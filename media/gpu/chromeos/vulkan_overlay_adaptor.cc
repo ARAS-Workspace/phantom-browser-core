@@ -917,10 +917,6 @@ std::unique_ptr<VulkanOverlayAdaptor> VulkanOverlayAdaptor::Create(
 
   VkFormat out_format =
       (format == kMT2T
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION) && \
-    defined(ARCH_CPU_ARM_FAMILY)
-       && base::FeatureList::IsEnabled(media::kEnableArmHwdrm10bitOverlays)
-#endif
            )
           ? VK_FORMAT_A2R10G10B10_UNORM_PACK32
           : VK_FORMAT_B8G8R8A8_UNORM;

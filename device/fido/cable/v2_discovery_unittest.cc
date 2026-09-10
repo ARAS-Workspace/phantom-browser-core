@@ -29,12 +29,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/test/scoped_feature_list.h"
-#include "device/bluetooth/bluetooth_low_energy_scan_filter.h"
-#include "device/bluetooth/floss/floss_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_MAC)
 #include "device/fido/mac/util.h"
 #endif
@@ -302,28 +296,5 @@ TEST_F(CableV2DiscoveryTest, TestResumeDiscoveryAfterPoweredOn) {
   task_environment().FastForwardUntilNoTasksRemain();
   EXPECT_TRUE(mock_tunnel_server().create_called_);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests regular successful discovery flow for Cable device on Floss.
-TEST_F(CableV2DiscoveryTest, TestDiscoveryFindsNewDeviceFloss) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(floss::features::kFlossEnabled);
-
-  NiceMock<MockFidoDiscoveryObserver> mock_observer;
-  EXPECT_CALL(
-      mock_observer,
-      DiscoveryStarted(discovery(), true, std::vector<FidoAuthenticator*>()));
-  EXPECT_CALL(mock_observer, AuthenticatorAdded(_, _));
-  discovery()->set_observer(&mock_observer);
-
-  auto mock_adapter = CableMockBluetoothAdapter::MakePoweredOn();
-  mock_adapter->ExpectLEScan(GetV2Advert());
-
-  BluetoothAdapterFactory::SetAdapterForTesting(mock_adapter);
-  discovery()->Start();
-  task_environment().FastForwardUntilNoTasksRemain();
-  EXPECT_TRUE(mock_tunnel_server().create_called_);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace device::cablev2

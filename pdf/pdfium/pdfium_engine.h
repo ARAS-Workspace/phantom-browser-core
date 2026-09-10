@@ -60,10 +60,6 @@
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/geometry/vector2d.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "pdf/flatten_pdf_result.h"
-#endif
-
 #if BUILDFLAG(ENABLE_PDF_INK2)
 #include "pdf/pdf_ink_ids.h"
 #include "pdf/pdf_ink_metrics_handler.h"

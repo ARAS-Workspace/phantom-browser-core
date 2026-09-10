@@ -75,11 +75,7 @@ TEST_F(CacheUtilTest, MoveCache) {
   EXPECT_TRUE(base::PathExists(dest_file1_));
   EXPECT_TRUE(base::PathExists(dest_file2_));
   EXPECT_TRUE(base::PathExists(dest_dir1_));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(base::PathExists(cache_dir_)); // old cache dir stays
-#else
   EXPECT_FALSE(base::PathExists(cache_dir_)); // old cache is gone
-#endif
   EXPECT_FALSE(base::PathExists(file1_));
   EXPECT_FALSE(base::PathExists(file2_));
   EXPECT_FALSE(base::PathExists(dir1_));
@@ -131,13 +127,6 @@ TEST_F(CacheUtilTest, CleanupDirectory) {
           base::SafeBaseName::Create(path);
       ASSERT_EQ(dirname, tmp_dir_.GetPath());
       ASSERT_TRUE(basename.has_value());
-#if BUILDFLAG(IS_CHROMEOS)
-      if (basename->path().value() == FILE_PATH_LITERAL("Cache")) {
-        // See the comment above.
-        ASSERT_TRUE(base::IsDirectoryEmpty(dirname.Append(*basename)));
-        continue;
-      }
-#endif
       ASSERT_EQ(basename->path().value(), FILE_PATH_LITERAL("old_Cache_000"));
       found = true;
     }

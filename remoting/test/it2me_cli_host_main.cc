@@ -12,9 +12,9 @@
 #include "remoting/host/resources.h"
 #include "remoting/test/it2me_cli_host.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/linux_util.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 int main(int argc, char const* argv[]) {
   base::AtExitManager exitManager;
@@ -25,11 +25,11 @@ int main(int argc, char const* argv[]) {
     return 0;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Need to prime the host OS version value for linux to prevent IO on the
   // network thread. base::GetLinuxDistro() caches the result.
   base::GetLinuxDistro();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   base::SingleThreadTaskExecutor io_task_executor(base::MessagePumpType::IO);
   remoting::It2MeCliHost cli_host;

@@ -62,10 +62,6 @@ IN_PROC_BROWSER_TEST_F(MediaPickerUtilsTest,
   // The picker is created and is not modal to a tab or extension popup.
   ASSERT_TRUE(widget);
   ui::mojom::ModalType modal_type = widget->widget_delegate()->GetModalType();
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(modal_type, ui::mojom::ModalType::kSystem);
-#else
   EXPECT_EQ(modal_type, ui::mojom::ModalType::kNone);
-#endif
   widget->CloseNow();
 }

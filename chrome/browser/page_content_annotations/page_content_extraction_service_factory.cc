@@ -20,10 +20,6 @@
 #include "chrome/browser/page_content_annotations/android/page_content_extraction_tab_model_observer_android.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#endif
-
 namespace page_content_annotations {
 
 namespace {

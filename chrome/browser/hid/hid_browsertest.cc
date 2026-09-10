@@ -51,18 +51,7 @@
 #include "extensions/test/test_extension_dir.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/test/regular_logged_in_browser_test_mixin.h"
-#include "components/account_id/account_id.h"
-#include "components/account_id/account_id_literal.h"  // nogncheck
-#include "components/user_manager/user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/hid/hid_pinned_notification.h"
-#else
 #include "chrome/browser/hid/hid_status_icon.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 namespace {
 
@@ -197,11 +186,6 @@ class TestServiceWorkerConsoleObserver
       scoped_observation_{this};
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr auto kManagedUserAccountId =
-    AccountId::Literal::FromUserEmailGaiaId("example@example.com",
-                                            GaiaId::Literal("12345"));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 // Need to fill it with an url.
@@ -242,22 +226,11 @@ class WebHidExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
                                        extensions::ExtensionBrowserTest> {
  public:
   WebHidExtensionBrowserTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    // The user is created via RegularLoggedInBrowserTestMixin.
-    set_chromeos_user_ = false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void SetUpOnMainThread() override {
     InProcessBrowserTestMixinHostSupport<
         extensions::ExtensionBrowserTest>::SetUpOnMainThread();
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager::UserManager::Get()->SetUserPolicyStatus(
-        kManagedUserAccountId, /*is_managed=*/true, /*is_affiliated=*/true);
-    display_service_for_system_notification_ =
-        std::make_unique<NotificationDisplayServiceTester>(
-            /*profile=*/nullptr);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     mojo::PendingRemote<device::mojom::HidManager> hid_manager;
     hid_manager_.Bind(hid_manager.InitWithNewPipeAndPassReceiver());
@@ -324,28 +297,6 @@ class WebHidExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
 
   void SimulateClickOnSystemTrayIconButton(Browser* browser,
                                            const Extension* extension) {
-#if BUILDFLAG(IS_CHROMEOS)
-    auto* hid_pinned_notification = static_cast<HidPinnedNotification*>(
-        g_browser_process->hid_system_tray_icon());
-
-    auto* device_pinned_notification_renderer =
-        static_cast<DevicePinnedNotificationRenderer*>(
-            hid_pinned_notification->GetIconRendererForTesting());
-
-    auto expected_pinned_notification_id =
-        device_pinned_notification_renderer->GetNotificationId(
-            browser->GetProfile());
-    auto maybe_indicator_notification =
-        display_service_for_system_notification_->GetNotification(
-            expected_pinned_notification_id);
-    ASSERT_TRUE(maybe_indicator_notification);
-    EXPECT_TRUE(maybe_indicator_notification->pinned());
-    display_service_for_system_notification_->SimulateClick(
-        NotificationHandler::Type::TRANSIENT, expected_pinned_notification_id,
-        /*action_index=*/0, /*reply=*/std::nullopt);
-    auto* web_contents = browser->tab_strip_model()->GetActiveWebContents();
-    EXPECT_EQ(web_contents->GetURL(), "chrome://settings/content/hidDevices");
-#else
     // On non-ChromeOS platforms, as they use status icon and there isn't good
     // test infra to simulate click on the status icon button, so simulate the
     // click event by invoking ExecuteCommand of HidConnectionTracker directly.
@@ -366,16 +317,9 @@ class WebHidExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
         browser->tab_strip_model()->GetActiveWebContents()->GetURL(),
         "chrome://settings/content/siteDetails?site=chrome-extension%3A%2F%2F" +
             extension->id());
-#endif
   }
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::RegularLoggedInBrowserTestMixin logged_in_mixin_{&mixin_host_,
-                                                        kManagedUserAccountId};
-  std::unique_ptr<NotificationDisplayServiceTester>
-      display_service_for_system_notification_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   device::FakeHidManager hid_manager_;
 };

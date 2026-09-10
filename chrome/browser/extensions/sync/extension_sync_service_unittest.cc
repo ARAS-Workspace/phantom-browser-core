@@ -2201,7 +2201,6 @@ TEST_F(BlocklistedExtensionSyncServiceTest, InstallBlocklistedExtension) {
 }
 
 // Users should not be able to sign into transport mode on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 class ExtensionSyncServiceTransportModeTest : public ExtensionSyncServiceTest {
  public:
   ExtensionSyncServiceTransportModeTest() = default;
@@ -2463,7 +2462,6 @@ TEST_F(ExtensionSyncServiceTransportModeTest,
   EXPECT_THAT(signed_in_account_extensions,
               ::testing::ElementsAre(second_extension.get()));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Tests that, if disable reasons change during extension load, these are
 // properly handled and sent to the sync service.

@@ -101,14 +101,10 @@ bool LoadEGLGLES2Bindings(const base::FilePath& egl_library_path,
          /*overwrite=*/0);
   setenv(kTraceLibglesv2, gles_library_path.BaseName().value().c_str(),
          /*overwrite=*/0);
-#if BUILDFLAG(IS_CHROMEOS)
-  setenv(kTraceFile, "/tmp/gltrace.dat", /*overwrite=*/0);
-#else
   if (!getenv(kTraceFile)) {
     LOG(ERROR) << "egltrace requires valid TRACE_FILE environment variable but "
                   "none were found. Chrome will probably crash.";
   }
-#endif
 
   LOG(WARNING) << "Loading egltrace.so with TRACE_LIBEGL="
                << getenv(kTraceLibegl)

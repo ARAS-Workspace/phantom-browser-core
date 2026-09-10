@@ -33,14 +33,14 @@ int ThreadTypeToNiceValue(ThreadType thread_type);
 // Returns whether SetCurrentThreadType can set a thread as kRealtimeAudio.
 bool CanSetThreadTypeToRealtimeAudio();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Current thread id is cached in thread local storage for performance reasons.
 // In some rare cases it's important to invalidate that cache explicitly (e.g.
 // after going through clone() syscall which does not call pthread_atfork()
 // handlers).
 // This can only be called when the process is single-threaded.
 BASE_EXPORT void InvalidateTidCache();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Returns the ThreadPrioirtyForTest matching |nice_value| based on the
 // platform-specific implementation of kThreadTypeToNiceValueMapForTest.
@@ -53,19 +53,12 @@ int GetThreadNiceValue(PlatformThreadId id);
 
 bool SetThreadNiceFromType(PlatformThreadId thread_id, ThreadType thread_type);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void SetThreadTypeLinux(ProcessId process_id,
                         PlatformThreadId thread_id,
                         ThreadType thread_type);
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-void SetThreadTypeChromeOS(ProcessId process_id,
-                           PlatformThreadId thread_id,
-                           ThreadType thread_type);
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-inline constexpr auto SetThreadType = SetThreadTypeChromeOS;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 inline constexpr auto SetThreadType = SetThreadTypeLinux;
 #endif
 

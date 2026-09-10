@@ -9,7 +9,7 @@
 #include "build/build_config.h"
 #include "remoting/base/version.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/linux_util.h"
 #endif
 
@@ -24,8 +24,6 @@ std::string GetBuildVersion() {
 std::string GetOperatingSystemName() {
 #if BUILDFLAG(IS_APPLE)
   return "Mac";
-#elif BUILDFLAG(IS_CHROMEOS)
-  return "ChromeOS";
 #elif BUILDFLAG(IS_LINUX)
   return "Linux";
 #elif BUILDFLAG(IS_ANDROID)
@@ -38,7 +36,7 @@ std::string GetOperatingSystemName() {
 // Get the Operating System Version, removing the need to check for OS
 // definitions and keeps the format used consistent.
 std::string GetOperatingSystemVersion() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   return base::GetLinuxDistro();
 #else
   return base::SysInfo::OperatingSystemVersion();

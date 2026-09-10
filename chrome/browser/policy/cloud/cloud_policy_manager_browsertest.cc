@@ -35,15 +35,11 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/core/user_cloud_policy_manager_ash.h"
-#else
 #include "chrome/browser/net/system_network_context_manager.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
-#endif
 
 using content::BrowserThread;
 using testing::_;
@@ -175,10 +171,6 @@ class CloudPolicyManagerTest : public PlatformBrowserTest {
         g_browser_process->browser_policy_connector();
     connector->ScheduleServiceInitialization(0);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    policy_manager()->core()->client()->SetURLLoaderFactoryForTesting(
-        test_url_loader_factory_->GetSafeWeakWrapper());
-#else
     // Mock a signed-in user. This is used by the UserCloudPolicyStore to pass
     // the username to the UserCloudPolicyValidator.
     identity_test_env_ = std::make_unique<signin::IdentityTestEnvironment>();
@@ -191,7 +183,6 @@ class CloudPolicyManagerTest : public PlatformBrowserTest {
         std::make_unique<CloudPolicyClient>(
             connector->device_management_service(),
             test_url_loader_factory_->GetSafeWeakWrapper()));
-#endif
   }
 
   void TearDownOnMainThread() override {
@@ -200,15 +191,9 @@ class CloudPolicyManagerTest : public PlatformBrowserTest {
     identity_test_env_.reset();
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  UserCloudPolicyManagerAsh* policy_manager() {
-    return chrome_test_utils::GetProfile(this)->GetUserCloudPolicyManagerAsh();
-  }
-#else
   UserCloudPolicyManager* policy_manager() {
     return chrome_test_utils::GetProfile(this)->GetUserCloudPolicyManager();
   }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Register the client of the policy_manager() using a bogus auth token, and
   // returns once the registration gets a result back.
@@ -229,11 +214,7 @@ class CloudPolicyManagerTest : public PlatformBrowserTest {
     // Give a bogus OAuth token to the |policy_manager|. This should make its
     // CloudPolicyClient fetch the DMToken.
     CloudPolicyClient::RegistrationParameters parameters(
-#if BUILDFLAG(IS_CHROMEOS)
-        em::DeviceRegisterRequest::USER,
-#else
         em::DeviceRegisterRequest::BROWSER,
-#endif
         em::DeviceRegisterRequest::FLAVOR_USER_REGISTRATION);
     policy_manager()->core()->client()->Register(
         parameters, std::string() /* client_id */,
@@ -253,11 +234,7 @@ IN_PROC_BROWSER_TEST_F(CloudPolicyManagerTest, Register) {
         // Accept one register request. The initial request should not include
         // the reregister flag.
         em::DeviceRegisterRequest::Type expected_type =
-#if BUILDFLAG(IS_CHROMEOS)
-            em::DeviceRegisterRequest::USER;
-#else
             em::DeviceRegisterRequest::BROWSER;
-#endif
         RespondToRegisterWithSuccess(expected_type, /*expect_reregister=*/false,
                                      request, test_url_loader_factory_.get());
       }));
@@ -303,11 +280,7 @@ IN_PROC_BROWSER_TEST_F(CloudPolicyManagerTest, RegisterWithRetry) {
   test_url_loader_factory_->SetInterceptor(
       base::BindLambdaForTesting([&](const network::ResourceRequest& request) {
         em::DeviceRegisterRequest::Type expected_type =
-#if BUILDFLAG(IS_CHROMEOS)
-            em::DeviceRegisterRequest::USER;
-#else
             em::DeviceRegisterRequest::BROWSER;
-#endif
 
         // Accept one register request after failing once. The retry request
         // should set the reregister flag.

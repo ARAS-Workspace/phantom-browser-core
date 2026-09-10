@@ -15,11 +15,6 @@
 #include "components/sync/test/fake_server_network_resources.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/signin/identity_manager_factory.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
-#endif
-
 namespace browsing_data_counter_utils {
 
 class BrowsingDataCounterUtilsBrowserTest : public SyncTest {
@@ -35,11 +30,7 @@ class BrowsingDataCounterUtilsBrowserTest : public SyncTest {
 };
 
 // TODO(crbug.com/40935822): Test is flaky on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ShouldShowCookieException DISABLED_ShouldShowCookieException
-#else
 #define MAYBE_ShouldShowCookieException ShouldShowCookieException
-#endif
 IN_PROC_BROWSER_TEST_F(BrowsingDataCounterUtilsBrowserTest,
                        MAYBE_ShouldShowCookieException) {
   ASSERT_TRUE(SetupClients());
@@ -72,13 +63,11 @@ IN_PROC_BROWSER_TEST_F(BrowsingDataCounterUtilsBrowserTest,
   // Now that we're syncing, we should offer to retain the cookie.
   EXPECT_TRUE(ShouldShowCookieException(GetProfile(0)));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Pause sync.
   GetClient(0)->SignOutPrimaryAccount();
 
   // There's no point in showing the cookie exception.
   EXPECT_FALSE(ShouldShowCookieException(GetProfile(0)));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace browsing_data_counter_utils

@@ -39,12 +39,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/browser_delegate/browser_delegate.h"
-#include "chrome/browser/ash/system_web_apps/system_web_app_manager.h"
-#include "chrome/browser/ui/ash/system_web_apps/system_web_app_ui_utils.h"
-#endif
-
 namespace web_app {
 
 namespace {
@@ -164,20 +158,6 @@ content::WebContents* WebAppLaunchProcess::Run() {
       web_app_scope->GetScopeScore(launch_url) > 0
           ? LaunchUrlInScopeResult::kInScope
           : LaunchUrlInScopeResult::kNotInScope;
-#if BUILDFLAG(IS_CHROMEOS)
-  bool is_url_in_system_web_app_scope =
-      ash::GetSystemWebAppTypeForAppId(&*profile_, params_->app_id) &&
-      ash::SystemWebAppManager::Get(&*profile_)
-          ->GetSystemApp(
-              *ash::GetSystemWebAppTypeForAppId(&*profile_, params_->app_id)) &&
-      ash::SystemWebAppManager::Get(&*profile_)
-          ->GetSystemApp(
-              *ash::GetSystemWebAppTypeForAppId(&*profile_, params_->app_id))
-          ->IsUrlInSystemAppScope(launch_url);
-  if (is_url_in_system_web_app_scope) {
-    in_scope_result = LaunchUrlInScopeResult::kInScope;
-  }
-#endif
 
   if (in_scope_result == LaunchUrlInScopeResult::kNotInScope) {
     if (web_app_scope->scope().spec().back() == '/') {
@@ -198,17 +178,6 @@ content::WebContents* WebAppLaunchProcess::Run() {
     }
   }
   base::UmaHistogramEnumeration("WebApp.LaunchUrlIsInScope", in_scope_result);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // System Web Apps have their own launch code path.
-  std::optional<ash::SystemWebAppType> system_app_type =
-      ash::GetSystemWebAppTypeForAppId(&profile_.get(), params_->app_id);
-  if (system_app_type) {
-    ash::BrowserDelegate* browser = LaunchSystemWebAppImpl(
-        &profile_.get(), *system_app_type, launch_url, *params_);
-    return browser ? browser->GetActiveWebContents() : nullptr;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // During install, shortcut urls are required to be in-scope. But some users &
   // admins create custom shortcuts to launch weirdly configured apps with
@@ -423,11 +392,6 @@ BrowserWindowInterface* WebAppLaunchProcess::MaybeFindBrowserForLaunch() const {
     // we're specifically opening the app in the current tab, rather than a new
     // tab).
     int64_t display_id = display::kInvalidDisplayId;
-#if BUILDFLAG(IS_CHROMEOS)
-    if (params_->disposition != WindowOpenDisposition::CURRENT_TAB) {
-      display_id = display::Screen::Get()->GetDisplayForNewWindows().id();
-    }
-#endif
     return FindTabbedBrowser(&profile_.get(), display_id);
   }
 
@@ -459,9 +423,6 @@ BrowserWindowInterface* WebAppLaunchProcess::CreateBrowserForLaunch() {
       /*trusted_source=*/true, /*window_bounds=*/gfx::Rect(),
       /*profile=*/&profile_.get(),
       /*user_gesture*/ true);
-#if BUILDFLAG(IS_CHROMEOS)
-  browser_params.restore_id = params_->restore_id;
-#endif
   return CreateWebAppWindowMaybeWithHomeTab(params_->app_id,
                                             std::move(browser_params));
 }

@@ -834,7 +834,7 @@ class CallbackIpczChannelDelegate : public Channel::Delegate {
 // Note: While this test emulates sending behavior of old clients, it does not
 // emulate old receiving behaviors.
 TEST(ChannelTest, IpczHeaderCompatibilityTest) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   base::test::ScopedFeatureList scoped_feature_list;
   if (Channel::SupportsMultipleNotifiers()) {
     // The test constructs messages as if the feature is enabled. Enable the

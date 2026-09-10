@@ -33,16 +33,6 @@
 #include "ui/shell_dialogs/select_file_dialog.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/containers/to_vector.h"
-#include "chromeos/ash/components/dbus/hermes/hermes_euicc_client.h"
-#include "chromeos/ash/components/dbus/hermes/hermes_manager_client.h"
-#include "chromeos/ash/components/dbus/hermes/hermes_profile_client.h"
-#include "chromeos/ash/components/dbus/shill/shill_clients.h"
-#include "chromeos/ash/components/dbus/shill/shill_service_client.h"
-#include "chromeos/ash/components/network/managed_network_configuration_handler_impl.h"
-#include "third_party/cros_system_api/dbus/shill/dbus-constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 namespace {
 
@@ -301,74 +291,5 @@ IN_PROC_BROWSER_TEST_F(PinnedTabsResetTest, MAYBE_ResetPinnedTabs) {
   EXPECT_EQ(0, tab_strip_model->IndexOfFirstNonPinnedTab());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Returns the configured static name servers from `shill_properties`, or an
-// empty vector if no static name servers are configured.
-std::vector<std::string> GetStaticNameServersFromShillProperties(
-    const base::DictValue& shill_properties) {
-  const base::DictValue* static_ip_config =
-      shill_properties.FindDict(shill::kStaticIPConfigProperty);
-  if (!static_ip_config) {
-    return {};
-  }
-  const base::ListValue* nameservers =
-      static_ip_config->FindList(shill::kNameServersProperty);
-  if (!nameservers) {
-    return {};
-  }
-  return base::ToVector(*nameservers, [](const base::Value& nameserver) {
-    return nameserver.GetString();
-  });
-}
-
-// DnsConfigResetTest --------------------------------------------------------
-
-class DnsConfigResetTest : public InProcessBrowserTest,
-                           public ProfileResetterTestBase {
- protected:
-  void SetUpOnMainThread() override {
-    InProcessBrowserTest::SetUpOnMainThread();
-    resetter_ = std::make_unique<ProfileResetter>(browser()->GetProfile());
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(DnsConfigResetTest, ResetDnsConfigurations) {
-  ash::ShillServiceClient::TestInterface* shill_service_client =
-      ash::ShillServiceClient::Get()->GetTestInterface();
-
-  // DNS settings.
-  // Set the profile so this shows up as a configured network.
-  const std::string kWifi1Path = "/service/wifi1";
-  ash::NetworkHandler::Get()
-      ->managed_network_configuration_handler()
-      ->SetPolicy(::onc::ONC_SOURCE_DEVICE_POLICY, std::string(),
-                  base::ListValue(), base::DictValue());
-  // Set a static NameServers config.
-  base::DictValue static_ip_config;
-  base::ListValue name_servers;
-  name_servers.Append("8.8.3.1");
-  name_servers.Append("8.8.2.1");
-  name_servers.Append("0.0.0.0");
-  name_servers.Append("0.0.0.0");
-  static_ip_config.Set(shill::kNameServersProperty, std::move(name_servers));
-  shill_service_client->SetServiceProperty(
-      kWifi1Path, shill::kStaticIPConfigProperty,
-      base::Value(std::move(static_ip_config)));
-
-  // Verify that network exists and the custom name server has been applied.
-  const base::DictValue* shill_properties =
-      shill_service_client->GetServiceProperties(kWifi1Path);
-  ASSERT_TRUE(shill_properties);
-  EXPECT_THAT(GetStaticNameServersFromShillProperties(*shill_properties),
-              testing::ElementsAre("8.8.3.1", "8.8.2.1", "0.0.0.0", "0.0.0.0"));
-
-  ResetAndWait(ProfileResetter::DNS_CONFIGURATIONS);
-
-  // Check DNS settings have changed to expected defaults.
-  // Verify that the given network has it's NameServers field cleared.
-  EXPECT_THAT(GetStaticNameServersFromShillProperties(*shill_properties),
-              testing::IsEmpty());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

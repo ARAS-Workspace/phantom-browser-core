@@ -27,7 +27,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 
 class MockChromeSigninClient : public ChromeSigninClient {
  public:
@@ -268,7 +268,7 @@ TEST_P(ChromeSigninClientSignoutSourceTest, UserSignoutAllowed) {
 
 // TODO(crbug.com/40240718): Enable |ChromeSigninClientSignoutSourceTest| test
 // suite on Android.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 TEST_P(ChromeSigninClientSignoutSourceTest, UserSignoutDisallowed) {
   signin_metrics::ProfileSignout signout_source = GetParam();
 
@@ -358,4 +358,4 @@ INSTANTIATE_TEST_SUITE_P(AllSignoutSources,
                          ChromeSigninClientSignoutSourceTest,
                          testing::ValuesIn(kSignoutSources));
 
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)

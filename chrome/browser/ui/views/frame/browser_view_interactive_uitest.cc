@@ -45,11 +45,6 @@
 #include "chrome/test/base/interactive_test_utils.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/wm/window_pin_util.h"
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#endif
-
 using views::FocusManager;
 
 namespace {
@@ -106,7 +101,7 @@ IN_PROC_BROWSER_TEST_F(BrowserViewTest, FullscreenClearsFocus) {
 // Test that the view tree order is preserved after entering and exiting
 // immersive fullscreen. Immersive fullscreen is only supported on ChromeOS and
 // MacOS at this point in time.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(BrowserViewTest, ImmersiveFullscreenViewTreeOrder) {
   auto* const immersive_mode_controller =
       ImmersiveModeController::From(browser());
@@ -414,13 +409,7 @@ IN_PROC_BROWSER_TEST_F(BrowserViewTest, FullscreenShowBookmarkBar) {
       .Wait();
   EXPECT_FALSE(browser_view->GetTabStripVisible());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Bookmark bar in immersive fullscreen mode on ChromeOS is accessible and
-  // should be considered visible.
-  EXPECT_TRUE(browser_view->IsBookmarkBarVisible());
-#else
   EXPECT_FALSE(browser_view->IsBookmarkBarVisible());
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // Test toggling toolbar state in fullscreen mode would also affect bookmark
@@ -676,71 +665,3 @@ IN_PROC_BROWSER_TEST_F(BrowserViewTest, GetAccessibleTabModalDialogTitle) {
                                window_title, base::CompareCase::SENSITIVE));
 }
 #endif  // !BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_CHROMEOS)
-using BrowserViewLockedFullscreenTestChromeOS = BrowserViewTest;
-
-IN_PROC_BROWSER_TEST_F(BrowserViewLockedFullscreenTestChromeOS,
-                       ShowExclusiveAccessBubbleWhenNotLocked) {
-  ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/false);
-  browser()
-      ->GetFeatures()
-      .exclusive_access_manager()
-      ->context()
-      ->UpdateExclusiveAccessBubble(
-          {
-              .origin = url::Origin::Create(
-                  GURL("http://www.example.com")),  // Should be non-empty to
-                                                    // show bubble
-              .type = ExclusiveAccessBubbleType::
-                  EXCLUSIVE_ACCESS_BUBBLE_TYPE_FULLSCREEN_EXIT_INSTRUCTION,
-              .force_update = true,
-          },
-          base::NullCallback());
-  EXPECT_TRUE(browser_view()
-                  ->GetExclusiveAccessContext()
-                  ->IsExclusiveAccessBubbleDisplayed());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewLockedFullscreenTestChromeOS,
-                       HideExclusiveAccessBubbleWhenLocked) {
-  ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/true);
-  browser()
-      ->GetFeatures()
-      .exclusive_access_manager()
-      ->context()
-      ->UpdateExclusiveAccessBubble(
-          {.origin = url::Origin::Create(
-               GURL("http://www.example.com")),  // Should be non-empty to show
-                                                 // bubble
-           .type = ExclusiveAccessBubbleType::
-               EXCLUSIVE_ACCESS_BUBBLE_TYPE_FULLSCREEN_EXIT_INSTRUCTION,
-           .force_update = true},
-          base::NullCallback());
-  EXPECT_FALSE(browser_view()
-                   ->GetExclusiveAccessContext()
-                   ->IsExclusiveAccessBubbleDisplayed());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewLockedFullscreenTestChromeOS,
-                       EnableImmersiveModeWhenNotTrustedPinned) {
-  ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/false);
-  EXPECT_TRUE(ImmersiveModeController::From(browser())->IsEnabled());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewLockedFullscreenTestChromeOS,
-                       DisableImmersiveModeWhenNotLockedForOnTask) {
-  ash::boca::OnTaskLockedController::From(browser())->set_locked_for_on_task(
-      false);
-  ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/true);
-  EXPECT_FALSE(ImmersiveModeController::From(browser())->IsEnabled());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewLockedFullscreenTestChromeOS,
-                       EnableImmersiveModeWhenLockedForOnTask) {
-  ash::boca::OnTaskLockedController::From(browser())->set_locked_for_on_task(
-      true);
-  ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/true);
-  EXPECT_TRUE(ImmersiveModeController::From(browser())->IsEnabled());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)

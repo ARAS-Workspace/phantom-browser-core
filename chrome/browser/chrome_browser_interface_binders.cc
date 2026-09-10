@@ -88,7 +88,7 @@
 #include "third_party/blink/public/mojom/unhandled_tap_notifier/unhandled_tap_notifier.mojom.h"
 #endif  // BUILDFLAG(ENABLE_UNHANDLED_TAP)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/screen_ai/screen_ai_service_router.h"
 #include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
 #include "chrome/browser/web_applications/sub_apps/sub_apps_service_impl.h"
@@ -109,15 +109,8 @@
 #include "chrome/browser/web_applications/web_install_service_impl.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/digital_goods/digital_goods_factory_impl.h"
-#include "chrome/browser/speech/cros_speech_recognition_service_factory.h"
-#include "chromeos/ash/experiences/isolated_web_app/set_shape_service_impl.h"
-#include "third_party/blink/public/mojom/set_shape/set_shape.mojom.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/webshare/share_service_impl.h"
 #include "chrome/common/chrome_features.h"
 #endif
@@ -309,8 +302,6 @@ void BindSpeechRecognitionContextHandler(
   // Bind via the appropriate factory.
 #if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
   auto* factory = SpeechRecognitionServiceFactory::GetForProfile(profile);
-#elif BUILDFLAG(IS_CHROMEOS)
-  auto* factory = CrosSpeechRecognitionServiceFactory::GetForProfile(profile);
 #else
 #error "No speech recognition service factory on this platform."
 #endif
@@ -355,7 +346,7 @@ void BindOnDeviceSpeechRecognitionHandler(
       ->Bind(std::move(receiver));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 void BindScreenAIAnnotator(
     content::RenderFrameHost* frame_host,
     mojo::PendingReceiver<screen_ai::mojom::ScreenAIAnnotator> receiver) {
@@ -505,13 +496,7 @@ void PopulateChromeFrameBinders(
   }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  map->Add<payments::mojom::DigitalGoodsFactory>(
-      &apps::DigitalGoodsFactoryImpl::BindDigitalGoodsFactory);
-  map->Add<blink::mojom::SetShapeService>(&ash::SetShapeServiceImpl::Create);
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   map->Add<blink::mojom::ShareService>(&ShareServiceImpl::Create);
 #endif
 #if BUILDFLAG(IS_ANDROID)
@@ -532,7 +517,7 @@ void PopulateChromeFrameBinders(
       &BindSpeechRecognitionRecognizerClientHandler);
 #endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(blink::features::kSubApps) &&
       !render_frame_host->GetParentOrOuterDocument()) {
     // The service binder will reject non-primary main frames, but we still need

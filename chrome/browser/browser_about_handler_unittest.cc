@@ -34,10 +34,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/login/session/session_termination_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 using content::BrowserThread;
@@ -93,9 +89,6 @@ class BrowserAboutHandlerTest : public testing::Test {
   // specifically for testing environments to prevent test failures.
   void ResetBrowserExitState() {
     browser_shutdown::SetTryingToQuit(false);
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::SessionTerminationManager::SetSendStopRequestToSessionManager(false);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void SetBlockList(base::ListValue blocklist) {
@@ -191,12 +184,7 @@ TEST_F(BrowserAboutHandlerTest,
   EXPECT_TRUE(HandleNonNavigationAboutURL(url, profile()));
   task_environment()->RunUntilIdle();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_FALSE(browser_shutdown::IsTryingToQuit());
-#else
-  EXPECT_FALSE(
-      ash::SessionTerminationManager::IsSendingStopRequestToSessionManager());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST_F(BrowserAboutHandlerTest,
@@ -208,12 +196,7 @@ TEST_F(BrowserAboutHandlerTest,
   EXPECT_TRUE(HandleNonNavigationAboutURL(url, profile()));
   task_environment()->RunUntilIdle();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(browser_shutdown::IsTryingToQuit());
-#else
-  EXPECT_TRUE(
-      ash::SessionTerminationManager::IsSendingStopRequestToSessionManager());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   ResetBrowserExitState();
 }
 

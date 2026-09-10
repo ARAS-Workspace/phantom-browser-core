@@ -15,7 +15,7 @@
 
 namespace cookie_config {
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace {
 
 void OnOsCryptReadyOnUi(
@@ -130,12 +130,11 @@ std::unique_ptr<net::CookieCryptoDelegate> GetCookieCryptoDelegate(
                                                   ui_task_runner);
 }
 #else
-// BUILDFLAG(IS_CHROMEOS)
 std::unique_ptr<net::CookieCryptoDelegate> GetCookieCryptoDelegate(
     os_crypt_async::OSCryptAsync* os_crypt_async,
     scoped_refptr<base::SequencedTaskRunner> ui_task_runner) {
   return nullptr;
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace cookie_config

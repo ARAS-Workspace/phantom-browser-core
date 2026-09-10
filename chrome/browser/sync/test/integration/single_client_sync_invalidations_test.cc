@@ -686,7 +686,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSyncInvalidationsTest,
 }
 
 // ChromeOS doesn't have the concept of sign-out.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // TODO(crbug.com/40833316): Enable test on Android once signout is supported.
 #if BUILDFLAG(IS_ANDROID)
@@ -730,7 +729,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSyncInvalidationsTest,
       ServerDeviceInfoMatchChecker(Contains(HasInstanceIdToken(new_token)))
           .Wait());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientSyncInvalidationsTest,
                        RecordTransitLatencyHistograms) {

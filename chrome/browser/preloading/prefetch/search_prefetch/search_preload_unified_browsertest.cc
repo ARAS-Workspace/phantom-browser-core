@@ -2341,8 +2341,7 @@ IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest,
 // Tests that even when prerendering is not failed, users can open the
 // prefetched result in another tab and activate the prefetched response
 // successfully.
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) && \
-    defined(ADDRESS_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER)
 #define MAYBE_OpenPrefetchedResponseInBackgroundedTab \
   DISABLED_OpenPrefetchedResponseInBackgroundedTab
 #else

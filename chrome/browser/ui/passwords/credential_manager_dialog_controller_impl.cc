@@ -33,7 +33,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 std::u16string GetAuthenticationMessage(PasswordsModelDelegate* delegate) {
   std::u16string message;
   if (!delegate || !delegate->GetWebContents()) {
@@ -47,7 +47,7 @@ std::u16string GetAuthenticationMessage(PasswordsModelDelegate* delegate) {
       l10n_util::GetStringFUTF16(IDS_PASSWORD_MANAGER_FILLING_REAUTH, origin);
   return message;
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
 struct PasswordFormTraits {
   static std::u16string GetAccountName(
@@ -151,7 +151,7 @@ bool CredentialManagerDialogControllerImpl::ShouldShowFooter() const {
 void CredentialManagerDialogControllerImpl::OnChooseCredentials(
     const password_manager::PasswordForm& password_form,
     password_manager::CredentialType credential_type) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   if (delegate_->GetPasswordFeatureManager()
           ->IsBiometricAuthenticationBeforeFillingEnabled()) {
     delegate_->AuthenticateUserWithMessage(
@@ -168,7 +168,7 @@ void CredentialManagerDialogControllerImpl::OnChooseCredentials(
 
 void CredentialManagerDialogControllerImpl::OnSignInClicked() {
   CHECK_EQ(1u, local_credentials_.size());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   if (delegate_->GetPasswordFeatureManager()
           ->IsBiometricAuthenticationBeforeFillingEnabled()) {
     delegate_->AuthenticateUserWithMessage(

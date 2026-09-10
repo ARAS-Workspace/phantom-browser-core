@@ -31,13 +31,6 @@ class InterstitialUITest : public InProcessBrowserTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     InProcessBrowserTest::SetUpCommandLine(command_line);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // These tests use chrome:// URLs and are written on the assumption devtools
-    // are always available, so guarantee that assumption holds. Tests that
-    // check if devtools can be disabled should use a test fixture without the
-    // kForceDevToolsAvailable switch set.
-    command_line->AppendSwitch(switches::kForceDevToolsAvailable);
-#endif
   }
 
   void SetUpOnMainThread() override {

@@ -117,17 +117,6 @@ void CheckUserAgentStringOrdering(bool mobile_device) {
   ASSERT_LE(0, value);
   ASSERT_TRUE(base::StringToInt(pieces[2], &value));
   ASSERT_LE(0, value);
-#elif BUILDFLAG(IS_CHROMEOS)
-  // Post-UA Reduction there is a single <unifiedPlatform> value for ChromeOS:
-  // X11; CrOS x86_64 14541.0.0
-  ASSERT_EQ(2u, pieces.size());
-  ASSERT_EQ("X11", pieces[0]);
-  pieces = base::SplitStringUsingSubstr(pieces[1], " ", base::KEEP_WHITESPACE,
-                                        base::SPLIT_WANT_ALL);
-  ASSERT_EQ(3u, pieces.size());
-  ASSERT_EQ("CrOS", pieces[0]);
-  ASSERT_EQ("x86_64", pieces[1]);
-  ASSERT_EQ("14541.0.0", pieces[2]);
 #elif BUILDFLAG(IS_LINUX)
   // Post-UA Reduction there is a single <unifiedPlatform> value for Linux:
   // X11; Linux x86_64
@@ -232,9 +221,7 @@ class UserAgentUtilsTest : public testing::Test,
     // BUILDFLAG(IS_IOS).
     // This matches GetUnifiedPlatform().
     static const char* const kExpectedPlatform =
-#if BUILDFLAG(IS_CHROMEOS)
-        "X11; CrOS x86_64 14541.0.0";
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
         "X11; Linux x86_64";
 #elif BUILDFLAG(IS_MAC)
         "Macintosh; Intel Mac OS X 10_15_7";
@@ -545,12 +532,6 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
   EXPECT_EQ(metadata.platform, "iOS");
 #elif BUILDFLAG(IS_MAC)
   EXPECT_EQ(metadata.platform, "macOS");
-#elif BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  EXPECT_EQ(metadata.platform, "Chrome OS");
-#else
-  EXPECT_EQ(metadata.platform, "Chromium OS");
-#endif
 #elif BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(metadata.platform, "Android");
 #elif BUILDFLAG(IS_LINUX)
@@ -969,24 +950,6 @@ TEST_F(UserAgentUtilsTest, BuildOSCpuInfoFromOSVersionAndCpuType) {
         /*os_version=*/"VERSION",
         /*cpu_type=*/"CPU TYPE",
         /*expected_os_cpu_info=*/"CPU TYPE Mac OS X VERSION",
-    },
-#elif BUILDFLAG(IS_CHROMEOS)
-    {
-        /*os_version=*/"4537.56.0",
-        /*cpu_type=*/"armv7l",
-        /*expected_os_cpu_info=*/"CrOS armv7l 4537.56.0",
-    },
-    // These cases should never happen in real life, but may be useful to detect
-    // changes when things are refactored.
-    {
-        /*os_version=*/"",
-        /*cpu_type=*/"",
-        /*expected_os_cpu_info=*/"CrOS  ",
-    },
-    {
-        /*os_version=*/"VERSION",
-        /*cpu_type=*/"CPU TYPE",
-        /*expected_os_cpu_info=*/"CrOS CPU TYPE VERSION",
     },
 #elif BUILDFLAG(IS_ANDROID)
     {

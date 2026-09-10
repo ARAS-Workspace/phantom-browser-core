@@ -64,15 +64,6 @@
 #include "extensions/common/extension_features.h"
 #include "extensions/common/extensions_client.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_mode/kiosk_cryptohome_remover.h"
-#include "chrome/browser/ash/extensions/install_limiter.h"
-#include "chrome/browser/browser_process.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "components/user_manager/fake_user_manager_delegate.h"
-#include "components/user_manager/user_manager_impl.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -261,11 +252,6 @@ ExtensionServiceTestBase::ExtensionServiceTestBase()
 ExtensionServiceTestBase::ExtensionServiceTestBase(
     std::unique_ptr<content::BrowserTaskEnvironment> task_environment)
     : task_environment_(std::move(task_environment)),
-#if BUILDFLAG(IS_CHROMEOS)
-      user_manager_(std::make_unique<user_manager::UserManagerImpl>(
-          std::make_unique<user_manager::FakeUserManagerDelegate>(),
-          TestingBrowserProcess::GetGlobal()->local_state())),
-#endif
       verifier_format_override_(crx_file::VerifierFormat::CRX3) {
   base::FilePath test_data_dir;
   if (!base::PathService::Get(chrome::DIR_TEST_DATA, &test_data_dir)) {
@@ -439,19 +425,6 @@ void ExtensionServiceTestBase::SetUp() {
   ExtensionsClient::Get()->InitializeWebStoreUrls(
       base::CommandLine::ForCurrentProcess());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(b/308107135) own KioskController instead of KioskAppManager.
-  // A test might have initialized a `KioskAppManager` already.
-  if (!ash::KioskChromeAppManager::IsInitialized()) {
-    kiosk_cryptohome_remover_ = std::make_unique<ash::KioskCryptohomeRemover>(
-        TestingBrowserProcess::GetGlobal()->local_state());
-    kiosk_chrome_app_manager_ = std::make_unique<ash::KioskChromeAppManager>(
-        TestingBrowserProcess::GetGlobal()->local_state(),
-        TestingBrowserProcess::GetGlobal()->shared_url_loader_factory(),
-        kiosk_cryptohome_remover_.get());
-  }
-#endif
-
   if (ShouldAllowMV2Extensions()) {
     mv2_enabler_.emplace();
   }
@@ -468,9 +441,6 @@ void ExtensionServiceTestBase::TearDown() {
     }
   }
   policy_provider_.Shutdown();
-#if BUILDFLAG(IS_CHROMEOS)
-  kiosk_chrome_app_manager_.reset();
-#endif
   DeleteProfile();
   testing_profile_manager_.reset();
 }
@@ -541,15 +511,6 @@ void ExtensionServiceTestBase::CreateExtensionService(
       ExtensionPrefs::DelayReason::kWaitForImports,
       SharedModuleServiceFactory::GetForBrowserContext(profile()));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!enable_install_limiter) {
-    auto* install_limiter =
-        InstallLimiter::Get(profile()->GetOriginalProfile());
-    if (install_limiter) {
-      install_limiter->DisableForTest();
-    }
-  }
-#endif
 }
 
 }  // namespace extensions

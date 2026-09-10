@@ -29,14 +29,6 @@
 #include "extensions/common/extension.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_mode/kiosk_chrome_app_manager.h"
-#include "chrome/browser/ash/app_mode/kiosk_cryptohome_remover.h"
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "services/network/public/cpp/shared_url_loader_factory.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 class Profile;
@@ -207,12 +199,6 @@ class ExtensionServiceTestBase : public testing::Test {
   }
   policy::PolicyService* policy_service() { return policy_service_.get(); }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedCrosSettingsTestHelper& cros_settings_test_helper() {
-    return cros_settings_test_helper_;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
  private:
   void CreateExtensionService(bool is_first_run,
                               bool autoupdate_enabled,
@@ -251,13 +237,6 @@ class ExtensionServiceTestBase : public testing::Test {
   content::InProcessUtilityThreadHelper in_process_utility_thread_helper_;
 
   bool is_setup_called_ = false;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedCrosSettingsTestHelper cros_settings_test_helper_;
-  std::unique_ptr<ash::KioskCryptohomeRemover> kiosk_cryptohome_remover_;
-  std::unique_ptr<ash::KioskChromeAppManager> kiosk_chrome_app_manager_;
-  user_manager::ScopedUserManager user_manager_;
-#endif
 
   // The associated testing profile.
   std::unique_ptr<TestingProfileManager> testing_profile_manager_;

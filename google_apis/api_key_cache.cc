@@ -190,51 +190,6 @@ ApiKeyCache::ApiKeyCache(const DefaultApiKeys& default_api_keys)
       default_api_keys.allow_unset_values);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  api_key_sharing_ = CalculateKeyValue(
-      default_api_keys.google_api_key_sharing,
-      STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_SHARING), std::string(), nullptr,
-      std::string(), environment.get(), command_line, gaia_config,
-      default_api_keys.allow_override_via_environment,
-      default_api_keys.allow_unset_values);
-
-  api_key_read_aloud_ = CalculateKeyValue(
-      default_api_keys.google_api_key_read_aloud,
-      STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_READ_ALOUD), std::string(), nullptr,
-      std::string(), environment.get(), command_line, gaia_config,
-      default_api_keys.allow_override_via_environment,
-      default_api_keys.allow_unset_values);
-
-  api_key_fresnel_ = CalculateKeyValue(
-      default_api_keys.google_api_key_fresnel,
-      STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_FRESNEL), std::string(), nullptr,
-      std::string(), environment.get(), command_line, gaia_config,
-      default_api_keys.allow_override_via_environment,
-      default_api_keys.allow_unset_values);
-
-  api_key_boca_ = CalculateKeyValue(
-      default_api_keys.google_api_key_boca,
-      STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_BOCA), std::string(), nullptr,
-      std::string(), environment.get(), command_line, gaia_config,
-      default_api_keys.allow_override_via_environment,
-      default_api_keys.allow_unset_values);
-
-  api_key_cros_system_geo_ = CalculateKeyValue(
-      default_api_keys.google_api_key_cros_system_geo_,
-      STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_CROS_SYSTEM_GEO), std::string(),
-      nullptr, std::string(), environment.get(), command_line, gaia_config,
-      default_api_keys.allow_override_via_environment,
-      default_api_keys.allow_unset_values);
-
-  api_key_cros_chrome_geo_ = CalculateKeyValue(
-      default_api_keys.google_api_key_cros_chrome_geo_,
-      STRINGIZE_NO_EXPANSION(GOOGLE_API_KEY_CROS_CHROME_GEO), std::string(),
-      nullptr, std::string(), environment.get(), command_line, gaia_config,
-      default_api_keys.allow_override_via_environment,
-      default_api_keys.allow_unset_values);
-
-#endif
-
   metrics_key_ = CalculateKeyValue(
       default_api_keys.google_metrics_signing_key,
       STRINGIZE_NO_EXPANSION(GOOGLE_METRICS_SIGNING_KEY), std::string(),

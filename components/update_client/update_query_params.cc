@@ -25,8 +25,6 @@ constexpr std::string_view kOs =
     "mac";
 #elif BUILDFLAG(IS_ANDROID)
     "android";
-#elif BUILDFLAG(IS_CHROMEOS)
-    "cros";
 #elif BUILDFLAG(IS_LINUX)
     "linux";
 #elif BUILDFLAG(IS_OPENBSD)

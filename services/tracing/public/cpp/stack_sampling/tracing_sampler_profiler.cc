@@ -261,10 +261,7 @@ struct FrameDetails {
 };
 
 #if BUILDFLAG(IS_APPLE) || ANDROID_ARM64_UNWINDING_SUPPORTED || \
-    ANDROID_CFI_UNWINDING_SUPPORTED ||                          \
-    (BUILDFLAG(IS_CHROMEOS) &&                                  \
-     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))) ||  \
-    BUILDFLAG(IS_LINUX)
+    ANDROID_CFI_UNWINDING_SUPPORTED || BUILDFLAG(IS_LINUX)
 // Returns whether stack sampling is supported on the current platform.
 bool IsStackSamplingSupported() {
   return base::StackSamplingProfiler::IsSupportedForCurrentPlatform();
@@ -384,12 +381,12 @@ void TracingSamplerProfiler::TracingProfileBuilder::WriteSampleToTrace(
     thread_descriptor->set_reference_timestamp_us(
         last_timestamp_.since_origin().InMicroseconds());
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
     if (base::GetCurrentProcId() != perfetto::Platform::GetCurrentProcessId()) {
       auto* chrome_thread = track_descriptor->set_chrome_thread();
       chrome_thread->set_is_sandboxed_tid(true);
     }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_AIX)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 
     TRACE_EVENT_INSTANT(TRACE_DISABLED_BY_DEFAULT("cpu_profiler"),
                         UnwinderTypeToString(unwinder_type_));
@@ -652,10 +649,7 @@ void TracingSamplerProfiler::RegisterDataSource() {
 // static
 bool TracingSamplerProfiler::IsStackUnwindingSupportedForTesting() {
 #if BUILDFLAG(IS_APPLE) || ANDROID_ARM64_UNWINDING_SUPPORTED || \
-    ANDROID_CFI_UNWINDING_SUPPORTED ||                          \
-    (BUILDFLAG(IS_CHROMEOS) &&                                  \
-     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))) ||  \
-    BUILDFLAG(IS_LINUX)
+    ANDROID_CFI_UNWINDING_SUPPORTED || BUILDFLAG(IS_LINUX)
   return IsStackSamplingSupported();
 #else
   return false;

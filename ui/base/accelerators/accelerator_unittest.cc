@@ -155,22 +155,4 @@ TEST_F(AcceleratorTestMac, FunctionModifierUsesGlobeWhenGlobeKeyAvailable) {
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(AcceleratorTest, ConversionFromKeyEvent_Ash) {
-  ui::KeyEvent key_event(ui::EventType::kKeyPressed, ui::VKEY_F,
-                         ui::EF_ALT_DOWN | ui::EF_CONTROL_DOWN);
-  Accelerator accelerator(key_event);
-
-  EXPECT_EQ(accelerator.key_code(), ui::VKEY_F);
-  EXPECT_EQ(accelerator.modifiers(), ui::EF_ALT_DOWN | ui::EF_CONTROL_DOWN);
-
-  // Code is set when converting from a KeyEvent.
-  EXPECT_EQ(accelerator.code(), DomCode::US_F);
-
-  // Test resetting code.
-  accelerator.reset_code();
-  EXPECT_EQ(accelerator.code(), DomCode::NONE);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace ui

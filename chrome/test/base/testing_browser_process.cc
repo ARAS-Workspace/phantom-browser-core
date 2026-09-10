@@ -86,25 +86,13 @@
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/hid/hid_pinned_notification.h"
-#include "chrome/browser/usb/usb_pinned_notification.h"
-#else
 #include "chrome/browser/hid/hid_status_icon.h"
 #include "chrome/browser/usb/usb_status_icon.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/web_applications/isolated_web_apps/runtime_init.h"
 #include "components/component_updater/component_updater_service.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
-#include "chrome/browser/media_galleries/media_file_system_registry.h"
-#endif
 
 #if BUILDFLAG(ENABLE_CHROME_NOTIFICATIONS)
 #include "chrome/browser/notifications/notification_ui_manager.h"
@@ -318,13 +306,8 @@ void TestingBrowserProcess::Init() {
   web_app::InitializeIsolatedWebAppRuntime(
       base::PassKey<TestingBrowserProcess>());
   KeepAliveRegistry::GetInstance()->SetIsShuttingDown(false);
-#if BUILDFLAG(IS_CHROMEOS)
-  hid_system_tray_icon_ = std::make_unique<HidPinnedNotification>();
-  usb_system_tray_icon_ = std::make_unique<UsbPinnedNotification>();
-#else
   hid_system_tray_icon_ = std::make_unique<HidStatusIcon>();
   usb_system_tray_icon_ = std::make_unique<UsbStatusIcon>();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
 }
 
@@ -425,13 +408,8 @@ TestingBrowserProcess::browser_policy_connector() {
         chrome::DIR_POLICY_FILES, local_policy_path, true, false));
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-    browser_policy_connector_ =
-        std::make_unique<policy::BrowserPolicyConnectorAsh>();
-#else
     browser_policy_connector_ =
         std::make_unique<policy::ChromeBrowserPolicyConnector>();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     // Note: creating the ChromeBrowserPolicyConnector invokes BrowserThread::
     // GetTaskRunnerForThread(), which initializes a base::LazyInstance of
@@ -615,15 +593,6 @@ TestingBrowserProcess::component_updater() {
 #endif
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-MediaFileSystemRegistry* TestingBrowserProcess::media_file_system_registry() {
-  if (!media_file_system_registry_) {
-    media_file_system_registry_ = std::make_unique<MediaFileSystemRegistry>();
-  }
-  return media_file_system_registry_.get();
-}
-#endif
-
 network_time::NetworkTimeTracker*
 TestingBrowserProcess::network_time_tracker() {
   if (!network_time_tracker_) {
@@ -768,7 +737,7 @@ void TestingBrowserProcess::MaybeStartTearDown() {
 
 void TestingBrowserProcess::ShutdownBrowserPolicyConnector() {
   if (browser_policy_connector_) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
     // Initial cleanup for ChromeBrowserCloudManagement, shutdown components
     // that depend on profile and notification system. For example,
     // ProfileManager observer and KeyServices observer need to be removed

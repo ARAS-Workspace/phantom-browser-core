@@ -19,7 +19,7 @@
 #include "components/device_event_log/device_event_log.h"
 #include "services/device/public/cpp/device_features.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <asm-generic/ioctls.h>
 #include <linux/serial.h>
 
@@ -38,7 +38,7 @@ struct termios2 {
 };
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC)
 #include <IOKit/serial/ioss.h>
@@ -84,7 +84,7 @@ bool BitrateToSpeedConstant(int bitrate, speed_t* speed) {
 #undef BITRATE_TO_SPEED_CASE
 }
 
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_LINUX)
 // Convert a known nominal speed into an integral bitrate. Returns |true|
 // if the conversion was successful and |false| otherwise.
 bool SpeedConstantToBitrate(speed_t speed, int* bitrate) {
@@ -158,7 +158,7 @@ void SerialIoHandlerPosix::CancelWriteImpl() {
 }
 
 bool SerialIoHandlerPosix::ConfigurePortImpl() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   struct termios2 config;
   if (ioctl(file().GetPlatformFile(), TCGETS2, &config) < 0) {
 #else
@@ -185,7 +185,7 @@ bool SerialIoHandlerPosix::ConfigurePortImpl() {
   bool need_iossiospeed = false;
 #endif
   if (BitrateToSpeedConstant(options().bitrate, &bitrate_opt)) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     config.c_cflag &= ~CBAUD;
     config.c_cflag |= bitrate_opt;
 #else
@@ -194,7 +194,7 @@ bool SerialIoHandlerPosix::ConfigurePortImpl() {
 #endif
   } else {
     // Attempt to set a custom speed.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     config.c_cflag &= ~CBAUD;
     config.c_cflag |= CBAUDEX;
     config.c_ispeed = config.c_ospeed = options().bitrate;
@@ -266,7 +266,7 @@ bool SerialIoHandlerPosix::ConfigurePortImpl() {
     config.c_cflag &= ~CRTSCTS;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (ioctl(file().GetPlatformFile(), TCSETS2, &config) < 0) {
 #else
   if (tcsetattr(file().GetPlatformFile(), TCSANOW, &config) != 0) {
@@ -297,12 +297,7 @@ bool SerialIoHandlerPosix::PostOpen() {
     return false;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // The Chrome OS permission broker does not open devices in async mode.
-  return base::SetNonBlocking(file().GetPlatformFile());
-#else
   return true;
-#endif
 }
 
 void SerialIoHandlerPosix::PreClose() {
@@ -548,7 +543,7 @@ bool SerialIoHandlerPosix::SetControlSignals(
 }
 
 mojom::SerialConnectionInfoPtr SerialIoHandlerPosix::GetPortInfo() const {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   struct termios2 config;
   if (ioctl(file().GetPlatformFile(), TCGETS2, &config) < 0) {
 #else
@@ -560,7 +555,7 @@ mojom::SerialConnectionInfoPtr SerialIoHandlerPosix::GetPortInfo() const {
   }
 
   auto info = mojom::SerialConnectionInfo::New();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Linux forces c_ospeed to contain the correct value, which is nice.
   info->bitrate = config.c_ospeed;
 #else

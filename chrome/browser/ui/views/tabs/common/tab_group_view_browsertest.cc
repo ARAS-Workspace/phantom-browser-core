@@ -321,7 +321,7 @@ IN_PROC_BROWSER_TEST_F(TabGroupViewTest, MousePressFalseWhileEditorBubbleOpen) {
   EXPECT_FALSE(tab_group_header->OnMousePressed(mouse_press_event));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_EditorBubbleOpensOnEditorBubbleButtonPress \
   EditorBubbleOpensOnEditorBubbleButtonPress
 #else

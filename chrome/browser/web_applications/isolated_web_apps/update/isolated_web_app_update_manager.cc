@@ -66,12 +66,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_mode/isolated_web_app/kiosk_iwa_policy_util.h"
-#include "chrome/browser/web_applications/isolated_web_apps/update/isolated_web_app_update_notification_service.h"
-#include "chromeos/components/kiosk/kiosk_utils.h"
-#endif
-
 namespace web_app {
 
 IsolatedWebAppUpdateOptions::IsolatedWebAppUpdateOptions() = default;
@@ -191,22 +185,6 @@ IwaBundleIdToUpdateOptionsMap GetForceInstalledPolicyIsolatedWebApps(
   return result;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IwaBundleIdToUpdateOptionsMap GetKioskPolicyIsolatedWebApps() {
-  IwaBundleIdToUpdateOptionsMap result;
-  std::optional<ash::KioskIwaUpdateData> kiosk_iwa_policy_data =
-      ash::GetCurrentKioskIwaUpdateData();
-  if (kiosk_iwa_policy_data) {
-    result[kiosk_iwa_policy_data->web_bundle_id] =
-        IsolatedWebAppUpdateOptions(kiosk_iwa_policy_data->update_manifest_url,
-                                    kiosk_iwa_policy_data->update_channel,
-                                    kiosk_iwa_policy_data->allow_downgrades,
-                                    kiosk_iwa_policy_data->pinned_version);
-  }
-  return result;
-}
-#endif
-
 IwaBundleIdToUpdateOptionsMap GetIsolatedWebAppsWithOnlyUserManagement(
     Profile* profile) {
   IwaBundleIdToUpdateOptionsMap result;
@@ -234,13 +212,6 @@ IwaBundleIdToUpdateOptionsMap GetIsolatedWebAppsWithOnlyUserManagement(
 
 IwaBundleIdToUpdateOptionsMap GetBundleIdToIsolatedWebAppsUpdateOptionsMap(
     Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // DeviceLocalAccounts policy defines an IWA used in kiosk mode.
-  // IsolatedWebAppInstallForceList is used in other session types.
-  if (chromeos::IsKioskSession()) {
-    return GetKioskPolicyIsolatedWebApps();
-  }
-#endif
   IwaBundleIdToUpdateOptionsMap result =
       GetIsolatedWebAppsWithOnlyUserManagement(profile);
 
@@ -379,11 +350,6 @@ void IsolatedWebAppUpdateManager::Start() {
   }
 
   has_started_ = true;
-#if BUILDFLAG(IS_CHROMEOS)
-  update_notification_service_ =
-      std::make_unique<IsolatedWebAppUpdateNotificationService>(*profile_,
-                                                                *provider_);
-#endif
   install_manager_observation_.Observe(&provider_->install_manager());
   runtime_data_changed_subscription_ =
       IwaRuntimeDataProvider::GetInstance().OnRuntimeDataChanged(
@@ -465,9 +431,6 @@ void IsolatedWebAppUpdateManager::Shutdown() {
   next_update_discovery_check_.Reset();
   task_queue_.Clear();
   update_apply_waiters_.clear();
-#if BUILDFLAG(IS_CHROMEOS)
-  update_notification_service_.reset();
-#endif
 }
 
 base::Value IsolatedWebAppUpdateManager::AsDebugValue() const {
@@ -730,12 +693,6 @@ void IsolatedWebAppUpdateManager::CreateUpdateApplyWaiter(
       base::BindOnce(&IsolatedWebAppUpdateManager::OnUpdateApplyWaiterFinished,
                      weak_factory_.GetWeakPtr(), url_info,
                      std::move(on_update_apply_task_created)));
-#if BUILDFLAG(IS_CHROMEOS)
-  if (provider_->ui_manager().GetNumWindowsForApp(app_id) > 0 &&
-      update_notification_service_) {
-    update_notification_service_->ShowUpdatePendingNotification(app_id);
-  }
-#endif
 }
 
 void IsolatedWebAppUpdateManager::OnUpdateDiscoverAndPrepareTaskCompleted(
@@ -785,11 +742,6 @@ void IsolatedWebAppUpdateManager::OnUpdateApplyWaiterFinished(
     base::OnceClosure on_update_apply_task_created,
     std::unique_ptr<ScopedKeepAlive> keep_alive,
     std::unique_ptr<ScopedProfileKeepAlive> profile_keep_alive) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (update_notification_service_) {
-    update_notification_service_->CloseNotification(url_info.app_id());
-  }
-#endif
   update_apply_waiters_.erase(url_info.app_id());
 
   task_queue_.Push(std::make_unique<IsolatedWebAppUpdateApplyTask>(

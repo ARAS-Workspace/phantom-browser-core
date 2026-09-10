@@ -1297,14 +1297,14 @@ class WebUIToolbarViewsLocationBarInteractiveUiTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
 #define MAYBE_DragLocationIcon DragLocationIcon
 #else
 #define MAYBE_DragLocationIcon DISABLED_DragLocationIcon
 #endif
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_DragLocationIcon) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url = embedded_test_server()->GetURL("/title1.html");
 
   std::unique_ptr<TestDragDropClient> drag_drop_client;
@@ -1351,10 +1351,10 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
             .SetInputStateLookup(aura::InputStateLookup::Create());
         drag_drop_client.reset();
       })));
-#endif  // defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // defined(USE_AURA)
 }
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
 #define MAYBE_DragTextFromWebUIOmnibox DragTextFromWebUIOmnibox
 #define MAYBE_DragUrlFromWebUIOmnibox DragUrlFromWebUIOmnibox
 #define MAYBE_DragJavascriptFromWebUIOmnibox DragJavascriptFromWebUIOmnibox
@@ -1373,7 +1373,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_DragTextFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url = embedded_test_server()->GetURL("/title1.html");
 
   RunTestSequence(
@@ -1424,7 +1424,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_DragUrlFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url = embedded_test_server()->GetURL("/title2.html");
 
   RunTestSequence(
@@ -1480,7 +1480,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_DragJavascriptFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url = embedded_test_server()->GetURL("/title1.html");
   const std::string js_to_drag = "javascript:alert(1)";
 
@@ -1530,7 +1530,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_DragChromeUrlFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url("chrome://version/");
   const std::string chrome_url_to_drag = "chrome://version/";
 
@@ -1582,7 +1582,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_DragPartialUrlFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url =
       embedded_test_server()->GetURL("a.test", "/title1.html");
 
@@ -1641,7 +1641,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 // TODO(crbug.com/538459286): Flaky on MSan due to clipboard synchronization
 // timeouts.
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS) && !defined(MEMORY_SANITIZER)
+#if defined(USE_AURA) && !defined(MEMORY_SANITIZER)
 #define MAYBE_CopyTextFromWebUIOmnibox CopyTextFromWebUIOmnibox
 #define MAYBE_CopyUrlFromWebUIOmnibox CopyUrlFromWebUIOmnibox
 #define MAYBE_CutUrlFromWebUIOmnibox CutUrlFromWebUIOmnibox
@@ -1662,7 +1662,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_CopyTextFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const char kAdjustTextScript[] = R"(
     (el) => {
       el.focus();
@@ -1682,7 +1682,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_CopyUrlFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url = embedded_test_server()->GetURL("/title1.html");
   RunTestSequence(RunClipboardSetTest(kClipboardOp::kCopy, initial_url,
                                       "title1",
@@ -1694,7 +1694,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_CutUrlFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url = embedded_test_server()->GetURL("/title1.html");
   RunTestSequence(RunClipboardSetTest(kClipboardOp::kCut, initial_url, "title1",
                                       "(el) => { el.focus(); el.select(); }",
@@ -1707,7 +1707,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_CopyJavascriptFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const char kAdjustTextTemplate[] = R"(
     (el) => {
       el.focus();
@@ -1729,7 +1729,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_CopyChromeUrlFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const std::string chrome_url_to_copy = "chrome://version/";
   RunTestSequence(RunClipboardSetTest(kClipboardOp::kCopy,
                                       GURL("chrome://version/"), "version",
@@ -1741,7 +1741,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarViewsLocationBarInteractiveUiTest,
                        MAYBE_CopyPartialUrlFromWebUIOmnibox) {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   const GURL initial_url =
       embedded_test_server()->GetURL("a.test", "/title1.html");
   RunTestSequence(RunClipboardSetTest(
@@ -1925,17 +1925,6 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarFocusMinimalInteractiveUiTest,
   // Focus is now in the C++ Omnibox. Escaping it via simulated Tab keys is
   // highly unstable in headless environments, so we programmatically set
   // pane focus on the Profile (Avatar) button instead.
-#if BUILDFLAG(IS_CHROMEOS)
-      // ChromeOS has no avatar button, so use app menu instead.
-      Do(base::BindLambdaForTesting([this]() {
-        auto* view =
-            GetViewForIdentifier(browser(), kToolbarAppMenuButtonElementId);
-        BrowserView::GetBrowserViewForBrowser(browser())
-            ->toolbar()
-            ->SetPaneFocus(view);
-      })),
-      ExpectFocusedView(kToolbarAppMenuButtonElementId),
-#else
       Do(base::BindLambdaForTesting([this]() {
         auto* view =
             GetViewForIdentifier(browser(), kToolbarAvatarButtonElementId);
@@ -1948,7 +1937,6 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarFocusMinimalInteractiveUiTest,
       // 10. ArrowRight -> Chrome Menu (Views).
       SendKeyPress(kToolbarAvatarButtonElementId, ui::VKEY_RIGHT),
       ExpectFocusedView(kToolbarAppMenuButtonElementId),
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
       // 11. ArrowRight -> Back (WebUI, wrap-around!).
       SendKeyPress(kToolbarAppMenuButtonElementId, ui::VKEY_RIGHT),
@@ -1959,13 +1947,11 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarFocusMinimalInteractiveUiTest,
       SendKeyPress(WebUIToolbarId(), ui::VKEY_LEFT),
       ExpectFocusedView(kToolbarAppMenuButtonElementId),
 
-#if !BUILDFLAG(IS_CHROMEOS)
       // Skip for ChromeOS which has no profile button.
 
       // 13. ArrowLeft -> Profile (Views).
       SendKeyPress(kToolbarAppMenuButtonElementId, ui::VKEY_LEFT),
       ExpectFocusedView(kToolbarAvatarButtonElementId),
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
       // 14. Test Home and End keys.
       // Focus WebUI WebView in C++ to ensure it has active pane focus before
@@ -2100,13 +2086,6 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarFocusFullInteractiveUiTest,
                   "el => el.focus()"),
       ExpectFocusedWebUIElement("pinnedToolbarActions"),
 
-#if BUILDFLAG(IS_CHROMEOS)
-      // ChromeOS has no profile button, so skip to Chrome menu.
-
-      // 8. ArrowRight -> Chrome Menu (Views).
-      SendKeyPress(WebUIToolbarId(), ui::VKEY_RIGHT),
-      ExpectFocusedView(kToolbarAppMenuButtonElementId),
-#else
       // 8. ArrowRight -> Profile (Views).
       // Since Extensions is hidden in the test profile, focus goes directly to
       // Profile.
@@ -2116,7 +2095,6 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarFocusFullInteractiveUiTest,
       // 10. ArrowRight -> Chrome Menu (Views).
       SendKeyPress(kToolbarAvatarButtonElementId, ui::VKEY_RIGHT),
       ExpectFocusedView(kToolbarAppMenuButtonElementId),
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
       // 11. ArrowRight -> Back (WebUI, wrap-around!).
       SendKeyPress(kToolbarAppMenuButtonElementId, ui::VKEY_RIGHT),

@@ -436,9 +436,7 @@ void MetricsLog::RecordCoreSystemProfile(
 
 // On ChromeOS, KernelVersion refers to the Linux kernel version and
 // OperatingSystemVersion refers to the ChromeOS release version.
-#if BUILDFLAG(IS_CHROMEOS)
-  os->set_kernel_version(base::SysInfo::KernelVersion());
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // Linux operating system version is copied over into kernel version to be
   // consistent.
   os->set_kernel_version(base::SysInfo::OperatingSystemVersion());
@@ -654,12 +652,5 @@ void MetricsLog::TruncateEvents() {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void MetricsLog::SetUserId(const std::string& user_id) {
-  uint64_t hashed_user_id = Hash(user_id);
-  uma_proto_.set_user_id(hashed_user_id);
-  log_metadata_.user_id = hashed_user_id;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace metrics

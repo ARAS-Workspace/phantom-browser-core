@@ -442,7 +442,7 @@ DEFINE_IPC_CHANNEL_MOJO_TEST_CLIENT_WITH_CUSTOM_FIXTURE(DropAssociatedRequest,
   DestroyProxy();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 const base::ProcessId kMagicChildId = 54321;
 
@@ -486,7 +486,7 @@ DEFINE_IPC_CHANNEL_MOJO_TEST_CLIENT(IPCChannelTestVerifyGlobalPidClient) {
   Close();
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 class ListenerWithUrgentMessageAssociatedInterface
     : public IPC::mojom::InterfaceWithUrgentMethod,

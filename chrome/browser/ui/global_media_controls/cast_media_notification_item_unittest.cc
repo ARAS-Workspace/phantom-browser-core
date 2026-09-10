@@ -125,19 +125,10 @@ class CastMediaNotificationItemTest : public testing::Test {
           EXPECT_EQ(0u, actions.size());
         });
 
-#if BUILDFLAG(IS_CHROMEOS)
-    EXPECT_CALL(view_, UpdateWithMediaMetadata(_))
-        .WillOnce([&](const media_session::MediaMetadata& metadata) {
-          const std::string separator = " \xC2\xB7 ";
-          EXPECT_EQ(base::UTF8ToUTF16(kRouteDesc + separator + kSinkName),
-                    metadata.source_title);
-        });
-#else
     EXPECT_CALL(view_, UpdateWithMediaMetadata(_))
         .WillOnce([&](const media_session::MediaMetadata& metadata) {
           EXPECT_EQ(kRouteDesc, base::UTF16ToUTF8(metadata.source_title));
         });
-#endif
 
     item_->SetView(&view_);
     testing::Mock::VerifyAndClearExpectations(&view_);

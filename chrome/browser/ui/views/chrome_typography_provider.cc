@@ -16,13 +16,6 @@
 #include "ui/gfx/platform_font.h"
 #include "ui/views/style/typography.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <optional>
-
-// gn check complains on Linux Ozone.
-#include "ash/public/cpp/ash_typography.h"  // nogncheck
-#endif
-
 bool ChromeTypographyProvider::StyleAllowedForContext(int context,
                                                       int style) const {
   if (context == CONTEXT_TAB_HOVER_CARD_TITLE) {
@@ -35,14 +28,9 @@ bool ChromeTypographyProvider::StyleAllowedForContext(int context,
     // Limit emphasizing text to contexts where it's obviously correct. If you
     // hit this check, ensure it's sane and UX-approved to extend it to your
     // new case (e.g. don't add CONTEXT_BUTTON_MD).
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(crbug.com/40234831): Limit more specific Ash contexts.
-    return true;
-#else
     return context == views::style::CONTEXT_LABEL ||
            context == views::style::CONTEXT_DIALOG_BODY_TEXT ||
            context == CONTEXT_DIALOG_BODY_TEXT_SMALL;
-#endif
   }
 
   return TypographyProvider::StyleAllowedForContext(context, style);
@@ -67,10 +55,6 @@ ui::ResourceBundle::FontDetails ChromeTypographyProvider::GetFontDetailsImpl(
   ui::ResourceBundle::FontDetails details;
 
   details.size_delta = gfx::PlatformFont::GetFontSizeDelta(kDefaultSize);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ApplyAshFontStyles(context, style, details);
-#endif
 
   ApplyCommonFontStyles(context, style, details);
 
@@ -109,11 +93,7 @@ ui::ResourceBundle::FontDetails ChromeTypographyProvider::GetFontDetailsImpl(
     // Secondary font is for double-digit counts. Because we have control over
     // system fonts on ChromeOS, we can just choose a condensed font. For other
     // platforms we adjust size.
-#if BUILDFLAG(IS_CHROMEOS)
-    details.typeface = "Roboto Condensed";
-#else
     details.size_delta -= 2;
-#endif
   }
 
   if (style == views::style::STYLE_EMPHASIZED ||
@@ -139,13 +119,6 @@ ui::ResourceBundle::FontDetails ChromeTypographyProvider::GetFontDetailsImpl(
 
 ui::ColorId ChromeTypographyProvider::GetColorIdImpl(int context,
                                                      int style) const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/400615941): Remove ash-spcecific handling from //chrome.
-  if (std::optional<ui::ColorId> color_id = ash::GetColorId(style);
-      color_id.has_value()) {
-    return color_id.value();
-  }
-#endif
 
   // Body text styles are the same as for labels.
   if (context == views::style::CONTEXT_DIALOG_BODY_TEXT ||
@@ -175,15 +148,6 @@ int ChromeTypographyProvider::GetLineHeightImpl(int context, int style) const {
       style < views::style::STYLE_OVERRIDE_TYPOGRAPHY_END) {
     return TypographyProvider::GetLineHeightImpl(context, style);
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/400615941): Remove ash-spcecific handling when we remove
-  // usage where GetLineHeightImpl receives ash-specific `context`.
-  std::optional<int> height = ash::GetLineHeight(context);
-  if (height) {
-    return height.value();
-  }
-#endif
 
   // "Target" line height constants from the Harmony spec. A default OS
   // configuration should use these heights. However, if the user overrides OS

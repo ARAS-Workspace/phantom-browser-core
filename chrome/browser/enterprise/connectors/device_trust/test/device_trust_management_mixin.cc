@@ -16,10 +16,6 @@
 #include "components/policy/policy_constants.h"
 #include "components/prefs/pref_service.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/test/scoped_policy_update.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace enterprise_connectors::test {
 
 using ManagementContext = enterprise::test::ManagementContext;
@@ -35,16 +31,6 @@ base::Value GetAllowedHostValue(const std::string& url) {
 base::Value GetEmptyListValue() {
   return base::Value(base::ListValue());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-std::vector<std::string> ParseUrlsValue(const base::Value& urls_value) {
-  std::vector<std::string> url_strings;
-  for (const base::Value& value : urls_value.GetList()) {
-    url_strings.push_back(value.GetString());
-  }
-  return url_strings;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 ManagementContext ToManagementContext(
     const DeviceTrustConnectorState& device_trust_state) {
@@ -141,30 +127,10 @@ void DeviceTrustManagementMixin::SetMachineInlinePolicy(
     base::Value policy_value) {
   CHECK(device_trust_state_.cloud_machine_management_level.is_managed);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  auto device_policy_update =
-      management_context_mixin_->RequestDevicePolicyUpdate();
-  auto* allowed_urls_proto =
-      device_policy_update->policy_payload()
-          ->mutable_device_login_screen_context_aware_access_signals_allowlist();
-  allowed_urls_proto->mutable_policy_options()->set_mode(
-      enterprise_management::PolicyOptions::MANDATORY);
-  auto* policy_string_list = allowed_urls_proto->mutable_value();
-  const auto urls = ParseUrlsValue(policy_value);
-
-  if (urls.empty()) {
-    policy_string_list->Clear();
-  } else {
-    for (const auto& url : urls) {
-      policy_string_list->add_entries(url.c_str());
-    }
-  }
-#else
   base::flat_map<std::string, std::optional<base::Value>> policy_values;
   policy_values.insert({policy::key::kBrowserContextAwareAccessSignalsAllowlist,
                         std::move(policy_value)});
   management_context_mixin_->SetCloudMachinePolicies(std::move(policy_values));
-#endif
 }
 
 void DeviceTrustManagementMixin::SetUserInlinePolicy(base::Value policy_value) {

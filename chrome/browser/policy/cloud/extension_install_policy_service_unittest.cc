@@ -36,14 +36,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/browser_process_platform_part.h"  // nogncheck
-#include "components/policy/core/common/cloud/mock_cloud_external_data_manager.h"
-#include "components/policy/core/common/cloud/mock_cloud_policy_store.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using ManagementPrefUpdater = extensions::ExtensionManagementPrefUpdater<
     sync_preferences::TestingPrefServiceSyncable>;
 
@@ -52,11 +44,6 @@ namespace {
 
 constexpr char kExtensionId[] = "abcdefghijklmnopabcdefghijklmnop";
 constexpr char kExtensionVersion[] = "1.0.0.0";
-
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kEmail[] = "user@example.com";
-constexpr GaiaId::Literal kTestGaiaId("12345");
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 base::Value GetPolicyValueForAction(
     const std::string& extension_version,
@@ -93,26 +80,6 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
     profile_manager_ = std::make_unique<TestingProfileManager>(
         TestingBrowserProcess::GetGlobal());
     ASSERT_TRUE(profile_manager_->SetUp());
-#if BUILDFLAG(IS_CHROMEOS)
-    auto fake_user_manager = std::make_unique<ash::FakeChromeUserManager>();
-    const AccountId account_id = AccountId::FromUserEmail(kEmail);
-    fake_user_manager->AddUser(account_id);
-    fake_user_manager->LoginUser(account_id);
-    scoped_user_manager_ = std::make_unique<user_manager::ScopedUserManager>(
-        std::move(fake_user_manager));
-
-    profile_ = profile_manager_->CreateTestingProfile(
-        kEmail,
-        /*prefs=*/nullptr,
-        /*user_name=*/u"user",
-        /*avatar_id=*/0,
-        /*testing_factories=*/{},
-        /*is_supervised_profile=*/false,
-        /*is_new_profile=*/false, std::move(policy_service_),
-        /*shared_url_loader_factory=*/nullptr,
-        /*user_cloud_policy_manager=*/nullptr);
-    profile_->SetUserCloudPolicyManagerAsh(BuildUserCloudPolicyManagerAsh());
-#else
     profile_ = profile_manager_->CreateTestingProfile(
         chrome::kInitialProfile,
         /*prefs=*/nullptr,
@@ -122,7 +89,6 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
         /*is_supervised_profile=*/false,
         /*is_new_profile=*/false, std::move(policy_service_),
         /*shared_url_loader_factory=*/nullptr, BuildUserCloudPolicyManager());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     profile_->GetPrefs()->SetBoolean(
         extensions::pref_names::kExtensionInstallCloudPolicyChecksEnabled,
@@ -135,11 +101,7 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
     CHECK(manager);
     manager->Init(&schema_registry_);
     manager->core()->store()->SetFirstPoliciesLoaded(true);
-#if BUILDFLAG(IS_CHROMEOS)
-    manager->core()->Connect(std::move(client_));
-#else
     manager->Connect(g_browser_process->local_state(), std::move(client_));
-#endif
     service_ = static_cast<ExtensionInstallPolicyServiceImpl*>(
         ExtensionInstallPolicyServiceFactory::GetForBrowserContext(profile()));
   }
@@ -151,15 +113,12 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
     profile_manager_->DeleteAllTestingProfiles();
     profile_manager_ = nullptr;
     TestingBrowserProcess::GetGlobal()->SetSharedURLLoaderFactory(nullptr);
-#if !BUILDFLAG(IS_CHROMEOS)
     TestingBrowserProcess::GetGlobal()->local_state()->ClearPref(
         extensions::pref_names::kExtensionInstallCloudPolicyChecksEnabled);
-#endif
   }
 
   TestingProfile* profile() { return profile_; }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Build a test version CloudPolicyManager for testing profiles.
   std::unique_ptr<UserCloudPolicyManager> BuildUserCloudPolicyManager() {
     auto mock_user_cloud_policy_store =
@@ -181,36 +140,6 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
         task_environment_.GetMainThreadTaskRunner(),
         network::TestNetworkConnectionTracker::CreateGetter());
   }
-#else
-  std::unique_ptr<UserCloudPolicyManagerAsh> BuildUserCloudPolicyManagerAsh() {
-    auto mock_user_cloud_policy_store = std::make_unique<MockCloudPolicyStore>(
-        dm_protocol::GetChromeUserPolicyType());
-    std::unique_ptr<MockCloudPolicyStore>
-        mock_user_cloud_policy_extension_install_store =
-            std::make_unique<MockCloudPolicyStore>(
-                dm_protocol::kChromeExtensionInstallUserCloudPolicyType);
-
-    auto cloud_external_data_manager =
-        std::make_unique<MockCloudExternalDataManager>();
-    cloud_external_data_manager->SetPolicyStore(
-        mock_user_cloud_policy_store.get());
-
-    return std::make_unique<UserCloudPolicyManagerAsh>(
-        TestingBrowserProcess::GetGlobal()->local_state(),
-        test_url_loader_factory_.GetSafeWeakWrapper(),
-        TestingBrowserProcess::GetGlobal()
-            ->platform_part()
-            ->browser_policy_connector_ash(),
-        profile_, std::move(mock_user_cloud_policy_store),
-        std::move(mock_user_cloud_policy_extension_install_store),
-        std::move(cloud_external_data_manager), base::FilePath(),
-        UserCloudPolicyManagerAsh::PolicyEnforcement::kPolicyRequired,
-        /*policy_refresh_timeout=*/base::TimeDelta(),
-        /*fatal_error_callback=*/base::OnceClosure(),
-        AccountId::FromUserEmailGaiaId(kEmail, kTestGaiaId),
-        task_environment_.GetMainThreadTaskRunner());
-  }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
  protected:
   content::BrowserTaskEnvironment task_environment_;
@@ -222,9 +151,6 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
   base::test::ScopedFeatureList scoped_feature_list_{
       features::kEnableExtensionInstallPolicyFetching};
   SchemaRegistry schema_registry_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_;
-#endif
   network::TestURLLoaderFactory test_url_loader_factory_;
 };
 
@@ -350,7 +276,6 @@ TEST_F(ExtensionInstallPolicyServiceTest, IsExtensionBlockedByPolicy) {
                    .value());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(ExtensionInstallPolicyServiceTest, IsExtensionBlockedByMachinePolicy) {
   PolicyMap policy;
   policy.Set(kExtensionId, POLICY_LEVEL_MANDATORY, POLICY_SCOPE_MACHINE,
@@ -371,7 +296,6 @@ TEST_F(ExtensionInstallPolicyServiceTest, IsExtensionBlockedByMachinePolicy) {
                        ExtensionIdAndVersion(kExtensionId, kExtensionVersion))
                    .value());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(ExtensionInstallPolicyServiceTest,
        IsExtensionBlockedByExtensionSettings) {
@@ -539,11 +463,9 @@ TEST_F(ExtensionInstallPolicyServiceTest, TypesToFetch) {
                   dm_protocol::kChromeExtensionInstallUserCloudPolicyType,
                   service_.get())));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   auto* extension_install_store_mock = static_cast<MockUserCloudPolicyStore*>(
       static_cast<UserCloudPolicyManager*>(manager)->extension_install_store());
   EXPECT_CALL(*extension_install_store_mock, Clear()).Times(1);
-#endif
 
   // Disable the feature, it should get removed from types_to_fetch().
   profile()->GetPrefs()->SetBoolean(
@@ -562,9 +484,7 @@ TEST_F(ExtensionInstallPolicyServiceTest, TypesToFetch) {
   service_->Shutdown();
   EXPECT_TRUE(
       manager->extension_install_core()->client()->types_to_fetch().empty());
-#if !BUILDFLAG(IS_CHROMEOS)
   testing::Mock::VerifyAndClearExpectations(extension_install_store_mock);
-#endif
 }
 
 }  // namespace policy

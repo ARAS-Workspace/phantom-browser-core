@@ -35,9 +35,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "net/http/http_status_code.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/components/mgs/managed_guest_session_utils.h"
-#endif
 
 namespace safe_browsing {
 namespace {
@@ -115,11 +112,6 @@ bool CloudBinaryUploadService::IsEnhancedProtection() {
   return profile_ && IsEnhancedProtectionEnabled(*profile_->GetPrefs());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool CloudBinaryUploadService::IsManagedGuestSession() {
-  return chromeos::IsManagedGuestSession();
-}
-#endif
 
 void CloudBinaryUploadService::SetTokenFetcherForTesting(
     std::unique_ptr<SafeBrowsingTokenFetcher> token_fetcher) {

@@ -37,11 +37,6 @@
 #include "net/test/embedded_test_server/http_request.h"
 #include "net/test/embedded_test_server/http_response.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace optimization_guide {
 
 namespace {
@@ -121,9 +116,6 @@ class PredictionModelStoreBrowserTestBase : public InProcessBrowserTest {
                 "/")
             .spec());
     cmd->AppendSwitchASCII("force-variation-ids", "4");
-#if BUILDFLAG(IS_CHROMEOS)
-    cmd->AppendSwitch(ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
   }
 
   void RegisterModelFileObserverWithKeyedService(
@@ -286,11 +278,7 @@ IN_PROC_BROWSER_TEST_F(PredictionModelStoreBrowserTest,
 }
 
 // TODO(crbug.com/41490438): Re-enable this test
-#if BUILDFLAG(IS_CHROMEOS) && defined(ADDRESS_SANITIZER)
-#define MAYBE_TestIncognitoProfile DISABLED_TestIncognitoProfile
-#else
 #define MAYBE_TestIncognitoProfile TestIncognitoProfile
-#endif
 IN_PROC_BROWSER_TEST_F(PredictionModelStoreBrowserTest,
                        MAYBE_TestIncognitoProfile) {
   ModelFileObserver model_file_observer;

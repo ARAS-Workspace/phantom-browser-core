@@ -1094,12 +1094,7 @@ IN_PROC_BROWSER_TEST_F(
 // TODO(https://crbug.com/330066242): Flakes on chromeOS.
 // ui_test_utils::NavigateToURL() causes: [focus_controller.cc(277)] Check
 // failed: rules_->CanFocusWindow(window, nullptr).
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_NTPUpdateAcrossBrowserRestart \
-  DISABLED_NTPUpdateAcrossBrowserRestart
-#else
 #define MAYBE_NTPUpdateAcrossBrowserRestart NTPUpdateAcrossBrowserRestart
-#endif
 
 // Continues the PRE_ test by testing that upon browser start v2 of the
 // extension is installed.

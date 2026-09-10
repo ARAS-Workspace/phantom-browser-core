@@ -179,7 +179,7 @@ MATCHER_P(PasswordUiEntryDataEquals, expected, "") {
 
 void ExpectAuthentication(scoped_refptr<PasswordsPrivateDelegateImpl> delegate,
                           bool successful) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   auto biometric_authenticator =
       std::make_unique<device_reauth::MockDeviceAuthenticator>();
 
@@ -488,7 +488,7 @@ IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplTest,
       password_manager::metrics_util::ACCESS_PASSWORD_VIEWED, 1);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplTest,
                        TestFailedReauthOnRequestCredentialsDetails) {
   std::unique_ptr<content::WebContents> web_contents = CreateWebContents();
@@ -588,7 +588,7 @@ IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplTest,
                                           mock_callback.Get());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 class PasswordsPrivateDelegateImplMockTaskEnvironmentTest
     : public PasswordsPrivateDelegateImplTest {
  public:
@@ -689,6 +689,6 @@ IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplMockTaskEnvironmentTest,
   EXPECT_CALL(*biometric_authenticator_ptr, Cancel);
   delegate.reset();
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace extensions

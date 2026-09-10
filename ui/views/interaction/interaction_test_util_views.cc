@@ -54,7 +54,7 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) && BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(IS_OZONE)
 #define HANDLE_WAYLAND_FAILURE 1
 #else
 #define HANDLE_WAYLAND_FAILURE 0

@@ -22,12 +22,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
@@ -47,16 +41,6 @@ class BundledSettingsMetricsProviderUnitTest : public testing::Test {
     profile_ = profile_manager_.CreateTestingProfile("shelly@gmail.com");
     profiles::SetLastUsedProfile(profile_->GetBaseName());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    auto* fake_user_manager = new ash::FakeChromeUserManager();
-    scoped_user_manager_enabler_ =
-        std::make_unique<user_manager::ScopedUserManager>(
-            base::WrapUnique(fake_user_manager));
-    const AccountId account_id(AccountId::FromUserEmail("shelly@gmail.com"));
-    fake_user_manager->AddUser(account_id);
-    fake_user_manager->LoginUser(account_id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
     prefs_ = profile_->GetPrefs();
 
     SetSelectedBundle(SecuritySettingsBundleSetting::STANDARD);
@@ -74,9 +58,6 @@ class BundledSettingsMetricsProviderUnitTest : public testing::Test {
   raw_ptr<TestingProfile> profile_;
   raw_ptr<PrefService> prefs_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_enabler_;
-#endif
 };
 
 TEST_F(BundledSettingsMetricsProviderUnitTest,

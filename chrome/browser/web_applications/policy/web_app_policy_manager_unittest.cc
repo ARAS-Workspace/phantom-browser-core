@@ -64,23 +64,6 @@
 #include "third_party/skia/include/core/SkColor.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_pref_names.h"
-#include "ash/constants/ash_switches.h"
-#include "base/test/scoped_command_line.h"
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/ash/system_web_apps/test_support/test_system_web_app_manager.h"
-#include "chrome/browser/policy/system_features_disable_list_policy_handler.h"
-#include "chromeos/constants/chromeos_features.h"
-#include "components/policy/core/common/policy_pref_names.h"
-#include "components/policy/core/common/system_features_disable_list_constants.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/test_helper.h"
-#include "components/user_manager/user_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 
 namespace {
@@ -223,46 +206,16 @@ class WebAppPolicyManagerTestBase : public WebAppTest {
   ~WebAppPolicyManagerTestBase() override = default;
 
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    // Need to run the WebAppTest::SetUp() after the fake
-    // user manager set up so that the scoped_user_manager can be destructed in
-    // the correct order.
-    // TODO(crbug.com/40275387): Consider setting up a fake user in all Ash web
-    // app tests.
-    auto user_manager = std::make_unique<ash::FakeChromeUserManager>();
-    auto* fake_user_manager = user_manager.get();
-    scoped_user_manager_ = std::make_unique<user_manager::ScopedUserManager>(
-        std::move(user_manager));
-    fake_user_manager->AddUser(user_manager::StubAccountId());
-    fake_user_manager->UserLoggedIn(
-        user_manager::StubAccountId(),
-        user_manager::TestHelper::GetFakeUsernameHash(
-            user_manager::StubAccountId()));
-#endif
 
     WebAppTest::SetUp();
-#if BUILDFLAG(IS_CHROMEOS)
-    test_system_app_manager_ = std::make_unique<ash::TestSystemWebAppManager>(
-        TestingBrowserProcess::GetGlobal()
-            ->GetFeatures()
-            ->application_locale_storage(),
-        profile());
-#endif
     auto web_app_policy_manager =
         std::make_unique<WebAppPolicyManager>(profile());
-#if BUILDFLAG(IS_CHROMEOS)
-    web_app_policy_manager->SetSystemWebAppDelegateMap(
-        &system_app_manager().system_app_delegates());
-#endif
     fake_provider().SetWebAppPolicyManager(std::move(web_app_policy_manager));
 
     test::AwaitStartWebAppProviderAndSubsystems(profile());
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    test_system_app_manager_.reset();
-#endif
     WebAppTest::TearDown();
   }
 
@@ -290,12 +243,6 @@ class WebAppPolicyManagerTestBase : public WebAppTest {
         WebAppInstallInfo::CreateWithStartUrlForTesting(GURL(url));
     web_app::test::InstallWebApp(profile(), std::move(web_app_info));
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::TestSystemWebAppManager& system_app_manager() {
-    return *test_system_app_manager_;
-  }
-#endif
 
   WebAppRegistrar& app_registrar() {
     return fake_provider().registrar_unsafe();
@@ -365,10 +312,6 @@ class WebAppPolicyManagerTestBase : public WebAppTest {
   data_decoder::test::InProcessDataDecoder data_decoder_;
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<ash::TestSystemWebAppManager> test_system_app_manager_;
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_;
-#endif
 };
 
 class WebAppPolicyManagerTest : public WebAppPolicyManagerTestBase,
@@ -1098,172 +1041,6 @@ TEST_F(WebAppPolicyManagerTest, WebAppSettingsForceInstallNewApps) {
   app_registrar().RemoveObserver(&mock_observer);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-class WebAppPolicyManagerDisableListTest : public WebAppPolicyManagerTestBase {
- public:
-  WebAppPolicyManagerDisableListTest() {
-    scoped_feature_list_.InitAndEnableFeature(
-        chromeos::features::kSystemFeaturesDisableListHidden);
-  }
-
-  WebAppPolicyManagerDisableListTest(
-      const WebAppPolicyManagerDisableListTest&) = delete;
-  WebAppPolicyManagerDisableListTest& operator=(
-      const WebAppPolicyManagerDisableListTest&) = delete;
-
-  ~WebAppPolicyManagerDisableListTest() override = default;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-TEST_F(WebAppPolicyManagerDisableListTest, DisableSystemWebApps) {
-  auto disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_TRUE(disabled_apps.empty());
-
-  // Add supported system web apps to system features disable list policy.
-  TestingBrowserProcess::GetGlobal()->GetTestingLocalState()->SetUserPref(
-      policy::policy_prefs::kSystemFeaturesDisableList,
-      base::ListValue()
-          .Append(static_cast<int>(policy::SystemFeature::kCamera))
-          .Append(static_cast<int>(policy::SystemFeature::kOsSettings))
-          .Append(static_cast<int>(policy::SystemFeature::kScanning))
-          .Append(static_cast<int>(policy::SystemFeature::kExplore))
-          .Append(static_cast<int>(policy::SystemFeature::kCrosh))
-          .Append(static_cast<int>(policy::SystemFeature::kTerminal))
-          .Append(static_cast<int>(policy::SystemFeature::kGallery))
-          .Append(static_cast<int>(policy::SystemFeature::kPrintJobs))
-          .Append(static_cast<int>(policy::SystemFeature::kKeyShortcuts))
-          .Append(static_cast<int>(policy::SystemFeature::kRecorder)));
-  base::RunLoop().RunUntilIdle();
-
-  disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_THAT(
-      disabled_apps,
-      testing::UnorderedElementsAre(
-          ash::SystemWebAppType::CAMERA, ash::SystemWebAppType::SETTINGS,
-          ash::SystemWebAppType::SCANNING, ash::SystemWebAppType::HELP,
-          ash::SystemWebAppType::CROSH, ash::SystemWebAppType::TERMINAL,
-          ash::SystemWebAppType::MEDIA, ash::SystemWebAppType::PRINT_MANAGEMENT,
-          ash::SystemWebAppType::SHORTCUT_CUSTOMIZATION,
-          ash::SystemWebAppType::RECORDER, ash::SystemWebAppType::GRADUATION,
-          ash::SystemWebAppType::BOCA));
-
-  // If the app is disabled by the SystemFeaturesDisableList policy, default
-  // disable mode for user sessions is hidden.
-  EXPECT_TRUE(
-      policy_manager().IsDisabledAppsModeHidden(ash::SystemWebAppType::CAMERA));
-  EXPECT_TRUE(policy_manager().IsDisabledAppsModeHidden(
-      ash::SystemWebAppType::SETTINGS));
-  EXPECT_TRUE(policy_manager().IsDisabledAppsModeHidden(
-      ash::SystemWebAppType::SCANNING));
-  EXPECT_TRUE(
-      policy_manager().IsDisabledAppsModeHidden(ash::SystemWebAppType::HELP));
-  EXPECT_TRUE(
-      policy_manager().IsDisabledAppsModeHidden(ash::SystemWebAppType::CROSH));
-  EXPECT_TRUE(policy_manager().IsDisabledAppsModeHidden(
-      ash::SystemWebAppType::TERMINAL));
-  EXPECT_TRUE(
-      policy_manager().IsDisabledAppsModeHidden(ash::SystemWebAppType::MEDIA));
-  EXPECT_TRUE(policy_manager().IsDisabledAppsModeHidden(
-      ash::SystemWebAppType::PRINT_MANAGEMENT));
-  EXPECT_TRUE(policy_manager().IsDisabledAppsModeHidden(
-      ash::SystemWebAppType::SHORTCUT_CUSTOMIZATION));
-  EXPECT_TRUE(policy_manager().IsDisabledAppsModeHidden(
-      ash::SystemWebAppType::RECORDER));
-
-  // For apps not hidden by the SystemFeaturesDisableList policy, default
-  // disable mode for user sessions is blocked.
-  EXPECT_FALSE(policy_manager().IsDisabledAppsModeHidden(
-      ash::SystemWebAppType::GRADUATION));
-  EXPECT_FALSE(
-      policy_manager().IsDisabledAppsModeHidden(ash::SystemWebAppType::BOCA));
-}
-
-class WebAppPolicyManagerWithGraduationTest
-    : public WebAppPolicyManagerTestBase {
- public:
-  WebAppPolicyManagerWithGraduationTest() {
-    scoped_feature_list_.InitAndEnableFeature(ash::features::kGraduation);
-  }
-
-  ~WebAppPolicyManagerWithGraduationTest() override = default;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-  std::unique_ptr<TestingProfile> managed_profile_;
-};
-
-TEST_F(WebAppPolicyManagerWithGraduationTest,
-       GraduationNotDisabledWhenAllowed) {
-  auto disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_TRUE(disabled_apps.empty());
-
-  TestingBrowserProcess::GetGlobal()->GetTestingLocalState()->SetUserPref(
-      policy::policy_prefs::kSystemFeaturesDisableList,
-      base::ListValue()
-          .Append(static_cast<int>(policy::SystemFeature::kCamera))
-          .Append(static_cast<int>(policy::SystemFeature::kOsSettings))
-          .Append(static_cast<int>(policy::SystemFeature::kKeyShortcuts)));
-  base::DictValue graduation_status;
-  graduation_status.Set("is_enabled", true);
-  profile()->GetPrefs()->SetDict(ash::prefs::kGraduationEnablementStatus,
-                                 graduation_status.Clone());
-
-  disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_FALSE(disabled_apps.contains(ash::SystemWebAppType::GRADUATION));
-}
-
-TEST_F(WebAppPolicyManagerWithGraduationTest, GraduationDisabledWhenBlocked) {
-  auto disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_TRUE(disabled_apps.empty());
-
-  // Add supported system web apps to system features disable list policy.
-  TestingBrowserProcess::GetGlobal()->GetTestingLocalState()->SetUserPref(
-      policy::policy_prefs::kSystemFeaturesDisableList,
-      base::ListValue()
-          .Append(static_cast<int>(policy::SystemFeature::kCamera))
-          .Append(static_cast<int>(policy::SystemFeature::kOsSettings))
-          .Append(static_cast<int>(policy::SystemFeature::kKeyShortcuts)));
-  base::DictValue graduation_status;
-  graduation_status.Set("is_enabled", false);
-  profile()->GetPrefs()->SetDict(ash::prefs::kGraduationEnablementStatus,
-                                 graduation_status.Clone());
-
-  disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_TRUE(disabled_apps.contains(ash::SystemWebAppType::GRADUATION));
-}
-
-class WebAppPolicyManagerWithBocaTest : public WebAppPolicyManagerTestBase {
- public:
-  WebAppPolicyManagerWithBocaTest() = default;
-  ~WebAppPolicyManagerWithBocaTest() override = default;
-};
-
-TEST_F(WebAppPolicyManagerWithBocaTest,
-       BocaNotDisabledWhenNotDisabledFromPolicy) {
-  auto disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_TRUE(disabled_apps.empty());
-
-  profile()->GetPrefs()->SetString(
-      ash::prefs::kClassManagementToolsAvailabilitySetting, "teacher");
-
-  disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_FALSE(disabled_apps.contains(ash::SystemWebAppType::BOCA));
-}
-
-TEST_F(WebAppPolicyManagerWithBocaTest, BocaDisabledWhenDisabledFromPolicy) {
-  auto disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_TRUE(disabled_apps.empty());
-  profile()->GetPrefs()->SetString(
-      ash::prefs::kClassManagementToolsAvailabilitySetting, "disabled");
-  disabled_apps = policy_manager().GetDisabledSystemWebApps();
-  EXPECT_TRUE(disabled_apps.contains(ash::SystemWebAppType::BOCA));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class WebAppPolicyManagerPreventCloseTest
     : public WebAppPolicyManagerTestBase,
       public testing::WithParamInterface<bool /*prevent_close_enabled*/> {
@@ -1412,11 +1189,6 @@ TEST_P(WebAppPolicyManagerPreventCloseTest, WebAppSettingsPreventClose) {
   EXPECT_FALSE(IsPreventCloseEnabled(kWindowedOnlyManuallyInstalled));
 
   bool expected_windowed_url_status = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (prevent_close_enabled()) {
-    expected_windowed_url_status = true;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   EXPECT_EQ(IsPreventCloseEnabled(kWindowedAlsoManuallyInstalled),
             expected_windowed_url_status);

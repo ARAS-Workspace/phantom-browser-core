@@ -247,29 +247,6 @@ void WebAppNavigationBrowserTest::SetUpOnMainThread() {
 }
 
 void WebAppNavigationBrowserTest::TearDownOnMainThread() {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto* const provider = WebAppProvider::GetForWebApps(profile());
-  const WebAppRegistrar& registrar = provider->registrar_unsafe();
-  std::vector<webapps::AppId> app_ids = registrar.GetAppIds();
-  for (const auto& app_id : app_ids) {
-    if (!registrar.GetInstallState(app_id).has_value()) {
-      continue;
-    }
-    const WebApp* app = registrar.GetAppById(app_id);
-    DCHECK(app->CanUserUninstallWebApp());
-    apps::AppReadinessWaiter app_readiness_waiter(
-        profile(), app_id, apps::Readiness::kUninstalledByUser);
-    base::RunLoop run_loop;
-    provider->scheduler().RemoveUserUninstallableManagements(
-        app_id, webapps::WebappUninstallSource::kAppsPage,
-        base::BindLambdaForTesting([&](webapps::UninstallResultCode code) {
-          EXPECT_EQ(code, webapps::UninstallResultCode::kAppRemoved);
-          run_loop.Quit();
-        }));
-    run_loop.Run();
-    app_readiness_waiter.Await();
-  }
-#endif
 
   WebAppBrowserTestBase::TearDownOnMainThread();
 }

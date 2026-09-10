@@ -20,7 +20,7 @@ BASE_FEATURE(kWebPaymentsJustInTimePaymentApp,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kAppStoreBilling,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT

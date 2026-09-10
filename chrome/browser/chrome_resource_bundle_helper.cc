@@ -25,11 +25,6 @@
 #include "ui/base/resource/resource_bundle_android.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "ash/constants/ash_switches.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/common/extension_l10n_util.h"
 #endif
@@ -40,23 +35,6 @@ extern void InitializeLocalState(
     ChromeFeatureListCreator* chrome_feature_list_creator) {
   TRACE_EVENT0("startup", "ChromeBrowserMainParts::InitializeLocalState");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  if (command_line->HasSwitch(ash::switches::kLoginManager)) {
-    PrefService* local_state = chrome_feature_list_creator->local_state();
-    DCHECK(local_state);
-
-    std::string owner_locale = local_state->GetString(ash::prefs::kOwnerLocale);
-    // Ensure that we start with owner's locale.
-    if (!owner_locale.empty() &&
-        local_state->GetString(language::prefs::kApplicationLocale) !=
-            owner_locale &&
-        !local_state->IsManagedPreference(
-            language::prefs::kApplicationLocale)) {
-      local_state->SetString(language::prefs::kApplicationLocale, owner_locale);
-    }
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 // Initializes the shared instance of ResourceBundle and returns the application

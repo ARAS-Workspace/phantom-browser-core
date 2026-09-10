@@ -16,11 +16,6 @@
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/bluetooth/bluetooth_low_energy_scan_filter.h"
-#include "device/bluetooth/bluetooth_low_energy_scan_session.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace bluetooth {
 
 class FakePeripheral;
@@ -189,7 +184,7 @@ class FakeCentral final : public mojom::FakeCentral,
   void SetDiscoverable(bool discoverable,
                        base::OnceClosure callback,
                        ErrorCallback error_callback) override;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   base::TimeDelta GetDiscoverableTimeout() const override;
 #endif
   bool IsDiscovering() const override;
@@ -206,7 +201,7 @@ class FakeCentral final : public mojom::FakeCentral,
       std::unique_ptr<device::BluetoothAdvertisement::Data> advertisement_data,
       CreateAdvertisementCallback callback,
       AdvertisementErrorCallback error_callback) override;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   void SetAdvertisingInterval(
       const base::TimeDelta& min,
       const base::TimeDelta& max,
@@ -222,24 +217,6 @@ class FakeCentral final : public mojom::FakeCentral,
 #endif
   device::BluetoothLocalGattService* GetGattService(
       const std::string& identifier) const override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetServiceAllowList(const UUIDList& uuids,
-                           base::OnceClosure callback,
-                           ErrorCallback error_callback) override;
-  void SetSimpleSecurePairingEnabled(bool enabled,
-                                     base::OnceClosure callback,
-                                     ErrorCallback error_callback) override;
-
-  LowEnergyScanSessionHardwareOffloadingStatus
-  GetLowEnergyScanSessionHardwareOffloadingStatus() override;
-  std::unique_ptr<device::BluetoothLowEnergyScanSession>
-  StartLowEnergyScanSession(
-      std::unique_ptr<device::BluetoothLowEnergyScanFilter> filter,
-      base::WeakPtr<device::BluetoothLowEnergyScanSession::Delegate> delegate)
-      override;
-  std::vector<BluetoothRole> GetSupportedRoles() override;
-  void SetStandardChromeOSAdapterName() override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   base::WeakPtr<BluetoothAdapter> GetWeakPtr() override;
   bool SetPoweredImpl(bool powered) override;
   void UpdateFilter(

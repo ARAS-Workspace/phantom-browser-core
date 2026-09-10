@@ -217,9 +217,6 @@
 #include "services/device/public/mojom/nfc.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "third_party/blink/public/mojom/smart_card/smart_card.mojom-forward.h"
-#endif
 
 #if BUILDFLAG(ENABLE_MEDIA_REMOTING)
 #include "media/mojo/mojom/remoting.mojom-forward.h"
@@ -2140,10 +2137,6 @@ class CONTENT_EXPORT RenderFrameHostImpl
   void BindModelContextHost(
       mojo::PendingReceiver<blink::mojom::ModelContextHost> receiver);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void GetSmartCardService(
-      mojo::PendingReceiver<blink::mojom::SmartCardService> receiver);
-#endif
 
   IdleManagerImpl* GetIdleManager();
 

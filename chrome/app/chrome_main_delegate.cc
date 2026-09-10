@@ -105,7 +105,7 @@
 #include "components/devtools/devtools_pipe/devtools_pipe.h"     // nogncheck
 #endif  // !defined(BUILDING_CHROME_RENDERER)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif
 
@@ -134,21 +134,6 @@
 #endif  // !defined(BUILDING_CHROME_RENDERER)
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_paths.h"
-#include "ash/constants/ash_switches.h"
-#include "base/system/sys_info.h"
-#include "chrome/browser/ash/boot_times_recorder/boot_times_recorder.h"  // nogncheck
-#include "chrome/browser/ash/dbus/ash_dbus_helper.h"           // nogncheck
-#include "chrome/browser/ash/locale/startup_settings_cache.h"  // nogncheck
-#include "chrome/browser/ash/schedqos/dbus_schedqos_state_handler.h"  // nogncheck
-#include "chromeos/ash/components/memory/memory.h"
-#include "chromeos/ash/components/memory/mglru.h"
-#include "chromeos/ash/experiences/arc/arc_util.h"
-#include "chromeos/dbus/constants/dbus_paths.h"
-#include "content/public/common/content_features.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/java_exception_reporter.h"
 #include "base/android/library_loader/library_loader_hooks.h"
@@ -173,7 +158,7 @@
 #include "v8/include/v8.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/environment.h"
 #endif
 
@@ -182,8 +167,7 @@
 #include "ui/linux/display_server_utils.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #if !defined(BUILDING_CHROME_RENDERER)
 #include "chrome/browser/policy/policy_path_parser.h"  // nogncheck
 #endif  // !defined(BUILDING_CHROME_RENDERER)
@@ -229,7 +213,7 @@ ChromeMainDelegate::GetNonWildcardDomainNonPortSchemes() {
       extensions::kExtensionScheme,
 #endif
       chrome::kChromeSearchScheme,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       webapps::kIsolatedAppScheme,
 #endif
       content::kChromeDevToolsScheme,    content::kChromeUIScheme,
@@ -240,7 +224,7 @@ ChromeMainDelegate::GetNonWildcardDomainNonPortSchemes() {
 
 namespace {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void AdjustLinuxOOMScore(const std::string& process_type) {
   int score = -1;
 
@@ -268,13 +252,13 @@ void AdjustLinuxOOMScore(const std::string& process_type) {
     base::AdjustOOMScore(base::GetCurrentProcId(), score);
   }
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Returns true if this subprocess type needs the ResourceBundle initialized
 // and resources loaded.
 bool SubprocessNeedsResourceBundle(const std::string& process_type) {
   return
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       // The zygote process opens the resources for the renderers.
       process_type == switches::kZygoteProcess ||
 #endif
@@ -513,7 +497,7 @@ void InitializeUserDataDir(base::CommandLine* command_line) {
   std::string process_type =
       command_line->GetSwitchValueASCII(switches::kProcessType);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // On Linux, Chrome does not support running multiple copies under different
   // DISPLAYs, so the profile directory can be specified in the environment to
   // support the virtual desktop use-case.
@@ -527,7 +511,7 @@ void InitializeUserDataDir(base::CommandLine* command_line) {
           base::FilePath::FromUTF8Unsafe(user_data_dir_string.value());
     }
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(IS_MAC)
   policy::path_parser::CheckUserDataDirPolicy(&user_data_dir);
 #endif  // BUILDFLAG(IS_MAC)
@@ -568,13 +552,6 @@ void InitializeUserDataDir(base::CommandLine* command_line) {
     command_line->AppendSwitchPath(switches::kUserDataDir, user_data_dir);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Set the same value to ash::DIR_USER_DATA. The directory should be already
-  // created above, so `create` should be set to false.
-  CHECK(base::PathService::OverrideAndCreateIfNeeded(
-      ash::DIR_USER_DATA, user_data_dir, /*absolute=*/false, /*create=*/false));
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }
 #endif  // !defined(BUILDING_CHROME_RENDERER)
 
@@ -588,14 +565,6 @@ void InitLogging(const std::string& process_type) {
       *base::CommandLine::ForCurrentProcess();
   logging::InitChromeLogging(command_line, file_state);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Log the Chrome version for information. Do so at WARNING level as that's
-  // the min level on ChromeOS.
-  if (process_type.empty()) {
-    LOG(WARNING) << "This is Chrome version " << chrome::kChromeVersion
-                 << " (not a warning)";
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
@@ -616,7 +585,7 @@ void RecordMainStartupMetrics(const StartupTimestamps& timestamps) {
       timestamps.exe_entry_point_ticks);
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Record the startup process creation time on supported platforms. On Android
   // this is recorded in ChromeMainDelegateAndroid.
   startup_metric_utils::GetCommon().RecordStartupProcessCreationTime(
@@ -718,12 +687,6 @@ std::optional<int> ChromeMainDelegate::PostEarlyInitialization(
   // On Chrome OS, IPC (D-Bus, Crosapi) is required to create the FeatureList,
   // which depends on policy from an OS service. So, initialize it at this
   // timing.
-#if BUILDFLAG(IS_CHROMEOS)
-  // The feature list depends on BrowserPolicyConnectorAsh which depends
-  // on DBus, so initialize it here. Some D-Bus clients may depend on feature
-  // list, so initialize them separately later at the end of this function.
-  ash::InitializeDBus();
-#endif
 
   ChromeFeatureListCreator* chrome_feature_list_creator =
       chrome_content_browser_client_->startup_data()
@@ -736,14 +699,6 @@ std::optional<int> ChromeMainDelegate::PostEarlyInitialization(
   }
 
   content::InitializeMojoCore();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(features::kSchedQoSOnResourcedForChrome)) {
-    ash::DBusSchedQOSStateHandler::Create(
-        base::SequencedTaskRunner::GetCurrentDefault());
-    base::Process::Current().InitializePriority();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   CommonEarlyInitialization();
 
@@ -762,9 +717,6 @@ std::optional<int> ChromeMainDelegate::PostEarlyInitialization(
 #endif
 
   // On Chrome OS, initialize D-Bus clients that depend on feature list.
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::InitializeFeatureListDependentDBus();
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
   chrome_content_browser_client_->startup_data()->InitProfileKey();
@@ -878,10 +830,6 @@ void ChromeMainDelegate::CommonEarlyInitialization() {
   InitializeMemorySystem();
 
   if (is_browser_process) {
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::InitializeMGLRU();
-    ash::LockMainProgramText();
-#endif
   }
 
   // Initialize the HangWatcher.
@@ -913,14 +861,14 @@ void ChromeMainDelegate::SetupTracing() {
   // before CreateOnMainThread() runs.
   tracing_sampler_profiler_.reset();
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // Don't set up tracing in zygotes. Zygotes don't do much, and the tracing
   // system won't work after a fork because all the thread IDs will change.
   if (base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
           switches::kProcessType) == switches::kZygoteProcess) {
     return;
   }
-#endif  // #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // We pass in CreateCoreUnwindersFactory here since it lives in the chrome/
   // layer while TracingSamplerProfiler is outside of chrome/.
@@ -950,9 +898,6 @@ void ChromeMainDelegate::SetupTracing() {
 }
 
 std::optional<int> ChromeMainDelegate::BasicStartupComplete() {
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::BootTimesRecorder::Get()->SaveChromeMainStats();
-#endif
 
 #if !defined(BUILDING_CHROME_RENDERER)
   const base::CommandLine& command_line =
@@ -1029,11 +974,6 @@ std::optional<int> ChromeMainDelegate::BasicStartupComplete() {
     chrome::RegisterPathProvider();
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::RegisterPathProvider();
-  chromeos::dbus_paths::RegisterPathProvider();
-#endif
-
   ContentSettingsPattern::SetNonWildcardDomainNonPortSchemes(
       GetNonWildcardDomainNonPortSchemes());
 
@@ -1065,67 +1005,6 @@ std::optional<int> ChromeMainDelegate::BasicStartupComplete() {
         command_line, &writer);
     diagnostics::DiagnosticsController::GetInstance()->ClearResults();
     return exit_code;
-  }
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Initialize primary user homedir (in multi-profile session) as it may be
-  // passed as a command line switch.
-  base::FilePath homedir;
-  if (command_line.HasSwitch(ash::switches::kHomedir)) {
-    homedir = base::FilePath(
-        command_line.GetSwitchValueASCII(ash::switches::kHomedir));
-    base::PathService::OverrideAndCreateIfNeeded(base::DIR_HOME, homedir, true,
-                                                 false);
-  }
-
-  // If we are recovering from a crash on a ChromeOS device, then we will do
-  // some recovery using the diagnostics module, and then continue on. We fake
-  // up a command line to tell it that we want it to recover, and to preserve
-  // the original command line. Note: logging at this point is to /var/log/ui.
-  if ((base::SysInfo::IsRunningOnChromeOS() &&
-       command_line.HasSwitch(ash::switches::kLoginUser)) ||
-      command_line.HasSwitch(switches::kDiagnosticsRecovery)) {
-    base::CommandLine interim_command_line(command_line.GetProgram());
-    const char* const kSwitchNames[] = {
-        switches::kUserDataDir,
-    };
-    interim_command_line.CopySwitchesFrom(command_line, kSwitchNames);
-    interim_command_line.AppendSwitch(switches::kDiagnostics);
-    interim_command_line.AppendSwitch(switches::kDiagnosticsRecovery);
-
-    diagnostics::DiagnosticsWriter::FormatType format =
-        diagnostics::DiagnosticsWriter::LOG;
-    if (command_line.HasSwitch(switches::kDiagnosticsFormat)) {
-      std::string format_str =
-          command_line.GetSwitchValueASCII(switches::kDiagnosticsFormat);
-      if (format_str == "machine") {
-        format = diagnostics::DiagnosticsWriter::MACHINE;
-      } else if (format_str == "human") {
-        format = diagnostics::DiagnosticsWriter::HUMAN;
-      } else {
-        DUMP_WILL_BE_CHECK_EQ("log", format_str);
-      }
-    }
-
-    diagnostics::DiagnosticsWriter writer(format);
-    int diagnostics_exit_code =
-        diagnostics::DiagnosticsController::GetInstance()->Run(command_line,
-                                                               &writer);
-    if (diagnostics_exit_code) {
-      // Diagnostics has failed somehow, so we exit.
-      return diagnostics_exit_code;
-    }
-
-    // Now we run the actual recovery tasks.
-    int recovery_exit_code =
-        diagnostics::DiagnosticsController::GetInstance()->RunRecovery(
-            command_line, &writer);
-
-    if (recovery_exit_code) {
-      // Recovery has failed somehow, so we exit.
-      return recovery_exit_code;
-    }
   }
 #endif
 
@@ -1245,13 +1124,6 @@ void ChromeMainDelegate::PreSandboxStartup() {
     // the --lang flag to pass the value of the PrefService in here. Maybe
     // this value could be passed in a different way.
     std::string locale = command_line.GetSwitchValueASCII(switches::kLang);
-#if BUILDFLAG(IS_CHROMEOS)
-    if (process_type == switches::kZygoteProcess) {
-      DUMP_WILL_BE_CHECK(locale.empty());
-      // See comment at ReadAppLocale() for why we do this.
-      locale = ash::startup_settings_cache::ReadAppLocale();
-    }
-#endif
 #if BUILDFLAG(IS_ANDROID)
     // The renderer sandbox prevents us from accessing our .pak files directly.
     // Therefore file descriptors to the .pak files that we need are passed in
@@ -1376,7 +1248,7 @@ void ChromeMainDelegate::PreSandboxStartup() {
 void ChromeMainDelegate::SandboxInitialized(const std::string& process_type) {
   // Note: If you are adding a new process type below, be sure to adjust the
   // AdjustLinuxOOMScore function too.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   AdjustLinuxOOMScore(process_type);
 #endif
 
@@ -1467,7 +1339,7 @@ void ChromeMainDelegate::ProcessExiting(const std::string& process_type) {
 #endif  // !BUILDFLAG(IS_ANDROID)
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void ChromeMainDelegate::ZygoteStarting(
     std::vector<std::unique_ptr<content::ZygoteForkDelegate>>* delegates) {}
 
@@ -1497,7 +1369,7 @@ void ChromeMainDelegate::ZygoteForked() {
   crash_keys::SetCrashKeysFromCommandLine(*command_line);
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 content::ContentClient* ChromeMainDelegate::CreateContentClient() {
   return &chrome_content_client_;

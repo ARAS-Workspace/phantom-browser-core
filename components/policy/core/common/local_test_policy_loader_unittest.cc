@@ -130,7 +130,6 @@ TEST_F(LocalTestPolicyLoaderTest, SamePolicyCombination) {
   EXPECT_TRUE(entry->Equals(expected_entry));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(LocalTestPolicyLoaderTest, PrecedencePolicy) {
   std::unique_ptr<LocalTestPolicyLoader> policy_loader =
       std::make_unique<LocalTestPolicyLoader>();
@@ -180,7 +179,6 @@ TEST_F(LocalTestPolicyLoaderTest, PrecedencePolicy) {
 
   EXPECT_TRUE(entry->Equals(expected_entry));
 }
-#endif
 
 TEST_F(LocalTestPolicyLoaderTest, InvalidInput_MissingScope) {
   std::unique_ptr<LocalTestPolicyLoader> policy_loader =

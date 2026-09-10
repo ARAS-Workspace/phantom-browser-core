@@ -31,7 +31,6 @@ extern const char kSignInPromoQueryKeyAutoClose[];
 extern const char kSignInPromoQueryKeyForceKeepData[];
 extern const char kSignInPromoQueryKeyReason[];
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // These functions are only used to unlock the profile from the desktop user
 // manager and the windows credential provider.
 
@@ -49,7 +48,6 @@ GURL GetEmbeddedPromoURL(signin_metrics::AccessPoint access_point,
 GURL GetEmbeddedReauthURLWithEmail(signin_metrics::AccessPoint access_point,
                                    signin_metrics::Reason reason,
                                    const std::string& email);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Controls the information displayed around the Gaia Sign In page via the
 // "flow" url parameter.

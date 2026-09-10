@@ -12,12 +12,6 @@
 #include "components/enterprise/data_controls/core/browser/conditions/condition.h"
 #include "components/url_matcher/url_matcher.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <set>
-
-#include "components/enterprise/data_controls/core/browser/component.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace re2 {
 class RE2;
 }  // namespace re2
@@ -48,9 +42,6 @@ class AttributesCondition {
   static constexpr char kKeyGeminiInChrome[] = "gemini_in_chrome";
   static constexpr char kKeySizeHigherThan[] = "size_higher_than";
   static constexpr char kKeySizeLowerThan[] = "size_lower_than";
-#if BUILDFLAG(IS_CHROMEOS)
-  static constexpr char kKeyComponents[] = "components";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   explicit AttributesCondition(const base::DictValue& value);
   AttributesCondition(AttributesCondition&& other);
@@ -66,11 +57,6 @@ class AttributesCondition {
  protected:
   // Returns true if `url` should be considered to trigger the condition.
   bool URLMatches(GURL url) const;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Return true if `component` should be considered to trigger the condition.
-  bool ComponentMatches(Component component) const;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Helpers that compare a given value from a destination/source context to its
   // corresponding conditions.
@@ -114,11 +100,6 @@ class AttributesCondition {
   std::optional<int64_t> min_size_;
   std::optional<int64_t> max_size_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // A destination/source must be in this set to pass the condition, unless the
-  // set is empty.
-  std::set<Component> components_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 // Source-only AttributeCondition that also implement the `Condition` interface.

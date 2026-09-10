@@ -220,20 +220,10 @@ class EncryptedSessionStorageBrowserTestBase : public InProcessBrowserTest {
                   collaboration::messaging::EmptyMessagingBackendService>();
             }));
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(switches::kCreateBrowserOnStartupForTests);
-  }
-#endif
 
   void SetUpOnMainThread() override {
     host_resolver()->AddRule("*", "127.0.0.1");
     content::SetupCrossSiteRedirector(embedded_test_server());
-
-#if BUILDFLAG(IS_CHROMEOS)
-    SessionServiceTestHelper helper(browser()->GetProfile());
-    helper.SetForceBrowserNotAliveWithNoWindows(true);
-#endif
 
     if (browser()) {
       SessionStartupPref pref(SessionStartupPref::LAST);

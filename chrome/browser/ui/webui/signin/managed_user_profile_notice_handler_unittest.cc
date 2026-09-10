@@ -40,22 +40,18 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/enterprise/profile_management/profile_management_features.h"
-#endif  //  !BUILDFLAG(IS_CHROMEOS)
 
 using testing::_;
 
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 ProfileAttributesEntry* GetProfileEntry(Profile* profile) {
   return g_browser_process->profile_manager()
       ->GetProfileAttributesStorage()
       .GetProfileAttributesWithPath(profile->GetPath());
 }
-#endif
 
 }  // namespace
 
@@ -242,7 +238,6 @@ TEST_P(ManagedUserProfileNoticeHandleProceedTest,
   }
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Tests how `HandleProceed` processes the arguments and the handler's state to
 // notify the registered callback.
 TEST_P(ManagedUserProfileNoticeHandleProceedTest,
@@ -373,13 +368,10 @@ TEST_P(ManagedUserProfileNoticeHandleProceedTest,
   web_ui()->HandleReceivedMessage("proceed", args);
 }
 
-#endif  //  !BUILDFLAG(IS_CHROMEOS)
-
 INSTANTIATE_TEST_SUITE_P(All,
                          ManagedUserProfileNoticeHandleProceedTest,
                          testing::ValuesIn(kHandleProceedParams));
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class ManagedUserProfileNoticeHandlerTest
     : public ManagedUserProfileNoticeHandlerTestBase {
  protected:
@@ -615,7 +607,6 @@ TEST_F(ManagedUserProfileNoticeHandleCancelTest, HandleCancelNoUseAfterFree) {
   web_ui()->HandleReceivedMessage("cancel", base::ListValue());
   EXPECT_EQ(handler(), nullptr);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(CHROME_FOR_TESTING)
 class ManagedUserProfileNoticeHandlerAutoApproveTest

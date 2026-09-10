@@ -52,24 +52,18 @@ enum class RequestType {
   kKeyboardLock,
   kPointerLock,
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   kProtectedMediaIdentifier,
 #endif
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
   kRegisterProtocolHandler,
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_CHROMEOS)
-  kSmartCard,
-#endif
   kSensors,
   kStorageAccess,
   kVrSession,
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
   kWebAppInstallation,
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-  kWebPrinting,
-#endif
   kWindowManagement,
   kMaxValue = kWindowManagement
 };

@@ -658,13 +658,8 @@ IN_PROC_BROWSER_TEST_F(InitialWebUIMetricsMappingBrowserTest,
 }
 
 // TODO(crbug.com/491012584): Flaky on ChromeOS MSan.
-#if BUILDFLAG(IS_CHROMEOS) && defined(MEMORY_SANITIZER)
-#define MAYBE_NormalRendererMetricsAreNotMapped \
-  DISABLED_NormalRendererMetricsAreNotMapped
-#else
 #define MAYBE_NormalRendererMetricsAreNotMapped \
   NormalRendererMetricsAreNotMapped
-#endif
 IN_PROC_BROWSER_TEST_F(InitialWebUIMetricsMappingBrowserTest,
                        MAYBE_NormalRendererMetricsAreNotMapped) {
   base::HistogramTester histogram_tester;
@@ -768,7 +763,7 @@ class InitialWebUIMetricsDropBrowserTest : public InitialWebUIBrowserTestBase {
 };
 
 // TODO(crbug.com/491012584): Flaky on ChromeOS MSan and Linux MSan.
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) && defined(MEMORY_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER)
 #define MAYBE_WebiumRendererMetricsDroppedIfNoRule \
   DISABLED_WebiumRendererMetricsDroppedIfNoRule
 #else
@@ -924,14 +919,6 @@ IN_PROC_BROWSER_TEST_F(InitialWebUISameStartupPopupBrowserTest,
   // Reset startup metrics utility state to enable logging even with
   // kNoStartupWindow.
   startup_metric_utils::GetBrowser().ResetSessionForTesting();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, startup metrics logging requires the time origin to be
-  // initialized via RecordWebContentsStartTime(). Since this test uses
-  // kNoStartupWindow, the normal browser launch flow is bypassed and we must
-  // initialize it manually.
-  startup_metric_utils::GetBrowser().RecordWebContentsStartTime(t0);
-#endif
 
   // Reset static state of the manager.
   InitialWebUIWindowMetricsManager::ResetForTesting();

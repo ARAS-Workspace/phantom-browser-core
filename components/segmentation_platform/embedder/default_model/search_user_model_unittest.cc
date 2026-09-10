@@ -21,7 +21,6 @@ TEST_F(SearchUserModelTest, InitAndFetchModel) {
 }
 
 // Segmentation Ukm Engine is disabled on CrOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(SearchUserModelTest, VerifyMetadata) {
   ExpectInitAndFetchModel();
   ASSERT_TRUE(fetched_metadata_);
@@ -45,7 +44,6 @@ TEST_F(SearchUserModelTest, VerifyMetadata) {
 
   EXPECT_NE(sql_feature.sql(), "");
 }
-#endif  //! BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(SearchUserModelTest, ExecuteModelWithInput) {
   ExpectInitAndFetchModel();

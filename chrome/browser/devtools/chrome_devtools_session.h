@@ -55,9 +55,6 @@ class ChromeDevToolsSession : public ChromeDevToolsSessionBase {
   std::unique_ptr<SystemInfoHandler> system_info_handler_;
   std::unique_ptr<TargetHandler> target_handler_;
   std::unique_ptr<WebMCPHandler> webmcp_handler_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<WindowManagerHandler> window_manager_handler_;
-#endif
 };
 
 #endif  // CHROME_BROWSER_DEVTOOLS_CHROME_DEVTOOLS_SESSION_H_

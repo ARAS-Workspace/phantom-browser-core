@@ -37,11 +37,7 @@ namespace webauthn {
 namespace {
 
 constexpr char kAccountsGoogleHost[] = "accounts.google.com";
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kEncryptionUnlockDesktopPath[] = "/encryption/unlock/chromeos";
-#else
 constexpr char kEncryptionUnlockDesktopPath[] = "/encryption/unlock/desktop";
-#endif
 
 // Custom request handler to serve the encryption unlock page.
 std::unique_ptr<net::test_server::HttpResponse>

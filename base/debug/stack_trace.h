@@ -182,7 +182,7 @@ class BASE_EXPORT OverrideStackTraceOutputForTesting {
 // scanning area at the origin of the stack, wasting time and not finding any
 // frames (since Android libraries don't have frame pointers). Scanning is not
 // enabled on other posix platforms due to legacy reasons.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 constexpr bool kEnableScanningByDefault = true;
 #else
 constexpr bool kEnableScanningByDefault = false;

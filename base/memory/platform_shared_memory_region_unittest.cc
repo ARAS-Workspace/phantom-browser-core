@@ -257,7 +257,7 @@ TEST_F(PlatformSharedMemoryRegionTest, TakeOrFailWritable) {
     auto result = PlatformSharedMemoryRegion::TakeOrFail(
         region.PassPlatformHandle(), PlatformSharedMemoryRegion::Mode::kUnsafe,
         region.GetSize(), region.GetGUID());
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     EXPECT_THAT(
         result,
         ErrorIs(PlatformSharedMemoryRegion::TakeError::kUnexpectedReadOnlyFd));
@@ -308,7 +308,7 @@ TEST_F(PlatformSharedMemoryRegionTest, TakeOrFailUnsafe) {
         region.PassPlatformHandle(),
         PlatformSharedMemoryRegion::Mode::kWritable, region.GetSize(),
         region.GetGUID());
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     EXPECT_THAT(result,
                 ErrorIs(PlatformSharedMemoryRegion::TakeError::kFcntlFailed));
 #else

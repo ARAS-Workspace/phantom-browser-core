@@ -21,10 +21,6 @@
 #include "chrome/common/chrome_switches.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace diagnostics {
 
 // Basic harness to acquire and release the required temporary environment to
@@ -54,14 +50,6 @@ class DiagnosticsControllerTest : public testing::Test {
     // in the process run.
     user_data_dir_override_.emplace(chrome::DIR_USER_DATA, user_data_dir_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Redirect the home dir to the profile directory. We have to do this
-    // because NSS uses the HOME directory to find where to store it's database,
-    // so that's where the diagnostics and recovery code looks for it.
-    base::PathService::Get(base::DIR_HOME, &old_home_dir_);
-    base::PathService::Override(base::DIR_HOME, user_data_dir_);
-#endif
-
     cmdline_ = base::CommandLine(base::CommandLine::NO_PROGRAM);
     cmdline_.AppendSwitchPath(switches::kUserDataDir, user_data_dir_);
     cmdline_.AppendSwitch(switches::kDiagnostics);
@@ -73,10 +61,6 @@ class DiagnosticsControllerTest : public testing::Test {
 
   void TearDown() override {
     DiagnosticsController::GetInstance()->ClearResults();
-#if BUILDFLAG(IS_CHROMEOS)
-    base::PathService::Override(base::DIR_HOME, old_home_dir_);
-    old_home_dir_.clear();
-#endif
   }
 
   void CorruptDataFile(const base::FilePath& path) {
@@ -93,9 +77,6 @@ class DiagnosticsControllerTest : public testing::Test {
   base::FilePath user_data_dir_;
   std::optional<base::ScopedPathOverride> user_data_dir_override_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  base::FilePath old_home_dir_;
-#endif
 };
 
 TEST_F(DiagnosticsControllerTest, Diagnostics) {
@@ -126,51 +107,5 @@ TEST_F(DiagnosticsControllerTest, RecoverAllOK) {
         << "Test: " << info.GetName();
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(DiagnosticsControllerTest, RecoverFromNssCertDbFailure) {
-  base::FilePath db_path = user_data_dir_.Append(ash::kNssCertDbPath);
-  EXPECT_TRUE(base::PathExists(db_path));
-  CorruptDataFile(db_path);
-  DiagnosticsController::GetInstance()->Run(cmdline_, writer_.get());
-  ASSERT_TRUE(DiagnosticsController::GetInstance()->HasResults());
-  const DiagnosticsModel& results =
-      DiagnosticsController::GetInstance()->GetResults();
-  EXPECT_EQ(results.GetTestRunCount(), results.GetTestAvailableCount());
-  EXPECT_EQ(DiagnosticsModel::kDiagnosticsTestCount, results.GetTestRunCount());
-
-  const DiagnosticsModel::TestInfo* info = nullptr;
-  EXPECT_TRUE(
-      results.GetTestInfo(DIAGNOSTICS_SQLITE_INTEGRITY_NSS_CERT_TEST, &info));
-  EXPECT_EQ(DiagnosticsModel::TEST_FAIL_CONTINUE, info->GetResult());
-  EXPECT_EQ(DIAG_SQLITE_CANNOT_OPEN_DB, info->GetOutcomeCode());
-
-  DiagnosticsController::GetInstance()->RunRecovery(cmdline_, writer_.get());
-  EXPECT_EQ(DiagnosticsModel::RECOVERY_OK, info->GetResult());
-  EXPECT_FALSE(base::PathExists(db_path));
-}
-
-TEST_F(DiagnosticsControllerTest, RecoverFromNssKeyDbFailure) {
-  base::FilePath db_path = user_data_dir_.Append(ash::kNssKeyDbPath);
-  EXPECT_TRUE(base::PathExists(db_path));
-  CorruptDataFile(db_path);
-  DiagnosticsController::GetInstance()->Run(cmdline_, writer_.get());
-  ASSERT_TRUE(DiagnosticsController::GetInstance()->HasResults());
-  const DiagnosticsModel& results =
-      DiagnosticsController::GetInstance()->GetResults();
-  EXPECT_EQ(results.GetTestRunCount(), results.GetTestAvailableCount());
-  EXPECT_EQ(DiagnosticsModel::kDiagnosticsTestCount, results.GetTestRunCount());
-
-  const DiagnosticsModel::TestInfo* info = nullptr;
-  EXPECT_TRUE(
-      results.GetTestInfo(DIAGNOSTICS_SQLITE_INTEGRITY_NSS_KEY_TEST, &info));
-  EXPECT_EQ(DiagnosticsModel::TEST_FAIL_CONTINUE, info->GetResult());
-  EXPECT_EQ(DIAG_SQLITE_CANNOT_OPEN_DB, info->GetOutcomeCode());
-
-  DiagnosticsController::GetInstance()->RunRecovery(cmdline_, writer_.get());
-  EXPECT_EQ(DiagnosticsModel::RECOVERY_OK, info->GetResult());
-  EXPECT_FALSE(base::PathExists(db_path));
-}
-#endif
 
 }  // namespace diagnostics

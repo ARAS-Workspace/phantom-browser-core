@@ -34,8 +34,6 @@ gfx::Font WatermarkFont(int font_size) {
       "SF Pro Text",
 #elif BUILDFLAG(IS_LINUX)
       "Ubuntu",
-#elif BUILDFLAG(IS_CHROMEOS)
-      "Google Sans",
 #else
       "sans-serif",
 #endif

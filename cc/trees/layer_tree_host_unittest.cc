@@ -9416,61 +9416,6 @@ class LayerTreeHostTopControlsDeltaTriggersViewportUpdate
 
 MULTI_THREAD_TEST_F(LayerTreeHostTopControlsDeltaTriggersViewportUpdate);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests that custom sequence metrics tracking result is reported to
-// LayerTreeHostDelegate.
-constexpr MutatorHost::TrackedAnimationSequenceId kSequenceId = 1u;
-class LayerTreeHostCustomMetricsTrackerTest : public LayerTreeHostTest {
- public:
-  // Custom sequences are only supported for ChromeOS UI, which is
-  // Single-Threaded.
-  void InitializeSettings(LayerTreeSettings* settings) override {
-    settings->is_layer_tree_for_ui = true;
-  }
-
-  void BeginTest() override { PostSetNeedsCommitToMainThread(); }
-
-  void DidCommit() override {
-    // FrameSequenceTracker typically sees the following sequence:
-    //   e(2,2)b(3)B(0,3)E(3)s(3)S(3)e(3,3)P(3)b(4)B(3,4)E(4)s(4)S(4)e(4,4)P(4)
-    switch (layer_tree_host()->SourceFrameNumber()) {
-      case 1:
-        animation_host()->StartCompositorMetricsTracking(kSequenceId);
-        break;
-      case 3:
-        animation_host()->StopCompositorMetricsTracking(kSequenceId);
-        break;
-      default:
-        break;
-    }
-
-    if (!TestEnded())
-      PostSetNeedsCommitWithForcedRedrawToMainThread();
-  }
-
-  void NotifyCompositorMetricsTrackerResults(
-      CustomTrackerResults results) override {
-    // Check that data for kSequenceId is captured. Ideally, we should get
-    // 2 frame_expected and 2 frame_produced. But on slow bots, it is difficult
-    // to infer the correct numbers. Both frame_expected and frame_produced
-    // could drop to 1 (or even below). So no sanity check on data itself.
-    ASSERT_TRUE(results.contains(kSequenceId));
-
-    EndTest();
-  }
-
-  // FrameSorter only tracks for BeginMainFrame which have provided metrics.
-  std::unique_ptr<BeginMainFrameMetrics> GetBeginMainFrameMetrics() override {
-    std::unique_ptr<BeginMainFrameMetrics> metrics =
-        std::make_unique<BeginMainFrameMetrics>();
-    metrics->should_measure_smoothness = true;
-    return metrics;
-  }
-};
-
-SINGLE_THREAD_TEST_F(LayerTreeHostCustomMetricsTrackerTest);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class LayerTreeHostTestDelegatedInkMetadataBase
     : public LayerTreeHostTest,
       public RenderFrameMetadataObserver {

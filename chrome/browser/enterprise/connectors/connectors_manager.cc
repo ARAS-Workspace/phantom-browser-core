@@ -74,34 +74,6 @@ bool ConnectorsManager::IsConnectorEnabledForLocalAgent(
 }
 #endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::optional<AnalysisSettings> ConnectorsManager::GetAnalysisSettings(
-    content::BrowserContext* context,
-    const storage::FileSystemURL& source_url,
-    const storage::FileSystemURL& destination_url,
-    AnalysisConnector connector) {
-  if (!IsAnalysisConnectorEnabled(connector)) {
-    return std::nullopt;
-  }
-
-  if (analysis_connector_settings_.count(connector) == 0)
-    CacheAnalysisConnectorPolicy(connector);
-
-  // If the connector is still not in memory, it means the pref is set to an
-  // empty list or that it is not a list.
-  if (analysis_connector_settings_.count(connector) == 0)
-    return std::nullopt;
-
-  // While multiple services can be set by the connector policies, only the
-  // first one is considered for now.
-  auto* analysis_connector_settings = static_cast<AnalysisServiceSettings*>(
-      analysis_connector_settings_[connector][0].get());
-
-  return analysis_connector_settings->GetAnalysisSettings(
-      context, source_url, destination_url, GetDataRegion(connector));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
 void ConnectorsManager::OnBrowserCreated(BrowserWindowInterface* browser) {
   // TODO(crbug.com/452120900): TabStripModel auto-unregistered by dtor

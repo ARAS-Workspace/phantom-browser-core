@@ -24,39 +24,4 @@ bool TextInputClient::SupportsAutoFill() const {
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-void TextInputClient::ExtendSelectionAndReplace(
-    size_t length_before_selection,
-    size_t length_after_selection,
-    const std::u16string_view replacement_string) {
-  ExtendSelectionAndDelete(length_before_selection, length_after_selection);
-  InsertText(std::u16string(replacement_string),
-             InsertTextCursorBehavior::kMoveCursorAfterText);
-}
-
-std::optional<GrammarFragment> TextInputClient::GetGrammarFragmentAtCursor()
-    const {
-  return std::nullopt;
-}
-
-bool TextInputClient::ClearGrammarFragments(const gfx::Range& range) {
-  return false;
-}
-
-bool TextInputClient::AddGrammarFragments(
-    const std::vector<GrammarFragment>& fragments) {
-  return false;
-}
-
-bool TextInputClient::SupportsAlwaysConfirmComposition() {
-  return true;
-}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-ui::TextInputClient::EditingContext TextInputClient::GetTextEditingContext() {
-  return {};
-}
-#endif
-
 }  // namespace ui

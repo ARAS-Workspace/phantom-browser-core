@@ -22,10 +22,6 @@
 #include "components/feedback/proto/math.pb.h"
 #include "google_apis/gaia/gaia_auth_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif
-
 namespace {
 
 // The below thresholds were chosen arbitrarily to conveniently show small data
@@ -144,15 +140,6 @@ void FeedbackCommon::PrepareReport(
 
   // Set whether we're reporting from ChromeOS or Chrome on another platform.
   userfeedback::ChromeData chrome_data;
-#if BUILDFLAG(IS_CHROMEOS)
-  const userfeedback::ChromeData_ChromePlatform chrome_platform =
-      userfeedback::ChromeData_ChromePlatform_CHROME_OS;
-  const int default_product_id = feedback::kChromeOSProductId;
-  userfeedback::ChromeOsData chrome_os_data;
-  chrome_os_data.set_category(
-      userfeedback::ChromeOsData_ChromeOsCategory_OTHER);
-  *(chrome_data.mutable_chrome_os_data()) = chrome_os_data;
-#else
   const userfeedback::ChromeData_ChromePlatform chrome_platform =
       userfeedback::ChromeData_ChromePlatform_CHROME_BROWSER;
   const int default_product_id = feedback::kChromeBrowserProductId;
@@ -160,7 +147,6 @@ void FeedbackCommon::PrepareReport(
   chrome_browser_data.set_category(
       userfeedback::ChromeBrowserData_ChromeBrowserCategory_OTHER);
   *(chrome_data.mutable_chrome_browser_data()) = chrome_browser_data;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   chrome_data.set_chrome_platform(chrome_platform);
   // TODO(b/301518187): Investigate if this line is needed in order for custom
   // product IDs to work. Remove `include_chrome_platform_` if it's not needed.
@@ -244,13 +230,6 @@ int FeedbackCommon::GetChromeBrowserProductId() {
 int FeedbackCommon::GetMahiProductId() {
   return feedback::kMahiFeedbackProductId;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-int FeedbackCommon::GetChromeOSProductId() {
-  return feedback::kChromeOSProductId;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 FeedbackCommon::~FeedbackCommon() = default;
 

@@ -13,9 +13,3 @@ void TestVersionUpdater::CheckForUpdate(StatusCallback callback,
   callback.Run(status_, progress_, rollback_, powerwash_, version_,
                update_size_, message_);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool TestVersionUpdater::IsManagedAutoUpdateEnabled() {
-  return true;
-}
-#endif

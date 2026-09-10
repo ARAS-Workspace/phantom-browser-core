@@ -56,12 +56,12 @@ inline constexpr char kCustomLinksInitialized[] = "custom_links.initialized";
 #endif  // BUILDFLAG(IS_DESKTOP_ANDROID)
 
 // Prefs used to cache enterprise shortcuts.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 inline constexpr char kEnterpriseShortcutsPolicyList[] =
     "enterprise_shortcuts.policy_list";
 inline constexpr char kEnterpriseShortcutsUserList[] =
     "enterprise_shortcuts.user_list";
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 // Pref used to verify whether custom links have been removed
 // for preinstalled default chrome apps

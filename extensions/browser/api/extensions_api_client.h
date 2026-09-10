@@ -22,11 +22,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_id.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "extensions/browser/api/clipboard/clipboard_api_types.h"
-#include "extensions/common/api/clipboard.h"
-#endif
-
 class GURL;
 class KeyedServiceBaseFactory;
 
@@ -78,10 +73,6 @@ class WebViewGuest;
 class WebViewGuestDelegate;
 class WebViewPermissionHelper;
 class WebViewPermissionHelperDelegate;
-
-#if BUILDFLAG(IS_CHROMEOS)
-class ConsentProvider;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Allows the embedder of the extensions module to customize its support for
 // API features. The embedder must create a single instance in the browser
@@ -175,13 +166,6 @@ class ExtensionsAPIClient {
       WebViewPermissionHelper* web_view_permission_helper) const;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Returns an interface for requesting consent for file system API. The caller
-  // owns the returned ConsentProvider.
-  virtual std::unique_ptr<ConsentProvider> CreateConsentProvider(
-      content::BrowserContext* browser_context) const;
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // TODO(wjmaclean): Remove this when (if) ContentRulesRegistry code moves
   // to extensions/browser/api.
   virtual scoped_refptr<ContentRulesRegistry> CreateContentRulesRegistry(
@@ -191,15 +175,6 @@ class ExtensionsAPIClient {
   // Creates a UsbDevicePermissionsPrompt appropriate for the embedder.
   virtual std::unique_ptr<UsbDevicePermissionsPrompt>
   CreateUsbDevicePermissionsPrompt(content::WebContents* web_contents) const;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Returns true if device policy allows detaching a given USB device.
-  virtual bool ShouldAllowDetachingUsb(int vid, int pid) const;
-
-  // Returns a delegate for some of VirtualKeyboardAPI's behavior.
-  virtual std::unique_ptr<VirtualKeyboardDelegate>
-  CreateVirtualKeyboardDelegate(content::BrowserContext* browser_context) const;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Creates a delegate for handling the management extension api.
   virtual ManagementAPIDelegate* CreateManagementAPIDelegate() const;
@@ -232,24 +207,6 @@ class ExtensionsAPIClient {
 
   virtual AutomationInternalApiDelegate* GetAutomationInternalApiDelegate();
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // If supported by the embedder, returns a delegate for querying non-native
-  // file systems.
-  virtual NonNativeFileSystemDelegate* GetNonNativeFileSystemDelegate();
-
-  // Returns a delegate for embedder-specific chrome.mediaPerceptionPrivate API
-  // behavior.
-  virtual MediaPerceptionAPIDelegate* GetMediaPerceptionAPIDelegate();
-
-  // Saves image data on clipboard.
-  virtual void SaveImageDataToClipboard(
-      std::vector<uint8_t> image_data,
-      api::clipboard::ImageType type,
-      AdditionalDataItemList additional_items,
-      base::OnceClosure success_callback,
-      base::OnceCallback<void(const std::string&)> error_callback);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Gets keyed service factories that are used in the other methods on this
   // class.

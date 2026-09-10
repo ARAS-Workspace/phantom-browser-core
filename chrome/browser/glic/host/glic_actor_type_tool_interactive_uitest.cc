@@ -137,12 +137,7 @@ IN_PROC_BROWSER_TEST_F(GlicActorTypeToolUiTest,
 }
 
 // TODO(crbug.com/469210106): Re-enable this test on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TypeActionOnDisabledInputFails \
-  DISABLED_TypeActionOnDisabledInputFails
-#else
 #define MAYBE_TypeActionOnDisabledInputFails TypeActionOnDisabledInputFails
-#endif
 IN_PROC_BROWSER_TEST_F(GlicActorTypeToolUiTest,
                        MAYBE_TypeActionOnDisabledInputFails) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kTypingTestTabId);

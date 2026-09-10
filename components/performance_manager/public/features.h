@@ -26,9 +26,6 @@ namespace performance_manager::features {
 #endif
 
 // When enabled removes the rate limit on reporting tab processes to resourced.
-#if BUILDFLAG(IS_CHROMEOS)
-BASE_DECLARE_FEATURE(kUnthrottledTabProcessReporting);
-#endif
 
 // Make the Battery Saver Modes available to users. If this is enabled, it
 // doesn't mean the mode is enabled, just that the user has the option of

@@ -437,20 +437,10 @@ IN_PROC_BROWSER_TEST_F(BrowserFrameViewBrowserTest, DISABLED_SaveCardIcon) {
   EXPECT_TRUE(icon->GetVisible());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(BrowserFrameViewBrowserTest, BrowserFrameWindowMask) {
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
-  BrowserFrameView* frame_view = browser_view->browser_widget()->GetFrameView();
-  SkPath path;
-  frame_view->GetWindowMask(frame_view->bounds().size(), &path);
-  EXPECT_TRUE(path.isEmpty());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using BrowserFrameViewPopupTest = InProcessBrowserTest;
 
 // TODO(crbug.com/41478509): Flaky on Linux TSAN and ASAN.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
+#if BUILDFLAG(IS_LINUX) && \
     (defined(ADDRESS_SANITIZER) || defined(THREAD_SANITIZER))
 #define MAYBE_HitTestPopupTopChrome DISABLED_HitTestPopupTopChrome
 #else
@@ -477,7 +467,7 @@ IN_PROC_BROWSER_TEST_F(BrowserFrameViewPopupTest, MAYBE_HitTestPopupTopChrome) {
 using BrowserFrameViewTabbedTest = InProcessBrowserTest;
 
 // TODO(crbug.com/40101869): Flaky on Linux TSAN.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(THREAD_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_HitTestTabstrip DISABLED_HitTestTabstrip
 #else
 #define MAYBE_HitTestTabstrip HitTestTabstrip
@@ -513,12 +503,10 @@ IN_PROC_BROWSER_TEST_F(BrowserFrameViewTabbedTest, MAYBE_HitTestTabstrip) {
   EXPECT_TRUE(browser_view->HitTestRect(gfx::Rect(
       tabstrip_bounds.x() + 10, tabstrip_bounds.bottom() - 10, 1, 1)));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Hits non-client portions of the tab strip (the top left corner of the
   // first tab).
   EXPECT_TRUE(frame_view->HitTestRect(
       gfx::Rect(tabstrip_bounds.x(), tabstrip_bounds.y(), 1, 1)));
-#endif
 
   // Hits tab strip and the browser-client area.
   EXPECT_TRUE(frame_view->HitTestRect(gfx::Rect(

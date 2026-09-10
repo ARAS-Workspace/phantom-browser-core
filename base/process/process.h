@@ -15,9 +15,9 @@
 #include "build/blink_buildflags.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE)
 #include "base/feature_list.h"
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_APPLE)
 
 #if BUILDFLAG(IS_APPLE)
 #include "base/process/port_provider_mac.h"
@@ -25,15 +25,6 @@
 
 namespace base {
 
-#if BUILDFLAG(IS_CHROMEOS)
-// FlattenCpuCgroups feature uses /sys/fs/cgroup/cpu/chrome_renderers and
-// /sys/fs/cgroup/cpu/chrome_renderers_background cpu cgroups for renderer
-// processes instead of nested cpu cgroups. Nested cpu cgroups has an overhead
-// on task scheduling.
-BASE_EXPORT BASE_DECLARE_FEATURE(kFlattenCpuCgroups);
-
-class ProcessPriorityDelegate;
-#endif
 
 // Provides a move-only encapsulation of a process.
 //
@@ -199,43 +190,10 @@ class BASE_EXPORT Process {
   // of this value is OS dependent.
   int GetOSPriority() const;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Get the PID in its PID namespace.
-  // If the process is not in a PID namespace or /proc/<pid>/status does not
-  // report NSpid, kNullProcessId is returned.
-  ProcessId GetPidInNamespace() const;
-#endif
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Returns true if the process has any seccomp policy applied.
   bool IsSeccompSandboxed();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Sets a delegate which handles process priority changes. This
-  // must be externally synchronized with any call to base::Process methods.
-  static void SetProcessPriorityDelegate(ProcessPriorityDelegate* delegate);
-
-  // Initializes the process's priority.
-  //
-  // This should be called before SetPriority().
-  //
-  // If SchedQoSOnResourcedForChrome is enabled, this creates a cache entry for
-  // the process priority. The returned `base::Process::PriorityEntry` should be
-  // freed when the process is terminated so that the cached entry is freed from
-  // the internal map.
-  //
-  // If OneGroupPerRenderer is enabled, it also creates a unique cgroup for the
-  // process.
-  // This is a no-op if the Process is not valid or if it has already been
-  // called.
-  void InitializePriority();
-
-  // Clears the entities initialized by InitializePriority().
-  //
-  // This is no-op if SchedQoSOnResourcedForChrome is disabled.
-  void ForgetPriority();
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_APPLE)
   // Sets the priority of the current process to its default value.
@@ -290,13 +248,6 @@ BASE_EXPORT const char* ProcessPriorityToString(
 BASE_EXPORT std::ostream& operator<<(std::ostream& os,
                                      Process::Priority priority);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Exposed for testing.
-// Given the contents of the /proc/<pid>/cgroup file, determine whether the
-// process is backgrounded or not.
-BASE_EXPORT Process::Priority GetProcessPriorityCGroup(
-    std::string_view cgroup_contents);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace base
 

@@ -73,11 +73,7 @@
 #include "chrome/browser/themes/theme_service_factory.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#else
 #include "components/enterprise/browser/reporting/common_pref_names.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/extensions/management/management_util.h"
@@ -102,9 +98,6 @@ ExtensionManagement::ExtensionManagement(Profile* profile)
     : profile_(profile), pref_service_(profile_->GetPrefs()) {
   TRACE_EVENT0("browser,startup",
                "ExtensionManagement::ExtensionManagement::ctor");
-#if BUILDFLAG(IS_CHROMEOS)
-  is_signin_profile_ = ash::ProfileHelper::IsSigninProfile(profile);
-#endif
   pref_change_registrar_.Init(pref_service_);
   base::RepeatingClosure pref_change_callback = base::BindRepeating(
       &ExtensionManagement::OnExtensionPrefChanged, base::Unretained(this));
@@ -122,10 +115,8 @@ ExtensionManagement::ExtensionManagement(Profile* profile)
   pref_change_registrar_.Add(
       enterprise_reporting::kCloudExtensionRequestEnabled,
       pref_change_callback);
-#if !BUILDFLAG(IS_CHROMEOS)
   pref_change_registrar_.Add(enterprise_reporting::kCloudReportingEnabled,
                              pref_change_callback);
-#endif
 
   pref_change_registrar_.Add(pref_names::kExtensionUnpublishedAvailability,
                              pref_change_callback);

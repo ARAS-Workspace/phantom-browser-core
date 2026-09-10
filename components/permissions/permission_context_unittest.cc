@@ -1098,7 +1098,7 @@ TEST_F(PermissionContextBaseTests, TestGlobalKillSwitch) {
   TestGlobalPermissionsKillSwitch<ContentSettingsType::NOTIFICATIONS>();
   TestGlobalPermissionsKillSwitch<ContentSettingsType::MIDI_SYSEX>();
   TestGlobalPermissionsKillSwitch<ContentSettingsType::PERSISTENT_STORAGE>();
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   TestGlobalPermissionsKillSwitch<
       ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER>();
 #endif

@@ -69,7 +69,7 @@ void PrepareBrowserCommandLineForTests(base::CommandLine* command_line) {
 
   command_line->AppendSwitch(switches::kDisableComponentUpdate);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Changing the stack canary means we need to disable the stack guard on all
   // functions that appear as ancestors in the call stack of RunZygote(). This
   // is infeasible for tests, and changing the stack canary is unnecessary for

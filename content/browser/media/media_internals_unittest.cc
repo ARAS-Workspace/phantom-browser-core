@@ -170,7 +170,7 @@ TEST_F(MediaInternalsVideoCaptureDeviceTest,
   descriptor.set_display_name("dummy");
 #if BUILDFLAG(IS_MAC)
   descriptor.capture_api = media::VideoCaptureApi::MACOSX_AVFOUNDATION;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   descriptor.device_id = "/dev/dummy";
   descriptor.capture_api = media::VideoCaptureApi::LINUX_V4L2_SINGLE_PLANE;
 #elif BUILDFLAG(IS_ANDROID)
@@ -188,7 +188,7 @@ TEST_F(MediaInternalsVideoCaptureDeviceTest,
   media_internals()->UpdateVideoCaptureDeviceCapabilities(
       descriptors_and_formats);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   ExpectString("id", "/dev/dummy");
 #else
   ExpectString("id", "dummy");
@@ -197,7 +197,7 @@ TEST_F(MediaInternalsVideoCaptureDeviceTest,
   base::ListValue expected_list;
   expected_list.Append(media::VideoCaptureFormat::ToString(format_hd));
   ExpectListOfStrings("formats", expected_list);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   ExpectString("captureApi", "V4L2 SPLANE");
 #elif BUILDFLAG(IS_MAC)
   ExpectString("captureApi", "AV Foundation");

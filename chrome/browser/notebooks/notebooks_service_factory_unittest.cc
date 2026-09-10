@@ -74,7 +74,7 @@ TEST_F(NotebooksServiceFactoryTest, FeatureEnabledUsesEmptyServiceInIncognito) {
   EXPECT_TRUE(service->IsEmptyForTesting());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(NotebooksServiceFactoryTest, ReturnsNullForSystemProfile) {
   InitFeature(/*enable_feature=*/true);
   TestingProfile* profile = profile_manager()->CreateSystemProfile();

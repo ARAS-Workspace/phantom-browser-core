@@ -28,21 +28,6 @@
 #include "extensions/browser/test_event_router.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/ash/login/users/user_manager_delegate_impl.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "chrome/browser/browser_process.h"
-#include "chromeos/ash/components/install_attributes/stub_install_attributes.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/test_helper.h"
-#include "components/user_manager/user.h"
-#include "components/user_manager/user_manager_impl.h"
-#endif
-
 namespace extensions {
 
 namespace {
@@ -157,18 +142,6 @@ class SafeBrowsingPrivateEventRouterTestBase : public testing::Test {
 
 class SafeBrowsingPrivateEventRouterTest
     : public SafeBrowsingPrivateEventRouterTestBase {
-#if BUILDFLAG(IS_CHROMEOS)
- public:
-  SafeBrowsingPrivateEventRouterTest() = default;
-
- protected:
-  ash::ScopedCrosSettingsTestHelper cros_settings_test_helper_;
-  user_manager::ScopedUserManager user_manager_{
-      std::make_unique<user_manager::UserManagerImpl>(
-          std::make_unique<ash::UserManagerDelegateImpl>(),
-          g_browser_process->local_state(),
-          ash::CrosSettings::Get())};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(SafeBrowsingPrivateEventRouterTest, TestOnReuseDetected_Warned) {

@@ -189,10 +189,6 @@ class ChromeBrowsingDataRemoverDelegate
   // A helper method that checks if time period is for "all time".
   bool IsForAllTime() const;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void OnClearPlatformKeys(base::OnceClosure done, bool);
-#endif
-
 #if BUILDFLAG(ENABLE_PLUGINS)
   // Called when plugin data has been cleared. Invokes NotifyIfDone.
   void OnWaitableEventSignaled(base::OnceClosure done,

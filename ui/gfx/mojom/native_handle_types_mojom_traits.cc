@@ -14,10 +14,9 @@
 #include "ui/gfx/mac/io_surface.h"
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
 #include "ui/gfx/native_pixmap_handle.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
-
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/scoped_hardware_buffer_handle.h"
@@ -76,13 +75,13 @@ bool StructTraits<gfx::mojom::AHardwareBufferHandleDataView,
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
 mojo::PlatformHandle StructTraits<
     gfx::mojom::NativePixmapPlaneDataView,
     gfx::NativePixmapPlane>::buffer_handle(gfx::NativePixmapPlane& plane) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   return mojo::PlatformHandle(std::move(plane.fd));
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 bool StructTraits<
@@ -94,11 +93,11 @@ bool StructTraits<
   out->size = data.size();
 
   mojo::PlatformHandle handle = data.TakeBufferHandle();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (!handle.is_fd())
     return false;
   out->fd = handle.TakeFD();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   return true;
 }
@@ -108,7 +107,7 @@ bool StructTraits<
     gfx::mojom::NativePixmapHandleDataView,
     gfx::NativePixmapHandle>::Read(gfx::mojom::NativePixmapHandleDataView data,
                                    gfx::NativePixmapHandle* out) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   out->modifier = data.modifier();
   out->supports_zero_copy_webgpu_import =
       data.supports_zero_copy_webgpu_import();
@@ -117,8 +116,7 @@ bool StructTraits<
 
   return data.ReadPlanes(&out->planes);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
-
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
 
 #if BUILDFLAG(IS_APPLE)
 IOSurfaceHandle::IOSurfaceHandle() = default;
@@ -157,10 +155,10 @@ gfx::mojom::GpuMemoryBufferPlatformHandleDataView::Tag UnionTraits<
     case gfx::IO_SURFACE_BUFFER:
       return Tag::kIoSurfaceHandle;
 #endif  // BUILDFLAG(IS_APPLE)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
     case gfx::NATIVE_PIXMAP:
       return Tag::kNativePixmapHandle;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
 #if BUILDFLAG(IS_ANDROID)
     case gfx::ANDROID_HARDWARE_BUFFER:
       return Tag::kAndroidHardwareBufferHandle;
@@ -234,11 +232,11 @@ bool UnionTraits<gfx::mojom::GpuMemoryBufferPlatformHandleDataView,
 #endif
       return true;
 #endif  // BUILDFLAG(IS_APPLE)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
     case Tag::kNativePixmapHandle:
       gmb_handle->type = gfx::NATIVE_PIXMAP;
       return data.ReadNativePixmapHandle(&gmb_handle->native_pixmap_handle_);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
 #if BUILDFLAG(IS_ANDROID)
     case Tag::kAndroidHardwareBufferHandle:
       gmb_handle->type = gfx::ANDROID_HARDWARE_BUFFER;

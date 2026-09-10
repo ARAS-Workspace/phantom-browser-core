@@ -43,38 +43,9 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/test/device_state_mixin.h"
-#include "chrome/browser/ash/login/test/logged_in_user_mixin.h"
-#include "chrome/test/base/mixin_based_in_process_browser_test.h"
-#include "components/account_id/account_id.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using ::testing::IsSubsetOf;
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// The set of PII types that can be found in policy status.
-const std::set<redaction::PIIType> kExpectedPIITypesInPolicyStatus = {
-    redaction::PIIType::kStableIdentifier,
-    redaction::PIIType::kStableIdentifier, redaction::PIIType::kGaiaID,
-    redaction::PIIType::kEmail};
-
-// The set of pairs with policy status keys which are considered as PII. These
-// are the common keys between user and device policy status.
-constexpr const char* kPolicyStatusFieldsWithPII[] = {
-    policy::kClientIdKey, policy::kEnterpriseDomainManagerKey,
-    policy::kUsernameKey};
-
-// The set of pairs with policy status keys which don't contain PII. These are
-// the common keys between user and device policy status.
-constexpr const char* kPolicyStatusFields[] = {
-    policy::kPolicyDescriptionKey, "error", "policiesPushAvailable", "status",
-    "timeSinceLastRefresh"};
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Reads the contents of exported policy Json file in to `policies`
 // dictionary.
@@ -147,60 +118,6 @@ class PolicyDataCollectorBrowserTest : public InProcessBrowserTest {
   // Use a temporary directory to store data collector output.
   base::ScopedTempDir temp_dir_;
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-class PolicyDataCollectorBrowserTestAsh
-    : public MixinBasedInProcessBrowserTest {
- public:
-  PolicyDataCollectorBrowserTestAsh() = default;
-
-  void SetUpOnMainThread() override {
-    MixinBasedInProcessBrowserTest::SetUpOnMainThread();
-    logged_in_user_mixin_.LogInUser();
-    // By default DeviceStateMixin sets public key version to 17 whereas policy
-    // test server inside LoggedInUserMixin has only one version. By setting
-    // public_key_version to 1, we make device policy requests succeed and thus
-    // device policy timestamp set.
-    device_state_.RequestDevicePolicyUpdate()
-        ->policy_data()
-        ->set_public_key_version(1);
-  }
-
-  void SetUpInProcessBrowserTestFixture() override {
-    MixinBasedInProcessBrowserTest::SetUpInProcessBrowserTestFixture();
-    // Allow blocking for testing in this scope for temporary directory
-    // creation.
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-  }
-
-  void TearDownInProcessBrowserTestFixture() override {
-    MixinBasedInProcessBrowserTest::TearDownInProcessBrowserTestFixture();
-    // Allow blocking for testing in this scope for temporary directory
-    // creation.
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    ASSERT_TRUE(temp_dir_.Delete());
-  }
-
- protected:
-  std::set<redaction::PIIType> GetSetOfPIITypesInPIIMap(const PIIMap& pii_map) {
-    std::set<redaction::PIIType> pii_types;
-    for (const auto& map_entry : pii_map) {
-      pii_types.insert(map_entry.first);
-    }
-    return pii_types;
-  }
-
-  ash::DeviceStateMixin device_state_{
-      &mixin_host_,
-      ash::DeviceStateMixin::State::OOBE_COMPLETED_CLOUD_ENROLLED};
-  ash::LoggedInUserMixin logged_in_user_mixin_{
-      &mixin_host_, /*test_base=*/this, embedded_test_server(),
-      ash::LoggedInUserMixin::LogInType::kManaged};
-  // Use a temporary directory to store data collector output.
-  base::ScopedTempDir temp_dir_;
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -307,109 +224,3 @@ IN_PROC_BROWSER_TEST_F(PolicyDataCollectorBrowserTest,
   ASSERT_TRUE(status);
   EXPECT_FALSE(status->empty());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// We test the status in detail for only ChromeOS in
-// PolicyDataCollectorBrowserTestAsh.CollectPolicyStatus because the Mixins
-// for logged-in user only exists for ChromeOS.
-IN_PROC_BROWSER_TEST_F(PolicyDataCollectorBrowserTestAsh, CollectPolicyStatus) {
-  // PolicyDataCollector for testing.
-  PolicyDataCollector data_collector(ProfileManager::GetActiveUserProfile());
-
-  // Collect policies and assert no error returned.
-  base::test::TestFuture<std::optional<SupportToolError>>
-      test_future_collect_data;
-  data_collector.CollectDataAndDetectPII(
-      test_future_collect_data.GetCallback(),
-      /*task_runner_for_redaction_tool=*/nullptr,
-      /*redaction_tool_container=*/nullptr);
-  std::optional<SupportToolError> error = test_future_collect_data.Get();
-  EXPECT_EQ(error, std::nullopt);
-
-  // Check the returned map of detected PII inside the collected data to see if
-  // it contains the PII types we expect.
-  PIIMap pii_map = data_collector.GetDetectedPII();
-  EXPECT_THAT(GetSetOfPIITypesInPIIMap(pii_map),
-              IsSubsetOf(kExpectedPIITypesInPolicyStatus));
-
-  // Create a temporary directory to store the output file.
-  base::FilePath output_path = temp_dir_.GetPath();
-  // Export the collected data into `output_path` and make sure no error is
-  // returned.
-  base::test::TestFuture<std::optional<SupportToolError>>
-      test_future_export_data;
-  data_collector.ExportCollectedDataWithPII(
-      /*pii_types_to_keep=*/{}, output_path,
-      /*task_runner_for_redaction_tool=*/nullptr,
-      /*redaction_tool_container=*/nullptr,
-      test_future_export_data.GetCallback());
-  error = test_future_export_data.Get();
-  EXPECT_EQ(error, std::nullopt);
-
-  base::DictValue policy_result;
-  ASSERT_NO_FATAL_FAILURE(ReadExportedPolicyFile(
-      &policy_result, output_path.Append(FILE_PATH_LITERAL("policies.json"))));
-  EXPECT_FALSE(policy_result.empty());
-
-  base::DictValue* status = policy_result.FindDict("status");
-  ASSERT_TRUE(status);
-
-  // Check device policy status.
-  base::DictValue* device_policy_status =
-      status->FindDict(policy::kDeviceStatusKey);
-  EXPECT_TRUE(device_policy_status);
-  // Check the policy status fields with PII.
-  for (const char* device_status_key : kPolicyStatusFieldsWithPII) {
-    EXPECT_TRUE(device_policy_status->contains(device_status_key))
-        << "Device policy status doesn't contain key: " << device_status_key;
-    base::Value* device_status = device_policy_status->Find(device_status_key);
-    ASSERT_TRUE(device_status);
-    // Check if the fields containing PII are properly masked.
-    EXPECT_TRUE(device_status->is_string())
-        << "Device policy key " << device_status_key
-        << " is not a string as expected";
-    EXPECT_EQ(device_status->GetString(), kRedactedPlaceholder);
-  }
-  // Check the policy status fields without PII.
-  for (const char* device_status_key : kPolicyStatusFields) {
-    EXPECT_TRUE(device_policy_status->contains(device_status_key))
-        << "Device policy status doesn't contain key: " << device_status_key;
-    base::Value* device_status = device_policy_status->Find(device_status_key);
-    ASSERT_TRUE(device_status);
-    // If the key is not PII, the value can either be string or a bool. Check
-    // that it's not empty if it's a string.
-    if (device_status->is_string()) {
-      EXPECT_NE(device_status->GetString(), std::string());
-    }
-  }
-
-  // Check user policy status.
-  base::DictValue* user_policy_status =
-      status->FindDict(policy::kUserStatusKey);
-  EXPECT_TRUE(user_policy_status);
-  // Check the policy status fields with PII.
-  for (const char* user_status_key : kPolicyStatusFieldsWithPII) {
-    EXPECT_TRUE(user_policy_status->contains(user_status_key))
-        << "User policy status doesn't contain key: " << user_status_key;
-    base::Value* user_status = user_policy_status->Find(user_status_key);
-    ASSERT_TRUE(user_status);
-    // Check if the fields containing PII are properly masked.
-    EXPECT_TRUE(user_status->is_string())
-        << "User policy key " << user_status_key
-        << " is not a string as expected";
-    EXPECT_EQ(user_status->GetString(), kRedactedPlaceholder);
-  }
-  // Check the policy status fields without PII.
-  for (const char* user_status_key : kPolicyStatusFields) {
-    EXPECT_TRUE(user_policy_status->contains(user_status_key))
-        << "User policy status doesn't contain key: " << user_status_key;
-    base::Value* user_status = user_policy_status->Find(user_status_key);
-    ASSERT_TRUE(user_status);
-    // If the key is not PII, the value can either be string or a bool. Check
-    // that it's not empty if it's a string.
-    if (user_status->is_string()) {
-      EXPECT_NE(user_status->GetString(), std::string());
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)

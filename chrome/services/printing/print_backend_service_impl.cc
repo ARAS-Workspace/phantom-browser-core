@@ -45,10 +45,6 @@
 #include "chrome/common/printing/printer_capabilities_mac.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-#include "printing/backend/cups_connection_pool.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "base/command_line.h"
 #include "base/no_destructor.h"
@@ -419,27 +415,6 @@ void PrintBackendServiceImpl::GetDefaultPrinterName(
   std::move(callback).Run(base::ok(default_printer));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void PrintBackendServiceImpl::GetPrinterSemanticCapsAndDefaults(
-    const std::string& printer_name,
-    mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsCallback
-        callback) {
-  DCHECK(print_backend_);
-  crash_keys_ = std::make_unique<crash_keys::ScopedPrinterInfo>(
-      printer_name, print_backend_->GetPrinterDriverInfo(printer_name));
-
-  PrinterSemanticCapsAndDefaults printer_caps;
-  const mojom::ResultCode result =
-      print_backend_->GetPrinterSemanticCapsAndDefaults(printer_name,
-                                                        &printer_caps);
-  if (result != mojom::ResultCode::kSuccess) {
-    std::move(callback).Run(base::unexpected(result));
-    return;
-  }
-  std::move(callback).Run(base::ok(std::move(printer_caps)));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void PrintBackendServiceImpl::FetchCapabilities(
     const std::string& printer_name,
     mojom::PrintBackendService::FetchCapabilitiesCallback callback) {
@@ -590,22 +565,6 @@ void PrintBackendServiceImpl::StartPrinting(
     const std::optional<PrintSettings>& settings,
 #endif
     mojom::PrintBackendService::StartPrintingCallback callback) {
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-  CupsConnectionPool* connection_pool = CupsConnectionPool::GetInstance();
-  if (connection_pool) {
-    // If a pool exists then this document can only proceed with printing if
-    // there is a connection available for use by a `PrintingContext`.
-    if (!connection_pool->IsConnectionAvailable()) {
-      // This document has to wait until a connection becomes available.  Hold
-      // off on issuing the callback.
-      // TODO(crbug.com/40561724)  Place this in a queue of waiting jobs.
-      DLOG(ERROR) << "Need queue for print jobs awaiting a connection";
-      std::move(callback).Run(mojom::ResultCode::kFailed,
-                              PrintingContext::kNoPrintJobId);
-      return;
-    }
-  }
-#endif
 
   // This job takes ownership of this printing context and associates it with
   // the document.

@@ -196,7 +196,6 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, MAYBE_Persist) {
   EXPECT_EQ(kPersistLastUsedTime, nodes[0]->date_last_used());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)  // No multi-profile on ChromeOS.
 
 // Sanity check that bookmarks from different profiles are separate.
 IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, MultiProfile) {
@@ -223,7 +222,6 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, MultiProfile) {
   ASSERT_TRUE(bookmark_model2->GetUniqueUrls().empty());
 }
 
-#endif
 
 // Sanity check that bookmarks from Incognito mode persist Incognito restart.
 IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, IncognitoPersistence) {
@@ -836,7 +834,6 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest,
 }
 
 // Account nodes don't exist on ChromeOS, so this test does not apply.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest,
                        BookmarkCurrentTab_WithAccountNodes) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -863,7 +860,6 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest,
   ASSERT_TRUE(chrome::ExecuteCommand(browser(), IDC_BOOKMARK_THIS_TAB));
   EXPECT_THAT(1u, bookmark_model->bookmark_bar_node()->children().size());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class BookmarkPrerenderBrowsertest : public BookmarkBrowsertest {
  public:

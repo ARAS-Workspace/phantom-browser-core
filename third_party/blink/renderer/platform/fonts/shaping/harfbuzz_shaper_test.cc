@@ -735,7 +735,7 @@ TEST_P(ShapeParameterTest, MaxGlyphsClusterDevanagari) {
   HarfBuzzShaper shaper(string);
   const ShapeResult* result = ShapeWithParameter(&shaper);
   EXPECT_EQ(length, result->NumCharacters());
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Linux uses Lohit Devanagari. When using that font the shaper
   // returns 32767 glyphs instead of 32769.
   // TODO(crbug.com/933551): Add Noto Sans Devanagari to

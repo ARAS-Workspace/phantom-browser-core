@@ -57,10 +57,6 @@
 #include "ui/views/widget/widget.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/window_properties.h"
-#endif
-
 namespace {
 
 // The roundedness of the edges of our bubble.
@@ -763,11 +759,6 @@ void StatusBubbleViews::InitPopup() {
     params.parent = widget->GetNativeView();
     params.context = widget->GetNativeWindow();
     params.name = "StatusBubble";
-#if BUILDFLAG(IS_CHROMEOS)
-    params.init_properties_container.SetProperty(ash::kHideInOverviewKey, true);
-    params.init_properties_container.SetProperty(ash::kHideInDeskMiniViewKey,
-                                                 true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
     popup_->Init(std::move(params));
     // We do our own animation and don't want any from the system.
     popup_->SetVisibilityChangedAnimationsEnabled(false);

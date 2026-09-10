@@ -48,7 +48,7 @@ class GpuChannelEstablishFactory;
 namespace media {
 class AudioManager;
 class AudioSystem;
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
 class DeviceMonitorLinux;
 #endif
 }  // namespace media
@@ -181,14 +181,6 @@ class CONTENT_EXPORT BrowserMainLoop {
   MediaKeysListenerManagerImpl* media_keys_listener_manager() const {
     return media_keys_listener_manager_.get();
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Only expose this on ChromeOS since it's only needed there. On Android this
-  // be null if this process started in reduced mode.
-  net::NetworkChangeNotifier* network_change_notifier() const {
-    return network_change_notifier_.get();
-  }
-#endif
 
   midi::MidiService* midi_service() const { return midi_service_.get(); }
 
@@ -366,7 +358,7 @@ class CONTENT_EXPORT BrowserMainLoop {
   // Must be deleted on the IO thread.
   std::unique_ptr<SpeechRecognitionManagerImpl> speech_recognition_manager_;
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
   std::unique_ptr<media::DeviceMonitorLinux> device_monitor_linux_;
 #endif
 

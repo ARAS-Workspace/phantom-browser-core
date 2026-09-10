@@ -77,9 +77,6 @@
 #include "content/public/test/test_navigation_observer.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
 
 namespace {
 
@@ -290,10 +287,6 @@ class BrowserCloseManagerBrowserTest : public InProcessBrowserTest {
   }
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
   }
 
   void CreateStalledDownload(BrowserWindowInterface* browser) {

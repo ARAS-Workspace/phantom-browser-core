@@ -58,8 +58,7 @@ FilePathWatcher::~FilePathWatcher() {
 
 // static
 bool FilePathWatcher::RecursiveWatchAvailable() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   return true;
 #else
   // FSEvents isn't available on iOS.

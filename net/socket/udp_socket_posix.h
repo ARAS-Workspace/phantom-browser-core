@@ -451,7 +451,7 @@ class NET_EXPORT UDPSocketPosix {
       size_t maximum_packet_size);
 
   // recvmmsg() and GRO are only available on Linux, ChromeOS, and Android.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   base::expected<DatagramsMetadata, Error> InternalReadMultipleWithGro(
       IOBuffer* buffer,
       size_t buf_len,

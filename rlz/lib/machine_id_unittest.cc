@@ -20,24 +20,3 @@ TEST(MachineDealCodeTestMachineId, MachineId) {
   EXPECT_STREQ("A341BA986A7E86840688977FCF20C86E253F00919E068B50F8",
                id.c_str());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(MachineDealCodeTestMachineId, MachineIdIsUnique) {
-  std::string id1;
-  std::string id2;
-  rlz_lib::GetMachineId(&id1);
-  rlz_lib::GetMachineId(&id2);
-  EXPECT_NE(id1, id2);
-}
-
-TEST(MachineDealCodeTestMachineId, MachineIdIsProperFormat) {
-  std::string id;
-  rlz_lib::GetMachineId(&id);
-  std::string prefix = id.substr(0, 5);
-
-  EXPECT_EQ(50u, id.length());
-  EXPECT_TRUE(
-      base::ContainsOnlyChars(id, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"));
-  EXPECT_STREQ("NONCE", prefix.c_str());
-}
-#endif

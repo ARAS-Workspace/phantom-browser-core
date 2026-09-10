@@ -27,15 +27,9 @@ IN_PROC_BROWSER_TEST_F(SyncInternalsWebUITest, Uninitialized) {
   RunTestCase("Uninitialized");
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(SyncInternalsWebUITest, SyncDisabledByDefaultChromeOS) {
-  RunTestCase("SyncDisabledByDefaultChromeOS");
-}
-#else
 IN_PROC_BROWSER_TEST_F(SyncInternalsWebUITest, SyncDisabledByDefault) {
   RunTestCase("SyncDisabledByDefault");
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(SyncInternalsWebUITest, LoadPastedAboutInfo) {
   RunTestCase("LoadPastedAboutInfo");

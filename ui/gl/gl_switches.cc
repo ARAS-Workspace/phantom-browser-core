@@ -17,12 +17,11 @@
 #include "base/android/android_info.h"
 #endif
 
-#if BUILDFLAG(ENABLE_VULKAN) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID))
 #include <vulkan/vulkan_core.h>
 #include "third_party/angle/src/gpu_info_util/SystemInfo.h"  // nogncheck
 #endif  // BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID))
+        // BUILDFLAG(IS_ANDROID))
 
 namespace gl {
 
@@ -317,8 +316,7 @@ bool IsDefaultANGLEVulkan() {
     return false;
   }
 #endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(ENABLE_VULKAN) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID))
   angle::SystemInfo system_info;
   {
     TRACE_EVENT("gpu,startup", "angle::GetSystemInfoVulkan");
@@ -413,7 +411,7 @@ bool IsDefaultANGLEVulkan() {
   }
 
 #endif  // BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID))
+        // BUILDFLAG(IS_ANDROID))
 
   return base::FeatureList::IsEnabled(kDefaultANGLEVulkan);
 #endif  // !defined(MEMORY_SANITIZER)

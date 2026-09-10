@@ -101,11 +101,6 @@
 #include "extensions/common/extension.h"
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 #endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/file_manager/fileapi_util.h"
-#include "chrome/browser/ash/fusebox/fusebox_server.h"
-#include "content/public/browser/storage_partition.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
@@ -124,41 +119,6 @@
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) && BUILDFLAG(ENABLE_GUEST_VIEW)
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-base::FilePath GetExternalPath(Profile* profile,
-                               storage::FileSystemContext* file_system_context,
-                               storage::ExternalMountPoints* mount_points,
-                               const base::FilePath& virtual_path) {
-  std::string ignored_mount_name;
-  storage::FileSystemMountOption ignored_mount_option;
-  base::FilePath physical_path;
-  if (!mount_points || !mount_points->CrackVirtualPath(
-                           virtual_path, &ignored_mount_name, nullptr, nullptr,
-                           &physical_path, &ignored_mount_option)) {
-    return base::FilePath();
-  }
-
-  base::FilePath resolved_path = physical_path;
-  if (file_system_context && profile) {
-    GURL external_gurl;
-    if (file_manager::util::ConvertAbsoluteFilePathToFileSystemUrl(
-            profile, physical_path, file_manager::util::GetFileManagerURL(),
-            &external_gurl)) {
-      storage::FileSystemURL external_cracked_url =
-          file_system_context->CrackURLInFirstPartyContext(external_gurl);
-      if (external_cracked_url.is_valid()) {
-        base::FilePath fusebox_path =
-            fusebox::Server::SubstituteFuseboxFilePath(external_cracked_url);
-        if (!fusebox_path.empty()) {
-          resolved_path = std::move(fusebox_path);
-        }
-      }
-    }
-  }
-  return resolved_path;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 using FileRequestData =
     FileSystemAccessPermissionRequestManager::FileRequestData;
@@ -363,7 +323,7 @@ GenerateBlockPaths(bool should_normalize_file_path) {
           FILE_PATH_LITERAL("Library/Mobile Documents/com~apple~CloudDocs"),
           BlockType::kDontBlockChildren),
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       // On Linux also block access to devices via /dev.
       BlockPath::CreateAbsolute(FILE_PATH_LITERAL("/dev"),
                                 BlockType::kBlockAllChildren),
@@ -403,7 +363,7 @@ GenerateBlockPaths(bool should_normalize_file_path) {
   // initiated this blocklist check.
   //
   // TODO(crbug.com/375490221): Improve the ChromeOS blocklist logic.
-  constexpr bool kUseProfilePathForDirHome = BUILDFLAG(IS_CHROMEOS);
+  constexpr bool kUseProfilePathForDirHome = false;
   // Populate the hard-coded rules.
   auto block_path_rules = std::make_unique<
       ChromeFileSystemAccessPermissionContext::BlockPathRules>();
@@ -2062,34 +2022,12 @@ void ChromeFileSystemAccessPermissionContext::CheckPathsAgainstEnterprisePolicy(
       enterprise_connectors::ContentAnalysisRequest::FILE_PICKER_DIALOG;
   data.initiating_frame_id = frame_id;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  storage::FileSystemContext* file_system_context = nullptr;
-  if (rfh) {
-    content::SiteInstance* site_instance = rfh->GetSiteInstance();
-    if (site_instance && browser_profile) {
-      file_system_context = browser_profile->GetStoragePartition(site_instance)
-                                ->GetFileSystemContext();
-    }
-  }
-  storage::ExternalMountPoints* mount_points =
-      storage::ExternalMountPoints::GetSystemInstance();
-#endif
-
   // Resolve virtual paths for kExternal files to their physical paths
   // so they can be scanned, but keep the original entries (with virtual paths)
   // to return to the caller.
   data.paths.reserve(entries.size());
   for (const auto& entry : entries) {
     base::FilePath path_to_scan = entry.path;
-#if BUILDFLAG(IS_CHROMEOS)
-    if (entry.type == content::PathType::kExternal) {
-      base::FilePath resolved_path = GetExternalPath(
-          browser_profile, file_system_context, mount_points, entry.path);
-      if (!resolved_path.empty()) {
-        path_to_scan = std::move(resolved_path);
-      }
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
     data.paths.push_back(std::move(path_to_scan));
   }
 

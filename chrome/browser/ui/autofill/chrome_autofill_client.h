@@ -129,8 +129,7 @@ class ChromeAutofillClient : public ContentAutofillClient {
   ChromeAutofillClient& operator=(const ChromeAutofillClient&) = delete;
   ~ChromeAutofillClient() override;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // Triggers the AtMemory promo bubble.
   void ShowAutofillAtMemoryPromo();
 #endif

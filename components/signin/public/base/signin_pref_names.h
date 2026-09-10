@@ -11,10 +11,6 @@
 
 namespace prefs {
 
-#if BUILDFLAG(IS_CHROMEOS)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-extern const char kAccountIdMigrationState[];
-#endif
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 extern const char kAccountInfo[];
 COMPONENT_EXPORT(SIGNIN_SWITCHES)

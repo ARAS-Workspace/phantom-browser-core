@@ -51,13 +51,8 @@
 #include "ui/views/test/button_test_api.h"
 #include "ui/views/widget/any_widget_observer.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/intent_helper/preferred_apps_test_util.h"
-#include "chrome/browser/web_applications/web_app_utils.h"
-#else
 #include "chrome/browser/web_applications/web_app_command_scheduler.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
-#endif
 
 class IntentChipButtonBrowserTest
     : public web_app::WebAppNavigationBrowserTest,
@@ -242,24 +237,6 @@ IN_PROC_BROWSER_TEST_P(IntentChipButtonBrowserTest,
   EXPECT_FALSE(IsIntentChipFullyCollapsed(browser()));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Using the Intent Chip for an app which is set as preferred should launch
-// directly into the app. Preferred apps are only available on ChromeOS.
-IN_PROC_BROWSER_TEST_P(IntentChipButtonBrowserTest, OpensAppForPreferredApp) {
-  apps_util::SetSupportedLinksPreferenceAndWait(profile(), test_web_app_id());
-
-  const GURL in_scope_url =
-      embedded_https_test_server().GetURL(GetAppUrlHost(), GetInScopeUrlPath());
-  EXPECT_TRUE(DoAndWaitForIntentPickerIconUpdate([this, in_scope_url] {
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), in_scope_url));
-  }));
-
-  Browser* app_browser = ClickIntentChip(/*wait_for_browser=*/true);
-
-  EXPECT_TRUE(web_app::AppBrowserController::IsForWebApp(app_browser,
-                                                         test_web_app_id()));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 INSTANTIATE_TEST_SUITE_P(
     ,

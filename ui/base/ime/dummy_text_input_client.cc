@@ -162,50 +162,11 @@ bool DummyTextInputClient::ShouldDoLearning() {
   return false;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool DummyTextInputClient::SetCompositionFromExistingText(
     const gfx::Range& range,
     const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) {
   return false;
-}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-gfx::Range DummyTextInputClient::GetAutocorrectRange() const {
-  return autocorrect_range_;
-}
-gfx::Rect DummyTextInputClient::GetAutocorrectCharacterBounds() const {
-  return gfx::Rect();
-}
-
-bool DummyTextInputClient::SetAutocorrectRange(
-    const gfx::Range& range) {
-  if (autocorrect_enabled_) {
-    autocorrect_range_ = range;
-  }
-  return autocorrect_enabled_;
-}
-
-std::optional<GrammarFragment>
-DummyTextInputClient::GetGrammarFragmentAtCursor() const {
-  for (const auto& fragment : grammar_fragments_) {
-    if (fragment.range.Contains(cursor_range_)) {
-      return fragment;
-    }
-  }
-  return std::nullopt;
-}
-
-bool DummyTextInputClient::ClearGrammarFragments(const gfx::Range& range) {
-  grammar_fragments_.clear();
-  return true;
-}
-
-bool DummyTextInputClient::AddGrammarFragments(
-    const std::vector<GrammarFragment>& fragments) {
-  grammar_fragments_.insert(grammar_fragments_.end(), fragments.begin(),
-                            fragments.end());
-  return true;
 }
 #endif
 

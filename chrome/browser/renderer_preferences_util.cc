@@ -17,9 +17,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/net/convert_explicitly_allowed_network_ports_pref.h"
 #include "content/public/browser/reduce_accept_language_utils.h"
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/demo_mode/demo_session.h"
-#endif
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/pref_names.h"
 #include "components/autofill/core/common/autofill_prefs.h"
@@ -111,19 +108,12 @@ namespace renderer_preferences_util {
 void UpdateFromSystemSettings(blink::RendererPreferences* prefs,
                               Profile* profile) {
   const PrefService* pref_service = profile->GetPrefs();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   content::UpdateFontRendererPreferencesFromSystemSettings(prefs);
 #endif
   prefs->focus_ring_color = BUILDFLAG(IS_MAC) ? SkColorSetRGB(0x00, 0x5F, 0xCC)
                                               : SkColorSetRGB(0x10, 0x10, 0x10);
 #if defined(USE_AURA)
-#if BUILDFLAG(IS_CHROMEOS)
-  // This color is 0x544d90fe modulated with 0xffffff.
-  prefs->active_selection_bg_color = SkColorSetRGB(0xCB, 0xE4, 0xFA);
-  prefs->active_selection_fg_color = SK_ColorBLACK;
-  prefs->inactive_selection_bg_color = SkColorSetRGB(0xEA, 0xEA, 0xEA);
-  prefs->inactive_selection_fg_color = SK_ColorBLACK;
-#endif
 
 #if BUILDFLAG(IS_LINUX)
   if (auto* linux_ui_theme = ui::LinuxUiTheme::GetForProfile(profile)) {

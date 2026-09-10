@@ -17,7 +17,7 @@
 #include "services/on_device_model/ml/gpu_blocklist.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <errno.h>
 
 #include "content/common/gpu_pre_sandbox_hook_linux.h"
@@ -34,7 +34,7 @@ namespace on_device_model {
 
 namespace {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 constexpr uint32_t kVendorIdAMD = 0x1002;
 constexpr uint32_t kVendorIdIntel = 0x8086;
 constexpr uint32_t kVendorIdNVIDIA = 0x10DE;
@@ -66,7 +66,7 @@ void UpdateSandboxOptionsForGpu(
 // adapter. This makes sure any relevant drivers or other libs are loaded before
 // enabling the sandbox.
 BASE_FEATURE(kOnDeviceModelWarmDrivers,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -128,7 +128,7 @@ bool PreSandboxInit() {
   return true;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void AddSandboxLinuxOptions(sandbox::policy::SandboxLinux::Options& options) {
   // Make sure any necessary vendor-specific options are set.
   gpu::GPUInfo info;

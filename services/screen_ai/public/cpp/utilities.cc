@@ -26,7 +26,7 @@ namespace {
 // The maximum image dimension which is processed without downsampling by OCR.
 constexpr uint32_t kMaxImageDimensionForOcr = 2048;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 constexpr char kBinaryPathSwitch[] = "screen-ai-binary";
 #endif
 
@@ -35,12 +35,6 @@ const base::FilePath::CharType kScreenAISubDirName[] =
 
 const base::FilePath::CharType kScreenAIComponentBinaryName[] =
     FILE_PATH_LITERAL("libchromescreenai.so");
-
-#if BUILDFLAG(IS_CHROMEOS)
-// The path to the Screen AI DLC directory.
-constexpr char kScreenAIDlcRootPath[] =
-    "/run/imageloader/screen-ai/package/root/";
-#endif
 
 #if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
 #if BUILDFLAG(IS_LINUX)
@@ -125,9 +119,6 @@ base::FilePath GetComponentDir() {
   }
 #endif  // BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  return base::FilePath::FromASCII(kScreenAIDlcRootPath);
-#else
   base::FilePath components_dir;
   if (!base::PathService::Get(component_updater::DIR_COMPONENT_USER,
                               &components_dir) ||
@@ -136,7 +127,6 @@ base::FilePath GetComponentDir() {
   }
 
   return components_dir.Append(kScreenAISubDirName);
-#endif
 }
 
 #if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS)
@@ -158,7 +148,7 @@ base::FilePath GetComponentBinaryPathForTests() {
 
 const char* GetBinaryPathSwitch() {
   // This is only used on Linux and ChromeOS.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   return kBinaryPathSwitch;
 #else
   return nullptr;

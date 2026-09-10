@@ -32,7 +32,7 @@ constexpr auto kExpectedFontFamilyNames = std::to_array({
     "Noto Sans Thai UI",
     "Noto Sans Thai UI",
 });
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
 constexpr auto kExpectedFontFamilyNames = std::to_array({
     "Ahem",
     "Arimo",

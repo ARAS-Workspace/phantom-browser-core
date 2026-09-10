@@ -59,10 +59,6 @@
 
 namespace media {
 class AudioSystem;
-#if BUILDFLAG(IS_CHROMEOS)
-class JpegAcceleratorProviderImpl;
-class SystemEventMonitorImpl;
-#endif
 }
 
 namespace url {
@@ -920,13 +916,6 @@ class CONTENT_EXPORT MediaStreamManager
   mojo::UniqueReceiverSet<media::mojom::VideoCaptureHost> video_capture_hosts_;
 
   GenerateStreamTestCallback generate_stream_test_callback_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<media::JpegAcceleratorProviderImpl>
-      jpeg_accelerator_provider_;
-
-  std::unique_ptr<media::SystemEventMonitorImpl> system_event_monitor_;
-#endif
 
   base::WeakPtrFactory<MediaStreamManager> weak_ptr_factory_{this};
 };

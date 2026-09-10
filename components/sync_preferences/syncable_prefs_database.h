@@ -80,10 +80,6 @@ class SyncablePrefMetadata {
         write_behavior_(write_behavior) {
     CHECK(data_type_ == syncer::PREFERENCES ||
           data_type_ == syncer::PRIORITY_PREFERENCES
-#if BUILDFLAG(IS_CHROMEOS)
-          || data_type_ == syncer::OS_PREFERENCES ||
-          data_type_ == syncer::OS_PRIORITY_PREFERENCES
-#endif  // BUILDFLAG(IS_CHROMEOS)
           )
         << "Invalid type " << data_type_
         << " for syncable pref with id=" << syncable_pref_id_;

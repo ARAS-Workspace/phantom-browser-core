@@ -98,19 +98,6 @@ class AccountCapabilities {
   signin::Tribool can_submit_feedback() const;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Chrome can toggle auto updates with this capability.
-  signin::Tribool can_toggle_auto_updates() const;
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // The user account is able to use generative AI features. Since many
-  // generative AI features inherit the same capability (minor restrictions),
-  // this one should be used for future generative AI features, instead of using
-  // a separate one for each of them.
-  signin::Tribool can_use_chromeos_generative_ai() const;
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if !BUILDFLAG(IS_IOS)
   // The user account is able to use DevTools AI features.
   signin::Tribool can_use_devtools_generative_ai_features() const;
@@ -123,16 +110,6 @@ class AccountCapabilities {
 
   // The user account is able to use Gemini in Chrome.
   signin::Tribool can_use_gemini_in_chrome() const;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // The user account is able to use generative AI in recorder app.
-  signin::Tribool can_use_generative_ai_in_recorder_app() const;
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // The user account is able to use generative AI photo editing.
-  signin::Tribool can_use_generative_ai_photo_editing() const;
-#endif
 
   // The user account is able to use manta service.
   signin::Tribool can_use_manta_service() const;

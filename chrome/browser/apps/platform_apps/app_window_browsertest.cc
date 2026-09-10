@@ -187,7 +187,7 @@ IN_PROC_BROWSER_TEST_F(AppWindowAPITest, DISABLED_TestRestoreAfterClose) {
 }
 
 // These tests will be flaky in Linux as window bounds change asynchronously.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestDeprecatedBounds DISABLED_TestDeprecatedBounds
 #define MAYBE_TestInitialBounds DISABLED_TestInitialBounds
 #define MAYBE_TestInitialConstraints DISABLED_TestInitialConstraints

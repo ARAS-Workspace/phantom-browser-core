@@ -81,26 +81,6 @@ char kLSanDefaultSuppressions[] =
     // Suppress leaks in CreateCdmInstance. https://crbug.com/961062
     "leak:media::CdmAdapter::CreateCdmInstance\n"
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Suppress leak in FileStream. crbug.com/1263374
-    "leak:chromeos::PipeReader::StartIO\n"
-    // Supppress AnimationObserverToHideView leak. crbug.com/1261464
-    "leak:ash::ShelfNavigationWidget::UpdateButtonVisibility\n"
-    // Suppress AnimationSequence leak. crbug.com/1265031
-    "leak:ash::LockStateController::StartPostLockAnimation\n"
-    // Suppress leak in SurfaceDrawContext. crbug.com/1265033
-    "leak:skgpu::v1::SurfaceDrawContext::drawGlyphRunList\n"
-    // Suppress leak in BluetoothServerSocket. crbug.com/1278970
-    "leak:nearby::chrome::BluetoothServerSocket::"
-    "BluetoothServerSocket\n"
-    // Suppress leak in NearbyConnectionBrokerImpl. crbug.com/1279578
-    "leak:ash::secure_channel::NearbyConnectionBrokerImpl\n"
-    // Suppress leak in NearbyEndpointFinderImpl. crbug.com/1288577
-    "leak:ash::secure_channel::NearbyEndpointFinderImpl::~"
-    "NearbyEndpointFinderImpl\n"
-    // Suppress leak in DelayedCallbackGroup test. crbug.com/1279563
-    "leak:DelayedCallbackGroup_TimeoutAndRun_Test\n"
-#endif
 #if BUILDFLAG(IS_MAC)
     // These are caused by the system, but not yet clear if they are false
     // positives or bugs in the Mac LSAN runtime. Suppress while investigating.

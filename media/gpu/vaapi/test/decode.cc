@@ -47,9 +47,6 @@ using media::vaapi_test::Vp9Decoder;
 using media_gpu_vaapi::InitializeStubs;
 using media_gpu_vaapi::kModuleVa;
 using media_gpu_vaapi::kModuleVa_drm;
-#if BUILDFLAG(IS_CHROMEOS)
-using media_gpu_vaapi::kModuleVa_prot;
-#endif
 using media_gpu_vaapi::StubPathMap;
 
 namespace {
@@ -252,9 +249,6 @@ int main(int argc, char** argv) {
   const std::string va_suffix(base::NumberToString(VA_MAJOR_VERSION + 1));
   paths[kModuleVa].push_back(std::string("libva.so.") + va_suffix);
   paths[kModuleVa_drm].push_back(std::string("libva-drm.so.") + va_suffix);
-#if BUILDFLAG(IS_CHROMEOS)
-  paths[kModuleVa_prot].push_back(std::string("libva.so.") + va_suffix);
-#endif
   if (!InitializeStubs(paths)) {
     LOG(ERROR) << "Failed to initialize VA stubs";
     return EXIT_FAILURE;

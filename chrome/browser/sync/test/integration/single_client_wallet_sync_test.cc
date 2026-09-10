@@ -84,7 +84,6 @@ MATCHER(AddressHasConverted, "") {
 const char kLocalGuidA[] = "EDC609ED-7EEE-4F27-B00C-423242A9C44A";
 const char kDifferentBillingAddressId[] = "another address entity ID";
 
-#if !BUILDFLAG(IS_CHROMEOS)
 std::vector<std::unique_ptr<CreditCard>> GetServerCards(
     scoped_refptr<autofill::AutofillWebDataService> service) {
   base::test::TestFuture<WebDataServiceBase::Handle,
@@ -121,7 +120,6 @@ GetCreditCardCloudTokenData(
              *future.Get<1>())
       .GetValue();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Waits until local changes are committed or an auth error is encountered.
 class TestForAuthError : public UpdatedProgressMarkerChecker {
@@ -218,7 +216,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 // ChromeOS does not support late signin after profile creation, so the test
 // below does not apply, at least in the current form.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest,
                        DownloadAccountStorage_Card) {
   ASSERT_TRUE(SetupClients());
@@ -320,7 +317,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest,
   EXPECT_EQ("data-2",
             paydm->GetCreditCardCloudTokenData()[0]->instrument_token);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest, EnabledByDefault) {
   ASSERT_TRUE(SetupSync());
@@ -334,7 +330,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest, EnabledByDefault) {
 }
 
 // ChromeOS does not sign out, so the test below does not apply.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest, ClearOnSignOut) {
   wallet_helper::SetWalletData(
       GetFakeServer(),
@@ -361,7 +356,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest, ClearOnSignOut) {
   EXPECT_EQ(0uL, paydm->GetCreditCardCloudTokenData().size());
   EXPECT_EQ(0U, GetServerCardsMetadata(0, GetStoreType()).size());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Wallet data should get cleared from the database when the user enters the
 // sync paused state (e.g. persistent auth error).
@@ -914,7 +908,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest,
 
 // ChromeOS doesn't support changes to the primary account after startup, so
 // these tests don't apply.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest,
                        SwitchesFromAccountToProfileStorageOnSyncOptIn) {
   wallet_helper::SetWalletData(
@@ -1033,4 +1026,3 @@ IN_PROC_BROWSER_TEST_P(
   EXPECT_EQ(0U, GetCreditCardCloudTokenData(account_data).size());
   EXPECT_EQ(1U, GetCreditCardCloudTokenData(profile_data).size());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

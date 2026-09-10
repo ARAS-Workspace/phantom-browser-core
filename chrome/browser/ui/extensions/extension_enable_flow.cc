@@ -21,9 +21,7 @@
 #include "extensions/browser/extension_system.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/profiles/profile_picker.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 using extensions::Extension;
 using extensions::InstallPromptData;
@@ -122,11 +120,9 @@ void ExtensionEnableFlow::CheckPermissionAndMaybePromptUser() {
   }
 
   if (profiles::IsProfileLocked(profile_->GetPath())) {
-#if !BUILDFLAG(IS_CHROMEOS)
     ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(
         ProfilePicker::EntryPoint::kProfileLocked));
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
     return;
   }
 

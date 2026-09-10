@@ -365,10 +365,6 @@
 #include "content/browser/host_zoom_map_impl.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/browser/smart_card/smart_card_service.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "content/browser/renderer_host/popup_menu_helper_mac.h"
 #endif
@@ -15202,13 +15198,6 @@ void RenderFrameHostImpl::GetHidService(
   HidService::Create(this, std::move(receiver));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void RenderFrameHostImpl::GetSmartCardService(
-    mojo::PendingReceiver<blink::mojom::SmartCardService> receiver) {
-  SmartCardService::Create(this, std::move(receiver));
-}
-#endif
-
 IdleManagerImpl* RenderFrameHostImpl::GetIdleManager() {
   return idle_manager_.get();
 }
@@ -17210,9 +17199,6 @@ void RenderFrameHostImpl::MaybeGenerateCrashReport(
       break;
     case base::TERMINATION_STATUS_OOM:
     case base::TERMINATION_STATUS_EVICTED_FOR_MEMORY:
-#if BUILDFLAG(IS_CHROMEOS)
-    case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
-#endif
 #if BUILDFLAG(IS_ANDROID)
     case base::TERMINATION_STATUS_OOM_PROTECTED:
 #endif

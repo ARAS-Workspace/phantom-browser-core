@@ -1440,9 +1440,6 @@ void Dispatcher::UpdateOriginPermissions(const Extension& extension) {
 }
 
 void Dispatcher::EnableCustomElementAllowlist() {
-#if BUILDFLAG(IS_CHROMEOS)
-  blink::WebCustomElement::AddEmbedderCustomElementName("appview");
-#endif
   blink::WebCustomElement::AddEmbedderCustomElementName("extensionoptions");
   blink::WebCustomElement::AddEmbedderCustomElementName("webview");
   for (const auto& api_provider : api_providers_) {
@@ -1526,17 +1523,6 @@ void Dispatcher::RequireGuestViewModules(ScriptContext* context) {
   // TODO(fsamuel): Eagerly calling Require on context startup is expensive.
   // It would be better if there were a light way of detecting when a webview
   // or appview is created and only then set up the infrastructure.
-
-#if BUILDFLAG(IS_CHROMEOS)
-  const bool app_view_permission_exists = is_platform_app;
-  // Require AppView.
-  if (context->GetAvailability("appViewEmbedderInternal").is_available()) {
-    requires_guest_view_module = true;
-    module_system->Require("appViewElement");
-  } else if (app_view_permission_exists) {
-    module_system->Require("appViewDeny");
-  }
-#endif
 
   // Require ExtensionOptions.
   if (context->GetAvailability("extensionOptionsInternal").is_available()) {

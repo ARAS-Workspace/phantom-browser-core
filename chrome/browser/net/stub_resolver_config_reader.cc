@@ -174,7 +174,7 @@ bool StubResolverConfigReader::ShouldDisableDohForManaged() {
   if (android_has_owner_.value_or(false))
     return true;
 #endif
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (g_browser_process->browser_policy_connector()->HasMachineLevelPolicies())
     return true;
 #endif

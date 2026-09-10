@@ -292,7 +292,7 @@ StartupProfilePathInfo GetStartupProfilePath(
     const base::CommandLine& command_line,
     bool ignore_profile_picker);
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // Returns the profile that should be loaded on process startup. This is either
 // the profile returned by GetStartupProfilePath, or the guest profile along
 // with StartupProfileMode::kProfilePicker mode if the profile picker should be
@@ -305,6 +305,6 @@ StartupProfileInfo GetStartupProfile(const base::FilePath& cur_dir,
 // GetStartupProfile() returns kError. This may return kError if neither any
 // profile nor the profile picker can be opened.
 StartupProfileInfo GetFallbackStartupProfile();
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // CHROME_BROWSER_UI_STARTUP_STARTUP_BROWSER_CREATOR_H_

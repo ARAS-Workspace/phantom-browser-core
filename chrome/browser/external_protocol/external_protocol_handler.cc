@@ -190,12 +190,9 @@ void LaunchUrlWithoutSecurityCheckWithDelegate(
       "Launched external handler for '" + url.possibly_invalid_spec() + "'.");
 
   platform_util::OpenExternal(
-#if BUILDFLAG(IS_CHROMEOS)
-      Profile::FromBrowserContext(web_contents->GetBrowserContext()),
-#endif
       url);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // If the protocol navigation occurs in a new tab, close it.
   // Avoid calling CloseContents if the tab is not in this browser's tab strip
   // model; this can happen if the protocol was initiated by something

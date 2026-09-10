@@ -77,18 +77,6 @@ ACCOUNT_CAPABILITY(kCanSubmitFeedbackInChromeCapabilityName,
                    "accountcapabilities/gizdqmrnmnqxa")
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-ACCOUNT_CAPABILITY(kCanToggleAutoUpdatesName,
-                   CAN_TOGGLE_AUTO_UPDATES_NAME,
-                   "accountcapabilities/gu4dmlldmfya")
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-ACCOUNT_CAPABILITY(kCanUseChromeOSGenerativeAi,
-                   CAN_USE_CHROMEOS_GENERATIVE_AI,
-                   "accountcapabilities/ge3dgmjnmnqxa")
-#endif
-
 #if !BUILDFLAG(IS_IOS)
 ACCOUNT_CAPABILITY(kCanUseDevToolsGenerativeAiFeaturesCapabilityName,
                    CAN_USE_DEVTOOLS_GENERATIVE_AI_FEATURES_CAPABILITY_NAME,
@@ -104,18 +92,6 @@ ACCOUNT_CAPABILITY(kCanUseEduFeaturesCapabilityName,
 ACCOUNT_CAPABILITY(kCanUseGeminiInChromeCapabilityName,
                    CAN_USE_GEMINI_IN_CHROME_CAPABILITY_NAME,
                    "accountcapabilities/giytmnrnmnqxa")
-
-#if BUILDFLAG(IS_CHROMEOS)
-ACCOUNT_CAPABILITY(kCanUseGenerativeAiInRecorderApp,
-                   CAN_USE_GENERATIVE_AI_IN_RECORDER_APP,
-                   "accountcapabilities/ge2tkobnmnqxa")
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-ACCOUNT_CAPABILITY(kCanUseGenerativeAiPhotoEditing,
-                   CAN_USE_GENERATIVE_AI_PHOTO_EDITING,
-                   "accountcapabilities/ge3dgobnmnqxa")
-#endif
 
 ACCOUNT_CAPABILITY(kCanUseMantaServiceName,
                    CAN_USE_MANTA_SERVICE_NAME,

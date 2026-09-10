@@ -338,7 +338,6 @@ std::vector<RecentTabItem> RecentTabsBuilder::BuildRemoteEntries(
     return items;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
     syncer::SyncService* sync_service =
         SyncServiceFactory::GetForProfile(profile);
@@ -364,7 +363,6 @@ std::vector<RecentTabItem> RecentTabsBuilder::BuildRemoteEntries(
         break;
     }
   }
-#endif
 
   items.emplace_back(RecentTabItem::Type::kHeader,
                      l10n_util::GetStringUTF16(IDS_YOUR_DEVICES));

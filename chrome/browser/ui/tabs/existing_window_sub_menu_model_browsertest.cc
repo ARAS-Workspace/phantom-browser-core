@@ -28,12 +28,6 @@
 #include "ui/base/base_window.h"
 #include "ui/gfx/text_elider.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/autotest_desks_api.h"
-#include "base/containers/span.h"
-#include "chrome/browser/ui/tabs/existing_window_sub_menu_model_chromeos.h"
-#endif
-
 namespace {
 
 class ExistingWindowSubMenuModelTest : public InProcessBrowserTest {
@@ -60,18 +54,6 @@ class ExistingWindowSubMenuModelTest : public InProcessBrowserTest {
     // Self deleting.
     return browser;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  Browser* CreateTestBrowserOnWorkspace(std::string desk_index) {
-    BrowserWindowCreateParams params(BrowserWindowInterface::TYPE_NORMAL,
-                                     browser()->GetProfile(),
-                                     /*from_user_gesture=*/true);
-    params.initial_workspace = desk_index;
-    Browser* browser =
-        CreateBrowserWindow(std::move(params))->GetBrowserForMigrationOnly();
-    ActivateBrowser(browser);
-    return browser;
-  }
-#endif
   void AddTabWithTitle(Browser* browser, std::string title) {
     chrome::AddTabAt(browser, GURL("about:blank"), /*index=*/-1,
                      /*foreground=*/true);
@@ -308,150 +290,5 @@ IN_PROC_BROWSER_TEST_F(ExistingWindowSubMenuModelTest, BuildSubmenuPopups) {
   CloseBrowserSynchronously(popup_browser_1);
   CloseBrowserSynchronously(popup_browser_2);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Ensure that when there are multiple desks the browsers are grouped by which
-// desk they belong to.
-IN_PROC_BROWSER_TEST_F(ExistingWindowSubMenuModelTest,
-                       BuildSubmenuGroupedByDesks) {
-  const std::string kBrowser2TabTitle("Browser 2 Tab 1");
-  const std::string kBrowser3TabTitle("Browser 3 Tab 1");
-  const std::string kBrowser4TabTitle("Browser 4 Tab 1");
-  const std::string kBrowser5TabTitle("Browser 5 Tab 1");
-  const std::string kBrowser6TabTitle("Browser 6 Tab 1");
-  const std::string kBrowser7TabTitle("Browser 7 Tab 1");
-
-  // Create 4 desks so we have 5 in total.
-  ash::AutotestDesksApi().CreateNewDesk();
-  ash::AutotestDesksApi().CreateNewDesk();
-  ash::AutotestDesksApi().CreateNewDesk();
-  ash::AutotestDesksApi().CreateNewDesk();
-
-  // Add some browsers and put them in each desk.
-  ActivateBrowser(browser());
-  Browser* browser_2(CreateTestBrowserOnWorkspace("0"));
-  Browser* browser_3(CreateTestBrowserOnWorkspace("1"));
-  Browser* browser_4(CreateTestBrowserOnWorkspace("1"));
-  Browser* browser_5(CreateTestBrowserOnWorkspace("2"));
-  Browser* browser_6(CreateTestBrowserOnWorkspace("2"));
-  Browser* browser_7(CreateTestBrowserOnWorkspace("3"));
-
-  // Add tabs.
-  AddTabWithTitle(browser_2, kBrowser2TabTitle);
-  AddTabWithTitle(browser_3, kBrowser3TabTitle);
-  AddTabWithTitle(browser_4, kBrowser4TabTitle);
-  AddTabWithTitle(browser_5, kBrowser5TabTitle);
-  AddTabWithTitle(browser_6, kBrowser6TabTitle);
-  AddTabWithTitle(browser_7, kBrowser7TabTitle);
-
-  // Scramble their MRU order by activating them. The MRU order should be:
-  // [b7, b5, b4, b2, b3, b6] (left-most is MRU).
-  ActivateBrowser(browser_6);
-  ActivateBrowser(browser_3);
-  ActivateBrowser(browser_2);
-  ActivateBrowser(browser_4);
-  ActivateBrowser(browser_5);
-  ActivateBrowser(browser_7);
-
-  const std::initializer_list<BrowserWindowInterface* const> expected_mru_order{
-      browser_7, browser_5, browser_4, browser_2, browser_3, browser_6};
-  // `initializer_list` (instead of `array`) is necessary to construct a dynamic
-  // span which can be compared to `vector`.
-  const auto mru_ordered_windows = browser()
-                                       ->GetFeatures()
-                                       .tab_menu_model_delegate()
-                                       ->GetOtherBrowserWindows(
-                                           /*is_app=*/false);
-  ASSERT_EQ(6u, mru_ordered_windows.size());
-  ASSERT_EQ(mru_ordered_windows, base::span{expected_mru_order});
-
-  // Create the menu from browser 1. The labels should be grouped by desk and
-  // respect MRU order within each desk grouping. Also a label shouldn't be made
-  // for the 5th desk since no browsers are in it.
-  auto menu1 = ExistingWindowSubMenuModel::Create(
-      nullptr, browser()->GetFeatures().tab_menu_model_delegate(),
-      browser()->tab_strip_model(), 0);
-  ASSERT_EQ(15u, menu1->GetItemCount());
-  EXPECT_EQ(u"Desk 1 (Current)", menu1->GetLabelAt(2));
-  CheckBrowserTitle(menu1->GetLabelAt(3), kBrowser2TabTitle, 1);
-  EXPECT_EQ(ui::SPACING_SEPARATOR, menu1->GetSeparatorTypeAt(4));
-  EXPECT_EQ(u"Desk 2", menu1->GetLabelAt(5));
-  CheckBrowserTitle(menu1->GetLabelAt(6), kBrowser4TabTitle, 1);
-  CheckBrowserTitle(menu1->GetLabelAt(7), kBrowser3TabTitle, 1);
-  EXPECT_EQ(ui::SPACING_SEPARATOR, menu1->GetSeparatorTypeAt(8));
-  EXPECT_EQ(u"Desk 3", menu1->GetLabelAt(9));
-  CheckBrowserTitle(menu1->GetLabelAt(10), kBrowser5TabTitle, 1);
-  CheckBrowserTitle(menu1->GetLabelAt(11), kBrowser6TabTitle, 1);
-  EXPECT_EQ(ui::SPACING_SEPARATOR, menu1->GetSeparatorTypeAt(12));
-  EXPECT_EQ(u"Desk 4", menu1->GetLabelAt(13));
-  CheckBrowserTitle(menu1->GetLabelAt(14), kBrowser7TabTitle, 1);
-
-  // Clean up.
-  CloseBrowserSynchronously(browser_2);
-  CloseBrowserSynchronously(browser_3);
-  CloseBrowserSynchronously(browser_4);
-  CloseBrowserSynchronously(browser_5);
-  CloseBrowserSynchronously(browser_6);
-  CloseBrowserSynchronously(browser_7);
-}
-
-// Tests out that executing the commands in the submenu grouped by desks work
-// properly.
-IN_PROC_BROWSER_TEST_F(ExistingWindowSubMenuModelTest,
-                       EnsureGroupedByDesksCommands) {
-  // Create 2 desks so we have 3 in total.
-  ash::AutotestDesksApi().CreateNewDesk();
-  ash::AutotestDesksApi().CreateNewDesk();
-
-  // Add some browsers and put them in desks.
-  Browser* browser_2(CreateTestBrowserOnWorkspace("0"));
-  Browser* browser_3(CreateTestBrowserOnWorkspace("1"));
-  Browser* browser_4(CreateTestBrowserOnWorkspace("1"));
-  Browser* browser_5(CreateTestBrowserOnWorkspace("2"));
-
-  // Scramble the MRU order by activating them. The MRU order should be:
-  // [b4, b2, b3, b5] (left-most is MRU).
-  ActivateBrowser(browser_5);
-  ActivateBrowser(browser_3);
-  ActivateBrowser(browser_2);
-  ActivateBrowser(browser_4);
-
-  const std::initializer_list<BrowserWindowInterface* const> expected_mru_order{
-      browser_4, browser_2, browser_3, browser_5};
-  // `initializer_list` (instead of `array`) is necessary to construct a dynamic
-  // span which can be compared to `vector`.
-  const auto mru_ordered_windows = browser()
-                                       ->GetFeatures()
-                                       .tab_menu_model_delegate()
-                                       ->GetOtherBrowserWindows(
-                                           /*is_app=*/false);
-  ASSERT_EQ(4u, mru_ordered_windows.size());
-  ASSERT_EQ(mru_ordered_windows, base::span{expected_mru_order});
-
-  // Create the menu from browser 1 and ensure that the command indexes properly
-  // map to their browser indices.
-  auto menu1 = ExistingWindowSubMenuModel::Create(
-      nullptr, browser()->GetFeatures().tab_menu_model_delegate(),
-      browser()->tab_strip_model(), 0);
-  const auto& command_id_to_target_index =
-      static_cast<chromeos::ExistingWindowSubMenuModelChromeOS*>(menu1.get())
-          ->command_id_to_target_index_for_testing();
-
-  // A vector of the expected mappings. The first element of each pair is the
-  // commdand id. The second element of each pair is the browser index.
-  const std::vector<std::pair<int, int>> kExpectedMappings{
-      {1002, 1}, {1003, 0}, {1004, 2}, {1005, 3}};
-  for (const auto& pair : kExpectedMappings) {
-    EXPECT_EQ(pair.second,
-              static_cast<int>(command_id_to_target_index.at(pair.first)));
-  }
-
-  // Clean up.
-  CloseBrowserSynchronously(browser_2);
-  CloseBrowserSynchronously(browser_3);
-  CloseBrowserSynchronously(browser_4);
-  CloseBrowserSynchronously(browser_5);
-}
-#endif
 
 }  // namespace

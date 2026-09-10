@@ -345,11 +345,6 @@ void ContentSettingSimpleBubbleModel::SetTitle() {
   };
 
   int title_id = [&]() {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (content_type() == ContentSettingsType::SMART_CARD_GUARD) {
-      return IDS_ACCESSED_SMART_CARD_READER_TITLE;
-    }
-#endif
     if (IsContentAllowed()) {
       return GetIdForContentType(kAccessedTitleIDs, content_type());
     }
@@ -393,11 +388,6 @@ void ContentSettingSimpleBubbleModel::SetMessage() {
   };
 
   int message_id = [&]() {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (content_type() == ContentSettingsType::SMART_CARD_GUARD) {
-      return IDS_ACCESSED_SMART_CARD_READER_BODY;
-    }
-#endif
     if (IsContentAllowed()) {
       return GetIdForContentType(kAccessedMessageIDs, content_type());
     }
@@ -1434,7 +1424,7 @@ void ContentSettingGeolocationBubbleModel::CommitChanges() {
 void ContentSettingGeolocationBubbleModel::
     InitializeSystemGeolocationPermissionBubble() {
 #if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   set_title(l10n_util::GetStringUTF16(IDS_GEOLOCATION_TURNED_OFF_IN_OS));
 #else
   // The system-level location permission is not supported on Linux.
@@ -1995,11 +1985,6 @@ ContentSettingBubbleModel::CreateContentSettingBubbleModel(
     case ContentSettingsType::STORAGE_ACCESS:
       return std::make_unique<ContentSettingStorageAccessBubbleModel>(delegate,
                                                                       page);
-#if BUILDFLAG(IS_CHROMEOS)
-    case ContentSettingsType::SMART_CARD_GUARD:
-      return std::make_unique<ContentSettingSimpleBubbleModel>(delegate, page,
-                                                               content_type);
-#endif
     default:
       NOTREACHED() << "No bubble for the content type "
                    << static_cast<int32_t>(content_type) << ".";

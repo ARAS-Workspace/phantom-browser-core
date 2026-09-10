@@ -45,10 +45,6 @@
 #include "ui/base/unowned_user_data/unowned_user_data_host.h"
 #include "ui/webui/resources/cr_components/history_embeddings/history_embeddings.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 class MockPage : public history_embeddings::mojom::Page {
@@ -112,10 +108,6 @@ class HistoryEmbeddingsHandlerTest : public ChromeRenderViewHostTestHarness {
              }},
             {history_embeddings::kHistoryEmbeddingsAnswers, {}},
             {feature_engagement::kIPHHistorySearchFeature, {}},
-#if BUILDFLAG(IS_CHROMEOS)
-            {chromeos::features::kFeatureManagementHistoryEmbedding, {{}}},
-            {chromeos::features::kFeatureManagementPassageEmbedder, {{}}},
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
         /*disabled_features=*/{});
 

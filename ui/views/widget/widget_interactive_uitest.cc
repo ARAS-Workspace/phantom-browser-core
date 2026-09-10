@@ -1108,8 +1108,7 @@ TEST_F(DesktopWidgetTestInteractive, EventHandlersClearedOnWidgetMinimize) {
 }
 #endif
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-    BUILDFLAG(ENABLE_DESKTOP_AURA)
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(ENABLE_DESKTOP_AURA)
 // Tests that when a desktop native widget has modal transient child, it should
 // avoid restore focused view itself as the modal transient child window will do
 // that, thus avoids having multiple focused view visually (crbug.com/727641).
@@ -1159,8 +1158,7 @@ TEST_F(DesktopWidgetTestInteractive,
   EXPECT_TRUE(dialog_textfield_ptr->HasFocus());
   EXPECT_FALSE(textfield_ptr->HasFocus());
 }
-#endif  // (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&
-        // BUILDFLAG(ENABLE_DESKTOP_AURA)
+#endif  // BUILDFLAG(IS_LINUX) && BUILDFLAG(ENABLE_DESKTOP_AURA)
 
 // Asserts the Widget's NativeView remains valid after the Widget has been
 // closed but before the Widget is destroyed.
@@ -1580,11 +1578,6 @@ TEST_F(WidgetCaptureTest, GrabUngrab) {
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_SystemModalWindowReleasesCapture \
   DISABLED_SystemModalWindowReleasesCapture
-#elif BUILDFLAG(IS_CHROMEOS)
-// Investigate enabling for Chrome OS. It probably requires help from the window
-// service.
-#define MAYBE_SystemModalWindowReleasesCapture \
-  DISABLED_SystemModalWindowReleasesCapture
 #else
 #define MAYBE_SystemModalWindowReleasesCapture SystemModalWindowReleasesCapture
 #endif
@@ -1630,7 +1623,7 @@ TEST_F(WidgetCaptureTest, MAYBE_SystemModalWindowReleasesCapture) {
 // Regression test for http://crbug.com/382421 (Linux-Aura issue).
 // TODO(pkotwicz): Make test pass on CrOS and Windows.
 // TODO(tapted): Investigate for toolkit-views on Mac http;//crbug.com/441064.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_MouseExitOnCaptureGrab DISABLED_MouseExitOnCaptureGrab
 #else
 #define MAYBE_MouseExitOnCaptureGrab MouseExitOnCaptureGrab

@@ -38,10 +38,6 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/shell.h"
-#endif
-
 namespace {
 
 const int kHorizontalMargin = 10;
@@ -370,13 +366,6 @@ gfx::NativeViewId ScreenCaptureNotificationUIImpl::OnStarted(
   params.remove_standard_frame = true;
   params.z_order = ui::ZOrderLevel::kFloatingUIElement;
   params.name = "ScreenCaptureNotificationUIViews";
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(sergeyu): The notification bar must be shown on the monitor that's
-  // being captured. Make sure it's always the case. Currently we always capture
-  // the primary monitor.
-  params.context = ash::Shell::GetPrimaryRootWindow();
-#endif
 
   widget_->set_frame_type(views::Widget::FrameType::kForceCustom);
   widget_->Init(std::move(params));

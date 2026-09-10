@@ -368,13 +368,8 @@ void NativeTheme::PaintMenuItemBackground(
   const SkScalar radius = SkIntToScalar(extra_params.corner_radius);
   cc::PaintFlags flags;
   const ColorId id = (state == kHovered)
-#if BUILDFLAG(IS_CHROMEOS)
-                         ? kColorAshSystemUIMenuItemBackgroundSelected
-                         : kColorAshSystemUIMenuBackground;
-#else
                          ? kColorMenuItemBackgroundSelected
                          : kColorMenuBackground;
-#endif
   flags.setColor(color_provider->GetColor(id));
   canvas->drawRoundRect(gfx::RectToSkRect(rect), radius, radius, flags);
 }

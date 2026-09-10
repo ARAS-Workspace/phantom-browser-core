@@ -415,12 +415,6 @@ class ExtensionBrowserTest : public PlatformBrowserTest,
   // maps to chrome/test/data/extensions/foo.
   ExtensionProtocolTestHandler test_protocol_handler_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // True if the command line should be tweaked as if ChromeOS user is
-  // already logged in.
-  bool set_chromeos_user_ = true;
-#endif
-
  private:
   // Common implementation for all our various install and update methods.
   const Extension* InstallOrUpdateExtension(

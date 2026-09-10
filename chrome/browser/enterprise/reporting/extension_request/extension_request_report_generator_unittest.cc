@@ -94,14 +94,9 @@ class ExtensionRequestReportGeneratorTest : public ::testing::Test {
       EXPECT_EQ(actual_report->justification(), kJustification);
     }
     EXPECT_EQ(is_removed, actual_report->removed());
-#if BUILDFLAG(IS_CHROMEOS)
-    EXPECT_EQ(ExtensionsWorkflowEvent::CHROME_OS_USER,
-              actual_report->client_type());
-#else
     EXPECT_EQ(ExtensionsWorkflowEvent::BROWSER_DEVICE,
               actual_report->client_type());
     EXPECT_EQ(policy::GetMachineName(), actual_report->device_name());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
  private:

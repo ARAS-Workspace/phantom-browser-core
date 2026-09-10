@@ -25,11 +25,11 @@ namespace {
 constexpr SquareSizePx kMinIconSizeForMaskableIcons = 256;
 constexpr SquareSizePx kIconSizeForSVGNoIntrinsicSize = 1024;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 constexpr bool kPreferMaskableIcons = true;
 #else
 constexpr bool kPreferMaskableIcons = false;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace
 std::optional<apps::IconInfo> GetTrustedIconsFromManifest(

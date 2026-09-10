@@ -96,11 +96,7 @@ class ReplaceMigrationSuggestedAppBrowserTest
         // and doesn't do anything for apps suggested from migration.
         return proto::InstallState::SUGGESTED_FROM_MIGRATION;
       case WebAppInstallFlow::kSyncInstall:
-#if BUILDFLAG(IS_CHROMEOS)
-        return proto::InstallState::INSTALLED_WITH_OS_INTEGRATION;
-#else
         return proto::InstallState::SUGGESTED_FROM_ANOTHER_DEVICE;
-#endif  // BUILDFLAG(IS_CHROMEOS)
     }
   }
 

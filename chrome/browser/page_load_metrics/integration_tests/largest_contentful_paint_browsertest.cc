@@ -230,7 +230,7 @@ IN_PROC_BROWSER_TEST_F(MetricIntegrationTest, DISABLED_LargestContentfulPaint) {
 }
 
 // TODO(crbug.com/40936591): This test is flaky on ChromeOS and Linux.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_LargestContentfulPaint_SubframeInput \
   DISABLED_LargestContentfulPaint_SubframeInput
 #else

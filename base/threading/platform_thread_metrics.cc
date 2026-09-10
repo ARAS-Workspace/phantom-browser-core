@@ -53,7 +53,7 @@ PlatformThreadMetrics::CreateForCurrentThread() {
   return CreateFromHandle(PlatformThread::CurrentHandle());
 }
 
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 
 // static
 std::unique_ptr<PlatformThreadMetrics>

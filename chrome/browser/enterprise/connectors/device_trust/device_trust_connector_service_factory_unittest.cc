@@ -18,11 +18,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/common/chrome_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using ::testing::_;
 
 namespace enterprise_connectors {
@@ -59,20 +54,9 @@ class DeviceTrustConnectorServiceFactoryTest
     : public DeviceTrustConnectorServiceFactoryBaseTest,
       public ::testing::Test {};
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(DeviceTrustConnectorServiceFactoryTest, CreateForRegularProfile) {
-  EXPECT_FALSE(profile()->IsOffTheRecord());
-  EXPECT_TRUE(DeviceTrustConnectorServiceFactory::GetForProfile(profile()));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(DeviceTrustConnectorServiceFactoryTest, NullForIncognitoProfile) {
   Profile* incognito_profile =
       profile()->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(ash::ProfileHelper::IsSigninProfile(incognito_profile));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   ASSERT_TRUE(incognito_profile);
 
@@ -82,30 +66,5 @@ TEST_F(DeviceTrustConnectorServiceFactoryTest, NullForIncognitoProfile) {
       DeviceTrustConnectorServiceFactory::GetForProfile(incognito_profile);
   EXPECT_FALSE(device_trust_connector_service);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-TEST_F(DeviceTrustConnectorServiceFactoryTest,
-       CreatedForSigninProfileChromeOS) {
-  TestingProfile::Builder builder;
-  builder.SetPath(base::FilePath(FILE_PATH_LITERAL(chrome::kInitialProfile)));
-  std::unique_ptr<TestingProfile> testing_profile = builder.Build();
-
-  Profile* signin_profile =
-      testing_profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-  RedirectTestingFactoryToRealFactory(signin_profile);
-
-  ASSERT_TRUE(signin_profile);
-  EXPECT_TRUE(signin_profile->IsOffTheRecord());
-  EXPECT_TRUE(ash::ProfileHelper::IsSigninProfile(signin_profile));
-
-  // Make sure a DeviceTrustConnectorService cannot be created from an incognito
-  // Profile.
-  DeviceTrustConnectorService* device_trust_connector_service =
-      DeviceTrustConnectorServiceFactory::GetForProfile(signin_profile);
-  EXPECT_TRUE(device_trust_connector_service);
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace enterprise_connectors

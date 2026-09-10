@@ -236,8 +236,7 @@ class TestPasswordManagerClient : public StubPasswordManagerClient {
               IsReauthBeforeFillingRequired,
               (device_reauth::DeviceAuthenticator*),
               (override));
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(
       std::unique_ptr<
           password_manager::PasswordCrossDomainConfirmationPopupController>,
@@ -2255,8 +2254,7 @@ TEST_F(PasswordAutofillManagerTest,
               ::testing::IsEmpty());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 TEST_F(PasswordAutofillManagerTest, ShowCrossDomainConfirmationPopup) {
   TestPasswordManagerClient client;
   NiceMock<MockAutofillClient> autofill_client;

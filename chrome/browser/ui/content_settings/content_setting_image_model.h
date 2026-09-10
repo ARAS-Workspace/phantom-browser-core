@@ -51,9 +51,6 @@ class ContentSettingImageModel {
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kClipboardRWElementId);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kStorageAccessElementId);
   // Notifications has global ID kNotificationContentSettingImageView.
-#if BUILDFLAG(IS_CHROMEOS)
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kSmartCardIconElementId);
-#endif
 
   ContentSettingImageModel(const ContentSettingImageModel&) = delete;
   ContentSettingImageModel& operator=(const ContentSettingImageModel&) = delete;

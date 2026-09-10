@@ -19,10 +19,6 @@
 
 #if BUILDFLAG(IS_LINUX)
 #include "media/capture/video/linux/video_capture_device_factory_linux.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "media/capture/video/chromeos/public/cros_features.h"
-#include "media/capture/video/chromeos/video_capture_device_factory_chromeos.h"
-#include "media/capture/video/linux/video_capture_device_factory_linux.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "media/capture/video/apple/video_capture_device_factory_apple.h"
 #elif BUILDFLAG(IS_ANDROID)
@@ -61,10 +57,6 @@ CreatePlatformSpecificVideoCaptureDeviceFactory(
     scoped_refptr<base::SingleThreadTaskRunner> ui_task_runner,
     gpu::GpuDriverBugWorkarounds* gpu_workarounds) {
 #if BUILDFLAG(IS_LINUX)
-  return std::make_unique<VideoCaptureDeviceFactoryLinux>(ui_task_runner);
-#elif BUILDFLAG(IS_CHROMEOS)
-  if (base::SysInfo::IsRunningOnChromeOS())
-    return std::make_unique<VideoCaptureDeviceFactoryChromeOS>(ui_task_runner);
   return std::make_unique<VideoCaptureDeviceFactoryLinux>(ui_task_runner);
 #elif BUILDFLAG(IS_APPLE)
 #if BUILDFLAG(IS_IOS_TVOS)

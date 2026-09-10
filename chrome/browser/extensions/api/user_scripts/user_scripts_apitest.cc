@@ -148,8 +148,7 @@ IN_PROC_BROWSER_TEST_F(UserScriptsAPITest, GetUserScripts) {
 
 // TODO(crbug.com/40935741, crbug.com/335421977): Flaky on Linux debug and on
 // "Linux ChromiumOS MSan Tests".
-#if (BUILDFLAG(IS_LINUX) && !defined(NDEBUG)) || \
-    (BUILDFLAG(IS_CHROMEOS) && defined(MEMORY_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_RegisterUserScripts DISABLED_RegisterUserScripts
 #else
 #define MAYBE_RegisterUserScripts RegisterUserScripts
@@ -254,11 +253,7 @@ IN_PROC_BROWSER_TEST_F(UserScriptsAPITest,
 }
 
 // TODO(crbug.com/335421977): Flaky on "Linux ChromiumOS MSan Tests".
-#if BUILDFLAG(IS_CHROMEOS) && defined(MEMORY_SANITIZER)
-#define MAYBE_ConfigureWorld DISABLED_ConfigureWorld
-#else
 #define MAYBE_ConfigureWorld ConfigureWorld
-#endif
 IN_PROC_BROWSER_TEST_F(UserScriptsAPITest, MAYBE_ConfigureWorld) {
   ASSERT_TRUE(RunUserScriptsExtensionTest("user_scripts/configure_world"))
       << message_;

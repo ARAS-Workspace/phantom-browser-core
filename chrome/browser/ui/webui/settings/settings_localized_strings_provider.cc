@@ -127,21 +127,7 @@
 #include "ui/strings/grit/ui_strings.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/webui/settings/public/constants/routes.mojom.h"
-#include "ash/webui/settings/public/constants/routes_util.h"
-#include "chrome/browser/ash/account_manager/account_manager_util.h"
-#include "chrome/browser/ash/kerberos/kerberos_credentials_manager.h"
-#include "chrome/browser/ash/login/quick_unlock/quick_unlock_utils.h"
-#include "chrome/browser/ash/ownership/owner_settings_service_ash.h"
-#include "chrome/browser/ash/ownership/owner_settings_service_ash_factory.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/common/webui_url_constants.h"
-#include "components/user_manager/user_manager.h"
-#else  // !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/webui/settings/system_handler.h"
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 #include "ui/display/screen.h"
@@ -199,10 +185,8 @@ void AddCommonStrings(content::WebUIDataSource* html_source, Profile* profile) {
       {"columnHeadingWhenOn", IDS_SETTINGS_COLUMN_HEADING_WHEN_ON},
       {"columnHeadingConsider", IDS_SETTINGS_COLUMN_HEADING_CONSIDER},
       {"columnHeadingWhenUsed", IDS_SETTINGS_COLUMN_HEADING_WHEN_USED},
-#if !BUILDFLAG(IS_CHROMEOS)
       {"relaunchConfirmationDialogTitle",
        IDS_RELAUNCH_CONFIRMATION_DIALOG_TITLE},
-#endif
       {"remove", IDS_REMOVE},
       {"restart", IDS_SETTINGS_RESTART},
       {"restartToApplyChanges", IDS_SETTINGS_RESTART_TO_APPLY_CHANGES},
@@ -235,12 +219,7 @@ void AddCommonStrings(content::WebUIDataSource* html_source, Profile* profile) {
 
   html_source->AddBoolean(
       "isGuest",
-#if BUILDFLAG(IS_CHROMEOS)
-      user_manager::UserManager::Get()->IsLoggedInAsGuest() ||
-          user_manager::UserManager::Get()->IsLoggedInAsManagedGuestSession());
-#else
       profile->IsGuestSession());
-#endif
 
   html_source->AddBoolean("isChildAccount", profile->IsChild());
 }
@@ -437,17 +416,14 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
       {"deletionConfirmationAllTimeToast",
        IDS_SETTINGS_DELETION_CONFIRMATION_ALL_TIME_TOAST_LABEL}};
 
-#if !BUILDFLAG(IS_CHROMEOS)
   html_source->AddBoolean("isClearPrimaryAccountAllowed",
                           !profile->IsGuestSession() &&
                               ChromeSigninClientFactory::GetForProfile(profile)
                                   ->IsClearPrimaryAccountAllowed());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   html_source->AddLocalizedStrings(kLocalizedStrings);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void AddDefaultBrowserStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"defaultBrowser", IDS_SETTINGS_DEFAULT_BROWSER},
@@ -469,7 +445,6 @@ void AddDefaultBrowserStrings(content::WebUIDataSource* html_source) {
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 }
-#endif
 
 void AddDownloadsStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
@@ -510,7 +485,6 @@ void AddResetStrings(content::WebUIDataSource* html_source, Profile* profile) {
       ResetSettingsHandler::ShouldShowResetProfileBanner(profile));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void AddImportDataStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"importTitle", IDS_SETTINGS_IMPORT_SETTINGS_TITLE},
@@ -527,7 +501,6 @@ void AddImportDataStrings(content::WebUIDataSource* html_source) {
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 }
-#endif
 
 void AddPerformanceStrings(content::WebUIDataSource* html_source) {
   // TODO(crbug.com/339250758): Clean up unused strings now that multistate mode
@@ -667,13 +640,6 @@ void AddPerformanceStrings(content::WebUIDataSource* html_source) {
               performance_manager::user_tuning::BatterySaverModeManager::
                   kLowBatteryThresholdPercent)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddString("osPowerSettingsUrl",
-                         chromeos::settings::GetOSSettingsUrl(
-                             chromeos::settings::mojom::kPowerSubpagePath)
-                             .spec());
-#endif
-
   html_source->AddBoolean(
       "cpuPerformanceEnabled",
       base::FeatureList::IsEnabled(blink::features::kCpuPerformance));
@@ -683,7 +649,6 @@ void AddLanguagesStrings(content::WebUIDataSource* html_source,
                          Profile* profile) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"languagesPageTitle", IDS_SETTINGS_LANGUAGES_PAGE_TITLE},
-#if !BUILDFLAG(IS_CHROMEOS)
       {"languagesCardTitle", IDS_SETTINGS_LANGUAGES_CARD_TITLE},
       {"searchLanguages", IDS_SETTINGS_LANGUAGE_SEARCH},
       {"languagesExpandA11yLabel",
@@ -704,19 +669,8 @@ void AddLanguagesStrings(content::WebUIDataSource* html_source,
       {"languageManagedDialogTitle",
        IDS_SETTINGS_LANGUAGES_MANAGED_DIALOG_TITLE},
       {"languageManagedDialogBody", IDS_SETTINGS_LANGUAGES_MANAGED_DIALOG_BODY},
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_CHROMEOS)
-      {"openChromeOSLanguagesSettingsLabel",
-       IDS_SETTINGS_LANGUAGES_OPEN_CHROME_OS_SETTINGS_LABEL},
-#endif
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddString("osSettingsLanguagesPageUrl",
-                         chromeos::settings::GetOSSettingsUrl(
-                             chromeos::settings::mojom::kLanguagesSubpagePath)
-                             .spec());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void AddOnStartupStrings(content::WebUIDataSource* html_source) {
@@ -1118,7 +1072,7 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
 
   bool is_mandatory_reauth_feature_flag_enabled = false;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   // The feature is already launched on Mac and ChromeOS.
   is_mandatory_reauth_feature_flag_enabled = true;
 #endif
@@ -1291,9 +1245,7 @@ void AddSyncAccountControlStrings(content::WebUIDataSource* html_source) {
 void AddPersonalizationOptionsStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"spellingPref", IDS_SETTINGS_SPELLING_PREF},
-#if !BUILDFLAG(IS_CHROMEOS)
       {"signinAllowedTitle", IDS_SETTINGS_SIGNIN_ALLOWED},
-#endif
       {"enablePersonalizationLogging", IDS_SETTINGS_ENABLE_LOGGING_PREF},
       {"enablePersonalizationLoggingDesc",
        IDS_SETTINGS_ENABLE_LOGGING_PREF_DESC},
@@ -1321,13 +1273,11 @@ void AddPersonalizationOptionsStrings(content::WebUIDataSource* html_source) {
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   html_source->AddLocalizedString(
       "signinAllowedDescription",
       syncer::IsReplaceSyncPromosWithSignInPromosEnabled()
           ? IDS_SETTINGS_SIGNIN_ALLOWED_DESC_2
           : IDS_SETTINGS_SIGNIN_ALLOWED_DESC);
-#endif
 }
 
 void AddBrowserSyncPageStrings(content::WebUIDataSource* html_source) {
@@ -1343,44 +1293,19 @@ void AddBrowserSyncPageStrings(content::WebUIDataSource* html_source) {
       {"personalizeGoogleServicesTitle",
        IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_TITLE},
       {"themeCheckboxLabel", IDS_SETTINGS_THEME_CHECKBOX_LABEL},
-#if BUILDFLAG(IS_CHROMEOS)
-      {"browserSyncFeatureLabel", IDS_BROWSER_SETTINGS_SYNC_FEATURE_LABEL},
-      {"cookiesCheckboxLabel", IDS_SETTINGS_COOKIES_CHECKBOX_LABEL},
-#endif
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddLocalizedString(
-      "peopleSignInSyncPagePromptSecondaryWithNoAccount",
-      IDS_SETTINGS_PEOPLE_SIGN_IN_PROMPT_SECONDARY_WITH_ACCOUNT);
-#else
   html_source->AddLocalizedString(
       "peopleSignInSyncPagePromptSecondaryWithNoAccount",
       syncer::IsReplaceSyncPromosWithSignInPromosEnabled()
           ? IDS_SETTINGS_PEOPLE_EXPLICIT_SIGN_IN_PROMPT_SECONDARY_WITH_NO_ACCOUNT_WITH_BOOKMARKS
           : IDS_SETTINGS_PEOPLE_EXPLICIT_SIGN_IN_PROMPT_SECONDARY_WITH_NO_ACCOUNT);
-#endif
 
   html_source->AddLocalizedString(
       "passwordsCheckboxLabel",
       IDS_SETTINGS_PASSWORDS_AND_PASSKEYS_CHECKBOX_LABEL);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddString("osSyncSetupSettingsUrl",
-                         chromeos::settings::GetOSSettingsUrl(
-                             chromeos::settings::mojom::kSyncSetupSubpagePath)
-                             .spec());
-  html_source->AddString("osSettingsPrivacyHubSubpageUrl",
-                         chromeos::settings::GetOSSettingsUrl(
-                             chromeos::settings::mojom::kPrivacyHubSubpagePath)
-                             .spec());
-  html_source->AddString(
-      "osSyncSettingsUrl",
-      chromeos::settings::GetOSSettingsUrl(
-          chromeos::settings::mojom::kSyncControlsSubpagePath)
-          .spec());
-#endif
 }
 
 void AddSyncControlsStrings(content::WebUIDataSource* html_source) {
@@ -1423,22 +1348,11 @@ void AddPeopleStrings(content::WebUIDataSource* html_source, Profile* profile) {
        IDS_SYNC_UNAVAILABLE_FOR_NON_GOOGLE_ACCOUNT},
       {"accountPageTitle", IDS_SETTINGS_ACCOUNT_PAGE_TITLE},
       {"accountDataTypesHeading", IDS_SETTINGS_ACCOUNT_DATATYPES_HEADING},
-#if BUILDFLAG(IS_CHROMEOS)
-      {"accountDataTypesBody", IDS_SETTINGS_ACCOUNT_BODY_CHROMEOS},
-#else
       {"accountDataTypesBody", IDS_SETTINGS_ACCOUNT_BODY},
-#endif
       {"syncDisabledUserInformation", IDS_SETTINGS_ACCOUNT_SYNC_DISABLED},
-#if BUILDFLAG(IS_CHROMEOS)
-      {"manageDeviceAccounts", IDS_ACCOUNT_CHROMEOS_DEVICE_ACCOUNTS},
-      {"accountManagerSubMenuLabel",
-       IDS_SETTINGS_ACCOUNT_MANAGER_SUBMENU_LABEL},
-#else
       {"editPerson", IDS_SETTINGS_CUSTOMIZE_PROFILE},
-#endif
 
   // Manage profile strings:
-#if !BUILDFLAG(IS_CHROMEOS)
       {"showShortcutLabel", IDS_SETTINGS_PROFILE_SHORTCUT_TOGGLE_LABEL},
       {"nameInputLabel", IDS_SETTINGS_PROFILE_NAME_INPUT_LABEL},
       {"nameYourProfile", IDS_SETTING_NAME_YOUR_PROFILE},
@@ -1460,7 +1374,6 @@ void AddPeopleStrings(content::WebUIDataSource* html_source, Profile* profile) {
       // Managed theme dialog strings:
       {"themeManagedDialogTitle", IDS_NTP_THEME_MANAGED_DIALOG_TITLE},
       {"themeManagedDialogBody", IDS_NTP_THEME_MANAGED_DIALOG_BODY},
-#endif
       {"deleteProfileWarningExpandA11yLabel",
        IDS_SETTINGS_SYNC_DISCONNECT_EXPAND_ACCESSIBILITY_LABEL},
       {"deleteProfileWarningWithCountsSingular",
@@ -1472,16 +1385,6 @@ void AddPeopleStrings(content::WebUIDataSource* html_source, Profile* profile) {
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddLocalizedString("peopleSignInPrompt",
-                                  IDS_SETTINGS_PEOPLE_SIGN_IN_PROMPT);
-  html_source->AddLocalizedString(
-      "peopleSignInPromptSecondaryWithAccount",
-      IDS_SETTINGS_PEOPLE_SIGN_IN_PROMPT_SECONDARY_WITH_ACCOUNT);
-  html_source->AddLocalizedString(
-      "peopleSignInPromptSecondaryWithNoAccount",
-      IDS_SETTINGS_PEOPLE_SIGN_IN_PROMPT_SECONDARY_WITH_ACCOUNT);
-#else
   html_source->AddLocalizedString(
       "peopleSignInPrompt",
       syncer::IsReplaceSyncPromosWithSignInPromosEnabled()
@@ -1502,7 +1405,6 @@ void AddPeopleStrings(content::WebUIDataSource* html_source, Profile* profile) {
       syncer::IsReplaceSyncPromosWithSignInPromosEnabled()
           ? IDS_SETTINGS_CUSTOMIZE_PROFILE
           : IDS_SETTINGS_CUSTOMIZE_YOUR_CHROME_PROFILE);
-#endif
 
   html_source->AddBoolean(
       "historyEmbeddingsAnswersFeatureEnabled",
@@ -1523,32 +1425,15 @@ void AddPeopleStrings(content::WebUIDataSource* html_source, Profile* profile) {
       AccountConsistencyModeManager::IsDiceSignInAllowed(profile_entry));
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Toggles the Chrome OS Account Manager submenu in the People section.
-  html_source->AddBoolean("isAccountManagerEnabled",
-                          ash::IsAccountManagerAvailable(profile));
-  html_source->AddString("osSettingsAccountsPageUrl",
-                         chromeos::settings::GetOSSettingsUrl(
-                             chromeos::settings::mojom::kPeopleSectionPath)
-                             .spec());
-#endif
-
   AddSignOutDialogStrings(html_source, profile);
   AddSyncControlsStrings(html_source);
   AddSyncAccountControlStrings(html_source);
-#if BUILDFLAG(IS_CHROMEOS)
-  AddPasswordPromptDialogStrings(html_source);
-#endif
   AddBrowserSyncPageStrings(html_source);
   AddSharedSyncPageStrings(html_source);
 }
 
 bool ShouldLinkSecureDnsOsSettings() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif
 }
 
 void AddPrivacyStrings(content::WebUIDataSource* html_source,
@@ -1664,10 +1549,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_SECURITY_JAVASCRIPT_OPTIMIZATION_LINK_ROW_ENABLED},
       {"securityJavascriptOptimizerLinkRowLabelDisabled",
        IDS_SETTINGS_SECURITY_JAVASCRIPT_OPTIMIZATION_LINK_ROW_DISABLED},
-#if BUILDFLAG(IS_CHROMEOS)
-      {"openChromeOSSecureDnsSettingsLabel",
-       IDS_SETTINGS_SECURE_DNS_OPEN_CHROME_OS_SETTINGS_LABEL},
-#endif
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
       {"manageDeviceCertificates", IDS_SETTINGS_MANAGE_DEVICE_CERTIFICATES},
       {"manageDeviceCertificatesDescription",
@@ -1727,12 +1608,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
 
   bool link_secure_dns = ShouldLinkSecureDnsOsSettings();
   html_source->AddBoolean("showSecureDnsSetting", !link_secure_dns);
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddBoolean("showSecureDnsSettingLink", link_secure_dns);
-  html_source->AddString(
-      "chromeOSPrivacyAndSecuritySectionPath",
-      chromeos::settings::mojom::kPrivacyAndSecuritySectionPath);
-#endif
 
 #if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
   html_source->AddString("certManagementV2URL",
@@ -2077,20 +1952,6 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
       {"siteSettingsProtectedContentAllowedSubLabel",
        IDS_SETTINGS_SITE_SETTINGS_PROTECTED_CONTENT_ALLOWED_SUB_LABEL},
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-      {"siteSettingsProtectedContentIdentifiersExplanation",
-       IDS_SETTINGS_SITE_SETTINGS_PROTECTED_CONTENT_IDENTIFIERS_EXPLANATION},
-      {"siteSettingsProtectedContentIdentifiersAllowed",
-       IDS_SETTINGS_SITE_SETTINGS_PROTECTED_CONTENT_IDENTIFIERS_ALLOWED},
-      {"siteSettingsProtectedContentIdentifiersBlocked",
-       IDS_SETTINGS_SITE_SETTINGS_PROTECTED_CONTENT_IDENTIFIERS_BLOCKED},
-      {"siteSettingsProtectedContentIdentifiersBlockedSubLabel",
-       IDS_SETTINGS_SITE_SETTINGS_PROTECTED_CONTENT_IDENTIFIERS_BLOCKED_SUB_LABEL},
-      {"siteSettingsProtectedContentIdentifiersAllowedExceptions",
-       IDS_SETTINGS_SITE_SETTINGS_PROTECTED_CONTENT_IDENTIFIERS_ALLOWED_EXCEPTIONS},
-      {"siteSettingsProtectedContentIdentifiersBlockedExceptions",
-       IDS_SETTINGS_SITE_SETTINGS_PROTECTED_CONTENT_IDENTIFIERS_BLOCKED_EXCEPTIONS},
-#endif
       {"siteSettingsPopups", IDS_SITE_SETTINGS_TYPE_POPUPS_REDIRECTS},
       {"siteSettingsPopupsMidSentence",
        IDS_SITE_SETTINGS_TYPE_POPUPS_REDIRECTS_MID_SENTENCE},
@@ -2103,10 +1964,6 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
       {"siteSettingsSerialPorts", IDS_SITE_SETTINGS_TYPE_SERIAL_PORTS},
       {"siteSettingsSerialPortsMidSentence",
        IDS_SITE_SETTINGS_TYPE_SERIAL_PORTS_MID_SENTENCE},
-#if BUILDFLAG(IS_CHROMEOS)
-      {"siteSettingsSmartCardReaders",
-       IDS_SITE_SETTINGS_TYPE_SMART_CARD_READERS},
-#endif
       {"siteSettingsUsbDevices", IDS_SITE_SETTINGS_TYPE_USB_DEVICES},
       {"siteSettingsUsbDevicesMidSentence",
        IDS_SITE_SETTINGS_TYPE_USB_DEVICES_MID_SENTENCE},
@@ -2953,7 +2810,6 @@ void AddSiteDataPageStrings(content::WebUIDataSource* html_source,
       IDS_SETTINGS_SITE_DATA_PAGE_CLEAR_ON_EXIT_WITH_EXCEPTION_RADIO_SUBLABEL);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void AddSystemStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"systemPageTitle", IDS_SETTINGS_SYSTEM},
@@ -2997,7 +2853,6 @@ void AddSystemStrings(content::WebUIDataSource* html_source) {
   // strings" to "load time data" as all primitive types are used now.
   SystemHandler::AddLoadTimeData(html_source);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void AddExtensionsStrings(content::WebUIDataSource* html_source) {
   html_source->AddLocalizedString("extensionsPageTitle",
@@ -3047,11 +2902,9 @@ void AddLocalizedStrings(content::WebUIDataSource* html_source,
   AddSiteDataPageStrings(html_source, profile);
   AddStorageAccessStrings(html_source);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   AddDefaultBrowserStrings(html_source);
   AddImportDataStrings(html_source);
   AddSystemStrings(html_source);
-#endif
 
   policy_indicator::AddLocalizedStrings(html_source);
 

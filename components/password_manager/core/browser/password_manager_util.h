@@ -167,7 +167,7 @@ const password_manager::StoredCredential* GetMatchForUpdating(
 password_manager::PasswordForm MakeNormalizedBlocklistedForm(
     password_manager::PasswordFormDigest digest);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 bool ShouldBiometricAuthenticationForFillingToggleBeVisible(
     const PrefService* local_state);
 

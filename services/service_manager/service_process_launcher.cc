@@ -40,7 +40,7 @@
 #include "base/apple/mach_port_rendezvous.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "sandbox/linux/services/namespace_sandbox.h"
 #endif
 
@@ -208,7 +208,7 @@ base::ProcessId ServiceProcessLauncher::ProcessState::LaunchInBackground(
 #endif
   DVLOG(2) << "Launching child with command line: "
            << child_command_line->GetCommandLineString();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (!sandbox::policy::IsUnsandboxedSandboxType(sandbox_type)) {
     child_process_ =
         sandbox::NamespaceSandbox::LaunchProcess(*child_command_line, options);
@@ -227,14 +227,7 @@ base::ProcessId ServiceProcessLauncher::ProcessState::LaunchInBackground(
     return base::kNullProcessId;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Always log instead of DVLOG because knowing which pid maps to which
-  // service is vital for interpreting crashes after-the-fact and Chrome OS
-  // devices generally run release builds, even in development.
-  VLOG(0)
-#else
   DVLOG(0)
-#endif
       << "Launched child process pid=" << child_process_.Pid()
       << " id=" << target.ToString();
 

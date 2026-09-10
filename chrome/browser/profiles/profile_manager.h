@@ -40,10 +40,6 @@
 class GlobalBrowserCollection;
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/location.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_ANDROID)
 class ProfileManagerAndroid;
 #endif
@@ -119,7 +115,7 @@ class ProfileManager : public Profile::Delegate {
   // like the System profile.
   static std::vector<Profile*> GetLastOpenedProfiles();
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Get the profile for the user which created the current session.
   // Note that in case of a guest account this will return a 'suitable' profile.
   //
@@ -144,9 +140,6 @@ class ProfileManager : public Profile::Delegate {
   // location. It should be always called FROM_HERE as default value.
   // TODO(crbug.com/40227502): Remove this.
   static Profile* GetPrimaryUserProfile(
-#if BUILDFLAG(IS_CHROMEOS)
-      const base::Location& location = FROM_HERE
-#endif
   );
 
   // Get the profile for the currently active user.
@@ -173,19 +166,16 @@ class ProfileManager : public Profile::Delegate {
   // location. It should be always called FROM_HERE as default value.
   // TODO(crbug.com/40227502): Remove this.
   static Profile* GetActiveUserProfile(
-#if BUILDFLAG(IS_CHROMEOS)
-      const base::Location& location = FROM_HERE
-#endif
   );
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Load and return the initial profile for browser. On ChromeOS, this returns
   // either the sign-in profile or the active user profile depending on whether
   // browser is started normally or is restarted after crash. On other
   // platforms, this returns the default profile.
   static Profile* CreateInitialProfile();
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   void AddObserver(ProfileManagerObserver* observer);
   void RemoveObserver(ProfileManagerObserver* observer);
@@ -296,10 +286,10 @@ class ProfileManager : public Profile::Delegate {
   // Returns the full path to be used for guest profiles.
   static base::FilePath GetGuestProfilePath();
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // Returns the full path to be used for system profiles.
   static base::FilePath GetSystemProfilePath();
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Get the path of the next profile directory and increment the internal
   // count.
@@ -531,7 +521,7 @@ class ProfileManager : public Profile::Delegate {
   // The profile used can be overridden by using --login-profile on cros.
   Profile* GetActiveUserOrOffTheRecordProfile();
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Unloads the `Profile` at `profile_dir` from the manager and destroys the
   // `Profile` C++ object. If it's an ephemeral profile, also deletes the
   // profile permanently and nukes the `profile_dir` directory from disk.

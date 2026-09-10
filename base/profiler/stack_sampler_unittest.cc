@@ -338,55 +338,6 @@ TEST_F(StackSamplerTest, CopyStack) {
   EXPECT_EQ(stack, stack_copy);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(StackSamplerTest, RecordStackFramesUMAMetric) {
-  base::test::TestFuture<void> sample_completed;
-  HistogramTester histogram_tester;
-  auto unwind_data = base::MakeRefCounted<StackUnwindData>(
-      std::make_unique<TestProfileBuilder>(&module_cache_));
-  std::vector<uintptr_t> stack;
-  constexpr size_t UIntPtrsPerKilobyte = 1024 / sizeof(uintptr_t);
-  // kExpectedSizeKB needs to be a fairly large number of kilobytes. The buckets
-  // in UmaHistogramMemoryKB are big enough that small values are in the same
-  // bucket as zero and less than zero, and testing that we added a sample in
-  // that bucket means that the test won't fail if, for example, the
-  // |stack_top - stack_bottom| subtraction was reversed and got a negative
-  // value.
-  constexpr int kExpectedSizeKB = 2048;
-  for (uintptr_t i = 0; i <= (kExpectedSizeKB * UIntPtrsPerKilobyte) + 1; i++) {
-    stack.push_back(i);
-  }
-  InjectModuleForContextInstructionPointer(stack, &module_cache_);
-  std::vector<uintptr_t> stack_copy;
-  std::unique_ptr<StackSampler> stack_sampler = StackSampler::CreateForTesting(
-      std::make_unique<TestStackCopier>(stack), std::move(unwind_data),
-      MakeUnwindersFactory(std::make_unique<TestUnwinder>(&stack_copy)));
-
-  stack_sampler->Initialize();
-
-  std::unique_ptr<StackBuffer> stack_buffer =
-      std::make_unique<StackBuffer>(stack.size() * sizeof(uintptr_t));
-
-  for (uint32_t i = 0; i < StackSampler::kUMAHistogramDownsampleAmount - 1;
-       i++) {
-    stack_sampler->RecordStackFrames(stack_buffer.get(),
-                                     PlatformThread::CurrentId(), DoNothing());
-
-    // Should have no new samples in the
-    // Memory.StackSamplingProfiler.StackSampleSize2 histogram.
-    histogram_tester.ExpectUniqueSample(
-        "Memory.StackSamplingProfiler.StackSampleSize2", kExpectedSizeKB, 0);
-  }
-
-  stack_sampler->RecordStackFrames(stack_buffer.get(),
-                                   PlatformThread::CurrentId(),
-                                   sample_completed.GetCallback());
-  ASSERT_TRUE(sample_completed.Wait());
-  histogram_tester.ExpectUniqueSample(
-      "Memory.StackSamplingProfiler.StackSampleSize2", kExpectedSizeKB, 1);
-}
-#endif  // #if BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(StackSamplerTest, CopyStackTimestamp) {
   base::test::TestFuture<void> sample_completed;
   auto unwind_data = base::MakeRefCounted<StackUnwindData>(

@@ -5,9 +5,9 @@
 #include "components/power_metrics/energy_metrics_provider.h"
 
 #include "build/build_config.h"
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "components/power_metrics/energy_metrics_provider_linux.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace power_metrics {
 
@@ -16,11 +16,11 @@ EnergyMetricsProvider::~EnergyMetricsProvider() = default;
 
 // static
 std::unique_ptr<EnergyMetricsProvider> EnergyMetricsProvider::Create() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   return EnergyMetricsProviderLinux::Create();
 #else
   return nullptr;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 }  // namespace power_metrics

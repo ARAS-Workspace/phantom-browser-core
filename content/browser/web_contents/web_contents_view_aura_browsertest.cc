@@ -366,7 +366,7 @@ class WebContentsViewAuraTest : public ContentBrowserTest {
 };
 
 // The test frequently times out on Linux. See crbug.com/440043.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_OverscrollNavigation DISABLED_OverscrollNavigation
 #else
 #define MAYBE_OverscrollNavigation OverscrollNavigation
@@ -377,7 +377,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsViewAuraTest, MAYBE_OverscrollNavigation) {
 }
 
 // On Linux, the test frequently times out. (See crbug.com/440043).
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_OverscrollNavigationWithTouchHandler \
   DISABLED_OverscrollNavigationWithTouchHandler
 #else
@@ -490,7 +490,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsViewAuraTest,
 }
 
 // Flaky on CrOS and Linux: https://crbug.com/856079
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_QuickOverscrollDirectionChange \
   DISABLED_QuickOverscrollDirectionChange
 #else
@@ -796,7 +796,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsViewAuraTest, ContentWindowClose) {
   delete web_contents->GetContentNativeView();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // This appears to be flaky in the same was as the other overscroll
 // tests. See http://crbug.com/369871.
 // For linux, see http://crbug.com/381294.

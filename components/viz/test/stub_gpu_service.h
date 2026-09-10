@@ -45,14 +45,6 @@ class StubGpuService : public mojom::GpuService {
   void StartPeakMemoryMonitor(uint32_t sequence_num) override;
   void GetPeakMemoryUsage(uint32_t sequence_num,
                           GetPeakMemoryUsageCallback callback) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void CreateJpegDecodeAccelerator(
-      mojo::PendingReceiver<chromeos_camera::mojom::MjpegDecodeAccelerator>
-          jda_receiver) override;
-  void CreateJpegEncodeAccelerator(
-      mojo::PendingReceiver<chromeos_camera::mojom::JpegEncodeAccelerator>
-          jea_receiver) override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   void CreateVideoEncodeAcceleratorProvider(
       mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
           receiver) override;

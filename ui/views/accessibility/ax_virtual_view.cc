@@ -706,7 +706,6 @@ void AXVirtualView::UpdateIgnoredState() {
 // TODO(crbug.com/371237539): In ChromeOS, its not an expectation that being
 // a view unfocusable descendant of a focusable ancestor will make the view
 // ignored.
-#if !BUILDFLAG(IS_CHROMEOS)
   bool is_ignored =
       should_be_ignored_ || pruned_ ||
       GetCachedRole() == ax::mojom::Role::kNone ||
@@ -716,10 +715,6 @@ void AXVirtualView::UpdateIgnoredState() {
   if (should_be_focusable_.has_value()) {
     is_ignored = is_ignored && !should_be_focusable_.value();
   }
-#else
-  bool is_ignored =
-      should_be_ignored_ || pruned_ || data().role == ax::mojom::Role::kNone;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   SetState(ax::mojom::State::kIgnored, is_ignored);
   UpdateFocusableState();
 }

@@ -628,10 +628,6 @@ class GlicEnabling final : public signin::IdentityManager::Observer,
 
   void MaybeNotifyProfileReadyStateChanged();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  static bool IsChromeOSProfileEligible(Profile* profile);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   bool recorded_startup_metrics_ = false;
 
   raw_ptr<Profile> profile_;

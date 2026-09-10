@@ -67,9 +67,7 @@
 #include "media/mojo/mojom/speech_recognition_service.mojom.h"  // nogncheck
 #endif  // BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
 
-#if (BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && \
-     !BUILDFLAG(IS_ANDROID)) ||                      \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
 #include "chrome/services/file_util/file_util_service.h"  // nogncheck
 #endif
 
@@ -102,33 +100,6 @@
 #include "components/services/paint_preview_compositor/paint_preview_compositor_collection_impl.h"
 #include "components/services/paint_preview_compositor/public/mojom/paint_preview_compositor.mojom.h"
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-static_assert(BUILDFLAG(ENABLE_PDF), "ChromeOS Ash must enable PDF");
-static_assert(BUILDFLAG(ENABLE_PRINTING), "ChromeOS Ash must enable Printing");
-#include "chrome/services/pdf/pdf_service.h"
-#include "chrome/services/pdf/public/mojom/pdf_service.mojom.h"
-#include "chrome/services/sharing/sharing_impl.h"
-#include "chromeos/ash/components/local_search_service/local_search_service.h"
-#include "chromeos/ash/components/local_search_service/public/mojom/local_search_service.mojom.h"
-#include "chromeos/ash/components/trash_service/public/mojom/trash_service.mojom.h"
-#include "chromeos/ash/components/trash_service/trash_service_impl.h"
-#include "chromeos/ash/services/boca/babelorca/cpp/tachyon_parsing_service.h"
-#include "chromeos/ash/services/boca/babelorca/mojom/tachyon_parsing_service.mojom.h"
-#include "chromeos/ash/services/ime/ime_service.h"
-#include "chromeos/ash/services/ime/public/mojom/input_engine.mojom.h"
-#include "chromeos/ash/services/nearby/public/mojom/sharing.mojom.h"  // nogncheck
-#include "chromeos/ash/services/orca/orca_library.h"
-#include "chromeos/ash/services/quick_pair/quick_pair_service.h"
-#include "chromeos/ash/services/recording/recording_service.h"
-#include "chromeos/components/mahi/content_extraction_service.h"
-#include "chromeos/components/mahi/public/mojom/content_extraction.mojom.h"
-#include "chromeos/components/quick_answers/public/cpp/service/spell_check_service.h"
-#include "chromeos/components/quick_answers/public/mojom/spell_check.mojom.h"
-#include "chromeos/constants/chromeos_features.h"  // nogncheck
-#include "chromeos/services/tts/public/mojom/tts_service.mojom.h"
-#include "chromeos/services/tts/tts_service.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 #include "components/on_device_translation/service/on_device_translation_service.h"
@@ -254,9 +225,7 @@ auto RunScreenAIServiceFactory(
 }
 #endif
 
-#if (BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && \
-     !BUILDFLAG(IS_ANDROID)) ||                      \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
 auto RunFileUtil(
     mojo::PendingReceiver<chrome::mojom::FileUtilService> receiver) {
   return std::make_unique<FileUtilService>(std::move(receiver));
@@ -276,12 +245,6 @@ auto RunMediaParserFactory(
   return std::make_unique<MediaParserFactory>(std::move(receiver));
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS) || BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-auto RunPdfService(mojo::PendingReceiver<pdf::mojom::PdfService> receiver) {
-  return std::make_unique<pdf::PdfService>(std::move(receiver));
-}
-#endif
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 auto RunPrintingService(
@@ -324,73 +287,6 @@ auto RunPrintCompositor(
 }
 #endif  // BUILDFLAG(ENABLE_PRINTING)
 
-#if BUILDFLAG(IS_CHROMEOS)
-auto RunImeService(
-    mojo::PendingReceiver<ash::ime::mojom::ImeService> receiver) {
-  return std::make_unique<ash::ime::ImeService>(
-      std::move(receiver), ash::ime::ImeSharedLibraryWrapperImpl::GetInstance(),
-      std::make_unique<ash::ime::FieldTrialParamsRetrieverImpl>());
-}
-
-auto RunOrcaService(
-    mojo::PendingReceiver<ash::orca::mojom::OrcaService> receiver) {
-  CHECK(chromeos::features::IsOrcaEnabled());
-  auto orca_library = std::make_unique<ash::orca::OrcaLibrary>();
-  base::expected<void, ash::orca::OrcaLibrary::BindError> error =
-      orca_library->BindReceiver(std::move(receiver));
-  if (!error.has_value()) {
-    LOG(ERROR) << error.error().message;
-  }
-  return orca_library;
-}
-
-auto RunRecordingService(
-    mojo::PendingReceiver<recording::mojom::RecordingService> receiver) {
-  return std::make_unique<recording::RecordingService>(std::move(receiver));
-}
-
-auto RunSharing(mojo::PendingReceiver<sharing::mojom::Sharing> receiver) {
-  return std::make_unique<sharing::SharingImpl>(
-      std::move(receiver), content::UtilityThread::Get()->GetIOTaskRunner());
-}
-
-auto RunTrashService(
-    mojo::PendingReceiver<ash::trash_service::mojom::TrashService> receiver) {
-  return std::make_unique<ash::trash_service::TrashServiceImpl>(
-      std::move(receiver));
-}
-
-auto RunTtsService(
-    mojo::PendingReceiver<chromeos::tts::mojom::TtsService> receiver) {
-  return std::make_unique<chromeos::tts::TtsService>(std::move(receiver));
-}
-
-auto RunLocalSearchService(
-    mojo::PendingReceiver<ash::local_search_service::mojom::LocalSearchService>
-        receiver) {
-  return std::make_unique<ash::local_search_service::LocalSearchService>(
-      std::move(receiver));
-}
-
-auto RunQuickPairService(
-    mojo::PendingReceiver<ash::quick_pair::mojom::QuickPairService> receiver) {
-  return std::make_unique<ash::quick_pair::QuickPairService>(
-      std::move(receiver));
-}
-
-auto RunQuickAnswersSpellCheckService(
-    mojo::PendingReceiver<quick_answers::mojom::SpellCheckService> receiver) {
-  return std::make_unique<quick_answers::SpellCheckService>(
-      std::move(receiver));
-}
-
-auto RunMahiContentExtractionServiceFactory(
-    mojo::PendingReceiver<mahi::mojom::ContentExtractionServiceFactory>
-        receiver) {
-  return std::make_unique<mahi::ContentExtractionService>(std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 auto RunOnDeviceTranslationService(
     mojo::PendingReceiver<
@@ -399,15 +295,6 @@ auto RunOnDeviceTranslationService(
       std::move(receiver));
 }
 #endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-
-#if BUILDFLAG(IS_CHROMEOS)
-auto RunBabelOrcaTachyonParsingService(
-    mojo::PendingReceiver<ash::babelorca::mojom::TachyonParsingService>
-        receiver) {
-  return std::make_unique<ash::babelorca::TachyonParsingService>(
-      std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 std::unique_ptr<readaloud::ReadAloudPlaybackController>
@@ -464,9 +351,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunMacNotificationService);
 #endif  // BUILDFLAG(IS_MAC)
 
-#if (BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && \
-     !BUILDFLAG(IS_ANDROID)) ||                      \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
   services.Add(RunFileUtil);
 #endif
 
@@ -476,10 +361,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
 
 #if BUILDFLAG(ENABLE_EXTENSIONS) || BUILDFLAG(IS_ANDROID)
   services.Add(RunMediaParserFactory);
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  services.Add(RunPdfService);
 #endif
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
@@ -498,22 +379,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
 #if BUILDFLAG(ENABLE_PAINT_PREVIEW)
   services.Add(RunPaintPreviewCompositor);
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  services.Add(RunImeService);
-  if (chromeos::features::IsOrcaEnabled()) {
-    services.Add(RunOrcaService);
-  }
-  services.Add(RunRecordingService);
-  services.Add(RunSharing);
-  services.Add(RunTrashService);
-  services.Add(RunTtsService);
-  services.Add(RunLocalSearchService);
-  services.Add(RunQuickPairService);
-  services.Add(RunBabelOrcaTachyonParsingService);
-  services.Add(RunQuickAnswersSpellCheckService);
-  services.Add(RunMahiContentExtractionServiceFactory);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
   services.Add(RunOnDeviceTranslationService);

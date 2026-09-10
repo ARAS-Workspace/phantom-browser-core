@@ -93,8 +93,7 @@ IN_PROC_BROWSER_TEST_F(PermissionsApiTest, ExperimentalPermissionsFail) {
 }
 
 // TODO(crbug.com/40124130): Flaky on ChromeOS, Linux, and Mac non-dbg builds.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)) && \
-    defined(NDEBUG)
+#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && defined(NDEBUG)
 #define MAYBE_FaviconPermission DISABLED_FaviconPermission
 #else
 #define MAYBE_FaviconPermission FaviconPermission

@@ -145,11 +145,11 @@ uint32_t FakePeripheral::GetBluetoothClass() const {
   NOTREACHED();
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 device::BluetoothTransport FakePeripheral::GetType() const {
   NOTREACHED();
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 std::string FakePeripheral::GetIdentifier() const {
   NOTREACHED();
@@ -196,12 +196,6 @@ bool FakePeripheral::IsPaired() const {
   NOTREACHED();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool FakePeripheral::IsBonded() const {
-  NOTREACHED();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 bool FakePeripheral::IsConnected() const {
   NOTREACHED();
 }
@@ -247,13 +241,6 @@ void FakePeripheral::Connect(PairingDelegate* pairing_delegate,
                              ConnectCallback callback) {
   NOTREACHED();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void FakePeripheral::ConnectClassic(PairingDelegate* pairing_delegate,
-                                    ConnectCallback callback) {
-  NOTREACHED();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void FakePeripheral::SetPinCode(const std::string& pincode) {
   NOTREACHED();
@@ -377,17 +364,5 @@ void FakePeripheral::DispatchDiscoveryEvent() {
 }
 
 void FakePeripheral::DisconnectGatt() {}
-
-#if BUILDFLAG(IS_CHROMEOS)
-void FakePeripheral::ExecuteWrite(base::OnceClosure callback,
-                                  ExecuteWriteErrorCallback error_callback) {
-  NOTIMPLEMENTED();
-}
-
-void FakePeripheral::AbortWrite(base::OnceClosure callback,
-                                AbortWriteErrorCallback error_callback) {
-  NOTIMPLEMENTED();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace bluetooth

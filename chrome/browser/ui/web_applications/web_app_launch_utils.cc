@@ -107,16 +107,6 @@
 #include "extensions/common/extension.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/ash/system_web_apps/system_web_app_manager.h"
-#include "chrome/browser/chromeos/app_mode/kiosk_web_app_browser_controller.h"
-#include "chrome/browser/ui/ash/system_web_apps/system_web_app_ui_utils.h"
-#include "chrome/browser/web_applications/chromeos_web_app_experiments.h"
-#include "chromeos/ash/experiences/system_web_apps/types/system_web_app_delegate.h"
-#include "chromeos/components/kiosk/kiosk_utils.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 namespace {
 
@@ -146,49 +136,16 @@ BrowserWindowInterface* ReparentWebContentsIntoAppBrowser(
   return target_browser;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-const ash::SystemWebAppDelegate* GetSystemWebAppDelegate(
-    BrowserWindowInterface* browser,
-    const webapps::AppId& app_id) {
-  auto system_app_type =
-      ash::GetSystemWebAppTypeForAppId(browser->GetProfile(), app_id);
-  if (system_app_type) {
-    return ash::SystemWebAppManager::Get(browser->GetProfile())
-        ->GetSystemApp(*system_app_type);
-  }
-  return nullptr;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-std::unique_ptr<AppBrowserController> CreateWebKioskBrowserController(
-    BrowserWindowInterface* browser,
-    WebAppProvider* provider,
-    const webapps::AppId& app_id) {
-  return std::make_unique<chromeos::KioskWebAppBrowserController>(
-      *provider, browser, app_id);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 std::unique_ptr<AppBrowserController> CreateWebAppBrowserController(
     BrowserWindowInterface* browser,
     WebAppProvider* provider,
     const webapps::AppId& app_id) {
   bool should_have_tab_strip_for_swa = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  const ash::SystemWebAppDelegate* system_app =
-      GetSystemWebAppDelegate(browser, app_id);
-  should_have_tab_strip_for_swa =
-      system_app && system_app->ShouldHaveTabStrip();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   const bool has_tab_strip =
       browser->GetType() != BrowserWindowInterface::Type::TYPE_APP_POPUP &&
       (should_have_tab_strip_for_swa ||
        provider->registrar_unsafe().IsTabbedWindowModeEnabled(app_id));
   return std::make_unique<WebAppBrowserController>(*provider, browser, app_id,
-#if BUILDFLAG(IS_CHROMEOS)
-                                                   system_app,
-#endif  // BUILDFLAG(IS_CHROMEOS)
                                                    has_tab_strip);
 }
 
@@ -258,21 +215,6 @@ bool IsNavigationCapturingReimplExperimentEnabled(
     }
     return true;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Check application-specific flags.
-  if (controlling_app_id.has_value() &&
-      ::web_app::ChromeOsWebAppExperiments::
-          IsNavigationCapturingReimplEnabledForTargetApp(*controlling_app_id)) {
-    return true;
-  }
-  if (current_browser_app_id.has_value() &&
-      ::web_app::ChromeOsWebAppExperiments::
-          IsNavigationCapturingReimplEnabledForSourceApp(
-              *current_browser_app_id, url)) {
-    return true;
-  }
-#endif
 
   return false;
 }
@@ -368,11 +310,9 @@ void ReparentWebContentsIntoBrowserImpl(BrowserWindowInterface* source_browser,
     CHECK(helper);
     helper->MaybeShowIntentPickerIcon();
   }
-#if !BUILDFLAG(IS_CHROMEOS)
   if (source_app_id && source_app_id != target_app_id) {
     apps::EnableLinkCapturingInfoBarDelegate::RemoveInfoBar(web_contents);
   }
-#endif
   target_browser->GetWindow()->Show();
 
   // The window will be registered correctly, however the tab will not be
@@ -649,15 +589,7 @@ std::unique_ptr<AppBrowserController> MaybeCreateAppBrowserController(
       WebAppProvider::GetForLocalAppsUnchecked(bwi->GetProfile());
   if (provider && provider->registrar_unsafe().AppMatches(
                       app_id, WebAppFilter::IsAppSurfaceableToUser())) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (chromeos::IsKioskSession()) {
-      controller = CreateWebKioskBrowserController(bwi, provider, app_id);
-    } else {
-      controller = CreateWebAppBrowserController(bwi, provider, app_id);
-    }
-#else
     controller = CreateWebAppBrowserController(bwi, provider, app_id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   } else {
     controller = MaybeCreateHostedAppBrowserController(bwi, app_id);
   }
@@ -821,13 +753,6 @@ void UpdateLaunchMetricsAndStats(const webapps::AppId& app_id,
   WebAppProvider::GetForLocalAppsUnchecked(profile)
       ->sync_bridge_unsafe()
       .SetAppLastLaunchTime(app_id, base::Time::Now());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::GetSystemWebAppTypeForAppId(profile, app_id)) {
-    // System web apps doesn't use the rest of the stats.
-    return;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Update the launch time in the site engagement service. A recent web
   // app launch will provide an engagement boost to the origin.

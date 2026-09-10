@@ -55,13 +55,6 @@ BASE_I18N_EXPORT std::u16string TimeFormatShortDateNumeric(Time time);
 // Returns a numeric date and time such as "12/13/52 2:44:30 PM".
 BASE_I18N_EXPORT std::u16string TimeFormatShortDateAndTime(Time time);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Returns a month and year, e.g. "November 2007" for the specified time zone.
-BASE_I18N_EXPORT std::u16string TimeFormatMonthAndYearForTimeZone(
-    Time time,
-    const icu::TimeZone* time_zone);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Returns a month and year, e.g. "November 2007"
 BASE_I18N_EXPORT std::u16string TimeFormatMonthAndYear(Time time);
 

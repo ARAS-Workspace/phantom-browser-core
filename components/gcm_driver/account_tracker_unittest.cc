@@ -269,9 +269,7 @@ class AccountTrackerTest : public testing::Test {
 // the underlying GoogleSignedOut callback is never sent). Tests that exercise
 // functionality dependent on that callback firing are not relevant on ChromeOS
 // and should simply not run on that platform.
-#if !BUILDFLAG(IS_CHROMEOS)
   void NotifyLogoutOfAllAccounts() { identity_test_env_.ClearPrimaryAccount(); }
-#endif
 
   CoreAccountInfo AddAccountWithToken(const std::string& email) {
     return identity_test_env_.MakeAccountAvailable(email);
@@ -311,9 +309,7 @@ TEST_F(AccountTrackerTest, PrimaryNoEventsBeforeLogin) {
   NotifyTokenRevoked(account.account_id);
 
 // Logout is not possible on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   NotifyLogoutOfAllAccounts();
-#endif
 
   EXPECT_TRUE(observer()->CheckEvents());
 }
@@ -345,7 +341,6 @@ TEST_F(AccountTrackerTest, PrimaryRevokeThenTokenAvailable) {
 }
 
 // These tests exercise true login/logout, which are not possible on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AccountTrackerTest, PrimaryTokenAvailableThenLogin) {
   AddAccountWithToken(kPrimaryAccountEmail);
   EXPECT_TRUE(observer()->CheckEvents());
@@ -387,8 +382,6 @@ TEST_F(AccountTrackerTest, PrimaryLogoutThenRevoke) {
   NotifyTokenRevoked(primary_account.account_id);
   EXPECT_TRUE(observer()->CheckEvents());
 }
-
-#endif
 
 // Non-primary accounts
 
@@ -458,9 +451,7 @@ TEST_F(AccountTrackerTest, MultiNoEventsBeforeLogin) {
   NotifyTokenRevoked(account2.account_id);
 
 // Logout is not possible on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   NotifyLogoutOfAllAccounts();
-#endif
 
   EXPECT_TRUE(observer()->CheckEvents());
 }
@@ -525,7 +516,6 @@ TEST_F(AccountTrackerTest, GetAccountsReturnNothingWhenPrimarySignedOut) {
 }
 
 // This test exercises true login/logout, which are not possible on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AccountTrackerTest, MultiLogoutRemovesAllAccounts) {
   CoreAccountInfo primary_account = SetActiveAccount(kPrimaryAccountEmail);
   NotifyTokenAvailable(primary_account.account_id);
@@ -537,6 +527,5 @@ TEST_F(AccountTrackerTest, MultiLogoutRemovesAllAccounts) {
   EXPECT_TRUE(observer()->CheckEvents(TrackingEvent(SIGN_OUT, primary_account),
                                       TrackingEvent(SIGN_OUT, account)));
 }
-#endif
 
 }  // namespace gcm

@@ -191,7 +191,7 @@ RequestTypeForUma PermissionUtil::GetUmaValueForRequestType(
       return RequestTypeForUma::PERMISSION_NOTIFICATIONS;
     case RequestType::kSensors:
       return RequestTypeForUma::PERMISSION_SENSORS;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
     case RequestType::kProtectedMediaIdentifier:
       return RequestTypeForUma::PERMISSION_PROTECTED_MEDIA_IDENTIFIER;
 #endif
@@ -199,18 +199,10 @@ RequestTypeForUma PermissionUtil::GetUmaValueForRequestType(
     case RequestType::kRegisterProtocolHandler:
       return RequestTypeForUma::REGISTER_PROTOCOL_HANDLER;
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_CHROMEOS)
-    case RequestType::kSmartCard:
-      return RequestTypeForUma::PERMISSION_SMART_CARD;
-#endif
     case RequestType::kStorageAccess:
       return RequestTypeForUma::PERMISSION_STORAGE_ACCESS;
     case RequestType::kVrSession:
       return RequestTypeForUma::PERMISSION_VR;
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-    case RequestType::kWebPrinting:
-      return RequestTypeForUma::PERMISSION_WEB_PRINTING;
-#endif
     case RequestType::kWindowManagement:
       return RequestTypeForUma::PERMISSION_WINDOW_MANAGEMENT;
     case RequestType::kTopLevelStorageAccess:
@@ -284,7 +276,7 @@ bool PermissionUtil::GetPermissionType(ContentSettingsType type,
     case ContentSettingsType::BACKGROUND_SYNC:
       *out = PermissionType::BACKGROUND_SYNC;
       break;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
     case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
       *out = PermissionType::PROTECTED_MEDIA_IDENTIFIER;
       break;
@@ -509,7 +501,7 @@ ContentSettingsType PermissionUtil::PermissionTypeToContentSettingsTypeSafe(
     case PermissionType::GEOLOCATION_APPROXIMATE:
       return content_settings::GeolocationContentSettingsType();
     case PermissionType::PROTECTED_MEDIA_IDENTIFIER:
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
       return ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER;
 #else
       break;

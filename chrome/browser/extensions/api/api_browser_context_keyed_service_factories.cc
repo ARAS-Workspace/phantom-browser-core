@@ -60,21 +60,8 @@
 #include "chrome/browser/extensions/api/web_authentication_proxy/web_authentication_proxy_service.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/extensions/wm/wm_desks_private_events.h"
-#include "chrome/browser/extensions/api/document_scan/document_scan_api_handler.h"
-#include "chrome/browser/extensions/api/input_ime/input_ime_api.h"
-#include "chrome/browser/extensions/api/platform_keys/verify_trust_api_service.h"
-#include "chrome/browser/extensions/api/terminal/terminal_private_api.h"
-#include "extensions/browser/api/bluetooth_low_energy/bluetooth_low_energy_api.h"
-#endif
-
 #if BUILDFLAG(ENABLE_SERVICE_DISCOVERY)
 #include "chrome/browser/extensions/api/mdns/mdns_api.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-#include "chrome/browser/extensions/api/printing/printing_api_handler.h"
 #endif
 
 #if BUILDFLAG(ENABLE_SPELLCHECK)
@@ -113,23 +100,14 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   extensions::ActivityLogAPI::GetFactoryInstance();
   extensions::AutofillPrivateEventRouterFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS)
-  extensions::BluetoothLowEnergyAPI::GetFactoryInstance();
-#endif
   extensions::BookmarkManagerPrivateAPI::GetFactoryInstance();
   extensions::BrailleDisplayPrivateAPI::GetFactoryInstance();
-#if BUILDFLAG(IS_CHROMEOS)
-  extensions::DocumentScanAPIHandler::GetFactoryInstance();
-#endif
   extensions::EnterpriseReportingPrivateEventRouterFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS)
-  extensions::InputImeAPI::GetFactoryInstance();
-#endif
   extensions::image_writer::OperationManager::GetFactoryInstance();
 #if BUILDFLAG(ENABLE_SPELLCHECK)
   extensions::LanguageSettingsPrivateDelegateFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   auto networking_private_ui_delegate_factory =
       std::make_unique<extensions::NetworkingPrivateUIDelegateFactoryImpl>();
   extensions::NetworkingPrivateDelegateFactory::GetInstance()
@@ -137,22 +115,12 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
 #endif
   extensions::PasswordsPrivateDelegateFactory::GetInstance();
   extensions::PasswordsPrivateEventRouterFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-  extensions::PrintingAPIHandler::GetFactoryInstance();
-#endif
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   extensions::SafeBrowsingPrivateEventRouterFactory::GetInstance();
 #endif
   extensions::SettingsPrivateEventRouterFactory::GetInstance();
   extensions::SettingsOverridesAPI::GetFactoryInstance();
   extensions::SidePanelService::GetFactoryInstance();
-#if BUILDFLAG(IS_CHROMEOS)
-  extensions::TerminalPrivateAPI::GetFactoryInstance();
-  extensions::VerifyTrustApiService::GetFactoryInstance();
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  extensions::WMDesksPrivateEventsAPI::GetFactoryInstance();
-#endif
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
   // These APIs are intentionally not supported on desktop Android.

@@ -100,7 +100,7 @@ void MemoryMeasurementDelegateImpl::OnMemorySummary(
                 base::KiBU(process_dump.os_dump().resident_set_kb),
             .private_footprint =
                 base::KiBU(process_dump.os_dump().private_footprint_kb),
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
             // `private_footprint_swap_kb` is only defined on these platforms
             .private_swap =
                 base::KiBU(process_dump.os_dump().private_footprint_swap_kb),

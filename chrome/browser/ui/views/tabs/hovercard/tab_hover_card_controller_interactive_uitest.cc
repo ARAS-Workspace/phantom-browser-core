@@ -73,10 +73,6 @@
 #include "ui/views/view_utils.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/system_web_apps/test_support/test_system_web_app_installation.h"
-#endif
-
 namespace {
 constexpr char16_t kTabTitle[] = u"Test Tab 2";
 constexpr char16_t kTabDomain[] = u"example.com";
@@ -142,7 +138,7 @@ class TabHoverCardInteractiveUiTest
     Tab::SetShowHoverCardOnMouseHoverForTesting(true);
     base::RunLoop run_loop(base::RunLoop::Type::kNestableTasksAllowed);
     gfx::Point upper_left;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // Because Ozone makes it impossible to target a point not in a window in
     // tests, instead target the extreme upper left of the browser window.
     upper_left = browser()->GetWindow()->GetBounds().origin();
@@ -831,43 +827,6 @@ IN_PROC_BROWSER_TEST_F(TabHoverCardFadeFooterInteractiveUiTest,
             collaboration_messaging_row->footer_label()->GetText());
   EXPECT_FALSE(collaboration_messaging_row->icon()->GetImageModel().IsEmpty());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class TabHoverCardSystemWebAppTest : public InteractiveBrowserTest {
- public:
-  TabHoverCardSystemWebAppTest()
-      : test_system_web_app_installation_(
-            ash::TestSystemWebAppInstallation::SetUpTabbedMultiWindowApp()) {}
-
-  void SetUpOnMainThread() override {
-    InteractiveBrowserTest::SetUpOnMainThread();
-    Tab::SetShowHoverCardOnMouseHoverForTesting(true);
-  }
-
- protected:
-  std::unique_ptr<ash::TestSystemWebAppInstallation>
-      test_system_web_app_installation_;
-};
-
-IN_PROC_BROWSER_TEST_F(TabHoverCardSystemWebAppTest,
-                       HideDomainNameFromHoverCard) {
-  test_system_web_app_installation_->WaitForAppInstall();
-  auto* const app_browser = web_app::LaunchWebAppBrowser(
-      browser()->GetProfile(), test_system_web_app_installation_->GetAppId());
-  const char kTabToHover[] = "Tab to hover";
-
-  RunTestSequenceInContext(
-      BrowserElements::From(app_browser)->GetContext(),
-      WithView(kTabStripElementId,
-               [](TabStrip* tab_strip) { tab_strip->StopAnimating(); }),
-      NameDescendantViewByType<Tab>(kBrowserViewElementId, kTabToHover, 0),
-      MoveMouseTo(kTabToHover),
-      WaitForShow(TabHoverCardBubbleView::kHoverCardBubbleElementId),
-      EnsureNotPresent(TabHoverCardBubbleView::kHoverCardDomainLabelElementId),
-      MoveMouseTo(kNewTabButtonElementId),
-      WaitForHide(TabHoverCardBubbleView::kHoverCardBubbleElementId));
-}
-#endif
 
 // TODO(crbug.com/497970633): Fix flakiness and enable tab group header
 // hover card tests.

@@ -1472,21 +1472,9 @@ void MatchesFatalMessagesTest() {
 // retain during truncation.
 TEST(TestLauncherTools, TruncateSnippetFocusedMatchesFatalMessagesTest) {
   logging::ScopedLoggingSettings scoped_logging_settings;
-#if BUILDFLAG(IS_CHROMEOS)
-  scoped_logging_settings.SetLogFormat(logging::LogFormat::LOG_FORMAT_SYSLOG);
-#endif
   MatchesFatalMessagesTest();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Validates TestSnippetFocused correctly identifies fatal messages to
-// retain during truncation, for ChromeOS.
-TEST(TestLauncherTools, TruncateSnippetFocusedMatchesFatalMessagesCrosAshTest) {
-  logging::ScopedLoggingSettings scoped_logging_settings;
-  scoped_logging_settings.SetLogFormat(logging::LogFormat::LOG_FORMAT_CHROME);
-  MatchesFatalMessagesTest();
-}
-#endif
 
 // Validate TestSnippetFocused truncates snippets correctly, regardless of
 // whether fatal messages appear at the start, middle or end of the snippet.

@@ -142,7 +142,6 @@ class ExtensionServiceBrowserTest : public ExtensionBrowserTest {
 
 // ChromeOS does not support multiple profiles. Hence excluding this test from
 // ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Tests that ExtensionService does not observe host events after
 // ExtensionService::Shutdown() has been executed.
 IN_PROC_BROWSER_TEST_F(ExtensionServiceBrowserTest,
@@ -181,7 +180,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionServiceBrowserTest,
   // Wait for profile to shut down.
   profile_shutdown_waiter.Wait();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Verifies that programmatically uninstalling an extension followed immediately
 // by a request from WebUI to disable the extension returns early without

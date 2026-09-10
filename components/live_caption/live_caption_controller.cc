@@ -215,7 +215,7 @@ void LiveCaptionController::OnError(
                                        std::move(error_silenced_callback));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 void LiveCaptionController::OnToggleFullscreen(
     CaptionBubbleContext* caption_bubble_context) {
   if (!enabled_) {

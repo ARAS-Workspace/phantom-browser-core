@@ -123,13 +123,6 @@
 #include "chrome/browser/extensions/policy_dse_ntp_override_metrics_reporter.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/system/sys_info.h"
-#include "chrome/browser/ash/extensions/install_limiter.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chromeos/constants/chromeos_features.h"
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
 #endif
@@ -159,7 +152,7 @@ const char* const kObsoleteComponentExtensionIds[] = {
 // ExtensionUnpublishedAvailability policy default value.
 constexpr int kAllowUnpublishedExtensions = 0;
 
-#if !BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
 const char kBlockLoadCommandline[] = "command_line";
 
 bool ShouldBlockCommandLineExtension(Profile& profile) {
@@ -352,20 +345,6 @@ void ExtensionService::Init() {
   bool load_saved_extensions = true;
   bool load_command_line_extensions =
       extension_registrar_->extensions_enabled();
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!ash::ProfileHelper::IsUserProfile(profile_)) {
-    load_saved_extensions = false;
-    load_command_line_extensions = false;
-  }
-
-  const bool load_autotest_ext =
-      command_line_->HasSwitch(switches::kLoadSigninProfileTestExtension);
-  const bool is_signin_profile = ash::ProfileHelper::IsSigninProfile(profile_);
-  if (load_autotest_ext && is_signin_profile) {
-    LoadSigninProfileTestExtension(command_line_->GetSwitchValueASCII(
-        switches::kLoadSigninProfileTestExtension));
-  }
-#endif
   if (load_saved_extensions) {
     InstalledLoader(profile_).LoadAllExtensions();
   }
@@ -419,11 +398,11 @@ void ExtensionService::LoadExtensionsFromCommandLineFlag(
 
   // Check that --load-extension is allowed.
   if (switch_name == switches::kLoadExtension) {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
     LOG(WARNING)
         << "--load-extension is not allowed in Google Chrome, ignoring.";
     return;
-#else   // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#else
     if (safe_browsing::IsEnhancedProtectionEnabled(*profile_->GetPrefs())) {
       VLOG(1) << "--load-extension is not allowed for users opted into "
               << "Enhanced Safe Browsing, ignoring.";
@@ -437,7 +416,7 @@ void ExtensionService::LoadExtensionsFromCommandLineFlag(
           << "ExtensionInstallTypeBlocklist::command_line, ignoring.";
       return;
     }
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
   } else if (base::FeatureList::IsEnabled(
                  extensions_features::
                      kDisableDisableExtensionsExceptCommandLineSwitch)) {
@@ -468,21 +447,6 @@ void ExtensionService::LoadExtensionsFromCommandLineFlag(
           ? ExtensionService::LoadExtensionFlag::kLoadExtension
           : ExtensionService::LoadExtensionFlag::kDisableExtensionsExcept);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void ExtensionService::LoadSigninProfileTestExtension(const std::string& path) {
-  base::SysInfo::CrashIfChromeOSNonTestImage();
-  std::string extension_id;
-  const bool installing =
-      UnpackedInstaller::Create(profile_)->LoadFromCommandLine(
-          base::FilePath(path), &extension_id, false /*only-allow-apps*/);
-  CHECK(installing);
-  CHECK_EQ(extension_id, extension_misc::kSigninProfileTestExtensionId)
-      << extension_id
-      << " extension not allowed to load from the command line in the "
-         "signin profile";
-}
-#endif
 
 void ExtensionService::PerformActionBasedOnOmahaAttributes(
     const std::string& extension_id,

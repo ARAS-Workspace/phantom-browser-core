@@ -48,19 +48,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/cros_system_api/dbus/service_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/test/metrics/histogram_tester.h"
-#include "base/time/time.h"
-#include "chromeos/constants/chromeos_features.h"
-#include "device/bluetooth/bluetooth_low_energy_scan_filter.h"
-#include "device/bluetooth/bluetooth_low_energy_scan_session.h"
-#include "device/bluetooth/chromeos/bluetooth_utils.h"
-#include "device/bluetooth/dbus/fake_bluetooth_advertisement_monitor_manager_client.h"
-#include "device/bluetooth/dbus/fake_bluetooth_le_advertising_manager_client.h"
-#include "mojo/public/cpp/bindings/pending_remote.h"
-#include "mojo/public/cpp/bindings/self_owned_receiver.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 using ::device::BluetoothAdapter;
@@ -76,44 +63,6 @@ using ::device::MockPairingDelegate;
 using ::device::TestBluetoothAdapterObserver;
 using ::testing::_;
 using ::testing::StrictMock;
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Background scanning filter values.
-constexpr int16_t kBackgroundScanningDeviceFoundRSSIThreshold = -80;
-constexpr int16_t kBackgroundScanningDeviceLostRSSIThreshold = -100;
-constexpr base::TimeDelta kBackgroundScanningDeviceFoundTimeout =
-    base::Seconds(1);
-constexpr base::TimeDelta kBackgroundScanningDeviceLostTimeout =
-    base::Seconds(5);
-// This pattern value encodes the Fast Initiation service ID of 0xfe2c and the
-// model ID of 0xfc128e.
-constexpr uint8_t kBackgroundScanningFilterPatternValue[] = {0x2c, 0xfe, 0xfc,
-                                                             0x12, 0x8e};
-std::unique_ptr<device::BluetoothLowEnergyScanFilter>
-CreateLowEnergyScanFilter() {
-  auto pattern_value =
-      std::vector<uint8_t>(std::begin(kBackgroundScanningFilterPatternValue),
-                           std::end(kBackgroundScanningFilterPatternValue));
-  device::BluetoothLowEnergyScanFilter::Pattern pattern(
-      /*start_position=*/0,
-      device::BluetoothLowEnergyScanFilter::AdvertisementDataType::kServiceData,
-      std::move(pattern_value));
-  return device::BluetoothLowEnergyScanFilter::Create(
-      kBackgroundScanningDeviceFoundRSSIThreshold,
-      kBackgroundScanningDeviceLostRSSIThreshold,
-      kBackgroundScanningDeviceFoundTimeout,
-      kBackgroundScanningDeviceLostTimeout, {pattern},
-      /*rssi_sampling_period=*/std::nullopt);
-}
-
-bluez::FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-GetAdvertisementMonitorApplicationManger() {
-  return static_cast<bluez::FakeBluetoothAdvertisementMonitorManagerClient*>(
-             bluez::BluezDBusManager::Get()
-                 ->GetBluetoothAdvertisementMonitorManagerClient())
-      ->application_provider();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void ScheduleAsynchronousCancelPairing(BluetoothDevice* device) {
   base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
@@ -180,80 +129,6 @@ class FakeBluetoothProfileServiceProviderDelegate
   void Cancel() override {}
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-class FakeBluetoothLowEnergyScanSessionDelegate
-    : public device::BluetoothLowEnergyScanSession::Delegate {
- public:
-  FakeBluetoothLowEnergyScanSessionDelegate() = default;
-
-  // device::BluetoothLowEnergyScanSession::Delegate
-  void OnSessionStarted(
-      device::BluetoothLowEnergyScanSession* scan_session,
-      std::optional<device::BluetoothLowEnergyScanSession::ErrorCode>
-          error_code) override {
-    sessions_started_.push_back(std::make_pair(scan_session, error_code));
-  }
-  void OnDeviceFound(device::BluetoothLowEnergyScanSession* scan_session,
-                     device::BluetoothDevice* device) override {
-    devices_found_.push_back(std::make_pair(scan_session, device));
-  }
-  void OnDeviceLost(device::BluetoothLowEnergyScanSession* scan_session,
-                    device::BluetoothDevice* device) override {
-    devices_lost_.push_back(std::make_pair(scan_session, device));
-  }
-  void OnSessionInvalidated(
-      device::BluetoothLowEnergyScanSession* scan_session) override {
-    sessions_invalidated_.push_back(scan_session);
-  }
-
-  const std::vector<std::pair<
-      device::BluetoothLowEnergyScanSession*,
-      std::optional<device::BluetoothLowEnergyScanSession::ErrorCode>>>&
-  sessions_started() const {
-    return sessions_started_;
-  }
-
-  const std::vector<std::pair<device::BluetoothLowEnergyScanSession*,
-                              device::BluetoothDevice*>>&
-  devices_found() const {
-    return devices_found_;
-  }
-
-  const std::vector<std::pair<device::BluetoothLowEnergyScanSession*,
-                              device::BluetoothDevice*>>&
-  devices_lost() const {
-    return devices_lost_;
-  }
-
-  const std::vector<
-      raw_ptr<device::BluetoothLowEnergyScanSession, VectorExperimental>>&
-  sessions_invalidated() const {
-    return sessions_invalidated_;
-  }
-
-  base::WeakPtr<FakeBluetoothLowEnergyScanSessionDelegate> GetWeakPtr() {
-    return weak_ptr_factory_.GetWeakPtr();
-  }
-
- private:
-  std::vector<std::pair<
-      device::BluetoothLowEnergyScanSession*,
-      std::optional<device::BluetoothLowEnergyScanSession::ErrorCode>>>
-      sessions_started_;
-  std::vector<std::pair<device::BluetoothLowEnergyScanSession*,
-                        device::BluetoothDevice*>>
-      devices_found_;
-  std::vector<std::pair<device::BluetoothLowEnergyScanSession*,
-                        device::BluetoothDevice*>>
-      devices_lost_;
-  std::vector<
-      raw_ptr<device::BluetoothLowEnergyScanSession, VectorExperimental>>
-      sessions_invalidated_;
-
-  base::WeakPtrFactory<FakeBluetoothLowEnergyScanSessionDelegate>
-      weak_ptr_factory_{this};
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }  // namespace
 
 class BluetoothBlueZTest : public testing::Test {
@@ -474,9 +349,6 @@ class BluetoothBlueZTest : public testing::Test {
   std::string last_client_error_;
   std::vector<std::unique_ptr<BluetoothDiscoverySession>> discovery_sessions_;
   raw_ptr<BluetoothAdapterProfileBlueZ> adapter_profile_;
-#if BUILDFLAG(IS_CHROMEOS)
-  base::HistogramTester histogram_tester_;
-#endif
 };
 
 // This class was created to test BluetoothDeviceBluez::Connect() and
@@ -494,25 +366,13 @@ class BluetoothBlueZTestP : public BluetoothBlueZTest,
       BluetoothDevice* device,
       device::BluetoothDevice::PairingDelegate* pairing_delegate,
       device::BluetoothDevice::ConnectCallback callback) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (GetParam()) {
-      device->ConnectClassic(pairing_delegate, std::move(callback));
-      return;
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
     device->Connect(pairing_delegate, std::move(callback));
   }
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-INSTANTIATE_TEST_SUITE_P(All,
-                         BluetoothBlueZTestP,
-                         /*should_use_connect_classic=*/testing::Bool());
-#else   // BUILDFLAG(IS_CHROMEOS)
 INSTANTIATE_TEST_SUITE_P(All,
                          BluetoothBlueZTestP,
                          /*should_use_connect_classic=*/testing::Values(false));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 const char BluetoothBlueZTest::kGapUuid[] =
     "00001800-0000-1000-8000-00805f9b34fb";
@@ -2072,48 +1932,7 @@ TEST_F(BluetoothBlueZTest, DeviceAddressChanged) {
   EXPECT_EQ(std::string(kNewAddress), devices[idx]->GetAddress());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(BluetoothBlueZTest, DeviceBondedChanged) {
-  // Simulate a change of bonded state of a device.
-  GetAdapter();
-
-  BluetoothAdapter::DeviceList devices = adapter_->GetDevices();
-  ASSERT_EQ(2U, devices.size());
-
-  int idx = GetDeviceIndexByAddress(
-      devices, bluez::FakeBluetoothDeviceClient::kPairedDeviceAddress);
-  ASSERT_NE(-1, idx);
-  ASSERT_EQ(bluez::FakeBluetoothDeviceClient::kPairedDeviceAddress,
-            devices[idx]->GetAddress());
-  ASSERT_EQ(true, devices[idx]->IsBonded());
-
-  // Install an observer; expect the DeviceBondedChanged method to be called
-  // when we change the bonded state of the device.
-  TestBluetoothAdapterObserver observer(adapter_);
-
-  bluez::FakeBluetoothDeviceClient::Properties* properties =
-      fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
-          bluez::FakeBluetoothDeviceClient::kPairedDevicePath));
-
-  properties->bonded.ReplaceValue(false);
-
-  EXPECT_EQ(1, observer.device_changed_count());
-  EXPECT_EQ(1, observer.device_bonded_changed_count());
-  EXPECT_FALSE(observer.device_new_bonded_status());
-  EXPECT_EQ(devices[idx], observer.last_device());
-
-  // Change the bonded state back to true to examine the consistent behavior of
-  // DevicePairedChanged method.
-  properties->bonded.ReplaceValue(true);
-
-  EXPECT_EQ(2, observer.device_changed_count());
-  EXPECT_EQ(2, observer.device_bonded_changed_count());
-  EXPECT_TRUE(observer.device_new_bonded_status());
-  EXPECT_EQ(devices[idx], observer.last_device());
-}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(BluetoothBlueZTest, DevicePairedChanged) {
   // Simulate a change of paired state of a device.
   GetAdapter();
@@ -2423,11 +2242,6 @@ TEST_F(BluetoothBlueZTest, ForgetDevice) {
   EXPECT_EQ(1, observer.device_removed_count());
   EXPECT_EQ(address, observer.last_device_address());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  histogram_tester_.ExpectBucketCount("Bluetooth.ChromeOS.Forget.Result",
-                                      device::ForgetResult::kSuccess, 1);
-#endif
-
   // GetDevices shouldn't return the device either.
   devices = adapter_->GetDevices();
   ASSERT_EQ(1U, devices.size());
@@ -2455,14 +2269,6 @@ TEST_P(BluetoothBlueZTestP, ForgetUnpairedDevice) {
 
   ASSERT_TRUE(device->IsConnected());
   ASSERT_FALSE(device->IsConnecting());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Make sure the trusted property has been set to true.
-  bluez::FakeBluetoothDeviceClient::Properties* properties =
-      fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
-          bluez::FakeBluetoothDeviceClient::kConnectUnpairablePath));
-  ASSERT_TRUE(properties->trusted.value());
-#endif
 
   // Install an observer; expect the DeviceRemoved method to be called
   // with the device we remove.
@@ -2504,12 +2310,7 @@ TEST_P(BluetoothBlueZTestP, ConnectPairedDevice) {
   run_loop.Run();
 
 // Two changes for connecting, one for connected.
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for trusted after connecting.
-  EXPECT_EQ(4, observer.device_changed_count());
-#else
   EXPECT_EQ(3, observer.device_changed_count());
-#endif
   EXPECT_EQ(device, observer.last_device());
 
   EXPECT_TRUE(device->IsConnected());
@@ -2541,12 +2342,7 @@ TEST_P(BluetoothBlueZTestP, ConnectUnpairableDevice) {
 
 // Two changes for connecting, one for connected, and one for the reconnect mode
 // (IsConnectable).
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for trusted after connection.
-  EXPECT_EQ(5, observer.device_changed_count());
-#else
   EXPECT_EQ(4, observer.device_changed_count());
-#endif
   EXPECT_EQ(device, observer.last_device());
 
   EXPECT_TRUE(device->IsConnected());
@@ -2556,11 +2352,7 @@ TEST_P(BluetoothBlueZTestP, ConnectUnpairableDevice) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kConnectUnpairablePath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 
   // Verify is a HID device and is not connectable.
   BluetoothDevice::UUIDSet uuids = device->GetUUIDs();
@@ -2610,12 +2402,7 @@ TEST_P(BluetoothBlueZTestP, ConnectConnectedDevice) {
   }
 
   // The observer will be called because Connecting will toggle true and false.
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for trusted.
-  EXPECT_EQ(3, observer.device_changed_count());
-#else
   EXPECT_EQ(2, observer.device_changed_count());
-#endif
 
   EXPECT_TRUE(device->IsConnected());
   EXPECT_FALSE(device->IsConnecting());
@@ -2686,14 +2473,6 @@ TEST_P(BluetoothBlueZTestP, DisconnectDevice) {
   BluetoothDevice* device = adapter_->GetDevice(
       bluez::FakeBluetoothDeviceClient::kPairedDeviceAddress);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bluez::FakeBluetoothDeviceClient::Properties* properties =
-      fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
-          bluez::FakeBluetoothDeviceClient::kPairedDevicePath));
-  properties->type.ReplaceValue(BluetoothDeviceClient::kTypeBredr);
-  properties->type.set_valid(true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   ASSERT_TRUE(device != nullptr);
   ASSERT_TRUE(device->IsPaired());
 
@@ -2728,16 +2507,6 @@ TEST_P(BluetoothBlueZTestP, DisconnectDevice) {
 
   EXPECT_FALSE(device->IsConnected());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  histogram_tester_.ExpectBucketCount(
-      "Bluetooth.ChromeOS.UserInitiatedDisconnect.Result",
-      device::DisconnectResult::kSuccess, 1);
-  histogram_tester_.ExpectBucketCount(
-      "Bluetooth.ChromeOS.UserInitiatedDisconnect.Result.Classic",
-      device::DisconnectResult::kSuccess, 1);
-  histogram_tester_.ExpectBucketCount("Bluetooth.ChromeOS.DeviceDisconnect",
-                                      device->GetDeviceType(), 1);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST_F(BluetoothBlueZTest, DisconnectUnconnectedDevice) {
@@ -2782,11 +2551,7 @@ TEST_F(BluetoothBlueZTest, PairTrustedDevice) {
           dbus::ObjectPath(bluez::FakeBluetoothDeviceClient::
                                kConnectedTrustedNotPairedDevicePath));
   EXPECT_FALSE(properties->paired.value());
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
   ASSERT_FALSE(device->IsPaired());
 
   // The |kConnectedTrustedNotPairedDevicePath| requests a passkey confirmation.
@@ -2832,11 +2597,7 @@ TEST_F(BluetoothBlueZTest, PairAlreadyPairedDevice) {
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kPairedDevicePath));
   EXPECT_TRUE(properties->paired.value());
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
   ASSERT_TRUE(device->IsPaired());
 
   TestBluetoothAdapterObserver observer(adapter_);
@@ -2885,12 +2646,7 @@ TEST_P(BluetoothBlueZTestP, PairLegacyAutopair) {
 
   // Two changes for connecting, one change for connected, one for paired,
   // and one for the reconnect mode (IsConnectable).
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded and two more for trusted (after pairing and connection)
-  EXPECT_EQ(8, observer.device_changed_count());
-#else
   EXPECT_EQ(5, observer.device_changed_count());
-#endif
   EXPECT_EQ(device, observer.last_device());
 
   EXPECT_TRUE(device->IsConnected());
@@ -2908,11 +2664,7 @@ TEST_P(BluetoothBlueZTestP, PairLegacyAutopair) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kLegacyAutopairPath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 }
 
 TEST_P(BluetoothBlueZTestP, PairDisplayPinCode) {
@@ -2943,12 +2695,7 @@ TEST_P(BluetoothBlueZTestP, PairDisplayPinCode) {
 
   // Two changes for connecting, one change for connected, one for paired,
   // and one for the reconnect mode (IsConnectable).
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded and two more for trusted (after pairing and connection)
-  EXPECT_EQ(8, observer.device_changed_count());
-#else
   EXPECT_EQ(5, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
@@ -2967,11 +2714,7 @@ TEST_P(BluetoothBlueZTestP, PairDisplayPinCode) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kDisplayPinCodePath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 }
 
 TEST_P(BluetoothBlueZTestP, PairDisplayPasskey) {
@@ -3007,12 +2750,7 @@ TEST_P(BluetoothBlueZTestP, PairDisplayPasskey) {
 
   // Two changes for connecting, one change for connected, one for paired,
   // and one for the reconnect mode (IsConnectable).
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded and two for trusted (after pairing and connection)
-  EXPECT_EQ(8, observer.device_changed_count());
-#else
   EXPECT_EQ(5, observer.device_changed_count());
-#endif
   EXPECT_EQ(device, observer.last_device());
 
   EXPECT_TRUE(device->IsConnected());
@@ -3032,11 +2770,7 @@ TEST_P(BluetoothBlueZTestP, PairDisplayPasskey) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kDisplayPasskeyPath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 }
 
 TEST_P(BluetoothBlueZTestP, PairRequestPinCode) {
@@ -3066,12 +2800,7 @@ TEST_P(BluetoothBlueZTestP, PairRequestPinCode) {
   run_loop.Run();
 
   // Two changes for connecting, one change for connected, one for paired
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded and two for trusted (after pairing and connection).
-  EXPECT_EQ(7, observer.device_changed_count());
-#else
   EXPECT_EQ(4, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
@@ -3091,11 +2820,7 @@ TEST_P(BluetoothBlueZTestP, PairRequestPinCode) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kRequestPinCodePath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 }
 
 TEST_P(BluetoothBlueZTestP, PairConfirmPasskey) {
@@ -3131,12 +2856,7 @@ TEST_P(BluetoothBlueZTestP, PairConfirmPasskey) {
   run_loop.Run();
 
   // Two changes for connecting, one change for connected, one for paired
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded and two for trusted (after pairing and connection).
-  EXPECT_EQ(7, observer.device_changed_count());
-#else
   EXPECT_EQ(4, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
@@ -3152,11 +2872,7 @@ TEST_P(BluetoothBlueZTestP, PairConfirmPasskey) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kConfirmPasskeyPath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 }
 
 TEST_P(BluetoothBlueZTestP, PairRequestPasskey) {
@@ -3192,12 +2908,7 @@ TEST_P(BluetoothBlueZTestP, PairRequestPasskey) {
   run_loop.Run();
 
   // Two changes for connecting, one change for connected, one for paired
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded and two for trusted (after pairing and connection).
-  EXPECT_EQ(7, observer.device_changed_count());
-#else
   EXPECT_EQ(4, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
@@ -3213,11 +2924,7 @@ TEST_P(BluetoothBlueZTestP, PairRequestPasskey) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kRequestPasskeyPath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 }
 
 TEST_P(BluetoothBlueZTestP, PairJustWorks) {
@@ -3247,12 +2954,7 @@ TEST_P(BluetoothBlueZTestP, PairJustWorks) {
   run_loop.Run();
 
   // Two changes for connecting, one change for connected, one for paired
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded and two for trusted (after pairing and connection).
-  EXPECT_EQ(7, observer.device_changed_count());
-#else
   EXPECT_EQ(4, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
@@ -3268,11 +2970,7 @@ TEST_P(BluetoothBlueZTestP, PairJustWorks) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(
           dbus::ObjectPath(bluez::FakeBluetoothDeviceClient::kJustWorksPath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 }
 
 TEST_P(BluetoothBlueZTestP, PairUnpairableDeviceFails) {
@@ -3362,12 +3060,7 @@ TEST_P(BluetoothBlueZTestP, PairingFailsAtConnection) {
 
   // Two changes for connecting, one for paired.
   // The device should not be connected.
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded and one for trusted after pairing
-  EXPECT_EQ(5, observer.device_changed_count());
-#else
   EXPECT_EQ(3, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
@@ -3381,11 +3074,7 @@ TEST_P(BluetoothBlueZTestP, PairingFailsAtConnection) {
   bluez::FakeBluetoothDeviceClient::Properties* properties =
       fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
           bluez::FakeBluetoothDeviceClient::kUnconnectableDevicePath));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(properties->trusted.value());
-#else
   EXPECT_FALSE(properties->trusted.value());
-#endif
 }
 
 TEST_P(BluetoothBlueZTestP, PairingRejectedAtPinCode) {
@@ -3690,24 +3379,11 @@ TEST_F(BluetoothBlueZTest, IncomingPairRequestPinCode) {
   run_loop.Run();
 
   // One change for paired.
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded , and one for trusted.
-  EXPECT_EQ(3, observer.device_changed_count());
-#else
   EXPECT_EQ(1, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
   EXPECT_TRUE(device->IsPaired());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Make sure the trusted property has been set to true.
-  bluez::FakeBluetoothDeviceClient::Properties* properties =
-      fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
-          bluez::FakeBluetoothDeviceClient::kRequestPinCodePath));
-  ASSERT_TRUE(properties->trusted.value());
-#endif
 
   // No pairing context should remain on the device.
   BluetoothDeviceBlueZ* device_bluez =
@@ -3753,24 +3429,11 @@ TEST_F(BluetoothBlueZTest, IncomingPairConfirmPasskey) {
   run_loop.Run();
 
   // One change for paired.
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded, and one for trusted
-  EXPECT_EQ(3, observer.device_changed_count());
-#else
   EXPECT_EQ(1, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
   EXPECT_TRUE(device->IsPaired());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Make sure the trusted property has been set to true.
-  bluez::FakeBluetoothDeviceClient::Properties* properties =
-      fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
-          bluez::FakeBluetoothDeviceClient::kConfirmPasskeyPath));
-  ASSERT_TRUE(properties->trusted.value());
-#endif
 
   // No pairing context should remain on the device.
   BluetoothDeviceBlueZ* device_bluez =
@@ -3816,24 +3479,11 @@ TEST_F(BluetoothBlueZTest, IncomingPairRequestPasskey) {
   run_loop.Run();
 
   // One change for paired.
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded, and one for trusted.
-  EXPECT_EQ(3, observer.device_changed_count());
-#else
   EXPECT_EQ(1, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
   EXPECT_TRUE(device->IsPaired());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Make sure the trusted property has been set to true.
-  bluez::FakeBluetoothDeviceClient::Properties* properties =
-      fake_bluetooth_device_client_->GetProperties(dbus::ObjectPath(
-          bluez::FakeBluetoothDeviceClient::kRequestPasskeyPath));
-  ASSERT_TRUE(properties->trusted.value());
-#endif
 
   // No pairing context should remain on the device.
   BluetoothDeviceBlueZ* device_bluez =
@@ -3880,24 +3530,11 @@ TEST_F(BluetoothBlueZTest, IncomingPairJustWorks) {
   run_loop.Run();
 
   // One change for paired
-#if BUILDFLAG(IS_CHROMEOS)
-  // One more for bonded, and one for trusted.
-  EXPECT_EQ(3, observer.device_changed_count());
-#else
   EXPECT_EQ(1, observer.device_changed_count());
-#endif
 
   EXPECT_EQ(device, observer.last_device());
 
   EXPECT_TRUE(device->IsPaired());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Make sure the trusted property has been set to true.
-  bluez::FakeBluetoothDeviceClient::Properties* properties =
-      fake_bluetooth_device_client_->GetProperties(
-          dbus::ObjectPath(bluez::FakeBluetoothDeviceClient::kJustWorksPath));
-  ASSERT_TRUE(properties->trusted.value());
-#endif
 
   // No pairing context should remain on the device.
   BluetoothDeviceBlueZ* device_bluez =
@@ -4801,71 +4438,6 @@ TEST_F(BluetoothBlueZTest, SetConnectionLatency) {
   EXPECT_EQ(2, error_callback_count_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(BluetoothBlueZTest, AdminPolicyEvents) {
-  // Simulate the addition, removal, and change of admin policy.
-  GetAdapter();
-
-  // Create a device that will have related admin policy events with.
-  dbus::ObjectPath device_path =
-      dbus::ObjectPath(bluez::FakeBluetoothDeviceClient::kLowEnergyPath);
-  fake_bluetooth_device_client_->CreateDevice(
-      dbus::ObjectPath(bluez::FakeBluetoothAdapterClient::kAdapterPath),
-      device_path);
-  BluetoothDevice* device =
-      adapter_->GetDevice(bluez::FakeBluetoothDeviceClient::kLowEnergyAddress);
-  EXPECT_TRUE(device);
-  // A new device is not blocked by policy.
-  EXPECT_FALSE(device->IsBlockedByPolicy());
-
-  // Create an admin policy, check that the device policy is updated.
-  fake_bluetooth_admin_policy_client_->CreateAdminPolicy(
-      device_path,
-      /*is_blocked_by_policy=*/true);
-  EXPECT_TRUE(device->IsBlockedByPolicy());
-
-  // Change the admin policy, check that the device policy is updated.
-  fake_bluetooth_admin_policy_client_->ChangeAdminPolicy(
-      device_path,
-      /*is_blocked_by_policy=*/false);
-  EXPECT_FALSE(device->IsBlockedByPolicy());
-
-  // Change the admin policy again, check that the device policy is updated.
-  fake_bluetooth_admin_policy_client_->ChangeAdminPolicy(
-      device_path,
-      /*is_blocked_by_policy=*/true);
-  EXPECT_TRUE(device->IsBlockedByPolicy());
-
-  // Remove the admin policy. The device policy should be set back to default
-  // (false).
-  fake_bluetooth_admin_policy_client_->RemoveAdminPolicy(device_path);
-  EXPECT_FALSE(device->IsBlockedByPolicy());
-}
-
-TEST_F(BluetoothBlueZTest, AdminPolicyInitBeforeDevice) {
-  // Simulate the admin policy being added before the device is added.
-  GetAdapter();
-
-  dbus::ObjectPath device_path =
-      dbus::ObjectPath(bluez::FakeBluetoothDeviceClient::kLowEnergyPath);
-
-  // Create an admin policy.
-  fake_bluetooth_admin_policy_client_->CreateAdminPolicy(
-      device_path,
-      /*is_blocked_by_policy=*/true);
-
-  // Create the associated device.
-  fake_bluetooth_device_client_->CreateDevice(
-      dbus::ObjectPath(bluez::FakeBluetoothAdapterClient::kAdapterPath),
-      device_path);
-  BluetoothDevice* device =
-      adapter_->GetDevice(bluez::FakeBluetoothDeviceClient::kLowEnergyAddress);
-  EXPECT_TRUE(device);
-  // The new device should contain the admin policy.
-  EXPECT_TRUE(device->IsBlockedByPolicy());
-}
-#endif
-
 TEST_F(BluetoothBlueZTest, BatteryEvents) {
   // Simulate the addition, removal, and change of Battery objects.
   GetAdapter();
@@ -4971,380 +4543,5 @@ TEST_F(BluetoothBlueZTest, DeviceUUIDsCombinedFromServiceAndAdvertisement) {
                              uuidLaterAdv, uuidLaterServ, uuidLaterBoth,
                              uuidAlwaysAdv, uuidAlwaysServ, uuidAlwaysBoth));
 }
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(BluetoothBlueZTest, StartLowEnergyScanSessionAdapterPresent) {
-  GetAdapter();
-
-  FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-      application_manager = GetAdvertisementMonitorApplicationManger();
-
-  auto filter = CreateLowEnergyScanFilter();
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      std::move(filter), /*delegate=*/delegate.GetWeakPtr());
-
-  // Check that advertisement monitor was added to d-bus layer.
-  ASSERT_EQ(1u, application_manager->AdvertisementMonitorsCount());
-
-  // Check that advertisement monitor gets removed from d-bus layer when the
-  // scan session is destroyed.
-  background_scan_session.reset();
-  ASSERT_EQ(0u, application_manager->AdvertisementMonitorsCount());
-}
-
-TEST_F(BluetoothBlueZTest, StartLowEnergyScanSessionAdapterAddedLater) {
-  fake_bluetooth_adapter_client_->SetPresent(false);
-  GetAdapter();
-  ASSERT_FALSE(adapter_->IsPresent());
-
-  FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-      application_manager = GetAdvertisementMonitorApplicationManger();
-
-  auto filter = CreateLowEnergyScanFilter();
-
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      std::move(filter), /*delegate=*/delegate.GetWeakPtr());
-
-  // Check that the advertisement monitor is not yet added to the d-bus layer.
-  // It is queued up until the adapter gets added.
-  ASSERT_EQ(0u, application_manager->AdvertisementMonitorsCount());
-
-  fake_bluetooth_adapter_client_->SetPresent(true);
-  EXPECT_TRUE(adapter_->IsPresent());
-
-  ASSERT_EQ(1u, application_manager->AdvertisementMonitorsCount());
-
-  background_scan_session.reset();
-  ASSERT_EQ(0u, application_manager->AdvertisementMonitorsCount());
-}
-
-TEST_F(BluetoothBlueZTest, StartLowEnergyScanSessionAdapterBecomeNotPresent) {
-  GetAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-
-  // Remove Adapter
-  fake_bluetooth_adapter_client_->SetPresent(false);
-
-  FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-      application_manager = GetAdvertisementMonitorApplicationManger();
-
-  auto filter = CreateLowEnergyScanFilter();
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      std::move(filter), /*delegate=*/delegate.GetWeakPtr());
-
-  // Check that advertisement monitor was not added to d-bus layer since there
-  // is no adapter present.
-  ASSERT_EQ(0u, application_manager->AdvertisementMonitorsCount());
-
-  // Add Adapter
-  fake_bluetooth_adapter_client_->SetPresent(true);
-
-  // Check that queued advertisement monitor was added to d-bus after adapter
-  // becomes present.
-  ASSERT_EQ(1u, application_manager->AdvertisementMonitorsCount());
-}
-
-TEST_F(BluetoothBlueZTest, BluetoothLowEnergyScanSessionBlueZDeviceFound) {
-  GetAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-
-  FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-      application_manager = GetAdvertisementMonitorApplicationManger();
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      CreateLowEnergyScanFilter(), /*delegate=*/delegate.GetWeakPtr());
-
-  // Check that advertisement monitor was added to d-bus layer.
-  EXPECT_EQ(1u, application_manager->AdvertisementMonitorsCount());
-
-  // Get advertisement fake advertisement monitor to forward events to
-  // BluetoothLowEnergyScanSessionBlueZ.
-  FakeBluetoothAdvertisementMonitorServiceProvider* advertisement_monitor =
-      application_manager->GetLastAddedAdvertisementMonitorServiceProvider();
-  ASSERT_TRUE(advertisement_monitor);
-
-  // Simulate a device found event.
-  advertisement_monitor->delegate()->OnDeviceFound(
-      dbus::ObjectPath(bluez::FakeBluetoothDeviceClient::kPairedDevicePath));
-  EXPECT_EQ(1u, delegate.devices_found().size());
-
-  std::pair<device::BluetoothLowEnergyScanSession*, device::BluetoothDevice*>
-      devices_found_pair = delegate.devices_found()[0];
-  EXPECT_EQ(background_scan_session.get(), devices_found_pair.first);
-  EXPECT_EQ(adapter_->GetDevice(
-                bluez::FakeBluetoothDeviceClient::kPairedDeviceAddress),
-            devices_found_pair.second);
-}
-
-TEST_F(BluetoothBlueZTest, BluetoothLowEnergyScanSessionBlueZDeviceNULL) {
-  GetAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-
-  FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-      application_manager = GetAdvertisementMonitorApplicationManger();
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      CreateLowEnergyScanFilter(), /*delegate=*/delegate.GetWeakPtr());
-
-  // Check that advertisement monitor was added to d-bus layer.
-  EXPECT_EQ(1u, application_manager->AdvertisementMonitorsCount());
-
-  // Get advertisement fake advertisement monitor to forward events to
-  // BluetoothLowEnergyScanSessionBlueZ.
-  FakeBluetoothAdvertisementMonitorServiceProvider* advertisement_monitor =
-      application_manager->GetLastAddedAdvertisementMonitorServiceProvider();
-  ASSERT_TRUE(advertisement_monitor);
-
-  bool did_dump_without_crashing = false;
-  dump_without_crashing_flag = &did_dump_without_crashing;
-  base::debug::SetDumpWithoutCrashingFunction(&HandleDumpWithoutCrashing);
-  advertisement_monitor->delegate()->OnDeviceFound(dbus::ObjectPath(""));
-
-  EXPECT_TRUE(did_dump_without_crashing);
-
-  base::debug::SetDumpWithoutCrashingFunction(nullptr);
-}
-
-TEST_F(BluetoothBlueZTest, BluetoothLowEnergyScanSessionBlueZDeviceLost) {
-  GetAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-
-  FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-      application_manager = GetAdvertisementMonitorApplicationManger();
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      CreateLowEnergyScanFilter(), /*delegate=*/delegate.GetWeakPtr());
-
-  // Check that advertisement monitor was added to d-bus layer.
-  EXPECT_EQ(1u, application_manager->AdvertisementMonitorsCount());
-
-  // Get advertisement fake advertisement monitor to forward events to
-  // BluetoothLowEnergyScanSessionBlueZ.
-  FakeBluetoothAdvertisementMonitorServiceProvider* advertisement_monitor =
-      application_manager->GetLastAddedAdvertisementMonitorServiceProvider();
-  ASSERT_TRUE(advertisement_monitor);
-
-  // Simulate a device lost event.
-  advertisement_monitor->delegate()->OnDeviceLost(
-      dbus::ObjectPath(bluez::FakeBluetoothDeviceClient::kPairedDevicePath));
-  EXPECT_EQ(1u, delegate.devices_lost().size());
-
-  std::pair<device::BluetoothLowEnergyScanSession*, device::BluetoothDevice*>
-      devices_lost_pair = delegate.devices_lost()[0];
-  EXPECT_EQ(background_scan_session.get(), devices_lost_pair.first);
-  EXPECT_EQ(adapter_->GetDevice(
-                bluez::FakeBluetoothDeviceClient::kPairedDeviceAddress),
-            devices_lost_pair.second);
-}
-
-TEST_F(BluetoothBlueZTest,
-       BluetoothLowEnergyScanSessionBlueZStartThenInvalidate) {
-  GetAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-
-  FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-      application_manager = GetAdvertisementMonitorApplicationManger();
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      CreateLowEnergyScanFilter(), /*delegate=*/delegate.GetWeakPtr());
-
-  // Check that advertisement monitor was added to d-bus layer.
-  EXPECT_EQ(1u, application_manager->AdvertisementMonitorsCount());
-
-  // Get advertisement fake advertisement monitor to forward events to
-  // BluetoothLowEnergyScanSessionBlueZ.
-  FakeBluetoothAdvertisementMonitorServiceProvider* advertisement_monitor =
-      application_manager->GetLastAddedAdvertisementMonitorServiceProvider();
-  ASSERT_TRUE(advertisement_monitor);
-
-  // Successfully start scan session.
-  advertisement_monitor->delegate()->OnActivate();
-  EXPECT_EQ(1u, delegate.sessions_started().size());
-  std::pair<device::BluetoothLowEnergyScanSession*,
-            std::optional<device::BluetoothLowEnergyScanSession::ErrorCode>>
-      session_started_pair = delegate.sessions_started()[0];
-
-  // Check that the correct scan session is started.
-  EXPECT_EQ(background_scan_session.get(), session_started_pair.first);
-
-  // Check that there was no error when starting the scan session.
-  EXPECT_FALSE(session_started_pair.second.has_value());
-
-  // Invalidate scan session after successful start.
-  advertisement_monitor->delegate()->OnRelease();
-  EXPECT_EQ(1u, delegate.sessions_invalidated().size());
-  EXPECT_EQ(background_scan_session.get(),
-            delegate.sessions_invalidated().front());
-}
-
-TEST_F(BluetoothBlueZTest, BluetoothLowEnergyScanSessionBlueZFailsToStart) {
-  GetAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-
-  FakeBluetoothAdvertisementMonitorApplicationServiceProvider*
-      application_manager = GetAdvertisementMonitorApplicationManger();
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      CreateLowEnergyScanFilter(), /*delegate=*/delegate.GetWeakPtr());
-
-  // Check that advertisement monitor was added to d-bus layer.
-  EXPECT_EQ(1u, application_manager->AdvertisementMonitorsCount());
-
-  // Get advertisement fake advertisement monitor to forward events to
-  // BluetoothLowEnergyScanSessionBlueZ.
-  FakeBluetoothAdvertisementMonitorServiceProvider* advertisement_monitor =
-      application_manager->GetLastAddedAdvertisementMonitorServiceProvider();
-  ASSERT_TRUE(advertisement_monitor);
-
-  // Scan session failed to start.
-  advertisement_monitor->delegate()->OnRelease();
-  EXPECT_EQ(1u, delegate.sessions_started().size());
-
-  std::pair<device::BluetoothLowEnergyScanSession*,
-            std::optional<device::BluetoothLowEnergyScanSession::ErrorCode>>
-      session_started_pair = delegate.sessions_started()[0];
-
-  // Check that the correct scan session.
-  EXPECT_EQ(background_scan_session.get(), session_started_pair.first);
-
-  // Check that there was an error indicating failure to start.
-  EXPECT_TRUE(session_started_pair.second.has_value());
-}
-
-TEST_F(BluetoothBlueZTest,
-       LowEnergyScanSession_HardwareOffloadingNotSupported) {
-  GetAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-
-  // We haven't added any supported features to the list, so this should report
-  // hardware offloading as not supported.
-  EXPECT_EQ(adapter_->GetLowEnergyScanSessionHardwareOffloadingStatus(),
-            BluetoothAdapter::LowEnergyScanSessionHardwareOffloadingStatus::
-                kNotSupported);
-}
-
-TEST_F(BluetoothBlueZTest, LowEnergyScanSession_HardwareOffloadingSupport) {
-  GetAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-
-  // Install an observer;
-  TestBluetoothAdapterObserver observer(adapter_);
-
-  BluetoothAdapterBlueZ* adapter_bluez =
-      static_cast<BluetoothAdapterBlueZ*>(adapter_.get());
-  FakeBluetoothAdvertisementMonitorManagerClient* client =
-      static_cast<bluez::FakeBluetoothAdvertisementMonitorManagerClient*>(
-          bluez::BluezDBusManager::Get()
-              ->GetBluetoothAdvertisementMonitorManagerClient());
-
-  // If no properties are returned we should get |kUndetermined| status.
-  client->RemoveProperties();
-  EXPECT_EQ(adapter_->GetLowEnergyScanSessionHardwareOffloadingStatus(),
-            BluetoothAdapter::LowEnergyScanSessionHardwareOffloadingStatus::
-                kUndetermined);
-  EXPECT_EQ(observer.last_low_energy_scan_session_hardware_offloading_status(),
-            BluetoothAdapter::LowEnergyScanSessionHardwareOffloadingStatus::
-                kUndetermined);
-
-  // Once we add the "controller-patterns" feature, the adapter should report
-  // hardware offloading as supported.
-  client->InitializeProperties();
-  BluetoothAdvertisementMonitorManagerClient::Properties* properties =
-      client->GetProperties(adapter_bluez->object_path());
-  ASSERT_TRUE(properties);
-  properties->supported_features.ReplaceValue(
-      {bluetooth_advertisement_monitor_manager::
-           kSupportedFeaturesControllerPatterns});
-  EXPECT_EQ(adapter_->GetLowEnergyScanSessionHardwareOffloadingStatus(),
-            BluetoothAdapter::LowEnergyScanSessionHardwareOffloadingStatus::
-                kSupported);
-  EXPECT_EQ(observer.last_low_energy_scan_session_hardware_offloading_status(),
-            BluetoothAdapter::LowEnergyScanSessionHardwareOffloadingStatus::
-                kSupported);
-
-  properties->supported_features.ReplaceValue({});
-  EXPECT_EQ(adapter_->GetLowEnergyScanSessionHardwareOffloadingStatus(),
-            BluetoothAdapter::LowEnergyScanSessionHardwareOffloadingStatus::
-                kNotSupported);
-  EXPECT_EQ(observer.last_low_energy_scan_session_hardware_offloading_status(),
-            BluetoothAdapter::LowEnergyScanSessionHardwareOffloadingStatus::
-                kNotSupported);
-
-  // Ensure that if no properties are returned we get the |kUndetermined|
-  // status.
-  client->RemoveProperties();
-  EXPECT_EQ(adapter_->GetLowEnergyScanSessionHardwareOffloadingStatus(),
-            BluetoothAdapter::LowEnergyScanSessionHardwareOffloadingStatus::
-                kUndetermined);
-}
-
-TEST_F(BluetoothBlueZTest, IsExtendedAdvertisementsAvailable) {
-  GetAdapter();
-
-  BluetoothAdapterBlueZ* adapter_bluez =
-      static_cast<BluetoothAdapterBlueZ*>(adapter_.get());
-
-  FakeBluetoothLEAdvertisingManagerClient* client =
-      static_cast<bluez::FakeBluetoothLEAdvertisingManagerClient*>(
-          bluez::BluezDBusManager::Get()
-              ->GetBluetoothLEAdvertisingManagerClient());
-
-  BluetoothLEAdvertisingManagerClient::Properties* properties =
-      client->GetProperties(adapter_bluez->object_path());
-  ASSERT_TRUE(properties);
-
-  std::vector<std::string> supported_features = {};
-
-  properties->supported_features.ReplaceValue(supported_features);
-
-  // Empty supported feature indicates the adapter doesn't support Ext
-  // Advertising
-  EXPECT_FALSE(adapter_bluez->IsExtendedAdvertisementsAvailable());
-
-  supported_features.push_back(std::string(
-      bluetooth_advertising_manager::kSupportedFeaturesHardwareOffload));
-
-  // HardwareOffload indicates the adapter support Ext Advertising
-  properties->supported_features.ReplaceValue(supported_features);
-
-  EXPECT_TRUE(adapter_bluez->IsExtendedAdvertisementsAvailable());
-}
-
-TEST_F(BluetoothBlueZTest, GetSupportedRoles) {
-  std::vector<std::string> adapter_roles;
-  GetAdapter();
-
-  ASSERT_TRUE(adapter_->GetSupportedRoles().empty());
-
-  // An unknown role should be ignored
-  adapter_roles.push_back("unknown-role");
-  fake_bluetooth_adapter_client_->SetRoles(adapter_roles);
-  ASSERT_TRUE(adapter_->GetSupportedRoles().empty());
-
-  adapter_roles.push_back("central");
-  fake_bluetooth_adapter_client_->SetRoles(adapter_roles);
-  EXPECT_EQ(1u, adapter_->GetSupportedRoles().size());
-  ASSERT_TRUE(std::ranges::contains(adapter_->GetSupportedRoles(),
-                                    BluetoothAdapter::BluetoothRole::kCentral));
-
-  adapter_roles.push_back("peripheral");
-  fake_bluetooth_adapter_client_->SetRoles(adapter_roles);
-  EXPECT_EQ(2u, adapter_->GetSupportedRoles().size());
-  ASSERT_TRUE(
-      std::ranges::contains(adapter_->GetSupportedRoles(),
-                            BluetoothAdapter::BluetoothRole::kPeripheral));
-
-  adapter_roles.push_back("central-peripheral");
-  fake_bluetooth_adapter_client_->SetRoles(adapter_roles);
-  EXPECT_EQ(3u, adapter_->GetSupportedRoles().size());
-  ASSERT_TRUE(std::ranges::contains(
-      adapter_->GetSupportedRoles(),
-      BluetoothAdapter::BluetoothRole::kCentralPeripheral));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace bluez

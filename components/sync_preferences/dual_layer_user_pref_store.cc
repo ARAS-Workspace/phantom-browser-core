@@ -34,25 +34,10 @@ constexpr syncer::UserSelectableTypeSet kInterestingUserSelectableTypes = {
     syncer::UserSelectableType::kPreferences,
     syncer::UserSelectableType::kHistory};
 
-#if BUILDFLAG(IS_CHROMEOS)
-// This is the set of user selectable OS types that are relevant to
-// `DualLayerUserPrefStore`. This is used to detect no-op changes to the user
-// selected types efficiently.
-constexpr syncer::UserSelectableOsTypeSet kInterestingUserSelectableOsTypes = {
-    syncer::UserSelectableOsType::kOsPreferences};
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // The name of the pref storing the set of user selected types on the local pref
 // store.
 constexpr std::string_view kUserSelectedTypesPrefName =
     "dual_layer_user_pref_store.user_selected_sync_types";
-
-#if BUILDFLAG(IS_CHROMEOS)
-// The name of the pref storing the set of user selected os types on the local
-// pref store.
-constexpr std::string_view kUserSelectedOsTypesPrefName =
-    "dual_layer_user_pref_store.user_selected_os_sync_types";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -523,13 +508,6 @@ bool DualLayerUserPrefStore::ShouldSetValueInAccountStore(
       is_pref_type_enabled = GetInterestingUserSelectedTypes().Has(
           syncer::UserSelectableType::kPreferences);
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    if (metadata->data_type() == syncer::OS_PREFERENCES ||
-        metadata->data_type() == syncer::OS_PRIORITY_PREFERENCES) {
-      is_pref_type_enabled = GetInterestingUserSelectedOsTypes().Has(
-          syncer::UserSelectableOsType::kOsPreferences);
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   } else {
     is_pref_type_enabled = active_types_.contains(metadata->data_type());
   }
@@ -584,10 +562,6 @@ bool DualLayerUserPrefStore::ShouldGetValueFromAccountStore(
 void DualLayerUserPrefStore::EnableType(syncer::DataType data_type) {
   CHECK(data_type == syncer::PREFERENCES ||
         data_type == syncer::PRIORITY_PREFERENCES
-#if BUILDFLAG(IS_CHROMEOS)
-        || data_type == syncer::OS_PREFERENCES ||
-        data_type == syncer::OS_PRIORITY_PREFERENCES
-#endif  // BUILDFLAG(IS_CHROMEOS)
   );
   active_types_.insert(data_type);
 }
@@ -636,10 +610,6 @@ void DualLayerUserPrefStore::DisableTypeAndClearAccountStore(
     syncer::DataType data_type) {
   CHECK(data_type == syncer::PREFERENCES ||
         data_type == syncer::PRIORITY_PREFERENCES
-#if BUILDFLAG(IS_CHROMEOS)
-        || data_type == syncer::OS_PREFERENCES ||
-        data_type == syncer::OS_PRIORITY_PREFERENCES
-#endif  // BUILDFLAG(IS_CHROMEOS)
   );
   active_types_.erase(data_type);
 
@@ -704,12 +674,6 @@ void DualLayerUserPrefStore::DisableTypeAndClearAccountStore(
     // TODO(crbug.com/464008640): Consider removing this, since the selected
     // types should get cleared anyway when sync is disabled.
     SetInterestingUserSelectedTypes(syncer::UserSelectableTypeSet());
-#if BUILDFLAG(IS_CHROMEOS)
-    SetInterestingUserSelectedOsTypes(syncer::UserSelectableOsTypeSet());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-    // Clear any account-only prefs from the local store. There shouldn't be any
-    // such prefs in the local store, but if there are due to some bug, this
-    // will clear them.
     if (base::FeatureList::IsEnabled(features::kAccountScopedPrefs)) {
       for (const std::string& pref_name :
            GetSyncablePrefNamesInStore(local_pref_store_.get())) {
@@ -929,18 +893,6 @@ void DualLayerUserPrefStore::SetUserSelectedTypesForTest(
   SetInterestingUserSelectedTypes(user_selected_types);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-syncer::UserSelectableOsTypeSet
-DualLayerUserPrefStore::GetUserSelectedOsTypesForTest() const {
-  return GetInterestingUserSelectedOsTypes();
-}
-
-void DualLayerUserPrefStore::SetUserSelectedOsTypesForTest(
-    syncer::UserSelectableOsTypeSet user_selected_os_types) {
-  SetInterestingUserSelectedOsTypes(user_selected_os_types);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void DualLayerUserPrefStore::SetInterestingUserSelectedTypes(
     syncer::UserSelectableTypeSet user_selected_types) {
   // This is stored in the local pref store for early availability to be able to
@@ -968,34 +920,6 @@ DualLayerUserPrefStore::GetInterestingUserSelectedTypes() const {
       kInterestingUserSelectableTypes);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void DualLayerUserPrefStore::SetInterestingUserSelectedOsTypes(
-    syncer::UserSelectableOsTypeSet user_selected_types) {
-  // This is stored in the local pref store for early availability to be able to
-  // decide whether to expose values of account priority prefs and
-  // history-scoped prefs.
-  CHECK(kInterestingUserSelectableOsTypes.HasAll(user_selected_types));
-  local_pref_store_->SetValueSilently(
-      kUserSelectedOsTypesPrefName,
-      base::Value(syncer::UserSelectableOsTypeSetToValueList(user_selected_types)),
-      WriteablePrefStore::DEFAULT_PREF_WRITE_FLAGS);
-}
-
-syncer::UserSelectableOsTypeSet
-DualLayerUserPrefStore::GetInterestingUserSelectedOsTypes() const {
-  const base::Value* value = nullptr;
-  // Load the user selected types from the local pref store. This allows for
-  // persistence and early availability.
-  if (!local_pref_store_->GetValue(kUserSelectedOsTypesPrefName, &value) ||
-      !value->is_list()) {
-    return syncer::UserSelectableOsTypeSet();
-  }
-  return base::Intersection(
-      syncer::ValueListToUserSelectableOsTypeSet(value->GetList()),
-      kInterestingUserSelectableOsTypes);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void DualLayerUserPrefStore::OnSyncServiceInitialized(
     syncer::SyncService* sync_service) {
   sync_service->AddObserver(this);
@@ -1009,26 +933,13 @@ void DualLayerUserPrefStore::OnStateChanged(syncer::SyncService* sync_service) {
   // Only retain the concerning types.
   user_selected_types.RetainAll(kInterestingUserSelectableTypes);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  syncer::UserSelectableOsTypeSet user_selected_os_types =
-      sync_service->GetUserSettings()->GetSelectedOsTypes();
-  // Only retain the concerning types.
-  user_selected_os_types.RetainAll(kInterestingUserSelectableOsTypes);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   if (user_selected_types == GetInterestingUserSelectedTypes()
-#if BUILDFLAG(IS_CHROMEOS)
-      && user_selected_os_types == GetInterestingUserSelectedOsTypes()
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ) {
     return;
   }
 
   if (!pref_model_associator_client_) {
     SetInterestingUserSelectedTypes(user_selected_types);
-#if BUILDFLAG(IS_CHROMEOS)
-    SetInterestingUserSelectedOsTypes(user_selected_os_types);
-#endif  // BUILDFLAG(IS_CHROMEOS)
     return;
   }
 
@@ -1053,9 +964,6 @@ void DualLayerUserPrefStore::OnStateChanged(syncer::SyncService* sync_service) {
   }
 
   SetInterestingUserSelectedTypes(user_selected_types);
-#if BUILDFLAG(IS_CHROMEOS)
-  SetInterestingUserSelectedOsTypes(user_selected_os_types);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // The sync state change might have changed the effective value. Compare the
   // old and new values and notify the observers if they change.

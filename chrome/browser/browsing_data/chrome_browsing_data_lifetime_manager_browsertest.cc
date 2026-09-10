@@ -708,12 +708,10 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(std::vector<FeatureConditions>{
         {BrowsingDataDeletionCondition::SyncDisabled, BrowserType::Incognito},
         {BrowsingDataDeletionCondition::SyncDisabled, BrowserType::Default},
-#if !BUILDFLAG(IS_CHROMEOS)
         {BrowsingDataDeletionCondition::BrowserSigninDisabled,
          BrowserType::Incognito},
         {BrowsingDataDeletionCondition::BrowserSigninDisabled,
          BrowserType::Default}
-#endif  // !BUILDFLAG(IS_CHROMEOS)
     }));
 #endif  // !BUILDFLAG(IS_ANDROID)
 

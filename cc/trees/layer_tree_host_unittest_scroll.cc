@@ -827,8 +827,7 @@ TEST_F(MAYBE_LayerTreeHostScrollTestCaseWithChild,
 }
 
 // TODO(crbug.com/41494364): Test is flaky on asan on multiple platforms.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
-    defined(ADDRESS_SANITIZER)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || defined(ADDRESS_SANITIZER)
 #define MAYBE_DeviceScaleFactor1_ScrollRootScrollLayer \
   DISABLED_DeviceScaleFactor1_ScrollRootScrollLayer
 #else
@@ -1297,7 +1296,7 @@ void DoGestureScroll(LayerTreeHostImpl* host_impl,
 // thread.
 // TODO(crbug.com/40762489): Flaky on ChromeOS, and Linux.
 // TODO(crbug.com/342502558): Flaky on Mac
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_LayerTreeHostScrollTestImplOnlyScrollSnap \
   DISABLED_LayerTreeHostScrollTestImplOnlyScrollSnap
 #else
@@ -1570,9 +1569,7 @@ class LayerTreeHostScrollTestImplOnlyMultipleScrollSnap
 };
 
 // TODO(crbug.com/40787490): Test is flaky on Chrome OS (both Ash and Lacros).
-#if !BUILDFLAG(IS_CHROMEOS)
 MULTI_THREAD_TEST_F(LayerTreeHostScrollTestImplOnlyMultipleScrollSnap);
-#endif
 
 class LayerTreeHostScrollTestScrollZeroMaxScrollOffset
     : public LayerTreeHostScrollTest {
@@ -1817,15 +1814,8 @@ class LayerTreeHostScrollTestImplScrollUnderMainThreadScrollingParent
 
 // This test is flaky in the single threaded configuration, only on the
 // chromeos-amd64-generic-rel bot. https://crbug.com/1093078.
-#if BUILDFLAG(IS_CHROMEOS)
-// SINGLE_THREAD_TEST_F(
-//    LayerTreeHostScrollTestImplScrollUnderMainThreadScrollingParent);
-MULTI_THREAD_TEST_F(
-    LayerTreeHostScrollTestImplScrollUnderMainThreadScrollingParent);
-#else
 SINGLE_AND_MULTI_THREAD_TEST_F(
     LayerTreeHostScrollTestImplScrollUnderMainThreadScrollingParent);
-#endif
 
 class ThreadCheckingInputHandlerClient : public InputHandlerClient {
  public:

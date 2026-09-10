@@ -14,18 +14,6 @@ namespace enterprise_connectors {
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Enrollment status of the device where the Device Trust connector attestation
-// is happening. These values are persisted to logs and should not be
-// renumbered. Please update the DTEnrollmentStatus enum in enums.xml when
-// adding a new step here.
-enum class DTEnrollmentStatus {
-  kManaged = 0,
-  kUnmanaged = 1,
-  kMaxValue = kUnmanaged,
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 DTHandshakeResult ResponseToResult(const DeviceTrustResponse& response) {
   if (!response.error) {
     return DTHandshakeResult::kSuccess;
@@ -116,21 +104,5 @@ void LogSignalsCollectionLatency(const char* variant,
   base::UmaHistogramTimes(base::StringPrintf(kLatencyHistogramFormat, variant),
                           base::TimeTicks::Now() - start_time);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void LogOrigin(DTOrigin origin) {
-  static constexpr char kOriginHistogram[] = "Enterprise.DeviceTrust.Origin";
-  base::UmaHistogramEnumeration(kOriginHistogram, origin);
-}
-
-void LogEnrollmentStatus(bool is_enterprise_managed) {
-  static constexpr char kEnrollmentStatusHistogram[] =
-      "Enterprise.DeviceTrust.EnrollmentStatus";
-  base::UmaHistogramEnumeration(kEnrollmentStatusHistogram,
-                                is_enterprise_managed
-                                    ? DTEnrollmentStatus::kManaged
-                                    : DTEnrollmentStatus::kUnmanaged);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace enterprise_connectors

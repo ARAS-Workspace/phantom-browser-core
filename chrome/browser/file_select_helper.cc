@@ -46,13 +46,6 @@
 #include "ui/base/models/dialog_model.h"
 #include "ui/shell_dialogs/selected_file_info.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/file_manager/fileapi_util.h"
-#include "chrome/browser/ash/fusebox/fusebox_server.h"
-#include "components/enterprise/connectors/core/features.h"
-#include "content/public/browser/site_instance.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/content_uri_utils.h"
 #else
@@ -280,27 +273,6 @@ void FileSelectHelper::ConvertToFileChooserFileInfoList(
   if (AbortIfWebContentsDestroyed())
     return;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!files.empty()) {
-    if (!IsValidProfile(profile_)) {
-      RunFileChooserEnd();
-      return;
-    }
-    // Converts |files| into FileChooserFileInfo with handling of non-native
-    // files.
-    content::SiteInstance* site_instance =
-        render_frame_host_->GetSiteInstance();
-    storage::FileSystemContext* file_system_context =
-        profile_->GetStoragePartition(site_instance)->GetFileSystemContext();
-    file_manager::util::ConvertSelectedFileInfoListToFileChooserFileInfoList(
-        file_system_context, render_frame_host_->GetLastCommittedOrigin(),
-        files,
-        base::BindOnce(&FileSelectHelper::PerformContentAnalysisIfNeeded,
-                       this));
-    return;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   std::vector<FileChooserFileInfoPtr> chooser_files;
   for (const auto& file : files) {
     chooser_files.push_back(
@@ -314,37 +286,7 @@ void FileSelectHelper::ConvertToFileChooserFileInfoList(
 
 base::FilePath FileSelectHelper::MaybeSubstituteFuseboxFilePath(
     const blink::mojom::FileSystemFileInfo& file_system_info) {
-#if BUILDFLAG(IS_CHROMEOS)
-  content::SiteInstance* site_instance = render_frame_host_->GetSiteInstance();
-  storage::FileSystemContext* file_system_context =
-      profile_->GetStoragePartition(site_instance)->GetFileSystemContext();
-  if (!file_system_context) {
-    return base::FilePath();
-  }
-
-  const storage::FileSystemURL cracked_url =
-      file_system_context->CrackURLInFirstPartyContext(file_system_info.url);
-  if (!cracked_url.is_valid()) {
-    return base::FilePath();
-  }
-
-  GURL external_gurl;
-  if (!file_manager::util::ConvertAbsoluteFilePathToFileSystemUrl(
-          profile_, cracked_url.path(), file_manager::util::GetFileManagerURL(),
-          &external_gurl)) {
-    return base::FilePath();
-  }
-
-  const storage::FileSystemURL external_cracked_url =
-      file_system_context->CrackURLInFirstPartyContext(external_gurl);
-  if (!external_cracked_url.is_valid()) {
-    return base::FilePath();
-  }
-
-  return fusebox::Server::SubstituteFuseboxFilePath(external_cracked_url);
-#else
   return base::FilePath();
-#endif
 }
 
 void FileSelectHelper::PerformContentAnalysisIfNeeded(
@@ -370,17 +312,6 @@ void FileSelectHelper::PerformContentAnalysisIfNeeded(
       if (file->is_native_file()) {
         data.paths.push_back(file->get_native_file()->file_path);
       }
-#if BUILDFLAG(IS_CHROMEOS)
-      else if (base::FeatureList::IsEnabled(
-                   enterprise_connectors::kEnableDlpFileSystemApi) &&
-               file->is_file_system()) {
-        base::FilePath path =
-            MaybeSubstituteFuseboxFilePath(*file->get_file_system());
-        if (!path.empty()) {
-          data.paths.push_back(std::move(path));
-        }
-      }
-#endif
     }
 
     if (data.paths.empty()) {
@@ -436,14 +367,6 @@ void FileSelectHelper::ContentAnalysisCompletionCallback(
     if ((*it)->is_native_file()) {
       is_scanned = true;
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    else if (base::FeatureList::IsEnabled(
-                 enterprise_connectors::kEnableDlpFileSystemApi) &&
-             (*it)->is_file_system()) {
-      is_scanned =
-          !MaybeSubstituteFuseboxFilePath(*(*it)->get_file_system()).empty();
-    }
-#endif
 
     if (is_scanned) {
       if (!result.paths_results[i]) {

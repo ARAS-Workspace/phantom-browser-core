@@ -212,11 +212,7 @@ void SupervisionMixin::ConfigureIdentityTestEnvironment() {
 }
 
 Profile* SupervisionMixin::GetProfile() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  return ProfileManager::GetActiveUserProfile();
-#else
   return test_base_->browser()->GetProfile();
-#endif
 }
 
 signin::IdentityTestEnvironment* SupervisionMixin::GetIdentityTestEnvironment()

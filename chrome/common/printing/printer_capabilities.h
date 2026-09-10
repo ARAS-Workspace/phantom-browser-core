@@ -34,7 +34,6 @@ base::DictValue AssemblePrinterSettings(const std::string& device_name,
                                         bool has_secure_protocol,
                                         PrinterSemanticCapsAndDefaults* caps);
 
-#if !BUILDFLAG(IS_CHROMEOS) || defined(UNIT_TEST)
 // Returns the value from `AssemblePrinterSettings()` using the required
 // `print_backend` to obtain settings as necessary.  The returned value is
 // suitable for passage to the WebUI in JSON.
@@ -43,7 +42,6 @@ base::DictValue GetSettingsOnBlockingTaskRunner(
     const PrinterBasicInfo& basic_info,
     PrinterSemanticCapsAndDefaults::Papers user_defined_papers,
     scoped_refptr<PrintBackend> print_backend);
-#endif  // !BUILDFLAG(IS_CHROMEOS) || defined(UNIT_TEST)
 
 }  // namespace printing
 

@@ -222,14 +222,6 @@ bool LocaleAwareCompareFilenames(const FilePath& a, const FilePath& b) {
 }
 
 void NormalizeFileNameEncoding(FilePath* file_name) {
-#if BUILDFLAG(IS_CHROMEOS)
-  std::string normalized_str;
-  if (ConvertToUtf8AndNormalize(file_name->BaseName().value(), kCodepageUTF8,
-                                &normalized_str) &&
-      !normalized_str.empty()) {
-    *file_name = file_name->DirName().Append(FilePath(normalized_str));
-  }
-#endif
 }
 
 }  // namespace base::i18n

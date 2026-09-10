@@ -107,8 +107,6 @@ EmbeddedPermissionPromptSystemSettingsView::GetButtonsConfiguration() const {
 
 #if BUILDFLAG(IS_MAC)
   operating_system_name = l10n_util::GetStringUTF16(IDS_MACOS_NAME_FRAGMENT);
-#elif BUILDFLAG(IS_CHROMEOS)
-  operating_system_name = l10n_util::GetStringUTF16(IDS_CHROMEOS_NAME_FRAGMENT);
 #endif
 
   // Do not show buttons if the OS is not supported.

@@ -15,18 +15,6 @@
 #include "pdf/document_metadata.h"
 #include "services/screen_ai/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "pdf/flatten_pdf_result.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-#include <memory>
-
-#include "base/functional/callback_forward.h"
-#include "services/screen_ai/public/mojom/screen_ai_service.mojom.h"
-#include "third_party/skia/include/core/SkBitmap.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-
 namespace gfx {
 class Rect;
 class Size;
@@ -35,19 +23,7 @@ class SizeF;
 
 namespace chrome_pdf {
 
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-class PdfProgressiveSearchifier;
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-
 void SetUseSkiaRendererPolicy(bool use_skia);
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Create a flattened PDF document from an existing PDF document.
-// `input_buffer` is the buffer that contains the entire PDF document to be
-// flattened.
-std::optional<FlattenPdfResult> CreateFlattenedPdf(
-    base::span<const uint8_t> input_buffer);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // `page_count` and `max_page_width` are optional and can be NULL.
 // Returns false if the document is not valid.
@@ -160,27 +136,6 @@ std::vector<uint8_t> ConvertPdfDocumentToNupPdf(
     size_t pages_per_sheet,
     const gfx::Size& page_size,
     const gfx::Rect& printable_area);
-
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
-// Converts an inaccessible PDF to a searchable PDF.
-// `pdf_buffer` is the buffer of the inaccessible PDF.
-// `perform_ocr_callback` is the callback that takes an image and outputs
-//     the OCR result. It may be called multiple times.
-//
-// The conversion is done by performing OCR on each image in the PDF and adding
-// a layer of invisible text to the PDF to make text on images accessible. Each
-// execution should take place in an isolated process, and each process should
-// be terminated upon completion of the conversion. An empty vector is returned
-// on failure.
-std::vector<uint8_t> Searchify(
-    base::span<const uint8_t> pdf_buffer,
-    base::RepeatingCallback<screen_ai::mojom::VisualAnnotationPtr(
-        const SkBitmap& bitmap)> perform_ocr_callback);
-
-// Creates a PDF searchifier for future operations, such as adding and deleting
-// pages, and saving PDFs. Crashes if failed to create.
-std::unique_ptr<PdfProgressiveSearchifier> CreateProgressiveSearchifier();
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
 
 }  // namespace chrome_pdf
 

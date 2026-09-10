@@ -40,26 +40,6 @@ class BASE_EXPORT PowerMonitorDeviceSource : public PowerMonitorSource {
 
   ~PowerMonitorDeviceSource() override;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On Chrome OS, Chrome receives power-related events from powerd, the system
-  // power daemon, via D-Bus signals received on the UI thread. base can't
-  // directly depend on that code, so this class instead exposes static methods
-  // so that events can be passed in.
-  static void SetPowerSource(
-      PowerStateObserver::BatteryPowerStatus battery_power_status);
-  static void HandleSystemSuspending();
-  static void HandleSystemResumed();
-  static void ThermalEventReceived(
-      PowerThermalObserver::DeviceThermalState state);
-
-  // These two methods is used for handling thermal state update requests, such
-  // as asking for initial state when starting lisitening to thermal change.
-  PowerThermalObserver::DeviceThermalState GetCurrentThermalState()
-      const override;
-  void SetCurrentThermalState(
-      PowerThermalObserver::DeviceThermalState state) override;
-#endif
-
  private:
   friend class PowerMonitorDeviceSourceTest;
 
@@ -125,10 +105,6 @@ class BASE_EXPORT PowerMonitorDeviceSource : public PowerMonitorSource {
   std::vector<id> notification_observers_;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  PowerThermalObserver::DeviceThermalState current_thermal_state_ =
-      PowerThermalObserver::DeviceThermalState::kUnknown;
-#endif
 };
 
 }  // namespace base

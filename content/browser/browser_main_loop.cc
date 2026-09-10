@@ -207,16 +207,12 @@
 #endif
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/bluetooth/bluetooth_adapter_factory.h"
-#include "services/data_decoder/public/cpp/data_decoder.h"
-#endif
 
 #if defined(USE_GLIB)
 #include <glib-object.h>
 #endif
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
 #include "media/device_monitors/device_monitor_udev.h"
 #endif
 
@@ -351,8 +347,7 @@ CreateMemoryPressureMonitor(const base::CommandLine& command_line) {
 
   std::unique_ptr<memory_pressure::MultiSourceMemoryPressureMonitor> monitor;
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   monitor =
       std::make_unique<memory_pressure::MultiSourceMemoryPressureMonitor>();
 #endif
@@ -551,8 +546,7 @@ int BrowserMainLoop::EarlyInitialization() {
   DCHECK(base::CurrentUIThread::IsSet());
   base::PlatformThread::SetDefaultThreadType(base::ThreadType::kPresentation);
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // We use quite a few file descriptors for our IPC as well as disk the disk
   // cache, and the default limit on Apple is low (256), so bump it up.
 
@@ -561,9 +555,7 @@ int BrowserMainLoop::EarlyInitialization() {
   // users can easily hit this limit with many open tabs. Bump up the limit to
   // an arbitrarily high number. See https://crbug.com/539567
   base::IncreaseFdLimitTo(8192);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
-
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(USE_NSS_CERTS)
   // We want to be sure to init NSPR on the main thread.
@@ -733,10 +725,8 @@ void BrowserMainLoop::PostCreateMainMessageLoop() {
 
   base::trace_event::MemoryDumpManager::GetInstance()->RegisterDumpProvider(
       sql::SqlMemoryDumpProvider::GetInstance(), "Sql", nullptr);
-#if !BUILDFLAG(IS_CHROMEOS)
   // Chrome Remote Desktop needs TransitionalURLLoaderFactoryOwner on ChromeOS.
   network::TransitionalURLLoaderFactoryOwner::DisallowUsageInProcess();
-#endif
 }
 
 void BrowserMainLoop::CreateMessageLoopForEarlyShutdown() {
@@ -1418,7 +1408,7 @@ void BrowserMainLoop::PostCreateThreadsImpl() {
 #endif
   }
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
   device_monitor_linux_ = std::make_unique<media::DeviceMonitorLinux>();
 #endif
 

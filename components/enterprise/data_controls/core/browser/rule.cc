@@ -92,9 +92,6 @@ std::vector<std::string_view> TabContextConditions(
         AttributesCondition::kKeyUrlRegexprs,
         AttributesCondition::kKeyIncognito,
         AttributesCondition::kKeyOtherProfile,
-#if BUILDFLAG(IS_CHROMEOS)
-        AttributesCondition::kKeyComponents
-#endif  // BUILDFLAG(IS_CHROMEOS)
        }) {
     if (value.contains(tab_condition)) {
       tab_conditions.push_back(tab_condition);
@@ -115,9 +112,6 @@ std::vector<std::string_view> AnyOfConditions(const base::DictValue& value) {
         AttributesCondition::kKeyOtherProfile,
         AttributesCondition::kKeySizeHigherThan,
         AttributesCondition::kKeySizeLowerThan,
-#if BUILDFLAG(IS_CHROMEOS)
-        AttributesCondition::kKeyComponents
-#endif  // BUILDFLAG(IS_CHROMEOS)
        }) {
     if (value.contains(anyof_condition)) {
       anyof_conditions.push_back(anyof_condition);
@@ -586,9 +580,6 @@ bool Rule::AddUnsupportedAttributeErrors(
                   AttributesCondition::kKeyIncognito,
                   AttributesCondition::kKeyOtherProfile,
                   AttributesCondition::kKeyGeminiInChrome,
-#if BUILDFLAG(IS_CHROMEOS)
-                  AttributesCondition::kKeyComponents,
-#endif  // BUILDFLAG(IS_CHROMEOS)
                   kKeyAnd,
                   kKeyOr,
                   kKeyNot,
@@ -601,16 +592,13 @@ bool Rule::AddUnsupportedAttributeErrors(
               {
                   AttributesCondition::kKeyUrls,
                   AttributesCondition::kKeyIncognito,
-#if BUILDFLAG(IS_CHROMEOS)
-                  AttributesCondition::kKeyComponents,
-#endif  // BUILDFLAG(IS_CHROMEOS)
                   kKeyAnd,
                   kKeyOr,
                   kKeyNot,
                   kKeySources,
               },
           },
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
           {
               Restriction::kFileDownload,
               {
@@ -622,7 +610,7 @@ bool Rule::AddUnsupportedAttributeErrors(
                   kKeySources,
               },
           },
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       });
 
   static const base::NoDestructor<
@@ -728,7 +716,7 @@ bool Rule::AddUnsupportedRestrictionErrors(
               },
           },
 #endif  // BUILDFLAG(ENTERPRISE_SCREENSHOT_PROTECTION)
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
           {
               Restriction::kFileDownload,
               {
@@ -738,7 +726,7 @@ bool Rule::AddUnsupportedRestrictionErrors(
                   Level::kBlock,
               },
           },
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       });
 
   bool valid = true;

@@ -189,11 +189,7 @@ BASE_FEATURE(kGlicOptInImpressionMetrics, base::FEATURE_ENABLED_BY_DEFAULT);
 // TODO(crbug.com/513620671) Investigate enabling on Windows.
 // TODO(crbug.com/516381993) Investigate enabling on ChromeOS.
 BASE_FEATURE(kGlicContentsInitiallyHidden,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif
 );
 
 BASE_FEATURE(kGlicAnchorEntryPointForOnboardedUsers,

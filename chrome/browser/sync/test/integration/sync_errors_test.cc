@@ -191,11 +191,6 @@ IN_PROC_BROWSER_TEST_P(SyncErrorTest, BirthdayErrorTest) {
 
   ASSERT_TRUE(syncer::SyncEngineStoppedChecker(GetSyncService(0)).Wait());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(GetSyncService(0)
-                  ->GetUserSettings()
-                  ->IsSyncFeatureDisabledViaDashboard());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_P(SyncErrorTest, UpgradeClientErrorDuringIncrementalSync) {
@@ -261,15 +256,10 @@ IN_PROC_BROWSER_TEST_P(SyncErrorTest, UpgradeClientErrorDuringInitialSync) {
 // This test verifies that sync keeps retrying if it encounters error during
 // setup.
 // crbug.com/41300290
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ErrorWhileSettingUp DISABLED_ErrorWhileSettingUp
-#else
 #define MAYBE_ErrorWhileSettingUp ErrorWhileSettingUp
-#endif
 IN_PROC_BROWSER_TEST_P(SyncErrorTest, MAYBE_ErrorWhileSettingUp) {
   ASSERT_TRUE(SetupClients());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // On non auto start enabled environments if the setup sync fails then
   // the setup would fail. So setup sync normally.
   // In contrast on auto start enabled platforms like chrome os we should be
@@ -277,20 +267,14 @@ IN_PROC_BROWSER_TEST_P(SyncErrorTest, MAYBE_ErrorWhileSettingUp) {
   ASSERT_TRUE(SetupSync()) << "Setup sync failed";
   ASSERT_TRUE(GetClient(0)->DisableSelectableType(
       syncer::UserSelectableType::kAutofill));
-#endif
 
   GetFakeServer()->TriggerError(sync_pb::SyncEnums::TRANSIENT_ERROR);
   EXPECT_TRUE(GetFakeServer()->EnableAlternatingTriggeredErrors());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Now setup sync and it should succeed.
-  ASSERT_TRUE(SetupSync());
-#else
   // Now enable a datatype, whose first 2 syncs would fail, but we should
   // recover and setup succesfully on the third attempt.
   ASSERT_TRUE(GetClient(0)->EnableSelectableType(
       syncer::UserSelectableType::kAutofill));
-#endif
 }
 
 // Tests that on receiving CLIENT_DATA_OBSOLETE sync engine gets restarted and

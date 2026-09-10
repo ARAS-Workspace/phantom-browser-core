@@ -101,7 +101,7 @@ bool CrashReporterClient::ShouldWriteMinidumpToLog() {
 
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 void CrashReporterClient::GetSanitizationInformation(
     const char* const** allowed_annotations,
     void** target_module,

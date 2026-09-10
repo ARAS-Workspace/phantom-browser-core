@@ -45,11 +45,6 @@
 #include "third_party/skia/include/private/chromium/GrDeferredDisplayList.h"
 #include "ui/gfx/gpu_fence_handle.h"
 
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-#include "media/gpu/chromeos/vulkan_overlay_adaptor.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "ui/gfx/android/surface_control_frame_rate.h"
 #endif
@@ -285,19 +280,6 @@ class SkiaOutputSurfaceImplOnGpu
   gpu::SharedImageFactory* shared_image_factory() const {
     return shared_image_factory_.get();
   }
-
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-  void DetileOverlay(gpu::Mailbox input,
-                     const gfx::Size& input_visible_size,
-                     gpu::Mailbox output,
-                     const gfx::RectF& display_rect,
-                     const gfx::RectF& crop_rect,
-                     gfx::OverlayTransform transform,
-                     bool is_10bit);
-
-  void CleanupImageProcessor();
-#endif
 
   void ReadbackForTesting(
       CopyOutputRequest::CopyOutputRequestCallback result_callback);
@@ -610,12 +592,6 @@ class SkiaOutputSurfaceImplOnGpu
   base::flat_set<gpu::Mailbox> solid_color_images_;
 
   THREAD_CHECKER(thread_checker_);
-
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-  std::unique_ptr<media::VulkanOverlayAdaptor> vulkan_overlay_adaptor_ =
-      nullptr;
-#endif
 
   base::WeakPtr<SkiaOutputSurfaceImplOnGpu> weak_ptr_;
   base::WeakPtrFactory<SkiaOutputSurfaceImplOnGpu> weak_ptr_factory_{this};

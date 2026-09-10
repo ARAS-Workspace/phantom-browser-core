@@ -2966,7 +2966,7 @@ IN_PROC_BROWSER_TEST_F(MediaSessionImplBrowserTest,
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/40097218): Re-enable this test.
 #define MAYBE_PositionStateRouteWithOnePlayer \
   DISABLED_PositionStateRouteWithOnePlayer

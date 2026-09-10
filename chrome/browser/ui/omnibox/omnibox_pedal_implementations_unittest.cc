@@ -24,9 +24,7 @@ class OmniboxPedalImplementationsTest : public testing::Test {
   void SetUp() override {
     feature_list_.InitWithFeatures(
         {
-#if !BUILDFLAG(IS_CHROMEOS)
             syncer::kUnoPhase2FollowUp
-#endif  // !BUILDFLAG(IS_CHROMEOS)
         },
         {});
     InitPedals();
@@ -11043,7 +11041,6 @@ class OmniboxPedalImplementationsTest : public testing::Test {
             "sync settings google",
             "sync settings google chrome",
             "sync settings manage",
-#if !BUILDFLAG(IS_CHROMEOS)
             "manage my stuff",
             "manage my chrome stuff",
             "manage my chrome data",
@@ -11051,7 +11048,6 @@ class OmniboxPedalImplementationsTest : public testing::Test {
             "manage bookmarks and stuff",
             "edit what I save",
             "edit what's in my account",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
         },
 
         // ID#12

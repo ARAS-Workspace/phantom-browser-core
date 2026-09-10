@@ -46,15 +46,6 @@ constexpr LogTrimmingDefaults GetLogTrimmingDefaults() {
       .log_bytes_trim_threshold = 3 * 1024 * 1024,  // 3 MiB
       .max_ongoing_log_size_bytes = 1024 * 1024,    // 1 MiB
   };
-#elif BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS has higher limits to reduce data loss, but the trim threshold is
-  // standard for historical reasons, see crrev.com/c/2904327.
-  return {
-      .initial_log_count_trim_threshold = 20,
-      .ongoing_log_count_trim_threshold = 8,
-      .log_bytes_trim_threshold = 300 * 1024,     // 300 KiB
-      .max_ongoing_log_size_bytes = 1024 * 1024,  // 1 MiB
-  };
 #elif BUILDFLAG(IS_ANDROID)
   return {
       .initial_log_count_trim_threshold = 40,
@@ -285,19 +276,6 @@ bool MetricsServiceClient::IsMetricsReportingForceEnabled() const {
   return ::metrics::IsMetricsReportingForceEnabled();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool MetricsServiceClient::ShouldUploadMetricsForUserId(uint64_t user_id) {
-  return true;
-}
-
-std::optional<bool> MetricsServiceClient::GetCurrentUserMetricsChoice() const {
-  return std::nullopt;
-}
-
-std::optional<std::string> MetricsServiceClient::GetCurrentUserId() const {
-  return std::nullopt;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 std::optional<regional_capabilities::CountryIdHolder>
 MetricsServiceClient::GetProfileCountryIdForPrivateMetricsReporting() {

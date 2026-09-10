@@ -34,12 +34,6 @@ const char kDisableAppContentVerification[] =
 const char kLoadApps[] = "load-apps";
 const char kLoadExtension[] = "load-extension";
 
-#if BUILDFLAG(IS_CHROMEOS)
-const char kLoadSigninProfileTestExtension[] =
-    "load-signin-profile-test-extension";
-const char kLoadGuestModeTestExtension[] = "load-guest-mode-test-extension";
-#endif
-
 const char kOffscreenDocumentTesting[] = "offscreen-document-testing";
 const char kRefreshComponentExtensionServiceWorkers[] =
     "refresh-component-extension-service-workers";

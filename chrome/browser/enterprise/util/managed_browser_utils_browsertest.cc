@@ -76,7 +76,6 @@ IN_PROC_BROWSER_TEST_P(ManagedBrowserUtilsBrowserTest, LocalState) {
             IsMachinePolicyPref(prefs::kManagedAutoSelectCertificateForUrls));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class EnterpriseProfileBadgingTest
     : public InProcessBrowserTest,
       public testing::WithParamInterface<std::tuple<bool, bool>> {
@@ -295,7 +294,6 @@ IN_PROC_BROWSER_TEST_P(EnterpriseBrowserBadgingTest,
 INSTANTIATE_TEST_SUITE_P(,
                          EnterpriseBrowserBadgingTest,
                          testing::Combine(testing::Bool(), testing::Bool()));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 using ManagedBrowserUtilsDeviceSignalsBrowserTest = InProcessBrowserTest;
 

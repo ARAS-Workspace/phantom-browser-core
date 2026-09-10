@@ -49,8 +49,7 @@ class HeadlessCompositorBrowserTest : public HeadlessProtocolBrowserTest {
 // chromium/src/headless/lib/browser/protocol/target_handler.cc?
 // rcl=5811aa08e60ba5ac7622f029163213cfbdb682f7&l=32
 // TODO(crbug.com/40656275): Suite is flaky on TSan Linux.
-#if BUILDFLAG(IS_MAC) || ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-                          defined(THREAD_SANITIZER))
+#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER))
 #define HEADLESS_COMPOSITOR_TEST(TEST_NAME, SCRIPT_NAME)  \
   HEADLESS_PROTOCOL_TEST_F(HeadlessCompositorBrowserTest, \
                            DISABLED_##TEST_NAME, SCRIPT_NAME)
@@ -69,7 +68,7 @@ HEADLESS_COMPOSITOR_TEST(CompositorImageAnimation,
                          "virtual-time/compositor-image-animation-test.js")
 
 // Flaky on all platforms. TODO(crbug.com/41471823): Re-enable.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_CompositorCssAnimation DISABLED_CompositorCssAnimation
 #else
 #define MAYBE_CompositorCssAnimation CompositorCssAnimation

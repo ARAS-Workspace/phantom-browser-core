@@ -901,12 +901,7 @@ IN_PROC_BROWSER_TEST_F(PointerLockBrowserTest, DISABLED_UnadjustedMovement) {
 
 #if defined(USE_AURA)
 // TODO(crbug.com/40635377): Remove failure test when fully implemented
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ChangeUnadjustedMovementFailure \
-  DISABLED_ChangeUnadjustedMovementFailure
-#else
 #define MAYBE_ChangeUnadjustedMovementFailure ChangeUnadjustedMovementFailure
-#endif
 // Tests that a subsequent request to RequestPointerLock with different
 // options inside a Child view gets piped to the proper places and gives
 // the proper unsupported error(this option is only supported on Windows

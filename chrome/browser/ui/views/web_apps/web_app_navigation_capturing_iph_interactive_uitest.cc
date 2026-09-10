@@ -10,12 +10,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/metrics/user_action_tester.h"
 #include "base/test/scoped_feature_list.h"
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/webui_url_constants.h"
-#include "ash/webui/settings/public/constants/routes.mojom.h"
-#include "chrome/browser/ash/system_web_apps/system_web_app_manager.h"
-#include "chrome/browser/ui/settings_window_manager_chromeos.h"
-#endif
 #include "chrome/browser/apps/app_service/app_registry_cache_waiter.h"
 #include "chrome/browser/apps/link_capturing/link_capturing_feature_test_support.h"
 #include "chrome/browser/browser_process.h"
@@ -95,11 +89,6 @@ class WebAppNavigationCapturingIphUiTest : public InteractiveFeaturePromoTest {
   void SetUpOnMainThread() override {
     InteractiveFeaturePromoTest::SetUpOnMainThread();
     ASSERT_TRUE(embedded_test_server()->Start());
-#if BUILDFLAG(IS_CHROMEOS)
-    // Required to launch the OS Settings System Web App (SWA) during the test.
-    ash::SystemWebAppManager::GetForTest(browser()->GetProfile())
-        ->InstallSystemAppsForTesting();
-#endif
   }
 
   void TearDownOnMainThread() override {
@@ -433,13 +422,7 @@ IN_PROC_BROWSER_TEST_F(WebAppNavigationCapturingIphUiTest,
   const webapps::AppId app_id = InstallTestWebApp(GetDestinationUrl());
 
   base::HistogramTester histogram_tester;
-#if BUILDFLAG(IS_CHROMEOS)
-  const GURL settings_url = GURL(base::StrCat(
-      {ash::kChromeUIOSSettingsURL,
-       chromeos::settings::mojom::kAppDetailsSubpagePath, "?id=", app_id}));
-#else
   const GURL settings_url = GURL(chrome::kChromeUIWebAppSettingsURL + app_id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   RunTestSequence(
       OpenStartPage(),

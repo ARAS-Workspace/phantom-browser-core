@@ -57,12 +57,7 @@ class LogNetLogTest : public InProcessBrowserTest {
   }
 };
 
-#if BUILDFLAG(IS_CHROMEOS) && defined(ADDRESS_SANITIZER)
-// TODO(crbug.com/457605739): Flaky on ASAN on ChromeOS.
-#define MAYBE_Exists DISABLED_Exists
-#else
 #define MAYBE_Exists Exists
-#endif
 IN_PROC_BROWSER_TEST_F(LogNetLogTest, MAYBE_Exists) {
   ASSERT_TRUE(embedded_test_server()->Start());
   GURL url(embedded_test_server()->GetURL("/simple.html"));
@@ -146,12 +141,7 @@ INSTANTIATE_TEST_SUITE_P(All,
                          ::testing::Values(nullptr, "IncludeSensitive"));
 
 // TODO(crbug.com/521183804): Flaky on Chrome OS ASAN/LSAN.
-#if BUILDFLAG(IS_CHROMEOS) && \
-    (defined(ADDRESS_SANITIZER) || defined(LEAK_SANITIZER))
-#define MAYBE_Basic DISABLED_Basic
-#else
 #define MAYBE_Basic Basic
-#endif
 IN_PROC_BROWSER_TEST_P(LogNetLogExplicitFileTest, MAYBE_Basic) {
   ASSERT_TRUE(embedded_test_server()->Start());
   GURL url(embedded_test_server()->GetURL("/set_cookie_header.html"));

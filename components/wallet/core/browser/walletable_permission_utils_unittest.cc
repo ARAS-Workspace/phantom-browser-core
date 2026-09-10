@@ -80,7 +80,6 @@ TEST_F(WalletablePermissionUtilsTest, OptInStatus_SetAndGet) {
       GetWalletablePassDetectionOptInStatus(prefs(), identity_manager()));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)  // Signing out does not work on ChromeOS.
 TEST_F(WalletablePermissionUtilsTest, OptInStatus_TiedToAccount) {
   AccountInfo account1 = identity_test_env().MakePrimaryAccountAvailable(
       "test1@gmail.com", signin::ConsentLevel::kSignin);
@@ -124,8 +123,6 @@ TEST_F(WalletablePermissionUtilsTest,
   EXPECT_FALSE(
       GetWalletablePassDetectionOptInStatus(prefs(), identity_manager()));
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Test fixture for WalletablePermissionUtils eligibility, initializing the
 // `kWalletablePassDetection` feature with a country allowlist.

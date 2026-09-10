@@ -42,12 +42,6 @@ proto::WebApp CreateWebAppProtoForTesting(const std::string& name,
           WebAppSpecifics_UserDisplayMode_STANDALONE);
   web_app.set_scope(start_url.GetWithoutFilename().spec());
   web_app.mutable_sources()->set_user_installed(true);
-#if BUILDFLAG(IS_CHROMEOS)
-  web_app.mutable_chromeos_data();
-  web_app.mutable_sync_data()->set_user_display_mode_cros(
-      sync_pb::WebAppSpecifics_UserDisplayMode::
-          WebAppSpecifics_UserDisplayMode_STANDALONE);
-#endif
   web_app.set_install_state(
       proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION);
   return web_app;
@@ -396,29 +390,6 @@ TEST_F(WebAppDatabaseMigrationTest,
   ASSERT_TRUE(app3);
   ASSERT_TRUE(app4);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // App 1: CrOS UDM should be populated from Default (Browser)
-  EXPECT_TRUE(app1->sync_proto().has_user_display_mode_cros());
-  EXPECT_EQ(app1->sync_proto().user_display_mode_cros(),
-            sync_pb::WebAppSpecifics_UserDisplayMode_BROWSER);
-  EXPECT_TRUE(
-      app1->sync_proto().has_user_display_mode_default());  // Default remains
-  EXPECT_EQ(app1->sync_proto().user_display_mode_default(),
-            sync_pb::WebAppSpecifics_UserDisplayMode_BROWSER);
-
-  // App 2: Default UDM should remain absent (CrOS doesn't populate Default)
-  EXPECT_TRUE(app2->sync_proto().has_user_display_mode_cros());  // CrOS remains
-  EXPECT_EQ(app2->sync_proto().user_display_mode_cros(),
-            sync_pb::WebAppSpecifics_UserDisplayMode_STANDALONE);
-  EXPECT_FALSE(app2->sync_proto().has_user_display_mode_default());
-
-  // App 3: CrOS UDM should default to Standalone
-  EXPECT_TRUE(app3->sync_proto().has_user_display_mode_cros());
-  EXPECT_EQ(app3->sync_proto().user_display_mode_cros(),
-            sync_pb::WebAppSpecifics_UserDisplayMode_STANDALONE);
-  EXPECT_FALSE(app3->sync_proto()
-                   .has_user_display_mode_default());  // Default remains absent
-#else  // !BUILDFLAG(IS_CHROMEOS)
   // App 1: Default UDM should remain Browser, CrOS should remain absent
   EXPECT_FALSE(app1->sync_proto().has_user_display_mode_cros());
   EXPECT_TRUE(app1->sync_proto().has_user_display_mode_default());
@@ -439,7 +410,6 @@ TEST_F(WebAppDatabaseMigrationTest,
   EXPECT_TRUE(app3->sync_proto().has_user_display_mode_default());
   EXPECT_EQ(app3->sync_proto().user_display_mode_default(),
             sync_pb::WebAppSpecifics_UserDisplayMode_STANDALONE);
-#endif
 
   // App 4: Should remain unchanged
   EXPECT_TRUE(app4->sync_proto().has_user_display_mode_cros());

@@ -21,14 +21,12 @@ using testing::AtLeast;
 
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void SetUpImageWriteClientProgressSimulation(FakeImageWriterClient* client) {
   std::vector<int> progress_list{0, 50, 100};
   bool will_succeed = true;
   client->SimulateProgressOnWrite(progress_list, will_succeed);
   client->SimulateProgressOnVerifyWrite(progress_list, will_succeed);
 }
-#endif
 
 }  // namespace
 
@@ -61,11 +59,9 @@ TEST_F(ImageWriterFromFileTest, InvalidFile) {
 
 // Runs the entire WriteFromFile operation.
 TEST_F(ImageWriterFromFileTest, WriteFromFileEndToEnd) {
-#if !BUILDFLAG(IS_CHROMEOS)
   // Sets up simulating Operation::Progress() and Operation::Success().
   test_utils_.RunOnUtilityClientCreation(
       base::BindOnce(&SetUpImageWriteClientProgressSimulation));
-#endif
 
   scoped_refptr<WriteFromFileOperation> op = new WriteFromFileOperation(
       manager_.AsWeakPtr(), kDummyExtensionId, test_utils_.GetImagePath(),
@@ -81,7 +77,6 @@ TEST_F(ImageWriterFromFileTest, WriteFromFileEndToEnd) {
                                    image_writer_api::Stage::kWrite, 100))
       .Times(AtLeast(1));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Chrome OS doesn't verify.
   EXPECT_CALL(manager_, OnProgress(kDummyExtensionId,
                                    image_writer_api::Stage::kVerifyWrite, _))
@@ -92,7 +87,6 @@ TEST_F(ImageWriterFromFileTest, WriteFromFileEndToEnd) {
   EXPECT_CALL(manager_, OnProgress(kDummyExtensionId,
                                    image_writer_api::Stage::kVerifyWrite, 100))
       .Times(AtLeast(1));
-#endif
 
   EXPECT_CALL(manager_, OnComplete(kDummyExtensionId)).Times(1);
   EXPECT_CALL(manager_, OnError(kDummyExtensionId, _, _, _)).Times(0);

@@ -10,21 +10,14 @@
 #include "content/public/common/content_features.h"
 #include "third_party/blink/public/common/features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/browser/web_applications/link_capturing_features.h"
-#endif
-
 namespace web_app {
 
 WebAppsSyncTestBase::WebAppsSyncTestBase(TestType test_type)
     : SyncTest(test_type) {
   std::vector<base::test::FeatureRef> enabled_features;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // TOOD(b/313492499): Update test driver to work with new intent picker UI.
   enabled_features.push_back(features::kPwaNavigationCapturing);
-#endif
   enabled_features.push_back(blink::features::kWebAppMigrationApi);
 
   scoped_feature_list_.InitWithFeatures(enabled_features, {});

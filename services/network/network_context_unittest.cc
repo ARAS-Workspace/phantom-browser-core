@@ -217,10 +217,6 @@
 #include "net/reporting/reporting_test_util.h"
 #endif  // BUILDFLAG(ENABLE_REPORTING)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "services/network/mock_mojo_dhcp_wpad_url_client.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_P2P_ENABLED)
 #include "services/network/public/mojom/p2p.mojom.h"
 #include "services/network/public/mojom/p2p_trusted.mojom.h"
@@ -3617,110 +3613,6 @@ TEST_F(NetworkContextTest, ClearEmptyHttpAuthCache) {
   EXPECT_EQ(0u, cache->GetEntriesSizeForTesting());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::optional<net::AuthCredentials> GetProxyAuthCredentials(
-    NetworkContext* network_context,
-    const net::ProxyServer& proxy_server,
-    const std::string& scheme,
-    const std::string& realm) {
-  base::RunLoop run_loop;
-  std::optional<net::AuthCredentials> result;
-  network_context->LookupProxyAuthCredentials(
-      proxy_server, scheme, realm,
-      base::BindLambdaForTesting(
-          [&](const std::optional<net::AuthCredentials>& credentials) {
-            result = credentials;
-            run_loop.Quit();
-          }));
-  run_loop.Run();
-  return result;
-}
-
-TEST_F(NetworkContextTest, LookupProxyAuthCredentials) {
-  GURL http_proxy("http://bar.test:1080");
-  GURL https_proxy("https://bar.test:443");
-  GURL http_proxy2("http://bar.test:443");
-  GURL server_origin("http://foo.test:3128");
-
-  std::unique_ptr<NetworkContext> network_context =
-      CreateContextWithParams(CreateNetworkContextParamsForTesting());
-  network_context->SetSplitAuthCacheByNetworkAnonymizationKey(true);
-  net::HttpAuthCache* cache = network_context->url_request_context()
-                                  ->http_transaction_factory()
-                                  ->GetSession()
-                                  ->http_auth_cache();
-
-  std::u16string user = u"user";
-  std::u16string password = u"pass";
-  cache->Add(url::SchemeHostPort(http_proxy), net::HttpAuth::AUTH_PROXY,
-             "Realm", net::HttpAuth::AUTH_SCHEME_BASIC,
-             net::NetworkAnonymizationKey(), "basic realm=Realm",
-             net::AuthCredentials(user, password),
-             /* path = */ "");
-  cache->Add(url::SchemeHostPort(https_proxy), net::HttpAuth::AUTH_PROXY,
-             "Realm", net::HttpAuth::AUTH_SCHEME_BASIC,
-             net::NetworkAnonymizationKey(), "basic realm=Realm",
-             net::AuthCredentials(user, password),
-             /* path = */ "");
-  cache->Add(url::SchemeHostPort(server_origin), net::HttpAuth::AUTH_SERVER,
-             "Realm", net::HttpAuth::AUTH_SCHEME_BASIC,
-             net::NetworkAnonymizationKey(), "basic realm=Realm",
-             net::AuthCredentials(user, password),
-             /* path = */ "/");
-  std::optional<net::AuthCredentials> result = GetProxyAuthCredentials(
-      network_context.get(),
-      net::ProxyServer(net::ProxyServer::Scheme::SCHEME_HTTP,
-                       net::HostPortPair::FromURL(http_proxy)),
-      "bAsIc", "Realm");
-  ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(user, result->username());
-  EXPECT_EQ(password, result->password());
-
-  result = GetProxyAuthCredentials(
-      network_context.get(),
-      net::ProxyServer(net::ProxyServer::Scheme::SCHEME_HTTPS,
-                       net::HostPortPair::FromURL(https_proxy)),
-      "bAsIc", "Realm");
-  ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(user, result->username());
-  EXPECT_EQ(password, result->password());
-
-  // Check that the proxy scheme is taken into account when looking for
-  // credentials
-  result = GetProxyAuthCredentials(
-      network_context.get(),
-      net::ProxyServer(net::ProxyServer::Scheme::SCHEME_HTTP,
-                       net::HostPortPair::FromURL(http_proxy2)),
-      "basic", "Realm");
-  EXPECT_FALSE(result.has_value());
-
-  // Check that the proxy authentication method is taken into account when
-  // looking for credentials
-  result = GetProxyAuthCredentials(
-      network_context.get(),
-      net::ProxyServer(net::ProxyServer::Scheme::SCHEME_HTTP,
-                       net::HostPortPair::FromURL(http_proxy)),
-      "digest", "Realm");
-  EXPECT_FALSE(result.has_value());
-
-  // Check that the realm is taken into account when looking for credentials
-  result = GetProxyAuthCredentials(
-      network_context.get(),
-      net::ProxyServer(net::ProxyServer::Scheme::SCHEME_HTTP,
-                       net::HostPortPair::FromURL(http_proxy)),
-      "basic", "Realm 2");
-  EXPECT_FALSE(result.has_value());
-
-  // Server credentials should not be returned
-  result = GetProxyAuthCredentials(
-      network_context.get(),
-      net::ProxyServer(net::ProxyServer::Scheme::SCHEME_HTTP,
-                       net::HostPortPair::FromURL(server_origin)),
-      "basic", "Realm");
-  EXPECT_FALSE(result.has_value());
-}
-#endif
-
 #if BUILDFLAG(ENABLE_REPORTING)
 TEST_F(NetworkContextTest, ClearReportingCacheReports) {
   auto reporting_context = std::make_unique<net::TestReportingContext>(
@@ -4421,12 +4313,6 @@ TEST_F(NetworkContextTest, ProxyLookupWithNetworkIsolationKey) {
   context_params->proxy_config_client_receiver =
       config_client.BindNewPipeAndPassReceiver();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  context_params->dhcp_wpad_url_client =
-      network::MockMojoDhcpWpadUrlClient::CreateWithSelfOwnedReceiver(
-          std::string());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   std::unique_ptr<NetworkContext> network_context =
       CreateContextWithParams(std::move(context_params));
 
@@ -4522,11 +4408,6 @@ TEST_F(NetworkContextTest, PacQuickCheck) {
   // default to false.
   mojom::NetworkContextParamsPtr context_params =
       CreateNetworkContextParamsForTesting();
-#if BUILDFLAG(IS_CHROMEOS)
-  context_params->dhcp_wpad_url_client =
-      network::MockMojoDhcpWpadUrlClient::CreateWithSelfOwnedReceiver(
-          std::string());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   context_params->proxy_resolver_factory =
       MockMojoProxyResolverFactory::Create();
   std::unique_ptr<NetworkContext> network_context =
@@ -4540,11 +4421,6 @@ TEST_F(NetworkContextTest, PacQuickCheck) {
 
   // Explicitly enable.
   context_params = CreateNetworkContextParamsForTesting();
-#if BUILDFLAG(IS_CHROMEOS)
-  context_params->dhcp_wpad_url_client =
-      network::MockMojoDhcpWpadUrlClient::CreateWithSelfOwnedReceiver(
-          std::string());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   context_params->proxy_resolver_factory =
       MockMojoProxyResolverFactory::Create();
   context_params->pac_quick_check_enabled = true;
@@ -4558,11 +4434,6 @@ TEST_F(NetworkContextTest, PacQuickCheck) {
 
   // Explicitly disable.
   context_params = CreateNetworkContextParamsForTesting();
-#if BUILDFLAG(IS_CHROMEOS)
-  context_params->dhcp_wpad_url_client =
-      network::MockMojoDhcpWpadUrlClient::CreateWithSelfOwnedReceiver(
-          std::string());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   context_params->proxy_resolver_factory =
       MockMojoProxyResolverFactory::Create();
   context_params->pac_quick_check_enabled = false;
@@ -7840,12 +7711,6 @@ TEST_F(NetworkContextTest, ProxyErrorClientNotifiedOfPacError) {
       CreateNetworkContextParamsForTesting();
   context_params->proxy_error_client = proxy_error_client.CreateRemote();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  context_params->dhcp_wpad_url_client =
-      network::MockMojoDhcpWpadUrlClient::CreateWithSelfOwnedReceiver(
-          std::string());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // The PAC URL doesn't matter, since the test is configured to use a
   // mock ProxyResolverFactory which doesn't actually evaluate it. It just
   // needs to be a data: URL to ensure the network fetch doesn't fail.
@@ -8942,7 +8807,7 @@ class NetworkContextMockHostTest : public NetworkContextTest {
   }
 };
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Flaky crashes on Linux: https://crbug.com/1115201
 #define MAYBE_CustomProxyUsesSpecifiedProxyList \
   DISABLED_CustomProxyUsesSpecifiedProxyList
@@ -10627,7 +10492,7 @@ TEST_F(NetworkContextTest,
             mojom::TrustTokenOperationStatus::kUnauthorized);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(NetworkContextTest, HttpAuthAllowGssApiLibraryLoad) {
   std::unique_ptr<NetworkContext> network_context =
       CreateContextWithParams(CreateNetworkContextParamsForTesting());
@@ -10642,7 +10507,7 @@ TEST_F(NetworkContextTest, HttpAuthAllowGssApiLibraryLoad) {
   EXPECT_FALSE(
       network_context->GetHttpAuthPreferences()->AllowGssapiLibraryLoad());
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 TEST_F(NetworkContextTest, HttpAuthUrlFilter) {
   std::unique_ptr<NetworkContext> network_context =

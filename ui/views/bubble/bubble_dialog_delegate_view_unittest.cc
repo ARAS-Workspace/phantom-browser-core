@@ -482,9 +482,6 @@ TEST_F(BubbleDialogDelegateViewTest,
 
 TEST_F(BubbleDialogDelegateViewTest, NoParentWidget) {
   test_views_delegate()->set_use_desktop_native_widgets(true);
-#if BUILDFLAG(IS_CHROMEOS)
-  test_views_delegate()->set_context(GetContext());
-#endif
   BubbleDialogDelegateView* bubble_delegate =
       new TestBubbleDialogDelegateView(nullptr);
   bubble_delegate->set_has_parent(false);

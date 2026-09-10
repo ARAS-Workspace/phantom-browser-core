@@ -217,10 +217,6 @@ class WindowsCreateFunction : public ExtensionFunction {
   // Returns the response to pass back to the extension.
   ResponseValue OnBrowserWindowCreated(BrowserWindowInterface* new_window);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void OnBocaWindowCreatedAsynchronously(const SessionID& session_id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if !BUILDFLAG(IS_ANDROID)
   // The info for an isolated web app to open, if any.
   std::optional<web_app::IsolatedWebAppUrlInfo> isolated_web_app_url_info_;

@@ -761,7 +761,7 @@ LayerTreeTest::LayerTreeTest(viz::RendererType renderer_type,
           ::switches::kSkiaGraphiteDawnBackendSwiftshader);
     }
     init_dawn = true;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     init_vulkan = true;
 #endif
   } else {

@@ -404,8 +404,7 @@ std::vector<std::string> GetDriverBugWorkaroundsImpl(GpuFeatureInfoType type) {
 int NumberOfRendererRasterThreads() {
   int num_processors = base::SysInfo::NumberOfProcessors();
 
-#if BUILDFLAG(IS_ANDROID) || \
-    (BUILDFLAG(IS_CHROMEOS) && defined(ARCH_CPU_ARM_FAMILY))
+#if BUILDFLAG(IS_ANDROID)
   // Android and ChromeOS ARM devices may report 6 to 8 CPUs for big.LITTLE
   // configurations. Limit the number of raster threads based on maximum of
   // 4 big cores.

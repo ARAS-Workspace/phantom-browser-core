@@ -26,10 +26,6 @@
 #include "ui/gfx/android/android_surface_control_compat.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 namespace features {
 namespace {
 
@@ -106,13 +102,6 @@ BASE_FEATURE(kGpuVsync, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kDefaultPassthroughCommandDecoder,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(ENABLE_VALIDATING_COMMAND_DECODER)
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Controls whether the GPU process falls back to software if GLES3 is not
-// supported.
-BASE_FEATURE(kFallbackToSWIfGLES3NotSupported,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 // Enables 2-pixel even boundary alignment for YUV SurfaceControl overlays.
@@ -228,11 +217,7 @@ void GetANGLEFeaturesFromCommandLineAndFinch(
 }
 
 bool ShouldFallbackToSWIfGLES3NotSupported() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return base::FeatureList::IsEnabled(kFallbackToSWIfGLES3NotSupported);
-#else
   return true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 #if BUILDFLAG(ENABLE_SWIFTSHADER)

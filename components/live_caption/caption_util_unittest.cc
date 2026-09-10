@@ -75,9 +75,7 @@ TEST_F(CaptionUtilTest, IsHeadlessCaptionFeatureSupportedReturnsTrue) {
   EXPECT_TRUE(IsHeadlessCaptionFeatureSupported());
 }
 TEST_F(CaptionUtilTest, ReturnsCorrectCaptionSettingsUrl) {
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://os-settings/audioAndCaptions");
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://settings/captions");
 #elif BUILDFLAG(IS_MAC)
   EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://settings/accessibility");

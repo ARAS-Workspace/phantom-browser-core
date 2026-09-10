@@ -66,10 +66,6 @@
 #include "ui/base/resource/resource_bundle_android.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/gfx/platform_font_skia.h"
-#endif
-
 namespace ui {
 
 namespace {
@@ -949,7 +945,7 @@ void ResourceBundle::ReloadFonts() {
 }
 
 ResourceScaleFactor ResourceBundle::GetMaxResourceScaleFactor() const {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   return max_scale_factor_;
 #else
   return GetMaxSupportedResourceScaleFactor();
@@ -1004,16 +1000,10 @@ void ResourceBundle::InitSharedInstance(Delegate* delegate) {
 
 // Register Png Decoder for use by DataURIResourceProviderProxy for embedded
 // images.
-#if BUILDFLAG(IS_CHROMEOS)
-  SkCodecs::Register(SkPngRustDecoder::Decoder());
-#endif
 }
 
 void ResourceBundle::FreeImages() {
   images_.clear();
-#if BUILDFLAG(IS_CHROMEOS)
-  image_models_.clear();
-#endif
 }
 
 void ResourceBundle::LoadChromeResources() {
@@ -1072,23 +1062,8 @@ void ResourceBundle::AddResourceHandle(
 }
 
 void ResourceBundle::InitDefaultFontList() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // InitDefaultFontList() is called earlier than overriding the locale strings.
-  // So we call the |GetLocalizedStringImpl()| which doesn't set the flag
-  // |can_override_locale_string_resources_| to false. This is okay, because the
-  // font list doesn't need to be overridden by variations.
-  std::string font_family =
-      base::UTF16ToUTF8(GetLocalizedStringImpl(IDS_UI_FONT_FAMILY_CROS));
-  gfx::FontList::SetDefaultFontDescription(font_family);
-
-  // TODO(yukishiino): Remove SetDefaultFontDescription() once the migration to
-  // the font list is done.  We will no longer need SetDefaultFontDescription()
-  // after every client gets started using a FontList instead of a Font.
-  gfx::PlatformFontSkia::SetDefaultFontDescription(font_family);
-#else
   // Use a single default font as the default font list.
   gfx::FontList::SetDefaultFontDescription(std::string());
-#endif
 }
 
 gfx::ImageSkia ResourceBundle::CreateImageSkia(int resource_id) {
@@ -1105,11 +1080,7 @@ gfx::ImageSkia ResourceBundle::CreateImageSkia(int resource_id) {
     return ParseLottieAsStillImage(std::move(*data));
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  const ResourceScaleFactor scale_factor_to_load = GetMaxResourceScaleFactor();
-#else
   const ResourceScaleFactor scale_factor_to_load = ui::k100Percent;
-#endif
 
   // TODO(oshima): Consider reading the image size from png IHDR chunk and
   // skip decoding here and remove #ifdef below.
@@ -1193,16 +1164,6 @@ gfx::Image& ResourceBundle::GetEmptyImage() {
   }
   return empty_image_;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-const ui::ImageModel& ResourceBundle::GetEmptyImageModel() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  if (empty_image_model_.IsEmpty())
-    empty_image_model_ = ui::ImageModel::FromImage(GetEmptyImage());
-  return empty_image_model_;
-}
-#endif
 
 std::u16string ResourceBundle::GetLocalizedStringImpl(int resource_id) const {
   std::u16string string;

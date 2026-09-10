@@ -263,7 +263,6 @@ TEST_F(SyncPrefsTest, ObservedPrefs) {
   sync_prefs_->RemoveObserver(&mock_sync_pref_observer);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(SyncPrefsTest, FirstSetupCompletePrefChange) {
   ASSERT_FALSE(sync_prefs_->IsInitialSyncFeatureSetupComplete());
 
@@ -273,36 +272,10 @@ TEST_F(SyncPrefsTest, FirstSetupCompletePrefChange) {
   sync_prefs_->ClearInitialSyncFeatureSetupComplete();
   EXPECT_FALSE(sync_prefs_->IsInitialSyncFeatureSetupComplete());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(SyncPrefsTest, SyncFeatureDisabledViaDashboard) {
-  EXPECT_FALSE(sync_prefs_->IsSyncFeatureDisabledViaDashboard());
-
-  sync_prefs_->SetSyncFeatureDisabledViaDashboard();
-  EXPECT_TRUE(sync_prefs_->IsSyncFeatureDisabledViaDashboard());
-
-  sync_prefs_->ClearSyncFeatureDisabledViaDashboard();
-  EXPECT_FALSE(sync_prefs_->IsSyncFeatureDisabledViaDashboard());
-}
-
-TEST_F(SyncPrefsTest, SetSelectedOsTypesTriggersPreferredDataTypesPrefChange) {
-  StrictMock<MockSyncPrefObserver> mock_sync_pref_observer;
-  EXPECT_CALL(mock_sync_pref_observer, OnSelectedTypesPrefChange);
-
-  sync_prefs_->AddObserver(&mock_sync_pref_observer);
-  sync_prefs_->SetSelectedOsTypes(/*sync_all_os_types=*/false,
-                                  UserSelectableOsTypeSet(),
-                                  UserSelectableOsTypeSet());
-  sync_prefs_->RemoveObserver(&mock_sync_pref_observer);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(SyncPrefsTest, Basic) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_FALSE(sync_prefs_->IsInitialSyncFeatureSetupComplete());
   sync_prefs_->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   EXPECT_TRUE(sync_prefs_->IsInitialSyncFeatureSetupComplete());
 
@@ -529,17 +502,15 @@ TEST_F(SyncPrefsTest,
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
                                         // kThemes is not supported on mobile.
                                         UserSelectableType::kThemes,
-#elif !BUILDFLAG(IS_CHROMEOS)
+#else
                                         UserSelectableType::kBookmarks,
                                         UserSelectableType::kReadingList,
                                         UserSelectableType::kExtensions,
 #endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
-#if !BUILDFLAG(IS_CHROMEOS)
                                         UserSelectableType::kHistory,
                                         UserSelectableType::kSavedTabGroups,
                                         UserSelectableType::kTabs,
                                         UserSelectableType::kCookies,
-#endif  // !BUILDFLAG(IS_CHROMEOS)
                                     });
 
   EXPECT_THAT(sync_prefs_->GetSelectedTypesForAccount(gaia_id_),
@@ -558,12 +529,10 @@ TEST_F(SyncPrefsTest,
   signin_prefs.SetExtensionsExplicitBrowserSignin(gaia_id_, true);
   const UserSelectableTypeSet expected_types_new_signin = Difference(
       UserSelectableTypeSet::All(), {
-#if !BUILDFLAG(IS_CHROMEOS)
                                         UserSelectableType::kHistory,
                                         UserSelectableType::kSavedTabGroups,
                                         UserSelectableType::kTabs,
                                         UserSelectableType::kCookies,
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
                                         // kThemes is not supported on mobile.
                                         UserSelectableType::kThemes,
@@ -659,132 +628,6 @@ TEST_F(SyncPrefsTest, KeepAccountSettingsPrefsOnlyForUsers) {
   EXPECT_THAT(sync_prefs_->GetSelectedTypesForAccount(gaia_id_2),
               ContainerEq(default_selected_types));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(SyncPrefsTest, IsSyncAllOsTypesEnabled) {
-  EXPECT_TRUE(sync_prefs_->IsSyncAllOsTypesEnabled());
-
-  sync_prefs_->SetSelectedOsTypes(
-      /*sync_all_os_types=*/false,
-      /*registered_types=*/UserSelectableOsTypeSet::All(),
-      /*selected_types=*/UserSelectableOsTypeSet::All());
-  EXPECT_FALSE(sync_prefs_->IsSyncAllOsTypesEnabled());
-  // Browser pref is not affected.
-  EXPECT_TRUE(sync_prefs_->HasKeepEverythingSynced());
-
-  sync_prefs_->SetSelectedOsTypes(
-      /*sync_all_os_types=*/true,
-      /*registered_types=*/UserSelectableOsTypeSet::All(),
-      /*selected_types=*/UserSelectableOsTypeSet::All());
-  EXPECT_TRUE(sync_prefs_->IsSyncAllOsTypesEnabled());
-}
-
-TEST_F(SyncPrefsTest, GetSelectedOsTypesWithAllOsTypesEnabled) {
-  EXPECT_TRUE(sync_prefs_->IsSyncAllOsTypesEnabled());
-  EXPECT_THAT(sync_prefs_->GetSelectedOsTypes(),
-              ContainerEq(UserSelectableOsTypeSet::All()));
-  for (UserSelectableOsType type : UserSelectableOsTypeSet::All()) {
-    sync_prefs_->SetSelectedOsTypes(
-        /*sync_all_os_types=*/true,
-        /*registered_types=*/UserSelectableOsTypeSet::All(),
-        /*selected_types=*/{type});
-    EXPECT_EQ(UserSelectableOsTypeSet::All(),
-              sync_prefs_->GetSelectedOsTypes());
-  }
-}
-
-TEST_F(SyncPrefsTest, GetSelectedOsTypesNotAllOsTypesSelected) {
-  const UserSelectableTypeSet browser_types =
-      sync_prefs_->GetSelectedTypesForSyncingUser();
-
-  sync_prefs_->SetSelectedOsTypes(
-      /*sync_all_os_types=*/false,
-      /*registered_types=*/UserSelectableOsTypeSet::All(),
-      /*selected_types=*/UserSelectableOsTypeSet());
-  EXPECT_THAT(sync_prefs_->GetSelectedOsTypes(), IsEmpty());
-  // Browser types are not changed.
-  EXPECT_THAT(sync_prefs_->GetSelectedTypesForSyncingUser(),
-              ContainerEq(browser_types));
-
-  for (UserSelectableOsType type : UserSelectableOsTypeSet::All()) {
-    sync_prefs_->SetSelectedOsTypes(
-        /*sync_all_os_types=*/false,
-        /*registered_types=*/UserSelectableOsTypeSet::All(),
-        /*selected_types=*/{type});
-    EXPECT_THAT(sync_prefs_->GetSelectedOsTypes(),
-                ContainerEq(UserSelectableOsTypeSet({type})));
-    // Browser types are not changed.
-    EXPECT_THAT(sync_prefs_->GetSelectedTypesForSyncingUser(),
-                ContainerEq(browser_types));
-  }
-}
-
-TEST_F(SyncPrefsTest, SelectedOsTypesKeepEverythingSyncedButPolicyRestricted) {
-  ASSERT_TRUE(sync_prefs_->HasKeepEverythingSynced());
-  pref_service_.SetManagedPref(prefs::internal::kSyncOsPreferences,
-                               base::Value(false));
-
-  UserSelectableOsTypeSet expected_type_set = UserSelectableOsTypeSet::All();
-  expected_type_set.Remove(UserSelectableOsType::kOsPreferences);
-  EXPECT_THAT(sync_prefs_->GetSelectedOsTypes(),
-              ContainerEq(expected_type_set));
-}
-
-TEST_F(SyncPrefsTest,
-       SelectedOsTypesNotKeepEverythingSyncedAndPolicyRestricted) {
-  pref_service_.SetManagedPref(prefs::internal::kSyncOsPreferences,
-                               base::Value(false));
-  sync_prefs_->SetSelectedOsTypes(
-      /*sync_all_os_types=*/false,
-      /*registered_types=*/UserSelectableOsTypeSet::All(),
-      /*selected_types=*/UserSelectableOsTypeSet());
-
-  ASSERT_FALSE(sync_prefs_->GetSelectedOsTypes().Has(
-      UserSelectableOsType::kOsPreferences));
-  for (UserSelectableOsType type : UserSelectableOsTypeSet::All()) {
-    sync_prefs_->SetSelectedOsTypes(
-        /*sync_all_os_types=*/false,
-        /*registered_types=*/UserSelectableOsTypeSet::All(),
-        /*selected_types=*/{type});
-    UserSelectableOsTypeSet expected_type_set = {type};
-    expected_type_set.Remove(UserSelectableOsType::kOsPreferences);
-    EXPECT_THAT(sync_prefs_->GetSelectedOsTypes(),
-                ContainerEq(expected_type_set));
-  }
-}
-
-TEST_F(SyncPrefsTest, SetOsTypeDisabledByPolicy) {
-  // By default, data types are enabled, and not policy-controlled.
-  ASSERT_TRUE(
-      sync_prefs_->GetSelectedOsTypes().Has(UserSelectableOsType::kOsApps));
-  ASSERT_FALSE(
-      sync_prefs_->IsOsTypeManagedByPolicy(UserSelectableOsType::kOsApps));
-  ASSERT_TRUE(sync_prefs_->GetSelectedOsTypes().Has(
-      UserSelectableOsType::kOsPreferences));
-  ASSERT_FALSE(sync_prefs_->IsOsTypeManagedByPolicy(
-      UserSelectableOsType::kOsPreferences));
-
-  // Set up a policy to disable apps.
-  PrefValueMap policy_prefs;
-  SyncPrefs::SetOsTypeDisabledByPolicy(&policy_prefs,
-                                       UserSelectableOsType::kOsApps);
-  // Copy the policy prefs map over into the PrefService.
-  for (const auto& policy_pref : policy_prefs) {
-    pref_service_.SetManagedPref(policy_pref.first, policy_pref.second.Clone());
-  }
-
-  // The policy should take effect and disable apps.
-  EXPECT_FALSE(
-      sync_prefs_->GetSelectedOsTypes().Has(UserSelectableOsType::kOsApps));
-  EXPECT_TRUE(
-      sync_prefs_->IsOsTypeManagedByPolicy(UserSelectableOsType::kOsApps));
-  // Other types should be unaffected.
-  EXPECT_TRUE(sync_prefs_->GetSelectedOsTypes().Has(
-      UserSelectableOsType::kOsPreferences));
-  EXPECT_FALSE(sync_prefs_->IsOsTypeManagedByPolicy(
-      UserSelectableOsType::kOsPreferences));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(SyncPrefsTest, PassphrasePromptMutedProductVersion) {
   EXPECT_EQ(0, sync_prefs_->GetPassphrasePromptMutedProductVersion());
@@ -1406,23 +1249,14 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_DefaultState) {
   default_enabled_types.Put(UserSelectableType::kReadingList);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // History, Tabs and Saved Tab Groups are enabled by default on ChromeOS.
-  default_enabled_types.Put(UserSelectableType::kHistory);
-  default_enabled_types.Put(UserSelectableType::kTabs);
-  default_enabled_types.Put(UserSelectableType::kSavedTabGroups);
-#endif
-
   ASSERT_TRUE(SyncPrefs(&pref_service_)
                   .GetSelectedTypesForAccount(gaia_id_)
                   .HasAll(default_enabled_types));
-#if !BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(
       SyncPrefs(&pref_service_)
           .GetSelectedTypesForAccount(gaia_id_)
           .HasAny({UserSelectableType::kHistory, UserSelectableType::kTabs,
                    UserSelectableType::kSavedTabGroups}));
-#endif
 
   SyncPrefs::MigrateGlobalDataTypePrefsToAccount(&pref_service_, gaia_id_);
 
@@ -1475,12 +1309,10 @@ TEST_F(SyncPrefsMigrationTest, GlobalToAccount_CustomState) {
                   .GetSelectedTypesForAccount(gaia_id_)
                   .HasAll(pre_migration_selected_types));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(
       SyncPrefs(&pref_service_)
           .GetSelectedTypesForAccount(gaia_id_)
           .HasAny({UserSelectableType::kHistory, UserSelectableType::kTabs}));
-#endif
 
   SyncPrefs::MigrateGlobalDataTypePrefsToAccount(&pref_service_, gaia_id_);
 
@@ -1667,11 +1499,7 @@ TEST_F(SyncPrefsMigrationTest,
 TEST_F(SyncPrefsMigrationTest,
        GlobalToAccount_ExplicitSigninForExtensionsEnabled_SyncEverything) {
   base::test::ScopedFeatureList feature_list(
-#if BUILDFLAG(IS_CHROMEOS)
-      syncer::kReplaceSyncPromosWithSignInPromos
-#else
       syncer::kReplaceSyncPromosWithSigninPromosNewSignin
-#endif  // BUILDFLAG(IS_CHROMEOS)
   );
 
   // All types including kExtensions are selected in the global prefs.
@@ -1694,11 +1522,7 @@ TEST_F(SyncPrefsMigrationTest,
 TEST_F(SyncPrefsMigrationTest,
        GlobalToAccount_ExplicitSigninForExtensionsEnabled_TypeEnabled) {
   base::test::ScopedFeatureList feature_list(
-#if BUILDFLAG(IS_CHROMEOS)
-      syncer::kReplaceSyncPromosWithSignInPromos
-#else
       syncer::kReplaceSyncPromosWithSigninPromosNewSignin
-#endif  // BUILDFLAG(IS_CHROMEOS)
   );
 
   // All types including kExtensions are selected in the global prefs.
@@ -1721,11 +1545,7 @@ TEST_F(SyncPrefsMigrationTest,
 TEST_F(SyncPrefsMigrationTest,
        GlobalToAccount_ExplicitSigninForExtensionsEnabled_TypeDisabled) {
   base::test::ScopedFeatureList feature_list(
-#if BUILDFLAG(IS_CHROMEOS)
-      syncer::kReplaceSyncPromosWithSignInPromos
-#else
       syncer::kReplaceSyncPromosWithSigninPromosNewSignin
-#endif  // BUILDFLAG(IS_CHROMEOS)
   );
 
   // All types except for kExtensions are selected in the global prefs.

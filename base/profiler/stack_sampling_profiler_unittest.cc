@@ -50,10 +50,7 @@
 // initialized.
 #if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && defined(ARCH_CPU_64_BITS)) || \
     (BUILDFLAG(IS_ANDROID) &&                                                \
-     (BUILDFLAG(ENABLE_ARM_CFI_TABLE) || defined(ARCH_CPU_ARM64))) ||        \
-    (BUILDFLAG(IS_CHROMEOS) &&                                               \
-     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64)) &&                \
-     !defined(MEMORY_SANITIZER))
+     (BUILDFLAG(ENABLE_ARM_CFI_TABLE) || defined(ARCH_CPU_ARM64)))
 #define STACK_SAMPLING_PROFILER_SUPPORTED 1
 #endif
 
@@ -192,7 +189,7 @@ void TestProfileBuilder::OnProfileCompleted(TimeDelta profile_duration,
 // is insufficient to ensure it's been unloaded.
 void SynchronousUnloadNativeLibrary(NativeLibrary library) {
   UnloadNativeLibrary(library);
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
 // Unloading a library on Mac and Android is synchronous.
 #else
   NOTIMPLEMENTED();
@@ -444,9 +441,8 @@ class StackSamplingProfilerTest : public testing::Test {
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
-#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) ||   \
-    (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_ANDROID)) || \
-    (BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE))
+#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || \
+    (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_ANDROID))
 #define MAYBE_Basic DISABLED_Basic
 #else
 #define MAYBE_Basic Basic
@@ -506,9 +502,7 @@ class TestAuxUnwinder : public Unwinder {
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
-#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || \
-    BUILDFLAG(IS_ANDROID) ||                               \
-    (BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE))
+#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_Alloca DISABLED_Alloca
 #else
 #define MAYBE_Alloca Alloca
@@ -537,8 +531,7 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_Alloca) {
 #if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) ||         \
     BUILDFLAG(IS_IOS) ||                                           \
     (BUILDFLAG(IS_ANDROID) && BUILDFLAG(EXCLUDE_UNWIND_TABLES)) || \
-    (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)) ||       \
-    (BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE))
+    (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER))
 #define MAYBE_OtherLibrary DISABLED_OtherLibrary
 #else
 #define MAYBE_OtherLibrary OtherLibrary
@@ -567,8 +560,7 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_OtherLibrary) {
 // ChromeOS device.
 #if BUILDFLAG(IS_APPLE) ||                                         \
     (BUILDFLAG(IS_ANDROID) && BUILDFLAG(EXCLUDE_UNWIND_TABLES)) || \
-    (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)) ||       \
-    (BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE))
+    (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER))
 #define MAYBE_UnloadingLibrary DISABLED_UnloadingLibrary
 #else
 #define MAYBE_UnloadingLibrary UnloadingLibrary
@@ -585,8 +577,7 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_UnloadingLibrary) {
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
 #if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) ||          \
-    (BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE))
+    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 #define MAYBE_UnloadedLibrary DISABLED_UnloadedLibrary
 #else
 #define MAYBE_UnloadedLibrary UnloadedLibrary

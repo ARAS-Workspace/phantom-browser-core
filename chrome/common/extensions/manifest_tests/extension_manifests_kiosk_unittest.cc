@@ -66,45 +66,9 @@ TEST_F(ExtensionManifestKioskModeTest, KioskEnabledDefaultRequired) {
 }
 
 // 'kiosk_only' key should be set only from ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ExtensionManifestKioskModeTest, KioskOnlyPlatformApp) {
-  scoped_refptr<Extension> extension(
-      LoadAndExpectSuccess("kiosk_only_platform_app.json"));
-  EXPECT_TRUE(KioskModeInfo::IsKioskOnly(extension.get()));
-}
-
-TEST_F(ExtensionManifestKioskModeTest, KioskOnlyInvalid) {
-  LoadAndExpectError("kiosk_only_invalid.json",
-                     manifest_errors::kInvalidKioskOnly);
-}
-
-TEST_F(ExtensionManifestKioskModeTest, KioskOnlyButNotEnabled) {
-  LoadAndExpectError("kiosk_only_not_enabled.json",
-                     manifest_errors::kInvalidKioskOnlyButNotEnabled);
-}
-
-TEST_F(ExtensionManifestKioskModeTest, KioskOnlyHostedApp) {
-  scoped_refptr<Extension> extension(
-      LoadAndExpectSuccess("kiosk_only_hosted_app.json"));
-  EXPECT_FALSE(KioskModeInfo::IsKioskOnly(extension.get()));
-}
-
-TEST_F(ExtensionManifestKioskModeTest, KioskOnlyPackagedApp) {
-  scoped_refptr<Extension> extension(
-      LoadAndExpectSuccess("kiosk_only_packaged_app.json"));
-  EXPECT_FALSE(KioskModeInfo::IsKioskOnly(extension.get()));
-}
-
-TEST_F(ExtensionManifestKioskModeTest, KioskOnlyExtension) {
-  scoped_refptr<Extension> extension(
-      LoadAndExpectSuccess("kiosk_only_extension.json"));
-  EXPECT_FALSE(KioskModeInfo::IsKioskOnly(extension.get()));
-}
-#else
 TEST_F(ExtensionManifestKioskModeTest, KioskOnlyFromNonChromeos) {
   LoadAndExpectWarning("kiosk_only_platform_app.json",
                        "'kiosk_only' is not allowed for specified platform.");
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace extensions

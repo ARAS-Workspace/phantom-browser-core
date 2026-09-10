@@ -29,10 +29,8 @@ class ConfigurationPolicyProvider;
 class LocalTestPolicyProvider;
 class ProxyPolicyProvider;
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class ChromeBrowserCloudManagementController;
 class MachineLevelUserCloudPolicyManager;
-#endif
 
 // Extends BrowserPolicyConnector with the setup shared among the desktop
 // implementations and Android.
@@ -84,7 +82,6 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
   // at the right time.
   void MaybeApplyLocalTestPolicies(PrefService* local_state);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   ChromeBrowserCloudManagementController*
   chrome_browser_cloud_management_controller() {
     return chrome_browser_cloud_management_controller_.get();
@@ -118,7 +115,6 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
   // provider.
   void SetProxyPolicyProviderForTesting(
       ProxyPolicyProvider* proxy_policy_provider);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // BrowserPolicyConnector:
   // Command line switch only supports Dev and Canary channel, trunk and
@@ -142,7 +138,6 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
   // Returns the policy provider that supplies platform policies.
   std::unique_ptr<ConfigurationPolicyProvider> CreatePlatformProvider();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   std::unique_ptr<ChromeBrowserCloudManagementController>
       chrome_browser_cloud_management_controller_;
 
@@ -176,7 +171,6 @@ class ChromeBrowserPolicyConnector : public BrowserPolicyConnector {
   // is created. Owned by the proxy policy provider.
   raw_ptr<MachineLevelUserCloudPolicyManager>
       machine_level_user_cloud_policy_manager_ = nullptr;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
   std::unique_ptr<android::PolicyCacheUpdater> policy_cache_updater_;

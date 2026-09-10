@@ -34,11 +34,6 @@
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "third_party/webrtc/modules/desktop_capture/desktop_capture_types.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/policy/dlp/test/mock_dlp_content_manager.h"
-#include "ui/aura/window.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/permissions/system/system_media_capture_permissions_mac.h"
 #endif
@@ -174,12 +169,6 @@ class DesktopCaptureAccessHandlerTest : public ChromeRenderViewHostTestHarness {
   const DesktopCaptureAccessHandler::RequestsQueues& GetRequestQueues() {
     return access_handler_->pending_requests_;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetPrimaryRootWindow(aura::Window* window) {
-    access_handler_->primary_root_window_for_testing_ = window;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
  protected:
   raw_ptr<FakeDesktopMediaPickerFactory, DanglingUntriaged> picker_factory_;
@@ -407,13 +396,6 @@ TEST_F(DesktopCaptureAccessHandlerTest, ScreenCaptureAccessSuccess) {
   extensions::ExtensionBuilder extensionBuilder(kComponentExtension);
   extensionBuilder.SetLocation(extensions::mojom::ManifestLocation::kComponent);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<aura::Window> primary_root_window =
-      std::make_unique<aura::Window>(/*delegate=*/nullptr);
-  primary_root_window->Init(ui::LAYER_NOT_DRAWN);
-  SetPrimaryRootWindow(primary_root_window.get());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   blink::mojom::MediaStreamRequestResult result;
   blink::mojom::StreamDevices devices;
 
@@ -424,236 +406,6 @@ TEST_F(DesktopCaptureAccessHandlerTest, ScreenCaptureAccessSuccess) {
   EXPECT_EQ(blink::mojom::MediaStreamRequestResult::OK, result);
   EXPECT_TRUE(devices.video_device.has_value());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(DesktopCaptureAccessHandlerTest, ScreenCaptureAccessDlpRestricted) {
-  // Setup Data Leak Prevention restriction.
-  policy::MockDlpContentManager mock_dlp_content_manager;
-  policy::ScopedDlpContentObserverForTesting scoped_dlp_content_manager(
-      &mock_dlp_content_manager);
-  EXPECT_CALL(mock_dlp_content_manager, CheckScreenShareRestriction)
-      .WillOnce([&](const content::DesktopMediaID& media_id,
-                    const std::u16string& application_title,
-                    base::OnceCallback<void(bool)> callback) {
-        std::move(callback).Run(/*should_proceed=*/false);
-      });
-
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kEnableUserMediaScreenCapturing);
-
-  extensions::ExtensionBuilder extensionBuilder(kComponentExtension);
-  extensionBuilder.SetLocation(extensions::mojom::ManifestLocation::kComponent);
-  std::unique_ptr<aura::Window> primary_root_window =
-      std::make_unique<aura::Window>(/*delegate=*/nullptr);
-  primary_root_window->Init(ui::LAYER_NOT_DRAWN);
-  SetPrimaryRootWindow(primary_root_window.get());
-
-  blink::mojom::MediaStreamRequestResult result =
-      blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED;
-  blink::mojom::StreamDevices devices;
-
-  ProcessGenerateStreamRequest(/*requested_video_device_ids=*/{}, GURL(kOrigin),
-                               extensionBuilder.Build().get(), &result,
-                               &devices);
-
-  EXPECT_EQ(blink::mojom::MediaStreamRequestResult::DLP_PERMISSION_DENIED,
-            result);
-  EXPECT_FALSE(devices.video_device.has_value());
-}
-
-TEST_F(DesktopCaptureAccessHandlerTest, ScreenCaptureAccessDlpNotRestricted) {
-  // Setup Data Leak Prevention restriction.
-  policy::MockDlpContentManager mock_dlp_content_manager;
-  policy::ScopedDlpContentObserverForTesting scoped_dlp_content_manager(
-      &mock_dlp_content_manager);
-  EXPECT_CALL(mock_dlp_content_manager, CheckScreenShareRestriction)
-      .WillOnce([&](const content::DesktopMediaID& media_id,
-                    const std::u16string& application_title,
-                    base::OnceCallback<void(bool)> callback) {
-        std::move(callback).Run(/*should_proceed=*/true);
-      });
-
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kEnableUserMediaScreenCapturing);
-
-  extensions::ExtensionBuilder extensionBuilder(kComponentExtension);
-  extensionBuilder.SetLocation(extensions::mojom::ManifestLocation::kComponent);
-  std::unique_ptr<aura::Window> primary_root_window =
-      std::make_unique<aura::Window>(/*delegate=*/nullptr);
-  primary_root_window->Init(ui::LAYER_NOT_DRAWN);
-  SetPrimaryRootWindow(primary_root_window.get());
-
-  blink::mojom::MediaStreamRequestResult result =
-      blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED;
-  blink::mojom::StreamDevices devices;
-
-  ProcessGenerateStreamRequest(/*requested_video_device_id=*/{}, GURL(kOrigin),
-                               extensionBuilder.Build().get(), &result,
-                               &devices);
-
-  EXPECT_EQ(blink::mojom::MediaStreamRequestResult::OK, result);
-  EXPECT_TRUE(devices.video_device.has_value());
-}
-
-TEST_F(DesktopCaptureAccessHandlerTest,
-       ScreenCaptureAccessDlpWebContentsDestroyed) {
-  // Setup Data Leak Prevention restriction.
-  policy::MockDlpContentManager mock_dlp_content_manager;
-  policy::ScopedDlpContentObserverForTesting scoped_dlp_content_manager(
-      &mock_dlp_content_manager);
-  EXPECT_CALL(mock_dlp_content_manager, CheckScreenShareRestriction)
-      .Times(1)
-      .WillOnce([&](const content::DesktopMediaID& media_id,
-                    const std::u16string& application_title,
-                    base::OnceCallback<void(bool)> callback) {
-        DeleteContents();
-        std::move(callback).Run(/*should_proceed=*/false);
-      });
-
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kEnableUserMediaScreenCapturing);
-
-  extensions::ExtensionBuilder extensionBuilder(kComponentExtension);
-  extensionBuilder.SetLocation(extensions::mojom::ManifestLocation::kComponent);
-  std::unique_ptr<aura::Window> primary_root_window =
-      std::make_unique<aura::Window>(/*delegate=*/nullptr);
-  primary_root_window->Init(ui::LAYER_NOT_DRAWN);
-  SetPrimaryRootWindow(primary_root_window.get());
-
-  blink::mojom::MediaStreamRequestResult result =
-      blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED;
-  blink::mojom::StreamDevices devices;
-
-  ProcessGenerateStreamRequest(/*requested_video_device_id=*/{}, GURL(kOrigin),
-                               extensionBuilder.Build().get(), &result,
-                               &devices, /*expect_result=*/false);
-
-  EXPECT_EQ(blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED, result);
-  EXPECT_FALSE(devices.video_device.has_value());
-}
-
-TEST_F(DesktopCaptureAccessHandlerTest, GenerateStreamDlpRestricted) {
-  // Setup Data Leak Prevention restriction.
-  policy::MockDlpContentManager mock_dlp_content_manager;
-  policy::ScopedDlpContentObserverForTesting scoped_dlp_content_manager(
-      &mock_dlp_content_manager);
-  EXPECT_CALL(mock_dlp_content_manager, CheckScreenShareRestriction)
-      .Times(1)
-      .WillOnce([](const content::DesktopMediaID& media_id,
-                   const std::u16string& application_title,
-                   base::OnceCallback<void(bool)> callback) {
-        std::move(callback).Run(/*should_proceed=*/false);
-      });
-
-  const std::string id =
-      content::DesktopStreamsRegistry::GetInstance()->RegisterStream(
-          web_contents()
-              ->GetPrimaryMainFrame()
-              ->GetProcess()
-              ->GetDeprecatedID(),
-          web_contents()->GetPrimaryMainFrame()->GetRoutingID(),
-          url::Origin::Create(GURL(kOrigin)),
-          content::DesktopMediaID(content::DesktopMediaID::TYPE_SCREEN,
-                                  content::DesktopMediaID::kFakeId),
-          content::DesktopStreamRegistryType::kRegistryStreamTypeDesktop);
-  blink::mojom::MediaStreamRequestResult result =
-      blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED;
-  blink::mojom::StreamDevices devices;
-
-  ProcessGenerateStreamRequest({id}, GURL(kOrigin), /*extension=*/nullptr,
-                               &result, &devices);
-
-  EXPECT_EQ(blink::mojom::MediaStreamRequestResult::DLP_PERMISSION_DENIED,
-            result);
-  EXPECT_FALSE(devices.video_device.has_value());
-}
-
-TEST_F(DesktopCaptureAccessHandlerTest, GenerateStreamDlpNotRestricted) {
-  // Setup Data Leak Prevention restriction.
-  policy::MockDlpContentManager mock_dlp_content_manager;
-  policy::ScopedDlpContentObserverForTesting scoped_dlp_content_manager(
-      &mock_dlp_content_manager);
-  EXPECT_CALL(mock_dlp_content_manager, CheckScreenShareRestriction)
-      .Times(1)
-      .WillOnce([](const content::DesktopMediaID& media_id,
-                   const std::u16string& application_title,
-                   base::OnceCallback<void(bool)> callback) {
-        std::move(callback).Run(/*should_proceed=*/true);
-      });
-
-  const std::string id =
-      content::DesktopStreamsRegistry::GetInstance()->RegisterStream(
-          web_contents()
-              ->GetPrimaryMainFrame()
-              ->GetProcess()
-              ->GetDeprecatedID(),
-          web_contents()->GetPrimaryMainFrame()->GetRoutingID(),
-          url::Origin::Create(GURL(kOrigin)),
-          content::DesktopMediaID(content::DesktopMediaID::TYPE_SCREEN,
-                                  content::DesktopMediaID::kFakeId),
-          content::DesktopStreamRegistryType::kRegistryStreamTypeDesktop);
-  blink::mojom::MediaStreamRequestResult result =
-      blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED;
-  blink::mojom::StreamDevices devices;
-
-  ProcessGenerateStreamRequest({id}, GURL(kOrigin), /*extension=*/nullptr,
-                               &result, &devices);
-
-  EXPECT_EQ(blink::mojom::MediaStreamRequestResult::OK, result);
-  EXPECT_TRUE(devices.video_device.has_value());
-}
-
-TEST_F(DesktopCaptureAccessHandlerTest, ChangeSourceDlpRestricted) {
-  // Setup Data Leak Prevention restriction.
-  policy::MockDlpContentManager mock_dlp_content_manager;
-  policy::ScopedDlpContentObserverForTesting scoped_dlp_content_manager(
-      &mock_dlp_content_manager);
-  EXPECT_CALL(mock_dlp_content_manager, CheckScreenShareRestriction)
-      .Times(1)
-      .WillOnce([](const content::DesktopMediaID& media_id,
-                   const std::u16string& application_title,
-                   base::OnceCallback<void(bool)> callback) {
-        std::move(callback).Run(/*should_proceed=*/false);
-      });
-
-  blink::mojom::MediaStreamRequestResult result =
-      blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED;
-  blink::mojom::StreamDevices stream_devices;
-  ProcessDeviceUpdateRequest(
-      content::DesktopMediaID(content::DesktopMediaID::TYPE_SCREEN,
-                              content::DesktopMediaID::kFakeId),
-      &result, &stream_devices, blink::MEDIA_DEVICE_UPDATE,
-      /*request audio=*/false);
-  EXPECT_EQ(blink::mojom::MediaStreamRequestResult::DLP_PERMISSION_DENIED,
-            result);
-  EXPECT_EQ(0u, blink::CountDevices(stream_devices));
-}
-
-TEST_F(DesktopCaptureAccessHandlerTest, ChangeSourceDlpNotRestricted) {
-  // Setup Data Leak Prevention restriction.
-  policy::MockDlpContentManager mock_dlp_content_manager;
-  policy::ScopedDlpContentObserverForTesting scoped_dlp_content_manager(
-      &mock_dlp_content_manager);
-  EXPECT_CALL(mock_dlp_content_manager, CheckScreenShareRestriction)
-      .Times(1)
-      .WillOnce([](const content::DesktopMediaID& media_id,
-                   const std::u16string& application_title,
-                   base::OnceCallback<void(bool)> callback) {
-        std::move(callback).Run(/*should_proceed=*/true);
-      });
-
-  blink::mojom::MediaStreamRequestResult result =
-      blink::mojom::MediaStreamRequestResult::NOT_SUPPORTED;
-  blink::mojom::StreamDevices stream_devices;
-  ProcessDeviceUpdateRequest(
-      content::DesktopMediaID(content::DesktopMediaID::TYPE_SCREEN,
-                              content::DesktopMediaID::kFakeId),
-      &result, &stream_devices, blink::MEDIA_DEVICE_UPDATE,
-      /*request audio=*/false);
-  EXPECT_EQ(blink::mojom::MediaStreamRequestResult::OK, result);
-  EXPECT_EQ(1u, blink::CountDevices(stream_devices));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_MAC)
 TEST_F(DesktopCaptureAccessHandlerTest, FeedbackUIRequestWithPickerEnabled) {

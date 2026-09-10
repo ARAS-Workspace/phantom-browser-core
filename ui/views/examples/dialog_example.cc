@@ -396,9 +396,7 @@ void DialogExample::OnPerformAction() {
                  GetModalType() != ui::mojom::ModalType::kChild) &&
                 (!bubble_->GetChecked() ||
                  GetModalType() != ui::mojom::ModalType::kWindow);
-#if !BUILDFLAG(IS_CHROMEOS)
   enable = enable && GetModalType() != ui::mojom::ModalType::kSystem;
-#endif
   show_->SetEnabled(enable);
   if (!enable && GetModalType() == ui::mojom::ModalType::kChild) {
     PrintStatus("ModalType::kChild can't be used with non-bubbles.");

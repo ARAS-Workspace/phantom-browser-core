@@ -141,23 +141,6 @@ class SigninHeaderHelperTest : public testing::Test {
   scoped_refptr<content_settings::CookieSettings> cookie_settings_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests that Mirror request is returned on Chrome OS for Public Sessions (no
-// account id).
-TEST_F(SigninHeaderHelperTest, TestMirrorRequestNoAccountIdChromeOS) {
-  account_consistency_ = AccountConsistencyMethod::kMirror;
-  CheckMirrorHeaderRequest(
-      GURL("https://docs.google.com"), GaiaId(),
-      /*is_child_account=*/Tribool::kUnknown,
-      "source=TestSource,mode=0,enable_account_consistency=true,"
-      "consistency_enabled_by_default=" +
-          consistency_enabled_by_default_value());
-  CheckMirrorCookieRequest(GURL("https://docs.google.com"), GaiaId(),
-                           "mode=0:enable_account_consistency=true:"
-                           "consistency_enabled_by_default=" +
-                               consistency_enabled_by_default_value());
-}
-#else  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_ANDROID)
 // Tests that eligible_for_consistency request is returned on Android
 // when reaching to Gaia origin and there's no primary account.
@@ -201,7 +184,6 @@ TEST_F(SigninHeaderHelperTest, TestNoMirrorRequestNoAccountId) {
                            /*is_child_account=*/Tribool::kUnknown, "");
   CheckMirrorCookieRequest(GURL("https://docs.google.com"), GaiaId(), "");
 }
-#endif
 
 // Tests that no Mirror request is returned for youtubekids.com.
 //

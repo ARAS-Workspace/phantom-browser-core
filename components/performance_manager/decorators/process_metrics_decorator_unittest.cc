@@ -166,7 +166,7 @@ class ProcessMetricsDecoratorTest : public GraphTestHarness {
                       process_node->GetWorkerNodes().size();
     EXPECT_EQ(resident_set, process_node->GetResidentSet());
     EXPECT_EQ(private_footprint, process_node->GetPrivateFootprint());
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
     EXPECT_EQ(private_swap, process_node->GetPrivateSwap());
 #endif
     for (const auto* frame : process_node->GetFrameNodes()) {

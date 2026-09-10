@@ -51,14 +51,6 @@
 #include "net/base/filename_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/feature_list.h"
-#include "components/app_restore/app_launch_info.h"
-#include "components/app_restore/full_restore_utils.h"
-#include "components/user_manager/user_manager.h"
-#include "extensions/common/extension_features.h"
-#endif
-
 namespace app_runtime = extensions::api::app_runtime;
 
 using content::BrowserThread;
@@ -379,10 +371,6 @@ void LaunchPlatformAppWithCommandLineAndLaunchId(
   // check in case this scenario does occur.
   if (extensions::KioskModeInfo::IsKioskOnly(app)) {
     bool in_kiosk_mode = false;
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager::UserManager* user_manager = user_manager::UserManager::Get();
-    in_kiosk_mode = user_manager && user_manager->IsLoggedInAsKioskChromeApp();
-#endif
     if (!in_kiosk_mode) {
       NOTREACHED() << "App with 'kiosk_only' attribute must be run in "
                    << " ChromeOS kiosk mode.";
@@ -449,11 +437,6 @@ void LaunchPlatformAppWithFileHandler(
     const Extension* app,
     const std::string& handler_id,
     const std::vector<base::FilePath>& entry_paths) {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto launch_info = std::make_unique<app_restore::AppLaunchInfo>(
-      app->id(), handler_id, entry_paths);
-  full_restore::SaveAppLaunchInfo(context->GetPath(), std::move(launch_info));
-#endif
 
   scoped_refptr<PlatformAppPathLauncher> launcher =
       new PlatformAppPathLauncher(context, app, entry_paths);

@@ -202,16 +202,6 @@ TEST(ChromePaths, DefaultUserDataDir) {
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(ChromePaths, UserMediaDirectories) {
-  base::FilePath path;
-  // Chrome OS does not support custom media directories.
-  EXPECT_FALSE(GetUserMusicDirectory(&path));
-  EXPECT_FALSE(GetUserPicturesDirectory(&path));
-  EXPECT_FALSE(GetUserVideosDirectory(&path));
-}
-#endif
-
 TEST(ChromePaths, DefaultUserDataDirectory) {
   EXPECT_TRUE(IsUsingDefaultDataDirectory().value());
 

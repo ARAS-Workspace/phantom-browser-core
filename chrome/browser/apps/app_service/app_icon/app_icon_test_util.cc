@@ -15,11 +15,6 @@
 #include "ui/gfx/image/image_skia_rep.h"
 #include "ui/gfx/image/image_unittest_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/test/base/testing_profile.h"
-#include "components/services/app_service/public/cpp/app_launch_params.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace apps {
 
 void EnsureRepresentationsLoaded(gfx::ImageSkia& output_image_skia) {
@@ -92,39 +87,5 @@ gfx::ImageSkia CreateSquareIconImageSkia(int size_dp, SkColor solid_color) {
   }
   return image;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-FakeIconLoader::FakeIconLoader(apps::AppServiceProxy* proxy) : proxy_(proxy) {}
-
-std::unique_ptr<apps::IconLoader::Releaser> FakeIconLoader::LoadIconFromIconKey(
-    const std::string& id,
-    const apps::IconKey& icon_key,
-    apps::IconType icon_type,
-    int32_t size_in_dip,
-    bool allow_placeholder_icon,
-    apps::LoadIconCallback callback) {
-  if (proxy_) {
-    proxy_->ReadIconsForTesting(proxy_->AppRegistryCache().GetAppType(id), id,
-                                size_in_dip, icon_key, icon_type,
-                                std::move(callback));
-  }
-  return nullptr;
-}
-
-FakePublisherForIconTest::FakePublisherForIconTest(apps::AppServiceProxy* proxy,
-                                                   apps::AppType app_type)
-    : AppPublisher(proxy) {
-  RegisterPublisher(app_type);
-}
-
-void FakePublisherForIconTest::GetCompressedIconData(
-    const std::string& app_id,
-    int32_t size_in_dip,
-    ui::ResourceScaleFactor scale_factor,
-    apps::LoadIconCallback callback) {
-  apps::GetWebAppCompressedIconData(proxy()->profile(), app_id, size_in_dip,
-                                    scale_factor, std::move(callback));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace apps

@@ -203,19 +203,6 @@ class VIZ_SERVICE_EXPORT SkiaOutputSurface : public OutputSurface,
 
   virtual bool SupportsBGRA() const = 0;
 
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-  virtual void DetileOverlay(gpu::Mailbox input,
-                             const gfx::Size& input_visible_size,
-                             gpu::SyncToken input_sync_token,
-                             gpu::Mailbox output,
-                             const gfx::RectF& display_rect,
-                             const gfx::RectF& crop_rect,
-                             gfx::OverlayTransform transform,
-                             bool is_10bit) = 0;
-
-  virtual void CleanupImageProcessor() = 0;
-#endif
 };
 
 }  // namespace viz

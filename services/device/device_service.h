@@ -52,11 +52,7 @@
 #include "services/device/public/mojom/pressure_manager.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "services/device/media_transfer_protocol/mtp_device_manager.h"
-#endif
-
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
 #include "services/device/public/mojom/input_service.mojom.h"
 #endif
 
@@ -174,7 +170,7 @@ class DeviceService : public mojom::DeviceService {
   void BindGeolocationInternals(
       mojo::PendingReceiver<mojom::GeolocationInternals> receiver) override;
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
   void BindInputDeviceManager(
       mojo::PendingReceiver<mojom::InputDeviceManager> receiver) override;
 #endif
@@ -198,11 +194,6 @@ class DeviceService : public mojom::DeviceService {
 
   void BindHidManager(
       mojo::PendingReceiver<mojom::HidManager> receiver) override;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void BindMtpManager(
-      mojo::PendingReceiver<mojom::MtpManager> receiver) override;
-#endif
 
   void BindPowerMonitor(
       mojo::PendingReceiver<mojom::PowerMonitor> receiver) override;
@@ -274,9 +265,6 @@ class DeviceService : public mojom::DeviceService {
   base::SequenceBound<SerialPortManagerImpl> serial_port_manager_;
 #endif  // defined(IS_SERIAL_ENABLED_PLATFORM)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<MtpDeviceManager> mtp_device_manager_;
-#endif
 };
 
 }  // namespace device

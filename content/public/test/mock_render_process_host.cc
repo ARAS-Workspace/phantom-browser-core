@@ -650,14 +650,6 @@ void MockRenderProcessHost::WriteIntoTrace(
   proto->set_id(GetID().value());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void MockRenderProcessHost::ReinitializeLogging(
-    uint32_t logging_dest,
-    base::ScopedFD log_file_descriptor) {
-  NOTIMPLEMENTED();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 uint64_t MockRenderProcessHost::GetPrivateMemoryFootprint() {
   return 0;
 }

@@ -120,7 +120,7 @@ IN_PROC_BROWSER_TEST_F(MultiContentsViewDropTargetControllerBrowserTest,
 
 // On Linux  and ChromeOS there are test-only discreptencies between the screen
 // width and the maximized browser width, so these test need to be skipped.
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_F(MultiContentsViewDropTargetControllerBrowserTest,
                        OnTabDragUpdatedMaximizedWithStartPoint) {
   SimulateTabDrag(

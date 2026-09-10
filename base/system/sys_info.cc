@@ -82,7 +82,7 @@ bool SysInfo::IsLowEndDevice() {
   return IsLowEndDeviceImpl();
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -169,14 +169,14 @@ bool SysInfo::Is6GbDevice() {
   return GetCachedSystemRamBucketizedSize() == BucketizedSize::k6Gb;
 }
 
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/40264947): This method is for chromium native code.
 // We need to update the java-side code, i.e.
 // base/android/java/src/org/chromium/base/SysUtils.java,
 // and to make the selected components in java to see this feature.
 bool SysInfo::IsLowEndDeviceOrPartialLowEndModeEnabled() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   return base::SysInfo::IsLowEndDevice() ||
          IsPartialLowEndModeOnMidRangeDevicesEnabled() ||
          IsPartialLowEndModeOn3GbDevicesEnabled();
@@ -187,7 +187,7 @@ bool SysInfo::IsLowEndDeviceOrPartialLowEndModeEnabled() {
 
 bool SysInfo::IsLowEndDeviceOrPartialLowEndModeEnabled(
     const FeatureParam<bool>& param_for_exclusion) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   return base::SysInfo::IsLowEndDevice() ||
          ((IsPartialLowEndModeOnMidRangeDevicesEnabled() ||
            IsPartialLowEndModeOn3GbDevicesEnabled()) &&
@@ -233,7 +233,7 @@ bool SysInfo::IsLowEndDeviceImpl() {
   return instance.value();
 }
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
 std::string SysInfo::HardwareModelName() {
   return std::string();
 }
@@ -246,7 +246,7 @@ std::string SysInfo::SocManufacturer() {
 #endif
 
 void SysInfo::GetHardwareInfo(base::OnceCallback<void(HardwareInfo)> callback) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   constexpr base::TaskTraits kTraits = {base::MayBlock()};
 #else
   constexpr base::TaskTraits kTraits = {};

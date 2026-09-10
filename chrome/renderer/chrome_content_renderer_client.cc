@@ -186,9 +186,9 @@
 #include "url/origin.h"
 #include "v8/include/v8-isolate.h"
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/renderer/sandbox_status_extension_android.h"
@@ -359,10 +359,8 @@ ChromeContentRendererClient::ChromeContentRendererClient()
   // The profiler can't start before the sandbox is initialized on
   // ChromeOS due to ChromeOS's sandbox initialization code's use of
   // AssertSingleThreaded().
-#if !BUILDFLAG(IS_CHROMEOS)
   main_thread_profiler_ =
       sampling_profiler::ThreadProfiler::CreateAndStartOnMainThread();
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   EnsureExtensionsClientInitialized();
   ChromeExtensionsRendererClient::Create();
@@ -420,10 +418,10 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   extensions_renderer_client->RenderThreadStarted();
   WebSecurityPolicy::RegisterURLSchemeAsExtension(
       WebString::FromAscii(extensions::kExtensionScheme));
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   WebSecurityPolicy::RegisterURLSchemeAsIsolatedApp(
       WebString::FromAscii(webapps::kIsolatedAppScheme));
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   WebSecurityPolicy::RegisterURLSchemeAsCodeCacheWithHashing(
       WebString::FromAscii(extensions::kExtensionScheme));
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -483,7 +481,7 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   WebString chrome_search_scheme(
       WebString::FromAscii(chrome::kChromeSearchScheme));
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // IWAs can be enabled by either the feature flag or by enterprise
   // policy. In either case the kEnableIsolatedWebAppsInRenderer flag is passed
   // to the renderer process.
@@ -502,7 +500,7 @@ void ChromeContentRendererClient::RenderThreadStarted() {
     WebSecurityPolicy::RegisterURLSchemeAsAllowedForReferrer(
         isolated_app_scheme);
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // The Instant process can only display the content but not read it. Other
   // processes can't display it or read it. (see http://crbug.com/40309067 for
@@ -536,7 +534,7 @@ void ChromeContentRendererClient::RenderThreadStarted() {
   // TODO(nyquist): Add test to ensure this happens when the flag is set.
   WebSecurityPolicy::RegisterURLSchemeAsDisplayIsolated(dom_distiller_scheme);
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(features::kGoogleChromeScheme)) {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
     WebSecurityPolicy::RegisterURLSchemeAsDirectLaunch(
@@ -1160,11 +1158,6 @@ void ChromeContentRendererClient::PrepareErrorPageForHttpStatusError(
 }
 
 void ChromeContentRendererClient::PostSandboxInitialized() {
-#if BUILDFLAG(IS_CHROMEOS)
-  DCHECK(!main_thread_profiler_);
-  main_thread_profiler_ =
-      sampling_profiler::ThreadProfiler::CreateAndStartOnMainThread();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void ChromeContentRendererClient::PostIOThreadCreated(
@@ -1413,7 +1406,7 @@ void ChromeContentRendererClient::
 
 // Web Share is conditionally enabled here in chrome/, to avoid it
 // being made available in WebView or Linux.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
   blink::WebRuntimeFeatures::EnableWebShare(true);
 #endif
 

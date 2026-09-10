@@ -13,14 +13,8 @@ namespace {
 const int kWindowTilePixels = WindowSizer::kWindowTilePixels;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/445541616): Reenable the test.
-#define MAYBE_DefaultSizeCase DISABLED_DefaultSizeCase
-#define MAYBE_PersistedBoundsCase DISABLED_PersistedBoundsCase
-#else
 #define MAYBE_DefaultSizeCase DefaultSizeCase
 #define MAYBE_PersistedBoundsCase PersistedBoundsCase
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Test that the window is sized appropriately for the first run experience
 // where the default window bounds calculation is invoked.

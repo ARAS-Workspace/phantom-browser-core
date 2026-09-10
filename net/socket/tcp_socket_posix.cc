@@ -85,7 +85,7 @@ bool SetTCPKeepAlive(int fd, bool enable, int delay) {
   // A delay of 0 doesn't work, and is the default, so ignore that and rely on
   // whatever the OS defaults are once we turned it on above.
   if (delay) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
     // Setting the keepalive interval varies by platform.
 
     // Set seconds until first TCP keep alive.

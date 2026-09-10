@@ -68,7 +68,7 @@ TEST(TrustedIconFilterTest, MaskableIconSelection) {
   auto icon_info = GetTrustedIconsFromManifest(icons);
   ASSERT_TRUE(icon_info.has_value());
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(icon_info->url, GURL("http://example.com/maskable.png"));
   EXPECT_EQ(icon_info->square_size_px, 256);
   EXPECT_EQ(icon_info->purpose, apps::IconInfo::Purpose::kMaskable);
@@ -101,7 +101,7 @@ TEST(TrustedIconFilterTest, OnlyMaskableIcon) {
                  {IconPurpose::MASKABLE}),
   };
   auto icon_info = GetTrustedIconsFromManifest(icons);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   ASSERT_TRUE(icon_info.has_value());
   EXPECT_EQ(icon_info->url, GURL("http://example.com/maskable.png"));
   EXPECT_EQ(icon_info->square_size_px, 256);
@@ -134,7 +134,7 @@ TEST(TrustedIconFilterTest, SvgFallbackMaskable) {
   };
   auto icon_info = GetTrustedIconsFromManifest(icons);
   ASSERT_TRUE(icon_info.has_value());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(icon_info->url, GURL("http://example.com/maskable.svg"));
   EXPECT_EQ(icon_info->square_size_px, 1024);
   EXPECT_EQ(icon_info->purpose, apps::IconInfo::Purpose::kMaskable);
@@ -169,7 +169,7 @@ TEST(TrustedIconFilterTest, IconWithMultiplePurposes) {
   ASSERT_TRUE(icon_info.has_value());
   EXPECT_EQ(icon_info->url, GURL("http://example.com/any_maskable.png"));
   EXPECT_EQ(icon_info->square_size_px, 256);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(icon_info->purpose, apps::IconInfo::Purpose::kMaskable);
 #else
   EXPECT_EQ(icon_info->purpose, apps::IconInfo::Purpose::kAny);
@@ -247,7 +247,7 @@ TEST(TrustedIconFilterTest, SvgMaskableVersusPngWithIdealSize) {
   auto icon_info = GetTrustedIconsFromManifest(icons);
   ASSERT_TRUE(icon_info.has_value());
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(icon_info->url, GURL("http://example.com/maskable.svg"));
   EXPECT_EQ(icon_info->square_size_px, 1024);
   EXPECT_EQ(icon_info->purpose, apps::IconInfo::Purpose::kMaskable);

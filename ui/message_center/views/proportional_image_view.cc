@@ -50,10 +50,6 @@ void ProportionalImageView::OnPaint(gfx::Canvas* canvas) {
   if (apply_rounded_corners_) {
     SkScalar corner_radius = SkIntToScalar(message_center::kImageCornerRadius);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    corner_radius = SkIntToScalar(message_center::kJellyImageCornerRadius);
-#endif
-
     const SkPath path = SkPath::RRect(gfx::RectToSkRect(draw_bounds),
                                       corner_radius, corner_radius);
 

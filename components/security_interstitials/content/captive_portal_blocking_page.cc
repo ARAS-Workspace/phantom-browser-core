@@ -103,7 +103,7 @@ std::string CaptivePortalBlockingPage::GetWiFiSSID() const {
   wifi_service->GetConnectedNetworkSSID(&ssid, &error);
   if (!error.empty())
     return std::string();
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   ssid = net::GetWifiSSID();
 #elif BUILDFLAG(IS_ANDROID)
   ssid = net::android::GetWifiSSID();

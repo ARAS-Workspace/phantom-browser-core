@@ -7,7 +7,7 @@
 #include "build/build_config.h"
 #include "ui/events/platform/platform_event_source.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "ui/events/platform/platform_event_source.h"
 #endif
 
@@ -26,7 +26,7 @@ BrowserUINativeEventObserver::~BrowserUINativeEventObserver() {
   UnregisterObserver();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void BrowserUINativeEventObserver::RegisterObserver() {
   CHECK(ui::PlatformEventSource::GetInstance());
   ui::PlatformEventSource::GetInstance()->AddPlatformEventObserver(this);
@@ -58,7 +58,7 @@ void BrowserUINativeEventObserver::PlatformEventSourceDestroying() {
   UnregisterObserver();
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 void BrowserUINativeEventObserver::RegisterObserver() {}

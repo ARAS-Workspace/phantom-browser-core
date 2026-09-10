@@ -63,10 +63,6 @@
 #include "extensions/test/extension_test_message_listener.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/extensions/browsertest_util.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/test/base/ui_test_utils.h"
 #endif
@@ -1282,9 +1278,6 @@ class ContentVerifierPolicyTest : public ContentVerifierTest {
   }
 
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    extensions::browsertest_util::CreateAndInitializeLocalCache();
-#endif
   }
 
  protected:

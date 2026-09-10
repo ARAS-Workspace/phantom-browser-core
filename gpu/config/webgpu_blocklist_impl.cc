@@ -112,13 +112,6 @@ WebGPUBlocklistReason GetWebGPUAdapterBlocklistReason(
   }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  constexpr uint32_t kAMDVendorID = 0x1002;
-  if (info.vendorID == kAMDVendorID && info.deviceID == 0x98e4) {
-    reason = reason | WebGPUBlocklistReason::AMDMissingDrmFormatModifier;
-  }
-#endif
-
   if (info.adapterType == wgpu::AdapterType::CPU) {
     reason = reason | WebGPUBlocklistReason::CPUAdapter;
   }

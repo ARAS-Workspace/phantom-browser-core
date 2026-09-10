@@ -50,33 +50,18 @@ class MediaItemUIListViewTest : public views::ViewsTestBase {
   }
 
   void ShowItem(const std::string& id) {
-#if BUILDFLAG(IS_CHROMEOS)
-    list_view_->ShowItem(id, std::make_unique<MediaItemUIView>(
-                                 id, item_->GetWeakPtr(), nullptr, nullptr,
-                                 media_message_center::MediaColorTheme(),
-                                 MediaDisplayPage::kQuickSettingsMediaView));
-#else
       list_view_->ShowUpdatedItem(
           id, std::make_unique<MediaItemUIUpdatedView>(
                   id, item_->GetWeakPtr(),
                   media_message_center::MediaColorTheme(), nullptr, nullptr));
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void HideItem(const std::string& id) {
-#if BUILDFLAG(IS_CHROMEOS)
-    list_view_->HideItem(id);
-#else
     list_view_->HideUpdatedItem(id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   int GetItemsSize() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return list_view()->items_for_testing().size();
-#else
     return list_view()->updated_items_for_testing().size();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   MediaItemUIListView* list_view() { return list_view_; }

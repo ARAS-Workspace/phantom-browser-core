@@ -17,13 +17,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/display/types/display_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/test/test_new_window_delegate.h"
-#include "chrome/browser/apps/app_service/publishers/app_publisher.h"
-#include "chrome/browser/apps/link_capturing/link_capturing_feature_test_support.h"
-#include "components/services/app_service/public/cpp/intent_filter_util.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace apps {
 
 class LaunchUtilsTest : public testing::Test {
@@ -131,12 +124,7 @@ TEST_F(LaunchUtilsTest, IntentFilesAreCopiedToLaunchParams) {
       apps::LaunchContainer::kLaunchContainerWindow, std::move(intent),
       &profile_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_EQ(params.launch_files.size(), 1U);
-  EXPECT_EQ("foo.txt", params.launch_files[0].MaybeAsASCII());
-#else
   ASSERT_EQ(params.launch_files.size(), 0U);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST_F(LaunchUtilsTest, GetLaunchFilesFromCommandLine_NoAppID) {
@@ -207,147 +195,5 @@ TEST_F(LaunchUtilsTest, GetLaunchFilesFromCommandLine_CustomProtocol) {
       apps::GetLaunchFilesFromCommandLine(command_line);
   EXPECT_EQ(0U, launch_files.size());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Fake AppPublisher for tracking app launches.
-class FakePublisher : public AppPublisher {
- public:
-  explicit FakePublisher(AppServiceProxy* proxy) : AppPublisher(proxy) {
-    RegisterPublisher(AppType::kWeb);
-  }
-
-  void PublishAppWithUrlScope(std::string app_id, GURL scope) {
-    AppPtr app = std::make_unique<App>(AppType::kWeb, app_id);
-    app->readiness = Readiness::kReady;
-    app->handles_intents = true;
-
-    app->intent_filters.emplace();
-    app->intent_filters->push_back(apps_util::MakeIntentFilterForUrlScope(
-        scope, /*omit_port_for_testing=*/true));
-
-    std::vector<AppPtr> apps;
-    apps.push_back(std::move(app));
-    AppPublisher::Publish(std::move(apps), AppType::kWeb,
-                          /*should_notify_initialized=*/true);
-  }
-
-  const std::string& last_launched_app() { return last_launched_app_; }
-
-  // AppPublisher:
-  void Launch(const std::string& app_id,
-              int32_t event_flags,
-              LaunchSource launch_source,
-              WindowInfoPtr window_info) override {}
-  void LaunchAppWithParams(AppLaunchParams&& params,
-                           LaunchCallback callback) override {}
-
-  void LaunchAppWithIntent(const std::string& app_id,
-                           int32_t event_flags,
-                           IntentPtr intent,
-                           LaunchSource launch_source,
-                           WindowInfoPtr window_info,
-                           LaunchCallback callback) override {
-    last_launched_app_ = app_id;
-  }
-
- private:
-  std::string last_launched_app_;
-};
-
-class MockNewWindowDelegate
-    : public testing::NiceMock<ash::TestNewWindowDelegate> {
- public:
-  // TestNewWindowDelegate:
-  MOCK_METHOD(void,
-              OpenUrl,
-              (const GURL& url, OpenUrlFrom from, Disposition disposition),
-              (override));
-};
-
-class LaunchUtilsNewWindowTest : public LaunchUtilsTest {
- public:
-  MockNewWindowDelegate& new_window_delegate() { return new_window_delegate_; }
-
- private:
-  MockNewWindowDelegate new_window_delegate_;
-};
-
-TEST_F(LaunchUtilsNewWindowTest,
-       MaybeLaunchPreferredAppForUrl_LaunchesPreferred) {
-  FakePublisher publisher(AppServiceProxyFactory::GetForProfile(&profile_));
-  publisher.PublishAppWithUrlScope("abc", GURL("https://www.example.com/"));
-  ASSERT_EQ(test::EnableLinkCapturingByUser(&profile_, "abc"), base::ok());
-
-  MaybeLaunchPreferredAppForUrl(&profile_, GURL("https://www.example.com/foo/"),
-                                LaunchSource::kFromTest);
-
-  ASSERT_EQ(publisher.last_launched_app(), "abc");
-}
-
-TEST_F(LaunchUtilsNewWindowTest,
-       MaybeLaunchPreferredAppForUrl_LaunchesBrowserIfNoPreferredApp) {
-  FakePublisher publisher(AppServiceProxyFactory::GetForProfile(&profile_));
-  // Do not mark this app as preferred. The browser should be opened instead.
-  publisher.PublishAppWithUrlScope("abc", GURL("https://www.example.com/"));
-
-  EXPECT_CALL(
-      new_window_delegate(),
-      OpenUrl(GURL("https://www.example.com/foo/"), testing::_, testing::_));
-
-  MaybeLaunchPreferredAppForUrl(&profile_, GURL("https://www.example.com/foo/"),
-                                LaunchSource::kFromTest);
-}
-
-TEST_F(LaunchUtilsNewWindowTest, LaunchUrlInInstalledAppOrBrowser_OneApp) {
-  FakePublisher publisher(AppServiceProxyFactory::GetForProfile(&profile_));
-  publisher.PublishAppWithUrlScope("abc", GURL("https://www.example.com/"));
-
-  LaunchUrlInInstalledAppOrBrowser(
-      &profile_, GURL("https://www.example.com/foo"), LaunchSource::kFromTest);
-
-  ASSERT_EQ(publisher.last_launched_app(), "abc");
-}
-
-TEST_F(LaunchUtilsNewWindowTest,
-       LaunchUrlInInstalledAppOrBrowser_TwoAppsNoPreferred) {
-  FakePublisher publisher(AppServiceProxyFactory::GetForProfile(&profile_));
-
-  publisher.PublishAppWithUrlScope("abc", GURL("https://www.example.com/"));
-  publisher.PublishAppWithUrlScope("def", GURL("https://www.example.com/app/"));
-
-  EXPECT_CALL(
-      new_window_delegate(),
-      OpenUrl(GURL("https://www.example.com/app/"), testing::_, testing::_));
-
-  LaunchUrlInInstalledAppOrBrowser(
-      &profile_, GURL("https://www.example.com/app/"), LaunchSource::kFromTest);
-}
-
-TEST_F(LaunchUtilsNewWindowTest,
-       LaunchUrlInInstalledAppOrBrowser_MultipleApps_LaunchesPreferred) {
-  FakePublisher publisher(AppServiceProxyFactory::GetForProfile(&profile_));
-
-  publisher.PublishAppWithUrlScope("abc", GURL("https://www.example.com/"));
-  publisher.PublishAppWithUrlScope("def", GURL("https://www.example.com/app/"));
-
-  // Enable the link capturing preference for one of the apps. This app should
-  // be launched by `LaunchUrlInInstalledAppOrBrowser`.
-  ASSERT_EQ(test::EnableLinkCapturingByUser(&profile_, "def"), base::ok());
-
-  LaunchUrlInInstalledAppOrBrowser(
-      &profile_, GURL("https://www.example.com/app/"), LaunchSource::kFromTest);
-
-  ASSERT_EQ(publisher.last_launched_app(), "def");
-}
-
-TEST_F(LaunchUtilsNewWindowTest,
-       LaunchUrlInInstalledAppOrBrowser_NoApp_LaunchesInBrowser) {
-  EXPECT_CALL(new_window_delegate(),
-              OpenUrl(GURL("https://www.example.com"), testing::_, testing::_));
-
-  LaunchUrlInInstalledAppOrBrowser(&profile_, GURL("https://www.example.com/"),
-                                   LaunchSource::kFromTest);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace apps

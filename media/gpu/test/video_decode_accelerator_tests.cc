@@ -41,9 +41,9 @@
 #include "media/gpu/chromeos/video_decoder_pipeline.h"
 #endif  // BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "media/gpu/chromeos/platform_video_frame_pool.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(USE_V4L2_CODEC)
 #include "media/gpu/v4l2/v4l2_utils.h"
@@ -159,7 +159,7 @@ class VideoDecoderTest : public ::testing::Test {
   bool InitializeDecoderWithConfig(VideoDecoderConfig& decoder_config) {
     // TODO(https://crbugs.com/350994517): Enable this test for Windows once
     // PlatformVideoFramePool is implemented for that.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     auto frame_pool = std::make_unique<PlatformVideoFramePool>();
     std::unique_ptr<VideoDecoder> decoder = VideoDecoderPipeline::Create(
         gpu::GpuDriverBugWorkarounds(),
@@ -182,7 +182,7 @@ class VideoDecoderTest : public ::testing::Test {
     return init_result;
 #else
     return false;
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
   }
 
  private:

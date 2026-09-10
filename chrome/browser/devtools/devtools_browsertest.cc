@@ -1955,7 +1955,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest,
 }
 
 // TODO(crbug.com/40930033): Flaky on Linux, ChromeOS, and macOS Tests.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_CantInspectNewTabPage DISABLED_CantInspectNewTabPage
 #else
 #define MAYBE_CantInspectNewTabPage CantInspectNewTabPage
@@ -1967,7 +1967,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest, MAYBE_CantInspectNewTabPage) {
 }
 
 // TODO(crbug.com/40943634): Re-enable the test once it is fixed.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_CantInspectChromeScheme DISABLED_CantInspectChromeScheme
 #else
 #define MAYBE_CantInspectChromeScheme CantInspectChromeScheme
@@ -2276,11 +2276,10 @@ class DevToolsExtensionFileAccessTest : public DevToolsExtensionTest {
 
 // This test is flaky on Linux MSAN.
 // TODO(https://crbug.com/463490299): Enable the test.
-#if defined(MEMORY_SANITIZER) || defined(ADDRESS_SANITIZER) ||         \
-    BUILDFLAG(CFI_CAST_CHECK) || BUILDFLAG(CFI_ICALL_CHECK) ||         \
-    BUILDFLAG(CFI_ENFORCEMENT_TRAP) ||                                 \
-    BUILDFLAG(CFI_ENFORCEMENT_DIAGNOSTIC) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_LINUX)
+#if defined(MEMORY_SANITIZER) || defined(ADDRESS_SANITIZER) || \
+    BUILDFLAG(CFI_CAST_CHECK) || BUILDFLAG(CFI_ICALL_CHECK) || \
+    BUILDFLAG(CFI_ENFORCEMENT_TRAP) ||                         \
+    BUILDFLAG(CFI_ENFORCEMENT_DIAGNOSTIC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_CanGetFileResourceWithFileAccess \
   DISABLED_CanGetFileResourceWithFileAccess
 #else
@@ -2355,7 +2354,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest,
 // Tests that debugger works correctly if pause event occurs when DevTools
 // frontend is being loaded.
 // Flaky on win and linux: crbug.com/40134806.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestPauseWhenLoadingDevTools DISABLED_TestPauseWhenLoadingDevTools
 #else
 #define MAYBE_TestPauseWhenLoadingDevTools TestPauseWhenLoadingDevTools
@@ -2465,7 +2464,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, DISABLED_TestConsoleOnNavigateBack) {
   RunTest("testConsoleOnNavigateBack", kNavigateBackTestPage);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // Flaking on linux runs, see crbug.com/40638917.
 #define MAYBE_TestDeviceEmulation DISABLED_TestDeviceEmulation
 #else
@@ -2692,7 +2691,7 @@ class DevToolsAutoOpenerTest : public DevToolsTest {
 // TODO(crbug.com/40742539): Flaky on debug builds.
 #if !defined(NDEBUG)
 #define MAYBE_TestAutoOpenForTabs DISABLED_TestAutoOpenForTabs
-#elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/40817460): Flaky failures
 #define MAYBE_TestAutoOpenForTabs DISABLED_TestAutoOpenForTabs
 #else
@@ -2806,7 +2805,7 @@ IN_PROC_BROWSER_TEST_F(WorkerDevToolsTest, InspectSharedWorker) {
 }
 
 // Flaky on multiple platforms. See http://crbug.com/40202857
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_PauseInSharedWorkerInitialization \
   DISABLED_PauseInSharedWorkerInitialization
 #else
@@ -2869,12 +2868,8 @@ class RemoteDebuggingTest : public extensions::ExtensionApiTest {
 };
 
 // Fails on CrOS. crbug.com/40392997
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_RemoteDebugger DISABLED_RemoteDebugger
-#else
 // TODO(crbug.com/41478279): Flaky on all platforms.
 #define MAYBE_RemoteDebugger DISABLED_RemoteDebugger
-#endif
 IN_PROC_BROWSER_TEST_F(RemoteDebuggingTest, MAYBE_RemoteDebugger) {
   ASSERT_TRUE(RunExtensionTest("target_list")) << message_;
 }
@@ -3213,9 +3208,6 @@ class DevToolsAllowedByCommandLineSwitch
     // literal here so it's possible to verify that the switch does not apply on
     // non-ChromeOS platforms.
     const std::string kForceDevToolsAvailableBase = "force-devtools-available";
-#if BUILDFLAG(IS_CHROMEOS)
-    ASSERT_EQ(kForceDevToolsAvailableBase, switches::kForceDevToolsAvailable);
-#endif
     command_line->AppendSwitch("--" + kForceDevToolsAvailableBase);
   }
 };
@@ -3229,11 +3221,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsAllowedByCommandLineSwitch,
   DevToolsWindow::OpenDevToolsWindow(web_contents,
                                      DevToolsOpenedByAction::kUnknown);
   auto agent_host = GetOrCreateDevToolsHostForWebContents(web_contents);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(DevToolsWindow::FindDevToolsWindow(agent_host.get()));
-#else
   EXPECT_FALSE(DevToolsWindow::FindDevToolsWindow(agent_host.get()));
-#endif
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
@@ -3653,7 +3641,6 @@ IN_PROC_BROWSER_TEST_F(InProcessBrowserTest,
   observer.Wait();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Skip for ChromeOS because the keep alive is not created for ChromeOS.
 // See https://crbug.com/40167603.
 class KeepAliveDevToolsTest : public InProcessBrowserTest {
@@ -3681,7 +3668,6 @@ IN_PROC_BROWSER_TEST_F(KeepAliveDevToolsTest, KeepsAliveUntilBrowserClose) {
   EXPECT_FALSE(KeepAliveRegistry::GetInstance()->IsOriginRegistered(
       KeepAliveOrigin::REMOTE_DEBUGGING));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class DevToolsPolicyTest : public InProcessBrowserTest {
  protected:

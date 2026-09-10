@@ -33,13 +33,11 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #include "components/enterprise/browser/enterprise_switches.h"
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/notreached.h"
@@ -223,11 +221,6 @@ class RealtimeReportingClientUmaTest
 
 TEST_P(RealtimeReportingClientUmaTest, TestUmaEventUploadSucceeds) {
 // Profile reporting is not supported on Ash.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (is_profile_reporting()) {
-    return;
-  }
-#endif
 
   SetUpReportingClient(is_profile_reporting());
 
@@ -270,11 +263,6 @@ TEST_P(RealtimeReportingClientUmaTest, TestUmaEventUploadSucceeds) {
 TEST_P(RealtimeReportingClientUmaTest,
        TestUploadCallbackReceivesEnrichedRequest) {
 // Profile reporting is not supported on Ash.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (is_profile_reporting()) {
-    return;
-  }
-#endif
 
   SetUpReportingClient(is_profile_reporting());
 
@@ -323,11 +311,6 @@ TEST_P(RealtimeReportingClientUmaTest,
 
 TEST_P(RealtimeReportingClientUmaTest, TestUmaEventUploadFails) {
 // Profile reporting is not supported on Ash.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (is_profile_reporting()) {
-    return;
-  }
-#endif
 
   SetUpReportingClient(is_profile_reporting());
 
@@ -713,11 +696,6 @@ class RealtimeReportingClientStandaloneTest
 using RealtimeReportingClientSaasTest = RealtimeReportingClientStandaloneTest;
 
 TEST_P(RealtimeReportingClientSaasTest, ReportSaasUsageEvent) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (is_profile_reporting()) {
-    return;
-  }
-#endif
 
   SetUpStandaloneReportingClient();
 
@@ -761,7 +739,6 @@ INSTANTIATE_TEST_SUITE_P(
                      testing::Values(policy::DM_STATUS_SUCCESS,
                                      policy::DM_STATUS_REQUEST_FAILED)));
 
-#if !BUILDFLAG(IS_CHROMEOS)
 using RealtimeReportingClientBrowserLaunchTest =
     RealtimeReportingClientStandaloneTest;
 
@@ -809,6 +786,5 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Combine(testing::Bool(),  // is_profile_reporting
                      testing::Values(policy::DM_STATUS_SUCCESS,
                                      policy::DM_STATUS_REQUEST_FAILED)));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace enterprise_connectors

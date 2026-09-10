@@ -236,35 +236,6 @@ class MetricsServiceClient {
 // implementing the functions below, remember to modify the callers of the
 // functions. Currently the callers have #if blocks that make them not call
 // these functions on other platforms.
-#if BUILDFLAG(IS_CHROMEOS)
-  // Returns true if metrics should be uploaded for the given |user_id|, which
-  // corresponds to the |user_id| field in ChromeUserMetricsExtension.
-  virtual bool ShouldUploadMetricsForUserId(uint64_t user_id);
-
-  // Initializes per-user metrics collection. For more details what per-user
-  // metrics collection is, refer to MetricsService::InitPerUserMetrics.
-  virtual void InitPerUserMetrics() {}
-
-  // Updates the current user's metrics consent. This allows embedders to update
-  // the user consent. If there is no current user, then this function will
-  // no-op.
-  virtual void UpdateCurrentUserMetricsChoice(bool user_choice) {}
-
-  // Returns the current user metrics consent if it should be applied to decide
-  // the current metrics reporting state. This allows embedders to determine
-  // when a user metric consent state should not be applied (ie no logged in
-  // user or managed policy).
-  //
-  // Will return std::nullopt if there is no current user or current user
-  // metrics consent should not be applied to determine metrics reporting state.
-  virtual std::optional<bool> GetCurrentUserMetricsChoice() const;
-
-  // Returns the current user id.
-  //
-  // Will return std::nullopt if there is no current user, metrics reporting is
-  // disabled, or current user should not have a user id.
-  virtual std::optional<std::string> GetCurrentUserId() const;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Returns the country ID associated with the profile used for metrics.
   // Returns std::nullopt if it's not available.

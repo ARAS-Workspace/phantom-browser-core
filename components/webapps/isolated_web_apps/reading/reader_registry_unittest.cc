@@ -201,10 +201,8 @@ using ReadResult =
     base::expected<IsolatedWebAppResponseReader::Response, ReadResponseError>;
 
 TEST_F(IsolatedWebAppReaderRegistryTest, TestSingleRequest) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   base::HistogramTester histogram_tester;
 
   network::ResourceRequest resource_request;
@@ -238,10 +236,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest, TestSingleRequest) {
 
 TEST_F(IsolatedWebAppReaderRegistryTest,
        ReadResponseWhenBundleIsNoLongerTrusted) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   network::ResourceRequest resource_request;
   resource_request.url = kUrl;
 
@@ -260,10 +256,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest,
 
 TEST_F(IsolatedWebAppReaderRegistryTest,
        TestSingleRequestWithQueryAndFragment) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   network::ResourceRequest resource_request;
   resource_request.url = kUrl.Resolve("/?bar=baz#foo");
 
@@ -287,10 +281,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest,
 }
 
 TEST_F(IsolatedWebAppReaderRegistryTest, TestMixedDevModeAndProdModeRequests) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
 
   network::ResourceRequest resource_request;
   resource_request.url = kUrl;
@@ -323,10 +315,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest, TestMixedDevModeAndProdModeRequests) {
 
 TEST_F(IsolatedWebAppReaderRegistryTest,
        TestReadingResponseAfterSignedWebBundleReaderIsDeleted) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   network::ResourceRequest resource_request;
   resource_request.url = kUrl;
 
@@ -357,10 +347,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest,
 }
 
 TEST_F(IsolatedWebAppReaderRegistryTest, TestRequestToNonExistingResponse) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   base::HistogramTester histogram_tester;
 
   network::ResourceRequest resource_request;
@@ -399,10 +387,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest, TestSignedWebBundleReaderLifetime) {
   resource_request.url = kUrl;
 
 // signatures only verified once per session even for multiple calls
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
 
   // Verify that the cache cleanup timer has not yet started.
   EXPECT_FALSE(registry_->IsCleanupTimerRunningForTesting());
@@ -527,10 +513,8 @@ INSTANTIATE_TEST_SUITE_P(
             UnusableSwbnFileError::Error::kIntegrityBlockParserFormatError)));
 
 TEST_F(IsolatedWebAppReaderRegistryTest, TestInvalidIntegrityBlockContents) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   base::HistogramTester histogram_tester;
 
   network::ResourceRequest resource_request;
@@ -567,10 +551,8 @@ class IsolatedWebAppReaderRegistrySignatureVerificationErrorTest
 
 TEST_P(IsolatedWebAppReaderRegistrySignatureVerificationErrorTest,
        SignatureVerificationError) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::unexpected(GetParam())));
-#endif
   base::HistogramTester histogram_tester;
 
   network::ResourceRequest resource_request;
@@ -582,19 +564,6 @@ TEST_P(IsolatedWebAppReaderRegistrySignatureVerificationErrorTest,
 
   FulfillIntegrityBlock();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, signatures are only verified at installation-time, thus the
-  // `web_package::test::FakeSignatureVerifier` set up above will never be
-  // called.
-  FulfillMetadata();
-  FulfillResponse(resource_request);
-
-  EXPECT_THAT(read_response_future.Take(), HasValue());
-
-  histogram_tester.ExpectBucketCount(
-      ToSuccessHistogramName("WebApp.Isolated.SwbnFileUsability"),
-      /*success*/ 1, 1);
-#else
   ReadResult result = read_response_future.Take();
   EXPECT_THAT(
       result,
@@ -607,7 +576,6 @@ TEST_P(IsolatedWebAppReaderRegistrySignatureVerificationErrorTest,
   histogram_tester.ExpectBucketCount(
       ToErrorHistogramName("WebApp.Isolated.SwbnFileUsability"),
       UnusableSwbnFileError::Error::kSignatureVerificationError, 1);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -624,10 +592,8 @@ class IsolatedWebAppReaderRegistryMetadataParserErrorTest
 
 TEST_P(IsolatedWebAppReaderRegistryMetadataParserErrorTest,
        TestMetadataParserError) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   base::HistogramTester histogram_tester;
 
   network::ResourceRequest resource_request;
@@ -671,10 +637,8 @@ INSTANTIATE_TEST_SUITE_P(
             UnusableSwbnFileError::Error::kMetadataParserFormatError)));
 
 TEST_F(IsolatedWebAppReaderRegistryTest, TestInvalidMetadataPrimaryUrl) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   base::HistogramTester histogram_tester;
 
   network::ResourceRequest resource_request;
@@ -707,10 +671,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest, TestInvalidMetadataPrimaryUrl) {
 }
 
 TEST_F(IsolatedWebAppReaderRegistryTest, TestInvalidMetadataInvalidExchange) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   network::ResourceRequest resource_request;
   resource_request.url = kUrl;
 
@@ -745,10 +707,8 @@ class IsolatedWebAppReaderRegistryResponseHeadParserErrorTest
 
 TEST_P(IsolatedWebAppReaderRegistryResponseHeadParserErrorTest,
        TestResponseHeadParserError) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   base::HistogramTester histogram_tester;
 
   network::ResourceRequest resource_request;
@@ -795,10 +755,8 @@ INSTANTIATE_TEST_SUITE_P(
                            kResponseHeadParserFormatError)));
 
 TEST_F(IsolatedWebAppReaderRegistryTest, TestConcurrentRequests) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   using ReaderCacheState = IsolatedWebAppReaderRegistry::ReaderCacheState;
   base::HistogramTester histogram_tester;
 
@@ -878,10 +836,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest, TestConcurrentRequests) {
 // Check that we can close the cached reader that keeps
 // the signed web bundle file opened.
 TEST_F(IsolatedWebAppReaderRegistryTest, Close) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   network::ResourceRequest resource_request;
   resource_request.url = kUrl;
 
@@ -915,10 +871,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest, Close) {
 // Check the case when the close request is coming while the reader
 // is being created.
 TEST_F(IsolatedWebAppReaderRegistryTest, CloseOnArrival) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   network::ResourceRequest resource_request;
   resource_request.url = kUrl;
 
@@ -952,10 +906,8 @@ TEST_F(IsolatedWebAppReaderRegistryTest, CloseEmpty) {
 
 // Reopen of the closed file should work.
 TEST_F(IsolatedWebAppReaderRegistryTest, OpenCloseOpen) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));
-#endif
   // Open the signed web bundle for the first time.
   {
     network::ResourceRequest resource_request;

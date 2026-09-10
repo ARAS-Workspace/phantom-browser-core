@@ -1085,7 +1085,7 @@ TEST_F(SSLErrorHandlerNameMismatchTest,
 }
 
 // Flakily fails on linux_chromium_tsan_rel_ng. http://crbug.com/989128
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(THREAD_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_TimeQueryStarted DISABLED_TimeQueryStarted
 #else
 #define MAYBE_TimeQueryStarted TimeQueryStarted
@@ -1120,7 +1120,7 @@ TEST_F(SSLErrorHandlerDateInvalidTest, MAYBE_TimeQueryStarted) {
 // clock can't be determined because network time is unavailable.
 
 // Flakily fails on linux_chromium_tsan_rel_ng. http://crbug.com/989225
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(THREAD_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_NoTimeQueries DISABLED_NoTimeQueries
 #else
 #define MAYBE_NoTimeQueries NoTimeQueries
@@ -1145,7 +1145,7 @@ TEST_F(SSLErrorHandlerDateInvalidTest, MAYBE_NoTimeQueries) {
 // the system clock times out (e.g. because a network time query hangs).
 
 // Flakily fails on linux_chromium_tsan_rel_ng. http://crbug.com/989289
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(THREAD_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_TimeQueryHangs DISABLED_TimeQueryHangs
 #else
 #define MAYBE_TimeQueryHangs TimeQueryHangs

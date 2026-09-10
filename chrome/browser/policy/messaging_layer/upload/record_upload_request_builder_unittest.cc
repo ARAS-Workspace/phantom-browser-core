@@ -132,7 +132,6 @@ class RecordUploadRequestBuilderTest
           policy::EnterpriseManagementAuthority::CLOUD_DOMAIN);
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(RecordUploadRequestBuilderTest,
        GenerationGuidNotRequiredForManagedBrowsersOnNonChromeOSDevices) {
   // Set up as CBCM enrolled browser on non-ChromeOS device.
@@ -155,34 +154,6 @@ TEST_F(RecordUploadRequestBuilderTest,
                   .has_value(),
               Eq(true));
 }
-#endif  // BUILDFLAG(!IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(RecordUploadRequestBuilderTest,
-       GenerationGuidRequiredForUnmanagedChromeOSDevices) {
-  // Set up as an unmanaged ChromeOS device.
-  policy::ScopedManagementServiceOverrideForTesting scoped_management_service =
-      policy::ScopedManagementServiceOverrideForTesting(
-          policy::ManagementServiceFactory::GetForPlatform(),
-          policy::EnterpriseManagementAuthority::NONE);
-
-  ASSERT_THAT(
-      policy::ManagementServiceFactory::GetForPlatform()->IsBrowserManaged(),
-      Eq(false));
-
-  EXPECT_THAT(EncryptedReportingClient::GenerationGuidIsRequired(), Eq(true));
-
-  SequenceInformation sequence_info;
-  sequence_info.set_generation_id(12345678);
-  sequence_info.set_priority(IMMEDIATE);
-  sequence_info.set_sequencing_id(0);
-
-  EXPECT_THAT(SequenceInformationDictionaryBuilder(
-                  sequence_info, /*is_generation_guid_required=*/true)
-                  .Build(),
-              Eq(std::nullopt));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(RecordUploadRequestBuilderTest, AcceptEncryptedRecordsList) {
   static constexpr size_t kNumRecords = 10;
@@ -306,32 +277,6 @@ TEST_P(RecordUploadRequestBuilderTest, DenyPoorlyFormedEncryptedRecords) {
   ASSERT_TRUE(record_dict.has_value());
   EXPECT_THAT(record_dict.value(), IsRecordValid<>());
   EXPECT_TRUE(record_reservation.reserved());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Now, verify that generation guid is required when the device is in an
-  // unmanaged state. The generation guid is not set, so we just need to ensure
-  // the device is unmanaged.
-
-  //  Change device state from managed to unmanaged. (Device is set to a managed
-  //  state at the beginning of each tests via `scoped_management_service_` in
-  //  `RecordUploadRequestBuilderTest` class )
-  const auto scoped_management_service =
-      policy::ScopedManagementServiceOverrideForTesting(
-          policy::ManagementServiceFactory::GetForPlatform(),
-          policy::EnterpriseManagementAuthority::NONE);
-
-  if (is_generation_guid_required()) {
-    // Generation guid is not set and the device is unmanaged, so expect
-    // failure.
-    EXPECT_FALSE(EncryptedRecordDictionaryBuilder(record, record_reservation,
-                                                  is_generation_guid_required())
-                     .Build()
-                     .has_value());
-  }
-
-  // Set the generation id - expect complete call.
-  sequence_information->set_generation_guid(kGenerationGuid);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   record_dict = EncryptedRecordDictionaryBuilder(record, record_reservation,
                                                  is_generation_guid_required())

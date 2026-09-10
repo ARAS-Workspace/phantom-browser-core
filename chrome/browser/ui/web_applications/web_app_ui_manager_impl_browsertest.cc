@@ -28,12 +28,6 @@
 #include "content/public/test/browser_test_utils.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_list/app_list_syncable_service.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service_factory.h"
-#include "chrome/browser/web_applications/test/web_app_test_observers.h"
-#endif
-
 namespace web_app {
 
 class WebAppUiManagerImplBrowserTest : public InProcessBrowserTest {
@@ -180,33 +174,6 @@ IN_PROC_BROWSER_TEST_F(
     EXPECT_TRUE(callback_ran);
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(WebAppUiManagerImplBrowserTest, MigrateAppAttribute) {
-  app_list::AppListSyncableService* app_list_service =
-      app_list::AppListSyncableServiceFactory::GetForProfile(
-          browser()->GetProfile());
-
-  // Install an old app to be replaced.
-  webapps::AppId old_app_id = test::InstallDummyWebApp(
-      profile(), "old_app", GURL("https://old.app.com"));
-  app_list_service->SetPinPosition(old_app_id,
-                                   syncer::StringOrdinal("positionold"));
-
-  // Install a new app to migrate the old one to.
-  webapps::AppId new_app_id = test::InstallDummyWebApp(
-      profile(), "new_app", GURL("https://new.app.com"));
-  base::test::TestFuture<void> future;
-  ui_manager().MigrateLauncherState(old_app_id, new_app_id,
-                                    future.GetCallback());
-  ASSERT_TRUE(future.Wait());
-
-  // New app should acquire old app's pin position.
-  EXPECT_EQ(app_list_service->GetSyncItem(new_app_id)
-                ->item_pin_ordinal.ToDebugString(),
-            "positionold");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(WebAppUiManagerImplBrowserTest,
                        CloseAppWindows_BypassesBeforeUnload) {

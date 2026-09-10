@@ -26,10 +26,6 @@ GL_EXPORT bool UseCompositorClockVSyncInterval();
 GL_EXPORT BASE_DECLARE_FEATURE(kDefaultPassthroughCommandDecoder);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-GL_EXPORT BASE_DECLARE_FEATURE(kFallbackToSWIfGLES3NotSupported);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_ANDROID)
 // Controls whether 2-pixel even boundary alignment is enforced for YUV 4:2:0
 // and 4:2:2 SurfaceControl overlays to prevent odd-coordinate hardware scaler

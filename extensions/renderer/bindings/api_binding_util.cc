@@ -140,9 +140,7 @@ void InvalidateContext(v8::Local<v8::Context> context) {
 }
 
 std::string_view GetPlatformString() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return "chromeos";
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return "linux";
 #elif BUILDFLAG(IS_MAC)
   return "mac";

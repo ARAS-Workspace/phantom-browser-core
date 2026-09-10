@@ -517,11 +517,7 @@ TEST_F(PrefServiceSetValueTest, SetListValue) {
 }
 
 // TODO(crbug.com/441781730): Failing on CrOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_GetValueWithTypeConversion DISABLED_GetValueWithTypeConversion
-#else
 #define MAYBE_GetValueWithTypeConversion GetValueWithTypeConversion
-#endif
 TEST(PrefServiceTest, MAYBE_GetValueWithTypeConversion) {
   TestingPrefServiceSimple prefs;
   const char kTimePref[] = "time_pref";

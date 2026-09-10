@@ -79,17 +79,9 @@ TEST_F(BrowserControlsAdapterImplTest,
   webui_toolbar::WebUIToolbarDragState::GetOrCreateForWebContents(
       web_contents())
       ->set_drag_originated_from_renderer(false);
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, all drags are conservatively treated as renderer-originated to
-  // enforce strict scheme validation, ensuring privileged schemes like
-  // chrome:// are blocked even if the drag state is not flagged as
-  // renderer-tainted.
-  EXPECT_CALL(browser_window_interface_, OpenGURL(_, _)).Times(0);
-#else
   EXPECT_CALL(
       browser_window_interface_,
       OpenGURL(GURL("chrome://settings"), WindowOpenDisposition::CURRENT_TAB));
-#endif
   adapter_->NavigateText("chrome://settings");
 }
 
@@ -98,15 +90,9 @@ TEST_F(BrowserControlsAdapterImplTest,
   webui_toolbar::WebUIToolbarDragState::GetOrCreateForWebContents(
       web_contents())
       ->set_drag_originated_from_renderer(false);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_CALL(browser_window_interface_,
-              OpenGURL(GURL("about:blank#blocked"),
-                       WindowOpenDisposition::CURRENT_TAB));
-#else
   EXPECT_CALL(
       browser_window_interface_,
       OpenGURL(GURL("chrome://settings"), WindowOpenDisposition::CURRENT_TAB));
-#endif
   adapter_->Navigate(GURL("chrome://settings"));
 }
 

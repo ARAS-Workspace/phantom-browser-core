@@ -38,29 +38,9 @@
 #include "chrome/browser/spellchecker/spellcheck_service.h"
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service_factory.h"
-#include "chrome/browser/ash/arc/arc_util.h"
-#include "chrome/browser/ash/floating_sso/floating_sso_service_factory.h"
-#include "chrome/browser/sync/wifi_configuration_sync_service_factory.h"
-#include "chromeos/ash/components/dbus/shill/shill_clients.h"
-#include "chromeos/ash/components/dbus/shill/shill_manager_client.h"
-#include "chromeos/ash/components/network/network_handler_test_helper.h"
-#include "chromeos/ash/components/sync_wifi/wifi_configuration_sync_service.h"
-#include "chromeos/ash/services/network_config/public/cpp/cros_network_config_test_helper.h"
-#endif
-
 class SyncServiceFactoryTest : public testing::Test {
  public:
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    app_list::AppListSyncableServiceFactory::SetUseInTesting(true);
-    // Cookie sync is only enabled for the primary profile, but for these tests
-    // there is no real benefit in setting up a fully logged in ChromeOS user.
-    ash::floating_sso::FloatingSsoServiceFactory::GetInstance()
-        ->AllowNonPrimaryProfileForTests();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     TestingProfile::Builder builder;
     builder.AddTestingFactory(FaviconServiceFactory::GetInstance(),
                               FaviconServiceFactory::GetDefaultFactory());
@@ -91,12 +71,6 @@ class SyncServiceFactoryTest : public testing::Test {
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    app_list::AppListSyncableServiceFactory::SetUseInTesting(false);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-    // There may tasks in flight referencing fields owned by the test fixture.
-    // Make sure they are flushed now to prevent memory safety errors, e.g.
-    // use-after-destruction errors.
 
     // Flush any pending initialization tasks (e.g. WebData) before destroying
     // the profile, to avoid accessing closed DBs.
@@ -161,27 +135,9 @@ class SyncServiceFactoryTest : public testing::Test {
 
     datatypes.Put(syncer::SAVED_TAB_GROUP);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     datatypes.Put(syncer::DICTIONARY);
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-    datatypes.Put(syncer::APP_LIST);
-    if (arc::IsArcAllowedForProfile(profile())) {
-      datatypes.Put(syncer::ARC_PACKAGE);
-    }
-    if (ash::features::IsFloatingSsoAllowed()) {
-      datatypes.Put(syncer::COOKIES);
-    }
-    datatypes.Put(syncer::OS_PREFERENCES);
-    datatypes.Put(syncer::OS_PRIORITY_PREFERENCES);
-    datatypes.Put(syncer::PRINTERS);
-    if (ash::features::IsOAuthIppEnabled()) {
-      datatypes.Put(syncer::PRINTERS_AUTHORIZATION_SERVERS);
-    }
-    datatypes.Put(syncer::WIFI_CONFIGURATIONS);
-    datatypes.Put(syncer::WORKSPACE_DESK);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     // Common types. This excludes PASSWORDS,
     // INCOMING_PASSWORD_SHARING_INVITATION and
@@ -292,15 +248,6 @@ class SyncServiceFactoryTest : public testing::Test {
   content::BrowserTaskEnvironment task_environment_;
   std::unique_ptr<TestingProfile> profile_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Fake network stack is required for WIFI_CONFIGURATIONS datatype. It's also
-  // used by `network_config_helper_`
-  ash::NetworkHandlerTestHelper network_handler_test_helper_;
-
-  // Sets up  and  tears down the Chrome OS networking mojo service as needed
-  // for the WIFI_CONFIGURATIONS sync service.
-  ash::network_config::CrosNetworkConfigTestHelper network_config_helper_;
-#endif
 };
 
 // Test fixture for testing the kDisableSync flag.

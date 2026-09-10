@@ -36,10 +36,6 @@
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/view_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace glic {
 namespace {
 
@@ -72,9 +68,6 @@ class GlicSidePanelCoordinatorTest : public InProcessBrowserTest {
         {
             features::kGlic,
             features::kGlicRollout,
-#if BUILDFLAG(IS_CHROMEOS)
-            chromeos::features::kFeatureManagementGlic,
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
         },
         {
@@ -131,11 +124,7 @@ IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorTest, EntryAdded) {
 }
 
 // TODO(crbug.com/460830593): Enable for ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_EntryNotAdded DISABLED_EntryNotAdded
-#else
 #define MAYBE_EntryNotAdded EntryNotAdded
-#endif
 IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorTest, MAYBE_EntryNotAdded) {
   EXPECT_FALSE(GlicEnabling::IsEnabledForProfile(profile()));
 
@@ -146,11 +135,7 @@ IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorTest, MAYBE_EntryNotAdded) {
 }
 
 // TODO(crbug.com/460830593): Enable for ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_EligibilityChangesReflected DISABLED_EligibilityChangesReflected
-#else
 #define MAYBE_EligibilityChangesReflected EligibilityChangesReflected
-#endif
 IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorTest,
                        MAYBE_EligibilityChangesReflected) {
   EXPECT_FALSE(GlicEnabling::IsEnabledForProfile(profile()));

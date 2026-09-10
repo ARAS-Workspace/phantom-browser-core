@@ -24,7 +24,7 @@
 #if BUILDFLAG(CAN_UNWIND_WITH_FRAME_POINTERS)
 #include <optional>
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include <pthread.h>
 
 #include "base/process/process_handle.h"
@@ -35,7 +35,7 @@
 #include <pthread.h>
 #endif
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(__GLIBC__)
+#if BUILDFLAG(IS_LINUX) && defined(__GLIBC__)
 extern "C" void* __libc_stack_end;
 #endif
 
@@ -259,7 +259,7 @@ uintptr_t GetStackEnd() {
   return reinterpret_cast<uintptr_t>(pthread_get_stackaddr_np(pthread_self()));
 #else
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(__GLIBC__)
+#if BUILDFLAG(IS_LINUX) && defined(__GLIBC__)
   static_assert(std::is_same_v<ProcessId, PlatformThreadId::UnderlyingType>);
   if (GetCurrentProcId() == PlatformThread::CurrentId().raw()) {
     // For the main thread we have a shortcut.

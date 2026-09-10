@@ -60,11 +60,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/test/glic_user_session_test_helper.h"
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/android_info.h"
 #else
@@ -146,9 +141,6 @@ class GlicEnablingTest : public testing::Test {
     scoped_feature_list_.InitWithFeatures(
         {
             features::kGlic,
-#if BUILDFLAG(IS_CHROMEOS)
-            chromeos::features::kFeatureManagementGlic,
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
 #if BUILDFLAG(IS_ANDROID)
         {}
@@ -466,9 +458,6 @@ class GlicEnablingProfileEligibilityTest : public testing::Test {
         /*enabled_features=*/
         {
             features::kGlic,
-#if BUILDFLAG(IS_CHROMEOS)
-            chromeos::features::kFeatureManagementGlic,
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
         /*disabled_features=*/{
             features::kGlicCountryFiltering,
@@ -492,11 +481,6 @@ class GlicEnablingProfileEligibilityTest : public testing::Test {
     raw_ptr<TestingProfileManager> testing_profile_manager =
         TestingBrowserProcess::GetGlobal()->SetUpGlobalFeaturesForTesting(
             /*profile_manager=*/true);
-
-#if BUILDFLAG(IS_CHROMEOS)
-    glic_user_session_test_helper_.PreProfileSetUp(
-        testing_profile_manager->profile_manager());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     profile_ = testing_profile_manager->CreateTestingProfile(
         TestingProfile::kDefaultProfileUserName,
@@ -524,9 +508,6 @@ class GlicEnablingProfileEligibilityTest : public testing::Test {
 
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    glic_user_session_test_helper_.PostProfileTearDown();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     FlushMessageLoop();
   }
 
@@ -538,9 +519,6 @@ class GlicEnablingProfileEligibilityTest : public testing::Test {
  private:
   content::BrowserTaskEnvironment task_environment_;
   base::test::ScopedFeatureList scoped_feature_list_;
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::GlicUserSessionTestHelper glic_user_session_test_helper_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   raw_ptr<TestingProfile> profile_ = nullptr;
 };
 
@@ -581,12 +559,10 @@ TEST_F(GlicEnablingProfileEligibilityTest, WasPreviouslyNotAllowedTest) {
   EXPECT_FALSE(GlicEnabling::WasPreviouslyNotAllowed(profile()));
 
   // 7. Sign out.
-#if !BUILDFLAG(IS_CHROMEOS)
   signin::ClearPrimaryAccount(identity_test_env->identity_manager());
 
   // 8. Even after signing out, WasPreviouslyNotAllowed should remain false.
   EXPECT_FALSE(GlicEnabling::WasPreviouslyNotAllowed(profile()));
-#endif
 }
 
 TEST_F(GlicEnablingProfileEligibilityTest,
@@ -721,9 +697,6 @@ class GlicEnablingAnchorEntryPointTestBase : public testing::Test {
         /*enabled_features=*/
         {
             features::kGlicRollout,
-#if BUILDFLAG(IS_CHROMEOS)
-            chromeos::features::kFeatureManagementGlic,
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
         /*disabled_features=*/{
             features::kGlic,  // Explicitly disable kGlic to fail global
@@ -755,11 +728,6 @@ class GlicEnablingAnchorEntryPointTestBase : public testing::Test {
         TestingBrowserProcess::GetGlobal()->SetUpGlobalFeaturesForTesting(
             /*profile_manager=*/true);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    glic_user_session_test_helper_.PreProfileSetUp(
-        testing_profile_manager->profile_manager());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
     profile_ = testing_profile_manager->CreateTestingProfile(
         TestingProfile::kDefaultProfileUserName,
         IdentityTestEnvironmentProfileAdaptor::
@@ -787,9 +755,6 @@ class GlicEnablingAnchorEntryPointTestBase : public testing::Test {
     profile_ = nullptr;
     FlushMessageLoop();
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
-#if BUILDFLAG(IS_CHROMEOS)
-    glic_user_session_test_helper_.PostProfileTearDown();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     FlushMessageLoop();
   }
 
@@ -802,9 +767,6 @@ class GlicEnablingAnchorEntryPointTestBase : public testing::Test {
  private:
   content::BrowserTaskEnvironment task_environment_;
   base::test::ScopedFeatureList scoped_feature_list_;
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::GlicUserSessionTestHelper glic_user_session_test_helper_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   raw_ptr<TestingProfile> profile_ = nullptr;
 };
 
@@ -985,7 +947,6 @@ TEST_F(GlicEnablingAnchorEntryPointTestBase,
       GlicEnabling::EnablementForProfile(profile()).ShouldShowGlicButton());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(GlicEnablingTrustFirstOnboardingTest,
        NotSignedIn_ReturnsSignInRequired) {
   base::test::ScopedFeatureList scoped_feature_list;
@@ -1021,7 +982,6 @@ TEST_F(GlicEnablingTrustFirstOnboardingTest,
             mojom::ProfileReadyState::kIneligible);
   EXPECT_FALSE(GlicEnabling::IsEnabledForProfile(profile()));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(GlicEnablingTrustFirstOnboardingTest,
        IsEnabledAndConsentForProfile_NotConsented_ReturnsFalse) {
@@ -1039,7 +999,6 @@ TEST_F(GlicEnablingTrustFirstOnboardingTest,
   EXPECT_TRUE(GlicEnabling::IsEnabledAndConsentForProfile(profile()));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(GlicEnablingTrustFirstOnboardingTest, ResetFreOnSignOut) {
   auto& enabling = glic::GlicKeyedService::Get(profile())->enabling();
   enabling.SetCompletedFre(prefs::FreStatus::kCompleted);
@@ -1054,7 +1013,6 @@ TEST_F(GlicEnablingTrustFirstOnboardingTest, ResetFreOnSignOut) {
   EXPECT_EQ(enabling.GetCompletedFre(), prefs::FreStatus::kCompleted);
 #endif
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 struct GatedFeatureParams {
   std::string name;
@@ -1687,7 +1645,7 @@ TEST_F(GlicEnablingCombinedObserverTest,
   EXPECT_TRUE(callback_called);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 constexpr char kPrefProjectId[] = "pref-project";
 constexpr char kPrefAppId[] = "pref-engine";
@@ -2356,10 +2314,6 @@ TEST_F(GlicEnablingRecoveryMetricsTest, RecoveryFromSignInRequired) {
   base::HistogramTester histogram_tester;
 
   // 2. Transition to kSignInRequired by clearing the primary account
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS we cannot clear primary account easily, so we skip
-  // kSignInRequired tests on ChromeOS.
-#else
   auto* identity_test_env = identity_test_env_adaptor_->identity_test_env();
   identity_test_env->ClearPrimaryAccount();
 
@@ -2398,7 +2352,6 @@ TEST_F(GlicEnablingRecoveryMetricsTest, RecoveryFromSignInRequired) {
       .MaybeRecordRecoveryOnInteraction();
   histogram_tester.ExpectTotalCount("Glic.ProfileEnablement.RecoveredFromState",
                                     1);
-#endif
 }
 
 TEST_F(GlicEnablingRecoveryMetricsTest, RecoveryFromIneligibleAccount) {

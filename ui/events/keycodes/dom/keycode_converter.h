@@ -16,10 +16,6 @@
 #include "ui/events/keycodes/dom/dom_code.h"
 #include "ui/events/keycodes/dom/dom_key.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/events/keycodes/keyboard_codes_posix.h"
-#endif
-
 // For reference, the W3C UI Event spec is located at:
 // http://www.w3.org/TR/uievents/
 
@@ -65,7 +61,7 @@ class KeycodeConverter {
   // Convert a DomCode into a native keycode.
   static int DomCodeToNativeKeycode(DomCode code);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Convert a XKB keycode into a DomCode.
   static DomCode XkbKeycodeToDomCode(uint32_t xkb_keycode);
 
@@ -77,24 +73,6 @@ class KeycodeConverter {
 
   // Convert a DomCode into an evdev code.
   static int DomCodeToEvdevCode(DomCode code);
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // If |key_code| is one of the keys (plus, minus, brackets, period, comma),
-  // that are treated positionally for keyboard shortcuts, this returns the
-  // DomCode of that key in the US layout. Any other key returns
-  // |DomCode::NONE|.
-  static DomCode MapUSPositionalShortcutKeyToDomCode(
-      KeyboardCode key_code,
-      DomCode original_dom_code = ui::DomCode::NONE);
-
-  // If |code| is one of the keys (plus, minus, brackets, period, comma) that
-  // are treated positionally for keyboard shortcuts, this returns the
-  // KeyboardCode (aka VKEY) of that key in the US layout. Any other key
-  // returns |VKEY_UNKNOWN|
-  static KeyboardCode MapPositionalDomCodeToUSShortcutKey(
-      DomCode code,
-      KeyboardCode original_key_code = VKEY_UNKNOWN);
 #endif
 
   // Conversion between DOM Code string and DomCode enum values.

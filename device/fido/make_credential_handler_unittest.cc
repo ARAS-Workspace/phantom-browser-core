@@ -319,11 +319,6 @@ TEST_F(FidoMakeCredentialHandlerTest, CrossPlatformAttachment) {
   // discovery factory.
   ExpectAllowedTransportsForRequestAre(request_handler.get(), {
     FidoTransportProtocol::kNearFieldCommunication,
-#if BUILDFLAG(IS_CHROMEOS)
-        // CrOS tries to instantiate a platform authenticator for cross-platform
-        // requests if enabled via enterprise policy.
-        FidoTransportProtocol::kInternal,
-#endif
         FidoTransportProtocol::kUsbHumanInterfaceDevice
   });
 }
@@ -587,21 +582,10 @@ TEST_F(FidoMakeCredentialHandlerTest,
 
   auto device = MockFidoDevice::MakeCtapWithGetInfoExpectation(
       test_data::kTestGetInfoResponsePlatformDevice);
-#if BUILDFLAG(IS_CHROMEOS)
-  // CrOS will dispatch to a platform authenticator and one can be
-  // instantiated in such cases if enabled via enterprise policy.
-  device->ExpectCtap2CommandAndRespondWithError(
-      CtapRequestCommand::kAuthenticatorMakeCredential,
-      CtapDeviceResponseCode::kCtap2ErrOperationDenied);
-#endif
   discovery()->AddDevice(std::move(device));
 
   task_environment_.FastForwardUntilNoTasksRemain();
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(future().IsReady());
-#else
   EXPECT_FALSE(future().IsReady());
-#endif
 }
 
 // A platform authenticator claiming to be a cross-platform authenticator as per

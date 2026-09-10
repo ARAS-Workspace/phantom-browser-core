@@ -25,7 +25,7 @@ scoped_refptr<base::SingleThreadTaskRunner> GetIOThreadTaskRunner() {
 
 LockThreadAffinity::LockThreadAffinity(int cpu_number)
     : affinity_set_ok_(false) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   cpu_set_t cpuset;
   UNSAFE_TODO(CPU_ZERO(&cpuset));
   UNSAFE_TODO(CPU_SET(cpu_number, &cpuset));
@@ -42,7 +42,7 @@ LockThreadAffinity::LockThreadAffinity(int cpu_number)
 LockThreadAffinity::~LockThreadAffinity() {
   if (!affinity_set_ok_)
     return;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   auto set_result = sched_setaffinity(0, sizeof(old_cpuset_), &old_cpuset_);
   DCHECK_EQ(0, set_result);
 #endif

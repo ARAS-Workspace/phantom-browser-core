@@ -21,15 +21,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/test/base/testing_profile.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/user_names.h"
-#include "content/public/test/browser_task_environment.h"
-#endif
-
 namespace webrtc_event_logging {
 
 namespace {
@@ -662,80 +653,5 @@ TEST_F(GzippedLogFileWriterTest,
   EXPECT_FALSE(writer->Close());
   EXPECT_FALSE(base::PathExists(path_));  // Errored files deleted by Close().
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-struct DoesProfileDefaultToLoggingEnabledForUserTypeTestCase {
-  user_manager::UserType user_type;
-  bool defaults_to_logging_enabled;
-};
-
-class DoesProfileDefaultToLoggingEnabledForUserTypeParametrizedTest
-    : public ::testing::TestWithParam<
-          DoesProfileDefaultToLoggingEnabledForUserTypeTestCase> {
- protected:
-  content::BrowserTaskEnvironment task_environment_;
-};
-
-TEST_P(DoesProfileDefaultToLoggingEnabledForUserTypeParametrizedTest,
-       WebRtcPolicyDefaultTest) {
-  DoesProfileDefaultToLoggingEnabledForUserTypeTestCase test_case = GetParam();
-
-  TestingProfile::Builder profile_builder;
-  profile_builder.OverridePolicyConnectorIsManagedForTesting(true);
-  std::unique_ptr<TestingProfile> testing_profile = profile_builder.Build();
-  auto fake_user_manager_ = std::make_unique<ash::FakeChromeUserManager>();
-  // We use a standard Gaia account by default:
-  AccountId account_id = AccountId::FromUserEmailGaiaId("name", GaiaId("id"));
-
-  switch (test_case.user_type) {
-    case user_manager::UserType::kRegular:
-      fake_user_manager_->AddUserWithAffiliationAndTypeAndProfile(
-          account_id, false, test_case.user_type, testing_profile.get());
-      break;
-    case user_manager::UserType::kGuest:
-      account_id = user_manager::GuestAccountId();
-      fake_user_manager_->AddGuestUser();
-      break;
-    case user_manager::UserType::kPublicAccount:
-      fake_user_manager_->AddPublicAccountUser(account_id);
-      break;
-    case user_manager::UserType::kKioskChromeApp:
-      fake_user_manager_->AddKioskChromeAppUser(account_id);
-      break;
-    case user_manager::UserType::kChild:
-      fake_user_manager_->AddChildUser(account_id);
-      break;
-    default:
-      FAIL() << "Invalid test setup. Unexpected user type.";
-  }
-
-  fake_user_manager_->LoginUser(account_id);
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_ =
-      std::make_unique<user_manager::ScopedUserManager>(
-          std::move(fake_user_manager_));
-
-  EXPECT_EQ(DoesProfileDefaultToLoggingEnabled(
-                testing_profile.get(), webrtc_logging::ApiType::kExtension),
-            test_case.defaults_to_logging_enabled);
-
-  EXPECT_EQ(DoesProfileDefaultToLoggingEnabled(testing_profile.get(),
-                                               webrtc_logging::ApiType::kWeb),
-            false);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    WebRtcPolicyDefaultTests,
-    DoesProfileDefaultToLoggingEnabledForUserTypeParametrizedTest,
-    testing::ValuesIn(
-        std::vector<DoesProfileDefaultToLoggingEnabledForUserTypeTestCase>{
-            {user_manager::UserType::kRegular, true},
-            {user_manager::UserType::kGuest, false},
-            {user_manager::UserType::kPublicAccount, false},
-            {user_manager::UserType::kKioskChromeApp, false},
-            {user_manager::UserType::kChild, false},
-        }));
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace webrtc_event_logging

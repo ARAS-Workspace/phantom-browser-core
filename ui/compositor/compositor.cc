@@ -371,9 +371,6 @@ void Compositor::SetLayerTreeFrameSink(
                                                   vsync_interval_);
     }
     display_private_->SetMaxVSyncAndVrr(max_vsync_interval_, vrr_state_);
-#if BUILDFLAG(IS_CHROMEOS)
-    display_private_->SetSupportedRefreshRates(seamless_refresh_rates_);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   MaybeUpdateObserveBeginFrame();
@@ -862,13 +859,7 @@ void Compositor::DidCommit(int source_frame_number,
 
 std::unique_ptr<cc::BeginMainFrameMetrics>
 Compositor::GetBeginMainFrameMetrics() {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto metrics_data = std::make_unique<cc::BeginMainFrameMetrics>();
-  metrics_data->should_measure_smoothness = true;
-  return metrics_data;
-#else
   return nullptr;
-#endif
 }
 
 void Compositor::NotifyCompositorMetricsTrackerResults(
@@ -1065,22 +1056,6 @@ void Compositor::MaybeUpdateObserveBeginFrame() {
   display_private_->SetStandaloneBeginFrameObserver(
       host_begin_frame_observer_->GetBoundRemote());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void Compositor::SetSeamlessRefreshRates(
-    const std::vector<float>& seamless_refresh_rates) {
-  seamless_refresh_rates_ = seamless_refresh_rates;
-
-  if (display_private_) {
-    display_private_->SetSupportedRefreshRates(seamless_refresh_rates);
-  }
-}
-
-void Compositor::OnSetPreferredRefreshRate(float refresh_rate) {
-  observer_list_.Notify(&CompositorObserver::OnSetPreferredRefreshRate, this,
-                        refresh_rate);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 Compositor::ScopedKeepSurfaceAliveCallback
 Compositor::TakeScopedKeepSurfaceAliveCallback(

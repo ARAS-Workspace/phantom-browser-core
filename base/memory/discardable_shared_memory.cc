@@ -404,7 +404,7 @@ bool DiscardableSharedMemory::Purge(Time current_time) {
 // Linux and Android provide MADV_REMOVE which is preferred as it has a
 // behavior that can be verified in tests. Other POSIX flavors (MacOSX, BSDs),
 // provide MADV_FREE which has the same result but memory is purged lazily.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #define MADV_PURGE_ARGUMENT MADV_REMOVE
 #elif BUILDFLAG(IS_APPLE)
   // MADV_FREE_REUSABLE is similar to MADV_FREE, but also marks the pages with

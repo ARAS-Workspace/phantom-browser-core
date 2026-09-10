@@ -846,20 +846,9 @@ TEST_F(XkbLayoutEngineVkTest, KeyboardCodeForNonPrintable) {
       // Verify AltGr+V & AltGr+W on de(neo) layout.
       {{DomCode::US_W, EF_ALTGR_DOWN, XKB_KEY_BackSpace, 8}, VKEY_BACK},
       {{DomCode::US_V, EF_ALTGR_DOWN, XKB_KEY_Return, 13}, VKEY_RETURN},
-#if BUILDFLAG(IS_CHROMEOS)
-      {{DomCode::ACCESSIBILITY, EF_NONE}, VKEY_ACCESSIBILITY},
-      {{DomCode::DO_NOT_DISTURB, EF_NONE}, VKEY_DO_NOT_DISTURB},
-      {{DomCode::CAMERA_ACCESS_TOGGLE, EF_NONE}, VKEY_CAMERA_ACCESS_TOGGLE},
-      // Verify on ChromeOS PRINT maps to VKEY_PRINT not VKEY_SNAPSHOT.
-      {{DomCode::PRINT, EF_NONE, XKB_KEY_Print}, VKEY_PRINT},
-      // On ChromeOS XKB_KEY_3270_PrintScreen is used for PRINT_SCREEN.
-      {{DomCode::PRINT_SCREEN, EF_NONE, XKB_KEY_3270_PrintScreen},
-       VKEY_SNAPSHOT},
-#else   // !BUILDFLAG(IS_CHROMEOS)
       // On Linux PRINT and PRINT_SCREEN map to VKEY_SNAPSHOT via XKB_KEY_Print
       {{DomCode::PRINT, EF_NONE, XKB_KEY_Print}, VKEY_SNAPSHOT},
       {{DomCode::PRINT_SCREEN, EF_NONE, XKB_KEY_Print}, VKEY_SNAPSHOT},
-#endif  // BUILDFLAG(IS_CHROMEOS)
   };
   for (const auto& e : kVkeyTestCase) {
     SCOPED_TRACE(static_cast<int>(e.test.dom_code));
@@ -1063,7 +1052,6 @@ TEST(XkbKeyboardLayoutEngineTest, NumpadDecimal) {
   EXPECT_EQ(ui::VKEY_DECIMAL, key_code);
 
   // NumLock off tests are skipped on ChromeOS because NumLock is always on.
-#if !BUILDFLAG(IS_CHROMEOS)
   // With NumLock disabled, NUMPAD_DECIMAL should map to DomKey::DEL and
   // VKEY_DELETE.
   dom_key = DomKey::NONE;
@@ -1081,7 +1069,6 @@ TEST(XkbKeyboardLayoutEngineTest, NumpadDecimal) {
                                    ui::EF_SHIFT_DOWN, &dom_key, &key_code));
   EXPECT_EQ(ui::DomKey::DEL, dom_key);
   EXPECT_EQ(ui::VKEY_DELETE, key_code);
-#endif
 
   // With NumLock enabled and Shift down, NumLock behavior is inverted (acts as
   // disabled), which maps to DomKey::DEL and VKEY_DELETE.

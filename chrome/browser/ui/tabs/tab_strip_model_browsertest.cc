@@ -76,11 +76,7 @@ constexpr char kCalculatorForceInstalled[] = R"([
   }
 ])";
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr bool kShouldPreventClose = true;
-#else
 constexpr bool kShouldPreventClose = false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -148,13 +144,8 @@ IN_PROC_BROWSER_TEST_F(TabStripModelPreventCloseTest,
 }
 
 // TODO(b/321593065): enable this flaky test.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable \
-  DISABLED_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable
-#else
 #define MAYBE_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable \
   PreventCloseEnforcedByPolicyTabbedAppShallBeClosable
-#endif
 IN_PROC_BROWSER_TEST_F(
     TabStripModelPreventCloseTest,
     MAYBE_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable) {
@@ -482,11 +473,7 @@ IN_PROC_BROWSER_TEST_F(TabStripModelBrowserTest, CommandDuplicateSelected) {
 }
 
 // TODO(crbug.com/501991031): Fails on "chrome/ci/linux-chromeos-chrome".
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TestCloseTabDuringMoveOperation \
-  DISABLED_TestCloseTabDuringMoveOperation
-// TODO(crbug.com/542347163): Re-enable test.
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestCloseTabDuringMoveOperation \
   DISABLED_TestCloseTabDuringMoveOperation
 #else

@@ -54,12 +54,6 @@
 #include "ui/base/ime/init/input_method_initializer.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/dbus/dbus_thread_manager.h"
-#include "device/bluetooth/dbus/bluez_dbus_manager.h"
-#include "device/bluetooth/floss/floss_dbus_manager.h"
-#include "device/bluetooth/floss/floss_features.h"
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 #include "device/bluetooth/dbus/dbus_bluez_manager_wrapper_linux.h"
@@ -108,14 +102,7 @@ ShellBrowserMainParts::ShellBrowserMainParts() = default;
 ShellBrowserMainParts::~ShellBrowserMainParts() = default;
 
 void ShellBrowserMainParts::PostCreateMainMessageLoop() {
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::DBusThreadManager::Initialize();
-  if (floss::features::IsFlossEnabled()) {
-    floss::FlossDBusManager::InitializeFake();
-  } else {
-    bluez::BluezDBusManager::InitializeFake();
-  }
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   bluez::DBusBluezManagerWrapperLinux::Initialize();
 #endif
 }
@@ -200,15 +187,7 @@ void ShellBrowserMainParts::PostMainMessageLoopRun() {
 }
 
 void ShellBrowserMainParts::PostDestroyThreads() {
-#if BUILDFLAG(IS_CHROMEOS)
-  device::BluetoothAdapterFactory::Shutdown();
-  if (floss::features::IsFlossEnabled()) {
-    floss::FlossDBusManager::Shutdown();
-  } else {
-    bluez::BluezDBusManager::Shutdown();
-  }
-  ash::DBusThreadManager::Shutdown();
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   device::BluetoothAdapterFactory::Shutdown();
   bluez::DBusBluezManagerWrapperLinux::Shutdown();
 #endif

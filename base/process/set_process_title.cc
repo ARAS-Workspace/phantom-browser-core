@@ -8,7 +8,7 @@
 // program_invocation_short_name. Keep this at the top of the file since some
 // system headers might include <errno.h> and the header could be skipped on
 // subsequent includes.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && !defined(_GNU_SOURCE)
+#if BUILDFLAG(IS_LINUX) && !defined(_GNU_SOURCE)
 #define _GNU_SOURCE
 #endif
 
@@ -26,7 +26,7 @@
 #include "base/command_line.h"
 #endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_SOLARIS)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <errno.h>  // Get program_invocation_short_name declaration.
 #include <sys/prctl.h>
 
@@ -38,7 +38,7 @@
 #include "base/threading/platform_thread.h"
 // Linux/glibc doesn't natively have setproctitle().
 #include "base/process/set_process_title_linux.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace base {
 
@@ -52,7 +52,7 @@ void SetProcessTitleFromCommandLine(const char** main_argv) {
   std::string title;
   bool have_argv0 = false;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   DCHECK_EQ(base::PlatformThread::CurrentId(),
             base::PlatformThreadId(getpid()));
 
@@ -90,7 +90,7 @@ void SetProcessTitleFromCommandLine(const char** main_argv) {
     *base_name_storage = std::move(base_name);
     program_invocation_short_name = &(*base_name_storage)[0];
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   const base::CommandLine* command_line =
       base::CommandLine::ForCurrentProcess();

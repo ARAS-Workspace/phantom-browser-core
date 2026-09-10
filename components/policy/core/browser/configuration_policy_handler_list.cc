@@ -164,7 +164,6 @@ bool ConfigurationPolicyHandlerList::IsPolicySupported(
   }
 
 // All policies on ChromeOS are from a cloud source so we can skip this check.
-#if !BUILDFLAG(IS_CHROMEOS)
   if (policy_details->source_restriction == kSourceRestrictionCloudOnly &&
       !IsCloudOnlyPolicy(entry)) {
     if (errors) {
@@ -172,7 +171,6 @@ bool ConfigurationPolicyHandlerList::IsPolicySupported(
     }
     return false;
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   return !IsBlockedPlatformDevicePolicy(*policy_details, entry);
 }

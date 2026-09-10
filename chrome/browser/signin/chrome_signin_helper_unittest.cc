@@ -768,9 +768,6 @@ TEST_F(ChromeSigninHelperTest, NonEligibleURL) {
       /*incognito_availability=*/0, signin::AccountConsistencyMethod::kMirror,
       GaiaId("gaia_id"), signin::ConsentLevel::kSignin,
       /*is_child_account=*/signin::Tribool::kFalse,
-#if BUILDFLAG(IS_CHROMEOS)
-      /*is_secondary_account_addition_allowed=*/true,
-#endif
       /*is_sync_feature_enabled=*/false,
       CookieSettingsFactory::GetForProfile(profile()).get());
   EXPECT_EQ(
@@ -786,9 +783,6 @@ TEST_F(ChromeSigninHelperTest, EligibleURL) {
       /*incognito_availability=*/0, signin::AccountConsistencyMethod::kMirror,
       GaiaId("gaia_id"), signin::ConsentLevel::kSignin,
       /*is_child_account=*/signin::Tribool::kFalse,
-#if BUILDFLAG(IS_CHROMEOS)
-      /*is_secondary_account_addition_allowed=*/true,
-#endif
       /*is_sync_feature_enabled=*/false,
       CookieSettingsFactory::GetForProfile(profile()).get());
   std::string expected_header =
@@ -809,28 +803,14 @@ TEST_F(ChromeSigninHelperTest, MirrorConsentLevelSync) {
       /*incognito_availability=*/0, signin::AccountConsistencyMethod::kMirror,
       GaiaId("gaia_id"), signin::ConsentLevel::kSync,
       /*is_child_account=*/signin::Tribool::kFalse,
-#if BUILDFLAG(IS_CHROMEOS)
-      /*is_secondary_account_addition_allowed=*/true,
-#endif
       /*is_sync_feature_enabled=*/false,
       CookieSettingsFactory::GetForProfile(profile()).get());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, the header is added even when not syncing, but without the
-  // gaia id.
-  std::string expected_header_no_sync =
-      "source=Chrome,mode=0,enable_account_consistency=true,"
-      "supervised=false,consistency_enabled_by_default=false";
-  EXPECT_THAT(
-      request.modified_headers().GetHeader(signin::kChromeConnectedHeader),
-      testing::Optional(expected_header_no_sync));
-#else
   // On other platforms, no header is added since sync is disabled and consent
   // level is kSync.
   EXPECT_EQ(
       request.modified_headers().GetHeader(signin::kChromeConnectedHeader),
       std::nullopt);
-#endif
 
   // 2. ConsentLevel::kSync, is_sync_feature_enabled=true.
   TestChromeRequestAdapter request_sync(GURL("https://docs.google.com"));
@@ -839,9 +819,6 @@ TEST_F(ChromeSigninHelperTest, MirrorConsentLevelSync) {
       /*incognito_availability=*/0, signin::AccountConsistencyMethod::kMirror,
       GaiaId("gaia_id"), signin::ConsentLevel::kSync,
       /*is_child_account=*/signin::Tribool::kFalse,
-#if BUILDFLAG(IS_CHROMEOS)
-      /*is_secondary_account_addition_allowed=*/true,
-#endif
       /*is_sync_feature_enabled=*/true,
       CookieSettingsFactory::GetForProfile(profile()).get());
 
@@ -865,9 +842,6 @@ TEST_F(ChromeSigninHelperTest, NonDefaultGaiaOrigin) {
       /*incognito_availability=*/0, signin::AccountConsistencyMethod::kMirror,
       GaiaId("gaia_id"), signin::ConsentLevel::kSignin,
       /*is_child_account=*/signin::Tribool::kFalse,
-#if BUILDFLAG(IS_CHROMEOS)
-      /*is_secondary_account_addition_allowed=*/true,
-#endif
       /*is_sync_feature_enabled=*/false,
       CookieSettingsFactory::GetForProfile(profile()).get());
   std::string expected_header =

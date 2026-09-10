@@ -22,10 +22,6 @@
 #include "base/android/content_uri_utils.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <grp.h>
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace storage {
 namespace {
 

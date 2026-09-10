@@ -76,11 +76,6 @@ class PolicyLoggerTest : public PlatformTest {
 // Checks that the logger is enabled by feature and that `GetAsList` returns an
 // updated list of logs.
 TEST_F(PolicyLoggerTest, PolicyLoggingEnabled) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!PolicyLogger::IsPolicyLoggingEnabled()) {
-    GTEST_SKIP() << "Policy logging is disabled on ChromeOS stable";
-  }
-#endif
   PolicyLogger* policy_logger = policy::PolicyLogger::GetInstance();
 
   size_t logs_size_before_adding = policy_logger->GetPolicyLogsSizeForTesting();
@@ -95,11 +90,6 @@ TEST_F(PolicyLoggerTest, PolicyLoggingEnabled) {
 
 // Checks that the deletion of expired logs works as expected.
 TEST_F(PolicyLoggerTest, DeleteOldLogs) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!PolicyLogger::IsPolicyLoggingEnabled()) {
-    GTEST_SKIP() << "Policy logging is disabled on ChromeOS stable";
-  }
-#endif
   PolicyLogger* policy_logger = policy::PolicyLogger::GetInstance();
   policy_logger->EnableLogDeletion();
   size_t logs_size_before_adding = policy_logger->GetPolicyLogsSizeForTesting();
@@ -131,11 +121,6 @@ TEST_F(PolicyLoggerTest, DeleteOldLogs) {
 // Checks that the first log  added is deleted when `PolicyLogger::kMaxLogSize`
 // is exceeded.
 TEST_F(PolicyLoggerTest, MaxSizeExceededDeletesOldestLog) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!PolicyLogger::IsPolicyLoggingEnabled()) {
-    GTEST_SKIP() << "Policy logging is disabled on ChromeOS stable";
-  }
-#endif
   PolicyLogger* policy_logger = policy::PolicyLogger::GetInstance();
 
   AddLogs("First log that will be removed.", policy_logger);
@@ -165,22 +150,12 @@ TEST_F(PolicyLoggerTest, MaxSizeExceededDeletesOldestLog) {
 // Checks that `ScheduleOldLogsDeletion` does not crash when there is no task
 // runner.
 TEST(PolicyLoggerTestNoTaskRunner, ScheduleOldLogsDeletion) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!PolicyLogger::IsPolicyLoggingEnabled()) {
-    GTEST_SKIP() << "Policy logging is disabled on ChromeOS stable";
-  }
-#endif
   ASSERT_TRUE(!base::SequencedTaskRunner::HasCurrentDefault());
   policy::PolicyLogger::GetInstance()->ScheduleOldLogsDeletionForTesting();
 }
 
 // Checks that the deletion of expired logs works as expected.
 TEST_F(PolicyLoggerTest, DeleteOldLogsMultithreaded) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!PolicyLogger::IsPolicyLoggingEnabled()) {
-    GTEST_SKIP() << "Policy logging is disabled on ChromeOS stable";
-  }
-#endif
   PolicyLogger* policy_logger = policy::PolicyLogger::GetInstance();
   policy_logger->EnableLogDeletion();
   size_t logs_size_before_adding = policy_logger->GetPolicyLogsSizeForTesting();
@@ -220,11 +195,6 @@ TEST_F(PolicyLoggerTest, DeleteOldLogsMultithreaded) {
 // Checks that the deletion of expired logs works does not happen when no
 // SequenceTaskRunner is available.
 TEST_F(PolicyLoggerTest, DeleteOldLogsMultithreadedNoSequencedTaskRunner) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!PolicyLogger::IsPolicyLoggingEnabled()) {
-    GTEST_SKIP() << "Policy logging is disabled on ChromeOS stable";
-  }
-#endif
   PolicyLogger* policy_logger = policy::PolicyLogger::GetInstance();
   policy_logger->EnableLogDeletion();
 

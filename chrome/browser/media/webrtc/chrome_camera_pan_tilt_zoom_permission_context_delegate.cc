@@ -13,16 +13,6 @@
 #include "base/compiler_specific.h"
 #endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_CHROMEOS)
-#include "extensions/browser/extension_registry.h"         // nogncheck
-#include "extensions/browser/extensions_browser_client.h"  // nogncheck
-#include "extensions/browser/kiosk/kiosk_delegate.h"       // nogncheck
-#include "extensions/common/constants.h"
-#include "extensions/common/extension.h"
-#include "extensions/common/permissions/api_permission.h"
-#include "extensions/common/permissions/permissions_data.h"
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_CHROMEOS)
-
 ChromeCameraPanTiltZoomPermissionContextDelegate::
     ChromeCameraPanTiltZoomPermissionContextDelegate(
         content::BrowserContext* browser_context)
@@ -40,40 +30,7 @@ bool ChromeCameraPanTiltZoomPermissionContextDelegate::
   // because pan and tilt are not supported on Android.
   *content_setting_result = CONTENT_SETTING_ALLOW;
   return true;
-#elif BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_CHROMEOS)
-  // Extensions running in kiosk mode that have declared the "videoCapture"
-  // permission in their manifest are allowed to control camera movements.
-  if (IsPermissionGrantedForExtension(requesting_origin)) {
-    *content_setting_result = CONTENT_SETTING_ALLOW;
-    return true;
-  }
-  return false;
 #else
   return false;
 #endif
 }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_CHROMEOS)
-bool ChromeCameraPanTiltZoomPermissionContextDelegate::
-    IsPermissionGrantedForExtension(const GURL& origin) const {
-  const extensions::Extension* extension =
-      extensions::ExtensionRegistry::Get(browser_context_)
-          ->enabled_extensions()
-          .GetExtensionOrAppByURL(origin);
-
-  extensions::KioskDelegate* const kiosk_delegate =
-      extensions::ExtensionsBrowserClient::Get()->GetKioskDelegate();
-  DCHECK(kiosk_delegate);
-
-  if (!extension ||
-      !extension->permissions_data()->HasAPIPermission(
-          extensions::mojom::APIPermissionID::kVideoCapture) ||
-      !kiosk_delegate->IsAutoLaunchedKioskApp(extension->id())) {
-    // The `extension` doesn't exist, doesn't have the "videoCapture"
-    // permission declared in their manifest, or is not running in kiosk mode.
-    return false;
-  }
-
-  return true;
-}
-#endif

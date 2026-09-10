@@ -57,13 +57,13 @@ class UpgradeDetectorTest : public ::testing::Test {
     return task_environment_.GetMockTickClock();
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   void OverrideTimezone(const std::string& tz) {
     // If there already is the override, reset it first.
     libc_timezone_override_.reset();
     libc_timezone_override_.emplace(tz);
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   void RunUntilIdle() { task_environment_.RunUntilIdle(); }
 
@@ -94,9 +94,9 @@ class UpgradeDetectorTest : public ::testing::Test {
 
  private:
   base::test::TaskEnvironment task_environment_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   std::optional<base::test::ScopedLibcTimezoneOverride> libc_timezone_override_;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 };
 
 TEST_F(UpgradeDetectorTest, RelaunchWindowPolicy) {
@@ -220,7 +220,7 @@ TEST_F(UpgradeDetectorTest, DeadlineAdjustmentOverMidnight) {
   RunUntilIdle();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(UpgradeDetectorTest, DeadlineAdjustmentDst) {
   // Set Europe timezone where daylight saving starts (UTC+1) at local 2:00am
   // on the last Sunday of March and ends at local 3:00am on the last Sunday of
@@ -276,4 +276,4 @@ TEST_F(UpgradeDetectorTest, DeadlineAdjustmentDst) {
   upgrade_detector.Shutdown();
   RunUntilIdle();
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)

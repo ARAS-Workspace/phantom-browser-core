@@ -26,11 +26,7 @@ namespace diagnostics {
 #if BUILDFLAG(IS_MAC)
 const int DiagnosticsModel::kDiagnosticsTestCount = 14;
 #elif BUILDFLAG(IS_POSIX)
-#if BUILDFLAG(IS_CHROMEOS)
-const int DiagnosticsModel::kDiagnosticsTestCount = 18;
-#else
 const int DiagnosticsModel::kDiagnosticsTestCount = 16;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(IS_MAC)
 
 namespace {
@@ -169,10 +165,6 @@ class DiagnosticsModelPosix : public DiagnosticsModelImpl {
     tests_.push_back(MakeSqliteFaviconsDbTest());
     tests_.push_back(MakeSqliteHistoryDbTest());
     tests_.push_back(MakeSqliteTopSitesDbTest());
-#if BUILDFLAG(IS_CHROMEOS)
-    tests_.push_back(MakeSqliteNssCertDbTest());
-    tests_.push_back(MakeSqliteNssKeyDbTest());
-#endif
   }
 
   DiagnosticsModelPosix(const DiagnosticsModelPosix&) = delete;

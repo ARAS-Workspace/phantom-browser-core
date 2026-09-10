@@ -583,11 +583,6 @@ void Widget::Init(InitParams params) {
   const ui::mojom::WindowShowState show_state = params.show_state;
   WidgetDelegate* delegate = params.delegate;
   bool should_set_initial_bounds = true;
-#if BUILDFLAG(IS_CHROMEOS)
-  // If the target display is specified on ChromeOS, the initial bounds will be
-  // set based on the display.
-  should_set_initial_bounds = !params.display_id.has_value();
-#endif
   background_color_ = params.background_color;
   native_widget_->InitNativeWidget(std::move(params));
   if (type == InitParams::TYPE_MENU) {
@@ -626,13 +621,6 @@ void Widget::Init(InitParams params) {
       saved_show_state_ = ui::mojom::WindowShowState::kMinimized;
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // In ChromeOS, rounding window can involve rounding its client view and the
-    // contents. Therefore, wait till the contents are set.
-    // Since on ChromeOS, window can be square or rounded based on the window
-    // state, wait till window is maximized or minimized.
-    non_client_view_->frame_view()->UpdateWindowRoundedCorners();
-#endif
   } else if (delegate) {
     SetContentsView(delegate->TransferOwnershipOfContentsView());
     if (should_set_initial_bounds) {

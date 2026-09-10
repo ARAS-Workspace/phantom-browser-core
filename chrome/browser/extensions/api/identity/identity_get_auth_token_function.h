@@ -150,9 +150,6 @@ class IdentityGetAuthTokenFunction : public ExtensionFunction,
   class AccountsInCookieUpdatedWaiter;
 #endif
   enum class InteractionType { kSignin, kConsent };
-#if BUILDFLAG(IS_CHROMEOS)
-  class DeviceOAuth2TokenFetcher;
-#endif
 
   // If `gaia_id` is empty or the account is not present in Chrome, this will
   // use the primary account if it exists. Otherwise, interactive sign in flow
@@ -204,20 +201,6 @@ class IdentityGetAuthTokenFunction : public ExtensionFunction,
   void OnRemoteConsentSuccess(
       const RemoteConsentResolutionData& resolution_data) override;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Starts a login access token request for device robot account. This method
-  // will be called only in Chrome OS for:
-  // 1. Enterprise kiosk mode.
-  // 2. Allowlisted first party apps in public session.
-  virtual void StartDeviceAccessTokenRequest();
-
-  // Called on completion of `StartDeviceAccessTokenRequest`.
-  void OnAccessTokenForDeviceAccountFetchCompleted(
-      const std::optional<std::string>& access_token,
-      base::Time expiration_time,
-      const GoogleServiceAuthError& error);
-#endif
-
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   // This dialog prompts the user to sign in with an account that is already
   // present in the identity manager. This is different from the signin dialog
@@ -227,9 +210,7 @@ class IdentityGetAuthTokenFunction : public ExtensionFunction,
 #endif
 
   // Methods for invoking UI. Overridable for testing.
-#if !BUILDFLAG(IS_CHROMEOS)
   virtual void ShowExtensionLoginPrompt();
-#endif
   virtual void ShowRemoteConsentDialog();
 
   std::string GetOAuth2ClientId() const;
@@ -289,10 +270,6 @@ class IdentityGetAuthTokenFunction : public ExtensionFunction,
       scoped_identity_manager_observation_{this};
 
   bool waiting_on_account_ = false;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<DeviceOAuth2TokenFetcher> device_oauth2_token_fetcher_;
-#endif
 
   base::WeakPtrFactory<IdentityGetAuthTokenFunction> weak_ptr_factory_{this};
 };

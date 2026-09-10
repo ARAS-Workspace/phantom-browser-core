@@ -391,12 +391,8 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, DragWithinUnpinnedContainer) {
 
 // This test uses an experimental API to replace mouse events with touch events.
 // It is currently only supported on Ash Chrome.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DragWithinUnpinnedContainerTouch DragWithinUnpinnedContainerTouch
-#else
 #define MAYBE_DragWithinUnpinnedContainerTouch \
   DISABLED_DragWithinUnpinnedContainerTouch
-#endif
 IN_PROC_BROWSER_TEST_F(VerticalTabDragTest,
                        MAYBE_DragWithinUnpinnedContainerTouch) {
   TabStripModel* tab_strip_model = browser()->GetTabStripModel();
@@ -572,11 +568,7 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, DragOverSplitInGroup) {
 }
 
 // TODO(crbug.com/40249472): Fails on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DragMultipleTabs DISABLED_DragMultipleTabs
-#else
 #define MAYBE_DragMultipleTabs DragMultipleTabs
-#endif
 IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, MAYBE_DragMultipleTabs) {
   TabStripModel* tab_strip_model = browser()->GetTabStripModel();
   ASSERT_NE(nullptr, tab_strip_model);
@@ -601,11 +593,7 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, MAYBE_DragMultipleTabs) {
 }
 
 // TODO(crbug.com/40249472): Fails on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DragMultipleTabsInGroup DISABLED_DragMultipleTabsInGroup
-#else
 #define MAYBE_DragMultipleTabsInGroup DragMultipleTabsInGroup
-#endif
 IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, MAYBE_DragMultipleTabsInGroup) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kFourthTab);
   TabStripModel* tab_strip_model = browser()->GetTabStripModel();
@@ -731,13 +719,8 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, DragOutOfGroup) {
 }
 
 // TODO(crbug.com/40249472): Fails on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DragMultiplePinnedTabsWithinContainer \
-  DISABLED_DragMultiplePinnedTabsWithinContainer
-#else
 #define MAYBE_DragMultiplePinnedTabsWithinContainer \
   DragMultiplePinnedTabsWithinContainer
-#endif
 IN_PROC_BROWSER_TEST_F(VerticalTabDragTest,
                        MAYBE_DragMultiplePinnedTabsWithinContainer) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kFourthTab);
@@ -1365,7 +1348,7 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragDetachTest,
 
 // TODO(crbug.com/40249472): Tab DnD tests not working on ChromeOS and Mac, and
 // flakes on Wayland. Fails on Windows.
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_LINUX)
+#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_LINUX)
 #define MAYBE_DragToDetachIntoNewWindowWithVerticalTabsState \
   DragToDetachIntoNewWindowWithVerticalTabsState
 #else
@@ -1460,7 +1443,7 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragDetachTest,
       }));
 }
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC)
 #define MAYBE_DetachMultipleTabs DetachMultipleTabs
 #else
 #define MAYBE_DetachMultipleTabs DISABLED_DetachMultipleTabs

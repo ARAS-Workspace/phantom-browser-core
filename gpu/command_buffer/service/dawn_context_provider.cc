@@ -330,7 +330,7 @@ wgpu::BackendType DawnContextProvider::GetDefaultBackendType() {
   if (gl::GetANGLEImplementation() == gl::ANGLEImplementation::kSwiftShader) {
     return wgpu::BackendType::Vulkan;
   }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   return wgpu::BackendType::Vulkan;
 #elif BUILDFLAG(IS_APPLE)
   return wgpu::BackendType::Metal;

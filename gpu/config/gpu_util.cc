@@ -589,17 +589,9 @@ GpuFeatureInfo ComputeGpuFeatureInfo(const GPUInfo& gpu_info,
     *needs_more_info = blocklist_needs_more_info;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   gpu_feature_info.status_values[GPU_FEATURE_TYPE_GPU_TILE_RASTERIZATION] =
       GetGpuRasterizationFeatureStatus(blocklisted_features, *command_line,
                                        use_software_gl);
-#else
-  // TODO(penghuang): call GetGpuRasterizationFeatureStatus() with
-  // |use_software_gl|.
-  gpu_feature_info.status_values[GPU_FEATURE_TYPE_GPU_TILE_RASTERIZATION] =
-      GetGpuRasterizationFeatureStatus(blocklisted_features, *command_line,
-                                       /*use_software_gl=*/false);
-#endif
   gpu_feature_info.status_values[GPU_FEATURE_TYPE_ACCELERATED_WEBGL] =
       GetWebGLFeatureStatus(blocklisted_features, use_software_gl);
   gpu_feature_info.status_values[GPU_FEATURE_TYPE_ACCELERATED_WEBGL2] =

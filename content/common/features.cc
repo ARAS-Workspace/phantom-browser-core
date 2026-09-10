@@ -115,11 +115,7 @@ BASE_FEATURE(kBackForwardCacheTimeToLiveControl,
 // TODO(b/281094330): Run experiment on ChromeOS. Experiment was not run on
 // ChromeOS due to try bot issue.
 BASE_FEATURE(kBeforeUnloadBrowserResponseQueue,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif
 );
 
 #if BUILDFLAG(IS_ANDROID)
@@ -218,10 +214,10 @@ BASE_FEATURE(kKillOnUnexpectedOriginHeader, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kEmbeddingRequiresOptIn, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables error reporting for JS errors inside DevTools frontend host
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kEnableDevToolsJsErrorReporting,
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // When enabled, the browser process will terminate a renderer process if it
 // attempts to bind gamepad Mojo interfaces (GamepadMonitor or
@@ -274,7 +270,7 @@ BASE_FEATURE(kFocusRenderWidgetHostViewAndroidOnMouseDown,
 // This feature controls whether the renderer should use FontDataManager to
 // fetch fonts from the Browser's FontDataService. It is currently scoped to
 // Linux (via separate features and experiments). See crbug.com/335680565.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 const base::FeatureParam<FontDataServiceTypefaceType>::Option
     font_data_service_typeface[] = {
         {FontDataServiceTypefaceType::kFreetype, "Freetype"},
@@ -296,7 +292,7 @@ BASE_FEATURE_ENUM_PARAM(FontDataServiceTypefaceType,
                         FontDataServiceTypefaceType::kFontations,
                         &font_data_service_typeface);
 #endif  // BUILDFLAG(IS_LINUX)
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Enables speculative font family prewarming through FontDataManager.
 BASE_FEATURE(kFontDataManagerPrewarming, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -305,12 +301,10 @@ BASE_FEATURE(kFontDataManagerPrewarming, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kFontDataServiceForCSSLocalFonts,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool IsFontDataServiceEnabled() {
 #if BUILDFLAG(IS_LINUX)
   return base::FeatureList::IsEnabled(features::kFontDataServiceLinux);
-#elif BUILDFLAG(IS_CHROMEOS)
-  return base::FeatureList::IsEnabled(features::kFontDataServiceChromeOS);
 #else
   return false;
 #endif
@@ -817,7 +811,7 @@ BASE_FEATURE(kStrictHighRankProcessLRU, base::FEATURE_ENABLED_BY_DEFAULT);
 // is handled at a different level and not through the interpretation of scroll
 // events.
 BASE_FEATURE(kTouchpadOverscrollHistoryNavigation,
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT

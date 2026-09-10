@@ -1200,7 +1200,7 @@ IN_PROC_BROWSER_TEST_F(CreativeOriginAdsPageLoadMetricsObserverBrowserTest,
 }
 
 // Disabled due to flakiness https://crbug.com/40778479
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_CreativeOriginStatusWithThrottlingNestedThrottled \
   DISABLED_CreativeOriginStatusWithThrottlingNestedThrottled
 #else
@@ -1345,7 +1345,7 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(https://crbug.com/40286659): Fix this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_DocOverwritesNavigation DISABLED_DocOverwritesNavigation
 #else
 #define MAYBE_DocOverwritesNavigation DocOverwritesNavigation
@@ -2898,7 +2898,7 @@ IN_PROC_BROWSER_TEST_F(AdsPageLoadMetricsObserverBrowserTest,
 
 // Test that rAF events are measured as part of the cpu metrics.
 // TODO(crbug.com/40826975): Flaky on multiple platforms.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_TwoRAFFramesTriggerCpuUpdates \
   DISABLED_TwoRAFFramesTriggerCpuUpdates
 #else

@@ -615,11 +615,7 @@ class AtMemoryEnablementUtilsWithGroupsTest
   }
 
   static constexpr std::string GetDogfoodGroupsPrefName() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return variations::kOsDogfoodGroupsSyncPrefName;
-#else
     return variations::kDogfoodGroupsSyncPrefName;
-#endif
   }
 
   void SetUserGroups(const std::vector<std::string>& groups) {

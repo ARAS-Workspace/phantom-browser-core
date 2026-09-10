@@ -34,20 +34,6 @@
 #include "device/fido/public/features.h"
 #include "device/fido/virtual_fido_device_factory.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/login/test/cryptohome_mixin.h"
-#include "chrome/browser/ash/login/test/device_state_mixin.h"
-#include "chrome/browser/ash/login/test/user_auth_config.h"
-#include "chrome/browser/ash/policy/affiliation/affiliation_mixin.h"
-#include "chrome/browser/ash/policy/affiliation/affiliation_test_helper.h"
-#include "chrome/browser/ash/policy/core/device_policy_cros_browser_test.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chromeos/ash/components/cryptohome/cryptohome_parameters.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/user_manager.h"
-#endif
-
 namespace {
 
 static constexpr char kGetAssertionCredID1234ExampleCom[] = R"((() => {
@@ -97,22 +83,10 @@ std::string PrintParam(testing::TestParamInfo<bool> is_affiliated) {
 // This file tests WebAuthn features that depend on user affiliation (user
 // is expected to be affiliated to use remoteDesktopClientOverride on CrOS)
 class WebAuthnIWARemoteDesktopOverrideBrowserTest :
-#if BUILDFLAG(IS_CHROMEOS)
-    public policy::DevicePolicyCrosBrowserTest,
-#else
     public InProcessBrowserTest,
-#endif
     public ::testing::WithParamInterface<bool> {
  public:
   WebAuthnIWARemoteDesktopOverrideBrowserTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    crypto_home_mixin_.MarkUserAsExisting(affiliation_mixin_.account_id());
-    crypto_home_mixin_.ApplyAuthConfig(
-        affiliation_mixin_.account_id(),
-        ash::test::UserAuthConfig::Create(ash::test::kDefaultAuthSetup));
-
-    affiliation_mixin_.set_affiliated(GetParam());
-#endif
     scoped_feature_list_.InitWithFeatures(
         {device::kWebAuthnIWARemoteDesktopAllowedOriginsPolicy,
          features::kIsolatedWebApps},
@@ -125,24 +99,10 @@ class WebAuthnIWARemoteDesktopOverrideBrowserTest :
       const WebAuthnIWARemoteDesktopOverrideBrowserTest&) = delete;
 
  protected:
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(
-        switches::kEnableExperimentalWebPlatformFeatures);
-    ::policy::AffiliationTestHelper::AppendCommandLineSwitchesForLoginManager(
-        command_line);
-    ::policy::DevicePolicyCrosBrowserTest::SetUpCommandLine(command_line);
-  }
-#endif
 
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    policy::DevicePolicyCrosBrowserTest::SetUpOnMainThread();
-#else
     InProcessBrowserTest::SetUpOnMainThread();
-#endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
     const base::flat_set<std::string> affiliation_ids =
         GetParam() ? base::flat_set<std::string>({"test-affiliation-id"})
                    : base::flat_set<std::string>();
@@ -150,7 +110,6 @@ class WebAuthnIWARemoteDesktopOverrideBrowserTest :
         affiliation_ids);
     profile()->GetProfilePolicyConnector()->SetUserAffiliationIdsForTesting(
         affiliation_ids);
-#endif
   }
 
   policy::ChromeBrowserPolicyConnector* browser_policy_connector() {
@@ -159,34 +118,17 @@ class WebAuthnIWARemoteDesktopOverrideBrowserTest :
   }
 
   Profile* profile() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return ::ash::ProfileHelper::Get()->GetProfileByAccountId(
-        affiliation_mixin_.account_id());
-#else
     return browser()->GetProfile();
-#endif
   }
 
   void VerifyAffiliationExpectations() {
-#if BUILDFLAG(IS_CHROMEOS)
-    const user_manager::User* user = user_manager::UserManager::Get()->FindUser(
-        affiliation_mixin_.account_id());
-    EXPECT_EQ(GetParam(), user->IsAffiliated());
-    EXPECT_TRUE(user->is_logged_in());
-#else
     ASSERT_TRUE(profile());
     EXPECT_EQ(GetParam(), enterprise_util::IsProfileAffiliated(profile()));
-#endif
   }
 
   base::test::ScopedFeatureList scoped_feature_list_;
   web_app::OsIntegrationTestOverrideBlockingRegistration
       os_integration_override_;
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::DevicePolicyCrosTestHelper test_helper_;
-  policy::AffiliationMixin affiliation_mixin_{&mixin_host_, &test_helper_};
-  ash::CryptohomeMixin crypto_home_mixin_{&mixin_host_};
-#endif
 
   content::RenderFrameHost* OpenApp(const webapps::AppId& app_id,
                                     Profile* profile) {
@@ -210,9 +152,6 @@ class WebAuthnIWARemoteDesktopOverrideBrowserTest :
 
 IN_PROC_BROWSER_TEST_P(WebAuthnIWARemoteDesktopOverrideBrowserTest,
                        PRE_IWAsPolicyAndPrefsSetDifferentRp_id) {
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::AffiliationTestHelper::PreLoginUser(affiliation_mixin_.account_id());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(WebAuthnIWARemoteDesktopOverrideBrowserTest,
@@ -221,9 +160,6 @@ IN_PROC_BROWSER_TEST_P(WebAuthnIWARemoteDesktopOverrideBrowserTest,
   // allowed and processed). Positive case with policy and prefs set, rp_id
   // not equals to IWAs caller origin, set in extension, and affiliated/non
   // affiliated user
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::AffiliationTestHelper::LoginUser(affiliation_mixin_.account_id());
-#endif
 
   VerifyAffiliationExpectations();
 

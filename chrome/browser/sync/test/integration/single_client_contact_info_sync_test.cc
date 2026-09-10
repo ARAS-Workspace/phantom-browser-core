@@ -76,7 +76,6 @@ MATCHER_P2(HasContactInfoWithGuidAndUnknownFields, guid, unknown_fields, "") {
 }
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Matches a sync::entity_data has a contact info field with `address`.
 MATCHER_P(HasContactInfoWithAddress, address, "") {
   return base::UTF8ToUTF16(
@@ -89,7 +88,6 @@ MATCHER_P(HasContactInfoWithAddress, address, "") {
 MATCHER_P(HasContactInfoWithFirstName, first_name, "") {
   return arg->GetRawInfo(autofill::FieldType::NAME_FIRST) == first_name;
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Checker to wait until the CONTACT_INFO datatype becomes (in)active, depending
 // on `expect_active`.
@@ -277,7 +275,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest, FinalizeAfterImport) {
 }
 
 // ChromeOS does not support signing out of a primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest, ClearOnSignout) {
   const AutofillProfile kProfile = BuildTestAccountProfile();
   AddSpecificsToServer(AsContactInfoSpecifics(kProfile), GetFakeServer());
@@ -291,7 +288,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest, ClearOnSignout) {
                   &GetPersonalDataManager()->address_data_manager(), IsEmpty())
                   .Wait());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Specialized fixture to test the behavior for custom passphrase users with and
 // without kSyncEnableContactInfoDataTypeForCustomPassphraseUsers enabled.
@@ -510,7 +506,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest,
                   HasContactInfoWithGuidAndUnknownFields(profile2.guid(), "")));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest,
                        ShouldReturnLocalDataDescriptions) {
   ASSERT_TRUE(SetupClients());
@@ -656,7 +651,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest,
       ElementsAre(HasContactInfoWithFirstName(
           profile1.GetRawInfo(autofill::FieldType::NAME_FIRST))));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest,
                        DisabledForManagedAccounts) {

@@ -37,7 +37,7 @@ inline constexpr char kDisableModalAnimations[] = "disable-modal-animations";
 inline constexpr char kShowMacOverlayBorders[] = "show-mac-overlay-borders";
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Specifies system font family name. Improves determinism when rendering pages
 // in headless mode.
 inline constexpr char kSystemFontFamily[] = "system-font-family";

@@ -92,12 +92,6 @@ proto::WebApp CreateWebAppProtoForTesting(const std::string& name,
           WebAppSpecifics_UserDisplayMode_STANDALONE);
   web_app.set_scope(start_url.GetWithoutFilename().spec());
   web_app.mutable_sources()->set_user_installed(true);
-#if BUILDFLAG(IS_CHROMEOS)
-  web_app.mutable_chromeos_data();
-  web_app.mutable_sync_data()->set_user_display_mode_cros(
-      WebAppSpecifics_UserDisplayMode::
-          WebAppSpecifics_UserDisplayMode_STANDALONE);
-#endif
   web_app.set_install_state(
       proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION);
   return web_app;
@@ -1279,9 +1273,6 @@ TEST_F(WebAppSyncBridgeTest, SpecificsProtoWithNewFieldPreserved) {
 
   WebAppSpecifics result_proto = app->sync_proto();
   result_proto.clear_relative_manifest_id();
-#if BUILDFLAG(IS_CHROMEOS)
-  result_proto.clear_user_display_mode_cros();
-#endif
 
   // Check that the sync proto retained its value, including the unknown field.
   EXPECT_EQ(result_proto.SerializeAsString(), serialized_proto);
@@ -1401,14 +1392,6 @@ class WebAppSyncBridgeTest_UserDisplayModeSplit
   }
 
   WebAppSyncBridgeTest_UserDisplayModeSplit()
-#if BUILDFLAG(IS_CHROMEOS)
-      // UDM mitigations mess with the installed local state, disable them so
-      // the state matches the intention of the test.
-      : disable_user_display_mode_sync_mitigations_for_testing_(
-            &FinalizeInstallOrUpdateJob::
-                DisableUserDisplayModeSyncMitigationsForTesting(),
-            true)
-#endif  // BUILDFLAG(IS_CHROMEOS)
   {
   }
 
@@ -1431,11 +1414,7 @@ class WebAppSyncBridgeTest_UserDisplayModeSplit
   }
 
   bool IsChromeOs() const {
-#if BUILDFLAG(IS_CHROMEOS)
-    return true;
-#else
     return false;
-#endif
   }
 
   std::optional<WebAppSpecifics_UserDisplayMode> sync_current_platform_udm()
@@ -1467,9 +1446,6 @@ class WebAppSyncBridgeTest_UserDisplayModeSplit
   }
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  base::AutoReset<bool> disable_user_display_mode_sync_mitigations_for_testing_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_P(WebAppSyncBridgeTest_UserDisplayModeSplit, SyncUpdateToUserDisplayMode) {

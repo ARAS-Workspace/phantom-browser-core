@@ -479,15 +479,6 @@ DownloadUIModel::GetInsecureDownloadStatus() const {
 
 void DownloadUIModel::OpenUsingPlatformHandler() {}
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::optional<DownloadCommands::Command>
-DownloadUIModel::MaybeGetMediaAppAction() const {
-  return std::nullopt;
-}
-
-void DownloadUIModel::OpenUsingMediaApp() {}
-#endif
-
 bool DownloadUIModel::IsBeingRevived() const {
   return true;
 }
@@ -730,12 +721,7 @@ void DownloadUIModel::ExecuteCommand(DownloadCommands* download_commands,
       break;
     case DownloadCommands::OPEN_WITH_MEDIA_APP:
     case DownloadCommands::EDIT_WITH_MEDIA_APP:
-#if BUILDFLAG(IS_CHROMEOS)
-      OpenUsingMediaApp();
-      break;
-#else
       NOTREACHED();
-#endif
   }
 }
 

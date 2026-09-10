@@ -249,19 +249,10 @@ void AvatarToolbarButtonTestAccessor::WaitForAvatarButton() {
 
   Profile* const profile = browser_->GetProfile();
   bool show_avatar_toolbar_button = true;
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS only badges Incognito, Guest, and captive portal signin icons in
-  // the browser window.
-  show_avatar_toolbar_button = profile->IsIncognitoProfile() ||
-                               profile->IsGuestSession() ||
-                               (profile->IsOffTheRecord() &&
-                                profile->GetOTRProfileID().IsCaptivePortal());
-#else
   // DevTools profiles are OffTheRecord, so hide it there.
   show_avatar_toolbar_button = profile->IsIncognitoProfile() ||
                                profile->IsGuestSession() ||
                                profile->IsRegularProfile();
-#endif
 
   if (!show_avatar_toolbar_button) {
     return;
@@ -393,23 +384,9 @@ content::WebContents* AvatarToolbarButtonTestAccessor::GetWebContents() {
 
 bool AvatarToolbarButtonTestAccessor::ShouldUseCppFallback(
     WebUIAvatarToolbarButton* button) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!button || !button->state_manager_) {
-    return false;
-  }
-  // On ChromeOS, the avatar button is hidden for normal profiles. In C++ Views,
-  // the button view still exists and is updated even when hidden, and many
-  // tests assert on its state/text. In WebUI, we don't render the element in
-  // the DOM at all when hidden. To allow these tests to pass without adding
-  // ChromeOS-specific conditions to every test, we fall back to querying the
-  // C++ state manager when the button is hidden.
-  Profile* profile = button->state_manager_->browser()->GetProfile();
-  return !AvatarToolbarButtonInterface::CanShowForProfile(profile);
-#else
   // On other platforms, the button is always visible for the profiles used in
   // these tests, so we should always test the actual WebUI DOM.
   return false;
-#endif
 }
 
 AvatarToolbarButtonTestAccessor::ButtonVariant
@@ -435,14 +412,7 @@ bool AvatarToolbarButtonTestAccessor::GetEnabled() {
               return false;
             }
             if (ShouldUseCppFallback(button)) {
-#if BUILDFLAG(IS_CHROMEOS)
-              Profile* profile =
-                  button->state_manager_->browser()->GetProfile();
-              return profile->IsOffTheRecord() && !profile->IsGuestSession() &&
-                     !profile->GetOTRProfileID().IsCaptivePortal();
-#else
               return true;
-#endif
             }
             content::WebContents* contents = GetWebContents();
             return contents &&

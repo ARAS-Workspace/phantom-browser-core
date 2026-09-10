@@ -119,12 +119,6 @@ class COMPONENT_EXPORT(PRINTING) PrintingContext {
   // information.
   mojom::ResultCode UpdatePrintSettings(base::DictValue job_settings);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Updates Print Settings.
-  mojom::ResultCode UpdatePrintSettingsFromPOD(
-      std::unique_ptr<PrintSettings> job_settings);
-#endif
-
   // Sets the print settings to `settings`.
   void SetPrintSettings(const PrintSettings& settings);
 

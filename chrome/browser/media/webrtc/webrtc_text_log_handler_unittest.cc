@@ -21,10 +21,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#endif
-
 namespace webrtc_text_log {
 
 class WebRtcTextLogHandlerTest : public testing::Test {
@@ -34,10 +30,6 @@ class WebRtcTextLogHandlerTest : public testing::Test {
   ~WebRtcTextLogHandlerTest() override = default;
 
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::system::StatisticsProvider::SetTestProvider(
-        &fake_statistics_provider_);
-#endif
     TestingBrowserProcess::GetGlobal()->SetWebRtcLogUploader(
         std::make_unique<WebRtcLogUploader>());
     text_log_handler_ = std::make_unique<WebRtcTextLogHandler>(1);
@@ -56,9 +48,6 @@ class WebRtcTextLogHandlerTest : public testing::Test {
       uploader->Shutdown();
     }
     TestingBrowserProcess::GetGlobal()->SetWebRtcLogUploader(nullptr);
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::system::StatisticsProvider::SetTestProvider(nullptr);
-#endif
   }
 
   // Helper to get the handler to STARTED state.
@@ -85,9 +74,6 @@ class WebRtcTextLogHandlerTest : public testing::Test {
  protected:
   content::BrowserTaskEnvironment task_environment_;
   std::unique_ptr<WebRtcTextLogHandler> text_log_handler_;
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::system::FakeStatisticsProvider fake_statistics_provider_;
-#endif
 };
 
 TEST_F(WebRtcTextLogHandlerTest, GetLogMessageCallbackWhenClosed) {

@@ -212,21 +212,6 @@
 #include "extensions/common/constants.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/net/system_proxy_manager.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#include "chromeos/ash/components/cryptohome/cryptohome_parameters.h"
-#include "chromeos/ash/components/dbus/attestation/attestation_client.h"
-#include "chromeos/ash/components/dbus/attestation/interface.pb.h"
-#include "chromeos/ash/components/dbus/constants/attestation_constants.h"
-#include "chromeos/ash/components/dbus/dbus_thread_manager.h"
-#include "chromeos/components/mahi/public/cpp/mahi_manager.h"
-#include "chromeos/constants/chromeos_features.h"
-#include "components/user_manager/user.h"
-#include "device/fido/cros/credential_store.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #endif
@@ -705,19 +690,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
       }
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    if (ash::SystemProxyManager::Get() &&
-        filter_builder->MatchesMostOriginsAndDomains()) {
-      // Sends a request to the System-proxy daemon to clear the proxy user
-      // credentials. System-proxy retrieves proxy username and password from
-      // the NetworkService, but not the creation time of the credentials. The
-      // |ClearUserCredentials| request will remove all the cached proxy
-      // credentials. If credentials prior to |delete_begin_| are removed from
-      // System-proxy, the daemon will send a D-Bus request to Chrome to fetch
-      // them from the NetworkService when needed.
-      ash::SystemProxyManager::Get()->ClearUserCredentials();
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -959,19 +931,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
             CreateTaskCompletionClosureForMojo(
                 TracingDataType::kHttpAuthCache));
 
-#if BUILDFLAG(IS_CHROMEOS)
-    if (ash::SystemProxyManager::Get()) {
-      // Sends a request to the System-proxy daemon to clear the proxy user
-      // credentials. System-proxy retrieves proxy username and password from
-      // the NetworkService, but not the creation time of the credentials. The
-      // |ClearUserCredentials| request will remove all the cached proxy
-      // credentials. If credentials prior to |delete_begin_| are removed from
-      // System-proxy, the daemon will send a D-Bus request to Chrome to fetch
-      // them from the NetworkService when needed.
-      ash::SystemProxyManager::Get()->ClearUserCredentials();
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
     if (credential_store_) {
       credential_store_->DeleteCredentials(
           delete_begin_, delete_end_,
@@ -1185,13 +1144,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
       }
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // If the cache from the browser is cleared. Mahi should clear its cache.
-    if (filter_builder->MatchesMostOriginsAndDomains() &&
-        chromeos::features::IsMahiEnabled() && chromeos::MahiManager::Get()) {
-      chromeos::MahiManager::Get()->ClearCache();
-    }
-#endif
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -1200,41 +1152,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
     // TODO(jrummell): This UMA should be renamed to indicate it is for Media
     // Licenses.
     base::RecordAction(UserMetricsAction("ClearBrowsingData_ContentLicenses"));
-
-#if BUILDFLAG(IS_CHROMEOS)
-    // On Chrome OS, delete any content protection platform keys.
-    // Platform keys do not support filtering by domain, so skip this if
-    // clearing only a specified set of sites.
-    if (filter_builder->MatchesMostOriginsAndDomains()) {
-      const user_manager::User* user =
-          ash::ProfileHelper::Get()->GetUserByProfile(profile_);
-      if (!user) {
-        LOG(WARNING) << "Failed to find user for current profile.";
-      } else {
-        ::attestation::DeleteKeysRequest request;
-        request.set_username(cryptohome::CreateAccountIdentifierFromAccountId(
-                                 user->GetAccountId())
-                                 .account_id());
-        request.set_key_label_match(
-            ash::attestation::kContentProtectionKeyPrefix);
-        request.set_match_behavior(
-            ::attestation::DeleteKeysRequest::MATCH_BEHAVIOR_PREFIX);
-
-        auto clear_platform_keys_callback = base::BindOnce(
-            &ChromeBrowsingDataRemoverDelegate::OnClearPlatformKeys,
-            weak_ptr_factory_.GetWeakPtr(),
-            CreateTaskCompletionClosure(TracingDataType::kTpmAttestationKeys));
-        ash::AttestationClient::Get()->DeleteKeys(
-            request, base::BindOnce(
-                         [](decltype(clear_platform_keys_callback) cb,
-                            const ::attestation::DeleteKeysReply& reply) {
-                           std::move(cb).Run(reply.status() ==
-                                             ::attestation::STATUS_SUCCESS);
-                         },
-                         std::move(clear_platform_keys_callback)));
-      }
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
     cdm::MediaDrmStorageImpl::ClearMatchingLicenses(
@@ -1717,24 +1634,10 @@ bool ChromeBrowsingDataRemoverDelegate::IsForAllTime() const {
   return delete_begin_ == base::Time() && delete_end_ == base::Time::Max();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void ChromeBrowsingDataRemoverDelegate::OnClearPlatformKeys(
-    base::OnceClosure done,
-    bool result) {
-  LOG_IF(ERROR, !result) << "Failed to clear platform keys.";
-  std::move(done).Run();
-}
-#endif
-
 std::unique_ptr<device::fido::PlatformCredentialStore>
 ChromeBrowsingDataRemoverDelegate::MakeCredentialStore() {
   return
-#if BUILDFLAG(IS_CHROMEOS)
-      std::make_unique<
-          device::fido::cros::PlatformAuthenticatorCredentialStore>();
-#else
       nullptr;
-#endif
 }
 
 void ChromeBrowsingDataRemoverDelegate::DisablePasswordsAutoSignin(

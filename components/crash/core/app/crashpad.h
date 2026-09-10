@@ -20,7 +20,7 @@
 #include "base/apple/scoped_mach_port.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <signal.h>
 #endif
 
@@ -89,7 +89,6 @@ void DestroyCrashpadClient();
 
 // ChromeOS has its own, OS-level consent system; Chrome does not maintain a
 // separate Upload Consent on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // Enables or disables crash report upload, taking the given consent to upload
 // into account. Consent may be ignored, uploads may not be enabled even with
@@ -100,8 +99,6 @@ void DestroyCrashpadClient();
 // applies to all other process types, including processes that are already
 // running.
 void SetUploadConsent(bool consent);
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 enum class ReportUploadState {
   NotUploaded,
@@ -164,12 +161,11 @@ void SetIntermediateDumpExtraMemoryRanges(
     crashpad::SimpleAddressRangeBag* address_range_bag);
 #endif  // BUILDFLAG(IS_IOS)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // Logs message and immediately crashes the current process without triggering a
 // crash dump.
 [[noreturn]] void CrashWithoutDumping(const std::string& message);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 // Returns the Crashpad database path, only valid in the browser. This will
 // return std::nullopt if crashpad has not yet been initialized. On Windows,
@@ -191,21 +187,6 @@ base::FilePath::StringType::const_pointer GetCrashpadDatabasePathImpl();
 
 // The implementation function for ClearReportsBetween.
 void ClearReportsBetweenImpl(time_t begin, time_t end);
-
-#if BUILDFLAG(IS_CHROMEOS_DEVICE)
-// Called late in shutdown to remove the file that tells ChromeOS's
-// crash_reporter "This browser process has crashpad initialized; you don't
-// need to handle the crash reports coming from the kernel".
-//
-// Since crash_reporter will do a lot of unnecessary work if there is a
-// crash after this file is removed, this function should be called as late
-// as possible in the shutdown process, ideally after any code that might crash
-// has executed.
-//
-// Only needed in the browser process; calls in other processes will be
-// ignored. Multiple calls will be ignored as well.
-void DeleteCrashpadIsReadyFile();
-#endif
 
 #if BUILDFLAG(IS_MAC)
 // Captures a minidump for the process named by its |task_port| and stores it
@@ -241,7 +222,7 @@ void StartProcessingPendingReports();
 void AllowMemoryRange(void* begin, size_t size);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Install a handler that gets a chance to handle faults before Crashpad. This
 // is used by V8 for trap-based bounds checks.
 void SetFirstChanceExceptionHandler(bool (*handler)(int, siginfo_t*, void*));
@@ -249,7 +230,7 @@ void SetFirstChanceExceptionHandler(bool (*handler)(int, siginfo_t*, void*));
 // Gets the socket and process ID of the Crashpad handler connected to this
 // process, valid if this function returns `true`.
 bool GetHandlerSocket(int* sock, pid_t* pid);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace internal {
 

@@ -126,9 +126,7 @@ class ZoomBubbleManager;
 class ProfileCustomizationBubbleSyncController;
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class DownloadToolbarUIController;
-#endif
 
 #if defined(USE_AURA)
 class OverscrollPrefManager;
@@ -142,15 +140,6 @@ namespace actions {
 class ActionItem;
 }  // namespace actions
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace ash::boca {
-class OnTaskLockedController;
-}  // namespace ash::boca
-
-namespace chromeos {
-class LockedStateController;
-}  // namespace chromeos
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 namespace chrome {
 class BrowserCommandController;
@@ -531,11 +520,6 @@ class BrowserWindowFeatures {
     return webui_browser_exclusive_access_context_.get();
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  chromeos::LockedStateController* locked_state_controller() {
-    return locked_state_controller_.get();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   static ui::UserDataFactoryWithOwner<BrowserWindowInterface>&
   GetUserDataFactoryForTesting();
@@ -764,14 +748,8 @@ class BrowserWindowFeatures {
       session_restore_infobar_controller_;
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<chromeos::LockedStateController> locked_state_controller_;
-  std::unique_ptr<ash::boca::OnTaskLockedController> on_task_locked_controller_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if !BUILDFLAG(IS_CHROMEOS)
   std::unique_ptr<DownloadToolbarUIController> download_toolbar_ui_controller_;
-#endif
 
 #if defined(USE_AURA)
   std::unique_ptr<OverscrollPrefManager> overscroll_pref_manager_;

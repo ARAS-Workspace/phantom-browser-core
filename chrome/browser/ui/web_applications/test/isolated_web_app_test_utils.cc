@@ -66,9 +66,7 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "content/public/common/content_features.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 namespace web_app {
 namespace {
@@ -137,9 +135,7 @@ IsolatedWebAppBrowserTestHarness::IsolatedWebAppBrowserTestHarness() {
   // without kControlledFrame in their feature list.
   iwa_scoped_feature_list_.InitWithFeatures(
       {
-#if !BUILDFLAG(IS_CHROMEOS)
           features::kIsolatedWebApps,
-#endif  // !BUILDFLAG(IS_CHROMEOS)
           features::kIsolatedWebAppDevMode},
       {});
 }

@@ -39,21 +39,10 @@
 #include "chrome/common/chrome_descriptors_android.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "build/util/LASTCHANGE_commit_position.h"
-#endif
-
 namespace {
 
 constexpr const char* UpdaterVersion() {
-#if BUILDFLAG(IS_CHROMEOS) && CHROMIUM_COMMIT_POSITION_IS_MAIN
-  // Adds the revision number as a suffix to the version number if the chrome
-  // is built from the main branch.
-  return PRODUCT_VERSION "-r" CHROMIUM_COMMIT_POSITION_NUMBER;
-#else
   return PRODUCT_VERSION;
-#endif
 }
 
 }  // namespace
@@ -84,22 +73,6 @@ void ChromeCrashReporterClient::Create() {
     base::PathService::Override(chrome::DIR_CRASH_DUMPS, crash_dumps_dir_path);
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-bool ChromeCrashReporterClient::ShouldPassCrashLoopBefore(
-    const std::string& process_type) {
-  if (process_type == ::switches::kRendererProcess ||
-      process_type == ::switches::kUtilityProcess ||
-      process_type == ::switches::kZygoteProcess) {
-    // These process types never cause a log-out, even if they crash. So the
-    // normal crash handling process should work fine; we shouldn't need to
-    // invoke the special crash-loop mode.
-    return false;
-  }
-  return true;
-}
-#endif
 
 ChromeCrashReporterClient::ChromeCrashReporterClient() = default;
 
@@ -132,8 +105,6 @@ void ChromeCrashReporterClient::GetProductInfo(ProductInfo* product_info) {
 
 #if BUILDFLAG(IS_ANDROID)
   product_info->product_name = "Chrome_Android";
-#elif BUILDFLAG(IS_CHROMEOS)
-  product_info->product_name = "Chrome_ChromeOS";
 #elif BUILDFLAG(IS_LINUX)
 #if defined(ADDRESS_SANITIZER)
   product_info->product_name = "Chrome_Linux_ASan";
@@ -151,7 +122,7 @@ void ChromeCrashReporterClient::GetProductInfo(ProductInfo* product_info) {
       chrome::GetChannelName(chrome::WithExtendedStable(true));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 bool ChromeCrashReporterClient::GetCrashMetricsLocation(
     base::FilePath* metrics_dir) {
   if (!GetCollectStatsConsent()) {
@@ -159,7 +130,7 @@ bool ChromeCrashReporterClient::GetCrashMetricsLocation(
   }
   return base::PathService::Get(chrome::DIR_CRASH_METRICS, metrics_dir);
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 bool ChromeCrashReporterClient::IsRunningUnattended() {
   std::unique_ptr<base::Environment> env(base::Environment::Create());
@@ -172,20 +143,6 @@ bool ChromeCrashReporterClient::GetCollectStatsConsent() {
 #else
   bool is_official_chrome_build = false;
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  bool is_guest_session = base::CommandLine::ForCurrentProcess()->HasSwitch(
-      ash::switches::kGuestSession);
-  bool is_stable_channel =
-      chrome::GetChannel() == version_info::Channel::STABLE;
-
-  if (is_guest_session && is_stable_channel) {
-    VLOG(1) << "GetCollectStatsConsent(): is_guest_session " << is_guest_session
-            << " && is_stable_channel " << is_stable_channel
-            << " so returning false";
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
   // TODO(jcivelli): we should not initialize the crash-reporter when it was not
@@ -205,14 +162,14 @@ bool ChromeCrashReporterClient::GetCollectStatsConsent() {
 #endif  // BUILDFLAG(IS_ANDROID)
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool ChromeCrashReporterClient::ShouldMonitorCrashHandlerExpensively() {
   // TODO(jperaza): Turn this on less frequently for stable channels when
   // Crashpad is always enabled on Linux. Consider combining with the
   // macOS implementation.
   return true;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 bool ChromeCrashReporterClient::EnableBreakpadForProcess(
     const std::string& process_type) {

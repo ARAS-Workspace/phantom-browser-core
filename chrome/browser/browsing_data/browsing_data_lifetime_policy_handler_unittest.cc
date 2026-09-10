@@ -45,7 +45,6 @@ TEST(BrowsingDataLifetimePolicyHandler, SyncDisabledTrue) {
 
 // When browser sign in is disabled by policy, the data deletion policy should
 // be applied and the error map and messages should be empty
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST(BrowsingDataLifetimePolicyHandler, BrowserSigninDisabled) {
   policy::PolicyMap policy_map;
   policy::PolicyErrorMap errors;
@@ -69,7 +68,6 @@ TEST(BrowsingDataLifetimePolicyHandler, BrowserSigninDisabled) {
   EXPECT_FALSE(policy_map.Get(policy::key::kBrowsingDataLifetime)
                    ->HasMessage(policy::PolicyMap::MessageType::kInfo));
 }
-#endif
 
 // Check that the policies work correctly when set together with sync.
 TEST(BrowsingDataLifetimePolicyHandler,

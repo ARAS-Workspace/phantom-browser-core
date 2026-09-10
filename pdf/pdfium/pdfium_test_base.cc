@@ -23,7 +23,7 @@
 #include "third_party/pdfium/public/fpdfview.h"
 #include "ui/gfx/geometry/size.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/environment.h"
 #endif
 
@@ -31,7 +31,7 @@ namespace chrome_pdf {
 
 namespace {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 base::FilePath GetTestFontsDir() {
   // base::TestSuite::Initialize() should have already set this.
   std::unique_ptr<base::Environment> env(base::Environment::Create());
@@ -39,7 +39,7 @@ base::FilePath GetTestFontsDir() {
   CHECK(fontconfig_sysroot.has_value());
   return base::FilePath(fontconfig_sysroot.value()).AppendASCII("test_fonts");
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace
 
@@ -49,7 +49,7 @@ PDFiumTestBase::~PDFiumTestBase() = default;
 
 // static
 bool PDFiumTestBase::UsingTestFonts() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   return true;
 #else
   return false;
@@ -145,7 +145,7 @@ void PDFiumTestBase::SimulateLoading(PDFiumEngine* engine,
 
 void PDFiumTestBase::InitializePDFiumSDK() {
   font_paths_.clear();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   test_fonts_path_ = GetTestFontsDir();
   font_paths_.push_back(test_fonts_path_.value().c_str());
   // When non-empty, `font_paths_` has to be terminated with a nullptr.

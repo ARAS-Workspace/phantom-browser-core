@@ -24,38 +24,6 @@
 #include "ui/views/widget/widget_observer.h"
 #include "ui/views/window/dialog_delegate.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/shelf_model.h"
-#include "chrome/browser/ash/app_list/arc/arc_app_list_prefs.h"
-#include "chrome/browser/ash/app_list/arc/arc_app_test.h"
-#include "chrome/browser/ash/app_list/arc/arc_app_utils.h"
-#include "chrome/browser/ash/browser_delegate/browser_controller_impl.h"
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/ash/login/users/scoped_account_id_annotator.h"
-#include "chrome/browser/ui/ash/shelf/chrome_shelf_controller.h"
-#include "chrome/browser/ui/ash/shelf/shelf_controller_helper.h"
-#include "chrome/test/base/testing_browser_process.h"
-#include "chrome/test/base/testing_profile_manager.h"
-#include "chromeos/ash/components/browser_context_helper/annotated_account_id.h"
-#include "chromeos/ash/experiences/arc/app/arc_app_constants.h"
-#include "components/user_manager/user_manager.h"
-
-namespace {
-
-std::vector<arc::mojom::AppInfoPtr> GetArcSettingsAppInfo() {
-  std::vector<arc::mojom::AppInfoPtr> apps;
-  arc::mojom::AppInfoPtr app(arc::mojom::AppInfo::New());
-  app->name = "settings";
-  app->package_name = "com.android.settings";
-  app->activity = "com.android.settings.Settings";
-  app->sticky = false;
-  apps.push_back(std::move(app));
-  return apps;
-}
-
-}  // namespace
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 const char kTestExtensionId[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -72,28 +40,9 @@ class AppInfoDialogViewsTest : public ChromeViewsTestBase,
   AppInfoDialogViewsTest& operator=(const AppInfoDialogViewsTest&) = delete;
 
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    arc_app_test_ =
-        std::make_unique<ArcAppTest>(ArcAppTest::UserManagerMode::kCreate);
-    arc_app_test_->PreProfileSetUp();
-#endif
 
     ChromeViewsTestBase::SetUp();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    arc_app_test_->PostProfileSetUp(extension_environment_.profile());
-
-    shelf_model_ = std::make_unique<ash::ShelfModel>();
-    browser_controller_.emplace();
-    chrome_shelf_controller_ = std::make_unique<ChromeShelfController>(
-        extension_environment_.profile(), shelf_model_.get());
-    chrome_shelf_controller_->SetProfileForTest(
-        extension_environment_.profile());
-    chrome_shelf_controller_->SetShelfControllerHelperForTest(
-        std::make_unique<ShelfControllerHelper>(
-            extension_environment_.profile()));
-    chrome_shelf_controller_->Init();
-#endif
     extension_ = extension_environment_.MakePackagedApp(kTestExtensionId, true);
     chrome_app_ = extension_environment_.MakePackagedApp(
         app_constants::kChromeAppId, true);
@@ -103,22 +52,11 @@ class AppInfoDialogViewsTest : public ChromeViewsTestBase,
     CloseAppInfo();
     extension_ = nullptr;
     chrome_app_ = nullptr;
-#if BUILDFLAG(IS_CHROMEOS)
-    chrome_shelf_controller_.reset();
-    browser_controller_.reset();
-    shelf_model_.reset();
-    CHECK(arc_app_test_);
-    arc_app_test_->PreProfileTearDown();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     extension_environment_.DeleteProfile();
 
     ChromeViewsTestBase::TearDown();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    arc_app_test_->PostProfileTearDown();
-    arc_app_test_.reset();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
  protected:
@@ -172,16 +110,7 @@ class AppInfoDialogViewsTest : public ChromeViewsTestBase,
       extensions::TestExtensionEnvironment::Type::
           kInheritExistingTaskEnvironment,
       extensions::TestExtensionEnvironment::ProfileCreationType::kCreate,
-#if BUILDFLAG(IS_CHROMEOS)
-      extensions::TestExtensionEnvironment::OSSetupType::kNoSetUp,
-#endif
   };
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<ash::ShelfModel> shelf_model_;
-  std::optional<ash::BrowserControllerImpl> browser_controller_;
-  std::unique_ptr<ChromeShelfController> chrome_shelf_controller_;
-  std::unique_ptr<ArcAppTest> arc_app_test_;
-#endif
 };
 
 // Tests that the dialog closes when the current app is uninstalled.
@@ -205,7 +134,6 @@ TEST_F(AppInfoDialogViewsTest, UninstallingOtherAppDoesNotCloseDialog) {
   EXPECT_TRUE(widget_);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Exclude the test from ChromeOS because profile destruction does not happen
 // on ChromeOS in production.
 //
@@ -239,85 +167,3 @@ TEST_F(AppInfoDialogViewsTest, DestroyedOtherProfileDoesNotCloseDialog) {
   base::RunLoop().RunUntilIdle();
   EXPECT_TRUE(widget_);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(AppInfoDialogViewsTest, ArcAppInfoLinks) {
-  ShowAppInfo(app_constants::kChromeAppId);
-  EXPECT_FALSE(widget_->IsClosed());
-  // App Info should not have ARC App info links section because ARC Settings
-  // app is not available yet.
-  EXPECT_FALSE(dialog_->arc_app_info_links_for_test());
-
-  // Re-show App Info but with ARC Settings app enabled.
-  CloseAppInfo();
-  ArcAppListPrefs* arc_prefs =
-      ArcAppListPrefs::Get(extension_environment_.profile());
-  ASSERT_TRUE(arc_prefs);
-  arc::mojom::AppHost* app_host = arc_prefs;
-  app_host->OnAppListRefreshed(GetArcSettingsAppInfo());
-  EXPECT_TRUE(arc_prefs->IsRegistered(arc::kSettingsAppId));
-  ShowAppInfo(app_constants::kChromeAppId);
-  EXPECT_FALSE(widget_->IsClosed());
-  EXPECT_TRUE(dialog_->arc_app_info_links_for_test());
-
-  // Re-show App Info but for non-primary profile.
-  CloseAppInfo();
-  const AccountId other_account_id =
-      AccountId::FromUserEmail("other_profile@gmail.com");
-  auto* fake_user_manager = static_cast<ash::FakeChromeUserManager*>(
-      user_manager::UserManager::Get());
-  fake_user_manager->AddUser(other_account_id);
-
-  TestingProfileManager profile_manager(TestingBrowserProcess::GetGlobal());
-  ASSERT_TRUE(profile_manager.SetUp());
-  ash::ScopedAccountIdAnnotator annotator(profile_manager.profile_manager(),
-                                          other_account_id);
-  TestingProfile* other_profile =
-      profile_manager.CreateTestingProfile("other_profile@gmail.com");
-
-  extension_environment_.CreateExtensionServiceForProfile(other_profile);
-  // We're adding the extension to the second profile, so don't install it
-  // automatically in the profile from `extension_environment_`.
-  const bool install = false;
-  scoped_refptr<const extensions::Extension> other_app =
-      extension_environment_.MakePackagedApp(app_constants::kChromeAppId,
-                                             install);
-  extensions::ExtensionRegistrar::Get(other_profile)
-      ->AddExtension(other_app.get());
-  ShowAppInfoForProfile(app_constants::kChromeAppId, other_profile);
-  EXPECT_FALSE(widget_->IsClosed());
-  // The ARC App info links are not available if ARC is not allowed for
-  // secondary profile.
-  EXPECT_FALSE(dialog_->arc_app_info_links_for_test());
-  CloseAppInfo();
-}
-
-// Tests that the pin/unpin button is focused after unpinning/pinning. This is
-// to verify regression in crbug.com/41140316 is fixed.
-TEST_F(AppInfoDialogViewsTest, PinButtonsAreFocusedAfterPinUnpin) {
-  ShowAppInfo(kTestExtensionId);
-  AppInfoFooterPanel* dialog_footer =
-      static_cast<AppInfoFooterPanel*>(dialog_->dialog_footer_);
-  views::View* pin_button = dialog_footer->pin_to_shelf_button_;
-  views::View* unpin_button = dialog_footer->unpin_from_shelf_button_;
-
-  pin_button->RequestFocus();
-  EXPECT_TRUE(pin_button->GetVisible());
-  EXPECT_FALSE(unpin_button->GetVisible());
-  EXPECT_TRUE(pin_button->HasFocus());
-
-  // Avoid attempting to use sync, it's not initialized in this test.
-  auto sync_disabler = chrome_shelf_controller_->GetScopedPinSyncDisabler();
-
-  dialog_footer->SetPinnedToShelf(true);
-  EXPECT_FALSE(pin_button->GetVisible());
-  EXPECT_TRUE(unpin_button->GetVisible());
-  EXPECT_TRUE(unpin_button->HasFocus());
-
-  dialog_footer->SetPinnedToShelf(false);
-  EXPECT_TRUE(pin_button->GetVisible());
-  EXPECT_FALSE(unpin_button->GetVisible());
-  EXPECT_TRUE(pin_button->HasFocus());
-}
-#endif

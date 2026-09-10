@@ -67,12 +67,6 @@ base::Value GetProcessValueDict(const base::Process& process) {
     ret.Set("is_current", true);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (process.GetPidInNamespace() != base::kNullProcessId) {
-    ret.Set("pid_in_namespace", process.GetPidInNamespace());
-  }
-#endif
-
   if (process.IsValid()) {
     // These properties can only be accessed for valid processes.
     ret.Set("os_priority", process.GetOSPriority());

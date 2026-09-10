@@ -38,10 +38,5 @@ MediaCryptoContext* CdmContext::GetMediaCryptoContext() {
 #endif
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-chromeos::ChromeOsCdmContext* CdmContext::GetChromeOsCdmContext() {
-  return nullptr;
-}
-#endif
 
 }  // namespace media

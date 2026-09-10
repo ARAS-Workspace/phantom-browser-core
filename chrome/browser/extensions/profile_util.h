@@ -25,12 +25,6 @@ size_t GetNumberOfProfiles();
 
 ProfileManager* GetProfileManager();
 
-#if BUILDFLAG(IS_CHROMEOS)
-Profile* GetPrimaryUserProfile();
-
-Profile* GetActiveUserProfile();
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace extensions::profile_util
 
 #endif  // CHROME_BROWSER_EXTENSIONS_PROFILE_UTIL_H_

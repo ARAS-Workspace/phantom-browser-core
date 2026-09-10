@@ -297,14 +297,6 @@ bool ReportScheduler::SetupBrowserPolicyClientRegistration() {
     return true;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!profile_request_generator_) {
-    // Browser reporting uses the device-level CloudPolicyClient which is
-    // initialized and registered outside of this class on ChromeOS.
-    return true;
-  }
-#endif
-
   auto dm_token = GetDMToken();
   std::string client_id;
   if (profile_request_generator_) {
@@ -312,11 +304,7 @@ bool ReportScheduler::SetupBrowserPolicyClientRegistration() {
     client_id = delegate_->GetProfileClientId();
   } else {
     // Get token for browser reporting
-#if !BUILDFLAG(IS_CHROMEOS)
     client_id = policy::BrowserDMTokenStorage::Get()->RetrieveClientId();
-#else
-    NOTREACHED();
-#endif
   }
   if (!dm_token.is_valid() || client_id.empty()) {
     VLOG(1)
@@ -818,11 +806,7 @@ policy::DMToken ReportScheduler::GetDMToken() {
   if (profile_request_generator_) {
     return delegate_->GetProfileDMToken();
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  return policy::DMToken::CreateValidToken(cloud_policy_client_->dm_token());
-#else
   return policy::BrowserDMTokenStorage::Get()->RetrieveDMToken();
-#endif
 }
 
 }  // namespace enterprise_reporting

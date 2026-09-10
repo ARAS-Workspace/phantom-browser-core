@@ -1127,7 +1127,7 @@ bool VulkanFunctionPointers::BindDeviceFunctionPointers(
     }
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (gfx::HasExtension(enabled_extensions,
                         VK_EXT_IMAGE_DRM_FORMAT_MODIFIER_EXTENSION_NAME)) {
     constexpr char kvkGetImageDrmFormatModifierPropertiesEXT[] =
@@ -1141,7 +1141,7 @@ bool VulkanFunctionPointers::BindDeviceFunctionPointers(
       return false;
     }
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   return true;
 }
@@ -1300,9 +1300,9 @@ void VulkanFunctionPointers::ResetForTesting() {
   vkGetSwapchainImagesKHR = nullptr;
   vkQueuePresentKHR = nullptr;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   vkGetImageDrmFormatModifierPropertiesEXT = nullptr;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 }  // namespace gpu

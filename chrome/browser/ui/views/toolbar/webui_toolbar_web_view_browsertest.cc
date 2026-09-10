@@ -188,11 +188,6 @@
 #include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
 #include "ui/webui/tracked_element/tracked_element_web_ui.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_pref_names.h"
-#include "chromeos/dbus/power/power_manager_client.h"
-#endif
 
 namespace {
 constexpr int kNumMaxRecoveryTime = 2;
@@ -207,11 +202,9 @@ constexpr char kHomeSelector[] = "#home";
 constexpr char kAppMenuButtonSelector[] = "#app-menu";
 
 
-#if !BUILDFLAG(IS_CHROMEOS)
 std::string GetAppMenuPropertyJS(const std::string& property) {
   return base::StrCat({GetButtonAppJS(kAppMenuButtonSelector), property});
 }
-#endif
 
 std::string GetValueForCSSProperty(const std::string& element_js,
                                    const std::string& property) {
@@ -413,9 +406,6 @@ class WebUIToolbarWebViewPixelBrowserTest : public InProcessBrowserTest {
          features::kWebUILocationBar, features::kWebUIExtensionsContainer,
          features::kSkipIPCChannelPausingForNonGuests,
          features::kWebUIInProcessResourceLoadingV2,
-#if BUILDFLAG(IS_CHROMEOS)
-         ash::features::kBatterySaver,
-#endif
          features::kWebUIBatterySaverButton},
         /*disabled_features=*/
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
@@ -1253,15 +1243,10 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewPixelBrowserTest,
   EXPECT_FALSE(IsButtonVisible(webui_web_contents, bsm_selector));
 
   // 2. Enable Battery Saver.
-#if BUILDFLAG(IS_CHROMEOS)
-  g_browser_process->local_state()->SetBoolean(ash::prefs::kPowerBatterySaver,
-                                               true);
-#else
   g_browser_process->local_state()->SetInteger(
       performance_manager::user_tuning::prefs::kBatterySaverModeState,
       static_cast<int>(performance_manager::user_tuning::prefs::
                            BatterySaverModeState::kEnabled));
-#endif
 
   // 3. Verify it becomes visible.
   EXPECT_TRUE(base::test::RunUntil([&]() {
@@ -1313,15 +1298,10 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewPixelBrowserTest,
   destroyed_waiter.Wait();
 
   // 6. Disable Battery Saver and verify it becomes hidden again.
-#if BUILDFLAG(IS_CHROMEOS)
-  g_browser_process->local_state()->SetBoolean(ash::prefs::kPowerBatterySaver,
-                                               false);
-#else
   g_browser_process->local_state()->SetInteger(
       performance_manager::user_tuning::prefs::kBatterySaverModeState,
       static_cast<int>(performance_manager::user_tuning::prefs::
                            BatterySaverModeState::kDisabled));
-#endif
 
   EXPECT_TRUE(base::test::RunUntil([&]() {
     return !webui_toolbar_view->battery_saver_control_.IsVisible();
@@ -2645,7 +2625,6 @@ IN_PROC_BROWSER_TEST_F(WebUIAppMenuBrowserTest, CheckAppMenuFocusSync) {
 // WebUIAppMenuButtonStateTest is disabled on ChromeOS because update and global
 // error badging on the app menu icon is not supported on that platform (they
 // are instead handled by the system tray).
-#if !BUILDFLAG(IS_CHROMEOS)
 class MockGlobalError : public GlobalError {
  public:
   explicit MockGlobalError(GlobalError::Severity severity)
@@ -2842,7 +2821,6 @@ INSTANTIATE_TEST_SUITE_P(
     [](const testing::TestParamInfo<AppMenuStateTestParam>& info) {
       return info.param.test_name;
     });
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class WebUIAvatarButtonBrowserTest : public WebUIToolbarWebViewBrowserTest {
  public:
@@ -3817,17 +3795,8 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewBrowserTest,
   SimulateUriListDropOnToolbar(web_contents,
                                "javascript:void(document.title='PWNED')");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, unsafe schemes dropped on toolbar are redirected to
-  // about:blank#blocked.
-  content::TestNavigationObserver navigation_observer(active_contents);
-  navigation_observer.Wait();
-  EXPECT_EQ(active_contents->GetLastCommittedURL(),
-            GURL("about:blank#blocked"));
-#else
   // Wait to see if any navigation starts (it should not).
   counter.WaitForNoNavigations();
-#endif
 
   // Verify that the title remained empty (javascript was not executed).
   EXPECT_EQ("",
@@ -3859,17 +3828,8 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewBrowserTest,
   SimulateUriListDropOnToolbar(
       web_contents, "javascript:javascript:void(document.title='PWNED')");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, unsafe schemes dropped on toolbar are redirected to
-  // about:blank#blocked.
-  content::TestNavigationObserver navigation_observer(active_contents);
-  navigation_observer.Wait();
-  EXPECT_EQ(active_contents->GetLastCommittedURL(),
-            GURL("about:blank#blocked"));
-#else
   // Wait to see if any navigation starts (it should not).
   counter.WaitForNoNavigations();
-#endif
 
   // Verify that the title remained empty (javascript was not executed).
   EXPECT_EQ("",
@@ -5631,11 +5591,7 @@ IN_PROC_BROWSER_TEST_P(WebUIToolbarWebViewPermissionBrowserTest,
 }
 
 // TODO(crbug.com/532463469): Flaky on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_LocationIconSuppressionE2E DISABLED_LocationIconSuppressionE2E
-#else
 #define MAYBE_LocationIconSuppressionE2E LocationIconSuppressionE2E
-#endif
 IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewPermissionBrowserTest,
                        MAYBE_LocationIconSuppressionE2E) {
   WebUIToolbarWebView* webui_toolbar_view = GetWebUIToolbarWebView(browser());
@@ -5748,7 +5704,7 @@ class WebUIToolbarSynchronousStartupBrowserTest
 // dependencies accurately hydrated synchronous startup data during early
 // `BrowserView::Init()` sequences.
 // TODO(crbug.com/540971327): Test is flaky on Linux and ChromeOS.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ColdWindowLaunch DISABLED_ColdWindowLaunch
 #else
 #define MAYBE_ColdWindowLaunch ColdWindowLaunch

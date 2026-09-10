@@ -46,8 +46,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "base/enterprise_util.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/install_attributes/install_attributes.h"
 #endif
 
 namespace indigo {
@@ -89,11 +87,6 @@ bool IsBrowserUnderAnyEnterpriseManagement(Profile* profile) {
   // Browser Cloud Management) is fully captured by Step 1 above.
 #if BUILDFLAG(IS_MAC)
   if (base::IsManagedOrEnterpriseDevice()) {
-    return true;
-  }
-#elif BUILDFLAG(IS_CHROMEOS)
-  if (ash::InstallAttributes::IsInitialized() &&
-      ash::InstallAttributes::Get()->IsEnterpriseManaged()) {
     return true;
   }
 #endif

@@ -414,7 +414,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSessionsSyncTest, SessionStartTime) {
   EXPECT_TRUE(found_header);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Regression test for crbug.com/361256057.
 IN_PROC_BROWSER_TEST_P(SingleClientSessionsSyncTest, UpdateSessionTag) {
   ASSERT_TRUE(SetupSync(SyncTestAccount::kConsumerAccount1));
@@ -454,7 +453,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSessionsSyncTest, UpdateSessionTag) {
                                        SessionHeader(second_cache_guid)))
                   .Wait());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientSessionsSyncTest, NavigateInTab) {
   ASSERT_TRUE(SetupSync());
@@ -1035,7 +1033,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSessionsWithoutDestroyProfileSyncTest,
   WaitForHierarchyOnServer(SessionsHierarchy());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class SingleClientSessionsWithDestroyProfileSyncTest
     : public SingleClientSessionsSyncTest {
  public:
@@ -1091,6 +1088,5 @@ IN_PROC_BROWSER_TEST_P(SingleClientSessionsWithDestroyProfileSyncTest,
   fake_server::FakeServerVerifier verifier(GetFakeServer());
   EXPECT_TRUE(verifier.VerifySessions(SessionsHierarchy({{url2.spec()}})));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

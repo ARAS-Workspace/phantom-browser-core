@@ -764,7 +764,7 @@ TEST(AddressTrackerLinuxNetlinkTest, TestInitializeTwoTrackers) {
 // These tests use `base::LaunchOptions::clone_flags` for fine-grained control
 // over the clone syscall, but the field is only defined on Linux and ChromeOS.
 // Unfortunately, this means these tests do not have coverage on Android.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // These tests require specific flag values defined in <sched.h>.
 #if defined(CLONE_NEWUSER) && defined(CLONE_NEWPID)
 
@@ -898,7 +898,7 @@ MULTIPROCESS_TEST_MAIN(ChildProcessInitializeTrackerForTesting) {
   return 0;
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // defined(CLONE_NEWUSER) && defined(CLONE_NEWPID)
 #endif  // defined(CLONE_NEWUSER) && defined(CLONE_NEWPID)
 
 }  // namespace net::internal

@@ -63,8 +63,7 @@ class ProcessMetricsDelegateImpl : public ProcessMetricsDelegate {
     return process_metrics_->GetPlatformIndependentCPUUsage();
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   int GetIdleWakeupsPerSecond() override {
     return process_metrics_->GetIdleWakeupsPerSecond();
   }
@@ -100,8 +99,7 @@ ProcessMonitor::Metrics SampleMetrics(ProcessMetricsDelegate& process_metrics) {
   metrics.cpu_usage = base::OptionalFromExpected(
       process_metrics.GetPlatformIndependentCPUUsage());
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   metrics.idle_wakeups = process_metrics.GetIdleWakeupsPerSecond();
 #endif
 #if BUILDFLAG(IS_MAC)
@@ -118,8 +116,7 @@ void ScaleMetrics(ProcessMonitor::Metrics* metrics, double factor) {
     metrics->cpu_usage.value() *= factor;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   metrics->idle_wakeups *= factor;
 #endif
 
@@ -202,8 +199,7 @@ ProcessMonitor::Metrics& operator+=(ProcessMonitor::Metrics& lhs,
     lhs.cpu_usage = lhs.cpu_usage.value_or(0.0) + rhs.cpu_usage.value_or(0.0);
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   lhs.idle_wakeups += rhs.idle_wakeups;
 #endif
 

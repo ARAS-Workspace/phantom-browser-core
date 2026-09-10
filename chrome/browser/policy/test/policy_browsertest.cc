@@ -63,11 +63,6 @@ namespace policy {
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS)
-const int kOneHourInMs = 60 * 60 * 1000;
-const int kThreeHoursInMs = 180 * 60 * 1000;
-#endif
-
 // Checks if WebGL is enabled in the given WebContents.
 bool IsWebGLEnabled(content::WebContents* contents) {
   return content::EvalJs(contents,
@@ -119,8 +114,7 @@ IN_PROC_BROWSER_TEST_F(PolicyTest, MAYBE_Disable3DAPIs) {
 }
 
 // TODO(crbug.com/40243891): Re-enable this flaky test.
-#if BUILDFLAG(IS_LINUX) || \
-    (BUILDFLAG(IS_CHROMEOS) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_HomepageLocation DISABLED_HomepageLocation
 #else
 #define MAYBE_HomepageLocation HomepageLocation
@@ -191,98 +185,5 @@ IN_PROC_BROWSER_TEST_F(PolicyTest, MAYBE_IncognitoEnabled) {
   EXPECT_EQ(2u, GlobalBrowserCollection::GetInstance()->GetSize());
   EXPECT_TRUE(IsOffTheRecordSessionActive());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// We need to block mouse events in |WaitForInitialUserActivityUnsatisfied| test
-// to avoid flakiness due to unexpected mouse input.
-class BlockMouseEventPolicyTest : public PolicyTest {
- public:
-  void SetUp() override {
-    // Backup previous IgnoreNativePlatformEvents value to restore after test.
-    old_ignore_native_platform_events_ =
-        ui::PlatformEventSource::ShouldIgnoreNativePlatformEvents();
-    ui::PlatformEventSource::SetIgnoreNativePlatformEvents(true);
-
-    PolicyTest::SetUp();
-  }
-  void TearDown() override {
-    ui::PlatformEventSource::SetIgnoreNativePlatformEvents(
-        old_ignore_native_platform_events_);
-
-    PolicyTest::TearDown();
-  }
-
- private:
-  bool old_ignore_native_platform_events_;
-};
-
-IN_PROC_BROWSER_TEST_F(BlockMouseEventPolicyTest,
-                       PRE_WaitForInitialUserActivityUnsatisfied) {
-  // Indicate that the session started 2 hours ago and no user activity has
-  // occurred yet.
-  g_browser_process->local_state()->SetInt64(
-      ash::prefs::kSessionStartTime,
-      (base::Time::Now() - base::Hours(2)).ToInternalValue());
-}
-
-IN_PROC_BROWSER_TEST_F(BlockMouseEventPolicyTest,
-                       WaitForInitialUserActivityUnsatisfied) {
-  PolicyTestAppTerminationObserver observer;
-
-  // Require initial user activity.
-  PolicyMap policies;
-  policies.Set(key::kWaitForInitialUserActivity, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD, base::Value(true),
-               nullptr);
-  UpdateProviderPolicy(policies);
-  base::RunLoop().RunUntilIdle();
-
-  // Set the session length limit to 1 hour. Verify that the session is not
-  // terminated.
-  policies.Set(key::kSessionLengthLimit, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD,
-               base::Value(kOneHourInMs), nullptr);
-  UpdateProviderPolicy(policies);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_FALSE(observer.WasAppTerminated());
-}
-
-IN_PROC_BROWSER_TEST_F(PolicyTest, PRE_WaitForInitialUserActivitySatisfied) {
-  // Indicate that initial user activity in this session occurred 2 hours ago.
-  g_browser_process->local_state()->SetInt64(
-      ash::prefs::kSessionStartTime,
-      (base::Time::Now() - base::Hours(2)).ToInternalValue());
-  g_browser_process->local_state()->SetBoolean(
-      ash::prefs::kSessionUserActivitySeen, true);
-}
-
-IN_PROC_BROWSER_TEST_F(PolicyTest, WaitForInitialUserActivitySatisfied) {
-  PolicyTestAppTerminationObserver observer;
-
-  // Require initial user activity and set the session length limit to 3 hours.
-  // Verify that the session is not terminated.
-  PolicyMap policies;
-  policies.Set(key::kWaitForInitialUserActivity, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD, base::Value(true),
-               nullptr);
-  policies.Set(key::kSessionLengthLimit, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD,
-               base::Value(kThreeHoursInMs), nullptr);
-  UpdateProviderPolicy(policies);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_FALSE(observer.WasAppTerminated());
-
-  // Decrease the session length limit to 1 hour. Verify that the session is
-  // terminated immediately.
-  policies.Set(key::kSessionLengthLimit, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD,
-               base::Value(kOneHourInMs), nullptr);
-  UpdateProviderPolicy(policies);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(observer.WasAppTerminated());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace policy

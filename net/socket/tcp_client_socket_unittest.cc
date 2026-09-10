@@ -387,7 +387,7 @@ class TestSocketPerformanceWatcher : public SocketPerformanceWatcher {
 
 // TestSocketPerformanceWatcher requires kernel support for tcp_info struct, and
 // so it is enabled only on certain platforms.
-#if defined(TCP_INFO) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if defined(TCP_INFO) || BUILDFLAG(IS_LINUX)
 #define MAYBE_TestSocketPerformanceWatcher TestSocketPerformanceWatcher
 #else
 #define MAYBE_TestSocketPerformanceWatcher TestSocketPerformanceWatcher

@@ -19,7 +19,6 @@
 
 namespace reporting {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // static
 std::unique_ptr<ReportingClient::TestEnvironment>
 ReportingClient::TestEnvironment::CreateWithLocalStorage(
@@ -43,7 +42,6 @@ ReportingClient::TestEnvironment::CreateWithLocalStorage(
       },
       reporting_path, verification_key)));
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // static
 std::unique_ptr<ReportingClient::TestEnvironment>

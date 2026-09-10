@@ -228,8 +228,7 @@ struct UpdateClientUtilsUTF8StringTypeTestCase {
 
 class UpdateClientUtilsUTF8StringTypeTest
     : public ::testing::TestWithParam<UpdateClientUtilsUTF8StringTypeTestCase> {
-#if !defined(SYSTEM_NATIVE_UTF8) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if !defined(SYSTEM_NATIVE_UTF8) && BUILDFLAG(IS_LINUX)
  protected:
   base::ScopedLocale locale_{"en_US.UTF-8"};
 #endif

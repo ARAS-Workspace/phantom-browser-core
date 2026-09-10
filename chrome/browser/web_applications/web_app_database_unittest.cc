@@ -78,10 +78,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/web_applications/web_app_run_on_os_login_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 
 using ::testing::_;
@@ -217,11 +213,7 @@ TEST_F(WebAppDatabaseTest, WriteAndDeleteAppsWithCallbacks) {
   std::vector<webapps::AppId> apps_to_delete;
   Registry expected_registry;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bool allow_system_source = true;
-#else
   bool allow_system_source = false;
-#endif
 
   for (uint32_t i = 0; i < num_apps; ++i) {
     test::CreateRandomWebAppParams params;
@@ -274,13 +266,6 @@ TEST_F(WebAppDatabaseTest, OpenDatabaseAndReadRegistry) {
       DisableResumeSyncInstallAndMissingOsIntegrationForTesting();
   auto disable_generated_icon_fixes =
       GeneratedIconFixManager::DisableGeneratedIconFixesForTesting();
-#if BUILDFLAG(IS_CHROMEOS)
-  // Some random apps will be configured to run on login, and by doing so we
-  // will 'fix' the InstallState if the OS integration is not there. So disable
-  // this behavior to prevent this from occurring.
-  auto disable_run_on_os_login =
-      WebAppRunOnOsLoginManager::SkipStartupForTesting();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   base::HistogramTester histogram_tester;
   Registry registry =
       WriteWebApps(kNumApps, /*exclude_fields_with_side_effects=*/true);
@@ -353,10 +338,6 @@ TEST_F(WebAppDatabaseTest, DowngradeCorruptionRecovery) {
       DisableResumeSyncInstallAndMissingOsIntegrationForTesting();
   auto disable_generated_icon_fixes =
       GeneratedIconFixManager::DisableGeneratedIconFixesForTesting();
-#if BUILDFLAG(IS_CHROMEOS)
-  auto disable_run_on_os_login =
-      WebAppRunOnOsLoginManager::SkipStartupForTesting();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   base::HistogramTester histogram_tester;
 
   // 1. Write the apps and metadata.

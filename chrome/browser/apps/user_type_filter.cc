@@ -11,10 +11,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "content/public/browser/browser_thread.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/components/mgs/managed_guest_session_utils.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace apps {
 
 // kUserType is required key that specifies enumeration of user types for which
@@ -35,11 +31,6 @@ std::string DetermineUserType(Profile* profile) {
   if (profile->IsChild())
     return kUserTypeChild;
   if (profile->GetProfilePolicyConnector()->IsManaged()) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (chromeos::IsManagedGuestSession()) {
-      return kUserTypeManagedGuest;
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
     return kUserTypeManaged;
   }
   return kUserTypeUnmanaged;

@@ -15,22 +15,14 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/vector_icon_types.h"
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/enterprise/browser_management/management_identity.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "ui/base/l10n/l10n_util.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/common/webui_url_constants.h"
-#include "chromeos/ash/components/demo_mode/utils/demo_session_utils.h"
-#include "components/supervised_user/core/common/supervised_user_constants.h"
-#include "ui/chromeos/devicetype_utils.h"
-#include "url/gurl.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "components/strings/grit/components_strings.h"
@@ -38,7 +30,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 enum ManagementStringType : size_t {
   BROWSER_MANAGED = 0,
   BROWSER_MANAGED_BY = 1,
@@ -49,19 +41,13 @@ enum ManagementStringType : size_t {
   SUPERVISED = 6,
   NOT_MANAGED = 7
 };
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 bool ShouldDisplayManagedByParentUi(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Don't display the managed by parent UI on ChromeOS, because similar UI is
-  // displayed at the OS level.
-  return false;
-#else
   return profile && profile->IsChild();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 ManagementStringType GetManagementStringType(Profile* profile) {
   if (!enterprise_util::IsBrowserManaged(profile) &&
       ShouldDisplayManagedByParentUi(profile)) {
@@ -107,22 +93,11 @@ ManagementStringType GetManagementStringType(Profile* profile) {
 
   return BROWSER_MANAGED_PROFILE_MANAGED_BY;
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
 bool ShouldDisplayManagedUi(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Don't show the UI in demo mode.
-  if (ash::demo_mode::IsDeviceInDemoMode()) {
-    return false;
-  }
-
-  // Don't show the UI for Family Link accounts.
-  if (profile->IsChild()) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   return enterprise_util::IsBrowserManaged(profile) ||
          ShouldDisplayManagedByParentUi(profile);
@@ -144,89 +119,7 @@ const gfx::VectorIcon& GetManagedUiIcon(Profile* profile) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(IS_CHROMEOS)
-GURL GetManagedUiUrl(Profile* profile) {
-  if (enterprise_util::IsBrowserManaged(profile)) {
-    return GURL(chrome::kChromeUIManagementURL);
-  }
-
-  if (ShouldDisplayManagedByParentUi(profile)) {
-    return GURL(supervised_user::kManagedByParentUiMoreInfoUrl);
-  }
-
-  return GURL();
-}
-
-std::string GetManagedUiWebUIIcon(Profile* profile) {
-  if (enterprise_util::IsBrowserManaged(profile)) {
-    return "cr:domain";
-  }
-
-  if (ShouldDisplayManagedByParentUi(profile)) {
-    // The Family Link "kite" icon.
-    return "cr20:family-link";
-  }
-
-  // This method can be called even if we shouldn't display the managed UI.
-  return std::string();
-}
-
-std::u16string GetManagedUiWebUILabel(Profile* profile) {
-  std::optional<std::string> account_manager =
-      GetAccountManagerIdentity(profile);
-  std::optional<std::string> device_manager = GetDeviceManagerIdentity();
-
-  switch (GetManagementStringType(profile)) {
-    case BROWSER_MANAGED:
-      return l10n_util::GetStringFUTF16(IDS_MANAGED_WITH_HYPERLINK,
-                                        chrome::kChromeUIManagementURL16);
-    case BROWSER_MANAGED_BY:
-      return l10n_util::GetStringFUTF16(IDS_MANAGED_BY_WITH_HYPERLINK,
-                                        chrome::kChromeUIManagementURL16,
-                                        base::UTF8ToUTF16(*device_manager));
-    case BROWSER_PROFILE_SAME_MANAGED_BY:
-      return l10n_util::GetStringFUTF16(
-          IDS_BROWSER_AND_PROFILE_SAME_MANAGED_BY_WITH_HYPERLINK,
-          chrome::kChromeUIManagementURL16, base::UTF8ToUTF16(*device_manager));
-    case BROWSER_PROFILE_DIFFERENT_MANAGED_BY:
-      return l10n_util::GetStringFUTF16(
-          IDS_BROWSER_AND_PROFILE_DIFFERENT_MANAGED_BY_WITH_HYPERLINK,
-          chrome::kChromeUIManagementURL16, base::UTF8ToUTF16(*device_manager),
-          base::UTF8ToUTF16(*account_manager));
-    case BROWSER_MANAGED_PROFILE_MANAGED_BY:
-      return l10n_util::GetStringFUTF16(
-          IDS_BROWSER_MANAGED_AND_PROFILE_MANAGED_BY_WITH_HYPERLINK,
-          chrome::kChromeUIManagementURL16,
-          base::UTF8ToUTF16(*account_manager));
-    case PROFILE_MANAGED_BY:
-      return l10n_util::GetStringFUTF16(IDS_PROFILE_MANAGED_BY_WITH_HYPERLINK,
-                                        chrome::kChromeUIManagementURL16,
-                                        base::UTF8ToUTF16(*account_manager));
-    case SUPERVISED:
-      return l10n_util::GetStringFUTF16(
-          IDS_MANAGED_BY_PARENT_WITH_HYPERLINK,
-          base::UTF8ToUTF16(supervised_user::kManagedByParentUiMoreInfoUrl));
-    case NOT_MANAGED:
-      return std::u16string();
-  }
-  return std::u16string();
-}
-
-std::u16string GetDeviceManagedUiWebUILabel() {
-  int string_id = IDS_DEVICE_MANAGED_WITH_HYPERLINK;
-  std::vector<std::u16string> replacements;
-  replacements.push_back(chrome::kChromeUIManagementURL16);
-  replacements.push_back(ui::GetChromeOSDeviceName());
-
-  const std::optional<std::string> device_manager = GetDeviceManagerIdentity();
-  if (device_manager && !device_manager->empty()) {
-    string_id = IDS_DEVICE_MANAGED_BY_WITH_HYPERLINK;
-    replacements.push_back(base::UTF8ToUTF16(*device_manager));
-  }
-
-  return l10n_util::GetStringFUTF16(string_id, replacements, nullptr);
-}
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 std::u16string GetManagementPageSubtitle(Profile* profile) {
   std::optional<std::string> account_manager =
       GetAccountManagerIdentity(profile);

@@ -73,16 +73,6 @@
 #include "services/network/test/test_network_connection_tracker.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/user_manager_delegate_impl.h"
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "chrome/browser/browser_process.h"
-#include "chromeos/ash/components/dbus/concierge/concierge_client.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/user_manager_impl.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -291,12 +281,6 @@ class ExtensionGCMAppHandlerTest : public testing::Test {
         std::make_unique<content::InProcessUtilityThreadHelper>();
 
     // This is needed to create extension service under CrOS.
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager_.Reset(std::make_unique<user_manager::UserManagerImpl>(
-        std::make_unique<ash::UserManagerDelegateImpl>(),
-        g_browser_process->local_state(), ash::CrosSettings::Get()));
-    ash::ConciergeClient::InitializeFake(/*fake_cicerone_client=*/nullptr);
-#endif
 
     // Create a new profile.
     TestingProfile::Builder builder;
@@ -322,9 +306,6 @@ class ExtensionGCMAppHandlerTest : public testing::Test {
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager_.Reset();
-#endif
 
     waiter_.PumpUILoop();
     gcm_app_handler_->Shutdown();
@@ -333,11 +314,6 @@ class ExtensionGCMAppHandlerTest : public testing::Test {
       partition->WaitForDeletionTasksForTesting();
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    gcm_app_handler_.reset();
-    profile_.reset();
-    ash::ConciergeClient::Shutdown();
-#endif
   }
 
   // Returns a barebones test extension.
@@ -454,10 +430,6 @@ class ExtensionGCMAppHandlerTest : public testing::Test {
   base::ScopedTempDir temp_dir_;
 
   // This is needed to create extension service under CrOS.
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedCrosSettingsTestHelper cros_settings_test_helper_;
-  user_manager::ScopedUserManager user_manager_;
-#endif
 
   Waiter waiter_;
   std::unique_ptr<FakeExtensionGCMAppHandler> gcm_app_handler_;

@@ -39,11 +39,7 @@
 #include "ui/menus/simple_menu_model.h"
 #include "ui/views/view_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/aura/window.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/feature_list.h"
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
 #include "chrome/browser/ui/views/location_bar/location_bar_view.h"
@@ -196,7 +192,7 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerBrowserTest,
 // TODO(crbug.com/539987012): Enable this test on MacOS once the flakiness is
 // fixed.
 // TODO(crbug.com/545007115): Flaky on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerBrowserTest,
                        DISABLED_ClickTabInImmersiveMode) {
   // Add another tab to switch to.
@@ -210,13 +206,8 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerBrowserTest,
       unpinned_collection_node()->children()[1].get();
   views::View* last_tab_view = last_tab_node->view();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ui::test::EventGenerator event_generator(
-      browser()->GetWindow()->GetNativeWindow()->GetRootWindow());
-#else
   ui::test::EventGenerator event_generator(
       browser()->GetWindow()->GetNativeWindow());
-#endif
 
   browser()->tab_strip_model()->ActivateTabAt(0);
   EXPECT_EQ(browser()->tab_strip_model()->active_index(), 0);
@@ -242,7 +233,7 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerBrowserTest,
   EXPECT_TRUE(button_provider->GetAppMenuControl()->IsDrawn());
 }
 
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 INSTANTIATE_TEST_SUITE_P(
     All,

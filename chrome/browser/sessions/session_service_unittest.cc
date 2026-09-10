@@ -65,12 +65,6 @@
 #include "third_party/skia/include/core/SkColor.h"
 #include "ui/base/mojom/window_show_state.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chromeos/components/kiosk/kiosk_test_utils.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using content::NavigationEntry;
 using sessions::ContentTestHelper;
 using sessions::SerializedNavigationEntry;
@@ -1463,35 +1457,3 @@ TEST_F(SessionServiceTest, ObserverNotifiedOnDestruction) {
 
   DestroySessionService();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// These preparation is necessary for `ShouldRestore` function to return true
-// in the regular user session.
-TEST_F(SessionServiceTest, OpenedWindowNotRestored) {
-  helper_.SetHasOpenTrackableBrowsers(false);
-  service()->WindowClosing(window_id);
-  service()->WindowClosed(window_id);
-  // Make sure `ShouldRestore` returns true for the regular user session.
-  EXPECT_TRUE(session_service_->ShouldRestore(nullptr));
-}
-
-class SessionServiceKioskTest : public SessionServiceTest {
- protected:
-  void SetUp() override {
-    SessionServiceTest::SetUp();
-    chromeos::SetUpFakeChromeAppKioskSession(
-        "test@kiosk-apps.device-local.localhost");
-  }
-
-  user_manager::TypedScopedUserManager<ash::FakeChromeUserManager>
-      fake_user_manager_{std::make_unique<ash::FakeChromeUserManager>()};
-};
-
-TEST_F(SessionServiceKioskTest, OpenedWindowNotRestored) {
-  helper_.SetHasOpenTrackableBrowsers(false);
-  service()->WindowClosing(window_id);
-  service()->WindowClosed(window_id);
-  // Make sure `ShouldRestore` returns true for the kiosk user session.
-  EXPECT_FALSE(session_service_->ShouldRestore(nullptr));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)

@@ -274,18 +274,9 @@ IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, PRE_OriginFlagEnabled) {
   // non-ChromeOS.
   ToggleEnableDropdown(contents, kFlagName, true);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // On non-ChromeOS, the command line is not modified until restart.
   EXPECT_EQ(kInitialSwitches,
             base::CommandLine::ForCurrentProcess()->GetSwitches());
-#else
-  // On ChromeOS, the command line is immediately modified.
-  EXPECT_NE(kInitialSwitches,
-            base::CommandLine::ForCurrentProcess()->GetSwitches());
-  EXPECT_EQ(
-      GetSanitizedInputAndCommandLine(),
-      base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(kSwitchName));
-#endif
 
   // Input should be restored after a page reload.
   NavigateToFlagsPage();
@@ -295,17 +286,10 @@ IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, PRE_OriginFlagEnabled) {
 
 // Flaky. http://crbug.com/40651256
 IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, DISABLED_OriginFlagEnabled) {
-#if !BUILDFLAG(IS_CHROMEOS)
   // On non-ChromeOS, the command line is modified after restart.
   EXPECT_EQ(
       GetSanitizedInputAndCommandLine(),
       base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(kSwitchName));
-#else
-  // On ChromeOS, the command line isn't modified after restart.
-  EXPECT_EQ(
-      GetInitialCommandLine(),
-      base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(kSwitchName));
-#endif
 
   NavigateToFlagsPage();
   content::WebContents* contents =
@@ -313,12 +297,6 @@ IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, DISABLED_OriginFlagEnabled) {
   EXPECT_TRUE(IsDropdownEnabled(contents, kFlagName));
   EXPECT_EQ(GetSanitizedInputAndCommandLine(),
             GetOriginListText(contents, kFlagName));
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS doesn't read chrome://flags values on startup so we explicitly
-  // need to disable and re-enable the flag here.
-  ToggleEnableDropdown(contents, kFlagName, true);
-#endif
 
   EXPECT_EQ(
       GetSanitizedInputAndCommandLine(),
@@ -333,7 +311,6 @@ IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, ExpiryHidesFlag) {
   EXPECT_FALSE(IsFlagPresent(contents, kExpiredFlagName));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, PRE_ExpiredFlagDoesntApply) {
   NavigateToFlagsPage();
   content::WebContents* contents =
@@ -354,7 +331,6 @@ IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, DISABLED_ExpiredFlagDoesntApply) {
   EXPECT_FALSE(base::CommandLine::ForCurrentProcess()->HasSwitch(
       kExpiredFlagSwitchName));
 }
-#endif
 
 // Regression test for https://crbug.com/40703779:
 // Test that simply setting a flag (without the backing feature) is sufficient

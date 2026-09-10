@@ -31,9 +31,7 @@
 
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kHistoryTabId);
-#endif
 
 }  // namespace
 
@@ -131,7 +129,6 @@ class HistoryEmbeddingsInteractiveTest
 
 // Opening the feedback dialog on CrOS open a system level dialog, which cannot
 // be easily tested here.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // TODO(crbug.com/374710231): Reenable - currently, this fails consistently on
 // Win11 ARM debug builds.
@@ -174,4 +171,3 @@ IN_PROC_BROWSER_TEST_F(HistoryEmbeddingsInteractiveTest, MAYBE_FeedbackDialog) {
       MoveMouseTo(kHistoryTabId, kThumbsDownElement), ClickMouse(),
       InAnyContext(WaitForShow(FeedbackDialog::kFeedbackDialogForTesting)));
 }
-#endif

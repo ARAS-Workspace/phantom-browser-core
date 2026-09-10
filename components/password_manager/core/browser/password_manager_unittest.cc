@@ -529,7 +529,7 @@ class PasswordManagerTestBase : public testing::Test {
         prefs::kProfileStoreDateLastUsedForFilling, base::Time());
     prefs_->registry()->RegisterTimePref(
         prefs::kAccountStoreDateLastUsedForFilling, base::Time());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
     prefs_->registry()->RegisterBooleanPref(
         password_manager::prefs::kBiometricAuthenticationBeforeFilling, true);
 #endif

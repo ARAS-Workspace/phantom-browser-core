@@ -38,10 +38,6 @@
 #include "ui/views/focus/focus_manager.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/time/time.h"
-#endif
-
 namespace message_center {
 
 namespace {
@@ -512,26 +508,8 @@ void MessageView::OnSnoozeButtonPressed(const ui::Event& event) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-base::TimeDelta MessageView::GetBoundsAnimationDuration(
-    const Notification& notification) const {
-  return base::Milliseconds(0);
-}
-#endif
-
 bool MessageView::ShouldShowControlButtons() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Users on ChromeOS are used to the Settings and Close buttons not being
-  // visible at all times, but users on other platforms expect them to be
-  // visible.
-  auto* control_buttons_view = GetControlButtonsView();
-  return control_buttons_view &&
-         (control_buttons_view->IsAnyButtonFocused() ||
-          (GetMode() != Mode::SETTING && IsMouseHovered()) ||
-          MessageCenter::Get()->IsSpokenFeedbackEnabled());
-#else
   return true;
-#endif
 }
 
 bool MessageView::ShouldParentHandleSlide() const {
@@ -558,12 +536,8 @@ void MessageView::UpdateNestedBorder() {
   }
 
   SkColor border_color;
-#if BUILDFLAG(IS_CHROMEOS)
-  border_color = SK_ColorTRANSPARENT;
-#else
   border_color =
       GetColorProvider()->GetColor(ui::kColorFocusableBorderUnfocused);
-#endif
 
   SetBorder(views::CreateRoundedRectBorder(
       kNotificationBorderThickness, kNotificationCornerRadius, border_color));

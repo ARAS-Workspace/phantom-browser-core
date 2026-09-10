@@ -42,12 +42,6 @@
 #include "third_party/metrics_proto/extension_install.pb.h"
 #include "third_party/metrics_proto/system_profile.pb.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif
-
 using extensions::Extension;
 using extensions::ExtensionBuilder;
 using extensions::Manifest;
@@ -132,16 +126,6 @@ class ExtensionsMetricsProviderTest : public testing::Test {
     testing::Test::SetUp();
     EXPECT_TRUE(profile_manager_.SetUp());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    auto* fake_user_manager = new ash::FakeChromeUserManager();
-    scoped_user_manager_enabler_ =
-        std::make_unique<user_manager::ScopedUserManager>(
-            base::WrapUnique(fake_user_manager));
-    const AccountId account_id(AccountId::FromUserEmail(kTestUserEmail));
-    fake_user_manager->AddUser(account_id);
-    fake_user_manager->LoginUser(account_id);
-#endif
-
     metrics::MetricsService::RegisterPrefs(prefs_.registry());
     metrics_state_manager_ = metrics::MetricsStateManager::Create(
         &prefs_, &enabled_state_provider_, std::wstring(), base::FilePath());
@@ -162,10 +146,6 @@ class ExtensionsMetricsProviderTest : public testing::Test {
   TestingPrefServiceSimple prefs_;
   TestingProfileManager profile_manager_;
   base::HistogramTester histogram_tester_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_enabler_;
-#endif
 
   metrics::TestEnabledStateProvider enabled_state_provider_;
   std::unique_ptr<metrics::MetricsStateManager> metrics_state_manager_;

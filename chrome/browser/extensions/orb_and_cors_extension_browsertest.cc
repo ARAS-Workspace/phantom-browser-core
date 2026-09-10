@@ -84,10 +84,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/chrome_app_deprecation/chrome_app_deprecation.h"
-#endif
-
 namespace extensions {
 
 namespace {
@@ -2000,7 +1996,7 @@ IN_PROC_BROWSER_TEST_F(OrbAndCorsExtensionBrowserTest,
   }
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // Flaky on Linux, especially under sanitizers: https://crbug.com/40127384
 // Flaky UAF on Mac under ASAN: https://crbug.com/40691871
 #define MAYBE_FromBackgroundServiceWorker_NoSniffXml \
@@ -2211,109 +2207,6 @@ IN_PROC_BROWSER_TEST_F(OrbAndCorsExtensionBrowserTest,
 
 // The following test is executed as Chrome App, which is only supported on
 // ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-class OrbAndCorsAppBrowserTest : public PlatformAppBrowserTest {
- public:
-  OrbAndCorsAppBrowserTest() = default;
-
-  void SetUpOnMainThread() override {
-    PlatformAppBrowserTest::SetUpOnMainThread();
-
-    host_resolver()->AddRule("*", "127.0.0.1");
-    content::SetupCrossSiteRedirector(embedded_test_server());
-    ASSERT_TRUE(embedded_test_server()->Start());
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(OrbAndCorsAppBrowserTest, WebViewContentScript) {
-  // Load the test app.
-  const char kManifest[] = R"(
-      {
-        "name": "CrossOriginReadBlockingTest - App",
-        "version": "1.0",
-        "manifest_version": 2,
-        "permissions": ["*://*/*", "webview"],
-        "app": {
-          "background": {
-            "scripts": ["background_script.js"]
-          }
-        }
-      } )";
-  TestExtensionDir dir;
-  dir.WriteManifest(kManifest);
-  const char kBackgroundScript[] = R"(
-      chrome.app.runtime.onLaunched.addListener(function() {
-        chrome.app.window.create('page.html', {}, function () {});
-      });
-  )";
-  dir.WriteFile(FILE_PATH_LITERAL("background_script.js"), kBackgroundScript);
-  const char kPage[] = R"(
-      <div id="webview-tag-container"></div>
-  )";
-  dir.WriteFile(FILE_PATH_LITERAL("page.html"), kPage);
-  const Extension* app = LoadExtension(dir.UnpackedPath());
-  ASSERT_TRUE(app);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  apps::chrome_app_deprecation::ScopedAddAppToAllowlistForTesting allowlist(
-      app->id());
-#endif
-
-  // Launch the test app and grab its WebContents.
-  content::WebContents* app_contents = nullptr;
-  {
-    content::WebContentsAddedObserver new_contents_observer;
-    LaunchPlatformApp(app);
-    app_contents = new_contents_observer.GetWebContents();
-  }
-  ASSERT_TRUE(content::WaitForLoadStop(app_contents));
-
-  // Inject a <webview> script and declare desire to inject
-  // cross-origin-fetching content scripts into the guest.
-  const char kWebViewInjectionScriptTemplate[] = R"(
-      document.querySelector('#webview-tag-container').innerHTML =
-          '<webview style="width: 100px; height: 100px;"></webview>';
-      var webview = document.querySelector('webview');
-      webview.addContentScripts([{
-          name: 'rule',
-          matches: ['*://*/*'],
-          js: { code: $1 },
-          run_at: 'document_start'}]);
-  )";
-  GURL cross_site_resource(
-      embedded_test_server()->GetURL("cross-site.com", "/nosniff.xml"));
-  std::string web_view_injection_script = content::JsReplace(
-      kWebViewInjectionScriptTemplate, CreateFetchScript(cross_site_resource));
-  ASSERT_TRUE(ExecJs(app_contents, web_view_injection_script));
-
-  // Navigate <webview>, which should trigger content script execution.
-  GURL guest_url(
-      embedded_test_server()->GetURL("fetch-initiator.com", "/title1.html"));
-  const char kWebViewNavigationScriptTemplate[] = R"(
-      var webview = document.querySelector('webview');
-      webview.src = $1;
-  )";
-  std::string web_view_navigation_script =
-      content::JsReplace(kWebViewNavigationScriptTemplate, guest_url);
-  {
-    // NOTE: The Dom message will be emitted in a new WebContents instance that
-    // is created when setting webview.src. Hence, we need to listen for the
-    // message in that instance.
-    content::WebContents* webview_contents = nullptr;
-    {
-      content::WebContentsAddedObserver webview_contents_added_observer;
-      content::ExecuteScriptAsync(app_contents, web_view_navigation_script);
-      webview_contents = webview_contents_added_observer.GetWebContents();
-    }
-    content::DOMMessageQueue queue(webview_contents);
-
-    std::string fetch_result = PopString(&queue);
-
-    // Verify that no ORB or CORS blocking occurred.
-    EXPECT_EQ("nosniff.xml - body\n", fetch_result);
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 using OriginHeaderExtensionBrowserTest = OrbAndCorsExtensionBrowserTest;
 

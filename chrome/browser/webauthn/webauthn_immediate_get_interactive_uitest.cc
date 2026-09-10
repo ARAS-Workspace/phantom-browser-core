@@ -200,16 +200,8 @@ class WebAuthnImmediateGetWithBootstrappedEnclaveTest
 };
 
 // TODO(crbug.com/422074323): Re-enable this test suite in ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_WebAuthnImmediateGetWithBootstrappedEnclaveTest \
-  DISABLED_WebAuthnImmediateGetWithBootstrappedEnclaveTest
-
-class DISABLED_WebAuthnImmediateGetWithBootstrappedEnclaveTest
-    : public WebAuthnImmediateGetWithBootstrappedEnclaveTest {};
-#else
 #define MAYBE_WebAuthnImmediateGetWithBootstrappedEnclaveTest \
   WebAuthnImmediateGetWithBootstrappedEnclaveTest
-#endif
 
 IN_PROC_BROWSER_TEST_F(MAYBE_WebAuthnImmediateGetWithBootstrappedEnclaveTest,
                        SinglePasskeyDiscouragedUv) {

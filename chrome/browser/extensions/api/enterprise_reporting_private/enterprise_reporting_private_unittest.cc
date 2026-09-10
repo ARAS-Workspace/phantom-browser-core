@@ -55,7 +55,7 @@
 #include "components/device_signals/core/common/signals_constants.h"  // nogncheck
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/nix/xdg_util.h"
 #endif
 
@@ -84,7 +84,6 @@ constexpr char kNoError[] = "";
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 
 namespace {
 
@@ -296,7 +295,7 @@ TEST_F(EnterpriseReportingPrivateGetDeviceInfoTest, GetDeviceInfo) {
   ASSERT_TRUE(info);
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ("macOS", info->os_name);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   std::unique_ptr<base::Environment> env(base::Environment::Create());
   env->SetVar(base::nix::kXdgCurrentDesktopEnvVar, "XFCE");
   EXPECT_EQ("linux", info->os_name);
@@ -344,7 +343,6 @@ TEST_F(EnterpriseReportingPrivateGetDeviceInfoTest, GetDeviceInfoConversion) {
   EXPECT_EQ(*info.windows_user_domain, "USER_DOMAIN");
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class EnterpriseReportingPrivateGetContextInfoTest
     : public ExtensionApiUnittest {
@@ -378,8 +376,7 @@ class EnterpriseReportingPrivateGetContextInfoTest
   }
 
   bool BuiltInDnsClientPlatformDefault() {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
     return true;
 #else
     return false;

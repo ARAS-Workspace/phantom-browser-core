@@ -531,18 +531,6 @@ const char kSeveralInnerCapabilitiesVendorCapabilityCdd[] = R"(
       }
     })";
 
-#if BUILDFLAG(IS_CHROMEOS)
-const char kPinOnlyCdd[] = R"(
-    {
-      "version": "1.0",
-      "printer": {
-        "pin": {
-          "supported": true
-        }
-      }
-    })";
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Invalid because `is_continuous_feed` is true and `min_height_microns` is
 // missing.
 const char kInvalidCustomMediaNoMinHeightCdd[] = R"(
@@ -1220,35 +1208,6 @@ TEST(PrinterDescriptionTest, CddSetVendorCapability) {
   EXPECT_EQ(NormalizeJson(kVendorCapabilityOnlyCdd),
             NormalizeJson(description.ToStringForTesting()));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(PrinterDescriptionTest, CddGetPin) {
-  {
-    CloudDeviceDescription description;
-    ASSERT_TRUE(description.InitFromString(kPinOnlyCdd));
-
-    PinCapability pin_capability;
-    EXPECT_TRUE(pin_capability.LoadFrom(description));
-    EXPECT_TRUE(pin_capability.value());
-  }
-  {
-    CloudDeviceDescription description;
-    ASSERT_TRUE(description.InitFromString(kDefaultCdd));
-    PinCapability pin_capability;
-    EXPECT_FALSE(pin_capability.LoadFrom(description));
-  }
-}
-
-TEST(PrinterDescriptionTest, CddSetPin) {
-  CloudDeviceDescription description;
-
-  PinCapability pin_capability;
-  pin_capability.set_value(true);
-  pin_capability.SaveTo(&description);
-  EXPECT_EQ(NormalizeJson(kPinOnlyCdd),
-            NormalizeJson(description.ToStringForTesting()));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST(PrinterDescriptionTest, CddInvalidCustomMediaNoMinHeight) {
   CloudDeviceDescription description;

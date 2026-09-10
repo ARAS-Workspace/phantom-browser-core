@@ -15,24 +15,9 @@
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/profile_metrics/browser_profile_type.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#endif
-
 namespace {
 
 profile_metrics::BrowserProfileType GetProfileType(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Alias the "system" profiles which present as regular profiles for metrics
-  // purposes (e.g. signin screen), to system metrics profiles. This is done
-  // here as, due to dependency injection, the service itself does not hold a
-  // profile pointer.
-  // TODO (crbug.com/40270186) - Move to simply not creating the service for
-  // these types of profiles.
-  if (!ash::IsUserBrowserContext(profile)) {
-    return profile_metrics::BrowserProfileType::kSystem;
-  }
-#endif
   return profile_metrics::GetBrowserProfileType(profile);
 }
 

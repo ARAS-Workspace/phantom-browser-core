@@ -17,11 +17,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "ui/display/screen_base.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/shell.h"
-#include "ui/display/test/display_manager_test_api.h"  // nogncheck
-#endif                                                 // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 constexpr char kGetScreensScript[] = R"(
@@ -96,34 +91,20 @@ class WindowManagementPermissionContextTest : public InProcessBrowserTest {
 class MultiscreenWindowManagementPermissionContextTest
     : public WindowManagementPermissionContextTest {
  public:
-#if !BUILDFLAG(IS_CHROMEOS)
   ~MultiscreenWindowManagementPermissionContextTest() override {
     display::Screen::SetScreenInstance(nullptr);
   }
-#endif
 
   void SetScreenInstance() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    // Use the default, see SetUpOnMainThread.
-    WindowManagementPermissionContextTest::SetScreenInstance();
-#else
     display::Screen::SetScreenInstance(&screen_);
     screen_.display_list().AddDisplay({1, gfx::Rect(100, 100, 801, 802)},
                                       display::DisplayList::Type::PRIMARY);
     screen_.display_list().AddDisplay({2, gfx::Rect(901, 100, 802, 803)},
                                       display::DisplayList::Type::NOT_PRIMARY);
     ASSERT_EQ(2, display::Screen::Get()->GetNumDisplays());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    // This has to happen later than SetScreenInstance as the ash shell
-    // does not exist yet.
-    display::test::DisplayManagerTestApi(ash::Shell::Get()->display_manager())
-        .UpdateDisplay("100+100-801x802,901+100-802x803");
-    ASSERT_EQ(2, display::Screen::Get()->GetNumDisplays());
-#endif
     WindowManagementPermissionContextTest::SetUpOnMainThread();
   }
 
@@ -169,7 +150,7 @@ IN_PROC_BROWSER_TEST_F(WindowManagementPermissionContextTest, GestureToPrompt) {
 
 // TODO(crbug.com/40212482): Test failing on linux-chromeos-chrome.
 // TODO(crbug.com/40212443): Test failing on linux.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_DismissAndDeny DISABLED_DismissAndDeny
 #else
 #define MAYBE_DismissAndDeny DismissAndDeny

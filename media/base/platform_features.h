@@ -58,11 +58,7 @@ namespace media {
 MEDIA_EXPORT bool IsVp9kSVCHWDecodingEnabled();
 
 MEDIA_EXPORT constexpr bool IsVp9kSVCHWEncodingEnabled() {
-#if defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif
 }
 
 }  // namespace media

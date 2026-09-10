@@ -336,7 +336,6 @@ TEST_P(AutofillAiMayPerformActionTest, ActionsWhenNotOptedIntoAutofillAi) {
       kAllowedActions.contains(GetParam()));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)  // Signing out does not work on ChromeOS.
 // Tests that every action other than listing and editing data requires the user
 // to be signed in.
 TEST_P(AutofillAiMayPerformActionTest, SignedOut) {
@@ -382,8 +381,6 @@ TEST_P(AutofillAiMayPerformActionTest, SignInPending) {
     EXPECT_EQ(debug_message, "User's sign-in is in a persistent error state.");
   }
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Tests that the check whether a client can use model execution features is
 // ignored.
@@ -777,7 +774,6 @@ INSTANTIATE_TEST_SUITE_P(
            AutofillAiAction::kTypeSupportsAmbientAutofillData),
     GetTestSuffix);
 
-#if !BUILDFLAG(IS_CHROMEOS)  // Signing out does not work on ChromeOS.
 // Tests that opt-in status is tied to a GAIA id.
 TEST_F(AutofillAiPermissionUtilsTest, OptInStatus) {
   const std::string initial_email =
@@ -816,7 +812,6 @@ TEST_F(AutofillAiPermissionUtilsTest, OptInStatus) {
       SetAutofillAiOptInStatus(client(), AutofillAiOptInStatus::kOptedOut));
   EXPECT_FALSE(GetAutofillAiOptInStatus(client()));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AutofillAiPermissionUtilsTest, OptInStatusWithUsePrivateAi) {
   base::test::ScopedFeatureList feature_list{features::kAutofillAiUsePrivateAi};

@@ -238,12 +238,6 @@ void StabilityMetricsHelper::LogRendererCrash(
     case base::TERMINATION_STATUS_EVICTED_FOR_MEMORY:
       LogRendererCrashImpl(coarse_renderer_type, exit_code);
       break;
-#if BUILDFLAG(IS_CHROMEOS)
-    case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
-      base::UmaHistogramEnumeration("BrowserRenderProcessHost.ChildKills.OOM",
-                                    coarse_renderer_type);
-      [[fallthrough]];
-#endif  // BUILDFLAG(IS_CHROMEOS)
     case base::TERMINATION_STATUS_PROCESS_WAS_KILLED:
       base::UmaHistogramEnumeration("BrowserRenderProcessHost.ChildKills",
                                     coarse_renderer_type);

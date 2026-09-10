@@ -35,10 +35,6 @@
 #include "services/network/public/mojom/network_service_test.mojom.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 namespace {
 
 bool IsQuicEnabled(network::mojom::NetworkContext* network_context) {
@@ -225,11 +221,7 @@ class QuicAllowedPolicyIsTrue : public QuicAllowedPolicyTestBase {
 // some particular order.
 
 // TODO(crbug.com/41444868): Flaky on ChromeOS with Network Service
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_QuicAllowedForSystem DISABLED_QuicAllowedForSystem
-#else
 #define MAYBE_QuicAllowedForSystem QuicAllowedForSystem
-#endif
 IN_PROC_BROWSER_TEST_F(QuicAllowedPolicyIsTrue, MAYBE_QuicAllowedForSystem) {
   EXPECT_TRUE(IsQuicEnabledForSystem());
 
@@ -306,10 +298,6 @@ class QuicAllowedPolicyDynamicTest : public QuicTestBase {
 
  protected:
   void SetUpCommandLine(base::CommandLine* command_line) override {
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
     // Ensure that QUIC is enabled by default on browser startup.
     command_line->AppendSwitch(switches::kEnableQuic);
     QuicTestBase::SetUpCommandLine(command_line);

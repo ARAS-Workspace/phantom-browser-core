@@ -42,9 +42,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "base/enterprise_util.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "chromeos/ash/components/install_attributes/stub_install_attributes.h"
 #endif
 
 namespace indigo {
@@ -757,26 +754,6 @@ TEST_P(IndigoServiceManagementPolicyDefaultEnabledTest,
                                   ? LocalEligibility::kEligible
                                   : LocalEligibility::kEnterpriseDisallowed));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(IndigoServiceManagementPolicyDefaultEnabledTest,
-       EnterpriseDeviceChromeOS) {
-  CreateService();
-  profile_.ScopedCrosSettingsTestHelper()->InstallAttributes()->SetCloudManaged(
-      "example.com", "device_id");
-  MakeAccountAvailableAndCapable();
-  EXPECT_TRUE(
-      LocalEligibilityBecomes(IsIndigoAllowedForEnterprise()
-                                  ? LocalEligibility::kEligible
-                                  : LocalEligibility::kEnterpriseDisallowed));
-
-  SetPolicySettings(prefs::Policy::kDisallowed);
-  EXPECT_TRUE(
-      LocalEligibilityBecomes(IsIndigoAllowedForEnterprise()
-                                  ? LocalEligibility::kDisabledByPolicy
-                                  : LocalEligibility::kEnterpriseDisallowed));
-}
-#endif
 
 INSTANTIATE_TEST_SUITE_P(
     /* no prefix */,

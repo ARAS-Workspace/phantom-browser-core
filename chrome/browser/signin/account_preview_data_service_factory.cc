@@ -17,11 +17,7 @@
 #include "components/signin/public/base/signin_switches.h"
 #include "content/public/browser/storage_partition.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/signin/wait_for_network_callback_helper_ash.h"
-#else
 #include "chrome/browser/signin/wait_for_network_callback_helper_chrome.h"
-#endif
 
 AccountPreviewDataServiceFactory::AccountPreviewDataServiceFactory()
     : ProfileKeyedServiceFactory("AccountPreviewDataService") {
@@ -55,12 +51,8 @@ AccountPreviewDataServiceFactory::BuildServiceInstanceForBrowserContext(
 
   Profile* profile = Profile::FromBrowserContext(context);
   std::unique_ptr<WaitForNetworkCallbackHelper> network_delay_helper;
-#if BUILDFLAG(IS_CHROMEOS)
-  network_delay_helper = std::make_unique<WaitForNetworkCallbackHelperAsh>();
-#else
   network_delay_helper = std::make_unique<WaitForNetworkCallbackHelperChrome>(
       /*should_disable_metrics_for_testing=*/profile->AsTestingProfile());
-#endif
   metrics::ProfileMetricsService* profile_metrics_service =
       ProfileMetricsServiceFactory::GetForProfile(profile);
 

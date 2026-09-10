@@ -215,13 +215,6 @@ BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
                            kChromeIdentitySurveyLaunchWithDelayDuration);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// If enabled, the primary account consent level on ChromeOS is set to kSignin
-// instead of kSync for new profiles.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kChromeOsUseConsentLevelSigninForNewUsers);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 // Feature flag to enable cross-device sign-in.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
@@ -810,11 +803,6 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kSmartEmailLineBreaking);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kStableDeviceId);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_IOS)
 // Killswitch for the feature to prefill the email of the account to add when
 // opening the "add account" flow for an ADDSESSION header.
@@ -853,13 +841,6 @@ BASE_DECLARE_FEATURE(kSyncEnableBookmarksInTransportMode);
 // flag is enabled by default on Windows/Mac/Linux.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kBookmarksMigrateUiChanges);
-
-#if BUILDFLAG(IS_CHROMEOS)
-// If enabled, undoes the effect of kChromeOsUseConsentLevelSigninForNewUsers
-// by reverting the consent level to kSync.
-COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kUndoChromeOsUseConsentLevelSignin);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 // Additional gate for user policy registration and download based on user

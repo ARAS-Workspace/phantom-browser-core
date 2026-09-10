@@ -37,11 +37,6 @@
 #include "services/device/hid/hid_connection_linux.h"
 #include "services/device/public/cpp/device_features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/system/sys_info.h"
-#include "chromeos/dbus/permission_broker/permission_broker_client.h"  // nogncheck
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace device {
 
 namespace {
@@ -404,18 +399,6 @@ void HidServiceLinux::Connect(const std::string& device_guid,
   }
   scoped_refptr<HidDeviceInfo> device_info = map_entry->second;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  auto split_callback = base::SplitOnceCallback(std::move(callback));
-  chromeos::PermissionBrokerClient::Get()->OpenPath(
-      device_info->device_node(),
-      base::BindOnce(&HidServiceLinux::OnPathOpenComplete,
-                     std::make_unique<ConnectParams>(
-                         device_info, allow_protected_reports,
-                         allow_fido_reports, std::move(split_callback.first))),
-      base::BindOnce(&HidServiceLinux::OnPathOpenError,
-                     device_info->device_node(),
-                     std::move(split_callback.second)));
-#else
   auto params =
       std::make_unique<ConnectParams>(device_info, allow_protected_reports,
                                       allow_fido_reports, std::move(callback));
@@ -424,29 +407,7 @@ void HidServiceLinux::Connect(const std::string& device_guid,
   blocking_task_runner->PostTask(
       FROM_HERE, base::BindOnce(&HidServiceLinux::OpenOnBlockingThread,
                                 std::move(params)));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// static
-void HidServiceLinux::OnPathOpenComplete(std::unique_ptr<ConnectParams> params,
-                                         base::ScopedFD fd) {
-  params->fd = std::move(fd);
-  FinishOpen(std::move(params));
-}
-
-// static
-void HidServiceLinux::OnPathOpenError(const std::string& device_path,
-                                      ConnectCallback callback,
-                                      const std::string& error_name,
-                                      const std::string& error_message) {
-  HID_LOG(EVENT) << "Permission broker failed to open '" << device_path
-                 << "': " << error_name << ": " << error_message;
-  std::move(callback).Run(nullptr);
-}
-
-#else
 
 // static
 void HidServiceLinux::OpenOnBlockingThread(
@@ -483,8 +444,6 @@ void HidServiceLinux::OpenOnBlockingThread(
   task_runner->PostTask(FROM_HERE, base::BindOnce(&HidServiceLinux::FinishOpen,
                                                   std::move(params)));
 }
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // static
 void HidServiceLinux::FinishOpen(std::unique_ptr<ConnectParams> params) {

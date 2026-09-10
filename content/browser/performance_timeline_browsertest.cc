@@ -717,7 +717,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_GT(duration, 0.0);
   EXPECT_LE(style_duration, duration);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // On Android emulators and ChromeOS, timing discrepancies between the LoAF
   // API and tracing may be too large to reliably compare. Skip the
   // tolerance-based assertions on these platforms.
@@ -799,7 +799,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_GT(duration, 0.0);
   EXPECT_LE(style_duration, duration);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // On Android emulators and ChromeOS, timing discrepancies between the LoAF
   // API and tracing may be too large to reliably compare. Skip the
   // tolerance-based assertions on these platforms.
@@ -884,7 +884,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_GE(script_forced_style_and_layout_duration,
             script_forced_style_duration);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // The trace should capture the same style recalc events.
   // script_forced_style_duration should be close to trace_style_duration
   // because the test only forces style during script execution, not during
@@ -990,7 +990,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
       total_forced_style_duration + total_forced_layout_duration;
   EXPECT_NEAR(sum_forced, total_forced_style_and_layout_duration, 1.0);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // On Android emulators and ChromeOS, timing discrepancies between the LoAF
   // API and tracing may be too large to reliably compare. Skip the
   // tolerance-based assertions on these platforms.
@@ -1113,7 +1113,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
       script_forced_style_duration + script_forced_layout_duration;
   EXPECT_NEAR(sum_style_layout, script_forced_style_and_layout_duration, 1.0);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // For forced layout, the trace should capture the same layout events.
   // The script_forced_layout_duration should be close to trace_layout_duration
   // because the test only forces layout during script execution, not during
@@ -1217,7 +1217,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   // styleDuration + layoutDuration should not exceed total frame duration.
   EXPECT_LE(style_duration + layout_duration, duration);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Verify that trace events for both style and layout were emitted.
   TraceStyleResult trace_style = GetStyleDurationFromTrace(trace_str);
   TraceLayoutResult trace_layout = GetLayoutDurationFromTrace(trace_str);
@@ -1349,7 +1349,7 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   // All durations should fit within the total frame duration.
   EXPECT_LE(entry_style_duration + entry_layout_duration, duration);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Verify trace captured interleaved style and layout events from
   // container query evaluation.
   TraceStyleResult trace_style = GetStyleDurationFromTrace(trace_str);

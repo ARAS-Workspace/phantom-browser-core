@@ -815,7 +815,6 @@ TEST_F(RTCVideoDecoderAdapterTest, DecodesImageWithSingleSpatialLayer) {
   }
 }
 
-#if !(defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS))
 // ChromeOS has the ability to decode VP9 kSVC Stream. Other cases should
 // fallback to sw decoder.
 TEST_F(RTCVideoDecoderAdapterTest,
@@ -829,7 +828,6 @@ TEST_F(RTCVideoDecoderAdapterTest,
 
   media_thread_.FlushForTesting();
 }
-#endif  // !(defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS))
 
 TEST_F(RTCVideoDecoderAdapterTest, FallbackToSWInAV1SVC) {
   SetSdpFormat(webrtc::SdpVideoFormat(

@@ -24,8 +24,7 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/native_ui_types.h"
 
-static_assert(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-              BUILDFLAG(IS_CHROMEOS));
+static_assert(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX));
 
 class BrowserWindowInterface;
 class GURL;

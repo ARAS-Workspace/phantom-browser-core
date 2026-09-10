@@ -168,19 +168,6 @@ bool SendMouseEventsNotifyWhenDone(
 bool SendMouseClick(MouseButton type,
                     gfx::NativeWindow window_hint = gfx::NativeWindow());
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Sends a TouchEvent to the window system. |action| is a bitmask of the
-// TouchType constants that indicates what events are generated, |id| identifies
-// the touch point.
-// TODO(mukai): consolidate this interface with the Windows SendTouchEvents.
-bool SendTouchEvents(int action, int id, int x, int y);
-bool SendTouchEventsNotifyWhenDone(int action,
-                                   int id,
-                                   int x,
-                                   int y,
-                                   base::OnceClosure task);
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 // Forces the platform implementation to use screen coordinates, even if they're
 // not really available, the next time that ui_controls::SendMouseMove() or
@@ -188,11 +175,6 @@ bool SendTouchEventsNotifyWhenDone(int action,
 // using these methods internally, e.g. ui_test_utils::SendMouseMoveSync(). All
 // following calls will behave normally (unless this method is called again).
 void ForceUseScreenCoordinatesOnce();
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-class UIControlsAura;
-void InstallUIControlsAura(UIControlsAura* instance);
 #endif
 
 #if BUILDFLAG(IS_APPLE)

@@ -4,8 +4,6 @@
 
 #include "chrome/browser/ui/views/page_info/page_info_permission_content_view.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 #include "base/run_loop.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
@@ -248,5 +246,3 @@ TEST_F(PageInfoPermissionContentViewTestMediaPreview,
   InitializePageInfo(ContentSettingsType::GEOLOCATION);
   ASSERT_FALSE(page_info_->GetPreviewsCoordinatorForTesting());
 }
-
-#endif

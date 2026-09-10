@@ -119,14 +119,6 @@
 #include "ui/linux/linux_ui.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/wm/core/ime_util_chromeos.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/base/ime/mojom/virtual_keyboard_types.mojom.h"
-#endif
-
 #if BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
 #endif
@@ -649,10 +641,8 @@ bool RenderWidgetHostViewAura::ShouldSkipCursorUpdate() const {
   CHECK(screen);
 
   // Ignore cursor update messages if the window under the cursor is not us.
-#if !BUILDFLAG(IS_CHROMEOS)
   if (!screen->IsWindowUnderCursor(root_window))
     return true;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   return false;
 }
 
@@ -1585,20 +1575,6 @@ void RenderWidgetHostViewAura::ExtendSelectionAndDelete(
   input_handler->ExtendSelectionAndDelete(before, after);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void RenderWidgetHostViewAura::ExtendSelectionAndReplace(
-    size_t before,
-    size_t after,
-    std::u16string_view replacement_text) {
-  auto* input_handler = GetFrameWidgetInputHandlerForFocusedWidget();
-  if (!input_handler) {
-    return;
-  }
-  input_handler->ExtendSelectionAndReplace(before, after,
-                                           std::u16string(replacement_text));
-}
-#endif
-
 void RenderWidgetHostViewAura::EnsureCaretNotInRect(
     const gfx::Rect& rect_in_screen) {
   keyboard_occluded_bounds_ = rect_in_screen;
@@ -1611,9 +1587,6 @@ void RenderWidgetHostViewAura::EnsureCaretNotInRect(
   }
 
   aura::Window* top_level_window = window_->GetToplevelWindow();
-#if BUILDFLAG(IS_CHROMEOS)
-  wm::EnsureWindowNotInRect(top_level_window, keyboard_occluded_bounds_);
-#endif
 
   // Perform overscroll if the caret is still hidden by the keyboard.
   const gfx::Rect hidden_window_bounds_in_screen = gfx::IntersectRects(
@@ -1647,7 +1620,7 @@ bool RenderWidgetHostViewAura::ShouldDoLearning() {
   return host() && host()->delegate() && host()->delegate()->ShouldDoLearning();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool RenderWidgetHostViewAura::SetCompositionFromExistingText(
     const gfx::Range& range,
     const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) {
@@ -1657,122 +1630,6 @@ bool RenderWidgetHostViewAura::SetCompositionFromExistingText(
   input_handler->SetCompositionFromExistingText(range.start(), range.end(),
                                                 ui_ime_text_spans);
   has_composition_text_ = true;
-  return true;
-}
-
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-gfx::Range RenderWidgetHostViewAura::GetAutocorrectRange() const {
-  if (!text_input_manager_ || !text_input_manager_->GetActiveWidget())
-    return gfx::Range();
-  return text_input_manager_->GetAutocorrectRange();
-}
-
-gfx::Rect RenderWidgetHostViewAura::GetAutocorrectCharacterBounds() const {
-  if (!text_input_manager_ || !text_input_manager_->GetActiveWidget())
-    return gfx::Rect();
-
-  const std::vector<ui::mojom::ImeTextSpanInfoPtr>& ime_text_spans_info =
-      text_input_manager_->GetTextInputState()->ime_text_spans_info;
-
-  // If there are multiple autocorrect spans, use the first one.
-  for (const auto& ime_text_span_info : ime_text_spans_info) {
-    if (ime_text_span_info->span.type == ui::ImeTextSpan::Type::kAutocorrect) {
-      return ConvertRectToScreen(ime_text_span_info->bounds);
-    }
-  }
-  return {};
-}
-
-bool RenderWidgetHostViewAura::SetAutocorrectRange(
-    const gfx::Range& range) {
-  if (!range.is_empty()) {
-    base::UmaHistogramEnumeration(
-        "InputMethod.Assistive.Autocorrect.Count",
-        TextInputClient::SubClass::kRenderWidgetHostViewAura);
-  }
-
-  auto* input_handler = GetFrameWidgetInputHandlerForFocusedWidget();
-  if (!input_handler)
-    return false;
-
-  input_handler->ClearImeTextSpansByType(0,
-                                         std::numeric_limits<uint32_t>::max(),
-                                         ui::ImeTextSpan::Type::kAutocorrect);
-
-  if (range.is_empty())
-    return true;
-
-  ui::ImeTextSpan ui_ime_text_span;
-  ui_ime_text_span.type = ui::ImeTextSpan::Type::kAutocorrect;
-  ui_ime_text_span.start_offset = 0;
-  ui_ime_text_span.end_offset = range.length();
-  ui_ime_text_span.underline_style = ui::ImeTextSpan::UnderlineStyle::kDot;
-  ui_ime_text_span.underline_color =
-      SkColorSetA(gfx::kGoogleGrey700, SK_AlphaOPAQUE * 0.7);
-  ui_ime_text_span.thickness = ui::ImeTextSpan::Thickness::kThick;
-
-  input_handler->AddImeTextSpansToExistingText(range.start(), range.end(),
-                                               {ui_ime_text_span});
-  return true;
-}
-
-std::optional<ui::GrammarFragment>
-RenderWidgetHostViewAura::GetGrammarFragmentAtCursor() const {
-  if (!text_input_manager_ || !text_input_manager_->GetActiveWidget())
-    return std::nullopt;
-  gfx::Range selection_range;
-  if (GetEditableSelectionRange(&selection_range)) {
-    return text_input_manager_->GetGrammarFragment(selection_range);
-  } else {
-    return std::nullopt;
-  }
-}
-
-bool RenderWidgetHostViewAura::ClearGrammarFragments(const gfx::Range& range) {
-  auto* input_handler = GetFrameWidgetInputHandlerForFocusedWidget();
-  if (!input_handler)
-    return false;
-
-  input_handler->ClearImeTextSpansByType(
-      range.start(), range.end(), ui::ImeTextSpan::Type::kGrammarSuggestion);
-  return true;
-}
-
-bool RenderWidgetHostViewAura::AddGrammarFragments(
-    const std::vector<ui::GrammarFragment>& fragments) {
-  if (!fragments.empty()) {
-    base::UmaHistogramEnumeration(
-        "InputMethod.Assistive.Grammar.Count",
-        TextInputClient::SubClass::kRenderWidgetHostViewAura);
-  }
-
-  auto* input_handler = GetFrameWidgetInputHandlerForFocusedWidget();
-  if (!input_handler || fragments.empty())
-    return false;
-
-  unsigned max_fragment_end = 0;
-  std::vector<::ui::ImeTextSpan> ime_text_spans;
-  ime_text_spans.reserve(fragments.size());
-  for (auto& fragment : fragments) {
-    ui::ImeTextSpan ui_ime_text_span;
-    ui_ime_text_span.type = ui::ImeTextSpan::Type::kGrammarSuggestion;
-    ui_ime_text_span.start_offset = fragment.range.start();
-    ui_ime_text_span.end_offset = fragment.range.end();
-    ui_ime_text_span.thickness = ui::ImeTextSpan::Thickness::kThick;
-    ui_ime_text_span.underline_style = ui::ImeTextSpan::UnderlineStyle::kDot;
-    ui_ime_text_span.underline_color = gfx::kGoogleBlue400;
-    ui_ime_text_span.suggestions = {fragment.suggestion};
-
-    ime_text_spans.push_back(ui_ime_text_span);
-    if (fragment.range.end() > max_fragment_end) {
-      max_fragment_end = fragment.range.end();
-    }
-  }
-  input_handler->AddImeTextSpansToExistingText(0, max_fragment_end,
-                                               ime_text_spans);
-
   return true;
 }
 
@@ -1800,26 +1657,6 @@ void RenderWidgetHostViewAura::GetActiveTextInputControlLayoutBounds(
     }
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-ui::TextInputClient::EditingContext
-RenderWidgetHostViewAura::GetTextEditingContext() {
-  ui::TextInputClient::EditingContext editing_context;
-  // We use the focused frame's URL here and not the main frame because
-  // TSF(Windows Text Service Framework) works on the active editable element
-  // context and it uses this information to assist the UIA(Microsoft UI
-  // Automation) service to determine the character that is being typed by the
-  // user via IME composition, the URL of the site that the user is typing on
-  // and other text related services that are used by the UIA clients to power
-  // accessibility features on Windows. We want to expose the focused frame's
-  // URL to TSF that notifies the UIA service which uses this info and the
-  // focused element's data to provide better screen reading capabilities.
-  RenderFrameHostImpl* frame = GetFocusedFrame();
-  if (frame)
-    editing_context.page_url = frame->GetLastCommittedURL();
-  return editing_context;
-}
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // RenderWidgetHostViewAura, display::DisplayObserver implementation:
@@ -2607,11 +2444,6 @@ void RenderWidgetHostViewAura::DetachFromInputMethod(bool is_removed) {
     if (!weak_this) {
       return;
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    if (!window_->is_destroying()) {
-      wm::RestoreWindowBoundsOnClientFocusLost(window_->GetToplevelWindow());
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
 }
@@ -2730,18 +2562,6 @@ void RenderWidgetHostViewAura::OnUpdateTextInputStateCalled(
 
   const ui::mojom::TextInputState* state =
       text_input_manager_->GetTextInputState();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (state && state->type != ui::TEXT_INPUT_TYPE_NONE) {
-    if (state->last_vk_visibility_request ==
-        ui::mojom::VirtualKeyboardVisibilityRequest::SHOW) {
-      GetInputMethod()->SetVirtualKeyboardVisibilityIfEnabled(true);
-    } else if (state->last_vk_visibility_request ==
-               ui::mojom::VirtualKeyboardVisibilityRequest::HIDE) {
-      GetInputMethod()->SetVirtualKeyboardVisibilityIfEnabled(false);
-    }
-  }
-#endif
 
   // Show the virtual keyboard if needed.
   if (state && state->type != ui::TEXT_INPUT_TYPE_NONE &&

@@ -777,7 +777,7 @@ class NetworkServiceTestHelper::NetworkServiceTestImpl
   void AllowsGSSAPILibraryLoad(
       AllowsGSSAPILibraryLoadCallback callback) override {
     bool allow_gssapi_library_load;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     allow_gssapi_library_load =
         network::NetworkService::GetNetworkServiceForTesting()
             ->http_auth_dynamic_network_service_params_for_testing()

@@ -219,7 +219,7 @@ class ProtocolHandlingExecuteTest : public ProtocolHandlingSubManagerTestBase {
   }
 #endif  // BUILDFLAG(IS_MAC)
 
-  bool AreProtocolsRegisteredWithOs() { return !BUILDFLAG(IS_CHROMEOS); }
+  bool AreProtocolsRegisteredWithOs() { return true; }
 };
 
 TEST_F(ProtocolHandlingExecuteTest, Register) {

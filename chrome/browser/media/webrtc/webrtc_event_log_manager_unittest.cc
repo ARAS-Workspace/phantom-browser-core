@@ -63,17 +63,11 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/core/common/policy_types.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
 #endif
 
 namespace webrtc_event_logging {
@@ -315,13 +309,13 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
     SetLocalLogsObserver(&local_observer_);
     SetRemoteLogsObserver(&remote_observer_);
     LoadMainTestProfile();
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
     policy::BrowserPolicyConnectorBase::SetPolicyProviderForTesting(&provider_);
 #endif
   }
 
   void TearDown() override {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
     policy::BrowserPolicyConnectorBase::SetPolicyProviderForTesting(nullptr);
 #endif
   }
@@ -752,7 +746,7 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
                                 policy_allows_remote_logging.value());
     }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
     policy::PolicyMap policy_map;
     if (has_device_level_policies) {
       policy_map.Set("test-policy", policy::POLICY_LEVEL_MANDATORY,
@@ -910,7 +904,7 @@ class WebRtcEventLogManagerTestBase : public ::testing::Test {
   scoped_refptr<network::SharedURLLoaderFactory>
       test_shared_url_loader_factory_;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   policy::MockConfigurationPolicyProvider provider_;
 #endif
 
@@ -1135,11 +1129,6 @@ class WebRtcEventLogManagerTestPolicy : public WebRtcEventLogManagerTestBase {
 
     WebRtcEventLogManagerTestBase::SetUp();
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> GetScopedUserManager(
-      user_manager::UserType user_type);
-#endif
 
   void TestManagedProfileAfterBeingExplicitlySet(bool explicitly_set_value);
 };
@@ -4499,34 +4488,9 @@ TEST_F(WebRtcEventLogManagerTestPolicy, NotManagedRejectsRemoteLogging) {
   EXPECT_EQ(StartRemoteLogging(key), allow_remote_logging);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::unique_ptr<user_manager::ScopedUserManager>
-WebRtcEventLogManagerTestPolicy::GetScopedUserManager(
-    user_manager::UserType user_type) {
-  const AccountId kAccountId =
-      AccountId::FromUserEmailGaiaId("name", GaiaId("id"));
-  auto fake_user_manager = std::make_unique<ash::FakeChromeUserManager>();
-  // On Chrome OS, there are different user types, some of which can be
-  // affiliated with the device if the device is enterprise-enrolled, i.e. the
-  // logged in account belongs to the org that owns the device. For our
-  // purposes here, affiliation does not matter for the determination of the
-  // policy default, so we can set it to false here. We do not need a user
-  // to profile mapping either, so profile can be a nullptr.
-  fake_user_manager->AddUserWithAffiliationAndTypeAndProfile(
-      kAccountId, /*is_affiliated*/ false, user_type, /*profile*/ nullptr);
-  return std::make_unique<user_manager::ScopedUserManager>(
-      std::move(fake_user_manager));
-}
-#endif
-
 TEST_F(WebRtcEventLogManagerTestPolicy,
        ManagedProfileAllowsRemoteLoggingByDefault) {
   const bool allow_remote_logging = true;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager =
-      GetScopedUserManager(user_manager::UserType::kRegular);
-#endif
 
   auto browser_context =
       CreateBrowserContext("name", true /* is_managed_profile */,
@@ -4545,29 +4509,8 @@ TEST_F(WebRtcEventLogManagerTestPolicy,
 // ProfileDefaultsToLoggingEnabledTestCase in
 // webrtc_event_log_manager_common_unittest because the test setup in this
 // class currently does not seem to allow for an easy setup of some user types.
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(WebRtcEventLogManagerTestPolicy,
-       ManagedProfileDoesNotAllowRemoteLoggingForSupervisedProfiles) {
-  const bool allow_remote_logging = false;
 
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager =
-      GetScopedUserManager(user_manager::UserType::kChild);
-
-  auto browser_context = CreateBrowserContextWithCustomSupervision(
-      "name", true /* is_managed_profile */,
-      false /* has_device_level_policies */, true /* is_supervised */,
-      std::nullopt);
-
-  auto rph = std::make_unique<MockRenderProcessHost>(browser_context.get());
-  const auto key = GetPeerConnectionKey(rph.get(), kLid);
-
-  ASSERT_TRUE(OnPeerConnectionAdded(key));
-  ASSERT_TRUE(OnPeerConnectionSessionIdSet(key));
-  EXPECT_EQ(StartRemoteLogging(key), allow_remote_logging);
-}
-#endif
-
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(WebRtcEventLogManagerTestPolicy,
        OnlyManagedByPlatformPoliciesDoesNotAllowRemoteLoggingByDefault) {
   const bool allow_remote_logging = false;

@@ -21,10 +21,8 @@
 #include "components/variations/variations_switches.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "crypto/hpke.h"
 #include "crypto/keypair.h"
-#endif
 
 namespace variations {
 namespace {
@@ -148,7 +146,6 @@ TEST(VariationsCommandLineTest,
   BASE_EXPECT_DEATH(MaybeUnpackVariationsStateFile(), "");
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // This test verify the prod key can encrypt. But it doesn't check if the
 // ciphertext can be decoded or not on the server side.
 TEST(VariationsCommandLineTest, EncryptToString_ProdKey) {
@@ -192,7 +189,6 @@ TEST(VariationsCommandLineTest, EncryptToString_EncryptAndDecryptUsingTestKey) {
   ASSERT_TRUE(result.has_value());
   EXPECT_EQ(base::as_string_view(*result), vc.ToString());
 }
-#endif
 
 }  // namespace
 }  // namespace variations

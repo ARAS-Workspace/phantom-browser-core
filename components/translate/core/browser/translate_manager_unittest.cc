@@ -139,9 +139,6 @@ struct ProfilePrefRegistration {
       sync_preferences::TestingPrefServiceSyncable* prefs) {
     language::LanguagePrefs::RegisterProfilePrefs(prefs->registry());
     prefs->SetString(accept_languages_prefs, std::string());
-#if BUILDFLAG(IS_CHROMEOS)
-    prefs->SetString(preferred_languages_prefs, std::string());
-#endif
     TranslatePrefs::RegisterProfilePrefs(prefs->registry());
     // TODO(groby): Figure out RegisterProfilePrefs() should register this.
     prefs->registry()->RegisterBooleanPref(

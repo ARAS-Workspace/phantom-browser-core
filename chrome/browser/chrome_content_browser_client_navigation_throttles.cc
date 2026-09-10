@@ -103,16 +103,6 @@
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_throttle.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/app_install/app_install_navigation_throttle.h"
-#include "chrome/browser/apps/intent_helper/chromeos_disabled_apps_throttle.h"
-#include "chrome/browser/apps/link_capturing/chromeos_reimpl_navigation_capturing_throttle.h"
-#include "chrome/browser/ash/boca/on_task/on_task_locked_session_navigation_throttle.h"
-#include "chrome/browser/ash/login/signin/merge_session_navigation_throttle.h"
-#include "chrome/browser/ash/login/signin/merge_session_throttling_utils.h"
-#include "chrome/browser/chromeos/app_mode/kiosk_settings_navigation_throttle.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
 #include "chrome/browser/apps/platform_apps/platform_app_navigation_redirector.h"
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
@@ -327,32 +317,10 @@ void CreateAndAddChromeThrottlesForNavigation(
   PlatformAppNavigationRedirector::MaybeCreateAndAdd(registry);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Check if we need to add merge session throttle. This throttle will postpone
-  // loading of main frames.
-  if (handle.IsInMainFrame()) {
-    // Add interstitial page while merge session process (cookie reconstruction
-    // from OAuth2 refresh token in ChromeOS login) is still in progress while
-    // we are attempting to load a google property.
-    if (ash::merge_session_throttling_utils::ShouldAttachNavigationThrottle() &&
-        !ash::merge_session_throttling_utils::AreAllSessionMergedAlready() &&
-        registry.GetNavigationHandle().GetURL().SchemeIsHTTPOrHTTPS()) {
-      ash::MergeSessionNavigationThrottle::CreateAndAdd(registry);
-    }
-  }
-
-  apps::ChromeOsDisabledAppsThrottle::MaybeCreateAndAdd(registry);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   Profile* profile =
       Profile::FromBrowserContext(handle.GetWebContents()->GetBrowserContext());
 
 #if !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/366547977): This currently does nothing and allows all
-  // navigations to proceed if v2 is enabled on ChromeOS. Implement.
-  apps::ChromeOsReimplNavigationCapturingThrottle::MaybeCreateAndAdd(registry);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   web_app::NavigationCapturingRedirectionThrottle::MaybeCreateAndAdd(registry);
 
@@ -453,10 +421,10 @@ void CreateAndAddChromeThrottlesForNavigation(
   }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   enterprise_connectors::DeviceTrustNavigationThrottle::MaybeCreateAndAdd(
       registry);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   // AimEligibilityRefreshNavigationThrottle must be registered before
   // ContextualTasksNavigationThrottle so it can detect AIM URL navigations
@@ -512,12 +480,6 @@ void CreateAndAddChromeThrottlesForNavigation(
       registry);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  chromeos::KioskSettingsNavigationThrottle::MaybeCreateAndAdd(registry);
-
-  ash::OnTaskLockedSessionNavigationThrottle::MaybeCreateAndAdd(registry);
-#endif
-
 #if BUILDFLAG(IS_MAC)
   MaybeCreateAndAddAuthSessionNavigationThrottle(registry);
 #endif
@@ -571,17 +533,6 @@ void CreateAndAddChromeThrottlesForNavigation(
         registry);
   }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(b:296844164) Handle captive portal signin properly.
-  if (profile && profile->IsIncognitoProfile() && profile->IsOffTheRecord() &&
-      !profile->GetOTRProfileID().IsCaptivePortal()) {
-    enterprise_incognito::IncognitoNavigationThrottle::MaybeCreateAndAdd(
-        registry);
-  }
-
-  apps::AppInstallNavigationThrottle::MaybeCreateAndAdd(registry);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (profile && profile->IsIncognitoProfile() && profile->IsOffTheRecord()) {

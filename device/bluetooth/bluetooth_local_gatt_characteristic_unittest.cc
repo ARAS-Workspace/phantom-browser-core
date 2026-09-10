@@ -53,7 +53,7 @@ class BluetoothLocalGattCharacteristicTest : public BluetoothGattServerTest {
   raw_ptr<BluetoothDevice, DanglingUntriaged> device_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ReadLocalCharacteristicValue ReadLocalCharacteristicValue
 #else
 #define MAYBE_ReadLocalCharacteristicValue DISABLED_ReadLocalCharacteristicValue
@@ -69,7 +69,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest,
   EXPECT_EQ(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_WriteLocalCharacteristicValue WriteLocalCharacteristicValue
 #else
 #define MAYBE_WriteLocalCharacteristicValue \
@@ -86,7 +86,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest,
   EXPECT_EQ(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_PrepareWriteLocalCharacteristicValue \
   PrepareWriteLocalCharacteristicValue
 #else
@@ -116,7 +116,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest,
   EXPECT_EQ(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ReadLocalCharacteristicValueFail ReadLocalCharacteristicValueFail
 #else
 #define MAYBE_ReadLocalCharacteristicValueFail \
@@ -134,7 +134,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest,
   EXPECT_NE(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ReadLocalCharacteristicValueWrongPermission \
   ReadLocalCharacteristicValueWrongPermission
 #else
@@ -152,7 +152,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest,
   EXPECT_NE(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_WriteLocalCharacteristicValueFail \
   WriteLocalCharacteristicValueFail
 #else
@@ -171,7 +171,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest,
   EXPECT_NE(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_WriteLocalCharacteristicValueWrongPermission \
   WriteLocalCharacteristicValueWrongPermission
 #else
@@ -189,7 +189,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest,
   EXPECT_NE(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_StartAndStopNotifications StartAndStopNotifications
 #else
 #define MAYBE_StartAndStopNotifications DISABLED_StartAndStopNotifications
@@ -216,7 +216,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest, MAYBE_StartAndStopNotifications) {
       notify_characteristic_.get()));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_SendNotifications SendNotifications
 #else
 #define MAYBE_SendNotifications DISABLED_SendNotifications
@@ -237,7 +237,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest, MAYBE_SendNotifications) {
                                 indicate_characteristic_.get())));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_SendNotificationsWrongProperties SendNotificationsWrongProperties
 #else
 #define MAYBE_SendNotificationsWrongProperties \
@@ -273,7 +273,7 @@ TEST_F(BluetoothLocalGattCharacteristicTest,
                                 indicate_characteristic_.get())));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_SendNotificationsServiceNotRegistered \
   SendNotificationsServiceNotRegistered
 #else

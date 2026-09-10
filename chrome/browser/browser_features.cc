@@ -52,11 +52,7 @@ BASE_FEATURE(kCertificateTransparencyAskBeforeEnabling,
 // fail to validate with network time will fall back to the system time.
 // This has no effect if the network_time::kNetworkTimeServiceQuerying flag is
 // disabled, or the BrowserNetworkTimeQueriesEnabled policy is set to false.
-#if !BUILDFLAG(IS_CHROMEOS)
 BASE_FEATURE(kCertVerificationNetworkTime, base::FEATURE_ENABLED_BY_DEFAULT);
-#else
-BASE_FEATURE(kCertVerificationNetworkTime, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Killswitch that guards clearing all user data in the ProfileImpl destructor.
 BASE_FEATURE(kClearUserDataUponProfileDestruction,
@@ -81,11 +77,7 @@ BASE_FEATURE(kDestroyProfileOnBrowserClose,
 // Enables showing the email of the flex org admin that setup CBCM in the
 // management disclosures.
 BASE_FEATURE(kFlexOrgManagementDisclosure,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 BASE_FEATURE(kInitialExternalExtensions, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)

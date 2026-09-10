@@ -47,9 +47,7 @@ class IWAProtocolTestBase : public DevToolsProtocolTestBase {
   IWAProtocolTestBase() {
     iwa_scoped_feature_list_.InitWithFeatures(
         {
-#if !BUILDFLAG(IS_CHROMEOS)
             features::kIsolatedWebApps,
-#endif  // !BUILDFLAG(IS_CHROMEOS)
             features::kIsolatedWebAppDevMode},
         {});
   }

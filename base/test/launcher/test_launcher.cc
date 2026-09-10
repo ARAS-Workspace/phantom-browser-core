@@ -384,8 +384,7 @@ int LaunchChildTestProcessWithOptions(const CommandLine& command_line,
 
   LaunchOptions new_options(options);
 
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // To prevent accidental privilege sharing to an untrusted child, processes
   // are started with PR_SET_NO_NEW_PRIVS. Do not set that here, since this
   // new child will be privileged and trusted.
@@ -557,7 +556,7 @@ ChildProcessResults DoLaunchChildTestProcess(
   }
 
   options.new_process_group = true;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   options.kill_on_parent_death = true;
 #endif
 
@@ -1619,13 +1618,10 @@ bool TestLauncher::Init(CommandLine* command_line) {
   results_tracker_.AddGlobalTag("OS_IOS");
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   results_tracker_.AddGlobalTag("OS_LINUX");
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  results_tracker_.AddGlobalTag("OS_CHROMEOS");
-#endif
 
 #if BUILDFLAG(IS_MAC)
   results_tracker_.AddGlobalTag("OS_MAC");

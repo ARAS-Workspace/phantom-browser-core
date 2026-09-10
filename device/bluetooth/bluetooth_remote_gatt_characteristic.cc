@@ -113,16 +113,6 @@ void BluetoothRemoteGattCharacteristic::StartNotifySession(
                              std::move(error_callback));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void BluetoothRemoteGattCharacteristic::StartNotifySession(
-    NotificationType notification_type,
-    NotifySessionCallback callback,
-    ErrorCallback error_callback) {
-  StartNotifySessionInternal(notification_type, std::move(callback),
-                             std::move(error_callback));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 bool BluetoothRemoteGattCharacteristic::AddDescriptor(
     std::unique_ptr<BluetoothRemoteGattDescriptor> descriptor) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -238,11 +228,6 @@ void BluetoothRemoteGattCharacteristic::ExecuteStartNotifySession(
   // do whatever else is needed to get the notifications flowing.
   SubscribeToNotifications(
       ccc_descriptor[0],
-#if BUILDFLAG(IS_CHROMEOS)
-      notification_type.value_or((GetProperties() & PROPERTY_NOTIFY)
-                                     ? NotificationType::kNotification
-                                     : NotificationType::kIndication),
-#endif  // BUILDFLAG(IS_CHROMEOS)
       base::BindOnce(
           &BluetoothRemoteGattCharacteristic::OnStartNotifySessionSuccess,
           GetWeakPtr(), std::move(callback)),

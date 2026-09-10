@@ -17,26 +17,11 @@
 #include "content/public/browser/weak_document_ptr.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/webui/settings/public/constants/routes.mojom.h"
-#include "chrome/browser/ui/settings_window_manager_chromeos.h"
-#include "chrome/common/webui_url_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #endif
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-BrowserWindowInterface* GetBrowser() {
-  chrome::ScopedTabbedBrowserDisplayer browser_displayer(
-      ProfileManager::GetLastUsedProfileAllowedByPolicy());
-  DCHECK(browser_displayer.browser_window_interface());
-  return browser_displayer.browser_window_interface();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -51,12 +36,6 @@ ChromeBluetoothChooserController::ChromeBluetoothChooserController(
 ChromeBluetoothChooserController::~ChromeBluetoothChooserController() = default;
 
 void ChromeBluetoothChooserController::OpenAdapterOffHelpUrl() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Chrome OS can directly link to the OS setting to turn on the adapter.
-  chrome::SettingsWindowManager::GetInstance()->ShowOSSettings(
-      GetBrowser()->GetProfile(),
-      chromeos::settings::mojom::kBluetoothDevicesSubpagePath);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void ChromeBluetoothChooserController::OpenPermissionPreferences() const {

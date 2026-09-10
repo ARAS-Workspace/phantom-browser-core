@@ -610,28 +610,6 @@ void ExtensionSyncService::ApplySyncData(
       id, profile_, extension_sync_data.incognito_enabled());
   extension = nullptr;  // No longer safe to use.
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Set app-specific data.
-  if (extension_sync_data.is_app()) {
-    // The corresponding validation of this value during ExtensionSyncData
-    // population is in ExtensionSyncData::ToAppSpecifics.
-    if (extension_sync_data.launch_type() >= extensions::LaunchType::kFirst &&
-        extension_sync_data.launch_type() <
-            extensions::LaunchType::kNumLaunchTypes) {
-      extensions::SetLaunchType(profile_, id,
-                                extension_sync_data.launch_type());
-    }
-
-    if (extension_sync_data.app_launch_ordinal().IsValid() &&
-        extension_sync_data.page_ordinal().IsValid()) {
-      AppSorting* app_sorting = system_->app_sorting();
-      app_sorting->SetAppLaunchOrdinal(
-          id, extension_sync_data.app_launch_ordinal());
-      app_sorting->SetPageOrdinal(id, extension_sync_data.page_ordinal());
-    }
-  }
-#endif
-
   // Notify the AccountExtensionTracker of an incoming extension via sync.
   if (!extension_sync_data.is_app() && state != NOT_INSTALLED) {
     DCHECK(ShouldPromoteToAccountExtension(extension_sync_data));

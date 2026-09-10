@@ -215,14 +215,6 @@ class DISPLAY_EXPORT Screen {
   // Returns true when running in headless mode.
   virtual bool IsHeadless() const;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Returns tablet state.
-  virtual TabletState GetTabletState() const;
-
-  // Returns true if the system is in tablet mode.
-  bool InTabletMode() const;
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
  protected:
   void set_shutdown(bool shutdown) { shutdown_ = shutdown; }
   int64_t display_id_for_new_windows() const {

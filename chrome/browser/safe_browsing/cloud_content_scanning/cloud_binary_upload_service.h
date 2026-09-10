@@ -54,9 +54,6 @@ class CloudBinaryUploadService
   BrowserPolicyConnectorGetter() override;
   bool IsAdvancedProtection() override;
   bool IsEnhancedProtection() override;
-#if BUILDFLAG(IS_CHROMEOS)
-  bool IsManagedGuestSession() override;
-#endif
 
   const raw_ptr<Profile> profile_;
 

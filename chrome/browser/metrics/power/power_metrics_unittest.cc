@@ -42,8 +42,7 @@ TEST(PowerMetricsTest, ReportAggregatedProcessMetricsHistograms) {
 
   ProcessMonitor::Metrics process_metrics;
   process_metrics.cpu_usage = 0.20;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   // Returns the number of average idle cpu wakeups per second since the last
   // time the metric was sampled.
   process_metrics.idle_wakeups = 51;
@@ -62,8 +61,7 @@ TEST(PowerMetricsTest, ReportAggregatedProcessMetricsHistograms) {
       {
           {"PerformanceMonitor.AverageCPU10.Total", 20},
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
           {"PerformanceMonitor.IdleWakeups2.Total", 51},
 #endif
 

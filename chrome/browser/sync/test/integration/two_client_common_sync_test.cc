@@ -15,12 +15,10 @@ class TwoClientCommonSyncTest : public SyncTest {
   ~TwoClientCommonSyncTest() override = default;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(TwoClientCommonSyncTest, AwaitQuiescenceWhenSyncOff) {
   ASSERT_TRUE(SetupSync());
   GetClient(1)->SignOutPrimaryAccount();
   EXPECT_TRUE(AwaitQuiescence());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

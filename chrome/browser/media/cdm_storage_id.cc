@@ -14,12 +14,6 @@
 #include "rlz/buildflags/buildflags.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/functional/bind.h"
-#include "chromeos/ash/components/cryptohome/system_salt_getter.h"
-#include "mojo/public/cpp/bindings/callback_helpers.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #if BUILDFLAG(ENABLE_RLZ)
 #include "rlz/lib/machine_id.h"
@@ -78,17 +72,6 @@ std::vector<uint8_t> CalculateStorageId(
   return result;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void ComputeAndReturnStorageId(const std::vector<uint8_t>& profile_salt,
-                               const url::Origin& origin,
-                               CdmStorageIdCallback callback,
-                               const std::string& machine_id) {
-  std::string storage_id_key = GetCdmStorageIdKey();
-  std::move(callback).Run(
-      CalculateStorageId(storage_id_key, profile_salt, origin, machine_id));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 
 void ComputeStorageId(const std::vector<uint8_t>& profile_salt,
@@ -101,13 +84,6 @@ void ComputeStorageId(const std::vector<uint8_t>& profile_salt,
   std::move(callback).Run(
       CalculateStorageId(storage_id_key, profile_salt, origin, machine_id));
 
-#elif BUILDFLAG(IS_CHROMEOS)
-  CdmStorageIdCallback scoped_callback =
-      mojo::WrapCallbackWithDefaultInvokeIfNotRun(std::move(callback),
-                                                  std::vector<uint8_t>());
-  ash::SystemSaltGetter::Get()->GetSystemSalt(
-      base::BindOnce(&ComputeAndReturnStorageId, profile_salt, origin,
-                     std::move(scoped_callback)));
 #else
 #error Storage ID enabled but not implemented for this platform.
 #endif

@@ -421,23 +421,6 @@ void PrimaryAccountManager::PrepareToLoadPrefs() {
     prefs->SetBoolean(prefs::kGoogleServicesConsentedToSync, false);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Migrate primary account ID from email to Gaia ID if needed.
-  std::string pref_account_id =
-      prefs->GetString(prefs::kGoogleServicesAccountId);
-  if (!pref_account_id.empty()) {
-    if (account_tracker_service_->GetMigrationState() ==
-        AccountTrackerService::MIGRATION_IN_PROGRESS) {
-      CoreAccountInfo account_info =
-          account_tracker_service_->FindAccountInfoByEmail(pref_account_id);
-      // |account_info.gaia| could be empty if |account_id| is already gaia id.
-      if (!account_info.gaia.empty()) {
-        pref_account_id = account_info.gaia.ToString();
-        prefs->SetString(prefs::kGoogleServicesAccountId, pref_account_id);
-      }
-    }
-  }
-#endif
 }
 
 std::pair<CoreAccountInfo, PrimaryAccountManager::InitializeAccountInfoState>
@@ -670,7 +653,6 @@ void PrimaryAccountManager::RemoveObserver(Observer* observer) {
   observers_.RemoveObserver(observer);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void PrimaryAccountManager::ClearPrimaryAccount(
     signin_metrics::ProfileSignout signout_source_metric) {
   StartSignOut(signout_source_metric, RemoveAccountsOption::kRemoveAllAccounts);
@@ -681,8 +663,6 @@ void PrimaryAccountManager::RemovePrimaryAccountButKeepTokens(
   StartSignOut(signout_source_metric,
                RemoveAccountsOption::kKeepAllAccountsAndClearPrimary);
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void PrimaryAccountManager::RevokeSyncConsent(
     signin_metrics::ProfileSignout signout_source_metric) {
@@ -912,13 +892,6 @@ void PrimaryAccountManager::FirePrimaryAccountChanged(
 
 void PrimaryAccountManager::OnRefreshTokensLoaded() {
   token_service_observation_.Reset();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (account_tracker_service_->GetMigrationState() ==
-      AccountTrackerService::MIGRATION_IN_PROGRESS) {
-    account_tracker_service_->SetMigrationDone();
-  }
-#endif
 
 // On Android, account seeding on Android is
 // controlled by SigninManager, so don't remove any accounts here.

@@ -43,10 +43,6 @@
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/net/dhcp_wpad_url_client.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 // Verify kPACScript is installed as the PAC script.
@@ -183,46 +179,6 @@ class HttpProxyScriptBrowserTest : public BaseHttpProxyScriptBrowserTest {
 IN_PROC_BROWSER_TEST_F(HttpProxyScriptBrowserTest, Verify) {
   VerifyProxyScript(browser());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests the use of a PAC script set via Web Proxy Autodiscovery Protocol.
-// TODO(crbug.com/41475031): Add a test case for when DhcpWpadUrlClient
-// returns an empty PAC URL.
-class WPADHttpProxyScriptBrowserTest : public HttpProxyScriptBrowserTest {
- public:
-  WPADHttpProxyScriptBrowserTest() = default;
-
-  WPADHttpProxyScriptBrowserTest(const WPADHttpProxyScriptBrowserTest&) =
-      delete;
-  WPADHttpProxyScriptBrowserTest& operator=(
-      const WPADHttpProxyScriptBrowserTest&) = delete;
-
-  ~WPADHttpProxyScriptBrowserTest() override = default;
-
-  void SetUp() override {
-    ASSERT_TRUE(http_server_.Start());
-    pac_url_ = http_server_.GetURL("/" + GetPacFilename());
-    ash::DhcpWpadUrlClient::SetPacUrlForTesting(pac_url_);
-    InProcessBrowserTest::SetUp();
-  }
-
-  void TearDown() override {
-    ash::DhcpWpadUrlClient::ClearPacUrlForTesting();
-    InProcessBrowserTest::TearDown();
-  }
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(switches::kProxyAutoDetect);
-  }
-
- private:
-  GURL pac_url_;
-};
-
-IN_PROC_BROWSER_TEST_F(WPADHttpProxyScriptBrowserTest, Verify) {
-  VerifyProxyScript(browser());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests the use of a PAC script that rejects requests to
 // https://www.google.com/ when myIpAddress() and myIpAddressEx() appear to be

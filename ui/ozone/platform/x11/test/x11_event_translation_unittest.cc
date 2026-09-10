@@ -52,11 +52,7 @@ TEST(XEventTranslationTest, KeyEventDomKeyExtraction) {
   EXPECT_TRUE(keyev);
 
   KeyEventTestApi test(keyev.get());
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(ui::DomKey::NONE, test.dom_key());
-#else
   EXPECT_EQ(ui::DomKey::ENTER, test.dom_key());
-#endif
 
   EXPECT_EQ(13, keyev->GetCharacter());
   EXPECT_EQ("Enter", keyev->GetCodeString());

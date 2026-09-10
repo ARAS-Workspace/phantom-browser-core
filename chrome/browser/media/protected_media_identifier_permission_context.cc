@@ -26,21 +26,7 @@
 #include "net/base/url_util.h"
 #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <utility>
-
-#include "ash/constants/ash_switches.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "chromeos/ash/components/settings/cros_settings_names.h"
-#include "chromeos/dbus/constants/dbus_switches.h"
-#include "components/permissions/permission_request.h"
-#include "components/permissions/permission_uma_util.h"
-#include "components/permissions/request_type.h"
-#include "components/pref_registry/pref_registry_syncable.h"
-#include "components/user_prefs/user_prefs.h"
-#endif
-
-#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS))
+#if !BUILDFLAG(IS_ANDROID)
 #error This file currently only supports Chrome OS, Android and Windows.
 #endif
 
@@ -141,37 +127,6 @@ void ProtectedMediaIdentifierPermissionContext::UpdateTabContext(
 // static
 bool ProtectedMediaIdentifierPermissionContext::
     IsProtectedMediaIdentifierEnabled(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Identifier is not allowed in incognito or guest mode.
-  if (profile != nullptr &&
-      (profile->IsOffTheRecord() || profile->IsGuestSession())) {
-    DVLOG(1) << "Protected media identifier disabled in incognito or guest "
-                "mode.";
-    return false;
-  }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  if (command_line->HasSwitch(chromeos::switches::kSystemDevMode) &&
-      !command_line->HasSwitch(switches::kAllowRAInDevMode)) {
-    DVLOG(1) << "Protected media identifier disabled in dev mode.";
-    return false;
-  }
-
-  // This could be disabled by the device policy or by a switch in content
-  // settings.
-  bool attestation_enabled = true;
-  if (!ash::CrosSettings::Get()->GetBoolean(
-          ash::kAttestationForContentProtectionEnabled, &attestation_enabled)) {
-    attestation_enabled = false;
-  }
-  if (!attestation_enabled) {
-    DVLOG(1) << "Protected media identifier disabled by the user or by device "
-                "policy.";
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (!IsProtectedContentIdentifierAllowedByPolicy(profile)) {
     DVLOG(1)

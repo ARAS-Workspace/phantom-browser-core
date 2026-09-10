@@ -77,8 +77,6 @@ Platform GetCurrentPlatform() {
   return Platform::PLATFORM_ANDROID;
 #elif BUILDFLAG(IS_IOS)
   return Platform::PLATFORM_IOS;
-#elif BUILDFLAG(IS_CHROMEOS)
-  return Platform::PLATFORM_CHROMEOS;
 #else
   return Platform::PLATFORM_OTHER;
 #endif

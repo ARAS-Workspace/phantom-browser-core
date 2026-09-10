@@ -59,11 +59,9 @@ class MockDeviceOAuth2TokenStore : public DeviceOAuth2TokenStore {
     TriggerTrustedAccountIdCallback(true);
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   void SetAccountEmail(const std::string& account_email) override {
     account_id_ = CoreAccountId::FromRobotEmail(account_email);
   }
-#endif
 
   // Mock-specific functions:
   void SetRefreshTokenForTesting(const std::string& token) {

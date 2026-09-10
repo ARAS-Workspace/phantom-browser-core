@@ -207,25 +207,6 @@ std::vector<T> GetColumnValuesFromDatabase(const base::FilePath& database_path,
   return results;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Set the new password value for all the rows with the specified username.
-void UpdatePasswordValueForUsername(const base::FilePath& database_path,
-                                    const std::u16string& username,
-                                    const std::u16string& password) {
-  sql::Database db(sql::test::kTestTag);
-  CHECK(db.Open(database_path));
-
-  sql::Statement s(db.GetCachedStatement(
-      SQL_FROM_HERE,
-      "UPDATE logins SET password_value = ? WHERE username_value = ?"));
-  EXPECT_TRUE(s.is_valid());
-  s.BindString16(0, password);
-  s.BindString16(1, username);
-
-  CHECK(s.Run());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 bool AddZeroClickableLogin(LoginDatabase* db,
                            const std::string& unique_string,
                            const GURL& origin) {
@@ -1970,60 +1951,6 @@ TEST_F(LoginDatabaseTest, EncryptionEnabled) {
   EXPECT_EQ(decrypted_pw, cred.password_value);
 }
 #endif  // !BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-// On ChromeOS there is a mix of plain-text and obfuscated
-// passwords. Verify that they can both be accessed. Obfuscated passwords start
-// with "v10". Some password values also start with "v10". Test that both are
-// accessible (this doesn't work for any plain-text value).
-TEST_F(LoginDatabaseTest, HandleObfuscationMix) {
-  const char k_obfuscated_pw[] = "v10pass1";
-  const char16_t k_obfuscated_pw16[] = u"v10pass1";
-  const char k_plain_text_pw1[] = "v10pass2";
-  const char16_t k_plain_text_pw116[] = u"v10pass2";
-  const char k_plain_text_pw2[] = "v11pass3";
-  const char16_t k_plain_text_pw216[] = u"v11pass3";
-
-  base::FilePath file = temp_dir_.GetPath().AppendASCII("TestUnencryptedDB");
-  {
-    LoginDatabase db(file, IsAccountStore(false));
-    ASSERT_TRUE(
-        db.Init(/*on_undecryptable_passwords_removed=*/base::NullCallback(),
-                /*encryptor=*/CreateEncryptor()));
-    // Add obfuscated (new) entries.
-    StoredCredential cred = GenerateExampleStoredCredential();
-    cred.password_value = password_manager::PasswordString(k_obfuscated_pw16);
-    EXPECT_EQ(AddChangeForForm(cred), db.AddLogin(CloneStoredCredential(cred)));
-    // Add plain-text (old) entries and rewrite the password on the disk.
-    cred.username_value = u"other_username";
-    EXPECT_EQ(AddChangeForForm(cred), db.AddLogin(CloneStoredCredential(cred)));
-    cred.username_value = u"other_username2";
-    EXPECT_EQ(AddChangeForForm(cred), db.AddLogin(CloneStoredCredential(cred)));
-  }
-  UpdatePasswordValueForUsername(file, u"other_username", k_plain_text_pw116);
-  UpdatePasswordValueForUsername(file, u"other_username2", k_plain_text_pw216);
-
-  std::vector<StoredCredential> credentials;
-  {
-    LoginDatabase db(file, IsAccountStore(false));
-    ASSERT_TRUE(
-        db.Init(/*on_undecryptable_passwords_removed=*/base::NullCallback(),
-                /*encryptor=*/CreateEncryptor()));
-    EXPECT_TRUE(db.GetAutofillableLogins(&credentials));
-  }
-
-  // On disk, unobfuscated passwords are as-is, while obfuscated passwords have
-  // been changed (obfuscated).
-  EXPECT_THAT(GetColumnValuesFromDatabase<std::string>(file, "password_value"),
-              UnorderedElementsAre(Ne(k_obfuscated_pw), k_plain_text_pw1,
-                                   k_plain_text_pw2));
-  // LoginDatabase serves the original values.
-  EXPECT_THAT(credentials, UnorderedElementsAre(
-                               StoredCredentialPasswordIs(k_obfuscated_pw16),
-                               StoredCredentialPasswordIs(k_plain_text_pw116),
-                               StoredCredentialPasswordIs(k_plain_text_pw216)));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // If the database initialisation fails, the initialisation transaction should
 // roll back without crashing.

@@ -260,11 +260,9 @@ bool SyncServiceImplHarness::ResetSyncForPrimaryAccount() {
                       transport_data_prefs.GetBirthday());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void SyncServiceImplHarness::SignOutPrimaryAccount() {
   signin_delegate_->SignOut();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 bool SyncServiceImplHarness::EnterSyncPausedStateForPrimaryAccount() {
@@ -333,9 +331,7 @@ bool SyncServiceImplHarness::SetupSyncNoWaitForCompletion(
   // By default, mimic the user confirming the default settings.
   return SetupSyncWithCustomSettingsNoWaitForCompletion(
       base::BindLambdaForTesting([](syncer::SyncUserSettings* user_settings) {
-#if !BUILDFLAG(IS_CHROMEOS)
         user_settings->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
       }),
       account);
 }
@@ -393,9 +389,7 @@ bool SyncServiceImplHarness::SetupSyncWithCustomSettingsNoWaitForCompletion(
 }
 
 void SyncServiceImplHarness::FinishSyncSetup() {
-#if !BUILDFLAG(IS_CHROMEOS)
   service()->GetUserSettings()->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   sync_blocker_.reset();
 }
 
@@ -560,37 +554,6 @@ bool SyncServiceImplHarness::DisableSelectableType(
   return false;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool SyncServiceImplHarness::EnableSelectableOsType(
-    syncer::UserSelectableOsType type) {
-  if (service() == nullptr) {
-    LOG(ERROR) << "EnableSelectableOsType(): service() is null.";
-    return false;
-  }
-
-  syncer::UserSelectableOsTypeSet selected_os_types =
-      service()->GetUserSettings()->GetSelectedOsTypes();
-  if (selected_os_types.Has(type)) {
-    DVLOG(1) << "EnableSelectableOsType(): Sync already enabled for type "
-             << syncer::GetUserSelectableOsTypeName(type) << " on "
-             << profile_debug_name_ << ".";
-    return true;
-  }
-
-  selected_os_types.Put(type);
-  service()->GetUserSettings()->SetSelectedOsTypes(false, selected_os_types);
-  if (AwaitSyncTransportActive()) {
-    DVLOG(1) << "EnableSelectableOsType(): Enabled sync for type "
-             << syncer::GetUserSelectableOsTypeName(type) << " on "
-             << profile_debug_name_ << ".";
-    return true;
-  }
-
-  DVLOG(0) << GetClientInfoString("EnableSelectableOsType failed");
-  return false;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 bool SyncServiceImplHarness::EnableAllSelectableTypes() {
   if (service() == nullptr) {
     LOG(ERROR) << "EnableAllSelectableTypes(): service() is null.";
@@ -624,24 +587,6 @@ bool SyncServiceImplHarness::DisableAllSelectableTypes() {
            << profile_debug_name_ << ".";
   return true;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool SyncServiceImplHarness::DisableAllSelectableOsTypes() {
-  DVLOG(1) << GetClientInfoString("DisableAllSelectableOsTypes");
-
-  if (service() == nullptr) {
-    LOG(ERROR) << "DisableAllSelectableOsTypes(): service() is null.";
-    return false;
-  }
-
-  service()->GetUserSettings()->SetSelectedOsTypes(
-      /*sync_everything=*/false, syncer::UserSelectableOsTypeSet());
-
-  DVLOG(1) << "DisableAllSelectableOsTypes(): Disabled all types on "
-           << profile_debug_name_ << ".";
-  return true;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 SyncCycleSnapshot SyncServiceImplHarness::GetLastCycleSnapshot() const {
   DCHECK(service() != nullptr) << "Sync service has not yet been set up.";

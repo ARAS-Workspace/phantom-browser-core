@@ -62,7 +62,7 @@ TEST_F(FontCacheTest, NoFallbackForPrivateUseArea) {
   }
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(FontCacheTest, FallbackForEmojis) {
   FontCache& font_cache = FontCache::Get();
 
@@ -118,7 +118,7 @@ TEST_F(FontCacheTest, FallbackForEmojis) {
     }
   }
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 TEST_F(FontCacheTest, firstAvailableOrFirst) {
   EXPECT_TRUE(FontCache::FirstAvailableOrFirst("").empty());
@@ -140,7 +140,7 @@ TEST_F(FontCacheTest, firstAvailableOrFirst) {
             FontCache::FirstAvailableOrFirst(", not exist, not exist"));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // local() font matching requires a Mojo connection which is not available in
 // unit tests.
 #define MAYBE_FontUniqueNameMatchAvailable DISABLED_FontUniqueNameMatchAvailable

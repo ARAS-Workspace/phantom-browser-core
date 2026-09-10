@@ -47,9 +47,9 @@
 #include "services/network/test/test_shared_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/linux_util.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace remoting {
 
@@ -98,26 +98,6 @@ class FakeRegisterSupportHostRequest : public RegisterSupportHostRequest {
   }
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::unique_ptr<HostEventReporter> CreateHostEventReporterStub(
-    scoped_refptr<HostStatusMonitor>) {
-  return std::make_unique<HostEventReporterStub>();
-}
-
-ChromeOsEnterpriseParams GetDefaultEnterpriseParamsForEnterpriseAdmin() {
-  ChromeOsEnterpriseParams params;
-  params.request_origin = ChromeOsEnterpriseRequestOrigin::kEnterpriseAdmin;
-  params.audio_playback = ChromeOsEnterpriseAudioPlayback::kLocalOnly;
-  return params;
-}
-
-ChromeOsEnterpriseParams GetDefaultEnterpriseParamsForClassManagement() {
-  ChromeOsEnterpriseParams params;
-  params.request_origin = ChromeOsEnterpriseRequestOrigin::kClassManagement;
-  params.audio_playback = ChromeOsEnterpriseAudioPlayback::kRemoteOnly;
-  return params;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -337,15 +317,12 @@ It2MeHostTest::It2MeHostTest() = default;
 It2MeHostTest::~It2MeHostTest() = default;
 
 void It2MeHostTest::SetUp() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Need to prime the host OS version value for linux to prevent IO on the
   // network thread. base::GetLinuxDistro() caches the result.
   base::GetLinuxDistro();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  test_url_loader_factory_ = new network::TestSharedURLLoaderFactory();
-#endif
 
   run_loop_ = std::make_unique<base::RunLoop>();
 
@@ -424,10 +401,6 @@ void It2MeHostTest::StartHost() {
     it2me_host_->set_authorized_helper(*authorized_helper_);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  it2me_host_->SetHostEventReporterFactoryForTesting(
-      base::BindRepeating(CreateHostEventReporterStub));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   auto create_connection_context = base::BindOnce(
       [](std::unique_ptr<FtlSignalStrategy> signal_strategy,
@@ -969,296 +942,5 @@ TEST_F(It2MeHostTest, AllowRemoteInputSessionPolicyEnabledByDefault) {
   EXPECT_TRUE(*get_local_session_policies().allow_remote_input);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(It2MeHostTest, ConnectRespectsSuppressDialogsParameter) {
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.suppress_user_dialogs = true;
-  StartHost(std::move(params));
-
-  EXPECT_FALSE(dialog_factory_->dialog_created());
-  EXPECT_FALSE(
-      GetHost()->desktop_environment_options().enable_user_interface());
-}
-
-TEST_F(It2MeHostTest, ConnectRespectsSuppressNotificationsParameter) {
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.suppress_notifications = true;
-  StartHost(std::move(params));
-
-  EXPECT_FALSE(dialog_factory_->dialog_created());
-  EXPECT_FALSE(GetHost()->desktop_environment_options().enable_notifications());
-}
-
-TEST_F(It2MeHostTest, ConnectRespectsTerminateUponInputParameter) {
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.terminate_upon_input = true;
-  StartHost(std::move(params));
-
-  EXPECT_TRUE(GetHost()->desktop_environment_options().terminate_upon_input());
-}
-
-TEST_F(It2MeHostTest, TerminateUponInputDefaultsToFalse) {
-  StartHost(/*enterprise_params=*/std::nullopt);
-
-  EXPECT_FALSE(GetHost()->desktop_environment_options().terminate_upon_input());
-}
-
-TEST_F(It2MeHostTest, ConnectRespectsMaximumSessionDurationParameter) {
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.maximum_session_duration = base::Hours(8);
-  StartHost(std::move(params));
-
-  EXPECT_EQ(GetHost()->desktop_environment_options().maximum_session_duration(),
-            base::Hours(8));
-}
-
-TEST_F(It2MeHostTest, ConnectRespectsEnableCurtainingParameter) {
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.curtain_local_user_session = true;
-  StartHost(std::move(params));
-
-  EXPECT_TRUE(*get_local_session_policies().curtain_required);
-}
-
-TEST_F(It2MeHostTest, ConnectRespectsAllowRemoteInputParameter) {
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.allow_remote_input = false;
-  StartHost(std::move(params));
-
-  EXPECT_FALSE(*get_local_session_policies().allow_remote_input);
-}
-
-TEST_F(It2MeHostTest, ConnectRespectsAllowClipboardSyncParameter) {
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.allow_clipboard_sync = false;
-  StartHost(std::move(params));
-
-  EXPECT_EQ(*get_local_session_policies().clipboard_size_bytes, 0U);
-}
-
-TEST_F(It2MeHostTest, EnableCurtainingDefaultsToFalse) {
-  StartHost(/*enterprise_params=*/std::nullopt);
-
-  EXPECT_FALSE(get_local_session_policies().curtain_required.has_value());
-}
-
-TEST_F(It2MeHostTest, AllowEnterpriseFileTransferWithPolicyEnabled) {
-  SetPolicies({{policy::key::kRemoteAccessHostAllowEnterpriseFileTransfer,
-                base::Value(true)}});
-
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.allow_file_transfer = true;
-  StartHost(std::move(params));
-
-  EXPECT_TRUE(*get_local_session_policies().allow_file_transfer);
-}
-
-TEST_F(It2MeHostTest, AllowEnterpriseFileTransferWithPolicyDisabled) {
-  SetPolicies({{policy::key::kRemoteAccessHostAllowEnterpriseFileTransfer,
-                base::Value(false)}});
-
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.allow_file_transfer = true;
-  StartHost(std::move(params));
-
-  EXPECT_FALSE(*get_local_session_policies().allow_file_transfer);
-}
-
-TEST_F(It2MeHostTest,
-       AllowEnterpriseFileTransferWithPolicyEnabledForNonEnterpriseSession) {
-  SetPolicies({{policy::key::kRemoteAccessHostAllowEnterpriseFileTransfer,
-                base::Value(true)}});
-
-  StartHost(/*enterprise_params=*/std::nullopt);
-
-  EXPECT_FALSE(*get_local_session_policies().allow_file_transfer);
-}
-
-TEST_F(It2MeHostTest, AllowEnterpriseFileTransferWithPolicyNotSet) {
-  SetPolicies({});
-
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.allow_file_transfer = true;
-  StartHost(std::move(params));
-
-  EXPECT_FALSE(*get_local_session_policies().allow_file_transfer);
-}
-
-TEST_F(It2MeHostTest, EnableFileTransferDefaultsToFalse) {
-  StartHost(/*enterprise_params=*/std::nullopt);
-
-  EXPECT_FALSE(*get_local_session_policies().allow_file_transfer);
-}
-
-TEST_F(It2MeHostTest, AudioPlaybackIsLocalOnlyForNonEnterpriseSessions) {
-  StartHost(/*enterprise_params=*/std::nullopt);
-
-  EXPECT_EQ(
-      GetHost()->desktop_environment_options_for_tests().audio_playback_mode(),
-      AudioPlaybackMode::kLocalOnly);
-}
-
-TEST_F(It2MeHostTest, ConnectRespectsAudioPlaybackParameter) {
-  ChromeOsEnterpriseParams params(
-      GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  params.audio_playback = ChromeOsEnterpriseAudioPlayback::kRemoteOnly;
-  StartHost(std::move(params));
-
-  EXPECT_EQ(
-      GetHost()->desktop_environment_options_for_tests().audio_playback_mode(),
-      AudioPlaybackMode::kRemoteOnly);
-}
-
-TEST_F(It2MeHostTest,
-       EnterpriseSessionsSucceedWhenRemoteSupportConnectionsPolicyDisabled) {
-  SetPolicies({{policy::key::kRemoteAccessHostAllowRemoteSupportConnections,
-                base::Value(false)}});
-
-  StartHost(GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kReceivedAccessCode);
-
-  ShutdownHost();
-  ASSERT_EQ(last_host_state_, It2MeHostState::kDisconnected);
-  ASSERT_EQ(last_error_code_, ErrorCode::OK);
-}
-
-TEST_F(It2MeHostTest, EnterpriseSessionsShouldNotCheckHostDomain) {
-  SetPolicies({{policy::key::kRemoteAccessHostDomainList,
-                MakeList({"other-domain.com"})}});
-
-  StartHost(GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kReceivedAccessCode);
-
-  ShutdownHost();
-  ASSERT_EQ(last_host_state_, It2MeHostState::kDisconnected);
-  ASSERT_EQ(last_error_code_, ErrorCode::OK);
-}
-
-TEST_F(
-    It2MeHostTest,
-    EnterpriseSessionsFailWhenEnterpriseRemoteSupportConnectionsPolicyDisabled) {
-  SetPolicies(
-      {{policy::key::kRemoteAccessHostAllowEnterpriseRemoteSupportConnections,
-        base::Value(false)}});
-
-  StartHost(GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kError);
-  ASSERT_EQ(last_error_code_, ErrorCode::DISALLOWED_BY_POLICY);
-}
-
-TEST_F(
-    It2MeHostTest,
-    RemoteSupportSessionsSucceedWhenEnterpriseRemoteSupportConnectionsPolicyDisabled) {
-  SetPolicies(
-      {{policy::key::kRemoteAccessHostAllowEnterpriseRemoteSupportConnections,
-        base::Value(false)}});
-
-  StartHost(/*enterprise_params=*/std::nullopt);
-  ASSERT_EQ(last_host_state_, It2MeHostState::kReceivedAccessCode);
-}
-
-TEST_F(It2MeHostTest, EnterpriseSessionsShouldNotDisconnectOnPolicyChange) {
-  StartHost(GetDefaultEnterpriseParamsForEnterpriseAdmin());
-  const It2MeHostState initial_state = last_host_state_;
-  ASSERT_EQ(initial_state, It2MeHostState::kReceivedAccessCode);
-
-  SetPolicies({{policy::key::kRemoteAccessHostFirewallTraversal,
-                base::Value(!last_nat_traversal_enabled_value_)}});
-
-  // Using RunUntilIdle is frowned upon, but there is no other way to check a
-  // change does *not* happen.
-  base::RunLoop().RunUntilIdle();
-  ASSERT_EQ(last_host_state_, initial_state);
-}
-
-TEST_F(It2MeHostTest, EnterpriseClassManagementSessionsSucceedAsAStudent) {
-  SetPolicies({{policy::key::kRemoteAccessHostAllowRemoteSupportConnections,
-                base::Value(false)},
-               {policy::key::kClassManagementEnabled, base::Value("student")}});
-
-  StartHost(GetDefaultEnterpriseParamsForClassManagement());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kReceivedAccessCode);
-}
-
-TEST_F(It2MeHostTest, EnterpriseClassManagementSessionsSucceedAsATeacher) {
-  SetPolicies({{policy::key::kRemoteAccessHostAllowRemoteSupportConnections,
-                base::Value(false)},
-               {policy::key::kClassManagementEnabled, base::Value("teacher")}});
-
-  StartHost(GetDefaultEnterpriseParamsForClassManagement());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kReceivedAccessCode);
-}
-
-TEST_F(
-    It2MeHostTest,
-    EnterpriseClassManagementSessionsFailsWhenClassManagementPolicyDisabled) {
-  SetPolicies(
-      {{policy::key::kClassManagementEnabled, base::Value("disabled")}});
-
-  StartHost(GetDefaultEnterpriseParamsForClassManagement());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kError);
-  ASSERT_EQ(last_error_code_, ErrorCode::DISALLOWED_BY_POLICY);
-}
-
-TEST_F(It2MeHostTest,
-       EnterpriseClassManagementSessionsFailsWhenClassManagementPolicyUnset) {
-  StartHost(GetDefaultEnterpriseParamsForClassManagement());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kError);
-  ASSERT_EQ(last_error_code_, ErrorCode::DISALLOWED_BY_POLICY);
-}
-
-TEST_F(It2MeHostTest,
-       EnterpriseClassManagementSessionsShouldNotCheckHostDomain) {
-  SetPolicies({{policy::key::kRemoteAccessHostDomainList,
-                MakeList({"other-domain.com"})},
-               {policy::key::kClassManagementEnabled, base::Value("student")}});
-
-  StartHost(GetDefaultEnterpriseParamsForClassManagement());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kReceivedAccessCode);
-
-  ShutdownHost();
-  ASSERT_EQ(last_host_state_, It2MeHostState::kDisconnected);
-  ASSERT_EQ(last_error_code_, ErrorCode::OK);
-}
-
-TEST_F(It2MeHostTest,
-       EnterpriseClassManagementSessionsShouldNotCheckClientDomain) {
-  SetPolicies({{policy::key::kRemoteAccessHostClientDomainList,
-                MakeList({"other-domain.com"})},
-               {policy::key::kClassManagementEnabled, base::Value("student")}});
-
-  authorized_helper_ = kTestClientUsername;
-  StartHost(GetDefaultEnterpriseParamsForClassManagement());
-  ASSERT_EQ(last_host_state_, It2MeHostState::kReceivedAccessCode);
-  RunValidationCallback(kTestClientJid);
-  ASSERT_EQ(validation_result_, ValidationResult::SUCCESS);
-  ASSERT_EQ(last_host_state_, It2MeHostState::kConnecting);
-
-  ShutdownHost();
-  ASSERT_EQ(last_host_state_, It2MeHostState::kDisconnected);
-  ASSERT_EQ(last_error_code_, ErrorCode::OK);
-}
-
-TEST_F(It2MeHostTest,
-       EnterpriseClassManagementSessionsFailWithoutAuthorizedUser) {
-  SetPolicies({{policy::key::kClassManagementEnabled, base::Value("student")}});
-
-  StartHost(GetDefaultEnterpriseParamsForClassManagement());
-  RunValidationCallback(kTestClientJid);
-  ASSERT_EQ(validation_result_, ValidationResult::ERROR_UNAUTHORIZED_ACCOUNT);
-  RunUntilStateChanged(It2MeHostState::kDisconnected);
-  ASSERT_EQ(last_host_state_, It2MeHostState::kDisconnected);
-}
-#endif
 
 }  // namespace remoting

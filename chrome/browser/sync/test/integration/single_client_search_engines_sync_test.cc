@@ -584,7 +584,7 @@ IN_PROC_BROWSER_TEST_F(
       "key1", GetFakeServer()));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(
     SingleClientSearchEnginesSyncTestWithSeparateLocalAndAccountSearchEnginesEnabled,
     PRE_ShouldClearAccountDataOnStartupIfSignInAllowedBitChanged) {
@@ -627,7 +627,7 @@ IN_PROC_BROWSER_TEST_F(
               testing::Pointee(
                   testing::Property(&TemplateURL::keyword, u"localkeyword")));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(
     SingleClientSearchEnginesSyncTestWithSeparateLocalAndAccountSearchEnginesEnabled,
@@ -643,11 +643,7 @@ IN_PROC_BROWSER_TEST_F(
       CreateTestTemplateURL(u"accountkeyword", "http://account.com", "guid",
                             base::Time::FromTimeT(100))));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_TRUE(SetupSync());
-#else
   ASSERT_TRUE(SignIn());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Account value is effective.
   ASSERT_THAT(service->GetTemplateURLForGUID("guid"),
@@ -656,14 +652,8 @@ IN_PROC_BROWSER_TEST_F(
 
   // Simulate a data type error to prevent clearing of account data.
   GetSyncService(0)->ReportDataTypeErrorForTest(syncer::SEARCH_ENGINES);
-#if BUILDFLAG(IS_CHROMEOS)
-  // Disable sync.
-  ASSERT_TRUE(GetClient(0)->DisableSelectableType(
-      syncer::UserSelectableType::kPreferences));
-#else
   // Sign out.
   GetClient(0)->SignOutPrimaryAccount();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ASSERT_TRUE(HasSearchEngine(/*profile_index=*/0, "accountkeyword"));
 
   ExcludeDataTypesFromCheckForDataTypeFailures({syncer::SEARCH_ENGINES});

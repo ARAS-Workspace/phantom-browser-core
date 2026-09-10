@@ -88,13 +88,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/40147906): Enable gn check once it learns about conditional
-// includes.
-#include "components/metrics/structured/structured_events.h"  // nogncheck
-#include "components/metrics/structured/structured_metrics_client.h"  // nogncheck
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/web_applications/os_integration/mac/web_app_shortcut_mac.h"
 #include "chrome/browser/web_applications/os_integration/web_app_shortcut.h"
@@ -130,14 +123,6 @@ std::ostream& operator<<(std::ostream& os, InstallOsType type) {
 }
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-namespace cros_events = metrics::structured::events::v2::cr_os_events;
-
-int64_t ToLong(web_app::WebAppInstallStatus web_app_install_status) {
-  return static_cast<int64_t>(web_app_install_status);
-}
-#endif
 
 // The defaulted <=> compares fields in declaration order: not needing
 // upscaling beats needing it, and within each group the smaller distance to
@@ -353,16 +338,6 @@ void WebAppInstallFlowDialogDelegate::OnAccept() {
     tracker_->NotifyEvent(feature_engagement::events::kDesktopPwaInstalled);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  const webapps::AppId app_id =
-      web_app::GenerateAppIdFromManifestId(install_info_->manifest_id());
-  metrics::structured::StructuredMetricsClient::Record(
-      cros_events::AppDiscovery_Browser_AppInstallDialogResult()
-          .SetWebAppInstallStatus(
-              ToLong(web_app::WebAppInstallStatus::kAccepted))
-          .SetAppId(app_id));
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // DIY apps get their name from the DIY install dialog and are always set to
   // open in a new window.
   if (dialog_type_ == InstallDialogType::kDiy) {
@@ -499,15 +474,6 @@ void WebAppInstallFlowDialogDelegate::MeasureMetricsOnDialogClose(
 
   if (install_info_ && callback_) {
     // If |install_info_| is populated, then the dialog was not accepted.
-#if BUILDFLAG(IS_CHROMEOS)
-    const webapps::AppId app_id =
-        web_app::GenerateAppIdFromManifestId(install_info_->manifest_id());
-    metrics::structured::StructuredMetricsClient::Record(
-        cros_events::AppDiscovery_Browser_AppInstallDialogResult()
-            .SetWebAppInstallStatus(
-                ToLong(web_app::WebAppInstallStatus::kCancelled))
-            .SetAppId(app_id));
-#endif  // BUILDFLAG(IS_CHROMEOS)
     std::move(callback_).Run(false, std::move(install_info_),
                              base::DoNothing());
   }
@@ -742,14 +708,6 @@ WebAppInstallFlowDialogDelegate::Show(
           web_contents->GetPrimaryMainFrame()->GetLastCommittedOrigin();
     }
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  const webapps::AppId app_id =
-      web_app::GenerateAppIdFromManifestId(install_info->manifest_id());
-  metrics::structured::StructuredMetricsClient::Record(
-      cros_events::AppDiscovery_Browser_AppInstallDialogShown().SetAppId(
-          app_id));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   auto delegate = std::make_unique<WebAppInstallFlowDialogDelegate>(
       web_contents, std::move(install_info), std::move(install_tracker),

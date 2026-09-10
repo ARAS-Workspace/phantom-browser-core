@@ -696,62 +696,6 @@ TEST_F(PlatformNotificationServiceTest, CreateNotificationFromData) {
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(IS_CHROMEOS)
-using PlatformNotificationServiceTest_WebAppNotificationIconAndTitle =
-    PlatformNotificationServiceTest;
-
-TEST_F(PlatformNotificationServiceTest_WebAppNotificationIconAndTitle,
-       FindWebAppIconAndTitle_NoApp) {
-  web_app::FakeWebAppProvider* provider =
-      web_app::FakeWebAppProvider::Get(profile_.get());
-  provider->Start();
-
-  const GURL web_app_url{"https://example.org/"};
-  EXPECT_FALSE(service()->FindWebAppIconAndTitle(web_app_url).has_value());
-}
-
-TEST_F(PlatformNotificationServiceTest_WebAppNotificationIconAndTitle,
-       FindWebAppIconAndTitle) {
-  web_app::FakeWebAppProvider* provider =
-      web_app::FakeWebAppProvider::Get(profile_.get());
-  web_app::WebAppIconManager& icon_manager = provider->GetIconManager();
-
-  std::unique_ptr<web_app::WebApp> web_app = web_app::test::CreateWebApp();
-  const GURL web_app_url = web_app->start_url();
-  const webapps::AppId app_id = web_app->app_id();
-  web_app->SetName("Web App Title");
-
-  IconManagerWriteGeneratedIcons(icon_manager, app_id,
-                                 {{web_app::IconPurpose::MONOCHROME,
-                                   {web_app::icon_size::k16},
-                                   {SK_ColorTRANSPARENT}}});
-  web_app->SetDownloadedIconSizes(web_app::IconPurpose::MONOCHROME,
-                                  {web_app::icon_size::k16});
-
-  provider->GetRegistrarMutable().registry().emplace(app_id,
-                                                     std::move(web_app));
-
-  base::RunLoop run_loop;
-  icon_manager.SetFaviconMonochromeReadCallbackForTesting(
-      base::BindLambdaForTesting(
-          [&](const webapps::AppId& cached_app_id) { run_loop.Quit(); }));
-  icon_manager.Start();
-  run_loop.Run();
-
-  provider->Start();
-
-  std::optional<PlatformNotificationServiceImpl::WebAppIconAndTitle>
-      icon_and_title = service()->FindWebAppIconAndTitle(web_app_url);
-
-  ASSERT_TRUE(icon_and_title.has_value());
-  EXPECT_EQ(u"Web App Title", icon_and_title->title);
-  EXPECT_FALSE(icon_and_title->icon.isNull());
-  EXPECT_EQ(
-      SK_ColorTRANSPARENT,
-      icon_and_title->icon.GetRepresentation(1.0f).GetBitmap().getColor(0, 0));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class PlatformNotificationServiceTest_NotificationContentDetection
     : public PlatformNotificationServiceTest,
       public testing::WithParamInterface<bool> {

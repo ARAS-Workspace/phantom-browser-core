@@ -104,15 +104,12 @@ TEST_P(SyncAuthManagerTest, IgnoresEventsIfNotRegistered) {
       auth_manager->GetActiveAccountInfo().account_info.account_id.empty());
 
 // ChromeOS doesn't support sign-out.
-#if !BUILDFLAG(IS_CHROMEOS)
   identity_env()->ClearPrimaryAccount();
   EXPECT_TRUE(
       auth_manager->GetActiveAccountInfo().account_info.account_id.empty());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 // ChromeOS doesn't support sign-out.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_P(SyncAuthManagerTest, ForwardsPrimaryAccountEvents) {
   // Start out already signed in before the SyncAuthManager is created.
   CoreAccountId account_id =
@@ -186,13 +183,12 @@ TEST_P(SyncAuthManagerTest, NotifiesOfSignoutBeforeAccessTokenIsGone) {
   ASSERT_TRUE(
       auth_manager->GetActiveAccountInfo().account_info.account_id.empty());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Unconsented primary accounts are only supported on Win/Mac/Linux.
 // TODO(crbug.com/40066949): Remove once kSync becomes unreachable or is
 // deleted from the codebase. See ConsentLevel::kSync documentation for
 // details.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 TEST_P(SyncAuthManagerTest, ForwardsUnconsentedAccountEvents) {
   EXPECT_CALL(delegate(), SyncAuthAccountStateChanged).Times(0);
   EXPECT_CALL(delegate(), SyncAuthCredentialsChanged).Times(0);
@@ -221,11 +217,9 @@ TEST_P(SyncAuthManagerTest, ForwardsUnconsentedAccountEvents) {
 
   EXPECT_TRUE(auth_manager->GetActiveAccountInfo().is_sync_consented);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID) &&
-        // !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
 // ChromeOS doesn't support sign-out.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_P(SyncAuthManagerTest, ClearsAuthErrorOnSignoutWithRefreshTokenRemoval) {
   // Start out already signed in before the SyncAuthManager is created.
   CoreAccountId account_id =
@@ -290,7 +284,6 @@ TEST_P(SyncAuthManagerTest,
   EXPECT_EQ(auth_manager->GetLastAuthError().state(),
             GoogleServiceAuthError::NONE);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(SyncAuthManagerTest, DoesNotClearAuthErrorOnSyncDisable) {
   // Start out already signed in before the SyncAuthManager is created.
@@ -922,7 +915,7 @@ TEST_P(SyncAuthManagerTest, PrimaryAccountWithNoSyncConsent) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 // Primary account with no sync consent is not supported on Android and iOS.
 // On CrOS the unconsented primary account can't be changed or removed, but can
 // be granted sync consent.
@@ -964,8 +957,7 @@ TEST_P(SyncAuthManagerTest,
   EXPECT_TRUE(
       auth_manager->GetActiveAccountInfo().account_info.account_id.empty());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID) &&
-        // !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
 TEST_P(SyncAuthManagerTest, DetectsInvalidRefreshTokenAtStartup) {
   // There is a primary account, but it has an invalid refresh token (with a
@@ -1074,7 +1066,6 @@ TEST_F(SyncAuthManagerTest, DeterminesAccountTypeAsynchronously) {
   histograms.ExpectTotalCount("Sync.AccountManagedStatusDuration", 1);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(SyncAuthManagerTest, AccountChangeWhileDeterminingAccountType) {
   // There is a primary account, whose managed-ness status isn't known yet.
   AccountInfo account_info = identity_env()->MakePrimaryAccountAvailable(
@@ -1132,7 +1123,6 @@ TEST_F(SyncAuthManagerTest, AccountChangeWhileDeterminingAccountType) {
       signin::AccountManagedStatusFinderOutcome::kConsumerNotWellKnown, 1);
   histograms.ExpectTotalCount("Sync.AccountManagedStatusDuration", 1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(SyncAuthManagerTest,
        FetchAccessTokenReturnsValidCachedTokenSynchronously) {

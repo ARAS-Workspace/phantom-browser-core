@@ -15,11 +15,6 @@
 #include "media/media_buildflags.h"
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace chromeos {
-class ChromeOsCdmContext;
-}
-#endif
 
 namespace media {
 
@@ -97,11 +92,6 @@ class MEDIA_EXPORT CdmContext {
 #endif
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Returns a ChromeOsCdmContext interface when the context is backed by the
-  // ChromeOS CdmFactoryDaemon. Otherwise return nullptr.
-  virtual chromeos::ChromeOsCdmContext* GetChromeOsCdmContext();
-#endif
 
  protected:
   CdmContext();

@@ -102,10 +102,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
                                       kClipboardRWElementId);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
                                       kStorageAccessElementId);
-#if BUILDFLAG(IS_CHROMEOS)
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
-                                      kSmartCardIconElementId);
-#endif
 
 // The image models hierarchy:
 //
@@ -235,43 +231,6 @@ class ContentSettingMediaImageModel : public ContentSettingImageModel {
  private:
   PageSpecificContentSettings::MicrophoneCameraState state_;
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Image model for displaying media icons in the location bar.
-class ContentSettingSmartCardImageModel
-    : public ContentSettingSimpleImageModel {
- public:
-  ContentSettingSmartCardImageModel()
-      : ContentSettingSimpleImageModel(ImageType::kSmartCard,
-                                       ContentSettingsType::SMART_CARD_GUARD) {}
-
-  ContentSettingSmartCardImageModel(const ContentSettingSmartCardImageModel&) =
-      delete;
-  ContentSettingSmartCardImageModel& operator=(
-      const ContentSettingSmartCardImageModel&) = delete;
-
-  bool UpdateAndGetVisibility(WebContents* web_contents) override {
-    PageSpecificContentSettings* content_settings =
-        PageSpecificContentSettings::GetForFrame(
-            web_contents->GetPrimaryMainFrame());
-    if (!content_settings) {
-      return false;
-    }
-    // This should never appear when the permission is blocked.
-    SetIcon(ContentSettingsType::SMART_CARD_GUARD, /*blocked=*/false);
-    set_tooltip(l10n_util::GetStringUTF16(IDS_ACCESSED_SMART_CARD_READER_BODY));
-    return content_settings->ShouldShowDeviceInUseIndicator(
-        ContentSettingsType::SMART_CARD_GUARD);
-  }
-
-  std::unique_ptr<ContentSettingBubbleModel> CreateBubbleModelImpl(
-      ContentSettingBubbleModel::Delegate* delegate,
-      content::Page& page) override {
-    return std::make_unique<ContentSettingSimpleBubbleModel>(
-        delegate, page, ContentSettingsType::SMART_CARD_GUARD);
-  }
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class ContentSettingSensorsImageModel : public ContentSettingSimpleImageModel {
  public:
@@ -507,15 +466,6 @@ void GetIconChromeRefresh(ContentSettingsType type,
                               ? vector_icons::kIframeIcon
                               : vector_icons::kIframeOldIcon);
       return;
-#if BUILDFLAG(IS_CHROMEOS)
-    case ContentSettingsType::SMART_CARD_GUARD:
-      // Indicator shows only when at least one connection is active, hence no
-      // need for the off icon.
-      *icon = &(features::IsRoundedIconsEnabled()
-                    ? vector_icons::kSmartCardReaderIcon
-                    : vector_icons::kSmartCardReaderOldIcon);
-      return;
-#endif
     default:
       NOTREACHED();
   }
@@ -598,10 +548,6 @@ ContentSettingImageModel::CreateForContentType(ImageType image_type) {
       return std::make_unique<ContentSettingStorageAccessImageModel>();
     case ImageType::kNotifications:
       return std::make_unique<ContentSettingNotificationsImageModel>();
-#if BUILDFLAG(IS_CHROMEOS)
-    case ImageType::kSmartCard:
-      return std::make_unique<ContentSettingSmartCardImageModel>();
-#endif
   }
   NOTREACHED();
 }
@@ -1427,10 +1373,6 @@ ui::ElementIdentifier ContentSettingImageModel::GetElementIdentifier() const {
       return kStorageAccessElementId;
     case ImageType::kNotifications:
       return kNotificationContentSettingImageView;
-#if BUILDFLAG(IS_CHROMEOS)
-    case ImageType::kSmartCard:
-      return kSmartCardIconElementId;
-#endif
   }
   NOTREACHED();
 }
@@ -1482,9 +1424,6 @@ ContentSettingImageModel::GenerateContentSettingImageModels() {
       ImageType::kClipboardReadWrite,
       ImageType::kNotifications,
       ImageType::kStorageAccess,
-#if BUILDFLAG(IS_CHROMEOS)
-      ImageType::kSmartCard,
-#endif
   };
 
   std::vector<std::unique_ptr<ContentSettingImageModel>> result;

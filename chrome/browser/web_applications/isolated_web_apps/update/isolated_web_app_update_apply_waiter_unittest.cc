@@ -103,37 +103,6 @@ TEST_F(IsolatedWebAppUpdateApplyWaiterTest,
 }
 
 // Other platforms do not have a `WebAppProvider` in guest sessions.
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(IsolatedWebAppUpdateApplyWaiterTest,
-       NoProfileKeepAliveWhenOffTheRecord) {
-  // In ChromeOS guest sessions, the profile is both a guest profile and off the
-  // record.
-  Profile* profile = profile_manager().CreateGuestProfile();
-  ASSERT_THAT(profile->GetAllOffTheRecordProfiles(), SizeIs(1));
-  profile = profile->GetAllOffTheRecordProfiles()[0];
-
-  EXPECT_THAT(profile->IsGuestSession(), IsTrue());
-  EXPECT_THAT(profile->IsOffTheRecord(), IsTrue());
-  EXPECT_THAT(AreWebAppsEnabled(profile), IsTrue());
-
-  auto* provider = FakeWebAppProvider::Get(profile);
-  provider->SetEnableAutomaticIwaUpdates(
-      FakeWebAppProvider::AutomaticIwaUpdateStrategy::kDefault);
-  test::AwaitStartWebAppProviderAndSubsystems(profile);
-  EXPECT_THAT(
-      provider->isolated_web_app_update_manager().AreAutomaticUpdatesEnabled(),
-      IsFalse());
-
-  IsolatedWebAppUpdateApplyWaiter waiter(url_info_, provider->ui_manager());
-  base::test::TestFuture<std::unique_ptr<ScopedKeepAlive>,
-                         std::unique_ptr<ScopedProfileKeepAlive>>
-      future;
-  waiter.Wait(profile, future.GetCallback());
-  auto [keep_alive, profile_keep_alive] = future.Take();
-  EXPECT_THAT(keep_alive, NotNull());
-  EXPECT_THAT(profile_keep_alive, IsNull());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 }  // namespace web_app

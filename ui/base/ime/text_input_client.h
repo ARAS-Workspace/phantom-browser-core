@@ -58,15 +58,6 @@ class COMPONENT_EXPORT(UI_BASE_IME) TextInputClient {
     FOCUS_REASON_OTHER,
   };
 
-#if BUILDFLAG(IS_CHROMEOS)
-  enum SubClass {
-    kRenderWidgetHostViewAura = 0,
-    kArcImeService = 1,
-    kTextField = 2,
-    kMaxValue = kTextField,
-  };
-#endif
-
   virtual ~TextInputClient();
 
   // This should be implemented by the most concrete class.
@@ -229,22 +220,6 @@ class COMPONENT_EXPORT(UI_BASE_IME) TextInputClient {
   // of IPC between browser and renderer.
   virtual void ExtendSelectionAndDelete(size_t before, size_t after) = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Deletes any active composition, and the current selection plus the
-  // specified number of char16 values before and after the selection, and
-  // replaces it with |replacement_string|.
-  // Places the cursor at the end of |replacement_string|.
-  //
-  // Clients should try to implement this with an atomic operation to ensure
-  // that input method features like autocorrection works well. However, it's
-  // also okay for clients to fall back to ExtendSelectionAndDelete followed by
-  // InsertText for a degraded experience.
-  virtual void ExtendSelectionAndReplace(
-      size_t length_before_selection,
-      size_t length_after_selection,
-      std::u16string_view replacement_string);
-#endif
-
   // Ensure the caret is not in |rect|.  |rect| is in screen coordinates in
   // DIP (Density Independent Pixel) and may extend beyond the bounds of this
   // TextInputClient.
@@ -274,7 +249,7 @@ class COMPONENT_EXPORT(UI_BASE_IME) TextInputClient {
   virtual bool SupportsAutoFill() const;
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Start composition over a given UTF-16 code range from existing text. This
   // should only be used for composition scenario when IME wants to start
   // composition on existing text. Returns whether the operation was successful.
@@ -284,43 +259,6 @@ class COMPONENT_EXPORT(UI_BASE_IME) TextInputClient {
       const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) = 0;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Return the start and end index of the autocorrect range. If non-existent,
-  // return an empty Range.
-  virtual gfx::Range GetAutocorrectRange() const = 0;
-
-  // Return the location of the autocorrect range as a gfx::Rect object.
-  // If gfx::Rect is empty, then the autocorrect character bounds have not been
-  // set.
-  // These bounds are in screen coordinates.
-  virtual gfx::Rect GetAutocorrectCharacterBounds() const = 0;
-
-  // Sets the autocorrect range to |range|. Clients should show some visual
-  // indication of the range, such as flashing or underlining. If |range| is
-  // empty, then the autocorrect range is cleared.
-  // Returns true if the operation was successful. If |range| is invalid, then
-  // no modifications are made and this function returns false.
-  virtual bool SetAutocorrectRange(const gfx::Range& range) = 0;
-
-  // Returns the grammar fragment which contains the current cursor. If
-  // non-existent, returns nullopt.
-  virtual std::optional<GrammarFragment> GetGrammarFragmentAtCursor() const;
-
-  // Clears all the grammar fragments in |range|, returns whether the operation
-  // is successful. Should return true if the there is no fragment in the range.
-  virtual bool ClearGrammarFragments(const gfx::Range& range);
-
-  // Adds new grammar markers according to |fragments|. Clients should show
-  // some visual indications such as underlining. Returns whether the operation
-  // is successful.
-  virtual bool AddGrammarFragments(
-      const std::vector<GrammarFragment>& fragments);
-
-  // Does the current text client support always confirming a composition, even
-  // if there isn't a composition currently set?
-  virtual bool SupportsAlwaysConfirmComposition();
-#endif
-
   // Returns false if either the focused editable element or the EditContext
   // bounds is not available, else it returns true with the control and
   // selection bounds for the EditContext or control bounds of the active
@@ -328,18 +266,6 @@ class COMPONENT_EXPORT(UI_BASE_IME) TextInputClient {
   virtual void GetActiveTextInputControlLayoutBounds(
       std::optional<gfx::Rect>* control_bounds,
       std::optional<gfx::Rect>* selection_bounds) = 0;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  struct EditingContext {
-    // Contains the active web content's URL.
-    GURL page_url;
-  };
-
-  virtual ui::TextInputClient::EditingContext GetTextEditingContext();
-
-  // Notifies TSF when a frame with a committed Url receives focus.
-  virtual void NotifyOnFrameFocusChanged() {}
-#endif
 
   // Called before ui::InputMethod dispatches a not-consumed event to PostIME
   // phase. This method gives TextInputClient a chance to intercept event

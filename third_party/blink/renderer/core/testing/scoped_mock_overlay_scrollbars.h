@@ -67,7 +67,7 @@ class ScopedMockOverlayScrollbars {
     // platform independent.
     if (use_mock_overlay_scrollbars_)
       return true;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
     // Non-overlay scrollbar is not supported on these platforms.
     return false;
 #else

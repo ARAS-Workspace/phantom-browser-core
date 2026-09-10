@@ -16,10 +16,6 @@
 #include "build/build_config.h"
 #include "chrome/installer/util/google_update_settings.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/google/google_brand_chromeos.h"
-#endif
-
 namespace google_brand {
 
 const char* g_brand_for_testing = nullptr;
@@ -34,11 +30,7 @@ bool GetBrand(std::string* brand) {
     return true;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  brand->assign(google_brand::chromeos::GetBrand());
-#else
   brand->clear();
-#endif
   return true;
 }
 
@@ -50,12 +42,7 @@ bool GetReactivationBrand(std::string* brand) {
 #endif
 
 bool GetRlzBrand(std::string* brand) {
-#if BUILDFLAG(IS_CHROMEOS)
-  brand->assign(google_brand::chromeos::GetRlzBrand());
-  return true;
-#else
   return GetBrand(brand);
-#endif
 }
 
 bool IsOrganic(const std::string& brand) {

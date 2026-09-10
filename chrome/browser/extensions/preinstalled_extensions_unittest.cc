@@ -25,9 +25,6 @@
 // preinstalled_extensions::Provider to install extensions.
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
-// Chrome OS has different way of installing pre-installed apps.
-static_assert(!BUILDFLAG(IS_CHROMEOS));
-
 using extensions::mojom::ManifestLocation;
 using preinstalled_extensions::Provider;
 

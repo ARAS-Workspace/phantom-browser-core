@@ -238,11 +238,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, Standard) {
   // array object with any unsupported prefs into the test , so it can skip
   // those.
   static constexpr char kMissingPrefs[] =
-#if BUILDFLAG(IS_CHROMEOS)
-      "[ ]";
-#else
       "[ \"protectedContentEnabled\" ]";
-#endif
 
   SetCustomArg(kMissingPrefs);
 

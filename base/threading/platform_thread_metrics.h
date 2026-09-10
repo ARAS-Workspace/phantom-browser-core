@@ -63,7 +63,7 @@ class BASE_EXPORT PlatformThreadMetrics {
       PlatformThreadHandle handle);
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
   static std::unique_ptr<PlatformThreadMetrics> CreateFromId(
       PlatformThreadId tid);
 #endif
@@ -103,7 +103,7 @@ class BASE_EXPORT PlatformThreadMetrics {
       : handle_(handle) {}
 
   PlatformThreadHandle handle_;
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
   explicit PlatformThreadMetrics(PlatformThreadId tid) : tid_(tid) {}
 
   PlatformThreadId tid_;

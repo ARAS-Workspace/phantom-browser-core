@@ -77,7 +77,6 @@ IN_PROC_BROWSER_TEST_F(FetchKeepAliveProcessAliveBrowserTest,
   }));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Verifies that every profile with in-flight fetch keepalive loaders is held
 // via ScopedProfileKeepAlive, not only the first one (crbug.com/408010432).
 IN_PROC_BROWSER_TEST_F(FetchKeepAliveProcessAliveBrowserTest,
@@ -113,7 +112,6 @@ IN_PROC_BROWSER_TEST_F(FetchKeepAliveProcessAliveBrowserTest,
         &second_profile, ProfileKeepAliveOrigin::kFetchKeepAlive);
   }));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Fixture with the fetch keepalive in-browser migration enabled but the
 // process-alive hold explicitly disabled.

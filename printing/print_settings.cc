@@ -312,17 +312,10 @@ PrintSettings& PrintSettings::operator=(const PrintSettings& settings) {
   landscape_ = settings.landscape_;
   is_modifiable_ = settings.is_modifiable_;
   pages_per_sheet_ = settings.pages_per_sheet_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   for (const auto& item : settings.advanced_settings_)
     advanced_settings_.emplace(item.first, item.second.Clone());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_CHROMEOS)
-  send_user_info_ = settings.send_user_info_;
-  username_ = settings.username_;
-  oauth_token_ = settings.oauth_token_;
-  pin_value_ = settings.pin_value_;
-  client_infos_ = settings.client_infos_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(ENABLE_OOP_PRINTING_NO_OOP_BASIC_PRINT_DIALOG)
   system_print_dialog_data_ = settings.system_print_dialog_data_.Clone();
 #endif
@@ -336,39 +329,25 @@ bool PrintSettings::operator==(const PrintSettings& other) const {
                   display_header_footer_, should_print_backgrounds_, collate_,
                   color_, copies_, duplex_mode_, device_name_, requested_media_,
                   page_setup_device_units_, dpi_, scale_factor_, rasterize_pdf_,
-                  rasterize_pdf_dpi_, landscape_,
-                  is_modifiable_, requested_custom_margins_in_microns_,
-                  pages_per_sheet_
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+                  rasterize_pdf_dpi_, landscape_, is_modifiable_,
+                  requested_custom_margins_in_microns_, pages_per_sheet_
+#if BUILDFLAG(IS_LINUX)
                   ,
                   advanced_settings_
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-                  ,
-                  send_user_info_, username_, oauth_token_, pin_value_,
-                  client_infos_, printer_manually_selected_,
-                  printer_status_reason_
-#endif
                   ) ==
-         std::tie(other.ranges_, other.selection_only_, other.margin_type_,
-                  other.title_, other.url_, other.display_header_footer_,
-                  other.should_print_backgrounds_, other.collate_, other.color_,
-                  other.copies_, other.duplex_mode_, other.device_name_,
-                  other.requested_media_, other.page_setup_device_units_,
-                  other.dpi_, other.scale_factor_, other.rasterize_pdf_,
-                  other.rasterize_pdf_dpi_, other.landscape_,
-                  other.is_modifiable_,
-                  other.requested_custom_margins_in_microns_,
-                  other.pages_per_sheet_
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-                  ,
-                  other.advanced_settings_
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-                  ,
-                  other.send_user_info_, other.username_, other.oauth_token_,
-                  other.pin_value_, other.client_infos_,
-                  other.printer_manually_selected_, other.printer_status_reason_
+         std::tie(
+             other.ranges_, other.selection_only_, other.margin_type_,
+             other.title_, other.url_, other.display_header_footer_,
+             other.should_print_backgrounds_, other.collate_, other.color_,
+             other.copies_, other.duplex_mode_, other.device_name_,
+             other.requested_media_, other.page_setup_device_units_, other.dpi_,
+             other.scale_factor_, other.rasterize_pdf_,
+             other.rasterize_pdf_dpi_, other.landscape_, other.is_modifiable_,
+             other.requested_custom_margins_in_microns_, other.pages_per_sheet_
+#if BUILDFLAG(IS_LINUX)
+             ,
+             other.advanced_settings_
 #endif
          );
 }
@@ -397,16 +376,9 @@ void PrintSettings::Clear() {
   landscape_ = false;
   is_modifiable_ = true;
   pages_per_sheet_ = 1;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   advanced_settings_.clear();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_CHROMEOS)
-  send_user_info_ = false;
-  username_.clear();
-  oauth_token_.clear();
-  pin_value_.clear();
-  client_infos_.clear();
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(ENABLE_OOP_PRINTING_NO_OOP_BASIC_PRINT_DIALOG)
   system_print_dialog_data_.clear();
 #endif
@@ -465,15 +437,6 @@ void PrintSettings::SetPrinterPrintableArea(
       margins.right = 0;
       break;
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    case mojom::MarginType::kPrecomputedMarginsForBackend: {
-      // Do not setup page setup device units for custom margins for backend,
-      // which doesn't use `page_setup_device_units` either. These margins are
-      // used to send to print jobs in the print backend instead. See details in
-      // print.mojom at the definition of the `MarginType` enum.
-      return;
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
     case mojom::MarginType::kCustomMargins: {
       margins.header = 0;
       margins.footer = 0;
@@ -511,14 +474,6 @@ void PrintSettings::SetCustomMargins(
   requested_custom_margins_in_microns_ = requested_margins_in_microns;
   margin_type_ = mojom::MarginType::kCustomMargins;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void PrintSettings::SetCustomMarginsForBackend(
-    const PageMargins& requested_margins_in_microns) {
-  requested_custom_margins_in_microns_ = requested_margins_in_microns;
-  margin_type_ = mojom::MarginType::kPrecomputedMarginsForBackend;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // static
 int PrintSettings::NewCookie() {

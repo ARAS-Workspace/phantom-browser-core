@@ -108,21 +108,6 @@ class CupsPrinterImpl : public CupsPrinter {
     if (!EnsureDestInfo())
       return false;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // OAuth token passed to CUPS as IPP attribute, see b/200086039.
-    if (name &&
-        UNSAFE_TODO(strcmp(name, kSettingChromeOSAccessOAuthToken)) == 0) {
-      return true;
-    }
-
-    // Special case for the IPP 'client-info' collection because
-    // cupsCheckDestSupported will not report it as supported even when it is.
-    // See http://b/238761330.
-    if (name && UNSAFE_TODO(strcmp(name, kIppClientInfo)) == 0) {
-      return true;
-    }
-#endif
-
     int supported = cupsCheckDestSupported(cups_http_, destination_.get(),
                                            dest_info_.get(), name, value);
     return supported == 1;

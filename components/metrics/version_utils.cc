@@ -57,11 +57,7 @@ std::string GetAppPackageName() {
 }
 
 std::string GetOperatingSystemName() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return "CrOS";
-#else
   return base::SysInfo::OperatingSystemName();
-#endif
 }
 
 }  // namespace metrics

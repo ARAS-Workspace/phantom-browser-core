@@ -58,11 +58,7 @@ TEST_F(ChromeProfileDownloadServiceTrackerTest, OneProfile) {
 
 // ChromeOS does not support deletion of profiles. So, skip the tests involving
 // it.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TwoProfiles DISABLED_TwoProfiles
-#else
 #define MAYBE_TwoProfiles TwoProfiles
-#endif
 
 TEST_F(ChromeProfileDownloadServiceTrackerTest, MAYBE_TwoProfiles) {
   auto service_tracker =

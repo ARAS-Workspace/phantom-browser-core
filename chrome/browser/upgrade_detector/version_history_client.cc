@@ -22,11 +22,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/cpp/simple_url_loader.h"
 
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "base/system/sys_info.h"
-#include "chromeos/ash/components/channel/channel_info.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
 namespace {
 
 // Returns the name of the current channel, as ingested by the VersionHistory
@@ -40,19 +35,6 @@ std::string GetChannelString() {
   if (!channel.empty()) {
     return channel;
   }
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // "" could mean Stable, LTC, or LTS. Find out which.
-  std::string ash_channel_name;
-  if (base::SysInfo::GetLsbReleaseValue(ash::kChromeOSReleaseTrack,
-                                        &ash_channel_name)) {
-    if (ash_channel_name == ash::kReleaseChannelLtc) {
-      return "ltc";
-    }
-    if (ash_channel_name == ash::kReleaseChannelLts) {
-      return "lts";
-    }
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
   return "stable";
 }
 
@@ -178,10 +160,6 @@ GURL GetVersionReleasesUrl(base::Version version) {
 #else
 #define CURRENT_PLATFORM "mac"
 #endif
-
-#elif BUILDFLAG(IS_CHROMEOS)
-
-#define CURRENT_PLATFORM "chromeos"
 
 #else
 

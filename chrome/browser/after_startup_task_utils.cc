@@ -32,10 +32,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/ash/login/login_display_host.h"
-#endif
-
 using content::BrowserThread;
 
 namespace {
@@ -122,7 +118,7 @@ void SetBrowserStartupIsComplete(StartupIsCompleteReason reason) {
                        TRACE_EVENT_SCOPE_GLOBAL, "BrowserCount", browser_count);
   GetStartupCompleteFlag().Set();
   base::UmaHistogramEnumeration("Startup.BrowserStartupCompleteReason", reason);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Process::Current().CreationTime() is not available on all platforms.
   const base::Time process_creation_time =
       base::Process::Current().CreationTime();
@@ -130,7 +126,7 @@ void SetBrowserStartupIsComplete(StartupIsCompleteReason reason) {
     UMA_HISTOGRAM_LONG_TIMES("Startup.AfterStartupTaskDelayedUntilTime",
                              base::Time::Now() - process_creation_time);
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   UMA_HISTOGRAM_COUNTS_10000("Startup.AfterStartupTaskCount",
                              GetAfterStartupTasks().size());
   for (AfterStartupTask* queued_task : GetAfterStartupTasks()) {
@@ -343,18 +339,6 @@ void AfterStartupTaskUtils::FinishStartupRegistration(
     performance_manager::Graph* graph) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   g_is_monitoring_started = true;
-#if BUILDFLAG(IS_CHROMEOS)
-  // If we are on a login screen which does not expect WebUI to be loaded,
-  // Browser won't be created at startup.
-  if (ash::LoginDisplayHost::default_host() &&
-      !ash::LoginDisplayHost::default_host()->IsWebUIStarted()) {
-    content::GetUIThreadTaskRunner({})->PostTask(
-        FROM_HERE,
-        base::BindOnce(&SetBrowserStartupIsComplete,
-                       StartupIsCompleteReason::kChromeOSLoginScreen));
-    return;
-  }
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   StartupObserver::Start(graph);

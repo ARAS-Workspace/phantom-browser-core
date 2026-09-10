@@ -27,11 +27,6 @@
 #include "ui/views/test/test_widget_observer.h"
 #include "ui/views/test/widget_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/views/frame/immersive_mode_controller_chromeos.h"
-#include "chromeos/ui/frame/immersive/immersive_fullscreen_controller_test_api.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/browser_commands_mac.h"
 #include "ui/base/test/scoped_fake_nswindow_fullscreen.h"
@@ -143,7 +138,7 @@ IN_PROC_BROWSER_TEST_F(ZoomBubbleImmersiveDisabledBrowserTest,
 
   EXPECT_FALSE(zoom_bubble_coordinator_->bubble());
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   const bool should_show_toolbar = true;
 #else
   const bool should_show_toolbar = false;
@@ -188,64 +183,6 @@ IN_PROC_BROWSER_TEST_F(ZoomBubbleImmersiveDisabledBrowserTest,
   ui_test_utils::ToggleFullscreenModeAndWait(browser());
 }
 #endif  // !BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Test whether the zoom bubble is anchored and whether it is visible when in
-// immersive fullscreen.
-IN_PROC_BROWSER_TEST_F(ZoomBubbleBrowserTest, ImmersiveFullscreen) {
-  BrowserView* const browser_view =
-      BrowserView::GetBrowserViewForBrowser(browser());
-  content::WebContents* web_contents = browser_view->GetActiveWebContents();
-
-  auto* const immersive_controller = ImmersiveModeController::From(browser());
-  chromeos::ImmersiveFullscreenControllerTestApi(
-      static_cast<ImmersiveModeControllerChromeos*>(immersive_controller)
-          ->controller())
-      .SetupForTest();
-
-  // Enter immersive fullscreen.
-  ui_test_utils::ToggleFullscreenModeAndWait(browser());
-  ASSERT_TRUE(immersive_controller->IsEnabled());
-  ASSERT_FALSE(immersive_controller->IsRevealed());
-
-  // The zoom bubble should not be anchored when it is shown in immersive
-  // fullscreen and the top-of-window views are not revealed.
-  zoom_bubble_coordinator_->Show(web_contents, ZoomBubbleView::AUTOMATIC);
-  ASSERT_TRUE(zoom_bubble_coordinator_->bubble());
-  const ZoomBubbleView* zoom_bubble = zoom_bubble_coordinator_->bubble();
-  EXPECT_FALSE(zoom_bubble->GetAnchorView());
-
-  // An immersive reveal should hide the zoom bubble.
-  views::test::WidgetDestroyedWaiter waiter(
-      zoom_bubble_coordinator_->bubble()->GetWidget());
-  std::unique_ptr<ImmersiveRevealedLock> immersive_reveal_lock =
-      immersive_controller->GetRevealedLock(
-          ImmersiveModeController::ANIMATE_REVEAL_NO);
-  ASSERT_TRUE(immersive_controller->IsRevealed());
-  waiter.Wait();
-  EXPECT_EQ(nullptr, zoom_bubble_coordinator_->bubble());
-
-  // The zoom bubble should be anchored when it is shown in immersive fullscreen
-  // and the top-of-window views are revealed.
-  zoom_bubble_coordinator_->Show(web_contents, ZoomBubbleView::AUTOMATIC);
-  zoom_bubble = zoom_bubble_coordinator_->bubble();
-  ASSERT_TRUE(zoom_bubble);
-  EXPECT_TRUE(zoom_bubble->GetAnchorView());
-
-  // The top-of-window views should not hide till the zoom bubble hides. (It
-  // would be weird if the view to which the zoom bubble is anchored hid while
-  // the zoom bubble was still visible.)
-  immersive_reveal_lock.reset();
-  EXPECT_TRUE(immersive_controller->IsRevealed());
-  zoom_bubble_coordinator_->Hide();
-  // The zoom bubble is deleted on a task.
-  content::RunAllPendingInMessageLoop();
-  EXPECT_FALSE(immersive_controller->IsRevealed());
-
-  // Exit fullscreen before ending the test for the sake of sanity.
-  ui_test_utils::ToggleFullscreenModeAndWait(browser());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests that trying to open zoom bubble with stale WebContents is safe.
 IN_PROC_BROWSER_TEST_F(ZoomBubbleBrowserTest, NoWebContentsIsSafe) {

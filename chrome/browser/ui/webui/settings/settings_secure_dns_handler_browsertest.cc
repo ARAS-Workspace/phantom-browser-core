@@ -27,20 +27,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/session/user_session_manager.h"
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/ash/net/secure_dns_manager.h"
-#include "chrome/browser/browser_process_platform_part_ash.h"
-#include "chrome/browser/policy/profile_policy_connector.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/browser.h"
-#include "components/account_id/account_id.h"
-#include "components/prefs/testing_pref_service.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/user_type.h"
-#endif
-
 using testing::_;
 using testing::IsEmpty;
 using testing::Return;
@@ -194,44 +180,6 @@ class SecureDnsHandlerTest : public InProcessBrowserTest {
     return false;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Similar to `GetLastSettingsChangedMessage`, but only reads data related to
-  // template URIs with identifiers.  Returns false if the message was invalid
-  // or not found; in this case the out params may be not set.
-  bool GetIdentifierConfigsFromLastSettingsChangedMessage(
-      bool* out_doh_with_identifiers_active,
-      std::string* out_doh_config_for_display) {
-    for (const std::unique_ptr<content::TestWebUI::CallData>& data :
-         std::views::reverse(web_ui_.call_data())) {
-      if (data->function_name() != "cr.webUIListenerCallback" ||
-          !data->arg1()->is_string() ||
-          data->arg1()->GetString() != "secure-dns-setting-changed") {
-        continue;
-      }
-      const base::DictValue* dict = data->arg2()->GetIfDict();
-      if (!dict) {
-        return false;
-      }
-      std::optional<bool> doh_with_identifiers_active =
-          dict->FindBool("dohWithIdentifiersActive");
-      if (!doh_with_identifiers_active) {
-        return false;
-      }
-      *out_doh_with_identifiers_active = *doh_with_identifiers_active;
-
-      const std::string* doh_config_for_display =
-          dict->FindString("configForDisplay");
-      if (!doh_config_for_display) {
-        return false;
-      }
-      *out_doh_config_for_display = *doh_config_for_display;
-
-      return true;
-    }
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // Sets a policy update which will cause power pref managed change.
   void SetPolicyForPolicyKey(policy::PolicyMap* policy_map,
                              const std::string& policy_key,
@@ -257,12 +205,6 @@ IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsModes) {
   int management_mode;
 
   PrefService* pref_service_for_user_settings = local_state;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // On Chrome OS, the local_state is shared between all users so the user-set
-  // pref is stored in the profile's pref service.
-  pref_service_for_user_settings = browser()->GetProfile()->GetPrefs();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   pref_service_for_user_settings->SetString(prefs::kDnsOverHttpsMode,
                                             SecureDnsConfig::kModeOff);
@@ -290,14 +232,6 @@ IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsModes) {
 }
 
 IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsPolicy) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // On Chrome OS, the local_state is only used on managed profiles.
-  g_browser_process->platform_part()
-      ->secure_dns_manager()
-      ->SetPrimaryProfilePropertiesForTesting(
-          browser()->GetProfile()->GetPrefs(),
-          /*is_profile_managed=*/true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   policy::PolicyMap policy_map;
   SetPolicyForPolicyKey(&policy_map, policy::key::kDnsOverHttpsMode,
@@ -318,14 +252,6 @@ IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsPolicy) {
 }
 
 IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsPolicyChange) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // On Chrome OS, the local_state is only used on managed profiles.
-  g_browser_process->platform_part()
-      ->secure_dns_manager()
-      ->SetPrimaryProfilePropertiesForTesting(
-          browser()->GetProfile()->GetPrefs(),
-          /*is_profile_managed=*/true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   policy::PolicyMap policy_map;
   SetPolicyForPolicyKey(&policy_map, policy::key::kDnsOverHttpsMode,
@@ -351,7 +277,6 @@ IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsPolicyChange) {
 
 // On platforms where enterprise policies do not have default values, test
 // that DoH is disabled when non-DoH policies are set.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, OtherPoliciesSet) {
   policy::PolicyMap policy_map;
   SetPolicyForPolicyKey(&policy_map, policy::key::kIncognitoModeAvailability,
@@ -370,7 +295,6 @@ IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, OtherPoliciesSet) {
   EXPECT_EQ(static_cast<int>(SecureDnsConfig::ManagementMode::kDisabledManaged),
             management_mode);
 }
-#endif
 
 // This test makes no assumptions about the country or underlying resolver list.
 IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, DropdownList) {
@@ -415,12 +339,6 @@ IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsTemplates) {
   PrefService* pref_service_for_user_settings =
       g_browser_process->local_state();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On Chrome OS, the local_state is shared between all users so the user-set
-  // pref is stored in the profile's pref service.
-  pref_service_for_user_settings = browser()->GetProfile()->GetPrefs();
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   pref_service_for_user_settings->SetString(prefs::kDnsOverHttpsMode,
                                             SecureDnsConfig::kModeAutomatic);
   pref_service_for_user_settings->SetString(kDnsOverHttpsTemplatesPrefName,
@@ -447,99 +365,6 @@ IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsTemplates) {
                                             &management_mode));
   EXPECT_EQ(good_post_template, doh_config);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest,
-                       SecureDnsTemplatesWithIdentifiers) {
-  std::string templatesWithIdentifier =
-      "https://foo.test-${USER_EMAIL}/dns-query{?dns}";
-  std::string templatesWithIdentifierDisplay =
-      "https://foo.test-${stub-user@example.com}/dns-query{?dns}";
-  std::string templatesWithIdentifierEffective =
-      "https://"
-      "foo.test-"
-      "A3AB66F42D4B8C81160D04124BFFF7B197C9B10EB04BB4E75DBE0E3FFCF39FA4/"
-      "dns-query{?dns}";
-  std::string templates = "https://bar.test/dns-query{?dns}";
-
-  g_browser_process->platform_part()
-      ->secure_dns_manager()
-      ->SetPrimaryProfilePropertiesForTesting(
-          browser()->GetProfile()->GetPrefs(),
-          /*is_profile_managed=*/true);
-
-  std::string secure_dns_mode;
-  std::string doh_config, doh_config_for_display;
-  bool doh_with_identifiers_active;
-  int management_mode;
-
-  policy::PolicyMap policy_map;
-  SetPolicyForPolicyKey(&policy_map, policy::key::kDnsOverHttpsMode,
-                        base::Value(SecureDnsConfig::kModeSecure));
-  SetPolicyForPolicyKey(&policy_map, policy::key::kDnsOverHttpsTemplates,
-                        base::Value(templates));
-  SetPolicyForPolicyKey(&policy_map,
-                        policy::key::kDnsOverHttpsTemplatesWithIdentifiers,
-                        base::Value(templatesWithIdentifier));
-  SetPolicyForPolicyKey(&policy_map, policy::key::kDnsOverHttpsSalt,
-                        base::Value("salt-for-test"));
-  EXPECT_TRUE(GetLastSettingsChangedMessage(&secure_dns_mode, &doh_config,
-                                            &management_mode));
-  EXPECT_TRUE(GetIdentifierConfigsFromLastSettingsChangedMessage(
-      &doh_with_identifiers_active, &doh_config_for_display));
-  EXPECT_EQ(templatesWithIdentifierEffective, doh_config);
-  EXPECT_EQ(templatesWithIdentifierDisplay, doh_config_for_display);
-  EXPECT_TRUE(doh_with_identifiers_active);
-
-  SetPolicyForPolicyKey(&policy_map,
-                        policy::key::kDnsOverHttpsTemplatesWithIdentifiers,
-                        base::Value());
-  EXPECT_TRUE(GetLastSettingsChangedMessage(&secure_dns_mode, &doh_config,
-                                            &management_mode));
-  EXPECT_TRUE(GetIdentifierConfigsFromLastSettingsChangedMessage(
-      &doh_with_identifiers_active, &doh_config_for_display));
-  EXPECT_EQ(templates, doh_config);
-  EXPECT_FALSE(doh_with_identifiers_active);
-}
-
-// Unmanaged users store the secure DoH config as profile prefs.
-IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest,
-                       SecureDnsTemplatesForUnmanagedUsers) {
-  const char kTemplates[] = "https://test1/dns-query{?dns}";
-  const char kTemplatesAlt[] = "https://test2/dns-query{?dns}";
-
-  PrefService* local_state = g_browser_process->local_state();
-  PrefService* profile_prefs = browser()->GetProfile()->GetPrefs();
-
-  local_state->SetString(prefs::kDnsOverHttpsMode,
-                         SecureDnsConfig::kModeSecure);
-  local_state->SetString(prefs::kDnsOverHttpsTemplates, kTemplates);
-
-  std::string secure_dns_mode;
-  std::string doh_config;
-  int management_mode;
-
-  EXPECT_FALSE(GetLastSettingsChangedMessage(&secure_dns_mode, &doh_config,
-                                             &management_mode));
-
-  profile_prefs->SetString(prefs::kDnsOverHttpsMode,
-                           SecureDnsConfig::kModeSecure);
-  profile_prefs->SetString(prefs::kDnsOverHttpsTemplates, kTemplates);
-  EXPECT_TRUE(GetLastSettingsChangedMessage(&secure_dns_mode, &doh_config,
-                                            &management_mode));
-  EXPECT_EQ(secure_dns_mode, SecureDnsConfig::kModeSecure);
-  EXPECT_EQ(doh_config, kTemplates);
-
-  profile_prefs->SetString(prefs::kDnsOverHttpsMode,
-                           SecureDnsConfig::kModeAutomatic);
-  profile_prefs->SetString(prefs::kDnsOverHttpsTemplates, kTemplatesAlt);
-  EXPECT_TRUE(GetLastSettingsChangedMessage(&secure_dns_mode, &doh_config,
-                                            &management_mode));
-  EXPECT_EQ(secure_dns_mode, SecureDnsConfig::kModeAutomatic);
-  EXPECT_EQ(doh_config, kTemplatesAlt);
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, TemplateValid) {
   base::ListValue args;

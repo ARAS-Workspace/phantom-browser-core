@@ -14,7 +14,7 @@
 #error "This file only applies when Widevine used."
 #endif
 
-#if !(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if !BUILDFLAG(IS_LINUX)
 #error "This file only applies to desktop Linux and ChromeOS."
 #endif
 

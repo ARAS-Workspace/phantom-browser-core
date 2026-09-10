@@ -23,10 +23,6 @@
 #include "chrome/browser/task_manager/sampling/task_group_sampler.h"
 #include "chrome/browser/task_manager/task_manager_observer.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/task_manager/sampling/arc_shared_sampler.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace gpu {
 struct VideoMemoryUsageStats;
 }
@@ -40,7 +36,7 @@ inline constexpr int kUnsupportedVMRefreshFlags =
     REFRESH_TYPE_WEBCACHE_STATS | REFRESH_TYPE_NETWORK_USAGE |
     REFRESH_TYPE_IDLE_WAKEUPS | REFRESH_TYPE_HANDLES | REFRESH_TYPE_START_TIME |
     REFRESH_TYPE_CPU_TIME | REFRESH_TYPE_PRIORITY |
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     REFRESH_TYPE_FD_COUNT |
 #endif
     REFRESH_TYPE_HARD_FAULTS;
@@ -82,10 +78,6 @@ class TaskGroup {
   // process represented by this TaskGroup have completed.
   bool AreBackgroundCalculationsDone() const;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetArcSampler(ArcSharedSampler* sampler);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   const base::ProcessHandle& process_handle() const { return process_handle_; }
   const base::ProcessId& process_id() const { return process_id_; }
 
@@ -109,12 +101,6 @@ class TaskGroup {
   std::optional<base::ByteSize> footprint_bytes() const {
     return memory_footprint_;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  std::optional<base::ByteSize> swapped_bytes() const { return swapped_mem_; }
-  void set_swapped_bytes(base::ByteSize swapped_bytes) {
-    swapped_mem_ = swapped_bytes;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   std::optional<base::ByteSize> gpu_memory() const { return gpu_memory_; }
   void set_gpu_memory(base::ByteSize gpu_mem_bytes) {
     gpu_memory_ = gpu_mem_bytes;
@@ -131,10 +117,10 @@ class TaskGroup {
     is_backgrounded_ = is_backgrounded;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   int open_fd_count() const { return open_fd_count_; }
   void set_open_fd_count(int open_fd_count) { open_fd_count_ = open_fd_count; }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   int idle_wakeups_per_second() const { return idle_wakeups_per_second_; }
   void set_idle_wakeups_per_second(int idle_wakeups) {
@@ -146,9 +132,9 @@ class TaskGroup {
 
   void RefreshWindowsHandles();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   void OnOpenFdCountRefreshDone(int open_fd_count);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   void OnCpuRefreshDone(double cpu_usage);
   void OnSwappedMemRefreshDone(base::ByteSize swapped_mem_bytes);
@@ -157,11 +143,6 @@ class TaskGroup {
 
   void OnSamplerRefreshDone(
       std::optional<SharedSampler::SamplingResult> results);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void OnArcSamplerRefreshDone(
-      std::optional<ArcSharedSampler::MemoryFootprintBytes> results);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   void OnBackgroundRefreshTypeFinished(int64_t finished_refresh_type);
 
@@ -177,10 +158,6 @@ class TaskGroup {
   scoped_refptr<TaskGroupSampler> worker_thread_sampler_;
 
   scoped_refptr<SharedSampler> shared_sampler_;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Shared sampler that retrieves memory footprint for all ARC processes.
-  raw_ptr<ArcSharedSampler> arc_shared_sampler_ = nullptr;  // Not owned
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Lists the Tasks in this TaskGroup.
   // Tasks are not owned by the TaskGroup. They're owned by the TaskProviders.
@@ -204,10 +181,10 @@ class TaskGroup {
   // the individual tasks sharing the same process.
   std::optional<base::ByteSize> per_process_network_usage_rate_;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // The number of file descriptors currently open by the process.
   int open_fd_count_ = -1;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   int idle_wakeups_per_second_ = -1;
   bool gpu_memory_has_duplicates_ = false;
   bool is_backgrounded_ = false;

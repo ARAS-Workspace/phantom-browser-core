@@ -105,16 +105,10 @@ IN_PROC_BROWSER_TEST_F(WebAppIconManagerBrowserTest, SingleIcon) {
                                 ->GetWindowAppIcon()
                                 .Rasterize(nullptr);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  gfx::ImageSkia image_skia =
-      app_service_test().LoadAppIconBlocking(app_id, kWebAppIconSmall);
-  EXPECT_TRUE(app_service_test().AreIconImageEqual(image_skia, app_icon));
-#else
   const SkBitmap* bitmap = app_icon.bitmap();
   EXPECT_EQ(SK_ColorBLUE, bitmap->getColor(0, 0));
   EXPECT_EQ(32, bitmap->width());
   EXPECT_EQ(32, bitmap->height());
-#endif
 }
 
 }  // namespace web_app

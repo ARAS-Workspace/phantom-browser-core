@@ -1024,7 +1024,7 @@ TEST_F(RTCPeerConnectionHandlerTest, ThermalResourceDefaultValue) {
   EXPECT_TRUE(mock_peer_connection_->adaptation_resources().empty());
   pc_handler_->OnThermalStateChange(
       mojom::blink::DeviceThermalState::kCritical);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   bool expect_disabled = false;
 #else
   bool expect_disabled = true;

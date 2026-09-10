@@ -198,32 +198,6 @@ TEST(TimeFormattingTest, TimeFormatTimeOfDayDE) {
                                                            kDropAmPm));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(TimeFormattingTest, TimeMonthYearInUTC) {
-  // See third_party/icu/source/data/locales/en.txt.
-  // The date patterns are "EEEE, MMMM d, y", "MMM d, y", and "M/d/yy".
-  test::ScopedRestoreICUDefaultLocale restore_locale;
-  i18n::SetICUDefaultLocale("en_US");
-  test::ScopedRestoreDefaultTimezone la_time("America/Los_Angeles");
-
-  Time time;
-  EXPECT_TRUE(Time::FromUTCExploded(kTestDateTimeExploded, &time));
-  EXPECT_EQ(u"April 2011",
-            TimeFormatMonthAndYearForTimeZone(time, icu::TimeZone::getGMT()));
-  EXPECT_EQ(u"April 2011", TimeFormatMonthAndYear(time));
-
-  const Time::Exploded kDiffMonthsForDiffTzTime = {
-      2011, 4, 5, 1,  // Fri, Apr 1, 2011 UTC = Thurs, March 31, 2011 US PDT.
-      0,    0, 0, 0   // 00:00:00.000 UTC = 05:00:00 previous day US PDT.
-  };
-
-  EXPECT_TRUE(Time::FromUTCExploded(kDiffMonthsForDiffTzTime, &time));
-  EXPECT_EQ(u"April 2011",
-            TimeFormatMonthAndYearForTimeZone(time, icu::TimeZone::getGMT()));
-  EXPECT_EQ(u"March 2011", TimeFormatMonthAndYear(time));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST(TimeFormattingTest, TimeFormatDateUS) {
   // See third_party/icu/source/data/locales/en.txt.
   // The date patterns are "EEEE, MMMM d, y", "MMM d, y", and "M/d/yy".

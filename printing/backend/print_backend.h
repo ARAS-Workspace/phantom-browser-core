@@ -49,79 +49,6 @@ struct COMPONENT_EXPORT(PRINT_BACKEND) PrinterBasicInfo {
 
 using PrinterList = std::vector<PrinterBasicInfo>;
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-struct COMPONENT_EXPORT(PRINT_BACKEND) AdvancedCapabilityValue {
-  AdvancedCapabilityValue();
-  AdvancedCapabilityValue(const std::string& name,
-                          const std::string& display_name);
-  AdvancedCapabilityValue(const AdvancedCapabilityValue& other);
-  ~AdvancedCapabilityValue();
-
-  bool operator==(const AdvancedCapabilityValue& other) const;
-
-  // IPP identifier of the value.
-  std::string name;
-
-  // Localized name for the value.
-  std::string display_name;
-};
-
-struct COMPONENT_EXPORT(PRINT_BACKEND) AdvancedCapability {
-  enum class Type : uint8_t { kBoolean, kFloat, kInteger, kString };
-
-  AdvancedCapability();
-  AdvancedCapability(const std::string& name, AdvancedCapability::Type type);
-  AdvancedCapability(const std::string& name,
-                     const std::string& display_name,
-                     AdvancedCapability::Type type,
-                     const std::string& default_value,
-                     const std::vector<AdvancedCapabilityValue>& values);
-  AdvancedCapability(const AdvancedCapability& other);
-  ~AdvancedCapability();
-
-  bool operator==(const AdvancedCapability& other) const;
-
-  // IPP identifier of the attribute.
-  std::string name;
-
-  // Localized name for the attribute.
-  std::string display_name;
-
-  // Attribute type.
-  AdvancedCapability::Type type;
-
-  // Default value.
-  std::string default_value;
-
-  // Values for enumerated attributes.
-  std::vector<AdvancedCapabilityValue> values;
-};
-
-using AdvancedCapabilities = std::vector<AdvancedCapability>;
-
-// Describes the margins for a paper size.
-struct COMPONENT_EXPORT(PRINT_BACKEND) PaperMargins {
-  PaperMargins();
-  PaperMargins(int32_t top_margin_um,
-               int32_t right_margin_um,
-               int32_t bottom_margin_um,
-               int32_t left_margin_um);
-  PaperMargins(const PaperMargins& other);
-  PaperMargins& operator=(const PaperMargins& other);
-  ~PaperMargins();
-
-  bool operator==(const PaperMargins& other) const;
-
-  // Defines margins from their edges.
-  int32_t top_margin_um;
-  int32_t right_margin_um;
-  int32_t bottom_margin_um;
-  int32_t left_margin_um;
-};
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 struct COMPONENT_EXPORT(PRINT_BACKEND) PrinterSemanticCapsAndDefaults {
   PrinterSemanticCapsAndDefaults();
   PrinterSemanticCapsAndDefaults(const PrinterSemanticCapsAndDefaults& other);
@@ -164,10 +91,6 @@ struct COMPONENT_EXPORT(PRINT_BACKEND) PrinterSemanticCapsAndDefaults {
           const gfx::Rect& printable_area_um,
           int max_height_um,
           bool has_borderless_variant
-#if BUILDFLAG(IS_CHROMEOS)
-          ,
-          std::optional<PaperMargins> supported_margins_um = std::nullopt
-#endif  // BUILDFLAG(IS_CHROMEOS)
     );
 
     ~Paper();
@@ -204,12 +127,6 @@ struct COMPONENT_EXPORT(PRINT_BACKEND) PrinterSemanticCapsAndDefaults {
     // of this object.  Else, return false.
     bool IsSizeWithinBounds(const gfx::Size& other_um) const;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    const std::optional<PaperMargins>& supported_margins_um() const {
-      return supported_margins_um_;
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
    private:
     std::string display_name_;
     std::string vendor_id_;
@@ -231,12 +148,6 @@ struct COMPONENT_EXPORT(PRINT_BACKEND) PrinterSemanticCapsAndDefaults {
     // will be false and `printable_area_um` will cover the entire page.
     bool has_borderless_variant_ = false;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // This field represents supported margins by the printer for this paper.
-    // If this field is nullopt, it means that it was not possible to determine
-    // the margins.
-    std::optional<PaperMargins> supported_margins_um_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   };
   using Papers = std::vector<Paper>;
   Papers papers;
@@ -259,15 +170,6 @@ struct COMPONENT_EXPORT(PRINT_BACKEND) PrinterSemanticCapsAndDefaults {
   std::vector<gfx::Size> dpis;
   gfx::Size default_dpi;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bool pin_supported = false;
-  AdvancedCapabilities advanced_capabilities;
-
-  // Print scaling capability
-  std::vector<mojom::PrintScalingType> print_scaling_types;
-  mojom::PrintScalingType print_scaling_type_default =
-      mojom::PrintScalingType::kUnknownPrintScalingType;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 #if defined(UNIT_TEST)

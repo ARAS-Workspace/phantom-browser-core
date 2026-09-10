@@ -128,9 +128,7 @@ bool IsHeadlessCaptionFeatureSupported() {
 }
 
 std::string GetCaptionSettingsUrl() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return "chrome://os-settings/audioAndCaptions";
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return "chrome://settings/captions";
 #elif BUILDFLAG(IS_MAC)
   return "chrome://settings/accessibility";

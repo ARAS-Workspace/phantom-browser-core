@@ -21,11 +21,7 @@
 #include "components/policy/core/common/policy_service.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/core/user_cloud_policy_manager_ash.h"
-#else
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class ProfileAttributesStorage;
 class ProfileManager;
@@ -63,15 +59,6 @@ class TestingProfileManager : public ProfileObserver {
       const base::FilePath& profiles_path = base::FilePath(),
       std::unique_ptr<ProfileManager> profile_manager = nullptr);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  using OnProfileCreatedCallback =
-      base::RepeatingCallback<void(const std::string&, Profile*)>;
-  void set_on_profile_created_callback(OnProfileCreatedCallback callback) {
-    callback_ = callback;
-  }
-  OnProfileCreatedCallback callback_;
-#endif
-
   // Creates a new TestingProfile whose data lives in a directory related to
   // profile_name, which is a non-user-visible key for the test environment.
   // |prefs| is the PrefService used by the profile. If it is NULL, the profile
@@ -93,14 +80,8 @@ class TestingProfileManager : public ProfileObserver {
           std::nullopt,
       scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory =
           nullptr,
-#if BUILDFLAG(IS_CHROMEOS)
-      std::unique_ptr<policy::UserCloudPolicyManagerAsh> user_cloud_policy_manager =
-          nullptr);
-#else
       std::unique_ptr<policy::UserCloudPolicyManager>
           user_cloud_policy_manager = nullptr);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-  // Small helpers for creating testing profiles. Just forward to above.
   TestingProfile* CreateTestingProfile(
       const std::string& name,
       TestingProfile::TestingFactories testing_factories = {},
@@ -124,14 +105,14 @@ class TestingProfileManager : public ProfileObserver {
   TestingProfile* CreateGuestProfile(
       std::optional<TestingProfile::Builder> builder = std::nullopt);
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // Creates a new system TestingProfile whose data lives in the system profile
   // test environment directory, as specified by the profile manager.
   // This profile will not be added to the ProfileAttributesStorage. This will
   // register the TestingProfile with the profile subsystem as well.
   // The subsystem owns the Profile and returns a weak pointer.
   TestingProfile* CreateSystemProfile();
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Deletes a TestingProfile from the profile subsystem.
   void DeleteTestingProfile(const std::string& profile_name);
@@ -143,10 +124,10 @@ class TestingProfileManager : public ProfileObserver {
   // Deletes a guest TestingProfile from the profile manager.
   void DeleteGuestProfile();
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // Deletes a system TestingProfile from the profile manager.
   void DeleteSystemProfile();
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Deletes the storage instance. This is useful for testing that the storage
   // is properly persisting data.

@@ -43,15 +43,6 @@ void StubGpuService::StartPeakMemoryMonitor(uint32_t sequence_num) {}
 void StubGpuService::GetPeakMemoryUsage(uint32_t sequence_num,
                                         GetPeakMemoryUsageCallback callback) {}
 
-#if BUILDFLAG(IS_CHROMEOS)
-void StubGpuService::CreateJpegDecodeAccelerator(
-    mojo::PendingReceiver<chromeos_camera::mojom::MjpegDecodeAccelerator>
-        jda_receiver) {}
-void StubGpuService::CreateJpegEncodeAccelerator(
-    mojo::PendingReceiver<chromeos_camera::mojom::JpegEncodeAccelerator>
-        jea_receiver) {}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void StubGpuService::CreateVideoEncodeAcceleratorProvider(
     mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
         receiver) {}

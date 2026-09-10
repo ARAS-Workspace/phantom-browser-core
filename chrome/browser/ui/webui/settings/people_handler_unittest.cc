@@ -74,12 +74,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/test/base/chrome_render_view_host_test_harness.h"
-#include "chromeos/constants/pref_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 using signin::ConsentLevel;
@@ -250,13 +244,7 @@ class TestingPeopleHandler : public PeopleHandler {
 };
 
 class PeopleHandlerTest
-#if BUILDFLAG(IS_CHROMEOS)
-    // ChromeRenderViewHostTestHarness is flaky, but is required on ChromeOS
-    // because `TestWebContentsFactory` does not work out of the box.
-    : public ChromeRenderViewHostTestHarness {
-#else
     : public testing::Test {
-#endif
  public:
   PeopleHandlerTest() = default;
 
@@ -266,12 +254,8 @@ class PeopleHandlerTest
   ~PeopleHandlerTest() override = default;
 
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    ChromeRenderViewHostTestHarness::SetUp();
-#else
     profile_ = IdentityTestEnvironmentProfileAdaptor::
         CreateProfileForIdentityTestEnvironment();
-#endif
     identity_test_env_adaptor_ =
         std::make_unique<IdentityTestEnvironmentProfileAdaptor>(profile());
 
@@ -286,17 +270,7 @@ class PeopleHandlerTest
     sync_service_ = nullptr;
     DestroyPeopleHandler();
     identity_test_env_adaptor_.reset();
-#if BUILDFLAG(IS_CHROMEOS)
-    ChromeRenderViewHostTestHarness::TearDown();
-#endif
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  TestingProfile::TestingFactories GetTestingFactories() const override {
-    return IdentityTestEnvironmentProfileAdaptor::
-        GetIdentityTestEnvironmentFactories();
-  }
-#endif
 
   void SigninUserWithoutSyncFeature() {
     const CoreAccountInfo account_info = identity_test_env()->SetPrimaryAccount(
@@ -313,9 +287,7 @@ class PeopleHandlerTest
   void CreatePeopleHandler() {
     handler_ = std::make_unique<TestingPeopleHandler>(&web_ui_, profile());
     handler_->AllowJavascript();
-#if !BUILDFLAG(IS_CHROMEOS)
     web_contents_ = web_contents_factory_.CreateWebContents(profile());
-#endif
     web_ui_.set_web_contents(web_contents());
     handler_->RegisterMessages();
   }
@@ -325,9 +297,7 @@ class PeopleHandlerTest
       handler_->set_web_ui(nullptr);
       handler_->DisallowJavascript();
       handler_ = nullptr;
-#if !BUILDFLAG(IS_CHROMEOS)
       web_contents_ = nullptr;
-#endif
     }
   }
 
@@ -534,26 +504,21 @@ class PeopleHandlerTest
   }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#if !BUILDFLAG(IS_CHROMEOS)
   Profile* profile() { return profile_.get(); }
   content::WebContents* web_contents() { return web_contents_; }
 
   content::BrowserTaskEnvironment task_environment_;
-#endif
   std::unique_ptr<IdentityTestEnvironmentProfileAdaptor>
       identity_test_env_adaptor_;
-#if !BUILDFLAG(IS_CHROMEOS)
   std::unique_ptr<TestingProfile> profile_;
   content::TestWebContentsFactory web_contents_factory_;
   raw_ptr<content::WebContents> web_contents_ = nullptr;
-#endif
   raw_ptr<syncer::TestSyncService> sync_service_;
   content::TestWebUI web_ui_;
   std::unique_ptr<TestingPeopleHandler> handler_;
   base::test::ScopedFeatureList feature_list_;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PeopleHandlerTest, DisplayBasicLogin) {
   testing::StrictMock<MockSigninUiDelegate> mock_signin_ui_delegate;
   base::AutoReset<signin_ui_util::SigninUiDelegate*> delegate_auto_reset =
@@ -587,8 +552,6 @@ TEST_F(PeopleHandlerTest, DisplayBasicLogin) {
       nullptr,
       LoginUIServiceFactory::GetForProfile(profile())->current_login_ui());
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PeopleHandlerTest, DisplayConfigureWithEngineDisabledAndCancel) {
   SigninUserAndTurnSyncFeatureOn();
@@ -666,7 +629,6 @@ TEST_F(PeopleHandlerTest,
 // Verifies the case where the user cancels after the sync engine has
 // initialized. This isn't reachable on Ash because
 // IsInitialSyncFeatureSetupComplete() always returns true.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PeopleHandlerTest,
        DisplayConfigureWithEngineDisabledAndCancelAfterSigninSuccess) {
   SigninUserAndTurnSyncFeatureOn();
@@ -689,7 +651,6 @@ TEST_F(PeopleHandlerTest,
 
   EXPECT_FALSE(sync_service_->IsSetupInProgress());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PeopleHandlerTest, RestartSyncAfterDashboardClear) {
   SigninUserAndTurnSyncFeatureOn();
@@ -704,17 +665,9 @@ TEST_F(PeopleHandlerTest, RestartSyncAfterDashboardClear) {
 
   ASSERT_EQ(sync_service_->GetTransportState(),
             syncer::SyncService::TransportState::INITIALIZING);
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_TRUE(sync_user_settings()->IsSyncFeatureDisabledViaDashboard());
-#else   // BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(sync_user_settings()->IsInitialSyncFeatureSetupComplete());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   handler_->HandleShowSyncSetupUI(base::ListValue());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(sync_user_settings()->IsSyncFeatureDisabledViaDashboard());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Since the engine is not initialized yet, no prefs should be sent.
   EXPECT_EQ(0U, GetFiredSyncPrefsChanged().size());
@@ -1048,7 +1001,6 @@ TEST_F(PeopleHandlerTest, ShowSetupCustomPassphraseRequired) {
 // Verifies that the user is not prompted to enter the custom passphrase while
 // sync setup is ongoing. This isn't reachable on Ash because
 // IsInitialSyncFeatureSetupComplete() always returns true.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PeopleHandlerTest, OngoingSetupCustomPassphraseRequired) {
   SigninUserWithoutSyncFeature();
   CreatePeopleHandler();
@@ -1065,7 +1017,6 @@ TEST_F(PeopleHandlerTest, OngoingSetupCustomPassphraseRequired) {
   base::DictValue dictionary = ExpectSyncPrefsChanged();
   ExpectHasBoolKey(dictionary, "passphraseRequired", false);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PeopleHandlerTest, ShowSetupTrustedVaultKeysRequired) {
   SigninUserAndTurnSyncFeatureOn();
@@ -1159,11 +1110,7 @@ TEST_F(PeopleHandlerTest, DashboardClearWhileSettingsOpen_ConfirmSoon) {
   sync_service_->MimicDashboardClear();
   sync_service_->FireStateChanged();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_TRUE(sync_user_settings()->IsSyncFeatureDisabledViaDashboard());
-#else   // BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(sync_user_settings()->IsInitialSyncFeatureSetupComplete());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Now the user confirms sync again. This should set both the sync-requested
   // and the first-setup-complete bits.
@@ -1185,11 +1132,7 @@ TEST_F(PeopleHandlerTest, DashboardClearWhileSettingsOpen_ConfirmLater) {
   sync_service_->MimicDashboardClear();
   sync_service_->FireStateChanged();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_TRUE(sync_user_settings()->IsSyncFeatureDisabledViaDashboard());
-#else   // BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(sync_user_settings()->IsInitialSyncFeatureSetupComplete());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Sync starts up in transport mode.
   ASSERT_EQ(sync_service_->GetTransportState(),
@@ -1249,49 +1192,6 @@ TEST(PeopleHandlerDiceTest, StoredAccountsList) {
   EXPECT_EQ("b@gmail.com", *accounts[1].GetDict().FindString("email"));
 }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Regression test for crash in guest mode. https://crbug.com/40114033
-TEST(PeopleHandlerGuestModeTest, GetStoredAccountsList) {
-  content::BrowserTaskEnvironment task_environment;
-  TestingProfile::Builder builder;
-  builder.SetGuestSession();
-  std::unique_ptr<Profile> profile = builder.Build();
-
-  PeopleHandler handler(profile.get());
-  base::ListValue accounts = handler.GetStoredAccountsList();
-  EXPECT_TRUE(accounts.empty());
-}
-
-TEST_F(PeopleHandlerTest, GetStoredAccountsList) {
-  // Chrome OS sets an unconsented primary account on login.
-  identity_test_env()->MakePrimaryAccountAvailable("user@gmail.com",
-                                                   ConsentLevel::kSignin);
-  ASSERT_FALSE(identity_manager()->HasPrimaryAccount(ConsentLevel::kSync));
-
-  CreatePeopleHandler();
-  base::ListValue accounts = handler_->GetStoredAccountsList();
-  ASSERT_EQ(1u, accounts.size());
-  EXPECT_EQ("user@gmail.com", *accounts[0].GetDict().FindString("email"));
-}
-
-TEST_F(PeopleHandlerTest, SyncCookiesDisabled) {
-  base::test::ScopedFeatureList features;
-  // Disable Floating SSO feature flag.
-  features.InitWithFeatures(
-      /*enabled_features=*/{},
-      /*disabled_features=*/{ash::features::kFloatingSso});
-
-  SigninUserAndTurnSyncFeatureOn();
-  CreatePeopleHandler();
-
-  const base::DictValue& sync_status_values =
-      handler_->GetSyncStatusDictionary();
-  std::optional<bool> sync_cookies_supported =
-      sync_status_values.FindBool("syncCookiesSupported");
-  EXPECT_FALSE(sync_cookies_supported.has_value());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 TEST_F(PeopleHandlerTest, ChromeSigninUserChoice) {
@@ -1781,56 +1681,6 @@ TEST_F(
 
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-class PeopleHandlerWithCookiesSyncTest : public PeopleHandlerTest {
- private:
-  // Enable Floating SSO feature flag.
-  base::test::ScopedFeatureList features_{ash::features::kFloatingSso};
-};
-
-TEST_F(PeopleHandlerWithCookiesSyncTest, SyncCookiesSupported) {
-  SigninUserAndTurnSyncFeatureOn();
-  CreatePeopleHandler();
-
-  // Feature flag enabled, policy unset.
-  {
-    const base::DictValue& sync_status_values =
-        handler_->GetSyncStatusDictionary();
-    std::optional<bool> sync_cookies_supported =
-        sync_status_values.FindBool("syncCookiesSupported");
-    ASSERT_TRUE(sync_cookies_supported.has_value());
-    EXPECT_FALSE(sync_cookies_supported.value());
-  }
-
-  // Feature flag enabled, policy set to false.
-  {
-    profile()->GetPrefs()->SetBoolean(chromeos::prefs::kFloatingSsoEnabled,
-                                      false);
-
-    const base::DictValue& sync_status_values =
-        handler_->GetSyncStatusDictionary();
-    std::optional<bool> sync_cookies_supported =
-        sync_status_values.FindBool("syncCookiesSupported");
-    ASSERT_TRUE(sync_cookies_supported.has_value());
-    EXPECT_FALSE(sync_cookies_supported.value());
-  }
-
-  // Feature flag enabled, policy set to true.
-  {
-    profile()->GetPrefs()->SetBoolean(chromeos::prefs::kFloatingSsoEnabled,
-                                      true);
-
-    const base::DictValue& sync_status_values =
-        handler_->GetSyncStatusDictionary();
-    std::optional<bool> sync_cookies_supported =
-        sync_status_values.FindBool("syncCookiesSupported");
-    ASSERT_TRUE(sync_cookies_supported.has_value());
-    EXPECT_TRUE(sync_cookies_supported.value());
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS)
 class PeopleHandlerWithReplaceSyncWithSigninUI : public PeopleHandlerTest {
   void SetUp() override {
     PeopleHandlerTest::SetUp();
@@ -1952,5 +1802,4 @@ TEST(PeopleHandlerDiceTest, RecordSigninOffered) {
 }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }  // namespace settings

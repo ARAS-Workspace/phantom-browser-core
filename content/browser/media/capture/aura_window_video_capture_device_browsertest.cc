@@ -292,32 +292,6 @@ IN_PROC_BROWSER_TEST_F(AuraWindowVideoCaptureDeviceBrowserTest,
   StopAndDeAllocate();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Disabled (https://crbug.com/1096946)
-// On ChromeOS, another window may occlude a window that is being captured.
-// Make sure the visibility is set to visible during capture if it's occluded.
-IN_PROC_BROWSER_TEST_F(AuraWindowVideoCaptureDeviceBrowserTest,
-                       DISABLED_CapturesOccludedWindows) {
-  NavigateToInitialDocument();
-  AllocateAndStartAndWaitForFirstFrame();
-
-  ASSERT_EQ(aura::Window::OcclusionState::VISIBLE,
-            shell()->web_contents()->GetNativeView()->GetOcclusionState());
-  // Create a window on top of the window being captured with same size so that
-  // it is occluded.
-  auto window = std::make_unique<aura::Window>(nullptr);
-  window->Init(ui::LAYER_TEXTURED);
-  shell()->window()->GetRootWindow()->AddChild(window.get());
-  window->SetBounds(shell()->window()->bounds());
-  window->Show();
-  EXPECT_EQ(aura::Window::OcclusionState::VISIBLE,
-            shell()->web_contents()->GetNativeView()->GetOcclusionState());
-
-  window.reset();
-  StopAndDeAllocate();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class AuraWindowVideoCaptureDeviceBrowserTestP
     : public AuraWindowVideoCaptureDeviceBrowserTest,
       public testing::WithParamInterface<std::tuple<bool, bool>> {
@@ -330,16 +304,6 @@ class AuraWindowVideoCaptureDeviceBrowserTestP
   }
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    AuraWindowVideoCaptureDeviceBrowserTestP,
-    testing::Combine(
-        // Note: On ChromeOS, software compositing is not an option.
-        testing::Values(false /* GPU-accelerated compositing */),
-        testing::Values(false /* variable aspect ratio */,
-                        true /* fixed aspect ratio */)));
-#else
 INSTANTIATE_TEST_SUITE_P(
     All,
     AuraWindowVideoCaptureDeviceBrowserTestP,
@@ -347,7 +311,6 @@ INSTANTIATE_TEST_SUITE_P(
                                      true /* software compositing */),
                      testing::Values(false /* variable aspect ratio */,
                                      true /* fixed aspect ratio */)));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Disabled (https://crbug.com/1096946)
 // Tests that the device successfully captures a series of content changes,

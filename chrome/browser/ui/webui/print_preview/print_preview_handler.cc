@@ -78,16 +78,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #endif  // BUILDFLAG(IS_MAC)
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "ash/webui/settings/public/constants/routes.mojom.h"
-#include "chrome/browser/ash/drive/drive_integration_service.h"
-#include "chrome/browser/ash/drive/drive_integration_service_factory.h"
-#include "chromeos/ash/experiences/settings_ui/settings_app_manager.h"
-#include "components/session_manager/core/session.h"
-#include "components/session_manager/core/session_manager.h"
-#include "components/user_manager/user_manager.h"
-#endif
 
 #if DCHECK_IS_ON()
 #include "base/debug/stack_trace.h"
@@ -164,23 +154,6 @@ const char kCssBackground[] = "cssBackground";
 // Name of a dictionary pref holding the policy value for the paper size
 // setting.
 const char kMediaSize[] = "mediaSize";
-#if BUILDFLAG(IS_CHROMEOS)
-// Name of a dictionary field holding policy value for the setting.
-const char kValue[] = "value";
-// Name of a dictionary pref holding the policy value for the sheets number.
-const char kSheets[] = "sheets";
-// Name of a dictionary pref holding the policy value for the color setting.
-const char kColor[] = "color";
-// Name of a dictionary pref holding the policy value for the duplex setting.
-const char kDuplex[] = "duplex";
-// Name of a dictionary pref holding the policy value for the pin setting.
-const char kPin[] = "pin";
-// Name of a dictionary field indicating whether the user's Drive directory is
-// mounted.
-const char kIsDriveMounted[] = "isDriveMounted";
-#endif  // BUILDFLAG(IS_CHROMEOS)
-// Name of a dictionary field indicating whether the 'Save to PDF' destination
-// is disabled.
 const char kPdfPrinterDisabled[] = "pdfPrinterDisabled";
 // Name of a dictionary field indicating whether the destinations are managed by
 // the PrinterTypeDenyList enterprise policy.
@@ -207,12 +180,6 @@ UserActionBuckets DetermineUserAction(const base::DictValue& settings) {
 #if BUILDFLAG(IS_MAC)
   if (settings.contains(kSettingOpenPDFInPreview)) {
     return UserActionBuckets::kOpenInMacPreview;
-  }
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (settings.FindBool(kSettingPrintToGoogleDrive).value_or(false)) {
-    return UserActionBuckets::kPrintToGoogleDriveCros;
   }
 #endif
 
@@ -305,68 +272,6 @@ base::DictValue GetPolicies(const PrefService& prefs) {
     policies.Set(kPrintPdfAsImage,
                  std::move(print_as_image_for_pdf_default_policy));
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (prefs.HasPrefPath(ash::prefs::kPrintingMaxSheetsAllowed)) {
-    int max_sheets = prefs.GetInteger(ash::prefs::kPrintingMaxSheetsAllowed);
-    if (max_sheets >= 0) {
-      base::DictValue sheets_policy;
-      sheets_policy.Set(kValue, max_sheets);
-      policies.Set(kSheets, std::move(sheets_policy));
-    }
-  }
-
-  base::DictValue color_policy;
-  if (prefs.HasPrefPath(ash::prefs::kPrintingAllowedColorModes)) {
-    int value = prefs.GetInteger(ash::prefs::kPrintingAllowedColorModes);
-    if (value) {
-      color_policy.Set(kAllowedMode, value);
-    }
-  }
-  if (prefs.HasPrefPath(ash::prefs::kPrintingColorDefault)) {
-    int value = prefs.GetInteger(ash::prefs::kPrintingColorDefault);
-    if (value) {
-      color_policy.Set(kDefaultMode, value);
-    }
-  }
-  if (!color_policy.empty()) {
-    policies.Set(kColor, std::move(color_policy));
-  }
-
-  base::DictValue duplex_policy;
-  if (prefs.HasPrefPath(ash::prefs::kPrintingAllowedDuplexModes)) {
-    int value = prefs.GetInteger(ash::prefs::kPrintingAllowedDuplexModes);
-    if (value) {
-      duplex_policy.Set(kAllowedMode, value);
-    }
-  }
-  if (prefs.HasPrefPath(ash::prefs::kPrintingDuplexDefault)) {
-    int value = prefs.GetInteger(ash::prefs::kPrintingDuplexDefault);
-    if (value) {
-      duplex_policy.Set(kDefaultMode, value);
-    }
-  }
-  if (!duplex_policy.empty()) {
-    policies.Set(kDuplex, std::move(duplex_policy));
-  }
-
-  base::DictValue pin_policy;
-  if (prefs.HasPrefPath(ash::prefs::kPrintingAllowedPinModes)) {
-    int value = prefs.GetInteger(ash::prefs::kPrintingAllowedPinModes);
-    if (value) {
-      pin_policy.Set(kAllowedMode, value);
-    }
-  }
-  if (prefs.HasPrefPath(ash::prefs::kPrintingPinDefault)) {
-    int value = prefs.GetInteger(ash::prefs::kPrintingPinDefault);
-    if (value) {
-      pin_policy.Set(kDefaultMode, value);
-    }
-  }
-  if (!pin_policy.empty()) {
-    policies.Set(kPin, std::move(pin_policy));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   return policies;
 }
@@ -884,9 +789,6 @@ void PrintPreviewHandler::SendInitialSettings(
   base::DictValue initial_settings;
   initial_settings.Set(kDocumentTitle, print_preview_ui()->initiator_title());
   initial_settings.Set(kSettingPreviewModifiable, !is_pdf);
-#if BUILDFLAG(IS_CHROMEOS)
-  initial_settings.Set(kSettingPreviewIsFromArc, request_params->is_from_arc);
-#endif
   initial_settings.Set(kSettingPrinterName, default_printer);
   initial_settings.Set(kDocumentHasSelection, request_params->has_selection);
   initial_settings.Set(kSettingShouldPrintSelectionOnly,
@@ -924,14 +826,6 @@ void PrintPreviewHandler::SendInitialSettings(
   }
 
   GetLocaleInformation(&initial_settings);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  drive::DriveIntegrationService* drive_service =
-      drive::DriveIntegrationServiceFactory::GetForProfile(
-          Profile::FromWebUI(web_ui()));
-  initial_settings.Set(kIsDriveMounted,
-                       drive_service && drive_service->IsMounted());
-#endif
 
   ResolveJavascriptCallback(base::Value(callback_id), initial_settings);
 }
@@ -1195,19 +1089,7 @@ void PrintPreviewHandler::SetPdfSavedClosureForTesting(
 }
 
 void PrintPreviewHandler::HandleManagePrinters(const base::ListValue& args) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/447287122): Consider to use the active session, instead of
-  // primary session, or pass the user context from callers.
-  auto* session = session_manager::SessionManager::Get()->GetPrimarySession();
-  CHECK(session);
-  auto* user =
-      user_manager::UserManager::Get()->FindUser(session->account_id());
-  ash::SettingsAppManager::Get()->Open(
-      CHECK_DEREF(user),
-      {.sub_page = chromeos::settings::mojom::kPrintingDetailsSubpagePath});
-#else
   printing::PrinterManagerDialog::ShowPrinterManagerDialog();
-#endif
 }
 
 }  // namespace printing

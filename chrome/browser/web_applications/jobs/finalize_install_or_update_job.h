@@ -26,10 +26,6 @@
 #include "components/webapps/browser/installable/installable_metrics.h"
 #include "components/webapps/common/web_app_id.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/experiences/system_web_apps/types/system_web_app_data.h"
-#endif
-
 class Profile;
 
 namespace webapps {
@@ -78,9 +74,6 @@ struct FinalizeJobOptions {
   bool skip_icon_writes_on_download_failure = false;
 
   std::optional<WebAppChromeOsData> chromeos_data;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::optional<ash::SystemWebAppData> system_web_app_data;
-#endif
 
   // These are required to be false if `install_state` is not
   // proto::INSTALLED_WITH_OS_INTEGRATION.
@@ -91,7 +84,7 @@ struct FinalizeJobOptions {
   // defaults to false on ChromeOS, while remaining true by default on other
   // desktop platforms where it has the expected native shortcut-creation
   // effect.
-  bool add_to_quick_launch_bar = !BUILDFLAG(IS_CHROMEOS);
+  bool add_to_quick_launch_bar = true;
   std::optional<RunOnOsLoginMode> run_on_os_login_mode;
 
   // Controls fetching and validation of web_app_origin_association data

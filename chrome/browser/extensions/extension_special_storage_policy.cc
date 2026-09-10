@@ -42,10 +42,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/webui_url_constants.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 using content::BrowserThread;
@@ -138,15 +134,6 @@ bool ExtensionSpecialStoragePolicy::IsStorageUnlimited(const GURL& origin) {
       origin.host() == chrome::kChromeUIDevToolsHost) {
     return true;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // chrome-untrusted://terminal/ runs the SSH extension code which can store
-  // SSH known_hosts, config, and Identity keys. Use unlimitedStorage to match
-  // extension config.
-  if (origin == ash::kChromeUIUntrustedTerminalURL) {
-    return true;
-  }
-#endif
 
   base::AutoLock locker(lock_);
   if (origins_with_unlimited_storage_.contains(url::Origin::Create(origin))) {

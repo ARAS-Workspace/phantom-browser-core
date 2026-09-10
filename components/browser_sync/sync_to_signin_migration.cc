@@ -90,7 +90,6 @@ enum class SyncToSigninMigrationExecutionMode {
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/sync/enums.xml:SyncToSigninMigrationExecutionMode)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
 // LINT.IfChange(SyncSetupIncompleteMigrationDecision)
@@ -103,7 +102,6 @@ enum class SyncSetupIncompleteMigrationDecision {
   kMaxValue = kDontMigrateFlagDisabled
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/sync/enums.xml:SyncSetupIncompleteMigrationDecision)
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // See docs of the kFirstTimeTriedToMigrateSyncFeaturePausedToSignin pref.
 void SetFirstTimeTriedToMigrateSyncPaused(PrefService* pref_service) {
@@ -242,10 +240,8 @@ void UndoSyncToSigninMigration(PrefService* pref_service) {
 
   // Mark the user as syncing again.
   pref_service->SetBoolean(prefs::kGoogleServicesConsentedToSync, true);
-#if !BUILDFLAG(IS_CHROMEOS)
   pref_service->SetBoolean(
       syncer::prefs::internal::kSyncInitialSyncFeatureSetupComplete, true);
-#endif
 
   // Restore the "previously syncing user" prefs too.
   pref_service->SetString(prefs::kGoogleServicesLastSyncingGaiaId,
@@ -545,10 +541,8 @@ void MaybeMigrateSyncingUserToSignedInInternal(
   // Also clear the "InitialSyncFeatureSetup" pref. It's not needed
   // post-migration, and that pref being true without ConsentLevel::kSync would
   // be an inconsistent state.
-#if !BUILDFLAG(IS_CHROMEOS)
   pref_service->ClearPref(
       syncer::prefs::internal::kSyncInitialSyncFeatureSetupComplete);
-#endif
 
   // Migrate the global data type prefs (used for Sync-the-feature) over to the
   // account-specific ones.
@@ -656,7 +650,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
 }
 
 // On ChromeOS, there exists no sync setup incomplete state.
-#if !BUILDFLAG(IS_CHROMEOS)
 SyncSetupIncompleteMigrationDecision GetSyncSetupIncompleteMigrationDecision(
     PrefService* pref_service) {
   if (pref_service->GetString(prefs::kGoogleServicesAccountId).empty()) {
@@ -704,7 +697,6 @@ void MaybeMigrateUserWithSyncSetupIncomplete(const base::FilePath& profile_path,
   pref_service->ClearPref(
       syncer::prefs::internal::kSyncInitialSyncFeatureSetupComplete);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -712,13 +704,8 @@ SyncToSigninMigrationDataTypeDecision GetSyncToSigninMigrationDataTypeDecision(
     const PrefService* pref_service,
     syncer::DataType type,
     const char* type_enabled_pref) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // In ChromeOS-Ash, the "initial-setup-complete" pref doesn't exist.
-  bool initial_setup_complete = true;
-#else
   bool initial_setup_complete = pref_service->GetBoolean(
       syncer::prefs::internal::kSyncInitialSyncFeatureSetupComplete);
-#endif
   bool sync_everything = pref_service->GetBoolean(
       syncer::prefs::internal::kSyncKeepEverythingSynced);
 
@@ -741,9 +728,7 @@ SyncToSigninMigrationDataTypeDecision GetSyncToSigninMigrationDataTypeDecision(
 void MaybeMigrateSyncingUserToSignedIn(const base::FilePath& profile_path,
                                        PrefService* pref_service) {
   // On ChromeOS, there exists no sync setup incomplete state.
-#if !BUILDFLAG(IS_CHROMEOS)
   MaybeMigrateUserWithSyncSetupIncomplete(profile_path, pref_service);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   MaybeMigrateSyncingUserToSignedInInternal(profile_path, pref_service, {});
 }
 

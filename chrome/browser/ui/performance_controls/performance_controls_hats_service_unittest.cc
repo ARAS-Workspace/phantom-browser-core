@@ -25,10 +25,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif
-
 namespace {
 
 using performance_manager::features::kPerformanceControlsPPMSurveyMaxDelay;

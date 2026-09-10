@@ -44,14 +44,6 @@
 #include "net/test/cert_test_util.h"
 #include "net/test/test_data_directory.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
-#include "chrome/browser/ash/policy/core/user_cloud_policy_manager_ash.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#include "chrome/browser/policy/dm_token_utils.h"
-#include "chromeos/dbus/constants/dbus_switches.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/device_signals/core/common/signals_features.h"
 #endif
@@ -132,7 +124,7 @@ class MockClientCertStore : public net::ClientCertStore {
 class EnterpriseReportingPrivateGetContextInfoBaseBrowserTest
     : public InProcessBrowserTest {
  public:
-#if !BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
   void SetUpDefaultCommandLine(base::CommandLine* command_line) override {
     InProcessBrowserTest::SetUpDefaultCommandLine(command_line);
     command_line->AppendSwitch(::switches::kEnableChromeBrowserCloudManagement);
@@ -140,9 +132,6 @@ class EnterpriseReportingPrivateGetContextInfoBaseBrowserTest
 #endif
 
   void SetupDMToken() {
-#if BUILDFLAG(IS_CHROMEOS)
-    policy::SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
-#else
     browser_dm_token_storage_ =
         std::make_unique<policy::FakeBrowserDMTokenStorage>();
     browser_dm_token_storage_->SetEnrollmentToken("enrollment_token");
@@ -150,7 +139,6 @@ class EnterpriseReportingPrivateGetContextInfoBaseBrowserTest
     browser_dm_token_storage_->SetDMToken("dm_token");
     policy::BrowserDMTokenStorage::SetForTesting(
         browser_dm_token_storage_.get());
-#endif
   }
 
  private:
@@ -181,15 +169,9 @@ class EnterpriseReportingPrivateGetContextInfoBrowserTest
         SetUpOnMainThread();
 
     if (browser_managed()) {
-#if BUILDFLAG(IS_CHROMEOS)
-      auto* browser_policy_manager = g_browser_process->platform_part()
-                                         ->browser_policy_connector_ash()
-                                         ->GetDeviceCloudPolicyManager();
-#else
       auto* browser_policy_manager =
           g_browser_process->browser_policy_connector()
               ->machine_level_user_cloud_policy_manager();
-#endif
       auto browser_policy_data =
           std::make_unique<enterprise_management::PolicyData>();
       browser_policy_data->add_device_affiliation_ids(kBrowserID1);
@@ -199,15 +181,8 @@ class EnterpriseReportingPrivateGetContextInfoBrowserTest
     }
 
     if (profile_managed()) {
-#if BUILDFLAG(IS_CHROMEOS)
-      auto* profile_policy_manager =
-          GetProfile()->GetUserCloudPolicyManagerAsh();
-      profile_policy_manager->core()->client()->SetupRegistration(
-          "dm_token", "client_id", {});
-#else
       enterprise_connectors::test::SetProfileDMToken(GetProfile(), "dm_token");
       auto* profile_policy_manager = GetProfile()->GetUserCloudPolicyManager();
-#endif
       auto profile_policy_data =
           std::make_unique<enterprise_management::PolicyData>();
       profile_policy_data->add_user_affiliation_ids(kProfileID1);
@@ -272,76 +247,6 @@ IN_PROC_BROWSER_TEST_P(
   EXPECT_EQ(version_info::GetVersionNumber(), info->browser_version);
   EXPECT_EQ(site_isolation_enabled(), info->site_isolation_enabled);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class EnterpriseReportingPrivateGetContextInfoChromeOSFirewallTest
-    : public EnterpriseReportingPrivateGetContextInfoBaseBrowserTest,
-      public testing::WithParamInterface<bool> {
- public:
-  bool dev_mode_enabled() { return GetParam(); }
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    if (dev_mode_enabled()) {
-      command_line->AppendSwitch(chromeos::switches::kSystemDevMode);
-    } else {
-      command_line->RemoveSwitch(chromeos::switches::kSystemDevMode);
-    }
-  }
-
-  bool BuiltInDnsClientPlatformDefault() {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_LINUX)
-    return true;
-#else
-    return false;
-#endif
-  }
-};
-
-IN_PROC_BROWSER_TEST_P(
-    EnterpriseReportingPrivateGetContextInfoChromeOSFirewallTest,
-    Test) {
-  auto function =
-      base::MakeRefCounted<EnterpriseReportingPrivateGetContextInfoFunction>();
-  auto context_info_value = api_test_utils::RunFunctionAndReturnSingleResult(
-      function.get(),
-      /*args*/ "[]", GetProfile());
-  ASSERT_TRUE(context_info_value);
-  ASSERT_TRUE(context_info_value->is_dict());
-
-  auto info = enterprise_reporting_private::ContextInfo::FromValue(
-      context_info_value->GetDict());
-  ASSERT_TRUE(info);
-
-  EXPECT_TRUE(info->browser_affiliation_ids.empty());
-  EXPECT_TRUE(info->profile_affiliation_ids.empty());
-  EXPECT_TRUE(info->on_file_attached_providers.empty());
-  EXPECT_TRUE(info->on_file_downloaded_providers.empty());
-  EXPECT_TRUE(info->on_bulk_data_entry_providers.empty());
-  EXPECT_TRUE(info->on_print_providers.empty());
-  EXPECT_EQ(enterprise_reporting_private::RealtimeUrlCheckMode::kDisabled,
-            info->realtime_url_check_mode);
-  EXPECT_TRUE(info->on_security_event_providers.empty());
-  EXPECT_EQ(version_info::GetVersionNumber(), info->browser_version);
-  EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
-            info->safe_browsing_protection_level);
-  EXPECT_EQ(BuiltInDnsClientPlatformDefault(),
-            info->built_in_dns_client_enabled);
-  EXPECT_EQ(
-      enterprise_reporting_private::PasswordProtectionTrigger::kPolicyUnset,
-      info->password_protection_warning_trigger);
-  EXPECT_FALSE(info->chrome_remote_desktop_app_blocked);
-  EXPECT_EQ(dev_mode_enabled()
-                ? api::enterprise_reporting_private::SettingValue::kUnknown
-                : api::enterprise_reporting_private::SettingValue::kEnabled,
-            info->os_firewall);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    EnterpriseReportingPrivateGetContextInfoChromeOSFirewallTest,
-    testing::Bool());
-#endif
 
 IN_PROC_BROWSER_TEST_P(EnterpriseReportingPrivateGetContextInfoBrowserTest,
                        AffiliationIDs) {

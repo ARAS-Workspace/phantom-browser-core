@@ -207,7 +207,7 @@ class ChromeBrowserMainParts : public content::BrowserMainParts {
   downgrade::DowngradeManager downgrade_manager_;
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Android's first run is done in Java instead of native. Chrome OS does not
   // use master preferences.
   std::unique_ptr<first_run::MasterPrefs> master_prefs_;

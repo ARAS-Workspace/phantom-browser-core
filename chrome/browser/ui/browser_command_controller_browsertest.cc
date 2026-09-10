@@ -86,16 +86,6 @@
 #include "ui/actions/actions.h"
 #include "ui/base/ui_base_features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-#include "ash/constants/ash_switches.h"
-#include "ash/wm/window_pin_util.h"
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#include "chrome/browser/ash/login/test/guest_session_mixin.h"
-#include "chrome/test/base/mixin_based_in_process_browser_test.h"
-#include "ui/aura/window.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "extensions/buildflags/buildflags.h"
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -119,10 +109,6 @@ class BrowserCommandControllerBrowserTest : public InProcessBrowserTest {
   ~BrowserCommandControllerBrowserTest() override = default;
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
   }
 };
 
@@ -228,7 +214,6 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
   EXPECT_FALSE(chrome::IsCommandEnabled(browser(), IDC_MOVE_TAB_TO_NEW_WINDOW));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
                        NewAvatarMenuEnabledInGuestMode) {
   EXPECT_EQ(1U, GlobalBrowserCollection::GetInstance()->GetSize());
@@ -240,143 +225,6 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
       chrome::BrowserCommandController::From(browser);
   EXPECT_TRUE(command_updater->IsCommandEnabled(IDC_SHOW_AVATAR_MENU));
 }
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-class BrowserCommandControllerBrowserTestLockedFullscreen
-    : public BrowserCommandControllerBrowserTest {
- protected:
-  void SetUpOnMainThread() override {
-    BrowserCommandControllerBrowserTest::SetUpOnMainThread();
-
-    // Set up browser for testing / validating page navigation and tab
-    // management command states. This mostly involves opening a new tab and
-    // ensuring that we are able to navigate back and forward for the test.
-    OpenUrlWithDisposition(GURL("chrome://new-tab-page/"),
-                           WindowOpenDisposition::NEW_FOREGROUND_TAB);
-    OpenUrlWithDisposition(GURL("chrome://version/"),
-                           WindowOpenDisposition::CURRENT_TAB);
-    OpenUrlWithDisposition(GURL("about:blank"),
-                           WindowOpenDisposition::CURRENT_TAB);
-
-    // Go back by one page to ensure the forward command is also available for
-    // testing purposes.
-    content::TestNavigationObserver navigation_observer(
-        browser()->tab_strip_model()->GetActiveWebContents());
-    chrome::GoBack(browser(), WindowOpenDisposition::CURRENT_TAB);
-    navigation_observer.Wait();
-    ASSERT_TRUE(chrome::CanGoBack(browser()));
-    ASSERT_TRUE(chrome::CanGoForward(browser()));
-  }
-
-  void EnterLockedFullscreen() {
-    ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/true);
-
-    // Update the corresponding command controller state as well as other
-    // states so we can verify what commands are enabled.
-    chrome::BrowserCommandController::From(browser())
-        ->LockedFullscreenStateChanged();
-    chrome::BrowserCommandController::From(browser())->TabStateChanged();
-    chrome::BrowserCommandController::From(browser())->FullscreenStateChanged();
-    chrome::BrowserCommandController::From(browser())->PrintingStateChanged();
-    chrome::BrowserCommandController::From(browser())->ExtensionStateChanged();
-    chrome::BrowserCommandController::From(browser())
-        ->FindBarVisibilityChanged();
-    chrome::BrowserCommandController::From(browser())->UpdateReloadStopState(
-        /*is_loading=*/true,
-        /*force=*/false);
-  }
-
-  void ExitLockedFullscreen() {
-    ash::UnpinWindow(browser()->GetWindow()->GetNativeWindow());
-    chrome::BrowserCommandController::From(browser())
-        ->LockedFullscreenStateChanged();
-  }
-
-  CommandUpdater* GetCommandUpdater() {
-    return chrome::BrowserCommandController::From(browser())
-        ->command_updater_.get();
-  }
-
- private:
-  void OpenUrlWithDisposition(GURL url, WindowOpenDisposition disposition) {
-    ASSERT_TRUE(ui_test_utils::NavigateToURLWithDisposition(
-        browser(), url, disposition,
-        ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP));
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestLockedFullscreen,
-                       WhenNotLockedForOnTask) {
-  ash::boca::OnTaskLockedController::From(browser())->set_locked_for_on_task(
-      false);
-  CommandUpdater* const command_updater = GetCommandUpdater();
-
-  // IDC_EXIT is always enabled in regular mode so it's a perfect candidate for
-  // testing.
-  EXPECT_TRUE(command_updater->IsCommandEnabled(IDC_EXIT));
-  EnterLockedFullscreen();
-
-  // IDC_EXIT is not enabled in locked fullscreen.
-  EXPECT_FALSE(command_updater->IsCommandEnabled(IDC_EXIT));
-  constexpr int kAllowlistedIds[] = {IDC_CUT, IDC_COPY, IDC_PASTE};
-
-  // Go through all the command ids and ensure only allowlisted commands are
-  // enabled.
-  for (int id : command_updater->GetAllIds()) {
-    bool is_command_allowlisted = std::ranges::contains(kAllowlistedIds, id);
-    EXPECT_EQ(command_updater->IsCommandEnabled(id), is_command_allowlisted)
-        << "Command " << id << " failed to meet enabled state expectation";
-  }
-
-  // Exit locked fullscreen and verify IDC_EXIT is enabled again.
-  ExitLockedFullscreen();
-  EXPECT_TRUE(command_updater->IsCommandEnabled(IDC_EXIT));
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestLockedFullscreen,
-                       WhenLockedForOnTask) {
-  ash::boca::OnTaskLockedController::From(browser())->set_locked_for_on_task(
-      true);
-  CommandUpdater* const command_updater = GetCommandUpdater();
-
-  // IDC_EXIT is always enabled in regular mode so it's a perfect candidate for
-  // testing.
-  EXPECT_TRUE(command_updater->IsCommandEnabled(IDC_EXIT));
-  EnterLockedFullscreen();
-
-  // IDC_EXIT is not enabled in locked fullscreen.
-  EXPECT_FALSE(command_updater->IsCommandEnabled(IDC_EXIT));
-
-  // NOTE: If new commands are being added, please disable them by default and
-  // notify the ChromeOS team by filing a bug under this component --
-  // b/?q=componentid:1389107.
-  constexpr int kAllowlistedIds[] = {
-      IDC_CUT, IDC_COPY, IDC_PASTE,
-      // Page navigation commands.
-      IDC_BACK, IDC_FORWARD, IDC_RELOAD, IDC_RELOAD_BYPASSING_CACHE,
-      IDC_RELOAD_CLEARING_CACHE, IDC_STOP,
-      // Tab navigation commands.
-      IDC_SELECT_NEXT_TAB, IDC_SELECT_PREVIOUS_TAB, IDC_CYCLE_TO_NEXT_TAB,
-      IDC_CYCLE_TO_PREV_TAB, IDC_SELECT_TAB_0, IDC_SELECT_TAB_1,
-      IDC_SELECT_TAB_2, IDC_SELECT_TAB_3, IDC_SELECT_TAB_4, IDC_SELECT_TAB_5,
-      IDC_SELECT_TAB_6, IDC_SELECT_TAB_7, IDC_SELECT_LAST_TAB,
-      // Find content commands.
-      IDC_FIND, IDC_FIND_NEXT, IDC_FIND_PREVIOUS, IDC_CLOSE_FIND_OR_STOP};
-
-  // Go through all the command ids and ensure only allowlisted commands are
-  // enabled.
-  for (int id : command_updater->GetAllIds()) {
-    bool is_command_allowlisted = std::ranges::contains(kAllowlistedIds, id);
-    EXPECT_EQ(command_updater->IsCommandEnabled(id), is_command_allowlisted)
-        << "Command " << id << " failed to meet enabled state expectation";
-  }
-
-  // Exit locked fullscreen and verify IDC_EXIT is enabled again.
-  ExitLockedFullscreen();
-  EXPECT_TRUE(command_updater->IsCommandEnabled(IDC_EXIT));
-}
-#endif
 
 IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
                        TestTabRestoreServiceInitialized) {
@@ -484,7 +332,6 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTest,
   ASSERT_EQ(false, commandController->IsCommandEnabled(IDC_OPEN_FILE));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestRefreshOnly,
                        ExecuteProfileMenuCustomizeChrome) {
   EXPECT_TRUE(chrome::ExecuteCommand(browser(), IDC_CUSTOMIZE_CHROME));
@@ -648,7 +495,6 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestRefreshOnly,
   EXPECT_TRUE(ProfilePicker::IsOpen());
 }
 
-#endif
 IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestRefreshOnly,
                        ShowTranslateStatusChromePage) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1012,14 +858,12 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestGlic,
       chrome::IsCommandEnabled(incognito_browser, IDC_GLIC_TOGGLE_PIN));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestGlic,
                        DisabledInGuestProfile) {
   Browser* guest_browser = CreateGuestBrowser();
   EXPECT_TRUE(guest_browser->GetProfile()->IsGuestSession());
   EXPECT_FALSE(chrome::IsCommandEnabled(guest_browser, IDC_GLIC_TOGGLE_PIN));
 }
-#endif  // !BUILDFLAG(IS_CHROME)
 
 IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestGlic,
                        ThreeDotMenuItemEnabledInRegularProfile) {
@@ -1049,41 +893,5 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestGlic,
   ASSERT_TRUE(base::test::RunUntil(
       [&]() { return !chrome::IsCommandEnabled(browser(), IDC_OPEN_GLIC); }));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class BrowserCommandControllerBrowserTestGlicChromeOSGuest
-    : public MixinBasedInProcessBrowserTest {
- public:
-  BrowserCommandControllerBrowserTestGlicChromeOSGuest() {
-    scoped_feature_list_.InitWithFeatures({features::kGlic}, {});
-  }
-
-  BrowserCommandControllerBrowserTestGlicChromeOSGuest(
-      const BrowserCommandControllerBrowserTestGlicChromeOSGuest&) = delete;
-  BrowserCommandControllerBrowserTestGlicChromeOSGuest& operator=(
-      const BrowserCommandControllerBrowserTestGlicChromeOSGuest&) = delete;
-
-  ~BrowserCommandControllerBrowserTestGlicChromeOSGuest() override = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    MixinBasedInProcessBrowserTest::SetUpCommandLine(command_line);
-    // Bypass glic eligibility check.
-    command_line->AppendSwitch(::switches::kGlicDev);
-  }
-
- protected:
-  // Use a ChromeOS guest session mixin instead of a guest browser.
-  ash::GuestSessionMixin guest_session_mixin_{&mixin_host_};
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestGlicChromeOSGuest,
-                       DisabledInGuestProfile) {
-  EXPECT_TRUE(browser()->GetProfile()->IsGuestSession());
-  EXPECT_FALSE(chrome::IsCommandEnabled(browser(), IDC_GLIC_TOGGLE_PIN));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace chrome

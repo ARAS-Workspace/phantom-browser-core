@@ -178,49 +178,6 @@ TEST_F(ReportingServiceTest, BasicTest) {
   EXPECT_FALSE(client_.uploader()->is_uploading());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ReportingServiceTest, UserIdLogsUploadedIfUserConsented) {
-  uint64_t user_id = 12345;
-
-  TestReportingService service(&client_, GetLocalState());
-  service.AddLog(TestLog("log1", user_id));
-  service.AddLog(TestLog("log2", user_id));
-  service.EnableReporting();
-  client_.AllowMetricUploadForUserId(user_id);
-
-  task_environment_.FastForwardBy(
-      base::Seconds(MetricsScheduler::GetInitialIntervalSeconds()));
-  EXPECT_TRUE(client_.uploader()->is_uploading());
-  EXPECT_EQ(1, client_.uploader()->reporting_info().attempt_count());
-  EXPECT_FALSE(client_.uploader()->reporting_info().has_last_response_code());
-  client_.uploader()->CompleteUpload(200);
-
-  // Upload 2nd log and last response code logged.
-  task_environment_.FastForwardBy(
-      MetricsUploadScheduler::GetUnsentLogsInterval());
-  EXPECT_EQ(200, client_.uploader()->reporting_info().last_response_code());
-  EXPECT_TRUE(client_.uploader()->is_uploading());
-
-  client_.uploader()->CompleteUpload(200);
-  EXPECT_EQ(task_environment_.GetPendingMainThreadTaskCount(), 0U);
-  EXPECT_FALSE(client_.uploader()->is_uploading());
-}
-
-TEST_F(ReportingServiceTest, UserIdLogsNotUploadedIfUserNotConsented) {
-  TestReportingService service(&client_, GetLocalState());
-  service.AddLog(TestLog("log1", 12345));
-  service.AddLog(TestLog("log2", 12345));
-  service.EnableReporting();
-
-  // Log with user id should never be in uploading state if user upload
-  // disabled. |client_.uploader()| should be nullptr since it is lazily
-  // created when a log is to be uploaded for the first time.
-  task_environment_.FastForwardBy(
-      base::Seconds(MetricsScheduler::GetInitialIntervalSeconds()));
-  EXPECT_EQ(client_.uploader(), nullptr);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(ReportingServiceTest, ForceDiscard) {
   TestReportingService service(&client_, GetLocalState());
   service.AddLog(TestLog("log1"));

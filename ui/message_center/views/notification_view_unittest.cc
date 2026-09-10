@@ -38,9 +38,6 @@
 #include "ui/views/test/widget_test.h"
 #include "ui/views/widget/widget_utils.h"
 
-// ChromeOS/Ash uses `AshNotificationView` instead of `NotificationView`.
-static_assert(!BUILDFLAG(IS_CHROMEOS));
-
 namespace message_center {
 
 namespace {

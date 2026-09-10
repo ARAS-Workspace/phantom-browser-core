@@ -46,15 +46,9 @@ class InteractionTestUtilMouseUiTest
   std::unique_ptr<Mouse> mouse_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-INSTANTIATE_TEST_SUITE_P(TouchMode,
-                         InteractionTestUtilMouseUiTest,
-                         testing::Bool());
-#else
 INSTANTIATE_TEST_SUITE_P(TouchMode,
                          InteractionTestUtilMouseUiTest,
                          testing::Values(false));
-#endif
 
 IN_PROC_BROWSER_TEST_P(InteractionTestUtilMouseUiTest, MoveAndClick) {
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::AbortedCallback, aborted);

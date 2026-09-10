@@ -32,10 +32,6 @@
 #include "rlz/buildflags/buildflags.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 ChromeRLZTrackerDelegate::ChromeRLZTrackerDelegate() = default;
 
 ChromeRLZTrackerDelegate::~ChromeRLZTrackerDelegate() = default;
@@ -45,24 +41,6 @@ void ChromeRLZTrackerDelegate::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
 #if BUILDFLAG(ENABLE_RLZ)
   int rlz_ping_delay_seconds = 90;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          ash::switches::kRlzPingDelay)) {
-    // Use a switch for overwriting the default delay because it doesn't seem
-    // possible to manually override the Preferences file on Chrome OS: the file
-    // is already loaded into memory by the time you modify it and any changes
-    // made get overwritten by Chrome.
-    int parsed_delay_from_switch = 0;
-    if (base::StringToInt(
-            base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
-                ash::switches::kRlzPingDelay),
-            &parsed_delay_from_switch)) {
-      rlz_ping_delay_seconds = parsed_delay_from_switch;
-    }
-  } else {
-    rlz_ping_delay_seconds = 24 * 3600;
-  }
-#endif
   registry->RegisterIntegerPref(prefs::kRlzPingDelaySeconds,
                                 rlz_ping_delay_seconds);
 #endif

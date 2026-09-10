@@ -37,9 +37,7 @@
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/policy_constants.h"
 #include "components/policy/proto/device_management_backend.pb.h"
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
-#endif
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/supervised_user/core/common/features.h"
 #include "components/supervised_user/core/common/pref_names.h"
@@ -64,12 +62,6 @@
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "ui/gl/gl_switches.h"
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/test/device_state_mixin.h"
-#include "chrome/browser/supervised_user/chromeos/parent_access_extension_approvals_manager.h"
-#include "chrome/browser/ui/webui/ash/parent_access/fake_parent_access_dialog.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/supervised_user/supervised_user_extensions_metrics_recorder.h"
@@ -408,9 +400,6 @@ class SupervisedUserExtensionWebstorePrivateApiTest
     // test by about 19 seconds.
     // TODO (crbug.com/41477104): figure out why this switch speeds up the test,
     // and fix the test setup so this is not required.
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(::switches::kShortMergeSessionTimeoutForTest);
-#endif
   }
 
   void SetUpOnMainThread() override {
@@ -420,15 +409,6 @@ class SupervisedUserExtensionWebstorePrivateApiTest
         BrowserContextKeyedAPIFactory<ManagementAPI>::GetIfExists(profile())
             ->GetSupervisedUserExtensionsDelegate());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    auto dialog_provider =
-        std::make_unique<ash::FakeParentAccessDialogProvider>();
-    fake_parent_access_dialog_provider_ = dialog_provider.get();
-    extensions_delegate_->SetParentAccessExtensionApprovalsManagerForTesting(
-        std::make_unique<extensions::ParentAccessExtensionApprovalsManager>(
-            std::move(dialog_provider)));
-#endif
-
     supervised_user_test_util::
         SetSupervisedUserExtensionsMayRequestPermissionsPref(profile(), true);
 
@@ -436,9 +416,6 @@ class SupervisedUserExtensionWebstorePrivateApiTest
   }
 
   void TearDownOnMainThread() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_parent_access_dialog_provider_ = nullptr;
-#endif
     extensions_delegate_ = nullptr;
     ExtensionWebstorePrivateApiTest::TearDownOnMainThread();
   }
@@ -473,33 +450,11 @@ class SupervisedUserExtensionWebstorePrivateApiTest
   }
 
   bool IsParentPermissionDialogAppeared() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return bool(fake_parent_access_dialog_provider_->TakeLastParams());
-#else
     return parent_permission_dialog_appeared_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void set_next_dialog_action(NextDialogAction action) {
-#if BUILDFLAG(IS_CHROMEOS)
-    auto result = std::make_unique<ash::ParentAccessDialog::Result>();
-    switch (action) {
-      case NextDialogAction::kCancel:
-        result->status = ash::ParentAccessDialog::Result::Status::kCanceled;
-        break;
-      case NextDialogAction::kAccept:
-        result->status = ash::ParentAccessDialog::Result::Status::kApproved;
-        result->parent_access_token = "test_token";
-        result->parent_access_token_expire_timestamp =
-            base::Time::FromSecondsSinceUnixEpoch(123456L);
-        break;
-    }
-    fake_parent_access_dialog_provider_->SetNextAction(
-        ash::FakeParentAccessDialogProvider::Action::WithResult(
-            std::move(result)));
-#else
     next_dialog_action_ = action;
-#endif
   }
 
  protected:
@@ -512,10 +467,6 @@ class SupervisedUserExtensionWebstorePrivateApiTest
   std::optional<NextDialogAction> next_dialog_action_;
 
   bool parent_permission_dialog_appeared_ = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  raw_ptr<ash::FakeParentAccessDialogProvider>
-      fake_parent_access_dialog_provider_;
-#endif
 };
 
 // Tests install for a child when parent permission is granted.
@@ -1274,11 +1225,6 @@ class WebstorePrivateEnterprisePromotionApiTest
   ~WebstorePrivateEnterprisePromotionApiTest() override = default;
 
  protected:
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::DeviceStateMixin device_state_{
-      &mixin_host_,
-      ash::DeviceStateMixin::State::OOBE_COMPLETED_CLOUD_ENROLLED};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
  private:
   base::test::ScopedFeatureList feature_list_;
@@ -1335,13 +1281,11 @@ IN_PROC_BROWSER_TEST_F(WebstorePrivateEnterprisePromotionApiTest,
 
 IN_PROC_BROWSER_TEST_F(WebstorePrivateEnterprisePromotionApiTest,
                        ReturnsUnspecifiedResponseWhenBannerWasDismissed) {
-#if !BUILDFLAG(IS_CHROMEOS)
   policy::CloudPolicyManager* manager =
       browser()->GetProfile()->GetCloudPolicyManager();
   auto client = std::make_unique<policy::MockCloudPolicyClient>();
   client->SetDMToken("fake-dm-token");
   manager->Connect(g_browser_process->local_state(), std::move(client));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   PrefService* prefs = browser()->GetProfile()->GetPrefs();
   prefs->SetBoolean(pref_names::kHasDismissedEnterprisePromotion, true);
   scoped_refptr<WebstorePrivateShouldShowEnterprisePromotionBannerFunction>
@@ -1368,12 +1312,10 @@ IN_PROC_BROWSER_TEST_F(WebstorePrivateEnterprisePromotionApiTest,
 class WebstorePrivatePolicyTest : public ExtensionWebstorePrivateApiTest {
  public:
   WebstorePrivatePolicyTest() {
-#if !BUILDFLAG(IS_CHROMEOS)
     browser_dm_token_storage_.SetClientId("client_id");
     browser_dm_token_storage_.SetEnrollmentToken("enrollment_token");
     browser_dm_token_storage_.SetDMToken("dm_token");
     policy::BrowserDMTokenStorage::SetForTesting(&browser_dm_token_storage_);
-#endif
   }
 
   void SetUpInProcessBrowserTestFixture() override {
@@ -1385,9 +1327,7 @@ class WebstorePrivatePolicyTest : public ExtensionWebstorePrivateApiTest {
   }
 
  protected:
-#if !BUILDFLAG(IS_CHROMEOS)
   policy::FakeBrowserDMTokenStorage browser_dm_token_storage_;
-#endif
   testing::NiceMock<policy::MockConfigurationPolicyProvider> provider_;
 };
 

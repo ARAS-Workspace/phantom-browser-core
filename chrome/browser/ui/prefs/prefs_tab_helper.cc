@@ -134,7 +134,7 @@ constexpr auto kFontDefaults = std::to_array<FontDefault>({
     {prefs::kWebKitCursiveFontFamily, IDS_CURSIVE_FONT_FAMILY},
     {prefs::kWebKitFantasyFontFamily, IDS_FANTASY_FONT_FAMILY},
     {prefs::kWebKitMathFontFamily, IDS_MATH_FONT_FAMILY},
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
     {prefs::kWebKitStandardFontFamilyJapanese,
      IDS_STANDARD_FONT_FAMILY_JAPANESE},
@@ -170,17 +170,6 @@ constexpr auto kFontDefaults = std::to_array<FontDefault>({
      IDS_CURSIVE_FONT_FAMILY_SIMPLIFIED_HAN},
     {prefs::kWebKitCursiveFontFamilyTraditionalHan,
      IDS_CURSIVE_FONT_FAMILY_TRADITIONAL_HAN},
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-    {prefs::kWebKitStandardFontFamilyArabic, IDS_STANDARD_FONT_FAMILY_ARABIC},
-    {prefs::kWebKitSerifFontFamilyArabic, IDS_SERIF_FONT_FAMILY_ARABIC},
-    {prefs::kWebKitSansSerifFontFamilyArabic,
-     IDS_SANS_SERIF_FONT_FAMILY_ARABIC},
-    {prefs::kWebKitFixedFontFamilyKorean, IDS_FIXED_FONT_FAMILY_KOREAN},
-    {prefs::kWebKitFixedFontFamilySimplifiedHan,
-     IDS_FIXED_FONT_FAMILY_SIMPLIFIED_HAN},
-    {prefs::kWebKitFixedFontFamilyTraditionalHan,
-     IDS_FIXED_FONT_FAMILY_TRADITIONAL_HAN},
 #endif
 });
 

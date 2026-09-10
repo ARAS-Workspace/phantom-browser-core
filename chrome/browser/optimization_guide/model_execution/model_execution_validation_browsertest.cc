@@ -154,7 +154,7 @@ class ModelExecutionValidationBrowserTest
 };
 
 // TODO(b/318433299, crbug.com/41493189): Flaky on linux-chromeos and Mac.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_ModelExecutionSuccess DISABLED_ModelExecutionSuccess
 #else
 #define MAYBE_ModelExecutionSuccess ModelExecutionSuccess
@@ -177,12 +177,7 @@ IN_PROC_BROWSER_TEST_F(ModelExecutionValidationBrowserTest,
 }
 
 // TODO(b/318433299, crbug.com/41493189): Flaky on linux-chromeos and win
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ModelExecutionFailsServerFailure \
-  DISABLED_ModelExecutionFailsServerFailure
-#else
 #define MAYBE_ModelExecutionFailsServerFailure ModelExecutionFailsServerFailure
-#endif
 IN_PROC_BROWSER_TEST_F(ModelExecutionValidationBrowserTest,
                        MAYBE_ModelExecutionFailsServerFailure) {
   base::RunLoop run_loop;

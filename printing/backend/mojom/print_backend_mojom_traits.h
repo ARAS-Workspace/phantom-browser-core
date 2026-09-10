@@ -40,28 +40,6 @@ struct StructTraits<printing::mojom::PrinterBasicInfoDataView,
                    printing::PrinterBasicInfo* out);
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-template <>
-struct StructTraits<printing::mojom::PaperMarginsDataView,
-                    printing::PaperMargins> {
-  static int32_t top_margin_um(const printing::PaperMargins& m) {
-    return m.top_margin_um;
-  }
-  static int32_t right_margin_um(const printing::PaperMargins& m) {
-    return m.right_margin_um;
-  }
-  static int32_t bottom_margin_um(const printing::PaperMargins& m) {
-    return m.bottom_margin_um;
-  }
-  static int32_t left_margin_um(const printing::PaperMargins& m) {
-    return m.left_margin_um;
-  }
-
-  static bool Read(printing::mojom::PaperMarginsDataView data,
-                   printing::PaperMargins* out);
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 template <>
 struct StructTraits<printing::mojom::PaperDataView,
                     printing::PrinterSemanticCapsAndDefaults::Paper> {
@@ -89,12 +67,6 @@ struct StructTraits<printing::mojom::PaperDataView,
       const printing::PrinterSemanticCapsAndDefaults::Paper& p) {
     return p.has_borderless_variant();
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  static const std::optional<printing::PaperMargins>& supported_margins_um(
-      const printing::PrinterSemanticCapsAndDefaults::Paper& p) {
-    return p.supported_margins_um();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   static bool Read(printing::mojom::PaperDataView data,
                    printing::PrinterSemanticCapsAndDefaults::Paper* out);
@@ -115,59 +87,6 @@ struct StructTraits<printing::mojom::MediaTypeDataView,
   static bool Read(printing::mojom::MediaTypeDataView data,
                    printing::PrinterSemanticCapsAndDefaults::MediaType* out);
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-template <>
-struct EnumTraits<printing::mojom::AdvancedCapabilityType,
-                  ::printing::AdvancedCapability::Type> {
-  static printing::mojom::AdvancedCapabilityType ToMojom(
-      ::printing::AdvancedCapability::Type input);
-  static ::printing::AdvancedCapability::Type FromMojom(
-      printing::mojom::AdvancedCapabilityType input);
-};
-
-template <>
-struct StructTraits<printing::mojom::AdvancedCapabilityValueDataView,
-                    ::printing::AdvancedCapabilityValue> {
-  static const std::string& name(const ::printing::AdvancedCapabilityValue& v) {
-    return v.name;
-  }
-  static const std::string& display_name(
-      const ::printing::AdvancedCapabilityValue& v) {
-    return v.display_name;
-  }
-
-  static bool Read(printing::mojom::AdvancedCapabilityValueDataView data,
-                   ::printing::AdvancedCapabilityValue* out);
-};
-
-template <>
-struct StructTraits<printing::mojom::AdvancedCapabilityDataView,
-                    ::printing::AdvancedCapability> {
-  static const std::string& name(const ::printing::AdvancedCapability& c) {
-    return c.name;
-  }
-  static const std::string& display_name(
-      const ::printing::AdvancedCapability& c) {
-    return c.display_name;
-  }
-  static ::printing::AdvancedCapability::Type type(
-      const ::printing::AdvancedCapability& c) {
-    return c.type;
-  }
-  static const std::string& default_value(
-      const ::printing::AdvancedCapability& c) {
-    return c.default_value;
-  }
-  static const std::vector<::printing::AdvancedCapabilityValue>& values(
-      const ::printing::AdvancedCapability& c) {
-    return c.values;
-  }
-
-  static bool Read(printing::mojom::AdvancedCapabilityDataView data,
-                   ::printing::AdvancedCapability* out);
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 template <>
 struct StructTraits<printing::mojom::PrinterSemanticCapsAndDefaultsDataView,
@@ -234,24 +153,6 @@ struct StructTraits<printing::mojom::PrinterSemanticCapsAndDefaultsDataView,
       const printing::PrinterSemanticCapsAndDefaults& p) {
     return p.default_dpi;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  static bool pin_supported(const printing::PrinterSemanticCapsAndDefaults& p) {
-    return p.pin_supported;
-  }
-  static const printing::AdvancedCapabilities& advanced_capabilities(
-      const printing::PrinterSemanticCapsAndDefaults& p) {
-    return p.advanced_capabilities;
-  }
-  static const std::vector<printing::mojom::PrintScalingType>&
-  print_scaling_types(const printing::PrinterSemanticCapsAndDefaults& p) {
-    return p.print_scaling_types;
-  }
-  static printing::mojom::PrintScalingType print_scaling_type_default(
-      const printing::PrinterSemanticCapsAndDefaults& p) {
-    return p.print_scaling_type_default;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   static bool Read(printing::mojom::PrinterSemanticCapsAndDefaultsDataView data,
                    printing::PrinterSemanticCapsAndDefaults* out);

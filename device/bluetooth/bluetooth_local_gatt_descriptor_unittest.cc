@@ -48,7 +48,7 @@ class BluetoothLocalGattDescriptorTest : public BluetoothGattServerTest {
   raw_ptr<BluetoothDevice, DanglingUntriaged> device_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ReadLocalDescriptorValue ReadLocalDescriptorValue
 #else
 #define MAYBE_ReadLocalDescriptorValue DISABLED_ReadLocalDescriptorValue
@@ -63,7 +63,7 @@ TEST_F(BluetoothLocalGattDescriptorTest, MAYBE_ReadLocalDescriptorValue) {
   EXPECT_EQ(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_WriteLocalDescriptorValue WriteLocalDescriptorValue
 #else
 #define MAYBE_WriteLocalDescriptorValue DISABLED_WriteLocalDescriptorValue
@@ -78,7 +78,7 @@ TEST_F(BluetoothLocalGattDescriptorTest, MAYBE_WriteLocalDescriptorValue) {
   EXPECT_EQ(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ReadLocalDescriptorValueFail ReadLocalDescriptorValueFail
 #else
 #define MAYBE_ReadLocalDescriptorValueFail DISABLED_ReadLocalDescriptorValueFail
@@ -94,7 +94,7 @@ TEST_F(BluetoothLocalGattDescriptorTest, MAYBE_ReadLocalDescriptorValueFail) {
   EXPECT_NE(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_WriteLocalDescriptorValueFail WriteLocalDescriptorValueFail
 #else
 #define MAYBE_WriteLocalDescriptorValueFail \
@@ -111,7 +111,7 @@ TEST_F(BluetoothLocalGattDescriptorTest, MAYBE_WriteLocalDescriptorValueFail) {
   EXPECT_NE(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ReadLocalDescriptorValueWrongPermissions \
   ReadLocalDescriptorValueWrongPermissions
 #else
@@ -129,7 +129,7 @@ TEST_F(BluetoothLocalGattDescriptorTest,
   EXPECT_NE(device_->GetIdentifier(), delegate_->last_seen_device_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_WriteLocalDescriptorValueWrongPermissions \
   WriteLocalDescriptorValueWrongPermissions
 #else

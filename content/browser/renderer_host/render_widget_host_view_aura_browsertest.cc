@@ -53,20 +53,6 @@
 namespace content {
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS)
-const char kMinimalPageDataURL[] =
-    "data:text/html,<html><head></head><body>Hello, world</body></html>";
-
-// Run the current message loop for a short time without unwinding the current
-// call stack.
-void GiveItSomeTime() {
-  base::RunLoop run_loop;
-  base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE, run_loop.QuitClosure(), base::Milliseconds(250));
-  run_loop.Run();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class FakeWebContentsDelegate : public WebContentsDelegate {
  public:
   FakeWebContentsDelegate() = default;
@@ -117,129 +103,6 @@ class RenderWidgetHostViewAuraBrowserTest : public ContentBrowserTest {
   }
 
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewAuraBrowserTest,
-                       // TODO(crbug.com/40874148): Re-enable this test
-                       // TODO(crbug.com/40873813): Re-enable this test
-                       DISABLED_StaleFrameContentOnEvictionNormal) {
-  EXPECT_TRUE(NavigateToURL(shell(), GURL(kMinimalPageDataURL)));
-
-  // Make sure the renderer submits at least one frame before hiding it.
-  RenderFrameSubmissionObserver submission_observer(shell()->web_contents());
-  if (!submission_observer.render_frame_count())
-    submission_observer.WaitForAnyFrameSubmission();
-
-  FakeWebContentsDelegate delegate;
-  delegate.SetShowStaleContentOnEviction(true);
-  shell()->web_contents()->SetDelegate(&delegate);
-
-  // Initially there should be no stale content set.
-  EXPECT_FALSE(
-      GetDelegatedFrameHost()->stale_content_layer_->HasExternalContent());
-  EXPECT_EQ(GetDelegatedFrameHost()->frame_eviction_state_,
-            DelegatedFrameHost::FrameEvictionState::kNotStarted);
-
-  // Hide the view and evict the frame. This should trigger a copy of the stale
-  // frame content.
-  shell()->web_contents()->WasHidden();
-  auto* dfh = GetDelegatedFrameHost();
-  static_cast<viz::FrameEvictorClient*>(dfh)->EvictDelegatedFrame(
-      dfh->GetFrameEvictorForTesting()->CollectSurfaceIdsForEviction());
-  EXPECT_EQ(GetDelegatedFrameHost()->frame_eviction_state_,
-            DelegatedFrameHost::FrameEvictionState::kPendingEvictionRequests);
-
-  // Wait until the stale frame content is copied and set onto the layer.
-  while (!GetDelegatedFrameHost()->stale_content_layer_->HasExternalContent()) {
-    GiveItSomeTime();
-  }
-
-  EXPECT_EQ(GetDelegatedFrameHost()->frame_eviction_state_,
-            DelegatedFrameHost::FrameEvictionState::kNotStarted);
-
-  // Unhidding the view should reset the stale content layer to show the new
-  // frame content.
-  shell()->web_contents()->WasShown();
-  EXPECT_FALSE(
-      GetDelegatedFrameHost()->stale_content_layer_->HasExternalContent());
-}
-
-IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewAuraBrowserTest,
-                       StaleFrameContentOnEvictionRejected) {
-  EXPECT_TRUE(NavigateToURL(shell(), GURL(kMinimalPageDataURL)));
-
-  // Wait for first frame activation when a surface is embedded.
-  while (!GetDelegatedFrameHost()->HasSavedFrame())
-    GiveItSomeTime();
-
-  FakeWebContentsDelegate delegate;
-  delegate.SetShowStaleContentOnEviction(true);
-  shell()->web_contents()->SetDelegate(&delegate);
-
-  // Initially there should be no stale content set.
-  EXPECT_FALSE(
-      GetDelegatedFrameHost()->stale_content_layer_->HasExternalContent());
-  EXPECT_EQ(GetDelegatedFrameHost()->frame_eviction_state_,
-            DelegatedFrameHost::FrameEvictionState::kNotStarted);
-
-  // Hide the view and evict the frame. This should trigger a copy of the stale
-  // frame content.
-  shell()->web_contents()->WasHidden();
-  auto* dfh = GetDelegatedFrameHost();
-  static_cast<viz::FrameEvictorClient*>(dfh)->EvictDelegatedFrame(
-      dfh->GetFrameEvictorForTesting()->CollectSurfaceIdsForEviction());
-  EXPECT_EQ(GetDelegatedFrameHost()->frame_eviction_state_,
-            DelegatedFrameHost::FrameEvictionState::kPendingEvictionRequests);
-
-  shell()->web_contents()->WasShown();
-  EXPECT_EQ(GetDelegatedFrameHost()->frame_eviction_state_,
-            DelegatedFrameHost::FrameEvictionState::kNotStarted);
-
-  // Wait until the stale frame content is copied and the result callback is
-  // complete.
-  GiveItSomeTime();
-
-  // This should however not set the stale content as the view is visible and
-  // new frames are being submitted.
-  EXPECT_FALSE(
-      GetDelegatedFrameHost()->stale_content_layer_->HasExternalContent());
-}
-
-IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewAuraBrowserTest,
-                       StaleFrameContentOnEvictionNone) {
-  EXPECT_TRUE(NavigateToURL(shell(), GURL(kMinimalPageDataURL)));
-
-  // Wait for first frame activation when a surface is embedded.
-  while (!GetDelegatedFrameHost()->HasSavedFrame())
-    GiveItSomeTime();
-
-  FakeWebContentsDelegate delegate;
-  delegate.SetShowStaleContentOnEviction(false);
-  shell()->web_contents()->SetDelegate(&delegate);
-
-  // Initially there should be no stale content set.
-  EXPECT_FALSE(
-      GetDelegatedFrameHost()->stale_content_layer_->HasExternalContent());
-  EXPECT_EQ(GetDelegatedFrameHost()->frame_eviction_state_,
-            DelegatedFrameHost::FrameEvictionState::kNotStarted);
-
-  // Hide the view and evict the frame. This should not trigger a copy of the
-  // stale frame content as the WebContentDelegate returns false.
-  shell()->web_contents()->WasHidden();
-  auto* dfh = GetDelegatedFrameHost();
-  static_cast<viz::FrameEvictorClient*>(dfh)->EvictDelegatedFrame(
-      dfh->GetFrameEvictorForTesting()->CollectSurfaceIdsForEviction());
-
-  EXPECT_EQ(GetDelegatedFrameHost()->frame_eviction_state_,
-            DelegatedFrameHost::FrameEvictionState::kNotStarted);
-
-  // Wait for a while to ensure any copy requests that were sent out are not
-  // completed. There shouldnt be any requests sent however.
-  GiveItSomeTime();
-  EXPECT_FALSE(
-      GetDelegatedFrameHost()->stale_content_layer_->HasExternalContent());
-}
-#endif  // #if BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewAuraBrowserTest,
                        SetKeyboardFocusOnTapAfterDismissingPopup) {
@@ -687,39 +550,6 @@ IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewAuraActiveWidgetTest,
   EXPECT_FALSE(FrameIsFocused(main_frame));
   EXPECT_FALSE(FrameIsFocused(iframe));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Verifies that getting active input control accounts for iframe positioning.
-// Flaky: crbug.com/1293700
-IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewAuraActiveWidgetTest,
-                       DISABLED_TextControlBoundingRegionInIframe) {
-  GURL page(
-      embedded_test_server()->GetURL("example.com", "/input_in_iframe.html"));
-  EXPECT_TRUE(NavigateToURL(shell(), page));
-  FrameTreeNode* root = static_cast<WebContentsImpl*>(shell()->web_contents())
-                            ->GetPrimaryFrameTree()
-                            .root();
-
-  // Ensure both the main page and the iframe are loaded.
-  ASSERT_EQ("OUTER_LOADED",
-            EvalJs(root->current_frame_host(), "notifyWhenLoaded()"));
-  ASSERT_EQ("LOADED", EvalJs(root->current_frame_host(),
-                             "document.querySelector(\"iframe\").contentWindow."
-                             "notifyWhenLoaded();"));
-  // TODO(b/204006085): Remove this sleep call and replace with polling.
-  GiveItSomeTime();
-
-  std::optional<gfx::Rect> control_bounds;
-  std::optional<gfx::Rect> selection_bounds;
-  GetRenderWidgetHostView()->GetActiveTextInputControlLayoutBounds(
-      &control_bounds, &selection_bounds);
-
-  // 4000px from input offset inside input_box.html
-  // 200px from input_in_iframe.html
-  EXPECT_TRUE(control_bounds.has_value());
-  ASSERT_EQ(4200, control_bounds->origin().y());
-}
-#endif
 
 // Make sure that scroll sequence produces kGestureScrollEnd event even if
 // it starts with FlingCancel but never received FlingStart, which can

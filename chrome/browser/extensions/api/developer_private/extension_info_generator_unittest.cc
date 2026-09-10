@@ -576,7 +576,6 @@ TEST_F(ExtensionInfoGeneratorUnitTest, GenerateExtensionsJSONData) {
             "behllobkkfkfnphdnhnkndlbkcpglgmj.json"));
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Test Extension2
   extension_path = data_dir()
                        .AppendASCII("good")
@@ -599,7 +598,6 @@ TEST_F(ExtensionInfoGeneratorUnitTest, GenerateExtensionsJSONData) {
         expected_outputs_path.AppendASCII(
             "hpiknbiabeeppbpihjehijgoemciehgk.json"));
   }
-#endif
 
   // Test Extension3
   extension_path = data_dir().AppendASCII("good")
@@ -1279,48 +1277,11 @@ TEST_F(ExtensionInfoGeneratorUnitTest, RecommendedExtension) {
 // Test that extensions cannot be uploaded to the user's account if they are
 // signed out or signed in with full sync consent (automatically syncs all data
 // types including extensions).
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ExtensionInfoGeneratorUnitTest, UploadAsAccountExtension_FullSync) {
-  // Create two extensions: one syncable and one non-syncable.
-  const scoped_refptr<const Extension> syncable_extension =
-      CreateExtension("test1", base::ListValue(), ManifestLocation::kInternal);
-  EXPECT_TRUE(sync_util::ShouldSync(profile(), syncable_extension.get()));
-
-  const scoped_refptr<const Extension> unsyncable_extension =
-      CreateExtension("test2", base::ListValue(), ManifestLocation::kUnpacked);
-  EXPECT_FALSE(sync_util::ShouldSync(profile(), unsyncable_extension.get()));
-
-  // Neither extension can be uploaded to the user's account since there is no
-  // signed in user to upload to.
-  std::unique_ptr<developer::ExtensionInfo> info =
-      GenerateExtensionInfo(syncable_extension->id());
-  EXPECT_FALSE(info->can_upload_as_account_extension);
-
-  info = GenerateExtensionInfo(unsyncable_extension->id());
-  EXPECT_FALSE(info->can_upload_as_account_extension);
-
-  // Now sign in with full sync.
-  auto identity_test_env_profile_adaptor =
-      std::make_unique<IdentityTestEnvironmentProfileAdaptor>(profile());
-  identity_test_env_profile_adaptor->identity_test_env()
-      ->MakePrimaryAccountAvailable("testy@mctestface.com",
-                                    signin::ConsentLevel::kSync);
-
-  // Since extensions should be automatically synced with sync enabled for the
-  // user's account, they can't be manually uploaded.
-  info = GenerateExtensionInfo(syncable_extension->id());
-  EXPECT_FALSE(info->can_upload_as_account_extension);
-
-  info = GenerateExtensionInfo(unsyncable_extension->id());
-  EXPECT_FALSE(info->can_upload_as_account_extension);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Same test as above, except test that extensions CAN be uploaded if the user
 // is signed into transport mode with extensions sync enabled.
 // Disabled on ChromeOS since users should not be able to sign into transport
 // mode on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(ExtensionInfoGeneratorUnitTest, UploadAsAccountExtension_TransportMode) {
   // Sign the user in without full sync with an explicit signin.
   auto identity_test_env_profile_adaptor =
@@ -1353,7 +1314,6 @@ TEST_F(ExtensionInfoGeneratorUnitTest, UploadAsAccountExtension_TransportMode) {
   info = GenerateExtensionInfo(syncable_extension->id());
   EXPECT_FALSE(info->can_upload_as_account_extension);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
 
@@ -1444,103 +1404,4 @@ TEST_F(ExtensionInfoGeneratorUnitTestSupervised,
 
 #endif  // BUILDFLAG(ENABLE_SUPERVISED_USERS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-enum PendingSettingType { kAllowIncognito, kAllowOnFileUrls };
-
-class ExtensionInfoGeneratorSettingPendingUnitTest
-    : public ExtensionInfoGeneratorUnitTest,
-      public testing::WithParamInterface<std::tuple<PendingSettingType, bool>> {
-};
-
-INSTANTIATE_TEST_SUITE_P(
-    SettingPending,
-    ExtensionInfoGeneratorSettingPendingUnitTest,
-    ::testing::Combine(::testing::Values(PendingSettingType::kAllowIncognito,
-                                         PendingSettingType::kAllowOnFileUrls),
-                       ::testing::Bool()));
-
-TEST_P(ExtensionInfoGeneratorSettingPendingUnitTest,
-       GenerateExtensionInfoWithPendingSettings) {
-  scoped_refptr<const Extension> extension = ExtensionBuilder("alpha").Build();
-  registrar()->AddExtension(extension.get());
-
-  auto [setting, initial_setting_value] = GetParam();
-  bool pending_setting_value = !initial_setting_value;
-  auto* prefs = ExtensionPrefs::Get(profile());
-
-  switch (setting) {
-    case PendingSettingType::kAllowIncognito:
-      prefs->SetIsIncognitoEnabled(extension->id(), initial_setting_value);
-      prefs->SetIsIncognitoEnabledDelayed(extension->id(),
-                                          pending_setting_value);
-      break;
-    case PendingSettingType::kAllowOnFileUrls:
-      prefs->SetAllowFileAccess(extension->id(), initial_setting_value);
-      prefs->SetAllowFileAccessDelayed(extension->id(), pending_setting_value);
-      break;
-    default:
-      break;
-  }
-
-  std::unique_ptr<api::developer_private::ExtensionInfo> info =
-      GenerateExtensionInfo(extension->id());
-  ASSERT_TRUE(info);
-
-  switch (setting) {
-    case PendingSettingType::kAllowIncognito:
-      ASSERT_TRUE(info->incognito_access_pending_change);
-      ASSERT_FALSE(info->file_access_pending_change);
-      ASSERT_EQ(info->incognito_access.is_active, pending_setting_value);
-      break;
-    case PendingSettingType::kAllowOnFileUrls:
-      ASSERT_TRUE(info->file_access_pending_change);
-      ASSERT_FALSE(info->incognito_access_pending_change);
-      ASSERT_EQ(info->file_access.is_active, pending_setting_value);
-      break;
-    default:
-      break;
-  }
-}
-
-TEST_P(ExtensionInfoGeneratorSettingPendingUnitTest,
-       GenerateExtensionInfoWithNoPendingSettings) {
-  scoped_refptr<const Extension> extension = ExtensionBuilder("alpha").Build();
-  registrar()->AddExtension(extension.get());
-
-  auto [setting, initial_setting_value] = GetParam();
-  auto* prefs = ExtensionPrefs::Get(profile());
-
-  switch (setting) {
-    case PendingSettingType::kAllowIncognito:
-      prefs->SetIsIncognitoEnabled(extension->id(), initial_setting_value);
-      prefs->SetIsIncognitoEnabledDelayed(extension->id(),
-                                          initial_setting_value);
-      break;
-    case PendingSettingType::kAllowOnFileUrls:
-      prefs->SetAllowFileAccess(extension->id(), initial_setting_value);
-      prefs->SetAllowFileAccessDelayed(extension->id(), initial_setting_value);
-      break;
-    default:
-      break;
-  }
-
-  std::unique_ptr<api::developer_private::ExtensionInfo> info =
-      GenerateExtensionInfo(extension->id());
-  ASSERT_TRUE(info);
-
-  ASSERT_FALSE(info->incognito_access_pending_change);
-  ASSERT_FALSE(info->file_access_pending_change);
-  switch (setting) {
-    case PendingSettingType::kAllowIncognito:
-      ASSERT_EQ(info->incognito_access.is_active, initial_setting_value);
-      break;
-    case PendingSettingType::kAllowOnFileUrls:
-      ASSERT_EQ(info->file_access.is_active, initial_setting_value);
-      break;
-    default:
-      break;
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }  // namespace extensions

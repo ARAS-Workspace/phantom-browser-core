@@ -152,16 +152,10 @@ IN_PROC_BROWSER_TEST_P(GeicButtonBrowserTest,
       BrowserElementsViews::From(browser())->GetViewAs<TabStripActionContainer>(
           kTabStripActionContainerElementId);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, Glic is not eligible in test profiles without an active user
-  // session, so the action container is not created.
-  EXPECT_EQ(container, nullptr);
-#else
   // On desktop platforms, Glic is enabled, so the container exists with the
   // Glic button and no GEiC button.
   ASSERT_TRUE(container);
   EXPECT_EQ(container->GetGeicButtonForTesting(), nullptr);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_P(GeicButtonBrowserTest, GeicButtonTogglesSidePanel) {

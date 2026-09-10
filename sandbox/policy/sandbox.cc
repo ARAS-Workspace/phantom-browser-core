@@ -18,9 +18,9 @@
 #include "third_party/jni_zero/common_apis.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "sandbox/policy/linux/sandbox_linux.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC)
 #include "sandbox/mac/seatbelt.h"
@@ -29,14 +29,14 @@
 namespace sandbox {
 namespace policy {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool Sandbox::Initialize(sandbox::mojom::Sandbox sandbox_type,
                          SandboxLinux::PreSandboxHook hook,
                          const SandboxLinux::Options& options) {
   return SandboxLinux::GetInstance()->InitializeSandbox(
       sandbox_type, std::move(hook), options);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // static
 bool Sandbox::IsProcessSandboxed() {
@@ -64,7 +64,7 @@ bool Sandbox::IsProcessSandboxed() {
   uid_t uid = getuid();
   uid_t app_id = uid % 100000;
   return (app_id >= 90000 && app_id <= 99999);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   int status = SandboxLinux::GetInstance()->GetStatus();
   constexpr int kLayer1Flags = SandboxLinux::Status::kSUID |
                                SandboxLinux::Status::kPIDNS |

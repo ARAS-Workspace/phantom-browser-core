@@ -208,8 +208,7 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {autofill::prefs::kAutofillAiTravelEntitiesEnabled,
          {syncable_prefs_ids::kAutofillAiTravelEntitiesEnabled,
           syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
         {autofill::prefs::kAutofillAiReauthBeforeViewingSensitiveData,
          {syncable_prefs_ids::kAutofillAiReauthBeforeViewingSensitiveData,
           syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
@@ -382,15 +381,13 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {translate::prefs::kPrefTranslateRecentTargets,
          {syncable_prefs_ids::kPrefTranslateRecentTargets, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-// For Ash, the OS_PRIORITY_PREFERENCES equivalent is defined in
-// chrome/browser/sync/prefs/chrome_syncable_prefs_database.cc instead.
-#if !BUILDFLAG(IS_CHROMEOS)
+        // For Ash, the OS_PRIORITY_PREFERENCES equivalent is defined in
+        // chrome/browser/sync/prefs/chrome_syncable_prefs_database.cc instead.
         {variations::kDogfoodGroupsSyncPrefName,
          {syncable_prefs_ids::kDogfoodGroupsSyncPrefName,
           syncer::PRIORITY_PREFERENCES,
           PrefSensitivity::kExemptFromUserControlWhileSignedIn,
           MergeBehavior::kNone}},
-#endif
         {kSyncablePrefForTesting,
          {syncable_prefs_ids::kSyncablePrefForTesting, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},

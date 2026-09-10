@@ -45,12 +45,6 @@
 #include "ui/views/interaction/element_tracker_views.h"
 #include "ui/views/view_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#include "chrome/browser/ui/web_applications/app_browser_controller.h"
-#include "chromeos/ash/experiences/system_web_apps/types/system_web_app_delegate.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TabStripCollectionController::TabStripCollectionController(
     TabStripModel* model,
     BrowserView* browser_view,
@@ -534,17 +528,6 @@ void TabStripCollectionController::ExecuteContextMenuCommand(
 bool TabStripCollectionController::GetContextMenuAccelerator(
     int command_id,
     ui::Accelerator* accelerator) {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto* browser = browser_view_->browser();
-  auto* system_app =
-      web_app::AppBrowserController::From(browser)
-          ? web_app::AppBrowserController::From(browser)->system_app()
-          : nullptr;
-  if (system_app && !system_app->ShouldShowTabContextMenuShortcut(
-                        browser->GetProfile(), command_id)) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   int browser_cmd;
   return TabStripModel::ContextMenuCommandToBrowserCommand(command_id,
@@ -606,13 +589,6 @@ void TabStripCollectionController::UpdateFocusModeTheme(
     browser_view_->browser_widget()->SetUserColorOverride(color);
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool TabStripCollectionController::IsLockedForOnTask() const {
-  return ash::boca::OnTaskLockedController::From(browser_view_->browser())
-      ->is_locked_for_on_task();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void TabStripCollectionController::TabKeyboardFocusChangedTo(
     const tabs::TabInterface* tab) {

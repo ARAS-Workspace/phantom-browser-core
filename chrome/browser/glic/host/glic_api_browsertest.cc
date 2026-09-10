@@ -129,13 +129,8 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/display/screen.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/profiles/profile_picker.h"
-#endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#endif
 
 // This file runs the respective JS tests from
 // chrome/test/data/webui/glic/browser_tests/glic_api_browsertest.ts.
@@ -608,11 +603,7 @@ class GlicApiTestGeminiEnterpriseSettingsPolicyUnset
 // Checks that all tests in api_test.ts have a corresponding test case in this
 // file.
 // TODO(crbug.com/460826483): Enable on CrOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_testAllTestsAreRegistered DISABLED_testAllTestsAreRegistered
-#else
 #define MAYBE_testAllTestsAreRegistered testAllTestsAreRegistered
-#endif
 IN_PROC_BROWSER_TEST_P(GlicApiTest, MAYBE_testAllTestsAreRegistered) {
   AssertAllTestsRegistered(GetTestSuiteNames());
 }
@@ -996,7 +987,7 @@ IN_PROC_BROWSER_TEST_P(GlicApiTest,
 
 // TODO(crbug.com/517682376): Flaky on ASan, MSan, and Linux/ChromeOS debug.
 #if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) || \
-    (!defined(NDEBUG) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)))
+    (!defined(NDEBUG) && BUILDFLAG(IS_LINUX))
 #define MAYBE_testPanelWillOpenHasPromptSuggestion \
   DISABLED_testPanelWillOpenHasPromptSuggestion
 #else
@@ -1190,13 +1181,8 @@ IN_PROC_BROWSER_TEST_F(GlicApiTestWithOneTab,
 }
 
 // TODO(crbug.com/460826488): Enable on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_testFetchInactiveTabScreenshotWhileMinimized \
-  DISABLED_testFetchInactiveTabScreenshotWhileMinimized
-#else
 #define MAYBE_testFetchInactiveTabScreenshotWhileMinimized \
   testFetchInactiveTabScreenshotWhileMinimized
-#endif
 IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
                        MAYBE_testFetchInactiveTabScreenshotWhileMinimized) {
   TODO_SKIP_BROKEN_MULTI_INSTANCE_TEST();

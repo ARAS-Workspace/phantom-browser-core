@@ -56,16 +56,6 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/dialog_client_view.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/shelf_item.h"
-#include "ash/public/cpp/window_properties.h"
-#include "chrome/browser/apps/icon_standardizer.h"
-#include "chrome/grit/theme_resources.h"
-#include "ui/aura/window.h"
-#include "ui/base/resource/resource_bundle.h"
-#include "ui/gfx/image/image_skia.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace task_manager {
 namespace {
 
@@ -83,16 +73,10 @@ base::span<const TaskManagerView::FilterTab> GetTabDefinitions() {
           },
           {
               .associated_category = DisplayCategory::kSystem,
-#if BUILDFLAG(IS_CHROMEOS)
-              .title_id = IDS_TASK_MANAGER_CATEGORY_SYSTEM_NAME,
-              .icon = &(features::IsRoundedIconsEnabled() ? kLaptopWindowsIcon
-                                                          : kLaptopOldIcon),
-#else
               .title_id = IDS_TASK_MANAGER_CATEGORY_BROWSER_NAME,
               .icon =
                   &(features::IsRoundedIconsEnabled() ? kChromeProductIcon
                                                       : kBrowserLogoOldIcon),
-#endif
           },
           {
               .associated_category = DisplayCategory::kAll,
@@ -146,17 +130,6 @@ task_manager::TaskManagerTableModel* TaskManagerView::Show(
     // readers read out the layout ltr (or flipped for rtl).
     g_task_manager_view->tabs_->GetSelectedTab()->RequestFocus();
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  aura::Window* window = g_task_manager_view->GetWidget()->GetNativeWindow();
-  // An app id for task manager windows, also used to identify the shelf item.
-  // Generated as crx_file::id_util::GenerateId("org.chromium.taskmanager")
-  static constexpr char kTaskManagerId[] = "ijaigheoohcacdnplfbdimmcfldnnhdi";
-  const ash::ShelfID shelf_id(kTaskManagerId);
-  window->SetProperty(ash::kShelfIDKey, shelf_id.Serialize());
-  window->SetProperty(ash::kAppIDKey, shelf_id.app_id);
-  window->SetProperty<int>(ash::kShelfItemTypeKey, ash::TYPE_DIALOG);
-  window->SetTitle(l10n_util::GetStringUTF16(IDS_TASK_MANAGER_TITLE));
-#endif
   return g_task_manager_view->table_model_.get();
 }
 
@@ -244,15 +217,7 @@ bool TaskManagerView::ExecuteWindowsCommand(int command_id) {
 
 ui::ImageModel TaskManagerView::GetWindowIcon() {
   TRACE_EVENT0("ui", "TaskManagerView::GetWindowIcon");
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/40739545): Move apps::CreateStandardIconImage to some
-  // where lower in the stack.
-  return ui::ImageModel::FromImageSkia(apps::CreateStandardIconImage(
-      *ui::ResourceBundle::GetSharedInstance().GetImageSkiaNamed(
-          IDR_ASH_SHELF_ICON_TASK_MANAGER)));
-#else
   return views::DialogDelegateView::GetWindowIcon();
-#endif
 }
 
 std::string TaskManagerView::GetWindowName() const {

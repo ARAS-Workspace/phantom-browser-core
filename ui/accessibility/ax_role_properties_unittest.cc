@@ -96,10 +96,6 @@ TEST(AXRolePropertiesTest, TestIsTableWithColumns) {
       ax::mojom::Role::kGrid, ax::mojom::Role::kListGrid,
       ax::mojom::Role::kTable, ax::mojom::Role::kTreeGrid};
 
-#if BUILDFLAG(IS_CHROMEOS)
-  roles_expected_is_table_with_columns.insert(ax::mojom::Role::kLayoutTable);
-#endif
-
   for (int role_idx = static_cast<int>(ax::mojom::Role::kMinValue);
        role_idx <= static_cast<int>(ax::mojom::Role::kMaxValue); role_idx++) {
     ax::mojom::Role role = static_cast<ax::mojom::Role>(role_idx);

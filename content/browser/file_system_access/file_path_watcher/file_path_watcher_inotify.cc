@@ -1363,14 +1363,14 @@ size_t FilePathWatcher::GetQuotaLimitImpl() {
   return GetQuotaLimitFromSystemLimit(GetMaxNumberOfInotifyWatches());
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-// Put inside "BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)" because Android
-// includes file_path_watcher_linux.cc.
+#if BUILDFLAG(IS_LINUX)
+// Put inside "BUILDFLAG(IS_LINUX)" because Android includes
+// file_path_watcher_linux.cc.
 
 // static
 bool FilePathWatcher::HasWatchesForTest() {
   return GetInotifyReader().HasWatches();
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace content

@@ -22,11 +22,6 @@
 #include "third_party/blink/public/mojom/manifest/display_mode.mojom-shared.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/browser/ash/drive/file_system_util.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 namespace {
 
@@ -110,12 +105,6 @@ constexpr Translation kNameTranslations[] = {
 };
 // clang-format on
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool IsDriveFsBulkPinningAvailable() {
-  return drive::util::IsDriveFsBulkPinningAvailable();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 
 ExternalInstallOptions GetConfigForGoogleDocs(bool is_standalone_tabbed) {
@@ -130,17 +119,6 @@ ExternalInstallOptions GetConfigForGoogleDocs(bool is_standalone_tabbed) {
   options.user_type_allowlist = {"unmanaged", "managed", "child"};
   options.uninstall_and_replace.push_back("aohghmighlieiainnegkcijnfilokake");
   options.expected_app_id = ash::kGoogleDocsAppId;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (IsDriveFsBulkPinningAvailable()) {
-    VLOG(1) << "DriveFsBulkPinning enabled, registering service worker";
-    options.load_and_await_service_worker_registration = true;
-    options.only_use_app_info_factory = false;
-    options.service_worker_registration_url = GURL("https://docs.google.com");
-    options.service_worker_registration_timeout = base::Minutes(10);
-    return options;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   options.load_and_await_service_worker_registration = false;
   options.only_use_app_info_factory = true;

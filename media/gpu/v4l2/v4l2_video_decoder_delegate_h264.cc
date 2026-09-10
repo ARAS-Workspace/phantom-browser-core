@@ -21,13 +21,6 @@
 #include "media/gpu/v4l2/v4l2_decode_surface_handler.h"
 #include "media/gpu/v4l2/v4l2_device.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-// gn check does not account for BUILDFLAG(), so including this header will
-// make gn check fail for builds other than ChromeOS. See gn help nogncheck
-// for more information.
-#include "chromeos/components/cdm_factory_daemon/chromeos_cdm_context.h"  // nogncheck
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace media {
 
 namespace {
@@ -421,116 +414,7 @@ V4L2VideoDecoderDelegateH264::ParseEncryptedSliceHeader(
     const std::vector<SubsampleEntry>& /*subsamples*/,
     uint64_t secure_handle,
     H264SliceHeader* slice_header_out) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!cdm_context_ || !cdm_context_->GetChromeOsCdmContext()) {
-    LOG(ERROR) << "Missing ChromeOSCdmContext";
-    return Status::kFail;
-  }
-  if (!secure_handle) {
-    LOG(ERROR) << "Invalid secure buffer";
-    return Status::kFail;
-  }
-
-  if (encrypted_slice_header_parsing_active_) {
-    return Status::kTryAgain;
-  }
-
-  if (encrypted_slice_header_parsing_failed_) {
-    encrypted_slice_header_parsing_failed_ = false;
-    last_parsed_encrypted_slice_header_.clear();
-    return Status::kFail;
-  }
-
-  std::vector<uint8_t> stream_data_vec(
-      UNSAFE_TODO(reinterpret_cast<uint8_t*>(&cencv1_stream_data_)),
-      UNSAFE_TODO(reinterpret_cast<uint8_t*>(&cencv1_stream_data_) +
-                  sizeof(cencv1_stream_data_)));
-
-  // Send the request for the slice header if we don't have a pending result.
-  if (last_parsed_encrypted_slice_header_.empty()) {
-    encrypted_slice_header_parsing_active_ = true;
-    cdm_context_->GetChromeOsCdmContext()->ParseEncryptedSliceHeader(
-        secure_handle,
-        base::checked_cast<uint32_t>(encrypted_slice_header_offset_),
-        stream_data_vec,
-        base::BindPostTaskToCurrentDefault(base::BindOnce(
-            &V4L2VideoDecoderDelegateH264::OnEncryptedSliceHeaderParsed,
-            weak_factory_.GetWeakPtr())));
-    return Status::kTryAgain;
-  }
-  // We have the result, map it to the structure and copy the fields.
-  if (last_parsed_encrypted_slice_header_.size() !=
-      sizeof(CencV1SliceParameterBufferH264)) {
-    return Status::kFail;
-  }
-  CencV1SliceParameterBufferH264 slice_param_buf;
-  UNSAFE_TODO(memcpy(&slice_param_buf,
-                     last_parsed_encrypted_slice_header_.data(),
-                     sizeof(slice_param_buf)));
-  last_parsed_encrypted_slice_header_.clear();
-
-  // The last span in |data| will be the slice header NALU.
-  slice_header_out->nalu_data = data.back().data();
-  slice_header_out->nalu_size = data.back().size();
-
-  // Read the parsed slice header data back and populate the structure with it.
-  slice_header_out->nal_ref_idc = slice_param_buf.nal_ref_idc;
-  slice_header_out->idr_pic_flag = !!slice_param_buf.idr_pic_flag;
-  slice_header_out->first_mb_in_slice = slice_param_buf.first_mb_in_slice;
-  slice_header_out->slice_type = slice_param_buf.slice_type;
-  slice_header_out->field_pic_flag = slice_param_buf.field_pic_flag;
-  slice_header_out->bottom_field_flag = slice_param_buf.bottom_field_flag;
-  slice_header_out->frame_num = slice_param_buf.frame_num;
-  slice_header_out->idr_pic_id = slice_param_buf.idr_pic_id;
-  slice_header_out->pic_order_cnt_lsb = slice_param_buf.pic_order_cnt_lsb;
-  slice_header_out->delta_pic_order_cnt_bottom =
-      slice_param_buf.delta_pic_order_cnt_bottom;
-  slice_header_out->delta_pic_order_cnt0 = slice_param_buf.delta_pic_order_cnt0;
-  slice_header_out->delta_pic_order_cnt1 = slice_param_buf.delta_pic_order_cnt1;
-  slice_header_out->num_ref_idx_l0_active_minus1 =
-      slice_param_buf.num_ref_idx_l0_active_minus1;
-  slice_header_out->num_ref_idx_l1_active_minus1 =
-      slice_param_buf.num_ref_idx_l1_active_minus1;
-
-  // Dec Ref Pic Marking.
-  slice_header_out->no_output_of_prior_pics_flag =
-      slice_param_buf.no_output_of_prior_pics_flag;
-  slice_header_out->long_term_reference_flag =
-      slice_param_buf.long_term_reference_flag;
-  slice_header_out->adaptive_ref_pic_marking_mode_flag =
-      slice_param_buf.adaptive_ref_pic_marking_mode_flag;
-  const size_t num_dec_ref_pics = slice_param_buf.dec_ref_pic_marking_size;
-  if (num_dec_ref_pics > H264SliceHeader::kRefListSize) {
-    DVLOG(1) << "Invalid number of dec_ref_pics: " << num_dec_ref_pics;
-    return Status::kFail;
-  }
-  for (size_t i = 0; i < num_dec_ref_pics; ++i) {
-    UNSAFE_TODO(
-        slice_header_out->ref_pic_marking[i].memory_mgmnt_control_operation =
-            slice_param_buf.dec_ref_pic_marking[i]
-                .memory_management_control_operation);
-    UNSAFE_TODO(
-        slice_header_out->ref_pic_marking[i].difference_of_pic_nums_minus1 =
-            slice_param_buf.dec_ref_pic_marking[i]
-                .difference_of_pic_nums_minus1);
-    UNSAFE_TODO(slice_header_out->ref_pic_marking[i].long_term_pic_num =
-                    slice_param_buf.dec_ref_pic_marking[i].long_term_pic_num);
-    UNSAFE_TODO(slice_header_out->ref_pic_marking[i].long_term_frame_idx =
-                    slice_param_buf.dec_ref_pic_marking[i].long_term_frame_idx);
-    UNSAFE_TODO(
-        slice_header_out->ref_pic_marking[i].max_long_term_frame_idx_plus1 =
-            slice_param_buf.dec_ref_pic_marking[i]
-                .max_long_term_frame_idx_plus1);
-  }
-  slice_header_out->dec_ref_pic_marking_bit_size =
-      slice_param_buf.dec_ref_pic_marking_bit_size;
-  slice_header_out->pic_order_cnt_bit_size =
-      slice_param_buf.pic_order_cnt_bit_size;
-  slice_header_out->full_sample_encryption = true;
-  return Status::kOk;
-#else
   return Status::kFail;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 H264Decoder::H264Accelerator::Status V4L2VideoDecoderDelegateH264::SubmitSlice(

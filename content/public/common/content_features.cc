@@ -299,7 +299,7 @@ BASE_FEATURE(kDeviceBoundSessionTerminationEvictBackForwardCache,
 // Controls whether the Digital Goods API is enabled.
 // https://github.com/WICG/digital-goods/
 BASE_FEATURE(kDigitalGoodsApi,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -638,11 +638,7 @@ BASE_FEATURE(kIsolatesPriorityBestEffortWhenHidden,
 // check kEnableIsolatedWebAppsInRenderer command line flag in the renderer
 // process.
 BASE_FEATURE(kIsolatedWebApps,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Enables process isolation of fenced content (content inside fenced frames)
 // from non-fenced content. See
@@ -727,11 +723,7 @@ const base::FeatureParam<double> kNavigationConfidenceEpsilonValue{
 // some tasks related to navigation network responses in a kHigh priority
 // queue.
 BASE_FEATURE(kNavigationNetworkResponseQueue,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif
 );
 
 // If the network service is enabled, runs it in process.
@@ -930,15 +922,7 @@ BASE_FEATURE_PARAM(size_t,
 // feature is disabled, those messages are instead queued because the IPC
 // channel is paused, and only flushed at OnProcessLaunched.
 BASE_FEATURE(kSkipIPCChannelPausingForNonGuests,
-#if BUILDFLAG(IS_CHROMEOS)
-             // Disabled by default on ChromeOS because of ChromeOS-only
-             // regressions at crbug.com/458372810.
-             // TODO(crbug.com/458372810): Resolve the regression and enable by
-             // default on all platforms.
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS)
 );
 
 const base::FeatureParam<bool>
@@ -1264,10 +1248,9 @@ BASE_FEATURE(kWebAssemblyTiering, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enable WebAssembly trap handler.
 BASE_FEATURE(kWebAssemblyTrapHandler,
-#if ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)) && \
-     defined(ARCH_CPU_X86_64)) ||                                            \
-    ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)) && \
-     defined(ARCH_CPU_ARM64))
+#if ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && \
+     defined(ARCH_CPU_X86_64)) ||                  \
+    ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && defined(ARCH_CPU_ARM64))
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -1521,11 +1504,7 @@ const base::FeatureParam<CapturingState>::Option kNavigationCapturingParams[] =
 
 const base::FeatureParam<CapturingState> kNavigationCapturingDefaultState{
     &kPwaNavigationCapturing, "link_capturing_state",
-#if BUILDFLAG(IS_CHROMEOS)
-    CapturingState::kReimplDefaultOff,
-#else
     CapturingState::kReimplDefaultOn,
-#endif
     &kNavigationCapturingParams};
 
 const base::FeatureParam<std::string> kForcedOffCapturingAppsOnFirstNavigation{

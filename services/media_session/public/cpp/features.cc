@@ -23,21 +23,13 @@ BASE_FEATURE(kMediaSessionService,
 // Enables Audio Focus enforcement which means that only one media session can
 // have audio focus at any one time.
 BASE_FEATURE(kAudioFocusEnforcement,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Enables Audio Focus grouping which means that multiple media sessions can
 // share audio focus at the same time provided that they have the same group id.
 BASE_FEATURE(kAudioFocusSessionGrouping,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 }  // namespace features

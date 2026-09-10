@@ -86,9 +86,6 @@
 #include "gpu/command_buffer/service/shared_image/dawn_image_backing_factory.h"
 #endif  // BUILDFLAG(USE_DAWN)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #include "base/feature_list.h"
 
@@ -111,7 +108,7 @@ const char* GmbTypeToString(gfx::GpuMemoryBufferType type) {
     case gfx::IO_SURFACE_BUFFER:
       return "platform";
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     case gfx::NATIVE_PIXMAP:
       return "platform";
 #endif
@@ -128,7 +125,7 @@ gfx::GpuMemoryBufferType GetNativeBufferType() {
   return gfx::GpuMemoryBufferType::IO_SURFACE_BUFFER;
 #elif BUILDFLAG(IS_ANDROID)
   return gfx::GpuMemoryBufferType::ANDROID_HARDWARE_BUFFER;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   return gfx::GpuMemoryBufferType::NATIVE_PIXMAP;
 #else
   return gfx::GpuMemoryBufferType::EMPTY_BUFFER;
@@ -886,13 +883,6 @@ void SharedImageFactory::LogGetFactoryFailed(gpu::SharedImageUsageSet usage,
              << ", size: " << size.ToString()
              << ", debug_label: " << debug_label;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not dump crash reports for Reven ChromeOS boards.
-  auto* command_line = base::CommandLine::ForCurrentProcess();
-  if (command_line->HasSwitch(ash::switches::kRevenBranding)) {
-    return;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   std::string new_debug_label = debug_label;
   // Get the debug label with Process Id for filtering crash reports by label as

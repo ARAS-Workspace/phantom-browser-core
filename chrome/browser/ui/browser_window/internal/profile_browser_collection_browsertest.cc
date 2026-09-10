@@ -140,12 +140,7 @@ class ProfileBrowserCollectionTest
 
 // TODO(crbug.com/483366391): Enable this on ChromeOS once the
 // BaseWindow::Activate() behaviour is fixed.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ForEachIteratesOverAllBrowsers \
-  DISABLED_ForEachIteratesOverAllBrowsers
-#else
 #define MAYBE_ForEachIteratesOverAllBrowsers ForEachIteratesOverAllBrowsers
-#endif  // BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(ProfileBrowserCollectionTest,
                        MAYBE_ForEachIteratesOverAllBrowsers) {
   std::vector<BrowserWindowInterface*> visited;
@@ -171,13 +166,8 @@ IN_PROC_BROWSER_TEST_P(ProfileBrowserCollectionTest,
 
 // TODO(crbug.com/483366391): Enable this on ChromeOS once the
 // BaseWindow::Activate() behaviour is fixed.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ForEachStopsWhenCallbackReturnsFalse \
-  DISABLED_ForEachStopsWhenCallbackReturnsFalse
-#else
 #define MAYBE_ForEachStopsWhenCallbackReturnsFalse \
   ForEachStopsWhenCallbackReturnsFalse
-#endif  // BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(ProfileBrowserCollectionTest,
                        MAYBE_ForEachStopsWhenCallbackReturnsFalse) {
   std::vector<BrowserWindowInterface*> visited;
@@ -199,13 +189,8 @@ IN_PROC_BROWSER_TEST_P(ProfileBrowserCollectionTest,
 
 // TODO(crbug.com/483366391): Enable this on ChromeOS once the
 // BaseWindow::Activate() behaviour is fixed.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ForEachResilientToBrowserDestruction \
-  DISABLED_ForEachResilientToBrowserDestruction
-#else
 #define MAYBE_ForEachResilientToBrowserDestruction \
   ForEachResilientToBrowserDestruction
-#endif  // BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(ProfileBrowserCollectionTest,
                        MAYBE_ForEachResilientToBrowserDestruction) {
   std::vector<BrowserWindowInterface*> visited;

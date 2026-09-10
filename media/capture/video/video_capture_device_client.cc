@@ -37,10 +37,6 @@
 #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
 #include "third_party/libyuv/include/libyuv.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "media/capture/video/chromeos/video_capture_jpeg_decoder.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 bool IsFormatSupported(media::VideoPixelFormat pixel_format) {
@@ -177,7 +173,7 @@ FourccAndFlip GetFourccAndFlipFromPixelFormat(
       CHECK(!is_width_odd && !is_height_odd);
       return {libyuv::FOURCC_UYVY};
     case media::PIXEL_FORMAT_RGB24:
-      if constexpr (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) {
+      if constexpr (BUILDFLAG(IS_LINUX)) {
         // Linux RGB24 defines red at lowest byte address,
         // see http://linuxtv.org/downloads/v4l-dvb-apis/packed-rgb.html.
         return {libyuv::FOURCC_RAW};
@@ -290,28 +286,12 @@ class BufferPoolBufferHandleProvider
   const int buffer_id_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-VideoCaptureDeviceClient::VideoCaptureDeviceClient(
-    std::unique_ptr<VideoFrameReceiver> receiver,
-    scoped_refptr<VideoCaptureBufferPool> buffer_pool,
-    VideoCaptureJpegDecoderFactoryCB optional_jpeg_decoder_factory_callback)
-    : receiver_(std::move(receiver)),
-      optional_jpeg_decoder_factory_callback_(
-          std::move(optional_jpeg_decoder_factory_callback)),
-      buffer_pool_(std::move(buffer_pool)),
-      last_captured_pixel_format_(PIXEL_FORMAT_UNKNOWN) {
-  on_started_using_gpu_cb_ =
-      base::BindOnce(&VideoFrameReceiver::OnStartedUsingGpuDecode,
-                     base::Unretained(receiver_.get()));
-}
-#else
 VideoCaptureDeviceClient::VideoCaptureDeviceClient(
     std::unique_ptr<VideoFrameReceiver> receiver,
     scoped_refptr<VideoCaptureBufferPool> buffer_pool)
     : receiver_(std::move(receiver)),
       buffer_pool_(std::move(buffer_pool)),
       last_captured_pixel_format_(PIXEL_FORMAT_UNKNOWN) {}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 VideoCaptureDeviceClient::~VideoCaptureDeviceClient() {
   DFAKE_SCOPED_RECURSIVE_LOCK(call_from_producer_);
@@ -369,15 +349,6 @@ void VideoCaptureDeviceClient::OnIncomingCapturedData(
     OnLog("Pixel format: " + VideoPixelFormatToString(format.pixel_format));
     last_captured_pixel_format_ = format.pixel_format;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    if (format.pixel_format == PIXEL_FORMAT_MJPEG &&
-        optional_jpeg_decoder_factory_callback_) {
-      external_jpeg_decoder_ =
-          std::move(optional_jpeg_decoder_factory_callback_).Run();
-      CHECK(external_jpeg_decoder_);
-      external_jpeg_decoder_->Initialize();
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   if (!format.IsValid()) {
@@ -429,25 +400,6 @@ void VideoCaptureDeviceClient::OnIncomingCapturedData(
 
   const gfx::ColorSpace color_space = OverrideColorSpaceForLibYuvConversion(
       data_color_space, format.pixel_format);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (external_jpeg_decoder_) {
-    const VideoCaptureJpegDecoder::STATUS status =
-        external_jpeg_decoder_->GetStatus();
-    if (status == VideoCaptureJpegDecoder::FAILED) {
-      external_jpeg_decoder_.reset();
-    } else if (status == VideoCaptureJpegDecoder::INIT_PASSED &&
-               format.pixel_format == PIXEL_FORMAT_MJPEG && rotation == 0 &&
-               !flip) {
-      if (on_started_using_gpu_cb_)
-        std::move(on_started_using_gpu_cb_).Run();
-      external_jpeg_decoder_->DecodeCapturedData(data.data(), data.size(),
-                                                 format, reference_time,
-                                                 timestamp, std::move(buffer));
-      return;
-    }
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // libyuv::ConvertToI420 uses Rec601 to convert RGB to YUV.
   if (libyuv::ConvertToI420(

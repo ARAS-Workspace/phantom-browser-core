@@ -11,15 +11,7 @@
 namespace media {
 
 bool IsVp9kSVCHWDecodingEnabled() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // arm: Support is API and driver dependent:
-  // - V4L2 state*less* API decoder is not capable of decoding VP9 kSVC stream.
-  // - V4L2 state*ful* API decoder is capable of decoding, but is driver
-  // dependent. x86: Always supported.
-  return true;
-#else
   return false;
-#endif
 }
 
 }  // namespace media

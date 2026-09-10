@@ -67,24 +67,6 @@
 #include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/login/existing_user_controller.h"
-#include "chrome/browser/ash/login/login_manager_test.h"
-#include "chrome/browser/ash/login/session/user_session_manager.h"
-#include "chrome/browser/ash/login/test/login_manager_mixin.h"
-#include "chrome/browser/ash/login/test/session_manager_state_waiter.h"
-#include "chrome/browser/ash/login/wizard_controller.h"
-#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
-#include "chrome/browser/ash/policy/core/device_local_account_policy_service.h"
-#include "chrome/browser/ash/policy/core/device_policy_cros_browser_test.h"
-#include "chrome/browser/ash/policy/test_support/embedded_policy_test_server_mixin.h"
-#include "chrome/browser/ui/ash/login/login_display_host.h"
-#include "chromeos/ash/components/dbus/session_manager/fake_session_manager_client.h"
-#include "chromeos/ash/components/policy/device_local_account/device_local_account_type.h"
-#include "components/policy/proto/chrome_device_policy.pb.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 
 namespace {
@@ -109,24 +91,10 @@ using policy::DeveloperToolsAvailability;
 using UpdateDiscoveryTaskFuture = base::test::TestFuture<
     IsolatedWebAppUpdateCheckAndPrepareTask::CompletionStatus>;
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kUserMail[] = "dla@example.com";
-constexpr char kDisplayName[] = "display name";
-
-void WaitForProfile() {
-  ProfileWaiter waiter;
-  waiter.WaitForProfileAdded();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 
-#if BUILDFLAG(IS_CHROMEOS)
-using IsolatedWebAppPolicyManagerTestHarness = ash::LoginManagerTest;
-#else
 using IsolatedWebAppPolicyManagerTestHarness =
     web_app::IsolatedWebAppBrowserTestHarness;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class IsolatedWebAppPolicyManagerBrowserTestBase
     : public IsolatedWebAppPolicyManagerTestHarness {
@@ -139,13 +107,7 @@ class IsolatedWebAppPolicyManagerBrowserTestBase
  protected:
   explicit IsolatedWebAppPolicyManagerBrowserTestBase(bool is_user_session)
       : is_user_session_(is_user_session) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (is_user_session_) {
-      login_manager_mixin_.AppendRegularUsers(1);
-    }
-#else
     EXPECT_TRUE(is_user_session_);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void SetUpOnMainThread() override {
@@ -196,14 +158,6 @@ class IsolatedWebAppPolicyManagerBrowserTestBase
         std::vector<UpdateChannel>{kBetaChannel});
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    IsolatedWebAppPolicyManagerTestHarness::SetUpCommandLine(command_line);
-    command_line->AppendSwitch(ash::switches::kLoginManager);
-    command_line->AppendSwitch(ash::switches::kForceLoginManagerInTests);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   void SetUpInProcessBrowserTestFixture() override {
     IsolatedWebAppPolicyManagerTestHarness::SetUpInProcessBrowserTestFixture();
 
@@ -214,39 +168,13 @@ class IsolatedWebAppPolicyManagerBrowserTestBase
       policy::BrowserPolicyConnector::SetPolicyProviderForTesting(
           &policy_provider_);
     } else {
-#if BUILDFLAG(IS_CHROMEOS)
-      // Turning on device local account.
-      device_policy()->policy_data().set_public_key_version(1);
-      policy::DeviceLocalAccountTestHelper::SetupDeviceLocalAccount(
-          &device_local_account_policy_, kUserMail, kDisplayName);
-#else
       NOTREACHED();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void UploadAndInstallDeviceLocalAccountPolicy() {
-    // Build device local account policy.
-    device_local_account_policy_.SetDefaultSigningKey();
-    device_local_account_policy_.Build();
-
-    policy_test_server_mixin_.UpdatePolicy(
-        policy::dm_protocol::kChromePublicAccountPolicyType, kUserMail,
-        device_local_account_policy_.payload().SerializeAsString());
-
-    session_manager_client()->set_device_local_account_policy(
-        kUserMail, device_local_account_policy_.GetBlob());
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   void AddUser() {
     if (!is_user_session_) {
-#if BUILDFLAG(IS_CHROMEOS)
-      AddManagedGuestSessionToDevicePolicy();
-#else
       NOTREACHED();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     }
     // No user needs to be created for user session: the user was already
     // added in the constructor (technical constraint).
@@ -257,10 +185,6 @@ class IsolatedWebAppPolicyManagerBrowserTestBase
       return;
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    UploadAndInstallDeviceLocalAccountPolicy();
-    WaitForPolicy();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void InstallOneApp() {
@@ -270,15 +194,6 @@ class IsolatedWebAppPolicyManagerBrowserTestBase
     }
     AddDeviceLocalAccountIwaPolicy();
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void AddManagedGuestSessionToDevicePolicy() {
-    em::ChromeDeviceSettingsProto& proto(device_policy()->payload());
-    policy::DeviceLocalAccountTestHelper::AddPublicSession(&proto, kUserMail);
-    RefreshDevicePolicy();
-    policy_test_server_mixin_.UpdateDevicePolicy(proto);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // This policy is active at the moment of login.
   void AddDeviceLocalAccountIwaPolicy() {
@@ -353,48 +268,14 @@ class IsolatedWebAppPolicyManagerBrowserTestBase
 
   // Returns a profile which can be used for testing.
   Profile* GetProfileForTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    // Any profile can be used here since this test does not test multi profile.
-    return ProfileManager::GetActiveUserProfile();
-#else
     return profile();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void WaitForPolicy() {
-#if BUILDFLAG(IS_CHROMEOS)
-    // Wait for the display name becoming available as that indicates
-    // device-local account policy is fully loaded, which is a prerequisite for
-    // successful login.
-    policy::DictionaryLocalStateValueWaiter("UserDisplayName", kDisplayName,
-                                            account_id_.GetUserEmail())
-        .Wait();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void StartLogin(const std::vector<webapps::AppId>&
                       wait_for_initial_update_for_apps = {}) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (is_user_session_) {
-      LoginUser(login_manager_mixin_.users()[0].account_id);
-    } else {
-      // Start login into the device-local account.
-      auto* host = ash::LoginDisplayHost::default_host();
-      ASSERT_TRUE(host);
-      host->StartSignInScreen();
-      auto* controller = ash::ExistingUserController::current_controller();
-      ASSERT_TRUE(controller);
-
-      ash::UserContext user_context(user_manager::UserType::kPublicAccount,
-                                    account_id_);
-      controller->Login(user_context, ash::SigninSpecifics());
-
-      if (!wait_for_initial_update_for_apps.empty()) {
-        WaitForProfile();
-        CreateInitialDiscoveryUpdateWaiters(wait_for_initial_update_for_apps);
-      }
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void CreateInitialDiscoveryUpdateWaiters(const webapps::AppId& app_id) {
@@ -418,29 +299,7 @@ class IsolatedWebAppPolicyManagerBrowserTestBase
   }
 
   void WaitForSessionStart() {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (session_manager::SessionManager::Get()->IsSessionStarted()) {
-      return;
-    }
-    if (ash::WizardController::default_controller()) {
-      ash::WizardController::default_controller()
-          ->SkipPostLoginScreensForTesting();
-    }
-    ash::test::WaitForPrimaryUserSessionStart();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void RefreshDevicePolicy() { policy_helper_.RefreshDevicePolicy(); }
-
-  policy::DevicePolicyBuilder* device_policy() {
-    return policy_helper_.device_policy();
-  }
-
-  ash::FakeSessionManagerClient* session_manager_client() {
-    return ash::FakeSessionManagerClient::Get();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   WebAppProvider& provider() {
     CHECK(GetProfileForTest());
@@ -455,18 +314,6 @@ class IsolatedWebAppPolicyManagerBrowserTestBase
       &mixin_host_};
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  const AccountId account_id_ =
-      AccountId::FromUserEmail(GenerateDeviceLocalAccountUserId(
-          kUserMail,
-          policy::DeviceLocalAccountType::kPublicSession));
-  ash::EmbeddedPolicyTestServerMixin policy_test_server_mixin_{&mixin_host_};
-  ash::DeviceStateMixin device_state_{
-      &mixin_host_,
-      ash::DeviceStateMixin::State::OOBE_COMPLETED_CLOUD_ENROLLED};
-  ash::LoginManagerMixin login_manager_mixin_{&mixin_host_};
-  policy::DevicePolicyCrosTestHelper policy_helper_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   base::test::ScopedFeatureList scoped_feature_list_;
   IsolatedWebAppTestUpdateServer iwa_test_update_server_;
   testing::NiceMock<policy::MockConfigurationPolicyProvider> policy_provider_;
@@ -797,13 +644,7 @@ IN_PROC_BROWSER_TEST_P(IsolatedWebAppPolicyManagerBrowserTest,
 INSTANTIATE_TEST_SUITE_P(
     /***/,
     IsolatedWebAppPolicyManagerBrowserTest,
-#if BUILDFLAG(IS_CHROMEOS)
-    // Controls whether or not to test in a user session (true) or in a managed
-    // guest session (false).
-    testing::Bool()
-#else
     testing::ValuesIn({true})
-#endif  // BUILDFLAG(IS_CHROMEOS)
 );
 
 class IsolatedWebAppDevToolsTestWithPolicy
@@ -867,11 +708,7 @@ INSTANTIATE_TEST_SUITE_P(
     /***/,
     IsolatedWebAppDevToolsTestWithPolicy,
     testing::Combine(
-#if BUILDFLAG(IS_CHROMEOS)
-        /*is_user_session=*/testing::Bool(),
-#else
         /*is_user_session=*/testing::ValuesIn({true}),
-#endif  // BUILDFLAG(IS_CHROMEOS)
         testing::Values(
             DeveloperToolsAvailability::kAllowed,
             DeveloperToolsAvailability::
@@ -961,13 +798,8 @@ IN_PROC_BROWSER_TEST_P(CleanupOrphanedBundlesTest,
 INSTANTIATE_TEST_SUITE_P(
     /***/,
     CleanupOrphanedBundlesTest,
-#if BUILDFLAG(IS_CHROMEOS)
-    // Is a user session (true) or a managed guest session (false).
-    testing::Bool()
-#else
     // We only test user sessions outside of ChromeOS.
     testing::ValuesIn({true})
-#endif  // BUILDFLAG(IS_CHROMEOS)
 );
 
 }  // namespace web_app

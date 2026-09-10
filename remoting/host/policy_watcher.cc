@@ -166,16 +166,9 @@ base::DictValue PolicyWatcher::GetDefaultPolicies() {
   result.Set(key::kRemoteAccessHostUdpPortRange, "");
   result.Set(key::kRemoteAccessHostClipboardSizeBytes, -1);
   result.Set(key::kRemoteAccessHostAllowRemoteSupportConnections, true);
-#if BUILDFLAG(IS_CHROMEOS)
-  result.Set(key::kRemoteAccessHostAllowEnterpriseRemoteSupportConnections,
-             true);
-  result.Set(key::kRemoteAccessHostAllowEnterpriseFileTransfer, false);
-  result.Set(key::kClassManagementEnabled, "disabled");
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   result.Set(key::kRemoteAccessHostMatchUsername, false);
 #endif
-#if !BUILDFLAG(IS_CHROMEOS)
   result.Set(key::kRemoteAccessHostRequireCurtain, false);
   result.Set(key::kRemoteAccessHostAllowClientPairing, true);
   result.Set(key::kRemoteAccessHostAllowGnubbyAuth, true);
@@ -185,7 +178,6 @@ base::DictValue PolicyWatcher::GetDefaultPolicies() {
   result.Set(key::kRemoteAccessHostAllowRemoteAccessConnections, true);
   result.Set(key::kRemoteAccessHostMaximumSessionDurationMinutes, 0);
   result.Set(key::kRemoteAccessHostAllowPinAuthentication, base::Value());
-#endif
   return result;
 }
 
@@ -403,8 +395,6 @@ std::unique_ptr<PolicyWatcher> PolicyWatcher::CreateWithTaskRunner(
   return base::WrapUnique(new PolicyWatcher(owned_policy_service.get(),
                                             std::move(owned_policy_service),
                                             nullptr, CreateSchemaRegistry()));
-#elif BUILDFLAG(IS_CHROMEOS)
-  NOTREACHED() << "CreateWithPolicyService() should be used on ChromeOS.";
 #else
 #error OS that is not yet supported by PolicyWatcher code.
 #endif

@@ -24,7 +24,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace {
-#if !BUILDFLAG(IS_CHROMEOS)
 const char kEmail[] = "example@email.com";
 
 void CheckProfilePrefsReset(PrefService* pref_service,
@@ -51,7 +50,6 @@ void SetProfilePrefs(PrefService* pref_service) {
 
   CheckProfilePrefsSet(pref_service, false);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }  // namespace
 
 class SigninProfileAttributesUpdaterTest : public testing::Test {
@@ -89,7 +87,6 @@ class SigninProfileAttributesUpdaterTest : public testing::Test {
       signin_profile_attributes_updater_;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Tests that the browser state info is updated on signin and signout.
 // ChromeOS does not support signout.
 TEST_F(SigninProfileAttributesUpdaterTest, SigninSignout) {
@@ -218,4 +215,3 @@ TEST_F(SigninProfileAttributesUpdaterWithForceSigninTest, IsSigninRequired) {
   EXPECT_EQ(entry->GetSigninState(), SigninState::kNotSignedIn);
   EXPECT_TRUE(entry->IsSigninRequired());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

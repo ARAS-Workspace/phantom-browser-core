@@ -223,12 +223,6 @@ void TranslatePrefs::ResetToDefaults() {
 // static
 base::ListValue TranslatePrefs::GetDefaultBlockedLanguages() {
   base::ListValue languages;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Preferred languages.
-  LanguageTag language =
-      ToTranslateLanguageTag(language::kFallbackInputMethodLocale);
-  languages.Append(language.tag_string());
-#else
   // Accept languages.
 #pragma GCC diagnostic push
 // See comment above the |break;| in the loop just below for why.
@@ -252,7 +246,6 @@ base::ListValue TranslatePrefs::GetDefaultBlockedLanguages() {
     break;
 #pragma GCC diagnostic pop
   }
-#endif
 
   std::sort(languages.begin(), languages.end());
   languages.erase(std::unique(languages.begin(), languages.end()),

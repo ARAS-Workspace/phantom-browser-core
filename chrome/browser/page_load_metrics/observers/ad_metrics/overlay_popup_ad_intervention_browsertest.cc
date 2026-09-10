@@ -62,7 +62,7 @@ class OverlayPopupAdViolationBrowserTest
 };
 
 // TODO(crbug.com/40761472): Fails on Linux MSan and ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER)
 #define MAYBE_NoOverlayPopupAd_AdInterventionNotTriggered \
   DISABLED_NoOverlayPopupAd_AdInterventionNotTriggered
 #else
@@ -96,11 +96,8 @@ IN_PROC_BROWSER_TEST_F(OverlayPopupAdViolationBrowserTest,
 }
 
 // TODO(crbug.com/40856777): Fix flakiness and re-enable test.
-#if (BUILDFLAG(IS_LINUX) &&                                     \
-     (defined(MEMORY_SANITIZER) || defined(LEAK_SANITIZER))) || \
-    (BUILDFLAG(IS_CHROMEOS) && !defined(NDEBUG)) ||             \
-    (defined(LEAK_SANITIZER) && BUILDFLAG(IS_CHROMEOS) &&       \
-     defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && \
+    (defined(MEMORY_SANITIZER) || defined(LEAK_SANITIZER))
 #define MAYBE_OverlayPopupAd_AdInterventionTriggered \
   DISABLED_OverlayPopupAd_AdInterventionTriggered
 #else
@@ -158,10 +155,7 @@ class OverlayPopupAdViolationBrowserTestWithoutEnforcement
 
 // TODO(crbug.com/40248595): Fails on Linux MSan, and ChromeOS Debug as
 // well as Asan LSsan.
-#if (BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER)) || \
-    (BUILDFLAG(IS_CHROMEOS) &&                            \
-     (!defined(NDEBUG) || defined(ADDRESS_SANITIZER) ||   \
-      defined(LEAK_SANITIZER)))
+#if BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER)
 #define MAYBE_OverlayPopupAd_NoAdInterventionTriggered \
   DISABLED_OverlayPopupAd_NoAdInterventionTriggered
 #else

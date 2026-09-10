@@ -17,11 +17,7 @@ BASE_FEATURE(kSegmentationPlatformFeature,
 
 BASE_FEATURE(kSegmentationPlatformUkmEngine,
 
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kSegmentationPlatformAdaptiveToolbarV2Feature,
              base::FEATURE_ENABLED_BY_DEFAULT);
@@ -114,11 +110,7 @@ BASE_FEATURE(kSegmentationPlatformComposePromotion,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSegmentationPlatformUmaFromSqlDb,
-#if !BUILDFLAG(IS_CHROMEOS)
              base::FEATURE_ENABLED_BY_DEFAULT);
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kSegmentationPlatformURLVisitResumptionRanker,
              base::FEATURE_ENABLED_BY_DEFAULT);

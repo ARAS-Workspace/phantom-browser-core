@@ -15,8 +15,6 @@ namespace {
 ClientInfo::ChromeClientInfo::Platform GetPlatform() {
 #if BUILDFLAG(IS_MAC)
   return ClientInfo::ChromeClientInfo::PLATFORM_MACOS;
-#elif BUILDFLAG(IS_CHROMEOS)
-  return ClientInfo::ChromeClientInfo::PLATFORM_CHROMEOS;
 #elif BUILDFLAG(IS_LINUX)
   return ClientInfo::ChromeClientInfo::PLATFORM_LINUX;
 #elif BUILDFLAG(IS_ANDROID)

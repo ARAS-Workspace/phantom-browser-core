@@ -1033,8 +1033,7 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest, CacheHTTPDocumentOnly) {
 
 // TODO(crbug.com/1127979, crbug.com/1446206): Flaky on Linux, ChromeOS, iOS,
 // and Mac.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
 #define MAYBE_NavigateToTwoPagesOnSameSite DISABLED_NavigateToTwoPagesOnSameSite
 #else
 #define MAYBE_NavigateToTwoPagesOnSameSite NavigateToTwoPagesOnSameSite

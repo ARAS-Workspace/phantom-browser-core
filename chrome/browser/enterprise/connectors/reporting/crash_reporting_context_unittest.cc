@@ -42,8 +42,6 @@ using ::testing::Return;
 
 namespace enterprise_connectors {
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 void CreateCrashReport(crashpad::CrashReportDatabase* database,
@@ -198,7 +196,5 @@ INSTANTIATE_TEST_SUITE_P(
                               kDefaultCrashpadPollingIntervalSeconds)));
 
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace enterprise_connectors

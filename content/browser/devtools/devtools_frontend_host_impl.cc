@@ -26,10 +26,10 @@
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
 #include "ui/base/webui/resource_path.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "components/crash/content/browser/error_reporting/javascript_error_report.h"  // nogncheck
 #include "components/crash/content/browser/error_reporting/js_error_report_processor.h"  // nogncheck
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace content {
 namespace {
@@ -38,7 +38,7 @@ const char kCompatibilityScriptSourceURL[] =
     "\n//# "
     "sourceURL=devtools://devtools/bundled/devtools_compatibility.js";
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Remove the pieces of the URL we don't want to send back with the error
 // reports. In particular, do not send query or fragments as those can have
 // privacy-sensitive information in them.
@@ -52,7 +52,7 @@ std::string RedactURL(const GURL& url) {
   base::StrAppend(&redacted_url, {url.path()});
   return redacted_url;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 // static
@@ -134,7 +134,7 @@ void DevToolsFrontendHostImpl::DispatchEmbedderMessage(
   handle_message_callback_.Run(std::move(message));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void DevToolsFrontendHostImpl::OnDidAddMessageToConsole(
     RenderFrameHost* source_frame,
     blink::mojom::ConsoleMessageLevel log_level,
@@ -190,6 +190,6 @@ void DevToolsFrontendHostImpl::OnDidAddMessageToConsole(
   processor->SendErrorReport(std::move(report), base::DoNothing(),
                              web_contents()->GetBrowserContext());
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace content

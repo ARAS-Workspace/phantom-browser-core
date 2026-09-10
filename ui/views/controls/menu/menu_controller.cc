@@ -1505,11 +1505,6 @@ void MenuController::TurnOffMenuSelectionHoldForTest() {
 }
 
 ui::ColorId MenuController::GetSeparatorColorId() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (use_ash_system_ui_layout_) {
-    return ui::kColorAshSystemUIMenuSeparator;
-  }
-#endif
   return ui::kColorMenuSeparator;
 }
 

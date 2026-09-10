@@ -115,7 +115,7 @@ inline bool IsArchitectureMips() {
 // to allow those futex(2) calls to fail with EINVAL, instead of crashing the
 // process. See crbug.com/598471.
 inline bool IsBuggyGlibcSemPost() {
-#if defined(LIBC_GLIBC) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(LIBC_GLIBC)
   return true;
 #else
   return false;

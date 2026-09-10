@@ -30,14 +30,8 @@
 #include "chrome/updater/updater_scope.h"   // nogncheck
 #endif
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #include "chrome/test/base/scoped_channel_override.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/dbus/spaced/fake_spaced_client.h"
-#include "chromeos/ash/components/dbus/spaced/spaced_client.h"
-#include "chromeos/ash/components/login/auth/auth_events_recorder.h"
 #endif
 
 namespace system_logs {
@@ -74,7 +68,7 @@ IN_PROC_BROWSER_TEST_F(ChromeInternalLogSourceTest,
       response->at("CHROME VERSION"));
 }
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 IN_PROC_BROWSER_TEST_F(ChromeInternalLogSourceTest,
                        VersionTagContainsExtendedLabel) {
   chrome::ScopedChannelOverride channel_override(
@@ -148,54 +142,6 @@ IN_PROC_BROWSER_TEST_F(ChromeInternalLogSourceTest, CpuTypePresentAndValid) {
 #endif
 }
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(ChromeInternalLogSourceTest,
-                       FreeAndTotalDiskSpacePresent) {
-  ash::FakeSpacedClient::Get()->set_free_disk_space(1000);
-  ash::FakeSpacedClient::Get()->set_total_disk_space(100000);
-
-  std::unique_ptr<SystemLogsResponse> response = GetChromeInternalLogs();
-  ASSERT_TRUE(response);
-  auto free_disk_space = response->at("FREE_DISK_SPACE");
-  auto total_disk_space = response->at("TOTAL_DISK_SPACE");
-
-  EXPECT_EQ(free_disk_space, "1000");
-  EXPECT_EQ(total_disk_space, "100000");
-}
-
-IN_PROC_BROWSER_TEST_F(ChromeInternalLogSourceTest,
-                       KnowledgeFactorAuthFailuresPresent) {
-  ash::AuthEventsRecorder::Get()->OnKnowledgeFactorAuthFailure();
-
-  std::unique_ptr<SystemLogsResponse> response = GetChromeInternalLogs();
-  auto knowledge_factor_auth_failure_count =
-      response->at("FAILED_KNOWLEDGE_FACTOR_ATTEMPTS");
-
-  EXPECT_EQ(knowledge_factor_auth_failure_count, "1");
-}
-
-IN_PROC_BROWSER_TEST_F(ChromeInternalLogSourceTest, RecordedAuthEventsPresent) {
-  auto* auth_events_recorder = ash::AuthEventsRecorder::Get();
-  auth_events_recorder->OnAuthenticationSurfaceChange(
-      ash::AuthEventsRecorder::AuthenticationSurface::kLogin);
-  auth_events_recorder->OnLockContentsViewUpdate();
-  auth_events_recorder->OnAuthSubmit();
-  auth_events_recorder->OnLoginSuccess(ash::SuccessReason::OFFLINE_ONLY,
-                                       /*is_new_user=*/false,
-                                       /*is_login_offline=*/true,
-                                       /*is_ephemeral=*/false);
-  auth_events_recorder->OnExistingUserLoginScreenExit(
-      ash::AuthEventsRecorder::AuthenticationOutcome::kSuccess, 1);
-
-  std::unique_ptr<SystemLogsResponse> response = GetChromeInternalLogs();
-  auto auth_events = response->at("RECORDED_AUTH_EVENTS");
-
-  EXPECT_EQ(auth_events,
-            "auth_surface_change_Login,update_lock_screen_view,auth_submit,"
-            "login_offline,login_screen_exit_success,");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 }  // namespace system_logs

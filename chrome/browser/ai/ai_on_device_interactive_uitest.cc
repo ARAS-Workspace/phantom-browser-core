@@ -139,11 +139,7 @@ void InjectOTToken(content::WebContents* tab, std::string_view token) {
 }
 
 // TODO(crbug.com/419321441): Support Built-In AI APIs on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_AIOnDeviceBrowserTest DISABLED_AIOnDeviceBrowserTest
-#else
 #define MAYBE_AIOnDeviceBrowserTest AIOnDeviceBrowserTest
-#endif  // BUILDFLAG(IS_CHROMEOS)
 class MAYBE_AIOnDeviceBrowserTest
     : public InProcessBrowserTest,
       public testing::WithParamInterface<Variant> {

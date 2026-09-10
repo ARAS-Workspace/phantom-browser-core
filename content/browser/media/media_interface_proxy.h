@@ -98,18 +98,6 @@ class MediaInterfaceProxy final : public DocumentUserData<MediaInterfaceProxy>,
   void OnCdmServiceConnectionError(const media::CdmType& cdm_type);
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Callback for for Chrome OS CDM creation to facilitate falling back to the
-  // library CDM if the daemon is unavailable or other settings prevent usage of
-  // it.
-  void OnChromeOsCdmCreated(
-      const media::CdmConfig& cdm_config,
-      CreateCdmCallback callback,
-      mojo::PendingRemote<media::mojom::ContentDecryptionModule> receiver,
-      media::mojom::CdmContextPtr cdm_context,
-      media::CreateCdmStatus status);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   mojo::UniqueReceiverSet<media::mojom::FrameInterfaceFactory> frame_factories_;
 
   // InterfacePtr to the remote InterfaceFactory implementation in the Media

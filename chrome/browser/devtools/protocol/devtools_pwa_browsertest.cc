@@ -1096,13 +1096,7 @@ IN_PROC_BROWSER_TEST_F(PWAProtocolTest, ChangeAppUserSettings_ChangeNothing) {
             GetAppUserSettings(InstallableWebAppManifestId()));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Setting linkCapturing on ChromeOS is not supported yet.
-// TODO(crbug.com/339453269): Implement setting linkCapturing on ChromeOS.
-#define DISABLE_ON_CHROMEOS(x) DISABLED_##x
-#else
 #define DISABLE_ON_CHROMEOS(x) x
-#endif
 
 IN_PROC_BROWSER_TEST_F(PWAProtocolTest,
                        DISABLE_ON_CHROMEOS(ChangeAppUserSettings_NoApp)) {

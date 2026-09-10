@@ -29,11 +29,6 @@
 #include "ui/gfx/geometry/rect.h"
 #include "ui/gfx/geometry/size.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "printing/cups_printer_status_reason_ash.h"
-#include "printing/print_settings_conversion_chromeos.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace printing {
 
 namespace {
@@ -290,7 +285,7 @@ std::unique_ptr<PrintSettings> PrintSettingsFromJobSettings(
     settings->set_is_modifiable(is_modifiable.value());
   }
 
-#if BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_CUPS))
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_CUPS)
   const base::DictValue* advanced_settings =
       job_settings.FindDict(kSettingAdvancedSettings);
   if (advanced_settings) {
@@ -303,47 +298,7 @@ std::unique_ptr<PrintSettings> PrintSettingsFromJobSettings(
       }
     }
   }
-#endif  // BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_LINUX) &&
-        // BUILDFLAG(USE_CUPS))
-
-#if BUILDFLAG(IS_CHROMEOS)
-  bool send_user_info =
-      job_settings.FindBool(kSettingSendUserInfo).value_or(false);
-  settings->set_send_user_info(send_user_info);
-  if (send_user_info) {
-    const std::string* username = job_settings.FindString(kSettingUsername);
-    if (username) {
-      settings->set_username(*username);
-    }
-  }
-
-  const std::string* oauth_token =
-      job_settings.FindString(kSettingChromeOSAccessOAuthToken);
-  if (oauth_token) {
-    settings->set_oauth_token(*oauth_token);
-  }
-
-  const std::string* pin_value = job_settings.FindString(kSettingPinValue);
-  if (pin_value) {
-    settings->set_pin_value(*pin_value);
-  }
-
-  const base::ListValue* client_info_list =
-      job_settings.FindList(kSettingIppClientInfo);
-  if (client_info_list) {
-    settings->set_client_infos(
-        ConvertJobSettingToClientInfo(*client_info_list));
-  }
-
-  settings->set_printer_manually_selected(
-      job_settings.FindBool(kSettingPrinterManuallySelected).value_or(false));
-
-  std::optional<int> reason = job_settings.FindInt(kSettingPrinterStatusReason);
-  if (reason.has_value()) {
-    settings->set_printer_status_reason(
-        static_cast<CupsPrinterStatusReason>(reason.value()));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_CUPS)
 
   return settings;
 }
@@ -403,11 +358,6 @@ base::DictValue PrintSettingsToJobSettingsDebug(const PrintSettings& settings) {
   SetRectToJobSettings("content_area", page_setup.content_area(), debug);
   SetRectToJobSettings("printable_area", page_setup.printable_area(), debug);
   job_settings.Set("debug", std::move(debug));
-
-#if BUILDFLAG(IS_CHROMEOS)
-  job_settings.Set(kSettingIppClientInfo,
-                   ConvertClientInfoToJobSetting(settings.client_infos()));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   return job_settings;
 }

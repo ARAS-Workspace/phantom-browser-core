@@ -254,7 +254,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest,
 }
 
 // Test platform node ids on OS's that have platform nodes.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(AccessibilityModeTest, ReEnablingDoesNotAlterUniqueIds) {
   ASSERT_TRUE(NavigateToURL(shell(), GURL(R"HTML(
       data:text/html,<!DOCTYPE html>
@@ -329,6 +329,6 @@ IN_PROC_BROWSER_TEST_F(AccessibilityModeTest, ReEnablingDoesNotAlterUniqueIds) {
   EXPECT_EQ(unique_id_1, button_1_refresh->GetAXPlatformNode()->GetUniqueId());
   EXPECT_EQ(unique_id_2, button_2_refresh->GetAXPlatformNode()->GetUniqueId());
 }
-#endif  // #if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

@@ -17,11 +17,11 @@ class Event;
 COMPONENT_EXPORT(UI_BASE)
 mojom::MenuSourceType GetMenuSourceTypeForEvent(const Event& event);
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 // Returns the menu source type based on `event_flags`.
 COMPONENT_EXPORT(UI_BASE)
 mojom::MenuSourceType GetMenuSourceType(int event_flags);
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 }  // namespace ui
 

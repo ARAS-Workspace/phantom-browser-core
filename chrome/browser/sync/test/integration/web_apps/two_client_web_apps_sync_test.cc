@@ -256,11 +256,7 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsSyncTest, IsLocallyInstalled) {
   web_app::proto::InstallState expected_state;
   // ChromeOS fully installs all synced apps, whereas desktop keeps them as
   // "SUGGESTED_FROM_ANOTHER_DEVICE".
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_state = proto::INSTALLED_WITH_OS_INTEGRATION;
-#else
   expected_state = proto::SUGGESTED_FROM_ANOTHER_DEVICE;
-#endif
   EXPECT_EQ(expected_state,
             GetRegistrar(GetProfile(1)).GetInstallState(app_id));
   EXPECT_TRUE(AllProfilesHaveSameWebAppIds());
@@ -352,18 +348,6 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsSyncTest, SyncFaviconOnly) {
     ASSERT_TRUE(ui_test_utils::NavigateToURL(
         browser,
         embedded_test_server()->GetURL("/web_apps/favicon_only.html")));
-#if BUILDFLAG(IS_CHROMEOS)
-    base::AutoReset<web_app::InstallDialogTestResponse> auto_accept =
-        web_app::SetPwaInstallationAutoRespondForTesting(
-            web_app::InstallDialogTestResponse::kAcceptAndLaunch);
-    base::AutoReset<web_app::CreateShortcutDialogCheckState> auto_check =
-        web_app::SetCreateShortcutDialogCheckStateForTesting(
-            web_app::CreateShortcutDialogCheckState::kChecked);
-    WebAppTestInstallObserver installObserver(sourceProfile);
-    installObserver.BeginListening();
-    chrome::ExecuteCommand(browser, IDC_CREATE_SHORTCUT);
-    app_id = installObserver.Wait();
-#else
     // Install as DIY App.
     base::AutoReset<web_app::InstallDialogTestResponse> auto_accept_diy =
         web_app::SetPwaInstallationAutoRespondForTesting(
@@ -372,7 +356,6 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsSyncTest, SyncFaviconOnly) {
     installObserver.BeginListening();
     CHECK(chrome::ExecuteCommand(browser, IDC_INSTALL_PWA));
     app_id = installObserver.Wait();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     chrome::CloseWindow(browser);
   }
   EXPECT_EQ(GetRegistrar(sourceProfile).GetAppShortName(app_id),
@@ -464,9 +447,6 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsSyncTest, SyncWithoutUsingNameFallback) {
   bool should_use_fallback = true;
   // ChromeOS always installs from the manifest, even when trusted icons are
   // enabled.
-#if BUILDFLAG(IS_CHROMEOS)
-  should_use_fallback = false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Post trusted icons infrastructure launch, sync installs always use fallback
   // information.
@@ -546,26 +526,16 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsSyncTest, SyncUserDisplayModeChange) {
   auto* provider0 = WebAppProvider::GetForTest(GetProfile(0));
   auto* provider1 = WebAppProvider::GetForTest(GetProfile(1));
   WebAppRegistrar& registrar1 = provider1->registrar_unsafe();
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(registrar1.GetAppUserDisplayMode(app_id),
-            mojom::UserDisplayMode::kStandalone);
-#else
   EXPECT_EQ(registrar1.GetAppUserDisplayMode(app_id),
             mojom::UserDisplayMode::kBrowser);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   DisplayModeChangeWaiter display_mode_change_waiter(registrar1);
   provider0->sync_bridge_unsafe().SetAppUserDisplayModeForTesting(
       app_id, mojom::UserDisplayMode::kTabbed);
   display_mode_change_waiter.Wait();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(registrar1.GetAppUserDisplayMode(app_id),
-            mojom::UserDisplayMode::kTabbed);
-#else
   EXPECT_EQ(registrar1.GetAppUserDisplayMode(app_id),
             mojom::UserDisplayMode::kBrowser);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace web_app

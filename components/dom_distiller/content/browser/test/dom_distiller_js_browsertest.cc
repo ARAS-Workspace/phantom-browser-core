@@ -108,7 +108,7 @@ class DomDistillerJsTest : public content::ContentBrowserTest {
 // crrev.com/c/916021). We must solve this precision issue.
 #if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_ANDROID) ||        \
     defined(THREAD_SANITIZER) ||                                 \
-    ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&          \
+    (BUILDFLAG(IS_LINUX) &&                                      \
      (BUILDFLAG(CFI_CAST_CHECK) || BUILDFLAG(CFI_ICALL_CHECK) || \
       BUILDFLAG(CFI_ENFORCEMENT_DIAGNOSTIC) ||                   \
       BUILDFLAG(CFI_ENFORCEMENT_TRAP)))

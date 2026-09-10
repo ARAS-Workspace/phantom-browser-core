@@ -51,13 +51,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/shell.h"
-#include "chrome/browser/ui/webui/ash/parent_access/parent_access_dialog.h"
-#include "ui/events/event_constants.h"
-#include "ui/events/test/event_generator.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 using content::NavigationController;
@@ -70,9 +63,6 @@ static const char* kFamiliesHost = "families.google.com";
 static const char* kIframeHost1 = "www.iframe1.com";
 static const char* kIframeHost2 = "www.iframe2.com";
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kLocalUrlAccessCommand[] = "requestUrlAccessLocal";
-#endif
 constexpr char kRemoteUrlAccessCommand[] = "requestUrlAccessRemote";
 
 // Class to keep track of iframes created and destroyed.
@@ -298,12 +288,7 @@ INSTANTIATE_TEST_SUITE_P(,
                          });
 
 // Tests that prerendering fails in supervised user mode.
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/40201321): Flaky on ChromeOS.
-#define MAYBE_DisallowPrerendering DISABLED_DisallowPrerendering
-#else
 #define MAYBE_DisallowPrerendering DisallowPrerendering
-#endif
 IN_PROC_BROWSER_TEST_P(SupervisedUserNavigationThrottleWithPrerenderingTest,
                        MAYBE_DisallowPrerendering) {
   const GURL initial_url = embedded_test_server()->GetURL("/simple.html");
@@ -797,12 +782,10 @@ IN_PROC_BROWSER_TEST_F(
   // request.
   EXPECT_EQ(requested_host, kStrippedExampleHost);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // TODO(crbug.com/376229427): Unguard once flakiness removed.
   WaitForNavigationFinished(blocked_frame_id, blocked_url);
   // The unstriped url gets unblocked.
   EXPECT_FALSE(IsInterstitialBeingShownInFrame(blocked_frame_id));
-#endif
 }
 
 // Tests that the url stripping is applied on the url on the interstitial, when
@@ -982,215 +965,6 @@ IN_PROC_BROWSER_TEST_F(SupervisedUserIframeFilterTest,
 // The switches::kHostWindowBounds commandline flag doesn't appear to work
 // for tests on other platforms.
 // TODO(b/300426225): enable these tests on Linux/Mac/Windows.
-#if BUILDFLAG(IS_CHROMEOS)
-class SupervisedUserNarrowWidthIframeFilterTest
-    : public SupervisedUserIframeFilterTest {
- protected:
-  SupervisedUserNarrowWidthIframeFilterTest() = default;
-  ~SupervisedUserNarrowWidthIframeFilterTest() override = default;
-
-  void SetUp() override;
-};
-
-void SupervisedUserNarrowWidthIframeFilterTest::SetUp() {
-  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-      ::switches::kHostWindowBounds, "0+0-400x800");
-  SupervisedUserIframeFilterTest::SetUp();
-}
-
-IN_PROC_BROWSER_TEST_F(SupervisedUserNarrowWidthIframeFilterTest,
-                       NarrowWidthWindow) {
-  BlockHost(kExampleHost);
-
-  GURL blocked_url = embedded_test_server()->GetURL(
-      kExampleHost, "/supervised_user/with_iframes.html");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), blocked_url));
-  EXPECT_TRUE(IsInterstitialBeingShownInMainFrame(browser()));
-
-  auto blocked_frames = GetBlockedFrames();
-  EXPECT_EQ(blocked_frames.size(), 1u);
-
-  // Expect that remote approvals button is shown.
-  EXPECT_TRUE(IsRemoteApprovalsButtonBeingShown(blocked_frames[0]));
-  // Expect that the local approvals button is shown if the flag is enabled.
-  EXPECT_EQ(IsLocalWebApprovalsEnabled(),
-            IsLocalApprovalsButtonBeingShown(blocked_frames[0]));
-  // Expect that the "Details" link is no longer available for the new
-  // interstitial UI.
-  EXPECT_FALSE(IsDetailsLinkAvailable(blocked_frames[0]));
-
-  // Delay approval/denial by parent.
-  permission_creator()->SetPermissionResult(true);
-  permission_creator()->DelayHandlingForNextRequests();
-
-  // Request permission.
-  SendCommandToFrame(kRemoteUrlAccessCommand, blocked_frames[0]);
-
-  // Navigate to another allowed url.
-  GURL allowed_url = embedded_test_server()->GetURL(
-      kExampleHost2, "/supervised_user/with_iframes.html");
-
-  kids_management_api_mock().AllowSubsequentClassifyUrl();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), allowed_url));
-  EXPECT_FALSE(IsInterstitialBeingShownInMainFrame(browser()));
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), blocked_url));
-  EXPECT_TRUE(IsInterstitialBeingShownInMainFrame(browser()));
-
-  // Navigate back to the blocked url.
-  EXPECT_TRUE(IsInterstitialBeingShownInMainFrame(browser()));
-
-  // Error page is being shown, but "Ask Permission" button is not being shown.
-  EXPECT_FALSE(IsRemoteApprovalsButtonBeingShown(blocked_frames[0]));
-  // Expect that the local approvals instead button is shown on the page if the
-  // flag is enabled.
-  EXPECT_EQ(IsLocalWebApprovalsEnabled(),
-            IsLocalApprovalsInsteadButtonBeingShown(blocked_frames[0]));
-
-  ASSERT_NE(supervised_user_navigation_observer(), nullptr);
-
-  EXPECT_TRUE(supervised_user_navigation_observer()
-                  ->requested_hosts_for_test()
-                  .contains(kExampleHost));
-
-  NavigationFinishedWaiter waiter(
-      web_contents(),
-      web_contents()->GetPrimaryMainFrame()->GetFrameTreeNodeId(), blocked_url);
-  permission_creator()->HandleDelayedRequests();
-  waiter.Wait();
-
-  EXPECT_FALSE(supervised_user_navigation_observer()
-                   ->requested_hosts_for_test()
-                   .contains(kExampleHost));
-
-  EXPECT_FALSE(IsInterstitialBeingShownInMainFrame(browser()));
-}
-
-// Tests Chrome OS local web approvals flow.
-using ChromeOSLocalWebApprovalsTest = SupervisedUserIframeFilterTest;
-
-IN_PROC_BROWSER_TEST_F(ChromeOSLocalWebApprovalsTest,
-                       StartLocalWebApprovalsFromMainFrame) {
-  base::HistogramTester histogram_tester;
-  BlockHost(kExampleHost);
-
-  GURL blocked_url = embedded_test_server()->GetURL(
-      kExampleHost, "/supervised_user/simple.html");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), blocked_url));
-  EXPECT_TRUE(IsInterstitialBeingShownInMainFrame(browser()));
-
-  const std::vector<content::FrameTreeNodeId> blocked_frames =
-      GetBlockedFrames();
-  ASSERT_EQ(blocked_frames.size(), 1u);
-  const content::FrameTreeNodeId blocked_frame = blocked_frames[0];
-  EXPECT_TRUE(IsLocalApprovalsButtonBeingShown(blocked_frame));
-  EXPECT_TRUE(IsRemoteApprovalsButtonBeingShown(blocked_frame));
-  CheckPreferredApprovalButton(blocked_frame);
-
-  // Trigger local approval flow - native dialog should appear.
-  SendCommandToFrame(kLocalUrlAccessCommand, blocked_frame);
-  EXPECT_TRUE(ash::ParentAccessDialog::GetInstance());
-
-  // Close the flow without approval - interstitial should be still shown.
-  ui::test::EventGenerator generator(ash::Shell::Get()->GetPrimaryRootWindow());
-  generator.PressKey(ui::VKEY_ESCAPE, ui::EF_NONE);
-
-  EXPECT_FALSE(ash::ParentAccessDialog::GetInstance());
-  EXPECT_TRUE(IsInterstitialBeingShownInMainFrame(browser()));
-  EXPECT_TRUE(IsLocalApprovalsButtonBeingShown(blocked_frame));
-  EXPECT_TRUE(IsRemoteApprovalsButtonBeingShown(blocked_frame));
-  CheckPreferredApprovalButton(blocked_frame);
-
-  histogram_tester.ExpectUniqueSample(
-      supervised_user::SupervisedUserInterstitial::
-          kInterstitialCommandHistogramName,
-      supervised_user::SupervisedUserInterstitial::Commands::
-          LOCAL_ACCESS_REQUEST,
-      1);
-  histogram_tester.ExpectUniqueSample(
-      supervised_user::SupervisedUserInterstitial::
-          kInterstitialPermissionSourceHistogramName,
-      supervised_user::SupervisedUserInterstitial::RequestPermissionSource::
-          MAIN_FRAME,
-      1);
-}
-
-IN_PROC_BROWSER_TEST_F(ChromeOSLocalWebApprovalsTest,
-                       StartLocalWebApprovalsFromIframe) {
-  base::HistogramTester histogram_tester;
-  BlockHost(kIframeHost1);
-
-  const GURL allowed_url_with_iframes = embedded_test_server()->GetURL(
-      kExampleHost, "/supervised_user/with_iframes.html");
-
-  kids_management_api_mock().AllowSubsequentClassifyUrl();
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), allowed_url_with_iframes));
-  EXPECT_FALSE(IsInterstitialBeingShownInMainFrame(browser()));
-
-  const std::vector<content::FrameTreeNodeId> blocked_frames =
-      GetBlockedFrames();
-  ASSERT_EQ(blocked_frames.size(), 1u);
-  const content::FrameTreeNodeId blocked_frame = blocked_frames[0];
-  EXPECT_TRUE(IsInterstitialBeingShownInFrame(blocked_frame));
-  EXPECT_TRUE(IsLocalApprovalsButtonBeingShown(blocked_frame));
-  EXPECT_TRUE(IsRemoteApprovalsButtonBeingShown(blocked_frame));
-  CheckPreferredApprovalButton(blocked_frame);
-
-  // Trigger local approval flow - native dialog should appear.
-  SendCommandToFrame(kLocalUrlAccessCommand, blocked_frame);
-  EXPECT_TRUE(ash::ParentAccessDialog::GetInstance());
-
-  // Close the flow without approval - interstitial should be still shown.
-  ui::test::EventGenerator generator(ash::Shell::Get()->GetPrimaryRootWindow());
-  generator.PressKey(ui::VKEY_ESCAPE, ui::EF_NONE);
-
-  EXPECT_FALSE(ash::ParentAccessDialog::GetInstance());
-  EXPECT_FALSE(IsInterstitialBeingShownInMainFrame(browser()));
-  EXPECT_TRUE(IsInterstitialBeingShownInFrame(blocked_frame));
-  EXPECT_TRUE(IsLocalApprovalsButtonBeingShown(blocked_frame));
-  EXPECT_TRUE(IsRemoteApprovalsButtonBeingShown(blocked_frame));
-  CheckPreferredApprovalButton(blocked_frame);
-
-  histogram_tester.ExpectUniqueSample(
-      supervised_user::SupervisedUserInterstitial::
-          kInterstitialCommandHistogramName,
-      supervised_user::SupervisedUserInterstitial::Commands::
-          LOCAL_ACCESS_REQUEST,
-      1);
-  histogram_tester.ExpectUniqueSample(
-      supervised_user::SupervisedUserInterstitial::
-          kInterstitialPermissionSourceHistogramName,
-      supervised_user::SupervisedUserInterstitial::RequestPermissionSource::
-          SUB_FRAME,
-      1);
-}
-
-IN_PROC_BROWSER_TEST_F(ChromeOSLocalWebApprovalsTest,
-                       UpdateUIAfterRemoteRequestSent) {
-  BlockHost(kExampleHost);
-
-  GURL blocked_url = embedded_test_server()->GetURL(
-      kExampleHost, "/supervised_user/simple.html");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), blocked_url));
-  EXPECT_TRUE(IsInterstitialBeingShownInMainFrame(browser()));
-
-  const std::vector<content::FrameTreeNodeId> blocked_frames =
-      GetBlockedFrames();
-  ASSERT_EQ(blocked_frames.size(), 1u);
-  const content::FrameTreeNodeId blocked_frame = blocked_frames[0];
-  EXPECT_TRUE(IsLocalApprovalsButtonBeingShown(blocked_frame));
-  EXPECT_TRUE(IsRemoteApprovalsButtonBeingShown(blocked_frame));
-
-  // Trigger remote approval flow - ui should change.
-  SendCommandToFrame(kRemoteUrlAccessCommand, blocked_frame);
-
-  EXPECT_TRUE(IsInterstitialBeingShownInMainFrame(browser()));
-  EXPECT_FALSE(IsLocalApprovalsButtonBeingShown(blocked_frame));
-  EXPECT_FALSE(IsRemoteApprovalsButtonBeingShown(blocked_frame));
-  EXPECT_TRUE(IsLocalApprovalsInsteadButtonBeingShown(blocked_frame));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class SupervisedUserNavigationThrottleOnlyEnabledForSupervisedUsers
     : public SupervisedUserNavigationThrottleTestBase,

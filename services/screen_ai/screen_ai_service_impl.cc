@@ -96,19 +96,6 @@ OcrClientTypeForMetrics GetClientType(mojom::OcrClientType client_type) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-ui::AXTreeUpdate ConvertVisualAnnotationToTreeUpdate(
-    std::optional<chrome_screen_ai::VisualAnnotation>& annotation_proto,
-    const gfx::Rect& image_rect) {
-  if (!annotation_proto) {
-    VLOG(0) << "Screen AI library could not process snapshot or no OCR data.";
-    return ui::AXTreeUpdate();
-  }
-
-  return VisualAnnotationToAXTreeUpdate(*annotation_proto, image_rect);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 ui::AXNodeID ComputeMainNode(
     const ui::AXTree* tree,
     const std::vector<ui::AXNodeID>& content_node_ids) {
@@ -258,10 +245,6 @@ void ScreenAIService::LoadLibrary(const base::FilePath& library_path) {
   library_->GetLibraryVersion(version_major, version_minor);
   VLOG(2) << "Screen AI library version: " << version_major << "."
           << version_minor;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  library_->SetLogger();
-#endif
 
   library_->SetFileContentFunctions(&ModelDataHolder::GetDataSize,
                                     &ModelDataHolder::CopyData);
@@ -503,21 +486,6 @@ void ScreenAIService::PerformOcrAndReturnAnnotation(
 
   std::move(callback).Run(mojom::VisualAnnotation::New());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void ScreenAIService::PerformOcrAndReturnAXTreeUpdate(
-    const SkBitmap& image,
-    PerformOcrAndReturnAXTreeUpdateCallback callback) {
-  std::optional<chrome_screen_ai::VisualAnnotation> annotation_proto =
-      PerformOcrAndRecordMetrics(image);
-  ui::AXTreeUpdate update = ConvertVisualAnnotationToTreeUpdate(
-      annotation_proto, gfx::Rect(image.width(), image.height()));
-
-  // The original caller is always replied to, and an empty AXTreeUpdate tells
-  // that the annotation function was not successful.
-  std::move(callback).Run(update);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void ScreenAIService::ExtractMainContent(const ui::AXTreeUpdate& snapshot,
                                          ExtractMainContentCallback callback) {

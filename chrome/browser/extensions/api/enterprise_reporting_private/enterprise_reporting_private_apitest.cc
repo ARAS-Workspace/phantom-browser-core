@@ -52,31 +52,17 @@
 #include "components/device_signals/test/test_constants.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
 #include "components/policy/core/common/cloud/cloud_policy_core.h"
 #include "components/policy/core/common/cloud/cloud_policy_store.h"
 #include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/policy/proto/device_management_backend.pb.h"
-#else
-#include "base/strings/strcat.h"
-#include "chrome/browser/ash/login/test/cryptohome_mixin.h"
-#include "chrome/browser/ash/login/test/user_auth_config.h"
-#include "chrome/browser/ash/policy/affiliation/affiliation_mixin.h"
-#include "chrome/browser/ash/policy/affiliation/affiliation_test_helper.h"
-#include "chrome/browser/ash/policy/core/device_policy_cros_browser_test.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/enterprise/util/affiliation.h"
-#include "chrome/browser/extensions/api/enterprise_reporting_private/enterprise_reporting_private_api.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 namespace extensions {
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 constexpr char kAffiliationId[] = "affiliation-id";
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Manifest key for the Endpoint Verification extension found at
 // chrome.google.com/webstore/detail/callobklhcbilhphinckomhgkigmfocg
@@ -121,17 +107,14 @@ constexpr char kTestUrl[] = "https://foo.bar";
 class EnterpriseReportingPrivateApiTest : public extensions::ExtensionApiTest {
  public:
   EnterpriseReportingPrivateApiTest() {
-#if !BUILDFLAG(IS_CHROMEOS)
     browser_dm_token_storage_.SetClientId("client_id");
     browser_dm_token_storage_.SetEnrollmentToken("enrollment_token");
     browser_dm_token_storage_.SetDMToken("dm_token");
     policy::BrowserDMTokenStorage::SetForTesting(&browser_dm_token_storage_);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   }
 
   ~EnterpriseReportingPrivateApiTest() override = default;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Signs in and returns the account ID of the primary account.
   AccountInfo SignIn(const std::string& email, bool as_managed = true) {
     auto account_info = identity_test_env()->MakePrimaryAccountAvailable(
@@ -161,7 +144,6 @@ class EnterpriseReportingPrivateApiTest : public extensions::ExtensionApiTest {
 
     return account_info;
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   void RunTest(const std::string& background_js,
                bool authorized_manifest_key = true) {
@@ -238,9 +220,7 @@ class EnterpriseReportingPrivateApiTest : public extensions::ExtensionApiTest {
 
   network::TestURLLoaderFactory test_url_loader_factory_;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   policy::FakeBrowserDMTokenStorage browser_dm_token_storage_;
-#endif
 };
 
 IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest,

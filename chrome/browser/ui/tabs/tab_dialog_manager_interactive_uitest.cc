@@ -78,7 +78,6 @@ class TabDialogManagerUiTest : public InteractiveBrowserTest {
 };
 
 // ChromeOS does not use desktop widgets.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 class TabDialogManagerDesktopWidgetUiTest : public TabDialogManagerUiTest {
  public:
@@ -203,7 +202,6 @@ IN_PROC_BROWSER_TEST_F(TabDialogManagerDesktopWidgetUiTest,
   EXPECT_TRUE(browser()->GetWindow()->IsActive());
   EXPECT_FALSE(widget->IsActive());
 }
-#endif  // BUILDFLAG(!IS_CHROMEOS)
 
 // Regression tests for crbug.com/460178087.
 // Tests that showing a dialog in an inactive browser window does not activate

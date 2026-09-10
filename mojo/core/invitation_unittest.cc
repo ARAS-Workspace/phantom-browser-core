@@ -59,9 +59,6 @@ const char kSecondaryChannelHandleSwitch[] = "test-secondary-channel-handle";
 // TODO(crbug.com/40900578): Flaky on Tsan.
 #if defined(THREAD_SANITIZER)
 #define MAYBE_InvitationTest DISABLED_InvitationTest
-#elif BUILDFLAG(IS_CHROMEOS)
-// TODO(https://crbug.com/498954838): Flaky on CrOS.
-#define MAYBE_InvitationTest DISABLED_InvitationTest
 #else
 #define MAYBE_InvitationTest InvitationTest
 #endif
@@ -784,11 +781,7 @@ TEST_F(MAYBE_InvitationTest, SendIsolatedInvitationWithDuplicateName) {
 // OnAcceptPeer updates the expected peer name. Disabled on ChromeOS devices due
 // to high retry cost on cros_test_platform. Preserves coverage on
 // linux-chromeos-chrome, linux-chromeos-rel, and etc.
-#if BUILDFLAG(IS_CHROMEOS_DEVICE)
-#define MAYBE_SendIsolatedInvitationToSelf DISABLED_SendIsolatedInvitationToSelf
-#else
 #define MAYBE_SendIsolatedInvitationToSelf SendIsolatedInvitationToSelf
-#endif
 TEST_F(MAYBE_InvitationTest, MAYBE_SendIsolatedInvitationToSelf) {
   if (IsMojoIpczEnabled()) {
     GTEST_SKIP() << "MojoIpcz does not support nodes sending isolated "

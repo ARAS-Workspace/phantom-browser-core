@@ -173,11 +173,6 @@ bool ExtensionsGuestViewManagerDelegate::IsOwnedByControlledFrameEmbedder(
 
 void ExtensionsGuestViewManagerDelegate::RegisterAdditionalGuestViewTypes(
     GuestViewManager* manager) {
-#if BUILDFLAG(IS_CHROMEOS)
-  manager->RegisterGuestViewType(AppViewGuest::Type,
-                                 base::BindRepeating(&AppViewGuest::Create),
-                                 base::NullCallback());
-#endif
   manager->RegisterGuestViewType(
       ExtensionOptionsGuest::Type,
       base::BindRepeating(&ExtensionOptionsGuest::Create),

@@ -235,9 +235,7 @@
 #include "components/rlz/rlz_tracker.h"  // nogncheck
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/apps/link_capturing/enable_link_capturing_infobar_delegate.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/web_applications/extensions/launch.h"
@@ -2371,9 +2369,6 @@ void Print(BrowserWindowInterface* browser) {
       browser->GetTabStripModel()->GetActiveWebContents();
 
   printing::StartPrint(web_contents,
-#if BUILDFLAG(IS_CHROMEOS)
-                       /*print_renderer=*/mojo::NullAssociatedRemote(),
-#endif
                        browser->GetProfile()->GetPrefs()->GetBoolean(
                            prefs::kPrintPreviewDisabled),
                        /*has_selection=*/false);
@@ -2883,12 +2878,6 @@ void ToggleCaretBrowsing(BrowserWindowInterface* browser) {
 void PromptToNameWindow(BrowserWindowInterface* browser) {
   chrome::ShowWindowNamePrompt(browser->GetBrowserForMigrationOnly());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void ToggleMultitaskMenu(BrowserWindowInterface* browser) {
-  BrowserWindow::FromBrowser(browser)->ToggleMultitaskMenu();
-}
-#endif
 
 #if !defined(TOOLKIT_VIEWS)
 std::optional<int> GetKeyboardFocusedTabIndex(

@@ -154,11 +154,6 @@ const gfx::VectorIcon& GetIconIdDesktop(RequestType type) {
       return ::features::IsRoundedIconsEnabled()
                  ? vector_icons::kMouseLockIcon
                  : vector_icons::kPointerLockOldIcon;
-#if BUILDFLAG(IS_CHROMEOS)
-    case RequestType::kProtectedMediaIdentifier:
-      // This icon is provided by ChromePermissionsClient::GetOverrideIconId.
-      NOTREACHED();
-#endif
     case RequestType::kRegisterProtocolHandler:
       return ::features::IsRoundedIconsEnabled()
                  ? vector_icons::kProtocolHandlerIcon
@@ -167,22 +162,10 @@ const gfx::VectorIcon& GetIconIdDesktop(RequestType type) {
       return ::features::IsRoundedIconsEnabled()
                  ? vector_icons::kSensorsIcon
                  : vector_icons::kSensorsChromeRefreshOldIcon;
-#if BUILDFLAG(IS_CHROMEOS)
-    case RequestType::kSmartCard:
-      return ::features::IsRoundedIconsEnabled()
-                 ? vector_icons::kSmartCardReaderIcon
-                 : vector_icons::kSmartCardReaderOldIcon;
-#endif
     case RequestType::kWebAppInstallation:
       return ::features::IsRoundedIconsEnabled()
                  ? vector_icons::kInstallDesktopIcon
                  : vector_icons::kInstallDesktopOldIcon;
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-    case RequestType::kWebPrinting:
-      return ::features::IsRoundedIconsEnabled()
-                 ? vector_icons::kPrintIcon
-                 : vector_icons::kPrinterOldIcon;
-#endif
     case RequestType::kStorageAccess:
     case RequestType::kTopLevelStorageAccess:
       return ::features::IsRoundedIconsEnabled()
@@ -331,7 +314,7 @@ std::optional<RequestType> ContentSettingsTypeToRequestTypeIfExists(
     case ContentSettingsType::POINTER_LOCK:
       return RequestType::kPointerLock;
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
     case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
       return RequestType::kProtectedMediaIdentifier;
 #endif
@@ -353,14 +336,6 @@ std::optional<RequestType> ContentSettingsTypeToRequestTypeIfExists(
       return RequestType::kTopLevelStorageAccess;
     case ContentSettingsType::FILE_SYSTEM_WRITE_GUARD:
       return RequestType::kFileSystemAccess;
-#if BUILDFLAG(IS_CHROMEOS)
-    case ContentSettingsType::SMART_CARD_DATA:
-      return RequestType::kSmartCard;
-#endif
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-    case ContentSettingsType::WEB_PRINTING:
-      return RequestType::kWebPrinting;
-#endif
     case ContentSettingsType::FEDERATED_IDENTITY_API:
       return RequestType::kIdentityProvider;
     default:
@@ -431,22 +406,14 @@ std::optional<ContentSettingsType> RequestTypeToContentSettingsType(
     case RequestType::kPointerLock:
       return ContentSettingsType::POINTER_LOCK;
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
     case RequestType::kProtectedMediaIdentifier:
       return ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER;
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-    case RequestType::kSmartCard:
-      return ContentSettingsType::SMART_CARD_DATA;
 #endif
     case RequestType::kStorageAccess:
       return ContentSettingsType::STORAGE_ACCESS;
     case RequestType::kVrSession:
       return ContentSettingsType::VR;
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-    case RequestType::kWebPrinting:
-      return ContentSettingsType::WEB_PRINTING;
-#endif
     case RequestType::kWindowManagement:
       return ContentSettingsType::WINDOW_MANAGEMENT;
     case RequestType::kTopLevelStorageAccess:
@@ -559,7 +526,7 @@ const char* PermissionKeyForRequestType(permissions::RequestType request_type) {
     case permissions::RequestType::kPointerLock:
       return "pointer_lock";
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
     case permissions::RequestType::kProtectedMediaIdentifier:
       return "protected_media_identifier";
 #endif
@@ -567,20 +534,12 @@ const char* PermissionKeyForRequestType(permissions::RequestType request_type) {
     case permissions::RequestType::kRegisterProtocolHandler:
       return "register_protocol_handler";
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_CHROMEOS)
-    case RequestType::kSmartCard:
-      return "smart_card";
-#endif
     case permissions::RequestType::kStorageAccess:
       return "storage_access";
     case permissions::RequestType::kTopLevelStorageAccess:
       return "top_level_storage_access";
     case permissions::RequestType::kVrSession:
       return "vr_session";
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-    case RequestType::kWebPrinting:
-      return "web_printing";
-#endif
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
     case permissions::RequestType::kWebAppInstallation:
       return "web_app_installation";

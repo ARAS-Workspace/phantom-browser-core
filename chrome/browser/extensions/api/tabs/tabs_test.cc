@@ -149,11 +149,6 @@
 #include "extensions/browser/app_window/app_window_registry.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/wm/window_pin_util.h"
-#include "chrome/browser/chromeos/policy/dlp/test/mock_dlp_content_manager.h"
-#include "chrome/common/pref_names.h"
-#endif
 
 namespace extensions {
 
@@ -4982,87 +4977,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, TabsGoForwardAndBackWithoutTabId) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Ensure tabs.captureVisibleTab respects any Data Leak Prevention restrictions.
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTest, ScreenshotsRestricted) {
-  // Setup the function and extension.
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("Screenshot")
-          .AddAPIPermission("tabs")
-          .AddHostPermission("<all_urls>")
-          .Build();
-  auto function = base::MakeRefCounted<TabsCaptureVisibleTabFunction>();
-  function->set_extension(extension.get());
-
-  // Add a visible tab.
-  TabListInterface* tab_list = GetTabListInterface();
-  const GURL kGoogle("http://www.google.com");
-  tabs::TabInterface* tab = tab_list->OpenTab(kGoogle, -1);
-  content::WebContents* web_contents = tab->GetContents();
-  content::WaitForLoadStop(web_contents);
-
-  // Setup Data Leak Prevention restriction.
-  policy::MockDlpContentManager mock_dlp_content_manager;
-  policy::ScopedDlpContentObserverForTesting scoped_dlp_content_observer_(
-      &mock_dlp_content_manager);
-  EXPECT_CALL(mock_dlp_content_manager, IsScreenshotApiRestricted(testing::_))
-      .Times(1)
-      .WillOnce(testing::Return(true));
-
-  // Run the function and check result.
-  std::string error = utils::RunFunctionAndReturnError(
-      function.get(), "[{}]", profile(), utils::FunctionMode::kNone);
-  EXPECT_EQ(keys::kScreenshotsDisabledByDlp, error);
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
-                       DontCreateTabsInLockedFullscreenMode) {
-  scoped_refptr<const Extension> extension_with_tabs_permission =
-      ExtensionBuilder("Test").AddAPIPermission("tabs").Build();
-
-  // In locked fullscreen mode we should not be able to create any tabs.
-  ash::PinWindow(browser_window_interface()->GetWindow()->GetNativeWindow(),
-                 /*trusted=*/true);
-
-  auto function = base::MakeRefCounted<TabsCreateFunction>();
-  function->set_extension(extension_with_tabs_permission.get());
-
-  EXPECT_EQ(ExtensionTabUtil::kLockedFullscreenModeNewTabError,
-            utils::RunFunctionAndReturnError(function.get(), "[{}]", profile(),
-                                             utils::FunctionMode::kNone));
-
-  // Unpin for cleanup.
-  ash::UnpinWindow(browser_window_interface()->GetWindow()->GetNativeWindow());
-}
-
-// Screenshot should return an error when disabled in user profile preferences.
-IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
-                       ScreenshotDisabledInProfilePreferences) {
-  // Setup the function and extension.
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("Screenshot")
-          .AddAPIPermission("tabs")
-          .AddHostPermission("<all_urls>")
-          .Build();
-  auto function = base::MakeRefCounted<TabsCaptureVisibleTabFunction>();
-  function->set_extension(extension.get());
-
-  // Add a visible tab.
-  TabListInterface* tab_list = GetTabListInterface();
-  const GURL kGoogle("http://www.google.com");
-  tabs::TabInterface* tab = tab_list->OpenTab(kGoogle, -1);
-  content::WebContents* web_contents = tab->GetContents();
-  content::WaitForLoadStop(web_contents);
-
-  // Disable screenshot.
-  profile()->GetPrefs()->SetBoolean(prefs::kDisableScreenshots, true);
-
-  // Run the function and check result.
-  std::string error = utils::RunFunctionAndReturnError(
-      function.get(), "[{}]", profile(), utils::FunctionMode::kNone);
-  EXPECT_EQ(keys::kScreenshotsDisabled, error);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 // Picture in picture is not supported for Android.
@@ -5097,56 +5011,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionTabsTest,
 
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests that calling chrome.tabs.discard on a saved tab does discard for
-// extensions with locked fullscreen permission. Locked fullscreen permission
-// is ChromeOS only.
-IN_PROC_BROWSER_TEST_F(
-    ExtensionTabsTest,
-    TabsDiscardSavedTabGroupTabAllowedForLockedFullscreenPermission) {
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("DiscardTest")
-          .SetID("pmgljoohajacndjcjlajcopidgnhphcl")
-          .AddAPIPermission("lockWindowFullscreenPrivate")
-          .Build();
-  const GURL kExampleCom("http://example.com");
-
-  TabListInterface* tab_list = GetTabListInterface();
-  tabs::TabInterface* tab = tab_list->OpenTab(kExampleCom, -1);
-  content::WebContents* web_contents = tab->GetContents();
-  content::WaitForLoadStop(web_contents);
-
-  int index = tab_list->GetIndexOfTab(tab->GetHandle());
-  int tab_id = ExtensionTabUtil::GetTabId(web_contents);
-
-  tab_groups::TabGroupSyncService* saved_service =
-      tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile());
-  ASSERT_TRUE(saved_service);
-
-#if !BUILDFLAG(IS_ANDROID)
-  tab_groups::TabGroupSyncServiceInitializedObserver sync_observer(
-      saved_service);
-  sync_observer.Wait();
-#endif
-
-  // Group the tab and save it.
-  std::optional<tab_groups::TabGroupId> group =
-      tab_list->CreateTabGroup({tab->GetHandle()});
-  ASSERT_TRUE(group.has_value());
-  tab_groups::TabGroupVisualData visual_data(
-      u"Initial title", tab_groups::TabGroupColorId::kBlue);
-  tab_list->SetTabGroupVisualData(*group, visual_data);
-
-  // The tab discard function should not fail.
-  auto function = base::MakeRefCounted<TabsDiscardFunction>();
-  function->set_extension(extension);
-  ASSERT_TRUE(utils::RunFunction(function.get(),
-                                 base::StringPrintf("[%d]", tab_id), profile(),
-                                 utils::FunctionMode::kNone));
-  // Check that the tab was discarded.
-  EXPECT_TRUE(tab_list->GetTab(index)->GetContents()->WasDiscarded());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 // Split view is not enabled on Android.

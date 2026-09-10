@@ -54,11 +54,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_list/arc/arc_app_utils.h"
-#include "chromeos/ash/experiences/arc/app/arc_app_constants.h"
-#endif
-
 namespace {
 
 const char kFileHandlingLearnMore[] =
@@ -84,16 +79,7 @@ bool ShouldHidePinToShelf(const std::string& app_id) {
 }
 
 bool ShouldHideStoragePermission(const std::string& app_id) {
-#if BUILDFLAG(IS_CHROMEOS)
-  constexpr auto kAppIdsWithHiddenStoragePermission =
-      base::MakeFixedFlatSet<std::string_view>({
-          arc::kPlayStoreAppId,
-      });
-
-  return kAppIdsWithHiddenStoragePermission.contains(app_id);
-#else
   return false;
-#endif
 }
 
 // Returns true if Chrome can direct users to a centralized system UI for

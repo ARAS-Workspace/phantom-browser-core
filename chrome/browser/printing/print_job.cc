@@ -184,21 +184,6 @@ const PrintSettings& PrintJob::settings() const {
   return document()->settings();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void PrintJob::SetSource(PrintJob::Source source,
-                         const std::string& source_id) {
-  source_ = source;
-  source_id_ = source_id;
-}
-
-PrintJob::Source PrintJob::source() const {
-  return source_;
-}
-
-const std::string& PrintJob::source_id() const {
-  return source_id_;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 
 void PrintJob::UpdatePrintedDocument(

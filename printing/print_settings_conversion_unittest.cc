@@ -139,24 +139,6 @@ TEST(PrintSettingsConversionTest, Conversion) {
   base::DictValue dict = base::test::ParseJsonDict(kPrinterSettings);
   std::unique_ptr<PrintSettings> settings = PrintSettingsFromJobSettings(dict);
   ASSERT_TRUE(settings);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(settings->send_user_info());
-  EXPECT_EQ("username@domain.net", settings->username());
-  EXPECT_EQ("this is an OAuth access token", settings->oauth_token());
-  EXPECT_EQ("0000", settings->pin_value());
-
-  ASSERT_EQ(settings->client_infos().size(), 2u);
-  EXPECT_EQ(settings->client_infos()[0].client_name, "ChromeOS");
-  EXPECT_EQ(settings->client_infos()[0].client_type,
-            mojom::IppClientInfo::ClientType::kOperatingSystem);
-  EXPECT_EQ(settings->client_infos()[0].client_patches, "patch");
-  EXPECT_EQ(settings->client_infos()[0].client_string_version, "str_version");
-  EXPECT_EQ(settings->client_infos()[0].client_version, "version");
-  EXPECT_EQ(settings->client_infos()[1].client_name,
-            "chromebook-{DEVICE_ASSET_ID}");
-  EXPECT_EQ(settings->client_infos()[1].client_type,
-            mojom::IppClientInfo::ClientType::kOther);
-#endif
   EXPECT_EQ(settings->dpi_horizontal(), 300);
   EXPECT_EQ(settings->dpi_vertical(), 300);
 
@@ -296,18 +278,7 @@ TEST(PrintSettingsConversionTest, MissingDeviceName) {
   EXPECT_FALSE(PrintSettingsFromJobSettings(dict));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(PrintSettingsConversionTest, DontSendUsername) {
-  base::DictValue dict = base::test::ParseJsonDict(kPrinterSettings);
-  dict.Set(kSettingSendUserInfo, false);
-  std::unique_ptr<PrintSettings> settings = PrintSettingsFromJobSettings(dict);
-  ASSERT_TRUE(settings);
-  EXPECT_FALSE(settings->send_user_info());
-  EXPECT_EQ("", settings->username());
-}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_CUPS))
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_CUPS)
 TEST(PrintSettingsConversionTest, FilterNonJobSettings) {
   base::DictValue dict = base::test::ParseJsonDict(kPrinterSettings);
 
@@ -326,7 +297,6 @@ TEST(PrintSettingsConversionTest, FilterNonJobSettings) {
   ASSERT_TRUE(settings->advanced_settings().contains("Foo"));
   EXPECT_EQ(settings->advanced_settings().at("Foo"), base::Value("Bar"));
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_LINUX) &&
-        // BUILDFLAG(USE_CUPS))
+#endif  // BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_CUPS)
 
 }  // namespace printing

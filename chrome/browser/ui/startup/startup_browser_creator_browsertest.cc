@@ -127,7 +127,6 @@
 #include "ui/views/controls/webview/webview.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "base/functional/callback.h"
 #include "base/json/values_util.h"
 #include "base/run_loop.h"
@@ -156,7 +155,6 @@
 #endif
 
 using testing::Return;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/apps/app_shim/app_shim_manager_mac.h"
@@ -169,8 +167,6 @@ using testing::_;
 using web_app::WebAppProvider;
 
 namespace {
-
-#if !BUILDFLAG(IS_CHROMEOS)
 
 const char kAppId[] = "dofnemchnjfeendjmdhaldenaiabpiad";
 const char16_t kAppName[] = u"Test App";
@@ -210,8 +206,6 @@ struct StartupBrowserCreatorFlagTypeValue {
   // only supposed to be shown once.
   bool is_global_infobar;
 };
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 typedef std::optional<policy::PolicyLevel> PolicyVariant;
 
@@ -261,10 +255,6 @@ class StartupBrowserCreatorTest : public extensions::ExtensionBrowserTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     extensions::ExtensionBrowserTest::SetUpCommandLine(command_line);
     command_line->AppendSwitchASCII(switches::kHomePage, url::kAboutBlankURL);
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(nkostylev): Investigate if we can remove this switch.
-    command_line->AppendSwitch(switches::kCreateBrowserOnStartupForTests);
-#endif
   }
 
   // Helper functions return void so that we can ASSERT*().
@@ -351,7 +341,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, OpenURLsPopup) {
 // We don't do non-process-startup browser launches on ChromeOS.
 // Session restore for process-startup browser launches is tested
 // in session_restore_uitest.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Verify that startup URLs are honored when the process already exists but has
 // no tabbed browser windows (eg. as if the process is running only due to a
 // background application.
@@ -1206,8 +1195,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
 IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
                        ReadingWasRestartedAfterRestart) {
   // Tests that StartupBrowserCreator::WasRestarted reads and resets the
@@ -1232,7 +1219,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   EXPECT_FALSE(StartupBrowserCreator::WasRestarted());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // If startup pref is set as LAST_AND_URLS, startup urls should be opened in a
 // new browser window separated from the last-session-restored browser. This
 // test does not apply to ChromeOS.
@@ -2154,7 +2140,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserWithListAppsFeature,
 }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 webapps::AppId InstallPWA(Profile* profile, const GURL& start_url) {
   auto web_app_info =
       web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(start_url);
@@ -2300,7 +2285,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorRestartTest,
   EXPECT_EQ(1u,
             GetBrowsersForType(BrowserWindowInterface::Type::TYPE_APP).size());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class StartupBrowserWithWebAppTest : public StartupBrowserCreatorTest {
  protected:
@@ -2769,7 +2753,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserWithRealWebAppTest,
   new_browser = FindOneOtherBrowserForProfile(&profile1, new_browser);
   ASSERT_EQ(new_browser->GetType(), BrowserWindowInterface::TYPE_APP);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
@@ -3203,7 +3186,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserWebAppProtocolAndFileHandlingTest,
 
 // These tests are not applicable to Chrome OS as neither initial preferences
 // nor the onboarding promos exist there.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 class StartupBrowserCreatorFirstRunTest : public InProcessBrowserTest {
  public:
@@ -3243,20 +3225,14 @@ bool StartupBrowserCreatorFirstRunTest::SetUpUserDataDirectory() {
 
 void StartupBrowserCreatorFirstRunTest::SetUpInProcessBrowserTestFixture() {
   // TODO(crbug.com/382086296): Confirm IS_CHROMEOS is needed here.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-    BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
   // Set a policy that prevents the first-run dialog from being shown.
   policy_map_.Set(
-#if BUILDFLAG(IS_CHROMEOS)
-      policy::key::kDeviceMetricsReportingEnabled,
-#else
       policy::key::kMetricsReportingEnabled,
-#endif
       policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
       policy::POLICY_SOURCE_CLOUD, base::Value(false), nullptr);
   provider_.UpdateChromePolicy(policy_map_);
-#endif  // (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&
-        // BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#endif  // BUILDFLAG(IS_LINUX) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
   provider_.SetDefaultReturns(/*is_initialization_complete_return=*/true,
                               /*is_first_policy_load_complete_return=*/true);
@@ -3396,8 +3372,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorFirstRunTest,
             tab_strip->GetWebContentsAt(0)->GetVisibleURL().ExtractFileName());
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
 // Validates that prefs::kWasRestarted is automatically reset after next browser
 // start.
 class StartupBrowserCreatorWasRestartedFlag : public InProcessBrowserTest {
@@ -3458,7 +3432,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorWasRestartedFlag, Test) {
 }
 
 // The kCommandLineFlagSecurityWarningsEnabled policy doesn't exist on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 enum class CommandLineFlagSecurityWarningsPolicy {
   kNoPolicy,
   kEnabled,
@@ -3754,10 +3727,6 @@ INSTANTIATE_TEST_SUITE_P(
           [](unsigned char c) { return !absl::ascii_isalnum(c); }, '_');
       return name;
     });
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // Verifies that infobars are not displayed in Kiosk mode.
 class StartupBrowserCreatorInfobarsKioskTest : public InProcessBrowserTest {
@@ -4561,5 +4530,3 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTestRootStoreFlagTest,
   EXPECT_TRUE(HasInfoBar(
       infobar_manager, infobars::InfoBarDelegate::BAD_FLAGS_INFOBAR_DELEGATE));
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)

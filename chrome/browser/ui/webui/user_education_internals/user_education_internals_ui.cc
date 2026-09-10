@@ -43,12 +43,10 @@ UserEducationInternalsUI::UserEducationInternalsUI(content::WebUI* web_ui)
   content::URLDataSource::Add(profile, std::make_unique<ThemeSource>(profile));
 
   int32_t version_to_request = CHROME_VERSION_MAJOR;
-#if !BUILDFLAG(IS_CHROMEOS)
   auto* registry = g_browser_process->GetFeatures()->whats_new_registry();
   CHECK(registry);
   version_to_request =
       registry->version_override().value_or(version_to_request);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   source->AddInteger("whatsNewVersionToRequest", version_to_request);
   source->AddInteger("currentChromeVersion", CHROME_VERSION_MAJOR);
 

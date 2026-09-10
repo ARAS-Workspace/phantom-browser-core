@@ -1144,20 +1144,7 @@
   E_CPONLY(kColorWindowControlButtonBackgroundActive) \
   E_CPONLY(kColorWindowControlButtonBackgroundInactive) \
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define CHROME_PLATFORM_SPECIFIC_COLOR_IDS \
-    /* Borealis colors. */ \
-    E_CPONLY(kColorBorealisSplashScreenBackground) \
-    E_CPONLY(kColorBorealisSplashScreenForeground) \
-    /* Caption colors. */ \
-    E_CPONLY(kColorCaptionForeground) \
-    E_CPONLY(kColorVerticalTabsCaptionButtonForegroundActive) \
-    E_CPONLY(kColorVerticalTabsCaptionButtonForegroundInactive) \
-    /* Sharesheet colors. */ \
-    E_CPONLY(kColorSharesheetTargetButtonIconShadow)
-#else
 #define CHROME_PLATFORM_SPECIFIC_COLOR_IDS
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #define CHROME_COLOR_IDS \
     COMMON_CHROME_COLOR_IDS CHROME_PLATFORM_SPECIFIC_COLOR_IDS

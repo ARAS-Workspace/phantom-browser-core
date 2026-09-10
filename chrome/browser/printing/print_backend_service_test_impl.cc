@@ -64,21 +64,6 @@ void PrintBackendServiceTestImpl::GetDefaultPrinterName(
   PrintBackendServiceImpl::GetDefaultPrinterName(std::move(callback));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void PrintBackendServiceTestImpl::GetPrinterSemanticCapsAndDefaults(
-    const std::string& printer_name,
-    mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsCallback
-        callback) {
-  if (terminate_receiver_) {
-    TerminateConnection();
-    return;
-  }
-
-  PrintBackendServiceImpl::GetPrinterSemanticCapsAndDefaults(
-      printer_name, std::move(callback));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void PrintBackendServiceTestImpl::FetchCapabilities(
     const std::string& printer_name,
     mojom::PrintBackendService::FetchCapabilitiesCallback callback) {

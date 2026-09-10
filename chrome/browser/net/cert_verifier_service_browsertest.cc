@@ -53,24 +53,6 @@
 #include "third_party/boringssl/src/pki/trust_store.h"
 #endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "base/path_service.h"
-#include "base/test/metrics/histogram_tester.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/net/nss_service.h"
-#include "chrome/browser/net/nss_service_factory.h"
-#include "chrome/browser/policy/profile_policy_connector_builder.h"
-#include "chrome/common/chrome_paths.h"
-#include "components/account_id/account_id.h"
-#include "components/prefs/pref_service.h"
-#include "components/session_manager/core/session_manager.h"
-#include "components/user_manager/test_helper.h"
-#include "net/cert/cert_type.h"
-#include "net/cert/nss_cert_database.h"
-#include "net/cert/x509_util_nss.h"
-#endif
-
 #if BUILDFLAG(CHROME_ROOT_STORE_OPTIONAL)
 class CertVerifierServiceChromeRootStoreOptionalTest
     : public PlatformBrowserTest,
@@ -561,39 +543,6 @@ IN_PROC_BROWSER_TEST_F(CertVerifierUserSettingsTest,
 class CertVerifierMultiProfileUserSettingsTest
     : public CertVerifierUserSettingsTest {
  public:
-#if BUILDFLAG(IS_CHROMEOS)
-  static inline constexpr char kPrimaryUserAccount[] = "test1@test.com";
-  static inline constexpr GaiaId::Literal kPrimaryUserGaiaId{"1234567890"};
-  static inline constexpr char kPrimaryUserHash[] = "test1-hash";
-  static inline constexpr char kSecondaryUserAccount[] = "test2@test.com";
-  static inline constexpr GaiaId::Literal kSecondaryUserGaiaId{"9876543210"};
-  static inline constexpr char kSecondaryUserHash[] = "test2-hash";
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    CertVerifierUserSettingsTest::SetUpCommandLine(command_line);
-    // Don't require policy for our sessions - this is required so the policy
-    // code knows not to expect cached policy for the secondary profile.
-    command_line->AppendSwitchASCII(ash::switches::kProfileRequiresPolicy,
-                                    "false");
-
-    command_line->AppendSwitchASCII(ash::switches::kLoginUser,
-                                    kPrimaryUserAccount);
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile,
-                                    kPrimaryUserHash);
-  }
-
-  void SetUpLocalStatePrefService(PrefService* local_state) override {
-    CertVerifierUserSettingsTest::SetUpLocalStatePrefService(local_state);
-
-    // Register a persisted user.
-    user_manager::TestHelper::RegisterPersistedUser(
-        *local_state, AccountId::FromUserEmailGaiaId(kPrimaryUserAccount,
-                                                     kPrimaryUserGaiaId));
-    user_manager::TestHelper::RegisterPersistedUser(
-        *local_state, AccountId::FromUserEmailGaiaId(kSecondaryUserAccount,
-                                                     kSecondaryUserGaiaId));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   void SetUpOnMainThread() override {
     CertVerifierUserSettingsTest::SetUpOnMainThread();
@@ -615,34 +564,11 @@ class CertVerifierMultiProfileUserSettingsTest
 
     // Create a second profile.
     {
-#if BUILDFLAG(IS_CHROMEOS)
-      ON_CALL(policy_for_profile_2_, IsInitializationComplete(testing::_))
-          .WillByDefault(testing::Return(true));
-      ON_CALL(policy_for_profile_2_, IsFirstPolicyLoadComplete(testing::_))
-          .WillByDefault(testing::Return(true));
-      policy::PushProfilePolicyConnectorProviderForTesting(
-          &policy_for_profile_2_);
-
-      base::FilePath user_data_directory;
-      base::PathService::Get(chrome::DIR_USER_DATA, &user_data_directory);
-      session_manager::SessionManager::Get()->CreateSession(
-          AccountId::FromUserEmailGaiaId(kSecondaryUserAccount,
-                                         kSecondaryUserGaiaId),
-          kSecondaryUserHash,
-          /*new_user=*/false,
-          /*has_active_session=*/false);
-      // Set up the secondary profile.
-      base::FilePath profile_dir = user_data_directory.Append(
-          ash::ProfileHelper::GetUserProfileDir(kSecondaryUserHash).BaseName());
-      profile_2_ =
-          g_browser_process->profile_manager()->GetProfile(profile_dir);
-#else
       ProfileManager* profile_manager = g_browser_process->profile_manager();
       base::FilePath new_path =
           profile_manager->GenerateNextProfileDirectoryPath();
       profile_2_ =
           &profiles::testing::CreateProfileSync(profile_manager, new_path);
-#endif
     }
   }
 
@@ -665,11 +591,6 @@ class CertVerifierMultiProfileUserSettingsTest
   raw_ptr<Profile> profile_1_;
   raw_ptr<Profile> profile_2_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Policy provider for |profile_2_|. Overrides any other policy providers.
-  testing::NiceMock<policy::MockConfigurationPolicyProvider>
-      policy_for_profile_2_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 IN_PROC_BROWSER_TEST_F(CertVerifierMultiProfileUserSettingsTest,
@@ -735,143 +656,5 @@ IN_PROC_BROWSER_TEST_F(CertVerifierMultiProfileUserSettingsTest,
       ssl_test_util::CertError::NONE, security_state::SECURE,
       ssl_test_util::AuthState::NONE);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class CertVerifierNSSMigrationTest : public PlatformBrowserTest {
- public:
-  CertVerifierNSSMigrationTest() {
-    if (GetTestPreCount() == 2) {
-      net::ServerCertificateDatabaseService::
-          DisableNSSCertMigrationForTesting();
-    }
-  }
-
- protected:
-  base::HistogramTester histogram_tester_;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_{
-      net::kEnableNSSCertMigration};
-};
-
-// Setup the NSS database before doing migration. The PRE_PRE_ test is run with
-// DisableNSSCertMigrationForTesting() so the migration will not be attempted
-// yet.
-IN_PROC_BROWSER_TEST_F(CertVerifierNSSMigrationTest,
-                       PRE_PRE_TestNSSCertMigration) {
-  // PRE_ test and main test don't share state, so there isn't an easy way use a
-  // generated EmbeddedTestServer cert in the PRE_ test and then run an
-  // EmbeddedTestServer with the same generated cert in the main test. Therefore
-  // we test the migration by importing the static test root and disabling
-  // TestRootCerts.
-  // Import test root as trusted in the NSS database.
-  scoped_refptr<net::X509Certificate> test_root =
-      net::ImportCertFromFile(net::EmbeddedTestServer::GetRootCertPemPath());
-  ASSERT_TRUE(test_root);
-  base::test::TestFuture<net::NSSCertDatabase*> nss_waiter;
-  NssServiceFactory::GetForContext(browser()->GetProfile())
-      ->UnsafelyGetNSSCertDatabaseForTesting(nss_waiter.GetCallback());
-  net::NSSCertDatabase* nss_db = nss_waiter.Get();
-  net::NSSCertDatabase::ImportCertFailureList not_imported;
-  EXPECT_TRUE(nss_db->ImportCACerts(
-      net::x509_util::CreateCERTCertificateListFromX509Certificate(
-          test_root.get()),
-      net::NSSCertDatabase::TRUSTED_SSL, &not_imported));
-  EXPECT_TRUE(not_imported.empty());
-
-  // Migration pref should be false.
-  EXPECT_EQ(browser()->GetProfile()->GetPrefs()->GetInteger(
-                net::prefs::kNSSCertsMigratedToServerCertDb),
-            static_cast<int>(net::ServerCertificateDatabaseService::
-                                 NSSMigrationResultPref::kNotMigrated));
-  histogram_tester_.ExpectTotalCount("Net.CertVerifier.NSSCertMigrationResult",
-                                     0);
-}
-
-// Tests that NSS cert migration is done on initialization and that the
-// verification is blocked on the migration completing.
-IN_PROC_BROWSER_TEST_F(CertVerifierNSSMigrationTest, PRE_TestNSSCertMigration) {
-  net::EmbeddedTestServer https_test_server{
-      net::EmbeddedTestServer::TYPE_HTTPS};
-
-  https_test_server.ServeFilesFromSourceDirectory("chrome/test/data");
-  ASSERT_TRUE(https_test_server.Start());
-
-  // Clear test roots so that cert validation only happens with
-  // what's in the relevant root store.
-  net::TestRootCerts::GetInstance()->Clear();
-  // Loading the page should succeed since the root was trusted through the
-  // server cert db.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_test_server.GetURL("/simple.html")));
-  ssl_test_util::CheckSecurityState(
-      chrome_test_utils::GetActiveWebContents(this),
-      ssl_test_util::CertError::NONE, security_state::SECURE,
-      ssl_test_util::AuthState::NONE);
-
-  // Migration pref should be true now.
-  EXPECT_EQ(
-      browser()->GetProfile()->GetPrefs()->GetInteger(
-          net::prefs::kNSSCertsMigratedToServerCertDb),
-      static_cast<int>(net::ServerCertificateDatabaseService::
-                           NSSMigrationResultPref::kMigratedSuccessfully));
-
-  // Migration histograms should have been recorded. ExpectUniqueSample is not
-  // used here as the ChromeOS browsertests seem to create multiple users so
-  // this histogram may be recorded multiple times (the other samples would be
-  // kEmpty).
-  histogram_tester_.ExpectBucketCount("Net.CertVerifier.NSSCertMigrationResult",
-                                      net::ServerCertificateDatabaseService::
-                                          NSSMigrationResultHistogram::kSuccess,
-                                      1);
-
-  // Set root cert in NSS to distrusted. This ensures that when the next phase
-  // of the test runs it's actually the trust from the server cert db causing
-  // the connection to succeed and not still using the NSS trust, and also
-  // tests that the migration is not run again.
-  scoped_refptr<net::X509Certificate> test_root =
-      net::ImportCertFromFile(net::EmbeddedTestServer::GetRootCertPemPath());
-  ASSERT_TRUE(test_root);
-  base::test::TestFuture<net::NSSCertDatabase*> nss_waiter;
-  NssServiceFactory::GetForContext(browser()->GetProfile())
-      ->UnsafelyGetNSSCertDatabaseForTesting(nss_waiter.GetCallback());
-  net::NSSCertDatabase* nss_db = nss_waiter.Get();
-  nss_db->SetCertTrust(
-      net::x509_util::CreateCERTCertificateFromX509Certificate(test_root.get())
-          .get(),
-      net::CertType::CA_CERT, net::NSSCertDatabase::DISTRUSTED_SSL);
-}
-
-// Tests that after migration is done the NSS user db is no longer depended on.
-IN_PROC_BROWSER_TEST_F(CertVerifierNSSMigrationTest, TestNSSCertMigration) {
-  // Migration pref should already be true.
-  EXPECT_EQ(
-      browser()->GetProfile()->GetPrefs()->GetInteger(
-          net::prefs::kNSSCertsMigratedToServerCertDb),
-      static_cast<int>(net::ServerCertificateDatabaseService::
-                           NSSMigrationResultPref::kMigratedSuccessfully));
-
-  net::EmbeddedTestServer https_test_server{
-      net::EmbeddedTestServer::TYPE_HTTPS};
-  https_test_server.ServeFilesFromSourceDirectory("chrome/test/data");
-  ASSERT_TRUE(https_test_server.Start());
-
-  // Clear test roots so that cert validation only happens with
-  // what's in the relevant root store.
-  net::TestRootCerts::GetInstance()->Clear();
-  // Loading the page should succeed since the root was trusted through the
-  // server cert db. The distrust set in NSS should be ignored as NSS user db
-  // is no longer used.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_test_server.GetURL("/simple.html")));
-  ssl_test_util::CheckSecurityState(
-      chrome_test_utils::GetActiveWebContents(this),
-      ssl_test_util::CertError::NONE, security_state::SECURE,
-      ssl_test_util::AuthState::NONE);
-
-  histogram_tester_.ExpectTotalCount("Net.CertVerifier.NSSCertMigrationResult",
-                                     0);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)

@@ -47,12 +47,6 @@
 #include "chrome/browser/ui/views/frame/opaque_browser_frame_view_layout.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/frame/frame_view_ash.h"
-#include "chromeos/ui/base/window_properties.h"
-#include "chromeos/ui/wm/window_util.h"
-#endif
-
 namespace glic {
 namespace {
 
@@ -73,15 +67,6 @@ class GlicClientView : public views::ClientView {
   GlicClientView(views::Widget* widget, views::View* contents_view)
       : views::ClientView(widget, contents_view) {}
   ~GlicClientView() override = default;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void UpdateWindowRoundedCorners(
-      const gfx::RoundedCornersF& window_radii) override {
-    // For ChromeOS, we have to manually round the contents of `ClientView`.
-    glic_view()->SetBackgroundRoundedCorners(window_radii);
-    glic_view()->holder()->SetNativeViewCornerRadii(window_radii);
-  }
-#endif
 
  private:
   GlicView* glic_view() { return static_cast<GlicView*>(contents_view()); }
@@ -342,27 +327,6 @@ std::unique_ptr<views::WidgetDelegate> GlicWidget::CreateWidgetDelegate(
       }));
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(b:458115863): Move ChromeOS specific code to platform specific
-  // implementation. (Like GlicWidgetChromeOS?)
-  delegate->RegisterWidgetInitializedCallback(base::BindOnce(
-      [](views::WidgetDelegate* delegate) {
-        // Increase the hit region inside of the glic window to make it
-        // easier to resize the window.
-        constexpr int kResizeInsetSize = 6;
-        constexpr int kResizeInsetScaleForTouch = 3;
-        const gfx::Insets mouse_insets(kResizeInsetSize);
-        const gfx::Insets touch_insets =
-            gfx::ScaleToFlooredInsets(mouse_insets, kResizeInsetScaleForTouch);
-
-        auto* frame_window = delegate->GetWidget()->GetNativeWindow();
-        chromeos::wm::InstallResizeHandleWindowTargeterForWindow(
-            frame_window,
-            chromeos::ResizeBorderInsets{.for_mouse = mouse_insets,
-                                         .for_touch = touch_insets});
-      },
-      base::Unretained(delegate.get())));
-#endif
   return delegate;
 }
 
@@ -412,11 +376,6 @@ std::unique_ptr<GlicWidget> GlicWidget::Create(views::WidgetDelegate* delegate,
   params.wm_class_class = shell_integration_linux::GetProgramClassClass();
   params.wayland_app_id = params.wm_class_class + "-glic";
 #endif  // BUILDFLAG(IS_LINUX)
-#if BUILDFLAG(IS_CHROMEOS)
-  params.shadow_type = views::Widget::InitParams::ShadowType::kDrop;
-  params.init_properties_container.SetProperty(
-      chromeos::kShouldHaveHighlightBorderOverlay, true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (user_resizable) {
     params.bounds.Outset(GetTargetOutsets(initial_bounds));

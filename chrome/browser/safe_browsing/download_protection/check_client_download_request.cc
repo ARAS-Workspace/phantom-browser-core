@@ -414,7 +414,7 @@ bool CheckClientDownloadRequest::ShouldPromptForDeepScanning(
 
 bool CheckClientDownloadRequest::ShouldPromptForLocalDecryption(
     bool server_requests_prompt) const {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   if (!server_requests_prompt) {
@@ -454,7 +454,7 @@ bool CheckClientDownloadRequest::ShouldPromptForLocalDecryption(
 }
 
 bool CheckClientDownloadRequest::ShouldPromptForIncorrectPassword() const {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return password_.has_value() &&

@@ -148,9 +148,6 @@ class TestBrowserWindow : public BrowserWindow,
       const std::optional<url::Origin>& initiating_origin,
       IntentPickerResponse callback) override {}
 #endif  //  !define(OS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS)
-  void ToggleMultitaskMenu() override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ShowTranslateBubbleResult ShowTranslateBubble(
       content::WebContents* contents,
       translate::TranslateStep step,
@@ -174,7 +171,7 @@ class TestBrowserWindow : public BrowserWindow,
   void MaybeShowProfileSwitchIPH() override {}
   void MaybeShowSupervisedUserProfileSignInIPH() override {}
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   void ShowHatsDialog(
       const std::string& site_id,
       const std::optional<std::string>& hats_histogram_name,

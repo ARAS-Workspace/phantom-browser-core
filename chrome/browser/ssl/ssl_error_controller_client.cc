@@ -28,14 +28,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/webui/settings/public/constants/routes.mojom.h"
-#include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/ui/settings_window_manager_chromeos.h"
-#include "chrome/common/webui_url_constants.h"
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -109,15 +101,9 @@ bool SSLErrorControllerClient::CanLaunchDateAndTimeSettings() {
 void SSLErrorControllerClient::LaunchDateAndTimeSettings() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  chrome::SettingsWindowManager::GetInstance()->ShowOSSettings(
-      ProfileManager::GetActiveUserProfile(),
-      chromeos::settings::mojom::kSystemPreferencesSectionPath);
-#else
   base::ThreadPool::PostTask(
       FROM_HERE, {base::TaskPriority::USER_VISIBLE, base::MayBlock()},
       base::BindOnce(&security_interstitials::LaunchDateAndTimeSettings));
-#endif
 }
 
 #if !BUILDFLAG(IS_ANDROID)

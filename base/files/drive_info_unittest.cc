@@ -21,7 +21,7 @@ void TestForReasonableDriveInfo(const std::optional<DriveInfo>& info) {
   // `has_seek_penalty` may or may not be true but should be ascertainable.
   EXPECT_NE(info->has_seek_penalty, std::nullopt);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // `is_removable` may or may not be true but should be ascertainable.
   EXPECT_NE(info->is_removable, std::nullopt);
 

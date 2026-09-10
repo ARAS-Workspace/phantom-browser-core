@@ -28,19 +28,7 @@
 #include "printing/printing_utils.h"
 #include "printing/units.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/functional/callback.h"
-#include "base/metrics/histogram_functions.h"
-#include "base/no_destructor.h"
-#include "printing/backend/ipp_handler_map.h"
-#include "printing/backend/ipp_handlers.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace printing {
-
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr int kPinMinimumLength = 4;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 namespace {
 
@@ -291,13 +279,6 @@ PaperFromMediaColDatabaseEntry(ipp_t* db_entry) {
   return PrinterSemanticCapsAndDefaults::Paper(
       /*display_name=*/"", /*vendor_id=*/"", size_um, printable_area_um,
       max_height_um, /*has_borderless_variant=*/false
-#if BUILDFLAG(IS_CHROMEOS)
-      ,
-      PaperMargins(size->top_margin * kMicronsPerPwgUnit,
-                   size->right_margin * kMicronsPerPwgUnit,
-                   size->bottom_margin * kMicronsPerPwgUnit,
-                   size->left_margin * kMicronsPerPwgUnit)
-#endif  // BUILDFLAG(IS_CHROMEOS)
   );
 }
 
@@ -443,138 +424,6 @@ bool CollateDefault(const CupsOptionProvider& printer) {
   return name && !std::string_view(name).compare(kCollated);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool PinSupported(const CupsOptionProvider& printer) {
-  ipp_attribute_t* attr = printer.GetSupportedOptionValues(kIppPin);
-  if (!attr)
-    return false;
-  int password_maximum_length_supported = ippGetInteger(attr, 0);
-  if (password_maximum_length_supported < kPinMinimumLength)
-    return false;
-
-  std::vector<std::string_view> values =
-      printer.GetSupportedOptionValueStrings(kIppPinEncryption);
-  return std::ranges::contains(values, kPinEncryptionNone);
-}
-
-// Returns the number of IPP attributes added to `caps` (not necessarily in
-// 1-to-1 correspondence).
-size_t AddAttributes(const CupsOptionProvider& printer,
-                     const char* attr_group_name,
-                     AdvancedCapabilities* caps) {
-  ipp_attribute_t* attr = printer.GetSupportedOptionValues(attr_group_name);
-  if (!attr)
-    return 0;
-
-  int num_options = ippGetCount(attr);
-  static const base::NoDestructor<HandlerMap> handlers(GenerateHandlers());
-  // The names of attributes that we know are not supported (b/266573545).
-  static constexpr auto kOptionsToIgnore =
-      base::MakeFixedFlatSet<std::string_view>(
-          {"finishings-col", "ipp-attribute-fidelity", "job-name",
-           "number-up-layout"});
-  std::vector<std::string> unknown_options;
-  size_t attr_count = 0;
-  for (int i = 0; i < num_options; i++) {
-    const char* option_name = ippGetString(attr, i, nullptr);
-    if (kOptionsToIgnore.contains(option_name)) {
-      continue;
-    }
-    auto it = handlers->find(option_name);
-    if (it == handlers->end()) {
-      unknown_options.emplace_back(option_name);
-      continue;
-    }
-
-    size_t previous_size = caps->size();
-    // Run the handler that adds items to `caps` based on option type.
-    it->second.Run(printer, option_name, caps);
-    if (caps->size() > previous_size)
-      attr_count++;
-  }
-  if (!unknown_options.empty()) {
-    LOG(WARNING) << "Unknown IPP options: "
-                 << base::JoinString(unknown_options, ", ");
-  }
-  return attr_count;
-}
-
-// Adds the "Input Tray" option to Advanced Attributes.
-size_t AddInputTray(const CupsOptionProvider& printer,
-                    AdvancedCapabilities* caps) {
-  size_t previous_size = caps->size();
-  KeywordHandler(printer, kIppMediaSource, caps);
-  return caps->size() - previous_size;
-}
-
-void ExtractAdvancedCapabilities(const CupsOptionProvider& printer,
-                                 PrinterSemanticCapsAndDefaults* printer_info) {
-  AdvancedCapabilities* options = &printer_info->advanced_capabilities;
-  options->clear();
-  size_t attr_count = AddInputTray(printer, options);
-  attr_count += AddAttributes(printer, kIppJobAttributes, options);
-  attr_count += AddAttributes(printer, kIppDocumentAttributes, options);
-  base::UmaHistogramCounts1000("Printing.CUPS.IppAttributesCount", attr_count);
-}
-
-// Convert string value to mojom::PrintScalingType
-mojom::PrintScalingType PrintScalingTypeFromString(
-    const std::string_view value) {
-  if (value == "auto") {
-    return mojom::PrintScalingType::kAuto;
-  }
-  if (value == "auto-fit") {
-    return mojom::PrintScalingType::kAutoFit;
-  }
-  if (value == "fill") {
-    return mojom::PrintScalingType::kFill;
-  }
-  if (value == "fit") {
-    return mojom::PrintScalingType::kFit;
-  }
-  if (value == "none") {
-    return mojom::PrintScalingType::kNone;
-  }
-
-  // Default to unknown for any unrecognized values.
-  return mojom::PrintScalingType::kUnknownPrintScalingType;
-}
-
-void ExtractPrintScaling(const CupsOptionProvider& printer,
-                         PrinterSemanticCapsAndDefaults* printer_info) {
-  printer_info->print_scaling_types.clear();
-  printer_info->print_scaling_type_default =
-      mojom::PrintScalingType::kUnknownPrintScalingType;
-
-  std::vector<std::string_view> values =
-      printer.GetSupportedOptionValueStrings(kIppPrintScaling);
-  for (const auto& value : values) {
-    auto type = PrintScalingTypeFromString(value);
-    if (type != mojom::PrintScalingType::kUnknownPrintScalingType) {
-      printer_info->print_scaling_types.emplace_back(type);
-    }
-  }
-
-  if (printer_info->print_scaling_types.empty()) {
-    return;
-  }
-
-  // Get default value
-  ipp_attribute_t* attr = printer.GetDefaultOptionValue(kIppPrintScaling);
-  if (const char* const name = ippGetString(attr, 0, nullptr)) {
-    printer_info->print_scaling_type_default = PrintScalingTypeFromString(name);
-  }
-
-  if (printer_info->print_scaling_type_default ==
-          mojom::PrintScalingType::kUnknownPrintScalingType &&
-      !printer_info->print_scaling_types.empty()) {
-    // If no default is provided, use the first value.
-    printer_info->print_scaling_type_default =
-        printer_info->print_scaling_types[0];
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 
 PrinterSemanticCapsAndDefaults::Paper DefaultPaper(const CupsPrinter& printer) {
@@ -600,12 +449,6 @@ void CapsAndDefaultsFromPrinter(const CupsPrinter& printer,
   // paper
   printer_info->default_paper = DefaultPaper(printer);
   printer_info->papers = SupportedPapers(printer);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  printer_info->pin_supported = PinSupported(printer);
-  ExtractAdvancedCapabilities(printer, printer_info);
-  ExtractPrintScaling(printer, printer_info);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   ExtractCopies(printer, printer_info);
   ExtractColor(printer, printer_info);

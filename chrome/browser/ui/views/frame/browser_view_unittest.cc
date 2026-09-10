@@ -68,10 +68,6 @@
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/interaction/element_tracker_views.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/recently_audible_helper.h"
 #endif
@@ -169,26 +165,6 @@ TEST_F(BrowserViewTest, BrowserView) {
                 ui::kColorIcon));
   EXPECT_EQ(customize_chrome_action->GetEnabled(), true);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(BrowserViewTest, OnTaskLockedBrowserView) {
-  Browser* const browser = browser_view()->browser();
-  ASSERT_TRUE(browser);
-  ash::boca::OnTaskLockedController::From(browser)->set_locked_for_on_task(
-      true);
-  EXPECT_FALSE(browser_view()->CanMinimize());
-  EXPECT_FALSE(browser_view()->ShouldShowCloseButton());
-}
-
-TEST_F(BrowserViewTest, OnTaskUnlockedBrowserView) {
-  Browser* const browser = browser_view()->browser();
-  ASSERT_TRUE(browser);
-  ash::boca::OnTaskLockedController::From(browser)->set_locked_for_on_task(
-      false);
-  EXPECT_TRUE(browser_view()->CanMinimize());
-  EXPECT_TRUE(browser_view()->ShouldShowCloseButton());
-}
-#endif
 
 namespace {
 // A thin wrapper around `Browser` to ensure that it's destructed in the right
@@ -340,7 +316,7 @@ TEST_F(BrowserViewTest, DISABLED_BrowserViewLayout) {
 }
 
 // TODO(crbug.com/40656637): Flaky on Linux.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_FindBarBoundingBoxLocationBar \
   DISABLED_FindBarBoundingBoxLocationBar
 #else

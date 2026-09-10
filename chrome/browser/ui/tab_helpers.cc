@@ -204,18 +204,7 @@
 #include "components/zoom/zoom_controller.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boot_times_recorder/boot_times_recorder_tab_helper.h"
-#include "chrome/browser/ash/child_accounts/time_limits/web_time_navigation_observer.h"
-#include "chrome/browser/ash/growth/campaigns_manager_session_tab_helper.h"
-#include "chrome/browser/ash/mahi/web_contents/mahi_tab_helper.h"
-#include "chrome/browser/chromeos/gemini_app/gemini_app_tab_helper.h"
-#include "chrome/browser/chromeos/policy/dlp/dlp_content_tab_helper.h"
-#include "chrome/browser/ui/ash/google_one/google_one_offer_iph_tab_helper.h"
-#include "chromeos/ash/experiences/isolated_web_app/cros_isolated_web_app_enabler.h"
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/blocked_content/framebust_block_tab_helper.h"
 #include "chrome/browser/ui/hats/hats_helper.h"
 #include "chrome/browser/ui/performance_controls/performance_controls_hats_service_factory.h"
@@ -618,17 +607,10 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   StorageAccessAPITabHelper::CreateForWebContents(
       web_contents, StorageAccessAPIServiceFactory::GetForBrowserContext(
                         web_contents->GetBrowserContext()));
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not create for Incognito mode.
-  if (!profile->IsIncognitoProfile()) {
-    SupervisedUserNavigationObserver::CreateForWebContents(web_contents);
-  }
-#else
   // Do not create for OTR.
   if (!profile->IsOffTheRecord()) {
     SupervisedUserNavigationObserver::CreateForWebContents(web_contents);
   }
-#endif
   tasks::TaskTabHelper::CreateForWebContents(web_contents);
 #if !BUILDFLAG(IS_ANDROID)
   TabCaptureContentsBorderHelper::CreateForWebContents(web_contents);
@@ -753,22 +735,6 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  GoogleOneOfferIphTabHelper::CreateForWebContents(web_contents);
-  // Do not create for Incognito mode.
-  if (!profile->IsOffTheRecord()) {
-    CampaignsManagerSessionTabHelper::CreateForWebContents(web_contents);
-  }
-  ash::BootTimesRecorderTabHelper::MaybeCreateForWebContents(web_contents);
-
-  ash::CrosIsolatedWebAppEnabler::CreateForWebContents(web_contents);
-  GeminiAppTabHelper::MaybeCreateForWebContents(web_contents);
-  mahi::MahiTabHelper::MaybeCreateForWebContents(web_contents);
-  policy::DlpContentTabHelper::MaybeCreateForWebContents(web_contents);
-  ash::app_time::WebTimeNavigationObserver::MaybeCreateForWebContents(
-      web_contents);
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   webapps::PreRedirectionURLObserver::CreateForWebContents(web_contents);
 #endif
@@ -777,7 +743,7 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   metrics::DesktopSessionDurationObserver::CreateForWebContents(web_contents);
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(
           features::kHappinessTrackingSurveysForDesktopDemo) ||
       base::FeatureList::IsEnabled(features::kTrustSafetySentimentSurvey) ||

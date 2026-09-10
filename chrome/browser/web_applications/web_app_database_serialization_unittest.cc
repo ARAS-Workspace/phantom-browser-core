@@ -51,16 +51,8 @@ std::tuple<proto::WebApp, webapps::AppId> CreateWebAppProtoForTesting(
   web_app.mutable_sync_data()->set_user_display_mode_default(
       sync_pb::WebAppSpecifics_UserDisplayMode::
           WebAppSpecifics_UserDisplayMode_STANDALONE);
-#if BUILDFLAG(IS_CHROMEOS)
-  web_app.mutable_sync_data()->set_user_display_mode_cros(
-      sync_pb::WebAppSpecifics_UserDisplayMode::
-          WebAppSpecifics_UserDisplayMode_STANDALONE);
-#endif
   web_app.set_scope(start_url.GetWithoutFilename().spec());
   web_app.mutable_sources()->set_user_installed(true);
-#if BUILDFLAG(IS_CHROMEOS)
-  web_app.mutable_chromeos_data();
-#endif
   web_app.set_install_state(
       proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION);
   webapps::AppId app_id = GenerateAppIdFromManifestId(manifest_id);
@@ -179,9 +171,6 @@ TEST_F(WebAppDatabaseSerializationTest,
   std::tie(proto, app_id) =
       CreateWebAppProtoForTesting("Test App", GURL("https://example.com/"));
   proto.mutable_sync_data()->clear_user_display_mode_default();
-#if BUILDFLAG(IS_CHROMEOS)
-  proto.mutable_sync_data()->clear_user_display_mode_cros();
-#endif
   EXPECT_THAT(ParseWebAppProto(proto, app_id), IsNull());
 }
 
@@ -191,15 +180,9 @@ TEST_F(WebAppDatabaseSerializationTest,
   webapps::AppId app_id;
   std::tie(proto, app_id) =
       CreateWebAppProtoForTesting("Test App", GURL("https://example.com/"));
-#if BUILDFLAG(IS_CHROMEOS)
-  proto.mutable_sync_data()->clear_user_display_mode_cros();
-  proto.mutable_sync_data()->set_user_display_mode_default(
-      sync_pb::WebAppSpecifics_UserDisplayMode_STANDALONE);
-#else
   proto.mutable_sync_data()->clear_user_display_mode_default();
   proto.mutable_sync_data()->set_user_display_mode_cros(
       sync_pb::WebAppSpecifics_UserDisplayMode_STANDALONE);
-#endif
   EXPECT_THAT(ParseWebAppProto(proto, app_id), IsNull());
 }
 
@@ -259,16 +242,6 @@ TEST_F(WebAppDatabaseSerializationTest,
   EXPECT_THAT(ParseWebAppProto(proto2, app_id2), NotNull());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(WebAppDatabaseSerializationTest, ParseWebAppProto_MissingCrOSData) {
-  proto::WebApp proto;
-  webapps::AppId app_id;
-  std::tie(proto, app_id) =
-      CreateWebAppProtoForTesting("Test App", GURL("https://example.com/"));
-  proto.clear_chromeos_data();
-  EXPECT_THAT(ParseWebAppProto(proto, app_id), IsNull());
-}
-#else
 TEST_F(WebAppDatabaseSerializationTest, ParseWebAppProto_HasCrOSData) {
   proto::WebApp proto;
   webapps::AppId app_id;
@@ -277,7 +250,6 @@ TEST_F(WebAppDatabaseSerializationTest, ParseWebAppProto_HasCrOSData) {
   proto.mutable_chromeos_data();  // Add CrOS data on non-CrOS
   EXPECT_THAT(ParseWebAppProto(proto, app_id), IsNull());
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(WebAppDatabaseSerializationTest, ParseWebAppProto_InvalidFileHandler) {
   proto::WebApp proto;

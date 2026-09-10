@@ -37,10 +37,6 @@ VIZ_COMMON_EXPORT bool ShouldDiscardVizBufferQueueOnVisibilityChange();
 
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kDelegatedCompositing);
 
-#if BUILDFLAG(IS_CHROMEOS)
-VIZ_COMMON_EXPORT extern const char kDrawQuadSplit[];
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kDrawQuadSplitLimit);
 
 enum class DelegatedCompositingMode {
@@ -128,9 +124,6 @@ VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(
     kVizDirectCompositorThreadIpcFrameSinkManager);
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kVizWithIoMessagePump);
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kVizNullHypothesis);
-#if BUILDFLAG(IS_CHROMEOS)
-VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kCrosContentAdjustedRefreshRate);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 VIZ_COMMON_EXPORT extern const char kDraw1Point12Ms[];
 VIZ_COMMON_EXPORT extern const char kDraw2Points6Ms[];
@@ -174,9 +167,6 @@ NumCooldownFramesForAckOnSurfaceActivationDuringInteraction();
 VIZ_COMMON_EXPORT extern const base::FeatureParam<int>
     kNumCooldownFramesForAckOnSurfaceActivationDuringInteraction;
 VIZ_COMMON_EXPORT bool ShouldAckOnSurfaceActivationWhenInteractive();
-#if BUILDFLAG(IS_CHROMEOS)
-VIZ_COMMON_EXPORT bool IsCrosContentAdjustedRefreshRateEnabled();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_ANDROID)
 VIZ_COMMON_EXPORT bool IsBrowserControlsInVizEnabled();
 

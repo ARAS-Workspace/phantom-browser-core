@@ -63,9 +63,6 @@ std::optional<ViewID> GetViewID(
     case ImageType::kSensors:
     case ImageType::kNotifications:
     case ImageType::kStorageAccess:
-#if BUILDFLAG(IS_CHROMEOS)
-    case ImageType::kSmartCard:
-#endif
       return std::nullopt;
   }
   NOTREACHED();

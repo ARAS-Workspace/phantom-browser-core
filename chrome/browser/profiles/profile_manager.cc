@@ -140,29 +140,7 @@
 #include "chrome/browser/signin/signin_manager_android_factory.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "base/debug/dump_without_crashing.h"
-#include "base/hash/hash.h"
-#include "base/strings/stringprintf.h"
-#include "base/system/sys_info.h"
-#include "chrome/browser/ash/account_manager/account_manager_policy_controller_factory.h"
-#include "chrome/browser/ash/account_manager/child_account_type_changed_user_data.h"
-#include "chrome/browser/ash/arc/policy/arc_policy_util.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/browser_process_platform_part_ash.h"
-#include "chrome/browser/chromeos/extensions/desk_api/desk_api_extension_manager_factory.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#include "chromeos/ash/experiences/arc/arc_prefs.h"
-#include "chromeos/ash/experiences/arc/session/arc_management_transition.h"
-#include "chromeos/constants/chromeos_features.h"
-#include "components/user_manager/user.h"
-#include "components/user_manager/user_manager.h"
-#include "components/user_manager/user_type.h"
-#endif
-
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/profiles/profile_statistics.h"
 #include "chrome/browser/profiles/profile_statistics_factory.h"
 #endif
@@ -349,13 +327,6 @@ bool IsRegisteredAsEphemeral(ProfileAttributesStorage* storage,
   return entry && entry->IsEphemeral();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool IsLoggedIn() {
-  return user_manager::UserManager::IsInitialized() &&
-         user_manager::UserManager::Get()->IsUserLoggedIn();
-}
-#endif
-
 bool IsForceEphemeralProfilesEnabled(Profile* profile) {
   return profile->GetPrefs()->GetBoolean(prefs::kForceEphemeralProfiles);
 }
@@ -387,33 +358,13 @@ std::ostream& operator<<(
   return out;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void UpdateSupervisedUserPref(Profile* profile, bool is_child) {
-  DCHECK(profile);
-  if (is_child) {
-    profile->GetPrefs()->SetString(prefs::kSupervisedUserId,
-                                   supervised_user::kChildAccountSUID);
-  } else {
-    profile->GetPrefs()->ClearPref(prefs::kSupervisedUserId);
-  }
-}
-
-std::optional<bool> IsUserChild(Profile* profile) {
-  const user_manager::User* user =
-      ash::ProfileHelper::Get()->GetUserByProfile(profile);
-  return user ? std::make_optional(user->GetType() ==
-                                   user_manager::UserType::kChild)
-              : std::nullopt;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void RunCallbacks(std::vector<base::OnceCallback<void(Profile*)>>& callbacks,
                   Profile* profile) {
   for (base::OnceCallback<void(Profile*)>& callback : callbacks)
     std::move(callback).Run(profile);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 void ClearPrimaryAccountForProfile(
     base::WeakPtr<Profile> weak_profile,
     signin_metrics::ProfileSignout signout_source_metric) {
@@ -435,11 +386,6 @@ std::string GetKeepAliveOriginName(ProfileKeepAliveOrigin origin) {
 
 // Determines if profile should be OTR.
 bool ShouldGoOffTheRecord(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!ash::ProfileHelper::IsUserProfile(profile)) {
-    return true;
-  }
-#endif
   return profile->IsGuestSession() || profile->IsSystemProfile();
 }
 
@@ -530,35 +476,7 @@ Profile* ProfileManager::GetLastUsedProfile() {
   if (!profile_manager)  // Can be null in unit tests.
     return nullptr;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Use default login profile if user has not logged in yet.
-  if (!IsLoggedIn())
-    return profile_manager->GetActiveUserOrOffTheRecordProfile();
-
-  // CrOS multi-profiles implementation is different so GetLastUsedProfile()
-  // has custom implementation too.
-  // In case of multi-profiles we ignore "last used profile" preference
-  // since it may refer to profile that has been in use in previous session.
-  // That profile dir may not be mounted in this session so instead return
-  // active profile from current session.
-  user_manager::UserManager* manager = user_manager::UserManager::Get();
-  // IsLoggedIn check above ensures |user| is non-null.
-  const auto* user = manager->GetActiveUser();
-  Profile* profile = profile_manager->GetProfileByPath(
-      ash::BrowserContextHelper::Get()->GetBrowserContextPathByUserIdHash(
-          user->username_hash()));
-
-  // Accessing a user profile before it is loaded may lead to policy exploit.
-  // See http://crbug.com/40505153.
-  LOG_IF(FATAL, !profile) << "Calling GetLastUsedProfile() before profile "
-                          << "initialization is completed.";
-
-  return profile->IsGuestSession()
-             ? profile->GetPrimaryOTRProfile(/*create_if_needed=*/true)
-             : profile;
-#else
   return profile_manager->GetProfile(profile_manager->GetLastUsedProfileDir());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 // static
@@ -628,84 +546,10 @@ std::vector<Profile*> ProfileManager::GetLastOpenedProfiles() {
   return to_return;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace {
-// Returns the hash to identify the caller for investigation.
-// To stabilize against unrelated line edits in the file, we drop line number
-// from the source of the hash.
-uint32_t LocationHash(const base::Location& location) {
-  if (!location.has_source_info()) {
-    // Use 0 to indicate "missing source info" error.
-    return 0;
-  }
-  return base::PersistentHash(
-      base::StrCat({location.function_name(), location.file_name()}));
-}
-}  // namespace
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // static
 Profile* ProfileManager::GetPrimaryUserProfile(
-#if BUILDFLAG(IS_CHROMEOS)
-    const base::Location& location
-#endif
 ) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (IsLoggedIn()) {
-    user_manager::UserManager* manager = user_manager::UserManager::Get();
-    const user_manager::User* user = manager->GetPrimaryUser();
-    if (!user)  // Can be null in unit tests.
-      return nullptr;
-
-    if (user->is_profile_created()) {
-      // Note: The ProfileHelper will take care of guest profiles.
-      return ash::ProfileHelper::Get()->GetProfileByUser(user);
-    }
-
-    LOG(ERROR) << "ProfileManager::GetPrimaryUserProfile is called when "
-                  "|user| is created but |user|'s profile is not yet created. "
-                  "It probably means that something is wrong with a calling "
-                  "code. Please report in http://crbug.com/41100311 if you see "
-                  "this message.";
-
-    // Taking metrics to make sure this code path is not used in production.
-    // TODO(crbug.com/40225390): Remove the following code, once we made sure
-    // they are not used in the production.
-    if (base::SysInfo::IsRunningOnChromeOS()) {
-      base::UmaHistogramBoolean(
-          "Ash.BrowserContext.UnexpectedGetPrimaryUserProfile", true);
-      // Also taking the stack trace, so we can identify who's the caller on
-      // unexpected cases.
-      base::debug::DumpWithoutCrashing();
-    }
-
-    LOG(ERROR) << "ProfileManager::GetPrimaryUserProfile is called "
-               << "in a user session but before initialization completion from "
-               << location.ToString();
-    base::UmaHistogramSparse(
-        "Ash.BrowserContext.UnexpectedGetPrimaryUserProfile.InSession.Location",
-        LocationHash(location));
-
-    Profile* profile = ProfileManager::GetActiveUserProfile();
-    if (profile && manager->IsLoggedInAsGuest())
-      profile = profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-    return profile;
-  }
-
-  LOG(ERROR) << "ProfileManager::GetPrimaryUserProfile is called "
-             << "at sign in screen from " << location.ToString();
-  base::UmaHistogramSparse(
-      "Ash.BrowserContext.UnexpectedGetPrimaryUserProfile.LoginScreen.Location",
-      LocationHash(location));
-
-  // Respect profile creation configuration.
-  // GetActiveUserOrOffTheRecordProfile() may create the profile if missing.
-  // This means unexpected uses. See also crbug.com/40227502.
-  if (!ash::BrowserContextHelper::IsImplicitBrowserContextCreationEnabled()) {
-    return nullptr;
-  }
-#endif
 
   ProfileManager* profile_manager = g_browser_process->profile_manager();
   if (!profile_manager)  // Can be null in unit tests.
@@ -716,47 +560,8 @@ Profile* ProfileManager::GetPrimaryUserProfile(
 
 // static
 Profile* ProfileManager::GetActiveUserProfile(
-#if BUILDFLAG(IS_CHROMEOS)
-    const base::Location& location
-#endif
 ) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!profile_manager)
-    return nullptr;
-
-  if (IsLoggedIn()) {
-    user_manager::UserManager* manager = user_manager::UserManager::Get();
-    const user_manager::User* user = manager->GetActiveUser();
-    // To avoid an endless loop (crbug.com/41083672) we have to additionally
-    // check if the profile of the user was already created. If the profile was
-    // not yet created we load the profile using the profile directly.
-    // TODO: This should be cleaned up with the new profile manager.
-    if (user && user->is_profile_created())
-      return ash::ProfileHelper::Get()->GetProfileByUser(user);
-
-    LOG(ERROR) << "ProfileManager::GetActiveUserProfile is called "
-               << "in a user session but before initialization completion from "
-               << location.ToString();
-    base::UmaHistogramSparse(
-        "Ash.BrowserContext.UnexpectedGetActiveUserProfile.InSession.Location",
-        LocationHash(location));
-  } else {
-    LOG(ERROR) << "ProfileManager::GetActiveUserProfile is called "
-               << "at sign in screen from " << location.ToString();
-    base::UmaHistogramSparse(
-        "Ash.BrowserContext.UnexpectedGetActiveUserProfile.LoginScreen."
-        "Location",
-        LocationHash(location));
-  }
-
-  // Respect profile creation configuration.
-  // GetActiveUserOrOffTheRecordProfile() may create the profile if missing.
-  // This means unexpected uses. See also crbug.com/40227502.
-  if (!ash::BrowserContextHelper::IsImplicitBrowserContextCreationEnabled()) {
-    return nullptr;
-  }
-#endif
 
   Profile* profile = profile_manager->GetActiveUserOrOffTheRecordProfile();
   // |profile| could be null if the user doesn't have a profile yet and the path
@@ -779,7 +584,7 @@ Profile* ProfileManager::CreateInitialProfile() {
   }
   return profile;
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 void ProfileManager::AddObserver(ProfileManagerObserver* observer) {
   observers_.AddObserver(observer);
@@ -925,16 +730,6 @@ bool ProfileManager::IsValidProfile(const void* profile) {
 
 // static
 base::FilePath ProfileManager::GetInitialProfileDir() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (IsLoggedIn()) {
-    user_manager::UserManager* manager = user_manager::UserManager::Get();
-    // IsLoggedIn check above ensures |user| is non-null.
-    const auto* user = manager->GetActiveUser();
-    return base::FilePath(
-        ash::BrowserContextHelper::GetUserBrowserContextDirName(
-            user->username_hash()));
-  }
-#endif
   base::FilePath relative_profile_dir;
   // TODO(mirandac): should not automatically be default profile.
   return relative_profile_dir.AppendASCII(chrome::kInitialProfile);
@@ -1110,7 +905,7 @@ base::FilePath ProfileManager::GetGuestProfilePath() {
   return guest_path.Append(chrome::kGuestProfileDir);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // static
 base::FilePath ProfileManager::GetSystemProfilePath() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
@@ -1120,7 +915,7 @@ base::FilePath ProfileManager::GetSystemProfilePath() {
   base::FilePath system_path = profile_manager->user_data_dir();
   return system_path.Append(chrome::kSystemProfileDir);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 base::FilePath ProfileManager::GenerateNextProfileDirectoryPath() {
   PrefService* local_state = g_browser_process->local_state();
@@ -1195,68 +990,6 @@ void ProfileManager::InitProfileUserPrefs(Profile* profile) {
   // User type can change during online sign in on Chrome OS. Propagate the
   // change to the profile and remove stored profile attributes so they can be
   // re-initialized later.
-#if BUILDFLAG(IS_CHROMEOS)
-  const std::optional<bool> user_is_child = IsUserChild(profile);
-  const bool profile_is_new = profile->IsNewProfile();
-  const bool profile_is_child = profile->IsChild();
-  const bool did_supervised_status_change =
-      !profile_is_new && user_is_child.has_value() &&
-      profile_is_child != user_is_child.value();
-
-  if (user_is_child.has_value()) {
-    if (did_supervised_status_change) {
-      ProfileAttributesEntry* entry =
-          storage.GetProfileAttributesWithPath(profile->GetPath());
-      if (entry)
-        storage.RemoveProfile(profile->GetPath());
-    }
-    UpdateSupervisedUserPref(profile, user_is_child.value());
-  }
-
-  // Additionally to propagation of the user type change to profile on Chrome
-  // OS, Ash needs to propagate it to ARC++ and update secondary accounts.
-  if (user_is_child.has_value()) {
-    const bool profile_is_managed = !profile->IsOffTheRecord() &&
-                                    arc::policy_util::IsAccountManaged(profile);
-
-    if (did_supervised_status_change) {
-      ash::ChildAccountTypeChangedUserData::GetForProfile(profile)->SetValue(
-          true);
-    } else {
-      ash::ChildAccountTypeChangedUserData::GetForProfile(profile)->SetValue(
-          false);
-    }
-
-    // Notify ARC about transition via prefs if needed.
-    if (!profile_is_new) {
-      const bool arc_is_managed =
-          profile->GetPrefs()->GetBoolean(arc::prefs::kArcIsManaged);
-      const bool arc_is_managed_set =
-          profile->GetPrefs()->HasPrefPath(arc::prefs::kArcIsManaged);
-
-      const bool arc_signed_in =
-          profile->GetPrefs()->GetBoolean(arc::prefs::kArcSignedIn);
-
-      arc::ArcManagementTransition transition;
-      if (!arc_signed_in) {
-        // No transition is necessary if user never enabled ARC.
-        transition = arc::ArcManagementTransition::NO_TRANSITION;
-      } else if (profile_is_child != user_is_child.value()) {
-        transition = user_is_child.value()
-                         ? arc::ArcManagementTransition::REGULAR_TO_CHILD
-                         : arc::ArcManagementTransition::CHILD_TO_REGULAR;
-      } else if (profile_is_managed && arc_is_managed_set && !arc_is_managed) {
-        transition = arc::ArcManagementTransition::UNMANAGED_TO_MANAGED;
-      } else {
-        // User state has not changed.
-        transition = arc::ArcManagementTransition::NO_TRANSITION;
-      }
-
-      profile->GetPrefs()->SetInteger(arc::prefs::kArcManagementTransition,
-                                      static_cast<int>(transition));
-    }
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   size_t avatar_index;
   std::string profile_name;
@@ -1275,7 +1008,7 @@ void ProfileManager::InitProfileUserPrefs(Profile* profile) {
       supervised_user_id = entry->GetSupervisedUserId();
     } else {
       avatar_index = profiles::GetPlaceholderAvatarIndex();
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
       profile_name = base::UTF16ToUTF8(storage.ChooseNameForNewProfile());
 #else
       profile_name =
@@ -1489,7 +1222,7 @@ void ProfileManager::NotifyOnProfileMarkedForPermanentDeletion(
 }
 
 void ProfileManager::UnloadProfileIfNoKeepAlive(const ProfileInfo* info) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (GetTotalRefCount(info->keep_alives) != 0)
     return;
 
@@ -1508,7 +1241,7 @@ void ProfileManager::UnloadProfileIfNoKeepAlive(const ProfileInfo* info) {
 
   VLOG(1) << "Unloading profile " << info->GetCreatedProfile()->GetDebugName();
   UnloadProfile(info->GetCreatedProfile()->GetPath());
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ProfileManager::DoFinalInit(ProfileInfo* profile_info,
@@ -1562,34 +1295,8 @@ void ProfileManager::DoFinalInitForServices(Profile* profile,
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   bool extensions_enabled = !go_off_the_record;
-#if BUILDFLAG(IS_CHROMEOS)
-  bool are_extensions_allowed_for_profile =
-      ash::IsSigninBrowserContext(profile);
-  if (chromeos::features::IsLockScreenBadgeAuthEnabled()) {
-    are_extensions_allowed_for_profile |=
-        ash::IsLockScreenBrowserContext(profile);
-  }
-
-  if ((!base::CommandLine::ForCurrentProcess()->HasSwitch(
-           switches::kDisableLoginScreenApps) &&
-       are_extensions_allowed_for_profile) ||
-      ash::IsShimlessRmaAppBrowserContext(profile)) {
-    extensions_enabled = true;
-  }
-#endif
   extensions::ExtensionSystem::Get(profile)->InitForRegularProfile(
       extensions_enabled);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Ensure that the `DeskApiExtensionManager` is instantiated
-  // after other systems are set up and only when extensions are enabled for the
-  // given profile. This is done in `ProfileManager` so we can repurpose the
-  // same pre-conditional checks that are being used with other extension
-  // components and we can maintain said order.
-  if (extensions_enabled) {
-    ::chromeos::DeskApiExtensionManagerFactory::GetForProfile(profile);
-  }
-#endif
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
@@ -1635,9 +1342,6 @@ void ProfileManager::DoFinalInitForServices(Profile* profile,
   if (accessibility_service)
     accessibility_service->Init();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::AccountManagerPolicyControllerFactory::GetForBrowserContext(profile);
-#endif
 }
 
 void ProfileManager::DoFinalInitLogging(Profile* profile) {
@@ -1719,46 +1423,15 @@ Profile* ProfileManager::ProfileInfo::GetRawProfile() const {
   return unowned_profile_;
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 Profile* ProfileManager::GetActiveUserOrOffTheRecordProfile() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!IsLoggedIn()) {
-    base::FilePath default_profile_dir =
-        profiles::GetDefaultProfileDir(user_data_dir_);
-    Profile* profile = GetProfile(default_profile_dir);
-    // For cros, return the OTR profile so we never accidentally keep
-    // user data in an unencrypted profile. But doing this makes
-    // many of the browser and ui tests fail. We do return the OTR profile
-    // if the login-profile switch is passed so that we can test this.
-    if (ShouldGoOffTheRecord(profile))
-      return profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-    DCHECK(!user_manager::UserManager::Get()->IsLoggedInAsGuest());
-    return profile;
-  }
-
-  base::FilePath default_profile_dir =
-      user_data_dir_.Append(GetInitialProfileDir());
-  ProfileInfo* profile_info = GetProfileInfoByPath(default_profile_dir);
-  // Fallback to default off-the-record profile, if user profile has not started
-  // loading or has not fully loaded yet.
-  if (!profile_info || !profile_info->GetCreatedProfile())
-    default_profile_dir = profiles::GetDefaultProfileDir(user_data_dir_);
-
-  Profile* profile = GetProfile(default_profile_dir);
-  // Some unit tests didn't initialize the UserManager.
-  if (user_manager::UserManager::IsInitialized() &&
-      user_manager::UserManager::Get()->IsLoggedInAsGuest())
-    return profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-  return profile;
-#else
   base::FilePath default_profile_dir =
       user_data_dir_.Append(GetInitialProfileDir());
   return GetProfile(default_profile_dir);
-#endif
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 void ProfileManager::UnloadProfile(const base::FilePath& profile_dir) {
   TRACE_EVENT0("browser", "ProfileManager::UnloadProfile");
 
@@ -1791,7 +1464,7 @@ void ProfileManager::UnloadProfile(const base::FilePath& profile_dir) {
        base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
       base::BindOnce(&NukeProfileFromDisk, profile_dir, base::OnceClosure()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 Profile* ProfileManager::CreateAndInitializeProfile(
     const base::FilePath& profile_dir,
@@ -2030,7 +1703,7 @@ void ProfileManager::AddProfileToStorage(Profile* profile) {
     ProfileAttributesEntry* entry =
         storage.GetProfileAttributesWithPath(profile->GetPath());
     if (entry) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
       bool could_be_managed_status = entry->CanBeManaged();
 #endif
       // The ProfileAttributesStorage's info must match the Identity Manager.
@@ -2040,7 +1713,7 @@ void ProfileManager::AddProfileToStorage(Profile* profile) {
       entry->SetSignedInWithCredentialProvider(profile->GetPrefs()->GetBoolean(
           prefs::kSignedInWithCredentialProvider));
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
       // Sign out if force-sign-in policy is enabled and profile is not signed
       // in.
       VLOG(1) << "ForceSigninCheck: " << signin_util::IsForceSigninEnabled()
@@ -2073,13 +1746,6 @@ void ProfileManager::AddProfileToStorage(Profile* profile) {
 
   init_params.supervised_user_id =
       profile->GetPrefs()->GetString(prefs::kSupervisedUserId);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  user_manager::User* user =
-      ash::ProfileHelper::Get()->GetUserByProfile(profile);
-  if (user)
-    init_params.account_id = user->GetAccountId();
-#endif
 
   init_params.gaia_id = account_info.gaia;
   init_params.user_name = username;
@@ -2294,12 +1960,10 @@ void ProfileManager::OnBrowserClosed(BrowserWindowInterface* browser) {
                                    duration.InMinutes(), 1,
                                    base::Days(28).InMinutes(), 100);
     // ChromeOS handles guest data independently.
-#if !BUILDFLAG(IS_CHROMEOS)
     // Clear all browsing data once a Guest Session completes. The Guest profile
     // has BrowserContextKeyedServices that the ProfileDestroyer can't delete
     // properly.
     profiles::RemoveBrowsingDataForProfile(profile->GetPath());
-#endif  //! BUILDFLAG(IS_CHROMEOS)
   }
 
   base::FilePath path = profile->GetPath();

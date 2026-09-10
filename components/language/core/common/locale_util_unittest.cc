@@ -122,19 +122,6 @@ TEST_F(LocaleUtilTest, ConvertToActualUILocale) {
 // ---------------------------------------------------------------------------
 // This only matters for ChromeOS, as it is the only system where users can
 // set the display UI.
-#if BUILDFLAG(IS_CHROMEOS)
-  locale = "sd";  // Sindhi
-  is_ui = ConvertToActualUILocale(&locale);
-  EXPECT_FALSE(is_ui);
-
-  locale = "ga";  // Irish
-  is_ui = ConvertToActualUILocale(&locale);
-  EXPECT_FALSE(is_ui);
-
-  locale = "ky";  // Kyrgyz
-  is_ui = ConvertToActualUILocale(&locale);
-  EXPECT_FALSE(is_ui);
-#endif
 }
 
 }  // namespace

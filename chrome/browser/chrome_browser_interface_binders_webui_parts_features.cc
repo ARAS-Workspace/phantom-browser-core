@@ -28,7 +28,7 @@
 #include "chrome/common/compose/compose.mojom.h"
 #endif
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)

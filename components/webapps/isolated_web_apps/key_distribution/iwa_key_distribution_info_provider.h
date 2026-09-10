@@ -211,11 +211,6 @@ class COMPONENT_EXPORT(ISOLATED_WEB_APPS) IwaKeyDistributionInfoProvider
   bool skip_managed_checks_for_testing_ = false;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-COMPONENT_EXPORT(ISOLATED_WEB_APPS)
-BASE_DECLARE_FEATURE(kIsolatedWebAppBypassManagedAllowlist);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace web_app
 
 #endif  // COMPONENTS_WEBAPPS_ISOLATED_WEB_APPS_KEY_DISTRIBUTION_IWA_KEY_DISTRIBUTION_INFO_PROVIDER_H_

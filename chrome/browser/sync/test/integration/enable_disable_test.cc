@@ -30,12 +30,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-// To control Floating SSO (= sync of cookies) on ChromeOS.
-#include "chromeos/constants/pref_names.h"
-#include "components/prefs/pref_service.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 using fake_server::FakeServer;
@@ -173,26 +167,13 @@ class EnableDisableSingleClientTest
   void SetupTest(bool all_types_enabled) {
     ASSERT_TRUE(SetupClients());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // This unblocks sync of cookies on ChromeOS, see dedicated controller
-    // CookieSyncDataTypeController. The tests in this file are not prepared
-    // to handle selectable datatypes which are disabled by default via their
-    // DataTypeController, so we have to enable the pref for them to pass.
-    // TODO(crbug.com/378091718): think if we can also make the tests pass with
-    // this preference disabled.
-    GetProfile(0)->GetPrefs()->SetBoolean(chromeos::prefs::kFloatingSsoEnabled,
-                                          true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
     if (GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTheFeature) {
       ASSERT_TRUE(GetClient(0)->SetupSyncWithCustomSettings(
           base::BindLambdaForTesting([all_types_enabled](
                                          syncer::SyncUserSettings*
                                              user_settings) {
             user_settings->SetSelectedTypes(all_types_enabled, {});
-#if !BUILDFLAG(IS_CHROMEOS)
             user_settings->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
           })));
     } else {
       ASSERT_TRUE(GetClient(0)->SignInNoWaitForCompletion());
@@ -225,9 +206,7 @@ class EnableDisableSingleClientTest
     // TODO(crbug.com/40066949): Simplify (fully removes these types) once
     // Sync-the-feature is gone.
     DataTypeSet unsupported = {syncer::AUTOFILL, syncer::AUTOFILL_PROFILE};
-#if !BUILDFLAG(IS_CHROMEOS)
     unsupported.PutAll({syncer::APPS, syncer::APP_SETTINGS});
-#endif
     return unsupported;
   }
 
@@ -552,7 +531,6 @@ IN_PROC_BROWSER_TEST_P(EnableDisableSingleClientTest, FastEnableDisableEnable) {
 // the following tests.
 //
 // ChromeOS does not support signing out of a primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(EnableDisableSingleClientTest, RedownloadsAfterSignout) {
   ASSERT_TRUE(SetupClients());
   ASSERT_FALSE(bookmarks_helper::GetBookmarkModel(0)->IsBookmarked(
@@ -573,9 +551,7 @@ IN_PROC_BROWSER_TEST_P(EnableDisableSingleClientTest, RedownloadsAfterSignout) {
         types.Remove(syncer::UserSelectableType::kHistory);
         types.Remove(syncer::UserSelectableType::kPasswords);
         settings->SetSelectedTypes(/*sync_everything=*/false, types);
-#if !BUILDFLAG(IS_CHROMEOS)
         settings->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
       })));
   ASSERT_TRUE(GetSyncService(0)->IsSyncFeatureActive());
   ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().HasAny(
@@ -599,7 +575,6 @@ IN_PROC_BROWSER_TEST_P(EnableDisableSingleClientTest, RedownloadsAfterSignout) {
       GURL(kSyncedBookmarkURL)));
   EXPECT_EQ(GetNumUpdatesDownloadedInLastCycle(), initial_updates_downloaded);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(EnableDisableSingleClientTest,
                        DoesNotRedownloadAfterSyncUnpaused) {

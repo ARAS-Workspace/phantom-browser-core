@@ -320,7 +320,7 @@
 #include "ui/base/device_form_factor.h"
 #include "ui/webui/buildflags.h"
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/enterprise/network_header_injection/core/features.h"  // nogncheck
 #endif
 
@@ -415,12 +415,10 @@
 #include "components/optimization_guide/core/model_execution/model_execution_features.h"
 #include "ui/accessibility/accessibility_features.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/download/bubble/download_bubble_update_service_factory.h"
 #include "chrome/browser/profiles/profile_statistics_factory.h"
 #include "chrome/browser/ui/startup/first_run_service.h"
 #include "chrome/browser/ui/webui/signin/turn_sync_on_helper.h"
-#endif
 
 #endif
 
@@ -435,50 +433,11 @@
 
 #include "chrome/browser/enterprise/signals/signals_aggregator_factory.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/browser/apps/almanac_api_client/device_info_manager_factory.h"
-#include "chrome/browser/apps/app_preload_service/app_preload_service_factory.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service_factory.h"
-#include "chrome/browser/ash/certificate_provider/certificate_provider_service_factory.h"
-#include "chrome/browser/ash/file_manager/cloud_upload_prefs_watcher.h"
-#include "chrome/browser/ash/file_manager/cloud_upload_prompt_prefs_handler.h"
-#include "chrome/browser/ash/floating_sso/floating_sso_service_factory.h"
-#include "chrome/browser/ash/input_method/editor_mediator_factory.h"
-#include "chrome/browser/ash/keyed_service/browser_context_keyed_service_factories.h"
-#include "chrome/browser/ash/language_packs/language_pack_font_service_factory.h"
-#include "chrome/browser/ash/lobster/lobster_service_provider.h"
-#include "chrome/browser/ash/login/auth_factors_policy/local_auth_factors_policy_controller_factory.h"
-#include "chrome/browser/ash/policy/dlp/files_policy_notification_manager_factory.h"
-#include "chrome/browser/ash/policy/skyvault/local_files_migration_manager.h"
-#include "chrome/browser/ash/scanner/scanner_keyed_service_factory.h"
-#include "chrome/browser/chromeos/enterprise/cloud_storage/one_drive_pref_observer.h"
-#include "chrome/browser/chromeos/policy/dlp/dlp_download_observer_factory.h"
-#include "chrome/browser/chromeos/policy/dlp/dlp_rules_manager_factory.h"
-#include "chrome/browser/media/webrtc/multi_capture/multi_capture_data_service_factory.h"
-#include "chrome/browser/media/webrtc/multi_capture/multi_capture_session_controller_factory.h"
-#include "chrome/browser/media/webrtc/multi_capture/multi_capture_usage_indicator_service_factory.h"
-#include "chrome/browser/media_galleries/gallery_watch_manager.h"
-#include "chrome/browser/media_galleries/media_file_system_registry.h"
-#include "chrome/browser/media_galleries/media_galleries_preferences_factory.h"
-#include "chrome/browser/nearby_sharing/nearby_sharing_service_factory.h"
-#include "chrome/browser/policy/networking/policy_cert_service_factory.h"
-#include "chrome/browser/policy/networking/user_network_configuration_updater_factory.h"
-#include "chrome/browser/push_notification/push_notification_service_factory.h"
-#include "chrome/browser/smart_card/smart_card_permission_context_factory.h"
-#include "chromeos/constants/chromeos_features.h"
-
-#if !BUILDFLAG(IS_CHROMEOS_DEVICE)
-// A ChromeOS build for a dev linux machine.
-#include "chrome/browser/smart_card/fake_smart_card_device_service_factory.h"
-#endif
-#else
 #include "chrome/browser/enterprise/groups/enterprise_groups_handler_factory.h"
 #include "chrome/browser/policy/cloud/user_policy_signin_service_factory.h"
 #include "chrome/browser/profiles/gaia_info_update_service_factory.h"
-#endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/connectors/device_trust/device_trust_connector_service_factory.h"
 #include "chrome/browser/enterprise/connectors/device_trust/device_trust_service_factory.h"
 #include "chrome/browser/enterprise/network_header_injection/http_header_injection_service_factory.h"  // nogncheck
@@ -494,7 +453,7 @@
 #include "chrome/browser/webauthn/passkey_unlock_manager_factory.h"
 #include "device/fido/public/features.h"
 #endif
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/policy/messaging_layer/util/manual_test_heartbeat_event_factory.h"
 #endif
 
@@ -546,11 +505,6 @@
 #include "components/webapps/isolated_web_apps/reading/response_reader_registry_factory.h"  // nogncheck
 #include "components/webapps/isolated_web_apps/url_loading/url_loader_factory.h"  // nogncheck
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/platform_apps/api/browser_context_keyed_service_factories.h"
-#include "chrome/browser/chromeos/extensions/telemetry/api/telemetry_extension_api_browser_context_keyed_service_factories.h"
-#include "chrome/browser/extensions/api/chromeos_api_browser_context_keyed_service_factories.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -672,19 +626,11 @@ void ChromeBrowserMainExtraPartsProfiles::
   // ---------------------------------------------------------------------------
   // Redirect to those lists for factories that are part of those modules.
   // Module specific registration functions:
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::EnsureBrowserContextKeyedServiceFactoriesBuilt();
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   apps::EnsureBrowserContextKeyedServiceFactoriesBuilt();
   chrome_apps::EnsureBrowserContextKeyedServiceFactoriesBuilt();
   chrome_extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
-#if BUILDFLAG(IS_CHROMEOS)
-  chrome_apps::api::EnsureBrowserContextKeyedServiceFactoriesBuilt();
-  chromeos::EnsureBrowserContextKeyedServiceFactoriesBuilt();
-  chromeos_extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
-#endif
   extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
 #elif BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
   chrome_extensions::EnsureBrowserContextKeyedServiceFactoriesBuilt();
@@ -742,29 +688,11 @@ void ChromeBrowserMainExtraPartsProfiles::
   AndroidSmsOtpBackendFactory::GetInstance();
 #endif
   AnnouncementNotificationServiceFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS)
-  app_list::AppListSyncableServiceFactory::GetInstance();
-  apps::AppPreloadServiceFactory::GetInstance();
-#endif
 #if !BUILDFLAG(IS_ANDROID)
   apps::AppServiceProxyFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  apps::DeviceInfoManagerFactory::GetInstance();
-#endif
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   AppSessionServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  if (chromeos::features::IsOrcaEnabled()) {
-    ash::input_method::EditorMediatorFactory::GetInstance();
-  }
-  if (ash::features::IsLobsterEnabled()) {
-    LobsterServiceProvider::GetInstance();
-  }
-  if (base::FeatureList::IsEnabled(ash::features::kLanguagePacksFonts)) {
-    ash::language_packs::LanguagePackFontServiceFactory::GetInstance();
-  }
 #endif
   AutocompleteClassifierFactory::GetInstance();
   AutocompleteControllerEmitterFactory::GetInstance();
@@ -803,7 +731,7 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if !BUILDFLAG(IS_ANDROID)
   badging::BadgeManagerFactory::GetInstance();
 #endif
-#if BUILDFLAG(ENABLE_DICE_SUPPORT) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #endif
   BitmapFetcherServiceFactory::GetInstance();
   BluetoothChooserContextFactory::GetInstance();
@@ -851,19 +779,8 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   ChromeBrowsingDataLifetimeManagerFactory::GetInstance();
   ChromeBrowsingDataRemoverDelegateFactory::GetInstance();
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
   ChromeDeviceAuthenticatorFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  chromeos::CertificateProviderServiceFactory::GetInstance();
-  if (chromeos::features::IsUploadOfficeToCloudEnabled()) {
-    chromeos::cloud_upload::CloudUploadPrefsWatcherFactory::GetInstance();
-  }
-  if (chromeos::features::IsUploadOfficeToCloudEnabled() &&
-      chromeos::features::IsUploadOfficeToCloudSyncEnabled()) {
-    chromeos::cloud_upload::CloudUploadPromptPrefsHandlerFactory::GetInstance();
-  }
-
 #endif
   ChromePolicyBlocklistServiceFactory::GetInstance();
   ChromeSigninClientFactory::GetInstance();
@@ -876,20 +793,10 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if !BUILDFLAG(IS_ANDROID)
   CmtgDeviceKeyProviderFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  multi_capture::MultiCaptureDataServiceFactory::GetInstance();
-  multi_capture::MultiCaptureUsageIndicatorServiceFactory::GetInstance();
-  multi_capture::MultiCaptureSessionControllerFactory::GetInstance();
-
-  if (chromeos::features::
-          IsMicrosoftOneDriveIntegrationForEnterpriseEnabled()) {
-    chromeos::cloud_storage::OneDrivePrefObserverFactory::GetInstance();
-  }
-#endif
   collaboration::CollaborationServiceFactory::GetInstance();
   collaboration::comments::CommentsServiceFactory::GetInstance();
   collaboration::messaging::MessagingBackendServiceFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   tab_groups::CollaborationMessagingObserverFactory::GetInstance();
 #endif
   commerce::ShoppingServiceFactory::GetInstance();
@@ -941,7 +848,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   DocumentSuggestionsServiceFactory::GetInstance();
   dom_distiller::DomDistillerServiceFactory::GetInstance();
   DomainDiversityReporterFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   DownloadBubbleUpdateServiceFactory::GetInstance();
 #endif
   DownloadCoreServiceFactory::GetInstance();
@@ -949,15 +856,13 @@ void ChromeBrowserMainExtraPartsProfiles::
   EnclaveManagerFactory::GetInstance();
 #endif
   enterprise::ProfileIdServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_CHROMEOS)
   enterprise_commands::UserRemoteCommandsServiceFactory::GetInstance();
-#endif
 #if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
     BUILDFLAG(FULL_SAFE_BROWSING)
   enterprise_connectors::BrowserCrashEventRouterFactory::GetInstance();
 #endif
   enterprise_connectors::ConnectorsServiceFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   enterprise_connectors::DeviceTrustConnectorServiceFactory::GetInstance();
   enterprise_connectors::DeviceTrustServiceFactory::GetInstance();
 #endif
@@ -975,7 +880,7 @@ void ChromeBrowserMainExtraPartsProfiles::
     BUILDFLAG(FULL_SAFE_BROWSING)
   enterprise_connectors::ReportingEventRouterFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (enterprise_custom_headers::IsHttpHeaderInjectionEnabled()) {
     enterprise_custom_headers::HttpHeaderInjectionServiceFactory::GetInstance();
   }
@@ -985,9 +890,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   enterprise_data_protection::DataProtectionUrlLookupServiceFactory::
       GetInstance();
 #endif
-#if !BUILDFLAG(IS_CHROMEOS)
   enterprise_groups::EnterpriseGroupsProfileHandlerFactory::GetInstance();
-#endif
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   enterprise_idle::IdleServiceFactory::GetInstance();
 #endif
@@ -997,8 +900,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   EnterpriseProxyServiceFactory::GetInstance();
   enterprise_reporting::CloudProfileReportingServiceFactory::GetInstance();
   enterprise_reporting::LegacyTechServiceFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   enterprise_signals::UserPermissionServiceFactory::GetInstance();
 #endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
@@ -1016,11 +918,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   // factory is built here, rather than with other Extension APIs.
   extensions::TtsAPI::GetFactoryInstance();
 #endif
-#if BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE)
-  // A ChromeOS build for a dev linux machine.
-  // Makes manual testing possible.
-  FakeSmartCardDeviceServiceFactory::GetInstance();
-#endif
   FaviconServiceFactory::GetInstance();
   feature_engagement::TrackerFactory::GetInstance();
   FederatedIdentityApiPermissionContextFactory::GetInstance();
@@ -1035,22 +932,12 @@ void ChromeBrowserMainExtraPartsProfiles::
   FindBarStateFactory::GetInstance();
   finds::FindsServiceFactory::GetInstance();
   first_party_sets::FirstPartySetsPolicyServiceFactory::GetInstance();
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   FirstRunServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::features::IsFloatingSsoAllowed()) {
-    ash::floating_sso::FloatingSsoServiceFactory::GetInstance();
-  }
 #endif
   FontPrefChangeNotifierFactory::GetInstance();
   FromGWSNavigationAndKeepAliveRequestTrackerFactory::GetInstance();
-#if !BUILDFLAG(IS_CHROMEOS)
   GAIAInfoUpdateServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  GalleryWatchManager::EnsureFactoryBuilt();
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(gapis::kEnableGapis)) {
     GapisServiceFactory::GetInstance();
@@ -1096,11 +983,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(IS_ANDROID)
   LevelDBPersistedTabDataStorageAndroidFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::features::IsManagedLocalPinAndPasswordEnabled()) {
-    ash::LocalAuthFactorsPolicyControllerFactory::GetInstance();
-  }
-#endif
   LocalOrSyncableBookmarkSyncServiceFactory::GetInstance();
   login_detection::LoginDetectionKeyedServiceFactory::GetInstance();
 #if !BUILDFLAG(IS_ANDROID)
@@ -1127,10 +1009,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   if (MediaEngagementService::IsEnabled()) {
     MediaEngagementServiceFactory::GetInstance();
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  MediaFileSystemRegistry::GetFactoryInstance();
-  MediaGalleriesPreferencesFactory::GetInstance();
-#endif
 #if !BUILDFLAG(IS_ANDROID)
   MediaNotificationServiceFactory::GetInstance();
 #endif
@@ -1161,16 +1039,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   HistorySyncOptinServiceFactory::GetInstance();
   ProfileManagementDisclaimerServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  NearbySharingServiceFactory::GetInstance();
-  if (base::FeatureList::IsEnabled(ash::features::kNearbyPresence)) {
-    // PushNotificationService is only enabled for ash for MVP. As more features
-    // are added to use the PushNotificationService, this can be reevaluated and
-    // expanded to enable building the PushNotificationService for all Chrome
-    // Desktop builds.
-    push_notification::PushNotificationServiceFactory::GetInstance();
-  }
 #endif
 #if !BUILDFLAG(IS_ANDROID)
   notebooks::NotebooksServiceFactory::GetInstance();
@@ -1250,7 +1118,7 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if !BUILDFLAG(IS_ANDROID)
   PasswordCounterFactory::GetInstance();
 #endif  // !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   PasswordManagerBlocklistPolicyFactory::GetInstance();
 #endif
   PasswordManagerSettingsServiceFactory::GetInstance();
@@ -1288,29 +1156,16 @@ void ChromeBrowserMainExtraPartsProfiles::
   PluginInfoHostImpl::EnsureFactoryBuilt();
   PluginPrefsFactory::GetInstance();
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::DlpDownloadObserverFactory::GetInstance();
-  policy::DlpRulesManagerFactory::GetInstance();
-  policy::FilesPolicyNotificationManagerFactory::GetInstance();
-  policy::local_user_files::LocalFilesMigrationManagerFactory::GetInstance();
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   policy::ExtensionInstallPolicyServiceFactory::GetInstance();
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   policy::ManagementServiceFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::PolicyCertServiceFactory::GetInstance();
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   policy::ProfileTokenPolicyWebSigninServiceFactory::GetInstance();
 #endif
   policy::UserCloudPolicyInvalidatorFactory::GetInstance();
   policy::UserFmRegistrationTokenUploaderFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::UserNetworkConfigurationUpdaterFactory::GetInstance();
-#else
   policy::UserPolicySigninServiceFactory::GetInstance();
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   policy::UserPolicyOidcSigninServiceFactory::GetInstance();
 #endif
@@ -1330,7 +1185,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   private_ai::PrivateAiServiceFactory::GetInstance();
   ProfileNetworkContextServiceFactory::GetInstance();
   ProfilePasswordStoreFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   ProfileStatisticsFactory::GetInstance();
 #endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
@@ -1358,7 +1213,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   ReduceAcceptLanguageFactory::GetInstance();
   RendererUpdaterFactory::GetInstance();
   regional_capabilities::RegionalCapabilitiesServiceFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   reporting::ManualTestHeartbeatEventFactory::GetInstance();
 #endif
 #if BUILDFLAG(IS_ANDROID)
@@ -1407,11 +1262,6 @@ void ChromeBrowserMainExtraPartsProfiles::
     screen_ai::AXMainNodeAnnotatorControllerFactory::GetInstance();
   }
   screen_ai::ScreenAIServiceRouterFactory::EnsureFactoryBuilt();
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::features::IsScannerEnabled()) {
-    ScannerKeyedServiceFactory::GetInstance();
-  }
 #endif
   SCTReportingServiceFactory::GetInstance();
   search_engines::SearchEngineChoiceServiceFactory::GetInstance();
@@ -1476,9 +1326,6 @@ void ChromeBrowserMainExtraPartsProfiles::
     site_token_provider::SiteTokenProviderServiceFactory::GetInstance();
   }
   skills::SkillsServiceFactory::GetInstance();
-#if BUILDFLAG(IS_CHROMEOS)
-  SmartCardPermissionContextFactory::GetInstance();
-#endif
 #if !BUILDFLAG(IS_ANDROID)
   SpeechRecognitionClientBrowserInterfaceFactory::EnsureFactoryBuilt();
   SpeechRecognitionServiceFactory::EnsureFactoryBuilt();
@@ -1530,7 +1377,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   tree_fixing::AXTreeFixingServicesRouterFactory::GetInstance();
   TriggeredProfileResetterFactory::GetInstance();
 #endif
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   TurnSyncOnHelper::EnsureFactoryBuilt();
 #endif
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
@@ -1566,8 +1413,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   }
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   autofill::AtMemoryCrossTabCopyPasteTrackerFactory::GetInstance();
 #endif
 

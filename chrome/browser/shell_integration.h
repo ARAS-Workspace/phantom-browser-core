@@ -159,7 +159,7 @@ void AppendProfileArgs(const base::FilePath& profile_path,
 // shortcuts. This is needed for Mac and Linux.
 std::u16string GetAppShortcutsSubdirName();
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // Returns the URL scheme for google-chrome:// URLs.
 // This varies based on channel, branding, and platform to ensure that
 // different installations do not collide. For example:

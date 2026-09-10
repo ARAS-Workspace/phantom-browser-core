@@ -301,7 +301,7 @@ void WebTestBrowserMainRunner::Initialize() {
   // Disable the backgrounding of renderers to make running tests faster.
   command_line.AppendSwitch(switches::kDisableRendererBackgrounding);
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
   content::WebTestBrowserPlatformInitialize();
 #endif
 

@@ -54,30 +54,9 @@
 #endif
 #endif  // BUILDFLAG(ENABLE_SCREEN_CAPTURE)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/browser/gpu/chromeos/video_capture_dependencies.h"
-#include "media/capture/video/chromeos/scoped_video_capture_jpeg_decoder.h"
-#include "media/capture/video/chromeos/video_capture_jpeg_decoder_impl.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace content {
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-std::unique_ptr<media::VideoCaptureJpegDecoder> CreateGpuJpegDecoder(
-    media::VideoCaptureJpegDecoder::DecodeDoneCB decode_done_cb,
-    base::RepeatingCallback<void(const std::string&)> send_log_message_cb) {
-  auto io_task_runner = GetIOThreadTaskRunner({});
-  return std::make_unique<media::ScopedVideoCaptureJpegDecoder>(
-      std::make_unique<media::VideoCaptureJpegDecoderImpl>(
-          base::BindRepeating(
-              &VideoCaptureDependencies::CreateJpegDecodeAccelerator),
-          io_task_runner, std::move(decode_done_cb),
-          std::move(send_log_message_cb)),
-      io_task_runner);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_SCREEN_CAPTURE)
 
@@ -387,19 +366,8 @@ InProcessVideoCaptureDeviceLauncher::CreateDeviceClient(
       base::MakeRefCounted<media::VideoCaptureBufferPoolImpl>(
           requested_buffer_type, buffer_pool_max_buffer_count);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  return std::make_unique<media::VideoCaptureDeviceClient>(
-      std::move(receiver), std::move(buffer_pool),
-      base::BindRepeating(
-          &CreateGpuJpegDecoder,
-          base::BindRepeating(&media::VideoFrameReceiver::OnFrameReadyInBuffer,
-                              receiver_on_io_thread),
-          base::BindRepeating(&media::VideoFrameReceiver::OnLog,
-                              receiver_on_io_thread)));
-#else
   return std::make_unique<media::VideoCaptureDeviceClient>(
       std::move(receiver), std::move(buffer_pool));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void InProcessVideoCaptureDeviceLauncher::OnDeviceStarted(

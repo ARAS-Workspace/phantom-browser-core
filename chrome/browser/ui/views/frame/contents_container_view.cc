@@ -202,13 +202,6 @@ void ContentsContainerView::UpdateBorderAndOverlay(bool is_in_split,
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (split_changed) {
-    // Ensures correct window rounded corners after updating contents rounded
-    // corners in UpdateBorderRoundedCorners().
-    GetWidget()->non_client_view()->frame_view()->UpdateWindowRoundedCorners();
-  }
-#endif  //  BUILDFLAG(IS_CHROMEOS)
 }
 
 void ContentsContainerView::SetBorderRoundedCornersFrom(
@@ -595,19 +588,6 @@ views::ProposedLayout ContentsContainerView::CalculateProposedLayout(
     } else {
       rect = contents_view_bounds;
     }
-
-#if BUILDFLAG(IS_CHROMEOS)
-    // Immersive top container might overlap with the blue border in fullscreen
-    // mode - see crbug.com/40880524. By insetting the bounds rectangle we
-    // ensure that the blue border is always placed below the top container.
-    if (ImmersiveModeController::From(browser_view_->browser())->IsRevealed()) {
-      const int delta =
-          browser_view_->top_container()->bounds().bottom() - rect.y();
-      if (delta > 0) {
-        rect.Inset(gfx::Insets().set_top(delta));
-      }
-    }
-#endif
 
     bool visible = capture_contents_border_view_->GetVisible();
 #if BUILDFLAG(IS_MAC)

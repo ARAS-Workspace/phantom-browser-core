@@ -221,21 +221,6 @@ void PrepareDropDataForChildProcess(
   // in unit tests.
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // The externalfile:// scheme is used in Chrome OS to open external files in a
-  // browser tab.
-  // TODO(https://crbug.com/858972): This seems like it could be forged by the
-  // renderer. This probably needs to check that this didn't originate from the
-  // renderer.
-  // We use GrantRequestOfExternalFileUrl to limit the permissions granted.
-  if (!drop_data->url_infos.empty()) {
-    const GURL& url = drop_data->url_infos.front().url;
-    if (url.SchemeIs(content::kExternalFileScheme)) {
-      security_policy->GrantRequestOfExternalFileUrl(child_id, url);
-    }
-  }
-#endif
-
   std::string filesystem_id = PrepareDataTransferFilenamesForChildProcess(
       drop_data->filenames, security_policy, child_id, file_system_context);
   drop_data->filesystem_id = base::UTF8ToUTF16(filesystem_id);

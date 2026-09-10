@@ -34,8 +34,7 @@
 #endif
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
 #include <string>
 #include <utility>
 #include <vector>
@@ -45,7 +44,7 @@
 
 namespace base {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // Minor and major page fault counts since the process creation.
 // Both counts are process-wide, and exclude child processes.
 //
@@ -55,8 +54,7 @@ struct PageFaultCounts {
   int64_t minor;
   int64_t major;
 };
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 // Convert a POSIX timeval to microseconds.
 BASE_EXPORT int64_t TimeValToMicroseconds(const struct timeval& tv);
@@ -82,11 +80,10 @@ struct ProcessMemoryInfo {
   uint64_t compressed_bytes = 0;
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   uint64_t rss_anon_bytes = 0;
   uint64_t vm_swap_bytes = 0;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
   // On iOS,
   //   TBD: https://crbug.com/41315025
@@ -169,8 +166,7 @@ class BASE_EXPORT ProcessMetrics {
   // wall-clock second.
   base::expected<TimeDelta, ProcessCPUUsageError> GetCumulativeCPUUsage();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
   // Emits the cumulative CPU usage for all currently active threads since they
   // were started into the output parameter (replacing its current contents).
   // Threads that have already terminated will not be reported. Thus, the sum of
@@ -181,8 +177,7 @@ class BASE_EXPORT ProcessMetrics {
   // NOTE: Currently only supported on Linux/Android.
   using CPUUsagePerThread = std::vector<std::pair<PlatformThreadId, TimeDelta>>;
   bool GetCumulativeCPUUsagePerThread(CPUUsagePerThread&);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
 
   // Returns the number of average idle cpu wakeups per second since the last
   // call.
@@ -215,12 +210,11 @@ class BASE_EXPORT ProcessMetrics {
   int GetOpenFdSoftLimit() const;
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // Minor and major page fault count as reported by /proc/[pid]/stat.
   // Returns true for success.
   bool GetPageFaultCounts(PageFaultCounts* counts) const;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
   // Returns total memory usage of malloc.
   size_t GetMallocUsage();
@@ -232,8 +226,7 @@ class BASE_EXPORT ProcessMetrics {
   ProcessMetrics(ProcessHandle process, PortProvider* port_provider);
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   int CalculateIdleWakeupsPerSecond(uint64_t absolute_idle_wakeups);
 #endif
 #if BUILDFLAG(IS_APPLE)
@@ -255,8 +248,7 @@ class BASE_EXPORT ProcessMetrics {
   TimeDelta last_cumulative_cpu_;
 #endif
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   // Same thing for idle wakeups.
   TimeTicks last_idle_wakeups_time_;
   uint64_t last_absolute_idle_wakeups_;
@@ -295,8 +287,8 @@ BASE_EXPORT size_t GetHandleLimit();
 BASE_EXPORT void IncreaseFdLimitTo(unsigned int max_descriptors);
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(IS_AIX)
 // Data about system-wide memory consumption. Available on Mac, Linux, Android
 // and Chrome OS.
 //
@@ -318,8 +310,7 @@ struct BASE_EXPORT SystemMemoryInfo {
 
   ByteSize free;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
   // This provides an estimate of available memory as described here:
   // https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=34e431b0ae398fc54ea69ff85ec700722c9da773
   // NOTE: this is ONLY valid in kernels 3.14 and up.  Its value will always
@@ -333,7 +324,7 @@ struct BASE_EXPORT SystemMemoryInfo {
   ByteSize swap_free;
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   ByteSize buffers;
   ByteSize cached;
   ByteSize active_anon;
@@ -342,12 +333,7 @@ struct BASE_EXPORT SystemMemoryInfo {
   ByteSize inactive_file;
   ByteSize dirty;
   ByteSize reclaimable;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_AIX)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  ByteSize shmem;
-  ByteSize slab;
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 
 #if BUILDFLAG(IS_APPLE)
   ByteSize speculative;
@@ -369,11 +355,10 @@ struct BASE_EXPORT SystemMemoryInfo {
 // Exposed for memory debugging widget.
 BASE_EXPORT bool GetSystemMemoryInfo(SystemMemoryInfo* meminfo);
 
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-        // || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+        // || BUILDFLAG(IS_AIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
 // Parse the data found in /proc/<pid>/stat and return the sum of the
 // CPU-related ticks.  Returns -1 on parse error.
 // Exposed for testing.
@@ -448,57 +433,7 @@ BASE_EXPORT bool GetSystemDiskInfo(SystemDiskInfo* diskinfo);
 // Returns the amount of time spent in user space since boot across all CPUs.
 BASE_EXPORT TimeDelta GetUserCpuTimeSinceBoot();
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Data from files in directory /sys/block/zram0 about ZRAM usage.
-struct BASE_EXPORT SwapInfo {
-  SwapInfo()
-      : num_reads(0),
-        num_writes(0),
-        compr_data_size(0),
-        orig_data_size(0),
-        mem_used_total(0) {}
-
-  uint64_t num_reads = 0;
-  uint64_t num_writes = 0;
-  uint64_t compr_data_size = 0;
-  uint64_t orig_data_size = 0;
-  uint64_t mem_used_total = 0;
-};
-
-// Parses a string containing the contents of /sys/block/zram0/mm_stat.
-// This should be used for the new ZRAM sysfs interfaces.
-// Returns true on success or false for a parsing error.
-// Exposed for testing.
-BASE_EXPORT bool ParseZramMmStat(std::string_view mm_stat_data,
-                                 SwapInfo* swap_info);
-
-// Parses a string containing the contents of /sys/block/zram0/stat
-// This should be used for the new ZRAM sysfs interfaces.
-// Returns true on success or false for a parsing error.
-// Exposed for testing.
-BASE_EXPORT bool ParseZramStat(std::string_view stat_data, SwapInfo* swap_info);
-
-// In ChromeOS, reads files from /sys/block/zram0 that contain ZRAM usage data.
-// Fills in the provided |swap_data| structure.
-// Returns true on success or false for a parsing error.
-BASE_EXPORT bool GetSwapInfo(SwapInfo* swap_info);
-
-// Data about GPU memory usage. These fields will be -1 if not supported.
-struct BASE_EXPORT GraphicsMemoryInfoKB {
-  int gpu_objects = -1;
-  int64_t gpu_memory_size = -1;
-};
-
-// Report on Chrome OS graphics memory. Returns true on success.
-// /run/debugfs_gpu is a bind mount into /sys/kernel/debug and synchronously
-// reading the in-memory files in /sys is fast in most cases. On platform that
-// reading the graphics memory info is slow, this function returns false.
-BASE_EXPORT bool GetGraphicsMemoryInfo(GraphicsMemoryInfoKB* gpu_meminfo);
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
 
 struct BASE_EXPORT SystemPerformanceInfo {
   SystemPerformanceInfo();
@@ -549,14 +484,10 @@ class BASE_EXPORT SystemMetrics {
   FRIEND_TEST_ALL_PREFIXES(SystemMetricsTest, SystemMetrics);
 
   size_t committed_memory_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   SystemMemoryInfo memory_info_;
   VmStatInfo vmstat_info_;
   SystemDiskInfo disk_info_;
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  SwapInfo swap_info_;
-  GraphicsMemoryInfoKB gpu_memory_info_;
 #endif
 };
 

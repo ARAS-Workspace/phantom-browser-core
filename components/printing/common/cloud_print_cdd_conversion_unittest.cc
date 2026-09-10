@@ -215,123 +215,6 @@ constexpr char kExpectedMediaType[] = R"json({
     }
 ]})json";
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kExpectedPinSupportedTrue[] = R"json({
-  "supported": true
-})json";
-
-constexpr char kExpectedPinSupportedFalse[] = R"json({
-  "supported": false
-})json";
-
-constexpr char kExpectedAdvancedCapabilities[] = R"json([
-  {
-    "display_name": "Advanced Capability #1 (bool)",
-    "id": "advanced_cap_bool",
-    "type": "TYPED_VALUE",
-    "typed_value_cap": {
-      "value_type": "BOOLEAN"
-    }
-  }, {
-    "display_name": "Advanced Capability #2 (double)",
-    "id": "advanced_cap_double",
-    "select_cap": {
-      "option": [ {
-        "display_name": "Advanced Capability #1",
-        "value": "adv_cap_val_1"
-      }, {
-        "display_name": "Advanced Capability #2",
-        "value": "adv_cap_val_2"
-      }, {
-        "display_name": "Advanced Capability #3",
-        "value": "adv_cap_val_3"
-      } ]
-    },
-    "type": "SELECT"
-  }
-])json";
-
-constexpr char kExpectedFitToPageValues[] = R"json({
-   "option": [ {
-      "type": "AUTO"
-   }, {
-      "type": "AUTO_FIT"
-   }, {
-      "type": "FILL"
-   }, {
-      "type": "FIT"
-   }, {
-      "type": "NONE"
-   }, {
-      "is_default": true,
-      "type": "FIT"
-   }
-]})json";
-
-constexpr char kExpectedFitToPageValues2[] = R"json({
-   "option": [ {
-      "type": "FILL"
-   }, {
-      "type": "NONE"
-   }, {
-      "type": "AUTO"
-   }, {
-      "type": "FIT"
-   }, {
-      "type": "AUTO_FIT"
-   }, {
-      "is_default": true,
-      "type": "FILL"
-   }
-]})json";
-
-constexpr char kExpectedFitToPageSingleValue[] = R"json({
-   "option": [ {
-      "type": "AUTO_FIT"
-   }, {
-      "is_default": true,
-      "type": "AUTO_FIT"
-   }
-]})json";
-
-constexpr char kExpectedMargins[] = R"json({
-  "option": [
-    {
-      "bottom_microns": 200,
-      "left_microns": 200,
-      "right_microns": 100,
-      "top_microns": 100,
-      "is_default": true
-    }, {
-      "bottom_microns": 0,
-      "left_microns": 0,
-      "right_microns": 0,
-      "top_microns": 0
-    }
-]})json";
-
-constexpr char kExpectedMarginsWiderPaper[] = R"json({
-  "option": [
-    {
-      "bottom_microns": 200,
-      "left_microns": 200,
-      "right_microns": 100,
-      "top_microns": 100,
-      "is_default": true
-    }, {
-      "bottom_microns": 0,
-      "left_microns": 0,
-      "right_microns": 0,
-      "top_microns": 0
-    }, {
-      "bottom_microns": 500,
-      "left_microns": 1000,
-      "right_microns": 700,
-      "top_microns": 200
-    }
-]})json";
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 const base::DictValue* GetPrinterDict(const base::Value& caps_value) {
   const base::DictValue* caps_dict = caps_value.GetIfDict();
   if (!caps_dict || !caps_dict->contains(kKeyVersion) ||
@@ -352,9 +235,6 @@ TEST(CloudPrintCddConversionTest, ValidCloudPrintCddConversion) {
   const base::DictValue* printer_dict = GetPrinterDict(output);
   ASSERT_TRUE(printer_dict);
   size_t expected_dict_size = 9;
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_dict_size += 2;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ASSERT_EQ(expected_dict_size, printer_dict->size());
   EXPECT_THAT(
       *printer_dict,
@@ -373,13 +253,6 @@ TEST(CloudPrintCddConversionTest, ValidCloudPrintCddConversion) {
               .Set("supported_content_type",
                    base::test::ParseJson(kExpectedSupportedContentType))));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_THAT(printer_dict->Find("pin"),
-              Pointee(base::test::IsJson(kExpectedPinSupportedFalse)));
-  ASSERT_FALSE(printer_dict->contains("fit_to_page"));
-  EXPECT_THAT(printer_dict->Find("margins"),
-              Pointee(base::test::IsJson(kExpectedMargins)));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST(CloudPrintCddConversionTest, MissingEntry) {
@@ -392,9 +265,6 @@ TEST(CloudPrintCddConversionTest, MissingEntry) {
 
   ASSERT_TRUE(printer_dict);
   size_t expected_dict_size = 8;
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_dict_size += 2;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ASSERT_EQ(expected_dict_size, printer_dict->size());
   ASSERT_FALSE(printer_dict->contains("collate"));
 }
@@ -409,9 +279,6 @@ TEST(CloudPrintCddConversionTest, CollateDefaultIsFalse) {
 
   ASSERT_TRUE(printer_dict);
   size_t expected_dict_size = 9;
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_dict_size += 2;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ASSERT_EQ(expected_dict_size, printer_dict->size());
   EXPECT_THAT(printer_dict->Find("collate"),
               Pointee(base::test::IsJson(kExpectedCollateDefaultFalse)));
@@ -432,236 +299,16 @@ TEST(CloudPrintCddConversionTest, WiderPaper) {
   // Use const as constexpr fails on Android-x86 builds.
   const std::string kVendorId = "15";
   const std::string kDisplayName = "NA_INDEX_3X5";
-#if BUILDFLAG(IS_CHROMEOS)
-  input.papers.emplace_back(kDisplayName, kVendorId, kPaperSize, kPrintableArea,
-                            kMaxHeight, kHasBorderlessVariant,
-                            printing::PaperMargins(200, 700, 500, 1000));
-#else
   input.papers.emplace_back(kDisplayName, kVendorId, kPaperSize, kPrintableArea,
                             kMaxHeight, kHasBorderlessVariant);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   const base::Value output = PrinterSemanticCapsAndDefaultsToCdd(input);
   const base::DictValue* printer_dict = GetPrinterDict(output);
 
   ASSERT_TRUE(printer_dict);
   size_t expected_dict_size = 9;
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_dict_size += 2;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ASSERT_EQ(expected_dict_size, printer_dict->size());
   EXPECT_THAT(printer_dict->Find("media_size"),
               Pointee(base::test::IsJson(kExpectedMediaSizeWithWiderPaper)));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_THAT(printer_dict->Find("margins"),
-              Pointee(base::test::IsJson(kExpectedMarginsWiderPaper)));
-#endif
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(CloudPrintCddConversionTest, MediaTypeOnlyOne) {
-  printing::PrinterSemanticCapsAndDefaults input =
-      printing::GenerateSamplePrinterSemanticCapsAndDefaults({});
-  input.media_types = {input.media_types[0]};
-  const base::Value output = PrinterSemanticCapsAndDefaultsToCdd(input);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  // The media type list should only be included when more than one media type
-  // is supported.
-  ASSERT_TRUE(printer_dict);
-  EXPECT_FALSE(printer_dict->contains("media_type"));
-}
-
-TEST(CloudPrintCddConversionTest, PinAndAdvancedCapabilities) {
-  printing::PrinterSemanticCapsAndDefaults input =
-      printing::GenerateSamplePrinterSemanticCapsAndDefaults(
-          printing::SampleWithScaleAndPinAndAdvancedCapabilities());
-  base::Value output = PrinterSemanticCapsAndDefaultsToCdd(input);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  ASSERT_TRUE(printer_dict);
-  size_t expected_dict_size = 13;
-  ASSERT_EQ(expected_dict_size, printer_dict->size());
-  EXPECT_THAT(
-      *printer_dict,
-      base::test::IsSupersetOfValue(
-          base::DictValue()
-              .Set("pin", base::test::ParseJson(kExpectedPinSupportedTrue))
-              .Set("vendor_capability",
-                   base::test::ParseJson(kExpectedAdvancedCapabilities))));
-}
-
-TEST(CloudPrintCddConversionTest, MarginsAndFitToPageCapabilities) {
-  printing::PrinterSemanticCapsAndDefaults input =
-      printing::GenerateSamplePrinterSemanticCapsAndDefaults(
-          printing::SampleWithScaleAndPinAndAdvancedCapabilities());
-  base::Value output = PrinterSemanticCapsAndDefaultsToCdd(input);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  ASSERT_TRUE(printer_dict);
-  size_t expected_dict_size = 13;
-  ASSERT_EQ(expected_dict_size, printer_dict->size());
-  EXPECT_THAT(
-      *printer_dict,
-      base::test::IsSupersetOfValue(
-          base::DictValue()
-              .Set("fit_to_page",
-                   base::test::ParseJson(kExpectedFitToPageValues))
-              .Set("margins", base::test::ParseJson(kExpectedMargins))));
-}
-
-TEST(CloudPrintCddConversionTest, FitToPageNoCapability) {
-
-  printing::PrinterSemanticCapsAndDefaults printer_info;
-
-  base::Value output =
-      cloud_print::PrinterSemanticCapsAndDefaultsToCdd(printer_info);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  ASSERT_TRUE(printer_dict);
-  ASSERT_EQ(5u, printer_dict->size());
-  EXPECT_FALSE(printer_dict->contains("fit_to_page"));
-}
-
-TEST(CloudPrintCddConversionTest, FitToPageSingleValue) {
-
-  printing::PrinterSemanticCapsAndDefaults printer_info;
-  printer_info.print_scaling_types = {
-      printing::mojom::PrintScalingType::kAutoFit};
-
-  base::Value output =
-      cloud_print::PrinterSemanticCapsAndDefaultsToCdd(printer_info);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  ASSERT_TRUE(printer_dict);
-  ASSERT_EQ(6u, printer_dict->size());
-  EXPECT_TRUE(printer_dict->contains("fit_to_page"));
-  EXPECT_THAT(*printer_dict,
-              base::test::IsSupersetOfValue(base::DictValue().Set(
-                  "fit_to_page",
-                  base::test::ParseJson(kExpectedFitToPageSingleValue))));
-}
-
-TEST(CloudPrintCddConversionTest, FitToPageDefaultValueOnly) {
-
-  printing::PrinterSemanticCapsAndDefaults printer_info;
-  printer_info.print_scaling_type_default =
-      printing::mojom::PrintScalingType::kFit;
-
-  base::Value output =
-      cloud_print::PrinterSemanticCapsAndDefaultsToCdd(printer_info);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  ASSERT_TRUE(printer_dict);
-  ASSERT_EQ(5u, printer_dict->size());
-  EXPECT_FALSE(printer_dict->contains("fit_to_page"));
-}
-
-TEST(CloudPrintCddConversionTest, FitToPageNoDefaultInSupported) {
-
-  printing::PrinterSemanticCapsAndDefaults printer_info;
-  printer_info.print_scaling_types = {
-      printing::mojom::PrintScalingType::kAutoFit};
-  printer_info.print_scaling_type_default =
-      printing::mojom::PrintScalingType::kFit;
-
-  base::Value output =
-      cloud_print::PrinterSemanticCapsAndDefaultsToCdd(printer_info);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  ASSERT_TRUE(printer_dict);
-  ASSERT_EQ(5u, printer_dict->size());
-  EXPECT_FALSE(printer_dict->contains("fit_to_page"));
-}
-
-TEST(CloudPrintCddConversionTest, FitToPageUnknownDefault) {
-
-  printing::PrinterSemanticCapsAndDefaults printer_info;
-  printer_info.print_scaling_type_default =
-      printing::mojom::PrintScalingType::kUnknownPrintScalingType;
-  printer_info.print_scaling_types = {
-      printing::mojom::PrintScalingType::kFill,
-      printing::mojom::PrintScalingType::kNone,
-      printing::mojom::PrintScalingType::kAuto,
-      printing::mojom::PrintScalingType::kFit,
-      printing::mojom::PrintScalingType::kAutoFit,
-      printing::mojom::PrintScalingType::kUnknownPrintScalingType};
-
-  base::Value output =
-      cloud_print::PrinterSemanticCapsAndDefaultsToCdd(printer_info);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  ASSERT_TRUE(printer_dict);
-  ASSERT_EQ(6u, printer_dict->size());
-  EXPECT_THAT(
-      *printer_dict,
-      base::test::IsSupersetOfValue(base::DictValue().Set(
-          "fit_to_page", base::test::ParseJson(kExpectedFitToPageValues2))));
-}
-
-TEST(CloudPrintCddConversionTest, FitToPageUnknownsOnly) {
-
-  printing::PrinterSemanticCapsAndDefaults printer_info;
-  printer_info.print_scaling_type_default =
-      printing::mojom::PrintScalingType::kUnknownPrintScalingType;
-  printer_info.print_scaling_types = {
-      printing::mojom::PrintScalingType::kUnknownPrintScalingType};
-
-  base::Value output =
-      cloud_print::PrinterSemanticCapsAndDefaultsToCdd(printer_info);
-  const base::DictValue* printer_dict = GetPrinterDict(output);
-
-  ASSERT_TRUE(printer_dict);
-  ASSERT_EQ(5u, printer_dict->size());
-  EXPECT_FALSE(printer_dict->contains("fit_to_page"));
-}
-
-TEST(CloudPrintCddConversionTest, FitToPageCorrectMapping) {
-
-  struct ScalingTypeToString {
-    printing::mojom::PrintScalingType type;
-    std::string str;
-  };
-  constexpr std::array<ScalingTypeToString, 6> kScalingTypes{
-      ScalingTypeToString{printing::mojom::PrintScalingType::kAuto, "AUTO"},
-      ScalingTypeToString{printing::mojom::PrintScalingType::kAutoFit,
-                          "AUTO_FIT"},
-      ScalingTypeToString{printing::mojom::PrintScalingType::kFill, "FILL"},
-      ScalingTypeToString{printing::mojom::PrintScalingType::kFit, "FIT"},
-      ScalingTypeToString{printing::mojom::PrintScalingType::kNone, "NONE"},
-      ScalingTypeToString{
-          printing::mojom::PrintScalingType::kUnknownPrintScalingType, ""}};
-
-  for (const auto& value : kScalingTypes) {
-    printing::PrinterSemanticCapsAndDefaults printer_info;
-    printer_info.print_scaling_types = {value.type};
-
-    base::Value output =
-        cloud_print::PrinterSemanticCapsAndDefaultsToCdd(printer_info);
-    const base::DictValue* printer_dict = GetPrinterDict(output);
-
-    ASSERT_TRUE(printer_dict);
-    if (value.type ==
-        printing::mojom::PrintScalingType::kUnknownPrintScalingType) {
-      ASSERT_EQ(5u, printer_dict->size());
-      EXPECT_FALSE(printer_dict->contains("fit_to_page"));
-    } else {
-      std::string formatted_json = base::StringPrintf(
-          R"json({
-          "option": [ {
-              "type": "%s"
-          }, {
-              "is_default": true,
-              "type": "%s"
-          }]
-        })json",
-          value.str.c_str(), value.str.c_str());
-      ASSERT_EQ(6u, printer_dict->size());
-      EXPECT_THAT(*printer_dict,
-                  base::test::IsSupersetOfValue(base::DictValue().Set(
-                      "fit_to_page", base::test::ParseJson(formatted_json))));
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace cloud_print

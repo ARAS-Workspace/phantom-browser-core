@@ -148,7 +148,7 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerInteractiveTest,
 // the page to exit fullscreen mode. So we need to maintain a list of exiting /
 // non-exiting commands, which is not the goal of this test.
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // This test is flaky on ChromeOS and Linux, see http://crbug.com/41339012 and
 // http://crbug.com/41341579 respectively.
 // TODO(zijiehe): Find out the root cause.

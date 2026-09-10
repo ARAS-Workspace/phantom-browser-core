@@ -35,10 +35,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/dbus/image_loader/fake_image_loader_client.h"
-#endif
-
 namespace component_updater {
 namespace {
 
@@ -81,18 +77,9 @@ class RegisterTranslateKitComponentTest : public ::testing::Test {
         component_updater::DIR_COMPONENT_PREINSTALLED,
         fake_install_dir_.GetPath());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::ImageLoaderClient::InitializeFake();
-    fake_image_loader_client_ =
-        static_cast<ash::FakeImageLoaderClient*>(ash::ImageLoaderClient::Get());
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_image_loader_client_ = nullptr;
-    ash::ImageLoaderClient::Shutdown();
-#endif
     scoped_path_override_.reset();
   }
 
@@ -115,17 +102,8 @@ class RegisterTranslateKitComponentTest : public ::testing::Test {
     fake_version_ = base::Version(version_str);
     fake_manifest_.Set("version", version_str);
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::FakeImageLoaderClient& fake_image_loader_client() {
-    return *fake_image_loader_client_;
-  }
-#endif
 
   void CreateFakeInstallation() {
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_image_loader_client().SetMountPathForComponent("ChromeTranslateKit",
-                                                        install_dir());
-#endif
     base::FilePath component_dir = install_dir().Append(
         on_device_translation::GetBinaryRelativeInstallDir());
     CHECK(base::CreateDirectory(component_dir));
@@ -156,9 +134,6 @@ class RegisterTranslateKitComponentTest : public ::testing::Test {
   base::Version fake_version_;
   base::DictValue fake_manifest_;
   std::unique_ptr<base::ScopedPathOverride> scoped_path_override_;
-#if BUILDFLAG(IS_CHROMEOS)
-  raw_ptr<ash::FakeImageLoaderClient> fake_image_loader_client_ = nullptr;
-#endif
 };
 
 TEST_F(RegisterTranslateKitComponentTest, ComponentRegistrationNoForceInstall) {

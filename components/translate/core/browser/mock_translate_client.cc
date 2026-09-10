@@ -11,11 +11,7 @@ namespace translate {
 
 namespace testing {
 
-#if BUILDFLAG(IS_CHROMEOS)
-const char* preferred_languages_prefs = "settings.language.preferred_languages";
-#else
 const char* preferred_languages_prefs = nullptr;
-#endif
 const char* accept_languages_prefs = "intl.accept_languages";
 
 MockTranslateClient::MockTranslateClient(TranslateDriver* driver,

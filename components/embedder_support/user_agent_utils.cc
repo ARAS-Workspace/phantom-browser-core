@@ -174,7 +174,7 @@ blink::UserAgentBrandList ShuffleBrandList(
 std::string GetUserAgentPlatform() {
 #if BUILDFLAG(IS_MAC)
   return "Macintosh; ";
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   return "X11; ";  // strange, but that's what Firefox uses
 #elif BUILDFLAG(IS_ANDROID)
   return "Linux; ";
@@ -188,7 +188,7 @@ std::string GetUserAgentPlatform() {
 }
 
 std::string GetUnifiedPlatform() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   // This constant is only used on Android (desktop) and Linux.
   constexpr char kUnifiedPlatformChromeOSX64[] = "X11; CrOS x86_64 14541.0.0";
 
@@ -204,8 +204,6 @@ std::string GetUnifiedPlatform() {
                : "X11; Linux x86_64";
   }
   return "Linux; Android 10; K";
-#elif BUILDFLAG(IS_CHROMEOS)
-  return kUnifiedPlatformChromeOSX64;
 #elif BUILDFLAG(IS_MAC)
   return "Macintosh; Intel Mac OS X 10_15_7";
 #elif BUILDFLAG(IS_LINUX)
@@ -254,7 +252,7 @@ std::string BuildCpuInfo() {
 std::string GetOSVersion(IncludeAndroidBuildNumber include_android_build_number,
                          IncludeAndroidModel include_android_model) {
   std::string os_version;
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE)
   int32_t os_major_version = 0;
   int32_t os_minor_version = 0;
   int32_t os_bugfix_version = 0;
@@ -284,9 +282,6 @@ std::string GetOSVersion(IncludeAndroidBuildNumber include_android_build_number,
                       os_bugfix_version
 #elif BUILDFLAG(IS_IOS)
                       "%d_%d", os_major_version, os_minor_version
-#elif BUILDFLAG(IS_CHROMEOS)
-                      "%d.%d.%d", os_major_version, os_minor_version,
-                      os_bugfix_version
 #elif BUILDFLAG(IS_ANDROID)
                       "%s%s", android_version_str.c_str(),
                       android_info_str.c_str()
@@ -499,15 +494,6 @@ std::string GetPlatformForUAMetadata() {
   // TODO(crbug.com/40704421): This can be removed/re-refactored once we use
   // "macOS" by default
   return "macOS";
-#elif BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/40846294): The branding change to remove the space caused a
-  // regression that's solved here. Ideally, we would just use the new OS name
-  // without the space here too, but that needs a launch plan.
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  return "Chrome OS";
-#else
-  return "Chromium OS";
-#endif
 #else
   return std::string(version_info::GetOSType());
 #endif
@@ -635,11 +621,6 @@ std::string BuildOSCpuInfoFromOSVersionAndCpuType(const std::string& os_version,
   base::StringAppendF(&os_cpu,
 #if BUILDFLAG(IS_MAC)
                       "%s Mac OS X %s", cpu_type.c_str(), os_version.c_str()
-#elif BUILDFLAG(IS_CHROMEOS)
-                      "CrOS "
-                      "%s %s",
-                      cpu_type.c_str(),  // e.g. i686
-                      os_version.c_str()
 #elif BUILDFLAG(IS_ANDROID)
                       "Android %s", os_version.c_str()
 #elif BUILDFLAG(IS_IOS)

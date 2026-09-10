@@ -42,10 +42,6 @@
 #include "chrome/browser/safe_browsing/security_settings_bundle_toast_helper.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Minimum score of an HTTPS origin to enable HFM on its hostname.
 const base::FeatureParam<int> kHttpsAddThreshold{
     &features::kHttpsFirstModeV2ForEngagedSites, "https-add-threshold", 80};
@@ -170,14 +166,6 @@ GURL GetHttpUrlFromHttps(const GURL& https_url) {
 
 std::unique_ptr<KeyedService> BuildService(content::BrowserContext* context) {
   Profile* profile = Profile::FromBrowserContext(context);
-#if BUILDFLAG(IS_CHROMEOS)
-  // Explicitly check for ChromeOS sign-in profiles (which would cause
-  // double-counting of at-startup metrics for ChromeOS restarts) which are not
-  // covered by the `IsRegularProfile()` check.
-  if (ash::ProfileHelper::IsSigninProfile(profile)) {
-    return nullptr;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return std::make_unique<HttpsFirstModeService>(profile, GetClock());
 }
 

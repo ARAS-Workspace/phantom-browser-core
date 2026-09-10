@@ -214,7 +214,7 @@ bool FakeTextInputClient::ShouldDoLearning() {
   return should_do_learning_;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool FakeTextInputClient::SetCompositionFromExistingText(
     const gfx::Range& range,
     const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) {
@@ -227,30 +227,8 @@ bool FakeTextInputClient::SetCompositionFromExistingText(
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-gfx::Range FakeTextInputClient::GetAutocorrectRange() const {
-  return autocorrect_range_;
-}
-
-gfx::Rect FakeTextInputClient::GetAutocorrectCharacterBounds() const {
-  return {};
-}
-
-bool FakeTextInputClient::SetAutocorrectRange(const gfx::Range& range) {
-  autocorrect_range_ = range;
-  return true;
-}
-#endif
-
 void FakeTextInputClient::GetActiveTextInputControlLayoutBounds(
     std::optional<gfx::Rect>* control_bounds,
     std::optional<gfx::Rect>* selection_bounds) {}
-
-#if BUILDFLAG(IS_CHROMEOS)
-ui::TextInputClient::EditingContext
-FakeTextInputClient::GetTextEditingContext() {
-  return EditingContext{.page_url = url_};
-}
-#endif
 
 }  // namespace ui

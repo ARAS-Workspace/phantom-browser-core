@@ -34,7 +34,7 @@ using ::testing::Mock;
 using ::testing::Property;
 using ::testing::ValuesIn;
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 #error Not supported on this platform.
 #endif
 

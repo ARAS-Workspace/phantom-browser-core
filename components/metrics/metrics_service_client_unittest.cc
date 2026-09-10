@@ -82,16 +82,6 @@ TEST_F(MetricsServiceClientTest, TestGetStorageLimits) {
   EXPECT_EQ(0u, storage_limits.initial_log_queue_limits.max_log_size_bytes);
   EXPECT_EQ(1024u * 1024,
             storage_limits.ongoing_log_queue_limits.max_log_size_bytes);
-#elif BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(20u, storage_limits.initial_log_queue_limits.min_log_count);
-  EXPECT_EQ(8u, storage_limits.ongoing_log_queue_limits.min_log_count);
-  EXPECT_EQ(300u * 1024,
-            storage_limits.initial_log_queue_limits.min_queue_size_bytes);
-  EXPECT_EQ(300u * 1024,
-            storage_limits.ongoing_log_queue_limits.min_queue_size_bytes);
-  EXPECT_EQ(0u, storage_limits.initial_log_queue_limits.max_log_size_bytes);
-  EXPECT_EQ(1024u * 1024,
-            storage_limits.ongoing_log_queue_limits.max_log_size_bytes);
 #elif BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(40u, storage_limits.initial_log_queue_limits.min_log_count);
   EXPECT_EQ(16u, storage_limits.ongoing_log_queue_limits.min_log_count);

@@ -11,10 +11,6 @@
 #include "net/dns/public/host_resolver_results.h"
 #include "services/network/public/mojom/restricted_udp_socket.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "services/network/public/mojom/socket_connection_tracker.mojom.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace network {
 
 class UDPSocket;
@@ -48,11 +44,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) RestrictedUDPSocket
               net::DnsQueryType dns_query_type,
               SendToCallback callback) override;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void AttachConnectionTracker(
-      mojo::PendingRemote<mojom::SocketConnectionTracker>);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
  private:
   void OnResolveCompleteForSendTo(std::vector<uint8_t> data,
                                   SendToCallback callback,
@@ -67,9 +58,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) RestrictedUDPSocket
   bool allow_multicast_;
   bool allow_source_specific_multicast_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  mojo::PendingRemote<mojom::SocketConnectionTracker> connection_tracker_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 }  // namespace network

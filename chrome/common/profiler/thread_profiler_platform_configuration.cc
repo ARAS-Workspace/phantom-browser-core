@@ -65,14 +65,6 @@ DefaultPlatformConfiguration::GetEnableRates(
     return RelativePopulations{0.0, 100.0, 0.0};
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (browser_test_mode_enabled()) {
-    // This is a browser test or maybe a tast test that called
-    // chrome.EnableStackSampledMetrics().
-    return RelativePopulations{0.0, 100.0, 0.0};
-  }
-#endif
-
   CHECK_NE(*release_channel, version_info::Channel::UNKNOWN);
 
   switch (*release_channel) {
@@ -136,14 +128,6 @@ bool DefaultPlatformConfiguration::IsSupportedForChannel(
   if (!release_channel) {
     return true;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (browser_test_mode_enabled()) {
-    // This is a browser test or maybe a tast test that called
-    // chrome.EnableStackSampledMetrics().
-    return true;
-  }
-#endif
 
   // All channels are supported in release builds.
   return *release_channel != version_info::Channel::UNKNOWN;

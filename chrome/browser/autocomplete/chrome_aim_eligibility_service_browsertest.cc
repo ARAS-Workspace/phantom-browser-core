@@ -353,7 +353,7 @@ INSTANTIATE_TEST_SUITE_P(,
                              // Values for Pdf server response eligibility.
                              ::testing::Values(true, false)));
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/488467253): Fix and re-enable this test for all platforms.
 #define MAYBE_ComprehensiveEligibilityTest DISABLED_ComprehensiveEligibilityTest
 #else
@@ -1249,11 +1249,7 @@ class ChromeAimEligibilityServiceOAuthBrowserTest
 };
 
 // TODO(crbug.com/541665465): Test is flaky on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_RequestIncludesOAuthToken DISABLED_RequestIncludesOAuthToken
-#else
 #define MAYBE_RequestIncludesOAuthToken RequestIncludesOAuthToken
-#endif
 IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
                        MAYBE_RequestIncludesOAuthToken) {
   // Setup: Make a primary account available with a refresh token.
@@ -1330,7 +1326,6 @@ IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
 // This test is not supported on ChromeOS since there isn't a way to clear the
 // primary account. See:
 // https://crsrc.org/c/components/signin/public/identity_manager/identity_test_utils.cc;?q=signin::ClearPrimaryAccount&ss=chromium
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
                        PrimaryAccountTracking) {
   base::HistogramTester histogram_tester;
@@ -1395,7 +1390,6 @@ IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
 
   EXPECT_EQ(request_counter, 3);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
                        FallbackToCookieWhenNoPrimaryAccount) {
@@ -1470,7 +1464,6 @@ IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
 // This test is not supported on ChromeOS since there isn't a way to clear the
 // primary account. See:
 // https://crsrc.org/c/components/signin/public/identity_manager/identity_test_utils.cc;?q=signin::ClearPrimaryAccount&ss=chromium
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
                        AccountTracking) {
   base::HistogramTester histogram_tester;
@@ -1545,14 +1538,8 @@ IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
 
   EXPECT_EQ(request_counter, 3);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/488467253): Fix and re-enable this test for CrOS.
-#define MAYBE_RefreshesOnPersistentError DISABLED_RefreshesOnPersistentError
-#else
 #define MAYBE_RefreshesOnPersistentError RefreshesOnPersistentError
-#endif
 IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
                        MAYBE_RefreshesOnPersistentError) {
   base::HistogramTester histogram_tester;

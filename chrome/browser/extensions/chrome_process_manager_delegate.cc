@@ -22,12 +22,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/permissions/permissions_data.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/extensions/component_extensions_allowlist/allowlist.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#endif
-
 namespace extensions {
 
 ChromeProcessManagerDelegate::ChromeProcessManagerDelegate() {
@@ -66,33 +60,6 @@ bool ChromeProcessManagerDelegate::AreBackgroundPagesAllowedForContext(
 bool ChromeProcessManagerDelegate::IsExtensionBackgroundPageAllowed(
     content::BrowserContext* context,
     const Extension& extension) const {
-#if BUILDFLAG(IS_CHROMEOS)
-  Profile* profile = Profile::FromBrowserContext(context);
-
-  const bool is_auth_screen_profile =
-      (ash::IsSigninBrowserContext(profile) ||
-       ash::IsLockScreenBrowserContext(profile)) &&
-      !profile->IsOffTheRecord();
-
-  if (is_auth_screen_profile) {
-    // Check for flag.
-    if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-            ::switches::kDisableLoginScreenApps)) {
-      return false;
-    }
-
-    // Get login screen apps installed by policy.
-    base::DictValue login_screen_apps_list =
-        ExtensionManagementFactory::GetForBrowserContext(context)
-            ->GetForceInstallList();
-
-    // For the ChromeOS login profile, only allow apps installed by device
-    // policy or that are explicitly allowlisted.
-    return login_screen_apps_list.Find(extension.id()) ||
-           IsComponentExtensionAllowlistedForSignInProfile(extension.id());
-  }
-
-#endif
 
   return AreBackgroundPagesAllowedForContext(context);
 }

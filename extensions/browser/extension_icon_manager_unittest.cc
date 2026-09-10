@@ -167,49 +167,6 @@ TEST_F(ExtensionIconManagerTest, LoadRemoveLoad) {
   EXPECT_TRUE(gfx::test::AreImagesEqual(first_icon, second_icon));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests loading an icon for a component extension.
-TEST_F(ExtensionIconManagerTest, LoadComponentExtensionResource) {
-  gfx::Image default_icon = GetDefaultIcon();
-
-  base::FilePath test_dir;
-  ASSERT_TRUE(base::PathService::Get(DIR_TEST_DATA, &test_dir));
-  base::FilePath manifest_path =
-      test_dir.AppendASCII("extension_icon_manager/manifest.json");
-
-  JSONFileValueDeserializer deserializer(manifest_path);
-  std::unique_ptr<base::Value> manifest =
-      deserializer.Deserialize(nullptr, nullptr);
-  ASSERT_TRUE(manifest.get());
-  ASSERT_TRUE(manifest->is_dict());
-  std::u16string error;
-  scoped_refptr<Extension> extension(Extension::Create(
-      manifest_path.DirName(), mojom::ManifestLocation::kComponent,
-      manifest->GetDict(), Extension::NO_FLAGS, &error));
-  ASSERT_TRUE(extension.get());
-
-  ExtensionIconManager icon_manager;
-  icon_manager.set_observer(this);
-  // Load the icon.
-  icon_manager.LoadIcon(browser_context(), extension.get());
-  WaitForImageLoad();
-  gfx::Image first_icon = icon_manager.GetIcon(extension->id());
-  EXPECT_FALSE(gfx::test::AreImagesEqual(first_icon, default_icon));
-
-  // Remove the icon from the manager.
-  icon_manager.RemoveIcon(extension->id());
-
-  // Now re-load the icon - we should get the same result bitmap (and not the
-  // default icon).
-  icon_manager.LoadIcon(browser_context(), extension.get());
-  WaitForImageLoad();
-  gfx::Image second_icon = icon_manager.GetIcon(extension->id());
-  EXPECT_FALSE(gfx::test::AreImagesEqual(second_icon, default_icon));
-
-  EXPECT_TRUE(gfx::test::AreImagesEqual(first_icon, second_icon));
-}
-#endif
-
 // Test what bitmaps are loaded when various combinations of scale factors are
 // supported.
 TEST_F(ExtensionIconManagerTest, ScaleFactors) {

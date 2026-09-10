@@ -224,17 +224,10 @@ void KeyboardAccessTest::TestMenuKeyboardAccess(bool alternate_key_sequence,
         /*is_user_initiated=*/false, /*clear_focus_if_failed=*/false);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Chrome OS doesn't have a way to just focus the app menu, so we use Alt+F to
-  // bring up the menu.
-  ASSERT_TRUE(ui_test_utils::SendKeyPressSync(browser(), ui::VKEY_F, false,
-                                              shift, true, false));
-#else
   ui::KeyboardCode menu_key =
       alternate_key_sequence ? ui::VKEY_MENU : ui::VKEY_F10;
   ASSERT_TRUE(ui_test_utils::SendKeyPressSync(browser(), menu_key, false, shift,
                                               false, false));
-#endif
 
   if (shift) {
     // Verify Chrome does not move the view focus. We should not move the view
@@ -249,13 +242,11 @@ void KeyboardAccessTest::TestMenuKeyboardAccess(bool alternate_key_sequence,
 
   // See above comment. Since we already brought up the menu, no need to do this
   // on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   if (alternate_key_sequence) {
     SendKeyPress(browser(), ui::VKEY_DOWN);
   } else {
     SendKeyPress(browser(), ui::VKEY_RETURN);
   }
-#endif
 
   // Wait for the new tab to appear.
   tab_add.Wait();
@@ -295,9 +286,7 @@ void KeyboardAccessTest::TestMenuKeyboardAccessAndDismiss() {
 }
 
 // http://crbug.com/41260780.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TestMenuKeyboardAccess DISABLED_TestMenuKeyboardAccess
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // No keyboard shortcut for the Chrome menu on Mac: http://crbug.com/41377766
 #define MAYBE_TestMenuKeyboardAccess DISABLED_TestMenuKeyboardAccess
 #else
@@ -309,9 +298,7 @@ IN_PROC_BROWSER_TEST_F(KeyboardAccessTest, MAYBE_TestMenuKeyboardAccess) {
 }
 
 // http://crbug.com/41260780.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TestAltMenuKeyboardAccess DISABLED_TestAltMenuKeyboardAccess
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // No keyboard shortcut for the Chrome menu on Mac: http://crbug.com/41377766
 #define MAYBE_TestAltMenuKeyboardAccess DISABLED_TestAltMenuKeyboardAccess
 #else

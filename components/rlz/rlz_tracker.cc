@@ -28,22 +28,13 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/mojom/url_loader.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/syslog_logging.h"
-#endif
-
 namespace rlz {
 namespace {
 
 // Maximum and minimum delay for financial ping we would allow to be set through
 // master preferences. Somewhat arbitrary, may need to be adjusted in future.
-#if BUILDFLAG(IS_CHROMEOS)
-const base::TimeDelta kMinInitDelay = base::Seconds(60);
-const base::TimeDelta kMaxInitDelay = base::Hours(24);
-#else
 const base::TimeDelta kMinInitDelay = base::Seconds(20);
 const base::TimeDelta kMaxInitDelay = base::Seconds(200);
-#endif
 
 void RecordProductEvents(bool first_run,
                          bool is_google_default_search,
@@ -154,11 +145,7 @@ bool SendFinancialPing(const std::string& brand,
   std::string lang_ascii(base::UTF16ToASCII(lang));
   std::string referral_ascii(base::UTF16ToASCII(referral));
   std::string product_signature;
-#if BUILDFLAG(IS_CHROMEOS)
-  product_signature = "chromeos";
-#else
   product_signature = "chrome";
-#endif
   return rlz_lib::SendFinancialPing(
       rlz_lib::CHROME, points, product_signature.c_str(), brand.c_str(),
       referral_ascii.c_str(), lang_ascii.c_str(), false, true);
@@ -319,22 +306,6 @@ bool RLZTracker::Init(bool first_run,
 #endif
   }
   delegate_->GetReactivationBrand(&reactivation_brand_);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // If the brand is organic, RLZ is essentially disabled.  Write a log to the
-  // console for administrators and QA.
-  if (delegate_->IsBrandOrganic(brand_) &&
-      delegate_->IsBrandOrganic(reactivation_brand_)) {
-    SYSLOG(INFO) << "RLZ is disabled";
-  } else if (delegate_->ShouldUpdateExistingAccessPointRlz()) {
-    background_task_runner_->PostTask(
-        FROM_HERE, base::BindOnce(
-                       [](const std::string& brand) {
-                         rlz_lib::UpdateExistingAccessPointRlz(brand);
-                       },
-                       brand_));
-  }
-#endif
 
   // Could be null; don't run if so.  RLZ will try again next restart.
   auto shared_url_loader_factory = delegate_->GetURLLoaderFactory();
@@ -698,35 +669,6 @@ bool RLZTracker::ScheduleGetAccessPointRlz(rlz_lib::AccessPoint point) {
                      not_used));
   return true;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-void RLZTracker::ClearRlzState() {
-  RLZTracker* tracker = GetInstance();
-  if (tracker->delegate_)
-    tracker->ClearRlzStateImpl();
-}
-
-void RLZTracker::ClearRlzStateImpl() {
-  DCHECK(delegate_) << "RLZTracker used before initialization";
-  if (ScheduleClearRlzState())
-    return;
-
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  rlz_lib::ClearAllProductEvents(rlz_lib::CHROME);
-}
-
-bool RLZTracker::ScheduleClearRlzState() {
-  DCHECK(delegate_) << "RLZTracker used before initialization";
-  if (!delegate_->IsOnUIThread())
-    return false;
-
-  background_task_runner_->PostTask(
-      FROM_HERE,
-      base::BindOnce(&RLZTracker::ClearRlzStateImpl, base::Unretained(this)));
-  return true;
-}
-#endif
 
 // static
 void RLZTracker::CleanupRlz() {

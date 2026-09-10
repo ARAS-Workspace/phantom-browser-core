@@ -16,9 +16,8 @@
 #include "partition_alloc/partition_alloc_base/compiler_specific.h"
 #include "partition_alloc/partition_alloc_base/cxx_wrapper/algorithm.h"
 
-#if PA_BUILDFLAG(PA_ARCH_CPU_ARM_FAMILY) &&                \
-    (PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_LINUX) || \
-     PA_BUILDFLAG(IS_CHROMEOS))
+#if PA_BUILDFLAG(PA_ARCH_CPU_ARM_FAMILY) && \
+    (PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_LINUX))
 #include <asm/hwcap.h>
 #include <sys/auxv.h>
 
@@ -34,7 +33,7 @@
 #endif  // PA_BUILDFLAG(PA_ARCH_CPU_ARM64)
 
 #endif  // PA_BUILDFLAG(PA_ARCH_CPU_ARM_FAMILY) && (PA_BUILDFLAG(IS_ANDROID) ||
-        // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS))
+        // PA_BUILDFLAG(IS_LINUX))
 
 #if PA_BUILDFLAG(PA_ARCH_CPU_X86_FAMILY)
 #if PA_BUILDFLAG(PA_COMPILER_MSVC)
@@ -186,8 +185,7 @@ void CPU::Initialize() {
     }
   }
 #elif PA_BUILDFLAG(PA_ARCH_CPU_ARM_FAMILY)
-#if PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_LINUX) || \
-    PA_BUILDFLAG(IS_CHROMEOS)
+#if PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_LINUX)
 
 #if PA_BUILDFLAG(PA_ARCH_CPU_ARM64)
   // Check for Armv8.5-A BTI/MTE support, exposed via HWCAP2

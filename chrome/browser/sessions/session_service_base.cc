@@ -60,12 +60,6 @@
 #include "chrome/browser/app_controller_mac.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/web_applications/app_browser_controller.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/browser/web_applications/web_app_registrar.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
 #include "ui/ozone/public/platform_session_manager.h"
@@ -853,23 +847,6 @@ bool SessionServiceBase::ShouldTrackBrowser(
       !WindowFeatureController::From(browser)->IsTrustedSource()) {
     return false;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Windows that are auto-started and prevented from closing are exempted from
-  // tracking for session restore to prevent multiple unclosable open instances
-  // of the same app.
-  web_app::AppBrowserController* app_controller =
-      web_app::AppBrowserController::From(browser);
-  web_app::WebAppProvider* provider =
-      web_app::WebAppProvider::GetForWebApps(profile());
-  // Checking for close prevention does not require an `AppLock` and
-  // therefore `registrar_unsafe()` is safe to use.
-  if (app_controller && provider &&
-      provider->registrar_unsafe().IsPreventCloseEnabled(
-          app_controller->app_id())) {
-    return false;
-  }
-#endif  // #if BUILDFLAG(IS_CHROMEOS)
 
   return ShouldRestoreWindowOfType(
       WindowTypeForBrowserType(browser->GetType()));

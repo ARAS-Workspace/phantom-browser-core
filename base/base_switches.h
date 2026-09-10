@@ -185,15 +185,6 @@ inline constexpr char kPackageName[] = "package-name";
 inline constexpr char kPackageVersionName[] = "package-version-name";
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Override the default scheduling boosting value for urgent tasks.
-// This can be adjusted if a specific chromeos device shows better perf/power
-// ratio (e.g. by running video conference tests).
-// Currently, this values directs to linux scheduler's utilization min clamp.
-// Range is 0(no biased load) ~ 100(mamximum load value).
-inline constexpr char kSchedulerBoostUrgent[] = "scheduler-boost-urgent";
-#endif
-
 }  // namespace switches
 
 #endif  // BASE_BASE_SWITCHES_H_

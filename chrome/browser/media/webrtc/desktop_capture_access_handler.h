@@ -21,12 +21,6 @@
 #include "content/public/browser/media_stream_request.h"
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace aura {
-class Window;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace extensions {
 class Extension;
 }
@@ -118,19 +112,6 @@ class DesktopCaptureAccessHandler : public CaptureAccessHandlerBase,
   RequestsQueues pending_requests_;
 
   WebContentsCollection web_contents_collection_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Called back after checking Data Leak Prevention (DLP) restrictions.
-  void OnDlpRestrictionChecked(
-      base::WeakPtr<content::WebContents> web_contents,
-      std::unique_ptr<PendingAccessRequest> pending_request,
-      const content::DesktopMediaID& media_id,
-      bool capture_audio,
-      bool is_dlp_allowed);
-
-  raw_ptr<aura::Window, DanglingUntriaged> primary_root_window_for_testing_ =
-      nullptr;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Returns true if the request is from a built-in feedback UI and
   // `kUseSCContentSharingPicker` feature is enabled.

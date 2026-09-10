@@ -302,20 +302,6 @@ const int kInitializationDelaySeconds = 30;
 // The browser last live timestamp is updated every 15 minutes.
 const int kUpdateAliveTimestampSeconds = 15 * 60;
 
-#if BUILDFLAG(IS_CHROMEOS)
-enum UserLogStoreState {
-  kSetPostSendLogsState = 0,
-  kSetPreSendLogsState = 1,
-  kUnsetPostSendLogsState = 2,
-  kUnsetPreSendLogsState = 3,
-  kMaxValue = kUnsetPreSendLogsState,
-};
-
-void RecordUserLogStoreState(UserLogStoreState state) {
-  base::UmaHistogramEnumeration("UMA.CrosPerUser.UserLogStoreState", state);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 
 // static
@@ -747,102 +733,6 @@ void MetricsService::MarkCurrentHistogramsAsReported() {
       /*required_flags=*/base::Histogram::kUmaTargetedHistogramFlag,
       &snapshot_manager);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void MetricsService::SetUserLogStore(
-    std::unique_ptr<UnsentLogStore> user_log_store) {
-  if (log_store()->has_alternate_ongoing_log_store()) {
-    return;
-  }
-
-  if (state_ >= SENDING_LOGS) {
-    // Closes the current log so that a new log can be opened in the user log
-    // store.
-    PushPendingLogsToPersistentStorage(
-        MetricsLogsEventManager::CreateReason::kAlternateOngoingLogStoreSet);
-    log_store()->SetAlternateOngoingLogStore(std::move(user_log_store));
-    OpenNewLog();
-    RecordUserLogStoreState(kSetPostSendLogsState);
-  } else {
-    // Initial log has not yet been created and flushing now would result in
-    // incomplete information in the current log.
-    //
-    // Logs recorded before a user login will be appended to user logs. This
-    // should not happen frequently.
-    //
-    // TODO(crbug.com/40203458): Look for a way to "pause" pre-login logs and
-    // flush when INIT_TASK is done.
-    log_store()->SetAlternateOngoingLogStore(std::move(user_log_store));
-    RecordUserLogStoreState(kSetPreSendLogsState);
-  }
-}
-
-void MetricsService::UnsetUserLogStore() {
-  if (!log_store()->has_alternate_ongoing_log_store()) {
-    return;
-  }
-
-  if (state_ >= SENDING_LOGS) {
-    PushPendingLogsToPersistentStorage(
-        MetricsLogsEventManager::CreateReason::kAlternateOngoingLogStoreUnset);
-    log_store()->UnsetAlternateOngoingLogStore();
-    OpenNewLog();
-    RecordUserLogStoreState(kUnsetPostSendLogsState);
-    return;
-  }
-
-  // Fast startup and logout case. We flush all histograms and discard the
-  // current log. This is to prevent histograms captured during the user
-  // session from leaking into local state logs.
-  // TODO(crbug.com/40245274): Consider not flushing histograms here.
-
-  // Discard histograms.
-  DiscardingHistogramSnapshotManager histogram_snapshot_manager;
-  delegating_provider_.RecordHistogramSnapshots(&histogram_snapshot_manager);
-  base::StatisticsRecorder::PrepareDeltas(
-      /*include_persistent=*/true, /*flags_to_set=*/base::Histogram::kNoFlags,
-      /*required_flags=*/base::Histogram::kUmaTargetedHistogramFlag,
-      &histogram_snapshot_manager);
-
-  // Discard the current log, don't store it and stop recording.
-  CHECK(current_log_);
-  current_log_.reset();
-  DisableRecording();
-
-  log_store()->UnsetAlternateOngoingLogStore();
-  RecordUserLogStoreState(kUnsetPreSendLogsState);
-}
-
-bool MetricsService::HasUserLogStore() {
-  return log_store()->has_alternate_ongoing_log_store();
-}
-
-void MetricsService::InitPerUserMetrics() {
-  client_->InitPerUserMetrics();
-}
-
-std::optional<bool> MetricsService::GetCurrentUserMetricsChoice() const {
-  return client_->GetCurrentUserMetricsChoice();
-}
-
-std::optional<std::string> MetricsService::GetCurrentUserId() const {
-  return client_->GetCurrentUserId();
-}
-
-void MetricsService::UpdateCurrentUserMetricsChoice(bool user_choice) {
-  client_->UpdateCurrentUserMetricsChoice(user_choice);
-}
-
-void MetricsService::ResetClientId() {
-  // Pref must be cleared in order for ForceClientIdCreation to generate a new
-  // client ID.
-  local_state_->ClearPref(prefs::kMetricsClientID);
-  local_state_->ClearPref(prefs::kMetricsLogFinalizedRecordId);
-  local_state_->ClearPref(prefs::kMetricsLogRecordId);
-  state_manager_->ForceClientIdCreation();
-  client_->SetMetricsClientId(state_manager_->client_id());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 variations::SyntheticTrialRegistry*
 MetricsService::GetSyntheticTrialRegistry() {
@@ -1449,12 +1339,6 @@ std::unique_ptr<MetricsLog> MetricsService::CreateLog(
   auto new_metrics_log = std::make_unique<MetricsLog>(
       state_manager_->client_id(), session_id_, log_type, client_);
   new_metrics_log->AssignRecordId(local_state_);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::optional<std::string> user_id = GetCurrentUserId();
-  if (user_id.has_value())
-    new_metrics_log->SetUserId(user_id.value());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   return new_metrics_log;
 }

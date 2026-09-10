@@ -144,29 +144,19 @@ IN_PROC_BROWSER_TEST_P(MetricsServiceUserDemographicsBrowserTest,
     histogram.ExpectTotalCount("UMA.UserDemographics.Status", /*count=*/0);
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Sign out the user to revoke all refresh tokens. This prevents any posted
   // tasks from successfully fetching an access token during the tear-down
   // phase and crashing on a DCHECK. See crbug.com/40704261 for more details.
   harness->SignOutPrimaryAccount();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 // LINT.ThenChange(/ios/chrome/browser/metrics/demographics_egtest.mm:AddSyncedUserBirthYearAndGenderToProtoDataEnabled_msudBrowsertest)
 // ThenChange(/ios/chrome/browser/metrics/demographics_egtest.mm:AddSyncedUserBirthYearAndGenderToProtoDataDisabled_msudBrowsertest)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Cannot test for the enabled feature on Chrome OS because there are always
-// multiple profiles.
-static const auto kDemographicsTestParams = testing::Values(
-    test::DemographicsTestParams{/*enable_feature=*/false,
-                                 /*expect_reported_demographics=*/false});
-#else
 static const auto kDemographicsTestParams = testing::Values(
     test::DemographicsTestParams{/*enable_feature=*/false,
                                  /*expect_reported_demographics=*/false},
     test::DemographicsTestParams{/*enable_feature=*/true,
                                  /*expect_reported_demographics=*/true});
-#endif
 
 INSTANTIATE_TEST_SUITE_P(,
                          MetricsServiceUserDemographicsBrowserTest,

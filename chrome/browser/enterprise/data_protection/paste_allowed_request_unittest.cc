@@ -33,11 +33,6 @@
 #include "ui/base/clipboard/scoped_clipboard_writer.h"
 #include "ui/base/clipboard/test/test_clipboard.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/network/network_handler.h"
-#include "chromeos/ash/services/network_config/public/cpp/cros_network_config_test_helper.h"
-#endif
-
 namespace enterprise_data_protection {
 
 namespace {
@@ -127,17 +122,9 @@ class PasteAllowedRequestTest : public testing::Test {
     PasteAllowedRequest::CleanupRequestsForTesting();
     ui::TestClipboard::CreateForCurrentThread();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    network_config_helper_ =
-        std::make_unique<ash::network_config::CrosNetworkConfigTestHelper>();
-    ash::NetworkHandler::Initialize();
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::NetworkHandler::Shutdown();
-#endif
   }
 
   content::WebContents* main_web_contents() {
@@ -210,10 +197,6 @@ class PasteAllowedRequestTest : public testing::Test {
   std::unique_ptr<content::WebContents> main_web_contents_;
   std::unique_ptr<content::WebContents> secondary_web_contents_;
   raw_ptr<content::RenderFrameHost> child_rfh_ = nullptr;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<ash::network_config::CrosNetworkConfigTestHelper>
-      network_config_helper_;
-#endif
 };
 
 class PasteAllowedRequestScanningTest : public PasteAllowedRequestTest {

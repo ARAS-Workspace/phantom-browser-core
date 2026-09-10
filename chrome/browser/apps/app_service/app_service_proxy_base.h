@@ -381,9 +381,6 @@ class AppServiceProxyBase : public KeyedService,
   // on platform is a short term workaround. This should be cleaned on
   // extracting an interface.
   virtual bool MaybeShowLaunchPreventionDialog(const apps::AppUpdate& update)
-#if BUILDFLAG(IS_CHROMEOS)
-      = 0
-#endif
       ;
 
   IntentFilterPtr FindBestMatchingFilter(const IntentPtr& intent);

@@ -21,16 +21,9 @@
 #include "components/services/app_service/public/cpp/menu.h"
 #include "components/services/app_service/public/cpp/permission.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/app_icon/compressed_icon_getter.h"
-#endif
-
 namespace apps {
 
 class Publisher
-#if BUILDFLAG(IS_CHROMEOS)
-    : public CompressedIconGetter
-#endif
 {
  public:
   virtual ~Publisher() = default;
@@ -158,7 +151,6 @@ class Publisher
   virtual void OpenNativeSettings(const std::string& app_id) = 0;
 
   // Hereafter, used only in Ash.
-  // TODO(crbug.com/441649482): Guard them by ifsef BUILDFLAG(IS_CHROMEOS).
 
   // Requests that the app identified by `app_id` is marked as paused. Paused
   // apps cannot be launched. Implemented if the publisher supports the pausing
@@ -189,17 +181,6 @@ class Publisher
   // apps, and otherwise should do nothing.
   virtual void SetResizeLocked(const std::string& app_id, bool locked) = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Returns the default icon if a valid icon can't be loaded, e.g. because an
-  // app didn't supply an icon.
-  virtual int DefaultIconResourceId() const = 0;
-
-  // Set the locale for the app identified by `app_id`. Implemented if the
-  // publisher supports changing app-specific locale, and otherwise should do
-  // nothing.
-  virtual void SetAppLocale(const std::string& app_id,
-                            const std::string& locale_tag) = 0;
-#endif
 };
 
 }  // namespace apps

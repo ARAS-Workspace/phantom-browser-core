@@ -341,7 +341,6 @@ TEST_F(IdleTimeoutPolicyHandlerTest, AllActions) {
 
 // When browser sign in is disabled by policy, the clear actions should
 // be applied and the error map and messages should be empty.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(IdleTimeoutPolicyHandlerTest, BrowserSigninDisabled) {
   SetPolicyValue(policy::key::kSyncDisabled, base::Value(false));
   SetPolicyValue(policy::key::kIdleTimeout, base::Value(15));
@@ -371,7 +370,6 @@ TEST_F(IdleTimeoutPolicyHandlerTest, BrowserSigninDisabled) {
                   static_cast<int>(ActionType::kClearBrowsingHistory),
                   static_cast<int>(ActionType::kClearCookiesAndOtherSiteData)));
 }
-#endif
 
 TEST_F(IdleTimeoutPolicyHandlerTest, SyncTypesDisabledForClearActions) {
   // Start with sync prefs enabled so we can sense that they have changed.

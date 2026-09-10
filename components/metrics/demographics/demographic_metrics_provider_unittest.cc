@@ -36,12 +36,6 @@ enum TestSyncServiceState {
   SYNC_FEATURE_ENABLED_BUT_PAUSED,
   SYNC_FEATURE_DISABLED_BUT_PREFERENCES_ENABLED,
   SYNC_FEATURE_ENABLED_BUT_PREFERENCES_NOT_SELECTED,
-#if BUILDFLAG(IS_CHROMEOS)
-  // Represents the user clearing sync data via dashboard. On all platforms
-  // except ChromeOS, this clears the primary account (which is basically
-  // SYNC_FEATURE_NOT_ENABLED). On ChromeOS, Sync enters a special state.
-  SYNC_FEATURE_DISABLED_ON_CHROMEOS_VIA_DASHBOARD,
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 // Profile client for testing that gets fake Profile information and services.
@@ -114,30 +108,6 @@ class TestProfileClient : public DemographicMetricsProvider::ProfileClient {
                  sync_service_->GetTransportState());
         break;
 
-#if BUILDFLAG(IS_CHROMEOS)
-      case SYNC_FEATURE_DISABLED_ON_CHROMEOS_VIA_DASHBOARD:
-        sync_service_ = std::make_unique<syncer::TestSyncService>();
-        sync_service_->GetUserSettings()->SetSyncFeatureDisabledViaDashboard();
-
-        // On ChromeOS Ash, IsInitialSyncFeatureSetupComplete always returns
-        // true (in SyncPrefs::IsInitialSyncFeatureSetupComplete()) but
-        // IsSyncFeatureEnabled() stays false because the user needs to manually
-        // resume sync the feature.
-        //
-        // However TestSyncService::SetSignedIn forces
-        // TestSyncUserSettings::IsInitialSyncFeatureSetupComplete() to return
-        // false when sync is in transport mode.
-        if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-          CHECK(!sync_service_->GetUserSettings()
-                     ->IsInitialSyncFeatureSetupComplete());
-        } else {
-          CHECK(sync_service_->GetUserSettings()
-                    ->IsInitialSyncFeatureSetupComplete());
-        }
-
-        CHECK(!sync_service_->IsSyncFeatureEnabled());
-        break;
-#endif  // BUILDFLAG(IS_CHROMEOS)
     }
   }
 
@@ -268,31 +238,6 @@ TEST_P(DemographicMetricsProviderTest,
 }
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(
-    DemographicMetricsProviderTest,
-    ProvideSyncedUserNoisedBirthYearAndGender_SyncFeatureDisabledOnChromeOsAshViaSyncDashboard) {
-  base::HistogramTester histogram;
-
-  auto client = std::make_unique<TestProfileClient>(
-      /*number_of_profiles=*/1,
-      SYNC_FEATURE_DISABLED_ON_CHROMEOS_VIA_DASHBOARD);
-
-  // Run demographics provider.
-  DemographicMetricsProvider provider(
-      std::move(client), MetricsLogUploader::MetricServiceType::UMA);
-  ChromeUserMetricsExtension uma_proto;
-  provider.ProvideSyncedUserNoisedBirthYearAndGender(&uma_proto);
-
-  // Expect the proto fields to be not set and left to default.
-  EXPECT_FALSE(uma_proto.user_demographics().has_birth_year());
-  EXPECT_FALSE(uma_proto.user_demographics().has_gender());
-
-  // Verify histograms.
-  histogram.ExpectUniqueSample("UMA.UserDemographics.Status",
-                               UserDemographicsStatus::kSyncNotEnabled, 1);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(DemographicMetricsProviderTest,
        ProvideSyncedUserNoisedBirthYearAndGender_SyncNotEnabled) {
@@ -356,7 +301,6 @@ TEST_P(DemographicMetricsProviderTest,
   ChromeUserMetricsExtension uma_proto;
   provider.ProvideSyncedUserNoisedBirthYearAndGender(&uma_proto);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Expect that the UMA proto is untouched.
   EXPECT_FALSE(uma_proto.user_demographics().has_birth_year());
   EXPECT_FALSE(uma_proto.user_demographics().has_gender());
@@ -364,16 +308,6 @@ TEST_P(DemographicMetricsProviderTest,
   // Verify histograms.
   histogram.ExpectUniqueSample("UMA.UserDemographics.Status",
                                UserDemographicsStatus::kMoreThanOneProfile, 1);
-#else
-  // On ChromeOS, we have a profile selection strategy, so expect UMA reporting
-  // to work.
-  EXPECT_TRUE(uma_proto.user_demographics().has_birth_year());
-  EXPECT_TRUE(uma_proto.user_demographics().has_gender());
-
-  // Verify histograms.
-  histogram.ExpectUniqueSample("UMA.UserDemographics.Status",
-                               UserDemographicsStatus::kSuccess, 1);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST_P(DemographicMetricsProviderTest,

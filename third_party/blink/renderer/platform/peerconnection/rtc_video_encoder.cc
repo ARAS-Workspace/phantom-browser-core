@@ -2135,7 +2135,7 @@ scoped_refptr<media::VideoFrame> RTCVideoEncoder::Impl::CreateMemoryFrame(
   // and `input_visible_size_` strides match. This ensures the strides of the
   // frame that we pass to the encoder fits the input requirements.
   bool native_buffer_scaling =
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
       frame_buffer.type() == webrtc::VideoFrameBuffer::Type::kNative &&
       input_frame_coded_size_ == input_visible_size_;
 #else

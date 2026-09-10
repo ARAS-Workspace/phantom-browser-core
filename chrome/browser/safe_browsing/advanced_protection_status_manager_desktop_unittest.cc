@@ -300,7 +300,6 @@ TEST_F(AdvancedProtectionStatusManagerDesktopTest, StayInAdvancedProtection) {
               testing::ElementsAre(base::Bucket(true, 1)));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Not applicable to Chrome OS.
 TEST_F(AdvancedProtectionStatusManagerDesktopTest, SignInAndSignOutEvent) {
   base::HistogramTester histograms;
@@ -325,7 +324,6 @@ TEST_F(AdvancedProtectionStatusManagerDesktopTest, SignInAndSignOutEvent) {
   EXPECT_FALSE(aps_manager.IsRefreshScheduled());
   aps_manager.UnsubscribeFromSigninEvents();
 }
-#endif
 
 TEST_F(AdvancedProtectionStatusManagerDesktopTest, AccountRemoval) {
   base::HistogramTester histograms;
@@ -422,7 +420,6 @@ TEST_F(AdvancedProtectionStatusManagerDesktopTest,
 
 // On ChromeOS, there is no unconsented primary account. We can only track the
 // primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AdvancedProtectionStatusManagerDesktopTest,
        TracksUnconsentedPrimaryAccount) {
   base::HistogramTester histograms;
@@ -444,6 +441,5 @@ TEST_F(AdvancedProtectionStatusManagerDesktopTest,
 
   aps_manager.UnsubscribeFromSigninEvents();
 }
-#endif
 
 }  // namespace safe_browsing

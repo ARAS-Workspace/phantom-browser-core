@@ -34,11 +34,6 @@
 #include "content/public/test/browser_test_utils.h"
 #include "ui/views/test/views_test_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "base/test/scoped_feature_list.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class SessionRestoreInteractiveTest : public InProcessBrowserTest {
  public:
   SessionRestoreInteractiveTest() = default;
@@ -182,7 +177,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreInteractiveTest, MAYBE_FocusOnLaunch) {
 }
 
 // TODO(crbug.com/40818881, 517292406): Flaky failures.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_RestoreMinimizedWindow DISABLED_RestoreMinimizedWindow
 #else
 #define MAYBE_RestoreMinimizedWindow RestoreMinimizedWindow
@@ -273,88 +268,3 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreVerticalTabsInteractiveTest,
   ASSERT_TRUE(controller->IsCollapsed() == kIsCollapsed);
   ASSERT_TRUE(controller->GetUncollapsedWidth() == kUncollapsedWidth);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class SessionRestoreAshInteractiveTest : public SessionRestoreInteractiveTest {
- protected:
-  base::test::ScopedFeatureList scoped_feature_list_{
-      ash::features::kAshSessionRestoreDeferOccludedActiveTabLoad};
-};
-
-// Verify that only the visible active tab gets immediately loaded out of
-// session restore.
-// The test and the optimization only works for ash because the occlusion state
-// is calculated synchronously and is available when `ProcessSessionWindows`
-// finishes.
-IN_PROC_BROWSER_TEST_F(SessionRestoreAshInteractiveTest, MultiWindowTabLoad) {
-  // Make WebContents respect occlusion state.
-  base::CommandLine* cmd = base::CommandLine::ForCurrentProcess();
-  cmd->RemoveSwitch(switches::kDisableBackgroundingOccludedWindowsForTesting);
-
-  Profile* profile = browser()->GetProfile();
-
-  const gfx::Rect bounds(0, 0, 600, 400);
-
-  // Creates 2 browser windows with one fully occludes the other.
-  BrowserWindowInterface* browser1 = browser();
-  const GURL kUrlWindow1("data:,window 1");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser1, kUrlWindow1));
-  browser1->GetWindow()->SetBounds(bounds);
-
-  ui_test_utils::BrowserCreatedObserver browser_created_observer;
-  chrome::NewWindow(browser1);
-  BrowserWindowInterface* browser2 = browser_created_observer.Wait();
-  browser2->GetWindow()->SetBounds(bounds);
-
-  ui_test_utils::WaitUntilBrowserBecomeActive(browser2);
-  const GURL kUrlWindow2("data:,window 2");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser2, kUrlWindow2));
-
-  EXPECT_EQ(
-      content::Visibility::OCCLUDED,
-      browser1->GetTabStripModel()->GetActiveWebContents()->GetVisibility());
-  EXPECT_EQ(
-      content::Visibility::VISIBLE,
-      browser2->GetTabStripModel()->GetActiveWebContents()->GetVisibility());
-
-  // Quit and restore.
-  QuitMultiWindowBrowserAndRestore(profile, /*wait_for_tab_loading=*/false);
-
-  // Checks that only the active tab in "window 2" starts to load immediately.
-  int load_count = 0;
-  GURL last_loading_tab_url;
-  ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
-      [&load_count, &last_loading_tab_url](BrowserWindowInterface* browser) {
-        TabStripModel* const tab_model = browser->GetTabStripModel();
-        for (int i = 0; i < tab_model->count(); ++i) {
-          content::WebContents* const contents = tab_model->GetWebContentsAt(i);
-          if (contents->IsLoading()) {
-            ++load_count;
-            last_loading_tab_url = contents->GetLastCommittedURL();
-          }
-        }
-        return true;
-      });
-  EXPECT_EQ(1, load_count);
-  EXPECT_EQ(kUrlWindow2, last_loading_tab_url);
-
-  // Waits for "window 1" to finish load.
-  content::WebContents* contents_window1 = nullptr;
-  ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
-      [&contents_window1, &kUrlWindow1](BrowserWindowInterface* browser) {
-        TabStripModel* const tab_model = browser->GetTabStripModel();
-        for (int i = 0; i < tab_model->count(); ++i) {
-          content::WebContents* const contents = tab_model->GetWebContentsAt(i);
-          if (contents->GetLastCommittedURL() == kUrlWindow1) {
-            contents_window1 = contents;
-            return false;
-          }
-        }
-        return true;
-      });
-  EXPECT_TRUE(content::WaitForLoadStop(contents_window1));
-
-  // "window 1" should be in occluded state after load.
-  EXPECT_EQ(content::Visibility::OCCLUDED, contents_window1->GetVisibility());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)

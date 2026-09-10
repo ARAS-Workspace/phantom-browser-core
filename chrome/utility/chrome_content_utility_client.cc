@@ -27,10 +27,6 @@
 #include "content/public/child/child_thread.h"
 #include "content/public/common/content_switches.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/mojo_service_manager/connection.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 ChromeContentUtilityClient::ChromeContentUtilityClient() {
   base::ThreadGroupProfiler::SetClient(
       std::make_unique<ChromeThreadGroupProfilerClient>());
@@ -90,10 +86,3 @@ void ChromeContentUtilityClient::RegisterIOThreadServices(
     mojo::ServiceFactory& services) {
   return ::RegisterIOThreadServices(services);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-mojo::GenericPendingReceiver
-ChromeContentUtilityClient::InitMojoServiceManager() {
-  return ash::mojo_service_manager::BootstrapServiceManagerInUtilityProcess();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)

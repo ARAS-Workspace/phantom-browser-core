@@ -498,12 +498,7 @@ TEST_F(MediaSessionNotificationItemTest, GetSessionMetadata) {
   item().MediaSessionInfoChanged(std::move(session_info));
   item().UpdateDeviceName("device_friendly_name");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(u"source_title \xB7 device_friendly_name",
-            item().GetSessionMetadata().source_title);
-#else
   EXPECT_EQ(u"source_title", item().GetSessionMetadata().source_title);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST_F(MediaSessionNotificationItemTest, GetRemotePlaybackMetadata) {

@@ -10,7 +10,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #include <sys/ucontext.h>
 #elif BUILDFLAG(IS_APPLE) && \
     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
@@ -21,7 +21,7 @@
 
 namespace base {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 
 using RegisterContext = mcontext_t;
 

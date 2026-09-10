@@ -442,7 +442,6 @@ bool ChromeBrowsingDataLifetimeManager::
     return sync_disabled;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Allow clearing data if browser signin is disabled.
   if (!profile_->GetPrefs()->GetBoolean(prefs::kSigninAllowed)) {
     return true;
@@ -454,7 +453,6 @@ bool ChromeBrowsingDataLifetimeManager::
         browsing_data::prefs::kClearBrowsingDataOnExitDeletionPending, true);
     return false;
   }
-#endif
 
   // Check that sync types have been disabled if neither sync nor browser sign
   // in is disabled.

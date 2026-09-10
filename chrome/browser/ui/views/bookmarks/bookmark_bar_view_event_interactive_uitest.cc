@@ -1305,12 +1305,7 @@ class BookmarkBarViewTest11 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40282036): Fails on latest versions of ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_CloseMenuAfterClosingContextMenu \
-  DISABLED_CloseMenuAfterClosingContextMenu
-#else
 #define MAYBE_CloseMenuAfterClosingContextMenu CloseMenuAfterClosingContextMenu
-#endif
 VIEW_TEST(BookmarkBarViewTest11, MAYBE_CloseMenuAfterClosingContextMenu)
 
 // Tests showing a modal dialog from a context menu.
@@ -1636,11 +1631,7 @@ class BookmarkBarViewTest17 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40282036): Fails on latest versions of ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ContextMenus3 DISABLED_ContextMenus3
-#else
 #define MAYBE_ContextMenus3 ContextMenus3
-#endif
 VIEW_TEST(BookmarkBarViewTest17, MAYBE_ContextMenus3)
 
 // Verifies sibling menus works. Clicks on the 'all bookmarks' folder, then
@@ -1808,8 +1799,7 @@ class BookmarkBarViewTest20 : public BookmarkBarViewEventTestBase {
   }
 
   void Step3() {
-    EXPECT_EQ(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ? 1 : 2,
-              test_view_->press_count());
+    EXPECT_EQ(BUILDFLAG(IS_LINUX) ? 1 : 2, test_view_->press_count());
     EXPECT_EQ(nullptr, bb_view_->GetMenu());
     Done();
   }

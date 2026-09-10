@@ -161,9 +161,7 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/first_run/scoped_relaunch_chrome_browser_override.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "base/apple/scoped_nsautorelease_pool.h"
@@ -172,12 +170,6 @@
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/web_app_id_constants.h"
-#include "base/json/json_reader.h"
-#include "chrome/browser/web_applications/test/web_app_test_observers.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 using sessions::ContentTestHelper;
 using sessions::SerializedNavigationEntry;
@@ -274,12 +266,6 @@ class SessionRestoreTest : public InProcessBrowserTest {
   ~SessionRestoreTest() override = default;
 
  protected:
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // TODO(nkostylev): Investigate if we can remove this switch.
-    command_line->AppendSwitch(switches::kCreateBrowserOnStartupForTests);
-  }
-#endif
 
   void RegisterFakeServices(content::BrowserContext* context) {
     collaboration::messaging::MessagingBackendServiceFactory::GetInstance()
@@ -292,17 +278,6 @@ class SessionRestoreTest : public InProcessBrowserTest {
   }
 
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    const testing::TestInfo* const test_info =
-        testing::UnitTest::GetInstance()->current_test_info();
-    if (std::string_view(test_info->name()) !=
-        "NoSessionRestoreNewWindowChromeOS") {
-      // Undo the effect of kBrowserAliveWithNoWindows in defaults.cc so that we
-      // can get these test to work without quitting.
-      SessionServiceTestHelper helper(browser()->GetProfile());
-      helper.SetForceBrowserNotAliveWithNoWindows(true);
-    }
-#endif
     if (browser()) {
       SessionStartupPref pref(SessionStartupPref::LAST);
       SessionStartupPref::SetStartupPref(browser()->GetProfile(), pref);
@@ -456,7 +431,6 @@ class SessionRestoreTest : public InProcessBrowserTest {
     return count;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   Profile* CreateSecondaryProfile(int profile_num) {
     base::ScopedAllowBlockingForTesting allow_blocking;
     ProfileManager* profile_manager = g_browser_process->profile_manager();
@@ -468,7 +442,6 @@ class SessionRestoreTest : public InProcessBrowserTest {
     SessionStartupPref::SetStartupPref(profile, pref);
     return profile;
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
  private:
   // TODO(https://crbug.com/423465927): Explore a better approach to make the
@@ -626,75 +599,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, RestoredTabsHaveCorrectInitialSize) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Verify that session restore does not occur when a user opens a browser window
-// when no other browser windows are open on ChromeOS.
-// TODO(pkotwicz): Add test which doesn't open incognito browser once
-// disable-zero-browsers-open-for-tests is removed.
-// (http://crbug.com/40756809)
-// TODO(pkotwicz): Mac should have the behavior outlined by this test. It should
-// not do session restore if an incognito window is already open.
-// (http://crbug.com/40766464)
-IN_PROC_BROWSER_TEST_F(SessionRestoreTest, NoSessionRestoreNewWindowChromeOS) {
-  // When the full restore feature is enabled, session restore does occur when a
-  // user opens a browser window. So set the pref as default, open the New Tab
-  // page for this test, to verify that session restore does not occur.
-  Profile* profile = browser()->GetProfile();
-  SessionStartupPref current_pref = SessionStartupPref::GetStartupPref(profile);
-  SessionStartupPref pref(SessionStartupPref::DEFAULT);
-  SessionStartupPref::SetStartupPref(profile, pref);
-
-  GURL url(chrome_test_utils::GetTestUrl(
-      base::FilePath(base::FilePath::kCurrentDirectory),
-      base::FilePath(FILE_PATH_LITERAL("title1.html"))));
-
-  // Add a single tab.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  BrowserWindowInterface* incognito_browser = CreateIncognitoBrowser();
-  chrome::AddTabAt(incognito_browser, GURL(), -1, true);
-  incognito_browser->GetWindow()->Show();
-
-  // Close the normal browser. After this we only have the incognito window
-  // open.
-  CloseBrowserSynchronously(browser());
-
-  // Create a new window, which should open NTP.
-  ui_test_utils::BrowserCreatedObserver browser_created_observer;
-  chrome::NewWindow(incognito_browser);
-  BrowserWindowInterface* new_browser = browser_created_observer.Wait();
-  ui_test_utils::WaitUntilBrowserBecomeActive(new_browser);
-  EXPECT_NE(new_browser, incognito_browser);
-
-  ASSERT_TRUE(new_browser);
-  EXPECT_EQ(1, new_browser->GetTabStripModel()->count());
-  EXPECT_EQ(chrome::ChromeUINewTabURLAsGURL(),
-            new_browser->GetTabStripModel()->GetWebContentsAt(0)->GetURL());
-}
-
-// Test that maximized applications get restored maximized.
-IN_PROC_BROWSER_TEST_F(SessionRestoreTest, MaximizedApps) {
-  const char* app_name = "TestApp";
-  BrowserWindowInterface* app_browser =
-      CreateBrowserForApp(app_name, browser()->GetProfile());
-  app_browser->GetWindow()->Maximize();
-  app_browser->GetWindow()->Show();
-  EXPECT_TRUE(app_browser->GetWindow()->IsMaximized());
-  EXPECT_EQ(app_browser->GetType(), BrowserWindowInterface::Type::TYPE_APP);
-
-  // Close the normal browser. After this we only have the app_browser window.
-  CloseBrowserSynchronously(browser());
-
-  // Create a new window, which should open NTP.
-  chrome::NewWindow(app_browser);
-  BrowserWindowInterface* new_browser = ui_test_utils::WaitForBrowserToOpen();
-
-  ASSERT_TRUE(new_browser);
-  EXPECT_TRUE(app_browser->GetWindow()->IsMaximized());
-  EXPECT_EQ(app_browser->GetType(), BrowserWindowInterface::Type::TYPE_APP);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Creates a tabbed browser and popup and makes sure we restore both.
 IN_PROC_BROWSER_TEST_F(SessionRestoreTest, NormalAndPopup) {
   // Open a popup.
@@ -810,7 +714,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest,
   EXPECT_EQ(http_status_code, entry->GetHttpStatusCode());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // This test does not apply to ChromeOS as ChromeOS does not do session
 // restore when a new window is open.
 
@@ -842,7 +745,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, IncognitotoNonIncognito) {
   EXPECT_EQ(url,
             new_browser->GetTabStripModel()->GetWebContentsAt(0)->GetURL());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(SessionRestoreTest, RestoreForeignTab) {
   GURL url1("https://google.com");
@@ -1943,7 +1845,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, ActiveIndexUpdatedAtInsert) {
   ASSERT_EQ(new_browser->GetTabStripModel()->active_index(), 1);
 }
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC)
 // This test doesn't apply to Mac; see GetCommandLineForRelaunch for details. It
 // was disabled for ChromeOS a long time so might never have worked there.
 
@@ -1975,7 +1877,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest,
             new_browser->GetTabStripModel()->GetActiveWebContents()->GetURL());
 }
 
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_MAC)
 
 // Creates two windows, closes one, restores, make sure only one window open.
 IN_PROC_BROWSER_TEST_F(SessionRestoreTest, TwoWindowsCloseOneRestoreOnlyOne) {
@@ -2420,7 +2322,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, RecordNormalTabWindowDiff) {
 }
 
 // Test is flaky on Linux: https://crbug.com/40170555
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_LINUX)
+#if !BUILDFLAG(IS_LINUX)
 namespace {
 
 class MultiBrowserObserver : public BrowserCollectionObserver {
@@ -2566,7 +2468,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, RestoreAllBrowsers) {
                .possibly_invalid_spec();
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_LINUX)
 
 // Tracks the load order of tabs in a new browser.
 class LoadOrderObserver : public BrowserCollectionObserver,
@@ -2633,7 +2535,7 @@ class LoadOrderObserver : public BrowserCollectionObserver,
 
 // PRE_CorrectLoadingOrder is flaky on ChromeOS MSAN and Mac.
 // See http://crbug.com/40420117.
-#if (BUILDFLAG(IS_CHROMEOS) && defined(MEMORY_SANITIZER)) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_PRE_CorrectLoadingOrder DISABLED_PRE_CorrectLoadingOrder
 #define MAYBE_CorrectLoadingOrder DISABLED_CorrectLoadingOrder
 #else
@@ -2776,7 +2678,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreWithURLInCommandLineTest,
   EXPECT_EQ(GetUrl3(), tab_strip_model->GetWebContentsAt(2)->GetURL());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // This test does not apply to ChromeOS as ChromeOS does not consider command
 // line urls while determining startup tabs.
 IN_PROC_BROWSER_TEST_F(SessionRestoreWithURLInCommandLineTest,
@@ -2803,7 +2704,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreWithURLInCommandLineTest,
   EXPECT_EQ(command_line_url_, tab_strip_model->GetWebContentsAt(1)->GetURL());
   EXPECT_EQ(1, tab_strip_model->active_index());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class MultiOriginSessionRestoreTest : public SessionRestoreTest {
  public:
@@ -3632,7 +3532,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest,
   EXPECT_TRUE(helper.GetHasOpenTrackableBrowsers());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Skip for ChromeOS because the keep alive is not created for ChromeOS.
 // See https://crbug.com/40167603.
 class SessionRestoreSilentLaunchTest : public SessionRestoreTest {
@@ -3681,7 +3580,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreSilentLaunchTest, SilentLaunchAfterCrash) {
   EXPECT_EQ(ExitType::kCrashed, GetLastSessionExitType());
   EXPECT_FALSE(IsSessionServiceSavingEnabled());
 }
-#endif
 
 class AppSessionRestoreTest : public SessionRestoreTest {
  public:
@@ -3831,172 +3729,6 @@ IN_PROC_BROWSER_TEST_F(AppSessionRestoreTest, MAYBE_BasicAppSessionRestore) {
 
 // This feature is only available on ChromeOS.
 // This test opens an unclosable app and ensures that it is not restored.
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(AppSessionRestoreTest, DontTrackUnclosableApp) {
-  Profile* profile = browser()->GetProfile();
-
-  // Make sure the app is unclosable when before it is launched to influence the
-  // tracking for session restore.
-  {
-    web_app::WebAppTestInstallObserver observer(profile);
-    observer.BeginListening({ash::kCalculatorAppId});
-
-    base::ListValue web_app_settings =
-        base::JSONReader::Read(R"([
-    {
-      "manifest_id": "https://calculator.apps.chrome/",
-      "run_on_os_login": "run_windowed",
-      "prevent_close_after_run_on_os_login": true
-    }
-    ])",
-                               base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-            ->GetList()
-            .Clone();
-    profile->GetPrefs()->SetList(prefs::kWebAppSettings,
-                                 std::move(web_app_settings));
-
-    base::ListValue web_app_install_list =
-        base::JSONReader::Read(R"([
-    {
-      "url": "https://calculator.apps.chrome/",
-      "default_launch_container": "window"
-    }
-    ])",
-                               base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-            ->GetList()
-            .Clone();
-    profile->GetPrefs()->SetList(prefs::kWebAppInstallForceList,
-                                 std::move(web_app_install_list));
-
-    observer.Wait();
-  }
-
-  // Open a PWA.
-  BrowserWindowInterface* app_browser =
-      web_app::LaunchWebAppBrowserAndWait(profile, ash::kCalculatorAppId);
-
-  // Pretend to 'close the browser'.
-  // Just shutdown the services as we would if the browser is shutting down for
-  // real.
-  ShutdownServices(profile);
-
-  auto keep_alive = std::make_unique<ScopedKeepAlive>(
-      KeepAliveOrigin::SESSION_RESTORE, KeepAliveRestartOption::DISABLED);
-  auto profile_keep_alive = std::make_unique<ScopedProfileKeepAlive>(
-      profile, ProfileKeepAliveOrigin::kBrowserWindow);
-
-  // Remove unclosability setting. The browser should still not be restored
-  // because the app window was not tracked when the browser was closed.
-  profile->GetPrefs()->SetList(prefs::kWebAppSettings, base::ListValue());
-
-  // Now that SessionServices are off, we can close stuff to simulate a closure.
-  CloseBrowserSynchronously(app_browser);
-  CloseBrowserSynchronously(browser());
-
-  ASSERT_EQ(0u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  // Now trigger a restore.
-  // We need to start up the services again before restoring.
-  StartupServices(profile);
-
-  SessionRestore::RestoreSession(profile, nullptr,
-                                 SessionRestore::SYNCHRONOUS |
-                                     SessionRestore::RESTORE_APPS |
-                                     SessionRestore::RESTORE_BROWSER,
-                                 {});
-
-  ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
-      [](BrowserWindowInterface* browser) {
-        EXPECT_NE(browser->GetType(), BrowserWindowInterface::TYPE_APP);
-        return true;
-      });
-  EXPECT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  keep_alive.reset();
-  profile_keep_alive.reset();
-}
-
-IN_PROC_BROWSER_TEST_F(AppSessionRestoreTest, DontRestoreUnclosableApp) {
-  Profile* profile = browser()->GetProfile();
-
-  {
-    web_app::WebAppTestInstallObserver observer(profile);
-    observer.BeginListening({ash::kCalculatorAppId});
-
-    base::ListValue web_app_install_list =
-        base::JSONReader::Read(R"([
-    {
-      "url": "https://calculator.apps.chrome/",
-      "default_launch_container": "window"
-    }
-    ])",
-                               base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-            ->GetList()
-            .Clone();
-
-    profile->GetPrefs()->SetList(prefs::kWebAppInstallForceList,
-                                 std::move(web_app_install_list));
-
-    observer.Wait();
-  }
-
-  // Open a PWA.
-  BrowserWindowInterface* app_browser =
-      web_app::LaunchWebAppBrowserAndWait(profile, ash::kCalculatorAppId);
-
-  // Pretend to 'close the browser'.
-  // Just shutdown the services as we would if the browser is shutting down for
-  // real.
-  ShutdownServices(profile);
-
-  auto keep_alive = std::make_unique<ScopedKeepAlive>(
-      KeepAliveOrigin::SESSION_RESTORE, KeepAliveRestartOption::DISABLED);
-  auto profile_keep_alive = std::make_unique<ScopedProfileKeepAlive>(
-      profile, ProfileKeepAliveOrigin::kBrowserWindow);
-
-  // Now that SessionServices are off, we can close stuff to simulate a closure.
-  CloseBrowserSynchronously(app_browser);
-  CloseBrowserSynchronously(browser());
-
-  ASSERT_EQ(0u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  // Now trigger a restore.
-  // We need to start up the services again before restoring.
-  StartupServices(profile);
-
-  {
-    base::ListValue web_app_settings =
-        base::JSONReader::Read(R"([
-    {
-      "manifest_id": "https://calculator.apps.chrome/",
-      "run_on_os_login": "run_windowed",
-      "prevent_close_after_run_on_os_login": true
-    }
-    ])",
-                               base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-            ->GetList()
-            .Clone();
-    profile->GetPrefs()->SetList(prefs::kWebAppSettings,
-                                 std::move(web_app_settings));
-  }
-
-  SessionRestore::RestoreSession(profile, nullptr,
-                                 SessionRestore::SYNCHRONOUS |
-                                     SessionRestore::RESTORE_APPS |
-                                     SessionRestore::RESTORE_BROWSER,
-                                 {});
-
-  ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
-      [](BrowserWindowInterface* browser) {
-        EXPECT_NE(browser->GetType(), BrowserWindowInterface::TYPE_APP);
-        return true;
-      });
-  EXPECT_EQ(1u, GlobalBrowserCollection::GetInstance()->GetSize());
-
-  keep_alive.reset();
-  profile_keep_alive.reset();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // This is disabled on mac pending http://crbug.com/40758309
 #if BUILDFLAG(IS_MAC)
@@ -4486,7 +4218,6 @@ IN_PROC_BROWSER_TEST_F(AppSessionRestoreTest, NoAppRestore) {
   profile_keep_alive.reset();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class SessionRestoreRestartMetricTest : public AppSessionRestoreTest {
  public:
   SessionRestoreRestartMetricTest() {
@@ -4567,7 +4298,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreRestartMetricTest, RecordTabWindowDiff) {
   ASSERT_TRUE(histogram);
   EXPECT_EQ(histogram->SnapshotSamples()->GetCount(0), 1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Do a complex scenario that should only restore an app.
 // Have a browser session saved in disk, then open and close two separate

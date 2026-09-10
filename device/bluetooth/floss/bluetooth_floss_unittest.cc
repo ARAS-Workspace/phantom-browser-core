@@ -35,9 +35,6 @@ using ::testing::_;
 using ::testing::StrictMock;
 
 const uint8_t kTestScannerId = 10;
-#if BUILDFLAG(IS_CHROMEOS)
-const uint8_t kTestScannerId2 = 11;
-#endif
 constexpr char kTestDeviceAddr[] = "11:22:33:44:55:66";
 constexpr char kTestDeviceName[] = "FlossDevice";
 
@@ -838,97 +835,5 @@ TEST_F(BluetoothFlossTest, SetAdvertisingInterval) {
   EXPECT_EQ(static_cast<uint32_t>(1),
             GetFakeAdvertiserClient()->stop_advertising_set_called_);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(BluetoothFlossTest, StartLowEnergyScanSessions) {
-  InitializeAndEnableAdapter();
-
-  // Initial conditions
-  EXPECT_EQ(0, GetFakeLEScanClient()->scanners_registered_);
-
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      /*filter=*/nullptr, /*delegate=*/nullptr);
-  base::RunLoop().RunUntilIdle();
-
-  // We should have registered a scanner
-  EXPECT_EQ(1, GetFakeLEScanClient()->scanners_registered_);
-
-  // Register another scanner
-  auto another_background_scan_session = adapter_->StartLowEnergyScanSession(
-      /*filter=*/nullptr, /*delegate=*/nullptr);
-  base::RunLoop().RunUntilIdle();
-
-  // Should register another scanner
-  EXPECT_EQ(2, GetFakeLEScanClient()->scanners_registered_);
-
-  // Destroy one of the sessions
-  background_scan_session.reset();
-  EXPECT_EQ(1, GetFakeLEScanClient()->scanners_registered_);
-}
-
-TEST_F(BluetoothFlossTest, StartLowEnergyScanSessionWithScanResult) {
-  InitializeAndEnableAdapter();
-
-  FakeBluetoothLowEnergyScanSessionDelegate delegate;
-  GetFakeLEScanClient()->SetNextScannerUUID(
-      device::BluetoothUUID(kTestUuidStr));
-  auto background_scan_session = adapter_->StartLowEnergyScanSession(
-      /*filter=*/nullptr, delegate.GetWeakPtr());
-  base::RunLoop().RunUntilIdle();
-
-  FakeBluetoothLowEnergyScanSessionDelegate delegate2;
-  GetFakeLEScanClient()->SetNextScannerUUID(
-      device::BluetoothUUID(kTestUuidStr2));
-  auto background_scan_session2 = adapter_->StartLowEnergyScanSession(
-      /*filter=*/nullptr, delegate2.GetWeakPtr());
-  base::RunLoop().RunUntilIdle();
-
-  // Initial conditions
-  EXPECT_TRUE(GetFakeLEScanClient()->scanner_ids_.empty());
-
-  EXPECT_EQ(0, delegate.sessions_started_);
-  EXPECT_TRUE(delegate.devices_found_.empty());
-  EXPECT_EQ(0, delegate.sessions_invalidated_);
-
-  EXPECT_EQ(0, delegate2.sessions_started_);
-  EXPECT_TRUE(delegate2.devices_found_.empty());
-  EXPECT_EQ(0, delegate2.sessions_invalidated_);
-
-  // Simulate OnScannerRegistered.
-  RegisterScanner(device::BluetoothUUID(kTestUuidStr), kTestScannerId);
-  EXPECT_TRUE(GetFakeLEScanClient()->scanner_ids_.contains(kTestScannerId));
-  EXPECT_EQ(1, delegate.sessions_started_);
-  RegisterScanner(device::BluetoothUUID(kTestUuidStr2), kTestScannerId2);
-  EXPECT_TRUE(GetFakeLEScanClient()->scanner_ids_.contains(kTestScannerId2));
-  EXPECT_EQ(1, delegate2.sessions_started_);
-
-  // Simulate a scan result event
-  GetScanResult();
-  EXPECT_FALSE(std::ranges::contains(delegate.devices_found_, kTestDeviceAddr));
-
-  base::RunLoop run_loop;
-  // Because of the workaround in BluetoothAdapterFloss::AdvertisementFound
-  // we need to wait for a bit before checking if OnDeviceFound is called.
-  // TODO(b/271165074): This is not needed when Floss daemon can consolidate
-  // the OnAdvertisementFound callback together with the first advertisement
-  // data.
-  base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE, run_loop.QuitClosure(), base::Seconds(2));
-  GetAdvFound();
-  run_loop.Run();
-  // The device found should only affect the scanner that causes it.
-  EXPECT_TRUE(std::ranges::contains(delegate.devices_found_, kTestDeviceAddr));
-  EXPECT_FALSE(
-      std::ranges::contains(delegate2.devices_found_, kTestDeviceAddr));
-
-  // Check that the scanned device is in the devices_ map so clients can
-  // access the device.
-  BluetoothDevice* device = adapter_->GetDevice(kTestDeviceAddr);
-  EXPECT_NE(nullptr, device);
-
-  adapter_->Shutdown();
-  EXPECT_EQ(1, delegate.sessions_invalidated_);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace floss

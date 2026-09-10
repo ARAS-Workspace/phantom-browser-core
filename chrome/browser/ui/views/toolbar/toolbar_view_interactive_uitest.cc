@@ -506,12 +506,7 @@ IN_PROC_BROWSER_TEST_P(ToolbarViewTest,
 }
 
 // TODO(crbug.com/41474891): Setup test profiles properly for CrOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ExtensionsToolbarDesktopForGuest \
-  DISABLED_ExtensionsToolbarDesktopForGuest
-#else
 #define MAYBE_ExtensionsToolbarDesktopForGuest ExtensionsToolbarDesktopForGuest
-#endif
 IN_PROC_BROWSER_TEST_P(ToolbarViewTest,
                        MAYBE_ExtensionsToolbarDesktopForGuest) {
   // Verify guest browser does not have an extensions toolbar container.
@@ -560,11 +555,7 @@ IN_PROC_BROWSER_TEST_P(ToolbarViewTest, MAYBE_BackButtonMenu) {
 }
 
 // TODO(crbug.com/402492418): Find workaround for Mac and ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_SplitTabsToolbarButton DISABLED_SplitTabsToolbarButton
-#else
 #define MAYBE_SplitTabsToolbarButton SplitTabsToolbarButton
-#endif
 IN_PROC_BROWSER_TEST_P(ToolbarViewTest, MAYBE_SplitTabsToolbarButton) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContents1Id);
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContents2Id);

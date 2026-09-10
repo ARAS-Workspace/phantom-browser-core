@@ -57,10 +57,6 @@
 #include "ui/wm/core/wm_state.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/views/examples/examples_views_delegate_chromeos.h"
-#endif
-
 #if BUILDFLAG(ENABLE_DESKTOP_AURA)
 #include "ui/views/widget/desktop_aura/desktop_screen.h"
 #endif
@@ -173,9 +169,6 @@ ExamplesExitCode ExamplesMainProc(bool under_test, ExampleVector examples) {
   ExamplesExitCode compare_result = ExamplesExitCode::kSucceeded;
 
   {
-#if BUILDFLAG(IS_CHROMEOS)
-    ExamplesViewsDelegateChromeOS views_delegate;
-#else  // BUILDFLAG(IS_CHROMEOS)
     views::DesktopTestViewsDelegate views_delegate;
 #if BUILDFLAG(IS_MAC)
     views_delegate.set_context_factory(context_factories->GetContextFactory());
@@ -183,7 +176,6 @@ ExamplesExitCode ExamplesMainProc(bool under_test, ExampleVector examples) {
 #if defined(USE_AURA)
     wm::WMState wm_state;
 #endif
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_MAC)
     display::ScopedNativeScreen desktop_screen;
 #elif BUILDFLAG(ENABLE_DESKTOP_AURA)

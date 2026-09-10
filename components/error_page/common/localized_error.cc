@@ -777,7 +777,7 @@ void GetSuggestionsSummaryList(int error_code,
 
 // If the current platform has a directly accesible network diagnostics tool and
 // the URL is valid add a suggestion.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (IsOnlySuggestion(suggestions, SUGGEST_DIAGNOSE_TOOL)) {
     int diagose_message_id =
         error_code == error_page::DNS_PROBE_FINISHED_NXDOMAIN
@@ -794,7 +794,7 @@ void GetSuggestionsSummaryList(int error_code,
   }
 #else
   DCHECK(!IsSuggested(suggestions, SUGGEST_DIAGNOSE_TOOL));
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
   // Add list prefix header.
   error_strings.Set(
@@ -1137,12 +1137,6 @@ LocalizedError::PageState LocalizedError::GetPageState(
     reload_button.Set("reloadUrl", failed_url.spec());
     result.strings.Set("reloadButton", std::move(reload_button));
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS has its own diagnostics extension, which doesn't rely on a
-  // browser-initiated dialog.
-  can_show_network_diagnostics_dialog = true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Add default suggestions and any relevant supporting details.
   GetSuggestionsSummaryList(error_code, result.strings, options.suggestions,

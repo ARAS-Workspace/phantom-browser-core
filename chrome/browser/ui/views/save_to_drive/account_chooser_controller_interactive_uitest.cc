@@ -364,13 +364,8 @@ IN_PROC_BROWSER_TEST_F(AccountChooserControllerInteractiveUiTest,
 }
 
 // TODO(481839673): Re-enable on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_RemoveOneAccountFromMultipleAccounts \
-  DISABLED_RemoveOneAccountFromMultipleAccounts
-#else
 #define MAYBE_RemoveOneAccountFromMultipleAccounts \
   RemoveOneAccountFromMultipleAccounts
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Steps:
 // 1. Call GetAccount with multiple accounts.
@@ -415,7 +410,6 @@ IN_PROC_BROWSER_TEST_F(AccountChooserControllerInteractiveUiTest,
 
 // This test doesn't make sense for ChromeOS. ChromeOS requires at least one
 // account.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Steps:
 // 1. Call GetAccount with one account.
 // 2. Remove the account.
@@ -434,7 +428,6 @@ IN_PROC_BROWSER_TEST_F(AccountChooserControllerInteractiveUiTest,
           &persisted_account),
       VerifyPopupOpened());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Steps:
 // 1. Call GetAccount with a signed out primary account.

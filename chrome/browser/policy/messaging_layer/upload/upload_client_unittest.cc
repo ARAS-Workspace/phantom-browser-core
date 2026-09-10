@@ -32,14 +32,6 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/test/base/testing_profile.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/test_helper.h"
-#include "google_apis/gaia/core_account_id.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace reporting {
 namespace {
 
@@ -71,26 +63,9 @@ class UploadClientTest : public ::testing::TestWithParam<
     memory_resource_ =
         base::MakeRefCounted<ResourceManager>(4u * 1024LLu * 1024LLu);  // 4 MiB
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Set up fake primary profile.
-    auto fake_user_manager = std::make_unique<ash::FakeChromeUserManager>();
-    profile_ = std::make_unique<TestingProfile>(
-        base::FilePath(FILE_PATH_LITERAL("/home/chronos/u-0123456789abcdef")));
-    const AccountId account_id(AccountId::FromUserEmailGaiaId(
-        profile_->GetProfileUserName(), GaiaId("12345")));
-    fake_user_manager->AddPublicAccountUser(account_id);
-    fake_user_manager->UserLoggedIn(
-        account_id, user_manager::TestHelper::GetFakeUsernameHash(account_id));
-    user_manager_ = std::make_unique<user_manager::ScopedUserManager>(
-        std::move(fake_user_manager));
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager_.reset();
-    profile_.reset();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     EXPECT_THAT(memory_resource_->GetUsed(), Eq(0uL));
   }
 
@@ -100,10 +75,6 @@ class UploadClientTest : public ::testing::TestWithParam<
 
   content::BrowserTaskEnvironment task_environment_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<TestingProfile> profile_;
-  std::unique_ptr<user_manager::ScopedUserManager> user_manager_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   scoped_refptr<ResourceManager> memory_resource_;
 };
 
@@ -113,10 +84,6 @@ using TestConfigFileAttached = MockFunction<void(ConfigFile)>;
 TEST_P(UploadClientTest, CreateUploadClientAndUploadRecords) {
   static constexpr int64_t kExpectedCallTimes = 10;
   static constexpr int64_t kGenerationId = 1234;
-#if BUILDFLAG(IS_CHROMEOS)
-  static constexpr char kGenerationGuid[] =
-      "c947e7e9-b87d-4592-9fe7-407792544e53";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   base::DictValue data;
   data.Set("TEST_KEY", "TEST_VALUE");
@@ -141,9 +108,6 @@ TEST_P(UploadClientTest, CreateUploadClientAndUploadRecords) {
         encrypted_record.mutable_sequence_information();
     sequence_information->set_sequencing_id(i);
     sequence_information->set_generation_id(kGenerationId);
-#if BUILDFLAG(IS_CHROMEOS)
-    sequence_information->set_generation_guid(kGenerationGuid);
-#endif  // BUILDFLAG(IS_CHROMEOS)
     sequence_information->set_priority(Priority::IMMEDIATE);
     ScopedReservation record_reservation(encrypted_record.ByteSizeLong(),
                                          memory_resource_);
@@ -178,18 +142,6 @@ TEST_P(UploadClientTest, CreateUploadClientAndUploadRecords) {
   auto test_env = std::make_unique<ReportingServerConnector::TestEnvironment>();
 
   static constexpr char matched_record_template[] =
-#if BUILDFLAG(IS_CHROMEOS)
-      R"JSON(
-{
-  "sequenceInformation": {
-    "generationId": "1234",
-    "generationGuid": "c947e7e9-b87d-4592-9fe7-407792544e53",
-    "priority": 1,
-    "sequencingId": "%d"
-  }
-}
-)JSON"
-#else   // BUILDFLAG(IS_CHROMEOS)
       R"JSON(
 {
   "sequenceInformation": {
@@ -199,7 +151,6 @@ TEST_P(UploadClientTest, CreateUploadClientAndUploadRecords) {
   }
 }
 )JSON"
-#endif  // BUILDFLAG(IS_CHROMEOS)
       ;
 
   test::TestMultiEvent<SequenceInformation, bool> upload_success_event;

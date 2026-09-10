@@ -11,12 +11,6 @@
 #include "build/build_config.h"
 #include "remoting/protocol/file_transfer_helpers.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-// `nogncheck` prevents false positive 'missing dependency' errors on
-// non-chromeos builds.
-#include "chrome/common/chrome_paths.h"  // nogncheck
-#endif
-
 namespace remoting {
 
 namespace {
@@ -41,11 +35,7 @@ protocol::FileTransferResult<base::FilePath> GetFileUploadDirectory() {
     CHECK_IS_TEST();
     return *g_upload_directory_for_testing;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  return GetDirectory(chrome::DIR_DEFAULT_DOWNLOADS_SAFE);
-#else
   return GetDirectory(base::DIR_USER_DESKTOP);
-#endif
 }
 
 void SetFileUploadDirectoryForTesting(base::FilePath dir) {

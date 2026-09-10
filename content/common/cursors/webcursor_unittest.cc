@@ -70,25 +70,14 @@ TEST(WebCursorTest, WebCursorCursorConstructorCustom) {
   TestScreen screen(display);
   webcursor.UpdateDisplayInfoForWindow(nullptr);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(webcursor.has_custom_cursor_for_test());
-#else
   EXPECT_TRUE(webcursor.has_custom_cursor_for_test());
-#endif
 
   native_cursor = webcursor.GetNativeCursor();
   EXPECT_TRUE(webcursor.has_custom_cursor_for_test());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Hotspot should be scaled & rotated. We're using the icon created for 2.0,
-  // on the display with dsf=1.0, so the hotspot should be
-  // ((32 - 20) / 2, 10 / 2) = (6, 5).
-  EXPECT_EQ(gfx::Point(6, 5), native_cursor.custom_hotspot());
-#else
   // For non-CrOS platforms, the cursor mustn't be rotated as logical and
   // physical location is the same.
   EXPECT_EQ(gfx::Point(5, 10), native_cursor.custom_hotspot());
-#endif
 
   aura::client::SetCursorShapeClient(nullptr);
 #endif  // defined(USE_AURA)
@@ -110,19 +99,10 @@ TEST(WebCursorTest, CursorScaleFactor) {
   TestScreen screen(display);
   webcursor.UpdateDisplayInfoForWindow(nullptr);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // In Ash, the size of the cursor is capped at 64px unless the hardware
-  // advertises support for bigger cursors.
-  const gfx::Size kDefaultMaxSize = gfx::Size(64, 64);
-  EXPECT_EQ(gfx::SkISizeToSize(
-                webcursor.GetNativeCursor().custom_bitmap().dimensions()),
-            kDefaultMaxSize);
-#else
   EXPECT_EQ(
       gfx::SkISizeToSize(
           webcursor.GetNativeCursor().custom_bitmap().dimensions()),
       gfx::ScaleToFlooredSize(gfx::Size(128, 128), kDeviceScale / kImageScale));
-#endif
 
   // The scale factor of the cursor image should match the device scale factor,
   // regardless of the cursor size.

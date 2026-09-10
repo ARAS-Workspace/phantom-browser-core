@@ -264,22 +264,11 @@ class SimplePolicyPrefMappingTest {
 
     const base::Value* default_value = test.Find("default_value");
     const base::Value* default_for_enterprise_users = nullptr;
-#if BUILDFLAG(IS_CHROMEOS)
-    default_for_enterprise_users = test.Find("default_for_enterprise_users");
-    if (!default_value && !default_for_enterprise_users) {
-      ADD_FAILURE()
-          << "Simple test for " << policy_name
-          << " is missing a 'default_value' (or alternatively a "
-             "'default_for_enterprise_users' if the policy defines one)";
-      return;
-    }
-#else   // BUILDFLAG(IS_CHROMEOS)
     if (!default_value && is_os_supported) {
       ADD_FAILURE() << "Simple test for " << policy_name
                     << " is missing a 'default_value'";
       return;
     }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     const base::ListValue* values_to_test = test.FindList("values_to_test");
     if (!values_to_test || values_to_test->empty()) {
@@ -430,8 +419,6 @@ class PolicyTestCase {
     const std::string os("desktop_android");
 #elif BUILDFLAG(IS_ANDROID)
     const std::string os("android");
-#elif BUILDFLAG(IS_CHROMEOS)
-    const std::string os("chromeos");
 #elif BUILDFLAG(IS_IOS)
     const std::string os("ios");
 #elif BUILDFLAG(IS_LINUX)
@@ -595,9 +582,6 @@ void SetProviderPolicy(MockConfigurationPolicyProvider* provider,
                        const base::DictValue& policies_settings,
                        PolicyLevel level) {
   PolicyMap policy_map;
-#if BUILDFLAG(IS_CHROMEOS)
-  SetEnterpriseUsersDefaults(&policy_map);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   for (auto it : policies) {
     const PolicyDetails* policy_details = GetChromePolicyDetails(it.first);
     const PolicySettings policy_settings =

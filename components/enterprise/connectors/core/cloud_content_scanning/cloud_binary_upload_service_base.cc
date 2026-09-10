@@ -288,9 +288,6 @@ void CloudBinaryUploadServiceBase::SetAuthForTesting(
            AnalysisConnector::FILE_ATTACHED,
            AnalysisConnector::BULK_DATA_ENTRY,
            AnalysisConnector::PRINT,
-#if BUILDFLAG(IS_CHROMEOS)
-           AnalysisConnector::FILE_TRANSFER,
-#endif
        }) {
     TokenAndConnector token_and_connector = {dm_token, connector};
     can_upload_enterprise_data_[token_and_connector] = auth_check_result;
@@ -416,16 +413,6 @@ void CloudBinaryUploadServiceBase::IsAuthorized(const GURL& url,
       request->set_device_token(dm_token);
       request->set_analysis_connector(connector);
       request->set_per_profile_request(per_profile_request);
-
-#if BUILDFLAG(IS_CHROMEOS)
-      // WebProtect handles requests from ChromeOS Managed Guest Sessions
-      // differently, as it cannot rely on the GAIA ID to determine whether or
-      // not the user has the BCE license.
-      ClientMetadata client_metadata;
-      client_metadata.set_is_chrome_os_managed_guest_session(
-          delegate_->IsManagedGuestSession());
-      request->set_client_metadata(std::move(client_metadata));
-#endif
 
       QueueForDeepScanning(std::move(request));
     }

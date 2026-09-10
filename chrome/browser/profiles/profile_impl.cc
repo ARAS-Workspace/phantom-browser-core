@@ -192,35 +192,6 @@
 #include "services/service_manager/public/cpp/service.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "ash/constants/ash_switches.h"
-#include "base/check_deref.h"
-#include "base/command_line.h"
-#include "chrome/browser/app_mode/app_mode_utils.h"
-#include "chrome/browser/ash/account_manager/account_manager_util.h"
-#include "chrome/browser/ash/app_mode/app_launch_utils.h"
-#include "chrome/browser/ash/arc/session/arc_service_launcher.h"
-#include "chrome/browser/ash/locale/locale_change_guard.h"
-#include "chrome/browser/ash/login/session/user_session_manager.h"
-#include "chrome/browser/ash/policy/core/user_cloud_policy_manager_ash.h"
-#include "chrome/browser/ash/policy/core/user_cloud_policy_manager_factory_ash.h"
-#include "chrome/browser/ash/preferences/preferences.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/ash/secure_channel/secure_channel_client_provider.h"
-#include "chrome/browser/ash/settings/device_settings_service.h"
-#include "chrome/browser/browser_process_platform_part.h"  // nogncheck crbug.com/40147906
-#include "chrome/browser/global_features.h"
-#include "chrome/browser/signin/chrome_device_id_helper.h"
-#include "chromeos/ash/components/account_manager/account_manager_factory.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#include "components/account_manager_core/chromeos/account_manager.h"
-#include "components/session_manager/core/session_manager.h"
-#include "components/user_manager/user.h"
-#include "components/user_manager/user_manager.h"
-#include "components/version_info/version_info.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/android/profile_key_startup_accessor.h"
 #include "chrome/browser/password_manager/factories/password_manager_settings_service_factory.h"
@@ -328,24 +299,11 @@ base::Time CreateProfileDirectory(base::SequencedTaskRunner* io_task_runner,
   return base::Time::Now();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Checks if |new_locale| is the same as |pref_locale| or |pref_locale| is used
-// to show UI translation for |new_locale|. (e.g. "it" is used for "it-CH")
-bool LocaleNotChanged(const std::string& pref_locale,
-                      const std::string& new_locale) {
-  std::string new_locale_converted = new_locale;
-  language::ConvertToActualUILocale(&new_locale_converted);
-  return pref_locale == new_locale_converted;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS)
 ProfileImpl::CloudPolicyManagerTestFactory&
 GetTestingCloudPolicyManagerFactory() {
   static base::NoDestructor<ProfileImpl::CloudPolicyManagerTestFactory> factory;
   return *factory;
 }
-#endif
 
 }  // namespace
 
@@ -442,7 +400,7 @@ void ProfileImpl::RegisterProfilePrefs(
 #endif  // !BUILDFLAG(IS_ANDROID)
   registry->RegisterTimePref(prefs::kProfileCreationTime, base::Time());
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(ENABLE_PDF_INK2)
+#if BUILDFLAG(ENABLE_PDF_INK2)
   registry->RegisterBooleanPref(prefs::kPdfAnnotationsEnabled, true);
 #endif
   registry->RegisterIntegerPref(prefs::kEnterpriseBadgingTemporarySetting, 0);
@@ -450,13 +408,11 @@ void ProfileImpl::RegisterProfilePrefs(
   registry->RegisterUint64Pref(prefs::kLomProfileId, 0u);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // static
 void ProfileImpl::SetCloudPolicyManagerFactoryForTesting(
     CloudPolicyManagerTestFactory factory) {
   GetTestingCloudPolicyManagerFactory() = std::move(factory);
 }
-#endif
 
 ProfileImpl::ProfileImpl(
     const base::FilePath& path,
@@ -474,28 +430,16 @@ ProfileImpl::ProfileImpl(
   DCHECK(!path.empty()) << "Using an empty path will attempt to write "
                         << "profile files to the root directory!";
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // In ChromeOS Guest Mode, there can be only three profiles, main guest
-  // profile, otr guest profile and sign in profile, and only main and otr ,
-  // which are 'user profile', should be the guest
   bool is_guest_session = path == ProfileManager::GetGuestProfilePath();
-  if (new_guest_profile_impl_) {
-    is_guest_session = base::CommandLine::ForCurrentProcess()->HasSwitch(
-                           ash::switches::kGuestSession) &&
-                       ash::IsUserBrowserContextBaseName(path_.BaseName());
-  }
-#else
-  bool is_guest_session = path == ProfileManager::GetGuestProfilePath();
-#endif
 
   if (is_guest_session) {
     profile_metrics::SetBrowserProfileType(
         this, profile_metrics::BrowserProfileType::kGuest);
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   } else if (path == ProfileManager::GetSystemProfilePath()) {
     profile_metrics::SetBrowserProfileType(
         this, profile_metrics::BrowserProfileType::kSystem);
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
   } else {
     profile_metrics::SetBrowserProfileType(
         this, profile_metrics::BrowserProfileType::kRegular);
@@ -521,32 +465,6 @@ ProfileImpl::ProfileImpl(
   user_prefs::UserPrefs::Set(this, prefs_.get());
 
   SimpleKeyMap::GetInstance()->Associate(this, key_.get());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/40225390): Move this into
-  // ProfileUserManagerController::OnProfileCreationStarted().
-  if (ash::ProfileHelper::IsUserProfile(this)) {
-    // TODO(crbug.com/404133029): Avoid g_browser_process usage.
-    scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory =
-        g_browser_process->shared_url_loader_factory();
-
-    // |ash::InitializeAccountManager| is called during a User's session
-    // initialization but some tests do not properly login to a User Session.
-    // This invocation of |ash::InitializeAccountManager| is used only during
-    // tests.
-    // Note: |ash::InitializeAccountManager| is idempotent and safe to call
-    // multiple times.
-    // Consider removing this initialization and fixing failing tests.
-    // See https://crbug.com/40635309 for reference.
-    ash::InitializeAccountManager(
-        std::move(shared_url_loader_factory), path_,
-        base::DoNothing() /* initialization_callback */);
-
-    auto* account_manager =
-        ash::AccountManagerFactory::Get()->GetAccountManager(path_.value());
-    account_manager->SetPrefService(GetPrefs());
-  }
-#endif
 
   if (async_prefs) {
     // Wait for the notification that prefs has been loaded
@@ -610,21 +528,6 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
 
   policy::CloudPolicyManager* cloud_policy_manager = nullptr;
   policy::ConfigurationPolicyProvider* policy_provider = nullptr;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (force_immediate_policy_load)
-    ash::DeviceSettingsService::Get()->LoadImmediately();
-  else
-    ash::DeviceSettingsService::Get()->LoadIfNotPresent();
-
-  user_cloud_policy_manager_ash_ = policy::CreateUserCloudPolicyManagerAsh(
-      g_browser_process->local_state(),
-      g_browser_process->shared_url_loader_factory(),
-      g_browser_process->platform_part()->browser_policy_connector_ash(), this,
-      force_immediate_policy_load, io_task_runner_);
-
-  cloud_policy_manager = nullptr;
-  policy_provider = GetUserCloudPolicyManagerAsh();
-#else  // !BUILDFLAG(IS_CHROMEOS)
   {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     if (GetTestingCloudPolicyManagerFactory()) {
@@ -675,7 +578,6 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
     }
     policy_provider = cloud_policy_manager;
   }
-#endif
   profile_policy_connector_ =
       policy::CreateProfilePolicyConnectorForBrowserContext(
           schema_registry_service_->registry(), cloud_policy_manager,
@@ -683,9 +585,6 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
           force_immediate_policy_load, this);
 
   bool is_signin_profile = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  is_signin_profile = ash::ProfileHelper::IsSigninProfile(this);
-#endif
   ::RegisterProfilePrefs(is_signin_profile,
                          g_browser_process->GetApplicationLocale(),
                          pref_registry_.get());
@@ -793,12 +692,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
     // ChromeOS because Chrome is always running, no need for special keep-alive
     // or launch-on-startup support unless kKeepAliveForTest is set.
     bool init_background_mode_manager = true;
-#if BUILDFLAG(IS_CHROMEOS)
-    if (!base::CommandLine::ForCurrentProcess()->HasSwitch(
-            switches::kKeepAliveForTest)) {
-      init_background_mode_manager = false;
-    }
-#endif
     if (init_background_mode_manager &&
         g_browser_process->background_mode_manager()) {
       g_browser_process->background_mode_manager()->RegisterProfile(this);
@@ -817,16 +710,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
   // as a URLDataSource early.
   dom_distiller::RegisterViewerSource(this);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  MigrateSigninScopedDeviceId(this);
-
-  if (ash::UserSessionManager::GetInstance()
-          ->RestartToApplyPerSessionFlagsIfNeed(this, true)) {
-    return;
-  }
-#endif
-
-#if !BUILDFLAG(IS_CHROMEOS)
   // Listen for bookmark model load, to bootstrap the sync service.
   // Not necessary for profiles that don't have a BookmarkModel.
   // On CrOS sync service will be initialized after sign in.
@@ -836,7 +719,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
     // completes.
     new BookmarkModelLoadedObserver(this, model);
   }
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // Bootstrap and initialize the Gapis service.
@@ -1164,19 +1046,8 @@ void ProfileImpl::OnLocaleReady(CreateMode create_mode) {
 
 void ProfileImpl::OnSyncToSigninMigrationMaybeCompleted(
     CreateMode create_mode) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // If this is a kiosk profile, reset some of its prefs which should not
-  // persist between sessions.
-  if (IsRunningInForcedAppMode()) {
-    ash::ResetEphemeralKioskPreferences(prefs_.get());
-  }
-#endif
 
   g_browser_process->profile_manager()->InitProfileUserPrefs(this);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  arc::ArcServiceLauncher::Get()->MaybeSetProfile(this);
-#endif
 
   SimpleDependencyManager::GetInstance()->CreateServices(GetProfileKey());
 
@@ -1211,22 +1082,7 @@ void ProfileImpl::OnPrefsLoaded(CreateMode create_mode, bool success) {
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  switch (create_mode) {
-    case CreateMode::kSynchronous:
-      // Synchronous create mode implies that either it is restart after crash,
-      // or we are in tests. In both cases the first loaded locale is correct.
-      OnLocaleReady(create_mode);
-      break;
-    case CreateMode::kAsynchronous:
-      ash::UserSessionManager::GetInstance()->RespectLocalePreferenceWrapper(
-          this, base::BindOnce(&ProfileImpl::OnLocaleReady,
-                               base::Unretained(this), create_mode));
-      break;
-  }
-#else
   OnLocaleReady(create_mode);
-#endif
 
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   // SessionService depends on Profile::GetPrefs() and therefore shouldn't be
@@ -1310,11 +1166,6 @@ policy::SchemaRegistryService* ProfileImpl::GetPolicySchemaRegistryService() {
   return schema_registry_service_.get();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-policy::UserCloudPolicyManagerAsh* ProfileImpl::GetUserCloudPolicyManagerAsh() {
-  return user_cloud_policy_manager_ash_.get();
-}
-#else
 policy::UserCloudPolicyManager* ProfileImpl::GetUserCloudPolicyManager() {
   return user_cloud_policy_manager_.get();
 }
@@ -1322,12 +1173,8 @@ policy::UserCloudPolicyManager* ProfileImpl::GetUserCloudPolicyManager() {
 policy::ProfileCloudPolicyManager* ProfileImpl::GetProfileCloudPolicyManager() {
   return profile_cloud_policy_manager_.get();
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 policy::CloudPolicyManager* ProfileImpl::GetCloudPolicyManager() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return GetUserCloudPolicyManagerAsh();
-#else
   if (user_cloud_policy_manager_) {
     return GetUserCloudPolicyManager();
   }
@@ -1335,22 +1182,15 @@ policy::CloudPolicyManager* ProfileImpl::GetCloudPolicyManager() {
     return GetProfileCloudPolicyManager();
   }
   return nullptr;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 policy::ConfigurationPolicyProvider*
 ProfileImpl::configuration_policy_provider() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (user_cloud_policy_manager_ash_)
-    return user_cloud_policy_manager_ash_.get();
-  return nullptr;
-#else  // !BUILDFLAG(IS_CHROMEOS)
   if (user_cloud_policy_manager_.get()) {
     return user_cloud_policy_manager_.get();
   } else {
     return profile_cloud_policy_manager_.get();
   }
-#endif
 }
 
 policy::ProfilePolicyConnector* ProfileImpl::GetProfilePolicyConnector() {
@@ -1504,128 +1344,6 @@ void ProfileImpl::EnsureSessionServiceCreated() {
   SessionServiceFactory::GetForProfile(this);
 }
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-void ProfileImpl::ChangeAppLocale(const std::string& new_locale,
-                                  AppLocaleChangedVia via) {
-  if (new_locale.empty()) {
-    NOTREACHED();
-  }
-  PrefService* local_state = g_browser_process->local_state();
-  DCHECK(local_state);
-  if (local_state->IsManagedPreference(language::prefs::kApplicationLocale))
-    return;
-  std::string pref_locale =
-      GetPrefs()->GetString(language::prefs::kApplicationLocale);
-  language::ConvertToActualUILocale(&pref_locale);
-  bool do_update_pref = true;
-  switch (via) {
-    case APP_LOCALE_CHANGED_VIA_SETTINGS:
-    case APP_LOCALE_CHANGED_VIA_REVERT: {
-      // We keep kApplicationLocaleBackup value as a reference.  In case value
-      // of kApplicationLocale preference would change due to sync from other
-      // device then kApplicationLocaleBackup value will trigger and allow us to
-      // show notification about automatic locale change in LocaleChangeGuard.
-      GetPrefs()->SetString(ash::prefs::kApplicationLocaleBackup, new_locale);
-      GetPrefs()->ClearPref(ash::prefs::kApplicationLocaleAccepted);
-      // We maintain kApplicationLocale property in both a global storage
-      // and user's profile.  Global property determines locale of login screen,
-      // while user's profile determines their personal locale preference.
-      break;
-    }
-    case APP_LOCALE_CHANGED_VIA_LOGIN:
-    case APP_LOCALE_CHANGED_VIA_PUBLIC_SESSION_LOGIN: {
-      if (!pref_locale.empty()) {
-        DCHECK(LocaleNotChanged(pref_locale, new_locale));
-
-        if (!locale_change_guard_) {
-          locale_change_guard_ = std::make_unique<ash::LocaleChangeGuard>(
-              local_state,
-              g_browser_process->GetFeatures()->application_locale_storage(),
-              this);
-        }
-        locale_change_guard_->set_locale_changed_during_login(true);
-
-        std::string accepted_locale =
-            GetPrefs()->GetString(ash::prefs::kApplicationLocaleAccepted);
-        if (accepted_locale == new_locale) {
-          // If locale is accepted then we do not want to show LocaleChange
-          // notification.  This notification is triggered by different values
-          // of kApplicationLocaleBackup and kApplicationLocale preferences,
-          // so make them identical.
-          GetPrefs()->SetString(ash::prefs::kApplicationLocaleBackup,
-                                new_locale);
-        } else {
-          // Back up locale of login screen.
-          std::string cur_locale = g_browser_process->GetApplicationLocale();
-          GetPrefs()->SetString(ash::prefs::kApplicationLocaleBackup,
-                                cur_locale);
-          locale_change_guard_->PrepareChangingLocale(cur_locale, new_locale);
-        }
-      } else {
-        std::string cur_locale = g_browser_process->GetApplicationLocale();
-        std::string backup_locale =
-            GetPrefs()->GetString(ash::prefs::kApplicationLocaleBackup);
-        // Profile synchronization takes time and is not completed at that
-        // moment at first login.  So we initialize locale preference in steps:
-        // (1) first save it to temporary backup;
-        // (2) on next login we assume that synchronization is already completed
-        //     and we may finalize initialization.
-        GetPrefs()->SetString(ash::prefs::kApplicationLocaleBackup, cur_locale);
-        if (!new_locale.empty())
-          GetPrefs()->SetString(language::prefs::kApplicationLocale,
-                                new_locale);
-        else if (!backup_locale.empty())
-          GetPrefs()->SetString(language::prefs::kApplicationLocale,
-                                backup_locale);
-        do_update_pref = false;
-      }
-      break;
-    }
-    case APP_LOCALE_CHANGED_VIA_POLICY: {
-      // If the locale change has been triggered by policy, the original locale
-      // is not allowed and can't be switched back to.
-      GetPrefs()->SetString(ash::prefs::kApplicationLocaleBackup, new_locale);
-      break;
-    }
-    case APP_LOCALE_CHANGED_VIA_DEMO_SESSION_REVERT:
-    case APP_LOCALE_CHANGED_VIA_SYSTEM_TRAY: {
-      // no-op
-      break;
-    }
-    case APP_LOCALE_CHANGED_VIA_UNKNOWN: {
-      NOTREACHED();
-    }
-  }
-  if (do_update_pref)
-    GetPrefs()->SetString(language::prefs::kApplicationLocale, new_locale);
-  if (via != APP_LOCALE_CHANGED_VIA_PUBLIC_SESSION_LOGIN)
-    local_state->SetString(language::prefs::kApplicationLocale, new_locale);
-
-  if (user_manager::UserManager::Get()->GetOwnerAccountId() ==
-      ash::ProfileHelper::Get()->GetUserByProfile(this)->GetAccountId())
-    local_state->SetString(ash::prefs::kOwnerLocale, new_locale);
-}
-
-void ProfileImpl::OnLogin() {
-  if (!locale_change_guard_) {
-    locale_change_guard_ = std::make_unique<ash::LocaleChangeGuard>(
-        g_browser_process->local_state(),
-        g_browser_process->GetFeatures()->application_locale_storage(), this);
-  }
-  locale_change_guard_->OnLogin();
-}
-
-void ProfileImpl::InitChromeOSPreferences() {
-  chromeos_preferences_ = std::make_unique<ash::Preferences>(
-      g_browser_process->local_state(),
-      g_browser_process->GetFeatures()->application_locale_storage(),
-      g_browser_process->platform_part()->GetTimezoneResolverManager());
-  chromeos_preferences_->Init(
-      this, ash::ProfileHelper::Get()->GetUserByProfile(this));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 bool ProfileImpl::IsNewProfile() const {
 #if !BUILDFLAG(IS_ANDROID)

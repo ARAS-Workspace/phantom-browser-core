@@ -7,10 +7,6 @@
 
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/enterprise/data_controls/core/browser/component.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace data_controls {
 
 struct ActionSource {
@@ -79,9 +75,6 @@ struct ActionDestination {
   // profile-bound attributes like `incognito`.
   bool gemini_in_chrome = false;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  Component component = Component::kUnknownComponent;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 // Generic struct that represents metadata about an action involved in Data

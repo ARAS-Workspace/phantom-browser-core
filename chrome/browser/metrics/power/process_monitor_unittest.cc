@@ -48,8 +48,7 @@ class FakeProcessMetricsDelegate : public ProcessMetricsDelegate {
     return cpu_usage_;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   int GetIdleWakeupsPerSecond() override { return 0; }
 #endif
 

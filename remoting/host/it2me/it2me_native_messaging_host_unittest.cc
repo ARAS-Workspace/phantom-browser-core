@@ -339,10 +339,6 @@ void It2MeNativeMessagingHostTest::SetUp() {
       base::BindOnce(&It2MeNativeMessagingHostTest::ExitTest,
                      base::Unretained(this)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  test_url_loader_factory_ = new network::TestSharedURLLoaderFactory();
-#endif
-
   host_task_runner_->PostTask(
       FROM_HERE, base::BindOnce(&It2MeNativeMessagingHostTest::StartHost,
                                 base::Unretained(this)));
@@ -711,12 +707,12 @@ TEST_F(It2MeNativeMessagingHostTest,
   params.connection_auto_accept_timeout = base::Hours(8);
   params.request_origin = ChromeOsEnterpriseRequestOrigin::kEnterpriseAdmin;
   params.audio_playback = ChromeOsEnterpriseAudioPlayback::kLocalOnly;
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   it2me_host_raw_ptr_->set_chrome_os_enterprise_params(params);
 #endif
   WriteMessageToInputPipe(connect_message);
   VerifyConnectResponses(next_id);
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   ASSERT_TRUE(get_chrome_os_enterprise_params().has_value());
   ASSERT_TRUE(get_chrome_os_enterprise_params()->suppress_user_dialogs);
   ASSERT_TRUE(get_chrome_os_enterprise_params()->suppress_notifications);
@@ -742,7 +738,7 @@ TEST_F(It2MeNativeMessagingHostTest,
        ConnectRespectsIsEnterpriseAdminUserParameterOnChromeOsOnly) {
   int next_id = 1;
   base::DictValue connect_message = CreateConnectMessage(next_id);
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   ChromeOsEnterpriseParams params;
   params.request_origin = ChromeOsEnterpriseRequestOrigin::kEnterpriseAdmin;
   params.audio_playback = ChromeOsEnterpriseAudioPlayback::kLocalOnly;
@@ -750,7 +746,7 @@ TEST_F(It2MeNativeMessagingHostTest,
 #endif
   WriteMessageToInputPipe(connect_message);
   VerifyConnectResponses(next_id);
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   EXPECT_TRUE(factory_raw_ptr_->host->is_enterprise_session());
 #else
   EXPECT_FALSE(factory_raw_ptr_->host->is_enterprise_session());

@@ -98,10 +98,6 @@
 #include "pdf/pdf_features.h"
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -981,9 +977,6 @@ class CrossProfileDebuggerApiTest : public DebuggerApiTest {
 
  private:
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::ProfileHelper::SetAlwaysReturnPrimaryUserForTesting(true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
     DebuggerApiTest::SetUpOnMainThread();
     ProfileManager* const profile_manager = profile_util::GetProfileManager();
 
@@ -1301,7 +1294,7 @@ IN_PROC_BROWSER_TEST_F(DebuggerExtensionApiTest, AttachToBlob) {
 // does not cause a crash.
 // This is a regression test for https://crbug.com/40055226.
 // TODO(crbug.com/41483732): Re-enable this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_NavigateToForbiddenUrl DISABLED_NavigateToForbiddenUrl
 #else
 #define MAYBE_NavigateToForbiddenUrl NavigateToForbiddenUrl

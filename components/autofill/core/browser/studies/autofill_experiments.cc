@@ -245,7 +245,7 @@ bool ShouldShowIbanOnSettingsPage(const std::string& user_country_code,
 
 bool IsDeviceAuthAvailable(
     device_reauth::DeviceAuthenticator* device_authenticator) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   CHECK(device_authenticator);
   return device_authenticator->CanAuthenticateWithBiometricOrScreenLock();
 #else

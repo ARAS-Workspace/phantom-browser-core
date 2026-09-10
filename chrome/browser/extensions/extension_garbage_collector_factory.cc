@@ -15,10 +15,6 @@
 #include "extensions/browser/extensions_browser_client.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/extensions/extension_garbage_collector_chromeos.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -58,11 +54,7 @@ ExtensionGarbageCollectorFactory::~ExtensionGarbageCollectorFactory() = default;
 std::unique_ptr<KeyedService>
 ExtensionGarbageCollectorFactory::BuildInstanceFor(
     content::BrowserContext* context) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return std::make_unique<ExtensionGarbageCollectorChromeOS>(context);
-#else
   return std::make_unique<ExtensionGarbageCollector>(context);
-#endif
 }
 
 std::unique_ptr<KeyedService>

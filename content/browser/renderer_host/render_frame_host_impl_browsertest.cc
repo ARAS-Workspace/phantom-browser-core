@@ -762,7 +762,7 @@ class RenderFrameHostFactoryForBeforeUnloadInterceptor
 // Tests that a beforeunload dialog in an iframe doesn't stop the beforeunload
 // timer of a parent frame.
 // TODO(avi): flaky on Linux TSAN: http://crbug.com/795326
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(THREAD_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_IframeBeforeUnloadParentHang DISABLED_IframeBeforeUnloadParentHang
 #else
 #define MAYBE_IframeBeforeUnloadParentHang IframeBeforeUnloadParentHang
@@ -9067,7 +9067,7 @@ class RenderFrameHostImplBrowsingContextStateNameTest
  protected:
   void SetUp() override {
     // TODO(crbug.com/40840863): Flaky on Mac, Android, Linux, and ChromeOS.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
     GTEST_SKIP();
 #else
 

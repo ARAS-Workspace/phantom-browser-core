@@ -22,7 +22,7 @@
 #include "content/public/browser/browser_thread.h"
 #include "ui/base/clipboard/scoped_clipboard_writer.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #endif
 
@@ -150,7 +150,7 @@ void DownloadCommands::ExecuteCommand(Command command) {
   model_->ExecuteCommand(this, command);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 BrowserWindowInterface* DownloadCommands::GetBrowser() const {
   if (!model_)
@@ -173,7 +173,7 @@ bool DownloadCommands::CanOpenPdfInSystemViewer() const {
   return IsDownloadPdf();
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 void DownloadCommands::CopyFileAsImageToClipboard() {
   if (!model_)

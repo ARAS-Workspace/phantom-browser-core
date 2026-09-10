@@ -122,8 +122,6 @@ class CrashHandlerHostLinux : public base::MessagePumpForIO::FdWatcher,
 
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 namespace crashpad {
 
 class CrashHandlerHost : public base::MessagePumpForIO::FdWatcher,
@@ -181,7 +179,5 @@ class CrashHandlerHost : public base::MessagePumpForIO::FdWatcher,
 };
 
 }  // namespace crashpad
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #endif  // COMPONENTS_CRASH_CONTENT_BROWSER_CRASH_HANDLER_HOST_LINUX_H_

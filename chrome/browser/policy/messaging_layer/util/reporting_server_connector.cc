@@ -53,11 +53,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
-#include "chromeos/ash/components/install_attributes/install_attributes.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using ::policy::CloudPolicyClient;
 using ::policy::CloudPolicyCore;
 
@@ -86,9 +81,6 @@ ReportingServerConnector::ReportingServerConnector()
   // Initialize `ReportingServerConnector` instance. For non-Ash configurations
   // it is initialized on the first use, but for Ash we need it to be prepared
   // for encryption key delivery early after enrollment.
-#if BUILDFLAG(IS_CHROMEOS)
-  std::ignore = EnsureUsableClient();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 ReportingServerConnector::~ReportingServerConnector() {
@@ -244,26 +236,6 @@ ReportingServerConnector::GetUserCloudPolicyManager() {
   DCHECK_CURRENTLY_ON(::content::BrowserThread::UI);
   // Pointer to `policy::CloudPolicyManager` is retrieved differently
   // for ChromeOS, for Android and for all other cases.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!ash::InstallAttributes::IsInitialized()) {
-    CHECK_IS_TEST();
-    return base::unexpected(
-        Status(error::UNAVAILABLE, "InstallAttributes not initialized"));
-  }
-  if (!g_browser_process || !g_browser_process->platform_part() ||
-      !g_browser_process->platform_part()->browser_policy_connector_ash()) {
-    base::UmaHistogramEnumeration(
-        reporting::kUmaUnavailableErrorReason,
-        UnavailableErrorReason::CANNOT_GET_CLOUD_POLICY_MANAGER_FOR_BROWSER,
-        UnavailableErrorReason::MAX_VALUE);
-    return base::unexpected(
-        Status(error::UNAVAILABLE,
-               "Browser process not fit to retrieve CloudPolicyManager"));
-  }
-  return g_browser_process->platform_part()
-      ->browser_policy_connector_ash()
-      ->GetDeviceCloudPolicyManager();
-#else
   if (!g_browser_process || !g_browser_process->browser_policy_connector()) {
     base::UmaHistogramEnumeration(
         reporting::kUmaUnavailableErrorReason,
@@ -275,7 +247,6 @@ ReportingServerConnector::GetUserCloudPolicyManager() {
   }
   return g_browser_process->browser_policy_connector()
       ->machine_level_user_cloud_policy_manager();
-#endif
 }
 
 Status ReportingServerConnector::EnsureUsableCore() {

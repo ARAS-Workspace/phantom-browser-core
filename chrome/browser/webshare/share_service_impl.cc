@@ -43,13 +43,8 @@ ShareServiceImpl::ShareServiceImpl(
     mojo::PendingReceiver<blink::mojom::ShareService> receiver)
     : content::DocumentService<blink::mojom::ShareService>(render_frame_host,
                                                            std::move(receiver))
-#if BUILDFLAG(IS_CHROMEOS)
-      ,
-      sharesheet_client_(
-          content::WebContents::FromRenderFrameHost(&render_frame_host))
-#endif
 {
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   NOTREACHED();
 #endif
 }
@@ -286,10 +281,7 @@ void ShareServiceImpl::RunShareOperation(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  sharesheet_client_.Share(title, text, share_url, std::move(files),
-                           std::move(callback));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   auto sharing_service_operation =
       std::make_unique<webshare::SharingServiceOperation>(
           title, text, share_url, std::move(files), web_contents);

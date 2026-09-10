@@ -50,15 +50,6 @@
 #include "ui/gfx/image/image.h"
 #include "ui/message_center/public/cpp/notifier_id.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/user_manager_delegate_impl.h"
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "chrome/browser/browser_process.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/user_manager_impl.h"
-#endif
-
 using auto_launch_util::StartupLaunchMode;
 using extensions::mojom::ManifestLocation;
 using testing::_;
@@ -336,15 +327,6 @@ class BackgroundModeManagerWithExtensionsTest : public testing::Test {
 
   ui::UserDataFactory::ScopedOverride startup_launch_manager_override_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS needs extra services to run in the following order.
-  ash::ScopedCrosSettingsTestHelper cros_settings_test_helper_;
-  user_manager::ScopedUserManager user_manager_{
-      std::make_unique<user_manager::UserManagerImpl>(
-          std::make_unique<UserManagerDelegateImpl>(),
-          g_browser_process->local_state(),
-          CrosSettings::Get())};
-#endif
 };
 
 TEST_F(BackgroundModeManagerTest, BackgroundAppLoadUnload) {

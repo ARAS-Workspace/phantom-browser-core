@@ -28,10 +28,6 @@
 namespace content {
 class BrowserContext;
 
-#if BUILDFLAG(IS_CHROMEOS)
-class TtsControllerDelegate;
-#endif
-
 // Singleton class that manages text-to-speech for all TTS engines and
 // APIs, maintaining a queue of pending utterances and keeping
 // track of all state.
@@ -201,12 +197,6 @@ class CONTENT_EXPORT TtsControllerImpl
   // net::NetworkChangeNotifier::NetworkChangeObserver
   void OnNetworkChanged(
       net::NetworkChangeNotifier::ConnectionType type) override;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  TtsControllerDelegate* GetTtsControllerDelegate();
-  void SetTtsControllerDelegateForTesting(TtsControllerDelegate* delegate);
-  raw_ptr<TtsControllerDelegate, DanglingUntriaged> delegate_ = nullptr;
-#endif
 
   raw_ptr<TtsEngineDelegate, DanglingUntriaged> engine_delegate_ = nullptr;
 

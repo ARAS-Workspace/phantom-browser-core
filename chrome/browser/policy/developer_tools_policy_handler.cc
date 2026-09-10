@@ -22,11 +22,6 @@
 #include "components/prefs/pref_value_map.h"
 #include "components/strings/grit/components_strings.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/user_manager/user.h"
-#include "components/user_manager/user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/policy/extension_developer_mode_policy_handler.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -178,43 +173,6 @@ DeveloperToolsAvailability GetDevToolsAvailability(const PrefService* pref_sevic
   return static_cast<DeveloperToolsAvailability>(value);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Returns true if developer tools availability is set by an active policy in
-// |pref_service|.
-bool IsDevToolsAvailabilitySetByPolicy(const PrefService* pref_service) {
-  return pref_service->IsManagedPreference(prefs::kDevToolsAvailability);
-}
-
-// Returns the most restrictive availability within [|availability_1|,
-// |availability_2|].
-DeveloperToolsAvailability GetMostRestrictiveAvailability(DeveloperToolsAvailability availability_1,
-                                            DeveloperToolsAvailability availability_2) {
-  if (availability_1 == DeveloperToolsAvailability::kDisallowed ||
-      availability_2 == DeveloperToolsAvailability::kDisallowed) {
-    return DeveloperToolsAvailability::kDisallowed;
-  }
-  if (availability_1 == DeveloperToolsAvailability::kDisallowedForForceInstalledExtensions ||
-      availability_2 == DeveloperToolsAvailability::kDisallowedForForceInstalledExtensions) {
-    return DeveloperToolsAvailability::kDisallowedForForceInstalledExtensions;
-  }
-  return DeveloperToolsAvailability::kAllowed;
-}
-
-const PrefService* GetPrimaryUserPrefs() {
-  auto* user_manager = user_manager::UserManager::Get();
-  if (!user_manager) {
-    return nullptr;
-  }
-  const user_manager::User* primary_user = user_manager->GetPrimaryUser();
-  if (!primary_user) {
-    return nullptr;
-  }
-  return primary_user->GetProfilePrefs();
-}
-
-#endif
-
 }  // namespace
 
 DeveloperToolsPolicyHandler::DeveloperToolsPolicyHandler() = default;
@@ -292,23 +250,8 @@ void DeveloperToolsPolicyHandler::ApplyPolicySettings(const PolicyMap& policies,
 
 policy::DeveloperToolsAvailability
 DeveloperToolsPolicyHandler::GetEffectiveAvailability(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  if (command_line->HasSwitch(switches::kForceDevToolsAvailable)) {
-    return DeveloperToolsAvailability::kAllowed;
-  }
-#endif
 
   DeveloperToolsAvailability availability = GetDevToolsAvailability(profile->GetPrefs());
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not create DevTools if it's disabled for primary user.
-  const PrefService* primary_user_prefs = GetPrimaryUserPrefs();
-  if (primary_user_prefs &&
-      IsDevToolsAvailabilitySetByPolicy(primary_user_prefs)) {
-    availability = GetMostRestrictiveAvailability(
-        availability, GetDevToolsAvailability(primary_user_prefs));
-  }
-#endif
   return availability;
 }
 

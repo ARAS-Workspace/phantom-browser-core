@@ -508,10 +508,6 @@ IN_PROC_BROWSER_TEST_F(NtpRealboxInteractiveTest, ComposeboxTypedSuggestions) {
 }
 
 IN_PROC_BROWSER_TEST_F(NtpRealboxInteractiveTest, RealboxMultilineInputTest) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/496928186): Re-enable after de-flaking.
-  GTEST_SKIP() << "Flaky on ChromeOS";
-#else
   RunTestSequence(
       // Load NTP.
       AddInstrumentedTab(kNtpElementId, chrome::ChromeUINewTabURLAsGURL()),
@@ -528,7 +524,6 @@ IN_PROC_BROWSER_TEST_F(NtpRealboxInteractiveTest, RealboxMultilineInputTest) {
       // Wait for Realbox input to have a newline between 'a' and 'b'.
       WaitForJsConditionAt(kNtpElementId, kRealboxInput,
                            "(el) => el && el.value === 'a\\nb'"));
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(NtpRealboxInteractiveTest,
@@ -689,12 +684,6 @@ INSTANTIATE_TEST_SUITE_P(All, NtpRealboxSubmitInteractiveTest, testing::Bool());
 
 IN_PROC_BROWSER_TEST_P(NtpRealboxSubmitInteractiveTest,
                        SubmittingInputNavigatesToSearch) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!ClickMatch()) {
-    // TODO(crbug.com/496928186): Re-enable after de-flaking.
-    GTEST_SKIP() << "Flaky on ChromeOS";
-  }
-#endif
 
   RunTestSequence(
       // Wait for the realbox to render on the NTP.
@@ -1164,10 +1153,6 @@ IN_PROC_BROWSER_TEST_F(NtpRealboxDefaultExperienceInteractiveTest,
 
 IN_PROC_BROWSER_TEST_F(NtpRealboxDefaultExperienceInteractiveTest,
                        ClickOutsideAndEscapeBehavior) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/496928186): Re-enable after de-flaking.
-  GTEST_SKIP() << "Flaky on ChromeOS";
-#else
   RunTestSequence(
       // Load NTP.
       AddInstrumentedTab(kNtpElementId, chrome::ChromeUINewTabURLAsGURL()),
@@ -1216,7 +1201,6 @@ IN_PROC_BROWSER_TEST_F(NtpRealboxDefaultExperienceInteractiveTest,
       WaitForElementVisibilityChange(kComposeButton, /*expected_visible=*/true),
       WaitForElementToRender(kNtpElementId, kVoiceSearchButton),
       WaitForElementToRender(kNtpElementId, kLensSearchButton));
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(NtpRealboxDefaultExperienceInteractiveTest,

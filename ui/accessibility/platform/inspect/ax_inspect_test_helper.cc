@@ -358,14 +358,6 @@ FilePath::StringType AXInspectTestHelper::GetVersionSpecificExpectedFileSuffix(
            FILE_PATH_LITERAL(".txt");
   }
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  if (expectation_type_ == "blink") {
-    FilePath::StringType suffix;
-    if (!expectations_qualifier.empty())
-      suffix = FILE_PATH_LITERAL("-") + expectations_qualifier;
-    return suffix + FILE_PATH_LITERAL("-expected-blink-cros.txt");
-  }
-#endif
   return FILE_PATH_LITERAL("");
 }
 

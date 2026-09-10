@@ -38,13 +38,6 @@ class ConnectorsService : public ConnectorsServiceBase, public KeyedService {
   // Accessors that call the corresponding method in ConnectorsManager.
   std::optional<ReportingSettings> GetReportingSettings() override;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::optional<AnalysisSettings> GetAnalysisSettings(
-      const storage::FileSystemURL& source_url,
-      const storage::FileSystemURL& destination_url,
-      AnalysisConnector connector);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // Returns the CBCM domain or profile domain that enables connector policies.
   // If both set Connector policies, the CBCM domain is returned as it has
   // precedence.

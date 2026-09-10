@@ -18,7 +18,7 @@
 // No MessagePumpForUI, see below.
 #elif defined(USE_GLIB)
 #include "base/message_loop/message_pump_glib.h"
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
 #include "base/message_loop/message_pump_epoll.h"
 #endif
 
@@ -36,7 +36,7 @@ using MessagePumpForUI = MessagePump;
 // TODO(abarth): Figure out if we need this.
 #elif defined(USE_GLIB)
 using MessagePumpForUI = MessagePumpGlib;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
 using MessagePumpForUI = MessagePumpEpoll;
 #else
 #error Platform does not define MessagePumpForUI

@@ -13,7 +13,7 @@
 #include "chrome/browser/ui/views/site_data/page_specific_site_data_dialog_controller.h"
 #include "content/public/browser/web_contents.h"
 
-#if defined(TOOLKIT_VIEWS) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(TOOLKIT_VIEWS)
 #include "chrome/browser/ui/views/web_apps/deprecated_apps_dialog_view.h"
 #include "chrome/browser/ui/views/web_apps/force_installed_deprecated_apps_dialog_view.h"
 #include "chrome/browser/ui/views/web_apps/force_installed_preinstalled_deprecated_app_dialog_view.h"
@@ -86,7 +86,7 @@ void TabDialogsViews::ShowDeprecatedAppsDialog(
     const extensions::ExtensionId& optional_launched_extension_id,
     const std::set<extensions::ExtensionId>& deprecated_app_ids,
     content::WebContents* web_contents) {
-#if defined(TOOLKIT_VIEWS) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(TOOLKIT_VIEWS)
   DeprecatedAppsDialogView::CreateAndShowDialog(
       optional_launched_extension_id, deprecated_app_ids, web_contents);
 #endif
@@ -95,7 +95,7 @@ void TabDialogsViews::ShowDeprecatedAppsDialog(
 void TabDialogsViews::ShowForceInstalledDeprecatedAppsDialog(
     const extensions::ExtensionId& app_id,
     content::WebContents* web_contents) {
-#if defined(TOOLKIT_VIEWS) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(TOOLKIT_VIEWS)
   ForceInstalledDeprecatedAppsDialogView::CreateAndShowDialog(app_id,
                                                               web_contents);
 #endif
@@ -104,7 +104,7 @@ void TabDialogsViews::ShowForceInstalledDeprecatedAppsDialog(
 void TabDialogsViews::ShowForceInstalledPreinstalledDeprecatedAppDialog(
     const extensions::ExtensionId& extension_id,
     content::WebContents* web_contents) {
-#if defined(TOOLKIT_VIEWS) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(TOOLKIT_VIEWS)
   ForceInstalledPreinstalledDeprecatedAppDialogView::CreateAndShowDialog(
       extension_id, web_contents);
 #endif

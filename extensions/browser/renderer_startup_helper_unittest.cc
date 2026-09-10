@@ -24,14 +24,6 @@
 #include "mojo/public/cpp/bindings/associated_receiver_set.h"
 #include "third_party/blink/public/common/features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#include "chromeos/constants/pref_names.h"
-#include "components/prefs/pref_registry_simple.h"
-#include "components/prefs/pref_service.h"
-#include "components/prefs/testing_pref_service.h"
-#endif
-
 namespace extensions {
 
 // Class that implements the binding of a new Renderer mojom interface and
@@ -532,7 +524,7 @@ TEST_F(RendererStartupHelperTest, PlatformAppInIncognitoRenderer) {
   ASSERT_EQ(1u, helper_->num_loaded_extensions_in_incognito());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 // Tests the process re-registration workflow when OnRenderProcessLaunched() is
 // called after the process has exited. This simulates:
 // 1. OnRenderProcessHostCreated() initializes process
@@ -578,44 +570,7 @@ TEST_F(RendererStartupHelperTest, ProcessReregistrationAfterExit) {
   // and does NOT re-load extensions (to avoid duplicate loading).
   ASSERT_EQ(0u, helper_->num_loaded_extensions());
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-class RendererStartupHelperTestCaptivePortalPopupWindow
-    : public RendererStartupHelperTest {
- public:
-  RendererStartupHelperTestCaptivePortalPopupWindow() = default;
-  ~RendererStartupHelperTestCaptivePortalPopupWindow() override = default;
-  void SetUp() override {
-    RendererStartupHelperTest::SetUp();
-    static_cast<TestingPrefServiceSimple*>(pref_service())
-        ->registry()
-        ->RegisterBooleanPref(chromeos::prefs::kCaptivePortalSignin, false);
-  }
-};
-
-// Tests that only incognito-enabled extensions are loaded in an incognito
-// context.
-TEST_F(RendererStartupHelperTestCaptivePortalPopupWindow,
-       ExtensionInCaptivePortalSigninRenderer) {
-  // Set prefs::kCaptivePortalSignin to true in the shared PerfService instance.
-  ASSERT_TRUE(pref_service());
-  pref_service()->SetBoolean(chromeos::prefs::kCaptivePortalSignin, true);
-
-  // Initialize the incognito renderer.
-  EXPECT_FALSE(IsProcessInitialized(incognito_render_process_host_.get()));
-  SimulateRenderProcessCreated(incognito_render_process_host_.get());
-  EXPECT_TRUE(IsProcessInitialized(incognito_render_process_host_.get()));
-
-  // Enable the extension. With the pref set it *should* be loaded in the
-  // initialized incognito renderer.
-  helper_->clear_extensions();
-  AddExtensionToRegistry(extension_);
-  helper_->OnExtensionLoaded(*extension_);
-  EXPECT_TRUE(util::IsIncognitoEnabled(extension_->id(), incognito_context()));
-  EXPECT_TRUE(IsExtensionLoaded(*extension_));
-}
-#endif
+#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(RendererStartupHelperTest, InitializeProcessIdempotency) {
   // 1. First call should initialize the process.

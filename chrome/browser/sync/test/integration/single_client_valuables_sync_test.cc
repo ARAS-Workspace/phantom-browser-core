@@ -253,7 +253,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientValuablesSyncTest, InitialSync) {
 
 // ChromeOS does not support late signin after profile creation, so the test
 // below does not apply, at least in the current form.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Valuables should get cleared from the database when the user signs out.
 IN_PROC_BROWSER_TEST_P(SingleClientValuablesSyncTest, ClearOnSignOut) {
   const LoyaltyCard loyalty_card = CreateLoyaltyCard();
@@ -270,7 +269,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientValuablesSyncTest, ClearOnSignOut) {
   WaitForNumberOfLoyaltyCards(0);
   WaitForNumberOfEntityInstances(0);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Valuables should get cleared from the database when the user enters the sync
 // paused state (e.g. persistent auth error).

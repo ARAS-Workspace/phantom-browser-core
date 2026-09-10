@@ -14,10 +14,6 @@
 #include "components/signin/public/base/signin_metrics.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/webui_url_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 bool IsHostAllowedInIncognito(const GURL& url) {
@@ -36,9 +32,6 @@ bool IsHostAllowedInIncognito(const GURL& url) {
   // chrome://settings.
   return host != chrome::kChromeUIAppLauncherPageHost &&
          host != chrome::kChromeUISettingsHost &&
-#if BUILDFLAG(IS_CHROMEOS)
-         host != ash::kChromeUIOSSettingsHost &&
-#endif
          host != chrome::kChromeUIHelpHost &&
          host != chrome::kChromeUIHistoryHost &&
          host != chrome::kChromeUIExtensionsHost &&

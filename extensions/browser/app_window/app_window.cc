@@ -475,11 +475,7 @@ void AppWindow::ExitPictureInPicture() {
 }
 
 bool AppWindow::ShouldShowStaleContentOnEviction(content::WebContents* source) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void AppWindow::RenderFrameCreated(content::RenderFrameHost* frame_host) {

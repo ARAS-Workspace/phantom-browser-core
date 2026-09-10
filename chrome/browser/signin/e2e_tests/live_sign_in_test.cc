@@ -78,9 +78,7 @@
 #include "ui/views/controls/webview/webview.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/sync/sync_ui_util.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 namespace signin::test {
 namespace {
@@ -215,10 +213,8 @@ IN_PROC_BROWSER_TEST_F(LiveSignInTestFullSync, MANUAL_WebSignOut) {
   EXPECT_TRUE(
       identity_manager()->HasAccountWithRefreshTokenInPersistentErrorState(
           primary_account.account_id));
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(sync_service()->GetUserActionableError(),
             syncer::SyncService::UserActionableError::kSignInNeedsUpdate);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 // This test can pass. Marked as manual because it TIMED_OUT on Win7.

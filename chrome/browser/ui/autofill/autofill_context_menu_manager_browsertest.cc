@@ -877,15 +877,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 class PasswordsFallbackWithGuestProfileTest : public PasswordsFallbackTestBase {
  public:
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(ash::switches::kGuestSession);
-    command_line->AppendSwitchASCII(ash::switches::kLoginUser,
-                                    user_manager::kGuestUserName);
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile,
-                                    TestingProfile::kTestUserProfileDir);
-  }
-#else
   void SetUpOnMainThread() override {
     host_resolver()->AddRule("*", "127.0.0.1");
     guest_browser_ = CreateGuestBrowser();
@@ -909,7 +900,6 @@ class PasswordsFallbackWithGuestProfileTest : public PasswordsFallbackTestBase {
     guest_browser_ = nullptr;
     PasswordsFallbackTestBase::TearDownOnMainThread();
   }
-#endif
 
  private:
   raw_ptr<Browser> guest_browser_ = nullptr;

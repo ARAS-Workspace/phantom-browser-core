@@ -38,11 +38,6 @@
 #include "third_party/blink/public/mojom/navigation/navigation_params.mojom.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/dbus/permission_broker/fake_permission_broker_client.h"  // nogncheck
-#include "content/browser/direct_sockets/firewall_hole_delegate.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // The tests in this file use the Network Service implementation of
 // NetworkContext, to test sending and receiving of data over UDP sockets.
 
@@ -325,19 +320,6 @@ IN_PROC_BROWSER_TEST_F(DirectSocketsUdpBrowserTest, ReadWriteUdpOnSocketError) {
 
 class DirectSocketsBoundUdpBrowserTest : public DirectSocketsUdpBrowserTest {
  public:
-#if BUILDFLAG(IS_CHROMEOS)
-  DirectSocketsBoundUdpBrowserTest() {
-    chromeos::PermissionBrokerClient::InitializeFake();
-    FirewallHoleDelegate::SetAlwaysOpenFirewallHoleForTesting(true);
-  }
-
-  ~DirectSocketsBoundUdpBrowserTest() override {
-    chromeos::PermissionBrokerClient::Shutdown();
-    // Need to reset the flag because there are other tests that
-    // use FirewallHoleDelegate.
-    FirewallHoleDelegate::SetAlwaysOpenFirewallHoleForTesting(false);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 IN_PROC_BROWSER_TEST_F(DirectSocketsBoundUdpBrowserTest, ExchangeUdp) {
@@ -525,67 +507,6 @@ IN_PROC_BROWSER_TEST_F(DirectSocketsBoundUdpBrowserTest,
               testing::HasSubstr("succeeded"));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(DirectSocketsBoundUdpBrowserTest, HasFirewallHole) {
-  class DelegateImpl : public chromeos::FakePermissionBrokerClient::Delegate {
-   public:
-    DelegateImpl(uint16_t port, base::OnceClosure quit_closure)
-        : port_(port), quit_closure_(std::move(quit_closure)) {}
-
-    void OnUdpPortReleased(uint16_t port,
-                           const std::string& interface) override {
-      if (port == port_) {
-        ASSERT_EQ(interface, "");
-        ASSERT_TRUE(quit_closure_);
-        std::move(quit_closure_).Run();
-      }
-    }
-
-   private:
-    uint16_t port_;
-    base::OnceClosure quit_closure_;
-  };
-
-  auto* client = static_cast<chromeos::FakePermissionBrokerClient*>(
-      chromeos::PermissionBrokerClient::Get());
-
-  const std::string open_script = R"(
-    (async () => {
-      socket = new UDPSocket({ localAddress: '127.0.0.1' });
-      const { localPort } = await socket.opened;
-      return localPort;
-    })();
-  )";
-
-  const int32_t local_port = EvalJs(shell(), open_script).ExtractInt();
-  ASSERT_TRUE(client->HasUdpHole(local_port, "" /* all interfaces */));
-
-  base::RunLoop run_loop;
-  auto delegate =
-      std::make_unique<DelegateImpl>(local_port, run_loop.QuitClosure());
-  client->AttachDelegate(delegate.get());
-
-  EXPECT_TRUE(
-      EvalJs(shell(), content::test::WrapAsync("socket.close()")).is_ok());
-  run_loop.Run();
-}
-
-IN_PROC_BROWSER_TEST_F(DirectSocketsBoundUdpBrowserTest, FirewallHoleDenied) {
-  auto* client = chromeos::FakePermissionBrokerClient::Get();
-  client->SetUdpDenyAll();
-
-  const std::string open_script = R"(
-    (async () => {
-      socket = new UDPSocket({ localAddress: '127.0.0.1' });
-      return await socket.opened.catch(err => err.message);
-    })();
-  )";
-
-  EXPECT_THAT(EvalJs(shell(), open_script).ExtractString(),
-              testing::HasSubstr("Firewall"));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 IN_PROC_BROWSER_TEST_F(DirectSocketsUdpBrowserTest, UdpMessageConfigurations) {
   {
     const std::string script = R"(
@@ -734,17 +655,6 @@ class DirectSocketsMulticastBrowserTest
       public testing::WithParamInterface<
           DirectSocketsMulticastBrowserTestParams> {
  public:
-#if BUILDFLAG(IS_CHROMEOS)
-  DirectSocketsMulticastBrowserTest() {
-    chromeos::PermissionBrokerClient::InitializeFake();
-    FirewallHoleDelegate::SetAlwaysOpenFirewallHoleForTesting(true);
-  }
-
-  ~DirectSocketsMulticastBrowserTest() override {
-    chromeos::PermissionBrokerClient::Shutdown();
-    FirewallHoleDelegate::SetAlwaysOpenFirewallHoleForTesting(false);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   void SetUpInProcessBrowserTestFixture() override {
     DirectSocketsUdpBrowserTest::SetUpInProcessBrowserTestFixture();

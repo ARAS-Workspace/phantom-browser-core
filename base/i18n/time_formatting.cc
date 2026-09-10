@@ -136,22 +136,6 @@ std::u16string TimeFormatShortDateAndTimeWithTimeZone(Time time) {
               i18n::DateTimeFormatterOptions::TimeZoneStyle::kShortSpecific));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::u16string TimeFormatMonthAndYearForTimeZone(
-    Time time,
-    const icu::TimeZone* time_zone) {
-  DCHECK(time_zone);
-  icu::UnicodeString id;
-  time_zone->getID(id);
-  std::string id_str;
-  id.toUTF8String(id_str);
-
-  return GetDateTimeFormatter().Format(
-      time, i18n::datetime_options::YM::Long().with_time_zone(
-                base::i18n::TimeZone::FromString(id_str)));
-}
-#endif
-
 std::u16string TimeFormatMonthAndYear(Time time) {
   return GetDateTimeFormatter().Format(time,
                                        i18n::datetime_options::YM::Long());

@@ -53,11 +53,6 @@ TerminationStatus GetTerminationStatusImpl(ProcessHandle handle,
       case SIGSYS:
         return TERMINATION_STATUS_PROCESS_CRASHED;
       case SIGKILL:
-#if BUILDFLAG(IS_CHROMEOS)
-        // On ChromeOS, only way a process gets kill by SIGKILL
-        // is by oom-killer.
-        return TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM;
-#endif
       case SIGINT:
       case SIGTERM:
         return TERMINATION_STATUS_PROCESS_WAS_KILLED;
@@ -169,7 +164,7 @@ void EnsureProcessTerminated(Process process) {
       0, MakeSelfDeleting<BackgroundReaper>(std::move(process), Seconds(2)));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void EnsureProcessGetsReaped(Process process) {
   DCHECK(!process.is_current());
 
@@ -181,7 +176,7 @@ void EnsureProcessGetsReaped(Process process) {
   PlatformThread::CreateNonJoinable(
       0, MakeSelfDeleting<BackgroundReaper>(std::move(process), TimeDelta()));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #endif  // !BUILDFLAG(IS_APPLE)
 

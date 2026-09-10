@@ -7,7 +7,7 @@
 #include "build/build_config.h"
 #include "partition_alloc/buildflags.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <malloc.h>
 #endif
 

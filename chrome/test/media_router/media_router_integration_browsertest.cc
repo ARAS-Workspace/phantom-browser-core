@@ -42,10 +42,6 @@
 #include "testing/gtest/include/gtest/gtest-param-test.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using content::WebContents;
 using testing::Optional;
 
@@ -83,17 +79,6 @@ class NoRoutesObserver : public MediaRoutesObserver {
 MediaRouterIntegrationBrowserTest::MediaRouterIntegrationBrowserTest(
     UiForBrowserTest test_ui_type)
     : test_ui_type_(test_ui_type) {
-#if BUILDFLAG(IS_CHROMEOS)
-  feature_list_.InitWithFeatures(
-      {
-          // Without this flag, SodaInstaller::GetInstance() fails a DCHECK
-          // on Chrome OS. The call to SodaInstaller::GetInstance() is in
-          // MediaDialogView::AddedToWidget(), which is called indirectly
-          // from MediaDialogView::ShowDialogForPresentationRequest().
-          ash::features::kOnDeviceSpeechRecognition,
-      },
-      {});
-#endif
 }
 
 MediaRouterIntegrationBrowserTest::~MediaRouterIntegrationBrowserTest() =
@@ -438,9 +423,6 @@ bool MediaRouterIntegrationBrowserTest::RequiresMediaRouteProviders() const {
 // TODO(crbug.com/1238758): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_Basic MANUAL_Basic
-#elif BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_Basic DISABLED_Basic
 #else
 #define MAYBE_Basic Basic
 #endif
@@ -451,9 +433,6 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest, MAYBE_Basic) {
 // TODO(crbug.com/40784325): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_SendAndOnMessage MANUAL_SendAndOnMessage
-#elif BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_SendAndOnMessage DISABLED_SendAndOnMessage
 #else
 #define MAYBE_SendAndOnMessage SendAndOnMessage
 #endif
@@ -462,12 +441,7 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
   RunSendMessageTest("foo");
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_CloseOnError DISABLED_CloseOnError
-#else
 #define MAYBE_CloseOnError CloseOnError
-#endif
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest, MAYBE_CloseOnError) {
   test_provider_->set_close_route_error_on_send();
   WebContents* web_contents = StartSessionWithTestPageAndChooseSink();
@@ -477,7 +451,7 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest, MAYBE_CloseOnError) {
 }
 
 // TODO(crbug.com/40784296): Test is flaky.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_Fail_SendMessage MANUAL_Fail_SendMessage
 #else
 #define MAYBE_Fail_SendMessage Fail_SendMessage
@@ -487,12 +461,7 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
   RunFailToSendMessageTest();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_Fail_CreateRoute DISABLED_Fail_CreateRoute
-#else
 #define MAYBE_Fail_CreateRoute Fail_CreateRoute
-#endif
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
                        MAYBE_Fail_CreateRoute) {
   test_provider_->set_route_error_message("Unknown sink");
@@ -500,34 +469,19 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
   CheckStartFailed(web_contents, "UnknownError", "Unknown sink");
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_ReconnectSession DISABLED_ReconnectSession
-#else
 #define MAYBE_ReconnectSession ReconnectSession
-#endif
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
                        MAYBE_ReconnectSession) {
   RunReconnectSessionTest();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_Fail_ReconnectSession DISABLED_Fail_ReconnectSession
-#else
 #define MAYBE_Fail_ReconnectSession Fail_ReconnectSession
-#endif
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
                        MAYBE_Fail_ReconnectSession) {
   RunFailedReconnectSessionTest();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_Fail_StartCancelled DISABLED_Fail_StartCancelled
-#else
 #define MAYBE_Fail_StartCancelled Fail_StartCancelled
-#endif
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
                        MAYBE_Fail_StartCancelled) {
   WebContents* web_contents = StartSessionWithTestPageAndSink();
@@ -535,26 +489,15 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
   CheckStartFailed(web_contents, "NotAllowedError", "Dialog closed.");
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_Fail_StartCancelledNoSinks DISABLED_Fail_StartCancelledNoSinks
-#else
 #define MAYBE_Fail_StartCancelledNoSinks Fail_StartCancelledNoSinks
-#endif
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
                        MAYBE_Fail_StartCancelledNoSinks) {
   test_provider_->set_empty_sink_list();
   StartSessionAndAssertNotFoundError();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
-#define MAYBE_Fail_StartCancelledNoSupportedSinks \
-  DISABLED_Fail_StartCancelledNoSupportedSinks
-#else
 #define MAYBE_Fail_StartCancelledNoSupportedSinks \
   Fail_StartCancelledNoSupportedSinks
-#endif
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest,
                        MAYBE_Fail_StartCancelledNoSupportedSinks) {
   test_provider_->set_unsupported_media_sources_list();

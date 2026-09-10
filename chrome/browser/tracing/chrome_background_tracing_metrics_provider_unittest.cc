@@ -23,16 +23,6 @@
 #include "third_party/metrics_proto/trace_log.pb.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-// "nogncheck" because of crbug.com/40147906.
-#include "chrome/browser/ash/login/demo_mode/demo_session.h"
-#include "chrome/browser/metrics/chromeos_system_profile_provider.h"
-#include "chromeos/ash/components/login/login_state/login_state.h"
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#include "chromeos/dbus/power/power_manager_client.h"
-#include "chromeos/dbus/tpm_manager/tpm_manager_client.h"  // nogncheck
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace tracing {
 namespace {
 
@@ -133,87 +123,5 @@ TEST_F(ChromeBackgroundTracingMetricsProviderTest, HandleMissingTrace) {
   EXPECT_EQ(0, uma_proto.trace_log_size());
   EXPECT_FALSE(provider.HasIndependentMetrics());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class ChromeBackgroundTracingMetricsProviderChromeOSTest
-    : public ChromeBackgroundTracingMetricsProviderTest {
- public:
-  // ChromeBackgroundTracingMetricsProviderTest:
-  void SetUp() override {
-    ChromeBackgroundTracingMetricsProviderTest::SetUp();
-
-    // ChromeOSSystemProfileProvider needs the following to provide system
-    // profile meta.
-    chromeos::PowerManagerClient::InitializeFake();
-    chromeos::TpmManagerClient::InitializeFake();
-    ash::DemoSession::SetDemoConfigForTesting(
-        ash::DemoSession::DemoModeConfig::kNone);
-    ash::LoginState::Initialize();
-  }
-
-  void TearDown() override {
-    ChromeBackgroundTracingMetricsProviderTest::TearDown();
-
-    ash::LoginState::Shutdown();
-    ash::DemoSession::ResetDemoConfigForTesting();
-    chromeos::TpmManagerClient::Shutdown();
-    chromeos::PowerManagerClient::Shutdown();
-  }
-};
-
-TEST_F(ChromeBackgroundTracingMetricsProviderChromeOSTest, HardwareClass) {
-  // Set a fake hardware class.
-  constexpr char kFakeHardwareClass[] = "Fake hardware class";
-  ash::system::ScopedFakeStatisticsProvider fake_statistics_provider;
-  fake_statistics_provider.SetMachineStatistic("hardware_class",
-                                               kFakeHardwareClass);
-
-  auto system_profile_provider =
-      std::make_unique<ChromeOSSystemProfileProvider>();
-  ChromeBackgroundTracingMetricsProvider provider(
-      system_profile_provider.get());
-  provider.Init();
-
-  // AsyncInit needs to happen to collect `hardware_class` etc.
-  {
-    base::RunLoop run_loop;
-    base::RepeatingClosure barrier =
-        base::BarrierClosure(2, run_loop.QuitWhenIdleClosure());
-    provider.AsyncInit(barrier);
-    system_profile_provider->AsyncInit(barrier);
-    run_loop.Run();
-  }
-
-  TestBackgroundTracingHelper background_tracing_helper;
-  // Fake a UMA collection for background tracing.
-  tracing::BackgroundTracingManager::GetInstance().SaveTraceForTesting(
-      kDummyTrace, "test_scenario", "test_rule", base::Token::CreateRandom());
-  background_tracing_helper.WaitForTraceSaved();
-  ASSERT_TRUE(provider.HasIndependentMetrics());
-
-  metrics::ChromeUserMetricsExtension uma_proto;
-  {
-    base::RunLoop run_loop;
-    provider.ProvideIndependentMetrics(
-        base::DoNothing(), base::BindLambdaForTesting([&](bool success) {
-          EXPECT_TRUE(success);
-          run_loop.Quit();
-        }),
-        &uma_proto,
-        /* snapshot_manager=*/nullptr);
-    run_loop.Run();
-  }
-
-  // Verify `hardware_class` is collected correctly.
-  ASSERT_EQ(1, uma_proto.trace_log_size());
-  const metrics::SystemProfileProto& system_profile =
-      uma_proto.system_profile();
-  const metrics::SystemProfileProto::Hardware& hardware =
-      system_profile.hardware();
-  EXPECT_EQ(kFakeHardwareClass, hardware.full_hardware_class());
-
-  EXPECT_FALSE(provider.HasIndependentMetrics());
-}
-#endif
 
 }  // namespace tracing

@@ -22,8 +22,7 @@
 #include "partition_alloc/partition_stats.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
 #define MALLOC_MEMORY_TRACING_SUPPORTED
 #endif
 

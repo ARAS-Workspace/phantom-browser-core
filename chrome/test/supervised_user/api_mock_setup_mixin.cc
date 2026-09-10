@@ -37,12 +37,7 @@ constexpr std::string_view kKidsManagementServiceEndpoint{
 void WaitUntilReady(InProcessBrowserTest* test_base,
                     std::string_view preference,
                     std::string_view value) {
-#if BUILDFLAG(IS_CHROMEOS)
-  PrefService* pref_service =
-      ProfileManager::GetActiveUserProfile()->GetPrefs();
-#else
   PrefService* pref_service = test_base->browser()->GetProfile()->GetPrefs();
-#endif
 
   if (pref_service->GetString(prefs::kSupervisedUserId) !=
       supervised_user::kChildAccountSUID) {

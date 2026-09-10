@@ -206,43 +206,5 @@ IN_PROC_BROWSER_TEST_F(AppWindowApiTest, OpeningAbsoluteURLs) {
   EXPECT_FALSE(app_window_contents->GetPrimaryMainFrame()->IsErrorDocument());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(AppWindowApiTest, ImeWindowHasPermissions) {
-  EXPECT_TRUE(
-      RunExtensionTest("platform_apps/windows_api_ime/has_permissions_allowed",
-                       {}, {.load_as_component = true}))
-      << message_;
-
-  EXPECT_TRUE(RunExtensionTest(
-      "platform_apps/windows_api_ime/has_permissions_platform_app",
-      {.launch_as_platform_app = true}, {.ignore_manifest_warnings = true}))
-      << message_;
-}
-
-IN_PROC_BROWSER_TEST_F(AppWindowApiTest, ImeWindowNoPermissions) {
-  EXPECT_TRUE(
-      RunExtensionTest("platform_apps/windows_api_ime/no_permissions_allowed",
-                       {}, {.load_as_component = true}))
-      << message_;
-
-  EXPECT_TRUE(RunExtensionTest(
-      "platform_apps/windows_api_ime/no_permissions_platform_app",
-      {.launch_as_platform_app = true}))
-      << message_;
-}
-
-IN_PROC_BROWSER_TEST_F(AppWindowApiTest, ImeWindowNotFullscreen) {
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  command_line->AppendSwitch(switches::kForceAppMode);
-  command_line->AppendSwitchASCII(switches::kAppId,
-                                  "jkghodnilhceideoidjikpgommlajknk");
-
-  EXPECT_TRUE(RunExtensionTest(
-      "platform_apps/windows_api_ime/forced_app_mode_not_fullscreen", {},
-      {.load_as_component = true}))
-      << message_;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 }  // namespace extensions

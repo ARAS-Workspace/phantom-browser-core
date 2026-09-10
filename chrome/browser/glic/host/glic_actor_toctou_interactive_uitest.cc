@@ -11,11 +11,6 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/test/scoped_feature_list.h"
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace glic::test {
 
 namespace {
@@ -28,12 +23,6 @@ using MultiStep = GlicActorUiTest::MultiStep;
 class GlicActorToctouUiTest : public GlicActorUiTest {
  public:
   GlicActorToctouUiTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(crbug.com/465305046): Investigate how the rounded windows feature
-    // affects the hit test.
-    scoped_feature_list_.InitAndDisableFeature(
-        chromeos::features::kFeatureManagementRoundedWindows);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   MultiStep NavigateFrame(ui::ElementIdentifier webcontents_id,
@@ -41,9 +30,6 @@ class GlicActorToctouUiTest : public GlicActorUiTest {
                           const GURL& url);
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList scoped_feature_list_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 MultiStep GlicActorToctouUiTest::NavigateFrame(

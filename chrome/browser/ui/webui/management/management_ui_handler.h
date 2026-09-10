@@ -74,9 +74,7 @@ class ManagementUIHandler : public content::WebUIMessageHandler,
   void RegisterMessages() override;
 
   void SetAccountManagedForTesting(bool managed) { account_managed_ = managed; }
-#if !BUILDFLAG(IS_CHROMEOS)
   void SetBrowserManagedForTesting(bool managed) { browser_managed_ = managed; }
-#endif
 
   void OnJavascriptAllowed() override;
   void OnJavascriptDisallowed() override;
@@ -110,9 +108,7 @@ class ManagementUIHandler : public content::WebUIMessageHandler,
   virtual void UpdateManagedState();
 
   bool UpdateAccountManagedState(Profile* profile);
-#if !BUILDFLAG(IS_CHROMEOS)
   bool UpdateBrowserManagedState();
-#endif
 
   std::string GetAccountManager(Profile* profile) const;
 

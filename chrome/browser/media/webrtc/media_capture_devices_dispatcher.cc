@@ -49,10 +49,6 @@
 #include "content/public/common/content_features.h"
 #endif  //  BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/media/chromeos_login_and_lock_media_access_handler.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/media/webrtc/desktop_capture_access_handler.h"
 #include "chrome/browser/media/webrtc/tab_capture_access_handler.h"
@@ -88,10 +84,6 @@ MediaCaptureDevicesDispatcher::MediaCaptureDevicesDispatcher()
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#if BUILDFLAG(IS_CHROMEOS)
-  media_access_handlers_.push_back(
-      std::make_unique<ChromeOSLoginAndLockMediaAccessHandler>());
-#endif
   media_access_handlers_.push_back(
       std::make_unique<ExtensionMediaAccessHandler>());
 #endif

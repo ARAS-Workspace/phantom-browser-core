@@ -37,12 +37,6 @@
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_paths.h"
-#include "base/test/metrics/histogram_tester.h"
-#include "chrome/browser/web_applications/isolated_web_apps/policy/isolated_web_app_cache_client.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 
 namespace {
@@ -57,13 +51,6 @@ constexpr char kVersion3[] = "7.0.8";
 const SignedWebBundleId kBundleId = test::GetDefaultEd25519WebBundleId();
 const Ed25519KeyPair kKeyPair = test::GetDefaultEd25519KeyPair();
 const UpdateChannel kBetaChannel = UpdateChannel::Create("beta").value();
-
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kCopyBundleToCacheSuccessMetric[] =
-    "WebApp.Isolated.CopyBundleToCacheAfterInstallationSuccess";
-constexpr char kCopyBundleToCacheErrorMetric[] =
-    "WebApp.Isolated.CopyBundleToCacheAfterInstallationError";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -82,13 +69,6 @@ class IwaInstallerBaseTest : public IsolatedWebAppTest {
     resetter_ = IwaRuntimeDataProvider::SetInstanceForTesting(&data_provider_);
     IsolatedWebAppTest::SetUp();
     test::AwaitStartWebAppProviderAndSubsystems(profile());
-
-#if BUILDFLAG(IS_CHROMEOS)
-    if (IsMgs()) {
-      test_managed_guest_session_ =
-          std::make_unique<profiles::testing::ScopedTestManagedGuestSession>();
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     data_provider_.Update(
         [](auto& update) { update.AddToManagedAllowlist({kBundleId}); });
@@ -193,12 +173,6 @@ class IwaInstallerBaseTest : public IsolatedWebAppTest {
 
  private:
   SessionType session_type_;
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList scoped_feature_list_{
-      features::kIsolatedWebAppManagedGuestSessionInstall};
-  std::unique_ptr<profiles::testing::ScopedTestManagedGuestSession>
-      test_managed_guest_session_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   FakeIwaRuntimeDataProvider data_provider_;
   std::optional<base::AutoReset<IwaRuntimeDataProvider*>> resetter_;
@@ -384,10 +358,6 @@ TEST_P(IwaInstallerTest, PinnedVersionIsAvailableInWrongChannel) {
 
 // Checks enabling caching does not break the installation.
 TEST_P(IwaInstallerTest, CachingEnabled) {
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList scoped_feature_list(
-      features::kIsolatedWebAppBundleCache);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   CreateAndPublishIwaBundle(kBundleId, kVersion1);
 
@@ -400,165 +370,5 @@ INSTANTIATE_TEST_SUITE_P(
     /* no prefix */,
     IwaInstallerTest,
     testing::Values(kUser, kMgs));
-
-#if BUILDFLAG(IS_CHROMEOS)
-// IWA cache installation tests for Managed Guest Session (MGS).
-class IwaMgsCachingInstallerTest : public IwaInstallerBaseTest {
- public:
-  IwaMgsCachingInstallerTest() : IwaInstallerBaseTest(kMgs) {}
-
-  void SetUp() override {
-    IwaInstallerBaseTest::SetUp();
-    OverrideCacheDir();
-  }
-
-  void OverrideCacheDir() {
-    ASSERT_TRUE(cache_root_dir_.CreateUniqueTempDir());
-    cache_root_dir_override_ = std::make_unique<base::ScopedPathOverride>(
-        ash::DIR_DEVICE_LOCAL_ACCOUNT_IWA_CACHE, CacheRootPath());
-  }
-
-  void DestroyCacheDir() { cache_root_dir_override_.reset(); }
-
-  base::FilePath GetBundleDirWithVersion(const SignedWebBundleId& bundle_id,
-                                         const IwaVersion& version) {
-    auto session_cache_dir =
-        IwaCacheClient::GetCacheBaseDirectoryForSessionType(
-            IwaCacheClient::SessionType::kManagedGuestSession, CacheRootPath());
-    return IwaCacheClient::GetCacheDirectoryForBundleWithVersion(
-        session_cache_dir, bundle_id, version);
-  }
-
-  base::FilePath GetFullBundlePath(const SignedWebBundleId& bundle_id,
-                                   const IwaVersion& version) {
-    return IwaCacheClient::GetBundleFullName(
-        GetBundleDirWithVersion(bundle_id, version));
-  }
-
-  void CopyBundleToCache(const web_package::SignedWebBundleId& web_bundle_id,
-                         const IwaVersion& version,
-                         const base::FilePath& bundle_to_copy) {
-    ASSERT_TRUE(
-        base::CreateDirectory(GetBundleDirWithVersion(web_bundle_id, version)));
-    ASSERT_TRUE(base::CopyFile(bundle_to_copy,
-                               GetFullBundlePath(web_bundle_id, version)));
-  }
-
-  void ExpectEmptyCopyBundleMetrics() {
-    histogram_tester_.ExpectTotalCount(kCopyBundleToCacheSuccessMetric, 0);
-    histogram_tester_.ExpectTotalCount(kCopyBundleToCacheErrorMetric, 0);
-  }
-
-  void ExpectSuccessCopyBundleMetric() {
-    EXPECT_THAT(
-        histogram_tester_.GetAllSamples(kCopyBundleToCacheSuccessMetric),
-        BucketsAre(base::Bucket(true, 1)));
-    histogram_tester_.ExpectTotalCount(kCopyBundleToCacheErrorMetric, 0);
-  }
-
-  void ExpectErrorCopyBundleMetric(const CopyBundleToCacheError& error) {
-    EXPECT_THAT(
-        histogram_tester_.GetAllSamples(kCopyBundleToCacheSuccessMetric),
-        BucketsAre(base::Bucket(false, 1)));
-    EXPECT_THAT(histogram_tester_.GetAllSamples(kCopyBundleToCacheErrorMetric),
-                BucketsAre(base::Bucket(error, 1)));
-  }
-
- protected:
-  const base::FilePath& CacheRootPath() { return cache_root_dir_.GetPath(); }
-
-  base::HistogramTester histogram_tester_;
-  base::ScopedTempDir cache_root_dir_;
-  std::unique_ptr<base::ScopedPathOverride> cache_root_dir_override_;
-  base::test::ScopedFeatureList scoped_feature_list_{
-      features::kIsolatedWebAppBundleCache};
-};
-
-TEST_F(IwaMgsCachingInstallerTest,
-       BundleCopiedToCacheAfterSuccessfulInstallation) {
-  ExpectEmptyCopyBundleMetrics();
-  CreateAndPublishIwaBundle(kBundleId, kVersion1);
-
-  ASSERT_EQ(RunInstallerAndWaitForResult(kBundleId),
-            IwaInstallerResult::Type::kSuccess);
-
-  AssertAppInstalledAtVersion(kBundleId, kVersion1);
-  // Checks that bundle exists in cache after successful installation.
-  EXPECT_TRUE(base::PathExists(
-      GetFullBundlePath(kBundleId, *IwaVersion::Create(kVersion1))));
-  ExpectSuccessCopyBundleMetric();
-}
-
-TEST_F(IwaMgsCachingInstallerTest,
-       BundleNotCopiedToCacheAfterFailedInstallation) {
-  ExpectEmptyCopyBundleMetrics();
-  CreateAndPublishIwaBundle(kBundleId, kVersion1);
-  test_update_server().SetServedUpdateManifestResponse(
-      kBundleId, net::HttpStatusCode::HTTP_NOT_FOUND, /*json_content=*/"");
-
-  EXPECT_EQ(RunInstallerAndWaitForResult(kBundleId),
-            IwaInstallerResult::Type::kErrorUpdateManifestDownloadFailed);
-
-  EXPECT_FALSE(base::PathExists(
-      GetFullBundlePath(kBundleId, *IwaVersion::Create(kVersion1))));
-  ExpectEmptyCopyBundleMetrics();
-}
-
-TEST_F(IwaMgsCachingInstallerTest, FailedToCopyBundleToCache) {
-  ExpectEmptyCopyBundleMetrics();
-  DestroyCacheDir();
-  CreateAndPublishIwaBundle(kBundleId, kVersion1);
-
-  ASSERT_EQ(RunInstallerAndWaitForResult(kBundleId),
-            IwaInstallerResult::Type::kSuccess);
-
-  AssertAppInstalledAtVersion(kBundleId, kVersion1);
-  ExpectErrorCopyBundleMetric(CopyBundleToCacheError::kFailedToCreateDir);
-}
-
-TEST_F(IwaMgsCachingInstallerTest, InstallFromCache) {
-  histogram_tester_.ExpectTotalCount("WebApp.Isolated.InstallFromCache", 0);
-  // Change the response, so the installation can only happen from the cache.
-  std::unique_ptr<ScopedBundledIsolatedWebApp> app =
-      CreateIwaBundle(kBundleId, kVersion1);
-  test_update_server().SetServedUpdateManifestResponse(
-      kBundleId, net::HttpStatusCode::HTTP_NOT_FOUND,
-      /*json_content=*/"");
-
-  CopyBundleToCache(app->web_bundle_id(), app->version(), app->path());
-
-  ASSERT_EQ(RunInstallerAndWaitForResult(kBundleId),
-            IwaInstallerResult::Type::kSuccess);
-  AssertAppInstalledAtVersion(kBundleId, kVersion1);
-  EXPECT_THAT(
-      histogram_tester_.GetAllSamples("WebApp.Isolated.InstallFromCache"),
-      BucketsAre(base::Bucket(true, 1)));
-}
-
-TEST_F(IwaMgsCachingInstallerTest, InstallFromCacheFailedRetryFromInternet) {
-  histogram_tester_.ExpectTotalCount("WebApp.Isolated.InstallFromCache", 0);
-  // Change the response, so the installation can only happen from the cache.
-  std::unique_ptr<ScopedBundledIsolatedWebApp> app =
-      CreateIwaBundle(kBundleId, kVersion1);
-  test_update_server().SetServedUpdateManifestResponse(
-      kBundleId, net::HttpStatusCode::HTTP_NOT_FOUND,
-      /*json_content=*/"");
-
-  // Installer will try to install the IWA from cache since the cache file
-  // exists, but it will fail since it is not a real bundle. Then the
-  // installation will happen from the Internet (and fail because we changed the
-  // response).
-  base::FilePath temp_file;
-  base::CreateTemporaryFile(&temp_file);
-  CopyBundleToCache(app->web_bundle_id(), app->version(), temp_file);
-
-  EXPECT_EQ(RunInstallerAndWaitForResult(kBundleId),
-            IwaInstallerResult::Type::kErrorUpdateManifestDownloadFailed);
-  EXPECT_THAT(
-      histogram_tester_.GetAllSamples("WebApp.Isolated.InstallFromCache"),
-      BucketsAre(base::Bucket(false, 1)));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace web_app

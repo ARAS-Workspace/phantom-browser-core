@@ -108,11 +108,7 @@
 #include "device/fido/mac/credential_metadata.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/fido/cros/authenticator.h"
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 #include "content/browser/webauth/is_uvpaa.h"
 #endif
 
@@ -332,20 +328,6 @@ std::unique_ptr<device::FidoDiscoveryFactory> MakeDiscoveryFactory(
       GetWebAuthenticationDelegate()->GetTouchIdAuthenticatorConfig(
           render_frame_host->GetBrowserContext()));
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Ignore the ChromeOS u2fd virtual U2F HID device so that it doesn't collide
-  // with the ChromeOS platform authenticator, also implemented in u2fd.
-  // There are two possible PIDs the virtual U2F HID device could use, with or
-  // without corp protocol functionality.
-  constexpr device::VidPid kChromeOsU2fdVidPid{0x18d1, 0x502c};
-  constexpr device::VidPid kChromeOsU2fdCorpVidPid{0x18d1, 0x5212};
-  discovery_factory->set_hid_ignore_list(
-      {kChromeOsU2fdVidPid, kChromeOsU2fdCorpVidPid});
-  discovery_factory->set_generate_request_id_callback(
-      GetWebAuthenticationDelegate()->GetGenerateRequestIdCallback(
-          render_frame_host));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   return discovery_factory;
 }
@@ -957,10 +939,6 @@ void AuthenticatorCommonImpl::StartGetAssertionRequest(
       ctap_get_assertion_request->user_verification,
       ctap_get_assertion_request->cmtg_key,
       /*user_name=*/std::nullopt, discover_enclave, discovery_factory());
-#if BUILDFLAG(IS_CHROMEOS)
-  discovery_factory()->set_get_assertion_request_for_legacy_credential_check(
-      *ctap_get_assertion_request);
-#endif
   SetHints(req_state_->request_delegate.get(), req_state_->hints);
 
   auto platform_discoveries =
@@ -2095,8 +2073,6 @@ void AuthenticatorCommonImpl::ContinueIsUvpaaAfterOverrideCheck(
 #if BUILDFLAG(IS_MAC)
   IsUVPlatformAuthenticatorAvailable(GetBrowserContext(),
                                      std::move(uma_decorated_callback));
-#elif BUILDFLAG(IS_CHROMEOS)
-  IsUVPlatformAuthenticatorAvailable(std::move(uma_decorated_callback));
 #else
   std::move(uma_decorated_callback).Run(false);
 #endif

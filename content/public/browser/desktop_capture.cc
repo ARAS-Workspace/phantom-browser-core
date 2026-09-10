@@ -17,10 +17,6 @@
 #include "content/public/common/content_features.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/browser/media/capture/desktop_capturer_ash.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "content/browser/media/capture/desktop_capturer_android.h"
 #endif
@@ -67,11 +63,6 @@ webrtc::DesktopCaptureOptions CreateDesktopCaptureOptions() {
 std::unique_ptr<webrtc::DesktopCapturer> CreateScreenCapturer(
     webrtc::DesktopCaptureOptions options,
     bool for_snapshot) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (for_snapshot) {
-    return std::make_unique<DesktopCapturerAsh>();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
   return std::make_unique<DesktopCapturerAndroid>(options);

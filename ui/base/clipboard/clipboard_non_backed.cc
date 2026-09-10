@@ -362,9 +362,6 @@ class ClipboardDataBuilder {
   static void CommitToClipboard(ClipboardInternal& clipboard,
                                 std::optional<DataTransferEndpoint> data_src) {
     ClipboardData* data = GetCurrentData();
-#if BUILDFLAG(IS_CHROMEOS)
-    data->set_commit_time(base::Time::Now());
-#endif  // BUILDFLAG(IS_CHROMEOS)
     data->set_source(std::move(data_src));
     clipboard.WriteData(TakeCurrentData());
   }
@@ -672,18 +669,11 @@ void ClipboardNonBacked::ReadText(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kText);
   std::u16string result;
   clipboard_internal.ReadText(&result);
   std::move(callback).Run(std::move(result));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadAsciiText(
@@ -700,18 +690,11 @@ void ClipboardNonBacked::ReadAsciiText(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kText);
   std::string result;
   clipboard_internal.ReadAsciiText(&result);
   std::move(callback).Run(std::move(result));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadHTML(
@@ -728,10 +711,6 @@ void ClipboardNonBacked::ReadHTML(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kHtml);
   std::u16string markup;
   std::string src_url;
@@ -742,9 +721,6 @@ void ClipboardNonBacked::ReadHTML(
   std::move(callback).Run(std::move(markup), GURL(src_url), fragment_start,
                           fragment_end);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadSvg(
@@ -761,18 +737,11 @@ void ClipboardNonBacked::ReadSvg(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kSvg);
   std::u16string result;
   clipboard_internal.ReadSvg(&result);
   std::move(callback).Run(std::move(result));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadRTF(
@@ -789,18 +758,11 @@ void ClipboardNonBacked::ReadRTF(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kRtf);
   std::string result;
   clipboard_internal.ReadRTF(&result);
   std::move(callback).Run(std::move(result));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadPng(
@@ -817,16 +779,9 @@ void ClipboardNonBacked::ReadPng(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kPng);
   clipboard_internal.ReadPng(std::move(callback));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadDataTransferCustomData(
@@ -845,18 +800,11 @@ void ClipboardNonBacked::ReadDataTransferCustomData(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kCustomData);
   std::u16string result;
   clipboard_internal.ReadDataTransferCustomData(type, &result);
   std::move(callback).Run(std::move(result));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadFilenames(
@@ -873,16 +821,9 @@ void ClipboardNonBacked::ReadFilenames(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kFilenames);
   std::move(callback).Run(clipboard_internal.ReadFilenames());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadURL(
@@ -899,10 +840,6 @@ void ClipboardNonBacked::ReadURL(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kUrl);
   std::u16string title;
   std::string url;
@@ -912,9 +849,6 @@ void ClipboardNonBacked::ReadURL(
   url_info.title = std::move(title);
   std::move(callback).Run(std::move(url_info));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 void ClipboardNonBacked::ReadData(
@@ -936,27 +870,16 @@ void ClipboardNonBacked::ReadData(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RecordTimeIntervalBetweenCommitAndRead(clipboard_internal.GetData());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   RecordRead(ClipboardFormatMetric::kData);
   std::string result;
   clipboard_internal.ReadData(format, &result);
   std::move(callback).Run(std::move(result));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ClipboardMonitor::GetInstance()->NotifyClipboardDataRead();
-#endif
 }
 
 #if BUILDFLAG(IS_OZONE)
 bool ClipboardNonBacked::IsSelectionBufferAvailable() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  return false;
-#else
   return true;
-#endif
 }
 #endif  // BUILDFLAG(IS_OZONE)
 

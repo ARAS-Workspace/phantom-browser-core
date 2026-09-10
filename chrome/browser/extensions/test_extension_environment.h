@@ -59,20 +59,9 @@ class TestExtensionEnvironment {
     kCreate,
   };
 
-#if BUILDFLAG(IS_CHROMEOS)
-  enum class OSSetupType {
-    kNoSetUp,
-    kSetUp,
-  };
-#endif
-
   explicit TestExtensionEnvironment(
       Type type = Type::kWithTaskEnvironment,
       ProfileCreationType profile_creation_type = ProfileCreationType::kCreate
-#if BUILDFLAG(IS_CHROMEOS)
-      ,
-      OSSetupType os_setup_type = OSSetupType::kSetUp
-#endif
   );
 
   TestExtensionEnvironment(const TestExtensionEnvironment&) = delete;
@@ -131,10 +120,6 @@ class TestExtensionEnvironment {
   // If `task_environment_` is needed, then it needs to constructed before
   // `profile_` and destroyed after `profile_`.
   const std::unique_ptr<content::BrowserTaskEnvironment> task_environment_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  const std::unique_ptr<ChromeOSEnv> chromeos_env_;
-#endif
 
   // TestingProfile may be created or not, depending on the caller's
   // configuration passed to the constructor. This member keeps the ownership

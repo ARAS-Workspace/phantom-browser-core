@@ -67,13 +67,9 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/features.h"
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "sandbox/policy/linux/sandbox_seccomp_bpf_linux.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 using SystemNetworkContextManagerBrowsertest = InProcessBrowserTest;
 
@@ -87,7 +83,7 @@ IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest,
   network::mojom::HttpAuthStaticParamsPtr static_params =
       SystemNetworkContextManager::GetHttpAuthStaticParamsForTesting();
   EXPECT_EQ("", static_params->gssapi_library_name);
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
   // Test that prefs are reflected in params.
 
   PrefService* local_state = g_browser_process->local_state();
@@ -96,8 +92,7 @@ IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest,
   static_params =
       SystemNetworkContextManager::GetHttpAuthStaticParamsForTesting();
   EXPECT_EQ(dev_null, static_params->gssapi_library_name);
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) &&
-        // !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 }
 
 IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest, AuthParams) {
@@ -194,7 +189,7 @@ IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest, AuthParams) {
   EXPECT_EQ(kDelegateAllowList, dynamic_params->delegate_allowlist);
   EXPECT_FALSE(dynamic_params->delegate_by_kdc_policy);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   local_state->SetString(prefs::kAuthSchemes, "basic");
   local_state->SetBoolean(prefs::kAuthNegotiateDelegateByKdcPolicy, true);
   dynamic_params =
@@ -207,18 +202,7 @@ IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest, AuthParams) {
   EXPECT_EQ(kDelegateAllowList, dynamic_params->delegate_allowlist);
   EXPECT_TRUE(dynamic_params->delegate_by_kdc_policy);
   EXPECT_TRUE(dynamic_params->patterns_allowed_to_use_all_schemes.empty());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // The kerberos.enabled pref is false and the device is not Active Directory
-  // managed by default.
-  EXPECT_FALSE(dynamic_params->allow_gssapi_library_load);
-  local_state->SetBoolean(ash::prefs::kKerberosEnabled, true);
-  dynamic_params =
-      SystemNetworkContextManager::GetHttpAuthDynamicParamsForTesting();
-  EXPECT_TRUE(dynamic_params->allow_gssapi_library_load);
-  EXPECT_TRUE(dynamic_params->patterns_allowed_to_use_all_schemes.empty());
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   base::ListValue patterns_allowed_to_use_all_schemes;
   patterns_allowed_to_use_all_schemes.Append("*.allowed.google.com");
@@ -237,7 +221,7 @@ IN_PROC_BROWSER_TEST_F(SystemNetworkContextManagerBrowsertest, AuthParams) {
             dynamic_params->patterns_allowed_to_use_all_schemes);
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // GSSAPI is currently incompatible with the network service sandbox
 // (crbug.com/40070096). It isn't known until the browser is already started
 // whether GSSAPI is desired, so if Chrome detects that GSSAPI is desired after
@@ -253,9 +237,7 @@ class SystemNetworkContextManagerNetworkServiceSandboxBrowsertest
   // is sandboxed, and when it changes from false to true this should trigger a
   // network service restart to remove the sandbox.
   const char* kGssapiDesiredPref =
-#if BUILDFLAG(IS_CHROMEOS)
-      ash::prefs::kKerberosEnabled;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
       prefs::kReceivedHttpAuthNegotiateHeader;
 #endif
 
@@ -398,7 +380,7 @@ INSTANTIATE_TEST_SUITE_P(
                         : "NetworkSandboxFullyDisabled";
     });
 
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
 class SystemNetworkContextManagerHttpNegotiateHeader

@@ -115,13 +115,6 @@
 #include "ui/gfx/image/image_unittest_util.h"
 #include "ui/gfx/scoped_animation_duration_scale_mode.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/common/chrome_switches.h"
-#include "chrome/test/base/testing_profile.h"
-#include "components/user_manager/user_names.h"
-#endif
-
 namespace {
 using ::testing::StrictMock;
 using ::testing::ValuesIn;
@@ -584,7 +577,6 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
         /*is_type_on=*/enable_sync);
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   void Signout() {
     ASSERT_TRUE(
         GetIdentityManager()->HasPrimaryAccount(signin::ConsentLevel::kSignin));
@@ -595,7 +587,6 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
     ASSERT_FALSE(
         GetIdentityManager()->HasPrimaryAccount(signin::ConsentLevel::kSignin));
   }
-#endif
 
   void SimulateSigninPending(bool web_sign_out) {
     ASSERT_TRUE(
@@ -694,11 +685,7 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
 
   void ExpectSyncPaused(BrowserWindowInterface* browser) {
     std::u16string expected = l10n_util::GetStringUTF16(
-#if !BUILDFLAG(IS_CHROMEOS)
         IDS_AVATAR_BUTTON_SYNC_PAUSED
-#else
-        IDS_AVATAR_BUTTON_SYNC_ERROR
-#endif
     );
     EXPECT_TRUE(AvatarToolbarButtonTestAccessor(browser).WaitForText(expected));
   }
@@ -958,7 +945,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, IncognitoWindowCount) {
   EXPECT_FALSE(GetWindowCountInAvatarButtonText(browser1).has_value());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, GuestWindowCount) {
   Browser* browser1 = CreateGuestBrowser();
   AvatarToolbarButtonTestAccessor avatar_accessor1(browser1);
@@ -977,56 +963,11 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, GuestWindowCount) {
   CloseBrowserSynchronously(browser2);
   EXPECT_FALSE(GetWindowCountInAvatarButtonText(browser1).has_value());
 }
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-class AvatarToolbarButtonAshBrowserTest
-    : public AvatarToolbarButtonBrowserTestBase {
- protected:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // Adding these command lines simulates Ash in Guest mode.
-    command_line->AppendSwitch(ash::switches::kGuestSession);
-    command_line->AppendSwitchASCII(ash::switches::kLoginUser,
-                                    user_manager::kGuestUserName);
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile,
-                                    TestingProfile::kTestUserProfileDir);
-    command_line->AppendSwitch(switches::kIncognito);
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(AvatarToolbarButtonAshBrowserTest, GuestSession) {
-  Profile* guest_profile = browser()->GetProfile();
-  ASSERT_TRUE(guest_profile->IsGuestSession());
-
-  EXPECT_TRUE(AvatarToolbarButtonTestAccessor(browser()).GetVisible());
-  EXPECT_FALSE(AvatarToolbarButtonTestAccessor(browser()).GetEnabled());
-
-  EXPECT_EQ(AvatarToolbarButtonTestAccessor(browser()).GetText(),
-            l10n_util::GetPluralStringFUTF16(IDS_AVATAR_BUTTON_GUEST, 1));
-
-  Browser* browser_2 = CreateBrowser(guest_profile);
-  EXPECT_TRUE(AvatarToolbarButtonTestAccessor(browser_2).GetVisible());
-  EXPECT_FALSE(AvatarToolbarButtonTestAccessor(browser_2).GetEnabled());
-
-  // Browser count is not taken into consideration on purpose for Ash Guest
-  // windows since the button is not enabled, both buttons still show the same
-  // text as if it was a single window, which is different from other platforms.
-  EXPECT_EQ(AvatarToolbarButtonTestAccessor(browser()).GetText(),
-            l10n_util::GetPluralStringFUTF16(IDS_AVATAR_BUTTON_GUEST, 1));
-  EXPECT_EQ(AvatarToolbarButtonTestAccessor(browser_2).GetText(),
-            l10n_util::GetPluralStringFUTF16(IDS_AVATAR_BUTTON_GUEST, 1));
-}
-#endif
 
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, DefaultBrowser) {
   AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-#if BUILDFLAG(IS_CHROMEOS)
-  // No avatar button is shown in normal Ash windows.
-  EXPECT_FALSE(avatar_accessor.GetVisible());
-#else
   EXPECT_TRUE(avatar_accessor.GetVisible());
   EXPECT_TRUE(avatar_accessor.GetEnabled());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, IncognitoBrowser) {
@@ -1036,29 +977,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, IncognitoBrowser) {
   EXPECT_TRUE(avatar_accessor1.GetVisible());
   EXPECT_TRUE(avatar_accessor1.GetEnabled());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, SigninBrowser) {
-  // Create an Incognito browser first.
-  CreateIncognitoBrowser(browser()->GetProfile());
-  // Create a portal signin browser which will not be the Incognito browser.
-  Profile::OTRProfileID profile_id(
-      Profile::OTRProfileID::CreateUniqueForCaptivePortal());
-  Browser* browser1 =
-      CreateBrowserWindow(BrowserWindowCreateParams(
-                              browser()->GetProfile()->GetOffTheRecordProfile(
-                                  profile_id,
-                                  /*create_if_needed=*/true),
-                              /*from_user_gesture=*/true))
-          ->GetBrowserForMigrationOnly();
-  AddBlankTabAndShow(browser1);
-  AvatarToolbarButtonTestAccessor avatar_accessor1(browser1);
-  // On ChromeOS, captive portal signin windows show a
-  // disabled avatar button to indicate that the window is incognito.
-  EXPECT_TRUE(avatar_accessor1.GetVisible());
-  EXPECT_FALSE(avatar_accessor1.GetEnabled());
-}
-#endif
 
 // Test suite to mark test with Sync enabled (simulating Sync granted already -
 // Enabling sync and only after clearing states performing checks) that have a
@@ -1128,7 +1046,6 @@ class AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest
   test_type(test_suite, test_name)  // Actual test implementation starts here.
 
 // TODO(b/331746545): Check flaky test issue on windows.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_WITH_SIGNED_IN_FROM_PRE(
     IN_PROC_BROWSER_TEST_F,
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
@@ -1152,7 +1069,6 @@ TEST_WITH_SIGNED_IN_FROM_PRE(
   // Once the greeting and promo are not shown anymore, we expect no text.
   EXPECT_EQ(avatar_accessor.GetText(), std::u16string());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // TODO(b/331746545): Check flaky test issue on windows.
 #define MAYBE_ShowNameOnSync ShowNameOnSync
@@ -1241,7 +1157,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonWithSyncBrowserTest,
   ExpectSyncPaused(browser());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Checks that "Signin pending" has higher priority than passphrase errors.
 // Adapted regression test for https://crbug.com/368997513
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
@@ -1258,7 +1173,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
   EXPECT_TRUE(avatar_accessor.WaitForText(
       l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SIGNIN_PAUSED)));
 }
-#endif
 
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonWithSyncBrowserTest, SyncError) {
   AvatarToolbarButtonInterface* avatar_button =
@@ -1295,7 +1209,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonWithSyncBrowserTest,
 
 // Avatar button is not shown on Ash. No need to perform those tests as the info
 // checked might not be adapted.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonWithSyncBrowserTest,
                        BookmarksLimitExceededErrorOpensProfileMenu) {
   AvatarToolbarButtonInterface* avatar_button =
@@ -1311,7 +1224,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonWithSyncBrowserTest,
   // a test harness for this purpose.
   EXPECT_TRUE(browser()->GetFeatures().profile_menu_coordinator()->IsShowing());
 }
-#endif
 
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        BookmarksLimitExceededErrorForSignedInUser) {
@@ -1458,7 +1370,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
 
 // Avatar button is not shown on Ash. No need to perform those tests as the info
 // checked might not be adapted.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, SignInOutIconEffect) {
   ASSERT_TRUE(WaitForIsSignedInImageUsed(false));
 
@@ -1542,8 +1453,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
   EXPECT_EQ(AvatarToolbarButtonTestAccessor(new_browser).GetText(),
             std::u16string());
 }
-
-#endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 
@@ -3919,7 +3828,6 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Bool());
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class MockPasskeyUnlockManager : public webauthn::PasskeyUnlockManager {
  public:
   MOCK_METHOD(bool, ShouldDisplayErrorUi, (), (const, override));
@@ -4216,8 +4124,6 @@ TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_F,
   // Click the button to trigger a crash in the original code.
   avatar_accessor.Click();
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 INSTANTIATE_TEST_SUITE_P(All, AvatarToolbarButtonBrowserTest, testing::Bool());
 INSTANTIATE_TEST_SUITE_P(All,

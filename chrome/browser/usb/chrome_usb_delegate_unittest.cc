@@ -616,14 +616,8 @@ class ChromeUsbTestHelper {
     TestFuture<device::mojom::UsbClaimInterfaceResult> claim_interface_future;
     device->ClaimInterface(0, claim_interface_future.GetCallback());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // The allowlist only allows the interface to be claimed on Chrome OS.
-    EXPECT_EQ(claim_interface_future.Get(),
-              device::mojom::UsbClaimInterfaceResult::kSuccess);
-#else
     EXPECT_EQ(claim_interface_future.Get(),
               device::mojom::UsbClaimInterfaceResult::kProtectedClass);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void TestAllowlistedSmartCardConnectorExtension(

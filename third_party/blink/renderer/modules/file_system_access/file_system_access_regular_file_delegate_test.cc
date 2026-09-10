@@ -16,7 +16,7 @@
 #include "third_party/blink/renderer/core/dom/document.h"
 #include "third_party/blink/renderer/core/testing/page_test_base.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <fcntl.h>
 #include <unistd.h>
 #endif
@@ -25,7 +25,7 @@ namespace blink {
 
 class FileSystemAccessRegularFileDelegateTest : public PageTestBase {};
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(FileSystemAccessRegularFileDelegateTest, WriteReturnsNoSpaceError) {
   base::File backing_file(base::FilePath(FILE_PATH_LITERAL("/dev/full")),
                           base::File::FLAG_OPEN | base::File::FLAG_WRITE);
@@ -94,6 +94,6 @@ TEST_F(FileSystemAccessRegularFileDelegateTest, GetLengthReturnsFileError) {
   ASSERT_EQ(closed_fd, open("/dev/null", O_RDONLY));
   delegate->Close();
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace blink

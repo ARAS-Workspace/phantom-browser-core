@@ -79,11 +79,6 @@ class SessionRestoreObserverTest : public InProcessBrowserTest {
   void SetUpOnMainThread() override {
     SessionStartupPref pref(SessionStartupPref::LAST);
     SessionStartupPref::SetStartupPref(browser()->GetProfile(), pref);
-#if BUILDFLAG(IS_CHROMEOS)
-    SessionServiceTestHelper helper(
-        SessionServiceFactory::GetForProfile(browser()->GetProfile()));
-    helper.SetForceBrowserNotAliveWithNoWindows(true);
-#endif
     ASSERT_TRUE(embedded_test_server()->Start());
   }
 
@@ -132,7 +127,7 @@ class SessionRestoreObserverTest : public InProcessBrowserTest {
   MockSessionRestoreObserver mock_observer_;
 };
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_SingleTabSessionRestore DISABLED_SingleTabSessionRestore
 #else
 #define MAYBE_SingleTabSessionRestore SingleTabSessionRestore

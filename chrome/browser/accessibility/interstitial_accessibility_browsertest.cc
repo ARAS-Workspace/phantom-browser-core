@@ -49,12 +49,7 @@ class InterstitialAccessibilityBrowserTest : public InProcessBrowserTest {
 
 // TODO(crbug.com/1453221): flakily times out on ChromeOS MSAN builders. Deflake
 // and re-enable.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TestSSLInterstitialAccessibility \
-  DISABLED_TestSSLInterstitialAccessibility
-#else
 #define MAYBE_TestSSLInterstitialAccessibility TestSSLInterstitialAccessibility
-#endif
 IN_PROC_BROWSER_TEST_F(InterstitialAccessibilityBrowserTest,
                        MAYBE_TestSSLInterstitialAccessibility) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("about:blank")));

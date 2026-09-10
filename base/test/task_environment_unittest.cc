@@ -1429,7 +1429,7 @@ TEST_F(TaskEnvironmentTest, SingleThreadMockTime) {
 // TODO(crbug.com/40835641): Re-enable this test
 // TODO(crbug.com/475624916): This test is flaky on Fuchsia when host
 // environment is less performant.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #define MAYBE_ParallelExecutionFence DISABLED_ParallelExecutionFence
 #else
 #define MAYBE_ParallelExecutionFence ParallelExecutionFence

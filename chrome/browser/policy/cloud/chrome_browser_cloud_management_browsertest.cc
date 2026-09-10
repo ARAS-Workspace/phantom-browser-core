@@ -1299,7 +1299,7 @@ class MachineLevelUserCloudPolicyRobotAuthTest : public PlatformBrowserTest {
 };  // namespace policy
 
 // Flaky on linux & win: https://crbug.com/40705662
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_Test DISABLED_Test
 #else
 #define MAYBE_Test Test

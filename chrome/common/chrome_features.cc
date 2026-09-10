@@ -63,7 +63,7 @@ BASE_FEATURE(kUseAdHocSigningForWebAppShims, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kUseKeychainKeyProvider, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Enables or disables the Autofill survey triggered by opening a prompt to
 // save address info.
 BASE_FEATURE(kAutofillAddressSurvey, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -90,28 +90,12 @@ const base::FeatureParam<std::string> kBoardingPassDetectorUrlParam(
     "");
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Enable Borealis on Chrome OS.
-BASE_FEATURE(kBorealis, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kCaptureHandleForStandalonePwasAndIwas,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Enable project Crostini, Linux VMs on Chrome OS.
-BASE_FEATURE(kCrostini, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, use the restricted/unified locked state controller.
-BASE_FEATURE(kUseUnifiedLockedStateController,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-bool IsUseUnifiedLockedStateControllerEnabled() {
-  return base::FeatureList::IsEnabled(kUseUnifiedLockedStateController);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Enables stricter cryptography settings for CNSA2 compliance. This is not
 // needed for security, but may be required by some organizations.
@@ -195,20 +179,12 @@ BASE_FEATURE(kDeferSpellcheckInitialization, base::FEATURE_DISABLED_BY_DEFAULT);
 // Moves the Extensions "puzzle piece" icon from the title bar into the app menu
 // for web app windows.
 BASE_FEATURE(kDesktopPWAsElidedExtensionsMenu,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // If enabled, allow-listed PWAs cannot be closed manually by the user.
 BASE_FEATURE(kDesktopPWAsPreventClose,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Adds a user settings that allows PWAs to be opened with a tab strip.
@@ -245,11 +221,6 @@ BASE_FEATURE(kEnableFullscreenToAnyScreenAndroid,
 BASE_FEATURE(kChromeAppsDeprecation, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-BASE_FEATURE(kForcedAppRelaunchOnPlaceholderUpdate,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Controls whether the actor component of Glic is enabled.
 BASE_FEATURE(kGlicActor, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -566,7 +537,7 @@ BASE_FEATURE(kGlicMessageFirstFre, base::FEATURE_DISABLED_BY_DEFAULT);
 // kill-switch for Glic and can be used in the future to handle unsupported
 // Chrome versions.
 BASE_FEATURE(kGlic,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -1361,24 +1332,10 @@ BASE_FEATURE(kIsolatedWebAppFastUpdateCheck, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables users on unmanaged devices to install Isolated Web Apps.
 BASE_FEATURE(kIsolatedWebAppUnmanagedInstall,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS)
 );
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Enables users to install isolated web apps in managed guest sessions.
-BASE_FEATURE(kIsolatedWebAppManagedGuestSessionInstall,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables bundle cache for isolated web apps in kiosk and managed guest
-// session.
-BASE_FEATURE(kIsolatedWebAppBundleCache, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kLinuxLowMemoryMonitor, base::FEATURE_DISABLED_BY_DEFAULT);
 // Values taken from the low-memory-monitor documentation and also apply to the
 // portal API:
@@ -1387,7 +1344,7 @@ constexpr base::FeatureParam<int> kLinuxLowMemoryMonitorModerateLevel{
     &kLinuxLowMemoryMonitor, "moderate_level", 50};
 constexpr base::FeatureParam<int> kLinuxLowMemoryMonitorCriticalLevel{
     &kLinuxLowMemoryMonitor, "critical_level", 255};
-#endif  // BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 BASE_FEATURE(kListWebAppsSwitch, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -1444,12 +1401,6 @@ BASE_FEATURE(kOomIntervention, base::FEATURE_ENABLED_BY_DEFAULT);
 // Allows Chrome to do preconnect when prerender fails.
 BASE_FEATURE(kPrerenderFallbackToPreconnect, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// If enabled, use managed per-printer print job options set via
-// DevicePrinters/PrinterBulkConfiguration policy in print preview.
-BASE_FEATURE(kUseManagedPrintJobOptionsInPrintPreview,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kUserValueDefaultBrowserStrings,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -1672,17 +1623,6 @@ BASE_FEATURE(kProcessPerSiteForDSE,
 // (`kProcessPerSiteForDSE`).
 BASE_FEATURE(kConsiderDSEWarmUpPageAsSRP, base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Enables Camera Cloud Storage for saving photos and videos on Google Drive
-// or OneDrive, controlled by CameraSaveLocation policy.
-BASE_FEATURE(kCameraCloudStorage, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables the SkyVault (cloud-first) changes, some of which are also controlled
-// by policies: removing local storage, saving downloads and screen captures to
-// the cloud, and related UX changes, primarily in the Files App.
-BASE_FEATURE(kSkyVault, base::FEATURE_ENABLED_BY_DEFAULT);
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Disable downloads of unsafe file types over insecure transports if initiated
 // from a secure page. As of M89, mixed downloads are blocked on all platforms.
@@ -2038,20 +1978,8 @@ BASE_FEATURE(kRestrictedWebUICodeCache, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<std::string> kRestrictedWebUICodeCacheResources{
     &kRestrictedWebUICodeCache, "RestrictedWebUICodeCacheResources", ""};
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Populates storage dimensions in UMA log if enabled. Requires diagnostics
-// package in the image.
-BASE_FEATURE(kUmaStorageDimensions, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-// A feature to enable periodic log class management enabled policy.
-BASE_FEATURE(kClassManagementEnabledMetricsProvider,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 // A feature to enable smart restart metrics collection. The collected metrics

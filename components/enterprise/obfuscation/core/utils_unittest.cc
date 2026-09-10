@@ -265,26 +265,4 @@ INSTANTIATE_TEST_SUITE_P(
                           kMaxChunkSize + 1024,
                           kMaxChunkSize * 2 + 1024)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(ObfuscationUtilsChromeOSTest, NonExistentVirtualPathReturnsError) {
-  base::FilePath virtual_path(
-      FILE_PATH_LITERAL("/media/fuse/drivefs-123/root/missing.txt"));
-  auto result = DeobfuscateFileInPlace(virtual_path);
-  EXPECT_EQ(result.error(), Error::kFileOperationError);
-}
-
-TEST(ObfuscationUtilsChromeOSTest, IsVirtualFilesystem) {
-  EXPECT_TRUE(IsVirtualFilesystem(base::FilePath("/media/fuse")));
-  EXPECT_TRUE(IsVirtualFilesystem(
-      base::FilePath("/media/fuse/drivefs-123/root/file.txt")));
-  EXPECT_TRUE(IsVirtualFilesystem(
-      base::FilePath("/media/fuse/fusebox/subdir/file.txt")));
-  EXPECT_FALSE(IsVirtualFilesystem(
-      base::FilePath("/home/chronos/user/MyFiles/Downloads/file.txt")));
-  EXPECT_FALSE(IsVirtualFilesystem(base::FilePath("/tmp/file.txt")));
-  EXPECT_FALSE(
-      IsVirtualFilesystem(base::FilePath("/media/removable/USB/file.txt")));
-}
-#endif
-
 }  // namespace enterprise_obfuscation

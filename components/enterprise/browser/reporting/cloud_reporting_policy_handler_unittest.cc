@@ -53,10 +53,8 @@ INSTANTIATE_TEST_SUITE_P(MachineEnrolledOrNot,
                          testing::Bool());
 
 TEST_P(CloudReportingPolicyHandlerTest, MachineEnrollment) {
-#if !BUILDFLAG(IS_CHROMEOS)
   // CBCM device enrollment is not for chromeos.
   bool enrolled = EnrollWithChromeBrowserCloudManagement();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   policy::PolicyMap policy_map;
   policy_map.Set(policy::key::kCloudReportingEnabled,
@@ -66,11 +64,7 @@ TEST_P(CloudReportingPolicyHandlerTest, MachineEnrollment) {
   CloudReportingPolicyHandler handler;
   policy::PolicyErrorMap errors;
   ASSERT_TRUE(handler.CheckPolicySettings(policy_map, &errors));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(errors.empty());
-#else
   EXPECT_EQ(errors.empty(), enrolled);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   PrefValueMap prefs;
   handler.ApplyPolicySettings(policy_map, &prefs);
   bool enabled = false;

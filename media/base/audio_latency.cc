@@ -27,9 +27,7 @@ namespace media {
 
 // static
 bool AudioLatency::IsResamplingPassthroughSupported(Type type) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Only N MR1+ has support for OpenSLES performance modes which allow for
   // power efficient playback. Per the Android audio team, we shouldn't waste
   // cycles on resampling when using the playback mode. See OpenSLESOutputStream
@@ -88,7 +86,7 @@ int AudioLatency::GetRtcBufferSize(int sample_rate, int hardware_buffer_size) {
     return frames_per_buffer;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE)
   // On Linux, MacOS and Fuchsia, the low level IO implementations on the
   // browser side supports all buffer size the clients want. We use the native
   // peer connection buffer size (10ms) to achieve best possible performance.

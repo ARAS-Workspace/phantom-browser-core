@@ -61,10 +61,6 @@ class AppInfoDialogBrowserTest : public DialogBrowserTest {
             extensions::TestExtensionEnvironment::Type::
                 kInheritExistingTaskEnvironment,
             extensions::TestExtensionEnvironment::ProfileCreationType::kNoCreate
-#if BUILDFLAG(IS_CHROMEOS)
-            ,
-            extensions::TestExtensionEnvironment::OSSetupType::kNoSetUp
-#endif
         );
     constexpr char kTestExtensionId[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     extension_ =
@@ -88,23 +84,14 @@ class AppInfoDialogBrowserTest : public DialogBrowserTest {
 
 // Invokes a dialog that shows details of an installed extension.
 // Flaky on ChromeOS. See https://crbug.com/40933370
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_InvokeUi_default DISABLED_InvokeUi_default
-#else
 #define MAYBE_InvokeUi_default InvokeUi_default
-#endif
 IN_PROC_BROWSER_TEST_F(AppInfoDialogBrowserTest, MAYBE_InvokeUi_default) {
   ShowAndVerifyUi();
 }
 
 // Flaky on ChromeOS. See https://crbug.com/40932992
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_CreateShortcutsAfterExtensionUnloaded \
-  DISABLED_CreateShortcutsAfterExtensionUnloaded
-#else
 #define MAYBE_CreateShortcutsAfterExtensionUnloaded \
   CreateShortcutsAfterExtensionUnloaded
-#endif
 IN_PROC_BROWSER_TEST_F(AppInfoDialogBrowserTest,
                        MAYBE_CreateShortcutsAfterExtensionUnloaded) {
   ShowUi("");

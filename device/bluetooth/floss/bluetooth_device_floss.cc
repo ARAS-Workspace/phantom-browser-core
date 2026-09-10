@@ -23,10 +23,6 @@
 #include "device/bluetooth/floss/floss_gatt_manager_client.h"
 #include "device/bluetooth/floss/floss_socket_manager.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/bluetooth/chromeos/bluetooth_utils.h"
-#endif
-
 namespace floss {
 
 namespace {
@@ -58,12 +54,6 @@ void OnRemoveBond(base::OnceClosure callback, DBusResult<bool> ret) {
   } else if (!*ret) {
     BLUETOOTH_LOG(ERROR) << "RemoveBond returned failure";
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  bool success = ret.has_value() && *ret;
-  device::RecordForgetResult(success ? device::ForgetResult::kSuccess
-                                     : device::ForgetResult::kFailure);
-#endif
 
   std::move(callback).Run();
 }
@@ -120,12 +110,6 @@ bool BluetoothDeviceFloss::IsPaired() const {
   return IsBondedImpl() ||
          FlossAdapterClient::IsConnectionPaired(connection_state_);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool BluetoothDeviceFloss::IsBonded() const {
-  return IsBondedImpl();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 bool BluetoothDeviceFloss::IsConnected() const {
   return is_acl_connected_;
@@ -342,15 +326,6 @@ void BluetoothDeviceFloss::ConnectionIncomplete() {
       BluetoothDevice::ConnectErrorCode::ERROR_NON_AUTH_TIMEOUT);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void BluetoothDeviceFloss::ConnectClassic(
-    device::BluetoothDevice::PairingDelegate* pairing_delegate,
-    ConnectCallback callback) {
-  ConnectWithTransport(pairing_delegate, std::move(callback),
-                       FlossAdapterClient::BluetoothTransport::kBrEdr);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void BluetoothDeviceFloss::SetPinCode(const std::string& pincode) {
   std::vector<uint8_t> pin(pincode.begin(), pincode.end());
   FlossDBusManager::Get()->GetAdapterClient()->SetPin(
@@ -465,100 +440,6 @@ BluetoothPairingFloss* BluetoothDeviceFloss::BeginPairing(
   pairing_ = std::make_unique<BluetoothPairingFloss>(pairing_delegate);
   return pairing_.get();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void BluetoothDeviceFloss::OnExecuteWrite(
-    base::OnceClosure callback,
-    ExecuteWriteErrorCallback error_callback,
-    DBusResult<Void> ret) {
-  if (!ret.has_value()) {
-    std::move(error_callback)
-        .Run(device::BluetoothGattService::GattErrorCode::kFailed);
-    return;
-  }
-
-  pending_execute_write_ =
-      std::make_pair(std::move(callback), std::move(error_callback));
-}
-
-void BluetoothDeviceFloss::BeginReliableWrite() {
-  DCHECK(!using_reliable_write_);
-
-  if (!using_reliable_write_) {
-    using_reliable_write_ = true;
-
-    FlossDBusManager::Get()->GetGattManagerClient()->BeginReliableWrite(
-        base::DoNothing(), address_);
-  }
-}
-
-void BluetoothDeviceFloss::ExecuteWrite(
-    base::OnceClosure callback,
-    ExecuteWriteErrorCallback error_callback) {
-  // Only one pending execute allowed at a time.
-  if (pending_execute_write_) {
-    std::move(error_callback)
-        .Run(device::BluetoothGattService::GattErrorCode::kInProgress);
-    return;
-  }
-
-  if (!using_reliable_write_) {
-    std::move(error_callback)
-        .Run(device::BluetoothGattService::GattErrorCode::kFailed);
-    return;
-  }
-
-  FlossDBusManager::Get()->GetGattManagerClient()->EndReliableWrite(
-      base::BindOnce(&BluetoothDeviceFloss::OnExecuteWrite,
-                     weak_ptr_factory_.GetWeakPtr(), std::move(callback),
-                     std::move(error_callback)),
-      address_, /*execute=*/true);
-}
-
-void BluetoothDeviceFloss::AbortWrite(base::OnceClosure callback,
-                                      AbortWriteErrorCallback error_callback) {
-  // Only one pending execute allowed at a time.
-  if (pending_execute_write_) {
-    std::move(error_callback)
-        .Run(device::BluetoothGattService::GattErrorCode::kInProgress);
-    return;
-  }
-
-  if (!using_reliable_write_) {
-    std::move(error_callback)
-        .Run(device::BluetoothGattService::GattErrorCode::kFailed);
-    return;
-  }
-
-  FlossDBusManager::Get()->GetGattManagerClient()->EndReliableWrite(
-      base::BindOnce(&BluetoothDeviceFloss::OnExecuteWrite,
-                     weak_ptr_factory_.GetWeakPtr(), std::move(callback),
-                     std::move(error_callback)),
-      address_, /*execute=*/false);
-}
-
-void BluetoothDeviceFloss::GattExecuteWrite(std::string address,
-                                            GattStatus status) {
-  if (address != address_) {
-    return;
-  }
-
-  if (!pending_execute_write_) {
-    return;
-  }
-
-  if (status != GattStatus::kSuccess) {
-    std::move(pending_execute_write_->second)
-        .Run(
-            floss::BluetoothGattServiceFloss::GattStatusToServiceError(status));
-  } else {
-    std::move(pending_execute_write_->first).Run();
-  }
-
-  pending_execute_write_ = std::nullopt;
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 FlossDeviceId BluetoothDeviceFloss::AsFlossDeviceId() const {
   return FlossDeviceId{.address = address_, .name = name_};
@@ -958,22 +839,11 @@ void BluetoothDeviceFloss::OnDisconnectAllEnabledProfiles(
     ErrorCallback error_callback,
     DBusResult<Void> ret) {
   if (!ret.has_value()) {
-#if BUILDFLAG(IS_CHROMEOS)
-    device::RecordUserInitiatedDisconnectResult(
-        device::DisconnectResult::kFailure,
-        /*transport=*/GetType());
-#endif
     BLUETOOTH_LOG(ERROR) << "Failed to discconnect all enabled profiles: "
                          << ret.error();
     std::move(error_callback).Run();
     return;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  device::RecordUserInitiatedDisconnectResult(
-      device::DisconnectResult::kSuccess,
-      /*transport=*/GetType());
-#endif
 
   std::move(callback).Run();
 }
@@ -1219,15 +1089,5 @@ void BluetoothDeviceFloss::GattConfigureMtu(std::string address,
 
   DidConnectGatt(std::nullopt);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void BluetoothDeviceFloss::GattServiceChanged(std::string address) {
-  if (address != GetAddress()) {
-    return;
-  }
-
-  adapter()->NotifyGattNeedsDiscovery(this);
-}
-#endif
 
 }  // namespace floss

@@ -21,9 +21,3 @@ using ColorProviderCSSColorsTest = WebUIMochaBrowserTest;
 IN_PROC_BROWSER_TEST_F(ColorProviderCSSColorsTest, All) {
   RunTest("css/color_provider_css_colors_test.js", "mocha.run()");
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(ColorProviderCSSColorsTest, ChromeOS) {
-  RunTest("css/color_provider_css_colors_test_chromeos.js", "mocha.run()");
-}
-#endif

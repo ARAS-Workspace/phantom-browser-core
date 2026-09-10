@@ -198,12 +198,7 @@ IN_PROC_BROWSER_TEST_F(TestStructuredMetricsService,
 
 // TODO(crbug.com/40931189): Re-enable this test
 // Only flaky on chromeos-rel.
-#if BUILDFLAG(IS_CHROMEOS) && defined(NDEBUG) && !defined(ADDRESS_SANITIZER)
-#define MAYBE_StagedLogPurgeOnConsentRevoke \
-  DISABLED_StagedLogPurgeOnConsentRevoke
-#else
 #define MAYBE_StagedLogPurgeOnConsentRevoke StagedLogPurgeOnConsentRevoke
-#endif
 IN_PROC_BROWSER_TEST_F(TestStructuredMetricsService,
                        MAYBE_StagedLogPurgeOnConsentRevoke) {
   auto* sm_service = GetSMService();
@@ -249,46 +244,6 @@ IN_PROC_BROWSER_TEST_F(TestStructuredMetricsService,
   EXPECT_FALSE(HasStagedLog());
   EXPECT_EQ(sm_service->recorder()->event_storage()->RecordedEventsCount(), 0);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(TestStructuredMetricsService, SystemProfilePopulated) {
-  auto* sm_service = GetSMService();
-
-  // Enable consent for profile.
-  structured_metrics_mixin_.UpdateRecordingState(true);
-
-  // Wait for the consent to propagate.
-  WaitForConsentChanges();
-
-  // Verify that recording and reporting are enabled.
-  EXPECT_TRUE(sm_service->recording_enabled());
-  EXPECT_TRUE(sm_service->reporting_active());
-
-  WaitUntilKeysReady();
-
-  // Record an event inorder to build a log.
-  structured::StructuredMetricsClient::Record(
-      structured::events::v2::test_project_one::TestEventOne()
-          .SetTestMetricOne("metric one")
-          .SetTestMetricTwo(10));
-
-  // This will timeout and fail the test if events have not been recorded
-  // successfully.
-  structured_metrics_mixin_.WaitUntilEventRecorded(kProjectOneHash,
-                                                   kEventOneHash);
-
-  // Flush the in-memory events to a staged log.
-  sm_service->Flush(metrics::MetricsLogsEventManager::CreateReason::kUnknown);
-
-  std::unique_ptr<ChromeUserMetricsExtension> uma_proto = GetStagedLog();
-  ASSERT_NE(uma_proto.get(), nullptr);
-
-  // Verify that the SystemProfile has been set appropriately.
-  const SystemProfileProto& system_profile = uma_proto->system_profile();
-  EXPECT_EQ(system_profile.app_version(),
-            GetSMService()->GetMetricsServiceClient()->GetVersionString());
-}
-#endif  //  BUILDFLAG(IS_CHROMEOS)
 
 // TODO(crbug.com/41485716): Flaky on linux-chromeos-rel.
 IN_PROC_BROWSER_TEST_F(TestStructuredMetricsService,

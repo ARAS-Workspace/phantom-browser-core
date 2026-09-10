@@ -110,13 +110,6 @@
 #include "components/webapps/browser/installable/installable_metrics.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_switches.h"
-#include "ash/constants/web_app_id_constants.h"
-#include "chrome/browser/extensions/updater/local_extension_cache.h"
-#endif
-
 using base::test::TestFuture;
 using extensions::CorruptedExtensionReinstaller;
 using extensions::CrxInstallError;
@@ -411,32 +404,6 @@ class ExtensionPolicyTest : public ExtensionPolicyTestBase {
 };
 
 }  // namespace
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Check that component extension can't be blocklisted.
-IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
-                       ExtensionInstallBlocklistComponentApps) {
-  // Load all component extensions.
-  extensions::ComponentLoader::EnableBackgroundExtensionsForTesting();
-  auto* loader = extensions::ComponentLoader::Get(browser()->GetProfile());
-  loader->AddDefaultComponentExtensions(false);
-  base::RunLoop().RunUntilIdle();
-
-  extensions::ExtensionRegistry* registry = extension_registry();
-  ASSERT_TRUE(
-      registry->enabled_extensions().GetByID(extensions::kWebStoreAppId));
-
-  base::ListValue blocklist;
-  blocklist.Append(extensions::kWebStoreAppId);
-  PolicyMap policies;
-  policies.Set(key::kExtensionInstallBlocklist, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD,
-               base::Value(std::move(blocklist)), nullptr);
-  UpdateProviderPolicy(policies);
-  ASSERT_TRUE(
-      registry->enabled_extensions().GetByID(extensions::kWebStoreAppId));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
                        ExtensionInstallBlocklistSelective) {
@@ -896,100 +863,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
   EXPECT_FALSE(
       extension_cache()->GetExtension(kGoodCrxId, "", nullptr, nullptr));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Verifies that if the cache entry contains inconsistent extension version,
-// the crx installation fails and download of a new crx file is attempted.
-//
-// TODO(crbug.com/40236711): Fix this test. It doesn't always pass.
-IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
-                       DISABLED_CrxVersionInconsistencyInCache) {
-  base::ScopedAllowBlockingForTesting allow_io;
-  // Intercepts the call to download the crx file and responds with the test crx
-  // file.
-  ExtensionRequestInterceptor interceptor;
-  extensions::ExtensionRegistry* registry = extension_registry();
-  ASSERT_FALSE(registry->GetExtensionById(
-      kGoodCrxId, extensions::ExtensionRegistry::EVERYTHING));
-
-  // Override the fake extension cache set in SetUpOnMainThread() as the test
-  // requires real extension cache to retry download of crx file when
-  // installation fails due to version mismatch.
-  extensions::ExtensionCache* cache =
-      extensions::ExtensionsBrowserClient::Get()->GetExtensionCache();
-  extension_updater()->SetExtensionCacheForTesting(cache);
-
-  base::FilePath extension_path(chrome_test_utils::GetTestFilePath(
-      base::FilePath(kTestExtensionsDir), base::FilePath(kGoodCrxName)));
-  cache->AllowCaching(kGoodCrxId);
-
-  // Copy the crx file to a temp directory so that the test file is not deleted
-  // when cache entry is removed on version mismatch.
-  base::ScopedTempDir tmp_dir;
-  ASSERT_TRUE(tmp_dir.CreateUniqueTempDir());
-  const base::FilePath tmp_path = tmp_dir.GetPath();
-  const base::FilePath filename =
-      tmp_path.Append(extensions::LocalExtensionCache::ExtensionFileName(
-          kGoodCrxId, kGoodCrxVersion, "" /* hash */));
-  EXPECT_TRUE(CopyFile(extension_path, filename));
-
-  // Wait for the extension cache to get ready.
-  base::RunLoop cache_init_run_loop;
-  cache->Start(cache_init_run_loop.QuitClosure());
-  cache_init_run_loop.Run();
-
-  base::RunLoop put_extension_run_loop;
-  // Insert a cache entry with version "1.0.0.1" while the crx file it points to
-  // belongs to version "1.0.0.0".
-  cache->PutExtension(
-      kGoodCrxId, "" /* expected hash */, filename, kGoodCrxVersion,
-      base::BindLambdaForTesting(
-          [&put_extension_run_loop](const base::FilePath& file_path,
-                                    bool file_ownership_passed) {
-            put_extension_run_loop.Quit();
-          }));
-  put_extension_run_loop.Run();
-  EXPECT_TRUE(cache->GetExtension(kGoodCrxId, "", nullptr, nullptr));
-
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url =
-      embedded_test_server()->GetURL("/extensions/good2_update_manifest.xml");
-  PolicyMap policies;
-
-  TestFuture<std::optional<CrxInstallError>> installer_done_future;
-  extension_updater()->SetCrxInstallerResultCallbackForTesting(
-      installer_done_future
-          .GetCallback<const std::optional<CrxInstallError>&>());
-
-  // Add an entry in the extension force list policy.
-  AddExtensionToForceList(&policies, kGoodCrxId, url);
-
-  TestExtensionRegistryObserver registry_observer(extension_registry());
-
-  // Updating the policy triggers the extension installation process.
-  UpdateProviderPolicy(policies);
-  // Wait till extension entry is found in the cache and installation fails due
-  // to version mismatch as the cache entry informs extension version as
-  // "1.0.0.1" while the crx file it points to belongs to "1.0.0.0".
-  const std::optional<CrxInstallError>& install_error =
-      installer_done_future.Get();
-  EXPECT_TRUE(install_error);
-
-  // Wait till extension is freshly downloaded from the server and installation
-  // succeeds.
-  ASSERT_TRUE(registry_observer.WaitForExtensionLoaded());
-
-  EXPECT_TRUE(registry->GetExtensionById(
-      kGoodCrxId, extensions::ExtensionRegistry::EVERYTHING));
-  std::string version;
-  base::FilePath file_path;
-  // Check extension is inserted in the cache with a new filepath to the
-  // downloaded correct crx.
-  EXPECT_TRUE(cache->GetExtension(kGoodCrxId, "", &file_path, &version));
-  EXPECT_EQ(version, kGoodCrxVersion);
-  EXPECT_NE(file_path, filename);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Verifies that extensions that are force-installed by policies are
 // installed and can't be uninstalled.
@@ -2599,10 +2472,6 @@ class ExtensionPolicyTest2Contexts : public PolicyTest {
 
  protected:
   void SetUpCommandLine(base::CommandLine* command_line) override {
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
     PolicyTest::SetUpCommandLine(command_line);
   }
 

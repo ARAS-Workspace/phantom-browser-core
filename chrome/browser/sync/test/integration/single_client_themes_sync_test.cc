@@ -757,7 +757,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientThemesSyncTestWithAccountThemesSeparation,
 
 // Signing out is not supported on ChromeOS, thus excluded from the following
 // tests.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientThemesSyncTestWithAccountThemesSeparation,
                        ShouldReturnLocalDataDescriptions) {
   ASSERT_TRUE(SetupClients());
@@ -931,7 +930,6 @@ IN_PROC_BROWSER_TEST_P(
       "Sync.SyncableService.MaybeClearDataIfMetadataEmptyOrInvalid.THEME", true,
       /*expected_bucket_count=*/1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(
     SingleClientThemesSyncTestWithAccountThemesSeparation,
@@ -943,27 +941,15 @@ IN_PROC_BROWSER_TEST_P(
 
   GetFakeServer()->InjectEntity(CreateGrayscaleThemeEntity());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_TRUE(SetupSync());
-#else
   ASSERT_TRUE(SignIn());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Account theme is effective.
   ASSERT_TRUE(GrayscaleThemeChecker(GetProfile(0)).Wait());
 
   // Simulate a data type error to prevent clearing of account data.
   GetSyncService(0)->ReportDataTypeErrorForTest(syncer::THEMES);
-#if BUILDFLAG(IS_CHROMEOS)
-  // Disable sync.
-  ASSERT_TRUE(
-      GetClient(0)->DisableSelectableType(syncer::UserSelectableType::kThemes));
-#else
   // Sign out. Account theme should stay because of the data type error.
   GetClient(0)->SignOutPrimaryAccount();
-#endif  // BUILDFLAG(IS_CHROMEOS)
-  // Local theme is not restored because stop sync is not called when there is a
-  // data type error.
   ASSERT_TRUE(UsingGrayscaleTheme(GetProfile(0)));
 
   ExcludeDataTypesFromCheckForDataTypeFailures({syncer::THEMES});
@@ -987,7 +973,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientThemesSyncTestWithAccountThemesSeparation,
 }
 
 // Signing out is not supported on ChromeOS, thus excluded from this test suite.
-#if !BUILDFLAG(IS_CHROMEOS)
 class SingleClientThemesSyncTestWithAccountThemesSeparationInSigninPendingState
     : public SingleClientThemesSyncTestWithAccountThemesSeparation {
  public:
@@ -1127,8 +1112,6 @@ IN_PROC_BROWSER_TEST_P(
   GetClient(0)->SignOutPrimaryAccount();
   ASSERT_TRUE(DefaultThemeChecker(GetProfile(0)).Wait());
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class SingleClientThemesMigrateSyncingUserToSignedInSyncTest
     : public SingleClientThemesSyncTestWithAccountThemesSeparation {

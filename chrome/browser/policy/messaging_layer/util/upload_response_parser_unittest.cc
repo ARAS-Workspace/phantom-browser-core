@@ -220,10 +220,6 @@ TEST_P(UploadResponseParserTest, SuccessfulUpload) {
       response.last_successfully_uploaded_record_sequence_info().value(),
       AllOf(Property(&SequenceInformation::priority, Eq(kPriority)),
             Property(&SequenceInformation::sequencing_id, Eq(kSequencingId)),
-#if BUILDFLAG(IS_CHROMEOS)
-            Property(&SequenceInformation::generation_guid,
-                     StrEq(kGenerationGuid)),
-#endif  // BUILDFLAG(IS_CHROMEOS)
             Property(&SequenceInformation::generation_id, Eq(kGenerationId))));
 }
 
@@ -301,71 +297,8 @@ TEST_P(UploadResponseParserTest, ContainsGenerationGuid) {
       response.last_successfully_uploaded_record_sequence_info().value(),
       AllOf(Property(&SequenceInformation::priority, Eq(kPriority)),
             Property(&SequenceInformation::sequencing_id, Eq(kSequencingId)),
-#if BUILDFLAG(IS_CHROMEOS)
-            Property(&SequenceInformation::generation_guid,
-                     StrEq(kGenerationGuid)),
-#endif  // BUILDFLAG(IS_CHROMEOS)
             Property(&SequenceInformation::generation_id, Eq(kGenerationId))));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(UploadResponseParserTest, InvalidGenerationGuid) {
-  auto seq_info = ComposeSequencingInfo(kPriority, kSequencingId, kGenerationId,
-                                        kGenerationGuid);
-  builder_.SetLastSuccessfulRecord(std::move(seq_info));
-
-  auto response_dict = builder_.Build();
-  // Generation guids must be parsable into `base::Uuid`.
-  response_dict.SetByDottedPath("lastSucceedUploadedRecord.generationGuid",
-                                "invalid-generation-guid");
-
-  UploadResponseParser response(/*is_generation_guid_required=*/true,
-                                std::move(response_dict));
-  CommonExpectation(response);
-  EXPECT_FALSE(
-      response.last_successfully_uploaded_record_sequence_info().has_value());
-  EXPECT_THAT(
-      response.last_successfully_uploaded_record_sequence_info().error(),
-      Property(&Status::error_code, Eq(error::INVALID_ARGUMENT)));
-}
-
-TEST_P(UploadResponseParserTest, MissingGenerationGuidFailsWhenRequired) {
-  auto seq_info = ComposeSequencingInfo(kPriority, kSequencingId, kGenerationId,
-                                        std::nullopt);
-  builder_.SetLastSuccessfulRecord(std::move(seq_info));
-
-  auto response_dict = builder_.Build();
-  // Remove the generation guid.
-  response_dict.RemoveByDottedPath("lastSucceedUploadedRecord.generationGuid");
-
-  UploadResponseParser response(/*is_generation_guid_required=*/true,
-                                std::move(response_dict));
-  CommonExpectation(response);
-  EXPECT_FALSE(
-      response.last_successfully_uploaded_record_sequence_info().has_value());
-  EXPECT_THAT(
-      response.last_successfully_uploaded_record_sequence_info().error(),
-      Property(&Status::error_code, Eq(error::INVALID_ARGUMENT)));
-}
-
-TEST_P(UploadResponseParserTest, MissingGenerationGuidOkWhenNotRequired) {
-  auto seq_info = ComposeSequencingInfo(kPriority, kSequencingId, kGenerationId,
-                                        std::nullopt);
-  builder_.SetLastSuccessfulRecord(std::move(seq_info));
-
-  UploadResponseParser response(/*is_generation_guid_required=*/false,
-                                builder_.Build());
-  CommonExpectation(response);
-  EXPECT_TRUE(
-      response.last_successfully_uploaded_record_sequence_info().has_value());
-  EXPECT_THAT(
-      response.last_successfully_uploaded_record_sequence_info().value(),
-      AllOf(Property(&SequenceInformation::priority, Eq(kPriority)),
-            Property(&SequenceInformation::sequencing_id, Eq(kSequencingId)),
-            Property(&SequenceInformation::generation_id, Eq(kGenerationId)),
-            Property(&SequenceInformation::generation_guid, IsEmpty())));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(UploadResponseParserTest, GapUponPermanentFailure) {
   auto seq_info = ComposeSequencingInfo(kPriority, kSequencingId, kGenerationId,
@@ -387,10 +320,6 @@ TEST_P(UploadResponseParserTest, GapUponPermanentFailure) {
       response.last_successfully_uploaded_record_sequence_info().value(),
       AllOf(Property(&SequenceInformation::priority, Eq(kPriority)),
             Property(&SequenceInformation::sequencing_id, Eq(kSequencingId)),
-#if BUILDFLAG(IS_CHROMEOS)
-            Property(&SequenceInformation::generation_guid,
-                     StrEq(kGenerationGuid)),
-#endif  // BUILDFLAG(IS_CHROMEOS)
             Property(&SequenceInformation::generation_id, Eq(kGenerationId))));
 
   EXPECT_TRUE(response.gap_record_for_permanent_failure().has_value());
@@ -400,10 +329,6 @@ TEST_P(UploadResponseParserTest, GapUponPermanentFailure) {
                AllOf(Property(&SequenceInformation::priority, Eq(kPriority)),
                      Property(&SequenceInformation::sequencing_id,
                               Eq(kSequencingId + 1)),
-#if BUILDFLAG(IS_CHROMEOS)
-                     Property(&SequenceInformation::generation_guid,
-                              StrEq(kGenerationGuid)),
-#endif  // BUILDFLAG(IS_CHROMEOS)
                      Property(&SequenceInformation::generation_id,
                               Eq(kGenerationId)))));
 }
@@ -428,10 +353,6 @@ TEST_P(UploadResponseParserTest, GapUponPermanentFailureLoss) {
       response.last_successfully_uploaded_record_sequence_info().value(),
       AllOf(Property(&SequenceInformation::priority, Eq(kPriority)),
             Property(&SequenceInformation::sequencing_id, Eq(kSequencingId)),
-#if BUILDFLAG(IS_CHROMEOS)
-            Property(&SequenceInformation::generation_guid,
-                     StrEq(kGenerationGuid)),
-#endif  // BUILDFLAG(IS_CHROMEOS)
             Property(&SequenceInformation::generation_id, Eq(kGenerationId))));
 
   EXPECT_FALSE(response.gap_record_for_permanent_failure().has_value());

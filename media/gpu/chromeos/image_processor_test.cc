@@ -239,17 +239,6 @@ YuvSubsampling ToYuvSubsampling(VideoPixelFormat format) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool IsFormatTestedForDmabufAndGbm(VideoPixelFormat format) {
-  switch (format) {
-    case PIXEL_FORMAT_NV12:
-    case PIXEL_FORMAT_YV12:
-      return true;
-    default:
-      return false;
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(USE_V4L2_CODEC)
 bool SupportsNecessaryGLExtension() {
@@ -554,99 +543,6 @@ TEST_P(ImageProcessorParamTest, ConvertOneTime_MemToMem) {
   EXPECT_TRUE(ip_client->WaitForFrameProcessors());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// We don't yet have the function to create Dmabuf-backed VideoFrame on
-// platforms except ChromeOS. So MemToDmabuf test is limited on ChromeOS.
-TEST_P(ImageProcessorParamTest, ConvertOneTime_DmabufToMem) {
-  // Load the test input image. We only need the output image's metadata so we
-  // can compare checksums.
-  test::Image input_image(BuildSourceFilePath(std::get<0>(GetParam())));
-  test::Image output_image(BuildSourceFilePath(std::get<1>(GetParam())));
-  ASSERT_TRUE(input_image.Load());
-  ASSERT_TRUE(output_image.LoadMetadata());
-  if (!IsFormatTestedForDmabufAndGbm(input_image.PixelFormat()))
-    GTEST_SKIP() << "Skipping Dmabuf format " << input_image.PixelFormat();
-  const bool is_scaling = (input_image.PixelFormat() == PIXEL_FORMAT_NV12 &&
-                           output_image.PixelFormat() == PIXEL_FORMAT_NV12);
-  const auto storage = is_scaling ? VideoFrame::STORAGE_MAPPABLE_SHARED_IMAGE
-                                  : VideoFrame::STORAGE_OWNED_MEMORY;
-  auto ip_client =
-      CreateImageProcessorClient(input_image, storage, &output_image, storage);
-  if (!ip_client && g_backend_type.has_value()) {
-    GTEST_SKIP() << "Forced backend " << ToString(*g_backend_type)
-                 << " does not support this test";
-  }
-  ASSERT_TRUE(ip_client);
-
-  ip_client->Process(input_image, output_image);
-
-  EXPECT_TRUE(ip_client->WaitUntilNumImageProcessed(1u));
-  EXPECT_EQ(ip_client->GetErrorCount(), 0u);
-  EXPECT_EQ(ip_client->GetNumOfProcessedImages(), 1u);
-  EXPECT_TRUE(ip_client->WaitForFrameProcessors());
-}
-
-TEST_P(ImageProcessorParamTest, ConvertOneTime_DmabufToDmabuf) {
-  // Load the test input image. We only need the output image's metadata so we
-  // can compare checksums.
-  test::Image input_image(BuildSourceFilePath(std::get<0>(GetParam())));
-  test::Image output_image(BuildSourceFilePath(std::get<1>(GetParam())));
-  ASSERT_TRUE(input_image.Load());
-  ASSERT_TRUE(output_image.LoadMetadata());
-  if (!IsFormatTestedForDmabufAndGbm(input_image.PixelFormat()))
-    GTEST_SKIP() << "Skipping Dmabuf format " << input_image.PixelFormat();
-  if (!IsFormatTestedForDmabufAndGbm(output_image.PixelFormat()))
-    GTEST_SKIP() << "Skipping Dmabuf format " << output_image.PixelFormat();
-
-  auto ip_client =
-      CreateImageProcessorClient(input_image, VideoFrame::STORAGE_DMABUFS,
-                                 &output_image, VideoFrame::STORAGE_DMABUFS);
-  if (!ip_client && g_backend_type.has_value()) {
-    GTEST_SKIP() << "Forced backend " << ToString(*g_backend_type)
-                 << " does not support this test";
-  }
-  ASSERT_TRUE(ip_client);
-  ip_client->Process(input_image, output_image);
-
-  EXPECT_TRUE(ip_client->WaitUntilNumImageProcessed(1u));
-  EXPECT_EQ(ip_client->GetErrorCount(), 0u);
-  EXPECT_EQ(ip_client->GetNumOfProcessedImages(), 1u);
-  EXPECT_TRUE(ip_client->WaitForFrameProcessors());
-}
-
-// Although MappableSharedImage is a cross platform class, code for image
-// processor test is designed only for ChromeOS. So this test runs on ChromeOS
-// only.
-TEST_P(ImageProcessorParamTest, ConvertOneTime_MappableSIToMappableSI) {
-  // Load the test input image. We only need the output image's metadata so we
-  // can compare checksums.
-  test::Image input_image(BuildSourceFilePath(std::get<0>(GetParam())));
-  test::Image output_image(BuildSourceFilePath(std::get<1>(GetParam())));
-  ASSERT_TRUE(input_image.Load());
-  ASSERT_TRUE(output_image.LoadMetadata());
-  if (!IsFormatTestedForDmabufAndGbm(input_image.PixelFormat())) {
-    GTEST_SKIP() << "Skipping format " << input_image.PixelFormat();
-  }
-  if (!IsFormatTestedForDmabufAndGbm(output_image.PixelFormat())) {
-    GTEST_SKIP() << "Skipping format " << output_image.PixelFormat();
-  }
-
-  auto ip_client = CreateImageProcessorClient(
-      input_image, VideoFrame::STORAGE_MAPPABLE_SHARED_IMAGE, &output_image,
-      VideoFrame::STORAGE_MAPPABLE_SHARED_IMAGE);
-  if (!ip_client && g_backend_type.has_value()) {
-    GTEST_SKIP() << "Forced backend " << ToString(*g_backend_type)
-                 << " does not support this test";
-  }
-  ASSERT_TRUE(ip_client);
-  ip_client->Process(input_image, output_image);
-
-  EXPECT_TRUE(ip_client->WaitUntilNumImageProcessed(1u));
-  EXPECT_EQ(ip_client->GetErrorCount(), 0u);
-  EXPECT_EQ(ip_client->GetNumOfProcessedImages(), 1u);
-  EXPECT_TRUE(ip_client->WaitForFrameProcessors());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 INSTANTIATE_TEST_SUITE_P(
     PixelFormatConversionToNV12,
@@ -701,10 +597,6 @@ INSTANTIATE_TEST_SUITE_P(NV12CroppingAndScaling,
                          ::testing::Values(std::make_tuple(kNV12Image360PIn480P,
                                                            kNV12Image270P)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(hiroh): Add more tests.
-// MEM->DMABUF (V4L2VideoEncodeAccelerator),
-#endif
 
 #if BUILDFLAG(USE_V4L2_CODEC)
 TEST(ImageProcessorBackendTest, CompareLibYUVAndGLBackendsForMM21Image) {

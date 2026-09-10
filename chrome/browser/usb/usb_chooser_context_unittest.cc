@@ -33,12 +33,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "chrome/browser/ash/settings/stub_cros_settings_provider.h"
-#include "chromeos/ash/components/settings/cros_settings_names.h"
-#endif
-
 using ::base::test::TestFuture;
 using ::content_settings::SettingSource;
 using ::device::mojom::UsbDeviceInfoPtr;
@@ -58,10 +52,6 @@ constexpr int kDeviceIdWildcard = -1;
 class UsbChooserContextTest : public testing::Test {
  public:
   UsbChooserContextTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    profile_.ScopedCrosSettingsTestHelper()
-        ->ReplaceDeviceSettingsProviderWithStub();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   ~UsbChooserContextTest() override {
@@ -79,10 +69,6 @@ class UsbChooserContextTest : public testing::Test {
       EXPECT_CALL(*entry.second, OnObjectPermissionChanged).Times(AnyNumber());
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    profile_.ScopedCrosSettingsTestHelper()
-        ->RestoreRealDeviceSettingsProvider();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
  protected:
@@ -714,79 +700,6 @@ TEST_F(UsbChooserContextTest,
   EXPECT_TRUE(store->HasDevicePermission(kCoolOrigin, *unrelated_device_info));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-class DeviceLoginScreenWebUsbChooserContextTest : public UsbChooserContextTest {
- public:
-  DeviceLoginScreenWebUsbChooserContextTest() {
-    TestingProfile::Builder builder;
-    builder.SetPath(base::FilePath(FILE_PATH_LITERAL(chrome::kInitialProfile)));
-    signin_profile_ = builder.Build();
-  }
-  ~DeviceLoginScreenWebUsbChooserContextTest() override = default;
-
- protected:
-  Profile* GetSigninProfile() { return signin_profile_.get(); }
-
- private:
-  std::unique_ptr<Profile> signin_profile_;
-};
-
-TEST_F(DeviceLoginScreenWebUsbChooserContextTest,
-       UserUsbChooserContextOnlyUsesUserPolicy) {
-  const std::vector<GURL> kValidOrigins = {
-      GURL(kProductVendorUrl), GURL(kVendorUrl), GURL(kAnyDeviceUrl)};
-  const std::vector<GURL> kInvalidOrigins = {GURL(kGadgetUrl), GURL(kCoolUrl)};
-
-  UsbDeviceInfoPtr specific_device_info = device_manager_.CreateAndAddDevice(
-      6353, 5678, "Google", "Gizmo", "ABC123");
-
-  Profile* user_profile = profile();
-  Profile* signin_profile = GetSigninProfile();
-
-  auto* user_store = GetChooserContext(user_profile);
-  auto* signin_store = GetChooserContext(signin_profile);
-
-  ExpectNoPermissions(user_store, *specific_device_info);
-  ExpectNoPermissions(signin_store, *specific_device_info);
-
-  user_profile->GetPrefs()->SetList(prefs::kManagedWebUsbAllowDevicesForUrls,
-                                    base::test::ParseJsonList(kPolicySetting));
-
-  ExpectCorrectPermissions(user_store, kValidOrigins, kInvalidOrigins,
-                           *specific_device_info);
-  ExpectNoPermissions(signin_store, *specific_device_info);
-}
-
-TEST_F(DeviceLoginScreenWebUsbChooserContextTest,
-       SigninUsbChooserContextOnlyUsesDevicePolicy) {
-  const std::vector<GURL> kValidOrigins = {
-      GURL(kProductVendorUrl), GURL(kVendorUrl), GURL(kAnyDeviceUrl)};
-  const std::vector<GURL> kInvalidOrigins = {GURL(kGadgetUrl), GURL(kCoolUrl)};
-
-  UsbDeviceInfoPtr specific_device_info = device_manager_.CreateAndAddDevice(
-      6353, 5678, "Google", "Gizmo", "ABC123");
-
-  Profile* user_profile = profile();
-  Profile* signin_profile = GetSigninProfile();
-
-  auto* user_store = GetChooserContext(user_profile);
-  auto* signin_store = GetChooserContext(signin_profile);
-
-  ExpectNoPermissions(user_store, *specific_device_info);
-  ExpectNoPermissions(signin_store, *specific_device_info);
-
-  signin_profile->GetPrefs()->SetList(
-      prefs::kManagedWebUsbAllowDevicesForUrls,
-      base::test::ParseJsonList(kPolicySetting));
-
-  ExpectNoPermissions(user_store, *specific_device_info);
-  ExpectCorrectPermissions(signin_store, kValidOrigins, kInvalidOrigins,
-                           *specific_device_info);
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 void ExpectDeviceObjectInfo(const base::DictValue& actual,
@@ -1281,50 +1194,6 @@ TEST_F(UsbChooserContextTest, MassStorageHidden) {
       }));
   loop.Run();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(UsbChooserContextTest, MassStorageShownWhenDetachable) {
-  base::ListValue allowlist;
-  base::DictValue ids;
-  ids.Set(ash::kUsbDetachableAllowlistKeyVid, 1234);
-  ids.Set(ash::kUsbDetachableAllowlistKeyPid, 1);
-  allowlist.Append(std::move(ids));
-
-  profile()->ScopedCrosSettingsTestHelper()->GetStubbedProvider()->Set(
-      ash::kUsbDetachableAllowlist, base::Value(std::move(allowlist)));
-
-  GURL kUrl("https://www.google.com");
-  const auto origin = url::Origin::Create(kUrl);
-
-  // Mass storage devices should be hidden unless they are listed in the
-  // UsbDetachableAllowlist policy.
-  std::vector<device::mojom::UsbConfigurationInfoPtr> storage_configs;
-  storage_configs.push_back(
-      device::FakeUsbDeviceInfo::CreateConfiguration(0x08, 0x06, 0x50));
-  UsbDeviceInfoPtr detachable_storage_device_info =
-      device_manager_.CreateAndAddDevice(1234, 1, "vendor1",
-                                         "detachable storage", "123ABC",
-                                         std::move(storage_configs));
-
-  storage_configs.clear();
-  storage_configs.push_back(
-      device::FakeUsbDeviceInfo::CreateConfiguration(0x08, 0x06, 0x50));
-  UsbDeviceInfoPtr storage_device_info = device_manager_.CreateAndAddDevice(
-      1234, 2, "vendor1", "storage", "456DEF", std::move(storage_configs));
-
-  UsbChooserContext* chooser_context = GetChooserContext(profile());
-
-  base::RunLoop loop;
-  chooser_context->GetDevices(
-      base::BindLambdaForTesting([&](std::vector<UsbDeviceInfoPtr> devices) {
-        EXPECT_EQ(1u, devices.size());
-        EXPECT_EQ(detachable_storage_device_info->product_name,
-                  devices[0]->product_name);
-        loop.Quit();
-      }));
-  loop.Run();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(UsbChooserContextTest, DeviceWithNoInterfaceVisible) {
   GURL url("https://www.google.com");

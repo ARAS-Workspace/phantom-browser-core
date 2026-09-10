@@ -38,28 +38,7 @@ bool ShouldDisplayManagedUi(Profile* profile);
 const gfx::VectorIcon& GetManagedUiIcon(Profile* profile);
 #endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// The URL which management surfaces should link to for more info.
-//
-// Returns an empty string if ShouldDisplayManagedUi(profile) is false.
-GURL GetManagedUiUrl(Profile* profile);
-
-// An icon name/label recognized by <iron-icon> for the WebUI footnote for
-// Managed UI indicating that the browser is managed.
-//
-// Returns an empty string if ShouldDisplayManagedUi(profile) is false.
-std::string GetManagedUiWebUIIcon(Profile* profile);
-
-// The label for the WebUI footnote for Managed UI indicating that the browser
-// is managed. These strings contain HTML for an <a> element.
-//
-// Returns an empty string if ShouldDisplayManagedUi(profile) is false.
-std::u16string GetManagedUiWebUILabel(Profile* profile);
-
-// The label for the WebUI footnote for Managed UI indicating that the device
-// is mananged. These strings contain HTML for an <a> element.
-std::u16string GetDeviceManagedUiWebUILabel();
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 std::u16string GetManagementPageSubtitle(Profile* profile);
 #endif
 

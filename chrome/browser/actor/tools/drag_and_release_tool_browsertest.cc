@@ -17,11 +17,6 @@
 #include "ui/gfx/geometry/rect_f.h"
 #include "ui/gfx/geometry/vector2d.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/test/scoped_feature_list.h"
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using base::test::TestFuture;
 using content::EvalJs;
 using content::ExecJs;
@@ -40,12 +35,6 @@ int GetRangeValue(content::RenderFrameHost& rfh, std::string_view query) {
 class ActorDragAndReleaseToolBrowserTest : public ActorToolsTest {
  public:
   ActorDragAndReleaseToolBrowserTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(crbug.com/465305046): Investigate how the rounded windows feature
-    // affects the hit test.
-    scoped_feature_list_.InitAndDisableFeature(
-        chromeos::features::kFeatureManagementRoundedWindows);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
   ~ActorDragAndReleaseToolBrowserTest() override = default;
 
@@ -56,9 +45,6 @@ class ActorDragAndReleaseToolBrowserTest : public ActorToolsTest {
   }
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList scoped_feature_list_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 // Test the drag and release tool by moving the thumb on a range slider control.

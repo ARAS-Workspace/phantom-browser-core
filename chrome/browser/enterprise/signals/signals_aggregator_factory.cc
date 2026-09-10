@@ -35,13 +35,6 @@
 #include "content/public/browser/browser_context.h"
 #include "net/ssl/client_cert_store.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
-#include "chrome/browser/ash/policy/core/device_cloud_policy_manager_ash.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#include "chrome/browser/enterprise/util/affiliation.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "components/device_signals/core/browser/android/android_os_signals_collector.h"
 #else
@@ -93,7 +86,7 @@ SignalsAggregatorFactory::SignalsAggregatorFactory()
 #endif  // !BUILDFLAG(IS_ANDROID)
   DependsOn(UserPermissionServiceFactory::GetInstance());
   DependsOn(enterprise::ProfileIdServiceFactory::GetInstance());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   DependsOn(ProfileNetworkContextServiceFactory::GetInstance());
 #endif
 }
@@ -132,7 +125,7 @@ SignalsAggregatorFactory::BuildServiceInstanceForBrowserContext(
           CreateSettingsClient()));
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (enterprise_signals::features::IsCertificateCollectionEnabled()) {
     auto* profile_network_service =
         ProfileNetworkContextServiceFactory::GetForContext(profile);
@@ -147,7 +140,7 @@ SignalsAggregatorFactory::BuildServiceInstanceForBrowserContext(
     }
   }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   auto* management_service =
       policy::ManagementServiceFactory::GetForProfile(profile);
@@ -160,19 +153,8 @@ SignalsAggregatorFactory::BuildServiceInstanceForBrowserContext(
         g_browser_process->browser_policy_connector();
 
     if (browser_policy_connector) {
-#if BUILDFLAG(IS_CHROMEOS)
-      // Only fetch the device-level CloudPolicyManager if the user is
-      // affiliated, as we should only expose device-level signals (like
-      // the enrollment domain) to affiliated users.
-      if (enterprise_util::IsProfileAffiliated(profile)) {
-        browser_policy_manager = g_browser_process->platform_part()
-                                     ->browser_policy_connector_ash()
-                                     ->GetDeviceCloudPolicyManager();
-      }
-#else
       browser_policy_manager =
           browser_policy_connector->machine_level_user_cloud_policy_manager();
-#endif
     }
   }
 

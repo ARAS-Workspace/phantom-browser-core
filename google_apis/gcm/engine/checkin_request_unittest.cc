@@ -148,12 +148,8 @@ TEST_F(CheckinRequestTest, FetcherDataAndURL) {
   EXPECT_EQ(chrome_build_proto_.channel(),
             request_proto.checkin().chrome_build().channel());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(checkin_proto::DEVICE_CHROME_OS, request_proto.checkin().type());
-#else
   EXPECT_EQ(checkin_proto::DEVICE_CHROME_BROWSER,
             request_proto.checkin().type());
-#endif
 
   EXPECT_EQ(kSettingsDigest, request_proto.digest());
 }

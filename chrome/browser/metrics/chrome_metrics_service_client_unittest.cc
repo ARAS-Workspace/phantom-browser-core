@@ -59,11 +59,6 @@
 #include "extensions/common/extension_builder.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/install_attributes/stub_install_attributes.h"
-#include "chromeos/ash/components/login/login_state/login_state.h"
-#include "chromeos/dbus/power/power_manager_client.h"
-#endif
 namespace {
 
 std::unique_ptr<KeyedService> BuildTestHistoryService(
@@ -103,9 +98,6 @@ class TestChromeMetricsServiceClient : public ChromeMetricsServiceClient {
       variations::SyntheticTrialRegistry* synthetic_trial_registry)
       : ChromeMetricsServiceClient(state_manager, synthetic_trial_registry) {}
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void AsyncInitSystemProfileProvider() override {}
-#endif
 };
 
 class ChromeMetricsServiceClientTest : public testing::Test {
@@ -128,23 +120,12 @@ class ChromeMetricsServiceClientTest : public testing::Test {
         &prefs_, &enabled_state_provider_, std::wstring(), base::FilePath());
     metrics_state_manager_->InstantiateFieldTrialList();
     ASSERT_TRUE(profile_manager_.SetUp());
-#if BUILDFLAG(IS_CHROMEOS)
-    scoped_feature_list_.InitWithFeatures(
-        {features::kUmaStorageDimensions,
-         features::kClassManagementEnabledMetricsProvider,
-         metrics::dwa::kDwaFeature, switches::kDynamicProfileCountry},
-        {});
-
-    // ChromeOs Metrics Provider require g_login_state and power manager client
-    // initialized before they can be instantiated.
-    chromeos::PowerManagerClient::InitializeFake();
-    ash::LoginState::Initialize();
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
     scoped_feature_list_.InitWithFeatures({metrics::dwa::kDwaFeature}, {});
 #else
     scoped_feature_list_.InitWithFeatures(
         {metrics::dwa::kDwaFeature, switches::kDynamicProfileCountry}, {});
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_ANDROID)
     auto mock_component_updater = std::make_unique<
@@ -158,10 +139,6 @@ class ChromeMetricsServiceClientTest : public testing::Test {
 #if !BUILDFLAG(IS_ANDROID)
     TestingBrowserProcess::GetGlobal()->SetComponentUpdater(nullptr);
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::LoginState::Shutdown();
-    chromeos::PowerManagerClient::Shutdown();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void TriggerOnAdvancedReportingEnabledForAllProfilesChanged(
@@ -233,10 +210,6 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterUKMProviders) {
   // ChromeMetricsServiceClient::RegisterUKMProviders, for all platform with one
   // exception on ChromeOS.
   size_t expected_providers = 10;
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOSMetricsProvider
-  expected_providers++;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
   // ChromeAndroidMetricsProvider
@@ -297,25 +270,9 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
   expected_providers += 1;
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // AmbientModeMetricsProvider,
-  // CrosHealthdMetricsProvider, ChromeOSMetricsProvider,
-  // ChromeOSHistogramMetricsProvider, ChromeShelfMetricsProvider,
-  // ClassManagementEnabledMetricsProvider,
-  // K12AgeClassificationMetricsProvider, KeyboardBacklightColorMetricsProvider,
-  // PersonalizationAppThemeMetricsProvider, PrinterMetricsProvider,
-  // FamilyUserMetricsProvider, FamilyLinkUserMetricsProvider,
-  // UpdateEngineMetricsProvider, OsSettingsMetricsProvider,
-  // UserTypeByDeviceTypeMetricsProvider, WallpaperMetricsProvider,
-  // and VmmMetricsProvider.
-  expected_providers += 17;
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS)
   // ChromeSigninStatusMetricsProvider (for non ChromeOS).
   // FamilyLinkUserMetricsProvider
   expected_providers += 2;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_MAC)
   // PowerMetricsProvider, GoogleUpdateMetricsProviderMac
@@ -329,13 +286,13 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
   expected_providers += 3;
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // TabMetricsProvider
   // SkillsMetricsProvider
   expected_providers += 2;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // BluetoothMetricsProvider
   expected_providers += 1;
 #endif
@@ -496,10 +453,6 @@ TEST_F(ChromeMetricsServiceClientTest,
     EXPECT_TRUE(ukm_test_helper.HasUnsentLogs());
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedStubInstallAttributes stub_install_attributes;
-#endif
-
   client.reset();
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -567,10 +520,6 @@ TEST_F(ChromeMetricsServiceClientTest,
     // Clean up profile before shutting down the tracker.
     profile_manager_.DeleteTestingProfile("p1");
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedStubInstallAttributes stub_install_attributes;
-#endif
 
   client.reset();
 

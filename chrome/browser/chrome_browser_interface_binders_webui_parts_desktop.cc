@@ -142,35 +142,6 @@
 #include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/webui/diagnostics_ui/diagnostics_ui.h"
-#include "ash/webui/firmware_update_ui/firmware_update_app_ui.h"
-#include "ash/webui/graduation/graduation_ui.h"
-#include "ash/webui/os_feedback_ui/os_feedback_ui.h"
-#include "ash/webui/personalization_app/personalization_app_ui.h"
-#include "ash/webui/print_management/print_management_ui.h"
-#include "ash/webui/sanitize_ui/sanitize_ui.h"
-#include "ash/webui/scanning/scanning_ui.h"
-#include "ash/webui/shortcut_customization_ui/shortcut_customization_app_ui.h"
-#include "ash/webui/vc_background_ui/vc_background_ui.h"
-#include "chrome/browser/ui/webui/ash/app_install/app_install_dialog.h"
-#include "chrome/browser/ui/webui/ash/bluetooth/bluetooth_pairing_dialog.h"
-#include "chrome/browser/ui/webui/ash/cloud_upload/cloud_upload_ui.h"
-#include "chrome/browser/ui/webui/ash/curtain_ui/remote_maintenance_curtain_ui.h"
-#include "chrome/browser/ui/webui/ash/emoji/emoji_ui.h"
-#include "chrome/browser/ui/webui/ash/extended_updates/extended_updates_ui.h"
-#include "chrome/browser/ui/webui/ash/internet/internet_config_dialog.h"
-#include "chrome/browser/ui/webui/ash/internet/internet_detail_dialog.h"
-#include "chrome/browser/ui/webui/ash/login/oobe_ui.h"
-#include "chrome/browser/ui/webui/ash/multidevice_setup/multidevice_setup_dialog.h"
-#include "chrome/browser/ui/webui/ash/office_fallback/office_fallback_ui.h"
-#include "chrome/browser/ui/webui/ash/parent_access/parent_access_ui.h"
-#include "chrome/browser/ui/webui/ash/set_time/set_time_ui.h"
-#include "chrome/browser/ui/webui/ash/settings/os_settings_ui.h"
-#include "chrome/browser/ui/webui/ash/skyvault/local_files_migration_ui.h"
-#include "chrome/browser/ui/webui/nearby_share/nearby_share_dialog_ui.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if !defined(OFFICIAL_BUILD)
 #include "chrome/browser/ui/webui/new_tab_page/foo/foo.mojom.h"  // nogncheck crbug.com/40147906
 #endif  // defined(OFFICIAL_BUILD)
@@ -179,7 +150,7 @@
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation_ui.h"
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/default_browser/default_browser_features.h"
 #include "chrome/browser/ui/webui/default_browser/default_browser_modal.mojom.h"
 #include "chrome/browser/ui/webui/default_browser/default_browser_modal_ui.h"
@@ -330,10 +301,8 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   RegisterWebUIControllerInterfaceBinder<
       theme_color_picker::mojom::ThemeColorPickerHandlerFactory,
       CustomizeChromeUI
-#if !BUILDFLAG(IS_CHROMEOS)
       ,
       ProfileCustomizationUI
-#endif  // !BUILDFLAG(IS_CHROMEOS)
       >(map);
 
   RegisterWebUIControllerInterfaceBinder<
@@ -341,10 +310,8 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       ReadingListUI, NewTabPageUI, CustomizeChromeUI,
       HistoryUI, lens::LensOverlayUntrustedUI, lens::LensSidePanelUntrustedUI,
       ContextualTasksUI
-#if !BUILDFLAG(IS_CHROMEOS)
       ,
       ProfilePickerUI
-#endif  //! BUILDFLAG(IS_CHROMEOS)
       >(map);
 
 #if !defined(OFFICIAL_BUILD)
@@ -495,7 +462,7 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
                                          webapps::AppHomeUI>(map);
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   auto prompt_surface = default_browser::GetDefaultBrowserPromptSurface();
 
   if (prompt_surface == default_browser::DefaultBrowserPromptSurface::
@@ -538,10 +505,8 @@ void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
 
   registry
       .ForWebUI<settings::SettingsUI>()
-#if !BUILDFLAG(IS_CHROMEOS)
       .Add<theme_color_picker::mojom::ThemeColorPickerHandlerFactory>()
       .Add<signin::mojom::SigninPageHandlerFactory>()
-#endif  // !BUILDFLAG(IS_CHROMEOS)
       .Add<customize_color_scheme_mode::mojom::
                CustomizeColorSchemeModeHandlerFactory>()
       .Add<help_bubble::mojom::HelpBubbleHandlerFactory>();

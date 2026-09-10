@@ -91,7 +91,7 @@
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_EXTENSIONS)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
 #endif
 
@@ -1748,7 +1748,7 @@ ExtensionFunction::ResponseAction DownloadsSetShelfEnabledFunction::Run() {
     if (!match_current_service || current_service->IsDownloadUiEnabled()) {
       continue;
     }
-#if !BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_EXTENSIONS)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
     // Calling this API affects the download bubble as well, so extensions
     // using this API is still compatible with the new download bubble. This
     // API will eventually be deprecated (replaced by the SetUiOptions API
@@ -1803,7 +1803,7 @@ ExtensionFunction::ResponseAction DownloadsSetUiOptionsFunction::Run() {
       continue;
     }
 
-#if !BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_EXTENSIONS)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
     BrowserWindowInterface* browser = window->GetBrowser();
     BrowserWindow* browser_window = BrowserWindow::FromBrowser(browser);
     if (browser_window->GetDownloadBubbleUIController()) {

@@ -109,11 +109,7 @@ IN_PROC_BROWSER_TEST_F(CollaborationControllerDelegateDesktopInteractiveUITest,
   EXPECT_NE(nullptr, delegate.prompt_dialog_widget_for_testing());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_PromptDialogAccept DISABLED_PromptDialogAccept
-#else
 #define MAYBE_PromptDialogAccept PromptDialogAccept
-#endif
 IN_PROC_BROWSER_TEST_F(CollaborationControllerDelegateDesktopInteractiveUITest,
                        MAYBE_PromptDialogAccept) {
   // Show prompt dialog and accept it.

@@ -106,10 +106,6 @@ class TranslateInfoBarDelegateTest : public ::testing::Test {
     language::LanguagePrefs::RegisterProfilePrefs(pref_service_->registry());
     pref_service_->SetString(testing::accept_languages_prefs, std::string());
     pref_service_->SetString(language::prefs::kAcceptLanguages, std::string());
-#if BUILDFLAG(IS_CHROMEOS)
-    pref_service_->SetString(language::prefs::kPreferredLanguages,
-                             std::string());
-#endif
     pref_service_->registry()->RegisterBooleanPref(
         prefs::kOfferTranslateEnabled, true);
     TranslatePrefs::RegisterProfilePrefs(pref_service_->registry());
@@ -290,10 +286,6 @@ TEST_F(TranslateInfoBarDelegateTest, IsTranslatableLanguage) {
   base::ListValue& update_list = update.Get();
   update_list.Append(kSourceLanguage);
   pref_service_->SetString(language::prefs::kAcceptLanguages, kSourceLanguage);
-#if BUILDFLAG(IS_CHROMEOS)
-  pref_service_->SetString(language::prefs::kPreferredLanguages,
-                           kSourceLanguage);
-#endif
 
   EXPECT_FALSE(delegate->IsTranslatableLanguageByPrefs());
 

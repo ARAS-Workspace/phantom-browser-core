@@ -47,14 +47,7 @@ TEST_F(URLOverridesManifestTest, Override) {
 
   // "keyboard" property is only available on ChromeOS Ash.
   extension = LoadAndExpectSuccess("override_keyboard_page.json");
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(extension->url().spec() + "a_page.html",
-            extensions::URLOverrides::GetChromeURLOverrides(extension.get())
-                .find("keyboard")
-                ->second.spec());
-#else
   EXPECT_TRUE(URLOverrides::GetChromeURLOverrides(extension.get()).empty());
-#endif
 }
 
 TEST(ChromeURLOverridesHandlerTest, TestFileMissing) {

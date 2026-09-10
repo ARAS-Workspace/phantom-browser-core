@@ -67,7 +67,6 @@ class ActorUiContentsContainerControllerTest
 // TODO(crbug.com/41487832): Enable on ChromeOS when test setup in the death
 // subprocess is fixed. AshTestHelper causes ICU/Timezone crashes in the forked
 // process before the DCHECK can fire.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(ActorUiContentsContainerControllerTest,
        OverlayStateMoveAndClickDeathCheck) {
   ActorOverlayState invalid_state;
@@ -79,7 +78,6 @@ TEST_F(ActorUiContentsContainerControllerTest,
   EXPECT_DCHECK_DEATH(controller_->OnOverlayStateChanged(
       /*is_visible=*/true, invalid_state, future.GetCallback()));
 }
-#endif
 
 TEST(ActorUiWindowControllerTest, FromNullWindow) {
   EXPECT_EQ(nullptr, ActorUiWindowController::From(nullptr));

@@ -32,10 +32,6 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/aura/window_tree_host.h"
-#endif
-
 namespace eye_dropper {
 
 constexpr int kEyeDropperSize = 100;
@@ -227,15 +223,6 @@ class EyeDropperContentsView : public views::View {
     const SkBitmap frame = owner_->screen_capturer_->GetBitmap();
     gfx::Point center_position_px;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // ChromeOS only captures a single display at a time, and we need to convert
-    // the cursor position to display (root window) local pixel coordinates.
-    aura::Window* window = GetWidget()->GetNativeWindow();
-    const gfx::Point center_position =
-        window->GetBoundsInRootWindow().CenterPoint();
-    center_position_px =
-        window->GetHost()->GetRootTransform().MapPoint(center_position);
-#else
     // The captured frame is not scaled so we need to use widget's bounds in
     // pixels to have the magnified region match cursor position.
     center_position_px =
@@ -245,7 +232,6 @@ class EyeDropperContentsView : public views::View {
             .CenterPoint();
     center_position_px.Offset(-owner_->screen_capturer_->original_offset_x(),
                               -owner_->screen_capturer_->original_offset_y());
-#endif
 
     view_canvas->DrawImageInt(gfx::ImageSkia::CreateFrom1xBitmap(frame),
                               center_position_px.x() - pixel_count / 2,
@@ -359,23 +345,12 @@ EyeDropperView::EyeDropperView(gfx::NativeView parent,
   CaptureInput();
   auto* screen = display::Screen::Get();
   gfx::Point initial_position = screen->GetCursorScreenPoint();
-#if BUILDFLAG(IS_CHROMEOS)
-  if (screen->InTabletMode()) {
-    initial_position =
-        screen->GetDisplayForNewWindows().work_area().CenterPoint();
-  }
-#endif
   UpdatePosition(initial_position);
 
   // The ignore selection time should be long enough to allow the user to see
   // the UI.
   ignore_selection_time_ = base::TimeTicks::Now() + base::Milliseconds(500);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Add an observation so the capture can be updated as the eye dropper window
-  // moves between displays.
-  window_observation_.Observe(GetWidget()->GetNativeWindow());
-#endif
   // Start observing only once everything else is setup and ready to go.
   widget_->AddObserver(this);
 }
@@ -408,18 +383,6 @@ void EyeDropperView::OnWidgetBoundsChanged(views::Widget* widget,
     widget_->GetContentsView()->SchedulePaint();
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void EyeDropperView::OnWindowAddedToRootWindow(aura::Window* window) {
-  display::Display display =
-      display::Screen::Get()->GetDisplayNearestWindow(window);
-  CaptureScreen(display.id());
-}
-
-void EyeDropperView::OnWindowDestroying(aura::Window* window) {
-  window_observation_.Reset();
-}
-#endif
 
 void EyeDropperView::CaptureScreen(
     std::optional<webrtc::DesktopCapturer::SourceId> screen) {

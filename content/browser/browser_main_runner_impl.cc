@@ -141,11 +141,6 @@ void BrowserMainRunnerImpl::Shutdown() {
   DCHECK(initialization_started_);
   DCHECK(!is_shutdown_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Reduces shutdown hangs on CrOS.
-  // Googlers: see go/cros-no-op-free-2024 for the experiment write-up.
-  base::allocator::MakeFreeNoOp();
-#endif
 
   main_loop_->PreShutdown();
 

@@ -763,9 +763,6 @@ void DevToolsUIBindings::FrontendWebContentsObserver::
   switch (status) {
     case base::TERMINATION_STATUS_ABNORMAL_TERMINATION:
     case base::TERMINATION_STATUS_PROCESS_WAS_KILLED:
-#if BUILDFLAG(IS_CHROMEOS)
-    case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
-#endif
     case base::TERMINATION_STATUS_PROCESS_CRASHED:
     case base::TERMINATION_STATUS_LAUNCH_FAILED:
     case base::TERMINATION_STATUS_OOM:
@@ -976,11 +973,7 @@ void DevToolsUIBindings::AgentHostClosed(
 
 bool DevToolsUIBindings::MayWriteLocalFiles() {
   // Do not allow local file system access via the front-end on Chrome OS.
-#if BUILDFLAG(IS_CHROMEOS)
-  return false;
-#else
   return true;
-#endif
 }
 
 void DevToolsUIBindings::SendMessageAck(int request_id,
@@ -1843,11 +1836,7 @@ bool DevToolsUIBindings::GetFeatureStateForDevTools(
 // static
 base::DictValue DevToolsUIBindings::GetHostConfigDictionary(Profile* profile) {
   base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-#if BUILDFLAG(IS_CHROMEOS)
-  PrefService* prefs = profile->GetPrefs();
-#else
   PrefService* prefs = g_browser_process->local_state();
-#endif
   auto flags_storage =
       std::make_unique<flags_ui::PrefServiceFlagsStorage>(prefs);
 
@@ -2431,11 +2420,7 @@ void DevToolsUIBindings::RecordNewBadgeUsage(const std::string& feature_name) {
 void DevToolsUIBindings::SetChromeFlagInternal(Profile* profile,
                                                const std::string& flag_name,
                                                bool value) {
-#if BUILDFLAG(IS_CHROMEOS)
-  PrefService* prefs = profile->GetPrefs();
-#else
   PrefService* prefs = g_browser_process->local_state();
-#endif
   auto flags_storage =
       std::make_unique<flags_ui::PrefServiceFlagsStorage>(prefs);
 

@@ -100,9 +100,6 @@ std::string GetFileContents(GKeyFile* key_file) {
 // If |scheme| is empty this function sets Chrome as the default browser,
 // otherwise it sets Chrome as the default handler application for |scheme|.
 bool SetDefaultWebClient(const std::string& scheme) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   std::unique_ptr<base::Environment> env(base::Environment::Create());
 
   std::vector<std::string> argv;
@@ -120,7 +117,6 @@ bool SetDefaultWebClient(const std::string& scheme) {
   bool ran_ok = LaunchXdgUtility(argv, &exit_code);
 
   return ran_ok && exit_code == EXIT_SUCCESS;
-#endif
 }
 
 // If |scheme| is empty this function checks if Chrome is the default browser,
@@ -128,9 +124,6 @@ bool SetDefaultWebClient(const std::string& scheme) {
 // |scheme|.
 shell_integration::DefaultWebClientState GetIsDefaultWebClient(
     const std::string& scheme) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return shell_integration::UNKNOWN_DEFAULT;
-#else
   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
                                                 base::BlockingType::MAY_BLOCK);
 
@@ -161,7 +154,6 @@ shell_integration::DefaultWebClientState GetIsDefaultWebClient(
   return base::StartsWith(reply, "yes", base::CompareCase::SENSITIVE)
              ? shell_integration::IS_DEFAULT
              : shell_integration::NOT_DEFAULT;
-#endif
 }
 
 // https://wiki.gnome.org/Projects/GnomeShell/ApplicationBased

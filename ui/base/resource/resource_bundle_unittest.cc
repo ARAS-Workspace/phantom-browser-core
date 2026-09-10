@@ -665,14 +665,8 @@ TEST_F(ResourceBundleImageTest, GetImageNamed) {
 
   gfx::ImageSkia* image_skia = resource_bundle->GetImageSkiaNamed(3);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS loads highest scale factor first.
-  EXPECT_EQ(ui::k200Percent, GetSupportedResourceScaleFactor(
-                                 image_skia->image_reps()[0].scale()));
-#else
   EXPECT_EQ(ui::k100Percent, GetSupportedResourceScaleFactor(
                                  image_skia->image_reps()[0].scale()));
-#endif
 
   // Resource ID 3 exists in both 1x and 2x paks. Image reps should be
   // available for both scale factors in |image_skia|.

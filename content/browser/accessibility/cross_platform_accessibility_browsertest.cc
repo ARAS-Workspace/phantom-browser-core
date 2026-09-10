@@ -2125,7 +2125,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 }
 
 // TODO(crbug.com/40656480) re-enable when crashing on linux is resolved.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_LocalizedRoleDescription DISABLED_LocalizedRoleDescription
 #else
 #define MAYBE_LocalizedRoleDescription LocalizedRoleDescription

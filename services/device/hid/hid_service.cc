@@ -18,7 +18,7 @@
 #include "components/device_event_log/device_event_log.h"
 #include "services/device/hid/hid_connection.h"
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
 #include "services/device/hid/hid_service_linux.h"
 #elif BUILDFLAG(IS_MAC)
 #include "services/device/hid/hid_service_mac.h"
@@ -60,7 +60,7 @@ constexpr base::TaskTraits HidService::kBlockingTaskTraits;
 
 // static
 std::unique_ptr<HidService> HidService::Create() {
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
   return std::make_unique<HidServiceLinux>();
 #elif BUILDFLAG(IS_MAC)
   return std::make_unique<HidServiceMac>();

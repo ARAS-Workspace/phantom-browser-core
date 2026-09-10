@@ -86,10 +86,6 @@ class FlossDBusManagerTest : public testing::Test {
     FlossDBusManager::Get()->ObjectAdded(
         FlossDBusClient::GenerateLoggingPath(kMockAdapterIndex),
         kAdapterLoggingInterface);
-#if BUILDFLAG(IS_CHROMEOS)
-    FlossDBusManager::Get()->ObjectAdded(
-        FlossDBusClient::GenerateAdminPath(kMockAdapterIndex), kAdminInterface);
-#endif
     FlossDBusManager::Get()->ObjectAdded(
         FlossDBusClient::GenerateBatteryManagerPath(kMockAdapterIndex),
         kBatteryManagerInterface);
@@ -110,10 +106,6 @@ class FlossDBusManagerTest : public testing::Test {
     FlossDBusManager::Get()->ObjectAdded(
         FlossDBusClient::GenerateLoggingPath(kMockAdapterIndex),
         kAdapterLoggingInterface);
-#if BUILDFLAG(IS_CHROMEOS)
-    FlossDBusManager::Get()->ObjectAdded(
-        FlossDBusClient::GenerateAdminPath(kMockAdapterIndex), kAdminInterface);
-#endif
     FlossDBusManager::Get()->ObjectAdded(
         FlossDBusClient::GenerateBatteryManagerPath(kMockAdapterIndex),
         kBatteryManagerInterface);
@@ -137,10 +129,6 @@ class FlossDBusManagerTest : public testing::Test {
     FlossDBusManager::Get()->ObjectRemoved(
         FlossDBusClient::GenerateLoggingPath(kMockAdapterIndex),
         kAdapterLoggingInterface);
-#if BUILDFLAG(IS_CHROMEOS)
-    FlossDBusManager::Get()->ObjectRemoved(
-        FlossDBusClient::GenerateAdminPath(kMockAdapterIndex), kAdminInterface);
-#endif
     FlossDBusManager::Get()->ObjectRemoved(
         FlossDBusClient::GenerateBatteryManagerPath(kMockAdapterIndex),
         kBatteryManagerInterface);

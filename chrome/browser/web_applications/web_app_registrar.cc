@@ -64,12 +64,6 @@
 #include "third_party/blink/public/common/manifest/manifest_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "ash/constants/web_app_id_constants.h"
-#include "chrome/browser/web_applications/chromeos_web_app_experiments.h"
-#endif
-
 namespace web_app {
 namespace {
 using InstallStateSet = base::EnumSet<proto::InstallState,
@@ -77,12 +71,9 @@ using InstallStateSet = base::EnumSet<proto::InstallState,
                                       proto::InstallState_MAX>;
 
 // ChromeOS stores the per-app capturing setting in PreferredAppsImpl, not here.
-#if !BUILDFLAG(IS_CHROMEOS)
 BASE_FEATURE(kDiyAppsDefaultCaptureForcedOff,
              "capture_forced_off_diy_apps",
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#endif
 
 struct AppStateForNavigationCapturing {
   bool is_diy_app = false;
@@ -91,7 +82,6 @@ struct AppStateForNavigationCapturing {
 };
 
 // ChromeOS stores the per-app capturing setting in PreferredAppsImpl, not here.
-#if !BUILDFLAG(IS_CHROMEOS)
 bool IsNavigationCapturingSettingOffByDefault(
     AppStateForNavigationCapturing app_state) {
   // If the app is a DIY app, capture navigations by default unless enforced via
@@ -123,7 +113,6 @@ bool IsNavigationCapturingSettingOffByDefault(
       return !app_state.client_mode_valid_and_specified;
   }
 }
-#endif
 
 bool IsAppCapturingSettingForcedOff(const webapps::AppId& app_id) {
   if (!features::kForcedOffCapturingAppsUserSetting.Get().empty()) {
@@ -436,7 +425,6 @@ void WebAppRegistrar::NotifyWebAppEffectiveScopeChanged(
   }
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void WebAppRegistrar::NotifyWebAppUserLinkCapturingPreferencesChanged(
     const webapps::AppId& app_id,
     bool is_preferred) {
@@ -446,7 +434,6 @@ void WebAppRegistrar::NotifyWebAppUserLinkCapturingPreferencesChanged(
     observer.OnWebAppUserLinkCapturingPreferencesChanged(app_id, is_preferred);
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void WebAppRegistrar::NotifyPendingUpdateInfoChanged(
     const webapps::AppId& app_id,
@@ -1281,10 +1268,6 @@ bool WebAppRegistrar::CanCaptureLinksInScope(
     return false;
   }
   if (!base::FeatureList::IsEnabled(features::kPwaNavigationCapturing)
-#if BUILDFLAG(IS_CHROMEOS)
-      && !ChromeOsWebAppExperiments::
-             IsNavigationCapturingReimplEnabledForTargetApp(app_id)
-#endif
   ) {
     return false;
   }
@@ -1314,7 +1297,6 @@ bool WebAppRegistrar::AppScopesMatchForUserLinkCapturing(
   return app_scope1 == app_scope2;
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 bool WebAppRegistrar::CapturesLinksInScope(const webapps::AppId& app_id) const {
   if (!CanCaptureLinksInScope(app_id)) {
     return false;
@@ -1467,7 +1449,6 @@ std::vector<webapps::AppId> WebAppRegistrar::GetOverlappingAppsMatchingScope(
   }
   return all_apps_with_supported_links;
 }
-#endif
 
 base::flat_map<webapps::AppId, std::string>
 WebAppRegistrar::GetAllAppsControllingUrl(
@@ -1615,51 +1596,11 @@ ApiApprovalState WebAppRegistrar::GetAppFileHandlerApprovalState(
 bool WebAppRegistrar::IsAppPolicyDefinedHandlerForFileExtension(
     const webapps::AppId& app_id,
     const std::string file_extension) const {
-#if BUILDFLAG(IS_CHROMEOS)
-  const std::string* file_extension_policy_id =
-      profile_->GetPrefs()
-          ->GetDict(ash::prefs::kDefaultHandlersForFileExtensions)
-          .FindString(file_extension);
-  if (!file_extension_policy_id) {
-    return false;
-  }
-
-  const WebApp* web_app = GetAppById(app_id);
-  if (!web_app) {
-    return false;
-  }
-
-  std::optional<std::vector<std::string>> app_policy_ids =
-      WebAppPolicyManager::GetPolicyIds(profile(), *web_app);
-
-  if (!app_policy_ids->empty()) {
-    return std::ranges::contains(app_policy_ids.value(),
-                                 *file_extension_policy_id);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return false;
 }
 
 bool WebAppRegistrar::IsAppSetAsPolicyDefinedFileHandlerForAnyFileExtension(
     const webapps::AppId& app_id) const {
-#if BUILDFLAG(IS_CHROMEOS)
-  const base::DictValue& default_handlers = profile_->GetPrefs()->GetDict(
-      ash::prefs::kDefaultHandlersForFileExtensions);
-
-  const WebApp* web_app = GetAppById(app_id);
-  if (!web_app) {
-    return false;
-  }
-
-  std::optional<std::vector<std::string>> app_policy_ids =
-      WebAppPolicyManager::GetPolicyIds(profile(), *web_app);
-
-  if (!app_policy_ids->empty()) {
-    return std::ranges::any_of(default_handlers, [&](const auto& handler) {
-      return std::ranges::contains(*app_policy_ids, handler.second.GetString());
-    });
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return false;
 }
 
@@ -1801,11 +1742,11 @@ SortedSizesPx WebAppRegistrar::GetAppTrustedIconSizesFallbackToUntrusted(
   }
 
   SortedSizesPx sorted_sizes;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   if (!web_app->stored_trusted_icon_sizes(IconPurpose::MASKABLE).empty()) {
     return web_app->stored_trusted_icon_sizes(IconPurpose::MASKABLE);
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
   if (!web_app->stored_trusted_icon_sizes(IconPurpose::ANY).empty()) {
     return web_app->stored_trusted_icon_sizes(IconPurpose::ANY);

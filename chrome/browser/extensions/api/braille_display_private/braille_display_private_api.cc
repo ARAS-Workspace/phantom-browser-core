@@ -13,12 +13,6 @@
 #include "chrome/browser/extensions/api/braille_display_private/braille_controller.h"
 #include "chrome/browser/profiles/profile.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/accessibility/accessibility_manager.h"
-#include "device/bluetooth/public/cpp/bluetooth_address.h"
-#include "extensions/browser/extensions_browser_client.h"
-#endif
-
 namespace OnDisplayStateChanged =
     extensions::api::braille_display_private::OnDisplayStateChanged;
 namespace OnKeyEvent = extensions::api::braille_display_private::OnKeyEvent;
@@ -85,11 +79,7 @@ void BrailleDisplayPrivateAPI::OnBrailleKeyEvent(const KeyEvent& key_event) {
 }
 
 bool BrailleDisplayPrivateAPI::IsProfileActive() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return extensions::ExtensionsBrowserClient::Get()->IsActiveContext(profile_);
-#else  // !BUILDFLAG(IS_CHROMEOS)
   return true;
-#endif
 }
 
 void BrailleDisplayPrivateAPI::SetEventDelegateForTest(
@@ -187,22 +177,7 @@ void BrailleDisplayPrivateWriteDotsFunction::WriteDotsOnIO() {
 
 ExtensionFunction::ResponseAction
 BrailleDisplayPrivateUpdateBluetoothBrailleDisplayAddressFunction::Run() {
-#if BUILDFLAG(IS_CHROMEOS)
-  EXTENSION_FUNCTION_VALIDATE(args().size() >= 1);
-  EXTENSION_FUNCTION_VALIDATE(args()[0].is_string());
-  const std::string& address = args()[0].GetString();
-  // Validate that the address is a well-formed Bluetooth MAC address.
-  // CanonicalizeBluetoothAddress returns empty on invalid input.
-  std::string canonical = device::CanonicalizeBluetoothAddress(address);
-  if (canonical.empty()) {
-    return RespondNow(Error("Invalid Bluetooth address"));
-  }
-  ash::AccessibilityManager::Get()->UpdateBluetoothBrailleDisplayAddress(
-      canonical);
-  return RespondNow(NoArguments());
-#else
   NOTREACHED();
-#endif
 }
 
 }  // namespace api

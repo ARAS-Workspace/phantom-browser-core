@@ -520,11 +520,7 @@ bool FileAnalysisRequestBase::IsVirtualFile(const base::FilePath& path) {
   if (g_is_virtual_file_for_testing) {
     return true;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  return base::FilePath("/media/fuse").IsParent(path);
-#else
   return false;
-#endif
 }
 
 }  // namespace enterprise_connectors

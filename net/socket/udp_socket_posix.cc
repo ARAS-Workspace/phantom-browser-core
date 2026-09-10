@@ -87,7 +87,7 @@ namespace {
 constexpr int kBindRetries = 10;
 constexpr int kPortStart = 1024;
 constexpr int kPortEnd = 65535;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // Maximum number of UDP packets that can be read at a time from recvmmsg.
 constexpr size_t kMaxMmsgMessages = 128;
 #endif
@@ -277,7 +277,7 @@ int UDPSocketPosix::AdoptOpenedSocket(AddressFamily address_family,
   return ConfigureOpenedSocket();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 namespace {
 
 SetSocketOptionGroResult GetSetSocketOptionGroResult(int setsockopt_rv,
@@ -310,7 +310,7 @@ void RecordGroPacketsRead(size_t packet_count) {
 #endif
 
 void UDPSocketPosix::ConfigureGroSocketOption() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
   CHECK_NE(socket_, kInvalidSocket);
   CHECK_EQ(gro_status_, GroStatus::kUnconfigured);
@@ -523,7 +523,7 @@ base::expected<DatagramsMetadata, Error> UDPSocketPosix::ReadMultiple(
   // when reading coalesced superpackets (e.g. UDP GRO).
   CHECK_GE(buf_len, kMinimumReadMultipleBufferSize);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   if (gro_status_ == GroStatus::kUnconfigured) {
     if (base::FeatureList::IsEnabled(features::kEnableUdpGro)) {
       ConfigureGroSocketOption();
@@ -1126,7 +1126,7 @@ void UDPSocketPosix::FillResultFromMessageHeader(struct msghdr* msg,
       base::byte_span_from_ref(tclass_val).copy_from(cmsg_data_as_span);
       result->tos = static_cast<uint8_t>(tclass_val);
     }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
     else if (gro_status_ == GroStatus::kEnabled &&
              cmsg->cmsg_level == SOL_UDP && cmsg->cmsg_type == UDP_GRO &&
              cmsg->cmsg_len >= CMSG_LEN(sizeof(int)) &&
@@ -1159,7 +1159,7 @@ base::expected<DatagramsMetadata, Error> UDPSocketPosix::InternalReadMultiple(
   if (socket_ == kInvalidSocket) {
     return base::unexpected(ERR_SOCKET_NOT_CONNECTED);
   }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   if (gro_status_ == GroStatus::kEnabled) {
     return InternalReadMultipleWithGro(buffer, buf_len, maximum_packet_size);
   }
@@ -1170,7 +1170,7 @@ base::expected<DatagramsMetadata, Error> UDPSocketPosix::InternalReadMultiple(
 #endif
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 base::expected<DatagramsMetadata, Error> UDPSocketPosix::InternalRecvMmsg(
     IOBuffer* buffer,
     size_t num_messages,
@@ -1535,10 +1535,7 @@ int UDPSocketPosix::DoBind(const IPEndPoint& address) {
   if (rv == 0)
     return OK;
   int last_error = errno;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (last_error == EINVAL)
-    return ERR_ADDRESS_IN_USE;
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   if (last_error == EADDRNOTAVAIL)
     return ERR_ADDRESS_IN_USE;
 #endif

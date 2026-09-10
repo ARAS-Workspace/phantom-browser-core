@@ -87,9 +87,7 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
   void HandleSetUserAffiliated(const base::ListValue& args);
   void HandleGetAppliedTestPolicies(const base::ListValue& args);
   void HandleGetPoliciesJson(const base::ListValue& args);
-#if !BUILDFLAG(IS_CHROMEOS)
   void HandleUploadReport(const base::ListValue& args);
-#endif
 
   // Core logic for setting the user affiliation status for test policies.
   // This is used to simulate user affiliation for testing purposes.
@@ -129,10 +127,8 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
   // information.
   void SendStatus();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Called when report has been uploaded, successfully or not.
   void OnReportUploaded(const std::string& callback_id);
-#endif
 
   // Builds a raw JSON string representation of all the policies.
   std::string GetPoliciesJsonImpl(policy::mojom::GetPoliciesReason reason);

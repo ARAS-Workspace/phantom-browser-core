@@ -194,7 +194,6 @@ TEST_P(AppMenuIconControllerTest, UpgradeNotification) {
 
 INSTANTIATE_TEST_SUITE_P(All, AppMenuIconControllerTest, ::testing::Values(0));
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_P(AppMenuIconControllerTest, GlobalErrorLowSeverityShowsActionRequired) {
   ::testing::NiceMock<MockAppMenuIconControllerDelegate> mock_delegate;
   AppMenuIconController controller(upgrade_detector(), profile(),
@@ -232,4 +231,3 @@ TEST_P(AppMenuIconControllerTest, GlobalErrorMediumOrHighShowsError) {
   EXPECT_EQ(state.severity, AppMenuIconController::Severity::kHigh);
   error_service->RemoveGlobalError(&high);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

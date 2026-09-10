@@ -94,14 +94,6 @@
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/wm/window_pin_util.h"
-#include "chrome/browser/ash/browser_delegate/browser_controller.h"
-#include "chrome/browser/ash/browser_delegate/browser_delegate.h"
-#include "chrome/browser/ui/browser.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(FULL_SAFE_BROWSING)
 #include "chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service.h"
 #endif
@@ -328,11 +320,6 @@ bool MatchesBool(const std::optional<bool>& boolean, bool value) {
 // window).
 // TODO(https://crbug.com/432056907): Determine if we need locked-fullscreen
 // support on desktop android.
-#if BUILDFLAG(IS_CHROMEOS)
-bool IsLockedFullscreen(BrowserWindowInterface* browser) {
-  return platform_util::IsBrowserLockedFullscreen(browser);
-}
-#endif
 
 // Returns the tab group ID for the tab at `index`. Returns nullopt if the index
 // is out of range, the tab is not found, or the tab is not part of a group.
@@ -349,33 +336,6 @@ std::optional<tab_groups::TabGroupId> GetTabGroupForTab(
 
 // Places the window in a special type of fullscreen where the user is locked
 // into one browser window based on `is_locked_fullscreen`.
-#if BUILDFLAG(IS_CHROMEOS)
-void MaybeSetLockedFullscreenState(const api::windows::Update::Params& params,
-                                   BrowserWindowInterface* browser,
-                                   bool is_locked_fullscreen) {
-  // State will be WINDOW_STATE_NONE if the state parameter wasn't passed from
-  // the JS side, and in that case we don't want to change the locked state.
-  if (browser) {
-    if (is_locked_fullscreen &&
-        params.update_info.state != windows::WindowState::kLockedFullscreen &&
-        params.update_info.state != windows::WindowState::kNone) {
-      auto* delegate =
-          ash::BrowserController::GetInstance()->GetDelegate(browser);
-      if (delegate && delegate->IsLockedFullscreen()) {
-        delegate->LeaveLockedFullscreen();
-      }
-    } else if (!is_locked_fullscreen &&
-               params.update_info.state ==
-                   windows::WindowState::kLockedFullscreen) {
-      auto* delegate =
-          ash::BrowserController::GetInstance()->GetDelegate(browser);
-      if (delegate && !delegate->IsLockedFullscreen()) {
-        delegate->EnterLockedFullscreen(/*focus_toolbar=*/false);
-      }
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Updates `window_bounds` from `params`. Returns true if bounds were set.
 bool UpdateWindowBoundsFromParams(const api::windows::Update::Params& params,
@@ -1367,16 +1327,6 @@ ExtensionFunction::ResponseValue WindowsCreateFunction::OnBrowserWindowCreated(
   // TODO(crbug.com/438540029) - Remove once the migration is complete.
   if (create_data_ &&
       create_data_->state == windows::WindowState::kLockedFullscreen) {
-#if BUILDFLAG(IS_CHROMEOS)
-    Browser* const target_browser = new_window->GetBrowserForMigrationOnly();
-    if (target_browser) {
-      auto* delegate =
-          ash::BrowserController::GetInstance()->GetDelegate(target_browser);
-      if (delegate) {
-        delegate->EnterLockedFullscreen(/*focus_toolbar=*/false);
-      }
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   if (new_window->GetProfile()->IsOffTheRecord() &&
@@ -1472,21 +1422,6 @@ std::string WindowsCreateFunction::SetWindowBounds(
   return std::string();  // No error.
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void WindowsCreateFunction::OnBocaWindowCreatedAsynchronously(
-    const SessionID& session_id) {
-  BrowserWindowInterface* const browser =
-      BrowserWindowInterface::FromSessionID(session_id);
-  if (!browser) {
-    RespondWithError(ExtensionTabUtil::kBrowserWindowNotAllowed);
-    return;
-  }
-  Respond(WithArguments(ExtensionTabUtil::CreateWindowValueForExtension(
-      *browser, extension(), WindowController::kPopulateTabs,
-      source_context_type())));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 ExtensionFunction::ResponseAction WindowsUpdateFunction::Run() {
   std::optional<windows::Update::Params> params =
       windows::Update::Params::Create(args());
@@ -1506,19 +1441,6 @@ ExtensionFunction::ResponseAction WindowsUpdateFunction::Run() {
     return RespondNow(Error(ExtensionTabUtil::kNoCrashBrowserError));
   }
   ui::BaseWindow* browser_window = browser->GetWindow();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Don't allow locked fullscreen operations on a window without the proper
-  // permission (also don't allow any operations on a locked window if the
-  // extension doesn't have the permission).
-  const bool is_locked_fullscreen = IsLockedFullscreen(browser);
-  if ((params->update_info.state == windows::WindowState::kLockedFullscreen ||
-       is_locked_fullscreen) &&
-      !tabs_internal::ExtensionHasLockedFullscreenPermission(extension())) {
-    return RespondNow(
-        Error(tabs_internal::kMissingLockWindowFullscreenPrivatePermission));
-  }
-#endif
 
   // Before changing any of a window's state, validate the update parameters.
   // This prevents Chrome from performing "half" an update.
@@ -1575,9 +1497,6 @@ ExtensionFunction::ResponseAction WindowsUpdateFunction::Run() {
 #endif
 
   // Parameters are valid. Now to perform the actual updates.
-#if BUILDFLAG(IS_CHROMEOS)
-  MaybeSetLockedFullscreenState(*params, browser, is_locked_fullscreen);
-#endif
 
   UpdateWindowState(*params, browser, window_controller, show_state,
                     set_window_bounds, window_bounds);
@@ -1656,14 +1575,6 @@ ExtensionFunction::ResponseAction WindowsRemoveFunction::Run() {
 
   // TODO(https://crbug.com/432056907): Determine if we need locked-fullscreen
   // support on desktop android.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (window_controller->GetBrowserWindowInterface() &&
-      IsLockedFullscreen(window_controller->GetBrowserWindowInterface()) &&
-      !tabs_internal::ExtensionHasLockedFullscreenPermission(extension())) {
-    return RespondNow(
-        Error(tabs_internal::kMissingLockWindowFullscreenPrivatePermission));
-  }
-#endif
 
   TabListInterface* tab_list =
       TabListInterface::From(window_controller->GetBrowserWindowInterface());

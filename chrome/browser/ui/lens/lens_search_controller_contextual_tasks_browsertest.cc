@@ -683,13 +683,8 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksLensInteractionBrowserTest,
   EXPECT_TRUE(controller->IsShowingUI());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TextQueryFromComposeboxLoadsResult \
-  DISABLED_TextQueryFromComposeboxLoadsResult
-#else
 #define MAYBE_TextQueryFromComposeboxLoadsResult \
   TextQueryFromComposeboxLoadsResult
-#endif
 IN_PROC_BROWSER_TEST_F(ContextualTasksLensInteractionBrowserTest,
                        MAYBE_TextQueryFromComposeboxLoadsResult) {
   // Wait for the page to be painted to prevent flakiness when screenshotting.
@@ -724,13 +719,8 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksLensInteractionBrowserTest,
       base::test::RunUntil([&]() { return !inner_contents->IsLoading(); }));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_SubsequentRegionSelectionLoadsNewResult \
-  DISABLED_SubsequentRegionSelectionLoadsNewResult
-#else
 #define MAYBE_SubsequentRegionSelectionLoadsNewResult \
   SubsequentRegionSelectionLoadsNewResult
-#endif
 IN_PROC_BROWSER_TEST_F(ContextualTasksLensInteractionBrowserTest,
                        MAYBE_SubsequentRegionSelectionLoadsNewResult) {
   // Wait for the page to be painted to prevent flakiness when screenshotting.
@@ -779,13 +769,8 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksLensInteractionBrowserTest,
   }));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_SubsequentRegionSelectionFromComposeboxAddsVisualSelection \
-  DISABLED_SubsequentRegionSelectionFromComposeboxAddsVisualSelection
-#else
 #define MAYBE_SubsequentRegionSelectionFromComposeboxAddsVisualSelection \
   SubsequentRegionSelectionFromComposeboxAddsVisualSelection
-#endif
 IN_PROC_BROWSER_TEST_F(
     ContextualTasksLensInteractionBrowserTest,
     MAYBE_SubsequentRegionSelectionFromComposeboxAddsVisualSelection) {

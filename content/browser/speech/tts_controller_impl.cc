@@ -32,10 +32,6 @@
 #include "third_party/blink/public/mojom/speech/speech_synthesis.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/public/browser/tts_controller_delegate.h"
-#endif
-
 namespace content {
 namespace {
 // A value to be used to indicate that there is no char index available.
@@ -43,19 +39,6 @@ const int kInvalidCharIndex = -1;
 
 // A value to be used to indicate that there is no length available.
 const int kInvalidLength = -1;
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool VoiceIdMatches(
-    const std::optional<TtsControllerDelegate::PreferredVoiceId>& id,
-    const content::VoiceData& voice) {
-  if (!id.has_value() || voice.name.empty() ||
-      (voice.engine_id.empty() && !voice.native))
-    return false;
-  if (voice.native)
-    return id->name == voice.name && id->id.empty();
-  return id->name == voice.name && id->id == voice.engine_id;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TtsUtteranceImpl* AsUtteranceImpl(TtsUtterance* utterance) {
   return static_cast<TtsUtteranceImpl*>(utterance);
@@ -380,13 +363,7 @@ void TtsControllerImpl::OnTtsEvent(int utterance_id,
 }
 
 void TtsControllerImpl::OnTtsUtteranceBecameInvalid(int utterance_id) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // This handles the case that the utterance originated from the standalone
-  // browser becomes invalid, we need to stop
-  RemoveUtteranceAndStopIfNeeded(utterance_id);
-#else
   NOTREACHED();
-#endif
 }
 
 void TtsControllerImpl::GetVoices(BrowserContext* browser_context,
@@ -722,11 +699,6 @@ void TtsControllerImpl::UpdateUtteranceDefaults(TtsUtterance* utterance) {
   double rate = utterance->GetContinuousParameters().rate;
   double pitch = utterance->GetContinuousParameters().pitch;
   double volume = utterance->GetContinuousParameters().volume;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (GetTtsControllerDelegate())
-    GetTtsControllerDelegate()->UpdateUtteranceDefaultsFromPrefs(
-        utterance, &rate, &pitch, &volume);
-#else
   // Update pitch, rate and volume to defaults if not explicity set on
   // this utterance.
   if (rate == blink::mojom::kSpeechSynthesisDoublePrefNotSet)
@@ -735,7 +707,6 @@ void TtsControllerImpl::UpdateUtteranceDefaults(TtsUtterance* utterance) {
     pitch = blink::mojom::kSpeechSynthesisDefaultPitch;
   if (volume == blink::mojom::kSpeechSynthesisDoublePrefNotSet)
     volume = blink::mojom::kSpeechSynthesisDefaultVolume;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   utterance->SetContinuousParameters(rate, pitch, volume);
 }
 
@@ -820,12 +791,6 @@ int TtsControllerImpl::GetMatchingVoice(TtsUtterance* utterance,
   // match, something will be returned if there are any voices.
   int best_score = -1;
   int best_score_index = -1;
-#if BUILDFLAG(IS_CHROMEOS)
-  TtsControllerDelegate* delegate = GetTtsControllerDelegate();
-  std::unique_ptr<TtsControllerDelegate::PreferredVoiceIds> preferred_ids =
-      delegate ? delegate->GetPreferredVoiceIdsForUtterance(utterance)
-               : nullptr;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   for (size_t i = 0; i < voices.size(); ++i) {
     const content::VoiceData& voice = voices[i];
     int score = 0;
@@ -887,28 +852,6 @@ int TtsControllerImpl::GetMatchingVoice(TtsUtterance* utterance,
       if (has_all_required_event_types)
         score += 32;
     }
-
-#if BUILDFLAG(IS_CHROMEOS)
-    if (preferred_ids) {
-      // First prefer the user's preference voice for the utterance language,
-      // if the utterance language is specified.
-      if (!utterance->GetLang().empty() &&
-          VoiceIdMatches(preferred_ids->lang_voice_id, voice)) {
-        score += 16;
-      }
-
-      // Then prefer the user's preference voice for the system language.
-      // This is a lower priority match than the utterance voice.
-      if (VoiceIdMatches(preferred_ids->locale_voice_id, voice))
-        score += 8;
-
-      // Finally, prefer the user's preference voice for any language. This will
-      // pick the default voice if there is no better match for the current
-      // system language and utterance language.
-      if (VoiceIdMatches(preferred_ids->any_locale_voice_id, voice))
-        score += 4;
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     // Finally, prefer system language.
     if (!voice.lang.empty()) {
@@ -1050,22 +993,5 @@ void TtsControllerImpl::OnNetworkChanged(
       allow_remote_voices_ = false;
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TtsControllerDelegate* TtsControllerImpl::GetTtsControllerDelegate() {
-  if (delegate_)
-    return delegate_;
-  if (GetContentClient() && GetContentClient()->browser()) {
-    delegate_ = GetContentClient()->browser()->GetTtsControllerDelegate();
-    return delegate_;
-  }
-  return nullptr;
-}
-
-void TtsControllerImpl::SetTtsControllerDelegateForTesting(
-    TtsControllerDelegate* delegate) {
-  delegate_ = delegate;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace content

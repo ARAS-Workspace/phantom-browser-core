@@ -44,13 +44,6 @@
 #include "ui/gfx/image/image_skia.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/pickle.h"
-#include "ui/base/clipboard/clipboard_format_type.h"
-#include "ui/base/clipboard/custom_data_helper.h"
-#include "ui/base/dragdrop/os_exchange_data_provider_non_backed.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_X11)
 #include "ui/base/x/selection_utils.h"
 #include "ui/base/x/x11_os_exchange_data_provider.h"
@@ -266,7 +259,7 @@ TEST_F(WebContentsViewAuraTest, WebContentsDestroyedDuringClick) {
                              ui::EF_LEFT_MOUSE_BUTTON, 0);
   ui::EventHandler* event_handler = GetView();
   event_handler->OnMouseEvent(&mouse_event);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // The web-content is not activated during mouse-press on Linux.
   // See comment in WebContentsViewAura::OnMouseEvent() for more details.
   EXPECT_NE(web_contents(), nullptr);
@@ -312,7 +305,7 @@ TEST_F(WebContentsViewAuraTest, MAYBE_DragDropFiles) {
   view->OnDragEntered(event);
   ASSERT_NE(nullptr, view->current_drag_data_);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // By design, Linux implementations return an empty string if file data
   // is also present.
   EXPECT_TRUE(!view->current_drag_data_->text ||
@@ -352,7 +345,7 @@ TEST_F(WebContentsViewAuraTest, MAYBE_DragDropFiles) {
 
   CheckDropData(view);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // By design, Linux implementations returns an empty string if file data
   // is also present.
   EXPECT_TRUE(!drop_complete_data_->drop_data.text ||
@@ -397,7 +390,7 @@ TEST_F(WebContentsViewAuraTest, MAYBE_DragDropFilesOriginateFromRenderer) {
   view->OnDragEntered(event);
   ASSERT_NE(nullptr, view->current_drag_data_);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // By design, Linux implementations return an empty string if file data
   // is also present.
   EXPECT_TRUE(!view->current_drag_data_->text ||
@@ -406,11 +399,7 @@ TEST_F(WebContentsViewAuraTest, MAYBE_DragDropFilesOriginateFromRenderer) {
   EXPECT_EQ(string_data, view->current_drag_data_->text);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_FALSE(view->current_drag_data_->filenames.empty());
-#else
   ASSERT_TRUE(view->current_drag_data_->filenames.empty());
-#endif
 
   // Simulate drop.
   auto callback = base::BindOnce(&WebContentsViewAuraTest::OnDropComplete,
@@ -429,7 +418,7 @@ TEST_F(WebContentsViewAuraTest, MAYBE_DragDropFilesOriginateFromRenderer) {
 
   CheckDropData(view);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // By design, Linux implementations returns an empty string if file data is
   // also present.
   EXPECT_TRUE(!drop_complete_data_->drop_data.text ||
@@ -438,13 +427,7 @@ TEST_F(WebContentsViewAuraTest, MAYBE_DragDropFilesOriginateFromRenderer) {
   EXPECT_EQ(string_data, drop_complete_data_->drop_data.text);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // CHROMEOS never filters out files from a drop, even if the drag
-  // originated from a renderer, because otherwise, it breaks the Files app.
-  ASSERT_FALSE(drop_complete_data_->drop_data.filenames.empty());
-#else
   ASSERT_TRUE(drop_complete_data_->drop_data.filenames.empty());
-#endif
 }
 
 TEST_F(WebContentsViewAuraTest, MAYBE_DragDropImageFromRenderer) {
@@ -534,104 +517,6 @@ TEST_F(WebContentsViewAuraTest, MAYBE_DragDropImageFromRenderer) {
   EXPECT_EQ("",
             drop_complete_data_->drop_data.file_contents_content_disposition);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-TEST_F(WebContentsViewAuraTest, StartDragging) {
-  const char kGmailUrl[] = "http://mail.google.com/";
-  NavigateAndCommit(GURL(kGmailUrl));
-  FocusWebContentsOnMainFrame();
-
-  TestDragDropClient drag_drop_client;
-  aura::client::SetDragDropClient(root_window(), &drag_drop_client);
-
-  WebContentsViewAura* view = GetView();
-  // This condition is needed to avoid calling WebContentsViewAura::EndDrag
-  // which will result NOTREACHED being called in
-  // `RenderWidgetHostViewBase::TransformPointToCoordSpaceForView`.
-  view->drag_in_progress_ = true;
-
-  DropData drop_data;
-  drop_data.text.emplace(u"Hello World!");
-  view->StartDragging(*main_rfh(), drop_data,
-                      blink::DragOperationsMask::kDragOperationNone,
-                      gfx::ImageSkia(), gfx::Vector2d(), gfx::Rect(),
-                      blink::mojom::DragEventSourceInfo());
-
-  ui::OSExchangeData* exchange_data = drag_drop_client.GetDragDropData();
-  EXPECT_TRUE(exchange_data);
-  EXPECT_TRUE(exchange_data->GetSource());
-  EXPECT_TRUE(exchange_data->GetSource()->IsUrlType());
-  EXPECT_EQ(*(exchange_data->GetSource()->GetURL()), GURL(kGmailUrl));
-}
-
-namespace {
-
-std::unique_ptr<ui::OSExchangeData> MakeExchangeDataWithFilesAppCustomTypes(
-    const GURL& source_url) {
-  std::unordered_map<std::u16string, std::u16string> custom_data;
-  custom_data[u"fs/tag"] = u"filemanager-data";
-  custom_data[u"fs/sources"] =
-      u"filesystem:chrome://file-manager/external/Downloads-hash/a.txt";
-  custom_data[u"fs/sourceRootURL"] =
-      u"filesystem:chrome://file-manager/external/Downloads-hash/";
-  custom_data[u"text/custom"] = u"other";
-  base::Pickle pickle;
-  ui::WriteCustomDataToPickle(custom_data, &pickle);
-
-  auto data = std::make_unique<ui::OSExchangeData>(
-      std::make_unique<ui::OSExchangeDataProviderNonBacked>());
-  data->SetPickledData(ui::ClipboardFormatType::DataTransferCustomType(),
-                       pickle);
-  data->SetSource(std::make_unique<ui::DataTransferEndpoint>(source_url));
-  return data;
-}
-
-}  // namespace
-
-// The 'fs/*' DataTransfer custom-data types are used by the ChromeOS Files app
-// to carry filesystem URLs between its own windows. They must only be honoured
-// when the drag source is a WebUI page; drags from ordinary web content should
-// have them removed before reaching the drop target so that targets which
-// resolve them (e.g. the Files app) only act on data the app itself produced.
-TEST_F(WebContentsViewAuraTest, DragEnterFilesAppCustomTypesFromWebSource) {
-  WebContentsViewAura* view = GetView();
-  auto data =
-      MakeExchangeDataWithFilesAppCustomTypes(GURL("https://www.example.com/"));
-
-  ui::DropTargetEvent event(*data.get(), kClientPt, kScreenPt,
-                            ui::DragDropTypes::DRAG_COPY);
-  EXPECT_EQ(nullptr, view->current_drag_data_);
-  view->OnDragEntered(event);
-  ASSERT_NE(nullptr, view->current_drag_data_);
-
-  const auto& custom_data = view->current_drag_data_->custom_data;
-  EXPECT_EQ(custom_data.end(), custom_data.find(u"fs/tag"));
-  EXPECT_EQ(custom_data.end(), custom_data.find(u"fs/sources"));
-  EXPECT_EQ(custom_data.end(), custom_data.find(u"fs/sourceRootURL"));
-  ASSERT_NE(custom_data.end(), custom_data.find(u"text/custom"));
-  EXPECT_EQ(u"other", custom_data.at(u"text/custom"));
-}
-
-TEST_F(WebContentsViewAuraTest, DragEnterFilesAppCustomTypesFromWebUISource) {
-  WebContentsViewAura* view = GetView();
-  auto data =
-      MakeExchangeDataWithFilesAppCustomTypes(GURL("chrome://file-manager/"));
-
-  ui::DropTargetEvent event(*data.get(), kClientPt, kScreenPt,
-                            ui::DragDropTypes::DRAG_COPY);
-  EXPECT_EQ(nullptr, view->current_drag_data_);
-  view->OnDragEntered(event);
-  ASSERT_NE(nullptr, view->current_drag_data_);
-
-  const auto& custom_data = view->current_drag_data_->custom_data;
-  EXPECT_NE(custom_data.end(), custom_data.find(u"fs/tag"));
-  EXPECT_NE(custom_data.end(), custom_data.find(u"fs/sources"));
-  EXPECT_NE(custom_data.end(), custom_data.find(u"fs/sourceRootURL"));
-  EXPECT_NE(custom_data.end(), custom_data.find(u"text/custom"));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class BlockDragContentBrowserClient : public ContentBrowserClient {
  public:

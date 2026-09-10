@@ -243,20 +243,20 @@ void ScreenAIServiceHandlerBase::LaunchIfNotRunning() {
   }
 
   base::FilePath binary_path = state_instance->get_component_binary_path();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   std::vector<std::string> extra_switches = {
       base::StringPrintf("--%s=%s", screen_ai::GetBinaryPathSwitch(),
                          binary_path.MaybeAsASCII().c_str())};
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   std::string process_name = base::StrCat({GetServiceName(), " Service"});
   content::ServiceProcessHost::Launch(
       screen_ai_service_factory_.BindNewPipeAndPassReceiver(),
       content::ServiceProcessHost::Options()
           .WithDisplayName(process_name)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
           .WithExtraCommandLineSwitches(extra_switches)
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
           .WithProcessCallback(
               base::BindOnce(&ScreenAIServiceHandlerBase::OnServiceLaunched,
                              weak_ptr_factory_.GetWeakPtr(), process_name))

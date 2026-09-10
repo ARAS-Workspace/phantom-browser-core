@@ -16,8 +16,6 @@
 #include "services/device/generic_sensor/platform_sensor_provider_mac.h"
 #elif BUILDFLAG(IS_ANDROID)
 #include "services/device/generic_sensor/platform_sensor_provider_android.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "services/device/generic_sensor/platform_sensor_provider_chromeos.h"
 #elif BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
 #include "services/device/generic_sensor/platform_sensor_provider_linux.h"
 #endif
@@ -58,8 +56,6 @@ std::unique_ptr<PlatformSensorProvider> PlatformSensorProvider::Create() {
   return std::make_unique<PlatformSensorProviderMac>();
 #elif BUILDFLAG(IS_ANDROID)
   return std::make_unique<PlatformSensorProviderAndroid>();
-#elif BUILDFLAG(IS_CHROMEOS)
-  return std::make_unique<PlatformSensorProviderChromeOS>();
 #elif BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
   return std::make_unique<PlatformSensorProviderLinux>();
 #else

@@ -25,7 +25,6 @@
 
 namespace security_interstitials {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void LaunchDateAndTimeSettings() {
 // The code for each OS is completely separate, in order to avoid bugs like
 // https://crbug.com/430877 .
@@ -84,7 +83,6 @@ void LaunchDateAndTimeSettings() {
 #endif
   // Don't add code here! (See the comment at the beginning of the function.)
 }
-#endif
 
 }  // namespace security_interstitials
 

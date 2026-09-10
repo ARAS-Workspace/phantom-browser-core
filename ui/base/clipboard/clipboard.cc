@@ -89,11 +89,11 @@ bool Clipboard::IsSupportedClipboardBuffer(ClipboardBuffer buffer) {
   // Use lambda instead of local helper function in order to access private
   // member IsSelectionBufferAvailable().
   static auto IsSupportedSelectionClipboard = []() -> bool {
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_OZONE)
     ui::Clipboard* clipboard = ui::Clipboard::GetForCurrentThread();
     CHECK(clipboard);
     return clipboard->IsSelectionBufferAvailable();
-#elif !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_CHROMEOS)
+#elif !BUILDFLAG(IS_APPLE)
     return true;
 #else
     return false;

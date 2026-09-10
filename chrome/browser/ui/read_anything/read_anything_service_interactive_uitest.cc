@@ -13,8 +13,6 @@
 
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 using ReadAnythingServiceGuestTest = InProcessBrowserTest;
 IN_PROC_BROWSER_TEST_F(ReadAnythingServiceGuestTest,
                        ServiceIsCreatedForGuestProfile) {
@@ -32,6 +30,5 @@ IN_PROC_BROWSER_TEST_F(ReadAnythingServiceGuestTest,
       ReadAnythingService::Get(original_profile);
   EXPECT_EQ(nullptr, original_service);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

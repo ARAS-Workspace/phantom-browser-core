@@ -264,7 +264,7 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionSpeechRecognitionHostTest,
   OnSpeechRecognitionError(frame_host);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(LiveCaptionSpeechRecognitionHostTest,
                        MediaEffectivelyFullscreenChanged) {
   content::WebContents* web_contents =

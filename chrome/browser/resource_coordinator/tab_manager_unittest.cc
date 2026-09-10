@@ -97,9 +97,6 @@ TEST_F(TabManagerTest, IsInternalPage) {
   EXPECT_TRUE(TabManager::IsInternalPage(GURL(chrome::kChromeUISettingsURL)));
 
 // Debugging URLs are not included.
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(TabManager::IsInternalPage(GURL(chrome::kChromeUIDiscardsURL)));
-#endif
   EXPECT_FALSE(
       TabManager::IsInternalPage(GURL(chrome::kChromeUINetInternalsURL)));
 

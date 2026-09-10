@@ -86,13 +86,7 @@ void TestSyncService::SetSignedOut() {
 }
 
 void TestSyncService::MimicDashboardClear() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Clearing sync from the dashboard results in
-  // IsSyncFeatureDisabledViaDashboard() returning true.
-  user_settings_.SetSyncFeatureDisabledViaDashboard();
-#else
   SetSignedIn(signin::ConsentLevel::kSignin);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void TestSyncService::SetAllowedByEnterprisePolicy(bool allowed) {
@@ -346,11 +340,6 @@ DataTypeSet TestSyncService::GetActiveDataTypes() const {
   if (GetTransportState() != TransportState::ACTIVE) {
     return DataTypeSet();
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (user_settings_.IsSyncFeatureDisabledViaDashboard()) {
-    return DataTypeSet();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   DataTypeSet types_with_encryption_error =
       (user_settings_.IsPassphraseRequired() ||

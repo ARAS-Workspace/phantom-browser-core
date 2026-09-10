@@ -124,15 +124,9 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/smart_card/smart_card_permission_context.h"
-#include "chrome/browser/smart_card/smart_card_permission_context_factory.h"
-#include "components/user_manager/user_manager.h"
-#endif
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/common/constants.h"
@@ -1141,13 +1135,6 @@ void SiteSettingsHandler::HandleSetDefaultValueForContentType(
       site_settings::ContentSettingsTypeFromGroupName(content_type);
 
   Profile* profile = profile_;
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS special case: in Guest mode, settings are opened in Incognito
-  // mode so we need the original profile to actually modify settings.
-  if (user_manager::UserManager::Get()->IsLoggedInAsGuest()) {
-    profile = profile->GetOriginalProfile();
-  }
-#endif
   HostContentSettingsMap* map =
       HostContentSettingsMapFactory::GetForProfile(profile);
   ContentSetting previous_setting =
@@ -2088,7 +2075,7 @@ void SiteSettingsHandler::SendZoomLevels() {
 
   base::ListValue zoom_levels_exceptions;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Show any non-default Isolated Web App zoom levels at the top of the page.
   auto* web_app_provider = web_app::WebAppProvider::GetForWebApps(profile_);
   if (web_app_provider) {
@@ -2121,7 +2108,7 @@ void SiteSettingsHandler::SendZoomLevels() {
                     *b.GetDict().FindString(site_settings::kDisplayName);
                 return name_a < name_b;
               });
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   }
 
   content::HostZoomMap* host_zoom_map =
@@ -2188,7 +2175,7 @@ void SiteSettingsHandler::HandleRemoveZoomLevel(const base::ListValue& args) {
 
   GURL url(host_or_spec);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (url.is_valid() && url.GetScheme() == webapps::kIsolatedAppScheme) {
     base::expected<web_app::IsolatedWebAppUrlInfo, std::string> iwa_url_info =
         web_app::IsolatedWebAppUrlInfo::Create(url);
@@ -2204,7 +2191,7 @@ void SiteSettingsHandler::HandleRemoveZoomLevel(const base::ListValue& args) {
     host_zoom_map->SetZoomLevelForHost(url.GetHost(), default_level);
     return;
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   content::HostZoomMap* host_zoom_map =
       content::HostZoomMap::GetDefaultForBrowserContext(profile_);
@@ -2334,15 +2321,6 @@ void SiteSettingsHandler::ObserveSourcesForProfile(Profile* profile) {
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(blink::features::kSmartCard)) {
-    auto& smart_card_context =
-        SmartCardPermissionContextFactory::GetForProfile(*profile);
-    if (!chooser_observations_.IsObservingSource(&smart_card_context)) {
-      chooser_observations_.AddObservation(&smart_card_context);
-    }
-  }
-#endif
   observed_profiles_.AddObservation(profile);
 }
 
@@ -2386,16 +2364,6 @@ void SiteSettingsHandler::StopObservingSourcesForProfile(Profile* profile) {
           file_system_access_permission_context);
     }
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(blink::features::kSmartCard)) {
-    auto& smart_card_context =
-        SmartCardPermissionContextFactory::GetForProfile(*profile);
-    if (chooser_observations_.IsObservingSource(&smart_card_context)) {
-      chooser_observations_.RemoveObservation(&smart_card_context);
-    }
-  }
-#endif
 
   observed_profiles_.RemoveObservation(profile);
 }
@@ -2791,26 +2759,6 @@ base::ListValue SiteSettingsHandler::PopulateFileSystemGrantData() {
 
 base::Value SiteSettingsHandler::GetSystemDeniedPermissions() {
   base::ListValue blocked_permissions;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // This is used to display warning messages in the UI in case that
-  // geolocation, microphone or camera are disabled at the system level. At the
-  // moment this functionality is only targeting CrOS.
-  if (system_permission_settings::IsDenied(
-          ContentSettingsType::MEDIASTREAM_CAMERA)) {
-    blocked_permissions.Append(site_settings::ContentSettingsTypeToGroupName(
-        ContentSettingsType::MEDIASTREAM_CAMERA));
-  }
-  if (system_permission_settings::IsDenied(
-          ContentSettingsType::MEDIASTREAM_MIC)) {
-    blocked_permissions.Append(site_settings::ContentSettingsTypeToGroupName(
-        ContentSettingsType::MEDIASTREAM_MIC));
-  }
-  if (system_permission_settings::IsDenied(ContentSettingsType::GEOLOCATION)) {
-    blocked_permissions.Append(site_settings::ContentSettingsTypeToGroupName(
-        ContentSettingsType::GEOLOCATION));
-  }
-#endif
 
   return base::Value(std::move(blocked_permissions));
 }

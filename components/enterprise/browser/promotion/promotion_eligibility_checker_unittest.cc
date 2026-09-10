@@ -227,7 +227,6 @@ TEST_F(PromotionEligibilityCheckerTest,
 
 // Will not test this scenario on ChromeOS because the account is very unlikely
 // to be empty.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PromotionEligibilityCheckerTest,
        DeterminePromotionEligibilityNoAccount) {
   identity_test_env()->ClearPrimaryAccount();
@@ -251,6 +250,5 @@ TEST_F(PromotionEligibilityCheckerTest,
 
   checker_no_account.MaybeCheckPromotionEligibility(callback.Get());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace enterprise_promotion

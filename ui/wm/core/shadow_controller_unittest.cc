@@ -276,9 +276,6 @@ TEST_F(ShadowControllerTest, SetColorsMapToShadow) {
   const auto* default_details = shadow->details_for_testing();
   SkColor default_key_color = SkColorSetA(SK_ColorBLACK, 0x3d);
   SkColor default_ambient_color = SkColorSetA(SK_ColorBLACK, 0x1f);
-#if BUILDFLAG(IS_CHROMEOS)
-  default_ambient_color = SkColorSetA(SK_ColorBLACK, 0x1a);
-#endif
   EXPECT_EQ(default_details->values[0].color(), default_key_color);
   EXPECT_EQ(default_details->values[1].color(), default_ambient_color);
 

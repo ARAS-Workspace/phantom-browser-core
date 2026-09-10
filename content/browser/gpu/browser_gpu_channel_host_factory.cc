@@ -340,9 +340,7 @@ void BrowserGpuChannelHostFactory::EstablishGpuChannel(
 // CrOS and this check failed when tested on an experimental builder. Revert
 // https://crrev.com/c/3174621 to enable it. See go/chrome-dcheck-on-cros
 // or http://crbug.com/1113456 for more details.
-#if !BUILDFLAG(IS_CHROMEOS)
     DCHECK(!pending_request_.get());
-#endif
     // Recreate the channel if it has been lost.
     gpu_channel_->DestroyChannel();
     gpu_channel_ = nullptr;

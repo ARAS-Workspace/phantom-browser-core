@@ -47,10 +47,6 @@
 #include "chrome/common/request_header_integrity/request_header_integrity_url_loader_throttle.h"  // nogncheck crbug.com/40147906
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/renderer/ash_merge_session_loader_throttle.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "components/safe_browsing/content/renderer/renderer_url_loader_throttle.h"
 #endif
@@ -260,12 +256,6 @@ URLLoaderThrottleProviderImpl::CreateThrottles(
 #endif
       chrome_content_renderer_client_->GetChromeObserver()
           ->GetDynamicParams()));
-
-#if BUILDFLAG(IS_CHROMEOS)
-  throttles.emplace_back(std::make_unique<AshMergeSessionLoaderThrottle>(
-      chrome_content_renderer_client_->GetChromeObserver()
-          ->chromeos_listener()));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_REQUEST_HEADER_INTEGRITY)
   if (request_header_integrity::RequestHeaderIntegrityURLLoaderThrottle::

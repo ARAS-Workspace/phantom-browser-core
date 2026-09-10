@@ -525,7 +525,7 @@ Status LaunchDesktopChrome(network::mojom::URLLoaderFactory* factory,
       command.AppendSwitch(kEnableCrashReport);
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // We need to allow new privileges so that chrome's setuid sandbox can run.
   options.allow_new_privs = true;
 #endif
@@ -1298,9 +1298,6 @@ std::string GetTerminationReason(base::TerminationStatus status) {
     case base::TERMINATION_STATUS_ABNORMAL_TERMINATION:
       return "exited abnormally";
     case base::TERMINATION_STATUS_PROCESS_WAS_KILLED:
-#if BUILDFLAG(IS_CHROMEOS)
-    case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
-#endif
     case base::TERMINATION_STATUS_OOM:
       return "was killed";
 #if BUILDFLAG(IS_ANDROID)

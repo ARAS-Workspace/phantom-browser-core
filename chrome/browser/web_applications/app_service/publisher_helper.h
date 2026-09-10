@@ -22,13 +22,6 @@ namespace web_app {
 webapps::WebappUninstallSource ConvertUninstallSourceToWebAppUninstallSource(
     apps::UninstallSource uninstall_source);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Consults the app service to figure out which web apps are capable of handling
-// `protocol_url`.
-std::vector<std::string> GetWebAppIdsForProtocolUrl(Profile* profile,
-                                                    const GURL& protocol_url);
-#endif
-
 }  // namespace web_app
 
 #endif  // CHROME_BROWSER_WEB_APPLICATIONS_APP_SERVICE_PUBLISHER_HELPER_H_

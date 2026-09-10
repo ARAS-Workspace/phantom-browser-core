@@ -68,7 +68,7 @@ class ContentsWebView : public views::WebView,
   // This allows the browser to force focus synchronization in split view even
   // when native OS focus gets stuck on a different window (like a permission
   // prompt).
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   void DidGetUserInteraction(const blink::WebInputEvent& event) override;
 #endif
 

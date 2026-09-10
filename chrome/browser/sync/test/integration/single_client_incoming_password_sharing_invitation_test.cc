@@ -82,7 +82,6 @@ IncomingPasswordSharingInvitationSpecifics CreateInvitationSpecifics(
       syncer::CrossUserSharingPublicPrivateKeyPair::GenerateNewKeyPair());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Fill in fields in `password_data` required for computing password client tag.
 // This is useful for testing collisions. Note that the `invitation` must
 // contain only one password in a group.
@@ -103,7 +102,6 @@ void FillPasswordClientTagFromInvitation(
       invitation_group_element_data.password_element());
   password_data->set_signon_realm(invitation_group_element_data.signon_realm());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Waits until all the incoming invitations are deleted from the fake server.
 class ServerPasswordInvitationChecker
@@ -317,7 +315,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,
 
 // ChromeOS does not support signing out of a primary account, which these test
 // relies on to initialize Nigori.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,
                        ShouldHandleIncomingInvitationsAtInitialSync) {
   // First, setup sync to initialize Nigori node with a public key to be able to
@@ -410,12 +407,11 @@ IN_PROC_BROWSER_TEST_P(
           kCredentialsExistWithDifferentPassword,
       /*expected_bucket_count=*/1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // The unconsented primary account isn't supported on ChromeOS.
 // TODO(crbug.com/358053884): enable on Android once transport mode for
 // Passwords is supported.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // This test verifies that Incoming Password Sharing Invitation data type is
 // stopped when the Password data type is opted out in the transport mode.
 IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,
@@ -453,7 +449,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,
       IncomingPasswordSharingInvitationInactiveChecker(GetSyncService(0))
           .Wait());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // This test verifies that Incoming Password Sharing Invitation data type is
 // stopped when the Password data type is encountered error.

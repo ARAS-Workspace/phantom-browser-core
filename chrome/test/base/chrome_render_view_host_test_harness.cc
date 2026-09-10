@@ -11,10 +11,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/signin/signin_error_controller_factory.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/shell.h"
-#endif
-
 using content::RenderViewHostTester;
 using content::RenderViewHostTestHarness;
 
@@ -26,9 +22,6 @@ TestingProfile* ChromeRenderViewHostTestHarness::profile() {
 
 void ChromeRenderViewHostTestHarness::TearDown() {
   RenderViewHostTestHarness::TearDown();
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::Shell::DeleteInstance();
-#endif
 }
 
 TestingProfile::TestingFactories

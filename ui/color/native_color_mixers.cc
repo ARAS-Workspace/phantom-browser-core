@@ -9,7 +9,7 @@
 
 namespace ui {
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 void AddNativeCoreColorMixer(ColorProvider* provider,
                              const ColorProviderKey& key) {}
 #endif

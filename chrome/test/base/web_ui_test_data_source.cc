@@ -18,25 +18,12 @@
 #include "ui/webui/resources/grit/webui_resources.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/webui/common/trusted_types_util.h"
-#endif
 
 namespace {
 
 void SetupTestDataSource(content::WebUIDataSource* source,
                          const std::string& scheme) {
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::EnableTrustedTypesCSP(source);
-  // Add lit-html-desktop policy so that Desktop UI components used by
-  // cross-platform UIs (e.g. chrome://print, chrome://history) can be tested
-  // on CrOS builds.
-  source->OverrideContentSecurityPolicy(
-      network::mojom::CSPDirectiveName::TrustedTypes,
-      base::StrCat({ash::kDefaultTrustedTypesPolicies, " lit-html-desktop;"}));
-#else
   webui::EnableTrustedTypesCSP(source);
-#endif
 
   source->OverrideContentSecurityPolicy(
       network::mojom::CSPDirectiveName::ScriptSrc,

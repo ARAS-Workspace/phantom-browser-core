@@ -224,22 +224,6 @@ TEST_F(OAuth2AccessTokenFetcherImplTest, CancelOngoingRequest) {
   base::RunLoop().RunUntilIdle();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(OAuth2AccessTokenFetcherImplTest, GetAccessTokenRaptRequiredFailure) {
-  SetupGetAccessToken(net::OK, net::HTTP_BAD_REQUEST,
-                      kRaptRequiredErrorResponse);
-  EXPECT_CALL(
-      consumer_,
-      OnGetTokenFailure(
-          GoogleServiceAuthError::FromScopeLimitedUnrecoverableErrorReason(
-              GoogleServiceAuthError::ScopeLimitedUnrecoverableErrorReason::
-                  kInvalidGrantRaptError)))
-      .Times(1);
-  fetcher_->Start("client_id", "client_secret", ScopeList());
-  base::RunLoop().RunUntilIdle();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(OAuth2AccessTokenFetcherImplTest, MakeGetAccessTokenBodyNoScope) {
   std::string body =
       "client_id=cid1&"

@@ -252,9 +252,7 @@ class ContextualTasksButtonInteractiveTestBase : public InteractiveBrowserTest {
 
   auto ClearPrimaryAccount() {
     return Do([&]() {
-#if !BUILDFLAG(IS_CHROMEOS)
       identity_test_env()->ClearPrimaryAccount();
-#endif
       GetTestingService()->GetFakeEligibilityManager()->SetIsEligible(false);
     });
   }
@@ -473,7 +471,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksEphemeralButtonInteractiveTest,
 }
 
 // Immersive fullscreen mode is only supported on ChromeOS and macOS.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(ContextualTasksEphemeralButtonInteractiveTest,
                        CloseButtonHiddenInImmersiveMode) {
   RunTestSequence(

@@ -65,41 +65,6 @@ namespace extensions {
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::string GetFeatureSessionTypeAsString() {
-  switch (GetCurrentFeatureSessionType()) {
-    case mojom::FeatureSessionType::kInitial:
-      return "Initial";
-    case mojom::FeatureSessionType::kUnknown:
-      return "Unknown";
-    case mojom::FeatureSessionType::kRegular:
-      return "Regular";
-    case mojom::FeatureSessionType::kKiosk:
-      return "Kiosk";
-    case mojom::FeatureSessionType::kAutolaunchedKiosk:
-      return "Auto-launched kiosk";
-  }
-}
-
-void ReportActivationTokenError(content::BrowserContext* browser_context,
-                                const Extension& extension,
-                                const char* error_message) {
-  std::ostringstream error_stream;
-  error_stream << error_message << " "
-               << "Extension ID: " << extension.id()
-               << ". Session type: " << GetFeatureSessionTypeAsString()
-               << ". Is guest session: "
-               << ExtensionsBrowserClient::Get()->IsGuestSession(
-                      browser_context);
-  LOG(ERROR) << error_stream.str();
-  static auto* const crash_key = base::debug::AllocateCrashKeyString(
-      "GetActivationTokenForWorkerBasedExtension",
-      base::debug::CrashKeySize::Size1024);
-  base::debug::SetCrashKeyString(crash_key, error_stream.str());
-  base::debug::DumpWithoutCrashing();
-}
-#endif
-
 // Gets the current activation token for `extension`.
 std::optional<base::UnguessableToken> GetActivationTokenForWorkerBasedExtension(
     content::BrowserContext* browser_context,
@@ -118,35 +83,13 @@ std::optional<base::UnguessableToken> GetActivationTokenForWorkerBasedExtension(
   // For the off the record profile...
   if (browser_context->IsOffTheRecord()) {
     if (IncognitoInfo::IsSplitMode(&extension)) {
-#if BUILDFLAG(IS_CHROMEOS)
-      if (!activation_token.has_value()) {
-        // TODO(crbug.com/442902361): Remove crash logging once activation
-        // token issue has been fixed.
-        ReportActivationTokenError(
-            browser_context, extension,
-            "Off-the-record extension running in split mode is "
-            "missing an activation token.");
-      }
-#else
       // Split mode extensions will have a separate activation token.
       CHECK(activation_token.has_value());
       // TODO(crbug.com/357889496): Add a test that confirms that split mode
       // tokens are different across the OnTR and OffTR extension processes.
-#endif
     } else if (IncognitoInfo::IsSpanningMode(&extension)) {
-#if BUILDFLAG(IS_CHROMEOS)
-      if (activation_token.has_value()) {
-        // TODO(crbug.com/442902361): Remove crash logging once activation
-        // token issue has been fixed.
-        ReportActivationTokenError(
-            browser_context, extension,
-            "Off-the-record extension running in spanning mode "
-            "incorrectly has an activation token.");
-      }
-#else
       // Spanning mode extensions will not have a separate activation token.
       CHECK(!activation_token.has_value());
-#endif
     }
   }
 
@@ -266,7 +209,7 @@ void RendererStartupHelper::OnRenderProcessLaunched(
     // extensions should have already been initialized in
     // OnRenderProcessHostCreated(), if it corresponds to the same context.
     ExtensionsBrowserClient* client = ExtensionsBrowserClient::Get();
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
     // On Android and ChromeOS, handle race condition during process restart:
     // 1. OnRenderProcessHostCreated() initializes extensions and populates
     // process_mojo_map_.
@@ -283,7 +226,7 @@ void RendererStartupHelper::OnRenderProcessLaunched(
 #else
     CHECK(GetRenderer(host) != nullptr ||
           !client->IsSameContext(browser_context_, host->GetBrowserContext()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
     return;
   }
   // Otherwise, we should *not* have initialized the host yet.

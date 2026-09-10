@@ -38,10 +38,6 @@ enum TerminationStatus : int {
   TERMINATION_STATUS_PROCESS_CRASHED = 3,
   // Child hasn't exited yet.
   TERMINATION_STATUS_STILL_RUNNING = 4,
-#if BUILDFLAG(IS_CHROMEOS)
-  // OOM-killer killed the process on ChromeOS.
-  TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM = 5,
-#endif
 #if BUILDFLAG(IS_ANDROID)
   // On Android processes are spawned from the system Zygote and we do not get
   // the termination status. We can't know if the termination was a crash or an
@@ -96,11 +92,11 @@ BASE_EXPORT TerminationStatus GetTerminationStatus(ProcessHandle handle,
 BASE_EXPORT TerminationStatus
 GetKnownDeadTerminationStatus(ProcessHandle handle, int* exit_code);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Spawns a thread to wait asynchronously for the child |process| to exit
 // and then reaps it.
 BASE_EXPORT void EnsureProcessGetsReaped(Process process);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 #endif  // BUILDFLAG(IS_POSIX)
 
 // Registers |process| to be asynchronously monitored for termination, forcibly

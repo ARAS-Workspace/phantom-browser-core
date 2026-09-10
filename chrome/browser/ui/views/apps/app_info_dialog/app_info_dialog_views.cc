@@ -29,15 +29,6 @@
 #include "ui/views/layout/box_layout.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_list/arc/arc_app_list_prefs.h"
-#include "chrome/browser/ash/app_list/arc/arc_app_utils.h"
-#include "chrome/browser/ash/arc/arc_util.h"
-#include "chrome/browser/ui/views/apps/app_info_dialog/arc_app_info_links_panel.h"
-#include "chromeos/ash/experiences/arc/app/arc_app_constants.h"
-#include "components/app_constants/constants.h"
-#endif
-
 base::WeakPtr<AppInfoDialog>& AppInfoDialog::GetLastDialogForTesting() {
   static base::NoDestructor<base::WeakPtr<AppInfoDialog>> last_dialog;
   return *last_dialog;
@@ -61,20 +52,6 @@ AppInfoDialog::AppInfoDialog(Profile* profile, const extensions::Extension* app)
       std::make_unique<AppInfoSummaryPanel>(profile, app));
   dialog_body_contents->AddChildView(
       std::make_unique<AppInfoPermissionsPanel>(profile, app));
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // When Google Play Store is enabled and the Settings app is available, show
-  // the "Manage supported links" link for Chrome.
-  if (app->id() == app_constants::kChromeAppId &&
-      arc::IsArcPlayStoreEnabledForProfile(profile)) {
-    const ArcAppListPrefs* arc_app_list_prefs = ArcAppListPrefs::Get(profile);
-    if (arc_app_list_prefs &&
-        arc_app_list_prefs->IsRegistered(arc::kSettingsAppId)) {
-      arc_app_info_links_ = dialog_body_contents->AddChildView(
-          std::make_unique<ArcAppInfoLinksPanel>(profile, app));
-    }
-  }
-#endif
 
   // Clip the scrollable view so that the scrollbar appears. As long as this
   // is larger than the height of the dialog, it will be resized to the dialog's

@@ -746,18 +746,9 @@ IN_PROC_BROWSER_TEST_P(AttemptLoginToolInteractiveUiTest,
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// FederationEnabled tests are flaky on ChromeOS.
-// TODO(b/495445228): Fix flaky tests.
-INSTANTIATE_TEST_SUITE_P(All,
-                         AttemptLoginToolInteractiveUiTest,
-                         testing::Values(false),
-                         AttemptLoginToolInteractiveUiTest::DescribeParams);
-#else
 INSTANTIATE_TEST_SUITE_P(All,
                          AttemptLoginToolInteractiveUiTest,
                          testing::Bool(),
                          AttemptLoginToolInteractiveUiTest::DescribeParams);
-#endif
 
 }  // namespace actor

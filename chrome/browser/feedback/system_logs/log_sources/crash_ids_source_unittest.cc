@@ -10,11 +10,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/dbus/debug_daemon/debug_daemon_client.h"
-#include "chromeos/ash/components/dbus/debug_daemon/fake_debug_daemon_client.h"
-#endif
-
 namespace system_logs {
 
 class StubUploadList : public UploadList {
@@ -34,45 +29,5 @@ class StubUploadList : public UploadList {
 
   void RequestSingleUpload(const std::string& local_id) override {}
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-class TestDebugDaemonClient : public ash::FakeDebugDaemonClient {
- public:
-  TestDebugDaemonClient() = default;
-
-  TestDebugDaemonClient(const TestDebugDaemonClient&) = delete;
-  TestDebugDaemonClient& operator=(const TestDebugDaemonClient&) = delete;
-
-  ~TestDebugDaemonClient() override = default;
-
-  void UploadCrashes(UploadCrashesCallback callback) override {
-    ++upload_crashes_called_;
-    FakeDebugDaemonClient::UploadCrashes(std::move(callback));
-  }
-
-  int upload_crashes_called() const { return upload_crashes_called_; }
-
- private:
-  int upload_crashes_called_ = 0;
-};
-
-TEST(CrashIdsSourceTest, CallsCrashSender) {
-  content::BrowserTaskEnvironment task_environment;
-
-  TestDebugDaemonClient test_debug_client;
-  ash::DebugDaemonClient::SetInstanceForTest(&test_debug_client);
-
-  CrashIdsSource source;
-  source.SetUploadListForTesting(new StubUploadList());
-
-  EXPECT_EQ(0, test_debug_client.upload_crashes_called());
-
-  source.Fetch(base::BindOnce([](std::unique_ptr<SystemLogsResponse>) {}));
-
-  EXPECT_EQ(1, test_debug_client.upload_crashes_called());
-
-  ash::DebugDaemonClient::SetInstanceForTest(nullptr);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace system_logs

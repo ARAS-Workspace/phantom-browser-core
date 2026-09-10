@@ -69,11 +69,6 @@
 #include "ui/base/models/tree_node_iterator.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/signin/wait_for_network_callback_helper_ash.h"
-#include "chromeos/ash/components/network/network_handler.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/android/tab_model/tab_model.h"
 #include "chrome/browser/ui/android/tab_model/tab_model_list.h"
@@ -83,15 +78,13 @@
 #include "chrome/browser/ui/browser.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/signin/wait_for_network_callback_helper_chrome.h"
-#endif
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 #include "chrome/browser/signin/bound_session_credentials/bound_session_cookie_refresh_service.h"
@@ -290,12 +283,8 @@ class ChromeOAuthConsumerRegistry : public signin::OAuthConsumerRegistry {
 
 ChromeSigninClient::ChromeSigninClient(Profile* profile)
     : wait_for_network_callback_helper_(
-#if BUILDFLAG(IS_CHROMEOS)
-          std::make_unique<WaitForNetworkCallbackHelperAsh>()
-#else
           std::make_unique<WaitForNetworkCallbackHelperChrome>(
               profile->AsTestingProfile())
-#endif
               ),
       profile_(profile),
       oauth_consumer_registry_(
@@ -377,7 +366,7 @@ void ChromeSigninClient::PreSignOut(
   DCHECK(!on_signout_decision_reached_) << "SignOut already in-progress!";
   on_signout_decision_reached_ = std::move(on_signout_decision_reached);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // `signout_source_metric` is `signin_metrics::ProfileSignout::kAbortSignin`
   // if the user declines sync in the signin process. In case the user accepts
   // the managed account but declines sync, we should keep the window open.
@@ -475,9 +464,7 @@ void ChromeSigninClient::OnPrimaryAccountChanged(
                                              /*defer_if_no_browser=*/true);
         }
 
-#if !BUILDFLAG(IS_CHROMEOS)
         RecordOpenTabCount(access_point, consent_level);
-#endif
 
         break;
     }
@@ -541,7 +528,7 @@ SigninClient::SignoutDecision ChromeSigninClient::GetSignoutDecision(
 }
 
 void ChromeSigninClient::VerifySyncToken() {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // We only verify the token once when Profile is just created.
   if (signin_util::IsForceSigninEnabled() && !force_signin_verifier_) {
     force_signin_verifier_ = std::make_unique<ForceSigninVerifier>(
@@ -552,7 +539,7 @@ void ChromeSigninClient::VerifySyncToken() {
 #endif
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 void ChromeSigninClient::OnTokenFetchComplete(bool token_is_valid) {
   // If the token is valid we do need to do anything special and let the user
   // proceed.
@@ -575,7 +562,6 @@ void ChromeSigninClient::OnTokenFetchComplete(bool token_is_valid) {
 }
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void ChromeSigninClient::RecordOpenTabCount(
     signin_metrics::AccessPoint access_point,
     signin::ConsentLevel consent_level) {
@@ -607,26 +593,17 @@ void ChromeSigninClient::RecordOpenTabCount(
 
   signin_metrics::RecordOpenTabCountOnSignin(consent_level, tabs_count);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void ChromeSigninClient::SetURLLoaderFactoryForTest(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
   url_loader_factory_for_testing_ = url_loader_factory;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not make network requests in unit tests. ash::NetworkHandler should
-  // not be used and is not expected to have been initialized in unit tests.
-  wait_for_network_callback_helper_
-      ->DisableNetworkCallsDelayedForTesting(  // IN-TEST
-          url_loader_factory_for_testing_ &&
-          !ash::NetworkHandler::IsInitialized());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void ChromeSigninClient::OnCloseBrowsersSuccess(
     const signin_metrics::ProfileSignout signout_source_metric,
     bool should_sign_out,
     const base::FilePath& profile_path) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (signin_util::IsForceSigninEnabled() && force_signin_verifier_.get()) {
     force_signin_verifier_->Cancel();
   }
@@ -668,7 +645,7 @@ void ChromeSigninClient::LockForceSigninProfile(
 }
 
 void ChromeSigninClient::ShowUserManager(const base::FilePath& profile_path) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(
       ProfilePicker::EntryPoint::kProfileLocked));
 #endif

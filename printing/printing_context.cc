@@ -201,16 +201,6 @@ mojom::ResultCode PrintingContext::UpdatePrintSettings(
   return UpdatePrinterSettings(printer_settings);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-mojom::ResultCode PrintingContext::UpdatePrintSettingsFromPOD(
-    std::unique_ptr<PrintSettings> job_settings) {
-  ResetSettings();
-  settings_ = std::move(job_settings);
-
-  return UpdatePrinterSettings({.show_system_dialog = false});
-}
-#endif
-
 void PrintingContext::SetPrintSettings(const PrintSettings& settings) {
   *settings_ = settings;
 }

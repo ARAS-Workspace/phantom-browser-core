@@ -414,31 +414,18 @@ bool ContentAnalysisBrowserTestBase::MatchesRequest(
 std::string ContentAnalysisBrowserTestBase::ExpectedDeviceToken() {
   // TODO(crbug.com/498915066): Handle cases where device_token is set with a
   // profile DM token.
-#if BUILDFLAG(IS_CHROMEOS)
-  return "device_dm_token";
-#else
   return "browser_dm_token";
-#endif
 }
 
 std::string ContentAnalysisBrowserTestBase::ExpectedProfileToken() {
   // TODO(crbug.com/498915066): Handle more complex profile/device management
   // cases.
-#if BUILDFLAG(IS_CHROMEOS)
-  return "device_dm_token";
-#else
   return "profile_dm_token";
-#endif
 }
 
 void ContentAnalysisBrowserTestBase::AddAuthRequestIfNeeded(
     const ContentAnalysisData& data,
     ContentAnalysisRequest request) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // This field is set in authorization requests only on CrOS.
-  request.mutable_client_metadata()->set_is_chrome_os_managed_guest_session(
-      false);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   if (!paste_auth_request_added_ &&
       request.analysis_connector() == BULK_DATA_ENTRY) {
     expected_requests_.emplace_back(request, "", std::vector<std::string>());

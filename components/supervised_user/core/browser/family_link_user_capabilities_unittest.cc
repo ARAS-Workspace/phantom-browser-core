@@ -133,7 +133,6 @@ TEST_F(FamilyLinkUserCapabilitiesTest, SignedInCanFetchFamilyMemberInfo) {
 }
 
 // ChromeOS does not support sign-out in tests.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(FamilyLinkUserCapabilitiesTest, SignOutTriggersCapabilitiesUpdate) {
   AccountInfo account_info = identity_test_env_.MakePrimaryAccountAvailable(
       kEmail, signin::ConsentLevel::kSignin);
@@ -155,6 +154,5 @@ TEST_F(FamilyLinkUserCapabilitiesTest, SignOutTriggersCapabilitiesUpdate) {
 
   identity_test_env_.ClearPrimaryAccount();
 }
-#endif
 
 }  // namespace supervised_user

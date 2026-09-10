@@ -45,7 +45,7 @@
 #include "testing/multiprocess_func_list.h"
 #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <malloc.h>
 #include <sched.h>
 #include <sys/syscall.h>
@@ -421,11 +421,7 @@ TEST_F(ProcessUtilTest, GetTerminationStatusSigKill) {
   exit_code = 42;
   TerminationStatus status =
       WaitForChildTermination(process.Handle(), &exit_code);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM, status);
-#else
   EXPECT_EQ(TERMINATION_STATUS_PROCESS_WAS_KILLED, status);
-#endif
 
 #if BUILDFLAG(IS_POSIX)
   int signaled = WIFSIGNALED(exit_code);
@@ -865,11 +861,11 @@ std::string TestLaunchProcess(const CommandLine& cmdline,
   File write_pipe(fds[1]);
   options.fds_to_remap.emplace_back(fds[1], STDOUT_FILENO);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   options.clone_flags = clone_flags;
 #else
   CHECK_EQ(0, clone_flags);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   EXPECT_TRUE(LaunchProcess(cmdline, options).IsValid());
   write_pipe.Close();
@@ -927,11 +923,11 @@ TEST_F(ProcessUtilTest, LaunchProcess) {
   EXPECT_EQ("wibble", TestLaunchProcess(kPrintEnvCommand, env_changes,
                                         no_clear_environ, no_clone_flags));
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Test a non-trival value for clone_flags.
   EXPECT_EQ("wibble", TestLaunchProcess(kPrintEnvCommand, env_changes,
                                         no_clear_environ, CLONE_FS));
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   EXPECT_EQ("wibble",
             TestLaunchProcess(kPrintEnvCommand, env_changes,
@@ -941,8 +937,7 @@ TEST_F(ProcessUtilTest, LaunchProcess) {
                                   true /* clear_environ */, no_clone_flags));
 }
 
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 MULTIPROCESS_TEST_MAIN(CheckPidProcess) {
   const pid_t kInitPid = 1;
   const pid_t pid = syscall(__NR_getpid);
@@ -1003,7 +998,7 @@ TEST_F(ProcessUtilTest, InvalidCurrentDirectory) {
   EXPECT_TRUE(process.WaitForExit(&exit_code));
   EXPECT_NE(kSuccess, exit_code);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC)
 

@@ -43,9 +43,6 @@ class FakeDelegate : public CloudBinaryUploadServiceBase::Delegate {
   }
   bool IsAdvancedProtection() override { return false; }
   bool IsEnhancedProtection() override { return false; }
-#if BUILDFLAG(IS_CHROMEOS)
-  bool IsManagedGuestSession() override { return false; }
-#endif
 };
 
 class TestCloudBinaryUploadServiceBase : public CloudBinaryUploadServiceBase {

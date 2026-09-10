@@ -104,28 +104,6 @@ COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetPartialTranslateAPIKey();
 COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetHatsAPIKey();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Retrieves the Sharing API Key.
-COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetSharingAPIKey();
-
-// Retrieves the ReadAloud API Key.
-COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetReadAloudAPIKey();
-
-// Retrieves the Fresnel API Key.
-COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetFresnelAPIKey();
-
-// Retrieves the Boca API Key.
-COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetBocaAPIKey();
-
-// Retrieves the ChromeOS-specific Geolocation API Key used by the System
-// Services.
-COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetCrosSystemGeoAPIKey();
-// Retrieves the ChromeOS-specific Geolocation API Key used by the Chrome
-// browser.
-COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetCrosChromeGeoAPIKey();
-
-#endif
-
 // Retrieves the key used to sign metrics (UMA/UKM) uploads.
 COMPONENT_EXPORT(GOOGLE_APIS) const std::string& GetMetricsKey();
 

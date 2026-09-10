@@ -23,10 +23,6 @@
 #include "chrome/browser/enterprise/net/enterprise_proxy_service_factory.h"
 #endif  // BUILDFLAG(ENTERPRISE_PROXY)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/api/proxy/proxy_api.h"
 #endif // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -43,14 +39,6 @@ ProxyConfigMonitor::ProxyConfigMonitor(Profile* profile) {
 
 // If this is the ChromeOS sign-in or lock screen profile, just create the
 // tracker from global state.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::ProfileHelper::IsSigninProfile(profile) ||
-      ash::ProfileHelper::IsLockScreenProfile(profile)) {
-    pref_proxy_config_tracker_ =
-        ProxyServiceFactory::CreatePrefProxyConfigTrackerOfLocalState(
-            g_browser_process->local_state());
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (!pref_proxy_config_tracker_) {
     enterprise_net::EnterpriseProxyService* enterprise_proxy_service = nullptr;

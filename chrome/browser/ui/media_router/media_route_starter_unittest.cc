@@ -173,11 +173,7 @@ class MediaRouteStarterTest : public ChromeRenderViewHostTestHarness {
     ChromeMediaRouterFactory::GetInstance()->SetTestingFactory(
         GetBrowserContext(), base::BindRepeating(&MockMediaRouter::Create));
     Profile* default_profile =
-#if BUILDFLAG(IS_CHROMEOS)
-        ProfileManager::GetActiveUserProfile();
-#else
         ProfileManager::GetLastUsedProfile();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     ChromeMediaRouterFactory::GetInstance()->SetTestingFactory(
         default_profile, base::BindRepeating(&MockMediaRouter::Create));

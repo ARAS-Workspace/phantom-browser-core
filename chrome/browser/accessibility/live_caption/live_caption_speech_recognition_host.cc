@@ -277,7 +277,7 @@ void LiveCaptionSpeechRecognitionHost::OnSpeechRecognitionStopped() {
   }
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 void LiveCaptionSpeechRecognitionHost::MediaEffectivelyFullscreenChanged(
     bool is_fullscreen) {
   LiveCaptionController* live_caption_controller = GetLiveCaptionController();

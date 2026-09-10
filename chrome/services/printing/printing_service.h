@@ -37,10 +37,6 @@ class PrintingService : public mojom::PrintingService {
   void BindPdfToPwgRasterConverter(
       mojo::PendingReceiver<mojom::PdfToPwgRasterConverter> receiver) override;
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  void BindPdfFlattener(
-      mojo::PendingReceiver<mojom::PdfFlattener> receiver) override;
-#endif
 
   scoped_refptr<discardable_memory::ClientDiscardableSharedMemoryManager>
       discardable_shared_memory_manager_;

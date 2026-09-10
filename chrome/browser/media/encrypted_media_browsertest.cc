@@ -63,9 +63,6 @@ const char16_t kEmeRenewalMissingHeader[] = u"EME_RENEWAL_MISSING_HEADER";
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 const char kEmeSessionClosedAndError[] = "EME_SESSION_CLOSED_AND_ERROR";
 const char kEmeSessionNotFound[] = "EME_SESSION_NOT_FOUND";
-#if BUILDFLAG(IS_CHROMEOS)
-const char kEmeUnitTestFailure[] = "UNIT_TEST_FAILURE";
-#endif
 #endif
 
 const char kDefaultEmePlayer[] = "eme_player.html";
@@ -250,18 +247,6 @@ class EncryptedMediaTestBase : public MediaBrowserTest {
     title_watcher->AlsoWaitForTitle(kEmeRenewalMissingHeader);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    MediaBrowserTest::SetUpCommandLine(command_line);
-
-    // Persistent license is supported on ChromeOS when protected media
-    // identifier is allowed which involves a user action. Use this switch to
-    // always allow the identifier for testing purpose. Note that the test page
-    // is hosted on "127.0.0.1". See net::EmbeddedTestServer for details.
-    command_line->AppendSwitchASCII(
-        switches::kUnsafelyAllowProtectedMediaIdentifierForDomain, "127.0.0.1");
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
   void SetUpDefaultCommandLine(base::CommandLine* command_line) override {
@@ -493,12 +478,7 @@ class ECKEncryptedMediaOutputProtectionTest
       public WithParamInterface<const char*> {
  public:
   void TestOutputProtection(bool create_recorder_before_media_keys) {
-#if BUILDFLAG(IS_CHROMEOS)
-    // QueryOutputProtectionStatus() is known to fail on Linux Chrome OS builds.
-    std::string expected_title = kEmeUnitTestFailure;
-#else
     std::string expected_title = kUnitTestSuccess;
-#endif
 
     base::StringPairs query_params;
     if (create_recorder_before_media_keys) {
@@ -1174,7 +1154,7 @@ IN_PROC_BROWSER_TEST_P(ECKEncryptedMediaTest, StorageIdTest) {
 
 // TODO(crbug.com/40601162): Times out in debug builds.
 // TODO(crbug.com/40916095): Test flakiness.
-#if !defined(NDEBUG) || BUILDFLAG(IS_CHROMEOS)
+#if !defined(NDEBUG)
 #define MAYBE_MultipleCdmTypes DISABLED_MultipeCdmTypes
 #else
 #define MAYBE_MultipleCdmTypes MultipeCdmTypes

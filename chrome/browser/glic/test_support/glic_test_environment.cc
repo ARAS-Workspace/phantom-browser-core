@@ -25,10 +25,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/jni_android.h"
@@ -193,9 +189,6 @@ std::vector<base::test::FeatureRef> GetDefaultEnabledGlicTestFeatures() {
           // enabling is required here because some tests instantiate their own
           // ScopedFeatureList which can clobber the field trial testing config.
           features::kGlicAnchorEntryPointForOnboardedUsers,
-#if BUILDFLAG(IS_CHROMEOS)
-          chromeos::features::kFeatureManagementGlic
-#endif  // BUILDFLAG(IS_CHROMEOS)
   };
 }
 std::vector<base::test::FeatureRef> GetDefaultDisabledGlicTestFeatures() {
@@ -376,25 +369,6 @@ GlicTestEnvironmentService::GlicTestEnvironmentService(Profile* profile)
     SetResultForFutureCookieSync(*config.override_cookie_sync_result);
   }
   if (config.force_signin_and_glic_capability) {
-#if BUILDFLAG(IS_CHROMEOS)
-    // SigninWithPrimaryAccount below internally runs RunLoop to wait for an
-    // async task completion. This is the test only behavior.
-    // However, that has side effect that other tasks in the queue also runs.
-    // Specifically, some of the queued tasks will require communicating with
-    // SigninBrowserContext, and if it's not existing, the instance is created.
-    // Because this running inside a KeyedService construction,
-    // KeyedServiceTemplatedFactory temporarily keeps the map entry between
-    // the current browser context and the info of this KeyedService instance.
-    // However, the entry is invalidated if another BrowserContext is created,
-    // like SigninBrowserContext case explained above, regardless of whether
-    // the newly created BrowserContext will create this service or not.
-    // Thus, after returning from this function, it will cause crashes.
-    // To avoid such crashes, while running the async task, we temporarily
-    // disable the creation of new BrowserContext for the workaround.
-    // See also crbug.com/460334478 for details.
-    auto disabled = ash::BrowserContextHelper::
-        DisableImplicitBrowserContextCreationForTest();
-#endif
 #if BUILDFLAG(IS_ANDROID)
     // Seed the account into the FakeAccountManagerFacade.
     // This is required on Android because SigninManager checks the facade

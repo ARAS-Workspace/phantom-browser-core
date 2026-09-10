@@ -12,17 +12,9 @@
 
 // static
 bool AvatarToolbarButtonInterface::CanShowForProfile(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS only badges Incognito, Guest, and captive portal signin icons in
-  // the browser window.
-  return profile->IsIncognitoProfile() || profile->IsGuestSession() ||
-         (profile->IsOffTheRecord() &&
-          profile->GetOTRProfileID().IsCaptivePortal());
-#else
   // DevTools profiles are OffTheRecord, so hide it there.
   return profile->IsIncognitoProfile() || profile->IsGuestSession() ||
          profile->IsRegularProfile();
-#endif
 }
 
 views::BubbleAnchor AvatarToolbarButtonInterface::GetBubbleAnchor(

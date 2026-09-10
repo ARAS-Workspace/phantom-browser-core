@@ -47,18 +47,14 @@
 #include "services/device/public/cpp/device_features.h"
 #include "services/device/public/cpp/geolocation/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/media/protected_media_identifier_permission_context.h"
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/android/tab_android.h"
 #include "chrome/browser/geolocation/geolocation_permission_context_delegate_android.h"
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-#include "chrome/browser/printing/web_api/web_printing_permission_context.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
 
 #if BUILDFLAG(OS_LEVEL_GEOLOCATION_PERMISSION_SUPPORTED)
 #include "services/device/public/cpp/geolocation/geolocation_system_permission_manager.h"
@@ -172,10 +168,10 @@ permissions::PermissionManager::PermissionContextMap CreatePermissionContexts(
   permission_contexts[ContentSettingsType::POINTER_LOCK] =
       std::make_unique<permissions::PointerLockPermissionContext>(profile);
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   permission_contexts[ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER] =
       std::make_unique<ProtectedMediaIdentifierPermissionContext>(profile);
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   permission_contexts[ContentSettingsType::STORAGE_ACCESS] =
       std::make_unique<StorageAccessGrantPermissionContext>(profile);
@@ -193,11 +189,6 @@ permissions::PermissionManager::PermissionContextMap CreatePermissionContexts(
   permission_contexts[ContentSettingsType::WEB_APP_INSTALLATION] =
       std::make_unique<permissions::WebAppInstallationPermissionContext>(
           profile);
-
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-  permission_contexts[ContentSettingsType::WEB_PRINTING] =
-      std::make_unique<WebPrintingPermissionContext>(profile);
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
 
   return permission_contexts;
 }

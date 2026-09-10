@@ -24,10 +24,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
 #else
@@ -48,18 +44,8 @@ class ProfileIdServiceFactoryTest : public testing::Test,
  public:
   ProfileIdServiceFactoryTest()
       : profile_manager_(TestingBrowserProcess::GetGlobal()) {
-#if !BUILDFLAG(IS_CHROMEOS)
     policy::BrowserDMTokenStorage::SetForTesting(&storage_);
     storage_.SetClientId(kFakeDeviceID);
-#else
-    auto policy_data = std::make_unique<enterprise_management::PolicyData>();
-    policy_data->set_machine_name(kFakeDeviceID);
-    store_.set_policy_data_for_testing(std::move(policy_data));
-    fake_statistics_provider_.SetMachineStatistic(ash::system::kSerialNumberKey,
-                                                  kFakeDeviceID);
-    fake_statistics_provider_.SetLoadingState(
-        ash::system::StatisticsProvider::LoadingState::kFinished);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
     EXPECT_TRUE(profile_manager_.SetUp());
     profile_ = profile_manager_.CreateTestingProfile("test-user");
@@ -98,7 +84,7 @@ class ProfileIdServiceFactoryTest : public testing::Test,
 
 // TODO(b/341267441): Enable this test for chrome os ash when
 // `OnProfileCreationStarted` is fixed for `FakeProfileManager`.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   Profile* CreateNewProfileWithPresetGuid(std::string preset_guid) {
     Profile* new_profile = nullptr;
     // Making sure no two profiles have duplicate names/paths.
@@ -120,7 +106,7 @@ class ProfileIdServiceFactoryTest : public testing::Test,
     run_loop.Run();
     return new_profile;
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   content::BrowserTaskEnvironment task_environment_;
   TestingProfileManager profile_manager_;
@@ -135,9 +121,6 @@ class ProfileIdServiceFactoryTest : public testing::Test,
 #else
   policy::MockCloudPolicyStore store_{
       policy::dm_protocol::GetChromeUserPolicyType()};
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::system::ScopedFakeStatisticsProvider fake_statistics_provider_;
-#endif
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 };
 
@@ -185,7 +168,7 @@ TEST_F(ProfileIdServiceFactoryTest, GetProfileId_Incognito_Profile) {
   EXPECT_FALSE(service_);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ProfileIdServiceFactoryTest, GetProfileIdWithPresetGuid) {
   std::string random_guid = base::Uuid::GenerateRandomV4().AsLowercaseString();
   std::string device_id = kFakeDeviceID;
@@ -221,6 +204,6 @@ TEST_F(ProfileIdServiceFactoryTest, PresetGuidDataIsOneOff) {
 
   EXPECT_NE(service_->GetProfileId(), preset_guid_profile_id);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace enterprise

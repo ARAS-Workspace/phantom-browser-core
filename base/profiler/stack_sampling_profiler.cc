@@ -850,9 +850,7 @@ bool StackSamplingProfiler::IsSupportedForCurrentPlatform() {
 #if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && defined(ARCH_CPU_64_BITS)) || \
     (BUILDFLAG(IS_ANDROID) &&                                                \
      ((defined(ARCH_CPU_ARMEL) && BUILDFLAG(ENABLE_ARM_CFI_TABLE)) ||        \
-      defined(ARCH_CPU_ARM64))) ||                                           \
-    (BUILDFLAG(IS_CHROMEOS) &&                                               \
-     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64)))
+      defined(ARCH_CPU_ARM64)))
   return true;
 #else
   return false;

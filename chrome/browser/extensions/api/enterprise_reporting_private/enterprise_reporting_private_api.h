@@ -25,7 +25,6 @@
 
 namespace extensions {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 namespace enterprise_reporting {
 
 extern const char kDeviceIdNotFound[];
@@ -159,7 +158,6 @@ class EnterpriseReportingPrivateGetDeviceInfoFunction
   void OnDeviceInfoRetrieved(const enterprise_signals::DeviceInfo& device_info);
 };
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class EnterpriseReportingPrivateGetContextInfoFunction
     : public ExtensionFunction {

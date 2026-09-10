@@ -94,11 +94,6 @@
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using content::SSLStatus;
 using content_settings::SettingSource;
 using testing::_;
@@ -178,12 +173,6 @@ class PageInfoTest : public ChromeRenderViewHostTestHarness {
     cert_ =
         net::ImportCertFromFile(net::GetTestCertsDirectory(), "ok_cert.pem");
     ASSERT_TRUE(cert_);
-
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_user_manager_->AddUserWithAffiliation(
-        AccountId::FromUserEmail(profile()->GetProfileUserName()),
-        /*is_affiliated=*/true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     CreateWebContentsUserData(web_contents());
 
@@ -341,11 +330,6 @@ class PageInfoTest : public ChromeRenderViewHostTestHarness {
   ChromeLayoutProvider layout_provider_;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  user_manager::TypedScopedUserManager<ash::FakeChromeUserManager>
-      fake_user_manager_{std::make_unique<ash::FakeChromeUserManager>()};
-#endif
-
   scoped_refptr<net::X509Certificate> cert_;
   GURL url_;
   url::Origin origin_;
@@ -386,7 +370,7 @@ TEST_F(PageInfoTest, PermissionStringsHaveMidSentenceVersion) {
 #endif
         EXPECT_EQ(normal, mid_sentence);
         break;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
       case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
         EXPECT_NE(normal, mid_sentence);
         EXPECT_EQ(base::ToLowerASCII(normal), base::ToLowerASCII(mid_sentence));

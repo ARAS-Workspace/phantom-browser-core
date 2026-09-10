@@ -60,7 +60,6 @@
 
 namespace signin {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST(SigninPromoTest, TestPromoURL) {
   GURL::Replacements replace_query;
   replace_query.SetQueryStr("access_point=0&reason=0&auto_close=1");
@@ -87,7 +86,6 @@ TEST(SigninPromoTest, TestReauthURL) {
                                     signin_metrics::Reason::kFetchLstOnly,
                                     "example@domain.com"));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 // This test can be deleted once kReplaceSyncPromosWithSignInPromos is launched.
@@ -302,24 +300,12 @@ TEST(SigninPromoTest, IsSignInPromo_SendTabToSelf) {
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 // ChromeOS currently does not show any sign in promos.
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(SigninPromoTest, IsSignInPromo) {
-  EXPECT_FALSE(IsSignInPromo(signin_metrics::AccessPoint::kPasswordBubble));
-  EXPECT_FALSE(IsSignInPromo(signin_metrics::AccessPoint::kAddressBubble));
-  EXPECT_FALSE(IsSignInPromo(signin_metrics::AccessPoint::kBookmarkBubble));
-  EXPECT_FALSE(
-      IsSignInPromo(signin_metrics::AccessPoint::kExtensionInstallBubble));
-  EXPECT_FALSE(IsSignInPromo(signin_metrics::AccessPoint::kSendTabToSelfPromo));
-}
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Extensions explicit signin is not enabled in ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST(SigninPromoTest, IsSignInPromo_ExtensionsWithExplicitSignin) {
   EXPECT_TRUE(
       IsSignInPromo(signin_metrics::AccessPoint::kExtensionInstallBubble));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST(SigninPromoTest, GetSignInPromoTypeFromAccessPoint) {
   EXPECT_EQ(SignInPromoType::kPassword,
@@ -417,18 +403,10 @@ TEST_F(ShowPromoTest, ShouldShowSigninPromoSyncDisabled) {
 }
 
 TEST_F(ShowPromoTest, ShouldShowSigninPromoSyncEnabled) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // No signin promos on Ash.
-  EXPECT_FALSE(ShouldShowPasswordSignInPromo(*profile()));
-  EXPECT_FALSE(ShouldShowAddressSignInPromo(*profile(), CreateAddress()));
-  EXPECT_FALSE(ShouldShowBookmarkSignInPromo(*profile()));
-  EXPECT_FALSE(ShouldShowExtensionSignInPromo(*profile(), *CreateExtension()));
-#else
   EXPECT_TRUE(ShouldShowPasswordSignInPromo(*profile()));
   EXPECT_TRUE(ShouldShowAddressSignInPromo(*profile(), CreateAddress()));
   EXPECT_TRUE(ShouldShowBookmarkSignInPromo(*profile()));
   EXPECT_TRUE(ShouldShowExtensionSignInPromo(*profile(), *CreateExtension()));
-#endif
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 

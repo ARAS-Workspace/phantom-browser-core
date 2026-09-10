@@ -318,11 +318,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 // ChromeOS has a different concept of guest profile, so we will only test
 // standard desktop behavior.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_GuestModeSplitViewFavicons DISABLED_GuestModeSplitViewFavicons
-#else
 #define MAYBE_GuestModeSplitViewFavicons GuestModeSplitViewFavicons
-#endif  // BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(TabSearchUIBrowserTest,
                        MAYBE_GuestModeSplitViewFavicons) {
   // Open guest browser.

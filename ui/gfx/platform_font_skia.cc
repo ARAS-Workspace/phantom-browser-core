@@ -167,21 +167,7 @@ void PlatformFontSkia::EnsuresDefaultFontIsInitialized() {
   } else
 #endif
       if (default_font_description_) {
-#if BUILDFLAG(IS_CHROMEOS)
-    // On ChromeOS, a FontList font description string is stored as a
-    // translatable resource and passed in via SetDefaultFontDescription().
-    FontRenderParamsQuery query;
-    CHECK(FontList::ParseDescription(*default_font_description_,
-                                     &query.families, &query.style,
-                                     &query.pixel_size, &query.weight))
-        << "Failed to parse font description " << *default_font_description_;
-    params = gfx::GetFontRenderParams(query, &family);
-    size_pixels = query.pixel_size;
-    style = query.style;
-    weight = query.weight;
-#else
         NOTREACHED();
-#endif
   } else {
     params = gfx::GetFontRenderParams(FontRenderParamsQuery(), nullptr);
   }
@@ -309,7 +295,7 @@ const FontRenderParams& PlatformFontSkia::GetFontRenderParams() {
   TRACE_EVENT0("fonts", "PlatformFontSkia::GetFontRenderParams");
   float current_scale_factor = GetFontRenderParamsDeviceScaleFactor();
   bool force_query = false;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   const bool current_subpixel_rendering_enabled =
       gfx::GetFontRenderParamsSubpixelRenderingEnabled();
   if (current_subpixel_rendering_enabled != subpixel_rendering_enabled_) {
@@ -326,7 +312,7 @@ const FontRenderParams& PlatformFontSkia::GetFontRenderParams() {
     query.device_scale_factor = current_scale_factor;
     font_render_params_ = gfx::GetFontRenderParams(query, nullptr);
     device_scale_factor_ = current_scale_factor;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     subpixel_rendering_enabled_ = current_subpixel_rendering_enabled;
 #endif
   }
@@ -379,7 +365,7 @@ void PlatformFontSkia::InitFromDetails(sk_sp<SkTypeface> typeface,
   style_ = style;
   weight_ = weight;
   device_scale_factor_ = GetFontRenderParamsDeviceScaleFactor();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   subpixel_rendering_enabled_ =
       gfx::GetFontRenderParamsSubpixelRenderingEnabled();
 #endif
@@ -395,7 +381,7 @@ void PlatformFontSkia::InitFromPlatformFont(const PlatformFontSkia* other) {
   style_ = other->style_;
   weight_ = other->weight_;
   device_scale_factor_ = other->device_scale_factor_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   subpixel_rendering_enabled_ = other->subpixel_rendering_enabled_;
 #endif
   font_render_params_ = other->font_render_params_;

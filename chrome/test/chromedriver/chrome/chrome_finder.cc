@@ -26,7 +26,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void GetApplicationDirs(std::vector<base::FilePath>* locations) {
   // TODO: Respect users' PATH variables.
   // Until then, we use an approximation of the most common defaults.
@@ -76,11 +76,12 @@ std::vector<base::FilePath> GetChromeProgramNames() {
           chrome::kGoogleChromeForTestingBrowserProcessExecutablePath),
       base::FilePath(chrome::kGoogleChromeBrowserProcessExecutablePath),
       base::FilePath(chrome::kChromiumBrowserProcessExecutablePath),
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-    base::FilePath(chrome::kBrowserProcessExecutablePath),
-        base::FilePath("chrome"),  // Chrome for Testing or Google Chrome
-        base::FilePath("google-chrome"), base::FilePath("chromium"),
-        base::FilePath("chromium-browser"),
+#elif BUILDFLAG(IS_LINUX)
+      base::FilePath(chrome::kBrowserProcessExecutablePath),
+      base::FilePath("chrome"),  // Chrome for Testing or Google Chrome
+      base::FilePath("google-chrome"),
+      base::FilePath("chromium"),
+      base::FilePath("chromium-browser"),
 #else
     // it will compile but won't work on other OSes
     base::FilePath()
@@ -90,7 +91,7 @@ std::vector<base::FilePath> GetChromeProgramNames() {
 
 std::vector<base::FilePath> GetHeadlessShellProgramNames() {
   return {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       base::FilePath("chrome-headless-shell"),
 #else
     // it will compile but won't work on other OSes

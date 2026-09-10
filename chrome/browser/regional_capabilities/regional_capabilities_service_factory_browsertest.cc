@@ -57,7 +57,7 @@ class RegionalCapabilitiesServiceFactoryBrowserTestForVariationsCountry
 const VariationsCountryTestParam kTestParams[] = {
     {.test_suffix = "FR",
      .variations_country_code = "fr",
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
      .expected_country_id = CountryId("FR")
 #else
      .expected_country_id = kUsaCountryId

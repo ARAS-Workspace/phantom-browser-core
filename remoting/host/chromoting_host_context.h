@@ -37,23 +37,12 @@ class ChromotingHostContext {
   using CreateClientCertStoreCallback =
       base::RepeatingCallback<std::unique_ptr<net::ClientCertStore>()>;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Attaches task runners to the relevant browser threads for the chromoting
-  // host. Must be called on the UI thread of the browser process.
-  static std::unique_ptr<ChromotingHostContext> CreateForChromeOS(
-      scoped_refptr<base::SingleThreadTaskRunner> io_task_runner,
-      scoped_refptr<base::SingleThreadTaskRunner> ui_task_runner,
-      scoped_refptr<base::SingleThreadTaskRunner> file_task_runner,
-      scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
-      CreateClientCertStoreCallback create_client_cert_store);
-#else
   // Create threads and URLRequestContextGetter for use by a host.
   // During shutdown the caller should tear-down the ChromotingHostContext and
   // then continue to run until |ui_task_runner| is no longer referenced.
   // nullptr is returned if any threads fail to start.
   static std::unique_ptr<ChromotingHostContext> Create(
       scoped_refptr<AutoThreadTaskRunner> ui_task_runner);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   static std::unique_ptr<ChromotingHostContext> CreateForTesting(
       scoped_refptr<AutoThreadTaskRunner> ui_task_runner,
       scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory);

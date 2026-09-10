@@ -63,7 +63,7 @@ std::ostream& operator<<(std::ostream& os, MessagePumpType type) {
 #include "base/time/time.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <pthread.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
@@ -393,7 +393,7 @@ TEST(PlatformThreadTest, SetDefaultThreadType) {
 // and hardcodes what we know. Please inform scheduler-dev@chromium.org if this
 // proprerty changes for a given platform.
 TEST(PlatformThreadTest, CanChangeThreadType) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // On Ubuntu, RLIMIT_NICE and RLIMIT_RTPRIO are 0 by default, so we won't be
   // able to increase priority to any level unless we are root (euid == 0).
   bool kCanIncreasePriority = false;
@@ -459,8 +459,8 @@ TEST(PlatformThreadTest, GetDefaultThreadStackSize) {
   size_t stack_size = PlatformThread::GetDefaultThreadStackSize();
 #if BUILDFLAG(IS_IOS)
   EXPECT_EQ(1024u * 1024u, stack_size);
-#elif ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&   \
-       defined(__GLIBC__) && !defined(THREAD_SANITIZER)) || \
+#elif (BUILDFLAG(IS_LINUX) && defined(__GLIBC__) && \
+       !defined(THREAD_SANITIZER)) ||               \
     (BUILDFLAG(IS_ANDROID) && !defined(ADDRESS_SANITIZER))
   EXPECT_EQ(0u, stack_size);
 #else
@@ -617,7 +617,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 namespace {
 
@@ -688,7 +688,7 @@ TEST(PlatformThreadTidCacheTest, MainThreadSecond) {
 
 }  // namespace
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_ANDROID)
 

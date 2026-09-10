@@ -22,9 +22,7 @@ namespace {
 // Returns string that represents system in UserAgent.
 std::string GetSystemString() {
   std::string system;
-#if BUILDFLAG(IS_CHROMEOS)
-  system = "CROS ";
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   switch (ui::GetDeviceFormFactor()) {
     case ui::DEVICE_FORM_FACTOR_PHONE:
     // Foldables are also considered phones here.

@@ -13,10 +13,6 @@
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/ash/multi_user/multi_user_util.h"
-#endif
-
 // static
 std::string ProfileNotification::GetProfileNotificationId(
     const std::string& delegate_id,
@@ -46,12 +42,6 @@ ProfileNotification::ProfileNotification(
           notification),
       original_id_(notification.id()),
       type_(type) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (profile_) {
-    notification_.set_profile_id(
-        multi_user_util::GetAccountIdFromProfile(profile).GetUserEmail());
-  }
-#else
   // These keepalives prevent the browser process from shutting down when
   // the last browser window is closed and there are open notifications. It's
   // not used on Chrome OS as closing the last browser window never shuts down
@@ -65,7 +55,6 @@ ProfileNotification::ProfileNotification(
     profile_keep_alive_ = std::make_unique<ScopedProfileKeepAlive>(
         profile, ProfileKeepAliveOrigin::kNotification);
   }
-#endif
 }
 
 ProfileNotification::~ProfileNotification() = default;

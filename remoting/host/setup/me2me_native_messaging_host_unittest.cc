@@ -336,10 +336,6 @@ void Me2MeNativeMessagingHostTest::SetUp() {
       base::BindOnce(&Me2MeNativeMessagingHostTest::ExitTest,
                      base::Unretained(this)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  test_url_loader_factory_ = new network::TestSharedURLLoaderFactory();
-#endif
-
   host_task_runner_->PostTask(
       FROM_HERE, base::BindOnce(&Me2MeNativeMessagingHostTest::StartHost,
                                 base::Unretained(this)));

@@ -144,11 +144,11 @@ class FileSystemObserverTest : public InProcessBrowserTest {
   }
 
   bool SupportsReportingModifiedPath() const {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     return true;
 #else
     return false;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   }
 
   bool SupportsChangeInfo() const { return SupportsReportingModifiedPath(); }

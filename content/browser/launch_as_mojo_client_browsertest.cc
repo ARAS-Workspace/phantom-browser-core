@@ -29,7 +29,7 @@
 #include "ui/ozone/public/ozone_switches.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || defined(MEMORY_SANITIZER)
+#if defined(MEMORY_SANITIZER)
 #include "ui/gl/gl_switches.h"
 #endif
 
@@ -69,14 +69,6 @@ class LaunchAsMojoClientBrowserTest : public ContentBrowserTest {
         switches::kOzonePlatform,
     };
     command_line.CopySwitchesFrom(cmdline, kSwitchesToCopy);
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line.AppendSwitchASCII(switches::kUseGL,
-                                   gl::kGLImplementationANGLEName);
-    command_line.AppendSwitchASCII(switches::kUseANGLE,
-                                   gl::kANGLEImplementationSwiftShaderName);
-    command_line.AppendSwitch(switches::kEnableUnsafeSwiftShader);
 #endif
 
 #if defined(MEMORY_SANITIZER)

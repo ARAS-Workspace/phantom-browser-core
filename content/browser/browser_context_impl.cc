@@ -46,10 +46,6 @@
 #include "content/browser/renderer_host/navigation_transitions/navigation_transition_config.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "storage/browser/file_system/external_mount_points.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -328,14 +324,7 @@ storage::ExternalMountPoints* BrowserContextImpl::GetMountPoints() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI) ||
          !BrowserThread::IsThreadInitialized(BrowserThread::UI));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!external_mount_points_) {
-    external_mount_points_ = storage::ExternalMountPoints::CreateRefCounted();
-  }
-  return external_mount_points_.get();
-#else
   return nullptr;
-#endif
 }
 
 PrefetchService* BrowserContextImpl::GetPrefetchService() {

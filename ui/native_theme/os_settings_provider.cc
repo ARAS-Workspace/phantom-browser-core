@@ -27,8 +27,6 @@
 // it in `Get()` below, we must have the full type definition.
 #if BUILDFLAG(IS_ANDROID)
 #include "ui/native_theme/os_settings_provider_android.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "ui/native_theme/os_settings_provider_ash.h"
 #elif BUILDFLAG(IS_MAC)
 #include "ui/native_theme/os_settings_provider_mac.h"
 #endif

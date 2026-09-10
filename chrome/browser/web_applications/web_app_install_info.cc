@@ -277,7 +277,7 @@ DialogImageInfo WebAppInstallInfo::GetIconBitmapsForSecureSurfaces() const {
     return image_info;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   if (!trusted_icon_bitmaps.maskable.empty()) {
     image_info.bitmaps =
         UnorderedSizeToBitmap(trusted_icon_bitmaps.maskable.begin(),
@@ -285,7 +285,7 @@ DialogImageInfo WebAppInstallInfo::GetIconBitmapsForSecureSurfaces() const {
     image_info.is_maskable = true;
     return image_info;
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
   image_info.bitmaps = UnorderedSizeToBitmap(trusted_icon_bitmaps.any.begin(),
                                              trusted_icon_bitmaps.any.end());

@@ -156,7 +156,6 @@ TEST_F(PersonalContextEligibilityServiceImplTest, EnabledWhenAllFeaturesAreOn) {
       PersonalContextNonEligibilityReason::kEligible, 1);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)  // Signing out does not work on ChromeOS.
 TEST_F(PersonalContextEligibilityServiceImplTest,
        ForcedEnablementState_SignOut) {
   {
@@ -184,8 +183,6 @@ TEST_F(PersonalContextEligibilityServiceImplTest, DisabledWhenSignedOut) {
       "Autofill.PersonalContext.NonEligibilityReason",
       PersonalContextNonEligibilityReason::kNotSignedIn, 2);
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Verifies that the service is disabled for underaged users.
 TEST_F(PersonalContextEligibilityServiceImplTest, DisabledWhenUnderaged) {

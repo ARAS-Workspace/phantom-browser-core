@@ -92,14 +92,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "chrome/browser/ash/net/dhcp_wpad_url_client.h"
-#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#include "chrome/browser/net/network_annotation_monitor.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/net/chrome_mojo_proxy_resolver_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -137,18 +129,16 @@ enum class NetworkSandboxState {
 // The global instance of the SystemNetworkContextManager.
 SystemNetworkContextManager* g_system_network_context_manager = nullptr;
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // Whether kerberos library loading will work in the network service due to the
 // sandbox.
 bool g_network_service_will_allow_gssapi_library_load = false;
 
 const char* kGssapiDesiredPref =
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::prefs::kKerberosEnabled;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     prefs::kReceivedHttpAuthNegotiateHeader;
 #endif
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Constructs HttpAuthStaticParams based on |local_state|.
 network::mojom::HttpAuthStaticParamsPtr CreateHttpAuthStaticParams(
@@ -156,11 +146,10 @@ network::mojom::HttpAuthStaticParamsPtr CreateHttpAuthStaticParams(
   network::mojom::HttpAuthStaticParamsPtr auth_static_params =
       network::mojom::HttpAuthStaticParams::New();
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
   auth_static_params->gssapi_library_name =
       local_state->GetString(prefs::kGSSAPILibraryName);
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) &&
-        // !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 
   return auth_static_params;
 }
@@ -191,10 +180,10 @@ network::mojom::HttpAuthDynamicParamsPtr CreateHttpAuthDynamicParams(
   auth_dynamic_params->basic_over_http_enabled =
       local_state->GetBoolean(prefs::kBasicAuthOverHttpEnabled);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   auth_dynamic_params->delegate_by_kdc_policy =
       local_state->GetBoolean(prefs::kAuthNegotiateDelegateByKdcPolicy);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_POSIX)
   auth_dynamic_params->ntlm_v2_enabled =
@@ -206,17 +195,17 @@ network::mojom::HttpAuthDynamicParamsPtr CreateHttpAuthDynamicParams(
       local_state->GetString(prefs::kAuthAndroidNegotiateAccountType);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   auth_dynamic_params->allow_gssapi_library_load =
       local_state->GetBoolean(kGssapiDesiredPref);
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   return auth_dynamic_params;
 }
 
 void OnNewHttpAuthDynamicParams(
     network::mojom::HttpAuthDynamicParamsPtr& params) {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // The kerberos library is incompatible with the network service sandbox, so
   // if library loading is now enabled, the network service needs to be
   // restarted. It will be restarted unsandboxed because is
@@ -242,7 +231,7 @@ void OnNewHttpAuthDynamicParams(
     base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE, base::BindOnce(&content::RestartNetworkService));
   }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 void OnAuthPrefsChanged(PrefService* local_state,
@@ -264,11 +253,11 @@ NetworkSandboxState IsNetworkSandboxEnabledInternal() {
     // it is not always initialized.
     CHECK_IS_TEST();
   }
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   auto* local_state = g_browser_process->local_state();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // The network service sandbox and the kerberos library are incompatible.
   // If kerberos is enabled by policy, disable the network service sandbox.
   if (g_network_service_will_allow_gssapi_library_load ||
@@ -276,7 +265,7 @@ NetworkSandboxState IsNetworkSandboxEnabledInternal() {
        local_state->GetBoolean(kGssapiDesiredPref))) {
     return NetworkSandboxState::kDisabledBecauseOfKerberos;
   }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
   if (local_state &&
@@ -631,10 +620,10 @@ SystemNetworkContextManager::SystemNetworkContextManager(
   pref_change_registrar_.Add(prefs::kAllHttpAuthSchemesAllowedForOrigins,
                              auth_pref_callback);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   pref_change_registrar_.Add(prefs::kAuthNegotiateDelegateByKdcPolicy,
                              auth_pref_callback);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_POSIX)
   pref_change_registrar_.Add(prefs::kNtlmV2Enabled, auth_pref_callback);
@@ -645,9 +634,9 @@ SystemNetworkContextManager::SystemNetworkContextManager(
                              auth_pref_callback);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   pref_change_registrar_.Add(kGssapiDesiredPref, auth_pref_callback);
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   local_state_->SetDefaultPrefValue(
       prefs::kEnableReferrers,
@@ -703,10 +692,9 @@ void SystemNetworkContextManager::RegisterPrefs(PrefRegistrySimple* registry) {
   // Static auth params
   registry->RegisterStringPref(prefs::kAuthSchemes,
                                "basic,digest,ntlm,negotiate");
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
   registry->RegisterStringPref(prefs::kGSSAPILibraryName, std::string());
-#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) &&
-        // !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 
   // Dynamic auth params.
   registry->RegisterListPref(prefs::kAllHttpAuthSchemesAllowedForOrigins);
@@ -717,10 +705,10 @@ void SystemNetworkContextManager::RegisterPrefs(PrefRegistrySimple* registry) {
   registry->RegisterStringPref(prefs::kAuthNegotiateDelegateAllowlist,
                                std::string());
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   registry->RegisterBooleanPref(prefs::kAuthNegotiateDelegateByKdcPolicy,
                                 false);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_POSIX)
   registry->RegisterBooleanPref(prefs::kNtlmV2Enabled, true);
@@ -869,21 +857,6 @@ void SystemNetworkContextManager::OnNetworkServiceCreated(
 
   UpdateTLS13EarlyDataEnabled();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(features::kNetworkAnnotationMonitoring)) {
-    // Create NetworkAnnotationMonitor.
-    if (!network_annotation_monitor_) {
-      network_annotation_monitor_ =
-          std::make_unique<NetworkAnnotationMonitor>();
-    }
-
-    // Pass NetworkAnnotationMonitor remote to NetworkService so that network
-    // calls can be reported.
-    network_service->SetNetworkAnnotationMonitor(
-        network_annotation_monitor_->GetClient());
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // cert_verifier_time_updater_ does not depend on the network service, but
   // can't be initialized from the constructor since network_time_tracker()
   // requires the SystemNetworkContextManager to be ready. It does not need to
@@ -963,10 +936,6 @@ void SystemNetworkContextManager::ConfigureDefaultNetworkContextParams(
       network_context_params->proxy_resolver_factory =
           ChromeMojoProxyResolverFactory::CreateWithSelfOwnedReceiver();
 
-#if BUILDFLAG(IS_CHROMEOS)
-      network_context_params->dhcp_wpad_url_client =
-          ash::DhcpWpadUrlClient::CreateWithSelfOwnedReceiver();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     }
   }
 
@@ -1056,11 +1025,11 @@ bool SystemNetworkContextManager::IsNetworkSandboxEnabled() {
       break;
   }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (!enabled) {
     g_network_service_will_allow_gssapi_library_load = true;
   }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   return enabled;
 }
@@ -1080,14 +1049,6 @@ void SystemNetworkContextManager::FlushNetworkInterfaceForTesting() {
     url_loader_factory_.FlushForTesting();
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void SystemNetworkContextManager::FlushNetworkAnnotationMonitorForTesting() {
-  if (network_annotation_monitor_) {
-    network_annotation_monitor_->FlushForTesting();  // IN-TEST
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 network::mojom::HttpAuthStaticParamsPtr
 SystemNetworkContextManager::GetHttpAuthStaticParamsForTesting() {

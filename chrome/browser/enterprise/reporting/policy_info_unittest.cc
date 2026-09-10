@@ -228,11 +228,9 @@ TEST_F(PolicyInfoTest, ExtensionPolicy) {
 
 TEST_F(PolicyInfoTest, MachineLevelUserCloudPolicyFetchTimestamp) {
   em::ChromeUserProfileInfo profile_info;
-#if !BUILDFLAG(IS_CHROMEOS)
   AppendCloudPolicyFetchTimestamp(
       &profile_info, g_browser_process->browser_policy_connector()
                          ->machine_level_user_cloud_policy_manager());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(0, profile_info.policy_fetched_timestamps_size());
 }
 

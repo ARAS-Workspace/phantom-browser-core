@@ -476,7 +476,7 @@ void DiskCachePerfTest::ResetAndEvictSystemDiskCache() {
        file_path = enumerator.Next()) {
     ASSERT_TRUE(base::EvictFileFromSystemCache(file_path));
   }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // And, cache directories, on platforms where the eviction utility supports
   // this (currently Linux and Android only).
   if (backend_to_test() == BackendToTest::kSimple) {

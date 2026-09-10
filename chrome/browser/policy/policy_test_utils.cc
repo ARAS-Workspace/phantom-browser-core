@@ -67,9 +67,6 @@ void PolicyTest::SetUpOnMainThread() {
 
 void PolicyTest::UpdateProviderPolicy(const PolicyMap& policy) {
   PolicyMap policy_with_defaults = policy.Clone();
-#if BUILDFLAG(IS_CHROMEOS)
-  SetEnterpriseUsersDefaults(&policy_with_defaults);
-#endif
   provider_.UpdateChromePolicy(policy_with_defaults);
 }
 

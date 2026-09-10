@@ -114,34 +114,6 @@ IN_PROC_BROWSER_TEST_F(AppWindowFrameBrowserTest, DraggableFramelessWindow) {
   EXPECT_FALSE(draggable_region->isEmpty());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Disabled due to flake. https://crbug.com/40256924
-IN_PROC_BROWSER_TEST_F(AppWindowFrameBrowserTest,
-                       DISABLED_ShouldShowStaleContentOnEviction) {
-  AppWindow* app_window = CreateTestAppWindow("{}");
-  // Make sure that a surface gets embedded in the frame evictor of the
-  // DelegateFrameHost.
-  app_window->Show(AppWindow::SHOW_ACTIVE);
-  ASSERT_TRUE(app_window->web_contents());
-  content::WaitForResizeComplete(app_window->web_contents());
-
-  // Make sure the renderer submits at least one frame before we test frame
-  // eviction.
-  content::RenderFrameSubmissionObserver submission_observer(
-      app_window->web_contents());
-  if (!submission_observer.render_frame_count()) {
-    submission_observer.WaitForAnyFrameSubmission();
-  }
-
-  // Helper function as this test requires inspecting a number of content::
-  // internal objects.
-  content::VerifyStaleContentOnFrameEviction(
-      app_window->web_contents()->GetRenderWidgetHostView());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 
 }  // namespace extensions

@@ -35,7 +35,6 @@ BASE_FEATURE(kSyncNotebook, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSyncJourney, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_CHROMEOS)
 BASE_FEATURE(kUnoPhase2FollowUp,
 #if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
@@ -43,7 +42,6 @@ BASE_FEATURE(kUnoPhase2FollowUp,
              base::FEATURE_DISABLED_BY_DEFAULT
 #endif
 );
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 
 BASE_FEATURE(kSyncEnableContactInfoDataTypeForCustomPassphraseUsers,
@@ -65,11 +63,7 @@ BASE_FEATURE(kSyncEnableContactInfoDataTypeForDasherUsers,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSeparateLocalAndAccountSearchEngines,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS)
 );
 
 BASE_FEATURE(kReplaceSyncPromosWithSignInPromos,
@@ -131,11 +125,7 @@ BASE_FEATURE(kSpellcheckSeparateLocalAndAccountDictionaries,
 
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 BASE_FEATURE(kReadingListEnableSyncTransportModeUponSignIn,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif
 );
 
 bool IsReadingListAccountStorageEnabled() {
@@ -152,11 +142,7 @@ BASE_FEATURE(kSyncReadingListBatchUploadSelectedItems,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSeparateLocalAndAccountThemes,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS)
 );
 
 BASE_FEATURE(kSyncIncreaseNudgeDelayForSingleClient,
@@ -212,10 +198,6 @@ BASE_FEATURE(kSyncUploadAndroidBuildFingerprintPrefix,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-BASE_FEATURE(kEstimateNewSignInUsersWithFinchAvailablePopulation,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 BASE_FEATURE(kSyncFixWebSigninSessionDurationForShortLivedSessions,
              base::FEATURE_ENABLED_BY_DEFAULT);

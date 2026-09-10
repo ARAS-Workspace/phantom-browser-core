@@ -71,10 +71,6 @@
 #include "content/public/browser/web_contents.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -240,17 +236,6 @@ void ExtensionBrowserTest::SetUpCommandLine(base::CommandLine* command_line) {
     ignore_install_verification_ =
         std::make_unique<ScopedInstallVerifierBypassForTest>();
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (set_chromeos_user_) {
-    // This makes sure that we create the Default profile first, with no
-    // ExtensionService and then the real profile with one, as we do when
-    // running on chromeos.
-    command_line->AppendSwitchASCII(ash::switches::kLoginUser,
-                                    "testuser@gmail.com");
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile, "user");
-  }
-#endif
 
   if (ShouldAllowMV2Extensions()) {
     mv2_enabler_.emplace();

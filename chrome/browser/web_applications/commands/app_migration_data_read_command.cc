@@ -92,12 +92,12 @@ void AppMigrationDataReadCommand::ReadSingleIcon(
     const webapps::AppId& app_id,
     base::OnceCallback<void(SkBitmap)> callback) {
   IconPurpose purpose = IconPurpose::ANY;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   auto* web_app = lock_->registrar().GetAppById(app_id);
   if (!web_app->stored_trusted_icon_sizes(IconPurpose::MASKABLE).empty()) {
     purpose = IconPurpose::MASKABLE;
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
   lock_->icon_manager().ReadTrustedIconsWithFallbackToManifestIcons(
       app_id, {web_app::kIconSizeForUpdateDialog}, purpose,

@@ -23,7 +23,7 @@
 #include "ui/gfx/gpu_fence.h"
 #include "ui/gfx/gpu_memory_buffer_handle.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <linux/memfd.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -315,7 +315,7 @@ TestSharedImageInterface::CreateSharedImageWithAsyncMapControl(
   return image;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 scoped_refptr<ClientSharedImage>
 TestSharedImageInterface::CreateNativePixmapBackedSharedImage(
     const SharedImageInfo& si_info,
@@ -347,7 +347,7 @@ TestSharedImageInterface::CreateNativePixmapBackedSharedImage(
       si_info, surface_handle, buffer_usage,
       gfx::GpuMemoryBufferHandle(std::move(native_pixmap_handle)));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 bool TestSharedImageInterface::CheckSharedImageExists(
     const Mailbox& mailbox) const {

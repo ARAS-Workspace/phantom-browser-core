@@ -12,9 +12,7 @@
 #include "build/buildflag.h"
 #include "crypto/keypair.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "base/feature_list.h"
-#endif
 
 namespace base {
 class CommandLine;
@@ -24,7 +22,6 @@ class FilePath;
 
 namespace variations {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 BASE_DECLARE_FEATURE(kFeedbackIncludeVariations);
 
 // These values are persisted to logs. Entries should not be renumbered and
@@ -39,7 +36,6 @@ enum class VariationsStateEncryptionStatus {
   kMaxValue = kHpkeSealFailure,
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/variations/enums.xml:VariationsStateEncryptionStatus)
-#endif
 
 // Parses the content of `variations::switches::kVariationsStateFile` and
 // modifies the command-line arguments of the running process by setting the
@@ -98,7 +94,6 @@ struct VariationsCommandLine {
   // some reason.
   bool WriteToString(std::string* serialized_json) const;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Serializes and encrypts the state to `ciphertext` with a public key.
   // Encryption is needed for security and privacy purpose. This is used by
   // the feedback component.
@@ -113,7 +108,6 @@ struct VariationsCommandLine {
   VariationsStateEncryptionStatus EncryptToStringForTesting(
       std::vector<uint8_t>* ciphertext,
       const crypto::keypair::PublicKey& public_key) const;
-#endif
 };
 
 }  // namespace variations

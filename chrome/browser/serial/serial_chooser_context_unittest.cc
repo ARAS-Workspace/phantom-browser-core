@@ -35,12 +35,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif
-
 namespace {
 
 using ::base::test::InvokeFuture;
@@ -109,18 +103,6 @@ class SerialChooserContextTestBase {
       delete;
 
   void DoSetUp(bool is_affiliated) {
-#if BUILDFLAG(IS_CHROMEOS)
-    auto fake_user_manager = std::make_unique<ash::FakeChromeUserManager>();
-    auto* fake_user_manager_ptr = fake_user_manager.get();
-    scoped_user_manager_ = std::make_unique<user_manager::ScopedUserManager>(
-        std::move(fake_user_manager));
-
-    const GaiaId kTestUserGaiaId("1111111111");
-    auto account_id =
-        AccountId::FromUserEmailGaiaId(kTestUserEmail, kTestUserGaiaId);
-    fake_user_manager_ptr->AddUserWithAffiliation(account_id, is_affiliated);
-    fake_user_manager_ptr->LoginUser(account_id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     testing_profile_manager_ = std::make_unique<TestingProfileManager>(
         TestingBrowserProcess::GetGlobal());
@@ -175,10 +157,6 @@ class SerialChooserContextTestBase {
   device::FakeSerialPortManager port_manager_;
   std::unique_ptr<TestingProfileManager> testing_profile_manager_;
   raw_ptr<TestingProfile> profile_ = nullptr;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_;
-#endif
 
   raw_ptr<SerialChooserContext> context_;
   NiceMock<permissions::MockPermissionObserver> permission_observer_;
@@ -1110,11 +1088,7 @@ TEST_P(SerialChooserContextAffiliatedTest, BlocklistOverridesPolicy) {
 INSTANTIATE_TEST_SUITE_P(
     SerialChooserContextAffiliatedTestInstance,
     SerialChooserContextAffiliatedTest,
-#if BUILDFLAG(IS_CHROMEOS)
-    testing::Values(true, false),
-#else
     testing::Values(true),
-#endif
     [](const testing::TestParamInfo<
         SerialChooserContextAffiliatedTest::ParamType>& info) {
       return info.param ? "affiliated" : "unaffiliated";

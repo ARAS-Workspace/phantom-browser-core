@@ -755,7 +755,7 @@ TEST_F(WebEmbeddedWorkerImplTest, TerminateSoonAfterStart) {
   worker_->WaitForShutdownForTesting();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TerminateWhileWaitingForDebugger \
   DISABLED_TerminateWhileWaitingForDebugger
 #else
@@ -783,7 +783,7 @@ TEST_F(WebEmbeddedWorkerImplTest, MAYBE_TerminateWhileWaitingForDebugger) {
   worker_->WaitForShutdownForTesting();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ScriptNotFound DISABLED_ScriptNotFound
 #else
 #define MAYBE_ScriptNotFound ScriptNotFound
@@ -815,7 +815,7 @@ TEST_F(WebEmbeddedWorkerImplTest, MAYBE_ScriptNotFound) {
   worker_->WaitForShutdownForTesting();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_GCOnWorkerThreadShouldNotCauseUploadFail \
   DISABLED_GCOnWorkerThreadShouldNotCauseUploadFail
 #else

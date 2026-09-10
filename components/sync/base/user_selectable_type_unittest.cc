@@ -73,14 +73,6 @@ TEST_F(UserSelectableTypeTest, GetUserSelectableTypeFromDataType) {
       continue;
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    if (ChromeOsSpecificTypes().Has(type)) {
-      EXPECT_FALSE(GetUserSelectableTypeFromDataType(type).has_value())
-          << "Failed for data type: " << type;
-      continue;
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
     if (non_convertible_types.Has(type)) {
       EXPECT_FALSE(GetUserSelectableTypeFromDataType(type).has_value())
           << "Failed for data type: " << type;

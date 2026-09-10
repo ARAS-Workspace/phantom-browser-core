@@ -23,10 +23,6 @@
 #include "device/fido/mac/icloud_keychain.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/fido/cros/discovery.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace device {
 
 FidoDiscoveryFactory::FidoDiscoveryFactory() = default;
@@ -47,7 +43,7 @@ std::vector<std::unique_ptr<FidoDiscoveryBase>> FidoDiscoveryFactory::Create(
       return {};
     case FidoTransportProtocol::kInternal: {
       std::vector<std::unique_ptr<FidoDiscoveryBase>> discoveries;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
       discoveries = MaybeCreatePlatformDiscovery();
 #endif
       return discoveries;
@@ -139,32 +135,6 @@ FidoDiscoveryFactory::MaybeCreatePlatformDiscovery() const {
     ret.emplace_back(fido::icloud_keychain::NewDiscovery(nswindow_));
   }
   return ret;
-}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-std::vector<std::unique_ptr<FidoDiscoveryBase>>
-FidoDiscoveryFactory::MaybeCreatePlatformDiscovery() const {
-  auto discovery = std::make_unique<FidoChromeOSDiscovery>(
-      generate_request_id_callback_,
-      std::move(get_assertion_request_for_legacy_credential_check_));
-  discovery->set_require_power_button_mode(require_legacy_cros_authenticator_);
-  return SingleDiscovery(std::move(discovery));
-}
-
-void FidoDiscoveryFactory::set_generate_request_id_callback(
-    base::RepeatingCallback<std::string()> callback) {
-  generate_request_id_callback_ = std::move(callback);
-}
-
-void FidoDiscoveryFactory::set_require_legacy_cros_authenticator(bool value) {
-  require_legacy_cros_authenticator_ = value;
-}
-
-void FidoDiscoveryFactory::
-    set_get_assertion_request_for_legacy_credential_check(
-        CtapGetAssertionRequest request) {
-  get_assertion_request_for_legacy_credential_check_ = std::move(request);
 }
 #endif
 

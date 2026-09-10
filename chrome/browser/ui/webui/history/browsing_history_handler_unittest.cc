@@ -319,7 +319,6 @@ TEST_F(BrowsingHistoryHandlerTest, MdTruncatesTitles) {
 }
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(BrowsingHistoryHandlerTest, RequestAccountInfo) {
   // Check that the account info is sent to the page.
   signin::IdentityManager* identity_manager =
@@ -739,8 +738,6 @@ TEST_F(BrowsingHistoryHandlerTest,
   EXPECT_EQ(results->value[0]->critical_actions[0]->id, "action-visit-2");
   EXPECT_EQ(results->value[0]->critical_actions[1]->id, "action-visit-1");
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class BrowsingHistoryHandlerHatsSurveyTest
     : public BrowsingHistoryHandlerTest,

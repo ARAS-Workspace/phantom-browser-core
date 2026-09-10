@@ -95,14 +95,6 @@ RenderAccessibilityImpl::RenderAccessibilityImpl(
   render_frame_->GetWebView()->GetSettings()->SetAriaModalPrunesAXTree(true);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not ignore SVG grouping (<g>) elements on ChromeOS, which is needed so
-  // Select-to-Speak can read SVG text nodes in natural reading order.
-  render_frame_->GetWebView()
-      ->GetSettings()
-      ->SetAccessibilityIncludeSvgGElement(true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   ax_annotators_manager_ = std::make_unique<AXAnnotatorsManager>(this);
 }
 
@@ -207,16 +199,6 @@ void RenderAccessibilityImpl::set_reset_token(uint32_t reset_token) {
     ax_context_->SetSerializationResetToken(reset_token);
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void RenderAccessibilityImpl::FireLayoutComplete() {
-  if (ax_context_) {
-    ax_context_->AddEventToSerializationQueue(
-        ui::AXEvent(ComputeRoot().AxID(), ax::mojom::Event::kLayoutComplete),
-        true);
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void RenderAccessibilityImpl::FireLoadCompleteIfLoaded() {
   if (GetMainDocument().IsLoaded() &&

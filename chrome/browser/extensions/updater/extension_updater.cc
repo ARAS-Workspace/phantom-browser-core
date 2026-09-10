@@ -63,13 +63,6 @@
 #include "extensions/common/manifest_constants.h"
 #include "extensions/common/manifest_handlers/manifest_url_handlers.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/time/time.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "chromeos/ash/components/settings/cros_settings_names.h"
-#include "components/user_manager/user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 using base::RandDouble;
@@ -392,14 +385,6 @@ ExtensionDownloaderTask ExtensionUpdater::ToDownloaderTask(
 void ExtensionUpdater::EraseUnupdatableIds(std::set<ExtensionId>& ids) const {
   // In Kiosk mode extensions are downloaded and updated by the ExternalCache.
   bool kiosk_crx_manifest_update_url_ignored = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  user_manager::UserManager* user_manager = user_manager::UserManager::Get();
-  if (user_manager && user_manager->IsLoggedInAsKioskChromeApp()) {
-    ash::CrosSettings::Get()->GetBoolean(
-        ash::kKioskCRXManifestUpdateURLIgnored,
-        &kiosk_crx_manifest_update_url_ignored);
-  }
-#endif
   std::erase_if(ids, [&](const ExtensionId& id) {
     // Don't update blocked extensions.
     if (registry_->blocked_extensions().Contains(id)) {

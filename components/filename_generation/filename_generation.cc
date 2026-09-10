@@ -166,7 +166,7 @@ bool TruncateFilename(base::FilePath* path, size_t limit) {
 
   // Encoding specific truncation logic.
   base::FilePath::StringType truncated;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   // UTF-8.
   base::TruncateUTF8ToByteSize(name, limit, &truncated);
 #else

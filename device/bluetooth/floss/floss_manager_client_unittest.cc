@@ -556,33 +556,6 @@ TEST_F(FlossManagerClientTest, HandleManagerPresence) {
   EXPECT_TRUE(method_called_[manager::kRegisterCallback] == 0);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(FlossManagerClientTest, SetFlossEnabledRetries) {
-  base::RunLoop loop;
-
-  TestManagerObserver observer(client_.get());
-  floss_enabled_target_ = false;
-  client_->Init(bus_.get(), kManagerInterface, /*adapter_index=*/-1,
-                GetCurrVersion(), base::DoNothing());
-
-  // First confirm we had it set to False
-  EXPECT_EQ(method_called_[manager::kSetFlossEnabled], 1);
-  EXPECT_EQ(method_called_[manager::kGetFlossEnabled], 1);
-
-  method_called_.clear();
-
-  // Retries up to 3 times across both Get and Set.
-  fail_setfloss_count_ = 1;
-  fail_getfloss_count_ = 1;
-  floss_enabled_target_ = true;
-  SetFlossEnabled(true, 3, 0, loop.QuitClosure());
-  loop.Run();
-
-  EXPECT_EQ(method_called_[manager::kSetFlossEnabled], 2);
-  EXPECT_EQ(method_called_[manager::kGetFlossEnabled], 2);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(FlossManagerClientTest, GetFlossApiVersion) {
   base::Version version = floss::version::IntoVersion(floss_api_version_);
 

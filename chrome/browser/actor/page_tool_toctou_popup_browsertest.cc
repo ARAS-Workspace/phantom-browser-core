@@ -87,24 +87,6 @@ class PageToolToctouPopupBypassTest : public ActorToolsTest {
 
   gfx::Point SetUpAttackAndSwap(tabs::TabInterface* tab) {
     WebContents* wc = tab->GetContents();
-#if BUILDFLAG(IS_CHROMEOS)
-    // On ChromeOS, Ash window decorations (caption bar and window borders)
-    // overlap the WebContents view area. This causes the main browser window
-    // surface to be aggregated in Viz with the 'Ask' flag (due to
-    // OverlappedRegion/IrregularClip properties). Since FindWidgetAtPoint is
-    // synchronous, it cannot perform asynchronous queries to Aura when it hits
-    // an 'Ask' region, and fails to route coordinates to cross-process
-    // subframes. Forcing the window to fullscreen removes these decorations and
-    // the 'Ask' flag, allowing synchronous hit-testing to successfully traverse
-    // child FrameSinks.
-    Browser* browser = nullptr;
-    if (tab->GetBrowserWindowInterface()) {
-      browser = tab->GetBrowserWindowInterface()->GetBrowserForMigrationOnly();
-    }
-    if (browser && !browser->GetWindow()->IsFullscreen()) {
-      ui_test_utils::ToggleFullscreenModeAndWait(browser);
-    }
-#endif
 
     const GURL attacker = embedded_https_test_server().GetURL(
         "a.com", "/actor/toctou_frame_swap.html");

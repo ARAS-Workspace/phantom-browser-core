@@ -111,7 +111,7 @@ class ConstrainedWebDialogBrowserTest : public InProcessBrowserTest {
 
 // Tests that opening/closing the constrained window won't crash it.
 // Flaky on trusty builder: http://crbug.com/40656498.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_BasicTest DISABLED_BasicTest
 #else
 #define MAYBE_BasicTest BasicTest
@@ -132,7 +132,7 @@ IN_PROC_BROWSER_TEST_F(ConstrainedWebDialogBrowserTest, MAYBE_BasicTest) {
 }
 
 // TODO(crbug.com/40656271): Crashy on Linux
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ReleaseWebContents DISABLED_ReleaseWebContents
 #else
 #define MAYBE_ReleaseWebContents ReleaseWebContents
@@ -193,7 +193,7 @@ INSTANTIATE_TEST_SUITE_P(
 // is enabled.
 // Flaky on CrOS: http://crbug.com/41439468
 // Flaky on Mac: http://crbug.com/40939810
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_ContentResizeInAutoResizingDialog \
   DISABLED_ContentResizeInAutoResizingDialog
 #else

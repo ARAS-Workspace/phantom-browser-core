@@ -24,12 +24,10 @@ const SessionPolicies GetFullSessionPolicies() {
   session_policies.allow_stun_connections = true;
   session_policies.allow_relayed_connections = false;
   session_policies.host_udp_port_range = *PortRange::Create(123, 456);
-#if !BUILDFLAG(IS_CHROMEOS)
   session_policies.allow_file_transfer = true;
   session_policies.allow_uri_forwarding = false;
   session_policies.maximum_session_duration = base::Hours(20);
   session_policies.curtain_required = false;
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   session_policies.host_username_match_required = true;
 #endif
@@ -43,13 +41,11 @@ const base::DictValue& GetFullSessionPolicyDict() {
           .Set(policy::key::kRemoteAccessHostFirewallTraversal, true)
           .Set(policy::key::kRemoteAccessHostAllowRelayedConnection, false)
           .Set(policy::key::kRemoteAccessHostUdpPortRange, "123-456")
-#if !BUILDFLAG(IS_CHROMEOS)
           .Set(policy::key::kRemoteAccessHostAllowFileTransfer, true)
           .Set(policy::key::kRemoteAccessHostAllowUrlForwarding, false)
           .Set(policy::key::kRemoteAccessHostMaximumSessionDurationMinutes,
                1200)
           .Set(policy::key::kRemoteAccessHostRequireCurtain, false)
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
           .Set(policy::key::kRemoteAccessHostMatchUsername, true)
 #endif
@@ -57,12 +53,10 @@ const base::DictValue& GetFullSessionPolicyDict() {
   return *dict;
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 base::DictValue GetPolicyDictWithMaxDurationMins(int mins) {
   return GetFullSessionPolicyDict().Clone().Set(
       policy::key::kRemoteAccessHostMaximumSessionDurationMinutes, mins);
 }
-#endif
 
 base::DictValue GetPolicyDictWithClipboardSize(int clipboard_size) {
   return GetFullSessionPolicyDict().Clone().Set(
@@ -127,7 +121,6 @@ TEST(SessionPoliciesFromDict,
   EXPECT_EQ(*policies, expected_policies);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST(SessionPoliciesFromDict, NonPositiveMaxSessionDuration_FieldIsNullopt) {
   SessionPolicies expected_policies = GetFullSessionPolicies();
   expected_policies.maximum_session_duration.reset();
@@ -150,7 +143,6 @@ TEST(SessionPoliciesFromDict, PositiveMaxSessionDuration_FieldIsPopulated) {
   ASSERT_TRUE(policies.has_value());
   EXPECT_EQ(*policies, expected_policies);
 }
-#endif
 
 TEST(SessionPoliciesFromDict, InvalidHostUdpPortRange_ReturnsNullopt) {
   base::DictValue policy_dict = GetFullSessionPolicyDict().Clone().Set(

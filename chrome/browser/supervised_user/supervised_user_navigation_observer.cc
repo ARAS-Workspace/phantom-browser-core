@@ -55,8 +55,6 @@
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/supervised_user/android/supervised_user_web_content_handler_impl.h"
 #include "components/supervised_user/core/browser/android/android_parental_controls.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/supervised_user/chromeos/supervised_user_web_content_handler_impl.h"
 #elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/supervised_user/linux_mac_windows/supervised_user_web_content_handler_impl.h"
 #endif
@@ -69,12 +67,7 @@ std::unique_ptr<supervised_user::WebContentHandler> CreateWebContentHandler(
     Profile* profile,
     content::FrameTreeNodeId frame_id,
     int navigation_id) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return std::make_unique<SupervisedUserWebContentHandlerImpl>(
-      web_contents, url,
-      *LargeIconServiceFactory::GetForBrowserContext(profile), frame_id,
-      navigation_id);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return std::make_unique<SupervisedUserWebContentHandlerImpl>(
       web_contents, frame_id, navigation_id);
 #elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

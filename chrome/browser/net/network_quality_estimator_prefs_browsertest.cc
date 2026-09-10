@@ -146,12 +146,7 @@ class NetworkQualityEstimatorPrefsBrowserTest : public InProcessBrowserTest {
 
 // Verify that prefs are read at startup.
 // Flaky on ChromeOS. See https://crbug.com/40282398
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ReadPrefsAtStartupCustomPrefFile \
-  DISABLED_ReadPrefsAtStartupCustomPrefFile
-#else
 #define MAYBE_ReadPrefsAtStartupCustomPrefFile ReadPrefsAtStartupCustomPrefFile
-#endif
 IN_PROC_BROWSER_TEST_F(NetworkQualityEstimatorPrefsBrowserTest,
                        MAYBE_ReadPrefsAtStartupCustomPrefFile) {
   base::ScopedAllowBlockingForTesting scoped_allow_blocking;

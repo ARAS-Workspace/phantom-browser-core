@@ -8,11 +8,6 @@
 #include "build/build_config.h"
 #include "components/signin/core/browser/account_reconcilor.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/feature_list.h"
-#include "components/sync/base/features.h"
-#endif
-
 namespace signin {
 
 MirrorAccountReconcilorDelegate::MirrorAccountReconcilorDelegate(
@@ -45,15 +40,8 @@ bool MirrorAccountReconcilorDelegate::ShouldAbortReconcileIfPrimaryHasError()
 
 ConsentLevel MirrorAccountReconcilorDelegate::GetConsentLevelForPrimaryAccount()
     const {
-#if BUILDFLAG(IS_CHROMEOS)
-  return base::FeatureList::IsEnabled(
-             syncer::kReplaceSyncPromosWithSignInPromos)
-             ? ConsentLevel::kSignin
-             : ConsentLevel::kSync;
-#else
   // For mobile (iOS, Android).
   return ConsentLevel::kSignin;
-#endif
 }
 
 std::vector<CoreAccountId>

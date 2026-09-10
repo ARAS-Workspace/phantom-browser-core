@@ -28,9 +28,6 @@
 #if BUILDFLAG(IS_OZONE)
 #include "ui/views/test/test_desktop_screen_ozone.h"
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/test/ui_controls_ash.h"
-#endif
 #if defined(USE_AURA) && BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
 #include "ui/platform_window/common/platform_window_defaults.h"
@@ -78,9 +75,7 @@ void KombuchaInProcessFuzzer::SetUp() {
   // that live outside the ui_interaction_test directory.
   // The following is copied from
   // chrome/test/base/interactive_ui_tests_main.cc
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::test::EnableUIControlsAsh();
-#elif BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
   // Notifies the platform that test config is needed. For Wayland, for
   // example, makes its possible to use emulated input.
   ui::test::EnableTestConfigForPlatformWindows();

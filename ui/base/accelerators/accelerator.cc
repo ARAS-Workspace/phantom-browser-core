@@ -31,11 +31,6 @@
 #include "ui/events/keycodes/keyboard_code_conversion.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/base/accelerators/ash/quick_insert_event_property.h"
-#include "ui/base/ui_base_features.h"
-#endif
-
 #if BUILDFLAG(USE_BLINK)
 #include "ui/base/accelerators/media_keys_listener.h"
 #endif
@@ -103,17 +98,6 @@ Accelerator::Accelerator(const KeyEvent& key_event)
       time_stamp_(key_event.time_stamp()),
       interrupted_by_mouse_event_(false),
       source_device_id_(key_event.source_device_id()) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (features::IsImprovedKeyboardShortcutsEnabled()) {
-    code_ = key_event.code();
-  }
-
-  // Rewrite to Quick Insert based on the presence of the property.
-  if (key_event.key_code() == VKEY_ASSISTANT &&
-      HasQuickInsertProperty(key_event)) {
-    key_code_ = VKEY_QUICK_INSERT;
-  }
-#endif
 }
 
 #if BUILDFLAG(IS_MAC)
@@ -131,9 +115,6 @@ KeyEvent Accelerator::ToKeyEvent() const {
                       ? EventType::kKeyPressed
                       : EventType::kKeyReleased,
                   key_code(),
-#if BUILDFLAG(IS_CHROMEOS)
-                  code(),
-#endif
                   modifiers(), time_stamp());
 }
 
@@ -376,8 +357,6 @@ std::vector<std::u16string> Accelerator::GetLongFormModifiers() const {
   if (IsCmdDown()) {
 #if BUILDFLAG(IS_MAC)
     modifiers.push_back(l10n_util::GetStringUTF16(IDS_APP_COMMAND_KEY));
-#elif BUILDFLAG(IS_CHROMEOS)
-    modifiers.push_back(l10n_util::GetStringUTF16(IDS_APP_SEARCH_KEY));
 #elif BUILDFLAG(IS_LINUX)
     modifiers.push_back(l10n_util::GetStringUTF16(IDS_APP_SUPER_KEY));
 #else

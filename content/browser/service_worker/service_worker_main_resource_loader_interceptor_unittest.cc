@@ -88,9 +88,6 @@ TEST_F(ServiceWorkerMainResourceLoaderInterceptorTest,
 TEST_F(ServiceWorkerMainResourceLoaderInterceptorTest,
        ShouldCreateForNavigation_ExternalFileScheme) {
   bool expected_handler_created = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_handler_created = true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(
       expected_handler_created,
       ShouldCreateForNavigation(GURL("externalfile:drive/doc"),

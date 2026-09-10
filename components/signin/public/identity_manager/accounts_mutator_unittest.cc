@@ -26,13 +26,11 @@
 namespace {
 
 constexpr char kTestEmail[] = "test_user@test.com";
-#if !BUILDFLAG(IS_CHROMEOS)
 constexpr GaiaId::Literal kTestGaiaId("gaia-id-test_user-test.com");
 constexpr GaiaId::Literal kTestGaiaId2("gaia-id-test_user-2-test.com");
 constexpr char kTestEmail2[] = "test_user@test-2.com";
 constexpr char kRefreshToken[] = "refresh_token";
 constexpr char kRefreshToken2[] = "refresh_token_2";
-#endif
 
 // Class that observes diagnostics updates from signin::IdentityManager.
 class TestIdentityManagerDiagnosticsObserver
@@ -210,7 +208,6 @@ TEST_F(AccountsMutatorTest, UpdateAccountInfo) {
   EXPECT_EQ(reset_account_info.IsChildAccount(), Tribool::kFalse);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Test that a new account gets added to the AccountTrackerService when calling
 // AddOrUpdateAccount() and that a new refresh token becomes available for the
 // passed account_id when adding an account for the first time.
@@ -639,7 +636,6 @@ TEST_F(AccountsMutatorTest, RemoveRefreshTokenFromSource) {
   EXPECT_EQ("Settings::Signout",
             identity_manager_diagnostics_observer()->token_remover_source());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 TEST_F(AccountsMutatorTest, MoveAccount) {

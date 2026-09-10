@@ -44,10 +44,6 @@
 #include "chrome/browser/browsing_data/counters/tabs_counter.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/fido/cros/credential_store.h"
-#endif
-
 namespace {
 
 history::WebHistoryService* GetUpdatedWebHistoryService(Profile* profile) {
@@ -79,12 +75,7 @@ BrowsingDataCounterFactory::GetForProfileAndPref(Profile* profile,
 
   if (pref_name == browsing_data::prefs::kDeletePasswords) {
     std::unique_ptr<::device::fido::PlatformCredentialStore> credential_store =
-#if BUILDFLAG(IS_CHROMEOS)
-        std::make_unique<
-            ::device::fido::cros::PlatformAuthenticatorCredentialStore>();
-#else
         nullptr;
-#endif
     return std::make_unique<browsing_data::SigninDataCounter>(
         ProfilePasswordStoreFactory::GetForProfile(
             profile, ServiceAccessType::EXPLICIT_ACCESS),

@@ -206,11 +206,6 @@ class DataProtectionNavigationControllerPolicyTest
     enterprise_connectors::test::ClearAnalysisConnector(
         browser()->GetProfile()->GetPrefs(),
         enterprise_connectors::AnalysisConnector::FILE_DOWNLOADED);
-#if BUILDFLAG(IS_CHROMEOS)
-    enterprise_connectors::test::ClearAnalysisConnector(
-        browser()->GetProfile()->GetPrefs(),
-        enterprise_connectors::AnalysisConnector::FILE_TRANSFER);
-#endif
     enterprise_connectors::test::ClearAnalysisConnector(
         browser()->GetProfile()->GetPrefs(),
         enterprise_connectors::AnalysisConnector::PRINT);
@@ -264,13 +259,6 @@ INSTANTIATE_TEST_SUITE_P(
               prefs, enterprise_connectors::AnalysisConnector::FILE_DOWNLOADED,
               GetAnalysisPolicy());
         }),
-#if BUILDFLAG(IS_CHROMEOS)
-        base::BindRepeating([](PrefService* prefs) {
-          enterprise_connectors::test::SetAnalysisConnector(
-              prefs, enterprise_connectors::AnalysisConnector::FILE_TRANSFER,
-              GetAnalysisPolicy());
-        }),
-#endif
         base::BindRepeating([](PrefService* prefs) {
           enterprise_connectors::test::SetAnalysisConnector(
               prefs, enterprise_connectors::AnalysisConnector::PRINT,

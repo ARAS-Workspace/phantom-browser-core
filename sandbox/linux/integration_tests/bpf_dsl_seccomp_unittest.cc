@@ -2158,13 +2158,6 @@ SANDBOX_TEST(SandboxBPF, Tsync) {
   const bool supports_multi_threaded = SandboxBPF::SupportsSeccompSandbox(
       SandboxBPF::SeccompLevel::MULTI_THREADED);
 // On Chrome OS tsync is mandatory.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::SysInfo::IsRunningOnChromeOS()) {
-    BPF_ASSERT_EQ(true, supports_multi_threaded);
-  }
-// else a Chrome OS build not running on a Chrome OS device e.g. Chrome bots.
-// In this case fall through.
-#endif
   if (!supports_multi_threaded) {
     return;
   }

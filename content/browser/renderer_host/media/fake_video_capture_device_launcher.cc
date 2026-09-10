@@ -18,10 +18,6 @@
 #include "media/capture/video/video_capture_device_client.h"
 #include "media/capture/video/video_frame_receiver_on_task_runner.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "media/capture/video/chromeos/video_capture_jpeg_decoder.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 class FakeLaunchedVideoCaptureDevice
@@ -101,19 +97,10 @@ void FakeVideoCaptureDeviceLauncher::LaunchDeviceAsync(
       device_or_error.ReleaseDevice();
   auto buffer_pool = base::MakeRefCounted<media::VideoCaptureBufferPoolImpl>(
       media::VideoCaptureBufferType::kSharedMemory);
-#if BUILDFLAG(IS_CHROMEOS)
-  auto device_client = std::make_unique<media::VideoCaptureDeviceClient>(
-      std::make_unique<media::VideoFrameReceiverOnTaskRunner>(
-          receiver, base::SingleThreadTaskRunner::GetCurrentDefault()),
-      std::move(buffer_pool), base::BindRepeating([]() {
-        return std::unique_ptr<media::VideoCaptureJpegDecoder>();
-      }));
-#else
   auto device_client = std::make_unique<media::VideoCaptureDeviceClient>(
       std::make_unique<media::VideoFrameReceiverOnTaskRunner>(
           receiver, base::SingleThreadTaskRunner::GetCurrentDefault()),
       std::move(buffer_pool));
-#endif  // BUILDFLAG(IS_CHROMEOS)
   device->AllocateAndStart(params, std::move(device_client));
   auto launched_device =
       std::make_unique<FakeLaunchedVideoCaptureDevice>(std::move(device));

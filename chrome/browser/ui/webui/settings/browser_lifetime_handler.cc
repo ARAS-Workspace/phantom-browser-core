@@ -12,52 +12,14 @@
 #include "chrome/grit/branded_strings.h"
 #include "components/policy/core/common/management/management_service.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "chrome/browser/ash/tpm/tpm_firmware_update.h"
-#include "chrome/browser/browser_process.h"
-#include "components/prefs/pref_service.h"
-#include "components/user_manager/user_manager.h"
-#include "ui/webui/webui_util.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/grit/generated_resources.h"
 #include "ui/base/l10n/l10n_util.h"
-#endif
 
 namespace settings {
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Triggers a TPM firmware update using the least destructive mode from
-// |available_modes|.
-void TriggerTPMFirmwareUpdate(
-    const std::set<ash::tpm_firmware_update::Mode>& available_modes) {
-  using ::ash::tpm_firmware_update::Mode;
-
-  // Decide which update mode to use.
-  for (Mode mode :
-       {Mode::kPreserveDeviceState, Mode::kPowerwash, Mode::kCleanup}) {
-    if (available_modes.count(mode) == 0) {
-      continue;
-    }
-
-    // Save a TPM firmware update request in local state, which
-    // will trigger the reset screen to appear on reboot.
-    PrefService* prefs = g_browser_process->local_state();
-    prefs->SetBoolean(ash::prefs::kFactoryResetRequested, true);
-    prefs->SetInteger(ash::prefs::kFactoryResetTPMFirmwareUpdateMode,
-                      static_cast<int>(mode));
-    prefs->CommitPendingWrite();
-    chrome::AttemptRelaunch();
-    return;
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -72,18 +34,7 @@ void BrowserLifetimeHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback(
       "relaunch", base::BindRepeating(&BrowserLifetimeHandler::HandleRelaunch,
                                       base::Unretained(this)));
-#if BUILDFLAG(IS_CHROMEOS)
-  web_ui()->RegisterMessageCallback(
-      "signOutAndRestart",
-      base::BindRepeating(&BrowserLifetimeHandler::HandleSignOutAndRestart,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "factoryReset",
-      base::BindRepeating(&BrowserLifetimeHandler::HandleFactoryReset,
-                          base::Unretained(this)));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if !BUILDFLAG(IS_CHROMEOS)
   web_ui()->RegisterMessageCallback(
       "shouldShowRelaunchConfirmationDialog",
       base::BindRepeating(
@@ -94,7 +45,6 @@ void BrowserLifetimeHandler::RegisterMessages() {
       base::BindRepeating(&BrowserLifetimeHandler::
                               HandleGetRelaunchConfirmationDialogDescription,
                           base::Unretained(this)));
-#endif
 }
 
 void BrowserLifetimeHandler::HandleRestart(const base::ListValue& args) {
@@ -105,43 +55,6 @@ void BrowserLifetimeHandler::HandleRelaunch(const base::ListValue& args) {
   chrome::AttemptRelaunch();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void BrowserLifetimeHandler::HandleSignOutAndRestart(
-    const base::ListValue& args) {
-  chrome::AttemptUserExit();
-}
-
-void BrowserLifetimeHandler::HandleFactoryReset(const base::ListValue& args) {
-  CHECK_EQ(1U, args.size());
-  bool tpm_firmware_update_requested = args[0].GetBool();
-
-  if (tpm_firmware_update_requested) {
-    ash::tpm_firmware_update::GetAvailableUpdateModes(
-        base::BindOnce(&TriggerTPMFirmwareUpdate), base::TimeDelta());
-    return;
-  }
-
-  // TODO(crbug.com/40596547): Centralize powerwash restriction checks.
-  bool allow_powerwash =
-      !policy::ManagementServiceFactory::GetForPlatform()->IsManaged() &&
-      !user_manager::UserManager::Get()->IsLoggedInAsGuest() &&
-      !user_manager::UserManager::Get()->IsLoggedInAsChildUser();
-
-  if (!allow_powerwash) {
-    return;
-  }
-
-  PrefService* prefs = g_browser_process->local_state();
-  prefs->SetBoolean(ash::prefs::kFactoryResetRequested, true);
-  prefs->CommitPendingWrite();
-
-  // Perform sign out. Current chrome process will then terminate, new one will
-  // be launched (as if it was a restart).
-  chrome::AttemptRelaunch();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS)
 void BrowserLifetimeHandler::HandleGetRelaunchConfirmationDialogDescription(
     const base::ListValue& args) {
   AllowJavascript();
@@ -192,6 +105,5 @@ void BrowserLifetimeHandler::HandleShouldShowRelaunchConfirmationDialog(
     ResolveJavascriptCallback(callback_id, result);
   }
 }
-#endif
 
 }  // namespace settings

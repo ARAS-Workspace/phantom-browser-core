@@ -61,20 +61,6 @@ TEST(AttributesConditionTest, InvalidSourceInputs) {
       CreateDict(R"({"gemini_in_chrome": "str"})")));
   ASSERT_FALSE(SourceAttributesCondition::Create(
       CreateDict(R"({"gemini_in_chrome": 1234})")));
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"urls": "https://foo.com", "components": "ARC"})")));
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"urls": 1, "components": "ARC"})")));
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"urls": 99.999, "components": "ARC"})")));
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"components": "ARC"})")));
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"components": 12345})")));
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"components": 99.999})")));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Dictionaries with valid schemas but invalid URL patterns or components are
   // rejected.
@@ -88,14 +74,6 @@ TEST(AttributesConditionTest, InvalidSourceInputs) {
       SourceAttributesCondition::Create(CreateDict(R"({"urls": ["//"]})")));
   ASSERT_FALSE(
       SourceAttributesCondition::Create(CreateDict(R"({"urls": ["a", 1]})")));
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"urls": ["a", 1], "components": ["ARC"]})")));
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"components": ["1", "a"]})")));
-  ASSERT_FALSE(SourceAttributesCondition::Create(
-      CreateDict(R"({"components": ["5.5"]})")));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST(AttributesConditionTest, InvalidDestinationInputs) {
@@ -135,20 +113,6 @@ TEST(AttributesConditionTest, InvalidDestinationInputs) {
       CreateDict(R"({"gemini_in_chrome": "str"})")));
   ASSERT_FALSE(DestinationAttributesCondition::Create(
       CreateDict(R"({"gemini_in_chrome": 1234})")));
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"urls": "https://foo.com", "components": "ARC"})")));
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"urls": 1, "components": "ARC"})")));
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"urls": 99.999, "components": "ARC"})")));
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"components": "ARC"})")));
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"components": 12345})")));
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"components": 99.999})")));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Dictionaries with valid schemas but invalid URL patterns or components are
   // rejected.
@@ -162,14 +126,6 @@ TEST(AttributesConditionTest, InvalidDestinationInputs) {
       CreateDict(R"({"urls": ["//"]})")));
   ASSERT_FALSE(DestinationAttributesCondition::Create(
       CreateDict(R"({"urls": ["a", 1]})")));
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"urls": ["a", 1], "components": ["ARC"]})")));
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"components": ["1", "a"]})")));
-  ASSERT_FALSE(DestinationAttributesCondition::Create(
-      CreateDict(R"({"components": ["5.5"]})")));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST(AttributesConditionTest, AnyURL) {
@@ -228,83 +184,6 @@ TEST(AttributesConditionTest, SpecificDestinationURL) {
   ASSERT_FALSE(chromium_url_destination->IsTriggered(
       {.destination = {.url = GURL(kGoogleUrl)}}));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(AttributesConditionTest, AllComponents) {
-  auto any_component = DestinationAttributesCondition::Create(CreateDict(R"(
-    {
-      "components": ["ARC", "CROSTINI", "PLUGIN_VM", "USB", "DRIVE", "ONEDRIVE"]
-    })"));
-  ASSERT_TRUE(any_component);
-  for (Component component : kAllComponents) {
-    ActionContext context = {.destination = {.component = component}};
-    ASSERT_TRUE(any_component->IsTriggered(context));
-  }
-}
-
-TEST(AttributesConditionTest, OneComponent) {
-  for (Component condition_component : kAllComponents) {
-    constexpr char kTemplate[] = R"({"components": ["%s"]})";
-    auto one_component =
-        DestinationAttributesCondition::Create(CreateDict(base::StringPrintf(
-            kTemplate, GetComponentMapping(condition_component).c_str())));
-
-    for (Component context_component : kAllComponents) {
-      ActionContext context = {.destination = {.component = context_component}};
-      if (context_component == condition_component) {
-        ASSERT_TRUE(one_component->IsTriggered(context));
-      } else {
-        ASSERT_FALSE(one_component->IsTriggered(context));
-      }
-    }
-  }
-}
-
-TEST(AttributesConditionTest, URLAndAllComponents) {
-  auto any_component_or_url =
-      DestinationAttributesCondition::Create(CreateDict(R"(
-      {
-        "urls": ["*"],
-        "components": ["ARC", "CROSTINI", "PLUGIN_VM", "USB", "DRIVE",
-                       "ONEDRIVE"]
-      })"));
-  ASSERT_TRUE(any_component_or_url);
-  for (Component component : kAllComponents) {
-    for (const char* url : {kGoogleUrl, kChromiumUrl}) {
-      ActionContext context = {
-          .destination = {.url = GURL(url), .component = component}};
-      ASSERT_TRUE(any_component_or_url->IsTriggered(context));
-    }
-  }
-}
-
-TEST(AttributesConditionTest, URLAndOneComponent) {
-  for (Component condition_component : kAllComponents) {
-    constexpr char kTemplate[] =
-        R"({"urls": ["google.com"], "components": ["%s"]})";
-    auto google_and_one_component =
-        DestinationAttributesCondition::Create(CreateDict(base::StringPrintf(
-            kTemplate, GetComponentMapping(condition_component).c_str())));
-
-    ASSERT_TRUE(google_and_one_component);
-    for (Component context_component : kAllComponents) {
-      for (const char* url : {kGoogleUrl, kChromiumUrl}) {
-        ActionContext context = {
-            .destination = {.url = GURL(url), .component = context_component}};
-        if (context_component == condition_component && url == kGoogleUrl) {
-          ASSERT_TRUE(google_and_one_component->IsTriggered(context))
-              << "Expected " << GetComponentMapping(context_component)
-              << " to trigger for " << url;
-        } else {
-          ASSERT_FALSE(google_and_one_component->IsTriggered(context))
-              << "Expected " << GetComponentMapping(context_component)
-              << " to not trigger for " << url;
-        }
-      }
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST(AttributesConditionTest, IncognitoDestination) {
   // A destination tab can have `incognito` set even without a committed URL

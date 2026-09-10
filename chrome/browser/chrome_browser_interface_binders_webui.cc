@@ -46,9 +46,7 @@
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
 #include "chrome/browser/ui/webui/side_panel/reading_list/reading_list_ui.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_ui.h"
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
-#endif
 #endif
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
@@ -75,8 +73,7 @@
 #include "ui/webui/resources/cr_components/color_change_listener/color_change_listener.mojom.h"
 #endif  // !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_DESKTOP_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_DESKTOP_ANDROID)
 #include "chrome/browser/ui/webui/discards/discards.mojom.h"
 #include "chrome/browser/ui/webui/discards/discards_ui.h"
 #include "chrome/browser/ui/webui/discards/site_data.mojom.h"
@@ -131,9 +128,7 @@ void BindTrackedElementHandlerRestricted(
       controller->GetAs<ReadingListUI>() ||
       controller->GetAs<CustomizeChromeUI>() ||
       controller->GetAs<HistoryUI>() ||
-#if !BUILDFLAG(IS_CHROMEOS)
       controller->GetAs<ProfilePickerUI>() ||
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
       controller->GetAs<ContextualTasksUI>();
 
@@ -299,12 +294,7 @@ void PopulateChromeWebUIFrameBinders(
   PopulateChromeWebUIFrameBindersPartsDesktop(map, render_frame_host);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  PopulateChromeWebUIFrameBindersPartsCros(map, render_frame_host);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_DESKTOP_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_DESKTOP_ANDROID)
   RegisterWebUIControllerInterfaceBinder<discards::mojom::DetailsProvider,
                                          DiscardsUI>(map);
 
@@ -322,10 +312,6 @@ void PopulateChromeWebUIFrameBinders(
 void PopulateTrustedChromeWebUIFrameInterfaceBrokers(
     content::WebUIBrowserInterfaceBrokerRegistry& registry) {
   // This function is broken up into sections based on WebUI types.
-
-#if BUILDFLAG(IS_CHROMEOS)
-  PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsCros(registry);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
   PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(registry);
@@ -346,10 +332,6 @@ void PopulateTrustedChromeWebUIFrameInterfaceBrokers(
 void PopulateUntrustedChromeWebUIFrameInterfaceBrokers(
     content::WebUIBrowserInterfaceBrokerRegistry& registry) {
   PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsFeatures(registry);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsCros(registry);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
   PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop(registry);

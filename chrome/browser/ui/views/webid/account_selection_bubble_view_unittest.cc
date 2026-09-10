@@ -1504,13 +1504,8 @@ TEST_F(AccountSelectionBubbleViewTest, IframeTitle) {
 }
 
 // TODO(crbug.com/420421406): Re-enable this test on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ContinueButtonFocusedWithScreenReader \
-  DISABLED_ContinueButtonFocusedWithScreenReader
-#else
 #define MAYBE_ContinueButtonFocusedWithScreenReader \
   ContinueButtonFocusedWithScreenReader
-#endif
 TEST_F(AccountSelectionBubbleViewTest,
        MAYBE_ContinueButtonFocusedWithScreenReader) {
   content::ScopedAccessibilityModeOverride screen_reader_mode(

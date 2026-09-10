@@ -64,14 +64,6 @@
 #include "components/variations/service/variations_service.h"
 #include "components/variations/service/variations_service_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"  // nogncheck
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"  // nogncheck
-#include "chromeos/constants/chromeos_features.h"
-#include "components/user_manager/user.h"       // nogncheck
-#include "components/user_manager/user_type.h"  // nogncheck
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/android_info.h"
 #endif
@@ -132,9 +124,6 @@ constexpr char kDefaultEnabledLocales[] =
     "af,am,bg,bn,ca,cs,da,de,el,es,es-419,et,fi,fil,fr,gu,hi,hr,hu,id,it,ja,kn,"
     "ko,lt,lv,ml,mr,ms,nl,no,pl,pt-BR,pt-PT,ro,ru,sk,sl,sr,sv,sw,ta,te,th,tr,"
     "uk,vi,zh-CN,zh-TW,en-GB,en-US"
-#if BUILDFLAG(IS_CHROMEOS)
-    ",eu,gl,is,zu"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(IS_ANDROID)
     ;
 
@@ -743,18 +732,7 @@ bool GlicGlobalEnabling::IsSystemRequirementMet() const {
             features::kGlicMinRequiredRamMb.Get()))) {
       return false;
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    constexpr base::ByteSize kMinimumMemoryThreshold = base::GiBU(7);
-    const bool bypass_cbx_requirement =
-        GlicEnabling::IsLikelyDogfoodClient() &&
-        base::SysInfo::AmountOfTotalPhysicalMemory() >= kMinimumMemoryThreshold;
-
-    return (bypass_cbx_requirement ||
-            base::FeatureList::IsEnabled(
-                chromeos::features::kFeatureManagementGlic));
-#else
     return true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }();
 
   return supported_system_requirements;
@@ -866,11 +844,6 @@ void GlicEnabling::RecordProfileIneligibilityMetricsAtStartup(
   if (!profile || !(profile->IsRegularProfile())) {
     not_regular_profile = true;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!IsChromeOSProfileEligible(profile)) {
-    not_regular_profile = true;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (not_regular_profile) {
     base::UmaHistogramEnumeration(
@@ -1082,39 +1055,6 @@ void GlicEnabling::OnGlicSettingsPolicyChanged() {
   // Update the overall enabled status as the policy has changed.
   UpdateEnabledStatus();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-bool GlicEnabling::IsChromeOSProfileEligible(Profile* profile) {
-  if (!ash::IsUserBrowserContext(profile)) {
-    // We only allow regular user session profiles.
-    // E.g. disallowed on login screen.
-    return false;
-  }
-  auto* user =
-      ash::BrowserContextHelper::Get()->GetUserByBrowserContext(profile);
-  if (user == nullptr) {
-    // When there is no signed in user on ChromeOS, assume that the profile is
-    // not eligible.
-    return false;
-  }
-  switch (user->GetType()) {
-    case user_manager::UserType::kRegular:
-    case user_manager::UserType::kChild:
-      // These are ok to use Glic.
-      break;
-    case user_manager::UserType::kGuest:
-    case user_manager::UserType::kPublicAccount:
-    case user_manager::UserType::kKioskChromeApp:
-    case user_manager::UserType::kKioskWebApp:
-    case user_manager::UserType::kKioskIWA:
-    case user_manager::UserType::kKioskArcvmApp:
-      // Disallows guest session, and device local account sessions.
-      return false;
-  }
-  return true;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // static
 bool GlicEnabling::IsAutoOpenForPdfEnabled(Profile* profile) {

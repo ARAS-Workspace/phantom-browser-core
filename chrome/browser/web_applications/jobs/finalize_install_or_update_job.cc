@@ -70,10 +70,6 @@
 #include "third_party/skia/include/core/SkColor.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/experiences/system_web_apps/types/system_web_app_data.h"
-#endif
-
 namespace web_app {
 
 // Overwrite the user display mode if the install source indicates a
@@ -202,91 +198,6 @@ bool FinalizeInstallOrUpdateJob::SubAppScopeOverlapWithParentOrSibling(
   }
   return false;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// When web apps are added to sync on ChromeOS the value of
-// user_display_mode_default should be set in certain cases to avoid poor sync
-// install states on pre-M122 devices and non-CrOS devices with particular web
-// apps.
-// See switch for specific cases being mitigated against.
-// See go/udm-desync#bookmark=id.cg753kjyrruo for design doc.
-// TODO(crbug.com/320771282): Add automated tests.
-void ApplyUserDisplayModeSyncMitigations(const FinalizeJobOptions& options,
-                                         WebApp& web_app) {
-  if (FinalizeInstallOrUpdateJob::
-          DisableUserDisplayModeSyncMitigationsForTesting()) {
-    return;
-  }
-
-  // Guaranteed by EnsureAppsHaveUserDisplayModeForCurrentPlatform().
-  CHECK(web_app.sync_proto().has_user_display_mode_cros());
-
-  // Don't mitigate installations from sync, this is only for installs that will
-  // be newly uploaded to sync.
-  if (options.install_surface == webapps::WebappInstallSource::SYNC) {
-    return;
-  }
-
-  // Only mitigate if web app is being added to sync.
-  if (options.source != WebAppManagement::Type::kSync) {
-    return;
-  }
-
-  // Don't override existing default-platform value.
-  if (web_app.sync_proto().has_user_display_mode_default()) {
-    return;
-  }
-
-  sync_pb::WebAppSpecifics sync_proto = web_app.sync_proto();
-
-  switch (web_app.sync_proto().user_display_mode_cros()) {
-    case sync_pb::WebAppSpecifics_UserDisplayMode_BROWSER:
-      // Pre-M122 CrOS devices use the user_display_mode_default sync field
-      // instead of user_display_mode_cros. If user_display_mode_default is ever
-      // unset they will fallback to using kStandalone even if
-      // user_display_mode_cros is set to kBrowser. This mitigation ensures
-      // user_display_mode_default is set to kBrowser for these devices. Example
-      // user journey:
-      // - Install web app as browser shortcut on post-M122 CrOS device.
-      // - Sync installation to pre-M122 CrOS device.
-      // - Check that it is synced as a browser shortcut.
-      // TODO(crbug.com/321617981): Remove when there are sufficiently few
-      // pre-M122 CrOS devices in circulation.
-      web_app.UpdateDefaultUserDisplayModeInSyncProto(
-          sync_pb::WebAppSpecifics_UserDisplayMode_BROWSER);
-      break;
-
-    case sync_pb::WebAppSpecifics_UserDisplayMode_STANDALONE: {
-      // Ensure standalone averse apps don't get defaulted to kStandalone on
-      // non-CrOS devices via sync.
-      // Example user journey:
-      // - Install Google Docs as a standalone web app.
-      // - Sync installation to non-CrOS device.
-      // - Check that it is synced as a browser shortcut.
-      // TODO(crbug.com/321617972): Remove when Windows/Mac/Linux support for
-      // tabbed web apps is in sufficient circulation.
-      bool is_standalone_averse_app =
-          web_app.app_id() == ash::kGoogleDocsAppId ||
-          web_app.app_id() == ash::kGoogleSheetsAppId ||
-          web_app.app_id() == ash::kGoogleSlidesAppId;
-      if (!is_standalone_averse_app) {
-        break;
-      }
-      web_app.UpdateDefaultUserDisplayModeInSyncProto(
-          sync_pb::WebAppSpecifics_UserDisplayMode_BROWSER);
-      break;
-    }
-
-    case sync_pb::WebAppSpecifics_UserDisplayMode_TABBED:
-      // This can only be reached when kDesktopPWAsTabStripSettings is enabled,
-      // this is only for testing and is planned to be removed.
-      return;
-    case sync_pb::WebAppSpecifics_UserDisplayMode_UNSPECIFIED:
-      // Ignore unknown UserDisplayMode values.
-      return;
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 FinalizeInstallOrUpdateJob::FinalizeInstallOrUpdateJob(
     Profile& profile,
@@ -558,9 +469,6 @@ void FinalizeInstallOrUpdateJob::SetWebAppFieldsForInstall(
   if (options_.run_on_os_login_mode.has_value()) {
     web_app->SetRunOnOsLoginMode(options_.run_on_os_login_mode.value());
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  ApplyUserDisplayModeSyncMitigations(options_, *web_app);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   CHECK(HasCurrentPlatformUserDisplayMode(web_app->sync_proto()));
 
 #if BUILDFLAG(IS_MAC)
@@ -584,15 +492,6 @@ void FinalizeInstallOrUpdateJob::SetWebAppFieldsForInstall(
     cros_data->is_disabled = true;
     web_app->SetWebAppChromeOsData(std::move(cros_data));
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // `WebApp::system_web_app_data` has a default value already. Only override if
-  // the caller provided a new value.
-  if (options_.system_web_app_data.has_value()) {
-    web_app->client_data()->system_web_app_data =
-        options_.system_web_app_data.value();
-  }
-#endif
 
   web_app->SetParentAppId(web_app_info_.parent_app_id);
   web_app->SetAdditionalSearchTerms(web_app_info_.additional_search_terms);
@@ -801,14 +700,12 @@ void FinalizeInstallOrUpdateJob::OnDatabaseCommitCompleted(
 
   // OS integration should always be enabled on ChromeOS for manifest updates.
   bool should_skip_os_integration_on_manifest_update = false;
-#if !BUILDFLAG(IS_CHROMEOS)
   // If the app being updated was installed by default and not also manually
   // installed by the user or an enterprise policy, disable os integration.
   should_skip_os_integration_on_manifest_update =
       options_.is_silent_update &&
       registrar().GetInstallState(app_id_) ==
           proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   if (should_skip_os_integration_on_manifest_update) {
     OnHooksFinished();

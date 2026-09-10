@@ -49,11 +49,7 @@ TranslateUIDelegate::TranslateUIDelegate(
   MaybeSetContentLanguages();
 
   // Also start listening for changes in the accept languages.
-#if BUILDFLAG(IS_CHROMEOS)
-  const std::string& pref_name = language::prefs::kPreferredLanguages;
-#else
   const std::string& pref_name = language::prefs::kAcceptLanguages;
-#endif
 
   PrefService* pref_service = translate_manager->translate_client()->GetPrefs();
   pref_change_registrar_.Init(pref_service);

@@ -27,18 +27,10 @@ class ProfileTestingHelper {
   TestingProfile* guest_profile() { return guest_profile_; }
   Profile* guest_profile_otr() { return guest_profile_otr_; }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   TestingProfile* system_profile() { return system_profile_; }
   Profile* system_profile_otr() { return system_profile_otr_; }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  TestingProfile* signin_profile() { return signin_profile_; }
-  Profile* signin_profile_otr() { return signin_profile_otr_; }
-
-  TestingProfile* lockscreen_profile() { return lockscreen_profile_; }
-  Profile* lockscreen_profile_otr() { return lockscreen_profile_otr_; }
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
  private:
   content::BrowserTaskEnvironment task_environment_;
@@ -50,18 +42,10 @@ class ProfileTestingHelper {
   raw_ptr<TestingProfile, DanglingUntriaged> guest_profile_ = nullptr;
   raw_ptr<Profile, DanglingUntriaged> guest_profile_otr_ = nullptr;
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   raw_ptr<TestingProfile, DanglingUntriaged> system_profile_ = nullptr;
   raw_ptr<Profile, DanglingUntriaged> system_profile_otr_ = nullptr;
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  raw_ptr<TestingProfile, DanglingUntriaged> signin_profile_ = nullptr;
-  raw_ptr<Profile, DanglingUntriaged> signin_profile_otr_ = nullptr;
-
-  raw_ptr<TestingProfile, DanglingUntriaged> lockscreen_profile_ = nullptr;
-  raw_ptr<Profile, DanglingUntriaged> lockscreen_profile_otr_ = nullptr;
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 #endif  // CHROME_BROWSER_PROFILES_PROFILE_TESTING_HELPER_H_

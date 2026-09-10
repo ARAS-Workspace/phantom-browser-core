@@ -8,10 +8,6 @@
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace ttc {
 
 class AiOverlayDialogWebUIBrowserTest : public WebUIMochaBrowserTest {
@@ -24,9 +20,6 @@ class AiOverlayDialogWebUIBrowserTest : public WebUIMochaBrowserTest {
   void SetUp() override {
     scoped_feature_list_.InitWithFeatures(
         {
-#if BUILDFLAG(IS_CHROMEOS)
-            chromeos::features::kFeatureManagementGlic,
-#endif  // BUILDFLAG(IS_CHROMEOS)
             features::kAiOverlayDialog},
         {});
     WebUIMochaBrowserTest::SetUp();

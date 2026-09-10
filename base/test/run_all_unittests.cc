@@ -9,7 +9,7 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/process/set_process_title_linux.h"
 #endif
 
@@ -33,7 +33,7 @@ class BaseUnittestSuite : public TestSuite {
 }  // namespace base
 
 int main(int argc, char** argv) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // For setproctitle unit tests.
   setproctitle_init(const_cast<const char**>(argv));
 #endif

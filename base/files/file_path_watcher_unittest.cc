@@ -45,7 +45,7 @@
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/files/file_path_watcher_inotify.h"
 #include "base/format_macros.h"
 #endif
@@ -56,7 +56,7 @@ namespace {
 
 AtomicSequenceNumber g_next_delegate_id;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // inotify fires two events - one for each file creation + modification.
 constexpr size_t kExpectedEventsForNewFileWrite = 2;
 #else
@@ -164,7 +164,7 @@ inline constexpr auto IsType =
           testing::Field(&FilePathWatcher::ChangeInfo::change_type,
                          change_type));
     };
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 inline constexpr auto IsFile = [] {
   return testing::Field(
       &Event::change_info,
@@ -184,8 +184,7 @@ inline constexpr auto IsUnknownPathType = [] {
       testing::Field(&FilePathWatcher::ChangeInfo::file_path_type,
                      FilePathWatcher::FilePathType::kUnknown));
 };
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 // Enables an accumulative, add-as-you-go pattern for expecting events:
 //   - Do something that should fire `event1` on `delegate`
@@ -784,13 +783,12 @@ TEST_F(FilePathWatcherTest, DisappearingDirectory) {
 
   ASSERT_TRUE(DeletePathRecursively(dir));
   event_expecter.AddExpectedEventForPath(file);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // TODO(crbug.com/40263766): Figure out why this may fire two events on
   // inotify. Only the file is being watched, so presumably there should only be
   // one deletion event.
   event_expecter.AddExpectedEventForPath(file);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
@@ -950,13 +948,12 @@ TEST_F(FilePathWatcherTest, RecursiveWatch) {
   FilePath subdir2b(subdir.AppendASCII("subdir2b"));
   Move(subdir2, subdir2b);
   event_expecter.AddExpectedEventForPath(dir);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // inotify generates separate IN_MOVED_TO and IN_MOVED_FROM events for a
   // rename. Since both the source and destination are within the scope of this
   // watch, both events should be received.
   event_expecter.AddExpectedEventForPath(dir);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   delegate.RunUntilEventsMatch(event_expecter);
 
 // Mac and Win don't generate events for Touch.
@@ -1145,7 +1142,7 @@ TEST_F(FilePathWatcherTest, FileAttributesChanged) {
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 // Verify that creating a symlink is caught.
 TEST_F(FilePathWatcherTest, CreateLink) {
@@ -1558,9 +1555,9 @@ TEST_F(FilePathWatcherTest, InotifyLimitInUpdateRecursive) {
   }
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 TEST_F(FilePathWatcherTest, ReturnFullPath_RecursiveInRootFolder) {
   FilePathWatcher directory_watcher;
@@ -1770,8 +1767,7 @@ TEST_F(FilePathWatcherTest, ReturnWatchedPath_NonRecursiveInRootFolder) {
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -1931,7 +1927,7 @@ TEST_F(FilePathWatcherTest, TrivialDirMove) {
 
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/40263777): Ideally most all of the tests above would be
 // parameterized in this way.
 // TODO(crbug.com/40260973): ChangeInfo is currently only supported by
@@ -2932,7 +2928,6 @@ TEST_F(FilePathWatcherTest, UseDummyChangeInfoIfNotSupported) {
   delegate.RunUntilEventsMatch(matcher);
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 }  // namespace base

@@ -44,14 +44,6 @@ const char* const kNameserversIPv4[] = {
     "1.0.0.1",
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-const char* const kNameserversIPv6[] = {
-    nullptr,
-    "2001:DB8:0::42",
-    nullptr,
-    "::FFFF:129.144.52.38",
-};
-#endif
 
 void DummyConfigCallback(const DnsConfig& config) {
   // Do nothing
@@ -81,35 +73,9 @@ void InitializeResState(res_state res) {
     ++res->nscount;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Install IPv6 addresses, replacing the corresponding IPv4 addresses.
-  unsigned nscount6 = 0;
-  for (unsigned i = 0; i < std::size(kNameserversIPv6) && i < MAXNS; ++i) {
-    if (!UNSAFE_TODO(kNameserversIPv6[i])) {
-      continue;
-    }
-    // Must use malloc to mimick res_ninit.
-    struct sockaddr_in6 *sa6;
-    sa6 = (struct sockaddr_in6 *)malloc(sizeof(*sa6));
-    sa6->sin6_family = AF_INET6;
-    sa6->sin6_port = base::HostToNet16(NS_DEFAULTPORT - i);
-    UNSAFE_TODO(inet_pton(AF_INET6, kNameserversIPv6[i], &sa6->sin6_addr));
-    UNSAFE_TODO(res->_u._ext.nsaddrs[i]) = sa6;
-    UNSAFE_TODO(memset(&res->nsaddr_list[i], 0, sizeof res->nsaddr_list[i]));
-    ++nscount6;
-  }
-  res->_u._ext.nscount6 = nscount6;
-#endif
 }
 
 void CloseResState(res_state res) {
-#if BUILDFLAG(IS_CHROMEOS)
-  for (int i = 0; i < res->nscount; ++i) {
-    if (UNSAFE_TODO(res->_u._ext.nsaddrs[i]) != nullptr) {
-      free(UNSAFE_TODO(res->_u._ext.nsaddrs[i]));
-    }
-  }
-#endif
 }
 
 void InitializeExpectedConfig(DnsConfig* config) {
@@ -129,16 +95,6 @@ void InitializeExpectedConfig(DnsConfig* config) {
     config->nameservers.push_back(IPEndPoint(ip, NS_DEFAULTPORT + i));
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  for (unsigned i = 0; i < std::size(kNameserversIPv6) && i < MAXNS; ++i) {
-    if (!UNSAFE_TODO(kNameserversIPv6[i])) {
-      continue;
-    }
-    IPAddress ip;
-    EXPECT_TRUE(ip.AssignFromIPLiteral(UNSAFE_TODO(kNameserversIPv6[i])));
-    config->nameservers[i] = IPEndPoint(ip, NS_DEFAULTPORT - i);
-  }
-#endif
 }
 
 TEST(DnsConfigServicePosixTest, CreateAndDestroy) {

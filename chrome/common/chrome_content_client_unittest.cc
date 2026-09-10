@@ -51,9 +51,9 @@ TEST(ChromeContentClientTest, AdditionalSchemes) {
       "chrome://foo/",
       "chrome-untrusted://foo/",
       "chrome-search://foo/",
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       "isolated-app://foo/",
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       "chrome-extension://foo/",
 #endif

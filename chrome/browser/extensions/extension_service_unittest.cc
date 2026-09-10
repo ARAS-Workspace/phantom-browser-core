@@ -2109,7 +2109,6 @@ TEST_F(ExtensionServiceTest, UpdateIncognitoMode) {
   EXPECT_FALSE(util::IsIncognitoEnabled(id, profile()));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // This tests that the granted permissions preferences are correctly set for
 // pre-installed apps.
 TEST_F(ExtensionServiceTest, PreinstalledAppsGrantedPermissions) {
@@ -2146,7 +2145,6 @@ TEST_F(ExtensionServiceTest, PreinstalledAppsGrantedPermissions) {
   EXPECT_FALSE(known_perms->IsEmpty());
   EXPECT_EQ(expected_api_perms, known_perms->apis());
 }
-#endif
 
 // Tests that the extension is disabled when permissions are missing from
 // the extension's granted permissions preferences. (This simulates updating
@@ -4985,7 +4983,6 @@ TEST_F(ExtensionServiceTest, ExternalExtensionBecomesEnabledIfForceInstalled) {
   EXPECT_TRUE(prefs()->GetDisableReasons(kGoodCrx).empty());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // This tests if pre-installed extensions are installed correctly.
 TEST_F(ExtensionServiceTest, PreinstalledExtensionsInstall) {
   InitializeEmptyExtensionService();
@@ -5025,7 +5022,6 @@ TEST_F(ExtensionServiceTest, PreinstalledExtensionsInstall) {
   EXPECT_TRUE(extension->from_webstore());
   EXPECT_TRUE(extension->was_installed_by_default());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Tests disabling extensions
 TEST_F(ExtensionServiceTest, DisableExtension) {
@@ -5985,7 +5981,7 @@ TEST_F(ExtensionServiceTest, WillNotLoadFromCommandLineForESBUsers) {
 
 // Tests --load-extension works for non-ESB users.
 // --load-extension was disabled in https://crbug.com/401529219
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #define MAYBE_LoadsFromCommandLineForNonESBUsers DISABLED_LoadsFromCommandLineForNonESBUsers
 #else
 #define MAYBE_LoadsFromCommandLineForNonESBUsers LoadsFromCommandLineForNonESBUsers
@@ -6039,7 +6035,7 @@ TEST_F(ExtensionServiceTest,
 // policy ExtensionInstallTypeBlocklist not containing "command_line" (default
 // value)
 // --load-extension was disabled in https://crbug.com/401529219
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #define MAYBE_LoadsFromCommandLineForUsersWithoutPolicy DISABLED_LoadsFromCommandLineForUsersWithoutPolicy
 #else
 #define MAYBE_LoadsFromCommandLineForUsersWithoutPolicy LoadsFromCommandLineForUsersWithoutPolicy

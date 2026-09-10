@@ -127,16 +127,12 @@ GetUpdateShortcutsForAllAppsCallback() {
 OsIntegrationManager::ScopedSuppressForTesting::ScopedSuppressForTesting() {
 // Creating OS hooks on ChromeOS doesn't write files to disk, so it's
 // unnecessary to suppress and it provides better crash coverage.
-#if !BUILDFLAG(IS_CHROMEOS)
   GetSuppressCount().Increment();
-#endif
 }
 
 OsIntegrationManager::ScopedSuppressForTesting::~ScopedSuppressForTesting() {
-#if !BUILDFLAG(IS_CHROMEOS)
   CHECK(!GetSuppressCount().IsZero());
   GetSuppressCount().Decrement();
-#endif
 }
 
 // static
@@ -261,7 +257,6 @@ void OsIntegrationManager::Synchronize(
     return;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   if (KeepAliveRegistry::GetInstance()->IsShuttingDown()) {
     LOG(ERROR)
         << "Can't perform OS integration while the browser is shutting down.";
@@ -286,11 +281,6 @@ void OsIntegrationManager::Synchronize(
           base::DoNothingWithBoundArgs(std::move(profile_keep_alive),
                                        std::move(browser_keep_alive)))
           .Then(std::move(callback));
-#else
-  // TODO(crbug.com/394384898): Do this for ChromeOS too once it
-  // doesn't break browser tests using InstallSystemAppsForTesting.
-  auto end_keep_alive_then_run_callback = std::move(callback);
-#endif
 
   std::unique_ptr<proto::os_state::WebAppOsIntegration> desired_states =
       std::make_unique<proto::os_state::WebAppOsIntegration>();

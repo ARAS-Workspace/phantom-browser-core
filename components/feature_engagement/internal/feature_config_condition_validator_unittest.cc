@@ -125,22 +125,12 @@ class TestConfiguration : public Configuration {
   const std::vector<std::string> GetRegisteredGroups() const override {
     return std::vector<std::string>();
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  void UpdateConfig(const base::Feature& feature,
-                    const ConfigurationProvider* provider) override {}
-  const EventPrefixSet& GetRegisteredAllowedEventPrefixes() const override {
-    return event_prefixes_;
-  }
-#endif
 
  private:
   FeatureConfig config_;
   GroupConfig group_config_;
   Configuration::ConfigMap map_;
   Configuration::GroupConfigMap group_map_;
-#if BUILDFLAG(IS_CHROMEOS)
-  Configuration::EventPrefixSet event_prefixes_;
-#endif
 };
 
 class TestEventModel : public EventModel {

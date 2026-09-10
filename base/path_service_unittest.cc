@@ -58,7 +58,7 @@ bool ReturnsValidPath(int key) {
     check_path_exists = false;
   }
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // On the linux try-bots: a path is returned (e.g. /home/chrome-bot/Desktop),
   // but it doesn't exist.
   if (key == DIR_USER_DESKTOP) {

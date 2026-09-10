@@ -25,22 +25,10 @@ TEST_F(ProviderStateServiceFactoryTest, PrefEnabledReturnsValidService) {
   EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
       profile_testing_helper_.guest_profile_otr()));
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
       profile_testing_helper_.system_profile()));
   EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
       profile_testing_helper_.system_profile_otr()));
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
-      profile_testing_helper_.signin_profile()));
-  EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
-      profile_testing_helper_.signin_profile_otr()));
-
-  EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
-      profile_testing_helper_.lockscreen_profile()));
-  EXPECT_FALSE(ProviderStateServiceFactory::GetForProfile(
-      profile_testing_helper_.lockscreen_profile_otr()));
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 }

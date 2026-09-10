@@ -28,17 +28,6 @@ DataTypeSet UserSelectableTypesToDataTypes(
   return preferred_types;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-DataTypeSet UserSelectableOsTypesToDataTypes(
-    UserSelectableOsTypeSet selected_types) {
-  DataTypeSet preferred_types;
-  for (UserSelectableOsType type : selected_types) {
-    preferred_types.PutAll(UserSelectableOsTypeToAllDataTypes(type));
-  }
-  return preferred_types;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TestSyncUserSettings::TestSyncUserSettings(TestSyncService* service)
     : service_(service) {}
 
@@ -128,9 +117,6 @@ DataTypeSet TestSyncUserSettings::GetPreferredDataTypes() const {
   DataTypeSet types = UserSelectableTypesToDataTypes(GetSelectedTypes());
   types.PutAll(AlwaysPreferredUserTypes());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  types.PutAll(UserSelectableOsTypesToDataTypes(GetSelectedOsTypes()));
-#endif
   types.PutAll(ControlTypes());
   if (service_->IsLocalSyncEnabled()) {
     types.RetainAll(LocalSyncSupportedTypes());
@@ -142,57 +128,6 @@ UserSelectableTypeSet TestSyncUserSettings::GetRegisteredSelectableTypes()
     const {
   return registered_selectable_types_;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool TestSyncUserSettings::IsSyncFeatureDisabledViaDashboard() const {
-  return sync_feature_disabled_via_dashboard_;
-}
-
-void TestSyncUserSettings::ClearSyncFeatureDisabledViaDashboard() {
-  sync_feature_disabled_via_dashboard_ = false;
-}
-
-void TestSyncUserSettings::SetSyncFeatureDisabledViaDashboard() {
-  sync_feature_disabled_via_dashboard_ = true;
-}
-
-bool TestSyncUserSettings::IsSyncAllOsTypesEnabled() const {
-  return sync_all_os_types_enabled_;
-}
-
-UserSelectableOsTypeSet TestSyncUserSettings::GetSelectedOsTypes() const {
-  return selected_os_types_;
-}
-
-bool TestSyncUserSettings::IsOsTypeManagedByPolicy(
-    UserSelectableOsType type) const {
-  return managed_os_types_.Has(type);
-}
-
-void TestSyncUserSettings::SetSelectedOsTypes(bool sync_all_os_types,
-                                              UserSelectableOsTypeSet types) {
-  sync_all_os_types_enabled_ = sync_all_os_types;
-
-  UserSelectableOsTypeSet selected_os_types;
-
-  if (sync_all_os_types_enabled_) {
-    for (UserSelectableOsType type : UserSelectableOsTypeSet::All()) {
-      selected_os_types.Put(type);
-    }
-  } else {
-    for (UserSelectableOsType type : types) {
-      selected_os_types.Put(type);
-    }
-  }
-
-  selected_os_types_ = selected_os_types;
-}
-
-UserSelectableOsTypeSet TestSyncUserSettings::GetRegisteredSelectableOsTypes()
-    const {
-  return UserSelectableOsTypeSet::All();
-}
-#endif
 
 bool TestSyncUserSettings::IsCustomPassphraseAllowed() const {
   return custom_passphrase_allowed_;
@@ -299,17 +234,6 @@ void TestSyncUserSettings::SetTypeIsManagedByCustodian(UserSelectableType type,
     managed_by_custodian_types_.Remove(type);
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void TestSyncUserSettings::SetOsTypeIsManaged(UserSelectableOsType type,
-                                              bool managed) {
-  if (managed) {
-    managed_os_types_.Put(type);
-  } else {
-    managed_os_types_.Remove(type);
-  }
-}
-#endif
 
 void TestSyncUserSettings::SetPassphraseRequired() {
   SetPassphraseRequired(kDefaultPassphrase);

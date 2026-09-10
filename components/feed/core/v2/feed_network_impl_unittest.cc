@@ -318,7 +318,6 @@ TEST_F(FeedNetworkTest, SendQueryRequestSendsValidRequest) {
 // These tests need ClearPrimaryAccount() which isn't supported by ChromeOS.
 // RevokeSyncConsent() sometimes clears the account rather than just changing
 // the consent level so we may as well sign out and sign back in ourselves.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(FeedNetworkTest, SendQueryRequestPersonalized_AccountSignin) {
   // Request should be signed in if account consent level is kSignin.
   identity_env()->ClearPrimaryAccount();
@@ -347,8 +346,6 @@ TEST_F(FeedNetworkTest, SendQueryRequestPersonalized_AccountSignin) {
   histogram().ExpectBucketCount(
       "ContentSuggestions.Feed.Network.ResponseStatus.FeedQuery", 200, 1);
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(FeedNetworkTest, SendQueryRequestPersonalized_AccountSync) {
   // Request should be signed in if account consent level is kSync.
@@ -635,7 +632,6 @@ TEST_F(FeedNetworkTest, ShouldIncludeAPIKeyForAuthError) {
 
 // Disabled for chromeos, which doesn't allow for there not to be a signed in
 // user.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(FeedNetworkTest, ShouldIncludeAPIKeyForNoSignedInUser) {
   identity_env()->ClearPrimaryAccount();
   CallbackReceiver<QueryRequestResult> receiver;
@@ -649,7 +645,6 @@ TEST_F(FeedNetworkTest, ShouldIncludeAPIKeyForNoSignedInUser) {
   EXPECT_THAT(resource_request.url.spec(),
               testing::HasSubstr("key=dummy_api_key"));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(FeedNetworkTest, TestDurationHistogram) {
   base::HistogramTester histogram_tester;

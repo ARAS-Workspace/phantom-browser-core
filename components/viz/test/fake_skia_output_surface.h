@@ -166,20 +166,6 @@ class FakeSkiaOutputSurface : public SkiaOutputSurface {
     return delegated_ink_renderer_receiver_arrived_;
   }
 
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-  void DetileOverlay(gpu::Mailbox input,
-                     const gfx::Size& input_visible_size,
-                     gpu::SyncToken input_sync_token,
-                     gpu::Mailbox output,
-                     const gfx::RectF& display_rect,
-                     const gfx::RectF& crop_rect,
-                     gfx::OverlayTransform transform,
-                     bool is_10bit) override {}
-
-  void CleanupImageProcessor() override {}
-#endif
-
  protected:
   explicit FakeSkiaOutputSurface(
       scoped_refptr<ContextProvider> context_provider);

@@ -495,12 +495,6 @@ class EchoCancellationContainer {
     // TODO(crbug.com/1481032): Consider extending to other platforms. It is not
     // known at the moment what OSes support this behavior.
     const bool is_aec_reconfiguration_supported =
-#if BUILDFLAG(IS_CHROMEOS)
-        // ChromeOS is currently the only platform where we have confirmed
-        // support for simultaneous streams with and without hardware AEC on the
-        // same device.
-        true;
-#else
         // Allowing it when the system echo cancellation is enforced via flag,
         // for evaluation purposes.
         media::IsSystemEchoCancellationEnforced() ||
@@ -509,7 +503,6 @@ class EchoCancellationContainer {
          !EchoCanceller::From(source_info->properties(),
                               device_parameters.effects())
               .IsPlatformProvided());
-#endif
     if (is_full_reconfiguration_allowed && is_aec_reconfiguration_supported) {
       return;
     }
@@ -833,10 +826,8 @@ class ProcessingBasedContainer {
       const media::AudioParameters& device_parameters,
       bool is_full_reconfiguration_allowed) {
     BoolSet voice_isolation_set;
-#if !BUILDFLAG(IS_CHROMEOS)
     // Voice Isolation is only supported on ChromeOS.
     voice_isolation_set = BoolSet({false});
-#endif
     return ProcessingBasedContainer(
         ProcessingType::kNoApmProcessed, {EchoCancellationMode::kDisabled},
         /*auto_gain_control_set=*/BoolSet({false}),
@@ -1515,7 +1506,7 @@ Vector<EchoCancellationMode> GetSupportedEchoCancellationModes(
 }
 
 bool IsVoiceIsolationSupported() {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
+#if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
   return true;
 #else
   return false;

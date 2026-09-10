@@ -34,7 +34,7 @@
 
 namespace {
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC)
 // Test dimensions for resizing the browser window.
 constexpr int kResizeWindowX = 10;
 constexpr int kResizeWindowY = 10;
@@ -48,23 +48,7 @@ gfx::Size GetExpectedClientViewSize(
     views::Widget* widget,
     web_modal::WebContentsModalDialogHost* dialog_host,
     const gfx::Size& preferred_size) {
-#if BUILDFLAG(IS_CHROMEOS)
-  views::Widget* host_widget =
-      views::Widget::GetWidgetForNativeView(dialog_host->GetHostView());
-  gfx::Size max_size = host_widget->GetWindowBoundsInScreen().size();
-
-  gfx::Insets insets = widget->non_client_view()->frame_view()->GetInsets();
-
-  gfx::Size expected_widget_size = preferred_size;
-  expected_widget_size.Enlarge(insets.width(), insets.height());
-  expected_widget_size.SetToMin(max_size);
-
-  gfx::Size expected_client_size = expected_widget_size;
-  expected_client_size.Enlarge(-insets.width(), -insets.height());
-  return expected_client_size;
-#else
   return preferred_size;
-#endif
 }
 
 // Helper class to wait until a `View` is destroyed/deleting.
@@ -218,7 +202,7 @@ TEST_F(DrivePickerHostControllerTest, PickerCoversBrowserContents) {
   EXPECT_EQ(picker_view()->bounds().size(), expected_size);
 }
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC)
 TEST_F(DrivePickerHostControllerTest, PickerResizesWithWindow) {
   ShowDrivePickerHost();
 

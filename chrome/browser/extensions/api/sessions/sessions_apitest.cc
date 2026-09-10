@@ -66,10 +66,6 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "ui/base/base_window.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/callback_android.h"
 #include "base/android/jni_android.h"
@@ -262,9 +258,6 @@ ExtensionSessionsTest::ExtensionSessionsTest() {
 
 void ExtensionSessionsTest::SetUpCommandLine(base::CommandLine* command_line) {
   ExtensionBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_CHROMEOS)
-  command_line->AppendSwitch(ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
 }
 
 void ExtensionSessionsTest::SetUpOnMainThread() {

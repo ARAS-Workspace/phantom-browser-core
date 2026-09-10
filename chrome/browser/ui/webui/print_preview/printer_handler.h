@@ -48,12 +48,6 @@ class PrinterHandler {
   using PrintCallback = base::OnceCallback<void(const base::Value& error)>;
   using GetPrinterInfoCallback =
       base::OnceCallback<void(const base::DictValue& printer_info)>;
-#if BUILDFLAG(IS_CHROMEOS)
-  using GetEulaUrlCallback =
-      base::OnceCallback<void(const std::string& license)>;
-  using PrinterStatusRequestCallback = base::OnceCallback<void(
-      std::optional<base::DictValue> cups_printer_status)>;
-#endif
 
   // Creates an instance of a PrinterHandler for extension printers.
   static std::unique_ptr<PrinterHandler> CreateForExtensionPrinters(
@@ -110,19 +104,6 @@ class PrinterHandler {
                           scoped_refptr<base::RefCountedMemory> print_data,
                           PrintCallback callback) = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Starts getting the printer's PPD EULA URL with the provided destination ID.
-  // |destination_id|: The ID of the printer.
-  // |callback| should be called in response to the request.
-  virtual void StartGetEulaUrl(const std::string& destination_id,
-                               GetEulaUrlCallback callback);
-
-  // Initiates a status request for specified printer.
-  // |printer_id|: Printer id.
-  // |callback|: should be called in response to the request.
-  virtual void StartPrinterStatusRequest(const std::string& printer_id,
-                                         PrinterStatusRequestCallback callback);
-#endif
 };
 
 }  // namespace printing

@@ -39,12 +39,7 @@ BASE_FEATURE(kTracingServiceInProcess,
 // This feature is enabled by default on WebView using
 // `variations::FeatureOverrides` since we can't have #ifdef for WebView only.
 BASE_FEATURE(kEnablePerfettoSystemTracing,
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(crbug.com/42050521): Read from structured config on Fuchsia.
-    base::FEATURE_ENABLED_BY_DEFAULT
-#else
     base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 BASE_FEATURE(kEnablePerfettoSystemBackgroundTracing,

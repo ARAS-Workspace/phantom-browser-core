@@ -18,10 +18,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/views/test/views_test_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/shell.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/test/test_browser_dialog_mac.h"
 #endif
@@ -218,11 +214,7 @@ std::string TestBrowserDialog::GetNonDialogName() {
 
 void TestBrowserDialog::UpdateWidgets() {
   widgets_.clear();
-#if BUILDFLAG(IS_CHROMEOS)
-  for (aura::Window* root_window : ash::Shell::GetAllRootWindows()) {
-    widgets_.merge(views::Widget::GetAllChildWidgets(root_window));
-  }
-#elif defined(TOOLKIT_VIEWS)
+#if defined(TOOLKIT_VIEWS)
   widgets_ = views::test::WidgetTest::GetAllWidgets();
 #else
   NOTIMPLEMENTED();

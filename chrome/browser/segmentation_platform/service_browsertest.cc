@@ -594,7 +594,7 @@ class SegmentationPlatformUkmModelTest : public SegmentationPlatformTest {
 // deleted at startup before adding metrics.
 // https://crbug.com/40276817 -- Flaky on Mac
 // https://crbug.com/40200835 -- Tests using "PRE_" don't work on Android.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_PRE_RunUkmBasedModel DISABLED_PRE_RunUkmBasedModel
 #define MAYBE_RunUkmBasedModel DISABLED_RunUkmBasedModel
 #else

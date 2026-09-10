@@ -127,11 +127,7 @@ IN_PROC_BROWSER_TEST_F(AutocompleteBrowserTest, Basic) {
 
 // Autocomplete test is flaky on ChromeOS.
 // http://crbug.com/41200172
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_Autocomplete DISABLED_Autocomplete
-#else
 #define MAYBE_Autocomplete Autocomplete
-#endif
 
 IN_PROC_BROWSER_TEST_F(AutocompleteBrowserTest, MAYBE_Autocomplete) {
   WaitForTemplateURLServiceToLoad();

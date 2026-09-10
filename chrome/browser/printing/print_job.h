@@ -21,10 +21,6 @@
 #include "content/public/browser/global_routing_id.h"
 #include "printing/print_settings.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <string>
-#endif
-
 namespace base {
 class Location;
 class RefCountedMemory;
@@ -58,19 +54,6 @@ class PrintJob : public base::RefCountedThreadSafe<PrintJob> {
     virtual void OnFailed() {}
     virtual void OnDestruction() {}
   };
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // An enumeration of components where print jobs can come from. The order of
-  // these enums must match that of
-  // chrome/browser/ash/printing/history/print_job_info.proto.
-  enum class Source {
-    kPrintPreview,
-    kArc,
-    kExtension,
-    kPrintPreviewIncognito,
-    kIsolatedWebApp,
-  };
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Create a empty PrintJob. When initializing with this constructor,
   // post-constructor initialization must be done with Initialize().
@@ -132,25 +115,6 @@ class PrintJob : public base::RefCountedThreadSafe<PrintJob> {
 
   // Access stored settings.
   const PrintSettings& settings() const;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Sets the component which initiated the print job.
-  void SetSource(Source source, const std::string& source_id);
-
-  // Returns the source of print job.
-  Source source() const;
-
-  // Returns the ID of the source.
-  const std::string& source_id() const;
-
-  const base::ObserverList<
-      Observer,
-      /*check_empty=*/false,
-      base::ObserverListReentrancyPolicy::kAllowReentrancyUntriaged>&
-  GetObserversForTesting() {
-    return observers_;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Posts the given task to be run.
   bool PostTask(const base::Location& from_here, base::OnceClosure task);
@@ -226,15 +190,6 @@ class PrintJob : public base::RefCountedThreadSafe<PrintJob> {
   // Is Canceling? If so, try to not cause recursion if on FAILED notification,
   // the notified calls Cancel() again.
   bool is_canceling_ = false;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // The component which initiated the print job.
-  Source source_;
-
-  // ID of the source.
-  // This should be blank if the source is kPrintPreview or kArc.
-  std::string source_id_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Holds the quit closure while running a nested RunLoop to flush tasks.
   base::OnceClosure quit_closure_;

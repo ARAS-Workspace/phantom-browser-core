@@ -31,11 +31,6 @@
 #include "extensions/common/manifest_handlers/background_info.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif
-
 namespace extensions {
 
 namespace {
@@ -112,17 +107,6 @@ class UpdateInstallGateTest : public testing::Test {
     ASSERT_TRUE(profile_manager_->SetUp());
 
     const char kUserProfile[] = "profile1@example.com";
-#if BUILDFLAG(IS_CHROMEOS)
-    const AccountId account_id(AccountId::FromUserEmail(kUserProfile));
-    // Needed to allow ChromeProcessManagerDelegate to allow background pages.
-    fake_user_manager_ = new ash::FakeChromeUserManager();
-    // Takes ownership of fake_user_manager_.
-    scoped_user_manager_enabler_ =
-        std::make_unique<user_manager::ScopedUserManager>(
-            base::WrapUnique(fake_user_manager_.get()));
-    fake_user_manager_->AddUser(account_id);
-    fake_user_manager_->LoginUser(account_id);
-#endif
     profile_ = profile_manager_->CreateTestingProfile(kUserProfile);
     render_process_host_ =
         std::make_unique<content::MockRenderProcessHost>(profile_);
@@ -224,13 +208,6 @@ class UpdateInstallGateTest : public testing::Test {
   raw_ptr<ExtensionService, DanglingUntriaged> service_ = nullptr;
   raw_ptr<ExtensionRegistry, DanglingUntriaged> registry_ = nullptr;
   raw_ptr<EventRouter, DanglingUntriaged> event_router_ = nullptr;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Needed for creating ExtensionService.
-  raw_ptr<ash::FakeChromeUserManager, DanglingUntriaged> fake_user_manager_ =
-      nullptr;
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_enabler_;
-#endif
 
   std::unique_ptr<UpdateInstallGate> delayer_;
 

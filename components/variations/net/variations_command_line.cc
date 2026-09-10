@@ -24,13 +24,10 @@
 #include "components/variations/net/variations_command_line.h"
 #include "components/variations/variations_switches.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "base/check_is_test.h"
 #include "crypto/hpke.h"
 #include "crypto/keypair.h"
-#endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Prod key for feedback encryption.
 // To debug the workflow with a dev key, or replace the prod key, please see
 // google3/analysis/uma/tools/extract_public_key.py for more information.
@@ -38,7 +35,6 @@ const auto kFeedbackEncryptionPublicKey = std::to_array<uint8_t>(
     {0x21, 0x4f, 0x93, 0x34, 0x1f, 0x3a, 0xf8, 0xcb, 0x90, 0xd8, 0x13,
      0x4c, 0x42, 0x74, 0x77, 0x81, 0x1b, 0x68, 0x1e, 0xe8, 0xc3, 0x49,
      0x8b, 0x68, 0x10, 0x56, 0xb0, 0xf8, 0xc0, 0xd2, 0x61, 0x01});
-#endif
 
 // Exits the browser with a helpful error message.
 void ExitWithMessage(const std::string& message) {
@@ -48,9 +44,7 @@ void ExitWithMessage(const std::string& message) {
 
 namespace variations {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 BASE_FEATURE(kFeedbackIncludeVariations, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 void MaybeUnpackVariationsStateFile() {
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
@@ -122,7 +116,6 @@ std::string GetStringFromDict(const base::DictValue& dict,
   return s ? *s : std::string();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Encrypt `plaintext` with the `public_key` and save the result to
 // `ciphertext`. Also if `enc_len` is not null, update the length of enc
 // which is stored in `ciphertext`.
@@ -146,7 +139,6 @@ VariationsStateEncryptionStatus EncryptStringWithPublicKey(
   *ciphertext = *sealed;
   return VariationsStateEncryptionStatus::kSuccess;
 }
-#endif
 
 }  // namespace
 
@@ -276,7 +268,6 @@ bool VariationsCommandLine::WriteToString(std::string* serialized_json) const {
   return serializer.Serialize(dict);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 VariationsStateEncryptionStatus VariationsCommandLine::EncryptToString(
     std::vector<uint8_t>* ciphertext) const {
   std::optional<crypto::keypair::PublicKey> key =
@@ -292,6 +283,5 @@ VariationsCommandLine::EncryptToStringForTesting(
   CHECK_IS_TEST();
   return EncryptStringWithPublicKey(ToString(), ciphertext, public_key);
 }
-#endif
 
 }  // namespace variations

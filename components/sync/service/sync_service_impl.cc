@@ -352,21 +352,6 @@ void SyncServiceImpl::Initialize(DataTypeController::TypeVector controllers) {
   // crash during signout).
   if (HasDisableReason(DISABLE_REASON_ENTERPRISE_POLICY)) {
     StopAndClear(ResetEngineReason::kEnterprisePolicy);
-#if BUILDFLAG(IS_CHROMEOS)
-    // Disable OS data types to avoid automatic local data upload upon policy
-    // removal, as OS data types do not support dual storage with UNO.
-    if (!HasSyncConsent() && IsReplaceSyncPromosWithSignInPromosEnabled()) {
-      user_settings_->SetSelectedOsTypes(/*sync_all_os_types=*/false,
-                                         UserSelectableOsTypeSet());
-    } else {
-      // On ChromeOS Ash, sync-the-feature stays disabled even after the policy
-      // is removed, for historic reasons. It is unclear if this behavior is
-      // optional, because it is indistinguishable from the
-      // sync-reset-via-dashboard case. It can be resolved by invoking
-      // ClearSyncFeatureDisabledViaDashboard().
-      user_settings_->SetSyncFeatureDisabledViaDashboard();
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   } else if (HasDisableReason(DISABLE_REASON_NOT_SIGNED_IN)) {
     // On ChromeOS-Ash, signout is not possible, so it's not necessary to handle
     // this case.
@@ -374,20 +359,12 @@ void SyncServiceImpl::Initialize(DataTypeController::TypeVector controllers) {
     // ChromeOS-Ash since it's supposedly unreachable, *but* during the very
     // first startup of a fresh profile, the signed-in account isn't known yet
     // at this point (see also https://crbug.com/1458701#c7).
-#if !BUILDFLAG(IS_CHROMEOS)
     StopAndClear(ResetEngineReason::kNotSignedIn);
-#endif
   }
 
   const bool is_sync_feature_requested_for_metrics =
       IsLocalSyncEnabled() ||
-#if BUILDFLAG(IS_CHROMEOS)
-      (!user_settings_->IsSyncFeatureDisabledViaDashboard() &&
-       (!base::FeatureList::IsEnabled(kReplaceSyncPromosWithSignInPromos) ||
-        HasSyncConsent()));
-#else
       HasSyncConsent();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Note: We need to record the initial state *after* calling
   // RegisterForAuthNotifications(), because before that the authenticated
@@ -1165,14 +1142,6 @@ void SyncServiceImpl::OnActionableProtocolError(
       // should be okay.
       StopAndClear(ResetEngineReason::kDisableSyncOnClient);
 
-#if BUILDFLAG(IS_CHROMEOS)
-      // On Ash, the primary account is always set and sync the feature
-      // turned on, so a dedicated bit is needed to ensure that
-      // Sync-the-feature remains off. Note that sync-the-transport will restart
-      // immediately because IsEngineAllowedToRun() is almost certainly true at
-      // this point and StopAndClear() leads to TryStart().
-      user_settings_->SetSyncFeatureDisabledViaDashboard();
-#else  // !BUILDFLAG(IS_CHROMEOS)
       // On every platform except ash, revoke the Sync consent/Clear primary
       // account after a dashboard clear.
       // TODO(crbug.com/40066949): Simplify once kSync becomes unreachable or is
@@ -1213,7 +1182,6 @@ void SyncServiceImpl::OnActionableProtocolError(
             signin_metrics::ProfileSignout::kServerForcedDisable);
 #endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
       }
-#endif  // BUILDFLAG(IS_CHROMEOS)
       break;
     case STOP_SYNC_FOR_DISABLED_ACCOUNT:
       // Sync disabled by domain admin. Stop syncing until next restart.
@@ -1509,23 +1477,6 @@ CoreAccountInfo SyncServiceImpl::GetSyncAccountInfoForPrefs() const {
   return GetAccountInfo();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void SyncServiceImpl::OnSyncFeatureDisabledViaDashboardCleared() {
-  // If the Sync engine was already initialized (probably running in transport
-  // mode), just reconfigure.
-  if (engine_ && engine_->IsInitialized()) {
-    ConfigureDataTypeManager(ConfigureReason::kReconfiguration,
-                             /*bypass_setup_in_progress_check=*/false);
-  } else {
-    // Otherwise try to start up. Note that there might still be other disable
-    // reasons remaining, in which case this will effectively do nothing.
-    TryStart();
-  }
-
-  NotifyObservers();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 bool SyncServiceImpl::IsSetupInProgress() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return outstanding_setup_in_progress_handles_ > 0;
@@ -1817,17 +1768,6 @@ void SyncServiceImpl::ConfigureDataTypeManager(
       }
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    bool sync_everything_os = user_settings_->IsSyncAllOsTypesEnabled();
-    base::UmaHistogramBoolean("Sync.SyncEverythingOS", sync_everything_os);
-    if (!sync_everything_os) {
-      for (UserSelectableOsType type : user_settings_->GetSelectedOsTypes()) {
-        DataTypeForHistograms canonical_data_type = DataTypeHistogramValue(
-            UserSelectableOsTypeToCanonicalDataType(type));
-        base::UmaHistogramEnumeration("Sync.CustomOSSync", canonical_data_type);
-      }
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   NotifyObservers();
@@ -1925,21 +1865,6 @@ void SyncServiceImpl::OnSyncClientDisabledByPolicyChanged() {
 
   if (user_settings_->IsSyncClientDisabledByPolicy()) {
     StopAndClear(ResetEngineReason::kEnterprisePolicy);
-#if BUILDFLAG(IS_CHROMEOS)
-    // Disable OS data types to avoid automatic local data upload upon policy
-    // removal, as OS data types do not support dual storage with UNO.
-    if (!HasSyncConsent() && IsReplaceSyncPromosWithSignInPromosEnabled()) {
-      user_settings_->SetSelectedOsTypes(/*sync_all_os_types=*/false,
-                                         UserSelectableOsTypeSet());
-    } else {
-      // On ChromeOS Ash, sync-the-feature stays disabled even after the policy
-      // is removed, for historic reasons. It is unclear if this behavior is
-      // optional, because it is indistinguishable from the
-      // sync-reset-via-dashboard case. It can be resolved by invoking
-      // ClearSyncFeatureDisabledViaDashboard().
-      user_settings_->SetSyncFeatureDisabledViaDashboard();
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   } else {
     // Sync is no longer disabled by policy. Try starting it up if appropriate.
     DCHECK(!engine_);
@@ -1949,12 +1874,10 @@ void SyncServiceImpl::OnSyncClientDisabledByPolicyChanged() {
   }
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void SyncServiceImpl::OnInitialSyncFeatureSetupCompleted() {
   ConfigureDataTypeManager(ConfigureReason::kReconfiguration,
                            /*bypass_setup_in_progress_check=*/false);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void SyncServiceImpl::OnAccountsCookieDeletedByUserAction() {
   // Pass an empty `signin::AccountsInCookieJarInfo` to simulate empty cookies.
@@ -2259,13 +2182,11 @@ void SyncServiceImpl::StopAndClear(ResetEngineReason reset_engine_reason) {
   // passphrase pref should be cleared before clearing
   // InitialSyncFeatureSetupComplete().
   sync_prefs_.ClearAllEncryptionBootstrapTokens();
-#if !BUILDFLAG(IS_CHROMEOS)
   // Note: ResetEngine() does *not* clear directly user-controlled prefs (such
   // as the set of selected types), so that if the user ever chooses to enable
   // Sync again, they start off with their previous settings by default.
   // However, they do have to go through the initial setup again.
   sync_prefs_.ClearInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   sync_prefs_.ClearPassphrasePromptMutedProductVersion();
   // Cached information provided by SyncEngine must be cleared.
   sync_prefs_.ClearCachedPassphraseType();

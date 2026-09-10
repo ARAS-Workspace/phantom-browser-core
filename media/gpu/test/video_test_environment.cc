@@ -52,11 +52,11 @@ VideoTestEnvironment::VideoTestEnvironment(
     task_environment_ = std::make_unique<base::test::TaskEnvironment>(
 // Not sure why on CrOS this needs to be UI thread type? On Windows we use
 // the default type.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
         base::test::TaskEnvironment::MainThreadType::UI
 #else
         base::test::TaskEnvironment::MainThreadType::DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
     );
 
     at_exit_manager_ = std::make_unique<base::AtExitManager>();

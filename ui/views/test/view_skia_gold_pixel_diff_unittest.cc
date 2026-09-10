@@ -101,11 +101,7 @@ TEST_F(ViewSkiaGoldPixelDiffTest, CompareScreenshotByView) {
   views::Widget* widget = CreateTopLevelNativeWidget();
   views::View* child_view = AddChildViewToWidget(widget);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  constexpr char kPrefix[] = "Prefix.Demo.";
-#else
   constexpr char kPrefix[] = "Prefix_Demo_";
-#endif
   EXPECT_CALL(
       mock_launch_process(),
       Call(ResultOf(

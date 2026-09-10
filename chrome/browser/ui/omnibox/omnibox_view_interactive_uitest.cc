@@ -532,7 +532,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewTest, DISABLED_BrowserAccelerators) {
   ASSERT_NO_FATAL_FAILURE(SendKey(ui::VKEY_X, kCtrlOrCmdMask));
   EXPECT_EQ(u"Hello ", omnibox_view->GetText());
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   // Try alt-f4 to close the browser.
   ExpectBrowserClosed(browser(), ui::VKEY_F4, ui::EF_ALT_DOWN);
 #endif
@@ -569,7 +569,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewTest, PopupAccelerators) {
   EXPECT_EQ(u"Hello world", omnibox_view->GetText());
   EXPECT_TRUE(omnibox_view->IsSelectAll());
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   // Try alt-f4 to close the popup.
   ExpectBrowserClosed(popup, ui::VKEY_F4, ui::EF_ALT_DOWN);
 #endif

@@ -1110,11 +1110,7 @@ TEST_F(RootViewTest, AnnounceTextAsTest) {
   hidden_alert_view->GetViewAccessibility().GetAccessibleNodeData(&node_data);
   EXPECT_EQ(kAlertText,
             node_data.GetString16Attribute(ax::mojom::StringAttribute::kName));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(node_data.role, ax::mojom::Role::kStaticText);
-#else
   EXPECT_EQ(node_data.role, ax::mojom::Role::kAlert);
-#endif
   EXPECT_TRUE(node_data.HasState(ax::mojom::State::kInvisible));
 
   const std::u16string kPoliteText = u"Something polite";
@@ -1131,11 +1127,7 @@ TEST_F(RootViewTest, AnnounceTextAsTest) {
       ax::mojom::StringAttribute::kContainerLiveStatus);
   EXPECT_EQ("polite", val);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(node_data.role, ax::mojom::Role::kStaticText);
-#else
   EXPECT_EQ(node_data.role, ax::mojom::Role::kStatus);
-#endif
 
   EXPECT_TRUE(
       node_data.GetBoolAttribute(ax::mojom::BoolAttribute::kLiveAtomic));
@@ -1332,11 +1324,7 @@ TEST_F(RootViewTest, AnnounceTextAsPolite_SetsLiveRegionAttributes) {
 
   ui::AXNodeData data;
   announce_view->GetViewAccessibility().GetAccessibleNodeData(&data);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(data.role, ax::mojom::Role::kStaticText);
-#else
   EXPECT_EQ(data.role, ax::mojom::Role::kStatus);
-#endif
   EXPECT_EQ(data.GetString16Attribute(ax::mojom::StringAttribute::kName),
             u"Polite announcement");
   EXPECT_EQ(
@@ -1387,11 +1375,7 @@ TEST_F(RootViewTest, AnnounceTextAsAlert_SetsAlertRole) {
 
 // ChromeOS uses kStaticText; other platforms use kAlert for alert
 // announcements.
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(data.role, ax::mojom::Role::kStaticText);
-#else
   EXPECT_EQ(data.role, ax::mojom::Role::kAlert);
-#endif
 
   EXPECT_EQ(data.GetString16Attribute(ax::mojom::StringAttribute::kName),
             u"Alert announcement");

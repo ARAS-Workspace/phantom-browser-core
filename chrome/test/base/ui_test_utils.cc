@@ -97,15 +97,6 @@
 #include "ui/views/test/views_test_utils.h"
 #include "ui/views/test/widget_activation_waiter.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/multi_user/multi_user_window_manager.h"
-#include "ash/shell.h"
-#include "base/check_is_test.h"
-#include "chrome/browser/ui/ash/multi_user/multi_user_util.h"
-#include "components/account_id/account_id.h"
-#include "ui/base/base_window.h"
-#endif
-
 #if defined(TOOLKIT_VIEWS)
 #include "ui/views/test/widget_test_api.h"
 #include "ui/views/view.h"
@@ -223,28 +214,6 @@ class WebContentsDestructionObserver : public content::WebContentsObserver {
 // platforms this is always true.
 bool IsBrowserShownForProfile(BrowserWindowInterface& browser,
                               const Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Get the profile on which the window is currently shown.
-  // ash::Shell might be NULL under test scenario.
-  // TODO(crbug.com/427889779): Consider to drop this check.
-  if (ash::Shell::HasInstance()) {
-    ash::MultiUserWindowManager* const multi_user_window_manager =
-        ash::Shell::Get()->multi_user_window_manager();
-    const AccountId& shown_account_id =
-        multi_user_window_manager->GetUserPresentingWindow(
-            browser.GetWindow()->GetNativeWindow());
-    Profile* shown_profile =
-        shown_account_id.is_valid()
-            ? multi_user_util::GetProfileFromAccountId(shown_account_id)
-            : nullptr;
-    if (shown_profile &&
-        shown_profile->GetOriginalProfile() != profile->GetOriginalProfile()) {
-      return false;
-    }
-  } else {
-    CHECK_IS_TEST();
-  }
-#endif
   return true;
 }
 

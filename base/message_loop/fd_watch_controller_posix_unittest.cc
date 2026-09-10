@@ -19,7 +19,7 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include "base/message_loop/message_pump_epoll.h"
 #endif
 
@@ -38,7 +38,7 @@ class FdWatchControllerPosixTest : public testing::Test,
 
   // testing::Test interface.
   void SetUp() override {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
     features_.InitWithFeatureStates(
         {{kUsePollForMessagePumpEpoll, GetParam()}});
     MessagePumpEpoll::InitializeFeatures();

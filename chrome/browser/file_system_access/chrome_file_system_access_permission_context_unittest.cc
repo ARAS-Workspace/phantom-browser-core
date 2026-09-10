@@ -451,13 +451,7 @@ class ChromeFileSystemAccessPermissionContextTest : public testing::Test {
   // `base::ScopedPathOverride` of base::DIR_HOME.
   ScopedHomeDirOverride OverrideHomeDir(const base::FilePath& home_dir,
                                         bool should_skip_check = false) {
-#if BUILDFLAG(IS_CHROMEOS)
-    // ChromeOS has special logic to handle the base::DIR_HOME path key.
-    return ScopedHomeDirOverride(
-        permission_context_->OverrideProfilePathForTesting(home_dir));
-#else
     return ScopedHomeDirOverride(home_dir, should_skip_check);
-#endif
   }
 
  protected:
@@ -647,7 +641,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
       IsOpenAbort(app_data_dir.AppendASCII("foo"), HandleType::kDirectory));
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   base::FilePath cache_dir = temp_dir_.GetPath().AppendASCII("cache");
   base::ScopedPathOverride cache_override(base::DIR_CACHE, cache_dir, true,
                                           true);
@@ -659,8 +653,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_TRUE(IsOpenAbort(cache_dir.AppendASCII("foo"), HandleType::kFile));
   EXPECT_TRUE(
       IsOpenAbort(cache_dir.AppendASCII("foo"), HandleType::kDirectory));
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 }
 
 // TODO(crbug.com/432011571): Flaky test.
@@ -689,7 +682,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   }
 
   // The profile directory is the home directory on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   // The profile directory, its children, and its direct parent should all be
   // blocked. Note that this may not match USER_DATA_DIR if the --user-data-dir
   // override is used.
@@ -711,39 +703,8 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
     EXPECT_TRUE(
         IsOpenAllowed(download_dir.AppendASCII("foo"), HandleType::kDirectory));
   }
-#endif
 
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ChromeFileSystemAccessPermissionContextTest,
-       ConfirmSensitiveEntryAccess_UseProfilePathAsDirHome) {
-  base::FilePath home_dir = temp_dir_.GetPath().AppendASCII("home");
-
-  // Setting `temp_dir_` as DIR_EXE will block all children by default in
-  // `temp_dir_` unless another rule is specifies otherwise for a child.
-  base::ScopedPathOverride app_override(base::DIR_EXE, temp_dir_.GetPath(),
-                                        true, true);
-  base::ScopedPathOverride home_override(base::DIR_HOME, home_dir, true, true);
-
-  // `base::DIR_HOME` and paths inside of it should not be allowed.
-  EXPECT_FALSE(IsOpenAllowed(home_dir, HandleType::kDirectory));
-  EXPECT_FALSE(
-      IsOpenAllowed(home_dir.AppendASCII("foo"), HandleType::kDirectory));
-  EXPECT_FALSE(IsOpenAllowed(home_dir.AppendASCII("foo"), HandleType::kFile));
-
-  base::FilePath profile_path;
-  base::NormalizeFilePath(profile()->GetPath(), &profile_path);
-
-  // On ChromeOs, the profile directory should act as the home directory where
-  // it is blocked but not its children.
-  EXPECT_FALSE(IsOpenAllowed(profile_path, HandleType::kDirectory));
-  EXPECT_TRUE(
-      IsOpenAllowed(profile_path.AppendASCII("foo"), HandleType::kDirectory));
-  EXPECT_TRUE(
-      IsOpenAllowed(profile_path.AppendASCII("foo"), HandleType::kFile));
-}
-#endif
 
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        ConfirmSensitiveEntryAccess_RelativePathBlock) {
@@ -767,7 +728,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
        ConfirmSensitiveEntryAccess_ExplicitPathBlock) {
 // Linux is the only OS where we have some blocked directories with explicit
 // paths (as opposed to PathService provided paths).
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // /dev should be blocked.
   EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
                 permission_context(), PathInfo(FILE_PATH_LITERAL("/dev")),
@@ -1107,7 +1068,7 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
        false},
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       {kNoBasePathKey, FILE_PATH_LITERAL("/dev"), true, false},
       {kNoBasePathKey, FILE_PATH_LITERAL("/proc"), true, false},
       {kNoBasePathKey, FILE_PATH_LITERAL("/sys"), true, false},
@@ -4204,108 +4165,8 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_EQ(future.Get<0>()[0].path, path_foo);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ChromeFileSystemAccessPermissionContextTest,
-       CheckPathsAgainstEnterprisePolicy_ExternalFile) {
-  EnableEnterpriseAnalysis(profile());
-
-  // 1. Set up the external mount point.
-  base::FilePath mount_path = temp_dir_.GetPath().AppendASCII("mount");
-  ASSERT_TRUE(base::CreateDirectory(mount_path));
-  base::FilePath physical_path = mount_path.AppendASCII("foo");
-  EXPECT_TRUE(CreateNonEmptyFile(physical_path));
-
-  const std::string mount_name = "test_mount";
-  scoped_refptr<storage::ExternalMountPoints> mount_points =
-      storage::ExternalMountPoints::GetSystemInstance();
-  // Revoke if already exists (should not, but good practice)
-  mount_points->RevokeFileSystem(mount_name);
-  EXPECT_TRUE(mount_points->RegisterFileSystem(
-      mount_name, storage::kFileSystemTypeLocal,
-      storage::FileSystemMountOption(), mount_path));
-  base::ScopedClosureRunner cleanup_mount(
-      base::BindOnce([](scoped_refptr<storage::ExternalMountPoints> mp,
-                        std::string name) { mp->RevokeFileSystem(name); },
-                     mount_points, mount_name));
-
-  // The virtual path that the FSA manager would see.
-  base::FilePath virtual_path =
-      mount_points->CreateVirtualRootPath(mount_name).AppendASCII("foo");
-
-  // 2. Set up the fake delegate to verify it receives the PHYSICAL path.
-  ContentAnalysisDelegate::SetFactoryForTesting(base::BindRepeating(
-      &FakeContentAnalysisDelegate::Create, base::DoNothing(),
-      base::BindLambdaForTesting([physical_path](const std::string& contents,
-                                                 const base::FilePath& path) {
-        // VERIFY: The path passed to the scanner must be the physical path!
-        EXPECT_EQ(path, physical_path);
-        return FakeContentAnalysisDelegate::SuccessfulResponse({"dlp"});
-      }),
-      kDummyDmToken));
-
-  std::vector<PathInfo> entries{
-      {PathType::kExternal, virtual_path},
-  };
-
-  // 3. Run the check.
-  base::test::TestFuture<std::vector<PathInfo>> future;
-  permission_context_->CheckPathsAgainstEnterprisePolicy(entries, frame_id(),
-                                                         future.GetCallback());
-
-  // VERIFY: The returned entry must have the original VIRTUAL path and
-  // kExternal type.
-  EXPECT_THAT(future.Get<0>(), testing::ElementsAreArray(entries));
-}
-
-TEST_F(ChromeFileSystemAccessPermissionContextTest,
-       CheckPathsAgainstEnterprisePolicy_ResolutionFailure_FailClosed) {
-  EnableEnterpriseAnalysis(profile(), /*fail_closed=*/true);
-
-  // We do NOT register the mount point, so virtual_path will fail to resolve.
-  base::FilePath virtual_path(
-      FILE_PATH_LITERAL("/special/mount/test_mount/foo"));
-
-  std::vector<PathInfo> entries{
-      {PathType::kExternal, virtual_path},
-  };
-
-  // Run the check.
-  base::test::TestFuture<std::vector<PathInfo>> future;
-  permission_context_->CheckPathsAgainstEnterprisePolicy(entries, frame_id(),
-                                                         future.GetCallback());
-
-  // VERIFY: The returned entries must be empty because the unresolved file
-  // is blocked under the fail-closed policy.
-  EXPECT_TRUE(future.Get<0>().empty());
-}
-
-TEST_F(ChromeFileSystemAccessPermissionContextTest,
-       CheckPathsAgainstEnterprisePolicy_ResolutionFailure_FailOpen) {
-  EnableEnterpriseAnalysis(profile());  // Default policy is fail-open
-
-  // We do NOT register the mount point, so virtual_path will fail to resolve.
-  base::FilePath virtual_path(
-      FILE_PATH_LITERAL("/special/mount/test_mount/foo"));
-
-  std::vector<PathInfo> entries{
-      {PathType::kExternal, virtual_path},
-  };
-
-  // Run the check.
-  base::test::TestFuture<std::vector<PathInfo>> future;
-  permission_context_->CheckPathsAgainstEnterprisePolicy(entries, frame_id(),
-                                                         future.GetCallback());
-
-  // VERIFY: The returned entry must have the original VIRTUAL path and
-  // kExternal type because the unresolved file is allowed under the fail-open
-  // policy.
-  EXPECT_THAT(future.Get<0>(), testing::ElementsAreArray(entries));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // ChromeOS doesn't use the same method for setting the home path override.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        ConfirmSensitiveEntryAccess_NonAbsolutePath) {
@@ -4327,4 +4188,3 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
           HandleType::kDirectory, UserAction::kOpen),
       SensitiveDirectoryResult::kAllowed);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

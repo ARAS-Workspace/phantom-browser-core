@@ -17,10 +17,6 @@
 #include "components/signin/public/base/signin_switches.h"
 #include "components/startup_metric_utils/browser/startup_metric_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#error "Chrome OS should use first_run_internal_chromeos.cc."
-#endif
-
 namespace first_run {
 
 base::OnceClosure& GetBeforeShowFirstRunDialogHookForTesting() {

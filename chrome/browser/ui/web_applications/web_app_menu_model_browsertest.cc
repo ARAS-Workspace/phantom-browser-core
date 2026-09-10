@@ -248,11 +248,7 @@ constexpr char kCalculatorForceInstalled[] = R"([
   }
 ])";
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr bool kShouldPreventClose = true;
-#else
 constexpr bool kShouldPreventClose = false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 

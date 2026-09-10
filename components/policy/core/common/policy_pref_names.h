@@ -49,7 +49,7 @@ inline constexpr char kEnterpriseMDMManagementAndroid[] =
     "management.platform.enterprise_mdm_android";
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // Boolean pref indicating whether protected content identifiers are allowed.
 inline constexpr char kProtectedContentIdentifiersAllowed[] =
     "policy.protected_content_identifiers.allowed";
@@ -216,17 +216,6 @@ inline constexpr char kForcePermissionPolicyUnloadDefaultEnabled[] =
 // 3 - Block all downloads
 // 4 - Block malicious downloads
 inline constexpr char kDownloadRestrictions[] = "download_restrictions";
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Allows user browser navigation access to the listed host patterns. Only
-// applied when a AlwaysOn VPN is active but not connected.
-inline constexpr char kAlwaysOnVpnPreConnectUrlAllowlist[] =
-    "policy.alwayson_vpn_pre_connect_url_allowlist";
-
-// Boolean value for the FloatingWorkspaceEnabled policy
-inline constexpr char kFloatingWorkspaceEnabled[] =
-    "ash.floating_workspace_enabled";
-#endif
 
 // A boolean value indicating whether the built-in AI APIs are enabled.
 inline constexpr char kBuiltInAIAPIsEnabled[] =

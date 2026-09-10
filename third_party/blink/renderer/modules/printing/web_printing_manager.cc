@@ -100,17 +100,7 @@ void WebPrintingManager::Trace(Visitor* visitor) const {
 }
 
 mojom::blink::WebPrintingService* WebPrintingManager::GetPrintingService() {
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-  if (!printing_service_.is_bound()) {
-    auto* execution_context = GetExecutionContext();
-    execution_context->GetBrowserInterfaceBroker().GetInterface(
-        printing_service_.BindNewPipeAndPassReceiver(
-            execution_context->GetTaskRunner(TaskType::kMiscPlatformAPI)));
-  }
-  return printing_service_.get();
-#else
   return nullptr;
-#endif
 }
 
 void WebPrintingManager::OnPrintersRetrieved(

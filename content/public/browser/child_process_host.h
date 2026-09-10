@@ -69,7 +69,7 @@ class CONTENT_EXPORT ChildProcessHost {
     // No special behavior requested.
     CHILD_NORMAL = 0,
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // Indicates that the child execed after forking may be execced from
     // /proc/self/exe rather than using the "real" app path. This prevents
     // autoupdate from confusing us if it changes the file out from under us.
@@ -154,14 +154,6 @@ class CONTENT_EXPORT ChildProcessHost {
   // the power/speed tuning is left up to the different components to figure
   // out.
   virtual void SetBatterySaverMode(bool battery_saver_mode_enabled) = 0;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Reinitializes the child process's logging with the given settings. This
-  // is needed on Chrome OS, which switches to a log file in the user's home
-  // directory once they log in.
-  virtual void ReinitializeLogging(uint32_t logging_dest,
-                                   base::ScopedFD log_file_descriptor) = 0;
-#endif
 
 #if BUILDFLAG(CLANG_PROFILING_INSIDE_SANDBOX)
   // Write out the accumulated code profiling profile to the configured file.

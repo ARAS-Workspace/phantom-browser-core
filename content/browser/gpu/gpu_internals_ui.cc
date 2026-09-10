@@ -88,10 +88,6 @@ std::string GPUDeviceToString(const gpu::GPUInfo::GPUDevice& gpu) {
   if (!gpu.device_string.empty())
     base::StrAppend(&device, {" [", gpu.device_string, "]"});
   std::string rt = base::StringPrintf("VENDOR= %s, DEVICE=%s", vendor, device);
-#if BUILDFLAG(IS_CHROMEOS)
-  if (gpu.revision)
-    rt += base::StringPrintf(", REV=%u", gpu.revision);
-#endif
   if (!gpu.driver_vendor.empty())
     base::StrAppend(&rt, {", DRIVER_VENDOR=", gpu.driver_vendor});
   if (!gpu.driver_version.empty())

@@ -14,10 +14,6 @@
 #include "extensions/browser/extension_host.h"
 #include "extensions/common/constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_extension_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace performance_manager {
 
 namespace {
@@ -44,10 +40,6 @@ void RecordBackgroundHostCreatedForExtension(
     value = BackgroundHostCreatedForExtensionValue::kDocsOffline;
   } else if (id == extension_misc::kInAppPaymentsSupportAppId) {
     value = BackgroundHostCreatedForExtensionValue::kInAppPaymentSupport;
-#if BUILDFLAG(IS_CHROMEOS)
-  } else if (id == extension_misc::kAssessmentAssistantExtensionId) {
-    value = BackgroundHostCreatedForExtensionValue::kAssessmentAssistant;
-#endif
   }
 
   base::UmaHistogramEnumeration("Extensions.BackgroundHostCreatedForExtension",

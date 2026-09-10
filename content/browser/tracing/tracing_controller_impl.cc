@@ -67,11 +67,6 @@
 #include "v8/include/v8-trace-categories.h"
 #include "v8/include/v8-version-string.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/statistics_provider.h"
-#include "content/browser/tracing/cros_tracing_agent.h"
-#endif
-
 #if defined(CAST_TRACING_AGENT)
 #include "content/browser/tracing/cast_tracing_agent.h"
 #endif
@@ -140,14 +135,6 @@ TracingControllerImpl::TracingControllerImpl()
   InitializeDataSources();
   g_tracing_controller = this;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Bind hwclass once the statistics are available.
-  ash::system::StatisticsProvider::GetInstance()
-      ->ScheduleOnMachineStatisticsLoaded(
-          base::BindOnce(&TracingControllerImpl::OnMachineStatisticsLoaded,
-                         weak_ptr_factory_.GetWeakPtr()));
-#endif
-
   tracing::PerfettoTracedProcess::Get().SetConsumerConnectionFactory(
       &GetTracingService, base::SingleThreadTaskRunner::GetCurrentDefault());
 }
@@ -166,9 +153,7 @@ void TracingControllerImpl::InitializeDataSources() {
       {base::BindRepeating(&TracingControllerImpl::GenerateMetadataPacket)},
       tracing_delegate()->CreateChromeMetadataPacketRecorder());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  RegisterCrOSTracingDataSource();
-#elif defined(CAST_TRACING_AGENT)
+#if defined(CAST_TRACING_AGENT)
   RegisterCastTracingDataSource();
 #endif
 }
@@ -393,16 +378,5 @@ void TracingControllerImpl::OnReadBuffersComplete() {
   if (is_data_complete_)
     CompleteFlush();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void TracingControllerImpl::OnMachineStatisticsLoaded() {
-  if (const std::optional<std::string_view> hardware_class =
-          ash::system::StatisticsProvider::GetInstance()->GetMachineStatistic(
-              ash::system::kHardwareClassKey)) {
-    hardware_class_ = std::string(hardware_class.value());
-  }
-  are_statistics_loaded_ = true;
-}
-#endif
 
 }  // namespace content

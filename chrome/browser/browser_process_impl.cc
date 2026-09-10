@@ -168,14 +168,7 @@
 #include "chrome/browser/chrome_browser_main_mac.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "chrome/browser/media_galleries/media_file_system_registry.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
-#include "components/soda/soda_installer_impl_chromeos.h"
-#else
 #include "ui/message_center/message_center.h"
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/accessibility/accessibility_prefs/android/accessibility_prefs_controller.h"
@@ -236,7 +229,7 @@ void OnLocalStatePrefsLoaded();
 #include "chrome/browser/sessions/exit_type_service.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/first_run/upgrade_util.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #endif
@@ -245,13 +238,7 @@ void OnLocalStatePrefsLoaded();
 #include "chrome/browser/notifications/notification_ui_manager.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/extensions/telemetry/chromeos_telemetry_extensions_browser_api_provider.h"
-#include "chrome/browser/hid/hid_pinned_notification.h"
-#include "chrome/browser/screen_ai/screen_ai_downloader_chromeos.h"
-#include "chrome/browser/usb/usb_pinned_notification.h"
-#include "components/crash/core/app/crashpad.h"
-#elif !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/hid/hid_status_icon.h"
 #include "chrome/browser/screen_ai/screen_ai_downloader_non_chromeos.h"
 #include "chrome/browser/usb/usb_status_icon.h"
@@ -345,15 +332,6 @@ void BrowserProcessImpl::Init() {
   device_parental_controls_->Init();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Forces creation of |metrics_services_manager_client_| if necessary
-  // (typically this call is a no-op as MetricsServicesManager has already been
-  // created).
-  GetMetricsServicesManager();
-  DCHECK(metrics_services_manager_client_);
-  metrics_services_manager_client_->OnCrosSettingsCreated();
-#endif
-
   download_status_updater_ = std::make_unique<DownloadStatusUpdater>();
 
 #if BUILDFLAG(ENABLE_PRINTING)
@@ -406,11 +384,6 @@ void BrowserProcessImpl::Init() {
   extensions_browser_client_->AddAPIProvider(
       std::make_unique<
           controlled_frame::ControlledFrameExtensionsBrowserAPIProvider>());
-#if BUILDFLAG(IS_CHROMEOS)
-  extensions_browser_client_->AddAPIProvider(
-      std::make_unique<
-          chromeos::ChromeOSTelemetryExtensionsBrowserAPIProvider>());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   extensions::AppWindowClient::Set(ChromeAppWindowClient::GetInstance());
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
@@ -485,13 +458,8 @@ void BrowserProcessImpl::Init() {
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS)
-  hid_system_tray_icon_ = std::make_unique<HidPinnedNotification>();
-  usb_system_tray_icon_ = std::make_unique<UsbPinnedNotification>();
-#else
   hid_system_tray_icon_ = std::make_unique<HidStatusIcon>();
   usb_system_tray_icon_ = std::make_unique<UsbStatusIcon>();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
   features_->PostBrowserProcessInit();
@@ -557,7 +525,6 @@ void BrowserProcessImpl::StartTearDown() {
 #endif
   network_time_tracker_.reset();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Initial cleanup for ChromeBrowserCloudManagement, shutdown components that
   // depend on profile and notification system. For example, ProfileManager
   // observer and KeyServices observer need to be removed before profiles.
@@ -566,7 +533,6 @@ void BrowserProcessImpl::StartTearDown() {
   if (cloud_management_controller) {
     cloud_management_controller->ShutDown();
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // |hid_system_tray_icon_| and |usb_system_tray_icon_| must be destroyed
   // before |system_notification_helper_| for ChromeOS and |status_tray_| for
@@ -599,15 +565,9 @@ void BrowserProcessImpl::StartTearDown() {
   {
     TRACE_EVENT0("shutdown",
                  "BrowserProcessImpl::StartTearDown:ProfileManager");
-#if !BUILDFLAG(IS_CHROMEOS)
     // The desktop profile picker needs to be closed before the guest profile
     // can be destroyed.
     ProfilePicker::Hide();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-    // `profile_manager_` must be destroyed before `background_mode_manager_`,
-    // because the background mode manager does not stop observing profile
-    // changes at destruction (notifying the observers would cause a use-after-
-    // free).
     profile_manager_.reset();
   }
 
@@ -615,12 +575,6 @@ void BrowserProcessImpl::StartTearDown() {
     media_router::DualMediaSinkService::GetInstance()
         ->StopObservingPrefChanges();
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // The `media_file_system_registry_` cannot be reset until the
-  // `profile_manager_` has been.
-  media_file_system_registry_.reset();
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   // Remove the global instance of the Storage Monitor now. Otherwise the
@@ -821,7 +775,6 @@ void BrowserProcessImpl::EndSession() {
   metrics::MetricsService* metrics = g_browser_process->metrics_service();
   if (metrics) {
     metrics->LogCleanShutdown();
-#if !BUILDFLAG(IS_CHROMEOS)
     // The MetricsService may update Local State prefs in memory without
     // writing the updated prefs to disk, so schedule a Local State write now.
     //
@@ -830,27 +783,12 @@ void BrowserProcessImpl::EndSession() {
     // crbug.com/41062061.
     local_state_->CommitPendingWrite(base::OnceClosure(),
                                      rundown_counter->GetRundownClosure());
-#endif
   }
 
   // This wait is legitimate and necessary on Windows, since the process will
   // be terminated soon.
   // http://crbug.com/40198606
   base::ScopedAllowBaseSyncPrimitivesOutsideBlockingScope allow_wait;
-
-#if BUILDFLAG(IS_CHROMEOS_DEVICE)
-  // The browser is already shutting down, so the DeleteFile inside
-  // DeleteCrashpadIsReadyFile cannot causing UI jank. Also, this code
-  // cannot use other MayBlock threads, as the process will be disappearing
-  // momentarily.
-  {
-    base::ScopedAllowBlocking allow_delete;
-    // Crashes after this point will generate a bunch of unnecessary work
-    // in crash reporter, so call this function as late as possible, after
-    // approximately everything that can crash is complete.
-    crash_reporter::DeleteCrashpadIsReadyFile();
-  }
-#endif
 
   // We must write that the profile and metrics service shutdown cleanly,
   // otherwise on startup we'll think we crashed. So we block until done and
@@ -1106,10 +1044,8 @@ IntranetRedirectDetector* BrowserProcessImpl::intranet_redirect_detector() {
 #endif
 
 const std::string& BrowserProcessImpl::GetApplicationLocale() {
-#if !BUILDFLAG(IS_CHROMEOS)
   // TODO(crbug.com/40663419): Remove #if.
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#endif
 
   // TODO(crbug.com/407681800): Replace this with CHECK(features_) once we've
   // confirmed no such code path exists.
@@ -1133,15 +1069,6 @@ void BrowserProcessImpl::SetApplicationLocale(
 DownloadStatusUpdater* BrowserProcessImpl::download_status_updater() {
   return download_status_updater_.get();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-MediaFileSystemRegistry* BrowserProcessImpl::media_file_system_registry() {
-  if (!media_file_system_registry_) {
-    media_file_system_registry_ = std::make_unique<MediaFileSystemRegistry>();
-  }
-  return media_file_system_registry_.get();
-}
-#endif
 
 WebRtcLogUploader* BrowserProcessImpl::webrtc_log_uploader() {
   if (!webrtc_log_uploader_) {
@@ -1242,19 +1169,12 @@ void BrowserProcessImpl::RegisterPrefs(PrefRegistrySimple* registry) {
 
   registry->RegisterBooleanPref(prefs::kAllowCrossOriginAuthPrompt, false);
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(prefs::kEulaAccepted, false);
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   registry->RegisterStringPref(language::prefs::kApplicationLocale,
                                std::string());
-#if BUILDFLAG(IS_CHROMEOS)
-  registry->RegisterStringPref(ash::prefs::kOwnerLocale, std::string());
-  registry->RegisterStringPref(ash::prefs::kHardwareKeyboardLayout,
-                               std::string());
-  registry->RegisterBooleanPref(
-      password_manager::prefs::kPinAuthenticationAvailableOnChromeOS, false);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   registry->RegisterBooleanPref(metrics::prefs::kMetricsReportingEnabled,
                                 GoogleUpdateSettings::GetCollectStatsConsent());
@@ -1547,13 +1467,9 @@ void BrowserProcessImpl::PreMainMessageLoopRun() {
 #endif
 
 // Create the global SodaInstaller instance.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   soda_installer_impl_ = std::make_unique<speech::SodaInstallerImpl>();
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  soda_installer_impl_ = std::make_unique<speech::SodaInstallerImplChromeOS>();
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_ANDROID)
   screen_ai_download_ = screen_ai::ScreenAIInstallState::Create();

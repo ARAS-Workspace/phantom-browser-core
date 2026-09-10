@@ -51,10 +51,6 @@
 #include "extensions/common/extension.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/policy/dlp/dlp_content_manager.h"
-#endif
-
 using content::BrowserThread;
 using content::WebContents;
 
@@ -316,12 +312,6 @@ class MediaStreamCaptureIndicator::UIDelegate : public content::MediaStreamUI {
       device_usage_->AddDevices(devices_, stop_callback, stop_callback_id_);
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    policy::DlpContentManager::Get()->OnScreenShareStarted(
-        label, screen_capture_ids, application_title_, stop_callback,
-        state_change_callback, source_callback);
-#endif
-
     // If a custom |ui_| is specified, notify it that the stream started and let
     // it handle the |stop_callback| and |source_callback|.
     if (ui_)
@@ -336,17 +326,10 @@ class MediaStreamCaptureIndicator::UIDelegate : public content::MediaStreamUI {
       const content::DesktopMediaID& old_media_id,
       const content::DesktopMediaID& new_media_id,
       bool captured_surface_control_active) override {
-#if BUILDFLAG(IS_CHROMEOS)
-    policy::DlpContentManager::Get()->OnScreenShareSourceChanging(
-        label, old_media_id, new_media_id, captured_surface_control_active);
-#endif
   }
 
   void OnDeviceStopped(const std::string& label,
                        const content::DesktopMediaID& media_id) override {
-#if BUILDFLAG(IS_CHROMEOS)
-    policy::DlpContentManager::Get()->OnScreenShareStopped(label, media_id);
-#endif
   }
 
   void OnRegionCaptureRectChanged(

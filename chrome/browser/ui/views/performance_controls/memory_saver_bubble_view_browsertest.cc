@@ -230,7 +230,7 @@ IN_PROC_BROWSER_TEST_F(MemorySaverBubbleViewTest,
   EXPECT_EQ(bubble_delegate->GetSubtitle(), u"foo.com");
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(MemorySaverBubbleViewTest,
                        ShowDialogWithoutExcludeSiteButtonInGuestMode) {
   Browser* guest_browser = CreateGuestBrowser();

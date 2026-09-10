@@ -78,10 +78,8 @@ class IconLoader : public base::SelfDeleting {
   // The TaskRunner that ReadIcon() must be called on.
   static scoped_refptr<base::TaskRunner> GetReadIconTaskRunner();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   void ReadGroup();
   void ReadIcon();
-#endif
 
   // The traits of the tasks posted to base::ThreadPool by this class. These
   // operations may block, because they are fetching icons from the disk, yet

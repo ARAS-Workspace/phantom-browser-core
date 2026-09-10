@@ -200,10 +200,6 @@ class MockVaapiWrapper : public VaapiWrapper {
                    const gfx::Size& va_surface_dst_size,
                    std::optional<gfx::Rect> src_rect = std::nullopt,
                    std::optional<gfx::Rect> dest_rect = std::nullopt
-#if BUILDFLAG(IS_CHROMEOS)
-                   ,
-                   VAProtectedSessionID va_protected_session_id = VA_INVALID_ID
-#endif
                    ) override {
     return DoBlitSurface(src_rect, dest_rect);
   }

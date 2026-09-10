@@ -14,12 +14,6 @@
 #include "components/webui/flags/flags_storage.h"
 #include "components/webui/flags/flags_ui_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/settings/about_flags.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/profiles/profile.h"
-#endif
-
 namespace {
 bool ExtractKeyValue(const base::ListValue& args,
                      std::string& key,
@@ -151,7 +145,7 @@ void FlagsUIHandler::SendExperimentalFeatures(bool deprecated_features_only) {
   results.Set("importExportEnabled",
               base::FeatureList::IsEnabled(features::kImportExportFlags));
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   version_info::Channel channel = chrome::GetChannel();
   results.Set(
       flags_ui::kShowBetaChannelPromotion,
@@ -220,14 +214,6 @@ void FlagsUIHandler::HandleSetStringFlagMessage(const base::ListValue& args) {
 
 void FlagsUIHandler::HandleRestartBrowser(const base::ListValue& args) {
   DCHECK(flags_storage_);
-#if BUILDFLAG(IS_CHROMEOS)
-  // On Chrome OS be less intrusive and restart inside the user session after
-  // we apply the newly selected flags.
-  VLOG(1) << "Restarting to apply per-session flags...";
-  ash::about_flags::FeatureFlagsUpdate(*flags_storage_,
-                                       Profile::FromWebUI(web_ui())->GetPrefs())
-      .UpdateSessionManager();
-#endif
   chrome::AttemptRestart();
 }
 

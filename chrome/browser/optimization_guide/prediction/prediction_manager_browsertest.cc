@@ -52,10 +52,6 @@
 #include "net/test/embedded_test_server/http_response.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 namespace {
 
 constexpr int kSuccessfulModelVersion = 123;
@@ -410,10 +406,6 @@ class PredictionManagerModelDownloadingBrowserTest
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     PredictionManagerBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
     // TODO(crbug.com/40285326): This fails with the field trial testing config.
     command_line->AppendSwitch("disable-field-trial-config");
   }

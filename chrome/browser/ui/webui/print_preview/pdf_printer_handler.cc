@@ -52,16 +52,6 @@
 #include "chrome/common/printing/printer_capabilities_mac.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/drive/drive_integration_service.h"
-#include "chrome/browser/ash/drive/drive_integration_service_factory.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/ui/ash/holding_space/holding_space_keyed_service.h"
-#include "chrome/browser/ui/ash/holding_space/holding_space_keyed_service_factory.h"
-#include "components/drive/file_system_core_util.h"
-#include "components/user_manager/user.h"
-#endif
-
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
 #endif
@@ -82,12 +72,7 @@ class PrintingContextDelegate : public PrintingContext::Delegate {
 };
 
 const AccountId& GetAccountId(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  const auto* user = ash::ProfileHelper::Get()->GetUserByProfile(profile);
-  return user ? user->GetAccountId() : EmptyAccountId();
-#else
   return EmptyAccountId();
-#endif
 }
 
 gfx::Size GetDefaultPdfMediaSizeMicrons() {
@@ -189,19 +174,6 @@ void PrintToPdfCallback(scoped_refptr<base::RefCountedMemory> data,
 void OnPdfPrintedCallback(const AccountId& account_id,
                           const base::FilePath& path,
                           base::OnceClosure pdf_file_saved_closure) {
-#if BUILDFLAG(IS_CHROMEOS)
-  Profile* profile =
-      ash::ProfileHelper::Get()->GetProfileByAccountId(account_id);
-  if (profile) {
-    ash::HoldingSpaceKeyedService* holding_space_keyed_service =
-        ash::HoldingSpaceKeyedServiceFactory::GetInstance()->GetService(
-            profile);
-    if (holding_space_keyed_service) {
-      holding_space_keyed_service->AddItemOfType(
-          ash::HoldingSpaceItem::Type::kPrintedPdf, path);
-    }
-  }
-#endif
   if (!pdf_file_saved_closure.is_null()) {
     std::move(pdf_file_saved_closure).Run();
   }
@@ -318,10 +290,6 @@ void PdfPrinterHandler::StartPrint(
   base::FilePath path = GetFileName(initiator_url, job_title, is_savable);
 
   bool prompt_user = !SilentPrintingEnabled();
-#if BUILDFLAG(IS_CHROMEOS)
-  use_drive_mount_ =
-      settings.FindBool(kSettingPrintToGoogleDrive).value_or(false);
-#endif
 
   SelectFile(path, initiator, prompt_user);
 }
@@ -528,14 +496,6 @@ void PdfPrinterHandler::OnDirectorySelected(const base::FilePath& filename,
 }
 
 base::FilePath PdfPrinterHandler::GetSaveLocation() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  drive::DriveIntegrationService* drive_service =
-      drive::DriveIntegrationServiceFactory::GetForProfile(profile_);
-  if (use_drive_mount_ && drive_service && drive_service->IsMounted()) {
-    return drive_service->GetMountPointPath().Append(
-        drive::util::kDriveMyDriveRootDirName);
-  }
-#endif
   DownloadPrefs* download_prefs = DownloadPrefs::FromBrowserContext(profile_);
   return download_prefs->SaveFilePath();
 }

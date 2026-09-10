@@ -82,22 +82,6 @@ FilePath GetDebugBasenameForModule(const void* base_address,
   }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // SetProcessTitleFromCommandLine() does not play well with dladdr(). In
-  // particular, after calling our setproctitle(), calling dladdr() with an
-  // address in the main binary will return the complete command line of the
-  // program, including all arguments, in dli_fname. If we get a complete
-  // command-line like "/opt/google/chrome/chrome --type=gpu-process
-  // --gpu-sandbox-failures-fatal=yes --enable-logging ...", strip off
-  // everything that looks like an argument. This is safe on ChromeOS, where we
-  // control the directory and file names and know that no chrome binary or
-  // system library will have a " --" in the path.
-  size_t pos = file.find(" --");
-  if (pos != std::string_view::npos) {
-    file = file.substr(0, pos);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   return FilePath(file).BaseName();
 }
 

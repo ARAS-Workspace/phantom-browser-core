@@ -253,11 +253,6 @@
 #include "third_party/blink/public/mojom/input/text_input_host.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/browser/lock_screen/lock_screen_service_impl.h"
-#include "third_party/blink/public/mojom/lock_screen/lock_screen.mojom.h"
-#include "third_party/blink/public/mojom/smart_card/smart_card.mojom.h"
-#endif
 
 
 #if BUILDFLAG(ENABLE_VRP_FLAGS)
@@ -1312,10 +1307,6 @@ void PopulateBinderMapWithContext(
   map->Add<blink::mojom::ModelContextHost>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::BindModelContextHost>);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  map->Add<blink::mojom::SmartCardService>(
-      &BindRenderFrameHostImpl<&RenderFrameHostImpl::GetSmartCardService>);
-#endif
 
 #if BUILDFLAG(IS_MAC)
   map->Add<blink::mojom::TextInputHost>(base::BindRepeating(
@@ -1436,11 +1427,6 @@ void PopulateBinderMapWithContext(
 
   map->Add<device::mojom::VibrationManager>(&BindVibrationManager);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(features::kWebLockScreenApi)) {
-    map->Add<blink::mojom::LockScreenService>(&LockScreenServiceImpl::Create);
-  }
-#endif
 
 
 #if BUILDFLAG(ENABLE_VRP_FLAGS)

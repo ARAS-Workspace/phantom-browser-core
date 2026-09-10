@@ -50,10 +50,6 @@
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #endif                                                // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/background/glic/glic_status_icon_chromeos.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 int GetTooltipMessageId() {
@@ -77,11 +73,7 @@ namespace glic {
 std::unique_ptr<GlicStatusIcon> GlicStatusIcon::Create(
     GlicBackgroundDelegate* delegate,
     StatusTray* status_tray) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return std::make_unique<GlicStatusIconChromeOS>(delegate, status_tray);
-#else
   return std::make_unique<GlicStatusIcon>(delegate, status_tray);
-#endif
 }
 
 GlicStatusIcon::GlicStatusIcon(GlicBackgroundDelegate* delegate,
@@ -200,13 +192,6 @@ void GlicStatusIcon::OnBrowserClosed(BrowserWindowInterface* browser) {
 }
 
 void GlicStatusIcon::UpdateHotkey(const ui::Accelerator& hotkey) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!context_menu_) {
-    // TODO(crbug.com/454734385): Implement StatusTray functionality on
-    // ChromeOS.
-    return;
-  }
-#endif
 
   CHECK(context_menu_);
   std::optional<size_t> toggle_menu_item_index =

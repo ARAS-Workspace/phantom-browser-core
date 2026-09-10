@@ -31,39 +31,9 @@ struct LessPaper {
   }
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-struct LessAdvancedCapability {
-  bool operator()(const ::printing::AdvancedCapability& lhs,
-                  const ::printing::AdvancedCapability& rhs) const {
-    return std::tie(lhs.name, lhs.display_name) <
-           std::tie(rhs.name, rhs.display_name);
-  }
-};
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 
 namespace mojo {
-
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-bool StructTraits<
-    printing::mojom::PaperMarginsDataView,
-    printing::PaperMargins>::Read(printing::mojom::PaperMarginsDataView data,
-                                  printing::PaperMargins* out) {
-  if (data.top_margin_um() < 0 || data.right_margin_um() < 0 ||
-      data.bottom_margin_um() < 0 || data.left_margin_um() < 0) {
-    return false;
-  }
-  out->top_margin_um = data.top_margin_um();
-  out->right_margin_um = data.right_margin_um();
-  out->bottom_margin_um = data.bottom_margin_um();
-  out->left_margin_um = data.left_margin_um();
-  return true;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 namespace {
 
@@ -132,12 +102,6 @@ bool StructTraits<printing::mojom::PaperDataView,
   if (!data.ReadPrintableAreaUm(&printable_area_um)) {
     return false;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  std::optional<printing::PaperMargins> supported_margins_um;
-  if (!data.ReadSupportedMarginsUm(&supported_margins_um)) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   int max_height_um = data.max_height_um();
   bool has_borderless_variant = data.has_borderless_variant();
@@ -165,15 +129,9 @@ bool StructTraits<printing::mojom::PaperDataView,
   if (!gfx::Rect(size_um).Contains(printable_area_um)) {
     return false;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  *out = printing::PrinterSemanticCapsAndDefaults::Paper(
-      display_name, vendor_id, size_um, printable_area_um, max_height_um,
-      has_borderless_variant, supported_margins_um);
-#else
   *out = printing::PrinterSemanticCapsAndDefaults::Paper(
       display_name, vendor_id, size_um, printable_area_um, max_height_um,
       has_borderless_variant);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return true;
 }
 
@@ -185,64 +143,6 @@ bool StructTraits<printing::mojom::MediaTypeDataView,
   return data.ReadDisplayName(&out->display_name) &&
          data.ReadVendorId(&out->vendor_id);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-printing::mojom::AdvancedCapabilityType
-EnumTraits<printing::mojom::AdvancedCapabilityType,
-           ::printing::AdvancedCapability::Type>::
-    ToMojom(::printing::AdvancedCapability::Type input) {
-  switch (input) {
-    case ::printing::AdvancedCapability::Type::kBoolean:
-      return printing::mojom::AdvancedCapabilityType::kBoolean;
-    case ::printing::AdvancedCapability::Type::kFloat:
-      return printing::mojom::AdvancedCapabilityType::kFloat;
-    case ::printing::AdvancedCapability::Type::kInteger:
-      return printing::mojom::AdvancedCapabilityType::kInteger;
-    case ::printing::AdvancedCapability::Type::kString:
-      return printing::mojom::AdvancedCapabilityType::kString;
-  }
-  NOTREACHED();
-}
-
-// static
-::printing::AdvancedCapability::Type
-EnumTraits<printing::mojom::AdvancedCapabilityType,
-           ::printing::AdvancedCapability::Type>::
-    FromMojom(printing::mojom::AdvancedCapabilityType input) {
-  switch (input) {
-    case printing::mojom::AdvancedCapabilityType::kBoolean:
-      return ::printing::AdvancedCapability::Type::kBoolean;
-    case printing::mojom::AdvancedCapabilityType::kFloat:
-      return ::printing::AdvancedCapability::Type::kFloat;
-    case printing::mojom::AdvancedCapabilityType::kInteger:
-      return ::printing::AdvancedCapability::Type::kInteger;
-    case printing::mojom::AdvancedCapabilityType::kString:
-      return ::printing::AdvancedCapability::Type::kString;
-  }
-  NOTREACHED();
-}
-
-// static
-bool StructTraits<printing::mojom::AdvancedCapabilityValueDataView,
-                  ::printing::AdvancedCapabilityValue>::
-    Read(printing::mojom::AdvancedCapabilityValueDataView data,
-         ::printing::AdvancedCapabilityValue* out) {
-  return data.ReadName(&out->name) && data.ReadDisplayName(&out->display_name);
-}
-
-// static
-bool StructTraits<printing::mojom::AdvancedCapabilityDataView,
-                  ::printing::AdvancedCapability>::
-    Read(printing::mojom::AdvancedCapabilityDataView data,
-         ::printing::AdvancedCapability* out) {
-  return data.ReadName(&out->name) &&
-         data.ReadDisplayName(&out->display_name) &&
-         data.ReadType(&out->type) &&
-         data.ReadDefaultValue(&out->default_value) &&
-         data.ReadValues(&out->values);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // static
 bool StructTraits<printing::mojom::PrinterSemanticCapsAndDefaultsDataView,
@@ -271,15 +171,6 @@ bool StructTraits<printing::mojom::PrinterSemanticCapsAndDefaultsDataView,
     return false;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  out->pin_supported = data.pin_supported();
-  if (!data.ReadAdvancedCapabilities(&out->advanced_capabilities) ||
-      !data.ReadPrintScalingTypes(&out->print_scaling_types) ||
-      !data.ReadPrintScalingTypeDefault(&out->print_scaling_type_default)) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // Extra validity checks.
 
   // Can not have less than one copy.
@@ -298,17 +189,6 @@ bool StructTraits<printing::mojom::PrinterSemanticCapsAndDefaultsDataView,
     DLOG(ERROR) << "Duplicate user_defined_papers detected.";
     return false;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (HasDuplicateItems(out->advanced_capabilities, LessAdvancedCapability{})) {
-    DLOG(ERROR) << "Duplicate advanced_capabilities detected.";
-    return false;
-  }
-  if (HasDuplicateItems(out->print_scaling_types)) {
-    DLOG(ERROR) << "Duplicate print_scaling_types detected.";
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (!data.ReadMediaTypes(&media_types) ||
       !data.ReadDefaultMediaType(&default_media_type)) {

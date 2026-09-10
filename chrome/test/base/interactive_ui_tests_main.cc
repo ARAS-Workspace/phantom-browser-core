@@ -26,10 +26,6 @@
 #include "ui/linux/display_server_utils.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/test/ui_controls_ash.h"
-#endif
-
 #if defined(USE_AURA) && BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
 #include "ui/platform_window/common/platform_window_defaults.h"
@@ -45,9 +41,7 @@ class InteractiveUITestSuite : public ChromeTestSuite {
   void Initialize() override {
     ChromeTestSuite::Initialize();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::test::EnableUIControlsAsh();
-#elif BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
     // Notifies the platform that test config is needed. For Wayland, for
     // example, makes it possible to use emulated input.
     ui::test::EnableTestConfigForPlatformWindows();
@@ -71,7 +65,7 @@ class InteractiveUITestSuite : public ChromeTestSuite {
 
     // TODO(crbug.com/40263135) Investigate why https upgrade causes
     // interactive_ui_tests to run longer.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     // Force the HTTPS-Upgrades timeout to zero.
     HttpsUpgradesNavigationThrottle::set_timeout_for_testing(base::TimeDelta());
 #endif
@@ -137,12 +131,6 @@ int main(int argc, char** argv) {
   base::CommandLine::Init(argc, argv);
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
 
-#if BUILDFLAG(IS_CHROMEOS) && defined(MEMORY_SANITIZER)
-  // Force software-gl. This is necessary for mus tests to avoid an msan warning
-  // in gl init.
-  command_line->AppendSwitch(switches::kOverrideUseSoftwareGLForTests);
-#endif
-
   // Without this it's possible for the first browser to start up in the
   // background, generally because the last test did something that causes the
   // test to run in the background. Most interactive ui tests assume they are in
@@ -155,15 +143,8 @@ int main(int argc, char** argv) {
   // For ash chrome, it's using multiple X11 windows to host the browser.
   // Also, {emulating|injecting} keyboard and mouse events happen at ozone
   // level, not OS level. So it is fine to run tests in parallel.
-#if BUILDFLAG(IS_CHROMEOS)
-  size_t parallel_jobs = base::NumParallelJobs(/*cores_per_job=*/2);
-  if (parallel_jobs == 0) {
-    parallel_jobs = 1;
-  }
-#else
   // Run interactive_ui_tests serially, they do not support running in parallel.
   size_t parallel_jobs = 1;
-#endif
 
   // Adjust switches for interactive tests where the user is expected to
   // manually verify results.

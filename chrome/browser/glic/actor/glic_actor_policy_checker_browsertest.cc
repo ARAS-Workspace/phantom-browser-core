@@ -995,14 +995,12 @@ IN_PROC_BROWSER_TEST_P(GlicActorPolicyCheckerBrowserTestWithManagedAccount,
   }
 
 // Note: sign-out from enterprise account is not allowed in ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   ClearPrimaryAccount();
   EXPECT_FALSE(GetPolicyChecker().CanActOnWeb());
 
   // Now the account is not an enterprise account, thus has the capability.
   SimulatePrimaryAccountChangedSignIn(&kNonEnterpriseAccount);
   EXPECT_TRUE(GetPolicyChecker().CanActOnWeb());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_P(GlicActorPolicyCheckerBrowserTestWithManagedAccount,
@@ -1074,7 +1072,6 @@ IN_PROC_BROWSER_TEST_F(
             CannotActReason::kDisabledByPolicy);
 
 // Note: sign-out from enterprise account is not allowed in ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   ClearPrimaryAccount();
   // No capability because the policy is disabled.
   SimulatePrimaryAccountChangedSignIn(&kNonEnterpriseAccount);
@@ -1083,7 +1080,6 @@ IN_PROC_BROWSER_TEST_F(
   UpdateGeminiActOnWebPolicy(
       glic::prefs::GlicActuationOnWebPolicyState::kEnabled);
   EXPECT_TRUE(GetPolicyChecker().CanActOnWeb());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_F(

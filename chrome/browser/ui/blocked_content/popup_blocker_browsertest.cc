@@ -72,7 +72,7 @@
 #include "ui/events/keycodes/dom/keycode_converter.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "third_party/blink/public/common/switches.h"
 #endif
 
@@ -118,7 +118,7 @@ class PopupBlockerBrowserTest : public InProcessBrowserTest {
     ASSERT_TRUE(embedded_test_server()->Start());
   }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   void SetUpCommandLine(base::CommandLine* command_line) override {
     // Testing on some platforms is flaky due to slower loading interacting with
     // deferred commits.
@@ -260,7 +260,7 @@ IN_PROC_BROWSER_TEST_F(PopupBlockerBrowserTest, BlockWebContentsCreation) {
 }
 
 // TODO(crbug.com/40144522): Flaky on Mac ASAN and Chrome OS.
-#if (BUILDFLAG(IS_MAC) && defined(ADDRESS_SANITIZER)) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) && defined(ADDRESS_SANITIZER)
 #define MAYBE_BlockWebContentsCreationIncognito \
   DISABLED_BlockWebContentsCreationIncognito
 #else
@@ -474,7 +474,7 @@ IN_PROC_BROWSER_TEST_F(PopupBlockerBrowserTest,
 // https://codereview.chromium.org/23903056
 // BUG=https://code.google.com/p/chromium/issues/detail?id=295299
 // TODO(ananta). Debug and fix this test.
-#if defined(USE_AURA) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if defined(USE_AURA) && BUILDFLAG(IS_LINUX)
 #define MAYBE_WindowFeatures DISABLED_WindowFeatures
 #else
 #define MAYBE_WindowFeatures WindowFeatures

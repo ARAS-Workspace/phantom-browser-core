@@ -58,10 +58,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#endif
-
 using base::test::RunOnceClosure;
 using base::test::TaskEnvironment;
 using testing::_;
@@ -269,34 +265,6 @@ em::DeviceManagementResponse GetTokenBasedRegistrationResponse() {
   return registration_response;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-em::DeviceManagementRequest GetReregistrationRequest() {
-  em::DeviceManagementRequest request;
-
-  em::DeviceRegisterRequest* reregister_request =
-      request.mutable_register_request();
-  reregister_request->set_type(em::DeviceRegisterRequest::USER);
-  reregister_request->mutable_device_info()->set_form_factor(GetFormFactor());
-  reregister_request->set_machine_id(kMachineID);
-  reregister_request->set_machine_model(kMachineModel);
-  reregister_request->set_brand_code(kBrandCode);
-  reregister_request->mutable_device_register_identification()
-      ->set_attested_device_id(kAttestedDeviceId);
-  reregister_request->set_ethernet_mac_address(kEthernetMacAddressStr);
-  reregister_request->set_dock_mac_address(kDockMacAddressStr);
-  reregister_request->set_manufacture_date(kManufactureDate);
-  reregister_request->set_lifetime(
-      em::DeviceRegisterRequest::LIFETIME_INDEFINITE);
-  reregister_request->set_flavor(
-      em::DeviceRegisterRequest::FLAVOR_ENROLLMENT_RECOVERY);
-  reregister_request->set_reregister(true);
-  reregister_request->set_reregistration_dm_token(kDMToken);
-
-  return request;
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 em::DeviceManagementRequest GetTokenBasedDeviceRegistrationRequest() {
   em::DeviceManagementRequest request;
   em::DeviceRegisterRequest* register_request =
@@ -496,12 +464,6 @@ class CloudPolicyClientTest : public testing::Test {
         job_type_(DeviceManagementService::JobConfiguration::TYPE_INVALID),
         client_id_(kClientID),
         policy_type_(dm_protocol::GetChromeUserPolicyType()) {
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_statistics_provider_.SetMachineStatistic(ash::system::kSerialNumberKey,
-                                                  "fake_serial_number");
-    fake_statistics_provider_.SetLoadingState(
-        ash::system::StatisticsProvider::LoadingState::kFinished);
-#endif
 
     CreateClient();
   }
@@ -651,9 +613,6 @@ class CloudPolicyClientTest : public testing::Test {
   std::unique_ptr<CloudPolicyClient> client_;
   network::TestURLLoaderFactory url_loader_factory_;
   scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory_;
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::system::ScopedFakeStatisticsProvider fake_statistics_provider_;
-#endif
 
  private:
   void CreateClient(std::string_view attested_device_id,
@@ -2730,7 +2689,7 @@ INSTANTIATE_TEST_SUITE_P(
         em::DeviceRegisterRequest::PSM_RESULT_SUCCESSFUL_WITHOUT_STATE,
         em::DeviceRegisterRequest::PSM_RESULT_ERROR));
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 TEST_F(CloudPolicyClientTest, UploadSecurityEventNotRegistered) {
   ASSERT_FALSE(client_->is_registered());
 
@@ -2900,7 +2859,7 @@ TEST_F(CloudPolicyClientTest, RealtimeReportMerge) {
   ASSERT_EQ("1.0.0.0", merged_request.browser().chrome_version());
   ASSERT_EQ(2, merged_request.events_size());
 }
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 TEST_F(CloudPolicyClientTest, MultipleActiveRequests) {
   RegisterClient();
@@ -3229,102 +3188,6 @@ TEST_F(CloudPolicyClientTest, RequestGcmIdUpdate) {
   EXPECT_EQ(job_request_.SerializePartialAsString(),
             gcm_id_update_request.SerializePartialAsString());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(CloudPolicyClientTest, PolicyReregistration) {
-  RegisterClient();
-
-  // Handle 410 (unknown deviceID) on policy fetch.
-  EXPECT_TRUE(client_->is_registered());
-  EXPECT_FALSE(client_->requires_reregistration());
-  DeviceManagementService::JobConfiguration::JobType upload_type;
-  EXPECT_CALL(job_creation_handler_, OnJobCreation)
-      .WillOnce(DoAll(service_.CaptureJobType(&upload_type),
-                      service_.SendJobResponseAsync(
-                          net::OK, DeviceManagementService::kDeviceNotFound)));
-
-  RunClientTaskAndWaitError(base::BindLambdaForTesting(
-      [this]() { client_->FetchPolicy(kPolicyFetchReason); }));
-
-  EXPECT_EQ(DM_STATUS_SERVICE_DEVICE_NOT_FOUND, client_->last_dm_status());
-  EXPECT_FALSE(client_->GetPolicyFor(policy_type_, std::string()));
-  EXPECT_FALSE(client_->is_registered());
-  EXPECT_TRUE(client_->requires_reregistration());
-
-  // Re-register.
-  ExpectAndCaptureJob(GetRegistrationResponse());
-  EXPECT_CALL(device_dmtoken_callback_observer_,
-              OnDeviceDMTokenRequested(
-                  /*user_affiliation_ids=*/std::vector<std::string>()))
-      .WillOnce(Return(kDeviceDMToken));
-
-  RunClientTaskAndWaitRegistration(base::BindLambdaForTesting([this]() {
-    CloudPolicyClient::RegistrationParameters user_recovery(
-        em::DeviceRegisterRequest::USER,
-        em::DeviceRegisterRequest::FLAVOR_ENROLLMENT_RECOVERY);
-    client_->Register(user_recovery, client_id_, kOAuthToken);
-  }));
-
-  EXPECT_EQ(DeviceManagementService::JobConfiguration::TYPE_POLICY_FETCH,
-            upload_type);
-  EXPECT_EQ(DeviceManagementService::JobConfiguration::TYPE_REGISTRATION,
-            job_type_);
-  EXPECT_EQ(auth_data_, DMAuth::NoAuth());
-  VerifyQueryParameter();
-  EXPECT_EQ(job_request_.SerializePartialAsString(),
-            GetReregistrationRequest().SerializePartialAsString());
-  EXPECT_TRUE(client_->is_registered());
-  EXPECT_FALSE(client_->requires_reregistration());
-  EXPECT_FALSE(client_->GetPolicyFor(policy_type_, std::string()));
-  EXPECT_EQ(DM_STATUS_SUCCESS, client_->last_dm_status());
-}
-
-TEST_F(CloudPolicyClientTest, PolicyReregistrationFailsWithNonMatchingDMToken) {
-  RegisterClient();
-
-  // Handle 410 (unknown deviceID) on policy fetch.
-  EXPECT_TRUE(client_->is_registered());
-  EXPECT_FALSE(client_->requires_reregistration());
-  DeviceManagementService::JobConfiguration::JobType upload_type;
-  EXPECT_CALL(job_creation_handler_, OnJobCreation)
-      .WillOnce(DoAll(service_.CaptureJobType(&upload_type),
-                      service_.SendJobResponseAsync(
-                          net::OK, DeviceManagementService::kDeviceNotFound)));
-
-  RunClientTaskAndWaitError(base::BindLambdaForTesting(
-      [this]() { client_->FetchPolicy(kPolicyFetchReason); }));
-
-  EXPECT_EQ(DM_STATUS_SERVICE_DEVICE_NOT_FOUND, client_->last_dm_status());
-  EXPECT_FALSE(client_->GetPolicyFor(policy_type_, std::string()));
-  EXPECT_FALSE(client_->is_registered());
-  EXPECT_TRUE(client_->requires_reregistration());
-
-  // Re-register (server sends wrong DMToken).
-  ExpectAndCaptureJobReplyFailure(
-      net::OK, DeviceManagementService::kInvalidAuthCookieOrDMToken);
-
-  RunClientTaskAndWaitError(base::BindLambdaForTesting([this]() {
-    CloudPolicyClient::RegistrationParameters user_recovery(
-        em::DeviceRegisterRequest::USER,
-        em::DeviceRegisterRequest::FLAVOR_ENROLLMENT_RECOVERY);
-    client_->Register(user_recovery, client_id_, kOAuthToken);
-  }));
-
-  EXPECT_EQ(DeviceManagementService::JobConfiguration::TYPE_POLICY_FETCH,
-            upload_type);
-  EXPECT_EQ(DeviceManagementService::JobConfiguration::TYPE_REGISTRATION,
-            job_type_);
-  EXPECT_EQ(auth_data_, DMAuth::NoAuth());
-  VerifyQueryParameter();
-  EXPECT_EQ(job_request_.SerializePartialAsString(),
-            GetReregistrationRequest().SerializePartialAsString());
-  EXPECT_FALSE(client_->is_registered());
-  EXPECT_TRUE(client_->requires_reregistration());
-  EXPECT_FALSE(client_->GetPolicyFor(policy_type_, std::string()));
-  EXPECT_EQ(DM_STATUS_SERVICE_MANAGEMENT_TOKEN_INVALID,
-            client_->last_dm_status());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(CloudPolicyClientTest, ResultCopyAssignment) {
   CloudPolicyClient::Result result1 =

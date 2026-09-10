@@ -245,7 +245,7 @@ TEST_F(DiscardEligibilityPolicyTest, TestCanDiscardNeverAudiblePage) {
                                      /*ignore_recent_visibility=*/true);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(DiscardEligibilityPolicyTest,
        TestCannotDiscardRecentlyVisiblePageUnlessExplicitlyRequested) {
   page_node()->SetIsVisible(true);

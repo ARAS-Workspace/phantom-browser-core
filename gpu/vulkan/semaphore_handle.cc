@@ -27,13 +27,13 @@ SemaphoreHandle::~SemaphoreHandle() = default;
 SemaphoreHandle& SemaphoreHandle::operator=(SemaphoreHandle&&) = default;
 
 SemaphoreHandle::SemaphoreHandle(gfx::GpuFenceHandle fence_handle) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   Init(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR,
        fence_handle.Release());
 #elif BUILDFLAG(IS_POSIX)
   Init(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
        fence_handle.Release());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 }
 
 void SemaphoreHandle::Init(VkExternalSemaphoreHandleTypeFlagBits type,
@@ -44,7 +44,7 @@ void SemaphoreHandle::Init(VkExternalSemaphoreHandleTypeFlagBits type,
 
 gfx::GpuFenceHandle SemaphoreHandle::ToGpuFenceHandle() && {
   gfx::GpuFenceHandle fence_handle;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   if (type_ == VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR) {
     fence_handle.Adopt(TakeHandle());
   } else {
@@ -52,7 +52,7 @@ gfx::GpuFenceHandle SemaphoreHandle::ToGpuFenceHandle() && {
   }
 #elif BUILDFLAG(IS_POSIX)
   fence_handle.Adopt(TakeHandle());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   return fence_handle;
 }
 

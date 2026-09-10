@@ -17,7 +17,6 @@ namespace remoting {
 
 std::optional<SessionPolicies> SessionPoliciesFromDict(
     const base::DictValue& dict) {
-#if !BUILDFLAG(IS_CHROMEOS)
   std::optional<base::TimeDelta> maximum_session_duration;
   std::optional<int> max_session_duration_mins =
       dict.FindInt(policy::key::kRemoteAccessHostMaximumSessionDurationMinutes);
@@ -26,7 +25,6 @@ std::optional<SessionPolicies> SessionPoliciesFromDict(
   if (max_session_duration_mins.has_value() && *max_session_duration_mins > 0) {
     maximum_session_duration = base::Minutes(*max_session_duration_mins);
   }
-#endif
 
   PortRange host_udp_port_range;
   const std::string* udp_port_range_string =
@@ -63,7 +61,6 @@ std::optional<SessionPolicies> SessionPoliciesFromDict(
           ? dict.FindBool(policy::key::kRemoteAccessHostAllowRelayedConnection)
           : false;
   session_policies.host_udp_port_range = host_udp_port_range;
-#if !BUILDFLAG(IS_CHROMEOS)
   session_policies.allow_file_transfer =
       dict.FindBool(policy::key::kRemoteAccessHostAllowFileTransfer);
   session_policies.allow_uri_forwarding =
@@ -73,7 +70,6 @@ std::optional<SessionPolicies> SessionPoliciesFromDict(
   session_policies.maximum_session_duration = maximum_session_duration;
   session_policies.curtain_required =
       dict.FindBool(policy::key::kRemoteAccessHostRequireCurtain);
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   session_policies.host_username_match_required =
       dict.FindBool(policy::key::kRemoteAccessHostMatchUsername);

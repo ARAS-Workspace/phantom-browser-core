@@ -29,7 +29,7 @@ ViewsTestHelperAura::ViewsTestHelperAura() {
                           : std::make_unique<aura::test::AuraTestHelper>();
 }
 
-#if DCHECK_IS_ON() && !BUILDFLAG(IS_CHROMEOS)
+#if DCHECK_IS_ON()
 ViewsTestHelperAura::~ViewsTestHelperAura() {
   // Ensure all Widgets (and Windows) are closed in unit tests.
   //

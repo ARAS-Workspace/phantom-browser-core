@@ -46,10 +46,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/chrome_app_deprecation/chrome_app_deprecation.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/auto_reset.h"
 #endif
@@ -190,10 +186,6 @@ class NotificationsApiTest : public extensions::ExtensionApiTest {
   }
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList scoped_feature_list_{
-      apps::chrome_app_deprecation::kAllowUserInstalledChromeApps};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   base::AutoReset<bool> enable_chrome_apps_{
       &extensions::testing::g_enable_chrome_apps_for_testing, true};

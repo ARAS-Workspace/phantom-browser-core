@@ -346,10 +346,6 @@ class BrowserWindow : public ui::BaseWindow {
   // |already_bookmarked| is true if the url is already bookmarked.
   virtual void ShowBookmarkBubble(const GURL& url, bool already_bookmarked) = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Toggles the multitask menu on the browser frame size button.
-  virtual void ToggleMultitaskMenu() = 0;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Shows the Full Page Translate bubble.
   //

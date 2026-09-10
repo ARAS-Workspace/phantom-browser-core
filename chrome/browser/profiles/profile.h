@@ -51,9 +51,6 @@ class ProfileCloudPolicyManager;
 class UserCloudPolicyManager;
 class CloudPolicyManager;
 
-#if BUILDFLAG(IS_CHROMEOS)
-class UserCloudPolicyManagerAsh;
-#endif
 }  // namespace policy
 
 namespace user_prefs {
@@ -94,11 +91,6 @@ class Profile : public content::BrowserContext {
     // Creates a unique OTR profile id to be used for media router.
     static OTRProfileID CreateUniqueForMediaRouter();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Creates a unique OTR profile id to be used for captive portal signin on
-    // ChromeOS.
-    static OTRProfileID CreateUniqueForCaptivePortal();
-#endif
     // Creates a unique OTR profile id for tests.
     static OTRProfileID CreateUniqueForTesting();
 
@@ -109,11 +101,6 @@ class Profile : public content::BrowserContext {
 
     bool AllowsBrowserWindows() const;
     bool IsDevTools() const;
-
-#if BUILDFLAG(IS_CHROMEOS)
-    // Returns true if the OTR Profile was created for captive portal signin.
-    bool IsCaptivePortal() const;
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
     // Constructs a Java OTRProfileID from the provided C++ OTRProfileID
@@ -323,14 +310,9 @@ class Profile : public content::BrowserContext {
   // Returns the SchemaRegistryService.
   virtual policy::SchemaRegistryService* GetPolicySchemaRegistryService() = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Returns the UserCloudPolicyManagerAsh.
-  virtual policy::UserCloudPolicyManagerAsh* GetUserCloudPolicyManagerAsh() = 0;
-#else
   // Returns the UserCloudPolicyManager.
   virtual policy::UserCloudPolicyManager* GetUserCloudPolicyManager() = 0;
   virtual policy::ProfileCloudPolicyManager* GetProfileCloudPolicyManager() = 0;
-#endif
 
   // Returns CloudPolicyManager.
   // This function combine three Get*CloudPolicyManager functions above and
@@ -348,35 +330,6 @@ class Profile : public content::BrowserContext {
   // Returns the last directory that was chosen for uploading or opening a file.
   virtual base::FilePath last_selected_directory() = 0;
   virtual void set_last_selected_directory(const base::FilePath& path) = 0;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  enum AppLocaleChangedVia{// Caused by chrome://settings change.
-                           APP_LOCALE_CHANGED_VIA_SETTINGS,
-                           // Locale has been reverted via LocaleChangeGuard.
-                           APP_LOCALE_CHANGED_VIA_REVERT,
-                           // From login screen.
-                           APP_LOCALE_CHANGED_VIA_LOGIN,
-                           // From login to a public session.
-                           APP_LOCALE_CHANGED_VIA_PUBLIC_SESSION_LOGIN,
-                           // From AllowedLanguages policy.
-                           APP_LOCALE_CHANGED_VIA_POLICY,
-                           // Locale is reverted in the next demo session.
-                           APP_LOCALE_CHANGED_VIA_DEMO_SESSION_REVERT,
-                           // From system tray.
-                           APP_LOCALE_CHANGED_VIA_SYSTEM_TRAY,
-                           // Source unknown.
-                           APP_LOCALE_CHANGED_VIA_UNKNOWN};
-
-  // Changes application locale for a profile.
-  virtual void ChangeAppLocale(
-      const std::string& locale, AppLocaleChangedVia via) = 0;
-
-  // Called after login.
-  virtual void OnLogin() = 0;
-
-  // Initializes Chrome OS's preferences.
-  virtual void InitChromeOSPreferences() = 0;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Returns the home page for this profile.
   virtual GURL GetHomePage() = 0;
@@ -520,12 +473,6 @@ class Profile : public content::BrowserContext {
   }
 
   const std::optional<OTRProfileID> otr_profile_id_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(40233408): Remove this when migration is completed.
-  // True if the guest profile uses BrowserProfileType::kGuest.
-  bool new_guest_profile_impl_;
-#endif
 
  private:
   bool restored_last_session_ = false;

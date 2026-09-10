@@ -58,12 +58,6 @@ constexpr std::string_view GetOSType() {
   return "iOS";
 #elif BUILDFLAG(IS_MAC)
   return "Mac OS X";
-#elif BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  return "ChromeOS";
-#else
-  return "ChromiumOS";
-#endif
 #elif BUILDFLAG(IS_ANDROID)
   return "Android";
 #elif BUILDFLAG(IS_LINUX)

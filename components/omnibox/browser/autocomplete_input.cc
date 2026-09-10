@@ -30,10 +30,6 @@
 #include "url/url_canon_ip.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/url_constants.h"  // nogncheck
-#endif                                         // BUILDFLAG(IS_CHROMEOS)
-
 // static
 const char16_t AutocompleteInput::kInvalidChars[] = {
     '\n',   '\r', '\t',
@@ -280,13 +276,6 @@ metrics::OmniboxInputType AutocompleteInput::Parse(
       url_formatter::FixupURL(base::UTF16ToUTF8(text), desired_tld);
   if (!canonicalized_url->is_valid())
     return metrics::OmniboxInputType::QUERY;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::EqualsCaseInsensitiveASCII(parsed_scheme_utf8,
-                                       chromeos::kAppInstallUriScheme)) {
-    return metrics::OmniboxInputType::URL;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (base::EqualsCaseInsensitiveASCII(parsed_scheme_utf8, url::kFileScheme)) {
     // A user might or might not type a scheme when entering a file URL.  In

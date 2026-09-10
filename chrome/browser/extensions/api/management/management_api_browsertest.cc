@@ -36,9 +36,6 @@
 #include "extensions/common/extension_id.h"
 #include "extensions/test/extension_test_message_listener.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/chrome_app_deprecation/chrome_app_deprecation.h"
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/ui/browser.h"
@@ -101,10 +98,6 @@ class ExtensionManagementApiTestWithBackgroundType
     enable_chrome_apps_ = std::make_unique<base::AutoReset<bool>>(
         &extensions::testing::g_enable_chrome_apps_for_testing, true);
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-    scoped_feature_list_.InitAndEnableFeature(
-        apps::chrome_app_deprecation::kAllowUserInstalledChromeApps);
-#endif
   }
   ~ExtensionManagementApiTestWithBackgroundType() override = default;
   ExtensionManagementApiTestWithBackgroundType(
@@ -114,9 +107,6 @@ class ExtensionManagementApiTestWithBackgroundType
 
  private:
   std::unique_ptr<base::AutoReset<bool>> enable_chrome_apps_;
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList scoped_feature_list_;
-#endif
 };
 
 // We test this here instead of in an ExtensionApiTest because normal extensions

@@ -50,9 +50,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/sync/base/features.h"
-#endif
 
 namespace extensions {
 
@@ -66,10 +63,6 @@ class GlicMessagingBrowserTest : public GlicPrivateApiTestBase {
          {extensions_features::kApiGlicAccessFromPromotionPage, {}},
          {features::kGlicActor,
           {{"glic_actor_policy_control_exemption", "true"}}}
-#if BUILDFLAG(IS_CHROMEOS)
-         ,
-         {syncer::kReplaceSyncPromosWithSignInPromos, {}}
-#endif
         },
         {});
   }

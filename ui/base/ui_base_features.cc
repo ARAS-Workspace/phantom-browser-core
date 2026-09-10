@@ -19,10 +19,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/base/shortcut_mapping_pref_delegate.h"
-#endif
-
 namespace features {
 
 // If enabled, generates an empty GestureScrollUpdate if the preceding TouchMove
@@ -50,47 +46,6 @@ BASE_FEATURE(kAsyncLiveResize, base::FEATURE_DISABLED_BY_DEFAULT);
 // compositor frame has been received.
 BASE_FEATURE(kAlphaInsteadOfCATransaction, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Integrate input method specific settings to Chrome OS settings page.
-// https://crbug.com/895886.
-BASE_FEATURE(kSettingsShowsPerKeyboardSettings,
-             "InputMethodIntegratedSettings",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kDeprecateAltClick, base::FEATURE_DISABLED_BY_DEFAULT);
-
-bool IsDeprecateAltClickEnabled() {
-  return base::FeatureList::IsEnabled(kDeprecateAltClick);
-}
-
-BASE_FEATURE(kNotificationsIgnoreRequireInteraction,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsNotificationsIgnoreRequireInteractionEnabled() {
-  return base::FeatureList::IsEnabled(kNotificationsIgnoreRequireInteraction);
-}
-
-// Enables settings that allow users to remap the F11 and F12 keys in the
-// "Customize keyboard keys" page.
-BASE_FEATURE(kSupportF11AndF12KeyShortcuts, base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool AreF11AndF12ShortcutsEnabled() {
-  // TODO(crbug.com/40203434): Remove this once kDeviceI18nShortcutsEnabled
-  // policy is deprecated. This policy allows managed users to still be able to
-  // use deprecated legacy shortcuts which some enterprise customers rely on.
-  if (::ui::ShortcutMappingPrefDelegate::IsInitialized()) {
-    ::ui::ShortcutMappingPrefDelegate* instance =
-        ::ui::ShortcutMappingPrefDelegate::GetInstance();
-    if (instance && instance->IsDeviceEnterpriseManaged()) {
-      return instance->IsI18nShortcutPrefEnabled() &&
-             base::FeatureList::IsEnabled(
-                 features::kSupportF11AndF12KeyShortcuts);
-    }
-  }
-  return base::FeatureList::IsEnabled(features::kSupportF11AndF12KeyShortcuts);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_OZONE)
 BASE_FEATURE(kOzoneBubblesUsePlatformWidgets, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -197,32 +152,12 @@ BASE_FEATURE(kFocusFollowsCursor, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kDragDropOnlySynthesizeHttpOrHttpsUrlsFromText,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool IsImprovedKeyboardShortcutsEnabled() {
-  // TODO(crbug.com/40203434): Remove this once kDeviceI18nShortcutsEnabled
-  // policy is deprecated.
-  if (::ui::ShortcutMappingPrefDelegate::IsInitialized()) {
-    ::ui::ShortcutMappingPrefDelegate* instance =
-        ::ui::ShortcutMappingPrefDelegate::GetInstance();
-    if (instance && instance->IsDeviceEnterpriseManaged()) {
-      return instance->IsI18nShortcutPrefEnabled();
-    }
-  }
-  return true;
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Whether to enable new touch text editing features such as extra touch
 // selection gestures and quick menu options. Planning to release for ChromeOS
 // first, then possibly also enable some parts for other platforms later.
 // TODO(b/262297017): Clean up after touch text editing redesign ships.
 BASE_FEATURE(kTouchTextEditingRedesign,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 bool IsTouchTextEditingRedesignEnabled() {
@@ -231,7 +166,7 @@ bool IsTouchTextEditingRedesignEnabled() {
 
 // This feature enables drag and drop using touch input devices.
 BASE_FEATURE(kTouchDragAndDrop,
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -257,7 +192,7 @@ bool IsForcedColorsEnabled() {
 // and Linux. This feature will be released for other platforms in later
 // milestones.
 BASE_FEATURE(kEyeDropper,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -386,11 +321,7 @@ BASE_FEATURE(kBubbleMetricsApi, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kBubbleFrameViewTitleIsHeading, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kEnableGestureBeginEndTypes,
-#if !BUILDFLAG(IS_CHROMEOS)
              base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 );
 
 BASE_FEATURE(kUseUtf8EncodingForSvgImage, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -412,11 +343,7 @@ BASE_FEATURE(kNonBlockingOsClipboardReads, base::FEATURE_ENABLED_BY_DEFAULT);
 // to be done via corner points. See https://crbug.com/720596 for details.
 BASE_FEATURE(kEnablePixelCanvasRecording,
              "enable-pixel-canvas-recording",
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 bool IsPixelCanvasRecordingEnabled() {
@@ -474,7 +401,7 @@ BASE_FEATURE(kWebUIRoundedIcons, base::FEATURE_DISABLED_BY_DEFAULT);
 // Updates the default dark neutrals for the theme palette.
 BASE_FEATURE(kChromeDarkNeutrals26, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kUsePortalAccentColor, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif
 

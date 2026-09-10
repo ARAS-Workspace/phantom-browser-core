@@ -262,9 +262,6 @@ class PageInfo : private content_settings::CookieControlsObserver,
   // This method is called when the user opens the Cookies & Site Data subpage.
   void OnCookiesPageOpened();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bool ShouldSyncCookiesForCurrentUrl();
-#endif
 
   // Return a pointer to the ObjectPermissionContextBase corresponding to the
   // content settings type, |type|. Returns nullptr for content settings

@@ -475,17 +475,10 @@ bool GpuControlList::Conditions::Contains(OsType target_os_type,
       } else {
         for (size_t ii = 0; !found && ii < devices.size(); ++ii) {
           uint32_t device_id = devices[ii].device_id;
-#if BUILDFLAG(IS_CHROMEOS)
-          uint32_t revision = devices[ii].revision;
-#endif  // BUILDFLAG(IS_CHROMEOS)
           for (auto& candidate : candidates) {
             if (vendor_id != candidate.vendor_id ||
                 device_id != candidate.device_id)
               continue;
-#if BUILDFLAG(IS_CHROMEOS)
-            if (revision && revision != candidate.revision)
-              continue;
-#endif  // BUILDFLAG(IS_CHROMEOS)
             found = true;
             break;
           }
@@ -800,9 +793,7 @@ uint32_t GpuControlList::max_entry_id() const {
 
 // static
 GpuControlList::OsType GpuControlList::GetOsType() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return kOsChromeOS;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return kOsAndroid;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
   return kOsLinux;

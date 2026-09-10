@@ -11,10 +11,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/testing_profile_manager.h"
@@ -47,16 +43,7 @@ class OnStartupHandlerTest : public testing::Test {
   void SetUp() override {
     ASSERT_TRUE(profile_manager_.SetUp());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    auto* fake_user_manager = new ash::FakeChromeUserManager;
-    user_manager_enabler_ = std::make_unique<user_manager::ScopedUserManager>(
-        base::WrapUnique(fake_user_manager));
-    constexpr char kFakeEmail[] = "fake_id@gmail.com";
-    profile_ = profile_manager_.CreateTestingProfile(kFakeEmail);
-    fake_user_manager->AddUser(AccountId::FromUserEmail(kFakeEmail));
-#else
     profile_ = profile_manager_.CreateTestingProfile("Profile 1");
-#endif
 
     handler_ = std::make_unique<TestOnStartupHandler>(profile_);
     handler_->set_web_ui(&web_ui_);
@@ -71,9 +58,6 @@ class OnStartupHandlerTest : public testing::Test {
   TestingProfileManager profile_manager_;
   std::unique_ptr<TestOnStartupHandler> handler_;
   raw_ptr<Profile> profile_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> user_manager_enabler_;
-#endif
   content::TestWebUI web_ui_;
 };
 

@@ -1424,14 +1424,6 @@ void MediaSessionImpl::GetMediaImageBitmap(
     int desired_size_px,
     GetMediaImageBitmapCallback callback) {
 // We want to hide the media image from ChromeOS' media controls.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (session_info_ && session_info_->hide_metadata) {
-    MediaSessionClient* media_session_client = MediaSessionClient::Get();
-    CHECK(media_session_client);
-    std::move(callback).Run(media_session_client->GetThumbnailPlaceholder());
-    return;
-  }
-#endif
 
   // We should make sure `image` is in `images_`.
   bool found = false;
@@ -1576,14 +1568,6 @@ void MediaSessionImpl::RebuildAndNotifyMediaSessionInfoChanged() {
 
   session_info_ = std::move(current_info);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // If we need to hide the metadata, then we need to notify the metadata
-  // observers with the hidden metadata. They might have received the metadata
-  // before the info has been updated.
-  if (session_info_->hide_metadata) {
-    RebuildAndNotifyMetadataChanged();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 bool MediaSessionImpl::AddOneShotPlayer(MediaSessionPlayerObserver* observer,
@@ -1992,28 +1976,6 @@ void MediaSessionImpl::RebuildAndNotifyMetadataChanged() {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void MediaSessionImpl::BuildPlaceholderMetadata(
-    media_session::MediaMetadata& metadata,
-    std::vector<media_session::MediaImage>& artwork) {
-  if ((routed_service_ && routed_service_->metadata()) ||
-      !metadata_.IsEmpty()) {
-    MediaSessionClient* media_session_client = MediaSessionClient::Get();
-    CHECK(media_session_client);
-
-    metadata.title = media_session_client->GetTitlePlaceholder();
-    metadata.artist = media_session_client->GetArtistPlaceholder();
-    metadata.album = media_session_client->GetAlbumPlaceholder();
-    metadata.source_title = media_session_client->GetSourceTitlePlaceholder();
-
-    // Always make sure the metadata replacement is accompanied by the thumbnail
-    // replacement.
-    // An empty `MediaImage` so `GetMediaImageBitmap` is eventually triggered.
-    // That is where we replace the artwork with the placeholder `Bitmap`.
-    artwork.push_back(media_session::MediaImage());
-  }
-}
-#endif
 
 void MediaSessionImpl::BuildMetadata(
     media_session::MediaMetadata& metadata,
@@ -2022,12 +1984,6 @@ void MediaSessionImpl::BuildMetadata(
   // `MediaNotificationItem` lives in //components which cannot depend on
   // //content. For other platforms, metadata is hidden in the
   // `SystemMediaControlsNotifier`.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (session_info_ && session_info_->hide_metadata) {
-    BuildPlaceholderMetadata(metadata, artwork);
-    return;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (routed_service_ && routed_service_->metadata()) {
     metadata.title = routed_service_->metadata()->title;

@@ -19,13 +19,13 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
 #include "ui/views/widget/desktop_aura/desktop_screen.h"
 
 #if BUILDFLAG(IS_LINUX)
 #include "ui/views/test/test_desktop_screen_ozone.h"
 #endif  // BUILDFLAG(IS_LINUX)
-#endif  // defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // defined(USE_AURA)
 
 namespace {
 
@@ -94,7 +94,7 @@ ViewEventTestBase::ViewEventTestBase() {
   // in a new process.
   mojo::core::Init();
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   // TODO(pkasting): Determine why the TestScreen in AuraTestHelper is
   // insufficient for these tests, then either bolster/replace it or fix the
   // tests.
@@ -107,7 +107,7 @@ ViewEventTestBase::ViewEventTestBase() {
   if (!display::Screen::HasScreen()) {
     screen_ = views::CreateDesktopScreen();
   }
-#endif  // defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // defined(USE_AURA)
 }
 
 ViewEventTestBase::~ViewEventTestBase() {

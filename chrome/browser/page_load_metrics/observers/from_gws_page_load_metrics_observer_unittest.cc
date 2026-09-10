@@ -802,7 +802,7 @@ TEST_F(FromGWSPageLoadMetricsObserverTest,
 }
 
 // Disabled due to flakiness: https://crbug.com/40698074
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_NewNavigationBeforeCommit DISABLED_NewNavigationBeforeCommit
 #else
 #define MAYBE_NewNavigationBeforeCommit NewNavigationBeforeCommit

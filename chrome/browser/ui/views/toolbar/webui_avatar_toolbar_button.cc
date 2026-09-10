@@ -262,11 +262,6 @@ void WebUIAvatarToolbarButton::UpdateState() {
   state->state = MapAvatarState(state_manager_->GetActiveState());
 
   bool is_enabled = true;
-#if BUILDFLAG(IS_CHROMEOS)
-  Profile* profile = delegate_->GetBrowser()->GetProfile();
-  is_enabled = profile->IsOffTheRecord() && !profile->IsGuestSession() &&
-               !profile->GetOTRProfileID().IsCaptivePortal();
-#endif
 
   const ui::ColorProvider* const color_provider =
       delegate_->GetView()->GetColorProvider();

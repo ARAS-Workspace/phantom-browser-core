@@ -90,12 +90,6 @@
 #include "media/base/android/media_codec_util.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/chromeos_camera/gpu_mjpeg_decode_accelerator_factory.h"
-#include "components/chromeos_camera/mojo_jpeg_encode_accelerator_service.h"
-#include "components/chromeos_camera/mojo_mjpeg_decode_accelerator_service.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_APPLE)
 #include "ui/base/cocoa/quartz_util.h"
 #endif
@@ -135,12 +129,7 @@ constexpr char kGpuInitializationEventCategory[] = "latency";
 constexpr char kGpuInitializationEvent[] = "GpuInitialization";
 
 bool IsAcceleratedJpegDecodeSupported() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return chromeos_camera::GpuMjpegDecodeAcceleratorFactory::
-      IsAcceleratedJpegDecodeSupported();
-#else
   return false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void RunGetPeakGpuMemoryUsageCallbackOnMainThread(
@@ -556,27 +545,6 @@ void GpuServiceImpl::SetPriorityChangedCallback(
   DCHECK(main_runner_->BelongsToCurrentThread());
   priority_changed_callback_ = std::move(callback);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void GpuServiceImpl::CreateJpegDecodeAccelerator(
-    mojo::PendingReceiver<chromeos_camera::mojom::MjpegDecodeAccelerator>
-        jda_receiver) {
-  DCHECK(io_runner_->BelongsToCurrentThread());
-  chromeos_camera::MojoMjpegDecodeAcceleratorService::Create(
-      std::move(jda_receiver),
-      base::BindRepeating(
-          &GpuServiceImpl::SetMjpegDecodeAcceleratorBeginFrameCB,
-          base::Unretained(this)));
-}
-
-void GpuServiceImpl::CreateJpegEncodeAccelerator(
-    mojo::PendingReceiver<chromeos_camera::mojom::JpegEncodeAccelerator>
-        jea_receiver) {
-  DCHECK(io_runner_->BelongsToCurrentThread());
-  chromeos_camera::MojoJpegEncodeAcceleratorService::Create(
-      std::move(jea_receiver));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void GpuServiceImpl::CreateVideoEncodeAcceleratorProvider(
     mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>

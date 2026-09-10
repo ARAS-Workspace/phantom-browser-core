@@ -296,15 +296,11 @@ class ContentAnalysisDelegateBrowserTestBase
   }
 
   void EnableUploadsScanningAndReporting() {
-#if BUILDFLAG(IS_CHROMEOS)
-    SetDMTokenForTesting(policy::DMToken::CreateValidToken(kBrowserDMToken));
-#else
     if (machine_scope_) {
       SetDMTokenForTesting(policy::DMToken::CreateValidToken(kBrowserDMToken));
     } else {
       test::SetProfileDMToken(browser()->GetProfile(), kProfileDMToken);
     }
-#endif
 
     constexpr char kBlockingScansForDlpAndMalware[] = R"({
       "service_provider": "google",
@@ -326,29 +322,17 @@ class ContentAnalysisDelegateBrowserTestBase
                                       /*enabled*/ true,
                                       /*enabled_event_names*/ {},
                                       /*enabled_opt_in_events*/ {},
-#if BUILDFLAG(IS_CHROMEOS)
-                                      /*machine_scope*/ false);
-#else
                                       machine_scope_);
-#endif
 
     client_ = std::make_unique<policy::MockCloudPolicyClient>();
     client_->SetDMToken(
-#if BUILDFLAG(IS_CHROMEOS)
-        kBrowserDMToken);
-#else
         machine_scope() ? kBrowserDMToken : kProfileDMToken);
-#endif
     if (machine_scope_) {
       RealtimeReportingClientFactory::GetForProfile(browser()->GetProfile())
           ->SetBrowserCloudPolicyClientForTesting(client_.get());
     } else {
       RealtimeReportingClientFactory::GetForProfile(browser()->GetProfile())
-#if BUILDFLAG(IS_CHROMEOS)
-          ->SetBrowserCloudPolicyClientForTesting(client_.get());
-#else
           ->SetProfileCloudPolicyClientForTesting(client_.get());
-#endif
     }
     identity_test_environment_ =
         std::make_unique<signin::IdentityTestEnvironment>();
@@ -369,9 +353,6 @@ class ContentAnalysisDelegateBrowserTestBase
   policy::MockCloudPolicyClient* client() { return client_.get(); }
 
   std::string GetProfileIdentifier() const {
-#if BUILDFLAG(IS_CHROMEOS)
-    return browser()->GetProfile()->GetPath().AsUTF8Unsafe();
-#else
     if (machine_scope_) {
       return browser()->GetProfile()->GetPath().AsUTF8Unsafe();
     }
@@ -382,7 +363,6 @@ class ContentAnalysisDelegateBrowserTestBase
       return profile_id_service->GetProfileId().value();
     }
     return std::string();
-#endif
   }
 
  private:
@@ -1104,15 +1084,11 @@ IN_PROC_BROWSER_TEST_P(ContentAnalysisDelegateBrowserTest, Throttled) {
     }
 
     std::vector<std::string> expected_file_names =
-#if BUILDFLAG(IS_CHROMEOS)
-        {"a.exe", "b.exe", "c.exe"};
-#else
         {
             machine_scope() ? created_file_paths()[0].AsUTF8Unsafe() : "a.exe",
             machine_scope() ? created_file_paths()[1].AsUTF8Unsafe() : "b.exe",
             machine_scope() ? created_file_paths()[2].AsUTF8Unsafe() : "c.exe",
         };
-#endif
 
     validator.ExpectUnscannedFileEvents(
         std::move(expected_event), expected_file_names,
@@ -1266,12 +1242,8 @@ IN_PROC_BROWSER_TEST_P(ContentAnalysisDelegateBlockingSettingBrowserTest,
     expected_event.set_tab_url("about:blank");
     expected_event.set_source("");
     expected_event.set_destination("");
-#if BUILDFLAG(IS_CHROMEOS)
-    expected_event.set_file_name("encrypted.zip");
-#else
     machine_scope() ? expected_event.set_file_name(test_zip.AsUTF8Unsafe())
                     : expected_event.set_file_name("encrypted.zip");
-#endif
     expected_event.set_download_digest_sha_256(
         "701FCEA8B2112FFAB257A8A8DFD3382ABCF047689AB028D42903E3B3AA488D9A");
     expected_event.set_content_type("application/zip");
@@ -1391,13 +1363,9 @@ IN_PROC_BROWSER_TEST_P(ContentAnalysisDelegateBlockingSettingBrowserTest,
     expected_event.set_tab_url("about:blank");
     expected_event.set_source("");
     expected_event.set_destination("");
-#if BUILDFLAG(IS_CHROMEOS)
-    expected_event.set_file_name("large.doc");
-#else
     machine_scope()
         ? expected_event.set_file_name(created_file_paths()[0].AsUTF8Unsafe())
         : expected_event.set_file_name("large.doc");
-#endif
     expected_event.set_download_digest_sha_256(
         "6F040FFDD67004CA3074BFB39936F553A49669427C477CC60DBE064C355EE1B1");
     expected_event.set_content_type("text/plain");
@@ -1650,13 +1618,9 @@ IN_PROC_BROWSER_TEST_P(ContentAnalysisDelegateBlockingSettingBrowserTest,
     expected_download_event.set_tab_url("about:blank");
     expected_download_event.set_source("");
     expected_download_event.set_destination("");
-#if BUILDFLAG(IS_CHROMEOS)
-    expected_download_event.set_file_name("foo.doc");
-#else
     machine_scope() ? expected_download_event.set_file_name(
                           created_file_paths()[0].AsUTF8Unsafe())
                     : expected_download_event.set_file_name("foo.doc");
-#endif
     expected_download_event.set_content_size(11);
     expected_download_event.set_download_digest_sha256(
         "B3A2E2EDBAA3C798B4FC267792B1641B94793DE02D870124E5CBE663750B4CFC");
@@ -1691,13 +1655,9 @@ IN_PROC_BROWSER_TEST_P(ContentAnalysisDelegateBlockingSettingBrowserTest,
     expected_data_event.set_destination("");
     expected_data_event.set_download_digest_sha_256(
         "B3A2E2EDBAA3C798B4FC267792B1641B94793DE02D870124E5CBE663750B4CFC");
-#if BUILDFLAG(IS_CHROMEOS)
-    expected_data_event.set_file_name("foo.doc");
-#else
     machine_scope() ? expected_data_event.set_file_name(
                           created_file_paths()[0].AsUTF8Unsafe())
                     : expected_data_event.set_file_name("foo.doc");
-#endif
     expected_data_event.set_content_size(11);
     expected_data_event.set_scan_id(kScanId1);
     expected_data_event.set_trigger(
@@ -2002,15 +1962,11 @@ class ContentAnalysisDelegateUnauthorizedBrowserTest
   }
 
   void SetUpScanning(bool file_scan) {
-#if BUILDFLAG(IS_CHROMEOS)
-    SetDMTokenForTesting(policy::DMToken::CreateValidToken(dm_token()));
-#else
     if (machine_scope()) {
       SetDMTokenForTesting(policy::DMToken::CreateValidToken(dm_token()));
     } else {
       test::SetProfileDMToken(browser()->GetProfile(), dm_token());
     }
-#endif
 
     std::string pref = base::StringPrintf(
         R"({
@@ -2220,13 +2176,9 @@ IN_PROC_BROWSER_TEST_P(ContentAnalysisDelegateFilesBrowserTest, FilesUpload) {
     expected_event.set_tab_url("about:blank");
     expected_event.set_source("");
     expected_event.set_destination("");
-#if BUILDFLAG(IS_CHROMEOS)
-    expected_event.set_file_name("bad.exe");
-#else
     machine_scope()
         ? expected_event.set_file_name(created_file_paths()[1].AsUTF8Unsafe())
         : expected_event.set_file_name("bad.exe");
-#endif
     expected_event.set_content_size(16);
     expected_event.set_download_digest_sha256(
         "77AE96C38386429D28E53F5005C46C7B4D8D39BE73D757CE61E0AE65CC1A5A5D");
@@ -2342,13 +2294,9 @@ IN_PROC_BROWSER_TEST_P(ContentAnalysisDelegateFilesBrowserTest,
     expected_event.set_tab_url("about:blank");
     expected_event.set_source("");
     expected_event.set_destination("");
-#if BUILDFLAG(IS_CHROMEOS)
-    expected_event.set_file_name("bad.exe");
-#else
     machine_scope()
         ? expected_event.set_file_name(created_file_paths()[1].AsUTF8Unsafe())
         : expected_event.set_file_name("bad.exe");
-#endif
     expected_event.set_content_size(16);
     expected_event.set_download_digest_sha256(
         "77AE96C38386429D28E53F5005C46C7B4D8D39BE73D757CE61E0AE65CC1A5A5D");

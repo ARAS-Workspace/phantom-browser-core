@@ -73,13 +73,7 @@ IN_PROC_BROWSER_TEST_F(IdleApiTest, SetDetectionInterval) {
                     ->GetThresholdForTest(last_loaded_extension_id()));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(IdleApiTest, IdleGetAutoLockDelay) {
-  ASSERT_TRUE(RunExtensionTest("idle/get_auto_lock_delay")) << message_;
-}
-#else
 IN_PROC_BROWSER_TEST_F(IdleApiTest, UnsupportedIdleGetAutoLockDelay) {
   ASSERT_TRUE(RunExtensionTest("idle/unsupported_get_auto_lock_delay"));
 }
-#endif
 }  // namespace extensions

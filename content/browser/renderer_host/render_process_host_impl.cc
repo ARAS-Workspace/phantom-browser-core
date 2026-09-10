@@ -229,7 +229,7 @@
 #include "third_party/blink/public/mojom/android_font_lookup/android_font_lookup.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <sys/resource.h>
 
 #include "components/services/font/public/mojom/font_service.mojom.h"  // nogncheck
@@ -1164,7 +1164,7 @@ static constexpr size_t kUnknownPlatformProcessLimit = 0;
 // to indicate failure and std::numeric_limits<size_t>::max() to indicate
 // unlimited.
 size_t GetPlatformProcessLimit() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   struct rlimit limit;
   if (getrlimit(RLIMIT_NPROC, &limit) != 0)
     return kUnknownPlatformProcessLimit;
@@ -1175,7 +1175,7 @@ size_t GetPlatformProcessLimit() {
 #else
   // TODO(crbug.com/40671068): Implement on other platforms.
   return kUnknownPlatformProcessLimit;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
@@ -1424,9 +1424,9 @@ RenderProcessHostImpl::IOThreadHostImpl::~IOThreadHostImpl() = default;
 
 void RenderProcessHostImpl::IOThreadHostImpl::SetPid(
     base::ProcessId child_pid) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   child_thread_type_switcher_.SetPid(child_pid);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 void RenderProcessHostImpl::IOThreadHostImpl::GetInterfacesForTesting(
@@ -1887,7 +1887,7 @@ bool RenderProcessHostImpl::Init() {
   }
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   int flags = renderer_prefix.empty() ? ChildProcessHost::CHILD_ALLOW_SELF
                                       : ChildProcessHost::CHILD_NORMAL;
 #elif BUILDFLAG(IS_MAC)
@@ -2483,17 +2483,6 @@ void RenderProcessHostImpl::CreateNotificationService(
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void RenderProcessHostImpl::ReinitializeLogging(
-    uint32_t logging_dest,
-    base::ScopedFD log_file_descriptor) {
-  auto logging_settings = mojom::LoggingSettings::New();
-  logging_settings->logging_dest = logging_dest;
-  logging_settings->log_file_descriptor =
-      mojo::PlatformHandle(std::move(log_file_descriptor));
-  child_process_->ReinitializeLogging(std::move(logging_settings));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void RenderProcessHostImpl::SetBatterySaverMode(
     bool battery_saver_mode_enabled) {
@@ -3776,7 +3765,7 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
       sandbox::policy::switches::kDisableLandlockSandbox,
       sandbox::policy::switches::kDisableSeccompFilterSandbox,
       sandbox::policy::switches::kNoSandbox,
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       switches::kDisableDevShmUsage,
 #endif
 #if BUILDFLAG(ENABLE_VRP_FLAGS)
@@ -3895,9 +3884,6 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
       blink::switches::kEnablePreferCompositingToLCDText,
       blink::switches::kEnableRGBA4444Textures,
       blink::switches::kEnableRasterSideDarkModeForImages,
-#if BUILDFLAG(IS_CHROMEOS)
-      blink::switches::kEnableOverlaysAndLowLatencyUsageForWebGL,
-#endif
       blink::switches::kForceGpuMemAvailableMb,
       blink::switches::
           kGpuMemoryBufferReadbackFromTextureForceDisabledForDebugging,
@@ -3950,9 +3936,6 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
       switches::kIpcDumpDirectory,
       switches::kIpcFuzzerTestcase,
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-      switches::kSchedulerBoostUrgent,
-#endif
   };
   renderer_cmd->CopySwitchesFrom(browser_cmd, kSwitchNames);
 
@@ -3975,7 +3958,7 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
   if (browser_cmd.HasSwitch(switches::kDisableGpuCompositing)) {
     renderer_cmd->AppendSwitch(switches::kDisableGpuCompositing);
   }
-#elif !BUILDFLAG(IS_CHROMEOS)
+#else
   // If gpu compositing is not being used, tell the renderer at startup. This
   // is inherently racey, as it may change while the renderer is being
   // launched, but the renderer will hear about the correct state eventually.
@@ -4229,7 +4212,7 @@ void RenderProcessHostImpl::OnChannelConnected(int32_t peer_pid) {
     for (auto& observer : observers_)
       observer.RenderProcessReady(this);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // Provide /proc/{renderer pid}/status and statm files for
     // MemoryUsageMonitor in blink.
     ProvideStatusFileForRenderer();
@@ -5784,7 +5767,7 @@ uint64_t RenderProcessHostImpl::GetPrivateMemoryFootprint() {
   // - Mac OS: https://crbug.com/707021 .
   // - Win: https://crbug.com/707022 .
   uint64_t total_size = 0;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   total_size = dump->platform_private_footprint->rss_anon_bytes +
                dump->platform_private_footprint->vm_swap_bytes;
 #elif BUILDFLAG(IS_APPLE)
@@ -6106,7 +6089,7 @@ void RenderProcessHostImpl::OnProcessLaunched() {
     for (auto& observer : observers_)
       observer.RenderProcessReady(this);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // Provide /proc/{renderer pid}/status and statm files for
     // MemoryUsageMonitor in blink.
     ProvideStatusFileForRenderer();
@@ -6330,7 +6313,7 @@ void RenderProcessHostImpl::BindTracedProcess(
   BindReceiver(std::move(receiver));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 void RenderProcessHostImpl::ProvideStatusFileForRenderer() {
   // We use ScopedAllowBlocking, because opening /proc/{pid}/status and
   // /proc/{pid}/statm is not blocking call.

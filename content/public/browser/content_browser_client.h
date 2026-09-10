@@ -293,11 +293,6 @@ class TtsEnvironmentAndroid;
 class AuthenticatorRequestClientDelegate;
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-class SmartCardDelegate;
-class TtsControllerDelegate;
-#endif
-
 // Embedder API (or SPI) for participating in browser logic, to be implemented
 // by the client of the content browser. See ChromeContentBrowserClient for the
 // principal implementation. The methods are assumed to be called on the UI
@@ -1284,11 +1279,6 @@ class CONTENT_EXPORT ContentBrowserClient {
       const std::string& language,
       media::mojom::SpeechRecognitionQuality quality);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Allows the embedder to return a delegate for the TtsController.
-  virtual TtsControllerDelegate* GetTtsControllerDelegate();
-#endif
-
   // Applies policy-dictated changes to the manifest that was loaded from the
   // provided render_frame_host.
   virtual void MaybeOverrideManifest(RenderFrameHost* render_frame_host,
@@ -2191,11 +2181,6 @@ class CONTENT_EXPORT ContentBrowserClient {
   // Allows the embedder to provide an implementation of the Local Font Access
   // API.
   virtual FontAccessDelegate* GetFontAccessDelegate();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Allows the embedder to provide an implementation of the Web Smart Card API.
-  virtual SmartCardDelegate* GetSmartCardDelegate();
-#endif
 
   // Attempt to open the Payment Handler window inside its corresponding
   // PaymentRequest UI surface. Returns true if the ContentBrowserClient

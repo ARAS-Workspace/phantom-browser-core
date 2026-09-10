@@ -104,10 +104,6 @@ void BrowserProcessIOThread::ProcessHostCleanUp() {
 #if BUILDFLAG(CLANG_PROFILING)
       // On profiling build, browser_tests runs 10x slower.
       const int kMaxSecondsToWaitForNetworkProcess = 100;
-#elif BUILDFLAG(IS_CHROMEOS)
-      // ChromeOS will kill the browser process if it doesn't shut down within
-      // 3 seconds, so make sure we wait for less than that.
-      const int kMaxSecondsToWaitForNetworkProcess = 1;
 #else
       const int kMaxSecondsToWaitForNetworkProcess = 10;
 #endif

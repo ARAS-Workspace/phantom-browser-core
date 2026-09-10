@@ -11,7 +11,7 @@
 #include "components/viz/common/resources/shared_image_format_utils.h"
 #include "ui/gfx/geometry/size.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <drm_fourcc.h>
 #include <unistd.h>
 
@@ -21,7 +21,7 @@
 
 namespace gfx {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 static_assert(NativePixmapHandle::kNoModifier == DRM_FORMAT_MOD_INVALID,
               "gfx::NativePixmapHandle::kNoModifier should be an alias for"
               "DRM_FORMAT_MOD_INVALID");
@@ -32,7 +32,7 @@ NativePixmapPlane::NativePixmapPlane() : stride(0), offset(0), size(0) {}
 NativePixmapPlane::NativePixmapPlane(uint32_t stride,
                                      uint64_t offset,
                                      uint64_t size
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
                                      ,
                                      base::ScopedFD fd
 #endif
@@ -40,7 +40,7 @@ NativePixmapPlane::NativePixmapPlane(uint32_t stride,
     : stride(stride),
       offset(offset),
       size(size)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       ,
       fd(std::move(fd))
 #endif
@@ -65,7 +65,7 @@ NativePixmapHandle& NativePixmapHandle::operator=(NativePixmapHandle&& other) =
 NativePixmapHandle CloneHandleForIPC(const NativePixmapHandle& handle) {
   NativePixmapHandle clone;
   for (auto& plane : handle.planes) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     DCHECK(plane.fd.is_valid());
     // Combining the HANDLE_EINTR and ScopedFD's constructor causes the compiler
     // to emit some very strange assembly that tends to cause FD ownership
@@ -87,7 +87,7 @@ NativePixmapHandle CloneHandleForIPC(const NativePixmapHandle& handle) {
 #endif
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   clone.modifier = handle.modifier;
   clone.supports_zero_copy_webgpu_import =
       handle.supports_zero_copy_webgpu_import;

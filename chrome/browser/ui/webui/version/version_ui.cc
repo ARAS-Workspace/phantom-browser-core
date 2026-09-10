@@ -54,11 +54,6 @@
 #include "chrome/browser/ui/webui/theme_source.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "build/util/LASTCHANGE_commit_position.h"
-#include "chrome/browser/ui/webui/version/version_handler_chromeos.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #endif
@@ -91,14 +86,7 @@ void CreateAndAddVersionUIDataSource(Profile* profile) {
       {version_ui::kVariationsSourceName,
        IDS_VERSION_UI_VARIATIONS_SOURCE_NAME},
       {version_ui::kVariationsSeedName, IDS_VERSION_UI_VARIATIONS_SEED_NAME},
-#if BUILDFLAG(IS_CHROMEOS)
-      {version_ui::kARC, IDS_ARC_LABEL},
-      {version_ui::kPlatform, IDS_PLATFORM_LABEL},
-      {version_ui::kCustomizationId, IDS_VERSION_UI_CUSTOMIZATION_ID},
-      {version_ui::kFirmwareVersion, IDS_VERSION_UI_FIRMWARE_VERSION},
-#else
       {version_ui::kOSName, IDS_VERSION_UI_OS},
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_ANDROID)
       {version_ui::kGmsName, IDS_VERSION_UI_GMS},
 #endif  // BUILDFLAG(IS_ANDROID)
@@ -132,13 +120,7 @@ std::string GetProductModifier() {
 }
 
 std::string_view GetVersionInformationalSuffix() {
-#if BUILDFLAG(IS_CHROMEOS) && CHROMIUM_COMMIT_POSITION_IS_MAIN
-  // Adds the revision number as a suffix to the version number if the chrome
-  // is built from the main branch.
-  return "-r" CHROMIUM_COMMIT_POSITION_NUMBER;
-#else
   return "";
-#endif
 }
 
 }  // namespace
@@ -147,11 +129,7 @@ VersionUI::VersionUI(content::WebUI* web_ui)
     : content::WebUIController(web_ui) {
   Profile* profile = Profile::FromWebUI(web_ui);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  web_ui->AddMessageHandler(std::make_unique<VersionHandlerChromeOS>());
-#else
   web_ui->AddMessageHandler(std::make_unique<VersionHandler>());
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   // Set up the chrome://theme/ source.
@@ -247,7 +225,7 @@ void VersionUI::AddVersionDetailStrings(content::WebUIDataSource* html_source) {
 
 #if BUILDFLAG(IS_MAC)
   html_source->AddString(version_ui::kOSType, base::mac::GetOSDisplayName());
-#elif !BUILDFLAG(IS_CHROMEOS)
+#else
   html_source->AddString(version_ui::kOSType, version_info::GetOSType());
 #endif  // BUILDFLAG(IS_MAC)
 

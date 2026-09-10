@@ -57,12 +57,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/ui_base_features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/policy/system_features_disable_list_policy_handler.h"
-#include "chromeos/constants/chromeos_features.h"
-#include "components/policy/core/common/policy_pref_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using ::testing::_;
 
 namespace {
@@ -345,9 +339,7 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelGlicTest, GlicItem) {
 
 IN_PROC_BROWSER_TEST_F(AppMenuModelTest, DoNotShowShareSubMenuItem) {
   PrefService* prefs = browser()->GetProfile()->GetPrefs();
-#if !BUILDFLAG(IS_CHROMEOS)
   prefs->SetBoolean(prefs::kDesktopSharingHubEnabled, false);
-#endif
   prefs->SetBoolean(prefs::kDisableScreenshots, true);
 
   AppMenuModel model(this, browser());
@@ -477,7 +469,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionsMenuModelTest, ExtensionsMenu) {
 }
 
 // Profile row does not show on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 class TestAppMenuModelMetricsTest : public AppMenuModelTest,
                                     public testing::WithParamInterface<int> {
  public:
@@ -735,68 +726,11 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_FALSE(profile_menu->GetIndexOfCommandId(0).has_value());
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests settings menu items is disabled in the app menu when
-// kSystemFeaturesDisableList is set.
-IN_PROC_BROWSER_TEST_F(AppMenuModelTest, DisableSettingsItem) {
-  AppMenuModel model(this, browser());
-  model.Init();
-  const size_t options_index = model.GetIndexOfCommandId(IDC_OPTIONS).value();
-  EXPECT_TRUE(model.IsEnabledAt(options_index));
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  const size_t help_menu_index =
-      model.GetIndexOfCommandId(AppMenuModel::kHelpMenuPlaceholder).value();
-  ui::SimpleMenuModel* help_menu = static_cast<ui::SimpleMenuModel*>(
-      model.GetSubmenuModelAt(help_menu_index));
-  const size_t about_index = help_menu->GetIndexOfCommandId(IDC_ABOUT).value();
-  EXPECT_TRUE(help_menu->IsEnabledAt(about_index));
-#else
-  const size_t about_index = model.GetIndexOfCommandId(IDC_ABOUT).value();
-  EXPECT_TRUE(model.IsEnabledAt(about_index));
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
-  {
-    ScopedListPrefUpdate update(
-        g_browser_process->local_state(),
-        policy::policy_prefs::kSystemFeaturesDisableList);
-    update->Append(static_cast<int>(policy::SystemFeature::kBrowserSettings));
-  }
-  EXPECT_FALSE(model.IsEnabledAt(options_index));
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  EXPECT_FALSE(help_menu->IsEnabledAt(about_index));
-#else
-  EXPECT_FALSE(model.IsEnabledAt(about_index));
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
-  {
-    ScopedListPrefUpdate update(
-        g_browser_process->local_state(),
-        policy::policy_prefs::kSystemFeaturesDisableList);
-    update->clear();
-  }
-  EXPECT_TRUE(model.IsEnabledAt(options_index));
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  EXPECT_TRUE(help_menu->IsEnabledAt(about_index));
-#else
-  EXPECT_TRUE(model.IsEnabledAt(about_index));
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class TabSearchMenuModelTest : public AppMenuModelTest {
  public:
   TabSearchMenuModelTest() {
     glic_enabled_feature_list_.InitWithFeatures(
         {
-#if BUILDFLAG(IS_CHROMEOS)
-            chromeos::features::kFeatureManagementGlic
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
         /*disabled_features=*/{features::kGlicLocaleFiltering,
                                features::kGlicCountryFiltering});

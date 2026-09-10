@@ -457,9 +457,6 @@ void BrowserChildProcessHostImpl::OnChildDisconnected() {
                                   PROCESS_TYPE_MAX);
         break;
       }
-#if BUILDFLAG(IS_CHROMEOS)
-      case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
-#endif
       case base::TERMINATION_STATUS_PROCESS_WAS_KILLED: {
         exited_abnormally_ = true;
         delegate_->OnProcessCrashed(info.exit_code);
@@ -629,10 +626,9 @@ void BrowserChildProcessHostImpl::OnProcessLaunched() {
           ->child_process());
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   child_thread_type_switcher_.SetPid(process.Pid());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-
+#endif  // BUILDFLAG(IS_LINUX)
 
   DCHECK(!process.is_current());
   data_.SetProcess(process.Duplicate());

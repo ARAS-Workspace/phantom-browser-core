@@ -284,7 +284,6 @@ const PasskeyUnlockManagerErrorUiTestParams kErrorUiTestParams[] = {
 
 // On Chrome OS, AreUserVerifyingKeysSupported always returns true, thus this
 // tests cannot establish the preconditions.
-#if !BUILDFLAG(IS_CHROMEOS)
     {"HiddenWithoutUVKeysWithoutGpmPin", EnclaveManagerStatus::kEnclaveNotReady,
      GpmPinStatus::kGpmPinUnset,
      /*uv_keys_supported=*/false,
@@ -301,7 +300,6 @@ const PasskeyUnlockManagerErrorUiTestParams kErrorUiTestParams[] = {
      /*trusted_vault_recoverability_degraded=*/false,
      /*passkeys_sync_allowed=*/true,
      /*should_display_error_ui=*/true},
-#endif
 };
 
 INSTANTIATE_TEST_SUITE_P(

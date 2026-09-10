@@ -104,13 +104,8 @@ TEST_F(CastMediaNotificationProducerTest, UpdateRoute) {
   EXPECT_CALL(view, UpdateWithMediaMetadata(_))
       .WillOnce([&](const media_session::MediaMetadata& metadata) {
         const std::string separator = " \xC2\xB7 ";
-#if BUILDFLAG(IS_CHROMEOS)
-        EXPECT_EQ(base::UTF8ToUTF16(new_description + separator + new_sink),
-                  metadata.source_title);
-#else
         EXPECT_EQ(base::UTF8ToUTF16(new_description), metadata.source_title);
         EXPECT_EQ(new_sink, item->device_name());
-#endif
       });
   notification_producer_->OnRoutesUpdated({route});
 }

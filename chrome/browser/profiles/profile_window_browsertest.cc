@@ -51,10 +51,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#error "This test verifies the Desktop implementation of Guest only."
-#endif
-
 namespace {
 
 // Code related to history borrowed from:
@@ -353,7 +349,7 @@ IN_PROC_BROWSER_TEST_F(ProfileWindowBrowserTest,
 }
 
 // TODO(crbug.com/41443527): Test is flaky on Linux.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_OpenBrowserWindowForProfileWithSigninRequired \
   DISABLED_OpenBrowserWindowForProfileWithSigninRequired
 #else

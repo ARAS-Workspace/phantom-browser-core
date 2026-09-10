@@ -55,9 +55,7 @@
 #include "chrome/browser/ui/startup/startup_browser_creator.h"
 #endif  // !defined (OS_ANDROID)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/profiles/profile_picker.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 using base::UserMetricsAction;
 using content::BrowserThread;
@@ -103,7 +101,6 @@ void FindOrCreateNewWindowForProfile(
   base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
   StartupBrowserCreator browser_creator;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   if (open_command_line_urls) {
     auto* current_command_line = base::CommandLine::ForCurrentProcess();
     StartupTabProviderImpl startup_tab_provider;
@@ -115,7 +112,6 @@ void FindOrCreateNewWindowForProfile(
       }
     }
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // This is not a browser launch from the user; don't record the launch mode.
   browser_creator.LaunchBrowser(command_line, profile, base::FilePath(),
@@ -151,7 +147,6 @@ void OpenBrowserWindowForProfile(
     is_first_run = chrome::startup::IsFirstRun::kYes;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   if (!profile->IsGuestSession()) {
     ProfileAttributesEntry* entry =
         g_browser_process->profile_manager()
@@ -163,7 +158,6 @@ void OpenBrowserWindowForProfile(
       return;
     }
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // If |always_create| is false, and we have a |callback| to run, check
   // whether a browser already exists so that we can run the callback. We don't

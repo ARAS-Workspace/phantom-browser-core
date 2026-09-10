@@ -15,10 +15,6 @@
 #include "ui/message_center/public/cpp/message_center_public_export.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/notifier_catalogs.h"
-#endif
-
 namespace message_center {
 
 // This enum is being used for histogram reporting and the elements should not
@@ -41,14 +37,7 @@ struct MESSAGE_CENTER_PUBLIC_EXPORT NotifierId {
 
 // Constructor for non WEB_PAGE type. `catalog_name` is required for CrOS system
 // notifications.
-#if BUILDFLAG(IS_CHROMEOS)
-  NotifierId(NotifierType type,
-             const std::string& id,
-             ash::NotificationCatalogName catalog_name =
-                 ash::NotificationCatalogName::kNone);
-#else
   NotifierId(NotifierType type, const std::string& id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Constructor for WEB_PAGE type.
   explicit NotifierId(const GURL& url);
@@ -74,11 +63,6 @@ struct MESSAGE_CENTER_PUBLIC_EXPORT NotifierId {
 
   // The identifier of the app notifier. Empty if it's WEB_PAGE.
   std::string id;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Identifier for CrOS system notifications.
-  ash::NotificationCatalogName catalog_name;
-#endif
 
   // The URL pattern of the notifier.
   GURL url;

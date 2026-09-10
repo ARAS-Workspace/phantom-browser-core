@@ -58,10 +58,6 @@
 #include "chrome/browser/ui/browser_window.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 using ::base::test::TestFuture;
 
 namespace actor {
@@ -85,9 +81,6 @@ void ActorKeyedServiceBrowserTest::SetUpCommandLine(
     base::CommandLine* command_line) {
   PlatformBrowserTest::SetUpCommandLine(command_line);
   SetUpBlocklist(command_line, "blocked.example.com");
-#if BUILDFLAG(IS_CHROMEOS)
-  command_line->AppendSwitch(ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
 }
 
 void ActorKeyedServiceBrowserTest::SetUpOnMainThread() {

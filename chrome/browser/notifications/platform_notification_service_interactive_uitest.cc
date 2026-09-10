@@ -519,7 +519,6 @@ IN_PROC_BROWSER_TEST_F(PlatformNotificationServiceBrowserTest,
 }
 
 // Chrome OS shows the notification settings inline.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(PlatformNotificationServiceBrowserTest,
                        WebNotificationSiteSettingsButton) {
   GrantNotificationPermissionForTest();
@@ -557,7 +556,6 @@ IN_PROC_BROWSER_TEST_F(PlatformNotificationServiceBrowserTest,
   std::string url = web_contents->GetLastCommittedURL().spec();
   ASSERT_EQ(content::GetWebUIURLString("settings/content/notifications"), url);
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(PlatformNotificationServiceBrowserTest,
                        WebNotificationOptionsVibrationPattern) {

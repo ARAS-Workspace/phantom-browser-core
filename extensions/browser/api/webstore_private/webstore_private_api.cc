@@ -437,11 +437,7 @@ void ReportWebStoreInstallNotAllowlistedInstalled(bool installed,
 
 // Returns whether the app launcher has been enabled.
 bool IsAppLauncherEnabled() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif
 }
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -1146,17 +1142,14 @@ void WebstorePrivateBeginInstallWithManifest3Function::ShowInstallDialog(
     if (requires_parent_permission) {
       // Bypass the install prompt dialog if V2 is enabled. The
       // ParentAccessDialog handles both the blocked and install use case.
-#if BUILDFLAG(IS_CHROMEOS)
-      RequestExtensionApproval(contents);
-      return;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       // Shows a parental permission dialog directly bypassing the extension
       // install dialog view. The parental permission dialog contains a superset
       // of data from the extension install dialog: requested extension
       // permissions and also parent's password input.
       PromptForParentApproval();
       return;
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     }
   }
 

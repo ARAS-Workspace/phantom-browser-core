@@ -9,11 +9,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "components/tabs/public/tab_interface.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_window.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions::browser_window_util {
@@ -36,15 +31,6 @@ bool BrowserMatchesHelper(BrowserWindowInterface& browser,
       browser.GetType() != BrowserWindowInterface::TYPE_NORMAL) {
     return false;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (restrict_to_current_workspace) {
-    BrowserWindow* browser_window = BrowserWindow::FromBrowser(&browser);
-    if (!browser_window || !browser_window->IsOnCurrentWorkspace()) {
-      return false;
-    }
-  }
-#endif
 
   return true;
 }

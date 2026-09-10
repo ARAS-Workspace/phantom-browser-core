@@ -22,11 +22,11 @@ namespace chrome {
 enum {
   PATH_START = 1000,
 
-  DIR_LOGS = PATH_START,  // Directory where logs should be written.
-  DIR_USER_DATA,          // Directory where user data can be written.
-  DIR_CRASH_METRICS,      // Directory where crash metrics are written.
-  DIR_CRASH_DUMPS,        // Directory where crash dumps are written.
-  DIR_LOCAL_TRACES,       // Directory where local traces are written.
+  DIR_LOGS = PATH_START,       // Directory where logs should be written.
+  DIR_USER_DATA,               // Directory where user data can be written.
+  DIR_CRASH_METRICS,           // Directory where crash metrics are written.
+  DIR_CRASH_DUMPS,             // Directory where crash dumps are written.
+  DIR_LOCAL_TRACES,            // Directory where local traces are written.
   DIR_RESOURCES,               // Directory containing separate file resources
                                // used by Chrome at runtime.
   DIR_APP_DICTIONARIES,        // Directory where the global dictionaries are.
@@ -49,8 +49,7 @@ enum {
                      // to set policies for chrome. This directory
                      // contains subdirectories.
 #endif
-#if BUILDFLAG(IS_CHROMEOS) || \
-    (BUILDFLAG(IS_LINUX) && BUILDFLAG(CHROMIUM_BRANDING)) || BUILDFLAG(IS_MAC)
+#if (BUILDFLAG(IS_LINUX) && BUILDFLAG(CHROMIUM_BRANDING)) || BUILDFLAG(IS_MAC)
   DIR_USER_EXTERNAL_EXTENSIONS,  // Directory for per-user external extensions
                                  // on Chrome Mac and Chromium Linux.
                                  // On Chrome OS, this path is used for OEM
@@ -58,7 +57,7 @@ enum {
                                  // create it.
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   DIR_STANDALONE_EXTERNAL_EXTENSIONS,  // Directory for 'per-extension'
                                        // definition manifest files that
                                        // describe extensions which are to be
@@ -88,15 +87,8 @@ enum {
                                // binary data for internal pages (e.g., html
                                // files and images).
 
-#if BUILDFLAG(IS_CHROMEOS)
-  DIR_CHROMEOS_CRD_DATA,  // Directory where Chrome Remote Desktop can store
-                          // data that must persist a Chrome restart but that
-                          // must be cleared on device reboot.
-#endif
-
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE) &&                                   \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
-     BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(ENABLE_EXTENSIONS_CORE) && \
+    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID))
   DIR_NATIVE_MESSAGING,       // System directory where native messaging host
                               // manifest files are stored.
   DIR_USER_NATIVE_MESSAGING,  // Directory with Native Messaging Hosts
@@ -111,11 +103,6 @@ enum {
   DIR_GEN_TEST_DATA,  // Directory where generated test data resides.
   DIR_TEST_DATA,      // Directory where unit test data resides.
   DIR_TEST_TOOLS,     // Directory where unit test tools reside.
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // File containing the device refresh_token.
-  FILE_CHROME_OS_DEVICE_REFRESH_TOKEN,
-#endif
 
   DIR_OPTIMIZATION_GUIDE_PREDICTION_MODELS,  // Directory where verified models
                                              // downloaded by the Optimization

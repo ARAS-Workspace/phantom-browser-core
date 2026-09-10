@@ -50,7 +50,6 @@ class PriceInsightsHandlerBrowserTest : public InProcessBrowserTest {
 
 // The feedback dialog on CrOS happens at the system level, which cannot be
 // easily tested here.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(PriceInsightsHandlerBrowserTest, TestShowFeedback) {
   ASSERT_EQ(nullptr, FeedbackDialog::GetInstanceForTest());
@@ -67,7 +66,5 @@ IN_PROC_BROWSER_TEST_F(PriceInsightsHandlerBrowserTest, TestShowFeedback) {
   ASSERT_TRUE(meta_data.has_value());
   ASSERT_EQ(*meta_data->FindString("categoryTag"), "price_insights");
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace commerce

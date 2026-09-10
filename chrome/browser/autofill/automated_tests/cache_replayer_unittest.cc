@@ -30,7 +30,7 @@ namespace {
 
 // Only run these tests on Linux because there are issues with other platforms.
 // Testing on one platform gives enough confidence.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 using base::JSONWriter;
 
@@ -655,7 +655,7 @@ TEST(AutofillCacheReplayerTest, CrossEnvironmentIntegrationTest) {
   EXPECT_EQ(std::vector<bool>(),
             CheckFormsInCache(form_split_cache_replayer, {form5}));
 }
-#endif  // if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 }  // namespace
 }  // namespace test
 }  // namespace autofill

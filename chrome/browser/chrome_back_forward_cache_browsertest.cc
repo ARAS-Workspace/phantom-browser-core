@@ -931,7 +931,7 @@ IN_PROC_BROWSER_TEST_P(
 }
 
 // Flaky: crbug.com/40935990
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_DoesNotCachePageWithEmbeddedPdfAppendedOnPageLoaded \
   DISABLED_DoesNotCachePageWithEmbeddedPdfAppendedOnPageLoaded
 #else
@@ -1008,7 +1008,7 @@ IN_PROC_BROWSER_TEST_P(ChromeBackForwardCacheBrowserWithEmbedTest,
 
 #if BUILDFLAG(ENABLE_PDF)
 // Flaky: crbug.com/40935990
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_DoesNotCachePageWithEmbeddedHtmlMutatedIntoPdf \
   DISABLED_DoesNotCachePageWithEmbeddedHtmlMutatedIntoPdf
 #else

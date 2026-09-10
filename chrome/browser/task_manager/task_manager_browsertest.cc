@@ -236,7 +236,7 @@ INSTANTIATE_TEST_SUITE_P(SitePerProcess,
                          TaskManagerOOPIFBrowserTest,
                          ::testing::Values(true));
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_ShutdownWhileOpen DISABLED_ShutdownWhileOpen
 #else
 #define MAYBE_ShutdownWhileOpen ShutdownWhileOpen
@@ -699,7 +699,7 @@ IN_PROC_BROWSER_TEST_F(TaskManagerBrowserTest, JSHeapMemory) {
   ASSERT_NO_FATAL_FAILURE(WaitForTaskManagerRows(1, MatchTab("title1.html")));
 }
 
-#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_LINUX)
 // This tests times out when MSan is enabled. See https://crbug.com/41417851.
 // Failing on Linux CFI. See https://crbug.com/41476833.
 #define MAYBE_SentDataObserved DISABLED_SentDataObserved
@@ -743,7 +743,7 @@ IN_PROC_BROWSER_TEST_F(TaskManagerBrowserTest, MAYBE_SentDataObserved) {
             model()->GetColumnValue(ColumnSpecifier::TOTAL_NETWORK_USE, 0));
 }
 
-#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_LINUX)
 // This tests times out when MSan is enabled. See https://crbug.com/41417851.
 // Failing on Linux CFI. See https://crbug.com/41476833.
 #define MAYBE_TotalSentDataObserved DISABLED_TotalSentDataObserved

@@ -53,10 +53,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/experiences/arc/intent_helper/arc_intent_helper_package.h"
-#endif
-
 using AppInfo = apps::IntentPickerAppInfo;
 using BubbleType = apps::IntentPickerBubbleType;
 using content::WebContents;
@@ -222,7 +218,6 @@ class IntentPickerBubbleViewTest : public ChromeViewsTestBase {
   bool last_selection_should_persist_;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // This test runs only on non ChromeOS platforms, since navigation capturing has
 // not fully launched to 100% of the Stable population.
 class IntentPickerBubbleViewListTest : public IntentPickerBubbleViewTest {
@@ -392,7 +387,6 @@ TEST_F(IntentPickerBubbleViewListTest, InitiatingOriginView) {
   const int children_with_same_origin = bubble()->children().size();
   EXPECT_EQ(children_without_origin, children_with_same_origin);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class IntentPickerBubbleViewLayoutTest
     : public IntentPickerBubbleViewTest,

@@ -19,11 +19,6 @@
 #include "media/mojo/mojom/android_overlay.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/services/font/public/mojom/font_service.mojom.h"  // nogncheck
-#include "content/browser/font_service.h"  // nogncheck
-#endif
-
 namespace content {
 
 namespace {
@@ -44,14 +39,6 @@ void GpuProcessHost::BindHostReceiver(
   if (auto r = generic_receiver.As<media::mojom::AndroidOverlayProvider>()) {
     GetUIThreadTaskRunner({})->PostTask(
         FROM_HERE, base::BindOnce(&BindAndroidOverlayProvider, std::move(r)));
-    return;
-  }
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (auto font_receiver =
-          generic_receiver.As<font_service::mojom::FontService>()) {
-    ConnectToFontService(std::move(font_receiver));
     return;
   }
 #endif

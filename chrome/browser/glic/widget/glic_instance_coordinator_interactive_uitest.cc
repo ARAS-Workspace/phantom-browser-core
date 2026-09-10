@@ -68,9 +68,7 @@ namespace glic {
 
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kFirstTab);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 const InteractiveBrowserTestApi::DeepQuery kMockGlicClientHangButton = {
     "#hang"};
@@ -425,7 +423,6 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
 // So invalidation is not supported.
 // TODO(crbug.com/450629835): Revisit if we figure out actual flow we need
 // reauth.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
                        InvalidatedAccountWhileLoadingGlic) {
   if (base::FeatureList::IsEnabled(features::kGlicMultiInstance)) {
@@ -464,7 +461,6 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
                   WaitForAndInstrumentGlic(kHostOnly),
                   WaitForWebUIState(mojom::WebUiState::kReady));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
                        AccountInvalidatedWhileGlicOpen) {
@@ -648,7 +644,6 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorLocationMetricsUiTest,
 // Note: ChromeOS maintains account auth as a part of OS User session,
 // and Profile is coupled with the User. Thus, deletion Profile
 // during the use should not happen.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
                        PermanentlyDeleteProfile) {
   if (base::FeatureList::IsEnabled(features::kGlicMultiInstance)) {
@@ -680,7 +675,6 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
 
   EXPECT_FALSE(service1->instance_coordinator().IsAnyPanelShowing());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class GlicInstanceCoordinatorWithPreviousPostionUiTest
     : public GlicInstanceCoordinatorUiTest {

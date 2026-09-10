@@ -357,7 +357,7 @@ TEST_BASELINE_SIGSYS(__NR_inotify_init)
 TEST_BASELINE_SIGSYS(__NR_vserver)
 #endif
 
-#if defined(LIBC_GLIBC) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(LIBC_GLIBC)
 BPF_TEST_C(BaselinePolicy, FutexEINVAL, BaselinePolicy) {
   int ops[] = {
       FUTEX_CMP_REQUEUE_PI, FUTEX_CMP_REQUEUE_PI_PRIVATE,

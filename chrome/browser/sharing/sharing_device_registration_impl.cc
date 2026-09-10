@@ -225,7 +225,7 @@ bool SharingDeviceRegistrationImpl::IsSmsFetcherSupported() const {
 }
 
 bool SharingDeviceRegistrationImpl::IsRemoteCopySupported() const {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return true;
 #else
   return false;

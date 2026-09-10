@@ -536,7 +536,6 @@ class WebAppRegistrar {
 
   // ChromeOS stores the per-app capturing setting in PreferredAppsImpl, not
   // here.
-#if !BUILDFLAG(IS_CHROMEOS)
   // Returns true if a web app is set to be the default app to
   // capture links by the user. If an app is not locally installed, this returns
   // false.
@@ -559,7 +558,6 @@ class WebAppRegistrar {
   // Returns a set of app ids that match the scope for user link capturing that
   std::vector<webapps::AppId> GetOverlappingAppsMatchingScope(
       const webapps::AppId& app_id) const;
-#endif
 
   // Returns information about apps that controls the input url, i.e. the app's
   // scope is a substring of the url passed to the API.
@@ -622,11 +620,9 @@ class WebAppRegistrar {
   void NotifyWebAppSettingsPolicyChanged();
   void NotifyWebAppEffectiveScopeChanged(const webapps::AppId& app_id);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   void NotifyWebAppUserLinkCapturingPreferencesChanged(
       const webapps::AppId& app_id,
       bool is_preferred);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   using PendingUpdateInfoChangePassKey =
       base::PassKey<ManifestUpdateJob,

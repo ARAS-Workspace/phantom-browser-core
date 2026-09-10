@@ -56,11 +56,7 @@ using ::chrome::cros::reporting::proto::UploadEventsRequest;
 BASE_FEATURE(kPolicyFetchWithSha256, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kEnableReregistration,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 namespace {
 

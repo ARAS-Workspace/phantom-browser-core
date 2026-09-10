@@ -939,11 +939,7 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DropValidUrlFromOutside) {
 // https://crbug.com/40496018.
 // TODO(crbug.com/344168586): Very flaky on linux-chromeos-rel bots and
 // consistently failing on linux-chromeos-dbg.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DropUrlIntoOmnibox DISABLED_DropUrlIntoOmnibox
-#else
 #define MAYBE_DropUrlIntoOmnibox DropUrlIntoOmnibox
-#endif
 IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, MAYBE_DropUrlIntoOmnibox) {
   std::string frame_site = use_cross_site_subframe() ? "b.test" : "a.test";
   ASSERT_TRUE(NavigateToTestPage("a.test"));
@@ -1195,7 +1191,7 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DragStartInFrame) {
   SimulateMouseUp();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Failing to receive final drop event on linux crbug.com/40803504.
 // TODO(crbug.com/442927728): Fix failing test on ChromeOS
 #define MAYBE_DragSameOriginImageBetweenFrames \
@@ -1228,7 +1224,7 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest,
                                /*image_crossorigin_attr=*/false);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_DragCorsSameOriginImageBetweenFrames \
   DISABLED_DragCorsSameOriginImageBetweenFrames
 #else
@@ -1250,7 +1246,7 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest,
                                /*image_crossorigin_attr=*/true);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_DragCrossOriginImageBetweenFrames \
   DISABLED_DragCrossOriginImageBetweenFrames
 #else
@@ -1510,7 +1506,7 @@ void DragAndDropBrowserTest::DragImageBetweenFrames_Step3(
 
 // Disable the test on Linux due to flaky: crbug.com/40163536
 // TODO(crbug.com/40876472): Enable on ChromeOS once flakiness is fixed.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_DragImageFromDisappearingFrame \
   DISABLED_DragImageFromDisappearingFrame
 #else
@@ -1640,11 +1636,7 @@ void DragAndDropBrowserTest::DragImageFromDisappearingFrame_Step3(
 }
 
 // TODO(b:361552512): Flaky on Chrome OS
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_CrossSiteDrag DISABLED_CrossSiteDrag
-#else
 #define MAYBE_CrossSiteDrag CrossSiteDrag
-#endif
 
 // Data that needs to be shared across multiple test steps below
 // (i.e. across CrossSiteDrag_Step2 and CrossSiteDrag_Step3).
@@ -1850,7 +1842,7 @@ void DragAndDropBrowserTest::CrossNavCrossSiteDrag_Step3(
                     "dragend"}));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/442927728): Fix failing test on Linux and ChromeOS
 // https://crbug.com/40248270: Flaky at ChromeOS ASAN and Debug builds
 #define MAYBE_CrossTabDrag DISABLED_CrossTabDrag
@@ -2136,13 +2128,9 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DragUpdateScreenCoordinates) {
 // navigation.
 
 // Injecting input with scaling works as expected on Chromeos.
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr std::initializer_list<double> ui_scaling_factors = {1.0, 1.25, 2.0};
-#else
 // Injecting input with non-1x scaling doesn't work correctly with x11 ozone or
 // Windows 7.
 constexpr std::initializer_list<double> ui_scaling_factors = {1.0};
-#endif
 
 INSTANTIATE_TEST_SUITE_P(
     SameSiteSubframe,
@@ -2155,81 +2143,5 @@ INSTANTIATE_TEST_SUITE_P(
     DragAndDropBrowserTest,
     ::testing::Combine(::testing::Values(true),
                        ::testing::ValuesIn(ui_scaling_factors)));
-
-#if BUILDFLAG(IS_CHROMEOS)
-class DragAndDropBrowserTestNoParam : public InProcessBrowserTest {
- protected:
-  void SimulateDragFromOmniboxToWebContents(base::OnceClosure quit) {
-    chrome::FocusLocationBar(browser());
-
-    BrowserView* browser_view =
-        BrowserView::GetBrowserViewForBrowser(browser());
-    OmniboxViewViews* omnibox_view =
-        browser_view->toolbar()->location_bar_view()->omnibox_view();
-
-    // Simulate mouse move to omnibox.
-    gfx::Point point;
-    views::View::ConvertPointToScreen(omnibox_view, &point);
-    EXPECT_TRUE(ui_controls::SendMouseMoveNotifyWhenDone(
-        point.x(), point.y(),
-        base::BindOnce(&DragAndDropBrowserTestNoParam::Step2,
-                       base::Unretained(this), std::move(quit))));
-  }
-
-  void Step2(base::OnceClosure quit) {
-    // Simulate mouse down.
-    EXPECT_TRUE(ui_controls::SendMouseEventsNotifyWhenDone(
-        ui_controls::LEFT, ui_controls::DOWN,
-        base::BindOnce(&DragAndDropBrowserTestNoParam::Step3,
-                       base::Unretained(this), std::move(quit))));
-  }
-
-  void Step3(base::OnceClosure quit) {
-    // Simulate mouse move to WebContents.
-    // Keep sending mouse move until the current tab is closed.
-    // After the current tab is closed, send mouse up to end drag and drop.
-    if (browser()->tab_strip_model()->count() == 1) {
-      EXPECT_TRUE(ui_controls::SendMouseEventsNotifyWhenDone(
-          ui_controls::LEFT, ui_controls::UP, std::move(quit)));
-      return;
-    }
-
-    gfx::Rect bounds = browser()
-                           ->tab_strip_model()
-                           ->GetActiveWebContents()
-                           ->GetContainerBounds();
-    EXPECT_TRUE(ui_controls::SendMouseMoveNotifyWhenDone(
-        bounds.CenterPoint().x(), bounds.CenterPoint().y(),
-        base::BindOnce(&DragAndDropBrowserTestNoParam::Step3,
-                       base::Unretained(this), std::move(quit))));
-  }
-};
-
-// https://crbug.com/40059276
-// TODO(crbug.com/441134573): Fix and reenable the test.
-IN_PROC_BROWSER_TEST_F(DragAndDropBrowserTestNoParam,
-                       DISABLED_CloseTabDuringDrag) {
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-  ui_test_utils::TabAddedWaiter wait_for_new_tab(browser());
-
-  // Create a new tab that closes itself on dragover event.
-  ASSERT_TRUE(ExecJs(browser()
-                         ->tab_strip_model()
-                         ->GetActiveWebContents()
-                         ->GetPrimaryMainFrame(),
-                     "window.open('javascript:document.addEventListener("
-                     "\"dragover\", () => {window.close(); })');"));
-
-  wait_for_new_tab.Wait();
-
-  EXPECT_EQ(2, browser()->tab_strip_model()->count());
-
-  base::RunLoop loop;
-  SimulateDragFromOmniboxToWebContents(loop.QuitClosure());
-  loop.Run();
-
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace chrome

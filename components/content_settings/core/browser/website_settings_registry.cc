@@ -69,9 +69,6 @@ const WebsiteSettingsInfo* WebsiteSettingsRegistry::Register(
 #elif BUILDFLAG(IS_MAC)
   if (!(platform & PLATFORM_MAC))
     return nullptr;
-#elif BUILDFLAG(IS_CHROMEOS)
-  if (!(platform & PLATFORM_CHROMEOS))
-    return nullptr;
 #elif BUILDFLAG(IS_ANDROID)
   if (!(platform & PLATFORM_ANDROID))
     return nullptr;

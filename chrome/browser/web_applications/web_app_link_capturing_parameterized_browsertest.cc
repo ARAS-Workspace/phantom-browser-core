@@ -851,7 +851,6 @@ static const base::flat_set<std::string> disabled_flaky_tests = {
 // Example string to add when disabling a test:
 // "FocusExisting_BothStandalone_CaptureOn_AppWnd_ScopeA2B_Direct_..." (etc).
 #elif BUILDFLAG(IS_LINUX)
-#elif BUILDFLAG(IS_CHROMEOS)
 #endif
 };
 

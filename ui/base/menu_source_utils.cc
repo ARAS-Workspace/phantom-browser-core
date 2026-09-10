@@ -17,7 +17,7 @@ mojom::MenuSourceType GetMenuSourceTypeForEvent(const Event& event) {
   return mojom::MenuSourceType::kMouse;
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 mojom::MenuSourceType GetMenuSourceType(int event_flags) {
   if (event_flags & EF_MOUSE_BUTTON) {
     return mojom::MenuSourceType::kMouse;
@@ -27,6 +27,6 @@ mojom::MenuSourceType GetMenuSourceType(int event_flags) {
   }
   return mojom::MenuSourceType::kKeyboard;
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 }  // namespace ui

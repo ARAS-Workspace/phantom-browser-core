@@ -55,7 +55,6 @@ void InitButtonEvent(x11::Event* event,
                              });
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Initializes the passed-in x11::Event.
 void InitKeyEvent(x11::Event* event,
                   bool is_press,
@@ -70,7 +69,6 @@ void InitKeyEvent(x11::Event* event,
                                  .state = state,
                              });
 }
-#endif
 
 float ComputeRotationAngle(float twist) {
   float rotation_angle = twist;
@@ -495,7 +493,6 @@ TEST_F(EventsXTest, DisableMouse) {
   EXPECT_EQ(ui::EventType::kMousePressed, ui::EventTypeFromXEvent(*xev));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(EventsXTest, ImeFabricatedKeyEvents) {
   x11::KeyButMask state_to_be_fabricated[] = {
       {},
@@ -535,7 +532,6 @@ TEST_F(EventsXTest, ImeFabricatedKeyEvents) {
     }
   }
 }
-#endif
 
 TEST_F(EventsXTest, IgnoresMotionEventForMouseWheelScroll) {
   int device_id = 1;
@@ -621,7 +617,6 @@ TEST_F(EventsXTest, GetCharacter) {
   EXPECT_EQ(13, keyev4->GetCharacter());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(EventsXTest, NormalizeKeyEventFlags) {
   // Normalize flags when KeyEvent is created from XEvent.
   ScopedXI2Event event;
@@ -656,7 +651,6 @@ TEST_F(EventsXTest, NormalizeKeyEventFlags) {
     EXPECT_EQ(EF_NONE, keyev->flags());
   }
 }
-#endif
 
 TEST_F(EventsXTest, KeyEventCode) {
   const DomCode kDomCodeForSpace = DomCode::SPACE;

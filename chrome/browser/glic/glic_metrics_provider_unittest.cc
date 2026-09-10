@@ -24,10 +24,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif
-
 namespace glic {
 
 class GlicMetricsProviderTest : public testing::Test {
@@ -36,9 +32,6 @@ class GlicMetricsProviderTest : public testing::Test {
     std::vector<base::test::FeatureRef> enabled_features = {
         features::kGlic, features::kGlicRollout,
         features::kGlicShowForSignedOut};
-#if BUILDFLAG(IS_CHROMEOS)
-    enabled_features.push_back(chromeos::features::kFeatureManagementGlic);
-#endif
     scoped_feature_list_.InitWithFeatures(
         enabled_features,
         {features::kGlicCountryFiltering, features::kGlicLocaleFiltering});

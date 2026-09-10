@@ -55,12 +55,6 @@
 #include "ui/views/widget/any_widget_observer.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/test/base/testing_profile.h"
-#include "components/user_manager/user_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/web_applications/web_app_utils.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
@@ -755,27 +749,12 @@ class WebInstallGuestModeTest : public WebInstallCurrentDocumentBrowserTest {
   WebInstallGuestModeTest(const WebInstallGuestModeTest&) = delete;
   WebInstallGuestModeTest& operator=(const WebInstallGuestModeTest&) = delete;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // To create a guest session in ChromeOS, CreateGuestBrowser() cannot be used
-  // and proper switches to commandline need to be set.
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(ash::switches::kGuestSession);
-    command_line->AppendSwitchASCII(ash::switches::kLoginUser,
-                                    user_manager::kGuestUserName);
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile,
-                                    TestingProfile::kTestUserProfileDir);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 IN_PROC_BROWSER_TEST_P(WebInstallGuestModeTest,
                        NotSupportedDialogInGuestMode_CurrentDocument) {
   // Open a new guest mode window.
-#if BUILDFLAG(IS_CHROMEOS)
-  Browser* guest_browser = browser();
-#else
   Browser* guest_browser = CreateGuestBrowser();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ASSERT_TRUE(guest_browser->GetProfile()->IsGuestSession());
 
   // Navigate to a page with a valid manifest in the guest browser.
@@ -834,11 +813,7 @@ IN_PROC_BROWSER_TEST_P(WebInstallGuestModeTest,
 IN_PROC_BROWSER_TEST_P(WebInstallGuestModeTest,
                        NotSupportedDialogInGuestMode_BackgroundDocument) {
   // Open a new guest mode window.
-#if BUILDFLAG(IS_CHROMEOS)
-  Browser* guest_browser = browser();
-#else
   Browser* guest_browser = CreateGuestBrowser();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ASSERT_TRUE(guest_browser->GetProfile()->IsGuestSession());
 
   // Navigate to a valid URL in the guest browser.

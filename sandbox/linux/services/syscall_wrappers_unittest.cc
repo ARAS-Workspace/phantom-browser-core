@@ -263,11 +263,6 @@ TEST(SyscallWrappers, LStat) {
 
 // /tmp is mounted with nosymfollow on ChromeOS so calling
 // sys_stat leads to an error.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::SysInfo::IsRunningOnChromeOS()) {
-    GTEST_SKIP();
-  }
-#endif
 
   struct kernel_stat stat_info;
   rc = sys_stat(symlink_name.c_str(), &stat_info);

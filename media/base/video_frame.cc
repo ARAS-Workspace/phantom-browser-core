@@ -43,10 +43,6 @@
 #include "third_party/skia/include/core/SkYUVAPixmaps.h"
 #include "ui/gfx/geometry/point.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/ozone/public/client_native_pixmap_factory_ozone.h"  // nogncheck
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include <CoreVideo/CVPixelBuffer.h>
 
@@ -86,7 +82,7 @@ std::string VideoFrame::StorageTypeToString(
       return "OWNED_MEMORY";
     case VideoFrame::STORAGE_SHMEM:
       return "SHMEM";
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     case VideoFrame::STORAGE_DMABUFS:
       return "DMABUFS";
 #endif
@@ -522,7 +518,7 @@ scoped_refptr<VideoFrame> VideoFrame::WrapMappableSharedImage(
         plane_size.width() * VideoFrame::BytesPerElement(*format, plane);
   }
   uint64_t modifier = gfx::NativePixmapHandle::kNoModifier;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   bool is_native_buffer = !shared_image->IsSharedMemoryForVideoFrame();
   if (is_native_buffer) {
     const auto gmb_handle = shared_image->CloneGpuMemoryBufferHandle();
@@ -787,7 +783,7 @@ scoped_refptr<VideoFrame> VideoFrame::WrapExternalYuvaData(
   return frame;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // static
 scoped_refptr<VideoFrame> VideoFrame::WrapExternalDmabufs(
     const VideoFrameLayout& layout,
@@ -1519,7 +1515,7 @@ scoped_refptr<gpu::ClientSharedImage> VideoFrame::shared_image() const {
   return wrapped_frame_ ? wrapped_frame_->shared_image() : shared_image_;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 size_t VideoFrame::NumDmabufFds() const {
   if (wrapped_frame_) {
     return wrapped_frame_->NumDmabufFds();

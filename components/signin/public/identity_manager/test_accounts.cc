@@ -17,8 +17,6 @@ namespace signin {
 
 #if BUILDFLAG(IS_MAC)
 const char kPlatform[] = "mac";
-#elif BUILDFLAG(IS_CHROMEOS)
-const char kPlatform[] = "chromeos";
 #elif BUILDFLAG(IS_LINUX)
 const char kPlatform[] = "linux";
 #elif BUILDFLAG(IS_ANDROID)

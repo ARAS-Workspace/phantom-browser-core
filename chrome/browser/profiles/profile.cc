@@ -47,16 +47,6 @@
 #include "content/public/browser/web_ui.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_pref_names.h"
-#include "ash/constants/ash_switches.h"
-#include "base/command_line.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#include "chromeos/constants/chromeos_features.h"
-#include "chromeos/constants/pref_names.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/jni_string.h"
 #include "base/strings/utf_string_conversions.h"
@@ -108,10 +98,6 @@ constexpr char kDevToolsOTRProfileIDPrefix[] = "Devtools::BrowserContext";
 constexpr char kMediaRouterOTRProfileIDPrefix[] = "MediaRouter::Presentation";
 constexpr char kTestOTRProfileIDPrefix[] = "Test::OTR";
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kCaptivePortalOTRProfileIDPrefix[] = "CaptivePortal::Signin";
-#endif
-
 using perfetto::protos::pbzero::ChromeTrackEvent;
 
 }  // namespace
@@ -128,12 +114,6 @@ bool Profile::OTRProfileID::AllowsBrowserWindows() const {
                        base::CompareCase::SENSITIVE)) {
     return true;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::StartsWith(profile_id_, kCaptivePortalOTRProfileIDPrefix,
-                       base::CompareCase::SENSITIVE)) {
-    return true;
-  }
-#endif
   return false;
 }
 
@@ -141,13 +121,6 @@ bool Profile::OTRProfileID::IsDevTools() const {
   return base::StartsWith(profile_id_, kDevToolsOTRProfileIDPrefix,
                           base::CompareCase::SENSITIVE);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool Profile::OTRProfileID::IsCaptivePortal() const {
-  return base::StartsWith(profile_id_, kCaptivePortalOTRProfileIDPrefix,
-                          base::CompareCase::SENSITIVE);
-}
-#endif
 
 // static
 const Profile::OTRProfileID Profile::OTRProfileID::PrimaryID() {
@@ -173,13 +146,6 @@ Profile::OTRProfileID Profile::OTRProfileID::CreateUniqueForDevTools() {
 Profile::OTRProfileID Profile::OTRProfileID::CreateUniqueForMediaRouter() {
   return CreateUnique(kMediaRouterOTRProfileIDPrefix);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-Profile::OTRProfileID Profile::OTRProfileID::CreateUniqueForCaptivePortal() {
-  return CreateUnique(kCaptivePortalOTRProfileIDPrefix);
-}
-#endif
 
 // static
 Profile::OTRProfileID Profile::OTRProfileID::CreateUniqueForTesting() {
@@ -248,10 +214,6 @@ std::string Profile::OTRProfileID::Serialize() const {
 Profile::Profile(const OTRProfileID* otr_profile_id)
     : otr_profile_id_(otr_profile_id ? std::make_optional(*otr_profile_id)
                                      : std::nullopt) {
-#if BUILDFLAG(IS_CHROMEOS)
-  new_guest_profile_impl_ =
-      base::FeatureList::IsEnabled(chromeos::features::kNewGuestProfile);
-#endif
 
 #if DCHECK_IS_ON()
   base::AutoLock lock(GetProfileInstancesLock());
@@ -360,15 +322,7 @@ void Profile::RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   base::PathService::Get(base::DIR_HOME, &home);
   registry->RegisterStringPref(prefs::kSelectFileLastDirectory,
                                home.MaybeAsASCII());
-#if BUILDFLAG(IS_CHROMEOS)
-  const uint32_t caption_registration_flags =
-      base::FeatureList::IsEnabled(
-          ash::features::kOsSyncAccessibilitySettingsBatch2)
-          ? user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PREF
-          : 0;
-#else
   constexpr uint32_t caption_registration_flags = 0;
-#endif
   registry->RegisterStringPref(prefs::kAccessibilityCaptionsTextSize,
                                std::string(), caption_registration_flags);
   registry->RegisterStringPref(prefs::kAccessibilityCaptionsTextFont,
@@ -389,21 +343,6 @@ void Profile::RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterIntegerPref(prefs::kProfileIconVersion, 0);
   registry->RegisterBooleanPref(prefs::kProfileIconWin11Format, false);
   registry->RegisterBooleanPref(prefs::kAllowDinosaurEasterEgg, true);
-#if BUILDFLAG(IS_CHROMEOS)
-  registry->RegisterBooleanPref(chromeos::prefs::kCaptivePortalSignin, false);
-  // TODO(dilmah): For OS_CHROMEOS we maintain kApplicationLocale in both
-  // local state and user's profile.  For other platforms we maintain
-  // kApplicationLocale only in local state.
-  // In the future we may want to maintain kApplicationLocale
-  // in user's profile for other platforms as well.
-  registry->RegisterStringPref(
-      language::prefs::kApplicationLocale, std::string(),
-      user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PRIORITY_PREF);
-  registry->RegisterStringPref(ash::prefs::kApplicationLocaleBackup,
-                               std::string());
-  registry->RegisterStringPref(ash::prefs::kApplicationLocaleAccepted,
-                               std::string());
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
   registry->RegisterStringPref(prefs::kLatestVersionWhenClickedUpdateMenuItem,
@@ -434,12 +373,6 @@ bool Profile::IsIncognitoProfile() const {
 }
 
 bool Profile::IsGuestSession() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!new_guest_profile_impl_) {
-    return base::CommandLine::ForCurrentProcess()->HasSwitch(
-        ash::switches::kGuestSession);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return profile_metrics::GetBrowserProfileType(this) ==
          profile_metrics::BrowserProfileType::kGuest;
 }
@@ -449,11 +382,11 @@ PrefService* Profile::GetReadOnlyOffTheRecordPrefs() {
 }
 
 bool Profile::IsSystemProfile() const {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   DCHECK_NE(profile_metrics::GetBrowserProfileType(this),
             profile_metrics::BrowserProfileType::kSystem);
   return false;
-#else  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#else
   return profile_metrics::GetBrowserProfileType(this) ==
          profile_metrics::BrowserProfileType::kSystem;
 #endif
@@ -469,14 +402,7 @@ bool Profile::IsDevToolsOTRProfile() const {
 }
 
 bool Profile::CanUseDiskWhenOffTheRecord() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Guest mode on ChromeOS uses an in-memory file system to store the profile
-  // in, so despite this being an off the record profile, it is still okay to
-  // store data on disk.
-  return IsGuestSession();
-#else
   return false;
-#endif
 }
 
 bool Profile::ShouldRestoreOldSessionCookies() {
@@ -571,12 +497,6 @@ bool Profile::AllowsBrowserWindows() const {
     return allows_browser_windows_for_testing_.value();
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not allow Browsers on signin-derived profiles.
-  if (ash::IsSigninBrowserContext(GetOriginalProfile())) {
-    return false;
-  }
-#endif
   // Only OTR Browsers may be opened in guest mode.
   if (IsGuestSession() && !IsOffTheRecord()) {
     return false;
@@ -644,11 +564,6 @@ std::string Profile::ToDebugString() const {
   if (IsOffTheRecord()) {
     out << ", otr";
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::IsSigninBrowserContext(this)) {
-    out << ", signin";
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (GetOriginalProfile() == this) {
     out << ", is-original";

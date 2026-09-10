@@ -43,10 +43,6 @@
 #include "chrome/browser/printing/oop_features.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/policy/dlp/dlp_content_manager.h"
-#endif
-
 #if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
 #include "chrome/browser/enterprise/data_protection/print_utils.h"
 #endif
@@ -184,19 +180,8 @@ bool PrintViewManager::BasicPrint(content::RenderFrameHost* rfh) {
 bool PrintViewManager::PrintPreviewNow(content::RenderFrameHost* rfh,
                                        bool has_selection) {
   return PrintPreview(rfh,
-#if BUILDFLAG(IS_CHROMEOS)
-                      mojo::NullAssociatedRemote(),
-#endif
                       has_selection);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool PrintViewManager::PrintPreviewWithPrintRenderer(
-    content::RenderFrameHost* rfh,
-    mojo::PendingAssociatedRemote<mojom::PrintRenderer> print_renderer) {
-  return PrintPreview(rfh, std::move(print_renderer), /*has_selection=*/false);
-}
-#endif
 
 void PrintViewManager::PrintPreviewForNodeUnderContextMenu(
     content::RenderFrameHost* rfh) {
@@ -294,14 +279,7 @@ void PrintViewManager::ClearPrintPreviewSettings() {
 void PrintViewManager::RejectPrintPreviewRequestIfRestricted(
     content::GlobalRenderFrameHostId rfh_id,
     base::OnceCallback<void(bool should_proceed)> callback) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Don't print DLP restricted content on Chrome OS, and use `callback`
-  // directly since scanning isn't an option.
-  policy::DlpContentManager::Get()->CheckPrintingRestriction(
-      web_contents(), rfh_id, std::move(callback));
-#else
   std::move(callback).Run(/*should_proceed=*/true);
-#endif
 }
 
 void PrintViewManager::OnPrintPreviewRequestRejected(
@@ -327,9 +305,6 @@ void PrintViewManager::SetReceiverImplForTesting(PrintManager* impl) {
 
 bool PrintViewManager::PrintPreview(
     content::RenderFrameHost* rfh,
-#if BUILDFLAG(IS_CHROMEOS)
-    mojo::PendingAssociatedRemote<mojom::PrintRenderer> print_renderer,
-#endif
     bool has_selection) {
   // Users can send print commands all they want and it is beyond
   // PrintViewManager's control. Just ignore the extra commands.
@@ -349,9 +324,6 @@ bool PrintViewManager::PrintPreview(
   }
 
   GetPrintRenderFrame(rfh)->InitiatePrintPreview(
-#if BUILDFLAG(IS_CHROMEOS)
-      std::move(print_renderer),
-#endif
       has_selection);
 
   SetPrintPreviewRenderFrameHost(rfh);

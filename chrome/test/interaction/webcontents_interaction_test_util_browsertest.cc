@@ -955,13 +955,8 @@ IN_PROC_BROWSER_TEST_F(WebContentsInteractionTestUtilTest,
 
 // TODO(crbug.com/40285351): Resolve flakiness on ChromeOS and re-enable the
 // test.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_StateChangeExistsTimeoutSendsEvent \
-  DISABLED_StateChangeExistsTimeoutSendsEvent
-#else
 #define MAYBE_StateChangeExistsTimeoutSendsEvent \
   StateChangeExistsTimeoutSendsEvent
-#endif
 IN_PROC_BROWSER_TEST_F(WebContentsInteractionTestUtilTest,
                        MAYBE_StateChangeExistsTimeoutSendsEvent) {
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::CompletedCallback, completed);

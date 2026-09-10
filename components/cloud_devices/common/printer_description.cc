@@ -66,9 +66,6 @@ extern constexpr char kOptionSelectCapability[] = "select_cap";
 extern constexpr char kOptionTypedValueCapability[] = "typed_value_cap";
 extern constexpr char kOptionVendorCapability[] = "vendor_capability";
 extern constexpr char kOptionVendorItem[] = "vendor_ticket_item";
-#if BUILDFLAG(IS_CHROMEOS)
-extern constexpr char kOptionPin[] = "pin";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 constexpr char kMarginBottom[] = "bottom_microns";
 constexpr char kMarginLeft[] = "left_microns";
@@ -101,10 +98,6 @@ constexpr char kPwgRasterRotateAllPages[] = "rotate_all_pages";
 constexpr char kMinValue[] = "min";
 constexpr char kMaxValue[] = "max";
 constexpr char kDefaultValue[] = "default";
-
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kPinSupported[] = "supported";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 constexpr char kTypeRangeVendorCapabilityFloat[] = "FLOAT";
 constexpr char kTypeRangeVendorCapabilityInteger[] = "INTEGER";
@@ -1550,23 +1543,6 @@ class VendorItemTraits : public ItemsTraits<kOptionVendorItem> {
   }
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-class PinTraits : public NoValueValidation, public ItemsTraits<kOptionPin> {
- public:
-  static bool Load(const base::DictValue& dict, bool* option) {
-    std::optional<bool> supported = dict.FindBool(kPinSupported);
-    if (!supported)
-      return false;
-    *option = supported.value();
-    return true;
-  }
-
-  static void Save(bool option, base::DictValue* dict) {
-    dict->Set(kPinSupported, option);
-  }
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace printer
 
 template class ListCapability<printer::ContentType, printer::ContentTypeTraits>;
@@ -1592,9 +1568,6 @@ template class ValueCapability<printer::Copies,
 template class EmptyCapability<printer::PageRangeTraits>;
 template class BooleanCapability<printer::CollateTraits>;
 template class BooleanCapability<printer::ReverseTraits>;
-#if BUILDFLAG(IS_CHROMEOS)
-template class ValueCapability<bool, printer::PinTraits>;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 template class TicketItem<printer::PwgRasterConfig,
                           printer::PwgRasterConfigTraits>;

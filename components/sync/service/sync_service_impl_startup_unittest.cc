@@ -160,9 +160,7 @@ class SyncServiceImplStartupTest : public testing::Test {
   void SetSyncFeatureEnabledPrefs() {
     CHECK(!sync_service_);
 
-#if !BUILDFLAG(IS_CHROMEOS)
     sync_prefs_.SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   }
 
   SyncPrefs* sync_prefs() { return &sync_prefs_; }
@@ -202,7 +200,6 @@ class SyncServiceImplStartupTest : public testing::Test {
 };
 
 // ChromeOS does not support sign-in after startup
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(SyncServiceImplStartupTest, StartFirstTime) {
   // We've never completed startup.
   ASSERT_FALSE(sync_prefs()->IsInitialSyncFeatureSetupComplete());
@@ -261,7 +258,6 @@ TEST_F(SyncServiceImplStartupTest, StartFirstTime) {
   EXPECT_EQ(SyncService::TransportState::ACTIVE,
             sync_service()->GetTransportState());
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(SyncServiceImplStartupTest, StartNoCredentials) {
   // The user is already signed in, but refresh tokens aren't loaded yet.
@@ -404,50 +400,6 @@ TEST_F(SyncServiceImplStartupTest, StartInvalidCredentials) {
             sync_service()->GetTransportState());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(SyncServiceImplStartupTest, StartAshNoCredentials) {
-  // We've never completed startup.
-  ASSERT_FALSE(
-      engine_factory()->HasTransportDataIncludingFirstSync(gaia_id_hash()));
-
-  // On ChromeOS, the user is always immediately signed in, but a refresh token
-  // isn't necessarily available yet.
-  SimulateRefreshTokensNotLoadedYet();
-  SignInWithSyncConsentWithoutRefreshToken();
-
-  CreateSyncService();
-
-  // Calling Initialize should cause the service to immediately create and
-  // initialize the engine, and configure the DataTypeManager.
-  base::RunLoop().RunUntilIdle();
-
-  // Without refresh tokens, SyncServiceImpl can't determine whether the
-  // signed-in account is managed or not, so it'll remain in the INITIALIZING
-  // state.
-  EXPECT_EQ(SyncService::TransportState::INITIALIZING,
-            sync_service()->GetTransportState());
-  // FirstSetupComplete gets set automatically on Ash.
-  EXPECT_TRUE(
-      sync_service()->GetUserSettings()->IsInitialSyncFeatureSetupComplete());
-}
-
-TEST_F(SyncServiceImplStartupTest, StartAshFirstTime) {
-  // We've never completed Sync startup.
-  ASSERT_FALSE(
-      engine_factory()->HasTransportDataIncludingFirstSync(gaia_id_hash()));
-
-  // There is already a signed-in user.
-  SignInWithSyncConsent();
-
-  // Sync should become active, even though IsInitialSyncFeatureSetupComplete
-  // wasn't set yet.
-  CreateSyncService();
-  base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(SyncService::TransportState::ACTIVE,
-            sync_service()->GetTransportState());
-}
-#endif
-
 TEST_F(SyncServiceImplStartupTest, ResetSyncViaDashboard) {
   SetSyncFeatureEnabledPrefs();
   SignInWithSyncConsent();
@@ -477,15 +429,8 @@ TEST_F(SyncServiceImplStartupTest, ResetSyncViaDashboard) {
             sync_service()->GetTransportState());
   EXPECT_FALSE(sync_service()->IsSyncFeatureEnabled());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(
-      sync_service()->GetUserSettings()->IsInitialSyncFeatureSetupComplete());
-  EXPECT_TRUE(
-      sync_service()->GetUserSettings()->IsSyncFeatureDisabledViaDashboard());
-#else   // BUILDFLAG(IS_CHROMEOS)
   EXPECT_FALSE(
       sync_service()->GetUserSettings()->IsInitialSyncFeatureSetupComplete());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Reset sync again while the sync service is already in transport mode. It
   // should immediately start up again in transport mode.
@@ -496,20 +441,9 @@ TEST_F(SyncServiceImplStartupTest, ResetSyncViaDashboard) {
             sync_service()->GetTransportState());
   EXPECT_FALSE(sync_service()->IsSyncFeatureEnabled());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(sync_service()->GetActiveDataTypes().Has(BOOKMARKS));
-
-  // On ChromeOS, test clearing the dashboard error, which should start
-  // sync-the-feature and start BOOKMARKS.
-  sync_service()->GetUserSettings()->ClearSyncFeatureDisabledViaDashboard();
-  FastForwardThroughSyncStartup();
-  EXPECT_TRUE(sync_service()->IsSyncFeatureActive());
-  EXPECT_TRUE(sync_service()->GetActiveDataTypes().Has(BOOKMARKS));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 // ChromeOS does not support sign-in after startup.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Verify that enabling sync honors existing values of data type preferences.
 TEST_F(SyncServiceImplStartupTest, HonorsExistingDatatypePrefs) {
   // Explicitly set Keep Everything Synced to false and have only bookmarks
@@ -526,7 +460,6 @@ TEST_F(SyncServiceImplStartupTest, HonorsExistingDatatypePrefs) {
   EXPECT_EQ(UserSelectableTypeSet({UserSelectableType::kBookmarks}),
             sync_service()->GetUserSettings()->GetSelectedTypes());
 }
-#endif
 
 TEST_F(SyncServiceImplStartupTest, ManagedStartup) {
   // Sync was previously enabled, but a policy was set while Chrome wasn't
@@ -590,19 +523,8 @@ TEST_F(SyncServiceImplStartupTest, SwitchManaged) {
   EXPECT_EQ(SyncService::DisableReasonSet(),
             sync_service()->GetDisableReasons());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(
-      sync_service()->GetUserSettings()->IsInitialSyncFeatureSetupComplete());
-  // On ChromeOS Ash, sync-the-feature stays disabled even after the policy is
-  // removed, for historic reasons. It is unclear if this behavior is optional,
-  // because it is indistinguishable from the sync-reset-via-dashboard case.
-  // It can be resolved by invoking ClearSyncFeatureDisabledViaDashboard().
-  EXPECT_TRUE(
-      sync_service()->GetUserSettings()->IsSyncFeatureDisabledViaDashboard());
-#else
   EXPECT_FALSE(
       sync_service()->GetUserSettings()->IsInitialSyncFeatureSetupComplete());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   EXPECT_FALSE(sync_service()->IsSyncFeatureEnabled());
   EXPECT_FALSE(sync_service()->IsSyncFeatureActive());
@@ -617,9 +539,7 @@ TEST_F(SyncServiceImplStartupTest, StartDownloadFailed) {
   ASSERT_FALSE(
       engine_factory()->HasTransportDataIncludingFirstSync(gaia_id_hash()));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(sync_prefs()->IsInitialSyncFeatureSetupComplete());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   FastForwardThroughSyncStartup();
 
@@ -637,7 +557,6 @@ TEST_F(SyncServiceImplStartupTest, StartDownloadFailed) {
 }
 
 // ChromeOS does not support sign-in after startup.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(SyncServiceImplStartupTest, FullStartupSequenceFirstTime) {
   // We've never completed startup.
   ASSERT_FALSE(sync_prefs()->IsInitialSyncFeatureSetupComplete());
@@ -714,7 +633,6 @@ TEST_F(SyncServiceImplStartupTest, FullStartupSequenceFirstTime) {
             sync_service()->GetTransportState());
   EXPECT_TRUE(sync_service()->IsSyncFeatureActive());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(SyncServiceImplStartupTest, FullStartupSequenceNthTime) {
   // The user is already signed in and has completed Sync setup before.
@@ -800,7 +718,6 @@ TEST_F(SyncServiceImplStartupTest, DeferredStartInterruptedByDataType) {
 }
 
 // ChromeOS does not support sign-in after startup.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(SyncServiceImplStartupTest, UserTriggeredStartIsNotDeferredStart) {
   // Signed-out at first.
   base::HistogramTester histogram_tester;
@@ -817,7 +734,6 @@ TEST_F(SyncServiceImplStartupTest, UserTriggeredStartIsNotDeferredStart) {
             syncer::SyncService::TransportState::ACTIVE);
   EXPECT_TRUE(histogram_tester.GetAllSamples(kTimeDeferredHistogram).empty());
 }
-#endif
 
 TEST_F(SyncServiceImplStartupTest,
        ShouldClearMetadataForAlreadyDisabledTypesBeforeConfigurationDone) {

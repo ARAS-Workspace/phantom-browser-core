@@ -64,27 +64,21 @@
 #include "device/vr/public/mojom/isolated_xr_service.mojom.h"       // nogncheck
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "sandbox/linux/services/libc_interceptor.h"
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 #include "sandbox/policy/sandbox_type.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_LINUX)
 #include "services/shape_detection/public/mojom/shape_detection_service.mojom.h"  // nogncheck
 #include "services/shape_detection/shape_detection_service.h"  // nogncheck
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && (BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_LINUX))
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "media/mojo/mojom/mediadrm_support.mojom.h"       // nogncheck
 #include "media/mojo/services/mediadrm_support_service.h"  // nogncheck
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
-#include "chromeos/ash/experiences/arc/video_accelerator/oop_arc_video_accelerator_factory.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 
 #if BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 #include "content/common/features.h"
@@ -205,7 +199,7 @@ auto RunAudio(mojo::PendingReceiver<audio::mojom::AudioService> receiver) {
       << "task_policy_set TASK_QOS_POLICY";
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   auto* command_line = base::CommandLine::ForCurrentProcess();
   if (sandbox::policy::SandboxTypeFromCommandLine(*command_line) ==
       sandbox::mojom::Sandbox::kNoSandbox) {
@@ -218,8 +212,7 @@ auto RunAudio(mojo::PendingReceiver<audio::mojom::AudioService> receiver) {
   return audio::CreateStandaloneService(std::move(receiver));
 }
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_LINUX)
 auto RunShapeDetectionService(
     mojo::PendingReceiver<shape_detection::mojom::ShapeDetectionService>
         receiver) {
@@ -270,13 +263,6 @@ auto RunTracing(
 
 auto RunVideoCapture(
     mojo::PendingReceiver<video_capture::mojom::VideoCaptureService> receiver) {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto service_manager_receiver =
-      GetContentClient()->utility()->InitMojoServiceManager();
-  if (service_manager_receiver.is_valid()) {
-    UtilityThread::Get()->BindHostReceiver(std::move(service_manager_receiver));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   auto service = std::make_unique<UtilityThreadVideoCaptureServiceImpl>(
       std::move(receiver), base::SingleThreadTaskRunner::GetCurrentDefault());
 #if BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)
@@ -304,15 +290,6 @@ auto RunXrDeviceService(
       std::move(receiver), ChildProcess::current()->io_task_runner());
 }
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
-auto RunOOPArcVideoAcceleratorFactoryService(
-    mojo::PendingReceiver<arc::mojom::VideoAcceleratorFactory> receiver) {
-  return std::make_unique<arc::OOPArcVideoAcceleratorFactory>(
-      std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS) && \
-        // BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 
 #if BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 auto RunOOPVideoDecoderFactoryProcessService(
@@ -365,8 +342,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
     services.Add(RunOnDeviceModel);
   }
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_LINUX)
   services.Add(RunShapeDetectionService);
 #endif
 
@@ -386,11 +362,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
 #if BUILDFLAG(ENABLE_VR) && !BUILDFLAG(IS_ANDROID)
   services.Add(RunXrDeviceService);
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
-  services.Add(RunOOPArcVideoAcceleratorFactoryService);
-#endif  // BUILDFLAG(IS_CHROMEOS) && \
-        // BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 
 #if BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
   services.Add(RunVideoEncodeAcceleratorProviderFactory);

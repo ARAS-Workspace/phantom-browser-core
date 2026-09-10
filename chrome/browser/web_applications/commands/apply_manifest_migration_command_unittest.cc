@@ -166,11 +166,7 @@ class ApplyManifestMigrationCommandTest : public WebAppTest {
   }
 
   bool IsOsIntegrationSupported() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return false;
-#else
     return true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   SkColor GetShortcutColor(const webapps::AppId& app_id,

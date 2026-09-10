@@ -10,7 +10,7 @@ namespace feature_engagement {
 
 namespace events {
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 const char kNewTabOpened[] = "new_tab_opened";
 const char kSixthTabOpened[] = "sixth_tab_opened";
 const char kReadingListItemAdded[] = "reading_list_item_added";
@@ -47,7 +47,7 @@ const char kExtensionsRequestAccessButtonClicked[] =
 
 const char kGlicOnboardingCompleted[] = "glic_onboarding_completed";
 
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_IOS)
 const char kChromeOpened[] = "chrome_opened";

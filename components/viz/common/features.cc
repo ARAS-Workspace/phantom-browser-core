@@ -52,11 +52,7 @@ BASE_FEATURE(kVizBufferQueueDiscardOnVisibilityChange,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kUseDrmBlackFullscreenOptimization,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 #if BUILDFLAG(IS_ANDROID)
@@ -65,11 +61,7 @@ BASE_FEATURE(kUseFrameIntervalDeciderAdaptiveFrameRate,
 #endif
 
 BASE_FEATURE(kUseMultipleOverlays,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 const char kMaxOverlaysParam[] = "max_overlays";
 
@@ -311,12 +303,6 @@ BASE_FEATURE(kVizWithIoMessagePump, base::FEATURE_DISABLED_BY_DEFAULT);
 // judge finch variation.
 BASE_FEATURE(kVizNullHypothesis, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Allows the display to seamlessly adjust the refresh rate in order to match
-// content preferences. ChromeOS only.
-BASE_FEATURE(kCrosContentAdjustedRefreshRate,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 BASE_FEATURE(kNoCompositorFrameAcks, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<int> kNumberPendingFramesUntilThrottle{
@@ -411,11 +397,6 @@ bool IsVSyncAligned() {
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool IsCrosContentAdjustedRefreshRateEnabled() {
-  return base::FeatureList::IsEnabled(kCrosContentAdjustedRefreshRate);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 
 #if BUILDFLAG(IS_ANDROID)

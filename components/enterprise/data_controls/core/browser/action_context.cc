@@ -26,13 +26,8 @@ bool ActionDestination::empty() const {
   // - The integrated Gemini browser agent (Glic) with `gemini_in_chrome` set
   //   to true.
   // - A separate application represented by `component` (CrOS-only).
-#if BUILDFLAG(IS_CHROMEOS)
-  return url.is_empty() && !incognito && !other_profile && !os_clipboard &&
-         !gemini_in_chrome && component == Component::kUnknownComponent;
-#else
   return url.is_empty() && !incognito && !other_profile && !os_clipboard &&
          !gemini_in_chrome;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace data_controls

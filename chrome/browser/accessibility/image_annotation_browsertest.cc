@@ -557,11 +557,7 @@ IN_PROC_BROWSER_TEST_F(ImageAnnotationBrowserTest,
 }
 
 // TODO(crbug.com/40928269): Fix flakiness on ChromeOS
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DoesntAnnotateInternalPages DISABLED_DoesntAnnotateInternalPages
-#else
 #define MAYBE_DoesntAnnotateInternalPages DoesntAnnotateInternalPages
-#endif
 IN_PROC_BROWSER_TEST_F(ImageAnnotationBrowserTest,
                        MAYBE_DoesntAnnotateInternalPages) {
   FakeAnnotator::SetReturnLabelResults(true);

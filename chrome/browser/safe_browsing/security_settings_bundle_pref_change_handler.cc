@@ -10,7 +10,7 @@
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/safe_browsing/security_settings_bundle_toast_helper.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -31,7 +31,7 @@ SecuritySettingsBundlePrefChangeHandler::
 
 void SecuritySettingsBundlePrefChangeHandler::
     MaybeShowEnhancedBundleSettingChangeNotification() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (!profile_ ||
       !base::FeatureList::IsEnabled(safe_browsing::kBundledSecuritySettings)) {
     return;
@@ -56,7 +56,7 @@ void SecuritySettingsBundlePrefChangeHandler::
 #endif
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 void SecuritySettingsBundlePrefChangeHandler::SetToastControllerForTesting(
     ToastController* controller) {
   toast_controller_for_testing_ = controller;

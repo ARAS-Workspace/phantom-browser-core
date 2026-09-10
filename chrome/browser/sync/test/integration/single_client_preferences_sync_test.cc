@@ -337,7 +337,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
 }
 
 // ChromeOS does not support signing out of a primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
                        ShouldCleanupAccountStoreOnSignout) {
@@ -373,8 +372,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
   EXPECT_EQ(GetPrefs(0)->GetString(sync_preferences::kSyncablePrefForTesting),
             "local value");
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
                        ShouldCleanupAccountStoreOnDisable) {
@@ -535,9 +532,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
             settings->GetRegisteredSelectableTypes();
         types.Remove(syncer::UserSelectableType::kHistory);
         settings->SetSelectedTypes(/*sync_everything=*/false, types);
-#if !BUILDFLAG(IS_CHROMEOS)
         settings->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
       })));
 
   ASSERT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PREFERENCES));
@@ -647,9 +642,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
             settings->GetRegisteredSelectableTypes();
         types.Remove(syncer::UserSelectableType::kHistory);
         settings->SetSelectedTypes(/*sync_everything=*/false, types);
-#if !BUILDFLAG(IS_CHROMEOS)
         settings->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
       })));
 
   ASSERT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PREFERENCES));
@@ -681,7 +674,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
 
 // Regression test for crbug.com/40066193.
 // ChromeOS does not support signing out of a primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
                        ShouldHandleWalletSideEffectsWhenSyncDisabled) {
   ASSERT_TRUE(SetupClients());
@@ -713,7 +705,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
   // Enabling sync again should work, without crashes.
   EXPECT_TRUE(SetupSync());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 
@@ -775,8 +766,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
       file_content->FindString(sync_preferences::kSyncablePrefForTesting));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
                        ShouldCleanupAccountPreferencesFileOnSignout) {
   ASSERT_TRUE(SetupClients());
@@ -831,7 +820,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
   EXPECT_TRUE(file_content->empty());
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 // Adds pref values to persistent storage.
@@ -942,7 +930,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
 // and it is unclear as to why they are still failing.
 #if !BUILDFLAG(IS_ANDROID)
 // ChromeOS does not support sign-in allowed flag.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(
     SingleClientPreferencesWithAccountStorageSyncTest,
     PRE_ShouldClearAccountDataOnStartupIfSignInAllowedBitChanged) {
@@ -996,7 +983,6 @@ IN_PROC_BROWSER_TEST_P(
       true,
       /*expected_bucket_count=*/1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(
     SingleClientPreferencesWithAccountStorageSyncTest,
@@ -1014,11 +1000,7 @@ IN_PROC_BROWSER_TEST_P(
                                sync_preferences::kSyncablePrefForTesting,
                                base::Value("account value"));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_TRUE(SetupSync());
-#else
   ASSERT_TRUE(SignIn());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Account value is effective.
   ASSERT_EQ(GetPrefs(0)->GetString(sync_preferences::kSyncablePrefForTesting),
@@ -1026,16 +1008,8 @@ IN_PROC_BROWSER_TEST_P(
 
   // Simulate a data type error to prevent clearing of account data.
   GetSyncService(0)->ReportDataTypeErrorForTest(syncer::PREFERENCES);
-#if BUILDFLAG(IS_CHROMEOS)
-  // Disable sync.
-  ASSERT_TRUE(GetClient(0)->DisableSelectableType(
-      syncer::UserSelectableType::kPreferences));
-#else
   // Sign out. Account value should stay because of the data type error.
   GetClient(0)->SignOutPrimaryAccount();
-#endif  // BUILDFLAG(IS_CHROMEOS)
-  // Local value is not restored because stop sync is not called when there is a
-  // data type error.
   ASSERT_EQ(GetPrefs(0)->GetString(sync_preferences::kSyncablePrefForTesting),
             "account value");
 
@@ -1539,7 +1513,7 @@ IN_PROC_BROWSER_TEST_P(
 #endif  // BUILDFLAG(IS_ANDROID)
 
 // Preference tracking is not required on android and chromeos.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 
 const char* kProtectedPrefName = prefs::kShowHomeButton;
 const char* kUnprotectedPrefName = prefs::kShowForwardButton;
@@ -1854,7 +1828,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientTrackedPreferencesSyncTestWithAttack,
       << "Incorrect key " << account_pref_name << " in " << *prefs;
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_ANDROID)
 

@@ -179,10 +179,6 @@
 #endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 using content::WebContents;
@@ -1673,7 +1669,7 @@ INSTANTIATE_TEST_SUITE_P(
     ExtensionWebRequestApiTestWithContextType::PrintToStringParamName());
 
 // TODO: crbug.com/40915577 - Re-enable tests on Mac and CrOS.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_WebRequestCORSWithExtraHeaders \
   DISABLED_WebRequestCORSWithExtraHeaders
 #else
@@ -1740,7 +1736,7 @@ IN_PROC_BROWSER_TEST_P(ExtensionWebRequestApiTestWithContextType,
 // TODO(crbug.com/40259518): test is flaky on Mac10.14.
 // TODO(crbug.com/40282182): test is flaky on linux tests.
 // TODO(crbug.com/393555373): test is flaky on Windows.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_WebRequestRedirectsWorkers DISABLED_WebRequestRedirectsWorkers
 #else
 #define MAYBE_WebRequestRedirectsWorkers WebRequestRedirectsWorkers
@@ -2632,11 +2628,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebRequestApiTest, WebSocketRequestOnWorker) {
 // Regression test for https://crbug.com/40616409.
 //
 // TODO(b:332825952): Flaky on linux-chromeos-dbg
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_WebSocketCleanClose DISABLED_WebSocketCleanClose
-#else
 #define MAYBE_WebSocketCleanClose WebSocketCleanClose
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionWebRequestApiTest, MAYBE_WebSocketCleanClose) {
   ASSERT_TRUE(StartEmbeddedTestServer());
   ASSERT_TRUE(StartWebSocketServer());
@@ -2942,9 +2934,6 @@ IN_PROC_BROWSER_TEST_F(
 
   // Create a profile that will be destroyed later.
   base::ScopedAllowBlockingForTesting allow_blocking;
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ProfileHelper::SetAlwaysReturnPrimaryUserForTesting(true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ProfileManager* profile_manager = g_browser_process->profile_manager();
   std::unique_ptr<Profile> temp_profile = Profile::CreateProfile(
       profile_manager->user_data_dir().AppendASCII("profile"), nullptr,

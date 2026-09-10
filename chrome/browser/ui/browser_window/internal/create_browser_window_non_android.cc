@@ -14,11 +14,6 @@
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/create_browser_window.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/session_manager/core/session_manager.h"
-#include "components/user_manager/user_manager.h"
-#endif
-
 BrowserWindowCreateParams BrowserWindowCreateParams::Clone() const {
   BrowserWindowCreateParams clone(type, *profile, from_user_gesture);
   clone.initial_bounds = initial_bounds;
@@ -43,9 +38,6 @@ BrowserWindowCreateParams BrowserWindowCreateParams::Clone() const {
   clone.vertical_tab_strip_uncollapsed_width =
       vertical_tab_strip_uncollapsed_width;
   clone.focused_tab_group_id = focused_tab_group_id;
-#if BUILDFLAG(IS_CHROMEOS)
-  clone.display_id = display_id;
-#endif
 #if BUILDFLAG(IS_LINUX)
   clone.startup_id = startup_id;
 #endif
@@ -112,29 +104,6 @@ BrowserWindowCreateParams BrowserWindowCreateParams::CreateForDevTools(
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool IsOnKioskSplashScreen() {
-  session_manager::SessionManager* session_manager =
-      session_manager::SessionManager::Get();
-  if (!session_manager) {
-    return false;
-  }
-  // We have to check this way because of CHECK() in UserManager::Get().
-  if (!user_manager::UserManager::IsInitialized()) {
-    return false;
-  }
-  user_manager::UserManager* user_manager = user_manager::UserManager::Get();
-  if (!user_manager->IsLoggedInAsAnyKioskApp()) {
-    return false;
-  }
-  if (session_manager->session_state() !=
-      session_manager::SessionState::LOGIN_PRIMARY) {
-    return false;
-  }
-  return true;
-}
-#endif
-
 }  // namespace
 
 BrowserWindowInterface* CreateBrowserWindow(
@@ -174,12 +143,6 @@ BrowserWindowInterface::CreationStatus GetBrowserWindowCreationStatusForProfile(
       IsProfileDirectoryMarkedForDeletion(profile.GetPath())) {
     return BrowserWindowInterface::CreationStatus::kErrorProfileUnsuitable;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (IsOnKioskSplashScreen()) {
-    return BrowserWindowInterface::CreationStatus::kErrorLoadingKiosk;
-  }
-#endif
 
   return BrowserWindowInterface::CreationStatus::kOk;
 }

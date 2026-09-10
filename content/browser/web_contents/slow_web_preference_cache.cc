@@ -15,7 +15,7 @@
 #include "ui/base/pointer/pointer_device.h"
 #include "ui/gl/gpu_switching_manager.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "ui/events/devices/device_data_manager.h"
 #elif BUILDFLAG(IS_ANDROID)
 #include "ui/base/device_form_factor.h"
@@ -53,7 +53,7 @@ SlowWebPreferenceCacheObserver::~SlowWebPreferenceCacheObserver() = default;
 SlowWebPreferenceCache::SlowWebPreferenceCache() {
   gpu_switch_observation_.Observe(ui::GpuSwitchingManager::GetInstance());
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   ui::DeviceDataManager::GetInstance()->AddObserver(this);
 #elif BUILDFLAG(IS_ANDROID)
   ui::InputDeviceObserverAndroid::GetInstance()->AddObserver(this);
@@ -63,7 +63,7 @@ SlowWebPreferenceCache::SlowWebPreferenceCache() {
 }
 
 SlowWebPreferenceCache::~SlowWebPreferenceCache() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   ui::DeviceDataManager::GetInstance()->RemoveObserver(this);
 #elif BUILDFLAG(IS_ANDROID)
   ui::InputDeviceObserverAndroid::GetInstance()->RemoveObserver(this);

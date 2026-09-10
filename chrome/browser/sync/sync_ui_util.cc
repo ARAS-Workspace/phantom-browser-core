@@ -29,10 +29,6 @@
 #include "net/base/url_util.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/search_engines/ui_thread_search_terms_data.h"
 #include "chrome/browser/trusted_vault/trusted_vault_encryption_keys_tab_helper.h"
@@ -103,17 +99,6 @@ SyncStatusLabels GetSyncStatusLabelsForSettings(
             IDS_SYNC_EMPTY_STRING, IDS_SYNC_EMPTY_STRING,
             SyncStatusActionType::kNoAction};
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (service->GetUserSettings()->IsSyncFeatureDisabledViaDashboard() &&
-      (service->HasSyncConsent() ||
-       !syncer::IsReplaceSyncPromosWithSignInPromosEnabled())) {
-    return {SyncStatusMessageType::kSyncError,
-            IDS_SIGNED_IN_WITH_SYNC_STOPPED_VIA_DASHBOARD,
-            IDS_SYNC_EMPTY_STRING, IDS_SYNC_EMPTY_STRING,
-            SyncStatusActionType::kNoAction};
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // If first setup is in progress, show an "in progress" message.
   if (service->IsSetupInProgress()) {
@@ -205,19 +190,9 @@ SyncStatusLabels GetAvatarSyncErrorLabelsForSettings(
           SyncStatusActionType::kRetrieveTrustedVaultKeys};
 
     case syncer::SyncService::UserActionableError::kNeedsPassphrase: {
-#if BUILDFLAG(IS_CHROMEOS)
-      syncer::SyncService* service = SyncServiceFactory::GetForProfile(profile);
-#endif
       return {
           SyncStatusMessageType::kSyncError,
-#if BUILDFLAG(IS_CHROMEOS)
-          (syncer::IsReplaceSyncPromosWithSignInPromosEnabled() && service &&
-           !service->HasSyncConsent())
-              ? IDS_SETTINGS_ERROR_PASSPHRASE_USER_ERROR_DESCRIPTION_WITH_EMAIL
-              : IDS_SETTINGS_ERROR_PASSPHRASE_USER_ERROR_DESCRIPTION,
-#else
           IDS_SETTINGS_ERROR_PASSPHRASE_USER_ERROR_DESCRIPTION_WITH_EMAIL,
-#endif
           button_string_id,
           syncer::IsReplaceSyncPromosWithSignInPromosEnabled()
               ? IDS_SETTINGS_PEOPLE_SIGN_OUT

@@ -203,7 +203,7 @@ class TCPSocketTest
     EXPECT_EQ(accepted_address.address(), local_address_.address());
   }
 
-#if defined(TCP_INFO) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if defined(TCP_INFO) || BUILDFLAG(IS_LINUX)
   // Tests that notifications to Socket Performance Watcher (SPW) are delivered
   // correctly. |should_notify_updated_rtt| is true if the SPW is interested in
   // receiving RTT notifications. |num_messages| is the number of messages that
@@ -274,7 +274,7 @@ class TCPSocketTest
     EXPECT_EQ(expect_rtt_notification_count,
               watcher_ptr->rtt_notification_count());
   }
-#endif  // defined(TCP_INFO) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // defined(TCP_INFO) || BUILDFLAG(IS_LINUX)
 
   AddressList local_address_list() const {
     return AddressList(local_address_);
@@ -1262,7 +1262,7 @@ TEST_P(TCPSocketTest, BeforeConnectCallback) {
   ASSERT_EQ(0, os_result);
 // Linux platforms generally allocate twice as much buffer size is requested to
 // account for internal kernel data structures.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(2 * kReceiveBufferSize, actual_size);
 // Unfortunately, Apple platform behavior doesn't seem to be documented, and
 // doesn't match behavior on any other platforms.
@@ -1368,7 +1368,7 @@ TEST_P(TCPSocketTest, SetNoDelay) {
 
 // These tests require kernel support for tcp_info struct, and so they are
 // enabled only on certain platforms.
-#if defined(TCP_INFO) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if defined(TCP_INFO) || BUILDFLAG(IS_LINUX)
 // If SocketPerformanceWatcher::ShouldNotifyUpdatedRTT always returns false,
 // then the wtatcher should not receive any notifications.
 TEST_P(TCPSocketTest, SPWNotInterested) {
@@ -1380,7 +1380,7 @@ TEST_P(TCPSocketTest, SPWNotInterested) {
 TEST_P(TCPSocketTest, SPWNoAdvance) {
   TestSPWNotifications(true, 2u, 0u, 3u);
 }
-#endif  // defined(TCP_INFO) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // defined(TCP_INFO) || BUILDFLAG(IS_LINUX)
 
 // On Android, where socket tagging is supported, verify that TCPSocket::Tag
 // works as expected.

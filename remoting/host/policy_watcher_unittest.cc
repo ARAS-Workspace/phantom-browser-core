@@ -138,14 +138,12 @@ class PolicyWatcherTest : public testing::Test {
     unknown_policies_.Set("UnknownPolicyTwo", std::string());
     unknown_policies_.Set("RemoteAccessHostUnknownPolicyThree", true);
 
-#if !BUILDFLAG(IS_CHROMEOS)
     pairing_true_.Set(key::kRemoteAccessHostAllowClientPairing, true);
     pairing_false_.Set(key::kRemoteAccessHostAllowClientPairing, false);
     gnubby_auth_true_.Set(key::kRemoteAccessHostAllowGnubbyAuth, true);
     gnubby_auth_false_.Set(key::kRemoteAccessHostAllowGnubbyAuth, false);
     curtain_true_.Set(key::kRemoteAccessHostRequireCurtain, true);
     curtain_false_.Set(key::kRemoteAccessHostRequireCurtain, false);
-#endif
     relay_true_.Set(key::kRemoteAccessHostAllowRelayedConnection, true);
     relay_false_.Set(key::kRemoteAccessHostAllowRelayedConnection, false);
     port_range_full_.Set(key::kRemoteAccessHostUdpPortRange, kPortRange);
@@ -291,16 +289,9 @@ class PolicyWatcherTest : public testing::Test {
     dict.Set(key::kRemoteAccessHostDomainList, base::ListValue());
     dict.Set(key::kRemoteAccessHostClipboardSizeBytes, -1);
     dict.Set(key::kRemoteAccessHostAllowRemoteSupportConnections, true);
-#if BUILDFLAG(IS_CHROMEOS)
-    dict.Set(key::kRemoteAccessHostAllowEnterpriseRemoteSupportConnections,
-             true);
-    dict.Set(key::kRemoteAccessHostAllowEnterpriseFileTransfer, false);
-    dict.Set(key::kClassManagementEnabled, "disabled");
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     dict.Set(key::kRemoteAccessHostMatchUsername, false);
 #endif
-#if !BUILDFLAG(IS_CHROMEOS)
     dict.Set(key::kRemoteAccessHostRequireCurtain, false);
     dict.Set(key::kRemoteAccessHostAllowClientPairing, true);
     dict.Set(key::kRemoteAccessHostAllowGnubbyAuth, true);
@@ -310,7 +301,6 @@ class PolicyWatcherTest : public testing::Test {
     dict.Set(key::kRemoteAccessHostAllowRemoteAccessConnections, true);
     dict.Set(key::kRemoteAccessHostMaximumSessionDurationMinutes, 0);
     dict.Set(key::kRemoteAccessHostAllowPinAuthentication, base::Value());
-#endif
 
     ASSERT_THAT(&dict, IsPolicies(&GetDefaultValues()))
         << "Sanity check that defaults expected by the test code "
@@ -519,7 +509,6 @@ INSTANTIATE_TEST_SUITE_P(
                       "RemoteAccessHostdomain",
                       "RemoteAccessHostPolicyForFutureVersion"));
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PolicyWatcherTest, PairingFalseThenTrue) {
   testing::InSequence sequence;
   EXPECT_CALL(mock_policy_callback_,
@@ -549,7 +538,6 @@ TEST_F(PolicyWatcherTest, GnubbyAuth) {
   SetPolicies(gnubby_auth_false_);
   SetPolicies(gnubby_auth_true_);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PolicyWatcherTest, RemoteAssistanceUiAccess) {
   testing::InSequence sequence;
@@ -577,7 +565,6 @@ TEST_F(PolicyWatcherTest, Relay) {
   SetPolicies(relay_true_);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PolicyWatcherTest, Curtain) {
   testing::InSequence sequence;
   EXPECT_CALL(mock_policy_callback_,
@@ -609,7 +596,6 @@ TEST_F(PolicyWatcherTest, MatchUsername) {
   SetPolicies(username_false_);
 }
 #endif
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PolicyWatcherTest, UdpPortRange) {
   testing::InSequence sequence;
@@ -634,12 +620,8 @@ TEST_F(PolicyWatcherTest, PolicySchemaAndPolicyWatcherShouldBeInSync) {
   // are kept in-sync.
 
   std::map<std::string, base::Value::Type> expected_schema;
-#if BUILDFLAG(IS_CHROMEOS)
-  base::flat_set<std::string> policies_with_no_default_values;
-#else
   base::flat_set<std::string> policies_with_no_default_values = {
       policy::key::kRemoteAccessHostAllowPinAuthentication};
-#endif
   for (auto i : GetDefaultValues()) {
     if (policies_with_no_default_values.contains(i.first)) {
       // This policy has no default value, so we need to explicitly set the

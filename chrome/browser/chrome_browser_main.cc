@@ -172,8 +172,7 @@
 #include "chrome/browser/usb/web_usb_detector.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "sql/database.h"
 #endif
 
@@ -181,23 +180,7 @@
 #include "base/check_op.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "base/task/task_traits.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/ash/settings/hardware_data_usage_controller.h"
-#include "chrome/browser/ash/settings/stats_reporting_controller.h"
-#include "chrome/browser/browser_process_platform_part_ash.h"
-#include "chrome/browser/ui/ash/main_extra_parts/chrome_browser_main_extra_parts_ash.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#include "chromeos/ash/experiences/arc/metrics/stability_metrics_manager.h"
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "chrome/browser/extensions/component_loader.h"
-#endif
-#else
 #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/first_run/upgrade_util_linux.h"
@@ -276,7 +259,7 @@
 
 #endif  // BUILDFLAG(ENABLE_PROCESS_SINGLETON)
 
-#if BUILDFLAG(ENABLE_RLZ) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(ENABLE_RLZ)
 #include <cmath>
 
 #include "chrome/browser/first_run/first_run.h"
@@ -296,8 +279,6 @@
 // other per-platform includes in the appropriate section above.
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/chrome_browser_main_mac.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/main_parts/chrome_browser_main_parts_ash.h"
 #elif BUILDFLAG(IS_LINUX)
 #include "chrome/browser/chrome_browser_main_linux.h"
 #elif BUILDFLAG(IS_ANDROID)
@@ -328,8 +309,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 constexpr base::FilePath::CharType kMediaHistoryDatabaseName[] =
     FILE_PATH_LITERAL("Media History");
 
@@ -437,7 +417,7 @@ StartupProfileInfo CreateInitialProfile(
   }
 
   StartupProfileInfo profile_info;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   profile_info = {ProfileManager::CreateInitialProfile(),
                   StartupProfileMode::kBrowserWindow};
 
@@ -668,15 +648,6 @@ void ChromeBrowserMainParts::ProfileInitManager::OnProfileAdded(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Ignore ChromeOS helper profiles (sign-in, lockscreen, etc).
-  if (!ash::ProfileHelper::IsUserProfile(profile)) {
-    // Notify of new profile initialization only for regular profiles. The
-    // startup profile initialization is triggered by another code path.
-    return;
-  }
-#endif
-
   browser_main_->CallPostProfileInit(profile);
 }
 
@@ -696,9 +667,6 @@ std::unique_ptr<content::BrowserMainParts> ChromeBrowserMainParts::Create(
 #if BUILDFLAG(IS_MAC)
   main_parts = std::make_unique<ChromeBrowserMainPartsMac>(is_integration_test,
                                                            startup_data);
-#elif BUILDFLAG(IS_CHROMEOS)
-  main_parts = std::make_unique<ash::ChromeBrowserMainPartsAsh>(
-      is_integration_test, startup_data);
 #elif BUILDFLAG(IS_LINUX)
   main_parts = std::make_unique<ChromeBrowserMainPartsLinux>(
       is_integration_test, startup_data);
@@ -739,11 +707,6 @@ std::unique_ptr<content::BrowserMainParts> ChromeBrowserMainParts::Create(
 
 #if BUILDFLAG(IS_MAC)
   main_parts->AddParts(std::make_unique<ChromeBrowserMainExtraPartsMac>());
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(jamescook): Combine with `ChromeBrowserMainPartsAsh`.
-  main_parts->AddParts(std::make_unique<ChromeBrowserMainExtraPartsAsh>());
 #endif
 
 #if BUILDFLAG(IS_LINUX)
@@ -793,11 +756,6 @@ ChromeBrowserMainParts::ChromeBrowserMainParts(bool is_integration_test,
                                                StartupData* startup_data)
     : is_integration_test_(is_integration_test), startup_data_(startup_data) {
   DCHECK(startup_data_);
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  if (is_integration_test_) {
-    extensions::ComponentLoader::DisableHelpAppForTesting();
-  }
-#endif
 }
 
 ChromeBrowserMainParts::~ChromeBrowserMainParts() {
@@ -1010,9 +968,7 @@ int ChromeBrowserMainParts::PreCreateThreads() {
     // These members must be initialized before exiting this function normally.
 #if !BUILDFLAG(IS_ANDROID)
     DCHECK(browser_creator_.get());
-#if !BUILDFLAG(IS_CHROMEOS)
     DCHECK(master_prefs_.get());
-#endif
 #endif
 
     for (auto& chrome_extra_part : chrome_extra_parts_) {
@@ -1065,7 +1021,7 @@ int ChromeBrowserMainParts::OnLocalStateLoaded(
 int ChromeBrowserMainParts::ApplyFirstRunPrefs() {
 // Android does first run in Java instead of native.
 // Chrome OS has its own out-of-box-experience code.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   master_prefs_ = std::make_unique<first_run::MasterPrefs>();
 
   std::unique_ptr<installer::InitialPreferences> installer_initial_prefs =
@@ -1103,7 +1059,7 @@ int ChromeBrowserMainParts::ApplyFirstRunPrefs() {
                             master_prefs_->confirm_to_quit);
   }
 #endif
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   return content::RESULT_CODE_NORMAL_EXIT;
 }
 
@@ -1132,13 +1088,6 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
 
   PrefService* local_state = browser_process_->local_state();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  browser_process_->platform_part()->InitializeCrosSettings();
-  ash::StatsReportingController::Initialize(local_state);
-  arc::StabilityMetricsManager::Initialize(local_state);
-  ash::HWDataUsageController::Initialize(local_state);
-#endif
-
   {
     TRACE_EVENT0(
         "startup",
@@ -1146,7 +1095,6 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
     browser_process_->Init();
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   std::optional<std::string> managed_by =
       policy::GetManagedBy(browser_process_->browser_policy_connector()
                                ->machine_level_user_cloud_policy_manager());
@@ -1155,7 +1103,6 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
     crash_keys::AllocateCrashKeyInBrowserAndChildren(kEnrollmentDomain,
                                                      managed_by.value());
   }
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   // These members must be initialized before returning from this function.
@@ -1174,18 +1121,17 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
 
 // Android does first run in Java instead of native.
 // Chrome OS has its own out-of-box-experience code.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (first_run::IsChromeFirstRun()) {
     if (!base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kApp) &&
         !base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kAppId)) {
       browser_creator_->AddFirstRunTabs(master_prefs_->new_tabs);
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(ENABLE_EXTENSIONS_CORE) &&                                   \
-    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-     BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(ENABLE_EXTENSIONS_CORE) && \
+    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID))
   // Create directory for user-level Native Messaging manifest files. This
   // makes it less likely that the directory will be created by third-party
   // software with incorrect owner or permission. See crbug.com/41321051 .
@@ -1462,8 +1408,7 @@ void ChromeBrowserMainParts::PostProfileInit(Profile* profile,
     chrome_extra_part->PostProfileInit(profile, is_initial_profile);
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // Delete the media history database if it still exists.
   // TODO(crbug.com/40177301): Remove this.
   base::ThreadPool::PostTask(
@@ -1481,7 +1426,7 @@ void ChromeBrowserMainParts::PostProfileInit(Profile* profile,
       base::BindOnce(&DeleteDeprecatedPrivacySandboxData, profile->GetPath()));
 #endif
 
-#if BUILDFLAG(ENABLE_RLZ) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(ENABLE_RLZ)
   if (is_initial_profile) {
     // Init the RLZ library. This just binds the dll and schedules a task on the
     // file thread to be run sometime later. If this is the first run we record
@@ -1506,10 +1451,8 @@ void ChromeBrowserMainParts::PostProfileInit(Profile* profile,
   translate::TranslateMetricsLoggerImpl::LogApplicationStartMetrics(
       ChromeTranslateClient::CreateTranslatePrefs(profile->GetPrefs()));
 // On ChromeOS results in a crash. https://crbug.com/40158352
-#if !BUILDFLAG(IS_CHROMEOS)
   language::LanguageUsageMetrics::RecordPageLanguages(
       *UrlLanguageHistogramFactory::GetForBrowserContext(profile));
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (headless::IsHeadlessMode()) {
@@ -1651,7 +1594,6 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
   downgrade_manager_.UpdateLastVersion(user_data_dir_);
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Initialize the chrome browser cloud management controller after
   // the browser process singleton is acquired to remove race conditions where
   // multiple browser processes start simultaneously.  The main
@@ -1665,9 +1607,8 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
       browser_process_->local_state(),
       browser_process_->system_network_context_manager()
           ->GetSharedURLLoaderFactory());
-#endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Wait for the chrome browser cloud management enrollment to finish.
   // If enrollment is not mandatory, this function returns immediately.
   // Abort the launch process if required enrollment fails.
@@ -1743,7 +1684,7 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
   // Call `PostProfileInit()`and set it up for profiles created later.
   profile_init_manager_ = std::make_unique<ProfileInitManager>(this, profile);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Execute first run specific code after the PrefService has been initialized
   // and preferences have been registered since some of the import code depends
   // on preferences.
@@ -1861,7 +1802,6 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
   // We are in regular browser boot sequence. Open initial tabs and enter the
   // main message loop.
   std::vector<Profile*> last_opened_profiles;
-#if !BUILDFLAG(IS_CHROMEOS)
   // On ChromeOS multiple profiles doesn't apply, and will break if we load
   // them this early as the cryptohome hasn't yet been mounted (which happens
   // only once we log in). And if we're launching a web app, we don't want to
@@ -1870,7 +1810,6 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
     last_opened_profiles =
         g_browser_process->profile_manager()->GetLastOpenedProfiles();
   }
-#endif
 
 #if BUILDFLAG(CHROME_FOR_TESTING)
   if (g_browser_process->component_updater()) {
@@ -2084,16 +2023,6 @@ void ChromeBrowserMainParts::PostDestroyThreads() {
 
   profile_init_manager_.reset();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // These controllers make use of `browser_process_->local_state()`, so they
-  // must be destroyed before `browser_process_`.
-  // Shutting down in the reverse order of Initialize().
-  ash::HWDataUsageController::Shutdown();
-  arc::StabilityMetricsManager::Shutdown();
-  ash::StatsReportingController::Shutdown();
-  browser_process_->platform_part()->ShutdownCrosSettings();
-#endif
-
 #if BUILDFLAG(ENABLE_DOWNGRADE_PROCESSING)
   if (result_code_ == CHROME_RESULT_CODE_DOWNGRADE_AND_RELAUNCH) {
     // Process a pending User Data downgrade before restarting.
@@ -2112,9 +2041,7 @@ void ChromeBrowserMainParts::PostDestroyThreads() {
 
   browser_shutdown::ShutdownPostThreadsStop(restart_mode);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   master_prefs_.reset();
-#endif
 
   device_event_log::Shutdown();
 #endif  // BUILDFLAG(IS_ANDROID)

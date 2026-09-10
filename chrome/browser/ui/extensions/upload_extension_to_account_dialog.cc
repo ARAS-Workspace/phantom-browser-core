@@ -27,10 +27,6 @@ void ShowUploadExtensionToAccountDialog(Profile* profile,
                                         const Extension& extension,
                                         base::OnceClosure accept_callback,
                                         base::OnceClosure cancel_callback) {
-#if BUILDFLAG(IS_CHROMEOS)
-  CHECK(
-      base::FeatureList::IsEnabled(syncer::kReplaceSyncPromosWithSignInPromos));
-#endif
   CHECK(AccountExtensionTracker::Get(profile)->CanUploadAsAccountExtension(
       extension));
 

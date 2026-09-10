@@ -37,10 +37,6 @@
 #include "ui/views/view_utils.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 constexpr char kCalculatorAppUrl[] = "https://calculator.apps.chrome/";
 
@@ -59,11 +55,7 @@ constexpr char kCalculatorForceInstalled[] = R"([
   }
 ])";
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr bool kShouldPreventClose = true;
-#else
 constexpr bool kShouldPreventClose = false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -110,13 +102,8 @@ IN_PROC_BROWSER_TEST_P(UnloadControllerPreventCloseTest,
 }
 
 // Flaky on IS_CHROMEOS. crbug.com/369817361
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable \
-  DISABLED_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable
-#else
 #define MAYBE_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable \
   PreventCloseEnforcedByPolicyTabbedAppShallBeClosable
-#endif
 IN_PROC_BROWSER_TEST_P(
     UnloadControllerPreventCloseTest,
     MAYBE_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable) {
@@ -151,50 +138,3 @@ INSTANTIATE_TEST_SUITE_P(
           return "Horizontal";
       }
     });
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Browser tests for verifying `UnloadController` behavior for apps when locked
-// (and not locked) for OnTask. Only relevant for non-web browser scenarios.
-class UnloadControllerWithOnTaskTest : public InProcessBrowserTest {
- protected:
-  webapps::AppId InstallMockApp() {
-    return web_app::test::InstallDummyWebApp(
-        browser()->GetProfile(), /*app_name=*/"Mock app",
-        /*app_url=*/GURL("https://www.example.com/"));
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(UnloadControllerWithOnTaskTest,
-                       PreventCloseWhenLockedForOnTask) {
-  // Install and launch app.
-  webapps::AppId app_id = InstallMockApp();
-  Browser* const app_browser =
-      web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-  ash::boca::OnTaskLockedController::From(app_browser)
-      ->set_locked_for_on_task(true);
-
-  // Verify tab cannot be closed.
-  content::WebContents* const active_web_contents =
-      app_browser->tab_strip_model()->GetWebContentsAt(0);
-  UnloadController* unload_controller = UnloadController::From(app_browser);
-  EXPECT_FALSE(unload_controller->CanCloseContents(active_web_contents));
-}
-
-IN_PROC_BROWSER_TEST_F(UnloadControllerWithOnTaskTest,
-                       AllowCloseWhenNotLockedForOnTask) {
-  // Install and launch app.
-  webapps::AppId app_id = InstallMockApp();
-  Browser* const app_browser =
-      web_app::LaunchWebAppBrowser(browser()->GetProfile(), app_id);
-  ash::boca::OnTaskLockedController::From(app_browser)
-      ->set_locked_for_on_task(false);
-
-  // Verify tab can be closed.
-  content::WebContents* const active_web_contents =
-      app_browser->tab_strip_model()->GetWebContentsAt(0);
-  UnloadController* unload_controller = UnloadController::From(app_browser);
-  EXPECT_TRUE(unload_controller->CanCloseContents(active_web_contents));
-}
-
-#endif

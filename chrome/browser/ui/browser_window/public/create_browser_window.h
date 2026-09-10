@@ -175,12 +175,6 @@ struct BrowserWindowCreateParams {
   // focused state.
   std::optional<tab_groups::TabGroupId> focused_tab_group_id;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // If set, the browser should be created on the display given by
-  // `display_id`.
-  std::optional<int64_t> display_id;
-#endif
-
 #if BUILDFLAG(IS_LINUX)
   // When the browser window is shown, the desktop environment is notified
   // using this ID. In response, the desktop will stop playing the "waiting

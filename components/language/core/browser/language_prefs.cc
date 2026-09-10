@@ -38,14 +38,6 @@ void LanguagePrefs::RegisterProfilePrefs(
                                user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 
   registry->RegisterListPref(language::prefs::kForcedLanguages);
-#if BUILDFLAG(IS_CHROMEOS)
-  registry->RegisterStringPref(language::prefs::kPreferredLanguages,
-                               kFallbackInputMethodLocale);
-
-  registry->RegisterStringPref(
-      language::prefs::kPreferredLanguagesSyncable, "",
-      user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PREF);
-#endif
 #if BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(
       language::prefs::kAppLanguagePromptShown, false,
@@ -72,11 +64,7 @@ void LanguagePrefs::GetAcceptLanguagesList(
     std::vector<std::string>* languages) const {
   DCHECK(languages);
   DCHECK(languages->empty());
-#if BUILDFLAG(IS_CHROMEOS)
-  const std::string& key = language::prefs::kPreferredLanguages;
-#else
   const std::string& key = language::prefs::kAcceptLanguages;
-#endif
 
   *languages = base::SplitString(prefs_->GetString(key), ",",
                                  base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
@@ -97,9 +85,6 @@ void LanguagePrefs::SetUserSelectedLanguagesList(
       l10n_util::KeepAcceptedLanguages(languages);
   std::string languages_str = base::JoinString(filtered_languages, ",");
   prefs_->SetString(language::prefs::kSelectedLanguages, languages_str);
-#if BUILDFLAG(IS_CHROMEOS)
-  prefs_->SetString(language::prefs::kPreferredLanguages, languages_str);
-#endif
 }
 
 void LanguagePrefs::GetDeduplicatedUserLanguages(
@@ -173,10 +158,6 @@ void LanguagePrefs::InitializeSelectedLanguagesPref() {
 void ResetLanguagePrefs(PrefService* prefs) {
   prefs->ClearPref(language::prefs::kSelectedLanguages);
   prefs->ClearPref(language::prefs::kAcceptLanguages);
-#if BUILDFLAG(IS_CHROMEOS)
-  prefs->ClearPref(language::prefs::kPreferredLanguages);
-  prefs->ClearPref(language::prefs::kPreferredLanguagesSyncable);
-#endif
 #if BUILDFLAG(IS_ANDROID)
   prefs->ClearPref(language::prefs::kULPLanguages);
 #endif

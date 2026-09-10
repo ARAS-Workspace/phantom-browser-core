@@ -25,15 +25,12 @@ namespace {
 constexpr int kFocusToggleAcceleratorModifiers =
 #if BUILDFLAG(IS_MAC)
     ui::EF_CONTROL_DOWN | ui::EF_COMMAND_DOWN;
-#elif BUILDFLAG(IS_CHROMEOS)
-// ui::EF_COMMAND_DOWN is the search key for ChromeOS.
-    ui::EF_COMMAND_DOWN | ui::EF_ALT_DOWN;
 #else
     ui::EF_ALT_DOWN | ui::EF_SHIFT_DOWN;
 #endif
 
 constexpr int kCaptureRegionAcceleratorModifiers =
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
     ui::EF_CONTROL_DOWN | ui::EF_SHIFT_DOWN;
 #else
     ui::EF_ALT_DOWN | ui::EF_CONTROL_DOWN;
@@ -42,9 +39,6 @@ constexpr int kCaptureRegionAcceleratorModifiers =
 constexpr int kPanelToggleAcceleratorModifiers =
 #if BUILDFLAG(IS_MAC)
     ui::EF_CONTROL_DOWN;
-#elif BUILDFLAG(IS_CHROMEOS)
-    // ui::EF_COMMAND_DOWN is the search key for ChromeOS.
-    ui::EF_COMMAND_DOWN;
 #else
         ui::EF_ALT_DOWN;
 #endif

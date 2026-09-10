@@ -49,11 +49,11 @@
 #include "ui/base/webui/web_ui_util.h"
 #include "ui/webui/webui_util.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "base/command_line.h"
 #include "chrome/browser/enterprise/reporting/browser_launch/scoped_initial_command_line.h"
 #include "chrome/common/chrome_switches.h"
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // LINT.IfChange
 
@@ -92,7 +92,7 @@ base::DictValue GetVersionInfo() {
   return version_info;
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 namespace {
 
 // List of command-line switches that are not considered user-specified,
@@ -120,7 +120,7 @@ std::string GetCustomCommandLineArguments(
 
   return arguments;
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 void CreateAndAddPolicyUIHtmlSource(Profile* profile) {
   content::WebUIDataSource* source = content::WebUIDataSource::CreateAndAdd(
@@ -188,9 +188,7 @@ void CreateAndAddPolicyUIHtmlSource(Profile* profile) {
       {"statusDevice", IDS_POLICY_STATUS_DEVICE},
       {"statusMachine", IDS_POLICY_STATUS_MACHINE},
       {"statusUser", IDS_POLICY_STATUS_USER},
-#if !BUILDFLAG(IS_CHROMEOS)
       {"uploadReport", IDS_UPLOAD_REPORT},
-#endif  // !BUILDFLAG(IS_CHROMEOS)
       {"viewLogs", IDS_VIEW_POLICY_LOGS},
 #if !BUILDFLAG(IS_ANDROID)
       {"commandLineFlagsWarning", IDS_POLICY_COMMAND_LINE_FLAGS_WARNING},
@@ -293,13 +291,13 @@ void CreateAndAddPolicyUIHtmlSource(Profile* profile) {
 
   source->AddBoolean("hideUploadReportButton", profile->IsOffTheRecord());
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   std::string custom_arguments =
       GetCustomCommandLineArguments(GetInitialBrowserCommandLine());
   source->AddBoolean(policy::kHasCustomCommandLineArguments,
                      !custom_arguments.empty());
   source->AddString(policy::kCustomCommandLineArguments, custom_arguments);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

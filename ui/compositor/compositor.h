@@ -516,15 +516,6 @@ class COMPOSITOR_EXPORT Compositor
     return vrr_state_;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Sets the list of refresh rates that the compositor may request to use.
-  void SetSeamlessRefreshRates(
-      const std::vector<float>& seamless_refresh_rates);
-
-  // Notifies observers of a new refresh rate preference.
-  void OnSetPreferredRefreshRate(float refresh_rate);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // While there are outstanding `ScopedKeepSurfaceAlive`, Compositor will
   // attempt to ensure any pending `viz::CopyOutputRequest` in any part of the
   // compositor surface tree are fulfilled in a timely manner. `surface_id`
@@ -668,9 +659,6 @@ class COMPOSITOR_EXPORT Compositor
   std::optional<base::TimeDelta> max_vsync_interval_ = std::nullopt;
   display::VariableRefreshRateState vrr_state_ =
       display::VariableRefreshRateState::kVrrNotCapable;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::vector<float> seamless_refresh_rates_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   const bool use_external_begin_frame_control_;
   const bool force_software_compositor_;

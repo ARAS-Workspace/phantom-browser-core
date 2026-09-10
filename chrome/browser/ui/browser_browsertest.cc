@@ -190,13 +190,6 @@
 #include "ui/base/test/scoped_fake_nswindow_fullscreen.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/test/base/testing_profile.h"
-#include "components/user_manager/user_names.h"
-
-#endif
-
 using base::ASCIIToUTF16;
 using content::HostZoomMap;
 using content::NavigationController;
@@ -1299,7 +1292,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, TabClosingWhenRemovingExtension) {
 }
 
 // Open with --app-id=<id>, and see that an application window opens by default.
-#if !BUILDFLAG(IS_CHROMEOS)
 // TODO(https://crbug.com/399807131): Re-enable on chrome win builders.
 #define MAYBE_AppIdSwitch AppIdSwitch
 IN_PROC_BROWSER_TEST_F(BrowserTest, MAYBE_AppIdSwitch) {
@@ -1333,7 +1325,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, MAYBE_AppIdSwitch) {
                     ->GetSize());
   EXPECT_EQ(1, browser()->tab_strip_model()->count());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Overscroll is only enabled on Aura platforms currently, and even then only
 // when a specific feature (OverscrollHistoryNavigation) is enabled.
@@ -1476,7 +1467,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, ReattachDevToolsWindow) {
 
 // Chromeos defaults to restoring the last session, so this test isn't
 // applicable.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Makes sure pinned tabs are restored correctly on start.
 IN_PROC_BROWSER_TEST_F(BrowserTest, RestorePinnedTabs) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1537,7 +1527,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, RestorePinnedTabs) {
   EXPECT_TRUE(new_model->IsTabPinned(1));
   EXPECT_FALSE(new_model->IsTabPinned(2));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // This test verifies we don't crash when closing the last window and the app
 // menu is showing.
@@ -2089,7 +2078,7 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, FullscreenBookmarkBar) {
             BookmarkBarController::From(browser())->bookmark_bar_state());
   chrome::ToggleFullscreenMode(browser());
   EXPECT_TRUE(browser()->GetWindow()->IsFullscreen());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   // Mac and Chrome OS both have an "immersive style" fullscreen where the
   // bookmark bar is visible when the top views slide down.
   EXPECT_EQ(BookmarkBar::SHOW,
@@ -2207,25 +2196,6 @@ IN_PROC_BROWSER_TEST_F(KioskModeTest, MAYBE_EnableKioskModeTest) {
   ASSERT_FALSE(fullscreen_bubble_element);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(KioskModeTest, DoNotExitFullscreen) {
-  BrowserWindow::FromBrowser(browser())
-      ->GetExclusiveAccessContext()
-      ->ExitFullscreen();
-  ASSERT_TRUE(browser()->GetWindow()->IsFullscreen());
-}
-
-IN_PROC_BROWSER_TEST_F(KioskModeTest, DoNotChangeBounds) {
-  gfx::Rect old_bounds = browser()->GetWindow()->GetBounds();
-
-  browser()->GetWindow()->SetBounds(gfx::Rect(10, 10, 10, 10));
-  gfx::Rect new_bounds = browser()->GetWindow()->GetBounds();
-
-  ASSERT_TRUE(browser()->GetWindow()->IsFullscreen());
-  ASSERT_EQ(old_bounds, new_bounds);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
 // Tests to ensure that the browser continues running in the background after
 // the last window closes.
@@ -2284,7 +2254,6 @@ IN_PROC_BROWSER_TEST_F(NoStartupWindowTest, NoStartupWindowBasicTest) {
 
 // Chromeos needs to track app windows because it considers them to be part of
 // session state.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(NoStartupWindowTest, DontInitSessionServiceForApps) {
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
 
@@ -2298,7 +2267,6 @@ IN_PROC_BROWSER_TEST_F(NoStartupWindowTest, DontInitSessionServiceForApps) {
 
   ASSERT_FALSE(ProcessedAnyCommands(command_storage_manager));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // This test needs to be placed outside the anonymous namespace because we
 // need to access private type of Browser.
@@ -3206,63 +3174,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, CreatePictureInPicture) {
             BrowserWindowInterface::Type::TYPE_PICTURE_IN_PICTURE);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(BrowserTest, PreventCloseYieldsCancelledEvent) {
-  base::test::TestFuture<void> policy_refresh_sync_future;
-  web_app::WebAppProvider::GetForWebApps(profile())
-      ->policy_manager()
-      .SetRefreshPolicySettingsCompletedCallbackForTesting(
-          policy_refresh_sync_future.GetCallback());
-
-  const absl::Cleanup policy_cleanup = [this]() {
-    // Clear policy values, otherwise we won't be able to gracefully close the
-    // browser test.
-    profile()->GetPrefs()->SetList(prefs::kWebAppSettings, base::ListValue());
-  };
-
-  // Set up policy values.
-  static constexpr char kCalculatorAppUrl[] = "https://calculator.apps.chrome/";
-  profile()->GetPrefs()->SetList(
-      prefs::kWebAppSettings,
-      base::ListValue().Append(
-          base::DictValue()
-              .Set(web_app::kManifestId, kCalculatorAppUrl)
-              .Set(web_app::kRunOnOsLogin, web_app::kRunWindowed)
-              .Set(web_app::kPreventClose, true)));
-  profile()->GetPrefs()->SetList(
-      prefs::kWebAppInstallForceList,
-      base::ListValue().Append(
-          base::DictValue()
-              .Set(web_app::kUrlKey, kCalculatorAppUrl)
-              .Set(web_app::kDefaultLaunchContainerKey,
-                   web_app::kDefaultLaunchContainerWindowValue)));
-  ASSERT_TRUE(policy_refresh_sync_future.Wait());
-
-  apps::AppUpdateWaiter waiter(
-      profile(), ash::kCalculatorAppId,
-      base::BindRepeating([](const apps::AppUpdate& update) {
-        return update.AllowClose().has_value() && !update.AllowClose().value();
-      }));
-  waiter.Await();
-
-  Browser* const browser =
-      web_app::LaunchWebAppBrowser(profile(), ash::kCalculatorAppId);
-  ASSERT_TRUE(browser);
-
-  int times_called = 0;
-  base::CallbackListSubscription browser_close_canelled_subscription =
-      browser->RegisterBrowserCloseCancelled(base::BindLambdaForTesting(
-          [&](BrowserWindowInterface* bwi,
-              BrowserWindowInterface::ClosingStatus status) {
-            EXPECT_EQ(BrowserWindowInterface::ClosingStatus::kDeniedByPolicy,
-                      status);
-            times_called++;
-          }));
-  UnloadController::From(browser)->OnWindowClosing();
-  EXPECT_EQ(1, times_called);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Asserts that browser close operations only propagate browser closed
 // notifications once.
 IN_PROC_BROWSER_TEST_F(BrowserTest, BrowserCloseEmitsClosedNotificationsOnce) {
@@ -3323,23 +3234,10 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, ClosedBrowsersShouldNotShow) {
 
 class GuestSessionBrowserTest : public BrowserTest {
  public:
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(ash::switches::kGuestSession);
-    command_line->AppendSwitchASCII(ash::switches::kLoginUser,
-                                    user_manager::kGuestUserName);
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile,
-                                    TestingProfile::kTestUserProfileDir);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   void SetUpOnMainThread() override {
     BrowserTest::SetUpOnMainThread();
-#if BUILDFLAG(IS_CHROMEOS)
-    guest_browser_ = browser();
-#else
     guest_browser_ = CreateGuestBrowser();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void TearDownOnMainThread() override {

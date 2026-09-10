@@ -46,7 +46,6 @@ TEST(NSSUtilTest, PRTimeConversion) {
   EXPECT_EQ(pr_time, BaseTimeToPRTime(base_time));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class NssDirectoryTest : public testing::Test {
  protected:
   void SetUp() override {
@@ -94,7 +93,5 @@ TEST_F(NssDirectoryTest, UseXdgDataNssFolderFallback) {
 
   ASSERT_EQ(nssdb_path, GetDefaultNSSConfigDirectory());
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace crypto

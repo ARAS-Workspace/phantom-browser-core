@@ -48,29 +48,9 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#include "chromeos/constants/pref_names.h"
-#include "components/prefs/pref_service.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/system/sys_info.h"
-#endif
-
 namespace extensions::util {
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool IsSigninProfileTestExtensionOnTestImage(const Extension* extension) {
-  if (extension->id() != extension_misc::kSigninProfileTestExtensionId) {
-    return false;
-  }
-  base::SysInfo::CrashIfChromeOSNonTestImage();
-  return true;
-}
-#endif
 
 // Returns `true` if `extension` was installed from the webstore, otherwise
 // false.
@@ -83,21 +63,6 @@ bool ExtensionIsFromWebstore(const Extension& extension) {
 // This is safe to call even when the extension is completely unloaded.
 bool IsIncognitoEnabledForIdAndContext(const ExtensionId& extension_id,
                                        content::BrowserContext* context) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // An OTR Profile is used for captive portal signin to hide PII from
-  // captive portals (which require HTTP redirects to function).
-  // However, for captive portal signin we do not want want to disable
-  // extensions by default. (Proxies are explicitly disabled elsewhere).
-  // See b/261727502 for details.
-  PrefService* prefs = user_prefs::UserPrefs::Get(context);
-  if (prefs) {
-    const PrefService::Preference* captive_portal_pref =
-        prefs->FindPreference(chromeos::prefs::kCaptivePortalSignin);
-    if (captive_portal_pref && captive_portal_pref->GetValue()->GetBool()) {
-      return true;
-    }
-  }
-#endif
 
   // The ultimate fallback database check.
   return ExtensionPrefs::Get(context)->IsIncognitoEnabled(extension_id);
@@ -125,11 +90,6 @@ bool IsIncognitoEnabled(const Extension* extension,
     if (extension->is_login_screen_extension()) {
       return true;
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    if (IsSigninProfileTestExtensionOnTestImage(extension)) {
-      return true;
-    }
-#endif
   }
 
   return IsIncognitoEnabledForIdAndContext(extension->id(), context);

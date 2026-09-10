@@ -279,14 +279,6 @@ class NetworkContextConfigurationBrowserTest
       incognito_ = CreateIncognitoBrowser();
     SimulateNetworkServiceCrashIfNecessary();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // On ChromeOS the connection type comes from a fake Shill service, which
-    // is configured with a fake ethernet connection asynchronously. Wait for
-    // the connection type to be available to avoid getting notified of the
-    // connection change halfway through the test.
-    ConnectionTypeWaiter().Wait(
-        net::NetworkChangeNotifier::ConnectionType::CONNECTION_ETHERNET);
-#endif
   }
 
   // Returns true if the NetworkContext being tested is associated with an
@@ -1317,7 +1309,7 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationBrowserTest,
 }
 
 // Disabled due to flakiness. See crbug.com/40755205.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_UserAgentAndLanguagePrefs DISABLED_UserAgentAndLanguagePrefs
 #else
 #define MAYBE_UserAgentAndLanguagePrefs UserAgentAndLanguagePrefs
@@ -1525,7 +1517,7 @@ IN_PROC_BROWSER_TEST_P(NetworkContextConfigurationBrowserTest,
 }
 
 // Disabled due to flakiness. See https://crbug.com/40718681.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_PRE_ThirdPartyCookiesBlocked DISABLED_PRE_ThirdPartyCookiesBlocked
 #define MAYBE_ThirdPartyCookiesBlocked DISABLED_ThirdPartyCookiesBlocked
 #else

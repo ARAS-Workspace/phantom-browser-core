@@ -102,18 +102,6 @@
 #include "ui/events/keycodes/keyboard_code_conversion.h"
 #include "ui/events/keycodes/keyboard_codes.h"
 
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_EXTENSIONS)
-// Includes for ChromeVox accessibility tests.
-#include "chrome/browser/ash/accessibility/accessibility_manager.h"
-#include "chrome/browser/ash/accessibility/accessibility_test_utils.h"
-#include "chrome/browser/ash/accessibility/chromevox_test_utils.h"
-#include "chrome/browser/ash/accessibility/speech_monitor.h"
-#include "chrome/browser/ui/aura/accessibility/automation_manager_aura.h"
-#include "extensions/browser/browsertest_util.h"
-#include "ui/accessibility/accessibility_features.h"
-#include "ui/base/test/ui_controls.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_EXTENSIONS)
-
 using ::base::ASCIIToUTF16;
 using ::base::test::RunClosure;
 using ::content::URLLoaderInterceptor;
@@ -3153,7 +3141,6 @@ IN_PROC_BROWSER_TEST_F(AutofillInteractiveTestDynamicForm,
   expect_count("Autofill.KeyMetrics.FillingAcceptance.CreditCard", 1, 1);
   expect_count("Autofill.KeyMetrics.FillingCorrectness.CreditCard", 1, 1);
   expect_count("Autofill.KeyMetrics.FillingAssistance.CreditCard", 1, 1);
-#if !BUILDFLAG(IS_CHROMEOS)
   expect_count("Autofill.KeyMetrics.FillingReadiness.CreditCard.Profile0", 1,
                1);
   expect_count("Autofill.KeyMetrics.FillingAcceptance.CreditCard.Profile0", 1,
@@ -3162,7 +3149,6 @@ IN_PROC_BROWSER_TEST_F(AutofillInteractiveTestDynamicForm,
                1);
   expect_count("Autofill.KeyMetrics.FillingAssistance.CreditCard.Profile0", 1,
                1);
-#endif
   // Ensure that refills don't count as edits.
   expect_count("Autofill.PerfectFilling.CreditCards", 1, 1);
   // Bucket 0 = edited, 1 = accepted; 3 samples for 3 fields.
@@ -3229,107 +3215,6 @@ IN_PROC_BROWSER_TEST_P(AutofillInteractiveTestShadowDom,
 }
 
 // ChromeVox is only available on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_EXTENSIONS)
-
-class AutofillInteractiveTestChromeVox
-    : public AutofillInteractiveTestBase,
-      public ::testing::WithParamInterface<ash::ManifestVersion> {
- public:
-  AutofillInteractiveTestChromeVox() {
-    std::vector<base::test::FeatureRef> enabled_features, disabled_features;
-    if (GetParam() == ash::ManifestVersion::kTwo) {
-      disabled_features.push_back(
-          ::features::kAccessibilityManifestV3ChromeVox);
-    } else if (GetParam() == ash::ManifestVersion::kThree) {
-      enabled_features.push_back(::features::kAccessibilityManifestV3ChromeVox);
-    }
-    scoped_feature_list_.InitWithFeatures(enabled_features, disabled_features);
-  }
-  ~AutofillInteractiveTestChromeVox() override = default;
-
-  void SetUpOnMainThread() override {
-    AutofillInteractiveTestBase::SetUpOnMainThread();
-
-    chromevox_test_utils_ = std::make_unique<ash::ChromeVoxTestUtils>();
-  }
-
-  void TearDownOnMainThread() override {
-    chromevox_test_utils_.reset();
-    // Unload the ChromeVox extension so the browser doesn't try to respond to
-    // in-flight requests during test shutdown. https://crbug.com/41436231
-    ash::AccessibilityManager::Get()->EnableSpokenFeedback(false);
-    AutomationManagerAura::GetInstance()->Disable();
-    AutofillInteractiveTestBase::TearDownOnMainThread();
-  }
-
-  ash::ChromeVoxTestUtils* chromevox_test_utils() {
-    return chromevox_test_utils_.get();
-  }
-  ash::test::SpeechMonitor* sm() { return chromevox_test_utils()->sm(); }
-
- private:
-  std::unique_ptr<ash::ChromeVoxTestUtils> chromevox_test_utils_;
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-INSTANTIATE_TEST_SUITE_P(ManifestVersion,
-                         AutofillInteractiveTestChromeVox,
-                         ::testing::Values(ash::ManifestVersion::kTwo,
-                                           ash::ManifestVersion::kThree));
-
-// Ensure that autofill suggestions are properly read out via ChromeVox.
-// This is a regressions test for crbug.com/40766297.
-// TODO(crbug.com/40820453): Flaky on ChromeOS
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TestNotificationOfAutofillDropdown \
-  DISABLED_TestNotificationOfAutofillDropdown
-#else
-#define MAYBE_TestNotificationOfAutofillDropdown \
-  TestNotificationOfAutofillDropdown
-#endif
-IN_PROC_BROWSER_TEST_P(AutofillInteractiveTestChromeVox,
-                       MAYBE_TestNotificationOfAutofillDropdown) {
-  CreateTestProfile();
-  SetTestUrlResponse(kTestShippingFormString);
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetTestUrl()));
-
-  chromevox_test_utils()->EnableChromeVox();
-  content::ScopedAccessibilityModeOverride scoped_accessibility_mode(
-      web_contents(), ui::kAXModeComplete);
-
-  // The following contains a sequence of calls to
-  // sm()->ExpectSpeechPattern() and test_delegate()->Wait(). It is essential
-  // to first flush the expected speech patterns, otherwise the two functions
-  // start incompatible RunLoops.
-  sm()->ExpectSpeechPattern("Web Content");
-  sm()->Call([this] {
-    content::WaitForAccessibilityTreeToContainNodeWithName(web_contents(),
-                                                           "First name:");
-    web_contents()->Focus();
-    test_delegate()->SetExpectations({ObservedUiEvents::kSuggestionsShown});
-    ASSERT_TRUE(FocusField(GetElementById("firstname"), GetWebContents()));
-  });
-  sm()->ExpectSpeechPattern("First name:");
-  sm()->ExpectSpeechPattern("Edit text");
-  sm()->ExpectSpeechPattern("Region");
-  // Wait for suggestions popup to show up. This needs to happen before we
-  // simulate the cursor down key press.
-  sm()->Call([this] { ASSERT_TRUE(test_delegate()->Wait()); });
-  sm()->Call([this] {
-    test_delegate()->SetExpectations({ObservedUiEvents::kPreviewFormData});
-    ASSERT_TRUE(
-        ui_controls::SendKeyPress(browser()->GetWindow()->GetNativeWindow(),
-                                  ui::VKEY_DOWN, false, false, false, false));
-  });
-  sm()->ExpectSpeechPattern("Autofill menu opened");
-  sm()->ExpectSpeechPattern("Milton 4120 Freidrich Lane");
-  sm()->ExpectSpeechPattern("List item");
-  sm()->ExpectSpeechPattern("1 of 2");
-  sm()->Call([this] { ASSERT_TRUE(test_delegate()->Wait()); });
-  sm()->Replay();
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_EXTENSIONS)
 
 class AutofillInteractiveFormSubmissionTest
     : public AutofillInteractiveTestBase {

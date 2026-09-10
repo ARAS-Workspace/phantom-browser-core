@@ -39,10 +39,6 @@
 #include "device/fido/mac/authenticator.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/fido/cros/authenticator.h"
-#endif
-
 namespace device {
 
 namespace {

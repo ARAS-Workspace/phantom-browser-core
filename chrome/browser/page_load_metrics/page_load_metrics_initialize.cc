@@ -80,9 +80,9 @@
 #include "ui/accessibility/accessibility_features.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/page_load_metrics/observers/android_page_load_metrics_observer.h"
@@ -97,10 +97,6 @@
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_webui_config.h"
 #include "chrome/common/webui_url_constants.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/page_load_metrics/observers/ash_session_restore_page_load_metrics_observer.h"
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -317,15 +313,6 @@ void PageLoadMetricsEmbedder::RegisterObservers(
   }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (AshSessionRestorePageLoadMetricsObserver::ShouldBeInstantiated(
-          Profile::FromBrowserContext(web_contents()->GetBrowserContext()))) {
-    tracker->AddObserver(
-        std::make_unique<AshSessionRestorePageLoadMetricsObserver>(
-            web_contents()));
-  }
-#endif
-
   tracker->AddObserver(std::make_unique<CaptchaMetricsObserver>());
 }
 
@@ -430,12 +417,11 @@ bool PageLoadMetricsEmbedder::IsInternalWebUI(const GURL& url) {
 }
 
 bool PageLoadMetricsEmbedder::ShouldObserveScheme(std::string_view scheme) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return scheme == webapps::kIsolatedAppScheme;
 #else
-  // BUILDFLAG(IS_CHROMEOS))
   return false;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }
 
 }  // namespace

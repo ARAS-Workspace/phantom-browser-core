@@ -28,12 +28,12 @@ BASE_FEATURE(kGamepadRawInputChangeEvent, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kClaimDuplicateGamepadsProductIdentifier,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Enabling this feature causes GamepadPlatformDataFetcherLinux to check device
 // IDs before opening the hidraw device node to avoid interfering with devices
 // that are not gamepads or do not require hidraw access.
 BASE_FEATURE(kAllowlistHidrawGamepads, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_APPLE)
 // Enable Xbox gamepad support in GameControllerDataFetcherMac

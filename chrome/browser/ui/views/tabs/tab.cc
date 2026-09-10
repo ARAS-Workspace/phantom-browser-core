@@ -92,10 +92,6 @@
 #if defined(USE_AURA)
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#endif
-
 using base::UserMetricsAction;
 namespace {
 
@@ -130,16 +126,6 @@ int Center(int size, int item_size) {
   }
   return extra_space / 2;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Returns true if the tab should be locked for the task and false otherwise.
-bool IsLockedForOnTask(BrowserWindowInterface* browser_window_interface) {
-  return browser_window_interface
-             ? ash::boca::OnTaskLockedController::From(browser_window_interface)
-                   ->is_locked_for_on_task()
-             : false;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class TabStyleHighlightPathGenerator : public views::HighlightPathGenerator {
  public:
@@ -380,12 +366,6 @@ Tab::Tab(tabs::TabHandle handle, TabSlotController* controller)
   // This will cause calls to GetContentsBounds to return only the rectangle
   // inside the tab shape, rather than to its extents.
   UpdateInsets();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  showing_close_button_ = !IsLockedForOnTask(browser_window_interface);
-
-  close_button_->SetVisible(showing_close_button_);
-#endif
 
   tab_close_button_observer_ = std::make_unique<TabCloseButtonObserver>(
       this, close_button_, controller_);
@@ -1313,14 +1293,7 @@ void Tab::UpdateIconVisibility() {
       !(mouse_hovered_ || HasFocus() ||
         (close_button_ && close_button_->HasFocus()));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Hide tab close button for OnTask if locked. Only applicable for non-web
-  // browser scenarios.
-  const bool should_show_close_button =
-      !IsLockedForOnTask(controller_->GetBrowserWindowInterface());
-#else
   const bool should_show_close_button = true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (IsActive()) {
     if (!declutter_eligible) {
@@ -1452,7 +1425,7 @@ void Tab::MaybeUpdateHoverStatus(const ui::MouseEvent& event) {
     return;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Move the hit test area for hovering up so that it is not overlapped by tab
   // hover cards when they are shown.
   // TODO(crbug.com/41467565): Once Linux/CrOS widget transparency is solved,

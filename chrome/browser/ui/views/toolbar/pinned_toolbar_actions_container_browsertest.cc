@@ -277,7 +277,6 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
   EXPECT_TRUE(pinned_button->IsActive());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
                        QRCodeUpdatesWithSharingHubPrefChanges) {
   PinnedActionToolbarButton* button =
@@ -301,7 +300,6 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
   views::test::WaitForAnimatingLayoutManager(container());
   EXPECT_EQ(pinned_button->GetVisible(), false);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
                        QRCodeUpdatesWithPolicyPrefChanges) {

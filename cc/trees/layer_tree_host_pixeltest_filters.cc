@@ -671,9 +671,8 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageFilterScaled) {
   filter->SetBackdropFilters(filters);
   filter->ClearBackdropFilterBounds();
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
-    defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
+#if BUILDFLAG(IS_MAC)
   // There's a 1 pixel error on MacOS and ChromeOS
   float percentage_pixels_error = 0.0025f;  // 1px / (200*200)
   int error_allowed = 1;
@@ -1014,8 +1013,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, RotatedDropShadowFilter) {
 
   background->AddChild(child);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || defined(ARCH_CPU_ARM64) || \
-    BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_MAC) || defined(ARCH_CPU_ARM64) || BUILDFLAG(IS_OZONE)
 #if defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX))
 
   // Windows, macOS, Fuchsia and Linux on ARM64 has some pixels difference.
@@ -1029,7 +1027,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, RotatedDropShadowFilter) {
 
   float average_error_allowed_in_bad_pixels = 5.f;
   int error_allowed = 17;
-#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
+#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
   // There's a 1 pixel error on MacOS and ChromeOS
   float percentage_pixels_error = 0.00111112f;  // 1px / (300*300)
   float average_error_allowed_in_bad_pixels = 1.f;

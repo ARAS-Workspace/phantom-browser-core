@@ -989,7 +989,7 @@ class ContextualTasksInteractiveUiTest : public InteractiveBrowserTest {
 
 // TODO(crbug.com/500717050): Parameterize this test suite on the feature flag.
 // TODO(crbug.com/524797987): Re-enable this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_AddAndRemovePdfChipFromComposebox \
   DISABLED_AddAndRemovePdfChipFromComposebox
 #else
@@ -1045,7 +1045,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
 }
 
 // TODO(crbug.com/524797987): Re-enable this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_AddAndRemoveImageChipFromComposebox \
   DISABLED_AddAndRemoveImageChipFromComposebox
 #else
@@ -1091,7 +1091,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
 }
 
 // TODO(crbug.com/524797987, crbug.com/529701663): Re-enable this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_AddAndRemoveTabFromComposebox \
   DISABLED_AddAndRemoveTabFromComposebox
 #else

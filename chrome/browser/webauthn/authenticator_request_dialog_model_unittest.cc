@@ -722,7 +722,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
        {c(enclave_cred1), hybrid},
        hero},
     #endif
-    #if !BUILDFLAG(IS_CHROMEOS)
       // If an enclave credential is in an allowlist, we should jump to UV
       // immediately.
       {L,
@@ -731,7 +730,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
        {only_hybrid_or_internal, enclave_cred, uv_pref},
        {c(enclave_cred1), hybrid},
        kIsMac ? enclave_touchid : hero},
-     #endif
       // But, again, not for uv=discouraged.
       {L,
        ga,

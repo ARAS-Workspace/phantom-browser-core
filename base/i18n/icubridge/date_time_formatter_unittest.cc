@@ -64,12 +64,6 @@ class DateTimeFormatterTest : public testing::Test {
           continue;
         }
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-        // ChromeOS ICU data for Urdu is currently causing test failures.
-        if (locale_str == "ur") {
-          continue;
-        }
-#endif
 #if BUILDFLAG(IS_IOS)
         // iOS ICU data is missing some locale-specific formatting for these
         // locales.

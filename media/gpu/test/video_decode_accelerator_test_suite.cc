@@ -232,13 +232,6 @@ VideoDecodeAcceleratorTestSuite* VideoDecodeAcceleratorTestSuite::Create(
   cmd_line->AppendSwitch("enable-clear-hevc-for-testing");
   cmd_line->AppendSwitchPath("video", video_path);
 
-#if defined(ARCH_CPU_ARM_FAMILY) && BUILDFLAG(IS_CHROMEOS)
-  // On some platforms bandwidth compression is fully opaque and can not be read
-  // by the cpu. This prevents MD5 computation as that is done by the CPU. This
-  // is currently only needed for Trogdor/Strongbad to disable UBWC compression.
-  setenv("MINIGBM_DEBUG", "nocompression", 1);
-#endif
-
 #if BUILDFLAG(USE_V4L2_CODEC) || BUILDFLAG(USE_VAAPI)
   // For V4L2/VAAPI testing with VISL or libfake (virtual drivers), the dumb
   // driver is used with vkms for minigbm backend. In this case, the primary

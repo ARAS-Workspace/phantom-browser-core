@@ -94,11 +94,9 @@
 #include <unistd.h>
 #endif
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID) || \
-    PA_BUILDFLAG(IS_CHROMEOS)
+#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
 #include "partition_alloc/partition_alloc_base/debug/proc_maps_linux.h"  // nogncheck
-#endif  // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID) ||
-        // PA_BUILDFLAG(IS_CHROMEOS)
+#endif  // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
 
 // In the MTE world, the upper bits of a pointer can be decorated with a tag,
 // thus allowing many versions of the same pointer to exist. These macros take
@@ -763,7 +761,7 @@ void FreeFullSlotSpan(PartitionRoot* root, const SlotSpan* slot_span) {
   EXPECT_TRUE(slot_span->is_empty());
 }
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)
+#if PA_BUILDFLAG(IS_LINUX)
 bool CheckPageInCore(void* ptr, bool in_core) {
   unsigned char ret = 0;
   EXPECT_EQ(0, mincore(ptr, SystemPageSize(), &ret));
@@ -774,7 +772,7 @@ bool CheckPageInCore(void* ptr, bool in_core) {
   EXPECT_TRUE(CheckPageInCore(ptr, in_core))
 #else
 #define CHECK_PAGE_IN_CORE(ptr, in_core) (void)(0)
-#endif  // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)
+#endif  // PA_BUILDFLAG(IS_LINUX)
 
 class MockPartitionStatsDumper : public PartitionStatsDumper {
  public:
@@ -4187,8 +4185,7 @@ TEST_P(PartitionAllocTest, ZapOnFree) {
   branch.Purge();
 }
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID) || \
-    PA_BUILDFLAG(IS_CHROMEOS)
+#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
 
 TEST_P(PartitionAllocTest, InaccessibleRegionAfterSlotSpans) {
   // There is inaccessible space only when this setting is not enabled,
@@ -4320,8 +4317,7 @@ TEST_P(PartitionAllocTest, FewerMemoryRegions) {
   root->Free(ptr);
 }
 
-#endif  // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID) ||
-        // PA_BUILDFLAG(IS_CHROMEOS)
+#endif  // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
 
 TEST_P(PartitionAllocTest, ZeroFreedMemory) {
   auto* root = allocator.root();

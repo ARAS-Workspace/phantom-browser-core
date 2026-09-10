@@ -110,8 +110,6 @@ const char* GetPlatformName() {
   return "macOS";
 #elif BUILDFLAG(IS_LINUX)
   return "linux";
-#elif BUILDFLAG(IS_CHROMEOS)
-  return "ash";
 #endif
 }
 

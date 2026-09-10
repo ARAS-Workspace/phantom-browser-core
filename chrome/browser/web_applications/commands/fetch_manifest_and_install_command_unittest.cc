@@ -70,28 +70,11 @@
 #include "ui/gfx/image/image_unittest_util.h"
 #include "ui/gfx/test/sk_gmock_support.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/test/task_environment.h"
-#include "chrome/browser/ash/app_list/arc/arc_app_test.h"
-#include "chromeos/ash/experiences/arc/mojom/intent_helper.mojom.h"
-#include "chromeos/ash/experiences/arc/session/arc_bridge_service.h"
-#include "chromeos/ash/experiences/arc/session/arc_service_manager.h"
-#include "chromeos/ash/experiences/arc/test/connection_holder_util.h"
-#include "chromeos/ash/experiences/arc/test/fake_app_instance.h"
-#include "chromeos/ash/experiences/arc/test/fake_intent_helper_host.h"
-#include "chromeos/ash/experiences/arc/test/fake_intent_helper_instance.h"
-#endif
-
 namespace web_app {
 namespace {
 
 class FetchManifestAndInstallCommandTest
     : public WebAppTest
-#if BUILDFLAG(IS_CHROMEOS)
-    ,
-      // TODO(crbug.com/461689107): Figure out a better way and remove this.
-      public base::test::TaskEnvironment::DestructionObserver
-#endif  //  BUILDFLAG(IS_CHROMEOS)
 {
  public:
   const GURL kWebAppUrl = GURL("https://example.com/path/index.html");
@@ -103,9 +86,6 @@ class FetchManifestAndInstallCommandTest
   const SkColor kDefaultIconColor = SK_ColorYELLOW;
 
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    arc_app_test_.PreProfileSetUp();
-#endif
     WebAppTest::SetUp();
 
     FakeWebAppProvider::Get(profile())->UseRealOsIntegrationManager();
@@ -114,51 +94,12 @@ class FetchManifestAndInstallCommandTest
 
     web_contents_manager().SetUrlLoaded(web_contents(), kWebAppUrl);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    arc_app_test_.PostProfileSetUp(profile());
-
-    auto* arc_bridge_service =
-        arc_app_test_.arc_service_manager()->arc_bridge_service();
-    fake_intent_helper_host_ = std::make_unique<arc::FakeIntentHelperHost>(
-        arc_bridge_service->intent_helper());
-    fake_intent_helper_instance_ =
-        std::make_unique<arc::FakeIntentHelperInstance>();
-    arc_bridge_service->intent_helper()->SetInstance(
-        fake_intent_helper_instance_.get());
-    WaitForInstanceReady(arc_bridge_service->intent_helper());
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    arc_app_test_.arc_service_manager()
-        ->arc_bridge_service()
-        ->intent_helper()
-        ->CloseInstance(fake_intent_helper_instance_.get());
-    fake_intent_helper_instance_.reset();
-    fake_intent_helper_host_.reset();
-    arc_app_test_.PreProfileTearDown();
-
-    // `ArcAppTest::PostProfileTearDown` should be called after profile is
-    // deleted, but before TaskEnvironment is deleted. In this test, both
-    // profile and TaskEnvironment are destroyed in the parent's TearDown. So,
-    // this test uses `TaskEnvironment::DestructionObserver` to get the chance.
-    // TODO(crbug.com/461689107): Figure out a better way and remove this.
-    base::test::TaskEnvironment::AddDestructionObserver(this);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     WebAppTest::TearDown();
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // base::test::TaskEnvironment::DestructionObserver override:
-  // TODO(crbug.com/461689107): Figure out a better way and remove this.
-  void WillDestroyCurrentTaskEnvironment() override {
-    base::test::TaskEnvironment::RemoveDestructionObserver(this);
-
-    arc_app_test_.PostProfileTearDown();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   WebAppProvider* provider() { return WebAppProvider::GetForTest(profile()); }
 
@@ -173,10 +114,6 @@ class FetchManifestAndInstallCommandTest
   TestFileUtils& file_utils() {
     return *fake_provider().file_utils()->AsTestFileUtils();
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  ArcAppTest& arc_app_test() { return arc_app_test_; }
-#endif
 
   WebAppInstallDialogCallback CreateDialogCallback(
       bool accept = true,
@@ -270,11 +207,6 @@ class FetchManifestAndInstallCommandTest
  private:
   base::HistogramTester histogram_tester_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ArcAppTest arc_app_test_;
-  std::unique_ptr<arc::FakeIntentHelperHost> fake_intent_helper_host_;
-  std::unique_ptr<arc::FakeIntentHelperInstance> fake_intent_helper_instance_;
-#endif
 };
 
 TEST_F(FetchManifestAndInstallCommandTest, SuccessWithManifest) {
@@ -370,9 +302,9 @@ TEST_F(FetchManifestAndInstallCommandTest, SuccessWithManifestTrustedIcons) {
   icon_info3.purpose = apps::IconInfo::Purpose::kMaskable;
 
   bool prefer_maskable = false;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   prefer_maskable = true;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
   apps::IconInfo trusted_icon = prefer_maskable ? icon_info3 : icon_info2;
   IconPurpose trusted_icon_purpose =
@@ -900,23 +832,6 @@ TEST_F(FetchManifestAndInstallCommandTest, WebContentsNavigates) {
   EXPECT_FALSE(
       provider()->registrar_unsafe().GetInstallState(kWebAppId).has_value());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(FetchManifestAndInstallCommandTest, IntentToPlayStore) {
-  arc_app_test().app_instance()->set_is_installable(true);
-
-  auto manifest = CreateValidManifest();
-  blink::Manifest::RelatedApplication related_app;
-  related_app.platform = u"chromeos_play";
-  related_app.id = u"com.app.id";
-  manifest->related_applications.push_back(std::move(related_app));
-  SetupPageState(std::move(manifest));
-
-  EXPECT_EQ(InstallAndWait(webapps::WebappInstallSource::OMNIBOX_INSTALL_ICON,
-                           CreateDialogCallback(true)),
-            webapps::InstallResultCode::kIntentToPlayStore);
-}
-#endif
 
 class FetchManifestAndInstallCommandUniversalInstallTest
     : public FetchManifestAndInstallCommandTest {

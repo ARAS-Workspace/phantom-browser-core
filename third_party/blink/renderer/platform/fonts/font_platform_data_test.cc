@@ -83,7 +83,7 @@ TEST_F(FontPlatformDataTest, AhemHasAliasing) {
   EXPECT_EQ(sk_font.getEdging(), SkFont::Edging::kAlias);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(FontPlatformDataTest, GeometricPrecision) {
   const float saved_device_scale_factor = FontCache::DeviceScaleFactor();
   sk_sp<SkTypeface> typeface = skia::DefaultTypeface();

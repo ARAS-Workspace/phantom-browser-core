@@ -74,7 +74,7 @@ std::optional<std::vector<IPEndPoint>> GetNameservers(
     }
     nameservers.push_back(ipe);
   }
-#elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_LINUX)
   static_assert(std::extent<decltype(res.nsaddr_list)>() >= MAXNS &&
                     std::extent<decltype(res._u._ext.nsaddrs)>() >= MAXNS,
                 "incompatible libresolv res_state");
@@ -102,8 +102,7 @@ std::optional<std::vector<IPEndPoint>> GetNameservers(
       return std::nullopt;
     nameservers.push_back(ipe);
   }
-#else  // !(BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE)
-       // || BUILDFLAG(IS_FREEBSD))
+#else
   DCHECK_LE(res.nscount, MAXNS);
   for (int i = 0; i < res.nscount; ++i) {
     IPEndPoint ipe;

@@ -143,10 +143,6 @@
 #include "ui/events/test/test_event.h"
 #include "ui/views/controls/styled_label.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/metrics/desktop_session_duration/desktop_session_duration_tracker.h"
-#endif
-
 using chrome_browser_interstitials::SecurityInterstitialIDNTest;
 using content::BrowserThread;
 using content::NavigationController;

@@ -73,10 +73,6 @@
 #include "ui/gfx/image/image_skia.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/network/network_handler_test_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace indigo {
 namespace {
 
@@ -188,11 +184,7 @@ class MockSigninUiDelegate : public signin_ui_util::SigninUiDelegate {
 };
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr bool kSignOutSupportedOnPlatform = false;
-#else
 constexpr bool kSignOutSupportedOnPlatform = true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 struct CreateControllerOptions {
   bool expect_register_optimization_types = true;
@@ -418,11 +410,6 @@ class IndigoPageActionControllerTest : public testing::Test {
   content::BrowserTaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
   base::test::ScopedFeatureList feature_list_;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Needed because TestWebContents ends up creating BTM classes which depend
-  // on this on ChromeOS.
-  ash::NetworkHandlerTestHelper network_handler_test_helper_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   raw_ptr<TestingProfileManager> testing_profile_manager_;
   raw_ptr<testing::NiceMock<glic::MockGlicKeyedService>>
       mock_glic_keyed_service_ = nullptr;

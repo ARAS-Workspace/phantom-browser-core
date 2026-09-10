@@ -32,17 +32,6 @@
 #include "chrome/renderer/extensions/api/app_hooks_delegate.h"
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/renderer/extensions/api/accessibility_private_hooks_delegate.h"
-#include "chrome/renderer/extensions/api/file_browser_handler_custom_bindings.h"
-#include "chrome/renderer/extensions/api/file_manager_private_custom_bindings.h"
-#include "chrome/renderer/extensions/api/media_galleries_custom_bindings.h"
-#include "chrome/renderer/extensions/api/platform_keys_natives.h"
-#if BUILDFLAG(USE_CUPS)
-#include "chrome/renderer/extensions/api/printing_hooks_delegate.h"
-#endif  // BUILDFLAG(USE_CUPS)
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_PDF_INK2)
 #include "chrome/renderer/extensions/api/pdf_viewer_private_custom_bindings.h"
 #endif
@@ -81,19 +70,6 @@ void ChromeExtensionsRendererAPIProvider::RegisterNativeHandlers(
   module_system->RegisterNativeHandler(
       "sync_file_system",
       std::make_unique<SyncFileSystemCustomBindings>(context));
-#if BUILDFLAG(IS_CHROMEOS)
-  module_system->RegisterNativeHandler(
-      "file_browser_handler",
-      std::make_unique<FileBrowserHandlerCustomBindings>(context));
-  module_system->RegisterNativeHandler(
-      "platform_keys_natives", std::make_unique<PlatformKeysNatives>(context));
-  module_system->RegisterNativeHandler(
-      "file_manager_private",
-      std::make_unique<FileManagerPrivateCustomBindings>(context));
-  module_system->RegisterNativeHandler(
-      "mediaGalleries",
-      std::make_unique<MediaGalleriesCustomBindings>(context));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 }
 
@@ -116,15 +92,6 @@ void ChromeExtensionsRendererAPIProvider::AddBindingsSystemHooks(
                  dispatcher, bindings->request_handler(),
                  bindings_system->GetIPCMessageSender()));
 #endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
-#if BUILDFLAG(IS_CHROMEOS)
-  bindings->RegisterHooksDelegate(
-      "accessibilityPrivate",
-      std::make_unique<extensions::AccessibilityPrivateHooksDelegate>());
-#if BUILDFLAG(USE_CUPS)
-  bindings->RegisterHooksDelegate(
-      "printing", std::make_unique<extensions::PrintingHooksDelegate>());
-#endif  // BUILDFLAG(USE_CUPS)
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void ChromeExtensionsRendererAPIProvider::PopulateSourceMap(
@@ -175,68 +142,6 @@ void ChromeExtensionsRendererAPIProvider::PopulateSourceMap(
       {"pdfViewerPrivate",
        IDR_RENDERER_RESOURCES_EXTENSIONS_PDF_VIEWER_PRIVATE_CUSTOM_BINDINGS_JS},
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-      {"certificateProvider",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_CERTIFICATE_PROVIDER_CUSTOM_BINDINGS_JS},
-      {"enterprise.platformKeys",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_ENTERPRISE_PLATFORM_KEYS_CUSTOM_BINDINGS_JS},
-      {"enterprise.platformKeys.CryptoKey",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_ENTERPRISE_PLATFORM_KEYS_CRYPTO_KEY_JS},
-      {"enterprise.platformKeys.SubtleCrypto",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_ENTERPRISE_PLATFORM_KEYS_SUBTLE_CRYPTO_JS},
-      {"enterprise.platformKeys.Token",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_ENTERPRISE_PLATFORM_KEYS_TOKEN_JS},
-      {"fileBrowserHandler",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_FILE_BROWSER_HANDLER_CUSTOM_BINDINGS_JS},
-      {"fileSystemProvider",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_FILE_SYSTEM_PROVIDER_CUSTOM_BINDINGS_JS},
-      {"platformKeys",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_PLATFORM_KEYS_CUSTOM_BINDINGS_JS},
-      {"platformKeys.getCryptoKeyUtil",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_PLATFORM_KEYS_GET_CRYPTO_KEY_UTIL_JS},
-      {"platformKeys.Key",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_PLATFORM_KEYS_KEY_JS},
-      {"platformKeys.SubtleCrypto",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_PLATFORM_KEYS_SUBTLE_CRYPTO_JS},
-      {"platformKeys.utils",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_PLATFORM_KEYS_UTILS_JS},
-
-      // Remote Apps.
-      {"chromeos.remote_apps.mojom-lite",
-       IDR_RENDERER_RESOURCES_MOJO_CHROMEOS_COMPONENTS_REMOTE_APPS_MOJOM_REMOTE_APPS_MOJOM_LITE_JS},
-      {"chromeos.remote_apps",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_REMOTE_APPS_REMOTE_APPS_BINDINGS_JS},
-      {"url/mojom/url.mojom-lite",
-       IDR_RENDERER_RESOURCES_MOJO_URL_MOJOM_URL_MOJOM_LITE_JS},
-
-      {"fileManagerPrivate",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_FILE_MANAGER_PRIVATE_CUSTOM_BINDINGS_JS},
-      {"terminalPrivate",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_TERMINAL_PRIVATE_CUSTOM_BINDINGS_JS},
-
-      // IME service on Chrome OS.
-      {"ash.ime.mojom.ime_service.mojom",
-       IDR_RENDERER_RESOURCES_MOJO_CHROMEOS_ASH_SERVICES_IME_PUBLIC_MOJOM_IME_SERVICE_MOJOM_JS},
-      {"ash.ime.mojom.input_engine.mojom",
-       IDR_RENDERER_RESOURCES_MOJO_CHROMEOS_ASH_SERVICES_IME_PUBLIC_MOJOM_INPUT_ENGINE_MOJOM_JS},
-      {"ash.ime.mojom.input_method.mojom",
-       IDR_RENDERER_RESOURCES_MOJO_CHROMEOS_ASH_SERVICES_IME_PUBLIC_MOJOM_INPUT_METHOD_MOJOM_JS},
-      {"ash.ime.mojom.input_method_host.mojom",
-       IDR_RENDERER_RESOURCES_MOJO_CHROMEOS_ASH_SERVICES_IME_PUBLIC_MOJOM_INPUT_METHOD_HOST_MOJOM_JS},
-      {"chromeos.ime.service",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_CHROMEOS_IME_SERVICE_BINDINGS_JS},
-
-      {"chromeos.tts.mojom.google_tts_stream.mojom",
-       IDR_RENDERER_RESOURCES_MOJO_CHROMEOS_SERVICES_TTS_PUBLIC_MOJOM_TTS_SERVICE_MOJOM_JS},
-      {"chromeos.tts.google_stream",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_CHROMEOS_GOOGLE_TTS_STREAM_BINDINGS_JS},
-
-      {"ash.enhanced_network_tts.mojom-lite",
-       IDR_RENDERER_RESOURCES_MOJO_CHROMEOS_ASH_COMPONENTS_ENHANCED_NETWORK_TTS_MOJOM_ENHANCED_NETWORK_TTS_MOJOM_LITE_JS},
-      {"ash.enhanced_network_tts",
-       IDR_RENDERER_RESOURCES_EXTENSIONS_ENHANCED_NETWORK_TTS_ENHANCED_NETWORK_TTS_CUSTOM_BINDINGS_JS},
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
       {"webrtcDesktopCapturePrivate",
        IDR_RENDERER_RESOURCES_EXTENSIONS_WEBRTC_DESKTOP_CAPTURE_PRIVATE_CUSTOM_BINDINGS_JS},

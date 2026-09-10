@@ -183,11 +183,6 @@ class BrowserWindowInterface : public content::PageNavigator {
     // down.
     kErrorProfileUnsuitable,
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Indicates the profile is currently loading kiosk mode, so no new windows
-    // should be allowed.
-    kErrorLoadingKiosk,
-#endif
   };
 
   // WARNING: Many uses of base::WeakPtr are inappropriate and lead to bugs.

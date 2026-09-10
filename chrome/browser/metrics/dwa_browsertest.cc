@@ -178,7 +178,6 @@ class DwaBrowserTest : public SyncTest {
     }
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   void SetAppsConsentState(Profile* profile, bool consent_state) {
     unified_consent::UnifiedConsentService* consent_service =
         UnifiedConsentServiceFactory::GetForProfile(profile);
@@ -197,7 +196,6 @@ class DwaBrowserTest : public SyncTest {
           harness->DisableSelectableType(syncer::UserSelectableType::kApps));
     }
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
  protected:
   std::unique_ptr<SyncServiceImplHarness> EnableSyncForProfile(
@@ -433,7 +431,6 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_Extensions) {
 // UserSelectableType but rather through OS settings. This test ensures that
 // disabling Apps UKM consent disables and purges DWA. Additionally ensures that
 // DWA is disabled until all UKM consents are enabled.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_Apps) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
@@ -456,7 +453,6 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_Apps) {
   // consents are enabled.
   RecordTestMetricsAndAssertMetricsRecorded();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // This test ensures that disabling MSBB and Extensions UKM consents disables
 // and purges DWA. Additionally ensures that DWA is disabled until all UKM
@@ -495,7 +491,6 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest,
 // UserSelectableType but rather through OS settings. This test ensures that
 // disabling MSBB and Apps UKM consents disables and purges DWA. Additionally
 // ensures that DWA is disabled until all UKM consents are enabled.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_MsbbAndApps) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
@@ -595,7 +590,6 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest,
   // consents are enabled.
   RecordTestMetricsAndAssertMetricsRecorded();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace metrics::dwa

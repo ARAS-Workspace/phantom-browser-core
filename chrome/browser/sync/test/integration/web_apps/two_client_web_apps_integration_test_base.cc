@@ -16,10 +16,6 @@
 #include "components/signin/public/base/consent_level.h"
 #include "components/sync/base/user_selectable_type.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/multi_user/multi_user_window_manager.h"
-#endif
-
 namespace web_app::integration_tests {
 
 using WebAppIntegration = TwoClientWebAppsIntegrationTestBase;
@@ -30,15 +26,6 @@ INSTANTIATE_TEST_SUITE_P(,
 
 TwoClientWebAppsIntegrationTestBase::TwoClientWebAppsIntegrationTestBase()
     : WebAppsSyncTestBase(TWO_CLIENT),
-#if BUILDFLAG(IS_CHROMEOS)
-      // TwoClientWebAppsIntegrationTest strategy is using two profiles.
-      // However, that does not work with multi-user-sign-in implementation
-      // in ChromeOS properly. Disable the feature now.
-      // TODO(crbug.com/425160398): Consider to redesign the tests to work
-      // with the feature.
-      multi_user_window_manager_resetter_(
-          ash::MultiUserWindowManager::DisableForTesting()),
-#endif  // BUILDFLAG(IS_CHROMEOS)
       helper_(this) {
   std::vector<base::test::FeatureRef> enabled_features;
   std::vector<base::test::FeatureRef> disabled_features;
@@ -86,36 +73,22 @@ bool TwoClientWebAppsIntegrationTestBase::IsSyncTest() {
 
 void TwoClientWebAppsIntegrationTestBase::SyncTurnOff() {
   for (SyncServiceImplHarness* client : GetSyncClients()) {
-#if BUILDFLAG(IS_CHROMEOS)
-    client->service()->GetUserSettings()->SetSelectedOsTypes(
-        /*sync_everything=*/false, /*types=*/{});
-#else   // BUILDFLAG(IS_CHROMEOS)
     client->service()->GetUserSettings()->SetSelectedTypes(
         /*sync_everything=*/false, /*types=*/{});
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 }
 
 void TwoClientWebAppsIntegrationTestBase::SyncTurnOn() {
   for (SyncServiceImplHarness* client : GetSyncClients()) {
     ASSERT_TRUE(client->SetupSync());
-#if BUILDFLAG(IS_CHROMEOS)
-    client->service()->GetUserSettings()->SetSelectedOsTypes(
-        /*sync_everything=*/false,
-        /*types=*/{syncer::UserSelectableOsType::kOsApps});
-#else   // BUILDFLAG(IS_CHROMEOS)
     client->service()->GetUserSettings()->SetSelectedTypes(
         /*sync_everything=*/false,
         /*types=*/{syncer::UserSelectableType::kApps});
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
   AwaitWebAppQuiescence();
 }
 
 void TwoClientWebAppsIntegrationTestBase::SyncSignOut(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  NOTREACHED();
-#else
   for (int i = 0; i < num_clients(); ++i) {
     if (GetProfile(i) != profile) {
       continue;
@@ -123,13 +96,9 @@ void TwoClientWebAppsIntegrationTestBase::SyncSignOut(Profile* profile) {
     GetClient(i)->SignOutPrimaryAccount();
   }
   AwaitWebAppQuiescence();
-#endif
 }
 
 void TwoClientWebAppsIntegrationTestBase::SyncSignIn(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  NOTREACHED();
-#else
   for (int i = 0; i < num_clients(); ++i) {
     if (GetProfile(i) != profile) {
       continue;
@@ -137,7 +106,6 @@ void TwoClientWebAppsIntegrationTestBase::SyncSignIn(Profile* profile) {
     ASSERT_TRUE(GetClient(i)->SetupSync());
   }
   AwaitWebAppQuiescence();
-#endif
 }
 
 void TwoClientWebAppsIntegrationTestBase::AwaitWebAppQuiescence() {
@@ -186,31 +154,17 @@ void TwoClientWebAppsIntegrationTestBase::SetUpOnMainThread() {
       ASSERT_TRUE(
           GetClient(i)->SetupSyncWithCustomSettings(base::BindLambdaForTesting(
               [](syncer::SyncUserSettings* user_settings) {
-#if BUILDFLAG(IS_CHROMEOS)
-                user_settings->SetSelectedTypes(/*sync_everything=*/false,
-                                                /*types=*/{});
-                user_settings->SetSelectedOsTypes(
-                    /*sync_everything=*/false,
-                    /*types=*/{syncer::UserSelectableOsType::kOsApps});
-#else   // BUILDFLAG(IS_CHROMEOS)
                 user_settings->SetSelectedTypes(
                     /*sync_everything=*/false,
                     /*types=*/{syncer::UserSelectableType::kApps});
                 user_settings->SetInitialSyncFeatureSetupComplete();
-#endif  // BUILDFLAG(IS_CHROMEOS)
               })));
     } else {
       ASSERT_TRUE(GetClient(i)->SignInNoWaitForCompletion());
       ASSERT_TRUE(GetClient(i)->AwaitSyncTransportActive());
       ASSERT_TRUE(GetClient(i)->DisableAllSelectableTypes());
-#if BUILDFLAG(IS_CHROMEOS)
-      ASSERT_TRUE(GetClient(i)->DisableAllSelectableOsTypes());
-      ASSERT_TRUE(GetClient(i)->EnableSelectableOsType(
-          syncer::UserSelectableOsType::kOsApps));
-#else
       ASSERT_TRUE(GetClient(i)->EnableSelectableType(
           syncer::UserSelectableType::kApps));
-#endif  // BUILDFLAG(IS_CHROMEOS)
     }
   }
 

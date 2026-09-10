@@ -103,8 +103,7 @@
 #include "media/mojo/mojom/interface_factory.mojom.h"
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "content/browser/child_thread_type_switcher_linux.h"
 #include "media/mojo/mojom/video_encode_accelerator.mojom.h"
 #endif
@@ -362,10 +361,6 @@ class CONTENT_EXPORT RenderProcessHostImpl
   void WriteIntoTrace(perfetto::TracedProto<TraceProto> proto) const override;
 #if BUILDFLAG(CLANG_PROFILING_INSIDE_SANDBOX)
   void DumpProfilingData(base::OnceClosure callback) override;
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  void ReinitializeLogging(uint32_t logging_dest,
-                           base::ScopedFD log_file_descriptor) override;
 #endif
   void SetBatterySaverMode(bool battery_saver_mode_enabled) override;
   uint64_t GetPrivateMemoryFootprint() override;
@@ -1038,7 +1033,7 @@ class CONTENT_EXPORT RenderProcessHostImpl
     mojo::Remote<media::mojom::VideoEncodeAcceleratorProviderFactory>
         video_encode_accelerator_factory_remote_;
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     ChildThreadTypeSwitcher child_thread_type_switcher_;
 #endif
   };
@@ -1302,7 +1297,7 @@ class CONTENT_EXPORT RenderProcessHostImpl
   // if the request isn't handled on the IO thread.
   void OnBindHostReceiver(mojo::GenericPendingReceiver receiver);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Provides /proc/{renderer pid}/status and statm files for the renderer,
   // because the files are required to calculate the renderer's private
   // footprint on Chromium Linux. Regarding MacOS X and Windows, we have

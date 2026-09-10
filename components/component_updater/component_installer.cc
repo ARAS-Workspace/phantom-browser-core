@@ -212,14 +212,6 @@ Result ComponentInstaller::InstallHelper(const base::FilePath& unpack_path,
     return Result(InstallError::INSTALL_PATH_ERROR);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!base::SetPosixFilePermissions(local_install_path, 0755)) {
-    VPLOG(0) << "SetPosixFilePermissions failed: "
-             << local_install_path.value();
-    return Result(InstallError::SET_PERMISSIONS_FAILED);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_APPLE)
   // Since components can be large and can be re-downloaded when needed, they
   // are excluded from backups.
@@ -491,18 +483,6 @@ std::optional<base::FilePath> ComponentInstaller::GetComponentDirectory() {
              << ").";
     return std::nullopt;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  base::FilePath base_dir_ = base_component_dir;
-  for (const base::FilePath::StringType& component :
-       installer_policy_->GetRelativeInstallDir().GetComponents()) {
-    base_dir_ = base_dir_.Append(component);
-    if (!base::SetPosixFilePermissions(base_dir_, 0755)) {
-      VPLOG(0) << "SetPosixFilePermissions failed: " << base_dir.value();
-      return std::nullopt;
-    }
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   return base_dir;
 }

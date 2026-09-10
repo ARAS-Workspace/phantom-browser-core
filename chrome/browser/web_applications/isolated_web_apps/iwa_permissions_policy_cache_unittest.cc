@@ -54,10 +54,8 @@ class IwaPermissionsPolicyCacheTest : public WebAppTest {
 
  private:
   raw_ptr<IwaPermissionsPolicyCache> cache_;
-#if !BUILDFLAG(IS_CHROMEOS)
   base::test::ScopedFeatureList scoped_feature_list_{
       features::kIsolatedWebApps};
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(IwaPermissionsPolicyCacheTest, ParseManifestAndSetPolicy_Complex) {

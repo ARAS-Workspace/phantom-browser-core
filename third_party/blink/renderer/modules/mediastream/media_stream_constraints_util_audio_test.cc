@@ -1429,15 +1429,10 @@ TEST_P(MediaStreamConstraintsUtilAudioTest,
       system_echo_canceller_with_source->DeviceID());
   constraint_factory_.basic().echo_cancellation.SetExactBoolean(false);
   result = SelectSettings(true, capabilities);
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS supports reopening a device with a different system AEC setting.
-  EXPECT_TRUE(result.HasValue());
-#else
   EXPECT_FALSE(result.HasValue());
-#endif
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
+#if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
 // Tests voice isolation constraints on a device that has the
 // media::AudioParameters::VOICE_ISOLATION_SUPPORTED effect set.
 TEST_P(MediaStreamConstraintsUtilAudioTest, VoiceIsolationEnabledOnSupportedDevice) {
@@ -1596,7 +1591,7 @@ TEST_P(MediaStreamConstraintsUtilAudioTest, VoiceIsolationControl) {
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
+#if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
 class TestAudioSource : public blink::MediaStreamAudioSource {
  public:
   TestAudioSource()

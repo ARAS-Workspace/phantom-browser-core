@@ -44,13 +44,9 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/wm/test/wm_test_helper.h"
-#else  // !BUILDFLAG(IS_CHROMEOS)
 #include "ui/display/screen.h"
 #include "ui/views/widget/desktop_aura/desktop_screen.h"
 #include "ui/wm/core/wm_state.h"
-#endif
 
 namespace content {
 
@@ -61,12 +57,8 @@ struct ShellPlatformDelegate::ShellData {
 };
 
 struct ShellPlatformDelegate::PlatformData {
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<wm::WMTestHelper> wm_test_helper;
-#else
   std::unique_ptr<wm::WMState> wm_state;
   std::unique_ptr<display::Screen> screen;
-#endif
 
   // TODO(danakj): This looks unused?
   std::unique_ptr<views::ViewsDelegate> views_delegate;
@@ -117,9 +109,6 @@ class ShellView : public views::BoxLayoutView,
 
     // Resizing a widget on chromeos doesn't automatically resize the root, need
     // to explicitly do that.
-#if BUILDFLAG(IS_CHROMEOS)
-    GetWidget()->GetNativeWindow()->GetHost()->SetBoundsInPixels(bounds);
-#endif
   }
 
   void EnableUIControl(UIControl control, bool is_enabled) {
@@ -324,15 +313,10 @@ void ShellPlatformDelegate::Initialize(const gfx::Size& default_window_size) {
 
   platform_ = std::make_unique<PlatformData>();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  platform_->wm_test_helper =
-      std::make_unique<wm::WMTestHelper>(default_window_size);
-#else
   platform_->wm_state = std::make_unique<wm::WMState>();
   // FakeScreen tests create their own screen.
   if (!display::Screen::HasScreen())
     platform_->screen = views::CreateDesktopScreen();
-#endif
 
   platform_->views_delegate =
       std::make_unique<views::DesktopTestViewsDelegate>();
@@ -353,13 +337,6 @@ void ShellPlatformDelegate::CreatePlatformWindow(
   delegate->SetHasWindowSizeControls(true);
   delegate->SetOwnedByWidget(views::WidgetDelegate::OwnedByWidgetPassKey());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  shell_data.window_widget = views::Widget::CreateWindowWithContext(
-      std::move(delegate),
-      platform_->wm_test_helper->GetDefaultParent(nullptr, gfx::Rect(),
-                                                  display::kInvalidDisplayId),
-      gfx::Rect(initial_size));
-#else
   shell_data.window_widget = new views::Widget();
   views::Widget::InitParams params(
       views::Widget::InitParams::NATIVE_WIDGET_OWNS_WIDGET);
@@ -370,7 +347,6 @@ void ShellPlatformDelegate::CreatePlatformWindow(
   params.wm_class_name = params.wm_class_class;
 #endif  // BUILDFLAG(IS_LINUX)
   shell_data.window_widget->Init(std::move(params));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // |window_widget| is made visible in PlatformSetContents(), so that the
   // platform-window size does not need to change due to layout again.

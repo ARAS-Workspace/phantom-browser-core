@@ -134,7 +134,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientUserConsentsSyncTest, ShouldSubmit) {
 }
 
 // ChromeOS does not support signing out of a primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(
     SingleClientUserConsentsSyncTest,
     ShouldPreserveConsentsOnSignoutAndResubmitWhenReenabled) {
@@ -161,7 +160,6 @@ IN_PROC_BROWSER_TEST_P(
 
   EXPECT_TRUE(ExpectUserConsents({specifics}));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientUserConsentsSyncTest,
                        ShouldPreserveConsentsLoggedBeforeSyncSetup) {
@@ -200,7 +198,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientUserConsentsSyncTest,
 
 // ChromeOS does not support late signin after profile creation, so the test
 // below does not apply, at least in the current form.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientUserConsentsSyncTest,
                        ShouldSubmitIfSignedInAlthoughFullSyncNotEnabled) {
   if (GetSetupSyncMode() != SetupSyncMode::kSyncTransportOnly) {
@@ -230,7 +227,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientUserConsentsSyncTest,
   specifics.set_obfuscated_gaia_id(GetGaiaId().ToString());
   EXPECT_TRUE(ExpectUserConsents({specifics}));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 INSTANTIATE_TEST_SUITE_P(,
                          SingleClientUserConsentsSyncTest,

@@ -338,12 +338,7 @@ class ShadowColorTest : public ShadowTest,
   ~ShadowColorTest() override = default;
 
   static std::vector<gfx::ShadowStyle> GetTestParamValues() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return {gfx::ShadowStyle::kMaterialDesign,
-            gfx::ShadowStyle::kChromeOSSystemUI};
-#else
     return {gfx::ShadowStyle::kMaterialDesign};
-#endif
   }
 };
 

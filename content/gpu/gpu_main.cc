@@ -101,7 +101,7 @@
 #include "services/webnn/public/cpp/webnn_sandbox_init.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "content/child/sandboxed_process_thread_type_handler.h"
 #include "content/common/gpu_pre_sandbox_hook_linux.h"
 #include "sandbox/policy/linux/sandbox_linux.h"
@@ -122,7 +122,7 @@ namespace content {
 
 namespace {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool StartSandboxLinux(gpu::GpuWatchdogThread*,
                        const gpu::GPUInfo*,
                        const gpu::GpuPreferences&);
@@ -154,15 +154,10 @@ class ContentSandboxHelper : public gpu::GpuSandboxHelper {
     }
 
 #if BUILDFLAG(USE_VAAPI)
-#if BUILDFLAG(IS_CHROMEOS)
-    media::VaapiWrapper::PreSandboxInitialization(
-        /*allow_disabling_global_lock=*/false, &workarounds, gpu_info);
-#else  // For Linux with VA-API support.
     if (!gpu_prefs.disable_accelerated_video_decode) {
       media::VaapiWrapper::PreSandboxInitialization(
           /*allow_disabling_global_lock=*/false, &workarounds, gpu_info);
     }
-#endif
 #endif  // BUILDFLAG(USE_VAAPI)
 #if BUILDFLAG(IS_LINUX)
     webnn::PreSandboxWebNNInitialization();
@@ -177,7 +172,7 @@ class ContentSandboxHelper : public gpu::GpuSandboxHelper {
                                 const gpu::GPUInfo* gpu_info,
                                 const gpu::GpuPreferences& gpu_prefs) override {
     TRACE_EVENT("gpu,startup", "gpu_main::EnsureSandboxInitialized");
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     return StartSandboxLinux(watchdog_thread, gpu_info, gpu_prefs);
 #elif BUILDFLAG(IS_MAC)
     return sandbox::Seatbelt::IsSandboxed();
@@ -258,7 +253,7 @@ int GpuMain(MainFunctionParams parameters) {
           std::make_unique<base::SingleThreadTaskExecutor>(
               gpu_preferences.message_pump_type, /*is_main_thread=*/true);
     }
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
 #error "Unsupported Linux platform."
 #elif BUILDFLAG(IS_MAC)
     // Cross-process CoreAnimation requires a CFRunLoop to function at all, and
@@ -285,7 +280,7 @@ int GpuMain(MainFunctionParams parameters) {
   base::MessagePumpWakeupCounter::InitializeForCurrentThread("GpuMain");
   base::LockMetricsRecorder::EnableRecordingOnCurrentThread("CrGpuMain");
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Thread type delegate of the process should be registered before
   // thread type change below for the main thread and for thread pool in
   // ChildProcess constructor.
@@ -293,7 +288,7 @@ int GpuMain(MainFunctionParams parameters) {
   // which may race with application of the sandbox. InitializeAndStartSandbox()
   // sandboxes the process and starts threads so this has to happen first.
   SandboxedProcessThreadTypeHandler::Create();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   base::PlatformThread::SetDefaultThreadType(base::ThreadType::kPresentation);
 
@@ -325,9 +320,6 @@ int GpuMain(MainFunctionParams parameters) {
   // message from the browser (through mojom::VizMain::CreateGpuService()).
   const bool init_success = gpu_init->InitializeAndStartSandbox(
       const_cast<base::CommandLine*>(&command_line), gpu_preferences);
-#if BUILDFLAG(IS_CHROMEOS)
-  LOG(WARNING) << "gpu initialization completed init_success:" << init_success;
-#endif
   const bool dead_on_arrival = !init_success;
 
   auto* client = GetContentClient()->gpu();
@@ -434,7 +426,7 @@ int GpuMain(MainFunctionParams parameters) {
 
 namespace {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool StartSandboxLinux(gpu::GpuWatchdogThread* watchdog_thread,
                        const gpu::GPUInfo* gpu_info,
                        const gpu::GpuPreferences& gpu_prefs) {
@@ -482,7 +474,7 @@ bool StartSandboxLinux(gpu::GpuWatchdogThread* watchdog_thread,
   sandbox_options.accelerated_video_encode_enabled =
       !gpu_prefs.disable_accelerated_video_encode;
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // Video decoding of many video streams can use thousands of FDs as well as
   // Exo clients.
   // See https://crbug.com/1417237
@@ -511,7 +503,7 @@ bool StartSandboxLinux(gpu::GpuWatchdogThread* watchdog_thread,
 
   return res;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_ANDROID)
 bool StartSandboxAndroid(gpu::GpuWatchdogThread* watchdog_thread) {

@@ -199,7 +199,7 @@ void SimulateMultiClick(PDFiumEngine& engine,
                         const gfx::PointF& position,
                         int click_count) {
   for (int i = 0, click = 1; i < click_count; ++i, ++click) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // On both Linux and ChromeOS `click_count` is only 1, 2 or 3. On MacOS and
     // Windows `click_count` just keeps increasing as the user keeps clicking.
     if (click > 3) {
@@ -1448,7 +1448,7 @@ TEST_P(PDFiumEngineSelectionTest, SelectTextWithFourClicks) {
 
   constexpr gfx::PointF kPosition(100, 120);
   SimulateMultiClick(*engine, kPosition, 4);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_THAT(engine->GetSelectedText(), IsEmpty());
 #else
   EXPECT_EQ("Goodbye, world!", engine->GetSelectedText());
@@ -1461,7 +1461,7 @@ TEST_P(PDFiumEngineSelectionTest, SelectTextFiveClicks) {
 
   constexpr gfx::PointF kPosition(100, 120);
   SimulateMultiClick(*engine, kPosition, 5);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_EQ("Goodbye", engine->GetSelectedText());
 #else
   EXPECT_EQ("Goodbye, world!", engine->GetSelectedText());
@@ -5234,7 +5234,7 @@ TEST_P(PDFiumEngineCaretTest, TextMultiClick) {
 
   SimulateMultiClick(*engine, kHelloWorldGoodbyeWorldCharB, /*click_count=*/4);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   DrawCaretAndCompareWithPlatformExpectations(*engine, /*page_index=*/0,
                                               "hello_world_caret_1.png");
 #else

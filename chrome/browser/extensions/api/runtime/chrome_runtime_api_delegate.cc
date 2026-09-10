@@ -45,12 +45,6 @@
 #include "extensions/common/mojom/view_type.mojom.h"
 #include "net/base/backoff_entry.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/components/kiosk/kiosk_utils.h"
-#include "chromeos/dbus/power/power_manager_client.h"
-#include "third_party/cros_system_api/dbus/service_constants.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/ui/browser.h"
@@ -406,13 +400,6 @@ bool ChromeRuntimeAPIDelegate::GetPlatformInfo(PlatformInfo* info) {
 }
 
 bool ChromeRuntimeAPIDelegate::RestartDevice(std::string* error_message) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (chromeos::IsKioskSession()) {
-    chromeos::PowerManagerClient::Get()->RequestRestart(
-        power_manager::REQUEST_RESTART_API, "chrome.runtime API");
-    return true;
-  }
-#endif
 
   *error_message = "Function available only for ChromeOS kiosk mode.";
   return false;

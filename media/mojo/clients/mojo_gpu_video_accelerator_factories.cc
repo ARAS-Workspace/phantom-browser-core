@@ -257,16 +257,6 @@ MojoGpuVideoAcceleratorFactories::VideoFrameOutputFormat(
   if (CheckContextLost()) {
     return media::GpuVideoAcceleratorFactories::OutputFormat::UNDEFINED;
   }
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(IS_OZONE)
-  // TODO(sugoi): This configuration is currently used only for testing ChromeOS
-  // on Linux and doesn't support hardware acceleration. OSMesa did not support
-  // any hardware acceleration here, so this was never an issue, but SwiftShader
-  // revealed this issue. See https://crbug.com/859946
-  if (gpu_channel_host_->gpu_info().gl_renderer.find("SwiftShader") !=
-      std::string::npos) {
-    return OutputFormat::UNDEFINED;
-  }
-#endif
   const auto& capabilities = context_provider_->ContextCapabilities();
   const auto& shared_image_capabilities =
       context_provider_->SharedImageInterface()->GetCapabilities();
@@ -310,12 +300,10 @@ MojoGpuVideoAcceleratorFactories::VideoFrameOutputFormat(
 
   // For ChromeOS, if above hardware support for NV12 is not present then
   // fallback to pixel upload.
-#if !BUILDFLAG(IS_CHROMEOS)
   if (capabilities.texture_rg) {
     // Use NV12 for Mac, Windows, Linux and CastOS platforms.
     return OutputFormat::NV12;
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   return OutputFormat::UNDEFINED;
 }

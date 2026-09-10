@@ -97,15 +97,6 @@ IN_PROC_BROWSER_TEST_F(PreventCloseControllerBrowserTest,
   // Act by launching PWA a second time
   Browser* second_browser = LaunchWebAppBrowser(ash::kCalculatorAppId);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Assert that the PWA only has one existing window
-  EXPECT_TRUE(WebAppProvider::GetForTest(profile())
-                  ->registrar_unsafe()
-                  .IsPreventCloseEnabled(ash::kCalculatorAppId));
-  EXPECT_EQ(browser, second_browser);
-  EXPECT_EQ(expected_browser_count,
-            ProfileBrowserCollection::GetForProfile(profile())->GetSize());
-#else
   // On other platforms, the prevent close should not be enabled.
   EXPECT_FALSE(WebAppProvider::GetForTest(profile())
                    ->registrar_unsafe()
@@ -113,7 +104,6 @@ IN_PROC_BROWSER_TEST_F(PreventCloseControllerBrowserTest,
   EXPECT_NE(browser, second_browser);
   EXPECT_EQ(expected_browser_count + 1,
             ProfileBrowserCollection::GetForProfile(profile())->GetSize());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(PreventCloseControllerBrowserTest,

@@ -539,8 +539,8 @@ TEST_P(PartitionAllocThreadCacheTest, ThreadCacheRegistry) {
   auto* parent_thread_tcache = root()->thread_cache_for_testing();
   ASSERT_TRUE(parent_thread_tcache);
 
-#if !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID) ||   \
-      PA_BUILDFLAG(IS_CHROMEOS) || PA_BUILDFLAG(IS_LINUX)) && \
+#if !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID) || \
+      PA_BUILDFLAG(IS_LINUX)) &&                            \
     PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
   // iOS and MacOS 15 create worker threads internally(start_wqthread).
   // So thread caches are created for the worker threads, because the threads
@@ -567,8 +567,8 @@ TEST_P(PartitionAllocThreadCacheTest, ThreadCacheRegistry) {
                                                    &thread_handle);
   internal::base::PlatformThreadForTesting::Join(thread_handle);
 
-#if !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID) ||   \
-      PA_BUILDFLAG(IS_CHROMEOS) || PA_BUILDFLAG(IS_LINUX)) && \
+#if !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID) || \
+      PA_BUILDFLAG(IS_LINUX)) &&                            \
     PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
   internal::ScopedGuard lock(ThreadCacheRegistry::GetLock());
   EXPECT_EQ(parent_thread_tcache->prev_for_testing(), nullptr);
@@ -679,8 +679,8 @@ class ThreadDelegateForMultipleThreadCachesAccounting
 
 TEST_P(PartitionAllocThreadCacheTest, MultipleThreadCachesAccounting) {
   ThreadCacheStats wqthread_stats{0};
-#if (PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID) ||   \
-     PA_BUILDFLAG(IS_CHROMEOS) || PA_BUILDFLAG(IS_LINUX)) && \
+#if (PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID) || \
+     PA_BUILDFLAG(IS_LINUX)) &&                            \
     PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
   {
     // iOS and MacOS 15 create worker threads internally(start_wqthread).

@@ -56,21 +56,6 @@ DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kScrollStarted);
 DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kScrollToRequestReceived);
 
 // TODO(crbug.com/494144298): Re-enable once ASAN issues on ChromeOS are fixed.
-#if BUILDFLAG(IS_CHROMEOS) && defined(ADDRESS_SANITIZER)
-#define MAYBE_GlicAnnotationManagerUiTest DISABLED_GlicAnnotationManagerUiTest
-#define MAYBE_GlicAnnotationManagerWithFloatingWindowInLiveModeUiTest \
-  DISABLED_GlicAnnotationManagerWithFloatingWindowInLiveModeUiTest
-#define MAYBE_GlicAnnotationManagerTabContextPermissionUiTest \
-  DISABLED_GlicAnnotationManagerTabContextPermissionUiTest
-#define MAYBE_GlicAnnotationManagerWithScrollToDisabledUiTest \
-  DISABLED_GlicAnnotationManagerWithScrollToDisabledUiTest
-#define MAYBE_GlicAnnotationManagerTestForPDF \
-  DISABLED_GlicAnnotationManagerTestForPDF
-#define MAYBE_GlicAnnotationManagerTestForPDFFeatureDisabled \
-  DISABLED_GlicAnnotationManagerTestForPDFFeatureDisabled
-#define MAYBE_GlicAnnotationManagerTestForPDFWithEnforceURLDisabled \
-  DISABLED_GlicAnnotationManagerTestForPDFWithEnforceURLDisabled
-#else
 #define MAYBE_GlicAnnotationManagerUiTest GlicAnnotationManagerUiTest
 #define MAYBE_GlicAnnotationManagerWithFloatingWindowInLiveModeUiTest \
   GlicAnnotationManagerWithFloatingWindowInLiveModeUiTest
@@ -83,7 +68,6 @@ DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kScrollToRequestReceived);
   GlicAnnotationManagerTestForPDFFeatureDisabled
 #define MAYBE_GlicAnnotationManagerTestForPDFWithEnforceURLDisabled \
   GlicAnnotationManagerTestForPDFWithEnforceURLDisabled
-#endif
 
 #if BUILDFLAG(IS_MAC)
 bool kTestDisabledForVirtualMachineMac =

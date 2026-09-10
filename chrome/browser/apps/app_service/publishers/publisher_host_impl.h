@@ -18,14 +18,7 @@ class WebApps;
 
 namespace apps {
 
-#if BUILDFLAG(IS_CHROMEOS)
-class BorealisApps;
-class BruschettaApps;
-class CrostiniApps;
-class ExtensionAppsChromeOs;
-#else
 class ExtensionApps;
-#endif
 
 // PublisherHostImpl saves publishers created by AppServiceProxy.
 class PublisherHostImpl : public PublisherHost {
@@ -35,47 +28,15 @@ class PublisherHostImpl : public PublisherHost {
   PublisherHostImpl& operator=(const PublisherHostImpl&) = delete;
   ~PublisherHostImpl() override;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetArcIsRegistered() override;
-  void Shutdown() override;
-  void ReInitializeCrostiniForTesting() override;
-  void RegisterPublishersForTesting() override;
-#endif
-
  private:
   void Initialize();
 
   // Owns this class.
   raw_ptr<AppServiceProxy> proxy_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<BorealisApps> borealis_apps_;
-  std::unique_ptr<BruschettaApps> bruschetta_apps_;
-  std::unique_ptr<CrostiniApps> crostini_apps_;
-  std::unique_ptr<ExtensionAppsChromeOs> chrome_apps_;
-  std::unique_ptr<ExtensionAppsChromeOs> extension_apps_;
-  std::unique_ptr<web_app::WebApps> web_apps_;
-#else
   std::unique_ptr<web_app::WebApps> web_apps_;
   std::unique_ptr<ExtensionApps> chrome_apps_;
-#endif
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-class ScopedOmitBorealisAppsForTesting {
- public:
-  ScopedOmitBorealisAppsForTesting();
-  ScopedOmitBorealisAppsForTesting(const ScopedOmitBorealisAppsForTesting&) =
-      delete;
-  ScopedOmitBorealisAppsForTesting& operator=(
-      const ScopedOmitBorealisAppsForTesting&) = delete;
-  ~ScopedOmitBorealisAppsForTesting();
-
- private:
-  const bool previous_omit_borealis_apps_for_testing_;
-};
-
-#endif
 
 }  // namespace apps
 

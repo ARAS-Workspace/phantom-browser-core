@@ -25,7 +25,7 @@
 #include "chrome/test/views/chrome_views_test_base.h"
 #include "ui/accessibility/platform/ax_platform_for_test.h"
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
 namespace display {
 class Screen;
 }
@@ -129,7 +129,7 @@ class ViewEventTestBase : public ChromeViewsTestBase {
 
   ui::AXPlatformForTest ax_platform_;
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   std::unique_ptr<display::Screen> screen_;
 #endif
 

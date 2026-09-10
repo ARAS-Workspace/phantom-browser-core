@@ -156,28 +156,7 @@ EmeConfig::Rule WidevineKeySystemInfo::GetRobustnessConfigRule(
   [[maybe_unused]] bool hw_secure_codecs_required =
       hw_secure_requirement && *hw_secure_requirement;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Hardware security requires HWDRM or remote attestation, both of these
-  // require an identifier.
-  if (robustness >= Robustness::HW_SECURE_CRYPTO || hw_secure_codecs_required) {
-#if BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
-    return EmeConfig{.identifier = EmeConfigRuleState::kRequired,
-                     .hw_secure_codecs = EmeConfigRuleState::kRequired};
-#else
-    return EmeConfig{.identifier = EmeConfigRuleState::kRequired};
-#endif
-  }
-
-  // For video, recommend remote attestation if HW_SECURE_ALL is available,
-  // regardless of the value of |robustness|, because it enables hardware
-  // accelerated decoding.
-  // TODO(sandersd): Only do this when hardware accelerated decoding is
-  // available for the requested codecs.
-  if (media_type == EmeMediaType::VIDEO &&
-      max_robustness == Robustness::HW_SECURE_ALL) {
-    return EmeConfig{.identifier = EmeConfigRuleState::kRecommended};
-  }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // On Android, require hardware secure codecs for SW_SECURE_DECODE and above.
   if (robustness >= Robustness::SW_SECURE_DECODE || hw_secure_codecs_required) {
     return EmeConfig{.hw_secure_codecs = EmeConfigRuleState::kRequired};
@@ -190,7 +169,7 @@ EmeConfig::Rule WidevineKeySystemInfo::GetRobustnessConfigRule(
     return EmeConfig{.hw_secure_codecs = EmeConfigRuleState::kRequired};
   }
 
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   return media::EmeConfig::SupportedRule();
 }
@@ -200,21 +179,6 @@ EmeConfig::Rule WidevineKeySystemInfo::GetPersistentLicenseSessionSupport()
   bool is_supported =
       session_types_.contains(CdmSessionType::kPersistentLicense);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // The logic around hardware/software security support is complicated on
-  // ChromeOS. This code is to preserve the original logic, by deciding the
-  // support only based on `is_supported` and ignore `is_hw_secure_supported`.
-  // Note: On ChromeOS, platform verification (similar to CDM host verification)
-  // is required for persistent license support, which requires identifier.
-  // TODO(crbug.com/40839176): Fix the logic after refactoring EmeConfig.
-  if (is_supported) {
-    return EmeConfig{.identifier = EmeConfigRuleState::kRequired,
-                     .persistence = EmeConfigRuleState::kRequired};
-
-  } else {
-    return media::EmeConfig::UnsupportedRule();
-  }
-#else   // BUILDFLAG(IS_CHROMEOS)
   bool is_hw_secure_supported =
       hw_secure_session_types_.contains(CdmSessionType::kPersistentLicense);
 
@@ -230,7 +194,6 @@ EmeConfig::Rule WidevineKeySystemInfo::GetPersistentLicenseSessionSupport()
   } else {
     return media::EmeConfig::UnsupportedRule();
   }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 EmeFeatureSupport WidevineKeySystemInfo::GetPersistentStateSupport() const {

@@ -115,7 +115,7 @@ enum class SelectedTabDiscardStatus {
   kMaxValue = kDiscarded
 };
 
-#if !BUILDFLAG(IS_CHROMEOS) && defined(USE_AURA)
+#if defined(USE_AURA)
 DesktopMediaID::Id AcceleratedWidgetToDesktopMediaId(
     gfx::AcceleratedWidget accelerated_widget) {
   return static_cast<DesktopMediaID::Id>(accelerated_widget);
@@ -679,7 +679,7 @@ DesktopMediaPickerDialogView::DesktopMediaPickerDialogView(
     dialog_window_id = DesktopMediaID::RegisterNativeWindow(
         DesktopMediaID::TYPE_WINDOW, widget->GetNativeWindow());
 
-#if !BUILDFLAG(IS_CHROMEOS) && defined(USE_AURA)
+#if defined(USE_AURA)
     // Set native window ID if the windows is outside Ash.
     dialog_window_id.id = AcceleratedWidgetToDesktopMediaId(
         widget->GetNativeWindow()->GetHost()->GetAcceleratedWidget());

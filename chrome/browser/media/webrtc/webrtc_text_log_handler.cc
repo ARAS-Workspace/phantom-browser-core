@@ -46,17 +46,13 @@
 #include "net/base/network_interfaces.h"
 #include "services/network/public/mojom/network_service.mojom.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/linux_util.h"
 #include "base/task/thread_pool.h"
 #endif
 
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/statistics_provider.h"
 #endif
 
 using base::NumberToString;
@@ -462,7 +458,7 @@ void WebRtcTextLogHandler::SetWebAppId(int web_app_id) {
 void WebRtcTextLogHandler::OnGetNetworkInterfaceList(
     GenericDoneCallback callback,
     const std::optional<net::NetworkInterfaceList>& networks) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Hop to a background thread to get the distro string, which can block.
   base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE, {base::MayBlock()}, base::BindOnce(&base::GetLinuxDistro),
@@ -508,7 +504,7 @@ void WebRtcTextLogHandler::OnGetNetworkInterfaceListFinish(
   LogToCircularBuffer(base::SysInfo::OperatingSystemName() + " " +
                       base::SysInfo::OperatingSystemVersion() + " " +
                       base::SysInfo::OperatingSystemArchitecture());
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   { LogToCircularBuffer("Linux distribution: " + linux_distro); }
 #endif
 
@@ -526,12 +522,6 @@ void WebRtcTextLogHandler::OnGetNetworkInterfaceListFinish(
   std::string computer_model = "Not available";
 #if BUILDFLAG(IS_MAC)
   computer_model = base::SysInfo::HardwareModelName();
-#elif BUILDFLAG(IS_CHROMEOS)
-  if (const std::optional<std::string_view> computer_model_statistic =
-          ash::system::StatisticsProvider::GetInstance()->GetMachineStatistic(
-              ash::system::kHardwareClassKey)) {
-    computer_model = std::string(computer_model_statistic.value());
-  }
 #endif
   LogToCircularBuffer("Computer model: " + computer_model);
 

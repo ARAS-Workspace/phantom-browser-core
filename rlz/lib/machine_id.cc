@@ -23,28 +23,6 @@ bool GetMachineId(std::string* machine_id) {
   if (!machine_id)
     return false;
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-  // Generate a random machine Id each time this function is called.  This
-  // prevents the RLZ server from correlating two RLZ pings from the same
-  // Chrome OS device.
-  //
-  // The Id should be 50 characters long and begin with "nonce-".  Generate 23
-  // cryptographically random bytes, then convert to a printable string using
-  // 2 hex digits per byte for a string of length 46 characters. Truncate last
-  // hex character for 45 characters.
-  unsigned char bytes[23];
-  std::string str_bytes;
-  base::RandBytes(bytes);
-  rlz_lib::BytesToString(bytes, &str_bytes);
-  str_bytes.resize(45);
-  machine_id->clear();
-  base::StringAppendF(machine_id, "NONCE%s", str_bytes.c_str());
-  DCHECK_EQ(50u, machine_id->length());
-  return true;
-
-#else
-
   static std::string calculated_id;
   static bool calculated = false;
   if (calculated) {
@@ -64,7 +42,6 @@ bool GetMachineId(std::string* machine_id) {
   calculated_id = *machine_id;
   return true;
 
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 namespace testing {

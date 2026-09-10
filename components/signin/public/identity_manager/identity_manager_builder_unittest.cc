@@ -27,11 +27,6 @@
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/account_manager/account_manager_factory.h"
-#include "components/account_manager_core/chromeos/account_manager.h"
-#endif
-
 #if BUILDFLAG(IS_IOS)
 #include "components/signin/public/identity_manager/ios/fake_device_accounts_provider.h"
 #endif
@@ -124,20 +119,6 @@ TEST_F(IdentityManagerBuilderTest, BuildIdentityManagerInitParameters) {
       std::make_unique<MockAccountFetcherFactory>();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // This enables `AccountManagerFactory::Get()`, which is needed for
-  // `ProfileOAuth2TokenServiceDelegateChromeOS`.
-  ash::AccountManagerFactory account_manager_factory;
-
-  account_manager_factory.GetAccountManager(profile_path.value())
-      ->InitializeInEphemeralMode(
-          GetTestURLLoaderFactory()->GetSafeWeakWrapper());
-
-  params.account_manager_facade =
-      account_manager_factory.GetAccountManagerFacade(profile_path.value());
-  params.is_regular_profile = true;
-#endif
-
   const IdentityManager::InitParameters init_params =
       signin::BuildIdentityManagerInitParameters(&params);
 
@@ -155,9 +136,6 @@ TEST_F(IdentityManagerBuilderTest, BuildIdentityManagerInitParameters) {
 #else
   EXPECT_EQ(init_params.device_accounts_synchronizer, nullptr);
   EXPECT_NE(init_params.accounts_mutator, nullptr);
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_NE(init_params.account_manager_facade, nullptr);
 #endif
 }
 

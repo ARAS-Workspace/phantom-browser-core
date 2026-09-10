@@ -173,7 +173,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuFullscreenInteractiveTest, ToggleFullscreen) {
 
 // Check Full screen Notification
 // The original manual test doesn't work on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(AppMenuFullscreenInteractiveTest, Notification) {
   std::unique_ptr<ui_test_utils::FullscreenWaiter> waiter1;
 
@@ -186,7 +185,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuFullscreenInteractiveTest, Notification) {
       CheckFullscreenForBrowser(waiter1, true),
       InAnyContext(WaitForShow(kExclusiveAccessBubbleViewElementId)));
 }
-#endif
 
 // Check Context menu in full screen mode
 IN_PROC_BROWSER_TEST_F(AppMenuFullscreenInteractiveTest, ContextMenu) {

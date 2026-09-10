@@ -44,12 +44,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chromeos/ash/components/install_attributes/stub_install_attributes.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using testing::_;
 using testing::NiceMock;
 using testing::Return;
@@ -180,9 +174,6 @@ class ProfilePolicyConnectorTest : public testing::Test {
   // required.
   raw_ptr<MockCloudPolicyStore> cloud_policy_store_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedStubInstallAttributes test_install_attributes_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(ProfilePolicyConnectorTest, IsManagedForManagedUsers) {
@@ -201,81 +192,6 @@ TEST_F(ProfilePolicyConnectorTest, IsManagedForManagedUsers) {
   // Cleanup.
   connector.Shutdown();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ProfilePolicyConnectorTest, ChromeosIsManagedForGaiaUsers) {
-  user_manager::ScopedUserManager scoped_user_manager_enabler(
-      std::make_unique<ash::FakeChromeUserManager>());
-  ProfilePolicyConnector connector;
-  const AccountId account_id =
-      AccountId::FromUserEmailGaiaId("user@domain.example", GaiaId("gaia-id"));
-  std::unique_ptr<user_manager::User> user = CreateRegularUser(account_id);
-  connector.Init(user.get(), &schema_registry_, cloud_policy_manager_.get(),
-                 cloud_policy_store_.get(),
-                 g_browser_process->browser_policy_connector(), false);
-  EXPECT_FALSE(connector.IsManaged());
-
-  auto policy = std::make_unique<enterprise_management::PolicyData>();
-  policy->set_state(enterprise_management::PolicyData::ACTIVE);
-  cloud_policy_store_->set_policy_data_for_testing(std::move(policy));
-  EXPECT_TRUE(connector.IsManaged());
-
-  // Cleanup.
-  connector.Shutdown();
-}
-
-TEST_F(ProfilePolicyConnectorTest, ChromeosPrimaryUserPoliciesProxied) {
-  auto user_manager_unique_ptr = std::make_unique<ash::FakeChromeUserManager>();
-  ash::FakeChromeUserManager* user_manager = user_manager_unique_ptr.get();
-  user_manager::ScopedUserManager scoped_user_manager_enabler(
-      std::move(user_manager_unique_ptr));
-
-  auto policy = std::make_unique<enterprise_management::PolicyData>();
-  policy->set_state(enterprise_management::PolicyData::ACTIVE);
-  cloud_policy_store_->set_policy_data_for_testing(std::move(policy));
-  cloud_policy_store_->policy_map_.Set(
-      key::kAutofillAddressEnabled, POLICY_LEVEL_MANDATORY, POLICY_SCOPE_USER,
-      POLICY_SOURCE_CLOUD, base::Value(false), nullptr);
-  cloud_policy_store_->NotifyStoreLoaded();
-  base::RunLoop().RunUntilIdle();
-
-  ProfilePolicyConnector connector;
-  const AccountId account_id =
-      AccountId::FromUserEmailGaiaId("user@domain.example", GaiaId("gaia-id"));
-  user_manager::User* user = user_manager->AddUser(account_id);
-  user_manager->LoginUser(account_id);
-  EXPECT_EQ(user, user_manager::UserManager::Get()->GetPrimaryUser());
-  connector.Init(user, &schema_registry_, cloud_policy_manager_.get(),
-                 cloud_policy_store_.get(),
-                 g_browser_process->browser_policy_connector(), false);
-  EXPECT_TRUE(connector.IsManaged());
-
-  EXPECT_FALSE(connector.policy_service()->IsInitializationComplete(
-      POLICY_DOMAIN_CHROME));
-  EXPECT_FALSE(connector.policy_service()->IsFirstPolicyLoadComplete(
-      POLICY_DOMAIN_CHROME));
-
-  PolicyServiceInitializedWaiter(connector.policy_service(),
-                                 POLICY_DOMAIN_CHROME)
-      .Wait();
-
-  PolicyNamespace chrome_ns(POLICY_DOMAIN_CHROME, std::string());
-  const base::Value* profile_policy_value =
-      connector.policy_service()->GetPolicies(chrome_ns).GetValue(
-          key::kAutofillAddressEnabled, base::Value::Type::BOOLEAN);
-  ASSERT_TRUE(profile_policy_value);
-  EXPECT_FALSE(profile_policy_value->GetBool());
-
-  const base::Value* proxied_policy_value =
-      g_browser_process->policy_service()->GetPolicies(chrome_ns).GetValue(
-          key::kAutofillAddressEnabled, base::Value::Type::BOOLEAN);
-  ASSERT_TRUE(proxied_policy_value);
-  EXPECT_FALSE(proxied_policy_value->GetBool());
-
-  // Cleanup.
-  connector.Shutdown();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(ProfilePolicyConnectorTest, IsProfilePolicy) {
   NiceMock<MockConfigurationPolicyProvider> mock_platform_provider;
@@ -325,7 +241,6 @@ TEST_F(ProfilePolicyConnectorTest, IsProfilePolicy) {
   g_browser_process->browser_policy_connector()->Shutdown();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(ProfilePolicyConnectorTest, MachineLevelUserCloudPolicyForProfile) {
   // Setup mock MachineLevelUserCloudPolicyManager.
   NiceMock<MockConfigurationPolicyProvider>
@@ -354,7 +269,6 @@ TEST_F(ProfilePolicyConnectorTest, MachineLevelUserCloudPolicyForProfile) {
   g_browser_process->browser_policy_connector()->Shutdown();
   proxy_policy_provider.Shutdown();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(ProfilePolicyConnectorTest, LocalTestProviderUseAndRevert) {
   const PolicyNamespace chrome_namespace(POLICY_DOMAIN_CHROME, std::string());

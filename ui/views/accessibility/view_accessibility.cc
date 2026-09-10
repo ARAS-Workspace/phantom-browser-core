@@ -110,13 +110,7 @@ std::unique_ptr<ViewAccessibility> ViewAccessibility::Create(View* view) {
 
 // static
 bool ViewAccessibility::IsViewsAccessibilityTreeEnabled() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS never uses the Views accessibility tree, even if the feature is
-  // enabled elsewhere. Instead, it uses the Automation API.
-  return false;
-#else
   return ::features::IsAccessibilityTreeForViewsEnabled();
-#endif
 }
 
 ViewAccessibility::ViewAccessibility(View* view) : view_(view) {
@@ -2144,15 +2138,10 @@ void ViewAccessibility::UpdateIgnoredState() {
 // TODO(crbug.com/371237539): In ChromeOS, its not an expectation that being
 // a view unfocusable descendant of a focusable ancestor will make the view
 // ignored.
-#if !BUILDFLAG(IS_CHROMEOS)
   bool is_ignored = should_be_ignored_ || pruned_ ||
                     GetCachedRole() == ax::mojom::Role::kNone ||
                     (has_focusable_ancestor_ &&
                      view_->GetFocusBehavior() == View::FocusBehavior::NEVER);
-#else
-  bool is_ignored = should_be_ignored_ || pruned_ ||
-                    GetCachedRole() == ax::mojom::Role::kNone;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   SetState(ax::mojom::State::kIgnored, is_ignored);
   UpdateFocusableState();
 }

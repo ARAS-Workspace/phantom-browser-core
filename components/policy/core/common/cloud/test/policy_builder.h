@@ -228,10 +228,6 @@ using ComponentCloudPolicyBuilder =
     TypedPolicyBuilder<enterprise_management::ExternalPolicyData>;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-using ComponentActiveDirectoryPolicyBuilder = StringPolicyBuilder;
-#endif
-
 }  // namespace policy
 
 #endif  // COMPONENTS_POLICY_CORE_COMMON_CLOUD_TEST_POLICY_BUILDER_H_

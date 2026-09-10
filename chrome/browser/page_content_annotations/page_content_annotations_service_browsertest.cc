@@ -82,12 +82,6 @@
 #include "pdf/mojom/pdf.mojom.h"
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/test/device_state_mixin.h"
-#include "chrome/browser/ash/login/test/guest_session_mixin.h"
-#include "chrome/test/base/mixin_based_in_process_browser_test.h"
-#endif
-
 namespace page_content_annotations {
 
 namespace {
@@ -232,31 +226,6 @@ IN_PROC_BROWSER_TEST_F(PageContentAnnotationsServiceKioskModeBrowserTest,
   EXPECT_EQ(nullptr, PageContentAnnotationsServiceFactory::GetForProfile(
                          browser()->GetProfile()));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class PageContentAnnotationsServiceEphemeralProfileBrowserTest
-    : public MixinBasedInProcessBrowserTest {
- public:
-  PageContentAnnotationsServiceEphemeralProfileBrowserTest() = default;
-
-  ~PageContentAnnotationsServiceEphemeralProfileBrowserTest() override =
-      default;
-
-  PageContentAnnotationsServiceEphemeralProfileBrowserTest(
-      const PageContentAnnotationsServiceEphemeralProfileBrowserTest&) = delete;
-  PageContentAnnotationsServiceEphemeralProfileBrowserTest& operator=(
-      const PageContentAnnotationsServiceEphemeralProfileBrowserTest&) = delete;
-
- private:
-  ash::GuestSessionMixin guest_session_{&mixin_host_};
-};
-
-IN_PROC_BROWSER_TEST_F(PageContentAnnotationsServiceEphemeralProfileBrowserTest,
-                       EphemeralProfileDoesNotInstantiateService) {
-  EXPECT_EQ(nullptr, PageContentAnnotationsServiceFactory::GetForProfile(
-                         browser()->GetProfile()));
-}
-#endif
 
 class PageContentAnnotationsServiceBrowserTest : public InProcessBrowserTest {
  public:
@@ -2520,11 +2489,7 @@ IN_PROC_BROWSER_TEST_P(PageContentAnnotationsServiceContentExtractionPdfTest,
 }
 
 // TODO(crbug.com/517335503): Re-enable this test on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TwoPDFPageLoads DISABLED_TwoPDFPageLoads
-#else
 #define MAYBE_TwoPDFPageLoads TwoPDFPageLoads
-#endif
 IN_PROC_BROWSER_TEST_P(PageContentAnnotationsServiceContentExtractionPdfTest,
                        MAYBE_TwoPDFPageLoads) {
   base::HistogramTester histogram_tester;

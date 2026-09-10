@@ -21,23 +21,14 @@ const char kKeyProfilePath[] = "profilePath";
 
 // Strings.
 const char kApplicationLabel[] = "application_label";
-#if BUILDFLAG(IS_CHROMEOS)
-const char kARC[] = "arc_label";
-#endif
 const char kCL[] = "cl";
 const char kCommandLine[] = "command_line";
 const char kCommandLineName[] = "command_line_name";
 const char kCompany[] = "company";
 const char kCopyright[] = "copyright";
-#if BUILDFLAG(IS_CHROMEOS)
-const char kCustomizationId[] = "customization_id";
-#endif
 #if !BUILDFLAG(IS_IOS)
 const char kExecutablePath[] = "executable_path";
 const char kExecutablePathName[] = "executable_path_name";
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-const char kFirmwareVersion[] = "firmware_version";
 #endif
 #if !BUILDFLAG(IS_IOS)
 const char kJSEngine[] = "js_engine";
@@ -45,10 +36,8 @@ const char kJSVersion[] = "js_version";
 #endif
 const char kLogoAltText[] = "logo_alt_text";
 const char kOfficial[] = "official";
-#if !BUILDFLAG(IS_CHROMEOS)
 const char kOSName[] = "os_name";
 const char kOSType[] = "os_type";
-#endif
 #if BUILDFLAG(IS_ANDROID)
 const char kOSVersion[] = "os_version";
 const char kVersionCode[] = "version_code";
@@ -57,17 +46,9 @@ const char kTargetSdkVersion[] = "target_sdk_version";
 const char kGmsName[] = "gms_name";
 const char kGmsVersion[] = "gms_version";
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-const char kPlatform[] = "platform";
-#endif
 #if !BUILDFLAG(IS_IOS)
 const char kProfilePath[] = "profile_path";
 const char kProfilePathName[] = "profile_path_name";
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-const char kOsVersionHeaderText1[] = "os-version-text1";
-const char kOsVersionHeaderText2[] = "os-version-text2";
-const char kOsVersionHeaderLink[] = "os-version-link";
 #endif
 const char kCopyLabel[] = "copy_label";
 const char kCopyNotice[] = "copy_notice";

@@ -383,32 +383,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest, GetMediaImageBitmap) {
 // We hide the media image from CrOS' media controls by replacing the image in
 // the MediaSessionImpl with a placeholder image. These changes are gated to
 // only affect ChromeOS, hence why the testing for this is also ChromeOS only.
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest, HideMediaMetadataImageInCrOS) {
-  client_.SetShouldHideMetadata(true);
-
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // We don't expect a media image because of the way the image will be replaced
-  // with its placeholder in MediaSessionImpl.
-  MediaSession* media_session =
-      SetupMediaImageTest(/*expect_media_image=*/false);
-  ASSERT_NE(nullptr, media_session);
-
-  MediaImageGetterHelper helper(media_session, CreateTestImageWithSize(1), 0,
-                                10);
-
-  helper.Wait();
-
-  EXPECT_EQ(hidden_metadata_placeholder_thumbnail_size,
-            helper.bitmap().width());
-  EXPECT_EQ(hidden_metadata_placeholder_thumbnail_size,
-            helper.bitmap().height());
-
-  // As we are replacing the image, we should not visit the original's URL.
-  EXPECT_FALSE(WasURLVisited(GetTestImageURL()));
-}
-#else  // !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
                        DontHideMediaMetadataImageInNonCrOS) {
   client_.SetShouldHideMetadata(true);
@@ -429,7 +403,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
 
   EXPECT_TRUE(WasURLVisited(GetTestImageURL()));
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
                        GetMediaImageBitmap_ImageTooSmall) {

@@ -30,11 +30,6 @@
 #include "content/public/test/mock_navigation_throttle_registry.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/attestation/mock_tpm_challenge_key.h"
-#include "chrome/browser/ash/attestation/tpm_challenge_key.h"
-#include "chrome/browser/ash/attestation/tpm_challenge_key_result.h"
-#else
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/commands/scoped_key_rotation_command_factory.h"  // nogncheck
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/core/persistence/scoped_key_persistence_delegate_factory.h"  // nogncheck
 #include "chrome/browser/ui/browser_element_identifiers.h"
@@ -43,7 +38,6 @@
 #include "components/enterprise/device_trust/core/device_trust_key_manager.h"
 #include "components/prefs/pref_service.h"
 #include "ui/base/interaction/element_identifier.h"
-#endif
 
 using content::NavigationHandle;
 
@@ -66,46 +60,12 @@ constexpr char kChallengeV1[] =
     "}"
     "}";
 
-#if BUILDFLAG(IS_CHROMEOS)
-DeviceTrustConnectorState CreateManagedDeviceState() {
-  DeviceTrustConnectorState state;
-
-  state.cloud_machine_management_level.is_managed = true;
-
-  // In case user management is added.
-  state.affiliated = true;
-
-  return state;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 DeviceTrustConnectorState CreateUnmanagedState() {
   return DeviceTrustConnectorState();
 }
 
 }  // namespace
 
-#if BUILDFLAG(IS_CHROMEOS)
-class DeviceTrustAshBrowserTest : public test::DeviceTrustBrowserTestBase {
- protected:
-  explicit DeviceTrustAshBrowserTest(
-      std::optional<DeviceTrustConnectorState> state = std::nullopt)
-      : DeviceTrustBrowserTestBase(std::move(state)) {
-    auto mock_challenge_key =
-        std::make_unique<ash::attestation::MockTpmChallengeKey>();
-    mock_challenge_key->EnableFake();
-    ash::attestation::TpmChallengeKeyFactory::SetForTesting(
-        std::move(mock_challenge_key));
-  }
-
-  void TearDownOnMainThread() override {
-    ash::attestation::TpmChallengeKeyFactory::Create();
-    test::DeviceTrustBrowserTestBase::TearDownOnMainThread();
-  }
-};
-
-using DeviceTrustBrowserTest = DeviceTrustAshBrowserTest;
-#else
 class DeviceTrustDesktopBrowserTest : public test::DeviceTrustBrowserTestBase {
  protected:
   explicit DeviceTrustDesktopBrowserTest(
@@ -135,7 +95,6 @@ class DeviceTrustDesktopBrowserTest : public test::DeviceTrustBrowserTestBase {
 };
 
 using DeviceTrustBrowserTest = DeviceTrustDesktopBrowserTest;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests that the whole attestation flow occurs when navigating to an
 // allowed domain.
@@ -238,13 +197,6 @@ IN_PROC_BROWSER_TEST_P(DeviceTrustDelayedManagementBrowserTest,
 INSTANTIATE_TEST_SUITE_P(UnmanagedState,
                          DeviceTrustDelayedManagementBrowserTest,
                          testing::Values(CreateUnmanagedState()));
-
-#if BUILDFLAG(IS_CHROMEOS)
-INSTANTIATE_TEST_SUITE_P(ManagedState,
-                         DeviceTrustDelayedManagementBrowserTest,
-                         testing::Values(CreateManagedDeviceState()));
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests that signal values respect the expected format and is filled-out as
 // expect per platform.
@@ -613,97 +565,5 @@ INSTANTIATE_TEST_SUITE_P(
                      /*will_trigger_user_inline_flow=*/testing::Bool()));
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-class DeviceTrustBrowserTestForUnmanagedDevices
-    : public DeviceTrustBrowserTest,
-      public testing::WithParamInterface<
-          /* 2 boolean variables that define the flow on unmanaged devices
-          (crOS):
-          - if the user is managed
-          - if user-level inline flow is enabled */
-          testing::tuple<bool, bool>> {
- protected:
-  DeviceTrustBrowserTestForUnmanagedDevices()
-      : DeviceTrustBrowserTest(DeviceTrustConnectorState({
-            .affiliated = false,
-            .cloud_user_management_level = DeviceTrustManagementLevel({
-                .is_managed = testing::get<0>(GetParam()),
-                .is_inline_policy_enabled = testing::get<1>(GetParam()),
-            }),
-        })) {}
-
-  bool is_user_managed() { return testing::get<0>(GetParam()); }
-  bool is_user_inline_flow_enabled() { return testing::get<1>(GetParam()); }
-};
-
-IN_PROC_BROWSER_TEST_P(DeviceTrustBrowserTestForUnmanagedDevices,
-                       AttestationFullFlow) {
-  TriggerUrlNavigation();
-
-  if (!is_user_managed() || !is_user_inline_flow_enabled()) {
-    VerifyNoInlineFlowOccurred();
-    return;
-  }
-
-  VerifyAttestationFlowSuccessful();
-}
-
-INSTANTIATE_TEST_SUITE_P(ManagedUser,
-                         DeviceTrustBrowserTestForUnmanagedDevices,
-                         testing::Combine(
-                             /*is_user_managed=*/testing::Values(true),
-                             /*is_user_inline_flow_enabled=*/testing::Bool()));
-INSTANTIATE_TEST_SUITE_P(
-    UnmanagedUser,
-    DeviceTrustBrowserTestForUnmanagedDevices,
-    testing::Combine(
-        /*is_user_managed=*/testing::Values(false),
-        /*is_user_inline_flow_enabled=*/testing::Values(false)));
-
-class DeviceTrustBrowserTestSignalsContractForUnmanagedDevices
-    : public DeviceTrustBrowserTest {
- protected:
-  DeviceTrustBrowserTestSignalsContractForUnmanagedDevices()
-      : DeviceTrustBrowserTest(DeviceTrustConnectorState({
-            .affiliated = false,
-            .cloud_user_management_level = DeviceTrustManagementLevel({
-                .is_managed = true,
-                .is_inline_policy_enabled = true,
-            }),
-        })) {}
-};
-
-// Tests that signal values respect the expected format and is filled-out
-// as expect, especially respective filtered stable device identifiers.
-IN_PROC_BROWSER_TEST_F(DeviceTrustBrowserTestSignalsContractForUnmanagedDevices,
-                       SignalsContract) {
-  auto* device_trust_service =
-      DeviceTrustServiceFactory::GetForProfile(browser()->GetProfile());
-  ASSERT_TRUE(device_trust_service);
-
-  base::test::TestFuture<base::DictValue> future;
-  device_trust_service->GetSignals(future.GetCallback());
-
-  // This error most likely indicates that one of the signals decorators did
-  // not invoke its done_closure in time.
-  ASSERT_TRUE(future.Wait()) << "Timed out while collecting signals.";
-
-  const base::DictValue& signals_dict = future.Get();
-
-  const auto signals_contract_map =
-      device_signals::test::GetSignalsContractForUnmanagedDevices();
-  ASSERT_FALSE(signals_contract_map.empty());
-  for (const auto& signals_contract_entry : signals_contract_map) {
-    // First is the signal name.
-    // Second is the contract evaluation predicate.
-    EXPECT_TRUE(signals_contract_entry.second.Run(signals_dict))
-        << "Signals contract validation failed for: "
-        << signals_contract_entry.first;
-  }
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace enterprise_connectors::test

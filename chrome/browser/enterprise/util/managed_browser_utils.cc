@@ -301,7 +301,7 @@ void SetUserAcceptedAccountManagement(Profile* profile, bool accepted) {
     return;
   // The updated consent screen also ask the user for consent to share device
   // signals.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   profile->GetPrefs()->SetBoolean(
       device_signals::prefs::kDeviceSignalsPermanentConsentReceived, accepted);
 #endif

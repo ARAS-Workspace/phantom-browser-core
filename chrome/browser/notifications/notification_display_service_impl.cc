@@ -30,22 +30,15 @@
 #include "chrome/browser/extensions/api/notifications/extension_notification_handler.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/sharing/sharing_notification_handler.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/nearby_sharing/nearby_notification_handler.h"
-#include "chrome/browser/nearby_sharing/nearby_sharing_service_factory.h"
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/notifications/muted_notification_handler.h"
 #include "chrome/browser/notifications/screen_capture_notification_blocker.h"
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/default_browser/default_browser_changed_notification_handler.h"
 #include "chrome/browser/default_browser/default_browser_features.h"
-#endif
 #endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
@@ -77,7 +70,7 @@ NotificationDisplayServiceImpl::NotificationDisplayServiceImpl(Profile* profile)
     AddNotificationHandler(NotificationHandler::Type::WEB_PERSISTENT,
                            std::make_unique<PersistentNotificationHandler>());
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)) && \
+#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && \
     BUILDFLAG(SAFE_BROWSING_AVAILABLE)
     AddNotificationHandler(
         NotificationHandler::Type::TAILORED_SECURITY,
@@ -104,7 +97,6 @@ NotificationDisplayServiceImpl::NotificationDisplayServiceImpl(Profile* profile)
     notification_queue_.AddNotificationBlocker(
         std::move(screen_capture_blocker));
 
-#if !BUILDFLAG(IS_CHROMEOS)
     if (default_browser::IsDefaultBrowserFrameworkEnabled() &&
         default_browser::IsDefaultBrowserChangedOsNotificationEnabled()) {
       AddNotificationHandler(
@@ -113,15 +105,7 @@ NotificationDisplayServiceImpl::NotificationDisplayServiceImpl(Profile* profile)
               default_browser::DefaultBrowserChangedNotificationHandler>());
     }
 #endif
-#endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-    if (NearbySharingServiceFactory::IsNearbyShareSupportedForBrowserContext(
-            profile_)) {
-      AddNotificationHandler(NotificationHandler::Type::NEARBY_SHARE,
-                             std::make_unique<NearbyNotificationHandler>());
-    }
-#endif
   }
 
   bridge_delegator_ = std::make_unique<NotificationPlatformBridgeDelegator>(

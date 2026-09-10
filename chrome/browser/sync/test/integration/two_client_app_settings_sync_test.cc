@@ -11,10 +11,6 @@
 #include "chrome/browser/sync/test/integration/sync_test.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif
-
 namespace {
 
 using apps_helper::InstallHostedAppForAllProfiles;

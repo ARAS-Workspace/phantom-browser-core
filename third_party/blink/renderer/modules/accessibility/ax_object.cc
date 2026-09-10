@@ -2017,14 +2017,7 @@ void AXObject::SerializeMathContent(ui::AXNodeData* node_data) const {
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (node_data->role == ax::mojom::blink::Role::kMath ||
-      node_data->role == ax::mojom::blink::Role::kMathMLMath) {
-    TruncateAndAddStringAttribute(
-        node_data, ax::mojom::blink::StringAttribute::kMathContent,
-        element->GetInnerHTMLString(), kMaxStaticTextLength);
-  }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (element->IsMathMLElement()) {
     // Add `arg` and `intent` attributes if non-empty.
     TruncateAndAddStringAttribute(

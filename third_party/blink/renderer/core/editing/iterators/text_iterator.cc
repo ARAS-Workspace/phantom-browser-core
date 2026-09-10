@@ -314,7 +314,7 @@ void TextIteratorAlgorithm<Strategy>::Advance() {
     // TODO(crbug.com/1296290): Disable this DCHECK as it's troubling CrOS engs.
     // TODO(crbug.com/421311110): Disable this DCHECK as it's troubling android
     // engs.
-#if DCHECK_IS_ON() && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if DCHECK_IS_ON() && !BUILDFLAG(IS_ANDROID)
     // |node_| shouldn't be after |past_end_node_|.
     if (past_end_node_) {
       DCHECK_LE(PositionTemplate<Strategy>(node_, 0),

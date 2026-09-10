@@ -94,7 +94,7 @@ TEST(ManagementUtilsTest, GetAddEntityTypeStringForI18n) {
                 /*is_wallet_branded=*/true),
             "");
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // Verify baseline (default variant 0) branded strings.
   EXPECT_EQ(GetAddEntityTypeStringForI18n(EntityType(EntityTypeName::kPassport),
                                           /*is_wallet_branded=*/true),

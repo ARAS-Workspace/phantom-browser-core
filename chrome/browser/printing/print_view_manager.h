@@ -51,15 +51,6 @@ class PrintViewManager : public PrintViewManagerBase,
   // selection or the entire frame is being printed.
   bool PrintPreviewNow(content::RenderFrameHost* rfh, bool has_selection);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Initiate print preview of the current document and provide the renderer
-  // a printing::mojom::PrintRenderer to perform the actual rendering of
-  // the print document.
-  bool PrintPreviewWithPrintRenderer(
-      content::RenderFrameHost* rfh,
-      mojo::PendingAssociatedRemote<mojom::PrintRenderer> print_renderer);
-#endif
-
   // Initiate print preview for the node under the context menu.
   void PrintPreviewForNodeUnderContextMenu(content::RenderFrameHost* rfh);
 
@@ -115,9 +106,6 @@ class PrintViewManager : public PrintViewManagerBase,
   // false if print preview is impossible at the moment.
   bool PrintPreview(
       content::RenderFrameHost* rfh,
-#if BUILDFLAG(IS_CHROMEOS)
-      mojo::PendingAssociatedRemote<mojom::PrintRenderer> print_renderer,
-#endif
       bool has_selection);
 
   // Notify PrintViewManager that print preview is starting in the renderer for

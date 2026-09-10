@@ -110,7 +110,6 @@ TEST_F(AccountExtensionTrackerUnitTest, AccountExtensionTypeSignedIn) {
             GetAccountExtensionType(external_extension->id()));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Same as the above test, except this uses transport mode (signed in but not
 // syncing) instead of sync, and an explicit user sign in. Not run for ChromeOS
 // because the user should not be able to sign into transport mode in ChromeOS.
@@ -381,7 +380,5 @@ TEST_F(AccountExtensionTrackerSyncToSigninMigrationTest,
       AccountExtensionTracker::AccountExtensionType::kAccountInstalledLocally,
       GetAccountExtensionType(kGoodCrx));
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace extensions

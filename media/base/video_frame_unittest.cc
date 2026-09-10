@@ -573,7 +573,7 @@ TEST(VideoFrame, WrapMappableSharedImage) {
   EXPECT_TRUE(wrapped_frame->HasMappableSharedImage());
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST(VideoFrame, WrapExternalDmabufs) {
   gfx::Size coded_size = gfx::Size(256, 256);
   gfx::Rect visible_rect(coded_size);

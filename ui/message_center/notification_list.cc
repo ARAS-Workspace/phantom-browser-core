@@ -19,25 +19,11 @@
 #include "ui/message_center/public/cpp/notification.h"
 #include "ui/message_center/public/cpp/notification_types.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <vector>
-
-#include "ash/constants/ash_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace message_center {
 
 namespace {
 
 // Constants -------------------------------------------------------------------
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// A notification created within this time period is exempted from over-limit
-// removal. NOTE: Used only if the notification limit feature is enabled.
-constexpr base::TimeDelta kRemovalExemptionPeriod = base::Seconds(1);
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Helpers ---------------------------------------------------------------------
 
@@ -92,36 +78,6 @@ NotificationList::NotificationList(MessageCenter* message_center)
     : message_center_(message_center), quiet_mode_(false) {}
 
 NotificationList::~NotificationList() = default;
-
-#if BUILDFLAG(IS_CHROMEOS)
-std::vector<std::string> NotificationList::GetTopKRemovableNotificationIds(
-    size_t count) const {
-  CHECK(ash::features::IsNotificationLimitEnabled());
-
-  std::vector<std::string> found_ids;
-  const base::Time current_time = base::Time::NowFromSystemTime();
-  for (const auto& state_by_notification : base::Reversed(notifications_)) {
-    const Notification& notification = *state_by_notification.first;
-
-    // Skip the following notifications:
-    // 1. Parent notifications with grouped children because this kind
-    //    of notification is a container of child notifications.
-    // 2. Pinned notifications.
-    // 3. Notifications created within a defined time threshold.
-    if (notification.pinned() || notification.group_parent() ||
-        current_time - notification.timestamp() <= kRemovalExemptionPeriod) {
-      continue;
-    }
-
-    found_ids.push_back(notification.id());
-    if (found_ids.size() == count) {
-      break;
-    }
-  }
-
-  return found_ids;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void NotificationList::SetNotificationsShown(
     const NotificationBlockers& blockers,
@@ -511,10 +467,6 @@ void NotificationList::PushNotification(
     // For critical ChromeOS system notifications, we ignore the standard quiet
     // mode behaviour and show the notification anyways.
     bool effective_quiet_mode = quiet_mode_;
-#if BUILDFLAG(IS_CHROMEOS)
-    effective_quiet_mode &= notification->system_notification_warning_level() !=
-                            SystemNotificationWarningLevel::CRITICAL_WARNING;
-#endif
 
     // TODO(mukai): needs to distinguish if a notification is dismissed by
     // the quiet mode or user operation.

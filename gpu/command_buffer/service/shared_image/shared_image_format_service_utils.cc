@@ -260,12 +260,6 @@ bool IsSizeForBufferHandleValid(const gfx::Size& size,
     return true;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Allow odd size for CrOS.
-  // TODO(https://crbug.com/1208788, https://crbug.com/1224781): Merge this
-  // with the path that uses viz::IsOddSizeMultiPlanarBuffersAllowed.
-  return true;
-#else
   auto [width_scale, height_scale] = format.GetSubsamplingScale();
   if (size.width() % width_scale &&
       !viz::IsOddSizeMultiPlanarBuffersAllowed()) {
@@ -276,7 +270,6 @@ bool IsSizeForBufferHandleValid(const gfx::Size& size,
     return false;
   }
   return true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 SkYUVAInfo::PlaneConfig ToSkYUVAPlaneConfig(viz::SharedImageFormat format) {

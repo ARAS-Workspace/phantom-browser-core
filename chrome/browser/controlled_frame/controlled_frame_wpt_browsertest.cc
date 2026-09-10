@@ -27,14 +27,12 @@ namespace controlled_frame {
 
 namespace {
 
-#define IS_LINUX_OR_CROS (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
-
 // TODO(crbug.com/423697478): frame_event_handlers_part_1 and webrequest_auth
 // times out on win-asan bots and linux / chromeos bots.
 const auto kTestFiles = testing::Values("add_content_scripts.window.js",
                                         "camera.window.js",
                                         "client_hints_user_agent.window.js",
-#if !IS_LINUX_OR_CROS
+#if !BUILDFLAG(IS_LINUX)
                                         "frame_event_handlers_part_1.window.js",
 #endif
                                         "frame_event_handlers_part_2.window.js",
@@ -44,7 +42,7 @@ const auto kTestFiles = testing::Values("add_content_scripts.window.js",
                                         "no_callback.window.js",
                                         "scheme.window.js",
                                         "user_agent_override.window.js",
-#if !IS_LINUX_OR_CROS
+#if !BUILDFLAG(IS_LINUX)
                                         "webrequest_auth.window.js",
 #endif
                                         "webrequest_core.window.js",

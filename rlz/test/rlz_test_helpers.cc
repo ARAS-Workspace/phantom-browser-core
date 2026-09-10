@@ -78,15 +78,7 @@ void RlzLibTestBase::SetUp() {
   }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  statistics_provider_ =
-      std::make_unique<ash::system::FakeStatisticsProvider>();
-  ash::system::StatisticsProvider::SetTestProvider(statistics_provider_.get());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void RlzLibTestBase::TearDown() {
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::system::StatisticsProvider::SetTestProvider(nullptr);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }

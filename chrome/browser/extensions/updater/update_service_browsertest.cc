@@ -47,10 +47,6 @@
 #include "extensions/common/extension_urls.h"
 #include "extensions/common/mojom/manifest.mojom-shared.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/install_attributes/stub_install_attributes.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 using extensions::mojom::ManifestLocation;
@@ -567,13 +563,6 @@ class PolicyUpdateServiceTest : public ExtensionUpdateClientBaseTest {
   std::string id_ = "aohghmighlieiainnegkcijnfilokake";
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  // Set up managed environment.
-  std::unique_ptr<ash::ScopedStubInstallAttributes> install_attributes_ =
-      std::make_unique<ash::ScopedStubInstallAttributes>(
-          ash::StubInstallAttributes::CreateCloudManaged("fake-domain.com",
-                                                         "fake-id"));
-#endif
   testing::NiceMock<policy::MockConfigurationPolicyProvider> policy_provider_;
   content_verifier_test::DownloaderTestDelegate downloader_;
 };
@@ -718,8 +707,7 @@ IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest, MAYBE_Backoff) {
 
 // TODO(crbug.com/316940720): Flaky on Chrome OS MSAN bot. Also flaky on desktop
 // Android. Crashes during test shutdown in ~CrxInstaller.
-#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_CHROMEOS)) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_PRE_PolicyCorruptedOnStartup DISABLED_PRE_PolicyCorruptedOnStartup
 #define MAYBE_PolicyCorruptedOnStartup DISABLED_PolicyCorruptedOnStartup
 #else

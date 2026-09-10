@@ -124,7 +124,7 @@ class VideoEncodeAcceleratorAdapterTest
     // Define shared image usage for a mappable shared image.
     constexpr auto si_usage = gpu::SHARED_IMAGE_USAGE_CPU_WRITE_ONLY |
                               gpu::SHARED_IMAGE_USAGE_DISPLAY_READ;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     constexpr auto buffer_usage =
         gfx::BufferUsage::VEA_READ_CAMERA_AND_CPU_READ_WRITE;
 #else

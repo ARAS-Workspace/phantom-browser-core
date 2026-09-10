@@ -16,9 +16,7 @@
 // that the true limits are OS-wide, while these thresholds are per-process. It
 // also takes into account that we never actually gate codec creation, and we
 // only vary the eagerness with which we will try to reclaim codecs instead.
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr int kSharedPressureThreshold = 3;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 constexpr int kSharedPressureThreshold = 24;
 #elif BUILDFLAG(IS_ANDROID)
 constexpr int kSharedPressureThreshold = 4;

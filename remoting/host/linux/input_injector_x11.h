@@ -32,10 +32,6 @@
 #include "third_party/webrtc/modules/desktop_capture/desktop_geometry.h"
 #include "ui/gfx/x/xproto.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "remoting/host/chromeos/point_transformer.h"
-#endif
-
 namespace remoting {
 
 // A class to generate events on X11.
@@ -134,9 +130,6 @@ class InputInjectorX11 : public InputInjector {
     static const int kNumPointerButtons = 9;
 
     std::array<int, kNumPointerButtons> pointer_button_map_;
-#if BUILDFLAG(IS_CHROMEOS)
-    PointTransformer point_transformer_;
-#endif
     std::unique_ptr<Clipboard> clipboard_;
     std::unique_ptr<X11CharacterInjector> character_injector_;
     bool saved_auto_repeat_enabled_ = false;

@@ -343,7 +343,6 @@ TEST_F(AccessCodeCastDiscoveryInterfaceTest, ServerError) {
   task_environment_.RunUntilIdle();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Revoking Sync consent is not possible on ChromeOS.
 TEST_F(AccessCodeCastDiscoveryInterfaceTest, SyncError) {
   if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
@@ -360,7 +359,6 @@ TEST_F(AccessCodeCastDiscoveryInterfaceTest, SyncError) {
   stub_interface()->ValidateDiscoveryAccessCode(mock_callback.Get());
   task_environment_.RunUntilIdle();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AccessCodeCastDiscoveryInterfaceTest, HttpErrorMapping) {
   ErrorMappingTestHelper(net::HTTP_UNAUTHORIZED, AddSinkResultCode::AUTH_ERROR);

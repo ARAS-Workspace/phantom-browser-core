@@ -202,12 +202,12 @@ class SnapshotAuraTest : public testing::Test {
 #define MAYBE_FullScreenWindow FullScreenWindow
 #endif
 TEST_F(SnapshotAuraTest, MAYBE_FullScreenWindow) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // TODO(crbug.com/40154923): Fix this test to run in < action_timeout()
   // on the Linux Debug & TSAN bots.
   const base::test::ScopedRunLoopTimeout increased_run_timeout(
       FROM_HERE, TestTimeouts::action_max_timeout());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   SetupTestWindow(root_window()->bounds());
   WaitForDraw();

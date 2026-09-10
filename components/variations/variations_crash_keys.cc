@@ -25,17 +25,13 @@
 #include "components/variations/synthetic_trials.h"
 #include "components/variations/variations_switches.h"
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include "base/task/thread_pool.h"
 #endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/task/cancelable_task_tracker.h"
 #include "components/variations/variations_crash_keys_android.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/variations/variations_crash_keys_chromeos.h"
 #endif
 
 namespace variations {
@@ -151,7 +147,7 @@ class VariationsCrashKeys final
   // observer calls that happen on a different thread.
   scoped_refptr<base::SequencedTaskRunner> ui_thread_task_runner_;
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Task runner corresponding to a background thread, used for tasks that may
   // block.
   scoped_refptr<base::SequencedTaskRunner> background_thread_task_runner_;
@@ -192,7 +188,7 @@ VariationsCrashKeys::VariationsCrashKeys() {
   // |ui_thread_task_runner_| before it is set.
   ui_thread_task_runner_ = base::SequencedTaskRunner::GetCurrentDefault();
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Set |background_thread_task_runner_| before observering field trials for
   // the same reason mentioned above.
   background_thread_task_runner_ = base::ThreadPool::CreateSequencedTaskRunner(
@@ -377,9 +373,6 @@ void VariationsCrashKeys::UpdateCrashKeys() {
                                 background_thread_task_runner_, info);
 #endif  // IS_ANDROID
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ReportVariationsToChromeOs(background_thread_task_runner_, info);
-#endif  // IS_CHROMEOS
 }
 
 void VariationsCrashKeys::OnSyntheticTrialsChanged(

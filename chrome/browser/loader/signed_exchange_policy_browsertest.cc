@@ -82,9 +82,6 @@ IN_PROC_BROWSER_TEST_F(SignedExchangePolicyBrowserTest, BlockList) {
                policy::POLICY_SCOPE_USER, policy::POLICY_SOURCE_CLOUD,
                base::Value(std::move(blocklist)), nullptr);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::SetEnterpriseUsersProfileDefaults(&policies);
-#endif
   policy_provider_.UpdateChromePolicy(policies);
   base::RunLoop loop;
   loop.RunUntilIdle();

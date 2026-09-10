@@ -7,10 +7,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <stdio.h>
-#include <unistd.h>
-#endif
 
 #include "base/command_line.h"
 #include "base/files/file_path.h"
@@ -31,10 +27,6 @@
 #include "media/base/media.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_paths.h"
-#include "base/process/process_metrics.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "base/apple/bundle_locations.h"
@@ -47,15 +39,7 @@
 namespace {
 
 bool IsCrosPythonProcess() {
-#if BUILDFLAG(IS_CHROMEOS)
-  base::FilePath target;
-  if (!base::ReadSymbolicLink(base::FilePath(base::kProcSelfExe), &target)) {
-    return false;
-  }
-  return target.BaseName().value().starts_with("python");
-#else
   return false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace

@@ -46,7 +46,7 @@ namespace {
 // Please try to keep this comment up to date when changing behaviour on one of
 // the platforms supported by the browser.
 bool SystemNotificationsEnabled(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return true;
 #else
 #if BUILDFLAG(IS_LINUX)
@@ -60,7 +60,7 @@ bool SystemNotificationsEnabled(Profile* profile) {
 #endif  // BUILDFLAG(IS_LINUX)
   return base::FeatureList::IsEnabled(features::kNativeNotifications) &&
          base::FeatureList::IsEnabled(features::kSystemNotifications);
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 NotificationPlatformBridge* GetSystemNotificationPlatformBridge(

@@ -28,15 +28,7 @@ class ChromeInternalLogSource : public SystemLogsSource {
   void PopulateExtensionInfoLogs(SystemLogsResponse* response);
   void PopulatePowerApiLogs(SystemLogsResponse* response);
   void PopulateDataReductionProxyLogs(SystemLogsResponse* response);
-#if !BUILDFLAG(IS_CHROMEOS)
   void PopulateVariations(SystemLogsResponse* response);
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void PopulateLocalStateSettings(SystemLogsResponse* response);
-  void PopulateArcPolicyStatus(SystemLogsResponse* response);
-  void PopulateOnboardingTime(SystemLogsResponse* response);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_MAC)
   void PopulateLastUpdateState(SystemLogsResponse* response);

@@ -26,10 +26,8 @@
 #include "base/timer/elapsed_timer.h"
 #include "chrome/common/read_anything/read_anything_util.h"
 #include "read_anything_app_model.h"
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/common/webui_url_constants.h"
 #include "content/public/common/url_constants.h"
-#endif
 #include "chrome/renderer/accessibility/read_anything/read_aloud_traversal_utils.h"
 #include "chrome/renderer/accessibility/read_anything/read_anything_node_utils.h"
 #include "content/public/renderer/render_thread.h"
@@ -546,10 +544,8 @@ void ReadAnythingAppModel::SetTreeInfoUrlInformation(
                       url.GetPath().starts_with("/document") &&
                       !url.ExtractFileName().empty();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   tree_info.is_whats_new = url.SchemeIs(content::kChromeUIScheme) &&
                            url.host() == chrome::kChromeUIWhatsNewHost;
-#endif
 
   tree_info.is_url_information_set = true;
   previous_tree_url_ = url.GetContent();

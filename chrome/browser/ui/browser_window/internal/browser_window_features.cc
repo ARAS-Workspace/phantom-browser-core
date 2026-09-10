@@ -220,16 +220,9 @@
 #include "chrome/browser/ui/views/session_restore_infobar/session_restore_infobar_controller.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#include "chrome/browser/ui/chromeos/locked_state/locked_state_controller.h"
-#endif
-
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
 #include "chrome/browser/download/bubble/download_display_controller.h"
 #include "chrome/browser/ui/views/download/bubble/download_toolbar_ui_controller.h"
-#endif
 
 #if defined(USE_AURA)
 #include "chrome/browser/ui/overscroll_pref_manager.h"
@@ -454,15 +447,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
 
   memory_saver_bubble_controller_ =
       std::make_unique<memory_saver::MemorySaverBubbleController>(browser);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  locked_state_controller_ =
-      GetUserDataFactory().CreateInstance<chromeos::LockedStateController>(
-          *browser, browser);
-  on_task_locked_controller_ =
-      GetUserDataFactory().CreateInstance<ash::boca::OnTaskLockedController>(
-          *browser, browser);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if defined(USE_AURA)
   overscroll_pref_manager_ = std::make_unique<OverscrollPrefManager>(
@@ -790,7 +774,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
       *desktop_browser_window_capabilities_, *browser_ui_controller_);
 
   // Must be after exclusive_access_manager_.
-#if !BUILDFLAG(IS_CHROMEOS)
   if (browser_view) {
     download_toolbar_ui_controller_ =
         GetUserDataFactory().CreateInstance<DownloadToolbarUIController>(
@@ -798,7 +781,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
     download_toolbar_ui_controller_->display_controller()
         ->ListenToFullScreenChanges();
   }
-#endif
 
   // Focus manager can be null in tests.
   if (focus_manager) {
@@ -1129,11 +1111,9 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   extension_side_panel_manager_.reset();
   extension_keybinding_registry_.reset();
   // Must be before exclusive_access_manager_.
-#if !BUILDFLAG(IS_CHROMEOS)
   if (download_toolbar_ui_controller_) {
     download_toolbar_ui_controller_->TearDownPreBrowserWindowDestruction();
   }
-#endif
   browser_web_contents_delegate_.reset();
   exclusive_access_manager_.reset();
   // Must be after exclusive_access_manager_ (which holds a reference to this

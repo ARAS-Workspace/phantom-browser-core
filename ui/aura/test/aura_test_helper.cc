@@ -35,7 +35,7 @@
 #include "ui/wm/core/default_activation_client.h"
 #include "ui/wm/core/default_screen_position_client.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "ui/platform_window/common/platform_window_defaults.h"  // nogncheck
 #endif
 
@@ -57,14 +57,10 @@ AuraTestHelper::AuraTestHelper(ui::ContextFactory* context_factory) {
   DCHECK(!g_instance);
   g_instance = this;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   ui::test::EnableTestConfigForPlatformWindows();
 #endif
 
-#if BUILDFLAG(IS_OZONE) && BUILDFLAG(IS_CHROMEOS) && \
-    !BUILDFLAG(IS_CHROMEOS_DEVICE)
-  ui::DisableNativeUiEventDispatchForTest();
-#endif
 
 
   ui::InitializeInputMethodForTesting();

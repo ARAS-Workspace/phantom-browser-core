@@ -21,10 +21,6 @@
 #include "base/strings/utf_ostream_operators.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <cstdio>
-#endif
-
 //
 // Optional message capabilities
 // -----------------------------
@@ -529,17 +525,6 @@ class BASE_EXPORT LogMessage {
   const char* const file_;
   const int line_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void InitWithSyslogPrefix(std::string_view filename,
-                            int line,
-                            uint64_t tick_count,
-                            const char* log_severity_name_c_str,
-                            const char* log_prefix,
-                            bool enable_process_id,
-                            bool enable_thread_id,
-                            bool enable_timestamp,
-                            bool enable_tickcount);
-#endif
 };
 
 class BASE_EXPORT LogMessageFatal final : public LogMessage {
@@ -601,14 +586,6 @@ class BASE_EXPORT ErrnoLogMessageFatal final : public ErrnoLogMessage {
 //       statements, there's no guarantee that it will stay closed
 //       after this call.
 BASE_EXPORT void CloseLogFile();
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Returns a new file handle that will write to the same destination as the
-// currently open log file. Returns nullptr if logging to a file is disabled,
-// or if opening the file failed. This is intended to be used to initialize
-// logging in child processes that are unable to open files.
-BASE_EXPORT FILE* DuplicateLogFILE();
-#endif
 
 // Async signal safe logging mechanism.
 BASE_EXPORT void RawLog(int level, const char* message);

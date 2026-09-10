@@ -30,7 +30,7 @@ ViewsDelegate::ViewsDelegate() {
   DCHECK(!views_delegate);
   views_delegate = this;
 
-#if BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(ENABLE_DESKTOP_AURA)
   // TouchSelectionMenuRunnerViews is not supported on Mac or Cast.
   // It is also not used on Ash (the ChromeViewsDelegate() for Ash will
   // immediately replace this). But tests running without the Chrome layer
@@ -79,8 +79,7 @@ bool ViewsDelegate::ShouldCloseMenuIfMouseCaptureLost() const {
   return true;
 }
 
-#if BUILDFLAG(ENABLE_DESKTOP_AURA) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if BUILDFLAG(ENABLE_DESKTOP_AURA) && BUILDFLAG(IS_LINUX)
 gfx::ImageSkia* ViewsDelegate::GetDefaultWindowIcon() const {
   return nullptr;
 }

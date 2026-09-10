@@ -636,12 +636,12 @@ class VideoEncoderTest : public ::testing::Test {
       std::optional<uint32_t> encode_rate = std::nullopt,
       bool measure_quality = false,
       size_t num_encode_frames = kNumEncodeFramesForSpeedPerformance) {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     RawVideo* video = g_env->GenerateNV12Video();
 #else
     // TODO(b/211783271): Add support for I420 SHM input.
     RawVideo* video = g_env->Video();
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
     VideoCodecProfile profile = g_env->Profile();
     const media::VideoBitrateAllocation& bitrate = g_env->BitrateAllocation();
     const std::vector<VideoEncodeAccelerator::Config::SpatialLayer>&
@@ -663,7 +663,7 @@ class VideoEncoderTest : public ::testing::Test {
     VideoEncoderClientConfig config(
         video, profile, spatial_layers, g_env->InterLayerPredMode(),
         g_env->ContentType(), bitrate, g_env->Reverse());
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     config.input_storage_type =
         VideoEncodeAccelerator::Config::StorageType::kGpuMemoryBuffer;
 #else
@@ -671,7 +671,7 @@ class VideoEncoderTest : public ::testing::Test {
     // Windows/Linux.
     config.input_storage_type =
         VideoEncodeAccelerator::Config::StorageType::kShmem;
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
     config.num_frames_to_encode = num_encode_frames;
     if (encode_rate) {
       config.encode_interval = base::Seconds(1u) / encode_rate.value();
@@ -1082,9 +1082,6 @@ int main(int argc, char** argv) {
     }
   }
 
-#if defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
-  enabled_features.push_back(media::kVaapiH264SWBitrateController);
-#endif  // defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
   disabled_features.push_back(media::kGlobalVaapiLock);
 
   if (test_type ==

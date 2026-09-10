@@ -133,15 +133,7 @@ void AutomationEventRouter::DispatchActionResult(const ui::AXActionData& data,
 void AutomationEventRouter::DispatchGetTextLocationDataResult(
     const ui::AXActionData& data,
     const std::optional<gfx::Rect>& rect) {
-#if BUILDFLAG(IS_CHROMEOS)
-  CHECK(!data.source_extension_id.empty());
-
-  for (const auto& remote : automation_remote_set_) {
-    remote->DispatchGetTextLocationResult(data, rect);
-  }
-#else
   NOTREACHED();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void AutomationEventRouter::NotifyAllAutomationExtensionsGone() {

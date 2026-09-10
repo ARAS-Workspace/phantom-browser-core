@@ -134,9 +134,6 @@ TEST_F(SafeBrowsingPrefsTest, VerifyMatchesPasswordProtectionLoginURL) {
   GURL chrome_url("chrome://os-settings");
   EXPECT_FALSE(prefs_.HasPrefPath(prefs::kPasswordProtectionLoginURLs));
   EXPECT_FALSE(MatchesPasswordProtectionLoginURL(url, prefs_));
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(MatchesPasswordProtectionLoginURL(chrome_url, prefs_));
-#endif
   base::ListValue login_urls;
   login_urls.Append("https://otherdomain.com/login.html");
   prefs_.SetList(prefs::kPasswordProtectionLoginURLs, login_urls.Clone());

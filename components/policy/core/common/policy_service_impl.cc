@@ -44,10 +44,6 @@
 #include "components/policy/core/common/android/policy_service_android.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/policy/core/common/default_chrome_apps_migrator.h"
-#endif
-
 namespace policy {
 
 namespace {
@@ -57,11 +53,7 @@ namespace {
 void DowngradeMetricsReportingToRecommendedPolicy(PolicyMap* policies) {
   // Capture both the Chrome-only and device-level policies on Chrome OS.
   const std::vector<const char*> metrics_keys = {
-#if BUILDFLAG(IS_CHROMEOS)
-      policy::key::kDeviceMetricsReportingEnabled,
-#else
       policy::key::kMetricsReportingEnabled,
-#endif
   };
   for (const char* policy_key : metrics_keys) {
     PolicyMap::Entry* policy = policies->GetMutable(policy_key);
@@ -86,18 +78,14 @@ base::flat_set<std::string> GetStringListPolicyItems(
 }
 
 bool IsUserCloudMergingAllowed(const PolicyMap& policies) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return false;
-#else
   const base::Value* cloud_user_policy_merge_value =
       policies.GetValue(key::kCloudUserPolicyMerge, base::Value::Type::BOOLEAN);
   return cloud_user_policy_merge_value &&
          cloud_user_policy_merge_value->GetBool();
-#endif
 }
 
 void AddPolicyMessages(PolicyMap& policies) {
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
   // Add warning to inform users that these policies are ignored when the user
   // is unaffiliated.
   if (policies.IsUserAffiliated()) {
@@ -119,7 +107,7 @@ void AddPolicyMessages(PolicyMap& policies) {
         ->AddMessage(PolicyMap::MessageType::kError,
                      IDS_POLICY_IGNORED_UNAFFILIATED);
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_IOS)
 }
 
 // Returns the list of histogram names to record depending on scope and number
@@ -455,9 +443,6 @@ PolicyBundle PolicyServiceImpl::MergePolicyBundles(
   // Merge from each provider in their order of priority.
   const PolicyNamespace chrome_namespace(POLICY_DOMAIN_CHROME, std::string());
   PolicyBundle bundle;
-#if BUILDFLAG(IS_CHROMEOS)
-  DefaultChromeAppsMigrator chrome_apps_migrator;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   for (const PolicyBundle* policy_bundle : bundles) {
     // Merge non-chrome namespaces directly from the provider. No clone is
     // needed because PolicyMap::MergeFrom deep-copies individual entries
@@ -473,9 +458,6 @@ PolicyBundle PolicyServiceImpl::MergePolicyBundles(
     PolicyMap chrome_clone = policy_bundle->Get(chrome_namespace).Clone();
     IgnoreUserCloudPrecedencePolicies(&chrome_clone);
     DowngradeMetricsReportingToRecommendedPolicy(&chrome_clone);
-#if BUILDFLAG(IS_CHROMEOS)
-    chrome_apps_migrator.Migrate(&chrome_clone);
-#endif  // BUILDFLAG(IS_CHROMEOS)
     bundle.Get(chrome_namespace).MergeFrom(chrome_clone);
   }
 

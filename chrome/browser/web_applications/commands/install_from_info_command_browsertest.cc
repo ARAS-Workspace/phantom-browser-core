@@ -64,11 +64,7 @@ IN_PROC_BROWSER_TEST_F(InstallFromInfoCommandTest, SuccessInstall) {
   info->title = u"Test name";
 
   const webapps::WebappInstallSource install_source =
-#if BUILDFLAG(IS_CHROMEOS)
-      webapps::WebappInstallSource::SYSTEM_DEFAULT;
-#else
       webapps::WebappInstallSource::OMNIBOX_INSTALL_ICON;
-#endif
 
   base::RunLoop loop;
   webapps::AppId result_app_id;

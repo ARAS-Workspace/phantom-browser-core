@@ -182,7 +182,7 @@ mojom::ResultCode TestPrintingContext::UpdatePrinterSettings(
   if (!existing_settings->requested_media().IsDefault()) {
     settings_->set_requested_media(existing_settings->requested_media());
   }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   for (const auto& item : existing_settings->advanced_settings())
     settings_->advanced_settings().emplace(item.first, item.second.Clone());
 #endif

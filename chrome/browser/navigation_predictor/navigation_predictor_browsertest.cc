@@ -438,8 +438,7 @@ IN_PROC_BROWSER_TEST_P(NavigationPredictorSiteIsolationBrowserTest,
 IN_PROC_BROWSER_TEST_P(NavigationPredictorSiteIsolationBrowserTest,
                        PageWithSameOriginIframeInCrossOriginIframe) {
   // TODO(crbug.com/41492823): Flaky timeouts on mac, linux rel, and cros rel.
-#if BUILDFLAG(IS_MAC) || \
-    ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(NDEBUG))
+#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && defined(NDEBUG))
   if (SiteIsolationEnabled()) {
     GTEST_SKIP() << "Flaky. https://crbug.com/41492823";
   }

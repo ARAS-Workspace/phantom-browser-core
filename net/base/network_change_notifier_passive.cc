@@ -108,14 +108,7 @@ NetworkChangeNotifierPassive::GetAddressMapOwnerInternal() {
 NetworkChangeNotifier::NetworkChangeCalculatorParams
 NetworkChangeNotifierPassive::NetworkChangeCalculatorParamsPassive() {
   NetworkChangeCalculatorParams params;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Delay values arrived at by simple experimentation and adjusted so as to
-  // produce a single signal when switching between network connections.
-  params.ip_address_offline_delay_ = base::Milliseconds(4000);
-  params.ip_address_online_delay_ = base::Milliseconds(1000);
-  params.connection_type_offline_delay_ = base::Milliseconds(500);
-  params.connection_type_online_delay_ = base::Milliseconds(500);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   params = NetworkChangeNotifierAndroid::NetworkChangeCalculatorParamsAndroid();
 #elif BUILDFLAG(IS_LINUX)
   params = NetworkChangeNotifierLinux::NetworkChangeCalculatorParamsLinux();

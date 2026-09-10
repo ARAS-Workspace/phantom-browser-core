@@ -19,9 +19,6 @@ class WebContents;
 // ChromeOS. Conceptually, this should be ok to use a part of web browser
 // implementation even on ChromeOS (as a cross platform implementation),
 // but should not be used as a part of OS system implementation.
-static_assert(!BUILDFLAG(IS_CHROMEOS),
-              "This should not be included in ChromeOS builds.");
-
 namespace web_app {
 
 // Launches an app for the given `app_id` in a way specified by `params`.

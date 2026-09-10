@@ -71,7 +71,7 @@ class TabCollectionNodeInteractiveUiTest
 };
 
 #if defined(MEMORY_SANITIZER) || defined(UNDEFINED_SANITIZER) || \
-    BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+    BUILDFLAG(IS_LINUX)
 #define MAYBE_ValidateViewFocusOrder DISABLED_ValidateViewFocusOrder
 #else
 #define MAYBE_ValidateViewFocusOrder ValidateViewFocusOrder

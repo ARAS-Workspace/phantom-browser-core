@@ -154,7 +154,7 @@ std::string GetApplicationLocaleInternalNonMac(std::string_view pref_locale) {
   // On Android, query java.util.Locale for the default locale.
   candidates.push_back(
       GetLanguageTagFromString(base::android::GetDefaultLocaleString()));
-#elif defined(USE_GLIB) && !BUILDFLAG(IS_CHROMEOS)
+#elif defined(USE_GLIB)
   // GLib implements correct environment variable parsing with
   // the precedence order: LANGUAGE, LC_ALL, LC_MESSAGES and LANG.
   const char* const* languages = g_get_language_names();

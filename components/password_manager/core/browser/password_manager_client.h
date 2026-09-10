@@ -31,11 +31,11 @@
 #include "components/safe_browsing/buildflags.h"
 #include "net/cert/cert_status_flags.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "base/i18n/rtl.h"
 #include "components/password_manager/core/browser/password_cross_domain_confirmation_popup_controller.h"
 #include "ui/gfx/geometry/rect_f.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "components/password_manager/core/browser/first_cct_page_load_passwords_ukm_recorder.h"
@@ -587,7 +587,7 @@ class PasswordManagerClient {
 
   virtual void TriggerSignIn(signin_metrics::AccessPoint access_point) const;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // Shows the bubble with the details of the `form`.
   virtual void OpenPasswordDetailsBubble(
       const password_manager::PasswordForm& form) = 0;
@@ -596,7 +596,7 @@ class PasswordManagerClient {
   // based on the current URL.
   virtual void MaybeShowSavePasswordPrimingPromo(const url::Origin& origin) = 0;
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if !BUILDFLAG(IS_IOS)
   // Creates and show the cross domain confirmation popup.

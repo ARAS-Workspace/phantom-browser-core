@@ -188,8 +188,7 @@ TEST(SupportedTypesTest, IsDecoderSupportedVideoType_VP9Profiles) {
 
 // VP9 Profile2 are supported on x86, ChromeOS on ARM and Mac/Win/Linux
 // on ARM64. See third_party/libvpx/BUILD.gn.
-#if defined(ARCH_CPU_X86_FAMILY) ||                             \
-    (defined(ARCH_CPU_ARM_FAMILY) && BUILDFLAG(IS_CHROMEOS)) || \
+#if defined(ARCH_CPU_X86_FAMILY) || \
     (defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)))
 
   EXPECT_TRUE(IsDecoderSupportedVideoType(
@@ -416,8 +415,7 @@ TEST(SupportedTypesTest, IsEncoderSupportedVideoType_VP9Profiles) {
 
 // VP9 Profile2 are supported on x86, ChromeOS on ARM and Mac/Win/Linux
 // on ARM64. See third_party/libvpx/BUILD.gn.
-#if defined(ARCH_CPU_X86_FAMILY) ||                             \
-    (defined(ARCH_CPU_ARM_FAMILY) && BUILDFLAG(IS_CHROMEOS)) || \
+#if defined(ARCH_CPU_X86_FAMILY) || \
     (defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)))
 
   EXPECT_TRUE(
@@ -868,8 +866,7 @@ TEST(SupportedTypesTest, ProfileColorSpace_VP9Profile0WithBT2020) {
                        gfx::ColorSpace::RangeID::LIMITED)}));
 }
 
-#if defined(ARCH_CPU_X86_FAMILY) ||                             \
-    (defined(ARCH_CPU_ARM_FAMILY) && BUILDFLAG(IS_CHROMEOS)) || \
+#if defined(ARCH_CPU_X86_FAMILY) || \
     (defined(ARCH_CPU_ARM64) && BUILDFLAG(IS_MAC))
 TEST(SupportedTypesTest, ProfileColorSpace_VP9Profile2WithHDR) {
   // VP9 Profile 2 support depends on high bit depth support in libvpx.

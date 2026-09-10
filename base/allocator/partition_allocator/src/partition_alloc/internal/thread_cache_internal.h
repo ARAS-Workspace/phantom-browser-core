@@ -545,17 +545,6 @@ PA_ALWAYS_INLINE internal::UntaggedSlotStart ThreadCache::GetFromCache(
   PA_DCHECK(bucket.count != 0);
   internal::FreelistEntry* entry = bucket.freelist_head;
   // TODO(lizeb): Consider removing once crbug.com/1382658 is fixed.
-#if PA_BUILDFLAG(IS_CHROMEOS) && PA_BUILDFLAG(PA_ARCH_CPU_X86_64) && \
-    PA_BUILDFLAG(HAS_64_BIT_POINTERS)
-  // x86_64 architecture now supports 57 bits of address space, as of Ice Lake
-  // for Intel. However Chrome OS systems do not ship with kernel support for
-  // it, but with 48 bits, so all canonical addresses have the upper 16 bits
-  // zeroed (17 in practice, since the upper half of address space is reserved
-  // by the kernel).
-  constexpr uintptr_t kCanonicalPointerMask = (1ULL << 48) - 1;
-  PA_CHECK(!(reinterpret_cast<uintptr_t>(entry) & ~kCanonicalPointerMask));
-#endif  // PA_BUILDFLAG(IS_CHROMEOS) && PA_BUILDFLAG(PA_ARCH_CPU_X86_64) &&
-        // PA_BUILDFLAG(HAS_64_BIT_POINTERS)
 
   // Passes the bucket size to |GetNextForThreadCache()|, so that in case of
   // freelist corruption, we know the bucket size that lead to the crash,

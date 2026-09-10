@@ -34,7 +34,7 @@ const char kInvalidSocketPath[] = "/invalid/path";
 bool UserCanConnectCallback(bool allow_user,
     const UnixDomainServerSocket::Credentials& credentials) {
   // Here peers are running in same process.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(getpid(), credentials.process_id);
 #endif
   EXPECT_EQ(getuid(), credentials.user_id);
@@ -69,7 +69,7 @@ TEST_F(UnixDomainServerSocketTest, ListenWithInvalidPathWithAbstractNamespace) {
   const bool kUseAbstractNamespace = true;
   UnixDomainServerSocket server_socket(CreateAuthCallback(true),
                                        kUseAbstractNamespace);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
   EXPECT_THAT(server_socket.BindAndListen(kInvalidSocketPath, /*backlog=*/1),
               IsOk());
 #else

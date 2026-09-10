@@ -23,11 +23,6 @@
 #include "ui/aura/env.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/command_line.h"
-#include "ui/gl/gl_switches.h"
-#endif
-
 namespace views {
 
 ViewsTestSuite::ViewsTestSuite(int argc, char** argv)
@@ -52,13 +47,6 @@ void ViewsTestSuite::Initialize() {
 
   testing::UnitTest::GetInstance()->listeners().Append(
       new ui::ProvideAXPlatformForTests());
-
-#if BUILDFLAG(IS_CHROMEOS) && defined(MEMORY_SANITIZER)
-  // Force software-gl. This is necessary for mus tests to avoid an msan warning
-  // in gl init.
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kOverrideUseSoftwareGLForTests);
-#endif
 
   gl::GLSurfaceTestSupport::InitializeOneOff();
 

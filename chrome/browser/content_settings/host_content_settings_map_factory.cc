@@ -43,11 +43,6 @@
 #include "chrome/browser/webapps/installable/installed_webapp_provider.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/extensions/component_extension_content_settings/component_extension_content_settings_allowlist_factory.h"
-#include "chrome/browser/chromeos/extensions/component_extension_content_settings/component_extension_content_settings_provider.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 #include "chrome/browser/sessions/exit_type_service_factory.h"
 #endif
@@ -77,11 +72,6 @@ HostContentSettingsMapFactory::HostContentSettingsMapFactory()
   DependsOn(extensions::ContentSettingsService::GetFactoryInstance());
   DependsOn(extensions::ExtensionRegistrarFactory::GetInstance());
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  DependsOn(extensions::ComponentExtensionContentSettingsAllowlistFactory::
-                GetInstance());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-  // Used by way of ShouldRestoreOldSessionCookies().
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   DependsOn(ExitTypeServiceFactory::GetInstance());
 #endif
@@ -131,15 +121,6 @@ scoped_refptr<RefcountedKeyedService>
       WebUIAllowlist::GetOrCreate(profile));
   settings_map->RegisterProvider(ProviderType::kWebuiAllowlistProvider,
                                  std::move(allowlist_provider));
-
-#if BUILDFLAG(IS_CHROMEOS)
-  auto component_extension_provider =
-      std::make_unique<extensions::ComponentExtensionContentSettingsProvider>(
-          extensions::ComponentExtensionContentSettingsAllowlistFactory::
-              GetForBrowserContext(profile));
-  settings_map->RegisterProvider(ProviderType::kComponentExtensionProvider,
-                                 std::move(component_extension_provider));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // These must be registered before before the HostSettings are passed over to

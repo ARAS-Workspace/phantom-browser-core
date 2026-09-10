@@ -67,13 +67,6 @@ base::ListValue PrintersToValues(const PrinterList& printer_list) {
       options.SetByDottedPath(opt_it.first, opt_it.second);
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    printer_info.Set(
-        kCUPSEnterprisePrinter,
-        printer.options.contains(kCUPSEnterprisePrinter) &&
-            printer.options.at(kCUPSEnterprisePrinter) == kValueTrue);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
     printer_info.Set(kSettingPrinterOptions, std::move(options));
 
     results.Append(std::move(printer_info));

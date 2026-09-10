@@ -422,7 +422,6 @@ TEST_F(AccountNameEmailStoreTest, OnCounterPrefUpdated) {
 }
 
 // ChromeOS does not support signing out
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // Tests that the user's gets their `kAutofillNameAndEmailProfileSignature` pref
 // cleared on signout and the kAccountNameEmail profile is removed.
@@ -527,8 +526,6 @@ TEST_F(AccountNameEmailStoreTest, SignInAfterHardRemove) {
                 prefs::kAutofillNameAndEmailProfileNotSelectedCounter),
             AccountNameEmailStore::kNotSelectedThreshold);
 }
-
-#endif  // !BUILDFLAG(CHROME_OS)
 
 // Tests that the kAccountNameEmail profile will be recreated after enabling
 // autofill sync toggle.

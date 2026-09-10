@@ -237,7 +237,7 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsBMOSyncTest,
 }
 
 // Flaky, see crbug.com/40148122.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_SyncDoubleInstallationDifferentUserDisplayMode \
   DISABLED_SyncDoubleInstallationDifferentUserDisplayMode
 #else
@@ -641,16 +641,10 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsBMOSyncTest,
     base::RunLoop loop;
     base::RepeatingCallback<void(const webapps::AppId&)> on_installed_closure;
     base::RepeatingCallback<void(const webapps::AppId&)> on_hooks_closure;
-#if BUILDFLAG(IS_CHROMEOS)
-    on_installed_closure = base::DoNothing();
-    on_hooks_closure = base::BindLambdaForTesting(
-        [&](const webapps::AppId& installed_app_id) { loop.Quit(); });
-#else
     on_installed_closure = base::BindLambdaForTesting(
         [&](const webapps::AppId& installed_app_id) { loop.Quit(); });
     on_hooks_closure = base::BindLambdaForTesting(
         [](const webapps::AppId& installed_app_id) { FAIL(); });
-#endif
     WebAppInstallManagerObserverAdapter app_listener(GetProfile(1));
     app_listener.SetWebAppInstalledDelegate(on_installed_closure);
     app_listener.SetWebAppInstalledWithOsHooksDelegate(on_hooks_closure);

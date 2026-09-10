@@ -68,11 +68,6 @@
 #include "remoting/signaling/signaling_address.h"
 #include "remoting/signaling/signaling_id_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/feature_list.h"
-#include "remoting/host/chromeos/features.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "remoting/host/linux/gnome_remote_desktop_session.h"
 #include "remoting/host/linux/portal_remote_desktop_session.h"
@@ -97,15 +92,6 @@ typedef ValidatingAuthenticator::ResultCallback ValidationResultCallback;
 // the network, such as the signal strategy. This delay ensures there is time
 // for messages (such as session-terminate) to be sent.
 constexpr base::TimeDelta kDestroyMessagingObjectDelay = base::Seconds(2);
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Enabled value for ClassManagementEnabled when host belongs to a student and
-// their screen can be viewed by a teacher.
-constexpr char kClassManagementStudent[] = "student";
-// Enabled value for ClassManagementEnabled when host belongs to a teacher and
-// they would like to access their host via another device.
-constexpr char kClassManagementTeacher[] = "teacher";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // STL containers do not have a defined destruction orders for their elements.
 // Post(Delayed)Task relies on these containers so the destruction order is also
@@ -139,10 +125,6 @@ It2MeHost::DeferredConnectContext::DeferredConnectContext() = default;
 It2MeHost::DeferredConnectContext::~DeferredConnectContext() = default;
 
 It2MeHost::It2MeHost() {
-#if BUILDFLAG(IS_CHROMEOS)
-  host_event_reporter_factory_ =
-      base::BindRepeating(&HostEventReporter::Create);
-#endif
 }
 
 It2MeHost::~It2MeHost() {
@@ -152,7 +134,7 @@ It2MeHost::~It2MeHost() {
 
 void It2MeHost::set_chrome_os_enterprise_params(
     ChromeOsEnterpriseParams params) {
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   CHECK_NE(params.request_origin, ChromeOsEnterpriseRequestOrigin::kUnknown);
   CHECK_NE(params.audio_playback, ChromeOsEnterpriseAudioPlayback::kUnknown);
   chrome_os_enterprise_params_ = std::move(params);
@@ -167,7 +149,7 @@ void It2MeHost::set_authorized_helper(const std::string& authorized_helper) {
 }
 
 void It2MeHost::set_reconnect_params(ReconnectParams reconnect_params) {
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   reconnect_params_.emplace(std::move(reconnect_params));
 #else
   NOTREACHED() << "It2MeHost::set_reconnect_params is only supported on CrOS";
@@ -175,7 +157,7 @@ void It2MeHost::set_reconnect_params(ReconnectParams reconnect_params) {
 }
 
 bool It2MeHost::SessionSupportsReconnections() const {
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   return is_enterprise_session() &&
          chrome_os_enterprise_params_->allow_reconnections;
 #else
@@ -185,7 +167,7 @@ bool It2MeHost::SessionSupportsReconnections() const {
 
 std::optional<ReconnectParams> It2MeHost::CreateReconnectParams() const {
   std::optional<ReconnectParams> reconnect_params;
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   if (!SessionSupportsReconnections()) {
     return reconnect_params;
   }
@@ -387,7 +369,7 @@ void It2MeHost::ConnectOnNetworkThread(
   // Set up the desktop environment options.
   DesktopEnvironmentOptions options(DesktopEnvironmentOptions::CreateDefault());
 
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   if (is_enterprise_session()) {
     options.set_enable_user_interface(
         !chrome_os_enterprise_params_->suppress_user_dialogs);
@@ -416,7 +398,7 @@ void It2MeHost::ConnectOnNetworkThread(
     // Audio remoting is disabled for non-enterprise ChromeOS connections.
     options.set_audio_playback_mode(AudioPlaybackMode::kLocalOnly);
   }
-#endif  // BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#endif  // !defined(NDEBUG)
 
   auto peer_session_factory = std::make_unique<PeerSessionImplFactory>(
       desktop_environment_factory_.get(), std::move(get_ice_config_fetcher_cb));
@@ -433,10 +415,6 @@ void It2MeHost::ConnectOnNetworkThread(
   // Create event logger.
   host_event_logger_ =
       HostEventLogger::Create(host_->status_monitor(), kApplicationName);
-#if BUILDFLAG(IS_CHROMEOS)
-  host_event_reporter_ =
-      host_event_reporter_factory_.Run(host_->status_monitor());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Connect signaling and start the host.
   signal_strategy_->Connect();
@@ -502,13 +480,6 @@ ValidationCallback It2MeHost::GetValidationCallbackForTesting() {
   return base::BindRepeating(&It2MeHost::ValidateConnectionDetails,
                              base::Unretained(this));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void It2MeHost::SetHostEventReporterFactoryForTesting(
-    HostEventReporterFactory factory) {
-  host_event_reporter_factory_ = factory;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void It2MeHost::OnPolicyUpdate(base::DictValue policies) {
   // The policy watcher runs on the |ui_task_runner|.
@@ -656,7 +627,7 @@ void It2MeHost::UpdateLocalSessionPolicies(
 
   local_session_policies->allow_remote_input = true;
 
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
   if (is_enterprise_session()) {
     local_session_policies->curtain_required =
         chrome_os_enterprise_params_->curtain_local_user_session;
@@ -673,14 +644,7 @@ void It2MeHost::UpdateLocalSessionPolicies(
           chrome_os_enterprise_params_->maximum_session_duration;
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    bool enterprise_file_transfer_allowed =
-        platform_policies
-            .FindBool(policy::key::kRemoteAccessHostAllowEnterpriseFileTransfer)
-            .value_or(false);
-#else
     bool enterprise_file_transfer_allowed = false;
-#endif
     local_session_policies->allow_file_transfer =
         chrome_os_enterprise_params_->allow_file_transfer &&
         enterprise_file_transfer_allowed;
@@ -846,9 +810,6 @@ void It2MeHost::DisconnectOnNetworkThread(protocol::ErrorCode error_code) {
       FROM_HERE, base::DoNothingWithBoundArgs(std::move(ordered_destruction)),
       kDestroyMessagingObjectDelay);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  host_event_reporter_.reset();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   host_event_logger_ = nullptr;
 
   // Post tasks to delete UI objects on the UI thread.
@@ -978,36 +939,6 @@ void It2MeHost::OnConfirmationResult(ValidationResultCallback result_callback,
 
 bool It2MeHost::RemoteSupportConnectionsAllowed(
     const base::DictValue& policies) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // The policy to disallow remote support connections
-  // (RemoteAccessHostAllowRemoteSupportConnections) does not apply to support
-  // sessions initiated by the enterprise admin via a RemoteCommand or by Class
-  // tools. These two cases are handled specifically by the policy to disallow
-  // enterprise remote support connections
-  // (RemoteAccessHostAllowEnterpriseRemoteSupportConnections) and the policy
-  // to disallow teachers from viewing student screens
-  // (ClassManagementEnabled).
-  if (is_enterprise_session()) {
-    switch (chrome_os_enterprise_params_->request_origin) {
-      case remoting::ChromeOsEnterpriseRequestOrigin::kClassManagement:
-        if (const std::string* class_management_enabled_value =
-                policies.FindString(policy::key::kClassManagementEnabled)) {
-          return *class_management_enabled_value == kClassManagementStudent ||
-                 *class_management_enabled_value == kClassManagementTeacher;
-        }
-        return false;
-      case remoting::ChromeOsEnterpriseRequestOrigin::kEnterpriseAdmin:
-        return policies
-            .FindBool(
-                policy::key::
-                    kRemoteAccessHostAllowEnterpriseRemoteSupportConnections)
-            .value_or(true);
-      case remoting::ChromeOsEnterpriseRequestOrigin::kUnknown:
-        NOTREACHED() << "RequestOrigin is validated to be known when "
-                        "enterprise parameters are set";
-    }
-  }
-#endif
   return policies
       .FindBool(policy::key::kRemoteAccessHostAllowRemoteSupportConnections)
       .value_or(true);

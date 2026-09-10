@@ -122,27 +122,6 @@ class LocalDeviceInfoProviderImplTest : public testing::Test {
   std::unique_ptr<LocalDeviceInfoProviderImpl> provider_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(LocalDeviceInfoProviderImplTest, UmaToggleFullHardwareClass) {
-  InitializeProvider(kLocalDeviceGuid);
-
-  // Tests that |full_hardware_class| maintains correct values on toggling UMA
-  // from ON -> OFF, OFF -> ON
-  ON_CALL(device_info_sync_client_, IsUmaEnabledOnCrOSDevice)
-      .WillByDefault(Return(true));
-  EXPECT_EQ(provider_->GetLocalDeviceInfo()->full_hardware_class(),
-            kLocalFullHardwareClass);
-
-  ON_CALL(device_info_sync_client_, IsUmaEnabledOnCrOSDevice)
-      .WillByDefault(Return(false));
-  EXPECT_EQ(provider_->GetLocalDeviceInfo()->full_hardware_class(), "");
-
-  ON_CALL(device_info_sync_client_, IsUmaEnabledOnCrOSDevice)
-      .WillByDefault(Return(true));
-  EXPECT_EQ(provider_->GetLocalDeviceInfo()->full_hardware_class(),
-            kLocalFullHardwareClass);
-}
-#else   // NOT BUILDFLAG(IS_CHROMEOS)
 TEST_F(LocalDeviceInfoProviderImplTest,
        UmaEnabledNonChromeOSHardwareClassEmpty) {
   // Tests that the |full_hardware_class| doesn't get updated when on
@@ -157,7 +136,6 @@ TEST_F(LocalDeviceInfoProviderImplTest,
   // |kLocalFullHardwareClass| is reset after retrieving |local_device_info|
   EXPECT_EQ(local_device_info->full_hardware_class(), "");
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(LocalDeviceInfoProviderImplTest, GetLocalDeviceInfo) {
   ASSERT_EQ(nullptr, provider_->GetLocalDeviceInfo());

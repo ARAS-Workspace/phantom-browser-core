@@ -191,13 +191,11 @@ bool IdleTimeoutActionsPolicyHandler::CheckPolicySettings(
 #endif  //! BUILDFLAG(IS_ANDROID)
 
 // BrowserSignin policy is not available on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   const auto* browser_signin_disabled = policies.GetValue(
       policy::key::kBrowserSignin, base::Value::Type::INTEGER);
   if (browser_signin_disabled && browser_signin_disabled->GetInt() == 0) {
     return true;
   }
-#endif
 
   // Automatically disable sync for the required data types.
   const base::Value* value =

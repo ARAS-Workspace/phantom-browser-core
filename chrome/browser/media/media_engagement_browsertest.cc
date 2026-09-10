@@ -55,11 +55,6 @@
 #include "third_party/blink/public/mojom/autoplay/autoplay.mojom-test-utils.h"
 #include "third_party/blink/public/mojom/autoplay/autoplay.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/sessions/session_service_factory.h"
-#include "chrome/browser/sessions/session_service_test_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 const char* kMediaEngagementTestDataPath = "chrome/test/data/media/engagement";
@@ -351,11 +346,7 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest, RecordEngagement) {
 }
 
 // Flaky tests on CrOS: http://crbug.com/40656329.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_RecordEngagement_AudioOnly DISABLED_RecordEngagement_AudioOnly
-#else
 #define MAYBE_RecordEngagement_AudioOnly RecordEngagement_AudioOnly
-#endif
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
                        MAYBE_RecordEngagement_AudioOnly) {
   LoadTestPageAndWaitForPlayAndAudible("engagement_test_audio.html", false);
@@ -373,13 +364,8 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
 }
 
 // Flaky tests on CrOS: http://crbug.com/40656092.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DoNotRecordEngagement_NotTime_AudioOnly \
-  DISABLED_DoNotRecordEngagement_NotTime_AudioOnly
-#else
 #define MAYBE_DoNotRecordEngagement_NotTime_AudioOnly \
   DoNotRecordEngagement_NotTime_AudioOnly
-#endif
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
                        MAYBE_DoNotRecordEngagement_NotTime_AudioOnly) {
   LoadTestPageAndWaitForPlayAndAudible("engagement_test_audio.html", false);
@@ -397,13 +383,8 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
 }
 
 // Flaky tests on CrOS: http://crbug.com/40656092.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DoNotRecordEngagement_TabMuted_AudioOnly \
-  DISABLED_DoNotRecordEngagement_TabMuted_AudioOnly
-#else
 #define MAYBE_DoNotRecordEngagement_TabMuted_AudioOnly \
   DoNotRecordEngagement_TabMuted_AudioOnly
-#endif
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
                        MAYBE_DoNotRecordEngagement_TabMuted_AudioOnly) {
   LoadTestPageAndWaitForPlayAndAudible("engagement_test_audio.html", true);
@@ -442,13 +423,8 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
 }
 
 // Flaky tests on CrOS: http://crbug.com/40656092.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DoNotRecordEngagement_PlaybackStopped_AudioOnly \
-  DISABLED_DoNotRecordEngagement_PlaybackStopped_AudioOnly
-#else
 #define MAYBE_DoNotRecordEngagement_PlaybackStopped_AudioOnly \
   DoNotRecordEngagement_PlaybackStopped_AudioOnly
-#endif
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
                        MAYBE_DoNotRecordEngagement_PlaybackStopped_AudioOnly) {
   LoadTestPageAndWaitForPlayAndAudible("engagement_test_audio.html", false);
@@ -469,13 +445,8 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
 }
 
 // Flaky tests on CrOS: http://crbug.com/40656092.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_RecordEngagement_NotVisible_AudioOnly \
-  DISABLED_RecordEngagement_NotVisible_AudioOnly
-#else
 #define MAYBE_RecordEngagement_NotVisible_AudioOnly \
   RecordEngagement_NotVisible_AudioOnly
-#endif
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
                        MAYBE_RecordEngagement_NotVisible_AudioOnly) {
   LoadTestPageAndWaitForPlayAndAudible("engagement_test_audio.html", false);
@@ -521,7 +492,7 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest, RecordVisitOnBrowserClose) {
   ExpectScores(1, 0);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // Flaky timeout. https://crbug.com/40653059
 #define MAYBE_RecordSingleVisitOnSameOrigin \
   DISABLED_RecordSingleVisitOnSameOrigin
@@ -543,7 +514,7 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
   ExpectScores(1, 0);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Flaky: https://crbug.com/40144269
 #define MAYBE_RecordVisitOnNewOrigin DISABLED_RecordVisitOnNewOrigin
 #else
@@ -560,13 +531,8 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
 }
 
 // Flaky tests on CrOS: http://crbug.com/40656092.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DoNotRecordEngagement_SilentAudioTrack_AudioOnly \
-  DISABLED_DoNotRecordEngagement_SilentAudioTrack_AudioOnly
-#else
 #define MAYBE_DoNotRecordEngagement_SilentAudioTrack_AudioOnly \
   DoNotRecordEngagement_SilentAudioTrack_AudioOnly
-#endif
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
                        MAYBE_DoNotRecordEngagement_SilentAudioTrack_AudioOnly) {
   LoadTestPageAndWaitForPlay(
@@ -615,11 +581,7 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
 }
 
 // Flaky tests on CrOS: http://crbug.com/40656092.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_MultipleElements DISABLED_MultipleElements
-#else
 #define MAYBE_MultipleElements MultipleElements
-#endif
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest, MAYBE_MultipleElements) {
   LoadTestPageAndWaitForPlayAndAudible("engagement_test_multiple.html", false);
   AdvanceMeaningfulPlaybackTime();
@@ -833,10 +795,6 @@ class MediaEngagementSessionRestoreBrowserTest
 
     SessionStartupPref::SetStartupPref(
         profile, SessionStartupPref(SessionStartupPref::LAST));
-#if BUILDFLAG(IS_CHROMEOS)
-    SessionServiceTestHelper helper(profile);
-    helper.SetForceBrowserNotAliveWithNoWindows(true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     std::unique_ptr<ScopedKeepAlive> keep_alive(new ScopedKeepAlive(
         KeepAliveOrigin::SESSION_RESTORE, KeepAliveRestartOption::DISABLED));

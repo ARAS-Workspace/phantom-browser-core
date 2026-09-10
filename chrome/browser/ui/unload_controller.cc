@@ -54,10 +54,6 @@
 #include "extensions/common/constants.h"
 #endif  // (ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 DEFINE_USER_DATA(UnloadController);
 
 namespace {
@@ -242,15 +238,6 @@ bool UnloadController::CanCloseContents(content::WebContents* contents) {
           browser_->tab_strip_model()->GetIndexOfWebContents(contents))) {
     return false;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Tabs cannot be closed when the app is locked for OnTask. Only relevant for
-  // non-web browser scenarios.
-  if (ash::boca::OnTaskLockedController::From(browser_)
-          ->is_locked_for_on_task()) {
-    return false;
-  }
-#endif
 
   return !is_attempting_to_close_browser_ ||
          is_calling_before_unload_handlers();
@@ -858,7 +845,7 @@ UnloadController::OkToCloseWithInProgressDownloads(
 }
 
 bool UnloadController::CanCloseWithInProgressDownloads() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   // On Mac and ChromeOS, non-incognito and non-Guest downloads can still
   // continue after window is closed.
   if (!browser_->GetProfile()->IsOffTheRecord()) {

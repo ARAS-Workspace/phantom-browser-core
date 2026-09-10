@@ -137,16 +137,6 @@ class MockTextInputClient : public TextInputClient {
               SetCompositionFromExistingText,
               (const gfx::Range&, const std::vector<ui::ImeTextSpan>&),
               (override));
-#if BUILDFLAG(IS_CHROMEOS)
-  MOCK_METHOD(gfx::Range, GetAutocorrectRange, (), (const, override));
-  MOCK_METHOD(gfx::Rect, GetAutocorrectCharacterBounds, (), (const, override));
-  MOCK_METHOD(bool, SetAutocorrectRange, (const gfx::Range& range), (override));
-  MOCK_METHOD(void,
-              GetActiveTextInputControlLayoutBounds,
-              (std::optional<gfx::Rect> * control_bounds,
-               std::optional<gfx::Rect>* selection_bounds),
-              (override));
-#endif
 
  private:
   TextInputType text_input_type_;

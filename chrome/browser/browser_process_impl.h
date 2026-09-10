@@ -219,9 +219,6 @@ class BrowserProcessImpl : public BrowserProcess,
 
   activity_reporter::ActivityReporter* activity_reporter() override;
   component_updater::ComponentUpdateService* component_updater() override;
-#if BUILDFLAG(IS_CHROMEOS)
-  MediaFileSystemRegistry* media_file_system_registry() override;
-#endif
   WebRtcLogUploader* webrtc_log_uploader() override;
   network_time::NetworkTimeTracker* network_time_tracker() override;
 #if !BUILDFLAG(IS_ANDROID)
@@ -345,10 +342,6 @@ class BrowserProcessImpl : public BrowserProcess,
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   std::unique_ptr<extensions::ExtensionsBrowserClient>
       extensions_browser_client_;
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<MediaFileSystemRegistry> media_file_system_registry_;
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)

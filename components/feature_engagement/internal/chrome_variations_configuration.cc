@@ -83,9 +83,6 @@ void ChromeVariationsConfiguration::LoadConfigs(
 
   for (auto* feature : features) {
     LoadFeatureConfig(*feature, configuration_providers, features, groups);
-#if BUILDFLAG(IS_CHROMEOS)
-    LoadAllowedEventPrefixes(*feature, configuration_providers);
-#endif
   }
 
   ExpandGroupNamesInFeatures(groups);
@@ -94,23 +91,6 @@ void ChromeVariationsConfiguration::LoadConfigs(
     LoadGroupConfig(*group, configuration_providers);
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void ChromeVariationsConfiguration::UpdateConfig(
-    const base::Feature& feature,
-    const ConfigurationProvider* provider) {
-  FeatureConfig& config = configs_[feature.name];
-
-  // Clear existing configs.
-  config = FeatureConfig();
-  provider->MaybeProvideFeatureConfiguration(feature, config, {}, {});
-}
-
-const Configuration::EventPrefixSet&
-ChromeVariationsConfiguration::GetRegisteredAllowedEventPrefixes() const {
-  return event_prefixes_;
-}
-#endif
 
 void ChromeVariationsConfiguration::LoadFeatureConfig(
     const base::Feature& feature,
@@ -165,29 +145,6 @@ void ChromeVariationsConfiguration::LoadGroupConfig(
     DVLOG(3) << "No field trial or checked in config for " << group.name;
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void ChromeVariationsConfiguration::LoadAllowedEventPrefixes(
-    const base::Feature& feature,
-    const ConfigurationProviderList& configuration_providers) {
-  // Allowed prefixes from different providers are inserted in a set, therefore,
-  // it could potential affect other features.
-  for (const auto& provider : configuration_providers) {
-    const auto prefixes = provider->MaybeProvideAllowedEventPrefixes(feature);
-    for (auto it = prefixes.begin(); it != prefixes.end(); ++it) {
-      // Do not insert empty prefix.
-      if (it->empty()) {
-        continue;
-      }
-
-      // Check if there are duplicate prefixes.
-      const auto inserted = event_prefixes_.insert(*it);
-      CHECK(inserted.second)
-          << "Configuration has duplicate event prefixes: " << *it;
-    }
-  }
-}
-#endif
 
 void ChromeVariationsConfiguration::ExpandGroupNamesInFeatures(
     const GroupVector& all_groups) {

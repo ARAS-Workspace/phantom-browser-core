@@ -185,12 +185,10 @@ TEST_F(ChromePoliciesValueProviderTest, GetNames) {
   VerifyProviderNames(names, kChromePoliciesId, kChromePoliciesName,
                       {key::kShowHomeButton});
 
-#if !BUILDFLAG(IS_CHROMEOS)
   VerifyProviderNames(
       names, kPrecedencePoliciesId, kPrecedencePoliciesName,
       std::vector<std::string>(std::begin(metapolicy::kPrecedence),
                                std::end(metapolicy::kPrecedence)));
-#endif
 }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -287,7 +285,7 @@ TEST_F(ExtensionInstallPoliciesValueProviderTest,
             l10n_util::GetStringUTF16(
                 IDS_POLICY_EXTENSION_INSTALL_IGNORED_BY_INSTALLATION_MODE));
 }
-#endif  // BUIDLFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 class ExtensionPoliciesValueProviderTest : public PolicyValueProviderTestBase {

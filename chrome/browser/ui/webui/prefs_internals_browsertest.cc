@@ -21,7 +21,7 @@
 
 using PrefsInternalsTest = InProcessBrowserTest;
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && !defined(NDEBUG)
+#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 // TODO(crbug.com//527272461): Re-enable this test.
 #define MAYBE_TestPrefsAreServed DISABLED_TestPrefsAreServed
 #else

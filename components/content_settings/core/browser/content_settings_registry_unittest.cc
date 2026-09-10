@@ -58,7 +58,7 @@ TEST_F(ContentSettingsRegistryTest, GetPlatformDependent) {
 #endif
 
 // Protected media identifier only registered on Android and Chrome OS.
-#if defined(ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if defined(ANDROID)
   EXPECT_TRUE(registry()->Get(ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER));
 #else
   EXPECT_FALSE(
@@ -175,11 +175,6 @@ TEST_F(ContentSettingsRegistryTest, IsDefaultSettingValid) {
 
   info = registry()->Get(ContentSettingsType::MEDIASTREAM_CAMERA);
   EXPECT_FALSE(info->IsDefaultSettingValid(CONTENT_SETTING_ALLOW));
-
-#if BUILDFLAG(IS_CHROMEOS)
-  info = registry()->Get(ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER);
-  EXPECT_TRUE(info->IsDefaultSettingValid(CONTENT_SETTING_ALLOW));
-#endif
 
 #if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
   info = registry()->Get(ContentSettingsType::FILE_SYSTEM_WRITE_GUARD);

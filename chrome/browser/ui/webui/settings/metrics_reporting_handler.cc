@@ -5,7 +5,7 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
@@ -89,4 +89,4 @@ void MetricsReportingHandler::SendMetricsReportingChange() {
 
 }  // namespace settings
 
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)

@@ -143,9 +143,6 @@ void FixAccountConsistencyRequestHeader(
     const GaiaId& primary_account_gaia_id,
     ConsentLevel primary_account_consent_level,
     signin::Tribool is_child_account,
-#if BUILDFLAG(IS_CHROMEOS)
-    bool is_secondary_account_addition_allowed,
-#endif
     bool is_sync_feature_enabled,
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
     const std::string& signin_scoped_device_id,

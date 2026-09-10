@@ -2652,19 +2652,11 @@ class SingleClientBookmarksThrottlingSyncTest
                   base::BindOnce([](syncer::SyncUserSettings* user_settings) {
                     user_settings->SetSelectedTypes(
                         false, {syncer::UserSelectableType::kBookmarks});
-#if BUILDFLAG(IS_CHROMEOS)
-                    user_settings->SetSelectedOsTypes(false, {});
-#else   // BUILDFLAG(IS_CHROMEOS)
                     user_settings->SetInitialSyncFeatureSetupComplete();
-#endif  // BUILDFLAG(IS_CHROMEOS)
                   })));
     } else {
       ASSERT_TRUE(GetClient(kSingleProfileIndex)->SignInNoWaitForCompletion());
       ASSERT_TRUE(GetClient(kSingleProfileIndex)->DisableAllSelectableTypes());
-#if BUILDFLAG(IS_CHROMEOS)
-      ASSERT_TRUE(
-          GetClient(kSingleProfileIndex)->DisableAllSelectableOsTypes());
-#endif  // BUILDFLAG(IS_CHROMEOS)
       ASSERT_TRUE(
           GetClient(kSingleProfileIndex)
               ->EnableSelectableType(syncer::UserSelectableType::kBookmarks));
@@ -2902,7 +2894,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientBookmarksThrottlingSyncTest,
 
 // On ChromeOS, Sync-the-feature gets started automatically once a primary
 // account is signed in and the transport mode is not a thing.
-#if !BUILDFLAG(IS_CHROMEOS)
 class SingleClientBookmarksWithAccountStorageSyncTest : public SyncTest {
  public:
   SingleClientBookmarksWithAccountStorageSyncTest() : SyncTest(SINGLE_CLIENT) {}
@@ -4064,7 +4055,5 @@ IN_PROC_BROWSER_TEST_F(SingleClientBookmarksExplicitSigninTransitionTest,
       syncer::UserSelectableType::kBookmarks));
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

@@ -445,14 +445,6 @@ void BrowserTabStripModelDelegate::CloseTab(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Tabs cannot be closed when the app is in locked fullscreen, which is
-  // available only on ChromeOS.
-  if (platform_util::IsBrowserLockedFullscreen(browser_)) {
-    return;
-  }
-#endif
-
   if (base::FeatureList::IsEnabled(
           contextual_tasks::kContextualTasksCloseTabExpandsSidePanel)) {
     ContextualTasksCloseButtonController* const close_button_controller =

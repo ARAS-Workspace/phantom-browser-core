@@ -21,10 +21,6 @@
 #include "ui/gl/gl_angle_util_vulkan.h"
 #include "ui/gl/gl_switches.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <sys/sysmacros.h>
-#endif
-
 namespace gpu {
 
 namespace {
@@ -470,22 +466,6 @@ bool VulkanInstance::CollectDeviceInfo(VkPhysicalDevice physical_device) {
           .pNext = &info.driver_properties,
       };
       vkGetPhysicalDeviceProperties2(device, &properties2);
-
-#if BUILDFLAG(IS_CHROMEOS)
-      if (has_drm_extension &&
-          (drm_properties.hasRender || drm_properties.hasPrimary)) {
-        static_assert(sizeof(dev_t) <= sizeof(info.drm_device_id),
-                      "unexpected dev_t size");
-        if (drm_properties.hasRender) {
-          info.drm_device_id =
-              makedev(drm_properties.renderMajor, drm_properties.renderMinor);
-        } else {
-          info.drm_device_id =
-              makedev(drm_properties.primaryMajor, drm_properties.primaryMinor);
-        }
-        DCHECK(info.drm_device_id);
-      }
-#endif
 
       VkPhysicalDeviceSamplerYcbcrConversionFeatures ycbcr_conversion_features =
           {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES};

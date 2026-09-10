@@ -468,9 +468,6 @@ class LocalNetworkAccessWebSocketsPolicyBrowserTest
  protected:
   void UpdateProviderPolicy(const policy::PolicyMap& policy) {
     policy::PolicyMap policy_with_defaults = policy.Clone();
-#if BUILDFLAG(IS_CHROMEOS)
-    policy::SetEnterpriseUsersDefaults(&policy_with_defaults);
-#endif
     provider_.UpdateChromePolicy(policy_with_defaults);
   }
 

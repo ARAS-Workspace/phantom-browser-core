@@ -60,16 +60,6 @@
 #include "content/public/common/content_features.h"
 #include "content/public/common/content_switches.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/allocator/buildflags.h"
-#include "chrome/browser/performance_manager/policies/oom_score_policy_chromeos.h"
-#include "chrome/browser/performance_manager/policies/report_page_processes_policy.h"
-#include "chromeos/dbus/power/power_manager_client.h"
-#include "components/performance_manager/power/battery_level_provider_chromeos.h"
-#include "components/performance_manager/power/dbus_power_manager_sampling_event_source.h"
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/performance_manager/extension_watcher.h"
 #endif
@@ -167,15 +157,6 @@ void ChromeBrowserMainExtraPartsPerformanceManager::CreatePoliciesAndDecorators(
     graph->PassToGraph(performance_manager::policies::WorkingSetTrimmerPolicy::
                            CreatePolicyForPlatform());
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-  graph->PassToGraph(std::make_unique<
-                     performance_manager::policies::OomScorePolicyChromeOS>());
-  graph->PassToGraph(
-      std::make_unique<
-          performance_manager::policies::ReportPageProcessesPolicy>());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   using performance_manager::policies::DiscardEligibilityPolicy;
   auto discard_eligibility_policy =
@@ -394,15 +375,7 @@ void ChromeBrowserMainExtraPartsPerformanceManager::PostCreateThreads() {
     // TODO(crbug.com/40871810): All of the battery level machinery should be in
     // the same location, and the ifdefs should be contained to the
     // `BatteryLevelProvider` and SamplingEventSource` instantiation functions.
-#if BUILDFLAG(IS_CHROMEOS)
-    battery_state_sampler_ = std::make_unique<base::BatteryStateSampler>(
-        std::make_unique<
-            performance_manager::power::DbusPowerManagerSamplingEventSource>(
-            chromeos::PowerManagerClient::Get()),
-        std::make_unique<
-            performance_manager::power::BatteryLevelProviderChromeOS>(
-            chromeos::PowerManagerClient::Get()));
-#elif BUILDFLAG(HAS_BATTERY_LEVEL_PROVIDER_IMPL)
+#if BUILDFLAG(HAS_BATTERY_LEVEL_PROVIDER_IMPL)
     battery_state_sampler_ = std::make_unique<base::BatteryStateSampler>();
 #endif
   }

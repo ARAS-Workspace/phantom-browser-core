@@ -279,15 +279,6 @@ TabViewHorizontalLayout::CalculateChildVisibilities(int width) const {
         (TabView().close_button_ && TabView().close_button_->HasFocus()));
 
   bool should_show_close_button = true;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Hide tab close button for OnTask if locked. Only applicable for non-web
-  // browser scenarios.
-  const TabCollectionNode* collection_node = TabView().collection_node();
-  if (collection_node && collection_node->GetController()) {
-    should_show_close_button =
-        !collection_node->GetController()->IsLockedForOnTask();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (TabView().active_) {
     if (!declutter_eligible) {

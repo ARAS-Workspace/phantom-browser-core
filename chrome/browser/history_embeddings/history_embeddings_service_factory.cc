@@ -29,18 +29,9 @@
 #include "components/keyed_service/core/service_access_type.h"
 #include "components/passage_embeddings/core/passage_embeddings_service_controller.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#endif
-
 namespace {
 
 bool IsEphemeralProfile(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::ProfileHelper::IsEphemeralUserProfile(profile)) {
-    return true;
-  }
-#endif
 
   // Catch additional logic that may not be caught by the existing Ash check.
   ProfileAttributesStorage& storage =

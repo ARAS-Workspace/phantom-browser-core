@@ -52,10 +52,6 @@ bool ViewsTextServicesContextMenuBase::GetAcceleratorForCommandId(
     *accelerator = ui::Accelerator(ui::VKEY_SPACE,
                                    ui::EF_COMMAND_DOWN | ui::EF_CONTROL_DOWN);
     return true;
-#elif BUILDFLAG(IS_CHROMEOS)
-    *accelerator = ui::Accelerator(ui::VKEY_SPACE,
-                                   ui::EF_SHIFT_DOWN | ui::EF_COMMAND_DOWN);
-    return true;
 #else
     return false;
 #endif
@@ -86,13 +82,13 @@ bool ViewsTextServicesContextMenuBase::SupportsCommand(int command_id) const {
   return command_id == IDS_CONTENT_CONTEXT_EMOJI;
 }
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC)
 // static
 std::unique_ptr<ViewsTextServicesContextMenu>
 ViewsTextServicesContextMenu::Create(ui::SimpleMenuModel* menu,
                                      Textfield* client) {
   return std::make_unique<ViewsTextServicesContextMenuBase>(menu, client);
 }
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_MAC)
 
 }  // namespace views

@@ -47,9 +47,6 @@
 #include "chrome/browser/ui/views/frame/browser_widget.h"
 #endif  // defined(TOOLKIT_VIEWS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/policy/dlp/dlp_content_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/media/webrtc/system_media_capture_permissions_mac.h"
@@ -789,38 +786,9 @@ void DisplayMediaAccessHandler::OnDisplaySurfaceSelected(
   }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Check Data Leak Prevention restrictions on Chrome.
-  // base::Unretained(this) is safe because DisplayMediaAccessHandler is owned
-  // by MediaCaptureDevicesDispatcher, which is a lazy singleton which is
-  // destroyed when the browser process terminates.
-  policy::DlpContentManager::Get()->CheckScreenShareRestriction(
-      media_id, GetApplicationTitle(web_contents.get()),
-      base::BindOnce(&DisplayMediaAccessHandler::OnDlpRestrictionChecked,
-                     base::Unretained(this), web_contents, media_id));
-#else   // BUILDFLAG(IS_CHROMEOS)
-  AcceptRequest(web_contents.get(), media_id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-}
-
-#if BUILDFLAG(IS_CHROMEOS)
-void DisplayMediaAccessHandler::OnDlpRestrictionChecked(
-    base::WeakPtr<WebContents> web_contents,
-    const DesktopMediaID& media_id,
-    bool is_dlp_allowed) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  if (!web_contents) {
-    return;
-  }
-
-  if (!is_dlp_allowed) {
-    RejectRequest(web_contents.get(),
-                  MediaStreamRequestResult::DLP_PERMISSION_DENIED);
-  }
   AcceptRequest(web_contents.get(), media_id);
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
+
 
 void DisplayMediaAccessHandler::DeletePendingAccessRequest(
     int render_process_id,

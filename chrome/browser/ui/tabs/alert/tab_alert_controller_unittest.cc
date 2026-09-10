@@ -255,12 +255,6 @@ TEST_F(TabAlertControllerTest, MutedStateReliesOnRecentlyAudible) {
 }
 
 TEST_F(TabAlertControllerTest, MediaStatesUpdate) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Need to mock the system settings to allow audio and video capture on
-  // ChromeOS.
-  base::AutoReset<bool> mock_system_settings =
-      system_permission_settings::MockShowSystemSettingsForTesting();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   scoped_refptr<MediaStreamCaptureIndicator> indicator =
       MediaCaptureDevicesDispatcher::GetInstance()
           ->GetMediaStreamCaptureIndicator();

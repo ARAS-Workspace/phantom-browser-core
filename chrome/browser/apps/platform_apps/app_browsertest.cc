@@ -73,13 +73,6 @@
 #include "ui/base/window_open_disposition.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/chrome_app_deprecation/chrome_app_deprecation.h"
-#include "chrome/browser/ash/test/kiosk_app_logged_in_browser_test_mixin.h"
-#include "chromeos/dbus/power/fake_power_manager_client.h"
-#include "components/user_manager/user_manager.h"
-#endif
-
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/browser/printing/test_print_preview_observer.h"
 #include "chrome/browser/ui/webui/print_preview/print_preview_ui.h"
@@ -158,7 +151,6 @@ class TabsAddedObserver : public TabStripModelObserver {
   std::vector<raw_ptr<content::WebContents, VectorExperimental>> observed_tabs_;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 bool CopyTestDataAndGetTestFilePath(const base::FilePath& test_data_file,
                                     const base::FilePath& temp_dir,
                                     const char* filename,
@@ -171,7 +163,6 @@ bool CopyTestDataAndGetTestFilePath(const base::FilePath& test_data_file,
   *file_path = path;
   return true;
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class PlatformAppWithFileBrowserTest : public PlatformAppBrowserTest {
  public:
@@ -266,9 +257,7 @@ class PlatformAppWithFileBrowserTest : public PlatformAppBrowserTest {
 };
 
 const char kChromiumURL[] = "https://chromium.org";
-#if !BUILDFLAG(IS_CHROMEOS)
 const char kTestFilePath[] = "platform_apps/launch_files/test.txt";
-#endif
 
 }  // namespace
 
@@ -342,10 +331,6 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, AppWithContextMenu) {
 IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, InstalledAppWithContextMenu) {
   const Extension* extension = InstallPlatformApp("context_menu");
   ASSERT_TRUE(extension);
-#if BUILDFLAG(IS_CHROMEOS)
-  apps::chrome_app_deprecation::ScopedAddAppToAllowlistForTesting allowlist(
-      extension->id());
-#endif
 
   ExtensionTestMessageListener launched_listener("Launched");
   {
@@ -495,7 +480,7 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest,
 
 // Failing on some Linux buildbots.  See crbug.com/41095977.
 // TODO(crbug.com/40846460): Fix flakiness on macOS and re-enable this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_Iframes DISABLED_Iframes
 #else
 #define MAYBE_Iframes Iframes
@@ -601,7 +586,6 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, MAYBE_ExtensionWindowingApis) {
 
 // ChromeOS does not support passing arguments on the command line, so the tests
 // that rely on this functionality are disabled.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Tests that launch data is sent through if the file extension matches.
 IN_PROC_BROWSER_TEST_F(PlatformAppWithFileBrowserTest,
                        LaunchFilesWithFileExtension) {
@@ -809,8 +793,6 @@ IN_PROC_BROWSER_TEST_F(PlatformAppWithFileBrowserTest, LaunchNewFile) {
       << message_;
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
 IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, OpenLink) {
   ASSERT_TRUE(StartEmbeddedTestServer());
   ui_test_utils::TabAddedWaiter tab_added_waiter(browser());
@@ -922,11 +904,6 @@ void MAYBE_PlatformAppDevToolsBrowserTest::RunTestWithDevTools(const char* name,
     // Close the AppWindow, and ensure it is gone.
     CloseAppWindow(window);
     ASSERT_FALSE(GetFirstAppWindow());
-
-#if BUILDFLAG(IS_CHROMEOS)
-    apps::chrome_app_deprecation::ScopedAddAppToAllowlistForTesting allowlist(
-        extension->id());
-#endif
 
     // Relaunch the app and get a new AppWindow.
     content::CreateAndLoadWebContentsObserver app_loaded_observer(
@@ -1267,122 +1244,6 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest,
 
 #endif  // ENABLE_PRINT_PREVIEW
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-class PlatformAppIncognitoBrowserTest : public PlatformAppBrowserTest,
-                                        public AppWindowRegistry::Observer {
- public:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // Tell chromeos to launch in Guest mode, aka incognito.
-    command_line->AppendSwitch(switches::kIncognito);
-    PlatformAppBrowserTest::SetUpCommandLine(command_line);
-  }
-  void SetUp() override {
-    // Make sure the file manager actually gets loaded.
-    ComponentLoader::EnableBackgroundExtensionsForTesting();
-    PlatformAppBrowserTest::SetUp();
-  }
-
-  // AppWindowRegistry::Observer implementation.
-  void OnAppWindowAdded(AppWindow* app_window) override {
-    opener_app_ids_.insert(app_window->extension_id());
-  }
-
- protected:
-  // A set of ids of apps we've seen open a app window.
-  std::set<std::string> opener_app_ids_;
-};
-
-// Seen to fail repeatedly; crbug.com/41349411.
-IN_PROC_BROWSER_TEST_F(PlatformAppIncognitoBrowserTest,
-                       DISABLED_IncognitoComponentApp) {
-  // Get the file manager app.
-  const Extension* file_manager =
-      extension_registry()->enabled_extensions().GetByID(
-          extension_misc::kFilesManagerAppId);
-  ASSERT_TRUE(file_manager != nullptr);
-  Profile* incognito_profile =
-      profile()->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-  ASSERT_TRUE(incognito_profile != nullptr);
-
-  // Wait until the file manager has had a chance to register its listener
-  // for the launch event.
-  EventRouter* router = EventRouter::Get(incognito_profile);
-  ASSERT_TRUE(router != nullptr);
-  while (!router->ExtensionHasEventListener(
-      file_manager->id(), app_runtime::OnLaunched::kEventName)) {
-    content::RunAllPendingInMessageLoop();
-  }
-
-  // Listen for new app windows so we see the file manager app launch itself.
-  AppWindowRegistry* registry = AppWindowRegistry::Get(incognito_profile);
-  ASSERT_TRUE(registry != nullptr);
-  registry->AddObserver(this);
-  apps::AppServiceProxyFactory::GetForProfile(incognito_profile)
-      ->Launch(file_manager->id(),
-               apps::GetEventFlags(WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                                   true /* prefer_container */),
-               apps::LaunchSource::kFromTest);
-
-  while (!opener_app_ids_.contains(file_manager->id())) {
-    content::RunAllPendingInMessageLoop();
-  }
-}
-
-class RestartKioskDeviceTest : public PlatformAppBrowserTest {
- public:
-  RestartKioskDeviceTest() { set_chromeos_user_ = false; }
-
-  void SetUpLocalStatePrefService(PrefService* local_state) override {
-    PlatformAppBrowserTest::SetUpLocalStatePrefService(local_state);
-
-    // Until EnterKioskSession is called, the setup and the test run in a
-    // regular user session. Marking another user as the owner prevents the
-    // current user from taking ownership and overriding the kiosk mode.
-    user_manager::TestHelper::RegisterOwner(*local_state,
-                                            "not_current_user@example.com");
-  }
-
-  void SetUpOnMainThread() override {
-    PlatformAppBrowserTest::SetUpOnMainThread();
-    // Disable "faked" shutdown of Chrome if the OS was supposed to restart.
-    // The fakes this test injects would cause it to crash.
-    chromeos::FakePowerManagerClient* fake_power_manager_client =
-        chromeos::FakePowerManagerClient::Get();
-    ASSERT_NE(nullptr, fake_power_manager_client);
-    fake_power_manager_client->set_restart_callback(base::DoNothing());
-  }
-
- protected:
-  static int num_request_restart_calls() {
-    return chromeos::FakePowerManagerClient::Get()->num_request_restart_calls();
-  }
-
- private:
-  ash::KioskAppLoggedInBrowserTestMixin login_mixin_{&mixin_host_,
-                                                     "kiosk-app-account"};
-};
-
-// Tests that chrome.runtime.restart would request device restart in
-// ChromeOS kiosk mode.
-IN_PROC_BROWSER_TEST_F(RestartKioskDeviceTest, Restart) {
-  ASSERT_EQ(0, num_request_restart_calls());
-
-  ExtensionTestMessageListener launched_listener("Launched",
-                                                 ReplyBehavior::kWillReply);
-  const Extension* extension =
-      LoadAndLaunchPlatformApp("restart_device", &launched_listener);
-  ASSERT_TRUE(extension);
-
-  launched_listener.Reply("restart");
-  ExtensionTestMessageListener restart_requested_listener("restartRequested");
-  ASSERT_TRUE(restart_requested_listener.WaitUntilSatisfied());
-
-  EXPECT_EQ(1, num_request_restart_calls());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Test that when an application is uninstalled and re-install it does not have
 // access to the previously set data.
 IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, ReinstallDataCleanup) {
@@ -1427,10 +1288,6 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, AppsIgnoreDefaultZoom) {
   // that would have been delivered to the app renderer and back for zoom have
   // made it through.
   ExtensionTestMessageListener launched_listener("Launched");
-#if BUILDFLAG(IS_CHROMEOS)
-  apps::chrome_app_deprecation::ScopedAddAppToAllowlistForTesting allowlist(
-      extension->id());
-#endif
   LaunchPlatformApp(extension);
   EXPECT_TRUE(launched_listener.WaitUntilSatisfied());
 

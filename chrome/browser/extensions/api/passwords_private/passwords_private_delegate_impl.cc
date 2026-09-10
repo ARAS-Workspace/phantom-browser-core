@@ -80,9 +80,6 @@
 #include "url/gurl.h"
 #include "url/scheme_host_port.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/extensions/api/passwords_private/passwords_private_utils_chromeos.h"
-#endif
 
 namespace {
 
@@ -132,17 +129,6 @@ std::u16string GetReauthPurpose(
     case extensions::api::passwords_private::PlaintextReason::kEdit:
       return l10n_util::GetStringUTF16(
           IDS_PASSWORDS_PAGE_EDIT_AUTHENTICATION_PROMPT_BIOMETRIC_SUFFIX);
-    case extensions::api::passwords_private::PlaintextReason::kNone:
-      NOTREACHED();
-  }
-#elif BUILDFLAG(IS_CHROMEOS)
-  switch (reason) {
-    case extensions::api::passwords_private::PlaintextReason::kView:
-      return l10n_util::GetStringUTF16(
-          IDS_PASSWORDS_PAGE_AUTHENTICATION_PROMPT_CHROMEOS);
-    case extensions::api::passwords_private::PlaintextReason::kCopy:
-    case extensions::api::passwords_private::PlaintextReason::kEdit:
-      return std::u16string();
     case extensions::api::passwords_private::PlaintextReason::kNone:
       NOTREACHED();
   }
@@ -216,7 +202,7 @@ extensions::api::passwords_private::ImportResults ConvertImportResults(
   return private_results;
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 
 using password_manager::prefs::kBiometricAuthenticationBeforeFilling;
 
@@ -242,12 +228,6 @@ std::u16string GetMessageForBiometricAuthenticationBeforeFillingSetting(
   message = l10n_util::GetStringUTF16(
       pref_enabled ? IDS_PASSWORD_MANAGER_TURN_OFF_FILLING_REAUTH_MAC
                    : IDS_PASSWORD_MANAGER_TURN_ON_FILLING_REAUTH_MAC);
-#elif BUILDFLAG(IS_CHROMEOS)
-  const bool pref_enabled =
-      prefs->GetBoolean(kBiometricAuthenticationBeforeFilling);
-  message = l10n_util::GetStringUTF16(
-      pref_enabled ? IDS_PASSWORD_MANAGER_TURN_OFF_FILLING_REAUTH_CHROMEOS
-                   : IDS_PASSWORD_MANAGER_TURN_ON_FILLING_REAUTH_CHROMEOS);
 #endif
   return message;
 }
@@ -346,9 +326,7 @@ PasswordsPrivateDelegateImpl::PasswordsPrivateDelegateImpl(
     sync_service_observation_.Observe(sync_service_);
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   install_manager_observation_.Observe(web_app_install_manager);
-#endif
 }
 
 PasswordsPrivateDelegateImpl::~PasswordsPrivateDelegateImpl() {
@@ -360,7 +338,7 @@ PasswordsPrivateDelegateImpl::~PasswordsPrivateDelegateImpl() {
   device_authenticator_.reset();
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 std::unique_ptr<device_reauth::DeviceAuthenticator>
 PasswordsPrivateDelegateImpl::GetDeviceAuthenticator(
     base::TimeDelta auth_validity_period) {
@@ -852,7 +830,7 @@ PasswordsPrivateDelegateImpl::GetPasswordCheckStatus() {
 
 void PasswordsPrivateDelegateImpl::SwitchBiometricAuthBeforeFillingState(
     AuthenticationCallback authentication_callback) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   AuthResultCallback callback =
       base::BindOnce(&ChangeBiometricAuthenticationBeforeFillingSetting, prefs_,
                      std::move(authentication_callback));
@@ -1255,7 +1233,7 @@ void PasswordsPrivateDelegateImpl::AuthenticateUser(
   auto callback = password_manager::metrics_util::TimeCallbackMediumTimes(
       std::move(auth_callback), "PasswordManager.Settings.AuthenticationTime2");
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC)
   std::move(callback).Run(true);
 #else
 

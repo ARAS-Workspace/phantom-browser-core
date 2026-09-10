@@ -206,7 +206,7 @@ inline constexpr char kProfileStoreDateLastUsedForFilling[] =
 inline constexpr char kAccountStoreDateLastUsedForFilling[] =
     "password_manager.account_store_date_last_used_for_filling";
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 // Integer indicating how many times user saw biometric authentication before
 // filling promo.
 inline constexpr char kBiometricAuthBeforeFillingPromoShownCounter[] =
@@ -221,12 +221,12 @@ inline constexpr char kHadBiometricsAvailable[] =
     "password_manager.had_biometrics_available";
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Boolean indicating whether user enabled biometric authentication before
 // filling.
 inline constexpr char kBiometricAuthenticationBeforeFilling[] =
     "password_manager.biometric_authentication_filling";
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)  // Desktop
 // A list of available promo cards with related information which are displayed
@@ -272,16 +272,11 @@ inline constexpr char kProfileStoreBackupPasswordCleaningLastTimestamp[] =
 inline constexpr char kLastNegativePasswordChangeTimestamp[] =
     "password_manager.last_negative_password_change_timestamp";
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // List of urls for which password manager is disabled/blocked.
 inline constexpr char kPasswordManagerBlocklist[] =
     "password_manager.password_manager_blocklist";
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_CHROMEOS)
-inline constexpr char kPinAuthenticationAvailableOnChromeOS[] =
-    "password_manager.pin_authentication_available_on_chrome_os";
-#endif
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 }  // namespace password_manager::prefs
 

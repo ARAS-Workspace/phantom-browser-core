@@ -76,17 +76,12 @@ class ReportClientTest : public ::testing::TestWithParam<bool> {
     }
 
     // Provide client test environment with local storage.
-#if BUILDFLAG(IS_CHROMEOS)
-    test_reporting_ =
-        ReportingClient::TestEnvironment::CreateWithStorageModule();
-#else
     ASSERT_TRUE(location_.CreateUniqueTempDir());
     test_reporting_ = ReportingClient::TestEnvironment::CreateWithLocalStorage(
         location_.GetPath(),
         std::string_view(
             reinterpret_cast<const char*>(signature_verification_public_key_),
             kKeySize));
-#endif
 
     // Use MockDMTokenRetriever and configure it to always return the test DM
     // token by default
@@ -346,7 +341,6 @@ TEST_P(ReportClientTest, CreatesTwoDifferentReportQueues) {
 // Remaining tests are only available with local storage option that does not
 // exist on ChromeOS configuration.
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Creates queue, enqueues message and verifies it is uploaded.
 TEST_P(ReportClientTest, EnqueueMessageAndUpload) {
   // Create queue.
@@ -410,7 +404,6 @@ TEST_P(ReportClientTest, SpeculativelyEnqueueMessageAndUpload) {
   VerifyDataUpload(std::move(request_body));
   test_env_.SimulateResponseForRequest(0);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 INSTANTIATE_TEST_SUITE_P(ReportClientTestSuite,
                          ReportClientTest,

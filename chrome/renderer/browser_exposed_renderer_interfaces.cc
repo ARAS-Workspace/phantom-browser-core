@@ -21,10 +21,6 @@
 #include "components/spellcheck/renderer/spellcheck.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/allocator/buildflags.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 void BindWebRTCLoggingAgent(

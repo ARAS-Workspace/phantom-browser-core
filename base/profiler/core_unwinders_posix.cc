@@ -14,16 +14,7 @@
 namespace base {
 
 StackSamplingProfiler::UnwindersFactory CreateCoreUnwindersFactory() {
-#if BUILDFLAG(IS_CHROMEOS) && \
-    (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
-  return BindOnce([] {
-    std::vector<std::unique_ptr<Unwinder>> unwinders;
-    unwinders.push_back(std::make_unique<FramePointerUnwinder>());
-    return unwinders;
-  });
-#else
   return StackSamplingProfiler::UnwindersFactory();
-#endif
 }
 
 }  // namespace base

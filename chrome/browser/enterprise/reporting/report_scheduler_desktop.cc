@@ -37,11 +37,7 @@ namespace {
 // TODO(crbug.com/40703888): Get rid of this function after Chrome OS reporting
 // logic has been split to its own delegates.
 constexpr bool ShouldReportUpdates() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return false;
-#else
   return true;
-#endif
 }
 
 PrefService* LocalState() {

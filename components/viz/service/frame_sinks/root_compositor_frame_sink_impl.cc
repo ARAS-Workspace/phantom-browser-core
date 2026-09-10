@@ -191,10 +191,6 @@ RootCompositorFrameSinkImpl::Create(
     external_begin_frame_source =
         std::make_unique<ExternalBeginFrameSourceIOS>(restart_id);
 #else
-#if BUILDFLAG(IS_CHROMEOS)
-    hw_support_for_multiple_refresh_rates =
-        features::IsCrosContentAdjustedRefreshRateEnabled();
-#endif
     if (params->disable_frame_rate_limit) {
       synthetic_begin_frame_source =
           std::make_unique<BackToBackBeginFrameSource>(
@@ -497,16 +493,9 @@ void RootCompositorFrameSinkImpl::SetSwapCompletionCallbackEnabled(
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 void RootCompositorFrameSinkImpl::SetSupportedRefreshRates(
     const std::vector<float>& supported_refresh_rates) {
-#if BUILDFLAG(IS_CHROMEOS)
-  CHECK_NE(use_preferred_interval_,
-           features::IsCrosContentAdjustedRefreshRateEnabled());
-  if (use_preferred_interval_) {
-    return;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   exact_supported_refresh_rates_.clear();
   for (float rate : supported_refresh_rates) {
@@ -521,7 +510,7 @@ void RootCompositorFrameSinkImpl::SetSupportedRefreshRates(
 
   UpdateFrameIntervalDeciderSettings();
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 void RootCompositorFrameSinkImpl::AddVSyncParameterObserver(
     mojo::PendingRemote<mojom::VSyncParameterObserver> observer) {
@@ -950,17 +939,7 @@ void RootCompositorFrameSinkImpl::SetWideColorEnabled(bool enabled) {
 
 void RootCompositorFrameSinkImpl::SetPreferredFrameInterval(
     base::TimeDelta interval) {
-#if BUILDFLAG(IS_CHROMEOS)
-  CHECK_NE(use_preferred_interval_,
-           features::IsCrosContentAdjustedRefreshRateEnabled());
-  if (use_preferred_interval_) {
-    preferred_frame_interval_ = interval;
-    UpdateVSyncParameters();
-    return;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS))
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   if (display_client_) {
     float refresh_rate;
     if (interval.is_zero()) {
@@ -981,7 +960,7 @@ void RootCompositorFrameSinkImpl::SetPreferredFrameInterval(
 #else
   preferred_frame_interval_ = interval;
   UpdateVSyncParameters();
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void RootCompositorFrameSinkImpl::DisplayDidDrawAndSwap() {}
@@ -1005,11 +984,6 @@ void RootCompositorFrameSinkImpl::SetMaxVSyncAndVrr(
             : std::nullopt);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!use_preferred_interval_) {
-    interval_decider_use_fixed_intervals_ = !max_vsync_interval.has_value();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   UpdateFrameIntervalDeciderSettings();
 }
 

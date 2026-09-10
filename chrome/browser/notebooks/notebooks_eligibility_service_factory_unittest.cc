@@ -78,7 +78,7 @@ TEST_F(NotebooksEligibilityServiceFactoryTest,
   EXPECT_FALSE(service->IsEligible());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(NotebooksEligibilityServiceFactoryTest, ReturnsNullForSystemProfile) {
   InitFeature(/*enable_feature=*/true);
   TestingProfile* profile = profile_manager()->CreateSystemProfile();

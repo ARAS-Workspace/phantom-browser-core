@@ -38,13 +38,6 @@
 #include "ui/gfx/font_util.h"
 #include "ui/gl/test/gl_surface_test_support.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_paths.h"
-#include "chrome/browser/ash/arc/arc_util.h"
-#include "chromeos/dbus/constants/dbus_paths.h"
-#include "crypto/nss_util_internal.h"
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "base/auto_reset.h"
 #include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
@@ -109,10 +102,6 @@ class ChromeUnitTestSuiteInitializer : public testing::EmptyTestEventListener {
           << "Use content::ScopedAccessibilityModeOverride or otherwise ensure "
              "that accessibility is disabled at the end of your test.";
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    arc::ClearArcAllowedCheckForTesting();
-    crypto::ResetTokenManagerForTesting();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if !BUILDFLAG(IS_ANDROID)
     web_app::SetTrustedWebBundleIdsForTesting({});
 #endif  // !BUILDFLAG(IS_ANDROID)
@@ -179,14 +168,6 @@ void ChromeUnitTestSuite::InitializeProviders() {
   ui::RegisterPathProvider();
   component_updater::RegisterPathProvider(chrome::DIR_COMPONENTS,
                                           chrome::DIR_USER_DATA);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::RegisterPathProvider();
-  CHECK(base::PathService::OverrideWithoutCheckForTesting(
-      ash::DIR_USER_DATA,
-      base::PathService::CheckedGet(chrome::DIR_USER_DATA)));
-  chromeos::dbus_paths::RegisterPathProvider();
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   extensions::RegisterPathProvider();

@@ -16,13 +16,11 @@
 #include "content/public/test/browser_test.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_test_util.h"
 #include "chrome/test/base/testing_browser_process.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 using testing::_;
 
@@ -81,13 +79,11 @@ class FilterVerifier : public BrowserCollectionObserver {
 
 class BrowserManagerServiceTest : public InProcessBrowserTest {
  protected:
-#if !BUILDFLAG(IS_CHROMEOS)
   Profile& CreateSecondaryProfile() {
     ProfileManager* profile_manager = g_browser_process->profile_manager();
     return profiles::testing::CreateProfileSync(
         profile_manager, profile_manager->GenerateNextProfileDirectoryPath());
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // TODO(crbug.com/356183782): Consider rewriting this test as an interactive
   // ui test and using ui_test_utils::BringBrowserWindowToFront() instead.
@@ -177,7 +173,6 @@ IN_PROC_BROWSER_TEST_F(BrowserManagerServiceTest,
   EXPECT_TRUE(verifier.called());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(BrowserManagerServiceTest,
                        TestObservationWithMultipleProfiles) {
   // Observe primary profile.
@@ -276,4 +271,3 @@ IN_PROC_BROWSER_TEST_F(BrowserManagerServiceTest,
   });
   EXPECT_EQ(count, initial_size);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

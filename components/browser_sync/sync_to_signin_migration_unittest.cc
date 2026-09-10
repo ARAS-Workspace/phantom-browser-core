@@ -125,9 +125,7 @@ class SyncToSigninMigrationTestBase {
     sync_prefs_->SetSelectedTypesForSyncingUser(
         settings->IsSyncEverythingEnabled(),
         settings->GetRegisteredSelectableTypes(), settings->GetSelectedTypes());
-#if !BUILDFLAG(IS_CHROMEOS)
     sync_prefs_->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
     if (include_status_recorder) {
       // Populate migration-specific Sync status prefs.
@@ -202,9 +200,7 @@ TEST_P(SyncToSigninMigrationTest, SyncActive) {
             gaia_id.ToString());
   // But not syncing anymore.
   EXPECT_FALSE(pref_service_.GetBoolean(prefs::kGoogleServicesConsentedToSync));
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_FALSE(sync_prefs_->IsInitialSyncFeatureSetupComplete());
-#endif
   // The fact that the user was migrated should be recorded in prefs.
   EXPECT_EQ(pref_service_.GetString(
                 prefs::kGoogleServicesSyncingGaiaIdMigratedToSignedIn),
@@ -2104,9 +2100,7 @@ TEST_P(SyncToSigninMigrationUndoTest, UndoesMigration) {
       pref_service_.GetString(prefs::kGoogleServicesLastSyncingGaiaId).empty());
   ASSERT_TRUE(pref_service_.GetString(prefs::kGoogleServicesLastSyncingUsername)
                   .empty());
-#if !BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(sync_prefs_->IsInitialSyncFeatureSetupComplete());
-#endif
   // Marked as "migrated":
   ASSERT_EQ(pref_service_.GetString(
                 prefs::kGoogleServicesSyncingGaiaIdMigratedToSignedIn),
@@ -2240,7 +2234,6 @@ INSTANTIATE_TEST_SUITE_P(
       });
     });
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class SyncSetupIncompleteMigrationTest : public SyncToSigninMigrationTestBase,
                                          public testing::Test {
  public:
@@ -2495,7 +2488,6 @@ TEST_F(SyncSetupIncompleteMigrationTest, ShouldNotMigrateIfFlagDisabled) {
         syncer::prefs::internal::kSyncInitialSyncFeatureSetupComplete));
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #endif  // !BUILDFLAG(IS_IOS)
 

@@ -178,7 +178,7 @@ class TestFontServiceApp : public font_data_service::mojom::FontDataService {
   size_t legacy_make_typeface_call_count_ = 0;
   bool fail_match_family_ = false;
   base::MappedReadOnlyRegion memory_map_region_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // On Linux/ChromeOS, only the shared memory fallback is supported.
   bool use_memory_fallback_ = true;
 #else

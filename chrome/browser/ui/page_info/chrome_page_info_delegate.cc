@@ -98,14 +98,6 @@
 #include "ui/events/event.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/browser/ash/floating_sso/floating_sso_service.h"
-#include "chrome/browser/ash/floating_sso/floating_sso_service_factory.h"
-#include "chrome/browser/smart_card/smart_card_permission_context.h"
-#include "chrome/browser/smart_card/smart_card_permission_context_factory.h"
-#endif
-
 namespace {
 
 // Expected URL types for `UrlIdentity::CreateFromUrl()`.
@@ -172,11 +164,6 @@ ChromePageInfoDelegate::GetChooserContext(ContentSettingsType type) {
       NOTREACHED();
 #endif
     case ContentSettingsType::SMART_CARD_DATA:
-#if BUILDFLAG(IS_CHROMEOS)
-      if (base::FeatureList::IsEnabled(blink::features::kSmartCard)) {
-        return &SmartCardPermissionContextFactory::GetForProfile(*GetProfile());
-      }
-#endif
       return nullptr;
     default:
       NOTREACHED();
@@ -610,18 +597,3 @@ void ChromePageInfoDelegate::SetSecurityStateForTests(
   security_level_for_tests_ = security_level;
   visible_security_state_for_tests_ = visible_security_state;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool ChromePageInfoDelegate::ShouldSyncCookiesForUrl(const GURL& url) {
-  if (!ash::features::IsFloatingSsoAllowed()) {
-    return false;
-  }
-  // Floating SSO is an internal name for the feature which can sync cookies for
-  // ChromeOS enterprise users.
-  auto* floating_sso_service =
-      ash::floating_sso::FloatingSsoServiceFactory::GetForProfile(GetProfile());
-  // Even when cookie sync is enabled, it isn't applied to every site.
-  return floating_sso_service && floating_sso_service->IsFloatingSsoEnabled() &&
-         floating_sso_service->ShouldSyncCookiesForUrl(url);
-}
-#endif

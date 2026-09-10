@@ -12,10 +12,6 @@
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/browser_context.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#error BrowserSwitcher is not supported on ChromeOS. Neither Ash nor LaCrOS.
-#endif
-
 namespace browser_switcher {
 
 namespace {

@@ -109,11 +109,6 @@
 #include "ui/views/widget/widget.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/components/webauthn/webauthn_request_registrar.h"
-#include "ui/aura/window.h"
-#endif
-
 using PasswordCredentials = PasswordCredentialFetcher::PasswordCredentials;
 using UIPresentation = ChromeAuthenticatorRequestDelegate::UIPresentation;
 using TransportAvailabilityInfo =

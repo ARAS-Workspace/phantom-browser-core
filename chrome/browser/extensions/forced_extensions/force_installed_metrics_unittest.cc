@@ -40,15 +40,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chromeos/ash/experiences/arc/arc_prefs.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/test_helper.h"
-#include "components/user_manager/user_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "components/policy/core/common/management/management_service.h"
@@ -125,13 +116,6 @@ constexpr char kFetchRetriesManifestFetchFailedStats[] =
     "Extensions.ForceInstalledManifestFetchFailedFetchTries";
 constexpr char kSandboxUnpackFailureReason[] =
     "Extensions.ForceInstalledFailureSandboxUnpackFailureReason2";
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kFailureSessionStats[] =
-    "Extensions.ForceInstalledFailureSessionType";
-constexpr char kStuckInCreateStageSessionType[] =
-    "Extensions.ForceInstalledFailureSessionType."
-    "ExtensionStuckInInitialCreationStage";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 constexpr char kPossibleNonMisconfigurationFailures[] =
     "Extensions.ForceInstalledSessionsWithNonMisconfigurationFailureOccured";
 constexpr char kDisableReason[] =
@@ -728,9 +712,6 @@ TEST_F(ForceInstalledMetricsTest,
       kFailureReasonsCWS,
       InstallStageTracker::FailureReason::REPLACED_BY_SYSTEM_APP, 1);
   bool expected_non_misconfiguration_failure = true;
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_non_misconfiguration_failure = false;
-#endif
   histogram_tester_.ExpectBucketCount(kPossibleNonMisconfigurationFailures,
                                       expected_non_misconfiguration_failure, 1);
 }
@@ -906,99 +887,6 @@ TEST_F(ForceInstalledMetricsTest, ExtensionStuckInCreatedStage) {
           NOTIFIED_FROM_MANAGEMENT_INITIAL_CREATION_NOT_FORCED,
       1);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ForceInstalledMetricsTest, ReportManagedGuestSessionOnExtensionFailure) {
-  auto* fake_user_manager = new ash::FakeChromeUserManager();
-  user_manager::ScopedUserManager scoped_user_manager(
-      base::WrapUnique(fake_user_manager));
-  const AccountId account_id =
-      AccountId::FromUserEmail(profile()->GetProfileUserName());
-  fake_user_manager->AddPublicAccountUser(account_id);
-  fake_user_manager->UserLoggedIn(
-      account_id, user_manager::TestHelper::GetFakeUsernameHash(account_id));
-  SetupForceList(ExtensionOrigin::kWebStore);
-  install_stage_tracker()->ReportFailure(
-      kExtensionId1, InstallStageTracker::FailureReason::INVALID_ID);
-  install_stage_tracker()->ReportCrxInstallError(
-      kExtensionId2,
-      InstallStageTracker::FailureReason::CRX_INSTALL_ERROR_OTHER,
-      CrxInstallErrorDetail::UNEXPECTED_ID);
-  // ForceInstalledMetrics shuts down timer because all extension are either
-  // loaded or failed.
-  EXPECT_FALSE(fake_timer_->IsRunning());
-  histogram_tester_.ExpectBucketCount(
-      kFailureSessionStats,
-      ForceInstalledMetrics::UserType::USER_TYPE_PUBLIC_ACCOUNT, 2);
-}
-
-TEST_F(ForceInstalledMetricsTest, ReportGuestSessionOnExtensionFailure) {
-  auto* fake_user_manager = new ash::FakeChromeUserManager();
-  user_manager::ScopedUserManager scoped_user_manager(
-      base::WrapUnique(fake_user_manager));
-  user_manager::User* user = fake_user_manager->AddGuestUser();
-  fake_user_manager->UserLoggedIn(
-      user->GetAccountId(),
-      user_manager::TestHelper::GetFakeUsernameHash(user->GetAccountId()));
-  SetupForceList(ExtensionOrigin::kWebStore);
-  install_stage_tracker()->ReportFailure(
-      kExtensionId1, InstallStageTracker::FailureReason::INVALID_ID);
-  install_stage_tracker()->ReportCrxInstallError(
-      kExtensionId2,
-      InstallStageTracker::FailureReason::CRX_INSTALL_ERROR_OTHER,
-      CrxInstallErrorDetail::UNEXPECTED_ID);
-  // ForceInstalledMetrics shuts down timer because all extension are either
-  // loaded or failed.
-  EXPECT_FALSE(fake_timer_->IsRunning());
-  histogram_tester_.ExpectBucketCount(
-      kFailureSessionStats, ForceInstalledMetrics::UserType::USER_TYPE_GUEST,
-      2);
-}
-
-// Verified that the metrics related to user type are reported correctly for
-// extension stuck in NOTIFIED_FROM_MANAGEMENT_INITIAL_CREATION_FORCED stage.
-TEST_F(ForceInstalledMetricsTest,
-       ReportGuestSessionForExtensionsStuckInCreatedStage) {
-  auto* fake_user_manager = new ash::FakeChromeUserManager();
-  user_manager::ScopedUserManager scoped_user_manager(
-      base::WrapUnique(fake_user_manager));
-  user_manager::User* user = fake_user_manager->AddGuestUser();
-  fake_user_manager->UserLoggedIn(
-      user->GetAccountId(),
-      user_manager::TestHelper::GetFakeUsernameHash(user->GetAccountId()));
-
-  SetupForceList(ExtensionOrigin::kWebStore);
-  CreateExtensionService(/*extensions_enabled=*/true);
-
-  scoped_refptr<const Extension> ext1 = CreateNewExtension(
-      kExtensionName1, kExtensionId1, ExtensionStatus::kLoaded);
-  install_stage_tracker()->ReportInstallationStage(
-      kExtensionId2, InstallStageTracker::Stage::CREATED);
-  install_stage_tracker()->ReportInstallCreationStage(
-      kExtensionId2, InstallStageTracker::InstallCreationStage::
-                         NOTIFIED_FROM_MANAGEMENT_INITIAL_CREATION_FORCED);
-
-  EXPECT_TRUE(fake_timer_->IsRunning());
-  fake_timer_->Fire();
-  histogram_tester_.ExpectUniqueSample(
-      kFailureReasonsCWS, InstallStageTracker::FailureReason::IN_PROGRESS, 1);
-  histogram_tester_.ExpectBucketCount(kInstallationStages,
-                                      InstallStageTracker::Stage::CREATED, 1);
-  histogram_tester_.ExpectBucketCount(
-      kInstallCreationStages,
-      InstallStageTracker::InstallCreationStage::
-          NOTIFIED_FROM_MANAGEMENT_INITIAL_CREATION_FORCED,
-      1);
-  histogram_tester_.ExpectUniqueSample(kStuckInCreatedStageAreExtensionsEnabled,
-                                       true, 1);
-  histogram_tester_.ExpectBucketCount(
-      kFailureSessionStats, ForceInstalledMetrics::UserType::USER_TYPE_GUEST,
-      1);
-  histogram_tester_.ExpectBucketCount(
-      kStuckInCreateStageSessionType,
-      ForceInstalledMetrics::UserType::USER_TYPE_GUEST, 1);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(ForceInstalledMetricsTest, ExtensionsAreDownloading) {
   SetupForceList(ExtensionOrigin::kWebStore);
@@ -1435,49 +1323,6 @@ TEST_F(ForceInstalledMetricsTest, NonMisconfigurationFailurePresent) {
   histogram_tester_.ExpectBucketCount(kPossibleNonMisconfigurationFailures, 1,
                                       1);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Session in which either all the extensions installed successfully, or all
-// failures are admin-side misconfigurations. This test verifies that failure
-// REPLACED_BY_ARC_APP is not considered as misconfiguration when ARC++ is
-// enabled for the profile.
-TEST_F(ForceInstalledMetricsTest,
-       NonMisconfigurationFailureNotPresentReplacedByArcAppErrorArcEnabled) {
-  // Enable ARC++ for this profile.
-  prefs()->SetManagedPref(arc::prefs::kArcEnabled,
-                          std::make_unique<base::Value>(true));
-  SetupForceList(ExtensionOrigin::kWebStore);
-  scoped_refptr<const Extension> ext1 = CreateNewExtension(
-      kExtensionName1, kExtensionId1, ExtensionStatus::kLoaded);
-  install_stage_tracker()->ReportFailure(
-      kExtensionId2, InstallStageTracker::FailureReason::REPLACED_BY_ARC_APP);
-  // ForceInstalledMetrics shuts down timer because all extension are either
-  // loaded or failed.
-  EXPECT_FALSE(fake_timer_->IsRunning());
-  histogram_tester_.ExpectBucketCount(kPossibleNonMisconfigurationFailures, 0,
-                                      1);
-}
-
-// Session in which at least one non misconfiguration failure occurred. This
-// test verifies that failure REPLACED_BY_ARC_APP is not considered as
-// misconfiguration when ARC++ is disabled for the profile.
-TEST_F(ForceInstalledMetricsTest,
-       NonMisconfigurationFailureNotPresentReplacedByArcAppErrorArcDisabled) {
-  // Enable ARC++ for this profile.
-  prefs()->SetManagedPref(arc::prefs::kArcEnabled,
-                          std::make_unique<base::Value>(false));
-  SetupForceList(ExtensionOrigin::kWebStore);
-  scoped_refptr<const Extension> ext1 = CreateNewExtension(
-      kExtensionName1, kExtensionId1, ExtensionStatus::kLoaded);
-  install_stage_tracker()->ReportFailure(
-      kExtensionId2, InstallStageTracker::FailureReason::REPLACED_BY_ARC_APP);
-  // ForceInstalledMetrics shuts down timer because all extension are either
-  // loaded or failed.
-  EXPECT_FALSE(fake_timer_->IsRunning());
-  histogram_tester_.ExpectBucketCount(kPossibleNonMisconfigurationFailures, 1,
-                                      1);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Session in which either all the extensions installed successfully, or all
 // failures are admin-side misconfigurations. This test verifies that failure

@@ -389,7 +389,7 @@ base::span<const int> GetDesiredIconSizesForShortcut() {
 #if BUILDFLAG(IS_MAC)
   static constexpr int kDesiredIconSizesForShortcut[] = {16, 32, 128, 256, 512};
   return kDesiredIconSizesForShortcut;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   // Linux supports icons of any size. FreeDesktop Icon Theme Specification
   // states that "Minimally you should install a 48x48 icon in the hicolor
   // theme."

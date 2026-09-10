@@ -106,8 +106,7 @@ TEST_F(RequestHeaderIntegrityURLLoaderThrottleTest, RedirectToGoogle) {
 }
 #endif  // !BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS) && \
-    !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
 TEST_F(RequestHeaderIntegrityURLLoaderThrottleTest, GoogleSiteWithBranding) {
   ASSERT_NE(CHANNEL_NAME_HEADER_NAME, "X-Placeholder-1");
   ASSERT_NE(LASTCHANGE_YEAR_HEADER_NAME, "X-Placeholder-2");
@@ -195,7 +194,6 @@ TEST_F(RequestHeaderIntegrityURLLoaderThrottleTest,
       COPYRIGHT_HEADER_NAME));
 }
 
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS) && \
-        // !BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_ANDROID)
 
 }  // namespace request_header_integrity

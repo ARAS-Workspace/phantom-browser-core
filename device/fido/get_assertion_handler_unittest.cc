@@ -49,10 +49,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/dbus/u2f/u2f_client.h"
-#endif
-
 namespace device {
 
 namespace {
@@ -118,16 +114,9 @@ class FidoGetAssertionHandlerTest : public ::testing::Test {
     bluetooth_config_->SetLESupported(true);
     BluetoothAdapterFactory::SetAdapterForTesting(mock_adapter_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    chromeos::U2FClient::InitializeFake();
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    task_environment_.RunUntilIdle();
-    chromeos::U2FClient::Shutdown();
-#endif
   }
 
   void ForgeDiscoveries() {

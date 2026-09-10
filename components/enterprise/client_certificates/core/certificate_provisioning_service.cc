@@ -242,30 +242,6 @@ bool CertificateProvisioningServiceImpl::IsProvisioning() const {
 
 void CertificateProvisioningServiceImpl::OnPolicyUpdated() {
   if (!IsPolicyEnabled()) {
-#if BUILDFLAG(IS_CHROMEOS)
-    // The policy is disabled, so delete any leftover managed key material.
-    // Whether anything was actually provisioned is the store's concern: it
-    // exits early when nothing is persisted, so we always delegate to it. This
-    // also catches a policy that was removed while Chrome was not running.
-    //
-    // Abort any in-flight provisioning first, as DeleteManagedIdentities is a
-    // no-op while provisioning. Invalidating the provisioning weak pointers
-    // cancels the in-flight async callbacks so they can neither resurrect the
-    // identity in the store nor access the reset provisioning_context_.
-    if (IsProvisioning()) {
-      provisioning_weak_factory_.InvalidateWeakPtrs();
-      provisioning_context_.reset();
-      for (auto& pending_callback : std::exchange(pending_callbacks_, {})) {
-        std::move(pending_callback).Run(std::nullopt);
-      }
-    }
-    // Log the cleanup outcome so a persistently failing deletion is visible.
-    DeleteManagedIdentities(base::BindOnce(
-        [](std::string logging_context, bool success) {
-          LogManagedIdentityDeletion(logging_context, success);
-        },
-        GetLoggingContext()));
-#endif  // BUILDFLAG(IS_CHROMEOS)
     return;
   }
 

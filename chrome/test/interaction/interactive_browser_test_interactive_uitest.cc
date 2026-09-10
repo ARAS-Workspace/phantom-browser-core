@@ -279,13 +279,8 @@ IN_PROC_BROWSER_TEST_F(InteractiveBrowserTestUiTest,
 
 // TODO(crbug.com/330095872): Flaky on linux-chromeos-rel and Linux ChromiumOS
 // MSan.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_WatchForNonTabWebContentsActivation \
-  DISABLED_WatchForNonTabWebContentsActivation
-#else
 #define MAYBE_WatchForNonTabWebContentsActivation \
   WatchForNonTabWebContentsActivation
-#endif
 // Tests whether ActivateSurface() results in kCurrentWidgetFocus updating
 // correctly when targeting a non-tab web contents.
 //

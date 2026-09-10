@@ -158,14 +158,12 @@ void ConnectorsInternalsPageHandler::GetClientCertificateState(
           profile_);
   client_certificates::CertificateProvisioningService*
       browser_certificate_provisioning_service = nullptr;
-#if !BUILDFLAG(IS_CHROMEOS)
   // Browser-level (machine) certificate provisioning is driven by the Chrome
   // Browser Cloud Management controller, which does not exist on ChromeOS.
   browser_certificate_provisioning_service =
       g_browser_process->browser_policy_connector()
           ->chrome_browser_cloud_management_controller()
           ->GetCertificateProvisioningService();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   if (!profile_certificate_provisioning_service &&
       !browser_certificate_provisioning_service) {
     std::move(callback).Run(

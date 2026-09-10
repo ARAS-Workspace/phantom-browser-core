@@ -91,19 +91,6 @@ bool IsValidCdmDisplayName(const std::string& cdm_name) {
 
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// These are reported to UMA server. Do not renumber or reuse values.
-enum class CrosCdmType {
-  kChromeCdm = 0,
-  kPlatformCdm = 1,
-  // Note: Only add new values immediately before this line.
-  kMaxValue = kPlatformCdm,
-};
-
-void ReportCdmTypeUMA(CrosCdmType cdm_type) {
-  UMA_HISTOGRAM_ENUMERATION("Media.EME.CrosCdmType", cdm_type);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // The amount of time to allow the secondary Media Service instance to idle
 // before tearing it down. Only used if the Content embedder defines how to
@@ -203,11 +190,6 @@ MediaInterfaceProxy::MediaInterfaceProxy(RenderFrameHost* render_frame_host)
   DVLOG(1) << __func__;
 
   media::CdmType cdm_type;
-#if BUILDFLAG(IS_CHROMEOS)
-  // The CdmType passed in here is only used by the CDM obtained through the
-  // |media_interface_factory_ptr_|.
-  cdm_type = kChromeOsCdmType;
-#endif
 
   auto frame_factory_getter = base::BindRepeating(
       &MediaInterfaceProxy::GetFrameServices, base::Unretained(this), cdm_type);
@@ -445,34 +427,6 @@ void MediaInterfaceProxy::OnCdmServiceConnectionError(
 }
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-void MediaInterfaceProxy::OnChromeOsCdmCreated(
-    const media::CdmConfig& cdm_config,
-    CreateCdmCallback callback,
-    mojo::PendingRemote<media::mojom::ContentDecryptionModule> receiver,
-    media::mojom::CdmContextPtr cdm_context,
-    media::CreateCdmStatus status) {
-  if (receiver) {
-    ReportCdmTypeUMA(CrosCdmType::kPlatformCdm);
-    // Success case, just pass it back through the callback.
-    std::move(callback).Run(std::move(receiver), std::move(cdm_context),
-                            status);
-    return;
-  }
-
-  // We failed creating a CDM with the Chrome OS daemon, fallback to the library
-  // CDM interface.
-  VLOG(1) << "Failed creating Chrome OS CDM, will use library CDM";
-  auto* factory = GetCdmFactory(cdm_config.key_system);
-  if (!factory) {
-    std::move(callback).Run(mojo::NullRemote(), nullptr,
-                            media::CreateCdmStatus::kCdmFactoryCreationFailed);
-    return;
-  }
-  ReportCdmTypeUMA(CrosCdmType::kChromeCdm);
-  factory->CreateCdm(cdm_config, std::move(callback));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 DOCUMENT_USER_DATA_KEY_IMPL(MediaInterfaceProxy);
 

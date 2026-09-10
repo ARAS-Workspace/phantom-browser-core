@@ -739,11 +739,7 @@ GURL FamilyLinkSettingsService::GetUnnormalizedEffectiveUrlToUnblock(
 
 GURL FamilyLinkSettingsService::GetEffectiveUrlToUnblock(
     const WebFilteringResult& result) const {
-#if !BUILDFLAG(IS_CHROMEOS)
   return NormalizeUrl(GetUnnormalizedEffectiveUrlToUnblock(result));
-#else
-  return GetUnnormalizedEffectiveUrlToUnblock(result);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace supervised_user

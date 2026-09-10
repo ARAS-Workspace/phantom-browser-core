@@ -341,7 +341,7 @@ IN_PROC_BROWSER_TEST_F(KeyboardLockInteractiveBrowserTest,
 
 // https://crbug.com/40707442 Flakey on ChromeOS.
 // https://crbug.com/40715327 Also flaky on Mac
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_SubsequentLockCallSupersedesPreviousCall \
   DISABLED_SubsequentLockCallSupersedesPreviousCall
 #else
@@ -526,7 +526,7 @@ IN_PROC_BROWSER_TEST_F(KeyboardLockInteractiveBrowserTest,
   ASSERT_FALSE(IsKeyboardLockActive());
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // BringBrowserWindowToFront hangs on Linux: http://crbug.com/40295645
 #define MAYBE_GainAndLoseFocusInWindowMode DISABLED_GainAndLoseFocusInWindowMode
 #else
@@ -587,7 +587,7 @@ IN_PROC_BROWSER_TEST_F(KeyboardLockInteractiveBrowserTest,
   ASSERT_FALSE(IsKeyboardLockActive());
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // BringBrowserWindowToFront hangs on Linux: http://crbug.com/40295645
 #define MAYBE_GainAndLoseFocusInFullscreen DISABLED_GainAndLoseFocusInFullscreen
 #else

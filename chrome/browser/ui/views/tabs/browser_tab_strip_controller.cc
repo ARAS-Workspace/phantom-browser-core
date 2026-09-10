@@ -86,11 +86,6 @@
 #include "ui/views/widget/widget.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/window_properties.h"
-#include "chromeos/ash/experiences/system_web_apps/types/system_web_app_delegate.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
 #endif
@@ -900,16 +895,6 @@ void BrowserTabStripController::ExecuteContextMenuCommand(
 bool BrowserTabStripController::GetContextMenuAccelerator(
     int command_id,
     ui::Accelerator* accelerator) {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto* const app_controller =
-      web_app::AppBrowserController::From(GetBrowserWindowInterface());
-  auto* system_app = app_controller ? app_controller->system_app() : nullptr;
-  if (system_app &&
-      !system_app->ShouldShowTabContextMenuShortcut(
-          GetBrowserWindowInterface()->GetProfile(), command_id)) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   int browser_cmd;
   return TabStripModel::ContextMenuCommandToBrowserCommand(command_id,

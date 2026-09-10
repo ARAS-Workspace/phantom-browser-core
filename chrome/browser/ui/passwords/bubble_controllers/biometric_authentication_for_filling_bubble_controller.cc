@@ -71,9 +71,6 @@ std::u16string BiometricAuthenticationForFillingBubbleController::GetBody()
 #if BUILDFLAG(IS_MAC)
   return l10n_util::GetStringUTF16(
       IDS_PASSWORD_MANAGER_BIOMETRIC_AUTHENTICATION_FOR_FILLING_PROMO_MESSAGE_MAC);
-#elif BUILDFLAG(IS_CHROMEOS)
-  return l10n_util::GetStringUTF16(
-      IDS_PASSWORD_MANAGER_BIOMETRIC_AUTHENTICATION_FOR_FILLING_PROMO_MESSAGE_CHROMEOS);
 #else
   NOTIMPLEMENTED();
 #endif
@@ -107,9 +104,6 @@ void BiometricAuthenticationForFillingBubbleController::OnAccepted() {
 #if BUILDFLAG(IS_MAC)
   message = l10n_util::GetStringUTF16(
       IDS_PASSWORD_MANAGER_TURN_ON_FILLING_REAUTH_MAC);
-#elif BUILDFLAG(IS_CHROMEOS)
-  message = l10n_util::GetStringUTF16(
-      IDS_PASSWORD_MANAGER_TURN_ON_FILLING_REAUTH_CHROMEOS);
 #endif
   delegate_->AuthenticateUserWithMessage(message,
                                          std::move(on_reauth_completed));
@@ -128,9 +122,6 @@ std::u16string BiometricAuthenticationForFillingBubbleController::GetTitle()
 #if BUILDFLAG(IS_MAC)
   return l10n_util::GetStringUTF16(
       IDS_PASSWORD_MANAGER_BIOMETRIC_AUTHENTICATION_FOR_FILLING_PROMO_TITLE_MAC);
-#elif BUILDFLAG(IS_CHROMEOS)
-  return l10n_util::GetStringUTF16(
-      IDS_PASSWORD_MANAGER_BIOMETRIC_AUTHENTICATION_FOR_FILLING_PROMO_TITLE_CHROMEOS);
 #else
   NOTIMPLEMENTED();
 #endif

@@ -97,30 +97,15 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/apps/link_capturing/enable_link_capturing_infobar_delegate.h"
 #include "chrome/browser/infobars/confirm_infobar_creator.h"
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/infobars/core/infobar.h"
-#else
-#include "chrome/browser/ui/web_applications/web_app_relaunch_notification.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_MAC)
 #include "ui/aura/window.h"
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/shelf_model.h"
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service_factory.h"
-#include "chrome/browser/ui/ash/shelf/chrome_shelf_controller.h"
-#include "chrome/browser/ui/ash/shelf/chrome_shelf_controller_util.h"
-#include "chromeos/ash/components/nonclosable_app_ui/nonclosable_app_ui_utils.h"
-#include "components/sync/model/string_ordinal.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 
 namespace base {
@@ -139,12 +124,6 @@ struct UninstallDialogState {
 };
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-void ShowNonclosableAppToast(const web_app::WebAppRegistrar& registrar,
-                             const webapps::AppId& app_id) {
-  ash::ShowNonclosableAppToast(app_id, registrar.GetAppShortName(app_id));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 
 }  // namespace
@@ -262,33 +241,16 @@ void WebAppUiManagerImpl::OnExtensionSystemReady() {
 }
 
 bool WebAppUiManagerImpl::CanAddAppToQuickLaunchBar() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif
 }
 
 void WebAppUiManagerImpl::AddAppToQuickLaunchBar(const webapps::AppId& app_id) {
   DCHECK(CanAddAppToQuickLaunchBar());
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeShelfController does not exist in unit tests.
-  if (auto* controller = ChromeShelfController::instance()) {
-    PinAppWithIDToShelf(app_id);
-    controller->UpdateV1AppState(app_id);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 bool WebAppUiManagerImpl::IsAppInQuickLaunchBar(
     const webapps::AppId& app_id) const {
   DCHECK(CanAddAppToQuickLaunchBar());
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeShelfController does not exist in unit tests.
-  if (auto* controller = ChromeShelfController::instance()) {
-    return controller->shelf_model()->IsAppPinned(app_id);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return false;
 }
 
@@ -307,7 +269,7 @@ bool WebAppUiManagerImpl::IsAppMigrationDialogShowing(
   if (!controller) {
     return false;
   }
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(window);
   return browser_view &&
          browser_view->GetProperty(kIsPwaUpdateDialogShowingKey) &&
@@ -412,29 +374,6 @@ void WebAppUiManagerImpl::LaunchWebApp(apps::AppLaunchParams params,
                           std::move(callback));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void WebAppUiManagerImpl::MigrateLauncherState(
-    const webapps::AppId& from_app_id,
-    const webapps::AppId& to_app_id,
-    base::OnceClosure callback) {
-  auto* app_list_syncable_service =
-      app_list::AppListSyncableServiceFactory::GetForProfile(profile_);
-  bool to_app_in_shelf =
-      app_list_syncable_service->GetPinPosition(to_app_id).IsValid();
-  // If the new app is already pinned to the shelf don't transfer UI prefs
-  // across as that could cause it to become unpinned.
-  if (!to_app_in_shelf) {
-    app_list_syncable_service->TransferItemAttributes(from_app_id, to_app_id);
-  }
-  std::move(callback).Run();
-}
-
-void WebAppUiManagerImpl::DisplayRunOnOsLoginNotification(
-    const base::flat_map<webapps::AppId, RoolNotificationBehavior>& apps,
-    base::WeakPtr<Profile> profile) {
-  web_app::DisplayRunOnOsLoginNotification(apps, profile);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void WebAppUiManagerImpl::NotifyAppRelaunchState(
     const webapps::AppId& placeholder_app_id,
@@ -442,11 +381,6 @@ void WebAppUiManagerImpl::NotifyAppRelaunchState(
     const std::u16string& final_app_name,
     base::WeakPtr<Profile> profile,
     AppRelaunchState relaunch_state) {
-#if BUILDFLAG(IS_CHROMEOS)
-  web_app::NotifyAppRelaunchState(placeholder_app_id, final_app_id,
-                                  final_app_name, std::move(profile),
-                                  relaunch_state);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 content::WebContents* WebAppUiManagerImpl::CreateNewTab() {
@@ -677,7 +611,6 @@ void WebAppUiManagerImpl::OnIsolatedWebAppInstallerClosed(
 void WebAppUiManagerImpl::MaybeCreateEnableSupportedLinksInfobar(
     content::WebContents* web_contents,
     const std::string& launch_name) {
-#if !BUILDFLAG(IS_CHROMEOS)
   std::unique_ptr<apps::EnableLinkCapturingInfoBarDelegate> delegate =
       apps::EnableLinkCapturingInfoBarDelegate::MaybeCreate(web_contents,
                                                             launch_name);
@@ -685,7 +618,6 @@ void WebAppUiManagerImpl::MaybeCreateEnableSupportedLinksInfobar(
     infobars::ContentInfoBarManager::FromWebContents(web_contents)
         ->AddInfoBar(CreateConfirmInfoBar(std::move(delegate)));
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 void WebAppUiManagerImpl::MaybeCreateWebAppBlockedMigrationInfoBar(
@@ -711,20 +643,9 @@ void WebAppUiManagerImpl::MaybeShowIPHPromoForAppsLaunchedViaLinkCapturing(
   WebAppProvider* provider = WebAppProvider::GetForWebApps(profile);
   CHECK(provider);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!apps::AppServiceProxyFactory::IsAppServiceAvailableForProfile(profile)) {
-    return;
-  }
-  apps::AppServiceProxy* proxy =
-      apps::AppServiceProxyFactory::GetForProfile(profile);
-  if (!proxy->PreferredAppsList().IsPreferredAppForSupportedLinks(app_id)) {
-    return;
-  }
-#else
   if (!provider->registrar_unsafe().CapturesLinksInScope(app_id)) {
     return;
   }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   BrowserWindowInterface* const app_browser =
       browser ? browser : AppBrowserController::FindForWebApp(*profile, app_id);
@@ -753,14 +674,6 @@ void WebAppUiManagerImpl::OnBrowserCreated(BrowserWindowInterface* browser) {
 
   ++num_windows_for_apps_map_[GetAppIdForBrowser(browser)];
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/452120900): TabStripModel auto-unregistered by dtor
-  browser->GetTabStripModel()->AddObserver(this);
-  browser_close_cancelled_subscriptions_.push_back(
-      browser->RegisterBrowserCloseCancelled(
-          base::BindRepeating(&WebAppUiManagerImpl::OnBrowserCloseCancelled,
-                              base::Unretained(this))));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void WebAppUiManagerImpl::OnBrowserClosed(BrowserWindowInterface* browser) {
@@ -791,21 +704,6 @@ void WebAppUiManagerImpl::OnBrowserClosed(BrowserWindowInterface* browser) {
   windows_closed_requests_map_.erase(app_id);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void WebAppUiManagerImpl::OnTabCloseCancelled(const tabs::TabInterface* tab) {
-  const content::WebContents* contents = tab->GetContents();
-  CHECK(contents);
-  const WebAppTabHelper* tab_helper =
-      WebAppTabHelper::FromWebContents(contents);
-  if (!tab_helper || !tab_helper->window_app_id()) {
-    return;
-  }
-
-  ShowNonclosableAppToast(
-      WebAppProvider::GetForWebApps(profile_)->registrar_unsafe(),
-      *tab_helper->window_app_id());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 
 bool WebAppUiManagerImpl::IsBrowserForInstalledApp(
@@ -963,7 +861,7 @@ void WebAppUiManagerImpl::ClearWebAppSiteDataIfNeeded(
   }
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 const base::Feature& GetPromoFeatureEngagementFromBrowser(
     const BrowserWindowInterface* browser) {
@@ -1070,24 +968,7 @@ void WebAppUiManagerImpl::OnTabChangedDuringIph(
   }
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-void WebAppUiManagerImpl::OnBrowserCloseCancelled(
-    BrowserWindowInterface* browser,
-    BrowserWindowInterface::ClosingStatus closing_status) {
-  DCHECK(started_);
-  if (!IsBrowserForInstalledApp(browser) ||
-      closing_status !=
-          BrowserWindowInterface::ClosingStatus::kDeniedByPolicy) {
-    return;
-  }
-
-  ShowNonclosableAppToast(
-      WebAppProvider::GetForWebApps(profile_)->registrar_unsafe(),
-      GetAppIdForBrowser(browser));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 void WebAppUiManagerImpl::NotifyDidFinishNavigation(
     content::NavigationHandle* navigation_handle) {

@@ -251,11 +251,7 @@ bool VideoEncodeAccelerator::IsFlushSupported() {
 }
 
 bool VideoEncodeAccelerator::IsGpuFrameResizeSupported() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/40164413) Add proper method overrides in
-  // MojoVideoEncodeAccelerator and other subclasses that might return true.
-  return true;
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   return base::FeatureList::IsEnabled(
       kVTVideoEncodeAcceleratorOpaqueSharedImageEncode);
 #else

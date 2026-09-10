@@ -234,11 +234,6 @@ bool RenderViewContextMenuViews::GetAcceleratorForCommandId(
         return true;
       }
 
-#if BUILDFLAG(IS_CHROMEOS)
-      // Chromebooks typically do not have an F11 key, so do not show an
-      // accelerator here.
-      return false;
-#else
       // User-triggered fullscreen. Show the shortcut for toggling fullscreen
       // (i.e., F11).
       ui::AcceleratorProvider* accelerator_provider =
@@ -249,7 +244,6 @@ bool RenderViewContextMenuViews::GetAcceleratorForCommandId(
 
       return accelerator_provider->GetAcceleratorForCommandId(IDC_FULLSCREEN,
                                                               accel);
-#endif
     }
 
     case IDC_VIEW_SOURCE:
@@ -283,10 +277,6 @@ bool RenderViewContextMenuViews::GetAcceleratorForCommandId(
 #if BUILDFLAG(IS_MAC)
       *accel = ui::Accelerator(ui::VKEY_SPACE,
                                ui::EF_COMMAND_DOWN | ui::EF_CONTROL_DOWN);
-      return true;
-#elif BUILDFLAG(IS_CHROMEOS)
-      *accel = ui::Accelerator(ui::VKEY_SPACE,
-                               ui::EF_SHIFT_DOWN | ui::EF_COMMAND_DOWN);
       return true;
 #else
       return false;

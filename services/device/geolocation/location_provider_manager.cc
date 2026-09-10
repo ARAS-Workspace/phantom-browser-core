@@ -92,9 +92,6 @@ LocationProviderManager::LocationProviderManager(
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   // On Android and iOS, default to using the platform location provider.
   provider_manager_mode_ = kPlatformOnly;
-#elif BUILDFLAG(IS_CHROMEOS)
-  // On Ash / Lacros, default to using the network location provider.
-  provider_manager_mode_ = kNetworkOnly;
 #else
   // On macOS / Windows / Linux platforms, use the mode specified by the feature
   // flag.

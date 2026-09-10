@@ -199,7 +199,6 @@ class PrimaryAccountManagerTest : public testing::Test,
   int num_unconsented_account_changed_{0};
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PrimaryAccountManagerTest, SignOut) {
   CreatePrimaryAccountManager();
   CoreAccountId main_account_id =
@@ -341,7 +340,6 @@ TEST_F(PrimaryAccountManagerTest, UnconsentedSignOutWhileProhibited) {
   CheckSigninMetrics({.sign_in = AccessPoint::kStartPage,
                       .sign_out = signin_metrics::ProfileSignout::kTest});
 }
-#endif
 
 TEST_F(PrimaryAccountManagerTest, RevokeSyncConsentAllowedSignoutProhibited) {
   CreatePrimaryAccountManager();
@@ -373,13 +371,11 @@ TEST_F(PrimaryAccountManagerTest, RevokeSyncConsentAllowedSignoutProhibited) {
   EXPECT_FALSE(manager_->HasPrimaryAccount(ConsentLevel::kSync));
   EXPECT_TRUE(manager_->HasPrimaryAccount(ConsentLevel::kSignin));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   manager_->ClearPrimaryAccount(signin_metrics::ProfileSignout::kTest);
   EXPECT_TRUE(manager_->HasPrimaryAccount(ConsentLevel::kSignin));
   CheckSigninMetrics({.sign_in = AccessPoint::kStartPage,
                       .sync_opt_in = AccessPoint::kStartPage,
                       .turn_off_sync = signin_metrics::ProfileSignout::kTest});
-#endif
 }
 
 // Regression test for https://crbug.com/1155519.
@@ -467,75 +463,6 @@ TEST_F(PrimaryAccountManagerTest,
   CheckSigninMetrics({.sign_in = AccessPoint::kSettings,
                       .sync_opt_in = AccessPoint::kSettings});
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(PrimaryAccountManagerTest, GaiaIdMigration) {
-  ASSERT_EQ(AccountTrackerService::MIGRATION_DONE,
-            account_tracker()->GetMigrationState());
-  std::string email = "user@gmail.com";
-  GaiaId gaia_id("account_gaia_id");
-
-  PrefService* client_prefs = signin_client()->GetPrefs();
-  client_prefs->SetInteger(prefs::kAccountIdMigrationState,
-                           AccountTrackerService::MIGRATION_NOT_STARTED);
-  ScopedListPrefUpdate update(client_prefs, prefs::kAccountInfo);
-  update->clear();
-  base::DictValue dict;
-  dict.Set("account_id", email);
-  dict.Set("email", email);
-  dict.Set("gaia", gaia_id.ToString());
-  update->Append(std::move(dict));
-
-  // Re-create account tracker to trigger migration.
-  account_tracker_ =
-      std::make_unique<AccountTrackerService>(&user_prefs_, base::FilePath());
-
-  client_prefs->SetString(prefs::kGoogleServicesAccountId, email);
-  client_prefs->SetBoolean(prefs::kGoogleServicesConsentedToSync, true);
-
-  CreatePrimaryAccountManager();
-
-  EXPECT_EQ(CoreAccountId::FromGaiaId(gaia_id),
-            manager_->GetPrimaryAccountId(ConsentLevel::kSync));
-  EXPECT_EQ(gaia_id.ToString(),
-            user_prefs_.GetString(prefs::kGoogleServicesAccountId));
-}
-
-TEST_F(PrimaryAccountManagerTest, GaiaIdMigrationCrashInTheMiddle) {
-  ASSERT_EQ(AccountTrackerService::MIGRATION_DONE,
-            account_tracker()->GetMigrationState());
-  std::string email = "user@gmail.com";
-  GaiaId gaia_id("account_gaia_id");
-
-  PrefService* client_prefs = signin_client()->GetPrefs();
-  client_prefs->SetInteger(prefs::kAccountIdMigrationState,
-                           AccountTrackerService::MIGRATION_NOT_STARTED);
-  ScopedListPrefUpdate update(client_prefs, prefs::kAccountInfo);
-  update->clear();
-  base::DictValue dict;
-  dict.Set("account_id", email);
-  dict.Set("email", email);
-  dict.Set("gaia", gaia_id.ToString());
-  update->Append(std::move(dict));
-
-  // Re-create account tracker to trigger migration.
-  account_tracker_ =
-      std::make_unique<AccountTrackerService>(&user_prefs_, base::FilePath());
-
-  client_prefs->SetString(prefs::kGoogleServicesAccountId, gaia_id.ToString());
-  client_prefs->SetBoolean(prefs::kGoogleServicesConsentedToSync, true);
-
-  CreatePrimaryAccountManager();
-  EXPECT_EQ(CoreAccountId::FromGaiaId(gaia_id),
-            manager_->GetPrimaryAccountId(ConsentLevel::kSync));
-  EXPECT_EQ(gaia_id.ToString(),
-            user_prefs_.GetString(prefs::kGoogleServicesAccountId));
-
-  base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(AccountTrackerService::MIGRATION_DONE,
-            account_tracker()->GetMigrationState());
-}
-#endif
 
 TEST_F(PrimaryAccountManagerTest, RestoreFromPrefsConsented) {
   CoreAccountId account_id =
@@ -719,7 +646,6 @@ TEST_F(PrimaryAccountManagerTest, RevokeSyncConsent) {
             manager_->GetPrimaryAccountInfo(ConsentLevel::kSignin).account_id);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PrimaryAccountManagerTest, ClearPrimaryAccount) {
   CreatePrimaryAccountManager();
   CoreAccountId account_id =
@@ -733,7 +659,6 @@ TEST_F(PrimaryAccountManagerTest, ClearPrimaryAccount) {
   EXPECT_FALSE(manager_->HasPrimaryAccount(ConsentLevel::kSync));
   EXPECT_FALSE(manager_->HasPrimaryAccount(ConsentLevel::kSignin));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_IOS)
 TEST_F(PrimaryAccountManagerTest, RestoreSyncAccountInfo) {
@@ -830,12 +755,10 @@ TEST_F(PrimaryAccountManagerTest, ExplicitSigninPref) {
   EXPECT_FALSE(prefs()->GetBoolean(prefs::kExplicitBrowserSignin));
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Clearing signin.
   manager_->ClearPrimaryAccount(signin_metrics::ProfileSignout::kTest);
 
   EXPECT_FALSE(prefs()->GetBoolean(prefs::kExplicitBrowserSignin));
-#endif
 }
 
 TEST_F(PrimaryAccountManagerTest, ImplicitSigninDoesNotSetExplicitSigninPref) {
@@ -973,12 +896,10 @@ TEST_F(PrimaryAccountManagerTest, AccountStoragePrefNewUser) {
       prefs::kPrefsThemesSearchEnginesAccountStorageEnabled));
 
 // ChromeOS does not support signing out.
-#if !BUILDFLAG(IS_CHROMEOS)
   // Signout does not clear the pref.
   manager_->ClearPrimaryAccount(signin_metrics::ProfileSignout::kTest);
   EXPECT_TRUE(prefs()->GetBoolean(
       prefs::kPrefsThemesSearchEnginesAccountStorageEnabled));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 // Explicit sign-in prefs for bookmarks and extensions are only used on Dice
@@ -1057,7 +978,6 @@ TEST_F(PrimaryAccountManagerTest,
 }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(PrimaryAccountManagerTest, PerProfileMetrics) {
   // First PrimaryAccountManager with `context1`, records metric for both
   // `Profile1` and non-profile specific.
@@ -1169,7 +1089,6 @@ TEST_F(PrimaryAccountManagerTest, PerProfileMetricsSync) {
   histogram_tester_.ExpectUniqueSample("Signin.SyncTurnOff.Completed.Profile2",
                                        ProfileSignout::kTest, 1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 class PrimaryAccountManagerExplicitSigninNewFeatureTest

@@ -155,7 +155,7 @@
 
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/environment.h"
 #include "base/files/file_path_watcher_inotify.h"
 #include "base/native_library.h"
@@ -170,7 +170,7 @@
 #include "content/public/common/content_client.h"
 #endif
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(USE_ZYGOTE)
 #include "base/stack_canary_linux.h"
@@ -357,7 +357,7 @@ void InitializeZygoteSandboxForBrowserProcess(
 }
 #endif  // BUILDFLAG(USE_ZYGOTE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 // Loads registered library CDMs but does not initialize them. This is needed by
@@ -411,7 +411,7 @@ void PreSandboxInit() {
   base::internal::CanUseUtilityThreadTypeForWorkerThread();
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 mojo::ScopedMessagePipeHandle MaybeAcceptMojoInvitation() {
   const auto& command_line = *base::CommandLine::ForCurrentProcess();
@@ -427,12 +427,7 @@ mojo::ScopedMessagePipeHandle MaybeAcceptMojoInvitation() {
 
 bool ShouldAllowSystemTracingConsumer() {
 // System tracing consumer support is currently only supported on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-  // The consumer should only be enabled when the delegate allows it.
-  return GetContentClient()->browser()->IsSystemWideTracingEnabled();
-#else
   return false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void CreateChildThreadPool(const std::string& process_type) {
@@ -583,7 +578,7 @@ NO_STACK_PROTECTOR int RunZygote(ContentMainDelegate* delegate) {
   // Once Zygote forks and feature list initializes we can start a thread to
   // begin tracing immediately.
   if (delegate->ShouldInitializePerfetto(invoked_in_child)) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     if (process_type == switches::kGpuProcess) {
       tracing::InitTracingPostFeatureList(/*enable_consumer=*/false,
                                           /*will_trace_thread_restart=*/true);
@@ -680,7 +675,7 @@ NO_STACK_PROTECTOR int RunOtherNamedProcessTypeMain(
     base::HangWatcher::CreateHangWatcherInstance();
     unregister_thread_closure = base::HangWatcher::RegisterThread(
         base::HangWatcher::ThreadType::kMainThread);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // On Linux/ChromeOS, the HangWatcher can't start until after the sandbox is
     // initialized, because the sandbox can't be started with multiple threads.
     // TODO(mpdenton): start the HangWatcher after the sandbox is initialized.
@@ -690,7 +685,7 @@ NO_STACK_PROTECTOR int RunOtherNamedProcessTypeMain(
         SandboxTypeFromCommandLine(*main_function_params.command_line));
 #else
     const bool start_hang_watcher_now = true;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
     if (start_hang_watcher_now) {
       base::HangWatcher::GetInstance()->Start();
     } else {
@@ -800,12 +795,10 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
                  base::GlobalDescriptors::kBaseDescriptor);
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OPENBSD)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
   g_fds->Set(kCrashDumpSignal,
              kCrashDumpSignal + base::GlobalDescriptors::kBaseDescriptor);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_OPENBSD)
-
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
 
   is_initialized_ = true;
   TRACE_EVENT0("startup,benchmark,rail", "ContentMainRunnerImpl::Initialize");
@@ -914,7 +907,7 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
 
   delegate_->PreSandboxStartup();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Set environment variables for fontconfig fontations indexing and before
   // creating threads.
   if (process_type.empty()) {
@@ -923,7 +916,7 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
     // Use Fontations, instead of FreeType, indexing in FontConfig.
     environment->SetVar("FC_FONTATIONS", "1");
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if PA_BUILDFLAG(ENABLE_THREAD_ISOLATION)
   // instantiate the ThreadIsolatedAllocator before we spawn threads
@@ -943,7 +936,7 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
     // SeatbeltExecServer.
     CHECK(sandbox::Seatbelt::IsSandboxed());
   }
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   // In sandboxed processes and zygotes, certain resource should be pre-warmed
   // as they cannot be initialized under a sandbox. In addition, loading these
   // resources in zygotes (including the unsandboxed zygote) allows them to be
@@ -969,12 +962,12 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
   }
 #endif  // BUILDFLAG(USE_ZYGOTE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (process_type.empty()) {
     // Check if Landlock is supported.
     sandbox::policy::ReportLandlockStatus();
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // Return -1 to indicate no early termination.
   return -1;
@@ -1023,7 +1016,7 @@ NO_STACK_PROTECTOR int ContentMainRunnerImpl::Run() {
       }
       if (delegate_->ShouldInitializePerfetto(
               ContentMainDelegate::InvokedInChildProcess())) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
         if (process_type == switches::kGpuProcess) {
           tracing::InitTracingPostFeatureList(
               /*enable_consumer=*/false,

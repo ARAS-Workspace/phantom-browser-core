@@ -12,19 +12,9 @@
 #include "build/build_config.h"
 #include "components/storage_monitor/storage_info.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/storage_monitor/test_media_transfer_protocol_manager_chromeos.h"
-#endif
-
 namespace storage_monitor {
 
 TestStorageMonitor::TestStorageMonitor() : init_called_(false) {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto* fake_mtp_manager =
-      TestMediaTransferProtocolManagerChromeOS::GetFakeMtpManager();
-  fake_mtp_manager->AddReceiver(
-      media_transfer_protocol_manager_.BindNewPipeAndPassReceiver());
-#endif
 }
 
 TestStorageMonitor::~TestStorageMonitor() = default;
@@ -104,13 +94,6 @@ bool TestStorageMonitor::GetStorageInfoForPath(
                              std::u16string(), std::u16string(), 0);
   return true;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-device::mojom::MtpManager*
-TestStorageMonitor::media_transfer_protocol_manager() {
-  return media_transfer_protocol_manager_.get();
-}
-#endif
 
 StorageMonitor::Receiver* TestStorageMonitor::receiver() const {
   return StorageMonitor::receiver();

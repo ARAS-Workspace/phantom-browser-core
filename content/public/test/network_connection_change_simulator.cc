@@ -15,10 +15,6 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "services/network/public/mojom/network_service_test.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "net/base/network_change_notifier_passive.h"
-#endif
-
 namespace content {
 
 // SetConnectionType will block until the network connection changes, and
@@ -32,33 +28,6 @@ constexpr base::RunLoop::Type kRunLoopType =
 
 NetworkConnectionChangeSimulator::NetworkConnectionChangeSimulator() = default;
 NetworkConnectionChangeSimulator::~NetworkConnectionChangeSimulator() = default;
-
-#if BUILDFLAG(IS_CHROMEOS)
-void NetworkConnectionChangeSimulator::InitializeChromeosConnectionType() {
-  // Manually set the connection type since ChromeOS's NetworkChangeNotifier
-  // implementation relies on some other class controlling it (normally
-  // NetworkChangeManagerClient), which isn't used on content/.
-  net::NetworkChangeNotifierPassive* network_change_notifier =
-      static_cast<net::NetworkChangeNotifierPassive*>(
-          content::GetNetworkChangeNotifier());
-  network_change_notifier->OnConnectionChanged(
-      net::NetworkChangeNotifier::CONNECTION_ETHERNET);
-  // If the network service is enabled, set the connection type for its
-  // NetworkChangeNotifier instance as well.
-  if (IsOutOfProcessNetworkService()) {
-    mojo::Remote<network::mojom::NetworkChangeManager> manager;
-    GetNetworkService()->GetNetworkChangeManager(
-        manager.BindNewPipeAndPassReceiver());
-    manager->OnNetworkChanged(
-        /*dns_changed=*/false,
-        network::mojom::IPAddressChangeType::IP_ADDRESS_CHANGE_NONE,
-        /*connection_type_changed=*/true,
-        net::NetworkChangeNotifier::ConnectionType::CONNECTION_ETHERNET,
-        /*connection_subtype_changed=*/false,
-        network::mojom::ConnectionSubtype::SUBTYPE_UNKNOWN);
-  }
-}
-#endif
 
 void NetworkConnectionChangeSimulator::SetConnectionType(
     net::NetworkChangeNotifier::ConnectionType type) {

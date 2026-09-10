@@ -28,9 +28,6 @@ UserCloudPolicyStatusProvider::UserCloudPolicyStatusProvider(
 UserCloudPolicyStatusProvider::~UserCloudPolicyStatusProvider() = default;
 
 base::DictValue UserCloudPolicyStatusProvider::GetStatus() {
-#if BUILDFLAG(IS_CHROMEOS)
-  const bool show_flex_org_warning = false;
-#else
   signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(profile());
   const bool show_flex_org_warning =
@@ -41,7 +38,6 @@ base::DictValue UserCloudPolicyStatusProvider::GetStatus() {
   if (!show_flex_org_warning && !core()->store()->is_managed()) {
     return {};
   }
-#endif
 
   ProfileAttributesEntry* entry =
       g_browser_process->profile_manager()

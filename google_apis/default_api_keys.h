@@ -35,14 +35,6 @@ struct DefaultApiKeys {
   const char* google_api_key_remoting;
   const char* google_api_key_soda;
   const char* google_api_key_partial_translate;
-#if BUILDFLAG(IS_CHROMEOS)
-  const char* google_api_key_sharing;
-  const char* google_api_key_read_aloud;
-  const char* google_api_key_fresnel;
-  const char* google_api_key_boca;
-  const char* google_api_key_cros_system_geo_;
-  const char* google_api_key_cros_chrome_geo_;
-#endif
 
   const char* google_client_id_main;
   const char* google_client_secret_main;

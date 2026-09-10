@@ -133,7 +133,6 @@ TEST(ChromeBrowsingDataLifetimeManager, ScheduledRemovalWithSyncDisabled) {
   delegate.VerifyAndClearExpectations();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST(ChromeBrowsingDataLifetimeManager,
      ScheduledRemovalWithBrowserSigninDisabled) {
   signin_util::ResetForceSigninForTesting();
@@ -211,7 +210,6 @@ TEST(ChromeBrowsingDataLifetimeManager,
   browser_task_environment.FastForwardBy(base::Hours(1));
   delegate.VerifyAndClearExpectations();
 }
-#endif
 
 TEST(ChromeBrowsingDataLifetimeManager,
      ScheduledRemovalWithBrowserSyncTypeDisabled) {

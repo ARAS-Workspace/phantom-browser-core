@@ -233,7 +233,7 @@ RenderViewHostImpl* RenderViewHostImpl::From(RenderWidgetHost* rwh) {
 // static
 void RenderViewHostImpl::GetPlatformSpecificPrefs(
     blink::RendererPreferences* prefs) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if (command_line->HasSwitch(switches::kSystemFontFamily)) {
     prefs->system_font_family_name =

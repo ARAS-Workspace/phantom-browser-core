@@ -175,12 +175,7 @@ TEST_F(OmniboxEverywhereUIManagerTest, ShowWhileWidgetIsHidden) {
 // initial bounds are centered and initialized with the default resting height
 // (kDefaultRestingHeight) and fixed width (kPopupFixedWidth) to prevent visual
 // resize flashing before WebUI auto-resize occurs.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_InitialBoundsMatchRestingHeight \
-  DISABLED_InitialBoundsMatchRestingHeight
-#else
 #define MAYBE_InitialBoundsMatchRestingHeight InitialBoundsMatchRestingHeight
-#endif
 TEST_F(OmniboxEverywhereUIManagerTest, MAYBE_InitialBoundsMatchRestingHeight) {
   display::test::TestScreen test_screen(/*create_display=*/false,
                                         /*register_screen=*/false);
@@ -209,13 +204,8 @@ TEST_F(OmniboxEverywhereUIManagerTest, MAYBE_InitialBoundsMatchRestingHeight) {
 // Verifies that on displays with dimensions smaller than the fixed popup width,
 // widget bounds calculation clamps width and coordinates to remain fully within
 // the visible work area without overflowing or negative positioning.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_CalculateBoundsClampsToSmallDisplays \
-  DISABLED_CalculateBoundsClampsToSmallDisplays
-#else
 #define MAYBE_CalculateBoundsClampsToSmallDisplays \
   CalculateBoundsClampsToSmallDisplays
-#endif
 TEST_F(OmniboxEverywhereUIManagerTest,
        MAYBE_CalculateBoundsClampsToSmallDisplays) {
   display::test::TestScreen test_screen(/*create_display=*/false,
@@ -383,11 +373,7 @@ TEST_F(OmniboxEverywhereUIManagerTest, ShutdownSynchronouslyDestroysResources) {
   EXPECT_FALSE(ui_manager->is_file_chooser_open_for_testing());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ShowPositionsOnTargetDisplay DISABLED_ShowPositionsOnTargetDisplay
-#else
 #define MAYBE_ShowPositionsOnTargetDisplay ShowPositionsOnTargetDisplay
-#endif
 TEST_F(OmniboxEverywhereUIManagerTest, MAYBE_ShowPositionsOnTargetDisplay) {
   // Create and set up a TestScreen with two displays.
   // Display 1: 0, 0, 800, 600 (Primary)
@@ -424,13 +410,8 @@ TEST_F(OmniboxEverywhereUIManagerTest, MAYBE_ShowPositionsOnTargetDisplay) {
   ui_manager->Close();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_PreservePositionAcrossDisplaysOnReinvoke \
-  DISABLED_PreservePositionAcrossDisplaysOnReinvoke
-#else
 #define MAYBE_PreservePositionAcrossDisplaysOnReinvoke \
   PreservePositionAcrossDisplaysOnReinvoke
-#endif
 TEST_F(OmniboxEverywhereUIManagerTest,
        MAYBE_PreservePositionAcrossDisplaysOnReinvoke) {
   display::test::TestScreen test_screen(/*create_display=*/false,
@@ -789,7 +770,7 @@ TEST_F(OmniboxEverywhereUIManagerTest, ContextMenuCommandEnablement) {
 }
 
 // TODO(crbug.com/546710681): Re-enable test on linux
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ResizeDueToAutoResizeUpdatesWidgetBounds \
   DISABLED_ResizeDueToAutoResizeUpdatesWidgetBounds
 #else

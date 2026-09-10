@@ -87,8 +87,6 @@ class FormControlsBrowserTest : public ContentBrowserTest {
     platform_suffix = "_mac";
 #elif BUILDFLAG(IS_LINUX)
     platform_suffix = "_linux";
-#elif BUILDFLAG(IS_CHROMEOS)
-    platform_suffix = "_chromeos";
 #elif BUILDFLAG(IS_ANDROID)
     int sdk_int = base::android::android_info::sdk_int();
     if (sdk_int >= base::android::android_info::SDK_VERSION_T) {
@@ -265,11 +263,7 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, Input) {
           /* screenshot_height */ 330);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_Textarea DISABLED_Textarea
-#else
 #define MAYBE_Textarea Textarea
-#endif
 IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Textarea) {
   if (SkipTestForOldAndroidVersions())
     return;
@@ -386,7 +380,7 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Select) {
 // TODO(crbug.com/448656594): The test fails on Android. Probably we need
 // separate baselines for phone and tablet devices.
 // TODO(crbug.com/449053040): Re-enable the test on Linux.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #define MAYBE_MultiSelect DISABLED_MultiSelect
 #else
 #define MAYBE_MultiSelect MultiSelect

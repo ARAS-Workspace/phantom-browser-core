@@ -55,9 +55,6 @@ class RendererEventInjectionTest
     command_line->AppendSwitch(switches::kDisableRendererBackgrounding);
     command_line->AppendSwitch(switches::kEnableGpuBenchmarking);
     // kHostWindowBounds is unique to ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitchASCII(switches::kHostWindowBounds, GetParam());
-#endif
     embedded_test_server()->ServeFilesFromSourceDirectory("content/test/data");
     ASSERT_TRUE(embedded_test_server()->Start());
   }
@@ -128,17 +125,8 @@ IN_PROC_BROWSER_TEST_P(RendererEventInjectionTest, TestRootTransform) {
   rwh->RemoveInputEventObserver(&touch_observer);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// This configures the display in various interesting ways for ChromeOS. In
-// particular, it tests rotation "/r" and a scale factor of 2 "*2".
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    RendererEventInjectionTest,
-    ::testing::Values("1200x800", "1200x800/r", "1200x800*2", "1200x800*2/r"));
-#else
 INSTANTIATE_TEST_SUITE_P(All,
                          RendererEventInjectionTest,
                          ::testing::Values(""));
-#endif
 
 }  // namespace

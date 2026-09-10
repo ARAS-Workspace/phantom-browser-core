@@ -118,9 +118,6 @@ class CertVerifyProcFactoryImpl : public net::CertVerifyProcFactory {
                                                 root_store_mtc_metadata);
 
     std::unique_ptr<net::SystemTrustStore> trust_store;
-#if BUILDFLAG(IS_CHROMEOS)
-    trust_store = net::CreateChromeOnlySystemTrustStore(std::move(chrome_root));
-#else
     if (instance_params.include_system_trust_store) {
       trust_store =
           net::CreateSslSystemTrustStoreChromeRoot(std::move(chrome_root));
@@ -128,7 +125,6 @@ class CertVerifyProcFactoryImpl : public net::CertVerifyProcFactory {
       trust_store =
           net::CreateChromeOnlySystemTrustStore(std::move(chrome_root));
     }
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
     // Start initialization of TrustStoreAndroid on a separate thread if it
@@ -222,10 +218,8 @@ void UpdateCertVerifierInstanceParams(
   instance_params->additional_distrusted_spkis =
       additional_certificates->distrusted_spkis;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   instance_params->include_system_trust_store =
       additional_certificates->include_system_trust_store;
-#endif
 
   instance_params->additional_trust_anchors_with_constraints =
       ConvertMojoListToInternalList(

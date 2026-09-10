@@ -44,17 +44,9 @@ const char kAdviseOnGclientSolution[] =
 
 #if defined(THREAD_SANITIZER) || defined(MEMORY_SANITIZER) || \
     defined(ADDRESS_SANITIZER)
-#if BUILDFLAG(IS_CHROMEOS)
-const int kDefaultPollIntervalMsec = 2000;
-#else
 const int kDefaultPollIntervalMsec = 1000;
-#endif  // BUILDFLAG(IS_CHROMEOS)
-#else
-#if BUILDFLAG(IS_CHROMEOS)
-const int kDefaultPollIntervalMsec = 500;
 #else
 const int kDefaultPollIntervalMsec = 250;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif
 
 bool IsErrorResult(const std::string& result) {
@@ -74,7 +66,7 @@ base::FilePath GetToolForPlatform(const std::string& tool_name) {
       GetReferenceFilesDir().Append(FILE_PATH_LITERAL("tools"));
 #if BUILDFLAG(IS_MAC)
   return tools_dir.Append(FILE_PATH_LITERAL("mac")).AppendASCII(tool_name);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   return tools_dir.Append(FILE_PATH_LITERAL("linux")).AppendASCII(tool_name);
 #else
   NOTREACHED() << "Can't retrieve tool " << tool_name << " on this platform.";

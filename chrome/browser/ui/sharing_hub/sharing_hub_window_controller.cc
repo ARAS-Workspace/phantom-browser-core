@@ -18,9 +18,7 @@
 #include "ui/actions/action_id.h"
 #include "ui/gfx/image/image.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/views/sharing_hub/sharing_hub_bubble_view_impl.h"
-#endif
 
 namespace sharing_hub {
 
@@ -39,7 +37,6 @@ SharingHubWindowController::SharingHubWindowController(
 
 SharingHubWindowController::~SharingHubWindowController() = default;
 
-#if !BUILDFLAG(IS_CHROMEOS)
 SharingHubBubbleView* SharingHubWindowController::ShowSharingHubBubble(
     share::ShareAttempt attempt) {
   views::BubbleAnchor anchor =
@@ -56,7 +53,6 @@ SharingHubBubbleView* SharingHubWindowController::ShowSharingHubBubble(
 
   return bubble_ptr;
 }
-#endif
 
 ScreenshotCapturedBubble*
 SharingHubWindowController::ShowScreenshotCapturedBubble(

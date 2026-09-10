@@ -18,10 +18,6 @@
 #include "ui/display/test/test_screen.h"
 #include "ui/gfx/geometry/size.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/dbus/u2f/u2f_client.h"
-#endif
-
 namespace {
 
 const char kSupportsHDRHistogramName[] = "Hardware.Display.SupportsHDR";
@@ -62,18 +58,9 @@ class ChromeBrowserMainExtraPartsMetricsTest : public testing::Test {
 
  protected:
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    // ChromeBrowserMainExtraPartsMetrics::RecordMetrics() requires a U2FClient,
-    // which would ordinarily have been set up by browser DBus initialization.
-    chromeos::U2FClient::InitializeFake();
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    task_environment_.RunUntilIdle();
-    chromeos::U2FClient::Shutdown();
-#endif
   }
 
  private:

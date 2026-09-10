@@ -142,12 +142,6 @@
 #include "device/fido/mac/scoped_touch_id_test_environment.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/dbus/tpm_manager/tpm_manager_client.h"
-#include "chromeos/dbus/u2f/u2f_client.h"
-#include "device/bluetooth/floss/floss_features.h"
-#endif
-
 namespace content {
 
 using ::testing::_;
@@ -1103,13 +1097,6 @@ TEST_F(AuthenticatorImplTest, GetAssertionResponseWithAttestedCredentialData) {
       AuthenticatorGetAssertionAndWaitForTimeout(std::move(options)).status,
       AuthenticatorStatus::NOT_ALLOWED_ERROR);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(AuthenticatorImplTest, IsUVPAA) {
-  NavigateAndCommit(GURL(kTestOrigin1));
-  EXPECT_FALSE(AuthenticatorIsUvpaa());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 enum class EnterprisePolicy {
   LISTED,

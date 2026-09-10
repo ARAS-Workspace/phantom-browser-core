@@ -220,14 +220,7 @@ TEST_F(TabMenuModelTest, ExtensionItems) {
   // Verify that the menu model successfully populated items (standard +
   // extension).
   size_t count = model.GetItemCount();
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, ContextMenuMatcher does not add a separator before the first
-  // extension item. See:
-  // https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/extensions/context_menu_matcher.cc;l=87-97;drc=8b9a95f24181fb0d3975b1760045e0d1ed38c159
-  EXPECT_EQ(count, baseline_count + 1);  // Adds 1 item (no separator).
-#else
   EXPECT_EQ(count, baseline_count + 2);  // Adds 1 separator and 1 item.
-#endif
 
   // Find the index of the extension item by searching for an extension custom
   // command ID.

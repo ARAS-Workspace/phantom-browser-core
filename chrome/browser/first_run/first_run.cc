@@ -313,7 +313,7 @@ void SetupInitialPrefsFromInstallPrefs(
 
 // -- Platform-specific functions --
 
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_BSD)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_BSD)
 bool IsOrganicFirstRun() {
   std::string brand;
   google_brand::GetBrand(&brand);

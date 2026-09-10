@@ -195,10 +195,6 @@ bool SetPathToGivenAndReturnTrue(const base::FilePath& path_to_return,
 
   int expected_permissions = base::FILE_PERMISSION_READ_BY_USER |
                              base::FILE_PERMISSION_WRITE_BY_USER
-#if BUILDFLAG(IS_CHROMEOS)
-                             | base::FILE_PERMISSION_READ_BY_GROUP |
-                             base::FILE_PERMISSION_READ_BY_OTHERS
-#endif
       ;
 
   if ((actual_permissions & expected_permissions) != actual_permissions) {

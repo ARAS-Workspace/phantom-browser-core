@@ -491,7 +491,6 @@ class OmniboxPedalManageSync : public OmniboxPedal {
                      GURL("chrome://settings/syncSetup/advanced")) {}
 
   static LabelStrings GetLabelStrings() {
-#if !BUILDFLAG(IS_CHROMEOS)
     if (base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)) {
       return LabelStrings(
           IDS_OMNIBOX_PEDAL_MANAGE_SYNC_HINT_UPDATED,
@@ -499,7 +498,6 @@ class OmniboxPedalManageSync : public OmniboxPedal {
           IDS_ACC_OMNIBOX_PEDAL_MANAGE_SYNC_SUFFIX_UPDATED,
           IDS_ACC_OMNIBOX_PEDAL_MANAGE_SYNC_UPDATED);
     }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
     return LabelStrings(IDS_OMNIBOX_PEDAL_MANAGE_SYNC_HINT,
                         IDS_OMNIBOX_PEDAL_MANAGE_SYNC_SUGGESTION_CONTENTS,
                         IDS_ACC_OMNIBOX_PEDAL_MANAGE_SYNC_SUFFIX,
@@ -508,7 +506,6 @@ class OmniboxPedalManageSync : public OmniboxPedal {
 
   std::vector<SynonymGroupSpec> SpecifySynonymGroups(
       bool locale_is_english) const override {
-#if !BUILDFLAG(IS_CHROMEOS)
     if (base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)) {
       if (locale_is_english) {
         return {
@@ -533,7 +530,6 @@ class OmniboxPedalManageSync : public OmniboxPedal {
         };
       }
     }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
     if (locale_is_english) {
       return {
           {
@@ -1967,16 +1963,12 @@ GetPedalImplementations(bool incognito, bool guest, bool testing) {
   add(new OmniboxPedalManageChromeSettings());
   add(new OmniboxPedalManageChromeDownloads());
   add(new OmniboxPedalViewChromeHistory());
-#if !BUILDFLAG(IS_CHROMEOS)
   // The sharing hub pedal is intentionally excluded
   // on ChromeOS because the sharing hub experience on that
   // platform is different from other desktop platforms.
   add(new OmniboxPedalShareThisPage());
   add(new OmniboxPedalManageChromeAccessibility());
   add(new OmniboxPedalSetChromeAsDefaultBrowser());
-#else   // !BUILDFLAG(IS_CHROMEOS)
-  add(new OmniboxPedalManageChromeOSAccessibility());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   add(new OmniboxPedalCustomizeChromeFonts());
   add(new OmniboxPedalManageChromeThemes());
   add(new OmniboxPedalCustomizeSearchEngines());

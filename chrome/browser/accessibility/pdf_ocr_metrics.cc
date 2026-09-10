@@ -7,10 +7,6 @@
 #include "base/metrics/histogram_macros.h"
 #include "ui/accessibility/platform/ax_platform.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/accessibility/accessibility_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace accessibility {
 
 void RecordPDFOpenedWithA11yFeatureWithPdfOcr() {
@@ -25,12 +21,6 @@ void RecordPDFOpenedWithA11yFeatureWithPdfOcr() {
                           is_pdf_ocr_on);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::AccessibilityManager::Get()->IsSelectToSpeakEnabled()) {
-    UMA_HISTOGRAM_BOOLEAN("Accessibility.PDF.OpenedWithSelectToSpeak.PdfOcr",
-                          is_pdf_ocr_on);
-  }
-#endif
 }
 
 }  // namespace accessibility

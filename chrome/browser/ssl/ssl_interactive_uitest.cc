@@ -25,12 +25,6 @@ class SSLUITestWithWebApps : public InteractiveBrowserTestMixin<SSLUITestBase> {
  public:
   SSLUITestWithWebApps() {
     auto disabled_features = SSLUITestBase::GetDisabledFeatures();
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(crbug.com/532595481): Disabling navigation capturing as a
-    // workaround for flakiness on ChromeOS due to reentrant behavior in
-    // WebAppPublisherHelper.
-    disabled_features.push_back(features::kPwaNavigationCapturing);
-#endif  // BUILDFLAG(IS_CHROMEOS)
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features=*/{net::features::kVerifyQWACs}, disabled_features);
   }

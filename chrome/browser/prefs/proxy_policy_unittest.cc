@@ -30,10 +30,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/install_attributes/stub_install_attributes.h"
-#endif
-
 using ::testing::Return;
 using ::testing::_;
 
@@ -130,9 +126,6 @@ class ProxyPolicyTest : public testing::Test {
   testing::NiceMock<MockConfigurationPolicyProvider> provider_;
   std::unique_ptr<PolicyServiceImpl> policy_service_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedStubInstallAttributes test_install_attributes_;
-#endif
 };
 
 TEST_F(ProxyPolicyTest, OverridesCommandLineOptions) {

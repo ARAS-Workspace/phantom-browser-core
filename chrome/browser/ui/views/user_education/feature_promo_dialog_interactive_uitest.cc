@@ -213,12 +213,10 @@ IN_PROC_BROWSER_TEST_F(FeaturePromoDialogTest, InvokeUi_IPH_DesktopPwaInstall) {
   ShowAndVerifyUi();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(FeaturePromoDialogTest, InvokeUi_IPH_ProfileSwitch) {
   set_baseline("3710120");
   ShowAndVerifyUi();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(FeaturePromoDialogTest,
                        InvokeUi_IPH_DesktopSharedHighlighting) {

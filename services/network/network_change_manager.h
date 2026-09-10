@@ -55,7 +55,7 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkChangeManager
       mojo::PendingRemote<mojom::NetworkChangeManagerClient> client_remote)
       override;
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
   void OnNetworkChanged(
       bool dns_changed,
       mojom::IPAddressChangeType ip_address_change_type,

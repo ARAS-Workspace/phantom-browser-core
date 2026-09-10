@@ -21,11 +21,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/multiprocess_func_list.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <sys/resource.h>
-#include "base/process/internal_linux.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 constexpr int kExpectedStillRunningExitCode = 0;
@@ -136,7 +131,7 @@ TEST_F(ProcessTest, CreationTimeOtherProcess) {
   // was spawned and a time recorded after it was spawned. However, since the
   // base::Time and process creation clocks don't match, tolerate some error.
   constexpr base::TimeDelta kTolerance =
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       // On Linux, process creation time is relative to boot time which has a
       // 1-second resolution. Tolerate 1 second for the imprecise boot time and
       // 100 ms for the imprecise clock.
@@ -333,23 +328,5 @@ TEST_F(ProcessTest, ChildProcessIsRunning) {
   process.Terminate(0, true);
   EXPECT_TRUE(process.WaitForExitWithTimeout(base::TimeDelta(), nullptr));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Tests that the function GetProcessPriorityCGroup() can parse the contents
-// of the /proc/<pid>/cgroup file successfully.
-TEST_F(ProcessTest, TestGetProcessPriorityCGroup) {
-  const char kNotBackgroundedCGroup[] = "5:cpuacct,cpu,cpuset:/daemons\n";
-  const char kBackgroundedCGroup[] =
-      "2:freezer:/chrome_renderers/to_be_frozen\n"
-      "1:cpu:/chrome_renderers/background\n";
-
-  EXPECT_EQ(GetProcessPriorityCGroup(kNotBackgroundedCGroup),
-            Process::Priority::kUserBlocking);
-  EXPECT_EQ(GetProcessPriorityCGroup(kBackgroundedCGroup),
-            Process::Priority::kBestEffort);
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace base

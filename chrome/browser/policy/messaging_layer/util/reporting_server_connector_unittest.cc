@@ -30,11 +30,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/test/scoped_feature_list.h"
-#include "chromeos/ash/components/install_attributes/stub_install_attributes.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using testing::_;
 using testing::ContainerEq;
 using testing::DoAll;
@@ -71,10 +66,6 @@ class ReportingServerConnectorTest : public ::testing::Test {
  protected:
   void SetUp() override {
     test_env_ = std::make_unique<ReportingServerConnector::TestEnvironment>();
-#if BUILDFLAG(IS_CHROMEOS)
-    install_attributes_.Get()->SetCloudManaged("fake-domain-name",
-                                               "fake-device-id");
-#endif
   }
 
   void TearDown() override {
@@ -116,10 +107,6 @@ class ReportingServerConnectorTest : public ::testing::Test {
   }
 
   content::BrowserTaskEnvironment task_environment_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedStubInstallAttributes install_attributes_;
-#endif
 
   std::unique_ptr<ReportingServerConnector::TestEnvironment> test_env_;
 
@@ -197,50 +184,5 @@ TEST_F(ReportingServerConnectorTest,
 // This test verifies that we can upload from an unmanaged device when the
 // proper features are enabled.
 // TODO(b/281905099): remove feature dependencies after roll out.
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ReportingServerConnectorTest, UploadFromUnmanagedDevice) {
-  // Set the device management state to unmanaged.
-  install_attributes_.Get()->SetConsumerOwned();
-
-  // Enable EnableReportingFromUnmanagedDevices feature. Required to
-  // upload records from an unmanaged device.
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      /*enabled_features=*/{kEnableReportingFromUnmanagedDevices},
-      /*disabled_features=*/{});
-
-  // Call `ReportingServerConnector::UploadEncryptedReport` from the
-  // thread pool.
-  ComposePayload(1);
-  const auto expected_cached_seq_ids = GetExpectedCachedSeqIds();
-  test::TestEvent<StatusOr<std::list<int64_t>>> enqueued_event;
-  test::TestEvent<StatusOr<UploadResponseParser>> response_event;
-  base::ThreadPool::PostTask(
-      FROM_HERE,
-      base::BindOnce(
-          &ReportingServerConnector::UploadEncryptedReport,
-          /*need_encryption_key=*/false,
-          /*config_file_version=*/0,
-          /*records=*/payload_records_,
-          /*scoped_reservation=*/
-          ScopedReservation(RecordsSize(payload_records_), memory_resource_),
-          enqueued_event.cb(), response_event.cb()));
-  const auto& enqueued_result = enqueued_event.result();
-  EXPECT_TRUE(enqueued_result.has_value());
-  EXPECT_THAT(enqueued_result.value(), ContainerEq(expected_cached_seq_ids));
-
-  task_environment_.RunUntilIdle();
-  ASSERT_THAT(*test_env_->url_loader_factory()->pending_requests(), SizeIs(1));
-
-  // Verify request header DOES NOT contain a dm token
-  const net::HttpRequestHeaders& headers =
-      test_env_->url_loader_factory()->GetPendingRequest(0)->request.headers;
-  EXPECT_FALSE(headers.HasHeader(policy::dm_protocol::kAuthHeader));
-
-  test_env_->SimulateResponseForRequest(0);
-
-  EXPECT_TRUE(response_event.result().has_value());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace reporting

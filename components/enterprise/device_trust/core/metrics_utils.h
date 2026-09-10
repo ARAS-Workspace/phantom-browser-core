@@ -49,17 +49,6 @@ enum class DTAttestationPolicyLevel {
   kMaxValue = kUserAndBrowser
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Possible origins of the Device Trust connector attestation flow on ChromeOS.
-// These values are persisted to logs and should not be renumbered. Please
-// update the DTOrigins enum in enums.xml when adding a new step here.
-enum class DTOrigin {
-  kInSession = 0,
-  kLoginScreen = 1,
-  kMaxValue = kLoginScreen,
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void LogAttestationFunnelStep(DTAttestationFunnelStep step);
 
 void LogAttestationPolicyLevel(const std::set<DTCPolicyLevel>& levels);
@@ -75,12 +64,6 @@ void LogDeviceTrustResponse(const DeviceTrustResponse& response,
 // Enterprise.DeviceTrust.SignalsDecorator.Latency.{Variant}
 void LogSignalsCollectionLatency(const char* variant,
                                  base::TimeTicks start_time);
-
-#if BUILDFLAG(IS_CHROMEOS)
-void LogOrigin(DTOrigin origin);
-
-void LogEnrollmentStatus(bool is_enterprise_managed);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace enterprise_connectors
 

@@ -14,10 +14,6 @@
 #include "components/sync/service/sync_service_impl.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif
-
 namespace {
 
 using extension_settings_helper::AllExtensionSettingsSameChecker;

@@ -30,12 +30,6 @@
 #include "ui/views/widget/widget_observer.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/window_properties.h"
-#include "ui/aura/client/aura_constants.h"
-#include "ui/aura/window.h"
-#endif
-
 namespace {
 
 using content::WebContents;
@@ -149,93 +143,6 @@ class PresentationReceiverWindowViewBrowserTest : public InProcessBrowserTest {
   raw_ptr<PresentationReceiverWindowView, AcrossTasksDanglingUntriaged>
       receiver_view_ = nullptr;
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(PresentationReceiverWindowViewBrowserTest,
-                       ChromeOSHardwareFullscreenButton) {
-  // Bypass ExclusiveAccessContext and default accelerator to simulate hardware
-  // window state button, which sets the native aura window to a "normal" state.
-
-  // Waits for the PresentationReceiverWindowView to enter or exit fullscreen.
-  // It waits for the location bar visibility to change rather than simply using
-  // RunLoop::RunUntilIdle because in Mash, the fullscreen change takes place in
-  // another process.
-  class FullscreenWaiter final {
-   public:
-    enum class AwaitType {
-      kOutOfFullscreen,
-      kIntoFullscreen,
-    };
-
-    FullscreenWaiter(PresentationReceiverWindowView* receiver_view,
-                     AwaitType await_type,
-                     base::OnceClosure fullscreen_callback)
-        : receiver_view_(receiver_view),
-          await_type_(await_type),
-          fullscreen_callback_(std::move(fullscreen_callback)) {
-      auto* location_bar_view = receiver_view_->location_bar_view();
-      subscription_ =
-          location_bar_view->AddVisibleChangedCallback(base::BindRepeating(
-              &FullscreenWaiter::OnViewVisibilityChanged,
-              base::Unretained(this), base::Unretained(location_bar_view)));
-    }
-
-    FullscreenWaiter(const FullscreenWaiter&) = delete;
-    FullscreenWaiter& operator=(const FullscreenWaiter&) = delete;
-
-    ~FullscreenWaiter() = default;
-
-   private:
-    void OnViewVisibilityChanged(views::View* observed_view) {
-      bool fullscreen = !observed_view->GetVisible();
-      EXPECT_EQ(fullscreen, receiver_view_->IsFullscreen());
-      if (fullscreen == (await_type_ == AwaitType::kIntoFullscreen)) {
-        std::move(fullscreen_callback_).Run();
-      }
-    }
-
-    const raw_ptr<PresentationReceiverWindowView> receiver_view_;
-    base::CallbackListSubscription subscription_;
-    const AwaitType await_type_;
-    base::OnceClosure fullscreen_callback_;
-  };
-
-  {
-    base::RunLoop fullscreen_loop;
-    FullscreenWaiter waiter(receiver_view_,
-                            FullscreenWaiter::AwaitType::kIntoFullscreen,
-                            fullscreen_loop.QuitClosure());
-    receiver_view_->ShowInactiveFullscreen();
-    fullscreen_loop.Run();
-
-    ASSERT_TRUE(receiver_view_->IsFullscreen());
-    EXPECT_FALSE(receiver_view_->location_bar_view()->GetVisible());
-  }
-
-  {
-    base::RunLoop fullscreen_loop;
-    FullscreenWaiter waiter(receiver_view_,
-                            FullscreenWaiter::AwaitType::kOutOfFullscreen,
-                            fullscreen_loop.QuitClosure());
-    receiver_view_->GetWidget()->SetFullscreen(false);
-    fullscreen_loop.Run();
-    ASSERT_FALSE(receiver_view_->IsFullscreen());
-    EXPECT_TRUE(receiver_view_->location_bar_view()->GetVisible());
-  }
-
-  // Back to fullscreen with the hardware button.
-  {
-    base::RunLoop fullscreen_loop;
-    FullscreenWaiter waiter(receiver_view_,
-                            FullscreenWaiter::AwaitType::kIntoFullscreen,
-                            fullscreen_loop.QuitClosure());
-    receiver_view_->GetWidget()->SetFullscreen(true);
-    fullscreen_loop.Run();
-    ASSERT_TRUE(receiver_view_->IsFullscreen());
-    EXPECT_FALSE(receiver_view_->location_bar_view()->GetVisible());
-  }
-}
-#endif
 
 IN_PROC_BROWSER_TEST_F(PresentationReceiverWindowViewBrowserTest,
                        LocationBarViewShown) {

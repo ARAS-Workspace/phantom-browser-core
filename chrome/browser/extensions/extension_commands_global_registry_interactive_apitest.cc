@@ -31,18 +31,14 @@ using GlobalCommandsApiTest = ExtensionApiTest;
 // extension.
 //
 // Doesn't work in CrOS builds, http://crbug.com/41258695
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_GlobalCommand DISABLED_GlobalCommand
-#else
 #define MAYBE_GlobalCommand GlobalCommand
-#endif
 IN_PROC_BROWSER_TEST_F(GlobalCommandsApiTest, MAYBE_GlobalCommand) {
   // Load the extension in the non-incognito browser.
   ResultCatcher catcher;
   ASSERT_TRUE(RunExtensionTest("keybinding/global")) << message_;
   ASSERT_TRUE(catcher.GetNextResult());
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // Our infrastructure for sending keys expects a browser to send them to, but
   // to properly test global shortcuts you need to send them to another target.
   // So, create an incognito browser to use as a target to send the shortcuts

@@ -91,9 +91,6 @@
 #include "third_party/dawn/include/dawn/webgpu_cpp.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(SKIA_USE_DAWN) && BUILDFLAG(IS_CHROMEOS)
-#include "gpu/command_buffer/service/drm_modifiers_filter_dawn.h"
-#endif
 
 namespace gpu {
 
@@ -306,9 +303,6 @@ GpuInit::~GpuInit() {
 bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
                                         const GpuPreferences& gpu_preferences) {
   TRACE_EVENT("gpu,startup", "gpu::GpuInit::InitializeAndStartSandbox");
-#if BUILDFLAG(IS_CHROMEOS)
-  LOG(WARNING) << "Starting gpu initialization.";
-#endif  //  BUILDFLAG(IS_CHROMEOS)
   gpu_preferences_ = gpu_preferences;
   // Blocklist decisions based on basic GPUInfo may not be final. It might
   // need more context based GPUInfo. In such situations, switching to
@@ -369,15 +363,15 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
   enable_watchdog = false;
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   bool gpu_sandbox_start_early = gpu_preferences_.gpu_sandbox_start_early;
-#else   // !(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#else
   // For some reasons MacOSX's VideoToolbox might crash when called after
   // initializing GL, see crbug.com/1047643 and crbug.com/871280. On other
   // operating systems like Windows and Android the pre-sandbox steps have
   // always been executed before initializing GL so keep it this way.
   bool gpu_sandbox_start_early = true;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // PreSandbox is mainly for resource handling and not related to the GPU
   // driver, it doesn't need the GPU watchdog. The loadLibrary may take long
@@ -393,9 +387,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
   // function.
   GpuWatchdogInit watchdog_init;
 
-  // Don't start watchdog immediately, to allow developers to switch to VT2 on
-  // startup.
-  constexpr bool delayed_watchdog_enable = BUILDFLAG(IS_CHROMEOS);
+  constexpr bool delayed_watchdog_enable = false;
 
   // Start the GPU watchdog only after anything that is expected to be time
   // consuming has completed, otherwise the process is liable to be aborted.
@@ -408,7 +400,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
   }
 
   bool attempted_startsandbox = false;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // On Chrome OS ARM Mali, GPU driver userspace creates threads when
   // initializing a GL context, so start the sandbox early.
   // TODO(zmo): Need to collect OS version before this.
@@ -417,7 +409,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
         watchdog_thread_.get(), &gpu_info_, gpu_preferences_);
     attempted_startsandbox = true;
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_OZONE)
   // Initialize Ozone GPU after the watchdog in case it hangs. The sandbox
@@ -427,9 +419,6 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
   params.enable_native_gpu_memory_buffers =
       gpu_preferences_.enable_native_gpu_memory_buffers;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  params.allow_sync_and_real_buffer_page_flip_testing = true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ui::OzonePlatform::InitializeForGPU(params);
 #endif  // BUILDFLAG(IS_OZONE)
 
@@ -451,7 +440,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
     }
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // The ContentSandboxHelper is currently the only one implementation of
   // GpuSandboxHelper and it has no dependency. Except on Linux where
   // VaapiWrapper checks the GL implementation to determine which display
@@ -463,7 +452,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
     sandbox_helper_->PreSandboxStartup(gpu_preferences, workarounds,
                                        &gpu_info_);
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   ResumeGpuWatchdog(watchdog_thread_.get());
 
@@ -484,16 +473,6 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
   gpu_preferences_.use_passthrough_cmd_decoder = true;
 #endif  // BUILDFLAG(ENABLE_VALIDATING_COMMAND_DECODER)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(b/233238923): While passthrough is rolling out on CrOS, it's useful
-  // to know whether a bug report is for a session with passthrough enabled.
-  // Remove this logging when passthrough is fully launched on CrOS.
-  if (gpu_preferences_.use_passthrough_cmd_decoder) {
-    LOG(WARNING) << "Using passthrough command decoder. NOTE: This log is "
-        << "to help triage feedback reports and does not by itself mean there "
-        << "is an issue.";
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // We need to collect GL strings (VENDOR, RENDERER) for blocklisting purposes.
   if (!gl_disabled) {
@@ -510,7 +489,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
           command_line, gpu_feature_info_,
           gpu_preferences_.disable_software_rasterizer, false);
       if (gl_use_swiftshader_) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
         VLOG(1) << "Quit GPU process launch to fallback to SwiftShader cleanly "
                 << "on Linux";
         return false;
@@ -534,7 +513,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
               << "failed";
           return false;
         }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
       }
     } else {  // gl_use_swiftshader_ == true
       switch (gpu_preferences_.use_vulkan) {
@@ -652,7 +631,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
     }
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Driver may create a compatibility profile context when collect graphics
   // information on Linux platform. Try to collect graphics information
   // based on core profile context after disabling platform extensions.
@@ -672,7 +651,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
       return false;
     }
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_OZONE)
   // We need to get supported formats before sandboxing to avoid an known
@@ -727,8 +706,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
       }
     }
   }
-#if BUILDFLAG(IS_LINUX) || \
-    (BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE))
+#if BUILDFLAG(IS_LINUX)
   if (!gl_disabled && !gl_use_swiftshader_ && std::getenv("RUNNING_UNDER_RR")) {
     // https://rr-project.org/ is a Linux-only record-and-replay debugger that
     // is unhappy when things like GPU drivers write directly into the
@@ -813,14 +791,6 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
     filter_set = true;
   }
 #endif  // BUILDFLAG(ENABLE_VULKAN)
-#if BUILDFLAG(SKIA_USE_DAWN) && BUILDFLAG(IS_CHROMEOS)
-  if (dawn_context_provider_ && factory->SupportsDrmModifiersFilter()) {
-    CHECK(!filter_set);
-    factory->SetDrmModifiersFilter(std::make_unique<DrmModifiersFilterDawn>(
-        dawn_context_provider_->GetDevice().GetAdapter()));
-    filter_set = true;
-  }
-#endif  // BUILDFLAG(SKIA_USE_DAWN) && BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(IS_OZONE)
 
   RecordUMA();
@@ -888,9 +858,6 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
   ui::OzonePlatform::InitParams params;
   params.single_process = true;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  params.allow_sync_and_real_buffer_page_flip_testing = true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ui::OzonePlatform::InitializeForGPU(params);
 #endif  // BUILDFLAG(IS_OZONE)
 
@@ -924,8 +891,7 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
   }
   bool gl_disabled = gl::GetGLImplementation() == gl::kGLImplementationDisabled;
 
-#if BUILDFLAG(IS_LINUX) || \
-    (BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE))
+#if BUILDFLAG(IS_LINUX)
   if (!gl_disabled && !gl_use_swiftshader_ && std::getenv("RUNNING_UNDER_RR")) {
     // https://rr-project.org/ is a Linux-only record-and-replay debugger that
     // is unhappy when things like GPU drivers write directly into the
@@ -980,7 +946,7 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
     }
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Driver may create a compatibility profile context when collect graphics
   // information on Linux platform. Try to collect graphics information
   // based on core profile context after disabling platform extensions.
@@ -1004,7 +970,7 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
       }
     }
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   if (gl_use_swiftshader_) {
     AdjustInfoToSwiftShader();

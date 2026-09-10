@@ -189,7 +189,7 @@ class TestChromeAutofillClient : public ChromeAutofillClient {
       : ChromeAutofillClient(web_contents) {}
   ~TestChromeAutofillClient() override = default;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   using ChromeAutofillClient::at_memory_copy_paste_observer;
 #endif
 };
@@ -879,7 +879,7 @@ TEST_F(ChromeAutofillClientTestWithMockWindow,
 
 #endif  //  !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Tests that `ShowAutofillAtMemoryPromo` is propagated to the browser user
 // education service when AtMemory is enabled.
@@ -1206,7 +1206,7 @@ TEST_F(ChromeAutofillClientTestWithMockWindow,
       paste_event);
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Tests that if there is no enablement service available to the profile, client
 // defaults to kDisabledNotEligible state.

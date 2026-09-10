@@ -405,18 +405,6 @@ bool SequenceInformationRecordMatcher::MatchAndExplainRecord(
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (EncryptedReportingClient::GenerationGuidIsRequired()) {
-    const auto* generation_guid =
-        sequence_information->FindString(json_keys::kGenerationGuid);
-    if ((!generation_guid || generation_guid->empty())) {
-      *listener << "No key named \"sequenceInformation/generationGuid\" or the "
-                   "value is not a string in record "
-                << record << '.';
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return true;
 }
 

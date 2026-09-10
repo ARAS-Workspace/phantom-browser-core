@@ -112,7 +112,7 @@ void MandatoryReauthManager::StartDeviceAuthentication(
       non_interactive_payment_method_type, authentication_method,
       autofill_metrics::MandatoryReauthAuthenticationFlowEvent::kFlowStarted);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   AuthenticateWithMessage(
       l10n_util::GetStringUTF16(IDS_PAYMENTS_AUTOFILL_FILLING_MANDATORY_REAUTH),
       std::move(authentication_complete_callback));
@@ -246,7 +246,7 @@ void MandatoryReauthManager::OnUserAcceptedOptInPrompt() {
       opt_in_source_,
       /*opt_in=*/true,
       autofill_metrics::MandatoryReauthAuthenticationFlowEvent::kFlowStarted);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   AuthenticateWithMessage(
       l10n_util::GetStringUTF16(IDS_PAYMENTS_AUTOFILL_MANDATORY_REAUTH_PROMPT),
       base::BindOnce(

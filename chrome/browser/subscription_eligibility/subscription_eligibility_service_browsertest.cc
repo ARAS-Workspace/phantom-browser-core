@@ -94,7 +94,6 @@ IN_PROC_BROWSER_TEST_F(SubscriptionEligibilityServiceTest,
 
 // We don't run this test on ChromeOS because we can't create multiple
 // profiles.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SubscriptionEligibilityServiceTest, Metrics) {
   {
     base::HistogramTester histogram_tester;
@@ -230,7 +229,6 @@ IN_PROC_BROWSER_TEST_F(SubscriptionEligibilityServiceTest, Metrics) {
                                             "NoProfilesSubscribed"));
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 

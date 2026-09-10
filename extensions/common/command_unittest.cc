@@ -233,11 +233,6 @@ TEST(CommandTest, ExtensionCommandParsingFallback) {
 #if BUILDFLAG(IS_MAC)
   ui::Accelerator accelerator(ui::VKEY_M,
                               ui::EF_SHIFT_DOWN | ui::EF_COMMAND_DOWN);
-#elif BUILDFLAG(IS_CHROMEOS)
-  ui::Accelerator accelerator(ui::VKEY_C,
-                              ui::EF_SHIFT_DOWN | ui::EF_CONTROL_DOWN);
-  // TODO(https://crbug.com/356905053): Should this be ChromeOS keybindings?
-
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_DESKTOP_ANDROID)
   ui::Accelerator accelerator(ui::VKEY_L,
                               ui::EF_SHIFT_DOWN | ui::EF_CONTROL_DOWN);

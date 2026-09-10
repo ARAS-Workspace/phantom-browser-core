@@ -31,13 +31,6 @@ namespace signin {
 class IdentityManager;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-namespace user_manager {
-class User;
-}
-
-#endif
 
 namespace enterprise_connectors {
 
@@ -92,10 +85,8 @@ class RealtimeReportingClient : public RealtimeReportingClientBase {
       base::TimeTicks upload_started_at,
       policy::CloudPolicyClient::Result upload_result) override;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   std::pair<std::string, policy::CloudPolicyClient*> InitProfileReportingClient(
       const std::string& dm_token) override;
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   void MaybeCollectDeviceSignalsAndReportEvent(
@@ -114,11 +105,6 @@ class RealtimeReportingClient : public RealtimeReportingClientBase {
   void OnCloudPolicyClientAvailable(const std::string& policy_client_desc,
                                     policy::CloudPolicyClient* client);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Return the Chrome OS user who is subject to reporting, or nullptr if
-  // the user cannot be deterined.
-  static const user_manager::User* GetChromeOSUser();
-#endif
 
   void RemoveDmTokenFromRejectedSet(const std::string& dm_token);
 

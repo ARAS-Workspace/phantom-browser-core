@@ -60,10 +60,6 @@ class TranslateUIDelegateTest : public ::testing::Test {
         std::make_unique<sync_preferences::TestingPrefServiceSyncable>();
     language::LanguagePrefs::RegisterProfilePrefs(pref_service_->registry());
     pref_service_->SetString(language::prefs::kAcceptLanguages, std::string());
-#if BUILDFLAG(IS_CHROMEOS)
-    pref_service_->SetString(language::prefs::kPreferredLanguages,
-                             std::string());
-#endif
 
     pref_service_->registry()->RegisterBooleanPref(
         prefs::kOfferTranslateEnabled, true);

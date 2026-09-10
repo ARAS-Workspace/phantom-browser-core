@@ -56,11 +56,6 @@ constexpr const char* kAllowListPrefixesForAllPlatforms[] = {
 #if BUILDFLAG(IS_MAC)
 constexpr const char* kAllowListPrefixesForPlatform[] = {
     "/Default/Visited Links"};
-#elif BUILDFLAG(IS_CHROMEOS)
-constexpr const char* kAllowListPrefixesForPlatform[] = {
-    "/Default/Local Storage/leveldb/CURRENT",
-    "/Default/Site Characteristics Database", "/Default/Sync Data/LevelDB",
-    "/test-user/.variations-list.txt"};
 #elif BUILDFLAG(IS_LINUX)
 constexpr const char* kAllowListPrefixesForPlatform[] = {"/Default/Web Data"};
 #else
@@ -230,18 +225,6 @@ class IncognitoProfileContainmentBrowserTest : public InProcessBrowserTest {
   IncognitoProfileContainmentBrowserTest()
       : allow_list_(std::begin(kAllowListPrefixesForAllPlatforms),
                     std::end(kAllowListPrefixesForAllPlatforms)) {
-#if BUILDFLAG(IS_CHROMEOS)
-    // These prefixes are allowed twice, once under "Default" and once under
-    // "test-user".
-    std::set<std::string> test_folder;
-    const int offset = strlen("/Default");
-    for (std::string prefix : allow_list_) {
-      if (prefix.find("/Default/") == 0) {
-        test_folder.insert(std::string("/test-user") + prefix.substr(offset));
-      }
-    }
-    allow_list_.insert(test_folder.begin(), test_folder.end());
-#endif
 
     for (const char* platform_prefix : kAllowListPrefixesForPlatform) {
       allow_list_.emplace(platform_prefix);

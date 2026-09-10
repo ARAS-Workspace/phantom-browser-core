@@ -69,7 +69,7 @@ class LiveCaptionController : public KeyedService,
   // Mac and ChromeOS move the fullscreened window into a new workspace. When
   // the WebContents associated with the CaptionBubbleContext goes
   // fullscreen, ensure that the Live Caption bubble moves to the new workspace.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   void OnToggleFullscreen(CaptionBubbleContext* caption_bubble_context);
 #endif
 

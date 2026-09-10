@@ -211,7 +211,6 @@ IN_PROC_BROWSER_TEST_F(ShoppingUiHandlerDelegateBrowserTest,
 
 // The feedback dialog on CrOS happens at the system level, which cannot be
 // easily tested here.
-#if !BUILDFLAG(IS_CHROMEOS)
 // When the user has the page saved locally, an account node is created instead
 // so that the feature can be used.
 IN_PROC_BROWSER_TEST_F(ShoppingUiHandlerDelegateBrowserTest,
@@ -232,4 +231,3 @@ IN_PROC_BROWSER_TEST_F(ShoppingUiHandlerDelegateBrowserTest,
   EXPECT_EQ(account_bookmark_count + 1,
             bookmark_model_->account_other_node()->children().size());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

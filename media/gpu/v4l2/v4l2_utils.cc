@@ -534,10 +534,6 @@ void GetSupportedResolution(const IoctlAsCallback& ioctl_cb,
       min_resolution->SetSize(frame_size.stepwise.min_width,
                               frame_size.stepwise.min_height);
     } else {
-#if BUILDFLAG(IS_CHROMEOS)
-      // All of Chrome-supported implementations support STEPWISE only.
-      CHECK_EQ(frame_size.type, V4L2_FRMSIZE_TYPE_STEPWISE);
-#endif
     }
   } else {
     DLOGF(INFO) << "VIDIOC_ENUM_FRAMESIZES failed, using default values";
@@ -580,10 +576,6 @@ std::optional<SupportedVideoDecoderConfigs> GetSupportedV4L2DecoderConfigs() {
   SupportedVideoDecoderConfigs supported_media_configs;
   std::vector<std::string> candidate_paths;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  constexpr char kVideoDevicePattern[] = "/dev/video-dec0";
-  candidate_paths.push_back(kVideoDevicePattern);
-#else
   constexpr char kVideoDevicePattern[] = "/dev/video";
   constexpr int kMaxDevices = 256;
   candidate_paths.reserve(kMaxDevices);
@@ -591,15 +583,11 @@ std::optional<SupportedVideoDecoderConfigs> GetSupportedV4L2DecoderConfigs() {
     candidate_paths.push_back(
         base::StringPrintf("%s%d", kVideoDevicePattern, i));
   }
-#endif
 
   for (const auto& path : candidate_paths) {
     base::ScopedFD device_fd(
         HANDLE_EINTR(open(path.c_str(), O_RDWR | O_NONBLOCK | O_CLOEXEC)));
     if (!device_fd.is_valid()) {
-#if BUILDFLAG(IS_CHROMEOS)
-      PLOG(WARNING) << "Could not open " << path;
-#endif
       continue;
     }
 

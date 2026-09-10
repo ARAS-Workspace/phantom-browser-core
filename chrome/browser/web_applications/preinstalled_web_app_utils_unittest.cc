@@ -18,12 +18,6 @@
 #include "ui/events/devices/device_data_manager_test_api.h"
 #include "ui/events/devices/touchscreen_device.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "base/command_line.h"
-#include "chromeos/ash/experiences/arc/arc_util.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 
 namespace {
@@ -95,106 +89,6 @@ class PreinstalledWebAppUtilsTest : public testing::Test {
 };
 
 // ParseConfig() is also tested by PreinstalledWebAppManagerTest.
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-namespace {
-
-std::string BoolParamToString(
-    const ::testing::TestParamInfo<bool>& bool_param) {
-  return bool_param.param ? "true" : "false";
-}
-
-using IsTablet = bool;
-using IsArcSupported = bool;
-
-}  // namespace
-
-class PreinstalledWebAppUtilsTabletTest
-    : public PreinstalledWebAppUtilsTest,
-      public ::testing::WithParamInterface<IsTablet> {
- public:
-  PreinstalledWebAppUtilsTabletTest() {
-    if (GetParam()) {
-      base::CommandLine::ForCurrentProcess()->AppendSwitch(
-          ash::switches::kEnableTabletFormFactor);
-    }
-  }
-  ~PreinstalledWebAppUtilsTabletTest() override = default;
-
-  bool is_tablet() const { return GetParam(); }
-};
-
-TEST_P(PreinstalledWebAppUtilsTabletTest, DisableIfTabletFormFactor) {
-  std::optional<ExternalInstallOptions> disable_true_options = ParseConfig(R"(
-    {
-      "app_url": "https://test.org",
-      "launch_container": "window",
-      "disable_if_tablet_form_factor": true,
-      "user_type": ["test"]
-    }
-  )");
-  EXPECT_TRUE(disable_true_options->disable_if_tablet_form_factor);
-
-  std::optional<ExternalInstallOptions> disable_false_options = ParseConfig(R"(
-    {
-      "app_url": "https://test.org",
-      "launch_container": "window",
-      "disable_if_tablet_form_factor": false,
-      "user_type": ["test"]
-    }
-  )");
-  EXPECT_FALSE(disable_false_options->disable_if_tablet_form_factor);
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         PreinstalledWebAppUtilsTabletTest,
-                         ::testing::Values(true, false),
-                         BoolParamToString);
-
-class PreinstalledWebAppUtilsArcTest
-    : public PreinstalledWebAppUtilsTest,
-      public ::testing::WithParamInterface<IsArcSupported> {
- public:
-  PreinstalledWebAppUtilsArcTest() {
-    if (GetParam()) {
-      base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-          ash::switches::kArcAvailability, "officially-supported");
-    }
-  }
-  ~PreinstalledWebAppUtilsArcTest() override = default;
-
-  bool is_arc_supported() const { return GetParam(); }
-};
-
-TEST_P(PreinstalledWebAppUtilsArcTest, DisableIfArcSupported) {
-  std::optional<ExternalInstallOptions> disable_true_options = ParseConfig(R"(
-    {
-      "app_url": "https://test.org",
-      "launch_container": "window",
-      "disable_if_arc_supported": true,
-      "user_type": ["test"]
-    }
-  )");
-  EXPECT_TRUE(disable_true_options->disable_if_arc_supported);
-
-  std::optional<ExternalInstallOptions> disable_false_options = ParseConfig(R"(
-    {
-      "app_url": "https://test.org",
-      "launch_container": "window",
-      "disable_if_arc_supported": false,
-      "user_type": ["test"]
-    }
-  )");
-  EXPECT_FALSE(disable_false_options->disable_if_arc_supported);
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         PreinstalledWebAppUtilsArcTest,
-                         ::testing::Values(true, false),
-                         BoolParamToString);
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #define MAYBE_OfflineManifestValid OfflineManifestValid
 TEST_F(PreinstalledWebAppUtilsTest, MAYBE_OfflineManifestValid) {

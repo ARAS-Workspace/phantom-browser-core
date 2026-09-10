@@ -220,17 +220,12 @@ class ManagementUIManagedStatusTest
     // Condition to deflake, some builds will initiate a client before this and
     // will crash when adding a new client
     Profile* profile = browser()->GetProfile();
-#if BUILDFLAG(IS_CHROMEOS)
-    profile->GetCloudPolicyManager()->core()->client()->SetupRegistration(
-        "dm_token", "client_id", {});
-#else
     auto client = std::make_unique<policy::CloudPolicyClient>(
         /*service=*/g_browser_process->browser_policy_connector()
             ->device_management_service(),
         /*url_loader_factory=*/g_browser_process->shared_url_loader_factory());
     client->SetupRegistration("dm_token", "client_id", {});
     profile->GetCloudPolicyManager()->core()->Connect(std::move(client));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
     EXPECT_FALSE(signin::MakeAccountAvailable(
                      IdentityManagerFactory::GetForProfile(profile),
@@ -284,15 +279,6 @@ class ManagementUIManagedStatusTest
         std::make_unique<net::test_server::BasicHttpResponse>();
     http_response->set_code(net::HTTP_TEMPORARY_REDIRECT);
     http_response->AddCustomHeader("Location", dest);
-#if BUILDFLAG(IS_CHROMEOS)
-    // Intercept policy fetch requests since ChromeOS specifically calls for a
-    // policy fetch, and failed policy fetches cause the client dm token to be
-    // overridden, furthermore we do not test any policy fetch logic, so we
-    // return a basic response.
-    if (request_type == "policy") {
-      return std::make_unique<net::test_server::BasicHttpResponse>();
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
     return http_response;
   }
 

@@ -333,15 +333,9 @@ void FileSystemAccessSafeMoveHelper::DidFileDoQuarantine(
   // On ChromeOS on the other hand anything that isn't in the sandboxed file
   // system is also uniquely identifiable by its FileSystemURL::path(), and
   // thus we accept all other FileSystemURL types.
-#if BUILDFLAG(IS_CHROMEOS)
-  DCHECK(target_url.type() != storage::kFileSystemTypeTemporary &&
-         target_url.type() != storage::kFileSystemTypePersistent)
-      << target_url.type();
-#else
   DCHECK(target_url.type() == storage::kFileSystemTypeLocal ||
          target_url.type() == storage::kFileSystemTypeTest)
       << target_url.type();
-#endif
 
   GURL authority_url =
       referrer_url.is_valid() && referrer_url.SchemeIsHTTPOrHTTPS()

@@ -54,8 +54,6 @@ constexpr char kManifestTemplate[] = R"({
 std::string GetAnotherCommandPlatform() {
 #if BUILDFLAG(IS_MAC)
   return ui::kKeybindingPlatformChromeOs;
-#elif BUILDFLAG(IS_CHROMEOS)
-  return ui::kKeybindingPlatformLinux;
 #elif BUILDFLAG(IS_LINUX)
   return ui::kKeybindingPlatformWin;
 #else

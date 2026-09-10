@@ -11,9 +11,7 @@
 #include "chrome/common/chrome_features.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "content/public/common/content_features.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 namespace web_app {
 
@@ -76,9 +74,7 @@ IsolatedWebAppTest::IsolatedWebAppTest(
     bool dev_mode)
     : env_(std::move(env)) {
   std::vector<base::test::FeatureRef> enabled_features = {
-#if !BUILDFLAG(IS_CHROMEOS)
       features::kIsolatedWebApps,
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       component_updater::kIwaKeyDistributionComponent,
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

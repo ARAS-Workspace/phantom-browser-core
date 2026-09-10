@@ -44,7 +44,7 @@ TEST(FontList, GetFontList) {
       FROM_HERE, base::BindOnce([] {
         base::ListValue fonts = content::GetFontList_SlowBlocking();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
         EXPECT_TRUE(HasFontWithName(fonts, "Arimo", "Arimo"));
 #else
         EXPECT_TRUE(HasFontWithName(fonts, "Arial", "Arial"));

@@ -46,17 +46,11 @@ bool ValidateLaunchUrlWebUnsafe(const GURL& url) {
 
   const GURL settings_url(chrome::kChromeUISettingsURL);
   bool url_points_to_an_approved_settings_page = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  // In ChromeOS, allow any settings page to be specified on the command line.
-  url_points_to_an_approved_settings_page =
-      url.DeprecatedGetOriginAsURL() == settings_url.DeprecatedGetOriginAsURL();
-#else
   // Exposed for external cleaners to offer a settings reset to the
   // user. The allowed URLs must match exactly.
   const GURL reset_settings_url =
       settings_url.Resolve(chrome::kResetProfileSettingsSubPage);
   url_points_to_an_approved_settings_page = url == reset_settings_url;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   bool url_scheme_is_chrome = false;
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

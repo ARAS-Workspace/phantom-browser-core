@@ -39,18 +39,10 @@
 #include "ui/views/interaction/interaction_test_util_views.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/smart_card/smart_card_permission_context.h"
-#include "chrome/browser/smart_card/smart_card_permission_context_factory.h"
-#endif
-
 namespace {
 
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContentsElementId);
 const char kFirstPermissionRow[] = "FirstPermissionRow";
-#if BUILDFLAG(IS_CHROMEOS)
-const char kSecondPermissionRow[] = "SecondPermissionRow";
-#endif
 
 // Clicks the location icon to open the page info bubble.
 void OpenPageInfoBubble(Browser* browser) {
@@ -322,20 +314,6 @@ class PageInfoBubbleViewInteractiveUiTest : public InteractiveBrowserTest {
         }));
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  auto EnsureSmartCardReaderGrantStatus(const std::string& reader_name,
-                                        bool is_granted) {
-    return CheckResult(
-        base::BindLambdaForTesting([this, reader_name]() {
-          return SmartCardPermissionContextFactory::GetForProfile(
-                     *browser()->GetProfile())
-              .HasReaderPermission(url::Origin::Create(GetURL()), reader_name);
-        }),
-        is_granted,
-        "Checking if the smart card reader permission matches the expectation");
-  }
-#endif
-
   auto CheckContentSettings(ContentSettingsType type, ContentSetting setting) {
     return CheckResult(
         base::BindLambdaForTesting([type, this]() {
@@ -381,23 +359,7 @@ class PageInfoBubbleViewInteractiveUiTest : public InteractiveBrowserTest {
         ContentSettingsPattern::Wildcard(), type, setting);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void GrantSmartCardReaderPermission(const std::string& reader_name) {
-    SmartCardPermissionContextFactory::GetForProfile(*browser()->GetProfile())
-        .GrantPersistentReaderPermission(url::Origin::Create(GetURL()),
-                                         reader_name);
-  }
-
-  void ResetSmartCardReaderGrants() {
-    SmartCardPermissionContextFactory::GetForProfile(*browser()->GetProfile())
-        .RevokeAllPermissions();
-  }
-#endif
-
   std::unique_ptr<net::EmbeddedTestServer> https_server_;
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList feature_list_{blink::features::kSmartCard};
-#endif
 };
 
 IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewInteractiveUiTest,
@@ -610,43 +572,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewInteractiveUiTest,
                         &PermissionToggleRowView::GetRowSubTitleForTesting,
                         u""));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewInteractiveUiTest,
-                       SmartCardGrantsShowCorrectly) {
-  GrantSmartCardReaderPermission("Reader 1");
-  GrantSmartCardReaderPermission("Reader 2");
-
-  RunTestSequence(NavigateAndOpenPageInfo(),
-                  // A view with permissions in PageInfo.
-                  WaitForShow(PageInfoMainView::kPermissionsElementId),
-                  // Set id to the first child of `kPermissionsElementId` -
-                  // should be first reader grant.
-                  NameChildView(PageInfoMainView::kPermissionsElementId,
-                                kFirstPermissionRow, 0u),
-                  // Verify the first row is the Reader 1 grant.
-                  CheckViewProperty(kFirstPermissionRow,
-                                    &ChosenObjectView::GetObjectNameForTesting,
-                                    u"Reader 1"),
-                  // Set id to the second child of `kPermissionsElementId` -
-                  // should be the second reader grant.
-                  NameChildView(PageInfoMainView::kPermissionsElementId,
-                                kSecondPermissionRow, 1u),
-                  // Verify the second row is the Reader 2 grant.
-                  CheckViewProperty(kSecondPermissionRow,
-                                    &ChosenObjectView::GetObjectNameForTesting,
-                                    u"Reader 2"),
-                  // Click the button deleting grant.
-                  DeleteGrant(kFirstPermissionRow),
-                  // Row with Reader 1 should disappear.
-                  WaitForHide(kFirstPermissionRow),
-                  // Permissions should align with what is visible.
-                  EnsureSmartCardReaderGrantStatus("Reader 1", false),
-                  EnsureSmartCardReaderGrantStatus("Reader 2", true));
-
-  ResetSmartCardReaderGrants();
-}
-#endif
 
 #if BUILDFLAG(IS_MAC)
 // Test that when clipboard permission is denied at the platform level (e.g.,

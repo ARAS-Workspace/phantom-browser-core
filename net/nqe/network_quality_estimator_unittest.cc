@@ -1948,8 +1948,7 @@ TEST_F(NetworkQualityEstimatorTest, TestGlobalSocketWatcherThrottle) {
 // TestTCPSocketRTT requires kernel support for tcp_info struct, and so it is
 // enabled only on certain platforms.
 // ChromeOS is disabled due to crbug.com/986904
-#if (defined(TCP_INFO) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)) && \
-    !BUILDFLAG(IS_CHROMEOS)
+#if (defined(TCP_INFO) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID))
 #define MAYBE_TestTCPSocketRTT TestTCPSocketRTT
 #else
 #define MAYBE_TestTCPSocketRTT DISABLED_TestTCPSocketRTT

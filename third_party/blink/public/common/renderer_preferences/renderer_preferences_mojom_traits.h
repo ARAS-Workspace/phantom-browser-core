@@ -130,7 +130,7 @@ struct BLINK_COMMON_EXPORT
     return data.enable_encrypted_media;
   }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   static const bool& use_overlay_scrollbar(
       const ::blink::RendererPreferences& data) {
     return data.use_overlay_scrollbar;
@@ -182,7 +182,7 @@ struct BLINK_COMMON_EXPORT
     return data.send_subresource_notification;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   static const std::string& system_font_family_name(
       const ::blink::RendererPreferences& data) {
     return data.system_font_family_name;

@@ -93,7 +93,6 @@ using history::WebHistoryService;
 
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 history::mojom::AccountInfoPtr CreateAccountInfoDataMojo(
     const AccountInfo& info) {
   auto account_info_mojo = history::mojom::AccountInfo::New();
@@ -103,7 +102,6 @@ history::mojom::AccountInfoPtr CreateAccountInfoDataMojo(
       GURL(signin::GetAccountPictureUrl(info));
   return account_info_mojo;
 }
-#endif
 
 // Identifiers for the type of device from which a history entry originated.
 static const char kDeviceTypeLaptop[] = "laptop";
@@ -566,18 +564,12 @@ void BrowsingHistoryHandler::OpenClearBrowsingDataDialog() {
 }
 
 void BrowsingHistoryHandler::TurnOnHistorySync() {
-#if !BUILDFLAG(IS_CHROMEOS)
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(web_contents_);
   if (browser) {
     signin_ui_util::SignInAndEnableHistorySync(
         browser, profile_, signin_metrics::AccessPoint::kRecentTabs);
   }
-#else
-  // This is not expected to be called on ChromeOS as the screen that uses this
-  // function is never shown for ChromeOS (using <if expr="not is_chromeos">).
-  NOTREACHED();
-#endif
 }
 
 void BrowsingHistoryHandler::RemoveBookmark(const std::string& url) {
@@ -722,7 +714,6 @@ Profile* BrowsingHistoryHandler::GetProfile() {
 
 void BrowsingHistoryHandler::RequestAccountInfo(
     RequestAccountInfoCallback callback) {
-#if !BUILDFLAG(IS_CHROMEOS)
   AccountInfo account_info = signin_ui_util::GetSingleAccountForPromos(
       &identity_manager_.get(),
       AccountPreviewDataServiceFactory::GetForProfile(profile_));
@@ -731,16 +722,10 @@ void BrowsingHistoryHandler::RequestAccountInfo(
   if (!identity_manager_observation_.IsObserving()) {
     identity_manager_observation_.Observe(&identity_manager_.get());
   }
-#else
-  // This is not expected to be called on ChromeOS as the screen that uses this
-  // function is never shown for ChromeOS (using <if expr="not is_chromeos">).
-  NOTREACHED();
-#endif
 }
 
 void BrowsingHistoryHandler::OnExtendedAccountInfoUpdated(
     const AccountInfo& info) {
-#if !BUILDFLAG(IS_CHROMEOS)
   AccountInfo account_to_display = signin_ui_util::GetSingleAccountForPromos(
       &identity_manager_.get(),
       AccountPreviewDataServiceFactory::GetForProfile(profile_));
@@ -750,9 +735,4 @@ void BrowsingHistoryHandler::OnExtendedAccountInfoUpdated(
     return;
   }
   page_->SendAccountInfo(CreateAccountInfoDataMojo(info));
-#else
-  // This is not expected to be called on ChromeOS as the screen that uses this
-  // function is never shown for ChromeOS (using <if expr="not is_chromeos">).
-  NOTREACHED();
-#endif
 }

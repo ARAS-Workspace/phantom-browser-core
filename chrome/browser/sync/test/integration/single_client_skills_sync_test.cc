@@ -379,7 +379,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSkillsSyncTest,
 }
 
 // ChromeOS does not support signout.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientSkillsSyncTest,
                        ShouldDeleteAllDataOnDisableSync) {
   InjectSpecificsToFakeServer(CreateSkillSpecifics(
@@ -416,7 +415,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSkillsSyncTest,
                                        "prompt2", "description2"))))
                   .Wait());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientSkillsSyncTest,
                        ShouldMirrorSyncOnPrefChange) {

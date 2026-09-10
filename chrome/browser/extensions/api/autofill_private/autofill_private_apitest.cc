@@ -328,7 +328,7 @@ IN_PROC_BROWSER_TEST_F(AutofillPrivateApiTest, logServerIbanLinkClicked) {
   histogram_tester.ExpectTotalCount("Autofill.ServerIbanLinkClicked", 1u);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(AutofillPrivateApiTest,
                        authenticateUserAndFlipMandatoryAuthToggle) {
   base::UserActionTester user_action_tester;

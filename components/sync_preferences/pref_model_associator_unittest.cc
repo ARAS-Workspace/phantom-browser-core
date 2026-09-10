@@ -50,10 +50,6 @@ const char kDictionaryPrefName[] = "pref.dictionary";
 const char kCustomMergePrefName[] = "pref.custom";
 
 const char kStringPriorityPrefName[] = "priority.pref.string";
-#if BUILDFLAG(IS_CHROMEOS)
-const char kStringOsPrefName[] = "os.pref.string";
-const char kStringOsPriorityPrefName[] = "os.priority.pref.string";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Assigning an id of 0 to all the test prefs.
 const TestSyncablePrefsDatabase::PrefsMap kSyncablePrefsDatabase = {
@@ -72,13 +68,6 @@ const TestSyncablePrefsDatabase::PrefsMap kSyncablePrefsDatabase = {
     {kStringPriorityPrefName,
      {0, syncer::PRIORITY_PREFERENCES, PrefSensitivity::kNone,
       MergeBehavior::kNone}},
-#if BUILDFLAG(IS_CHROMEOS)
-    {kStringOsPrefName,
-     {0, syncer::OS_PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-    {kStringOsPriorityPrefName,
-     {0, syncer::OS_PRIORITY_PREFERENCES, PrefSensitivity::kNone,
-      MergeBehavior::kNone}},
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 // Creates SyncData for a remote pref change.
@@ -623,23 +612,6 @@ TEST_F(SyncablePrefsDatabaseTest, ShouldAllowRegisteringSyncablePriorityPrefs) {
               NotNull());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(SyncablePrefsDatabaseTest, ShouldAllowRegisteringSyncableOSPrefs) {
-  pref_registry_->RegisterStringPref(
-      kStringOsPrefName, std::string(),
-      user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PREF);
-  EXPECT_THAT(pref_service_->FindPreference(kStringOsPrefName), NotNull());
-}
-
-TEST_F(SyncablePrefsDatabaseTest,
-       ShouldAllowRegisteringSyncableOSPriorityPrefs) {
-  pref_registry_->RegisterStringPref(
-      kStringOsPriorityPrefName, std::string(),
-      user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PRIORITY_PREF);
-  EXPECT_THAT(pref_service_->FindPreference(kStringOsPriorityPrefName),
-              NotNull());
-}
-#endif
 using SyncablePrefsDatabaseDeathTest = SyncablePrefsDatabaseTest;
 
 TEST_F(SyncablePrefsDatabaseDeathTest, ShouldFailRegisteringIllegalPrefs) {
@@ -686,55 +658,6 @@ TEST_F(SyncablePrefsDatabaseDeathTest,
       kExpectedErrorMessageHint);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(SyncablePrefsDatabaseDeathTest, ShouldFailRegisteringIllegalOSPrefs) {
-  const std::string kIllegalStringPrefName = "not-allowed_string_pref";
-  const std::string kIllegalListPrefName = "not-allowed_list_pref";
-  const std::string kIllegalDictPrefName = "not-allowed_dict_pref";
-  const std::string kExpectedErrorMessageHint = "syncable prefs allowlist";
-
-  EXPECT_DCHECK_DEATH_WITH(
-      pref_registry_->RegisterStringPref(
-          kIllegalStringPrefName, std::string(),
-          user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PREF),
-      kExpectedErrorMessageHint);
-  EXPECT_DCHECK_DEATH_WITH(
-      pref_registry_->RegisterListPref(
-          kIllegalListPrefName,
-          user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PREF),
-      kExpectedErrorMessageHint);
-  EXPECT_DCHECK_DEATH_WITH(
-      pref_registry_->RegisterDictionaryPref(
-          kIllegalDictPrefName,
-          user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PREF),
-      kExpectedErrorMessageHint);
-}
-
-TEST_F(SyncablePrefsDatabaseDeathTest,
-       ShouldFailRegisteringIllegalOSPriorityPrefs) {
-  const std::string kIllegalStringPrefName = "not-allowed_string_pref";
-  const std::string kIllegalListPrefName = "not-allowed_list_pref";
-  const std::string kIllegalDictPrefName = "not-allowed_dict_pref";
-  const std::string kExpectedErrorMessageHint = "syncable prefs allowlist";
-
-  EXPECT_DCHECK_DEATH_WITH(
-      pref_registry_->RegisterStringPref(
-          kIllegalStringPrefName, std::string(),
-          user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PRIORITY_PREF),
-      kExpectedErrorMessageHint);
-  EXPECT_DCHECK_DEATH_WITH(
-      pref_registry_->RegisterListPref(
-          kIllegalListPrefName,
-          user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PRIORITY_PREF),
-      kExpectedErrorMessageHint);
-  EXPECT_DCHECK_DEATH_WITH(
-      pref_registry_->RegisterDictionaryPref(
-          kIllegalDictPrefName,
-          user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PRIORITY_PREF),
-      kExpectedErrorMessageHint);
-}
-#endif
-
 TEST_F(SyncablePrefsDatabaseDeathTest,
        ShouldFailRegisteringPrefsWithInvalidType) {
   const std::string kExpectedErrorMessageHint = "has incorrect data";
@@ -747,18 +670,6 @@ TEST_F(SyncablePrefsDatabaseDeathTest,
                                kStringPriorityPrefName, std::string(),
                                user_prefs::PrefRegistrySyncable::SYNCABLE_PREF),
                            kExpectedErrorMessageHint);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_DCHECK_DEATH_WITH(
-      pref_registry_->RegisterStringPref(
-          kStringOsPrefName, std::string(),
-          user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PRIORITY_PREF),
-      kExpectedErrorMessageHint);
-  EXPECT_DCHECK_DEATH_WITH(
-      pref_registry_->RegisterStringPref(
-          kStringOsPriorityPrefName, std::string(),
-          user_prefs::PrefRegistrySyncable::SYNCABLE_OS_PREF),
-      kExpectedErrorMessageHint);
-#endif
 }
 
 class PrefModelAssociatorWithPreferencesAccountStorageTest

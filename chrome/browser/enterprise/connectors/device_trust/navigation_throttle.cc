@@ -29,11 +29,6 @@
 #include "net/http/http_response_headers.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chromeos/ash/components/install_attributes/install_attributes.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace enterprise_connectors {
 
 using DeviceTrustCallback = DeviceTrustService::DeviceTrustCallback;
@@ -76,17 +71,6 @@ Profile* GetProfile(content::NavigationHandle& navigation_handle) {
   return Profile::FromBrowserContext(
       navigation_handle.GetWebContents()->GetBrowserContext());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-DTOrigin GetAttestationFlowOrigin(content::BrowserContext* context) {
-  if (context->IsOffTheRecord() && ash::ProfileHelper::IsSigninProfile(
-                                       Profile::FromBrowserContext(context))) {
-    return DTOrigin::kLoginScreen;
-  }
-
-  return DTOrigin::kInSession;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -196,11 +180,6 @@ DeviceTrustNavigationThrottle::AddHeadersIfNeeded() {
   if (navigation_handle()->GetResponseHeaders() == nullptr ||
       !navigation_handle()->GetResponseHeaders()->HasHeader(
           kVerifiedAccessChallengeHeader)) {
-#if BUILDFLAG(IS_CHROMEOS)
-    LogOrigin(GetAttestationFlowOrigin(
-        navigation_handle()->GetWebContents()->GetBrowserContext()));
-    LogEnrollmentStatus(ash::InstallAttributes::Get()->IsEnterpriseManaged());
-#endif  // BUILDFLAG(IS_CHROMEOS)
     LogAttestationFunnelStep(DTAttestationFunnelStep::kAttestationFlowStarted);
     navigation_handle()->SetRequestHeader(kDeviceTrustHeader,
                                           kDeviceTrustHeaderValue);

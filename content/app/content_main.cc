@@ -55,7 +55,7 @@
 #include "content/common/shared_file_util.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "base/files/scoped_file.h"
 #endif
 
@@ -182,7 +182,7 @@ NO_STACK_PROTECTOR int RunContentProcess(
     base::EnableTerminationOnOutOfMemory();
     logging::RegisterAbslAbortHook();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // The various desktop environments set this environment variable that
     // allows the dbus client library to connect directly to the bus. When this
     // variable is not set (test environments like xvfb-run), the dbus client
@@ -262,7 +262,7 @@ NO_STACK_PROTECTOR int RunContentProcess(
 #endif
 #endif
 
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) && !defined(COMPONENT_BUILD)
+#if BUILDFLAG(IS_LINUX) && !defined(COMPONENT_BUILD)
     base::subtle::EnableFDOwnershipEnforcement(true);
 #endif
 

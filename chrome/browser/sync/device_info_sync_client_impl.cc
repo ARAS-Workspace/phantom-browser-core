@@ -94,11 +94,7 @@ DeviceInfoSyncClientImpl::GetPhoneAsASecurityKeyInfo() const {
 }
 
 bool DeviceInfoSyncClientImpl::IsUmaEnabledOnCrOSDevice() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  return ChromeMetricsServiceAccessor::IsMetricsAndCrashReportingEnabled();
-#else
   return false;
-#endif
 }
 
 bool DeviceInfoSyncClientImpl::GetDesktopToIOSPromoReceivingEnabled() const {

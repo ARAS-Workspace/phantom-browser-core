@@ -117,19 +117,11 @@ IN_PROC_BROWSER_TEST_F(MetricsConsentMigrationBrowserTest,
   ASSERT_TRUE(harness->SetupSync());
 
   // Disable Apps sync.
-#if BUILDFLAG(IS_CHROMEOS)
-  syncer::UserSelectableOsTypeSet os_types =
-      harness->service()->GetUserSettings()->GetSelectedOsTypes();
-  os_types.Remove(syncer::UserSelectableOsType::kOsApps);
-  harness->service()->GetUserSettings()->SetSelectedOsTypes(
-      /*sync_all_os_types=*/false, os_types);
-#else
   syncer::UserSelectableTypeSet types =
       harness->service()->GetUserSettings()->GetSelectedTypes();
   types.Remove(syncer::UserSelectableType::kApps);
   harness->service()->GetUserSettings()->SetSelectedTypes(
       /*sync_everything=*/false, types);
-#endif
 
   // Set MSBB to true.
   profile->GetPrefs()->SetBoolean(
@@ -274,19 +266,11 @@ IN_PROC_BROWSER_TEST_F(MetricsConsentMigrationRollbackBrowserTest,
   ASSERT_TRUE(harness->SetupSync());
 
   // Disable Apps sync.
-#if BUILDFLAG(IS_CHROMEOS)
-  syncer::UserSelectableOsTypeSet os_types =
-      harness->service()->GetUserSettings()->GetSelectedOsTypes();
-  os_types.Remove(syncer::UserSelectableOsType::kOsApps);
-  harness->service()->GetUserSettings()->SetSelectedOsTypes(
-      /*sync_all_os_types=*/false, os_types);
-#else
   syncer::UserSelectableTypeSet types =
       harness->service()->GetUserSettings()->GetSelectedTypes();
   types.Remove(syncer::UserSelectableType::kApps);
   harness->service()->GetUserSettings()->SetSelectedTypes(
       /*sync_everything=*/false, types);
-#endif
 
   // Set MSBB to true.
   profile->GetPrefs()->SetBoolean(

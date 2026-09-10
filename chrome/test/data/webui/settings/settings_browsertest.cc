@@ -53,9 +53,7 @@
 #include "third_party/blink/public/common/features_generated.h"
 #include "ui/compositor/compositor_switches.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/toasts/toast_features.h"  // nogncheck
-#endif
 
 
 #if BUILDFLAG(ENABLE_COMPOSE)
@@ -102,12 +100,10 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, AppearancePageIndex) {
   RunTest("settings/appearance_page_index_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // TODO(crbug.com/40856240) Test is flaky on ChromeOS
 IN_PROC_BROWSER_TEST_F(SettingsTest, AppearancePage) {
   RunTest("settings/appearance_page_test.js", "mocha.run()");
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, ContactInfoAddressValidation) {
   RunTest("settings/contact_info_page_address_validation_test.js",
@@ -173,11 +169,9 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, CrPolicyPrefIndicator) {
   RunTest("settings/cr_policy_pref_indicator_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SettingsTest, DefaultBrowser) {
   RunTest("settings/default_browser_test.js", "mocha.run()");
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, DoNotTrackToggle) {
   RunTest("settings/do_not_track_toggle_test.js", "mocha.run()");
@@ -273,7 +267,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, HomeUrlInput) {
   RunTest("settings/home_url_input_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SettingsTest, ImportDataDialog) {
   RunTest("settings/import_data_dialog_test.js", "mocha.run()");
 }
@@ -289,7 +282,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, LiveCaption) {
 IN_PROC_BROWSER_TEST_F(SettingsTest, LiveTranslate) {
   RunTest("settings/live_translate_test.js", "mocha.run()");
 }
-#endif
 
 // Copied from Polymer 2 version of tests:
 // Times out on Windows Tests (dbg). See https://crbug.com/41278078.
@@ -300,7 +292,7 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, DISABLED_MainPage) {
 }
 
 // TODO(crbug.com/454213441): Flaky on Linux builds and debug ChromeOS builds.
-#if BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_CHROMEOS) && !defined(NDEBUG))
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_SettingsMain DISABLED_SettingsMain
 #else
 #define MAYBE_SettingsMain SettingsMain
@@ -309,7 +301,7 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, MAYBE_SettingsMain) {
   RunTest("settings/settings_main_plugins_test.js", "mocha.run()");
 }
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 IN_PROC_BROWSER_TEST_F(SettingsTest, MetricsReporting) {
   RunTest("settings/metrics_reporting_test.js",
           "runMochaSuite('MetricsReporting')");
@@ -381,17 +373,10 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, PeoplePageIndex) {
   RunTest("settings/people_page_index_test.js", "mocha.run()");
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(SettingsTest, PeoplePageChromeOS) {
-  RunTest("settings/people_page_test_cros.js", "mocha.run()");
-}
-#endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SettingsTest, PeoplePageManageProfile) {
   RunTest("settings/people_page_manage_profile_test.js", "mocha.run()");
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, PeoplePageSyncControls) {
   RunTest("settings/people_page_sync_controls_test.js", "mocha.run()");
@@ -403,7 +388,7 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, PrivacyPageIndex) {
 }
 
 // TODO(crbug.com/533057215): Flaky on Linux and ChromeOS debug builds.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_PrivacyPageIndexSiteSettings DISABLED_PrivacyPageIndexSiteSettings
 #else
 #define MAYBE_PrivacyPageIndexSiteSettings PrivacyPageIndexSiteSettings
@@ -1060,11 +1045,9 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, RecentSitePermissions) {
   RunTest("settings/recent_site_permissions_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SettingsTest, RelaunchConfirmationDialog) {
   RunTest("settings/relaunch_confirmation_dialog_test.js", "mocha.run()");
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, ResetPage) {
   RunTest("settings/reset_page_test.js", "mocha.run()");
@@ -1207,12 +1190,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, SiteFavicon) {
   RunTest("settings/site_favicon_test.js", "mocha.run()");
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Copied from Polymer 2 test. TODO(crbug.com/41439813): flaky, fix.
-IN_PROC_BROWSER_TEST_F(SettingsTest, DISABLED_SiteListChromeOS) {
-  RunTest("settings/site_list_tests_cros.js", "mocha.run()");
-}
-#endif
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, SiteListEntry) {
   RunTest("settings/site_list_entry_test.js", "mocha.run()");
@@ -1226,11 +1203,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, Slider) {
   RunTest("settings/settings_slider_test.js", "mocha.run()");
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(SettingsTest, SmartCardReadersPage) {
-  RunTest("settings/smart_card_readers_page_test.js", "mocha.run()");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, SpeedPage) {
   RunTest("settings/speed_page_test.js", "runMochaSuite('SpeedPage')");
@@ -1316,7 +1288,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, ZoomLevels) {
   RunTest("settings/zoom_levels_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class SettingsSystemPageTest : public SettingsBrowserTest {
  private:
 };
@@ -1324,7 +1295,6 @@ class SettingsSystemPageTest : public SettingsBrowserTest {
 IN_PROC_BROWSER_TEST_F(SettingsSystemPageTest, SystemPage) {
   RunTest("settings/system_page_test.js", "mocha.run()");
 }
-#endif  //! BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 class SettingsAiPageOfficialTest : public SettingsBrowserTest {
@@ -1356,13 +1326,11 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, PrivacyGuidePromoVisibility) {
 
 using SettingsClearBrowsingDataTest = SettingsBrowserTest;
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SettingsClearBrowsingDataTest,
                        DeleteBrowsingDataAccountIndicator) {
   RunTest("settings/clear_browsing_data_account_indicator_test.js",
           "runMochaSuite('DeleteBrowsingDataAccountIndicator')");
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(SettingsClearBrowsingDataTest,
                        DeleteBrowsingDataDialog) {
@@ -1423,7 +1391,6 @@ IN_PROC_BROWSER_TEST_F(SettingsWithPixelOutputTest,
   RunTest("settings/security/fingerprint_progress_arc_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 using SettingsLanguagePageTest = SettingsBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(SettingsLanguagePageTest, AddLanguagesDialog) {
@@ -1439,7 +1406,6 @@ IN_PROC_BROWSER_TEST_F(SettingsLanguagePageTest, LanguageMenu) {
 IN_PROC_BROWSER_TEST_F(SettingsLanguagePageTest, MetricsBrowser) {
   RunTest("settings/languages_page_metrics_test_browser.js", "mocha.run()");
 }
-#endif
 
 using SettingsPerformancePageTest = SettingsBrowserTest;
 
@@ -1570,9 +1536,6 @@ class SettingsPrivacyPageTest : public SettingsBrowserTest {
   SettingsPrivacyPageTest() {
     scoped_feature_list1_.InitWithFeatures(
         {
-#if BUILDFLAG(IS_CHROMEOS)
-            blink::features::kWebPrinting,
-#endif
         },
         {});
     scoped_feature_list2_.InitAndEnableFeatureWithParameters(
@@ -1644,11 +1607,7 @@ IN_PROC_BROWSER_TEST_F(SettingsRouteTest, DynamicParameters) {
 
 // Copied from Polymer 2 test:
 // Failing on ChromiumOS dbg. https://crbug.com/263415119
-#if BUILDFLAG(IS_CHROMEOS) && !defined(NDEBUG)
-#define MAYBE_NonExistentRoute DISABLED_NonExistentRoute
-#else
 #define MAYBE_NonExistentRoute NonExistentRoute
-#endif
 IN_PROC_BROWSER_TEST_F(SettingsRouteTest, MAYBE_NonExistentRoute) {
   RunTest("settings/route_test.js", "runMochaSuite('NonExistentRoute')");
 }
@@ -1747,7 +1706,6 @@ IN_PROC_BROWSER_TEST_F(SettingsSiteSettingsPageTest, SoundPage) {
   RunTest("settings/sound_page_test.js", "runMochaSuite('SoundPage')");
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 using SettingsTranslatePageTest = SettingsBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(SettingsTranslatePageTest, TranslateSettings) {
@@ -1768,7 +1726,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTranslatePageTest, NeverTranslateDialog) {
 IN_PROC_BROWSER_TEST_F(SettingsTranslatePageTest, MetricsBrowser) {
   RunTest("settings/translate_page_metrics_test_browser.js", "mocha.run()");
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 using YourSavedInfoTest = SettingsBrowserTest;
 

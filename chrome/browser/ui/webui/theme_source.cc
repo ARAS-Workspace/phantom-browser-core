@@ -53,11 +53,6 @@
 #include "chrome/browser/themes/browser_theme_pack.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/grit/cros_styles_resources.h"  // nogncheck crbug.com/40143654
-#include "ui/chromeos/styles/cros_tokens_color_mappings.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 GURL GetThemeUrl(const std::string& path) {
@@ -123,14 +118,6 @@ void ThemeSource::StartDataRequest(
     SendColorsCss(url, wc_getter, std::move(callback));
     return;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  constexpr char kTypographyCssPath[] = "typography.css";
-  if (parsed_path == kTypographyCssPath) {
-    SendTypographyCss(std::move(callback));
-    return;
-  }
-#endif
 
   int resource_id = -1;
   if (parsed_path == "current-channel-logo") {
@@ -294,15 +281,7 @@ std::optional<std::string> ThemeSource::GenerateColorsCss(
        base::BindRepeating(to_css_id, ui::ColorIdName)},
       {"chrome", kChromeColorsStart, kChromeColorsEnd,
        base::BindRepeating(to_css_id, &ChromeColorIdName)},
-#if BUILDFLAG(IS_CHROMEOS)
-      {"ref", cros_tokens::kCrosRefColorsStart, cros_tokens::kCrosRefColorsEnd,
-       base::BindRepeating(cros_tokens::ColorIdName)},
-      {"sys", cros_tokens::kCrosSysColorsStart, cros_tokens::kCrosSysColorsEnd,
-       base::BindRepeating(cros_tokens::ColorIdName)},
-      {"legacy", cros_tokens::kLegacySemanticColorsStart,
-       cros_tokens::kLegacySemanticColorsEnd,
-       base::BindRepeating(cros_tokens::ColorIdName)},
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
       {"ref", ui::kColorRefPrimary0, ui::kColorRefNeutralVariant100,
        base::BindRepeating(to_css_id, ui::ColorIdName)},
       {"sys", ui::kColorSysPrimary, ui::kColorSysOmniboxContainer,
@@ -409,16 +388,6 @@ std::string ThemeSource::GetAccessControlAllowOriginForOrigin(
 
   return content::URLDataSource::GetAccessControlAllowOriginForOrigin(origin);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void ThemeSource::SendTypographyCss(
-    content::URLDataSource::GotDataCallback callback) {
-  const ui::ResourceBundle& rb = ui::ResourceBundle::GetSharedInstance();
-  std::move(callback).Run(rb.LoadDataResourceBytesForScale(
-      IDR_CROS_STYLES_UI_CHROMEOS_STYLES_CROS_TYPOGRAPHY_CSS,
-      ui::kScaleFactorNone));
-}
-#endif
 
 std::string ThemeSource::GetContentSecurityPolicy(
     network::mojom::CSPDirectiveName directive) {

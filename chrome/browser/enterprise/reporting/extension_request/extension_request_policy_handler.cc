@@ -41,7 +41,6 @@ bool ExtensionRequestPolicyHandler::CheckPolicySettings(
     return false;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Disable extension workflow when it's set by user cloud policy but machine
   // is not managed or managed by a different domain.
   const policy::PolicyMap::Entry* extension_request_policy =
@@ -51,7 +50,6 @@ bool ExtensionRequestPolicyHandler::CheckPolicySettings(
     errors->AddError(policy_name(), IDS_POLICY_USER_IS_NOT_AFFILIATED_ERROR);
     return false;
   }
-#endif
 
   return true;
 }

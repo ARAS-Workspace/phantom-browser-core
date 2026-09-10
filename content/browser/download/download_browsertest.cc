@@ -3177,9 +3177,7 @@ IN_PROC_BROWSER_TEST_F(DownloadContentTest, RemoveResumedDownload) {
 }
 
 // TODO(qinmin): Flaky crashes on ASAN Linux. https://crbug.com/836689
-#if BUILDFLAG(IS_ANDROID) ||                           \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-        defined(ADDRESS_SANITIZER)
+#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER))
 #define MAYBE_CancelResumedDownload DISABLED_CancelResumedDownload
 #else
 #define MAYBE_CancelResumedDownload CancelResumedDownload
@@ -5178,7 +5176,7 @@ IN_PROC_BROWSER_TEST_F(MhtmlDownloadTest,
       download::DownloadItem::COMPLETE);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || defined(ADDRESS_SANITIZER)
+#if BUILDFLAG(IS_LINUX) || defined(ADDRESS_SANITIZER)
 // Flaky https://crbug.com/852073
 #define MAYBE_ForceDownloadMessageRfc822Page \
   DISABLED_ForceDownloadMessageRfc822Page

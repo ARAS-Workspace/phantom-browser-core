@@ -27,10 +27,6 @@
 #include "content/public/test/browser_test.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace policy {
 
 // Tests the ComponentUpdater's EnabledComponentUpdates group policy by
@@ -110,10 +106,6 @@ const char ComponentUpdaterPolicyTest::component_id_[] =
 
 ComponentUpdaterPolicyTest::ComponentUpdaterPolicyTest()
     : https_server_(net::EmbeddedTestServer::TYPE_HTTPS) {
-#if BUILDFLAG(IS_CHROMEOS)
-  scoped_feature_list_.InitAndDisableFeature(
-      ash::features::kGrowthCampaignsInConsumerSession);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 ComponentUpdaterPolicyTest::~ComponentUpdaterPolicyTest() = default;

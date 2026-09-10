@@ -18,11 +18,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 // TODO(crbug.com/351775836): Move ChromeOS to use TestGpuServiceHolder.
-#if BUILDFLAG(IS_CHROMEOS)
-#include "gpu/ipc/in_process_gpu_thread_holder.h"
-#else
 #include "components/viz/test/test_gpu_service_holder.h"
-#endif
 
 namespace {
 
@@ -31,11 +27,7 @@ class ContextTestBase : public testing::Test {
   std::unique_ptr<gpu::GLInProcessContext> CreateGLInProcessContext() {
     auto context = std::make_unique<gpu::GLInProcessContext>();
     // TODO(crbug.com/351775836): Move ChromeOS to use TestGpuServiceHolder.
-#if BUILDFLAG(IS_CHROMEOS)
-    auto result = context->Initialize(gpu_thread_holder_.GetTaskExecutor()
-#else
     auto result = context->Initialize(gpu_thread_holder_.task_executor()
-#endif
     );
     DCHECK_EQ(result, gpu::ContextResult::kSuccess);
     return context;
@@ -59,11 +51,7 @@ class ContextTestBase : public testing::Test {
 
  private:
   // TODO(crbug.com/351775836): Move ChromeOS to use TestGpuServiceHolder.
-#if BUILDFLAG(IS_CHROMEOS)
-  gpu::InProcessGpuThreadHolder gpu_thread_holder_;
-#else
   viz::TestGpuServiceHolder gpu_thread_holder_;
-#endif
   std::unique_ptr<gpu::GLInProcessContext> context_;
 };
 

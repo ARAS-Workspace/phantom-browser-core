@@ -32,13 +32,6 @@
 #include "extensions/common/switches.h"
 #include "extensions/test/extension_test_message_listener.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/chrome_app_deprecation/chrome_app_deprecation.h"
-#include "chrome/browser/ui/ash/cast_config/cast_config_controller_media_router.h"
-#include "components/media_router/browser/media_routes_observer.h"
-#include "testing/gmock/include/gmock/gmock.h"
-#endif
-
 using content::WebContents;
 
 namespace {
@@ -75,23 +68,9 @@ void PlatformAppBrowserTest::SetUpCommandLine(base::CommandLine* command_line) {
 
 void PlatformAppBrowserTest::SetUpOnMainThread() {
   MixinBasedExtensionApiTest::SetUpOnMainThread();
-#if BUILDFLAG(IS_CHROMEOS)
-  // Mock the Media Router in extension api tests. Several of the
-  // PlatformAppBrowserTest suites call RunAllPendingInMessageLoop() when there
-  // are mojo messages that will call back into Profile creation through the
-  // media router.
-  media_router_ = std::make_unique<media_router::MockMediaRouter>();
-  ON_CALL(*media_router_, RegisterMediaSinksObserver(::testing::_))
-      .WillByDefault(::testing::Return(true));
-
-  CastConfigControllerMediaRouter::SetMediaRouterForTest(media_router_.get());
-#endif
 }
 
 void PlatformAppBrowserTest::TearDownOnMainThread() {
-#if BUILDFLAG(IS_CHROMEOS)
-  CastConfigControllerMediaRouter::SetMediaRouterForTest(nullptr);
-#endif
   MixinBasedExtensionApiTest::TearDownOnMainThread();
 }
 
@@ -117,11 +96,6 @@ const Extension* PlatformAppBrowserTest::LoadAndLaunchPlatformApp(
   const Extension* extension = LoadExtension(
       test_data_dir_.AppendASCII("platform_apps").AppendASCII(name));
   EXPECT_TRUE(extension);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  apps::chrome_app_deprecation::ScopedAddAppToAllowlistForTesting allowlist(
-      extension->id());
-#endif
 
   LaunchPlatformApp(extension);
 

@@ -440,8 +440,6 @@ TEST_P(PrimaryAccountAccessTokenFetcherTest, IdentityManagerShutdownNoAccount) {
   ShutdownIdentityManager();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 TEST_P(PrimaryAccountAccessTokenFetcherTest,
        ShouldNotRetryCanceledAccessTokenRequestIfSignedOut) {
   TestTokenCallback callback;
@@ -462,8 +460,6 @@ TEST_P(PrimaryAccountAccessTokenFetcherTest,
 
   identity_test_env()->ClearPrimaryAccount();
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(PrimaryAccountAccessTokenFetcherTest,
        ShouldNotRetryCanceledAccessTokenRequestIfRefreshTokenRevoked) {
@@ -510,71 +506,5 @@ INSTANTIATE_TEST_SUITE_P(All,
                          PrimaryAccountAccessTokenFetcherTest,
                          testing::Values(ConsentLevel::kSignin,
                                          ConsentLevel::kSync));
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Chrome OS can directly set the unconsented primary account during login,
-// so it has additional tests.
-TEST_F(PrimaryAccountAccessTokenFetcherTest,
-       UnconsentedPrimaryAccountWithSyncConsentNotRequired) {
-  TestTokenCallback callback;
-
-  // Simulate login.
-  identity_test_env()->MakePrimaryAccountAvailable(
-      "me@gmail.com", signin::ConsentLevel::kSignin);
-
-  // Perform an immediate fetch with consent not required.
-  auto fetcher = CreateFetcher(
-      callback.Get(), PrimaryAccountAccessTokenFetcher::Mode::kImmediate,
-      ConsentLevel::kSignin);
-
-  // We should get called back with the token.
-  EXPECT_CALL(callback, Run(GoogleServiceAuthError::AuthErrorNone(),
-                            access_token_info()));
-  identity_test_env()->WaitForAccessTokenRequestIfNecessaryAndRespondWithToken(
-      access_token_info().token, access_token_info().expiration_time,
-      access_token_info().id_token);
-}
-
-TEST_F(PrimaryAccountAccessTokenFetcherTest,
-       UnconsentedPrimaryAccountWithSyncConsentRequired) {
-  TestTokenCallback callback;
-
-  // Simulate login.
-  identity_test_env()->MakePrimaryAccountAvailable(
-      "me@gmail.com", signin::ConsentLevel::kSignin);
-
-  // Try an immediate fetch with consent required.
-  auto fetcher = CreateFetcher(
-      callback.Get(), PrimaryAccountAccessTokenFetcher::Mode::kImmediate,
-      ConsentLevel::kSync);
-
-  // No token request generated because the account isn't consented.
-  EXPECT_FALSE(identity_test_env()->IsAccessTokenRequestPending());
-}
-
-TEST_F(PrimaryAccountAccessTokenFetcherTest,
-       ShouldWaitForUnconsentedAccountLogin) {
-  TestTokenCallback callback;
-
-  // Not logged in, so the fetcher waits for an account to become available.
-  auto fetcher =
-      CreateFetcher(callback.Get(),
-                    PrimaryAccountAccessTokenFetcher::Mode::kWaitUntilAvailable,
-                    ConsentLevel::kSignin);
-  EXPECT_FALSE(identity_test_env()->IsAccessTokenRequestPending());
-
-  // Simulate login.
-  identity_test_env()->MakePrimaryAccountAvailable(
-      "me@gmail.com", signin::ConsentLevel::kSignin);
-
-  // Once the access token request is fulfilled, we should get called back with
-  // the access token.
-  EXPECT_CALL(callback, Run(GoogleServiceAuthError::AuthErrorNone(),
-                            access_token_info()));
-  identity_test_env()->WaitForAccessTokenRequestIfNecessaryAndRespondWithToken(
-      access_token_info().token, access_token_info().expiration_time,
-      access_token_info().id_token);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace signin

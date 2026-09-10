@@ -79,11 +79,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "ui/views/view_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/wm/window_pin_util.h"
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#endif
-
 using content::OpenURLParams;
 using content::Referrer;
 
@@ -426,91 +421,6 @@ IN_PROC_BROWSER_TEST_P(WebAppTabStripBrowserTest, PopOutTabOnInstall) {
 }
 
 // TODO(crbug.com/40598974) Enabled tab strip for web apps on non-Chrome OS.
-#if BUILDFLAG(IS_CHROMEOS)
-
-IN_PROC_BROWSER_TEST_P(WebAppTabStripBrowserTest,
-                       ActiveTabColorIsBackgroundColor) {
-  // Ensure we're not using the system theme on Linux.
-  ThemeService* theme_service =
-      ThemeServiceFactory::GetForProfile(browser()->GetProfile());
-  theme_service->UseDefaultTheme();
-
-  webapps::AppId app_id = Install();
-
-  // Trigger the launch but do not wait for the web contents to load.
-  web_app::WebAppProvider* provider =
-      web_app::WebAppProvider::GetForLocalAppsUnchecked(profile());
-  base::test::TestFuture<base::WeakPtr<BrowserWindowInterface>,
-                         base::WeakPtr<content::WebContents>,
-                         apps::LaunchContainer>
-      future;
-  provider->scheduler().LaunchAppWithCustomParams(
-      apps::AppLaunchParams(
-          app_id, apps::LaunchContainer::kLaunchContainerWindow,
-          WindowOpenDisposition::CURRENT_TAB, apps::LaunchSource::kFromTest),
-      future.GetCallback());
-  content::WebContents* web_contents = future.template Get<1>().get();
-  ASSERT_TRUE(web_contents);
-  Browser* app_browser = GlobalBrowserCollection::GetInstance()
-                             ->FindBrowserWithTab(web_contents)
-                             ->GetBrowserForMigrationOnly();
-  App app{app_id, app_browser,
-          BrowserView::GetBrowserViewForBrowser(app_browser), web_contents};
-
-  EXPECT_EQ(registrar().GetAppBackgroundColor(app.id), kAppBackgroundColor);
-
-  // Expect manifest background color prior to page loading.
-  {
-    ASSERT_FALSE(
-        app.web_contents->IsDocumentOnLoadCompletedInPrimaryMainFrame());
-    EXPECT_EQ(web_app::AppBrowserController::From(app.browser)
-                  ->GetBackgroundColor()
-                  .value(),
-              kAppBackgroundColor);
-    EXPECT_EQ(GetTabColor(app.browser_view), kAppBackgroundColor);
-  }
-
-  // Expect initial page background color to be white.
-  {
-    content::BackgroundColorChangeWaiter(app.web_contents).Wait();
-    EXPECT_EQ(web_app::AppBrowserController::From(app.browser)
-                  ->GetBackgroundColor()
-                  .value(),
-              SK_ColorWHITE);
-    EXPECT_EQ(GetTabColor(app.browser_view), SK_ColorWHITE);
-  }
-
-  // Ensure HTML document has loaded before we execute JS in it.
-  content::AwaitDocumentOnLoadCompleted(app.web_contents);
-
-  // Set document color to black and read tab background color.
-  {
-    content::BackgroundColorChangeWaiter waiter(app.web_contents);
-    EXPECT_TRUE(content::ExecJs(
-        app.web_contents, "document.body.style.backgroundColor = 'black';"));
-    waiter.Wait();
-    EXPECT_EQ(web_app::AppBrowserController::From(app.browser)
-                  ->GetBackgroundColor()
-                  .value(),
-              SK_ColorBLACK);
-    EXPECT_EQ(GetTabColor(app.browser_view), SK_ColorBLACK);
-  }
-
-  // Update document color to cyan and check that the tab color matches.
-  {
-    content::BackgroundColorChangeWaiter waiter(app.web_contents);
-    EXPECT_TRUE(content::ExecJs(
-        app.web_contents, "document.body.style.backgroundColor = 'cyan';"));
-    waiter.Wait();
-    EXPECT_EQ(web_app::AppBrowserController::From(app.browser)
-                  ->GetBackgroundColor()
-                  .value(),
-              SK_ColorCYAN);
-    EXPECT_EQ(GetTabColor(app.browser_view), SK_ColorCYAN);
-  }
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(WebAppTabStripBrowserTest, AutoNewTabUrl) {
   GURL start_url = embedded_test_server()->GetURL(
@@ -1516,98 +1426,6 @@ IN_PROC_BROWSER_TEST_P(WebAppTabStripBrowserTest, PageTitle) {
                                                    /*is_for_tab=*/false),
                        u"Favicon only"));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Browser tests that verify web-app tab strip behavior when locked (and not
-// locked) for OnTask. Only relevant for non-web browser scenarios.
-using WebAppTabStripForOnTaskBrowserTest = WebAppTabStripBrowserTest;
-
-IN_PROC_BROWSER_TEST_P(WebAppTabStripForOnTaskBrowserTest,
-                       MiddleClickDoesNotCloseTabsWhenLockedForOnTask) {
-  // Set up app and lock the app for OnTask.
-  GURL start_url =
-      embedded_test_server()->GetURL("/web_apps/tab_strip_customizations.html");
-  const webapps::AppId app_id = InstallTestWebApp(start_url);
-  Browser* const app_browser =
-      FindWebAppBrowser(browser()->GetProfile(), app_id);
-  ash::boca::OnTaskLockedController::From(app_browser)
-      ->set_locked_for_on_task(true);
-
-  const TabStripModel* const tab_strip_model = app_browser->tab_strip_model();
-  ASSERT_TRUE(registrar().IsTabbedWindowModeEnabled(app_id));
-  ASSERT_EQ(tab_strip_model->count(), 1);
-  ASSERT_TRUE(tab_strip_model->IsTabPinned(0));
-
-  PinWindow(app_browser->GetWindow()->GetNativeWindow(), /*trusted=*/true);
-  // TODO(crbug.com/429215055): This should happen as a part of pin state
-  // transition.
-  chrome::BrowserCommandController::From(app_browser)
-      ->LockedFullscreenStateChanged();
-  ASSERT_TRUE(platform_util::IsBrowserLockedFullscreen(app_browser));
-
-  // Open another tab so we can test tab close behavior on both home and
-  // non-home tabs.
-  OpenUrlAndWait(app_browser,
-                 embedded_test_server()->GetURL("/web_apps/get_manifest.html"));
-  ASSERT_EQ(tab_strip_model->count(), 2);
-
-  // Verify home tab cannot be closed.
-  BrowserView* browser_view =
-      BrowserView::GetBrowserViewForBrowser(app_browser);
-  CloseTabFor(browser_view, 0);
-  ASSERT_EQ(tab_strip_model->count(), 2);
-
-  // Also verify the non-home tab cannot be closed.
-  CloseTabFor(browser_view, 1);
-  EXPECT_EQ(tab_strip_model->count(), 2);
-}
-
-IN_PROC_BROWSER_TEST_P(WebAppTabStripForOnTaskBrowserTest,
-                       MiddleClickCanCloseTabsWhenNotLockedForOnTask) {
-  // Set up app and do not lock the app for OnTask.
-  GURL start_url =
-      embedded_test_server()->GetURL("/web_apps/tab_strip_customizations.html");
-  const webapps::AppId app_id = InstallTestWebApp(start_url);
-  Browser* const app_browser =
-      FindWebAppBrowser(browser()->GetProfile(), app_id);
-  ash::boca::OnTaskLockedController::From(app_browser)
-      ->set_locked_for_on_task(false);
-
-  const TabStripModel* const tab_strip_model = app_browser->tab_strip_model();
-  ASSERT_TRUE(registrar().IsTabbedWindowModeEnabled(app_id));
-  ASSERT_EQ(tab_strip_model->count(), 1);
-  ASSERT_TRUE(tab_strip_model->IsTabPinned(0));
-
-  // Open another tab so we can test tab close behavior on both home and
-  // non-home tabs.
-  OpenUrlAndWait(app_browser,
-                 embedded_test_server()->GetURL("/web_apps/get_manifest.html"));
-  ASSERT_EQ(tab_strip_model->count(), 2);
-
-  // Verify home tab cannot be closed (default behavior on tabbed web apps).
-  BrowserView* browser_view =
-      BrowserView::GetBrowserViewForBrowser(app_browser);
-  CloseTabFor(browser_view, 0);
-  ASSERT_EQ(tab_strip_model->count(), 2);
-
-  // Verify the non-home tab can be closed.
-  CloseTabFor(browser_view, 1);
-  ASSERT_EQ(tab_strip_model->count(), 1);
-
-  // The home tab is the only tab open so it can be closed now.
-  CloseTabFor(browser_view, 0);
-  EXPECT_EQ(tab_strip_model->count(), 0);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    WebAppTabStripForOnTaskBrowserTest,
-    testing::Values(apps::test::LinkCapturingFeatureVersion::kV2DefaultOff,
-                    apps::test::LinkCapturingFeatureVersion::kV2DefaultOn),
-    apps::test::LinkCapturingVersionToString);
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(WebAppTabStripBrowserTest, HomeTabCantBeClosedViaUI) {
   GURL start_url =

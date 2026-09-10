@@ -14,8 +14,6 @@
 namespace signin {
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 TEST(DeviceIdHelper, GenerateSigninScopedDeviceId) {
   EXPECT_FALSE(GenerateSigninScopedDeviceId().empty());
   EXPECT_NE(GenerateSigninScopedDeviceId(), GenerateSigninScopedDeviceId());
@@ -58,8 +56,6 @@ TEST(DeviceIdHelper, GetSigninScopedDeviceId) {
   EXPECT_EQ(device_id_2,
             prefs.GetString(prefs::kGoogleServicesSigninScopedDeviceId));
 }
-
-#endif
 
 }  // namespace
 }  // namespace signin

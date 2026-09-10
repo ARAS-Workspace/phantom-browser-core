@@ -59,7 +59,6 @@ base::flat_set<std::string> CombineIds(
   return combined_ids;
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Returns the calculated priority of the policy entry based on the policy's
 // scope and source, in addition to external factors such as precedence
 // metapolicy values. Used for browser policies.
@@ -109,7 +108,6 @@ PolicyPriorityBrowser GetPriority(
       NOTREACHED();
   }
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Helper function used in the invocation of `PolicyMap::CloneIf` from
 // `PolicyMap::Clone`.
@@ -483,13 +481,8 @@ void PolicyMap::MergePolicy(const std::string& policy_name,
   // EntryHasHigherPriority() only examines metadata fields (level, scope,
   // source, details), so the priority check can use the original entry
   // without a deep copy.
-#if BUILDFLAG(IS_CHROMEOS)
-  const bool other_is_higher_priority =
-      EntryHasHigherPriority(*other_policy, *policy);
-#else   // BUILDFLAG(IS_CHROMEOS)
   const bool other_is_higher_priority = EntryHasHigherPriority(
       *other_policy, *policy, using_default_precedence);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Determine whether the lower-priority entry is an enterprise default being
   // overwritten. This check also uses only metadata fields.
@@ -552,7 +545,6 @@ void PolicyMap::MergeFrom(const PolicyMap& other) {
   SetDeviceAffiliationIds(
       CombineIds(GetDeviceAffiliationIds(), other.GetDeviceAffiliationIds()));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Precedence metapolicies are merged before all other policies, including
   // merging metapolicies, because their value affects policy overriding.
   for (auto* policy : metapolicy::kPrecedence) {
@@ -562,17 +554,14 @@ void PolicyMap::MergeFrom(const PolicyMap& other) {
   }
 
   UpdateStoredComputedMetapolicies();
-#endif
 
   for (const auto& policy_and_entry : other) {
-#if !BUILDFLAG(IS_CHROMEOS)
     // Skip precedence metapolicies since they have already been merged into the
     // current PolicyMap.
     if (std::ranges::contains(metapolicy::kPrecedence,
                               policy_and_entry.first)) {
       continue;
     }
-#endif
 
     // External factors, such as the values of metapolicies, are considered.
     MergePolicy(policy_and_entry.first, other, false);
@@ -663,10 +652,6 @@ bool PolicyMap::EntryHasHigherPriority(const PolicyMap::Entry& lhs,
 bool PolicyMap::EntryHasHigherPriority(const PolicyMap::Entry& lhs,
                                        const PolicyMap::Entry& rhs,
                                        bool using_default_precedence) const {
-#if BUILDFLAG(IS_CHROMEOS)
-  return std::tie(lhs.level, lhs.scope, lhs.source) >
-         std::tie(rhs.level, rhs.scope, rhs.source);
-#else   // BUILDFLAG(IS_CHROMEOS)
   const PolicyDetails* details = lhs.details ? lhs.details : rhs.details;
   PolicyPriorityBrowser lhs_priority =
       using_default_precedence
@@ -683,7 +668,6 @@ bool PolicyMap::EntryHasHigherPriority(const PolicyMap::Entry& lhs,
                         cloud_user_policy_overrides_cloud_machine_policy_,
                         IsUserAffiliated(), details);
   return std::tie(lhs.level, lhs_priority) > std::tie(rhs.level, rhs_priority);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 bool PolicyMap::IsUserAffiliated() const {
@@ -710,7 +694,6 @@ const base::flat_set<std::string>& PolicyMap::GetDeviceAffiliationIds() const {
   return device_affiliation_ids_;
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void PolicyMap::UpdateStoredComputedMetapolicies() {
   const base::Value* cloud_policy_overrides_platform_policy = GetValue(
       key::kCloudPolicyOverridesPlatformPolicy, base::Value::Type::BOOLEAN);
@@ -725,7 +708,6 @@ void PolicyMap::UpdateStoredComputedMetapolicies() {
       cloud_user_policy_overrides_cloud_machine_policy &&
       cloud_user_policy_overrides_cloud_machine_policy->GetBool();
 }
-#endif
 
 void PolicyMap::UpdateStoredUserAffiliation() {
   is_user_affiliated_ =

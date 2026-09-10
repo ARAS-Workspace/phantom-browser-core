@@ -556,36 +556,8 @@ bool BrowserStartupMetricRecorder::IsFirstRun() const {
 
 base::TimeTicks
 BrowserStartupMetricRecorder::GetApplicationStartTicksForStartup() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // `application_start_ticks_` is inappropriate since the device often boots
-  // to a login screen, and an indefinite amount of time can elapse before a
-  // browser window is opened. Even when restoring a session after a crash
-  // (which has no login screen), the session is not restored automatically.
-  // The user must click a notification first before browser windows are
-  // created and restored, so using `application_start_ticks_` would have the
-  // same issue.
-  //
-  // If `web_contents_start_ticks_` is not set here, that could be intentional
-  // as this metric should not be recorded in certain cases (ex: a manually
-  // opened browser window).
-  if (web_contents_start_ticks_.is_null()) {
-    return base::TimeTicks();
-  }
-  return web_contents_start_ticks_;
-#else
   return GetCommon().application_start_ticks_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void BrowserStartupMetricRecorder::RecordWebContentsStartTime(
-    base::TimeTicks ticks) {
-  if (web_contents_start_ticks_.is_null()) {
-    web_contents_start_ticks_ = ticks;
-    DCHECK(!web_contents_start_ticks_.is_null());
-  }
-}
-#endif
 
 void BrowserStartupMetricRecorder::RecordExternalStartupMetric(
     const char* histogram_name,

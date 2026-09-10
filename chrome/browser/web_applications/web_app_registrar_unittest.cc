@@ -64,15 +64,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/test_helper.h"
-#include "components/user_manager/user_names.h"
-#endif
-
 namespace web_app {
 
 namespace {
@@ -1236,7 +1227,6 @@ TEST_F(WebAppRegistrarTest, TestIsDefaultManagementInstalled) {
 // This test uses SetLinkCapturingUserPreference, which is not appropriate for
 // ChromeOS because link capturing preferences & overlapping scopes have custom
 // behavior on CrOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(WebAppRegistrarTest, AppsDoNotOverlapIfNestedScope) {
   StartWebAppProvider();
 
@@ -1258,7 +1248,6 @@ TEST_F(WebAppRegistrarTest, AppsDoNotOverlapIfNestedScope) {
 
   EXPECT_TRUE(registrar().GetOverlappingAppsMatchingScope(app_id1).empty());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 using WebAppRegistrarTest_ScopeExtensions = WebAppRegistrarTest;
 
@@ -1758,92 +1747,6 @@ TEST_F(WebAppRegistrarTest, TrustedIconMetrics) {
                                     /*count=*/1)));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-class WebAppRegistrarAshTest : public WebAppTest {
- public:
-  void SetUp() override {
-    // TODO(crbug.com/40275387): Consider setting up a fake user in all Ash web
-    // app tests.
-    auto user_manager = std::make_unique<ash::FakeChromeUserManager>();
-    auto* fake_user_manager = user_manager.get();
-    scoped_user_manager_ = std::make_unique<user_manager::ScopedUserManager>(
-        std::move(user_manager));
-    fake_user_manager->AddUser(user_manager::StubAccountId());
-    fake_user_manager->UserLoggedIn(
-        user_manager::StubAccountId(),
-        user_manager::TestHelper::GetFakeUsernameHash(
-            user_manager::StubAccountId()));
-    // Need to run the WebAppTest::SetUp() after the fake user manager set up
-    // so that the scoped_user_manager can be destructed in the correct order.
-    WebAppTest::SetUp();
-  }
-  WebAppRegistrarAshTest() = default;
-  ~WebAppRegistrarAshTest() override = default;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_;
-};
-
-TEST_F(WebAppRegistrarAshTest, SourceSupported) {
-  const GURL example_url("https://example.com/my-app/start");
-  const GURL swa_url("chrome://swa/start");
-  const GURL uninstalling_url("https://example.com/uninstalling/start");
-
-  webapps::AppId example_id;
-  webapps::AppId swa_id;
-  webapps::AppId uninstalling_id;
-  WebAppRegistrarMutable registrar(profile());
-  {
-    Registry registry;
-
-    auto example_app = test::CreateWebApp(example_url);
-    example_id = example_app->app_id();
-    registry.emplace(example_id, std::move(example_app));
-
-    auto swa_app = test::CreateWebApp(swa_url, WebAppManagement::Type::kSystem);
-    swa_id = swa_app->app_id();
-    registry.emplace(swa_id, std::move(swa_app));
-
-    auto uninstalling_app =
-        test::CreateWebApp(uninstalling_url, WebAppManagement::Type::kSystem);
-    uninstalling_app->SetIsUninstalling(true);
-    uninstalling_id = uninstalling_app->app_id();
-    registry.emplace(uninstalling_id, std::move(uninstalling_app));
-
-    registrar.InitRegistry(std::move(registry));
-  }
-
-  EXPECT_EQ(registrar.CountUserInstalledApps(), 1);
-  EXPECT_EQ(CountApps(registrar.GetApps()), 2);
-
-  EXPECT_EQ(registrar.FindBestAppWithUrlInScope(
-                example_url, web_app::WebAppFilter::InstalledInChrome()),
-            example_id);
-  EXPECT_EQ(registrar.GetAppScope(example_id),
-            GURL("https://example.com/my-app/"));
-  EXPECT_TRUE(registrar.GetAppUserDisplayMode(example_id).has_value());
-
-  EXPECT_EQ(registrar.FindBestAppWithUrlInScope(
-                swa_url, web_app::WebAppFilter::InstalledInChrome()),
-            swa_id);
-  EXPECT_EQ(registrar.GetAppScope(swa_id), GURL("chrome://swa/"));
-  EXPECT_TRUE(registrar.GetAppUserDisplayMode(swa_id).has_value());
-
-  EXPECT_FALSE(
-      registrar
-          .FindBestAppWithUrlInScope(uninstalling_url,
-                                     web_app::WebAppFilter::InstalledInChrome())
-          .has_value());
-  EXPECT_EQ(registrar.GetAppScope(uninstalling_id),
-            GURL("https://example.com/uninstalling/"));
-  EXPECT_TRUE(registrar.GetAppUserDisplayMode(uninstalling_id).has_value());
-  EXPECT_FALSE(std::ranges::contains(registrar.GetAppIds(), uninstalling_id));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class WebAppRegistrarDisplayModeTest
     : public WebAppRegistrarTest,
       public testing::WithParamInterface<DisplayMode> {
@@ -2068,7 +1971,6 @@ class WebAppRegistrarParameterizedTest
 // These tests use SetLinkCapturingUserPreference, which is not appropriate for
 // ChromeOS because link capturing preferences & overlapping scopes have custom
 // behavior on CrOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_P(WebAppRegistrarParameterizedTest, AppsOverlapIfSharesScope) {
   StartWebAppProvider();
 
@@ -2141,7 +2043,6 @@ TEST_P(WebAppRegistrarParameterizedTest, Filter_OpensInBrowserTab) {
   EXPECT_EQ(std::nullopt, registrar().FindBestAppWithUrlInScope(
                               app_url_2, WebAppFilter::OpensInBrowserTab()));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(WebAppRegistrarParameterizedTest, Filter_IsIsolatedApp) {
   base::test::ScopedFeatureList scoped_feature_list(features::kIsolatedWebApps);

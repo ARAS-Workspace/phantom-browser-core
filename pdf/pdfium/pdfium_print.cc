@@ -303,22 +303,6 @@ PDFiumPrint::PDFiumPrint(PDFiumEngine* engine) : engine_(engine) {}
 
 PDFiumPrint::~PDFiumPrint() = default;
 
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-std::optional<FlattenPdfResult> PDFiumPrint::CreateFlattenedPdf(
-    ScopedFPDFDocument doc) {
-  std::optional<uint32_t> pages_flattened = FlattenPrintData(doc.get());
-  if (!pages_flattened) {
-    return std::nullopt;
-  }
-  std::vector<uint8_t> buffer = ConvertDocToBuffer(std::move(doc));
-  if (buffer.empty()) {
-    return std::nullopt;
-  }
-  return FlattenPdfResult(std::move(buffer), *pages_flattened);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // static
 std::vector<uint8_t> PDFiumPrint::CreateNupPdf(
     ScopedFPDFDocument doc,

@@ -115,9 +115,6 @@ class WebUIBrowserWindow : public BrowserWindow,
       const std::optional<url::Origin>& initiating_origin,
       IntentPickerResponse callback) override;
   void ShowBookmarkBubble(const GURL& url, bool already_bookmarked) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void ToggleMultitaskMenu() override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ShowTranslateBubbleResult ShowTranslateBubble(
       content::WebContents* contents,
       translate::TranslateStep step,

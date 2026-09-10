@@ -28,10 +28,6 @@ namespace {
 // TODO(plundblad): Find a way to detect the controlling terminal of the
 // X server.
 static const int kDefaultTtyLinux = 7;
-#if BUILDFLAG(IS_CHROMEOS)
-// The GUI is always running on vt1 in Chrome OS.
-static const int kDefaultTtyChromeOS = 1;
-#endif
 }  // namespace
 
 class BrlapiConnectionImpl : public BrlapiConnection {
@@ -81,11 +77,6 @@ BrlapiConnection::ConnectResult BrlapiConnectionImpl::Connect(
   }
   std::array path = {0, 0};
   int pathElements = 0;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::SysInfo::IsRunningOnChromeOS()) {
-    path[pathElements++] = kDefaultTtyChromeOS;
-  }
-#endif
   if (pathElements == 0 && getenv("WINDOWPATH") == nullptr) {
     path[pathElements++] = kDefaultTtyLinux;
   }

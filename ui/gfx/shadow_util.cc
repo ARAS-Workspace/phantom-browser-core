@@ -138,12 +138,6 @@ const ShadowDetails& ShadowDetails::Get(
       return Get(rounded_corners,
                  ShadowValue::MakeMdShadowValues(elevation, SK_ColorBLACK,
                                                  is_pill_shaped));
-#if BUILDFLAG(IS_CHROMEOS)
-    case ShadowStyle::kChromeOSSystemUI:
-      return Get(rounded_corners,
-                 ShadowValue::MakeChromeOSSystemUIShadowValues(
-                     elevation, SK_ColorBLACK, is_pill_shaped));
-#endif
   }
 }
 
@@ -159,12 +153,6 @@ const ShadowDetails& ShadowDetails::Get(
       return Get(rounded_corners,
                  ShadowValue::MakeMdShadowValues(
                      elevation, key_color, ambient_color, is_pill_shaped));
-#if BUILDFLAG(IS_CHROMEOS)
-    case ShadowStyle::kChromeOSSystemUI:
-      return Get(rounded_corners,
-                 ShadowValue::MakeChromeOSSystemUIShadowValues(
-                     elevation, key_color, ambient_color, is_pill_shaped));
-#endif
   }
 }
 

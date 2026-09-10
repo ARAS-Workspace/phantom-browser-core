@@ -23,7 +23,7 @@
 #include <malloc.h>
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include <features.h>
 
 #include "base/numerics/safe_conversions.h"
@@ -38,8 +38,7 @@ int64_t TimeValToMicroseconds(const struct timeval& tv) {
   return ret;
 }
 
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 static const rlim_t kSystemDefaultMaxFds = 8192;
 #elif BUILDFLAG(IS_APPLE)
 static const rlim_t kSystemDefaultMaxFds = 256;
@@ -103,8 +102,7 @@ void IncreaseFdLimitTo(unsigned int max_descriptors) {
   }
 }
 
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 namespace {
 
 size_t GetMallocUsageMallinfo() {
@@ -122,15 +120,14 @@ size_t GetMallocUsageMallinfo() {
 }
 
 }  // namespace
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 size_t ProcessMetrics::GetMallocUsage() {
 #if BUILDFLAG(IS_APPLE)
   malloc_statistics_t stats = {0};
   malloc_zone_statistics(nullptr, &stats);
   return stats.size_in_use;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   return GetMallocUsageMallinfo();
 #endif
 }

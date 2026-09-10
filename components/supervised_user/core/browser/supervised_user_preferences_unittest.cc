@@ -63,18 +63,6 @@ TEST_F(SupervisedUserPreferencesTest, ToggleParentalControlsSetsUserId) {
             std::string());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(SupervisedUserPreferencesTest, ToggleParentalControlsSetsChildStatus) {
-  EnableParentalControls(*supervised_user_test_environment_.pref_service());
-  EXPECT_TRUE(IsChildAccountStatusKnown(
-      *supervised_user_test_environment_.pref_service()));
-
-  DisableParentalControls(*supervised_user_test_environment_.pref_service());
-  EXPECT_TRUE(IsChildAccountStatusKnown(
-      *supervised_user_test_environment_.pref_service()));
-}
-#endif
-
 TEST_F(SupervisedUserPreferencesTest, StartFetchingFamilyInfo) {
   kidsmanagement::ListMembersResponse list_family_members_response;
   SetFamilyMemberAttributesForTesting(

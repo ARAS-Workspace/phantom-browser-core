@@ -659,11 +659,9 @@ IN_PROC_BROWSER_TEST_P(EmbeddedPermissionPromptInteractiveTest,
 
 #if BUILDFLAG(IS_MAC)
   open_settings_label = u"MacOS settings";
-#elif BUILDFLAG(IS_CHROMEOS)
-  open_settings_label = u"ChromeOS settings";
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   RunTestSequence(
       InstrumentTab(kWebContentsElementId),
       NavigateWebContents(kWebContentsElementId, GetURL()),

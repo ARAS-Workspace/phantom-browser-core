@@ -13,8 +13,6 @@
 #elif BUILDFLAG(IS_MAC)
 #include "chrome/browser/device_reauth/mac/authenticator_mac.h"
 #include "chrome/browser/device_reauth/mac/device_authenticator_mac.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/device_reauth/chromeos/device_authenticator_chromeos.h"
 #endif
 
 using content::BrowserContext;
@@ -86,9 +84,6 @@ ChromeDeviceAuthenticatorFactory::GetForProfile(
 #if BUILDFLAG(IS_MAC)
   auto device_authenticator = std::make_unique<DeviceAuthenticatorMac>(
       std::make_unique<AuthenticatorMac>(), proxy, params);
-#elif BUILDFLAG(IS_CHROMEOS)
-  auto device_authenticator = std::make_unique<DeviceAuthenticatorChromeOS>(
-      std::make_unique<AuthenticatorChromeOS>(), proxy, params);
 #else
   static_assert(false);
 #endif
@@ -100,11 +95,5 @@ std::unique_ptr<KeyedService>
 ChromeDeviceAuthenticatorFactory::BuildServiceInstanceForBrowserContext(
     BrowserContext* context) const {
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Asynchronously check for PIN availability and cache the result in a local
-  // state preference.
-  DeviceAuthenticatorChromeOS::CacheIfPinIsAvailable(
-      std::make_unique<AuthenticatorChromeOS>().get());
-#endif
   return std::make_unique<DeviceAuthenticatorProxy>();
 }

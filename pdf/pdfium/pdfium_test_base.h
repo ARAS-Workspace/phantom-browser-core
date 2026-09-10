@@ -92,7 +92,7 @@ class PDFiumTestBase : public testing::TestWithParam<bool> {
 
   base::TestDiscardableMemoryAllocator discardable_memory_allocator_;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   base::FilePath test_fonts_path_;
 #endif
 

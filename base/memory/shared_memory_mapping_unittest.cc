@@ -268,11 +268,11 @@ TEST_F(SharedMemoryMappingTest, TooBigAtomic) {
 // mapped.
 #if !BUILDFLAG(IS_IOS)
 // TODO(crbug.com/40846204) Fix flakiness and re-enable on Linux and ChromeOS.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TotalMappedSizeLimit DISABLED_TotalMappedSizeLimit
 #else
 #define MAYBE_TotalMappedSizeLimit TotalMappedSizeLimit
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 TEST_F(SharedMemoryMappingTest, MAYBE_TotalMappedSizeLimit) {
   // Nothing interesting to test if the address space isn't 64 bits, since
   // there's no real limit enforced on 32 bits other than complete address

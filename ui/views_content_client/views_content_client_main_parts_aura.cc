@@ -6,9 +6,7 @@
 
 #include <utility>
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "ui/wm/core/wm_state.h"
-#endif
 
 namespace ui {
 
@@ -22,9 +20,7 @@ ViewsContentClientMainPartsAura::~ViewsContentClientMainPartsAura() {
 void ViewsContentClientMainPartsAura::ToolkitInitialized() {
   ViewsContentClientMainParts::ToolkitInitialized();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   wm_state_ = std::make_unique<::wm::WMState>();
-#endif
 }
 
 void ViewsContentClientMainPartsAura::PostMainMessageLoopRun() {

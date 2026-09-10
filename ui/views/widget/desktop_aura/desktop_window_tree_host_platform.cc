@@ -269,10 +269,6 @@ void DesktopWindowTreeHostPlatform::Init(const Widget::InitParams& params) {
       ConvertWidgetInitParamsToInitProperties(params);
   AddAdditionalInitProperties(params, &properties);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Set persistable based on whether or not the content window is persistable.
-  properties.persistable = GetContentWindow()->GetProperty(wm::kPersistableKey);
-#endif
 
   // If we have a parent, record the parent/child relationship. We use this
   // data during destruction to make sure that when we try to close a parent
@@ -286,9 +282,6 @@ void DesktopWindowTreeHostPlatform::Init(const Widget::InitParams& params) {
 
   // Calculate initial bounds.
   properties.bounds = params.bounds;
-#if BUILDFLAG(IS_CHROMEOS)
-  properties.display_id = params.display_id;
-#endif
 
   // Set extensions delegate.
   DCHECK(!properties.workspace_extension_delegate);
@@ -1312,7 +1305,7 @@ bool DesktopWindowTreeHostPlatform::RotateFocusForWidget(
 // DesktopWindowTreeHost:
 
 // Linux subclasses this host and adds some Linux specific bits.
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_LINUX)
 // static
 DesktopWindowTreeHost* DesktopWindowTreeHost::Create(
     internal::NativeWidgetDelegate* native_widget_delegate,

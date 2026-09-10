@@ -82,10 +82,10 @@
 #include "content/public/browser/web_contents.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/profiles/profile_ui_test_utils.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace metrics {
 namespace {
@@ -459,7 +459,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, IncognitoPlusRegularCheck) {
 // LINT.ThenChange(/ios/chrome/browser/metrics/ukm_egtest.mm:IncognitoPlusRegularCheck)
 
 // Make sure that UKM is disabled while a guest profile's window is open.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, RegularPlusGuestCheck) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());
   test::MetricsConsentOverride metrics_consent(true);
@@ -484,10 +484,10 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, RegularPlusGuestCheck) {
 
   CloseBrowserSynchronously(regular_browser);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // ProfilePicker and System profile do not exist on ChromeOS and on Android.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // Displaying the ProfilePicker implicitly creates a System Profile.
 // System Profile shouldn't have any effect on the UKM Enable Status.
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, ProfilePickerCheck) {
@@ -518,7 +518,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, ProfilePickerCheck) {
 
   CloseBrowserSynchronously(regular_browser);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Not applicable to Android as it doesn't have multiple profiles.
 #if !BUILDFLAG(IS_ANDROID)
@@ -543,15 +543,8 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, OpenNonSyncCheck) {
   CloseBrowserSynchronously(nonsync_browser);
   // TODO(crbug.com/40530708): UKM doesn't actually get re-enabled yet.
   // EXPECT_TRUE(ukm_test_helper.IsRecordingEnabled());
-#if !BUILDFLAG(IS_CHROMEOS)
   // Client ID should not have been reset.
   EXPECT_EQ(original_client_id, ukm_test_helper.GetClientId());
-#else
-  // When flag is enabled, removing MSBB consent will cause the client id to be
-  // reset. In this case a new profile with sync turned off is added which also
-  // removes consent.
-  EXPECT_NE(original_client_id, ukm_test_helper.GetClientId());
-#endif
 
   CloseBrowserSynchronously(sync_browser);
 }
@@ -672,30 +665,20 @@ IN_PROC_BROWSER_TEST_P(UkmBrowserTestWithDemographics,
     EXPECT_FALSE(report->has_user_demographics());
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Sign out the user to revoke all refresh tokens. This prevents any posted
   // tasks from successfully fetching an access token during the tear-down
   // phase and crashing on a DCHECK. See crbug.com/40704261 for more details.
   harness->SignOutPrimaryAccount();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   ClosePlatformBrowser(browser);
 }
 // LINT.ThenChange(/ios/chrome/browser/metrics/demographics_egtest.mm:AddSyncedUserBirthYearAndGenderToProtoDataEnabled_ukmBrowsertest)
 // ThenChange(/ios/chrome/browser/metrics/demographics_egtest.mm:AddSyncedUserBirthYearAndGenderToProtoDataDisabled_ukmBrowsertest)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Cannot test for the enabled feature on Chrome OS because there are always
-// multiple profiles.
-static const auto kDemographicsTestParams = testing::Values(
-    test::DemographicsTestParams{/*enable_feature=*/false,
-                                 /*expect_reported_demographics=*/false});
-#else
 static const auto kDemographicsTestParams = testing::Values(
     test::DemographicsTestParams{/*enable_feature=*/false,
                                  /*expect_reported_demographics=*/false},
     test::DemographicsTestParams{/*enable_feature=*/true,
                                  /*expect_reported_demographics=*/true});
-#endif
 
 INSTANTIATE_TEST_SUITE_P(,
                          UkmBrowserTestWithDemographics,
@@ -867,16 +850,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MultiDisableExtensionsSyncCheck) {
   BrowserWindowInterface* browser2 = CreateBrowser(profile2);
   EXPECT_TRUE(ukm_test_helper.IsRecordingEnabled());
   EXPECT_TRUE(ukm_test_helper.IsExtensionRecordingEnabled());
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(original_client_id, ukm_test_helper.GetClientId());
-#else
-  // If the feature is enabled, then the client id will have been reset. The
-  // client id is reset when the second profile is initially created without any
-  // sync preferences enabled or MSBB. With the feature, any consent on to off
-  // change for MSBB or App Sync will cause the client id to reset.
-  EXPECT_NE(original_client_id, ukm_test_helper.GetClientId());
-  original_client_id = ukm_test_helper.GetClientId();
-#endif
 
   ASSERT_TRUE(
       harness2->DisableSelectableType(syncer::UserSelectableType::kExtensions));
@@ -1028,7 +1002,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, LogsOpenerSource) {
 //
 // Make sure that UKM is disabled when the profile signs out of Sync.
 // LINT.IfChange(SingleSyncSignoutCheck)
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, SingleSyncSignoutCheck) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());
   test::MetricsConsentOverride metrics_consent(true);
@@ -1048,13 +1022,11 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, SingleSyncSignoutCheck) {
 
   ClosePlatformBrowser(browser);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
-// LINT.ThenChange(/chrome/android/javatests/src/org/chromium/chrome/browser/sync/UkmTest.java:SingleSyncSignoutCheck)
-// ThenChange(/ios/chrome/browser/metrics/model/ukm_egtest.mm:SingleSyncSignoutCheck)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // ChromeOS doesn't have the concept of sign-out so this test doesn't make sense
 // there. Android doesn't have multiple profiles.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // Make sure that UKM is disabled when any profile signs out of Sync.
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MultiSyncSignoutCheck) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());
@@ -1083,7 +1055,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MultiSyncSignoutCheck) {
   CloseBrowserSynchronously(browser2);
   CloseBrowserSynchronously(browser1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Make sure that if history/sync services weren't available when we tried to
 // attach listeners, UKM is not enabled.
@@ -1170,7 +1142,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MAYBE_HistoryDeleteCheck) {
 
 // On ChromeOS, the test profile starts with a primary account already set, so
 // this test doesn't apply.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, NotEnabledForNonSyncingAccountSync) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());
   test::MetricsConsentOverride metrics_consent(true);
@@ -1198,7 +1170,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, NotEnabledForNonSyncingAccountSync) {
 
   EXPECT_FALSE(ukm_test_helper.IsRecordingEnabled());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(UkmConsentParamBrowserTest, GroupPolicyConsentCheck) {
@@ -1488,19 +1460,11 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, AllowedStateChanged) {
   unified_consent::UnifiedConsentService* consent_service =
       UnifiedConsentServiceFactory::GetForProfile(test_profile);
   consent_service->SetUrlKeyedAnonymizedDataCollectionEnabled(false);
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_FALSE(ukm_test_helper.IsRecordingEnabled());
   EXPECT_FALSE(g_browser_process->GetMetricsServicesManager()
                    ->IsUkmAllowedForAllProfiles());
   // Expect nothing to be consented to.
   observer.ExpectAllowedStateChanged(ukm::UkmConsentState());
-#else
-  // ChromeOS has a different behavior compared to other platforms.
-  EXPECT_TRUE(ukm_test_helper.IsRecordingEnabled());
-  EXPECT_TRUE(g_browser_process->GetMetricsServicesManager()
-                  ->IsUkmAllowedForAllProfiles());
-  observer.ExpectAllowedStateChanged(ukm::UkmConsentState({ukm::APPS}));
-#endif
 
   consent_service->SetUrlKeyedAnonymizedDataCollectionEnabled(true);
   EXPECT_TRUE(ukm_test_helper.IsRecordingEnabled());
@@ -1509,148 +1473,5 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, AllowedStateChanged) {
   observer.ExpectAllowedStateChanged(ukm::UkmConsentState::All());
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-class UkmBrowserTestForAppConsent : public UkmBrowserTestBase {
- public:
-  UkmBrowserTestForAppConsent() = default;
-};
-
-IN_PROC_BROWSER_TEST_F(UkmBrowserTestForAppConsent, MetricsClientEnablement) {
-  ukm::UkmService* ukm_service = GetUkmService();
-  ukm::UkmTestHelper ukm_test_helper(ukm_service);
-  test::MetricsConsentOverride metrics_consent(true);
-  Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
-  unified_consent::UnifiedConsentService* consent_service =
-      UnifiedConsentServiceFactory::GetForProfile(profile);
-  std::unique_ptr<SyncServiceImplHarness> harness =
-      EnableSyncForProfile(profile);
-
-  // All consents are on.
-  EXPECT_TRUE(ukm_test_helper.IsRecordingEnabled());
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::MSBB));
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::EXTENSIONS));
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::APPS));
-
-  // Turn off MSBB consent.
-  consent_service->SetUrlKeyedAnonymizedDataCollectionEnabled(false);
-
-  // Still have AppKM consent.
-  EXPECT_TRUE(ukm_test_helper.IsRecordingEnabled());
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::MSBB));
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::EXTENSIONS));
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::APPS));
-
-  // Turn off App-sync.
-  auto* user_settings = harness->service()->GetUserSettings();
-  auto registered_os_sync_types =
-      user_settings->GetRegisteredSelectableOsTypes();
-  registered_os_sync_types.Remove(syncer::UserSelectableOsType::kOsApps);
-  user_settings->SetSelectedOsTypes(false, registered_os_sync_types);
-
-  // UKM recording is now disabled since MSBB and App-sync consent
-  // has been removed.
-  EXPECT_FALSE(ukm_test_helper.IsRecordingEnabled());
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::MSBB));
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::EXTENSIONS));
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::APPS));
-}
-
-// LINT.IfChange(ClientIdResetWhenConsentRemoved)
-IN_PROC_BROWSER_TEST_F(UkmBrowserTestForAppConsent,
-                       ClientIdResetWhenConsentRemoved) {
-  ukm::UkmService* ukm_service = GetUkmService();
-  ukm::UkmTestHelper ukm_test_helper(ukm_service);
-  test::MetricsConsentOverride metrics_consent(true);
-  Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
-  unified_consent::UnifiedConsentService* consent_service =
-      UnifiedConsentServiceFactory::GetForProfile(profile);
-  std::unique_ptr<SyncServiceImplHarness> harness =
-      EnableSyncForProfile(profile);
-  const auto original_client_id = ukm_test_helper.GetClientId();
-  EXPECT_NE(0ul, original_client_id);
-
-  // All consents are on.
-  EXPECT_TRUE(ukm_test_helper.IsRecordingEnabled());
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::MSBB));
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::EXTENSIONS));
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::APPS));
-
-  // Turn off MSBB consent.
-  consent_service->SetUrlKeyedAnonymizedDataCollectionEnabled(false);
-
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::MSBB));
-
-  // Client ID should reset when MSBB is disabled.
-  const auto app_sync_client_id = ukm_test_helper.GetClientId();
-  EXPECT_NE(original_client_id, app_sync_client_id);
-
-  // Turn off app sync.
-  auto* user_settings = harness->service()->GetUserSettings();
-  auto registered_os_sync_types =
-      user_settings->GetRegisteredSelectableOsTypes();
-  registered_os_sync_types.Remove(syncer::UserSelectableOsType::kOsApps);
-  user_settings->SetSelectedOsTypes(false, registered_os_sync_types);
-
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::APPS));
-
-  // Client ID should reset when app sync is disable.
-  const auto final_client_id = ukm_test_helper.GetClientId();
-  EXPECT_NE(app_sync_client_id, final_client_id);
-}
-// LINT.ThenChange(/ios/chrome/browser/metrics/model/ukm_egtest.mm:ClientIdResetWhenConsentRemoved)
-
-IN_PROC_BROWSER_TEST_F(UkmBrowserTestForAppConsent,
-                       EnsurePurgeOnConsentChange) {
-  ukm::UkmService* ukm_service = GetUkmService();
-  ukm::UkmTestHelper ukm_test_helper(ukm_service);
-  test::MetricsConsentOverride metrics_consent(true);
-  Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
-  unified_consent::UnifiedConsentService* consent_service =
-      UnifiedConsentServiceFactory::GetForProfile(profile);
-  std::unique_ptr<SyncServiceImplHarness> harness =
-      EnableSyncForProfile(profile);
-  BrowserWindowInterface* sync_browser = CreateBrowser(profile);
-
-  const std::vector<GURL> test_urls = {
-      embedded_test_server()->GetURL("/title1.html"),
-      embedded_test_server()->GetURL("/title2.html"),
-      embedded_test_server()->GetURL("/title3.html")};
-
-  // Verify all consents are enabled.
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::MSBB));
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::EXTENSIONS));
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::APPS));
-
-  int tab_index = 1;
-  // Generate MSBB ukm entries by navigating to some test webpages.
-  for (const auto& url : test_urls) {
-    ASSERT_TRUE(AddTabAtIndexToBrowser(sync_browser, tab_index++,
-                                       GURL(url::kAboutBlankURL),
-                                       ui::PAGE_TRANSITION_TYPED, true));
-    NavigateAndGetSource(url, sync_browser, &ukm_test_helper);
-  }
-
-  // Revoke MSBB consent.
-  consent_service->SetUrlKeyedAnonymizedDataCollectionEnabled(false);
-
-  // Verify that MSBB consent was revoked.
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::MSBB));
-  EXPECT_FALSE(ukm_service->recording_enabled(ukm::EXTENSIONS));
-  EXPECT_TRUE(ukm_service->recording_enabled(ukm::APPS));
-
-  ukm_test_helper.BuildAndStoreLog();
-  const std::unique_ptr<ukm::Report> report = ukm_test_helper.GetUkmReport();
-
-  // Verify that the only sources in the report are APP_ID.
-  // NOTE(crbug.com/40248943): It was noticed that there was an APP_ID source
-  // generated despite not being explicitly created. No entries are associated
-  // with it though.
-  for (int i = 0; i < report->sources_size(); ++i) {
-    const auto id = report->sources(i).id();
-    EXPECT_EQ(ukm::GetSourceIdType(id), ukm::SourceIdType::APP_ID);
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace metrics

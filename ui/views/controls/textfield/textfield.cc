@@ -100,13 +100,6 @@
 #include "ui/ozone/public/platform_gl_egl_utility.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/aura/window.h"
-#include "ui/base/ime/ash/extension_ime_util.h"
-#include "ui/base/ime/ash/input_method_manager.h"
-#include "ui/wm/core/ime_util_chromeos.h"
-#endif
-
 #if defined(USE_AURA)
 #include "ui/views/touchui/touch_selection_controller_impl.h"
 #endif
@@ -182,7 +175,7 @@ bool IsControlKeyModifier(int flags) {
 // Control-modified key combination, but we cannot extend it to other platforms
 // as Control has different meanings and behaviors.
 // https://crrev.com/2580483002/#msg46
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   return flags & ui::EF_CONTROL_DOWN;
 #else
   return false;
@@ -1230,10 +1223,6 @@ void Textfield::OnBlur() {
 
   if (GetInputMethod()) {
     GetInputMethod()->DetachTextInputClient(this);
-#if BUILDFLAG(IS_CHROMEOS)
-    wm::RestoreWindowBoundsOnClientFocusLost(
-        GetNativeView()->GetToplevelWindow());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
   StopBlinkingCursor();
   cursor_view_->SetVisible(false);
@@ -1997,10 +1986,6 @@ void Textfield::ExtendSelectionAndDelete(size_t before, size_t after) {
 }
 
 void Textfield::EnsureCaretNotInRect(const gfx::Rect& rect_in_screen) {
-#if BUILDFLAG(IS_CHROMEOS)
-  aura::Window* top_level_window = GetNativeView()->GetToplevelWindow();
-  wm::EnsureWindowNotInRect(top_level_window, rect_in_screen);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 bool Textfield::IsTextEditCommandEnabled(ui::TextEditCommand command) const {
@@ -2122,7 +2107,7 @@ bool Textfield::ShouldDoLearning() {
   return false;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/41452689): Implement this method to support Korean IME
 // reconversion feature on native text fields (e.g. find bar).
 bool Textfield::SetCompositionFromExistingText(
@@ -2136,42 +2121,6 @@ bool Textfield::SetCompositionFromExistingText(
   OnAfterUserAction();
   return true;
 }
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-gfx::Range Textfield::GetAutocorrectRange() const {
-  // TODO(b/316461955): Implement autocorrect UI for native fields.
-  NOTIMPLEMENTED_LOG_ONCE();
-  return gfx::Range();
-}
-
-gfx::Rect Textfield::GetAutocorrectCharacterBounds() const {
-  // TODO(b/316461955): Implement autocorrect UI for native fields.
-  NOTIMPLEMENTED_LOG_ONCE();
-  return gfx::Rect();
-}
-
-bool Textfield::SetAutocorrectRange(const gfx::Range& range) {
-  if (!range.is_empty()) {
-    base::UmaHistogramEnumeration("InputMethod.Assistive.Autocorrect.Count",
-                                  TextInputClient::SubClass::kTextField);
-  }
-  // TODO(b/316461955): Implement autocorrect UI for native fields.
-  NOTIMPLEMENTED_LOG_ONCE();
-  return false;
-}
-
-bool Textfield::AddGrammarFragments(
-    const std::vector<ui::GrammarFragment>& fragments) {
-  if (!fragments.empty()) {
-    base::UmaHistogramEnumeration("InputMethod.Assistive.Grammar.Count",
-                                  TextInputClient::SubClass::kTextField);
-  }
-  // TODO(crbug.com/40178699): Implement this method for CrOS Grammar.
-  NOTIMPLEMENTED_LOG_ONCE();
-  return false;
-}
-
 #endif
 
 void Textfield::GetActiveTextInputControlLayoutBounds(
@@ -2630,7 +2579,7 @@ ui::TextEditCommand Textfield::GetCommandForKeyEvent(
       if (!control) {
         return ui::TextEditCommand::DELETE_BACKWARD;
       }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       // Only erase by line break on Linux and ChromeOS.
       if (shift) {
         return ui::TextEditCommand::DELETE_TO_BEGINNING_OF_LINE;
@@ -2638,7 +2587,7 @@ ui::TextEditCommand Textfield::GetCommandForKeyEvent(
 #endif
       return ui::TextEditCommand::DELETE_WORD_BACKWARD;
     case ui::VKEY_DELETE:
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       // Only erase by line break on Linux and ChromeOS.
       if (shift && control) {
         return ui::TextEditCommand::DELETE_TO_END_OF_LINE;

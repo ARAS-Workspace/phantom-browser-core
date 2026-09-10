@@ -26,11 +26,6 @@
 #include "components/signin/public/base/list_accounts_test_utils.h"
 #include "extensions/browser/load_error_reporter.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/input_method/input_method_configuration.h"
-#include "ui/base/ime/ash/mock_input_method_manager_impl.h"
-#endif
-
 namespace {
 
 std::unique_ptr<KeyedService> CreateAutocompleteClassifier(
@@ -50,10 +45,6 @@ std::unique_ptr<KeyedService> CreateAutocompleteClassifier(
 TestWithBrowserView::~TestWithBrowserView() = default;
 
 void TestWithBrowserView::SetUp() {
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::input_method::InitializeForTesting(
-      new ash::input_method::MockInputMethodManagerImpl);
-#endif
   BrowserWithTestWindowTest::SetUp();
   browser_view_ = BrowserView::GetBrowserViewForBrowser(browser());
 }
@@ -73,9 +64,6 @@ void TestWithBrowserView::TearDown() {
   ASSERT_TRUE(release_browser());
 
   BrowserWithTestWindowTest::TearDown();
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::input_method::Shutdown();
-#endif
 }
 
 TestingProfile* TestWithBrowserView::CreateProfile(

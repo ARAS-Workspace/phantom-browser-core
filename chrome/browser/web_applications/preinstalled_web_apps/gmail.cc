@@ -21,11 +21,7 @@ ExternalInstallOptions GetConfigForGmail() {
   ExternalInstallOptions options(
       /*install_url=*/GURL(
           "https://mail.google.com/mail/installwebapp?usp=chrome_default"),
-#if BUILDFLAG(IS_CHROMEOS)
-      /*user_display_mode=*/mojom::UserDisplayMode::kStandalone,
-#else
       /*user_display_mode=*/mojom::UserDisplayMode::kBrowser,
-#endif  // BUILDFLAG(IS_CHROMEOS)
       /*install_source=*/ExternalInstallSource::kExternalDefault);
 
   options.user_type_allowlist = {"unmanaged", "managed", "child"};

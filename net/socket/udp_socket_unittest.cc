@@ -936,7 +936,6 @@ TEST_F(UDPSocketTest, MAYBE_SharedMulticastAddress) {
                                 NetLogSource(), handles::kInvalidNetworkHandle);
   ASSERT_THAT(client_socket.Connect(send_address), IsOk());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Send a message via the multicast group. That message is expected be be
   // received by both receving sockets.
   //
@@ -946,7 +945,6 @@ TEST_F(UDPSocketTest, MAYBE_SharedMulticastAddress) {
   ASSERT_GE(WriteSocket(&client_socket, kMessage), 0);
   EXPECT_EQ(kMessage, RecvFromSocket(&socket1));
   EXPECT_EQ(kMessage, RecvFromSocket(&socket2));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
@@ -2251,7 +2249,7 @@ TEST_F(UDPSocketTest, ReadMultiple) {
 // platforms. Consequently, the read operation succeeds instead of failing, and
 // we cannot test the control message truncation behavior on fallback platforms
 // without modifying the general-purpose RecvFrom implementation.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 TEST_F(UDPSocketTest, ReadMultipleControlTruncated) {
   // Create sender and receiver sockets.
   UDPSocket sender(DatagramSocket::DEFAULT_BIND, nullptr, NetLogSource());
@@ -2309,8 +2307,7 @@ TEST_F(UDPSocketTest, ReadMultipleControlTruncated) {
   ASSERT_FALSE(read_result.has_value());
   EXPECT_EQ(read_result.error(), ERR_CONTROL_MSG_TOO_BIG);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 TEST_F(UDPSocketTest, ReadMultiple_TooBig) {
   // Create sender and receiver sockets.
@@ -2443,7 +2440,7 @@ TEST_F(UDPSocketTest, ReadFailsWhenGroEnabled) {
       receiver.Read(read_buf.get(), read_buf->size(), callback.callback()));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 class UDPSocketGroTest : public UDPSocketTest {
  protected:
   UDPSocketGroTest()
@@ -2732,8 +2729,7 @@ TEST_F(UDPSocketGroTest, ReadMultipleGroUnequalSegments) {
   histogram_tester_.ExpectUniqueSample("Net.UDPSocketPosix.GroPacketsRead", 3,
                                        1);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(IS_POSIX)
 
 }  // namespace net

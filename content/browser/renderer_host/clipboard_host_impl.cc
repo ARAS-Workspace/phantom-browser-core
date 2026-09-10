@@ -58,10 +58,6 @@
 #include "ui/base/data_transfer_policy/data_transfer_policy_controller.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/public/common/url_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace content {
 
 namespace {
@@ -167,15 +163,6 @@ void ClipboardHostImpl::OnGetAllAvailableFormatsForReadAvailableTypes(
   // (http://crbug.com/1241671).
   bool file_type_only =
       formats.contains(ui::ClipboardFormatType::FilenamesType());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS FilesApp must include the custom 'fs/sources', etc data for
-  // paste that it put on the clipboard during copy (crbug.com/271078230).
-  if (render_frame_host().GetMainFrame()->GetLastCommittedURL().SchemeIs(
-          kChromeUIScheme)) {
-    file_type_only = false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (file_type_only) {
     std::move(callback).Run({ui::kMimeTypeUriList16});

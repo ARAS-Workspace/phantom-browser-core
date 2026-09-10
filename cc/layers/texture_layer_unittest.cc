@@ -1160,11 +1160,7 @@ class TextureLayerChangeInvisibleMailboxTest : public LayerTreeTest,
 };
 
 // TODO(crbug.com/40760099): Test fails on chromeos-amd64-generic-rel.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_SINGLE_AND_MULTI_THREAD_TEST_F MULTI_THREAD_TEST_F
-#else
 #define MAYBE_SINGLE_AND_MULTI_THREAD_TEST_F SINGLE_AND_MULTI_THREAD_TEST_F
-#endif
 
 MAYBE_SINGLE_AND_MULTI_THREAD_TEST_F(TextureLayerChangeInvisibleMailboxTest);
 

@@ -47,11 +47,6 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "chromeos/dbus/constants/dbus_switches.h"  // nogncheck
-#endif
-
 namespace {
 
 using tracing::BackgroundTracingStateManager;
@@ -167,17 +162,5 @@ ChromeTracingDelegate::CreateChromeMetadataPacketRecorder() const {
 }
 
 bool ChromeTracingDelegate::IsSystemWideTracingEnabled() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Always allow system tracing in dev mode images.
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          chromeos::switches::kSystemDevMode)) {
-    return true;
-  }
-  // In non-dev images, honor the pref for system-wide tracing.
-  PrefService* local_state = g_browser_process->local_state();
-  DCHECK(local_state);
-  return local_state->GetBoolean(ash::prefs::kDeviceSystemWideTracingEnabled);
-#else
   return false;
-#endif
 }

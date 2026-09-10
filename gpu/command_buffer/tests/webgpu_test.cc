@@ -69,8 +69,7 @@ bool WebGPUTest::WebGPUSupported() const {
 bool WebGPUTest::WebGPUSharedImageSupported() const {
   // Currently WebGPUSharedImage is only implemented on Mac, Linux, Windows
   // and ChromeOS.
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-    BUILDFLAG(USE_DAWN)
+#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)) && BUILDFLAG(USE_DAWN)
   // TODO(crbug.com/40166640): Re-enable on AMD when the RX 5500 XT issues are
   // resolved.
   return !GPUTestBotConfig::CurrentConfigMatches("Linux AMD");
@@ -109,7 +108,7 @@ void WebGPUTest::Initialize(const Options& options) {
     base::CommandLine::ForCurrentProcess()->AppendSwitch(
         switches::kEnableSkiaGraphite);
   } else {
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && BUILDFLAG(USE_DAWN)
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DAWN)
     gpu_preferences.use_vulkan = gpu::VulkanImplementationName::kNative;
     gpu_preferences.gr_context_type = gpu::GrContextType::kVulkan;
 #endif

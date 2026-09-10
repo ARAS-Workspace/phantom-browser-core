@@ -46,13 +46,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/check_deref.h"
-#include "chromeos/ash/components/account_manager/account_manager_factory.h"
-#include "components/account_manager_core/chromeos/account_manager.h"
-#include "components/signin/internal/identity_manager/test_profile_oauth2_token_service_delegate_chromeos.h"
-#endif
-
 #if BUILDFLAG(IS_IOS)
 #include "components/signin/internal/identity_manager/profile_oauth2_token_service_delegate_ios.h"
 #endif
@@ -87,10 +80,6 @@ class IdentityManagerDependenciesOwner {
   metrics::ProfileMetricsService* profile_metrics_service();
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  // Created only if there is no other AccountManagerFactory.
-  std::unique_ptr<ash::AccountManagerFactory> account_manager_factory_;
-#endif
   // Depending on whether a |pref_service| instance is passed in
   // the constructor, exactly one of these will be non-null.
   std::unique_ptr<sync_preferences::TestingPrefServiceSyncable>
@@ -107,12 +96,6 @@ IdentityManagerDependenciesOwner::IdentityManagerDependenciesOwner(
     sync_preferences::TestingPrefServiceSyncable* pref_service_param,
     TestSigninClient* signin_client_param)
     :
-#if BUILDFLAG(IS_CHROMEOS)
-      account_manager_factory_(
-          ash::AccountManagerFactory::Get()
-              ? nullptr
-              : std::make_unique<ash::AccountManagerFactory>()),
-#endif
       owned_pref_service_(
           pref_service_param
               ? nullptr
@@ -210,9 +193,6 @@ IdentityTestEnvironment::IdentityTestEnvironment(
   IdentityManager::RegisterProfilePrefs(test_pref_service->registry());
   SigninPrefs::RegisterProfilePrefs(test_pref_service->registry());
   IdentityManager::RegisterLocalStatePrefs(test_pref_service->registry());
-#if BUILDFLAG(IS_CHROMEOS)
-  account_manager::AccountManager::RegisterPrefs(test_pref_service->registry());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   owned_identity_manager_ = BuildIdentityManagerForTests(
       test_signin_client, test_pref_service,
       dependencies_owner_->profile_metrics_service(), base::FilePath());
@@ -220,68 +200,6 @@ IdentityTestEnvironment::IdentityTestEnvironment(
   Initialize();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-std::unique_ptr<IdentityManager>
-IdentityTestEnvironment::BuildIdentityManagerForTests(
-    SigninClient* signin_client,
-    PrefService* pref_service,
-    metrics::ProfileMetricsService* profile_metrics_service,
-    base::FilePath user_data_dir) {
-  auto account_tracker_service =
-      std::make_unique<AccountTrackerService>(pref_service, user_data_dir);
-
-  auto* account_manager_factory = ash::AccountManagerFactory::Get();
-  CHECK(account_manager_factory);
-
-  account_manager::AccountManager* account_manager =
-      account_manager_factory->GetAccountManager(user_data_dir.value());
-
-  // TODO(crbug.com/458695293): If this is called during profile creation,
-  // calling GetURLLoaderFactory here can introduce a circular dependency.
-  // So, while there's some risk of UAF theoretically, practically we don't
-  // have such cases in our tests. We're going to move this initialization out
-  // anyways, so the risk should be gone. See the bug for more details.
-  if (user_data_dir.empty()) {
-    account_manager->InitializeInEphemeralMode(base::BindOnce(
-        &SigninClient::GetURLLoaderFactory, base::Unretained(signin_client)));
-  } else {
-    account_manager::AccountManager::DelayNetworkCallRunner
-        immediate_callback_runner =
-            base::BindRepeating([](base::OnceClosure closure) -> void {
-              std::move(closure).Run();
-            });
-    account_manager->Initialize(
-        user_data_dir,
-        base::BindOnce(&SigninClient::GetURLLoaderFactory,
-                       base::Unretained(signin_client)),
-        immediate_callback_runner, base::DoNothing());
-  }
-  account_manager->SetPrefService(pref_service);
-
-  // TODO(crbug.com/458695293): AccountManager::Initialize() may already have
-  // been called before this method. In that case, the Initialize() calls above
-  // are almost no-ops. Even so, still set the URLLoaderFactory from
-  // SigninClient here.
-  // Consider removing this along with the removal of Initialize().
-  account_manager->SetUrlLoaderFactoryForTests(base::BindOnce(
-      &SigninClient::GetURLLoaderFactory, base::Unretained(signin_client)));
-
-  auto* account_manager_facade =
-      account_manager_factory->GetAccountManagerFacade(user_data_dir.value());
-
-  auto token_service = std::make_unique<FakeProfileOAuth2TokenService>(
-      pref_service,
-      std::make_unique<TestProfileOAuth2TokenServiceDelegateChromeOS>(
-          signin_client, account_tracker_service.get(), account_manager_facade,
-          /*is_regular_profile=*/true));
-
-  return FinishBuildIdentityManagerForTests(
-      std::move(account_tracker_service), std::move(token_service),
-      signin_client, pref_service, profile_metrics_service,
-      account_manager_facade);
-}
-#else
 // static
 std::unique_ptr<IdentityManager>
 IdentityTestEnvironment::BuildIdentityManagerForTests(
@@ -300,7 +218,6 @@ IdentityTestEnvironment::BuildIdentityManagerForTests(
       std::move(account_tracker_service), std::move(token_service),
       signin_client, pref_service, profile_metrics_service);
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IdentityTestEnvironment::PendingRequest::PendingRequest(
     CoreAccountId account_id,
@@ -325,10 +242,6 @@ IdentityTestEnvironment::FinishBuildIdentityManagerForTests(
     SigninClient* signin_client,
     PrefService* pref_service,
     metrics::ProfileMetricsService* profile_metrics_service
-#if BUILDFLAG(IS_CHROMEOS)
-    ,
-    account_manager::AccountManagerFacade* account_manager_facade
-#endif
 ) {
   auto account_fetcher_service = std::make_unique<AccountFetcherService>();
   auto account_fetcher_factory = std::make_unique<FakeAccountFetcherFactory>(
@@ -378,9 +291,6 @@ IdentityTestEnvironment::FinishBuildIdentityManagerForTests(
       std::move(gaia_cookie_manager_service);
   init_params.primary_account_manager = std::move(primary_account_manager);
   init_params.token_service = std::move(token_service);
-#if BUILDFLAG(IS_CHROMEOS)
-  init_params.account_manager_facade = account_manager_facade;
-#endif
   init_params.signin_client = signin_client;
 
   return std::make_unique<IdentityManager>(std::move(init_params));
@@ -448,11 +358,9 @@ AccountInfo IdentityTestEnvironment::MakePrimaryAccountAvailable(
                                              consent_level);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void IdentityTestEnvironment::RevokeSyncConsent() {
   signin::RevokeSyncConsent(identity_manager());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void IdentityTestEnvironment::ClearPrimaryAccount() {
   signin::ClearPrimaryAccount(identity_manager());

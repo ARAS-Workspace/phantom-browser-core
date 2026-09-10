@@ -86,11 +86,6 @@ class MirroringGpuFactoriesFactoryTest : public ::testing::Test {
     void CreateVideoEncodeAcceleratorProvider(
         mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
             receiver) override {}
-#if BUILDFLAG(IS_CHROMEOS)
-    void CreateJpegDecodeAccelerator(
-        mojo::PendingReceiver<chromeos_camera::mojom::MjpegDecodeAccelerator>
-            jda_receiver) override {}
-#endif
   };
   StubGpu stub_gpu_;
   mojo::Receiver<viz::mojom::Gpu> gpu_receiver_{&stub_gpu_};

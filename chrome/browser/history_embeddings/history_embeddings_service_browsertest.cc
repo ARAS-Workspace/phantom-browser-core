@@ -44,10 +44,6 @@
 #include "content/public/browser/weak_document_ptr.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace history_embeddings {
 
 class HistoryEmbeddingsBrowserTest : public InProcessBrowserTest {
@@ -188,10 +184,6 @@ class HistoryEmbeddingsBrowserTest : public InProcessBrowserTest {
               {"ContentVisibilityThreshold", "0.01"},
               {"UseUrlFilter", "false"}}},
             {kHistoryEmbeddingsAnswers, {{}}},
-#if BUILDFLAG(IS_CHROMEOS)
-            {chromeos::features::kFeatureManagementHistoryEmbedding, {{}}},
-            {chromeos::features::kFeatureManagementPassageEmbedder, {{}}},
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
         /*disabled_features=*/{});
   }
@@ -275,10 +267,6 @@ class HistoryEmbeddingsWithLowAggregationBrowserTest
             {kHistoryEmbeddings,
              {{"SendQualityLog", "true"},
               {"PassageExtractionMaxWordsPerAggregatePassage", "10"}}},
-#if BUILDFLAG(IS_CHROMEOS)
-            {chromeos::features::kFeatureManagementHistoryEmbedding, {{}}},
-            {chromeos::features::kFeatureManagementPassageEmbedder, {{}}},
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
         /*disabled_features=*/{});
   }
@@ -427,10 +415,6 @@ class HistoryEmbeddingsWithUrlFilterBrowserTest
         {
             {kHistoryEmbeddings,
              {{"SendQualityLog", "true"}, {"UseUrlFilter", "true"}}},
-#if BUILDFLAG(IS_CHROMEOS)
-            {chromeos::features::kFeatureManagementHistoryEmbedding, {{}}},
-            {chromeos::features::kFeatureManagementPassageEmbedder, {{}}},
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
         /*disabled_features=*/{});
   }
@@ -617,10 +601,6 @@ class HistoryEmbeddingsKillSwitchBrowserTest
              {{"SendQualityLog", "true"},
               {"ContentVisibilityThreshold", "0.01"},
               {"UseUrlFilter", "false"}}},
-#if BUILDFLAG(IS_CHROMEOS)
-            {chromeos::features::kFeatureManagementHistoryEmbedding, {{}}},
-            {chromeos::features::kFeatureManagementPassageEmbedder, {{}}},
-#endif  // BUILDFLAG(IS_CHROMEOS)
         },
         /*disabled_features=*/{kLaunchedHistoryEmbeddings});
   }

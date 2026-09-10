@@ -50,28 +50,4 @@ constexpr char kIppMediaType[] = "media-type";
 constexpr char kIppXDimension[] = "x-dimension";
 constexpr char kIppYDimension[] = "y-dimension";
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-constexpr char kIppDocumentAttributes[] =
-    "document-creation-attributes";                              // PWG 5100.5
-constexpr char kIppJobAttributes[] = "job-creation-attributes";  // PWG 5100.11
-
-constexpr char kPinEncryptionNone[] = "none";
-
-constexpr char kOptionFalse[] = "false";
-constexpr char kOptionTrue[] = "true";
-
-// client-info
-constexpr char kIppClientInfo[] = "client-info";
-constexpr char kIppClientName[] = "client-name";
-constexpr char kIppClientPatches[] = "client-patches";
-constexpr char kIppClientStringVersion[] = "client-string-version";
-constexpr char kIppClientType[] = "client-type";
-constexpr char kIppClientVersion[] = "client-version";
-
-// printer attributes
-constexpr char kIppPrintScaling[] = "print-scaling";  // PWG 5100.16
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace printing

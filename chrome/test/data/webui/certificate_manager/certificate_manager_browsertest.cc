@@ -46,10 +46,3 @@ IN_PROC_BROWSER_TEST_F(CertficateManagerTest, LocalCerts) {
 IN_PROC_BROWSER_TEST_F(CertficateManagerTest, Navigation) {
   RunTest("certificate_manager/navigation_test.js", "mocha.run()");
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(CertficateManagerTest, CertificateManagerProvisioning) {
-  RunTest("certificate_manager/certificate_manager_provisioning_test.js",
-          "mocha.run()");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)

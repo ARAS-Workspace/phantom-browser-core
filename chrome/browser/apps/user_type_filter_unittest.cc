@@ -100,18 +100,6 @@ TEST_F(UserTypeFilterTest, ManagedUser) {
       profile, CreateJsonWithFilter({kUserTypeUnmanaged, kUserTypeManaged})));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(UserTypeFilterTest, ManagedGuestUser) {
-  profiles::testing::ScopedTestManagedGuestSession test_managed_guest_session;
-  const auto profile = CreateProfile();
-  profile->GetProfilePolicyConnector()->OverrideIsManagedForTesting(true);
-  EXPECT_FALSE(Match(profile, CreateJsonWithFilter({kUserTypeManaged})));
-  EXPECT_TRUE(Match(profile, CreateJsonWithFilter({kUserTypeManagedGuest})));
-  EXPECT_TRUE(Match(profile, CreateJsonWithFilter(
-                                 {kUserTypeUnmanaged, kUserTypeManagedGuest})));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(UserTypeFilterTest, UnmanagedUser) {
   EXPECT_TRUE(
       Match(CreateProfile(), CreateJsonWithFilter({kUserTypeUnmanaged})));

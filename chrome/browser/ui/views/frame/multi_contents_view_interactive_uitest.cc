@@ -847,7 +847,6 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewUiTest,
       WaitForHide(kContentsSeparatorTopCornerElementId));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(MultiContentsViewUiTest, RoundedCornersForSplitView) {
   RunTestSequence(
       CreateTabsAndEnterSplitView(), WaitForActiveTabChange(0),
@@ -872,7 +871,6 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewUiTest, RoundedCornersForSplitView) {
                       .IsEmpty();
                 }));
 }
-#endif
 
 IN_PROC_BROWSER_TEST_P(MultiContentsViewUiTest, BackgroundVisibility) {
   RunTestSequence(
@@ -1121,7 +1119,7 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewOutlineHighlightUiTest,
 
 // TODO(crbug.com/414590951): There's limited support for testing drag and drop
 // on various platforms. These should be re-enabled as support is added.
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_LINUX)
 
 gfx::Point PointForDropTargetFromView(views::View* view) {
   return view->GetBoundsInScreen().right_center() - gfx::Vector2d(10, 0);
@@ -1354,4 +1352,4 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewBookmarkDragEntrypointsUiTest,
       DragMouseToWithoutWait(kMultiContentsViewElementId, PointForDropTarget()),
       WaitForDropTargetVisible());
 }
-#endif  // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_LINUX)

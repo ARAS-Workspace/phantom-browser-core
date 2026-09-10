@@ -15,7 +15,7 @@
 #include "build/build_config.h"
 #include "content/shell/common/shell_switches.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/nix/xdg_util.h"
 #endif
 
@@ -24,7 +24,7 @@ namespace content {
 namespace {
 
 bool GetDefaultUserDataDirectory(base::FilePath* result) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   std::unique_ptr<base::Environment> env(base::Environment::Create());
   base::FilePath config_dir(base::nix::GetXDGDirectory(
       env.get(), base::nix::kXdgConfigHomeEnvVar, base::nix::kDotConfigDir));

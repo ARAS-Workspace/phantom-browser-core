@@ -36,10 +36,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_list/app_list_syncable_service.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_ANDROID)
 #include "components/gcm_driver/instance_id/scoped_use_fake_instance_id_android.h"
 #else
@@ -168,12 +164,6 @@ class SyncTest : public PlatformBrowserTest,
   // Returns a list of all profiles. Callee owns the objects and manages
   // their lifetime.
   std::vector<raw_ptr<Profile, VectorExperimental>> GetAllProfiles();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Enable using primary user profile for the sync test.
-  // When this is set, the number of profiles must be one.
-  void SetUsePrimaryUserProfile(bool value);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
   // Returns a pointer to a particular browser. Callee owns the object
@@ -447,14 +437,6 @@ class SyncTest : public PlatformBrowserTest,
   extensions::ScopedInstallVerifierBypassForTest ignore_install_verification_;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // A factory-like callback to create a model updater for testing, which will
-  // take the place of the real updater in AppListSyncableService for testing.
-  std::unique_ptr<base::ScopedClosureRunner> model_updater_factory_scope_;
-
-  bool use_primary_user_profile_ = false;
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
   instance_id::ScopedUseFakeInstanceIDAndroid
       scoped_use_fake_instance_id_android_;
@@ -472,9 +454,8 @@ class SyncTest : public PlatformBrowserTest,
 };
 
 inline auto GetSyncTestModes() {
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) &&           \
-    !defined(ADDRESS_SANITIZER) && !defined(THREAD_SANITIZER) && \
-    !defined(MEMORY_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && !defined(ADDRESS_SANITIZER) && \
+    !defined(THREAD_SANITIZER) && !defined(MEMORY_SANITIZER)
   return testing::Values(SyncTest::SetupSyncMode::kSyncTransportOnly,
                          SyncTest::SetupSyncMode::kSyncTheFeature);
 // On non-Linux, non-ChromeOS, and on expensive (ASan etc) bots, run only the

@@ -1680,7 +1680,6 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewViewsPlaceholderTest,
   EXPECT_EQ(u"", omnibox_view()->GetText());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Tests for dump accessibility events related to the omnibox.
 class OmniboxViewViewsDumpAccessibilityEventsTest
     : public views::DumpAccessibilityEventsViewsTestBase {
@@ -1757,5 +1756,3 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(
         views::DumpAccessibilityEventsViewsTestBase::EventTestPasses()),
     views::EventTestPassToString());
-
-#endif

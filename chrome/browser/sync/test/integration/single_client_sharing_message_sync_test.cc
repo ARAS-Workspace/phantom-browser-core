@@ -240,7 +240,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharingMessageSyncTest,
 }
 
 // ChromeOS does not support signing out of a primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientSharingMessageSyncTest,
                        ShouldCleanPendingMessagesUponSignout) {
   ASSERT_TRUE(SetupSync());
@@ -263,7 +262,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharingMessageSyncTest,
                   ->GetSyncEntitiesByDataType(syncer::SHARING_MESSAGE)
                   .empty());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(
     SingleClientSharingMessageSyncTest,

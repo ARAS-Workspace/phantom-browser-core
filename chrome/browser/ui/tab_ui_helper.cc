@@ -224,10 +224,6 @@ bool TabUIHelper::IsCrashed() {
   const base::TerminationStatus crashed_status =
       web_contents()->GetCrashedStatus();
   return (crashed_status == base::TERMINATION_STATUS_PROCESS_WAS_KILLED ||
-#if BUILDFLAG(IS_CHROMEOS)
-          crashed_status ==
-              base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM ||
-#endif
           crashed_status == base::TERMINATION_STATUS_PROCESS_CRASHED ||
           crashed_status == base::TERMINATION_STATUS_ABNORMAL_TERMINATION ||
           crashed_status == base::TERMINATION_STATUS_LAUNCH_FAILED);

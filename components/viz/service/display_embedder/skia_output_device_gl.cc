@@ -122,13 +122,6 @@ SkiaOutputDeviceGL::SkiaOutputDeviceGL(
   capabilities_.supports_surfaceless = gl_surface_->IsSurfaceless();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // If Chrome OS is run on Linux for development purposes, we need to
-  // advertise a hardware orientation mode since Ash manages a separate device
-  // rotation independent of the host's native windowing system.
-  capabilities_.orientation_mode = OutputSurface::OrientationMode::kHardware;
-#endif  // IS_CHROMEOS
-
   DCHECK(context_state_);
   DCHECK(gl_surface_);
 
@@ -190,9 +183,7 @@ SkiaOutputDeviceGL::~SkiaOutputDeviceGL() {
 }
 
 bool SkiaOutputDeviceGL::Reshape(const ReshapeParams& params) {
-#if !BUILDFLAG(IS_CHROMEOS)
   DCHECK_EQ(params.transform, gfx::OVERLAY_TRANSFORM_NONE);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   const gfx::Size size = params.GfxSize();
   const SkColorType color_type = params.image_info.colorType();

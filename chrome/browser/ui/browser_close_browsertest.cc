@@ -31,10 +31,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 class BrowserCloseTest : public InProcessBrowserTest {
  public:
   BrowserCloseTest() = default;
@@ -64,18 +60,6 @@ class BrowserCloseTest : public InProcessBrowserTest {
         });
     return mock;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    InProcessBrowserTest::SetUpCommandLine(command_line);
-    // This test dynamically creates new profiles for testing multi-profile
-    // download warnings without registering corresponding user manager users.
-    // This switch tells ProfileHelper to fall back to the active user during
-    // profile creation instead of crashing due to missing user manager mapping.
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-  }
-#endif
 
   void TearDownOnMainThread() override {
     // Reset download counts on all mocked profiles to 0 first so they don't
@@ -230,7 +214,7 @@ IN_PROC_BROWSER_TEST_F(BrowserCloseTest, LastRegular) {
             UnloadController::From(browser())->OkToCloseWithInProgressDownloads(
                 &num_downloads_blocking));
   EXPECT_EQ(num_downloads_blocking, 1);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(
       true,
       UnloadController::From(browser())->CanCloseWithInProgressDownloads());
@@ -352,7 +336,6 @@ IN_PROC_BROWSER_TEST_F(BrowserCloseTest,
   EXPECT_EQ(num_downloads_blocking, 0);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Last window close (guest window) will trigger warning.
 IN_PROC_BROWSER_TEST_F(BrowserCloseTest, LastWindowGuest) {
   Browser* guest_browser = CreateGuestBrowser();
@@ -406,4 +389,3 @@ IN_PROC_BROWSER_TEST_F(BrowserCloseTest, NonLastGuest) {
             UnloadController::From(guest_browser1)
                 ->OkToCloseWithInProgressDownloads(&num_downloads_blocking));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

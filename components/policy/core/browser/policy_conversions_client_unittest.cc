@@ -37,12 +37,6 @@ class StubPolicyConversionsClient : public PolicyConversionsClient {
   base::ListValue GetExtensionPolicies(PolicyDomain policy_domain) override {
     return base::ListValue();
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  base::ListValue GetDeviceLocalAccountPolicies() override {
-    return base::ListValue();
-  }
-  base::DictValue GetIdentityFields() override { return base::DictValue(); }
-#endif
   PolicyService* GetPolicyService() const override { return policy_service_; }
   SchemaRegistry* GetPolicySchemaRegistry() const override { return nullptr; }
   const ConfigurationPolicyHandlerList* GetHandlerList() const override {

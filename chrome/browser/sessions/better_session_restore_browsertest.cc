@@ -430,24 +430,8 @@ IN_PROC_BROWSER_TEST_P(ContinueWhereILeftOffSessionStorageTest,
   // regardless of feature state.
   CheckReloadedPageRestored();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS also loads a signin OTR Profile (always false) and its parent
-  // non-OTR Profile (true when the feature is enabled. False otherwise).
-  if (IsClearDiskStateEnabled()) {
-    histogram_tester_.ExpectBucketCount(
-        "Storage.SessionStorage.ClearDiskStateAtStoragePartitionInit", false,
-        2);
-    histogram_tester_.ExpectBucketCount(
-        "Storage.SessionStorage.ClearDiskStateAtStoragePartitionInit", true, 1);
-  } else {
-    histogram_tester_.ExpectUniqueSample(
-        "Storage.SessionStorage.ClearDiskStateAtStoragePartitionInit", false,
-        3);
-  }
-#else
   histogram_tester_.ExpectUniqueSample(
       "Storage.SessionStorage.ClearDiskStateAtStoragePartitionInit", false, 1);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest,
@@ -614,7 +598,6 @@ IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest,
 
 // ChromeOS does not override the SessionStartupPreference upon controlled
 // system restart.
-#if !BUILDFLAG(IS_CHROMEOS)
 class RestartTest : public BetterSessionRestoreTest {
  public:
   RestartTest() = default;
@@ -738,7 +721,6 @@ IN_PROC_BROWSER_TEST_F(RestartTest, MAYBE_Restart_PostWithPassword) {
   // The form data contained passwords, so it's removed completely.
   CheckFormRestored(false, false);
 }
-#endif
 
 // These tests ensure that the Better Session Restore features are not triggered
 // when they shouldn't be.
@@ -811,25 +793,9 @@ IN_PROC_BROWSER_TEST_P(NoSessionRestoreSessionStorageTest, SessionStorage) {
   EXPECT_EQ(std::string(url::kAboutBlankURL), web_contents->GetURL().spec());
   StoreDataWithPage("session_storage.html");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS also loads a signin OTR Profile (always false) and its parent
-  // non-OTR Profile (true when the feature is enabled. False otherwise).
-  if (IsClearDiskStateEnabled()) {
-    histogram_tester_.ExpectBucketCount(
-        "Storage.SessionStorage.ClearDiskStateAtStoragePartitionInit", true, 2);
-    histogram_tester_.ExpectBucketCount(
-        "Storage.SessionStorage.ClearDiskStateAtStoragePartitionInit", false,
-        1);
-  } else {
-    histogram_tester_.ExpectUniqueSample(
-        "Storage.SessionStorage.ClearDiskStateAtStoragePartitionInit", false,
-        3);
-  }
-#else
   histogram_tester_.ExpectUniqueSample(
       "Storage.SessionStorage.ClearDiskStateAtStoragePartitionInit",
       IsClearDiskStateEnabled(), 1);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_F(NoSessionRestoreTest,

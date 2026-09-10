@@ -50,22 +50,6 @@
 #include "chrome/browser/web_applications/web_app_utils.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service.h"
-#include "chrome/browser/ash/app_list/arc/arc_package_sync_data_type_controller.h"
-#include "chrome/browser/ash/app_list/arc/arc_package_syncable_service.h"
-#include "chrome/browser/ash/arc/arc_util.h"
-#include "chrome/browser/ash/floating_sso/cookie_sync_data_type_controller.h"
-#include "chrome/browser/ash/floating_sso/floating_sso_service.h"
-#include "chrome/browser/ash/printing/oauth2/authorization_zones_manager.h"
-#include "chrome/browser/ash/printing/printers_sync_bridge.h"
-#include "chrome/browser/ash/printing/synced_printers_manager.h"
-#include "chromeos/ash/components/sync_wifi/wifi_configuration_sync_service.h"
-#include "chromeos/ash/experiences/arc/arc_util.h"
-#include "components/sync_preferences/pref_service_syncable.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/android/webapk/webapk_sync_service.h"
@@ -134,55 +118,6 @@ void ChromeSyncControllerBuilder::SetWebApkSyncService(
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-void ChromeSyncControllerBuilder::SetAppListSyncableService(
-    app_list::AppListSyncableService* app_list_syncable_service) {
-  app_list_syncable_service_.Set(app_list_syncable_service);
-}
-
-void ChromeSyncControllerBuilder::SetAuthorizationZonesManager(
-    ash::printing::oauth2::AuthorizationZonesManager*
-        authorization_zones_manager) {
-  authorization_zones_manager_.Set(authorization_zones_manager);
-}
-
-void ChromeSyncControllerBuilder::SetArcPackageSyncableService(
-    arc::ArcPackageSyncableService* arc_package_syncable_service,
-    Profile* arc_package_profile) {
-  arc_package_syncable_service_.Set(arc_package_syncable_service);
-  arc_package_profile_.Set(arc_package_profile);
-}
-
-void ChromeSyncControllerBuilder::SetDeskSyncService(
-    desks_storage::DeskSyncService* desk_sync_service) {
-  desk_sync_service_.Set(desk_sync_service);
-}
-
-void ChromeSyncControllerBuilder::SetFloatingSsoService(
-    ash::floating_sso::FloatingSsoService* floating_sso_service) {
-  floating_sso_service_.Set(floating_sso_service);
-}
-
-void ChromeSyncControllerBuilder::SetOsPrefServiceSyncable(
-    sync_preferences::PrefServiceSyncable* os_pref_service_syncable) {
-  os_pref_service_syncable_.Set(os_pref_service_syncable);
-}
-
-void ChromeSyncControllerBuilder::SetPrefService(PrefService* pref_service) {
-  pref_service_.Set(pref_service);
-}
-
-void ChromeSyncControllerBuilder::SetSyncedPrintersManager(
-    ash::SyncedPrintersManager* synced_printer_manager) {
-  synced_printer_manager_.Set(synced_printer_manager);
-}
-
-void ChromeSyncControllerBuilder::SetWifiConfigurationSyncService(
-    ash::sync_wifi::WifiConfigurationSyncService*
-        wifi_configuration_sync_service) {
-  wifi_configuration_sync_service_.Set(wifi_configuration_sync_service);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 
 std::vector<std::unique_ptr<syncer::DataTypeController>>
@@ -241,17 +176,8 @@ ChromeSyncControllerBuilder::Build(syncer::SyncService* sync_service) {
           std::make_unique<browser_sync::ExtensionDataTypeController>(
               syncer::APPS, data_type_store_factory,
               extension_sync_service_.value()->AsWeakPtr(), dump_stack,
-#if BUILDFLAG(IS_CHROMEOS)
-              base::FeatureList::IsEnabled(
-                  syncer::kReplaceSyncPromosWithSignInPromos)
-                  ? browser_sync::ExtensionDataTypeController::DelegateMode::
-                        kTransportModeWithSingleModel
-                  : browser_sync::ExtensionDataTypeController::DelegateMode::
-                        kLegacyFullSyncModeOnly,
-#else
               browser_sync::ExtensionDataTypeController::DelegateMode::
                   kLegacyFullSyncModeOnly,
-#endif  // BUILDFLAG(IS_CHROMEOS)
               extension_system_profile_.value()));
 
       controllers.push_back(
@@ -260,17 +186,8 @@ ChromeSyncControllerBuilder::Build(syncer::SyncService* sync_service) {
               extensions::settings_sync_util::GetSyncableServiceProvider(
                   extension_system_profile_.value(), syncer::APP_SETTINGS),
               dump_stack,
-#if BUILDFLAG(IS_CHROMEOS)
-              base::FeatureList::IsEnabled(
-                  syncer::kReplaceSyncPromosWithSignInPromos)
-                  ? browser_sync::ExtensionSettingDataTypeController::
-                        DelegateMode::kTransportModeWithSingleModel
-                  : browser_sync::ExtensionSettingDataTypeController::
-                        DelegateMode::kLegacyFullSyncModeOnly,
-#else
               browser_sync::ExtensionSettingDataTypeController::DelegateMode::
                   kLegacyFullSyncModeOnly,
-#endif  // BUILDFLAG(IS_CHROMEOS)
               extension_system_profile_.value()));
     }
 
@@ -348,7 +265,7 @@ ChromeSyncControllerBuilder::Build(syncer::SyncService* sync_service) {
 #if BUILDFLAG(ENABLE_SPELLCHECK)
     // Chrome prefers OS provided spell checkers where they exist. So only sync
     // the custom dictionary on platforms that typically don't provide one.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // Dictionary sync is enabled by default.
     if (spellcheck_service_.value()) {
       controllers.push_back(
@@ -363,137 +280,9 @@ ChromeSyncControllerBuilder::Build(syncer::SyncService* sync_service) {
                   : syncer::SyncableServiceBasedDataTypeController::
                         DelegateMode::kLegacyFullSyncModeOnly));
     }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
-#if BUILDFLAG(IS_CHROMEOS)
-    CHECK(os_pref_service_syncable_.value());
-    controllers.push_back(
-        std::make_unique<syncer::SyncableServiceBasedDataTypeController>(
-            syncer::OS_PREFERENCES, data_type_store_factory,
-            os_pref_service_syncable_.value()
-                ->GetSyncableService(syncer::OS_PREFERENCES)
-                ->AsWeakPtr(),
-            dump_stack,
-            syncer::SyncableServiceBasedDataTypeController::DelegateMode::
-                kTransportModeWithSingleModel));
-    controllers.push_back(
-        std::make_unique<syncer::SyncableServiceBasedDataTypeController>(
-            syncer::OS_PRIORITY_PREFERENCES, data_type_store_factory,
-            os_pref_service_syncable_.value()
-                ->GetSyncableService(syncer::OS_PRIORITY_PREFERENCES)
-                ->AsWeakPtr(),
-            dump_stack,
-            syncer::SyncableServiceBasedDataTypeController::DelegateMode::
-                kTransportModeWithSingleModel));
-
-    CHECK(synced_printer_manager_.value());
-    syncer::DataTypeControllerDelegate* printers_delegate =
-        synced_printer_manager_.value()
-            ->GetSyncBridge()
-            ->change_processor()
-            ->GetControllerDelegate()
-            .get();
-    controllers.push_back(std::make_unique<syncer::DataTypeController>(
-        syncer::PRINTERS,
-        /*delegate_for_full_sync_mode=*/
-        std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-            printers_delegate),
-        /*delegate_for_transport_mode=*/
-        base::FeatureList::IsEnabled(syncer::kReplaceSyncPromosWithSignInPromos)
-            ? std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                  printers_delegate)
-            : nullptr));
-
-    // Some profile types (e.g. sign-in screen) don't support app list.
-    // Temporarily Disable AppListSyncableService for tablet form factor
-    // devices. See crbug.com/40652815 for details.
-    if (app_list_syncable_service_.value() &&
-        !ash::switches::IsTabletFormFactor()) {
-      // Runs in sync transport-mode and full-sync mode.
-      controllers.push_back(
-          std::make_unique<syncer::SyncableServiceBasedDataTypeController>(
-              syncer::APP_LIST, data_type_store_factory,
-              app_list_syncable_service_.value()->AsWeakPtr(), dump_stack,
-              syncer::SyncableServiceBasedDataTypeController::DelegateMode::
-                  kTransportModeWithSingleModel));
-    }
-
-    if (arc_package_syncable_service_.value()) {
-      controllers.push_back(std::make_unique<ArcPackageSyncDataTypeController>(
-          data_type_store_factory,
-          arc_package_syncable_service_.value()->AsWeakPtr(), dump_stack,
-          sync_service, arc_package_profile_.value()));
-    }
-
-    if (wifi_configuration_sync_service_.value()) {
-      syncer::DataTypeControllerDelegate* wifi_configurations_delegate =
-          wifi_configuration_sync_service_.value()
-              ->GetControllerDelegate()
-              .get();
-      controllers.push_back(std::make_unique<syncer::DataTypeController>(
-          syncer::WIFI_CONFIGURATIONS,
-          /*delegate_for_full_sync_mode=*/
-          std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-              wifi_configurations_delegate),
-          /*delegate_for_transport_mode=*/
-          base::FeatureList::IsEnabled(
-              syncer::kReplaceSyncPromosWithSignInPromos)
-              ? std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                    wifi_configurations_delegate)
-              : nullptr));
-    }
-
-    CHECK(desk_sync_service_.value());
-    controllers.push_back(std::make_unique<syncer::DataTypeController>(
-        syncer::WORKSPACE_DESK,
-        /*delegate_for_full_sync_mode=*/
-        std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-            desk_sync_service_.value()->GetControllerDelegate().get()),
-        /*delegate_for_transport_mode=*/
-        base::FeatureList::IsEnabled(syncer::kReplaceSyncPromosWithSignInPromos)
-            ? std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                  desk_sync_service_.value()->GetControllerDelegate().get())
-            : nullptr));
-
-    if (authorization_zones_manager_.value()) {
-      syncer::DataTypeControllerDelegate*
-          printers_authorization_servers_delegate =
-              authorization_zones_manager_.value()
-                  ->GetDataTypeSyncBridge()
-                  ->change_processor()
-                  ->GetControllerDelegate()
-                  .get();
-      controllers.push_back(std::make_unique<syncer::DataTypeController>(
-          syncer::PRINTERS_AUTHORIZATION_SERVERS,
-          /*delegate_for_full_sync_mode=*/
-          std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-              printers_authorization_servers_delegate),
-          /*delegate_for_transport_mode=*/
-          base::FeatureList::IsEnabled(
-              syncer::kReplaceSyncPromosWithSignInPromos)
-              ? std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                    printers_authorization_servers_delegate)
-              : nullptr));
-    }
-
-    if (floating_sso_service_.value()) {
-      syncer::DataTypeControllerDelegate* delegate =
-          floating_sso_service_.value()->GetControllerDelegate().get();
-      controllers.push_back(
-          std::make_unique<ash::floating_sso::CookieSyncDataTypeController>(
-              /*delegate_for_full_sync_mode=*/
-              std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-                  delegate),
-              /*delegate_for_transport_mode=*/
-              base::FeatureList::IsEnabled(
-                  syncer::kReplaceSyncPromosWithSignInPromos)
-                  ? std::make_unique<
-                        syncer::ForwardingDataTypeControllerDelegate>(delegate)
-                  : nullptr,
-              sync_service, pref_service_.value()));
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     if (auto tracker = cross_device_theme_tracker_.value()) {
       if (base::FeatureList::IsEnabled(

@@ -212,11 +212,7 @@ TEST(OverlayProcessorOzoneTest, ColorSpaceMismatch) {
   primary_plane.color_space = gfx::ColorSpace::CreateSRGB();
   candidates[0].color_space = gfx::ColorSpace::CreateHDR10();
   processor.CheckOverlaySupport(primary_plane, &candidates);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(candidates.at(0).overlay_handled);
-#else
   EXPECT_TRUE(candidates.at(0).overlay_handled);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   candidates[0] = candidate;
 

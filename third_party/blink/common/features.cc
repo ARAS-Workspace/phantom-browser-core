@@ -1346,11 +1346,7 @@ BASE_FEATURE(kLowLatencyUsageSupportedForCanvas,
 
 BASE_FEATURE(kLowPriorityAsyncScriptExecution,
 // TODO(crbug/429069717): Fix the high power consumption on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif
 );
 
 BASE_FEATURE_PARAM(double,
@@ -1693,7 +1689,7 @@ BASE_FEATURE(kOriginAgentClusterDefaultEnabled,
 // Enable defer commits to avoid flash of unstyled content, for all navigations.
 BASE_FEATURE(kPaintHolding, base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 // A parameter to exclude or not exclude CanvasFontCache from
 // PartialLowModeOnMidRangeDevices. This is used to see how
 // CanvasFontCache affects graphics smoothness and renderer memory usage.
@@ -1702,7 +1698,7 @@ BASE_FEATURE_PARAM(bool,
                    &base::features::kPartialLowEndModeOnMidRangeDevices,
                    "exclude-canvas-font-cache",
                    false);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Enables the use of the PaintCache for Path2D objects that are rasterized
 // out of process.  Has no effect when kCanvasOopRasterization is disabled.
@@ -1737,7 +1733,7 @@ BASE_FEATURE(kPrecompileInlineScripts, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kPreferCompositingToLCDText,
 // On Android we never have LCD text. On Chrome OS we prefer composited
 // scrolling for better scrolling performance.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -1753,7 +1749,7 @@ BASE_FEATURE(kPrefetchFontLookupTables,
 // Launch mouse hover feature only on Desktop. Note that Android Desktop mode is
 // currently out of scope.
 BASE_FEATURE(kPreloadingEagerHoverHeuristics,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -2424,11 +2420,7 @@ BASE_FEATURE(kWebRtcIgnoreUnspecifiedColorSpace,
 // Instructs WebRTC to honor the Min/Max Video Encode Accelerator dimensions.
 BASE_FEATURE(kWebRtcUseMinMaxVEADimensions,
 // TODO(crbug.com/1008491): enable other platforms.
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Kill switch for crbug.com/407785197.

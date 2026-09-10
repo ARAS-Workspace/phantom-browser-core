@@ -44,10 +44,6 @@
 #include "chrome/browser/extensions/menu_manager.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ui/clipboard_history/clipboard_history_types.h"
-#endif
-
 class AccessibilityLabelsMenuObserver;
 class BrowserWindowInterface;
 #if BUILDFLAG(ENABLE_COMPOSE)
@@ -90,20 +86,6 @@ class DictationMenuObserver;
 namespace ui {
 class DataTransferEndpoint;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-namespace ash {
-class SystemWebAppDelegate;
-}
-
-namespace chromeos::clipboard_history {
-class ClipboardHistorySubmenuModel;
-}  // namespace chromeos::clipboard_history
-
-namespace policy {
-class DlpRulesManager;
-}  // namespace policy
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
 namespace split_tabs {
@@ -217,10 +199,6 @@ class RenderViewContextMenu
   // Returns true if keyboard lock is active and requires the user to press and
   // hold escape to exit exclusive access mode.
   bool IsPressAndHoldEscRequiredToExitFullscreen() const;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  virtual const policy::DlpRulesManager* GetDlpRulesManager() const;
-#endif
 
 #if BUILDFLAG(ENABLE_COMPOSE)
   virtual ChromeComposeClient* GetChromeComposeClient() const;
@@ -486,12 +464,6 @@ class RenderViewContextMenu
       const SkBitmap& region_bytes,
       const gfx::Rect& region_bitmap);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Shows the standalone clipboard history menu. `event_flags` describes the
-  // event that caused the menu to show.
-  void ShowClipboardHistoryMenu(int event_flags);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if !BUILDFLAG(IS_ANDROID)
   // Opens the link in a new split view so that the linked page will be visible
   // next to the active tab. If the active tab is already in the split view,
@@ -537,21 +509,6 @@ class RenderViewContextMenu
       accessibility_labels_menu_observer_;
   ui::SimpleMenuModel accessibility_labels_submenu_model_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // An observer that handles "Open with <app>" items.
-  std::unique_ptr<RenderViewContextMenuObserver> open_with_menu_observer_;
-  // An observer that handles smart text selection action items.
-  std::unique_ptr<RenderViewContextMenuObserver>
-      start_smart_selection_action_menu_observer_;
-  // An observer that populates events to read write cards.
-  std::unique_ptr<ReadWriteCardObserver> read_write_card_observer_;
-
-  // A submenu model to contain clipboard history item descriptors. Used only if
-  // the clipboard history refresh feature is enabled.
-  std::unique_ptr<chromeos::clipboard_history::ClipboardHistorySubmenuModel>
-      submenu_model_;
-#endif
-
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
   // An observer that disables menu items when print preview is active.
   std::unique_ptr<PrintPreviewContextMenuObserver> print_preview_menu_observer_;
@@ -565,11 +522,6 @@ class RenderViewContextMenu
   // embeds the MimeHandlerViewGuest. Otherwise this will be the same as
   // |source_web_contents_|.
   const raw_ptr<content::WebContents, DanglingUntriaged> embedder_web_contents_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // The system app (if any) associated with the WebContents we're in.
-  raw_ptr<const ash::SystemWebAppDelegate> system_app_ = nullptr;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // A one-time callback that will be called the next time a plugin action is
   // executed from a given render frame.

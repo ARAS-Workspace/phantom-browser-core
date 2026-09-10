@@ -157,9 +157,6 @@ base::trace_event::MemoryAllocatorDump* SharedImageBacking::OnMemoryDump(
   dump->AddString("usage", "", CreateLabelForSharedImageUsage(usage()));
   dump->AddString("debug label", "", debug_label_);
   dump->AddScalar("purgeable", "bool", IsPurgeable());
-#if BUILDFLAG(IS_CHROMEOS)
-  dump->AddScalar("non_exo_size", "bool", IsImportedFromExo() ? 0 : byte_size);
-#endif
 
   // Add ownership edge to `client_guid` which expresses shared ownership with
   // the client process.

@@ -46,10 +46,6 @@ ExternalInstallOptions ConvertParamsToExternalInstallOptions(
 
   install_options.launch_query_params = install_params.launch_query_params;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  install_options.system_app_type = install_params.system_app_type;
-#endif
-
   install_options.oem_installed = install_params.oem_installed;
 
   return install_options;
@@ -99,10 +95,6 @@ TEST(WebAppExternalInstallOptions,
   install_options.additional_search_terms = {"str1", "str2"};
 
   install_options.launch_query_params = "param";
-
-#if BUILDFLAG(IS_CHROMEOS)
-  install_options.system_app_type = ash::SystemWebAppType::SAMPLE;
-#endif
 
   install_options.oem_installed = true;
 

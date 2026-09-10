@@ -99,14 +99,7 @@
 #include "chrome/browser/metrics/pressure/pressure_metrics_reporter.h"
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/files/file_util.h"
-#include "base/strings/string_util.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
-#include "components/user_manager/user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "components/power_metrics/system_power_monitor.h"
 #endif
 
@@ -369,8 +362,7 @@ void RecordMicroArchitectureStats() {
 #endif  // defined(ARCH_CPU_X86_FAMILY)
 }
 
-#if defined(ARCH_CPU_X86_FAMILY) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_LINUX)
 // Reads the microcode version from the kernel via sysfs.
 // This function returns -1 on failure.
 int GetMicrocodeVersion() {
@@ -914,8 +906,7 @@ void ChromeBrowserMainExtraPartsMetrics::PostBrowserStart() {
   base::ThreadPool::PostTask(FROM_HERE, kBestEffortTaskTraits,
                              base::BindOnce(&RecordStartupMetrics));
 
-#if defined(ARCH_CPU_X86_FAMILY) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_LINUX)
   base::ThreadPool::PostTask(FROM_HERE, kBestEffortTaskTraits,
                              base::BindOnce(&RecordMicrocodeVersionStats));
 #endif
@@ -939,9 +930,7 @@ void ChromeBrowserMainExtraPartsMetrics::PostBrowserStart() {
 // crash (which has no login screen) requires the user to click a notification
 // prompt before browser windows are restored, so the `BrowserList` is also
 // empty in this case.
-#if !BUILDFLAG(IS_CHROMEOS)
   metrics::BeginFirstWebContentsProfiling();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // Instantiate the power-related metrics reporters.
 
@@ -977,9 +966,9 @@ void ChromeBrowserMainExtraPartsMetrics::PostBrowserStart() {
   pressure_metrics_reporter_ = std::make_unique<PressureMetricsReporter>();
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   power_metrics::SystemPowerMonitor::Initialize();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   HandleEnableBenchmarkingCountdownAsync();
 }
@@ -1057,19 +1046,6 @@ void ChromeBrowserMainExtraPartsMetrics::HandleEnableBenchmarkingCountdown(
 void ChromeBrowserMainExtraPartsMetrics::
     HandleEnableBenchmarkingCountdownAsync() {
   Profile* profile = nullptr;
-#if BUILDFLAG(IS_CHROMEOS)
-  // This logic is subtle. There are two ways for PostBrowserStart to be called
-  // on ChromeOS. The first is when the device first shows the login screen. In
-  // this case the profile is the login profile. The second is after the user
-  // logs in. If any flags have been changed from the login profile's flags,
-  // then all of ash is restarted. We only care about invoking this logic in the
-  // second case. Thus we check if IsUserLoggedIn() to guard the logic.
-  if (!user_manager::UserManager::IsInitialized() ||
-      !user_manager::UserManager::Get()->IsUserLoggedIn()) {
-    return;
-  }
-  profile = g_browser_process->profile_manager()->GetPrimaryUserProfile();
-#endif
   about_flags::GetStorage(profile,
                           base::BindOnce(&HandleEnableBenchmarkingCountdown,
                                          g_browser_process->local_state()));

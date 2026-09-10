@@ -44,12 +44,6 @@ namespace network {
 class NetworkConnectionTracker;
 }  // namespace network
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace account_manager {
-class AccountManagerFacade;
-}
-#endif
-
 namespace signin {
 
 struct IdentityManagerBuildParams {
@@ -75,12 +69,6 @@ struct IdentityManagerBuildParams {
   scoped_refptr<TokenWebData> token_web_data;
   raw_ptr<unexportable_keys::UnexportableKeyService> unexportable_key_service =
       nullptr;
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  raw_ptr<account_manager::AccountManagerFacade, DanglingUntriaged>
-      account_manager_facade = nullptr;
-  bool is_regular_profile = false;
 #endif
 
 #if BUILDFLAG(IS_IOS)

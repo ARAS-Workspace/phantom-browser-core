@@ -18,7 +18,7 @@ namespace sandbox::policy {
 // This policy can be used by both renderer and worker processes.
 class SANDBOX_POLICY_EXPORT RendererProcessPolicy : public BPFBasePolicy {
  public:
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   RendererProcessPolicy();
 #elif BUILDFLAG(IS_ANDROID)
   explicit RendererProcessPolicy(

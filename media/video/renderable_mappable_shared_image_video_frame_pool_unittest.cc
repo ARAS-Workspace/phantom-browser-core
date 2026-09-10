@@ -387,7 +387,7 @@ TEST_P(RenderableMappableSharedImageVideoFramePoolTest,
 
   ASSERT_TRUE(pool);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   gfx::BufferUsage expected_usage = gfx::BufferUsage::SCANOUT_VEA_CPU_READ;
 #elif BUILDFLAG(IS_LINUX)
   gfx::BufferUsage expected_usage = gfx::BufferUsage::SCANOUT_CPU_READ_WRITE;
@@ -423,7 +423,7 @@ TEST_P(RenderableMappableSharedImageVideoFramePoolTest,
 
   ASSERT_TRUE(pool);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   gfx::BufferUsage expected_usage2 = gfx::BufferUsage::SCANOUT_VEA_CPU_READ;
 #elif BUILDFLAG(IS_LINUX)
   gfx::BufferUsage expected_usage2 = gfx::BufferUsage::SCANOUT;

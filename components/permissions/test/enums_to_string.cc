@@ -67,23 +67,17 @@ std::string_view ToString(permissions::RequestType request_type) {
           {RequestType::kKeyboardLock, "KeyboardLock"},
           {RequestType::kPointerLock, "PointerLock"},
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
           {RequestType::kProtectedMediaIdentifier, "ProtectedMediaIdentifier"},
 #endif
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
           {RequestType::kRegisterProtocolHandler, "RegisterProtocolHandler"},
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_CHROMEOS)
-          {RequestType::kSmartCard, "SmartCard"},
-#endif
           {RequestType::kStorageAccess, "StorageAccess"},
           {RequestType::kVrSession, "VrSession"},
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
           {RequestType::kWebAppInstallation, "WebAppInstallation"},
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-          {RequestType::kWebPrinting, "WebPrinting"},
-#endif
           {RequestType::kWindowManagement, "WindowManagement"},
       });
 

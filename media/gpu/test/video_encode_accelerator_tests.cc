@@ -629,7 +629,7 @@ TEST_F(VideoEncoderTest, BitrateCheck) {
   EXPECT_TRUE(encoder->WaitForBitstreamProcessors());
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // TODO(https://crbugs.com/350994517): NV12 DMABuf test does not apply to
 // Windows. There should be similar test for this with NV12 DXGI buffers added.
 TEST_F(VideoEncoderTest, FlushAtEndOfStream_NV12Dmabuf) {
@@ -796,7 +796,7 @@ TEST_F(VideoEncoderTest, FlushAtEndOfStream_NV12DmabufCroppingRightAndLeft) {
   EXPECT_EQ(encoder->GetFrameReleasedCount(), nv12_expanded_video->NumFrames());
   EXPECT_TRUE(encoder->WaitForBitstreamProcessors());
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // This tests deactivate and activating spatial layers during encoding.
 TEST_F(VideoEncoderTest, DeactivateAndActivateSpatialLayers) {
@@ -804,12 +804,12 @@ TEST_F(VideoEncoderTest, DeactivateAndActivateSpatialLayers) {
   if (spatial_layers.size() <= 1)
     GTEST_SKIP() << "Skip (de)activate spatial layers test for simple encoding";
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   RawVideo* video = g_env->GenerateNV12Video();
 #else
   // TODO(b/211783271): Add support for I420 SHM input.
   RawVideo* video = g_env->Video();
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   const size_t bottom_spatial_idx = 0;
   const size_t top_spatial_idx = spatial_layers.size() - 1;
@@ -852,14 +852,14 @@ TEST_F(VideoEncoderTest, DeactivateAndActivateSpatialLayers) {
       g_env->InterLayerPredMode(), g_env->ContentType(),
       g_env->BitrateAllocation(), g_env->Reverse());
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   config.input_storage_type =
       VideoEncodeAccelerator::Config::StorageType::kGpuMemoryBuffer;
 #else
   // TODO(https://crbugs.com/350994517): Enable GMB for Windows.
   config.input_storage_type =
       VideoEncodeAccelerator::Config::StorageType::kShmem;
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   std::vector<size_t> num_frames_to_encode(bitrate_allocations.size());
   for (size_t i = 0; i < num_frames_to_encode.size(); ++i)
@@ -1043,9 +1043,6 @@ int main(int argc, char** argv) {
     }
   }
 
-#if defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
-  enabled_features.push_back(media::kVaapiH264SWBitrateController);
-#endif  // defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
   disabled_features.push_back(media::kGlobalVaapiLock);
 
   testing::InitGoogleTest(&argc, argv);

@@ -239,10 +239,6 @@ class OnDemandUpdater {
   friend class TranslateKitComponentInstallerPolicy;
   friend class TranslateKitLanguagePackComponentInstallerPolicy;
   friend class ::extensions::AutotestPrivateLoadSmartDimComponentFunction;
-#if BUILDFLAG(IS_CHROMEOS)
-  friend class ash::SmartDimComponentIntegrationTest;
-  friend class CrOSComponentInstaller;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   friend class IwaKeyDistributionComponentInstallerPolicy;
   friend class PlatformRuntimeComponentInstallerPolicy;
   friend void UpdateAIEmbeddingsComponentOnDemand(Priority priority,

@@ -13,12 +13,6 @@
 #include "chrome/browser/performance_manager/test_support/fake_power_monitor_source.h"
 #include "components/prefs/pref_service.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chromeos/dbus/power/fake_power_manager_client.h"
-#include "chromeos/dbus/power/power_manager_client.h"
-#endif
-
 namespace performance_manager::user_tuning {
 
 namespace {
@@ -61,15 +55,6 @@ void TestUserPerformanceTuningManagerEnvironment::SetUp(
     PrefService* local_state,
     std::unique_ptr<base::SamplingEventSource> sampling_event_source,
     std::unique_ptr<base::BatteryLevelProvider> battery_level_provider) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!chromeos::PowerManagerClient::Get()) {
-    tear_down_power_manager_client_ = true;
-    chromeos::PowerManagerClient::InitializeFake();
-  } else {
-    // Check that it's FakePowerManagerClient.
-    chromeos::FakePowerManagerClient::Get();
-  }
-#endif
   auto source = std::make_unique<FakePowerMonitorSource>();
   power_monitor_source_ = source.get();
   base::PowerMonitor::GetInstance()->Initialize(std::move(source));
@@ -116,12 +101,6 @@ void TestUserPerformanceTuningManagerEnvironment::TearDown() {
   battery_sampler_.reset();
   power_monitor_source_ = nullptr;
   base::PowerMonitor::GetInstance()->ShutdownForTesting();
-#if BUILDFLAG(IS_CHROMEOS)
-  if (tear_down_power_manager_client_) {
-    chromeos::PowerManagerClient::Shutdown();
-    tear_down_power_manager_client_ = false;
-  }
-#endif
 }
 
 // static
@@ -132,24 +111,6 @@ void TestUserPerformanceTuningManagerEnvironment::SetBatterySaverMode(
                             BatterySaverModeState::kEnabled
                       : performance_manager::user_tuning::prefs::
                             BatterySaverModeState::kDisabled;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::features::IsBatterySaverAvailable()) {
-    base::RunLoop run_loop;
-    std::unique_ptr<QuitRunLoopOnBSMChangeObserver> observer =
-        std::make_unique<QuitRunLoopOnBSMChangeObserver>(
-            run_loop.QuitClosure());
-    BatterySaverModeManager* manager = BatterySaverModeManager::GetInstance();
-    manager->AddObserver(observer.get());
-    power_manager::SetBatterySaverModeStateRequest request;
-    request.set_enabled(enabled);
-    chromeos::FakePowerManagerClient::Get()->SetBatterySaverModeState(request);
-    run_loop.Run();
-    manager->RemoveObserver(observer.get());
-    return;
-    // Fall through to the Chrome battery saver pref set code if the ChromeOS
-    // battery saver feature is disabled.
-  }
-#endif
   local_state->SetInteger(
       performance_manager::user_tuning::prefs::kBatterySaverModeState,
       static_cast<int>(mode));

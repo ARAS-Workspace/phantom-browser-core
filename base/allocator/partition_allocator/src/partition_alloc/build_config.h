@@ -47,7 +47,7 @@
 // Definition of PA_BUILDFLAG(...) macro.
 #include "partition_alloc/buildflag.h"  // IWYU pragma: export
 
-// Definition of PA_BUILDFLAG(IS_CHROMEOS).
+// Definition of the PA_BUILDFLAG(...) values.
 #include "partition_alloc/buildflags.h"  // IWYU pragma: export
 
 // Clangd does not detect PA_BUILDFLAG_INTERNAL_* indirect usage, so mark the
@@ -75,12 +75,9 @@
 #define PA_IS_MAC
 #endif  // defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
 #elif defined(__linux__)
-#if !PA_BUILDFLAG(IS_CHROMEOS)
 // Do not define PA_IS_LINUX on Chrome OS build.
 // The IS_CHROMEOS PA_BUILDFLAG macro is defined in buildflags.h.
 #define PA_IS_LINUX
-#endif  // !PA_BUILDFLAG(IS_CHROMEOS)
-// Include features.h for glibc/uclibc macros.
 #include <features.h>
 #if defined(__GLIBC__) && !defined(__UCLIBC__)
 // We really are using glibc, not uClibc pretending to be glibc.
@@ -120,8 +117,7 @@
 #if defined(PA_IS_AIX) || defined(PA_IS_ASMJS) || defined(PA_IS_FREEBSD) ||  \
     defined(PA_IS_IOS) || defined(PA_IS_LINUX) || defined(PA_IS_CHROMEOS) || \
     defined(PA_IS_MAC) || defined(PA_IS_NETBSD) || defined(PA_IS_OPENBSD) || \
-    defined(PA_IS_QNX) || defined(PA_IS_SOLARIS) ||                          \
-    PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(IS_CHROMEOS)
+    defined(PA_IS_QNX) || defined(PA_IS_SOLARIS) || PA_BUILDFLAG(IS_ANDROID)
 #define PA_IS_POSIX
 #endif
 

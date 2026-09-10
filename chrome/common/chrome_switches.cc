@@ -194,12 +194,6 @@ const char kDiagnosticsFormat[] = "diagnostics-format";
 // Tells the diagnostics mode to do the requested recovery step(s).
 const char kDiagnosticsRecovery[] = "diagnostics-recovery";
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Disables the auto maximize feature on ChromeOS so that a browser window
-// always starts in normal state. This is used by tests that do not want this
-// auto maximizing behavior.
-const char kDisableAutoMaximizeForTests[] = "disable-auto-maximize-for-tests";
-#endif
 
 // Disable auto-reload of pages on top-level error.
 const char kDisableAutoReload[] = "disable-auto-reload";
@@ -284,11 +278,6 @@ const char kEnableAutoReload[] = "enable-auto-reload";
 // Enables the multi-level undo system for bookmarks.
 const char kEnableBookmarkUndo[] = "enable-bookmark-undo";
 
-#if BUILDFLAG(IS_CHROMEOS)
-// If enabled, DevTools will allow creating pwa_handler, to enable executing
-// CDP methods (i.e. PWA.install) on browsers connected remotely
-const char kEnableDevToolsPwaHandler[] = "enable-devtools-pwa-handler";
-#endif
 
 // Enables Domain Reliability Monitoring.
 const char kEnableDomainReliability[] = "enable-domain-reliability";
@@ -348,11 +337,6 @@ const char kExtensionExperimentalActor[] = "enable-extension-actor-api";
 // the app to be installed if it hasn't been already.
 const char kForceAppMode[] = "force-app-mode";
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Forces developer tools availability, no matter what values the enterprise
-// policies DeveloperToolsDisabled and DeveloperToolsAvailability are set to.
-const char kForceDevToolsAvailable[] = "force-devtools-available";
-#endif
 
 // Displays the First Run experience when the browser is started, regardless of
 // whether or not it's actually the First Run (this overrides kNoFirstRun).
@@ -791,28 +775,12 @@ const char kCastMirroringTargetPlayoutDelay[] =
     "cast-mirroring-target-playout-delay";
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Custom crosh command.
-const char kCroshCommand[] = "crosh-command";
-
-// Disables logging redirect for testing.
-const char kDisableLoggingRedirect[] = "disable-logging-redirect";
-
-// Disables apps on the login screen. By default, they are allowed and can be
-// installed through policy.
-const char kDisableLoginScreenApps[] = "disable-login-screen-apps";
-
-// Use a short (1 second) timeout for merge session loader throttle testing.
-const char kShortMergeSessionTimeoutForTest[] =
-    "short-merge-session-timeout-for-test";
-#else
 // Enables saving webpages as MHTML (Webpage, Single) by default, instead of
 // saving as HTML with a directory of sub-resources. (Webpage, Complete).
 // See http://crbug.com/40179885 for how to remove this switch.
 const char kSavePageAsMHTML[] = "save-page-as-mhtml";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 // These flags show the man page on Linux. They are equivalent to each
 // other.
 const char kHelp[] = "help";
@@ -869,7 +837,7 @@ const char kNoOpForTestingProcess[] = "no-op-for-testing";
 const char kDebugPrint[] = "debug-print";
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 // Causes the browser to launch directly in guest mode.
 const char kGuest[] = "guest";
@@ -934,12 +902,12 @@ const char kProfileBaseName[] = "profile-base-name";
 const char kProfileManagementAttributes[] = "profile-management-attributes";
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // Custom WebAPK server URL for the sake of testing.
 const char kWebApkServerUrl[] = "webapk-server-url";
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // Uses the system default printer as the initially selected destination in
 // print preview, instead of the most recently used destination.
 const char kUseSystemDefaultPrinter[] = "use-system-default-printer";

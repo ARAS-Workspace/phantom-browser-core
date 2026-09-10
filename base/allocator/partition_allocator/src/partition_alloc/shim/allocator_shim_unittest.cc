@@ -680,8 +680,7 @@ TEST_F(AllocatorShimTest, NewHandlerConcurrency) {
 static size_t GetUsableSize(void* ptr) {
   return malloc_size(ptr);
 }
-#elif PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS) || \
-    PA_BUILDFLAG(IS_ANDROID)
+#elif PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_ANDROID)
 static size_t GetUsableSize(void* ptr) {
   return malloc_usable_size(ptr);
 }

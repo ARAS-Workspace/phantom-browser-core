@@ -28,7 +28,7 @@
 #include <sys/prctl.h>
 #endif
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)
+#if PA_BUILDFLAG(IS_LINUX)
 #include <sys/resource.h>
 #endif
 

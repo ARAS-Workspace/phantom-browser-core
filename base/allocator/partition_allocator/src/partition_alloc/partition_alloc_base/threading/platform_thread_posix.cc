@@ -18,7 +18,7 @@
 #include "partition_alloc/partition_alloc_base/logging.h"
 #include "partition_alloc/partition_alloc_base/threading/platform_thread_internal_posix.h"
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)
+#if PA_BUILDFLAG(IS_LINUX)
 #include <sys/syscall.h>
 #include <atomic>
 #endif
@@ -32,7 +32,7 @@ PlatformThreadId PlatformThread::CurrentId() {
   // into the kernel.
 #if PA_BUILDFLAG(IS_APPLE)
   return pthread_mach_thread_np(pthread_self());
-#elif PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)
+#elif PA_BUILDFLAG(IS_LINUX)
   // Unlike base/threading/platform_thread_posix.cc, we avoid using thread_local
   // for thread_id caching. This prevents reentrancy issues within
   // PartitionAlloc, as reported in crbug.com/476192650. Since

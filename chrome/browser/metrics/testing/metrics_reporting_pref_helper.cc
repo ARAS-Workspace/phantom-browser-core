@@ -13,32 +13,6 @@
 #include "chrome/common/pref_names.h"
 #include "components/metrics/metrics_pref_names.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/settings/device_settings_cache.h"
-#include "components/policy/proto/chrome_device_policy.pb.h"
-#include "components/policy/proto/device_management_backend.pb.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-namespace {
-
-void SetMetricsReportingEnabledChromeOS(bool is_enabled,
-                                        base::DictValue& local_state_dict) {
-  namespace em = enterprise_management;
-  em::ChromeDeviceSettingsProto device_settings_proto;
-  device_settings_proto.mutable_metrics_enabled()->set_metrics_enabled(
-      is_enabled);
-  em::PolicyData policy_data;
-  policy_data.set_policy_type("google/chromeos/device");
-  policy_data.set_policy_value(device_settings_proto.SerializeAsString());
-  local_state_dict.Set(
-      ash::device_settings_cache::prefs::kDeviceSettingsCache,
-      ash::device_settings_cache::PolicyDataToString(policy_data));
-}
-
-}  // namespace
-#endif
-
 namespace metrics {
 
 base::FilePath SetUpUserDataDirectoryForTesting(bool is_enabled) {
@@ -49,11 +23,6 @@ base::FilePath SetUpUserDataDirectoryForTesting(bool is_enabled) {
   base::FilePath user_data_dir;
   if (!base::PathService::Get(chrome::DIR_USER_DATA, &user_data_dir))
     return base::FilePath();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS checks a separate place for reporting enabled.
-  SetMetricsReportingEnabledChromeOS(is_enabled, local_state_dict);
-#endif
 
   base::FilePath local_state_path =
       user_data_dir.Append(chrome::kLocalStateFilename);

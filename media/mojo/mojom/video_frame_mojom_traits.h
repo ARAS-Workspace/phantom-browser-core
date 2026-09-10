@@ -18,7 +18,7 @@
 
 namespace mojo {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 template <>
 struct StructTraits<media::mojom::ColorPlaneLayoutDataView,
                     media::ColorPlaneLayout> {
@@ -31,7 +31,7 @@ struct StructTraits<media::mojom::ColorPlaneLayoutDataView,
   static bool Read(media::mojom::ColorPlaneLayoutDataView data,
                    media::ColorPlaneLayout* out);
 };
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 template <>
 struct StructTraits<media::mojom::VideoFrameDataView,

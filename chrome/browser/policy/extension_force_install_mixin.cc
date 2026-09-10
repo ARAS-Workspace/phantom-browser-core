@@ -62,14 +62,6 @@
 #include "third_party/zlib/google/zip.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/test/device_state_mixin.h"
-#include "chrome/browser/ash/login/test/scoped_policy_update.h"
-#include "chrome/browser/ash/policy/core/device_policy_cros_browser_test.h"
-#include "chrome/browser/ash/policy/test_support/embedded_policy_test_server_mixin.h"
-#include "components/policy/proto/chrome_device_policy.pb.h"
-#endif
-
 namespace {
 
 // Name of the directory whose contents are served by the embedded test
@@ -372,62 +364,6 @@ void UpdatePolicyViaMockPolicyProvider(
   mock_policy_provider->UpdateChromePolicy(policy_map);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-void UpdatePolicyViaDeviceStateMixin(
-    const extensions::ExtensionId& extension_id,
-    const GURL& update_manifest_url,
-    ash::DeviceStateMixin* device_state_mixin) {
-  device_state_mixin->RequestDevicePolicyUpdate()
-      ->policy_payload()
-      ->mutable_device_login_screen_extensions()
-      ->add_device_login_screen_extensions(
-          MakeForceInstallPolicyItemValue(extension_id, update_manifest_url));
-}
-
-void UpdatePolicyViaDevicePolicyCrosTestHelper(
-    const extensions::ExtensionId& extension_id,
-    const GURL& update_manifest_url,
-    policy::DevicePolicyCrosTestHelper* device_policy_cros_test_helper) {
-  device_policy_cros_test_helper->device_policy()
-      ->payload()
-      .mutable_device_login_screen_extensions()
-      ->add_device_login_screen_extensions(
-          MakeForceInstallPolicyItemValue(extension_id, update_manifest_url));
-  device_policy_cros_test_helper->RefreshDevicePolicy();
-}
-
-void UpdatePolicyViaEmbeddedPolicyMixin(
-    const extensions::ExtensionId& extension_id,
-    const GURL& update_manifest_url,
-    ash::EmbeddedPolicyTestServerMixin* policy_test_server_mixin,
-    policy::UserPolicyBuilder* user_policy_builder,
-    const std::string& account_id,
-    const std::string& policy_type,
-    bool* success) {
-  user_policy_builder->payload()
-      .mutable_extensioninstallforcelist()
-      ->mutable_value()
-      ->add_entries(
-          MakeForceInstallPolicyItemValue(extension_id, update_manifest_url));
-  user_policy_builder->Build();
-
-  policy_test_server_mixin->UpdatePolicy(
-      policy_type, account_id,
-      user_policy_builder->payload().SerializeAsString());
-
-  base::RunLoop run_loop;
-  g_browser_process->policy_service()->RefreshPolicies(
-      run_loop.QuitClosure(), policy::PolicyFetchReason::kTest);
-  ASSERT_NO_FATAL_FAILURE(run_loop.Run());
-
-  // Report the outcome via an output argument instead of the return value,
-  // since ASSERT_NO_FATAL_FAILURE() only works in void functions.
-  *success = true;
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Simulates a server error according to the current error mode, or returns no
 // response when no error is configured. Note that this function is called on
 // the IO thread.
@@ -468,58 +404,6 @@ void ExtensionForceInstallMixin::InitWithMockPolicyProvider(
   profile_ = profile;
   mock_policy_provider_ = mock_policy_provider;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-void ExtensionForceInstallMixin::InitWithDeviceStateMixin(
-    Profile* profile,
-    ash::DeviceStateMixin* device_state_mixin) {
-  DCHECK(device_state_mixin);
-  DCHECK(!initialized_) << "Init already called";
-  DCHECK(!profile_);
-  DCHECK(!device_state_mixin_);
-  initialized_ = true;
-  profile_ = profile;
-  device_state_mixin_ = device_state_mixin;
-}
-
-void ExtensionForceInstallMixin::InitWithDevicePolicyCrosTestHelper(
-    Profile* profile,
-    policy::DevicePolicyCrosTestHelper* device_policy_cros_test_helper) {
-  DCHECK(device_policy_cros_test_helper);
-  DCHECK(!initialized_) << "Init already called";
-  DCHECK(!profile_);
-  DCHECK(!device_policy_cros_test_helper_);
-  initialized_ = true;
-  profile_ = profile;
-  device_policy_cros_test_helper_ = device_policy_cros_test_helper;
-}
-
-void ExtensionForceInstallMixin::InitWithEmbeddedPolicyMixin(
-    Profile* profile,
-    ash::EmbeddedPolicyTestServerMixin* policy_test_server_mixin,
-    policy::UserPolicyBuilder* user_policy_builder,
-    const std::string& account_id,
-    const std::string& policy_type) {
-  DCHECK(policy_test_server_mixin);
-  DCHECK(user_policy_builder);
-  DCHECK(!account_id.empty());
-  DCHECK(!policy_type.empty());
-  DCHECK(!initialized_) << "Init already called";
-  DCHECK(!profile_);
-  DCHECK(!policy_test_server_mixin_);
-  DCHECK(!user_policy_builder_);
-  DCHECK(account_id_.empty());
-  DCHECK(policy_type_.empty());
-  initialized_ = true;
-  profile_ = profile;
-  policy_test_server_mixin_ = policy_test_server_mixin;
-  user_policy_builder_ = user_policy_builder;
-  account_id_ = account_id;
-  policy_type_ = policy_type;
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 bool ExtensionForceInstallMixin::ForceInstallFromCrx(
     const base::FilePath& crx_path,
@@ -835,25 +719,6 @@ bool ExtensionForceInstallMixin::UpdatePolicy(
                                       mock_policy_provider_);
     return true;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (device_state_mixin_) {
-    UpdatePolicyViaDeviceStateMixin(extension_id, update_manifest_url,
-                                    device_state_mixin_);
-    return true;
-  }
-  if (device_policy_cros_test_helper_) {
-    UpdatePolicyViaDevicePolicyCrosTestHelper(extension_id, update_manifest_url,
-                                              device_policy_cros_test_helper_);
-    return true;
-  }
-  if (policy_test_server_mixin_) {
-    bool success = false;
-    UpdatePolicyViaEmbeddedPolicyMixin(
-        extension_id, update_manifest_url, policy_test_server_mixin_,
-        user_policy_builder_, account_id_, policy_type_, &success);
-    return success;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   NOTREACHED() << "Init not called";
 }
 

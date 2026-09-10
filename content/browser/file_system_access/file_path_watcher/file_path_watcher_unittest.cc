@@ -53,7 +53,7 @@
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/format_macros.h"
 #include "content/browser/file_system_access/file_path_watcher/file_path_watcher_inotify.h"
 #endif
@@ -64,22 +64,20 @@ namespace {
 
 base::AtomicSequenceNumber g_next_delegate_id;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // inotify fires two events - one for each file creation + modification.
 constexpr size_t kExpectedEventsForNewFileWrite = 2;
 #else
 constexpr size_t kExpectedEventsForNewFileWrite = 1;
 #endif
 
-#define CHANGE_INFO_SUPPORTED                                               \
-  BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-      BUILDFLAG(IS_MAC)
+#define CHANGE_INFO_SUPPORTED \
+  BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
 
 #if CHANGE_INFO_SUPPORTED
 // Only the inotify FilePathWatcher's usage can change while watching a file
 // entry. Other FilePathWatchers have a constant amount of usage.
-constexpr bool kUsageCanChange =
-    BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID);
+constexpr bool kUsageCanChange = BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID);
 #endif
 
 enum class ExpectedEventsSinceLastWait { kNone, kSome };
@@ -195,7 +193,7 @@ inline constexpr auto IsType =
                          change_type));
     };
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 inline constexpr auto IsFile = []() {
   return testing::Field(
       &Event::change_info,
@@ -210,7 +208,7 @@ inline constexpr auto IsDirectory = []() {
 };
 #endif
 
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_ANDROID)
 inline constexpr auto IsUnknownPathType = []() {
   return testing::Field(
       &Event::change_info,
@@ -242,7 +240,7 @@ inline constexpr auto IsDirectory = []() {
 };
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 inline constexpr auto IsDeletedFile = IsFile;
 inline constexpr auto IsDeletedDirectory = IsDirectory;
 
@@ -291,8 +289,7 @@ inline constexpr auto ModifiedMatcher = [](base::FilePath reported_path,
   return testing::ElementsAreArray({modified_matcher, modified_matcher});
 };
 #endif
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 // `EventExpecter`s can be implemented to provide a more convenient abstraction
 // to tests than building their own `EventListMatcher`s. An `EventExpecter` can
@@ -1221,13 +1218,12 @@ TEST_F(FilePathWatcherTest, DisappearingDirectory) {
 
   ASSERT_TRUE(DeletePathRecursively(dir));
   event_expecter.AddExpectedEventForPath(file);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // TODO(crbug.com/40263766): Figure out why this may fire two events on
   // inotify. Only the file is being watched, so presumably there should only be
   // one deletion event.
   event_expecter.AddExpectedEventForPath(file);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
@@ -1620,7 +1616,7 @@ TEST_F(FilePathWatcherTest, NoEventWhenFileAttributesChanged) {
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 // Verify that creating a symlink is caught.
 TEST_F(FilePathWatcherTest, CreateLink) {
@@ -2082,9 +2078,9 @@ TEST_F(FilePathWatcherTest, InotifyLimitInUpdateRecursive) {
   }
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 TEST_F(FilePathWatcherTest, ReturnFullPath_RecursiveInRootFolder) {
   FilePathWatcher directory_watcher;
@@ -2299,8 +2295,7 @@ TEST_F(FilePathWatcherTest, ReturnWatchedPath_NonRecursiveInRootFolder) {
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -3114,7 +3109,7 @@ TEST_P(FilePathWatcherWithChangeInfoTest, NoEventWhenFileAttributesChanged) {
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST_P(FilePathWatcherWithChangeInfoTest, CreateLink) {
   EventExpecterWithChangeInfo event_expecter;
 
@@ -3339,7 +3334,7 @@ TEST_P(FilePathWatcherWithChangeInfoTest, LinkedDirectoryPart3) {
   ASSERT_TRUE(DeleteFile(file));
   delegate.RunUntilEventsMatch(matcher);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_P(FilePathWatcherWithChangeInfoTest, CreatedFileInDirectory) {

@@ -49,9 +49,7 @@ bool RealtimeReportingTestEnvironment::Start() {
 
 std::vector<std::string> RealtimeReportingTestEnvironment::GetArguments() {
   return {
-#if !BUILDFLAG(IS_CHROMEOS)
       base::StrCat({"--", switches::kEnableChromeBrowserCloudManagement}),
-#endif
       base::StrCat({"--", policy::switches::kDeviceManagementUrl, "=",
                     policy_server_->GetServiceURL().spec()}),
       base::StrCat({"--", policy::switches::kRealtimeReportingUrl, "=",

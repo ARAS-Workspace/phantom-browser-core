@@ -422,11 +422,6 @@ class DnsProbeCurrentSecureConfigFailingProbesTest
 
     // Update prefs to enable Secure DNS in secure mode.
     PrefService* pref_service = g_browser_process->local_state();
-#if BUILDFLAG(IS_CHROMEOS)
-    // On Chrome OS, the local_state is shared between all users so the user-set
-    // pref is stored in the profile's pref service.
-    pref_service = browser()->GetProfile()->GetPrefs();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     pref_service->SetString(prefs::kDnsOverHttpsMode,
                             SecureDnsConfig::kModeSecure);
     pref_service->SetString(prefs::kDnsOverHttpsTemplates,

@@ -237,7 +237,6 @@ TEST_F(ConfigurationPolicyHandlerListTest, ApplySettingsWithDeprecatedPolicy) {
   VerifyPolicyAndPref(kPolicyName, /*in_pref=*/true, /*in_deprecated=*/true);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(ConfigurationPolicyHandlerListTest, ApplySettingsWithCloudOnlyPolicy) {
   details()->source_restriction = kSourceRestrictionCloudOnly;
 
@@ -356,7 +355,6 @@ TEST_F(ConfigurationPolicyHandlerListTest,
             l10n_util::GetStringUTF16(IDS_POLICY_CLOUD_SOURCE_ONLY_ERROR));
   ClearErrors();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_DESKTOP_ANDROID)
 TEST_F(ConfigurationPolicyHandlerListTest, DesktopAndroidBlocklist_Default) {

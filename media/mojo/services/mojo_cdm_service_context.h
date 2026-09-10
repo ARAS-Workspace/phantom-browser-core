@@ -18,10 +18,6 @@
 #include "media/media_buildflags.h"
 #include "media/mojo/services/media_mojo_export.h"
 
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
-#include "chromeos/components/cdm_factory_daemon/remote_cdm_context.h"
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
-
 namespace media {
 
 class CdmContextRef;
@@ -43,21 +39,6 @@ class MEDIA_MOJO_EXPORT MojoCdmServiceContext {
   // Unregisters the CDM. Must be called before the CDM is destroyed.
   void UnregisterCdm(const base::UnguessableToken& cdm_id);
 
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
-  // Registers the |remote_context| and returns a unique (per-process) CDM ID.
-  // This is used with out-of-process video decoding with HWDRM. We run
-  // MojoCdmServiceContext in the GPU process which works with MojoCdmService.
-  // We also run MojoCdmServiceContext in the Video Decoder process which
-  // doesn't use MojoCdmService, which is why we need to deal with
-  // RemoteCdmContext directly.
-  base::UnguessableToken RegisterRemoteCdmContext(
-      chromeos::RemoteCdmContext* remote_context);
-
-  // Unregisters the RemoteCdmContext. Must be called before the
-  // RemoteCdmContext is destroyed.
-  void UnregisterRemoteCdmContext(const base::UnguessableToken& cdm_id);
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
-
   // Returns the CdmContextRef associated with |cdm_id|.
   std::unique_ptr<CdmContextRef> GetCdmContextRef(
       const base::UnguessableToken& cdm_id);
@@ -70,12 +51,6 @@ class MEDIA_MOJO_EXPORT MojoCdmServiceContext {
   std::map<base::UnguessableToken, raw_ptr<MojoCdmService, CtnExperimental>>
       cdm_services_ GUARDED_BY(cdm_services_lock_);
 
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
-  // A map between CDM ID and RemoteCdmContext.
-  std::map<base::UnguessableToken,
-           raw_ptr<chromeos::RemoteCdmContext, CtnExperimental>>
-      remote_cdm_contexts_;
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 };
 
 }  // namespace media

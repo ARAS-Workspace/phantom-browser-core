@@ -25,8 +25,7 @@ namespace {
 // support non-Android, Linux x64 and AArch64, Windows x64 and Mac.
 // In the future more platforms will be supported. Though this file is a
 // browser test that is not built on Android.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-    (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
+#if BUILDFLAG(IS_LINUX) && (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
 constexpr bool kIsTrapHandlerSupported = true;
 #elif BUILDFLAG(IS_MAC) && (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
 constexpr bool kIsTrapHandlerSupported = true;

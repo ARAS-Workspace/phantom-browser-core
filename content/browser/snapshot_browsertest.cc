@@ -249,7 +249,7 @@ IN_PROC_BROWSER_TEST_F(SnapshotBrowserTest, MAYBE_SingleWindowTest) {
 //   Linux Chromium OS ASAN LSAN Tests (1)
 //   Linux TSAN Tests
 // See crbug.com/771119
-#if BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_SyncMultiWindowTest DISABLED_SyncMultiWindowTest
 #else
 #define MAYBE_SyncMultiWindowTest SyncMultiWindowTest
@@ -307,7 +307,7 @@ IN_PROC_BROWSER_TEST_F(SnapshotBrowserTest, MAYBE_SyncMultiWindowTest) {
 // See crbug.com/771119
 // TODO(crbug.com/40740836): recently crashes flakily on
 // linux_chromium_asan_rel_ng and linux-rel.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_AsyncMultiWindowTest DISABLED_AsyncMultiWindowTest
 #else
 #define MAYBE_AsyncMultiWindowTest AsyncMultiWindowTest

@@ -8,10 +8,6 @@
 #include "components/history_embeddings/core/history_embeddings_features.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class SidePanelHistoryClustersTest : public WebUIMochaBrowserTest {
  protected:
   SidePanelHistoryClustersTest() {
@@ -19,9 +15,6 @@ class SidePanelHistoryClustersTest : public WebUIMochaBrowserTest {
         {
             history_clusters::internal::kJourneys,
             history_embeddings::kHistoryEmbeddings,
-#if BUILDFLAG(IS_CHROMEOS)
-            chromeos::features::kFeatureManagementHistoryEmbedding,
-#endif
         },
         {});
     set_test_loader_host(chrome::kChromeUIHistoryClustersSidePanelHost);

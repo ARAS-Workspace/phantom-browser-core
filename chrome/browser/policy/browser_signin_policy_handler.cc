@@ -35,9 +35,7 @@ void BrowserSigninPolicyHandler::ApplyPolicySettings(const PolicyMap& policies,
       policies.GetValue(policy_name(), base::Value::Type::INTEGER);
   switch (static_cast<BrowserSigninMode>(value->GetInt())) {
     case BrowserSigninMode::kForced:
-#if !BUILDFLAG(IS_CHROMEOS)
       prefs->SetValue(prefs::kForceBrowserSignin, base::Value(true));
-#endif
       [[fallthrough]];
     case BrowserSigninMode::kEnabled:
       prefs->SetValue(

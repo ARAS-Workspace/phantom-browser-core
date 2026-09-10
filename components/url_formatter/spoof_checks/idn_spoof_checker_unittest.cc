@@ -1020,7 +1020,7 @@ const IDNTestCase kIdnCases[] = {
      u"\u1004\u1040\u1002\u1001\u1002.\u1019\u103c\u1014\u103a\u1019\u102c",
      kSafe},
 // Thai:
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     {"xn--o3cedqz2c.com", u"\u0e17\u0e19\u0e1a\u0e1e\u0e23\u0e2b.com", kUnsafe},
     {"xn--o3cedqz2c.th", u"\u0e17\u0e19\u0e1a\u0e1e\u0e23\u0e2b.th", kSafe},
     {"xn--o3cedqz2c.xn--o3cw4h",

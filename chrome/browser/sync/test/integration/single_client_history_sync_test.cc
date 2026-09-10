@@ -68,12 +68,12 @@ namespace {
 constexpr char kRedirectFromPath[] = "/redirect.html";
 constexpr char kRedirectToPath[] = "/sync/simple.html";
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 constexpr char kMetricNameWithHistorySync[] =
     "Session.TotalDurationMax1Day.WithHistorySync";
 constexpr char kMetricNameWithHistorySyncWithoutAuthError[] =
     "Session.TotalDurationMax1Day.WithHistorySyncWithoutAuthError";
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 GURL GetFileUrl(const char* file) {
   base::ScopedAllowBlockingForTesting allow_blocking;
@@ -371,7 +371,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest, DoesNotUploadWhilePaused) {
 }
 
 // Session total duration is not instrumented on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
                        PRE_ReportsSessionTotalDurationWhilePaused) {
   {
@@ -436,7 +435,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
     histograms.ExpectTotalCount(kMetricNameWithHistorySyncWithoutAuthError, 1);
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest, UploadsAllFields) {
@@ -988,7 +986,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
 }
 
 // Signing out or turning off Sync isn't possible on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
                        ClearsForeignHistoryOnTurningSyncOff) {
@@ -1138,8 +1135,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
       history_helper::GetUrlFromClient(/*index=*/0, url_this_client, &row));
   EXPECT_EQ(history_helper::GetVisitsFromClient(0, row.id()).size(), 1u);
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
                        HistorySyncDisabledForManagedAccount) {

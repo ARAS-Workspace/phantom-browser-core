@@ -51,10 +51,6 @@
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif
-
 using content::BrowserThread;
 
 namespace {
@@ -616,7 +612,6 @@ void SpellcheckService::OnUseSpellingServiceChanged() {
 
 void SpellcheckService::OnAcceptLanguagesChanged() {
   // Accept-Languages and spell check are decoupled on CrOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   std::vector<std::string> accept_languages = GetNormalizedAcceptLanguages();
 
   StringListPrefMember dictionaries_pref;
@@ -633,7 +628,6 @@ void SpellcheckService::OnAcceptLanguagesChanged() {
 
   dictionaries_pref.SetValue(filtered_dictionaries);
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 std::vector<std::string> SpellcheckService::GetNormalizedAcceptLanguages(

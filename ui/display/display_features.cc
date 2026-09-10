@@ -12,31 +12,6 @@
 namespace display {
 namespace features {
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Enables using HDR transfer function if the monitor says it supports it.
-BASE_FEATURE(kUseHDRTransferFunction,
-// TODO(b/168843009): Temporarily disable on ARM while investigating.
-#if defined(ARCH_CPU_ARM_FAMILY)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT
-#endif
-);
-
-// Enables using HDR10(PQ) mode if the monitor says it supports it.
-BASE_FEATURE(kEnableExternalDisplayHDR10Mode,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Feature to control if the CTM is dynamically set to the primary transform
-// from plane color space to output color space.
-BASE_FEATURE(kCtmColorManagement, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Feature to control if we assume that setting the DRM color space to Default
-// will cause the color primaries to be interpreted as Rec709 (as opposed to
-// the color primaries from the EDID).
-BASE_FEATURE(kDrmColorSpaceDefaultIsRec709, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
-
 #if BUILDFLAG(IS_MAC)
 BASE_FEATURE(kCADisplayLinkInBrowser, base::FEATURE_DISABLED_BY_DEFAULT);
 

@@ -39,11 +39,6 @@ extern const char kOnDataCopiedPref[];
 // Pref that maps to the "OnNetworkRequestEnterpriseConnector" policy.
 extern const char kOnNetworkRequestPref[];
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Pref that maps to the "OnFileTransferEnterpriseConnector" policy.
-extern const char kOnFileTransferPref[];
-#endif
-
 // Pref that maps to the "OnSecurityEventEnterpriseConnector" policy.
 extern const char kOnSecurityEventPref[];
 
@@ -61,9 +56,6 @@ extern const char kOnBulkDataEntryScopePref[];
 extern const char kOnPrintScopePref[];
 extern const char kOnDataCopiedScopePref[];
 extern const char kOnNetworkRequestScopePref[];
-#if BUILDFLAG(IS_CHROMEOS)
-extern const char kOnFileTransferScopePref[];
-#endif
 extern const char kOnSecurityEventScopePref[];
 inline constexpr const char kWatermarkStyleFillOpacityPref[] =
     "policy.watermark_style.fill_opacity";

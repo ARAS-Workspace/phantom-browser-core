@@ -136,19 +136,6 @@
 #include "components/guest_view/browser/guest_view_manager.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/arc/session/arc_service_launcher.h"
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/ash/net/delay_network_call.h"
-#include "chrome/browser/ash/policy/core/user_cloud_policy_manager_ash.h"
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "chrome/browser/ash/system_web_apps/system_web_app_manager_factory.h"
-#include "chrome/browser/ash/system_web_apps/test_support/test_system_web_app_manager.h"
-#include "chromeos/ash/components/account_manager/account_manager_factory.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "components/account_manager_core/chromeos/account_manager.h"
-#endif
-
 namespace {
 using base::Time;
 using content::BrowserThread;
@@ -190,13 +177,7 @@ TestingProfile::TestingFactories::~TestingFactories() = default;
 const char TestingProfile::kDefaultProfileUserName[] = "testing_profile@test";
 
 // static
-#if BUILDFLAG(IS_CHROMEOS)
-// Must be kept in sync with
-// `ChromeBrowserMainPartsAsh::PreEarlyInitialization`.
-const char TestingProfile::kTestUserProfileDir[] = "test-user";
-#else
 const char TestingProfile::kTestUserProfileDir[] = "Default";
-#endif
 
 TestingProfile::TestingProfile() : TestingProfile(base::FilePath()) {}
 
@@ -242,13 +223,9 @@ TestingProfile::TestingProfile(
     bool allows_browser_windows,
     bool is_new_profile,
     bool is_supervised_profile,
-#if BUILDFLAG(IS_CHROMEOS)
-    std::unique_ptr<policy::UserCloudPolicyManagerAsh> policy_manager,
-#else
     std::variant<std::unique_ptr<policy::UserCloudPolicyManager>,
                  std::unique_ptr<policy::ProfileCloudPolicyManager>>
         policy_manager,
-#endif  // BUILDFLAG(IS_CHROMEOS)
     std::unique_ptr<policy::PolicyService> policy_service,
     TestingFactories testing_factories,
     const std::string& profile_name,
@@ -273,9 +250,6 @@ TestingProfile::TestingProfile(
       url_loader_factory_(url_loader_factory)
 {
   set_allows_browser_windows_for_testing(allows_browser_windows);
-#if BUILDFLAG(IS_CHROMEOS)
-  user_cloud_policy_manager_ = std::move(policy_manager);
-#else
   if (std::holds_alternative<std::unique_ptr<policy::UserCloudPolicyManager>>(
           policy_manager)) {
     user_cloud_policy_manager_ =
@@ -286,13 +260,6 @@ TestingProfile::TestingProfile(
         std::move(std::get<std::unique_ptr<policy::ProfileCloudPolicyManager>>(
             policy_manager));
   }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!user_manager::UserManager::IsInitialized()) {
-    scoped_user_manager_ = std::make_unique<user_manager::ScopedUserManager>(
-        std::make_unique<ash::FakeChromeUserManager>());
-  }
-#endif
 
   if (parent)
     parent->SetOffTheRecordProfile(std::unique_ptr<Profile>(this));
@@ -391,25 +358,6 @@ void TestingProfile::Init(bool is_supervised_profile, CreateMode create_mode) {
   if (!base::PathExists(profile_path_))
     base::CreateDirectory(profile_path_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Initialize |account_manager::AccountManager|.
-  auto* account_manager = ash::AccountManagerFactory::Get()->GetAccountManager(
-      profile_path_.value());
-  account_manager::AccountManager::DelayNetworkCallRunner
-      immediate_callback_runner = base::BindRepeating(
-          [](base::OnceClosure closure) -> void { std::move(closure).Run(); });
-  account_manager->Initialize(profile_path_, GetURLLoaderFactory(),
-                              immediate_callback_runner);
-  account_manager->SetPrefService(GetPrefs());
-  if (!ash::CrosSettings::IsInitialized()) {
-    scoped_cros_settings_test_helper_ =
-        std::make_unique<ash::ScopedCrosSettingsTestHelper>();
-  }
-  arc::ArcServiceLauncher* launcher = arc::ArcServiceLauncher::Get();
-  if (launcher)
-    launcher->MaybeSetProfile(this);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   if (!AreKeyedServicesDisabledForProfileByDefault(this)) {
     ReadingListModelFactory::GetInstance()->SetTestingFactory(
         this, ReadingListModelFactory::GetDefaultFactoryForTesting());
@@ -448,12 +396,7 @@ void TestingProfile::Init(bool is_supervised_profile, CreateMode create_mode) {
         this, base::BindRepeating(&web_app::FakeWebAppProvider::BuildDefault));
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::SystemWebAppManagerFactory::GetInstance()->SetTestingFactory(
-        this, base::BindRepeating(&ash::TestSystemWebAppManager::BuildDefault));
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
     ChromeDeviceAuthenticatorFactory::GetInstance()->SetTestingFactory(
         this, base::BindRepeating([](content::BrowserContext* browser)
                                       -> std::unique_ptr<KeyedService> {
@@ -489,7 +432,7 @@ void TestingProfile::InitializeProfileType() {
     return;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   bool is_system = false;
   if (IsOffTheRecord()) {
     is_system = original_profile_->IsSystemProfile();
@@ -504,7 +447,7 @@ void TestingProfile::InitializeProfileType() {
         this, profile_metrics::BrowserProfileType::kSystem);
     return;
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (IsOffTheRecord()) {
     profile_metrics::SetBrowserProfileType(
@@ -568,11 +511,9 @@ TestingProfile::~TestingProfile() {
   if (user_cloud_policy_manager_)
     user_cloud_policy_manager_->Shutdown();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   if (profile_cloud_policy_manager_) {
     profile_cloud_policy_manager_->Shutdown();
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   if (host_content_settings_map_.get())
     host_content_settings_map_->ShutdownOnUIThread();
@@ -653,12 +594,6 @@ Profile* TestingProfile::GetOffTheRecordProfile(
   if (!HasOffTheRecordProfile(otr_profile_id)) {
     if (!create_if_needed)
       return nullptr;
-
-#if BUILDFLAG(IS_CHROMEOS)
-    if (IsGuestSession()) {
-      CHECK_EQ(otr_profile_id, OTRProfileID::PrimaryID());
-    }
-#endif
 
     TestingProfile::Builder builder;
     if (IsGuestSession() && otr_profile_id == OTRProfileID::PrimaryID())
@@ -862,18 +797,6 @@ TestingProfile::GetPolicySchemaRegistryService() {
   return schema_registry_service_.get();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void TestingProfile::SetUserCloudPolicyManagerAsh(
-    std::unique_ptr<policy::UserCloudPolicyManagerAsh>
-        user_cloud_policy_manager) {
-  user_cloud_policy_manager_ = std::move(user_cloud_policy_manager);
-}
-
-policy::UserCloudPolicyManagerAsh*
-TestingProfile::GetUserCloudPolicyManagerAsh() {
-  return user_cloud_policy_manager_.get();
-}
-#else
 policy::UserCloudPolicyManager* TestingProfile::GetUserCloudPolicyManager() {
   return user_cloud_policy_manager_.get();
 }
@@ -882,12 +805,8 @@ policy::ProfileCloudPolicyManager*
 TestingProfile::GetProfileCloudPolicyManager() {
   return profile_cloud_policy_manager_.get();
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 policy::CloudPolicyManager* TestingProfile::GetCloudPolicyManager() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return GetUserCloudPolicyManagerAsh();
-#else
   if (user_cloud_policy_manager_) {
     return GetUserCloudPolicyManager();
   }
@@ -895,7 +814,6 @@ policy::CloudPolicyManager* TestingProfile::GetCloudPolicyManager() {
     return GetProfileCloudPolicyManager();
   }
   return nullptr;
-#endif
 }
 
 policy::ProfilePolicyConnector* TestingProfile::GetProfilePolicyConnector() {
@@ -924,18 +842,6 @@ base::FilePath TestingProfile::last_selected_directory() {
 void TestingProfile::set_last_selected_directory(const base::FilePath& path) {
   last_selected_directory_ = path;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void TestingProfile::ChangeAppLocale(const std::string& locale,
-                                     AppLocaleChangedVia via) {
-  requested_locale_ = locale;
-}
-
-ash::ScopedCrosSettingsTestHelper*
-TestingProfile::ScopedCrosSettingsTestHelper() {
-  return scoped_cros_settings_test_helper_.get();
-}
-#endif
 
 void TestingProfile::BlockUntilHistoryProcessesPendingRequests() {
   history::HistoryService* history_service =
@@ -1094,14 +1000,6 @@ TestingProfile::Builder& TestingProfile::Builder::SetIsSupervisedProfile() {
   return *this;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TestingProfile::Builder& TestingProfile::Builder::SetUserCloudPolicyManagerAsh(
-    std::unique_ptr<policy::UserCloudPolicyManagerAsh>
-        user_cloud_policy_manager) {
-  user_cloud_policy_manager_ = std::move(user_cloud_policy_manager);
-  return *this;
-}
-#else
 TestingProfile::Builder& TestingProfile::Builder::SetUserCloudPolicyManager(
     std::unique_ptr<policy::UserCloudPolicyManager> user_cloud_policy_manager) {
   DCHECK_EQ(profile_cloud_policy_manager_, nullptr);
@@ -1116,7 +1014,6 @@ TestingProfile::Builder& TestingProfile::Builder::SetProfileCloudPolicyManager(
   profile_cloud_policy_manager_ = std::move(profile_cloud_policy_manager);
   return *this;
 }
-#endif
 
 TestingProfile::Builder& TestingProfile::Builder::SetPolicyService(
     std::unique_ptr<policy::PolicyService> policy_service) {
@@ -1170,7 +1067,6 @@ std::unique_ptr<TestingProfile> TestingProfile::Builder::Build() {
   DCHECK(!build_called_);
   build_called_ = true;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   std::variant<std::unique_ptr<policy::UserCloudPolicyManager>,
                std::unique_ptr<policy::ProfileCloudPolicyManager>>
       policy_manager;
@@ -1180,7 +1076,6 @@ std::unique_ptr<TestingProfile> TestingProfile::Builder::Build() {
   } else {
     policy_manager = std::move(profile_cloud_policy_manager_);
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   return std::make_unique<TestingProfile>(
       path_, delegate_, create_mode_,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -1188,11 +1083,7 @@ std::unique_ptr<TestingProfile> TestingProfile::Builder::Build() {
 #endif
       std::move(pref_service_), nullptr, guest_session_,
       allows_browser_windows_, is_new_profile_, is_supervised_profile_,
-#if BUILDFLAG(IS_CHROMEOS)
-      std::move(user_cloud_policy_manager_),
-#else
       std::move(policy_manager),
-#endif  // BUILDFLAG(IS_CHROMEOS)
       std::move(policy_service_), std::move(testing_factories_), profile_name_,
       override_policy_connector_is_managed_, nullptr, url_loader_factory_
   );

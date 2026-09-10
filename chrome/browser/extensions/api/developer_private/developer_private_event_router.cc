@@ -102,9 +102,6 @@ DeveloperPrivateEventRouter::DeveloperPrivateEventRouter(Profile* profile)
       base::BindRepeating(&DeveloperPrivateEventRouter::OnProfilePrefChanged,
                           base::Unretained(this)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(syncer::kReplaceSyncPromosWithSignInPromos))
-#endif
   {
     account_extension_tracker_observation_.Observe(
         AccountExtensionTracker::Get(profile));

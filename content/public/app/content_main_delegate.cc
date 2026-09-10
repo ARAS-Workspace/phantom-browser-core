@@ -29,12 +29,12 @@ std::variant<int, MainFunctionParams> ContentMainDelegate::RunProcess(
   return std::move(main_function_params);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 void ContentMainDelegate::ZygoteStarting(
     std::vector<std::unique_ptr<ZygoteForkDelegate>>* delegates) {}
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 int ContentMainDelegate::TerminateForFatalInitializationError() {
   NOTREACHED();

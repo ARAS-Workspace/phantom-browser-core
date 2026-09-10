@@ -237,7 +237,7 @@ class WebRtcDesktopCaptureBrowserTest : public WebRtcTestBase {
     // MSan and GL do not get along so avoid using the GPU with MSan.
     // TODO(crbug.com/40260482): Remove this after fixing feature
     // detection in 0c tab capture path as it'll no longer be needed.
-#if !BUILDFLAG(IS_CHROMEOS) && !defined(MEMORY_SANITIZER)
+#if !defined(MEMORY_SANITIZER)
     command_line->AppendSwitch(switches::kUseGpuInTests);
 #endif
   }

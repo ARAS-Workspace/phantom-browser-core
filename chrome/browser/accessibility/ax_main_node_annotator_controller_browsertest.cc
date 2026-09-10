@@ -28,17 +28,9 @@
 #include "ui/accessibility/ax_features.mojom-features.h"
 #include "ui/accessibility/platform/ax_platform.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/accessibility/accessibility_manager.h"
-#include "chrome/browser/ash/accessibility/chromevox_test_utils.h"
-#include "chrome/browser/ash/accessibility/speech_monitor.h"
-#include "extensions/browser/browsertest_util.h"
-#include "extensions/common/constants.h"
-#else
 #include <optional>
 
 #include "content/public/test/scoped_accessibility_mode_override.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class AXMainNodeAnnotatorControllerBrowserTest : public InProcessBrowserTest {
  public:
@@ -93,21 +85,6 @@ class AXMainNodeAnnotatorControllerBrowserTest : public InProcessBrowserTest {
   }
 
   void EnableScreenReader(bool enabled) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (!enabled) {
-      ash::AccessibilityManager::Get()->EnableSpokenFeedback(false);
-      return;
-    }
-
-    if (!chromevox_test_utils_) {
-      chromevox_test_utils_ = std::make_unique<ash::ChromeVoxTestUtils>();
-    }
-
-    chromevox_test_utils_->EnableChromeVox();
-    // Note: we can safely call `Replay` here since none of these tests make
-    // speech assertions.
-    chromevox_test_utils_->sm()->Replay();
-#else
     // Spoof a screen reader.
     if (!enabled) {
       ax_mode_override_.reset();
@@ -116,15 +93,10 @@ class AXMainNodeAnnotatorControllerBrowserTest : public InProcessBrowserTest {
                                 ui::AXMode::kExtendedProperties |
                                 ui::AXMode::kScreenReader);
     }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<ash::ChromeVoxTestUtils> chromevox_test_utils_;
-#else
   std::optional<content::ScopedAccessibilityModeOverride> ax_mode_override_;
-#endif
 
   base::test::ScopedFeatureList scoped_feature_list_;
 };

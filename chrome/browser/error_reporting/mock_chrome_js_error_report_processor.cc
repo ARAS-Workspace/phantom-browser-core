@@ -24,10 +24,6 @@ const char MockChromeJsErrorReportProcessor::kDefaultExperimentListString[] =
 // "= default".
 // NOLINTNEXTLINE
 MockChromeJsErrorReportProcessor::MockChromeJsErrorReportProcessor() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Shorten timeout or tests will time out.
-  set_maximium_wait_for_crash_reporter_for_test(base::Seconds(5));
-#endif
 }
 
 MockChromeJsErrorReportProcessor::~MockChromeJsErrorReportProcessor() = default;
@@ -74,20 +70,6 @@ MockChromeJsErrorReportProcessor::GetExperimentListInfo() const {
   return result;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::vector<std::string>
-MockChromeJsErrorReportProcessor::GetCrashReporterArgvStart() {
-  // Redirect uploads to our a simple upload shim which will then send them to
-  // the MockCrashEndpoint. This simulates the Chrome OS crash_reporter and
-  // crash_sender in a way that allows most tests to run without changes.
-  base::FilePath mock_crash_reporter_path;
-  CHECK(base::PathService::Get(base::DIR_EXE, &mock_crash_reporter_path));
-  mock_crash_reporter_path =
-      mock_crash_reporter_path.Append("mock_chromeos_crash_reporter");
-  return {mock_crash_reporter_path.value(),
-          base::StrCat({"--upload_to=", crash_endpoint_})};
-}
-#else
 std::string MockChromeJsErrorReportProcessor::GetOsVersion() {
   return "7.20.1";
 }
@@ -108,7 +90,6 @@ void MockChromeJsErrorReportProcessor::UpdateReportDatabase(
         std::move(remote_report_id), report_time);
   }
 }
-#endif  //  !BUILDFLAG(IS_CHROMEOS)
 
 ScopedMockChromeJsErrorReportProcessor::ScopedMockChromeJsErrorReportProcessor(
     const MockCrashEndpoint& endpoint)

@@ -40,9 +40,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/gfx/vector_icon_types.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/test/glic_user_session_test_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 namespace glic {
 namespace {
@@ -137,10 +134,6 @@ class GlicButtonControllerTest : public testing::Test {
         TestingBrowserProcess::GetGlobal()->SetUpGlobalFeaturesForTesting(
             /*profile_manager=*/true);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    glic_user_session_test_helper_.PreProfileSetUp(
-        testing_profile_manager->profile_manager());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     profile_ = testing_profile_manager->CreateTestingProfile("profile");
 
@@ -187,9 +180,6 @@ class GlicButtonControllerTest : public testing::Test {
 
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    glic_user_session_test_helper_.PostProfileTearDown();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     scoped_feature_list_.Reset();
   }
 
@@ -221,11 +211,6 @@ class GlicButtonControllerTest : public testing::Test {
   GlicUnitTestEnvironment glic_test_env_;
   content::BrowserTaskEnvironment task_environment;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // glic can run only in User session, so it needs to set up user session
-  // manually on ChromeOS.
-  ash::GlicUserSessionTestHelper glic_user_session_test_helper_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   raw_ptr<Profile> profile_ = nullptr;
   signin::IdentityTestEnvironment identity_test_environment;
 

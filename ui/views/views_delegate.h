@@ -118,8 +118,7 @@ class VIEWS_EXPORT ViewsDelegate {
   // this returns true.
   virtual bool ShouldCloseMenuIfMouseCaptureLost() const;
 
-#if BUILDFLAG(ENABLE_DESKTOP_AURA) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if BUILDFLAG(ENABLE_DESKTOP_AURA) && BUILDFLAG(IS_LINUX)
   virtual gfx::ImageSkia* GetDefaultWindowIcon() const;
 #endif
 

@@ -503,9 +503,7 @@ void DelegatedFrameHost::DidCopyStaleContent(
 
 // TODO(crbug.com/1227661): Revert https://crrev.com/c/3222541 to re-enable this
 // CHECK on CrOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   CHECK_NE(frame_eviction_state_, FrameEvictionState::kNotStarted);
-#endif
   SetFrameEvictionStateAndNotifyObservers(FrameEvictionState::kNotStarted);
   ContinueDelegatedFrameEviction(
       frame_evictor_->CollectSurfaceIdsForEviction());
@@ -522,9 +520,7 @@ void DelegatedFrameHost::DidCopyStaleContent(
   }
 
 // TODO(crbug.com/40812011): This DCHECK occasionally gets hit on Chrome OS.
-#if !BUILDFLAG(IS_CHROMEOS)
   CHECK(!stale_content_layer_->HasExternalContent());
-#endif
   stale_content_layer_->SetVisible(true);
   stale_content_layer_->SetBounds(gfx::Rect(surface_dip_size_));
   stale_content_layer_->SetTransferableResource(

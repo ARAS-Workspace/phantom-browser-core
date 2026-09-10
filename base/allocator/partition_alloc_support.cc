@@ -1396,14 +1396,14 @@ void PartitionAllocSupport::ReconfigureAfterTaskRunnerInit(
 
   base::allocator::StartThreadCachePeriodicPurge();
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   // Lower thread cache limits to avoid stranding too much memory in the caches.
   if (SysInfo::IsLowEndDeviceOrPartialLowEndModeEnabled(
           features::kPartialLowEndModeExcludePartitionAllocSupport)) {
     ::partition_alloc::ThreadCache::SetThreadCacheMultiplier(
         ::partition_alloc::ThreadCache::kDefaultMultiplier / 2.);
   }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Renderer processes are more performance-sensitive, increase thread cache
   // limits.

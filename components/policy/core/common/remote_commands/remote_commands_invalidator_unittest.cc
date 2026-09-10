@@ -221,11 +221,7 @@ TEST_F(RemoteCommandsInvalidatorTest, HasCorrectInvalidationType) {
   EXPECT_EQ(device_invalidator.GetType(), "DEVICE_REMOTE_COMMAND");
   EXPECT_EQ(browser_invalidator.GetType(), "BROWSER_REMOTE_COMMAND");
   EXPECT_EQ(user_invalidator.GetType(),
-#if BUILDFLAG(IS_CHROMEOS)
-            "CONSUMER_USER_REMOTE_COMMAND"
-#else
             "PROFILE_REMOTE_COMMAND"
-#endif
 
   );
 }

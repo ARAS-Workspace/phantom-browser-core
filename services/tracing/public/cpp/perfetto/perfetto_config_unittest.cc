@@ -234,23 +234,6 @@ TEST_F(AdaptPerfettoConfigForChromeTest, ProcessFilter) {
             PrintConfigToText(perfetto_config));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(AdaptPerfettoConfigForChromeTest, Systrace) {
-  auto perfetto_config = ParsePerfettoConfigFromText(R"pb(
-    data_sources: { config: { name: "org.chromium.trace_system" } }
-  )pb");
-  auto trace_config = GetDefaultPerfettoConfig(ParseTraceConfigFromJson(R"json({
-      "record_mode": "record-continuously",
-      "enable_systrace": true
-    })json"));
-  EXPECT_TRUE(AdaptPerfettoConfigForChrome(&perfetto_config));
-  EXPECT_EQ(PrintConfigToText(
-                GetDataSourceConfig(trace_config, "org.chromium.trace_system")),
-            PrintConfigToText(GetDataSourceConfig(
-                perfetto_config, "org.chromium.trace_system")));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(AdaptPerfettoConfigForChromeTest, EnableSystemBackend_NonChrome) {
   auto perfetto_config = ParsePerfettoConfigFromText(R"pb(
     data_sources: { config: { name: "linux.some_system_ds" } }

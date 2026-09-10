@@ -552,11 +552,7 @@ INSTANTIATE_TEST_SUITE_P(
             GenerateResponseWithErrorDetail(
                 em::CBCM_DELETION_POLICY_PREFERENCE_INVALIDATE_TOKEN)),
         FailedRequestParams(
-#if BUILDFLAG(IS_CHROMEOS)
-            DM_STATUS_SERVICE_DEVICE_NOT_FOUND,
-#else   // BUILDFLAG(IS_CHROMEOS)
             DM_STATUS_SERVICE_DEVICE_NEEDS_RESET,
-#endif  // BUILDFLAG(IS_CHROMEOS)
             net::OK,
             410,
             GenerateResponseWithErrorDetail(

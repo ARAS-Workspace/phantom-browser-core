@@ -49,10 +49,6 @@ class TCPConnectedSocket;
 
 namespace extensions {
 
-#if BUILDFLAG(IS_CHROMEOS)
-extern const char kCrOSTerminal[];
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 class Socket;
 
 // A simple interface to ApiResourceManager<Socket> or derived class. The goal

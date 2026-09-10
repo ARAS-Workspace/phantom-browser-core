@@ -50,14 +50,7 @@
 #include "media/mojo/clients/mojo_android_overlay.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/services/font/public/cpp/font_loader.h"  // nogncheck
-#include "components/services/font/public/mojom/font_service.mojom.h"  // nogncheck
-#include "third_party/skia/include/core/SkRefCnt.h"
-#include "third_party/skia/include/ports/SkFontConfigInterface.h"
-#endif
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "content/child/sandboxed_process_thread_type_handler.h"
 #endif
 
@@ -147,7 +140,7 @@ void GpuChildThread::Init(const base::TimeTicks& process_start_time) {
 
   viz_main_.gpu_service()->set_start_time(process_start_time);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   SandboxedProcessThreadTypeHandler::NotifyMainChildThreadCreated();
 #endif
 
@@ -160,14 +153,6 @@ void GpuChildThread::Init(const base::TimeTicks& process_start_time) {
   }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!in_process_gpu()) {
-    mojo::PendingRemote<font_service::mojom::FontService> font_service;
-    BindHostReceiver(font_service.InitWithNewPipeAndPassReceiver());
-    SkFontConfigInterface::SetGlobal(
-        sk_make_sp<font_service::FontLoader>(std::move(font_service)));
-  }
-#endif
 }
 
 bool GpuChildThread::in_process_gpu() const {

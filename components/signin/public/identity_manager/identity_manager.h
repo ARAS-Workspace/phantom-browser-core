@@ -41,12 +41,6 @@
 #include "base/time/time.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace account_manager {
-class AccountManagerFacade;
-}
-#endif
-
 namespace network {
 class SharedURLLoaderFactory;
 class TestURLLoaderFactory;
@@ -493,10 +487,6 @@ class IdentityManager : public KeyedService,
     std::unique_ptr<DeviceAccountsSynchronizer> device_accounts_synchronizer;
     std::unique_ptr<DiagnosticsProvider> diagnostics_provider;
     raw_ptr<SigninClient> signin_client = nullptr;
-#if BUILDFLAG(IS_CHROMEOS)
-    raw_ptr<account_manager::AccountManagerFacade, DanglingUntriaged>
-        account_manager_facade = nullptr;
-#endif
 
     InitParameters();
     InitParameters(InitParameters&&);
@@ -653,11 +643,6 @@ class IdentityManager : public KeyedService,
       const std::string& locale,
       const std::string& picture_url);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  friend account_manager::AccountManagerFacade* GetAccountManagerFacade(
-      IdentityManager* identity_manager);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // Temporary access to getters (e.g. GetTokenService()).
   // TODO(crbug.com/40619310): Remove this friendship by
   // extending identity_test_utils.h as needed.
@@ -730,9 +715,6 @@ class IdentityManager : public KeyedService,
   AccountTrackerService* GetAccountTrackerService() const;
   AccountFetcherService* GetAccountFetcherService() const;
   GaiaCookieManagerService* GetGaiaCookieManagerService() const;
-#if BUILDFLAG(IS_CHROMEOS)
-  account_manager::AccountManagerFacade* GetAccountManagerFacade() const;
-#endif
 
   // Populates and returns an AccountInfo object corresponding to |account_id|,
   // which must be an account with a refresh token.
@@ -803,10 +785,6 @@ class IdentityManager : public KeyedService,
   std::unique_ptr<PrimaryAccountManager> primary_account_manager_;
   std::unique_ptr<AccountFetcherService> account_fetcher_service_;
   const raw_ptr<SigninClient> signin_client_;
-#if BUILDFLAG(IS_CHROMEOS)
-  const raw_ptr<account_manager::AccountManagerFacade, DanglingUntriaged>
-      account_manager_facade_;
-#endif
 
   std::unique_ptr<IdentityMutator> identity_mutator_;
 

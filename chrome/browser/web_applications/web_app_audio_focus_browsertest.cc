@@ -173,7 +173,6 @@ IN_PROC_BROWSER_TEST_P(WebAppAudioFocusBrowserTest, AppHasDifferentAudioFocus) {
     }
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Open an auxiliary window, which should also open in an app window and share
   // the group id.
   // TODO(crbug.com/392106502): Fix this test and enable once auxiliary context
@@ -183,7 +182,6 @@ IN_PROC_BROWSER_TEST_P(WebAppAudioFocusBrowserTest, AppHasDifferentAudioFocus) {
         OpenWindow(web_contents, /*aux=*/true, app_url);
     EXPECT_EQ(group_id, GetAudioFocusGroupId(new_contents));
   }
-#endif
 
   ASSERT_EQ(apps::test::DisableLinkCapturingByUser(profile(), app_id),
             base::ok());

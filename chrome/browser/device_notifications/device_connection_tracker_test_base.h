@@ -23,11 +23,6 @@
 #include "extensions/common/extension.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/account_id/account_id.h"
-#include "google_apis/gaia/gaia_id.h"
-#endif
-
 class Profile;
 
 class DeviceConnectionTrackerTestBase : public InProcessBrowserTest {
@@ -38,12 +33,6 @@ class DeviceConnectionTrackerTestBase : public InProcessBrowserTest {
   DeviceConnectionTrackerTestBase& operator=(
       const DeviceConnectionTrackerTestBase&) = delete;
   ~DeviceConnectionTrackerTestBase() override;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpLocalStatePrefService(PrefService* local_state) override;
-
-  Profile& StartUserSession(const AccountId& account_id);
-#endif
 
   virtual DeviceConnectionTracker* GetDeviceConnectionTracker(Profile* profile,
                                                               bool create) = 0;
@@ -84,11 +73,6 @@ class DeviceConnectionTrackerTestBase : public InProcessBrowserTest {
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_CHROMEOS)
- protected:
-  const AccountId test_account_id_ =
-      AccountId::FromUserEmailGaiaId("test@gmail.com", GaiaId("9876543210"));
-#endif
 };
 
 #endif  // CHROME_BROWSER_DEVICE_NOTIFICATIONS_DEVICE_CONNECTION_TRACKER_TEST_BASE_H_

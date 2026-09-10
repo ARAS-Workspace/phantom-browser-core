@@ -13,10 +13,6 @@
 #include "content/public/test/browser_test.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-using syncer::UserSelectableOsType;
-using syncer::UserSelectableOsTypeSet;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 using syncer::UserSelectableType;
 using syncer::UserSelectableTypeSet;
 
@@ -40,7 +36,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientAppSettingsSyncTest, Basics) {
   syncer::SyncServiceImpl* service = GetSyncService(0);
   syncer::SyncUserSettings* settings = service->GetUserSettings();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(settings->GetSelectedTypes().Has(UserSelectableType::kApps));
   EXPECT_TRUE(service->GetActiveDataTypes().Has(syncer::APP_SETTINGS));
 
@@ -48,16 +43,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientAppSettingsSyncTest, Basics) {
 
   EXPECT_FALSE(settings->GetSelectedTypes().Has(UserSelectableType::kApps));
   EXPECT_FALSE(service->GetActiveDataTypes().Has(syncer::APP_SETTINGS));
-#else
-  EXPECT_TRUE(
-      settings->GetSelectedOsTypes().Has(UserSelectableOsType::kOsApps));
-  EXPECT_TRUE(service->GetActiveDataTypes().Has(syncer::APP_SETTINGS));
-
-  settings->SetSelectedOsTypes(false, UserSelectableOsTypeSet());
-  EXPECT_FALSE(
-      settings->GetSelectedOsTypes().Has(UserSelectableOsType::kOsApps));
-  EXPECT_FALSE(service->GetActiveDataTypes().Has(syncer::APP_SETTINGS));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace

@@ -42,7 +42,7 @@ class ChromeMainDelegateHangWatcherTest : public InProcessBrowserTest {
   base::HistogramTester histogram_tester_;
 };
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Tests that UncoveredStartupTime histograms are recorded for all watched
 // sandboxed processes.
 // TODO(crbug.com/431802107): Re-enable this test once the failure is fixed.
@@ -60,7 +60,7 @@ IN_PROC_BROWSER_TEST_F(ChromeMainDelegateHangWatcherTest,
                     Key("HangWatcher.RendererProcess.UncoveredStartupTime"),
                     Key("HangWatcher.UtilityProcess.UncoveredStartupTime")}));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Tests that HangWatcher monitors hung threads for all watched process types.
 IN_PROC_BROWSER_TEST_F(ChromeMainDelegateHangWatcherTest, MonitorsProcess) {

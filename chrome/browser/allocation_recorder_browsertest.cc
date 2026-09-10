@@ -23,7 +23,7 @@
 #include "base/cpu.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/base_switches.h"
 #include "base/command_line.h"
 #endif

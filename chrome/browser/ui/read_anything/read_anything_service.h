@@ -19,9 +19,7 @@ class ReadAnythingService : public KeyedService {
   ~ReadAnythingService() override;
 
   static ReadAnythingService* Get(Profile* profile);
-#if !BUILDFLAG(IS_CHROMEOS)
   static void InstallComponent(const base::FilePath& new_dir);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // Called by the per-tab ReadAnythingSidePanelController and in
   // ReadAnythingController.
@@ -34,9 +32,7 @@ class ReadAnythingService : public KeyedService {
   void RemoveTtsDownloadExtension();
   void OnLocalReadingModeSwitchDelayTimeout();
   static void RecordEngineVersion(const base::FilePath& engine_version);
-#if !BUILDFLAG(IS_CHROMEOS)
   void SetupDesktopEngine();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // The number of active local reading modes that are currently shown. If there
   // is no active local side panel (count is 0) after a timeout, we can safely

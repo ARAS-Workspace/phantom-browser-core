@@ -650,7 +650,6 @@ TEST_F(BookmarkBarViewTest, DropCallback_InvalidatePtrTest) {
   EXPECT_EQ(output_drag_op, ui::mojom::DragOperation::kNone);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Verifies that the apps shortcut is shown or hidden following the policy
 // value. This policy (and the apps shortcut) isn't present on ChromeOS.
 TEST_F(BookmarkBarViewTest, ManagedShowAppsShortcutInBookmarksBar) {
@@ -671,7 +670,6 @@ TEST_F(BookmarkBarViewTest, ManagedShowAppsShortcutInBookmarksBar) {
                         std::make_unique<base::Value>(false));
   EXPECT_FALSE(test_helper_->apps_page_shortcut()->GetVisible());
 }
-#endif
 
 // Verifies the SavedTabGroupBar's page navigator is set when the
 // bookmarkbarview's page navigator is set.

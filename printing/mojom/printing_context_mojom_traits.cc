@@ -19,7 +19,7 @@
 #include "base/numerics/safe_conversions.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "mojo/public/mojom/base/values.mojom.h"
 #endif
 
@@ -31,25 +31,12 @@ bool IsCustomOrPrecomputedMargins(printing::mojom::MarginType margin_type) {
   if (margin_type == printing::mojom::MarginType::kCustomMargins) {
     return true;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (margin_type ==
-      printing::mojom::MarginType::kPrecomputedMarginsForBackend) {
-    return true;
-  }
-#endif
   return false;
 }
 
 void SetMarginsToPrintSettings(printing::mojom::MarginType margin_type,
                                const printing::PageMargins& margins,
                                printing::PrintSettings* settings) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (margin_type ==
-      printing::mojom::MarginType::kPrecomputedMarginsForBackend) {
-    settings->SetCustomMarginsForBackend(margins);
-    return;
-  }
-#endif
   CHECK_EQ(margin_type, printing::mojom::MarginType::kCustomMargins);
   settings->SetCustomMargins(margins);
 }
@@ -127,11 +114,6 @@ bool StructTraits<
   // Precomputed margins for backend can be set only via
   // SetCustomMarginsForBackend, which is done below.
   bool must_set_margin_type = true;
-#if BUILDFLAG(IS_CHROMEOS)
-  must_set_margin_type =
-      data.margin_type() !=
-          printing::mojom::MarginType::kPrecomputedMarginsForBackend;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   if (must_set_margin_type) {
     out->set_margin_type(data.margin_type());
   }
@@ -204,24 +186,11 @@ bool StructTraits<
   }
 
   out->set_pages_per_sheet(data.pages_per_sheet());
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   DCHECK(out->advanced_settings().empty());
   if (!data.ReadAdvancedSettings(&out->advanced_settings()))
     return false;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_CHROMEOS)
-  out->set_send_user_info(data.send_user_info());
-
-  std::string username;
-  if (!data.ReadUsername(&username))
-    return false;
-  out->set_username(username);
-
-  std::string pin_value;
-  if (!data.ReadPinValue(&pin_value))
-    return false;
-  out->set_pin_value(pin_value);
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENABLE_OOP_PRINTING_NO_OOP_BASIC_PRINT_DIALOG)
   base::DictValue system_print_dialog_data;

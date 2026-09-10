@@ -92,7 +92,7 @@ class WebRtcAudioDebugRecordingsBrowserTest
   ~WebRtcAudioDebugRecordingsBrowserTest() override {}
 };
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 // Renderer crashes under Android ASAN: https://crbug.com/408496.
 // Renderer crashes under Android: https://crbug.com/820934.
 // Failures on Android M. https://crbug.com/535728.

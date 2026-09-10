@@ -158,7 +158,6 @@ TEST_F(AuthControllerTest, SkipCookieSyncOnOpen_Enabled) {
       glic::CheckAuthBeforeLoadOutcome::kSkipOnOpen, 1);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AuthControllerTest,
        CookieSyncOnTokenChange_Disabled_PrimaryAccountChanged) {
   feature_list_.InitAndDisableFeature(features::kGlicCookieSyncOnTokenChange);
@@ -222,7 +221,6 @@ TEST_F(AuthControllerTest,
       "Glic.CookieSynchronization.SuccessByTrigger",
       GlicCookieSyncTrigger::kOnPrimaryAccountChanged, 1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AuthControllerTest, CookieSyncOnTokenChange_SkipsSyncIfAlreadyDone) {
   feature_list_.InitAndEnableFeature(features::kGlicCookieSyncOnTokenChange);
@@ -422,7 +420,6 @@ TEST_F(
   // No sync should be triggered because FRE was not completed.
   EXPECT_EQ(synchronizer_->copy_cookies_called_count(), 0);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Changing primary account should also not trigger sync.
   signin::ClearPrimaryAccount(identity_test_env_->identity_manager());
   AccountInfo account_info2 =
@@ -431,7 +428,6 @@ TEST_F(
                                         signin::ConsentLevel::kSignin);
   task_environment_.FastForwardBy(base::Seconds(10));
   EXPECT_EQ(synchronizer_->copy_cookies_called_count(), 0);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST_F(

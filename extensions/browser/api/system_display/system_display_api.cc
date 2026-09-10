@@ -25,10 +25,6 @@
 #include "extensions/common/permissions/permissions_data.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "extensions/common/manifest_handlers/kiosk_mode_info.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -247,18 +243,6 @@ void HandleDisplayListenerAddedOrRemoved(content::BrowserContext* context,
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// |edid| is available only to Chrome OS kiosk mode applications.
-bool ShouldRestrictEdidInformation(const ExtensionFunction& function) {
-  if (function.extension()) {
-    return !(HasAutotestPrivate(function) ||
-             KioskModeInfo::IsKioskEnabled(function.extension()));
-  }
-
-  return function.source_context_type() != mojom::ContextType::kWebUi;
-}
-#endif
-
 }  // namespace
 
 bool SystemDisplayFunction::PreRunValidation(std::string* error) {
@@ -277,21 +261,8 @@ bool SystemDisplayCrOSRestrictedFunction::PreRunValidation(std::string* error) {
   if (!SystemDisplayFunction::PreRunValidation(error))
     return false;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!ShouldRestrictToKioskAndWebUI())
-    return true;
-
-  if (source_context_type() == mojom::ContextType::kWebUi) {
-    return true;
-  }
-  if (KioskModeInfo::IsKioskEnabled(extension()))
-    return true;
-  *error = kKioskOnlyError;
-  return false;
-#else
   *error = kCrosOnlyError;
   return false;
-#endif
 }
 
 bool SystemDisplayCrOSRestrictedFunction::ShouldRestrictToKioskAndWebUI() {
@@ -314,12 +285,6 @@ ExtensionFunction::ResponseAction SystemDisplayGetInfoFunction::Run() {
 
 void SystemDisplayGetInfoFunction::Response(
     std::vector<api::system_display::DisplayUnitInfo> all_displays_info) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ShouldRestrictEdidInformation(*this)) {
-    for (auto& display_info : all_displays_info)
-      display_info.edid.reset();
-  }
-#endif
   Respond(ArgumentList(display::GetInfo::Results::Create(all_displays_info)));
 }
 

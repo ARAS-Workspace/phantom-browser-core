@@ -22,10 +22,6 @@
 #include "ui/events/ozone/evdev/numberpad_metrics.h"
 #include "ui/events/ozone/features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/events/ozone/evdev/numberpad_metrics.h"
-#endif
-
 namespace ui {
 
 namespace {
@@ -74,13 +70,6 @@ EventConverterEvdevImpl::EventConverterEvdevImpl(
       controller_(FROM_HERE),
       cursor_(cursor),
       dispatcher_(dispatcher) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (has_numberpad_)
-    NumberpadMetricsRecorder::GetInstance()->AddDevice(input_device_);
-
-  microphone_mute_key_metrics_ = std::make_unique<MicrophoneMuteKeyMetrics>(
-      input_device_, devinfo.HasKeyboard());
-#endif
   // Converts unsigned long to uint64_t.
   const auto key_bits = devinfo.GetKeyBits();
   key_bits_.resize(EVDEV_BITS_TO_INT64(KEY_CNT));
@@ -92,10 +81,6 @@ EventConverterEvdevImpl::EventConverterEvdevImpl(
 }
 
 EventConverterEvdevImpl::~EventConverterEvdevImpl() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (has_numberpad_)
-    NumberpadMetricsRecorder::GetInstance()->RemoveDevice(input_device_);
-#endif
 }
 
 void EventConverterEvdevImpl::OnFileCanReadWithoutBlocking(int fd) {
@@ -335,14 +320,6 @@ void EventConverterEvdevImpl::OnKeyChange(unsigned int key,
 }
 
 void EventConverterEvdevImpl::GenerateKeyMetrics(unsigned int key, bool down) {
-#if BUILDFLAG(IS_CHROMEOS)
-  microphone_mute_key_metrics_->RecordMicMuteKeyMetrics(key, down,
-                                                        last_scan_code_);
-
-  if (!has_numberpad_)
-    return;
-  NumberpadMetricsRecorder::GetInstance()->ProcessKey(key, down, input_device_);
-#endif
 }
 
 void EventConverterEvdevImpl::ReleaseKeys() {

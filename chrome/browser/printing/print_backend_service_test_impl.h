@@ -47,12 +47,6 @@ class PrintBackendServiceTestImpl : public PrintBackendServiceImpl {
   void GetDefaultPrinterName(
       mojom::PrintBackendService::GetDefaultPrinterNameCallback callback)
       override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void GetPrinterSemanticCapsAndDefaults(
-      const std::string& printer_name,
-      mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsCallback
-          callback) override;
-#endif
   void FetchCapabilities(
       const std::string& printer_name,
       mojom::PrintBackendService::FetchCapabilitiesCallback callback) override;

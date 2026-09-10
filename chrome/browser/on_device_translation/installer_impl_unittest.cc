@@ -46,10 +46,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/dbus/image_loader/fake_image_loader_client.h"
-#endif
-
 namespace on_device_translation {
 
 namespace {
@@ -103,11 +99,6 @@ class OnDeviceTranslationInstallerTest : public ::testing::Test {
         std::move(mock_cus));
     local_state_ = TestingBrowserProcess::GetGlobal()->local_state();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::ImageLoaderClient::InitializeFake();
-    fake_image_loader_client_ =
-        static_cast<ash::FakeImageLoaderClient*>(ash::ImageLoaderClient::Get());
-#endif
     CHECK(install_dir_.CreateUniqueTempDir());
     CHECK(component_user_dir_.CreateUniqueTempDir());
     scoped_path_override_ = std::make_unique<base::ScopedPathOverride>(
@@ -120,17 +111,8 @@ class OnDeviceTranslationInstallerTest : public ::testing::Test {
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_image_loader_client_ = nullptr;
-    ash::ImageLoaderClient::Shutdown();
-#endif
     scoped_path_override_.reset();
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::FakeImageLoaderClient& fake_image_loader_client() {
-    return *fake_image_loader_client_;
-  }
-#endif
 
  protected:
   void CreateFakeLanguagePackInstallation(
@@ -157,10 +139,6 @@ class OnDeviceTranslationInstallerTest : public ::testing::Test {
   }
 
   void CreateFakeInstallation(const base::FilePath& base_dir) {
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_image_loader_client_->SetMountPathForComponent("ChromeTranslateKit",
-                                                        base_dir);
-#endif
     base::FilePath component_dir =
         base_dir.Append(on_device_translation::GetBinaryRelativeInstallDir());
     CHECK(base::CreateDirectory(component_dir));
@@ -184,9 +162,6 @@ class OnDeviceTranslationInstallerTest : public ::testing::Test {
     })"));
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  raw_ptr<ash::FakeImageLoaderClient> fake_image_loader_client_ = nullptr;
-#endif
   std::unique_ptr<OnDeviceTranslationInstaller> installer_;
   raw_ptr<PrefService> local_state_ = nullptr;
   testing::NiceMock<MockOnDemandUpdater> mock_ondemand_updater_;

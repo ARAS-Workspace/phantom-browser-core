@@ -338,7 +338,6 @@ IN_PROC_BROWSER_TEST_F(ZoomControllerBrowserTest,
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Regression test: crbug.com/40396772.
 IN_PROC_BROWSER_TEST_F(ZoomControllerBrowserTest,
                        SettingsZoomAfterLoadingWorks) {
@@ -385,7 +384,6 @@ IN_PROC_BROWSER_TEST_F(ZoomControllerBrowserTest,
   zoom_controller->SetZoomLevel(new_zoom_level);
   zoom_change_watcher.Wait();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class ZoomControllerForPrerenderingTest : public ZoomControllerBrowserTest,
                                           public zoom::ZoomObserver {

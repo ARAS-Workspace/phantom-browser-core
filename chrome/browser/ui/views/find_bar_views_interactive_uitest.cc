@@ -829,7 +829,7 @@ IN_PROC_BROWSER_TEST_F(FindBarViewsUiTest, MAYBE_PasteWithoutTextChange) {
 }
 
 // Slow flakiness on Linux. crbug.com/41365845
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_CtrlEnter DISABLED_CtrlEnter
 #else
 #define MAYBE_CtrlEnter CtrlEnter

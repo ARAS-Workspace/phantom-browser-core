@@ -47,7 +47,7 @@ class ShellMainDelegate : public ContentMainDelegate {
   std::variant<int, MainFunctionParams> RunProcess(
       const std::string& process_type,
       MainFunctionParams main_function_params) override;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   void ZygoteForked() override;
 #endif
   std::optional<int> PreBrowserMain() override;

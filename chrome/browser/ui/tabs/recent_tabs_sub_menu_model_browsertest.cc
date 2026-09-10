@@ -1105,7 +1105,6 @@ IN_PROC_BROWSER_TEST_F(RecentTabsSubMenuModelTest,
   }
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(RecentTabsSubMenuModelTest, OtherDevicesAvailability) {
   if (!syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
     GTEST_SKIP();
@@ -1156,4 +1155,3 @@ IN_PROC_BROWSER_TEST_F(RecentTabsSubMenuModelTest, OtherDevicesAvailability) {
   VerifyModel(RecentTabsSubMenuModel(nullptr, browser()),
               kDataWithoutOtherDevices);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

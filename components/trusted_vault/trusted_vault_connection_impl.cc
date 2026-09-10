@@ -103,9 +103,7 @@ trusted_vault_pb::PhysicalDeviceMetadata::DeviceType
 GetLocalPhysicalDeviceType() {
   // Note that some of the below are unreachable in practice as this code isn't
   // currently used or even built on all platforms.
-#if BUILDFLAG(IS_CHROMEOS)
-  return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_CHROMEOS;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_LINUX;
 #elif BUILDFLAG(IS_ANDROID)
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_ANDROID;

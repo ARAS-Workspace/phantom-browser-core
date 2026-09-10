@@ -20,9 +20,6 @@ bool StructTraits<gpu::mojom::GpuDeviceDataView, gpu::GPUInfo::GPUDevice>::Read(
     gpu::GPUInfo::GPUDevice* out) {
   out->vendor_id = data.vendor_id();
   out->device_id = data.device_id();
-#if BUILDFLAG(IS_CHROMEOS)
-  out->revision = data.revision();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   out->active = data.active();
   return data.ReadVendorString(&out->vendor_string) &&
          data.ReadDeviceString(&out->device_string) &&

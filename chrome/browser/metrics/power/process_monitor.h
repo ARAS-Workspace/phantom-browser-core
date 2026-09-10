@@ -46,8 +46,7 @@ class ProcessMetricsDelegate {
   virtual base::expected<double, base::ProcessCPUUsageError>
   GetPlatformIndependentCPUUsage() = 0;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
   virtual int GetIdleWakeupsPerSecond() = 0;
 #endif
 
@@ -108,8 +107,7 @@ class ProcessMonitor : public content::BrowserChildProcessObserver,
     // nullopt if there was an error calculating the CPU usage.
     std::optional<double> cpu_usage;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
     // Returns the number of average idle cpu wakeups per second since the last
     // time the metric was sampled.
     int idle_wakeups = 0;

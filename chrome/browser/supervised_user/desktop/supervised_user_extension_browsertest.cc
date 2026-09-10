@@ -28,11 +28,6 @@
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_builder.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/supervised_user/chromeos/parent_access_extension_approvals_manager.h"
-#include "chrome/browser/ui/webui/ash/parent_access/fake_parent_access_dialog.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 constexpr char kGoodCrxId[] = "ldnnhddmnhbkjipkidpdiheffobcpfmf";
 }  // namespace
@@ -345,20 +340,6 @@ IN_PROC_BROWSER_TEST_P(ParentApprovalRequestTest,
   auto supervised_user_extensions_delegate =
       std::make_unique<SupervisedUserExtensionsDelegateImpl>(profile());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  auto fake_parent_access_dialog_provider =
-      std::make_unique<ash::FakeParentAccessDialogProvider>();
-  auto fake_parent_access_dialog_provider_ptr =
-      fake_parent_access_dialog_provider.get();
-  supervised_user_extensions_delegate
-      ->SetParentAccessExtensionApprovalsManagerForTesting(
-          std::make_unique<ParentAccessExtensionApprovalsManager>(
-              std::move(fake_parent_access_dialog_provider)));
-  fake_parent_access_dialog_provider_ptr->SetNextAction(
-      ash::FakeParentAccessDialogProvider::Action::CaptureCallback(
-          base::DoNothing()));
-#endif
-
   SkBitmap icon;
   supervised_user_extensions_delegate->RequestToAddExtensionOrShowError(
       *extension.get(), browser()->tab_strip_model()->GetActiveWebContents(),
@@ -366,11 +347,7 @@ IN_PROC_BROWSER_TEST_P(ParentApprovalRequestTest,
 
   // Confirm that the parent approval dialog for extensions for each OS is
   // created.
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(fake_parent_access_dialog_provider_ptr->TakeLastParams());
-#else
   EXPECT_TRUE(parent_permission_dialog_appeared_);
-#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(

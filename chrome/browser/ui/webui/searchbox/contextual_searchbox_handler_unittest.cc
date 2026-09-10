@@ -104,10 +104,6 @@
 #include "ui/base/webui/web_ui_util.h"
 #include "ui/gfx/codec/png_codec.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/network/network_handler_test_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using contextual_search::SessionState;
 
 namespace {
@@ -505,9 +501,6 @@ class ContextualSearchboxHandlerTest
   BrowserWindowFeatures browser_window_features_;
   testing::NiceMock<ui::MockBaseWindow> mock_base_window_;
   ui::UnownedUserDataHost unowned_user_data_host_;
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::NetworkHandlerTestHelper network_handler_test_helper_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   raw_ptr<MockQueryController> query_controller_;
   raw_ptr<contextual_search::ContextualSearchService> service_;
   raw_ptr<MockContextualSearchMetricsRecorder> metrics_recorder_;

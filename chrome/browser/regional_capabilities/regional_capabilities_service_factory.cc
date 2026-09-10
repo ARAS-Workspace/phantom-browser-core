@@ -17,10 +17,6 @@
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_client_android.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/regional_capabilities/regional_capabilities_service_client_chromeos.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_client_linux.h"
 #endif
@@ -32,9 +28,6 @@ std::unique_ptr<RegionalCapabilitiesService::Client>
 CreateRegionalCapabilitiesServiceClient() {
 #if BUILDFLAG(IS_ANDROID)
   return std::make_unique<RegionalCapabilitiesServiceClientAndroid>(
-      g_browser_process->variations_service());
-#elif BUILDFLAG(IS_CHROMEOS)
-  return std::make_unique<RegionalCapabilitiesServiceClientChromeOS>(
       g_browser_process->variations_service());
 #elif BUILDFLAG(IS_LINUX)
   return std::make_unique<RegionalCapabilitiesServiceClientLinux>(

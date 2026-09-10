@@ -7,11 +7,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/string_tokenizer.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/time/time.h"
-#include "ui/base/clipboard/clipboard_data.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace ui {
 
 void RecordRead(ClipboardFormatMetric metric) {
@@ -33,21 +28,5 @@ void RecordWriteTextSizeMetrics(std::u16string_view text) {
   base::UmaHistogramCounts100000("Clipboard.Write.Text.CharacterCount",
                                  text.size());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void RecordTimeIntervalBetweenCommitAndRead(const ui::ClipboardData* data) {
-  if (!data)
-    return;
-
-  std::optional<base::Time> commit_time = data->commit_time();
-  if (!commit_time.has_value())
-    return;
-
-  base::UmaHistogramCustomTimes("Clipboard.TimeIntervalBetweenCommitAndRead",
-                                base::Time::Now() - commit_time.value(),
-                                /*min=*/base::Milliseconds(1),
-                                /*max=*/base::Hours(12), /*buckets=*/100);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace ui

@@ -82,7 +82,7 @@ const char kMonoEmojiLocale[] = "und-Zsym";
 extern const char kNotoColorEmojiCompat[] = "Noto Color Emoji Compat";
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 float FontCache::device_scale_factor_ = 1.0;
 #endif
 
@@ -131,7 +131,7 @@ void FontCache::Trace(Visitor* visitor) const {
 const FontPlatformData* FontCache::SystemFontPlatformData(
     const FontDescription& font_description) {
   const AtomicString& family = FontCache::SystemFontFamily();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
   if (family.empty() || family == font_family_names::kSystemUi)
     return nullptr;
 #else

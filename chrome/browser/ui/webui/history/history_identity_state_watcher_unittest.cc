@@ -283,7 +283,6 @@ TEST_F(HistorySignInStateWatcherSyncToSigninTest,
   EXPECT_EQ(final_expected_state, watcher.GetHistoryIdentityState());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Signing out again should once again change the state and trigger a
 // notification.
 TEST_F(HistorySignInStateWatcherSyncToSigninTest, NotifiesOnSignOut) {
@@ -446,7 +445,6 @@ TEST_F(HistorySignInStateWatcherSyncToSigninTest,
       .history_sync = HistoryIdentityState::SyncState::kTurnedOn};
   EXPECT_EQ(final_expected_state, watcher.GetHistoryIdentityState());
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class HistorySignInStateWatcherWithoutSyncToSigninTest
     : public HistorySignInStateWatcherTestBase {

@@ -3421,7 +3421,6 @@ TEST_F(DeveloperPrivateApiSupervisedUserUnitTest,
 
 // Signing into transport mode and Sign outs are not supported for ChromeOS
 // hence DeveloperPrivateApiTransportModeUnitTest is not run for ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 class DeveloperPrivateApiTransportModeUnitTest
     : public DeveloperPrivateApiUnitTest {
  public:
@@ -3827,6 +3826,5 @@ TEST_F(DeveloperPrivateApiTransportModeUnitTest,
   EXPECT_FALSE(info.can_upload_as_account_extension);
   EXPECT_FALSE(CanUploadToAccount(*extension));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace extensions

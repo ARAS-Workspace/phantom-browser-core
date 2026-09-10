@@ -32,11 +32,6 @@
 #include "content/public/browser/devtools_agent_host_client_channel.h"
 #include "third_party/blink/public/common/features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/devtools/protocol/window_manager_handler.h"
-#include "chromeos/dbus/constants/dbus_switches.h"
-#endif
-
 namespace {
 
 template <typename Handler>
@@ -129,13 +124,6 @@ ChromeDevToolsSession::ChromeDevToolsSession(
   if ((agent_host->GetType() == content::DevToolsAgentHost::kTypeBrowser ||
        agent_host->GetType() == content::DevToolsAgentHost::kTypePage) &&
       (channel->GetClient()->AllowUnsafeOperations()
-#if BUILDFLAG(IS_CHROMEOS)
-       // Also enable on ChromeOS in dev mode.
-       || (base::CommandLine::ForCurrentProcess()->HasSwitch(
-               chromeos::switches::kSystemDevMode) &&
-           base::CommandLine::ForCurrentProcess()->HasSwitch(
-               switches::kEnableDevToolsPwaHandler))
-#endif
            )) {
     if (IsDomainAvailableToUntrustedClient<PWAHandler>() ||
         channel->GetClient()->IsTrusted()) {
@@ -143,10 +131,6 @@ ChromeDevToolsSession::ChromeDevToolsSession(
           std::make_unique<PWAHandler>(dispatcher(), agent_host->GetId());
     }
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  window_manager_handler_ =
-      std::make_unique<WindowManagerHandler>(dispatcher());
-#endif
 }
 
 ChromeDevToolsSession::~ChromeDevToolsSession() = default;

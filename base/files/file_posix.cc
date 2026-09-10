@@ -193,7 +193,7 @@ void File::Info::FromStat(const stat_wrapper_t& stat_info) {
   // creation time. However, other than on Mac & iOS where the actual file
   // creation time is included as st_birthtime, the rest of POSIX platforms have
   // no portable way to get the creation time.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   time_t last_modified_sec = stat_info.st_mtim.tv_sec;
   int64_t last_modified_nsec = stat_info.st_mtim.tv_nsec;
   time_t last_accessed_sec = stat_info.st_atim.tv_sec;
@@ -612,9 +612,6 @@ void File::DoInitialize(const FilePath& path, uint32_t flags) {
   static_assert(O_RDONLY == 0, "O_RDONLY must equal zero");
 
   mode_t mode = S_IRUSR | S_IWUSR;
-#if BUILDFLAG(IS_CHROMEOS)
-  mode |= S_IRGRP | S_IROTH;
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
   if (path.IsContentUri() || path.IsVirtualDocumentPath()) {
@@ -670,7 +667,7 @@ bool File::Flush() {
   DCHECK(IsValid());
   SCOPED_FILE_TRACE("Flush");
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
   return !HANDLE_EINTR(fdatasync(file_.get()));
 #elif BUILDFLAG(IS_APPLE)
   // On macOS and iOS, fsync() is guaranteed to send the file's data to the

@@ -6458,7 +6458,7 @@ TEST_F(WebViewTest, ResizeWithFixedPosCrash) {
   frame->PrintEnd();
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 class OverlayScrollbarWebViewTest : public WebViewTest {
  protected:
   void SetUp() override {
@@ -6544,7 +6544,7 @@ TEST_F(OverlayScrollbarWebViewTest,
   ASSERT_NE(nullptr, layout_viewport->VerticalScrollbar());
   EXPECT_TRUE(layout_viewport->VerticalScrollbar()->IsOverlayScrollbar());
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 TEST_F(WebViewTest, DeviceEmulationResetScrollbars) {
   WebViewImpl* web_view = web_view_helper_.Initialize();

@@ -10,11 +10,7 @@
 #include "chrome/browser/ui/webui/print_preview/pdf_printer_handler.h"
 #include "chrome/common/buildflags.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/webui/print_preview/local_printer_handler_chromeos.h"
-#else
 #include "chrome/browser/ui/webui/print_preview/local_printer_handler_default.h"
-#endif
 
 namespace printing {
 
@@ -28,11 +24,7 @@ std::unique_ptr<PrinterHandler> PrinterHandler::CreateForExtensionPrinters(
 std::unique_ptr<PrinterHandler> PrinterHandler::CreateForLocalPrinters(
     content::WebContents* preview_web_contents,
     Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return LocalPrinterHandlerChromeos::Create(preview_web_contents);
-#else
   return std::make_unique<LocalPrinterHandlerDefault>(preview_web_contents);
-#endif
 }
 
 // static
@@ -52,18 +44,5 @@ void PrinterHandler::StartGrantPrinterAccess(const std::string& printer_id,
                                              GetPrinterInfoCallback callback) {
   NOTREACHED();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void PrinterHandler::StartGetEulaUrl(const std::string& destination_id,
-                                     GetEulaUrlCallback callback) {
-  NOTREACHED();
-}
-
-void PrinterHandler::StartPrinterStatusRequest(
-    const std::string& printer_id,
-    PrinterStatusRequestCallback callback) {
-  NOTREACHED();
-}
-#endif
 
 }  // namespace printing

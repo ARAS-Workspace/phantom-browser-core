@@ -22,8 +22,6 @@ namespace {
 const char kComponentPlatform[] =
 #if BUILDFLAG(IS_MAC)
     "mac";
-#elif BUILDFLAG(IS_CHROMEOS)
-    "cros";
 #elif BUILDFLAG(IS_LINUX)
     "linux";
 #else

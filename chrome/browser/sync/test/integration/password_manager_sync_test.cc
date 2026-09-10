@@ -147,7 +147,6 @@ class SyncActiveWithoutPasswordsChecker
 
 // Note: This helper applies to ChromeOS too, but is currently unused there. So
 // define it out to prevent a compile error due to the unused function.
-#if !BUILDFLAG(IS_CHROMEOS)
 content::WebContents* GetNewTab(Browser* browser) {
   ui_test_utils::NavigateToURLWithDisposition(
       browser, GURL("data:text/html"),
@@ -155,7 +154,6 @@ content::WebContents* GetNewTab(Browser* browser) {
       ui_test_utils::BROWSER_TEST_WAIT_FOR_TAB);
   return browser->tab_strip_model()->GetActiveWebContents();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // This test fixture is similar to SingleClientPasswordsSyncTest, but it also
 // sets up all the necessary test hooks etc for PasswordManager code (like
@@ -266,10 +264,8 @@ class PasswordManagerSyncTest : public SyncTest {
     ASSERT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Should only be called after SetupSyncTransportWithPasswordAccountStorage().
   void SignOut() { GetClient(0)->SignOutPrimaryAccount(); }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   GURL GetWWWOrigin() {
     return embedded_test_server()->GetURL(kExampleHostname, "/");
@@ -417,7 +413,6 @@ class PasswordManagerSyncTest : public SyncTest {
   content::ContentMockCertVerifier mock_cert_verifier_;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest, UpdateInProfileStore) {
   ASSERT_TRUE(SetupClients());
 
@@ -833,8 +828,6 @@ IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest,
 
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
 IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest,
                        SyncUtilApisWithSyncTheFeature) {
   ASSERT_TRUE(SetupSyncWithMode(SetupSyncMode::kSyncTheFeature));
@@ -877,7 +870,6 @@ IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest,
 }
 
 // Transport mode is not really supported on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest, SyncUtilApis) {
   ASSERT_TRUE(SetupSyncWithMode(SetupSyncMode::kSyncTransportOnly));
 
@@ -909,9 +901,7 @@ IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest, SyncUtilApis) {
       password_manager::sync_util::GetPasswordSyncState(GetSyncService(0)),
       password_manager::sync_util::SyncState::kNotActive);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class PasswordManagerSyncTestWithPolicy : public PasswordManagerSyncTest {
  public:
   void SetUpInProcessBrowserTestFixture() override {
@@ -976,7 +966,5 @@ IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest,
     waiter.Wait();
   }
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

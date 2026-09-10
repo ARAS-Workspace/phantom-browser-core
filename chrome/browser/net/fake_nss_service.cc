@@ -12,10 +12,6 @@
 #include "net/cert/nss_cert_database.h"
 #include "nss_service.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "net/cert/nss_cert_database_chromeos.h"
-#endif
-
 namespace {
 net::NSSCertDatabase* NssGetterForIOThread(
     net::NSSCertDatabase* result,
@@ -33,17 +29,6 @@ std::unique_ptr<KeyedService> CreateService(bool enable_system_slot,
 
 }  // namespace
 
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-FakeNssService* FakeNssService::InitializeForBrowserContext(
-    content::BrowserContext* context,
-    bool enable_system_slot) {
-  KeyedService* service =
-      NssServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          context, base::BindRepeating(&CreateService, enable_system_slot));
-  return static_cast<FakeNssService*>(service);
-}
-#else
 // static
 FakeNssService* FakeNssService::InitializeForBrowserContext(
     content::BrowserContext* context) {
@@ -52,30 +37,14 @@ FakeNssService* FakeNssService::InitializeForBrowserContext(
           context, base::BindRepeating(&CreateService, false));
   return static_cast<FakeNssService*>(service);
 }
-#endif
 
 FakeNssService::FakeNssService(content::BrowserContext* context,
                                bool enable_system_slot)
     : NssService(context) {
   public_slot_ = std::make_unique<crypto::ScopedTestNSSDB>();
-#if BUILDFLAG(IS_CHROMEOS)
-  private_slot_ = std::make_unique<crypto::ScopedTestNSSDB>();
-
-  auto cert_db = std::make_unique<net::NSSCertDatabaseChromeOS>(
-      crypto::ScopedPK11Slot(PK11_ReferenceSlot(public_slot_->slot())),
-      crypto::ScopedPK11Slot(PK11_ReferenceSlot(private_slot_->slot())));
-
-  if (enable_system_slot) {
-    system_slot_ = std::make_unique<crypto::ScopedTestNSSDB>();
-    cert_db->SetSystemSlot(
-        crypto::ScopedPK11Slot(PK11_ReferenceSlot(system_slot_->slot())));
-  }
-  nss_cert_database_ = std::move(cert_db);
-#else
   nss_cert_database_ = std::make_unique<net::NSSCertDatabase>(
       crypto::ScopedPK11Slot(PK11_ReferenceSlot(public_slot_->slot())),
       crypto::ScopedPK11Slot(PK11_ReferenceSlot(public_slot_->slot())));
-#endif
 }
 
 FakeNssService::~FakeNssService() {
@@ -90,13 +59,3 @@ NssCertDatabaseGetter FakeNssService::CreateNSSCertDatabaseGetterForIOThread() {
 PK11SlotInfo* FakeNssService::GetPublicSlot() const {
   return public_slot_->slot();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-PK11SlotInfo* FakeNssService::GetPrivateSlot() const {
-  return private_slot_->slot();
-}
-
-PK11SlotInfo* FakeNssService::GetSystemSlot() const {
-  return system_slot_->slot();
-}
-#endif

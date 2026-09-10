@@ -181,9 +181,6 @@ BuildTestRecordsVector(size_t number_of_test_records,
     auto* sequence_information =
         encrypted_record.mutable_sequence_information();
     sequence_information->set_generation_id(generation_id);
-#if BUILDFLAG(IS_CHROMEOS)
-    sequence_information->set_generation_guid(generation_guid);
-#endif  // BUILDFLAG(IS_CHROMEOS)
     sequence_information->set_sequencing_id(i);
     sequence_information->set_priority(Priority::IMMEDIATE);
     ScopedReservation record_reservation(encrypted_record.ByteSizeLong(),
@@ -366,16 +363,6 @@ TEST_P(RecordHandlerImplTest, ContainsGenerationGuid) {
                       .Build();
   ASSERT_TRUE(response.has_value());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Verify generation guid exists and equals kGenerationGuid.
-  ASSERT_THAT(response->FindStringByDottedPath(
-                  "lastSucceedUploadedRecord.generationGuid"),
-              NotNull());
-  EXPECT_THAT(*(response->FindStringByDottedPath(
-                  "lastSucceedUploadedRecord.generationGuid")),
-              StrEq(kGenerationGuid));
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   test_env_->SimulateCustomResponseForRequest(0, std::move(response.value()));
 
   const auto result = responder_event.result();
@@ -426,51 +413,6 @@ TEST_P(RecordHandlerImplTest, ValidGenerationGuid) {
   EXPECT_OK(result) << result.error();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(RecordHandlerImplTest, InvalidGenerationGuid) {
-  auto test_records = BuildTestRecordsVector(kNumTestRecords, kGenerationId,
-                                             kGenerationGuid, memory_resource_);
-  const auto force_confirm_by_server = force_confirm();
-  const auto expected_cached_seq_ids =
-      GetExpectedCachedSeqIds(test_records.second);
-
-  test::TestEvent<StatusOr<std::list<int64_t>>> enqueued_event;
-  test::TestEvent<SignedEncryptionInfo> encryption_key_attached_event;
-  test::TestEvent<ConfigFile> config_file_attached_event;
-  test::TestEvent<CompletionResponse> responder_event;
-
-  handler_->HandleRecords(need_encryption_key(), /*config_file_version=*/-1,
-                          std::move(test_records.second),
-                          std::move(test_records.first), enqueued_event.cb(),
-                          responder_event.cb(),
-                          encryption_key_attached_event.repeating_cb(),
-                          config_file_attached_event.repeating_cb());
-  const auto& enqueued_result = enqueued_event.result();
-  ASSERT_OK(enqueued_result) << enqueued_result.error();
-  EXPECT_THAT(enqueued_result.value(), ContainerEq(expected_cached_seq_ids));
-
-  task_environment_.RunUntilIdle();
-
-  ASSERT_THAT(*test_env_->url_loader_factory()->pending_requests(), SizeIs(1u));
-  auto request_body = test_env_->request_body(0);
-  EXPECT_THAT(request_body, IsDataUploadRequestValid());
-  auto response = ResponseBuilder(std::move(request_body))
-                      .SetForceConfirm(force_confirm_by_server)
-                      .Build();
-  ASSERT_TRUE(response.has_value());
-
-  // Generation guids must be parsable into `base::Uuid`.
-  response->SetByDottedPath("lastSucceedUploadedRecord.generationGuid",
-                            "invalid-generation-guid");
-
-  test_env_->SimulateCustomResponseForRequest(0, std::move(response.value()));
-
-  const auto result = responder_event.result();
-  EXPECT_THAT(result.error(),
-              Property(&Status::error_code, Eq(error::INTERNAL)));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_P(RecordHandlerImplTest, MissingGenerationGuidFromManagedDeviceIsOk) {
   // Set device as managed
   policy::ScopedManagementServiceOverrideForTesting scoped_management_service_ =
@@ -519,59 +461,6 @@ TEST_P(RecordHandlerImplTest, MissingGenerationGuidFromManagedDeviceIsOk) {
   const auto result = responder_event.result();
   EXPECT_OK(result) << result.error();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(RecordHandlerImplTest,
-       MissingGenerationGuidFromUnmanagedDeviceReturnError) {
-  // Set device as unmanaged
-  policy::ScopedManagementServiceOverrideForTesting scoped_management_service_ =
-      policy::ScopedManagementServiceOverrideForTesting(
-          policy::ManagementServiceFactory::GetForPlatform(),
-          policy::EnterpriseManagementAuthority::NONE);
-
-  auto test_records = BuildTestRecordsVector(kNumTestRecords, kGenerationId,
-                                             kGenerationGuid, memory_resource_);
-  const auto force_confirm_by_server = force_confirm();
-  const auto expected_cached_seq_ids =
-      GetExpectedCachedSeqIds(test_records.second);
-
-  test::TestEvent<StatusOr<std::list<int64_t>>> enqueued_event;
-  test::TestEvent<SignedEncryptionInfo> encryption_key_attached_event;
-  test::TestEvent<ConfigFile> config_file_attached_event;
-  test::TestEvent<CompletionResponse> responder_event;
-
-  handler_->HandleRecords(need_encryption_key(), /*config_file_version=*/-1,
-                          std::move(test_records.second),
-                          std::move(test_records.first), enqueued_event.cb(),
-                          responder_event.cb(),
-                          encryption_key_attached_event.repeating_cb(),
-                          config_file_attached_event.repeating_cb());
-  const auto& enqueued_result = enqueued_event.result();
-  ASSERT_OK(enqueued_result) << enqueued_result.error();
-  EXPECT_THAT(enqueued_result.value(), ContainerEq(expected_cached_seq_ids));
-
-  task_environment_.RunUntilIdle();
-
-  ASSERT_THAT(*test_env_->url_loader_factory()->pending_requests(), SizeIs(1u));
-  auto request_body = test_env_->request_body(0);
-  EXPECT_THAT(request_body, IsDataUploadRequestValid());
-  auto response = ResponseBuilder(std::move(request_body))
-                      .SetForceConfirm(force_confirm_by_server)
-                      .Build();
-  ASSERT_TRUE(response.has_value());
-
-  // Remove the generation guid. This should result in an error since we set
-  // the device to an unmanaged state at the beginning of the test.
-  response->RemoveByDottedPath("lastSucceedUploadedRecord.generationGuid");
-
-  test_env_->SimulateCustomResponseForRequest(0, std::move(response.value()));
-
-  const auto result = responder_event.result();
-  EXPECT_FALSE(result.has_value());
-  EXPECT_THAT(result.error(),
-              Property(&Status::error_code, Eq(error::INTERNAL)));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(RecordHandlerImplTest, MissingSequenceInformation) {
   // test records that has one record with missing sequence information.
@@ -799,67 +688,6 @@ TEST_P(RecordHandlerImplTest, AssignsRequestIdForRecordUploads) {
   const auto result = responder_event.result();
   EXPECT_THAT(result, ResponseEquals(expected_response));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(RecordHandlerImplTest,
-       ContainsConfigFileInResponseWithExperimentEnabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(kShouldRequestConfigurationFile);
-
-  auto test_records = BuildTestRecordsVector(kNumTestRecords, kGenerationId,
-                                             kGenerationGuid, memory_resource_);
-  const auto force_confirm_by_server = force_confirm();
-  const auto expected_cached_seq_ids =
-      GetExpectedCachedSeqIds(test_records.second);
-
-  SuccessfulUploadResponse expected_response{
-      .sequence_information = test_records.second.back().sequence_information(),
-      .force_confirm = force_confirm()};
-
-  test::TestEvent<StatusOr<std::list<int64_t>>> enqueued_event;
-  test::TestEvent<SignedEncryptionInfo> encryption_key_attached_event;
-  test::TestEvent<ConfigFile> config_file_attached_event;
-  test::TestEvent<CompletionResponse> responder_event;
-
-  handler_->HandleRecords(need_encryption_key(), /*config_file_version=*/1,
-                          std::move(test_records.second),
-                          std::move(test_records.first), enqueued_event.cb(),
-                          responder_event.cb(),
-                          encryption_key_attached_event.repeating_cb(),
-                          config_file_attached_event.repeating_cb());
-  const auto& enqueued_result = enqueued_event.result();
-  ASSERT_OK(enqueued_result) << enqueued_result.error();
-  EXPECT_THAT(enqueued_result.value(), ContainerEq(expected_cached_seq_ids));
-
-  task_environment_.RunUntilIdle();
-
-  ASSERT_THAT(*test_env_->url_loader_factory()->pending_requests(), SizeIs(1));
-  auto request_body = test_env_->request_body(0);
-  EXPECT_THAT(request_body, IsDataUploadRequestValid());
-  auto response = ResponseBuilder(std::move(request_body))
-                      .SetForceConfirm(force_confirm_by_server)
-                      .Build();
-  ASSERT_TRUE(response.has_value());
-  test_env_->SimulateCustomResponseForRequest(0, std::move(response.value()));
-
-  if (need_encryption_key()) {
-    EXPECT_THAT(
-        encryption_key_attached_event.result(),
-        AllOf(Property(&SignedEncryptionInfo::public_asymmetric_key,
-                       Not(IsEmpty())),
-              Property(&SignedEncryptionInfo::public_key_id, Gt(0)),
-              Property(&SignedEncryptionInfo::signature, Not(IsEmpty()))));
-  }
-
-  EXPECT_THAT(
-      config_file_attached_event.result(),
-      AllOf(Property(&ConfigFile::config_file_signature, Not(IsEmpty())),
-            Property(&ConfigFile::version, Gt(0)),
-            Property(&ConfigFile::blocked_event_configs, Not(IsEmpty()))));
-  const auto result = responder_event.result();
-  EXPECT_THAT(result, ResponseEquals(expected_response));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 INSTANTIATE_TEST_SUITE_P(
     NeedOrNoNeedKey,

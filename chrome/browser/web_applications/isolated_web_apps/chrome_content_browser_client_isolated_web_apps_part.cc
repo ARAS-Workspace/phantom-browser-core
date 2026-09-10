@@ -34,10 +34,6 @@
 #include "services/network/public/mojom/cross_origin_opener_policy.mojom-shared.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#endif
-
 namespace web_app {
 
 namespace {
@@ -167,13 +163,6 @@ bool ChromeContentBrowserClientIsolatedWebAppsPart::AreIsolatedWebAppsEnabled(
       profile->IsOffTheRecord()) {
     return false;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // IWAs should be enabled for ShimlessRMA app profile.
-  if (ash::IsShimlessRmaAppBrowserContext(browser_context)) {
-    return true;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (base::FeatureList::IsEnabled(features::kIsolatedWebApps)) {
     return true;

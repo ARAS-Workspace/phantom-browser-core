@@ -206,16 +206,14 @@ class CaptureHandleBrowserTest : public WebRtcTestBase {
         switches::kEnableExperimentalWebPlatformFeatures);
     command_line->AppendSwitchASCII(
         switches::kAutoSelectTabCaptureSourceByTitle, kCapturedTabTitle);
-#if defined(MEMORY_SANITIZER) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(MEMORY_SANITIZER)
     // Force software rendering to avoid GPU process crashes on slow MSan bots.
     // ChromeOS is excluded as it requires GPU acceleration even under MSan.
     command_line->AppendSwitch(switches::kDisableGpu);
 #else
     // TODO(crbug.com/40260482): Remove the CrOS exception after fixing feature
     // detection in 0c tab capture path as it'll no longer be needed.
-#if !BUILDFLAG(IS_CHROMEOS)
     command_line->AppendSwitch(switches::kUseGpuInTests);
-#endif
 #endif
   }
 
@@ -408,7 +406,7 @@ IN_PROC_BROWSER_TEST_F(
 
 // TODO(crbug.com/40185394): Test disabled on Mac due to multiple failing bots.
 // TODO(crbug.com/40211291, crbug.com/40864623): Flaky on Chrome OS.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_HandleExposedIfCallingFrameAllowlistedEvenIfTopLevelNotAllowlisted \
   DISABLED_HandleExposedIfCallingFrameAllowlistedEvenIfTopLevelNotAllowlisted
 #else

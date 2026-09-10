@@ -136,12 +136,4 @@ WebAuthenticationDelegate::GetTouchIdAuthenticatorConfig(
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-WebAuthenticationDelegate::ChromeOSGenerateRequestIdCallback
-WebAuthenticationDelegate::GetGenerateRequestIdCallback(
-    RenderFrameHost* render_frame_host) {
-  return base::NullCallback();
-}
-#endif
-
 }  // namespace content

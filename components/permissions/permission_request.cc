@@ -447,19 +447,9 @@ std::u16string PermissionRequest::GetMessageTextFragment() const {
     case RequestType::kPointerLock:
       message_id = IDS_POINTER_LOCK_PERMISSIONS_FRAGMENT;
       break;
-#if BUILDFLAG(IS_CHROMEOS)
-    case RequestType::kProtectedMediaIdentifier:
-      message_id = IDS_PROTECTED_MEDIA_IDENTIFIER_PERMISSION_FRAGMENT;
-      break;
-#endif
     case RequestType::kRegisterProtocolHandler:
       // Handled by an override in `RegisterProtocolHandlerPermissionRequest`.
       NOTREACHED();
-#if BUILDFLAG(IS_CHROMEOS)
-    case RequestType::kSmartCard:
-      // Handled by an override in `SmartCardPermissionRequest`.
-      NOTREACHED();
-#endif
     case RequestType::kStorageAccess:
     case RequestType::kTopLevelStorageAccess:
       message_id = IDS_STORAGE_ACCESS_PERMISSION_FRAGMENT;
@@ -470,11 +460,6 @@ std::u16string PermissionRequest::GetMessageTextFragment() const {
     case RequestType::kWebAppInstallation:
       message_id = IDS_WEB_APP_INSTALLATION_PERMISSION_FRAGMENT;
       break;
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-    case RequestType::kWebPrinting:
-      message_id = IDS_WEB_PRINTING_PERMISSION_FRAGMENT;
-      break;
-#endif
     case RequestType::kWindowManagement:
       message_id = IDS_WINDOW_MANAGEMENT_PERMISSION_FRAGMENT;
       break;

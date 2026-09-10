@@ -59,10 +59,6 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/color/color_id.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/ash/system_web_apps/system_web_app_ui_utils.h"
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "ui/views/vector_icons.h"
@@ -633,32 +629,6 @@ void DownloadItemModel::OpenUsingPlatformHandler() {
                      download_->GetMimeType());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::optional<DownloadCommands::Command>
-DownloadItemModel::MaybeGetMediaAppAction() const {
-  std::string mime_type = GetMimeType();
-
-  if (mime_type == "application/pdf") {
-    return DownloadCommands::EDIT_WITH_MEDIA_APP;
-  }
-
-  if (base::StartsWith(mime_type, "audio/", base::CompareCase::SENSITIVE) ||
-      base::StartsWith(mime_type, "video/", base::CompareCase::SENSITIVE)) {
-    return DownloadCommands::OPEN_WITH_MEDIA_APP;
-  }
-
-  return std::nullopt;
-}
-
-void DownloadItemModel::OpenUsingMediaApp() {
-  ash::SystemAppLaunchParams params;
-  params.launch_paths.push_back(GetFullPath());
-  ash::LaunchSystemWebAppAsync(profile(), ash::SystemWebAppType::MEDIA, params);
-
-  RecordDownloadOpen(DOWNLOAD_OPEN_METHOD_MEDIA_APP, GetMimeType());
-}
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 bool DownloadItemModel::IsCommandEnabled(
     const DownloadCommands* download_commands,
@@ -686,15 +656,7 @@ bool DownloadItemModel::IsCommandEnabled(
              DownloadUIModel::IsCommandEnabled(download_commands, command);
     case DownloadCommands::OPEN_WITH_MEDIA_APP:
     case DownloadCommands::EDIT_WITH_MEDIA_APP: {
-#if BUILDFLAG(IS_CHROMEOS)
-      std::optional<DownloadCommands::Command> media_app_command =
-          MaybeGetMediaAppAction();
-
-      return media_app_command == command && download_->CanOpenDownload() &&
-             !IsExtensionDownload();
-#else
       return false;
-#endif
     }
     case DownloadCommands::CANCEL:
     case DownloadCommands::RESUME:
@@ -724,7 +686,7 @@ bool DownloadItemModel::IsCommandChecked(
     case DownloadCommands::OPEN_WHEN_COMPLETE:
       return download_->GetOpenWhenComplete() || IsExtensionDownload();
     case DownloadCommands::ALWAYS_OPEN_TYPE:
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       if (download_commands->CanOpenPdfInSystemViewer()) {
         DownloadPrefs* prefs = DownloadPrefs::FromBrowserContext(profile());
         return prefs->ShouldOpenPdfInSystemReader();
@@ -771,7 +733,7 @@ void DownloadItemModel::ExecuteCommand(DownloadCommands* download_commands,
       bool is_checked = IsCommandChecked(download_commands,
                                          DownloadCommands::ALWAYS_OPEN_TYPE);
       DownloadPrefs* prefs = DownloadPrefs::FromBrowserContext(profile());
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       if (download_commands->CanOpenPdfInSystemViewer()) {
         prefs->SetShouldOpenPdfInSystemReader(!is_checked);
         SetShouldPreferOpeningInBrowser(is_checked);
@@ -1177,7 +1139,7 @@ void DownloadItemModel::DetermineAndSetShouldPreferOpeningInBrowser(
     return;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (download_->GetOriginalMimeType() == "application/x-x509-user-cert") {
     SetShouldPreferOpeningInBrowser(true);
     return;

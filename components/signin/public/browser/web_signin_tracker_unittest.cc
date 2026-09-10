@@ -53,11 +53,7 @@ class WebSigninTrackerTest : public ::testing::Test {
   }
 
   ConsentLevel GetConsentLevel() const {
-#if BUILDFLAG(IS_CHROMEOS)
-    return ConsentLevel::kSync;
-#else
     return ConsentLevel::kSignin;
-#endif
   }
 
  protected:

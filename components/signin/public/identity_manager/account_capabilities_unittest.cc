@@ -225,19 +225,6 @@ TEST_F(AccountCapabilitiesTest, IsOptedInToParentalSupervision) {
             signin::Tribool::kFalse);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(AccountCapabilitiesTest, CanToggleAutoUpdates) {
-  AccountCapabilities capabilities;
-  EXPECT_EQ(capabilities.can_toggle_auto_updates(), signin::Tribool::kUnknown);
-
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_can_toggle_auto_updates(true);
-  EXPECT_EQ(capabilities.can_toggle_auto_updates(), signin::Tribool::kTrue);
-
-  mutator.set_can_toggle_auto_updates(false);
-  EXPECT_EQ(capabilities.can_toggle_auto_updates(), signin::Tribool::kFalse);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_IOS)
 TEST_F(AccountCapabilitiesTest, CanUseDevToolsGenerativeAiFeatures) {
@@ -372,56 +359,8 @@ TEST_F(AccountCapabilitiesTest, CanUseSpeakerLabelInRecorderApp) {
             signin::Tribool::kFalse);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(AccountCapabilitiesTest, CanUseGenerativeAiInRecorderApp) {
-  AccountCapabilities capabilities;
-  EXPECT_EQ(capabilities.can_use_generative_ai_in_recorder_app(),
-            signin::Tribool::kUnknown);
 
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_can_use_generative_ai_in_recorder_app(true);
-  EXPECT_EQ(capabilities.can_use_generative_ai_in_recorder_app(),
-            signin::Tribool::kTrue);
 
-  mutator.set_can_use_generative_ai_in_recorder_app(false);
-  EXPECT_EQ(capabilities.can_use_generative_ai_in_recorder_app(),
-            signin::Tribool::kFalse);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(AccountCapabilitiesTest, CanUseGenerativeAiPhotoEditing) {
-  AccountCapabilities capabilities;
-  EXPECT_EQ(capabilities.can_use_generative_ai_photo_editing(),
-            signin::Tribool::kUnknown);
-
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_can_use_generative_ai_photo_editing(true);
-  EXPECT_EQ(capabilities.can_use_generative_ai_photo_editing(),
-            signin::Tribool::kTrue);
-
-  mutator.set_can_use_generative_ai_photo_editing(false);
-  EXPECT_EQ(capabilities.can_use_generative_ai_photo_editing(),
-            signin::Tribool::kFalse);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(AccountCapabilitiesTest, CanUseGenerativeAi) {
-  AccountCapabilities capabilities;
-  EXPECT_EQ(capabilities.can_use_chromeos_generative_ai(),
-            signin::Tribool::kUnknown);
-
-  AccountCapabilitiesTestMutator mutator(&capabilities);
-  mutator.set_can_use_chromeos_generative_ai(true);
-  EXPECT_EQ(capabilities.can_use_chromeos_generative_ai(),
-            signin::Tribool::kTrue);
-
-  mutator.set_can_use_chromeos_generative_ai(false);
-  EXPECT_EQ(capabilities.can_use_chromeos_generative_ai(),
-            signin::Tribool::kFalse);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AccountCapabilitiesTest,
        IsSubjectToPrivacySandboxRestrictedMeasurementApiNotice) {

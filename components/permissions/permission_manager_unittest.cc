@@ -570,7 +570,7 @@ TEST_F(PermissionManagerTest, InsecureOriginIsNotOverridable) {
 
 TEST_F(PermissionManagerTest, MissingContextIsNotOverridable) {
   // Permissions that are not implemented should be denied overridability.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(
       IsPermissionOverridable(PermissionType::PROTECTED_MEDIA_IDENTIFIER,
                               url::Origin::Create(GURL("http://localhost"))));

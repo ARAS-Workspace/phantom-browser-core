@@ -35,13 +35,9 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/text/bytes_formatting.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/sync/service/sync_user_settings.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "ui/strings/grit/ui_strings.h"
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/browsing_data/counters/tabs_counter.h"
@@ -154,14 +150,6 @@ std::u16string GetChromeCounterTextFromResult(
 #if BUILDFLAG(IS_ANDROID)
     return l10n_util::GetPluralStringFUTF16(
         IDS_ANDROID_DEL_COOKIES_COUNTER_ADVANCED, origins);
-#elif BUILDFLAG(IS_CHROMEOS)
-    // Determines whether or not to show the count with exception message.
-    int del_cookie_counter_msg_id =
-        ShouldShowCookieException(profile)
-            ? IDS_DEL_COOKIES_COUNTER_ADVANCED_WITH_SIGNED_IN_EXCEPTION
-            : IDS_DEL_COOKIES_COUNTER_ADVANCED;
-
-    return l10n_util::GetPluralStringFUTF16(del_cookie_counter_msg_id, origins);
 #else
     std::u16string cookies_counter_text = l10n_util::GetPluralStringFUTF16(
         IDS_DEL_COOKIES_COUNTER_ADVANCED, origins);

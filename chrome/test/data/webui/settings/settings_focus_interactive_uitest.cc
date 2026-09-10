@@ -47,7 +47,7 @@ IN_PROC_BROWSER_TEST_F(SettingsFocusTest, StartupUrlsPage) {
   RunTest("settings/startup_urls_page_focus_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(SettingsFocusTest, EditDictionaryPage) {
   RunTest("settings/edit_dictionary_page_test.js",
           "runMochaSuite('EditDictionaryPageFocus')");

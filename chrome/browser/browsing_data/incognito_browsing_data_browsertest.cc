@@ -50,11 +50,6 @@
 #include "base/memory/scoped_refptr.h"
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using content::BrowserThread;
 using content::BrowsingDataFilterBuilder;
 

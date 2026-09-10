@@ -44,87 +44,6 @@ class BrowserCommandControllerTest : public BrowserWithTestWindowTest {
 };
 
 TEST_F(BrowserCommandControllerTest, IsReservedCommandOrKey) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // F1-3 keys are reserved Chrome accelerators on Chrome OS.
-  EXPECT_TRUE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          IDC_BACK, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                        ui::EventType::kKeyPressed, ui::VKEY_BROWSER_BACK,
-                        ui::DomCode::BROWSER_BACK, 0))));
-  EXPECT_TRUE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          IDC_FORWARD, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                           ui::EventType::kKeyPressed, ui::VKEY_BROWSER_FORWARD,
-                           ui::DomCode::BROWSER_FORWARD, 0))));
-  EXPECT_TRUE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          IDC_RELOAD, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                          ui::EventType::kKeyPressed, ui::VKEY_BROWSER_REFRESH,
-                          ui::DomCode::BROWSER_REFRESH, 0))));
-
-  // When there are modifier keys pressed, don't reserve.
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          IDC_RELOAD_BYPASSING_CACHE,
-          input::NativeWebKeyboardEvent(
-              ui::KeyEvent(ui::EventType::kKeyPressed, ui::VKEY_F3,
-                           ui::DomCode::F3, ui::EF_SHIFT_DOWN))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          IDC_RELOAD_BYPASSING_CACHE,
-          input::NativeWebKeyboardEvent(
-              ui::KeyEvent(ui::EventType::kKeyPressed, ui::VKEY_F3,
-                           ui::DomCode::F3, ui::EF_CONTROL_DOWN))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          IDC_FULLSCREEN, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                              ui::EventType::kKeyPressed, ui::VKEY_F4,
-                              ui::DomCode::F4, ui::EF_SHIFT_DOWN))));
-
-  // F4-10 keys are not reserved since they are Ash accelerators.
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          -1,
-          input::NativeWebKeyboardEvent(ui::KeyEvent(
-              ui::EventType::kKeyPressed, ui::VKEY_F4, ui::DomCode::F4, 0))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          -1,
-          input::NativeWebKeyboardEvent(ui::KeyEvent(
-              ui::EventType::kKeyPressed, ui::VKEY_F5, ui::DomCode::F5, 0))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          -1,
-          input::NativeWebKeyboardEvent(ui::KeyEvent(
-              ui::EventType::kKeyPressed, ui::VKEY_F6, ui::DomCode::F6, 0))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          -1,
-          input::NativeWebKeyboardEvent(ui::KeyEvent(
-              ui::EventType::kKeyPressed, ui::VKEY_F7, ui::DomCode::F7, 0))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          -1,
-          input::NativeWebKeyboardEvent(ui::KeyEvent(
-              ui::EventType::kKeyPressed, ui::VKEY_F8, ui::DomCode::F8, 0))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          -1,
-          input::NativeWebKeyboardEvent(ui::KeyEvent(
-              ui::EventType::kKeyPressed, ui::VKEY_F9, ui::DomCode::F9, 0))));
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          -1,
-          input::NativeWebKeyboardEvent(ui::KeyEvent(
-              ui::EventType::kKeyPressed, ui::VKEY_F10, ui::DomCode::F10, 0))));
-
-  // Shift+Control+Alt+F3 is also an Ash accelerator. Don't reserve it.
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsReservedCommandOrKey(
-          -1, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                  ui::EventType::kKeyPressed, ui::VKEY_F3, ui::DomCode::F3,
-                  ui::EF_SHIFT_DOWN | ui::EF_CONTROL_DOWN | ui::EF_ALT_DOWN))));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if defined(USE_AURA)
   // Ctrl+n, Ctrl+w are reserved while Ctrl+f is not.
@@ -163,28 +82,6 @@ TEST_F(BrowserCommandControllerTest, IsReservedCommandOrKeyIsApp) {
 
   // When GetType() == BrowserWindowInterface::Type::TYPE_APP, no keys are
   // reserved.
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(chrome::BrowserCommandController::From(browser.get())
-                   ->IsReservedCommandOrKey(
-                       IDC_BACK, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                                     ui::EventType::kKeyPressed, ui::VKEY_F1,
-                                     ui::DomCode::F1, 0))));
-  EXPECT_FALSE(chrome::BrowserCommandController::From(browser.get())
-                   ->IsReservedCommandOrKey(
-                       IDC_FORWARD, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                                        ui::EventType::kKeyPressed, ui::VKEY_F2,
-                                        ui::DomCode::F2, 0))));
-  EXPECT_FALSE(chrome::BrowserCommandController::From(browser.get())
-                   ->IsReservedCommandOrKey(
-                       IDC_RELOAD, input::NativeWebKeyboardEvent(ui::KeyEvent(
-                                       ui::EventType::kKeyPressed, ui::VKEY_F3,
-                                       ui::DomCode::F3, 0))));
-  EXPECT_FALSE(chrome::BrowserCommandController::From(browser.get())
-                   ->IsReservedCommandOrKey(
-                       -1, input::NativeWebKeyboardEvent(
-                               ui::KeyEvent(ui::EventType::kKeyPressed,
-                                            ui::VKEY_F4, ui::DomCode::F4, 0))));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if defined(USE_AURA)
   // The input::NativeWebKeyboardEvent constructor is available only when
@@ -265,8 +162,7 @@ TEST_F(BrowserCommandControllerTest, AvatarAcceleratorEnabledOnDesktop) {
   const CommandUpdater* command_updater =
       chrome::BrowserCommandController::From(browser());
 
-  // Chrome OS uses system tray menu to handle multi-profiles.
-  bool enabled = !BUILDFLAG(IS_CHROMEOS);
+  bool enabled = true;
 
   ASSERT_EQ(1u, profile_manager->GetNumberOfProfiles());
   EXPECT_EQ(enabled, command_updater->IsCommandEnabled(IDC_SHOW_AVATAR_MENU));

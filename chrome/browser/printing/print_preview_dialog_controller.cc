@@ -37,10 +37,6 @@
 #include "ui/base/mojom/ui_base_types.mojom-shared.h"
 #include "ui/web_dialogs/web_dialog_delegate.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/arc/print_spooler/print_session_impl.h"  // nogncheck crbug.com/40147906
-#endif
-
 using content::NavigationController;
 using content::NavigationHandle;
 using content::WebContents;
@@ -54,17 +50,6 @@ PrintPreviewUI* GetPrintPreviewUIForDialog(WebContents* dialog) {
   content::WebUI* web_ui = dialog->GetWebUI();
   return web_ui ? web_ui->GetController()->GetAs<PrintPreviewUI>() : nullptr;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void CloseArcPrintSession(WebContents* initiator) {
-  WebContents* outermost_web_contents =
-      guest_view::GuestViewBase::GetTopLevelWebContents(initiator);
-  auto* arc_print_session =
-      arc::PrintSessionImpl::FromWebContents(outermost_web_contents);
-  if (arc_print_session)
-    arc_print_session->OnPrintPreviewClosed();
-}
-#endif
 
 // A ui::WebDialogDelegate that specifies the print preview dialog appearance.
 class PrintPreviewDialogDelegate : public ui::WebDialogDelegate {
@@ -496,10 +481,6 @@ void PrintPreviewDialogController::RemoveInitiator(
 
   PrintViewManager::FromWebContents(initiator)->PrintPreviewDone();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  CloseArcPrintSession(initiator);
-#endif
-
   // Initiator is closed. Close the print preview dialog too.
   auto* print_preview_ui = GetPrintPreviewUIForDialog(preview_dialog);
   if (print_preview_ui)
@@ -514,9 +495,6 @@ void PrintPreviewDialogController::RemovePreviewDialog(
     web_contents_collection_.StopObserving(initiator);
     PrintViewManager::FromWebContents(initiator)->PrintPreviewDone();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    CloseArcPrintSession(initiator);
-#endif
   }
 
   preview_dialog_map_.erase(preview_dialog);

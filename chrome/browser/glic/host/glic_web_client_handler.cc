@@ -1115,15 +1115,6 @@ class GlicWebClientHandler
     result->is_managed =
         management_service && management_service->IsAccountManaged();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // ChromeOS doesn't support profile, so local profile name and custom
-    // profile avatar are not supported. Instead, we will just use the user
-    // account avatar.
-    auto icon = account_info.GetAvatarImage();
-    if (icon.has_value()) {
-      result->avatar_icon = icon->AsBitmap();
-    }
-#else
     result->local_profile_name =
         base::UTF16ToUTF8(entry->GetLocalProfileName());
     // TODO(crbug.com/382794680): Determine the correct size.
@@ -1131,7 +1122,6 @@ class GlicWebClientHandler
     if (!icon.IsEmpty()) {
       result->avatar_icon = icon.AsBitmap();
     }
-#endif  //  BUILDFLAG(IS_CHROMEOS)
     std::move(callback).Run(std::move(result));
   }
 

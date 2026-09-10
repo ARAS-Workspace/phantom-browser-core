@@ -28,10 +28,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/bluetooth/floss/floss_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using base::JSONReader;
 using testing::NiceMock;
 
@@ -81,13 +77,7 @@ class DigitalCredentialsCrossDeviceRequestDispatcherTest
                                base::Value(std::move(request_value))};
       base::test::TestFuture<base::expected<Response, RequestDispatcher::Error>>
           callback;
-#if BUILDFLAG(IS_CHROMEOS)
-      if (!floss::features::IsFlossEnabled()) {
-        mock_adapter_->ExpectDiscoveryWithScanCallback();
-      }
-#else
       mock_adapter_->ExpectDiscoveryWithScanCallback();
-#endif
 
       auto request_handler = std::make_unique<RequestDispatcher>(
           std::move(discovery), std::move(request_info),

@@ -93,7 +93,7 @@ class AccessibilityUIMessageHandler : public content::WebUIMessageHandler,
                                 std::string& deny);
   void HandleRequestWebContentsTree(const base::ListValue& args);
   void HandleRequestNativeUITree(const base::ListValue& args);
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   void HandleRequestWidgetsTree(const base::ListValue& args);
 #endif
   void HandleRequestAccessibilityEvents(const base::ListValue& args);

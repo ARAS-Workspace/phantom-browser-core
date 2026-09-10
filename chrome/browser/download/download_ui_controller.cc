@@ -43,14 +43,10 @@
 #include "extensions/browser/extension_util.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
 #include "chrome/browser/download/bubble/download_bubble_update_service_factory.h"
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/download/notification/download_notification_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_MAC)
 #include "components/download/public/common/desktop/desktop_auto_resumption_handler.h"
@@ -76,7 +72,7 @@ void AndroidUIControllerDelegate::OnNewDownloadReady(
   DownloadControllerBase::Get()->OnDownloadStarted(item);
 }
 
-#elif !BUILDFLAG(IS_CHROMEOS)
+#else
 
 void InitializeDownloadBubbleUpdateService(Profile* profile,
                                            content::DownloadManager* manager) {
@@ -171,12 +167,8 @@ DownloadUIController::DownloadUIController(content::DownloadManager* manager,
   if (!delegate_) {
     Profile* profile =
         Profile::FromBrowserContext(manager->GetBrowserContext());
-#if BUILDFLAG(IS_CHROMEOS)
-    delegate_ = std::make_unique<DownloadNotificationManager>(profile);
-#else
     delegate_ = std::make_unique<DownloadBubbleUIControllerDelegate>(profile);
     InitializeDownloadBubbleUpdateService(profile, manager);
-#endif
   }
 #endif  // BUILDFLAG(IS_ANDROID)
 }

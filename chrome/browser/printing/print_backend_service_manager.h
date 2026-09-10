@@ -140,12 +140,6 @@ class PrintBackendServiceManager {
       mojom::PrintBackendService::FetchCapabilitiesCallback callback);
   void GetDefaultPrinterName(
       mojom::PrintBackendService::GetDefaultPrinterNameCallback callback);
-#if BUILDFLAG(IS_CHROMEOS)
-  void GetPrinterSemanticCapsAndDefaults(
-      const std::string& printer_name,
-      mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsCallback
-          callback);
-#endif
   ContextId EstablishPrintingContext(ClientId client_id,
                                      const std::string& printer_name
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -290,11 +284,6 @@ class PrintBackendServiceManager {
       RemoteSavedCallbacks<mojom::PrintBackendService::FetchCapabilitiesResult>;
   using RemoteSavedGetDefaultPrinterNameCallbacks = RemoteSavedCallbacks<
       mojom::PrintBackendService::GetDefaultPrinterNameResult>;
-#if BUILDFLAG(IS_CHROMEOS)
-  using RemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks =
-      RemoteSavedCallbacks<
-          mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsResult>;
-#endif
   using RemoteSavedUseDefaultSettingsCallbacks =
       RemoteSavedCallbacks<PrintSettingsResult>;
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -454,10 +443,6 @@ class PrintBackendServiceManager {
   GetRemoteSavedFetchCapabilitiesCallbacks(bool sandboxed);
   RemoteSavedGetDefaultPrinterNameCallbacks&
   GetRemoteSavedGetDefaultPrinterNameCallbacks(bool sandboxed);
-#if BUILDFLAG(IS_CHROMEOS)
-  RemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks&
-  GetRemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks(bool sandboxed);
-#endif
   RemoteSavedUseDefaultSettingsCallbacks&
   GetRemoteSavedUseDefaultSettingsCallbacks(bool sandboxed);
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -521,12 +506,6 @@ class PrintBackendServiceManager {
   void OnDidGetDefaultPrinterName(
       const CallbackContext& context,
       mojom::PrintBackendService::GetDefaultPrinterNameResult printer_name);
-#if BUILDFLAG(IS_CHROMEOS)
-  void OnDidGetPrinterSemanticCapsAndDefaults(
-      const CallbackContext& context,
-      mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsResult
-          printer_caps);
-#endif
   void OnDidUseDefaultSettings(const CallbackContext& context,
                                PrintSettingsResult settings);
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -608,12 +587,6 @@ class PrintBackendServiceManager {
       sandboxed_saved_get_default_printer_name_callbacks_;
   RemoteSavedGetDefaultPrinterNameCallbacks
       unsandboxed_saved_get_default_printer_name_callbacks_;
-#if BUILDFLAG(IS_CHROMEOS)
-  RemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks
-      sandboxed_saved_get_printer_semantic_caps_and_defaults_callbacks_;
-  RemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks
-      unsandboxed_saved_get_printer_semantic_caps_and_defaults_callbacks_;
-#endif
   RemoteSavedUseDefaultSettingsCallbacks
       sandboxed_saved_use_default_settings_callbacks_;
   RemoteSavedUseDefaultSettingsCallbacks

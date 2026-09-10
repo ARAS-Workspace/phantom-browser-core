@@ -18,18 +18,10 @@
 #include "components/sync_device_info/device_info.h"
 #include "ui/base/device_form_factor.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/statistics_provider.h"
-#endif
-
 namespace syncer {
 
 // Declared here but defined in platform-specific files.
 std::string GetPersonalizableDeviceNameInternal();
-
-#if BUILDFLAG(IS_CHROMEOS)
-std::string GetChromeOSDeviceNameFromType();
-#endif
 
 LocalDeviceNameInfo::LocalDeviceNameInfo() = default;
 LocalDeviceNameInfo::LocalDeviceNameInfo(const LocalDeviceNameInfo& other) =
@@ -48,13 +40,7 @@ void OnHardwareInfoReady(LocalDeviceNameInfo* name_info_ptr,
                          base::ScopedClosureRunner done_closure,
                          base::SysInfo::HardwareInfo hardware_info) {
   name_info_ptr->manufacturer_name = std::move(hardware_info.manufacturer);
-#if BUILDFLAG(IS_CHROMEOS)
-  // For ChromeOS the returned model values are product code names like Eve. We
-  // want to use generic names like Chromebook.
-  name_info_ptr->model_name = GetChromeOSDeviceNameFromType();
-#else
   name_info_ptr->model_name = std::move(hardware_info.model);
-#endif
 }
 
 struct BlockingDeviceDetails {
@@ -72,26 +58,13 @@ void OnBlockingDeviceDetailsReady(LocalDeviceNameInfo* name_info_ptr,
 
 void OnMachineStatisticsLoaded(LocalDeviceNameInfo* name_info_ptr,
                                base::ScopedClosureRunner done_closure) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // |full_hardware_class| is set on Chrome OS devices if the user has UMA
-  // enabled. Otherwise |full_hardware_class| is set to an empty string.
-  if (const std::optional<std::string_view> full_hardware_class =
-          ash::system::StatisticsProvider::GetInstance()->GetMachineStatistic(
-              ash::system::kHardwareClassKey)) {
-    name_info_ptr->full_hardware_class =
-        std::string(full_hardware_class.value());
-  }
-#else
   name_info_ptr->full_hardware_class = "";
-#endif
 }
 
 }  // namespace
 
 DeviceInfo::DeviceType GetLocalDeviceType() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return DeviceInfo::DeviceType::kChromeOS;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return DeviceInfo::DeviceType::kLinux;
 #elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   switch (ui::GetDeviceFormFactor()) {
@@ -110,9 +83,7 @@ DeviceInfo::DeviceType GetLocalDeviceType() {
 }
 
 DeviceInfo::OsType GetLocalDeviceOSType() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return DeviceInfo::OsType::kChromeOsAsh;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return DeviceInfo::OsType::kLinux;
 #elif BUILDFLAG(IS_ANDROID)
   return DeviceInfo::OsType::kAndroid;
@@ -182,16 +153,8 @@ void GetLocalDeviceNameInfo(
       base::BindOnce(&OnHardwareInfoReady, name_info_ptr,
                      base::ScopedClosureRunner(done_closure)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Bind hwclass once the statistics are available on ChromeOS devices.
-  ash::system::StatisticsProvider::GetInstance()
-      ->ScheduleOnMachineStatisticsLoaded(
-          base::BindOnce(&OnMachineStatisticsLoaded, name_info_ptr,
-                         base::ScopedClosureRunner(done_closure)));
-#else
   OnMachineStatisticsLoaded(name_info_ptr,
                             base::ScopedClosureRunner(done_closure));
-#endif
 
   base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE,

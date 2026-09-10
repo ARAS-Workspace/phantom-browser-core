@@ -20,9 +20,7 @@ namespace extensions {
 
 // static
 Feature::Platform Feature::GetCurrentPlatform() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return CHROMEOS_PLATFORM;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return LINUX_PLATFORM;
 #elif BUILDFLAG(IS_MAC)
   return MACOSX_PLATFORM;

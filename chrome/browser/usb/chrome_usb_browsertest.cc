@@ -80,12 +80,6 @@
 #include "extensions/test/extension_test_message_listener.h"
 #include "extensions/test/result_catcher.h"
 #include "extensions/test/test_extension_dir.h"
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/test/regular_logged_in_browser_test_mixin.h"
-#include "components/account_id/account_id.h"
-#include "components/account_id/account_id_literal.h"  // nogncheck
-#include "components/user_manager/user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
 namespace {
@@ -131,12 +125,6 @@ auto FailedWithSubstr(std::string_view substr) {
   return content::EvalJsResult::ErrorIs(testing::HasSubstr(substr));
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr auto kManagedUserAccountId =
-    AccountId::Literal::FromUserEmailGaiaId("example@example.com",
-                                            GaiaId::Literal("12345"));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 // Observer for an extension service worker events like start, activated, and
@@ -1176,22 +1164,11 @@ class WebUsbExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
                                        extensions::ExtensionBrowserTest> {
  public:
   WebUsbExtensionBrowserTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    // The user is created via RegularLoggedInBrowserTestMixin.
-    set_chromeos_user_ = false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void SetUpOnMainThread() override {
     InProcessBrowserTestMixinHostSupport<
         extensions::ExtensionBrowserTest>::SetUpOnMainThread();
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager::UserManager::Get()->SetUserPolicyStatus(
-        kManagedUserAccountId, /*is_managed=*/true, /*is_affiliated=*/true);
-    display_service_for_system_notification_ =
-        std::make_unique<NotificationDisplayServiceTester>(
-            /*profile=*/nullptr);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     mojo::PendingRemote<device::mojom::UsbDeviceManager> device_manager;
     device_manager_.AddReceiver(
@@ -1278,26 +1255,6 @@ class WebUsbExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
   void SimulateClickOnSystemTrayIconButton(const Extension* extension) {
 #if BUILDFLAG(IS_ANDROID)
     // TODO(crbug.com/494643383): Sort out notifications testing on Android.
-#elif BUILDFLAG(IS_CHROMEOS)
-    auto* usb_pinned_notification = static_cast<UsbPinnedNotification*>(
-        g_browser_process->usb_system_tray_icon());
-
-    auto* device_pinned_notification_renderer =
-        static_cast<DevicePinnedNotificationRenderer*>(
-            usb_pinned_notification->GetIconRendererForTesting());
-
-    auto expected_pinned_notification_id =
-        device_pinned_notification_renderer->GetNotificationId(GetProfile());
-    auto maybe_indicator_notification =
-        display_service_for_system_notification_->GetNotification(
-            expected_pinned_notification_id);
-    ASSERT_TRUE(maybe_indicator_notification);
-    EXPECT_TRUE(maybe_indicator_notification->pinned());
-    display_service_for_system_notification_->SimulateClick(
-        NotificationHandler::Type::TRANSIENT, expected_pinned_notification_id,
-        /*action_index=*/0, /*reply=*/std::nullopt);
-    auto* web_contents = GetActiveWebContents();
-    EXPECT_EQ(web_contents->GetURL(), "chrome://settings/content/usbDevices");
 #else
     // On non-ChromeOS platforms, as they use status icon and there isn't good
     // test infra to simulate click on the status icon button, so simulate the
@@ -1326,12 +1283,6 @@ class WebUsbExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
   device::FakeUsbDeviceManager device_manager_;
   device::mojom::UsbDeviceInfoPtr fake_device_info_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::RegularLoggedInBrowserTestMixin logged_in_mixin_{&mixin_host_,
-                                                        kManagedUserAccountId};
-  std::unique_ptr<NotificationDisplayServiceTester>
-      display_service_for_system_notification_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 IN_PROC_BROWSER_TEST_F(WebUsbExtensionBrowserTest, GetDevices) {

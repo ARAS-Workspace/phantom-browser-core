@@ -321,11 +321,6 @@ std::vector<std::string_view> KeyEventFlagsNames(int event_flags) {
     names.push_back("IS_EXTENDED_KEY");
   if (event_flags & EF_IS_STYLUS_BUTTON)
     names.push_back("IS_STYLUS_BUTTON");
-#if BUILDFLAG(IS_CHROMEOS)
-  if (event_flags & EF_IS_CUSTOMIZED_FROM_BUTTON) {
-    names.push_back("IS_CUSTOMIZED_FROM_BUTTON");
-  }
-#endif
 
   return names;
 }

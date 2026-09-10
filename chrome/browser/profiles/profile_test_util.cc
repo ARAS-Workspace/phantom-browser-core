@@ -19,10 +19,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/login/login_state/login_state.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace profiles::testing {
 
 Profile& CreateProfileSync(ProfileManager* profile_manager,
@@ -68,20 +64,9 @@ ScopedProfileSelectionsForFactoryTesting::
 }
 
 ScopedTestManagedGuestSession::ScopedTestManagedGuestSession() {
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::LoginState::Initialize();
-  ash::LoginState::Get()->SetLoggedInState(
-      ash::LoginState::LOGGED_IN_ACTIVE,
-      ash::LoginState::LOGGED_IN_USER_PUBLIC_ACCOUNT);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 ScopedTestManagedGuestSession::~ScopedTestManagedGuestSession() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::LoginState::IsInitialized()) {
-    ash::LoginState::Shutdown();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace profiles::testing

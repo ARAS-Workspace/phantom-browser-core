@@ -66,18 +66,6 @@ std::string FetchNeuralPalmRadiusPolynomial(const EventDeviceInfo& devinfo,
   }
 
   // TODO(robsc): Remove this when comfortable.
-#if BUILDFLAG(IS_CHROMEOS)
-  // We should really only be running in chromeos anyway; We do a check here
-  // temporarily for hatch and reef.  These numbers should live in config on
-  // chromeos side but for now during experiment are hard-coded here.
-  // TODO(robsc): Investigate a better way of doing this configuration.
-  std::string release_board = base::SysInfo::GetLsbReleaseBoard();
-  if ("hatch" == release_board) {
-    return "0.1010944, 3.51837568";
-  } else if ("reef" == release_board) {
-    return "0.17889799, 4.22584412";
-  }
-#endif
 
   // Basking. Does not report vendor_id / product_id
   if (devinfo.name() == "Elan Touchscreen") {

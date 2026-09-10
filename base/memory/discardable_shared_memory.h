@@ -28,7 +28,7 @@
 // and Android to indicate that this type of behavior can be expected on
 // those platforms. Note that madvise() will still be used on other POSIX
 // platforms but doesn't provide the zero-fill-on-demand pages guarantee.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #define DISCARDABLE_SHARED_MEMORY_ZERO_FILL_ON_DEMAND_PAGES_AFTER_PURGE
 #endif
 

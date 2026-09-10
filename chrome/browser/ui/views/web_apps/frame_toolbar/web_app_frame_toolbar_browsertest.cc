@@ -162,10 +162,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/views/frame/browser_frame_view_chromeos.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/views/frame/opaque_browser_frame_view_layout.h"
 #endif
@@ -796,7 +792,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_NoElidedExtensionsMenu,
 }
 
 // Unframed mode has not been implemented for win/mac.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if BUILDFLAG(IS_LINUX)
 class UnframedIsolatedWebAppBrowserTest
     : public web_app::IsolatedWebAppBrowserTestHarness {
  public:
@@ -955,12 +951,6 @@ IN_PROC_BROWSER_TEST_F(UnframedIsolatedWebAppBrowserTest,
   InstallAndLaunchIsolatedWebApp(/*uses_unframed=*/true);
   EXPECT_TRUE(browser_view()->AppUsesUnframedMode());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // `chromeos::FrameCaptionButtonContainerView` is ChromeOS only thing.
-  BrowserFrameViewChromeOS* frame_view_cros =
-      static_cast<BrowserFrameViewChromeOS*>(frame_view());
-  EXPECT_TRUE(frame_view_cros->caption_button_container()->GetVisible());
-#endif
   EXPECT_TRUE(web_app_frame_toolbar()->GetVisible());
 
   GrantWindowManagementPermission();
@@ -969,9 +959,6 @@ IN_PROC_BROWSER_TEST_F(UnframedIsolatedWebAppBrowserTest,
       browser_view()->window_management_permission_granted_for_testing());
   EXPECT_TRUE(browser_view()->IsUnframedModeEnabled());
   EXPECT_FALSE(web_app_frame_toolbar()->GetVisible());
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(frame_view_cros->caption_button_container()->GetVisible());
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(UnframedIsolatedWebAppBrowserTest, DisplayModeMediaCSS) {
@@ -1089,10 +1076,7 @@ IN_PROC_BROWSER_TEST_F(
 
 // For ChromeOS the resizable borders are "outside of the window" where as for
 // Linux they are "inside of the window".
-#if BUILDFLAG(IS_CHROMEOS)
-  WaitForWindowSizeCorrectlyUpdated(popup_browser_view, expected_size,
-                                    expected_size);
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   constexpr int kFrameInsets =
       2 * OpaqueBrowserFrameViewLayout::kFrameBorderThickness;
   // window.open() sets the inner size to match with the given size.
@@ -1157,10 +1141,7 @@ IN_PROC_BROWSER_TEST_F(
   gfx::Size expected_size(blink::kMinimumUnframedWindowSize,
                           blink::kMinimumUnframedWindowSize);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  WaitForWindowSizeCorrectlyUpdated(popup_browser_view, expected_size,
-                                    expected_size);
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   constexpr int kFrameInsets =
       2 * OpaqueBrowserFrameViewLayout::kFrameBorderThickness;
   // window.resizeTo() sets the outer size to match with the given size.
@@ -1187,10 +1168,7 @@ IN_PROC_BROWSER_TEST_F(UnframedIsolatedWebAppBrowserTest, FrameMinimumSize) {
   // The minimum size of a window is smaller for a unframed mode app than for
   // a normal app. The size of the borders is inconsistent (and we don't have
   // access to the exact borders from here) and varies by OS.
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_LT(frame_view()->GetMinimumSize().width(),
-            BrowserViewLayout::kMainBrowserContentsMinimumWidth);
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_EQ(frame_view()->GetMinimumSize(), gfx::Size(1, 1));
 #endif
 }
@@ -1212,7 +1190,7 @@ IN_PROC_BROWSER_TEST_F(UnframedIsolatedWebAppBrowserTestDisabledFlag,
       browser_view()->window_management_permission_granted_for_testing());
   EXPECT_FALSE(browser_view()->IsUnframedModeEnabled());
 }
-#endif  // (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#endif  // BUILDFLAG(IS_LINUX)
 
 class WebAppFrameToolbarBrowserTest_WindowControlsOverlay
     : public WebAppFrameToolbarBrowserTest {
@@ -1610,57 +1588,6 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
 // Test to ensure crbug.com/40858241 won't reproduce. It casts the frame_view to
 // the ChromeOS's frame_view to have access to the caption_button_container_ so
 // it cannot be run on any other platform.
-#if BUILDFLAG(IS_CHROMEOS)
-class WebAppFrameToolbarBrowserTest_WindowControlsOverlay_RoundedWindows
-    : public WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
-      public testing::WithParamInterface<bool> {
- public:
-  WebAppFrameToolbarBrowserTest_WindowControlsOverlay_RoundedWindows() {
-    if (GetParam()) {
-      scoped_feature_list_.InitWithFeatures(
-          {chromeos::features::kFeatureManagementRoundedWindows}, {});
-    } else {
-      scoped_feature_list_.InitWithFeatures(
-          {}, {chromeos::features::kFeatureManagementRoundedWindows});
-    }
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-INSTANTIATE_TEST_SUITE_P(
-    /* no prefix */,
-    WebAppFrameToolbarBrowserTest_WindowControlsOverlay_RoundedWindows,
-    ::testing::Bool());
-
-IN_PROC_BROWSER_TEST_P(
-    WebAppFrameToolbarBrowserTest_WindowControlsOverlay_RoundedWindows,
-    WindowControlsOverlayFrameViewHeight) {
-  InstallAndLaunchWebApp();
-  ToggleWindowControlsOverlayAndWait();
-  EXPECT_TRUE(GetWindowControlOverlayVisibility());
-
-  BrowserFrameViewChromeOS* frame_view_cros =
-      static_cast<BrowserFrameViewChromeOS*>(helper()->frame_view());
-
-  int frame_view_height = frame_view_cros->GetMinimumSize().height();
-  int caption_container_height =
-      frame_view_cros->caption_button_container()->size().height();
-  int client_view_height = frame_view_cros->browser_widget()
-                               ->client_view()
-                               ->GetMinimumSize()
-                               .height();
-
-  // Frame view minimum height also includes radius of window to ensure correct
-  // rounding of window. See b/294588040.
-  int bottom_window_radius =
-      GetParam() ? chromeos::kRoundedWindowCornerRadius : 0;
-
-  EXPECT_EQ(frame_view_height, caption_container_height + client_view_height +
-                                   bottom_window_radius);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        CSSRectTestLTR) {
@@ -1851,7 +1778,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
 
 // ChromeOS (immersive) and macOS (https://crbug.com/41431787) disable WCO in
 // fullscreen.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        EnabledAndClickableInFullscreen) {
   InstallAndLaunchWebApp();
@@ -1883,7 +1810,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
   ASSERT_FALSE(browser_view->IsFullscreen());
   EXPECT_TRUE(browser_view->IsWindowControlsOverlayEnabled());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        OpenInChrome) {
@@ -2054,7 +1981,6 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
 }
 
 // Extensions in  ChromeOS are not in the titlebar.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Regression test for https://crbug.com/40857235.
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        ExtensionsIconVisibility) {
@@ -2087,9 +2013,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                   ->extensions_container()
                   ->GetVisible());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Test that a download by a web app browser only shows the download UI in that
 // app's window.
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
@@ -2171,7 +2095,6 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                   ->download_display_for_testing()
                   ->IsShowing());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        DisplayModeMediaCSS) {
@@ -3341,11 +3264,7 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_FALSE(helper()->browser_view()->IsFullscreen());
 
   // Test the fullscreen shortcut key.
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS VKEY_ZOOM maps to ash::AcceleratorAction::kToggleFullscreen
-  ui::KeyboardCode fullscreen_key = ui::VKEY_ZOOM;
-  int fullscreen_modifiers = ui::EF_NONE;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ui::KeyboardCode fullscreen_key = ui::VKEY_F;
   int fullscreen_modifiers = ui::EF_COMMAND_DOWN | ui::EF_CONTROL_DOWN;
 #else

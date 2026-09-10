@@ -535,7 +535,7 @@ IN_PROC_BROWSER_TEST_F(PopupTrackerBrowserTest, PopupInTab_IsWindowFalse) {
 }
 
 // TODO(crbug.com/40749398): Test is flaky on Linux.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_PopupInWindow_IsWindowTrue DISABLED_PopupInWindow_IsWindowTrue
 #else
 #define MAYBE_PopupInWindow_IsWindowTrue PopupInWindow_IsWindowTrue

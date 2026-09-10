@@ -515,26 +515,6 @@ IN_PROC_BROWSER_TEST_F(SpeechRecognitionServiceTest, CreateAudioSourceFetcher) {
   // TODO(crbug.com/40753481): Check implementation / sandbox policy on Mac and
   // Windows.
   // TODO(crbug.com/381960795): Re-enable test on Linux once bug is fixed.
-#if BUILDFLAG(IS_CHROMEOS)
-  // Check that Start begins audio recording.
-  // TODO(crbug.com/40166991): Try to mock audio input, maybe with
-  // TestStreamFactory::stream_, to test end-to-end.
-  std::string device_id = media::AudioDeviceDescription::kDefaultDeviceId;
-  media::AudioParameters params(media::AudioParameters::AUDIO_PCM_LOW_LATENCY,
-                                media::ChannelLayoutConfig::Stereo(), 10000,
-                                1000);
-
-  // Create a fake stream factory.
-  std::unique_ptr<StrictMock<TestStreamFactory>> stream_factory =
-      std::make_unique<StrictMock<TestStreamFactory>>();
-  EXPECT_CALL(stream_factory->stream_, Record());
-  audio_source_fetcher_->Start(stream_factory->MakeRemote(), device_id, params);
-  stream_factory->WaitToCreateInputStream();
-
-  EXPECT_EQ(device_id, stream_factory->device_id_);
-  ASSERT_TRUE(stream_factory->params_);
-  EXPECT_TRUE(params.Equals(stream_factory->params_.value()));
-#endif
 
   audio_source_fetcher_->Stop();
   base::RunLoop().RunUntilIdle();

@@ -91,13 +91,4 @@ void PrefServiceFlagsStorage::RegisterPrefs(PrefRegistrySimple* registry) {
   registry->RegisterDictionaryPref(prefs::kAboutFlagsOriginLists);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// static
-void PrefServiceFlagsStorage::RegisterProfilePrefs(
-    user_prefs::PrefRegistrySyncable* registry) {
-  registry->RegisterListPref(prefs::kAboutFlagsEntries);
-  registry->RegisterDictionaryPref(prefs::kAboutFlagsOriginLists);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace flags_ui

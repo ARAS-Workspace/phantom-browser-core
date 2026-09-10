@@ -78,9 +78,6 @@ class TranslatePrefsTest : public testing::Test {
 
   void SetUp() override {
     prefs_.SetString(language::prefs::kAcceptLanguages, std::string());
-#if BUILDFLAG(IS_CHROMEOS)
-    prefs_.SetString(language::prefs::kPreferredLanguages, std::string());
-#endif
     prefs_.registry()->RegisterBooleanPref(
         prefs::kOfferTranslateEnabled, true,
         user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
@@ -615,7 +612,6 @@ TEST_F(TranslatePrefsTest, MoveLanguageUp) {
                                       {"it", "es"});
   accept_languages_tester_->ExpectAcceptLanguagePrefs("it,en,fr,es");
 
-#if !BUILDFLAG(IS_CHROMEOS)
   //---------------------------------------------------------------------------
   // Move with policy-forced languages present.
   // Forced languages should always remain at the top of the languages list and
@@ -658,7 +654,6 @@ TEST_F(TranslatePrefsTest, MoveLanguageUp) {
                                       {"en", "fr", "it", "es", "zh"});
   accept_languages_tester_->ExpectAcceptLanguagePrefs("en,fr,it,es,zh");
   accept_languages_tester_->SetForcedLanguagePrefs({});  // Reset pref
-#endif
 
   //---------------------------------------------------------------------------
   // Below we test cases that result in a valid rearrangement of the list.
@@ -744,7 +739,6 @@ TEST_F(TranslatePrefsTest, MoveLanguageUp) {
                                       {"en", "fr", "it", "es", "zh"});
   accept_languages_tester_->ExpectAcceptLanguagePrefs("es,en,fr,it,zh");
 
-#if !BUILDFLAG(IS_CHROMEOS)
   //---------------------------------------------------------------------------
   // Move with policy-forced languages present.
   // Only test on non-Chrome OS platforms.
@@ -777,7 +771,6 @@ TEST_F(TranslatePrefsTest, MoveLanguageUp) {
   accept_languages_tester_->ExpectAcceptLanguagePrefs("en,es,fr,zh,it");
   accept_languages_tester_->ExpectSelectedLanguagePrefs("zh,it,es");
   accept_languages_tester_->SetForcedLanguagePrefs({});  // Reset pref
-#endif
 }
 
 TEST_F(TranslatePrefsTest, MoveLanguageDown) {
@@ -834,7 +827,6 @@ TEST_F(TranslatePrefsTest, MoveLanguageDown) {
                                       {"fr", "it"});
   accept_languages_tester_->ExpectAcceptLanguagePrefs("en,fr,es,it");
 
-#if !BUILDFLAG(IS_CHROMEOS)
   //---------------------------------------------------------------------------
   // Move with policy-forced languages present.
   // Only test on non-Chrome OS platforms.
@@ -871,7 +863,6 @@ TEST_F(TranslatePrefsTest, MoveLanguageDown) {
   accept_languages_tester_->ExpectAcceptLanguagePrefs("en,es,fr,zh,it");
   accept_languages_tester_->ExpectSelectedLanguagePrefs("es,zh,it");
   accept_languages_tester_->SetForcedLanguagePrefs({});  // Reset pref
-#endif
 
   //---------------------------------------------------------------------------
   // Below we test cases that result in a valid rearrangement of the list.

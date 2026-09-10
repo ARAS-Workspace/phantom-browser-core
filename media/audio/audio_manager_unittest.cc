@@ -568,8 +568,6 @@ TEST_F(AudioManagerTest, CheckMinMaxAudioBufferSizeCallbacks) {
 
 #if BUILDFLAG(IS_MAC)
   CreateAudioManagerForTesting<AudioManagerMac>();
-#elif BUILDFLAG(USE_CRAS) && BUILDFLAG(IS_CHROMEOS)
-  CreateAudioManagerForTesting<AudioManagerCras>();
 #endif
 
   DCHECK(audio_manager_);

@@ -44,10 +44,6 @@
 #include "ui/views/view.h"
 #include "ui/views/view_class_properties.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace views {
 
 namespace {
@@ -56,11 +52,7 @@ static constexpr float kBackgroundBlurSigma = 30.f;
 static constexpr float kBackgroundBlurQuality = 0.33f;
 
 bool ShouldApplyBackgroundBlur() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return chromeos::features::IsSystemBlurEnabled();
-#else
   return true;
-#endif
 }
 
 // MenuScrollButton ------------------------------------------------------------
@@ -474,15 +466,6 @@ void MenuScrollViewContainer::CreateDefaultBorder() {
 void MenuScrollViewContainer::CreateBubbleBorder() {
   BubbleBorder::Shadow shadow_type = BubbleBorder::STANDARD_SHADOW;
   ui::ColorId id = ui::kColorMenuBackground;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (use_ash_system_ui_layout_) {
-    shadow_type = BubbleBorder::CHROMEOS_SYSTEM_UI_SHADOW;
-  }
-  id = ui::kColorAshSystemUIMenuBackground;
-  if (use_ash_system_ui_layout_) {
-    shadow_type = BubbleBorder::CHROMEOS_SYSTEM_UI_SHADOW;
-  }
-#endif
   id = border_color_id_.value_or(id);
 
   auto bubble_border = std::make_unique<BubbleBorder>(arrow_, shadow_type);
@@ -542,10 +525,6 @@ void MenuScrollViewContainer::CreateBubbleBorder() {
         CreateRoundedRectBackground(id, background_rounded_corners_));
     background_view_->layer()->SetRoundedCornerRadius(GetRoundedCorners());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    background_view_->SetBorder(std::make_unique<HighlightBorder>(
-        GetRoundedCorners(), HighlightBorder::Type::kHighlightBorderOnShadow));
-#endif
   } else {
     SetBackground(std::make_unique<BubbleBackground>(bubble_border.get()));
   }

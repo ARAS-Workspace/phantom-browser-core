@@ -27,10 +27,6 @@
 #include "net/test/embedded_test_server/http_response.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/test/guest_session_mixin.h"
-#endif
-
 using testing::Eq;
 
 namespace {
@@ -287,59 +283,3 @@ IN_PROC_BROWSER_TEST_F(ManagedConfigurationAPITest,
   base::RunLoop().RunUntilIdle();
   ASSERT_TRUE(DictValueEquals(GetValues({kKey1, kKey2}), {}));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Test the API behavior in the Guest Session.
-class ManagedConfigurationAPIGuestTest
-    : public ManagedConfigurationAPITestBase {
- public:
-  ManagedConfigurationAPIGuestTest() {
-    // Suppress the InProcessBrowserTest's default behavior of opening
-    // about://blank pages and let the standard startup code open the
-    // chrome://newtab page. The reason is that the navigator.managed API
-    // doesn't work on about://blank pages.
-    set_open_about_blank_on_browser_launch(false);
-  }
-
-  ~ManagedConfigurationAPIGuestTest() override = default;
-  ManagedConfigurationAPIGuestTest(const ManagedConfigurationAPIGuestTest&) =
-      delete;
-  ManagedConfigurationAPIGuestTest& operator=(
-      const ManagedConfigurationAPIGuestTest&) = delete;
-
- protected:
-  // Returns the result of navigator.managed.getManagedConfiguration().
-  content::EvalJsResult GetValuesFromJsApi(
-      const std::vector<std::string>& keys) {
-    content::WebContents* tab =
-        browser()->tab_strip_model()->GetActiveWebContents();
-    if (!tab) {
-      ADD_FAILURE() << "No tab active";
-      return {base::Value(), std::string()};
-    }
-    base::ListValue keys_value;
-    for (const auto& key : keys) {
-      keys_value.Append(key);
-    }
-    return content::EvalJs(
-        tab, content::JsReplace("navigator.managed.getManagedConfiguration($1)",
-                                base::Value(std::move(keys_value))));
-  }
-
- private:
-  ash::GuestSessionMixin guest_session_{&mixin_host_};
-};
-
-IN_PROC_BROWSER_TEST_F(ManagedConfigurationAPIGuestTest, Disabled) {
-  EXPECT_EQ(api(), nullptr);
-  // The JS API should return an error (but not cause a crash - it's a
-  // regression test for b/231283325).
-  EXPECT_THAT(GetValuesFromJsApi({kKey1}),
-              content::EvalJsResult::ErrorIs(
-                  Eq("a JavaScript error: \"NotAllowedError: Service "
-                     "connection error. This API is available only for "
-                     "managed apps.\"\n")));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)

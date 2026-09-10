@@ -297,20 +297,6 @@ IN_PROC_BROWSER_TEST_P(VideoCaptureBrowserTest,
                      std::move(quit_run_loop_on_current_thread_cb), true);
 
   bool must_wait_for_gpu_decode_to_start = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (params_.exercise_accelerated_jpeg_decoding) {
-    // Since the GPU jpeg decoder is created asynchronously while decoding
-    // in software is ongoing, we have to keep pushing frames until a message
-    // arrives that tells us that the GPU decoder is being used. Otherwise,
-    // it may happen that all test frames are decoded using the non-GPU
-    // decoding path before the GPU decoder has started getting used.
-    must_wait_for_gpu_decode_to_start = true;
-    EXPECT_CALL(mock_controller_event_handler_, OnStartedUsingGpuDecode(_))
-        .WillOnce(InvokeWithoutArgs([&must_wait_for_gpu_decode_to_start]() {
-          must_wait_for_gpu_decode_to_start = false;
-        }));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(mock_controller_event_handler_, DoOnNewBuffer(_, _, _))
       .Times(AtLeast(1));
   EXPECT_CALL(mock_controller_event_handler_, OnBufferReady(_, _))

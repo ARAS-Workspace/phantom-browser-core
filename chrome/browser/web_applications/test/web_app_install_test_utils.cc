@@ -181,7 +181,6 @@ webapps::AppId InstallWebApp(Profile* profile,
   // ensure that all browsertest / unit tests classes have the execution of the
   // integration suppressed or overridden.
   WebAppInstallParams params;
-#if !BUILDFLAG(IS_CHROMEOS)
   auto does_test_handle_os_integration = []() {
     return OsIntegrationTestOverride::Get() ||
            OsIntegrationManager::AreOsHooksSuppressedForTesting();
@@ -194,7 +193,6 @@ webapps::AppId InstallWebApp(Profile* profile,
     params.add_to_desktop = false;
     params.add_to_quick_launch_bar = false;
   }
-#endif
   provider->scheduler().InstallFromInfoWithParams(
       std::move(web_app_info), overwrite_existing_manifest_fields,
       install_source, future.GetCallback(), params);

@@ -898,11 +898,11 @@ class ManifestToWebAppInstallInfoTrustedIconTest
     : public ManifestToWebAppInstallInfoJobTest {
  protected:
   bool ShouldPreferMaskable() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
     return true;
 #else
     return false;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
   }
 };
 

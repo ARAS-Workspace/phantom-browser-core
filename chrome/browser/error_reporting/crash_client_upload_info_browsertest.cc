@@ -33,9 +33,7 @@ IN_PROC_BROWSER_TEST_F(CrashClientUploadInfoTest, CollectStatsConsent) {
 
 // Tests that product name returned by GetClientProductInfo() is correct.
 IN_PROC_BROWSER_TEST_F(CrashClientUploadInfoTest, GetClientProductInfo) {
-#if BUILDFLAG(IS_CHROMEOS)
-  constexpr char kProductName[] = "Chrome_ChromeOS";
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #if defined(ADDRESS_SANITIZER)
   constexpr char kProductName[] = "Chrome_Linux_ASan";
 #else

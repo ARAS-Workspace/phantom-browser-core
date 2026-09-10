@@ -103,13 +103,13 @@ class BASE_EXPORT FilePathWatcher {
   struct WatchOptions {
     Type type = Type::kNonRecursive;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
     // The callback will return the full path to a changed file instead of
     // the watched path supplied as |path| when Watch is called.
     // So the full path can be different from the watched path when a folder is
     // watched. In case of any error, it behaves as the original Watch.
     bool report_modified_path = false;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   };
 
   // Callback type for Watch(). |path| points to the file that was updated,
@@ -183,10 +183,10 @@ class BASE_EXPORT FilePathWatcher {
   // Returns true if the platform and OS version support recursive watches.
   static bool RecursiveWatchAvailable();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Whether there are outstanding inotify watches.
   static bool HasWatchesForTest();
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // Starts watching |path| (and its descendants if |type| is kRecursive) for
   // changes. |callback| will be run on the caller's sequence to report such

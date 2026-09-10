@@ -26,9 +26,7 @@ namespace {
 // Tells whether the component is supported on a particular platform wrt to
 // the feature flags.
 bool IsComponentSupported() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // ...however, on Mac/Linux, the component logic is not fully supported. A
   // separate flag enables developing and testing both: IWAs and the component
   // separately on these systems.

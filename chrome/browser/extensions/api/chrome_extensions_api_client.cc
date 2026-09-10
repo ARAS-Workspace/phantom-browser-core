@@ -67,11 +67,6 @@
 
 #if BUILDFLAG(ENABLE_GUEST_VIEW)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/guest_view/app_view/chrome_app_view_guest_delegate.h"
-#include "extensions/browser/api/virtual_keyboard_private/virtual_keyboard_delegate.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/guest_view/mime_handler_view/chrome_mime_handler_view_guest_delegate.h"
 #endif
@@ -90,16 +85,6 @@
 #include "chrome/browser/extensions/api/file_system/chrome_file_system_delegate.h"
 #include "chrome/browser/search/instant_service.h"
 #include "chrome/browser/search/instant_service_factory.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/extensions/api/file_handlers/non_native_file_system_delegate_chromeos.h"
-#include "chrome/browser/extensions/api/file_system/chrome_file_system_delegate_ash.h"
-#include "chrome/browser/extensions/api/file_system/consent_provider_impl.h"
-#include "chrome/browser/extensions/api/media_perception_private/media_perception_api_delegate_chromeos.h"
-#include "chrome/browser/extensions/api/virtual_keyboard_private/chrome_virtual_keyboard_delegate.h"
-#include "chrome/browser/extensions/clipboard_extension_helper_chromeos.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
 #endif
 
 #if BUILDFLAG(ENABLE_PRINTING)
@@ -342,13 +327,6 @@ void ChromeExtensionsAPIClient::OpenFileUrlForTesting(
 
 #if BUILDFLAG(ENABLE_GUEST_VIEW)
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::unique_ptr<AppViewGuestDelegate>
-ChromeExtensionsAPIClient::CreateAppViewGuestDelegate() const {
-  return std::make_unique<ChromeAppViewGuestDelegate>();
-}
-#endif
-
 std::unique_ptr<ExtensionOptionsGuestDelegate>
 ChromeExtensionsAPIClient::CreateExtensionOptionsGuestDelegate(
     ExtensionOptionsGuest* guest) const {
@@ -382,18 +360,6 @@ ChromeExtensionsAPIClient::CreateWebViewPermissionHelperDelegate(
 }
 #endif  // BUILDFLAG(ENABLE_GUEST_VIEW)
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::unique_ptr<ConsentProvider>
-ChromeExtensionsAPIClient::CreateConsentProvider(
-    content::BrowserContext* browser_context) const {
-  auto consent_provider_delegate =
-      std::make_unique<file_system_api::ConsentProviderDelegate>(
-          Profile::FromBrowserContext(browser_context));
-  return std::make_unique<file_system_api::ConsentProviderImpl>(
-      std::move(consent_provider_delegate));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 scoped_refptr<ContentRulesRegistry>
 ChromeExtensionsAPIClient::CreateContentRulesRegistry(
     content::BrowserContext* browser_context,
@@ -403,32 +369,6 @@ ChromeExtensionsAPIClient::CreateContentRulesRegistry(
       base::BindOnce(&CreateDefaultContentPredicateEvaluators,
                      base::Unretained(browser_context)));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool ChromeExtensionsAPIClient::ShouldAllowDetachingUsb(int vid,
-                                                        int pid) const {
-  const base::ListValue* policy_list;
-  if (ash::CrosSettings::Get()->GetList(ash::kUsbDetachableAllowlist,
-                                        &policy_list)) {
-    for (const auto& entry : *policy_list) {
-      const base::DictValue* entry_dict = entry.GetIfDict();
-      if (entry_dict &&
-          entry_dict->FindInt(ash::kUsbDetachableAllowlistKeyVid) == vid &&
-          entry_dict->FindInt(ash::kUsbDetachableAllowlistKeyPid) == pid) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-std::unique_ptr<VirtualKeyboardDelegate>
-ChromeExtensionsAPIClient::CreateVirtualKeyboardDelegate(
-    content::BrowserContext* browser_context) const {
-  return std::make_unique<ChromeVirtualKeyboardDelegate>(browser_context);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 ManagementAPIDelegate* ChromeExtensionsAPIClient::CreateManagementAPIDelegate()
     const {
@@ -466,11 +406,7 @@ MessagingDelegate* ChromeExtensionsAPIClient::GetMessagingDelegate() {
 #if !BUILDFLAG(IS_ANDROID)
 FileSystemDelegate* ChromeExtensionsAPIClient::GetFileSystemDelegate() {
   if (!file_system_delegate_) {
-#if BUILDFLAG(IS_CHROMEOS)
-    file_system_delegate_ = std::make_unique<ChromeFileSystemDelegateAsh>();
-#else
     file_system_delegate_ = std::make_unique<ChromeFileSystemDelegate>();
-#endif
   }
   return file_system_delegate_.get();
 }
@@ -493,40 +429,6 @@ ChromeExtensionsAPIClient::GetAutomationInternalApiDelegate() {
   return extensions_automation_api_delegate_.get();
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-MediaPerceptionAPIDelegate*
-ChromeExtensionsAPIClient::GetMediaPerceptionAPIDelegate() {
-  if (!media_perception_api_delegate_) {
-    media_perception_api_delegate_ =
-        std::make_unique<MediaPerceptionAPIDelegateChromeOS>();
-  }
-  return media_perception_api_delegate_.get();
-}
-
-NonNativeFileSystemDelegate*
-ChromeExtensionsAPIClient::GetNonNativeFileSystemDelegate() {
-  if (!non_native_file_system_delegate_) {
-    non_native_file_system_delegate_ =
-        std::make_unique<NonNativeFileSystemDelegateChromeOS>();
-  }
-  return non_native_file_system_delegate_.get();
-}
-
-void ChromeExtensionsAPIClient::SaveImageDataToClipboard(
-    std::vector<uint8_t> image_data,
-    api::clipboard::ImageType type,
-    AdditionalDataItemList additional_items,
-    base::OnceClosure success_callback,
-    base::OnceCallback<void(const std::string&)> error_callback) {
-  if (!clipboard_extension_helper_) {
-    clipboard_extension_helper_ = std::make_unique<ClipboardExtensionHelper>();
-  }
-  clipboard_extension_helper_->DecodeAndSaveImageData(
-      std::move(image_data), type, std::move(additional_items),
-      std::move(success_callback), std::move(error_callback));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 std::vector<KeyedServiceBaseFactory*>
 ChromeExtensionsAPIClient::GetFactoryDependencies() {

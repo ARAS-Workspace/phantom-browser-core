@@ -76,11 +76,9 @@
 #include "ui/views/bubble/bubble_dialog_model_host.h"
 #include "ui/views/controls/styled_label.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/signin/promos/bubble_signin_promo_view.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_sign_in_promo_bubble_view.h"
 #include "components/sync/base/features.h"
-#endif
 
 using base::UserMetricsAction;
 using bookmarks::BookmarkModel;
@@ -164,7 +162,6 @@ actions::ActionItem& GetBookmarkActionItem(BrowserWindowInterface* bwi) {
   return *action_item;
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void MaybeShowSignInPromo(bool already_bookmarked,
                           Profile* profile,
                           views::BubbleAnchor bubble_anchor,
@@ -192,7 +189,6 @@ void MaybeShowSignInPromo(bool already_bookmarked,
   views::BubbleDialogDelegateView::CreateBubble(std::move(bubble));
   bubble_ptr->ShowForReason(LocationBarBubbleDelegateView::USER_GESTURE);
 }
-#endif
 
 }  // namespace
 
@@ -511,11 +507,9 @@ void BookmarkBubbleView::ShowBubble(
                          base::Unretained(bubble_delegate)))
       .AddOkButton(base::BindOnce(&BookmarkBubbleDelegate::ApplyEdits,
                                   base::Unretained(bubble_delegate))
-#if !BUILDFLAG(IS_CHROMEOS)
                        .Then(base::BindOnce(
                            MaybeShowSignInPromo, already_bookmarked, profile,
                            bubble_anchor, web_contents, bookmark_node))
-#endif
                        ,
                    ui::DialogModel::Button::Params()
                        .SetLabel(l10n_util::GetStringUTF16(IDS_DONE))
@@ -580,7 +574,6 @@ void BookmarkBubbleView::ShowBubble(
     bubble->SetFootnoteView(
         std::make_unique<commerce::ShoppingCollectionIphView>());
   } else if (signin::ShouldShowBookmarkSignInPromo(*profile)) {
-#if !BUILDFLAG(IS_CHROMEOS)
     if (!base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)) {
       // TODO(pbos): Consider adding model support for footnotes so that this
       // does not need to be tied to views.
@@ -591,7 +584,6 @@ void BookmarkBubbleView::ShowBubble(
           syncer::LocalDataItemModel::DataId(bookmark_node->id()),
           ui::ButtonStyle::kDefault));
     }
-#endif
   }
 
   bubble_delegate->SetCloseCallback(std::move(post_save_callback));

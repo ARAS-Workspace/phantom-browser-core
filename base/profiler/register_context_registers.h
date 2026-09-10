@@ -14,7 +14,7 @@
 #include "base/compiler_specific.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #include <sys/ucontext.h>
 #elif BUILDFLAG(IS_APPLE)
 #include <mach/machine/thread_status.h>
@@ -36,7 +36,7 @@ uintptr_t& AsUintPtr(T* value) {
   return *reinterpret_cast<uintptr_t*>(value);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 
 inline uintptr_t RegisterContextStackPointer(mcontext_t* context) {
 #if defined(ARCH_CPU_ARMEL)

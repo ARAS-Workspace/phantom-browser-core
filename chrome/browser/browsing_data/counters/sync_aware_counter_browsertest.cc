@@ -162,12 +162,10 @@ IN_PROC_BROWSER_TEST_F(SyncAwareCounterTest, AutofillCounter) {
   EXPECT_TRUE(IsSyncEnabled());
 
   // Signout isn't possible on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   // Stopping the Sync service triggers a restart.
   GetClient(0)->SignOutPrimaryAccount();
   WaitForCounting();
   EXPECT_FALSE(IsSyncEnabled());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 // Test that the counting restarts when password sync state changes.
@@ -235,12 +233,10 @@ IN_PROC_BROWSER_TEST_F(SyncAwareCounterTest, PasswordCounter) {
   EXPECT_TRUE(IsSyncEnabled());
 
   // Signout isn't possible on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   // Stopping the Sync service triggers a restart.
   GetClient(0)->SignOutPrimaryAccount();
   WaitForCounting();
   EXPECT_FALSE(IsSyncEnabled());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 // Test that the counting restarts when history sync state changes.
@@ -327,12 +323,10 @@ IN_PROC_BROWSER_TEST_F(SyncAwareCounterTest, HistoryCounter) {
   // active again.
 
   // Signout isn't possible on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   // Stopping the Sync service triggers a restart.
   GetClient(0)->SignOutPrimaryAccount();
   WaitForCounting();
   EXPECT_FALSE(IsSyncEnabled());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace

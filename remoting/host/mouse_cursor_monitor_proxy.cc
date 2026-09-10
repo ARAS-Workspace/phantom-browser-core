@@ -21,10 +21,6 @@
 #include "third_party/webrtc/modules/desktop_capture/mouse_cursor.h"
 #include "third_party/webrtc/modules/desktop_capture/mouse_cursor_monitor.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "remoting/host/chromeos/mouse_cursor_monitor_aura.h"
-#endif
-
 namespace remoting {
 
 class MouseCursorMonitorProxy::Core

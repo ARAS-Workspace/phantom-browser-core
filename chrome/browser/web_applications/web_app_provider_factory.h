@@ -17,17 +17,6 @@ class Profile;
 
 namespace web_app {
 
-#if BUILDFLAG(IS_CHROMEOS)
-// The possible states of the link capturing preference migration. This state is
-// persisted in the preference system to prevent running the migration multiple
-// times when the feature flag remains in the same state.
-enum class MigrationState {
-  kDefaultOff = 0,
-  kDefaultOn = 1,
-  kOnViaClientMode = 2,
-};
-#endif
-
 class WebAppProvider;
 
 // Singleton that owns all WebAppProviderFactories and associates them with

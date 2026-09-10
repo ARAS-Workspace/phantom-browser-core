@@ -33,7 +33,7 @@
 #include "partition_alloc/shim/allocator_shim_default_dispatch_to_partition_alloc_internal.h"
 #include "partition_alloc/shim/allocator_shim_internals.h"
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)
+#if PA_BUILDFLAG(IS_LINUX)
 #include <malloc.h>
 #endif
 
@@ -1161,7 +1161,7 @@ SHIM_ALWAYS_EXPORT int mallopt(int cmd, int value) __THROW {
 
 #endif  // !PA_BUILDFLAG(IS_APPLE) && !PA_BUILDFLAG(IS_ANDROID)
 
-#if PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)
+#if PA_BUILDFLAG(IS_LINUX)
 SHIM_ALWAYS_EXPORT struct mallinfo mallinfo(void) __THROW {
   partition_alloc::SimplePartitionStatsDumper allocator_dumper;
   // TODO(crbug.com/477186304): Dump stats for all alloc tokens, by accumulating
@@ -1189,7 +1189,7 @@ SHIM_ALWAYS_EXPORT struct mallinfo mallinfo(void) __THROW {
 
   return info;
 }
-#endif  // PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)
+#endif  // PA_BUILDFLAG(IS_LINUX)
 
 }  // extern "C"
 

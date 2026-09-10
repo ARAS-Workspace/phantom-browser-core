@@ -20,10 +20,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/events/test/event_generator.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/aura/window.h"
-#endif
-
 class BrowserShutdownBrowserTest : public InProcessBrowserTest {
  public:
   BrowserShutdownBrowserTest() = default;
@@ -40,7 +36,6 @@ class BrowserShutdownBrowserTest : public InProcessBrowserTest {
 
 // ChromeOS has the different shutdown flow on user initiated exit process.
 // See the comment for chrome::AttemptUserExit() function declaration.
-#if !BUILDFLAG(IS_CHROMEOS)
 // Mac browser shutdown is flaky: https://crbug.com/40201651
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ClosingShutdownHistograms DISABLED_ClosingShutdownHistograms
@@ -112,21 +107,3 @@ IN_PROC_BROWSER_TEST_F(BrowserShutdownBrowserTest,
       static_cast<int>(browser_shutdown::ShutdownType::kWindowClose), 1);
   histogram_tester_.ExpectTotalCount("Shutdown.WindowClose.Time2", 1);
 }
-#else
-// On Chrome OS, the shutdown accelerator is handled by Ash and requires
-// confirmation, so Chrome shouldn't try to shut down after it's been hit one
-// time. Regression test for crbug.com/40572237
-IN_PROC_BROWSER_TEST_F(BrowserShutdownBrowserTest, ShutdownConfirmation) {
-  const int modifiers = ui::EF_CONTROL_DOWN | ui::EF_SHIFT_DOWN;
-
-  ui::test::EventGenerator generator(
-      browser()->GetWindow()->GetNativeWindow()->GetRootWindow());
-
-  // Press the accelerator for quitting.
-  generator.PressKey(ui::VKEY_Q, modifiers);
-  generator.ReleaseKey(ui::VKEY_Q, modifiers);
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(browser_shutdown::IsTryingToQuit());
-}
-#endif  // !BUILDFLAG(IS_CHROMEOS)

@@ -452,7 +452,7 @@ TEST_P(HttpAuthManagerTest, CrossOriginLeakViaStaleBiometricObserver) {
   httpauth_manager_.reset();
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 // The biometric reauth prompt should name the origin of the challenger.
 TEST_P(HttpAuthManagerTest, HttpAuthFillingReauthMessageUsesChallengerOrigin) {
   EXPECT_CALL(client_, IsFillingEnabled).WillRepeatedly(Return(true));
@@ -513,7 +513,7 @@ TEST_P(HttpAuthManagerTest, HttpAuthFillingReauthMessageUsesChallengerOrigin) {
   testing::Mock::VerifyAndClearExpectations(&store_);
   httpauth_manager()->DetachObserver(&observer);
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
 TEST_P(HttpAuthManagerTest, HttpAuthSaving) {
   for (bool filling_and_saving_enabled : {true, false}) {

@@ -25,7 +25,7 @@ using InteractionMediaQueriesDynamicTest = ContentBrowserTest;
 // Test that interaction media queries update dynamically when pointer/hover
 // capabilities change. On desktop, setting (pointer: coarse) + (hover: hover)
 // should produce a primary (pointer: coarse) and primary (hover: hover).
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_F(InteractionMediaQueriesDynamicTest,
                        PointerMediaQueriesDynamic) {
   std::optional<ui::ScopedSetPointerAndHoverTypesForTesting> scoper(

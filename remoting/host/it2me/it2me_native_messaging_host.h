@@ -21,9 +21,7 @@
 #include "remoting/host/it2me/reconnect_params.h"
 #include "remoting/protocol/errors.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "remoting/host/native_messaging/log_message_handler.h"
-#endif
 
 namespace base {
 class SingleThreadTaskRunner;
@@ -121,11 +119,9 @@ class It2MeNativeMessagingHost : public It2MeHost::Observer,
   PassthroughOAuthTokenGetter signaling_token_getter_;
   PassthroughOAuthTokenGetter api_token_getter_;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Don't install a log message handler on ChromeOS because we run in the
   // browser process and don't want to intercept all its log messages.
   std::unique_ptr<LogMessageHandler> log_message_handler_;
-#endif
 
   // Cached, read-only copies of |it2me_host_| session state.
   It2MeHostState state_ = It2MeHostState::kDisconnected;

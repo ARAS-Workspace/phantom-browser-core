@@ -273,7 +273,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksBrowserTest,
 }
 
 // TODO(crbug.com/487147580): Re-enable the test
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_Composebox_Submit DISABLED_Composebox_Submit
 #else
 #define MAYBE_Composebox_Submit Composebox_Submit
@@ -283,7 +283,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksBrowserTest, MAYBE_Composebox_Submit) {
 }
 
 // TODO(crbug.com/480689282): Flaky on Linux and ChromeOS.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_Composebox_ZeroState DISABLED_Composebox_ZeroState
 #else
 #define MAYBE_Composebox_ZeroState Composebox_ZeroState

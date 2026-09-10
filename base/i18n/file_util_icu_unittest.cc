@@ -140,25 +140,4 @@ TEST_F(FileUtilICUTest, IsFilenameLegalTest) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-static const struct normalize_name_encoding_test_cases {
-  const char* original_path;
-  const char* normalized_path;
-} kNormalizeFileNameEncodingTestCases[] = {
-    {"foo_na\xcc\x88me.foo", "foo_n\xc3\xa4me.foo"},
-    {"foo_dir_na\xcc\x88me/foo_na\xcc\x88me.foo",
-     "foo_dir_na\xcc\x88me/foo_n\xc3\xa4me.foo"},
-    {"", ""},
-    {"foo_dir_na\xcc\x88me/", "foo_dir_n\xc3\xa4me"}};
-
-TEST_F(FileUtilICUTest, NormalizeFileNameEncoding) {
-  for (const auto& test_case : kNormalizeFileNameEncodingTestCases) {
-    FilePath path(test_case.original_path);
-    NormalizeFileNameEncoding(&path);
-    EXPECT_EQ(FilePath(test_case.normalized_path), path);
-  }
-}
-
-#endif
-
 }  // namespace base::i18n

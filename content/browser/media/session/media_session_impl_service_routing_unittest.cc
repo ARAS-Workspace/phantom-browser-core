@@ -736,35 +736,6 @@ TEST_F(MediaSessionImplServiceRoutingTest,
 
 // We hide the media metadata only from CrOS' media controls by replacing the
 // metadata in the MediaSessionImpl with some placeholder metadata.
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(MediaSessionImplServiceRoutingTest, HideMediaMetadataInCrOS) {
-  client_.SetShouldHideMetadata(true);
-
-  media_session::MediaMetadata expected_metadata;
-  expected_metadata.title = hidden_metadata_placeholder_title;
-  expected_metadata.artist = hidden_metadata_placeholder_artist;
-  expected_metadata.album = hidden_metadata_placeholder_album;
-  expected_metadata.source_title = hidden_metadata_placeholder_source_title;
-
-  CreateServiceForFrame(main_frame_);
-  StartPlayerForFrame(main_frame_);
-
-  {
-    media_session::test::MockMediaSessionMojoObserver observer(
-        *GetMediaSession());
-
-    blink::mojom::SpecMediaMetadataPtr spec_metadata(
-        blink::mojom::SpecMediaMetadata::New());
-    spec_metadata->title = u"title";
-    spec_metadata->artist = u"artist";
-    spec_metadata->album = u"album";
-
-    services_[main_frame_]->SetMetadata(std::move(spec_metadata));
-
-    observer.WaitForExpectedMetadata(expected_metadata);
-  }
-}
-#else  // !BUILDFLAG(IS_CHROMEOS)
 TEST_F(MediaSessionImplServiceRoutingTest, DontHideMediaMetadataInNonCrOS) {
   client_.SetShouldHideMetadata(true);
 
@@ -792,7 +763,6 @@ TEST_F(MediaSessionImplServiceRoutingTest, DontHideMediaMetadataInNonCrOS) {
     observer.WaitForExpectedMetadata(expected_metadata);
   }
 }
-#endif
 
 TEST_F(MediaSessionImplServiceRoutingTest,
        NotifyObserverMetadataEmptyWhenControllable) {
@@ -1091,17 +1061,8 @@ TEST_F(MediaSessionImplServiceRoutingTest,
 
   services_[main_frame_]->SetMetadata(std::move(spec_metadata));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // We hide the image only from CrOS' media controls by replacing the it with a
-  // default image in the MediaSessionImpl.
-  std::vector<media_session::MediaImage> images_with_default;
-  images_with_default.push_back(media_session::MediaImage());
-  observer.WaitForExpectedImagesOfType(MediaSessionImageType::kArtwork,
-                                       images_with_default);
-#else  // !BUILDFLAG(IS_CHROMEOS)
   observer.WaitForExpectedImagesOfType(MediaSessionImageType::kArtwork,
                                        expected_images);
-#endif
 }
 
 TEST_F(MediaSessionImplServiceRoutingTest, StopBehaviourDefault) {

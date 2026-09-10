@@ -1287,9 +1287,6 @@ IN_PROC_BROWSER_TEST_F(
 IN_PROC_BROWSER_TEST_F(BrowsingDataModelBrowserTest,
                        RestrictYouTubeCookiesDeletion) {
   policy::PolicyMap policies;
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::SetEnterpriseUsersDefaults(&policies);
-#endif
   policies.Set(policy::key::kRestrictYouTubeCookiesDeletion,
                policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
                policy::POLICY_SOURCE_CLOUD, base::Value(true), nullptr);
@@ -1317,9 +1314,6 @@ IN_PROC_BROWSER_TEST_F(BrowsingDataModelBrowserTest,
 IN_PROC_BROWSER_TEST_F(BrowsingDataModelBrowserTest,
                        RestrictYouTubeCookiesDeletion_Disabled) {
   policy::PolicyMap policies;
-#if BUILDFLAG(IS_CHROMEOS)
-  policy::SetEnterpriseUsersDefaults(&policies);
-#endif
   policies.Set(policy::key::kRestrictYouTubeCookiesDeletion,
                policy::POLICY_LEVEL_MANDATORY, policy::POLICY_SCOPE_USER,
                policy::POLICY_SOURCE_CLOUD, base::Value(false), nullptr);

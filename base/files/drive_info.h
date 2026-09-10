@@ -47,7 +47,7 @@ struct BASE_EXPORT DriveInfo {
   // Whether the drive has a seek penalty (i.e. is or is not a spinning disk).
   std::optional<bool> has_seek_penalty;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Whether the drive is a "removable" drive.
   //
   // In macOS's IOKit API, a drive is "removable" if "the media is removable

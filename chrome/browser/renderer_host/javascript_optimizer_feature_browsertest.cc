@@ -1083,7 +1083,7 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/461777786): Flaky on Linux and CrOS.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ExpectOptimizationsEnabledInSpareRenderer \
   DISABLED_ExpectOptimizationsEnabledInSpareRenderer
 #else

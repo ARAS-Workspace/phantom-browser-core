@@ -26,22 +26,12 @@
 #include "ui/display/display.h"
 #include "ui/display/screen.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/window_sizer/window_sizer_chromeos.h"
-#endif
-
 namespace {
 
 // Minimum height of the visible part of a window.
 const int kMinVisibleHeight = 30;
 // Minimum width of the visible part of a window.
 const int kMinVisibleWidth = 30;
-
-#if BUILDFLAG(IS_CHROMEOS)
-// This specifies the minimum percentage of a window's dimension (either width
-// or height) that must remain visible with the display area.
-constexpr float kMinVisibleRatio = 0.3f;
-#endif
 
 ui::BaseWindow* FindMostRecentWindow(
     base::FunctionRef<bool(BrowserWindowInterface*)> matcher) {
@@ -138,12 +128,6 @@ class DefaultStateProvider : public WindowSizer::StateProvider {
             if (!web_app::AppBrowserController::IsForWebApp(browser, app_id)) {
               return false;
             }
-#if BUILDFLAG(IS_CHROMEOS)
-            if (display::Screen::Get()->GetDisplayNearestWindow(
-                    browser->GetWindow()->GetNativeWindow()) != display) {
-              return false;
-            }
-#endif
             if (!BrowserWindow::FromBrowser(browser)->IsOnCurrentWorkspace())
               return false;
             return true;
@@ -236,11 +220,7 @@ void WindowSizer::GetBrowserWindowBoundsAndShowState(
     ui::mojom::WindowShowState* show_state) {
   DCHECK(bounds);
   DCHECK(show_state);
-#if BUILDFLAG(IS_CHROMEOS)
-  WindowSizerChromeOS sizer(std::move(state_provider), browser);
-#else
   WindowSizer sizer(std::move(state_provider), browser);
-#endif
   // Pre-populate the window state with our default.
   *show_state = GetWindowDefaultShowState(browser);
   *bounds = specified_bounds;
@@ -416,13 +396,6 @@ void WindowSizer::AdjustBoundsToBeVisibleOnDisplay(
   // `kMinVisibleRatio` of width and height is visible on ChromeOS.
   int min_visible_width = kMinVisibleWidth;
   int min_visible_height = kMinVisibleHeight;
-#if BUILDFLAG(IS_CHROMEOS)
-  min_visible_width = std::max(
-      min_visible_width, base::ClampRound(bounds->width() * kMinVisibleRatio));
-  min_visible_height =
-      std::max(min_visible_height,
-               base::ClampRound(bounds->height() * kMinVisibleRatio));
-#endif  // BUILDFLAG(IS_CHROMEOS)
   const int min_y = work_area.y() + min_visible_height - bounds->height();
   const int min_x = work_area.x() + min_visible_width - bounds->width();
   const int max_y = work_area.bottom() - min_visible_height;
@@ -470,10 +443,5 @@ ui::mojom::WindowShowState WindowSizer::GetWindowDefaultShowState(
 
 // static
 display::Display WindowSizer::GetDisplayForNewWindow(const gfx::Rect& bounds) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Prefer the display where the user last activated a window.
-  return display::Screen::Get()->GetDisplayForNewWindows();
-#else
   return display::Screen::Get()->GetDisplayMatching(bounds);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }

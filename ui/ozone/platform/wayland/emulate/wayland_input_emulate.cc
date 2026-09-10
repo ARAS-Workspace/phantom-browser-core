@@ -24,12 +24,6 @@
 #include "ui/ozone/platform/wayland/host/xdg_popup.h"
 #include "ui/ozone/platform/wayland/host/xdg_toplevel.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/base/wayland/wayland_display_util.h"
-#include "ui/display/manager/managed_display_info.h"
-#include "ui/display/test/display_test_util.h"
-#endif
-
 namespace wl {
 
 namespace {

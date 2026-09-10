@@ -93,10 +93,6 @@
 #include "net/http/http_auth_handler_negotiate.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "services/network/mock_mojo_dhcp_wpad_url_client.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(USE_BLINK)
 #include "services/network/test_mojo_proxy_resolver_factory.h"
 #endif  // BUILDFLAG(USE_BLINK)
@@ -365,7 +361,7 @@ TEST_F(NetworkServiceTest, AuthDefaultParams) {
 #if BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
   ASSERT_TRUE(auth_handler_factory->IsSchemeAllowedForTesting(
       net::kNegotiateAuthScheme));
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_POSIX)
   EXPECT_EQ("", auth_handler_factory->GetNegotiateLibraryNameForTesting());
 #endif
 #endif  // BUILDFLAG(USE_KERBEROS) && !BUILDFLAG(IS_ANDROID)
@@ -1474,7 +1470,7 @@ TEST_P(NetworkServiceCookieTest, CookieEncryptionProvider) {
       // cookie_config::GetCookieCryptoDelegate only returns a valid OSCrypt
       // crypto delegate on some platforms. On other platforms, there is no
       // cookie crypto as it's handled by the OS.
-#if !(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if !(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
       expect_encrypted_data = false;
 #endif
     }
@@ -2372,11 +2368,6 @@ TEST_F(NetworkServiceNetworkDelegateTest,
       net::ProxyConfigWithAnnotation(net::ProxyConfig::CreateFromCustomPacURL(
                                          GURL("https://not.a.real.proxy.test")),
                                      kTestPacFetchAnnotation);
-#if BUILDFLAG(IS_CHROMEOS)
-  context_params->dhcp_wpad_url_client =
-      network::MockMojoDhcpWpadUrlClient::CreateWithSelfOwnedReceiver(
-          std::string());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   CreateNetworkContext(std::move(context_params));
 
   // Load an arbitrary URL. This should trigger the PAC fetch.

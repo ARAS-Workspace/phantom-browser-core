@@ -109,9 +109,6 @@ bool Is1pNtpUrl(const GURL& url) {
 const char kEffectiveSize[] = "effective_size";
 const char kSize[] = "size";
 const char kAllocatedObjectsSize[] = "allocated_objects_size";
-#if BUILDFLAG(IS_CHROMEOS)
-const char kNonExoSize[] = "non_exo_size";
-#endif
 
 constexpr int kKiB = 1024;
 constexpr int kMiB = 1024 * 1024;
@@ -341,10 +338,6 @@ const Metric kAllocatorDumpNamesForMetrics[] = {
      EmitTo::kSizeInUmaOnly, nullptr},
     {"gpu/shared_images", "SharedImages.Purgeable", MetricSize::kLarge,
      "purgeable_size", EmitTo::kSizeInUmaOnly, nullptr},
-#if BUILDFLAG(IS_CHROMEOS)
-    {"gpu/shared_images", "SharedImages.NonExo", MetricSize::kLarge,
-     kNonExoSize, EmitTo::kSizeInUmaOnly, nullptr},
-#endif  // BUILDFLAG(IS_CHROMEOS)
     {"gpu/transfer_cache", "ServiceTransferCache", MetricSize::kCustom, kSize,
      EmitTo::kSizeInUmaOnly, nullptr, ImageSizeMetricRange},
     {"gpu/transfer_cache", "ServiceTransferCache.AvgImageSize",
@@ -1109,7 +1102,7 @@ void EmitProcessUmaAndUkm(const GlobalMemoryDump::ProcessDump& pmd,
 
   builder->SetPrivateMemoryFootprint(pmd.os_dump().private_footprint_kb / kKiB);
   builder->SetSharedMemoryFootprint(pmd.os_dump().shared_footprint_kb / kKiB);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   builder->SetPrivateSwapFootprint(pmd.os_dump().private_footprint_swap_kb /
                                    kKiB);
 #endif
@@ -1129,7 +1122,7 @@ void EmitProcessUmaAndUkm(const GlobalMemoryDump::ProcessDump& pmd,
       base::StrCat(
           {kMemoryHistogramPrefix, process_name, ".SharedMemoryFootprint"}),
       pmd.os_dump().shared_footprint_kb / kKiB);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   MEMORY_METRICS_HISTOGRAM_MB(
       base::StrCat(
           {kMemoryHistogramPrefix, process_name, ".PrivateSwapFootprint"}),
@@ -1189,26 +1182,6 @@ void EmitSummedGpuMemory(const GlobalMemoryDump::ProcessDump& pmd,
   if (record_uma)
     EmitProcessUma(HistogramProcessType::kGpu, synthetic_metric, total);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void EmitGpuMemoryNonExo(const GlobalMemoryDump::ProcessDump& pmd,
-                         bool record_uma) {
-  if (!record_uma) {
-    return;
-  }
-  Metric synthetic_metric = {
-      nullptr, "GpuMemoryNonExo",      MetricSize::kLarge,
-      kSize,   EmitTo::kSizeInUmaOnly, nullptr};
-
-  // Combine several categories together to sum up Chrome-reported gpu memory.
-  uint64_t total = 0;
-  total += pmd.GetMetric("gpu/shared_images", kNonExoSize).value_or(0);
-  total += pmd.GetMetric("skia/gpu_resources", kSize).value_or(0);
-
-  // We only report this metric for the GPU process, so we always use kGpu.
-  EmitProcessUma(HistogramProcessType::kGpu, synthetic_metric, total);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void EmitBrowserMemoryMetrics(const GlobalMemoryDump::ProcessDump& pmd,
                               ukm::SourceId ukm_source_id,
@@ -1311,9 +1284,6 @@ void EmitGpuMemoryMetrics(const GlobalMemoryDump::ProcessDump& pmd,
   EmitProcessUmaAndUkm(pmd, HistogramProcessType::kGpu, uptime, record_uma,
                        &builder);
   EmitSummedGpuMemory(pmd, &builder, record_uma);
-#if BUILDFLAG(IS_CHROMEOS)
-  EmitGpuMemoryNonExo(pmd, record_uma);
-#endif
   builder.Record(ukm_recorder);
 }
 
@@ -1795,17 +1765,6 @@ void ProcessMemoryMetricsEmitter::ReceivedMemoryDump(
     // processes.
     per_tab_metrics.RecordPmfs(GetUkmRecorder());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    base::SystemMemoryInfo system_meminfo;
-    if (base::GetSystemMemoryInfo(&system_meminfo)) {
-      const base::ByteSizeDelta mem_used =
-          system_meminfo.total - system_meminfo.available;
-      UMA_HISTOGRAM_LARGE_MEMORY_MB("Memory.System.MemAvailableMB",
-                                    system_meminfo.available.InMiB());
-      UMA_HISTOGRAM_LARGE_MEMORY_MB("Memory.System.MemUsedMB",
-                                    mem_used.InMiB());
-    }
-#endif
   }
 }
 

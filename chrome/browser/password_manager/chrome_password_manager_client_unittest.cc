@@ -812,7 +812,7 @@ TEST_F(ChromePasswordManagerClientTest, OnNonPasswordLoginDetectedOpenerCycle) {
       "PasswordManager.FederatedLogin.SavePromptPrevented", false, 1);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Test for the PasswordManagerBlocklist policy.
 TEST_F(ChromePasswordManagerClientTest, PasswordManagerBlocklistPolicy) {
   // Make sure saving passwords is enabled.
@@ -854,7 +854,7 @@ TEST_F(ChromePasswordManagerClientTest, PasswordManagerBlocklistPolicy) {
   EXPECT_TRUE(GetClient()->IsSavingAndFillingEnabled(
       url::Origin::Create(GURL("https://example.com"))));
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 TEST_F(ChromePasswordManagerClientTest,
        PasswordManagerReceivesAutofillPredictions) {
@@ -1251,7 +1251,7 @@ TEST_F(ChromePasswordManagerClientTest,
       url::Origin::Create(GURL("https://passwords.google.com/path?query=1"))));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 // Test that authentication is not possible if the `authenticator` is `nullptr`.
 TEST_F(ChromePasswordManagerClientTest, CanUseBiometricAuthNoAuthenticator) {
   EXPECT_FALSE(GetClient()->IsReauthBeforeFillingRequired(
@@ -1281,7 +1281,7 @@ TEST_F(ChromePasswordManagerClientTest, CanUseBiometricAuthSettingDisabled) {
       password_manager::prefs::kBiometricAuthenticationBeforeFilling, false);
   EXPECT_FALSE(GetClient()->IsReauthBeforeFillingRequired(&authenticator));
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_MAC)
 // Test that authentication is possible if both the biometric authentication
@@ -1296,21 +1296,6 @@ TEST_F(ChromePasswordManagerClientTest, CanUseBiometricAuthSettingEnabled) {
   EXPECT_TRUE(GetClient()->IsReauthBeforeFillingRequired(&authenticator));
 }
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Test that authentication is possible if biometric authentication
-// hardware is available and the user configured the corresponding setting.
-TEST_F(ChromePasswordManagerClientTest,
-       CanUseBiometricAuthSettingEnabledKillFlagEnabled) {
-  device_reauth::MockDeviceAuthenticator authenticator;
-  // Both prefs are registered by the `PasswordManager`.
-  TestingBrowserProcess::GetGlobal()->local_state()->SetBoolean(
-      password_manager::prefs::kHadBiometricsAvailable, true);
-  profile()->GetTestingPrefService()->SetBoolean(
-      password_manager::prefs::kBiometricAuthenticationBeforeFilling, true);
-  EXPECT_TRUE(GetClient()->IsReauthBeforeFillingRequired(&authenticator));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 // Test that authentication is not possible if the `authenticator` is `nullptr`.

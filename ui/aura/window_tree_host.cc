@@ -641,11 +641,9 @@ void WindowTreeHost::OnDisplayMetricsChanged(const display::Display& display,
 // Chrome OS is handled in WindowTreeHostManager::OnDisplayMetricsChanged.
 // Chrome OS requires additional handling for the bounds that we do not need to
 // do for other OSes.
-#if !BUILDFLAG(IS_CHROMEOS)
   if (metrics & DISPLAY_METRIC_DEVICE_SCALE_FACTOR &&
       display.id() == GetDisplayId())
     OnHostResizedInPixels(GetBoundsInPixels().size());
-#endif
 }
 
 void WindowTreeHost::OnDisplayColorSpacesChanged(
@@ -769,24 +767,11 @@ void WindowTreeHost::MoveCursorToInternal(const gfx::Point& root_location,
 void WindowTreeHost::OnCompositingAckDeprecated(ui::Compositor* compositor) {
   // Currently, input is only throttled on ash and is not well supported on
   // other platforms. See crbug.com/41359082.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!holding_pointer_moves_)
-    return;
-
-  dispatcher_->ReleasePointerMoves();
-  holding_pointer_moves_ = false;
-#endif
 }
 
 void WindowTreeHost::OnCompositingChildResizing(ui::Compositor* compositor) {
   // Currently, input is only throttled on ash and is not well supported on
   // other platforms. See crbug.com/41359082.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!Env::GetInstance()->throttle_input_on_resize() || holding_pointer_moves_)
-    return;
-  dispatcher_->HoldPointerMoves();
-  holding_pointer_moves_ = true;
-#endif
 }
 
 void WindowTreeHost::OnFrameSinksToThrottleUpdated(

@@ -274,14 +274,14 @@ class ProfileAttributesStorage {
   void LoadGAIAPictureIfNeeded();
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Migrate any legacy profile names ("First user", "Default Profile") to
   // new style default names ("Person 1"). Rename any duplicates of "Person n"
   // i.e. Two or more profiles with the profile name "Person 1" would be
   // recomputed to "Person 1" and "Person 2".
   void MigrateLegacyProfileNamesAndRecomputeIfNeeded();
   static void SetLegacyProfileMigrationForTesting(bool value);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Called when the picture given by |key| has been loaded from disk and
   // decoded into |image|.
@@ -347,10 +347,10 @@ class ProfileAttributesStorage {
 
   const base::FilePath user_data_dir_;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   // PersistentRepeatingTimer for periodically logging profile metrics.
   std::unique_ptr<signin::PersistentRepeatingTimer> repeating_timer_;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::WeakPtrFactory<ProfileAttributesStorage> weak_ptr_factory_{this};
 };

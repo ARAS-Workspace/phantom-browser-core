@@ -41,10 +41,6 @@
 #include "ui/events/event_constants.h"
 #include "ui/events/keycodes/keyboard_codes.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif
-
 using auto_launch_util::StartupLaunchMode;
 
 namespace {
@@ -243,7 +239,6 @@ IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerUiTest, HotkeyPressed) {
 
 // In ChromeOS, we do not expect removing a user Profile during the user
 // session.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerUiTest, DeleteEligibleProfile) {
   // TODO(crbug.com/527717763): Re-enable this test
   if (!base::FeatureList::IsEnabled(features::kInitialWebUI)) {
@@ -286,6 +281,5 @@ IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerUiTest, DeleteEligibleProfile) {
   EXPECT_TRUE(second_keyed_service->enabling().HasConsented());
   EXPECT_TRUE(background_mode_manager->IsInBackgroundModeForTesting());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace glic

@@ -51,12 +51,8 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/zlib/google/compression_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#endif
-
 // Other platforms have no-op implementations of WebRTC Diagnostic Logging.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace {
 
 const char kTestUploadUrl[] = "https://upload.com/webrtc_upload";
@@ -134,10 +130,6 @@ class RTCDiagnosticLoggingTest : public ChromeRenderViewHostTestHarness {
 
   void SetUp() override {
     scoped_feature_list_.InitAndEnableFeature(kWebRtcLogUploaderExcludesGuid);
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::system::StatisticsProvider::SetTestProvider(
-        &fake_statistics_provider_);
-#endif
     ChromeRenderViewHostTestHarness::SetUp();
     TestingBrowserProcess::GetGlobal()->SetSharedURLLoaderFactory(
         test_shared_url_loader_factory_);
@@ -198,9 +190,6 @@ class RTCDiagnosticLoggingTest : public ChromeRenderViewHostTestHarness {
     }
 
     ChromeRenderViewHostTestHarness::TearDown();
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::system::StatisticsProvider::SetTestProvider(nullptr);
-#endif
   }
 
   WebRtcLogUploader* webrtc_log_uploader() {
@@ -356,9 +345,6 @@ class RTCDiagnosticLoggingTest : public ChromeRenderViewHostTestHarness {
   }
 
  protected:
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::system::FakeStatisticsProvider fake_statistics_provider_;
-#endif
   base::test::ScopedFeatureList scoped_feature_list_;
   network::TestURLLoaderFactory test_url_loader_factory_;
   scoped_refptr<network::SharedURLLoaderFactory>

@@ -78,7 +78,7 @@ TEST(SandboxTypeTest, Utility) {
   EXPECT_EQ(Sandbox::kSpeechRecognition,
             SandboxTypeFromCommandLine(command_line9));
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   base::CommandLine command_line13(command_line);
   SetCommandLineFlagsForSandboxType(&command_line13, Sandbox::kPrintBackend);
   EXPECT_EQ(Sandbox::kPrintBackend, SandboxTypeFromCommandLine(command_line13));

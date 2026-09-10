@@ -86,7 +86,7 @@ base::span<const PageInfoUI::PermissionUIInfo> GetContentSettingsUIInfo() {
       {ContentSettingsType::BACKGROUND_SYNC,
        IDS_SITE_SETTINGS_TYPE_BACKGROUND_SYNC,
        IDS_SITE_SETTINGS_TYPE_BACKGROUND_SYNC_MID_SENTENCE},
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
       {ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER,
        IDS_SITE_SETTINGS_TYPE_PROTECTED_MEDIA_ID,
        IDS_SITE_SETTINGS_TYPE_PROTECTED_MEDIA_ID_MID_SENTENCE},
@@ -172,10 +172,6 @@ base::span<const PageInfoUI::PermissionUIInfo> GetContentSettingsUIInfo() {
       {ContentSettingsType::WEB_APP_INSTALLATION,
        IDS_SITE_SETTINGS_TYPE_WEB_APP_INSTALLATION,
        IDS_SITE_SETTINGS_TYPE_WEB_APP_INSTALLATION_MID_SENTENCE},
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-      {ContentSettingsType::WEB_PRINTING, IDS_SITE_SETTINGS_TYPE_WEB_PRINTING,
-       IDS_SITE_SETTINGS_TYPE_WEB_PRINTING_MID_SENTENCE},
 #endif
   };
   return kPermissionUIInfo;
@@ -347,11 +343,6 @@ std::u16string GetPermissionAskStateString(ContentSettingsType type) {
     case ContentSettingsType::WEB_APP_INSTALLATION:
       message_id = IDS_PAGE_INFO_STATE_TEXT_WEB_APP_INSTALLATION_ASK;
       break;
-#if BUILDFLAG(IS_CHROMEOS)
-    case ContentSettingsType::WEB_PRINTING:
-      message_id = IDS_PAGE_INFO_STATE_TEXT_WEB_PRINTING_ASK;
-      break;
-#endif
     default:
       NOTREACHED();
   }

@@ -65,11 +65,6 @@ ChromeUserPopulation::ProfileManagementStatus GetProfileManagementStatus(
   } else {
     return ChromeUserPopulation::NOT_MANAGED;
   }
-#elif BUILDFLAG(IS_CHROMEOS)
-  if (bpc && bpc->IsDeviceEnterpriseManaged()) {
-    return ChromeUserPopulation::ENTERPRISE_MANAGED;
-  }
-  return ChromeUserPopulation::NOT_MANAGED;
 #else
   return ChromeUserPopulation::UNAVAILABLE;
 #endif  // BUILDFLAG(IS_MAC)

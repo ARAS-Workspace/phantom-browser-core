@@ -67,9 +67,6 @@ bool ShellDownloadManagerDelegate::DetermineDownloadTarget(
   if (default_download_path_.empty()) {
     default_download_path_ = download_manager_->GetBrowserContext()
                                  ->GetPath()
-#if BUILDFLAG(IS_CHROMEOS)
-                                 .Append(FILE_PATH_LITERAL("MyFiles"))
-#endif
                                  .Append(FILE_PATH_LITERAL("Downloads"));
   }
 

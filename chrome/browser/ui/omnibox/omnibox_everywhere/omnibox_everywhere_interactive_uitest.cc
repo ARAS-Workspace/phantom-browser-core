@@ -198,11 +198,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest, FocusAndActivationState) {
   ui_manager.Shutdown();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ShowAndDismissViaHotkey DISABLED_ShowAndDismissViaHotkey
-#else
 #define MAYBE_ShowAndDismissViaHotkey ShowAndDismissViaHotkey
-#endif
 IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
                        MAYBE_ShowAndDismissViaHotkey) {
   OmniboxEverywhereController* controller =
@@ -218,11 +214,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
                   InvokeViaHotkey(), CheckWidgetVisible(false));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_CopyPasteSupportInQueryBox DISABLED_CopyPasteSupportInQueryBox
-#else
 #define MAYBE_CopyPasteSupportInQueryBox CopyPasteSupportInQueryBox
-#endif
 IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
                        MAYBE_CopyPasteSupportInQueryBox) {
   OmniboxEverywhereController* controller =
@@ -379,11 +371,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest, VoicePermissionState) {
   EXPECT_FALSE(ui_manager.widget());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_RetainPositionOnReinvoke DISABLED_RetainPositionOnReinvoke
-#else
 #define MAYBE_RetainPositionOnReinvoke RetainPositionOnReinvoke
-#endif
 IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
                        MAYBE_RetainPositionOnReinvoke) {
 #if BUILDFLAG(IS_OZONE)
@@ -439,11 +427,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
                   InvokeViaHotkey(), CheckWidgetVisible(false));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_RetainInputTextOnReinvoke DISABLED_RetainInputTextOnReinvoke
-#else
 #define MAYBE_RetainInputTextOnReinvoke RetainInputTextOnReinvoke
-#endif
 IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
                        MAYBE_RetainInputTextOnReinvoke) {
   OmniboxEverywhereController* controller =
@@ -483,11 +467,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
       InvokeViaHotkey(), CheckWidgetVisible(false));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_StatusIconLifecycle DISABLED_StatusIconLifecycle_
-#else
 #define MAYBE_StatusIconLifecycle StatusIconLifecycle
-#endif
 IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
                        MAYBE_StatusIconLifecycle) {
   StatusTray* status_tray = g_browser_process->status_tray();
@@ -546,13 +526,8 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest, BackgroundModeKeepAlive) {
   }));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TargetProfileUpdatesOnBrowserActivation \
-  DISABLED_TargetProfileUpdatesOnBrowserActivation
-#else
 #define MAYBE_TargetProfileUpdatesOnBrowserActivation \
   TargetProfileUpdatesOnBrowserActivation
-#endif
 
 IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
                        MAYBE_TargetProfileUpdatesOnBrowserActivation) {

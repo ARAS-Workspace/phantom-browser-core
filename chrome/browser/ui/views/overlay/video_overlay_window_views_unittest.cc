@@ -194,9 +194,6 @@ class VideoOverlayWindowViewsTest : public ChromeViewsTestBase {
     web_contents_ = web_contents_factory_.CreateWebContents(&profile_);
     pip_window_controller_.set_web_contents(web_contents_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    test_views_delegate()->set_context(GetContext());
-#endif
     test_views_delegate()->set_use_desktop_native_widgets(true);
 
     // The default work area must be big enough to fit the minimum

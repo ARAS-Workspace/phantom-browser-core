@@ -67,13 +67,6 @@
 #include "pdf/pdf_features.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/test/shell_test_api.h"
-#include "ui/display/manager/display_manager.h"
-#include "ui/display/screen.h"
-#include "ui/display/test/display_manager_test_api.h"  // nogncheck
-#endif
-
 namespace {
 
 class RedirectObserver : public content::WebContentsObserver {
@@ -1484,43 +1477,3 @@ IN_PROC_BROWSER_TEST_F(ChromeSitePerProcessTest, JSPrintDuringSwap) {
   watcher.Wait();
   EXPECT_TRUE(watcher.did_exit_normally());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// This test verifies that an OOPIF created in a tab on a secondary display
-// doesn't initialize its device scale factor based on the primary display.
-// Note: This test could probably be expanded to run on all ASH platforms.
-// Disabled due to flakiness. https://crbug.com/40862378
-IN_PROC_BROWSER_TEST_F(ChromeSitePerProcessTest,
-                       DISABLED_TestInitialDSFForOOPIF) {
-  // Spec for a two-display system, where the primary display has non-unit
-  // device scale factor, but the secondary has unit device scale factor.
-  // Note: this test could really work with any two scale factors, so long as
-  // they're different.
-  std::string display_spec("0+0-500x500*2,0+501-500x500");
-  ash::ShellTestApi shell_test_api;
-  display::test::DisplayManagerTestApi(shell_test_api.display_manager())
-      .UpdateDisplay(display_spec);
-  ASSERT_EQ(2u, shell_test_api.display_manager()->GetNumDisplays());
-  display::test::DisplayManagerTestApi display_manager_test_api(
-      shell_test_api.display_manager());
-
-  display::Screen* screen = display::Screen::Get();
-  int64_t display2 = display_manager_test_api.GetSecondaryDisplay().id();
-  screen->SetDisplayForNewWindows(display2);
-  Browser* browser_on_secondary_display =
-      CreateBrowser(browser()->GetProfile());
-
-  // Open a page with an OOPIF on the secondary display.
-  GURL main_url(embedded_test_server()->GetURL(
-      "a.com", "/cross_site_iframe_factory.html?a(b)"));
-  content::ProxyDSFObserver observer;
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser_on_secondary_display, main_url));
-  observer.WaitForOneProxyHostCreation();
-
-  EXPECT_EQ(1u, observer.num_creations());
-  // If the OOPIF correctly gets its device_scale_factor from the secondary
-  // screen, then it will satisfy the following expectation.
-  EXPECT_EQ(1.f, observer.get_proxy_host_dsf(0));
-}
-#endif

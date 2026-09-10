@@ -93,10 +93,10 @@ const char kProfileReportingExtension[] = "profileReportingExtension";
 const char kProfileReportingPolicy[] = "profileReportingPolicy";
 const char kProfileReportingLearnMore[] = "profileReportingLearnMore";
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 const char kManagementScreenCaptureEvent[] = "managementScreenCaptureEvent";
 const char kManagementScreenCaptureData[] = "managementScreenCaptureData";
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     (BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_EXTENSIONS_CORE))
@@ -104,41 +104,3 @@ const char kManagementDeviceSignalsDisclosure[] =
     "managementDeviceSignalsDisclosure";
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_ANDROID) &&
         // BUILDFLAG(ENABLE_EXTENSIONS_CORE))
-
-#if BUILDFLAG(IS_CHROMEOS)
-const char kManagementLogUploadEnabled[] = "managementLogUploadEnabled";
-const char kManagementLogUploadEnabledNoLink[] =
-    "managementLogUploadEnabledNoLink";
-const char kManagementReportActivityTimes[] = "managementReportActivityTimes";
-const char kManagementReportDeviceAudioStatus[] =
-    "managementReportDeviceAudioStatus";
-const char kManagementReportDeviceGraphicsStatus[] =
-    "managementReportDeviceGraphicsStatus";
-const char kManagementReportDevicePeripherals[] =
-    "managementReportDevicePeripherals";
-const char kManagementReportNetworkData[] = "managementReportNetworkData";
-const char kManagementReportHardwareData[] = "managementReportHardwareData";
-const char kManagementReportUsers[] = "managementReportUsers";
-const char kManagementReportCrashReports[] = "managementReportCrashReports";
-const char kManagementReportAppInfoAndActivity[] =
-    "managementReportAppInfoAndActivity";
-const char kManagementReportExtensions[] = "managementReportExtensions";
-const char kManagementReportAndroidApplications[] =
-    "managementReportAndroidApplications";
-const char kManagementReportPrintJobs[] = "managementReportPrintJobs";
-const char kManagementReportLoginLogout[] = "managementReportLoginLogout";
-const char kManagementReportCRDSessions[] = "managementReportCRDSessions";
-const char kManagementReportDlpEvents[] = "managementReportDlpEvents";
-const char kManagementReportAllWebsiteInfoAndActivity[] =
-    "managementReportAllWebsiteInfoAndActivity";
-const char kManagementReportWebsiteInfoAndActivity[] =
-    "managementReportWebsiteInfoAndActivity";
-const char kManagementOnFileTransferEvent[] = "managementOnFileTransferEvent";
-const char kManagementOnFileTransferVisibleData[] =
-    "managementOnFileTransferVisibleData";
-const char kManagementPrinting[] = "managementPrinting";
-const char kManagementCrostini[] = "managementCrostini";
-const char kManagementCrostiniContainerConfiguration[] =
-    "managementCrostiniContainerConfiguration";
-const char kManagementReportFileEvents[] = "managementReportFileEvents";
-#endif  // BUILDFLAG(IS_CHROMEOS)

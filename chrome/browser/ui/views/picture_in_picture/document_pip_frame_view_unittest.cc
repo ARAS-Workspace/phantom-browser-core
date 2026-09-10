@@ -54,18 +54,7 @@
 #include "ui/views/window/non_client_view.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/user_manager.h"
-#include "google_apis/gaia/gaia_id.h"
-#endif
-
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kTestUserEmail[] = "user@example.com";
-#endif
 
 blink::mojom::PictureInPictureWindowOptions MakePipOptions(
     bool disallow_return_to_opener) {
@@ -88,20 +77,6 @@ class DocumentPipFrameViewTest : public ChromeViewsTestBase {
   void SetUp() override {
     ChromeViewsTestBase::SetUp();
     test_views_delegate()->set_use_desktop_native_widgets(true);
-
-#if BUILDFLAG(IS_CHROMEOS)
-    ASSERT_TRUE(user_manager::UserManager::IsInitialized());
-    auto* fake_user_manager = static_cast<ash::FakeChromeUserManager*>(
-        user_manager::UserManager::Get());
-
-    const GaiaId kTestUserGaiaId("1111111111");
-    auto account_id =
-        AccountId::FromUserEmailGaiaId(kTestUserEmail, kTestUserGaiaId);
-    fake_user_manager->AddUserWithAffiliationAndTypeAndProfile(
-        account_id, /*is_affiliated=*/true, user_manager::UserType::kRegular,
-        &profile_);
-    fake_user_manager->LoginUser(account_id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     opener_web_contents_ =
         content::WebContentsTester::CreateTestWebContents(&profile_, nullptr);

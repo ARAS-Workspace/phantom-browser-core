@@ -498,9 +498,6 @@ bool CollectGraphicsDeviceInfoFromCommandLine(
   }
 
   bool info_updated = gpu.vendor_id || gpu.device_id ||
-#if BUILDFLAG(IS_CHROMEOS)
-                      gpu.revision ||
-#endif
                       !gpu.driver_version.empty();
 
   return info_updated;
@@ -731,9 +728,6 @@ void FillGPUInfoFromSystemInfo(GPUInfo* gpu_info,
 
   gpu_info->gpu.vendor_id = active->vendorId;
   gpu_info->gpu.device_id = active->deviceId;
-#if BUILDFLAG(IS_CHROMEOS)
-  gpu_info->gpu.revision = active->revisionId;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   gpu_info->gpu.system_device_id = active->systemDeviceId;
   gpu_info->gpu.driver_vendor = std::move(active->driverVendor);
   gpu_info->gpu.driver_version = std::move(active->driverVersion);
@@ -747,9 +741,6 @@ void FillGPUInfoFromSystemInfo(GPUInfo* gpu_info,
     GPUInfo::GPUDevice device;
     device.vendor_id = system_info->gpus[i].vendorId;
     device.device_id = system_info->gpus[i].deviceId;
-#if BUILDFLAG(IS_CHROMEOS)
-    device.revision = system_info->gpus[i].revisionId;
-#endif  // BUILDFLAG(IS_CHROMEOS)
     device.system_device_id = system_info->gpus[i].systemDeviceId;
     device.driver_vendor = std::move(system_info->gpus[i].driverVendor);
     device.driver_version = std::move(system_info->gpus[i].driverVersion);

@@ -293,7 +293,6 @@ TEST_F(SyncInternalsMessageHandlerTest, WriteUserEventZero) {
   EXPECT_EQ(0, event.navigation_id());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(SyncInternalsMessageHandlerTest, RequestStart) {
   identity_test_environment()->MakePrimaryAccountAvailable(
       "foo@gmail.com", signin::ConsentLevel::kSignin);
@@ -308,7 +307,6 @@ TEST_F(SyncInternalsMessageHandlerTest, RequestStart) {
   EXPECT_FALSE(account_info.IsEmpty());
   EXPECT_EQ(account_info.email, "foo@gmail.com");
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 }  // namespace browser_sync

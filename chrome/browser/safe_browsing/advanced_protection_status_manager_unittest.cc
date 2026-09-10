@@ -64,7 +64,6 @@ class AdvancedProtectionStatusManagerTest : public testing::Test {
 
 // On ChromeOS, there is no unconsented primary account. We can only track the
 // primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AdvancedProtectionStatusManagerTest, TracksUnconsentedPrimaryAccount) {
   base::test::TaskEnvironment task_environment;
   signin::IdentityTestEnvironment identity_test_env(
@@ -86,6 +85,5 @@ TEST_F(AdvancedProtectionStatusManagerTest, TracksUnconsentedPrimaryAccount) {
 
   manager->Shutdown();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace safe_browsing

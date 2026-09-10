@@ -35,7 +35,7 @@ int BucketizeValue(int count) {
 }
 
 ClientFeatures_Platform GetCurrentPlatformProto() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   return permissions::ClientFeatures_Platform_PLATFORM_DESKTOP;
 #elif BUILDFLAG(IS_ANDROID)
   return permissions::ClientFeatures_Platform_PLATFORM_MOBILE;
@@ -45,7 +45,7 @@ ClientFeatures_Platform GetCurrentPlatformProto() {
 }
 
 ClientFeatures_PlatformEnum GetCurrentPlatformEnumProto() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   return permissions::ClientFeatures_PlatformEnum_PLATFORM_DESKTOP_V2;
 #elif BUILDFLAG(IS_ANDROID)
   return permissions::ClientFeatures_PlatformEnum_PLATFORM_MOBILE_V2;

@@ -30,7 +30,7 @@
 #include "device/bluetooth/test/bluetooth_test_mac.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"
-#elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_LINUX)
 #include "device/bluetooth/test/bluetooth_test_bluez.h"
 #endif
 
@@ -257,8 +257,7 @@ TEST_F(BluetoothTest, LowEnergyDeviceNoUUIDs) {
   EXPECT_EQ(0u, uuids.size());
 }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_GetServiceDataUUIDs_GetServiceDataForUUID \
   GetServiceDataUUIDs_GetServiceDataForUUID
 #else
@@ -268,11 +267,11 @@ TEST_F(BluetoothTest, LowEnergyDeviceNoUUIDs) {
 TEST_F(BluetoothTest, MAYBE_GetServiceDataUUIDs_GetServiceDataForUUID) {
   InitWithFakeAdapter();
 
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_LINUX)
   // TODO(crbug.com/41309944): Remove #if once StartLowEnergyDiscoverySession is
   // implemented for bluez.
   StartLowEnergyDiscoverySession();
-#endif  // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_LINUX)
 
   // Receive Advertisement with empty service data.
   BluetoothDevice* device1 = SimulateLowEnergyDevice(4);
@@ -301,8 +300,7 @@ TEST_F(BluetoothTest, MAYBE_GetServiceDataUUIDs_GetServiceDataForUUID) {
 
 // TODO(crbug.com/41310506): Remove #if once the BlueZ caching behavior is
 // changed.
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) && \
-    !defined(USE_CAST_BLUETOOTH_ADAPTER)
+#if BUILDFLAG(IS_LINUX) && !defined(USE_CAST_BLUETOOTH_ADAPTER)
   // On ChromeOS and Linux, BlueZ persists all service data meaning if
   // a device stops advertising service data for a UUID, BlueZ will
   // still return the cached value for that UUID.
@@ -343,7 +341,7 @@ TEST_F(BluetoothTest, MAYBE_GetServiceDataUUIDs_GetServiceDataForUUID) {
       std::vector<uint8_t>({0, 2}),
       *device2->GetServiceDataForUUID(BluetoothUUID(kTestUUIDImmediateAlert)));
 
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_LINUX)
   // TODO(crbug.com/41309944): Remove #if once StartLowEnergyDiscoverySession is
   // implemented for bluez.
   // Stop discovery.
@@ -360,7 +358,7 @@ TEST_F(BluetoothTest, MAYBE_GetServiceDataUUIDs_GetServiceDataForUUID) {
             device2->GetServiceDataForUUID(BluetoothUUID(kTestUUIDHeartRate)));
   EXPECT_EQ(nullptr, device2->GetServiceDataForUUID(
                          BluetoothUUID(kTestUUIDImmediateAlert)));
-#endif  // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_LINUX)
 }
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
@@ -997,8 +995,7 @@ TEST_F(BluetoothTest, MAYBE_AdvertisementData_ConnectionDuringDiscovery) {
   EXPECT_FALSE(device->GetInquiryTxPower());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 #define MAYBE_GetName_NullName GetName_NullName
 #else
 #define MAYBE_GetName_NullName DISABLED_GetName_NullName
@@ -1011,9 +1008,7 @@ TEST_F(BluetoothTest, MAYBE_GetName_NullName) {
 // and is non trivial to implement. On ChromeOS, it is not essential for
 // this test to operate, and so it is simply skipped. Android at least
 // does require this step.
-#if !BUILDFLAG(IS_CHROMEOS)
   StartLowEnergyDiscoverySession();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   BluetoothDevice* device = SimulateLowEnergyDevice(5);
   EXPECT_FALSE(device->GetName());
@@ -1755,7 +1750,7 @@ TEST_F(BluetoothTest, DISABLED_GattServicesDiscovered_SomeServicesBlocked) {
   EXPECT_EQ(3u, device->GetGattServices().size());
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 TEST_F(BluetoothTest, GetDeviceTransportType) {
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
@@ -1770,8 +1765,7 @@ TEST_F(BluetoothTest, GetDeviceTransportType) {
   EXPECT_EQ(BLUETOOTH_TRANSPORT_CLASSIC, device3->GetType());
 #endif  // !defined(USE_CAST_BLUETOOTH_ADAPTER)
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
 #define MAYBE_GetPrimaryServices GetPrimaryServices

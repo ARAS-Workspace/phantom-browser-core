@@ -99,7 +99,7 @@
 #include "components/contextual_tasks/public/features.h"
 #include "components/enterprise/browser/reporting/reporting_features.h"
 #include "components/multistep_filter/core/features.h"
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/contextual_tasks/contextual_tasks_tab_visit_tracker.h"
 #include "chrome/browser/record_replay/chrome_record_replay_client.h"
 #include "chrome/browser/ui/views/location_bar/record_replay_page_action_controller.h"
@@ -134,11 +134,6 @@
 #include "net/base/features.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/base/unowned_user_data/user_data_factory.h"
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"  // nogncheck
-#include "chrome/browser/ui/views/web_apps/protocol_handler_picker_coordinator.h"
-#endif
 
 namespace tabs {
 
@@ -465,7 +460,7 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
 
   task_manager::WebContentsTags::CreateForTabContents(tab.GetContents());
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   inactive_window_mouse_event_controller_ =
       std::make_unique<InactiveWindowMouseEventController>();
 
@@ -517,15 +512,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
       GetUserDataFactory().CreateInstance<lens::TabContextualizationController>(
           tab, &tab);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (apps::AppServiceProxyFactory::IsAppServiceAvailableForProfile(profile)) {
-    protocol_handler_picker_coordinator_ =
-        GetUserDataFactory()
-            .CreateInstance<web_app::ProtocolHandlerPickerCoordinator>(
-                tab, tab, apps::AppServiceProxyFactory::GetForProfile(profile));
-  }
-#endif
-
   // The controller is created for all tabs but only affects back button
   // behavior for destination tabs with opener relationships.
   if (base::FeatureList::IsEnabled(tabs::kBackToOpener)) {
@@ -537,7 +523,7 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
       GetUserDataFactory().CreateInstance<tabs::PageContextEligibilityHelper>(
           tab, tab);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(multistep_filter::kMultistepFilter)) {
     filter_ui_controller_ =
         GetUserDataFactory()

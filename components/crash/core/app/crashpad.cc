@@ -82,7 +82,7 @@ bool InitializeCrashpadImpl(bool initial_client,
     // sanitization.
     DCHECK(browser_process || process_type == "relauncher" ||
            process_type == "app_shim");
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
     DCHECK(browser_process);
 #else
 #error Port.
@@ -148,7 +148,7 @@ bool InitializeCrashpadImpl(bool initial_client,
   // On Mac, we only want the browser to initialize the database, but not the
   // relauncher.
   const bool should_initialize_database_and_set_upload_policy = browser_process;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   const bool should_initialize_database_and_set_upload_policy = browser_process;
 #endif
   if (should_initialize_database_and_set_upload_policy) {
@@ -157,7 +157,7 @@ bool InitializeCrashpadImpl(bool initial_client,
     g_database =
         crashpad::CrashReportDatabase::Initialize(database_path).release();
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
     // On Android crashpad doesn't handle uploads. Android uses
     // //components/minidump_uploader which queries metrics sample/consent opt
     // in from preferences.
@@ -194,7 +194,6 @@ void DestroyCrashpadClient() {
   }
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void SetUploadConsent(bool consent) {
   if (!g_database)
     return;
@@ -214,8 +213,6 @@ void SetUploadConsent(bool consent) {
   settings->SetUploadsEnabled(enable_uploads &&
                               crash_reporter_client->GetCollectStatsInSample());
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 void DumpWithoutCrashing() {
@@ -259,12 +256,11 @@ void SetIntermediateDumpExtraMemoryRanges(
 
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 void CrashWithoutDumping(const std::string& message) {
   crashpad::CrashpadClient::CrashWithoutDump(message);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 void GetReports(std::vector<Report>* reports) {
   GetReportsImpl(reports);

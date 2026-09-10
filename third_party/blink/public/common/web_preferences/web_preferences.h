@@ -149,8 +149,6 @@ struct BLINK_COMMON_EXPORT WebPreferences {
       mojom::EditingBehavior::kEditingMacBehavior;
 #elif BUILDFLAG(IS_ANDROID)
       mojom::EditingBehavior::kEditingAndroidBehavior;
-#elif BUILDFLAG(IS_CHROMEOS)
-      mojom::EditingBehavior::kEditingChromeOSBehavior;
 #elif BUILDFLAG(IS_POSIX)
       mojom::EditingBehavior::kEditingUnixBehavior;
 #else

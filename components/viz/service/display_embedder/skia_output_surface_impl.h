@@ -199,20 +199,6 @@ class VIZ_SERVICE_EXPORT SkiaOutputSurfaceImpl : public SkiaOutputSurface {
       std::vector<gpu::SyncToken> sync_tokens) override;
   void CheckAsyncWorkCompletionForTesting() override;
 
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-  void DetileOverlay(gpu::Mailbox input,
-                     const gfx::Size& input_visible_size,
-                     gpu::SyncToken input_sync_token,
-                     gpu::Mailbox output,
-                     const gfx::RectF& display_rect,
-                     const gfx::RectF& crop_rect,
-                     gfx::OverlayTransform transform,
-                     bool is_10bit) override;
-
-  void CleanupImageProcessor() override;
-#endif
-
   void ReadbackForTesting(
       CopyOutputRequest::CopyOutputRequestCallback result_callback) override;
 

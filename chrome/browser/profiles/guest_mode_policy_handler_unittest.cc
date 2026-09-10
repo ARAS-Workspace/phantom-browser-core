@@ -46,7 +46,6 @@ TEST_F(GuestModePolicyHandlerTest, ForceSigninNotSet) {
   EXPECT_FALSE(prefs_.GetValue(prefs::kBrowserGuestModeEnabled, nullptr));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(GuestModePolicyHandlerTest, ForceSigninDisabled) {
   SetUpPolicy(key::kBrowserSignin,
               static_cast<int>(policy::BrowserSigninMode::kDisabled));
@@ -121,6 +120,5 @@ TEST_F(GuestModePolicyHandlerTest,
   handler_.ApplyPolicySettings(policies_, &prefs_);
   EXPECT_FALSE(prefs_.GetBoolean(prefs::kBrowserGuestModeEnabled, &value));
 }
-#endif  //  !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace policy

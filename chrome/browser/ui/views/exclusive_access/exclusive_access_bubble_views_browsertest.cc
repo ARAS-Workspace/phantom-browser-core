@@ -100,14 +100,10 @@ class ExclusiveAccessBubbleViewsTest : public InProcessBrowserTest {
   }
 
   std::u16string GetFullscreenAcceleratorString() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return u"Fullscreen";
-#else
     ui::Accelerator accelerator;
     AcceleratorProviderForBrowser(browser())->GetAcceleratorForCommandId(
         IDC_FULLSCREEN, &accelerator);
     return accelerator.GetShortcutText();
-#endif
   }
 
   std::u16string GetShortcutText(Shortcut shortcut) {

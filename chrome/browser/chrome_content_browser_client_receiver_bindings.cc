@@ -57,10 +57,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/plugins/plugin_observer_android.h"
-#elif BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/mojo_service_manager/utility_process_bridge.h"
-#include "chromeos/components/cdm_factory_daemon/cdm_factory_daemon_proxy_ash.h"
-#include "components/performance_manager/public/performance_manager.h"
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -632,10 +628,6 @@ void ChromeContentBrowserClient::BindGpuHostReceiver(
     return;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (auto r = receiver.As<chromeos::cdm::mojom::BrowserCdmFactory>())
-    chromeos::CdmFactoryDaemonProxyAsh::Create(std::move(r));
-#endif
 }
 
 void ChromeContentBrowserClient::BindUtilityHostReceiver(
@@ -645,15 +637,6 @@ void ChromeContentBrowserClient::BindUtilityHostReceiver(
     metrics::CallStackProfileCollector::Create(std::move(r));
     return;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (auto service_manager_receiver =
-          receiver
-              .As<chromeos::mojo_service_manager::mojom::ServiceManager>()) {
-    ash::mojo_service_manager::EstablishUtilityProcessBridge(
-        service_name, std::move(service_manager_receiver));
-    return;
-  }
-#endif
 }
 
 void ChromeContentBrowserClient::BindHostReceiverForRenderer(

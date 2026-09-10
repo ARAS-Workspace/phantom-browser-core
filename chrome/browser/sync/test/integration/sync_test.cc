@@ -104,23 +104,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/app_list/arc/arc_app_list_prefs_factory.h"
-#include "chrome/browser/ash/app_list/test/fake_app_list_model_updater.h"
-#include "chrome/browser/sync/test/integration/sync_arc_package_helper.h"
-#include "chromeos/ash/components/account_manager/account_manager_factory.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
-#include "chromeos/ash/experiences/arc/test/arc_util_test_support.h"
-#include "components/account_id/account_id.h"
-#include "components/account_id/account_id_literal.h"  // nogncheck
-#include "components/account_manager_core/chromeos/account_manager.h"
-#include "components/session_manager/core/session_manager.h"
-#include "components/user_manager/test_helper.h"
-#include "components/user_manager/user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/sync/test/integration/sync_test_utils_android.h"
 #else  // BUILDFLAG(IS_ANDROID)
@@ -169,14 +152,6 @@ int GetNumClients(SyncTest::TestType test_type) {
   NOTREACHED();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr auto kAccountId1 =
-    AccountId::Literal::FromUserEmailGaiaId("user1@gmail.com",
-                                            GaiaId::Literal("11111111"));
-constexpr auto kAccountId2 =
-    AccountId::Literal::FromUserEmailGaiaId("user2@gmail.com",
-                                            GaiaId::Literal("22222222"));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }  // namespace
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -279,12 +254,6 @@ void SyncTest::CreatedBrowserMainParts(content::BrowserMainParts* parts) {
 
 void SyncTest::SetUpLocalStatePrefService(PrefService* local_state) {
   PlatformBrowserTest::SetUpLocalStatePrefService(local_state);
-#if BUILDFLAG(IS_CHROMEOS)
-  // For multi-user sign-in, users need to be pre registered on starting
-  // Chrome. This class uses at most two profiles, so register them.
-  user_manager::TestHelper::RegisterPersistedUser(*local_state, kAccountId1);
-  user_manager::TestHelper::RegisterPersistedUser(*local_state, kAccountId2);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void SyncTest::SetUpCommandLine(base::CommandLine* cl) {
@@ -327,23 +296,11 @@ void SyncTest::SetUpCommandLine(base::CommandLine* cl) {
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  cl->AppendSwitch(ash::switches::kIgnoreUserProfileMappingForTests);
-  cl->AppendSwitch(ash::switches::kDisableArcOptInVerification);
-  arc::SetArcAvailableCommandLineForTesting(cl);
-#endif
 }
 
 base::FilePath SyncTest::GetProfileBaseName(int index) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // In ChromeOS platform, user profile path is expected to start with "u-",
-  // followed by username hash. This follows the format.
-  return base::FilePath::FromASCII("u-SyncIntegrationTestClient" +
-                                   base::NumberToString(index));
-#else
   return base::FilePath::FromASCII("SyncIntegrationTestClient" +
                                    base::NumberToString(index));
-#endif
 }
 
 void SyncTest::PostCreateThreads() {
@@ -417,31 +374,6 @@ bool SyncTest::CreateProfile(int index) {
   Profile* profile = ProfileManager::GetLastUsedProfile();
 #else  // BUILDFLAG(IS_ANDROID)
   Profile* profile = nullptr;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (use_primary_user_profile_) {
-    CHECK_EQ(index, 0);
-    profile = Profile::FromBrowserContext(
-        ash::BrowserContextHelper::Get()->GetBrowserContextByUser(
-            user_manager::UserManager::Get()->GetPrimaryUser()));
-  } else {
-    // Create a fake user session.
-    CHECK(index == 0 || index == 1);
-    AccountId account_id = index == 0 ? kAccountId1 : kAccountId2;
-    session_manager::SessionManager::Get()->CreateSession(
-        account_id,
-        // Use profile path base for a fake username_hash here.
-        // In production, the profile base name in ChromeOS is in "u-${hash}"
-        // format, where ${hash} is actually user hash maintained in the
-        // ChromeOS system side, and extracts the hash from the path on
-        // initialization. This trick allows Chrome to tie the user and
-        // a Profile being created just below.
-        /*username_hash=*/
-        ash::BrowserContextHelper::GetUsernameHashFromBrowserContextDirName(
-            GetProfileBaseName(index)),
-        /*new_user=*/false,
-        /*has_active_session=*/false);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   if (!profile) {
     profile = g_browser_process->profile_manager()->GetProfile(profile_path);
   }
@@ -472,14 +404,6 @@ std::vector<raw_ptr<Profile, VectorExperimental>> SyncTest::GetAllProfiles() {
   }
   return profiles;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void SyncTest::SetUsePrimaryUserProfile(bool value) {
-  // Must be called early enough.
-  CHECK(profiles_.empty());
-  use_primary_user_profile_ = true;
-}
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
 Browser* SyncTest::GetBrowser(int index) {
@@ -598,21 +522,6 @@ bool SyncTest::SetupClients() {
     cl->AppendSwitchASCII(syncer::kSyncDeferredStartupTimeoutSeconds, "0");
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Sets Arc flags, need to be called before create test profiles.
-  ArcAppListPrefsFactory::SetFactoryForSyncTest();
-
-  // Uses a fake app list model updater to avoid interacting with Ash.
-  model_updater_factory_scope_ =
-      app_list::AppListSyncableService::SetScopedModelUpdaterFactoryForTest(
-          base::BindRepeating(
-              [](app_list::reorder::AppListReorderDelegate* reorder_delegate)
-                  -> std::unique_ptr<AppListModelUpdater> {
-                return std::make_unique<FakeAppListModelUpdater>(
-                    /*profile=*/nullptr, reorder_delegate);
-              }));
-#endif
-
   base::ScopedAllowBlockingForTesting allow_blocking;
 
   for (int i = 0; i < num_clients_; ++i) {
@@ -624,16 +533,6 @@ bool SyncTest::SetupClients() {
               << "; elapsed time since construction: "
               << (base::Time::Now() - test_construction_time_);
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ArcAppListPrefsFactory::IsFactorySetForSyncTest()) {
-    // Init SyncArcPackageHelper to ensure that the arc services are initialized
-    // for each Profile, only can be called after test profiles are created.
-    if (!sync_arc_helper()) {
-      return false;
-    }
-  }
-#endif
 
   LOG(INFO)
       << "SyncTest::SetupClients() completed; elapsed time since construction: "
@@ -990,18 +889,6 @@ void SyncTest::OnProfileWillBeDestroyed(Profile* profile) {
 }
 
 void SyncTest::OnProfileAdded(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // This cannot run in OnProfileCreationStarted() because it would be too
-  // early, and ProfileImpl's constructor would override it once again when
-  // invoking ash::InitializeAccountManager().
-  if (server_type_ == IN_PROCESS_FAKE_SERVER) {
-    account_manager::AccountManager* account_manager =
-        ash::AccountManagerFactory::Get()->GetAccountManager(
-            profile->GetPath().value());
-    account_manager->SetUrlLoaderFactoryForTests(
-        test_url_loader_factory_.GetSafeWeakWrapper());
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void SyncTest::OnProfileManagerDestroying() {
@@ -1080,9 +967,7 @@ bool SyncTest::ResetSyncForPrimaryAccount() {
     return false;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   client->SignOutPrimaryAccount();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // After reset, this client will disable sync. It may log some messages that
   // do not contribute to test failures. It includes:
@@ -1169,11 +1054,7 @@ void SyncTest::TriggerSyncForDataTypes(int index,
 }
 
 arc::SyncArcPackageHelper* SyncTest::sync_arc_helper() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return arc::SyncArcPackageHelper::GetInstance();
-#else
   return nullptr;
-#endif
 }
 
 std::string SyncTest::GetCacheGuid(size_t profile_index) const {
@@ -1275,13 +1156,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
   allowed_types.Put(syncer::CONTACT_INFO);
   allowed_types.Put(syncer::PASSWORDS);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // OS sync types run in transport mode.
-  allowed_types.PutAll({syncer::APP_LIST, syncer::ARC_PACKAGE, syncer::WEB_APPS,
-                        syncer::OS_PREFERENCES,
-                        syncer::OS_PRIORITY_PREFERENCES});
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   if (base::FeatureList::IsEnabled(
           switches::kEnablePreferencesAccountStorage)) {
     allowed_types.Put(syncer::PRIORITY_PREFERENCES);
@@ -1319,17 +1193,10 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
     allowed_types.Put(syncer::SAVED_TAB_GROUP);
     allowed_types.Put(syncer::SESSIONS);
     allowed_types.Put(syncer::USER_EVENTS);
-#if BUILDFLAG(IS_CHROMEOS)
-    allowed_types.Put(syncer::APPS);
-    allowed_types.Put(syncer::APP_SETTINGS);
-    allowed_types.Put(syncer::PRINTERS);
-    allowed_types.Put(syncer::WIFI_CONFIGURATIONS);
-    allowed_types.Put(syncer::WORKSPACE_DESK);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
     allowed_types.Put(syncer::WEB_APPS);
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
     if (data_sharing::features::IsDataSharingFunctionalityEnabled()) {
       allowed_types.Put(syncer::SHARED_TAB_GROUP_DATA);
@@ -1346,16 +1213,8 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
     }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#if BUILDFLAG(IS_CHROMEOS)
-    if (base::FeatureList::IsEnabled(
-            syncer::kReplaceSyncPromosWithSignInPromos)) {
-      allowed_types.Put(syncer::EXTENSIONS);
-      allowed_types.Put(syncer::EXTENSION_SETTINGS);
-    }
-#else
     allowed_types.Put(syncer::EXTENSIONS);
     allowed_types.Put(syncer::EXTENSION_SETTINGS);
-#endif
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   }
   allowed_types.Put(syncer::AUTOFILL_VALUABLE);
@@ -1427,12 +1286,12 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
   allowed_types.Put(syncer::WEBAUTHN_CREDENTIAL);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(
           syncer::kSpellcheckSeparateLocalAndAccountDictionaries)) {
     allowed_types.Put(syncer::DICTIONARY);
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   return allowed_types;
 }

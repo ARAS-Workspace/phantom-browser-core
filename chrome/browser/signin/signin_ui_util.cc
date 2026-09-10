@@ -59,14 +59,6 @@
 #include "ui/gfx/font_list.h"
 #include "ui/gfx/text_elider.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/signin/signin_ui_chromeos_util.h"
-#include "chrome/browser/ui/ash/account_manager/account_manager_dialog_coordinator.h"
-#include "chrome/browser/ui/ash/account_manager/account_manager_dialog_coordinator_factory.h"
-#include "components/user_manager/user.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "chrome/browser/signin/dice_tab_helper.h"
 #include "chrome/browser/signin/signin_ui_delegate_impl_dice.h"
@@ -165,15 +157,6 @@ std::u16string GetAuthenticatedUsername(Profile* profile) {
     user_display_name =
         identity_manager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
             .email;
-#if BUILDFLAG(IS_CHROMEOS)
-    // See https://crbug.com/40640779 for details.
-    user_manager::User* user =
-        ash::ProfileHelper::Get()->GetUserByProfile(profile);
-    // |user| may be null in tests.
-    if (user) {
-      user_display_name = user->GetDisplayEmail();
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   return base::UTF8ToUTF16(user_display_name);
@@ -205,12 +188,7 @@ void ShowReauthForPrimaryAccountWithAuthError(
 void ShowReauthForAccount(Profile* profile,
                           const std::string& email,
                           signin_metrics::AccessPoint access_point) {
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::AccountManagerDialogCoordinatorFactory::GetForProfile(profile)
-      ->ShowReauthAccountDialog(
-          GetAccountReauthSourceFromAccessPoint(access_point), email,
-          base::DoNothing());
-#elif BUILDFLAG(ENABLE_DICE_SUPPORT)
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
   // Pass `false` for `enable_sync`, as this function is not expected to start a
   // sync setup flow after the reauth.
   GetSigninUiDelegate()->ShowReauthUI(
@@ -554,7 +532,6 @@ void RecordProfileMenuClick(const Profile& profile) {
 void SignInAndEnableHistorySync(BrowserWindowInterface* browser,
                                 Profile* profile,
                                 signin_metrics::AccessPoint access_point) {
-#if !BUILDFLAG(IS_CHROMEOS)
   syncer::SyncService* sync_service =
       SyncServiceFactory::GetForProfile(profile);
   if (!sync_service) {
@@ -608,11 +585,6 @@ void SignInAndEnableHistorySync(BrowserWindowInterface* browser,
   SigninPromoTabHelper::GetForWebContents(*sign_in_tab_contents)
       ->InitializeCallbackAfterSignIn(std::move(enable_history_sync),
                                       access_point);
-#else
-  // This is not expected to be called on ChromeOS as the screen that uses this
-  // function is never shown for ChromeOS.
-  NOTREACHED();
-#endif
 }
 
 }  // namespace signin_ui_util

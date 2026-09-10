@@ -210,7 +210,7 @@ IN_PROC_BROWSER_TEST_F(AutoplayPolicyTest, AutoplayAllowlist_Missing) {
 }
 
 // Flaky on Linux and ChromeOS. See: crbug.com/40745945.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_AutoplayDeniedByPolicy DISABLED_AutoplayDeniedByPolicy
 #else
 #define MAYBE_AutoplayDeniedByPolicy AutoplayDeniedByPolicy
@@ -248,7 +248,7 @@ IN_PROC_BROWSER_TEST_F(AutoplayPolicyTest, MAYBE_AutoplayDeniedByPolicy) {
 }
 
 // Flaky on Linux. See: crbug.com/40745945.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_AutoplayDeniedAllowedWithURL DISABLED_AutoplayDeniedAllowedWithURL
 #else
 #define MAYBE_AutoplayDeniedAllowedWithURL AutoplayDeniedAllowedWithURL

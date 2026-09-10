@@ -44,18 +44,10 @@ bool ImposterCheckerEvdev::IsSuspectedKeyboardImposter(
     return false;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (converter->GetKeyboardType() == KeyboardType::IN_BLOCKLIST) {
-    fake_keyboard_heuristic_metrics_.RecordUsage(false);
-  }
-#endif
   if (!converter->HasKeyboard() || (!converter->HasMouse() && !shared_phys) ||
       converter->type() == InputDeviceType::INPUT_DEVICE_INTERNAL) {
     return false;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  fake_keyboard_heuristic_metrics_.RecordUsage(true);
-#endif
   return true;
 }
 

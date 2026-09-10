@@ -33,13 +33,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/tracing/public/cpp/tracing_features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/dbus/debug_daemon/debug_daemon_client.h"
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#include "chromeos/ash/components/system/statistics_provider.h"
-#include "content/browser/tracing/cros_tracing_agent.h"
-#endif
-
 using base::trace_event::TraceConfig;
 
 namespace content {
@@ -79,22 +72,11 @@ class TracingControllerTest : public ContentBrowserTest {
     enable_recording_done_callback_count_ = 0;
     disable_recording_done_callback_count_ = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::DebugDaemonClient::InitializeFake();
-    // Set statistic provider for hardware class tests.
-    ash::system::StatisticsProvider::SetTestProvider(
-        &fake_statistics_provider_);
-    fake_statistics_provider_.SetMachineStatistic(
-        ash::system::kHardwareClassKey, "test-hardware-class");
-#endif
     ContentBrowserTest::SetUp();
   }
 
   void TearDown() override {
     ContentBrowserTest::TearDown();
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::DebugDaemonClient::Shutdown();
-#endif
   }
 
   void Navigate(Shell* shell) {
@@ -287,11 +269,6 @@ class TracingControllerTest : public ContentBrowserTest {
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
- protected:
-  ash::system::ScopedFakeStatisticsProvider fake_statistics_provider_;
-#endif
-
  private:
   int get_categories_done_callback_count_;
   int enable_recording_done_callback_count_;
@@ -394,17 +371,10 @@ IN_PROC_BROWSER_TEST_F(TracingControllerTest, MAYBE_DoubleStopTracing) {
 }
 
 // Only CrOS supports system tracing.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_SystemTraceEvents SystemTraceEvents
-#else
 #define MAYBE_SystemTraceEvents DISABLED_SystemTraceEvents
-#endif
 class SystemTraceTracingControllerTest : public TracingControllerTest {
  public:
   SystemTraceTracingControllerTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    feature_list_.InitAndEnableFeature(kCrOSTracingDataSource);
-#endif
   }
 
  private:

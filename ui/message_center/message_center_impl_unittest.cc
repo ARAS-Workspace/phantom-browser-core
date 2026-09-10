@@ -513,12 +513,7 @@ TEST_F(MessageCenterImplTest, PopupTimersControllerRestartOnUpdate) {
   popup_timers_controller->OnNotificationDisplayed("id1", DISPLAY_SOURCE_POPUP);
   ASSERT_EQ(popup_timers_controller->timer_finished(), 0);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  const int dismiss_time =
-      popup_timers_controller->GetNotificationTimeoutDefault();
-#else
   const int dismiss_time = kAutocloseHighPriorityDelaySeconds;
-#endif
 
   // Fast forward the |task_runner| by one second less than the auto-close timer
   // frequency for Web Notifications. (As set by the |notifier_id|.)
@@ -1085,64 +1080,6 @@ TEST_F(MessageCenterImplTest, RemoveAllNotifications) {
   // Notification 2 shouldn't be removed since it was invisible.
   EXPECT_TRUE(NotificationsContain(notifications, "id2"));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(MessageCenterImplTest, RemoveAllNotificationsWithPinned) {
-  NotifierId notifier_id1(NotifierType::APPLICATION, "app1");
-  NotifierId notifier_id2(NotifierType::APPLICATION, "app2");
-
-  NearTotalNotificationBlocker blocker(message_center(), notifier_id1);
-  blocker.Init();
-  blocker.SetNotificationsEnabled(false);
-
-  // Notification 1: Visible, non-pinned
-  message_center()->AddNotification(std::make_unique<Notification>(
-      NOTIFICATION_TYPE_SIMPLE, "id1", u"title", u"message",
-      ui::ImageModel() /* icon */, std::u16string() /* display_source */,
-      GURL(), notifier_id1, RichNotificationData(), nullptr));
-
-  // Notification 2: Invisible, non-pinned
-  message_center()->AddNotification(std::make_unique<Notification>(
-      NOTIFICATION_TYPE_SIMPLE, "id2", u"title", u"message",
-      ui::ImageModel() /* icon */, std::u16string() /* display_source */,
-      GURL(), notifier_id2, RichNotificationData(), nullptr));
-
-  // Notification 3: Visible, pinned
-  auto notification3 = std::make_unique<Notification>(
-      NOTIFICATION_TYPE_SIMPLE, "id3", u"title", u"message",
-      ui::ImageModel() /* icon */, std::u16string() /* display_source */,
-      GURL(), notifier_id1, RichNotificationData(), nullptr);
-  notification3->set_pinned(true);
-  message_center()->AddNotification(std::move(notification3));
-
-  // Notification 4: Invisible, pinned
-  auto notification4 = std::make_unique<Notification>(
-      NOTIFICATION_TYPE_SIMPLE, "id4", u"title", u"message",
-      ui::ImageModel() /* icon */, std::u16string() /* display_source */,
-      GURL(), notifier_id2, RichNotificationData(), nullptr);
-  notification4->set_pinned(true);
-  message_center()->AddNotification(std::move(notification4));
-
-  // Remove all the notifications which are visible and non-pinned.
-  message_center()->RemoveAllNotifications(
-      false /* by_user */, MessageCenter::RemoveType::NON_PINNED);
-
-  EXPECT_EQ(1u, message_center()->NotificationCount());
-  blocker.SetNotificationsEnabled(true);  // Show invisible notifications.
-  EXPECT_EQ(3u, message_center()->NotificationCount());
-
-  NotificationList::Notifications notifications =
-      message_center()->GetVisibleNotifications();
-  // Notification 1 should be removed.
-  EXPECT_FALSE(NotificationsContain(notifications, "id1"));
-  // Notification 2 shouldn't be removed since it was invisible.
-  EXPECT_TRUE(NotificationsContain(notifications, "id2"));
-  // Notification 3 shouldn't be removed since it was pinned.
-  EXPECT_TRUE(NotificationsContain(notifications, "id3"));
-  // Notification 4 shouldn't be removed since it was invisible and pinned.
-  EXPECT_TRUE(NotificationsContain(notifications, "id4"));
-}
-#endif
 
 TEST_F(MessageCenterImplTest, NotifierEnabledChanged) {
   ASSERT_EQ(0u, message_center()->NotificationCount());

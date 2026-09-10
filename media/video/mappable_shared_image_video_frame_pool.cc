@@ -685,7 +685,7 @@ void MappableSharedImageVideoFramePool::PoolImpl::CreateHardwareFrame(
   }
 
   bool is_software_backed_video_frame = !video_frame->HasSharedImage();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   is_software_backed_video_frame &= !video_frame->HasDmaBufs();
 #endif
 
@@ -1108,7 +1108,7 @@ scoped_refptr<VideoFrame> MappableSharedImageVideoFramePool::PoolImpl::
           gpu::SHARED_IMAGE_USAGE_WEBGPU_READ);
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Gate this on SharedImage usage as ScopedAccess now CHECKs for it.
   // TOOD(crbug.com/425634684, crbug.com/413659843): Check for webgpu support
   // from SharedImageCapabilities, once this metadata is compatible.
@@ -1273,13 +1273,7 @@ MappableSharedImageVideoFramePool::PoolImpl::GetOrCreateFrameResource(
 
   // TODO(crbug.com/425634684): Check for webgpu support from
   // SharedImageCapabilities, once this metadata is compatible.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kEnableUnsafeWebGPU)) {
-    // This SharedImage may be used for zero-copy import into WebGPU.
-    si_usage |= gpu::SHARED_IMAGE_USAGE_WEBGPU_READ;
-  }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // This SharedImage may be used for zero-copy import into WebGPU.
   si_usage |= gpu::SHARED_IMAGE_USAGE_WEBGPU_READ;
 #endif

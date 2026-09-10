@@ -29,10 +29,6 @@
 #include "ui/gfx/geometry/rect.h"
 #include "ui/views/bubble/bubble_frame_view.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ui/frame/multitask_menu/multitask_menu_nudge_controller.h"
-#endif
-
 class TabSearchBubbleHostBrowserTest : public InProcessBrowserTest {
  public:
   TabSearchBubbleHostBrowserTest() = default;
@@ -147,9 +143,6 @@ IN_PROC_BROWSER_TEST_F(TabSearchBubbleHostBrowserTest,
 class FullscreenTabSearchBubbleDialogTest : public DialogBrowserTest {
  public:
   FullscreenTabSearchBubbleDialogTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    chromeos::MultitaskMenuNudgeController::SetSuppressNudgeForTesting(true);
-#endif
   }
 
   FullscreenTabSearchBubbleDialogTest(

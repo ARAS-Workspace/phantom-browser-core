@@ -50,7 +50,7 @@
 #include "third_party/icu/source/common/unicode/unistr.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #include "third_party/icu/source/i18n/unicode/timezone.h"
 #endif
 
@@ -212,11 +212,9 @@ bool InitializeICUFromDataFile() {
   debug::Alias(&debug_icu_load);
   int debug_icu_last_error = g_debug_icu_last_error;
   debug::Alias(&debug_icu_last_error);
-#if !BUILDFLAG(IS_CHROMEOS)
   // https://crbug.com/445616
   // https://crbug.com/1449816
   CHECK(result);
-#endif
 
   return result;
 }
@@ -226,7 +224,7 @@ bool InitializeICUFromDataFile() {
 // On some platforms, the time zone must be explicitly initialized zone rather
 // than relying on ICU's internal initialization.
 void InitializeIcuTimeZone() {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // To respond to the time zone change properly, the default time zone
   // cache in ICU has to be populated on starting up.
   // See TimeZoneMonitorLinux::NotifyClientsFromImpl().

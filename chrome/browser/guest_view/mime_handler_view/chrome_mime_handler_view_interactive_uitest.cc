@@ -90,7 +90,7 @@ class ChromeMimeHandlerViewInteractiveUITest : public ExtensionApiTest {
 };
 
 // Test is flaky on Linux.  https://crbug.com/41409998
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_Fullscreen DISABLED_Fullscreen
 #else
 #define MAYBE_Fullscreen Fullscreen

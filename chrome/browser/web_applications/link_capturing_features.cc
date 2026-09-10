@@ -29,11 +29,7 @@ const base::FeatureParam<::features::CapturingState>
         &kNavigationCapturingTestingOverrideParams};
 
 bool ShouldShowLinkCapturingUX() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return base::FeatureList::IsEnabled(::features::kPwaNavigationCapturing);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 ::features::CapturingState GetNavigationCapturingDefaultState() {

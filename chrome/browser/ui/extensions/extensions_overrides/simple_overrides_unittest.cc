@@ -117,9 +117,6 @@ constexpr const char* kDisallowedFeatures[] = {
 
 // Unlike the keys above, chromeos_system_extension *is* only defined on
 // ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-    extensions::manifest_keys::kChromeOSSystemExtension,
-#endif
 
     // The following features have no declared constant, but are present in
     // the manifest_features file (they may be used only in a single other file,

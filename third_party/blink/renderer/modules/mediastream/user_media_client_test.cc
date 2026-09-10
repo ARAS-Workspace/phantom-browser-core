@@ -1513,7 +1513,7 @@ TEST_F(UserMediaClientTest, NonDefaultAudioConstraintsPropagate) {
   user_media_client_impl_->RequestUserMediaForTest(request);
   blink::AudioCaptureSettings audio_capture_settings =
       user_media_processor_->AudioSettings();
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   audio_capture_settings = user_media_processor_->EligibleAudioSettings()[0];
 #endif
 
@@ -1572,7 +1572,7 @@ TEST_F(UserMediaClientTest, CreateWithBasicIdealValidDeviceId) {
       CreateDeviceConstraints(g_empty_string, fake_ids_->video_input_1);
 
   String expected_audio_device_id =
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
       String(media::AudioDeviceDescription::kDefaultDeviceId);
 #else
       fake_ids_->audio_input_1;
@@ -1590,7 +1590,7 @@ TEST_F(UserMediaClientTest, CreateWithAdvancedExactValidDeviceId) {
       g_empty_string, g_empty_string, fake_ids_->video_input_1);
 
   String expected_audio_device_id =
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
       String(media::AudioDeviceDescription::kDefaultDeviceId);
 #else
       fake_ids_->audio_input_1;
@@ -2253,7 +2253,7 @@ TEST_F(UserMediaClientTest, RestrictOwnAudioTrackCapabilities) {
             media::IsRestrictOwnAudioSupported());
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
+#if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
 TEST_F(UserMediaClientTest,
        ApplyConstraintsAudioDeviceClonedTrackVoiceIsolation) {
 #if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)

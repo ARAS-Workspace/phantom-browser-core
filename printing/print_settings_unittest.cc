@@ -90,10 +90,6 @@ TEST(PrintSettingsTest, SetPrinterPrintableArea) {
        mojom::MarginType::kCustomMargins},
       {300, PageMargins(0, 0, 10000, 20000, 5000, 15000),
        mojom::MarginType::kCustomMargins},
-#if BUILDFLAG(IS_CHROMEOS)
-      {300, PageMargins(0, 0, 10000, 10000, 5000, 5000),
-       mojom::MarginType::kPrecomputedMarginsForBackend}
-#endif  // BUILDFLAG(IS_CHROMEOS)
   };
 
   for (const auto& test_case : kTestCases) {
@@ -103,13 +99,6 @@ TEST(PrintSettingsTest, SetPrinterPrintableArea) {
     if (test_case.expected_margin_type == mojom::MarginType::kCustomMargins) {
       settings.SetCustomMargins(test_case.margins);
     }
-
-#if BUILDFLAG(IS_CHROMEOS)
-    if (test_case.expected_margin_type ==
-        mojom::MarginType::kPrecomputedMarginsForBackend) {
-      settings.SetCustomMarginsForBackend(test_case.margins);
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     settings.SetPrinterPrintableArea(kPhysicalSizeDeviceUnits,
                                      kPrintableAreaDeviceUnits,
@@ -155,13 +144,6 @@ TEST(PrintSettingsTest, SetPrinterPrintableArea) {
         EXPECT_EQ(expected_custom_margins, page_setup.effective_margins());
         break;
       }
-#if BUILDFLAG(IS_CHROMEOS)
-      case mojom::MarginType::kPrecomputedMarginsForBackend: {
-        EXPECT_TRUE(page_setup.effective_margins().IsEmpty());
-        EXPECT_TRUE(page_setup.requested_margins().IsEmpty());
-        break;
-      }
-#endif  // BUILDFLAG(IS_CHROMEOS)
       default: {
         NOTREACHED();
       }
@@ -174,14 +156,5 @@ TEST(PrintSettingsTest, SetCustomMarginsForBackend) {
   settings.SetCustomMargins(PageMargins(0, 0, 10000, 10000, 5000, 5000));
   EXPECT_EQ(settings.margin_type(), mojom::MarginType::kCustomMargins);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(PrintSettingsTest, SetPrecomputedMarginsForBackend) {
-  PrintSettings settings;
-  settings.SetCustomMarginsForBackend({0, 0, 10000, 10000, 5000, 5000});
-  EXPECT_EQ(settings.margin_type(),
-            mojom::MarginType::kPrecomputedMarginsForBackend);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace printing

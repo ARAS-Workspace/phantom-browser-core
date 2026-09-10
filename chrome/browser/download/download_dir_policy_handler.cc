@@ -26,10 +26,6 @@
 #include "components/prefs/pref_value_map.h"
 #include "components/strings/grit/components_strings.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 DownloadDirPolicyHandler::DownloadDirPolicyHandler()
     : TypeCheckingPolicyHandler(policy::key::kDownloadDirectory,
                                 base::Value::Type::STRING) {}
@@ -43,16 +39,6 @@ bool DownloadDirPolicyHandler::CheckPolicySettings(
   if (!CheckAndGetValue(policies, errors, &value)) {
     return false;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Download directory can only be set as a user policy. If it is set through
-  // platform policy for a chromeos=1 build, ignore it.
-  if (value &&
-      policies.Get(policy_name())->scope != policy::POLICY_SCOPE_USER) {
-    errors->AddError(policy_name(), IDS_POLICY_SCOPE_ERROR);
-    return false;
-  }
-#endif
 
   return true;
 }
@@ -92,31 +78,6 @@ void DownloadDirPolicyHandler::ApplyPolicySettingsWithParameters(
     prefs->SetBoolean(prefs::kPromptForDownload, false);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  const bool download_to_drive =
-      download_dir_util::DownloadToDrive(string_value, parameters);
-  const bool download_to_one_drive =
-      download_dir_util::DownloadToOneDrive(string_value, parameters);
-
-  // If the policy enforces a cloud location, ensure the corresponding service
-  // remains enabled.
-  if (is_mandatory) {
-    if (download_to_drive) {
-      prefs->SetBoolean(drive::prefs::kDisableDrive, false);
-    } else if (download_to_one_drive) {
-      prefs->SetBoolean(ash::prefs::kAllowUserToRemoveODFS, false);
-    }
-  }
-
-  // Set the Files App default folder, regardless of policy enforcement.
-  if (download_to_drive) {
-    prefs->SetString(ash::prefs::kFilesAppDefaultLocation,
-                     download_dir_util::kLocationGoogleDrive);
-  } else if (download_to_one_drive) {
-    prefs->SetString(ash::prefs::kFilesAppDefaultLocation,
-                     download_dir_util::kLocationOneDrive);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void DownloadDirPolicyHandler::ApplyPolicySettings(

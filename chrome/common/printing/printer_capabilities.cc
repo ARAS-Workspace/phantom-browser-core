@@ -29,10 +29,6 @@
 #include "printing/print_job_constants.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/common/printing/ipp_l10n.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(PRINT_MEDIA_L10N_ENABLED)
 #include "components/printing/common/print_media_l10n.h"
 #endif  // BUILDFLAG(PRINT_MEDIA_L10N_ENABLED)
@@ -74,37 +70,6 @@ void PopulateAndSortAllPaperNames(PrinterSemanticCapsAndDefaults& info) {
 }
 #endif  // BUILDFLAG(PRINT_MEDIA_L10N_ENABLED)
 
-#if BUILDFLAG(IS_CHROMEOS)
-void PopulateMediaTypeLocalization(
-    PrinterSemanticCapsAndDefaults::MediaTypes& media_types) {
-  auto& l10n_map = CapabilityLocalizationMap();
-  for (auto& value : media_types) {
-    auto value_it =
-        l10n_map.find(base::StrCat({"media-type/", value.vendor_id}));
-    if (value_it != l10n_map.end()) {
-      value.display_name = l10n_util::GetStringUTF8(value_it->second);
-    }
-  }
-}
-
-void PopulateAdvancedCapsLocalization(
-    std::vector<AdvancedCapability>* advanced_capabilities) {
-  auto& l10n_map = CapabilityLocalizationMap();
-  for (AdvancedCapability& capability : *advanced_capabilities) {
-    auto capability_it = l10n_map.find(capability.name);
-    if (capability_it != l10n_map.end())
-      capability.display_name = l10n_util::GetStringUTF8(capability_it->second);
-
-    for (AdvancedCapabilityValue& value : capability.values) {
-      auto value_it =
-          l10n_map.find(base::StrCat({capability.name, "/", value.name}));
-      if (value_it != l10n_map.end())
-        value.display_name = l10n_util::GetStringUTF8(value_it->second);
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Returns a dictionary representing printer capabilities as CDD, or
 // a Value of type NONE if no capabilities are provided.
 base::Value AssemblePrinterCapabilities(const std::string& device_name,
@@ -121,16 +86,6 @@ base::Value AssemblePrinterCapabilities(const std::string& device_name,
   PopulateAndSortAllPaperNames(*caps);
 #endif  // BUILDFLAG(PRINT_MEDIA_L10N_ENABLED)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  PopulateMediaTypeLocalization(caps->media_types);
-
-  if (!has_secure_protocol) {
-    caps->pin_supported = false;
-  }
-
-  PopulateAdvancedCapsLocalization(&caps->advanced_capabilities);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   return cloud_print::PrinterSemanticCapsAndDefaultsToCdd(*caps);
 }
 
@@ -146,13 +101,6 @@ base::DictValue AssemblePrinterSettings(const std::string& device_name,
   printer_info.Set(kSettingPrinterDescription, basic_info.printer_description);
 
   base::DictValue options;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  printer_info.Set(
-      kCUPSEnterprisePrinter,
-      basic_info.options.contains(kCUPSEnterprisePrinter) &&
-          basic_info.options.at(kCUPSEnterprisePrinter) == kValueTrue);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   printer_info.Set(kSettingPrinterOptions, std::move(options));
 

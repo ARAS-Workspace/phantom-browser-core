@@ -12,12 +12,6 @@
 #include "base/threading/platform_thread.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_CHROMEOS) && \
-    (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
-#include "base/profiler/stack_copier_signal.h"
-#include "base/profiler/thread_delegate_posix.h"
-#endif
-
 namespace base {
 
 std::unique_ptr<StackSampler> StackSampler::Create(
@@ -26,16 +20,7 @@ std::unique_ptr<StackSampler> StackSampler::Create(
     UnwindersFactory core_unwinders_factory,
     RepeatingClosure record_sample_callback,
     StackSamplerTestDelegate* test_delegate) {
-#if BUILDFLAG(IS_CHROMEOS) && \
-    (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
-  return base::WrapUnique(new StackSampler(
-      std::make_unique<StackCopierSignal>(
-          ThreadDelegatePosix::Create(thread_token)),
-      std::move(stack_unwind_data), std::move(core_unwinders_factory),
-      std::move(record_sample_callback), test_delegate));
-#else
   return nullptr;
-#endif
 }
 
 size_t StackSampler::GetStackBufferSize() {

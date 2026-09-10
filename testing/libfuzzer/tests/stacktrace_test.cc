@@ -213,8 +213,6 @@ std::string CheckFailureStackRegex() {
   return CheckFailureStackRegexLinuxAsan64Bit();
 #elif BUILDFLAG(IS_LINUX)
   return CheckFailureStackRegexLinux();
-#elif BUILDFLAG(IS_CHROMEOS)
-  return CheckFailureStackRegexChromeOs();
 #elif BUILDFLAG(IS_MAC) && defined(ARCH_CPU_ARM64)
   return CheckFailureStackRegexMacArm64();
 #endif

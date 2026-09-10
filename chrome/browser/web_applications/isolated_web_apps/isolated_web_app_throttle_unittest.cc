@@ -62,10 +62,8 @@ class IsolatedWebAppThrottleTest : public WebAppTest {
   }
 
  private:
-#if !BUILDFLAG(IS_CHROMEOS)
   base::test::ScopedFeatureList scoped_feature_list_{
       features::kIsolatedWebApps};
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(IsolatedWebAppThrottleTest, NoIwaNavigationProceed) {

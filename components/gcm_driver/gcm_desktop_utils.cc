@@ -28,8 +28,6 @@ GCMClient::ChromePlatform GetPlatform() {
   return GCMClient::PLATFORM_IOS;
 #elif BUILDFLAG(IS_ANDROID)
   return GCMClient::PLATFORM_ANDROID;
-#elif BUILDFLAG(IS_CHROMEOS)
-  return GCMClient::PLATFORM_CROS;
 #elif BUILDFLAG(IS_LINUX)
   return GCMClient::PLATFORM_LINUX;
 #else

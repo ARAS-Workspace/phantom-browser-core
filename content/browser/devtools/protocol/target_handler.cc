@@ -150,11 +150,6 @@ static std::string TerminationStatusToString(base::TerminationStatus status) {
       return "crashed";
     case base::TERMINATION_STATUS_STILL_RUNNING:
       return "still running";
-#if BUILDFLAG(IS_CHROMEOS)
-    // Used for the case when oom-killer kills a process on ChromeOS.
-    case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
-      return "oom killed";
-#endif
 #if BUILDFLAG(IS_ANDROID)
     // On Android processes are spawned from the system Zygote and we do not get
     // the termination status.  We can't know if the termination was a crash or

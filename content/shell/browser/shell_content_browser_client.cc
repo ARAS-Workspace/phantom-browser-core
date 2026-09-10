@@ -116,7 +116,7 @@
 #include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include "components/crash/core/app/crash_switches.h"
 #include "components/crash/core/app/crashpad.h"
 #include "content/public/common/content_descriptors.h"
@@ -156,7 +156,7 @@ GetShellContentBrowserClientInstancesImpl() {
 int GetCrashSignalFD(const base::CommandLine& command_line) {
   return crashpad::CrashHandlerHost::Get()->GetDeathSignalSocket();
 }
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
 int GetCrashSignalFD(const base::CommandLine& command_line) {
   int fd;
   pid_t pid;
@@ -445,7 +445,7 @@ void ShellContentBrowserClient::AppendExtraCommandLineSwitches(
   command_line->CopySwitchesFrom(*base::CommandLine::ForCurrentProcess(),
                                  kForwardSwitches);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
           switches::kEnableCrashReporter)) {
     int fd;
@@ -456,7 +456,7 @@ void ShellContentBrowserClient::AppendExtraCommandLineSwitches(
           base::NumberToString(pid));
     }
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   if (command_line->GetSwitchValueASCII(switches::kProcessType) ==
           switches::kRendererProcess &&
@@ -729,7 +729,7 @@ void ShellContentBrowserClient::OverrideURLLoaderFactoryParams(
   }
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 void ShellContentBrowserClient::GetAdditionalMappedFilesForChildProcess(
     const base::CommandLine& command_line,
     int child_process_id,
@@ -745,8 +745,7 @@ void ShellContentBrowserClient::GetAdditionalMappedFilesForChildProcess(
     mappings->Share(kCrashDumpSignal, crash_signal_fd);
   }
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 // Note that ShellContentBrowserClient overrides this method to work around
 // test flakiness that happens when NetworkService::SetTestDohConfigForTesting()

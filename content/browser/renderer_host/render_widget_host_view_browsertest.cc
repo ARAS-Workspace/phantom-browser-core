@@ -1567,13 +1567,8 @@ IN_PROC_BROWSER_TEST_P(
   PerformTestWithLeftRightRects(html_rect_size, copy_rect, output_size);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// On ChromeOS there is no software compositing.
-static const auto kTestCompositingModes = testing::Values(GL_COMPOSITING);
-#else
 static const auto kTestCompositingModes =
     testing::Values(GL_COMPOSITING, SOFTWARE_COMPOSITING);
-#endif
 
 INSTANTIATE_TEST_SUITE_P(GLAndSoftwareCompositing,
                          CompositingRenderWidgetHostViewBrowserTest,

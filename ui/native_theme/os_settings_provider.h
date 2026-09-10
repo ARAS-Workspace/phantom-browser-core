@@ -21,9 +21,6 @@ namespace ui {
 #if BUILDFLAG(IS_ANDROID)
 class OsSettingsProviderAndroid;
 using OsSettingsProviderImpl = OsSettingsProviderAndroid;
-#elif BUILDFLAG(IS_CHROMEOS)
-class OsSettingsProviderAsh;
-using OsSettingsProviderImpl = OsSettingsProviderAsh;
 #elif BUILDFLAG(IS_MAC)
 class OsSettingsProviderMac;
 using OsSettingsProviderImpl = OsSettingsProviderMac;

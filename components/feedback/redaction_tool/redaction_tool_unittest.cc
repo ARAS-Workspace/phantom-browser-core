@@ -260,16 +260,6 @@ const StringWithRedaction kStringsWithRedactions[] = {
     {"with prefixCrash report receipt ID 153C963587D8D8D4b with trailing text",
      "with prefixCrash report receipt ID (Crash ID: 2) with trailing text",
      PIIType::kCrashId},
-#if BUILDFLAG(IS_CHROMEOS)  // We only redact Android paths on Chrome OS.
-    // Allowed android storage path.
-    {"112K\t/home/root/deadbeef1234/android-data/data/system_de",
-     "112K\t/home/root/deadbeef1234/android-data/data/system_de",
-     PIIType::kNone},
-    // Redacted app-specific storage path.
-    {"8.0K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/de",
-     "8.0K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/d_",
-     PIIType::kAndroidAppStoragePath},
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 class RedactionToolTest : public testing::Test {
@@ -890,14 +880,6 @@ TEST_F(RedactionToolTest, RedactAndKeepSelectedHashes) {
                // that
                // contains
                // a hash.
-#if BUILDFLAG(IS_CHROMEOS)
-      {"8.0K\t/home/root/aabbccddeeff00112233445566778899/"
-       "android-data/data/data/pa.ckage2/de",  // Android app storage
-                                               // path that contains a
-                                               // hash.
-       "8.0K\t/home/root/(HASH:aabb "
-       "3)/android-data/data/data/pa.ckage2/de"}
-#endif  // BUILDFLAG(IS_CHROMEOS)
   };
   std::string redaction_input;
   std::string redaction_output;
@@ -917,9 +899,6 @@ TEST_F(RedactionToolTest, DetectPII) {
     redaction_input.append(s.pre_redaction).append("\n");
   }
   std::map<PIIType, std::set<std::string>> pii_in_data{
-#if BUILDFLAG(IS_CHROMEOS)  // We only detect Android paths on Chrome OS.
-      {PIIType::kAndroidAppStoragePath, {"/de"}},
-#endif  // BUILDFLAG(IS_CHROMEOS)
       {PIIType::kSSID, {"123aaaaaa"}},
       {PIIType::kURL,
        {"http://tets.comaaaaaaa",
@@ -986,60 +965,6 @@ TEST_F(RedactionToolTest, DetectPII) {
 
   EXPECT_EQ(pii_in_data, redactor_.Detect(redaction_input));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)  // We only redact Android paths on Chrome OS.
-TEST_F(RedactionToolTest, RedactAndroidAppStoragePaths) {
-  EXPECT_EQ("", RedactAndroidAppStoragePaths(""));
-  EXPECT_EQ("foo\nbar\n", RedactAndroidAppStoragePaths("foo\nbar\n"));
-
-  constexpr char kDuOutput[] =
-      "112K\t/home/root/deadbeef1234/android-data/data/system_de\n"
-      // /data/data will be modified by the redactor.
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pack.age1/a\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pack.age1/bc\n"
-      "24K\t/home/root/deadbeef1234/android-data/data/data/pack.age1\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/de\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/de/"
-      "\xe3\x81\x82\n"
-      "8.1K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/de/"
-      "\xe3\x81\x82\xe3\x81\x83\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/ef\n"
-      "24K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/app/pack.age1/a\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/app/pack.age1/bc\n"
-      "24K\t/home/root/deadbeef1234/android-data/data/app/pack.age1\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/user_de/0/pack.age1/a\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/user_de/0/pack.age1/bc\n"
-      "24K\t/home/root/deadbeef1234/android-data/data/user_de/0/pack.age1\n"
-      "78M\t/home/root/deadbeef1234/android-data/data/data\n"
-      "key=value path=/data/data/pack.age1/bc key=value\n"
-      "key=value path=/data/user_de/0/pack.age1/bc key=value\n"
-      "key=value exe=/data/app/pack.age1/bc key=value\n";
-  constexpr char kDuOutputRedacted[] =
-      "112K\t/home/root/deadbeef1234/android-data/data/system_de\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pack.age1/a\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pack.age1/b_\n"
-      "24K\t/home/root/deadbeef1234/android-data/data/data/pack.age1\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/d_\n"
-      // The non-ASCII directory names will become '*_'.
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/d_/*_\n"
-      "8.1K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/d_/*_\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2/e_\n"
-      "24K\t/home/root/deadbeef1234/android-data/data/data/pa.ckage2\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/app/pack.age1/a\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/app/pack.age1/b_\n"
-      "24K\t/home/root/deadbeef1234/android-data/data/app/pack.age1\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/user_de/0/pack.age1/a\n"
-      "8.0K\t/home/root/deadbeef1234/android-data/data/user_de/0/pack.age1/b_\n"
-      "24K\t/home/root/deadbeef1234/android-data/data/user_de/0/pack.age1\n"
-      "78M\t/home/root/deadbeef1234/android-data/data/data\n"
-      "key=value path=/data/data/pack.age1/b_ key=value\n"
-      "key=value path=/data/user_de/0/pack.age1/b_ key=value\n"
-      "key=value exe=/data/app/pack.age1/b_ key=value\n";
-  EXPECT_EQ(kDuOutputRedacted, RedactAndroidAppStoragePaths(kDuOutput));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_IOS)
 // TODO(xiangdongkong): Make the test work on IOS builds. Current issue: the

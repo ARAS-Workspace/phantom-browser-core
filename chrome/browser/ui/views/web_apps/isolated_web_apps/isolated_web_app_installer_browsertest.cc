@@ -48,10 +48,6 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/dialog_delegate.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 namespace {
 
@@ -77,10 +73,6 @@ class IsolatedWebAppInstallerBrowserTest : public WebAppBrowserTestBase {
 
   void SetUpOnMainThread() override {
     WebAppBrowserTestBase::SetUpOnMainThread();
-#if BUILDFLAG(IS_CHROMEOS)
-    profile()->GetPrefs()->SetBoolean(ash::prefs::kIsolatedWebAppsEnabled,
-                                      true);
-#endif
   }
 
  protected:
@@ -352,30 +344,6 @@ class IsolatedWebAppInstallerDisabledBrowserTest
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(IsolatedWebAppInstallerDisabledBrowserTest,
-                       DoesNotLaunchIfUnmanagedInstallIsDisabled) {
-  std::unique_ptr<ScopedBundledIsolatedWebApp> app =
-      IsolatedWebAppBuilder(ManifestBuilder()).BuildBundle();
-  app->TrustSigningKey();
-
-  base::test::TestFuture<void> on_closed_future;
-
-  profile()->GetPrefs()->SetBoolean(ash::prefs::kIsolatedWebAppsEnabled, true);
-
-  IsolatedWebAppInstallerCoordinator* coordinator =
-      IsolatedWebAppInstallerCoordinator::CreateAndStart(
-          profile(), app->path(), on_closed_future.GetCallback());
-
-  IsolatedWebAppInstallerModel* model = coordinator->GetModelForTesting();
-  ASSERT_TRUE(model);
-
-  ASSERT_TRUE(on_closed_future.Wait());
-
-  EXPECT_EQ(model->step(), IsolatedWebAppInstallerModel::Step::kNone);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 

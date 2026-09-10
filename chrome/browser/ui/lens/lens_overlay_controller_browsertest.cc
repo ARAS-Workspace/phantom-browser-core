@@ -5346,11 +5346,9 @@ IN_PROC_BROWSER_TEST_F(LensOverlayControllerBrowserTest,
   coordinator->RequestSendFeedback();
 
 // ChromeOS opens its own feedback dialog.
-#if !BUILDFLAG(IS_CHROMEOS)
   // Wait for the feedback dialog to appear instead of a new tab.
   ASSERT_TRUE(base::test::RunUntil(
       []() { return FeedbackDialog::GetInstanceForTest() != nullptr; }));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   histogram_tester.ExpectTotalCount("Feedback.RequestSource", 1);
 }

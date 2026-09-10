@@ -256,10 +256,4 @@ void DaemonController::ServiceNextRequest() {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-scoped_refptr<DaemonController> DaemonController::Create() {
-  NOTREACHED();
-}
-#endif
-
 }  // namespace remoting

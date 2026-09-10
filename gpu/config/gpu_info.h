@@ -195,11 +195,6 @@ struct GPU_CONFIG_EXPORT GPUInfo {
     // Device ids are unique to vendor, not to one another.
     uint32_t device_id = 0u;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // The graphics card revision number.
-    uint32_t revision = 0u;
-#endif
-
     // The 64-bit ID used for GPU selection by ANGLE_platform_angle_device_id.
     // On Mac this matches the registry ID of an IOGraphicsAccelerator2 or
     // AGXAccelerator.

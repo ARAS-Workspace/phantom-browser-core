@@ -17,10 +17,6 @@
 #include "device/fido/mac/authenticator.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/fido/cros/authenticator.h"
-#endif
-
 namespace content {
 
 #if BUILDFLAG(IS_MAC)
@@ -40,12 +36,6 @@ void IsUVPlatformAuthenticatorAvailable(
                                                        std::move(callback));
 }
 
-#elif BUILDFLAG(IS_CHROMEOS)
-void IsUVPlatformAuthenticatorAvailable(
-    IsUVPlatformAuthenticatorAvailableCallback callback) {
-  device::ChromeOSAuthenticator::IsUVPlatformAuthenticatorAvailable(
-      std::move(callback));
-}
 #endif
 
 }  // namespace content

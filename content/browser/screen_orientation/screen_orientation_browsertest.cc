@@ -134,11 +134,7 @@ class ScreenOrientationOOPIFBrowserTest : public ScreenOrientationBrowserTest {
 // actually support MacOS X if and when it switches to Aura.
 #if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
 // Flaky on Chrome OS: http://crbug.com/468259
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ScreenOrientationChange DISABLED_ScreenOrientationChange
-#else
 #define MAYBE_ScreenOrientationChange ScreenOrientationChange
-#endif
 IN_PROC_BROWSER_TEST_F(ScreenOrientationBrowserTest,
                        MAYBE_ScreenOrientationChange) {
   auto types =
@@ -169,11 +165,7 @@ IN_PROC_BROWSER_TEST_F(ScreenOrientationBrowserTest,
 #endif  // defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
 
 // Flaky on Chrome OS: http://crbug.com/468259
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_WindowOrientationChange DISABLED_WindowOrientationChange
-#else
 #define MAYBE_WindowOrientationChange WindowOrientationChange
-#endif
 IN_PROC_BROWSER_TEST_F(ScreenOrientationBrowserTest,
                        MAYBE_WindowOrientationChange) {
   GURL test_url = GetTestUrl("screen_orientation",
@@ -325,13 +317,8 @@ IN_PROC_BROWSER_TEST_F(ScreenOrientationOOPIFBrowserTest, ScreenOrientation) {
 // blink::mojom::FrameWidget::EnableDeviceEmulation, which calls
 // RenderWidget::Resize on the renderer side.  The test fakes this by directly
 // sending the resize message to the widget.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ScreenOrientationInPendingMainFrame \
-  DISABLED_ScreenOrientationInPendingMainFrame
-#else
 #define MAYBE_ScreenOrientationInPendingMainFrame \
   ScreenOrientationInPendingMainFrame
-#endif
 IN_PROC_BROWSER_TEST_F(ScreenOrientationOOPIFBrowserTest,
                        MAYBE_ScreenOrientationInPendingMainFrame) {
   GURL main_url(embedded_test_server()->GetURL("a.com", "/title1.html"));

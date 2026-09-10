@@ -25,10 +25,10 @@
 #include "sandbox/policy/sandbox_type.h"
 #include "sandbox/policy/switches.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "media/gpu/buildflags.h"
 #include "media/media_buildflags.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 using sandbox::mojom::Sandbox;
 using sandbox::policy::SandboxLinux;
@@ -117,7 +117,7 @@ class UtilityProcessSandboxBrowserTest
       }
 
       case Sandbox::kAudio:
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       case Sandbox::kShapeDetection:
       case Sandbox::kOnDeviceTranslation:
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
@@ -126,12 +126,7 @@ class UtilityProcessSandboxBrowserTest
 #if BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
       case Sandbox::kHardwareVideoEncoding:
 #endif  // BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_CHROMEOS)
-      case Sandbox::kIme:
-      case Sandbox::kTts:
-      case Sandbox::kNearby:
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
       case Sandbox::kNetwork:
       case Sandbox::kPrintBackend:
       case Sandbox::kScreenAI:

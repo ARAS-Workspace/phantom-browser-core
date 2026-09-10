@@ -46,10 +46,6 @@
 #include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/web_applications/isolated_web_apps/policy/isolated_web_app_cache_manager.h"
-#endif  //  BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 // New fields must be added to BuildDebugInfo().
@@ -75,9 +71,6 @@ constexpr char kIsolatedWebAppUpdateManager[] = "IsolatedWebAppUpdateManager";
 constexpr char kIsolatedWebAppPolicyManager[] = "IsolatedWebAppPolicyManager";
 constexpr char kIwaKeyDistributionInfoProvider[] =
     "IwaKeyDistributionInfoProvider";
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kIwaBundleCacheManager[] = "IwaBundleCacheManager";
-#endif  //  BUILDFLAG(IS_CHROMEOS)
 constexpr char kNavigationCapturing[] = "NavigationCapturing";
 
 constexpr char kNeedsRecordWebAppDebugInfo[] =
@@ -218,12 +211,6 @@ base::Value BuildIwaKeyDistributionInfoProviderValue(
       .AsDebugValue();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-base::Value BuildIwaCacheManagerValue(web_app::WebAppProvider& provider) {
-  return provider.isolated_web_app_cache_manager().GetDebugValue();
-}
-#endif  //  BUILDFLAG(IS_CHROMEOS)
-
 void BuildDirectoryState(base::FilePath file_or_folder,
                          base::DictValue* folder) {
   base::File::Info info;
@@ -306,9 +293,6 @@ void WebAppInternalsHandler::BuildDebugInfo(
            BuildIsolatedWebAppUpdaterManagerValue(*provider));
   root.Set(kIsolatedWebAppPolicyManager,
            BuildIsolatedWebAppPolicyManagerValue(*provider));
-#if BUILDFLAG(IS_CHROMEOS)
-  root.Set(kIwaBundleCacheManager, BuildIwaCacheManagerValue(*provider));
-#endif  //  BUILDFLAG(IS_CHROMEOS)
   root.Set(kIwaKeyDistributionInfoProvider,
            BuildIwaKeyDistributionInfoProviderValue(
                base::PassKey<WebAppInternalsHandler>()));

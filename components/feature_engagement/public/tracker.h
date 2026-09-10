@@ -390,16 +390,6 @@ class Tracker : public KeyedService, public base::SupportsUserData {
   // invoked exactly one time.
   virtual void AddOnInitializedCallback(OnInitializedCallback callback) = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Updates the config of a specific feature after initialization. The new
-  // config will replace the existing config.
-  // Calling this method requires the Tracker to already have been initialized.
-  // See IsInitialized() and AddOnInitializedCallback(...) for how to ensure
-  // the call to this is delayed.
-  virtual void UpdateConfig(const base::Feature& feature,
-                            const ConfigurationProvider* provider) = 0;
-#endif
-
   // Returns the configuration associated with the tracker for testing purposes.
   const Configuration* GetConfigurationForTesting() const {
     return GetConfiguration();

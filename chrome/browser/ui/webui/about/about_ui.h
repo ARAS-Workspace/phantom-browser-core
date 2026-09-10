@@ -43,25 +43,11 @@ class TermsUIConfig : public AboutUIConfigBase {
 };
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OPENBSD)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
 // chrome://linux-proxy-config
 class LinuxProxyConfigUI : public AboutUIConfigBase {
  public:
   LinuxProxyConfigUI();
-};
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-// chrome://os-credits
-class OSCreditsUI : public AboutUIConfigBase {
- public:
-  OSCreditsUI();
-};
-
-// chrome://crostini-credits
-class CrostiniCreditsUI : public AboutUIConfigBase {
- public:
-  CrostiniCreditsUI();
 };
 #endif
 
@@ -91,20 +77,11 @@ class AboutUIHTMLSource : public content::URLDataSource {
   void FinishDataRequest(const std::string& html,
                          content::URLDataSource::GotDataCallback callback);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetOSCreditsPrefixForTesting(const base::FilePath& prefix) {
-    os_credits_prefix_ = prefix;
-  }
-#endif
-
   Profile* profile() { return profile_; }
 
  private:
   std::string source_name_;
   raw_ptr<Profile> profile_;
-#if BUILDFLAG(IS_CHROMEOS)
-  base::FilePath os_credits_prefix_;
-#endif
 };
 
 class AboutUI : public content::WebUIController {

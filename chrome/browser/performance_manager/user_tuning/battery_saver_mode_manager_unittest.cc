@@ -31,14 +31,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chromeos/dbus/power/power_manager_client.h"
-#include "dbus/mock_bus.h"
-#include "dbus/mock_object_proxy.h"
-#include "dbus/object_path.h"
-#endif
-
 namespace performance_manager::user_tuning {
 namespace {
 
@@ -86,8 +78,6 @@ class MockObserver : public performance_manager::user_tuning::
   MOCK_METHOD1(OnDeviceHasBatteryChanged, void(bool));
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 base::BatteryLevelProvider::BatteryState CreateBatteryState(
     bool under_threshold) {
   return {
@@ -98,21 +88,6 @@ base::BatteryLevelProvider::BatteryState CreateBatteryState(
       .charge_unit = base::BatteryLevelProvider::BatteryLevelUnit::kRelative,
       .capture_time = base::TimeTicks::Now()};
 }
-
-#else  // BUILDFLAG(IS_CHROMEOS)
-
-class ScopedFakePowerManagerClientLifetime {
- public:
-  ScopedFakePowerManagerClientLifetime() {
-    chromeos::PowerManagerClient::InitializeFake();
-  }
-
-  ~ScopedFakePowerManagerClientLifetime() {
-    chromeos::PowerManagerClient::Shutdown();
-  }
-};
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -173,9 +148,6 @@ class BatterySaverModeManagerTest : public ::testing::Test {
       battery_level_provider_;
   std::unique_ptr<base::BatteryStateSampler> battery_sampler_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ScopedFakePowerManagerClientLifetime fake_power_manager_client_lifetime_;
-#endif
   raw_ptr<FakePowerMonitorSource, DanglingUntriaged> power_monitor_source_;
   bool throttling_enabled_ = false;
   bool child_process_tuning_enabled_ = false;
@@ -184,7 +156,6 @@ class BatterySaverModeManagerTest : public ::testing::Test {
 };
 
 // Battery Saver is controlled by the OS on ChromeOS
-#if !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(BatterySaverModeManagerTest, TemporaryBatterySaver) {
   StartManager();
@@ -589,66 +560,5 @@ TEST_F(BatterySaverModeManagerTest,
   sampling_source_->SimulateEvent();
   EXPECT_EQ(100, manager()->SampledBatteryPercentage());
 }
-
-#else   // BUILDFLAG(IS_CHROMEOS)
-
-TEST_F(BatterySaverModeManagerTest, ManagedFromPowerManager) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(ash::features::kBatterySaver);
-
-  StartManager();
-  EXPECT_FALSE(manager()->IsBatterySaverActive());
-  EXPECT_FALSE(throttling_enabled());
-  EXPECT_FALSE(child_process_tuning_enabled());
-  EXPECT_FALSE(freezing_enabled());
-
-  base::RunLoop run_loop;
-  std::unique_ptr<QuitRunLoopOnBSMChangeObserver> observer =
-      std::make_unique<QuitRunLoopOnBSMChangeObserver>(run_loop.QuitClosure());
-  manager()->AddObserver(observer.get());
-
-  // Request to enable PowerManager's BSM
-  power_manager::SetBatterySaverModeStateRequest proto;
-  proto.set_enabled(true);
-  chromeos::PowerManagerClient::Get()->SetBatterySaverModeState(proto);
-
-  run_loop.Run();
-  manager()->RemoveObserver(observer.get());
-
-  EXPECT_TRUE(manager()->IsBatterySaverActive());
-  EXPECT_FALSE(manager()->IsBatterySaverModeEnabled());
-  EXPECT_TRUE(throttling_enabled());
-  EXPECT_TRUE(child_process_tuning_enabled());
-  EXPECT_TRUE(freezing_enabled());
-}
-
-TEST_F(BatterySaverModeManagerTest,
-       StartsEnabledIfAlreadyEnabledInPowerManager) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(ash::features::kBatterySaver);
-
-  // Request to enable PowerManager's BSM
-  power_manager::SetBatterySaverModeStateRequest proto;
-  proto.set_enabled(true);
-  chromeos::PowerManagerClient::Get()->SetBatterySaverModeState(proto);
-
-  StartManager();
-
-  // It's fine to install the observer after the manager is created, as long as
-  // it's done before the runloop runs
-  base::RunLoop run_loop;
-  std::unique_ptr<QuitRunLoopOnBSMChangeObserver> observer =
-      std::make_unique<QuitRunLoopOnBSMChangeObserver>(run_loop.QuitClosure());
-  manager()->AddObserver(observer.get());
-
-  run_loop.Run();
-  manager()->RemoveObserver(observer.get());
-
-  EXPECT_TRUE(manager()->IsBatterySaverActive());
-  EXPECT_TRUE(throttling_enabled());
-  EXPECT_TRUE(child_process_tuning_enabled());
-  EXPECT_TRUE(freezing_enabled());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace performance_manager::user_tuning

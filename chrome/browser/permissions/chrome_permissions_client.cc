@@ -103,18 +103,6 @@
 #include "components/vector_icons/vector_icons.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/browser/ash/app_mode/isolated_web_app/kiosk_iwa_data.h"
-#include "chrome/browser/ash/app_mode/isolated_web_app/kiosk_iwa_manager.h"
-#include "chrome/browser/ash/app_mode/web_app/kiosk_web_app_data.h"
-#include "chrome/browser/ash/app_mode/web_app/kiosk_web_app_manager.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#include "chromeos/components/kiosk/kiosk_utils.h"
-#include "components/user_manager/user.h"
-#include "components/user_manager/user_manager.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/common/constants.h"
 #endif
@@ -183,32 +171,6 @@ bool ShouldUseQuietUI(content::WebContents* web_contents,
   }
   return manager->ShouldCurrentRequestUseQuietUI();
 }
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-std::optional<url::Origin> GetCurrentKioskOrigin() {
-  if (chromeos::IsWebKioskSession()) {
-    const AccountId& account_id =
-        user_manager::UserManager::Get()->GetPrimaryUser()->GetAccountId();
-    DCHECK(ash::KioskWebAppManager::IsInitialized());
-    const ash::KioskWebAppData* app_data =
-        ash::KioskWebAppManager::Get()->GetAppByAccountId(account_id);
-    DCHECK(app_data);
-    return url::Origin::Create(app_data->install_url());
-  }
-
-  if (chromeos::IsIwaKioskSession()) {
-    const AccountId& account_id =
-        user_manager::UserManager::Get()->GetPrimaryUser()->GetAccountId();
-    const ash::KioskIwaData* iwa_data =
-        CHECK_DEREF(ash::KioskIwaManager::Get()).GetApp(account_id);
-    return CHECK_DEREF(iwa_data).origin();
-  }
-
-  return std::nullopt;
-}
-
 #endif
 
 bool IsPermissionSetByAdministator(
@@ -430,12 +392,6 @@ void ChromePermissionsClient::GetUkmSourceId(
 
 permissions::IconId ChromePermissionsClient::GetOverrideIconId(
     permissions::RequestType request_type) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(xhwang): fix this icon, see crbug.com/40399970.
-  if (request_type == permissions::RequestType::kProtectedMediaIdentifier) {
-    return vector_icons::kProductIcon;
-  }
-#endif
   return PermissionsClient::GetOverrideIconId(request_type);
 }
 
@@ -669,22 +625,6 @@ std::optional<bool> ChromePermissionsClient::HasPreviouslyAutoRevokedPermission(
 
 std::optional<url::Origin> ChromePermissionsClient::GetAutoApprovalOrigin(
     content::BrowserContext* browser_context) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // In kiosk mode for web apps and isolated web apps, all permission requests
-  // are auto-approved for the origin of the main app.
-  std::optional<url::Origin> current_kiosk_origin = GetCurrentKioskOrigin();
-  if (current_kiosk_origin.has_value()) {
-    return current_kiosk_origin;
-  }
-
-  // In Shimless RMA mode, permission requests are auto-approved during runtime
-  // since the app has requested all permissions during install time.
-  if (ash::features::IsShimlessRMA3pDiagnosticsAllowPermissionPolicyEnabled() &&
-      ash::IsShimlessRmaAppBrowserContext(browser_context)) {
-    return ash::shimless_rma::DiagnosticsAppProfileHelperDelegate::
-        GetInstalledDiagnosticsAppOrigin();
-  }
-#endif
   return std::nullopt;
 }
 
@@ -1008,7 +948,7 @@ ChromePermissionsClient::CreatePromptContentScrim(
 
 bool ChromePermissionsClient::HasDevicePermission(
     ContentSettingsType type) const {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   return system_permission_settings::IsAllowed(type);
 #else
   return PermissionsClient::HasDevicePermission(type);
@@ -1017,7 +957,7 @@ bool ChromePermissionsClient::HasDevicePermission(
 
 bool ChromePermissionsClient::CanRequestDevicePermission(
     ContentSettingsType type) const {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   return system_permission_settings::CanPrompt(type);
 #else
   return PermissionsClient::CanRequestDevicePermission(type);

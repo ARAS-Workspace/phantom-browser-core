@@ -46,31 +46,6 @@ class Profile;
 
 namespace chrome {
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Sources of requests to show the help tab.
-enum class HelpSource {
-  // Keyboard accelerators.
-  kKeyboard,
-
-  // Menus (e.g. app menu or Chrome OS system menu).
-  kMenu,
-
-  // WebHID help center article.
-  kWebHID,
-
-  // WebUI (the "About" page).
-  kWebUI,
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // WebUI (the OS "About" page).
-  kWebUIChromeOS,
-#endif
-
-  // WebUSB help center article.
-  kWebUSD,
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void ShowBookmarkManager(BrowserWindowInterface* browser);
 void ShowBookmarkManagerForNode(BrowserWindowInterface* browser,
                                 int64_t node_id);
@@ -82,10 +57,6 @@ void ShowDownloads(BrowserWindowInterface* browser);
 void ShowExtensions(BrowserWindowInterface* browser,
                     const std::string& extension_to_highlight = std::string());
 
-#if BUILDFLAG(IS_CHROMEOS)
-void ShowHelp(BrowserWindowInterface* browser, HelpSource source);
-void ShowHelpForProfile(Profile* profile, HelpSource source);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 void ShowChromeTips(BrowserWindowInterface* browser);
 void ShowChromeWhatsNew(BrowserWindowInterface* browser);
@@ -158,12 +129,6 @@ void ShowAllSitesSettingsFilteredByRwsOwner(
 
 // Shows all recent shared tab group activities.
 void ShowSharedTabGroupActivity(Profile* profile);
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Shows the enterprise management info page in a browser tab.
-void ShowEnterpriseManagementPageInTabbedBrowser(
-    BrowserWindowInterface* browser);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 // Show chrome://app-settings/<app-id> page on desktop, or OS Settings on

@@ -193,12 +193,6 @@ void RemoveSiteSettingsData(const base::Time& delete_begin,
       delete_end, HostContentSettingsMap::PatternSourcePredicate());
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  host_content_settings_map->ClearSettingsForOneTypeWithPredicate(
-      ContentSettingsType::SMART_CARD_DATA, delete_begin, delete_end,
-      HostContentSettingsMap::PatternSourcePredicate());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   host_content_settings_map->ClearSettingsForOneTypeWithPredicate(
       ContentSettingsType::ON_DEVICE_SPEECH_RECOGNITION_LANGUAGES_DOWNLOADED,
       delete_begin, delete_end,

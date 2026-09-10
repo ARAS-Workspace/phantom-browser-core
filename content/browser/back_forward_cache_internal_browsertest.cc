@@ -365,7 +365,7 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
 
 // Disabled due to flakiness on Linux and Mac https://crbug.com/1287467
 // Disabled on Chrome OS due to flakiness https://crbug.com/1290834
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_ProxiesAreStoredAndRestored DISABLED_ProxiesAreStoredAndRestored
 #else
 #define MAYBE_ProxiesAreStoredAndRestored ProxiesAreStoredAndRestored

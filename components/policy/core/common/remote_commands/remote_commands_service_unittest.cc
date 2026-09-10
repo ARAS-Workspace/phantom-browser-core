@@ -568,7 +568,6 @@ TEST_P(RemoteCommandsServiceTest,
             em::RemoteCommandResult_ResultType_RESULT_IGNORED);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_P(RemoteCommandsServiceTest, ShouldRejectCommandWithCecDisabled) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeature(features::kUseCECFlagInPolicyData);
@@ -601,7 +600,6 @@ TEST_P(RemoteCommandsServiceTest, ShouldRejectCommandWithoutTopic) {
     EXPECT_TRUE(FetchRemoteCommands());
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class RemoteCommandsServiceHistogramTest : public RemoteCommandsServiceTest {
  protected:

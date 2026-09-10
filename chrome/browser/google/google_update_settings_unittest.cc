@@ -93,21 +93,3 @@ TEST_F(GoogleUpdateTest, IsEnterpriseBrandCodes) {
   EXPECT_FALSE(google_brand::IsEnterprise("EUBA"));
   EXPECT_FALSE(google_brand::IsEnterprise(""));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Test for http://crbug.com/40079723
-TEST_F(GoogleUpdateTest, ConsentFileIsWorldReadable) {
-  // Turn on stats reporting.
-  EXPECT_TRUE(GoogleUpdateSettings::SetCollectStatsConsent(true));
-
-  base::FilePath consent_dir;
-  ASSERT_TRUE(base::PathService::Get(chrome::DIR_USER_DATA, &consent_dir));
-  ASSERT_TRUE(base::DirectoryExists(consent_dir));
-
-  base::FilePath consent_file = consent_dir.Append("Consent To Send Stats");
-  ASSERT_TRUE(base::PathExists(consent_file));
-  int permissions;
-  ASSERT_TRUE(base::GetPosixFilePermissions(consent_file, &permissions));
-  EXPECT_TRUE(permissions & base::FILE_PERMISSION_READ_BY_OTHERS);
-}
-#endif

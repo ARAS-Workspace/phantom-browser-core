@@ -37,11 +37,6 @@
 #include "ui/base/ui_base_types.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
-#include "components/user_manager/user_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace capture_policy {
 namespace {
 
@@ -133,9 +128,6 @@ AllowedScreenCaptureLevel GetAllowedCaptureLevel(const GURL& request_origin,
 }
 
 void RegisterProfilePrefs(PrefRegistrySimple* registry) {
-#if BUILDFLAG(IS_CHROMEOS)
-  registry->RegisterListPref(kManagedMultiScreenCaptureAllowedForUrls);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 #if BUILDFLAG(ENABLE_SCREEN_CAPTURE)

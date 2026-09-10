@@ -18,10 +18,8 @@
 #include "extensions/browser/extension_system.h"
 #include "ui/accessibility/accessibility_features.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/component_updater/wasm_tts_engine_component_installer.h"
 #include "chrome/browser/extensions/component_loader.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 namespace {
 
@@ -31,10 +29,8 @@ constexpr int kRemoveExtensionDelaySeconds = 30;
 
 }  // namespace
 
-#if !BUILDFLAG(IS_CHROMEOS)
 const base::FilePath::CharType kManifestV3FileName[] =
     FILE_PATH_LITERAL("wasm_tts_manifest_v3.json");
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 ReadAnythingService::ReadAnythingService(Profile* profile) : profile_(profile) {
   if (features::IsReadAnythingDocsIntegrationEnabled()) {
@@ -66,9 +62,7 @@ ReadAnythingService* ReadAnythingService::Get(Profile* profile) {
 void ReadAnythingService::OnReadAnythingShown() {
 // The TTS download extension should only be installed on non-ChromeOS devices
 // when the Read Aloud flag is enabled.
-#if !BUILDFLAG(IS_CHROMEOS)
   SetupDesktopEngine();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   if (!features::IsReadAnythingDocsIntegrationEnabled()) {
     return;
@@ -78,7 +72,6 @@ void ReadAnythingService::OnReadAnythingShown() {
   InstallGDocsHelperExtension();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void ReadAnythingService::SetupDesktopEngine() {
   // If the extension was previously installed but now the Read Aloud flag
   // is disabled, or if the component updater flag is enabled, we should
@@ -104,7 +97,6 @@ void ReadAnythingService::SetupDesktopEngine() {
         GetWasmTTSEngineDirectory(base::BindOnce(InstallComponent));
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void ReadAnythingService::OnReadAnythingHidden() {
   if (!features::IsReadAnythingDocsIntegrationEnabled()) {
@@ -116,13 +108,6 @@ void ReadAnythingService::OnReadAnythingHidden() {
 }
 
 void ReadAnythingService::InstallGDocsHelperExtension() {
-#if BUILDFLAG(IS_CHROMEOS)
-  EmbeddedA11yExtensionLoader::GetInstance()->InstallExtensionWithId(
-      extension_misc::kReadingModeGDocsHelperExtensionId,
-      extension_misc::kReadingModeGDocsHelperExtensionPath,
-      extension_misc::kReadingModeGDocsHelperManifestFilename,
-      /*should_localize=*/false);
-#else
   auto* component_loader = extensions::ComponentLoader::Get(profile_);
   if (!component_loader) {
     // In tests, the loader might not be created.
@@ -135,14 +120,9 @@ void ReadAnythingService::InstallGDocsHelperExtension() {
         IDR_READING_MODE_GDOCS_HELPER_MANIFEST,
         base::FilePath(FILE_PATH_LITERAL("reading_mode_gdocs_helper")));
   }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void ReadAnythingService::RemoveGDocsHelperExtension() {
-#if BUILDFLAG(IS_CHROMEOS)
-  EmbeddedA11yExtensionLoader::GetInstance()->RemoveExtensionWithId(
-      extension_misc::kReadingModeGDocsHelperExtensionId);
-#else
   auto* component_loader = extensions::ComponentLoader::Get(profile_);
   if (!component_loader) {
     // In tests, the loader might not be created.
@@ -150,7 +130,6 @@ void ReadAnythingService::RemoveGDocsHelperExtension() {
     return;
   }
   component_loader->Remove(extension_misc::kReadingModeGDocsHelperExtensionId);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void ReadAnythingService::OnLocalReadingModeSwitchDelayTimeout() {
@@ -162,7 +141,6 @@ void ReadAnythingService::OnLocalReadingModeSwitchDelayTimeout() {
 }
 
 void ReadAnythingService::RemoveTtsDownloadExtension() {
-#if !BUILDFLAG(IS_CHROMEOS)
   // Remove the legacy TTS extension for all profiles.
 
   // This code for removing the extension installed in the legacy way
@@ -171,10 +149,8 @@ void ReadAnythingService::RemoveTtsDownloadExtension() {
   EmbeddedA11yExtensionLoader::GetInstance()->Init();
   EmbeddedA11yExtensionLoader::GetInstance()->RemoveExtensionWithId(
       extension_misc::kTTSEngineExtensionId);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void ReadAnythingService::InstallComponent(const base::FilePath& new_dir) {
   RecordEngineVersion(new_dir.BaseName());
   EmbeddedA11yExtensionLoader::GetInstance()->Init();
@@ -213,4 +189,3 @@ void ReadAnythingService::RecordEngineVersion(
         "Accessibility.ReadAnything.ReadAloud.EngineVersion", version_number);
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

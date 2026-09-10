@@ -38,11 +38,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/app_registry_cache_waiter.h"
-#include "chrome/browser/apps/intent_helper/preferred_apps_test_util.h"
-#endif
-
 namespace web_app {
 
 class WebAppScopeExtensionsBrowserTest
@@ -129,9 +124,6 @@ class WebAppScopeExtensionsBrowserTest
     app_ = provider().registrar_unsafe().GetAppById(app_id);
 
     // Turn on link capturing if needed.
-#if BUILDFLAG(IS_CHROMEOS)
-    apps::AppReadinessWaiter(browser()->GetProfile(), app_id).Await();
-#endif
     if (!LinkCapturingEnabledByDefault()) {
       EXPECT_THAT(apps::test::EnableLinkCapturingByUser(browser()->GetProfile(),
                                                         app_id),
@@ -409,9 +401,6 @@ IN_PROC_BROWSER_TEST_P(WebAppScopeExtensionsBrowserTest,
   bool allow_overlapping_scopes = true;
   // Overlapping scopes are only allowed if navigation capturing
   // is on-by-default.
-#if BUILDFLAG(IS_CHROMEOS)
-  allow_overlapping_scopes = LinkCapturingEnabledByDefault();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (allow_overlapping_scopes) {
     EXPECT_EQ(app_a_id, GetCapturingAppId(app_a_page_url));

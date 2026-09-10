@@ -29,7 +29,7 @@ namespace performance_manager::policies {
 namespace internal {
 // kNonVisiblePagesUrgentProtectionTime is encapsulated in CanDiscard(). This is
 // only accessible to testing code.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 inline constexpr base::TimeDelta kNonVisiblePagesUrgentProtectionTime =
     base::TimeDelta();
 #else

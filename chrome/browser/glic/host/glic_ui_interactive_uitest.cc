@@ -661,7 +661,6 @@ IN_PROC_BROWSER_TEST_F(GlicUiFullLoadingSequenceTest, EscapeKeyDismisses) {
       CheckEscapeKeyDismisses(kErrorPanel));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Multi-profile is not supported on ChromeOS.
 class GlicWithMultipleProfilesTest : public GlicUiInteractiveUiTestBase {
  public:
@@ -709,7 +708,6 @@ IN_PROC_BROWSER_TEST_F(GlicWithMultipleProfilesTest, OpenGlicInEachProfile) {
                   DeprecatedOpenGlicWindow(GlicWindowMode::kAttached,
                                            GlicInstrumentMode::kHostOnly));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(ui::test::PollingStateObserver<GURL>,
                                     kOpenedTabUrlState);

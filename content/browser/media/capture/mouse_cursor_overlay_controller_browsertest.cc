@@ -27,11 +27,6 @@
 #include "ui/android/view_android.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/aura/client/cursor_shape_client.h"
-#include "ui/wm/core/cursor_loader.h"  // nogncheck
-#endif                                 // BUILDFLAG(IS_CHROMEOS)
-
 using ::testing::Mock;
 
 namespace content {
@@ -95,10 +90,6 @@ class MouseCursorOverlayControllerBrowserTest : public ContentBrowserTest {
 
     // On Ash content browsertests, ash::Shell isn't initialized and thus
     // neither NativeCursorManagerAsh, the owner of CursorLoader.
-#if BUILDFLAG(IS_CHROMEOS)
-    cursor_loader_ = std::make_unique<wm::CursorLoader>();
-    aura::client::SetCursorShapeClient(cursor_loader_.get());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
     // Save the target size so that Android's
@@ -269,9 +260,6 @@ class MouseCursorOverlayControllerBrowserTest : public ContentBrowserTest {
     base::RunLoop().RunUntilIdle();
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<wm::CursorLoader> cursor_loader_;
-#endif
 };
 
 IN_PROC_BROWSER_TEST_F(MouseCursorOverlayControllerBrowserTest,

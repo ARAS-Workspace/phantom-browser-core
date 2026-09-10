@@ -195,10 +195,6 @@
 #include "content/public/browser/page_navigator.h"
 #include "content/public/common/profiling.h"
 #include "extensions/common/extension_urls.h"
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/ash/multi_user/multi_user_context_menu.h"
-#include "chrome/browser/ui/browser_commands_chromeos.h"
-#endif
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
 #include "printing/buildflags/buildflags.h"
@@ -212,9 +208,7 @@
 #include "ui/views/view.h"
 #include "ui/views/view_class_properties.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/views/download/bubble/download_toolbar_ui_controller.h"
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/common/pref_names.h"
@@ -1541,17 +1535,9 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
-#if BUILDFLAG(IS_CHROMEOS)
-                // ChromeOS does not use DownloadToolbarUIController (downloads
-                // are managed via the Ash shelf/holding space), so directly
-                // open the downloads WebUI page instead of showing the toolbar
-                // bubble.
-                chrome::ShowDownloads(webui::GetBrowserForOpeningWebUi(bwi));
-#else
                 if (auto* controller = DownloadToolbarUIController::From(bwi)) {
                   controller->InvokeUI();
                 }
-#endif
               },
               bwi),
           kActionShowDownloads, IDS_SHOW_DOWNLOADS, IDS_TOOLTIP_DOWNLOAD_ICON,
@@ -2089,67 +2075,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               : vector_icons::kLocationOnChromeRefreshOldIcon)
           .SetEnabled(!profile->IsGuestSession())
           .Build());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ToggleMultitaskMenu(bwi);
-              },
-              bwi))
-          .SetActionId(kToggleMultitaskMenu)
-          .Build());
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                ExecuteVisitDesktopCommand(
-                    IDC_VISIT_DESKTOP_OF_LRU_USER_2,
-                    BrowserWindow::FromBrowser(bwi)->GetNativeWindow());
-              },
-              bwi))
-          .SetActionId(kActionVisitDesktopOfLruUser2)
-          .Build());
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                ExecuteVisitDesktopCommand(
-                    IDC_VISIT_DESKTOP_OF_LRU_USER_3,
-                    BrowserWindow::FromBrowser(bwi)->GetNativeWindow());
-              },
-              bwi))
-          .SetActionId(kActionVisitDesktopOfLruUser3)
-          .Build());
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                ExecuteVisitDesktopCommand(
-                    IDC_VISIT_DESKTOP_OF_LRU_USER_4,
-                    BrowserWindow::FromBrowser(bwi)->GetNativeWindow());
-              },
-              bwi))
-          .SetActionId(kActionVisitDesktopOfLruUser4)
-          .Build());
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                ExecuteVisitDesktopCommand(
-                    IDC_VISIT_DESKTOP_OF_LRU_USER_5,
-                    BrowserWindow::FromBrowser(bwi)->GetNativeWindow());
-              },
-              bwi))
-          .SetActionId(kActionVisitDesktopOfLruUser5)
-          .Build());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_LINUX)
   root_action_item_->AddChild(
@@ -3187,7 +3112,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionShowSearchTools)
           .Build());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
@@ -3199,7 +3123,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionShowSyncPassphraseDialog)
           .Build());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   root_action_item_->AddChild(
       ChromeMenuAction(
@@ -3390,7 +3313,7 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionShowSigninWhenPaused)
           .Build());
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
@@ -3430,7 +3353,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionShowAiModeOmniboxButton)
           .Build());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
@@ -3457,7 +3379,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionCloseProfile)
           .Build());
-#endif
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
@@ -3543,7 +3464,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionOpenInChrome)
           .Build());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
@@ -3582,7 +3502,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           }))
           .SetActionId(kActionManageChromeProfiles)
           .Build());
-#endif
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
@@ -3736,19 +3655,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionShowAvatarMenu)
           .Build());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                ::TakeScreenshot();
-              },
-              bwi))
-          .SetActionId(kActionTakeScreenshot)
-          .Build());
-#endif
 
 #if BUILDFLAG(IS_MAC)
   root_action_item_->AddChild(

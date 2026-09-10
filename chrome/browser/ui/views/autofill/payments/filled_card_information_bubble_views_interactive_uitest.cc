@@ -719,11 +719,7 @@ IN_PROC_BROWSER_TEST_F(FilledCardInformationBubbleViewsInteractiveUiTest,
 
 // Test BNPL-specific card image and name views.
 // Consistently fails on multiple ChromeOS bots, see also crbug.com/414487274
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_BnplCardImageAndName DISABLED_BnplCardImageAndName
-#else
 #define MAYBE_BnplCardImageAndName BnplCardImageAndName
-#endif
 IN_PROC_BROWSER_TEST_F(FilledCardInformationBubbleViewsInteractiveUiTest,
                        MAYBE_BnplCardImageAndName) {
   CreditCard card = test::GetVirtualCard();

@@ -24,9 +24,7 @@
 #include "media/media_buildflags.h"
 #include "third_party/blink/public/common/peerconnection/webrtc_ip_handling_policy.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "ui/accessibility/accessibility_features.h"
-#endif
 
 void RegisterBrowserPrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(prefs::kAllowFileSelectionDialogs, true);
@@ -127,7 +125,7 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(
       prefs::kEnableDoNotTrack, false,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(prefs::kPrintPreviewUseSystemDefaultPrinter,
                                 false);
 #endif
@@ -167,10 +165,6 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(prefs::kFullscreenAllowed, true);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  registry->RegisterBooleanPref(prefs::kForceMaximizeOnFirstRun, false);
-#endif
-
   registry->RegisterBooleanPref(prefs::kEnterpriseHardwarePlatformAPIEnabled,
                                 false);
   registry->RegisterBooleanPref(prefs::kUserFeedbackAllowed, true);
@@ -189,10 +183,8 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
                                 true);
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS)
   registry->RegisterBooleanPref(prefs::kAccessibilityFocusHighlightEnabled,
                                 false);
-#endif
 
   registry->RegisterBooleanPref(
       prefs::kHttpsOnlyModeEnabled, false,

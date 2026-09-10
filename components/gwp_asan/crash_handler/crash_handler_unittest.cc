@@ -41,7 +41,7 @@
 #include "third_party/crashpad/crashpad/snapshot/minidump/process_snapshot_minidump.h"
 #include "third_party/crashpad/crashpad/tools/tool_support.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include "third_party/crashpad/crashpad/snapshot/sanitized/sanitization_information.h"
 #endif
 
@@ -132,7 +132,7 @@ MULTIPROCESS_TEST_MAIN(CrashingProcess) {
   std::map<std::string, std::string> annotations;
   std::vector<std::string> arguments;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   static crashpad::SanitizationInformation sanitization_info = {};
   static crashpad::SanitizationAllowedMemoryRanges allowed_memory_ranges;
   static base::NoDestructor<
@@ -167,7 +167,7 @@ MULTIPROCESS_TEST_MAIN(CrashingProcess) {
 #endif
 
   crashpad::CrashpadClient* client = new crashpad::CrashpadClient();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   bool handler =
       client->StartHandlerAtCrash(/* handler */ cmd_line->GetProgram(),
                                   /* database */ directory,
@@ -533,7 +533,7 @@ TEST_P(CrashHandlerTest, MAYBE_DISABLED(UnrelatedException)) {
 INSTANTIATE_TEST_SUITE_P(VaryAllocator,
                          CrashHandlerTest,
                          testing::Values(
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
                              TestParams("malloc",
                                         ShouldSanitize::kYes,
                                         EnableLightweightDetector::kNo),
@@ -562,7 +562,7 @@ TEST_P(LightweightDetectorCrashHandlerTest, LightweightDetectorUseAfterFree) {
 INSTANTIATE_TEST_SUITE_P(VarySanitization,
                          LightweightDetectorCrashHandlerTest,
                          testing::Values(
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
                              TestParams("partitionalloc",
                                         ShouldSanitize::kYes,
                                         EnableLightweightDetector::kYes),

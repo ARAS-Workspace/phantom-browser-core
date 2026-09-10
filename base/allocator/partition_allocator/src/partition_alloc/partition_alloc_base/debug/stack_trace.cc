@@ -16,7 +16,7 @@
 #include <algorithm>
 #endif
 
-#if (PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)) && defined(__GLIBC__)
+#if PA_BUILDFLAG(IS_LINUX) && defined(__GLIBC__)
 extern "C" void* __libc_stack_end;
 #endif
 
@@ -240,7 +240,7 @@ uintptr_t GetStackEnd() {
   return reinterpret_cast<uintptr_t>(pthread_get_stackaddr_np(pthread_self()));
 #else
 
-#if (PA_BUILDFLAG(IS_LINUX) || PA_BUILDFLAG(IS_CHROMEOS)) && defined(__GLIBC__)
+#if PA_BUILDFLAG(IS_LINUX) && defined(__GLIBC__)
   if (GetCurrentProcId() == PlatformThread::CurrentId()) {
     // For the main thread we have a shortcut.
     return reinterpret_cast<uintptr_t>(__libc_stack_end);

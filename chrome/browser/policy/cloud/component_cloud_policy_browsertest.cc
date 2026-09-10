@@ -46,17 +46,12 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/policy/core/user_cloud_policy_manager_ash.h"
-#else
 #include "chrome/browser/net/system_network_context_manager.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/signin/public/identity_manager/primary_account_mutator.h"
-#endif
 
 using testing::_;
 using testing::InvokeWithoutArgs;
@@ -108,17 +103,6 @@ class ComponentCloudPolicyTest : public extensions::ExtensionBrowserTest {
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     extensions::ExtensionBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_CHROMEOS)
-    // ExtensionBrowserTest sets the login users to a non-managed value;
-    // replace it. This is the default username sent in policy blobs from the
-    // testserver.
-    command_line->AppendSwitchASCII(ash::switches::kLoginUser,
-                                    PolicyBuilder::kFakeUsername);
-    // Let policy code know that policy is not required to be cached at startup
-    // (it can be loaded asynchronously).
-    command_line->AppendSwitchASCII(ash::switches::kProfileRequiresPolicy,
-                                    "false");
-#endif
   }
 
   void SetUpInProcessBrowserTestFixture() override {
@@ -190,11 +174,6 @@ class ComponentCloudPolicyTest : public extensions::ExtensionBrowserTest {
         g_browser_process->browser_policy_connector();
     connector->ScheduleServiceInitialization(0);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    UserCloudPolicyManagerAsh* policy_manager =
-        browser()->GetProfile()->GetUserCloudPolicyManagerAsh();
-    ASSERT_TRUE(policy_manager);
-#else
     // Mock a signed-in user. This is used by the UserCloudPolicyStore to pass
     // the account id to the UserCloudPolicyValidator.
     signin::SetPrimaryAccount(
@@ -212,8 +191,6 @@ class ComponentCloudPolicyTest : public extensions::ExtensionBrowserTest {
             connector->device_management_service(),
             g_browser_process->shared_url_loader_factory()));
 
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
     // Register the cloud policy client.
     client_ = policy_manager->core()->client();
     ASSERT_TRUE(client_);
@@ -230,7 +207,6 @@ class ComponentCloudPolicyTest : public extensions::ExtensionBrowserTest {
     client_->RemoveObserver(&observer);
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   void SignOut() {
     auto* primary_account_mutator =
         IdentityManagerFactory::GetForProfile(browser()->GetProfile())
@@ -238,7 +214,6 @@ class ComponentCloudPolicyTest : public extensions::ExtensionBrowserTest {
     primary_account_mutator->ClearPrimaryAccount(
         signin_metrics::ProfileSignout::kTest);
   }
-#endif
 
   void RefreshPolicies() {
     ProfilePolicyConnector* profile_connector =

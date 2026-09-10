@@ -2452,7 +2452,7 @@ TEST_F(AutocompleteControllerTest, ShouldRunProvider_LensSearchbox) {
 }
 
 // The EnterpriseSearchAggregatorProvider is only run on desktop.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(AutocompleteControllerTest,
        ShouldRunProvider_EnterpriseSearchAggregator) {
   // Populate template URL service.
@@ -2559,7 +2559,7 @@ TEST_F(AutocompleteControllerTest,
         << AutocompleteProvider::TypeToString(provider->type());
   }
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteControllerTest, ShouldRunProvider_AndroidHubSearch) {

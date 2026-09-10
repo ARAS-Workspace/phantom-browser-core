@@ -63,14 +63,6 @@
 #include "content/public/common/webplugininfo.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/dlp/dlp_files_controller_ash.h"
-#include "chrome/browser/chromeos/policy/dlp/dlp_file_destination.h"
-#include "chrome/browser/chromeos/policy/dlp/dlp_rules_manager.h"
-#include "chrome/browser/chromeos/policy/dlp/dlp_rules_manager_factory.h"
-#include "components/download/public/common/base_file.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "components/download/public/common/download_file.h"
 #include "components/safe_browsing/android/safe_browsing_api_handler_bridge.h"
@@ -1134,32 +1126,7 @@ DownloadConfirmationReason DownloadTargetDeterminer::NeedsConfirmation(
 
 bool DownloadTargetDeterminer::IsDownloadDlpBlocked(
     const base::FilePath& download_path) const {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto* web_contents =
-      download_ ? content::DownloadItemUtils::GetWebContents(download_)
-                : nullptr;
-  if (!web_contents)
-    return false;
-  policy::DlpRulesManager* rules_manager =
-      policy::DlpRulesManagerFactory::GetForPrimaryProfile();
-  if (!rules_manager)
-    return false;
-  policy::DlpFilesControllerAsh* files_controller =
-      static_cast<policy::DlpFilesControllerAsh*>(
-          rules_manager->GetDlpFilesController());
-  if (!files_controller)
-    return false;
-  const GURL authority_url = download::BaseFile::GetEffectiveAuthorityURL(
-      download_->GetURL(), download_->GetReferrerUrl(),
-      download_->GetRequestInitiator());
-  if (!authority_url.is_valid()) {
-    return true;
-  }
-  return files_controller->ShouldPromptBeforeDownload(
-      policy::DlpFileDestination(authority_url), download_path);
-#else
   return false;
-#endif
 }
 
 bool DownloadTargetDeterminer::HasPromptedForPath() const {

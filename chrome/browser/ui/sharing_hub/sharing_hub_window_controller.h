@@ -27,9 +27,7 @@ namespace sharing_hub {
 
 class ScreenshotCapturedBubble;
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class SharingHubBubbleView;
-#endif
 
 // Manages the Sharing Hub bubbles for a browser window.
 class SharingHubWindowController {
@@ -44,10 +42,8 @@ class SharingHubWindowController {
 
   static SharingHubWindowController* From(BrowserWindowInterface* browser);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Shows the Sharing Hub bubble.
   SharingHubBubbleView* ShowSharingHubBubble(share::ShareAttempt attempt);
-#endif
 
   // Shows the Screenshot bubble.
   ScreenshotCapturedBubble* ShowScreenshotCapturedBubble(

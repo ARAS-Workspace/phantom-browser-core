@@ -28,7 +28,7 @@ String GetReducedNavigatorPlatform() {
   return "Linux armv81";
 #elif BUILDFLAG(IS_MAC)
   return "MacIntel";
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   return "Linux x86_64";
 #elif BUILDFLAG(IS_IOS)
   return "iPhone";

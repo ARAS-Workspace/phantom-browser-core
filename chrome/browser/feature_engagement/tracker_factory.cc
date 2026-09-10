@@ -25,10 +25,6 @@
 #include "chrome/browser/user_education/user_education_configuration_provider.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/growth/campaigns_configuration_provider.h"
-#endif
-
 namespace feature_engagement {
 
 // static
@@ -87,10 +83,6 @@ TrackerFactory::BuildServiceInstanceForBrowserContext(
 #if !BUILDFLAG(IS_ANDROID)
   providers.emplace_back(
       std::make_unique<UserEducationConfigurationProvider>());
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  providers.emplace_back(
-      std::make_unique<growth::CampaignsConfigurationProvider>());
 #endif
 
   return feature_engagement::Tracker::Create(

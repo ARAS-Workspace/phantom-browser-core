@@ -447,11 +447,7 @@ IN_PROC_BROWSER_TEST_P(NetworkRequestMetricsBrowserTest,
 
 // TODO(crbug.com/520427873): This bug is flaky on ChromeOS most likely due to
 // the comment above the PostTask. Deflake before re-enabling.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_InterruptedCancelDuringBody DISABLED_InterruptedCancelDuringBody
-#else
 #define MAYBE_InterruptedCancelDuringBody InterruptedCancelDuringBody
-#endif
 IN_PROC_BROWSER_TEST_P(NetworkRequestMetricsBrowserTest,
                        MAYBE_InterruptedCancelDuringBody) {
   TestNavigationObserver navigation_observer(active_web_contents(), 1);

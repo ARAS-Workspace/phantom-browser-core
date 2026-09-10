@@ -42,14 +42,8 @@
 #include "printing/buildflags/buildflags.h"
 #include "rlz/buildflags/buildflags.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/first_run/upgrade_util.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boot_times_recorder/boot_times_recorder.h"
-#include "chrome/browser/lifetime/application_lifetime_chromeos.h"
-#include "chrome/browser/lifetime/termination_notification.h"
 #endif
 
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
@@ -167,10 +161,6 @@ ShutdownType GetShutdownType() {
 
 #if !BUILDFLAG(IS_ANDROID)
 RestartMode ShutdownPreThreadsStop() {
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::BootTimesRecorder::Get()->AddLogoutTimeMarker("BrowserShutdownStarted",
-                                                     false);
-#endif
 
   // WARNING: During logoff/shutdown (WM_ENDSESSION) we may not have enough
   // time to get here. If you have something that *must* happen on end session,
@@ -260,15 +250,7 @@ void ShutdownPostThreadsStop(RestartMode restart_mode) {
   // goes away.
   NukeDeletedProfilesFromDisk();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::BootTimesRecorder::Get()->AddLogoutTimeMarker("BrowserDeleted",
-                                                     /*send_to_uma=*/false);
-#endif
-
   if (restart_mode != RestartMode::kNoRestart) {
-#if BUILDFLAG(IS_CHROMEOS)
-    NOTIMPLEMENTED();
-#else
     const base::CommandLine& old_cl(*base::CommandLine::ForCurrentProcess());
     base::CommandLine new_cl(old_cl.GetProgram());
     base::CommandLine::SwitchMap switches = old_cl.GetSwitches();
@@ -311,12 +293,8 @@ void ShutdownPostThreadsStop(RestartMode restart_mode) {
       new_cl.AppendSwitch(switches::kRestart);
     }
     upgrade_util::RelaunchChromeBrowser(new_cl);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  chrome::StopSession();
-#endif
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 

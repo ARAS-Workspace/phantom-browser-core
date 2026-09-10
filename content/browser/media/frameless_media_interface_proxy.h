@@ -19,9 +19,9 @@
 #include "mojo/public/cpp/bindings/receiver_set.h"
 #include "mojo/public/cpp/bindings/remote.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "media/mojo/mojom/video_decoder.mojom.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace content {
 
@@ -84,7 +84,7 @@ class FramelessMediaInterfaceProxy final
   // Connections to the renderer.
   mojo::ReceiverSet<media::mojom::InterfaceFactory> receivers_;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Connection to the InterfaceFactory that lives in a utility process.
   // This is only used for out-of-process video decoding and only when the
   // FramelessMediaInterfaceProxy is created without a RenderProcessHost
@@ -93,7 +93,7 @@ class FramelessMediaInterfaceProxy final
   // in order to keep the video decoder process alive for the lifetime of the
   // FramelessMediaInterfaceProxy.
   mojo::Remote<media::mojom::InterfaceFactory> vd_factory_remote_;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // FramelessMediaInterfaceProxy is fully owned by the RenderProcessHostImpl,
   // and the latter never gives up that ownership. Therefore,

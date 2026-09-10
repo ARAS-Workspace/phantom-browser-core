@@ -75,10 +75,6 @@ IN_PROC_BROWSER_TEST_F(PaymentRequestTwaBillingTest,
       "NotSupportedError: The payment method "
       "\"https://play.google.com/billing\" is not supported.";
 
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_error = expected_error + " Unable to invoke Android apps.";
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // We expect the standard NotSupportedError inside a TWA because Play Billing
   // isn't supported yet.
   EXPECT_EQ(expected_error, content::EvalJs(GetActiveWebContents(), "show()"));

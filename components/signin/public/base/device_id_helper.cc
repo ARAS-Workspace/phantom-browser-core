@@ -13,8 +13,6 @@
 
 namespace signin {
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 std::string GetSigninScopedDeviceId(PrefService* prefs) {
   std::string signin_scoped_device_id =
       prefs->GetString(prefs::kGoogleServicesSigninScopedDeviceId);
@@ -36,7 +34,5 @@ std::string RecreateSigninScopedDeviceId(PrefService* prefs) {
 std::string GenerateSigninScopedDeviceId() {
   return base::Uuid::GenerateRandomV4().AsLowercaseString();
 }
-
-#endif
 
 }  // namespace signin

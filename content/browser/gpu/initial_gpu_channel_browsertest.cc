@@ -237,14 +237,10 @@ IN_PROC_BROWSER_TEST_F(InitialGpuChannelBrowserTest,
 
   // On non-ChromeOS platforms, the frame sink pipes should be created but
   // deferred because we are hidden.
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(rwhi->has_initial_frame_sink_for_testing());
-#else
   // Note that there might be some racy Show() call before this, which might
   // trigger the sending of the initial frame sink pipe earlier.
   EXPECT_EQ(rwhi->is_hidden_for_testing(),
             rwhi->has_initial_frame_sink_for_testing());
-#endif
 
   // Show the WebContents and focus it.
   shell()->web_contents()->WasShown();
@@ -423,12 +419,8 @@ IN_PROC_BROWSER_TEST_F(InitialGpuChannelForTopChromeWebUIOnlyBrowserTest,
   auto* rwhi = static_cast<RenderWidgetHostImpl*>(
       new_web_contents->GetPrimaryMainFrame()->GetRenderWidgetHost());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(rwhi->has_initial_frame_sink_for_testing());
-#else
   EXPECT_EQ(rwhi->is_hidden_for_testing(),
             rwhi->has_initial_frame_sink_for_testing());
-#endif
 }
 
 #endif  // !BUILDFLAG(IS_ANDROID)

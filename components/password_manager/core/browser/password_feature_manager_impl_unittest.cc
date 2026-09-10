@@ -32,7 +32,7 @@ class PasswordFeatureManagerImplTest : public ::testing::Test {
     account_.gaia = GaiaId("account");
     account_.account_id = CoreAccountId::FromGaiaId(account_.gaia);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
     pref_service_.registry()->RegisterBooleanPref(
         password_manager::prefs::kBiometricAuthenticationBeforeFilling, false);
     pref_service_.registry()->RegisterBooleanPref(
@@ -142,7 +142,7 @@ TEST_F(PasswordFeatureManagerImplTest, GenerationDisabledIfSyncPaused) {
   EXPECT_FALSE(password_feature_manager_.IsGenerationEnabled());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 
 struct TestCase {
   const char* description;
@@ -183,4 +183,4 @@ INSTANTIATE_TEST_SUITE_P(
             .had_biometrics = true,
             .pref_value = true,
         }));
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)

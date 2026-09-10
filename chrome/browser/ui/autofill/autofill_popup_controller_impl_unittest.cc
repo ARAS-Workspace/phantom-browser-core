@@ -34,9 +34,7 @@
 #include "ui/accessibility/platform/ax_platform_node_delegate.h"
 #include "ui/gfx/range/range.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "content/public/test/scoped_accessibility_mode_override.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 namespace autofill {
 namespace {
 
@@ -1439,7 +1437,6 @@ TEST_F(AutofillPopupControllerImplTest,
   EXPECT_TRUE(test_api(controller).HasEmptySuggestionContent());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class MockAutofillDriver : public ContentAutofillDriver {
  public:
   using ContentAutofillDriver::ContentAutofillDriver;
@@ -1601,7 +1598,6 @@ TEST_F(AutofillPopupControllerImplTestAccessibility,
   client().suggestion_controller(manager()).FireControlsChangedEvent(true);
   EXPECT_EQ(std::nullopt, ui::GetActivePopupAxUniqueId());
 }
-#endif
 
 }  // namespace
 }  // namespace autofill

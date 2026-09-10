@@ -304,13 +304,7 @@ class AccountReconcilorTest : public ::testing::Test {
   network::TestURLLoaderFactory test_url_loader_factory_;
 
   signin::ConsentLevel consent_level_for_reconcile_ =
-#if BUILDFLAG(IS_CHROMEOS)
-      // TODO(crbug.com/40067189): Migrate away from
-      // `ConsentLevel::kSync` on Ash.
-      signin::ConsentLevel::kSync;
-#else
       signin::ConsentLevel::kSignin;
-#endif
 
  private:
   base::test::SingleThreadTaskEnvironment task_environment_;
@@ -790,7 +784,6 @@ class AccountReconcilorTestTable
   }
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AccountReconcilorMirrorTest, IdentityManagerRegistration) {
   AccountReconcilor* reconcilor = GetMockReconcilor();
   ASSERT_TRUE(reconcilor);
@@ -823,8 +816,6 @@ TEST_F(AccountReconcilorMirrorTest, Reauth) {
 
   ASSERT_TRUE(reconcilor->IsRegisteredWithIdentityManager());
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AccountReconcilorMirrorTest, ProfileAlreadyConnected) {
   ConnectProfileToAccount(kFakeEmail);
@@ -2064,29 +2055,6 @@ TEST_F(AccountReconcilorMirrorTest,
   ASSERT_TRUE(reconcilor->is_reconcile_started_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// This test is needed until chrome changes to use gaia obfuscated id.
-// The primary account manager and token service use the gaia "email" property,
-// which preserves dots in usernames and preserves case.
-// gaia::ParseBinaryListAccountsData() however uses gaia "displayEmail" which
-// does not preserve case, and then passes the string through
-// gaia::CanonicalizeEmail() which removes dots.  This tests makes sure that an
-// email like "Dot.S@hmail.com", as seen by the token service, will be
-// considered the same as "dots@gmail.com" as returned by
-// gaia::ParseBinaryListAccountsData().
-TEST_F(AccountReconcilorMirrorTest, StartReconcileNoopWithDots) {
-  AccountInfo account_info = ConnectProfileToAccount("Dot.S@gmail.com");
-  signin::SetListAccountsResponseOneAccount(
-      account_info.email, account_info.gaia, &test_url_loader_factory_);
-  AccountReconcilor* reconcilor = GetMockReconcilor();
-  ASSERT_TRUE(reconcilor);
-
-  reconcilor->StartReconcile(AccountReconcilor::Trigger::kCookieChange);
-  base::RunLoop().RunUntilIdle();
-  ASSERT_FALSE(reconcilor->is_reconcile_started_);
-}
-#endif
-
 TEST_F(AccountReconcilorMirrorTest, StartReconcileNoopMultiple) {
   AccountInfo account_info = ConnectProfileToAccount(kFakeEmail);
   AccountInfo account_info_2 =
@@ -2209,7 +2177,6 @@ TEST_F(AccountReconcilorTest, AuthErrorTriggersListAccount) {
   identity_test_env()->identity_manager()->RemoveObserver(&observer);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // This test does not run on ChromeOS because it clears the primary account,
 // which is not a flow that exists on ChromeOS.
 
@@ -2248,8 +2215,6 @@ TEST_F(AccountReconcilorMirrorTest, SignoutAfterErrorDoesNotRecordUma) {
   base::HistogramTester::CountsMap expected_counts;
   expected_counts["Signin.Reconciler.Duration.UpTo3mins.Failure"] = 1;
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AccountReconcilorMirrorTest, StartReconcileRemoveFromCookie) {
   AccountInfo account_info = ConnectProfileToAccount(kFakeEmail);

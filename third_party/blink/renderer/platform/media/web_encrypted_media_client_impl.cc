@@ -83,15 +83,6 @@ std::string ConvertCreateCdmStatusToString(media::CreateCdmStatus status) {
       return "Unable to create MediaCrypto object.";
     case media::CreateCdmStatus::kAndroidUnsupportedMediaCryptoScheme:
       return "Crypto scheme not supported.";
-#elif BUILDFLAG(IS_CHROMEOS)
-    case media::CreateCdmStatus::kNoMoreInstances:
-      return "Only one instance allowed.";
-    case media::CreateCdmStatus::kInsufficientGpuResources:
-      return "Insufficient GPU memory available.";
-    case media::CreateCdmStatus::kCrOsVerifiedAccessDisabled:
-      return "Verified Access is disabled.";
-    case media::CreateCdmStatus::kCrOsRemoteFactoryCreationFailed:
-      return "Remote factory creation failed.";
 #endif  // BUILDFLAG(IS_ANDROID)
     default:
       return base::ToString(status);

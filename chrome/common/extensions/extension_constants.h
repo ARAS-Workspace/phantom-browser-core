@@ -15,10 +15,6 @@
 #include "chrome/common/buildflags.h"
 #include "extensions/common/constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_extension_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace extension_urls {
 
 // Field to use with webstore URL for tracking launch source.
@@ -242,16 +238,6 @@ inline constexpr auto kBuiltInFirstPartyExtensionIds =
         kGoogleSlidesAppId,
         kTextEditorAppId,
         kInAppPaymentsSupportAppId,
-#if BUILDFLAG(IS_CHROMEOS)
-        kAssessmentAssistantExtensionId,
-        kAccessibilityCommonExtensionId,
-        kSelectToSpeakExtensionId,
-        kSwitchAccessExtensionId,
-        kFilesManagerAppId,
-        kFirstRunDialogId,
-        kEspeakSpeechSynthesisExtensionId,
-        kGoogleSpeechSynthesisExtensionId,
-#endif  // BUILDFLAG(IS_CHROMEOS)
         kReadingModeGDocsHelperExtensionId,
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
         kTTSEngineExtensionId,

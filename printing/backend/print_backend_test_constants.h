@@ -30,13 +30,6 @@ struct OptionalSampleCapabilities {
       OptionalSampleCapabilities&& other) noexcept;
   ~OptionalSampleCapabilities();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bool pin_supported = false;
-  AdvancedCapabilities advanced_capabilities;
-  std::vector<mojom::PrintScalingType> print_scaling_types;
-  mojom::PrintScalingType print_scaling_type_default =
-      mojom::PrintScalingType::kUnknownPrintScalingType;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 inline const PrinterSemanticCapsAndDefaults::Paper kPaperA3{
@@ -51,10 +44,6 @@ inline const PrinterSemanticCapsAndDefaults::Paper kPaperA4{
     /*printable_area_um=*/gfx::Rect(100, 200, 500, 800),
     /*max_height_um=*/0,
     /*has_borderless_variant=*/true
-#if BUILDFLAG(IS_CHROMEOS)
-    ,
-    /*supported_margins_um=*/PaperMargins(100, 100, 200, 200)
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 inline const PrinterSemanticCapsAndDefaults::Paper kPaperLetter{
     /*display_name=*/"Letter", /*vendor_id=*/"45",
@@ -79,34 +68,6 @@ inline const PrinterSemanticCapsAndDefaults::MediaType kMediaTypePhoto{
     /*display_name=*/"Photo Paper",
     /*vendor_id=*/"photographic",
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-inline const AdvancedCapability kAdvancedCapability1(
-    /*name=*/"advanced_cap_bool",
-    /*display_name=*/"Advanced Capability #1 (bool)",
-    /*type=*/AdvancedCapability::Type::kBoolean,
-    /*default_value=*/"true",
-    /*values=*/{});
-inline const AdvancedCapability kAdvancedCapability2(
-    /*name=*/"advanced_cap_double",
-    /*display_name=*/"Advanced Capability #2 (double)",
-    /*type=*/AdvancedCapability::Type::kFloat,
-    /*default_value=*/"3.14159",
-    /*values=*/
-    {
-        AdvancedCapabilityValue(
-            /*name=*/"adv_cap_val_1",
-            /*display_name=*/"Advanced Capability #1"),
-        AdvancedCapabilityValue(
-            /*name=*/"adv_cap_val_2",
-            /*display_name=*/"Advanced Capability #2"),
-        AdvancedCapabilityValue(
-            /*name=*/"adv_cap_val_3",
-            /*display_name=*/"Advanced Capability #3"),
-    });
-inline const AdvancedCapabilities kAdvancedCapabilities{kAdvancedCapability1,
-                                                        kAdvancedCapability2};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 inline constexpr bool kCollateCapable = true;
 inline constexpr bool kCollateDefault = true;
@@ -133,22 +94,6 @@ inline const PrinterSemanticCapsAndDefaults::MediaTypes kMediaTypes{
     kMediaTypePlain, kMediaTypePhoto};
 inline const PrinterSemanticCapsAndDefaults::MediaType kDefaultMediaType =
     kMediaTypePlain;
-#if BUILDFLAG(IS_CHROMEOS)
-inline constexpr bool kPinSupported = true;
-inline constexpr std::array<mojom::PrintScalingType, 6> kPrintScalingTypes{
-    mojom::PrintScalingType::kAuto,
-    mojom::PrintScalingType::kAutoFit,
-    mojom::PrintScalingType::kFill,
-    mojom::PrintScalingType::kFit,
-    mojom::PrintScalingType::kNone,
-    mojom::PrintScalingType::kUnknownPrintScalingType};
-inline constexpr mojom::PrintScalingType kPrintScalingTypeDefault =
-    mojom::PrintScalingType::kFit;
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-OptionalSampleCapabilities SampleWithScaleAndPinAndAdvancedCapabilities();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 PrinterSemanticCapsAndDefaults GenerateSamplePrinterSemanticCapsAndDefaults(
     OptionalSampleCapabilities sample_capabilities);

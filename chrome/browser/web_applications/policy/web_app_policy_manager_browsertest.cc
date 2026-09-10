@@ -58,12 +58,6 @@
 #include "ui/gfx/image/image_unittest_util.h"
 #include "ui/gfx/test/sk_gmock_support.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/test/base/testing_profile.h"
-#include "components/user_manager/user_names.h"
-#endif
-
 namespace web_app {
 
 class WebAppPolicyManagerBrowserTest : public base::test::WithFeatureOverride,
@@ -270,7 +264,7 @@ IN_PROC_BROWSER_TEST_P(WebAppPolicyManagerBrowserTest, AppIdWhenNoManifestId) {
 }
 
 // TODO(crbug.com/40256661): Flaky on Mac and Linux.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_OverrideExistingInstall DISABLED_OverrideExistingInstall
 #else
 #define MAYBE_OverrideExistingInstall OverrideExistingInstall
@@ -352,34 +346,6 @@ IN_PROC_BROWSER_TEST_P(WebAppPolicyManagerBrowserTest,
       gfx::test::EqualsBitmap(gfx::test::CreateBitmap(192, SK_ColorBLUE)));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Scenario: A policy installed web app is replacing an existing app causing it
-// to be uninstalled after the policy app is installed.
-IN_PROC_BROWSER_TEST_P(WebAppPolicyManagerBrowserTest, MigratingPolicyApp) {
-  // Install old app to replace.
-  auto install_info = WebAppInstallInfo::CreateWithStartUrlForTesting(
-      GURL("https://some.app.com"));
-  install_info->title = u"some app";
-  webapps::AppId old_app_id =
-      test::InstallWebApp(profile(), std::move(install_info));
-
-  WebAppTestUninstallObserver uninstall_observer(profile());
-  uninstall_observer.BeginListening({old_app_id});
-
-  // Update policy app to replace old app.
-  SetPolicyPrefs(R"([{
-    "url": "https://example.com/install",
-    "uninstall_and_replace": ["$1"]
-  }])",
-                 {old_app_id});
-
-  // Old app should get uninstalled by policy app install.
-  uninstall_observer.Wait();
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // A policy entry with a non-HTTP/S scheme URL (e.g. corp-app://) must be
 // silently rejected. The valid HTTPS entry in the same batch must still
 // install normally.
@@ -427,14 +393,6 @@ class WebAppPolicyManagerGuestModeTest : public WebAppPolicyManagerBrowserTest {
  protected:
   void SetUpCommandLine(base::CommandLine* command_line) override {
     WebAppPolicyManagerBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(ash::switches::kGuestSession);
-    command_line->AppendSwitchASCII(ash::switches::kLoginUser,
-                                    user_manager::kGuestUserName);
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile,
-                                    TestingProfile::kTestUserProfileDir);
-    command_line->AppendSwitch(switches::kIncognito);
-#endif
   }
   web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
 };
@@ -442,18 +400,8 @@ class WebAppPolicyManagerGuestModeTest : public WebAppPolicyManagerBrowserTest {
 IN_PROC_BROWSER_TEST_P(WebAppPolicyManagerGuestModeTest,
                        DoNotCreateAppsOnGuestMode) {
   const webapps::AppId app_id =
-#if BUILDFLAG(IS_CHROMEOS)
-      // Installable Manager returns an IN_INCOGNITO error for incognito
-      // profiles on CrOS, even in guest profiles. So the app id will be based
-      // on the install url, not the start url (as no manifest is loaded).
-      // TODO(http://crbug.com/452122299): This probably needs to be fixed where
-      // the InstallableManager should allow the install.
-      GenerateAppIdFromManifestId(
-          GenerateManifestIdFromStartUrlOnly(GetInstallUrl()));
-#else
       // Note: Incognito flag is not set on other platforms.
       GetAppId();
-#endif
   ASSERT_TRUE(SetPolicyAndWaitForInstall(GetForceInstalledAppItem(), app_id));
 
   // This test should pass on all platforms, including on a ChromeOS
@@ -461,10 +409,8 @@ IN_PROC_BROWSER_TEST_P(WebAppPolicyManagerGuestModeTest,
   EXPECT_TRUE(provider().registrar_unsafe().AppMatches(
       app_id, WebAppFilter::InstalledInOperatingSystemForTesting()));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   Profile* guest_profile = CreateGuestBrowser()->GetProfile();
   EXPECT_FALSE(WebAppProvider::GetForTest(guest_profile));
-#endif
 }
 
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(WebAppPolicyManagerGuestModeTest);

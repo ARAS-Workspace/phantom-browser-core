@@ -118,11 +118,7 @@
 #include "third_party/blink/public/common/features.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#endif
-
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #endif
 
@@ -1032,7 +1028,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testClosePanel) {
   ASSERT_OK(WaitForGlicClose());
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testShowProfilePicker) {
   base::test::TestFuture<void> profile_picker_opened;
   ProfilePicker::AddOnProfilePickerOpenedCallbackForTesting(
@@ -1045,7 +1041,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testShowProfilePicker) {
 
 #if !BUILDFLAG(IS_ANDROID)
 // TODO(https://crbug.com/512641949): Fix flakes.
-#if BUILDFLAG(IS_CHROMEOS) || !defined(NDEBUG)
+#if !defined(NDEBUG)
 #define MAYBE_testPanelActive DISABLED_testPanelActive
 #else
 #define MAYBE_testPanelActive testPanelActive
@@ -1913,11 +1909,6 @@ class NewGlicApiTestWithContextualCueing : public NewGlicApiTest {
 
   void SetUpBrowserContextKeyedServices(
       content::BrowserContext* browser_context) override {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (!ash::IsUserBrowserContext(browser_context)) {
-      return;
-    }
-#endif
     fake_cueing_service_ = static_cast<FakeContextualCueingService*>(
         ContextualCueingServiceFactory::GetInstance()->SetTestingFactoryAndUse(
             browser_context,
@@ -2399,7 +2390,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testCreateTabInBackground) {
 // inheritance is supported on Android's tab creation.
 // TODO(crbug.com/515495117): Fix and re-enable this test on Mac.
 // TODO(crbug.com/517282139): Fix and re-enable this test on Linux Msan.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || \
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || \
     (BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER))
 #define MAYBE_testCreateTabByClickingOnLink \
   DISABLED_testCreateTabByClickingOnLink
@@ -2789,7 +2780,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testInitializeFailsAfterReload) {
 }
 
 // TODO(https://crbug.com/516659596): Re-enable on Linux debug builds.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || !defined(NDEBUG)
+#if BUILDFLAG(IS_ANDROID) || !defined(NDEBUG)
 #define MAYBE_testNoClientCreated DISABLED_testNoClientCreated
 #else
 #define MAYBE_testNoClientCreated testNoClientCreated
@@ -2917,7 +2908,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testReloadWebUi) {
 // TODO(crbug.com/460826483): Enable on CrOS.
 // TODO(crbug.com/508123456): Enable on Android once all disabled createTab
 // tests are fixed and re-enabled.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_testAllTestsAreRegistered DISABLED_testAllTestsAreRegistered
 #else
 #define MAYBE_testAllTestsAreRegistered testAllTestsAreRegistered

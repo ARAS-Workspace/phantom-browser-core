@@ -20,11 +20,6 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/device_trust/core/fake_device_trust_connector_service.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
@@ -90,21 +85,6 @@ class UserDelegateImplTest : public testing::Test {
 
   std::unique_ptr<UserDelegateImpl> user_delegate_;
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests that the sign-in profile is considered as sign-in context.
-TEST_F(UserDelegateImplTest, IsSigninContext_True) {
-  CreateDelegate(/*is_managed_user=*/true,
-                 base::FilePath(ash::kSigninBrowserContextBaseName));
-  EXPECT_TRUE(user_delegate_->IsSigninContext());
-}
-
-// Tests that a regular profile is not considered as sign-in context.
-TEST_F(UserDelegateImplTest, IsSigninContext_False) {
-  CreateDelegate();
-  EXPECT_FALSE(user_delegate_->IsSigninContext());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests that IsManagedUser returns false when the user is not managed.
 TEST_F(UserDelegateImplTest, IsManagedUser_False) {

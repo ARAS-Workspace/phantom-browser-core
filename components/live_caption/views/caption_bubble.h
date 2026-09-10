@@ -59,12 +59,6 @@ enum class SessionEvent {
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/accessibility/enums.xml:LiveCaptionSessionEvent)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Used by ash window manager to place the caption bubble in the correct
-// container.
-extern const ui::ClassProperty<bool>* const kIsCaptionBubbleKey;
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 // Caption Bubble
 //

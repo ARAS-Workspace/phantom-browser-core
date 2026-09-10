@@ -370,7 +370,6 @@ TEST_F(AccountPreviewDataServiceTest,
   EXPECT_TRUE(service_->HasActiveFetcherForTesting(account2.gaia));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AccountPreviewDataServiceTest, OnAllFetchesCompleted) {
   AllDataAvailableWaiter waiter(service_.get());
 
@@ -465,7 +464,6 @@ TEST_F(AccountPreviewDataServiceTest,
               testing::Optional(testing::Field(
                   &AccountPreviewPreference::gaia_id, account2.gaia)));
 }
-#endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 TEST_F(AccountPreviewDataServiceTest,
@@ -604,7 +602,6 @@ TEST_F(AccountPreviewDataServiceTest, NoFetchOnStartupIfTimerNotExpired) {
   EXPECT_FALSE(service_->HasActiveFetcherForTesting(account_info.gaia));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AccountPreviewDataServiceTest,
        ClearsInvalidDataOnPrimaryAccountCleared) {
   // 1. Setup: Make a primary account available.
@@ -628,7 +625,6 @@ TEST_F(AccountPreviewDataServiceTest,
   // 3. Assert: Its data should be removed.
   EXPECT_FALSE(service_->GetAccountPreviewData(primary_info.gaia).has_value());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AccountPreviewDataServiceTest, QueuesFetchWhenOffline) {
   // 1. Start offline (network calls delayed).

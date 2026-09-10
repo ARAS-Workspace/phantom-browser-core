@@ -18,7 +18,7 @@
 #include "base/android/android_info.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "base/command_line.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -27,7 +27,7 @@
 #include "content/public/test/browser_test_utils.h"
 #include "url/gurl.h"
 #include "url/url_constants.h"
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 using StartupMetricsTest = PlatformBrowserTest;
 
@@ -98,7 +98,7 @@ IN_PROC_BROWSER_TEST_F(StartupMetricsTest, MAYBE_ReportsValues) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 
 namespace {
 
@@ -194,4 +194,4 @@ IN_PROC_BROWSER_TEST_F(StartupMetricsContentfulPaintTest,
   WaitForHistogramSample(kLargestContentfulPaintHistogram);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)

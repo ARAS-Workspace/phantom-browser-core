@@ -158,12 +158,7 @@ class AnnounceTextView : public View {
   }
 
   void UpdateAccessibleRole(ax::mojom::Role announce_role) {
-#if BUILDFLAG(IS_CHROMEOS)
-    // On ChromeOS, kAlert role can invoke an unnecessary event on reparenting.
-    GetViewAccessibility().SetRole(ax::mojom::Role::kStaticText);
-#else
     GetViewAccessibility().SetRole(announce_role);
-#endif
   }
 
   bool HasValidRole() const {

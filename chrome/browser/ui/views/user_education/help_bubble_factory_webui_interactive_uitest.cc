@@ -100,12 +100,12 @@ class HelpBubbleFactoryWebUIInteractiveUiTest : public InteractiveBrowserTest {
         SelectMenuItem(AppMenuModel::kBookmarksMenuItem),
     // TODO(https://crbug.com/359252812): On Linux and ChromeOS, sometimes
     // the bookmarks submenu randomly loses focus causing it to close.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
         WithoutDelay(
 #endif
             SelectMenuItem(BookmarkSubMenuModel::kReadingListMenuItem),
             SelectMenuItem(ReadingListSubMenuModel::kReadingListMenuShowUI)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
                 )
 #endif
             ,
@@ -127,12 +127,12 @@ class HelpBubbleFactoryWebUIInteractiveUiTest : public InteractiveBrowserTest {
         PressButton(kToolbarAppMenuButtonElementId),
     // TODO(https://crbug.com/359252812): On Linux and ChromeOS, sometimes
     // the bookmarks submenu randomly loses focus causing it to close.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
         WithoutDelay(
 #endif
             SelectMenuItem(AppMenuModel::kBookmarksMenuItem),
             SelectMenuItem(BookmarkSubMenuModel::kShowBookmarkSidePanelItem)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
                 )
 #endif
             ,

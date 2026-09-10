@@ -50,9 +50,6 @@ class FakeServerAppChecker : public fake_server::FakeServerMatchStatusChecker {
     if (base::FeatureList::IsEnabled(extensions_features::kWebstoreHostedApp)) {
       expected_app_ids.push_back(extensions::kWebStoreAppId);
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    expected_app_ids.push_back(app_constants::kChromeAppId);
-#endif
     expected_app_ids_ = base::MakeFlatSet<std::string>(expected_app_ids);
   }
 

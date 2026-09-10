@@ -170,14 +170,6 @@ void CoreExtensionsRendererAPIProvider::PopulateSourceMap(
     const char* name = nullptr;
     int id = 0;
   } js_resources[] = {
-#if BUILDFLAG(IS_CHROMEOS)
-      {"appView",
-       IDR_EXTENSIONS_RENDERER_GENERATED_GUEST_VIEW_APP_VIEW_APP_VIEW_JS},
-      {"appViewDeny",
-       IDR_EXTENSIONS_RENDERER_GENERATED_GUEST_VIEW_APP_VIEW_APP_VIEW_DENY_JS},
-      {"appViewElement",
-       IDR_EXTENSIONS_RENDERER_GENERATED_GUEST_VIEW_APP_VIEW_APP_VIEW_ELEMENT_JS},
-#endif
 
       {"entryIdManager", IDR_EXTENSIONS_RENDERER_GENERATED_ENTRY_ID_MANAGER_JS},
       {"extensionOptions",
@@ -255,10 +247,6 @@ void CoreExtensionsRendererAPIProvider::PopulateSourceMap(
 // desktop-android builds. Currently, the full bindings aren't generated.
 #if BUILDFLAG(ENABLE_EXTENSIONS)
       {"mojo_bindings", IDR_MOJO_MOJO_BINDINGS_JS},
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-      {"mojo_bindings_lite", IDR_MOJO_MOJO_BINDINGS_LITE_JS},
 #endif
 
       {"extensions/common/mojom/keep_alive.mojom",

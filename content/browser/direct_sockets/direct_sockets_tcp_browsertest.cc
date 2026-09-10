@@ -49,10 +49,6 @@
 #include "third_party/blink/public/mojom/navigation/navigation_params.mojom.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/dbus/permission_broker/fake_permission_broker_client.h"  // nogncheck
-#include "content/browser/direct_sockets/firewall_hole_delegate.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // The tests in this file use the Network Service implementation of
 // NetworkContext, to test sending and receiving of data over TCP sockets.
@@ -644,19 +640,6 @@ IN_PROC_BROWSER_TEST_F(DirectSocketsTcpBrowserTest,
 
 class DirectSocketsTcpServerBrowserTest : public DirectSocketsTcpBrowserTest {
  public:
-#if BUILDFLAG(IS_CHROMEOS)
-  DirectSocketsTcpServerBrowserTest() {
-    chromeos::PermissionBrokerClient::InitializeFake();
-    FirewallHoleDelegate::SetAlwaysOpenFirewallHoleForTesting(true);
-  }
-
-  ~DirectSocketsTcpServerBrowserTest() override {
-    chromeos::PermissionBrokerClient::Shutdown();
-    // Need to reset the flag because there are other tests that
-    // use FirewallHoleDelegate.
-    FirewallHoleDelegate::SetAlwaysOpenFirewallHoleForTesting(false);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 IN_PROC_BROWSER_TEST_F(DirectSocketsTcpServerBrowserTest, ExchangeTcpServer) {
@@ -665,66 +648,6 @@ IN_PROC_BROWSER_TEST_F(DirectSocketsTcpServerBrowserTest, ExchangeTcpServer) {
               testing::HasSubstr("succeeded"));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(DirectSocketsTcpServerBrowserTest, HasFirewallHole) {
-  class DelegateImpl : public chromeos::FakePermissionBrokerClient::Delegate {
-   public:
-    DelegateImpl(uint16_t port, base::OnceClosure quit_closure)
-        : port_(port), quit_closure_(std::move(quit_closure)) {}
-
-    void OnTcpPortReleased(uint16_t port,
-                           const std::string& interface) override {
-      if (port == port_) {
-        ASSERT_EQ(interface, "");
-        ASSERT_TRUE(quit_closure_);
-        std::move(quit_closure_).Run();
-      }
-    }
-
-   private:
-    uint16_t port_;
-    base::OnceClosure quit_closure_;
-  };
-
-  auto* client = chromeos::FakePermissionBrokerClient::Get();
-
-  const std::string open_script = R"(
-    (async () => {
-      socket = new TCPServerSocket('127.0.0.1');
-      const { localPort } = await socket.opened;
-      return localPort;
-    })();
-  )";
-
-  const int32_t local_port = EvalJs(shell(), open_script).ExtractInt();
-  ASSERT_TRUE(client->HasTcpHole(local_port, "" /* all interfaces */));
-
-  base::RunLoop run_loop;
-  auto delegate =
-      std::make_unique<DelegateImpl>(local_port, run_loop.QuitClosure());
-  client->AttachDelegate(delegate.get());
-
-  EXPECT_TRUE(
-      EvalJs(shell(), content::test::WrapAsync("socket.close()")).is_ok());
-  run_loop.Run();
-}
-
-IN_PROC_BROWSER_TEST_F(DirectSocketsTcpServerBrowserTest, FirewallHoleDenied) {
-  auto* client = chromeos::FakePermissionBrokerClient::Get();
-  client->SetTcpDenyAll();
-
-  const std::string open_script = R"(
-    (async () => {
-      socket = new TCPServerSocket('127.0.0.1');
-      return await socket.opened.catch(err => err.message);
-    })();
-  )";
-
-  EXPECT_THAT(EvalJs(shell(), open_script).ExtractString(),
-              testing::HasSubstr("Firewall"));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(DirectSocketsTcpServerBrowserTest, OkOnClose) {
   ASSERT_EQ(true, EvalJs(shell(), R"(

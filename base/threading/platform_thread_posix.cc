@@ -33,7 +33,7 @@
 #include "base/posix/can_lower_nice_to.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <sys/syscall.h>
 
 #include <atomic>
@@ -162,7 +162,7 @@ bool CreateThread(size_t stack_size,
   return success;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 // Store the thread ids in local storage since calling the SWI can be
 // expensive and PlatformThread::CurrentId is used liberally.
@@ -193,11 +193,11 @@ class InitAtFork {
   }
 };
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 namespace internal {
 
@@ -207,7 +207,7 @@ void InvalidateTidCache() {
 
 }  // namespace internal
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // static
 PlatformThreadId PlatformThreadBase::CurrentId() {
@@ -217,7 +217,7 @@ PlatformThreadId PlatformThreadBase::CurrentId() {
   uint64_t tid;
   CHECK_EQ(pthread_threadid_np(nullptr, &tid), 0);
   return PlatformThreadId(tid);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   // Workaround false-positive MSAN use-of-uninitialized-value on
   // thread_local storage for loaded libraries:
   // https://github.com/google/sanitizers/issues/1265

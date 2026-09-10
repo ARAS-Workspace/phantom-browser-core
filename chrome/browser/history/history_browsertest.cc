@@ -1060,7 +1060,7 @@ IN_PROC_BROWSER_TEST_F(HistoryBrowserTest, VisitAnnotations) {
             base::Seconds(0));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_ObserversCallBothOnURLVisitedForLocalVisits \
   DISABLED_ObserversCallBothOnURLVisitedForLocalVisits
 #else

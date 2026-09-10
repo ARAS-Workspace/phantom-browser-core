@@ -100,42 +100,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTest, EventsAreUnregistered) {
 
 // The following test is executed as Chrome App, which is only supported on
 // ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-// Test that listeners for webview-related events are not stored (even for lazy
-// contexts). See crbug.com/41327043.
-IN_PROC_BROWSER_TEST_F(ExtensionApiTest, WebViewEventRegistration) {
-  ASSERT_TRUE(RunExtensionTest("events/webview_events",
-                               {.launch_as_platform_app = true}))
-      << message_;
-  EventRouter* event_router = EventRouter::Get(profile());
-  // We should not register lazy listeners for any webview-related events.
-  EXPECT_FALSE(
-      event_router->HasLazyEventListenerForTesting("webViewInternal.onClose"));
-  EXPECT_FALSE(event_router->HasLazyEventListenerForTesting("webview.close"));
-  EXPECT_FALSE(event_router->HasLazyEventListenerForTesting(
-      "chromeWebViewInternal.onContextMenuShow"));
-  EXPECT_FALSE(event_router->HasLazyEventListenerForTesting(
-      "chromeWebViewInternal.onClicked"));
-  EXPECT_FALSE(event_router->HasLazyEventListenerForTesting(
-      "webViewInternal.contextMenus"));
-  // Chrome webview context menu events also use a "subevent" pattern, so we
-  // need to look for suffixed events. These seem to always be suffixed with
-  // "3" and "4", but look for the first 10 to be a bit safer.
-  for (int i = 0; i < 10; ++i) {
-    EXPECT_FALSE(event_router->HasLazyEventListenerForTesting(
-        base::StringPrintf("chromeWebViewInternal.onClicked/%d", i)));
-    EXPECT_FALSE(event_router->HasLazyEventListenerForTesting(
-        base::StringPrintf("chromeWebViewInternal.onContextMenuShow/%d", i)));
-    EXPECT_FALSE(
-        event_router->HasLazyEventListenerForTesting(base::StringPrintf(
-            "webViewInternal.declarativeWebRequest.onMessage/%d", i)));
-  }
-
-  // Sanity check: app.runtime.onLaunched should have a lazy listener.
-  EXPECT_TRUE(
-      event_router->HasLazyEventListenerForTesting("app.runtime.onLaunched"));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests that registering a listener for an event that requires a permission and
 // then removing that permission using the permissions API does not lead to a
@@ -285,11 +249,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTest, EventAfterPermissionRemoved) {
 // Tests that events broadcast right after a profile has started to be destroyed
 // do not cause a crash. Regression test for crbug.com/40847328.
 // TODO(crbug.com/505759503): Enable the test.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_DispatchEventDuringShutdown DISABLED_DispatchEventDuringShutdown
-#else
 #define MAYBE_DispatchEventDuringShutdown DispatchEventDuringShutdown
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionApiTest, MAYBE_DispatchEventDuringShutdown) {
   // Minimize background page expiration time for testing purposes.
   ProcessManager::SetEventPageIdleTimeForTesting(1);

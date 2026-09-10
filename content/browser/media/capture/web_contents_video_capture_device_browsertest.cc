@@ -534,7 +534,7 @@ class WebContentsVideoCaptureDeviceBrowserTestP
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 INSTANTIATE_TEST_SUITE_P(
     All,
     WebContentsVideoCaptureDeviceBrowserTestP,
@@ -588,9 +588,7 @@ INSTANTIATE_TEST_SUITE_P(
 // TODO(crbug.com/328419809): Also flaky on Mac.
 // TODO(crbug.com/329654821): Also flaky for ChromeOS ASAN LSAN and debug.
 // TODO(crbug.com/540031290): Also flaky on Win ASAN.
-#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    (BUILDFLAG(IS_CHROMEOS) && defined(ADDRESS_SANITIZER)) ||                \
-    (BUILDFLAG(IS_CHROMEOS) && !defined(NDEBUG))
+#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_CapturesContentChanges DISABLED_CapturesContentChanges
 #else
 #define MAYBE_CapturesContentChanges CapturesContentChanges

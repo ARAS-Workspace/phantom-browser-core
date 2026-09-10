@@ -167,7 +167,7 @@ IN_PROC_BROWSER_TEST_F(AppBannerManagerDesktopBrowserTest,
 }
 
 // TODO(crbug.com/40817384): Flaky failures.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_DestroyWebContents DISABLED_DestroyWebContents
 #else
 #define MAYBE_DestroyWebContents DestroyWebContents

@@ -52,21 +52,6 @@ void VerifyPaper(const base::Value& paper_dict,
   EXPECT_EQ(expected_size.height(), height.value());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void VerifyMediaType(const base::Value& media_type_dict,
-                     const std::string& expected_name,
-                     const std::string& expected_vendor) {
-  ASSERT_TRUE(media_type_dict.is_dict());
-  const std::string* name =
-      media_type_dict.GetDict().FindString("custom_display_name");
-  ASSERT_TRUE(name);
-  EXPECT_EQ(expected_name, *name);
-  const std::string* vendor = media_type_dict.GetDict().FindString("vendor_id");
-  ASSERT_TRUE(vendor);
-  EXPECT_EQ(expected_vendor, *vendor);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace
 
 class PrinterCapabilitiesTest : public testing::Test {
@@ -317,87 +302,5 @@ TEST_F(PrinterCapabilitiesTest, PaperLocalizationsApplied) {
   VerifyPaper((*media_option)[14], "bar", "vendor", {600, 600});
 }
 #endif  // BUILDFLAG(PRINT_MEDIA_L10N_ENABLED)
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(PrinterCapabilitiesTest, MediaTypeLocalizationsApplied) {
-  std::string printer_name = "test_printer";
-  PrinterBasicInfo basic_info;
-
-  // Set a capability and add a valid printer.
-  auto caps = std::make_unique<PrinterSemanticCapsAndDefaults>();
-  caps->papers.push_back({"na letter", "na_letter_8.5x11in", {215900, 279400}});
-
-  // Add some media types.
-  caps->media_types.push_back({"stationery display name", "stationery"});
-  caps->media_types.push_back({"custom 1 display name", "custom-1"});
-  caps->media_types.push_back({"photo display name", "photographic"});
-  caps->media_types.push_back({"custom 2 display name", "custom-2"});
-
-  caps->dpis = {{600, 600}};
-  print_backend()->AddValidPrinter(
-      printer_name, std::move(caps),
-      std::make_unique<printing::PrinterBasicInfo>(basic_info));
-
-  base::DictValue settings_dictionary =
-      GetSettingsOnBlockingTaskRunnerAndWaitForResults(printer_name, basic_info,
-                                                       {});
-
-  // Verify settings were created.
-  ASSERT_FALSE(settings_dictionary.empty());
-
-  // Verify there is a CDD with a printer entry.
-  const base::DictValue* cdd =
-      settings_dictionary.FindDict(kSettingCapabilities);
-  ASSERT_TRUE(cdd);
-  const base::DictValue* printer = cdd->FindDict(kPrinter);
-  ASSERT_TRUE(printer);
-
-  // Verify there are 4 media types.
-  const base::DictValue* media_type = printer->FindDict("media_type");
-  ASSERT_TRUE(media_type);
-  const base::ListValue* media_type_option = media_type->FindList("option");
-  ASSERT_TRUE(media_type_option);
-  ASSERT_EQ(4U, media_type_option->size());
-
-  VerifyMediaType((*media_type_option)[0], "Paper (Plain)", "stationery");
-  VerifyMediaType((*media_type_option)[1], "custom 1 display name", "custom-1");
-  VerifyMediaType((*media_type_option)[2], "Photo", "photographic");
-  VerifyMediaType((*media_type_option)[3], "custom 2 display name", "custom-2");
-}
-
-TEST_F(PrinterCapabilitiesTest, HasNotSecureProtocol) {
-  std::string printer_name = "test_printer";
-  PrinterBasicInfo basic_info;
-  PrinterSemanticCapsAndDefaults::Papers no_user_defined_papers;
-
-  // Set a capability and add a valid printer.
-  auto caps = std::make_unique<PrinterSemanticCapsAndDefaults>();
-  caps->pin_supported = true;
-  print_backend()->AddValidPrinter(
-      printer_name, std::move(caps),
-      std::make_unique<printing::PrinterBasicInfo>(basic_info));
-
-  base::DictValue settings_dictionary =
-      GetSettingsOnBlockingTaskRunnerAndWaitForResults(
-          printer_name, basic_info, std::move(no_user_defined_papers));
-
-  // Verify settings were created.
-  ASSERT_FALSE(settings_dictionary.empty());
-
-  // Verify there is a CDD with a printer entry.
-  const base::DictValue* cdd =
-      settings_dictionary.FindDict(kSettingCapabilities);
-  ASSERT_TRUE(cdd);
-  const base::DictValue* printer = cdd->FindDict(kPrinter);
-  ASSERT_TRUE(printer);
-
-  // Verify that pin is not supported.
-  const base::DictValue* pin = printer->FindDict("pin");
-  ASSERT_TRUE(pin);
-  std::optional<bool> pin_supported = pin->FindBool("supported");
-  ASSERT_TRUE(pin_supported.has_value());
-  ASSERT_FALSE(pin_supported.value());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace printing

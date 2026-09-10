@@ -242,7 +242,6 @@ void SyncInternalsMessageHandler::HandleWriteUserEvent(
 
 void SyncInternalsMessageHandler::HandleRequestStart(
     const base::ListValue& args) {
-#if !BUILDFLAG(IS_CHROMEOS)
   CHECK_EQ(0U, args.size());
 
   if (!identity_manager_ || !sync_service_) {
@@ -261,7 +260,6 @@ void SyncInternalsMessageHandler::HandleRequestStart(
       signin::ConsentLevel::kSync,
       signin_metrics::AccessPoint::kSetSyncConsentFromSyncInternals);
   sync_service_->GetUserSettings()->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 void SyncInternalsMessageHandler::HandleTriggerRefresh(

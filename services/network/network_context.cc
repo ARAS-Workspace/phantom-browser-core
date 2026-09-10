@@ -2742,46 +2742,6 @@ void NetworkContext::SetCorsNonWildcardRequestHeadersSupport(bool value) {
       cors::NonWildcardRequestHeadersSupport(value);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void NetworkContext::LookupProxyAuthCredentials(
-    const net::ProxyServer& proxy_server,
-    const std::string& auth_scheme,
-    const std::string& realm,
-    LookupProxyAuthCredentialsCallback callback) {
-  net::HttpAuth::Scheme net_scheme =
-      net::HttpAuth::StringToScheme(base::ToLowerASCII(auth_scheme));
-  if (net_scheme == net::HttpAuth::Scheme::AUTH_SCHEME_MAX) {
-    std::move(callback).Run(std::nullopt);
-    return;
-  }
-  net::HttpAuthCache* http_auth_cache =
-      url_request_context_->http_transaction_factory()
-          ->GetSession()
-          ->http_auth_cache();
-  // TODO(crbug.com/40704785): Mapping proxy addresses to URLs is a
-  // lossy conversion, shouldn't do this.
-  const char* scheme =
-      proxy_server.is_secure_http_like() ? "https://" : "http://";
-  url::SchemeHostPort scheme_host_port(
-      GURL(scheme + proxy_server.host_port_pair().ToString()));
-  if (!scheme_host_port.IsValid()) {
-    std::move(callback).Run(std::nullopt);
-    return;
-  }
-
-  //  Unlike server credentials, proxy credentials are not keyed on
-  //  NetworkAnonymizationKey.
-  net::HttpAuthCache::Entry* entry = http_auth_cache->Lookup(
-      scheme_host_port, net::HttpAuth::AUTH_PROXY, realm, net_scheme,
-      net::NetworkAnonymizationKey());
-  if (entry) {
-    std::move(callback).Run(entry->credentials());
-  } else {
-    std::move(callback).Run(std::nullopt);
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 const net::HttpAuthPreferences* NetworkContext::GetHttpAuthPreferences() const {
   return &http_auth_merged_preferences_;
 }
@@ -2828,10 +2788,10 @@ void NetworkContext::OnHttpAuthDynamicParamsChanged(
       http_auth_dynamic_network_service_params->android_negotiate_account_type);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   http_auth_merged_preferences_.set_allow_gssapi_library_load(
       http_auth_dynamic_network_service_params->allow_gssapi_library_load);
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
   if (http_auth_dynamic_network_service_params->allowed_schemes.has_value()) {
     http_auth_merged_preferences_.SetAllowedSchemes(base::flat_set<std::string>(
         http_auth_dynamic_network_service_params->allowed_schemes->begin(),
@@ -2975,12 +2935,6 @@ URLRequestContextOwner NetworkContext::MakeURLRequestContext(
         std::move(params_->system_proxy_resolver));
   }
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (params_->dhcp_wpad_url_client) {
-    builder.SetDhcpWpadUrlClient(std::move(params_->dhcp_wpad_url_client));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (!params_->http_cache_enabled) {
     builder.DisableHttpCache();

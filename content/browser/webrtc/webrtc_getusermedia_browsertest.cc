@@ -274,7 +274,7 @@ IN_PROC_BROWSER_TEST_F(WebRtcGetUserMediaBrowserTest,
 }
 
 // TODO(crbug.com/571389, crbug.com/1241538): Flaky on TSAN bots and macOS.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_GetUserMediaWithMandatorySourceID \
   DISABLED_GetUserMediaWithMandatorySourceID
 #else
@@ -763,7 +763,7 @@ IN_PROC_BROWSER_TEST_F(WebRtcGetUserMediaBrowserTest,
 }
 
 // Flaky on Linux, see https://crbug.com/952381
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ApplyConstraintsNonDevice DISABLED_ApplyConstraintsNonDevice
 #else
 #define MAYBE_ApplyConstraintsNonDevice ApplyConstraintsNonDevice

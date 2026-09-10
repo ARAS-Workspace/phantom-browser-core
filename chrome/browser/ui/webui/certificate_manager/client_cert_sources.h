@@ -24,12 +24,7 @@ std::unique_ptr<CertificateManagerPageHandler::CertSource>
 CreateProvisionedClientCertSource(Profile* profile);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-std::unique_ptr<CertificateManagerPageHandler::CertSource>
-CreateExtensionsClientCertSource(Profile* profile);
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 class ClientCertManagementAccessControls {
  public:
   enum KeyStorage {
@@ -59,11 +54,7 @@ class ClientCertManagementAccessControls {
                        CertLocation cert_location) const;
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  const bool is_guest_;
-  const ClientCertificateManagementPermission client_cert_policy_;
-#endif
 };
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #endif  // CHROME_BROWSER_UI_WEBUI_CERTIFICATE_MANAGER_CLIENT_CERT_SOURCES_H_

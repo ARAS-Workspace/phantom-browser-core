@@ -84,9 +84,9 @@ CONTENT_EXPORT BASE_DECLARE_FEATURE(kEarlyTopAppForSandboxedRenderer);
 #endif
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kEditContextSelectionSync);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kKillOnUnexpectedOriginHeader);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kEnableDevToolsJsErrorReporting);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kEnforceGamepadPermissionsPolicy);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kEnforceSameDocumentOriginInvariants);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kEmbeddingRequiresOptIn);
@@ -99,7 +99,7 @@ CONTENT_EXPORT BASE_DECLARE_FEATURE(
     kFocusRenderWidgetHostViewAndroidOnMouseDown);
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(IS_LINUX)
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kFontDataServiceLinux);
 #else
@@ -111,12 +111,12 @@ enum class FontDataServiceTypefaceType {
 };
 CONTENT_EXPORT BASE_DECLARE_FEATURE_PARAM(FontDataServiceTypefaceType,
                                           kFontDataServiceTypefaceType);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kFontDataManagerPrewarming);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kFontDataServiceForCSSLocalFonts);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool IsFontDataServiceEnabled();
 #endif
 

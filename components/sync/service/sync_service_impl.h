@@ -225,11 +225,7 @@ class SyncServiceImpl : public SyncService,
   CoreAccountInfo GetSyncAccountInfoForPrefs() const override;
   void OnSyncClientDisabledByPolicyChanged() override;
   void OnSelectedTypesChanged() override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void OnSyncFeatureDisabledViaDashboardCleared() override;
-#else   // BUILDFLAG(IS_CHROMEOS)
   void OnInitialSyncFeatureSetupCompleted() override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // IdentityManager::Observer implementation.
   void OnAccountsCookieDeletedByUserAction() override;

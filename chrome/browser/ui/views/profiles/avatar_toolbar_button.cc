@@ -58,15 +58,6 @@ AvatarToolbarButton::AvatarToolbarButton(BrowserWindowInterface* browser)
       state_manager_(*this, browser),
       slide_animation_(this) {
   state_manager_.InitializeStates();
-#if BUILDFLAG(IS_CHROMEOS)
-  // On CrOS this button should only show as badging for Incognito, Guest and
-  // captivie portal signin. It's only enabled for non captive portal Incognito
-  // where a menu is available for closing all Incognito windows.
-  Profile* profile = browser->GetProfile();
-  CHECK(profile);
-  SetEnabled(profile->IsOffTheRecord() && !profile->IsGuestSession() &&
-             !profile->GetOTRProfileID().IsCaptivePortal());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Activate on press for left-mouse-button only to mimic other MenuButtons
   // without drag-drop actions (specifically the adjacent browser menu).

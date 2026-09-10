@@ -903,7 +903,7 @@ TEST_F(DownloadItemModelTest, RenamingProgress) {
   EXPECT_EQ(60, model().PercentComplete());
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 class DownloadItemModelTailoredWarningTest : public DownloadItemModelTest {
  public:
   DownloadItemModelTailoredWarningTest() {
@@ -966,4 +966,4 @@ TEST_F(DownloadItemModelTailoredWarningTest, GetTailoredWarningType) {
   }
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)

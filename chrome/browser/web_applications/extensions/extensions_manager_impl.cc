@@ -139,12 +139,8 @@ bool ExtensionsManagerImpl::IsExternalExtensionUninstalled(
 }
 
 bool ExtensionsManagerImpl::DidPreinstalledAppsPerformNewInstallation() {
-#if !BUILDFLAG(IS_CHROMEOS)
   return preinstalled_extensions::Provider::DidPerformNewInstallationForProfile(
       profile_);
-#else
-  return false;
-#endif
 }
 
 bool ExtensionsManagerImpl::IsPreinstalledExtensionAppId(

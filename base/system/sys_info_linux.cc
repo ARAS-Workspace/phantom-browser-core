@@ -78,11 +78,7 @@ ByteSize SysInfo::AmountOfAvailablePhysicalMemory(
 
 // static
 std::string SysInfo::CPUModelName() {
-#if BUILDFLAG(IS_CHROMEOS) && defined(ARCH_CPU_ARMEL)
-  const char kCpuModelPrefix[] = "Hardware";
-#else
   const char kCpuModelPrefix[] = "model name";
-#endif
   std::string contents;
   ReadFileToString(FilePath("/proc/cpuinfo"), &contents);
   DCHECK(!contents.empty());
@@ -133,7 +129,7 @@ std::string SysInfo::CPUModelName() {
   return std::string();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 // static
 SysInfo::HardwareInfo SysInfo::GetHardwareInfoSync() {
   static const size_t kMaxStringSize = 100u;

@@ -29,10 +29,6 @@
 class BrowserWindowInterface;
 class GlobalBrowserCollection;
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/public/browser/browser_context.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace storage {
 class FileSystemURL;
 }
@@ -58,14 +54,6 @@ class ConnectorsManager : public ConnectorsManagerBase {
                     const ServiceProviderConfig* config,
                     bool observe_prefs = true);
   ~ConnectorsManager() override;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::optional<AnalysisSettings> GetAnalysisSettings(
-      content::BrowserContext* context,
-      const storage::FileSystemURL& source_url,
-      const storage::FileSystemURL& destination_url,
-      AnalysisConnector connector);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
   // Check if the corresponding connector is enabled for any local agent.

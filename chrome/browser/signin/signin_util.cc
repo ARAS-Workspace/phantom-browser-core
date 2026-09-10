@@ -81,7 +81,7 @@ ScopedForceSigninSetterForTesting::~ScopedForceSigninSetterForTesting() {
   ResetForceSigninForTesting();  // IN-TEST
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 CookiesMover::CookiesMover(base::WeakPtr<Profile> source_profile,
                            base::WeakPtr<Profile> destination_profile,
                            base::OnceCallback<void()> callback)
@@ -148,7 +148,7 @@ void CookiesMover::OnCookiesReceived(
 void CookiesMover::OnCookiesMoved() {
   std::move(callback_).Run();
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool IsForceSigninEnabled() {
   if (g_is_force_signin_enabled_cache == NOT_CACHED) {
@@ -179,7 +179,6 @@ bool IsProfileDeletionAllowed(Profile* profile) {
 }
 
 #if !BUILDFLAG(IS_ANDROID)
-#if !BUILDFLAG(IS_CHROMEOS)
 // Returns true if managed accounts signin are required to create a new profile
 // by policies set in `profile`.
 bool IsProfileSeparationEnforcedByProfile(
@@ -266,7 +265,6 @@ bool IsAccountExemptedFromEnterpriseProfileSeparation(
       prefs::kProfileSeparationDomainExceptionList);
   return allowed_domains.contains(domain);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void RecordEnterpriseProfileCreationUserChoice(bool enforced_by_policy,
                                                bool created) {

@@ -332,11 +332,6 @@ ShowTranslateBubbleResult TestBrowserWindow::ShowTranslateBubble(
 }
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-void TestBrowserWindow::ToggleMultitaskMenu() {
-  return;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 DownloadBubbleUIController* TestBrowserWindow::GetDownloadBubbleUIController() {
   return nullptr;

@@ -54,15 +54,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/user_manager_delegate_impl.h"
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "components/prefs/pref_service.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/user_manager_impl.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using content::WebContents;
 
 namespace {

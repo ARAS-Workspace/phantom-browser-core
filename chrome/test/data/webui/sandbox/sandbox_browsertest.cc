@@ -8,7 +8,7 @@
 #include "content/public/common/url_constants.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 class SandboxStatusUITest : public WebUIMochaBrowserTest {
  protected:
   SandboxStatusUITest() { set_test_loader_host(chrome::kChromeUISandboxHost); }

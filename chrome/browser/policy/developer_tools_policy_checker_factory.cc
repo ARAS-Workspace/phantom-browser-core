@@ -57,7 +57,7 @@ void DeveloperToolsPolicyCheckerFactory::RegisterProfilePrefs(
       prefs::kDevToolsAvailability,
       static_cast<int>(DeveloperToolsAvailability::
                            kDisallowedForForceInstalledExtensions));
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   registry->RegisterListPref(prefs::kDeveloperToolsAvailabilityAllowlist);
   registry->RegisterListPref(prefs::kDeveloperToolsAvailabilityBlocklist);
 #endif

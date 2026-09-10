@@ -98,13 +98,6 @@
 #include "base/memory/scoped_refptr.h"
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/net/system_proxy_manager.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#include "chromeos/ash/components/dbus/system_proxy/system_proxy_client.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using content::BrowserThread;
 using content::BrowsingDataFilterBuilder;
 
@@ -1000,9 +993,6 @@ const std::vector<std::string> kDoesNotSupportOriginFilteringDelegate{
     "UserDataSnapshot",
 #endif
     "WebrtcEventLogs",
-#if BUILDFLAG(IS_CHROMEOS)
-    "TpmAttestationKeys",
-#endif
 };
 
 // See comment on FullyFilteredDataTypes test for advice when this test fails.
@@ -1485,12 +1475,6 @@ IN_PROC_BROWSER_TEST_P(BrowsingDataHistoryRemoverBrowserTest,
         // but there are a few bugs that need to be fixed.
         // Any addition to this list must have an associated TODO.
         static const std::vector<std::string> ignore_file_patterns = {
-#if BUILDFLAG(IS_CHROMEOS)
-            // TODO(crbug.com/40577815): Many leveldb files remain on ChromeOS.
-            // We don't know why and can't reproduce locally. ChromeOS behavior
-            // of aborting shutdown before finishing is suspected.
-            "[0-9]{6}",
-#endif
         };
         CheckUserDirectoryForString(kLocalHost, ignore_file_patterns,
                                     /*check_leveldb_content=*/true,
@@ -1547,38 +1531,6 @@ IN_PROC_BROWSER_TEST_F(BrowsingDataRemoverBrowserTest,
     EXPECT_FALSE(HasDataForType(type));
   }
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Test that removing passwords, when System-proxy is enabled on Chrome OS,
-// sends a request to System-proxy to clear the cached user credentials.
-IN_PROC_BROWSER_TEST_F(BrowsingDataRemoverBrowserTest,
-                       SystemProxyClearsUserCredentials_RemovePasswords) {
-  ash::SystemProxyManager::Get()->SetSystemProxyEnabledForTest(true);
-  EXPECT_EQ(0, ash::SystemProxyClient::Get()
-                   ->GetTestInterface()
-                   ->GetClearUserCredentialsCount());
-  RemoveAndWait(chrome_browsing_data_remover::DATA_TYPE_PASSWORDS);
-
-  EXPECT_EQ(1, ash::SystemProxyClient::Get()
-                   ->GetTestInterface()
-                   ->GetClearUserCredentialsCount());
-}
-
-// Test that removing cookies, when System-proxy is enabled on Chrome OS,
-// sends a request to System-proxy to clear the cached user credentials.
-IN_PROC_BROWSER_TEST_F(BrowsingDataRemoverBrowserTest,
-                       SystemProxyClearsUserCredentials_RemoveCookies) {
-  ash::SystemProxyManager::Get()->SetSystemProxyEnabledForTest(true);
-  EXPECT_EQ(0, ash::SystemProxyClient::Get()
-                   ->GetTestInterface()
-                   ->GetClearUserCredentialsCount());
-  RemoveAndWait(content::BrowsingDataRemover::DATA_TYPE_COOKIES);
-
-  EXPECT_EQ(1, ash::SystemProxyClient::Get()
-                   ->GetTestInterface()
-                   ->GetClearUserCredentialsCount());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(BrowsingDataRemoverBrowserTest,
                        RelatedWebsiteSetsDeletion) {

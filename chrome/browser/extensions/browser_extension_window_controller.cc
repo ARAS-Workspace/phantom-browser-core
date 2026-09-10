@@ -63,9 +63,6 @@ constexpr char kShowStateValueNormal[] = "normal";
 constexpr char kShowStateValueMinimized[] = "minimized";
 constexpr char kShowStateValueMaximized[] = "maximized";
 constexpr char kShowStateValueFullscreen[] = "fullscreen";
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kShowStateValueLockedFullscreen[] = "locked-fullscreen";
-#endif
 
 api::tabs::WindowType GetTabsWindowType(const BrowserWindowInterface* browser) {
   switch (browser->GetType()) {
@@ -204,11 +201,6 @@ base::DictValue BrowserExtensionWindowController::CreateWindowValueForExtension(
     if (window()->IsMinimized()) {
       return kShowStateValueMinimized;
     } else if (window()->IsFullscreen()) {
-#if BUILDFLAG(IS_CHROMEOS)
-      if (platform_util::IsBrowserLockedFullscreen(GetBrowser())) {
-        return kShowStateValueLockedFullscreen;
-      }
-#endif
       return kShowStateValueFullscreen;
     } else if (window()->IsMaximized()) {
       return kShowStateValueMaximized;

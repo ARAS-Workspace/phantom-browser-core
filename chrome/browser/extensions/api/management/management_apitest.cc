@@ -37,10 +37,6 @@
 #include "net/dns/mock_host_resolver.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/chrome_app_deprecation/chrome_app_deprecation.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/apps/app_service/app_service_proxy.h"
 #include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
@@ -103,11 +99,6 @@ class ExtensionManagementApiTest : public extensions::ExtensionApiTest {
 #if !BUILDFLAG(IS_ANDROID)
     enable_chrome_apps_ = std::make_unique<base::AutoReset<bool>>(
         &extensions::testing::g_enable_chrome_apps_for_testing, true);
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-    scoped_feature_list_.InitAndEnableFeature(
-        apps::chrome_app_deprecation::kAllowUserInstalledChromeApps);
-
 #endif
   }
   ~ExtensionManagementApiTest() override = default;
@@ -172,9 +163,6 @@ class ExtensionManagementApiTest : public extensions::ExtensionApiTest {
   std::unique_ptr<base::AutoReset<bool>> enable_chrome_apps_;
 #if !BUILDFLAG(IS_ANDROID)
   web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList scoped_feature_list_;
 #endif
 };
 

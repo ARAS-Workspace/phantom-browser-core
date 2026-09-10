@@ -381,53 +381,6 @@ TEST_F(PrepareFilesForWritableAppTest,
   run_loop.Run();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-TEST_F(PrepareFilesForWritableAppTest, SingleFileThatExistsDlpGrantsAccess) {
-  testing::StrictMock<base::MockOnceCallback<void()>> success_callback;
-  testing::StrictMock<base::MockOnceCallback<void(const base::FilePath& path)>>
-      fail_callback;
-  file_access::MockScopedFileAccessDelegate scoped_file_access_delegate;
-  base::RunLoop run_loop;
-  EXPECT_CALL(scoped_file_access_delegate, RequestFilesAccessForSystem)
-      .WillOnce([this](const std::vector<base::FilePath>& paths,
-                       base::OnceCallback<void(file_access::ScopedFileAccess)>
-                           callback) {
-        EXPECT_EQ(1ul, paths.size());
-        EXPECT_EQ(file1, paths[0]);
-        std::move(callback).Run(file_access::ScopedFileAccess::Allowed());
-      });
-  EXPECT_CALL(success_callback, Run).WillOnce([&run_loop] { run_loop.Quit(); });
-
-  PrepareFilesForWritableApp({file1}, &context_, {}, success_callback.Get(),
-                             fail_callback.Get());
-  run_loop.Run();
-}
-
-TEST_F(PrepareFilesForWritableAppTest, SingleFileThatExistsDlpDeniesAccess) {
-  testing::StrictMock<base::MockOnceCallback<void()>> success_callback;
-  testing::StrictMock<base::MockOnceCallback<void(const base::FilePath& path)>>
-      fail_callback;
-  file_access::MockScopedFileAccessDelegate scoped_file_access_delegate;
-  base::RunLoop run_loop;
-  EXPECT_CALL(scoped_file_access_delegate, RequestFilesAccessForSystem)
-      .WillOnce([this](const std::vector<base::FilePath>& paths,
-                       base::OnceCallback<void(file_access::ScopedFileAccess)>
-                           callback) {
-        EXPECT_EQ(1ul, paths.size());
-        EXPECT_EQ(file1, paths[0]);
-        std::move(callback).Run(
-            file_access::ScopedFileAccess(false, base::ScopedFD()));
-      });
-  EXPECT_CALL(success_callback, Run).WillOnce([&run_loop] { run_loop.Quit(); });
-
-  PrepareFilesForWritableApp({file1}, &context_, {}, success_callback.Get(),
-                             fail_callback.Get());
-  run_loop.Run();
-}
-
-#endif
-
 #if BUILDFLAG(IS_POSIX)
 TEST_F(PrepareFilesForWritableAppTest, SymlinkToExistingFile) {
   base::FilePath target = file1;

@@ -202,54 +202,6 @@ void ChromeUsbDelegate::AdjustProtectedInterfaceClasses(
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // These extensions can claim the protected HID interface class (example: used
-  // as badge readers)
-  static constexpr auto kHidPrivilegedExtensionIds =
-      base::MakeFixedFlatSet<std::string_view>({
-          // Imprivata Extensions, see crbug.com/40123998 and
-          // crbug.com/40640984.
-          "baobpecgllpajfeojepgedjdlnlfffde",
-          "bnfoibgpjolimhppjmligmcgklpboloj",
-          "cdgickkdpbekbnalbmpgochbninibkko",
-          "cjakdianfealdjlapagfagpdpemoppba",
-          "cokoeepjbmmnhgdhlkpahohdaiedfjgn",
-          "dahgfgiifpnaoajmloofonkndaaafacp",
-          "dbknmmkopacopifbkgookcdbhfnggjjh",
-          "ddcjglpbfbibgepfffpklmpihphbcdco",
-          "dhodapiemamlmhlhblgcibabhdkohlen",
-          "dlahpllbhpbkfnoiedkgombmegnnjopi",
-          "egfpnfjeaopimgpiioeedbpmojdapaip",
-          "fnbibocngjnefolmcodjkkghijpdlnfm",
-          "jcnflhjcfjkplgkcinikhbgbhfldkadl",
-          "jkfjfbelolphkjckiolfcakgalloegek",
-          "kmhpgpnbglclbaccjjgoioogjlnfgbne",
-          "lpimkpkllnkdlcigdbgmabfplniahkgm",
-          "odehonhhkcjnbeaomlodfkjaecbmhklm",
-          "olnmflhcfkifkgbiegcoabineoknmbjc",
-          "omificdfgpipkkpdhbjmefgfgbppehke",
-          "phjobickjiififdadeoepbdaciefacfj",
-          "pkeacbojooejnjolgjdecbpnloibpafm",
-          "pllbepacblmgialkkpcceohmjakafnbb",
-          "plpogimmgnkkiflhpidbibfmgpkaofec",
-          "pmhiabnkkchjeaehcodceadhdpfejmmd",
-
-          // Hotrod Extensions, see crbug.com/40186353
-          "acdafoiapclbpdkhnighhilgampkglpc",
-          "denipklgekfpcdmbahmbpnmokgajnhma",
-          "hkamnlhnogggfddmjomgbdokdkgfelgg",
-          "ikfcpmgefdpheiiomgmhlmmkihchmdlj",
-          "jlgegmdnodfhciolbdjciihnlaljdbjo",
-          "ldmpofkllgeicjiihkimgeccbhghhmfj",
-          "lkbhffjfgpmpeppncnimiiikojibkhnm",
-          "moklfjoegmpoolceggbebbmgbddlhdgp",
-      });
-
-  if (kHidPrivilegedExtensionIds.contains(origin.host())) {
-    std::erase(classes, device::mojom::kUsbHidClass);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   if (kSmartCardPrivilegedExtensionIds.contains(origin.host())) {
     std::erase(classes, device::mojom::kUsbSmartCardClass);
   }

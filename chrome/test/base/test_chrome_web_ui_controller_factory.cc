@@ -12,10 +12,6 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui_controller.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/functional/callback_helpers.h"
-#endif
-
 using content::WebContents;
 using content::WebUI;
 using content::WebUIController;
@@ -66,10 +62,6 @@ TestChromeWebUIControllerFactory::CreateWebUIControllerForURL(
                : ChromeWebUIControllerFactory::CreateWebUIControllerForURL(
                      web_ui, webui_url);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Add an empty callback since managed-footnote always sends this message.
-  web_ui->RegisterMessageCallback("observeManagedUI", base::DoNothing());
-#endif
   content::WebUIDataSource* source =
       webui::CreateAndAddWebUITestDataSource(profile);
   if (provider)

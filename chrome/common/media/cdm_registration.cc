@@ -33,12 +33,12 @@
 #if BUILDFLAG(ENABLE_WIDEVINE)
 #include "components/cdm/common/cdm_manifest.h"
 #include "third_party/widevine/cdm/widevine_cdm_common.h"  // nogncheck
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/native_library.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/media/component_widevine_cdm_hint_file_linux.h"
 #include "media/cdm/cdm_paths.h"  // nogncheck
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif                            // BUILDFLAG(IS_LINUX)
 #endif  // BUILDFLAG(ENABLE_WIDEVINE)
 
 #if BUILDFLAG(IS_ANDROID)
@@ -58,7 +58,7 @@ using Robustness = content::CdmInfo::Robustness;
 #if BUILDFLAG(ENABLE_WIDEVINE)
 #if (BUILDFLAG(BUNDLE_WIDEVINE_CDM) ||            \
      BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+    BUILDFLAG(IS_LINUX)
 // Create a CdmInfo for a Widevine CDM, using |version|, |cdm_library_path|, and
 // |capability|.
 std::unique_ptr<content::CdmInfo> CreateWidevineCdmInfo(
@@ -96,11 +96,9 @@ std::unique_ptr<content::CdmInfo> CreateCdmInfoFromWidevineDirectory(
   return CreateWidevineCdmInfo(cdm_library_path, std::move(capability));
 }
 #endif  // (BUILDFLAG(BUNDLE_WIDEVINE_CDM) ||
-        // BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS))
+        // BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)) && BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(BUNDLE_WIDEVINE_CDM) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if BUILDFLAG(BUNDLE_WIDEVINE_CDM) && BUILDFLAG(IS_LINUX)
 // On Linux/ChromeOS we have to preload the CDM since it uses the zygote
 // sandbox. On Windows and Mac, CDM registration is handled by Component
 // Update (as the CDM can be loaded only when needed).
@@ -120,11 +118,9 @@ std::unique_ptr<content::CdmInfo> GetBundledWidevine() {
 
   return CreateCdmInfoFromWidevineDirectory(install_dir);
 }
-#endif  // BUILDFLAG(BUNDLE_WIDEVINE_CDM) &&
-        // (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#endif  // BUILDFLAG(BUNDLE_WIDEVINE_CDM) && BUILDFLAG(IS_LINUX)
 
-#if (BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT) && \
-     (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)))
+#if BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT) && BUILDFLAG(IS_LINUX)
 // This code checks to see if Component Updater picked a version of the Widevine
 // CDM to be used last time it ran. (Component Updater may choose the bundled
 // CDM if there is not a new version available for download.) If there is one
@@ -151,8 +147,7 @@ std::unique_ptr<content::CdmInfo> GetHintedWidevine() {
 
   return CreateCdmInfoFromWidevineDirectory(install_dir);
 }
-#endif  // (BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)))
+#endif  // BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT) && BUILDFLAG(IS_LINUX)
 
 void AddSoftwareSecureWidevine(std::vector<content::CdmInfo>* cdms) {
   DVLOG(1) << __func__;
@@ -166,7 +161,7 @@ void AddSoftwareSecureWidevine(std::vector<content::CdmInfo>* cdms) {
       /*supports_sub_key_systems=*/false, kWidevineCdmDisplayName,
       kWidevineCdmType, base::FilePath());
 
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   // The Widevine CDM on Linux/ChromeOS needs to be registered (and loaded)
   // before the zygote is locked down. The CDM can be found from the version
   // bundled with Chrome (if BUNDLE_WIDEVINE_CDM = true) and/or the version
@@ -271,13 +266,7 @@ void AddHardwareSecureWidevine(std::vector<content::CdmInfo>* cdms) {
   capability.video_codecs.emplace(media::VideoCodec::kH264, kAllProfiles);
 #endif
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(media::kPlatformHEVCDecoderSupport)) {
-    capability.video_codecs.emplace(media::VideoCodec::kHEVC, kAllProfiles);
-  }
-#else
   capability.video_codecs.emplace(media::VideoCodec::kHEVC, kAllProfiles);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif
 #if BUILDFLAG(USE_CHROMEOS_PROTECTED_AV1)
   capability.video_codecs.emplace(media::VideoCodec::kAV1, kAllProfiles);
@@ -360,12 +349,10 @@ void RegisterCdmInfo(std::vector<content::CdmInfo>* cdms) {
   DVLOG(3) << __func__ << " done with " << cdms->size() << " cdms";
 }
 
-#if BUILDFLAG(ENABLE_WIDEVINE) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if BUILDFLAG(ENABLE_WIDEVINE) && BUILDFLAG(IS_LINUX)
 std::vector<content::CdmInfo> GetSoftwareSecureWidevine() {
   std::vector<content::CdmInfo> cdms;
   AddSoftwareSecureWidevine(&cdms);
   return cdms;
 }
-#endif  // BUILDFLAG(ENABLE_WIDEVINE) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS))
+#endif  // BUILDFLAG(ENABLE_WIDEVINE) && BUILDFLAG(IS_LINUX)

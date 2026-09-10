@@ -9,10 +9,6 @@
 #include "build/build_config.h"
 #include "components/policy/core/common/management/management_service.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"  // nogncheck crbug.com/40147906
-#endif
-
 using EnterpriseManagementAuthority = policy::EnterpriseManagementAuthority;
 using ManagementAuthorityTrustworthiness =
     policy::ManagementAuthorityTrustworthiness;
@@ -95,19 +91,5 @@ class LocalTestPolicyBrowserManagementProvider final
  private:
   raw_ptr<Profile> profile_;
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Returns the platform management status of ChromeOS devices.
-class DeviceManagementStatusProvider final
-    : public policy::ManagementStatusProvider {
- public:
-  DeviceManagementStatusProvider();
-  ~DeviceManagementStatusProvider() final;
-
- protected:
-  // ManagementStatusProvider impl
-  EnterpriseManagementAuthority FetchAuthority() final;
-};
-#endif
 
 #endif  // CHROME_BROWSER_ENTERPRISE_BROWSER_MANAGEMENT_BROWSER_MANAGEMENT_STATUS_PROVIDER_H_

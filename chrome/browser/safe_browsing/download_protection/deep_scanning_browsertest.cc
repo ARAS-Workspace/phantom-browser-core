@@ -185,11 +185,6 @@ class DownloadDeepScanningBrowserTestBase
     client_ = std::make_unique<policy::MockCloudPolicyClient>();
     client_->SetDMToken("dm_token");
 
-#if BUILDFLAG(IS_CHROMEOS)
-    enterprise_connectors::RealtimeReportingClientFactory::GetForProfile(
-        browser()->GetProfile())
-        ->SetBrowserCloudPolicyClientForTesting(client_.get());
-#else
     if (connectors_machine_scope()) {
       enterprise_connectors::RealtimeReportingClientFactory::GetForProfile(
           browser()->GetProfile())
@@ -199,7 +194,6 @@ class DownloadDeepScanningBrowserTestBase
           browser()->GetProfile())
           ->SetProfileCloudPolicyClientForTesting(client_.get());
     }
-#endif
     identity_test_environment_ =
         std::make_unique<signin::IdentityTestEnvironment>();
     identity_test_environment_->MakePrimaryAccountAvailable(
@@ -240,16 +234,12 @@ class DownloadDeepScanningBrowserTestBase
     if (!is_consumer_) {
       AuthorizeForDeepScanning();
 
-#if BUILDFLAG(IS_CHROMEOS)
-      SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
-#else
       if (connectors_machine_scope()) {
         SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
       } else {
         enterprise_connectors::test::SetProfileDMToken(browser()->GetProfile(),
                                                        "dm_token");
       }
-#endif
       enterprise_connectors::test::SetAnalysisConnector(
           browser()->GetProfile()->GetPrefs(),
           enterprise_connectors::FILE_DOWNLOADED,
@@ -419,9 +409,6 @@ class DownloadDeepScanningBrowserTestBase
   bool is_obfuscated() const { return is_obfuscated_; }
 
   std::string GetProfileIdentifier() const {
-#if BUILDFLAG(IS_CHROMEOS)
-    return browser()->GetProfile()->GetPath().AsUTF8Unsafe();
-#else
     if (connectors_machine_scope_) {
       return browser()->GetProfile()->GetPath().AsUTF8Unsafe();
     }
@@ -432,7 +419,6 @@ class DownloadDeepScanningBrowserTestBase
       return profile_id_service->GetProfileId().value();
     }
     return std::string();
-#endif
   }
 
   std::vector<base::test::FeatureRef> enabled_features_;
@@ -1111,13 +1097,9 @@ IN_PROC_BROWSER_TEST_P(DownloadRestrictionsDeepScanningBrowserTest,
   expected_event.set_tab_url(url.spec());
   expected_event.set_source("");
   expected_event.set_destination("");
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_event.set_file_name("zipfile_two_archives.zip");
-#else
   connectors_machine_scope()
       ? expected_event.set_file_name(main_file.AsUTF8Unsafe())
       : expected_event.set_file_name("zipfile_two_archives.zip");
-#endif
   expected_event.set_content_size(276);
   expected_event.set_download_digest_sha256("");
   expected_event.set_threat_type(
@@ -1390,11 +1372,7 @@ IN_PROC_BROWSER_TEST_F(SavePackageDeepScanningBrowserTest, Blocked) {
   expected_event.set_destination("");
   expected_event.set_download_digest_sha_256(
       "9789A2E12D50EFA4B891D4EF95C5189FA4C98E34C84E1F8017CD8F574CA035DD");
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_event.set_file_name("text.htm");
-#else
   expected_event.set_file_name(main_file.AsUTF8Unsafe());
-#endif
   expected_event.set_content_type("text/plain");
   expected_event.set_content_size(54);
   expected_event.set_scan_id(last_request().request_token());
@@ -1478,11 +1456,7 @@ IN_PROC_BROWSER_TEST_F(SavePackageDeepScanningBrowserTest, KeepAfterWarning) {
   expected_event.set_destination("");
   expected_event.set_download_digest_sha_256(
       "9789A2E12D50EFA4B891D4EF95C5189FA4C98E34C84E1F8017CD8F574CA035DD");
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_event.set_file_name("text.htm");
-#else
   expected_event.set_file_name(main_file.AsUTF8Unsafe());
-#endif
   expected_event.set_content_type("text/plain");
   expected_event.set_content_size(54);
   expected_event.set_scan_id(last_request().request_token());
@@ -1536,11 +1510,7 @@ IN_PROC_BROWSER_TEST_F(SavePackageDeepScanningBrowserTest, KeepAfterWarning) {
   expected_event2.set_destination("");
   expected_event2.set_download_digest_sha_256(
       "9789A2E12D50EFA4B891D4EF95C5189FA4C98E34C84E1F8017CD8F574CA035DD");
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_event2.set_file_name("text.htm");
-#else
   expected_event2.set_file_name(main_file.AsUTF8Unsafe());
-#endif
   expected_event2.set_content_type("text/plain");
   expected_event2.set_content_size(54);
   expected_event2.set_scan_id(last_request().request_token());
@@ -1625,11 +1595,7 @@ IN_PROC_BROWSER_TEST_F(SavePackageDeepScanningBrowserTest,
   expected_event.set_destination("");
   expected_event.set_download_digest_sha_256(
       "9789A2E12D50EFA4B891D4EF95C5189FA4C98E34C84E1F8017CD8F574CA035DD");
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_event.set_file_name("text.htm");
-#else
   expected_event.set_file_name(main_file.AsUTF8Unsafe());
-#endif
   expected_event.set_content_type("text/plain");
   expected_event.set_content_size(54);
   expected_event.set_scan_id(last_request().request_token());
@@ -1720,11 +1686,7 @@ IN_PROC_BROWSER_TEST_F(SavePackageDeepScanningBrowserTest, OpenNow) {
   expected_event.set_destination("");
   expected_event.set_download_digest_sha_256(
       "9789A2E12D50EFA4B891D4EF95C5189FA4C98E34C84E1F8017CD8F574CA035DD");
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_event.set_file_name("text.htm");
-#else
   expected_event.set_file_name(main_file.AsUTF8Unsafe());
-#endif
   expected_event.set_content_type("text/plain");
   expected_event.set_content_size(54);
   expected_event.set_scan_id(last_request().request_token());
@@ -1875,11 +1837,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessDeepScanningBrowserTest, BlockedWrite) {
   expected_event.set_destination("");
   expected_event.set_download_digest_sha_256(
       "6AE8A75555209FD6C44157C0AED8016E763FF435A19CF186F76863140143FF72");
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_event.set_file_name("test_fsa_file.txt");
-#else
   expected_event.set_file_name(GetTestFilePath().AsUTF8Unsafe());
-#endif
   expected_event.set_content_type("text/plain");
   expected_event.set_content_size(sizeof(kTestContent) - 1);
   expected_event.set_scan_id(last_request().request_token());
@@ -2014,11 +1972,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessDeepScanningBrowserTest, WarnedWrite) {
   expected_event.set_destination("");
   expected_event.set_download_digest_sha_256(
       "6AE8A75555209FD6C44157C0AED8016E763FF435A19CF186F76863140143FF72");
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_event.set_file_name("test_fsa_file.txt");
-#else
   expected_event.set_file_name(GetTestFilePath().AsUTF8Unsafe());
-#endif
   expected_event.set_content_type("text/plain");
   expected_event.set_content_size(sizeof(kTestContent) - 1);
   expected_event.set_scan_id(last_request().request_token());

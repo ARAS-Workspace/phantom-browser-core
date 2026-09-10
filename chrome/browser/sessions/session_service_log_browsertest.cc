@@ -39,12 +39,6 @@ class SessionServiceLogTest : public InProcessBrowserTest {
   ~SessionServiceLogTest() override = default;
 
  protected:
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // TODO(nkostylev): Investigate if we can remove this switch.
-    command_line->AppendSwitch(switches::kCreateBrowserOnStartupForTests);
-  }
-#endif
 
   void PreRunTestOnMainThread() override {
     InProcessBrowserTest::PreRunTestOnMainThread();

@@ -32,12 +32,6 @@ struct GPU_IPC_COMMON_EXPORT StructTraits<gpu::mojom::GpuDeviceDataView,
     return input.device_id;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  static uint32_t revision(const gpu::GPUInfo::GPUDevice& input) {
-    return input.revision;
-  }
-#endif
-
   static bool active(const gpu::GPUInfo::GPUDevice& input) {
     return input.active;
   }

@@ -56,10 +56,6 @@ class VersionHistoryClientTest : public ::testing::Test {
 #define CURRENT_PLATFORM "mac"
 #endif
 
-#elif BUILDFLAG(IS_CHROMEOS)
-
-#define CURRENT_PLATFORM "chromeos"
-
 #else
 
 #error Unsupported platform

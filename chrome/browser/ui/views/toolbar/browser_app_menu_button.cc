@@ -44,12 +44,6 @@
 #include "ui/views/view.h"
 #include "ui/views/view_class_properties.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/user_education/browser_user_education_interface.h"
-#include "ui/base/ime/input_method.h"
-#include "ui/base/ime/virtual_keyboard_controller.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 constexpr int kHideTextForFlexPadding = 4;
 }  // namespace
@@ -84,15 +78,6 @@ void BrowserAppMenuButton::ShowMenu(int run_types) {
   if (IsMenuShowing()) {
     return;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (auto* input_method = GetInputMethod()) {
-    if (auto* controller = input_method->GetVirtualKeyboardController();
-        controller && controller->IsKeyboardVisible()) {
-      input_method->SetVirtualKeyboardVisibilityIfEnabled(false);
-    }
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   Browser* browser = toolbar_view_->browser();
 
@@ -253,16 +238,6 @@ void BrowserAppMenuButton::OnTouchUiChanged() {
 }
 
 void BrowserAppMenuButton::ButtonPressed(const ui::Event& event) {
-#if BUILDFLAG(IS_CHROMEOS)
-  auto* const user_education =
-      BrowserUserEducationInterface::From(toolbar_view_->browser());
-  if (user_education->IsFeaturePromoActive(
-          feature_engagement::kIPHPasswordsSavePrimingPromoFeature)) {
-    user_education->NotifyFeaturePromoFeatureUsed(
-        feature_engagement::kIPHPasswordsSavePrimingPromoFeature,
-        FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   if (features::IsToolbarGlowUpEnabled() && !IsMenuShowing()) {

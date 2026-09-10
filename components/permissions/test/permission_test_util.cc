@@ -128,7 +128,7 @@ PermissionManager::PermissionContextMap CreatePermissionContexts(
       std::make_unique<FakeStorageAccessPermissionContext>(
           browser_context, ContentSettingsType::STORAGE_ACCESS,
           network::mojom::PermissionsPolicyFeature::kStorageAccessAPI);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   permission_contexts[ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER] =
       std::make_unique<FakePermissionContext>(
           browser_context, ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER,

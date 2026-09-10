@@ -76,11 +76,6 @@ constexpr auto kMediaIndicatorMinimumHoldDurationPhase2 = base::Seconds(4);
 // A delay before blocked media indicator disappears.
 constexpr auto kBlockedMediaIndicatorDismissDelay = base::Minutes(1);
 constexpr auto kBlockedMediaIndicatorDismissDelayPhase2 = base::Seconds(4);
-#if BUILDFLAG(IS_CHROMEOS)
-// A delay before in-use indicator for device (currently only smart cards)
-// disappears.
-constexpr auto kDeviceInUseIndicatorHideDelay = base::Seconds(15);
-#endif
 
 bool ignore_blocked_media_indicator_timer_for_testing_ = false;
 
@@ -1215,7 +1210,7 @@ void PageSpecificContentSettings::OnBrowsingDataAccessed(
   MaybeNotifySiteDataObservers(access_details);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 void PageSpecificContentSettings::OnProtectedMediaIdentifierPermissionSet(
     const GURL& requesting_origin,
     bool allowed) {
@@ -1612,33 +1607,6 @@ void PageSpecificContentSettings::OnCapturingStateChanged(
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void PageSpecificContentSettings::OnDeviceUsed(ContentSettingsType type) {
-  // For now, only smart card permissions are supported.
-  CHECK_EQ(ContentSettingsType::SMART_CARD_GUARD, type);
-  last_used_time_[type] = base::Time::Now();
-  if (in_use_.insert(type).second) {
-    MaybeUpdateLocationBar();
-  }
-}
-
-void PageSpecificContentSettings::OnLastDeviceConnectionLost(
-    ContentSettingsType type) {
-  // For now, only smart card permissions are supported.
-  CHECK_EQ(mojom::ContentSettingsType::SMART_CARD_GUARD, type);
-  in_use_.erase(type);
-
-  // The indicator should remain for `kDeviceInUseIndicatorHideDelay` seconds
-  // after the connection has died in order to also make user aware of very
-  // rapid connections.
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&PageSpecificContentSettings::MaybeUpdateLocationBar,
-                     weak_factory_.GetWeakPtr()),
-      kDeviceInUseIndicatorHideDelay);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 bool PageSpecificContentSettings::IsInUse(ContentSettingsType type) const {
   return in_use_.contains(type);
 }
@@ -1673,16 +1641,6 @@ void PageSpecificContentSettings::OnSensorStopped() {
 int PageSpecificContentSettings::active_available_sensors() const {
   return active_available_sensors_;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool PageSpecificContentSettings::ShouldShowDeviceInUseIndicator(
-    ContentSettingsType type) const {
-  return IsInUse(type) ||
-         GetLastUsedTime(type) >
-             base::Time::Now() - kDeviceInUseIndicatorHideDelay;
-  ;
-}
-#endif
 
 void PageSpecificContentSettings::OnCapturingStateChangedInternal(
     ContentSettingsType type,

@@ -143,36 +143,4 @@ void RecordClankKeySecurityLevel(BrowserKey::SecurityLevel security_level) {
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-void RecordKcerHardwareKeyGenerationError(kcer::Error error) {
-  base::UmaHistogramEnumeration(
-      "Enterprise.ClientCertificate.Ash.HardwareKeyGenerationError", error);
-}
-
-void RecordKcerKeyTaggingError(kcer::Error error) {
-  base::UmaHistogramEnumeration(
-      "Enterprise.ClientCertificate.Ash.KeyTaggingError", error);
-}
-
-void RecordKcerGeneratedKeyInfoError(kcer::Error error) {
-  base::UmaHistogramEnumeration(
-      "Enterprise.ClientCertificate.Ash.GeneratedKeyInfoError", error);
-}
-
-void RecordKcerSoftwareKeyGenerationError(kcer::Error error) {
-  base::UmaHistogramEnumeration(
-      "Enterprise.ClientCertificate.Ash.SoftwareKeyGenerationError", error);
-}
-
-void RecordKcerCertificateImportError(kcer::Error error) {
-  base::UmaHistogramEnumeration(
-      "Enterprise.ClientCertificate.Ash.CertificateImportError", error);
-}
-
-void RecordKcerKeyRemovalError(kcer::Error error) {
-  base::UmaHistogramEnumeration(
-      "Enterprise.ClientCertificate.Ash.KeyRemovalError", error);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 }  // namespace client_certificates

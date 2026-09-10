@@ -18,13 +18,6 @@ MockSafeArchiveAnalyzer& FakeFileUtilService::GetSafeArchiveAnalyzer() {
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-void FakeFileUtilService::BindZipFileCreator(
-    mojo::PendingReceiver<chrome::mojom::ZipFileCreator> receiver) {
-  NOTREACHED();
-}
-#endif
-
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
 void FakeFileUtilService::BindSafeArchiveAnalyzer(
     mojo::PendingReceiver<chrome::mojom::SafeArchiveAnalyzer> receiver) {

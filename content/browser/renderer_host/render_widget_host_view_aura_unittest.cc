@@ -1181,60 +1181,6 @@ TEST_F(RenderWidgetHostViewAuraTest, GetViewBoundsWithoutTransform) {
   EXPECT_EQ(initial_bounds, view_->GetViewBoundsWithoutTransform());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Checks that a popup view is destroyed when a user clicks outside of the popup
-// view and focus does not change. This is the case when the user clicks on the
-// desktop background on Chrome OS.
-TEST_F(RenderWidgetHostViewAuraTest, DestroyPopupClickOutsidePopup) {
-  parent_view_->SetBounds(gfx::Rect(10, 10, 400, 400));
-  parent_view_->Focus();
-  EXPECT_TRUE(parent_view_->HasFocus());
-
-  InitViewForPopup(parent_view_, gfx::Rect(10, 10, 100, 100));
-  aura::Window* window = view_->GetNativeView();
-  ASSERT_TRUE(window != nullptr);
-
-  gfx::Point click_point(0, 0);
-  EXPECT_FALSE(window->GetBoundsInRootWindow().Contains(click_point));
-  aura::Window* parent_window = parent_view_->GetNativeView();
-  EXPECT_FALSE(parent_window->GetBoundsInRootWindow().Contains(click_point));
-
-  TestWindowObserver observer(window);
-  ui::test::EventGenerator generator(window->GetRootWindow(), click_point);
-  widget_host_ = nullptr;  // Owned by `view_`.
-  view_ = nullptr;         // Self destroying during `ClickLeftButton`.
-  generator.ClickLeftButton();
-  ASSERT_TRUE(parent_view_->HasFocus());
-  ASSERT_TRUE(observer.destroyed());
-}
-
-// Checks that a popup view is destroyed when a user taps outside of the popup
-// view and focus does not change. This is the case when the user taps the
-// desktop background on Chrome OS.
-TEST_F(RenderWidgetHostViewAuraTest, DestroyPopupTapOutsidePopup) {
-  parent_view_->SetBounds(gfx::Rect(10, 10, 400, 400));
-  parent_view_->Focus();
-  EXPECT_TRUE(parent_view_->HasFocus());
-
-  InitViewForPopup(parent_view_, gfx::Rect(10, 10, 100, 100));
-  aura::Window* window = view_->GetNativeView();
-  ASSERT_TRUE(window != nullptr);
-
-  gfx::Point tap_point(0, 0);
-  EXPECT_FALSE(window->GetBoundsInRootWindow().Contains(tap_point));
-  aura::Window* parent_window = parent_view_->GetNativeView();
-  EXPECT_FALSE(parent_window->GetBoundsInRootWindow().Contains(tap_point));
-
-  TestWindowObserver observer(window);
-  ui::test::EventGenerator generator(window->GetRootWindow(), tap_point);
-  widget_host_ = nullptr;  // Owned by `view_`.
-  view_ = nullptr;         // Self destroying during `GestureTapAt`.
-  generator.GestureTapAt(tap_point);
-  ASSERT_TRUE(parent_view_->HasFocus());
-  ASSERT_TRUE(observer.destroyed());
-}
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 // On Desktop Linux, select boxes need mouse capture in order to work. Test that
 // when a select box is opened via a mouse press that it retains mouse capture
@@ -3004,12 +2950,7 @@ TEST_F(RenderWidgetHostViewAuraTest, CursorVisibilityChange) {
   view_->ShowWithVisibility(PageVisibilityState::kVisible);
   base::RunLoop().RunUntilIdle();
   auto events = GetAndResetDispatchedMessages();
-#if BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/40163541): Investigate occasional extra mousemoves in CrOS.
-  EXPECT_GE(1u, events.size());
-#else
   EXPECT_EQ(1u, events.size());
-#endif
   EXPECT_EQ("CursorVisibilityChanged", events[0]->name());
 
   cursor_client.RemoveObserver(view_);
@@ -3815,7 +3756,7 @@ TEST_F(RenderWidgetHostViewAuraOverscrollTest,
 // Tests that a fling in the opposite direction of the overscroll cancels the
 // overscroll instead of completing it.
 // Flaky on Fuchsia:  http://crbug.com/810690.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ReverseFlingCancelsOverscroll \
   DISABLED_ReverseFlingCancelsOverscroll
 #else
@@ -4874,101 +4815,6 @@ TEST_F(RenderWidgetHostViewAuraOverscrollTest, OverscrollResetsOnBlur) {
   EXPECT_EQ("GestureScrollEnd", GetMessageNames(events));
   ReleaseAndResetDispatchedMessages();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Check that when accessibility virtual keyboard is enabled, windows are
-// shifted up when focused and restored when focus is lost.
-TEST_F(RenderWidgetHostViewAuraTest, VirtualKeyboardFocusEnsureCaretInRect) {
-  // TODO (oshima): Test that overscroll occurs.
-
-  InitViewForFrame(nullptr);
-  aura::Window* root_window = parent_view_->GetNativeView()->GetRootWindow();
-  aura::client::ParentWindowWithContext(view_->GetNativeView(), root_window,
-                                        gfx::Rect(),
-                                        display::kInvalidDisplayId);
-
-  const gfx::Rect orig_view_bounds = gfx::Rect(0, 300, 400, 200);
-  const gfx::Rect shifted_view_bounds = gfx::Rect(0, 200, 400, 200);
-  const gfx::Rect root_bounds = root_window->bounds();
-  const int keyboard_height = 200;
-  const gfx::Rect keyboard_view_bounds =
-      gfx::Rect(0, root_bounds.height() - keyboard_height, root_bounds.width(),
-                keyboard_height);
-
-  ui::InputMethod* input_method = root_window->GetHost()->GetInputMethod();
-
-  // Focus the window.
-  view_->SetBounds(orig_view_bounds);
-  input_method->SetFocusedTextInputClient(view_);
-  EXPECT_EQ(view_->GetNativeView()->bounds(), orig_view_bounds);
-
-  // Simulate virtual keyboard.
-  input_method->SetVirtualKeyboardBounds(keyboard_view_bounds);
-
-  // Window should be shifted.
-  EXPECT_EQ(view_->GetNativeView()->bounds(), shifted_view_bounds);
-
-  // Detach the RenderWidgetHostViewAura from the IME.
-  view_->DetachFromInputMethod(false);
-
-  // Window should be restored.
-  EXPECT_EQ(view_->GetNativeView()->bounds(), orig_view_bounds);
-}
-
-// Check that the window insets is updated with the bounds changed when the
-// virtual keyboard is shown.
-TEST_F(RenderWidgetHostViewAuraTest, UpdateInsetsWithVirtualKeyboardEnabled) {
-  InitViewForFrame(nullptr);
-  aura::Window* root_window = parent_view_->GetNativeView()->GetRootWindow();
-  aura::client::ParentWindowWithContext(view_->GetNativeView(), root_window,
-                                        gfx::Rect(),
-                                        display::kInvalidDisplayId);
-
-  const gfx::Rect orig_view_bounds = gfx::Rect(0, 300, 400, 200);
-  const gfx::Rect shifted_view_bounds = gfx::Rect(0, 200, 400, 200);
-  const gfx::Rect moved_view_bounds = gfx::Rect(100, 250, 400, 200);
-  const gfx::Rect resized_view_bounds = gfx::Rect(100, 250, 300, 175);
-
-  const auto origin_view_insets = gfx::Insets::TLBR(0, 0, 100, 0);
-  const auto shifted_view_insets = gfx::Insets();
-  const auto moved_view_insets = gfx::Insets::TLBR(0, 0, 50, 0);
-  const auto resized_view_insets = gfx::Insets::TLBR(0, 0, 25, 0);
-
-  const gfx::Rect root_bounds = root_window->bounds();
-  const int keyboard_height = 200;
-  const gfx::Rect keyboard_view_bounds =
-      gfx::Rect(0, root_bounds.height() - keyboard_height, root_bounds.width(),
-                keyboard_height);
-
-  ui::InputMethod* input_method = root_window->GetHost()->GetInputMethod();
-
-  // Focus the window.
-  view_->SetBounds(orig_view_bounds);
-  input_method->SetFocusedTextInputClient(view_);
-  EXPECT_EQ(view_->GetNativeView()->bounds(), orig_view_bounds);
-
-  // Simulate virtual keyboard. For chrome browser window, the window insets
-  // will be changed.
-  view_->SetInsets(gfx::Insets::TLBR(
-      0, 0,
-      gfx::IntersectRects(orig_view_bounds, keyboard_view_bounds).height(), 0));
-  EXPECT_EQ(view_->insets_, origin_view_insets);
-  input_method->SetVirtualKeyboardBounds(keyboard_view_bounds);
-
-  // Window should be shifted. The insets will be updated.
-  EXPECT_EQ(view_->GetNativeView()->bounds(), shifted_view_bounds);
-  EXPECT_EQ(view_->insets_, shifted_view_insets);
-
-  // Move the view and the insets will be updated.
-  view_->SetBounds(moved_view_bounds);
-  EXPECT_EQ(view_->insets_, moved_view_insets);
-
-  // Resize the view and the insets will be updated.
-  view_->SetBounds(resized_view_bounds);
-  EXPECT_EQ(view_->insets_, resized_view_insets);
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests that invalid touch events are consumed and handled
 // synchronously.
@@ -6788,130 +6634,6 @@ TEST_F(RenderWidgetHostViewAuraReentrantDestructionIME,
   // OnUpdateTextInputStateCalled(), which calls into the input method above.
   GetTextInputManager(view_)->UpdateTextInputState(view_, state);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class MockVirtualKeyboardController final
-    : public ui::VirtualKeyboardController {
- public:
-  MockVirtualKeyboardController() = default;
-
-  MockVirtualKeyboardController(const MockVirtualKeyboardController&) = delete;
-  MockVirtualKeyboardController& operator=(
-      const MockVirtualKeyboardController&) = delete;
-
-  bool DisplayVirtualKeyboard() override {
-    virtual_keyboard_requested_ = true;
-    return virtual_keyboard_requested_;
-  }
-
-  void DismissVirtualKeyboard() override {
-    virtual_keyboard_requested_ = false;
-  }
-
-  void AddObserver(ui::VirtualKeyboardControllerObserver* observer) override {
-    observer_count_++;
-  }
-
-  void RemoveObserver(
-      ui::VirtualKeyboardControllerObserver* observer) override {
-    observer_count_--;
-  }
-
-  bool IsKeyboardVisible() override { return virtual_keyboard_requested_; }
-
-  size_t observer_count() const { return observer_count_; }
-
- private:
-  size_t observer_count_ = 0;
-  bool virtual_keyboard_requested_ = false;
-};
-
-class RenderWidgetHostViewAuraKeyboardMockInputMethod
-    : public ui::MockInputMethod {
- public:
-  RenderWidgetHostViewAuraKeyboardMockInputMethod()
-      : MockInputMethod(nullptr) {}
-
-  RenderWidgetHostViewAuraKeyboardMockInputMethod(
-      const RenderWidgetHostViewAuraKeyboardMockInputMethod&) = delete;
-  RenderWidgetHostViewAuraKeyboardMockInputMethod& operator=(
-      const RenderWidgetHostViewAuraKeyboardMockInputMethod&) = delete;
-
-  ui::VirtualKeyboardController* GetVirtualKeyboardController() override {
-    return &keyboard_controller_;
-  }
-  size_t keyboard_controller_observer_count() const {
-    return keyboard_controller_.observer_count();
-  }
-  void SetVirtualKeyboardVisibilityIfEnabled(bool should_show) override {
-    if (should_show) {
-      keyboard_controller_.DisplayVirtualKeyboard();
-    } else {
-      keyboard_controller_.DismissVirtualKeyboard();
-    }
-  }
-  bool IsKeyboardVisible() { return keyboard_controller_.IsKeyboardVisible(); }
-
- private:
-  MockVirtualKeyboardController keyboard_controller_;
-};
-
-class RenderWidgetHostViewAuraKeyboardTest
-    : public RenderWidgetHostViewAuraTest {
- public:
-  RenderWidgetHostViewAuraKeyboardTest() = default;
-
-  RenderWidgetHostViewAuraKeyboardTest(
-      const RenderWidgetHostViewAuraKeyboardTest&) = delete;
-  RenderWidgetHostViewAuraKeyboardTest& operator=(
-      const RenderWidgetHostViewAuraKeyboardTest&) = delete;
-
-  ~RenderWidgetHostViewAuraKeyboardTest() override {}
-  void SetUp() override {
-    // TODO(crbug.com/40275284) Pass as unique_ptr<>.
-    ui::SetUpInputMethodForTesting(
-        new RenderWidgetHostViewAuraKeyboardMockInputMethod());
-    SetUpEnvironment();
-  }
-
-  RenderWidgetHostViewAuraKeyboardMockInputMethod* GetMockInputMethod() const {
-    return static_cast<RenderWidgetHostViewAuraKeyboardMockInputMethod*>(
-        GetInputMethod());
-  }
-
-  size_t keyboard_controller_observer_count() const {
-    return GetMockInputMethod()->keyboard_controller_observer_count();
-  }
-  bool IsKeyboardVisible() const {
-    return GetMockInputMethod()->IsKeyboardVisible();
-  }
-};
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(RenderWidgetHostViewAuraKeyboardTest,
-       UpdateTextInputStateUpdatesVirtualKeyboardState) {
-  ActivateViewForTextInputManager(parent_view_, ui::TEXT_INPUT_TYPE_TEXT);
-
-  ui::mojom::TextInputState state;
-  state.type = ui::TEXT_INPUT_TYPE_TEXT;
-  state.mode = ui::TEXT_INPUT_MODE_NONE;
-  state.last_vk_visibility_request =
-      ui::mojom::VirtualKeyboardVisibilityRequest::SHOW;
-
-  EXPECT_EQ(IsKeyboardVisible(), false);
-
-  GetTextInputManager(parent_view_)->UpdateTextInputState(parent_view_, state);
-
-  EXPECT_EQ(IsKeyboardVisible(), true);
-
-  state.last_vk_visibility_request =
-      ui::mojom::VirtualKeyboardVisibilityRequest::HIDE;
-  GetTextInputManager(parent_view_)->UpdateTextInputState(parent_view_, state);
-
-  EXPECT_EQ(IsKeyboardVisible(), false);
-}
-#endif
 
 TEST_F(RenderWidgetHostViewAuraTest, ForceSpecifiedDeadline) {
   EXPECT_EQ(std::nullopt, parent_view_->GetForceSpecifiedDeadlineForTesting());

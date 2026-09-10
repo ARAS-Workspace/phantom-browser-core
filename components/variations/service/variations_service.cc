@@ -135,8 +135,6 @@ std::string GetPlatformString() {
   return "ios";
 #elif BUILDFLAG(IS_MAC)
   return "mac";
-#elif BUILDFLAG(IS_CHROMEOS)
-  return "chromeos";
 #elif BUILDFLAG(IS_ANDROID)
   return "android";
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD) || BUILDFLAG(IS_SOLARIS)
@@ -339,86 +337,6 @@ std::optional<std::string> EncryptAndEncodeSerialNumber(
 
 BASE_FEATURE(kVariationsRuntimeMutability, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// This is a utility which syncs the policy-managed value of
-// |prefs::kDeviceVariationsRestrictionsByPolicy| into
-// |prefs::kVariationsRestrictionsByPolicy|.
-// TODO(crbug.com/40121933): Remove this workaround and implement a better long
-// term solution.
-class DeviceVariationsRestrictionByPolicyApplicator {
- public:
-  DeviceVariationsRestrictionByPolicyApplicator(
-      PrefService* policy_pref_service)
-      : policy_pref_service_(policy_pref_service) {
-    DCHECK(policy_pref_service_);
-    const PrefService::PrefInitializationStatus prefs_init_status =
-        policy_pref_service_->GetAllPrefStoresInitializationStatus();
-    if (prefs_init_status == PrefService::INITIALIZATION_STATUS_WAITING) {
-      policy_pref_service_->AddPrefInitObserver(
-          base::BindOnce(&DeviceVariationsRestrictionByPolicyApplicator::
-                             OnPolicyPrefServiceInitialized,
-                         weak_ptr_factory_.GetWeakPtr()));
-      return;
-    }
-    OnPolicyPrefServiceInitialized(prefs_init_status ==
-                                   PrefService::INITIALIZATION_STATUS_SUCCESS);
-  }
-
-  ~DeviceVariationsRestrictionByPolicyApplicator() = default;
-
-  DeviceVariationsRestrictionByPolicyApplicator(
-      const DeviceVariationsRestrictionByPolicyApplicator& other) = delete;
-  DeviceVariationsRestrictionByPolicyApplicator& operator=(
-      const DeviceVariationsRestrictionByPolicyApplicator& other) = delete;
-
- private:
-  void OnPolicyPrefServiceInitialized(bool successful) {
-    // If PrefService initialization was not successful, another component will
-    // display an error message to the user.
-    if (!successful) {
-      return;
-    }
-
-    pref_change_registrar_ = std::make_unique<PrefChangeRegistrar>();
-    pref_change_registrar_->Init(policy_pref_service_);
-    pref_change_registrar_->Add(
-        prefs::kDeviceVariationsRestrictionsByPolicy,
-        base::BindRepeating(&DeviceVariationsRestrictionByPolicyApplicator::
-                                OnDevicePolicyChange,
-                            weak_ptr_factory_.GetWeakPtr()));
-    // Also process the initial value.
-    OnDevicePolicyChange();
-  }
-
-  // Observes the changes in prefs::kDeviceVariationsRestrictionsByPolicy,
-  // and saves and retrieve its local state value, then sets
-  // prefs::kVariationsRestrictParameter with that new value. That's to
-  // reflect the changes of chromeos policy into the user policy.
-  // TODO(crbug.com/40121933): Remove that workaround, and make a better long
-  // term solution.
-  void OnDevicePolicyChange() {
-    const std::string& device_policy =
-        prefs::kDeviceVariationsRestrictionsByPolicy;
-    const std::string& user_policy = prefs::kVariationsRestrictionsByPolicy;
-
-    if (policy_pref_service_->IsManagedPreference(device_policy)) {
-      const int device_value = policy_pref_service_->GetInteger(device_policy);
-      policy_pref_service_->SetInteger(user_policy, device_value);
-    } else {
-      policy_pref_service_->ClearPref(user_policy);
-    }
-  }
-
-  const raw_ptr<PrefService> policy_pref_service_;
-
-  // Watch the changes of the variations prefs.
-  std::unique_ptr<PrefChangeRegistrar> pref_change_registrar_;
-
-  base::WeakPtrFactory<DeviceVariationsRestrictionByPolicyApplicator>
-      weak_ptr_factory_{this};
-};
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 VariationsService::VariationsService(
     std::unique_ptr<VariationsServiceClient> client,
     std::unique_ptr<web_resource::ResourceRequestAllowedNotifier> notifier,
@@ -451,11 +369,6 @@ VariationsService::VariationsService(
   DCHECK(client_);
   DCHECK(resource_request_allowed_notifier_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  device_variations_restrictions_by_policy_applicator_ =
-      std::make_unique<DeviceVariationsRestrictionByPolicyApplicator>(
-          policy_pref_service_);
-#endif
 }
 
 VariationsService::~VariationsService() {
@@ -596,10 +509,6 @@ GURL VariationsService::GetVariationsServerURL(HttpOptions http_options) {
 }
 
 void VariationsService::EnsureLocaleEquals(const std::string& locale) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Chrome OS may switch language on the fly.
-  return;
-#else
 
 #if BUILDFLAG(IS_ANDROID)
   // TODO(asvitkine): Speculative early return to silence CHECK failures on
@@ -623,7 +532,6 @@ void VariationsService::EnsureLocaleEquals(const std::string& locale) {
         rhs_key, field_trial_creator_.application_locale());
     CHECK_EQ(locale, field_trial_creator_.application_locale());
   }
-#endif
 }
 
 // static

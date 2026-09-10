@@ -93,23 +93,6 @@ void FakeUsbDeviceManager::RefreshDeviceInfo(
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-void FakeUsbDeviceManager::CheckAccess(const std::string& guid,
-                                       CheckAccessCallback callback) {
-  std::move(callback).Run(true);
-}
-
-void FakeUsbDeviceManager::OpenFileDescriptor(
-    const std::string& guid,
-    uint32_t drop_privileges_mask,
-    mojo::PlatformHandle lifeline_fd,
-    OpenFileDescriptorCallback callback) {
-  std::move(callback).Run(base::File(
-      base::FilePath(FILE_PATH_LITERAL("/dev/null")),
-      base::File::FLAG_OPEN | base::File::FLAG_READ | base::File::FLAG_WRITE));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void FakeUsbDeviceManager::SetOnClientSetClosure(base::OnceClosure closure) {
   on_client_set_ = std::move(closure);
 }

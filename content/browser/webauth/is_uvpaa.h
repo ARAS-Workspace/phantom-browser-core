@@ -25,9 +25,6 @@ using IsUVPlatformAuthenticatorAvailableCallback =
 CONTENT_EXPORT void IsUVPlatformAuthenticatorAvailable(
     BrowserContext* browser_context,
     IsUVPlatformAuthenticatorAvailableCallback);
-#elif BUILDFLAG(IS_CHROMEOS)
-CONTENT_EXPORT void IsUVPlatformAuthenticatorAvailable(
-    IsUVPlatformAuthenticatorAvailableCallback);
 #endif
 
 }  // namespace content

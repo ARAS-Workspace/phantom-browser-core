@@ -21,16 +21,6 @@
 
 namespace {
 
-#if (!defined(NDEBUG) || defined(MEMORY_SANITIZER) || \
-     defined(ADDRESS_SANITIZER)) &&                   \
-    BUILDFLAG(IS_CHROMEOS)
-// History of this value:
-// 1) TODO(crbug.com/40120948): reduce the multiplier back to 2x.
-// 2) A number of tests on ChromeOS run very close to the base limit, so
-// ChromeOS gets 3x. TODO(b:318608561) Reduce back to 3x once OOBE load time is
-// lower.
-constexpr int kAshBaseMultiplier = 4;
-#endif
 
 // Sets value to the greatest of:
 // 1) value's current value multiplied by kTimeoutMultiplier (assuming
@@ -60,33 +50,17 @@ void InitializeTimeout(const char* switch_name,
   // down significantly.
   // For MSan the slowdown depends heavily on the value of msan_track_origins
   // build flag. The multiplier below corresponds to msan_track_origins = 1.
-#if BUILDFLAG(IS_CHROMEOS)
-  // Typical slowdown for memory sanitizer is 3x.
-  constexpr int kTimeoutMultiplier = 3 * kAshBaseMultiplier;
-#else
   constexpr int kTimeoutMultiplier = 6;
-#endif
 #elif BUILDFLAG(CFI_DIAG)
   constexpr int kTimeoutMultiplier = 3;
-#elif defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_CHROMEOS)
-  // Typical slowdown for memory sanitizer is 2x.
-  constexpr int kTimeoutMultiplier = 2 * kAshBaseMultiplier;
 #elif defined(ADDRESS_SANITIZER) || defined(THREAD_SANITIZER)
   constexpr int kTimeoutMultiplier = 2;
 #elif BUILDFLAG(CLANG_PROFILING)
   // On coverage build, tests run 3x slower.
   constexpr int kTimeoutMultiplier = 3;
-#elif !defined(NDEBUG) && BUILDFLAG(IS_CHROMEOS)
-  constexpr int kTimeoutMultiplier = kAshBaseMultiplier;
 #elif !defined(NDEBUG) && (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
   // A lot of browser_tests on Mac and Linux debug time out.
   constexpr int kTimeoutMultiplier = 2;
-#elif BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(IS_CHROMEOS_DEVICE)
-  // For test running on ChromeOS device/VM, they could be slower. We should not
-  // add too many ChromeOS details into //base. Say in the future if we want to
-  // set different values for a set of low spec ChromeOS boards, we should move
-  // the logic somewhere.
-  constexpr int kTimeoutMultiplier = 3;
 #else
   constexpr int kTimeoutMultiplier = 1;
 #endif

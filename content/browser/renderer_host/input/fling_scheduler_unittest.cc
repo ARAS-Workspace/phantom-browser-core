@@ -15,10 +15,6 @@
 #include "content/test/test_render_widget_host.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/display/test/test_screen.h"
-#endif
-
 namespace content {
 
 class FakeFlingScheduler : public FlingScheduler {
@@ -147,11 +143,6 @@ class FlingSchedulerTest : public testing::Test,
   scoped_refptr<SiteInstanceGroup> site_instance_group_;
   std::unique_ptr<TestRenderWidgetHostView> view_;
   std::unique_ptr<MockRenderWidgetHostDelegate> delegate_;
-#if BUILDFLAG(IS_CHROMEOS)
-  // This is necessary on ChromeOS as it needs to access tablet mode info.
-  display::test::TestScreen test_screen_{/*create_dispay=*/true,
-                                         /*register_screen=*/true};
-#endif
 };
 
 TEST_F(FlingSchedulerTest, ScheduleNextFlingProgress) {

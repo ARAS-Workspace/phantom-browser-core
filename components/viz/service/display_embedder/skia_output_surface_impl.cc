@@ -1513,7 +1513,7 @@ GrBackendFormat SkiaOutputSurfaceImpl::GetGrBackendFormatForTexture(
                                         VK_IMAGE_TILING_OPTIMAL, vk_format,
                                         si_format, image_context->color_space(),
                                         image_context->ycbcr_info());
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     // Textures that were allocated _on linux_ with ycbcr info came from
     // VaapiVideoDecoder, which exports using DRM format modifiers.
     return GrBackendFormats::MakeVk(gr_ycbcr_info,
@@ -1688,31 +1688,6 @@ bool SkiaOutputSurfaceImpl::SupportsBGRA() const {
       .isValid();
 }
 
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-void SkiaOutputSurfaceImpl::DetileOverlay(gpu::Mailbox input,
-                                          const gfx::Size& input_visible_size,
-                                          gpu::SyncToken input_sync_token,
-                                          gpu::Mailbox output,
-                                          const gfx::RectF& display_rect,
-                                          const gfx::RectF& crop_rect,
-                                          gfx::OverlayTransform transform,
-                                          bool is_10bit) {
-  auto task = base::BindOnce(&SkiaOutputSurfaceImplOnGpu::DetileOverlay,
-                             base::Unretained(impl_on_gpu_.get()), input,
-                             input_visible_size, output, display_rect,
-                             crop_rect, transform, is_10bit);
-  EnqueueGpuTask(std::move(task), {input_sync_token}, /*make_current=*/false,
-                 /*need_framebuffer=*/false);
-}
-
-void SkiaOutputSurfaceImpl::CleanupImageProcessor() {
-  auto task = base::BindOnce(&SkiaOutputSurfaceImplOnGpu::CleanupImageProcessor,
-                             base::Unretained(impl_on_gpu_.get()));
-  EnqueueGpuTask(std::move(task), {}, /*make_current=*/false,
-                 /*need_framebuffer=*/false);
-}
-#endif
 
 void SkiaOutputSurfaceImpl::ReadbackForTesting(
     CopyOutputRequest::CopyOutputRequestCallback result_callback) {

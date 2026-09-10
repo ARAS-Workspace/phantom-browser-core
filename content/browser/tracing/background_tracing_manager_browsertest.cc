@@ -750,7 +750,7 @@ IN_PROC_BROWSER_TEST_F(BackgroundTracingManagerBrowserTest,
 
 // This tests that histogram triggers for preemptive mode configs.
 // TODO(crbug.com/40900999): Flaky on Linux TSan.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(THREAD_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_ReceiveTraceSucceedsOnHigherHistogramSample \
   DISABLED_ReceiveTraceSucceedsOnHigherHistogramSample
 #else

@@ -165,10 +165,6 @@
 #include "content/public/test/mock_captured_surface_controller.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/webui/grit/ash_webui_common_resources.h"
-#endif
-
 #if defined(USE_AURA)
 #include "content/browser/renderer_host/delegated_frame_host.h"
 #include "content/browser/renderer_host/render_widget_host_view_aura.h"
@@ -441,31 +437,6 @@ class TestNavigationManagerThrottle : public NavigationThrottle {
   base::OnceClosure on_will_process_response_closure_;
   base::OnceClosure on_will_fail_request_closure_;
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-void AppendGzippedResource(const base::RefCountedMemory& encoded,
-                           std::string* to_append) {
-  auto source_stream = std::make_unique<net::MockSourceStream>();
-  source_stream->AddReadResult(base::span(encoded), net::OK,
-                               net::MockSourceStream::SYNC);
-  // Add an EOF.
-  source_stream->AddReadResult(base::span<uint8_t>(), net::OK,
-                               net::MockSourceStream::SYNC);
-  std::unique_ptr<net::GzipSourceStream> filter = net::GzipSourceStream::Create(
-      std::move(source_stream), net::SourceStreamType::kGzip);
-  scoped_refptr<net::IOBufferWithSize> dest_buffer =
-      base::MakeRefCounted<net::IOBufferWithSize>(4096);
-  while (true) {
-    int rv = filter->Read(dest_buffer.get(), dest_buffer->size(),
-                          net::CompletionOnceCallback());
-    ASSERT_LE(0, rv);
-    if (rv <= 0) {
-      break;
-    }
-    to_append->append(dest_buffer->data(), rv);
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Queries for video input devices on the current system using the getSources
 // API.
@@ -2207,51 +2178,6 @@ std::vector<WebContents*> GetAllWebContents() {
 
   return all_wc;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool ExecuteWebUIResourceTest(WebContents* web_contents) {
-  // Inject WebUI test runner script.
-  std::string script;
-  scoped_refptr<base::RefCountedMemory> bytes =
-      ui::ResourceBundle::GetSharedInstance().LoadDataResourceBytes(
-          IDR_ASH_WEBUI_COMMON_WEBUI_RESOURCE_TEST_JS);
-
-  if (net::GZipHeader::HasGZipHeader(base::span(*bytes))) {
-    AppendGzippedResource(*bytes, &script);
-  } else {
-    auto chars = base::as_chars(base::span(*bytes));
-    script.append(chars.data(), chars.size());
-  }
-
-  script.append("\n");
-  ExecuteScriptAsync(web_contents, script);
-
-  DOMMessageQueue message_queue(web_contents);
-
-  bool should_wait_flag = base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kWaitForDebuggerWebUI);
-
-  if (should_wait_flag) {
-    ExecuteScriptAsync(
-        web_contents,
-        "window.waitUser = true; "
-        "window.go = function() { window.waitUser = false }; "
-        "console.log('Waiting for debugger...'); "
-        "console.log('Run: go() in the JS console when you are ready.');");
-  }
-
-  ExecuteScriptAsync(web_contents, "runTests()");
-
-  std::string message;
-  do {
-    if (!message_queue.WaitForMessage(&message)) {
-      return false;
-    }
-  } while (message.compare("\"PENDING\"") == 0);
-
-  return message.compare("\"SUCCESS\"") == 0;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 std::string GetCookies(BrowserContext* browser_context,
                        const GURL& url,

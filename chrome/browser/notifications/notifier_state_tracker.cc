@@ -82,27 +82,11 @@ bool NotifierStateTracker::IsNotifierEnabled(
       // We do not disable system component notifications.
       return true;
     case message_center::NotifierType::ARC_APPLICATION:
-#if BUILDFLAG(IS_CHROMEOS)
-      // TODO(hriono): Ask Android if the application's notifications are
-      // enabled.
-      return true;
-#else
       break;
-#endif
     case message_center::NotifierType::CROSTINI_APPLICATION:
-#if BUILDFLAG(IS_CHROMEOS)
-      // Disabling Crostini notifications is not supported yet.
-      return true;
-#else
       NOTREACHED();
-#endif
     case message_center::NotifierType::PHONE_HUB:
-#if BUILDFLAG(IS_CHROMEOS)
-      // PhoneHub notifications are controlled in their own settings.
-      return true;
-#else
       break;
-#endif
   }
 
   NOTREACHED();

@@ -32,13 +32,6 @@
 #include "content/public/common/content_features.h"
 #include "third_party/abseil-cpp/absl/functional/overload.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_mode/isolated_web_app/kiosk_iwa_policy_util.h"
-#include "chrome/common/chromeos/extensions/chromeos_system_extension_info.h"  // nogncheck
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#include "components/webapps/isolated_web_apps/key_distribution/iwa_key_distribution_info_provider.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 
 namespace {
@@ -50,39 +43,9 @@ GetTrustedWebBundleIdsForTesting() {
   return *trusted_web_bundle_ids_for_testing;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Returns `true` if this Web Bundle ID is configured and currently running as
-// a kiosk. Kiosk mode is configured via DeviceLocalAccounts enterprise
-// policy.
-base::expected<void, std::string> IsTrustedForKiosk(
-    const web_package::SignedWebBundleId& web_bundle_id) {
-  if (ash::GetCurrentKioskIwaBundleId() == web_bundle_id) {
-    return base::ok();
-  }
-  return base::unexpected("IWAs in Kiosk mode can only run in Kiosk sessions.");
-}
-
-base::expected<void, std::string> IsTrustedForShimlessRma(
-    Profile& profile,
-    const web_package::SignedWebBundleId& web_bundle_id) {
-  if (ash::IsShimlessRmaAppBrowserContext(&profile) &&
-      chromeos::Is3pDiagnosticsIwaId(web_bundle_id)) {
-    return base::ok();
-  }
-  return base::unexpected(
-      "Shimless RMA IWA is only supported in Shimless Profile on "
-      "ChromeOS.");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 base::expected<void, std::string> IsTrustedForIwaPolicy(
     Profile& profile,
     const web_package::SignedWebBundleId& web_bundle_id) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(kIsolatedWebAppBypassManagedAllowlist)) {
-    return base::ok();
-  }
-#endif
   if (!IwaRuntimeDataProvider::GetInstance().IsManagedInstallPermitted(
           web_bundle_id.id())) {
     return base::unexpected(
@@ -161,14 +124,6 @@ base::expected<void, std::string> IsTrustedForManagementType(
     case WebAppManagement::Type::kIwaUserInstalled: {
       return IsTrustedForUserInstall(web_bundle_id);
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    case WebAppManagement::Type::kKiosk: {
-      return IsTrustedForKiosk(web_bundle_id);
-    }
-    case WebAppManagement::Type::kIwaShimlessRma: {
-      return IsTrustedForShimlessRma(profile, web_bundle_id);
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
     default:
       NOTREACHED();
   }

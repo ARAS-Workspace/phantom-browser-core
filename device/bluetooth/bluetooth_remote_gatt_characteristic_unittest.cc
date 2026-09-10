@@ -28,7 +28,7 @@
 #include "device/bluetooth/test/bluetooth_test_mac.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"
-#elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_LINUX)
 #include "device/bluetooth/test/bluetooth_test_bluez.h"
 #endif
 

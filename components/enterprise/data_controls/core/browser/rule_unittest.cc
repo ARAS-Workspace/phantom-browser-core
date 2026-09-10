@@ -284,13 +284,6 @@ TEST(DataControlsRuleTest, InvalidConditions_Clipboard) {
       kTemplate, "", R"("destinations": {"urls": [1, 2, 3, 4]},)")));
   ASSERT_FALSE(MakeRule(base::StringPrintf(
       kTemplate, "", R"("destinations": {"urls": ["not_a_real:pattern"]},)")));
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_FALSE(MakeRule(base::StringPrintf(
-      kTemplate, "", R"("destinations": {"components": [1, 2, 3, 4]},)")));
-  ASSERT_FALSE(MakeRule(base::StringPrintf(
-      kTemplate, "",
-      R"("destinations": {"components": ["not_a_real_component"]},)")));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Rules with invalid boolean attributes shouldn't be created.
   ASSERT_FALSE(MakeRule(base::StringPrintf(
@@ -375,13 +368,6 @@ TEST(DataControlsRuleTest, ValidSourcesInvalidDestinationsConditions) {
       kTemplate, R"("destinations": {"urls": [1, 2, 3, 4]},)")));
   ASSERT_TRUE(MakeRule(base::StringPrintf(
       kTemplate, R"("destinations": {"urls": ["not_a_real:pattern"]},)")));
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_TRUE(MakeRule(base::StringPrintf(
-      kTemplate, R"("destinations": {"components": [1, 2, 3, 4]},)")));
-  ASSERT_TRUE(MakeRule(base::StringPrintf(
-      kTemplate,
-      R"("destinations": {"components": ["not_a_real_component"]},)")));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST(DataControlsRuleTest, InvalidSourcesValidDestinationsConditions) {
@@ -644,45 +630,6 @@ TEST(DataControlsRuleTest, SourceAndDestinationUrls) {
                      }),
       Rule::Level::kNotSet);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST(DataControlsRuleTest, DestinationComponent) {
-  // A "FOO" component is included to validate that compatibility with future
-  // components works and doesn't interfere with the rest of the rule.
-  auto rule = MakeRule(R"({
-    "name": "Block pastes",
-    "rule_id": "1234",
-    "description": "A test rule to block pastes",
-    "destinations": { "components": ["FOO", "ARC"] },
-    "restrictions": [
-      { "class": "CLIPBOARD", "level": "BLOCK" }
-    ]
-  })");
-  ASSERT_TRUE(rule);
-
-  ASSERT_EQ(rule->GetLevel(Rule::Restriction::kClipboard,
-                           {.destination = {.component = Component::kArc}}),
-            Rule::Level::kBlock);
-  ASSERT_EQ(
-      rule->GetLevel(Rule::Restriction::kClipboard,
-                     {.destination = {.component = Component::kCrostini}}),
-      Rule::Level::kNotSet);
-  ASSERT_EQ(
-      rule->GetLevel(Rule::Restriction::kClipboard,
-                     {.destination = {.component = Component::kPluginVm}}),
-      Rule::Level::kNotSet);
-  ASSERT_EQ(rule->GetLevel(Rule::Restriction::kClipboard,
-                           {.destination = {.component = Component::kUsb}}),
-            Rule::Level::kNotSet);
-  ASSERT_EQ(rule->GetLevel(Rule::Restriction::kClipboard,
-                           {.destination = {.component = Component::kDrive}}),
-            Rule::Level::kNotSet);
-  ASSERT_EQ(
-      rule->GetLevel(Rule::Restriction::kClipboard,
-                     {.destination = {.component = Component::kOneDrive}}),
-      Rule::Level::kNotSet);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST(DataControlsRuleTest, ScreenshotRules) {
   auto rule = MakeRule(R"({

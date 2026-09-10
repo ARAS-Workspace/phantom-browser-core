@@ -39,10 +39,6 @@
 #include "ui/views/layout/box_layout.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/views/intent_picker_bubble_view.h"
-#endif
-
 namespace {
 
 constexpr int kSharingDialogSpacing = 8;

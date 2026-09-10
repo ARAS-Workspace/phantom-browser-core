@@ -45,19 +45,11 @@
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/base/ui_base_features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/common/chrome_switches.h"
-#include "components/user_manager/user_manager.h"
-#include "components/user_manager/user_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "components/policy/core/common/features.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
 namespace {
-#if !BUILDFLAG(IS_CHROMEOS)
 // Creates a Profile and its underlying OTR Profile for testing.
 // Waits for all tasks to be done to get as many services created as possible.
 // Returns the Original Profile.
@@ -71,7 +63,6 @@ Profile* CreateProfileAndWaitForAllTasks(const base::FilePath& profile_path) {
   content::RunAllTasksUntilIdle();
   return profile;
 }
-#endif
 
 // Gets all the KeyedServices from the DependencyGraph.
 std::vector<KeyedServiceBaseFactory*> GetKeyedServiceBaseFactories() {
@@ -220,7 +211,6 @@ class ProfileKeyedServiceBrowserTest : public InProcessBrowserTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // System Profile does not exist on ChromeOS.
 IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
                        SystemProfileOTR_NeededServices) {
@@ -264,7 +254,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     "LocalPresentationManager",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "PasswordManagerBlocklist",
 #endif
     "PasswordManagerInternalsService",
@@ -280,10 +270,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     // which does not yet have an implementation using `ProfileSelections`.
     "BrowserManagerService",
     "ExtensionKeybindingRegistryShutdownNotifierFactory",
-#if BUILDFLAG(IS_CHROMEOS)
-    "GalleryWatchManager",
-    "MediaFileSystemRegistry",
-#endif
     "NotificationDisplayService",
     "PermissionsUpdaterShutdownFactory",
     "PluginInfoHostImpl",
@@ -322,7 +308,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     "HasEnrolledInstrumentQuery",
     "OmniboxInputWatcher",
     "OmniboxSuggestionsWatcher",
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "PasswordManagerBlocklist",
 #endif
     "PolicyClipboardRestriction",
@@ -335,10 +321,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     // which does not yet have an implementation using `ProfileSelections`.
     "BrowserManagerService",
     "ExtensionKeybindingRegistryShutdownNotifierFactory",
-#if BUILDFLAG(IS_CHROMEOS)
-    "GalleryWatchManager",
-    "MediaFileSystemRegistry",
-#endif
     "NotificationDisplayService",
     "PermissionsUpdaterShutdownFactory",
     "PluginInfoHostImpl",
@@ -362,37 +344,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
                                   /*force_create_services=*/true);
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-class ProfileKeyedServiceGuestBrowserTest
-    : public ProfileKeyedServiceBrowserTest {
- public:
-  ProfileKeyedServiceGuestBrowserTest() {
-    // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox is
-    // enabled and then remove this.
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{},
-        /*disabled_features=*/
-        {omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
-  }
-  ~ProfileKeyedServiceGuestBrowserTest() override = default;
-
-  // ProfileKeyedServiceBrowserTest:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(ash::switches::kGuestSession);
-    command_line->AppendSwitch(::switches::kIncognito);
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile, "user");
-    command_line->AppendSwitchASCII(
-        ash::switches::kLoginUser,
-        user_manager::GuestAccountId().GetUserEmail());
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-#else
 class ProfileKeyedServiceGuestBrowserTest
     : public ProfileKeyedServiceBrowserTest {
  public:
@@ -409,7 +360,6 @@ class ProfileKeyedServiceGuestBrowserTest
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 };
-#endif
 
 IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
                        GuestProfileOTR_NeededServices) {
@@ -422,13 +372,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "AutocompleteControllerEmitter",
     "BackgroundContentsService",
     "BackgroundSyncService",
-#if BUILDFLAG(IS_CHROMEOS)
-    "BluetoothApiAdvertisementManager",
-    "BluetoothApiSocketManager",
-    "BluetoothLowEnergyConnectionManager",
-    "BluetoothLowEnergyNotifySessionManager",
-    "BluetoothSocketEventDispatcher",
-#endif  // BUILDFLAG(IS_CHROMEOS)
     "BrowserManagerService",
     "BrowsingDataLifetimeManager",
 
@@ -441,15 +384,8 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 #endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
     "ChromeEnterpriseRealTimeUrlLookupService",
 #if !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS)
-    "AshPolicyBlocklistService",
-#else
     "ChromePolicyBlocklistService",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS)
-    "ComponentExtensionContentSettingsAllowlist",
-#endif
     "DeveloperToolsPolicyChecker",
     "EnterpriseReportingPrivateEventRouter",
     "ExtensionKeybindingRegistryShutdownNotifierFactory",
@@ -468,10 +404,8 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "HidDeviceManager",
     "HostContentSettingsMap",
     "LiveCaptionController",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "LiveTranslateController",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
     "MediaRouter",
     "MediaRouterUIService",
@@ -500,10 +434,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "RulesRegistryService",
     "SafeBrowsingPrivateEventRouter",
 
-#if BUILDFLAG(IS_CHROMEOS)
-    "SerialConnectionManager",
-    "SerialPortManager",
-#endif
     "SettingsPrivateEventRouter",
     "SiteDataCacheFacadeFactory",
     "SiteEngagementService",
@@ -526,12 +456,10 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ClientHints",
     "ConnectorsService",
     "DataControlsRulesService",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): This is most likely unnesssary on CrOS because
     // it has its own UI, but factory is created, which should probably be
     // removed.
     "DownloadBubbleUpdateService",
-#endif
     "EnterpriseManagementService",
     "FindBarState",
     "HistoryClustersService",
@@ -541,10 +469,8 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "MediaNotificationService",
     "MerchantPromoCodeManager",
     "NoStatePrefetchManager",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "OfflineItemModelManager",
-#endif
     "OmniboxInputWatcher",
     "PermissionManagerFactory",
     "SafeBrowsingNavigationObserverManager",
@@ -557,30 +483,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "WebRequestProxyingURLLoaderFactory",
     "captive_portal::CaptivePortalService",
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(crbug.com/374351946):
-    // Verify these are necessary: then reorder or remove.
-
-    "AppListSyncableService",
-    "AppServiceProxy",
-    "CupsPrintersManagerFactory",
-    "DownloadCoreService",
-    "EventRouter",
-    "FileChangeService",
-    "FileSuggestKeyedService",
-    "HoldingSpaceService",
-    "LogSourceResource",
-    "PolicyCertService",
-    "PrimaryProfileServices",
-    "PrinterEventTracker",
-    "SharesheetService",
-    "SupervisedUserService",
-    "SupervisedUserUrlFilteringService",
-    "SystemWebAppManager",
-    "VirtualKeyboardAPI",
-    "VolumeManagerFactory",
-    "WebAppProvider",
-#endif  // BUILDFLAG(IS_CHROMEOS)
   };
   // clang-format on
   if (SearchEnginePreconnector::ShouldBeEnabledAsKeyedService() &&
@@ -607,15 +509,8 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     guest_otr_active_services.insert("ThemeColorsSourceManager");
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(user_manager::UserManager::Get()->IsLoggedInAsGuest());
-  // ChromeOS Guest mode starts with the guest otr profile.
-  Profile* guest_otr_profile = browser()->GetProfile();
-  // Some key services are created asynchronosly. Wait util they're ready.
-#else
   Browser* guest_browser = CreateGuestBrowser();
   Profile* guest_otr_profile = guest_browser->GetProfile();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   content::RunAllTasksUntilIdle();
 
   ASSERT_FALSE(guest_otr_profile->IsRegularProfile());
@@ -640,17 +535,15 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "AppLifetimeMonitor",
     "AppLoadService",
     "AppRestoreService",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "AppServiceProxy",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
     "AppSessionService",
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     "AppShortcutManager",
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     "ManualTestHeartbeatEvent",
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
     "AppTerminationObserver",
     "AppWindowRegistry",
     "AudioAPI",
@@ -664,16 +557,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "BackgroundContentsService",
     "BackgroundSyncService",
     "Blocklist",
-#if BUILDFLAG(IS_CHROMEOS)
-    "BluetoothAPI",
-    "BluetoothApiSocketManager",
-    "BluetoothApiAdvertisementManager",
-    "BluetoothLowEnergyAPI",
-    "BluetoothLowEnergyConnectionManager",
-    "BluetoothLowEnergyNotifySessionManager",
-    "BluetoothPrivateAPI",
-    "BluetoothSocketEventDispatcher",
-#endif  // BUILDFLAG(IS_CHROMEOS)
     "BookmarkManagerPrivateAPI",
 #if defined(TOOLKIT_VIEWS)
     "BookmarkExpandedStateTracker",
@@ -689,9 +572,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ChildAccountService",
     "ChromeSigninClient",
     "CommandService",
-#if BUILDFLAG(IS_CHROMEOS)
-    "ComponentExtensionContentSettingsAllowlist",
-#endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     "ComponentLoader",
 #endif
@@ -713,9 +593,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "DelayedInstallManager",
 #endif
     "DeveloperPrivateAPI",
-#if !BUILDFLAG(IS_CHROMEOS)
     "DownloadCoreService",
-#endif
     "EventRouter",
     "ExtensionActionDispatcher",
     "ExtensionActionManager",
@@ -755,10 +633,8 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "FirstPartySetsPolicyService",
     "FontPrefChangeNotifier",
     "FontSettingsAPI",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "GAIAInfoUpdateService",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
     "GCMProfileService",
     "GeneratedPrefs",
     "GlobalErrorService",
@@ -779,10 +655,8 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "InstallTracker",
     "InstallVerifier",
     "InstanceIDProfileService",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "InvalidationService",
-#endif
     "LanguageModelManager",
     "LanguageSettingsPrivateDelegate",
     "LazyBackgroundTaskQueue",
@@ -797,9 +671,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     "ManifestV2Handler",
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-    "MediaGalleriesAPI",
-#endif
     "MediaRouter",
     "MediaRouterUIService",
     "MenuManager",
@@ -809,9 +680,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "NotificationDisplayService",
     "NtpBackgroundService",
     "NtpCustomBackgroundService",
-#if BUILDFLAG(IS_CHROMEOS)
-    "NssServiceFactory",
-#endif // BUILDFLAG(IS_CHROMEOS)
     "OmniboxAPI",
     "OmniboxSuggestionsWatcher",
     "OnDeviceTailModelService",
@@ -819,10 +687,8 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "OperationManager",
     "OptimizationGuideGlobalStateHolderKeyedService",
     "OptimizationGuideKeyedService",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "PageContentAnnotationsService",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
     "PasswordsPrivateEventRouter",
     "PendingExtensionManager",
     "PermissionDecisionAutoBlocker",
@@ -871,13 +737,9 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "SafeBrowsingPrivateEventRouter",
     "SafeBrowsingTailoredSecurityService",
     "SearchEngineChoiceServiceFactory",
-#if BUILDFLAG(IS_CHROMEOS)
-    "SerialConnectionManager",
-    "SerialPortManager",
-#endif
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "ServerCertificateDatabaseService",
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "SessionDataService",
     "SessionProtoDBFactory",
     "SessionsAPI",
@@ -892,12 +754,10 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "SiteDataCacheFacadeFactory",
     "SiteEngagementService",
     "SocketManager",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Desktop chrome create this via
     // ShoppingService->SyncService->Spellchecker. Investigate if this is
     // expected on desktop chrome.
     "SpellcheckService",
-#endif
     "StorageFrontend",
     "StorageNotificationService",
     "SystemInfoAPI",
@@ -916,25 +776,18 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "UkmBackgroundRecorderService",
     "UsbDeviceManager",
     "UsbDeviceResourceManager",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "UserCloudPolicyInvalidator",
     "UserFmRegistrationTokenUploader",
     "UserPolicySigninService",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
     "UserScriptWorldConfigurationManager",
     "WarningBadgeService",
     "WarningService",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "WebAppProvider",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "WebAuthenticationProxyAPI",
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-    "WebcamPrivateAPI",
-#endif  // BUILDFLAG(IS_CHROMEOS)
     "WebDataService",
     "WebNavigationAPI",
     "WebRequestAPI",
@@ -943,61 +796,9 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "WriteQuotaChecker",
     "feedback::FeedbackUploaderChrome",
     "sct_reporting::Factory",
-#if !BUILDFLAG(IS_CHROMEOS)
     // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "ZeroSuggestCacheServiceFactory",
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(crbug.com/374351946):
-    // Verify these are necessary: then reorder or remove.
-
-    "AccountManagerPolicyController",
-    "ArcAppsPrivateAPI",
-    "AuthTokenValidatorFactory",
-    "AutotestPrivateAPI",
-    "CastMediaNotificationProducerKeyedService",
-    "ClientAppMetadataProviderService",
-    "ClipboardAPI",
-    "CrostiniMetricsService",
-    "CupsPrintJobManagerFactory",
-    "DebugLogsManagerFactory",
-    "DeviceSyncClient",
-    "DriveIntegrationService",
-    "EasyUnlockService",
-    "InputImeAPI",
-    "InputMethodAPI",
-    "KcerFactoryAsh",
-    "LogSourceResource",
-    "LorgnetteScannerManager",
-    "MediaNotificationService",
-    "MediaPerceptionAPIManager",
-    "MediaPlayerAPI",
-    "MultiDeviceSetupClient",
-    "MultiDeviceSetupService",
-    "NearbyConnector",
-    "NearbyProcessManager",
-    "OAuth2LoginManager",
-    "OobeCompletionTrackerFactory",
-    "OwnerSettingsService",
-    "Pkcs12Migrator",
-    "PlatformKeysService",
-    "PolicyCertService",
-    "PrintJobHistoryService",
-    "PrintJobReportingServiceFactory",
-    "PrintingManager",
-    "Service",
-    "SessionStateChangedEventDispatcher",
-    "SmbService",
-    "SyncedPrintersManager",
-    "TerminalPrivateAPI",
-    "TtsEngineExtensionObserverChromeOS",
-    "UserNetworkConfigurationUpdater",
-    "UserPrivateTokenKeyPermissionsManagerService",
-    "VirtualKeyboardAPI",
-    "VolumeManagerFactory",
-    "VpnService",
-#endif // BUILDFLAG(IS_CHROMEOS)
   };
   // clang-format on
 
@@ -1015,17 +816,9 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     guest_active_services.insert("ExtensionInstallPolicyService");
   }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(user_manager::UserManager::Get()->IsLoggedInAsGuest());
-  // ChromeOS Guest mode starts with the guest otr profile.
-  Profile* guest_otr_profile = browser()->GetProfile();
-  Profile* guest_parent_profile = guest_otr_profile->GetOriginalProfile();
-  // Some key services are created asynchronosly. Wait util they're ready.
-#else
   Browser* guest_browser = CreateGuestBrowser();
   Profile* guest_parent_profile =
       guest_browser->GetProfile()->GetOriginalProfile();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   content::RunAllTasksUntilIdle();
 
   ASSERT_FALSE(guest_parent_profile->IsRegularProfile());

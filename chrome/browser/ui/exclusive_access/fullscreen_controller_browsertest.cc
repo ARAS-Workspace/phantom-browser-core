@@ -35,10 +35,6 @@
 #include "ui/events/event_constants.h"
 #include "ui/events/keycodes/keyboard_codes.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/wm/window_pin_util.h"
-#endif
-
 using content::WebContents;
 using ui::PAGE_TRANSITION_TYPED;
 using FullscreenControllerTest = ExclusiveAccessTest;
@@ -466,7 +462,7 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerTest, DISABLED_TopViewStatusChange) {
   // Test Normal state <--> Browser fullscreen mode <--> Tab fullscreen mode.
   ui_test_utils::ToggleFullscreenModeAndWait(browser());
   EXPECT_TRUE(context->IsFullscreen());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   bool should_show_top_ui = true;
 #else
   bool should_show_top_ui = false;
@@ -476,11 +472,7 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerTest, DISABLED_TopViewStatusChange) {
 
   EnterActiveTabFullscreen();
   EXPECT_TRUE(context->IsFullscreen());
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(BrowserWindow::FromBrowser(browser())->IsToolbarVisible());
-#else
   EXPECT_FALSE(BrowserWindow::FromBrowser(browser())->IsToolbarVisible());
-#endif
 
   SendEscapeToExclusiveAccessManager();
   EXPECT_TRUE(context->IsFullscreen());
@@ -561,35 +553,6 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerPressAndHoldEscTest,
   WaitAndVerifyFullscreenState(/*browser_fullscreen=*/false,
                                /*tab_fullscreen=*/false);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(FullscreenControllerPressAndHoldEscTest,
-                       NotExitBrowserLockedFullscreenOnPressEsc) {
-  // Enter browser locked fullscreen.
-  ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/true);
-  ASSERT_FALSE(IsWindowFullscreenForTabOrPending());
-
-  // Short-press Esc key won't exit browser locked fullscreen.
-  SendEscapeToExclusiveAccessManager(/*is_key_down=*/true);
-  SendEscapeToExclusiveAccessManager(/*is_key_down=*/false);
-  EXPECT_TRUE(IsFullscreenForBrowser());
-}
-
-IN_PROC_BROWSER_TEST_F(FullscreenControllerPressAndHoldEscTest,
-                       NotExitBrowserLockedFullscreenOnPressAndHoldEsc) {
-  // Enter browser locked fullscreen.
-  ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/true);
-  ASSERT_FALSE(IsWindowFullscreenForTabOrPending());
-
-  // Press-and-hold Esc will not exit browser locked fullscreen.
-  {
-    base::TestMockTimeTaskRunner::ScopedContext scoped_context(task_runner());
-    SendEscapeToExclusiveAccessManager(/*is_key_down=*/true);
-    task_runner()->FastForwardBy(base::Seconds(2));
-  }
-  EXPECT_TRUE(IsFullscreenForBrowser());
-}
-#endif
 
 IN_PROC_BROWSER_TEST_F(FullscreenControllerPressAndHoldEscTest,
                        ExitBrowserFullscreenOnMultipleEscKeyDown) {

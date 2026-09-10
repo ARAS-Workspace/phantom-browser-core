@@ -166,7 +166,7 @@ const base::FeatureParam<std::string>
 // of associating with an unused IPC::Channel.
 BASE_FEATURE(kRemoveGPULegacyIPC, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // Feature flag to control whether SharedImageStub sequence uses high priority
 // on ChromeOS and Linux. Enabled by default.
 BASE_FEATURE(kSharedImageStubHighPriority, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -177,7 +177,7 @@ BASE_FEATURE(kSharedImageStubHighPriority, base::FEATURE_DISABLED_BY_DEFAULT);
 // DefaultEnableGpuRasterization has launched on Mac, Windows, ChromeOS,
 // Android and Linux.
 BASE_FEATURE(kDefaultEnableGpuRasterization,
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || \
     BUILDFLAG(USE_WEBGPU_ON_VULKAN_VIA_GL_INTEROP)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
@@ -252,7 +252,7 @@ BASE_FEATURE(kEnableDrDc,
 
 // Enable WebGPU on gpu service side only. This is used with origin trial and
 // enabled by default on supported platforms.
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || \
     BUILDFLAG(USE_WEBGPU_ON_VULKAN_VIA_GL_INTEROP)
 #define WEBGPU_ENABLED base::FEATURE_ENABLED_BY_DEFAULT
 #else
@@ -412,11 +412,7 @@ bool SkiaGraphiteUsesPersistentCache() {
 BASE_FEATURE(kConditionallySkipGpuChannelFlush,
 // To enable on ChromeOS, test failures must be investigated
 // (crrev.com/c/5435673).
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif
 );
 
 const SkiaGraphiteFeatureParams& GetSkiaGraphiteFeatureParams() {
@@ -550,10 +546,6 @@ bool IsSkiaGraphiteSupportedByDevice(const base::CommandLine* command_line) {
   }
 
   // Graphite on Android uses the Dawn Vulkan backend. Only enable Graphite if
-  // device would already be using Ganesh/Vulkan.
-  return IsUsingVulkan();
-#elif BUILDFLAG(IS_CHROMEOS)
-  // Graphite on ChromeOS uses the Dawn Vulkan backend. Only enable Graphite if
   // device would already be using Ganesh/Vulkan.
   return IsUsingVulkan();
 #else

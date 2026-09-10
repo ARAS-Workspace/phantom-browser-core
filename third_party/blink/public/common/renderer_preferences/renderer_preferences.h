@@ -54,7 +54,7 @@ struct BLINK_COMMON_EXPORT RendererPreferences {
   bool allow_cross_origin_auth_prompt{false};
   bool enable_do_not_track{false};
   bool enable_encrypted_media{true};
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   bool use_overlay_scrollbar{false};
 #endif
   blink::mojom::WebRtcIpHandlingPolicy webrtc_ip_handling_policy =
@@ -67,7 +67,7 @@ struct BLINK_COMMON_EXPORT RendererPreferences {
   UserAgentOverride user_agent_override;
   std::string accept_languages;
   bool send_subresource_notification{false};
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   std::string system_font_family_name;
 #endif
 #if BUILDFLAG(IS_OZONE)

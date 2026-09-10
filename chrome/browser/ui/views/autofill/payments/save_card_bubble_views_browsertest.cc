@@ -88,10 +88,6 @@
 #include "ui/views/widget/any_widget_observer.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/settings_window_manager_chromeos.h"
-#include "chromeos/ash/services/multidevice_setup/public/cpp/prefs.h"
-#endif
 
 namespace autofill {
 namespace {
@@ -2203,9 +2199,7 @@ IN_PROC_BROWSER_TEST_P(SaveCardBubbleViewsFullFormBrowserTest,
   FillForm();
   SubmitFormAndWaitForCardLocalSaveBubble();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   ResetEventWaiterForSequence({DialogEvent::BUBBLE_SHOWN});
-#endif
 
   // Click [Save] should close the offer-to-save bubble and show "Card saved"
   // animation -- followed by the sign-in promo (if not on Chrome OS).
@@ -2224,9 +2218,7 @@ IN_PROC_BROWSER_TEST_P(SaveCardBubbleViewsFullFormBrowserTest,
   FillForm();
   SubmitFormAndWaitForCardLocalSaveBubble();
 
-#if !BUILDFLAG(IS_CHROMEOS)
   ResetEventWaiterForSequence({DialogEvent::BUBBLE_SHOWN});
-#endif
 
   // Click [Save] should close the offer-to-save bubble and show "Card saved"
   // animation.

@@ -21,9 +21,7 @@ namespace gpu {
 namespace {
 
 GPUTestConfig::OS GetCurrentOS() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return GPUTestConfig::kOsChromeOS;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
   return GPUTestConfig::kOsLinux;
 #elif BUILDFLAG(IS_MAC)
   int32_t major_version = 0;

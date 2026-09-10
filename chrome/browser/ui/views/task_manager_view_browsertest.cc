@@ -51,12 +51,6 @@
 #include "ui/views/test/widget_activation_waiter.h"
 #include "ui/views/test/widget_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ui/base/app_types.h"
-#include "chromeos/ui/base/window_properties.h"
-#include "ui/aura/window.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace task_manager {
 
 using browsertest_util::WaitForTaskManagerRows;
@@ -482,16 +476,6 @@ IN_PROC_BROWSER_TEST_F(TaskManagerViewTest, CloseByAccelerator) {
 
   EXPECT_TRUE(GetView()->GetWidget()->IsClosed());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(TaskManagerViewTest, AppType) {
-  chrome::ShowTaskManager(browser());
-
-  EXPECT_EQ(chromeos::AppType::SYSTEM_APP,
-            GetView()->GetWidget()->GetNativeWindow()->GetProperty(
-                chromeos::kAppTypeKey));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests generally if focusing the TableView in Task Manager will auto-select
 // the first row.

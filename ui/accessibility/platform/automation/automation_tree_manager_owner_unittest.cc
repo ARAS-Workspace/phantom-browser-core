@@ -255,11 +255,7 @@ class AutomationTreeManagerOwnerTest : public testing::Test {
 
   void SendGetTextLocationResult(const AXActionData& data,
                                  const std::optional<gfx::Rect>& rect) {
-#if BUILDFLAG(IS_CHROMEOS)
-    tree_manager_owner_->DispatchGetTextLocationResult(data, rect);
-#else
     GTEST_FAIL();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   bool CallGetFocusInternal(AutomationAXTreeWrapper* top_wrapper,
@@ -969,25 +965,6 @@ TEST_F(AutomationTreeManagerOwnerTest, FireEventsWithListeners) {
 
   ASSERT_EQ(1U, events.size());
   EXPECT_EQ("clicked none", events[0]);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Verify that the manager forwards the text location.
-  bool text_location_sent = false;
-  AddGetTextLocationResultCallback(base::BindLambdaForTesting(
-      [&](const AXActionData& data, const std::optional<gfx::Rect>& rect) {
-        text_location_sent = true;
-      }));
-
-  AXActionData action_data;
-  action_data.target_tree_id = updates[0].tree_data.tree_id;
-  action_data.target_node_id = 1;
-  action_data.request_id = 1;
-  std::optional<gfx::Rect> rect = gfx::Rect();
-  rect->SetRect(2, 2, 4, 4);
-  SendGetTextLocationResult(action_data, rect);
-
-  EXPECT_TRUE(text_location_sent);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Finally, check if sending an event to delete the tree correctly notify
   // listeners.

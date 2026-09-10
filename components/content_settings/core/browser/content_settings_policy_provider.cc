@@ -159,16 +159,6 @@ constexpr PrefsForManagedContentSettingsMapEntry
          ContentSettingsType::SUB_APPS_WITHOUT_PROMPTS, CONTENT_SETTING_ALLOW},
         {prefs::kManagedSubAppsWithoutPromptsBlockedForOrigins,
          ContentSettingsType::SUB_APPS_WITHOUT_PROMPTS, CONTENT_SETTING_BLOCK},
-#if BUILDFLAG(IS_CHROMEOS)
-        {prefs::kManagedSmartCardConnectAllowedForUrls,
-         ContentSettingsType::SMART_CARD_GUARD, CONTENT_SETTING_ALLOW},
-        {prefs::kManagedSmartCardConnectBlockedForUrls,
-         ContentSettingsType::SMART_CARD_GUARD, CONTENT_SETTING_BLOCK},
-        {prefs::kManagedDeviceAttributesAllowedForOrigins,
-         ContentSettingsType::DEVICE_ATTRIBUTES, CONTENT_SETTING_ALLOW},
-        {prefs::kManagedDeviceAttributesBlockedForOrigins,
-         ContentSettingsType::DEVICE_ATTRIBUTES, CONTENT_SETTING_BLOCK},
-#endif
         {prefs::kManagedControlledFrameAllowedForUrls,
          ContentSettingsType::CONTROLLED_FRAME, CONTENT_SETTING_ALLOW},
         {prefs::kManagedControlledFrameBlockedForUrls,
@@ -265,12 +255,6 @@ constexpr const char* kManagedPrefs[] = {
     prefs::kManagedDirectSocketsPrivateNetworkAccessBlockedForUrls,
     prefs::kManagedSubAppsWithoutPromptsAllowedForOrigins,
     prefs::kManagedSubAppsWithoutPromptsBlockedForOrigins,
-#if BUILDFLAG(IS_CHROMEOS)
-    prefs::kManagedSmartCardConnectAllowedForUrls,
-    prefs::kManagedSmartCardConnectBlockedForUrls,
-    prefs::kManagedDeviceAttributesAllowedForOrigins,
-    prefs::kManagedDeviceAttributesBlockedForOrigins,
-#endif
     prefs::kManagedControlledFrameAllowedForUrls,
     prefs::kManagedControlledFrameBlockedForUrls,
 };
@@ -311,10 +295,6 @@ constexpr const char* kManagedDefaultPrefs[] = {
     prefs::kManagedDefaultSubAppsWithoutPromptsSetting,
     prefs::kManagedDefaultDirectSocketsPrivateNetworkAccessSetting,
     prefs::kManagedDefaultControlledFrameSetting,
-#if BUILDFLAG(IS_CHROMEOS)
-    prefs::kManagedDefaultSmartCardConnectSetting,
-    prefs::kManagedDefaultDeviceAttributesSetting,
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 void ReportCookiesAllowedForUrlsUsage(
@@ -434,12 +414,6 @@ const PolicyProvider::PrefsForManagedDefaultMapEntry
          prefs::kManagedDefaultControlledFrameSetting},
         {ContentSettingsType::SUB_APPS_WITHOUT_PROMPTS,
          prefs::kManagedDefaultSubAppsWithoutPromptsSetting},
-#if BUILDFLAG(IS_CHROMEOS)
-        {ContentSettingsType::SMART_CARD_GUARD,
-         prefs::kManagedDefaultSmartCardConnectSetting},
-        {ContentSettingsType::DEVICE_ATTRIBUTES,
-         prefs::kManagedDefaultDeviceAttributesSetting},
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 // static
@@ -533,16 +507,6 @@ void PolicyProvider::GetContentSettingsFromPreferences() {
                 << original_pattern_str;
         continue;
       }
-
-#if BUILDFLAG(IS_CHROMEOS)
-      if (entry.content_type == ContentSettingsType::SMART_CARD_GUARD &&
-          !pattern_pair.first.MatchesSingleOrigin()) {
-        VLOG(1) << "Smart card reader access cannot be allowed or blocked by "
-                   "wildcard, skipping pattern."
-                << original_pattern_str;
-        continue;
-      }
-#endif
 
       DCHECK_NE(entry.content_type,
                 ContentSettingsType::AUTO_SELECT_CERTIFICATE);

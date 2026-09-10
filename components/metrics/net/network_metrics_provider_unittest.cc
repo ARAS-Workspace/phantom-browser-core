@@ -14,10 +14,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/system_profile.pb.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/network/network_handler_test_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_IOS)
 #include "ios/web/public/test/web_task_environment.h"
 #else  // !BUILDFLAG(IS_IOS)
@@ -44,9 +40,6 @@ class NetworkMetricsProviderTest : public testing::Test {
   content::BrowserTaskEnvironment task_environment_{
       content::BrowserTaskEnvironment::IO_MAINLOOP};
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::NetworkHandlerTestHelper network_handler_test_helper_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 // Verifies that the effective connection type is correctly set.

@@ -96,7 +96,7 @@ static const char kUrlField[] = "url";
 static const char kValueField[] = "value";
 static const char kApiTypeField[] = "apiType";
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
 static const char kWidget[] = "widget";
 #endif
 
@@ -716,7 +716,7 @@ void AccessibilityUIMessageHandler::RegisterMessages() {
           &AccessibilityUIMessageHandler::HandleRequestNativeUITree,
           base::Unretained(this)));
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   web_ui()->RegisterMessageCallback(
       "requestWidgetsTree",
       base::BindRepeating(
@@ -969,7 +969,7 @@ void AccessibilityUIMessageHandler::HandleRequestNativeUITree(
   FireWebUIListener(request_type, result);
 }
 
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
 void AccessibilityUIMessageHandler::HandleRequestWidgetsTree(
     const base::ListValue& args) {
   const base::DictValue& data = args[0].GetDict();
@@ -989,7 +989,7 @@ void AccessibilityUIMessageHandler::HandleRequestWidgetsTree(
   AllowJavascript();
   FireWebUIListener(request_type, result);
 }
-#endif  // defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // defined(USE_AURA)
 
 void AccessibilityUIMessageHandler::Callback(const std::string& str) {
   event_logs_.push_back(str);

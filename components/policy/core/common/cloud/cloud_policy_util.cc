@@ -40,11 +40,6 @@
 #include "base/system/sys_info.h"
 #include "components/version_info/version_info.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/statistics_provider.h"
-#include "components/session_manager/core/session.h"
-#include "components/session_manager/core/session_manager.h"
-#endif
 
 
 #if BUILDFLAG(IS_MAC)
@@ -109,15 +104,13 @@ std::string GetMachineName() {
   return split.value().category;
 #elif BUILDFLAG(IS_ANDROID)
   return std::string();
-#elif BUILDFLAG(IS_CHROMEOS)
-  NOTREACHED();
 #else
 #error Unsupported platform
 #endif
 }
 
 std::string GetOSVersion() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
   return base::SysInfo::OperatingSystemVersion();
 #else
   NOTREACHED();
@@ -139,16 +132,6 @@ std::string GetOSUsername() {
     return std::string();
 
   return creds->pw_name;
-#elif BUILDFLAG(IS_CHROMEOS)
-  auto* session_manager = session_manager::SessionManager::Get();
-  if (!session_manager) {
-    return std::string();
-  }
-  const auto* primary_session = session_manager->GetPrimarySession();
-  if (!primary_session) {
-    return std::string();
-  }
-  return primary_session->account_id().GetUserEmail();
 #elif BUILDFLAG(IS_ANDROID)
   // TODO(crbug.com/40200780): This should be fully implemented when there is
   // support in fuchsia.
@@ -174,17 +157,7 @@ em::Channel ConvertToProtoChannel(version_info::Channel channel) {
 }
 
 std::string GetDeviceName() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (ash::system::StatisticsProvider::GetInstance()->GetLoadingState() ==
-      ash::system::StatisticsProvider::LoadingState::kNotStarted) {
-    return std::string();
-  }
-  return std::string(
-      ash::system::StatisticsProvider::GetInstance()->GetMachineID().value_or(
-          ""));
-#else
   return GetMachineName();
-#endif
 }
 
 std::unique_ptr<em::BrowserDeviceIdentifier> GetBrowserDeviceIdentifier() {

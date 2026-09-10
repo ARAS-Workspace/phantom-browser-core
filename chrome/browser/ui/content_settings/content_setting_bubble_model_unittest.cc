@@ -650,7 +650,7 @@ TEST_F(ContentSettingBubbleModelTest, Geolocation) {
         FakeOwner::Create(*content_setting_bubble_model, 0);
     const auto& bubble_content = content_setting_bubble_model->bubble_content();
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
     EXPECT_EQ(bubble_content.title,
               u"Location is turned off in system settings");
 #endif
@@ -674,7 +674,7 @@ TEST_F(ContentSettingBubbleModelTest, Geolocation) {
                 IsAllowed(ContentSettingsType::GEOLOCATION))
         .WillRepeatedly(Return(true));
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
     EXPECT_EQ(bubble_content.title,
               u"Location is turned off in system settings");
 #endif
@@ -1561,32 +1561,6 @@ TEST_F(ContentSettingBubbleModelTest,
             map->GetContentSetting(site.GetURL(), page_url,
                                    ContentSettingsType::STORAGE_ACCESS));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ContentSettingBubbleModelTest, SmartCard) {
-  const GURL page_url("https://toplevel.example/");
-  NavigateAndCommit(page_url);
-  auto* content_settings = PageSpecificContentSettings::GetForFrame(
-      web_contents()->GetPrimaryMainFrame());
-  content_settings->OnDeviceUsed(ContentSettingsType::SMART_CARD_GUARD);
-
-  ContentSettingSimpleBubbleModel content_setting_bubble_model(
-      nullptr, page(), ContentSettingsType::SMART_CARD_GUARD);
-
-  const ContentSettingBubbleModel::BubbleContent& bubble_content =
-      content_setting_bubble_model.bubble_content();
-  EXPECT_EQ(bubble_content.title,
-            l10n_util::GetStringUTF16(IDS_ACCESSED_SMART_CARD_READER_TITLE));
-  EXPECT_TRUE(bubble_content.radio_group.radio_items.empty());
-  EXPECT_TRUE(bubble_content.list_items.empty());
-  EXPECT_TRUE(bubble_content.site_list.empty());
-  EXPECT_TRUE(bubble_content.custom_link.empty());
-  EXPECT_FALSE(bubble_content.custom_link_enabled);
-  EXPECT_EQ(bubble_content.manage_text, l10n_util::GetStringUTF16(IDS_MANAGE));
-  EXPECT_EQ(bubble_content.message,
-            l10n_util::GetStringUTF16(IDS_ACCESSED_SMART_CARD_READER_BODY));
-}
-#endif
 
 // Test suite for verifying that permissions granted through Omnibox
 // bubbles are correctly marked as eligible for Safety Hub auto-revocation

@@ -182,7 +182,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientExtensionsSyncTest, UninstallWinsConflicts) {
 }
 
 // TODO(crbug.com/328400930): Investigate why these tests fail on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 class SingleClientExtensionsMigrateSyncingUserToSignedInSyncTest
     : public SyncTest {
  public:
@@ -530,7 +529,5 @@ IN_PROC_BROWSER_TEST_F(SingleClientExtensionsExplicitSigninTransitionTest,
   EXPECT_TRUE(GetSyncService(0)->GetUserSettings()->GetSelectedTypes().Has(
       syncer::UserSelectableType::kExtensions));
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

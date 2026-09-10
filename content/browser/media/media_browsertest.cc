@@ -66,7 +66,7 @@ void MediaBrowserTest::SetUpCommandLine(base::CommandLine* command_line) {
       // hardware/software decoder selection.
       media::kResolutionBasedDecoderPriority,
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       // Disable out of process audio on Linux due to process spawn
       // failures. http://crbug.com/986021
       features::kAudioServiceOutOfProcess,

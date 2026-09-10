@@ -14,17 +14,9 @@
 #include "content/public/test/accessibility_notification_waiter.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/accessibility/accessibility_manager.h"
-#include "chrome/browser/ash/accessibility/chromevox_test_utils.h"
-#include "chrome/browser/ash/accessibility/speech_monitor.h"
-#include "extensions/browser/browsertest_util.h"
-#include "extensions/common/constants.h"
-#else
 #include <optional>
 
 #include "content/public/test/scoped_accessibility_mode_override.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/accessibility/accessibility_labels_service.h"
@@ -44,18 +36,6 @@ class AccessibilityLabelsBrowserTest : public InProcessBrowserTest {
   void TearDownOnMainThread() override { EnableScreenReader(false); }
 
   void EnableScreenReader(bool enabled) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (!enabled) {
-      ash::AccessibilityManager::Get()->EnableSpokenFeedback(false);
-      return;
-    }
-
-    chromevox_test_utils_ = std::make_unique<ash::ChromeVoxTestUtils>();
-    chromevox_test_utils_->EnableChromeVox();
-    // Note: we can safely call `Replay` here since none of these tests make
-    // speech assertions.
-    chromevox_test_utils_->sm()->Replay();
-#else
     // Spoof a screen reader.
     if (!enabled) {
       screen_reader_override_.reset();
@@ -63,16 +43,11 @@ class AccessibilityLabelsBrowserTest : public InProcessBrowserTest {
       screen_reader_override_.emplace(ui::AXMode::kWebContents |
                                       ui::AXMode::kExtendedProperties);
     }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
  private:
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<ash::ChromeVoxTestUtils> chromevox_test_utils_;
-#else
   std::optional<content::ScopedAccessibilityModeOverride>
       screen_reader_override_;
-#endif
 };
 
 // Changing the kAccessibilityImageLabelsEnabled pref should affect the

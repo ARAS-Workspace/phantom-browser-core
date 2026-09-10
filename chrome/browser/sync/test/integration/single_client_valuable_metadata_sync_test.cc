@@ -349,7 +349,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientValuableMetadataSyncTest,
   EXPECT_TRUE(FakeServerValuableMetadataChecker(IsEmpty()).Wait());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Verifies that signing out of the primary account clears all valuable entity
 // data and metadata from the local database. This test is disabled on ChromeOS.
 IN_PROC_BROWSER_TEST_P(SingleClientValuableMetadataSyncTest, ClearOnSignOut) {
@@ -364,7 +363,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientValuableMetadataSyncTest, ClearOnSignOut) {
   WaitForNumberOfEntityInstances(0, edm);
   EXPECT_THAT(GetMetadataEntries(), IsEmpty());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Ensures that disabling the "Payments" sync toggle clears all valuable entity
 // data and metadata from the local database.

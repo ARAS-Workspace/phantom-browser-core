@@ -105,10 +105,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#include "chrome/browser/ui/ash/test_util.h"
-#endif
 
 
 class BrowserViewTest : public InProcessBrowserTest {
@@ -184,9 +180,6 @@ class BrowserViewTest : public InProcessBrowserTest {
 
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-using BrowserViewChromeOSTest = ChromeOSBrowserUITest;
-#endif
 
 namespace {
 // Used to simulate scenario in a crash. When WebContentsDestroyed() is
@@ -301,21 +294,6 @@ IN_PROC_BROWSER_TEST_F(BrowserViewTest, CloseWithTabsStartWithActive) {
   BrowserView::GetBrowserViewForBrowser(browser2)->GetWidget()->CloseNow();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(BrowserViewTest, OnTaskLockedBrowserView) {
-  ash::boca::OnTaskLockedController::From(browser())->set_locked_for_on_task(
-      true);
-  EXPECT_FALSE(browser_view()->CanMinimize());
-  EXPECT_FALSE(browser_view()->ShouldShowCloseButton());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewTest, OnTaskUnlockedBrowserView) {
-  ash::boca::OnTaskLockedController::From(browser())->set_locked_for_on_task(
-      false);
-  EXPECT_TRUE(browser_view()->CanMinimize());
-  EXPECT_TRUE(browser_view()->ShouldShowCloseButton());
-}
-#endif
 
 // Verifies that page and devtools WebViews are being correctly laid out
 // when DevTools is opened/closed/updated while docked.
@@ -1342,65 +1320,6 @@ IN_PROC_BROWSER_TEST_F(BrowserViewDataProtectionTest, DC_Screenshot) {
 
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(BrowserViewChromeOSTest, EnsureViewTreeOrder) {
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
-  auto* const immersive_mode_controller =
-      ImmersiveModeController::From(browser());
-
-  std::vector<views::View*> children_before;
-  for (const auto& child : browser_view->children()) {
-    children_before.push_back(child);
-  }
-
-  EnterTabletMode();
-
-  std::vector<views::View*> children_in_tablet;
-  for (const auto& child : browser_view->children()) {
-    children_in_tablet.push_back(child);
-  }
-
-  // Enter immersive fullscreen.
-  ui_test_utils::ToggleFullscreenModeAndWait(browser());
-  EXPECT_TRUE(immersive_mode_controller->IsEnabled());
-
-  // Exit immersive fullscreen.
-  ui_test_utils::ToggleFullscreenModeAndWait(browser());
-  EXPECT_FALSE(immersive_mode_controller->IsEnabled());
-
-  std::vector<views::View*> children_in_tablet_after_immersive;
-  for (const auto& child : browser_view->children()) {
-    children_in_tablet_after_immersive.push_back(child);
-  }
-
-  // View tree order before and after immersive mode should be the same in
-  // tablet mode.
-  EXPECT_EQ(children_in_tablet, children_in_tablet_after_immersive);
-
-  ExitTabletMode();
-
-  std::vector<views::View*> children_after;
-  for (const auto& child : browser_view->children()) {
-    children_after.push_back(child);
-  }
-
-  // View tree order should be unchanged before and after tablet mode.
-  EXPECT_EQ(children_before, children_after);
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewChromeOSTest,
-                       TabStripParentedToTopContainer) {
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
-  EXPECT_EQ(browser_view->tab_strip_view()->parent(), browser_view);
-
-  EnterTabletMode();
-  EXPECT_EQ(browser_view->tab_strip_view()->parent(),
-            static_cast<views::View*>(browser_view->top_container()));
-
-  ExitTabletMode();
-  EXPECT_EQ(browser_view->tab_strip_view()->parent(), browser_view);
-}
-#endif  // BUILDFLAG(CHROME_OS)
 
 namespace {
 

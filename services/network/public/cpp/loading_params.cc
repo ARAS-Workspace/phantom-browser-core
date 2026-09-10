@@ -29,7 +29,7 @@ static_assert(kDefaultDataPipeAllocationSize >= net::kMaxBytesToSniff,
 }  // namespace
 
 uint32_t GetDataPipeDefaultAllocationSize(DataPipeAllocationSize option) {
-#if BUILDFLAG(IS_CHROMEOS) || defined(ARCH_CPU_32_BITS)
+#if defined(ARCH_CPU_32_BITS)
   // TODO(crbug.com/1306998): ChromeOS experiences a much higher OOM crash
   // rate if the larger data pipe size is used.
   //

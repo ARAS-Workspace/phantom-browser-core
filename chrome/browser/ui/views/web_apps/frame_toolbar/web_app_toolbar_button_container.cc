@@ -42,10 +42,6 @@
 #include "ui/views/layout/flex_layout.h"
 #include "ui/views/window/hit_test_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/experiences/system_web_apps/types/system_web_app_delegate.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
 #endif
@@ -170,14 +166,6 @@ WebAppToolbarButtonContainer::WebAppToolbarButtonContainer(
     views::SetHitTestComponent(uninstall_button_, static_cast<int>(HTCLIENT));
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (app_controller->system_app()) {
-    system_app_accessible_name_ =
-        AddChildView(std::make_unique<SystemAppAccessibleName>(
-            app_controller->GetAppShortName()));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   if (app_controller->AppUsesWindowControlsOverlay() &&
       !base::FeatureList::IsEnabled(
           features::kDesktopPWAsWindowControlsOverlayWithNoToggle)) {
@@ -239,16 +227,6 @@ WebAppToolbarButtonContainer::WebAppToolbarButtonContainer(
                        app_controller->IsIsolatedWebApp())
                           ? ExtensionsToolbarDesktop::DisplayMode::kAutoHide
                           : ExtensionsToolbarDesktop::DisplayMode::kCompact;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Let the system web app decide if it needs to show the extensions container.
-  // Use compact display mode because we do not render the app menu for system
-  // web apps.
-  if (app_controller->system_app()) {
-    create_extensions_container =
-        app_controller->system_app()->ShouldHaveExtensionsContainerInToolbar();
-    display_mode = ExtensionsToolbarDesktop::DisplayMode::kCompact;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (create_extensions_container) {
     // Extensions toolbar area with pinned extensions is lower priority than,
@@ -282,7 +260,6 @@ WebAppToolbarButtonContainer::WebAppToolbarButtonContainer(
   views::SetHitTestComponent(pinned_toolbar_actions_container_,
                              static_cast<int>(HTCLIENT));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   if (app_controller->HasProfileMenuButton()) {
     avatar_button_ = AddChildView(
         std::make_unique<AvatarToolbarButton>(browser_view_->browser()));
@@ -291,7 +268,6 @@ WebAppToolbarButtonContainer::WebAppToolbarButtonContainer(
     views::SetHitTestComponent(avatar_button_, static_cast<int>(HTCLIENT));
     avatar_button_->SetVisible(app_controller->IsProfileMenuButtonVisible());
   }
-#endif
 
   if (app_controller->HasTitlebarMenuButton()) {
     web_app_menu_button_ =

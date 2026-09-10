@@ -638,7 +638,7 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
 }
 
 // Multiple running profiles is not supported on Android or ChromeOS.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
                        SitesInOpenTabsForDifferentProfilesAreNotExempt) {
   WebContents* web_contents = GetActiveWebContents();
@@ -684,6 +684,6 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
   EXPECT_FALSE(GetBtmState(GetBtmService(web_contents), GURL("http://c.test"))
                    .has_value());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace content

@@ -35,20 +35,10 @@ class UnexportableKeyService;
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace account_manager {
-class AccountManagerFacade;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 std::unique_ptr<ProfileOAuth2TokenService> BuildProfileOAuth2TokenService(
     PrefService* pref_service,
     AccountTrackerService* account_tracker_service,
     network::NetworkConnectionTracker* network_connection_tracker,
-#if BUILDFLAG(IS_CHROMEOS)
-    account_manager::AccountManagerFacade* account_manager_facade,
-    bool is_regular_profile,
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
     bool delete_signin_cookies_on_exit,
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)

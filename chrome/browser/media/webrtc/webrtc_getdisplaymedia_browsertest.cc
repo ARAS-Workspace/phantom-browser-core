@@ -63,11 +63,6 @@
 #include "chrome/browser/media/webrtc/system_media_capture_permissions_mac.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/policy/dlp/dlp_content_restriction_set.h"
-#include "chrome/browser/chromeos/policy/dlp/test/dlp_content_manager_test_helper.h"
-#endif
-
 namespace {
 
 using ::base::test::FeatureRef;
@@ -271,7 +266,7 @@ void AdjustCommandLineForZeroCopyCapture(base::CommandLine* command_line) {
   // MSan and GL do not get along so avoid using the GPU with MSan.
   // TODO(crbug.com/40260482): Remove this after fixing feature
   // detection in 0c tab capture path as it'll no longer be needed.
-#if !BUILDFLAG(IS_CHROMEOS) && !defined(MEMORY_SANITIZER)
+#if !defined(MEMORY_SANITIZER)
   command_line->AppendSwitch(switches::kUseGpuInTests);
 #endif
 }
@@ -359,13 +354,8 @@ class WebRtcScreenCaptureBrowserTestWithPicker
                                      ? switches::kThisTabCaptureAutoAccept
                                      : switches::kThisTabCaptureAutoReject);
     } else {
-#if BUILDFLAG(IS_CHROMEOS)
-      command_line->AppendSwitchASCII(switches::kAutoSelectDesktopCaptureSource,
-                                      "Display");
-#else
       command_line->AppendSwitchASCII(switches::kAutoSelectDesktopCaptureSource,
                                       "Entire screen");
-#endif  // BUILDFLAG(IS_CHROMEOS)
     }
   }
 
@@ -416,52 +406,6 @@ IN_PROC_BROWSER_TEST_P(WebRtcScreenCaptureBrowserTestWithPicker,
                      /*expect_success=*/test_config_.accept_this_tab_capture,
                      /*is_tab_capture=*/PreferCurrentTab());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_P(WebRtcScreenCaptureBrowserTestWithPicker,
-                       ScreenCaptureVideoWithDlp) {
-  if (!test_config_.should_prefer_current_tab &&
-      !test_config_.accept_this_tab_capture) {
-    GTEST_SKIP();
-  }
-
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  policy::DlpContentManagerTestHelper helper;
-  content::WebContents* tab = OpenTestPageInNewTab(kMainHtmlPage);
-  RunGetDisplayMedia(tab,
-                     GetConstraints(
-                         /*video=*/true, /*audio=*/false),
-                     /*is_fake_ui=*/false,
-                     /*expect_success=*/test_config_.accept_this_tab_capture,
-                     /*is_tab_capture=*/PreferCurrentTab());
-
-  if (!test_config_.accept_this_tab_capture) {
-    // This test is not relevant for this parameterized test case because it
-    // does not capture the tab/display surface.
-    return;
-  }
-
-  EXPECT_EQ(content::EvalJs(tab->GetPrimaryMainFrame(), "waitVideoUnmuted();"),
-            "unmuted");
-
-  const policy::DlpContentRestrictionSet kScreenShareRestricted(
-      policy::DlpContentRestriction::kScreenShare,
-      policy::DlpRulesManager::Level::kBlock);
-
-  helper.ChangeConfidentiality(tab, kScreenShareRestricted);
-  content::WaitForLoadStop(tab);
-
-  EXPECT_EQ(content::EvalJs(tab->GetPrimaryMainFrame(), "waitVideoMuted();"),
-            "muted");
-
-  const policy::DlpContentRestrictionSet kEmptyRestrictionSet;
-  helper.ChangeConfidentiality(tab, kEmptyRestrictionSet);
-
-  EXPECT_EQ(content::EvalJs(tab->GetPrimaryMainFrame(), "waitVideoUnmuted();"),
-            "unmuted");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // TODO(crbug.com/40744542): Real desktop capture is flaky on below platforms.
 // TODO(crbug.com/41493366): enable this flaky test.
@@ -1178,11 +1122,6 @@ class GetDisplayMediaChangeSourceBrowserTest
   void SetUp() override {
     // TODO(crbug.com/40245399): Fix GetDisplayMediaChangeSourceBrowserTest with
     // audio requested on ChromeOS
-#if BUILDFLAG(IS_CHROMEOS)
-    if (dynamic_surface_switching_requested_ && user_shared_audio_) {
-      GTEST_SKIP();
-    }
-#endif
     WebRtcTestBase::SetUp();
   }
 

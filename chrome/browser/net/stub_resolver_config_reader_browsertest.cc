@@ -33,10 +33,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/net/secure_dns_manager.h"
-#endif
-
 // TODO(ericorth@chromium.org): Consider validating that the expected
 // configuration makes it all the way to the net::HostResolverManager in the
 // network service, rather than just testing StubResolverConfigReader output.
@@ -127,12 +123,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest, ConfigFromPrefs) {
 
   PrefService* pref_service_for_user_settings =
       g_browser_process->local_state();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, the local_state is shared between all users so the user-set
-  // pref is stored in the profile's pref service.
-  pref_service_for_user_settings = browser()->GetProfile()->GetPrefs();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   pref_service_for_user_settings->SetString(prefs::kDnsOverHttpsMode,
                                             SecureDnsConfig::kModeSecure);
@@ -246,18 +236,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
 // ChromeOS includes its own special functionality to set default policies if
 // any policies are set.  This function is not declared and cannot be invoked
 // in non-CrOS builds. Expect these enterprise user defaults to disable DoH.
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest, SpecialPolicies) {
-  // Applies the special ChromeOS defaults to `policy_map_`.
-  policy::SetEnterpriseUsersDefaults(&policy_map_);
-  // Send the PolicyMap to the mock policy provider.
-  policy_provider_.UpdateChromePolicy(policy_map_);
-  SecureDnsConfig secure_dns_config = config_reader_->GetSecureDnsConfiguration(
-      /*force_check_parental_controls_for_automatic_mode=*/false);
-  EXPECT_EQ(secure_dns_config.mode(), net::SecureDnsMode::kOff);
-  EXPECT_THAT(secure_dns_config.doh_servers().servers(), testing::IsEmpty());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
                        DisableDohByPolicy) {

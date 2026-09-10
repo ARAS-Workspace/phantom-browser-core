@@ -70,10 +70,6 @@
 #include "ui/views/view_observer.h"
 #include "ui/views/widget/widget_observer.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/base/hit_test.h"
-#endif
-
 using content::EvalJs;
 using content::ExecJs;
 using ::testing::_;
@@ -439,7 +435,6 @@ IN_PROC_BROWSER_TEST_F(VideoPictureInPictureWindowControllerBrowserTest,
   EXPECT_TRUE(GetOverlayWindow()->AreControlsVisible());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 class PictureInPicturePixelComparisonBrowserTest
     : public VideoPictureInPictureWindowControllerBrowserTest {
  public:
@@ -590,7 +585,6 @@ IN_PROC_BROWSER_TEST_F(PictureInPicturePixelComparisonBrowserTest, VideoPlay) {
   ASSERT_FALSE(expected_image.isNull());
   EXPECT_TRUE(CompareImages(GetResultBitmap(), expected_image));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Tests that when an active WebContents accurately tracks whether a video
 // is in Picture-in-Picture.
@@ -1355,11 +1349,7 @@ IN_PROC_BROWSER_TEST_F(VideoPictureInPictureWindowControllerBrowserTest,
 // checked by closing the window because the test it at a too high level to be
 // able to check the actual media player id being used.
 // TODO(crbug.com/40830975) Fix flakiness on ChromeOS and reenable this test.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_PreloadNoneSrcChangeThenLoad DISABLED_PreloadNoneSrcChangeThenLoad
-#else
 #define MAYBE_PreloadNoneSrcChangeThenLoad PreloadNoneSrcChangeThenLoad
-#endif
 IN_PROC_BROWSER_TEST_F(VideoPictureInPictureWindowControllerBrowserTest,
                        MAYBE_PreloadNoneSrcChangeThenLoad) {
   GURL test_page_url = chrome_test_utils::GetTestUrl(
@@ -1432,108 +1422,6 @@ IN_PROC_BROWSER_TEST_F(VideoPictureInPictureWindowControllerBrowserTest,
   // gracefully.
   DevToolsWindowTesting::CloseDevToolsWindowSync(window);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests that the close and resize controls move properly as the window changes
-// quadrants.
-IN_PROC_BROWSER_TEST_F(VideoPictureInPictureWindowControllerBrowserTest,
-                       MovingQuadrantsMovesCloseAndResizeControls) {
-  GURL test_page_url = chrome_test_utils::GetTestUrl(
-      base::FilePath(base::FilePath::kCurrentDirectory),
-      base::FilePath(kPictureInPictureWindowSizePage));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), test_page_url));
-
-  content::WebContents* active_web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  ASSERT_TRUE(active_web_contents);
-
-  SetUpWindowController(active_web_contents);
-  ASSERT_TRUE(window_controller());
-
-  ASSERT_FALSE(GetOverlayWindow());
-
-  ASSERT_EQ(true, EvalJs(active_web_contents, "enterPictureInPicture();"));
-
-  ASSERT_TRUE(GetOverlayWindow());
-  ASSERT_TRUE(GetOverlayWindow()->IsVisible());
-
-  // The PiP window starts in the bottom-right quadrant of the screen.
-  gfx::Rect bottom_right_bounds = GetOverlayWindow()->GetBounds();
-  // The relative center point of the window.
-  gfx::Point center(bottom_right_bounds.width() / 2,
-                    bottom_right_bounds.height() / 2);
-  gfx::Point close_button_position =
-      GetOverlayWindow()->close_image_position_for_testing();
-  gfx::Point resize_button_position =
-      GetOverlayWindow()->resize_handle_position_for_testing();
-
-  // The close button should be in the top right corner.
-  EXPECT_LT(center.x(), close_button_position.x());
-  EXPECT_GT(center.y(), close_button_position.y());
-  // The resize button should be in the top left corner.
-  EXPECT_GT(center.x(), resize_button_position.x());
-  EXPECT_GT(center.y(), resize_button_position.y());
-  // The resize button hit test should start a top left resizing drag.
-  EXPECT_EQ(HTTOPLEFT, GetOverlayWindow()->GetResizeHTComponent());
-
-  // Move the window to the bottom left corner.
-  gfx::Rect bottom_left_bounds(0, bottom_right_bounds.y(),
-                               bottom_right_bounds.width(),
-                               bottom_right_bounds.height());
-  GetOverlayWindow()->SetBounds(bottom_left_bounds);
-  close_button_position =
-      GetOverlayWindow()->close_image_position_for_testing();
-  resize_button_position =
-      GetOverlayWindow()->resize_handle_position_for_testing();
-
-  // For the updated UI, the close button should not move.
-  EXPECT_LT(center.x(), close_button_position.x());
-  EXPECT_GT(center.y(), close_button_position.y());
-
-  // The resize button should be in the top right corner.
-  EXPECT_LT(center.x(), resize_button_position.x());
-  EXPECT_GT(center.y(), resize_button_position.y());
-  // The resize button hit test should start a top right resizing drag.
-  EXPECT_EQ(HTTOPRIGHT, GetOverlayWindow()->GetResizeHTComponent());
-
-  // Move the window to the top right corner.
-  gfx::Rect top_right_bounds(bottom_right_bounds.x(), 0,
-                             bottom_right_bounds.width(),
-                             bottom_right_bounds.height());
-  GetOverlayWindow()->SetBounds(top_right_bounds);
-  close_button_position =
-      GetOverlayWindow()->close_image_position_for_testing();
-  resize_button_position =
-      GetOverlayWindow()->resize_handle_position_for_testing();
-
-  // The close button should be in the top right corner.
-  EXPECT_LT(center.x(), close_button_position.x());
-  EXPECT_GT(center.y(), close_button_position.y());
-  // The resize button should be in the bottom left corner.
-  EXPECT_GT(center.x(), resize_button_position.x());
-  EXPECT_LT(center.y(), resize_button_position.y());
-  // The resize button hit test should start a bottom left resizing drag.
-  EXPECT_EQ(HTBOTTOMLEFT, GetOverlayWindow()->GetResizeHTComponent());
-
-  // Move the window to the top left corner.
-  gfx::Rect top_left_bounds(0, 0, bottom_right_bounds.width(),
-                            bottom_right_bounds.height());
-  GetOverlayWindow()->SetBounds(top_left_bounds);
-  close_button_position =
-      GetOverlayWindow()->close_image_position_for_testing();
-  resize_button_position =
-      GetOverlayWindow()->resize_handle_position_for_testing();
-
-  // The close button should be in the top right corner.
-  EXPECT_LT(center.x(), close_button_position.x());
-  EXPECT_GT(center.y(), close_button_position.y());
-  // The resize button should be in the bottom right corner.
-  EXPECT_LT(center.x(), resize_button_position.x());
-  EXPECT_LT(center.y(), resize_button_position.y());
-  // The resize button hit test should start a bottom right resizing drag.
-  EXPECT_EQ(HTBOTTOMRIGHT, GetOverlayWindow()->GetResizeHTComponent());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests that the Play/Pause button is displayed appropriately in the
 // Picture-in-Picture window.

@@ -535,7 +535,6 @@ IN_PROC_BROWSER_TEST_F(WallpaperSearchOptimizationGuideInteractiveTest,
 
 // The feedback dialog on Cros happens at the system level, which cannot be
 // easily tested here.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(WallpaperSearchOptimizationGuideInteractiveTest,
                        FeedbackDialogShowsOnThumbsDown) {
   EXPECT_CALL(mock_optimization_guide_keyed_service(),
@@ -563,7 +562,6 @@ IN_PROC_BROWSER_TEST_F(WallpaperSearchOptimizationGuideInteractiveTest,
       // 4. Ensure that the feedback dialog shows.
       InAnyContext(WaitForShow(FeedbackDialog::kFeedbackDialogForTesting)));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(WallpaperSearchOptimizationGuideInteractiveTest,
                        DescriptorErrorCTANavigatesToThemesPage) {

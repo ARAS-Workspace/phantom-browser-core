@@ -210,10 +210,6 @@ GpuTerminationStatus ConvertToGpuTerminationStatus(
       return GpuTerminationStatus::PROCESS_CRASHED;
     case base::TERMINATION_STATUS_STILL_RUNNING:
       return GpuTerminationStatus::STILL_RUNNING;
-#if BUILDFLAG(IS_CHROMEOS)
-    case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
-      return GpuTerminationStatus::PROCESS_WAS_KILLED_BY_OOM;
-#endif
 #if BUILDFLAG(IS_ANDROID)
     case base::TERMINATION_STATUS_OOM_PROTECTED:
       return GpuTerminationStatus::OOM_PROTECTED;
@@ -239,7 +235,7 @@ static const char* const kSwitchNames[] = {
     sandbox::policy::switches::kDisableGpuSandbox,
     sandbox::policy::switches::kDisableLandlockSandbox,
     sandbox::policy::switches::kNoSandbox,
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     switches::kDisableDevShmUsage,
 #endif
     switches::kBackgroundThreadPoolFieldTrial,
@@ -301,11 +297,6 @@ static const char* const kSwitchNames[] = {
     switches::kSkiaGraphiteDawnBackend,
 #if BUILDFLAG(IS_ANDROID)
     switches::kDisableAdpf,
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-    // TODO(crbug.com/371609830): Remove reven switch on experiment end.
-    ash::switches::kRevenBranding,
-    switches::kSchedulerBoostUrgent,
 #endif
 #if BUILDFLAG(USE_V4L2_CODEC)
     switches::kHardwareVideoDecodeFrameRate,
@@ -743,12 +734,6 @@ GpuProcessHost::~GpuProcessHost() {
       case base::TERMINATION_STATUS_STILL_RUNNING:
         message += "hasn't exited yet.";
         break;
-#if BUILDFLAG(IS_CHROMEOS)
-      case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
-        message += "was killed due to out of memory.";
-        unexpected_exit = true;
-        break;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_ANDROID)
       case base::TERMINATION_STATUS_OOM_PROTECTED:
         message += "was protected from out of memory kill.";
@@ -1076,7 +1061,7 @@ bool GpuProcessHost::GpuAccessAllowed() const {
 }
 
 void GpuProcessHost::DisableGpuCompositing() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   DLOG(ERROR) << "Can't disable GPU compositing";
 #else
   // TODO(crbug.com/40565996): The switch from GPU to software compositing
@@ -1147,7 +1132,7 @@ bool GpuProcessHost::LaunchGpuProcess() {
   std::unique_ptr<base::CommandLine> cmd_line =
       std::make_unique<base::CommandLine>(base::CommandLine::NO_PROGRAM);
 #else
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   int child_flags = gpu_launcher.empty() ? ChildProcessHost::CHILD_ALLOW_SELF
                                          : ChildProcessHost::CHILD_NORMAL;
 #elif BUILDFLAG(IS_MAC)
@@ -1273,10 +1258,6 @@ int GpuProcessHost::GetFallbackCrashLimit() const {
     // browser process.
     return 6;
   }
-#elif BUILDFLAG(IS_CHROMEOS)
-  // Chrome OS does not use software compositing and fallback crashes the
-  // browser process. So use larger maximum crash count limit.
-  return 6;
 #else
   // Maximum number of times the GPU process can crash before we try something
   // different, like disabling hardware acceleration or all GL.

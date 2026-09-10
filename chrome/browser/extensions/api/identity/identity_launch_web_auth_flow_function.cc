@@ -22,10 +22,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "net/cookies/cookie_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/extensions/api/identity/launch_web_auth_flow_delegate_ash.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -91,9 +87,6 @@ void RecordHistogramFunctionResult(
 }  // namespace
 
 IdentityLaunchWebAuthFlowFunction::IdentityLaunchWebAuthFlowFunction() {
-#if BUILDFLAG(IS_CHROMEOS)
-  delegate_ = std::make_unique<LaunchWebAuthFlowDelegateAsh>();
-#endif
 }
 
 IdentityLaunchWebAuthFlowFunction::~IdentityLaunchWebAuthFlowFunction() {

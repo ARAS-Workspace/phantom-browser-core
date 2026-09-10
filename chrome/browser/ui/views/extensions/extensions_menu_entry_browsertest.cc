@@ -63,7 +63,7 @@ void ExtensionsMenuEntryViewBrowserTest::SetUpOnMainThread() {
   views::Widget::InitParams init_params(
       views::Widget::InitParams::CLIENT_OWNS_WIDGET,
       views::Widget::InitParams::TYPE_POPUP);
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   init_params.native_widget = CreateNativeWidget(
       NativeWidgetType::kDesktopNativeWidgetAura, &init_params, widget_.get());
 #endif

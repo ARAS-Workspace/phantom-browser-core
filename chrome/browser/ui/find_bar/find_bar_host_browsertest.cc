@@ -527,8 +527,7 @@ IN_PROC_BROWSER_TEST_F(FindInPageControllerTest, SpanSearchable) {
 // TODO(crbug.com/40129326): Test is flaky on Mac debug builds.
 #if BUILDFLAG(IS_MAC) && !defined(NDEBUG)
 #define MAYBE_LargePage DISABLED_LargePage
-#elif (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-    (!defined(NDEBUG) || defined(ADDRESS_SANITIZER))
+#elif BUILDFLAG(IS_LINUX) && (!defined(NDEBUG) || defined(ADDRESS_SANITIZER))
 // TODO(crbug.com/404825193): Test is flaky on Linux ChromiumOS debug and ASAN
 // builds.
 // TODO(crbug.com/40751034): Test is flaky on Linux debug builds.
@@ -551,7 +550,7 @@ IN_PROC_BROWSER_TEST_F(FindInPageControllerTest, MAYBE_LargePage) {
 // TODO(crbug.com/40700976): Test is flaky on Mac debug builds and Linux asan.
 #if (BUILDFLAG(IS_MAC) && !defined(NDEBUG)) || defined(ADDRESS_SANITIZER)
 #define MAYBE_FindLongString DISABLED_FindLongString
-#elif (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && !defined(NDEBUG)
+#elif BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 // TODO(crbug.com/404825193): Test is flaky on Linux ChromiumOS debug builds.
 // TODO(crbug.com/40751034): Test is flaky on Linux debug builds.
 #define MAYBE_FindLongString DISABLED_FindLongString
@@ -587,7 +586,7 @@ IN_PROC_BROWSER_TEST_F(FindInPageControllerTest, BigString) {
 
 // Search Back and Forward on a single occurrence.
 // TODO(crbug.com/40714133): Test is flaky on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_SingleOccurrence DISABLED_SingleOccurrence
 #else
 #define MAYBE_SingleOccurrence SingleOccurrence

@@ -79,12 +79,6 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/icon_standardizer.h"
-#include "chromeos/ash/experiences/system_web_apps/types/system_web_app_delegate.h"
-#include "chromeos/ui/base/chromeos_ui_constants.h"
-#endif
-
 namespace {
 
 SkColor GetAltColor(SkColor color) {
@@ -129,21 +123,6 @@ bool AppBrowserController::IsIsolatedWebApp(
     const BrowserWindowInterface* browser) {
   return IsWebApp(browser) && From(browser)->IsIsolatedWebApp();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-const ash::SystemWebAppDelegate* GetSystemWebAppDelegate(
-    const BrowserWindowInterface* browser) {
-  auto* app_controller =
-      browser ? AppBrowserController::From(browser) : nullptr;
-  return app_controller ? app_controller->system_app() : nullptr;
-}
-
-std::optional<ash::SystemWebAppType> GetSystemWebAppType(
-    const BrowserWindowInterface* browser) {
-  auto* swa_delegate = GetSystemWebAppDelegate(browser);
-  return swa_delegate ? std::optional(swa_delegate->GetType()) : std::nullopt;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // static
 bool AppBrowserController::IsForWebApp(const BrowserWindowInterface* browser,
@@ -395,43 +374,19 @@ bool AppBrowserController::has_tab_strip() const {
 }
 
 bool AppBrowserController::HasTitlebarMenuButton() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Hide for system apps.
-  return !system_app();
-#else
   return true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 bool AppBrowserController::HasTitlebarAppOriginText() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not show origin text for System Apps.
-  if (system_app()) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return true;
 }
 
 bool AppBrowserController::HasTitlebarContentSettings() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not show content settings for System Apps.
-  return !system_app();
-#else
   return true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 std::vector<actions::ActionId> AppBrowserController::GetTitleBarPageActions()
     const {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (system_app()) {
-    return {
-        kActionFind,
-        kActionShowZoomBubble,
-    };
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   std::vector<actions::ActionId> types_enabled = {
       kActionFind,
@@ -454,11 +409,6 @@ std::vector<actions::ActionId> AppBrowserController::GetTitleBarPageActions()
 
 std::vector<PageActionIconType>
 AppBrowserController::GetTitleBarPageActionTypes() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (system_app()) {
-    return {PageActionIconType::kFind};
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   std::vector<PageActionIconType> types_enabled;
   types_enabled.push_back(PageActionIconType::kFind);
@@ -549,20 +499,12 @@ bool AppBrowserController::IsWindowCaptureHandleAllowed() const {
   return false;
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 bool AppBrowserController::HasProfileMenuButton() const {
   return false;
 }
 bool AppBrowserController::IsProfileMenuButtonVisible() const {
   return false;
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-const ash::SystemWebAppDelegate* AppBrowserController::system_app() const {
-  return nullptr;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 std::u16string AppBrowserController::GetLaunchFlashText() const {
   // Isolated Web Apps should show the app's name instead of the origin.
@@ -685,12 +627,6 @@ std::u16string AppBrowserController::GetTitle() const {
 }
 
 std::string AppBrowserController::GetTitleForMediaControls() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Only return the app name if we're a System Web App.
-  if (system_app()) {
-    return base::UTF16ToUTF8(GetAppShortName());
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return std::string();
 }
 
@@ -767,7 +703,6 @@ void AppBrowserController::AddColorMixers(
     ui::ColorProvider* provider,
     const ui::ColorProviderKey& key) const {
   constexpr SkAlpha kSeparatorOpacity = 0.15f * 255.0f;
-#if !BUILDFLAG(IS_CHROMEOS)
   // This color is the same as the default active frame color.
   const std::optional<SkColor> theme_color = GetThemeColor();
   ui::ColorTransform default_background =
@@ -776,7 +711,6 @@ void AppBrowserController::AddColorMixers(
           : ui::HSLShift(ui::kColorFrameActiveUnthemed,
                          ThemeProperties::GetDefaultTint(
                              ThemeProperties::TINT_FRAME, true));
-#endif
   ui::ColorMixer& mixer = provider->AddMixer();
   std::optional<SkColor> bg_color = GetBackgroundColor();
   // TODO(kylixrd): The definition of kColorPwaBackground isn't fully fleshed
@@ -798,13 +732,8 @@ void AppBrowserController::AddColorMixers(
       separator_color, kColorPwaToolbarBackground, kSeparatorOpacity);
   mixer[kColorPwaTabBarTopSeparator] =
       ui::AlphaBlend(separator_color, kColorPwaTheme, kSeparatorOpacity);
-#if BUILDFLAG(IS_CHROMEOS)
-  // Ash system frames differ from ChromeOS browser frames.
-  mixer[kColorPwaTheme] = {chromeos::kDefaultFrameColor};
-#else
   mixer[kColorPwaTheme] = theme_color ? ui::ColorTransform(theme_color.value())
                                       : default_background;
-#endif
   mixer[kColorPwaToolbarBackground] = {ui::kColorEndpointBackground};
   mixer[kColorPwaToolbarButtonIcon] =
       ui::DeriveDefaultIconColor(ui::kColorEndpointForeground);
@@ -925,12 +854,7 @@ ui::ImageModel AppBrowserController::GetFallbackAppIcon() const {
                                  ->GetCurrentPageIcon()
                                  .AsImageSkia();
   if (!page_icon.isNull()) {
-#if BUILDFLAG(IS_CHROMEOS)
-    return ui::ImageModel::FromImageSkia(
-        apps::CreateStandardIconImage(page_icon));
-#else
     return ui::ImageModel::FromImageSkia(page_icon);
-#endif
   }
 
   // The icon may be loading still. Return a transparent icon rather
@@ -994,15 +918,6 @@ void AppBrowserController::UpdateThemePack() {
   last_background_color_ = background_color;
 
   bool ignore_custom_colors = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Some system web apps use the system theme color, and should not update
-  // the theme pack here. Otherwise the colorIds for the window caption bar will
-  // be remapped through `BrowserThemePack::BuildFromColors`, and colors will be
-  // resolved differently than the colors set in the function `AddUiColorMixer`.
-  if (system_app() && system_app()->UseSystemThemeColor()) {
-    ignore_custom_colors = true;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   bool no_custom_colors = !theme_color && !background_color;
   bool non_tabbed_no_frame_color = !has_tab_strip_ && !theme_color;

@@ -731,7 +731,7 @@ TEST_F(DownloadPathReservationTrackerTest, UpdatesToTargetPath) {
 
 // Tests for long name truncation. On other platforms automatic truncation
 // is not performed (yet).
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE)
 
 TEST_F(DownloadPathReservationTrackerTest, BasicTruncation) {
   int real_max_length =

@@ -2145,7 +2145,7 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForDawn() {
   }
   NOTREACHED();
 
-#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
   scoped_refptr<gl::Presenter> presenter = dependency_->CreatePresenter();
   presenter_ = presenter.get();
 
@@ -2160,11 +2160,7 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForDawn() {
 #elif BUILDFLAG(IS_MAC)
   presenter_->SetVSyncDisplayID(renderer_settings_.display_id,
                                 /*force_update=*/false);
-#elif BUILDFLAG(IS_CHROMEOS)
-  if (!presenter_) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   output_device_ = std::make_unique<SkiaOutputDeviceBufferQueue>(
       std::make_unique<OutputPresenterGL>(std::move(presenter), dependency_),
@@ -2173,8 +2169,7 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForDawn() {
       GetReleaseOverlaysCallback());
   return true;
 
-#else  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) ||
-       // BUILDFLAG(IS_CHROMEOS)
+#else  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
   NOTREACHED();
 #endif
 #else   // BUILDFLAG(SKIA_USE_DAWN)
@@ -2676,67 +2671,6 @@ void SkiaOutputSurfaceImplOnGpu::CheckAsyncWorkCompletion() {
   }
 }
 
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-void SkiaOutputSurfaceImplOnGpu::DetileOverlay(
-    gpu::Mailbox input,
-    const gfx::Size& input_visible_size,
-    gpu::Mailbox output,
-    const gfx::RectF& display_rect,
-    const gfx::RectF& crop_rect,
-    gfx::OverlayTransform transform,
-    bool is_10bit) {
-  // TODO(greenjustin): Ideally we wouldn't have to recreate the entire
-  // VulkanOverlayAdaptor when we change from MM21 to MT2T, since only the
-  // shaders really need swapped out.
-  if (!vulkan_overlay_adaptor_ ||
-      (is_10bit && vulkan_overlay_adaptor_->GetTileFormat() == media::kMM21) ||
-      (!is_10bit && vulkan_overlay_adaptor_->GetTileFormat() == media::kMT2T)) {
-    vulkan_overlay_adaptor_ = media::VulkanOverlayAdaptor::Create(
-        true, is_10bit ? media::kMT2T : media::kMM21);
-  }
-
-  // Note that we don't want to get the device queue from the
-  // VulkanContextProvider because we actually need a special protected device
-  // queue.
-  auto input_representation =
-      shared_image_representation_factory_->ProduceVulkan(
-          input, vulkan_overlay_adaptor_->GetVulkanDeviceQueue(),
-          vulkan_overlay_adaptor_->GetVulkanImplementation(),
-          /*needs_detiling=*/true);
-  auto output_representation =
-      shared_image_representation_factory_->ProduceVulkan(
-          output, vulkan_overlay_adaptor_->GetVulkanDeviceQueue(),
-          vulkan_overlay_adaptor_->GetVulkanImplementation(),
-          /*needs_detiling=*/true);
-
-  if (!input_representation || !output_representation) {
-    LOG(ERROR) << "Error creating Vulkan representations for detiling.";
-    return;
-  }
-
-  {
-    std::vector<VkSemaphore> begin_semaphores;
-    std::vector<VkSemaphore> end_semaphores;
-    auto input_access = input_representation->BeginScopedAccess(
-        gpu::RepresentationAccessMode::kRead, begin_semaphores, end_semaphores);
-    auto output_access = output_representation->BeginScopedAccess(
-        gpu::RepresentationAccessMode::kWrite, begin_semaphores,
-        end_semaphores);
-
-    vulkan_overlay_adaptor_->Process(
-        input_access->GetVulkanImage(), input_visible_size,
-        output_access->GetVulkanImage(), display_rect, crop_rect, transform,
-        begin_semaphores, end_semaphores);
-  }
-
-  output_representation->SetCleared();
-}
-
-void SkiaOutputSurfaceImplOnGpu::CleanupImageProcessor() {
-  vulkan_overlay_adaptor_ = nullptr;
-}
-#endif
 
 void SkiaOutputSurfaceImplOnGpu::ReadbackForTesting(
     CopyOutputRequest::CopyOutputRequestCallback result_callback) {

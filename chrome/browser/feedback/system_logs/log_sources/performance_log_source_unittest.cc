@@ -41,7 +41,6 @@ namespace {
 
 constexpr char kMemorySaverModeActiveKey[] = "high_efficiency_mode_active";
 
-#if !BUILDFLAG(IS_CHROMEOS)
 constexpr char kBatterySaverModeStateKey[] = "battery_saver_state";
 constexpr char kBatterySaverModeActiveKey[] = "battery_saver_mode_active";
 constexpr char kBatterySaverModeDisabledForSessionKey[] =
@@ -49,7 +48,6 @@ constexpr char kBatterySaverModeDisabledForSessionKey[] =
 constexpr char kHasBatteryKey[] = "device_has_battery";
 constexpr char kUsingBatteryPowerKey[] = "device_using_battery_power";
 constexpr char kBatteryPercentage[] = "device_battery_percentage";
-#endif
 
 class PerformanceLogSourceTest : public testing::Test {
  public:
@@ -128,7 +126,6 @@ TEST_F(PerformanceLogSourceTest, CheckMemorySaverModeLogs) {
   EXPECT_EQ("false", response->at(kMemorySaverModeActiveKey));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Battery and battery saver logs are not used on ChromeOS.
 TEST_F(PerformanceLogSourceTest, CheckBatterySaverModeLogs) {
   SetBatterySaverModeEnabled(true);
@@ -170,6 +167,5 @@ TEST_F(PerformanceLogSourceTest, CheckBatteryDetailLogs) {
   EXPECT_EQ("false", response->at(kUsingBatteryPowerKey));
   EXPECT_EQ("100", response->at(kBatteryPercentage));
 }
-#endif
 
 }  // namespace

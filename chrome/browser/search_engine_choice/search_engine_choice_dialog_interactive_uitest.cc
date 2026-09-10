@@ -183,9 +183,7 @@ class SearchEngineChoiceDialogInteractiveUiTest
 };
 
 // TODO(crbug.com/431780231): Flaky on mac bots and chromeOS bots.
-#if BUILDFLAG(IS_MAC) ||       \
-    (BUILDFLAG(IS_CHROMEOS) && \
-     (defined(ADDRESS_SANITIZER) || defined(LEAK_SANITIZER)))
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_ChooseSearchEngine DISABLED_ChooseSearchEngine
 #else
 #define MAYBE_ChooseSearchEngine ChooseSearchEngine

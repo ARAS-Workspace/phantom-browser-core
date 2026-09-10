@@ -164,11 +164,6 @@ void ReportPrintSettingsStats(const base::DictValue& print_settings,
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (print_settings.FindString(kSettingPinValue)) {
-    ReportPrintSettingHistogram(PrintSettingsBuckets::kPin);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void ReportUserActionHistogram(UserActionBuckets event) {

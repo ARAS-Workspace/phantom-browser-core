@@ -174,29 +174,11 @@ bool PrefixSelector::ShouldDoLearning() {
   return false;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 bool PrefixSelector::SetCompositionFromExistingText(
     const gfx::Range& range,
     const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) {
   // TODO(crbug.com/40623107): Implement this method.
-  NOTIMPLEMENTED_LOG_ONCE();
-  return false;
-}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-gfx::Range PrefixSelector::GetAutocorrectRange() const {
-  NOTIMPLEMENTED_LOG_ONCE();
-  return gfx::Range();
-}
-
-gfx::Rect PrefixSelector::GetAutocorrectCharacterBounds() const {
-  NOTIMPLEMENTED_LOG_ONCE();
-  return gfx::Rect();
-}
-
-bool PrefixSelector::SetAutocorrectRange(const gfx::Range& range) {
-  // TODO(crbug.com/40134032): Implement SetAutocorrectRange.
   NOTIMPLEMENTED_LOG_ONCE();
   return false;
 }

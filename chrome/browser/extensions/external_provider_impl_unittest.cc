@@ -47,15 +47,7 @@
 #include "net/test/embedded_test_server/http_request.h"
 #include "net/test/embedded_test_server/http_response.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/customization/customization_document.h"
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#include "chromeos/ash/components/system/statistics_provider.h"
-#include "components/user_manager/scoped_user_manager.h"
-#else
 #include "chrome/browser/extensions/preinstalled_extensions.h"
-#endif
 
 namespace extensions {
 
@@ -104,10 +96,6 @@ class ExternalProviderImplTest : public ExtensionServiceTestBase {
   }
 
   void InitService(bool autoupdate_enabled) {
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager::ScopedUserManager scoped_user_manager(
-        std::make_unique<ash::FakeChromeUserManager>());
-#endif
     InitializeExtensionServiceWithUpdaterAndPrefs(autoupdate_enabled);
 
     extension_updater()->SetExtensionCacheForTesting(
@@ -245,12 +233,6 @@ class ExternalProviderImplTest : public ExtensionServiceTestBase {
   std::unique_ptr<base::ScopedPathOverride> external_externsions_overrides_;
   std::unique_ptr<ExtensionCacheFake> test_extension_cache_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // chromeos::ServicesCustomizationExternalLoader is hooked up as an
-  // ExternalLoader and depends on a functioning StatisticsProvider.
-  ash::system::ScopedFakeStatisticsProvider fake_statistics_provider_;
-#endif
-
 };
 
 }  // namespace
@@ -268,7 +250,6 @@ TEST_F(ExternalProviderImplTest, InAppPayments) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(ExternalProviderImplTest, DocsOfflineExtensionIsDefaultInstalled) {
   // No need to test the actual auto update, that's tested above and below.
   // Also, we don't have a dummy test CRX for Docs Offline like we do for
@@ -301,7 +282,6 @@ TEST_F(ExternalProviderImplTest, DocsOfflineExtensionIsNotReinstalled) {
   auto* manager = PendingExtensionManager::Get(profile());
   EXPECT_FALSE(manager->IsIdPending(extension_misc::kDocsOfflineExtensionId));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(ExternalProviderImplTest, BlockedExternalUserProviders) {
   OverrideExternalExtensionsPath();

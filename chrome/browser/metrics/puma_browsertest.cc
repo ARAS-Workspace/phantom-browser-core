@@ -209,9 +209,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, VerifyRcCoarseSystemProfile) {
 #elif BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(rc_profile.platform(),
             ::private_metrics::Platform::PLATFORM_ANDROID);
-#elif BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(rc_profile.platform(),
-            ::private_metrics::Platform::PLATFORM_CHROMEOS);
 #else
   EXPECT_EQ(rc_profile.platform(), ::private_metrics::Platform::PLATFORM_OTHER);
 #endif

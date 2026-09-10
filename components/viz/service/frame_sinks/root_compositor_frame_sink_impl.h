@@ -95,10 +95,10 @@ class VIZ_SERVICE_EXPORT RootCompositorFrameSinkImpl
   void PreserveChildSurfaceControls() override;
   void SetSwapCompletionCallbackEnabled(bool enable) override;
 #endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   void SetSupportedRefreshRates(
       const std::vector<float>& supported_refresh_rates) override;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
   void AddVSyncParameterObserver(
       mojo::PendingRemote<mojom::VSyncParameterObserver> observer) override;
   void SetDelegatedInkPointRenderer(

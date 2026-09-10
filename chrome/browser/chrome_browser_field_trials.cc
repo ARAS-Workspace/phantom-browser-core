@@ -55,11 +55,6 @@
 #include "ui/gl/gl_switches.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/common/channel_info.h"
-#include "chromeos/ash/services/multidevice_setup/public/cpp/first_run_field_trial.h"
-#endif
-
 ChromeBrowserFieldTrials::ChromeBrowserFieldTrials(PrefService* local_state)
     : local_state_(local_state) {
   DCHECK(local_state_);
@@ -84,11 +79,6 @@ void ChromeBrowserFieldTrials::SetUpClientSideFieldTrials(
   metrics::CreateFallbackUkmSamplingTrialIfNeeded(
       entropy_providers.default_entropy(), feature_list);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!has_seed) {
-    ash::multidevice_setup::CreateFirstRunFieldTrial(feature_list);
-  }
-#endif
 }
 
 void ChromeBrowserFieldTrials::RegisterSyntheticTrials() {

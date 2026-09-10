@@ -720,13 +720,8 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
   EXPECT_EQ(1, user_action_tester.GetActionCount(
                    "ResponsiveToolbar.OverflowButtonHidden"));
 }
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_StartBrowserWithWidthSmallerThanThreshold \
-  DISABLED_StartBrowserWithWidthSmallerThanThreshold
-#else
 #define MAYBE_StartBrowserWithWidthSmallerThanThreshold \
   StartBrowserWithWidthSmallerThanThreshold
-#endif
 IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                        MAYBE_StartBrowserWithWidthSmallerThanThreshold) {
   const auto threshold = overflow_threshold_width();

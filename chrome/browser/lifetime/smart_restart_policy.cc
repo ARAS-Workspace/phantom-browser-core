@@ -88,11 +88,9 @@ ExtendedExecutionOutcome SmartRestartPolicy::CanLockScreenRestartProceed(
     return ExtendedExecutionOutcome::kBlockedByPolicy;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   if (ProfilePicker::IsOpen()) {
     return ExtendedExecutionOutcome::kBlockedByPolicy;
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_MAC)
   if (app_controller_mac::IsOpeningNewWindow()) {

@@ -547,14 +547,6 @@ void TrackerImpl::UnregisterPriorityNotificationHandler(
   priority_notification_handlers_.erase(feature.name);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void TrackerImpl::UpdateConfig(const base::Feature& feature,
-                               const ConfigurationProvider* provider) {
-  CHECK(IsInitialized());
-  configuration_->UpdateConfig(feature, provider);
-}
-#endif
-
 const Configuration* TrackerImpl::GetConfiguration() const {
   return configuration_.get();
 }

@@ -345,7 +345,6 @@ TEST_F(GCMAccountTrackerTest, AccountRemoved) {
   VerifyAccountTokens(expected_accounts, driver()->accounts());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Tests that clearing the primary account when having multiple accounts
 // does not crash the application.
 // Regression test for crbug.com/1234406
@@ -366,7 +365,6 @@ TEST_F(GCMAccountTrackerTest, AccountRemovedWithoutSyncConsentNoCrash) {
   ClearPrimaryAccount();
   EXPECT_TRUE(driver()->update_accounts_called());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(GCMAccountTrackerTest, GetTokenFailed) {
   CoreAccountInfo account1 = SetPrimaryAccount(kEmail1);

@@ -78,15 +78,6 @@
 #include "ui/views/window/frame_view.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/window_properties.h"  // nogncheck
-#include "chromeos/ui/base/app_types.h"
-#include "chromeos/ui/base/chromeos_ui_constants.h"
-#include "chromeos/ui/base/window_properties.h"
-#include "ui/aura/client/aura_constants.h"
-#include "ui/aura/window.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/views/overlay/video_overlay_window_native_widget_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -232,15 +223,6 @@ class OverlayWindowFrameView : public views::FrameView {
       return window_component;
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // If the resize handle is clicked on, we want to force the hit test to
-    // force a resize drag.
-    if (window->AreControlsVisible() &&
-        window->GetResizeHandleControlsBounds().Contains(point)) {
-      return window->GetResizeHTComponent();
-    }
-#endif
-
     // If the live caption dialog is open, then we'll want to capture all mouse
     // clicks within the window so we can use them to close the dialog when the
     // user clicks outside of it.
@@ -251,21 +233,6 @@ class OverlayWindowFrameView : public views::FrameView {
     // Allows for dragging and resizing the window.
     return (window_component == HTNOWHERE) ? HTCAPTION : window_component;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  void UpdateWindowRoundedCorners() override {
-    // The first call to  occurs in `UpdateWindowRoundedCorners()`. However, the
-    // layer is initialized after the widget is initialized, hence the null
-    // check.
-    ui::Layer* root_view_layer = GetWidget()->GetRootView()->layer();
-    if (root_view_layer) {
-      const gfx::RoundedCornersF window_radii(
-          chromeos::kPipRoundedCornerRadius);
-
-      root_view_layer->SetRoundedCornerRadius(window_radii);
-      root_view_layer->SetIsFastRoundedCorner(true);
-    }
-  }
-#endif
 
   // views::ViewTargeterDelegate:
   bool DoesIntersectRect(const View* target,
@@ -343,13 +310,6 @@ std::unique_ptr<VideoOverlayWindowViews> VideoOverlayWindowViews::Create(
   params.native_widget =
       new VideoOverlayWindowNativeWidgetMac(overlay_window.get());
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  params.init_properties_container.SetProperty(chromeos::kAppTypeKey,
-                                               chromeos::AppType::BROWSER);
-  params.rounded_corners =
-      gfx::RoundedCornersF(chromeos::kPipRoundedCornerRadius);
-#endif
 
   overlay_window->Init(std::move(params));
   overlay_window->OnRootViewReady();
@@ -522,14 +482,6 @@ void VideoOverlayWindowViews::OnNativeWidgetMove() {
   // Update the maximum size of the widget in case we have moved to another
   // window.
   UpdateMaxSize(GetWorkAreaForWindow());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Update the positioning of some icons when the window is moved.
-  WindowQuadrant quadrant =
-      GetCurrentWindowQuadrant(GetBounds(), GetController());
-
-  UpdateResizeHandleBounds(quadrant);
-#endif
 
   views::Widget::OnNativeWidgetMove();
 }
@@ -1212,11 +1164,6 @@ void VideoOverlayWindowViews::SetUpViews() {
     toggle_mute_button->SetSize(kActionButtonSize);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  auto resize_handle_view =
-      std::make_unique<ResizeHandleButton>(views::Button::PressedCallback());
-#endif
-
   // view::View that holds the video. -----------------------------------------
   video_view->SetPaintToLayer(ui::LAYER_SURFACE);
   video_view->layer()->SetMasksToBounds(true);
@@ -1326,18 +1273,9 @@ void VideoOverlayWindowViews::SetUpViews() {
         std::move(toggle_mute_button));
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  resize_handle_view_ =
-      controls_container_view_->AddChildView(std::move(resize_handle_view));
-#endif
 }
 
 void VideoOverlayWindowViews::OnRootViewReady() {
-#if BUILDFLAG(IS_CHROMEOS)
-  GetNativeWindow()->SetProperty(ash::kWindowPipTypeKey, true);
-  highlight_border_overlay_ =
-      std::make_unique<HighlightBorderOverlay>(this, nullptr);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   GetRootView()->SetPaintToLayer(ui::LAYER_TEXTURED);
   GetRootView()->layer()->SetName("RootView");
@@ -1422,10 +1360,6 @@ void VideoOverlayWindowViews::OnUpdateControlsBounds() {
 
   WindowQuadrant quadrant = GetCurrentWindowQuadrant(GetBounds(), controller_);
   close_controls_view_->SetPosition(GetBounds().size(), quadrant);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  UpdateResizeHandleBounds(quadrant);
-#endif
 
   constexpr int kTopControlsHeight = 34;
   constexpr int kBottomControlsHeight = 64;
@@ -1635,16 +1569,6 @@ void VideoOverlayWindowViews::OnUpdateControlsBounds() {
                                          !is_live_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void VideoOverlayWindowViews::UpdateResizeHandleBounds(
-    WindowQuadrant quadrant) {
-  resize_handle_view_->SetPosition(GetBounds().size(), quadrant);
-  GetNativeWindow()->SetProperty(
-      ash::kWindowPipResizeHandleBoundsKey,
-      new gfx::Rect(GetResizeHandleControlsBounds()));
-}
-#endif
-
 bool VideoOverlayWindowViews::IsActive() const {
   return views::Widget::IsActive();
 }
@@ -1667,9 +1591,6 @@ void VideoOverlayWindowViews::ShowInactive() {
       this, PictureInPictureWidgetFadeAnimator::WidgetShowType::kShowInactive);
 
   views::Widget::SetVisibleOnAllWorkspaces(true);
-#if BUILDFLAG(IS_CHROMEOS)
-  non_client_view()->frame_view()->UpdateWindowRoundedCorners();
-#endif
 
   // If there is an existing overlay view, remove it now.
   RemoveOverlayViewIfExists();
@@ -1996,12 +1917,6 @@ gfx::Rect VideoOverlayWindowViews::GetMinimizeControlsBounds() {
   return minimize_button_->GetMirroredBounds();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-gfx::Rect VideoOverlayWindowViews::GetResizeHandleControlsBounds() {
-  return resize_handle_view_->GetMirroredBounds();
-}
-#endif
-
 gfx::Rect VideoOverlayWindowViews::GetPlayPauseControlsBounds() {
   return play_pause_controls_view_->GetMirroredBounds();
 }
@@ -2096,12 +2011,6 @@ bool VideoOverlayWindowViews::IsTrustedForMediaPlayback() const {
 
   return HasHighMediaEngagement(origin);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-int VideoOverlayWindowViews::GetResizeHTComponent() const {
-  return resize_handle_view_->GetHTComponent();
-}
-#endif
 
 void VideoOverlayWindowViews::TogglePlayPause() {
   // Retrieve expected active state based on what command was sent in
@@ -2227,12 +2136,6 @@ VideoOverlayWindowViews::back_to_tab_button_for_testing() const {
 gfx::Point VideoOverlayWindowViews::close_image_position_for_testing() const {
   return close_controls_view_->origin();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-gfx::Point VideoOverlayWindowViews::resize_handle_position_for_testing() const {
-  return resize_handle_view_->origin();
-}
-#endif
 
 VideoOverlayWindowViews::PlaybackState
 VideoOverlayWindowViews::playback_state_for_testing() const {

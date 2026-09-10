@@ -10,11 +10,6 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/command_line.h"
-#include "base/test/scoped_chromeos_version_info.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace syncer {
 namespace {
 
@@ -24,28 +19,6 @@ TEST(GetClientNameTest, GetPersonalizableDeviceNameBlocking) {
   const std::string& client_name = GetPersonalizableDeviceNameBlocking();
   EXPECT_FALSE(client_name.empty());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Call GetPersonalizableDeviceNameBlocking on ChromeOS where the
-// board type is CHROMEBOOK and make sure the return value is "Chromebook".
-TEST(GetClientNameTest, GetPersonalizableDeviceNameBlockingChromebook) {
-  const char* kLsbRelease = "DEVICETYPE=CHROMEBOOK\n";
-  base::test::ScopedChromeOSVersionInfo version(kLsbRelease, base::Time());
-  const std::string& client_name = GetPersonalizableDeviceNameBlocking();
-  EXPECT_EQ("Chromebook", client_name);
-}
-
-// Call GetPersonalizableDeviceNameBlocking on ChromeOS where the
-// board type is a CHROMEBOX and make sure the return value is "Chromebox".
-TEST(GetClientNameTest, GetPersonalizableDeviceNameBlockingChromebox) {
-  const char* kLsbRelease = "DEVICETYPE=CHROMEBOX\n";
-  base::test::ScopedChromeOSVersionInfo version(kLsbRelease, base::Time());
-  const std::string& client_name = GetPersonalizableDeviceNameBlocking();
-  EXPECT_EQ("Chromebox", client_name);
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 }  // namespace syncer

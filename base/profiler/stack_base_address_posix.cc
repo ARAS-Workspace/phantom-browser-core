@@ -18,10 +18,6 @@
 #include "base/files/scoped_file.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-extern "C" void* __libc_stack_end;
-#endif
-
 namespace base {
 
 namespace {
@@ -95,10 +91,6 @@ std::optional<uintptr_t> GetThreadStackBaseAddress(PlatformThreadId id,
     static const std::optional<uintptr_t> main_thread_base_address =
         GetAndroidMainThreadStackBaseAddressImpl();
     return main_thread_base_address;
-#elif BUILDFLAG(IS_CHROMEOS)
-    // Similarly, the sandbox will prevent pthread_getattr_np() from working
-    // on the main thread in ChromeOS. Here, we have a simpler solution.
-    return reinterpret_cast<uintptr_t>(__libc_stack_end);
 #endif
   }
   return GetThreadStackBaseAddressImpl(pthread_id);

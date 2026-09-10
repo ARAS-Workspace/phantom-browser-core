@@ -30,10 +30,6 @@
 #include "device/bluetooth/bluetooth_export.h"
 #include "device/bluetooth/bluetooth_local_gatt_service.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/bluetooth/bluetooth_low_energy_scan_session.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace base {
 class SingleThreadTaskRunner;
 }  // namespace base
@@ -43,9 +39,6 @@ namespace device {
 class BluetoothAdvertisement;
 class BluetoothDiscoveryFilter;
 class BluetoothDiscoverySession;
-#if BUILDFLAG(IS_CHROMEOS)
-class BluetoothLowEnergyScanFilter;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 class BluetoothRemoteGattCharacteristic;
 class BluetoothRemoteGattDescriptor;
 class BluetoothRemoteGattService;
@@ -62,14 +55,6 @@ enum class UMABluetoothDiscoverySessionOutcome;
 class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
     : public base::RefCounted<BluetoothAdapter> {
  public:
-#if BUILDFLAG(IS_CHROMEOS)
-  enum class LowEnergyScanSessionHardwareOffloadingStatus {
-    kUndetermined = 0,
-    kNotSupported,
-    kSupported
-  };
-  enum class BluetoothRole { kCentral = 0, kPeripheral, kCentralPeripheral };
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Interface for observing changes from bluetooth adapters.
   class DEVICE_BLUETOOTH_EXPORT Observer {
@@ -161,15 +146,7 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
         const BluetoothDevice::ServiceDataMap& service_data_map,
         const BluetoothDevice::ManufacturerDataMap& manufacturer_data_map) {}
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Called when the bonded property of the device |device| known to the
-    // adapter |adapter| changed.
-    virtual void DeviceBondedChanged(BluetoothAdapter* adapter,
-                                     BluetoothDevice* device,
-                                     bool new_bonded_status) {}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     // Called when the paired property of the device |device| known to the
     // adapter |adapter| changed.
     virtual void DevicePairedChanged(BluetoothAdapter* adapter,
@@ -208,7 +185,7 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
                                               bool new_blocked_status) {}
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     // Called when the device battery info with |type| has been updated.
     virtual void DeviceBatteryChanged(BluetoothAdapter* adapter,
                                       BluetoothDevice* device,
@@ -271,12 +248,6 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
     virtual void GattDiscoveryCompleteForService(
         BluetoothAdapter* adapter,
         BluetoothRemoteGattService* service) {}
-
-#if BUILDFLAG(IS_CHROMEOS)
-    // Called when the GATT service on the peer side indicates that something is
-    // changed on their side, so we need to start re-discovery everything.
-    virtual void GattNeedsDiscovery(BluetoothDevice* device) {}
-#endif
 
     // See "Deprecated GATT Added/Removed Events NOTE" above.
     //
@@ -344,12 +315,6 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
         BluetoothRemoteGattDescriptor* descriptor,
         const std::vector<uint8_t>& value) {}
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Called when the low energy scanning hardware offloading support state
-    // changes.
-    virtual void LowEnergyScanSessionHardwareOffloadingStatusChanged(
-        LowEnergyScanSessionHardwareOffloadingStatus status) {}
-#endif  // BUILDFLAG(IS_CHROMEOS)
   };
 
   // Used to configure a listening service.
@@ -423,7 +388,7 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
   // Returns a weak pointer to an existing adapter for testing purposes only.
   base::WeakPtr<BluetoothAdapter> GetWeakPtrForTesting();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Shutdown the adapter: tear down and clean up all objects owned by
   // BluetoothAdapter. After this call, the BluetoothAdapter will behave as if
   // no Bluetooth controller exists in the local system. |IsPresent| will return
@@ -517,7 +482,7 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
                                base::OnceClosure callback,
                                ErrorCallback error_callback) = 0;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Gets the current discoverable time for the adapter radio.
   virtual base::TimeDelta GetDiscoverableTimeout() const = 0;
 #endif
@@ -649,7 +614,7 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
   // Indicates whether LE extended advertising is supported.
   virtual bool IsExtendedAdvertisementsAvailable() const;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Sets the interval between two consecutive advertisements. Valid ranges
   // for the interval are from 20ms to 10.24 seconds, with min <= max.
   // Note: This is a best effort. The actual interval may vary non-trivially
@@ -702,24 +667,16 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
   void NotifyDeviceChanged(BluetoothDevice* device);
   void NotifyAdapterDiscoveryChangeCompletedForTesting();
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   void NotifyDevicePairedChanged(BluetoothDevice* device,
                                  bool new_paired_status);
   void NotifyDeviceConnectedStateChanged(BluetoothDevice* device,
                                          bool is_connected);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   void NotifyDeviceBatteryChanged(BluetoothDevice* device,
                                   BluetoothDevice::BatteryType type);
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void NotifyDeviceBondedChanged(BluetoothDevice* device,
-                                 bool new_bonded_status);
-  void NotifyDeviceIsBlockedByPolicyChanged(BluetoothDevice* device,
-                                            bool new_blocked_status);
-  void NotifyGattNeedsDiscovery(BluetoothDevice* device);
 #endif
 
   void NotifyGattServiceAdded(BluetoothRemoteGattService* service);
@@ -739,67 +696,6 @@ class DEVICE_BLUETOOTH_EXPORT BluetoothAdapter
   void NotifyGattDescriptorValueChanged(
       BluetoothRemoteGattDescriptor* descriptor,
       const std::vector<uint8_t>& value);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void NotifyLowEnergyScanSessionHardwareOffloadingStatusChanged(
-      LowEnergyScanSessionHardwareOffloadingStatus status);
-
-  // Set a service allowlist by specifying services UUIDs. When this is called,
-  // existing connections will be disconnected and services not in the allowlist
-  // will be blocked. Device property |IsBlockedByPolicy| will be True if some
-  // of the auto-connect services are blocked, False otherwise.
-  virtual void SetServiceAllowList(const UUIDList& uuids,
-                                   base::OnceClosure callback,
-                                   ErrorCallback error_callback) = 0;
-
-  // When enabled, start accepting simple secure pairing (Just Works) requests
-  // from nearby devices. Disabled by default
-  virtual void SetSimpleSecurePairingEnabled(bool enabled,
-                                             base::OnceClosure callback,
-                                             ErrorCallback error_callback) = 0;
-
-  // Returns |kSupported| if the device supports the offloading of filtering and
-  // other scanning logic to the Bluetooth hardware. This brings the benefit of
-  // reduced power consumption for BluetoothLowEnergyScanSession. Returns
-  // |kNotSupported| if hardware offloading is not available, in which case
-  // BluetoothLowEnergyScanSession will operate with higher power
-  // consumption. |kUndetermined| indicates the status can not currently be
-  // determined (such as when the adapter is not present), and the client should
-  // retry.
-  //
-  // Consumers should check this value before
-  // creating a BluetoothLowEnergyScanSession and consider ways to mitigate
-  // power usage, especially if the scan session is intended to be long-running.
-  virtual LowEnergyScanSessionHardwareOffloadingStatus
-  GetLowEnergyScanSessionHardwareOffloadingStatus() = 0;
-
-  // Starts a low energy scanning session that will notify the client on session
-  // started, session invalidated, device found and device lost events via the
-  // |delegate|.
-  //
-  // The client controls the lifetime of the session (except on unexpected
-  // invalidation, see below). The client ends a scan session by destroying the
-  // returned instance.
-  //
-  // A session cannot recover once the
-  // BluetoothLowEnergyScanSession::Delegate::OnSessionInvalidated() callback
-  // has been invoked. Invalidation can happen if the platform unexpectedly
-  // cleans up the scan session due to a firmware crash, etc.. If a client wants
-  // an identical scanning session, it should discard its newly invalidated
-  // BluetoothLowEnergyScanSession and create a new one by calling
-  // StartLowEnergyScanSession() again.
-  virtual std::unique_ptr<BluetoothLowEnergyScanSession>
-  StartLowEnergyScanSession(
-      std::unique_ptr<BluetoothLowEnergyScanFilter> filter,
-      base::WeakPtr<BluetoothLowEnergyScanSession::Delegate> delegate) = 0;
-
-  // Returns a list of all the roles that are supported by the adapter.
-  virtual std::vector<BluetoothRole> GetSupportedRoles() = 0;
-
-  // Set the adapter name to one chosen from the system information.
-  virtual void SetStandardChromeOSAdapterName() = 0;
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // The timeout in seconds used by RemoveTimedOutDevices.
   static const base::TimeDelta timeoutSec;

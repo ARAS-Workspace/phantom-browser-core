@@ -253,13 +253,11 @@ TEST_F(ChildAccountServiceTest, FamilyLinkSettingsServiceActiveState) {
   EXPECT_TRUE(family_link_settings_service_.IsActive());
 
   // Sign out not supported on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
   // Sign out.
   identity_test_environment_->ClearPrimaryAccount();
 
   // Settings service should be deactivated.
   EXPECT_FALSE(family_link_settings_service_.IsActive());
-#endif
 }
 
 }  // namespace supervised_user

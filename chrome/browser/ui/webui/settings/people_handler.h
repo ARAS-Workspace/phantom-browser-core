@@ -212,13 +212,7 @@ class PeopleHandler : public SettingsPageUIHandler,
   void HandleRecordSigninOffered(const base::ListValue& args);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void HandleAttemptUserExit(const base::ListValue& args);
-  void HandleTurnOnSync(const base::ListValue& args);
-  void HandleTurnOffSync(const base::ListValue& args);
-#else
   void HandleStartSignin(const base::ListValue& args);
-#endif
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   void HandleSignout(const base::ListValue& args);
   void HandleTurnOffSync(bool delete_profile,
@@ -229,14 +223,12 @@ class PeopleHandler : public SettingsPageUIHandler,
   void HandleSyncShowBookmarkLimitExceededHelp(const base::ListValue& args);
   void HandleGetSyncStatus(const base::ListValue& args);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Displays the GAIA login form.
   void DisplayGaiaLogin(signin_metrics::AccessPoint access_point);
 
   // When web-flow is enabled, displays the Gaia login form in a new tab.
   void DisplayGaiaLoginInNewTabOrWindow(
       signin_metrics::AccessPoint access_point);
-#endif
 
   void HandleShowSyncPassphraseDialog(const base::ListValue& args);
   void HandleShowAccountSettingsUI(const base::ListValue& args);

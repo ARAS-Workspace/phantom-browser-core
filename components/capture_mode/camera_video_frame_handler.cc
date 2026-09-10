@@ -52,43 +52,6 @@ viz::SharedImageFormat GetSharedImageFormat() {
              : viz::MultiPlaneFormat::kNV12;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Adjusts the requested video capture `params` depending on whether we're
-// running on an actual device or the linux-chromeos build.
-void AdjustParamsForCurrentConfig(media::VideoCaptureParams* params) {
-  DCHECK(params);
-
-  // The default params are good enough when running on linux-chromeos.
-  if (!base::SysInfo::IsRunningOnChromeOS() &&
-      !g_force_use_gpu_memory_buffer_for_test) {
-    DCHECK_EQ(params->buffer_type,
-              media::VideoCaptureBufferType::kSharedMemory);
-    return;
-  }
-
-  // On an actual device, the camera HAL only supports NV12 pixel formats in a
-  // GPU memory buffer.
-  params->requested_format.pixel_format = media::PIXEL_FORMAT_NV12;
-  params->buffer_type = media::VideoCaptureBufferType::kGpuMemoryBuffer;
-}
-
-bool IsFatalError(media::VideoCaptureError error) {
-  switch (error) {
-    case media::VideoCaptureError::kCrosHalV3FailedToStartDeviceThread:
-    case media::VideoCaptureError::kCrosHalV3DeviceDelegateMojoConnectionError:
-    case media::VideoCaptureError::
-        kCrosHalV3DeviceDelegateFailedToOpenCameraDevice:
-    case media::VideoCaptureError::
-        kCrosHalV3DeviceDelegateFailedToInitializeCameraDevice:
-    case media::VideoCaptureError::
-        kCrosHalV3DeviceDelegateFailedToConfigureStreams:
-    case media::VideoCaptureError::kCrosHalV3BufferManagerFatalDeviceError:
-      return true;
-    default:
-      return false;
-  }
-}
-#endif
 
 
 
@@ -119,9 +82,6 @@ class SharedMemoryBufferHandleHolder : public BufferHandleHolder {
       media::mojom::VideoBufferHandlePtr buffer_handle)
       : SharedMemoryBufferHandleHolder(
             buffer_handle->get_unsafe_shmem_region()) {
-#if BUILDFLAG(IS_CHROMEOS)
-    DCHECK(!base::SysInfo::IsRunningOnChromeOS());
-#endif
   }
   SharedMemoryBufferHandleHolder(const SharedMemoryBufferHandleHolder&) =
       delete;
@@ -486,9 +446,7 @@ CameraVideoFrameHandler::CameraVideoFrameHandler(
 
   media::VideoCaptureParams capture_params;
   capture_params.requested_format = capture_format;
-#if BUILDFLAG(IS_CHROMEOS)
-  AdjustParamsForCurrentConfig(&capture_params);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   AdjustMacParamsForCurrentConfig(&capture_params, device_id);
 #endif
 
@@ -597,11 +555,6 @@ void CameraVideoFrameHandler::OnError(media::VideoCaptureError error) {
   if (delegate_) {
     delegate_->OnError(error);
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (IsFatalError(error)) {
-    OnFatalErrorOrDisconnection();
-  }
-#endif
 }
 
 void CameraVideoFrameHandler::OnFrameDropped(

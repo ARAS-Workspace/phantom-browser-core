@@ -129,7 +129,6 @@ class FileSystemContextTest : public testing::Test {
 
 // It is not valid to pass nullptr ExternalMountPoints to FileSystemContext on
 // ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(FileSystemContextTest, NullExternalMountPoints) {
   scoped_refptr<FileSystemContext> file_system_context =
       CreateFileSystemContextForTest(/*external_mount_points=*/nullptr);
@@ -175,7 +174,6 @@ TEST_F(FileSystemContextTest, NullExternalMountPoints) {
   IsolatedContext::GetInstance()->RevokeFileSystem(isolated_id);
   ExternalMountPoints::GetSystemInstance()->RevokeFileSystem("system");
 }
-#endif  // !defiend(OS_CHROMEOS)
 
 TEST_F(FileSystemContextTest, FileSystemContextKeepsMountPointsAlive) {
   scoped_refptr<ExternalMountPoints> mount_points =

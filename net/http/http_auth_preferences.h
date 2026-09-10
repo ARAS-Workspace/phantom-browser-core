@@ -49,9 +49,9 @@ class NET_EXPORT HttpAuthPreferences {
 #if BUILDFLAG(IS_ANDROID)
   virtual std::string AuthAndroidNegotiateAccountType() const;
 #endif
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   virtual bool AllowGssapiLibraryLoad() const;
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
   virtual bool CanUseDefaultCredentials(
       const url::SchemeHostPort& auth_scheme_host_port) const;
   virtual HttpAuth::DelegationType GetDelegationType(
@@ -85,11 +85,11 @@ class NET_EXPORT HttpAuthPreferences {
   }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   void set_allow_gssapi_library_load(bool allow_gssapi_library_load) {
     allow_gssapi_library_load_ = allow_gssapi_library_load;
   }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   const std::optional<base::flat_set<std::string>>& allowed_schemes() const {
     return allowed_schemes_;
@@ -134,9 +134,9 @@ class NET_EXPORT HttpAuthPreferences {
   std::string auth_android_negotiate_account_type_;
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   bool allow_gssapi_library_load_ = true;
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   std::optional<base::flat_set<std::string>> allowed_schemes_;
   std::unique_ptr<URLSecurityManager> security_manager_;

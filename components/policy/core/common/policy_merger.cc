@@ -22,13 +22,7 @@ namespace {
 
 #if !BUILDFLAG(IS_IOS) && (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID))
 constexpr const char* kDictionaryPoliciesToMerge[] = {
-#if BUILDFLAG(IS_CHROMEOS)
-    key::kExtensionSettings,       key::kDeviceLoginScreenPowerManagement,
-    key::kKeyPermissions,          key::kPowerManagementIdleSettings,
-    key::kScreenBrightnessPercent, key::kScreenLockDelays,
-#else
     key::kExtensionSettings,
-#endif  //  BUILDFLAG(IS_CHROMEOS)
 };
 #endif  // !BUILDFLAG(IS_IOS) && (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID))
 

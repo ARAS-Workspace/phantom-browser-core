@@ -190,12 +190,6 @@ class GPU_GLES2_EXPORT SharedImageManager
 
   bool is_registered_as_memory_dump_provider_ = false;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bool supports_ycbcr_nv12_sampling_ = false;
-  bool supports_ycbcr_p010_sampling_ = false;
-  bool is_texture_sampling_queried_ GUARDED_BY(lock_) = false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_OZONE)
   bool supports_overlays_on_ozone_ = false;
   scoped_refptr<viz::VulkanContextProvider> vulkan_context_provider_;

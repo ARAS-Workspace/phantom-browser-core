@@ -38,7 +38,6 @@ using content::Referrer;
 using content::WebContents;
 
 // TODO(jam): http://crbug.com/40354951
-#if !(BUILDFLAG(IS_CHROMEOS) && defined(ADDRESS_SANITIZER))
 
 namespace {
 
@@ -212,5 +211,3 @@ IN_PROC_BROWSER_TEST_F(CrashRecoveryBrowserTest, BeforeUnloadNotRun) {
 }
 
 }  // namespace
-
-#endif

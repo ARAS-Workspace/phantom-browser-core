@@ -47,10 +47,6 @@
 #include "third_party/boringssl/src/include/openssl/ec_key.h"
 #include "third_party/boringssl/src/include/openssl/obj.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/bluetooth/floss/floss_features.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -223,13 +219,7 @@ class AuthenticatorCableV2Test : public AuthenticatorImplRequestDelegateTest {
   void OnCableEvent(Event event) { events_.push_back(event); }
 
   void MaybeExpectDiscoveryWithScanCallback() {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (!floss::features::IsFlossEnabled()) {
-      mock_bluetooth_adapter_->ExpectDiscoveryWithScanCallback();
-    }
-#else
     mock_bluetooth_adapter_->ExpectDiscoveryWithScanCallback();
-#endif
   }
 
   void DoPairingConnection() {

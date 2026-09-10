@@ -14,7 +14,7 @@
 #include "build/build_config.h"
 #include "components/viz/common/resources/shared_image_format.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/files/scoped_file.h"
 #endif
 
@@ -30,7 +30,7 @@ struct COMPONENT_EXPORT(GFX) NativePixmapPlane {
   NativePixmapPlane(uint32_t stride,
                     uint64_t offset,
                     uint64_t size
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
                     ,
                     base::ScopedFD fd
 #endif
@@ -48,7 +48,7 @@ struct COMPONENT_EXPORT(GFX) NativePixmapPlane {
   // This is necessary to map the buffers.
   uint64_t size;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // File descriptor for the underlying memory object (usually dmabuf).
   base::ScopedFD fd;
 #endif
@@ -69,7 +69,7 @@ struct COMPONENT_EXPORT(GFX) NativePixmapHandle {
 
   std::vector<NativePixmapPlane> planes;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // The modifier is retrieved from GBM library and passed to EGL driver.
   // Generally it's platform specific, and we don't need to modify it in
   // Chromium code. Also one per plane per entry.

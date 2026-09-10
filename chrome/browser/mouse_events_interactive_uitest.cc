@@ -111,7 +111,7 @@ IN_PROC_BROWSER_TEST_F(MouseEventsTest, MAYBE_ClickAndDoubleClick) {
   WaitForTitle("ondblclick");
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Flaky; http://crbug.com/40845791.
 #define MAYBE_TestOnMouseOut DISABLED_TestOnMouseOut
 #else
@@ -152,7 +152,7 @@ IN_PROC_BROWSER_TEST_F(MouseEventsTest, MAYBE_ContextMenu) {
   EXPECT_EQ(success_title, done_title_watcher.WaitAndGetTitle());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Test that a mouseleave is not triggered when showing a modal dialog.
 // Sample regression: crbug.com/41120621
 // Flaky; http://crbug.com/41386176

@@ -42,14 +42,6 @@
 #include "ui/views/widget/any_widget_observer.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/apps/intent_helper/preferred_apps_test_util.h"
-#include "components/services/app_service/public/cpp/preferred_apps_list_handle.h"
-#include "ui/views/controls/button/checkbox.h"
-#include "ui/views/view_utils.h"
-#endif
 
 using LinkCapturingFeatureVersion = apps::test::LinkCapturingFeatureVersion;
 
@@ -163,11 +155,7 @@ class IntentPickerIconBrowserTest
   std::string rel() { return std::get<std::string>(GetParam()); }
 
   bool IsDefaultOnEnabled() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return false;
-#else
     return LinkCapturingVersion() == LinkCapturingFeatureVersion::kV2DefaultOn;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
  private:
@@ -418,121 +406,6 @@ INSTANTIATE_TEST_SUITE_P(
                         LinkCapturingFeatureVersion::kV2DefaultOn)),
     GetLinkCapturingTestName);
 
-#if BUILDFLAG(IS_CHROMEOS)
-// This test verifies UXes that show up when an app is not set to be the
-// preferred app for capturing links.
-class IntentPickerIconBrowserBubbleTest
-    : public IntentPickerBrowserTest,
-      public ::testing::WithParamInterface<
-          std::tuple<std::string, LinkCapturingFeatureVersion>>,
-      public IntentChipButtonTestBase {
- public:
-  // TODO(crbug.com/40097608): Stop disabling Paint Holding.
-  IntentPickerIconBrowserBubbleTest() {
-    std::vector<base::test::FeatureRefAndParams> features_to_enable =
-        apps::test::GetFeaturesToEnableLinkCapturingUX(LinkCapturingVersion());
-
-    feature_list_.InitWithFeaturesAndParameters(
-        features_to_enable, {blink::features::kPaintHolding});
-  }
-
-  LinkCapturingFeatureVersion LinkCapturingVersion() const {
-    return std::get<LinkCapturingFeatureVersion>(GetParam());
-  }
-  bool LinkCapturingEnabledByDefault() const {
-    return LinkCapturingVersion() == LinkCapturingFeatureVersion::kV2DefaultOn;
-  }
-
-  size_t GetItemContainerSize(IntentPickerBubbleView* bubble) {
-    return bubble->GetViewByID(IntentPickerBubbleView::ViewId::kItemContainer)
-        ->children()
-        .size();
-  }
-
-  // The intent picker icon bubble shows up only when the app is not set as
-  // the preferred app to capture links on ChromeOS.
-  void InstallTestWebAppAndDisableLinkCapturingIfNecessary() {
-    InstallTestWebApp();
-    if (LinkCapturingEnabledByDefault()) {
-      auto result =
-          apps::test::DisableLinkCapturingByUser(profile(), test_web_app_id());
-      ASSERT_TRUE(result.has_value()) << result.error();
-    }
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_P(IntentPickerIconBrowserBubbleTest,
-                       IntentChipOpensBubble) {
-  InstallTestWebAppAndDisableLinkCapturingIfNecessary();
-  const GURL in_scope_url =
-      embedded_https_test_server().GetURL(GetAppUrlHost(), GetInScopeUrlPath());
-
-  OpenNewTab(in_scope_url);
-  ASSERT_TRUE(web_app::ClickIntentPickerAndWaitForBubble(browser()));
-
-  EXPECT_EQ(1U, GetItemContainerSize(intent_picker_bubble()));
-  auto& app_info = intent_picker_bubble()->app_info_for_testing();
-  ASSERT_EQ(1U, app_info.size());
-  EXPECT_EQ(test_web_app_id(), app_info[0].launch_name);
-  EXPECT_EQ(GetAppName(), app_info[0].display_name);
-}
-
-// Test that the "Remember this choice" checkbox works.
-IN_PROC_BROWSER_TEST_P(IntentPickerIconBrowserBubbleTest, RememberOpenWebApp) {
-  base::HistogramTester histogram_tester;
-
-  InstallTestWebAppAndDisableLinkCapturingIfNecessary();
-  const GURL in_scope_url =
-      embedded_https_test_server().GetURL(GetAppUrlHost(), GetInScopeUrlPath());
-
-  OpenNewTab(in_scope_url);
-  ASSERT_TRUE(web_app::ClickIntentPickerAndWaitForBubble(browser()));
-
-  // Check "Remember my choice" and accept the bubble.
-  views::Checkbox* remember_selection_checkbox =
-      views::AsViewClass<views::Checkbox>(intent_picker_bubble()->GetViewByID(
-          IntentPickerBubbleView::ViewId::kRememberCheckbox));
-  ASSERT_TRUE(remember_selection_checkbox);
-  ASSERT_TRUE(remember_selection_checkbox->GetEnabled());
-  remember_selection_checkbox->SetChecked(true);
-
-  apps::PreferredAppsListHandle& preferred_apps =
-      apps::AppServiceProxyFactory::GetForProfile(profile())
-          ->PreferredAppsList();
-  apps_util::PreferredAppUpdateWaiter preference_update_waiter(
-      preferred_apps, test_web_app_id());
-
-  ui_test_utils::BrowserCreatedObserver browser_created_observer;
-  intent_picker_bubble()->AcceptDialog();
-
-  // Accepting the bubble should open the app.
-  Browser* app_browser = browser_created_observer.Wait();
-  ASSERT_TRUE(web_app::AppBrowserController::IsForWebApp(app_browser,
-                                                         test_web_app_id()));
-
-  // The link capturing preference should be updated.
-  preference_update_waiter.Wait();
-  ASSERT_TRUE(
-      preferred_apps.IsPreferredAppForSupportedLinks(test_web_app_id()));
-
-  // Check that we recorded that settings were changed.
-  histogram_tester.ExpectBucketCount(
-      "ChromeOS.Intents.LinkCapturingEvent2",
-      apps::IntentHandlingMetrics::LinkCapturingEvent::kSettingsChanged, 1);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    IntentPickerIconBrowserBubbleTest,
-    testing::Combine(
-        testing::Values("", "noopener", "noreferrer", "nofollow"),
-        testing::Values(LinkCapturingFeatureVersion::kV2DefaultOff,
-                        LinkCapturingFeatureVersion::kV2DefaultOn)),
-    GetLinkCapturingTestName);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // This test only works when link capturing is set to default off for desktop
 // platforms, as prerendering navigations are aborted during link captured app

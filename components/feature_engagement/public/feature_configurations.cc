@@ -101,7 +101,7 @@ std::optional<FeatureConfig> CreateNewUserGestureInProductHelpConfig(
 
 std::optional<FeatureConfig> GetClientSideFeatureConfig(
     const base::Feature* feature) {
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
   if (kIPHPasswordsManagementBubbleAfterSaveFeature.name == feature->name) {
     FeatureConfig config;
     config.valid = true;
@@ -625,7 +625,7 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     return config;
   }
 
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 #if !BUILDFLAG(IS_ANDROID)
   if (kIPHiOSPasswordPromoDesktopFeature.name == feature->name) {
@@ -2394,8 +2394,7 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
 // CONFIGURATION_ANDROID_END
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
   if (kIPHAutofillCreditCardBenefitFeature.name == feature->name) {
     // The credit card benefit IPH appears up to three times over 10 years and
@@ -2502,8 +2501,7 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     return config;
   }
 
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-        // || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_IOS)
   if (kIPHiOSLensOverlayEntrypointTipFeature.name == feature->name) {
@@ -3487,31 +3485,6 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
   }
 
 #endif  // BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (kIPHLauncherSearchHelpUiFeature.name == feature->name) {
-    // A config that allows the ChromeOS Ash Launcher search IPH to be shown.
-    FeatureConfig config;
-    config.valid = true;
-    config.availability = Comparator(ANY, 0);
-    config.session_rate = Comparator(ANY, 0);
-    config.session_rate_impact.type = SessionRateImpact::Type::NONE;
-    config.blocked_by.type = BlockedBy::Type::NONE;
-    config.blocking.type = Blocking::Type::NONE;
-
-    // Can be shown any time until the `assistant_click` event is recorded.
-    config.trigger =
-        EventConfig("IPH_LauncherSearchHelpUi_trigger", Comparator(ANY, 0),
-                    kMaxStoragePeriod, kMaxStoragePeriod);
-    config.used =
-        EventConfig("IPH_LauncherSearchHelpUi_chip_click", Comparator(ANY, 0),
-                    kMaxStoragePeriod, kMaxStoragePeriod);
-    config.event_configs.insert(EventConfig(
-        "IPH_LauncherSearchHelpUi_assistant_click", Comparator(EQUAL, 0),
-        kMaxStoragePeriod, kMaxStoragePeriod));
-    return config;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 

@@ -67,11 +67,9 @@
 #include "ui/gfx/scrollbar_size.h"
 #include "ui/views/widget/widget.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/download/bubble/download_bubble_ui_controller.h"
 #include "chrome/browser/download/bubble/download_display_controller.h"
 #include "chrome/browser/ui/download/download_display.h"
-#endif
 
 namespace extensions {
 namespace {
@@ -90,14 +88,12 @@ class CreateAndLoadUserWebContentsObserver
             })) {}
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 bool IsDownloadSurfaceVisible(BrowserWindow* window) {
   return window->GetDownloadBubbleUIController()
       ->GetDownloadDisplayController()
       ->download_display_for_testing()
       ->IsShowingDetails();
 }
-#endif
 
 // Helper to ensure all extension hosts are destroyed during the test. If a host
 // is still alive, the Profile can not be destroyed in
@@ -402,7 +398,7 @@ IN_PROC_BROWSER_TEST_F(BrowserActionInteractiveTest,
 
   // Non-Aura Linux uses a singleton for the popup, so it looks like all windows
   // have popups if there is any popup open.
-#if !((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && !defined(USE_AURA))
+#if !(BUILDFLAG(IS_LINUX) && !defined(USE_AURA))
   // Starting window does not have a popup.
   EXPECT_FALSE(ExtensionActionTestHelper::Create(browser())->HasPopup());
 #endif
@@ -1194,9 +1190,7 @@ IN_PROC_BROWSER_TEST_F(NavigatingExtensionPopupInteractiveTest,
   // download surface is supported - on ChromeOS, instead of the download
   // surface, there is a download notification in the right-bottom corner of the
   // screen.
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(IsDownloadSurfaceVisible(BrowserWindow::FromBrowser(browser())));
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(NavigatingExtensionPopupInteractiveTest,
@@ -1230,9 +1224,7 @@ IN_PROC_BROWSER_TEST_F(NavigatingExtensionPopupInteractiveTest,
   // download surface is supported - on ChromeOS, instead of the download
   // surface, there is a download notification in the right-bottom corner of the
   // screen.
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(IsDownloadSurfaceVisible(BrowserWindow::FromBrowser(browser())));
-#endif
 }
 
 }  // namespace

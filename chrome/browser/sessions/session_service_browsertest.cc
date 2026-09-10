@@ -22,10 +22,6 @@
 #include "components/sessions/core/session_command.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/components/kiosk/kiosk_test_utils.h"
-#endif
-
 class SessionServiceBrowserTest : public InProcessBrowserTest {
  protected:
   SessionService* service() {

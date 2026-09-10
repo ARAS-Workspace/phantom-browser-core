@@ -17,7 +17,7 @@ namespace base {
 
 namespace internal {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 // Platforms for which it is possible to track ownership of file descriptors.
 //
 // On Android, fdsan is used.
@@ -53,7 +53,7 @@ struct ScopedFILECloser {
 
 }  // namespace internal
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 namespace subtle {
 
 #if !defined(COMPONENT_BUILD)
@@ -88,7 +88,7 @@ void BASE_EXPORT EnableFDOwnershipEnforcement(bool enabled);
 void BASE_EXPORT ResetFDOwnership();
 
 }  // namespace subtle
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // -----------------------------------------------------------------------------
 
@@ -110,11 +110,11 @@ using ScopedFD = ScopedGeneric<int, internal::ScopedFDCloseTraits>;
 // Automatically closes `FILE*`s.
 using ScopedFILE = std::unique_ptr<FILE, internal::ScopedFILECloser>;
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // Queries the ownership status of an FD, i.e. whether it is currently owned by
 // a ScopedFD in the calling process.
 bool BASE_EXPORT IsFDOwned(int fd);
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace base
 

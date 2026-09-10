@@ -25,30 +25,11 @@
 #include "content/public/browser/network_service_instance.h"
 #include "services/tracing/public/cpp/trace_startup_config.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/barrier_closure.h"
-#include "chrome/browser/metrics/chromeos_metrics_provider.h"
-#include "chrome/browser/metrics/chromeos_system_profile_provider.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace tracing {
 
 ChromeBackgroundTracingMetricsProvider::ChromeBackgroundTracingMetricsProvider(
     ChromeOSSystemProfileProvider* cros_system_profile_provider)
     : cros_system_profile_provider_(cros_system_profile_provider) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (cros_system_profile_provider_) {
-    // Collect system profile such as hardware class for ChromeOS. Note that
-    // ChromeOSMetricsProvider is initialized asynchronously. It might not be
-    // initialized when reporting metrics, in which case it'll just not add any
-    // ChromeOS system metrics to the proto (i.e. no hardware class etc).
-    auto chromeos_metrics_provider = std::make_unique<ChromeOSMetricsProvider>(
-        metrics::MetricsLogUploader::UMA, cros_system_profile_provider_);
-    chromeos_metrics_provider_ = chromeos_metrics_provider.get();
-    system_profile_providers_.emplace_back(
-        std::move(chromeos_metrics_provider));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   system_profile_providers_.emplace_back(
       std::make_unique<AccessibilityStateProvider>());

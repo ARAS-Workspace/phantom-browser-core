@@ -19,10 +19,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace content {
 
 using testing::_;
@@ -52,10 +48,6 @@ class SpeechRecognitionManagerImplTest
  private:
   // Set up the SODA on device speech recognition feature flags.
   base::test::ScopedFeatureList feature_1_{media::kOnDeviceWebSpeech};
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList feature_2_{
-      ash::features::kOnDeviceSpeechRecognition};
-#endif  // BUILDFLAG(IS_CHROMEOS)
   BrowserTaskEnvironment environment_;
 
  protected:

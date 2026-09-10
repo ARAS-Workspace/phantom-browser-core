@@ -20,11 +20,6 @@
 #include "media/base/media_switches.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/audio/cras_audio_handler.h"
-#include "chromeos/ash/components/dbus/audio/cras_audio_client.h"
-#endif
-
 namespace content {
 
 void WebRtcContentBrowserTestBase::SetUpCommandLine(
@@ -38,10 +33,6 @@ void WebRtcContentBrowserTestBase::SetUpCommandLine(
 void WebRtcContentBrowserTestBase::SetUp() {
   // We need pixel output when we dig pixels out of video tags for verification.
   EnablePixelOutput();
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::CrasAudioClient::InitializeFake();
-  ash::CrasAudioHandler::InitializeForTesting();
-#endif
   ContentBrowserTest::SetUp();
   ASSERT_TRUE(base::CommandLine::ForCurrentProcess()->HasSwitch(
       switches::kUseFakeDeviceForMediaStream));
@@ -49,10 +40,6 @@ void WebRtcContentBrowserTestBase::SetUp() {
 
 void WebRtcContentBrowserTestBase::TearDown() {
   ContentBrowserTest::TearDown();
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::CrasAudioHandler::Shutdown();
-  ash::CrasAudioClient::Shutdown();
-#endif
 }
 
 void WebRtcContentBrowserTestBase::AppendUseFakeUIForMediaStreamFlag() {

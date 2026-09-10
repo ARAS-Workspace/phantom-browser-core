@@ -59,10 +59,6 @@ TEST_F(GlicLauncherConfigurationTest, GetToggleHotkey_Default) {
   EXPECT_TRUE(accelerator.IsCtrlDown());
   EXPECT_FALSE(accelerator.IsAltDown());
   EXPECT_FALSE(accelerator.IsCmdDown());
-#elif BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(accelerator.IsCtrlDown());
-  EXPECT_FALSE(accelerator.IsAltDown());
-  EXPECT_TRUE(accelerator.IsCmdDown());
 #else
   EXPECT_FALSE(accelerator.IsCtrlDown());
   EXPECT_TRUE(accelerator.IsAltDown());

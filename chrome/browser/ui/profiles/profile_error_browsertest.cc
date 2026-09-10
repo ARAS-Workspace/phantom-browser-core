@@ -71,14 +71,8 @@ class ProfileErrorBrowserTest : public InProcessBrowserTest,
   const bool do_corrupt_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Disable the test on chromos since kernel controls the user profile thus we
-// won't be able to corrupt it.
-#define MAYBE_CorruptedProfile DISABLED_CorruptedProfile
-#else
 // http://crbug.com/41198880
 #define MAYBE_CorruptedProfile DISABLED_CorruptedProfile
-#endif
 
 IN_PROC_BROWSER_TEST_P(ProfileErrorBrowserTest, MAYBE_CorruptedProfile) {
   const char kPaintHistogram[] = "Startup.FirstWebContents.NonEmptyPaint3";

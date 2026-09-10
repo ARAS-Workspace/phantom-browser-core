@@ -129,7 +129,7 @@ void SetAllocatorDumpMetric(ProcessMemoryDumpPtr& pmd,
 OSMemDumpPtr GetFakeOSMemDump(uint32_t resident_set_kb,
                               uint32_t private_footprint_kb,
                               uint32_t shared_footprint_kb
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
                               ,
                               uint32_t private_swap_footprint_kb,
                               uint32_t mappings_count,
@@ -142,7 +142,7 @@ OSMemDumpPtr GetFakeOSMemDump(uint32_t resident_set_kb,
   return memory_instrumentation::mojom::OSMemDump::New(
       resident_set_kb, /*peak_resident_set_kb=*/resident_set_kb,
       /*is_peak_rss_resettable=*/true, private_footprint_kb, shared_footprint_kb
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       ,
       private_swap_footprint_kb, mappings_count, pss_kb, swap_pss_kb
 #endif
@@ -154,7 +154,7 @@ OSMemDumpPtr GetFakeOSMemDump(MetricMap& metrics_mb) {
       /*resident_set_kb=*/GetResidentValue(metrics_mb) * 1024,
       /*private_footprint_kb=*/metrics_mb["PrivateMemoryFootprint"] * 1024,
       /*shared_footprint_kb=*/metrics_mb["SharedMemoryFootprint"] * 1024
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       // accessing PrivateSwapFootprint on other OSes will
       // modify metrics_mb to create the value, which leads
       // to expectation failures.
@@ -208,7 +208,7 @@ MetricMap GetExpectedBrowserMetrics() {
       {"SharedMemoryFootprint", 35},
       {"Uptime", 42},
       {"GpuMemory", kGpuTotalMemory * 1024 * 1024},
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       {"PrivateSwapFootprint", 50},
 #endif
   });
@@ -405,7 +405,7 @@ MetricMap GetExpectedRendererMetrics() {
       {"V8.Workers.AllocatedObjects", 40},
       {"NumberOfExtensions", 0},
       {"Uptime", 42},
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       {"PrivateSwapFootprint", 50},
 #endif
       {"NumberOfAdSubframes", 28},
@@ -460,7 +460,7 @@ MetricMap GetExpectedGpuMetrics() {
       {"CommandBuffer", kGpuCommandBufferMB},
       {"Uptime", 42},
       {"GpuMemory", kGpuTotalMemory * 1024 * 1024},
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       {"PrivateSwapFootprint", 50},
 #endif
   });
@@ -492,7 +492,7 @@ MetricMap GetExpectedNetworkServiceMetrics() {
       {"PrivateMemoryFootprint", 0},
       {"SharedMemoryFootprint", 0},
       {"Uptime", 42},
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       {"PrivateSwapFootprint", 0},
 #endif
   });
@@ -506,7 +506,7 @@ MetricMap GetExpectedAudioServiceMetrics() {
       {"PrivateMemoryFootprint", 30},
       {"SharedMemoryFootprint", 35},
       {"Uptime", 42},
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       {"PrivateSwapFootprint", 50},
 #endif
   });
@@ -514,11 +514,12 @@ MetricMap GetExpectedAudioServiceMetrics() {
 
 MetricMap GetExpectedCdmServiceMetrics() {
   return MetricMap({
-    {"ProcessType", static_cast<int64_t>(ProcessType::UTILITY)},
-        {"Resident", 11}, {"PrivateMemoryFootprint", 21},
-        {"SharedMemoryFootprint", 31},
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
-        {"PrivateSwapFootprint", 41},
+      {"ProcessType", static_cast<int64_t>(ProcessType::UTILITY)},
+      {"Resident", 11},
+      {"PrivateMemoryFootprint", 21},
+      {"SharedMemoryFootprint", 31},
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+      {"PrivateSwapFootprint", 41},
 #endif
   });
 }
@@ -529,7 +530,7 @@ MetricMap GetExpectedPaintPreviewCompositorMetrics() {
       {"Resident", 10},
       {"PrivateMemoryFootprint", 30},
       {"SharedMemoryFootprint", 35},
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
       {"PrivateSwapFootprint", 50},
 #endif
   });
@@ -1165,7 +1166,7 @@ TEST_F(ProcessMemoryMetricsEmitterTest, RendererAndTotalHistogramsAreRecorded) {
                                 kTestRendererSharedMemoryFootprint, 2);
   histograms.ExpectUniqueSample("Memory.Renderer.ResidentSet",
                                 kTestRendererResidentSet, 2);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   histograms.ExpectUniqueSample("Memory.Renderer.MappingsCount",
                                 kTestMappingsCount, 2);
   histograms.ExpectUniqueSample("Memory.Renderer.Pss2", kTestPss, 2);

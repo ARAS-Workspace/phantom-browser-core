@@ -521,8 +521,6 @@ constexpr base::FilePath::CharType kHighResAvatarFolderName[] =
 // The size of the function-static kDefaultAvatarIconResources array below.
 #if BUILDFLAG(IS_ANDROID)
 constexpr size_t kDefaultAvatarIconsCount = 1;
-#elif BUILDFLAG(IS_CHROMEOS)
-constexpr size_t kDefaultAvatarIconsCount = 27;
 #else
 constexpr size_t kDefaultAvatarIconsCount = 56;
 #endif
@@ -693,7 +691,7 @@ size_t GetPlaceholderAvatarIndex() {
 }
 
 size_t GetModernAvatarIconStartIndex() {
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   return GetPlaceholderAvatarIndex() + 1;
 #else
   // Only use the placeholder avatar on ChromeOS and Android.
@@ -787,7 +785,7 @@ const IconResourceInfo* GetDefaultAvatarIconResourceInfo(size_t index) {
           // Placeholder avatar icon:
           {IDR_PROFILE_AVATAR_26, nullptr, IDS_DEFAULT_AVATAR_LABEL_26},
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
           // Modern avatar icons:
           {IDR_PROFILE_AVATAR_27, "avatar_origami_cat.png",
            IDS_DEFAULT_AVATAR_LABEL_27},

@@ -146,9 +146,7 @@ class ExtensionInstallPolicyServiceImpl
       initialization_waiters_;
 
   PrefChangeRegistrar pref_change_registrar_;
-#if !BUILDFLAG(IS_CHROMEOS)
   PrefChangeRegistrar local_state_change_registrar_;
-#endif
 };
 
 }  // namespace policy

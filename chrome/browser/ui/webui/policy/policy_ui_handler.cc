@@ -96,18 +96,7 @@
 #include "ui/base/webui/web_ui_util.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
-#include "chrome/browser/ash/policy/core/device_cloud_policy_store_ash.h"
-#include "chrome/browser/ash/policy/core/device_local_account_policy_service.h"
-#include "chrome/browser/ash/policy/core/user_cloud_policy_manager_ash.h"
-#include "chrome/browser/ash/policy/off_hours/device_off_hours_controller.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#include "components/user_manager/user_manager.h"
-#else
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/enterprise/identifiers/profile_id_service_factory.h"
@@ -184,10 +173,8 @@ void PolicyUIHandler::AddCommonLocalizedStringsToSource(
       {"sort", IDS_POLICY_TABLE_COLUMN_SORT},
       {"sortAscending", IDS_POLICY_TABLE_COLUMN_SORT_ASCENDING},
       {"sortDescending", IDS_POLICY_TABLE_COLUMN_SORT_DESCENDING},
-#if !BUILDFLAG(IS_CHROMEOS)
       {"reportUploading", IDS_REPORT_UPLOADING},
       {"reportUploaded", IDS_REPORT_UPLOADED},
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   };
   source->AddLocalizedStrings(kStrings);
 
@@ -257,11 +244,9 @@ void PolicyUIHandler::RegisterMessages() {
       "getPoliciesJson",
       base::BindRepeating(&PolicyUIHandler::HandleGetPoliciesJson,
                           base::Unretained(this)));
-#if !BUILDFLAG(IS_CHROMEOS)
   web_ui()->RegisterMessageCallback(
       "uploadReport", base::BindRepeating(&PolicyUIHandler::HandleUploadReport,
                                           base::Unretained(this)));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 void PolicyUIHandler::OnPolicyValueAndStatusChanged() {
@@ -294,29 +279,6 @@ void PolicyUIHandler::HandleListenPoliciesUpdates(const base::ListValue& args) {
 
 void PolicyUIHandler::HandleReloadPolicies(const base::ListValue&) {
   reload_policies_count_ += 1;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Allow user to manually fetch remote commands. Useful for testing or when
-  // the invalidation service is not working properly.
-  policy::CloudPolicyManager* const device_manager =
-      g_browser_process->platform_part()
-          ->browser_policy_connector_ash()
-          ->GetDeviceCloudPolicyManager();
-  policy::CloudPolicyManager* const user_manager =
-      profile_->GetUserCloudPolicyManagerAsh();
-
-  // Fetch both device and user remote commands.
-  for (policy::CloudPolicyManager* manager : {device_manager, user_manager}) {
-    // Active Directory management has no CloudPolicyManager.
-    if (manager) {
-      policy::RemoteCommandsService* const remote_commands_service =
-          manager->core()->remote_commands_service();
-      if (remote_commands_service) {
-        remote_commands_service->FetchRemoteCommands(
-            policy::RemoteCommandsFetchReason::kUserRequest);
-      }
-    }
-  }
-#endif
   policy_value_and_status_aggregator_->Refresh();
 }
 
@@ -350,7 +312,7 @@ void PolicyUIHandler::SetLocalTestPoliciesImpl(
               ->local_test_policy_provider());
   CHECK(local_test_provider);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   profile_->GetPrefs()->ClearPref(
       prefs::kUserCloudSigninPolicyResponseFromPolicyTestPage);
   profile_->GetPrefs()->SetDefaultPrefValue(
@@ -372,7 +334,7 @@ void PolicyUIHandler::RevertLocalTestPolicies() {
   if (!PolicyUI::ShouldLoadTestPage(&profile_.get())) {
     return;
   }
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   profile_->GetPrefs()->ClearPref(
       prefs::kUserCloudSigninPolicyResponseFromPolicyTestPage);
   profile_->GetPrefs()->SetDefaultPrefValue(
@@ -452,7 +414,6 @@ void PolicyUIHandler::GetPolicyLogs(GetPolicyLogsCallback callback) {
   std::move(callback).Run(policy::PolicyLogger::GetInstance()->GetAsMojoList());
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void PolicyUIHandler::HandleUploadReport(const base::ListValue& args) {
   upload_report_count_ += 1;
   DCHECK_EQ(1u, args.size());
@@ -497,7 +458,6 @@ void PolicyUIHandler::HandleUploadReport(const base::ListValue& args) {
   // to try again.
   OnReportUploaded(callback_id);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void PolicyUIHandler::SendPolicies() {
   if (!IsJavascriptAllowed()) {
@@ -526,7 +486,6 @@ void PolicyUIHandler::SendStatus() {
   }
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void PolicyUIHandler::OnReportUploaded(const std::string& callback_id) {
   if (!IsJavascriptAllowed()) {
     return;
@@ -535,7 +494,6 @@ void PolicyUIHandler::OnReportUploaded(const std::string& callback_id) {
                             /*response=*/base::Value());
   SendStatus();
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 std::string PolicyUIHandler::GetPoliciesJsonImpl(
     policy::mojom::GetPoliciesReason reason) {

@@ -307,17 +307,6 @@ class PrintBackendBrowserTest : public InProcessBrowserTest {
     CheckForQuit();
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void OnDidGetPrinterSemanticCapsAndDefaults(
-      mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsResult&
-          capture_printer_caps,
-      mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsResult
-          printer_caps) {
-    capture_printer_caps = std::move(printer_caps);
-    CheckForQuit();
-  }
-#endif
-
   void OnDidFetchCapabilities(
       mojom::PrintBackendService::FetchCapabilitiesResult&
           capture_caps_and_info,
@@ -452,58 +441,6 @@ IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, GetDefaultPrinterName) {
   ASSERT_TRUE(default_printer_name.has_value());
   EXPECT_EQ(default_printer_name.value(), kDefaultPrinterName);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest,
-                       GetPrinterSemanticCapsAndDefaults) {
-  AddDefaultPrinter();
-
-  mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsResult
-      printer_caps;
-
-  // Safe to use base::Unretained(this) since waiting locally on the callback
-  // forces a shorter lifetime than `this`.
-  GetPrintBackendService()->GetPrinterSemanticCapsAndDefaults(
-      kDefaultPrinterName,
-      base::BindOnce(
-          &PrintBackendBrowserTest::OnDidGetPrinterSemanticCapsAndDefaults,
-          base::Unretained(this), std::ref(printer_caps)));
-  WaitUntilCallbackReceived();
-  ASSERT_TRUE(printer_caps.has_value());
-  EXPECT_EQ(printer_caps.value().copies_max, kCopiesMax);
-
-  // Requesting for an invalid printer should not return capabilities.
-  GetPrintBackendService()->GetPrinterSemanticCapsAndDefaults(
-      kInvalidPrinterName,
-      base::BindOnce(
-          &PrintBackendBrowserTest::OnDidGetPrinterSemanticCapsAndDefaults,
-          base::Unretained(this), std::ref(printer_caps)));
-  WaitUntilCallbackReceived();
-  ASSERT_FALSE(printer_caps.has_value());
-  EXPECT_EQ(printer_caps.error(), mojom::ResultCode::kFailed);
-}
-
-IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest,
-                       GetPrinterSemanticCapsAndDefaultsAccessDenied) {
-  AddAccessDeniedPrinter();
-
-  mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsResult
-      printer_caps;
-
-  // Requesting for a printer which requires elevated privileges should not
-  // return capabilities, and should indicate that access was denied.
-  // Safe to use base::Unretained(this) since waiting locally on the callback
-  // forces a shorter lifetime than `this`.
-  GetPrintBackendService()->GetPrinterSemanticCapsAndDefaults(
-      kAccessDeniedPrinterName,
-      base::BindOnce(
-          &PrintBackendBrowserTest::OnDidGetPrinterSemanticCapsAndDefaults,
-          base::Unretained(this), std::ref(printer_caps)));
-  WaitUntilCallbackReceived();
-  ASSERT_FALSE(printer_caps.has_value());
-  EXPECT_EQ(printer_caps.error(), mojom::ResultCode::kAccessDenied);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, FetchCapabilities) {
   AddDefaultPrinter();

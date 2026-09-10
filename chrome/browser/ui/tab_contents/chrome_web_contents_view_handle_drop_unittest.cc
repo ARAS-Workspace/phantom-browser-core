@@ -46,13 +46,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/file_manager/fileapi_util.h"
-#include "chrome/browser/ash/fusebox/fusebox_server.h"
-#include "content/public/browser/storage_partition.h"
-#include "storage/browser/file_system/external_mount_points.h"
-#endif
-
 class TestDragDropRequestHandler
     : public enterprise_connectors::test::FakeClipboardRequestHandler {
  public:
@@ -277,16 +270,6 @@ class DragDropTestContentAnalysisDelegate
   }
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-class FakeFuseboxDelegate : public fusebox::Server::Delegate {
- public:
-  FakeFuseboxDelegate() = default;
-
-  void OnRegisterFSURLPrefix(const std::string& subdir) override {}
-  void OnUnregisterFSURLPrefix(const std::string& subdir) override {}
-};
-#endif
-
 class ChromeWebContentsViewDelegateHandleOnPerformingDrop
     : public testing::TestWithParam</*EnableDlpFileSystemApi_enabled=*/bool> {
  public:
@@ -306,32 +289,9 @@ class ChromeWebContentsViewDelegateHandleOnPerformingDrop
       scoped_feature_list_.InitAndDisableFeature(
           enterprise_connectors::kEnableDlpFileSystemApi);
     }
-#if BUILDFLAG(IS_CHROMEOS)
-    storage::ExternalMountPoints::GetSystemInstance()->RegisterFileSystem(
-        "fake_mount", storage::kFileSystemTypeProvided,
-        storage::FileSystemMountOption(),
-        base::FilePath(FILE_PATH_LITERAL("/media/archive/fake_mount")));
-    storage::ExternalMountPoints::GetSystemInstance()->RegisterFileSystem(
-        "not_backed_mount", storage::kFileSystemTypeProvided,
-        storage::FileSystemMountOption(),
-        base::FilePath(FILE_PATH_LITERAL("/media/archive/not_backed_mount")));
-
-    fusebox_server_ =
-        std::make_unique<fusebox::Server>(&fake_fusebox_delegate_);
-    fusebox_server_->RegisterFSURLPrefix(
-        "fake_mount", "filesystem:chrome://file-manager/external/fake_mount",
-        /*read_only=*/false);
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    storage::ExternalMountPoints::GetSystemInstance()->RevokeFileSystem(
-        "fake_mount");
-    storage::ExternalMountPoints::GetSystemInstance()->RevokeFileSystem(
-        "not_backed_mount");
-    fusebox_server_.reset();
-#endif
   }
 
  public:
@@ -516,10 +476,6 @@ class ChromeWebContentsViewDelegateHandleOnPerformingDrop
   std::map<std::string,
            enterprise_connectors::ContentAnalysisAcknowledgement::FinalAction>
       expected_final_actions_;
-#if BUILDFLAG(IS_CHROMEOS)
-  FakeFuseboxDelegate fake_fusebox_delegate_;
-  std::unique_ptr<fusebox::Server> fusebox_server_;
-#endif
 };
 
 // When no drop data is specified, HandleOnPerformingDrop() should indicate
@@ -738,122 +694,6 @@ TEST_P(ChromeWebContentsViewDelegateHandleOnPerformingDrop, Directories) {
   RunTest(data, /*enable=*/true, /*successful_text_scan=*/false,
           /*successful_file_paths*/ {});
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(ChromeWebContentsViewDelegateHandleOnPerformingDrop, VirtualFiles) {
-  content::WebContents* web_contents = contents();
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-
-  // Setup fusebox files
-
-  base::ScopedTempDir temp_dir;
-  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
-
-  base::FilePath fake_mount_dir =
-      temp_dir.GetPath().Append(FILE_PATH_LITERAL("fake_mount"));
-  ASSERT_TRUE(base::CreateDirectory(fake_mount_dir));
-
-  base::FilePath resolved_path_1 =
-      fake_mount_dir.Append(FILE_PATH_LITERAL("doc1.doc"));
-  base::FilePath resolved_path_2 =
-      fake_mount_dir.Append(FILE_PATH_LITERAL("doc2.doc"));
-
-  ASSERT_TRUE(base::WriteFile(resolved_path_1, "test content 1"));
-  ASSERT_TRUE(base::WriteFile(resolved_path_2, "test content 2"));
-
-  fusebox::Server::OverrideFuseBoxMediaPathForTesting(
-      temp_dir.GetPath().AsUTF8Unsafe() + "/");
-  base::ScopedClosureRunner reset_media_path(base::BindOnce(
-      []() { fusebox::Server::OverrideFuseBoxMediaPathForTesting(""); }));
-
-  storage::FileSystemContext* context =
-      profile
-          ->GetStoragePartition(
-              web_contents->GetPrimaryMainFrame()->GetSiteInstance())
-          ->GetFileSystemContext();
-
-  url::Origin origin = url::Origin::Create(GURL("https://example.com"));
-
-  // Create mock virtual file URLs
-  base::FilePath virtual_path_1(FILE_PATH_LITERAL("fake_mount/doc1.doc"));
-  base::FilePath virtual_path_2(FILE_PATH_LITERAL("fake_mount/doc2.doc"));
-  base::FilePath virtual_path_3(FILE_PATH_LITERAL("not_backed_mount/doc3.doc"));
-
-  file_manager::util::FileSystemURLAndHandle url_handle_1 =
-      file_manager::util::CreateIsolatedURLFromVirtualPath(*context, origin,
-                                                           virtual_path_1);
-  file_manager::util::FileSystemURLAndHandle url_handle_2 =
-      file_manager::util::CreateIsolatedURLFromVirtualPath(*context, origin,
-                                                           virtual_path_2);
-  file_manager::util::FileSystemURLAndHandle url_handle_3 =
-      file_manager::util::CreateIsolatedURLFromVirtualPath(*context, origin,
-                                                           virtual_path_3);
-
-  GURL url_1 = url_handle_1.url.ToGURL();
-  GURL url_2 = url_handle_2.url.ToGURL();
-  GURL url_3 = url_handle_3.url.ToGURL();
-
-  content::DropData data;
-  data.file_system_files.push_back({url_1, 10, std::string()});
-  data.file_system_files.push_back({url_2, 20, std::string()});
-  data.file_system_files.push_back({url_3, 30, std::string()});
-  data.document_is_handling_drag = true;
-
-  if (IsDlpFileSystemApiEnabled()) {
-    // Scenario 1: DLP Disabled -> All files allowed (including unscanned VFS 3)
-    SetExpectedRequestsCount(0);
-    RunTest(data, /*enable=*/false, /*successful_text_scan=*/false,
-            /*successful_file_paths=*/{},
-            /*successful_vfs_urls=*/{url_1, url_2, url_3},
-            /*use_mock_handler=*/true);
-
-    // Scenario 2: DLP Enabled, all allowed -> All files allowed (since no
-    // violations)
-    SetExpectedRequestsCount(2);
-    RunTest(data, /*enable=*/true, /*successful_text_scan=*/false,
-            /*successful_file_paths=*/{},
-            /*successful_vfs_urls=*/{url_1, url_2, url_3},
-            /*use_mock_handler=*/true);
-
-    // Scenario 3: DLP Enabled, selective block -> url_1 (resolved_path_1)
-    // blocks, others allowed. Note: url_3 is not backed by Fusebox, so it is
-    // allowed because it was never scanned.
-    SetExpectedRequestsCount(2);
-    SetFailingFileScans({resolved_path_1});
-    SetFailingFileAcks({resolved_path_1});
-    RunTest(data, /*enable=*/true, /*successful_text_scan=*/false,
-            /*successful_file_paths=*/{},
-            /*successful_vfs_urls=*/{url_2, url_3},
-            /*use_mock_handler=*/true);
-
-    // Scenario 4: DLP Enabled, all scannable files blocked -> Allow
-    // non-scannable Note: Since all files that *could* be scanned (url_1,
-    // url_2) are blocked, but url_3 is not scannable, the drop is not aborted
-    // and url_3 is allowed.
-    SetExpectedRequestsCount(2);
-    SetFailingFileScans({resolved_path_1, resolved_path_2});
-    SetFailingFileAcks({resolved_path_1, resolved_path_2});
-    RunTest(data, /*enable=*/true, /*successful_text_scan=*/false,
-            /*successful_file_paths=*/{},
-            /*successful_vfs_urls=*/{url_3},
-            /*use_mock_handler=*/true);
-  } else {
-    // When the feature is disabled, virtual files are allowed by default
-    // without scanning, regardless of DLP policy settings.
-    SetExpectedRequestsCount(0);
-    RunTest(data, /*enable=*/false, /*successful_text_scan=*/false,
-            /*successful_file_paths=*/{},
-            /*successful_vfs_urls=*/{url_1, url_2, url_3},
-            /*use_mock_handler=*/true);
-
-    RunTest(data, /*enable=*/true, /*successful_text_scan=*/false,
-            /*successful_file_paths=*/{},
-            /*successful_vfs_urls=*/{url_1, url_2, url_3},
-            /*use_mock_handler=*/true);
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 INSTANTIATE_TEST_SUITE_P(All,
                          ChromeWebContentsViewDelegateHandleOnPerformingDrop,

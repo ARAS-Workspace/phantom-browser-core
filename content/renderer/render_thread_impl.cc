@@ -183,8 +183,7 @@
 #include "content/renderer/theme_helper_mac.h"
 #endif
 
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "content/child/sandboxed_process_thread_type_handler.h"
 #endif
 
@@ -569,7 +568,7 @@ void RenderThreadImpl::Init() {
   }
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   SandboxedProcessThreadTypeHandler::NotifyMainChildThreadCreated();
 #endif
 
@@ -616,7 +615,7 @@ void RenderThreadImpl::Init() {
   base::DiscardableMemoryAllocator::SetInstance(
       discardable_memory_allocator_.get());
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   ChildProcess::current()->SetIOThreadType(base::ThreadType::kPresentation);
 #endif
 
@@ -1689,7 +1688,7 @@ RenderThreadImpl::CreateMediaMojoCodecFactory(
     bool enable_video_encode_accelerator) {
   mojo::PendingRemote<media::mojom::VideoEncodeAcceleratorProvider>
       vea_provider;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(media::kUseOutOfProcessVideoEncoding)) {
     BindHostReceiver(vea_provider.InitWithNewPipeAndPassReceiver());
   } else {

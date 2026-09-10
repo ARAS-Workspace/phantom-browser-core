@@ -277,15 +277,6 @@ bool ChromePageInfoUiDelegate::ShouldShowSettingsLinkForPermission(
         return true;
       }
       return false;
-#if BUILDFLAG(IS_CHROMEOS)
-    case ContentSettingsType::GEOLOCATION:
-      if (system_permission_settings::IsDenied(type)) {
-        *text_id = IDS_PAGE_INFO_LOCATION_SYSTEM_SETTINGS_DESCRIPTION;
-        *link_id = IDS_PAGE_INFO_SETTINGS_OF_A_SYSTEM_LINK;
-        return true;
-      }
-      return false;
-#endif
     case ContentSettingsType::CLIPBOARD_READ_WRITE:
       if (base::FeatureList::IsEnabled(
               content_settings::features::kLeftHandSideActivityIndicators) &&

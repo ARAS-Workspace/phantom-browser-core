@@ -93,12 +93,6 @@ std::string GetStringForContentType(ContentSettingsType content_type) {
       return "FileSystemWriteGuard";
     case ContentSettingsType::SUB_APP_INSTALLATION_PROMPTS:
       return "SubAppInstallationPrompts";
-#if BUILDFLAG(IS_CHROMEOS)
-    case ContentSettingsType::SMART_CARD_GUARD:
-      return "SmartCard";
-#endif  // BUILDFLAG(IS_CHROMEOS)
-    // If you add a new Content Setting here, also add it to
-    // IsEnabledForContentSetting.
     default:
       return PermissionUtil::GetPermissionString(content_type);
   }
@@ -252,9 +246,6 @@ bool PermissionDecisionAutoBlocker::IsEnabledForContentSetting(
              ContentSettingsType::FILE_SYSTEM_ACCESS_RESTORE_PERMISSION ||
          content_setting == ContentSettingsType::FILE_SYSTEM_WRITE_GUARD ||
          content_setting == ContentSettingsType::SUB_APP_INSTALLATION_PROMPTS
-#if BUILDFLAG(IS_CHROMEOS)
-         || content_setting == ContentSettingsType::SMART_CARD_GUARD
-#endif  // BUILDFLAG(IS_CHROMEOS)
       ;
   // If you add a new content setting here, also add it to
   // GetStringForContentType.

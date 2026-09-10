@@ -236,9 +236,6 @@ INSTANTIATE_TEST_SUITE_P(
                                      kOnBulkDataEntryPref,
                                      kOnPrintPref,
                                      kOnNetworkRequestPref,
-#if BUILDFLAG(IS_CHROMEOS)
-                                     kOnFileTransferPref,
-#endif
                                      kOnSecurityEventPref)));
 
 }  // namespace enterprise_connectors

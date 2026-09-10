@@ -39,7 +39,7 @@ DownloadCoreServiceFactory::DownloadCoreServiceFactory()
               // Ash Internals.
               .WithAshInternals(ProfileSelection::kOwnInstance)
               .Build()) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   DependsOn(DownloadBubbleUpdateServiceFactory::GetInstance());
 #endif  // !BUILDFLAG(IS_ANDROID)
   DependsOn(HistoryServiceFactory::GetInstance());

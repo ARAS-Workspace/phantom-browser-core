@@ -81,10 +81,6 @@ class ChromeWebAuthenticationDelegate final
   std::optional<TouchIdAuthenticatorConfig> GetTouchIdAuthenticatorConfig(
       content::BrowserContext* browser_context) override;
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_CHROMEOS)
-  ChromeOSGenerateRequestIdCallback GetGenerateRequestIdCallback(
-      content::RenderFrameHost* render_frame_host) override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   base::WeakPtrFactory<ChromeWebAuthenticationDelegate> weak_ptr_factory_{this};
 };

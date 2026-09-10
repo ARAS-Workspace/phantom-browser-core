@@ -91,39 +91,21 @@
 #include "chrome/browser/ui/webui/devtools/devtools_ui.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/url_constants.h"
-#include "ash/constants/webui_url_constants.h"
-#include "ash/webui/camera_app_ui/url_constants.h"
-#include "ash/webui/file_manager/url_constants.h"
-#include "ash/webui/files_internals/url_constants.h"
-#include "ash/webui/growth_internals/constants.h"
-#include "ash/webui/help_app_ui/url_constants.h"
-#include "ash/webui/mall/url_constants.h"
-#include "ash/webui/multidevice_debug/url_constants.h"
-#include "ash/webui/recorder_app_ui/url_constants.h"
-#include "ash/webui/vc_background_ui/url_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/app_home/app_home_ui.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/sandbox/sandbox_internals_ui.h"
 #endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/webui/management/management_ui.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/extensions/extension_url_overrides.h"
@@ -261,12 +243,12 @@ void ChromeWebUIControllerFactory::GetFaviconForURL(
     const GURL& page_url,
     const std::vector<int>& desired_sizes_in_pixel,
     favicon_base::FaviconResultsCallback callback) const {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (page_url.SchemeIs(webapps::kIsolatedAppScheme)) {
     ReadIsolatedWebAppFaviconsFromDisk(profile, page_url, std::move(callback));
     return;
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // Before determining whether page_url is an extension url, we must handle
   // overrides. This changes urls in |kChromeUIScheme| to extension urls, and
@@ -414,12 +396,10 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
   }
 
 #if !BUILDFLAG(IS_ANDROID)
-#if !BUILDFLAG(IS_CHROMEOS)
   // The chrome://apps page is not available on Android or ChromeOS.
   if (page_url.host() == chrome::kChromeUIAppLauncherPageHost) {
     return webapps::AppHomeUI::GetFaviconResourceBytes(scale_factor);
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   if (page_url.host() == chrome::kChromeUINewTabPageHost ||
       page_url.host() == chrome::kChromeUINewTabHost) {
@@ -432,22 +412,16 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
   }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (page_url.host() == chrome::kChromeUIManagementHost) {
-    return ManagementUI::GetFaviconResourceBytes(scale_factor);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // Tab Search hosts the split tab NTP and so leveraging the NTP favicon.
   if (page_url.host() == chrome::kChromeUITabSearchHost) {
     return NewTabPageUI::GetFaviconResourceBytes(scale_factor);
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (page_url.host() == chrome::kChromeUIContextualTasksHost) {
     return ContextualTasksUI::GetFaviconResourceBytes(scale_factor);
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -455,14 +429,6 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
     return extensions::ExtensionsUI::GetFaviconResourceBytes(scale_factor);
   }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (page_url.host() == ash::kChromeUIOSSettingsHost) {
-    // Chrome OS uses the general settings favicon for OS settings.
-    return ui::ResourceBundle::GetSharedInstance()
-        .LoadDataResourceBytesForScale(IDR_SETTINGS_FAVICON, scale_factor);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   return nullptr;
 }

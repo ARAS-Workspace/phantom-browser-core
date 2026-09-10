@@ -550,7 +550,7 @@ IN_PROC_BROWSER_TEST_F(LazyBackgroundPageApiTest, DISABLED_IncognitoSplitMode) {
 // Tests that messages from the content script activate the lazy background
 // page, and keep it alive until all channels are closed.
 // http://crbug.com/40169579; test fails occasionally on OS X 10.15
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_Messaging DISABLED_Messaging
 #else
 #define MAYBE_Messaging Messaging

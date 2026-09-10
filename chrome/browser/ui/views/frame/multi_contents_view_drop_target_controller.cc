@@ -55,9 +55,7 @@ bool IsPointEligibleForDrag(gfx::Point point_in_view,
 // static
 int MultiContentsViewDropTargetController::DropTargetConstants::GetHideWidth() {
   return
-#if BUILDFLAG(IS_CHROMEOS)
-      32;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
       50;
 #else
       0;

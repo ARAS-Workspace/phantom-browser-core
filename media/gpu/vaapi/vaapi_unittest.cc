@@ -415,25 +415,6 @@ TEST_F(VaapiTest, VbrAndCbrResolutionsMatch) {
 }
 
 #if BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
-#if BUILDFLAG(IS_CHROMEOS)
-// Verifies that VAProfileProtected is indeed supported by the command line
-// vainfo utility.
-TEST_F(VaapiTest, VaapiProfileProtected) {
-  VAImplementation impl = VaapiWrapper::GetImplementationType();
-  // VAProfileProtected is only used in the Intel iHD implementation. AMD does
-  // not need to support that profile (but should be the only other protected
-  // content VAAPI implementation).
-  if (impl == VAImplementation::kIntelIHD) {
-    const auto va_info = RetrieveVAInfoOutput();
-
-    EXPECT_TRUE(std::ranges::contains(va_info.at(VAProfileProtected),
-                                      VAEntrypointProtectedContent))
-        << ", va profile: " << vaProfileStr(VAProfileProtected);
-  } else {
-    EXPECT_EQ(impl, VAImplementation::kMesaGallium);
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
 
 // Verifies that if JPEG decoding and encoding are supported by VaapiWrapper,
@@ -520,22 +501,7 @@ TEST_F(VaapiTest, TooManyDecoderInstances) {
 // Verifies that VaapiWrapper::Create...() fails when an EncryptionScheme is
 // specified for a non-protected CodecMode.
 TEST_F(VaapiTest, EncryptionSchemeNeedsCodecMode) {
-#if !BUILDFLAG(IS_CHROMEOS)
   GTEST_SKIP() << "This test only applies to ChromeOS builds.";
-#else
-  std::map<VAProfile, std::vector<VAEntrypoint>> configurations =
-      VaapiWrapper::GetSupportedConfigurationsForCodecModeForTesting(
-          VaapiWrapper::kDecode);
-  // H.264 decoding is currently supported everywhere, but leave an ASSERT.
-  constexpr auto kVAProfile = VAProfileH264ConstrainedBaseline;
-  ASSERT_TRUE(configurations.contains(kVAProfile));
-
-  auto wrapper_or_error =
-      VaapiWrapper::Create(VaapiWrapper::kDecode, kVAProfile,
-                           EncryptionScheme::kCenc, base::DoNothing());
-  ASSERT_FALSE(wrapper_or_error.has_value());
-  ASSERT_EQ(wrapper_or_error.error(), DecoderStatus::Codes::kFailed);
-#endif
 }
 
 // Verifies that VaapiWrapper::CreateContext() will queue up a buffer to set the
@@ -626,37 +592,11 @@ TEST_F(VaapiTest, LowQualityEncodingSetting) {
 TEST_F(VaapiTest, CheckSupportedSVCScalabilityModes) {
   const std::vector<SVCScalabilityMode> kSupportedL1T1 = {
       SVCScalabilityMode::kL1T1};
-#if BUILDFLAG(IS_CHROMEOS)
-  const std::vector<SVCScalabilityMode> kSupportedTemporalSVC = {
-      SVCScalabilityMode::kL1T1, SVCScalabilityMode::kL1T2,
-      SVCScalabilityMode::kL1T3};
-  const std::vector<SVCScalabilityMode> kSupportedTemporalAndKeySVC = {
-      SVCScalabilityMode::kL1T1,    SVCScalabilityMode::kL1T2,
-      SVCScalabilityMode::kL1T3,    SVCScalabilityMode::kL2T2Key,
-      SVCScalabilityMode::kL2T3Key, SVCScalabilityMode::kL3T2Key,
-      SVCScalabilityMode::kL3T3Key, SVCScalabilityMode::kS2T1,
-      SVCScalabilityMode::kS2T2,    SVCScalabilityMode::kS2T3,
-      SVCScalabilityMode::kS3T1,    SVCScalabilityMode::kS3T2,
-      SVCScalabilityMode::kS3T3};
-#endif
 
   const auto scalability_modes_vp9_profile0 =
       VaapiWrapper::GetSupportedScalabilityModes(VP9PROFILE_PROFILE0,
                                                  VAProfileVP9Profile0);
-#if BUILDFLAG(IS_CHROMEOS)
-  const VAEntrypoint vp9_cqp_enc_va_entry_point =
-      VaapiWrapper::GetDefaultVaEntryPoint(
-          VaapiWrapper::kEncodeConstantQuantizationParameter,
-          VAProfileVP9Profile0);
-  if (vp9_cqp_enc_va_entry_point == VAEntrypointEncSliceLP ||
-      vp9_cqp_enc_va_entry_point == VAEntrypointEncSlice) {
-    EXPECT_EQ(scalability_modes_vp9_profile0, kSupportedTemporalAndKeySVC);
-  } else {
-    EXPECT_EQ(scalability_modes_vp9_profile0, kSupportedTemporalSVC);
-  }
-#else
   EXPECT_EQ(scalability_modes_vp9_profile0, kSupportedL1T1);
-#endif
 
   const auto scalability_modes_vp9_profile2 =
       VaapiWrapper::GetSupportedScalabilityModes(VP9PROFILE_PROFILE2,
@@ -665,20 +605,12 @@ TEST_F(VaapiTest, CheckSupportedSVCScalabilityModes) {
 
   const auto scalability_modes_vp8 = VaapiWrapper::GetSupportedScalabilityModes(
       VP8PROFILE_ANY, VAProfileVP8Version0_3);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(scalability_modes_vp8, kSupportedTemporalSVC);
-#else
   EXPECT_EQ(scalability_modes_vp8, kSupportedL1T1);
-#endif
 
   const auto scalability_modes_h264_baseline =
       VaapiWrapper::GetSupportedScalabilityModes(
           H264PROFILE_BASELINE, VAProfileH264ConstrainedBaseline);
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(scalability_modes_h264_baseline, kSupportedTemporalSVC);
-#else
   EXPECT_EQ(scalability_modes_h264_baseline, kSupportedL1T1);
-#endif
 }
 
 class VaapiVppTest
@@ -1027,14 +959,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 int main(int argc, char** argv) {
   base::TestSuite test_suite(argc, argv);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // For VAAPI testing with libfake, the dumb driver is used with vkms for
-  // the minigbm backend. In this case, the primary node needs to be used
-  // instead of the render node.
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kEnablePrimaryNodeAccessForVkmsTesting);
-#endif
 
   // PreSandboxInitialization() loads and opens the driver, queries its
   // capabilities and fills in the VASupportedProfiles.

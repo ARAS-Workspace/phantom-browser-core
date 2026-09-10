@@ -21,24 +21,6 @@ namespace screen_ai {
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS)
-void HandleLibraryLogging(int severity, const char* message) {
-  switch (severity) {
-    case logging::LOGGING_VERBOSE:
-    case logging::LOGGING_INFO:
-      VLOG(2) << message;
-      break;
-    case logging::LOGGING_WARNING:
-      VLOG(1) << message;
-      break;
-    case logging::LOGGING_ERROR:
-    case logging::LOGGING_FATAL:
-      VLOG(0) << message;
-      break;
-  }
-}
-#endif
-
 }  // namespace
 
 ScreenAILibraryWrapperImpl::ScreenAILibraryWrapperImpl() = default;
@@ -62,12 +44,6 @@ bool ScreenAILibraryWrapperImpl::Load(const base::FilePath& library_path) {
     VLOG(0) << "Library load error: " << library_.GetError()->message;
     return false;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!LoadFunction(set_logger_, "SetLogger")) {
-    return false;
-  }
-#endif
 
   // General functions.
   if (!LoadFunction(get_library_version_, "GetLibraryVersion") ||
@@ -97,14 +73,6 @@ bool ScreenAILibraryWrapperImpl::Load(const base::FilePath& library_path) {
 
   return true;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-NO_SANITIZE("cfi-icall")
-void ScreenAILibraryWrapperImpl::ScreenAILibraryWrapperImpl::SetLogger() {
-  CHECK(set_logger_);
-  set_logger_(&HandleLibraryLogging);
-}
-#endif
 
 NO_SANITIZE("cfi-icall")
 void ScreenAILibraryWrapperImpl::GetLibraryVersion(uint32_t& major,

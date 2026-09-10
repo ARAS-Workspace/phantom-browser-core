@@ -25,11 +25,6 @@
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#include "chromeos/ash/components/system/statistics_provider.h"
-#endif
-
 namespace web_app {
 
 class DedupeInstallUrlsCommandTest : public WebAppTest {
@@ -51,18 +46,9 @@ class DedupeInstallUrlsCommandTest : public WebAppTest {
 
     test::AwaitStartWebAppProviderAndSubsystems(profile());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Mocking the StatisticsProvider for testing.
-    ash::system::StatisticsProvider::SetTestProvider(&statistics_provider);
-    statistics_provider.SetMachineStatistic(ash::system::kActivateDateKey,
-                                            "2023-18");
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::system::StatisticsProvider::SetTestProvider(nullptr);
-#endif
     WebAppTest::TearDown();
   }
 
@@ -139,9 +125,6 @@ class DedupeInstallUrlsCommandTest : public WebAppTest {
   base::AutoReset<bool> skip_preinstalled_web_app_startup_;
   base::AutoReset<bool> bypass_offline_manifest_requirement_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::system::FakeStatisticsProvider statistics_provider;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(DedupeInstallUrlsCommandTest,

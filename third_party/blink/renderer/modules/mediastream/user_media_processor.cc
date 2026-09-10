@@ -362,7 +362,7 @@ String ErrorCodeToString(MediaStreamRequestResult result) {
   NOTREACHED();
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 // This only applies to user media requests.
 bool ShouldDeferDeviceSettingsSelection(
     UserMediaRequestType request_type,

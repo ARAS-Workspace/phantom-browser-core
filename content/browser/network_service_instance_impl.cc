@@ -94,7 +94,7 @@
 #include "content/browser/network_sandbox.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #include "content/browser/system_dns_resolution/system_dns_resolver.h"
 #include "services/network/public/mojom/system_dns_resolution.mojom-forward.h"
 #endif
@@ -115,14 +115,6 @@ constexpr char kKrb5CCEnvName[] = "KRB5CCNAME";
 // Environment variable pointing to Kerberos config file.
 constexpr char kKrb5ConfEnvName[] = "KRB5_CONFIG";
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-// File paths to the Kerberos credentials cache and configuration. The `FILE:`
-// prefix describes the type of credentials cache used. The `/home/chronos/user`
-// subpath corresponds to a bind mount of the active user.
-constexpr char kKrb5CCFilePath[] = "FILE:/home/chronos/user/kerberos/krb5cc";
-constexpr char kKrb5ConfFilePath[] = "/home/chronos/user/kerberos/krb5.conf";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 bool g_force_create_network_service_directly = false;
 bool g_network_service_crashes_on_next_startup = false;
@@ -383,17 +375,7 @@ network::mojom::NetworkServiceParamsPtr CreateNetworkServiceParams() {
   }
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, the network service is always out of process (unless
-  // --single-process is set on the command-line). In any case, we set Kerberos
-  // environment variables during the service initialization.
-  network_service_params->environment.push_back(
-      network::mojom::EnvironmentVariable::New(kKrb5CCEnvName,
-                                               kKrb5CCFilePath));
-  network_service_params->environment.push_back(
-      network::mojom::EnvironmentVariable::New(kKrb5ConfEnvName,
-                                               kKrb5ConfFilePath));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // Send Kerberos environment variables to the network service, if it's running
   // in another process.
   if (IsOutOfProcessNetworkService()) {
@@ -784,12 +766,6 @@ void RemoveNetworkServiceProcessObserver(
   }
   g_observed_network_service->RemoveObserver(observer);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-net::NetworkChangeNotifier* GetNetworkChangeNotifier() {
-  return BrowserMainLoop::GetInstance()->network_change_notifier();
-}
-#endif
 
 void FlushNetworkServiceInstanceForTesting() {
   DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI));

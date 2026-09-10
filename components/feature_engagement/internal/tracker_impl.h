@@ -83,10 +83,6 @@ class TrackerImpl : public Tracker {
                                            base::OnceClosure callback) override;
   void UnregisterPriorityNotificationHandler(
       const base::Feature& feature) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void UpdateConfig(const base::Feature& feature,
-                    const ConfigurationProvider* provider) override;
-#endif
   const Configuration* GetConfiguration() const override;
   void SetClockForTesting(const base::Clock& clock,
                           base::Time initial_now) override;

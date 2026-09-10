@@ -44,9 +44,6 @@ class CloudBinaryUploadServiceBase : public BinaryUploadService {
     virtual bool IsAdvancedProtection() = 0;
     virtual bool IsEnhancedProtection() = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    virtual bool IsManagedGuestSession() = 0;
-#endif
   };
 
   CloudBinaryUploadServiceBase(

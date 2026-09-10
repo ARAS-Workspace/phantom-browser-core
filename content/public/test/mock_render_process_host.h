@@ -275,11 +275,6 @@ class MockRenderProcessHost : public RenderProcessHost {
   std::string GetInfoForBrowserContextDestructionCrashReporting() override;
   void WriteIntoTrace(perfetto::TracedProto<TraceProto> proto) const override;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void ReinitializeLogging(uint32_t logging_dest,
-                           base::ScopedFD log_file_descriptor) override;
-#endif
-
   void SetBatterySaverMode(bool battery_saver_mode_enabled) override {}
   uint64_t GetPrivateMemoryFootprint() override;
 

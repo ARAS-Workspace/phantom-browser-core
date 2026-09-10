@@ -201,7 +201,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientReadingListSyncTest,
 
 // ChromeOS doesn't have the concept of sign-out, so this only exists on other
 // platforms.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientReadingListSyncTest,
                        ShouldDeleteAccountDataUponSignout) {
@@ -791,7 +790,5 @@ IN_PROC_BROWSER_TEST_P(SingleClientReadingListSyncTest,
   GetClient(0)->SignOutPrimaryAccount();
   EXPECT_THAT(model()->GetKeys(), ElementsAre(kUrlB));
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

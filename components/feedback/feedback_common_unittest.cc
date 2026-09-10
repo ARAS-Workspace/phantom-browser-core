@@ -34,11 +34,7 @@ constexpr uint8_t kJpegBytes[] = {0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10,
                                   0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
                                   0x01, 0x00, 0x00, 0x01};
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr int kDefaultProductId = 208;  // ChromeOS default product ID.
-#else
 constexpr int kDefaultProductId = 237;  // Chrome default product ID.
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }  // namespace
 
 class FeedbackCommonTest : public testing::Test {

@@ -65,15 +65,6 @@
 #include "content/public/test/test_utils.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "base/path_service.h"
-#include "chrome/common/chrome_paths.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#include "testing/gtest/include/gtest/gtest.h"
-#endif
-
 namespace {
 
 void ProfileCreationComplete(base::OnceClosure completion_callback,
@@ -236,18 +227,7 @@ class PasswordStoreConsumerVerifier
 base::FilePath GetFirstNonSigninProfile(ProfileAttributesStorage* storage) {
   std::vector<ProfileAttributesEntry*> entries =
       storage->GetAllProfilesAttributesSortedByNameWithCheck();
-#if BUILDFLAG(IS_CHROMEOS)
-  for (ProfileAttributesEntry* entry : entries) {
-    base::FilePath profile_path = entry->GetPath();
-    std::string base_name = profile_path.BaseName().value();
-    if (base_name != ash::kSigninBrowserContextBaseName) {
-      return profile_path;
-    }
-  }
-  return base::FilePath();
-#else
   return entries.front()->GetPath();
-#endif
 }
 
 }  // namespace
@@ -262,10 +242,6 @@ class ProfileManagerBrowserTestBase : public InProcessBrowserTest {
   }
   void SetUpCommandLine(base::CommandLine* command_line) override {
     InProcessBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
   }
 };
 
@@ -288,7 +264,6 @@ class ProfileManagerBrowserTest : public ProfileManagerBrowserTestBase,
 };
 
 // CrOS multi-profiles implementation is too different for these tests.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // TODO(crbug.com/40818380): Test failed on Mac.
 #if BUILDFLAG(IS_MAC)
@@ -447,8 +422,6 @@ IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, MAYBE_DeleteAllProfiles) {
   EXPECT_EQ(new_profile_path, last_used->GetPath());
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
 IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, ProfileFromProfileKey) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
   Profile* profile1 = browser()->GetProfile();
@@ -491,37 +464,7 @@ IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, ProfileFromProfileKey) {
             profile_manager->GetProfileFromProfileKey(otr_2b->GetProfileKey()));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-class ProfileManagerCrOSBrowserTest : public ProfileManagerBrowserTest {
- protected:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // Use a user hash other than the default
-    // ash::BrowserContextHelper::kTestUserBrowserContextDirName so that
-    // the prefix case is tested.
-    command_line->AppendSwitchASCII(ash::switches::kLoginProfile,
-                                    "test-user-hash");
-  }
-};
-
-IN_PROC_BROWSER_TEST_P(ProfileManagerCrOSBrowserTest, GetLastUsedProfile) {
-  // Make sure that last used profile is correct.
-  Profile* last_used_profile = ProfileManager::GetLastUsedProfile();
-  EXPECT_TRUE(last_used_profile != nullptr);
-
-  base::FilePath profile_path;
-  base::PathService::Get(chrome::DIR_USER_DATA, &profile_path);
-
-  profile_path = profile_path.Append(
-      ash::BrowserContextHelper::GetUserBrowserContextDirName(
-          "test-user-hash"));
-  EXPECT_EQ(profile_path.value(), last_used_profile->GetPath().value());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // ChromeOS doesn't support multiple profiles.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, CreateProfileWithCallback) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
 
@@ -537,7 +480,6 @@ IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, CreateProfileWithCallback) {
   run_loop.Run();
   EXPECT_EQ(profile_manager->GetNumberOfProfiles(), 2U);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, SwitchToProfile) {
   // If multiprofile mode is not enabled, you can't switch between profiles.
@@ -733,7 +675,6 @@ IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, EphemeralProfile) {
 }
 
 // The test makes sense on those platforms where the keychain exists.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, DeletePasswords) {
   Profile* profile = browser()->GetProfile();
   ASSERT_TRUE(profile);
@@ -772,7 +713,6 @@ IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, DeletePasswords) {
   verify_delete.Wait();
   EXPECT_EQ(0u, verify_delete.GetPasswords().size());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Tests Profile::HasOffTheRecordProfile, Profile::IsValidProfile and the
 // profile counts in ProfileManager with respect to the creation and destruction
@@ -822,21 +762,9 @@ IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, IncognitoProfile) {
                    .empty());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-INSTANTIATE_TEST_SUITE_P(DestroyProfileOnBrowserClose,
-                         ProfileManagerBrowserTest,
-                         testing::Values(false));
-
-INSTANTIATE_TEST_SUITE_P(DestroyProfileOnBrowserClose,
-                         ProfileManagerCrOSBrowserTest,
-                         testing::Bool());
-#else
 INSTANTIATE_TEST_SUITE_P(DestroyProfileOnBrowserClose,
                          ProfileManagerBrowserTest,
                          testing::Bool());
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS)
 
 const base::FilePath::CharType kNonAsciiProfileDir[] =
     FILE_PATH_LITERAL("\u0645\u0635\u0631");
@@ -867,9 +795,7 @@ IN_PROC_BROWSER_TEST_F(ProfileManagerNonAsciiBrowserTest,
               ::testing::UnorderedElementsAreArray(expected_paths));
 }
 
-#endif  //! BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Browser object only exists on Desktop platforms and multi-profiles are
 // supported.
 
@@ -1239,4 +1165,4 @@ IN_PROC_BROWSER_TEST_F(ProfileManagerDestroyProfileBrowserTest,
   EXPECT_EQ(2u, storage.GetNumberOfProfiles());
   EXPECT_TRUE(base::PathExists(dest_path1));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)

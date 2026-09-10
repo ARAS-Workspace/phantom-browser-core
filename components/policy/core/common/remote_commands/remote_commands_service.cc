@@ -196,11 +196,7 @@ std::string RemoteCommandsService::GetRequestType(
     case PolicyInvalidationScope::kCBCM:
       return dm_protocol::kChromeBrowserRemoteCommandType;
     case PolicyInvalidationScope::kUser:
-#if BUILDFLAG(IS_CHROMEOS)
-      return dm_protocol::kChromeAshUserRemoteCommandType;
-#else
       return dm_protocol::kChromeUserRemoteCommandType;
-#endif
   }
 }
 
@@ -380,7 +376,6 @@ bool RemoteCommandsService::CanFetchRemoteCommands() {
     return false;
   }
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // We need to check if CEC is enabled.
   if (scope_ == PolicyInvalidationScope::kUser) {
     const em::PolicyData* policy = store_->policy();
@@ -401,7 +396,6 @@ bool RemoteCommandsService::CanFetchRemoteCommands() {
       }
     }
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   if (command_fetch_in_progress_) {
     has_enqueued_fetch_request_ = true;

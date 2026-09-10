@@ -55,7 +55,6 @@ using testing::IsEmpty;
 using testing::SizeIs;
 using testing::UnorderedElementsAre;
 
-#if !BUILDFLAG(IS_CHROMEOS)
 MATCHER_P2(HasPasswordValue, fake_server_, password_value, "") {
   sync_pb::PasswordSpecificsData decrypted;
   syncer::CryptographerImpl::FromSingleKeyForTesting(
@@ -64,7 +63,6 @@ MATCHER_P2(HasPasswordValue, fake_server_, password_value, "") {
       ->Decrypt(arg.specifics().password().encrypted(), &decrypted);
   return decrypted.password_value() == password_value;
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 MATCHER_P3(HasPasswordValueAndUnsupportedFields,
            cryptographer,
@@ -364,7 +362,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
 
 // On ChromeOS, Sync-the-feature gets started automatically once a primary
 // account is signed in and the transport mode is not a thing.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
                        StoresDataForNonSyncingPrimaryAccountInAccountDB) {
   AddTestPasswordToFakeServer();
@@ -382,10 +379,8 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
       passwords_helper::GetAccountPasswordStoreInterface(0);
   EXPECT_EQ(passwords_helper::GetAllLogins(account_store).size(), 1u);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // The unconsented primary account isn't supported on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 // This test verifies that account storage is used when an account is signed in
 // but Sync-the-feature is not enabled.
 IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
@@ -405,10 +400,8 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
       passwords_helper::GetAccountPasswordStoreInterface(0);
   EXPECT_EQ(passwords_helper::GetAllLogins(account_store).size(), 1u);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // ChromeOS does not support signing out of a primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // Sanity check: The profile database should *not* get cleared on signout.
 IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
@@ -431,11 +424,9 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
   // Make sure the password is still in the store.
   ASSERT_EQ(passwords_helper::GetAllLogins(profile_store).size(), 1u);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // The unconsented primary account isn't supported on ChromeOS so Sync won't
 // start up for an unconsented account.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
                        ClearsAccountDBOnSignout) {
   AddTestPasswordToFakeServer();
@@ -731,8 +722,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
                   AllOf(Field(&PasswordForm::username_value, u"username1"),
                         Field(&PasswordForm::password_value, u"password1")))));
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientPasswordsSyncTest,
                        PreservesUnsupportedFieldsDataOnCommits) {

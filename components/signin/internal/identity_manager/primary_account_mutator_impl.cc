@@ -57,40 +57,21 @@ PrimaryAccountMutatorImpl::SetPrimaryAccount(
   DCHECK(!account_info.email.empty());
   DCHECK(!account_info.gaia.empty());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   bool is_signin_allowed = pref_service_->GetBoolean(prefs::kSigninAllowed);
   if (!is_signin_allowed) {
     return PrimaryAccountError::kSigninNotAllowed;
   }
-#endif
 
   switch (consent_level) {
     case ConsentLevel::kSync:
-#if !BUILDFLAG(IS_CHROMEOS)
       // TODO(crbug.com/40067025): Replace with NOTREACHED on iOS after all
       // flows have been migrated away from kSync. See ConsentLevel::kSync
       // documentation for details.
       if (primary_account_manager_->HasPrimaryAccount(ConsentLevel::kSync)) {
         return PrimaryAccountError::kSyncConsentAlreadySet;
       }
-#endif
       break;
     case ConsentLevel::kSignin:
-#if BUILDFLAG(IS_CHROMEOS)
-      // On Chrome OS the UPA can only be set once and never removed or changed.
-      if (base::FeatureList::IsEnabled(
-              syncer::kReplaceSyncPromosWithSignInPromos)) {
-        if (primary_account_manager_->HasPrimaryAccount(
-                ConsentLevel::kSignin)) {
-          CHECK_EQ(account_info,
-                   primary_account_manager_->GetPrimaryAccountInfo(
-                       ConsentLevel::kSignin));
-        }
-      } else {
-        DCHECK(!primary_account_manager_->HasPrimaryAccount(
-            ConsentLevel::kSignin));
-      }
-#endif
       // TODO(crbug.com/40067058): Delete this when ConsentLevel::kSync is
       //     deleted. See ConsentLevel::kSync documentation for details.
       DCHECK(!primary_account_manager_->HasPrimaryAccount(ConsentLevel::kSync));
@@ -111,7 +92,6 @@ PrimaryAccountMutatorImpl::SetPrimaryAccount(
   return PrimaryAccountError::kNoError;
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Users cannot revoke the Sync consent on Ash. They can only turn off all Sync
 // data types if they want. Revoking sync consent can lead to breakages in
 // IdentityManager dependencies like `chrome.identity` extension API - that
@@ -144,6 +124,5 @@ bool PrimaryAccountMutatorImpl::RemovePrimaryAccountButKeepTokens(
   primary_account_manager_->RemovePrimaryAccountButKeepTokens(source_metric);
   return true;
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace signin

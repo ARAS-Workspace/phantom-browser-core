@@ -35,9 +35,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 using ::testing::AnyNumber;
 
@@ -223,9 +221,7 @@ class UpgradeDetectorImplTest : public ::testing::Test {
   network::TestURLLoaderFactory url_loader_factory_;
   InstalledVersionPoller::ScopedDisableForTesting scoped_poller_disabler_;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   policy::FakeBrowserDMTokenStorage dm_token_storage_;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(UpgradeDetectorImplTest, VariationsChanges) {
@@ -548,9 +544,7 @@ class UpgradeDetectorImplTimerTest : public UpgradeDetectorImplTest,
   }
 
  private:
-#if !BUILDFLAG(IS_CHROMEOS)
   policy::FakeBrowserDMTokenStorage dm_token_storage_;
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 };
 
 INSTANTIATE_TEST_SUITE_P(All,

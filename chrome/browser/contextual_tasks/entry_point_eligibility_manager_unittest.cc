@@ -268,13 +268,8 @@ TEST_F(EntryPointEligibilityManagerTest,
 
 // Disable test on ChromeOS since ChromeOS does not support switching the
 // primary account without a restart.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_NotifyEntryPointEligibilityChanged \
-  DISABLED_NotifyEntryPointEligibilityChanged
-#else
 #define MAYBE_NotifyEntryPointEligibilityChanged \
   NotifyEntryPointEligibilityChanged
-#endif
 TEST_F(EntryPointEligibilityManagerTest,
        MAYBE_NotifyEntryPointEligibilityChanged) {
   // Start with eligible state.

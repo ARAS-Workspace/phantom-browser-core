@@ -253,11 +253,7 @@ IN_PROC_BROWSER_TEST_F(
              EvalJs(shell(), "scrollableDiv.getBoundingClientRect().bottom")
                  .ExtractDouble()) /
             2;
-#if BUILDFLAG(IS_CHROMEOS)
-  bool precise = true;
-#else
   bool precise = false;
-#endif
   // Send a GSB event to start scrolling the scrollableDiv.
   blink::WebGestureEvent gesture_scroll_begin(
       blink::WebGestureEvent::Type::kGestureScrollBegin,

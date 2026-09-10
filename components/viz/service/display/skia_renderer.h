@@ -593,14 +593,6 @@ class VIZ_SERVICE_EXPORT SkiaRenderer : public DirectRenderer {
   // Single-entry reuse pool for scanout backings.
   std::optional<RenderPassBacking> scanout_backing_for_reuse_;
 
-#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_CHROMEOS) && \
-    BUILDFLAG(USE_V4L2_CODEC)
-  bool is_protected_pool_idle_ = true;
-  std::unique_ptr<BufferQueue> protected_buffer_queue_ = nullptr;
-
-  gpu::Mailbox GetProtectedSharedImage(bool is_10bit);
-  void MaybeFreeProtectedPool();
-#endif
 };
 
 }  // namespace viz

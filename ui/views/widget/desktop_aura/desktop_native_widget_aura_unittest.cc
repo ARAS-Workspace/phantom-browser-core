@@ -67,7 +67,7 @@ TEST_F(DesktopNativeWidgetAuraTest, DesktopAuraWindowSizeTest) {
 
   // On Linux we test this with popup windows because the WM may ignore the size
   // suggestion for normal windows.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   Widget::InitParams init_params = CreateParams(
       Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_POPUP);
 #else
@@ -121,12 +121,7 @@ TEST_F(DesktopNativeWidgetAuraTest, NativeViewNoActivate) {
 }
 
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/40607034): investigate fixing and enabling on Chrome OS.
-#define MAYBE_GlobalCursorState DISABLED_GlobalCursorState
-#else
 #define MAYBE_GlobalCursorState GlobalCursorState
-#endif
 
 // Verify that the cursor state is shared between two native widgets.
 TEST_F(DesktopNativeWidgetAuraTest, MAYBE_GlobalCursorState) {
@@ -758,12 +753,7 @@ TEST_F(DesktopNativeWidgetAuraTest, CloseWidgetDuringMouseReleased) {
   RunCloseWidgetDuringDispatchTest(this, ui::EventType::kMouseReleased);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// TODO(crbug.com/40607034): investigate fixing and enabling on Chrome OS.
-#define MAYBE_WindowMouseModalityTest DISABLED_WindowMouseModalityTest
-#else
 #define MAYBE_WindowMouseModalityTest WindowMouseModalityTest
-#endif
 
 // This test verifies that whether mouse events when a modal dialog is
 // displayed are eaten or received by the dialog.

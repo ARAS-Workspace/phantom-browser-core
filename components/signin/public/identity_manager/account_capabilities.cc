@@ -197,18 +197,6 @@ signin::Tribool AccountCapabilities::can_submit_feedback() const {
 }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-signin::Tribool AccountCapabilities::can_toggle_auto_updates() const {
-  return GetCapabilityByName(kCanToggleAutoUpdatesName);
-}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-signin::Tribool AccountCapabilities::can_use_chromeos_generative_ai() const {
-  return GetCapabilityByName(kCanUseChromeOSGenerativeAi);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if !BUILDFLAG(IS_IOS)
 signin::Tribool AccountCapabilities::can_use_devtools_generative_ai_features()
     const {
@@ -239,20 +227,6 @@ signin::Tribool AccountCapabilities::can_use_gemini_in_chrome() const {
 #endif
   return GetCapabilityByName(kCanUseGeminiInChromeCapabilityName);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-signin::Tribool AccountCapabilities::can_use_generative_ai_in_recorder_app()
-    const {
-  return GetCapabilityByName(kCanUseGenerativeAiInRecorderApp);
-}
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-signin::Tribool AccountCapabilities::can_use_generative_ai_photo_editing()
-    const {
-  return GetCapabilityByName(kCanUseGenerativeAiPhotoEditing);
-}
-#endif
 
 signin::Tribool AccountCapabilities::can_use_manta_service() const {
   return GetCapabilityByName(kCanUseMantaServiceName);

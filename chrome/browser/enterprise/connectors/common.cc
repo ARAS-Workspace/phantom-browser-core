@@ -24,11 +24,6 @@
 #include "extensions/common/constants.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "components/user_manager/user.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/enterprise/signin/enterprise_signin_prefs.h"
 #include "components/prefs/pref_service.h"
@@ -133,17 +128,10 @@ void RunSavePackageScanningCallback(download::DownloadItem* item,
 }
 
 bool IsAffiliated(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  const user_manager::User* user =
-      ash::ProfileHelper::Get()->GetUserByProfile(profile);
-  return user && user->IsAffiliated();
-#else
   return enterprise_util::IsProfileAffiliated(profile);
-#endif
 }
 
 bool IncludeDeviceInfo(Profile* profile, bool per_profile) {
-#if !BUILDFLAG(IS_CHROMEOS)
   // A browser managed through the device can send device info.
   if (!per_profile) {
     return true;
@@ -153,7 +141,6 @@ bool IncludeDeviceInfo(Profile* profile, bool per_profile) {
   if (!policy::GetDMToken(profile).is_valid()) {
     return false;
   }
-#endif
   // A managed device can share its info with the profile if they are
   // affiliated.
   return IsAffiliated(profile);

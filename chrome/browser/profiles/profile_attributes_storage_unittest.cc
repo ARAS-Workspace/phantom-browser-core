@@ -60,10 +60,6 @@
 #include "ui/native_theme/native_theme.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#endif
-
 using ::testing::Mock;
 using ::testing::_;
 
@@ -185,10 +181,6 @@ class ProfileAttributesStorageTest : public testing::Test {
  public:
   ProfileAttributesStorageTest()
       : testing_profile_manager_(TestingBrowserProcess::GetGlobal()) {
-#if BUILDFLAG(IS_CHROMEOS)
-    scoped_cros_settings_test_helper_ =
-        std::make_unique<ash::ScopedCrosSettingsTestHelper>();
-#endif
   }
 
   ~ProfileAttributesStorageTest() override = default;
@@ -304,10 +296,6 @@ class ProfileAttributesStorageTest : public testing::Test {
 
  private:
   content::BrowserTaskEnvironment task_environment_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<ash::ScopedCrosSettingsTestHelper>
-      scoped_cros_settings_test_helper_;
-#endif
   TestingProfileManager testing_profile_manager_;
   ProfileAttributesTestObserver observer_;
   base::ScopedObservation<ProfileAttributesStorage,
@@ -1411,7 +1399,7 @@ TEST_F(ProfileAttributesStorageTest, AvatarIconIndex) {
 #endif
 
 // High res avatar downloading is only supported on desktop.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Verifies that GetAvatarIconWithType() returns the correct AvatarIconType
 // for each branch: GAIA picture, placeholder avatar, and non-placeholder
 // avatar.
@@ -1938,7 +1926,7 @@ TEST_F(ProfileAttributesStorageTest, GetAllProfilesKeys) {
             base::flat_set<std::string>({path.BaseName().MaybeAsASCII()}));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ProfileAttributesStorageTest, GetGaiaImageForAvatarMenu) {
   storage()->set_disable_avatar_download_for_testing(false);
 
@@ -1989,7 +1977,7 @@ TEST_F(ProfileAttributesStorageTest, GetGaiaImageForAvatarMenu) {
                                               kArbitraryPreferredSize));
   EXPECT_TRUE(gfx::test::AreImagesEqual(gaia_image, image_loaded));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ProfileAttributesStorageTest, ChooseNameForNewProfile) {
   DisableObserver();  // This test doesn't test observers.
@@ -2014,7 +2002,7 @@ TEST_F(ProfileAttributesStorageTest, ChooseNameForNewProfile) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ProfileAttributesStorageTest,
        MigrateLegacyProfileNamesAndRecomputeIfNeeded) {
   DisableObserver();  // This test doesn't test observers.
@@ -2098,7 +2086,7 @@ TEST_F(ProfileAttributesStorageTest,
   }
   EXPECT_EQ(actual_profile_names, expected_profile_names);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ProfileAttributesStorageTest,
        InitialSavedOrderValidWithAddRemoveProfiles) {

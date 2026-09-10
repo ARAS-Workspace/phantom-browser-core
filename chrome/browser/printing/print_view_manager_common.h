@@ -22,9 +22,6 @@ namespace printing {
 // documents.
 bool StartPrint(
     content::WebContents* web_contents,
-#if BUILDFLAG(IS_CHROMEOS)
-    mojo::PendingAssociatedRemote<mojom::PrintRenderer> print_renderer,
-#endif
     bool print_preview_disabled,
     bool has_selection);
 

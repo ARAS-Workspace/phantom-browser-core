@@ -107,12 +107,6 @@
 #include "third_party/blink/public/mojom/permissions/permission_status.mojom.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/app_list/search/essential_search/essential_search_manager.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/autocomplete/keyword_extensions_delegate_impl.h"
 #include "chrome/browser/autocomplete/unscoped_extension_provider_delegate_impl.h"
@@ -159,11 +153,9 @@ constexpr auto kChromeSettingsSubPages = std::to_array<base::cstring_view>({
     chrome::kSearchEnginesSubPage,
     chrome::kSecuritySubPage,
     chrome::kSyncSetupSubPage,
-#if !BUILDFLAG(IS_CHROMEOS)
     chrome::kImportDataSubPage,
     chrome::kManageProfileSubPage,
     chrome::kPeopleSubPage,
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 });
 
 content::WebContents* GetWebContents(
@@ -520,16 +512,7 @@ bool ChromeAutocompleteProviderClient::IsGuestSession() const {
 }
 
 bool ChromeAutocompleteProviderClient::SearchSuggestEnabled() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  return profile_->GetPrefs()->GetBoolean(prefs::kSearchSuggestEnabled) &&
-         (!g_browser_process->platform_part() ||
-          !g_browser_process->platform_part()->essential_search_manager() ||
-          !g_browser_process->platform_part()
-               ->essential_search_manager()
-               ->ShouldDisableSearchSuggest());
-#else
   return false;
-#endif
 }
 
 bool ChromeAutocompleteProviderClient::AllowDeletingBrowserHistory() const {

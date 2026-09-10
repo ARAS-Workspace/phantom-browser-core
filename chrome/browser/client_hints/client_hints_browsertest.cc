@@ -4822,7 +4822,6 @@ IN_PROC_BROWSER_TEST_F(ThirdPartyUaReductionBrowserTest,
 }
 
 // CrOS multi-profiles implementation is too different for these tests.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 void ClientHintsBrowserTest::TestSwitchWithNewProfile(
     const std::string& switch_value,
@@ -4867,7 +4866,6 @@ IN_PROC_BROWSER_TEST_F(ClientHintsBrowserTest, SwitchAppliesStorageOneOrigin) {
       "\"https://b.test\":\"Not Valid\"}",
       1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class ClientHintsCommandLineSwitchBrowserTest : public ClientHintsBrowserTest {
  public:

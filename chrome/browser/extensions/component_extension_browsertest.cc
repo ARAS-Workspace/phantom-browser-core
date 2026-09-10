@@ -29,22 +29,6 @@ namespace extensions {
 
 using ComponentExtensionBrowserTest = ExtensionBrowserTest;
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests that MojoJS is enabled for component extensions that need it.
-// Note the test currently only runs for ChromeOS because the test extension
-// uses `mojoPrivate` to test and `mojoPrivate` is ChromeOS only.
-IN_PROC_BROWSER_TEST_F(ComponentExtensionBrowserTest, MojoJS) {
-  ResultCatcher result_catcher;
-
-  auto* extension =
-      LoadExtension(test_data_dir_.AppendASCII("service_worker/mojo"),
-                    {.load_as_component = true});
-  ASSERT_TRUE(extension);
-
-  ASSERT_TRUE(result_catcher.GetNextResult());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 constexpr char kExtensionId[] = "iegclhlplifhodhkoafiokenjoapiobj";
 constexpr char kExtensionKey[] =
     "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjzv7dI7Ygyh67VHE1DdidudpYf8P"

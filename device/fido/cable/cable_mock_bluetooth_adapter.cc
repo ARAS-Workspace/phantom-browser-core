@@ -95,24 +95,6 @@ void CableMockBluetoothAdapter::ExpectDiscoveryWithScanCallback(
       }));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void CableMockBluetoothAdapter::ExpectLEScan(
-    const std::array<uint8_t, kAdvertSize> v2_advert) {
-  EXPECT_CALL(*this, StartLowEnergyScanSession(_, _))
-      .WillOnce(
-          [this, v2_advert](
-              std::unique_ptr<BluetoothLowEnergyScanFilter> filter,
-              base::WeakPtr<BluetoothLowEnergyScanSession::Delegate> delegate) {
-            EXPECT_TRUE(filter);
-            delegate->OnSessionStarted(/*scan_session=*/nullptr,
-                                       /*error_code=*/std::nullopt);
-            auto* device = CreateNewTestBluetoothDevice(v2_advert);
-            delegate->OnDeviceFound(/*scan_session=*/nullptr, device);
-            return nullptr;
-          });
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 BluetoothDevice* CableMockBluetoothAdapter::CreateNewTestBluetoothDevice(
     base::span<const uint8_t, kAdvertSize> v2_advert) {
   auto mock_device = CreateTestBluetoothDevice();

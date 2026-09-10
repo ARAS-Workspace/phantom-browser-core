@@ -24,10 +24,6 @@
 #include "ui/events/ozone/evdev/mouse_button_map_evdev.h"
 #include "ui/ozone/public/input_controller.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/events/ozone/evdev/microphone_mute_key_metrics.h"
-#endif
-
 struct input_event;
 
 namespace ui {
@@ -150,9 +146,6 @@ class COMPONENT_EXPORT(EVDEV) EventConverterEvdevImpl
   // Supported keyboard key bits.
   std::vector<uint64_t> key_bits_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<MicrophoneMuteKeyMetrics> microphone_mute_key_metrics_;
-#endif
 };
 
 }  // namespace ui

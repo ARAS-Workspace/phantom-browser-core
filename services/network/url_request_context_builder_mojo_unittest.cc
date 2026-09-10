@@ -24,10 +24,6 @@
 #include "testing/platform_test.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "services/network/mock_mojo_dhcp_wpad_url_client.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace network {
 
 namespace {
@@ -76,11 +72,6 @@ TEST_F(URLRequestContextBuilderMojoTest, MojoProxyResolver) {
   builder_.SetMojoProxyResolverFactory(
       test_mojo_proxy_resolver_factory_.CreateFactoryRemote());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  builder_.SetDhcpWpadUrlClient(
-      MockMojoDhcpWpadUrlClient::CreateWithSelfOwnedReceiver(std::string()));
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   std::unique_ptr<net::URLRequestContext> context(builder_.Build());
   net::TestDelegate delegate;
   std::unique_ptr<net::URLRequest> request(context->CreateRequest(
@@ -112,11 +103,6 @@ TEST_F(URLRequestContextBuilderMojoTest, ShutdownWithHungRequest) {
               TRAFFIC_ANNOTATION_FOR_TESTS)));
   builder_.SetMojoProxyResolverFactory(
       test_mojo_proxy_resolver_factory_.CreateFactoryRemote());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  builder_.SetDhcpWpadUrlClient(
-      MockMojoDhcpWpadUrlClient::CreateWithSelfOwnedReceiver(std::string()));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   std::unique_ptr<net::URLRequestContext> context(builder_.Build());
   net::TestDelegate delegate;

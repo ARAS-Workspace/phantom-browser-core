@@ -56,18 +56,6 @@ class SupportToolUiUtilsTest : public ::testing::Test {
   SupportToolUiUtilsTest(const SupportToolUiUtilsTest&) = delete;
   SupportToolUiUtilsTest& operator=(const SupportToolUiUtilsTest&) = delete;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUp() override {
-    profile_manager_ = std::make_unique<TestingProfileManager>(
-        TestingBrowserProcess::GetGlobal());
-    ASSERT_TRUE(profile_manager_->SetUp());
-  }
-
-  void TearDown() override {
-    profile_manager_.reset();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // Change included field of `included_data_collectors` in `data_collectors` as
   // true for testing.
   void MarkDataCollectorsAsIncluded(
@@ -104,9 +92,6 @@ class SupportToolUiUtilsTest : public ::testing::Test {
 
  private:
   content::BrowserTaskEnvironment task_environment_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<TestingProfileManager> profile_manager_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(SupportToolUiUtilsTest, PiiItems) {

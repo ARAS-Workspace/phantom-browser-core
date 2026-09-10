@@ -40,11 +40,7 @@ class GoogleGroupsManagerTest : public ::testing::Test {
       pref_groups_list.Append(std::move(group_dict));
     }
     source_prefs_.SetList(
-#if BUILDFLAG(IS_CHROMEOS)
-        variations::kOsDogfoodGroupsSyncPrefName,
-#else
         variations::kDogfoodGroupsSyncPrefName,
-#endif
         std::move(pref_groups_list));
   }
 
@@ -63,11 +59,7 @@ class GoogleGroupsManagerTest : public ::testing::Test {
   void CheckSourcePrefCleared() {
     EXPECT_TRUE(source_prefs_
                     .GetList(
-#if BUILDFLAG(IS_CHROMEOS)
-                        variations::kOsDogfoodGroupsSyncPrefName
-#else
                         variations::kDogfoodGroupsSyncPrefName
-#endif
                         )
                     .empty());
   }

@@ -40,7 +40,6 @@ IconLoader::IconLoader(const base::FilePath& file_path,
 
 IconLoader::~IconLoader() = default;
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void IconLoader::Start() {
   target_task_runner_ = base::SingleThreadTaskRunner::GetCurrentDefault();
 
@@ -55,4 +54,3 @@ void IconLoader::ReadGroup() {
   GetReadIconTaskRunner()->PostTask(
       FROM_HERE, base::BindOnce(&IconLoader::ReadIcon, base::Unretained(this)));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)

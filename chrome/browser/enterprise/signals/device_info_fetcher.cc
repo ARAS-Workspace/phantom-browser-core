@@ -8,7 +8,7 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/signals/device_info_fetcher_mac.h"
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
 #include "chrome/browser/enterprise/signals/device_info_fetcher_linux.h"
 #endif
 
@@ -74,7 +74,7 @@ std::unique_ptr<DeviceInfoFetcher> DeviceInfoFetcher::CreateInstance() {
   return CreateInstanceInternal();
 }
 
-#if !BUILDFLAG(IS_MAC) && !(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_LINUX)
 // static
 std::unique_ptr<DeviceInfoFetcher> DeviceInfoFetcher::CreateInstanceInternal() {
   return std::make_unique<StubDeviceFetcher>();

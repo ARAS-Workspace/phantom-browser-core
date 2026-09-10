@@ -35,7 +35,7 @@ KeySystemSupportImpl::KeySystemSupportImpl(RenderFrameHost* render_frame_host)
     : DocumentUserData(render_frame_host) {}
 
 KeySystemSupportImpl::~KeySystemSupportImpl() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   render_frame_host()
       .GetBrowserContext()
       ->GetPermissionController()
@@ -110,7 +110,7 @@ void KeySystemSupportImpl::InitializePermissions() {
 
 // Initialize permissions for platforms that supports
 // PROTECTED_MEDIA_IDENTIFIER.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   // Don't call RequestPermissionFromCurrentDocument API that requests
   // permission right away since `is_protected_identifier_allowed_` flag is used
   // only when deciding whether we allow or disallow hardware secure capability
@@ -141,7 +141,7 @@ void KeySystemSupportImpl::InitializePermissions() {
 }
 
 void KeySystemSupportImpl::SetUpPermissionListeners() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   // Setup permission listeners.
   permission_subscription_id_ =
       render_frame_host()

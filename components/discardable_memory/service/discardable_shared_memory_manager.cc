@@ -39,7 +39,7 @@
 #include "components/discardable_memory/common/discardable_shared_memory_heap.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
 #include "base/time/time.h"
@@ -179,7 +179,7 @@ uint64_t GetDefaultMaxBytes() {
   if (base::SysInfo::IsLowEndDevice())
     default_max_bytes /= 8;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   base::FilePath shmem_dir;
   if (base::GetShmemTempDir(false, &shmem_dir)) {
     int64_t shmem_dir_amount_of_free_space =

@@ -50,9 +50,6 @@
 #include "third_party/blink/public/mojom/manifest/display_mode.mojom-shared.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/link_capturing/chromeos_reimpl_navigation_capturing_throttle.h"
-#endif
 
 using content::RenderFrameHost;
 using content::WebContents;
@@ -446,18 +443,7 @@ IN_PROC_BROWSER_TEST_P(WebAppLinkCapturingBrowserTest,
     ExpectTabs(app_browser, {GetNestedAppUrl()});
     ExpectTabs(browser(), {about_blank_});
   } else {
-#if BUILDFLAG(IS_CHROMEOS)
-    // Under kV2DefaultOff, overlapping scopes support on ChromeOS has a
-    // discrepancy where the parent app captures the link since only the parent
-    // has link capturing enabled. See https://crbug.com/40279851.
-    Browser* app_browser = browser_created_observer.Wait();
-    EXPECT_NE(browser(), app_browser);
-    EXPECT_TRUE(AppBrowserController::IsForWebApp(app_browser, parent_app_id));
-    ExpectTabs(app_browser, {GetNestedAppUrl()});
-    ExpectTabs(browser(), {about_blank_});
-#else
     ExpectTabs(browser(), {about_blank_, GetNestedAppUrl()});
-#endif
   }
 }
 
@@ -466,15 +452,6 @@ IN_PROC_BROWSER_TEST_P(WebAppLinkCapturingBrowserTest,
 // link capturing is default on.
 IN_PROC_BROWSER_TEST_P(WebAppLinkCapturingBrowserTest,
                        ParentAppAndChildAppCapture) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Under kV2DefaultOff, overlapping scopes are not supported on ChromeOS (they
-  // conflict by design). Skip this test under kV2DefaultOff on ChromeOS.
-  if (!LinkCapturingEnabledByDefault()) {
-    GTEST_SKIP()
-        << "Skipping due to overlapping scope conflict by design on ChromeOS "
-           "under kV2DefaultOff";
-  }
-#endif
 
   // Note: The order matters so the nested app navigation for installation
   // doesn't get captured by the parent app.
@@ -724,88 +701,6 @@ INSTANTIATE_TEST_SUITE_P(
     apps::test::LinkCapturingVersionToString);
 
 // TODO(crbug.com/376922620): Add tabbed mode support for navigation capturing.
-#if BUILDFLAG(IS_CHROMEOS)
-class WebAppTabStripLinkCapturingBrowserTest
-    : public WebAppLinkCapturingBrowserTest {
- public:
-  WebAppTabStripLinkCapturingBrowserTest() {
-    features_.InitWithFeatures(
-        /*enabled_features=*/{blink::features::kDesktopPWAsTabStrip,
-                              blink::features::
-                                  kDesktopPWAsTabStripCustomizations},
-        /*disabled_features=*/{});
-  }
-
-  // Returns [app_id, in_scope_1, in_scope_2, scope]
-  std::tuple<webapps::AppId, GURL, GURL, GURL> InstallTestTabbedApp() {
-    const auto [app_id, in_scope_1, in_scope_2, scope] =
-        WebAppLinkCapturingBrowserTest::InstallTestApp(
-            "/banners/"
-            "manifest_test_page.html?manifest=manifest_tabbed_display_override."
-            "json");
-    return std::make_tuple(app_id, in_scope_1, in_scope_2, scope);
-  }
-
- private:
-  base::test::ScopedFeatureList features_;
-};
-
-// First in scope navigation from out of scope gets captured and reparented into
-// the app window.
-IN_PROC_BROWSER_TEST_P(WebAppTabStripLinkCapturingBrowserTest,
-                       InScopeNavigationsCaptured) {
-  if (!WebAppRegistrar::IsSupportedDisplayModeForNavigationCapture(
-          blink::mojom::DisplayMode::kTabbed)) {
-    GTEST_SKIP() << "kTabbed mode not yet supported for navigation capturing.";
-  }
-  const auto [app_id, in_scope_1, in_scope_2, scope] = InstallTestTabbedApp();
-  if (!LinkCapturingEnabledByDefault()) {
-    ASSERT_EQ(apps::test::EnableLinkCapturingByUser(profile(), app_id),
-              base::ok());
-  }
-
-  // Start browser at an out of scope page.
-  NavigateSelf(browser(), out_of_scope_);
-
-  // In scope navigation should open app window.
-  Browser* app_browser = GetNewBrowserFromNavigation(browser(), in_scope_1);
-  EXPECT_TRUE(AppBrowserController::IsForWebApp(app_browser, app_id));
-  ExpectTabs(browser(), {out_of_scope_});
-  ExpectTabs(app_browser, {in_scope_1});
-
-  // Another in scope navigation should open a new tab in the same app window.
-  NavigateCapturable(browser(), in_scope_2);
-  ExpectTabs(browser(), {out_of_scope_});
-  ExpectTabs(app_browser, {in_scope_1, in_scope_2});
-
-  // Whole origin should count as in scope.
-  NavigateCapturable(browser(), scope);
-  ExpectTabs(browser(), {out_of_scope_});
-  ExpectTabs(app_browser, {in_scope_1, in_scope_2, scope});
-
-  // Middle clicking links should not be captured.
-  auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
-  content::SimulateEndOfPaintHoldingOnPrimaryMainFrame(web_contents);
-  ClickLinkWithModifiersAndWaitForURL(
-      web_contents, scope, scope, LinkTarget::SELF, "",
-      blink::WebInputEvent::Modifiers::kNoModifiers,
-      blink::WebMouseEvent::Button::kMiddle);
-  ExpectTabs(browser(), {out_of_scope_, scope});
-  ExpectTabs(app_browser, {in_scope_1, in_scope_2, scope});
-
-  // Out of scope should behave as usual.
-  NavigateSelf(browser(), out_of_scope_);
-  ExpectTabs(browser(), {out_of_scope_, scope});
-  ExpectTabs(app_browser, {in_scope_1, in_scope_2, scope});
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    WebAppTabStripLinkCapturingBrowserTest,
-    testing::Values(apps::test::LinkCapturingFeatureVersion::kV2DefaultOff,
-                    apps::test::LinkCapturingFeatureVersion::kV2DefaultOn),
-    apps::test::LinkCapturingVersionToString);
-#endif
 
 }  // namespace
 }  // namespace web_app

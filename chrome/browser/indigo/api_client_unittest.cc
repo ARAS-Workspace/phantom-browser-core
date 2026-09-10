@@ -36,11 +36,7 @@ constexpr char kTestDataUrl[] =
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C"
     "8AAAAASUVORK5CYII=";
 
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr bool kSignOutSupportedOnPlatform = false;
-#else
 constexpr bool kSignOutSupportedOnPlatform = true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class TestSigninClientWithIndigoScope : public TestSigninClient {
  public:

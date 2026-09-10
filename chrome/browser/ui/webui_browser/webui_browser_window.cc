@@ -149,9 +149,6 @@ WebUIBrowserWindow::WebUIBrowserWindow(Browser* browser) : browser_(browser) {
   params.bounds = gfx::Rect(0, 0, 800, 600);
   params.delegate = widget_delegate_.get();
   params.native_widget = CreateNativeWidget();
-#if BUILDFLAG(IS_CHROMEOS)
-  params.remove_standard_frame = true;
-#endif
   widget_->Init(std::move(params));
   widget_->SetNativeWindowProperty(kWebUIBrowserWindowKey, this);
   widget_->MakeCloseSynchronous(base::BindOnce(
@@ -274,7 +271,6 @@ WebUIBrowserWindow* WebUIBrowserWindow::FromNativeWindow(
 // The code about Browser's activation state is copied from
 // BrowserView::Show().
 void WebUIBrowserWindow::Show() {
-#if !BUILDFLAG(IS_CHROMEOS)
   // The Browser associated with this browser window must become the active
   // browser at the time Show() is called. This is the natural behavior under
   // Chrome OS, but other platforms will not trigger OnWidgetActivationChanged()
@@ -282,7 +278,6 @@ void WebUIBrowserWindow::Show() {
   // Browser::GetLastActive() will return the wrong result if we do not
   // explicitly set it here.
   BrowserActiveStateManager::From(browser_)->DidBecomeActive();
-#endif
 
   // If the window is already visible, just activate it.
   if (widget_->IsVisible()) {
@@ -403,16 +398,7 @@ void WebUIBrowserWindow::SetZOrderLevel(ui::ZOrderLevel order) {
 }
 
 gfx::NativeWindow WebUIBrowserWindow::GetNativeWindow() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Ash ChromeOS has a UaF on widget's aura::Window during browser shutdown.
-  // The window is stored in apps::InstanceRegistry which becomes dangling after
-  // the BrowserWindow is destroyed.
-  // TODO(webium): Fix ChromeOS. Run WebUIBrowserTest.StartupAndShutdown
-  // to verify.
-  return gfx::NativeWindow();
-#else
   return widget_->GetNativeWindow();
-#endif
 }
 
 bool WebUIBrowserWindow::IsOnCurrentWorkspace() const {
@@ -494,12 +480,6 @@ ui::ColorProviderKey WebUIBrowserWindow::GetColorProviderKey() const {
 
   key.app_controller = web_app::AppBrowserController::From(browser_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS SystemWebApps use the OS theme all the time.
-  if (web_app::GetSystemWebAppType(browser_).has_value()) {
-    return key;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   const auto* theme_service =
       ThemeServiceFactory::GetForProfile(browser_->GetProfile());
@@ -661,11 +641,6 @@ bool WebUIBrowserWindow::FindCommandIdForAccelerator(
 void WebUIBrowserWindow::LoadAccelerators() {
   // Let's fill our own accelerator table.
   const bool is_app_mode = IsRunningInForcedAppMode();
-#if BUILDFLAG(IS_CHROMEOS)
-  const bool is_captive_portal_signin_window =
-      browser_->GetProfile()->IsOffTheRecord() &&
-      browser_->GetProfile()->GetOTRProfileID().IsCaptivePortal();
-#endif
   for (const auto& entry : GetAcceleratorList()) {
     // In app mode, only allow accelerators of allowlisted commands to pass
     // through.
@@ -676,22 +651,6 @@ void WebUIBrowserWindow::LoadAccelerators() {
       continue;
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    if (is_captive_portal_signin_window) {
-      int command = entry.command_id;
-      // Captive portal signin uses an OTR profile without history.
-      if (command == IDC_SHOW_HISTORY) {
-        continue;
-      }
-      // The NewTab command expects navigation to occur in the same browser
-      // window. For captive portal signin this is not the case, so hide these
-      // to reduce confusion.
-      if (command == IDC_NEW_TAB || command == IDC_NEW_TAB_TO_RIGHT ||
-          command == IDC_CREATE_NEW_TAB_GROUP) {
-        continue;
-      }
-    }
-#endif
 
     ui::Accelerator accelerator(entry.keycode, entry.modifiers);
     accelerator_table_[accelerator] = entry.command_id;
@@ -918,11 +877,6 @@ void WebUIBrowserWindow::ShowBookmarkBubble(const GURL& url,
   NOTIMPLEMENTED_LOG_ONCE();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void WebUIBrowserWindow::ToggleMultitaskMenu() {
-  NOTIMPLEMENTED_LOG_ONCE();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 ShowTranslateBubbleResult WebUIBrowserWindow::ShowTranslateBubble(
     content::WebContents* contents,
@@ -1255,22 +1209,12 @@ std::u16string WebUIBrowserWindow::WidgetDelegate::GetWindowTitle() const {
 bool WebUIBrowserWindow::WidgetDelegate::ShouldDescendIntoChildForEventHandling(
     gfx::NativeView child,
     const gfx::Point& location) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // The titlebar has `app-region: drag;` set, so we shouldn't descend into it
-  // for event handling on ChromeOS.
-  if (GetWidget() &&
-      GetWidget()->GetNonClientComponent(location) == HTCAPTION) {
-    return false;
-  }
-  return true;
-#else
   // Other platforms such as Windows do hit testing (WM_NCHITTEST) before
   // sending pointer events. That happens before aura::Window has a chance to
   // call ShouldDescendIntoChildForEventHandling(), so use the default
   // implementation instead.
   return views::WidgetDelegate::ShouldDescendIntoChildForEventHandling(
       child, location);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 WebUIBrowserUI* WebUIBrowserWindow::GetWebUIBrowserUI() const {

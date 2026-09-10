@@ -32,11 +32,11 @@ namespace {
 // Tests must run in series to manage virtual displays on supported platforms.
 // Use 2+ physical displays to run locally with --gtest_also_run_disabled_tests.
 // See: //docs/ui/display/multiscreen_testing.md
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_PopupMultiScreenTest PopupMultiScreenTest
 #else
 #define MAYBE_PopupMultiScreenTest DISABLED_PopupMultiScreenTest
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 class MAYBE_PopupMultiScreenTest : public PopupTestBase,
                                    public ::testing::WithParamInterface<bool> {
  public:

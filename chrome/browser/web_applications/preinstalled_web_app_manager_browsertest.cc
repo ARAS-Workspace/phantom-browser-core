@@ -84,14 +84,6 @@
 #include "ui/events/devices/touchscreen_device.h"
 #include "ui/gfx/codec/png_codec.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/test/app_list_test_api.h"
-#include "chrome/browser/ash/app_list/app_list_client_impl.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service_factory.h"
-#include "chromeos/constants/chromeos_features.h"
-#endif
-
 namespace web_app {
 
 namespace {
@@ -117,46 +109,6 @@ base::FilePath GetDataFilePath(const base::FilePath& relative_path,
   *path_exists = base::PathExists(path);
   return path;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void ExpectInitialManifestFieldsFromBasicWebApp(WebAppIconManager& icon_manager,
-                                                const WebApp* web_app,
-                                                const GURL& expect_start_url,
-                                                const GURL& expect_scope) {
-  // Manifest fields:
-  EXPECT_EQ(web_app->untranslated_name(), "Basic web app");
-  EXPECT_EQ(web_app->start_url().spec(), expect_start_url);
-  EXPECT_EQ(web_app->scope().spec(), expect_scope);
-  EXPECT_EQ(web_app->display_mode(), DisplayMode::kStandalone);
-  EXPECT_FALSE(web_app->theme_color().has_value());
-
-  EXPECT_FALSE(web_app->sync_proto().has_theme_color());
-  EXPECT_EQ("Basic web app", web_app->sync_proto().name());
-  EXPECT_EQ(expect_scope.spec(), web_app->sync_proto().scope());
-
-  ASSERT_EQ(2, web_app->sync_proto().icon_infos_size());
-
-  EXPECT_EQ(expect_start_url.Resolve("basic-48.png").spec(),
-            web_app->sync_proto().icon_infos(0).url());
-  EXPECT_EQ(48, web_app->sync_proto().icon_infos(0).size_in_px());
-  EXPECT_EQ(sync_pb::WebAppIconInfo_Purpose_ANY,
-            web_app->sync_proto().icon_infos(0).purpose());
-
-  EXPECT_EQ(expect_start_url.Resolve("basic-192.png").spec(),
-            web_app->sync_proto().icon_infos(1).url());
-  EXPECT_EQ(192, web_app->sync_proto().icon_infos(1).size_in_px());
-  EXPECT_EQ(sync_pb::WebAppIconInfo_Purpose_ANY,
-            web_app->sync_proto().icon_infos(1).purpose());
-
-  // Manifest Resources: This is chrome/test/data/web_apps/basic-192.png
-  EXPECT_EQ(IconManagerReadAppIconPixel(icon_manager, web_app->app_id(),
-                                        /*size_px=*/192),
-            SK_ColorBLACK);
-
-  // User preferences:
-  EXPECT_EQ(web_app->user_display_mode(), mojom::UserDisplayMode::kStandalone);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -359,11 +311,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
             webapps::InstallResultCode::kSuccessNewInstall);
 
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
   EXPECT_EQ(registrar().GetAppStartUrl(app_id).spec(), start_url);
 
@@ -407,11 +355,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
             webapps::InstallResultCode::kSuccessNewInstall);
 
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
   EXPECT_EQ(registrar().GetAppStartUrl(app_id).spec(), start_url);
 
@@ -453,11 +397,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
             webapps::InstallResultCode::kSuccessNewInstall);
 
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
   EXPECT_EQ(registrar().GetAppStartUrl(app_id).spec(), start_url);
   EXPECT_EQ(registrar().GetAppLaunchUrl(app_id), launch_url);
@@ -498,11 +438,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
             webapps::InstallResultCode::kSuccessNewInstall);
 
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
   EXPECT_EQ(registrar().GetAppStartUrl(app_id).spec(), start_url);
 
@@ -579,73 +515,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerExtensionBrowserTest,
   EXPECT_EQ(app, uninstalled_app.get());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-class PreinstalledWebAppManagerExtensionAlwaysMigrateBrowserTest
-    : public PreinstalledWebAppManagerExtensionBrowserTest {
- public:
-  PreinstalledWebAppManagerExtensionAlwaysMigrateBrowserTest() = default;
-  ~PreinstalledWebAppManagerExtensionAlwaysMigrateBrowserTest() override =
-      default;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_{
-      features::kPreinstalledWebAppAlwaysMigrateForTesting};
-};
-
-IN_PROC_BROWSER_TEST_F(
-    PreinstalledWebAppManagerExtensionAlwaysMigrateBrowserTest,
-    AlwaysUninstallAndReplace) {
-  GURL app_url = GURL("https://example.org/");
-  std::optional<extensions::ExtensionId> chrome_app_id;
-
-  base::HistogramTester tester;
-
-  ScopedTestingPreinstalledAppData scoped_preinstalls;
-  scoped_preinstalls.apps.push_back([&] {
-    ExternalInstallOptions options(
-        app_url, /*user_display_mode=*/mojom::UserDisplayMode::kStandalone,
-        ExternalInstallSource::kExternalDefault);
-    options.user_type_allowlist = {"unmanaged"};
-    options.only_use_app_info_factory = true;
-    options.app_info_factory = base::BindLambdaForTesting([=] {
-      auto info = std::make_unique<WebAppInstallInfo>(
-          GenerateManifestIdFromStartUrlOnly(app_url), app_url);
-      info->title = u"Test app";
-      return info;
-    });
-    return options;
-  }());
-
-  // Preinstall web app.
-  EXPECT_EQ(SyncPreinstalledApps().install_results[app_url].code,
-            webapps::InstallResultCode::kSuccessOfflineOnlyInstall);
-  tester.ExpectUniqueSample("WebApp.Preinstalled.ChromeAppMigrationNeeded",
-                            false, 1);
-
-  // Install Chrome app to be replaced after web app is already preinstalled.
-  const extensions::Extension* app = InstallExtensionWithSourceAndFlags(
-      test_data_dir_.AppendASCII("app"), 1,
-      extensions::mojom::ManifestLocation::kInternal,
-      extensions::Extension::NO_FLAGS);
-  scoped_preinstalls.apps[0].uninstall_and_replace.push_back(app->id());
-
-  // Start listening for Chrome app uninstall.
-  extensions::TestExtensionRegistryObserver uninstall_observer(
-      extensions::ExtensionRegistry::Get(browser()->GetProfile()));
-
-  // Trigger preinstall sync again.
-  EXPECT_EQ(SyncPreinstalledApps().install_results[app_url].code,
-            webapps::InstallResultCode::kSuccessOfflineOnlyInstall);
-  tester.ExpectBucketCount("WebApp.Preinstalled.ChromeAppMigrationNeeded", true,
-                           1);
-
-  // Chrome app should get uninstalled.
-  scoped_refptr<const extensions::Extension> uninstalled_app =
-      uninstall_observer.WaitForExtensionUninstalled();
-  EXPECT_EQ(app, uninstalled_app.get());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
                        PreinstalledAppsPrefInstall) {
   base::AutoReset<bool> bypass_offline_manifest_requirement =
@@ -715,11 +584,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
   webapps::AppId app_id = GenerateAppId(/*manifest_id=*/std::nullopt,
                                         GURL{kSimpleManifestStartUrl});
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
 }
 
@@ -741,11 +606,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
   webapps::AppId app_id = GenerateAppId(/*manifest_id=*/std::nullopt,
                                         GURL{kSimpleManifestStartUrl});
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
 }
 
@@ -815,11 +676,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
   webapps::AppId app_id =
       GenerateAppId(/*manifest_id=*/std::nullopt, GetAppUrl());
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
 }
 
@@ -861,11 +718,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
               webapps::InstallResultCode::kSuccessNewInstall);
 
     EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-              proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
               proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
     );
   }
 
@@ -874,11 +727,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
               webapps::InstallResultCode::kSuccessAlreadyInstalled);
 
     EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-              proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
               proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
     );
   }
 }
@@ -905,11 +754,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
     EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), config),
               webapps::InstallResultCode::kSuccessNewInstall);
     EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-              proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
               proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
     );
     tester.ExpectUniqueSample("WebApp.Preinstalled.DisabledReason",
                               /*kNotDisabled*/ 0, 1);
@@ -931,11 +776,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
     EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), config),
               webapps::InstallResultCode::kSuccessAlreadyInstalled);
     EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-              proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
               proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
     );
     tester.ExpectUniqueSample("WebApp.Preinstalled.DisabledReason",
                               /*kIgnorePreviouslyUninstalledByUser*/ 17, 1);
@@ -995,11 +836,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
   EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), manifest),
             webapps::InstallResultCode::kSuccessNewInstall);
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
   EXPECT_EQ(ignore_configs.size(), 0u);
 }
@@ -1042,584 +879,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
 
 // The offline manifest JSON config functionality is only available on Chrome
 // OS.
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Check that offline fallback installs work offline.
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       OfflineFallbackManifestSiteOffline) {
-  constexpr char kAppInstallUrl[] = "https://offline-site.com/install.html";
-  constexpr char kAppName[] = "Offline app name";
-  constexpr char kAppStartUrl[] = "https://offline-site.com/start.html";
-  constexpr char kAppScope[] = "https://offline-site.com/";
-
-  webapps::AppId app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, GURL(kAppStartUrl));
-  EXPECT_FALSE(registrar().GetInstallState(app_id).has_value());
-
-  constexpr char kAppConfigTemplate[] =
-      R"({
-        "app_url": "$1",
-        "launch_container": "window",
-        "user_type": ["unmanaged"],
-        "offline_manifest": {
-          "name": "$2",
-          "start_url": "$3",
-          "scope": "$4",
-          "display": "minimal-ui",
-          "theme_color_argb_hex": "AABBCCDD",
-          "icon_any_pngs": ["icon.png"]
-        }
-      })";
-  std::string app_config = base::ReplaceStringPlaceholders(
-      kAppConfigTemplate, {kAppInstallUrl, kAppName, kAppStartUrl, kAppScope},
-      nullptr);
-  EXPECT_EQ(SyncPreinstalledAppConfig(GURL(kAppInstallUrl), app_config),
-            webapps::InstallResultCode::kSuccessOfflineFallbackInstall);
-
-  EXPECT_EQ(registrar().GetInstallState(app_id),
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION);
-  EXPECT_EQ(registrar().GetAppShortName(app_id), kAppName);
-  EXPECT_EQ(registrar().GetAppStartUrl(app_id).spec(), kAppStartUrl);
-  EXPECT_EQ(registrar().GetAppScope(app_id).spec(), kAppScope);
-  EXPECT_EQ(registrar().GetAppUserDisplayMode(app_id),
-            mojom::UserDisplayMode::kStandalone);
-  EXPECT_EQ(registrar().GetAppDisplayMode(app_id), DisplayMode::kMinimalUi);
-  // theme_color must be installed opaque.
-  EXPECT_EQ(registrar().GetAppThemeColor(app_id),
-            SkColorSetARGB(0xFF, 0xBB, 0xCC, 0xDD));
-  EXPECT_EQ(
-      IconManagerReadAppIconPixel(icon_manager(), app_id, /*size_px=*/192),
-      SK_ColorBLUE);
-}
-
-// Check that offline fallback installs attempt fetching the install_url.
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       OfflineFallbackManifestSiteOnline) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // This install_url serves a manifest with different values to what we specify
-  // in the offline_manifest. Check that it gets used instead of the
-  // offline_manifest.
-  GURL install_url = embedded_test_server()->GetURL("/web_apps/basic.html");
-  GURL offline_start_url = embedded_test_server()->GetURL(
-      "/web_apps/offline-only-start-url-that-does-not-exist.html");
-  GURL scope = embedded_test_server()->GetURL("/web_apps/");
-
-  webapps::AppId offline_app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, offline_start_url);
-  EXPECT_FALSE(registrar().GetInstallState(offline_app_id).has_value());
-
-  constexpr char kAppConfigTemplate[] =
-      R"({
-          "app_url": "$1",
-          "launch_container": "window",
-          "user_type": ["unmanaged"],
-          "offline_manifest": {
-            "name": "Offline only app name",
-            "start_url": "$2",
-            "scope": "$3",
-            "display": "minimal-ui",
-            "theme_color_argb_hex": "AABBCCDD",
-            "icon_any_pngs": ["icon.png"]
-          }
-        })";
-  std::string app_config = base::ReplaceStringPlaceholders(
-      kAppConfigTemplate,
-      {install_url.spec(), offline_start_url.spec(), scope.spec()}, nullptr);
-  EXPECT_EQ(SyncPreinstalledAppConfig(install_url, app_config),
-            webapps::InstallResultCode::kSuccessNewInstall);
-
-  EXPECT_FALSE(registrar().GetInstallState(offline_app_id).has_value());
-
-  // basic.html's manifest start_url is basic.html.
-  webapps::AppId app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, install_url);
-  EXPECT_EQ(registrar().GetInstallState(app_id),
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION);
-  EXPECT_EQ(registrar().GetAppShortName(app_id), "Basic web app");
-  EXPECT_EQ(registrar().GetAppStartUrl(app_id).spec(), install_url);
-  EXPECT_EQ(registrar().GetAppScope(app_id).spec(), scope);
-  EXPECT_EQ(registrar().GetAppUserDisplayMode(app_id),
-            mojom::UserDisplayMode::kStandalone);
-  EXPECT_EQ(registrar().GetAppDisplayMode(app_id), DisplayMode::kStandalone);
-}
-
-// Check that offline only installs work offline.
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       OfflineOnlyManifestSiteOffline) {
-  constexpr char kAppInstallUrl[] = "https://offline-site.com/install.html";
-  constexpr char kAppName[] = "Offline app name";
-  constexpr char kAppStartUrl[] = "https://offline-site.com/start.html";
-  constexpr char kAppScope[] = "https://offline-site.com/";
-
-  webapps::AppId app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, GURL(kAppStartUrl));
-  EXPECT_FALSE(registrar().GetInstallState(app_id).has_value());
-
-  constexpr char kAppConfigTemplate[] =
-      R"({
-        "app_url": "$1",
-        "launch_container": "window",
-        "user_type": ["unmanaged"],
-        "only_use_offline_manifest": true,
-        "offline_manifest": {
-          "name": "$2",
-          "start_url": "$3",
-          "scope": "$4",
-          "display": "minimal-ui",
-          "theme_color_argb_hex": "AABBCCDD",
-          "icon_any_pngs": ["icon.png"]
-        }
-      })";
-  std::string app_config = base::ReplaceStringPlaceholders(
-      kAppConfigTemplate, {kAppInstallUrl, kAppName, kAppStartUrl, kAppScope},
-      nullptr);
-  EXPECT_EQ(SyncPreinstalledAppConfig(GURL(kAppInstallUrl), app_config),
-            webapps::InstallResultCode::kSuccessOfflineOnlyInstall);
-
-  EXPECT_EQ(registrar().GetInstallState(app_id),
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION);
-  EXPECT_EQ(registrar().GetAppShortName(app_id), kAppName);
-  EXPECT_EQ(registrar().GetAppStartUrl(app_id).spec(), kAppStartUrl);
-  EXPECT_EQ(registrar().GetAppScope(app_id).spec(), kAppScope);
-  EXPECT_EQ(registrar().GetAppUserDisplayMode(app_id),
-            mojom::UserDisplayMode::kStandalone);
-  EXPECT_EQ(registrar().GetAppDisplayMode(app_id), DisplayMode::kMinimalUi);
-  // theme_color must be installed opaque.
-  EXPECT_EQ(registrar().GetAppThemeColor(app_id),
-            SkColorSetARGB(0xFF, 0xBB, 0xCC, 0xDD));
-  EXPECT_EQ(
-      IconManagerReadAppIconPixel(icon_manager(), app_id, /*size_px=*/192),
-      SK_ColorBLUE);
-}
-
-// Check that offline only installs don't fetch from the install_url.
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       OfflineOnlyManifestSiteOnline) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // This install_url serves a manifest with different values to what we specify
-  // in the offline_manifest. Check that it doesn't get used.
-  GURL install_url = GetAppUrl();
-  const char kAppName[] = "Offline only app name";
-  GURL start_url = embedded_test_server()->GetURL(
-      "/web_apps/offline-only-start-url-that-does-not-exist.html");
-  GURL scope = embedded_test_server()->GetURL("/web_apps/");
-
-  webapps::AppId app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, start_url);
-  EXPECT_FALSE(registrar().GetInstallState(app_id).has_value());
-
-  constexpr char kAppConfigTemplate[] =
-      R"({
-        "app_url": "$1",
-        "launch_container": "window",
-        "user_type": ["unmanaged"],
-        "only_use_offline_manifest": true,
-        "offline_manifest": {
-          "name": "$2",
-          "start_url": "$3",
-          "scope": "$4",
-          "display": "minimal-ui",
-          "theme_color_argb_hex": "AABBCCDD",
-          "icon_any_pngs": ["icon.png"]
-        }
-      })";
-  std::string app_config = base::ReplaceStringPlaceholders(
-      kAppConfigTemplate,
-      {install_url.spec(), kAppName, start_url.spec(), scope.spec()}, nullptr);
-  EXPECT_EQ(SyncPreinstalledAppConfig(install_url, app_config),
-            webapps::InstallResultCode::kSuccessOfflineOnlyInstall);
-
-  EXPECT_EQ(registrar().GetInstallState(app_id),
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION);
-  EXPECT_EQ(registrar().GetAppShortName(app_id), kAppName);
-  EXPECT_EQ(registrar().GetAppStartUrl(app_id).spec(), start_url);
-  EXPECT_EQ(registrar().GetAppScope(app_id).spec(), scope);
-  EXPECT_EQ(registrar().GetAppUserDisplayMode(app_id),
-            mojom::UserDisplayMode::kStandalone);
-  EXPECT_EQ(registrar().GetAppDisplayMode(app_id), DisplayMode::kMinimalUi);
-  // theme_color must be installed opaque.
-  EXPECT_EQ(registrar().GetAppThemeColor(app_id),
-            SkColorSetARGB(0xFF, 0xBB, 0xCC, 0xDD));
-  EXPECT_EQ(
-      IconManagerReadAppIconPixel(icon_manager(), app_id, /*size_px=*/192),
-      SK_ColorBLUE);
-}
-
-const char kOnlyForNewUsersInstallUrl[] = "https://example.org/";
-const char kOnlyForNewUsersConfig[] = R"({
-    "app_url": "https://example.org/",
-    "launch_container": "window",
-    "user_type": ["unmanaged"],
-    "only_for_new_users": true,
-    "only_use_offline_manifest": true,
-    "offline_manifest": {
-      "name": "Test",
-      "start_url": "https://example.org/",
-      "scope": "https://example.org/",
-      "display": "standalone",
-      "icon_any_pngs": ["icon.png"]
-    }
-  })";
-
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       PRE_OnlyForNewUsersWithNewUser) {
-  // Install a policy app first to check that it doesn't interfere.
-  {
-    base::RunLoop run_loop;
-    WebAppPolicyManager& policy_manager =
-        WebAppProvider::GetForTest(profile())->policy_manager();
-    policy_manager.SetOnAppsSynchronizedCompletedCallbackForTesting(
-        run_loop.QuitClosure());
-    const char kWebAppPolicy[] = R"([{
-      "url": "https://policy-example.org/",
-      "default_launch_container": "window"
-    }])";
-    profile()->GetPrefs()->Set(
-        prefs::kWebAppInstallForceList,
-        base::JSONReader::Read(kWebAppPolicy,
-                               base::JSON_PARSE_CHROMIUM_EXTENSIONS)
-            .value());
-    run_loop.Run();
-  }
-
-  // New user should have the app installed.
-  EXPECT_EQ(SyncPreinstalledAppConfig(GURL(kOnlyForNewUsersInstallUrl),
-                                      kOnlyForNewUsersConfig),
-            webapps::InstallResultCode::kSuccessOfflineOnlyInstall);
-}
-
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       OnlyForNewUsersWithNewUser) {
-  // App should persist after user stops being a new user.
-  EXPECT_EQ(SyncPreinstalledAppConfig(GURL(kOnlyForNewUsersInstallUrl),
-                                      kOnlyForNewUsersConfig),
-            webapps::InstallResultCode::kSuccessAlreadyInstalled);
-}
-
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       PRE_OnlyForNewUsersWithOldUser) {
-  // Simulate running Chrome without the configs present.
-  SyncEmptyConfigs();
-}
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       OnlyForNewUsersWithOldUser) {
-  // This instance of Chrome should be considered not a new user after the
-  // previous PRE_ launch and sync.
-  EXPECT_EQ(SyncPreinstalledAppConfig(GURL(kOnlyForNewUsersInstallUrl),
-                                      kOnlyForNewUsersConfig),
-            std::nullopt);
-}
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest, OemInstalled) {
-  base::AutoReset<bool> bypass_offline_manifest_requirement =
-      PreinstalledWebAppManager::BypassOfflineManifestRequirementForTesting();
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(),
-                                      base::ReplaceStringPlaceholders(
-                                          R"({
-                "app_url": "$1",
-                "launch_container": "window",
-                "oem_installed": true,
-                "user_type": ["unmanaged"]
-              })",
-                                          {GetAppUrl().spec()}, nullptr)),
-            webapps::InstallResultCode::kSuccessNewInstall);
-
-  webapps::AppId app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, GetAppUrl());
-  EXPECT_TRUE(registrar().GetAppById(app_id)->chromeos_data()->oem_installed);
-
-  // Wait for app service to see the newly installed app.
-  auto* proxy = apps::AppServiceProxyFactory::GetForProfile(profile());
-
-  apps::InstallReason install_reason = apps::InstallReason::kUnknown;
-  proxy->AppRegistryCache().ForOneApp(app_id,
-                                      [&](const apps::AppUpdate& update) {
-                                        install_reason = update.InstallReason();
-                                      });
-
-  EXPECT_EQ(install_reason, apps::InstallReason::kOem);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-namespace {
-ui::TouchscreenDevice CreateTouchDevice(ui::InputDeviceType type,
-                                        bool stylus_support) {
-  ui::TouchscreenDevice touch_device = ui::TouchscreenDevice();
-  touch_device.type = type;
-  touch_device.has_stylus = stylus_support;
-  return touch_device;
-}
-}  // namespace
-
-IN_PROC_BROWSER_TEST_F(
-    PreinstalledWebAppManagerBrowserTest,
-    DisableIfTouchscreenWithStylusNotSupported_NoStylusSupport) {
-  base::AutoReset<bool> bypass_offline_manifest_requirement =
-      PreinstalledWebAppManager::BypassOfflineManifestRequirementForTesting();
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  ui::DeviceDataManagerTestApi().SetTouchscreenDevices(
-      {CreateTouchDevice(ui::InputDeviceType::INPUT_DEVICE_INTERNAL,
-                         /*stylus_support=*/false)});
-
-  const auto manifest = base::ReplaceStringPlaceholders(
-      R"({
-        "app_url": "$1",
-        "launch_container": "window",
-        "disable_if_touchscreen_with_stylus_not_supported": true,
-        "user_type": ["unmanaged"]
-      })",
-      {GetAppUrl().spec()}, nullptr);
-  webapps::AppId app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, GetAppUrl());
-  const auto& ignore_configs = manager().debug_info()->ignore_configs;
-  constexpr char kErrorMessage[] =
-      " ignore because the device does not have a built-in touchscreen with "
-      "stylus support.";
-
-  EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), manifest), std::nullopt);
-  EXPECT_FALSE(registrar().GetInstallState(app_id).has_value());
-  EXPECT_EQ(ignore_configs.size(), 1u);
-  EXPECT_EQ(ignore_configs.back().second, GetAppUrl().spec() + kErrorMessage);
-}
-
-IN_PROC_BROWSER_TEST_F(
-    PreinstalledWebAppManagerBrowserTest,
-    DisableIfTouchscreenWithStylusNotSupported_HasStylusSupport) {
-  base::AutoReset<bool> bypass_offline_manifest_requirement =
-      PreinstalledWebAppManager::BypassOfflineManifestRequirementForTesting();
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  ui::DeviceDataManagerTestApi().SetTouchscreenDevices(
-      {CreateTouchDevice(ui::InputDeviceType::INPUT_DEVICE_INTERNAL,
-                         /*stylus_support=*/true)});
-
-  const auto manifest = base::ReplaceStringPlaceholders(
-      R"({
-        "app_url": "$1",
-        "launch_container": "window",
-        "disable_if_touchscreen_with_stylus_not_supported": true,
-        "user_type": ["unmanaged"]
-      })",
-      {GetAppUrl().spec()}, nullptr);
-  webapps::AppId app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, GetAppUrl());
-
-  EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), manifest),
-            webapps::InstallResultCode::kSuccessNewInstall);
-  EXPECT_EQ(registrar().GetInstallState(app_id),
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION);
-}
-
-// Verify that stylus detection works even if DeviceDataManager is slow to
-// initialize.
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       DisableIfTouchscreenWithStylusStartupDelay) {
-  base::AutoReset<bool> bypass_offline_manifest_requirement =
-      PreinstalledWebAppManager::BypassOfflineManifestRequirementForTesting();
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  const auto manifest = base::ReplaceStringPlaceholders(
-      R"({
-        "app_url": "$1",
-        "launch_container": "window",
-        "disable_if_touchscreen_with_stylus_not_supported": true,
-        "user_type": ["unmanaged"]
-      })",
-      {GetAppUrl().spec()}, nullptr);
-  webapps::AppId app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, GetAppUrl());
-
-  // Clear out the device list and re-initialize it after a delay. Web app
-  // installation should wait for this to be ready.
-  ui::DeviceDataManager::GetInstance()->ResetDeviceListsForTest();
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE, base::BindLambdaForTesting([]() {
-        // Create a built-in touchscreen device with stylus support
-        // and add it to the device.
-        ui::DeviceDataManagerTestApi().SetTouchscreenDevices({CreateTouchDevice(
-            ui::InputDeviceType::INPUT_DEVICE_INTERNAL, true)});
-        ui::DeviceDataManagerTestApi().OnDeviceListsComplete();
-      }),
-      base::Milliseconds(500));
-
-  EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), manifest),
-            webapps::InstallResultCode::kSuccessNewInstall);
-}
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Disabled due to test flakiness. https://crbug.com/40802600.
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       DISABLED_UninstallFromTwoItemAppListFolder) {
-  GURL preinstalled_app_start_url("https://example.org/");
-  GURL user_app_start_url("https://test.org/");
-
-  apps::AppServiceProxy* proxy =
-      apps::AppServiceProxyFactory::GetForProfile(profile());
-  AppListClientImpl::GetInstance()->UpdateProfile();
-  ash::AppListTestApi app_list_test_api;
-  app_list::AppListSyncableService* app_list_syncable_service =
-      app_list::AppListSyncableServiceFactory::GetForProfile(profile());
-
-  // Install default app.
-  constexpr char kAppConfigTemplate[] =
-      R"({
-        "app_url": "$1",
-        "launch_container": "window",
-        "user_type": ["unmanaged"],
-        "only_use_offline_manifest": true,
-        "offline_manifest": {
-          "name": "Test default app",
-          "display": "standalone",
-          "start_url": "$1",
-          "scope": "$1",
-          "icon_any_pngs": ["icon.png"]
-        }
-      })";
-  std::string app_config = base::ReplaceStringPlaceholders(
-      kAppConfigTemplate, {preinstalled_app_start_url.spec()}, nullptr);
-  EXPECT_EQ(SyncPreinstalledAppConfig(preinstalled_app_start_url, app_config),
-            webapps::InstallResultCode::kSuccessOfflineOnlyInstall);
-  webapps::AppId preinstalled_app_id =
-      GenerateAppId(/*manifest_id=*/std::nullopt, preinstalled_app_start_url);
-
-  // Install user app.
-  auto install_info =
-      WebAppInstallInfo::CreateWithStartUrlForTesting(user_app_start_url);
-  install_info->title = u"Test user app";
-  webapps::AppId user_app_id =
-      web_app::test::InstallWebApp(profile(), std::move(install_info));
-
-  // Put apps in app list folder.
-  std::string folder_id = app_list_test_api.CreateFolderWithApps(
-      {preinstalled_app_id, user_app_id});
-  EXPECT_EQ(
-      app_list_syncable_service->GetSyncItem(preinstalled_app_id)->parent_id,
-      folder_id);
-  EXPECT_EQ(app_list_syncable_service->GetSyncItem(user_app_id)->parent_id,
-            folder_id);
-
-  // Uninstall default app.
-  proxy->UninstallSilently(preinstalled_app_id,
-                           apps::UninstallSource::kUnknown);
-
-  // Default app should be removed from local app list but remain in sync list.
-  EXPECT_FALSE(registrar().GetInstallState(preinstalled_app_id).has_value());
-  EXPECT_EQ(registrar().GetInstallState(user_app_id),
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION);
-  EXPECT_FALSE(app_list_test_api.HasApp(preinstalled_app_id));
-  EXPECT_TRUE(app_list_test_api.HasApp(user_app_id));
-  EXPECT_EQ(
-      app_list_syncable_service->GetSyncItem(preinstalled_app_id)->parent_id,
-      "");
-  EXPECT_EQ(app_list_syncable_service->GetSyncItem(user_app_id)->parent_id, "");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-// Check that offline only installs don't overwrite fresh online manifest
-// obtained via sync install.
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
-                       OfflineOnlyManifest_SiteAlreadyInstalledFromSync) {
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(profile());
-  signin::MakePrimaryAccountAvailable(identity_manager, "user@gmail.com",
-                                      signin::ConsentLevel::kSignin);
-  ui::DeviceDataManagerTestApi().OnDeviceListsComplete();
-
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  GURL install_url = GetAppUrl();
-  GURL start_url = install_url;
-  GURL scope = embedded_test_server()->GetURL("/web_apps/");
-
-  const webapps::AppId app_id = InstallWebAppFromPage(browser(), install_url);
-
-  const WebApp* web_app = registrar().GetAppById(app_id);
-  ASSERT_TRUE(web_app);
-
-  EXPECT_TRUE(web_app->IsSynced());
-  EXPECT_FALSE(web_app->IsPreinstalledApp());
-
-  {
-    SCOPED_TRACE("Expect initial manifest fields from basic.html web app.");
-    ExpectInitialManifestFieldsFromBasicWebApp(icon_manager(), web_app,
-                                               start_url, scope);
-  }
-
-  constexpr char kAppConfigTemplate[] =
-      R"({
-        "app_url": "$1",
-        "launch_container": "tab",
-        "user_type": ["unmanaged"],
-        "only_use_offline_manifest": true,
-        "offline_manifest": {
-          "name": "$2",
-          "start_url": "$3",
-          "scope": "$4",
-          "display": "minimal-ui",
-          "theme_color_argb_hex": "AABBCCDD",
-          "icon_any_pngs": ["icon.png"]
-        }
-      })";
-  std::string app_config = base::ReplaceStringPlaceholders(
-      kAppConfigTemplate,
-      {install_url.spec(), "Overwrite app name", start_url.spec(),
-       "https://overwrite.scope/"},
-      nullptr);
-  EXPECT_EQ(SyncPreinstalledAppConfig(install_url, app_config),
-            webapps::InstallResultCode::kSuccessOfflineOnlyInstall);
-
-  EXPECT_EQ(web_app, registrar().GetAppById(app_id));
-
-  EXPECT_TRUE(web_app->IsSynced());
-  EXPECT_TRUE(web_app->IsPreinstalledApp());
-
-  {
-    SCOPED_TRACE(
-        "Expect same manifest fields from basic.html web app, no overwrites.");
-    ExpectInitialManifestFieldsFromBasicWebApp(icon_manager(), web_app,
-                                               start_url, scope);
-  }
-}
-
-class PreinstalledWebAppManagerWithCloudGamingBrowserTest
-    : public PreinstalledWebAppManagerBrowserTest {
- public:
-  PreinstalledWebAppManagerWithCloudGamingBrowserTest() {
-    scoped_feature_list_.InitAndEnableFeature(
-        chromeos::features::kCloudGamingDevice);
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerWithCloudGamingBrowserTest,
-                       GateOnCloudGamingFeature) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  constexpr char kAppConfigTemplate[] =
-      R"({
-        "app_url": "$1",
-        "launch_container": "window",
-        "user_type": ["unmanaged"],
-        "feature_name": "$2"
-      })";
-  std::string app_config = base::ReplaceStringPlaceholders(
-      kAppConfigTemplate,
-      {GetAppUrl().spec(), chromeos::features::kCloudGamingDevice.name},
-      nullptr);
-
-  EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), app_config),
-            webapps::InstallResultCode::kSuccessNewInstall);
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class PreinstalledWebAppManagerPreferredAppForSupportedLinksBrowserTest
     : public PreinstalledWebAppManagerBrowserTest,
@@ -1644,11 +903,7 @@ class PreinstalledWebAppManagerPreferredAppForSupportedLinksBrowserTest
   }
 
   bool GetExpectedPreferredAppForSupportedLinks() const {
-#if BUILDFLAG(IS_CHROMEOS)
-    return IsPreferredAppPerInstallOption() || AppsCapturingByDefault();
-#else
     return IsPreferredAppPerInstallOption();
-#endif
   }
 
   void RemoveSupportedLinksPreference(const webapps::AppId& app_id) {
@@ -1692,11 +947,7 @@ IN_PROC_BROWSER_TEST_P(
             webapps::InstallResultCode::kSuccessNewInstall);
   apps::AppReadinessWaiter(profile(), app_id).Await();
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
 
   // Verify that the app is the preferred app if requested in the install
@@ -1711,11 +962,7 @@ IN_PROC_BROWSER_TEST_P(
   EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), manifest),
             webapps::InstallResultCode::kSuccessAlreadyInstalled);
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
 
   // Verify that the app is *not* the preferred app after re-installation as
@@ -1731,8 +978,6 @@ INSTANTIATE_TEST_SUITE_P(
         testing::Values(
             apps::test::LinkCapturingFeatureVersion::kV2DefaultOff,
             apps::test::LinkCapturingFeatureVersion::kV2DefaultOn)));
-
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // State denoting whether preinstalled apps are capturing links by default or
 // not based on the `kPreinstalledBrowserTabWebAppsCaptureOnDefault` flag.
@@ -1839,16 +1084,10 @@ IN_PROC_BROWSER_TEST_P(PreinstalledWebAppNavigationCapturing,
   EXPECT_EQ(SyncPreinstalledAppConfig(GetAppUrl(), manifest),
             webapps::InstallResultCode::kSuccessNewInstall);
   EXPECT_EQ(registrar().GetInstallState(app_id),
-#if BUILDFLAG(IS_CHROMEOS)
-            proto::InstallState::INSTALLED_WITH_OS_INTEGRATION
-#else
             proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION
-#endif
   );
 
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(ShouldCaptureLinks(), registrar().CapturesLinksInScope(app_id));
-#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -1885,8 +1124,6 @@ INSTANTIATE_TEST_SUITE_P(
       }
       return test_name;
     });
-
-#endif
 
 class PreinstalledWebAppManagerSimpleBrowserTest
     : public WebAppBrowserTestBase {

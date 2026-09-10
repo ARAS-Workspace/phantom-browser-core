@@ -55,10 +55,6 @@
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/components/kiosk/kiosk_utils.h"
-#endif
-
 namespace internal {
 const char kHistogramPrerenderPredictionStatusDefaultSearchEngine[] =
     "Prerender.Experimental.PredictionStatus.DefaultSearchEngine";
@@ -580,12 +576,6 @@ PrerenderManager::PrewarmDecision PrerenderManager::ShouldPrewarm(
     }
   }
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (chromeos::IsKioskSession()) {
-    return PrewarmDecision::kInKioskSession;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   return PrewarmDecision::kReady;
 }

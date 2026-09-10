@@ -129,10 +129,6 @@ class ChromePageInfoDelegate : public PageInfoDelegate {
   bool IsHttpsFirstModeEnabledForUrl(const GURL& url) override;
   bool IsIncognitoProfile() override;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bool ShouldSyncCookiesForUrl(const GURL& url) override;
-#endif
-
   void OnSuspiciousSiteBackToSafety() override;
   void OnSuspiciousSiteMarkAsSafe() override;
 

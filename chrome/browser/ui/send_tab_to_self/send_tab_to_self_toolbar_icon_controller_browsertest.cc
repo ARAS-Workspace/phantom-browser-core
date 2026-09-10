@@ -133,7 +133,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
 // TODO(crbug.com/529823129): Re-enable this test on ChromeOS and Linux.
 // This test cannot work on Wayland because the platform does not allow clients
 // to position top level windows, activate them, and set focus.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_StorePendingNewEntryFromIncognitoBrowser \
   DISABLED_StorePendingNewEntryFromIncognitoBrowser
 #else
@@ -161,12 +161,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
 }
 
 // TODO(crbug.com/529823129): Re-enable this test on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_StorePendingNewEntryFromWebApp \
-  DISABLED_StorePendingNewEntryFromWebApp
-#else
 #define MAYBE_StorePendingNewEntryFromWebApp StorePendingNewEntryFromWebApp
-#endif
 IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
                        MAYBE_StorePendingNewEntryFromWebApp) {
 #if BUILDFLAG(IS_OZONE)

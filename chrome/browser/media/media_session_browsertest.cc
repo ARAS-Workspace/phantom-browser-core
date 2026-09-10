@@ -99,20 +99,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
 // metadata in the MediaSessionImpl with some placeholder metadata. These
 // changes are gated to only affect ChromeOS, hence why the testing for this is
 // also ChromeOS only.
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
-                       MediaSessionInfoIsHiddenInCrOSIncognito) {
-  Browser* browser = CreateIncognitoBrowser();
-
-  media_session::test::MockMediaSessionMojoObserver observer(
-      *content::MediaSession::Get(
-          browser->tab_strip_model()->GetActiveWebContents()));
-
-  PlayVideoWithMetadata(browser);
-
-  observer.WaitForExpectedMetadata(GetExpectedHiddenMetadata());
-}
-#else  // !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
                        MediaSessionInfoIsNotHiddenInNonCrOSIncognito) {
   Browser* browser = CreateIncognitoBrowser();
@@ -125,4 +111,3 @@ IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
 
   observer.WaitForExpectedMetadata(GetExpectedMetadata());
 }
-#endif

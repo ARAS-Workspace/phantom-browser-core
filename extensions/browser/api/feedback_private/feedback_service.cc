@@ -39,30 +39,8 @@
 #include "extensions/browser/extensions_browser_client.h"
 #include "net/base/network_change_notifier.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include <optional>
-
-#include "base/base64.h"
-#include "chromeos/ash/components/cryptohome/cryptohome_parameters.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/user_manager.h"
-#include "content/public/browser/storage_partition.h"
-#include "crypto/hpke.h"
-#include "crypto/keypair.h"
-#include "extensions/browser/api/feedback_private/proto/hpke.pb.h"
-#include "net/http/http_status_code.h"
-#include "services/network/public/cpp/resource_request.h"
-#include "services/network/public/cpp/shared_url_loader_factory.h"
-#include "services/network/public/cpp/simple_url_loader.h"
-#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
-#include "services/network/public/mojom/url_response_head.mojom.h"
-#include "third_party/cros_system_api/dbus/debugd/dbus-constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "base/base64.h"
 #include "base/feature_list.h"
-#endif
 
 namespace extensions {
 
@@ -72,68 +50,8 @@ using system_logs::SystemLogsResponse;
 
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS)
 constexpr char kVariationsStateAttachmentName[] = "variations_state.bin";
-#endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-// The paths are relative to "/var/log/" by default, which can be overwritten
-// for testing purpose.
-constexpr base::FilePath::CharType kBluetoothLogsFilePath[] =
-    FILE_PATH_LITERAL("bluetooth/log.bz2");
-constexpr base::FilePath::CharType kBluetoothLogsFilePathOld[] =
-    FILE_PATH_LITERAL("bluetooth/log.bz2.old");
-constexpr base::FilePath::CharType kBluetoothQualityReportFilePath[] =
-    FILE_PATH_LITERAL("bluetooth/bluetooth_quality_report");
-
-constexpr char kBluetoothLogsAttachmentName[] = "bluetooth_logs.bz2";
-constexpr char kBluetoothLogsAttachmentNameOld[] = "bluetooth_logs.old.bz2";
-constexpr char kBluetoothQualityReportAttachmentName[] =
-    "bluetooth_quality_report";
-
-constexpr char kVariationsAttachmentName[] = "variations.binary";
-constexpr char kVariationsFetchHpkeKey[] =
-    "https://www.gstatic.com/chromeos-feedback-variations-encryption-key/"
-    "public_keyset.json";
-constexpr int kVariationsMaxDownloadBytes = 512;
-
-void AddAttachment(scoped_refptr<feedback::FeedbackData> feedback_data,
-                   const base::FilePath& root_path,
-                   const std::string& file_path,
-                   const std::string& attachment_name) {
-  std::string temp_log_content;
-  if (base::ReadFileToString(root_path.Append(file_path), &temp_log_content)) {
-    feedback_data->AddFile(attachment_name, std::move(temp_log_content));
-  } else {
-    LOG(WARNING) << "failed to add attachment " << attachment_name
-                 << ": could not read file: " << file_path << " in "
-                 << root_path.value();
-  }
-}
-
-void AttachBluetoothLogs(scoped_refptr<feedback::FeedbackData> feedback_data,
-                         const base::FilePath& root_path) {
-  AddAttachment(feedback_data, root_path, kBluetoothLogsFilePath,
-                kBluetoothLogsAttachmentName);
-  AddAttachment(feedback_data, root_path, kBluetoothLogsFilePathOld,
-                kBluetoothLogsAttachmentNameOld);
-  AddAttachment(feedback_data, root_path, kBluetoothQualityReportFilePath,
-                kBluetoothQualityReportAttachmentName);
-}
-
-// A new case must be added for every new log type. Otherwise the code should
-// not compile.
-std::string_view GetAttachmentName(debugd::FeedbackBinaryLogType log_type) {
-  switch (log_type) {
-    case debugd::WIFI_FIRMWARE_DUMP:
-      return "wifi_firmware_dumps.tar.zst";
-    case debugd::BLUETOOTH_FIRMWARE_DUMP:
-      return "bluetooth_firmware_dumps.tar.zst";
-  }
-}
-#endif
-
-#if !BUILDFLAG(IS_CHROMEOS)
 void IncludeVariations(scoped_refptr<feedback::FeedbackData> feedback_data) {
   std::vector<uint8_t> ciphertext;
   auto status =
@@ -148,7 +66,6 @@ void IncludeVariations(scoped_refptr<feedback::FeedbackData> feedback_data) {
                            std::string(ciphertext.begin(), ciphertext.end()));
   }
 }
-#endif
 
 void RedactFeedbackData(scoped_refptr<feedback::FeedbackData> feedback_data) {
   redaction::RedactionTool redactor;
@@ -179,13 +96,6 @@ void FeedbackService::RedactThenSendFeedback(
       base::BindOnce(&FeedbackService::SendFeedback, this, params,
                      feedback_data, std::move(callback)));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void FeedbackService::SetLogFilesRootPathForTesting(
-    const base::FilePath& log_file_root) {
-  log_file_root_ = log_file_root;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // After the attached file and screenshot if available are fetched, the callback
 // will be invoked. Other further processing will be done in background. The
@@ -250,18 +160,7 @@ void FeedbackService::OnAttachedFileAndScreenshotFetched(
     // will be loaded in the background without blocking the client.
     FetchSystemInformation(params, feedback_data);
   } else {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (feedback_data->sys_info()->size() > 0) {
-      // The user has chosen to send system logs which has been loaded from the
-      // client side. On ash, extra logs need to be fetched.
-      FetchExtraLogs(params, feedback_data);
-    } else {
-      // The user has chosen not to send system logs.
-      OnAllLogsFetched(params, feedback_data);
-    }
-#else
     OnAllLogsFetched(params, feedback_data);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   base::UmaHistogramMediumTimes(
@@ -304,82 +203,12 @@ void FeedbackService::OnSystemInformationFetched(
         feedback_data->AddLog(std::move(itr.first), std::move(itr.second));
     }
   }
-#if !BUILDFLAG(IS_CHROMEOS)
   if (base::FeatureList::IsEnabled(variations::kFeedbackIncludeVariations)) {
     IncludeVariations(feedback_data);
   }
-#endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  FetchExtraLogs(params, feedback_data);
-#else
   OnAllLogsFetched(params, feedback_data);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void FeedbackService::FetchExtraLogs(
-    const FeedbackParams& params,
-    scoped_refptr<feedback::FeedbackData> feedback_data) {
-  delegate_->FetchExtraLogs(
-      feedback_data,
-      base::BindOnce(&FeedbackService::OnExtraLogsFetched, this, params));
-}
-
-void FeedbackService::OnExtraLogsFetched(
-    const FeedbackParams& params,
-    scoped_refptr<feedback::FeedbackData> feedback_data) {
-  auto barrier_closure =
-      base::BarrierClosure((params.send_bluetooth_logs ? 2 : 0) +
-                               (params.send_wifi_debug_logs ? 1 : 0) + 1,
-                           base::BindOnce(&FeedbackService::OnAllLogsFetched,
-                                          this, params, feedback_data));
-
-  EncryptVariations(feedback_data, barrier_closure);
-
-  const user_manager::User* user =
-      user_manager::UserManager::Get()->GetActiveUser();
-  const auto account_identifier =
-      cryptohome::CreateAccountIdentifierFromAccountId(
-          user ? user->GetAccountId() : EmptyAccountId());
-
-  // If bluetooth logs are requested, invoke AttachBluetoothLogs to add
-  // them in a separate thread to avoid blocking the UI thread.
-  if (params.send_bluetooth_logs) {
-    base::ThreadPool::PostTaskAndReply(
-        FROM_HERE, {base::MayBlock()},
-        base::BindOnce(&AttachBluetoothLogs, feedback_data, log_file_root_),
-        barrier_closure);
-
-    binary_log_files_reader_.GetFeedbackBinaryLogs(
-        account_identifier,
-        debugd::FeedbackBinaryLogType::BLUETOOTH_FIRMWARE_DUMP,
-        base::BindOnce(&FeedbackService::OnBinaryLogFilesFetched, this, params,
-                       feedback_data, barrier_closure));
-  }
-
-  if (params.send_wifi_debug_logs) {
-    binary_log_files_reader_.GetFeedbackBinaryLogs(
-        account_identifier, debugd::FeedbackBinaryLogType::WIFI_FIRMWARE_DUMP,
-        base::BindOnce(&FeedbackService::OnBinaryLogFilesFetched, this, params,
-                       feedback_data, barrier_closure));
-  }
-}
-
-void FeedbackService::OnBinaryLogFilesFetched(
-    const FeedbackParams& params,
-    scoped_refptr<feedback::FeedbackData> feedback_data,
-    base::RepeatingClosure barrier_closure_callback,
-    feedback::BinaryLogFilesReader::BinaryLogsResponse binary_logs_response) {
-  if (binary_logs_response) {
-    for (auto& item : *binary_logs_response) {
-      feedback_data->AddFile(GetAttachmentName(item.first).data(),
-                             std::move(item.second));
-    }
-  }
-  std::move(barrier_closure_callback).Run();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void FeedbackService::OnAllLogsFetched(
     const FeedbackParams& params,
@@ -409,217 +238,5 @@ void FeedbackService::OnAllLogsFetched(
   base::UmaHistogramTimes("Feedback.Duration.FormSubmitToSendQueue",
                           base::TimeTicks::Now() - params.form_submit_time);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void FeedbackService::EncryptVariations(
-    scoped_refptr<feedback::FeedbackData> feedback_data,
-    base::RepeatingClosure barrier_closure) {
-  net::NetworkTrafficAnnotationTag traffic_annotation =
-      net::DefineNetworkTrafficAnnotation(
-          "chromeos_feedback_report_hpke_public_key_fetch_for_variations", R"(
-        semantics {
-          sender: "ChromeOS Feedback Report App"
-          description:
-            "Users can press Alt+Shift+i to report a bug or a feedback in "
-            "general. Here we fetch a Hpke public key to encrypt "
-            "the current running variations. This is ChromeOS-only."
-          trigger:
-            "When user chooses to send feedback to Google."
-          data:
-            "Fetches a HpKe public key. This key is used to encrypt the "
-            "variations that are running at the time the feedback report was "
-            "generated, and used by incident management engineering to triage "
-            "issues potentially caused by experiments. "
-            "If the user unchecks 'Send system information', this will "
-            "not be fetched and variations will not be included in the "
-            "feedback report."
-          destination: GOOGLE_OWNED_SERVICE
-          internal {
-            contacts {
-              email: "cros-feedback-app@google.com"
-            }
-          }
-          user_data {
-            type: NONE
-          }
-          last_reviewed: "2024-11-06"
-        }
-        policy {
-          cookies_allowed: NO
-          setting:
-            "This feature cannot be disabled by settings and is only activated "
-            "by direct user request."
-          chrome_policy {
-            UserFeedbackAllowed {
-              UserFeedbackAllowed: false
-            }
-          }
-        })");
-
-  auto resource_request = std::make_unique<network::ResourceRequest>();
-  resource_request->url = GURL(kVariationsFetchHpkeKey);
-  resource_request->method = "GET";
-  resource_request->credentials_mode = network::mojom::CredentialsMode::kOmit;
-
-  auto loader = network::SimpleURLLoader::Create(std::move(resource_request),
-                                                 traffic_annotation);
-
-  if (!url_loader_factory_) {
-    url_loader_factory_ = browser_context_->GetDefaultStoragePartition()
-                              ->GetURLLoaderFactoryForBrowserProcess();
-  }
-
-  // Loader will be owned by the callback, so we need a temporary reference to
-  // avoid use after move.
-  network::SimpleURLLoader* loader_ptr = loader.get();
-  loader_ptr->DownloadToString(
-      url_loader_factory_.get(),
-      base::BindOnce(&FeedbackService::OnVariationsFetchHpkeURL, this,
-                     std::move(loader), feedback_data,
-                     std::move(barrier_closure)),
-      kVariationsMaxDownloadBytes);
-}
-
-void FeedbackService::OnVariationsFetchHpkeURL(
-    std::unique_ptr<network::SimpleURLLoader> loader,
-    scoped_refptr<feedback::FeedbackData> feedback_data,
-    base::RepeatingClosure barrier_closure,
-    std::optional<std::string> hpke_public_key) {
-  if (!loader) {
-    LOG(ERROR) << "invalid loader";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  auto net_error = loader->NetError();
-  int http_error = 0;
-  if (loader->ResponseInfo() && loader->ResponseInfo()->headers) {
-    http_error = loader->ResponseInfo()->headers->response_code();
-  }
-  if (!hpke_public_key || http_error != net::HTTP_OK) {
-    LOG(ERROR) << "Unable to fetch hpke_public_key. http code: " << http_error
-               << ", net error: " << net_error;
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-// Sample JSON string:
-// {
-//   "primaryKeyId": 123,
-//   "key": [
-//     {
-//       "keyData": {
-//         "typeUrl": "type.googleapis.com/google.crypto.tink.HpkePublicKey",
-//         "value": "Base64Encoded HPKE Proto",
-//         "keyMaterialType": "ASYMMETRIC_PUBLIC"
-//       },
-//       "status": "ENABLED",
-//       "keyId": 123,
-//       "outputPrefixType": "RAW"
-//     }
-//   ]
-// }
-  std::optional<base::DictValue> json_dict =
-      base::JSONReader::ReadDict(*hpke_public_key, base::JSON_PARSE_RFC);
-  if (!json_dict) {
-    LOG(ERROR) << "Failed to parse JSON or it's not a dictionary.";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  const base::ListValue* key_list = json_dict->FindList("key");
-  if (!key_list || key_list->empty()) {
-    LOG(ERROR) << "Key list not found or empty.";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  // Get the first item in the "key" list
-  const base::Value& key_item = (*key_list)[0];
-  const base::DictValue* key_dict = key_item.GetIfDict();
-  if (!key_dict) {
-    LOG(ERROR) << "Unexpected format in 'key' item.";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  // Extract "keyData" dictionary
-  const base::DictValue* key_data_dict = key_dict->FindDict("keyData");
-  if (!key_data_dict) {
-    LOG(ERROR) << "Failed to find 'keyData' dictionary.";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  // Extract "value" from "keyData"
-  const std::string* base64_serialized_proto_hpke =
-      key_data_dict->FindString("value");
-  if (!base64_serialized_proto_hpke) {
-    LOG(ERROR) << "Failed to extract 'value' from 'keyData'.";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  std::string serialized_proto_hpke;
-  if (!base::Base64Decode(*base64_serialized_proto_hpke,
-                          &serialized_proto_hpke)) {
-    LOG(ERROR) << "base64 decode of hpke proto failed";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-  userfeedback::HpkePublicKey key_proto;
-  if (!key_proto.ParseFromString(serialized_proto_hpke)) {
-    LOG(ERROR) << "Failed to parse HpkePublicKey.";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  VLOG(1) << "HPKE public KEY:"
-          << base::HexEncode(base::as_byte_span(key_proto.public_key()));
-  VariationsEncryptWithHpkeKey(base::as_byte_span(key_proto.public_key()),
-                               feedback_data, std::move(barrier_closure));
-}
-
-void FeedbackService::VariationsEncryptWithHpkeKey(
-    base::span<const uint8_t> hpke_public_key,
-    scoped_refptr<feedback::FeedbackData> feedback_data,
-    base::RepeatingClosure barrier_closure) {
-  std::string variations_string =
-      variations::VariationsCommandLine::GetForCurrentProcess().ToString();
-  if (variations_string.empty()) {
-    LOG(ERROR) << "Unable to get valid variations.";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  const auto pubkey_span = hpke_public_key.to_fixed_extent<32>();
-  if (!pubkey_span) {
-    LOG(ERROR) << "Public key is of wrong size: " << hpke_public_key.size();
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  const auto pubkey =
-      crypto::keypair::PublicKey::FromX25519PublicKey(*pubkey_span);
-
-  const crypto::hpke::HpkeParams kParams = {
-      .kem = crypto::hpke::KemType::kX25519HkdfSha256,
-      .kdf = crypto::hpke::KdfType::kHkdfSha256,
-      .aead = crypto::hpke::AeadType::kAes256Gcm,
-  };
-
-  std::optional<std::vector<uint8_t>> ciphertext =
-      crypto::hpke::Seal(kParams, pubkey, base::as_byte_span(variations_string),
-                         /*info=*/{}, /*ad=*/{});
-  if (!ciphertext) {
-    LOG(ERROR) << "HPKE seal failed";
-    return VariationsFinished(false, std::move(barrier_closure));
-  }
-
-  feedback_data->AddFile(kVariationsAttachmentName, std::move(*ciphertext));
-  return VariationsFinished(true, std::move(barrier_closure));
-}
-
-void FeedbackService::VariationsFinished(
-    bool variations_attached,
-    base::RepeatingClosure barrier_closure) {
-  if (variations_attached) {
-    VLOG(1) << "variations attached to feedback report";
-  } else {
-    VLOG(1) << "variations not attached to feedback report";
-  }
-  std::move(barrier_closure).Run();
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace extensions

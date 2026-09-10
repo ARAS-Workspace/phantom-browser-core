@@ -1320,7 +1320,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // subframe.
 // https://crbug.com/959848: Flaky on Linux MSAN bots
 // https://crbug.com/959924: Flaky on Android MSAN bots
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_TouchAndGestureEventPositionChange \
   DISABLED_TouchAndGestureEventPositionChange
 #else
@@ -3470,7 +3470,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestAndroidBrowserTest,
 // This test verifies that MouseEnter and MouseLeave events fire correctly
 // when the mouse cursor moves between processes.
 // Flaky (timeout): https://crbug.com/1006635, crbug.com/334105909.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_CrossProcessMouseEnterAndLeaveTest \
   DISABLED_CrossProcessMouseEnterAndLeaveTest
 #else
@@ -5581,7 +5581,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // Test that performing a touchpad pinch over an OOPIF offers the synthetic
 // wheel events to the child and causes the page scale factor to change for
 // the main frame (given that the child did not consume the wheel).
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/41449850): Flaky on multiple platforms.
 #define MAYBE_TouchpadPinchOverOOPIF DISABLED_TouchpadPinchOverOOPIF
 #else
@@ -5690,8 +5690,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 
 // Tests that performing a touchpad double-tap zoom over an OOPIF offers the
 // synthetic wheel event to the child.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/41449850): Flaky on multiple platforms.
 #define MAYBE_TouchpadDoubleTapZoomOverOOPIF \
   DISABLED_TouchpadDoubleTapZoomOverOOPIF
@@ -5904,7 +5903,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHighDPIHitTestBrowserTest,
   CreateContextMenuTestHelper(shell(), embedded_test_server());
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // The Popup menu test often times out on linux. https://crbug.com/1111402
 #define MAYBE_PopupMenuTest DISABLED_PopupMenuTest
 #else
@@ -5976,7 +5975,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest, MAYBE_PopupMenuTest) {
   }
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Verify click-and-drag selection of popups still works on Linux with
   // OOPIFs enabled. This is only necessary to test on Aura because Mac and
   // Android use native widgets. Windows does not support this as UI
@@ -6015,7 +6014,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest, MAYBE_PopupMenuTest) {
   // This verifies that the popup actually received the event, and it wasn't
   // diverted to a different RenderWidgetHostView due to mouse capture.
   EXPECT_TRUE(popup_monitor.EventWasReceived());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // There are posted tasks that must be run before the test shuts down, lest
   // they access deleted state.
@@ -7316,7 +7315,7 @@ using SitePerProcessDelegatedInkBrowserTest = SitePerProcessHitTestBrowserTest;
 // TODO(crbug.com/40835227): Fix and enable the test on Fuchsia.
 // TODO(crbug.com/40935254): flaky on ChromeOS
 // TODO(http://b/331190208): Test failing on Linux
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_MetadataAndPointGoThroughOOPIF \
   DISABLED_MetadataAndPointGoThroughOOPIF
 #else

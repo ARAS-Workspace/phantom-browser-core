@@ -73,11 +73,7 @@ class ValidationFunction : public ExtensionFunction {
 
 using ChromeExtensionFunctionUnitTest = ExtensionServiceTestBase;
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_SimpleFunctionTest DISABLED_SimpleFunctionTest
-#else
 #define MAYBE_SimpleFunctionTest SimpleFunctionTest
-#endif
 TEST_F(ChromeExtensionFunctionUnitTest, MAYBE_SimpleFunctionTest) {
   scoped_refptr<ValidationFunction> function(new ValidationFunction(true));
   function->RunWithValidation().Execute();

@@ -103,7 +103,7 @@ bool IsFeatureEnabled(LocalDOMWindow* window) {
 // TODO(https://crbug.com/570344): Remove this method when all platforms are
 // supported.
 void AddUnsupportedPlatformConsoleMessage(ExecutionContext* context) {
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
   context->AddConsoleMessage(MakeGarbageCollected<ConsoleMessage>(
       mojom::blink::ConsoleMessageSource::kJavaScript,
       mojom::blink::ConsoleMessageLevel::kInfo,

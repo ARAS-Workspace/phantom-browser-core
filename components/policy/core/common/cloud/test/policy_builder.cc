@@ -556,13 +556,4 @@ TypedPolicyBuilder<em::ExternalPolicyData>::TypedPolicyBuilder() {
 template class TypedPolicyBuilder<em::ExternalPolicyData>;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-StringPolicyBuilder::StringPolicyBuilder() = default;
-
-void StringPolicyBuilder::Build() {
-  policy_data().set_policy_value(payload_);
-  PolicyBuilder::Build();
-}
-#endif
-
 }  // namespace policy

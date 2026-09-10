@@ -16,20 +16,11 @@ namespace message_center {
 namespace {
 
 bool UseHighPriorityDelay(Notification* notification) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS is going to ignore the `never_timeout` field so all notification
-  // popups are automatically dismissed in 6 seconds. System priority
-  // notifications with `never_timeout` set will be displayed for 30 minutes.
-  const bool use_high_priority_delay =
-      notification->never_timeout() &&
-      notification->priority() == SYSTEM_PRIORITY;
-#else
   // Web Notifications are given a longer on-screen time on non-Chrome OS
   // platforms as there is no notification center to dismiss them to.
   const bool use_high_priority_delay =
       notification->priority() > DEFAULT_PRIORITY ||
       notification->notifier_id().type == NotifierType::WEB_PAGE;
-#endif
 
   return use_high_priority_delay;
 }
@@ -141,9 +132,6 @@ void PopupTimersController::OnNotificationUpdated(const std::string& id) {
   // flag for now.
   const bool must_cancel_timer =
       (*iter)->never_timeout()
-#if BUILDFLAG(IS_CHROMEOS)
-      && !features::IsNotificationsIgnoreRequireInteractionEnabled()
-#endif
       ;
 
   if (must_cancel_timer) {

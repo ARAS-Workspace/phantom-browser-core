@@ -10,11 +10,6 @@
 #include "chrome/browser/ui/views/frame/system_menu_model_delegate.h"
 #include "ui/base/interaction/element_identifier.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace chromeos {
-class MoveToDesksMenuModel;
-}
-#endif
 class BrowserWindowInterface;
 
 namespace ui {
@@ -53,20 +48,12 @@ class SystemMenuModelBuilder {
   void BuildSystemMenuForBrowserWindow(ui::SimpleMenuModel* model);
   void BuildSystemMenuForAppOrPopupWindow(ui::SimpleMenuModel* model);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Add the submenu for move to desks.
-  void AppendMoveToDesksMenu(ui::SimpleMenuModel* model);
-#endif
-
   // Add the items to allow the window to visit the desktop of another user.
   void AppendTeleportMenu(ui::SimpleMenuModel* model);
 
   SystemMenuModelDelegate menu_delegate_;
   std::unique_ptr<ui::MenuModel> menu_model_;
   std::unique_ptr<ui::SimpleMenuModel> zoom_menu_contents_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<chromeos::MoveToDesksMenuModel> move_to_desks_model_;
-#endif
 };
 
 #endif  // CHROME_BROWSER_UI_VIEWS_FRAME_SYSTEM_MENU_MODEL_BUILDER_H_

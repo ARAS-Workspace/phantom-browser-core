@@ -132,15 +132,4 @@ TEST_F(EditableConfigurationTest, GroupConfigShouldBeEditable) {
   EXPECT_EQ(invalid_foo_config, invalid_foo_config_result);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(EditableConfigurationTest, SinglePrefixAddAndGet) {
-  const std::string foo_prefix = "FooEventPrefix";
-  configuration_.AddAllowedEventPrefix(foo_prefix);
-  const auto& foo_prefix_result =
-      configuration_.GetRegisteredAllowedEventPrefixes();
-  EXPECT_EQ(1u, foo_prefix_result.size());
-  EXPECT_TRUE(foo_prefix_result.contains(foo_prefix));
-}
-#endif
-
 }  // namespace feature_engagement

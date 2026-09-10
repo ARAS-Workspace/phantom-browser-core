@@ -2115,7 +2115,6 @@ TEST_F(PopupViewViewsTest, CellSubPopupResetAfterSuggestionsUpdates) {
 
 // TODO(crbug.com/41487832): Enable on ChromeOS when test setup in the death
 // subprocess is fixed.
-#if !BUILDFLAG(IS_CHROMEOS)
 // `PopupViewViewsTest` is not used in death tests because it sets up a complex
 // environment (namely creates a `TestingProfile`) that fails to be created in
 // the sub-process (see `EXPECT_CHECK_DEATH_WITH` doc for details). This fail
@@ -2152,7 +2151,6 @@ TEST_F(PopupViewViewsDeathTest, OpenSubPopupWithNoChildrenCheckCrash) {
                                 PopupCellSelectionSource::kNonUserInput),
       expected_message);
 }
-#endif
 
 TEST_F(PopupViewViewsTest, SubPopupHidingOnNoSelection) {
   ui::MouseEvent fake_event(ui::EventType::kMouseMoved, gfx::Point(),

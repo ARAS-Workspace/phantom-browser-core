@@ -126,11 +126,7 @@ class InstallFromSyncTest : public WebAppTest {
   // On ChromeOS, even with trusted icons enabled, sync installs always fetch
   // the manifest.
   bool UseFallbackModeForTrustedInstalls() {
-#if BUILDFLAG(IS_CHROMEOS)
-    return false;
-#else
     return true;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   InstallFromSyncCommand::Params CreateParams(

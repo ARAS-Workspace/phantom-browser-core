@@ -92,9 +92,7 @@ IN_PROC_BROWSER_TEST_P(NavigationCapturingForcedOffTest, CheckBehavior) {
 INSTANTIATE_TEST_SUITE_P(,
                          NavigationCapturingForcedOffTest,
                          testing::Values(
-#if !BUILDFLAG(IS_CHROMEOS)
                              NavCaptureOffConfig::kFeatureOnUserSettingOff,
-#endif
                              NavCaptureOffConfig::kFeatureOn,
                              NavCaptureOffConfig::kFeatureOnInitialNavOff),
                          NavCaptureToString);

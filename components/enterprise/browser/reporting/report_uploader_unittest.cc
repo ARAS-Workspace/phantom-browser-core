@@ -61,11 +61,7 @@ class ReportUploaderTest : public ::testing::Test {
   // Different CloudPolicyClient functions will be used in test cases based
   // on the current operation system. They share same retry and error handling
   // behaviors provided by ReportUploader.
-#if BUILDFLAG(IS_CHROMEOS)
-#define UploadReport UploadChromeOsUserReport
-#else
 #define UploadReport UploadChromeDesktopReport
-#endif
 
   ReportUploaderTest()
       : task_environment_(base::test::TaskEnvironment::TimeSource::MOCK_TIME) {

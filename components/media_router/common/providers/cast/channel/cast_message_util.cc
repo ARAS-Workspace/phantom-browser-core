@@ -163,8 +163,6 @@ CastMessage CreateKeepAliveMessage(std::string_view keep_alive_type) {
 int GetVirtualConnectPlatformValue() {
 #if BUILDFLAG(IS_APPLE)
   return 4;
-#elif BUILDFLAG(IS_CHROMEOS)
-  return 5;
 #elif BUILDFLAG(IS_LINUX)
   return 6;
 #else

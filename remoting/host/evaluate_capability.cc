@@ -45,7 +45,7 @@ base::FilePath BuildHostBinaryPath() {
     return directory.Append(FILE_PATH_LITERAL("capability_test_stub"));
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (path.BaseName().value() ==
       FILE_PATH_LITERAL("chrome-remote-desktop-host")) {
     return path;

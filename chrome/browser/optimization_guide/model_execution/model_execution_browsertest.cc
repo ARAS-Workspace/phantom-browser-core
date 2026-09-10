@@ -682,9 +682,7 @@ IN_PROC_BROWSER_TEST_F(
 IN_PROC_BROWSER_TEST_F(
     ModelExecutionEnabledBrowserTestWithExplicitBrowserSignin,
     EnableFeatureViaPref) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(IsSignedIn());
-#endif
   histogram_tester_.ExpectUniqueSample(
       "OptimizationGuide.ModelExecution.FeatureEnabledAtStartup.Compose", false,
       1);
@@ -721,9 +719,7 @@ IN_PROC_BROWSER_TEST_F(
 IN_PROC_BROWSER_TEST_F(
     ModelExecutionEnabledBrowserTestWithExplicitBrowserSignin,
     HistorySearchRecordsSyntheticFieldTrial) {
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(IsSignedIn());
-#endif
   EXPECT_TRUE(ShouldFeatureBeCurrentlyEnabledForUser(
       UserVisibleFeatureKey::kHistorySearch));
   EXPECT_TRUE(variations::IsInSyntheticTrialGroup(

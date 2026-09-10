@@ -85,14 +85,6 @@
 #include "components/rlz/rlz_tracker.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/app_restore/full_restore_utils.h"
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/search_integrity/search_integrity.h"
 #include "chrome/browser/search_integrity/search_integrity_factory.h"
@@ -109,12 +101,7 @@ namespace {
 // In other platforms, restore apps only when the browser is automatically
 // restarted.
 bool ShouldRestoreApps(bool is_post_restart, Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // In ChromeOS, restore apps only when there are apps launched before reboot.
-  return full_restore::HasAppTypeBrowser(profile->GetPath());
-#else
   return is_post_restart;
-#endif
 }
 
 void UrlsToTabs(const std::vector<GURL>& urls, StartupTabs* tabs) {
@@ -140,31 +127,6 @@ Browser* GetExistingBrowserForOpenBehavior(
       ProfileBrowserCollection::GetForProfile(profile)->GetLastActiveBrowser();
   Browser* workspace_browser =
       current_browser ? current_browser->GetBrowserForMigrationOnly() : nullptr;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS we specifically want to select the last active window on the
-  // current workspace if possible, see crbug.com/497494119.
-  ProfileBrowserCollection::GetForProfile(profile)->ForEach(
-      [&](BrowserWindowInterface* window) {
-        Browser* const candidate = window->GetBrowserForMigrationOnly();
-        if (window->GetType() != BrowserWindowInterface::Type::TYPE_NORMAL) {
-          return true;
-        }
-
-        BrowserWindow* const browser_window =
-            BrowserWindow::FromBrowser(candidate);
-        if (!browser_window) {
-          return true;
-        }
-
-        if (browser_window->IsOnCurrentWorkspace()) {
-          workspace_browser = candidate;
-          return false;
-        }
-        return true;
-      },
-      BrowserCollection::Order::kActivation);
-#endif
 
 #if BUILDFLAG(IS_LINUX)
   const bool match_original_profiles =

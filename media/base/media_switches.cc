@@ -258,24 +258,12 @@ const char kVideoThreads[] = "video-threads";
 const char kAudioCodecsFromEDID[] = "audio-codecs-from-edid";
 #endif  // BUILDFLAG(ENABLE_PASSTHROUGH_AUDIO_CODECS)
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Allows remote attestation (RA) in dev mode for testing purpose. Usually RA
-// is disabled in dev mode because it will always fail. However, there are cases
-// in testing where we do want to go through the permission flow even in dev
-// mode. This can be enabled by this flag.
-const char kAllowRAInDevMode[] = "allow-ra-in-dev-mode";
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FREEBSD) || \
-    BUILDFLAG(IS_SOLARIS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FREEBSD) || BUILDFLAG(IS_SOLARIS)
 // The Alsa device to use when opening an audio input stream.
 const char kAlsaInputDevice[] = "alsa-input-device";
 // The Alsa device to use when opening an audio stream.
 const char kAlsaOutputDevice[] = "alsa-output-device";
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_FREEBSD) || BUILDFLAG(IS_SOLARIS)
-
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FREEBSD) || BUILDFLAG(IS_SOLARIS)
 
 #if BUILDFLAG(USE_CRAS)
 // Enforce system audio echo cancellation.
@@ -326,11 +314,7 @@ BASE_FEATURE(kAomVpxUsePresentationThreadType,
 // Enables flash to be ducked by audio focus. This is enabled on Chrome OS which
 // has audio focus enabled.
 BASE_FEATURE(kAudioFocusDuckFlash,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Allows the AutoPictureInPictureTabHelper to automatically enter
@@ -591,7 +575,7 @@ BASE_FEATURE(kH264IDRKeyframeRequiresParameterSets,
 
 // Enables handling of hardware media keys for controlling media.
 BASE_FEATURE(kHardwareMediaKeyHandling,
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
              base::FEATURE_ENABLED_BY_DEFAULT
 #elif BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(USE_MPRIS)
@@ -601,7 +585,7 @@ BASE_FEATURE(kHardwareMediaKeyHandling,
 #endif  // BUILDFLAG(USE_MPRIS)
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 );
 
 // Enables hardware secure decryption if supported by hardware and CDM.
@@ -749,7 +733,7 @@ BASE_FEATURE(kMediaLinkHelpers, base::FEATURE_ENABLED_BY_DEFAULT);
 // Only affects builds when DCHECK is on for non-ERROR logs (ERROR logs are
 // always sent to the log stream). Enabled by default on Android and ChromeOS.
 BASE_FEATURE(kMediaLogToConsole,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -780,11 +764,7 @@ BASE_FEATURE(kMediaTrasncriptsFlagInPageMetadata,
 
 // Enables the On-Device Web Speech feature on supported devices.
 BASE_FEATURE(kOnDeviceWebSpeech,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS)
 );
 
 // Enables on-device speech recognition using on-device Gemini Nano.
@@ -961,11 +941,7 @@ BASE_FEATURE(kUseWindowBoundsForPip, base::FEATURE_ENABLED_BY_DEFAULT);
 // TODO(b/520117896): remove the feature when a workaround can be found in the
 // H264VaapiDecoderDelegate.
 BASE_FEATURE(kVaapiEarlyPPSParsingForCENCv1,
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_VAAPI)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Enable VA-API hardware low power encoder for all codecs on intel Gen9x gpu.
@@ -1019,11 +995,7 @@ BASE_FEATURE(kWebCodecsVideoEncoderFrameDrop,
 // Inform webrtc with correct video color space information whenever
 // possible.
 BASE_FEATURE(kWebRTCColorAccuracy,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS)
 );
 
 // A hardware video encoder is allowed to drop a frame in WebRTC.
@@ -1106,11 +1078,7 @@ BASE_FEATURE(kVideoPipForceTrustedForMediaPlaybackForTesting,
 // still be used as a proxy between renderers and utility processes (see
 // go/oop-vd-dd).
 BASE_FEATURE(kUseOutOfProcessVideoDecoding,
-#if BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Use shared image interface to transport video frame resources.
@@ -1345,49 +1313,7 @@ BASE_FEATURE(kVTVideoEncodeAcceleratorOpaqueSharedImageEncode,
 
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_CHROMEOS)
-BASE_FEATURE(kAudioFlexibleLoopbackForSystemLoopback,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables the new media player features.
-BASE_FEATURE(kBackgroundListening, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSDspBasedAecDeactivatedGroups,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSDspBasedAgcDeactivatedGroups,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSDspBasedNsDeactivatedGroups,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSEnforceMonoAudioCapture, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSEnforceSystemAec, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSEnforceSystemAecAgc, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSEnforceSystemAecNs, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSEnforceSystemAecNsAgc, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// To control running audio communication effect on Chrome OS Audio Server.
-BASE_FEATURE(kCrOSSystemAEC,
-             "CrOSSystemAECWithBoardTuningsAllowed",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSSystemAECDeactivatedGroups, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kCrOSSystemVoiceIsolationOption,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIgnoreUiGains, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kShowForceRespectUiGainsToggle, base::FEATURE_ENABLED_BY_DEFAULT);
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // Reduces the number of buffers needed in the output video frame pool to
 // populate the Renderer pipeline for hardware accelerated VideoDecoder in
 // non-low latency scenarios.
@@ -1402,8 +1328,7 @@ BASE_FEATURE(kUseOutOfProcessVideoEncoding, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kV4L2H264TemporalLayerHWEncoding,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
-
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
 // Enable vaapi/v4l2 video decoding on linux. This is already enabled by default
@@ -1573,23 +1498,6 @@ BASE_FEATURE(kEnableArmHwdrm, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // defined(ARCH_CPU_ARM_FAMILY)
 #endif  // BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
 
-#if defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
-// Enables VSync aligned MJPEG decoding.
-BASE_FEATURE(kVSyncMjpegDecoding, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enable AV1 temporal layer encoding with HW encoder on ChromeOS.
-BASE_FEATURE(kVaapiAV1TemporalLayerHWEncoding,
-             "VaapiAv1TemporalLayerEncoding",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enable software bitrate controller for H264 temporal layer encoding with HW
-// encoder on ChromeOS.
-BASE_FEATURE(kVaapiH264SWBitrateController, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enable VP9 S-mode encoding with HW encoder for webrtc use case on ChromeOS.
-BASE_FEATURE(kVaapiVp9SModeHWEncoding, base::FEATURE_ENABLED_BY_DEFAULT);
-
-#endif  // defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
 
 std::string GetEffectiveAutoplayPolicy(const base::CommandLine& command_line) {
   // Return the autoplay policy set in the command line, if any.
@@ -1685,11 +1593,7 @@ bool IsIamfAudioDecodingSupported() {
 }
 
 bool IsLiveTranslateEnabled() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return base::FeatureList::IsEnabled(kFeatureManagementLiveTranslateCrOS);
-#else
   return true;
-#endif
 }
 
 bool IsRestrictOwnAudioSupported() {
@@ -1773,11 +1677,7 @@ bool IsVideoCaptureAcceleratedJpegDecodingEnabled() {
           switches::kUseFakeMjpegDecodeAccelerator)) {
     return true;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif
 }
 
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)

@@ -52,28 +52,6 @@
 #include "ui/base/window_open_disposition.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/login/saml/fake_saml_idp_mixin.h"
-#include "chrome/browser/ash/login/screens/error_screen.h"
-#include "chrome/browser/ash/login/test/auth_ui_utils.h"
-#include "chrome/browser/ash/login/test/cryptohome_mixin.h"
-#include "chrome/browser/ash/login/test/device_state_mixin.h"
-#include "chrome/browser/ash/login/test/oobe_base_test.h"
-#include "chrome/browser/ash/login/test/oobe_screen_waiter.h"
-#include "chrome/browser/ash/login/test/oobe_screens_utils.h"
-#include "chrome/browser/ash/login/test/session_manager_state_waiter.h"
-#include "chrome/browser/ash/login/users/test_users.h"
-#include "chrome/browser/ash/policy/core/device_policy_cros_test_helper.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/ash/login/login_display_host.h"
-#include "chrome/browser/ui/webui/ash/login/error_screen_handler.h"
-#include "chrome/test/base/fake_gaia_mixin.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
-#include "content/public/test/test_navigation_observer.h"
-#include "net/base/net_errors.h"
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 // Used by DisableWithNewProfile test. See the comment in above that test.
 #include "chrome/test/base/ui_test_utils.h"
@@ -272,252 +250,6 @@ IN_PROC_BROWSER_TEST_F(SSLPolicyTest, PreferSlowCiphersPolicy) {
   EXPECT_FALSE(result.success);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Tests for the device login screen policies on ChromeOS, using a SAML login
-// flow for ease of testing. SAML-related test code is adapted from
-// //chrome/browser/ash/login/saml/saml_browsertest.cc.
-class SSLDeviceLoginScreenPolicyTest : public ash::OobeBaseTest {
- public:
-  SSLDeviceLoginScreenPolicyTest() {
-    // Delay starting the SAML test server to customize the server behavior for
-    // each test.
-    fake_saml_idp_.set_auto_start_saml_servers(false);
-    // Prevent the default FakeGaia configuration from overwriting SAML configs.
-    fake_gaia_.set_initialize_configuration(false);
-  }
-
-  ~SSLDeviceLoginScreenPolicyTest() override = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    ash::OobeBaseTest::SetUpCommandLine(command_line);
-    command_line->AppendSwitch(ash::switches::kOobeSkipPostLogin);
-    command_line->AppendSwitch(ash::switches::kAllowFailedPolicyFetchForTest);
-  }
-
-  void SetUpOnMainThread() override {
-    ash::OobeBaseTest::SetUpOnMainThread();
-    login_profile_ = Profile::FromBrowserContext(
-        ash::BrowserContextHelper::Get()->GetSigninBrowserContext());
-    ASSERT_TRUE(login_profile_);
-    policy_helper_.InstallOwnerKey();
-  }
-
-  void TearDownOnMainThread() override {
-    login_profile_ = nullptr;
-    ash::OobeBaseTest::TearDownOnMainThread();
-  }
-
-  bool StartFakeSamlServerWithConfig(const net::SSLServerConfig& ssl_config) {
-    fake_saml_idp_.saml_server()->SetSSLConfig(
-        ash::FakeSamlIdpMixin::GetServerCertConfig(), ssl_config);
-    return fake_saml_idp_.StartSamlServersNow();
-  }
-
-  std::optional<std::string> GetLoginProfileManagedStringPref(
-      const std::string_view pref_name) {
-    return GetManagedStringPref(login_profile_->GetPrefs(), pref_name);
-  }
-
-  void RefreshDevicePoliciesAndWaitForPrefChange(
-      const std::string_view pref_name) {
-    PrefService* prefs = login_profile_->GetPrefs();
-    ASSERT_TRUE(prefs);
-
-    PrefChangeRegistrar registrar;
-    base::test::TestFuture<std::string_view> pref_changed_future;
-    registrar.Init(prefs);
-    registrar.Add(pref_name,
-                  base::BindRepeating(
-                      pref_changed_future.GetRepeatingCallback(), pref_name));
-    policy_helper_.RefreshDevicePolicy();
-    EXPECT_EQ(pref_name, pref_changed_future.Take());
-  }
-
-  // If `expected_net_error` is std::nullopt, then SAML login is expected to
-  // succeed. Otherwise this expects to see an error screen when attempting to
-  // load the SAML page.
-  void SetUpAndAttemptSamlLogin(
-      std::optional<net::Error> expected_net_error = std::nullopt) {
-    fake_gaia_.fake_gaia()->RegisterSamlUser(account_id_.GetUserEmail(),
-                                             fake_saml_idp_.GetSamlPageUrl());
-    fake_gaia_.fake_gaia()->SetConfigurationHelper(account_id_.GetUserEmail(),
-                                                   "fake-auth-SID-cookie",
-                                                   "fake-auth-LSID-cookie");
-    fake_gaia_.SetupFakeGaiaForLogin(account_id_.GetUserEmail(),
-                                     account_id_.GetGaiaId(),
-                                     FakeGaiaMixin::kFakeRefreshToken);
-    fake_saml_idp_.SetLoginHTMLTemplate("saml_login.html");
-
-    ash::OobeUI* oobe_ui = ash::LoginDisplayHost::default_host()->GetOobeUI();
-    ash::test::OobeScreenWatcher<ash::ErrorScreenView> error_screen_watcher(
-        oobe_ui);
-
-    // Wait for the Gaia signin UI to load (in a webview).
-    std::unique_ptr<ash::test::GaiaPageActor> gaia_ui =
-        ash::test::AwaitGaiaSigninUI();
-
-    std::optional<content::TestNavigationObserver>
-        navigation_net_error_observer;
-    if (expected_net_error.has_value()) {
-      // Observe the OOBE UI and its children, including the signin webview, for
-      // the expected net::Error.
-      content::WebContents* oobe_web_contents =
-          ash::LoginDisplayHost::default_host()->GetOobeWebContents();
-      navigation_net_error_observer.emplace(oobe_web_contents,
-                                            *expected_net_error);
-      for (content::WebContents* wc :
-           oobe_web_contents->GetInnerWebContents()) {
-        navigation_net_error_observer->WatchWebContents(wc);
-      }
-    }
-
-    // Submit the user's email to load the SAML page.
-    gaia_ui->SubmitFullAuthEmail(account_id_);
-
-    if (expected_net_error.has_value()) {
-      navigation_net_error_observer->WaitForNavigationFinished();
-      EXPECT_FALSE(navigation_net_error_observer->last_navigation_succeeded());
-      EXPECT_EQ(navigation_net_error_observer->last_net_error_code(),
-                *expected_net_error);
-      const GURL& error_nav_url =
-          navigation_net_error_observer->last_navigation_url();
-      GURL::Replacements remove_query_str;
-      remove_query_str.ClearQuery();
-      EXPECT_EQ(error_nav_url.ReplaceComponents(remove_query_str),
-                fake_saml_idp_.GetSamlPageUrl());
-
-      if (!error_screen_watcher.has_target_screen_been_shown()) {
-        ash::OobeScreenWaiter(ash::ErrorScreenView::kScreenId).Wait();
-      }
-      EXPECT_TRUE(error_screen_watcher.has_target_screen_been_shown());
-      // The ErrorScreen sees issues with SAML page loading as "offline".
-      // We don't currently see the ash::NetworkError::ERROR_REASON_FRAME_ERROR
-      // that has been passed to ErrorScreen.
-      EXPECT_EQ(oobe_ui->GetErrorScreen()->GetErrorState(),
-                ash::NetworkError::ERROR_STATE_OFFLINE);
-      return;
-    }
-
-    auto saml_waiter = CreateGaiaPageEventWaiter("samlPageLoaded");
-    // The back button appears when the UI is ready.
-    WaitForGaiaPageBackButtonUpdate();
-    saml_waiter->Wait();
-    // Fill in the SAML IdP form and submit.
-    SigninFrameJS().TypeIntoPath("fake_user", {"Email"});
-    SigninFrameJS().TypeIntoPath("fake_password", {"Password"});
-    SigninFrameJS().TapOn("Submit");
-    ash::test::WaitForPrimaryUserSessionStart();
-    EXPECT_FALSE(error_screen_watcher.has_target_screen_been_shown());
-  }
-
- protected:
-  AccountId account_id_ = AccountId::FromUserEmailGaiaId(
-      ash::saml_test_users::kFirstUserCorpExampleComEmail,
-      FakeGaiaMixin::kFakeUserGaiaId);
-  ash::CryptohomeMixin cryptohome_mixin_{&mixin_host_};
-  ash::DeviceStateMixin device_state_{
-      &mixin_host_,
-      ash::DeviceStateMixin::State::OOBE_COMPLETED_CLOUD_ENROLLED};
-  DevicePolicyCrosTestHelper policy_helper_;
-  FakeGaiaMixin fake_gaia_{&mixin_host_};
-  ash::FakeSamlIdpMixin fake_saml_idp_{&mixin_host_, &fake_gaia_};
-  raw_ptr<Profile> login_profile_ = nullptr;
-};
-
-IN_PROC_BROWSER_TEST_F(SSLDeviceLoginScreenPolicyTest,
-                       DeviceLoginScreenPreferSlowKexAlgorithmsPolicy) {
-  // Set up the SAML server so it only allows clients supporting ML-KEM-1024.
-  net::SSLServerConfig ssl_config;
-  ssl_config.curves_for_testing = {NID_ML_KEM_1024};
-  ASSERT_TRUE(StartFakeSamlServerWithConfig(ssl_config));
-
-  // Check the initial state (no device or user policy).
-  ASSERT_EQ(GetLoginProfileManagedStringPref(prefs::kPreferSlowKexAlgorithms),
-            std::nullopt);
-  ASSERT_EQ(GetLocalStateManagedStringPref(prefs::kPreferSlowKexAlgorithms),
-            std::nullopt);
-
-  // Set the device login screen policy to cnsa2 to prefer ML-KEM-1024.
-  policy_helper_.device_policy()
-      ->payload()
-      .mutable_deviceloginscreenpreferslowkexalgorithms()
-      ->set_value("cnsa2");
-  RefreshDevicePoliciesAndWaitForPrefChange(prefs::kPreferSlowKexAlgorithms);
-  content::FlushNetworkServiceInstanceForTesting();
-
-  // The pref is now set to the correct value in the login profile, and the
-  // local state is unaffected.
-  EXPECT_EQ(GetLoginProfileManagedStringPref(prefs::kPreferSlowKexAlgorithms),
-            "cnsa2");
-  EXPECT_EQ(GetLocalStateManagedStringPref(prefs::kPreferSlowKexAlgorithms),
-            std::nullopt);
-
-  // Login should succeed.
-  SetUpAndAttemptSamlLogin();
-}
-
-IN_PROC_BROWSER_TEST_F(
-    SSLDeviceLoginScreenPolicyTest,
-    PreferSlowKexAlgorithmsDefaultOnLoginScreen_HandshakeFails) {
-  // Set up the SAML server so it only allows clients supporting ML-KEM-1024.
-  net::SSLServerConfig ssl_config;
-  ssl_config.curves_for_testing = {NID_ML_KEM_1024};
-  ASSERT_TRUE(StartFakeSamlServerWithConfig(ssl_config));
-
-  // Without the value "cnsa2" for the device login screen policy, SAML login
-  // should not work because we cannot negotiate any group for key exchange.
-  ASSERT_EQ(GetLoginProfileManagedStringPref(prefs::kPreferSlowKexAlgorithms),
-            std::nullopt);
-  SetUpAndAttemptSamlLogin(net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH);
-}
-
-IN_PROC_BROWSER_TEST_F(SSLDeviceLoginScreenPolicyTest,
-                       DeviceLoginScreenPreferSlowCiphersPolicy) {
-  // Set up the SAML server so it only allows clients with the CNSA cipher list
-  // order.
-  ASSERT_TRUE(
-      StartFakeSamlServerWithConfig(GetServerConfigForPreferSlowCiphersTest()));
-
-  // Check the initial state (no device or user policy).
-  ASSERT_EQ(GetLoginProfileManagedStringPref(prefs::kPreferSlowCiphers),
-            std::nullopt);
-  ASSERT_EQ(GetLocalStateManagedStringPref(prefs::kPreferSlowCiphers),
-            std::nullopt);
-
-  // Set the device login screen policy to cnsa to prefer the TLS 1.3 ciphers in
-  // the expected order.
-  policy_helper_.device_policy()
-      ->payload()
-      .mutable_deviceloginscreenpreferslowciphers()
-      ->set_value("cnsa");
-  RefreshDevicePoliciesAndWaitForPrefChange(prefs::kPreferSlowCiphers);
-
-  // The pref is now set to the correct value in the login profile, and the
-  // local state is unaffected.
-  EXPECT_EQ(GetLoginProfileManagedStringPref(prefs::kPreferSlowCiphers),
-            "cnsa");
-  EXPECT_EQ(GetLocalStateManagedStringPref(prefs::kPreferSlowCiphers),
-            std::nullopt);
-
-  // Login should succeed.
-  SetUpAndAttemptSamlLogin();
-}
-
-IN_PROC_BROWSER_TEST_F(SSLDeviceLoginScreenPolicyTest,
-                       PreferSlowCiphersDefaultOnLoginScreen_HandshakeFails) {
-  // Set up the SAML server so it only allows clients with the CNSA cipher list
-  // order.
-  ASSERT_TRUE(
-      StartFakeSamlServerWithConfig(GetServerConfigForPreferSlowCiphersTest()));
-
-  // Without the value "cnsa" for the device login screen policy, SAML login
-  // should not work because the test server rejects the handshake.
-  ASSERT_EQ(GetLoginProfileManagedStringPref(prefs::kPreferSlowCiphers),
-            std::nullopt);
-  SetUpAndAttemptSamlLogin(net::ERR_SSL_VERSION_OR_CIPHER_MISMATCH);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Tests the interaction between features::kCryptographyComplianceCnsa and the
 // policies. The test parameter indicates whether the feature is enabled.
 class SSLPolicyTestWithCnsaFeature : public SSLPolicyTest,
@@ -549,10 +281,6 @@ IN_PROC_BROWSER_TEST_P(SSLPolicyTestWithCnsaFeature,
   {
     PolicyMap policies;
     SetPolicy(&policies, key::kPreferSlowKexAlgorithms, base::Value("default"));
-#if BUILDFLAG(IS_CHROMEOS)
-    SetPolicy(&policies, key::kDeviceLoginScreenPreferSlowKexAlgorithms,
-              base::Value("default"));
-#endif
     UpdateProviderPolicy(policies);
     content::FlushNetworkServiceInstanceForTesting();
   }
@@ -567,10 +295,6 @@ IN_PROC_BROWSER_TEST_P(SSLPolicyTestWithCnsaFeature,
   {
     PolicyMap policies;
     SetPolicy(&policies, key::kPreferSlowKexAlgorithms, base::Value("cnsa2"));
-#if BUILDFLAG(IS_CHROMEOS)
-    SetPolicy(&policies, key::kDeviceLoginScreenPreferSlowKexAlgorithms,
-              base::Value("cnsa2"));
-#endif
     UpdateProviderPolicy(policies);
     content::FlushNetworkServiceInstanceForTesting();
   }
@@ -590,10 +314,6 @@ IN_PROC_BROWSER_TEST_P(SSLPolicyTestWithCnsaFeature,
   {
     PolicyMap policies;
     SetPolicy(&policies, key::kPreferSlowCiphers, base::Value("default"));
-#if BUILDFLAG(IS_CHROMEOS)
-    SetPolicy(&policies, key::kDeviceLoginScreenPreferSlowCiphers,
-              base::Value("default"));
-#endif
     UpdateProviderPolicy(policies);
     content::FlushNetworkServiceInstanceForTesting();
   }
@@ -608,10 +328,6 @@ IN_PROC_BROWSER_TEST_P(SSLPolicyTestWithCnsaFeature,
   {
     PolicyMap policies;
     SetPolicy(&policies, key::kPreferSlowCiphers, base::Value("cnsa"));
-#if BUILDFLAG(IS_CHROMEOS)
-    SetPolicy(&policies, key::kDeviceLoginScreenPreferSlowCiphers,
-              base::Value("cnsa"));
-#endif
     UpdateProviderPolicy(policies);
     content::FlushNetworkServiceInstanceForTesting();
   }
@@ -968,7 +684,6 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest,
 
 // Creating arbitrary user profiles via `ProfileManager` is not supported on
 // ChromeOS, so this test cannot work there.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest,
                        DisableWithNewRegularProfile) {
   PolicyMap policies;
@@ -997,7 +712,6 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest,
                 new_browser->tab_strip_model()->GetActiveWebContents()),
             kEarlyDataNotAcceptedTitle);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #endif  // !BUILDFLAG(IS_ANDROID)
 

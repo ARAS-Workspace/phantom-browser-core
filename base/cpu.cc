@@ -17,7 +17,7 @@
 #include "build/build_config.h"
 
 #if defined(ARCH_CPU_ARM_FAMILY) && \
-    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX))
 #include <asm/hwcap.h>
 #include <sys/auxv.h>
 
@@ -291,8 +291,7 @@ void CPU::Initialize() {
     }
   }
 #elif defined(ARCH_CPU_ARM_FAMILY)
-#if defined(ARCH_CPU_ARM64) && \
-    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX))
   // Check for Armv8.5-A BTI/MTE support, exposed via HWCAP2
   unsigned long hwcap2 = getauxval(AT_HWCAP2);
   has_mte_ = hwcap2 & HWCAP2_MTE;

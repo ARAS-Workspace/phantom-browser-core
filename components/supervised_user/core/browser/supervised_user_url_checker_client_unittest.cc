@@ -175,7 +175,7 @@ class SupervisedUserUrlCheckerClientNoCredentialsTest
             CredentialsMode::kNoCredentials) {}
 };
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
 TEST_F(SupervisedUserUrlCheckerClientNoCredentialsTest,
        NoPrimaryAccount) {
   ASSERT_FALSE(identity_test_env_.identity_manager()->HasPrimaryAccount(
@@ -189,7 +189,7 @@ TEST_F(SupervisedUserUrlCheckerClientNoCredentialsTest,
   CheckUrl("http://example.com");
   SimulateKidsApiResponse(kidsmanagement::ClassifyUrlResponse::ALLOWED);
 }
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
 
 class SupervisedUserUrlCheckerClientFamilyLinkEnabledTest
     : public SupervisedUserUrlCheckerClientTestBase {
@@ -210,7 +210,7 @@ TEST_F(SupervisedUserUrlCheckerClientFamilyLinkEnabledTest,
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_IOS)
 TEST_F(SupervisedUserUrlCheckerClientFamilyLinkEnabledTest,
        NoPrimaryAccount) {
   ASSERT_FALSE(identity_test_env_.identity_manager()->HasPrimaryAccount(
@@ -224,7 +224,7 @@ TEST_F(SupervisedUserUrlCheckerClientFamilyLinkEnabledTest,
                           safe_search_api::ClientClassification::kUnknown));
   CheckUrl("http://example.com");
 }
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_IOS)
 
 class SupervisedUserUrlCheckerClientTest
     : public SupervisedUserUrlCheckerClientTestBase {

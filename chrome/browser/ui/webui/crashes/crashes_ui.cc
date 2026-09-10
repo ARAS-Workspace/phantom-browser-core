@@ -39,11 +39,7 @@
 #include "ui/base/resource/resource_scale_factor.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/dbus/debug_daemon/debug_daemon_client.h"
-#endif
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "components/crash/core/app/crashpad.h"
 #endif
 
@@ -94,11 +90,6 @@ class CrashesDOMHandler : public WebUIMessageHandler {
   // Asynchronously fetches the list of crashes. Called from JS.
   void HandleRequestCrashes(const base::ListValue& args);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Asynchronously triggers crash uploading. Called from JS.
-  void HandleRequestUploads(const base::ListValue& args);
-#endif
-
   // Sends the recent crashes list JS.
   void UpdateUI();
 
@@ -126,13 +117,6 @@ void CrashesDOMHandler::RegisterMessages() {
       base::BindRepeating(&CrashesDOMHandler::HandleRequestCrashes,
                           base::Unretained(this)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  web_ui()->RegisterMessageCallback(
-      crash_reporter::kCrashesUIRequestCrashUpload,
-      base::BindRepeating(&CrashesDOMHandler::HandleRequestUploads,
-                          base::Unretained(this)));
-#endif
-
   web_ui()->RegisterMessageCallback(
       crash_reporter::kCrashesUIRequestSingleCrashUpload,
       base::BindRepeating(&CrashesDOMHandler::HandleRequestSingleCrashUpload,
@@ -157,19 +141,6 @@ void CrashesDOMHandler::HandleRequestCrashes(const base::ListValue& args) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void CrashesDOMHandler::HandleRequestUploads(const base::ListValue& args) {
-  ash::DebugDaemonClient* debugd_client = ash::DebugDaemonClient::Get();
-  DCHECK(debugd_client);
-
-  debugd_client->UploadCrashes(base::BindOnce([](bool success) {
-    if (!success) {
-      LOG(WARNING) << "crash_sender failed or timed out";
-    }
-  }));
-}
-#endif
-
 void CrashesDOMHandler::OnUploadListAvailable() {
   list_available_ = true;
   if (!first_load_) {
@@ -182,10 +153,6 @@ void CrashesDOMHandler::UpdateUI() {
       ChromeMetricsServiceAccessor::IsMetricsAndCrashReportingEnabled();
 
   bool system_crash_reporter = false;
-#if BUILDFLAG(IS_CHROMEOS)
-  // Chrome OS has a system crash reporter.
-  system_crash_reporter = true;
-#endif
 
   bool is_internal = false;
   auto* identity_manager =

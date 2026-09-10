@@ -184,7 +184,7 @@ TEST_F(TextfieldModelTest, EditString_ComplexScript) {
 // TODO(xji): temporarily disable in platform Win since the complex script
 // characters turned into empty square due to font regression. So, not able
 // to test 2 characters belong to the same grapheme.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_EQ(u"\x0915\x093f\x0061\x0062\x0915\x094d\x092e\x094d", model.text());
 #endif
   EXPECT_EQ(4U, model.GetCursorPosition());
@@ -194,7 +194,7 @@ TEST_F(TextfieldModelTest, EditString_ComplexScript) {
   // TODO(xji): temporarily disable in platform Win since the complex script
   // characters turned into empty square due to font regression. So, not able
   // to test 2 characters belong to the same grapheme.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_TRUE(model.Delete());
   EXPECT_EQ(u"\x0061\x0062\x0915\x094d\x092e\x094d", model.text());
   model.MoveCursorTo(model.text().length());
@@ -359,7 +359,7 @@ TEST_F(TextfieldModelTest, Selection_BidiWithNonSpacingMarks) {
   // TODO(xji): temporarily disable in platform Win since the complex script
   // characters turned into empty square due to font regression. So, not able
   // to test 2 characters belong to the same grapheme.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   model.Append(
       u"abc\x05E9\x05BC\x05C1\x05B8\x05E0\x05B8"
       u"def");
@@ -899,7 +899,7 @@ TEST_F(TextfieldModelTest, SelectWordTest) {
 // TODO(xji): temporarily disable in platform Win since the complex script
 // characters and Chinese characters are turned into empty square due to font
 // regression.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(TextfieldModelTest, SelectWordTest_MixScripts) {
   TextfieldModel model(this);
   std::vector<WordAndCursor> word_and_cursor;
@@ -1185,16 +1185,10 @@ TEST_F(TextfieldModelTest, CompositionTextTest) {
   model.SetCompositionText(composition);
   EXPECT_TRUE(model.HasCompositionText());
   EXPECT_TRUE(model.HasSelection());
-#if !BUILDFLAG(IS_CHROMEOS)
   // |composition.selection| is ignored because SetCompositionText checks
   // if a thick underline exists first.
   EXPECT_EQ(gfx::Range(5, 7), model.render_text()->selection());
   EXPECT_EQ(7U, model.render_text()->cursor_position());
-#else
-  // See SelectRangeInCompositionText().
-  EXPECT_EQ(gfx::Range(7, 5), model.render_text()->selection());
-  EXPECT_EQ(5U, model.render_text()->cursor_position());
-#endif
 
   model.GetTextRange(&range);
   EXPECT_EQ(10U, range.end());
@@ -1226,14 +1220,8 @@ TEST_F(TextfieldModelTest, CompositionTextTest) {
   model.SetCompositionText(composition);
   EXPECT_EQ(u"1234567890678", model.text());
   EXPECT_TRUE(model.HasSelection());
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(gfx::Range(10, 11), model.render_text()->selection());
   EXPECT_EQ(11U, model.render_text()->cursor_position());
-#else
-  // See SelectRangeInCompositionText().
-  EXPECT_EQ(gfx::Range(11, 10), model.render_text()->selection());
-  EXPECT_EQ(10U, model.render_text()->cursor_position());
-#endif
 
   model.InsertText(u"-");
   EXPECT_TRUE(composition_text_confirmed_or_cleared_);

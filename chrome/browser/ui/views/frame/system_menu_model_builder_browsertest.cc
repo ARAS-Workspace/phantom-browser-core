@@ -186,7 +186,7 @@ IN_PROC_BROWSER_TEST_F(SystemMenuModelBuilderVerticalTabsTest,
   EXPECT_FALSE(ContainsCommand(menu, IDC_TOGGLE_VERTICAL_TABS_EXPAND_ON_HOVER,
                                std::nullopt));
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Horizontal Tabs + Immersive Mode (only exists on Mac and ChromeOS).
   ui_test_utils::ToggleFullscreenModeAndWait(browser());
   ASSERT_TRUE(ImmersiveModeController::From(browser())->IsEnabled());
@@ -224,7 +224,7 @@ IN_PROC_BROWSER_TEST_F(SystemMenuModelBuilderVerticalTabsTest,
   EXPECT_TRUE(ContainsCommand(menu, IDC_TOGGLE_VERTICAL_TABS_EXPAND_ON_HOVER,
                               std::nullopt));
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Vertical Tabs + Immersive Mode.
   ui_test_utils::ToggleFullscreenModeAndWait(browser());
   ASSERT_TRUE(ImmersiveModeController::From(browser())->IsEnabled());

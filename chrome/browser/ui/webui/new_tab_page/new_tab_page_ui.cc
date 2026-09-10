@@ -986,14 +986,12 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
 
 // Give OGB 3P Cookie Permissions. Only necessary on non-Ash builds. Granting
 // 3P cookies on Ash causes b/314326552.
-#if !BUILDFLAG(IS_CHROMEOS)
   WebUIAllowlist::GetOrCreate(profile_)->RegisterAutoGrantedThirdPartyCookies(
       url::Origin::Create(GURL(chrome::kChromeUIUntrustedNewTabPageUrl)),
       {
           ContentSettingsPattern::FromURL(GURL("https://ogs.google.com")),
           ContentSettingsPattern::FromURL(GURL("https://corp.google.com")),
       });
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // TODO(b/502297163): Implement for Android.
 #if !BUILDFLAG(IS_ANDROID)

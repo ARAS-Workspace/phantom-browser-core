@@ -1176,9 +1176,9 @@ void BnplManager::MaybeUpdateDesktopSuggestionsWithBnpl(
       .OnBnplSuggestionShown(
           /*suggestion_contains_pay_later_tab_entry=*/false);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   payments_autofill_client().GetPaymentsDataManager().SetAutofillHasSeenBnpl();
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }
 
 void BnplManager::OnTosDialogAccepted() {

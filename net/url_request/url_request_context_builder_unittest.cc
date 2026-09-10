@@ -40,12 +40,10 @@
 #include "base/android/android_info.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include "net/proxy_resolution/proxy_config.h"
 #include "net/proxy_resolution/proxy_config_service_fixed.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
-
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_REPORTING)
 #include "base/files/scoped_temp_dir.h"
@@ -106,11 +104,10 @@ class URLRequestContextBuilderTest : public PlatformTest,
   }
 
   void SetUpURLRequestContextBuilder(URLRequestContextBuilder& builder) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
     builder.set_proxy_config_service(std::make_unique<ProxyConfigServiceFixed>(
         ProxyConfigWithAnnotation::CreateDirect()));
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   }
 
   std::unique_ptr<HostResolver> host_resolver_ =

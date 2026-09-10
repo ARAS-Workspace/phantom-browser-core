@@ -40,11 +40,6 @@
 #include "ui/views/test/widget_test.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#include "ash/shell.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/test/test_browser_dialog_mac.h"
 #endif
@@ -193,13 +188,7 @@ class NamedWidgetUiPixelTest : public MixinBasedUiBrowserTest {
   // Stores the current widgets in |widgets_|.
   void UpdateWidgets() {
     widgets_.clear();
-#if BUILDFLAG(IS_CHROMEOS)
-    for (aura::Window* root_window : ash::Shell::GetAllRootWindows()) {
-      widgets_.merge(views::Widget::GetAllChildWidgets(root_window));
-    }
-#else
     widgets_ = views::test::WidgetTest::GetAllWidgets();
-#endif
   }
 
   PixelTestConfigurationMixin pixel_test_mixin_;
@@ -239,10 +228,6 @@ class IsolatedWebAppInstallerViewUiPixelTest
 
   void ShowUi(const std::string& name) override {
     Profile* profile = browser()->GetProfile();
-
-#if BUILDFLAG(IS_CHROMEOS)
-    profile->GetPrefs()->SetBoolean(ash::prefs::kIsolatedWebAppsEnabled, true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     IsolatedWebAppInstallerCoordinator* coordinator =
         IsolatedWebAppInstallerCoordinator::CreateAndStart(

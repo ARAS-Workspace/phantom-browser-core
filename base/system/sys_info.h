@@ -37,11 +37,6 @@ namespace base {
 BASE_EXPORT BASE_DECLARE_FEATURE(kNumberOfCoresWithCpuSecurityMitigation);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Strings for environment variables.
-BASE_EXPORT extern const char kLsbReleaseKey[];
-BASE_EXPORT extern const char kLsbReleaseTimeKey[];
-#endif
 
 namespace debug {
 FORWARD_DECLARE_TEST(SystemMetricsTest, ParseMeminfo);
@@ -79,7 +74,7 @@ class BASE_EXPORT SysInfo {
   // under/overestimate in case of CPU hotplug.
   static int NumberOfEfficientProcessors();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // Returns the maximum frequency of all the processors in Hz, if
   // available. The data may not be available in virtual machines for
   // instance. In this case, the returned value is empty.
@@ -266,50 +261,6 @@ class BASE_EXPORT SysInfo {
   // granularity).
   static size_t VMAllocationGranularity();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Set |value| and return true if LsbRelease contains information about |key|.
-  static bool GetLsbReleaseValue(const std::string& key, std::string* value);
-
-  // Convenience function for GetLsbReleaseValue("CHROMEOS_RELEASE_BOARD",...).
-  // Returns "unknown" if CHROMEOS_RELEASE_BOARD is not set. Otherwise, returns
-  // the full name of the board. Note that the returned value often differs
-  // between developers' systems and devices that use official builds. E.g. for
-  // a developer-built image, the function could return 'glimmer', while in an
-  // official build, it may be something like 'glimmer-signed-mp-v4keys'.
-  //
-  // NOTE: Strings returned by this function should be treated as opaque values
-  // within Chrome (e.g. for reporting metrics elsewhere). If you need to make
-  // Chrome behave differently for different Chrome OS devices, either directly
-  // check for the hardware feature that you care about (preferred) or add a
-  // command-line flag to Chrome and pass it from session_manager (based on
-  // whether a USE flag is set or not). See https://goo.gl/BbBkzg for more
-  // details.
-  static std::string GetLsbReleaseBoard();
-
-  // Returns the creation time of /etc/lsb-release. (Used to get the date and
-  // time of the Chrome OS build).
-  static Time GetLsbReleaseTime();
-
-  // Returns true when actually running in a Chrome OS environment.
-  static bool IsRunningOnChromeOS();
-
-  // Overrides |lsb_release| and |lsb_release_time|. Overrides cannot be nested.
-  // Call ResetChromeOSVersionInfoForTest() to restore the previous values.
-  // Prefer base::test::ScopedChromeOSVersionInfo to calling this function.
-  static void SetChromeOSVersionInfoForTest(const std::string& lsb_release,
-                                            Time lsb_release_time);
-
-  // Undoes the function above.
-  static void ResetChromeOSVersionInfoForTest();
-
-  // Returns the kernel version of the host operating system.
-  static std::string KernelVersion();
-
-  // Crashes if running on Chrome OS non-test image. Use only for really
-  // sensitive and risky use cases. Only works while running in verified mode,
-  // this check an easily be bypassed in dev mode.
-  static void CrashIfChromeOSNonTestImage();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
   // Returns the Android build's codename.
@@ -370,7 +321,7 @@ class BASE_EXPORT SysInfo {
   static bool IsLowEndDeviceOrPartialLowEndModeEnabled(
       const FeatureParam<bool>& param_for_exclusion);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   // Returns true for Android devices whose memory is X GB, considering
   // carveouts. The carveouts is memory reserved by the system, e.g.
   // for drivers, MTE, etc. It's very common for querying app to see
@@ -382,7 +333,7 @@ class BASE_EXPORT SysInfo {
   // Returns true for Android devices whose memory is 4GB or 6GB, considering
   // carveouts.
   static bool Is4GbOr6GbDevice();
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
   // Indicates that CPU security mitigations are enabled for the current
@@ -405,8 +356,7 @@ class BASE_EXPORT SysInfo {
   static bool IsLowEndDeviceImpl();
   static HardwareInfo GetHardwareInfoSync();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
   static ByteSize AmountOfAvailablePhysicalMemory(
       const SystemMemoryInfo& meminfo);
 #endif

@@ -69,7 +69,7 @@ class HEADLESS_EXPORT HeadlessContentMainDelegate
   // Note this is nullptr in processes other than the browser.
   HeadlessBrowserImpl* browser() const { return browser_.get(); }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   void ZygoteForked() override;
 #endif
 

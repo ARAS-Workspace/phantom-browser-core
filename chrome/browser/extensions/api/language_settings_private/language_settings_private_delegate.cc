@@ -54,9 +54,6 @@ LanguageSettingsPrivateDelegate::LanguageSettingsPrivateDelegate(
       Profile::FromBrowserContext(context_)->GetPrefs());
 
   StartOrStopListeningForSpellcheckChanges();
-#if BUILDFLAG(IS_CHROMEOS)
-  StartOrStopListeningForInputMethodChanges();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 LanguageSettingsPrivateDelegate::~LanguageSettingsPrivateDelegate() {
@@ -107,15 +104,6 @@ void LanguageSettingsPrivateDelegate::Shutdown() {
     listening_spellcheck_ = false;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (listening_input_method_) {
-    auto* input_method_manager = ash::input_method::InputMethodManager::Get();
-    if (input_method_manager) {
-      input_method_manager->RemoveObserver(this);
-    }
-    listening_input_method_ = false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void LanguageSettingsPrivateDelegate::OnListenerAdded(
@@ -128,56 +116,13 @@ void LanguageSettingsPrivateDelegate::OnListenerAdded(
     StartOrStopListeningForSpellcheckChanges();
     return;
   }
-#if BUILDFLAG(IS_CHROMEOS)
-  if (details.event_name ==
-          language_settings_private::OnInputMethodAdded::kEventName ||
-      details.event_name ==
-          language_settings_private::OnInputMethodRemoved::kEventName) {
-    StartOrStopListeningForInputMethodChanges();
-    return;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void LanguageSettingsPrivateDelegate::OnListenerRemoved(
     const EventListenerInfo& details) {
   // Stop listening to events if there are no more listeners.
   StartOrStopListeningForSpellcheckChanges();
-#if BUILDFLAG(IS_CHROMEOS)
-  StartOrStopListeningForInputMethodChanges();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void LanguageSettingsPrivateDelegate::InputMethodChanged(
-    ash::input_method::InputMethodManager* manager,
-    Profile* profile,
-    bool show_message) {
-  // Nothing to do.
-}
-
-void LanguageSettingsPrivateDelegate::OnInputMethodExtensionAdded(
-    const std::string& extension_id) {
-  auto args(
-      language_settings_private::OnInputMethodAdded::Create(extension_id));
-  std::unique_ptr<extensions::Event> extension_event(new extensions::Event(
-      events::LANGUAGE_SETTINGS_PRIVATE_ON_INPUT_METHOD_ADDED,
-      language_settings_private::OnInputMethodAdded::kEventName,
-      std::move(args)));
-  EventRouter::Get(context_)->BroadcastEvent(std::move(extension_event));
-}
-
-void LanguageSettingsPrivateDelegate::OnInputMethodExtensionRemoved(
-    const std::string& extension_id) {
-  auto args(
-      language_settings_private::OnInputMethodRemoved::Create(extension_id));
-  std::unique_ptr<extensions::Event> extension_event(new extensions::Event(
-      events::LANGUAGE_SETTINGS_PRIVATE_ON_INPUT_METHOD_REMOVED,
-      language_settings_private::OnInputMethodRemoved::kEventName,
-      std::move(args)));
-  EventRouter::Get(context_)->BroadcastEvent(std::move(extension_event));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void LanguageSettingsPrivateDelegate::OnHunspellDictionaryInitialized(
     const std::string& language) {
@@ -282,29 +227,6 @@ void LanguageSettingsPrivateDelegate::
 
   listening_spellcheck_ = should_listen;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void LanguageSettingsPrivateDelegate::
-    StartOrStopListeningForInputMethodChanges() {
-  EventRouter* event_router = EventRouter::Get(context_);
-  bool should_listen =
-      event_router->HasEventListener(
-          language_settings_private::OnInputMethodAdded::kEventName) ||
-      event_router->HasEventListener(
-          language_settings_private::OnInputMethodRemoved::kEventName);
-
-  auto* input_method_manager = ash::input_method::InputMethodManager::Get();
-  if (input_method_manager) {
-    if (should_listen && !listening_input_method_) {
-      input_method_manager->AddObserver(this);
-    } else if (!should_listen && listening_input_method_) {
-      input_method_manager->RemoveObserver(this);
-    }
-  }
-
-  listening_input_method_ = should_listen;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void LanguageSettingsPrivateDelegate::RetryDownloadHunspellDictionary(
     const std::string& language) {

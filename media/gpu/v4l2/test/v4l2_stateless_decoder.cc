@@ -22,18 +22,12 @@
 #include "media/media_buildflags.h"
 
 // AV1 stateless decoding not supported upstream yet
-#if BUILDFLAG(IS_CHROMEOS)
-#include "media/gpu/v4l2/test/av1_decoder.h"
-#endif
 #include "media/gpu/v4l2/test/h264_decoder.h"
 #if BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
 #include "media/gpu/v4l2/test/h265_decoder.h"
 #endif
 
 // AV1 stateless decoding not supported upstream yet
-#if BUILDFLAG(IS_CHROMEOS)
-using media::v4l2_test::Av1Decoder;
-#endif
 using media::v4l2_test::H264Decoder;
 #if BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
 using media::v4l2_test::H265Decoder;
@@ -111,9 +105,6 @@ std::unique_ptr<VideoDecoder> CreateVideoDecoder(
   std::unique_ptr<VideoDecoder> decoder;
 
 // AV1 stateless decoding not supported upstream yet
-#if BUILDFLAG(IS_CHROMEOS)
-  decoder = Av1Decoder::Create(stream);
-#endif
 
   if (!decoder)
     decoder = Vp9Decoder::Create(stream);

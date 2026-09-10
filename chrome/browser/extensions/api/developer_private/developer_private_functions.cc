@@ -2214,10 +2214,6 @@ DeveloperPrivateUploadExtensionToAccountFunction::Run() {
   // - the extension is not syncable (for example, if it's unpacked).
   if (!AccountExtensionTracker::Get(profile_)->CanUploadAsAccountExtension(
           *extension)
-#if BUILDFLAG(IS_CHROMEOS)
-      ||
-      !base::FeatureList::IsEnabled(syncer::kReplaceSyncPromosWithSignInPromos)
-#endif
   ) {
     return RespondNow(Error(ErrorUtils::FormatErrorMessage(
         kCannotUploadExtensionToAccount, extension_id_)));

@@ -14,19 +14,9 @@
 #include "components/policy/core/browser/url_list/url_list_policy_pref_names.h"
 #include "components/policy/core/common/policy_pref_names.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/policy/policy_blocklist_service/ash_policy_blocklist_service_factory.h"
-#endif
-
 // static
 PolicyBlocklistService* ChromePolicyBlocklistServiceFactory::GetForProfile(
     Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // See comment AshPolicyBlocklistServiceFactory as to what's going on here.
-  if (!profile->IsIncognitoProfile()) {
-    return ash::AshPolicyBlocklistServiceFactory::GetForBrowserContext(profile);
-  }
-#endif
   return static_cast<PolicyBlocklistService*>(
       GetInstance()->GetServiceForBrowserContext(profile, true));
 }

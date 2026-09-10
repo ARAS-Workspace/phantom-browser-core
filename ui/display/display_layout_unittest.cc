@@ -122,35 +122,6 @@ TEST(DisplayLayoutTest, SwapPrimaryDisplayThreeDisplays) {
   EXPECT_EQ(Position::RIGHT, layout->placement_list[1].position);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Makes sure that only the least significant 8 bits of the display IDs in the
-// placement lists are used to validate their sort order.
-TEST(DisplayLayoutTest, PlacementSortOrder) {
-  // Sorted placement lists by full IDs, but not sorted by the least significant
-  // 8 bits of the IDs.
-  std::unique_ptr<DisplayLayout> layout(new DisplayLayout);
-  layout->primary_id = 456;
-  layout->placement_list.emplace_back(0x0405, 456, Position::LEFT, 0,
-                                      DisplayPlacement::TOP_LEFT);
-  layout->placement_list.emplace_back(0x0506, 0x0405, Position::RIGHT, 0,
-                                      DisplayPlacement::TOP_LEFT);
-  layout->placement_list.emplace_back(0x0604, 0x0506, Position::RIGHT, 0,
-                                      DisplayPlacement::TOP_LEFT);
-  EXPECT_FALSE(DisplayLayout::Validate({456, 0x0405, 0x0506, 0x0604}, *layout));
-
-  // Full IDs not sorted, but least significant 8 bits of the IDs are sorted.
-  layout->placement_list.clear();
-  layout->placement_list.emplace_back(0x0504, 456, Position::LEFT, 0,
-                                      DisplayPlacement::TOP_LEFT);
-  layout->placement_list.emplace_back(0x0605, 0x0504, Position::RIGHT, 0,
-                                      DisplayPlacement::TOP_LEFT);
-  layout->placement_list.emplace_back(0x0406, 0x0605, Position::RIGHT, 0,
-                                      DisplayPlacement::TOP_LEFT);
-  EXPECT_TRUE(DisplayLayout::Validate({456, 0x0504, 0x0605, 0x0406}, *layout));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 class TwoDisplays

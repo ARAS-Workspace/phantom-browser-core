@@ -1265,7 +1265,6 @@ TEST_F(MediaDevicesManagerTest, EnumerateDevicesWithCapabilities) {
 
 TEST_F(MediaDevicesManagerTest, EnumerateDevicesUnplugDefaultDevice) {
   // This tests does not apply to CrOS, which is to seamlessly switch device.
-#if !BUILDFLAG(IS_CHROMEOS)
   std::string default_device_id("fake_device_id_1");
   std::string new_default_device_id("fake_device_id_2");
 
@@ -1299,7 +1298,6 @@ TEST_F(MediaDevicesManagerTest, EnumerateDevicesUnplugDefaultDevice) {
   EXPECT_TRUE(removed_device_ids_.contains(default_device_id));
   EXPECT_TRUE(removed_device_ids_.contains(
       media::AudioDeviceDescription::kDefaultDeviceId));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 TEST_F(MediaDevicesManagerTest, EnumerateDevicesUnplugCommunicationsDevice) {

@@ -33,7 +33,7 @@
 #include "partition_alloc/shim/allocator_interception_apple.h"
 #include "partition_alloc/shim/allocator_shim.h"
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include <malloc.h>
 
 #include "base/test/malloc_wrapper.h"
@@ -290,7 +290,7 @@ TEST_F(OutOfMemoryDeathTest, SecurityAlignedAlloc) {
 // POSIX does not define an aligned realloc function.
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 TEST_F(OutOfMemoryDeathTest, Valloc) {
   ASSERT_OOM_DEATH({
@@ -336,7 +336,7 @@ TEST_F(OutOfMemoryDeathTest, ViaSharedLibraries) {
     [[maybe_unused]] void* volatile ptr = MallocWrapper(test_size_);
   });
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Android doesn't implement posix_memalign().
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
@@ -472,7 +472,7 @@ class OutOfMemoryHandledTest : public OutOfMemoryTest {
   }
 };
 
-#if defined(ARCH_CPU_32_BITS) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if defined(ARCH_CPU_32_BITS) && BUILDFLAG(IS_LINUX)
 
 void TestAllocationsReleaseReservation(void* (*alloc_fn)(size_t),
                                        void (*free_fn)(void*)) {
@@ -532,8 +532,7 @@ TEST_F(OutOfMemoryHandledTest, NewReleasesReservation) {
       [](size_t size) { return static_cast<void*>(new char[size]); },
       [](void* ptr) { delete[] static_cast<char*>(ptr); });
 }
-#endif  // defined(ARCH_CPU_32_BITS) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS))
+#endif  // defined(ARCH_CPU_32_BITS) && BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_ANDROID)
 

@@ -2305,13 +2305,8 @@ using NavigationConsumingTest = ChromeNavigationBrowserTest;
 // so use that API to test if navigation consumes the activation.
 // https://fullscreen.spec.whatwg.org/#allowed-to-request-fullscreen
 // https://crbug.com/40813521 Flaky on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_NavigationConsumesUserGesture_Fullscreen \
-  DISABLED_NavigationConsumesUserGesture_Fullscreen
-#else
 #define MAYBE_NavigationConsumesUserGesture_Fullscreen \
   NavigationConsumesUserGesture_Fullscreen
-#endif
 IN_PROC_BROWSER_TEST_F(NavigationConsumingTest,
                        MAYBE_NavigationConsumesUserGesture_Fullscreen) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(

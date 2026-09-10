@@ -243,20 +243,6 @@ void PrinterQuery::SetSettings(base::DictValue new_settings,
                      /*maybe_is_modifiable=*/std::nullopt));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void PrinterQuery::SetSettingsFromPOD(
-    std::unique_ptr<PrintSettings> new_settings,
-    base::OnceClosure callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  // `this` is owned by `callback`, so `base::Unretained()` is safe.
-  UpdatePrintSettingsFromPOD(
-      std::move(new_settings),
-      base::BindOnce(&PrinterQuery::PostSettingsDone, base::Unretained(this),
-                     std::move(callback),
-                     /*maybe_is_modifiable=*/std::nullopt));
-}
-#endif
-
 // static
 void PrinterQuery::ApplyDefaultPrintableAreaToVirtualPrinterPrintSettings(
     PrintSettings& print_settings) {
@@ -325,17 +311,6 @@ void PrinterQuery::UpdatePrintSettings(base::DictValue new_settings,
 
   InvokeSettingsCallback(std::move(callback), result);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void PrinterQuery::UpdatePrintSettingsFromPOD(
-    std::unique_ptr<PrintSettings> new_settings,
-    SettingsCallback callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  mojom::ResultCode result =
-      printing_context_->UpdatePrintSettingsFromPOD(std::move(new_settings));
-  InvokeSettingsCallback(std::move(callback), result);
-}
-#endif
 
 std::unique_ptr<PrintJobWorker> PrinterQuery::CreatePrintJobWorker(
     PrintJob* print_job) {

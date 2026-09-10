@@ -19,10 +19,6 @@
 #include "content/public/test/browser_test.h"
 #include "net/dns/mock_host_resolver.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/browser_features.h"
-#endif
-
 namespace {
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kNewTab);
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kSecondTab);
@@ -88,7 +84,6 @@ class TabSharingMultiContentsViewTest
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(TabSharingMultiContentsViewTest,
                        ContentsSharingBorderShows) {
   RunTestSequence(
@@ -152,28 +147,3 @@ IN_PROC_BROWSER_TEST_F(TabSharingMultiContentsViewTest,
       SelectTab(kTabStripElementId, 1), WaitForHide(kContentsCaptureBorder),
       CheckIsCaptureContentsBorderShowing(0, false));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-class ChromeOsTabSharingTest : public TabSharingMultiContentsViewTest {
- public:
-  TabCaptureContentsBorderHelper* GetTabCaptureContentsBorderHelper(int index) {
-    TabStripModel* const tab_strip_model = browser()->tab_strip_model();
-    return TabCaptureContentsBorderHelper::FromWebContents(
-        tab_strip_model->GetWebContentsAt(index));
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(ChromeOsTabSharingTest, BorderStaysHidden) {
-  RunTestSequence(
-      InstrumentTab(kNewTab), AddInstrumentedTab(kSecondTab, GetTestUrl()),
-      SelectTab(kTabStripElementId, 0), ShareTab(0),
-      EnsureNotPresent(kContentsCaptureBorder), Check([=, this]() {
-        return GetTabCaptureContentsBorderHelper(0)->IsTabCapturing();
-      }),
-      StopSharingTab(), EnsureNotPresent(kContentsCaptureBorder),
-      Check([=, this]() {
-        return !GetTabCaptureContentsBorderHelper(0)->IsTabCapturing();
-      }));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)

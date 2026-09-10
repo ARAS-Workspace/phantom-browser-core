@@ -264,33 +264,6 @@ INSTANTIATE_TEST_SUITE_P(,
                          GetSyncTestModes(),
                          testing::PrintToStringParamName());
 
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
-                       UmaEnabledSetFullHardwareClass) {
-  bool uma_enabled = true;
-  ChromeMetricsServiceAccessor::SetMetricsAndCrashReportingForTesting(
-      &uma_enabled);
-  ASSERT_TRUE(SetupSync());
-
-  EXPECT_THAT(fake_server_->GetSyncEntitiesByDataType(syncer::DEVICE_INFO),
-              Contains(HasFullHardwareClass()));
-
-  ChromeMetricsServiceAccessor::SetMetricsAndCrashReportingForTesting(nullptr);
-}
-
-IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
-                       UmaDisabledFullHardwareClassEmpty) {
-  bool uma_enabled = false;
-  ChromeMetricsServiceAccessor::SetMetricsAndCrashReportingForTesting(
-      &uma_enabled);
-  ASSERT_TRUE(SetupSync());
-
-  EXPECT_THAT(fake_server_->GetSyncEntitiesByDataType(syncer::DEVICE_INFO),
-              Contains(IsFullHardwareClassEmpty()));
-
-  ChromeMetricsServiceAccessor::SetMetricsAndCrashReportingForTesting(nullptr);
-}
-#else
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        UmaEnabledFullHardwareClassOnNonChromeOS) {
   bool uma_enabled = true;
@@ -303,7 +276,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
 
   ChromeMetricsServiceAccessor::SetMetricsAndCrashReportingForTesting(nullptr);
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest, CommitLocalDevice) {
   ASSERT_TRUE(SetupSync());
@@ -315,7 +287,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest, CommitLocalDevice) {
 }
 
 // ChromeOS doesn't support sign-out.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        ShouldDeleteDeviceInfoOnServerWhenSignedOut) {
   ASSERT_TRUE(SetupSync());
@@ -332,7 +303,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
   // leaving 0 normal DeviceInfo entities. Wait for it.
   EXPECT_TRUE(ServerDeviceInfoMatchChecker(IsEmpty()).Wait());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest, DownloadRemoteDevices) {
   InjectDeviceInfoEntityToServer(/*suffix=*/1);
@@ -464,7 +434,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
 
 // On ChromeOS, Sync-the-feature gets started automatically once a primary
 // account is signed in and transport mode is not a thing.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // TODO(crbug.com/40756482): Flaky on Android.
 #if BUILDFLAG(IS_ANDROID)
@@ -512,8 +481,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
               IsSupersetOf({HasCacheGuid(CacheGuidForSuffix(1)),
                             HasCacheGuid(CacheGuidForSuffix(2))}));
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        ShouldSetTheOnlyClientFlag) {
@@ -946,7 +913,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
 }
 
 // On ChromeOS, there is always a primary account, so this test doesn't apply.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(
     SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
     PRE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount) {
@@ -1033,7 +999,5 @@ IN_PROC_BROWSER_TEST_P(
       /*sample=*/2,
       /*expected_bucket_count=*/1, FROM_HERE);
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

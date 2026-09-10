@@ -379,10 +379,6 @@ bool HasFileRelatedItem(Input::DragData* data) {
           inner_url = GURL(inner_url.GetContent());
         }
         bool is_file = inner_url.SchemeIsFile();
-#if BUILDFLAG(IS_CHROMEOS)
-        // The "externalfile" scheme is ChromeOS-specific.
-        is_file |= inner_url.SchemeIs(content::kExternalFileScheme);
-#endif
         if (is_file) {
           return true;
         }

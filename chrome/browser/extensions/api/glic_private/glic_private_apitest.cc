@@ -39,11 +39,6 @@
 #include "services/network/public/cpp/network_switches.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#include "components/sync/base/features.h"
-#endif
-
 namespace extensions {
 
 class GlicPrivateApiTest : public GlicPrivateApiTestBase {
@@ -57,11 +52,6 @@ class GlicPrivateApiTest : public GlicPrivateApiTestBase {
          {features::kGlicAnchorEntryPointForOnboardedUsers, {}},
          {features::kGlicActor,
           {{"glic_actor_policy_control_exemption", "true"}}}
-#if BUILDFLAG(IS_CHROMEOS)
-         ,
-         {syncer::kReplaceSyncPromosWithSignInPromos, {}},
-         {chromeos::features::kFeatureManagementGlic, {}}
-#endif
         },
         /*disabled_features=*/{features::kGlicShowForSignedOut,
                                features::kGlicCountryFiltering,

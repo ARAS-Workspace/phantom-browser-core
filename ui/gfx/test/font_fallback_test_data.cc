@@ -26,7 +26,7 @@ FallbackFontTestCase::FallbackFontTestCase(
 
 FallbackFontTestCase::~FallbackFontTestCase() = default;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 // A list of script and the fallback font on the linux test environment.
 // On linux, font-config configuration and fonts are mock. The config

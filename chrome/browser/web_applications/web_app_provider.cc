@@ -79,14 +79,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "chrome/browser/web_applications/ash/migrations/adobe_express_oem_to_default_migration.h"
-#include "chrome/browser/web_applications/isolated_web_apps/policy/isolated_web_app_cache_manager.h"
-#include "chrome/browser/web_applications/web_app_run_on_os_login_manager.h"
-#include "chromeos/ash/components/browser_context_helper/browser_context_types.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/feature_list.h"
 #include "base/mac/mac_util.h"
@@ -151,13 +143,7 @@ WebAppProvider::WebAppProvider(Profile* profile)
 
   // WebApp System must have only one instance in original profile.
   // Exclude secondary off-the-record profiles.
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!profile_->IsGuestSession()) {
-    DCHECK(!profile_->IsOffTheRecord());
-  }
-#else
   DCHECK(!profile_->IsOffTheRecord());
-#endif
 
   CreateSubsystems(profile_);
 }
@@ -240,18 +226,6 @@ WebAppProvider::isolated_web_app_user_installed_manager() {
   CheckIsConnected();
   return *isolated_web_app_user_installed_manager_;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-WebAppRunOnOsLoginManager& WebAppProvider::run_on_os_login_manager() {
-  CheckIsConnected();
-  return *web_app_run_on_os_login_manager_;
-}
-
-IwaBundleCacheManager& WebAppProvider::isolated_web_app_cache_manager() {
-  CheckIsConnected();
-  return *isolated_web_app_cache_manager_;
-}
-#endif
 
 IsolatedWebAppPolicyManager& WebAppProvider::isolated_web_app_policy_manager() {
   CheckIsConnected();
@@ -431,13 +405,6 @@ void WebAppProvider::CreateSubsystems(Profile* profile) {
   origin_association_manager_ =
       std::make_unique<WebAppOriginAssociationManager>(*profile);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  web_app_run_on_os_login_manager_ =
-      std::make_unique<WebAppRunOnOsLoginManager>(profile);
-  isolated_web_app_cache_manager_ =
-      std::make_unique<IwaBundleCacheManager>(*profile);
-#endif
-
   web_contents_manager_ = std::make_unique<WebContentsManager>();
   visited_manifest_manager_ = std::make_unique<VisitedManifestManager>();
   navigation_capturing_log_ = std::make_unique<NavigationCapturingLog>(
@@ -466,10 +433,6 @@ void WebAppProvider::ConnectSubsystems() {
   isolated_web_app_update_manager_->SetProvider(pass_key, *this);
   isolated_web_app_policy_manager_->SetProvider(pass_key, *this);
   isolated_web_app_user_installed_manager_->SetProvider(pass_key, *this);
-#if BUILDFLAG(IS_CHROMEOS)
-  web_app_run_on_os_login_manager_->SetProvider(pass_key, *this);
-  isolated_web_app_cache_manager_->SetProvider(pass_key, *this);
-#endif
   icon_manager_->SetProvider(pass_key, *this);
   translation_manager_->SetProvider(pass_key, *this);
   generated_icon_fix_manager_->SetProvider(pass_key, *this);
@@ -511,21 +474,11 @@ void WebAppProvider::OnSyncBridgeReady(
     // Perform database migrations once the sync bridge is ready, but before
     // starting the rest of the subsystems and notifying that the registry is
     // ready.
-#if BUILDFLAG(IS_CHROMEOS)
-  web_app::migrations::MigrateAdobeExpressFromOemInstallToDefault(
-      sync_bridge_.get());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   base::ConcurrentClosures concurrent;
 
   base::OnceClosure on_web_app_policy_manager_done_callback =
-#if BUILDFLAG(IS_CHROMEOS)
-      base::BindOnce(&WebAppRunOnOsLoginManager::Start,
-                     web_app_run_on_os_login_manager_->GetWeakPtr())
-          .Then(concurrent.CreateClosure());
-#else
       concurrent.CreateClosure();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   registrar_->Start();
   icon_manager_->Start();
@@ -544,10 +497,6 @@ void WebAppProvider::OnSyncBridgeReady(
   generated_icon_fix_manager_->Start();
   command_manager_->Start();
   profile_deletion_manager_->Start();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  isolated_web_app_cache_manager_->Start();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Note: This does not wait for the call from the ChromeOS
   // SystemWebAppManager, which is a separate keyed service.

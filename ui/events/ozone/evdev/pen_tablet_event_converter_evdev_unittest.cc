@@ -805,31 +805,6 @@ TEST_F(PenTabletEventConverterEvdevTest, StylusButtonPress) {
   EXPECT_EQ(true, event->IsRightMouseButton());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(PenTabletEventConverterEvdevTest, TabletButtonPress) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitWithFeatures({ash::features::kPeripheralCustomization}, {});
-
-  std::unique_ptr<ui::MockPenTabletEventConverterEvdev> dev =
-      CreateDevice(kWacomIntuos5SPen);
-
-  struct input_event mock_kernel_queue[] = {
-      {{0, 0}, EV_KEY, BTN_0, 1},
-      {{0, 0}, EV_KEY, BTN_0, 0},
-  };
-
-  dev->ProcessEvents(mock_kernel_queue);
-  EXPECT_EQ(2u, size());
-
-  ui::KeyEvent* event = dispatched_key_event(0);
-  EXPECT_EQ(ui::EventType::kKeyPressed, event->type());
-  EXPECT_EQ(ui::VKEY_BUTTON_0, event->key_code());
-  event = dispatched_key_event(1);
-  EXPECT_EQ(ui::EventType::kKeyReleased, event->type());
-  EXPECT_EQ(ui::VKEY_BUTTON_0, event->key_code());
-}
-#endif
-
 // Should only get an event if BTN_TOOL received
 TEST_F(PenTabletEventConverterEvdevTest, CheckStylusFiltering) {
   std::unique_ptr<ui::MockPenTabletEventConverterEvdev> dev =

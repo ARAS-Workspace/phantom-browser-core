@@ -1434,18 +1434,6 @@ class PageInfoBubbleViewBrowserTestCookiesSubpage
                                                     static_cast<int>(mode));
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void EnableCookieSync() {
-    browser()->GetProfile()->GetPrefs()->SetBoolean(
-        chromeos::prefs::kFloatingSsoEnabled, true);
-  }
-
-  void SetBlockedDomainsForCookieSync(base::ListValue domains) {
-    browser()->GetProfile()->GetPrefs()->SetList(
-        chromeos::prefs::kFloatingSsoDomainBlocklist, std::move(domains));
-  }
-#endif
-
   void OpenPageInfoAndGoToCookiesSubpage(
       std::optional<std::u16string> rws_owner) {
     EXPECT_FALSE(browser()->GetProfile()->GetPrefs()->GetBoolean(
@@ -1636,56 +1624,6 @@ IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTestCookiesSubpage,
 
   EXPECT_EQ(new_tab_observer.GetWebContents()->GetVisibleURL(), url);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Checks that cookie sync disclaimer is displayed when cookies are synced, and
-// verifies that Chrome Sync settings link works.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTestCookiesSubpage,
-                       LinkInCookieSyncDisclaimer) {
-  EnableCookieSync();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL(kUrl)));
-
-  OpenPageInfoAndGoToCookiesSubpage(/*rws_owner =*/{});
-
-  auto* cookie_sync_disclaimer = static_cast<views::StyledLabel*>(
-      GetView(PageInfoViewFactory::VIEW_ID_PAGE_INFO_COOKIES_SYNC));
-  EXPECT_TRUE(cookie_sync_disclaimer);
-  base::UserActionTester user_actions_stats;
-  content::WebContentsAddedObserver new_tab_observer;
-  GURL url = chrome::GetSettingsUrl(chrome::kSyncSetupSubPage);
-
-  cookie_sync_disclaimer->ClickFirstLinkForTesting();
-
-  EXPECT_EQ(user_actions_stats.GetActionCount(
-                "PageInfo.CookiesSubpage.SyncSettingsLinkClicked"),
-            1);
-
-  EXPECT_EQ(new_tab_observer.GetWebContents()->GetVisibleURL(), url);
-}
-
-// Checks that cookie sync disclaimer is hidden when cookies are not synced for
-// the specific domain, even if in general cookie sync is enabled.
-IN_PROC_BROWSER_TEST_F(PageInfoBubbleViewBrowserTestCookiesSubpage,
-                       CookieSyncDisclaimerRespectsDomainBlocklist) {
-  // Enable cookie sync, but configure domain blocklist to exclude the site we
-  // are visiting in this test from sync.
-  EnableCookieSync();
-  base::ListValue domain_blocklist;
-  domain_blocklist.Append("example");
-  SetBlockedDomainsForCookieSync(std::move(domain_blocklist));
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL(kUrl)));
-
-  OpenPageInfoAndGoToCookiesSubpage(/*rws_owner =*/{});
-  views::Widget* page_info_bubble =
-      PageInfoBubbleView::GetPageInfoBubbleForTesting()->GetWidget();
-  ASSERT_TRUE(page_info_bubble);
-  views::View* cookie_sync_disclaimer =
-      page_info_bubble->GetRootView()->GetViewByID(
-          PageInfoViewFactory::VIEW_ID_PAGE_INFO_COOKIES_SYNC);
-  EXPECT_FALSE(cookie_sync_disclaimer);
-}
-#endif
 
 class PageInfoBubbleViewBrowserTestAutoPip
     : public PageInfoBubbleViewBrowserTest {

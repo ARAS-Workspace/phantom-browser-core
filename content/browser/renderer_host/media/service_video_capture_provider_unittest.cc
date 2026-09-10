@@ -75,16 +75,8 @@ class ServiceVideoCaptureProviderTest : public testing::Test {
 
  protected:
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    provider_ = std::make_unique<ServiceVideoCaptureProvider>(
-        base::BindRepeating([]() {
-          return std::unique_ptr<video_capture::mojom::AcceleratorFactory>();
-        }),
-        kIgnoreLogMessageCB);
-#else
     provider_ =
         std::make_unique<ServiceVideoCaptureProvider>(kIgnoreLogMessageCB);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     ON_CALL(mock_video_capture_service_, DoConnectToVideoSourceProvider(_))
         .WillByDefault(

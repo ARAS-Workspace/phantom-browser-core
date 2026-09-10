@@ -54,7 +54,6 @@ BASE_DECLARE_FEATURE(kSyncNotebook);
 // Enables syncing history journeys.
 BASE_DECLARE_FEATURE(kSyncJourney);
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Flag that controls Uno fast-follow features which are:
 // On Android:
 // - Batch upload of left-behind bookmarks from the bookmark manager
@@ -65,7 +64,6 @@ BASE_DECLARE_FEATURE(kSyncJourney);
 // Adding history sync opt-in entry points, and other follow-ups to
 // `kReplaceSyncPromosWithSignInPromos`.
 BASE_DECLARE_FEATURE(kUnoPhase2FollowUp);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Do not use this flag directly. Use
 // IsContactInfoDataTypeForCustomPassphraseUsersEnabled() instead.
@@ -242,11 +240,6 @@ BASE_DECLARE_FEATURE(kAlwaysRegisterSessionsInvalidationsAndroid);
 // kSyncUseServerDeterminedDeviceName.
 BASE_DECLARE_FEATURE(kSyncUploadAndroidBuildFingerprintPrefix);
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Feature flag for ChromeOS only to estimate new sign-in users population.
-BASE_DECLARE_FEATURE(kEstimateNewSignInUsersWithFinchAvailablePopulation);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // If enabled, computes the web sign-in status based on account in cookies
 // values even if they are stale. This ensures that we log the last known cookie

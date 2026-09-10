@@ -33,10 +33,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 namespace sync_sessions {
 
 class MockLocalSessionEventHandler : public LocalSessionEventHandler {
@@ -70,10 +66,6 @@ class BrowserListRouterHelperBrowserTest
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     InProcessBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
   }
 
   MockLocalSessionEventHandler& handler_1() { return handler_1_; }

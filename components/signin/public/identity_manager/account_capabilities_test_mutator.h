@@ -45,12 +45,6 @@ class AccountCapabilitiesTestMutator {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
   void set_can_submit_feedback(bool value);
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  void set_can_toggle_auto_updates(bool value);
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  void set_can_use_chromeos_generative_ai(bool value);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if !BUILDFLAG(IS_IOS)
   void set_can_use_devtools_generative_ai_features(bool value);
 #endif
@@ -58,12 +52,6 @@ class AccountCapabilitiesTestMutator {
   void set_can_use_edu_features(bool value);
 #endif
   void set_can_use_gemini_in_chrome(bool value);
-#if BUILDFLAG(IS_CHROMEOS)
-  void set_can_use_generative_ai_in_recorder_app(bool value);
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-  void set_can_use_generative_ai_photo_editing(bool value);
-#endif
   void set_can_use_manta_service(bool value);
   void set_can_use_model_execution_features(bool value);
   void set_can_use_speaker_label_in_recorder_app(bool value);

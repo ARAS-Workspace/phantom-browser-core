@@ -140,10 +140,6 @@ class PageInfoDelegate {
   virtual bool IsHttpsFirstModeEnabledForUrl(const GURL& url) = 0;
   virtual bool IsIncognitoProfile() = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  virtual bool ShouldSyncCookiesForUrl(const GURL& url) = 0;
-#endif
-
   // Notifies the embedder that the user clicked "Back to safety" or "Mark as
   // safe" on a Suspicious Site Warning.
   virtual void OnSuspiciousSiteBackToSafety() {}

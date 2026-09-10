@@ -828,11 +828,6 @@ ContentBrowserClient::GetOnDeviceSpeechRecognitionAvailabilityStatus(
   return media::mojom::AvailabilityStatus::kUnavailable;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TtsControllerDelegate* ContentBrowserClient::GetTtsControllerDelegate() {
-  return nullptr;
-}
-#endif
 
 TtsPlatform* ContentBrowserClient::GetTtsPlatform() {
   return nullptr;
@@ -1206,11 +1201,6 @@ FontAccessDelegate* ContentBrowserClient::GetFontAccessDelegate() {
   return nullptr;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-SmartCardDelegate* ContentBrowserClient::GetSmartCardDelegate() {
-  return nullptr;
-}
-#endif
 
 bool ContentBrowserClient::ShowPaymentHandlerWindow(
     content::BrowserContext* browser_context,

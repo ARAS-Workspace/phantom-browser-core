@@ -69,7 +69,6 @@ IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerBrowserTest,
 
 // ChromeOS does not support creating multiple profiles without user session
 // setup.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerBrowserTest,
                        KeepAliveTransfersWhenLaunchProfileChanges) {
   auto* profile_manager = g_browser_process->profile_manager();
@@ -108,6 +107,5 @@ IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerBrowserTest,
         profile0, ProfileKeepAliveOrigin::kGlicView);
   }));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace glic

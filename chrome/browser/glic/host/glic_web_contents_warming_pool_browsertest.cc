@@ -61,11 +61,7 @@ class GlicWarmingPoolBrowserTest
 };
 
 // TODO(b/496609005): Skip on ChromeOS due to profile ineligibility timeouts.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ColdWarming DISABLED_ColdWarming
-#else
 #define MAYBE_ColdWarming ColdWarming
-#endif
 IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest, MAYBE_ColdWarming) {
   EXPECT_TRUE(
       RunUntil([this]() { return pool().HasWarmedContainerForTesting(); },
@@ -73,11 +69,7 @@ IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest, MAYBE_ColdWarming) {
 }
 
 // TODO(b/496609005): Skip on ChromeOS due to profile ineligibility timeouts.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_BackfillWarming DISABLED_BackfillWarming
-#else
 #define MAYBE_BackfillWarming BackfillWarming
-#endif
 IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest, MAYBE_BackfillWarming) {
   // Wait for initial preload to complete.
   EXPECT_TRUE(
@@ -164,11 +156,7 @@ IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest, NoWarmingIfUnpinned) {
 }
 
 // TODO(b/496609005): Skip on ChromeOS due to profile ineligibility timeouts.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ClearedOnMemoryPressure DISABLED_ClearedOnMemoryPressure
-#else
 #define MAYBE_ClearedOnMemoryPressure ClearedOnMemoryPressure
-#endif
 IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest,
                        MAYBE_ClearedOnMemoryPressure) {
   // Wait for initial preload to complete.

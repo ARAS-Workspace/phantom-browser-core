@@ -3170,7 +3170,7 @@ INSTANTIATE_TEST_SUITE_P(FeatureFlag,
                          testing::Values(true, false));
 
 // TODO(crbug.com/542347163): Re-enable test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_RegularRequest DISABLED_RegularRequest
 #else
 #define MAYBE_RegularRequest RegularRequest
@@ -3209,7 +3209,7 @@ IN_PROC_BROWSER_TEST_P(ReduceAcceptLanguageCountBrowserTest,
 }
 
 // TODO(crbug.com/542347163): Re-enable test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_Iframe DISABLED_Iframe
 #else
 #define MAYBE_Iframe Iframe

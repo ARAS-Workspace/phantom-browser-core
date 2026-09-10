@@ -85,9 +85,6 @@ class PasswordsPrivateApiTest : public ExtensionApiTest {
 
   void UpdateProviderPolicy(const PolicyMap& policy) {
     PolicyMap policy_with_defaults = policy.Clone();
-#if BUILDFLAG(IS_CHROMEOS)
-    SetEnterpriseUsersDefaults(&policy_with_defaults);
-#endif
     policy_provider_.UpdateChromePolicy(policy_with_defaults);
   }
 

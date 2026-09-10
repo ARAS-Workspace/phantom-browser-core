@@ -30,11 +30,6 @@
 #include "ui/gfx/native_ui_types.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/shell.h"
-#include "ui/aura/window.h"
-#endif
-
 namespace internal {
 
 DEFINE_SAFE_CAST_TARGET(InteractiveBrowserTestPrivate)

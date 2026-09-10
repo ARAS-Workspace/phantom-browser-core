@@ -38,13 +38,13 @@ bool GetSiteIsolationEnabled();
 std::string GetHostName();
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Returns the hostname of the current machine.
 std::vector<std::string> GetSystemDnsServers();
 
 // Returns the current state of the OS firewall.
 SettingValue GetOSFirewall();
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
 // Returns the path to the ufw configuration file.

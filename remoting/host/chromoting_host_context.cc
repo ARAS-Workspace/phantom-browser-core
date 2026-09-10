@@ -25,118 +25,6 @@ namespace remoting {
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS)
-class ChromotingHostContextChromeOs : public ChromotingHostContext {
- public:
-  using CreateClientCertStoreCallback =
-      ChromotingHostContext::CreateClientCertStoreCallback;
-
-  ChromotingHostContextChromeOs(
-      scoped_refptr<AutoThreadTaskRunner> ui_task_runner,
-      scoped_refptr<AutoThreadTaskRunner> file_task_runner,
-      scoped_refptr<AutoThreadTaskRunner> input_task_runner,
-      scoped_refptr<AutoThreadTaskRunner> network_task_runner,
-      scoped_refptr<AutoThreadTaskRunner> video_capture_task_runner,
-      scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
-      CreateClientCertStoreCallback create_client_cert_store);
-
-  ChromotingHostContextChromeOs(const ChromotingHostContextChromeOs&) = delete;
-  ChromotingHostContextChromeOs& operator=(
-      const ChromotingHostContextChromeOs&) = delete;
-
-  ~ChromotingHostContextChromeOs() override;
-
-  // remoting::ChromotingHostContext implementation.
-  std::unique_ptr<ChromotingHostContext> Copy() override;
-  std::unique_ptr<net::ClientCertStore> CreateClientCertStore() const override;
-  scoped_refptr<net::URLRequestContextGetter> url_request_context_getter()
-      const override;
-  scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory() override;
-  CreateClientCertStoreCallback create_client_cert_store_callback()
-      const override;
-
- private:
-  // |ui_shared_url_loader_factory_| is a SharedUrlLoaderFactory which is bound
-  // to the ui_task_runner sequence and is used to create copies of the original
-  // ChromotingHostContext instance.
-  scoped_refptr<network::SharedURLLoaderFactory> ui_shared_url_loader_factory_;
-
-  // |pending_factory_| is initialized from |ui_shared_url_loader_factory_| on
-  // the UI thread which allows for binding |network_shared_url_loader_factory_|
-  // to the network_task_runner sequence.
-  std::unique_ptr<network::PendingSharedURLLoaderFactory> pending_factory_;
-
-  // |network_shared_url_loader_factory_| is a SharedUrlLoaderFactory which is
-  // bound to the network_task_runner sequence.
-  scoped_refptr<network::SharedURLLoaderFactory>
-      network_shared_url_loader_factory_;
-
-  CreateClientCertStoreCallback create_client_cert_store_;
-};
-
-ChromotingHostContextChromeOs::ChromotingHostContextChromeOs(
-    scoped_refptr<AutoThreadTaskRunner> ui_task_runner,
-    scoped_refptr<AutoThreadTaskRunner> file_task_runner,
-    scoped_refptr<AutoThreadTaskRunner> input_task_runner,
-    scoped_refptr<AutoThreadTaskRunner> network_task_runner,
-    scoped_refptr<AutoThreadTaskRunner> video_capture_task_runner,
-    scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
-    CreateClientCertStoreCallback create_client_cert_store)
-    : ChromotingHostContext(ui_task_runner,
-                            file_task_runner,
-                            input_task_runner,
-                            network_task_runner,
-                            video_capture_task_runner),
-      ui_shared_url_loader_factory_(shared_url_loader_factory),
-      pending_factory_(ui_shared_url_loader_factory_->Clone()),
-      create_client_cert_store_(create_client_cert_store) {}
-
-ChromotingHostContextChromeOs::~ChromotingHostContextChromeOs() {
-  // |ui_shared_url_loader_factory_| should always be valid however
-  // |network_shared_url_loader_factory_| may not be if it was never accessed.
-  ui_task_runner()->ReleaseSoon(FROM_HERE,
-                                std::move(ui_shared_url_loader_factory_));
-  if (network_shared_url_loader_factory_) {
-    network_task_runner()->ReleaseSoon(
-        FROM_HERE, std::move(network_shared_url_loader_factory_));
-  }
-}
-
-std::unique_ptr<ChromotingHostContext> ChromotingHostContextChromeOs::Copy() {
-  DCHECK(ui_task_runner()->BelongsToCurrentThread());
-  return std::make_unique<ChromotingHostContextChromeOs>(
-      ui_task_runner(), file_task_runner(), input_task_runner(),
-      network_task_runner(), video_capture_task_runner(),
-      ui_shared_url_loader_factory_, create_client_cert_store_);
-}
-
-std::unique_ptr<net::ClientCertStore>
-ChromotingHostContextChromeOs::CreateClientCertStore() const {
-  DCHECK(network_task_runner()->BelongsToCurrentThread());
-  return create_client_cert_store_.Run();
-}
-
-scoped_refptr<net::URLRequestContextGetter>
-ChromotingHostContextChromeOs::url_request_context_getter() const {
-  NOTREACHED();
-}
-
-scoped_refptr<network::SharedURLLoaderFactory>
-ChromotingHostContextChromeOs::url_loader_factory() {
-  DCHECK(network_task_runner()->BelongsToCurrentThread());
-  if (!network_shared_url_loader_factory_) {
-    network_shared_url_loader_factory_ =
-        network::SharedURLLoaderFactory::Create(std::move(pending_factory_));
-  }
-  return network_shared_url_loader_factory_;
-}
-
-ChromotingHostContext::CreateClientCertStoreCallback
-ChromotingHostContextChromeOs::create_client_cert_store_callback() const {
-  return create_client_cert_store_;
-}
-
-#else  // !BUILDFLAG(IS_CHROMEOS)
 void DisallowBlockingOperations() {
   base::DisallowBlocking();
   // TODO(crbug.com/41360128): Re-enable after the underlying issue is fixed.
@@ -232,7 +120,6 @@ ChromotingHostContextDesktop::create_client_cert_store_callback() const {
   return base::BindRepeating(&CreateClientCertStoreInstance);
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -280,7 +167,6 @@ policy::ManagementService* ChromotingHostContext::management_service() {
   return policy::PlatformManagementService::GetInstance();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 std::unique_ptr<ChromotingHostContext> ChromotingHostContext::Create(
     scoped_refptr<AutoThreadTaskRunner> ui_task_runner) {
   scoped_refptr<AutoThreadTaskRunner> file_task_runner =
@@ -297,11 +183,11 @@ std::unique_ptr<ChromotingHostContext> ChromotingHostContext::Create(
   // on a UI thread.
   scoped_refptr<AutoThreadTaskRunner> input_task_runner =
       AutoThread::CreateWithType("ChromotingInputThread", ui_task_runner,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
                                  base::MessagePumpType::UI);
 #else
                                  base::MessagePumpType::IO);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
   return std::make_unique<ChromotingHostContextDesktop>(
       ui_task_runner, file_task_runner, input_task_runner, network_task_runner,
@@ -314,55 +200,12 @@ std::unique_ptr<ChromotingHostContext> ChromotingHostContext::Create(
 #endif  // !BUILDFLAG(IS_APPLE)
       base::MakeRefCounted<URLRequestContextGetter>(network_task_runner));
 }
-#else   // BUILDFLAG(IS_CHROMEOS)
-
-// static
-std::unique_ptr<ChromotingHostContext> ChromotingHostContext::CreateForChromeOS(
-    scoped_refptr<base::SingleThreadTaskRunner> io_task_runner,
-    scoped_refptr<base::SingleThreadTaskRunner> ui_task_runner,
-    scoped_refptr<base::SingleThreadTaskRunner> file_task_runner,
-    scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
-    CreateClientCertStoreCallback create_client_cert_store) {
-  // AutoThreadTaskRunner is a TaskRunner with the special property that it will
-  // continue to process tasks until no references remain. We usually provide a
-  // QuitClosure which is run when the AutoThreadTaskRunner instance is
-  // destroyed, however on ChromeOS we are running on threads provided by the
-  // browser (meaning we don't own them or their lifetime) so we should not be
-  // stopping them when a remote session terminates.
-  // Providing any sort of callback (even base::DoNothing) will cause a crash if
-  // ash-chrome is shutting down when the AutoThreadTaskRunner is being
-  // destroyed. A real-world example is starting a CRD session and then signing
-  // out, see b/260395047 for more details.
-  scoped_refptr<AutoThreadTaskRunner> io_auto_task_runner =
-      new AutoThreadTaskRunner(io_task_runner);
-  scoped_refptr<AutoThreadTaskRunner> file_auto_task_runner =
-      new AutoThreadTaskRunner(file_task_runner);
-  scoped_refptr<AutoThreadTaskRunner> ui_auto_task_runner =
-      new AutoThreadTaskRunner(ui_task_runner);
-
-  // Use browser's file thread as the joiner as it is the only browser-thread
-  // that allows blocking I/O, which is required by thread joining.
-  return std::make_unique<ChromotingHostContextChromeOs>(
-      ui_auto_task_runner,
-      file_auto_task_runner,
-      ui_auto_task_runner,  // input_task_runner
-      io_auto_task_runner,  // network_task_runner
-      ui_auto_task_runner,  // video_capture_task_runner
-      shared_url_loader_factory, create_client_cert_store);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // static
 std::unique_ptr<ChromotingHostContext> ChromotingHostContext::CreateForTesting(
     scoped_refptr<AutoThreadTaskRunner> ui_task_runner,
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return ChromotingHostContext::CreateForChromeOS(
-      ui_task_runner, ui_task_runner, ui_task_runner, url_loader_factory,
-      base::BindRepeating(&CreateClientCertStoreInstance));
-#else
   return ChromotingHostContext::Create(ui_task_runner);
-#endif
 }
 
 }  // namespace remoting

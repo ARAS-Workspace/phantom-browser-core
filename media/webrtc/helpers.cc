@@ -65,11 +65,9 @@ void ConfigAutomaticGainControl(const AudioProcessingSettings& settings,
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   const bool kInputVolumeAdjustmentOverrideAllowed = true;
-#elif BUILDFLAG(IS_CHROMEOS)
-  const bool kInputVolumeAdjustmentOverrideAllowed = false;
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Use AGC2 digital and input volume controller.
   // TODO(crbug.com/40872787): Remove `kWebRtcAllowInputVolumeAdjustment` safely
   // and set `input_volume_controller.enabled` true.

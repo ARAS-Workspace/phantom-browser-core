@@ -51,12 +51,6 @@
 #include "ui/base/models/menu_model.h"
 #include "ui/menus/simple_menu_model.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/wm/window_pin_util.h"
-#include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
-#include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_window.h"
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/test_extension_menu_model_android.h"
@@ -638,29 +632,17 @@ static void VerifyMenuForSeparatorsTest(const MenuModel& menu) {
   //  normal3
 
   size_t index = 0;
-#if BUILDFLAG(IS_CHROMEOS)
-  ASSERT_EQ(7u, menu.GetItemCount());
-#else
   ASSERT_EQ(11u, menu.GetItemCount());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   ExpectLabelAndType("radio1", MenuModel::TYPE_RADIO, menu, index++);
   ExpectLabelAndType("radio2", MenuModel::TYPE_RADIO, menu, index++);
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(MenuModel::TYPE_SEPARATOR, menu.GetTypeAt(index++));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   ExpectLabelAndType("normal1", MenuModel::TYPE_COMMAND, menu, index++);
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(MenuModel::TYPE_SEPARATOR, menu.GetTypeAt(index++));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   ExpectLabelAndType("normal2", MenuModel::TYPE_COMMAND, menu, index++);
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(MenuModel::TYPE_SEPARATOR, menu.GetTypeAt(index++));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   ExpectLabelAndType("radio3", MenuModel::TYPE_RADIO, menu, index++);
   ExpectLabelAndType("radio4", MenuModel::TYPE_RADIO, menu, index++);
-#if !BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(MenuModel::TYPE_SEPARATOR, menu.GetTypeAt(index++));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
   ExpectLabelAndType("normal3", MenuModel::TYPE_COMMAND, menu, index++);
 }
 
@@ -951,50 +933,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuLazyTest, UpdateCheckboxes) {
                                 false);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Extension context menu tests with and without locked fullscreen when locked
-// and not locked for OnTask. Only relevant for non-web browser scenarios.
-class ExtensionContextMenuLockedFullscreenTest
-    : public ExtensionContextMenuBrowserTest,
-      public testing::WithParamInterface<std::tuple<bool, bool>> {
- protected:
-  bool IsLockedFullscreen() { return std::get<0>(GetParam()); }
-  bool IsLockedForOnTask() { return std::get<1>(GetParam()); }
-};
-
-IN_PROC_BROWSER_TEST_P(ExtensionContextMenuLockedFullscreenTest,
-                       VerifyItemStateForOnTask) {
-  ash::boca::OnTaskLockedController::From(browser())->set_locked_for_on_task(
-      IsLockedForOnTask());
-  if (IsLockedFullscreen()) {
-    ash::PinWindow(browser()->GetWindow()->GetNativeWindow(), /*trusted=*/true);
-  }
-
-  // Load test extension and wait for js test code to create context menu with
-  // one item.
-  ExtensionTestMessageListener listener("created context menu");
-  base::FilePath extension_dir = GetRootDir().AppendASCII("locked_fullscreen");
-  ASSERT_TRUE(
-      LoadExtension(extension_dir, {.wait_for_registration_stored = true}));
-  ASSERT_TRUE(listener.WaitUntilSatisfied());
-
-  // Create / build the context menu and verify item state is enabled if the
-  // instance is locked for OnTask or if the instance is not in locked
-  // fullscreen mode.
-  const GURL page_url("http://www.google.com");
-  const std::unique_ptr<TestRenderViewContextMenu> menu(
-      TestRenderViewContextMenu::Create(GetActiveWebContents(), page_url));
-  int command_id = ContextMenuMatcher::ConvertToExtensionsCustomCommandId(0);
-  bool expect_command_enabled = IsLockedForOnTask() || !IsLockedFullscreen();
-  ASSERT_EQ(expect_command_enabled, menu->IsCommandIdEnabled(command_id));
-}
-
-INSTANTIATE_TEST_SUITE_P(ExtensionContextMenuLockedFullscreenTests,
-                         ExtensionContextMenuLockedFullscreenTest,
-                         ::testing::Combine(
-                             /*IsLockedFullscreen=*/::testing::Bool(),
-                             /*IsLockedForOnTask=*/::testing::Bool()));
-#endif
 
 
 }  // namespace extensions

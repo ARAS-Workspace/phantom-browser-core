@@ -6352,7 +6352,7 @@ TEST_F(WebFrameTest, DISABLED_PositionForPointTest) {
   EXPECT_EQ(64, ComputeOffset(layout_object, 1000, 1000));
 }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/1317375): Build these tests on all platforms.
 #define MAYBE_SelectRangeStaysHorizontallyAlignedWhenMoved \
   DISABLED_SelectRangeStaysHorizontallyAlignedWhenMoved
@@ -6761,7 +6761,7 @@ TEST_F(CompositedSelectionBoundsTest, LargeSelectionScroll) {
 TEST_F(CompositedSelectionBoundsTest, LargeSelectionNoScroll) {
   RunTest("composited_selection_bounds_large_selection_noscroll.html");
 }
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #if !BUILDFLAG(IS_ANDROID)
 TEST_F(CompositedSelectionBoundsTest, Input) {
   web_view_helper_.GetWebView()->GetSettings()->SetDefaultFontSize(16);
@@ -13558,11 +13558,7 @@ TEST_F(WebFrameTest, ShowVirtualKeyboardOnElementFocus) {
 
   RunPendingTasks();
   // Verify that the right WidgetHost has been notified.
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(0u, widget_host.VirtualKeyboardRequestCount());
-#else
   EXPECT_LT(0u, widget_host.VirtualKeyboardRequestCount());
-#endif
   web_view_helper.Reset();
 }
 

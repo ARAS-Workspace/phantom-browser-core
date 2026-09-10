@@ -20,10 +20,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/mojom/speech/speech_synthesis.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/public/browser/tts_controller_delegate.h"
-#endif
-
 namespace content {
 
 // Platform Tts implementation that does nothing.
@@ -178,39 +174,6 @@ class MockTtsEngineDelegate : public TtsEngineDelegate {
   int stop_called_ = 0;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-class MockTtsControllerDelegate : public TtsControllerDelegate {
- public:
-  MockTtsControllerDelegate() = default;
-  ~MockTtsControllerDelegate() override = default;
-
-  void SetPreferredVoiceIds(const PreferredVoiceIds& ids) { ids_ = ids; }
-
-  BrowserContext* GetLastBrowserContext() {
-    BrowserContext* result = last_browser_context_;
-    last_browser_context_ = nullptr;
-    return result;
-  }
-
-  // TtsControllerDelegate:
-  std::unique_ptr<PreferredVoiceIds> GetPreferredVoiceIdsForUtterance(
-      TtsUtterance* utterance) override {
-    last_browser_context_ = utterance->GetBrowserContext();
-    auto ids = std::make_unique<PreferredVoiceIds>(ids_);
-    return ids;
-  }
-
-  void UpdateUtteranceDefaultsFromPrefs(content::TtsUtterance* utterance,
-                                        double* rate,
-                                        double* pitch,
-                                        double* volume) override {}
-
- private:
-  raw_ptr<BrowserContext> last_browser_context_ = nullptr;
-  PreferredVoiceIds ids_;
-};
-#endif
-
 class MockVoicesChangedDelegate : public VoicesChangedDelegate {
  public:
   void OnVoicesChanged() override {}
@@ -226,9 +189,6 @@ class TestTtsControllerImpl : public TtsControllerImpl {
   using TtsControllerImpl::GetMatchingVoice;
   using TtsControllerImpl::SpeakNextUtterance;
   using TtsControllerImpl::UpdateUtteranceDefaults;
-#if BUILDFLAG(IS_CHROMEOS)
-  using TtsControllerImpl::SetTtsControllerDelegateForTesting;
-#endif
   using TtsControllerImpl::IsPausedForTesting;
 
   TtsUtterance* current_utterance() { return current_utterance_.get(); }
@@ -251,9 +211,6 @@ class TtsControllerTest : public testing::Test {
     // since it has no extensions.
     controller()->SetTtsEngineDelegate(&engine_delegate_);
 #endif  // !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_CHROMEOS)
-    controller()->SetTtsControllerDelegateForTesting(&delegate_);
-#endif
     controller()->AddVoicesChangedDelegate(&voices_changed_);
   }
 
@@ -267,9 +224,6 @@ class TtsControllerTest : public testing::Test {
   TestBrowserContext* browser_context() { return browser_context_.get(); }
   MockTtsEngineDelegate* engine_delegate() { return &engine_delegate_; }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  MockTtsControllerDelegate* delegate() { return &delegate_; }
-#endif
   void ReleaseTtsController() {
     // Need to clear the controller on MockTtsPlatformImpl to avoid a dangling
     // pointer.
@@ -309,51 +263,9 @@ class TtsControllerTest : public testing::Test {
   std::unique_ptr<MockTtsPlatformImpl> platform_impl_;
   std::unique_ptr<TestBrowserContext> browser_context_;
   MockTtsEngineDelegate engine_delegate_;
-#if BUILDFLAG(IS_CHROMEOS)
-  MockTtsControllerDelegate delegate_;
-#endif
   MockVoicesChangedDelegate voices_changed_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(TtsControllerTest, TestBrowserContextRemoved) {
-  std::vector<VoiceData> voices;
-  VoiceData voice_data;
-  voice_data.engine_id = "x";
-  voice_data.events.insert(TTS_EVENT_END);
-  voices.push_back(voice_data);
-  platform_impl()->set_voices(voices);
-
-  // Speak an utterances associated with this test browser context.
-  std::unique_ptr<TtsUtterance> utterance1 =
-      TtsUtterance::Create(browser_context());
-  utterance1->SetEngineId("x");
-  utterance1->SetShouldClearQueue(false);
-  utterance1->SetSrcId(1);
-  controller()->SpeakOrEnqueue(std::move(utterance1));
-
-  // Assert that the delegate was called and it got our browser context.
-  ASSERT_EQ(browser_context(), delegate()->GetLastBrowserContext());
-
-  // Now queue up a second utterance to be spoken, also associated with
-  // this browser context.
-  std::unique_ptr<TtsUtterance> utterance2 =
-      TtsUtterance::Create(browser_context());
-  utterance2->SetEngineId("x");
-  utterance2->SetShouldClearQueue(false);
-  utterance2->SetSrcId(2);
-  controller()->SpeakOrEnqueue(std::move(utterance2));
-
-  // Destroy the browser context before the utterance is spoken.
-  ReleaseBrowserContext();
-
-  // Now speak the next utterance, and ensure that we don't get the
-  // destroyed browser context.
-  controller()->FinishCurrentUtterance();
-  controller()->SpeakNextUtterance();
-  ASSERT_EQ(nullptr, delegate()->GetLastBrowserContext());
-}
-#else
 TEST_F(TtsControllerTest, TestTtsControllerUtteranceDefaults) {
   std::unique_ptr<TtsUtterance> utterance1 = content::TtsUtterance::Create();
   // Initialized to default (unset constant) values.
@@ -373,7 +285,6 @@ TEST_F(TtsControllerTest, TestTtsControllerUtteranceDefaults) {
   EXPECT_EQ(blink::mojom::kSpeechSynthesisDefaultVolume,
             utterance1->GetContinuousParameters().volume);
 }
-#endif
 
 TEST_F(TtsControllerTest, TestGetMatchingVoice) {
   TestContentBrowserClient::GetInstance()->set_application_locale("en");
@@ -468,34 +379,6 @@ TEST_F(TtsControllerTest, TestGetMatchingVoice) {
     utterance->SetEngineId("id5");
     EXPECT_EQ(5, controller()->GetMatchingVoice(utterance.get(), voices));
 
-#if BUILDFLAG(IS_CHROMEOS)
-    TtsControllerDelegate::PreferredVoiceIds preferred_voice_ids;
-    preferred_voice_ids.locale_voice_id.emplace("Voice7", "id7");
-    preferred_voice_ids.any_locale_voice_id.emplace("Android", "");
-    delegate()->SetPreferredVoiceIds(preferred_voice_ids);
-
-    // Voice6 is matched when the utterance locale exactly matches its locale.
-    utterance->SetEngineId("");
-    utterance->SetLang("es-es");
-    EXPECT_EQ(6, controller()->GetMatchingVoice(utterance.get(), voices));
-
-    // The 7th voice is the default for "es", even though the utterance is
-    // "es-ar". |voice6| is not matched because it is not the default.
-    utterance->SetEngineId("");
-    utterance->SetLang("es-ar");
-    EXPECT_EQ(7, controller()->GetMatchingVoice(utterance.get(), voices));
-
-    // The 8th voice is like the built-in "Android" voice, it has no lang
-    // and no extension ID. Make sure it can still be matched.
-    preferred_voice_ids.locale_voice_id.reset();
-    delegate()->SetPreferredVoiceIds(preferred_voice_ids);
-    utterance->SetVoiceName("Android");
-    utterance->SetEngineId("");
-    utterance->SetLang("");
-    EXPECT_EQ(8, controller()->GetMatchingVoice(utterance.get(), voices));
-
-    delegate()->SetPreferredVoiceIds({});
-#endif
   }
 
   {
@@ -535,18 +418,6 @@ TEST_F(TtsControllerTest, TestGetMatchingVoice) {
     utterance->SetLang("");
     EXPECT_EQ(1, controller()->GetMatchingVoice(utterance.get(), voices));
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // voice0 is matched against the system language which has no region piece.
-    TestContentBrowserClient::GetInstance()->set_application_locale("en");
-    EXPECT_EQ(0, controller()->GetMatchingVoice(utterance.get(), voices));
-
-    TtsControllerDelegate::PreferredVoiceIds preferred_voice_ids2;
-    preferred_voice_ids2.locale_voice_id.emplace("voice0", "id0");
-    delegate()->SetPreferredVoiceIds(preferred_voice_ids2);
-    // voice0 is matched against the pref over the system language.
-    TestContentBrowserClient::GetInstance()->set_application_locale("en-US");
-    EXPECT_EQ(0, controller()->GetMatchingVoice(utterance.get(), voices));
-#endif
   }
 
   {
@@ -573,24 +444,6 @@ TEST_F(TtsControllerTest, TestGetMatchingVoice) {
     utterance->SetLang("EN-US");
     EXPECT_EQ(0, controller()->GetMatchingVoice(utterance.get(), voices));
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Add another English voice.
-    VoiceData voice2;
-    voice2.engine_id = "id1";
-    voice2.name = "Another English voice";
-    voice2.lang = "en-us";
-    voices.push_back(voice2);
-
-    // Set voice2 as the preferred voice for English.
-    TtsControllerDelegate::PreferredVoiceIds preferred_voice_ids;
-    preferred_voice_ids.lang_voice_id.emplace(voice2.name, voice2.engine_id);
-    delegate()->SetPreferredVoiceIds(preferred_voice_ids);
-
-    // Ensure that voice2 is chosen over voice0, even though the locales don't
-    // match exactly. The utterance has a locale of "en-US", while voice2 has
-    // a locale of "en-us"; this shouldn't prevent voice2 from being used.
-    EXPECT_EQ(2, controller()->GetMatchingVoice(utterance.get(), voices));
-#endif
   }
 }
 

@@ -31,8 +31,6 @@ optimization_guide::proto::Platform GetPlatform() {
   return optimization_guide::proto::PLATFORM_IOS;
 #elif BUILDFLAG(IS_MAC)
   return optimization_guide::proto::PLATFORM_MAC;
-#elif BUILDFLAG(IS_CHROMEOS)
-  return optimization_guide::proto::PLATFORM_CHROMEOS;
 #elif BUILDFLAG(IS_ANDROID)
   return optimization_guide::proto::PLATFORM_ANDROID;
 #elif BUILDFLAG(IS_LINUX)
@@ -187,8 +185,6 @@ optimization_guide::proto::ChromePlatform GetChromePlatform() {
   return optimization_guide::proto::CHROME_PLATFORM_IOS;
 #elif BUILDFLAG(IS_MAC)
   return optimization_guide::proto::CHROME_PLATFORM_MAC;
-#elif BUILDFLAG(IS_CHROMEOS)
-  return optimization_guide::proto::CHROME_PLATFORM_CHROMEOS;
 #elif BUILDFLAG(IS_ANDROID)
   return optimization_guide::proto::CHROME_PLATFORM_ANDROID;
 #elif BUILDFLAG(IS_LINUX)

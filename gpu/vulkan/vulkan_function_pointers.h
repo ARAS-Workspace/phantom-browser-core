@@ -342,10 +342,10 @@ struct COMPONENT_EXPORT(VULKAN) VulkanFunctionPointers {
   VulkanFunction<PFN_vkGetSwapchainImagesKHR> vkGetSwapchainImagesKHR;
   VulkanFunction<PFN_vkQueuePresentKHR> vkQueuePresentKHR;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   VulkanFunction<PFN_vkGetImageDrmFormatModifierPropertiesEXT>
       vkGetImageDrmFormatModifierPropertiesEXT;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
  private:
   bool BindUnassociatedFunctionPointersCommon();
@@ -1239,7 +1239,7 @@ ALWAYS_INLINE VkResult vkQueuePresentKHR(VkQueue queue,
                                                              pPresentInfo);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 ALWAYS_INLINE VkResult vkGetImageDrmFormatModifierPropertiesEXT(
     VkDevice device,
     VkImage image,
@@ -1247,6 +1247,6 @@ ALWAYS_INLINE VkResult vkGetImageDrmFormatModifierPropertiesEXT(
   return gpu::GetVulkanFunctionPointers()
       ->vkGetImageDrmFormatModifierPropertiesEXT(device, image, pProperties);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #endif  // GPU_VULKAN_VULKAN_FUNCTION_POINTERS_H_

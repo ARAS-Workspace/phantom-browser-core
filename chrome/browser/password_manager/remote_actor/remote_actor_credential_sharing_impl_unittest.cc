@@ -308,7 +308,7 @@ class RemoteActorCredentialSharingImplTest
       EXPECT_CALL(*raw_authenticator, CanAuthenticateWithBiometrics)
           .WillRepeatedly(testing::Return(true));
       std::u16string expected_message;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
       expected_message = l10n_util::GetStringFUTF16(
           IDS_PASSWORD_MANAGER_FILLING_REAUTH, base::UTF8ToUTF16(domain));
 #endif
@@ -902,7 +902,7 @@ TEST_F(RemoteActorCredentialSharingImplTest,
   SimulateDialogSelection(std::nullopt);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 TEST_F(RemoteActorCredentialSharingImplTest, ReauthEnabled_Success) {
   auto remote = SetUpAndBindFlow();
   SetupMockAuthenticator(/*reauth_required=*/true, /*auth_success=*/true);

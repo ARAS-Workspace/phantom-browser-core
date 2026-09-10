@@ -35,15 +35,6 @@ class PDFiumPrint {
   PDFiumPrint& operator=(const PDFiumPrint&) = delete;
   ~PDFiumPrint();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Flattens the `doc`.
-  // On success, returns the flattened version of `doc` as a vector and the
-  // number of pages inside FlattenPdfResult.
-  // On failure, returns std::nullopt.
-  static std::optional<FlattenPdfResult> CreateFlattenedPdf(
-      ScopedFPDFDocument doc);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   // Performs N-up PDF generation for `doc` based on `pages_per_sheet`,
   // `page_size`, and `printable_area`.
   // On success, returns the N-up version of `doc` as a vector.

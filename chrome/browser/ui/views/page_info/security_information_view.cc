@@ -217,21 +217,12 @@ void SecurityInformationView::AddPasswordReuseButtons(
   layout->set_main_axis_alignment(views::BoxLayout::MainAxisAlignment::kStart);
   password_reuse_button_container_->SetLayoutManager(std::move(layout));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (change_password_button) {
-    password_reuse_button_container_->AddChildView(
-        std::move(change_password_button));
-  }
-  password_reuse_button_container_->AddChildView(
-      std::move(allowlist_password_reuse_button));
-#else
   password_reuse_button_container_->AddChildView(
       std::move(allowlist_password_reuse_button));
   if (change_password_button) {
     password_reuse_button_container_->AddChildView(
         std::move(change_password_button));
   }
-#endif
 
   // Add padding at the top.
   password_reuse_button_container_->SetBorder(

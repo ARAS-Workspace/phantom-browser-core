@@ -39,10 +39,6 @@
 #include "ui/views/window/dialog_delegate.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using base::test::TestFuture;
 using content::ChildFrameAt;
 using content::EvalJs;
@@ -73,11 +69,6 @@ class ActorToolAgnosticBrowserTest : public ActorToolsTest {
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features=*/{},
         /*disabled_features=*/{
-#if BUILDFLAG(IS_CHROMEOS)
-            // TODO(crbug.com/465305046): Investigate how the rounded windows
-            // feature affects the hit test.
-            chromeos::features::kFeatureManagementRoundedWindows,
-#endif  // BUILDFLAG(IS_CHROMEOS)
             kGlicCrossOriginNavigationGating});
   }
   ~ActorToolAgnosticBrowserTest() override = default;

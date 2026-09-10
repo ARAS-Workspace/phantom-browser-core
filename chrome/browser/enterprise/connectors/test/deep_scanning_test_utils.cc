@@ -153,20 +153,6 @@ void EventReportValidator::ExpectUnscannedFileEvents(
                 unscanned_file_event.content_type()));
 
             std::string filename = unscanned_file_event.file_name();
-#if BUILDFLAG(IS_CHROMEOS)
-            // TODO(crbug.com/40941444): To fix the tests for ChromeOS.
-            // If filename is not found as expected, try the filename without
-            // path.
-            if (!filenames_and_hashes.contains(filename)) {
-              for (const auto& fh : filenames_and_hashes) {
-                if (base::FilePath(fh.first).BaseName().AsUTF8Unsafe() ==
-                    filename) {
-                  filename = fh.first;  // filename has full path now.
-                  break;
-                }
-              }
-            }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
             EXPECT_EQ(filenames_and_hashes.at(filename),
                       unscanned_file_event.download_digest_sha_256());
@@ -463,7 +449,6 @@ std::unique_ptr<KeyedService> BuildRealtimeReportingClient(
       context);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void SetProfileDMToken(Profile* profile, const std::string& dm_token) {
   auto policy_data = std::make_unique<enterprise_management::PolicyData>();
   policy_data->set_request_token(dm_token);
@@ -478,6 +463,5 @@ void SetProfileDMToken(Profile* profile, const std::string& dm_token) {
   profile->GetUserCloudPolicyManager()->Connect(
       g_browser_process->local_state(), std::move(client));
 }
-#endif
 
 }  // namespace enterprise_connectors::test

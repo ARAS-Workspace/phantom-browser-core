@@ -99,7 +99,7 @@ MessagingBackendServiceFactory::BuildServiceInstanceForBrowserContext(
 
   // This configuration object allows us to control platform specific behavior.
   MessagingBackendConfiguration configuration;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   configuration.clear_chip_on_tab_selection = false;
 #endif
 

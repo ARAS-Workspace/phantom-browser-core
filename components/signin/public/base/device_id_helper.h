@@ -13,8 +13,6 @@ class PrefService;
 
 namespace signin {
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 // Returns device id that is scoped to single signin. This device id will be
 // regenerated if user signs out and signs back in.
 // When refresh token is requested for this user it will be annotated with
@@ -28,8 +26,6 @@ std::string RecreateSigninScopedDeviceId(PrefService* prefs);
 // GetSigninScopedDeviceId().
 // Creates a new device ID value.
 std::string GenerateSigninScopedDeviceId();
-
-#endif
 
 }  // namespace signin
 

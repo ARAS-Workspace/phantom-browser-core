@@ -36,10 +36,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/uuid.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using ::testing::_;
 using ::testing::AllOf;
 using ::testing::Between;
@@ -281,11 +277,6 @@ EncryptedRecord ComposeEncryptedRecord(
   encrypted_record.set_encrypted_wrapped_record(data.data(), data.size());
   auto* sequence_information = encrypted_record.mutable_sequence_information();
   sequence_information->set_generation_id(kGenerationId);
-#if BUILDFLAG(IS_CHROMEOS)
-  static const std::string kGenerationGuid =
-      base::Uuid::GenerateRandomV4().AsLowercaseString();
-  sequence_information->set_generation_guid(kGenerationGuid);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   sequence_information->set_sequencing_id(0);
   sequence_information->set_priority(Priority::SECURITY);
   {

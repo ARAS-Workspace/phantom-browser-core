@@ -38,10 +38,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 namespace task_manager {
 
 namespace {
@@ -141,10 +137,6 @@ class WorkerTaskProviderBrowserTest : public InProcessBrowserTest,
 
  protected:
   void SetUpCommandLine(base::CommandLine* command_line) override {
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
   }
 
   void StopWaiting() {

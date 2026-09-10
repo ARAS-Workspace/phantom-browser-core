@@ -60,9 +60,9 @@ std::unique_ptr<base::MemoryMappedFile> CreateMemoryMappedFile(size_t size) {
                              base::File::FLAG_READ | base::File::FLAG_WRITE
 // On Windows FLAG_CREATE_ALWAYS will require FLAG_WRITE, and FLAG_APPEND
 // must not be specified.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
                              | base::File::FLAG_APPEND
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
           ),
       base::MemoryMappedFile::Region{0, size},
       base::MemoryMappedFile::READ_WRITE_EXTEND);

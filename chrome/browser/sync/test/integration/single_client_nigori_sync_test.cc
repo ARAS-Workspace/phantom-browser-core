@@ -82,17 +82,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/sync/sync_error_notifier.h"
-#include "chrome/browser/ash/sync/sync_error_notifier_factory.h"
-#include "chrome/browser/ui/browser_window.h"
-#include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#include "ui/views/test/widget_test.h"
-#include "ui/views/widget/any_widget_observer.h"
-#include "ui/views/widget/widget.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 using fake_server::GetServerNigori;
@@ -1280,12 +1269,10 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
                   ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
   ASSERT_FALSE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Verify the profile-menu error string.
   ASSERT_THAT(GetSyncService(0)->GetUserActionableError(),
               Eq(syncer::SyncService::UserActionableError::
                      kNeedsTrustedVaultKeyForPasswords));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // There needs to be an existing tab for the second tab (the retrieval flow)
   // to be closeable via javascript.
@@ -1318,11 +1305,9 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
       "TrustedVault.RecoveryFlowTriggeredEndpoint",
       trusted_vault::TrustedVaultRecoveryFlowEndpoint::kDesktop, 1);
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Verify the profile-menu error string is empty.
   EXPECT_EQ(GetSyncService(0)->GetUserActionableError(),
             syncer::SyncService::UserActionableError::kNone);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 // Regression test for crbug.com/40930088: test verifies that client is able to
@@ -1388,156 +1373,6 @@ IN_PROC_BROWSER_TEST_P(
                   .Wait());
   EXPECT_FALSE(GetSecurityDomainsServer()->IsRecoverabilityDegraded());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-class SingleClientNigoriWithWebApiAndDialogUIParamTest
-    : public SingleClientNigoriWithWebApiTest {
- public:
-  SingleClientNigoriWithWebApiAndDialogUIParamTest() {
-    SetUsePrimaryUserProfile(true);
-  }
-  ~SingleClientNigoriWithWebApiAndDialogUIParamTest() override = default;
-
-  bool WaitForTrustedVaultReauthCompletion() {
-    BrowserWindowInterface* browser =
-        ProfileBrowserCollection::GetForProfile(GetProfile(0))
-            ->FindTabbedBrowser();
-    return TabClosedChecker(browser->GetTabStripModel()->GetActiveWebContents())
-        .Wait();
-  }
-};
-
-INSTANTIATE_TEST_SUITE_P(
-    /* no prefix */,
-    SingleClientNigoriWithWebApiAndDialogUIParamTest,
-    GetSyncTestModes(),
-    testing::PrintToStringParamName());
-
-IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiAndDialogUIParamTest,
-                       ShouldAcceptTrustedVaultKeysUponAshSystemNotification) {
-  // Mimic the account being already using a trusted vault passphrase.
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics({kTestEncryptionKey}),
-                        GetFakeServer());
-
-  ASSERT_TRUE(SetupClients());
-  ASSERT_TRUE(GetBrowser(0));
-  NotificationDisplayServiceTester display_service(GetProfile(0));
-
-  // SyncErrorNotifier needs explicit instantiation in tests, because the test
-  // profile at hands doesn't exercise ChromeBrowserMainExtraPartsAsh.
-  const ash::SyncErrorNotifier* const sync_error_notifier =
-      ash::SyncErrorNotifierFactory::GetForProfile(GetProfile(0));
-
-  ASSERT_TRUE(SetupSync());
-  ASSERT_TRUE(GetSyncService(0)
-                  ->GetUserSettings()
-                  ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-  ASSERT_FALSE(
-      GetSyncService(0)->GetActiveDataTypes().Has(syncer::WIFI_CONFIGURATIONS));
-
-  // Verify that a notification was displayed.
-  const std::string notification_id =
-      sync_error_notifier->GetNotificationIdForTesting();
-  std::optional<message_center::Notification> notification =
-      display_service.GetNotification(notification_id);
-  ASSERT_TRUE(notification);
-  int expected_title_id =
-      GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTransportOnly
-          ? IDS_SYNC_ERROR_BUBBLE_VIEW_TITLE_2
-          : IDS_SYNC_ERROR_PASSWORDS_BUBBLE_VIEW_TITLE;
-  int expected_message_id =
-      GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTransportOnly
-          ? IDS_SYNC_NEEDS_KEYS_FOR_PASSWORDS_ERROR_BUBBLE_VIEW_MESSAGE_2
-          : IDS_SYNC_NEEDS_KEYS_FOR_PASSWORDS_ERROR_BUBBLE_VIEW_MESSAGE;
-
-  EXPECT_THAT(notification->title(),
-              Eq(l10n_util::GetStringUTF16(expected_title_id)));
-  EXPECT_THAT(notification->message(),
-              Eq(l10n_util::GetStringUTF16(expected_message_id)));
-
-  // Mimic the user clickling on the system notification, which opens up a
-  // tab where the user can interact with the retrieval flow.
-  display_service.SimulateClick(NotificationHandler::Type::TRANSIENT,
-                                notification_id, /*action_index=*/std::nullopt,
-                                /*reply=*/std::nullopt);
-
-  // Wait until successful completion.
-  EXPECT_TRUE(WaitForTrustedVaultReauthCompletion());
-
-  EXPECT_TRUE(WifiConfigurationsSyncActiveChecker(GetSyncService(0)).Wait());
-  EXPECT_FALSE(GetSyncService(0)
-                   ->GetUserSettings()
-                   ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
-}
-
-IN_PROC_BROWSER_TEST_P(
-    SingleClientNigoriWithWebApiAndDialogUIParamTest,
-    ShouldImproveTrustedVaultRecoverabilityUponAshSystemNotification) {
-  // Mimic the key being available upon startup but recoverability degraded.
-  const std::vector<uint8_t> trusted_vault_key =
-      GetSecurityDomainsServer()->RotateTrustedVaultKey(
-          /*last_trusted_vault_key=*/trusted_vault::
-              GetConstantTrustedVaultKey());
-  GetSecurityDomainsServer()->RequirePublicKeyToAvoidRecoverabilityDegraded(
-      kTestRecoveryMethodPublicKey);
-  SetNigoriInFakeServer(BuildTrustedVaultNigoriSpecifics(
-                            /*trusted_vault_keys=*/{trusted_vault_key}),
-                        GetFakeServer());
-  ASSERT_TRUE(SetupClients());
-  GetSyncTrustedVaultClient()->StoreKeys(
-      kDefaultGaiaId, GetSecurityDomainsServer()->GetAllTrustedVaultKeys(),
-      /*last_key_version=*/GetSecurityDomainsServer()->GetCurrentEpoch(),
-      /*trigger=*/std::nullopt);
-
-  NotificationDisplayServiceTester display_service(GetProfile(0));
-
-  // SyncErrorNotifier needs explicit instantiation in tests, because the test
-  // profile at hands doesn't exercise ChromeBrowserMainExtraPartsAsh.
-  const ash::SyncErrorNotifier* const sync_error_notifier =
-      ash::SyncErrorNotifierFactory::GetForProfile(GetProfile(0));
-
-  ASSERT_TRUE(SetupSync());
-
-  ASSERT_TRUE(GetSecurityDomainsServer()->IsRecoverabilityDegraded());
-  EXPECT_TRUE(TrustedVaultRecoverabilityDegradedStateChecker(GetSyncService(0),
-                                                             /*degraded=*/true)
-                  .Wait());
-
-  // Verify that a notification was displayed.
-  const std::string notification_id =
-      sync_error_notifier->GetNotificationIdForTesting();
-  std::optional<message_center::Notification> notification =
-      display_service.GetNotification(notification_id);
-  ASSERT_TRUE(notification);
-  int expected_title_id =
-      GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTransportOnly
-          ? IDS_SYNC_ERROR_BUBBLE_VIEW_TITLE_2
-          : IDS_SYNC_NEEDS_VERIFICATION_BUBBLE_VIEW_TITLE;
-  int expected_message_id =
-      GetSetupSyncMode() == SyncTest::SetupSyncMode::kSyncTransportOnly
-          ? IDS_SYNC_RECOVERABILITY_DEGRADED_FOR_PASSWORDS_ERROR_BUBBLE_VIEW_MESSAGE_2
-          : IDS_SYNC_RECOVERABILITY_DEGRADED_FOR_PASSWORDS_ERROR_BUBBLE_VIEW_MESSAGE;
-
-  EXPECT_THAT(notification->title(),
-              Eq(l10n_util::GetStringUTF16(expected_title_id)));
-  EXPECT_THAT(notification->message(),
-              Eq(l10n_util::GetStringUTF16(expected_message_id)));
-
-  // Mimic the user clickling on the system notification, which opens up a
-  // tab where the user can interact with the degraded recoverability flow.
-  display_service.SimulateClick(NotificationHandler::Type::TRANSIENT,
-                                notification_id, /*action_index=*/std::nullopt,
-                                /*reply=*/std::nullopt);
-
-  // Wait until successful completion.
-  EXPECT_TRUE(WaitForTrustedVaultReauthCompletion());
-
-  EXPECT_TRUE(TrustedVaultRecoverabilityDegradedStateChecker(GetSyncService(0),
-                                                             /*degraded=*/false)
-                  .Wait());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
                        ShouldAcceptEncryptionKeysFromSubFrameIfSyncEnabled) {
@@ -1628,11 +1463,9 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
                    ->IsTrustedVaultRecoverabilityDegraded());
   EXPECT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(syncer::PASSWORDS));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Verify the profile-menu error string is empty.
   EXPECT_EQ(GetSyncService(0)->GetUserActionableError(),
             syncer::SyncService::UserActionableError::kNone);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_P(
@@ -1836,14 +1669,7 @@ IN_PROC_BROWSER_TEST_P(
 
   base::HistogramTester histogram_tester;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   ASSERT_TRUE(SignIn());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-  // TODO(crbug.com/40914333): SetupSync(WAIT_FOR_COMMITS_TO_COMPLETE) (e.g.
-  // with default argument) causes test flakiness here due to unrelated issue in
-  // SharingService. From this test perspective it doesn't matter whether to use
-  // WAIT_FOR_COMMITS_TO_COMPLETE or WAIT_FOR_SYNC_SETUP_TO_COMPLETE, but it
-  // would be nice to use default argument once the issue is resolved.
   ASSERT_TRUE(SetupSync(WAIT_FOR_SYNC_SETUP_TO_COMPLETE));
 
   ASSERT_TRUE(GetSyncService(0)
@@ -1963,12 +1789,10 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
                    ->GetUserSettings()
                    ->IsTrustedVaultKeyRequiredForPreferredDataTypes());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Verify the profile-menu error string.
   EXPECT_THAT(GetSyncService(0)->GetUserActionableError(),
               Eq(syncer::SyncService::UserActionableError::
                      kTrustedVaultRecoverabilityDegradedForPasswords));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // Mimic opening a web page where the user can interact with the degraded
   // recoverability flow. Before that, there needs to be an existing tab for the
@@ -1989,11 +1813,9 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
                    ->IsTrustedVaultRecoverabilityDegraded());
   EXPECT_FALSE(GetSecurityDomainsServer()->IsRecoverabilityDegraded());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Verify the profile-menu error string is empty.
   EXPECT_EQ(GetSyncService(0)->GetUserActionableError(),
             syncer::SyncService::UserActionableError::kNone);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   histogram_tester.ExpectUniqueSample(
       "Sync.TrustedVaultRecoverabilityDegradedOnStartup",
@@ -2330,16 +2152,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
     // turned it off. Wait until the client is aware of reset.
     ASSERT_TRUE(SyncDisabledChecker(GetSyncService(0)).Wait());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    ASSERT_TRUE(GetSyncService(0)
-                    ->GetUserSettings()
-                    ->IsSyncFeatureDisabledViaDashboard());
-    GetSyncService(0)
-        ->GetUserSettings()
-        ->ClearSyncFeatureDisabledViaDashboard();
-#else   // BUILDFLAG(IS_CHROMEOS)
     ASSERT_TRUE(SetupSync());
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   // Make sure that client is able to follow key rotation with fresh security
@@ -2423,7 +2236,6 @@ IN_PROC_BROWSER_TEST_P(
 }
 
 // ChromeOS doesn't have unconsented primary accounts.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
                        ShouldAcceptEncryptionKeysFromTheWebInTransportMode) {
   // Mimic the account using a trusted vault passphrase.
@@ -2518,7 +2330,5 @@ IN_PROC_BROWSER_TEST_P(
       "Sync.TrustedVaultRecoverabilityDegradedOnStartup",
       /*sample=*/true, /*expected_bucket_count=*/1);
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace

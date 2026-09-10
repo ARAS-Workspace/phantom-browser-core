@@ -357,13 +357,8 @@ TEST_P(ReportingServiceTest,
 }
 
 // Flaky in ChromeOS: crbug.com/1356127
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_SendReportsAndRemoveSourceWithPendingReports \
-  DISABLED_SendReportsAndRemoveSourceWithPendingReports
-#else
 #define MAYBE_SendReportsAndRemoveSourceWithPendingReports \
   SendReportsAndRemoveSourceWithPendingReports
-#endif
 TEST_P(ReportingServiceTest,
        MAYBE_SendReportsAndRemoveSourceWithPendingReports) {
   auto parsed_header =

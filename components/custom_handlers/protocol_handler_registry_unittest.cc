@@ -835,7 +835,7 @@ TEST_F(ProtocolHandlerRegistryTest, TestOSRegistration) {
   registry()->OnAcceptRegisterProtocolHandler(ph_do2);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // TODO(benwells): When Linux support is more reliable and
 // http://crbug.com/88255 is fixed this test will pass.
 #define MAYBE_TestOSRegistrationFailure DISABLED_TestOSRegistrationFailure

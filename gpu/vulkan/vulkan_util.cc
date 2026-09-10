@@ -29,10 +29,6 @@
 #include "base/android/device_info.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/gfx/linux/drm_util_linux.h"  //nogncheck
-#endif
-
 #define GL_NONE 0x00
 #define GL_LAYOUT_GENERAL_EXT 0x958D
 #define GL_LAYOUT_COLOR_ATTACHMENT_EXT 0x958E

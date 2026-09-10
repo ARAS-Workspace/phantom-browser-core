@@ -81,10 +81,8 @@ class CertVerifierServiceFactoryImpl
   // version of Chrome.
   void GetChromeRootStoreInfo(GetChromeRootStoreInfoCallback callback) override;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   void GetPlatformRootStoreInfo(
       GetPlatformRootStoreInfoCallback callback) override;
-#endif
 
   static std::optional<net::ChromeRootStoreData> ParseChromeRootStoreProto(
       const mojo_base::ProtoWrapper& new_root_store);

@@ -84,23 +84,7 @@ class TestMetricsLog : public MetricsLog {
 
 // Returns the expected hardware class for a metrics log.
 std::string GetExpectedHardwareClass() {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Currently, we are relying on base/ implementation for functionality on our
-  // side which can be fragile if in the future someone decides to change that.
-  // This replicates the logic to get the hardware class for ChromeOS and this
-  // result should match with the result by calling
-  // base::SysInfo::HardwareModelName().
-  std::string board = base::SysInfo::GetLsbReleaseBoard();
-  if (board == "unknown") {
-    return "";
-  }
-  const size_t index = board.find("-signed-");
-  if (index != std::string::npos)
-    board.resize(index);
-  return base::ToUpperASCII(board);
-#else
   return base::SysInfo::HardwareModelName();
-#endif
 }
 
 // Sets the time in |network_time| to |time|.
@@ -316,17 +300,10 @@ TEST_F(MetricsLogTest, BasicRecord) {
       base::SysInfo::AmountOfTotalPhysicalMemory().InMiB());
   hardware->set_hardware_class(GetExpectedHardwareClass());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  system_profile->mutable_os()->set_name("CrOS");
-#else
   system_profile->mutable_os()->set_name(base::SysInfo::OperatingSystemName());
-#endif
   system_profile->mutable_os()->set_version(
       base::SysInfo::OperatingSystemVersion());
-#if BUILDFLAG(IS_CHROMEOS)
-  system_profile->mutable_os()->set_kernel_version(
-      base::SysInfo::KernelVersion());
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   system_profile->mutable_os()->set_kernel_version(
       base::SysInfo::OperatingSystemVersion());
 #elif BUILDFLAG(IS_ANDROID)

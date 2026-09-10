@@ -140,11 +140,7 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
 }
 
 // ClearPrimaryAccount is not supported on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_SignOutClosesAllInstances DISABLED_SignOutClosesAllInstances
-#else
 #define MAYBE_SignOutClosesAllInstances SignOutClosesAllInstances
-#endif
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
                        MAYBE_SignOutClosesAllInstances) {
   ASSERT_OK(OpenGlicForActiveTab());
@@ -1643,7 +1639,7 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorActuationBrowserTest,
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
                        SaasUsageReportingOnOpen) {
   // Set the policy to include the GiC virtual domain.

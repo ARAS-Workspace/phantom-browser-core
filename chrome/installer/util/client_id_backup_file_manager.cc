@@ -34,15 +34,6 @@ base::FilePath GetBackupFilePath() {
 
 void SetClientIdBackupFilePermissionIfNeeded(
     const base::FilePath& backup_file) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // The backup file needs to be world-readable. See http://crbug.com/40079723
-  int permissions;
-  if (base::GetPosixFilePermissions(backup_file, &permissions) &&
-      (permissions & base::FILE_PERMISSION_READ_BY_OTHERS) == 0) {
-    permissions |= base::FILE_PERMISSION_READ_BY_OTHERS;
-    base::SetPosixFilePermissions(backup_file, permissions);
-  }
-#endif
 }
 
 // These values are persisted to logs. Entries should not be renumbered and

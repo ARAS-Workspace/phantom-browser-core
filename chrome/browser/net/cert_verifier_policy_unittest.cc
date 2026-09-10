@@ -30,7 +30,6 @@ class CertVerifierPoliciesTest : public testing::Test {
 
 // TODO(crbug.com/40928765): add tests for other fields as they are used by the
 // Cert Management UI
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(CertVerifierPoliciesTest, ManagedPlatformIntegrationOn) {
   profile_->GetTestingPrefService()->SetManagedPref(
       prefs::kCAPlatformIntegrationEnabled,
@@ -87,7 +86,5 @@ TEST_F(CertVerifierPoliciesTest, UnmanagedPlatformIntegrationOff) {
   ASSERT_FALSE(policies.is_include_system_trust_store_managed);
   ASSERT_FALSE(policies.certificate_policies->include_system_trust_store);
 }
-
-#endif
 
 }  // namespace chrome_browser_net

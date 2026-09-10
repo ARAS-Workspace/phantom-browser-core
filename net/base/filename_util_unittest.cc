@@ -622,12 +622,6 @@ TEST(FilenameUtilTest, GenerateFileName) {
       {__LINE__, "http://www.example.com/goat.tgz?wearing_hat=true", "", "", "",
        "application/x-gzip", L"", L"goat.tgz"},
 
-#if BUILDFLAG(IS_CHROMEOS)
-      {// http://crosbug.com/26028
-       __LINE__, "http://www.example.com/fooa%cc%88.txt", "", "", "",
-       "image/jpeg", L"foo\xe4", L"foo\xe4.txt"},
-#endif
-
       // U+3000 IDEOGRAPHIC SPACE (http://crbug.com/849794): In URL file name.
       {__LINE__, "http://www.example.com/%E5%B2%A1%E3%80%80%E5%B2%A1.txt", "",
        "", "", "text/plain", L"", L"\u5ca1\u3000\u5ca1.txt"},

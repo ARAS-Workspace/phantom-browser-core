@@ -34,11 +34,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/ownership/owner_settings_service_ash.h"
-#include "chrome/browser/ash/ownership/owner_settings_service_ash_factory.h"
-#endif
-
 using testing::Mock;
 using testing::Return;
 using testing::_;
@@ -61,18 +56,6 @@ class SettingsPrivateApiTest : public ExtensionApiTest {
     policy::BrowserPolicyConnector::SetPolicyProviderForTesting(&provider_);
     ExtensionApiTest::SetUpInProcessBrowserTestFixture();
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpOnMainThread() override {
-    ExtensionApiTest::SetUpOnMainThread();
-
-    auto* owner_settings_service =
-        ash::OwnerSettingsServiceAshFactory::GetForBrowserContext(profile());
-    base::test::TestFuture<bool> future;
-    owner_settings_service->IsOwnerAsync(future.GetCallback());
-    ASSERT_TRUE(future.Get());
-  }
-#endif
 
  protected:
   void SetUpCommandLine(base::CommandLine* command_line) override {
@@ -145,19 +128,5 @@ IN_PROC_BROWSER_TEST_F(SettingsPrivateApiTest, GetManagedByParentPref) {
       std::move(provider), content_settings::ProviderType::kSupervisedProvider);
   EXPECT_TRUE(RunSettingsSubtest("getManagedByParentPref")) << message_;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(SettingsPrivateApiTest, GetPref_CrOSSetting) {
-  EXPECT_TRUE(RunSettingsSubtest("getPref_CrOSSetting")) << message_;
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivateApiTest, SetPref_CrOSSetting) {
-  EXPECT_TRUE(RunSettingsSubtest("setPref_CrOSSetting")) << message_;
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivateApiTest, OnPrefsChanged_CrOSSetting) {
-  EXPECT_TRUE(RunSettingsSubtest("onPrefsChanged_CrOSSetting")) << message_;
-}
-#endif
 
 }  // namespace extensions

@@ -15,11 +15,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/file_manager/app_id.h"
-#include "extensions/common/constants.h"
-#endif
-
 namespace translate {
 namespace {
 
@@ -52,14 +47,6 @@ TEST(TranslateServiceTest, CheckTranslatableURL) {
   std::string content = std::string(url::kContentScheme) + "://";
   GURL content_url = GURL(content);
   EXPECT_TRUE(TranslateService::IsTranslatableURL(content_url));
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::string filemanager = std::string(extensions::kExtensionScheme) +
-                            std::string("://") +
-                            std::string(file_manager::kFileManagerAppId);
-  GURL filemanager_url = GURL(filemanager);
-  EXPECT_FALSE(TranslateService::IsTranslatableURL(filemanager_url));
 #endif
 
   GURL right_url = GURL("http://www.tamurayukari.com/");

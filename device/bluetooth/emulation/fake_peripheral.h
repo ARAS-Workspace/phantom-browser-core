@@ -85,9 +85,9 @@ class FakePeripheral : public device::BluetoothDevice {
 
   // BluetoothDevice overrides:
   uint32_t GetBluetoothClass() const override;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   device::BluetoothTransport GetType() const override;
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   std::string GetIdentifier() const override;
   std::string GetAddress() const override;
   AddressType GetAddressType() const override;
@@ -99,9 +99,6 @@ class FakePeripheral : public device::BluetoothDevice {
   std::optional<std::string> GetName() const override;
   std::u16string GetNameForDisplay() const override;
   bool IsPaired() const override;
-#if BUILDFLAG(IS_CHROMEOS)
-  bool IsBonded() const override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   bool IsConnected() const override;
   bool IsGattConnected() const override;
   bool IsConnectable() const override;
@@ -115,10 +112,6 @@ class FakePeripheral : public device::BluetoothDevice {
                             ErrorCallback error_callback) override;
   void Connect(PairingDelegate* pairing_delegate,
                ConnectCallback callback) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void ConnectClassic(PairingDelegate* pairing_delegate,
-                      ConnectCallback callback) override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   void SetPinCode(const std::string& pincode) override;
   void SetPasskey(uint32_t passkey) override;
   void ConfirmPairing() override;
@@ -142,12 +135,6 @@ class FakePeripheral : public device::BluetoothDevice {
 #if BUILDFLAG(IS_APPLE)
   bool IsLowEnergyDevice() override;
 #endif  // BUILDFLAG(IS_APPLE)
-#if BUILDFLAG(IS_CHROMEOS)
-  void ExecuteWrite(base::OnceClosure callback,
-                    ExecuteWriteErrorCallback error_callback) override;
-  void AbortWrite(base::OnceClosure callback,
-                  AbortWriteErrorCallback error_callback) override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
  protected:
   void CreateGattConnectionImpl(std::optional<device::BluetoothUUID>) override;

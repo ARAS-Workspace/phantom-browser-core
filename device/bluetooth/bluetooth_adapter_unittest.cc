@@ -41,14 +41,9 @@
 #include "device/bluetooth/test/bluetooth_test_mac.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"
-#elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_LINUX)
 #include "device/bluetooth/test/bluetooth_test_bluez.h"
 #endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/bluetooth/bluetooth_low_energy_scan_filter.h"
-#include "device/bluetooth/bluetooth_low_energy_scan_session.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 using device::BluetoothDevice;
 
@@ -95,7 +90,7 @@ class TestBluetoothAdapter final : public BluetoothAdapter {
                        base::OnceClosure callback,
                        ErrorCallback error_callback) override {}
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   base::TimeDelta GetDiscoverableTimeout() const override {
     return base::Microseconds(0);
   }
@@ -121,7 +116,7 @@ class TestBluetoothAdapter final : public BluetoothAdapter {
       CreateAdvertisementCallback callback,
       AdvertisementErrorCallback error_callback) override {}
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   void SetAdvertisingInterval(
       const base::TimeDelta& min,
       const base::TimeDelta& max,
@@ -140,33 +135,6 @@ class TestBluetoothAdapter final : public BluetoothAdapter {
       const std::string& identifier) const override {
     return nullptr;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetServiceAllowList(const UUIDList& uuids,
-                           base::OnceClosure callback,
-                           ErrorCallback error_callback) override {}
-  void SetSimpleSecurePairingEnabled(bool enabled,
-                                     base::OnceClosure callback,
-                                     ErrorCallback error_callback) override {}
-
-  LowEnergyScanSessionHardwareOffloadingStatus
-  GetLowEnergyScanSessionHardwareOffloadingStatus() override {
-    return LowEnergyScanSessionHardwareOffloadingStatus::kNotSupported;
-  }
-
-  std::unique_ptr<BluetoothLowEnergyScanSession> StartLowEnergyScanSession(
-      std::unique_ptr<BluetoothLowEnergyScanFilter> filter,
-      base::WeakPtr<BluetoothLowEnergyScanSession::Delegate> delegate)
-      override {
-    return nullptr;
-  }
-
-  std::vector<BluetoothRole> GetSupportedRoles() override {
-    return std::vector<BluetoothRole>{};
-  }
-
-  void SetStandardChromeOSAdapterName() override {}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   void OnStartDiscoverySessionQuitLoop(
       base::OnceClosure run_loop_quit,
@@ -1237,8 +1205,7 @@ TEST_F(BluetoothTest, MAYBE_TurnOffAdapterWithConnectedDevice) {
   EXPECT_FALSE(device->IsGattConnected());
 }
 
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) && \
-    !defined(USE_CAST_BLUETOOTH_ADAPTER)
+#if BUILDFLAG(IS_LINUX) && !defined(USE_CAST_BLUETOOTH_ADAPTER)
 #define MAYBE_RegisterLocalGattServices RegisterLocalGattServices
 #else
 #define MAYBE_RegisterLocalGattServices DISABLED_RegisterLocalGattServices
@@ -1276,8 +1243,7 @@ TEST_F(BluetoothTest, MAYBE_RegisterLocalGattServices) {
                       GetGattErrorCallback(Call::EXPECTED));
 }
 
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) && \
-    !defined(USE_CAST_BLUETOOTH_ADAPTER)
+#if BUILDFLAG(IS_LINUX) && !defined(USE_CAST_BLUETOOTH_ADAPTER)
 #define MAYBE_RegisterMultipleServices RegisterMultipleServices
 #else
 #define MAYBE_RegisterMultipleServices DISABLED_RegisterMultipleServices
@@ -1326,8 +1292,7 @@ TEST_F(BluetoothTest, MAYBE_RegisterMultipleServices) {
   EXPECT_TRUE(ServiceSetsEqual(RegisteredGattServices(), {}));
 }
 
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) && \
-    !defined(USE_CAST_BLUETOOTH_ADAPTER)
+#if BUILDFLAG(IS_LINUX) && !defined(USE_CAST_BLUETOOTH_ADAPTER)
 #define MAYBE_DeleteServices DeleteServices
 #else
 #define MAYBE_DeleteServices DISABLED_DeleteServices

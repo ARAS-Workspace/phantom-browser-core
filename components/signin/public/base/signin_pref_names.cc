@@ -8,13 +8,6 @@
 
 namespace prefs {
 
-#if BUILDFLAG(IS_CHROMEOS)
-// An integer property indicating the state of account id migration from
-// email to gaia id for the the profile.  See account_tracker_service.h
-// for possible values.
-const char kAccountIdMigrationState[] = "account_id_migration_state";
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Name of the preference property that persists the account information
 // tracked by this signin.
 const char kAccountInfo[] = "account_info";

@@ -150,22 +150,12 @@ FakeIwaRuntimeDataProvider::GetUserInstallAllowlistData(
 
 bool FakeIwaRuntimeDataProvider::IsManagedInstallPermitted(
     std::string_view web_bundle_id) const {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(kIsolatedWebAppBypassManagedAllowlist)) {
-    return true;
-  }
-#endif
   return std::ranges::contains(managed_allowlist_, web_bundle_id,
                                &web_package::SignedWebBundleId::id);
 }
 
 bool FakeIwaRuntimeDataProvider::IsManagedUpdatePermitted(
     std::string_view web_bundle_id) const {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(kIsolatedWebAppBypassManagedAllowlist)) {
-    return true;
-  }
-#endif
   return std::ranges::contains(managed_allowlist_, web_bundle_id,
                                &web_package::SignedWebBundleId::id);
 }

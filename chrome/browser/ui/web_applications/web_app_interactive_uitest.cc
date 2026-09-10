@@ -35,7 +35,7 @@ class WebAppInteractiveUiTest : public WebAppBrowserTestBase {};
 // solution is possible using display::Screen::SetScreenInstance on other
 // platforms, window placement doesn't work right with a faked Screen
 // instance. See: //docs/ui/display/multiscreen_testing.md
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_TabOpensOnCorrectDisplayMultiScreen \
   TabOpensOnCorrectDisplayMultiScreen
 #else
@@ -89,25 +89,8 @@ IN_PROC_BROWSER_TEST_F(WebAppInteractiveUiTest,
     display::ScopedDisplayForNewWindows scoped_display(other_display.id());
     app_browser = LaunchBrowserForWebAppInTab(app_id);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    EXPECT_NE(app_browser, original_browser);
-    EXPECT_EQ(other_display.id(),
-              display::Screen::Get()
-                  ->GetDisplayNearestWindow(
-                      app_browser->GetWindow()->GetNativeWindow())
-                  .id());
-    EXPECT_EQ(2, original_browser->tab_strip_model()->count());
-    EXPECT_EQ(1, app_browser->tab_strip_model()->count());
-
-    // A second launch should re-use the same browser window.
-    Browser* app_browser2 = LaunchBrowserForWebAppInTab(app_id);
-    EXPECT_EQ(app_browser, app_browser2);
-    EXPECT_EQ(2, original_browser->tab_strip_model()->count());
-    EXPECT_EQ(2, app_browser->tab_strip_model()->count());
-#else
     EXPECT_EQ(app_browser, original_browser);
     EXPECT_EQ(3, original_browser->tab_strip_model()->count());
-#endif
   }
 
   {
@@ -116,11 +99,7 @@ IN_PROC_BROWSER_TEST_F(WebAppInteractiveUiTest,
     display::ScopedDisplayForNewWindows scoped_display(original_display.id());
     app_browser = LaunchBrowserForWebAppInTab(app_id);
     EXPECT_EQ(app_browser, original_browser);
-#if BUILDFLAG(IS_CHROMEOS)
-    EXPECT_EQ(3, original_browser->tab_strip_model()->count());
-#else
     EXPECT_EQ(4, original_browser->tab_strip_model()->count());
-#endif
   }
 }
 

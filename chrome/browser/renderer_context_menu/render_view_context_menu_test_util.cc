@@ -9,10 +9,6 @@
 #include "content/public/browser/web_contents.h"
 #include "ui/base/models/menu_model.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/chromeos/policy/dlp/dlp_rules_manager.h"
-#endif
-
 #if BUILDFLAG(ENABLE_COMPOSE)
 #include "chrome/browser/compose/chrome_compose_client.h"
 #endif
@@ -111,18 +107,6 @@ BrowserWindowInterface* TestRenderViewContextMenu::GetBrowser() const {
 
 void TestRenderViewContextMenu::Show() {
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-const policy::DlpRulesManager* TestRenderViewContextMenu::GetDlpRulesManager()
-    const {
-  return dlp_rules_manager_;
-}
-
-void TestRenderViewContextMenu::set_dlp_rules_manager(
-    policy::DlpRulesManager* dlp_rules_manager) {
-  dlp_rules_manager_ = dlp_rules_manager;
-}
-#endif
 
 #if BUILDFLAG(ENABLE_COMPOSE)
 ChromeComposeClient* TestRenderViewContextMenu::GetChromeComposeClient() const {

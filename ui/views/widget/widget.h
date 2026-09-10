@@ -450,13 +450,6 @@ class VIEWS_EXPORT Widget : public internal::NativeWidgetDelegate,
     // TODO(crbug.com/40287810): can we use screen coordinates universally?
     gfx::Rect bounds;
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // If specified and the `bounds` is inside the specified display, the widget
-    // will be created on this display. Otherwise, the display matching the
-    // `bounds` will be used.
-    std::optional<int64_t> display_id;
-#endif
-
     // The initial workspace of the Widget. Default is "", which means the
     // current workspace.
     std::string workspace;

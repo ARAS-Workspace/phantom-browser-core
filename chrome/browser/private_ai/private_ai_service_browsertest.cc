@@ -105,7 +105,6 @@ IN_PROC_BROWSER_TEST_F(PrivateAiServiceBrowserTest,
   // Token fetch should be enabled now.
   EXPECT_TRUE(host->IsTokenFetchEnabled());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // Sign out.
   //
   // This functionality is not available on ChromeOS.
@@ -113,7 +112,6 @@ IN_PROC_BROWSER_TEST_F(PrivateAiServiceBrowserTest,
 
   // Token fetch should be disabled again.
   EXPECT_FALSE(host->IsTokenFetchEnabled());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_F(PrivateAiServiceBrowserTest, GetAuthToken) {

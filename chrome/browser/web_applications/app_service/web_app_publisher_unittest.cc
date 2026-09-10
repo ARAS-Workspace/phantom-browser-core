@@ -25,15 +25,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/web_app_id_constants.h"
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#include "chromeos/ash/components/system/statistics_provider.h"
-#include "chromeos/constants/url_constants.h"
-#include "components/services/app_service/public/cpp/app_launch_params.h"
-#include "net/base/url_util.h"
-#endif
-
 namespace web_app {
 
 class WebAppPublisherTest : public testing::Test {

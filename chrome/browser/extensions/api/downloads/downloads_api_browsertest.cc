@@ -111,9 +111,7 @@
 #include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/test/base/ui_test_utils.h"
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/download/download_display.h"
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
@@ -1497,7 +1495,6 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionTest, FileExistenceCheckAfterSearch) {
       .WaitForEvent();
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
                        DownloadsShowFunction) {
   platform_util::internal::DisableShellOperationsForTesting();
@@ -1507,9 +1504,8 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
   RunFunction(base::MakeRefCounted<DownloadsShowFunction>(),
               DownloadItemIdAsArgList(item.get()));
 }
-#endif
 
-#if !BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(ENABLE_EXTENSIONS)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
 // Desktop Android does not support platform_util::OpenItem(), which is required
 // for this API.
 IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
@@ -2238,8 +2234,7 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
 // Test that we disallow certain headers case-insensitively.
 // TODO(crbug.com/335421977): Flaky on "Linux ChromiumOS MSan Tests"
 // TODO(crbug.com/441086569): Flaky on "Linux Tests (dbg)"
-#if (BUILDFLAG(IS_CHROMEOS) && defined(MEMORY_SANITIZER)) || \
-    (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
+#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_DownloadExtensionTest_Download_UnsafeHeaders \
   DISABLED_DownloadExtensionTest_Download_UnsafeHeaders
 #else
@@ -4428,8 +4423,7 @@ IN_PROC_BROWSER_TEST_F(
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 // TODO(crbug.com/405219117): Support incognito on desktop Android.
 // This test is flaky on Linux ASan LSan Tests bot. https://crbug.com/40710698
-#if ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-     defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER)
 #define MAYBE_DownloadExtensionTest_OnDeterminingFilename_IncognitoSplit \
   DISABLED_DownloadExtensionTest_OnDeterminingFilename_IncognitoSplit
 #else
@@ -4915,7 +4909,7 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
 
 // The DownloadExtensionBubbleEnabledTest relies on the download surface, which
 // ChromeOS_ASH and Android don't use (see crbug.com/40224714).
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 class DownloadExtensionBubbleEnabledTest : public DownloadExtensionTest {
  public:
   DownloadExtensionBubbleEnabledTest() = default;
@@ -5012,7 +5006,7 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionBubbleEnabledTest,
   items[0]->Cancel(true);
   EXPECT_TRUE(GetDownloadToolbarButton()->IsShowing());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 

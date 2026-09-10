@@ -20,10 +20,6 @@
 #endif
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "remoting/base/chromeos_remoting_test_suite.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 int main(int argc, char** argv) {
 #if BUILDFLAG(IS_POSIX)
   // Use a temporary directory for the security key socket to avoid interfering
@@ -35,11 +31,7 @@ int main(int argc, char** argv) {
   }
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  remoting::ChromeOSRemotingTestSuite test_suite(argc, argv);
-#else
   base::TestSuite test_suite(argc, argv);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   base::Thread ipc_thread("IPC thread");
   ipc_thread.StartWithOptions(

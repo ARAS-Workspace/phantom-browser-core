@@ -12300,12 +12300,7 @@ INSTANTIATE_TEST_SUITE_P(
 //
 // TODO: Disabled on ChromeOS until M140, re-enable after M140.
 // See crbug.com/422251948.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_CorruptedSessionHistoryMismatch \
-  DISABLED_CorruptedSessionHistoryMismatch
-#else
 #define MAYBE_CorruptedSessionHistoryMismatch CorruptedSessionHistoryMismatch
-#endif
 IN_PROC_BROWSER_TEST_P(ValidateCommitOriginTest,
                        MAYBE_CorruptedSessionHistoryMismatch) {
   // Navigate to a page and store the session history.

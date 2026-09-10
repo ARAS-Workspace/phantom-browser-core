@@ -13,7 +13,7 @@ namespace feature_engagement {
 namespace events {
 
 // Desktop
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 // The user has explicitly opened a new tab via an entry point from inside of
 // Chrome.
 extern const char kNewTabOpened[];
@@ -69,7 +69,7 @@ extern const char kExtensionsRequestAccessButtonClicked[];
 // The user has accepted the Glic onboarding.
 extern const char kGlicOnboardingCompleted[];
 
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_IOS)
 // The user has opened Chrome (cold start or from background).

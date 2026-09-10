@@ -21,11 +21,6 @@
 #endif
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/shell_window_ids.h"
-#include "ui/aura/window.h"
-#endif
-
 std::unique_ptr<content::EyeDropper> ShowEyeDropper(
     content::RenderFrameHost* frame,
     content::EyeDropperListener* listener) {
@@ -49,11 +44,6 @@ std::unique_ptr<content::EyeDropper> ShowEyeDropper(
 
   auto* web_contents = content::WebContents::FromRenderFrameHost(frame);
   auto* parent = web_contents->GetNativeView();
-#if BUILDFLAG(IS_CHROMEOS)
-  // Parent on a top-level container to allow moving between displays.
-  parent =
-      parent->GetRootWindow()->GetChildById(ash::kShellWindowId_MenuContainer);
-#endif
   return std::make_unique<eye_dropper::EyeDropperView>(
       parent, web_contents->GetNativeView(), listener);
 }

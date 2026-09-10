@@ -58,7 +58,7 @@ IN_PROC_BROWSER_TEST_F(MultiTabLoadingPageLoadMetricsBrowserTest, SingleTab) {
 }
 
 // TODO(crbug.com/40830313): Test is flaky on Linux, Chrome OS, Mac.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_MultiTabForeground DISABLED_MultiTabForeground
 #else
 #define MAYBE_MultiTabForeground MultiTabForeground

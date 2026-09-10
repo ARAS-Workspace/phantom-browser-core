@@ -155,11 +155,7 @@ IN_PROC_BROWSER_TEST_F(ExclusiveAccessManagerPressAndHoldEscTest,
 
 // Disable the test on ChromeOS because the Exclusive Access Bubble isn't shown
 // for browser fullscreen.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_ShowExclusiveAccessBubble DISABLED_ShowExclusiveAccessBubble
-#else
 #define MAYBE_ShowExclusiveAccessBubble ShowExclusiveAccessBubble
-#endif  // IS_CHROMEOS
 IN_PROC_BROWSER_TEST_F(ExclusiveAccessManagerPressAndHoldEscTest,
                        MAYBE_ShowExclusiveAccessBubble) {
   // The bubble is shown after the browser enters fullscreen.

@@ -207,22 +207,18 @@ class TabSearchPageHandlerTest : public InProcessBrowserTest {
     tab_url5_ = embedded_test_server()->GetURL("/title1.html?5");
     tab_url6_ = embedded_test_server()->GetURL("/title1.html?6");
 
-#if !BUILDFLAG(IS_CHROMEOS)
     base::FilePath path =
         g_browser_process->profile_manager()->user_data_dir().AppendASCII(
             "testing_profile2");
     profile2_ = &profiles::testing::CreateProfileSync(
         g_browser_process->profile_manager(), path);
-#endif
 
     browser2_ = CreateBrowserForTest(profile1(), Browser::TYPE_NORMAL);
     browser3_ =
         CreateBrowserForTest(browser()->GetProfile()->GetPrimaryOTRProfile(
                                  /*create_if_needed=*/true),
                              Browser::TYPE_NORMAL);
-#if !BUILDFLAG(IS_CHROMEOS)
     browser4_ = CreateBrowserForTest(profile2_, Browser::TYPE_NORMAL);
-#endif
     browser5_ = CreateBrowserForTest(profile1(), Browser::TYPE_POPUP);
 
     browser1()->GetWindow()->Activate();
@@ -304,14 +300,12 @@ class TabSearchPageHandlerTest : public InProcessBrowserTest {
             tab_group_service_1);
     observer_1->Wait();
 
-#if !BUILDFLAG(IS_CHROMEOS)
     tab_groups::TabGroupSyncService* tab_group_service_2 =
         tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile2());
     auto observer_2 =
         std::make_unique<tab_groups::TabGroupSyncServiceInitializedObserver>(
             tab_group_service_2);
     observer_2->Wait();
-#endif
   }
 
  protected:
@@ -379,9 +373,7 @@ IN_PROC_BROWSER_TEST_F(TabSearchPageHandlerTest, MAYBE_GetTabs) {
   // Browser3 and browser4 are using different profiles, browser5 is not a
   // normal type browser, thus their tabs should not be accessible.
   AddTabWithTitle(browser5(), tab_url6_, kTabName6);
-#if !BUILDFLAG(IS_CHROMEOS)
   AddTabWithTitle(browser4(), tab_url5_, kTabName5);
-#endif
   AddTabWithTitle(browser3(), tab_url4_, kTabName4);
   AddTabWithTitle(browser2(), tab_url3_, kTabName3);
   AddTabWithTitle(browser1(), tab_url2_, kTabName2);
@@ -865,11 +857,7 @@ IN_PROC_BROWSER_TEST_F(TabSearchPageHandlerTest,
 // Ensure that tab model changes in a browser with a different profile
 // will not call TabsChanged().
 // TODO(crbug.com/537468010): Flaky on linux-chromeos-rel. Fix and re-enable.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_TabsNotChanged DISABLED_TabsNotChanged
-#else
 #define MAYBE_TabsNotChanged TabsNotChanged
-#endif
 IN_PROC_BROWSER_TEST_F(TabSearchPageHandlerTest, MAYBE_TabsNotChanged) {
   EXPECT_CALL(page_, TabsChanged(_)).Times(1);
   EXPECT_CALL(page_, TabUpdated(_)).Times(0);
@@ -878,11 +866,9 @@ IN_PROC_BROWSER_TEST_F(TabSearchPageHandlerTest, MAYBE_TabsNotChanged) {
   AddTabWithTitle(browser3(), tab_url1_,
                   kTabName1);  // Will not kick off timer.
   ASSERT_FALSE(IsTimerRunning());
-#if !BUILDFLAG(IS_CHROMEOS)
   AddTabWithTitle(browser4(), tab_url2_,
                   kTabName2);  // Will not kick off timer.
   ASSERT_FALSE(IsTimerRunning());
-#endif
 }
 
 // Verify tab update event is called correctly with data

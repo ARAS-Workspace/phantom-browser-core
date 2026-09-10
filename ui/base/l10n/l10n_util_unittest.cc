@@ -72,7 +72,7 @@ class StringWrapper {
 
 // On Android, we are disabling this test since GetApplicationLocale() just
 // returns the system's locale, which, similarly, is not easily unit tested.
-#if BUILDFLAG(IS_POSIX) && defined(USE_GLIB) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_POSIX) && defined(USE_GLIB)
 const bool kPlatformHasDefaultLocale = true;
 const bool kUseLocaleFromEnvironment = true;
 const bool kSupportsLocalePreference = false;

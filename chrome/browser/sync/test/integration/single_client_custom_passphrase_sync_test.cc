@@ -330,9 +330,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientCustomPassphraseSyncTest,
         /*user_settings_callback=*/base::BindOnce(
             [](syncer::SyncUserSettings* user_settings) {
               user_settings->SetEncryptionPassphrase("hunter2");
-#if !BUILDFLAG(IS_CHROMEOS)
               user_settings->SetInitialSyncFeatureSetupComplete();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
             })));
   } else {
     ASSERT_TRUE(SignIn());

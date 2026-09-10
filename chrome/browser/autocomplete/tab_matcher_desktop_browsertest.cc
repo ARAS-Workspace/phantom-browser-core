@@ -25,19 +25,8 @@
 #include "ui/base/window_open_disposition.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "base/command_line.h"
-#endif
-
 class TabMatcherDesktopTest : public InProcessBrowserTest {
  public:
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 constexpr auto kServiceInitializers =

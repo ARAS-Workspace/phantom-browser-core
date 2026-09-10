@@ -8,7 +8,7 @@
 
 namespace browser_defaults {
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 const bool kBrowserAliveWithNoWindows = true;
 const bool kShowExitMenuItem = false;
 #else
@@ -16,17 +16,10 @@ const bool kBrowserAliveWithNoWindows = false;
 const bool kShowExitMenuItem = true;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-const bool kShowUpgradeMenuItem = false;
-const bool kShowImportOnBookmarkBar = false;
-const bool kAlwaysOpenIncognitoBrowserIfStartedWithIncognitoSwitch = true;
-const bool kAlwaysCreateTabbedBrowserOnSessionRestore = false;
-#else
 const bool kShowUpgradeMenuItem = true;
 const bool kShowImportOnBookmarkBar = true;
 const bool kAlwaysOpenIncognitoBrowserIfStartedWithIncognitoSwitch = false;
 const bool kAlwaysCreateTabbedBrowserOnSessionRestore = true;
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 const bool kScrollEventChangesTab = true;

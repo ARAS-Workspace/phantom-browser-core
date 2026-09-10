@@ -155,11 +155,6 @@ PeerSessionImpl::PeerSessionImpl(
       connection_(std::move(connection)) {
   connection_->SetEventHandler(this);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // LocalMouseInputMonitorWin and LocalPointerInputMonitorChromeos filter out
-  // an echo of the injected input before it reaches `remote_input_filter_`.
-  input_pipeline_.remote_input_filter()->SetExpectLocalEcho(false);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void PeerSessionImpl::Start(
@@ -731,9 +726,6 @@ void PeerSessionImpl::CreateMediaStreams() {
     std::unique_ptr<AudioCapturer> audio_capturer =
         desktop_environment_->CreateAudioCapturer();
     if (audio_capturer) {
-#if BUILDFLAG(IS_CHROMEOS)
-      audio_capturer->SetAudioPlaybackMode(audio_playback_mode);
-#endif
       audio_stream_ = connection_->StartAudioStream(std::move(audio_capturer));
     }
   }

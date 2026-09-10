@@ -53,13 +53,6 @@ void PlatformManagementService::AddLocalBrowserManagementStatusProvider(
   has_local_browser_managment_status_provider_ = true;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void PlatformManagementService::AddChromeOsStatusProvider(
-    std::unique_ptr<ManagementStatusProvider> provider) {
-  AddManagementStatusProvider(std::move(provider));
-  has_cros_status_provider_ = true;
-}
-#endif
 
 
 

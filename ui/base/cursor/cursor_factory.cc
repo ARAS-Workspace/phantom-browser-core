@@ -98,7 +98,7 @@ void CursorFactory::ObserveThemeChanges() {
   NOTIMPLEMENTED();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 bool IsValidCursorThemeName(std::string_view name) {
   if (name.empty() || name == ".") {
@@ -230,6 +230,6 @@ std::vector<std::string> CursorNamesFromType(mojom::CursorType type) {
   NOTREACHED();
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace ui

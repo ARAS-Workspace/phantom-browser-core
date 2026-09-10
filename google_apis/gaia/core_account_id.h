@@ -71,15 +71,6 @@ struct COMPONENT_EXPORT(GOOGLE_APIS) CoreAccountId {
   // |CoreAccountId::ToString()|.
   static CoreAccountId FromString(const std::string& value);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Only on ChromeOS, CoreAccountId objects may be created from Gaia emails.
-  //
-  // Create a CoreAccountId object from an email.
-  // Returns an empty CoreAccountId if |email| is empty.
-  static CoreAccountId FromEmail(const std::string& email);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-  // ---------------------------------------- ---------------------------------
-
  private:
   std::string id_;
 };

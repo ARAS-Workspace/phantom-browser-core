@@ -118,26 +118,6 @@ void FakeGaiaMixin::SetupFakeGaiaForChildUser(const std::string& user_email,
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void FakeGaiaMixin::SetupFakeGaiaForLoginManager() {
-  SetupFakeGaiaForLoginWithDefaults();
-
-  FakeGaia::AccessTokenInfo token_info;
-  token_info.scopes.insert(GaiaConstants::kDeviceManagementServiceOAuth);
-  token_info.scopes.insert(GaiaConstants::kGoogleUserInfoEmail);
-  token_info.audience = GaiaUrls::GetInstance()->oauth2_chrome_client_id();
-
-  token_info.token = kTestUserinfoToken1;
-  token_info.expires_in = kFakeAccessTokenExpiration;
-  token_info.email = kEnterpriseUser1;
-  fake_gaia_->IssueOAuthToken(kTestRefreshToken1, token_info);
-
-  token_info.token = kTestUserinfoToken2;
-  token_info.email = kEnterpriseUser2;
-  fake_gaia_->IssueOAuthToken(kTestRefreshToken2, token_info);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 GURL FakeGaiaMixin::GetFakeGaiaURL(const std::string& relative_url) {
   return gaia_server_.GetURL(kGAIAHost, relative_url);
 }

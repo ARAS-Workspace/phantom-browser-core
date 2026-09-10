@@ -422,9 +422,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest, ChangeSidePanelWidth) {
   new_bounds.set_width(min_side_panel_width * 3);
   // Explicitly restore the browser window on ChromeOS, as it would otherwise
   // be maximized and the SetBounds call would be a no-op.
-#if BUILDFLAG(IS_CHROMEOS)
-  BrowserView::GetBrowserViewForBrowser(browser())->Restore();
-#endif
   BrowserView::GetBrowserViewForBrowser(browser())->SetBounds(new_bounds);
 
   coordinator()->Toggle(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks),
@@ -483,9 +480,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
   new_bounds.set_width(min_side_panel_width * 3);
   // Explicitly restore the browser window on ChromeOS, as it would otherwise
   // be maximized and the SetBounds call would be a no-op.
-#if BUILDFLAG(IS_CHROMEOS)
-  BrowserView::GetBrowserViewForBrowser(browser())->Restore();
-#endif
   BrowserView::GetBrowserViewForBrowser(browser())->SetBounds(new_bounds);
 
   // Switch to the read anything side panel and verify the width is greater than
@@ -529,9 +523,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
   new_bounds.set_width((min_side_panel_width - 3) * 3 / 2);
   // Explicitly restore the browser window on ChromeOS, as it would otherwise
   // be maximized and the SetBounds call would be a no-op.
-#if BUILDFLAG(IS_CHROMEOS)
-  BrowserView::GetBrowserViewForBrowser(browser())->Restore();
-#endif
   BrowserView::GetBrowserViewForBrowser(browser())->SetBounds(new_bounds);
 
   coordinator()->Toggle(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks),
@@ -2182,7 +2173,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
   EXPECT_EQ(GetHeader(), nullptr);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
                        SidePanelPinButtonsHideInGuestMode) {
   // Check that pin button shows in normal window.
@@ -2212,7 +2202,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
                    ->header_pin_button()
                    ->GetVisible());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Verifies that clicking the pin button on an extensions side panel, pins the
 // extension in ToolbarActionsModel.

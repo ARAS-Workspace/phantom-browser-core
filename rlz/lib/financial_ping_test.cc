@@ -33,27 +33,9 @@
 
 #include "base/time/time.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/factory_ping_embargo_check.h"
-#include "rlz/chromeos/lib/rlz_value_store_chromeos.h"
-#endif
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS)
-void RemoveMachineIdFromUrl(std::string* url) {
-  size_t id_offset = url->find("&id=");
-  EXPECT_NE(std::string::npos, id_offset);
-  url->resize(id_offset);
-}
-
-std::string ConvertTimeToRlzEmbargoDate(const base::Time& time) {
-  base::Time::Exploded exploded;
-  time.UTCExplode(&exploded);
-  return base::StringPrintf("%04d-%02d-%02d", exploded.year, exploded.month,
-                            exploded.day_of_month);
-}
-#endif
 
 // Ping times in 100-nanosecond intervals.
 const int64_t k1MinuteInterval = 60LL * 10000000LL;  // 1 minute
@@ -85,21 +67,12 @@ TEST_F(FinancialPingTest, FormRequest) {
   // Don't check the machine Id on Chrome OS since a random one is generated
   // each time.
   std::string machine_id;
-#if BUILDFLAG(IS_CHROMEOS)
-  bool got_machine_id = false;
-#else
   bool got_machine_id = rlz_lib::GetMachineId(&machine_id);
-#endif
 
   std::string request;
   EXPECT_TRUE(rlz_lib::FinancialPing::FormRequest(rlz_lib::TOOLBAR_NOTIFIER,
       points, "swg", brand, NULL, "en", false, &request));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Ignore the machine Id of the request URL.  On Chrome OS a random Id is
-  // generated with each request.
-  RemoveMachineIdFromUrl(&request);
-#endif
 
   std::string expected_response;
   base::StringAppendF(&expected_response,
@@ -115,11 +88,6 @@ TEST_F(FinancialPingTest, FormRequest) {
   EXPECT_TRUE(rlz_lib::FinancialPing::FormRequest(rlz_lib::TOOLBAR_NOTIFIER,
       points, "swg", brand, "IdOk2", NULL, false, &request));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Ignore the machine Id of the request URL.  On Chrome OS a random Id is
-  // generated with each request.
-  RemoveMachineIdFromUrl(&request);
-#endif
 
   expected_response.clear();
   base::StringAppendF(&expected_response,
@@ -308,45 +276,3 @@ TEST_F(FinancialPingTest, ClearLastPingTime) {
   EXPECT_TRUE(rlz_lib::FinancialPing::IsPingTime(rlz_lib::TOOLBAR_NOTIFIER,
                                                  false));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(FinancialPingTest, RlzEmbargoEndDate) {
-  // Do not set last ping time, verify that |IsPingTime| returns true.
-  EXPECT_TRUE(
-      rlz_lib::FinancialPing::IsPingTime(rlz_lib::TOOLBAR_NOTIFIER, false));
-
-  // Simulate writing a past embargo date to VPD, verify that |IsPingTime|
-  // returns true when the embargo date has already passed.
-  statistics_provider_->SetMachineStatistic(
-      ash::system::kRlzEmbargoEndDateKey,
-      ConvertTimeToRlzEmbargoDate(base::Time::NowFromSystemTime() -
-                                  base::Days(1)));
-
-  EXPECT_TRUE(
-      rlz_lib::FinancialPing::IsPingTime(rlz_lib::TOOLBAR_NOTIFIER, false));
-
-  // Simulate writing a future embargo date (less than
-  // |kEmbargoEndDateGarbageDateThresholdDays|) to VPD, verify that
-  // |IsPingTime| is false.
-  statistics_provider_->SetMachineStatistic(
-      ash::system::kRlzEmbargoEndDateKey,
-      ConvertTimeToRlzEmbargoDate(
-          base::Time::NowFromSystemTime() +
-          ash::system::kEmbargoEndDateGarbageDateThreshold - base::Days(1)));
-
-  EXPECT_FALSE(
-      rlz_lib::FinancialPing::IsPingTime(rlz_lib::TOOLBAR_NOTIFIER, false));
-
-  // Simulate writing a future embargo date (more than
-  // |kEmbargoEndDateGarbageDateThresholdDays|) to VPD, verify that
-  // |IsPingTime| is true.
-  statistics_provider_->SetMachineStatistic(
-      ash::system::kRlzEmbargoEndDateKey,
-      ConvertTimeToRlzEmbargoDate(
-          base::Time::NowFromSystemTime() +
-          ash::system::kEmbargoEndDateGarbageDateThreshold + base::Days(1)));
-
-  EXPECT_TRUE(
-      rlz_lib::FinancialPing::IsPingTime(rlz_lib::TOOLBAR_NOTIFIER, false));
-}
-#endif

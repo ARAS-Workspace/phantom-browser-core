@@ -43,11 +43,6 @@
 #include "extensions/common/url_pattern_set.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -108,10 +103,6 @@ class UserScriptListenerTest : public testing::Test {
   ~UserScriptListenerTest() override = default;
 
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager_enabler_ = std::make_unique<user_manager::ScopedUserManager>(
-        std::make_unique<ash::FakeChromeUserManager>());
-#endif
     ASSERT_TRUE(profile_manager_->SetUp());
     // The listener must be set up after the profile manager has been set up/
     // installed itself on the browser process.
@@ -188,9 +179,6 @@ class UserScriptListenerTest : public testing::Test {
   raw_ptr<TestingProfile> profile_ = nullptr;
   bool was_navigation_resumed_ = false;
   std::unique_ptr<content::WebContents> web_contents_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> user_manager_enabler_;
-#endif
   // TODO(https://crbug.com/40804030): Migrate this to only rely on MV3
   // extensions.
   ScopedTestMV2Enabler mv2_enabler_;

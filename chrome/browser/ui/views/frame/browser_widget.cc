@@ -42,14 +42,6 @@
 #include "ui/views/controls/menu/menu_runner.h"
 #include "ui/views/widget/native_widget.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ui/base/window_properties.h"
-#include "chromeos/ui/base/window_state_type.h"
-#include "chromeos/ui/wm/desks/desks_helper.h"
-#include "components/user_manager/user_manager.h"
-#include "ui/aura/window.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "ui/linux/linux_ui.h"
 #endif
@@ -471,13 +463,6 @@ ui::ColorProviderKey BrowserWidget::GetColorProviderKey() const {
   // Apply BrowserWidget overrides:
   key.app_controller =
       web_app::AppBrowserController::From(browser_view_->browser());
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS SystemWebApps use the OS theme all the time.
-  if (web_app::GetSystemWebAppType(browser_view_->browser()).has_value()) {
-    return key;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // frame_type.
   const bool use_custom_frame =

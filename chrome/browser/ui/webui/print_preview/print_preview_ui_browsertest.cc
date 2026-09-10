@@ -84,7 +84,7 @@ IN_PROC_BROWSER_TEST_F(PrintPreviewBrowserTest, PrintCommands) {
 }
 
 // Disable the test for mac, see http://crbug.com/40362877.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_TaskManagerNewPrintPreview DISABLED_TaskManagerNewPrintPreview
 #else
 #define MAYBE_TaskManagerNewPrintPreview TaskManagerNewPrintPreview

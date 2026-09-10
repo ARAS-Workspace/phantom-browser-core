@@ -22,14 +22,6 @@ int DeviceVideoCaptureMaxBufferPoolSize() {
   // Also, this must be greater than the frame delay of VideoToolbox encoder
   // for AVC High Profile.
   max_buffer_count = 15;
-#elif BUILDFLAG(IS_CHROMEOS)
-  // On Chrome OS with MIPI cameras running on HAL v3, there can be four
-  // concurrent streams of camera pipeline depth ~6. We allow at most 36 buffers
-  // here to take into account the delay caused by the consumer (e.g. display or
-  // video encoder).
-  if (switches::IsVideoCaptureUseGpuMemoryBufferEnabled()) {
-    max_buffer_count = 36;
-  }
 #endif
 
   return max_buffer_count;

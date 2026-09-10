@@ -173,14 +173,6 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
   void OnDiskCacheHandleDestoyed(
       const gpu::GpuDiskCacheHandle& handle) override;
   void CloseChannel(int32_t client_id) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void CreateJpegDecodeAccelerator(
-      mojo::PendingReceiver<chromeos_camera::mojom::MjpegDecodeAccelerator>
-          jda_receiver) override;
-  void CreateJpegEncodeAccelerator(
-      mojo::PendingReceiver<chromeos_camera::mojom::JpegEncodeAccelerator>
-          jea_receiver) override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 
   void CreateVideoEncodeAcceleratorProvider(

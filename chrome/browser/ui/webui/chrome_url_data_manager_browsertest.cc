@@ -154,10 +154,6 @@ IN_PROC_BROWSER_TEST_F(ChromeURLDataManagerTest, LargeResourceScale) {
   EXPECT_NE(net::OK, observer.net_error());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-class PrefService;
-#endif
-
 // URLs known to be slow to load leading to test flakiness.
 static constexpr const char* const kSlowChromeUrls[] = {
 #if BUILDFLAG(IS_LINUX)

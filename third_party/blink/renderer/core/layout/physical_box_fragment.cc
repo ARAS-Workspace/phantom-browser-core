@@ -621,7 +621,7 @@ const PhysicalBoxFragment* PhysicalBoxFragment::PostLayout() const {
 
 // TODO(crbug.com/1241721): Revert https://crrev.com/c/3108806 to re-enable this
 // DCHECK on CrOS.
-#if DCHECK_IS_ON() && !BUILDFLAG(IS_CHROMEOS)
+#if DCHECK_IS_ON()
   DCHECK(AllowPostLayoutScope::IsAllowed());
 #endif
   return post_layout;

@@ -81,13 +81,6 @@ class PrinterQuery {
   virtual void SetSettings(base::DictValue new_settings,
                            base::OnceClosure callback);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Updates the current settings with `new_settings`.
-  // Caller has to ensure that `this` is alive until `callback` is run.
-  void SetSettingsFromPOD(std::unique_ptr<PrintSettings> new_settings,
-                          base::OnceClosure callback);
-#endif
-
   // Sets the printable area in `print_settings` to be the default printable
   // area. Intended to be used only for virtual printers. Does not communicate
   // with printer drivers, so it does not require special OOPPD handling.
@@ -154,13 +147,6 @@ class PrinterQuery {
   // Called to update the print settings.
   virtual void UpdatePrintSettings(base::DictValue new_settings,
                                    SettingsCallback callback);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Called to update the print settings.
-  void UpdatePrintSettingsFromPOD(
-      std::unique_ptr<printing::PrintSettings> new_settings,
-      SettingsCallback callback);
-#endif
 
   // Used by `TransferContextToNewWorker()`.  Virtual to support testing.
   virtual std::unique_ptr<PrintJobWorker> CreatePrintJobWorker(

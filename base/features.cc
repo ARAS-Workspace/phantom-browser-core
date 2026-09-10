@@ -17,7 +17,7 @@
 #include "build/build_config.h"
 #include "build/buildflag.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include "base/message_loop/message_pump_epoll.h"
 #endif
 
@@ -110,11 +110,7 @@ BASE_FEATURE(kSimdutfBase64Encode, base::FEATURE_DISABLED_BY_DEFAULT);
 // The feature is enabled by default on ChromeOS where crashes caused by
 // unreliable stack end are found. See https://crbug.com/402542102
 BASE_FEATURE(kStackScanMaxFramePointerToStackEndGap,
-#if BUILDFLAG(IS_CHROMEOS)
-             FEATURE_ENABLED_BY_DEFAULT
-#else
              FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 BASE_FEATURE_PARAM(int,
                    kStackScanMaxFramePointerToStackEndGapThresholdMB,
@@ -122,7 +118,7 @@ BASE_FEATURE_PARAM(int,
                    "StackScanMaxFramePointerToStackEndGapThresholdMB",
                    100);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 // Force to enable LowEndDeviceMode partially on Android 3Gb devices.
 // (see PartialLowEndModeOnMidRangeDevices below)
 BASE_FEATURE(kPartialLowEndModeOn3GbDevices, FEATURE_DISABLED_BY_DEFAULT);
@@ -139,11 +135,9 @@ BASE_FEATURE(kPartialLowEndModeOn3GbDevices, FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kPartialLowEndModeOnMidRangeDevices,
 #if BUILDFLAG(IS_ANDROID)
              FEATURE_ENABLED_BY_DEFAULT);
-#elif BUILDFLAG(IS_CHROMEOS)
-             FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 // Enable not perceptible binding without cpu priority boosting.
@@ -242,11 +236,11 @@ void Init() {
   debug::StackTrace::InitializeFeatures();
   FilePath::InitializeFeatures();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   MessagePumpEpoll::InitializeFeatures();
 #endif
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE)
   PlatformThread::InitializeFeatures();
 #endif
 

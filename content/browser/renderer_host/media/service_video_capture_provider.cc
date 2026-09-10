@@ -26,22 +26,10 @@
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 #include "services/video_capture/public/mojom/video_capture_service.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "content/public/browser/chromeos/delegate_to_browser_gpu_service_accelerator_factory.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 
 using GetSourceInfosResult =
     video_capture::mojom::VideoSourceProvider::GetSourceInfosResult;
-
-#if BUILDFLAG(IS_CHROMEOS)
-std::unique_ptr<video_capture::mojom::AcceleratorFactory>
-CreateAcceleratorFactory() {
-  return std::make_unique<
-      content::DelegateToBrowserGpuServiceAcceleratorFactory>();
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // anonymous namespace
 
@@ -92,24 +80,10 @@ class ServiceVideoCaptureProvider::ServiceProcessObserver
   const base::RepeatingClosure stop_callback_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-ServiceVideoCaptureProvider::ServiceVideoCaptureProvider(
-    base::RepeatingCallback<void(const std::string&)> emit_log_message_cb)
-    : ServiceVideoCaptureProvider(base::NullCallback(),
-                                  std::move(emit_log_message_cb)) {}
-
-ServiceVideoCaptureProvider::ServiceVideoCaptureProvider(
-    CreateAcceleratorFactoryCallback create_accelerator_factory_cb,
-    base::RepeatingCallback<void(const std::string&)> emit_log_message_cb)
-    : create_accelerator_factory_cb_(std::move(create_accelerator_factory_cb)),
-      emit_log_message_cb_(std::move(emit_log_message_cb)),
-      launcher_has_connected_to_source_provider_(false) {
-#else   // BUILDFLAG(IS_CHROMEOS)
 ServiceVideoCaptureProvider::ServiceVideoCaptureProvider(
     base::RepeatingCallback<void(const std::string&)> emit_log_message_cb)
     : emit_log_message_cb_(std::move(emit_log_message_cb)),
       launcher_has_connected_to_source_provider_(false) {
-#endif  // BUILDFLAG(IS_CHROMEOS)
   if (features::IsVideoCaptureServiceEnabledForOutOfProcess()) {
     service_process_observer_.emplace(
         GetUIThreadTaskRunner({}),
@@ -234,18 +208,6 @@ ServiceVideoCaptureProvider::LazyConnectToService() {
   time_of_last_connect_ = base::TimeTicks::Now();
 
   auto ui_task_runner = GetUIThreadTaskRunner({});
-#if BUILDFLAG(IS_CHROMEOS)
-  mojo::PendingRemote<video_capture::mojom::AcceleratorFactory>
-      accelerator_factory;
-  if (!create_accelerator_factory_cb_)
-    create_accelerator_factory_cb_ =
-        base::BindRepeating(&CreateAcceleratorFactory);
-  mojo::MakeSelfOwnedReceiver(
-      create_accelerator_factory_cb_.Run(),
-      accelerator_factory.InitWithNewPipeAndPassReceiver());
-  GetVideoCaptureService().InjectGpuDependencies(
-      std::move(accelerator_factory));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   mojo::Remote<video_capture::mojom::VideoSourceProvider> source_provider;
   GetVideoCaptureService().ConnectToVideoSourceProvider(

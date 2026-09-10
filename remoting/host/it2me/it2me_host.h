@@ -158,9 +158,6 @@ class It2MeHost : public base::RefCountedThreadSafe<It2MeHost>,
   protocol::ValidatingAuthenticator::ValidationCallback
   GetValidationCallbackForTesting();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetHostEventReporterFactoryForTesting(HostEventReporterFactory factory);
-#endif
 
   // Called when initial policies are read and when they change.
   void OnPolicyUpdate(base::DictValue policies);
@@ -253,10 +250,6 @@ class It2MeHost : public base::RefCountedThreadSafe<It2MeHost>,
   std::unique_ptr<HostEventLogger> host_event_logger_;
   std::unique_ptr<LocalSessionPoliciesProvider>
       local_session_policies_provider_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<HostEventReporter> host_event_reporter_;
-  HostEventReporterFactory host_event_reporter_factory_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   bool use_corp_session_authz_ = false;
 

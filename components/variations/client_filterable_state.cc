@@ -120,8 +120,6 @@ Study::Platform ClientFilterableState::GetCurrentPlatform() {
   return Study::PLATFORM_IOS;
 #elif BUILDFLAG(IS_MAC)
   return Study::PLATFORM_MAC;
-#elif BUILDFLAG(IS_CHROMEOS)
-  return Study::PLATFORM_CHROMEOS;
 #elif BUILDFLAG(IS_ANDROID)
   return Study::PLATFORM_ANDROID;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD) || BUILDFLAG(IS_SOLARIS)
@@ -148,7 +146,7 @@ base::Version ClientFilterableState::GetOSVersion() {
 
 std::string ClientFilterableState::GetHardwareClass() {
   // TODO(crbug.com/40708998): Expand to other platforms.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return base::SysInfo::HardwareModelName();
 #else
   return "";

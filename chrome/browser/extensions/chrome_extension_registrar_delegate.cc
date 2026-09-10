@@ -55,12 +55,6 @@
 #include "extensions/common/permissions/permission_set.h"
 #include "extensions/common/permissions/permissions_data.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/fileapi/file_system_backend.h"
-#include "content/public/browser/storage_partition.h"
-#include "storage/browser/file_system/file_system_context.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/extensions/sync/extension_sync_service.h"
 #include "chrome/browser/ui/webui/theme_source.h"
@@ -188,19 +182,6 @@ void ChromeExtensionRegistrarDelegate::PostDeactivateExtension(
   auto* special_storage_policy = profile_->GetExtensionSpecialStoragePolicy();
   CHECK(special_storage_policy);
   special_storage_policy->RevokeRightsForExtension(extension.get(), profile_);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Revoke external file access for the extension from its file system context.
-  // It is safe to access the extension's storage partition at this point. The
-  // storage partition may get destroyed only after the extension gets unloaded.
-  storage::FileSystemContext* filesystem_context =
-      util::GetStoragePartitionForExtensionId(extension->id(), profile_)
-          ->GetFileSystemContext();
-  if (filesystem_context && ash::FileSystemBackend::Get(*filesystem_context)) {
-    ash::FileSystemBackend::Get(*filesystem_context)
-        ->RevokeAccessForOrigin(extension->origin());
-  }
-#endif
 
   // TODO(kalman): This is broken. The crash reporter is process-wide so doesn't
   // work properly multi-profile. Besides which, it should be using

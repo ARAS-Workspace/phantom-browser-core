@@ -81,7 +81,6 @@ SmartRestartManager::SmartRestartManager(UpgradeDetector* upgrade_detector)
   // Exclude ChromeOS from Lock Screen trigger because calling AttemptRestart
   // on ChromeOS triggers a full system reboot when an update is pending,
   // which is too disruptive.
-#if !BUILDFLAG(IS_CHROMEOS)
   lock_state_subscription_ = ui::AddScreenLockCallback(base::BindRepeating(
       &SmartRestartManager::OnLockStateChanged, base::Unretained(this)));
   if (ui::CheckIdleStateIsLocked()) {
@@ -101,7 +100,6 @@ SmartRestartManager::SmartRestartManager(UpgradeDetector* upgrade_detector)
                        weak_factory_.GetWeakPtr(), true),
         base::Seconds(delay_secs));
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 SmartRestartManager::~SmartRestartManager() = default;
@@ -123,9 +121,7 @@ void SmartRestartManager::MaybeStartRestartTimer() {
   MaybeStartZeroWindowTimer();
 #endif  // BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_CHROMEOS)
   MaybeStartLockScreenTimer();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 void SmartRestartManager::OnLockStateChanged(bool is_locked) {

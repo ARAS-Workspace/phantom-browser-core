@@ -231,7 +231,7 @@ TEST_F(AutoPipSettingViewTest, TestOriginLabelForGURLWithLocalHost) {
                                origin_text_without_ellipsis));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // TODO (crbug.com/41494303): Evaluate fix and re-enable
 #define MAYBE_WidgetIsCenteredWhenArrowIsFloat \
   DISABLED_WidgetIsCenteredWhenArrowIsFloat

@@ -36,7 +36,7 @@
 #include "components/prefs/pref_service.h"
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/views/extensions/extension_post_install_dialog_view_utils.h"
 #endif
 
@@ -165,7 +165,7 @@ void ShowExtensionPostInstallDialog(
                                   weak_delegate->model(),
                                   manage_shortcuts_callback);
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // Add a sync or sign in promo in the footer if it should be shown.
   extensions::ExtensionRegistry* registry =
       extensions::ExtensionRegistry::Get(profile);
@@ -177,7 +177,7 @@ void ShowExtensionPostInstallDialog(
     extensions::MaybeAddSigninPromoFootnoteView(
         profile, web_contents, *extension, dialog_model_builder);
   }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   std::unique_ptr<ui::DialogModel> dialog_model = dialog_model_builder.Build();
   ShowDialog(native_window, weak_delegate->model()->extension_id(),

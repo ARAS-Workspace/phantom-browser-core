@@ -211,13 +211,6 @@ bool TestExtensionsBrowserClient::AreExtensionsDisabledForContext(
   return false;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-bool TestExtensionsBrowserClient::IsActiveContext(
-    content::BrowserContext* browser_context) const {
-  return true;
-}
-#endif
-
 bool TestExtensionsBrowserClient::IsGuestSession(
     BrowserContext* context) const {
   return false;

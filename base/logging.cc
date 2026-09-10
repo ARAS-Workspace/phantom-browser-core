@@ -93,9 +93,6 @@ typedef FILE* FileHandle;
 #include "base/android/jni_android.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/files/scoped_file.h"
-#endif
 
 
 namespace logging {
@@ -189,10 +186,6 @@ const char* log_severity_name(int severity) {
 // LoggingDestination values joined by bitwise OR.
 uint32_t g_logging_destination = LOG_DEFAULT;
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Specifies the format of log header for chrome os.
-LogFormat g_log_format = LogFormat::LOG_FORMAT_SYSLOG;
-#endif
 
 
 // For LOGGING_ERROR and above, always print to stderr.
@@ -408,9 +401,6 @@ BASE_EXPORT logging::LogSeverity LOGGING_DCHECK = LOGGING_ERROR;
 std::ostream* g_swallow_stream;
 
 bool BaseInitLoggingImpl(const LoggingSettings& settings) {
-#if BUILDFLAG(IS_CHROMEOS)
-  g_log_format = settings.log_format;
-#endif
 
   MaybeInitializeVlogInfo();
 
@@ -433,13 +423,6 @@ bool BaseInitLoggingImpl(const LoggingSettings& settings) {
   // default log file will re-initialize to the new options.
   CloseLogFileUnlocked();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (settings.log_file) {
-    CHECK(settings.log_file_path.empty());
-    g_log_file = settings.log_file;
-    return true;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   CHECK(!settings.log_file_path.empty())
       << "LOG_TO_FILE set but no log_file_path!";
@@ -793,13 +776,6 @@ void LogMessage::Init(const char* file, int line) {
                            std::min(std::size_t{6}, strlen(file)))
                      : file;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (g_log_format == LogFormat::LOG_FORMAT_SYSLOG) {
-    InitWithSyslogPrefix(
-        filename, line, TickCount(), log_severity_name(severity_), g_log_prefix,
-        g_log_process_id, g_log_thread_id, g_log_timestamp, g_log_tickcount);
-  } else
-#endif  // BUILDFLAG(IS_CHROMEOS)
   {
     // TODO(darin): It might be nice if the columns were fixed width.
     stream_ << '[';
@@ -939,38 +915,12 @@ void CloseLogFile() {
   CloseLogFileUnlocked();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-FILE* DuplicateLogFILE() {
-  if ((g_logging_destination & LOG_TO_FILE) == 0 ||
-      !InitializeLogFileHandle()) {
-    return nullptr;
-  }
-
-  int log_fd = fileno(g_log_file);
-  if (log_fd == -1) {
-    return nullptr;
-  }
-  base::ScopedFD dup_fd(dup(log_fd));
-  if (dup_fd == -1) {
-    return nullptr;
-  }
-  FILE* duplicate = fdopen(dup_fd.get(), "a");
-  if (!duplicate) {
-    return nullptr;
-  }
-  std::ignore = dup_fd.release();
-  return duplicate;
-}
-#endif
 
 
 // Used for testing. Declared in test/scoped_logging_settings.h.
 ScopedLoggingSettings::ScopedLoggingSettings()
     : min_log_level_(g_min_log_level),
       logging_destination_(g_logging_destination),
-#if BUILDFLAG(IS_CHROMEOS)
-      log_format_(g_log_format),
-#endif  // BUILDFLAG(IS_CHROMEOS)
       enable_process_id_(g_log_process_id),
       enable_thread_id_(g_log_thread_id),
       enable_timestamp_(g_log_timestamp),
@@ -995,9 +945,6 @@ ScopedLoggingSettings::~ScopedLoggingSettings() {
   // name and handle state, including re-initializing the VLOG internal state.
   CHECK(InitLogging({.logging_dest = logging_destination_,
                      .log_file_path = log_file_name_,
-#if BUILDFLAG(IS_CHROMEOS)
-                     .log_format = log_format_
-#endif
   })) << "~ScopedLoggingSettings() failed to restore settings.";
 
   // Restore plain data settings.
@@ -1008,11 +955,6 @@ ScopedLoggingSettings::~ScopedLoggingSettings() {
   SetLogMessageHandler(message_handler_);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void ScopedLoggingSettings::SetLogFormat(LogFormat log_format) const {
-  g_log_format = log_format;
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void RawLog(int level, const char* message) {
   if (level >= g_min_log_level && message) {

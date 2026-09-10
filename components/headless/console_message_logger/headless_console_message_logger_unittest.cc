@@ -52,13 +52,8 @@ TEST_F(HeadlessConsoleMessageLoggerTest, Basics) {
                               u"test.js");
 
   const char kExpected[] =
-#if BUILDFLAG(IS_CHROMEOS)
-      R"(INFO components_unittests: [CONSOLE:42] "foobar", source: test.js (42)
-)";
-#else
       R"([INFO:CONSOLE:42] "foobar", source: test.js (42)
 )";
-#endif
   EXPECT_THAT(log_string(), testing::StrEq(kExpected));
 }
 

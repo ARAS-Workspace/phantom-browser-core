@@ -355,9 +355,6 @@ bool CanViewSource(BrowserWindowInterface* browser);
 bool CanToggleCaretBrowsing(BrowserWindowInterface* browser);
 void ToggleCaretBrowsing(BrowserWindowInterface* browser);
 void PromptToNameWindow(BrowserWindowInterface* browser);
-#if BUILDFLAG(IS_CHROMEOS)
-void ToggleMultitaskMenu(BrowserWindowInterface* browser);
-#endif
 void ExecuteUIDebugCommand(int id, const BrowserWindowInterface* browser);
 
 std::optional<int> GetKeyboardFocusedTabIndex(

@@ -48,11 +48,7 @@ namespace content {
 namespace {
 
 inline bool IsChromeOS() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif
 }
 
 inline bool IsArchitectureArm() {
@@ -73,21 +69,10 @@ inline bool UseV4L2Codec(
 #endif
 }
 
-#if BUILDFLAG(IS_CHROMEOS) && defined(ARCH_CPU_ARM_FAMILY)
-static const char kMaliConfPath[] = "/etc/mali_platform.conf";
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) && defined(__aarch64__)
-static const char kLibGlesPath[] = "/usr/lib64/libGLESv2.so.2";
-static const char kLibEglPath[] = "/usr/lib64/libEGL.so.1";
-static const char kLibMaliPath[] = "/usr/lib64/libmali.so";
-static const char kLibTegraPath[] = "/usr/lib64/libtegrav4l2.so";
-#else
 static const char kLibGlesPath[] = "/usr/lib/libGLESv2.so.2";
 static const char kLibEglPath[] = "/usr/lib/libEGL.so.1";
 static const char kLibMaliPath[] = "/usr/lib/libmali.so";
 static const char kLibTegraPath[] = "/usr/lib/libtegrav4l2.so";
-#endif
 
 constexpr int dlopen_flag = RTLD_NOW | RTLD_GLOBAL | RTLD_NODELETE;
 
@@ -183,13 +168,6 @@ void AddArmMaliGpuPermissions(std::vector<BrokerFilePermission>* permissions) {
   permissions->push_back(BrokerFilePermission::ReadWrite(kMali0Path));
   // Need to be able to dlopen libmali.so from libEGL.so.
   permissions->push_back(BrokerFilePermission::ReadOnly(kLibMaliPath));
-
-#if BUILDFLAG(IS_CHROMEOS) && defined(ARCH_CPU_ARM_FAMILY)
-  // Files needed for protected DMA allocations.
-  static const char kDmaHeapPath[] = "/dev/dma_heap/restricted_mtk_cma";
-  permissions->push_back(BrokerFilePermission::ReadWrite(kDmaHeapPath));
-  permissions->push_back(BrokerFilePermission::ReadOnly(kMaliConfPath));
-#endif
 
   // Non-privileged render nodes for format enumeration.
   // https://dri.freedesktop.org/docs/drm/gpu/drm-uapi.html#render-nodes
@@ -439,15 +417,6 @@ void AddStandardGpuPermissions(std::vector<BrokerFilePermission>* permissions) {
 }
 
 void LoadArmGpuLibraries() {
-#if BUILDFLAG(IS_CHROMEOS) && defined(ARCH_CPU_ARM_FAMILY)
-  // This environmental variable needs to be set before we load libMali if we
-  // want to instantiate protected Vulkan device queues.
-  static const char kMaliConfVar[] = "MALI_PLATFORM_CONFIG";
-  // Note this function will only fail if we run out of memory entirely, in
-  // which case we would have much bigger problems, so we don't bother to check
-  // the return value.
-  setenv(kMaliConfVar, kMaliConfPath, 1);
-#endif
 
   // Preload the Mali library.
   {

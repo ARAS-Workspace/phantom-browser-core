@@ -21,7 +21,7 @@ namespace {
 
 constexpr size_t kTestLength = 8;
 
-#if BUILDFLAG(USE_CUPS) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(USE_CUPS)
 constexpr gfx::Size kIsoA4Microns(210000, 297000);
 constexpr gfx::Size kNaLetterMicrons(216000, 279000);
 #endif
@@ -61,7 +61,7 @@ TEST(PrintingUtilsTest, FormatDocumentTitleWithOwner) {
   EXPECT_EQ("ab...j: ", Format("abcdefghij", "0123456789"));
 }
 
-#if BUILDFLAG(USE_CUPS) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(USE_CUPS)
 TEST(PrintingUtilsTest, GetDefaultPaperSizeFromLocaleMicrons) {
   // Valid locales
   EXPECT_EQ(kNaLetterMicrons, GetDefaultPaperSizeFromLocaleMicrons("en-US"));
@@ -104,6 +104,6 @@ TEST(PrintingUtilsTest, SizesEqualWithinEpsilon) {
   EXPECT_TRUE(
       SizesEqualWithinEpsilon(kIsoA4Microns, gfx::Size(210500, 296500), 500));
 }
-#endif  // BUILDFLAG(USE_CUPS) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(USE_CUPS)
 
 }  // namespace printing

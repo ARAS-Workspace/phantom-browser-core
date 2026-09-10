@@ -106,12 +106,7 @@ void Operation::PostTask(base::OnceClosure task) {
 
 void Operation::Start() {
   DCHECK(IsRunningInCorrectSequence());
-#if BUILDFLAG(IS_CHROMEOS)
-  if (download_folder_.empty() ||
-      !temp_dir_->CreateUniqueTempDirUnderPath(download_folder_)) {
-#else
   if (!temp_dir_->CreateUniqueTempDir()) {
-#endif
     Error(error::kTempDirError);
     return;
   }
@@ -226,7 +221,6 @@ void Operation::CompleteAndContinue(base::OnceClosure continuation) {
   PostTask(std::move(continuation));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 void Operation::StartUtilityClient() {
   DCHECK(IsRunningInCorrectSequence());
   if (!image_writer_client_.get()) {
@@ -252,7 +246,6 @@ void Operation::WriteImageProgress(int64_t total_bytes, int64_t curr_bytes) {
     SetProgress(progress);
   }
 }
-#endif
 
 void Operation::GetMD5SumOfFile(
     const base::FilePath& file_path,

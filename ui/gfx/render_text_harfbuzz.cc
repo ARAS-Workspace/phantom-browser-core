@@ -201,7 +201,7 @@ bool TypefaceHasColorEmojiTable(SkTypeface* typeface) {
 const char* GetPlatformColorEmojiFontName() {
 #if BUILDFLAG(IS_APPLE)
   return "Apple Color Emoji";
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
   return "Noto Color Emoji";
 #else
   return nullptr;

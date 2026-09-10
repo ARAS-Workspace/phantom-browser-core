@@ -115,12 +115,12 @@ COMPONENT_EXPORT(GFX)
 FontRenderParams GetFontRenderParams(const FontRenderParamsQuery& query,
                                      std::string* family_out);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Clears GetFontRenderParams()'s cache.
 COMPONENT_EXPORT(GFX) void ClearFontRenderParamsCache();
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/517630459) Return this to `ForTesting()` after per display
 // subpixel rendering is implemented.
 COMPONENT_EXPORT(GFX) bool GetFontRenderParamsSubpixelRenderingEnabled();
@@ -129,7 +129,7 @@ COMPONENT_EXPORT(GFX) bool GetFontRenderParamsSubpixelRenderingEnabled();
 // Gets the device scale factor to query the FontRenderParams.
 COMPONENT_EXPORT(GFX) float GetFontRenderParamsDeviceScaleFactor();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 // Sets the device scale factor for FontRenderParams to decide
 // if it should enable subpixel positioning.
 COMPONENT_EXPORT(GFX)

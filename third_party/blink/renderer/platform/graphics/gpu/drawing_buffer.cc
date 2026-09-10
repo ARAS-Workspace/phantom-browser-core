@@ -729,7 +729,7 @@ scoped_refptr<StaticBitmapImage> DrawingBuffer::TransferToStaticBitmapImage() {
   if (CheckForDestructionAndChangeAndResolveIfNeeded(kDiscardAllowed) ==
       kContentsResolvedIfNeeded) {
     // NOTE: GPU compositing is always used on Android and ChromeOS.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
     shared_image =
         ExportSharedImageFromBackBuffer(sync_token, &release_callback);
 #else

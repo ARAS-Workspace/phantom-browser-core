@@ -244,12 +244,6 @@ ChildProcessLauncherHelper::ChildProcessLauncherHelper(
 }
 
 ChildProcessLauncherHelper::~ChildProcessLauncherHelper() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(features::kSchedQoSOnResourcedForChrome) &&
-      process_id_.has_value()) {
-    base::Process::Open(process_id_.value()).ForgetPriority();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_IOS)
   GetProcessLauncherTaskRunner()->DeleteSoon(FROM_HERE,
                                              std::move(scoped_temp_dir_));

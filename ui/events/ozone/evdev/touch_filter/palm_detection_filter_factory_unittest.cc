@@ -55,31 +55,6 @@ class PalmDetectionFilterFactoryTest : public testing::Test {
 class PalmDetectionFilterFactoryDeathTest
     : public PalmDetectionFilterFactoryTest {};
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(PalmDetectionFilterFactoryTest, RadiusesFromLSBRelease) {
-  {
-    base::test::ScopedChromeOSVersionInfo version(
-        "CHROMEOS_RELEASE_BOARD=hatch\n", base::Time());
-    EXPECT_EQ("0.1010944, 3.51837568",
-              internal::FetchNeuralPalmRadiusPolynomial(
-                  kohaku_touchscreen_info_, ""));
-  }
-  {
-    base::test::ScopedChromeOSVersionInfo version(
-        "CHROMEOS_RELEASE_BOARD=reef\n", base::Time());
-    EXPECT_EQ("0.17889799, 4.22584412",
-              internal::FetchNeuralPalmRadiusPolynomial(
-                  kohaku_touchscreen_info_, ""));
-  }
-  {
-    base::test::ScopedChromeOSVersionInfo version(
-        "CHROMEOS_RELEASE_BOARD=octopus\n", base::Time());
-    EXPECT_EQ("", internal::FetchNeuralPalmRadiusPolynomial(
-                      kohaku_touchscreen_info_, ""));
-  }
-}
-#endif
-
 TEST_F(PalmDetectionFilterFactoryTest, RadiusFromSwitch) {
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       kOzoneNNPalmSwitchName, "{\"radius-polynomial\" : \"15.8,22.7,30.01\"}");

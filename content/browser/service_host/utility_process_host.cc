@@ -66,7 +66,7 @@
 #include "content/browser/v8_snapshot_files.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "base/files/file_util.h"
 #include "base/files/scoped_file.h"
 #include "base/pickle.h"
@@ -90,7 +90,7 @@ namespace content {
 
 namespace {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 base::ScopedFD PassNetworkContextParentDirs(
     std::vector<base::FilePath> network_context_parent_dirs) {
   base::Pickle pickle;
@@ -113,7 +113,7 @@ base::ScopedFD PassNetworkContextParentDirs(
 
   return read_fd;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 }  // namespace
 
@@ -126,7 +126,7 @@ void UtilityProcessHost::RegisterUtilityMainThreadFactory(
 
 UtilityProcessHost::Options::Options()
     : sandbox_type_(sandbox::mojom::Sandbox::kUtility),
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       child_flags_(ChildProcessHost::CHILD_ALLOW_SELF),
 #else
       child_flags_(ChildProcessHost::CHILD_NORMAL),
@@ -373,7 +373,7 @@ bool UtilityProcessHost::StartProcess() {
       sandbox::policy::switches::kNoSandbox,
       sandbox::policy::switches::kDisableLandlockSandbox,
       sandbox::policy::switches::kDisableSeccompFilterSandbox,
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       switches::kDisableDevShmUsage,
 #endif
 #if BUILDFLAG(ENABLE_VRP_FLAGS)
@@ -408,8 +408,7 @@ bool UtilityProcessHost::StartProcess() {
       switches::kFailAudioStreamCreation,
       switches::kMuteAudio,
       switches::kUseFileForFakeAudioCapture,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FREEBSD) || \
-    BUILDFLAG(IS_SOLARIS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FREEBSD) || BUILDFLAG(IS_SOLARIS)
       switches::kAlsaInputDevice,
       switches::kAlsaOutputDevice,
 #endif
@@ -419,9 +418,6 @@ bool UtilityProcessHost::StartProcess() {
 #if BUILDFLAG(ENABLE_VR)
       device::switches::kWebXrHandAnonymizationStrategy,
       device::switches::kWebXrMaxFramebufferScale,
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-      switches::kSchedulerBoostUrgent,
 #endif
       switches::kFakeBackgroundBlurTogglePeriod,
 #if BUILDFLAG(USE_V4L2_CODEC)
@@ -471,7 +467,7 @@ bool UtilityProcessHost::StartProcess() {
       GetV8SnapshotFilesToPreload(*cmd_line));
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // The network service should have access to the parent directories
   // necessary for its usage.
   if (options_.sandbox_type_ == sandbox::mojom::Sandbox::kNetwork) {
@@ -480,7 +476,7 @@ bool UtilityProcessHost::StartProcess() {
     options_.file_data_->files_to_preload[kNetworkContextParentDirsDescriptor] =
         PassNetworkContextParentDirs(std::move(network_context_parent_dirs));
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)
   // Pass `kVideoCaptureUseGpuMemoryBuffer` flag to video capture service only

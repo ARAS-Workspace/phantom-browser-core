@@ -92,18 +92,6 @@
 #include "content/public/common/content_features.h"
 #include "extensions/browser/guest_view/web_view/web_view_guest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/apps/app_service/browser_app_launcher.h"
-#include "chrome/browser/apps/app_service/chrome_app_deprecation/chrome_app_deprecation.h"
-#include "chrome/browser/apps/platform_apps/app_browsertest_util.h"
-#include "chrome/browser/extensions/chrome_test_extension_loader.h"
-#include "extensions/browser/app_window/app_window_registry.h"
-#include "extensions/test/extension_test_message_listener.h"
-#include "extensions/test/test_extension_dir.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 using captive_portal::CaptivePortalResult;
@@ -2139,136 +2127,6 @@ IN_PROC_BROWSER_TEST_F(IWACaptivePortalBrowserTest,
 }
 
 // ChromeApps are only enabled on ChromeOS
-#if BUILDFLAG(IS_CHROMEOS)
-class ChromeAppCaptivePortalBrowserTest : public CaptivePortalBrowserTest {
- public:
-  ChromeAppCaptivePortalBrowserTest() = default;
-
-  void LaunchPlatformApp(const extensions::Extension* extension) {
-    apps::AppServiceProxyFactory::GetForProfile(GetProfile())
-        ->BrowserAppLauncher()
-        ->LaunchAppWithParamsForTesting(apps::AppLaunchParams(
-            extension->id(), apps::LaunchContainer::kLaunchContainerNone,
-            WindowOpenDisposition::NEW_WINDOW, apps::LaunchSource::kFromTest));
-  }
-
-  content::RenderFrameHost* InstallAndLaunchChromeApp() {
-    base::ScopedAllowBlockingForTesting allow_blocking;
-
-    extension_dir_.WriteManifest(R"({
-                      "name": "Captive Portal WebView Test App",
-                      "version": "1.0",
-                      "manifest_version": 2,
-                      "app": {
-                        "background": {
-                          "scripts": ["background.js"]
-                        }
-                      },
-                      "permissions": ["webview"]
-                    })");
-
-    extension_dir_.WriteFile(FILE_PATH_LITERAL("background.js"), R"(
-                      chrome.app.runtime.onLaunched.addListener(function() {
-                        chrome.app.window.create('embedder.html', {
-                          'innerBounds': {'width': 100, 'height': 100}
-                        });
-                      });
-                    )");
-
-    extension_dir_.WriteFile(FILE_PATH_LITERAL("embedder.html"), R"(
-                      <!DOCTYPE html>
-                      <html><head><title>Test Chrome App</title></head>
-                      <body>
-                          <script src="embedder.js"></script>
-                      </body></html>
-                    )");
-
-    extension_dir_.WriteFile(FILE_PATH_LITERAL("embedder.js"), R"(
-                  onload = function() {
-                    chrome.test.sendMessage('Launched');
-                  };
-                )");
-
-    ExtensionTestMessageListener listener("Launched");
-    extensions::ChromeTestExtensionLoader extension_loader(GetProfile());
-    extension_loader.set_pack_extension(false);
-
-    scoped_refptr<const extensions::Extension> extension =
-        extension_loader.LoadExtension(extension_dir_.UnpackedPath());
-    CHECK(extension);
-
-    apps::chrome_app_deprecation::ScopedAddAppToAllowlistForTesting allowlist(
-        extension->id());
-
-    LaunchPlatformApp(extension.get());
-
-    CHECK(listener.WaitUntilSatisfied());
-
-    // Flush any pending events to make sure we start with a clean slate.
-    content::RunAllPendingInMessageLoop();
-
-    extensions::AppWindowRegistry* app_registry =
-        extensions::AppWindowRegistry::Get(browser()->GetProfile());
-
-    extensions::AppWindow* window =
-        app_registry->GetCurrentAppWindowForApp(extension->id());
-    CHECK(window);
-
-    return window->web_contents()->GetPrimaryMainFrame();
-  }
-
-  void CreateWebView(content::RenderFrameHost* app_frame, const GURL& src) {
-    // JavaScript to create a <webview> element and append it to the body.
-    constexpr static std::string_view kCreateWebView = R"(
-        new Promise((resolve, reject) => {
-          const webview = document.createElement('webview');
-          webview.addEventListener('loadabort', (e) => {
-              resolve();
-          });
-          webview.addEventListener('loadstop', (e) => {
-              reject('must abort load because of cert error');
-          });
-
-          webview.src = $1;
-          document.body.appendChild(webview);
-        });
-      )";
-    CHECK(ExecJs(app_frame, content::JsReplace(kCreateWebView, src)));
-  }
-
- private:
-  extensions::TestExtensionDir extension_dir_;
-};
-
-// Make sure that a broken page (due to cert error) in a Chrome App's <webview>
-// causes a new login tab to be opened in the existing main browser window.
-IN_PROC_BROWSER_TEST_F(ChromeAppCaptivePortalBrowserTest,
-                       HttpsCertErrorWebViewNewTab) {
-  CertErrorInWebAppWithEmbeddedFrameOpensCaptivePortal(
-      /*should_open_new_browser=*/false, /*num_navigations_to_wait_for=*/1,
-      [this]() -> content::RenderFrameHost* {
-        return this->InstallAndLaunchChromeApp();
-      },
-      [this](content::RenderFrameHost* app_frame, const GURL& cert_error_url) {
-        this->CreateWebView(app_frame, cert_error_url);
-      });
-}
-
-// Make sure that a broken page (due to cert error) in a Chrome App's <webview>
-// causes a new browser with login tab to be opened.
-IN_PROC_BROWSER_TEST_F(ChromeAppCaptivePortalBrowserTest,
-                       HttpsCertErrorWebViewNewBrowser) {
-  CertErrorInWebAppWithEmbeddedFrameOpensCaptivePortal(
-      /*should_open_new_browser=*/true, /*num_navigations_to_wait_for=*/1,
-      [this]() -> content::RenderFrameHost* {
-        return this->InstallAndLaunchChromeApp();
-      },
-      [this](content::RenderFrameHost* app_frame, const GURL& cert_error_url) {
-        this->CreateWebView(app_frame, cert_error_url);
-      });
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
@@ -3328,11 +3186,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
 #define MAYBE_SecureDnsCaptivePortal SecureDnsCaptivePortal
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest, MAYBE_SecureDnsCaptivePortal) {
   PrefService* pref_service = g_browser_process->local_state();
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, the local_state is shared between all users so the user-set
-  // pref is stored in the profile's pref service.
-  pref_service = browser()->GetProfile()->GetPrefs();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   pref_service->SetString(prefs::kDnsOverHttpsMode,
                           SecureDnsConfig::kModeSecure);
@@ -3375,11 +3228,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest, MAYBE_SecureDnsCaptivePortal) {
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
                        MAYBE_SecureDnsErrorTriggersCheck) {
   PrefService* pref_service = g_browser_process->local_state();
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, the local_state is shared between all users so the user-set
-  // pref is stored in the profile's pref service.
-  pref_service = browser()->GetProfile()->GetPrefs();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   pref_service->SetString(prefs::kDnsOverHttpsTemplates,
                           "https://bar.test/dns-query{?dns}");
   pref_service->SetString(prefs::kDnsOverHttpsMode,
@@ -3422,11 +3270,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
                        MAYBE_SlowLoadSecureDnsErrorWithCaptivePortal) {
   PrefService* pref_service = g_browser_process->local_state();
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, the local_state is shared between all users so the user-set
-  // pref is stored in the profile's pref service.
-  pref_service = browser()->GetProfile()->GetPrefs();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   pref_service->SetString(prefs::kDnsOverHttpsTemplates,
                           "https://bar.test/dns-query{?dns}");
   pref_service->SetString(prefs::kDnsOverHttpsMode,
@@ -3463,11 +3306,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
                        MAYBE_SlowLoadSecureDnsErrorAfterLogin) {
   PrefService* pref_service = g_browser_process->local_state();
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, the local_state is shared between all users so the user-set
-  // pref is stored in the profile's pref service.
-  pref_service = browser()->GetProfile()->GetPrefs();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   pref_service->SetString(prefs::kDnsOverHttpsTemplates,
                           "https://bar.test/dns-query{?dns}");
   pref_service->SetString(prefs::kDnsOverHttpsMode,

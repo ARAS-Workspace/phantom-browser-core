@@ -87,12 +87,6 @@ void SocketFactory::CreateRestrictedUDPSocket(
   auto restricted_udp_socket = std::make_unique<RestrictedUDPSocket>(
       std::move(udp_socket), traffic_annotation, std::move(resolver),
       allow_multicast, allow_source_specific_multicast);
-#if BUILDFLAG(IS_CHROMEOS)
-  if (params && params->connection_tracker) {
-    restricted_udp_socket->AttachConnectionTracker(
-        std::move(params->connection_tracker));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   restricted_udp_socket_receivers_.Add(std::move(restricted_udp_socket),
                                        std::move(receiver));
 }
@@ -117,11 +111,6 @@ void SocketFactory::CreateTCPServerSocketHelper(
     const net::NetworkTrafficAnnotationTag& traffic_annotation,
     mojo::PendingReceiver<mojom::TCPServerSocket> receiver,
     mojom::NetworkContext::CreateTCPServerSocketCallback callback) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (options->connection_tracker) {
-    socket->AttachConnectionTracker(std::move(options->connection_tracker));
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   base::expected<net::IPEndPoint, int32_t> result =
       socket->Listen(local_addr, options->backlog, options->ipv6_only);
   if (!result.has_value()) {

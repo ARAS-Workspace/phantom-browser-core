@@ -268,19 +268,10 @@
 #include "chrome/browser/web_applications/web_app_sync_bridge.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chromeos/ash/components/dbus/attestation/fake_attestation_client.h"
-#include "chromeos/dbus/tpm_manager/fake_tpm_manager_client.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/test_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "components/crash/core/app/crashpad.h"
 #include "components/upload_list/crash_upload_list.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/extensions/mock_extension_special_storage_policy.h"
@@ -1135,9 +1126,6 @@ class ChromeBrowsingDataRemoverDelegateTest : public testing::Test {
             std::make_unique<TestWebappRegistry>());
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-    chromeos::TpmManagerClient::InitializeFake();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void TearDown() override {
@@ -2558,29 +2546,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, ZeroSuggestPrefsBasedCacheClear) {
             GetOriginTypeMask());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       ContentProtectionPlatformKeysRemoval) {
-  auto user_manager = std::make_unique<ash::FakeChromeUserManager>();
-  auto* user =
-      user_manager->AddUser(AccountId::FromUserEmail("test@example.com"));
-  user_manager->UserLoggedIn(
-      user->GetAccountId(),
-      user_manager::TestHelper::GetFakeUsernameHash(user->GetAccountId()));
-  user_manager::ScopedUserManager user_manager_enabler(std::move(user_manager));
-
-  ash::AttestationClient::InitializeFake();
-  BlockUntilBrowsingDataRemoved(
-      base::Time(), base::Time::Max(),
-      content::BrowsingDataRemover::DATA_TYPE_MEDIA_LICENSES, false);
-
-  const std::vector<::attestation::DeleteKeysRequest>& history =
-      ash::AttestationClient::Get()->GetTestInterface()->delete_keys_history();
-  EXPECT_EQ(history.size(), 1u);
-
-  ash::AttestationClient::Shutdown();
-}
-#endif
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest, DomainReliability_Null) {
   ClearDomainReliabilityTester tester(GetProfile());
@@ -3870,34 +3835,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, WipeOriginVerifierData) {
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, WipeCrashData) {
-  base::ScopedPathOverride override_crash_dumps(chrome::DIR_CRASH_DUMPS);
-  base::FilePath crash_dir_path;
-  base::PathService::Get(chrome::DIR_CRASH_DUMPS, &crash_dir_path);
-  base::FilePath upload_log_path =
-      crash_dir_path.AppendASCII(CrashUploadList::kReporterLogFilename);
-
-  constexpr char kCrashEntry1[] = "12345,abc\n";
-  constexpr char kCrashEntry2[] = "67890,def\n";
-  std::string initial_contents = kCrashEntry1;
-  initial_contents.append(kCrashEntry2);
-  ASSERT_TRUE(base::WriteFile(upload_log_path, initial_contents));
-
-  BlockUntilBrowsingDataRemoved(base::Time::FromTimeT(67890u),
-                                base::Time::Max(), constants::DATA_TYPE_HISTORY,
-                                false);
-
-  std::string contents;
-  base::ReadFileToString(upload_log_path, &contents);
-  EXPECT_EQ(kCrashEntry1, contents);
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                constants::DATA_TYPE_HISTORY, false);
-
-  EXPECT_FALSE(base::PathExists(upload_log_path));
-}
-#endif
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest, WipeCustomDictionaryData) {
   base::FilePath dict_path =

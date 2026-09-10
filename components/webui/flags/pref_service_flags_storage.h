@@ -45,10 +45,6 @@ class PrefServiceFlagsStorage : public FlagsStorage {
 
   static void RegisterPrefs(PrefRegistrySimple* registry);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  static void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
  private:
   // Pointed-to PrefService outlives PrefServiceFlagsStorage instances.
   raw_ptr<PrefService> prefs_;

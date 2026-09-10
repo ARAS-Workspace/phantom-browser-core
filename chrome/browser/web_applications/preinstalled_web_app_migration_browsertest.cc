@@ -65,15 +65,6 @@
 #include "net/test/embedded_test_server/http_request.h"
 #include "net/test/embedded_test_server/http_response.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/app_list/app_list_types.h"
-#include "chrome/browser/ash/app_list/app_list_model_updater.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service.h"
-#include "chrome/browser/ash/app_list/app_list_syncable_service_factory.h"
-#include "chrome/browser/ash/app_list/chrome_app_list_item.h"
-#include "chrome/browser/ui/ash/shelf/chrome_shelf_controller_util.h"
-#endif
-
 namespace {
 
 constexpr char kMigrationFlag[] = "MigrationTest";
@@ -309,14 +300,6 @@ class PreinstalledWebAppMigrationBrowserTest
 
 IN_PROC_BROWSER_TEST_F(PreinstalledWebAppMigrationBrowserTest,
                        MigrateRevertMigrate) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Grab handles to the app list to update shelf/list state for apps later on.
-  app_list::AppListSyncableService* app_list_syncable_service =
-      app_list::AppListSyncableServiceFactory::GetForProfile(profile());
-  AppListModelUpdater* app_list_model_updater =
-      app_list_syncable_service->GetModelUpdater();
-  app_list_model_updater->SetActive(true);
-#endif
 
   // Set up pre-migration state.
   {
@@ -328,15 +311,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppMigrationBrowserTest,
     EXPECT_FALSE(IsWebAppInstalled());
     EXPECT_TRUE(IsExtensionAppInstalled());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    app_list_model_updater->SetItemPosition(
-        kExtensionId, syncer::StringOrdinal("testapplistposition"));
-    app_list_syncable_service->SetPinPosition(
-        kExtensionId, syncer::StringOrdinal("testpinposition"));
-    EXPECT_EQ(app_list_syncable_service->GetSyncItem(kExtensionId)->ToString(),
-              "kbmnembi { Nothing } [testapplistposition] "
-              "[testpinposition](INVALID COLOR)");
-#endif
   }
 
   // Migrate extension app to web app.
@@ -368,19 +342,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppMigrationBrowserTest,
       histograms.ExpectUniqueSample(
           PreinstalledWebAppManager::kHistogramUninstallAndReplaceCount, 1, 1);
 
-#if BUILDFLAG(IS_CHROMEOS)
-      // Chrome OS shelf/list position should migrate.
-      EXPECT_EQ(
-          app_list_syncable_service->GetSyncItem(GetWebAppId())->ToString(),
-          base::StringPrintf("%s { Basic web app } [testapplistposition] "
-                             "[testpinposition](INVALID COLOR)",
-                             GetWebAppId().substr(0, 8).c_str()));
-      // Old Chrome app prefs are retained.
-      EXPECT_EQ(
-          app_list_syncable_service->GetSyncItem(kExtensionId)->ToString(),
-          "kbmnembi { Nothing } [testapplistposition] "
-          "[testpinposition](INVALID COLOR)");
-#endif
     }
   }
 
@@ -421,29 +382,11 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppMigrationBrowserTest,
     histograms.ExpectUniqueSample(
         PreinstalledWebAppManager::kHistogramUninstallAndReplaceCount, 1, 1);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Chrome OS shelf/list position should re-migrate.
-    EXPECT_EQ(app_list_syncable_service->GetSyncItem(GetWebAppId())->ToString(),
-              base::StringPrintf("%s { Basic web app } [testapplistposition] "
-                                 "[testpinposition](INVALID COLOR)",
-                                 GetWebAppId().substr(0, 8).c_str()));
-    // Old Chrome app prefs are retained.
-    EXPECT_EQ(app_list_syncable_service->GetSyncItem(kExtensionId)->ToString(),
-              "kbmnembi { Nothing } [testapplistposition] "
-              "[testpinposition](INVALID COLOR)");
-#endif
   }
 }
 
 IN_PROC_BROWSER_TEST_F(PreinstalledWebAppMigrationBrowserTest,
                        MigratePreferences) {
-#if BUILDFLAG(IS_CHROMEOS)
-  app_list::AppListSyncableService* app_list_syncable_service =
-      app_list::AppListSyncableServiceFactory::GetForProfile(profile());
-  AppListModelUpdater* app_list_model_updater =
-      app_list_syncable_service->GetModelUpdater();
-  app_list_model_updater->SetActive(true);
-#endif
   extensions::AppSorting* app_sorting =
       extensions::ExtensionSystem::Get(profile())->app_sorting();
 
@@ -455,16 +398,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppMigrationBrowserTest,
 
     EXPECT_FALSE(IsWebAppInstalled());
     EXPECT_TRUE(IsExtensionAppInstalled());
-
-#if BUILDFLAG(IS_CHROMEOS)
-    app_list_model_updater->SetItemPosition(
-        kExtensionId, syncer::StringOrdinal("testapplistposition"));
-    app_list_syncable_service->SetPinPosition(
-        kExtensionId, syncer::StringOrdinal("testpinposition"));
-    EXPECT_EQ(app_list_syncable_service->GetSyncItem(kExtensionId)->ToString(),
-              "kbmnembi { Nothing } [testapplistposition] "
-              "[testpinposition](INVALID COLOR)");
-#endif
 
     // Set chrome://apps position.
     app_sorting->SetAppLaunchOrdinal(kExtensionId,
@@ -510,18 +443,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppMigrationBrowserTest,
   // Check UI preferences have migrated across.
   {
     const webapps::AppId web_app_id = GetWebAppId();
-
-#if BUILDFLAG(IS_CHROMEOS)
-    // Chrome OS shelf/list position should migrate.
-    EXPECT_EQ(app_list_syncable_service->GetSyncItem(GetWebAppId())->ToString(),
-              base::StringPrintf("%s { Basic web app } [testapplistposition] "
-                                 "[testpinposition](INVALID COLOR)",
-                                 GetWebAppId().substr(0, 8).c_str()));
-    // Chrome app shelf/list position should be retained.
-    EXPECT_EQ(app_list_syncable_service->GetSyncItem(kExtensionId)->ToString(),
-              "kbmnembi { Nothing } [testapplistposition] "
-              "[testpinposition](INVALID COLOR)");
-#endif
 
     // chrome://apps position should migrate.
     EXPECT_EQ(app_sorting->GetAppLaunchOrdinal(web_app_id).ToDebugString(),
@@ -672,23 +593,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppMigrationBrowserTest,
         0, 1);
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Pin both apps to the shelf.
-  PinAppWithIDToShelf(GetWebAppId());
-  PinAppWithIDToShelf(kExtensionId);
-
-  // Re-sync preinstalled web apps.
-  {
-    base::HistogramTester histograms;
-    SyncExternalWebApps(/*expect_install=*/true);
-
-    // Apps have been added to the shelf.
-    histograms.ExpectUniqueSample(
-        PreinstalledWebAppManager::
-            kHistogramAppToReplaceStillInstalledInShelfCount,
-        1, 1);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 // Tests the migration from an extension-app to a preinstalled web app provided

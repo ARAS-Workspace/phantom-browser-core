@@ -247,23 +247,6 @@ TEST_F(SupervisedUserGoogleAuthNavigationThrottleTest,
   EXPECT_NE(std::string::npos,
             youtube_navigation_throttle.error_page_content()->find(
                 "supervised-user-verify"));
-#elif BUILDFLAG(IS_CHROMEOS)
-  // For ChromeOS, navigation to Google and YouTube are deferred.
-  EXPECT_EQ(content::NavigationThrottle::DEFER,
-            CreateNavigationThrottle(GURL(kGoogleSearchURL))
-                ->throttles()
-                .back()
-                ->WillStartRequest());
-  EXPECT_EQ(content::NavigationThrottle::DEFER,
-            CreateNavigationThrottle(GURL(kGoogleHomeURL))
-                ->throttles()
-                .back()
-                ->WillStartRequest());
-  EXPECT_EQ(content::NavigationThrottle::DEFER,
-            CreateNavigationThrottle(GURL(kYoutubeDomain))
-                ->throttles()
-                .back()
-                ->WillStartRequest());
 #elif BUILDFLAG(IS_ANDROID)
   // For Android, navigation to Google and YouTube are deferred.
   EXPECT_EQ(content::NavigationThrottle::DEFER,

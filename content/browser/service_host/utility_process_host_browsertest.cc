@@ -39,7 +39,7 @@
 #include "mojo/core/embedder/embedder.h"
 #include "mojo/public/cpp/bindings/remote.h"
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include <sys/wait.h>
 #endif
 
@@ -260,7 +260,7 @@ class UtilityProcessHostBrowserTest : public BrowserChildProcessObserver,
       const ChildProcessTerminationInfo& info) override {
     DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     EXPECT_TRUE(WIFSIGNALED(info.exit_code));
 #if defined(OFFICIAL_BUILD) || (defined(ARCH_CPU_ARM64) && BUILDFLAG(IS_LINUX))
     EXPECT_EQ(SIGTRAP, WTERMSIG(info.exit_code));
@@ -269,7 +269,7 @@ class UtilityProcessHostBrowserTest : public BrowserChildProcessObserver,
     EXPECT_EQ(SIGABRT, WTERMSIG(info.exit_code));
 #endif  // defined(OFFICIAL_BUILD) || (defined(ARCH_CPU_ARM64) &&
         // BUILDFLAG(IS_LINUX)
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     EXPECT_EQ(kTestProcessName, data.metrics_name);
     EXPECT_EQ(false, has_crashed_);
     has_crashed_ = true;
@@ -311,7 +311,7 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest, SkiaInitialized) {
 // TODO(crbug.com/40253015): Re-enable this test on Android when
 // `files_to_preload` is actually fixed there.
 // TODO(crbug.com/41484083): Re-enable this test on ChromeOS.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_FileDescriptorStore DISABLED_FileDescriptorStore
 #else
 #define MAYBE_FileDescriptorStore FileDescriptorStore
@@ -404,7 +404,7 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest,
 // Internals>Core.
 // ** READ THIS **
 #if !(BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARM64))
-#if (BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_X86_64)) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_X86_64)
 #define MAYBE_LaunchProcessAndCrash DISABLED_LaunchProcessAndCrash
 #else
 #define MAYBE_LaunchProcessAndCrash LaunchProcessAndCrash

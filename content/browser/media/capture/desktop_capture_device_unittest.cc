@@ -478,14 +478,12 @@ TEST_P(DesktopCaptureDeviceTest, Capture) {
           webrtc::DesktopCaptureOptions::CreateDefault(),
           /*for_snapshot=*/false));
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-    !BUILDFLAG(SUPPORTS_OZONE_X11)
+#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(SUPPORTS_OZONE_X11)
   // webrtc::DesktopCapturer is only supported on Ozone X11 by default.
   // TODO(webrtc/13429): Enable for Wayland.
   EXPECT_FALSE(capturer);
   GTEST_SKIP();
-#endif  // (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&
-        // !BUILDFLAG(SUPPORTS_OZONE_X11)
+#endif  // BUILDFLAG(IS_LINUX) && !BUILDFLAG(SUPPORTS_OZONE_X11)
 
   EXPECT_TRUE(capturer);
 

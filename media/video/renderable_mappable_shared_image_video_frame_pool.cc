@@ -197,7 +197,7 @@ bool FrameResources::Initialize(VideoPixelFormat format,
 
   gfx::BufferUsage buffer_usage = gfx::BufferUsage::SCANOUT_CPU_READ_WRITE;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   buffer_usage = gfx::BufferUsage::SCANOUT_VEA_CPU_READ;
 #elif BUILDFLAG(IS_LINUX)
   // On Linux, GBM_BO_USE_LINEAR (implied by SCANOUT_CPU_READ_WRITE) can

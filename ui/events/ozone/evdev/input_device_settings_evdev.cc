@@ -7,10 +7,6 @@
 #include "base/feature_list.h"
 #include "ui/events/ozone/features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace ui {
 namespace {
 
@@ -19,11 +15,7 @@ namespace {
 constexpr int kSharedSettingsDeviceId = -1;
 
 bool ShouldEnablePerDeviceSettings() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace

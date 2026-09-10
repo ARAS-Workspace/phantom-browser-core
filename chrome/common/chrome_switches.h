@@ -72,9 +72,6 @@ extern const char kDevToolsNavigationGatingRules[];
 extern const char kDiagnostics[];
 extern const char kDiagnosticsFormat[];
 extern const char kDiagnosticsRecovery[];
-#if BUILDFLAG(IS_CHROMEOS)
-extern const char kDisableAutoMaximizeForTests[];
-#endif
 extern const char kDisableAutoReload[];
 extern const char kDisableBackgroundNetworking[];
 extern const char kDisableClientSidePhishingDetection[];
@@ -100,9 +97,6 @@ extern const char kEnableAudioDebugRecordingsFromExtension[];
 extern const char kEnableAutoReload[];
 extern const char kEnableBookmarkUndo[];
 extern const char kEnableDomainReliability[];
-#if BUILDFLAG(IS_CHROMEOS)
-extern const char kEnableDevToolsPwaHandler[];
-#endif
 extern const char kEnableDownloadWarningImprovements[];
 extern const char kEnableExtensionActivityLogging[];
 extern const char kEnableExtensionActivityLogTesting[];
@@ -119,9 +113,6 @@ extern const char kExtensionContentVerificationEnforce[];
 extern const char kExtensionContentVerificationEnforceStrict[];
 extern const char kExtensionExperimentalActor[];
 extern const char kForceAppMode[];
-#if BUILDFLAG(IS_CHROMEOS)
-extern const char kForceDevToolsAvailable[];
-#endif
 extern const char kForceFirstRun[];
 extern const char kRefreshPlatformPolicy[];
 extern const char kForceWhatsNew[];
@@ -237,16 +228,9 @@ extern const char kRequestDesktopSites[];
 extern const char kCastMirroringTargetPlayoutDelay[];
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-extern const char kCroshCommand[];
-extern const char kDisableLoggingRedirect[];
-extern const char kDisableLoginScreenApps[];
-extern const char kShortMergeSessionTimeoutForTest[];
-#else
 extern const char kSavePageAsMHTML[];
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 extern const char kHelp[];
 extern const char kHelpShort[];
 extern const char kWmClass[];
@@ -268,7 +252,7 @@ extern const char kNoOpForTestingProcess[];
 extern const char kDebugPrint[];
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 extern const char kGuest[];
 #endif
 
@@ -298,11 +282,11 @@ extern const char kProfileBaseName[];
 extern const char kProfileManagementAttributes[];
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 extern const char kWebApkServerUrl[];
 #endif
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 extern const char kUseSystemDefaultPrinter[];
 #endif
 

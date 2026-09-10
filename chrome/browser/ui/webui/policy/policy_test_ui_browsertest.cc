@@ -56,7 +56,7 @@
 #include "chrome/browser/ui/browser.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/first_run/scoped_relaunch_chrome_browser_override.h"
 #endif
 
@@ -197,12 +197,12 @@ class PolicyTestHandlerTest : public base::test::WithFeatureOverride,
   PolicyTestHandlerTest()
       : base::test::WithFeatureOverride(
             policy::features::kPolicyPageMojoMigration) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
     if (policy::utils::IsPolicyTestingEnabled(/*pref_service=*/nullptr,
                                               chrome::GetChannel())) {
       SetUpRelaunchChromeOverrideForPRETests();
     }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   }
   PolicyTestHandlerTest(const PolicyTestHandlerTest&) = delete;
   PolicyTestHandlerTest& operator=(const PolicyTestHandlerTest&) = delete;
@@ -233,7 +233,7 @@ class PolicyTestHandlerTest : public base::test::WithFeatureOverride,
     return handler;
   }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   void SetUpRelaunchChromeOverrideForPRETests() {
     std::string_view test_name =
         ::testing::UnitTest::GetInstance()->current_test_info()->name();
@@ -248,7 +248,7 @@ class PolicyTestHandlerTest : public base::test::WithFeatureOverride,
               mock_relaunch_callback_->Get());
     }
   }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   /* Helper methods for executing JS strings. */
   content::EvalJsResult GetNumberOfRows() {
@@ -314,7 +314,7 @@ class PolicyTestHandlerTest : public base::test::WithFeatureOverride,
   mojo::Remote<policy::mojom::PolicyPageHandler> page_handler_;
   mojo::Receiver<policy::mojom::PolicyPageClient> page_client_{this};
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<
       base::MockCallback<upgrade_util::RelaunchChromeBrowserCallback>>
       mock_relaunch_callback_;
@@ -479,7 +479,7 @@ IN_PROC_BROWSER_TEST_P(PolicyTestHandlerTest,
     EXPECT_EQ(entry->source, policy::POLICY_SOURCE_CLOUD);
   }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(GetProfile()->GetPrefs()->GetString(
                 prefs::kUserCloudSigninPolicyResponseFromPolicyTestPage),
             "{}");
@@ -513,7 +513,7 @@ IN_PROC_BROWSER_TEST_P(PolicyTestHandlerTest,
         policy_map->Get(policy::key::kCloudReportingEnabled);
     EXPECT_FALSE(entry);
   }
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(GetProfile()->GetPrefs()->GetString(
                 prefs::kUserCloudSigninPolicyResponseFromPolicyTestPage),
             "");
@@ -557,7 +557,7 @@ IN_PROC_BROWSER_TEST_P(PolicyTestHandlerTest, FilterSensitivePolicies) {
 
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(PolicyTestHandlerTest);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
 // TODO(b:293632195) Implement test on android and chromeos
 // Test that test policies stored in the pref kLocalTestPoliciesForNextStartup
 // are applied after restart.
@@ -644,14 +644,14 @@ class PolicyTestHandlerTestDisabledByPolicy : public PolicyTestHandlerTest {
                    policy::POLICY_SOURCE_PLATFORM, base::Value(false), nullptr);
 
     provider_.UpdateChromePolicy(policy_map);
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID)
     // `PolicyTestHandlerTest` only sets up relaunch chrome override if policy
     // testing is enabled, but these tests require it unconditionally.
     if (!policy::utils::IsPolicyTestingEnabled(/*pref_service=*/nullptr,
                                                chrome::GetChannel())) {
       SetUpRelaunchChromeOverrideForPRETests();
     }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   }
 
   PolicyTestHandlerTestDisabledByPolicy(
@@ -746,7 +746,7 @@ IN_PROC_BROWSER_TEST_P(PolicyTestHandlerTestDisabledByPolicy,
 
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(PolicyTestHandlerTestDisabledByPolicy);
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace {
 

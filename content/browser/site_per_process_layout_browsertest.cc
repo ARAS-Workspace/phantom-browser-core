@@ -41,10 +41,6 @@
 #include "ui/base/test/scoped_preferred_scroller_style_mac.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ui/aura/test/test_screen.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -280,58 +276,6 @@ INSTANTIATE_TEST_SUITE_P(SitePerProcess,
 INSTANTIATE_TEST_SUITE_P(SitePerProcess,
                          SitePerProcessCompositorViewportBrowserTest,
                          testing::Values(1.0, 1.5, 2.0));
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
-                       SubframeUpdateToCorrectDeviceScaleFactor) {
-  GURL main_url(embedded_test_server()->GetURL(
-      "a.com", "/cross_site_iframe_factory.html?a(b)"));
-  EXPECT_TRUE(NavigateToURL(shell(), main_url));
-
-  EXPECT_EQ(1.0, GetFrameDeviceScaleFactor(web_contents()));
-
-  FrameTreeNode* root = web_contents()->GetPrimaryFrameTree().root();
-  ASSERT_EQ(1U, root->child_count());
-
-  FrameTreeNode* child = root->child_at(0);
-  EXPECT_EQ(1.0, GetFrameDeviceScaleFactor(child));
-
-  double expected_dip_scale = 2.0;
-
-  // TODO(oshima): allow DeviceScaleFactor change on other platforms
-  // (win, linux, mac, android and mus).
-  aura::TestScreen* test_screen =
-      static_cast<aura::TestScreen*>(display::Screen::Get());
-  test_screen->CreateHostForPrimaryDisplay();
-  test_screen->SetDeviceScaleFactor(expected_dip_scale);
-
-  // This forces |expected_dip_scale| to be applied to the aura::WindowTreeHost
-  // and aura::Window.
-  aura::WindowTreeHost* window_tree_host = shell()->window()->GetHost();
-  window_tree_host->SetBoundsInPixels(window_tree_host->GetBoundsInPixels());
-
-  // Wait until dppx becomes 2 if the frame's dpr hasn't beeen updated
-  // to 2 yet.
-  const char kScript[] = R"(
-      new Promise(resolve => {
-        if (window.devicePixelRatio == 2)
-          resolve(window.devicePixelRatio);
-        window.matchMedia('screen and (min-resolution: 2dppx)')
-            .addListener(function(e) {
-          if (e.matches) {
-            resolve(window.devicePixelRatio);
-          }
-        });
-      });
-      )";
-  // Make sure that both main frame and iframe are updated to 2x.
-  EXPECT_EQ(expected_dip_scale, EvalJs(child, kScript).ExtractDouble());
-
-  EXPECT_EQ(expected_dip_scale,
-            EvalJs(web_contents(), kScript).ExtractDouble());
-}
-
 #endif
 
 // Tests that when a large OOPIF has been scaled, the compositor raster area
@@ -1283,7 +1227,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest, ViewBoundsInNestedFrameTest) {
 // TODO(bokan): Pretty soon most/all platforms will use overlay scrollbars. This
 // test should find a better way to check for scrollability. crbug.com/662196.
 // Flaky on Linux. crbug.com/790929.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #define MAYBE_FrameOwnerPropertiesPropagationScrolling \
   DISABLED_FrameOwnerPropertiesPropagationScrolling
 #else

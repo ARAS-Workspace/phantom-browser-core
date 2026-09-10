@@ -18,7 +18,7 @@
 #include "content/public/browser/native_event_processor_observer_mac.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "ui/events/platform/platform_event_observer.h"
 #endif
 
@@ -39,7 +39,7 @@ namespace responsiveness {
 class CONTENT_EXPORT BrowserUINativeEventObserver
 #if BUILDFLAG(IS_MAC)
     : public NativeEventProcessorObserver
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
     : public ui::PlatformEventObserver
 #endif
 {
@@ -54,7 +54,7 @@ class CONTENT_EXPORT BrowserUINativeEventObserver
   BrowserUINativeEventObserver(WillRunEventCallback will_run_event_callback,
                                DidRunEventCallback did_run_event_callback);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
   BrowserUINativeEventObserver(const BrowserUINativeEventObserver&) = delete;
   BrowserUINativeEventObserver& operator=(const BrowserUINativeEventObserver&) =
@@ -66,7 +66,7 @@ class CONTENT_EXPORT BrowserUINativeEventObserver
 #endif
 
  protected:
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // ui::PlatformEventObserver overrides:
   void WillProcessEvent(const ui::PlatformEvent& event) override;
   void DidProcessEvent(const ui::PlatformEvent& event) override;
@@ -81,7 +81,7 @@ class CONTENT_EXPORT BrowserUINativeEventObserver
   void RegisterObserver();
   void UnregisterObserver();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   struct EventInfo {
     uintptr_t unique_id;
   };

@@ -274,11 +274,6 @@ static constexpr const char* kOptionalFunctionalityExtensions[] = {
     "GL_KHR_parallel_shader_compile",
     "GL_KHR_robust_buffer_access_behavior",
     "GL_OES_mapbuffer",
-#if BUILDFLAG(IS_CHROMEOS)
-    // Required for Webgl to display in overlay on ChromeOS devices.
-    // TODO(crbug.com/40244202): Consider for other platforms.
-    "GL_MESA_framebuffer_flip_y",
-#endif
     "GL_NV_pack_subimage",
     "GL_NV_pixel_buffer_object",
     "GL_OES_depth32",
@@ -1446,10 +1441,6 @@ gpu::Capabilities GLES2DecoderPassthroughImpl::GetCapabilities() {
   caps.supports_yuv_readback = true;
   caps.mesa_framebuffer_flip_y =
       feature_info_->feature_flags().mesa_framebuffer_flip_y;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  PopulateDRMCapabilities(&caps, feature_info_.get());
-#endif
 
   return caps;
 }

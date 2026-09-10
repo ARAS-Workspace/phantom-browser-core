@@ -51,10 +51,6 @@
 #include "extensions/test/test_content_script_load_waiter.h"
 #include "net/base/filename_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#endif
-
 using extensions::ExtensionRegistrar;
 using extensions::ExtensionRegistry;
 using extensions::FeatureSwitch;
@@ -347,18 +343,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionsLoadTest, Test) {
   WaitForServicesToStart(1, true);
   TestInjection(true, true);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-IN_PROC_BROWSER_TEST_F(ExtensionsLoadTest,
-                       SigninProfileCommandLineExtensionsDontLoad) {
-  // The --load-extension command line flag should not be applied to the sign-in
-  // profile.
-  EXPECT_EQ(0, GetNonComponentEnabledExtensionCount(
-                   ash::ProfileHelper::GetSigninProfile()));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // ExtensionsLoadMultipleTest
 // Ensures that we can startup the browser with multiple extensions

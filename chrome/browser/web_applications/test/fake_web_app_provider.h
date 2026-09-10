@@ -43,10 +43,6 @@ class WebAppTranslationManager;
 class WebAppUiManager;
 class WebContentsManager;
 
-#if BUILDFLAG(IS_CHROMEOS)
-class WebAppRunOnOsLoginManager;
-#endif
-
 // This is a tool that allows unit tests (enabled by default) and browser tests
 // (disabled by default) to use a 'fake' version of the WebAppProvider system.
 // This means that most of the dependencies are faked out. Specifically:
@@ -148,10 +144,6 @@ class FakeWebAppProvider : public WebAppProvider {
   void SetWebAppUiManager(std::unique_ptr<WebAppUiManager> ui_manager);
   void SetWebAppPolicyManager(
       std::unique_ptr<WebAppPolicyManager> web_app_policy_manager);
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetWebAppRunOnOsLoginManager(std::unique_ptr<WebAppRunOnOsLoginManager>
-                                        web_app_run_on_os_login_manager);
-#endif
   void SetCommandManager(std::unique_ptr<WebAppCommandManager> command_manager);
   void SetScheduler(std::unique_ptr<WebAppCommandScheduler> scheduler);
   void SetPreinstalledWebAppManager(

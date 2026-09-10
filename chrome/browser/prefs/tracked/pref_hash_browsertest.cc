@@ -58,10 +58,6 @@
 #include "services/preferences/public/cpp/tracked/tracked_preference_histogram_names.h"
 #include "services/preferences/tracked/features.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#endif
-
 namespace {
 
 // Extension ID of chrome/test/data/extensions/good.crx
@@ -117,7 +113,6 @@ int GetTrackedPrefHistogramCount(const char* histogram_name,
   return GetTrackedPrefHistogramCount(histogram_name, "", allowed_buckets);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Helper function to get the test profile directory path.
 base::FilePath GetProfileDir() {
   base::FilePath profile_dir;
@@ -142,7 +137,6 @@ std::optional<base::DictValue> ReadPrefsDictionary(
   }
   return std::move(*prefs).TakeDict();
 }
-#endif
 
 // Returns whether external validation is supported on the platform through
 // storing MACs in the registry.
@@ -180,10 +174,6 @@ class PrefHashBrowserTestBase : public extensions::ExtensionBrowserTest {
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     extensions::ExtensionBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_CHROMEOS)
-    command_line->AppendSwitch(
-        ash::switches::kIgnoreUserProfileMappingForTests);
-#endif
   }
 
   bool SetUpUserDataDirectory() override {
@@ -192,17 +182,6 @@ class PrefHashBrowserTestBase : public extensions::ExtensionBrowserTest {
     if (content::IsPreTest())
       return extensions::ExtensionBrowserTest::SetUpUserDataDirectory();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // For some reason, the Preferences file does not exist in the location
-    // below on Chrome OS. Since protection is disabled on Chrome OS, it's okay
-    // to simply not attack preferences at all (and still assert that no
-    // hardening related histogram kicked in in VerifyReactionToPrefAttack()).
-    // TODO(gab): Figure out why there is no Preferences file in this location
-    // on Chrome OS (and re-enable the section disabled for OS_CHROMEOS further
-    // below).
-    EXPECT_EQ(PROTECTION_DISABLED_ON_PLATFORM, protection_level_);
-    return true;
-#else
     base::FilePath profile_dir;
     EXPECT_TRUE(base::PathService::Get(chrome::DIR_USER_DATA, &profile_dir));
     profile_dir = profile_dir.AppendASCII(TestingProfile::kTestUserProfileDir);
@@ -251,7 +230,6 @@ class PrefHashBrowserTestBase : public extensions::ExtensionBrowserTest {
     }
 
     return true;
-#endif
   }
 
   void SetUpInProcessBrowserTestFixture() override {
@@ -458,11 +436,7 @@ class PrefHashBrowserTestUnchangedDefault : public PrefHashBrowserTestBase {
 
     histograms_.ExpectUniqueSample(
         DefaultSearchManager::kDefaultSearchEngineMirroredMetric, true,
-#if BUILDFLAG(IS_CHROMEOS)
-        2);  // CHROMEOS doesn't support Preference tracking.
-#else
         1);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
     if (SupportsRegistryValidation()) {
       // Expect all prefs to be reported as Unchanged.
@@ -769,12 +743,10 @@ class PrefHashBrowserTestChangedAtomic : public PrefHashBrowserTestBase {
 
 // TODO(gab): This doesn't work on OS_CHROMEOS because we fail to attack
 // Preferences.
-#if !BUILDFLAG(IS_CHROMEOS)
     // Explicitly verify the result of reported resets.
     EXPECT_EQ(
         protection_level_ >= PROTECTION_ENABLED_BASIC ? 0U : 2U,
         profile()->GetPrefs()->GetList(prefs::kURLsToRestoreOnStartup).size());
-#endif
 
     // Nothing else should have triggered.
     EXPECT_EQ(
@@ -1156,7 +1128,6 @@ class PrefHashBrowserTestDefaultSearch : public PrefHashBrowserTestBase {
 
     if (protection_level_ < PROTECTION_ENABLED_DSE) {
 // This doesn't work on OS_CHROMEOS because we fail to attack Preferences.
-#if !BUILDFLAG(IS_CHROMEOS)
       // Attack is successful.
       EXPECT_EQ(DefaultSearchManager::FROM_USER, dse_source);
       EXPECT_EQ(current_dse->keyword(), u"badkeyword");
@@ -1165,7 +1136,6 @@ class PrefHashBrowserTestDefaultSearch : public PrefHashBrowserTestBase {
                 "http://bad_default_engine/search?q=dirty_user_query");
       histograms_.ExpectUniqueSample(
           DefaultSearchManager::kDefaultSearchEngineMirroredMetric, false, 1);
-#endif
     } else {
       // Attack fails.
       EXPECT_EQ(DefaultSearchManager::FROM_FALLBACK, dse_source);
@@ -1296,11 +1266,9 @@ class PrefHashBrowserTestAccountValueUntrustedAddition
 
 // TODO(gab): This doesn't work on OS_CHROMEOS because we fail to attack
 // Preferences.
-#if !BUILDFLAG(IS_CHROMEOS)
     // Explicitly verify the result of reported resets.
     EXPECT_EQ(protection_level_ < PROTECTION_ENABLED_BASIC,
               profile()->GetPrefs()->GetBoolean(prefs::kShowHomeButton));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
     // Nothing else should have triggered.
     EXPECT_EQ(
@@ -1533,7 +1501,6 @@ class PrefHashBrowserTestEncryptedFallbackAndGeneratingEH
     // A write operation is scheduled after the encryptor received.
     profile()->GetPrefs()->CommitPendingWrite(run_loop.QuitClosure());
     run_loop.Run();
-#if !BUILDFLAG(IS_CHROMEOS)
     std::optional<base::DictValue> final_protected_prefs;
     std::optional<base::DictValue> final_unprotected_prefs;
     base::DictValue* final_macs_dict = nullptr;
@@ -1569,7 +1536,6 @@ class PrefHashBrowserTestEncryptedFallbackAndGeneratingEH
     const std::string encrypted_hash_key =
         std::string(prefs::kHomePage) + kEncryptedHashSuffix;
     EXPECT_TRUE(final_macs_dict->contains(encrypted_hash_key));
-#endif  // #if !BUILDFLAG(IS_CHROMEOS)
   }
 
  private:
@@ -1654,7 +1620,6 @@ class PrefHashBrowserTestEncryptedSplitPrefFallbackAndGeneratingEH
     base::RunLoop run_loop;
     profile()->GetPrefs()->CommitPendingWrite(run_loop.QuitClosure());
     run_loop.Run();
-#if !BUILDFLAG(IS_CHROMEOS)
     std::optional<base::DictValue> final_protected_prefs;
     std::optional<base::DictValue> final_unprotected_prefs;
     base::DictValue* final_macs_dict = nullptr;
@@ -1681,7 +1646,6 @@ class PrefHashBrowserTestEncryptedSplitPrefFallbackAndGeneratingEH
     const std::string encrypted_hash_key =
         std::string(extensions::pref_names::kExtensions) + kEncryptedHashSuffix;
     EXPECT_TRUE(final_macs_dict->FindDict(encrypted_hash_key));
-#endif  // #if !BUILDFLAG(IS_CHROMEOS)
   }
 
  private:

@@ -55,12 +55,6 @@
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/file_manager/file_manager_test_util.h"
-#include "chrome/browser/ash/file_manager/volume.h"
-#include "chrome/browser/extensions/scoped_test_mv2_enabler.h"
-#endif
-
 namespace web_app {
 
 class WebAppFileHandlingTestBase : public WebAppBrowserTestBase {
@@ -444,45 +438,6 @@ IN_PROC_BROWSER_TEST_F(WebAppFileHandlingBrowserTest,
   EXPECT_EQ(ApiApprovalState::kAllowed,
             registrar().GetAppById(app_id())->file_handler_approval_state());
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// End-to-end test to ensure the file handler is registered on ChromeOS when the
-// extension system is initialized. Gives more coverage than the unit tests.
-IN_PROC_BROWSER_TEST_F(WebAppFileHandlingBrowserTest, IsFileHandlerOnChromeOS) {
-  InstallFileHandlingPWA();
-
-  base::FilePath test_file_path = CreateTestFileWithExtension("txt");
-  std::vector<file_manager::file_tasks::FullTaskDescriptor> tasks =
-      file_manager::test::GetTasksForFile(profile(), test_file_path);
-  // Note that there are normally multiple tasks due to default-installed
-  // handlers (e.g. add to zip file). But those handlers are not installed by
-  // default in browser tests.
-  ASSERT_EQ(1u, tasks.size());
-  EXPECT_EQ(tasks[0].task_descriptor.app_id, app_id());
-}
-
-// Ensures correct behavior for files on "special volumes", such as file systems
-// provided by extensions. These do not have local files (i.e. backed by
-// inodes).
-IN_PROC_BROWSER_TEST_F(WebAppFileHandlingBrowserTest,
-                       HandlerForNonNativeFiles) {
-  // TODO(https://crbug.com/40804030): Remove this when updated to use MV3.
-  extensions::ScopedTestMV2Enabler mv2_enabler_;
-
-  InstallFileHandlingPWA();
-  base::WeakPtr<file_manager::Volume> fsp_volume =
-      file_manager::test::InstallFileSystemProviderChromeApp(profile());
-
-  // File in chrome/test/data/extensions/api_test/file_browser/image_provider/.
-  base::FilePath test_file_path =
-      fsp_volume->mount_path().AppendASCII("readonly.txt");
-  std::vector<file_manager::file_tasks::FullTaskDescriptor> tasks =
-      file_manager::test::GetTasksForFile(profile(), test_file_path);
-  // This test should work the same as IsFileHandlerOnChromeOS.
-  ASSERT_EQ(1u, tasks.size());
-  EXPECT_EQ(tasks[0].task_descriptor.app_id, app_id());
-}
-#endif
 
 IN_PROC_BROWSER_TEST_F(WebAppFileHandlingBrowserTest, LaunchQueueSetOnReload) {
   GURL handler_url = embedded_https_test_server().GetURL(

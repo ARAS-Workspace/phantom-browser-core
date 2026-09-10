@@ -586,7 +586,6 @@ TEST_F(FamilyLinkSettingsServiceTest,
                  .reason = FilteringBehaviorReason::MANUAL}));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(FamilyLinkSettingsServiceTest, NormalizesUnblockingUrls) {
   GURL full_spec_url("http://admin:password@www.example.com/path?query#ref");
 
@@ -612,7 +611,6 @@ TEST_F(FamilyLinkSettingsServiceTest, NormalizesUnblockingUrls) {
                  .behavior = FilteringBehavior::kBlock,
                  .reason = FilteringBehaviorReason::MANUAL}));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 }  // namespace supervised_user

@@ -119,7 +119,7 @@ IN_PROC_BROWSER_TEST_F(NetworkConnectionTrackerBrowserTest,
   // NetworkService on ChromeOS doesn't yet have a NetworkChangeManager
   // implementation. OSX uses a separate binary for service processes and
   // browser test fixture doesn't have NetworkServiceTest mojo code.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   network::NetworkConnectionTracker* tracker =
       content::GetNetworkConnectionTracker();
   EXPECT_NE(nullptr, tracker);
@@ -155,7 +155,7 @@ IN_PROC_BROWSER_TEST_F(NetworkConnectionTrackerBrowserTest,
   // NetworkService on ChromeOS doesn't yet have a NetworkChangeManager
   // implementation. OSX uses a separate binary for service processes and
   // browser test fixture doesn't have NetworkServiceTest mojo code.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   // Out-of-process network service is not enabled, so network service's crash
   // and restart aren't applicable.
   if (!content::IsOutOfProcessNetworkService())

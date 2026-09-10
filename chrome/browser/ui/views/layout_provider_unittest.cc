@@ -26,10 +26,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/public/cpp/ash_typography.h"
-#endif
-
 namespace {
 
 // The default system font name.
@@ -263,9 +259,6 @@ TEST_F(LayoutProviderTest, TypographyLineHeight) {
       std::to_array<Increases>({{views::style::CONTEXT_DIALOG_TITLE, 1, 4},
                                 {views::style::CONTEXT_DIALOG_BODY_TEXT, 2, 4},
                                 {CONTEXT_DIALOG_BODY_TEXT_SMALL, 4, 5},
-#if BUILDFLAG(IS_CHROMEOS)
-                                {ash::CONTEXT_HEADLINE, 4, 8},
-#endif  // BUILDFLAG(IS_CHROMEOS)
                                 {views::style::CONTEXT_BUTTON_MD, -2, 1}});
 
   const auto& typography_provider = views::TypographyProvider::Get();
@@ -306,9 +299,6 @@ TEST_F(LayoutProviderTest, ExplicitTypographyLineHeight) {
   static constexpr auto kHarmonyHeights = std::to_array<HarmonyHeight>(
       {{views::style::CONTEXT_DIALOG_TITLE, 22},
        {views::style::CONTEXT_DIALOG_BODY_TEXT, kBodyLineHeight},
-#if BUILDFLAG(IS_CHROMEOS)
-       {ash::CONTEXT_HEADLINE, 32},
-#endif  // BUILDFLAG(IS_CHROMEOS)
        {CONTEXT_DIALOG_BODY_TEXT_SMALL, kBodyLineHeight}});
 
   for (size_t i = 0; i < std::size(kHarmonyHeights); ++i) {
@@ -347,61 +337,3 @@ TEST_F(LayoutProviderTest, ExplicitTypographyLineHeight) {
 // versions, but on ChromeOS, there is only one OS version, so we can rely on
 // consistent behavior. Also ChromeOS is the only place where
 // IDS_UI_FONT_FAMILY_CROS works, which this test uses to control results.
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Ensure the omnibox font is always 14pt, even in Hebrew. On ChromeOS, Hebrew
-// has a larger default font size applied from the resource bundle, but the
-// Omnibox font configuration ignores it.
-TEST_F(LayoutProviderTest, OmniboxFontAlways14) {
-  constexpr int kOmniboxHeight = 24;
-  constexpr int kDecorationHeight = 14;
-  constexpr int kOmniboxDesiredSize = 14;
-  constexpr int kDecorationRequestedSize = 11;
-
-  auto& bundle = ui::ResourceBundle::GetSharedInstance();
-
-  auto set_system_font = [&bundle](const char* font) {
-    bundle.OverrideLocaleStringResource(IDS_UI_FONT_FAMILY_CROS,
-                                        base::ASCIIToUTF16(font));
-    bundle.ReloadFonts();
-    return gfx::FontList().GetFontSize();
-  };
-
-  int base_font_size = set_system_font("Roboto, 12px");
-  EXPECT_EQ(12, base_font_size);
-  EXPECT_EQ(base_font_size, bundle.GetFontListWithDelta(0).GetFontSize());
-  EXPECT_EQ(14 - base_font_size, GetFontSizeDeltaBoundedByAvailableHeight(
-                                     kOmniboxHeight, kOmniboxDesiredSize));
-  EXPECT_EQ(11 - base_font_size,
-            GetFontSizeDeltaBoundedByAvailableHeight(kDecorationHeight,
-                                                     kDecorationRequestedSize));
-
-  // Ensure there is a threshold where the font actually shrinks.
-  int latin_height_threshold = kOmniboxHeight;
-  for (; latin_height_threshold > 0; --latin_height_threshold) {
-    if (kOmniboxDesiredSize - base_font_size !=
-        GetFontSizeDeltaBoundedByAvailableHeight(latin_height_threshold,
-                                                 kOmniboxDesiredSize)) {
-      break;
-    }
-  }
-  // The threshold should always be the same, but the value depends on font
-  // metrics. Check for some sane value. This should only change if Roboto
-  // itself changes.
-  EXPECT_EQ(16, latin_height_threshold);
-
-  // Switch to Hebrew settings.
-  base_font_size = set_system_font("Roboto, Noto Sans Hebrew, 13px");
-  EXPECT_EQ(13, gfx::FontList().GetFontSize());
-  EXPECT_EQ(base_font_size, bundle.GetFontListWithDelta(0).GetFontSize());
-
-  // The base font size has increased, but the delta returned should still
-  // result in a 14pt font.
-  EXPECT_EQ(14 - base_font_size, GetFontSizeDeltaBoundedByAvailableHeight(
-                                     kOmniboxHeight, kOmniboxDesiredSize));
-  EXPECT_EQ(11 - base_font_size,
-            GetFontSizeDeltaBoundedByAvailableHeight(kDecorationHeight,
-                                                     kDecorationRequestedSize));
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)

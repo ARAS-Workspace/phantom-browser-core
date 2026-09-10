@@ -30,22 +30,7 @@
 #include "device/bluetooth/strings/grit/bluetooth_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/no_destructor.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace device {
-
-#if BUILDFLAG(IS_CHROMEOS)
-// See Bluetooth Assigned Numbers - 3.3 SDP Service Class and Profile
-// Identifiers
-const base::NoDestructor<std::vector<BluetoothUUID>> kAudioUUIDs([] {
-  return std::vector<BluetoothUUID>({
-      BluetoothUUID("0x110B"),  // Audio sink
-      BluetoothUUID("0x111E"),  // Hands free
-  });
-}());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 using BatteryInfo = BluetoothDevice::BatteryInfo;
 using BatteryType = BluetoothDevice::BatteryType;
@@ -317,18 +302,6 @@ BluetoothDeviceType BluetoothDevice::GetDeviceType() const {
       }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Some bluetooth devices paired via Fast Pair, e.g., JBL TUNE230NC,
-  // do not expose its bluetooth class or its appearance. Use UUIDs as
-  // last workaround.
-  UUIDSet uuids = GetUUIDs();
-  for (const auto& audio_uuid : *kAudioUUIDs) {
-    if (uuids.contains(audio_uuid)) {
-      return BluetoothDeviceType::AUDIO;
-    }
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
   return BluetoothDeviceType::UNKNOWN;
 }
 
@@ -353,21 +326,6 @@ bool BluetoothDevice::IsPairable() const {
 BluetoothDevice::UUIDSet BluetoothDevice::GetUUIDs() const {
   return device_uuids_.GetUUIDs();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void BluetoothDevice::SetIsBlockedByPolicy(bool is_blocked_by_policy) {
-  if (is_blocked_by_policy_ == is_blocked_by_policy) {
-    return;
-  }
-  is_blocked_by_policy_ = is_blocked_by_policy;
-  GetAdapter()->NotifyDeviceIsBlockedByPolicyChanged(this,
-                                                     is_blocked_by_policy);
-}
-
-bool BluetoothDevice::IsBlockedByPolicy() const {
-  return is_blocked_by_policy_;
-}
-#endif
 
 const BluetoothDevice::ServiceDataMap& BluetoothDevice::GetServiceData() const {
   return service_data_;
@@ -545,7 +503,7 @@ BluetoothDevice::GetPrimaryServicesByUUID(const BluetoothUUID& service_uuid) {
   return services;
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 void BluetoothDevice::SetBatteryInfo(const BatteryInfo& info) {
   if (info.percentage) {
     DCHECK_GE(info.percentage.value(), 0);

@@ -104,7 +104,7 @@
 #include "v8/include/cppgc/prefinalizer.h"
 #include "v8/include/v8-cppgc.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "third_party/blink/public/platform/web_font_render_style.h"
 #endif
 
@@ -2742,7 +2742,7 @@ void TestRunner::Reset() {
   blink::WebTestingSupport::ResetRuntimeFeatures();
   blink::WebCache::Clear();
   blink::WebSecurityPolicy::ClearOriginAccessList();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   blink::WebFontRenderStyle::SetSubpixelPositioning(false);
 #endif
   blink::ResetDomainRelaxationForTest();
@@ -3576,7 +3576,7 @@ void TestRunner::AddOriginAccessAllowListEntry(
 }
 
 void TestRunner::SetTextSubpixelPositioning(bool value) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Since FontConfig doesn't provide a variable to control subpixel
   // positioning, we'll fall back to setting it globally for all fonts.
   blink::WebFontRenderStyle::SetSubpixelPositioning(value);

@@ -36,9 +36,6 @@ void ReportGenerator::CreateBasicRequest(
     std::unique_ptr<ReportRequest> basic_request,
     ReportType report_type,
     ReportCallback callback) {
-#if BUILDFLAG(IS_CHROMEOS)
-  delegate_->SetAndroidAppInfos(basic_request.get());
-#else
   basic_request->GetDeviceReportRequest().set_computer_name(
       this->GetMachineName());
   basic_request->GetDeviceReportRequest().set_os_user_name(GetOSUserName());
@@ -48,7 +45,6 @@ void ReportGenerator::CreateBasicRequest(
   basic_request->GetDeviceReportRequest()
       .set_allocated_browser_device_identifier(
           policy::GetBrowserDeviceIdentifier().release());
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   // 1. Async function base::SysInfo::SetHardwareInfo is called.

@@ -34,11 +34,11 @@ namespace IPC {
 
 namespace {
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 
 int g_global_pid = 0;
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 class ThreadSafeChannelProxy : public mojo::ThreadSafeProxy {
  public:
@@ -76,11 +76,11 @@ class ThreadSafeChannelProxy : public mojo::ThreadSafeProxy {
 };
 
 base::ProcessId GetSelfPID() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   if (int global_pid = Channel::GetGlobalPid()) {
     return global_pid;
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
   return base::GetCurrentProcId();
 }
 
@@ -97,7 +97,7 @@ std::unique_ptr<Channel> Channel::Create(
                                       ipc_task_runner, proxy_task_runner));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // static
 void Channel::SetGlobalPid(int pid) {
   g_global_pid = pid;
@@ -107,7 +107,7 @@ void Channel::SetGlobalPid(int pid) {
 int Channel::GetGlobalPid() {
   return g_global_pid;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 void Channel::WillConnect() {
   did_start_connect_ = true;

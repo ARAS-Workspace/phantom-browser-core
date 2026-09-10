@@ -25,10 +25,6 @@
 #include "ui/views/controls/styled_label.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/system_web_apps/system_web_app_manager.h"
-#endif
-
 namespace payments {
 namespace {
 
@@ -254,11 +250,6 @@ using PaymentRequestSettingsLinkTest = PaymentRequestBrowserTestBase;
 
 // Tests that clicking the settings link brings the user to settings.
 IN_PROC_BROWSER_TEST_F(PaymentRequestSettingsLinkTest, ClickSettingsLink) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Install the Settings App.
-  ash::SystemWebAppManager::GetForTest(browser()->GetProfile())
-      ->InstallSystemAppsForTesting();
-#endif
 
   // Installs two apps so that the Payment Request UI will be shown.
   std::string a_method_name;

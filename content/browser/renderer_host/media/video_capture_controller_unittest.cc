@@ -46,10 +46,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "media/capture/video/chromeos/video_capture_jpeg_decoder_impl.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::InSequence;
@@ -199,17 +195,10 @@ class VideoCaptureControllerTest
   void InitializeNewDeviceClientAndBufferPoolInstances() {
     buffer_pool_ = base::MakeRefCounted<media::VideoCaptureBufferPoolImpl>(
         media::VideoCaptureBufferType::kSharedMemory, kPoolSize);
-#if BUILDFLAG(IS_CHROMEOS)
-    device_client_ = std::make_unique<media::VideoCaptureDeviceClient>(
-        std::make_unique<media::VideoFrameReceiverOnTaskRunner>(
-            controller_->GetWeakPtrForIOThread(), GetIOThreadTaskRunner({})),
-        buffer_pool_, media::VideoCaptureJpegDecoderFactoryCB());
-#else
     device_client_ = std::make_unique<media::VideoCaptureDeviceClient>(
         std::make_unique<media::VideoFrameReceiverOnTaskRunner>(
             controller_->GetWeakPtrForIOThread(), GetIOThreadTaskRunner({})),
         buffer_pool_);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   void SendStubFrameToDeviceClient(const media::VideoCaptureFormat format,

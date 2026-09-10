@@ -36,15 +36,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/user_manager_delegate_impl.h"
-#include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
-#include "chrome/browser/browser_process.h"
-#include "chromeos/ash/components/settings/cros_settings.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/user_manager_impl.h"
-#endif
-
 using ::testing::StrictMock;
 
 namespace {
@@ -142,21 +133,9 @@ class ExtensionDataCollectionTest : public testing::Test {
     profile_manager_ = std::make_unique<TestingProfileManager>(
         TestingBrowserProcess::GetGlobal());
     ASSERT_TRUE(profile_manager_->SetUp());
-#if BUILDFLAG(IS_CHROMEOS)
-    user_manager_.Reset(std::make_unique<user_manager::UserManagerImpl>(
-        std::make_unique<ash::UserManagerDelegateImpl>(),
-        g_browser_process->local_state(), ash::CrosSettings::Get()));
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    // UserManager should be destroyed before TestingBrowserProcess as it
-    // uses it in destructor.
-    user_manager_.Reset();
-    // Finish any pending tasks before deleting the TestingBrowserProcess.
-    task_environment_.RunUntilIdle();
-#endif
     profile_manager_.reset();
     TestingBrowserProcess::DeleteInstance();
     testing::Test::TearDown();
@@ -202,10 +181,6 @@ class ExtensionDataCollectionTest : public testing::Test {
  private:
   int profile_number_ = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::ScopedCrosSettingsTestHelper cros_settings_test_helper_;
-  user_manager::ScopedUserManager user_manager_;
-#endif
 };
 
 TEST_F(ExtensionDataCollectionTest,

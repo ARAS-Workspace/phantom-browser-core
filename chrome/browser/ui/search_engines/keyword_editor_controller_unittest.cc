@@ -215,7 +215,7 @@ TEST_F(KeywordEditorControllerTest, Modify_SiteSearchPolicyEngine) {
   // Verify preference was updated to include keyword.
   const base::ListValue& overridden_keywords = profile().GetPrefs()->GetList(
       EnterpriseSearchManager::kSiteSearchSettingsOverriddenKeywordsPrefName);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   EXPECT_EQ(1u, overridden_keywords.size());
   EXPECT_EQ(base::UTF16ToUTF8(kB), overridden_keywords[0].GetString());
 #else
@@ -278,7 +278,7 @@ TEST_F(KeywordEditorControllerTest, Remove_SiteSearchPolicyEngine) {
   // Verify preference was updated to include keyword.
   const base::ListValue& overridden_keywords = profile().GetPrefs()->GetList(
       EnterpriseSearchManager::kSiteSearchSettingsOverriddenKeywordsPrefName);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   EXPECT_EQ(1u, overridden_keywords.size());
   EXPECT_EQ(base::UTF16ToUTF8(kB), overridden_keywords[0].GetString());
 #else

@@ -53,11 +53,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/permissions/system/system_permission_settings.h"
-#include "components/content_settings/core/common/content_settings_types.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace resource_coordinator {
 
 namespace {

@@ -189,12 +189,10 @@ Publisher* AppServiceProxyBase::GetPublisher(AppType app_type) {
 }
 
 // In ChromeOS, this is defined in AppServiceProxyAsh.
-#if !BUILDFLAG(IS_CHROMEOS)
 bool AppServiceProxyBase::MaybeShowLaunchPreventionDialog(
     const apps::AppUpdate& update) {
   return false;
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 apps::AppRegistryCache& AppServiceProxyBase::AppRegistryCache() {
   return app_registry_cache_;

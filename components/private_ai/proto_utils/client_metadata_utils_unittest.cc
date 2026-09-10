@@ -31,9 +31,6 @@ TEST(ClientMetadataUtilsTest, ConvertChannelToProto) {
 TEST(ClientMetadataUtilsTest, GetPlatformForProto) {
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ(GetPlatformForProto(), proto::ChromeClientMetadata::PLATFORM_MAC);
-#elif BUILDFLAG(IS_CHROMEOS)
-  EXPECT_EQ(GetPlatformForProto(),
-            proto::ChromeClientMetadata::PLATFORM_CHROMEOS);
 #elif BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(GetPlatformForProto(),
             proto::ChromeClientMetadata::PLATFORM_ANDROID);

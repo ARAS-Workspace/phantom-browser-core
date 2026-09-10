@@ -24,7 +24,7 @@ namespace extensions {
 
 namespace {
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<views::View> CreateSigninPromoFootnoteView(
     content::WebContents* web_contents,
     const extensions::ExtensionId& extension_id) {
@@ -50,11 +50,11 @@ std::unique_ptr<views::View> CreateSigninPromoFootnoteView(
   wrapper_view->AddChildView(std::move(promo_view));
   return wrapper_view;
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 void MaybeAddSigninPromoFootnoteView(
     Profile* profile,
     content::WebContents* web_contents,
@@ -69,6 +69,6 @@ void MaybeAddSigninPromoFootnoteView(
             views::BubbleDialogModelHost::FieldType::kMenuItem));
   }
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace extensions

@@ -130,11 +130,7 @@ const char kChromeBrowserRemoteCommandType[] =
 const char kChromeUserRemoteCommandType[] = "google/chrome/user/remotecommand";
 
 const char kChromeExtensionInstallUserCloudPolicyType[] =
-#if BUILDFLAG(IS_CHROMEOS)
-    "google/extension-install-cloud-policy/chromeos/user";
-#else
     "google/extension-install-cloud-policy/chrome/user";
-#endif
 
 const char kChromeExtensionInstallMachineLevelCloudPolicyType[] =
     "google/extension-install-cloud-policy/chrome/machine";
@@ -143,9 +139,7 @@ const char kChromeMachineLevelUserCloudPolicyTypeBase64[] =
     "Z29vZ2xlL2Nocm9tZS9tYWNoaW5lLWxldmVsLXVzZXI=";
 
 const char* GetChromeUserPolicyType() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return "google/chromeos/user";
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (base::android::device_info::is_desktop()) {
     return "google/chrome/user";
   } else {

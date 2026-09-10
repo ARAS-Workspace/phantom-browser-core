@@ -15,8 +15,7 @@ namespace remoting {
 // the primary display, or relative to the upper-left of the entire desktop
 // region. See comment at DesktopDisplayInfo::CalcDisplayOffset() for more
 // information.
-#define OS_USES_PRIMARY_DISPLAY_AS_ORIGIN \
-  BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
+#define OS_USES_PRIMARY_DISPLAY_AS_ORIGIN BUILDFLAG(IS_APPLE)
 
 class DesktopDisplayInfoTest : public testing::Test {
  public:

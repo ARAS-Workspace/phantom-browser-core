@@ -183,7 +183,7 @@ class EarlyFeatureAccessTracker {
  private:
   void Fail(const Feature* feature, bool with_feature_allow_list) {
     // TODO(crbug.com/40237050): Enable this check on all platforms.
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
     // Create a crash key with the name of the feature accessed too early, to
     // facilitate crash triage.
     SCOPED_CRASH_KEY_STRING256("FeatureList", "feature-accessed-too-early",
@@ -195,8 +195,7 @@ class EarlyFeatureAccessTracker {
                             ? " which is not on the allow list passed to "
                               "SetEarlyAccessInstance()."
                             : " before FeatureList registration.");
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID) &&
-        // !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
   }
 
   friend class NoDestructor<EarlyFeatureAccessTracker>;

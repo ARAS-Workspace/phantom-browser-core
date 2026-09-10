@@ -31,10 +31,6 @@
 #include "chrome/browser/performance_manager/policies/page_discarding_helper.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif
-
 namespace performance_manager::user_tuning {
 
 bool IsRefreshRateThrottled() {
@@ -51,11 +47,7 @@ bool IsRefreshRateThrottled() {
 }
 
 bool IsBatterySaverModeManagedByOS() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return ash::features::IsBatterySaverAvailable();
-#else
   return false;
-#endif
 }
 
 base::ByteSize GetDiscardedMemoryEstimateForPage(const PageNode* node) {

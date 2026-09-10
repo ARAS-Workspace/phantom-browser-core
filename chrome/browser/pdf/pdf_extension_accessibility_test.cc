@@ -70,10 +70,6 @@
 #include "ui/accessibility/platform/inspect/ax_inspect_test_helper.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/accessibility/accessibility_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // Fake ScreenAI library returns empty results for all queries, so testing with
 // it is not helpful.
 #if BUILDFLAG(ENABLE_SCREEN_AI_BROWSERTESTS) && !BUILDFLAG(USE_FAKE_SCREEN_AI)
@@ -337,7 +333,7 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionAccessibilityTestWithOopifOverride,
 
 // Flaky on ChromiumOS MSan. See https://crbug.com/40932967.
 // Flaky on Mac: https://crbug.com/334099836.
-#if (BUILDFLAG(IS_CHROMEOS) && defined(MEMORY_SANITIZER)) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_PdfAccessibilityWordBoundaries \
   DISABLED_PdfAccessibilityWordBoundaries
 #else
@@ -1084,11 +1080,7 @@ using PDFExtensionAccessibilityNavigationTest =
     PDFExtensionAccessibilityTestWithOopifOverride;
 
 // TODO(crbug.com/40934115): Fix the flakiness on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_LinkNavigation DISABLED_LinkNavigation
-#else
 #define MAYBE_LinkNavigation LinkNavigation
-#endif  // BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(PDFExtensionAccessibilityNavigationTest,
                        MAYBE_LinkNavigation) {
   // Enable accessibility and load the test file.
@@ -1207,64 +1199,6 @@ IN_PROC_BROWSER_TEST_P(PdfOcrUmaTest, CheckOpenedWithScreenReader) {
       "Accessibility.PDF.OpenedWithScreenReader.PdfOcr", true,
       /*expected_bucket_count=*/1);
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_P(PdfOcrUmaTest, CheckOpenedWithSelectToSpeak) {
-  // TODO(crbug.com/289010799): Remove this once the metrics are added for OOPIF
-  // PDF.
-  if (UseOopif()) {
-    GTEST_SKIP();
-  }
-
-  ::ash::AccessibilityManager::Get()->SetSelectToSpeakEnabled(true);
-
-  base::HistogramTester histograms;
-  histograms.ExpectUniqueSample(
-      "Accessibility.PDF.OpenedWithSelectToSpeak.PdfOcr", true,
-      /*expected_bucket_count=*/0);
-
-  ASSERT_TRUE(LoadPdf(embedded_test_server()->GetURL("/pdf/test.pdf")));
-
-  WebContents* contents = GetActiveWebContents();
-  content::RenderFrameHost* extension_host =
-      pdf_extension_test_util::GetOnlyPdfExtensionHost(contents);
-  ASSERT_TRUE(extension_host);
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  histograms.ExpectUniqueSample(
-      "Accessibility.PDF.OpenedWithSelectToSpeak.PdfOcr", true,
-      /*expected_bucket_count=*/1);
-}
-
-IN_PROC_BROWSER_TEST_P(PdfOcrUmaTest,
-                       CheckSelectToSpeakPagesOcredWithAccessiblePdf) {
-  // TODO(crbug.com/289010799): Remove this once the metrics are added for OOPIF
-  // PDF.
-  if (UseOopif()) {
-    GTEST_SKIP();
-  }
-
-  ::ash::AccessibilityManager::Get()->SetSelectToSpeakEnabled(true);
-
-  base::HistogramTester histograms;
-  histograms.ExpectTotalCount(
-      "Accessibility.PdfOcr.CrosSelectToSpeak.PagesOcred",
-      /*expected_count=*/0);
-
-  ASSERT_TRUE(LoadPdf(embedded_test_server()->GetURL("/pdf/test.pdf")));
-
-  WebContents* contents = GetActiveWebContents();
-  content::RenderFrameHost* extension_host =
-      pdf_extension_test_util::GetOnlyPdfExtensionHost(contents);
-  ASSERT_TRUE(extension_host);
-
-  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
-  // The metric should record nothing for accessible PDFs.
-  histograms.ExpectTotalCount(
-      "Accessibility.PdfOcr.CrosSelectToSpeak.PagesOcred",
-      /*expected_count=*/0);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 INSTANTIATE_TEST_SUITE_P(All,
                          PdfOcrUmaTest,

@@ -21,10 +21,6 @@
 #include "content/public/common/url_constants.h"
 #include "net/net_buildflags.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/chrome_url_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace chrome {
 
 // "Learn more" URL linked in the dialog to cast using a code.
@@ -40,41 +36,7 @@ inline constexpr char kBrowserSettingsSearchEngineURL[] =
 inline constexpr char kCastNoDestinationFoundURL[] =
     "https://support.google.com/chromecast/?p=no_cast_destination";
 
-#if BUILDFLAG(IS_CHROMEOS)
-// The URL for the WebHID API help center article.
-inline constexpr char kChooserHidOverviewUrl[] =
-    "https://support.google.com/chrome?p=webhid";
-
-// The URL for the WebUsb help center article.
-inline constexpr char kChooserUsbOverviewURL[] =
-    "https://support.google.com/chrome?p=webusb";
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // General help links for Chrome, opened using various actions.
-#if BUILDFLAG(IS_CHROMEOS)
-inline constexpr char kChromeHelpViaKeyboardURL[] =
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    "chrome-extension://honijodknafkokifofgiaalefdiedpko/main.html";
-#else
-    "https://support.google.com/chromebook?p=help&ctx=keyboard";
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
-inline constexpr char kChromeHelpViaMenuURL[] =
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    "chrome-extension://honijodknafkokifofgiaalefdiedpko/main.html";
-#else
-    "https://support.google.com/chromebook?p=help&ctx=menu";
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
-inline constexpr char kChromeHelpViaWebUIURL[] =
-    "https://support.google.com/chrome?p=help&ctx=settings";
-inline constexpr char kChromeOsHelpViaWebUIURL[] =
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    "chrome-extension://honijodknafkokifofgiaalefdiedpko/main.html";
-#else
-    "https://support.google.com/chromebook?p=help&ctx=settings";
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // The chrome-native: scheme is used show pages rendered with platform specific
 // widgets instead of using HTML.
@@ -144,11 +106,7 @@ inline constexpr char kLearnMoreReportingURL[] =
 
 // The URL for the Learn More page about policies and enterprise enrollment.
 inline constexpr char16_t kManagedUiLearnMoreUrl[] =
-#if BUILDFLAG(IS_CHROMEOS)
-    u"https://support.google.com/chromebook?p=is_chrome_managed";
-#else
     u"https://support.google.com/chrome?p=is_chrome_managed";
-#endif
 
 inline constexpr char16_t kMyActivityUrlInHistory[] =
     u"https://myactivity.google.com/myactivity/?utm_source=chrome_h";
@@ -177,40 +135,18 @@ inline constexpr char kSafetyTipHelpCenterURL[] =
 // The URL for the Learn More page about Sync and Google services.
 inline constexpr char kSyncAndGoogleServicesLearnMoreURL[] =
     "https://support.google.com/chrome?p=syncgoogleservices";
-#if BUILDFLAG(IS_CHROMEOS)
-static_assert(std::string_view(kSyncAndGoogleServicesLearnMoreURL) ==
-              ash::chrome_external_urls::kSyncAndGoogleServicesLearnMoreURL);
-#endif
 
 // The URL for the "Learn more" page on sync encryption.
 inline constexpr char16_t kSyncEncryptionHelpURL[] =
-#if BUILDFLAG(IS_CHROMEOS)
-    u"https://support.google.com/chromebook?p=settings_encryption";
-#else
     u"https://support.google.com/chrome?p=settings_encryption";
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-// The URL for the "Learn more" link when there is a sync error.
-inline constexpr char kSyncErrorsHelpURL[] =
-    "https://support.google.com/chrome?p=settings_sync_error";
-#endif
 
 // Legacy URL to the sync google dashboard.
 inline constexpr char kLegacySyncGoogleDashboardURL[] =
     "https://www.google.com/settings/chrome/sync";
-#if BUILDFLAG(IS_CHROMEOS)
-static_assert(std::string_view(kLegacySyncGoogleDashboardURL) ==
-              ash::chrome_external_urls::kLegacySyncGoogleDashboardURL);
-#endif
 
 // New URL to the sync google dashboard.
 inline constexpr char kNewSyncGoogleDashboardURL[] =
     "https://chrome.google.com/data";
-#if BUILDFLAG(IS_CHROMEOS)
-static_assert(std::string_view(kNewSyncGoogleDashboardURL) ==
-              ash::chrome_external_urls::kNewSyncGoogleDashboardURL);
-#endif
 
 // The URL for the "Learn more" page for signing in to chrome with expanded
 // section on "Sign in and turn on sync" in the Computer/Desktop tab.
@@ -247,34 +183,13 @@ inline constexpr char kUpgradeHelpCenterBaseURL[] =
 inline constexpr char kPrivacyPolicyOnlineURLPath[] =
     "https://policies.google.com/privacy/embedded";
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 // "Learn more" URL for the enhanced playback notification dialog.
 inline constexpr char kEnhancedPlaybackNotificationLearnMoreURL[] =
-#if BUILDFLAG(IS_CHROMEOS)
-    "https://support.google.com/chromebook?p=enhanced_playback";
-#else
     // Keep in sync with
     // chrome/browser/ui/android/strings/android_chrome_strings.grd
     "https://support.google.com/chrome?p=mobile_protected_content";
 #endif
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Chrome OS default pre-defined custom handlers
-inline constexpr char kChromeOSDefaultMailtoHandler[] =
-    "https://mail.google.com/mail/?extsrc=mailto&amp;url=%s";
-inline constexpr char kChromeOSDefaultWebcalHandler[] =
-    "https://www.google.com/calendar/render?cid=%s";
-
-// The URL for the "Account recovery" page.
-inline constexpr char kAccountRecoveryURL[] =
-    "https://accounts.google.com/signin/recovery";
-
-// The URL for the Learn More page about enterprise enrolled devices.
-inline constexpr char kLearnMoreEnterpriseURL[] =
-    "https://support.google.com/chromebook?p=managed";
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Please do not append entries here. See the comments at the top of the file.
 

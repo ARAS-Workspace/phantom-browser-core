@@ -159,24 +159,12 @@ struct StructTraits<printing::mojom::PrintSettingsDataView,
     return s.pages_per_sheet();
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   static const printing::PrintSettings::AdvancedSettings& advanced_settings(
       const printing::PrintSettings& s) {
     return s.advanced_settings();
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_CHROMEOS)
-  static bool send_user_info(const printing::PrintSettings& s) {
-    return s.send_user_info();
-  }
-  static const std::string& username(const printing::PrintSettings& s) {
-    return s.username();
-  }
-  static const std::string& pin_value(const printing::PrintSettings& s) {
-    return s.pin_value();
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENABLE_OOP_PRINTING_NO_OOP_BASIC_PRINT_DIALOG)
   static const base::DictValue& system_print_dialog_data(

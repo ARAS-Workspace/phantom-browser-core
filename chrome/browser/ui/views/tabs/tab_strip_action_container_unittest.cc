@@ -36,16 +36,8 @@
 #include "ui/views/test/views_test_utils.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/test/glic_user_session_test_helper.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 // TODO(crbug.com/461140208): Re-enable failing tests on ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE(test_name) DISABLED_##test_name
-#else
 #define MAYBE(test_name) test_name
-#endif
 
 namespace {
 using testing::SizeIs;
@@ -74,10 +66,6 @@ class TabStripActionContainerTest : public ChromeViewsTestBase {
     raw_ptr<TestingProfileManager> testing_profile_manager =
         TestingBrowserProcess::GetGlobal()->SetUpGlobalFeaturesForTesting(
             /*profile_manager=*/true);
-#if BUILDFLAG(IS_CHROMEOS)
-    glic_user_session_test_helper_.PreProfileSetUp(
-        testing_profile_manager->profile_manager());
-#endif  // BUILDFLAG(IS_CHROMEOS)
     ChromeViewsTestBase::SetUp();
     profile_ = testing_profile_manager->CreateTestingProfile(
         TestingProfile::kDefaultProfileUserName);
@@ -101,9 +89,6 @@ class TabStripActionContainerTest : public ChromeViewsTestBase {
     ChromeViewsTestBase::TearDown();
 
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
-#if BUILDFLAG(IS_CHROMEOS)
-    glic_user_session_test_helper_.PostProfileTearDown();
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
 
   Profile* GetProfile(bool use_otr_profile) {
@@ -189,9 +174,6 @@ class TabStripActionContainerTest : public ChromeViewsTestBase {
   // Owned by TabStrip.
 
   content::RenderViewHostTestEnabler render_view_host_test_enabler_;
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::GlicUserSessionTestHelper glic_user_session_test_helper_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   raw_ptr<TestingProfile> profile_ = nullptr;
   std::unique_ptr<content::WebContents> web_contents_;
   raw_ptr<content::WebContents> raw_web_contents_ = nullptr;

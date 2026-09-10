@@ -87,8 +87,6 @@ TEST(ClientFilterableStateTest, IgnoreInvalidFakePlatformSwitch) {
   actual_platform = Study::PLATFORM_IOS;
 #elif BUILDFLAG(IS_MAC)
   actual_platform = Study::PLATFORM_MAC;
-#elif BUILDFLAG(IS_CHROMEOS)
-  actual_platform = Study::PLATFORM_CHROMEOS;
 #elif BUILDFLAG(IS_ANDROID)
   actual_platform = Study::PLATFORM_ANDROID;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD) || BUILDFLAG(IS_SOLARIS)

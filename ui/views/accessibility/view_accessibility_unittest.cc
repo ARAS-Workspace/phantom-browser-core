@@ -662,17 +662,10 @@ TEST_F(ViewAccessibilityTest,
 }
 
 TEST_F(ViewAccessibilityTest, FeatureFlagEnabled) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS should always return false, even when the feature is enabled.
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(features::kAccessibilityTreeForViews);
-  EXPECT_FALSE(ViewAccessibility::IsViewsAccessibilityTreeEnabled());
-#else
   // Other platforms should respect the feature flag.
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndEnableFeature(features::kAccessibilityTreeForViews);
   EXPECT_TRUE(ViewAccessibility::IsViewsAccessibilityTreeEnabled());
-#endif
 }
 
 TEST_F(ViewAccessibilityTest, FeatureFlagDisabled) {

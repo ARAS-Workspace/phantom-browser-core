@@ -248,11 +248,7 @@ size_t GetActiveTemporalLayers(
 }
 
 bool VP8TLEncodingIsEnabled() {
-#if defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
   return false;
-#endif  // defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace

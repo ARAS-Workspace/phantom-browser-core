@@ -654,28 +654,6 @@ TEST_F(ExternalAppResolutionCommandTest,
   EXPECT_FALSE(IsPlaceholderAppId(placeholder_app_id));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ExternalAppResolutionCommandTest, InstallPlaceholderCustomName) {
-  const GURL kWebAppUrl("https://foo.example");
-  const std::string kCustomName("Custom äpp näme");
-  ExternalInstallOptions options(kWebAppUrl,
-                                 mojom::UserDisplayMode::kStandalone,
-                                 ExternalInstallSource::kExternalPolicy);
-  options.install_placeholder = true;
-  options.override_name = kCustomName;
-  SetPageState(options,
-               {.url_load_result =
-                    webapps::WebAppUrlLoaderResult::kRedirectedUrlLoaded});
-
-  auto result = InstallAndWait(options);
-
-  EXPECT_EQ(webapps::InstallResultCode::kSuccessNewInstall, result.code);
-  ASSERT_TRUE(result.app_id.has_value());
-
-  EXPECT_EQ(registrar().GetAppShortName(result.app_id.value()), kCustomName);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(ExternalAppResolutionCommandTest, UninstallAndReplace) {
   const GURL kWebAppUrl("https://foo.example");
   ExternalInstallOptions options = {kWebAppUrl, std::nullopt,

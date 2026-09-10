@@ -35,18 +35,6 @@
 
 namespace settings {
 
-#if BUILDFLAG(IS_CHROMEOS)
-namespace {
-// Generates a Google Help URL which includes a "board type" parameter. Some
-// help pages need to be adjusted depending on the type of CrOS device that is
-// accessing the page.
-std::u16string GetHelpUrlWithBoard(const std::u16string& original_url) {
-  return base::StrCat(
-      {original_url, u"&b=",
-       base::ASCIIToUTF16(base::SysInfo::GetLsbReleaseBoard())});
-}
-}  // namespace
-#endif
 
 void AddAxAnnotationsSectionStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
@@ -64,12 +52,6 @@ void AddAxAnnotationsSectionStrings(content::WebUIDataSource* html_source) {
   html_source->AddBoolean(
       "mainNodeAnnotationsEnabled",
       base::FeatureList::IsEnabled(features::kMainNodeAnnotations));
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddBoolean(
-      "japaneseBrailleEnabled",
-      base::FeatureList::IsEnabled(
-          features::kAccessibilityChromeVoxJapaneseBraille));
-#endif
 }
 
 void AddCaptionSubpageStrings(content::WebUIDataSource* html_source) {
@@ -121,17 +103,9 @@ void AddCaptionSubpageStrings(content::WebUIDataSource* html_source) {
   html_source->AddLocalizedStrings(kLocalizedStrings);
   // Add the caption subtitle string conditionally so that non-cbx chromebooks
   // do not show live translate information.
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddLocalizedString(
-      "captionsManageLanguagesSubtitle",
-      base::FeatureList::IsEnabled(media::kFeatureManagementLiveTranslateCrOS)
-          ? IDS_SETTINGS_CAPTIONS_MANAGE_LANGUAGES_SUBTITLE
-          : IDS_SETTINGS_CAPTIONS_MANAGE_LANGUAGES_SUBTITLE_LIVE_CAPTION_ONLY);
-#else
   html_source->AddLocalizedString(
       "captionsManageLanguagesSubtitle",
       IDS_SETTINGS_CAPTIONS_MANAGE_LANGUAGES_SUBTITLE);
-#endif
 
   AddLiveCaptionSectionStrings(html_source);
 }
@@ -163,18 +137,6 @@ void AddLiveCaptionSectionStrings(content::WebUIDataSource* html_source) {
   html_source->AddBoolean("enableLiveTranslate", liveTranslateEnabled);
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void AddPasswordPromptDialogStrings(content::WebUIDataSource* html_source) {
-  static constexpr webui::LocalizedString kLocalizedStrings[] = {
-      {"passwordPromptTitle", IDS_SETTINGS_PEOPLE_PASSWORD_PROMPT_TITLE},
-      {"passwordPromptInvalidPassword",
-       IDS_SETTINGS_PEOPLE_PASSWORD_PROMPT_INVALID_PASSWORD},
-      {"passwordPromptPasswordLabel",
-       IDS_SETTINGS_PEOPLE_PASSWORD_PROMPT_PASSWORD_LABEL},
-  };
-  html_source->AddLocalizedStrings(kLocalizedStrings);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
@@ -196,10 +158,6 @@ void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
       {"syncAdvancedBrowserPageTitle",
        IDS_SETTINGS_NEW_SYNC_ADVANCED_BROWSER_PAGE_TITLE},
       {"enterPassphraseLabel", IDS_SYNC_ENTER_PASSPHRASE_BODY},
-#if BUILDFLAG(IS_CHROMEOS)
-      {"enterPassphraseLabelWithDate",
-       IDS_SYNC_ENTER_PASSPHRASE_BODY_WITH_DATE},
-#endif
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
@@ -216,10 +174,6 @@ void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
       "passphraseRecover",
       l10n_util::GetStringFUTF8(IDS_SETTINGS_PASSPHRASE_RECOVER,
                                 base::ASCIIToUTF16(sync_dashboard_url)));
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddString("syncDashboardUrl", sync_dashboard_url);
-  html_source->AddString("syncErrorsHelpUrl", chrome::kSyncErrorsHelpURL);
-#endif
 
   const bool updateAccountSettingsStrings =
       syncer::IsReplaceSyncPromosWithSignInPromosEnabled();
@@ -239,13 +193,6 @@ void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
       updateAccountSettingsStrings
           ? IDS_SYNC_FULL_ACCOUNT_DATA_ENCRYPTION_BODY_CUSTOM
           : IDS_SYNC_FULL_ENCRYPTION_BODY_CUSTOM);
-#if BUILDFLAG(IS_CHROMEOS)
-  html_source->AddLocalizedString(
-      "manageSyncedDataTitle",
-      updateAccountSettingsStrings
-          ? IDS_SETTINGS_ACCOUNT_DATA_DASHBOARD
-          : IDS_SETTINGS_NEW_MANAGE_SYNCED_DATA_TITLE_UNIFIED_CONSENT);
-#endif
 
   html_source->AddString(
       "passphraseResetHintEncryption",
@@ -267,11 +214,7 @@ void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
           updateAccountSettingsStrings
               ? IDS_SETTINGS_ENCRYPT_ACCOUNT_DATA_WITH_PASSPHRASE_LABEL
               : IDS_SETTINGS_ENCRYPT_WITH_SYNC_PASSPHRASE_LABEL,
-#if BUILDFLAG(IS_CHROMEOS)
-          GetHelpUrlWithBoard(chrome::kSyncEncryptionHelpURL)));
-#else
           chrome::kSyncEncryptionHelpURL));
-#endif
 }
 
 void AddSecureDnsStrings(content::WebUIDataSource* html_source) {

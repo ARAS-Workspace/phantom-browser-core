@@ -125,7 +125,7 @@ IN_PROC_BROWSER_TEST_F(LensOverlayTest, OverlayPerformanceTracker) {
   RunOverlayTest("lens/overlay/performance_tracker_test.js", "mocha.run()");
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_OverlayCursor DISABLED_OverlayCursor
 #else
 #define MAYBE_OverlayCursor OverlayCursor
@@ -146,7 +146,7 @@ IN_PROC_BROWSER_TEST_F(LensOverlayTest, OverlayScreenshot) {
 
 // TODO(crbug.com/414207670,531038976,531065529): Test is failing on Linux,
 // ChromeOS and mac bots.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_ManualRegionSelection DISABLED_ManualRegionSelection
 #else
 #define MAYBE_ManualRegionSelection ManualRegionSelection

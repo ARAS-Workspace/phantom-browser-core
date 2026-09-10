@@ -47,7 +47,7 @@ bool ShouldCreateCustomLinksManager() {
 }
 
 bool ShouldCreateEnterpriseShortcutsManager() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   return true;
 #else
   return false;

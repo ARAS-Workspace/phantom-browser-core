@@ -15,10 +15,6 @@
 #include "sandbox/policy/export.h"
 #include "sandbox/policy/linux/sandbox_linux.h"
 
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-#include "printing/backend/cups_connection_pool.h"
-#endif
-
 using sandbox::syscall_broker::BrokerFilePermission;
 using sandbox::syscall_broker::MakeBrokerCommandSet;
 
@@ -43,11 +39,6 @@ sandbox::syscall_broker::BrokerCommandSet GetPrintBackendBrokerCommandSet() {
 }
 
 std::vector<BrokerFilePermission> GetPrintBackendFilePermissions() {
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-  // No extra permissions required, as the needed socket connections to the CUPS
-  // server are established before entering the sandbox.
-  return std::vector<BrokerFilePermission>();
-#else
   base::FilePath temp_dir_path;
   CHECK(base::GetTempDir(&temp_dir_path));
   base::FilePath home_dir_path;
@@ -72,18 +63,12 @@ std::vector<BrokerFilePermission> GetPrintBackendFilePermissions() {
   };
 
   return permissions;
-#endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
 }
 
 }  // namespace
 
 bool PrintBackendPreSandboxHook(
     sandbox::policy::SandboxLinux::Options options) {
-#if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
-  // Create the socket connections to the CUPS server before engaging the
-  // sandbox, since new connections cannot be made after that.
-  CupsConnectionPool::Create();
-#endif
 
   auto* instance = sandbox::policy::SandboxLinux::GetInstance();
 

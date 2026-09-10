@@ -1267,11 +1267,7 @@ TEST_F(WallpaperSearchHandlerTest, GetWallpaperSearchResults_SignedOut) {
       .Times(0);
 
 // ChromeOs doesn't support signing out the primary account.
-#if !BUILDFLAG(IS_CHROMEOS)
   signin::ClearPrimaryAccount(&identity_manager());
-#else
-  profile().SetGuestSession(true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   side_panel::customize_chrome::mojom::ResultDescriptorsPtr result_descriptors =
       side_panel::customize_chrome::mojom::ResultDescriptors::New();
@@ -1590,11 +1586,6 @@ TEST_F(WallpaperSearchHandlerTest, SetUserFeedback) {
       .Run(optimization_guide::OptimizationGuideModelExecutionResult(
                base::ok(result1), nullptr),
            ModelQuality());
-#if BUILDFLAG(IS_CHROMEOS)
-  // The feedback dialog on CrOS happens at the system level. This can cause the
-  // unittest to crash.
-  handler->SkipShowFeedbackPageForTesting(true);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   handler->SetUserFeedback(
       side_panel::customize_chrome::mojom::UserFeedback::kThumbsDown);
 

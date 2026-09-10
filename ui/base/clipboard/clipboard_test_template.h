@@ -501,7 +501,7 @@ TYPED_TEST(ClipboardTest, URLTest) {
 // TODO(tonikitoo, msisov): enable back for ClipboardOzone implements
 // selection support. https://crbug.com/911992
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_OZONE)
+    !BUILDFLAG(IS_OZONE)
   ascii_text = clipboard_test_util::ReadAsciiText(&this->clipboard(),
                                                   ClipboardBuffer::kSelection,
                                                   /* data_dst = */ nullptr);
@@ -1101,69 +1101,6 @@ TYPED_TEST(ClipboardTest, BookmarkTestWithoutTitle) {
 
 // Policy controller is only intended to be used in Chrome OS, so the following
 // policy related tests are only run on Chrome OS.
-#if BUILDFLAG(IS_CHROMEOS)
-// Test that copy/paste would work normally if the policy controller didn't
-// restrict the clipboard data.
-TYPED_TEST(ClipboardTest, PolicyAllowDataRead) {
-  auto policy_controller = std::make_unique<MockPolicyController>();
-  const std::u16string kTestText(u"World");
-  {
-    ScopedClipboardWriter writer(
-        ClipboardBuffer::kCopyPaste,
-        std::make_unique<DataTransferEndpoint>(GURL("https://www.google.com")));
-    writer.WriteText(kTestText);
-  }
-  EXPECT_CALL(*policy_controller, IsClipboardReadAllowed)
-      .WillRepeatedly(testing::Return(true));
-  std::u16string read_result = clipboard_test_util::ReadText(
-      &this->clipboard(), ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr);
-  EXPECT_EQ(kTestText, read_result);
-
-  ::testing::Mock::VerifyAndClearExpectations(policy_controller.get());
-}
-
-// Test that pasting clipboard data would not work if the policy controller
-// restricted it.
-TYPED_TEST(ClipboardTest, PolicyDisallow_ReadText) {
-  auto policy_controller = std::make_unique<MockPolicyController>();
-  const std::u16string kTestText(u"World");
-  {
-    ScopedClipboardWriter writer(
-        ClipboardBuffer::kCopyPaste,
-        std::make_unique<DataTransferEndpoint>(GURL("https://google.com/")));
-    writer.WriteText(kTestText);
-  }
-  EXPECT_CALL(*policy_controller, IsClipboardReadAllowed)
-      .WillRepeatedly(testing::Return(false));
-  std::u16string read_result = clipboard_test_util::ReadText(
-      &this->clipboard(), ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr);
-  ::testing::Mock::VerifyAndClearExpectations(policy_controller.get());
-  EXPECT_EQ(std::u16string(), read_result);
-}
-
-TYPED_TEST(ClipboardTest, PolicyDisallow_ReadPng) {
-  auto policy_controller = std::make_unique<MockPolicyController>();
-  constexpr uint32_t kBitMapData[4 * 3] = {
-      N32(0x46, 0x06, 0x16, 0x26), N32(0xf6, 0x9f, 0x59, 0x88),
-      N32(0x79, 0x3f, 0x29, 0x37), N32(0xfa, 0x55, 0xb9, 0x86),
-      N32(0x78, 0x77, 0x21, 0x52), N32(0x87, 0x69, 0x2a, 0x30),
-      N32(0x36, 0x32, 0x2a, 0x25), N32(0x43, 0x20, 0x40, 0x1b),
-      N32(0x91, 0x84, 0x8c, 0x21), N32(0xc3, 0x17, 0x7b, 0x3c),
-      N32(0x69, 0x46, 0x15, 0x5c), N32(0x64, 0x17, 0x19, 0x52),
-  };
-  WriteBitmap(&this->clipboard(), SkImageInfo::MakeN32Premul(4, 3),
-              reinterpret_cast<const void*>(kBitMapData));
-  EXPECT_CALL(*policy_controller, IsClipboardReadAllowed)
-      .WillRepeatedly(testing::Return(false));
-  std::vector<uint8_t> image = clipboard_test_util::ReadPng(
-      &this->clipboard(), ClipboardBuffer::kCopyPaste, /*data_dst=*/nullptr);
-  ::testing::Mock::VerifyAndClearExpectations(policy_controller.get());
-  EXPECT_EQ(true, image.empty());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_APPLE)
 // Ensures that BookmarkEntriesType can be written to and read from the

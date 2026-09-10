@@ -151,7 +151,7 @@ class CrComponentsHistoryClustersTest : public WebUIMochaBrowserTest {
 };
 
 // TODO(crbug.com/390550686): Test is flaky.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_All DISABLED_All
 #else
 #define MAYBE_All All

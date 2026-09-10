@@ -30,10 +30,6 @@
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#endif
-
 namespace captions {
 
 namespace {
@@ -119,7 +115,7 @@ class LiveCaptionControllerTest : public LiveCaptionBrowserTest {
         GetCaptionBubbleContextBrowser());
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   void OnToggleFullscreen() {
     GetControllerForProfile(browser()->GetProfile())
         ->OnToggleFullscreen(GetCaptionBubbleContextBrowser());
@@ -168,14 +164,12 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest, ProfilePrefsAreRegistered) {
   EXPECT_FALSE(
       browser()->GetProfile()->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // These prefs are used for the component updater, but SODA does not use the
   // component updater on Chrome OS.
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaBinaryPath));
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaEnUsConfigPath));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest,
@@ -184,28 +178,24 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest,
   SetLiveCaptionEnabled(true);
   EXPECT_TRUE(
       browser()->GetProfile()->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-#if !BUILDFLAG(IS_CHROMEOS)
   // These prefs are used for the component updater, but SODA does not use the
   // component updater on Chrome OS.
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaBinaryPath));
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaEnUsConfigPath));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   // Ensure that live caption is also enabled in the incognito profile.
   Profile* incognito_profile =
       browser()->GetProfile()->GetPrimaryOTRProfile(/*create_if_needed=*/true);
   EXPECT_TRUE(
       incognito_profile->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-#if !BUILDFLAG(IS_CHROMEOS)
   // These prefs are used for the component updater, but SODA does not use the
   // component updater on Chrome OS.
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaBinaryPath));
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaEnUsConfigPath));
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest, LiveCaptionEnabledChanged) {
@@ -329,7 +319,7 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest, OnAudioStreamEnd) {
   EXPECT_FALSE(HasBubbleController());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest, OnToggleFullscreen) {
   OnToggleFullscreen();
   EXPECT_FALSE(HasBubbleController());
@@ -345,8 +335,6 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest, OnToggleFullscreen) {
   EXPECT_FALSE(HasBubbleController());
 }
 #endif
-
-#if !BUILDFLAG(IS_CHROMEOS)  // No multi-profile on ChromeOS.
 
 IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest,
                        LiveCaptionEnabledChanged_MultipleProfiles) {
@@ -449,6 +437,5 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest,
   ExpectIsWidgetVisibleOnProfile(false, profile1);
   ExpectIsWidgetVisibleOnProfile(false, profile2);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace captions

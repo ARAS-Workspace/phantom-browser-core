@@ -44,10 +44,8 @@
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
 #include "services/viz/public/cpp/gpu/gpu.h"  // nogncheck
-#if !BUILDFLAG(IS_CHROMEOS)
 #include "ui/display/screen.h"
 #include "ui/views/widget/desktop_aura/desktop_screen.h"
-#endif
 #include "ui/wm/core/wm_state.h"
 #endif  // defined(USE_AURA)
 
@@ -107,7 +105,7 @@ void ChromeBrowserMainExtraPartsViews::ToolkitInitialized() {
 }
 
 void ChromeBrowserMainExtraPartsViews::PreCreateThreads() {
-#if defined(USE_AURA) && !BUILDFLAG(IS_CHROMEOS)
+#if defined(USE_AURA)
   // The Screen instance may already be set in tests.
   if (!display::Screen::Get()) {
     screen_ = views::CreateDesktopScreen();

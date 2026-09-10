@@ -46,11 +46,6 @@
 using syncer::UserSelectableType;
 using syncer::UserSelectableTypeSet;
 
-#if BUILDFLAG(IS_CHROMEOS)
-using syncer::UserSelectableOsType;
-using syncer::UserSelectableOsTypeSet;
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 namespace {
 
@@ -58,11 +53,7 @@ namespace {
 const int64_t kDefaultTime = 1234L;
 
 proto::InstallState GetExpectedInstallState() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return proto::InstallState::INSTALLED_WITH_OS_INTEGRATION;
-#else
   return proto::InstallState::SUGGESTED_FROM_ANOTHER_DEVICE;
-#endif
 }
 
 class SingleClientWebAppsSyncTest
@@ -146,17 +137,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWebAppsSyncTest,
   syncer::SyncServiceImpl* service = GetSyncService(0);
   syncer::SyncUserSettings* settings = service->GetUserSettings();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Apps is an OS type on Ash.
-  ASSERT_TRUE(
-      settings->GetSelectedOsTypes().Has(UserSelectableOsType::kOsApps));
-  EXPECT_TRUE(service->GetActiveDataTypes().Has(syncer::WEB_APPS));
-
-  settings->SetSelectedOsTypes(false, UserSelectableOsTypeSet());
-  ASSERT_FALSE(
-      settings->GetSelectedOsTypes().Has(UserSelectableOsType::kOsApps));
-  EXPECT_FALSE(service->GetActiveDataTypes().Has(syncer::WEB_APPS));
-#else
   ASSERT_TRUE(settings->GetSelectedTypes().Has(UserSelectableType::kApps));
   EXPECT_TRUE(service->GetActiveDataTypes().Has(syncer::WEB_APPS));
 
@@ -164,7 +144,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWebAppsSyncTest,
 
   ASSERT_FALSE(settings->GetSelectedTypes().Has(UserSelectableType::kApps));
   EXPECT_FALSE(service->GetActiveDataTypes().Has(syncer::WEB_APPS));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_P(SingleClientWebAppsSyncTest,
@@ -302,13 +281,8 @@ IN_PROC_BROWSER_TEST_P(SingleClientWebAppsSyncTest, InstalledAppUpdatesSync) {
   sync_pb::WebAppSpecifics expected_sync_data;
   expected_sync_data.set_start_url(app_url.spec());
   expected_sync_data.set_name(app_name);
-#if BUILDFLAG(IS_CHROMEOS)
-  expected_sync_data.set_user_display_mode_cros(
-      sync_pb::WebAppSpecifics_UserDisplayMode_STANDALONE);
-#else
   expected_sync_data.set_user_display_mode_default(
       sync_pb::WebAppSpecifics_UserDisplayMode_STANDALONE);
-#endif
   expected_sync_data.set_theme_color(SK_ColorRED);
   expected_sync_data.set_scope("https://example.com/scope/");
   expected_sync_data.set_relative_manifest_id("manifest-id");
@@ -349,13 +323,8 @@ IN_PROC_BROWSER_TEST_P(SingleClientWebAppsSyncTest, InstalledAppUpdatesSync) {
   AwaitWebAppQuiescence();
 
   sync_pb::WebAppSpecifics updated_sync_data = expected_sync_data;
-#if BUILDFLAG(IS_CHROMEOS)
-  updated_sync_data.set_user_display_mode_cros(
-      sync_pb::WebAppSpecifics_UserDisplayMode_BROWSER);
-#else
   updated_sync_data.set_user_display_mode_default(
       sync_pb::WebAppSpecifics_UserDisplayMode_BROWSER);
-#endif
 
   {
     std::vector<sync_pb::SyncEntity> sync_entities =

@@ -105,11 +105,6 @@
 #include "pdf/pdf_features.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "base/containers/extend.h"
-#endif
-
 using content::RenderFrameHost;
 using content::WebContents;
 using extensions::Extension;
@@ -706,18 +701,6 @@ IN_PROC_BROWSER_TEST_P(HostedAppTestWithPrerendering,
 }
 
 // TODO(crbug.com/40890220): Flaky test.
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_P(HostedAppTest, DISABLED_LoadIcon) {
-  SetupApp("hosted_app");
-
-  EXPECT_TRUE(app_service_test().AreIconImageEqual(
-      app_service_test().LoadAppIconBlocking(
-          app_id_, extension_misc::EXTENSION_ICON_SMALL),
-      web_app::AppBrowserController::From(app_browser_)
-          ->GetWindowAppIcon()
-          .Rasterize(nullptr)));
-}
-#endif
 
 class HostedAppTestWithAutoupgradesDisabled : public HostedOrWebAppTest {
  public:

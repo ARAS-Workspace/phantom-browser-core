@@ -43,7 +43,7 @@
 #include "services/device/compute_pressure/pressure_manager_impl.h"
 #endif
 
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
 #include "services/device/hid/input_service_linux.h"
 #endif
 
@@ -108,7 +108,7 @@ DeviceService::DeviceService(
 }
 
 DeviceService::~DeviceService() {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_IOS_TVOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS_TVOS)
   // NOTE: We don't call this on Chrome OS due to https://crbug.com/856771, as
   // Shutdown() implicitly depends on DBusThreadManager, which may already be
   // destroyed by the time DeviceService is destroyed. Fortunately on Chrome OS
@@ -213,16 +213,7 @@ void DeviceService::BindHidManager(
   hid_manager_->AddReceiver(std::move(receiver));
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-void DeviceService::BindMtpManager(
-    mojo::PendingReceiver<mojom::MtpManager> receiver) {
-  if (!mtp_device_manager_)
-    mtp_device_manager_ = MtpDeviceManager::Initialize();
-  mtp_device_manager_->AddReceiver(std::move(receiver));
-}
-#endif
-
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if BUILDFLAG(IS_LINUX) && defined(USE_UDEV)
 void DeviceService::BindInputDeviceManager(
     mojo::PendingReceiver<mojom::InputDeviceManager> receiver) {
   file_task_runner_->PostTask(

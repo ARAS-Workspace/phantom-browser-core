@@ -99,13 +99,10 @@
 #include "ui/gl/gl_implementation.h"
 #include "ui/gl/gl_switches.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "ui/platform_window/common/platform_window_defaults.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE)
-#include "ui/events/ozone/events_ozone.h"
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/task_scheduler/post_task_android.h"
@@ -263,16 +260,10 @@ BrowserTestBase::BrowserTestBase() {
          "a new browser test suite that runs on Android, please add it to "
          "//build/android/pylib/gtest/gtest_test_instance.py.";
   g_instance_already_created = true;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   ui::test::EnableTestConfigForPlatformWindows();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_CHROMEOS_DEVICE)
-  // Events used in tests on CrOS are generated either at aura level, or ozone
-  // level, except for Crosier tests that run on a device.  Disable native
-  // events handling as they can cause unexpected behavior.
-  ui::DisableNativeUiEventDispatchForTest();
-#endif
 
 #if BUILDFLAG(IS_POSIX)
   handle_sigterm_ = true;
@@ -1014,18 +1005,10 @@ void BrowserTestBase::SetAllowNetworkAccessToHostResolutions() {
   // dependency on network access.
   CHECK(!set_up_called_);
 
-#if BUILDFLAG(IS_CHROMEOS_DEVICE)
-  // External network access is only allowed for ChromeOS integration tests
-  // running on real devices or VMs.
-  CHECK(base::SysInfo::IsRunningOnChromeOS())
-      << "External network access is only allowed for on device ChromeOS "
-         "integration tests";
-#else
   const char kManualTestPrefix[] = "MANUAL_";
   CHECK(base::StartsWith(
       testing::UnitTest::GetInstance()->current_test_info()->name(),
       kManualTestPrefix, base::CompareCase::SENSITIVE));
-#endif  // BUILDFLAG(IS_CHROMEOS_DEVICE)
 
   LOG(WARNING) << "External network access is allowed. "
                << "This could lead to DoS on web sites and is normally only "

@@ -65,8 +65,6 @@ IN_PROC_BROWSER_TEST_F(SystemDisplayExtensionApiTest, OnDisplayChangedEvent) {
       [&]() { return !provider_->is_observing_for_testing(); }));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
-
 IN_PROC_BROWSER_TEST_F(SystemDisplayExtensionApiTest, SetDisplay) {
   scoped_refptr<SystemDisplaySetDisplayPropertiesFunction> set_info_function(
       new SystemDisplaySetDisplayPropertiesFunction());
@@ -80,8 +78,6 @@ IN_PROC_BROWSER_TEST_F(SystemDisplayExtensionApiTest, SetDisplay) {
   std::optional<base::DictValue> set_info = provider_->GetSetInfoValue();
   EXPECT_FALSE(set_info);
 }
-
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 

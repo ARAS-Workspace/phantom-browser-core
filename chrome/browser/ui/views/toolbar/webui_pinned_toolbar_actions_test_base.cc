@@ -77,10 +77,8 @@ WebUIPinnedToolbarActionsTestBase::WebUIPinnedToolbarActionsTestBase()
            toolbar_ui_api::mojom::PinnedToolbarAction::
                kSidePanelShowHistoryCluster},
 // ChromeOS doesn't support download button.
-#if !BUILDFLAG(IS_CHROMEOS)
           {kActionShowDownloads,
            toolbar_ui_api::mojom::PinnedToolbarAction::kShowDownloads},
-#endif  // !BUILDFLAG(IS_CHROMEOS)
           {kActionClearBrowsingData,
            toolbar_ui_api::mojom::PinnedToolbarAction::kClearBrowsingData},
           {kActionPrint, toolbar_ui_api::mojom::PinnedToolbarAction::kPrint},

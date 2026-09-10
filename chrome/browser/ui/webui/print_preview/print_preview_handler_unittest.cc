@@ -82,10 +82,6 @@
 #include "chrome/test/base/testing_profile_manager.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_pref_names.h"
-#endif
-
 namespace printing {
 
 namespace {
@@ -928,77 +924,6 @@ TEST_F(PrintPreviewHandlerTest, InitialSettingsDefaultPaperSizeCustomSize) {
       *web_ui()->call_data().back(), "mediaSize", std::nullopt,
       base::test::ParseJson(kExpectedInitialSettingsPolicy));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(PrintPreviewHandlerTest, InitialSettingsMaxSheetsAllowedPolicy) {
-  prefs()->SetInteger(ash::prefs::kPrintingMaxSheetsAllowed, 2);
-  Initialize();
-  ValidateInitialSettingsValuePolicy(*web_ui()->call_data().back(), "sheets",
-                                     base::Value(2));
-}
-
-TEST_F(PrintPreviewHandlerTest, InitialSettingsZeroSheetsAllowedPolicy) {
-  prefs()->SetInteger(ash::prefs::kPrintingMaxSheetsAllowed, 0);
-  Initialize();
-  ValidateInitialSettingsValuePolicy(*web_ui()->call_data().back(), "sheets",
-                                     base::Value(0));
-}
-
-TEST_F(PrintPreviewHandlerTest, InitialSettingsNegativeMaxSheetsPolicy) {
-  prefs()->SetInteger(ash::prefs::kPrintingMaxSheetsAllowed, -1);
-  Initialize();
-  ValidateInitialSettingsValuePolicy(*web_ui()->call_data().back(), "sheets",
-                                     std::nullopt);
-}
-
-TEST_F(PrintPreviewHandlerTest, InitialSettingsEnableColorAndMonochrome) {
-  // Set a pref that should take priority over StickySettings.
-  prefs()->SetInteger(ash::prefs::kPrintingAllowedColorModes, 3);
-  Initialize();
-  ValidateInitialSettingsAllowedDefaultModePolicy(
-      *web_ui()->call_data().back(), "color", base::Value(3), std::nullopt);
-}
-
-TEST_F(PrintPreviewHandlerTest, InitialSettingsDefaultColor) {
-  // Set a pref that should take priority over StickySettings.
-  prefs()->SetInteger(ash::prefs::kPrintingColorDefault, 2);
-  Initialize();
-  ValidateInitialSettingsAllowedDefaultModePolicy(
-      *web_ui()->call_data().back(), "color", std::nullopt, base::Value(2));
-}
-
-TEST_F(PrintPreviewHandlerTest, InitialSettingsEnableSimplexAndDuplex) {
-  // Set a pref that should take priority over StickySettings.
-  prefs()->SetInteger(ash::prefs::kPrintingAllowedDuplexModes, 7);
-  Initialize();
-  ValidateInitialSettingsAllowedDefaultModePolicy(
-      *web_ui()->call_data().back(), "duplex", base::Value(7), std::nullopt);
-}
-
-TEST_F(PrintPreviewHandlerTest, InitialSettingsDefaultSimplex) {
-  // Set a pref that should take priority over StickySettings.
-  prefs()->SetInteger(ash::prefs::kPrintingDuplexDefault, 1);
-  Initialize();
-  ValidateInitialSettingsAllowedDefaultModePolicy(
-      *web_ui()->call_data().back(), "duplex", std::nullopt, base::Value(1));
-}
-
-TEST_F(PrintPreviewHandlerTest, InitialSettingsRestrictPin) {
-  // Set a pref that should take priority over StickySettings.
-  prefs()->SetInteger(ash::prefs::kPrintingAllowedPinModes, 1);
-  Initialize();
-  ValidateInitialSettingsAllowedDefaultModePolicy(
-      *web_ui()->call_data().back(), "pin", base::Value(1), std::nullopt);
-}
-
-TEST_F(PrintPreviewHandlerTest, InitialSettingsDefaultNoPin) {
-  // Set a pref that should take priority over StickySettings.
-  prefs()->SetInteger(ash::prefs::kPrintingPinDefault, 2);
-  Initialize();
-  ValidateInitialSettingsAllowedDefaultModePolicy(
-      *web_ui()->call_data().back(), "pin", std::nullopt, base::Value(2));
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PrintPreviewHandlerTest, GetPrinters) {
   base::HistogramTester histogram_tester;

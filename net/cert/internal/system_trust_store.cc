@@ -41,68 +41,7 @@
 #include "net/cert/internal/trust_store_chrome.h"
 #endif  // CHROME_ROOT_STORE_SUPPORTED
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/system/sys_info.h"
-#endif
-
 namespace net {
-
-#if BUILDFLAG(IS_CHROMEOS)
-namespace internal {
-class PemFileCertStore {
- public:
-  explicit PemFileCertStore(std::string_view file_name) {
-    // This will block on the cert verifier service thread, so the effect will
-    // just be to block any cert verifications (interactions with the cert
-    // verifier service are async mojo calls, so it shouldn't block the browser
-    // UI). There would be no benefit to moving this to a worker thread, since
-    // all cert verifications would still need to block on loading of the roots
-    // to complete.
-    base::ScopedAllowBlocking allow_blocking;
-    std::optional<std::vector<uint8_t>> certs_file =
-        base::ReadFileToBytes(base::FilePath(file_name));
-    if (!certs_file) {
-      return;
-    }
-
-    trust_store_ = std::make_unique<bssl::TrustStoreInMemory>();
-
-    CertificateList certs = X509Certificate::CreateCertificateListFromBytes(
-        *certs_file, X509Certificate::FORMAT_AUTO);
-
-    for (const auto& cert : certs) {
-      bssl::CertErrors errors;
-      auto parsed = bssl::ParsedCertificate::Create(
-          bssl::UpRef(cert->cert_buffer()),
-          x509_util::DefaultParseCertificateOptions(), &errors);
-      if (!parsed) {
-        LOG(ERROR) << file_name << ": " << errors.ToDebugString();
-        continue;
-      }
-      trust_store_->AddTrustAnchor(std::move(parsed));
-    }
-  }
-
-  bssl::TrustStoreInMemory* trust_store() { return trust_store_.get(); }
-
- private:
-  std::unique_ptr<bssl::TrustStoreInMemory> trust_store_;
-};
-}  // namespace internal
-
-namespace {
-
-// On ChromeOS look for a PEM file of root CA certs to trust which may be
-// present on test images.
-bssl::TrustStoreInMemory* GetChromeOSTestTrustStore() {
-  constexpr char kCrosTestRootCertsFile[] = "/etc/fake_root_ca_certs.pem";
-  static base::NoDestructor<internal::PemFileCertStore> cros_test_roots{
-      kCrosTestRootCertsFile};
-  return cros_test_roots->trust_store();
-}
-
-}  // namespace
-#endif
 
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
 class SystemTrustStoreChromeWithUnOwnedSystemStore : public SystemTrustStore {
@@ -116,17 +55,6 @@ class SystemTrustStoreChromeWithUnOwnedSystemStore : public SystemTrustStore {
       net::PlatformTrustStore* trust_store_system)
       : trust_store_chrome_(std::move(trust_store_chrome)),
         platform_trust_store_(trust_store_system) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (GetChromeOSTestTrustStore()) {
-      // The fake_root_ca_certs.pem file is only intended for testing purposes,
-      // crash if it is present on a ChromeOS device in a non-test image.
-      base::SysInfo::CrashIfChromeOSNonTestImage();
-
-      trust_store_collection_.AddTrustStore(GetChromeOSTestTrustStore());
-      non_crs_trust_store_collection_.AddTrustStore(
-          GetChromeOSTestTrustStore());
-    }
-#endif
     if (trust_store_system) {
       trust_store_collection_.AddTrustStore(trust_store_system);
       non_crs_trust_store_collection_.AddTrustStore(trust_store_system);

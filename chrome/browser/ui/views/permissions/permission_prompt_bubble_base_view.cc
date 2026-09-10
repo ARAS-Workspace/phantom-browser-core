@@ -275,14 +275,6 @@ void PermissionPromptBubbleBaseView::RunButtonCallback(int button_id) {
   auto* browser = GetBrowser();
   BrowserView* browser_view =
       browser ? BrowserView::GetBrowserViewForBrowser(browser) : nullptr;
-#if BUILDFLAG(IS_CHROMEOS)
-  // `PERMISSION_SMART_CARD` is essentially a chooser permission without an
-  // actual chooser - thus, there is no blocklist of devices and no real
-  // difference between deny and dismiss. Ergo, deny clicks should be handled as
-  // dismiss, including imposing embargo and recording appropriate histograms.
-  const bool is_deny_supported =
-      request_type() != permissions::RequestTypeForUma::PERMISSION_SMART_CARD;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   if (browser_view && browser_view->GetLocationBar()->GetChipController() &&
       browser_view->GetLocationBar()
           ->GetChipController()
@@ -302,12 +294,7 @@ void PermissionPromptBubbleBaseView::RunButtonCallback(int button_id) {
 
       case PermissionDialogButton::kDeny:
         chip_controller->PromptDecided(
-#if BUILDFLAG(IS_CHROMEOS)
-            is_deny_supported ? permissions::PermissionAction::DENIED
-                              : permissions::PermissionAction::DISMISSED
-#else
             permissions::PermissionAction::DENIED
-#endif  // BUILDFLAG(IS_CHROMEOS)
         );
         return;
     }
@@ -328,13 +315,7 @@ void PermissionPromptBubbleBaseView::RunButtonCallback(int button_id) {
       delegate_->AcceptThisTime(/*prompt_options=*/std::monostate());
       return;
     case PermissionDialogButton::kDeny:
-#if BUILDFLAG(IS_CHROMEOS)
-      is_deny_supported
-          ? delegate_->Deny(/*prompt_options=*/std::monostate())
-          : delegate_->Dismiss(/*prompt_options=*/std::monostate());
-#else
       delegate_->Deny(/*prompt_options=*/std::monostate());
-#endif  // BUILDFLAG(IS_CHROMEOS)
       return;
   }
   NOTREACHED();

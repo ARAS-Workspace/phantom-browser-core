@@ -206,7 +206,7 @@ TEST_F(ImageFrameGeneratorTest, GetSupportedSizes) {
 }
 
 TEST_F(ImageFrameGeneratorTest, incompleteDecode) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   base::test::ScopedFeatureList feature_list;
   // Since PartialLowEndModeOnMidRangeDevices is enabled, image decoders
   // are destroyed because of the incomplete decode for saving memory.
@@ -261,7 +261,7 @@ TEST_F(ImageFrameGeneratorTest, LowEndDeviceDestroysDecoderOnPartialDecode) {
 }
 
 TEST_F(ImageFrameGeneratorTest, incompleteDecodeBecomesComplete) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   base::test::ScopedFeatureList feature_list;
   // Since PartialLowEndModeOnMidRangeDevices is enabled, image decoders
   // are destroyed because of the incomplete decode for saving memory.
@@ -301,15 +301,14 @@ static void DecodeThreadMain(ImageFrameGenerator* generator,
                             cc::PaintImage::kDefaultGeneratorClientId);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/948641)
 #define MAYBE_incompleteDecodeBecomesCompleteMultiThreaded \
   DISABLED_incompleteDecodeBecomesCompleteMultiThreaded
 #else
 #define MAYBE_incompleteDecodeBecomesCompleteMultiThreaded \
   incompleteDecodeBecomesCompleteMultiThreaded
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 TEST_F(ImageFrameGeneratorTest,
        MAYBE_incompleteDecodeBecomesCompleteMultiThreaded) {
   SetFrameStatus(ImageFrame::kFramePartial);
@@ -347,7 +346,7 @@ TEST_F(ImageFrameGeneratorTest,
 }
 
 TEST_F(ImageFrameGeneratorTest, frameHasAlpha) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
   base::test::ScopedFeatureList feature_list;
   // Since PartialLowEndModeOnMidRangeDevices is enabled, image decoders
   // are not cached because it makes ShouldDecodeToExternalMemory()

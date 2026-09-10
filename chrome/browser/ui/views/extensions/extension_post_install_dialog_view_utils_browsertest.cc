@@ -90,17 +90,8 @@ void ExtensionPostInstallDialogViewUtilsBrowserTest::WaitForUserDismissal() {
   observer.Wait();
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// None of these tests work when run under Ash, because they need an
-// AuraTestHelper constructed at an inconvenient time in test setup, which
-// InProcessBrowserTest is not equipped to handle.
-// TODO(ellyjones): Fix that, or figure out an alternate way to test this UI.
-#define MAYBE_InvokeUi_default DISABLED_InvokeUi_default
-#define MAYBE_InvokeUi_SignInPromo DISABLED_InvokeUi_SignInPromo
-#else
 #define MAYBE_InvokeUi_default InvokeUi_default
 #define MAYBE_InvokeUi_SignInPromo InvokeUi_SignInPromo
-#endif
 
 IN_PROC_BROWSER_TEST_F(ExtensionPostInstallDialogViewUtilsBrowserTest,
                        MAYBE_InvokeUi_default) {

@@ -16,14 +16,6 @@
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/account_id/account_id.h"
-#include "components/session_manager/core/fake_session_manager_delegate.h"
-#include "components/session_manager/core/session_manager.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif
-
 class BrowserUnitTest : public testing::Test {
  public:
   BrowserUnitTest() = default;
@@ -101,33 +93,3 @@ TEST_F(BrowserUnitTest, CreateBrowserWithIncognitoModeEnabled) {
             GetBrowserWindowCreationStatusForProfile(
                 *profile_.GetPrimaryOTRProfile(/*create_if_needed=*/true)));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(BrowserUnitTest, CreateBrowserDuringKioskSplashScreen) {
-  // Setting up user manager state to be in kiosk mode:
-  // Creating a new user manager.
-  auto* user_manager = new ash::FakeChromeUserManager();
-  user_manager::ScopedUserManager manager{
-      std::unique_ptr<user_manager::UserManager>(user_manager)};
-
-  // Create SessionManager AFTER UserManager so it is destroyed BEFORE it.
-  session_manager::SessionManager session_manager{
-      std::make_unique<session_manager::FakeSessionManagerDelegate>()};
-
-  const user_manager::User* user = user_manager->AddKioskChromeAppUser(
-      AccountId::FromUserEmail("fake_user@test"));
-  user_manager->LoginUser(user->GetAccountId());
-
-  TestingProfile kiosk_profile;
-
-  session_manager.SetSessionState(session_manager::SessionState::LOGIN_PRIMARY);
-  // Browser should not be created during login session state.
-  EXPECT_EQ(BrowserWindowInterface::CreationStatus::kErrorLoadingKiosk,
-            GetBrowserWindowCreationStatusForProfile(kiosk_profile));
-
-  session_manager.SetSessionState(session_manager::SessionState::ACTIVE);
-  // Normal flow, creation succeeds.
-  EXPECT_EQ(BrowserWindowInterface::CreationStatus::kOk,
-            GetBrowserWindowCreationStatusForProfile(kiosk_profile));
-}
-#endif

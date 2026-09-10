@@ -44,11 +44,6 @@ TEST_F(CrashKeysTest, ShouldIgnoreBoringFlags) {
   command_line.AppendSwitch("--device-management-url=https://foo/bar");
   command_line.AppendSwitch(
       base::StrCat({"--", switches::kGpuPreferences, "=ABC123"}));
-#if BUILDFLAG(IS_CHROMEOS)
-  command_line.AppendSwitch("--user-data-dir=/tmp");
-  command_line.AppendSwitch("--default-wallpaper-small=test.png");
-  expected_num_switches = "9";
-#endif
 
   crash_keys::SetCrashKeysFromCommandLine(command_line);
 

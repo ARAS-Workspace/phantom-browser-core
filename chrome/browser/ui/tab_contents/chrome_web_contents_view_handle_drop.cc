@@ -36,56 +36,7 @@
 #include "chrome/browser/enterprise/connectors/analysis/content_analysis_delegate.h"
 #include "chrome/browser/safe_browsing/cloud_content_scanning/deep_scanning_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/file_manager/fileapi_util.h"
-#include "chrome/browser/ash/fusebox/fusebox_server.h"
-#include "components/enterprise/connectors/core/features.h"
-#include "content/public/browser/storage_partition.h"
-#include "storage/browser/file_system/file_system_context.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// TODO(523329793): factor out common method for fusebox file substitution that
-// is shared between drag-and-drop and file_select_helper.cc
-base::FilePath MaybeSubstituteFuseboxFilePath(
-    Profile* profile,
-    content::WebContents* web_contents,
-    const GURL& file_system_url) {
-  content::RenderFrameHost* rfh = web_contents->GetPrimaryMainFrame();
-  content::SiteInstance* site_instance = rfh ? rfh->GetSiteInstance() : nullptr;
-  storage::FileSystemContext* file_system_context =
-      site_instance
-          ? profile->GetStoragePartition(site_instance)->GetFileSystemContext()
-          : nullptr;
-  if (!file_system_context) {
-    return base::FilePath();
-  }
-
-  const storage::FileSystemURL cracked_url =
-      file_system_context->CrackURLInFirstPartyContext(file_system_url);
-  if (!cracked_url.is_valid()) {
-    return base::FilePath();
-  }
-
-  GURL external_gurl;
-  if (!file_manager::util::ConvertAbsoluteFilePathToFileSystemUrl(
-          profile, cracked_url.path(), file_manager::util::GetFileManagerURL(),
-          &external_gurl)) {
-    return base::FilePath();
-  }
-
-  const storage::FileSystemURL external_cracked_url =
-      file_system_context->CrackURLInFirstPartyContext(external_gurl);
-  if (!external_cracked_url.is_valid()) {
-    return base::FilePath();
-  }
-
-  return fusebox::Server::SubstituteFuseboxFilePath(external_cracked_url);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void CompletionCallback(
     content::DropData drop_data,
@@ -162,24 +113,6 @@ void CompletionCallback(
     final_filenames.push_back(std::move(drop_data.filenames[i]));
   }
   drop_data.filenames = std::move(final_filenames);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(
-          enterprise_connectors::kEnableDlpFileSystemApi)) {
-    std::vector<content::DropData::FileSystemFileInfo> final_file_system_files;
-    for (size_t i = 0; i < drop_data.file_system_files.size(); ++i) {
-      if (virtual_file_to_scan_file_index.contains(i)) {
-        int scan_file_index = virtual_file_to_scan_file_index[i];
-        if (file_indexes_to_block.contains(scan_file_index)) {
-          continue;
-        }
-      }
-      final_file_system_files.push_back(
-          std::move(drop_data.file_system_files[i]));
-    }
-    drop_data.file_system_files = std::move(final_file_system_files);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   std::move(callback).Run(std::move(drop_data));
 }
@@ -327,19 +260,6 @@ void HandleOnPerformingDrop(
   // file_system_files would be scanned, we need to define a mapping between
   // `drop_data.file_system_file` indices and `paths_to_scan` indices.
   base::flat_map<int, int> virtual_file_to_scan_file_index;
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(
-          enterprise_connectors::kEnableDlpFileSystemApi)) {
-    for (size_t i = 0; i < drop_data.file_system_files.size(); ++i) {
-      base::FilePath resolved_path = MaybeSubstituteFuseboxFilePath(
-          profile, scan_target, drop_data.file_system_files[i].url);
-      if (!resolved_path.empty()) {
-        virtual_file_to_scan_file_index[i] = paths_to_scan.size();
-        paths_to_scan.push_back(resolved_path);
-      }
-    }
-  }
-#endif
   // `handle_drop_scan_data` is created on the heap to stay alive regardless of
   // how long the threadpool work takes or in case `web_contents` is destroyed.
   // It deletes itself when `HandleDropScanData::ScanData` is called or when

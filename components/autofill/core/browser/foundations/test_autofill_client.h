@@ -552,11 +552,11 @@ class TestAutofillClientTemplate : public T {
     if (device_authenticator_) {
       return std::move(device_authenticator_);
     }
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
     return std::make_unique<device_reauth::MockDeviceAuthenticator>();
 #else
     return nullptr;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   }
 
 #if BUILDFLAG(IS_IOS)

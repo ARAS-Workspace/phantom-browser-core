@@ -40,17 +40,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/shell_dialogs/fake_select_file_dialog.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_pref_names.h"
-#include "chrome/browser/ash/kcer/kcer_factory_ash.h"
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chromeos/ash/components/login/login_state/login_state.h"
-#include "chromeos/constants/chromeos_features.h"
-#include "crypto/scoped_test_nss_chromeos_user.h"
-#include "crypto/scoped_test_system_nss_key_slot.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/net/fake_nss_service.h"
 #endif
@@ -58,10 +47,6 @@
 using testing::ElementsAre;
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char kUsername[] = "test@example.com";
-#endif
 
 bool SlotContainsCertWithHash(PK11SlotInfo* slot, std::string_view hash_hex) {
   if (!slot) {
@@ -153,27 +138,9 @@ class ClientCertSourceWritableUnitTest
   void SetUp() override {
     ASSERT_TRUE(profile_manager_.SetUp());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    ASSERT_TRUE(test_nss_user_.constructed_successfully());
-    test_nss_user_.FinishInit();
-
-    ash::LoginState::Initialize();
-#endif
-
     ChromeRenderViewHostTestHarness::SetUp();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_user_manager_.Reset(std::make_unique<ash::FakeChromeUserManager>());
-    // is_affiliated=true is required for nss_service_chromeos to configure the
-    // system slot.
-    fake_user_manager_->AddUserWithAffiliationAndTypeAndProfile(
-        account_, /*is_affiliated=*/true, user_manager::UserType::kRegular,
-        profile());
-    fake_user_manager_->OnUserProfileCreated(account_, profile()->GetPrefs());
-    fake_user_manager_->LoginUser(account_);
-#else
     nss_service_ = FakeNssService::InitializeForBrowserContext(profile());
-#endif
 
     fake_page_ = std::make_unique<FakeCertificateManagerPage>(
         fake_page_remote_.BindNewPipeAndPassReceiver());
@@ -185,38 +152,14 @@ class ClientCertSourceWritableUnitTest
   void TearDown() override {
     ui::SelectFileDialog::SetFactory(nullptr);
     cert_source_.reset();
-#if BUILDFLAG(IS_CHROMEOS)
-    fake_user_manager_.Reset();
-    ash::LoginState::Shutdown();
-    kcer::KcerFactoryAsh::ClearNssTokenMapForTesting();
-#else
     nss_service_ = nullptr;
-#endif
     ChromeRenderViewHostTestHarness::TearDown();
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bool use_hardware_backed() const { return GetParam(); }
-
-  std::string username_hash() const {
-    return user_manager::FakeUserManager::GetFakeUsernameHash(account_);
-  }
-#endif
-
   void DoImport(
       CertificateManagerPageHandler::ImportCertificateCallback callback) {
-#if BUILDFLAG(IS_CHROMEOS)
-    if (use_hardware_backed()) {
-      cert_source_->ImportAndBindCertificate(web_contents()->GetWeakPtr(),
-                                             std::move(callback));
-    } else {
-      cert_source_->ImportCertificate(web_contents()->GetWeakPtr(),
-                                      std::move(callback));
-    }
-#else
     cert_source_->ImportCertificate(web_contents()->GetWeakPtr(),
                                     std::move(callback));
-#endif
   }
 
   std::optional<certificate_manager::mojom::SummaryCertInfoPtr>
@@ -273,18 +216,8 @@ class ClientCertSourceWritableUnitTest
     net::NSSCertDatabase* nss_db = nss_waiter.Get();
 
     crypto::ScopedPK11Slot slot;
-#if BUILDFLAG(IS_CHROMEOS)
-    if (import_to_system_slot) {
-      slot = nss_db->GetSystemSlot();
-    } else if (use_hardware_backed()) {
-      slot = nss_db->GetPrivateSlot();
-    } else {
-      slot = nss_db->GetPublicSlot();
-    }
-#else
     slot = crypto::ScopedPK11Slot(
         PK11_ReferenceSlot(nss_service_->GetPublicSlot()));
-#endif
 
     std::string p12_file_data;
     if (!base::ReadFileToString(p12_file_path, &p12_file_data)) {
@@ -323,27 +256,11 @@ class ClientCertSourceWritableUnitTest
   }
 
   bool NSSContainsCertWithHash(std::string_view hash_hex) {
-#if BUILDFLAG(IS_CHROMEOS)
-    return SlotContainsCertWithHash(
-        crypto::GetPublicSlotForChromeOSUser(username_hash()).get(), hash_hex);
-#else
     return SlotContainsCertWithHash(nss_service_->GetPublicSlot(), hash_hex);
-#endif
   }
 
  protected:
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList feature_list_;
-  AccountId account_{AccountId::FromUserEmail(kUsername)};
-  crypto::ScopedTestNSSChromeOSUser test_nss_user_{username_hash()};
-  crypto::ScopedTestSystemNSSKeySlot test_nss_system_slot_{
-      /*simulate_token_loader=*/true};
-
-  user_manager::TypedScopedUserManager<ash::FakeChromeUserManager>
-      fake_user_manager_;
-#else
   raw_ptr<FakeNssService> nss_service_;
-#endif
 
   TestingProfileManager profile_manager_{TestingBrowserProcess::GetGlobal()};
 
@@ -353,32 +270,10 @@ class ClientCertSourceWritableUnitTest
   std::unique_ptr<CertificateManagerPageHandler::CertSource> cert_source_;
 };
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(ClientCertSourceWritableUnitTest, TriggerReloadOnKcerDbChange) {
-  base::test::TestFuture<
-      std::vector<certificate_manager::mojom::CertificateSource>>
-      reload_future;
-
-  fake_page_->set_trigger_reload_callback(reload_future.GetCallback());
-  std::string client_1_hash_hex = ImportToUserSlotForTesting(
-      net::GetTestCertsDirectory().AppendASCII("client_1.p12"), "chrome");
-  ASSERT_FALSE(client_1_hash_hex.empty());
-
-  EXPECT_THAT(
-      reload_future.Get(),
-      ElementsAre(
-          certificate_manager::mojom::CertificateSource::kPlatformClientCert));
-}
-#endif
-
 // Test importing from a PKCS #12 file and then deleting the imported cert,
 // with no policy set.
 TEST_P(ClientCertSourceWritableUnitTest,
        ImportPkcs12AndGetCertificateInfosAndDelete) {
-#if BUILDFLAG(IS_CHROMEOS)
-  EXPECT_FALSE(profile()->GetPrefs()->GetBoolean(
-      ash::prefs::kNssChapsDualWrittenCertsExist));
-#endif
 
   ui::FakeSelectFileDialog::Factory* factory =
       ui::FakeSelectFileDialog::RegisterFactory();
@@ -413,15 +308,6 @@ TEST_P(ClientCertSourceWritableUnitTest,
     EXPECT_TRUE(import_result->is_success());
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // The cert should be dual written only if dual-write feature is enabled
-  // and the import was not hardware backed (if it's hardware backed it
-  // already gets imported to Chaps so the dual write isn't needed.)
-  EXPECT_EQ(profile()->GetPrefs()->GetBoolean(
-                ash::prefs::kNssChapsDualWrittenCertsExist),
-            !use_hardware_backed());
-#endif
-
   EXPECT_TRUE(NSSContainsCertWithHash(client_1_hash_hex));
   EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_1_hash_hex));
   EXPECT_TRUE(GetCertificateInfosIsCertDeletable(client_1_hash_hex));
@@ -444,176 +330,6 @@ TEST_P(ClientCertSourceWritableUnitTest,
   EXPECT_FALSE(NSSContainsCertWithHash(client_1_hash_hex));
   EXPECT_FALSE(GetCertificateInfosContainsCertWithHash(client_1_hash_hex));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-TEST_P(ClientCertSourceWritableUnitTest, PolicyAllAllowsDeletion) {
-  std::string client_1_hash_hex = ImportToUserSlotForTesting(
-      net::GetTestCertsDirectory().AppendASCII("client_1.p12"), "chrome");
-  ASSERT_FALSE(client_1_hash_hex.empty());
-  std::string client_4_hash_hex = ImportToSystemSlotForTesting(
-      net::GetTestCertsDirectory().AppendASCII("client_4.p12"), "chrome");
-  ASSERT_FALSE(client_4_hash_hex.empty());
-
-  profile()->GetPrefs()->SetInteger(
-      prefs::kClientCertificateManagementAllowed,
-      static_cast<int>(ClientCertificateManagementPermission::kAll));
-
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_1_hash_hex));
-  EXPECT_TRUE(GetCertificateInfosIsCertDeletable(client_1_hash_hex));
-
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_4_hash_hex));
-  EXPECT_TRUE(GetCertificateInfosIsCertDeletable(client_4_hash_hex));
-
-  {
-    fake_page_->set_mocked_confirmation_result(true);
-    base::test::TestFuture<certificate_manager::mojom::ActionResultPtr>
-        delete_waiter;
-    cert_source_->DeleteCertificate("", client_1_hash_hex,
-                                    delete_waiter.GetCallback());
-
-    certificate_manager::mojom::ActionResultPtr delete_result =
-        delete_waiter.Take();
-    ASSERT_TRUE(delete_result);
-    ASSERT_TRUE(delete_result->is_success());
-  }
-  EXPECT_FALSE(GetCertificateInfosContainsCertWithHash(client_1_hash_hex));
-
-  {
-    fake_page_->set_mocked_confirmation_result(true);
-    base::test::TestFuture<certificate_manager::mojom::ActionResultPtr>
-        delete_waiter;
-    cert_source_->DeleteCertificate("", client_4_hash_hex,
-                                    delete_waiter.GetCallback());
-
-    certificate_manager::mojom::ActionResultPtr delete_result =
-        delete_waiter.Take();
-    ASSERT_TRUE(delete_result);
-    ASSERT_TRUE(delete_result->is_success());
-  }
-  EXPECT_FALSE(GetCertificateInfosContainsCertWithHash(client_4_hash_hex));
-}
-
-TEST_P(ClientCertSourceWritableUnitTest,
-       PolicyUserOnlyAllowsDeletionOfUserCertsOnly) {
-  std::string client_1_hash_hex = ImportToUserSlotForTesting(
-      net::GetTestCertsDirectory().AppendASCII("client_1.p12"), "chrome");
-  ASSERT_FALSE(client_1_hash_hex.empty());
-  std::string client_4_hash_hex = ImportToSystemSlotForTesting(
-      net::GetTestCertsDirectory().AppendASCII("client_4.p12"), "chrome");
-  ASSERT_FALSE(client_4_hash_hex.empty());
-
-  profile()->GetPrefs()->SetInteger(
-      prefs::kClientCertificateManagementAllowed,
-      static_cast<int>(ClientCertificateManagementPermission::kUserOnly));
-
-  // A client certificate in the user slot should be deletable.
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_1_hash_hex));
-  EXPECT_TRUE(GetCertificateInfosIsCertDeletable(client_1_hash_hex));
-
-  // A client certificate in the system slot should not be deletable.
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_4_hash_hex));
-  EXPECT_FALSE(GetCertificateInfosIsCertDeletable(client_4_hash_hex));
-
-  {
-    fake_page_->set_mocked_confirmation_result(true);
-    base::test::TestFuture<certificate_manager::mojom::ActionResultPtr>
-        delete_waiter;
-    cert_source_->DeleteCertificate("", client_1_hash_hex,
-                                    delete_waiter.GetCallback());
-
-    certificate_manager::mojom::ActionResultPtr delete_result =
-        delete_waiter.Take();
-    ASSERT_TRUE(delete_result);
-    ASSERT_TRUE(delete_result->is_success());
-  }
-  EXPECT_FALSE(GetCertificateInfosContainsCertWithHash(client_1_hash_hex));
-
-  {
-    fake_page_->set_mocked_confirmation_result(true);
-    base::test::TestFuture<certificate_manager::mojom::ActionResultPtr>
-        delete_waiter;
-    cert_source_->DeleteCertificate("", client_4_hash_hex,
-                                    delete_waiter.GetCallback());
-
-    certificate_manager::mojom::ActionResultPtr delete_result =
-        delete_waiter.Take();
-    ASSERT_TRUE(delete_result);
-    ASSERT_TRUE(delete_result->is_error());
-    EXPECT_EQ(delete_result->get_error(),
-              l10n_util::GetStringUTF8(
-                  IDS_SETTINGS_CERTIFICATE_MANAGER_V2_DELETE_ERROR));
-  }
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_4_hash_hex));
-}
-
-TEST_P(ClientCertSourceWritableUnitTest, PolicyNoneDoesNotAllowDeletion) {
-  std::string client_1_hash_hex = ImportToUserSlotForTesting(
-      net::GetTestCertsDirectory().AppendASCII("client_1.p12"), "chrome");
-  ASSERT_FALSE(client_1_hash_hex.empty());
-  std::string client_4_hash_hex = ImportToSystemSlotForTesting(
-      net::GetTestCertsDirectory().AppendASCII("client_4.p12"), "chrome");
-  ASSERT_FALSE(client_4_hash_hex.empty());
-
-  profile()->GetPrefs()->SetInteger(
-      prefs::kClientCertificateManagementAllowed,
-      static_cast<int>(ClientCertificateManagementPermission::kNone));
-
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_1_hash_hex));
-  EXPECT_FALSE(GetCertificateInfosIsCertDeletable(client_1_hash_hex));
-
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_4_hash_hex));
-  EXPECT_FALSE(GetCertificateInfosIsCertDeletable(client_4_hash_hex));
-
-  {
-    fake_page_->set_mocked_confirmation_result(true);
-    base::test::TestFuture<certificate_manager::mojom::ActionResultPtr>
-        delete_waiter;
-    cert_source_->DeleteCertificate("", client_1_hash_hex,
-                                    delete_waiter.GetCallback());
-
-    certificate_manager::mojom::ActionResultPtr delete_result =
-        delete_waiter.Take();
-    ASSERT_TRUE(delete_result);
-    ASSERT_TRUE(delete_result->is_error());
-    EXPECT_EQ(delete_result->get_error(),
-              l10n_util::GetStringUTF8(
-                  IDS_SETTINGS_CERTIFICATE_MANAGER_V2_DELETE_ERROR));
-  }
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_1_hash_hex));
-
-  {
-    fake_page_->set_mocked_confirmation_result(true);
-    base::test::TestFuture<certificate_manager::mojom::ActionResultPtr>
-        delete_waiter;
-    cert_source_->DeleteCertificate("", client_4_hash_hex,
-                                    delete_waiter.GetCallback());
-
-    certificate_manager::mojom::ActionResultPtr delete_result =
-        delete_waiter.Take();
-    ASSERT_TRUE(delete_result);
-    ASSERT_TRUE(delete_result->is_error());
-    EXPECT_EQ(delete_result->get_error(),
-              l10n_util::GetStringUTF8(
-                  IDS_SETTINGS_CERTIFICATE_MANAGER_V2_DELETE_ERROR));
-  }
-  EXPECT_TRUE(GetCertificateInfosContainsCertWithHash(client_4_hash_hex));
-}
-
-TEST_P(ClientCertSourceWritableUnitTest, ImportPkcs12NotAllowedByPolicy) {
-  profile()->GetPrefs()->SetInteger(
-      prefs::kClientCertificateManagementAllowed,
-      static_cast<int>(ClientCertificateManagementPermission::kNone));
-  base::test::TestFuture<certificate_manager::mojom::ActionResultPtr>
-      import_waiter;
-  DoImport(import_waiter.GetCallback());
-  certificate_manager::mojom::ActionResultPtr import_result =
-      import_waiter.Take();
-  ASSERT_TRUE(import_result);
-  ASSERT_TRUE(import_result->is_error());
-  EXPECT_EQ(import_result->get_error(), "not allowed");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_P(ClientCertSourceWritableUnitTest, ImportPkcs12PasswordWrong) {
   ui::FakeSelectFileDialog::Factory* factory =
@@ -783,9 +499,5 @@ TEST_P(ClientCertSourceWritableUnitTest, DeleteCertificateNotFound) {
 
 INSTANTIATE_TEST_SUITE_P(Foo,
                          ClientCertSourceWritableUnitTest,
-#if BUILDFLAG(IS_CHROMEOS)
-                         testing::Bool()
-#else
                          testing::Values(true)
-#endif
 );

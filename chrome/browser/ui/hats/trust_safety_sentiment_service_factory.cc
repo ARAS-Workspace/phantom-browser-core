@@ -57,7 +57,7 @@ std::unique_ptr<KeyedService>
 TrustSafetySentimentServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   // TrustSafetySentimentSurvey is conducted only for MacOS and Linux currently.
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS))
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // TrustSafetySentimentSurvey is conducted only in English currently.
   const std::string& application_locale =
@@ -95,5 +95,5 @@ TrustSafetySentimentServiceFactory::BuildServiceInstanceForBrowserContext(
   return std::make_unique<TrustSafetySentimentService>(profile);
 #else
   return nullptr;
-#endif  // BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS))
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }

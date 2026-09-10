@@ -348,14 +348,6 @@ struct v4l2_ctrl_hevc_decode_params SetupDecodeParams(
       static_cast<__u16>(slice_hdr->st_rps_bits);
   v4l2_decode_params.long_term_ref_pic_set_size =
       static_cast<__u16>(slice_hdr->lt_rps_bits);
-#if BUILDFLAG(IS_CHROMEOS)
-  // .num_delta_pocs_of_ref_rps_idx is upstream but not yet pulled
-  // into linux build sysroot.
-  // TODO(b/261127809): Remove once linux-libc-dev package is updated to
-  // at least v6.5 in the sysroots.
-  v4l2_decode_params.num_delta_pocs_of_ref_rps_idx =
-      static_cast<__u8>(slice_hdr->st_ref_pic_set.rps_idx_num_delta_pocs);
-#endif
   v4l2_decode_params.flags = static_cast<__u64>(
       (curr_pic->irap_pic_ ? V4L2_HEVC_DECODE_PARAM_FLAG_IRAP_PIC : 0) |
       ((curr_pic->nal_unit_type_ >= H265NALU::IDR_W_RADL &&

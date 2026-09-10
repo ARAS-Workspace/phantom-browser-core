@@ -38,13 +38,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/ash_switches.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
-#include "chrome/common/chrome_features.h"
-#else
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 namespace policy {
 
@@ -143,9 +137,6 @@ class ChunkedPolicyPrefsTest : public PolicyPrefsTest,
                                public ::testing::WithParamInterface<size_t> {
  public:
   ChunkedPolicyPrefsTest() {
-#if BUILDFLAG(IS_CHROMEOS)
-    feature_list_.InitAndEnableFeature(features::kCameraCloudStorage);
-#endif
   }
   ChunkedPolicyPrefsTest(const ChunkedPolicyPrefsTest&) = delete;
   ChunkedPolicyPrefsTest& operator=(const ChunkedPolicyPrefsTest&) = delete;
@@ -153,9 +144,6 @@ class ChunkedPolicyPrefsTest : public PolicyPrefsTest,
 
  protected:
   PrefMappingChunkInfo chunk_info_{GetParam(), GetNumChunks()};
-#if BUILDFLAG(IS_CHROMEOS)
-  base::test::ScopedFeatureList feature_list_;
-#endif
 };
 
 // Verifies that policies make their corresponding preferences become managed,
@@ -168,10 +156,8 @@ class ChunkedPolicyPrefsTest : public PolicyPrefsTest,
 IN_PROC_BROWSER_TEST_P(ChunkedPolicyPrefsTest, PolicyToPrefsMapping) {
   base::ScopedAllowBlockingForTesting allow_blocking;
 
-#if !BUILDFLAG(IS_CHROMEOS)
   policy::FakeBrowserDMTokenStorage storage;
   policy::BrowserDMTokenStorage::SetForTesting(&storage);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   PrefService* local_state = g_browser_process->local_state();
   PrefService* user_prefs = ProfileManager::GetLastUsedProfileIfLoaded()
@@ -187,39 +173,6 @@ INSTANTIATE_TEST_SUITE_P(Chunked,
                          ChunkedPolicyPrefsTest,
                          ::testing::Range(/* start= */ static_cast<size_t>(0),
                                           /* end= */ GetNumChunks()));
-
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Class used to check policy to pref mappings for policies that are mapped into
-// the sign-in profile (usually via LoginProfilePolicyProvider).
-class SigninPolicyPrefsTest : public PolicyPrefsTest {
- public:
-  SigninPolicyPrefsTest() = default;
-  SigninPolicyPrefsTest(const SigninPolicyPrefsTest&) = delete;
-  SigninPolicyPrefsTest& operator=(const SigninPolicyPrefsTest&) = delete;
-  ~SigninPolicyPrefsTest() override = default;
-
- protected:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    PolicyPrefsTest::SetUpCommandLine(command_line);
-
-    command_line->AppendSwitch(ash::switches::kLoginManager);
-    command_line->AppendSwitch(ash::switches::kForceLoginManagerInTests);
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(SigninPolicyPrefsTest, PolicyToPrefsMapping) {
-  PrefService* signin_profile_prefs =
-      ash::ProfileHelper::GetSigninProfile()->GetPrefs();
-
-  // Only checking signin_profile_prefs here since |local_state| is already
-  // checked by PolicyPrefsTest.PolicyToPrefsMapping test.
-  VerifyPolicyToPrefMappings(GetTestCaseDir(), /* local_state= */ nullptr,
-                             /* user_prefs= */ nullptr, signin_profile_prefs,
-                             GetMockPolicyProvider());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // For WebUI integration tests, see cr_policy_indicator_tests.js and
 // cr_policy_pref_indicator_tests.js.

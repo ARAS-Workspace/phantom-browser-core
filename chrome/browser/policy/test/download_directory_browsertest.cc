@@ -25,11 +25,6 @@
 #include "content/public/test/download_test_observer.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/drive/drive_integration_service.h"
-#include "chrome/browser/ash/drive/drive_integration_service_factory.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace policy {
 
 namespace {
@@ -90,41 +85,5 @@ IN_PROC_BROWSER_TEST_F(PolicyTest, DownloadDirectory) {
   // Verify that the first download location wasn't affected.
   EXPECT_FALSE(base::PathExists(initial_dir.Append(file)));
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-// Verifies that the download directory can be forced to Google Drive by policy.
-IN_PROC_BROWSER_TEST_F(PolicyTest, DownloadDirectory_Drive) {
-  // Override the download directory with the policy.
-  {
-    PolicyMap policies;
-    policies.Set(key::kDownloadDirectory, POLICY_LEVEL_RECOMMENDED,
-                 POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD,
-                 base::Value("${google_drive}/"), nullptr);
-    UpdateProviderPolicy(policies);
-
-    EXPECT_EQ(drive::DriveIntegrationServiceFactory::FindForProfile(
-                  browser()->GetProfile())
-                  ->GetMountPointPath()
-                  .AppendASCII("root"),
-              DownloadPrefs(browser()->GetProfile())
-                  .DownloadPath()
-                  .StripTrailingSeparators());
-  }
-
-  PolicyMap policies;
-  policies.Set(key::kDownloadDirectory, POLICY_LEVEL_MANDATORY,
-               POLICY_SCOPE_USER, POLICY_SOURCE_CLOUD,
-               base::Value("${google_drive}/Downloads"), nullptr);
-  UpdateProviderPolicy(policies);
-
-  EXPECT_EQ(drive::DriveIntegrationServiceFactory::FindForProfile(
-                browser()->GetProfile())
-                ->GetMountPointPath()
-                .AppendASCII("root/Downloads"),
-            DownloadPrefs(browser()->GetProfile())
-                .DownloadPath()
-                .StripTrailingSeparators());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace policy

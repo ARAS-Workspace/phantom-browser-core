@@ -163,13 +163,6 @@
 #include "ui/webui/webui_allowlist.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/smart_card/smart_card_permission_context.h"
-#include "chrome/browser/smart_card/smart_card_permission_context_factory.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif
 
 #if BUILDFLAG(ENABLE_PLUGINS)
 #include "chrome/browser/plugins/chrome_plugin_service_filter.h"
@@ -374,9 +367,6 @@ class SiteSettingsHandlerBaseTest : public testing::Test {
                             HistoryServiceFactory::GetDefaultFactory()}});
     EXPECT_TRUE(profile_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    SetUpUserManager(profile_.get());
-#endif
 
 
     mock_privacy_sandbox_service_ = static_cast<MockPrivacySandboxService*>(
@@ -409,9 +399,6 @@ class SiteSettingsHandlerBaseTest : public testing::Test {
       }
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    scoped_user_manager_.reset();
-#endif  // BUILDFLAG(IS_CHROMEOS)
     mock_privacy_sandbox_service_ = nullptr;
     incognito_profile_ = nullptr;
     profile_ = nullptr;
@@ -419,24 +406,6 @@ class SiteSettingsHandlerBaseTest : public testing::Test {
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  void SetUpUserManager(TestingProfile* profile) {
-    // On ChromeOS a user account is needed in order to check whether the user
-    // account is affiliated with the device owner for the purposes of applying
-    // enterprise policy.
-    constexpr GaiaId::Literal kTestUserGaiaId("1111111111");
-    auto fake_user_manager = std::make_unique<ash::FakeChromeUserManager>();
-    auto* fake_user_manager_ptr = fake_user_manager.get();
-    scoped_user_manager_ = std::make_unique<user_manager::ScopedUserManager>(
-        std::move(fake_user_manager));
-
-    auto account_id =
-        AccountId::FromUserEmailGaiaId(kTestUserEmail, kTestUserGaiaId);
-    fake_user_manager_ptr->AddUserWithAffiliation(account_id,
-                                                  /*is_affiliated=*/true);
-    fake_user_manager_ptr->LoginUser(account_id);
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   TestingProfileManager* profile_manager() { return profile_manager_; }
   TestingProfile* profile() { return profile_.get(); }
@@ -1213,9 +1182,6 @@ class SiteSettingsHandlerBaseTest : public testing::Test {
   raw_ptr<Profile, DanglingUntriaged> incognito_profile_ = nullptr;
   content::TestWebUI web_ui_;
   std::unique_ptr<SiteSettingsHandler> handler_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_;
-#endif
   raw_ptr<MockPrivacySandboxService> mock_privacy_sandbox_service_;
 };
 
@@ -1328,10 +1294,6 @@ TEST_P(SiteSettingsHandlerSchemeTest, HandleClearUnpartitionedUsage) {
 }
 
 class SiteSettingsHandlerTest : public SiteSettingsHandlerBaseTest {
-#if BUILDFLAG(IS_CHROMEOS)
- private:
-  base::test::ScopedFeatureList feature_list_{blink::features::kSmartCard};
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(SiteSettingsHandlerTest, GetAndSetDefault) {
@@ -6957,84 +6919,6 @@ TEST_F(SiteSettingsHandlerTest, SiteExceptionScopeTypeMetrics) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-class SiteSettingsGlobalPermissionTest
-    : public SiteSettingsHandlerBaseTest,
-      public testing::WithParamInterface<std::tuple<bool, bool, bool>> {
- protected:
-  bool CamBlocked() const { return std::get<0>(GetParam()); }
-  bool MicBlocked() const { return std::get<1>(GetParam()); }
-  bool GeoBlocked() const { return std::get<2>(GetParam()); }
-};
-
-TEST_P(SiteSettingsGlobalPermissionTest, GetSystemDeniedPermissions) {
-  system_permission_settings::ScopedSettingsForTesting cam_settings(
-      ContentSettingsType::MEDIASTREAM_CAMERA, CamBlocked());
-  system_permission_settings::ScopedSettingsForTesting mic_settings(
-      ContentSettingsType::MEDIASTREAM_MIC, MicBlocked());
-  system_permission_settings::ScopedSettingsForTesting geo_settings(
-      ContentSettingsType::GEOLOCATION, GeoBlocked());
-
-  base::ListValue args;
-  args.Append(kCallbackId);
-  handler()->HandleGetSystemDeniedPermissions(args);
-  EXPECT_LT(0u, CHECK_DEREF(web_ui()).call_data().size());
-  const auto& call_data = *(CHECK_DEREF(web_ui()).call_data().back());
-  EXPECT_EQ(3u, call_data.args().size());
-  EXPECT_EQ(base::Value(kCallbackId), CHECK_DEREF(call_data.arg1()));
-  EXPECT_EQ(base::Value(true), CHECK_DEREF(call_data.arg2()));
-
-  base::ListValue expected_result;
-  if (CamBlocked()) {
-    expected_result.Append("media-stream-camera");
-  }
-  if (MicBlocked()) {
-    expected_result.Append("media-stream-mic");
-  }
-  if (GeoBlocked()) {
-    expected_result.Append("location");
-  }
-
-  EXPECT_EQ(expected_result, CHECK_DEREF(call_data.arg3()));
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         SiteSettingsGlobalPermissionTest,
-                         testing::Combine(testing::Bool(),
-                                          testing::Bool(),
-                                          testing::Bool()));
-
-class SiteSettingsOpenSystemSettingsTest
-    : public SiteSettingsHandlerBaseTest,
-      public testing::WithParamInterface<ContentSettingsType> {
- public:
-  SiteSettingsOpenSystemSettingsTest() {
-    system_permission_settings::SetInstanceForTesting(&mock_platform_handle);
-  }
-  ~SiteSettingsOpenSystemSettingsTest() {
-    system_permission_settings::SetInstanceForTesting(nullptr);
-  }
-
-  ContentSettingsType PermissionType() const { return GetParam(); }
-
-  NiceMock<system_permission_settings::MockPlatformHandle> mock_platform_handle;
-};
-
-TEST_P(SiteSettingsOpenSystemSettingsTest, OpenSystemSettings) {
-  base::Value permission_type(
-      site_settings::ContentSettingsTypeToGroupName(PermissionType()));
-  auto args = base::ListValue().Append(std::move(permission_type));
-  EXPECT_CALL(mock_platform_handle, OpenSystemSettings(_, PermissionType()));
-  handler()->HandleOpenSystemPermissionSettings(args);
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    SiteSettingsOpenSystemSettingsTest,
-    testing::Values(ContentSettingsType::MEDIASTREAM_CAMERA,
-                    ContentSettingsType::MEDIASTREAM_MIC,
-                    ContentSettingsType::GEOLOCATION));
-#endif
 
 // Test suite for verifying that permissions granted through Site Settings
 // surfaces are correctly marked as eligible for Safety Hub auto-revocation

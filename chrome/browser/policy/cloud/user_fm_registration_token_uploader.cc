@@ -20,10 +20,6 @@
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/policy/core/common/remote_commands/remote_commands_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/cert_provisioning/cert_provisioning_common.h"
-#endif
-
 namespace {
 
 // Returns a set of all project numbers that will be used by user.
@@ -31,9 +27,6 @@ std::set<int64_t> GetAllInvalidationProjectNumbers() {
   return {
       policy::kPolicyInvalidationProjectNumber,
       policy::kRemoteCommandsInvalidationsProjectNumber,
-#if BUILDFLAG(IS_CHROMEOS)
-      ash::cert_provisioning::kCertProvisioningInvalidationProjectNumber,
-#endif
   };
 }
 

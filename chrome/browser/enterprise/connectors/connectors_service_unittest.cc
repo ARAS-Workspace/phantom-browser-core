@@ -34,19 +34,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/strings/strcat.h"
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/browser/ash/settings/device_settings_service.h"
-#include "chromeos/ash/components/dbus/session_manager/fake_session_manager_client.h"
-#include "chromeos/ash/components/policy/device_policy/device_policy_builder.h"
-#include "chromeos/components/mgs/managed_guest_session_test_utils.h"
-#include "components/ownership/mock_owner_key_util.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "content/public/test/test_utils.h"
-#include "extensions/common/constants.h"
-#endif
-
 namespace enterprise_connectors {
 
 namespace {
@@ -138,40 +125,13 @@ class ConnectorsServiceTestBase : public testing::Test {
   }
 
   void SetUp() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    auto owner_key_util = base::MakeRefCounted<ownership::MockOwnerKeyUtil>();
-    owner_key_util->SetPublicKeyFromPrivateKey(*device_policy_.GetSigningKey());
-
-    if (!ash::DeviceSettingsService::IsInitialized()) {
-      ash::DeviceSettingsService::Initialize();
-      initialized_device_settings_ = true;
-    }
-
-    ash::DeviceSettingsService::Get()->StartProcessing(
-        TestingBrowserProcess::GetGlobal()->local_state(),
-        &session_manager_client_, owner_key_util);
-
-    device_policy_.policy_data().set_device_id(kFakeDeviceId);
-    device_policy_.Build();
-    session_manager_client_.set_device_policy(device_policy_.GetBlob());
-
-    ash::DeviceSettingsService::Get()->Load();
-    content::RunAllTasksUntilIdle();
-#else
     fake_browser_dm_token_storage_.SetClientId(kFakeDeviceId);
     policy::BrowserDMTokenStorage::SetForTesting(
         &fake_browser_dm_token_storage_);
     fake_browser_dm_token_storage_.ResetForTesting();
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_CHROMEOS)
-    ash::DeviceSettingsService::Get()->StopProcessing();
-    if (initialized_device_settings_) {
-      ash::DeviceSettingsService::Shutdown();
-    }
-#endif
   }
 
  protected:
@@ -179,13 +139,7 @@ class ConnectorsServiceTestBase : public testing::Test {
   base::test::ScopedFeatureList scoped_feature_list_;
   TestingProfileManager profile_manager_;
   raw_ptr<TestingProfile> profile_;
-#if !BUILDFLAG(IS_CHROMEOS)
   policy::FakeBrowserDMTokenStorage fake_browser_dm_token_storage_;
-#else
-  ash::FakeSessionManagerClient session_manager_client_;
-  policy::DevicePolicyBuilder device_policy_;
-  bool initialized_device_settings_ = false;
-#endif
   std::string profile_name_;
 };
 
@@ -255,50 +209,6 @@ class ConnectorsServiceReportingFeatureTest
     return pref_value() == kNormalReportingSettingsPref;
   }
 };
-
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(ConnectorsServiceReportingFeatureTest,
-       ChromeOsManagedGuestSessionFlagSetInMgs) {
-  // A fake Managed Guest Session that gets destroyed at the end of the test.
-  chromeos::FakeManagedGuestSession fake_mgs;
-
-  if (pref_value()) {
-    profile_->GetPrefs()->Set(
-        pref(), *base::JSONReader::Read(pref_value(),
-                                        base::JSON_PARSE_CHROMIUM_EXTENSIONS));
-    profile_->GetPrefs()->SetInteger(scope_pref(),
-                                     policy::POLICY_SCOPE_MACHINE);
-  }
-
-  EXPECT_TRUE(ConnectorsServiceFactory::GetForBrowserContext(profile_)
-                  ->BuildClientMetadata(/*is_cloud=*/true)
-                  ->is_chrome_os_managed_guest_session());
-
-  // The flag is currently not included for local content scanning.
-  EXPECT_FALSE(ConnectorsServiceFactory::GetForBrowserContext(profile_)
-                   ->BuildClientMetadata(/*is_cloud=*/false)
-                   ->is_chrome_os_managed_guest_session());
-}
-
-TEST_P(ConnectorsServiceReportingFeatureTest,
-       ChromeOsManagedGuestSessionFlagNotSetInUserSession) {
-  if (pref_value()) {
-    profile_->GetPrefs()->Set(
-        pref(), *base::JSONReader::Read(pref_value(),
-                                        base::JSON_PARSE_CHROMIUM_EXTENSIONS));
-    profile_->GetPrefs()->SetInteger(scope_pref(),
-                                     policy::POLICY_SCOPE_MACHINE);
-  }
-
-  EXPECT_FALSE(ConnectorsServiceFactory::GetForBrowserContext(profile_)
-                   ->BuildClientMetadata(/*is_cloud=*/true)
-                   ->is_chrome_os_managed_guest_session());
-
-  EXPECT_FALSE(ConnectorsServiceFactory::GetForBrowserContext(profile_)
-                   ->BuildClientMetadata(/*is_cloud=*/false)
-                   ->is_chrome_os_managed_guest_session());
-}
-#endif
 
 #if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
 TEST_P(ConnectorsServiceReportingFeatureTest, CheckTelemetryPolicyObserver) {
@@ -484,20 +394,6 @@ TEST_P(ConnectorsServiceExemptURLsTest, BlobAndFilesystem) {
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_P(ConnectorsServiceExemptURLsTest, FirstPartyExtensions) {
-  auto* service = ConnectorsServiceFactory::GetForBrowserContext(profile_);
-
-  for (const std::string& suffix :
-       {"/", "/background", "/main.html", "/main.html?param=value"}) {
-    std::string url = base::StrCat(
-        {"chrome-extension://", extension_misc::kFilesManagerAppId, suffix});
-    auto settings = service->GetAnalysisSettings(GURL(url), connector());
-    ASSERT_FALSE(settings.has_value());
-  }
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 INSTANTIATE_TEST_SUITE_P(
     ,
     ConnectorsServiceExemptURLsTest,
@@ -521,26 +417,12 @@ class ConnectorsServiceProfileTypeBrowserTest : public testing::Test {
     return profile_testing_helper_.guest_profile_otr();
   }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   TestingProfile* system_profile() {
     return profile_testing_helper_.system_profile();
   }
   Profile* system_profile_otr() {
     return profile_testing_helper_.system_profile_otr();
-  }
-#elif BUILDFLAG(IS_CHROMEOS)
-  TestingProfile* signin_profile() {
-    return profile_testing_helper_.signin_profile();
-  }
-  Profile* signin_profile_otr() {
-    return profile_testing_helper_.signin_profile_otr();
-  }
-
-  TestingProfile* lockscreen_profile() {
-    return profile_testing_helper_.lockscreen_profile();
-  }
-  Profile* lockscreen_profile_otr() {
-    return profile_testing_helper_.lockscreen_profile_otr();
   }
 #endif
 
@@ -565,22 +447,16 @@ TEST_F(ConnectorsServiceProfileTypeBrowserTest, IsEnabled) {
   EXPECT_TRUE(CreateService(regular_profile())->ConnectorsEnabled());
   EXPECT_FALSE(CreateService(incognito_profile())->ConnectorsEnabled());
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(CreateService(guest_profile())->ConnectorsEnabled());
 #else
   EXPECT_FALSE(CreateService(guest_profile())->ConnectorsEnabled());
 #endif
   EXPECT_TRUE(CreateService(guest_profile_otr())->ConnectorsEnabled());
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(CreateService(system_profile())->ConnectorsEnabled());
   EXPECT_FALSE(CreateService(system_profile_otr())->ConnectorsEnabled());
-#elif BUILDFLAG(IS_CHROMEOS)
-  EXPECT_TRUE(CreateService(signin_profile())->ConnectorsEnabled());
-  EXPECT_FALSE(CreateService(signin_profile_otr())->ConnectorsEnabled());
-
-  EXPECT_TRUE(CreateService(lockscreen_profile())->ConnectorsEnabled());
-  EXPECT_FALSE(CreateService(lockscreen_profile_otr())->ConnectorsEnabled());
 #endif
 }
 
@@ -614,44 +490,23 @@ class ConnectorsServiceRealTimeURLIdentifierTest
  public:
   ConnectorsServiceRealTimeURLIdentifierTest()
       : ConnectorsServiceTestBase("user@example.com") {
-#if BUILDFLAG(IS_CHROMEOS)
-    auto fake_user_manager = std::make_unique<ash::FakeChromeUserManager>();
-    scoped_user_manager_ = std::make_unique<
-        user_manager::TypedScopedUserManager<ash::FakeChromeUserManager>>(
-        std::move(fake_user_manager));
-#endif
   }
 
   void SetUp() override {
     ConnectorsServiceTestBase::SetUp();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    const AccountId account_id = AccountId::FromUserEmail("user@example.com");
-    bool is_affiliated =
-        GetParam().profile_affiliation_id == GetParam().device_affiliation_id;
-    scoped_user_manager_->Get()->AddUserWithAffiliationAndTypeAndProfile(
-        account_id, is_affiliated, user_manager::UserType::kRegular, profile_);
-    scoped_user_manager_->Get()->LoginUser(account_id);
-#endif
   }
 
  protected:
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<
-      user_manager::TypedScopedUserManager<ash::FakeChromeUserManager>>
-      scoped_user_manager_;
-#endif
 };
 
 TEST_P(ConnectorsServiceRealTimeURLIdentifierTest, ReturnsCorrectIdentifier) {
-#if !BUILDFLAG(IS_CHROMEOS)
   // Set Affiliation IDs, matching affiliation ids => affiliated profile
   profile_->GetProfilePolicyConnector()->SetUserAffiliationIdsForTesting(
       {GetParam().profile_affiliation_id});
   TestingBrowserProcess::GetGlobal()
       ->browser_policy_connector()
       ->SetDeviceAffiliatedIdsForTesting({GetParam().device_affiliation_id});
-#endif
 
   // Set the profile email.
   auto* identity_manager = IdentityManagerFactory::GetForProfile(profile_);

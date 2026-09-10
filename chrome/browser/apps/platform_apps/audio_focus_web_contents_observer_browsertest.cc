@@ -13,10 +13,6 @@
 #include "extensions/browser/app_window/app_window_registry.h"
 #include "extensions/test/extension_test_message_listener.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/apps/app_service/chrome_app_deprecation/chrome_app_deprecation.h"
-#endif
-
 namespace apps {
 
 // AudioFocusWebContentsObserverBrowserTest test that apps have separate audio
@@ -49,10 +45,6 @@ IN_PROC_BROWSER_TEST_F(AudioFocusWebContentsObserverBrowserTest,
   ASSERT_TRUE(extension);
   EXPECT_TRUE(extension->is_platform_app());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  apps::chrome_app_deprecation::ScopedAddAppToAllowlistForTesting allowlist(
-      extension->id());
-#endif
   {
     content::CreateAndLoadWebContentsObserver app_loaded_observer;
     LaunchPlatformApp(extension);

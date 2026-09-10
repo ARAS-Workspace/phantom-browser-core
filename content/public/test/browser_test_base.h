@@ -353,7 +353,6 @@ class BrowserTestBase : public ::testing::Test {
   // TODO(pkasting): Consider an alternate solution, e.g. changing tests to use
   // a `ui::MockOsSettingsProvider` instead of the
   // `ash::DarkLightModeController` and removing the `#if` guards here.
-#if !BUILDFLAG(IS_CHROMEOS)
   // Browser tests should not use the current machine settings for theming, but
   // should default to a consistent baseline. Instantiating
   // `ui::OsSettingsProvider` will both provide sane default behavior and
@@ -361,7 +360,6 @@ class BrowserTestBase : public ::testing::Test {
   // platform-specific subclass.
   ui::OsSettingsProvider os_settings_provider_{
       ui::OsSettingsProvider::PriorityLevel::kTesting};
-#endif
 
   // When true, the compositor will produce pixel output that can be read back
   // for pixel tests.

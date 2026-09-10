@@ -133,31 +133,6 @@ TEST_F(WindowTreeHostTest,
   EXPECT_EQ(gfx::Rect(300, 400), host()->window()->bounds());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(WindowTreeHostTest, HoldPointerMovesOnChildResizing) {
-  aura::WindowEventDispatcher* dispatcher = host()->dispatcher();
-
-  aura::test::WindowEventDispatcherTestApi dispatcher_api(dispatcher);
-
-  EXPECT_FALSE(dispatcher_api.HoldingPointerMoves());
-
-  // Signal to the ui::Compositor that a child is resizing. This will
-  // immediately trigger input throttling.
-  host()->compositor()->OnChildResizing();
-
-  // Pointer moves should be throttled until the next commit. This has the
-  // effect of prioritizing the resize event above other operations in aura.
-  EXPECT_TRUE(dispatcher_api.HoldingPointerMoves());
-
-  // Wait for a CompositorFrame to be activated.
-  ui::DrawWaiterForTest::WaitForCompositingEnded(host()->compositor());
-
-  // Pointer moves should be routed normally after commit.
-  EXPECT_FALSE(dispatcher_api.HoldingPointerMoves());
-}
-#endif
-
-#if !BUILDFLAG(IS_CHROMEOS)
 // Tests if scale factor changes take effect. Previously a scale factor change
 // wouldn't take effect without a bounds change. For context see
 // https://crbug.com/1087626
@@ -179,7 +154,6 @@ TEST_F(WindowTreeHostTest, ShouldHandleTextScale) {
   asserter(1.05f);
   asserter(1.5f);
 }
-#endif
 
 TEST_F(WindowTreeHostTest, NoRewritesPostIME) {
   ui::test::TestEventRewriter event_rewriter;

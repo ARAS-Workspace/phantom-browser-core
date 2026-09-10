@@ -32,13 +32,6 @@
 #include <unistd.h>
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/feature_list.h"
-#include "components/user_manager/user_manager.h"
-#include "remoting/host/chromeos/features.h"
-#include "remoting/host/curtain_mode_chromeos.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace remoting {
 
 It2MeDesktopEnvironment::~It2MeDesktopEnvironment() {

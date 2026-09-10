@@ -364,9 +364,6 @@ const struct DomKeyToKeyboardCodeEntry {
     {DomKey::F22, VKEY_F22},
     {DomKey::F23, VKEY_F23},
     {DomKey::F24, VKEY_F24},
-#if BUILDFLAG(IS_CHROMEOS)
-    {DomKey::FN, VKEY_FUNCTION},
-#endif
     // Multimedia Keys
     // http://www.w3.org/TR/DOM-Level-3-Events-key/#keys-multimedia
     {DomKey::MEDIA_PLAY_PAUSE, VKEY_MEDIA_PLAY_PAUSE},
@@ -421,18 +418,9 @@ const struct DomCodeToKeyboardCodeEntry {
     // DomCode::TURBO                              0x000016 Turbo
     {DomCode::SLEEP, VKEY_SLEEP},  // 0x010082 Sleep
     // DomCode::WAKE_UP                            0x010083 WakeUp
-#if BUILDFLAG(IS_CHROMEOS)
-    {DomCode::FN, VKEY_FUNCTION},  // 0x010097 Fn
-    {DomCode::DO_NOT_DISTURB,
-     VKEY_DO_NOT_DISTURB},  // 0x01009B System Do Not Disturb
-#endif
 #if BUILDFLAG(IS_POSIX)
     {DomCode::MICROPHONE_MUTE_TOGGLE,
      VKEY_MICROPHONE_MUTE_TOGGLE},  // 0x0100A9 MicrophoneMuteToggle
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-    {DomCode::ACCESSIBILITY,
-     VKEY_ACCESSIBILITY},  // 0x0100AA System Accessibility Binding
 #endif
     {DomCode::US_A, VKEY_A},                    // 0x070004 KeyA
     {DomCode::US_B, VKEY_B},                    // 0x070005 KeyB
@@ -594,9 +582,6 @@ const struct DomCodeToKeyboardCodeEntry {
     {DomCode::BRIGHTNESS_UP, VKEY_BRIGHTNESS_UP},  // 0x0C006F BrightnessUp
     {DomCode::BRIGHTNESS_DOWN,
      VKEY_BRIGHTNESS_DOWN},  // 0x0C0070 BrightnessDown
-#endif
-#if BUILDFLAG(IS_CHROMEOS)
-    {DomCode::CAMERA_ACCESS_TOGGLE, VKEY_CAMERA_ACCESS_TOGGLE},  // 0x0C0078
 #endif
 #if BUILDFLAG(IS_POSIX)
     {DomCode::KBD_ILLUM_UP, VKEY_KBD_BRIGHTNESS_UP},  // 0x0C0079 KbdIllumUp

@@ -117,29 +117,12 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoDiscoveryFactory {
   }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Sets a callback to generate an identifier when making DBUS requests to
-  // u2fd.
-  void set_generate_request_id_callback(base::RepeatingCallback<std::string()>);
-
-  // Configures the ChromeOS platform authenticator discovery to instantiate an
-  // authenticator if the legacy U2F authenticator is enabled by policy.
-  void set_require_legacy_cros_authenticator(bool value);
-
-  // Sets a CtapGetAssertionRequest on the instance for checking if a credential
-  // exists on the enterprise policy controlled legacy U2F authenticator. If one
-  // exists and the enterprise policy is active, an authenticator may be
-  // instantiated even if IsUVPAA() is false (because no PIN has been set).
-  void set_get_assertion_request_for_legacy_credential_check(
-      CtapGetAssertionRequest request);
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
  protected:
   static std::vector<std::unique_ptr<FidoDiscoveryBase>> SingleDiscovery(
       std::unique_ptr<FidoDiscoveryBase> discovery);
 
  private:
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   std::vector<std::unique_ptr<FidoDiscoveryBase>> MaybeCreatePlatformDiscovery()
       const;
 #endif
@@ -163,12 +146,6 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoDiscoveryFactory {
       cable_invalidated_pairing_callback_;
   std::optional<base::RepeatingCallback<void(cablev2::Event)>>
       cable_event_callback_;
-#if BUILDFLAG(IS_CHROMEOS)
-  base::RepeatingCallback<std::string()> generate_request_id_callback_;
-  bool require_legacy_cros_authenticator_ = false;
-  std::optional<CtapGetAssertionRequest>
-      get_assertion_request_for_legacy_credential_check_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   base::flat_set<VidPid> hid_ignore_list_;
   std::unique_ptr<FidoDiscoveryBase::EventStream<
       std::unique_ptr<enclave::CredentialRequest>>>

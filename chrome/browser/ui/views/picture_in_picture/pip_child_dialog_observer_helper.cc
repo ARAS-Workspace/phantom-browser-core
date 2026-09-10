@@ -332,9 +332,7 @@ void PipChildDialogObserverHelper::MaybeResizeForChildDialog(
     // the pip window to include the child dialog.
     // ChromeOS is unique in that it does not clip non-desktop widgets to the
     // parent window. So skip resizing the pip window on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
     adjusted_bounds.Union(dialog_bounds);
-#endif
   } else {
     // Non-modal dialogs that are desktop widgets set their bounds directly and
     // are not clipped to the parent window bounds, so just leave it as is.

@@ -55,7 +55,7 @@ Service::Service(std::unique_ptr<AudioManagerAccessor> audio_manager_accessor,
   // This will pre-create AudioManager if AudioManagerAccessor owns it.
   CHECK(audio_manager_accessor_->GetAudioManager());
 
-#if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(CHROME_WIDE_ECHO_CANCELLATION)
   aecdump_recording_manager_ = std::make_unique<media::AecdumpRecordingManager>(
       audio_manager_accessor_->GetAudioManager()->GetTaskRunner());
 

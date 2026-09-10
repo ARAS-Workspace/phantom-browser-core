@@ -12,11 +12,6 @@
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/browser_process_platform_part.h"
-#endif
-
 // static
 std::unique_ptr<TestingProfile> IdentityTestEnvironmentProfileAdaptor::
     CreateProfileForIdentityTestEnvironment() {

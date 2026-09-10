@@ -360,14 +360,6 @@ void InputInjectorX11::Core::InjectMouseEvent(const MouseEvent& event) {
     // apps which assume MotionNotify implies movement. See crbug.com/138075.
     bool inject_motion = true;
     webrtc::DesktopVector new_mouse_position(event.x(), event.y());
-#if BUILDFLAG(IS_CHROMEOS)
-    // Interim hack to handle display rotation on Chrome OS.
-    // TODO(kelvin): Remove this when Chrome OS has completely migrated to
-    // Ozone (crbug.com/439287).
-    gfx::PointF screen_location = point_transformer_.ToScreenCoordinates(
-        gfx::PointF(event.x(), event.y()));
-    new_mouse_position.set(screen_location.x(), screen_location.y());
-#endif
     if (event.has_button() && event.has_button_down() && !event.button_down()) {
       if (new_mouse_position.equals(latest_mouse_position_)) {
         inject_motion = false;

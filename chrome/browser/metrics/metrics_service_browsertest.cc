@@ -59,7 +59,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Check CrashExitCodes.Renderer histogram for a single bucket entry and then
 // verify that the bucket entry contains a signal and the signal is |signal|.
@@ -75,7 +75,7 @@ void VerifyRendererExitCodeIsSignal(
   EXPECT_EQ(signal, WTERMSIG(exit_code));
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace
 
@@ -193,7 +193,7 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, MAYBE_CrashRenderers) {
   histogram_tester.ExpectBucketCount(
       "Stability.Counts2", metrics::StabilityEventType::kRendererCrash, 1);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   VerifyRendererExitCodeIsSignal(histogram_tester, SIGSEGV);
 #endif
 }
@@ -213,7 +213,7 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, MAYBE_CheckCrashRenderers) {
 
 #if BUILDFLAG(IS_MAC)
   VerifyRendererExitCodeIsSignal(histogram_tester, SIGTRAP);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_LINUX)
 #if defined(ARCH_CPU_ARM64)
   VerifyRendererExitCodeIsSignal(histogram_tester, SIGTRAP);
 #elif defined(OFFICIAL_BUILD)

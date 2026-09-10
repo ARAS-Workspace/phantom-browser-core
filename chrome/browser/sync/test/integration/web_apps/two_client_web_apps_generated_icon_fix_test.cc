@@ -120,13 +120,11 @@ class TwoClientGeneratedIconFixSyncTest
     install_observer.BeginListening({app_id});
     install_observer.Wait();
 
-#if !BUILDFLAG(IS_CHROMEOS)
     // Install locally on destination profile.
     base::test::TestFuture<void> install_locally_future;
     fake_providers_[destination]->scheduler().InstallAppLocally(
         app_id, install_locally_future.GetCallback());
     EXPECT_TRUE(install_locally_future.Wait());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
     return app_id;
   }

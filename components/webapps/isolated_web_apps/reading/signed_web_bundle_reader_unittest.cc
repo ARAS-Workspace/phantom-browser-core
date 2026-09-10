@@ -468,26 +468,6 @@ INSTANTIATE_TEST_SUITE_P(
         web_package::SignedWebBundleSignatureVerifier::Error::
             ForInvalidSignature("invalid signature")));
 
-#if BUILDFLAG(IS_CHROMEOS)
-
-// Test that signatures are not verified when the
-// `integrity_block_callback` asks to skip signature verification and
-// thus the provided `web_package::SignedWebBundleSignatureVerifier::Error` is
-// never triggered.
-TEST_F(SignedWebBundleReaderTest,
-       ReadIntegrityBlockAndSkipSignatureVerification) {
-  auto future = CreateReaderAndInitialize(/*verify_signatures=*/false);
-
-  parser_factory_->RunIntegrityBlockCallback(integrity_block_.Clone());
-  parser_factory_->RunMetadataCallback(integrity_block_->size,
-                                       metadata_->Clone());
-
-  auto parse_status = future.Take();
-  EXPECT_THAT(parse_status, HasValue());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 TEST_F(SignedWebBundleReaderTest, ReadMetadataError) {
   EXPECT_CALL(signature_verifier_, VerifySignatures)
       .WillOnce(RunOnceCallback<2>(base::ok()));

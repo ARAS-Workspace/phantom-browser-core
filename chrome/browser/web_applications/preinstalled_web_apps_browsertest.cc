@@ -29,21 +29,12 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/ui/browser_commands.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace web_app {
 
 namespace {
 
 web_app::proto::InstallState ExpectedPreinstalledAppInstallState() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return web_app::proto::InstallState::INSTALLED_WITH_OS_INTEGRATION;
-#else
   return web_app::proto::InstallState::INSTALLED_WITHOUT_OS_INTEGRATION;
-#endif
 }
 }  // namespace
 
@@ -82,29 +73,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppsBrowserTest, CheckInstalledFields) {
   };
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   auto kOfflineOnlyExpectations = std::to_array<OfflineOnlyExpectation>({
-#if BUILDFLAG(IS_CHROMEOS)
-      {
-          ash::kGoogleCalendarAppId,
-          "https://calendar.google.com/calendar/"
-          "installwebapp?usp=chrome_default",
-          "https://calendar.google.com/calendar/r?usp=installed_webapp",
-      },
-      {
-          ash::kGeminiAppId,
-          "https://gemini.google.com/",
-          "https://gemini.google.com/?cros_source=c",
-      },
-      {
-          ash::kNotebookLmAppId,
-          "https://notebooklm.google.com/install",
-          "https://notebooklm.google.com/",
-      },
-      {
-          ash::kVidsAppId,
-          "https://docs.google.com/videos/installwebapp?usp=chrome_default",
-          "https://docs.google.com/videos/?usp=installed_webapp",
-      },
-#endif  // BUILDFLAG(IS_CHROMEOS)
       {
           ash::kGoogleDocsAppId,
           "https://docs.google.com/document/installwebapp?usp=chrome_default",
@@ -158,18 +126,7 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppsBrowserTest, CheckInstalledFields) {
   struct OnlineOnlyExpectation {
     std::string_view install_url;
   };
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_CHROMEOS)
-  auto kOnlineOnlyExpectations = std::to_array<OnlineOnlyExpectation>({
-      {
-          "https://meet.google.com/download/webapp?usp=chrome_default",
-      },
-      {
-          "https://calculator.apps.chrome/install",
-      },
-  });
-#else
   std::array<OnlineOnlyExpectation, 0> kOnlineOnlyExpectations;
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_CHROMEOS)
 
   base::test::TestFuture<
       std::map<GURL, ExternallyManagedAppManager::InstallResult>,

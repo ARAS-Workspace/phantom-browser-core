@@ -180,7 +180,7 @@ IN_PROC_BROWSER_TEST_F(MediaSessionServiceImplBrowserTest,
 // observers to wait for the message to be processed on the MediaSessionObserver
 // side.
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // crbug.com/927234.
 #define MAYBE_ResetServiceWhenNavigatingAway \
   DISABLED_ResetServiceWhenNavigatingAway

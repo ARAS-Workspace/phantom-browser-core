@@ -23,10 +23,6 @@
 #include "media/gpu/vaapi/va_stubs.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-using media_gpu_vaapi::kModuleVa_prot;
-#endif
-
 using media_gpu_vaapi::kModuleVa;
 using media_gpu_vaapi::kModuleVa_drm;
 using media_gpu_vaapi::StubPathMap;
@@ -115,11 +111,7 @@ class FakeDriverTest : public testing::Test {
 };
 
 // TODO(crbug.com/454136608): re-enable after fixing flake.
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_VerifyQueryConfigProfiles DISABLED_VerifyQueryConfigProfiles
-#else
 #define MAYBE_VerifyQueryConfigProfiles VerifyQueryConfigProfiles
-#endif
 TEST_F(FakeDriverTest, MAYBE_VerifyQueryConfigProfiles) {
   ASSERT_GT(vaMaxNumProfiles(display_), 0);
 
@@ -767,9 +759,6 @@ int main(int argc, char** argv) {
 
   paths[kModuleVa].push_back(std::string("libva.so.") + va_suffix);
   paths[kModuleVa_drm].push_back(std::string("libva-drm.so.") + va_suffix);
-#if BUILDFLAG(IS_CHROMEOS)
-  paths[kModuleVa_prot].push_back(std::string("libva.so.") + va_suffix);
-#endif
 
   // InitializeStubs dlopen() VA-API libraries.
   const bool result = InitializeStubs(paths);

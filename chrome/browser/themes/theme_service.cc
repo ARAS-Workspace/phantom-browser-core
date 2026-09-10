@@ -322,8 +322,7 @@ void ThemeService::RegisterProfilePrefs(
       prefs::kDeprecatedGrayscaleThemeEnabledDoNotUse, false,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
   registry->RegisterBooleanPref(prefs::kGrayscaleThemeEnabled, false);
-  registry->RegisterBooleanPref(prefs::kBrowserFollowsSystemThemeColors,
-                                BUILDFLAG(IS_CHROMEOS));
+  registry->RegisterBooleanPref(prefs::kBrowserFollowsSystemThemeColors, false);
   registry->RegisterBooleanPref(prefs::kSyncingThemePrefsMigratedToNonSyncing,
                                 false);
   registry->RegisterBooleanPref(prefs::kShouldReadIncomingSyncingThemePrefs,
@@ -478,29 +477,11 @@ void ThemeService::UseSystemTheme() {
 }
 
 void ThemeService::UseDeviceTheme(bool follow) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // This toggle is currently supported on ChromeOS and we only want platforms
-  // to set the value if they have a visible toggle.
-  profile_->GetPrefs()->SetBoolean(prefs::kBrowserFollowsSystemThemeColors,
-                                   follow);
-  NotifyThemeChanged();
-#endif
 }
 
 bool ThemeService::UsingDeviceTheme() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  const PrefService::Preference* pref = profile_->GetPrefs()->FindPreference(
-      prefs::kBrowserFollowsSystemThemeColors);
-  // Ensure we respect previous theme settings for an unset follow theme
-  // value.
-  if (pref->IsDefaultValue()) {
-    return GetIsBaseline() && !UsingExtensionTheme();
-  }
-  return pref->GetValue()->GetBool();
-#else
   // Only ChromeOS and Windows have this toggle.
   return false;
-#endif
 }
 
 bool ThemeService::IsSystemThemeDistinctFromDefaultTheme() const {
@@ -909,11 +890,6 @@ void ThemeService::ClearThemeData(bool reset_all_settings) {
   SwapThemeSupplier(nullptr);
   ClearThemePrefs();
   if (reset_all_settings) {
-#if BUILDFLAG(IS_CHROMEOS)
-    // This toggle is currently supported on ChromeOS and we only want
-    // platforms to set the value if they have a visible toggle.
-    profile_->GetPrefs()->ClearPref(prefs::kBrowserFollowsSystemThemeColors);
-#endif
     NtpCustomBackgroundService::ResetNtpTheme(profile_);
   }
 

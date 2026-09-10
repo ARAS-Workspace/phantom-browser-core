@@ -27,11 +27,7 @@ static constexpr media::AudioProcessingSettings kDummyWebrtcSettings{
 // disable the system NS independently. TODO(crbug.com/417413190): delete if not
 // relevant any more.
 constexpr bool IsIndependentSystemNsAllowed() {
-#if BUILDFLAG(IS_CHROMEOS)
-  return false;
-#else
   return true;
-#endif
 }
 
 // Returns `enabled_platform_effects` adjusted based on the requested
@@ -71,46 +67,6 @@ int ConfigureEchoCancellationEffects(const EchoCanceller& echo_canceller,
   return enabled_platform_effects;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Adjusts voice processing bits of `enabled_platform_effects` based on what
-// is requested and returns the adjusted value.
-int UpdateVoiceIsolationEffects(
-    bool use_chrome_aec,
-    AudioProcessingProperties::VoiceIsolationType voice_isolation,
-    int enabled_platform_effects) {
-  if (!(base::FeatureList::IsEnabled(media::kCrOSSystemVoiceIsolationOption) &&
-        enabled_platform_effects &
-            media::AudioParameters::VOICE_ISOLATION_SUPPORTED)) {
-    return enabled_platform_effects;
-  }
-
-  if (use_chrome_aec || voice_isolation ==
-                            AudioProcessingProperties::VoiceIsolationType::
-                                kVoiceIsolationDisabled) {
-    // Force voice isolation effect to be disabled if disabled in the
-    // properties, or if browser-based AEC is enabled (platform voice
-    // isolation would break browser-based AEC).
-    enabled_platform_effects |=
-        media::AudioParameters::CLIENT_CONTROLLED_VOICE_ISOLATION;
-    enabled_platform_effects &= ~media::AudioParameters::VOICE_ISOLATION;
-  } else if (voice_isolation == AudioProcessingProperties::VoiceIsolationType::
-                                    kVoiceIsolationEnabled) {
-    // No browser-based AEC involved; voice isolation is enabled in the
-    // properties: force voice isolation to be enabled in the effects.
-    enabled_platform_effects |=
-        media::AudioParameters::CLIENT_CONTROLLED_VOICE_ISOLATION;
-
-    enabled_platform_effects |= media::AudioParameters::VOICE_ISOLATION;
-  } else {
-    // Turn off voice isolation control.
-    enabled_platform_effects &=
-        ~media::AudioParameters::CLIENT_CONTROLLED_VOICE_ISOLATION;
-  }
-
-  return enabled_platform_effects;
-}
-#endif
-
 int ApplyPropertiesToEffects(const EchoCanceller& echo_canceller,
                              const AudioProcessingProperties& properties,
                              int enabled_platform_effects) {
@@ -118,18 +74,6 @@ int ApplyPropertiesToEffects(const EchoCanceller& echo_canceller,
       echo_canceller,
       /*ns_requested=*/properties.noise_suppression,
       /*agc_requested=*/properties.auto_gain_control, enabled_platform_effects);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  enabled_platform_effects = UpdateVoiceIsolationEffects(
-      /*use_chrome_aec=*/echo_canceller.IsChromeProvided(),
-      properties.voice_isolation, enabled_platform_effects);
-  if (base::FeatureList::IsEnabled(media::kIgnoreUiGains)) {
-    // Ignore UI Gains if AGC is running in either browser or system
-    if (properties.auto_gain_control) {
-      return enabled_platform_effects | media::AudioParameters::IGNORE_UI_GAINS;
-    }
-  }
-#endif
 
   return enabled_platform_effects;
 }

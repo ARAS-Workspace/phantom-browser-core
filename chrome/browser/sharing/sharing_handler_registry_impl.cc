@@ -26,7 +26,7 @@
 #include "chrome/browser/sharing/sms/sms_fetch_request_handler.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/sharing/shared_clipboard/remote_copy_message_handler.h"
 #endif
 
@@ -60,13 +60,13 @@ SharingHandlerRegistryImpl::SharingHandlerRegistryImpl(
                            kOptimizationGuidePushNotification});
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (sharing_device_registration->IsRemoteCopySupported()) {
     AddSharingHandler(
         std::make_unique<RemoteCopyMessageHandler>(profile),
         {components_sharing_message::SharingMessage::kRemoteCopyMessage});
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #if !BUILDFLAG(IS_ANDROID)
   if (sharing_device_registration
           ->IsOneTimeTokenBackendNotificationSupported()) {

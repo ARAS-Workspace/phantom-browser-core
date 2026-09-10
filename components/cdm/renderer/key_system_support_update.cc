@@ -89,11 +89,6 @@ SupportedCodecs GetVP9Codecs(
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
 SupportedCodecs GetHevcCodecs(
     const base::flat_set<media::VideoCodecProfile>& profiles) {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!base::FeatureList::IsEnabled(media::kPlatformHEVCDecoderSupport)) {
-    return media::EME_CODEC_NONE;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // If no profiles are specified, then all are supported.
   if (profiles.empty()) {
@@ -259,15 +254,7 @@ bool CanSupportPersistentLicense() {
     return false;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, platform verification is similar to CDM host verification
-  // and is always checked, so persistent licenses are allowed.
-  // TODO(jrummell): Currently the ChromeOS CDM does not require storage ID
-  // to support persistent license. Update this logic when the new CDM requires
-  // storage ID.
-  return true;
-
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Since we do not control the implementation of the MediaDrm API on Android,
   // we assume that it can and will make use of persistence no matter whether
   // persistence-based features are supported or not.
@@ -286,7 +273,7 @@ bool CanSupportPersistentLicense() {
       << __func__ << ": Not supported without CDM storage ID.";
   return false;
 
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Remove `kPersistentLicense` support if it's not supported by the platform.
@@ -367,23 +354,16 @@ void AddWidevine(const media::KeySystemCapability& capability,
   auto max_audio_robustness = Robustness::SW_SECURE_CRYPTO;
   auto max_video_robustness = Robustness::SW_SECURE_DECODE;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, we support HW_SECURE_ALL even without hardware secure codecs.
-  // See WidevineKeySystemInfo::GetRobustnessConfigRule().
-  max_audio_robustness = Robustness::HW_SECURE_ALL;
-  max_video_robustness = Robustness::HW_SECURE_ALL;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // On Android we support hardware secure if possible.
   max_audio_robustness = Robustness::HW_SECURE_CRYPTO;
   max_video_robustness = Robustness::HW_SECURE_ALL;
-#endif  // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Others.
   auto persistent_state_support = EmeFeatureSupport::REQUESTABLE;
   auto distinctive_identifier_support = EmeFeatureSupport::NOT_SUPPORTED;
-#if BUILDFLAG(IS_CHROMEOS)
-  distinctive_identifier_support = EmeFeatureSupport::REQUESTABLE;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Since we do not control the implementation of the MediaDrm API on Android,
   // we assume that it can and will make use of persistence no matter whether
   // persistence-based features are supported or not.

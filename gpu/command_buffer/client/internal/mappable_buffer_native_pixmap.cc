@@ -64,7 +64,7 @@ MappableBufferNativePixmap::CreateFromHandle(
     viz::SharedImageFormat format,
     gfx::BufferUsage usage) {
   const bool supports_zero_copy_webgpu_import =
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
       handle.native_pixmap_handle().supports_zero_copy_webgpu_import;
 #else
       false;

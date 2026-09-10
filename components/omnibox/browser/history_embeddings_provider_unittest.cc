@@ -40,10 +40,6 @@
 #include "ui/base/page_transition_types.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using testing::AllOf;
 using testing::ElementsAre;
 using testing::Field;
@@ -221,9 +217,6 @@ TEST_F(HistoryEmbeddingsProviderTest, Start) {
   base::test::ScopedFeatureList enabled_feature;
   enabled_feature.InitWithFeaturesAndParameters(
       {{history_embeddings::kHistoryEmbeddings, {}},
-#if BUILDFLAG(IS_CHROMEOS)
-       {chromeos::features::kFeatureManagementHistoryEmbedding, {{}}}
-#endif  // BUILDFLAG(IS_CHROMEOS)
       },
       /*disabled_features=*/{});
   EXPECT_CALL(*client_, IsHistoryEmbeddingsEnabled())
@@ -344,9 +337,6 @@ TEST_F(HistoryEmbeddingsProviderTest,
   base::test::ScopedFeatureList enabled_feature;
   enabled_feature.InitWithFeaturesAndParameters(
       {{history_embeddings::kHistoryEmbeddings, {}},
-#if BUILDFLAG(IS_CHROMEOS)
-       {chromeos::features::kFeatureManagementHistoryEmbedding, {{}}}
-#endif  // BUILDFLAG(IS_CHROMEOS)
       },
       /*disabled_features=*/{});
   EXPECT_CALL(*client_, IsHistoryEmbeddingsEnabled())
@@ -479,9 +469,6 @@ TEST_F(HistoryEmbeddingsProviderTest,
   base::test::ScopedFeatureList enabled_feature;
   enabled_feature.InitWithFeaturesAndParameters(
       {{history_embeddings::kHistoryEmbeddings, {}},
-#if BUILDFLAG(IS_CHROMEOS)
-       {chromeos::features::kFeatureManagementHistoryEmbedding, {{}}}
-#endif  // BUILDFLAG(IS_CHROMEOS)
       },
       /*disabled_features=*/{});
 

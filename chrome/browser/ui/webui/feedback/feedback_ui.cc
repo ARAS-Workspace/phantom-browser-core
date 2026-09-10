@@ -22,11 +22,6 @@
 #include "content/public/browser/web_ui_data_source.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/arc/arc_util.h"
-#include "chromeos/strings/grit/chromeos_strings.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void AddStringResources(content::WebUIDataSource* source,
                         const Profile* profile) {
   static constexpr webui::LocalizedString kStrings[] = {
@@ -60,18 +55,8 @@ void AddStringResources(content::WebUIDataSource* source,
   };
 
   source->AddLocalizedStrings(kStrings);
-#if BUILDFLAG(IS_CHROMEOS)
-  source->AddLocalizedString("mayBeSharedWithPartnerNote",
-                             IDS_FEEDBACK_TOOL_MAY_BE_SHARED_NOTE);
-  source->AddLocalizedString(
-      "sysInfo",
-      arc::IsArcPlayStoreEnabledForProfile(profile)
-          ? IDS_FEEDBACK_INCLUDE_SYSTEM_INFORMATION_AND_METRICS_CHKBOX_ARC
-          : IDS_FEEDBACK_INCLUDE_SYSTEM_INFORMATION_AND_METRICS_CHKBOX);
-#else
   source->AddLocalizedString("sysInfo",
                              IDS_FEEDBACK_INCLUDE_SYSTEM_INFORMATION_CHKBOX);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void CreateAndAddFeedbackHTMLSource(Profile* profile) {

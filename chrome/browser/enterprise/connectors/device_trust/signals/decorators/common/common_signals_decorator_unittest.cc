@@ -15,10 +15,6 @@
 #include "components/device_signals/core/common/signals_constants.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace enterprise_connectors {
 
 namespace {
@@ -35,9 +31,6 @@ class CommonSignalsDecoratorTest : public testing::Test {
   base::test::TaskEnvironment task_environment_;
   base::HistogramTester histogram_tester_;
   CommonSignalsDecorator decorator_;
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::system::ScopedFakeStatisticsProvider fake_statistics_provider;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 };
 
 TEST_F(CommonSignalsDecoratorTest, Decorate_StaticValuesPresent) {

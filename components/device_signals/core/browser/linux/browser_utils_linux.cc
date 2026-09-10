@@ -12,10 +12,6 @@
 #include "base/strings/string_util.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/command_line.h"
-#include "chromeos/dbus/constants/dbus_switches.h"
-#endif
 #include "components/device_signals/core/common/common_types.h"
 #include "components/device_signals/core/common/platform_utils.h"
 #include "net/base/network_interfaces.h"
@@ -49,13 +45,6 @@ std::vector<std::string> GetSystemDnsServers() {
 }
 
 SettingValue GetOSFirewall() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          chromeos::switches::kSystemDevMode)) {
-    return SettingValue::UNKNOWN;
-  }
-  return SettingValue::ENABLED;
-#else
   base::FilePath path(*GetUfwConfigPath());
   std::string file_content;
   base::StringPairs values;
@@ -78,7 +67,6 @@ SettingValue GetOSFirewall() {
   } else {
     return SettingValue::UNKNOWN;
   }
-#endif
 }
 
 #if BUILDFLAG(IS_LINUX)

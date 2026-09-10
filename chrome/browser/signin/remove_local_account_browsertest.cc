@@ -24,10 +24,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/test/network_portal_detector_mixin.h"
-#endif
-
 namespace {
 
 using testing::Contains;
@@ -79,20 +75,11 @@ class RemoveLocalAccountTest : public MixinBasedInProcessBrowserTest {
 
     embedded_test_server_.StartAcceptingConnections();
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // `ChromeSigninClient` uses `ash::DelayNetworkCall()` which requires
-    // simulating being online.
-    network_portal_detector_.SimulateDefaultNetworkState(
-        ash::NetworkPortalDetectorMixin::NetworkStatus::kOnline);
-#endif
   }
 
   FakeGaia fake_gaia_;
   net::EmbeddedTestServer embedded_test_server_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  ash::NetworkPortalDetectorMixin network_portal_detector_{&mixin_host_};
-#endif
 };
 
 IN_PROC_BROWSER_TEST_F(RemoveLocalAccountTest, ShouldNotifyObservers) {

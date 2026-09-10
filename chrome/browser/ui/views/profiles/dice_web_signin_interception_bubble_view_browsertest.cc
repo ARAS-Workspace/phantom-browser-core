@@ -870,7 +870,7 @@ IN_PROC_BROWSER_TEST_F(DiceWebSigninInterceptionBubbleBrowserTest,
       SigninInterceptionDismissReason::kUserNotEligible, 1);
 }
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 struct InterceptTypesParam {
   WebSigninInterceptor::SigninInterceptionType intercept_type;
   int expected_avatar_text_id;

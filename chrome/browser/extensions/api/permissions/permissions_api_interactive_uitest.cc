@@ -18,7 +18,7 @@ using PermissionsApiInteractiveTest = ExtensionApiTest;
 
 // Tests that the dialog is parented to the correct window when there are
 // multiple browser windows open. Regression test for crbug.com/41482206.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // BringBrowserWindowToFront hangs on Linux: http://crbug.com/356183782
 #define MAYBE_DialogWithMultipleWindows DISABLED_DialogWithMultipleWindows
 #else

@@ -176,11 +176,7 @@ IN_PROC_BROWSER_TEST_F(ExitTypeServiceTest, RestoreFromCrashBubble) {
   GetExitTypeService()->AddCrashAckCallback(run_loop.QuitClosure());
   run_loop.Run();
   EXPECT_TRUE(IsSessionServiceSavingEnabled());
-#if BUILDFLAG(IS_CHROMEOS)
-  const bool restores_to_initial_browser = false;
-#else
   const bool restores_to_initial_browser = true;
-#endif
   ASSERT_EQ(2u + (restores_to_initial_browser ? 0u : 1u),
             GlobalBrowserCollection::GetInstance()->GetSize());
   BrowserWindowInterface* const browser1 = FindBrowserWithUrl(GetUrl1());
@@ -212,12 +208,7 @@ IN_PROC_BROWSER_TEST_F(ExitTypeServiceTest, PRE_CloseCrashBubbleEnablesSaving) {
 }
 
 // TODO(crbug.com/40927197): Re-enable test that flakily times out
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_CloseCrashBubbleEnablesSaving \
-  DISABLED_CloseCrashBubbleEnablesSaving
-#else
 #define MAYBE_CloseCrashBubbleEnablesSaving CloseCrashBubbleEnablesSaving
-#endif
 // Closes the crash bubble, which should enable saving.
 IN_PROC_BROWSER_TEST_F(ExitTypeServiceTest,
                        MAYBE_CloseCrashBubbleEnablesSaving) {

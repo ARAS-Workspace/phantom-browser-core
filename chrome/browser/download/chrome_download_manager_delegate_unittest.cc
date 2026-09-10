@@ -1779,7 +1779,6 @@ TEST_F(ChromeDownloadManagerDelegateTest,
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(ChromeDownloadManagerDelegateTest, ScheduleCancelForEphemeralWarning) {
 #if BUILDFLAG(IS_ANDROID)
   // Enable the feature on Android to activate warnings, and thus ephemeral
@@ -1822,7 +1821,6 @@ TEST_F(ChromeDownloadManagerDelegateTest,
   EXPECT_CALL(*download_item, Cancel(false)).Times(0);
   task_environment()->FastForwardBy(base::Hours(1));
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(ChromeDownloadManagerDelegateTest, CancelAllEphemeralWarnings) {
 #if BUILDFLAG(IS_ANDROID)
@@ -1850,16 +1848,9 @@ TEST_F(ChromeDownloadManagerDelegateTest, CancelAllEphemeralWarnings) {
   EXPECT_CALL(*download_manager(), GetAllDownloads(_))
       .WillRepeatedly(SetArgPointee<0>(items));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // No cancels should go through for Ash.
-  EXPECT_CALL(*safe_item, Cancel(false)).Times(0);
-  EXPECT_CALL(*dangerous_item, Cancel(false)).Times(0);
-  EXPECT_CALL(*canceled_item, Cancel(false)).Times(0);
-#else
   EXPECT_CALL(*safe_item, Cancel(false)).Times(0);
   EXPECT_CALL(*dangerous_item, Cancel(false)).Times(1);
   EXPECT_CALL(*canceled_item, Cancel(false)).Times(0);
-#endif
 
   delegate()->CancelAllEphemeralWarnings();
 }
@@ -2623,7 +2614,7 @@ TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
 
 // Auto cancel is only available on platforms with download bubble.
 // TODO(crbug.com/397407934): Support auto cancel reports on Android.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
        AutoCanceledReport_Sent) {
   safe_browsing::SetSafeBrowsingState(
@@ -2664,7 +2655,7 @@ TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
   EXPECT_FALSE(
       safe_browsing_service()->GetActualSentDidProceedValue().has_value());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
        CanceledReportAtShutdown_Persisted) {
@@ -2840,124 +2831,6 @@ TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
 }
 #endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS)
-TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
-       GetRenameHandlerForDownload_Obfuscation) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      enterprise_obfuscation::kEnterpriseFileObfuscation);
-
-  base::ScopedTempDir temp_dir;
-  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
-  base::FilePath staging_path = temp_dir.GetPath().AppendASCII("staging.txt");
-  base::FilePath local_path = temp_dir.GetPath().AppendASCII("local.txt");
-  base::FilePath virtual_path("/media/fuse/odfs/final.txt");
-
-  std::unique_ptr<download::MockDownloadItem> download_item =
-      CreateActiveDownloadItem(0);
-  EXPECT_CALL(*download_item, RequireSafetyChecks())
-      .WillRepeatedly(Return(true));
-  EXPECT_CALL(*download_item, GetTargetFilePath())
-      .WillRepeatedly(ReturnRef(staging_path));
-
-  auto mock_protection_service =
-      std::make_unique<::testing::StrictMock<TestDownloadProtectionService>>();
-  EXPECT_CALL(*delegate(), GetDownloadProtectionService())
-      .WillRepeatedly(Return(mock_protection_service.get()));
-
-  policy::SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
-  enterprise_connectors::test::SetAnalysisConnector(
-      pref_service(), enterprise_connectors::FILE_DOWNLOADED,
-      R"({
-        "service_provider": "google",
-        "enable": [
-          {
-            "url_list": ["*"],
-            "tags": ["malware", "dlp"]
-          }
-        ],
-        "block_until_verdict": 1
-      })");
-
-  // Local downloads (staging_path is non-virtual and original_target_path is
-  // not set yet) do not get a rename handler.
-  EXPECT_FALSE(delegate()->GetRenameHandlerForDownload(download_item.get()));
-
-  // Set up original_target_path on the user data that ShouldObfuscateDownload
-  // created (simulating DetermineLocalPath staging a non-local OneDrive
-  // download in temp dir).
-  auto* obfuscation_data =
-      static_cast<enterprise_obfuscation::DownloadObfuscationData*>(
-          download_item->GetUserData(
-              enterprise_obfuscation::DownloadObfuscationData::kUserDataKey));
-  ASSERT_TRUE(obfuscation_data);
-
-  // When original_target_path is a local path (non-virtual), no rename handler.
-  obfuscation_data->original_target_path = local_path;
-  EXPECT_FALSE(delegate()->GetRenameHandlerForDownload(download_item.get()));
-
-  // When original_target_path matches IsVirtualFilesystem, rename handler is
-  // returned.
-  obfuscation_data->original_target_path = virtual_path;
-  EXPECT_TRUE(delegate()->GetRenameHandlerForDownload(download_item.get()));
-}
-
-TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
-       DetermineLocalPath_Obfuscation_NonLocalPath) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      enterprise_obfuscation::kEnterpriseFileObfuscation);
-
-  std::unique_ptr<download::MockDownloadItem> download_item =
-      CreateActiveDownloadItem(0);
-  EXPECT_CALL(*download_item, RequireSafetyChecks())
-      .WillRepeatedly(Return(true));
-
-  auto mock_protection_service =
-      std::make_unique<::testing::StrictMock<TestDownloadProtectionService>>();
-  EXPECT_CALL(*delegate(), GetDownloadProtectionService())
-      .WillRepeatedly(Return(mock_protection_service.get()));
-
-  policy::SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
-  enterprise_connectors::test::SetAnalysisConnector(
-      pref_service(), enterprise_connectors::FILE_DOWNLOADED,
-      R"({
-        "service_provider": "google",
-        "enable": [
-          {
-            "url_list": ["*"],
-            "tags": ["malware", "dlp"]
-          }
-        ],
-        "block_until_verdict": 1
-      })");
-
-  base::FilePath virtual_path("/media/fuse/odfs/test.doc");
-  base::RunLoop run_loop;
-  base::FilePath res_local_path;
-  delegate()->CallBaseDetermineLocalPath(
-      download_item.get(), virtual_path,
-      base::BindLambdaForTesting([&](const base::FilePath& local_path,
-                                     const base::FilePath& default_name) {
-        res_local_path = local_path;
-        run_loop.Quit();
-      }));
-  run_loop.Run();
-
-  // Local path should have been staged in a temp directory because virtual_path
-  // is non-local and obfuscation is enabled.
-  EXPECT_NE(virtual_path, res_local_path);
-
-  auto* obfuscation_data =
-      static_cast<enterprise_obfuscation::DownloadObfuscationData*>(
-          download_item->GetUserData(
-              enterprise_obfuscation::DownloadObfuscationData::kUserDataKey));
-  ASSERT_TRUE(obfuscation_data);
-  EXPECT_EQ(virtual_path, obfuscation_data->original_target_path);
-
-  base::DeleteFile(res_local_path);
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 #endif  // SAFE_BROWSING_DOWNLOAD_PROTECTION
 
 #if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)

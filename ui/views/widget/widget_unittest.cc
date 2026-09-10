@@ -2516,7 +2516,7 @@ TEST_F(DesktopWidgetTest, GetWindowPlacement) {
 
   native_widget->GetWindowPlacement(&restored_bounds, &show_state);
   EXPECT_EQ(expected_bounds, restored_bounds);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   // Non-desktop/Ash widgets start off in "default" until a Restore().
   EXPECT_EQ(ui::mojom::WindowShowState::kDefault, show_state);
   widget->Restore();
@@ -2702,7 +2702,7 @@ TEST_F(WidgetTest, GetWindowBoundsInScreen) {
 // Chrome OS widgets need the shell to maximize/fullscreen window.
 // Disable on desktop Linux because windows restore to the wrong bounds.
 // See http://crbug.com/515369.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_GetRestoredBounds DISABLED_GetRestoredBounds
 #else
 #define MAYBE_GetRestoredBounds GetRestoredBounds

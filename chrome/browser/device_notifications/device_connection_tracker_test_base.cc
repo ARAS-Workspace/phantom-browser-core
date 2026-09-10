@@ -22,13 +22,6 @@
 #include "chrome/test/base/profile_deletion_observer.h"
 #include "chrome/test/base/ui_test_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
-#include "components/session_manager/core/session_manager.h"
-#include "components/user_manager/test_helper.h"
-#include "components/user_manager/user_manager.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/browser/extension_registrar.h"
 #include "extensions/browser/extension_system.h"
@@ -44,44 +37,12 @@ using testing::UnorderedElementsAre;
 
 using OriginState = DeviceConnectionTracker::OriginState;
 
-#if !BUILDFLAG(IS_CHROMEOS)
 constexpr char kTestProfileName[] = "user@gmail.com";
-#endif
 
 }  // namespace
 
 DeviceConnectionTrackerTestBase::DeviceConnectionTrackerTestBase() = default;
 DeviceConnectionTrackerTestBase::~DeviceConnectionTrackerTestBase() = default;
-
-#if BUILDFLAG(IS_CHROMEOS)
-void DeviceConnectionTrackerTestBase::SetUpLocalStatePrefService(
-    PrefService* local_state) {
-  InProcessBrowserTest::SetUpLocalStatePrefService(local_state);
-
-  // Register a persisted user.
-  user_manager::TestHelper::RegisterPersistedUser(*local_state,
-                                                  test_account_id_);
-}
-
-Profile& DeviceConnectionTrackerTestBase::StartUserSession(
-    const AccountId& account_id) {
-  auto* session_manager = session_manager::SessionManager::Get();
-  session_manager->CreateSession(account_id, account_id.GetUserEmail(),
-                                 /*new_user=*/false,
-                                 /*has_active_session=*/false);
-
-  Profile& profile = profiles::testing::CreateProfileSync(
-      g_browser_process->profile_manager(),
-      ash::BrowserContextHelper::Get()->GetBrowserContextPathByUserIdHash(
-          user_manager::UserManager::Get()
-              ->FindUser(account_id)
-              ->username_hash()));
-
-  session_manager->NotifyUserProfileLoaded(account_id);
-  session_manager->SessionStarted();
-  return profile;
-}
-#endif
 
 void DeviceConnectionTrackerTestBase::TestDeviceConnection(
     bool has_system_tray_icon,
@@ -365,16 +326,10 @@ void DeviceConnectionTrackerTestBase::TestProfileDestroyedExtensionOrigin() {
 
   // Create a second profile.
   ProfileManager* profile_manager = g_browser_process->profile_manager();
-#if BUILDFLAG(IS_CHROMEOS)
-  Profile& profile_to_be_destroyed_ref = StartUserSession(test_account_id_);
-  Profile* profile_to_be_destroyed = &profile_to_be_destroyed_ref;
-  base::FilePath profile_path = profile_to_be_destroyed->GetPath();
-#else
   base::FilePath profile_path =
       profile_manager->user_data_dir().AppendASCII(kTestProfileName);
   Profile* profile_to_be_destroyed =
       &profiles::testing::CreateProfileSync(profile_manager, profile_path);
-#endif
 
   auto extension = CreateExtensionWithName("Test Extension");
   auto origin = extension->origin();

@@ -10,10 +10,6 @@
 #include "chrome/browser/screen_ai/screen_ai_install_state.h"
 #include "chrome/browser/ui/webui/settings/settings_page_ui_handler.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/accessibility/accessibility_manager.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace settings {
 
 // Settings handler for the main accessibility settings page,
@@ -44,13 +40,6 @@ class AccessibilityMainHandler
   void HandleGetScreenAIInstallState(const base::ListValue& args);
 
   void SendScreenReaderStateChanged();
-
-#if BUILDFLAG(IS_CHROMEOS)
-  void OnAccessibilityStatusChanged(
-      const ash::AccessibilityStatusEventDetails& details);
-
-  base::CallbackListSubscription accessibility_subscription_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   base::ScopedObservation<screen_ai::ScreenAIInstallState,
                           screen_ai::ScreenAIInstallState::Observer>

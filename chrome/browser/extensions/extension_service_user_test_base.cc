@@ -13,13 +13,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "google_apis/gaia/gaia_id.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/user_names.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
@@ -30,47 +23,11 @@ ExtensionServiceUserTestBase::ExtensionServiceUserTestBase(
     std::unique_ptr<content::BrowserTaskEnvironment> task_environment)
     : ExtensionServiceTestBase(std::move(task_environment)) {}
 
-#if BUILDFLAG(IS_CHROMEOS)
-void ExtensionServiceUserTestBase::SetUp() {
-  ExtensionServiceTestBase::SetUp();
-  scoped_user_manager_ = std::make_unique<user_manager::ScopedUserManager>(
-      std::make_unique<ash::FakeChromeUserManager>());
-  account_id_ = AccountId::FromUserEmailGaiaId("test-user@testdomain.com",
-                                               GaiaId("1234567890"));
-}
-
-void ExtensionServiceUserTestBase::TearDown() {
-  ExtensionServiceTestBase::TearDown();
-  scoped_user_manager_.reset();
-}
-
-void ExtensionServiceUserTestBase::LoginChromeOSUser(
-    const user_manager::User* user,
-    const AccountId& account_id) {
-  ASSERT_TRUE(user);
-  GetFakeUserManager()->LoginUser(account_id,
-                                  /*set_profile_created_flag=*/false);
-  ASSERT_TRUE(GetFakeUserManager()->IsUserLoggedIn());
-  ASSERT_TRUE(user == GetFakeUserManager()->GetActiveUser());
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 void ExtensionServiceUserTestBase::MaybeSetUpTestUser(bool is_guest) {
   SetGuestSessionOnProfile(is_guest);
 
   ASSERT_EQ(is_guest, profile()->IsGuestSession());
 
-#if BUILDFLAG(IS_CHROMEOS)
-  user_manager::User* user;
-  AccountId account_id = account_id_;
-  if (is_guest) {
-    user = GetFakeUserManager()->AddGuestUser();
-    account_id = user_manager::GuestAccountId();
-  } else {
-    user = GetFakeUserManager()->AddUser(account_id_);
-  }
-  ASSERT_NO_FATAL_FAILURE(LoginChromeOSUser(user, account_id));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace extensions

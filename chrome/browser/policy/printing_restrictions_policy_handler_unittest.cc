@@ -211,7 +211,7 @@ TEST_F(PrintPdfAsImageRestrictionsPolicyHandlerTest,
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(PrintPdfAsImageRestrictionsPolicyHandlerTest,
        DefaultWithoutAvailability) {
   // For platforms that do not require PrintPdfAsImageAvailability, demonstrate
@@ -227,7 +227,7 @@ TEST_F(PrintPdfAsImageRestrictionsPolicyHandlerTest,
   ASSERT_TRUE(value);
   EXPECT_EQ(*value, default_value);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
 

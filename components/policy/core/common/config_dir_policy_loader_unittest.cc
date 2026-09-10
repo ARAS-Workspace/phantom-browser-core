@@ -37,12 +37,10 @@ const char PolicyWithQuirks[] = R"({
   /* Some more comments here */
 })";
 
-#if !BUILDFLAG(IS_CHROMEOS)
 const char PrecedencePolicies[] = R"({
   "CloudPolicyOverridesPlatformPolicy": true,
   "CloudUserPolicyOverridesCloudMachinePolicy": false,
 })";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 class TestHarness : public PolicyProviderTestHarness {
  public:
@@ -283,7 +281,6 @@ TEST_F(ConfigDirPolicyLoaderTest, ReadPrefsMergePrefs) {
   EXPECT_TRUE(bundle.Equals(expected_bundle));
 }
 
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(ConfigDirPolicyLoaderTest, LoadPrecedencePolicies) {
   const PolicyNamespace chrome_ns(POLICY_DOMAIN_CHROME, std::string());
   RegisterChromeSchema(chrome_ns);
@@ -304,6 +301,5 @@ TEST_F(ConfigDirPolicyLoaderTest, LoadPrecedencePolicies) {
 
   EXPECT_TRUE(bundle.Equals(expected_bundle));
 }
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace policy

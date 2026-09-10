@@ -28,7 +28,7 @@ viz::SharedImageFormat DefaultFormat() {
   // The default format on Mac is BGRA in screen_mac.cc, so we set it here
   // too so that it matches with --ensure-forced-color-profile.
   // https://crbug.com/1478708
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return viz::SinglePlaneFormat::kBGRA_8888;
 #else
   return viz::SinglePlaneFormat::kRGBA_8888;

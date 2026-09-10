@@ -537,12 +537,6 @@ IN_PROC_BROWSER_TEST_F(UnloadTest,
 
 // Tests terminating the browser with a beforeunload handler.
 // Currently only ChromeOS shuts down gracefully.
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(UnloadTest, BrowserTerminateBeforeUnload) {
-  NavigateToDataURL(BEFORE_UNLOAD_HTML, "beforeunload");
-  EXPECT_EQ(kill(base::GetCurrentProcessHandle(), SIGTERM), 0);
-}
-#endif
 
 // Tests closing the browser and clicking OK in the beforeunload confirm dialog
 // if an inner frame has the focus.

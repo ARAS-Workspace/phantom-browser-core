@@ -291,10 +291,6 @@ class BrowserProcess {
 
   virtual component_updater::ComponentUpdateService* component_updater() = 0;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  virtual MediaFileSystemRegistry* media_file_system_registry() = 0;
-#endif
-
   virtual WebRtcLogUploader* webrtc_log_uploader() = 0;
 
   virtual network_time::NetworkTimeTracker* network_time_tracker() = 0;

@@ -319,7 +319,6 @@ class MediaNotificationServiceCastTest : public MediaNotificationServiceTest {
 
 // CastMediaNotificationProducer is owned by
 // CastMediaNotificationProducerKeyedService in Ash.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(MediaNotificationServiceCastTest,
        ShowCastSessionsForPresentationRequest) {
   NiceMock<global_media_controls::test::MockMediaDialogDelegate>
@@ -358,7 +357,6 @@ TEST_F(MediaNotificationServiceCastTest,
   testing::Mock::VerifyAndClearExpectations(&dialog_delegate);
   SimulateCloseDialog();
 }
-#endif
 
 TEST_F(MediaNotificationServiceCastTest, ShowMediaItemsForPresentationRequest) {
   std::unique_ptr<content::WebContents> web_contents_1(
@@ -393,7 +391,6 @@ TEST_F(MediaNotificationServiceCastTest, ShowMediaItemsForPresentationRequest) {
 
 // SupplementalDevicePickerProducer is not owned by MediaNotificationService
 // on Chrome OS.
-#if !BUILDFLAG(IS_CHROMEOS)
 TEST_F(MediaNotificationServiceCastTest, ShowSupplementalNotifications) {
   NiceMock<global_media_controls::test::MockMediaDialogDelegate>
       dialog_delegate;
@@ -483,7 +480,6 @@ TEST_F(MediaNotificationServiceCastTest,
   EXPECT_TRUE(supplemental_notification);
   EXPECT_FALSE(supplemental_notification->is_default_presentation_request());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(MediaNotificationServiceCastTest,
        OnStartPresentationContextCreated_ForMediaSessionNotifications) {

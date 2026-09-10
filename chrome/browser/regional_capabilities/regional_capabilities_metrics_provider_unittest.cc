@@ -138,7 +138,7 @@ TEST_F(RegionalCapabilitiesMetricsProviderTest, SingleWaffle_Waffle) {
 }
 
 // Skip on platforms that don't have a system profile.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(RegionalCapabilitiesMetricsProviderTest,
        SystemProfileAndWaffle_Waffle) {
   profile_manager_.CreateSystemProfile();
@@ -158,7 +158,7 @@ TEST_F(RegionalCapabilitiesMetricsProviderTest,
       "RegionalCapabilities.ActiveRegionalProgram3.Profile1",
       ActiveRegionalProgram::kWaffle, 1);
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(RegionalCapabilitiesMetricsProviderTest, MultipleWaffle_Waffle) {
   CreateProfileWithCountry(metrics::ProfileMetricsContext{1},

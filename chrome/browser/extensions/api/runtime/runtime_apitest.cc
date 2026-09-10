@@ -67,8 +67,7 @@
 #endif
 
 // Includes used only by the dangling-pointer regression test below.
-#if !BUILDFLAG(IS_ANDROID) && PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS) && \
-    !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID) && PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS)
 #include "base/allocator/partition_alloc_features.h"
 #include "base/functional/callback_helpers.h"
 #include "base/scoped_observation.h"
@@ -604,8 +603,7 @@ IN_PROC_BROWSER_TEST_F(RuntimeAPIUpdateTest,
 // checks are compiled in, so the test is built only in that case.
 // Also exclude from ChromeOS because multiple profiles aren't supported there,
 // so the test can't be set up properly.
-#if !BUILDFLAG(IS_ANDROID) && PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS) && \
-    !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID) && PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS)
 namespace {
 
 // Test helper. When the observed profile is about to be destroyed, it fires the
@@ -694,8 +692,7 @@ IN_PROC_BROWSER_TEST_F(RuntimeOnInstalledShutdownTest,
   base::RunLoop().RunUntilIdle();
 }
 #endif  // !BUILDFLAG(IS_ANDROID) &&
-        // PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS) &&
-        // !BUILDFLAG(IS_CHROMEOS)
+        // PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 // TODO(crbug.com/423725749): Port to desktop Android when a cross-platform
@@ -1694,7 +1691,7 @@ class GetContextsWithDeveloperToolsOpened
 };
 
 // TODO(crbug.com/357845909): flaky on ChromeOS and Linux MSAN.
-#if defined(MEMORY_SANITIZER) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if defined(MEMORY_SANITIZER) && BUILDFLAG(IS_LINUX)
 #define MAYBE_ReturnsDevToolsContext DISABLED_ReturnsDevToolsContext
 #else
 #define MAYBE_ReturnsDevToolsContext ReturnsDevToolsContext

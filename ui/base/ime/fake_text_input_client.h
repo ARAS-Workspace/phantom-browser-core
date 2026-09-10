@@ -100,22 +100,14 @@ class FakeTextInputClient : public TextInputClient {
   void SetTextEditCommandForNextKeyEvent(TextEditCommand command) override;
   ukm::SourceId GetClientSourceForMetrics() const override;
   bool ShouldDoLearning() override;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   bool SetCompositionFromExistingText(
       const gfx::Range& range,
       const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) override;
 #endif
-#if BUILDFLAG(IS_CHROMEOS)
-  gfx::Range GetAutocorrectRange() const override;
-  gfx::Rect GetAutocorrectCharacterBounds() const override;
-  bool SetAutocorrectRange(const gfx::Range& range) override;
-#endif
   void GetActiveTextInputControlLayoutBounds(
       std::optional<gfx::Rect>* control_bounds,
       std::optional<gfx::Rect>* selection_bounds) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  ui::TextInputClient::EditingContext GetTextEditingContext() override;
-#endif
 
  private:
   raw_ptr<ui::InputMethod> input_method_ = nullptr;

@@ -40,7 +40,7 @@ class LockThreadAffinity {
 
  private:
   bool affinity_set_ok_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   cpu_set_t old_cpuset_;
 #endif
 };

@@ -17,16 +17,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/test/base/testing_browser_process.h"
-#include "chrome/test/base/testing_profile_manager.h"
-#include "chromeos/ash/components/login/login_state/login_state.h"
-#include "components/account_id/account_id.h"
-#include "components/user_manager/scoped_user_manager.h"
-#include "components/user_manager/user_type.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace {
 constexpr char kTestSite1[] = "https://foo.test.org";
 constexpr char kTestSite1Pattern[] = "foo.test.org";

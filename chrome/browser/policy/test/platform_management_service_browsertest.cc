@@ -22,7 +22,6 @@ class PlatformPolicyManagementServiceTest : public PolicyTest {
   ~PlatformPolicyManagementServiceTest() override = default;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS)
 // Some testing machines/bots are managed, so we cannot test that they become
 // managed after setting one policy. For those machines we check the presence of
 // `EnterpriseManagementAuthority::COMPUTER_LOCAL` in the management
@@ -45,6 +44,5 @@ IN_PROC_BROWSER_TEST_F(PlatformPolicyManagementServiceTest, HasPolicy) {
                   ->GetManagementAuthorityTrustworthiness());
   }
 }
-#endif
 
 }  //  namespace policy

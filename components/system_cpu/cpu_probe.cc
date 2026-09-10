@@ -12,23 +12,23 @@
 #include "base/functional/callback.h"
 #include "base/location.h"
 #include "build/build_config.h"
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #include "components/system_cpu/cpu_probe_linux.h"
 #elif BUILDFLAG(IS_MAC)
 #include "components/system_cpu/cpu_probe_mac.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace system_cpu {
 
 // static
 std::unique_ptr<CpuProbe> CpuProbe::Create() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   return CpuProbeLinux::Create();
 #elif BUILDFLAG(IS_MAC)
   return CpuProbeMac::Create();
 #else
   return nullptr;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 CpuProbe::CpuProbe() = default;

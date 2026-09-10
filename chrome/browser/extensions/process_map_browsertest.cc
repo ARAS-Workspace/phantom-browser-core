@@ -321,63 +321,6 @@ class ProcessMapBrowserTest : public ExtensionBrowserTest {
     return extension;
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  const Extension* AddExtensionWithWebViewAndOpen() {
-    static constexpr char kManifest[] =
-        R"({
-             "name": "Web View",
-             "manifest_version": 2,
-             "version": "0.1",
-             "app": {
-               "background": { "scripts": ["background.js"] }
-             },
-             "webview": {
-               "partitions": [{
-                 "name": "foo",
-                 "accessible_resources": ["accessible.html"]
-               }]
-             },
-             "permissions": ["webview"]
-           })";
-    static constexpr char kBackgroundJs[] =
-        R"(chrome.app.runtime.onLaunched.addListener(() => {
-             chrome.app.window.create('embedder.html', {}, function () {});
-           });)";
-    static constexpr char kEmbedderHtml[] =
-        R"(<html>
-           <body>
-             <webview partition="foo"></webview>
-             <script src="embedder.js"></script>
-           </body>
-           </html>)";
-    static constexpr char kEmbedderJs[] =
-        R"(onload = () => {
-             let webview = document.querySelector('webview');
-             webview.addEventListener('loadstop', () => {
-               chrome.test.sendMessage('webview loaded');
-             });
-             webview.addEventListener('loadabort', (e) => {
-               console.error('Webview aborted load: ' + e.toString());
-             });
-             webview.src = 'accessible.html';
-           };)";
-    auto extension_dir = std::make_unique<TestExtensionDir>();
-    extension_dir->WriteManifest(kManifest);
-    extension_dir->WriteFile(FILE_PATH_LITERAL("background.js"), kBackgroundJs);
-    extension_dir->WriteFile(FILE_PATH_LITERAL("embedder.html"), kEmbedderHtml);
-    extension_dir->WriteFile(FILE_PATH_LITERAL("embedder.js"), kEmbedderJs);
-    extension_dir->WriteFile(FILE_PATH_LITERAL("accessible.html"), "hello");
-
-    ExtensionTestMessageListener webview_listener("webview loaded");
-    const Extension* extension = LoadAndLaunchApp(extension_dir->UnpackedPath(),
-                                                  /*uses_guest_view=*/true);
-    extension_dirs_.push_back(std::move(extension_dir));
-    EXPECT_TRUE(webview_listener.WaitUntilSatisfied());
-
-    return extension;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
   content::WebContents* GetAppWindowContents() {
     AppWindowRegistry* registry = AppWindowRegistry::Get(profile());
@@ -1417,60 +1360,6 @@ IN_PROC_BROWSER_TEST_F(ProcessMapBrowserTest,
 
 // The following tests launch a dynamic Chrome App, which is only supported on
 // ChromeOS.
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(ProcessMapBrowserTest,
-                       IsPrivilegedExtensionProcess_WebViews) {
-  const Extension* extension = AddExtensionWithWebViewAndOpen();
-  ASSERT_TRUE(extension);
-
-  content::WebContents* embedder = GetAppWindowContents();
-  ASSERT_TRUE(embedder);
-
-  content::WebContents* webview = GetWebViewFromEmbedder(embedder);
-  ASSERT_TRUE(webview);
-
-  // The embedder (the app window) should be a privileged extension process,
-  // but the webview should not.
-  EXPECT_TRUE(process_map()->IsPrivilegedExtensionProcess(
-      *extension, embedder->GetPrimaryMainFrame()->GetProcess()->GetID()));
-  EXPECT_FALSE(process_map()->IsPrivilegedExtensionProcess(
-      *extension, webview->GetPrimaryMainFrame()->GetProcess()->GetID()));
-}
-
-IN_PROC_BROWSER_TEST_F(ProcessMapBrowserTest, CanHostContextType_WebViews) {
-  const Extension* extension = AddExtensionWithWebViewAndOpen();
-  ASSERT_TRUE(extension);
-
-  content::WebContents* embedder = GetAppWindowContents();
-  ASSERT_TRUE(embedder);
-
-  content::WebContents* webview = GetWebViewFromEmbedder(embedder);
-  ASSERT_TRUE(webview);
-
-  // The embedder (the app window) can theoretically host either a privileged
-  // context (default) or an offscreen context. In practice, apps can't use
-  // offscreen documents, but this isn't a security boundary, per se.
-  RunCanProcessHostContextTypeChecks(
-      extension, *embedder->GetPrimaryMainFrame()->GetProcess(),
-      {mojom::ContextType::kPrivilegedExtension,
-       mojom::ContextType::kOffscreenExtension},
-      "embedder process");
-
-  // The webview can only host unprivileged extension contexts (accessible
-  // resources) when associated with an extension.
-  RunCanProcessHostContextTypeChecks(
-      extension, *webview->GetPrimaryMainFrame()->GetProcess(),
-      {mojom::ContextType::kUnprivilegedExtension},
-      "webview process with extension passed");
-
-  // If the extension isn't associated with the call, the webview could only
-  // possibly contain web pages and untrusted web ui.
-  RunCanProcessHostContextTypeChecks(
-      nullptr, *webview->GetPrimaryMainFrame()->GetProcess(),
-      {mojom::ContextType::kWebPage, mojom::ContextType::kUntrustedWebUi},
-      "webview process without extension passed");
-}
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_F(ProcessMapBrowserTest,
                        IsPrivilegedExtensionProcess_UserScripts) {

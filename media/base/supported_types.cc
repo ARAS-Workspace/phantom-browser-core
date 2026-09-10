@@ -231,11 +231,6 @@ bool IsDecoderHevcProfileSupported(const VideoType& type) {
 
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
 #if BUILDFLAG(PLATFORM_HAS_OPTIONAL_HEVC_DECODE_SUPPORT)
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!base::FeatureList::IsEnabled(kPlatformHEVCDecoderSupport)) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
   return GetSupplementalDecoderVideoProfileCache()->IsProfileSupported(
       type.profile);
 #else

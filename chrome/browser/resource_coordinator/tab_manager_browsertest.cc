@@ -60,7 +60,7 @@
 
 using content::OpenURLParams;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace resource_coordinator {
 
@@ -640,15 +640,7 @@ IN_PROC_BROWSER_TEST_P(TabManagerTest, UrgentFastShutdownWithUnloadHandler) {
   // The Tab Manager will not be able to safely fast-kill either of the tabs as
   // one of them is current, and the other has an unload handler. An unsafe
   // attempt will be made on some platforms.
-#if BUILDFLAG(IS_CHROMEOS)
-  // The unsafe attempt for ChromeOS should succeed as ChromeOS ignores unload
-  // handlers when in critical condition.
-  WindowedRenderProcessHostExitObserver observer;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(UrgentDiscardTabImmediately());
-#if BUILDFLAG(IS_CHROMEOS)
-  observer.Wait();
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 IN_PROC_BROWSER_TEST_P(TabManagerTest,
@@ -695,23 +687,10 @@ IN_PROC_BROWSER_TEST_P(TabManagerIgnoreWorkersTest,
   // The Tab Manager will not be able to safely fast-kill either of the tabs as
   // one of them is current, and the other has a service worker. An unsafe
   // attempt will be made on some platforms.
-#if BUILDFLAG(IS_CHROMEOS)
-  // The unsafe attempt for ChromeOS should succeed as ChromeOS ignores unload
-  // handlers and workers when in critical condition.
-  WindowedRenderProcessHostExitObserver observer;
-#endif  // BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(UrgentDiscardTabImmediately());
-#if BUILDFLAG(IS_CHROMEOS)
-  observer.Wait();
-  histogram_tester.ExpectBucketCount(
-      "Discarding.AttemptFastKillForDiscardResult",
-      AttemptFastKillForDiscardResult::kKilledWithoutUnloadHandlersAndWorkers,
-      1);
-#else
   histogram_tester.ExpectBucketCount(
       "Discarding.AttemptFastKillForDiscardResult",
       AttemptFastKillForDiscardResult::kSkipped, 1);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 // Verifies the following state transitions for a tab:
@@ -1103,7 +1082,7 @@ INSTANTIATE_TEST_SUITE_P(
     });
 // Data race on Linux. http://crbug.com/41357022
 // Flaky on Mac and Windows: https://crbug.com/41477172
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_DiscardTabWithNonVisibleTabs DISABLED_DiscardTabWithNonVisibleTabs
 #else
 #define MAYBE_DiscardTabWithNonVisibleTabs DiscardTabWithNonVisibleTabs
@@ -1150,17 +1129,11 @@ IN_PROC_BROWSER_TEST_P(TabManagerTest, MAYBE_DiscardTabWithNonVisibleTabs) {
   EXPECT_TRUE(IsTabDiscarded(tab_strip1->GetWebContentsAt(1)));
   EXPECT_TRUE(IsTabDiscarded(tab_strip2->GetWebContentsAt(1)));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // On ChromeOS, a non-visible tab should be discarded even if it's active in
-  // its tab strip.
-  EXPECT_TRUE(IsTabDiscarded(tab_strip2->GetWebContentsAt(0)));
-#else
   // On other platforms, an active tab is never discarded, even if it's not
   // visible.
   EXPECT_FALSE(IsTabDiscarded(tab_strip2->GetWebContentsAt(0)));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace resource_coordinator
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

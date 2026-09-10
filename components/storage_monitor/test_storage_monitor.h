@@ -12,11 +12,6 @@
 #include "build/build_config.h"
 #include "components/storage_monitor/storage_monitor.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "mojo/public/cpp/bindings/remote.h"
-#include "services/device/public/mojom/mtp_manager.mojom.h"
-#endif
-
 namespace storage_monitor {
 
 class TestStorageMonitor : public StorageMonitor {
@@ -45,9 +40,6 @@ class TestStorageMonitor : public StorageMonitor {
   // StorageMonitor:
   bool GetStorageInfoForPath(const base::FilePath& path,
                              StorageInfo* device_info) const override;
-#if BUILDFLAG(IS_CHROMEOS)
-  device::mojom::MtpManager* media_transfer_protocol_manager() override;
-#endif
   Receiver* receiver() const override;
   void EjectDevice(
       const std::string& device_id,
@@ -69,9 +61,6 @@ class TestStorageMonitor : public StorageMonitor {
   // Paths considered for testing purposes to be on removable storage.
   std::vector<base::FilePath> removable_paths_;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  mojo::Remote<device::mojom::MtpManager> media_transfer_protocol_manager_;
-#endif
 };
 
 }  // namespace storage_monitor

@@ -10,21 +10,12 @@
 #include "content/public/test/browser_test_utils.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/experiences/arc/overlay/arc_overlay_manager.h"
-#endif
-
 namespace payments {
 namespace {
 
 using IconInstall = test::PaymentAppInstallUtil::IconInstall;
 
 struct [[maybe_unused]] ScopedTestSupport {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Invoking Play Billing on Chrome OS requires initializing the overlay
-  // manager.
-  ash::ArcOverlayManager overlay_manager;
-#endif
 };
 
 class AndroidPaymentAppFactoryTest
@@ -32,7 +23,6 @@ class AndroidPaymentAppFactoryTest
  public:
   AndroidPaymentAppFactoryTest() {
     feature_list_.InitAndEnableFeature(features::kAppStoreBilling);
-#if !BUILDFLAG(IS_CHROMEOS)
     // On non-ChromeOS platforms, AndroidAppCommunicationStub is used and
     // AndroidPaymentAppFactory discovers zero Android payment apps. Tests that
     // request both Play Billing and a Web payment method (such as
@@ -41,7 +31,6 @@ class AndroidPaymentAppFactoryTest
     // completes without opening a window or capturing user interaction,
     // bypassing user interaction is needed for a headless service worker.
     SetBypassUserInteractionForTesting();
-#endif
   }
 
   ~AndroidPaymentAppFactoryTest() override = default;
@@ -94,11 +83,7 @@ IN_PROC_BROWSER_TEST_F(AndroidPaymentAppFactoryTest,
   test_controller()->SetTwaPaymentApp("https://play.google.com/billing",
                                       "{\"status\": \"" + response + "\"}");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::string expected_response = response;
-#else
   std::string expected_response = "success";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   NavigateTo("b.com", "/payment_handler_status.html");
   ASSERT_EQ(expected_response,
@@ -118,13 +103,9 @@ IN_PROC_BROWSER_TEST_F(AndroidPaymentAppFactoryTest, PlayBillingPaymentMethod) {
   test_controller()->SetTwaPaymentApp("https://play.google.com/billing",
                                       "{\"status\": \"" + response + "\"}");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::string expected_response = response;
-#else
   std::string expected_response =
       "NotSupportedError: The payment method "
       "\"https://play.google.com/billing\" is not supported.";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   NavigateTo("b.com", "/payment_handler_status.html");
   ASSERT_EQ(expected_response,
@@ -143,13 +124,9 @@ IN_PROC_BROWSER_TEST_F(AndroidPaymentAppFactoryTest,
   test_controller()->SetTwaPaymentApp("https://play.google.com/billing",
                                       "{\"status\": \"" + response + "\"}");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::string expected_response = response;
-#else
   std::string expected_response =
       "NotSupportedError: The payment method "
       "\"https://play.google.com/billing\" is not supported.";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   NavigateTo("b.com", "/payment_handler_status.html");
   ASSERT_EQ(expected_response,
@@ -170,13 +147,9 @@ IN_PROC_BROWSER_TEST_F(AndroidPaymentAppFactoryTest,
   test_controller()->SetTwaPaymentApp("https://play.google.com/billing",
                                       "{\"status\": \"" + response + "\"}");
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::string expected_response = response;
-#else
   std::string expected_response =
       "NotSupportedError: The payment method "
       "\"https://play.google.com/billing\" is not supported.";
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   NavigateTo("b.com", "/payment_handler_status.html");
   ASSERT_EQ(expected_response,

@@ -370,12 +370,6 @@ IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleBaseViewBrowserTest,
 }
 
 // ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER is ChromeOS only.
-#if BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleBaseViewBrowserTest,
-                       InvokeUi_protected_media) {
-  ShowAndVerifyUi();
-}
-#endif
 
 // Test that the quiet prompt disposition returns the same value when permission
 // is not considered abusive (currently only applicable for Notifications) vs.

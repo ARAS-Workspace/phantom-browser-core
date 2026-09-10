@@ -15,10 +15,6 @@
 #include "base/files/scoped_temp_dir.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
-#endif
-
 // A test helper class that constructs and destructs platform dependent machine
 // state. It's used by src/components/rlz/rlz_tracker_unittest.cc and
 // src/rlz/lib/rlz_lib_test.cc
@@ -51,9 +47,6 @@ class RlzLibTestBase : public RlzLibTestNoMachineState {
   void SetUp() override;
   void TearDown() override;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<ash::system::FakeStatisticsProvider> statistics_provider_;
-#endif
 };
 
 #endif  // RLZ_TEST_RLZ_TEST_HELPERS_H_

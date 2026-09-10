@@ -89,21 +89,6 @@ class COMPONENT_EXPORT(GFX) ShadowValue {
                                          SkColor ambient_shadow_color,
                                          bool is_pill_shaped = false);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Makes ShadowValues for Chrome OS UI components with default colors.
-  static ShadowValues MakeChromeOSSystemUIShadowValues(
-      int elevation,
-      SkColor color = SK_ColorBLACK,
-      bool is_pill_shaped = false);
-  // Makes ShadowValues for chrome OS UI components with customized key and
-  // ambient colors.
-  static ShadowValues MakeChromeOSSystemUIShadowValues(
-      int elevation,
-      SkColor key_shadow_color,
-      SkColor ambient_shadow_color,
-      bool is_pill_shaped = false);
-#endif
-
  private:
   gfx::Vector2d offset_;
 

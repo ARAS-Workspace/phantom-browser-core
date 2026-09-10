@@ -27,11 +27,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/ash/components/file_manager/app_id.h"
-#include "extensions/common/constants.h"
-#endif
-
 namespace {
 // The singleton instance of TranslateService.
 TranslateService* g_translate_service = nullptr;
@@ -146,10 +141,6 @@ bool TranslateService::IsTranslatableURL(const GURL& url) {
   return !url.is_empty() && !url.SchemeIs(content::kChromeUIScheme) &&
          !url.SchemeIs(chrome::kChromeNativeScheme) &&
          !url.SchemeIs(content::kChromeDevToolsScheme) &&
-#if BUILDFLAG(IS_CHROMEOS)
-         !(url.SchemeIs(extensions::kExtensionScheme) &&
-           url.DomainIs(file_manager::kFileManagerAppId)) &&
-#endif
          !url.IsAboutBlank();
 }
 

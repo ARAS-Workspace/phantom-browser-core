@@ -78,7 +78,7 @@ constexpr Command kCommands[] = {
 
 /******** GetPeakMemoryMetrics ********/
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 // Linux does not have an exact mapping to the values used on Windows so use a
 // close approximation:
 // peak_virtual_memory ~= peak_page_file_usage
@@ -120,7 +120,7 @@ void GetPeakMemoryMetrics(size_t* peak_virtual_memory,
     }
   }
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
 /******** ScopedResourceUsageTracker ********/
 
@@ -131,17 +131,17 @@ class ScopedResourceUsageTracker {
   ScopedResourceUsageTracker() {
     start_time_ = base::TimeTicks::Now();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     GetPeakMemoryMetrics(&start_peak_page_file_usage_,
                          &start_peak_working_set_size_);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
   }
 
   // Computes and prints usage.
   ~ScopedResourceUsageTracker() {
     base::TimeTicks end_time = base::TimeTicks::Now();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     size_t cur_peak_page_file_usage = 0;
     size_t cur_peak_working_set_size = 0;
     GetPeakMemoryMetrics(&cur_peak_page_file_usage, &cur_peak_working_set_size);
@@ -157,7 +157,7 @@ class ScopedResourceUsageTracker {
               << (cur_peak_working_set_size - start_peak_working_set_size_) /
                      1024
               << " KiB";
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 
     LOG(INFO) << "Zucchini.TotalTime " << (end_time - start_time_).InSecondsF()
               << " s";
@@ -165,10 +165,10 @@ class ScopedResourceUsageTracker {
 
  private:
   base::TimeTicks start_time_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   size_t start_peak_page_file_usage_ = 0;
   size_t start_peak_working_set_size_ = 0;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX)
 };
 
 /******** Helper functions ********/

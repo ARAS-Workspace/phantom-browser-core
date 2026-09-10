@@ -1080,7 +1080,7 @@ DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kFrameLoadedEvent);
 DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kComposeboxFocusedEvent);
 
 // TODO(b/540260179, b/528971436): Flaky on Linux dbg and ChromeOS.
-#if (BUILDFLAG(IS_LINUX) && !defined(NDEBUG)) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_ComposeboxFocusOnBoundsUpdateWhenComposeboxHidden \
   DISABLED_ComposeboxFocusOnBoundsUpdateWhenComposeboxHidden
 #else

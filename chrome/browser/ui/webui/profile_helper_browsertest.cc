@@ -278,12 +278,6 @@ IN_PROC_BROWSER_TEST_P(ProfileHelperTestWithDestroyProfile,
   }
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-INSTANTIATE_TEST_SUITE_P(DestroyProfileOnBrowserClose,
-                         ProfileHelperTestWithDestroyProfile,
-                         testing::Values(false));
-#else
 INSTANTIATE_TEST_SUITE_P(DestroyProfileOnBrowserClose,
                          ProfileHelperTestWithDestroyProfile,
                          testing::Bool());
-#endif  // BUILDFLAG(IS_CHROMEOS)

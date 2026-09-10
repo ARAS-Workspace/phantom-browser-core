@@ -24,10 +24,6 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/webui_url_constants.h"
-#include "ash/webui/file_manager/url_constants.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 using testing::_;
 
@@ -118,17 +114,6 @@ TEST_F(ChromeUrlsHandlerTest, GetUrls) {
       std::make_unique<TestWebUIConfig>(content::kChromeUIUntrustedScheme,
                                         "dogs", false));
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Redirect the files, and sanitize config because they assume an Ash Shell
-  // exists in IsWebUIEnabled(), and the shell does not exist in unit tests.
-  content::ScopedWebUIConfigRegistration replace_files_app(
-      std::make_unique<TestWebUIConfig>(
-          content::kChromeUIScheme, ash::file_manager::kChromeUIFileManagerHost,
-          true));
-  content::ScopedWebUIConfigRegistration replace_sanitize_app(
-      std::make_unique<TestWebUIConfig>(content::kChromeUIScheme,
-                                        ash::kChromeUISanitizeAppHost, true));
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   base::MockCallback<chrome_urls::ChromeUrlsHandler::GetUrlsCallback> callback;
   chrome_urls::mojom::ChromeUrlsDataPtr url_data;

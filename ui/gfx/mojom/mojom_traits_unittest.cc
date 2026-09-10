@@ -48,7 +48,7 @@ gfx::AcceleratedWidget CastToAcceleratedWidget(int i) {
 // Used by the GpuMemoryBufferHandle test to produce a valid object handle to
 // embed in a NativePixmapPlane object, so that the test isn't sending an
 // invalid FD/vmo object where the mojom requires a valid one.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 base::ScopedFD CreateValidLookingBufferHandle() {
   return base::UnsafeSharedMemoryRegion::TakeHandleForSerialization(
              base::UnsafeSharedMemoryRegion::Create(1024))
@@ -266,7 +266,7 @@ TEST_F(StructTraitsTest, AcceleratedWidget) {
   EXPECT_EQ(input, output);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 TEST_F(StructTraitsTest, NativePixmapHandle) {
   // Test with a large offset that would trigger sign-extension if treated as
   // int.
@@ -310,9 +310,9 @@ TEST_F(StructTraitsTest, GpuMemoryBufferHandle) {
   base::UnsafeSharedMemoryRegion output_memory = std::move(output).region();
   EXPECT_TRUE(output_memory.Map().IsValid());
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)
   gfx::NativePixmapHandle native_pixmap_handle;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   const uint64_t kModifier = 2;
   base::ScopedFD buffer_handle = CreateValidLookingBufferHandle();
   native_pixmap_handle.modifier = kModifier;
@@ -325,7 +325,7 @@ TEST_F(StructTraitsTest, GpuMemoryBufferHandle) {
   handle2.stride = kStride;
   remote->EchoGpuMemoryBufferHandle(std::move(handle2), &output);
   EXPECT_EQ(gfx::NATIVE_PIXMAP, output.type);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_EQ(kModifier, output.native_pixmap_handle().modifier);
 #endif
   ASSERT_EQ(1u, output.native_pixmap_handle().planes.size());

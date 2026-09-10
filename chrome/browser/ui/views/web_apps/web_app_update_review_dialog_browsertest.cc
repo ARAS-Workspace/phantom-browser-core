@@ -393,9 +393,6 @@ class WebAppUpdateDialogBrowserTests : public WebAppBrowserTestBase {
 #if BUILDFLAG(IS_MAC)
     return base::FilePath(FILE_PATH_LITERAL(
         "chrome/test/data/web_apps/updating/green-masked-mac-96.png"));
-#elif BUILDFLAG(IS_CHROMEOS)
-    return base::FilePath(FILE_PATH_LITERAL(
-        "chrome/test/data/web_apps/updating/green-masked-chromeos-96.png"));
 #else
     return base::FilePath(
         FILE_PATH_LITERAL("chrome/test/data/web_apps/updating/green-96.png"));

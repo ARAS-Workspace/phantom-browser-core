@@ -703,7 +703,7 @@ TypedResult<IconMetadataFromDisk> ReadTrustedIconsBlocking(
   TypedResult<IconMetadataFromDisk> result;
 
 // First check for maskable icons available on Mac and ChromeOS.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   result = ReadIconsBlocking(utils, web_apps_directory, app_id,
                              IconPurpose::MASKABLE, icon_sizes,
                              /*read_trusted_icons=*/true);
@@ -712,7 +712,7 @@ TypedResult<IconMetadataFromDisk> ReadTrustedIconsBlocking(
     result.value.purpose = IconPurpose::MASKABLE;
     return result;
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
   // Check for `ANY` trusted icons. For MacOS and ChromeOS,
   // this behaves as a fallback to check for `ANY` icons if no maskable
@@ -1454,10 +1454,6 @@ void WebAppIconManager::Start() {
        provider_->registrar_unsafe().GetAppIds()) {
     ReadFavicon(app_id);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    // Notifications use a monochrome icon.
-    ReadMonochromeFavicon(app_id);
-#endif  // BUILDFLAG(IS_CHROMEOS)
   }
   install_manager_observation_.Observe(&provider_->install_manager());
 }
@@ -1582,12 +1578,12 @@ void WebAppIconManager::ReadIconsForPendingUpdate(
   // Construct the purpose for the "from_icon" from the web app instead of
   // relying on an external input for correctness.
   IconPurpose purpose_for_current_trusted_icon = IconPurpose::ANY;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   const WebApp* web_app = provider_->registrar_unsafe().GetAppById(app_id);
   if (!web_app->stored_trusted_icon_sizes(IconPurpose::MASKABLE).empty()) {
     purpose_for_current_trusted_icon = IconPurpose::MASKABLE;
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
   icon_task_runner_->PostTaskAndReplyWithResult(
       FROM_HERE,
@@ -1636,13 +1632,13 @@ void WebAppIconManager::ReadIconsLastUpdateTime(
   bool consider_trusted_icons = false;
   IconPurpose purpose = IconPurpose::ANY;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   if (!web_app->stored_trusted_icon_sizes(IconPurpose::MASKABLE).empty()) {
     sizes_px = web_app->stored_trusted_icon_sizes(IconPurpose::MASKABLE);
     consider_trusted_icons = true;
     purpose = IconPurpose::MASKABLE;
   }
-#endif  //  BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
   if (sizes_px.empty() &&
       !web_app->stored_trusted_icon_sizes(IconPurpose::ANY).empty()) {
@@ -1691,14 +1687,14 @@ void WebAppIconManager::ReadAllIcons(const webapps::AppId& app_id,
         std::vector<SquareSizePx>(sizes_px.begin(), sizes_px.end());
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   if (!web_app->stored_trusted_icon_sizes(IconPurpose::MASKABLE).empty()) {
     const SortedSizesPx& sizes_px =
         web_app->stored_trusted_icon_sizes(IconPurpose::MASKABLE);
     trusted_icon_purposes_to_sizes[IconPurpose::MASKABLE] =
         std::vector<SquareSizePx>(sizes_px.begin(), sizes_px.end());
   }
-#endif  //  BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC)
 
   if (trusted_icon_purposes_to_sizes.empty()) {
     const SortedSizesPx& sizes_px =

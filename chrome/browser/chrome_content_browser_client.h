@@ -503,9 +503,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::BrowserContext* context,
       const std::string& language,
       media::mojom::SpeechRecognitionQuality quality) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  content::TtsControllerDelegate* GetTtsControllerDelegate() override;
-#endif
   void MaybeOverrideManifest(content::RenderFrameHost* render_frame_host,
                              blink::mojom::ManifestPtr& manifest) override;
   content::TtsPlatform* GetTtsPlatform() override;
@@ -768,9 +765,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::RenderFrameHost* render_frame_host,
       mojo::PendingReceiver<payments::mojom::SecurePaymentConfirmationService>
           receiver) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  content::SmartCardDelegate* GetSmartCardDelegate() override;
-#endif
   bool ShowPaymentHandlerWindow(
       content::BrowserContext* browser_context,
       const GURL& url,
@@ -1091,13 +1085,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::BrowserContext& browser_context,
       const std::optional<url::Origin>& initiator_origin,
       const GURL& navigation_url) override;
-#if BUILDFLAG(IS_CHROMEOS)
-  void NotifyMultiCaptureStateChanged(
-      content::GlobalRenderFrameHostId capturer_rfh_id,
-      const std::string& label,
-      MultiCaptureChanged state,
-      base::OnceClosure stop_callback) override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   bool ShouldEnableBtm(content::BrowserContext* browser_context) override;
   void OnBtmServiceCreated(content::BrowserContext* browser_context,
@@ -1358,10 +1345,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   std::unique_ptr<ChromeBluetoothDelegate> bluetooth_delegate_;
   std::unique_ptr<ChromeUsbDelegate> usb_delegate_;
   std::unique_ptr<ChromeSerialDelegate> serial_delegate_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<content::SmartCardDelegate> smart_card_delegate_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_VR)
   std::unique_ptr<vr::ChromeXrIntegrationClient> xr_integration_client_;

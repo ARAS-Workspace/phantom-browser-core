@@ -195,7 +195,7 @@ bool OmniboxEverywhereController::IsVisible() const {
 void OmniboxEverywhereController::ShowProfilePicker() {
   Close();
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // TODO(crbug.com/527183107): Filter out or disallow selecting profiles where
   // Google is not the default search engine (DSE) in the Profile Picker.
   ProfilePicker::Show(ProfilePicker::Params::ForOmniboxEverywhere(

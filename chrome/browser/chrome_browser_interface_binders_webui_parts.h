@@ -42,16 +42,6 @@ void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop(
     content::WebUIBrowserInterfaceBrokerRegistry& registry);
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-void PopulateChromeWebUIFrameBindersPartsCros(
-    mojo::BinderMapWithContext<content::RenderFrameHost*>* map,
-    content::RenderFrameHost* render_frame_host);
-void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsCros(
-    content::WebUIBrowserInterfaceBrokerRegistry& registry);
-void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsCros(
-    content::WebUIBrowserInterfaceBrokerRegistry& registry);
-#endif
-
 }  // namespace chrome::internal
 
 #endif  // CHROME_BROWSER_CHROME_BROWSER_INTERFACE_BINDERS_WEBUI_PARTS_H_

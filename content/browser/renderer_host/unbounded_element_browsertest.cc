@@ -582,7 +582,7 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // hierarchy.
 // TODO(crbug.com/508672616): Not yet working on ChromeOS due to Aura/Ash
 // popup container positioning and coordinate conversion issues.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_PopupInputEventRouting DISABLED_PopupInputEventRouting
 #else
 #define MAYBE_PopupInputEventRouting PopupInputEventRouting
@@ -637,7 +637,7 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // hierarchy.
 // TODO(crbug.com/508672616): Not yet working on ChromeOS due to Aura/Ash
 // popup container positioning and coordinate conversion issues.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_PopupOutsideViewportInputEventRouting \
   DISABLED_PopupOutsideViewportInputEventRouting
 #else
@@ -742,7 +742,7 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // hierarchy.
 // TODO(crbug.com/508672616): Not yet working on ChromeOS due to Aura/Ash
 // popup container positioning and coordinate conversion issues.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_IframeClickEventRouting DISABLED_IframeClickEventRouting
 #else
 #define MAYBE_IframeClickEventRouting IframeClickEventRouting

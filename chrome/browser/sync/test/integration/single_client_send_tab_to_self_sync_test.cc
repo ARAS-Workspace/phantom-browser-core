@@ -371,7 +371,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSendTabToSelfSyncTest,
 }
 
 // An unconsented primary account is not supported on ChromeOS.
-#if !BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_P(SingleClientSendTabToSelfSyncTest,
                        ShouldCleanupOnSignout) {
   const GURL kUrl("https://www.example.com");
@@ -396,7 +395,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSendTabToSelfSyncTest,
                   GURL(kUrl))
                   .Wait());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 IN_PROC_BROWSER_TEST_P(SingleClientSendTabToSelfSyncTest,
                        ShouldNotUploadInSyncPausedState) {

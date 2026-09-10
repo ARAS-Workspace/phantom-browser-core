@@ -24,7 +24,7 @@ namespace {
 class ScopedLocale {
  public:
   explicit ScopedLocale(const char* locale) : locale_(locale) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     old_locale_ = getenv("LC_ALL");
 
     struct Locales {
@@ -48,7 +48,7 @@ class ScopedLocale {
   }
 
   ~ScopedLocale() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
     std::unique_ptr<base::Environment> env(base::Environment::Create());
     if (old_locale_) {
       env->SetVar("LC_ALL", old_locale_);
@@ -62,7 +62,7 @@ class ScopedLocale {
 
  private:
   std::string locale_;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
   const char* old_locale_;
 #endif
 };

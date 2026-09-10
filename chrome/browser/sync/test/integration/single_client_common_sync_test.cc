@@ -205,7 +205,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest,
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 // ChromeOS doesn't support primary account signout.
-#if !BUILDFLAG(IS_CHROMEOS)
 
 // Note: See also SyncErrorTest.ClientDataObsoleteTest, which ensures the cache
 // GUID does *not* get reused if the client's data needs to be reset.
@@ -284,8 +283,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest,
   }
 }
 
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-
 // Regression test for crbug.com/40624424 that verifies the cache GUID is not
 // reset upon restart of the browser.
 IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest, PRE_ReusesSameCacheGuid) {
@@ -298,12 +295,10 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest, PRE_ReusesSameCacheGuid) {
             GetSyncService(0)->GetTransportState());
 
   // On ChromeOS, IsInitialSyncFeatureSetupComplete() is always true.
-#if !BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(GetSyncService(0)
                    ->GetUserSettings()
                    ->IsInitialSyncFeatureSetupComplete());
   ASSERT_FALSE(GetSyncService(0)->IsSyncFeatureEnabled());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   syncer::SyncTransportDataPrefs transport_data_prefs(
       GetProfile(0)->GetPrefs(),
@@ -331,12 +326,10 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest, ReusesSameCacheGuid) {
             GetSyncService(0)->GetTransportState());
 
   // On ChromeOS, IsInitialSyncFeatureSetupComplete() is always true.
-#if !BUILDFLAG(IS_CHROMEOS)
   ASSERT_FALSE(GetSyncService(0)
                    ->GetUserSettings()
                    ->IsInitialSyncFeatureSetupComplete());
   ASSERT_FALSE(GetSyncService(0)->IsSyncFeatureEnabled());
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   syncer::SyncTransportDataPrefs transport_data_prefs(
       GetProfile(0)->GetPrefs(),
@@ -353,7 +346,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest, ReusesSameCacheGuid) {
 }
 
 // TODO(crbug.com/542347163): Re-enable test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ShouldCrashAwaitQuiescenceForE2ETest \
   DISABLED_ShouldCrashAwaitQuiescenceForE2ETest
 #else

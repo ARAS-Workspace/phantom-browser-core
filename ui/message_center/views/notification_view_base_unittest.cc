@@ -48,10 +48,6 @@
 #include "ui/views/test/widget_test.h"
 #include "ui/views/widget/widget_utils.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "ash/constants/notifier_catalogs.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace message_center {
 
 namespace {
@@ -766,92 +762,6 @@ TEST_F(NotificationViewBaseTest, MAYBE_DisableSlideForcibly) {
 }
 
 // Pinning notification is ChromeOS only feature.
-#if BUILDFLAG(IS_CHROMEOS)
-
-TEST_F(NotificationViewBaseTest, SlideOutPinned) {
-  notification_view()->SetIsNested();
-  gfx::ScopedAnimationDurationScaleMode zero_duration_scope(
-      gfx::ScopedAnimationDurationScaleMode::ZERO_DURATION);
-
-  std::unique_ptr<Notification> notification = CreateSimpleNotification();
-  notification->set_pinned(true);
-  UpdateNotificationViews(*notification);
-
-  BeginScroll();
-  ScrollBy(-200);
-  EXPECT_FALSE(IsRemovedAfterIdle(kDefaultNotificationId));
-  EXPECT_LT(-200.f, GetNotificationSlideAmount());
-  EndScroll();
-  EXPECT_FALSE(IsRemovedAfterIdle(kDefaultNotificationId));
-}
-
-TEST_F(NotificationViewBaseTest, Pinned) {
-  notification_view()->SetIsNested();
-  std::unique_ptr<Notification> notification = CreateSimpleNotification();
-
-  // Visible at the initial state.
-  EXPECT_TRUE(GetCloseButton());
-  EXPECT_TRUE(GetCloseButton()->GetVisible());
-
-  // Pin.
-  notification->set_pinned(true);
-  UpdateNotificationViews(*notification);
-  EXPECT_FALSE(GetCloseButton());
-
-  // Unpin.
-  notification->set_pinned(false);
-  UpdateNotificationViews(*notification);
-  EXPECT_TRUE(GetCloseButton());
-  EXPECT_TRUE(GetCloseButton()->GetVisible());
-
-  // Pin again.
-  notification->set_pinned(true);
-  UpdateNotificationViews(*notification);
-  EXPECT_FALSE(GetCloseButton());
-}
-
-TEST_F(NotificationViewBaseTest, FixedViewMode) {
-  gfx::ScopedAnimationDurationScaleMode zero_duration_scope(
-      gfx::ScopedAnimationDurationScaleMode::ZERO_DURATION);
-
-  std::unique_ptr<Notification> notification = CreateSimpleNotification();
-  notification_view()->SetSettingMode(true);
-  UpdateNotificationViews(*notification);
-  std::string notification_id = notification->id();
-
-  BeginScroll();
-  ScrollBy(-200);
-  EXPECT_FALSE(IsRemovedAfterIdle(notification_id));
-  EXPECT_EQ(0.f, GetNotificationSlideAmount());
-  EndScroll();
-  EXPECT_FALSE(IsRemovedAfterIdle(notification_id));
-
-  EXPECT_EQ(MessageView::Mode::SETTING, notification_view()->GetMode());
-}
-
-TEST_F(NotificationViewBaseTest, SnoozeButton) {
-  MessageCenter::Get()->RemoveAllNotifications(/*by_user=*/false,
-                                               MessageCenter::RemoveType::ALL);
-
-  // Create notification to replace the current one with itself.
-  message_center::RichNotificationData rich_data;
-  rich_data.settings_button_handler = SettingsButtonHandler::INLINE;
-  rich_data.pinned = true;
-  rich_data.should_show_snooze_button = true;
-  std::unique_ptr<Notification> notification = std::make_unique<Notification>(
-      message_center::NOTIFICATION_TYPE_CUSTOM, kDefaultNotificationId,
-      u"title", u"message", ui::ImageModel(), u"display source", GURL(),
-      message_center::NotifierId(message_center::NotifierType::ARC_APPLICATION,
-                                 "test_app_id"),
-      rich_data, nullptr);
-
-  UpdateNotificationViews(*notification);
-
-  EXPECT_NE(nullptr,
-            notification_view()->GetControlButtonsView()->snooze_button());
-}
-
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(NotificationViewBaseTest, UseImageAsIcon) {
   // TODO(tetsui): Remove duplicated integer literal in CreateOrUpdateIconView.
@@ -973,7 +883,6 @@ TEST_F(NotificationViewBaseTest, InlineSettings) {
   generator.ClickLeftButton();
   EXPECT_TRUE(notification_view()->settings_row_->GetVisible());
 
-#if !BUILDFLAG(IS_CHROMEOS)
   // By clicking settings button again, it will toggle. Skip this on ChromeOS as
   // the control_buttons_view gets hidden when the inline settings are shown.
   generator.ClickLeftButton();
@@ -982,7 +891,6 @@ TEST_F(NotificationViewBaseTest, InlineSettings) {
   // Show inline settings again.
   generator.ClickLeftButton();
   EXPECT_TRUE(notification_view()->settings_row_->GetVisible());
-#endif
 }
 
 TEST_F(NotificationViewBaseTest, TestClick) {
@@ -1099,12 +1007,7 @@ TEST_F(NotificationViewBaseTest, AppNameSystemNotification) {
   auto notification = std::make_unique<Notification>(
       NOTIFICATION_TYPE_SIMPLE, std::string(kDefaultNotificationId), u"title",
       u"message", ui::ImageModel(), std::u16string(), GURL(),
-#if BUILDFLAG(IS_CHROMEOS)
-      NotifierId(NotifierType::SYSTEM_COMPONENT, "system",
-                 ash::NotificationCatalogName::kTestCatalogName),
-#else
       NotifierId(NotifierType::SYSTEM_COMPONENT, "system"),
-#endif  // BUILDFLAG(IS_CHROMEOS)
       data, nullptr);
 
   UpdateNotificationViews(*notification);

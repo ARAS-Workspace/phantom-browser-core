@@ -33,14 +33,6 @@
 #include "components/webui/flags/flags_ui_switches.h"
 #include "components/webui/flags/pref_service_flags_storage.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "base/system/sys_info.h"
-#include "chrome/browser/ash/ownership/owner_settings_service_ash.h"
-#include "chrome/browser/ash/ownership/owner_settings_service_ash_factory.h"
-#include "chrome/browser/ash/settings/about_flags.h"
-#include "chrome/browser/profiles/profile.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 using flags_ui::FeatureEntry;
 using flags_ui::kDeprecated;
 
@@ -116,55 +108,12 @@ bool ShouldSkipNonDeprecatedFeatureEntry(const FeatureEntry& entry) {
 
 }  // namespace
 
-#if BUILDFLAG(IS_CHROMEOS)
-// This method may be invoked both synchronously or asynchronously. Based on
-// whether the current user is the owner of the device, generates the
-// appropriate flag storage.
-void GetStorageAsync(Profile* profile,
-                     GetStorageCallback callback,
-                     bool current_user_is_owner) {
-  // On ChromeOS the owner can set system wide flags and other users can only
-  // set flags for their own session.
-  if (current_user_is_owner) {
-    ash::OwnerSettingsServiceAsh* service =
-        ash::OwnerSettingsServiceAshFactory::GetForBrowserContext(profile);
-    std::move(callback).Run(
-        std::make_unique<ash::about_flags::OwnerFlagsStorage>(
-            profile->GetPrefs(), service),
-        flags_ui::kOwnerAccessToFlags);
-  } else {
-    std::move(callback).Run(std::make_unique<flags_ui::PrefServiceFlagsStorage>(
-                                profile->GetPrefs()),
-                            flags_ui::kGeneralAccessFlagsOnly);
-  }
-}
-#endif
-
 // ash-chrome uses different storage flag storage logic from other desktop
 // platforms.
 void GetStorage(Profile* profile, GetStorageCallback callback) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Bypass possible incognito profile.
-  // On ChromeOS the owner can set system wide flags and other users can only
-  // set flags for their own session.
-  Profile* original_profile = profile->GetOriginalProfile();
-  if (base::SysInfo::IsRunningOnChromeOS() &&
-      ash::OwnerSettingsServiceAshFactory::GetForBrowserContext(
-          original_profile)) {
-    ash::OwnerSettingsServiceAsh* service =
-        ash::OwnerSettingsServiceAshFactory::GetForBrowserContext(
-            original_profile);
-    service->IsOwnerAsync(base::BindOnce(&GetStorageAsync, original_profile,
-                                         std::move(callback)));
-  } else {
-    GetStorageAsync(original_profile, std::move(callback),
-                    /*current_user_is_owner=*/false);
-  }
-#else
   std::move(callback).Run(std::make_unique<flags_ui::PrefServiceFlagsStorage>(
                               g_browser_process->local_state()),
                           flags_ui::kOwnerAccessToFlags);
-#endif
 }
 
 bool ShouldSkipConditionalFeatureEntry(const flags_ui::FlagsStorage* storage,

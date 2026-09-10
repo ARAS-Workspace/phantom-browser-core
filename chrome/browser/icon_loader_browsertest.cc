@@ -56,8 +56,7 @@ class TestIconLoader {
 };
 
 // Under GTK, the icon providing functions do not return icons.
-#if !((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-      defined(MEMORY_SANITIZER))
+#if !(BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER))
 
 IN_PROC_BROWSER_TEST_F(IconLoaderBrowserTest, LoadGroup) {
   float scale = 1.0;
@@ -75,5 +74,4 @@ IN_PROC_BROWSER_TEST_F(IconLoaderBrowserTest, LoadGroup) {
   EXPECT_TRUE(test_loader.load_succeeded());
 }
 
-#endif  // !((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&
-        // defined(MEMORY_SANITIZER))
+#endif  // !(BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER))

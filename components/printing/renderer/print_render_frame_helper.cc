@@ -1487,9 +1487,6 @@ void PrintRenderFrameHelper::SetPrintPreviewUI(
 }
 
 void PrintRenderFrameHelper::InitiatePrintPreview(
-#if BUILDFLAG(IS_CHROMEOS)
-    mojo::PendingAssociatedRemote<mojom::PrintRenderer> print_renderer,
-#endif
     bool has_selection) {
   ScopedIPC scoped_ipc(weak_ptr_factory_.GetWeakPtr());
   if (ipc_nesting_level_ > kAllowedIpcDepthForPrint)
@@ -1498,13 +1495,6 @@ void PrintRenderFrameHelper::InitiatePrintPreview(
   if (print_in_progress_) {
     return;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (print_renderer) {
-    print_renderer_.Bind(std::move(print_renderer));
-    print_preview_context_.SetIsForArc(true);
-  }
-#endif
 
   blink::WebLocalFrame* frame = render_frame()->GetWebFrame();
 
@@ -1533,13 +1523,6 @@ void PrintRenderFrameHelper::PrintPreview(base::DictValue settings) {
 
   print_preview_context_.OnPrintPreview();
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (print_preview_context_.IsForArc()) {
-    base::UmaHistogramEnumeration("Arc.PrintPreview.PreviewEvent",
-                                  PREVIEW_EVENT_REQUESTED, PREVIEW_EVENT_MAX);
-  }
-#endif
-
   if (!print_preview_context_.source_frame()) {
     DidFinishPrinting(PrintingResult::kFailPreview);
     return;
@@ -1551,13 +1534,6 @@ void PrintRenderFrameHelper::PrintPreview(base::DictValue settings) {
     DidFinishPrinting(PrintingResult::kInvalidSettings);
     return;
   }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // Save the job settings if a PrintRenderer will be used to create the preview
-  // document.
-  if (print_renderer_)
-    print_renderer_job_settings_ = std::move(settings);
-#endif
 
   // Set the options from document if we are previewing a pdf and send a
   // message to browser.
@@ -1743,11 +1719,6 @@ void PrintRenderFrameHelper::OnFramePreparedForPreviewDocument() {
   }
 
   CreatePreviewDocumentResult result = CreatePreviewDocument();
-#if BUILDFLAG(IS_CHROMEOS)
-  if (result == CreatePreviewDocumentResult::kInProgress) {
-    return;
-  }
-#endif
 
   DidFinishPrinting(result == CreatePreviewDocumentResult::kSuccess
                         ? PrintingResult::kOk
@@ -1759,21 +1730,10 @@ PrintRenderFrameHelper::CreatePreviewDocument() {
   if (!print_pages_params_ || CheckForCancel() || !preview_ui_)
     return CreatePreviewDocumentResult::kFail;
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (print_preview_context_.IsForArc()) {
-    base::UmaHistogramEnumeration("Arc.PrintPreview.PreviewEvent",
-                                  PREVIEW_EVENT_CREATE_DOCUMENT,
-                                  PREVIEW_EVENT_MAX);
-  }
-#endif
-
   const mojom::PrintParams& print_params = *print_pages_params_->params;
 
   bool require_document_metafile =
       print_params.printed_doc_type != mojom::SkiaDocumentType::kMSKP;
-#if BUILDFLAG(IS_CHROMEOS)
-  require_document_metafile = require_document_metafile || print_renderer_;
-#endif
 
   if (!print_preview_context_.CreatePreviewDocument(
           std::move(prep_frame_view_), print_pages_params_->pages,
@@ -1829,20 +1789,6 @@ PrintRenderFrameHelper::CreatePreviewDocument() {
       print_params.preview_request_id);
   if (CheckForCancel())
     return CreatePreviewDocumentResult::kFail;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // If a PrintRenderer has been provided, use it to create the preview
-  // document.
-  if (print_renderer_) {
-    base::TimeTicks begin_time = base::TimeTicks::Now();
-    print_renderer_->CreatePreviewDocument(
-        print_renderer_job_settings_.Clone(),
-        base::BindOnce(&PrintRenderFrameHelper::OnPreviewDocumentCreated,
-                       weak_ptr_factory_.GetWeakPtr(),
-                       print_params.document_cookie, begin_time));
-    return CreatePreviewDocumentResult::kInProgress;
-  }
-#endif
 
   if (print_pages_params_->params->printed_doc_type ==
       mojom::SkiaDocumentType::kMSKP) {
@@ -1995,26 +1941,6 @@ bool PrintRenderFrameHelper::FinalizePrintReadyDocument() {
   }
   return true;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void PrintRenderFrameHelper::OnPreviewDocumentCreated(
-    int document_cookie,
-    base::TimeTicks begin_time,
-    base::ReadOnlySharedMemoryRegion preview_document_region) {
-  // Since the PrintRenderer renders preview documents asynchronously, multiple
-  // preview document requests may be sent before a preview document is
-  // returned. If the received preview document's cookie does not match the
-  // latest document cookie, ignore it and wait for the final preview document.
-  if (document_cookie != print_pages_params_->params->document_cookie) {
-    return;
-  }
-
-  bool success =
-      ProcessPreviewDocument(begin_time, std::move(preview_document_region));
-  DidFinishPrinting(success ? PrintingResult::kOk
-                            : PrintingResult::kFailPreview);
-}
-#endif
 
 bool PrintRenderFrameHelper::ProcessPreviewDocument(
     base::TimeTicks begin_time,
@@ -2731,9 +2657,6 @@ void PrintRenderFrameHelper::RequestPrintPreview(PrintPreviewRequestType type,
   const bool has_selection = print_preview_context_.HasSelection();
 
   auto params = mojom::RequestPrintPreviewParams::New();
-#if BUILDFLAG(IS_CHROMEOS)
-  params->is_from_arc = print_preview_context_.IsForArc();
-#endif
   params->has_selection = has_selection;
   switch (type) {
     case PrintPreviewRequestType::kScripted: {
@@ -2791,12 +2714,6 @@ void PrintRenderFrameHelper::RequestPrintPreview(PrintPreviewRequestType type,
     }
   }
 
-#if BUILDFLAG(IS_CHROMEOS)
-  if (print_preview_context_.IsForArc()) {
-    base::UmaHistogramEnumeration("Arc.PrintPreview.PreviewEvent",
-                                  PREVIEW_EVENT_INITIATED, PREVIEW_EVENT_MAX);
-  }
-#endif
   GetPrintManagerHost()->RequestPrintPreview(std::move(params));
 }
 
@@ -3005,10 +2922,6 @@ void PrintRenderFrameHelper::PrintPreviewContext::Failed(bool report_error) {
   if (report_error) {
     DCHECK_NE(PrintPreviewErrorBuckets::kNone, error_);
     const char* name = "PrintPreview.RendererError";
-#if BUILDFLAG(IS_CHROMEOS)
-    if (is_for_arc_)
-      name = "Arc.PrintPreview.RendererError";
-#endif
     base::UmaHistogramEnumeration(name, error_,
                                   PrintPreviewErrorBuckets::kLastEnum);
   }
@@ -3025,13 +2938,6 @@ uint32_t PrintRenderFrameHelper::PrintPreviewContext::GetNextPageIndex() {
 bool PrintRenderFrameHelper::PrintPreviewContext::IsRendering() const {
   return state_ == State::kRendering || state_ == State::kDone;
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-bool PrintRenderFrameHelper::PrintPreviewContext::IsForArc() const {
-  DCHECK_NE(state_, State::kUninitialized);
-  return is_for_arc_;
-}
-#endif
 
 bool PrintRenderFrameHelper::PrintPreviewContext::IsPlugin() const {
   DCHECK(state_ != State::kUninitialized);
@@ -3057,12 +2963,6 @@ bool PrintRenderFrameHelper::PrintPreviewContext::IsFinalPageRendered() const {
   DCHECK(IsRendering());
   return static_cast<size_t>(current_page_index_) == pages_to_render_.size();
 }
-
-#if BUILDFLAG(IS_CHROMEOS)
-void PrintRenderFrameHelper::PrintPreviewContext::SetIsForArc(bool is_for_arc) {
-  is_for_arc_ = is_for_arc;
-}
-#endif
 
 void PrintRenderFrameHelper::PrintPreviewContext::set_error(
     enum PrintPreviewErrorBuckets error) {

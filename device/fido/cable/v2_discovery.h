@@ -26,10 +26,6 @@
 #include "device/fido/public/fido_constants.h"
 #include "services/network/public/mojom/network_context.mojom-forward.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "device/bluetooth/bluetooth_low_energy_scan_session.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
 namespace device::cablev2 {
 
 struct Pairing;
@@ -39,9 +35,6 @@ class FidoTunnelDevice;
 // advert is seen that matches |qr_generator_key|.
 class COMPONENT_EXPORT(DEVICE_FIDO) Discovery
     : public FidoDeviceDiscovery,
-#if BUILDFLAG(IS_CHROMEOS)
-      public device::BluetoothLowEnergyScanSession::Delegate,
-#endif  // BUILDFLAG(IS_CHROMEOS)
       public BluetoothAdapter::Observer {
  public:
   Discovery(
@@ -73,20 +66,6 @@ class COMPONENT_EXPORT(DEVICE_FIDO) Discovery
   void DeviceChanged(BluetoothAdapter* adapter,
                      BluetoothDevice* device) override;
   void AdapterPoweredChanged(BluetoothAdapter* adapter, bool powered) override;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  // device::BluetoothLowEnergyScanSession::Delegate:
-  void OnDeviceFound(device::BluetoothLowEnergyScanSession* scan_session,
-                     device::BluetoothDevice* device) override;
-  void OnDeviceLost(device::BluetoothLowEnergyScanSession* scan_session,
-                    device::BluetoothDevice* device) override;
-  void OnSessionStarted(
-      device::BluetoothLowEnergyScanSession* scan_session,
-      std::optional<device::BluetoothLowEnergyScanSession::ErrorCode>
-          error_code) override;
-  void OnSessionInvalidated(
-      device::BluetoothLowEnergyScanSession* scan_session) override;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // FidoDeviceDiscovery:
   void StartInternal() override;
@@ -130,9 +109,6 @@ class COMPONENT_EXPORT(DEVICE_FIDO) Discovery
 
   scoped_refptr<BluetoothAdapter> adapter_;
   std::unique_ptr<BluetoothDiscoverySession> discovery_session_;
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<device::BluetoothLowEnergyScanSession> le_scan_session_;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   const FidoRequestType request_type_;
   NetworkContextFactory network_context_factory_;

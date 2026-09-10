@@ -793,13 +793,6 @@ class CONTENT_EXPORT RenderProcessHost : public IPC::Listener,
   virtual void DumpProfilingData(base::OnceClosure callback) {}
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-  // Reinitializes the child process's logging with the given settings. This
-  // is needed on Chrome OS, which switches to a log file in the user's home
-  // directory once they log in.
-  virtual void ReinitializeLogging(uint32_t logging_dest,
-                                   base::ScopedFD log_file_descriptor) = 0;
-#endif
 
   // Asks the renderer process to prioritize energy efficiency because the
   // embedder is in battery saver mode. This signal is propagated to blink and

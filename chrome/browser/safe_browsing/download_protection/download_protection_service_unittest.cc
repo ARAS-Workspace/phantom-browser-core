@@ -202,11 +202,7 @@ const char kAndroidDownloadProtectionOutcomeHistogram[] =
 #endif
 
 std::string GetFileName(const std::string& full_path) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return base::FilePath(full_path).BaseName().AsUTF8Unsafe();
-#else
   return full_path;
-#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 chrome::cros::reporting::proto::SafeBrowsingDangerousDownloadEvent

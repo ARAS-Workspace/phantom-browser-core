@@ -36,7 +36,7 @@
 #include "extensions/browser/extension_system_provider.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/device_reauth/chrome_device_authenticator_factory.h"
 #endif
 
@@ -47,7 +47,6 @@ using content::BrowserContext;
 namespace {
 
 void MaybeShowProfileSwitchIPH(Profile* profile) {
-#if !BUILDFLAG(IS_CHROMEOS)
   if (extensions::profile_util::GetNumberOfProfiles() < 2) {
     return;
   }
@@ -59,7 +58,6 @@ void MaybeShowProfileSwitchIPH(Profile* profile) {
                           ->HasProfileMenuButton()) {
     BrowserWindow::FromBrowser(launched_app)->MaybeShowProfileSwitchIPH();
   }
-#endif
 }
 
 // ChromeDeviceAuthenticatorFactory::GetForProfile() is overloaded, so binding
@@ -67,7 +65,7 @@ void MaybeShowProfileSwitchIPH(Profile* profile) {
 std::unique_ptr<device_reauth::DeviceAuthenticator> GetDeviceAuthenticator(
     Profile* profile,
     const device_reauth::DeviceAuthParams& params) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   return ChromeDeviceAuthenticatorFactory::GetForProfile(profile, params);
 #else
   // For other platforms, ChromeDeviceAuthenticatorFactory::GetForProfile() is
@@ -172,7 +170,7 @@ PasswordsPrivateDelegateFactory::PasswordsPrivateDelegateFactory()
   DependsOn(PasskeyModelFactory::GetInstance());
   DependsOn(EnclaveManagerFactory::GetInstance());
   DependsOn(web_app::WebAppProviderFactory::GetInstance());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC)
   DependsOn(ChromeDeviceAuthenticatorFactory::GetInstance());
 #endif
   // LINT.ThenChange(//chrome/browser/extensions/api/passwords_private/passwords_private_delegate_impl.h:Dependencies)

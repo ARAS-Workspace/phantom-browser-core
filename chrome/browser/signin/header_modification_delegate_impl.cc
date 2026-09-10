@@ -38,10 +38,6 @@
 #include "extensions/browser/guest_view/web_view/web_view_renderer_state.h"
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "components/account_manager_core/pref_names.h"
-#endif
-
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 #include "base/containers/flat_set.h"
 #include "chrome/browser/signin/bound_session_credentials/bound_session_cookie_refresh_service.h"
@@ -180,14 +176,6 @@ void HeaderModificationDelegateImpl::ProcessRequest(
   syncer::SyncService* sync_service =
       SyncServiceFactory::GetForProfile(profile_);
 
-#if BUILDFLAG(IS_CHROMEOS)
-  bool is_secondary_account_addition_allowed = true;
-  if (!prefs->GetBoolean(
-          ::account_manager::prefs::kSecondaryGoogleAccountSigninAllowed)) {
-    is_secondary_account_addition_allowed = false;
-  }
-#endif
-
   ConsentLevel consent_level = ConsentLevel::kSignin;
 #if !BUILDFLAG(IS_ANDROID)
   if (!syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
@@ -234,9 +222,6 @@ void HeaderModificationDelegateImpl::ProcessRequest(
       incognito_mode_availability,
       AccountConsistencyModeManager::GetMethodForProfile(profile_),
       primary_account.gaia, consent_level, is_child_account,
-#if BUILDFLAG(IS_CHROMEOS)
-      is_secondary_account_addition_allowed,
-#endif
       is_sync_feature_enabled,
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
       prefs->GetString(prefs::kGoogleServicesSigninScopedDeviceId),

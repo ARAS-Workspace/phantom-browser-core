@@ -157,13 +157,6 @@ inline base::expected<T, Error> RecordAndReturn(
   return result;
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-// Returns true if `path` is on a virtual/cloud filesystem (e.g. under
-// /media/fuse).
-COMPONENT_EXPORT(ENTERPRISE_OBFUSCATION)
-bool IsVirtualFilesystem(const base::FilePath& path);
-#endif
-
 }  // namespace enterprise_obfuscation
 
 #endif  // COMPONENTS_ENTERPRISE_OBFUSCATION_CORE_UTILS_H_

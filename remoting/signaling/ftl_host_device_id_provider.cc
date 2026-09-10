@@ -12,8 +12,6 @@ namespace {
 
 #if BUILDFLAG(IS_APPLE)
 constexpr char kDeviceIdPrefix[] = "crd-mac-host-";
-#elif BUILDFLAG(IS_CHROMEOS)
-constexpr char kDeviceIdPrefix[] = "crd-cros-host-";
 #elif BUILDFLAG(IS_LINUX)
 constexpr char kDeviceIdPrefix[] = "crd-linux-host-";
 #else

@@ -24,19 +24,9 @@
 #include "ui/gfx/codec/png_codec.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "components/user_manager/scoped_user_manager.h"
-#endif
-
 namespace settings {
 
 namespace {
-
-#if BUILDFLAG(IS_CHROMEOS)
-constexpr char fake_id[] = "fake_id";
-constexpr char fake_email[] = "fake_id@gmail.com";
-#endif
 
 class TestProfileInfoHandler : public ProfileInfoHandler {
  public:
@@ -57,15 +47,7 @@ class ProfileInfoHandlerTest : public testing::Test {
   void SetUp() override {
     ASSERT_TRUE(profile_manager_.SetUp());
 
-#if BUILDFLAG(IS_CHROMEOS)
-    auto* fake_user_manager = new ash::FakeChromeUserManager;
-    user_manager_enabler_ = std::make_unique<user_manager::ScopedUserManager>(
-        base::WrapUnique(fake_user_manager));
-    profile_ = profile_manager_.CreateTestingProfile(fake_email);
-    fake_user_manager->AddUser(AccountId::FromUserEmail(fake_email));
-#else
     profile_ = profile_manager_.CreateTestingProfile("Profile 1");
-#endif
 
     handler_ = std::make_unique<TestProfileInfoHandler>(profile_);
     handler_->set_web_ui(&web_ui_);
@@ -80,10 +62,6 @@ class ProfileInfoHandlerTest : public testing::Test {
     ASSERT_TRUE(name);
     ASSERT_TRUE(icon_url);
 
-#if BUILDFLAG(IS_CHROMEOS)
-    EXPECT_EQ(fake_id, *name);
-    EXPECT_FALSE(icon_url->empty());
-#else
     EXPECT_EQ("Profile 1", *name);
 
     std::string mime, charset, data;
@@ -92,7 +70,6 @@ class ProfileInfoHandlerTest : public testing::Test {
     EXPECT_EQ("image/png", mime);
     SkBitmap bitmap = gfx::PNGCodec::Decode(base::as_byte_span(data));
     EXPECT_FALSE(bitmap.isNull());
-#endif
   }
 
   content::TestWebUI* web_ui() { return &web_ui_; }
@@ -103,10 +80,6 @@ class ProfileInfoHandlerTest : public testing::Test {
   content::BrowserTaskEnvironment task_environment_;
   TestingProfileManager profile_manager_;
   content::TestWebUI web_ui_;
-
-#if BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<user_manager::ScopedUserManager> user_manager_enabler_;
-#endif
 
   raw_ptr<Profile> profile_;
   std::unique_ptr<TestProfileInfoHandler> handler_;

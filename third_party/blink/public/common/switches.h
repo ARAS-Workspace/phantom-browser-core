@@ -35,10 +35,6 @@ BLINK_COMMON_EXPORT extern const char kEnableLeakDetectionHeapSnapshot[];
 BLINK_COMMON_EXPORT extern const char kEnablePreferCompositingToLCDText[];
 BLINK_COMMON_EXPORT extern const char kEnableRasterSideDarkModeForImages[];
 BLINK_COMMON_EXPORT extern const char kEnableRGBA4444Textures[];
-#if BUILDFLAG(IS_CHROMEOS)
-BLINK_COMMON_EXPORT extern const char
-    kEnableOverlaysAndLowLatencyUsageForWebGL[];
-#endif
 BLINK_COMMON_EXPORT extern const char kEnableZeroCopy[];
 BLINK_COMMON_EXPORT extern const char
     kGpuMemoryBufferReadbackFromTextureForceDisabledForDebugging[];
