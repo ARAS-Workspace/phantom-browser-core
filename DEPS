@@ -2523,18 +2523,10 @@ deps = {
     Var('chromium_git') + '/external/github.com/libexpat/libexpat.git' + '@' + Var('libexpat_revision'),
 
   # The library for IPP protocol (Chrome OS).
-  'src/third_party/libipp/libipp': {
-      'url': Var('chromium_git') + '/chromiumos/platform2/libipp.git' + '@' + '4be5f77f672a3a9f1bbf3c935fb0ea8b3f86ce61',
-      'condition': 'checkout_linux',
-  },
 
   'src/third_party/libjpeg_turbo':
     Var('chromium_git') + '/chromium/deps/libjpeg_turbo.git' + '@' + '640f254ad0fa03f6b1f29f89b7dd9366f2f6e533',
 
-  'src/third_party/liblouis/src': {
-      'url': Var('chromium_git') + '/external/liblouis-github.git' + '@' + '9700847afb92cb35969bdfcbbfbbb74b9c7b3376',
-      'condition': 'checkout_linux',
-  },
 
   'src/third_party/libphonenumber/src':
     Var('chromium_git') + '/external/libphonenumber.git' + '@' + '17c9061a3af14f2e10907d73df92601b27785713',
@@ -3259,104 +3251,14 @@ deps = {
       'dep_type': 'cipd',
   },
 
-  'src/ash/ambient/resources': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/assistant/ambient',
-        'version': 'version:feel_the_breeze_with_frame_rate_markers',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
-  'src/ash/webui/eche_app_ui/resources/prod': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/apps/eche_app/app',
-        'version': 'l3lxv3u6Ygb9O_8_rfz7yuJwBZ64trjGFMzyXIuNl6sC',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
-  'src/ash/webui/boca_receiver_app_ui/resources/prod': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/apps/boca_receiver_app/app',
-        'version': 'LSlJH8lE1InbOjHG-bfZ910T2NqSe19muqdCAOhugQ8C',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
-  'src/ash/webui/boca_ui/resources/prod': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/apps/boca_app/app',
-        'version': 'gmMAJKHISU_vZNdi3A7PEYza4kgn1kgzdXyJ6xcIDzgC',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
-  'src/ash/webui/help_app_ui/resources/prod': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/apps/help_app/app',
-        'version': '1Gds_6BMdRWWurC2EZMnzfbAahONd_JrNdhzrVAXlmkC',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
-  'src/ash/webui/media_app_ui/resources/prod': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/apps/media_app/app',
-        'version': 'K-zW5zv9P8oOPoZD5Z4x2hoYtvJZ1rNkyUOVcvQc-QIC',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
-  'src/ash/webui/personalization_app/resources': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/assistant/time_of_day',
-        'version': 'VLbxe5avqbXTSa8HRjm9NNtD9H2wYovk8GPPxO0kpvQC',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
-  'src/ash/webui/shimless_rma/resources': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/ash/peripherals-and-serviceability/shimless-rma-project-simon-strings',
-        'version': '-uRXiZeA4Yl-Nv-6jP69DyDs5cGroZgGsa1NHnVySQwC',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
-  'src/ash/webui/projector_app/resources/prod': {
-    'packages': [
-      {
-        'package': 'chromeos_internal/apps/projector_app/app',
-        'version': 'q8FQpmtBz21UkOSTcay_5hdXkw62AzdSxqDZxxEQsxcC',
-      },
-    ],
-    'condition': 'checkout_chromeos and checkout_src_internal',
-    'dep_type': 'cipd',
-  },
 
   'src/third_party/android_prebuilts/build_tools': {
       'url': Var('android_git') + '/platform/prebuilts/build-tools.git' + '@' + '3fbcdf38727f967badc13f9537bda0b4392c1f74',
@@ -3614,17 +3516,7 @@ deps = {
   },
 
   # Dependencies from src_internal
-  'src/chromeos/ash/resources/internal': {
-      'url': Var('chrome_git') + '/chrome/chromeos/ash/resources/internal.git' + '@' +
-        'd4509cba32a0981c86a9fd63db3186f32c1042e2',
-      'condition': 'checkout_src_internal and checkout_chromeos',
-  },
 
-  'src/chromeos/assistant/internal': {
-      'url': Var('chrome_git') + '/chrome/assistant.git' + '@' +
-        '1929b1906442b7b8d3fd5fffafe2ffbb9e395f13',
-      'condition': 'checkout_src_internal and checkout_chromeos',
-    },
 
   'src/ui/gl/resources/angle-metal': {
     'packages': [{
@@ -3720,11 +3612,6 @@ deps = {
       'condition': 'checkout_src_internal',
   },
 
-  'src/chrome/browser/nearby_sharing/internal': {
-      'url': Var('chrome_git') + '/chrome/browser/nearby_sharing/internal.git' + '@' +
-        'b54453882b41959777ea55518a7e41ab64560776',
-      'condition': 'checkout_src_internal',
-  },
 
   'src/chrome/browser/payments/internal': {
       'url': Var('chrome_git') + '/chrome/payments.git' + '@' +
@@ -5041,29 +4928,6 @@ hooks = [
                'rsync',
                'gs://downloads.webmproject.org/test_data/libvpx',
                'src/third_party/libvpx/testdata'],
-  },
-  {
-    # Update chromeos/tast_control.gni
-    'name': 'tast_control',
-    'pattern': '.',
-    'action': ['python3', 'src/build/util/tast_control.py',
-               '-o', 'src/chromeos/tast_control.gni',
-               '-t', 'src/chromeos/tast_control.gni.template',
-               '-i', 'src/chromeos/tast_control_disabled_tests.txt',
-               '--input-public',
-               'src/chromeos/tast_control_disabled_tests_public_builders.txt',
-               '-f', 'src/chromeos/tast_control_flaky_tests.txt'],
-  },
-  {
-    # Update chromeos/tast_control_cq_tests.txt
-    'name': 'tast_control_cq_tests',
-    'pattern': '.',
-    'condition': 'checkout_simplechrome',
-    'action': ['python3', 'src/build/util/generate_tast_control_cq_tests.py',
-               '-o', 'src/chromeos/tast_control_cq_tests.txt',
-               '-a', 'src/chromeos/tast_control_additional_cq_tests.txt',
-               '-m', 'src/build/cros_cache/chrome-sdk/misc/test_metadata.jsonpb',
-               '-b', '{cros_boards}'],
   },
 
 ]
