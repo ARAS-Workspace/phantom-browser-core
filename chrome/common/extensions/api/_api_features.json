@@ -139,10 +139,6 @@
     // "desktop_android" is not supported.
     "platforms": ["chromeos", "linux", "mac", "win"]
   }],
-  "autotestPrivate": {
-    "dependencies": ["permission:autotestPrivate"],
-    "contexts": ["privileged_extension"]
-  },
   "bookmarkManagerPrivate": {
     "channel": "stable",
     "contexts": ["webui"],
@@ -347,34 +343,6 @@
     "dependencies": ["permission:cookies"],
     "contexts": ["privileged_extension"]
   },
-  "crashReportPrivate": [{
-    "dependencies": ["permission:crashReportPrivate"],
-    "contexts": ["privileged_extension"],
-    "default_parent": true
-  },
-  {
-    "channel": "stable",
-    "contexts": [
-      "webui"
-    ],
-    "matches": [
-      "chrome://camera-app/*",
-      "chrome://media-app/*",
-      "chrome://recorder-app/*"
-    ]
-  },
-  {
-    "channel": "stable",
-    "contexts": ["webui_untrusted"],
-    "matches": [
-      "chrome-untrusted://boca-app/*",
-      "chrome-untrusted://camera-app/*",
-      "chrome-untrusted://help-app/*",
-      "chrome-untrusted://media-app/*",
-      "chrome-untrusted://projector/*",
-      "chrome-untrusted://projector-annotator/*"
-    ]
-  }],
   "debugger": {
     "dependencies": ["permission:debugger"],
     "contexts": ["privileged_extension"],
