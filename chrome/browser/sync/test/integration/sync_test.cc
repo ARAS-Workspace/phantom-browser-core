@@ -647,18 +647,10 @@ bool SyncTest::SetupSyncInternal(SetupSyncMode setup_mode,
           ADD_FAILURE() << "AwaitSyncTransportActive() failed";
           return false;
         }
-        if (!client->AwaitInvalidationsStatus(/*expected_status=*/true)) {
-          ADD_FAILURE() << "AwaitInvalidationsStatus() failed";
-          return false;
-        }
         break;
       case WAIT_FOR_COMMITS_TO_COMPLETE:
         if (!client->AwaitSyncTransportActive()) {
           ADD_FAILURE() << "AwaitSyncTransportActive() failed";
-          return false;
-        }
-        if (!client->AwaitInvalidationsStatus(/*expected_status=*/true)) {
-          ADD_FAILURE() << "AwaitInvalidationsStatus() failed";
           return false;
         }
         if (!WaitForAsyncChangesToBeCommitted(client_index)) {

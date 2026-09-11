@@ -1165,16 +1165,6 @@ void SyncServiceImpl::OnBackedOffTypesChanged() {
   NotifyObservers();
 }
 
-void SyncServiceImpl::OnInvalidationStatusChanged() {
-  DVLOG(2) << "Notify observers OnInvalidationStatusChanged";
-  NotifyObservers();
-}
-
-void SyncServiceImpl::OnNewInvalidatedDataTypes() {
-  DVLOG(2) << "Notify observers OnNewInvalidatedDataTypes";
-  NotifyObservers();
-}
-
 void SyncServiceImpl::FetchAccessToken(
     base::OnceCallback<void(signin::AccessTokenInfo)> callback) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);

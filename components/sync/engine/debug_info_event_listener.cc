@@ -39,7 +39,7 @@ void DebugInfoEventListener::OnSyncCycleCompleted(
   sync_completed_event_info->set_get_updates_origin(
       snapshot.get_updates_origin());
   sync_completed_event_info->mutable_caller_info()->set_notifications_enabled(
-      snapshot.notifications_enabled());
+      false);
 
   AddEventToQueue(event_info);
 }

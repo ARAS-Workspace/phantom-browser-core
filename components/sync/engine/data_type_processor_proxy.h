@@ -35,9 +35,6 @@ class DataTypeProcessorProxy : public DataTypeProcessor {
       const sync_pb::DataTypeState& type_state,
       UpdateResponseDataList updates,
       std::optional<sync_pb::GarbageCollectionDirective> gc_directive) override;
-  void StorePendingInvalidations(
-      std::vector<sync_pb::DataTypeState_Invalidation> invalidations_to_store)
-      override;
 
  private:
   base::WeakPtr<DataTypeProcessor> processor_;

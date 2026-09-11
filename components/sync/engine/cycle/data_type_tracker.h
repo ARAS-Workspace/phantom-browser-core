@@ -13,7 +13,6 @@
 
 #include "base/time/time.h"
 #include "components/sync/base/data_type.h"
-#include "components/sync/base/sync_invalidation.h"
 #include "components/sync/engine/cycle/commit_quota.h"
 
 namespace sync_pb {
@@ -99,10 +98,6 @@ class DataTypeTracker {
   // Returns true if there is an uncommitted local change.
   bool HasLocalChangePending() const;
 
-  // Returns true if we've received an invalidation since we last fetched
-  // updates.
-  bool HasPendingInvalidation() const;
-
   // Returns true if an explicit refresh request is still outstanding.
   bool HasRefreshRequestPending() const;
 
@@ -138,9 +133,6 @@ class DataTypeTracker {
   // Unblocks the type if base::TimeTicks::Now() >= `unblock_time_` expiry time.
   void UpdateThrottleOrBackoffState();
 
-  // Update `has_pending_invalidations_` flag.
-  void SetHasPendingInvalidations(bool has_pending_invalidations);
-
   // Update the local change nudge delay for this type.
   // No update happens if `delay` is too small (less than the smallest default
   // delay).
@@ -148,10 +140,6 @@ class DataTypeTracker {
 
   // Returns the current local change nudge delay for this type.
   base::TimeDelta GetLocalChangeNudgeDelay(bool is_single_client) const;
-
-  // Returns the current nudge delay for receiving remote invalitation for this
-  // type;
-  base::TimeDelta GetRemoteInvalidationDelay() const;
 
   // Return the BlockingMode for this type.
   WaitInterval::BlockingMode GetBlockingMode() const;
@@ -186,10 +174,6 @@ class DataTypeTracker {
 
   // Set to true if this type need to get update to resolve conflict issue.
   bool sync_required_to_resolve_conflict_ = false;
-
-  // Set to true if this type has invalidations that are needed to be used in
-  // GetUpdate() trigger message.
-  bool has_pending_invalidations_ = false;
 
   // If !unblock_time_.is_null(), this type is throttled or backed off, check
   // `wait_interval_->mode` for specific reason. Now the datatype may not

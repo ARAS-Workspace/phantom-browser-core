@@ -186,11 +186,6 @@ DataTypeSet SyncSchedulerImpl::GetEnabledAndUnblockedTypes() {
   return Difference(enabled_protocol_types, blocked_types);
 }
 
-void SyncSchedulerImpl::SetHasPendingInvalidations(DataType type,
-                                                   bool has_invalidation) {
-  nudge_tracker_.SetHasPendingInvalidations(type, has_invalidation);
-}
-
 void SyncSchedulerImpl::SendInitialSnapshot() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
@@ -295,17 +290,6 @@ void SyncSchedulerImpl::ScheduleLocalRefreshRequest(DataTypeSet types) {
   SDVLOG(2) << "Scheduling sync because of local refresh request for "
             << DataTypeSetToDebugString(types);
   base::TimeDelta nudge_delay = nudge_tracker_.RecordLocalRefreshRequest(types);
-  ScheduleNudgeImpl(nudge_delay);
-}
-
-void SyncSchedulerImpl::ScheduleInvalidationNudge(DataType data_type) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  DCHECK(!syncer_->IsSyncing());
-
-  SDVLOG(2) << "Scheduling sync because we received invalidation for "
-            << DataTypeToDebugString(data_type);
-  base::TimeDelta nudge_delay =
-      nudge_tracker_.GetRemoteInvalidationDelay(data_type);
   ScheduleNudgeImpl(nudge_delay);
 }
 
@@ -877,17 +861,6 @@ void SyncSchedulerImpl::OnReceivedQuotaParamsForExtensionTypes(
     std::optional<base::TimeDelta> depleted_quota_nudge_delay) {
   nudge_tracker_.SetQuotaParamsForExtensionTypes(max_tokens, refill_interval,
                                                  depleted_quota_nudge_delay);
-}
-
-void SyncSchedulerImpl::SetNotificationsEnabled(bool notifications_enabled) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  cycle_context_->set_notifications_enabled(notifications_enabled);
-  if (notifications_enabled) {
-    nudge_tracker_.OnInvalidationsEnabled();
-  } else {
-    nudge_tracker_.OnInvalidationsDisabled();
-  }
 }
 
 bool SyncSchedulerImpl::IsEarlierThanCurrentPendingJob(

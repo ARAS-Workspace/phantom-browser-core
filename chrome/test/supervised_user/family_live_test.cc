@@ -185,7 +185,7 @@ void FamilyLiveTest::SigninToBrowserFor(BrowserUser& browser_user) {
     // After signing in the browser, wait until:
     // the sync engine has started and it can listen for changed and
     // receive parental controls synced data types for supervised user.
-    LOG(INFO) << "Waiting for sync service to set up invalidations.";
+    LOG(INFO) << "Waiting for sync service to set up.";
     syncer::SyncServiceImpl* service =
         SyncServiceFactory::GetAsSyncServiceImplForProfileForTesting(
             &browser_user.profile());
@@ -194,9 +194,7 @@ void FamilyLiveTest::SigninToBrowserFor(BrowserUser& browser_user) {
 
     CHECK(SyncSetupChecker(service, is_supervised_user).Wait())
         << "SyncSetupChecker timed out.";
-    CHECK(InvalidationsStatusChecker(service, /*expected_status=*/true).Wait())
-        << "Invalidation checker timed out.";
-    LOG(INFO) << "Invalidations ready.";
+    LOG(INFO) << "Sync ready.";
   }
 }
 

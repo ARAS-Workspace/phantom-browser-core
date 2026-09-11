@@ -1016,34 +1016,6 @@ void ClientTagBasedDataTypeProcessor::OnUpdateReceived(
   NudgeForCommitIfNeeded();
 }
 
-void ClientTagBasedDataTypeProcessor::StorePendingInvalidations(
-    std::vector<sync_pb::DataTypeState::Invalidation> invalidations_to_store) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  CHECK(IsConnected());
-  CHECK(bridge_);
-
-  // Use base::debug::Alias() to ensure that crash dumps in reports include
-  // DataType.
-  const DataType data_type = type_;
-  base::debug::Alias(&data_type);
-
-  if (model_error_ || !entity_tracker_) {
-    // It's possible to have incoming invalidations while the data type is not
-    // fully initialized (e.g. before the initial sync).
-    return;
-  }
-
-  std::unique_ptr<MetadataChangeList> metadata_changes =
-      bridge_->CreateMetadataChangeList();
-  sync_pb::DataTypeState data_type_state = entity_tracker_->data_type_state();
-  data_type_state.mutable_invalidations()->Assign(
-      invalidations_to_store.begin(), invalidations_to_store.end());
-  metadata_changes->UpdateDataTypeState(data_type_state);
-  entity_tracker_->set_data_type_state(data_type_state);
-  bridge_->ApplyIncrementalSyncChanges(std::move(metadata_changes),
-                                       EntityChangeList());
-}
-
 bool ClientTagBasedDataTypeProcessor::ValidateUpdate(
     const sync_pb::DataTypeState& data_type_state,
     const UpdateResponseDataList& updates,

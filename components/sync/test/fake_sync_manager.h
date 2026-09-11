@@ -5,7 +5,6 @@
 #ifndef COMPONENTS_SYNC_TEST_FAKE_SYNC_MANAGER_H_
 #define COMPONENTS_SYNC_TEST_FAKE_SYNC_MANAGER_H_
 
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -61,13 +60,8 @@ class FakeSyncManager : public SyncManager {
   // GetAndResetConfigureReason, or since startup if never called.
   ConfigureReason GetAndResetConfigureReason();
 
-  // Returns the number of invalidations received for type since startup.
-  int GetInvalidationCount(DataType type) const;
-
   // Block until the sync thread has finished processing any pending messages.
   void WaitForSyncThread();
-
-  bool IsInvalidatorEnabled() const { return invalidator_enabled_; }
 
   // Notifies all observers about the changed `status`.
   void NotifySyncStatusChanged(const SyncStatus& status);
@@ -89,10 +83,6 @@ class FakeSyncManager : public SyncManager {
                        DataTypeSet to_download,
                        SyncFeatureState sync_feature_state,
                        base::OnceClosure ready_task) override;
-  void OnIncomingInvalidation(
-      DataType type,
-      std::unique_ptr<SyncInvalidation> interface) override;
-  void SetInvalidatorEnabled(bool invalidator_enabled) override;
   void AddObserver(Observer* observer) override;
   void RemoveObserver(Observer* observer) override;
   void ShutdownOnSyncThread() override;
@@ -121,7 +111,6 @@ class FakeSyncManager : public SyncManager {
   std::string cache_guid_;
   std::string birthday_;
   std::string bag_of_chips_;
-  bool invalidator_enabled_ = false;
 
   // Faked data state.
   DataTypeSet initial_sync_ended_types_;
@@ -144,9 +133,6 @@ class FakeSyncManager : public SyncManager {
   FakeSyncEncryptionHandler fake_encryption_handler_;
 
   FakeDataTypeConnector fake_data_type_connector_;
-
-  // Number of invalidations received per type since startup.
-  std::map<DataType, int> num_invalidations_received_;
 };
 
 }  // namespace syncer

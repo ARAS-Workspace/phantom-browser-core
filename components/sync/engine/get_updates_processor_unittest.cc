@@ -22,7 +22,6 @@
 #include "components/sync/protocol/sync.pb.h"
 #include "components/sync/test/data_type_test_util.h"
 #include "components/sync/test/mock_debug_info_getter.h"
-#include "components/sync/test/mock_invalidation.h"
 #include "components/sync/test/mock_update_handler.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -132,81 +131,6 @@ TEST_F(GetUpdatesProcessorTest, BookmarkNudge) {
       EXPECT_EQ(0, gu_trigger.datatype_refresh_nudges());
     }
   }
-}
-
-// Basic test to ensure invalidation payloads are expressed in the
-// NormalDelegate requests.
-TEST_F(GetUpdatesProcessorTest, NotifyNormalDelegate) {
-  MockUpdateHandler* autofill_handler = GetAutofillHandler();
-  MockUpdateHandler* bookmarks_handler = GetBookmarksHandler();
-  MockUpdateHandler* preferences_handler = GetPreferencesHandler();
-
-  DataTypeSet notified_types;
-  notified_types.Put(AUTOFILL);
-  notified_types.Put(BOOKMARKS);
-  notified_types.Put(PREFERENCES);
-
-  NudgeTracker nudge_tracker;
-
-  sync_pb::ClientToServerMessage message;
-  NormalGetUpdatesDelegate normal_delegate(nudge_tracker);
-  std::unique_ptr<GetUpdatesProcessor> processor(
-      BuildGetUpdatesProcessor(normal_delegate));
-  processor->PrepareGetUpdates(enabled_types(), &message);
-
-  const sync_pb::GetUpdatesMessage& gu_msg = message.get_updates();
-  EXPECT_EQ(sync_pb::SyncEnums::GU_TRIGGER, gu_msg.get_updates_origin());
-
-  EXPECT_EQ(1, autofill_handler->GetPrepareGetUpdatesCount());
-  EXPECT_EQ(1, bookmarks_handler->GetPrepareGetUpdatesCount());
-  EXPECT_EQ(1, preferences_handler->GetPrepareGetUpdatesCount());
-}
-
-// Basic test to ensure invalidation payloads are not expressed in
-// ConfigureDelegate requests.
-TEST_F(GetUpdatesProcessorTest, NotifyConfigureDelegate) {
-  MockUpdateHandler* autofill_handler = GetAutofillHandler();
-  MockUpdateHandler* bookmarks_handler = GetBookmarksHandler();
-  MockUpdateHandler* preferences_handler = GetPreferencesHandler();
-
-  DataTypeSet notified_types;
-  notified_types.Put(AUTOFILL);
-  notified_types.Put(BOOKMARKS);
-  notified_types.Put(PREFERENCES);
-
-  sync_pb::ClientToServerMessage message;
-  ConfigureGetUpdatesDelegate configure_delegate(
-      sync_pb::SyncEnums::RECONFIGURATION);
-  std::unique_ptr<GetUpdatesProcessor> processor(
-      BuildGetUpdatesProcessor(configure_delegate));
-  processor->PrepareGetUpdates(enabled_types(), &message);
-
-  EXPECT_EQ(0, autofill_handler->GetPrepareGetUpdatesCount());
-  EXPECT_EQ(0, bookmarks_handler->GetPrepareGetUpdatesCount());
-  EXPECT_EQ(0, preferences_handler->GetPrepareGetUpdatesCount());
-}
-
-// Basic test to ensure invalidation payloads are not expressed in
-// PollGetUpdatesDelegate requests.
-TEST_F(GetUpdatesProcessorTest, NotifyPollGetUpdatesDelegate) {
-  MockUpdateHandler* autofill_handler = GetAutofillHandler();
-  MockUpdateHandler* bookmarks_handler = GetBookmarksHandler();
-  MockUpdateHandler* preferences_handler = GetPreferencesHandler();
-
-  DataTypeSet notified_types;
-  notified_types.Put(AUTOFILL);
-  notified_types.Put(BOOKMARKS);
-  notified_types.Put(PREFERENCES);
-
-  sync_pb::ClientToServerMessage message;
-  PollGetUpdatesDelegate poll_delegate;
-  std::unique_ptr<GetUpdatesProcessor> processor(
-      BuildGetUpdatesProcessor(poll_delegate));
-  processor->PrepareGetUpdates(enabled_types(), &message);
-
-  EXPECT_EQ(0, autofill_handler->GetPrepareGetUpdatesCount());
-  EXPECT_EQ(0, bookmarks_handler->GetPrepareGetUpdatesCount());
-  EXPECT_EQ(0, preferences_handler->GetPrepareGetUpdatesCount());
 }
 
 // Basic test to ensure initial sync requests are expressed in the request.
@@ -367,8 +291,7 @@ TEST_F(GetUpdatesProcessorApplyUpdatesTest, Normal) {
   EXPECT_EQ(0, GetAppliedHandler()->GetApplyUpdatesCount());
 
   StatusController status;
-  processor->ApplyUpdates(GetGuTypes(), /*data_types_with_failure=*/{},
-                          &status);
+  processor->ApplyUpdates(GetGuTypes(), &status);
 
   EXPECT_EQ(0, GetNonAppliedHandler()->GetApplyUpdatesCount());
   EXPECT_EQ(1, GetAppliedHandler()->GetApplyUpdatesCount());
@@ -385,8 +308,7 @@ TEST_F(GetUpdatesProcessorApplyUpdatesTest, Configure) {
   EXPECT_EQ(0, GetAppliedHandler()->GetApplyUpdatesCount());
 
   StatusController status;
-  processor->ApplyUpdates(GetGuTypes(), /*data_types_with_failure=*/{},
-                          &status);
+  processor->ApplyUpdates(GetGuTypes(), &status);
 
   EXPECT_EQ(0, GetNonAppliedHandler()->GetApplyUpdatesCount());
   EXPECT_EQ(1, GetAppliedHandler()->GetApplyUpdatesCount());
@@ -402,8 +324,7 @@ TEST_F(GetUpdatesProcessorApplyUpdatesTest, Poll) {
   EXPECT_EQ(0, GetAppliedHandler()->GetApplyUpdatesCount());
 
   StatusController status;
-  processor->ApplyUpdates(GetGuTypes(), /*data_types_with_failure=*/{},
-                          &status);
+  processor->ApplyUpdates(GetGuTypes(), &status);
 
   EXPECT_EQ(0, GetNonAppliedHandler()->GetApplyUpdatesCount());
   EXPECT_EQ(1, GetAppliedHandler()->GetApplyUpdatesCount());

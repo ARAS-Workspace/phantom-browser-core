@@ -71,13 +71,6 @@ class DeviceInfoSyncBridge : public DataTypeSyncBridge,
   // committed. Otherwise nothing happens.
   void RefreshLocalDeviceInfoIfNeeded();
 
-  // The |callback| will be invoked on each successful commit with newly enabled
-  // data types list. This is needed to invoke an additional GetUpdates request
-  // for the data types which have been just enabled and subscribed for new
-  // invalidations.
-  void SetCommittedAdditionalInterestedDataTypesCallback(
-      base::RepeatingCallback<void(const DataTypeSet&)> callback);
-
   // DataTypeSyncBridge implementation.
   void OnSyncStarting(const DataTypeActivationRequest& request) override;
   std::optional<ModelError> MergeFullSyncData(
@@ -228,11 +221,6 @@ class DeviceInfoSyncBridge : public DataTypeSyncBridge,
 
   std::vector<base::OnceClosure> device_info_synced_callback_list_
       GUARDED_BY_CONTEXT(sequence_checker_);
-
-  // Called when a new interested data type list has been committed. Only newly
-  // enabled data types will be passed. May be empty.
-  base::RepeatingCallback<void(const DataTypeSet&)>
-      new_interested_data_types_callback_ GUARDED_BY_CONTEXT(sequence_checker_);
 
   const std::unique_ptr<DeviceInfoPrefs> device_info_prefs_;
 

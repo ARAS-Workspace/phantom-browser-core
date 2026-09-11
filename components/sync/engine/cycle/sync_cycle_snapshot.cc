@@ -30,7 +30,6 @@ std::u16string FormatTimeDelta(base::TimeDelta delta) {
 SyncCycleSnapshot::SyncCycleSnapshot()
     : is_silenced_(false),
       num_server_conflicts_(0),
-      notifications_enabled_(false),
       has_remaining_local_changes_(false),
       is_initialized_(false) {}
 
@@ -41,7 +40,6 @@ SyncCycleSnapshot::SyncCycleSnapshot(
     const ProgressMarkerMap& download_progress_markers,
     bool is_silenced,
     int num_server_conflicts,
-    bool notifications_enabled,
     base::Time sync_start_time,
     base::Time poll_finish_time,
     sync_pb::SyncEnums::GetUpdatesOrigin get_updates_origin,
@@ -53,7 +51,6 @@ SyncCycleSnapshot::SyncCycleSnapshot(
       download_progress_markers_(download_progress_markers),
       is_silenced_(is_silenced),
       num_server_conflicts_(num_server_conflicts),
-      notifications_enabled_(notifications_enabled),
       sync_start_time_(sync_start_time),
       poll_finish_time_(poll_finish_time),
       get_updates_origin_(get_updates_origin),
@@ -84,7 +81,6 @@ base::DictValue SyncCycleSnapshot::ToValue() const {
       // We don't care too much if we lose precision here, also.
       .Set("numServerConflicts", num_server_conflicts_)
       .Set("getUpdatesOrigin", ProtoEnumToString(get_updates_origin_))
-      .Set("notificationsEnabled", notifications_enabled_)
       .Set("hasRemainingLocalChanges", has_remaining_local_changes_)
       .Set("poll_interval", FormatTimeDelta(poll_interval_))
       .Set("poll_finish_time",
@@ -108,10 +104,6 @@ bool SyncCycleSnapshot::is_silenced() const {
 
 int SyncCycleSnapshot::num_server_conflicts() const {
   return num_server_conflicts_;
-}
-
-bool SyncCycleSnapshot::notifications_enabled() const {
-  return notifications_enabled_;
 }
 
 base::Time SyncCycleSnapshot::sync_start_time() const {

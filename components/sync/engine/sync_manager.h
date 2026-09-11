@@ -17,7 +17,6 @@
 #include "base/task/task_runner.h"
 #include "base/time/time.h"
 #include "components/sync/base/data_type.h"
-#include "components/sync/base/sync_invalidation.h"
 #include "components/sync/engine/active_devices_invalidation_info.h"
 #include "components/sync/engine/configure_reason.h"
 #include "components/sync/engine/connection_status.h"
@@ -155,14 +154,6 @@ class SyncManager {
                                DataTypeSet to_download,
                                SyncFeatureState sync_feature_state,
                                base::OnceClosure ready_task) = 0;
-
-  // Inform the syncer of a change in the invalidator's state.
-  virtual void SetInvalidatorEnabled(bool invalidator_enabled) = 0;
-
-  // Inform the syncer that its cached information about a type is obsolete.
-  virtual void OnIncomingInvalidation(
-      DataType type,
-      std::unique_ptr<SyncInvalidation> invalidation) = 0;
 
   // Adds a listener to be notified of sync events.
   // NOTE: It is OK (in fact, it's probably a good idea) to call this before

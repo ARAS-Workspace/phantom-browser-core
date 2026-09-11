@@ -376,15 +376,6 @@ class BookmarkDataTypeProcessorTest : public testing::Test {
     return &error_handler_;
   }
 
-  sync_pb::DataTypeState::Invalidation BuildInvalidation(
-      int64_t version,
-      const std::string& payload) {
-    sync_pb::DataTypeState::Invalidation inv;
-    inv.set_version(version);
-    inv.set_hint(payload);
-    return inv;
-  }
-
   void RunUntilIdle() { task_environment_.RunUntilIdle(); }
 
  private:
@@ -1147,37 +1138,6 @@ TEST_F(BookmarkDataTypeProcessorTest,
   // carries the new encryption key name.
   EXPECT_THAT(tracker->data_type_state().encryption_key_name(),
               Eq(kEncryptionKeyName));
-}
-
-// Verifies that the data type state stored in the tracker gets
-// updated upon handling remote updates by replacing new pending invalidations.
-TEST_F(BookmarkDataTypeProcessorTest,
-       ShouldUpdateDataTypeStateUponHandlingInvalidations) {
-  // Initialize the process to make sure the tracker has been created.
-  SimulateModelReadyToSyncWithInitialSyncDone();
-  SimulateOnSyncStarting();
-  const SyncedBookmarkTracker* tracker = processor()->GetTrackerForTest();
-
-  // Build invalidations.
-  sync_pb::DataTypeState::Invalidation inv_1 =
-      BuildInvalidation(1, "bm_hint_1");
-  sync_pb::DataTypeState::Invalidation inv_2 =
-      BuildInvalidation(2, "bm_hint_2");
-  EXPECT_CALL(*schedule_save_closure(), Run());
-
-  processor()->StorePendingInvalidations({inv_1, inv_2});
-
-  // The data type state inside the tracker should have been updated, and
-  // carries the new invalidations.
-  EXPECT_EQ(2, tracker->data_type_state().invalidations_size());
-
-  EXPECT_EQ(inv_1.hint(), tracker->data_type_state().invalidations(0).hint());
-  EXPECT_EQ(inv_1.version(),
-            tracker->data_type_state().invalidations(0).version());
-
-  EXPECT_EQ(inv_2.hint(), tracker->data_type_state().invalidations(1).hint());
-  EXPECT_EQ(inv_2.version(),
-            tracker->data_type_state().invalidations(1).version());
 }
 
 // This tests that when the encryption key changes, but the received entities

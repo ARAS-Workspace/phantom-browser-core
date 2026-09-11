@@ -13,7 +13,6 @@
 #include "base/functional/callback_helpers.h"
 #include "base/location.h"
 #include "base/logging.h"
-#include "base/metrics/histogram_functions.h"
 #include "base/rand_util.h"
 #include "base/task/bind_post_task.h"
 #include "base/task/sequenced_task_runner.h"
@@ -137,8 +136,7 @@ SyncEngineImpl::SyncEngineImpl(
       name_(name),
       prefs_(std::move(prefs)),
       active_devices_provider_(std::move(active_devices_provider)),
-      network_time_tracker_(network_time_tracker),
-      engine_created_time_for_metrics_(base::TimeTicks::Now()) {
+      network_time_tracker_(network_time_tracker) {
   DCHECK(prefs_);
   backend_ = base::MakeRefCounted<SyncEngineBackend>(
       name_, sync_data_folder, weak_ptr_factory_.GetWeakPtr());
@@ -487,32 +485,9 @@ void SyncEngineImpl::HandleSyncStatusChanged(const SyncStatus& status) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   const bool backed_off_types_changed =
       (status.backed_off_types != cached_status_.backed_off_types);
-  const bool invalidation_status_changed =
-      (status.notifications_enabled != cached_status_.notifications_enabled);
-  const bool has_new_invalidated_data_types =
-      !cached_status_.invalidated_data_types.HasAll(
-          status.invalidated_data_types);
   cached_status_ = status;
   if (backed_off_types_changed) {
     host_->OnBackedOffTypesChanged();
-  }
-  if (invalidation_status_changed) {
-    if (status.notifications_enabled && !invalidations_enabled_reported_) {
-      // Record the time since the engine was created until invalidations are
-      // initialized.
-      base::UmaHistogramMediumTimes(
-          "Sync.InvalidationsInitializationTime",
-          base::TimeTicks::Now() - engine_created_time_for_metrics_);
-      invalidations_enabled_reported_ = true;
-    }
-    host_->OnInvalidationStatusChanged();
-  }
-  if (has_new_invalidated_data_types) {
-    // Notify about any new data types having pending invalidations. When there
-    // are less such data types, this basically means that sync cycle has been
-    // finished, and `host_` will be notified via OnSyncCycleCompleted(), so
-    // there is no point in duplicating it.
-    host_->OnNewInvalidatedDataTypes();
   }
 }
 

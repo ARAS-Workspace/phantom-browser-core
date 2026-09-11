@@ -18,10 +18,6 @@ void MockNudgeHandler::NudgeForCommit(DataType type) {
   num_commit_nudges_++;
 }
 
-void MockNudgeHandler::SetHasPendingInvalidations(
-    DataType type,
-    bool has_pending_invalidations) {}
-
 int MockNudgeHandler::GetNumInitialDownloadNudges() const {
   return num_initial_nudges_;
 }

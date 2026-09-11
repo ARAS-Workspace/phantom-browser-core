@@ -37,7 +37,6 @@ class SyncCycleSnapshot {
                     const ProgressMarkerMap& download_progress_markers,
                     bool is_silenced,
                     int num_server_conflicts,
-                    bool notifications_enabled,
                     base::Time sync_start_time,
                     base::Time poll_finish_time,
                     sync_pb::SyncEnums_GetUpdatesOrigin get_updates_origin,
@@ -56,7 +55,6 @@ class SyncCycleSnapshot {
   const ProgressMarkerMap& download_progress_markers() const;
   bool is_silenced() const;
   int num_server_conflicts() const;
-  bool notifications_enabled() const;
   base::Time sync_start_time() const;
   base::Time poll_finish_time() const;
   sync_pb::SyncEnums_GetUpdatesOrigin get_updates_origin() const;
@@ -74,7 +72,6 @@ class SyncCycleSnapshot {
   ProgressMarkerMap download_progress_markers_;
   bool is_silenced_;
   int num_server_conflicts_;
-  bool notifications_enabled_;
   base::Time sync_start_time_;
   base::Time poll_finish_time_;
 

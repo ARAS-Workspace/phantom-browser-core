@@ -1519,47 +1519,6 @@ TEST_F(DeviceInfoSyncBridgeTest, ShouldSendInvalidationFields) {
   EnableSyncAndMergeInitialData(SyncMode::kFull);
 }
 
-TEST_F(DeviceInfoSyncBridgeTest,
-       ShouldNotifyWhenAdditionalInterestedDataTypesSynced) {
-  InitializeAndPump();
-  local_device()->UpdateInterestedDataTypes({syncer::BOOKMARKS});
-  EnableSyncAndMergeInitialData(SyncMode::kFull);
-
-  base::MockRepeatingCallback<void(const DataTypeSet&)> callback;
-  bridge()->SetCommittedAdditionalInterestedDataTypesCallback(callback.Get());
-  local_device()->UpdateInterestedDataTypes(
-      {syncer::BOOKMARKS, syncer::SESSIONS});
-
-  bridge()->RefreshLocalDeviceInfoIfNeeded();
-
-  const std::string guid = local_device()->GetLocalDeviceInfo()->guid();
-  EXPECT_CALL(*processor(), IsEntityUnsynced(guid)).WillOnce(Return(false));
-
-  EXPECT_CALL(callback, Run(DataTypeSet({syncer::SESSIONS})));
-  bridge()->ApplyIncrementalSyncChanges(bridge()->CreateMetadataChangeList(),
-                                        EntityChangeList());
-}
-
-TEST_F(DeviceInfoSyncBridgeTest,
-       ShouldNotNotifyWithoutAdditionalInterestedDataTypes) {
-  InitializeAndPump();
-  local_device()->UpdateInterestedDataTypes(
-      {syncer::BOOKMARKS, syncer::SESSIONS});
-  EnableSyncAndMergeInitialData(SyncMode::kFull);
-
-  base::MockRepeatingCallback<void(const DataTypeSet&)> callback;
-  bridge()->SetCommittedAdditionalInterestedDataTypesCallback(callback.Get());
-  local_device()->UpdateInterestedDataTypes({syncer::BOOKMARKS});
-
-  bridge()->RefreshLocalDeviceInfoIfNeeded();
-
-  std::string guid = local_device()->GetLocalDeviceInfo()->guid();
-  EXPECT_CALL(*processor(), IsEntityUnsynced(guid)).WillOnce(Return(false));
-  EXPECT_CALL(callback, Run).Times(0);
-  bridge()->ApplyIncrementalSyncChanges(bridge()->CreateMetadataChangeList(),
-                                        EntityChangeList());
-}
-
 // This test mimics the case when OnSyncStarting is called before the metadata
 // is loaded from the storage.
 TEST_F(DeviceInfoSyncBridgeTest,

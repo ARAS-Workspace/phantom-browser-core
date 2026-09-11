@@ -64,9 +64,6 @@ class MockDataTypeProcessor : public DataTypeProcessor {
       const sync_pb::DataTypeState& type_state,
       UpdateResponseDataList response_list,
       std::optional<sync_pb::GarbageCollectionDirective> gc_directive) override;
-  void StorePendingInvalidations(
-      std::vector<sync_pb::DataTypeState_Invalidation> invalidations_to_store)
-      override;
 
   // By default, this object behaves as if all messages are processed
   // immediately.  Sometimes it is useful to defer work until later, as might
@@ -137,7 +134,6 @@ class MockDataTypeProcessor : public DataTypeProcessor {
                            const std::string& server_id);
 
   int GetLocalChangesCallCount() const;
-  int GetStoreInvalidationsCallCount() const;
 
  private:
   // Process a received commit response.
@@ -204,8 +200,6 @@ class MockDataTypeProcessor : public DataTypeProcessor {
   CommitRequestDataList commit_request_;
 
   int get_local_changes_call_count_ = 0;
-
-  int store_invalidations_call_count_ = 0;
 };
 
 }  // namespace syncer

@@ -194,8 +194,6 @@ class SyncServiceImpl : public SyncService,
   void OnMigrationNeededForTypes(DataTypeSet types) override;
   void OnActionableProtocolError(const SyncProtocolError& error) override;
   void OnBackedOffTypesChanged() override;
-  void OnInvalidationStatusChanged() override;
-  void OnNewInvalidatedDataTypes() override;
   void FetchAccessToken(
       base::OnceCallback<void(signin::AccessTokenInfo)> callback) override;
 

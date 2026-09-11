@@ -27,14 +27,6 @@ struct SyncStatus {
   SyncStatus(const SyncStatus& other);
   ~SyncStatus();
 
-  // TODO(akalin): Replace this with a NotificationsDisabledReason
-  // variable.
-  // True only if subscribed for notifications.
-  bool notifications_enabled = false;
-
-  // Notifications counters updated by the actions in synapi.
-  int notifications_received = 0;
-
   SyncProtocolError sync_protocol_error;
 
   // Number of items the server refused to commit due to conflict during most
@@ -71,9 +63,6 @@ struct SyncStatus {
   DataTypeSet backed_off_types;
 
   std::string cache_guid;
-
-  // Data types having pending invalidations.
-  DataTypeSet invalidated_data_types;
 
   // Time of next retry if sync scheduler is throttled or in backoff.
   base::Time retry_time;

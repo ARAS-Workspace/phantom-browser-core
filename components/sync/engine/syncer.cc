@@ -25,7 +25,6 @@
 #include "components/sync/engine/get_updates_processor.h"
 #include "components/sync/engine/sync_protocol_error.h"
 #include "components/sync/engine/syncer_error.h"
-#include "components/sync/engine/update_handler.h"
 #include "components/sync/protocol/sync_enums.pb.h"
 #include "net/http/http_status_code.h"
 
@@ -81,30 +80,6 @@ SyncerErrorValueForUma GetSyncerErrorValueForUma(const SyncerError& error) {
       return SyncerErrorValueForUma::kProtocolViolationError;
   }
   NOTREACHED();
-}
-
-// Returns the NudgedUpdateResult corresponding to the given SyncerError. Not
-// used for `kSuccess`.
-UpdateHandler::NudgedUpdateResult SyncerErrorToNudgedUpdateResult(
-    const SyncerError& error) {
-  switch (error.type()) {
-    case SyncerError::Type::kNetworkError:
-      return UpdateHandler::NudgedUpdateResult::kDownloadRequestNetworkError;
-    case SyncerError::Type::kHttpError:
-      if (error.GetHttpErrorOrDie() >= 400 && error.GetHttpErrorOrDie() < 500) {
-        return UpdateHandler::NudgedUpdateResult::
-            kDownloadRequestClientHttpError;
-      }
-      // In practice, this error should be for the 5xx HTTP errors but record it
-      // for any non-4xx HTTP error.
-      return UpdateHandler::NudgedUpdateResult::kDownloadRequestServerHttpError;
-    case SyncerError::Type::kProtocolError:
-    case SyncerError::Type::kProtocolViolationError:
-      // Return server error for all non-network errors.
-      return UpdateHandler::NudgedUpdateResult::kDownloadRequestProtocolError;
-    case SyncerError::Type::kSuccess:
-      NOTREACHED();
-  }
 }
 
 // Returns invalidation info after applying updates. This is used to drop
@@ -170,12 +145,10 @@ bool Syncer::NormalSyncShare(DataTypeSet request_types,
                              SyncCycle* cycle) {
   base::AutoReset<bool> is_syncing(&is_syncing_, true);
   HandleCycleBegin(cycle);
-  if (nudge_tracker->IsGetUpdatesRequired(request_types)) {
-    VLOG(1) << "Downloading types " << DataTypeSetToDebugString(request_types);
-    if (!DownloadAndApplyUpdates(&request_types, cycle,
-                                 NormalGetUpdatesDelegate(*nudge_tracker))) {
-      return HandleCycleEnd(cycle, nudge_tracker->GetOrigin());
-    }
+  VLOG(1) << "Downloading types " << DataTypeSetToDebugString(request_types);
+  if (!DownloadAndApplyUpdates(&request_types, cycle,
+                               NormalGetUpdatesDelegate(*nudge_tracker))) {
+    return HandleCycleEnd(cycle, nudge_tracker->GetOrigin());
   }
 
   SyncerError commit_result =
@@ -238,9 +211,6 @@ bool Syncer::DownloadAndApplyUpdates(DataTypeSet* request_types,
     }
   } while (get_updates_processor.HasMoreUpdatesToDownload());
 
-  DataTypeSet data_types_with_failure = Difference(
-      Difference(*request_types, download_types), requested_commit_only_types);
-
   // It is our responsibility to propagate the removal of types that occurred in
   // GetUpdatesProcessor::DownloadUpdates().
   *request_types = Union(download_types, requested_commit_only_types);
@@ -250,9 +220,6 @@ bool Syncer::DownloadAndApplyUpdates(DataTypeSet* request_types,
 
   // Exit without applying if an error was detected.
   if (download_result.type() != SyncerError::Type::kSuccess) {
-    get_updates_processor.RecordDownloadFailure(
-        Union(download_types, data_types_with_failure),
-        SyncerErrorToNudgedUpdateResult(download_result));
     return false;
   }
 
@@ -262,7 +229,7 @@ bool Syncer::DownloadAndApplyUpdates(DataTypeSet* request_types,
     // Apply updates to the other types. May or may not involve cross-thread
     // traffic, depending on the underlying update handlers and the GU type's
     // delegate.
-    get_updates_processor.ApplyUpdates(download_types, data_types_with_failure,
+    get_updates_processor.ApplyUpdates(download_types,
                                        cycle->mutable_status_controller());
 
     cycle->SendEventNotification(SyncCycleEvent::STATUS_CHANGED);

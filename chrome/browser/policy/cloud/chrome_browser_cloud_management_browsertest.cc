@@ -57,7 +57,6 @@
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/network_service_instance.h"
 #include "content/public/test/browser_test.h"
-#include "google_apis/gaia/gaia_urls.h"
 #include "net/base/upload_bytes_element_reader.h"
 #include "net/base/upload_data_stream.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
@@ -1245,17 +1244,6 @@ class MachineLevelUserCloudPolicyRobotAuthTest : public PlatformBrowserTest {
     g_browser_process->browser_policy_connector()
         ->chrome_browser_cloud_management_controller()
         ->AddObserver(&observer_);
-    test_url_loader_factory_.AddResponse(
-        GaiaUrls::GetInstance()->oauth2_token_url().spec(),
-        R"P({
-          "access_token":"at",
-          "refresh_token":"rt",
-          "expires_in":9999
-  })P");
-    g_browser_process->browser_policy_connector()
-        ->chrome_browser_cloud_management_controller()
-        ->SetGaiaURLLoaderFactory(
-            test_url_loader_factory_.GetSafeWeakWrapper());
   }
 
   void TearDownOnMainThread() override {
@@ -1294,7 +1282,6 @@ class MachineLevelUserCloudPolicyRobotAuthTest : public PlatformBrowserTest {
   std::unique_ptr<EmbeddedPolicyTestServer> test_server_;
   FakeBrowserDMTokenStorage storage_;
   base::ScopedTempDir temp_dir_;
-  network::TestURLLoaderFactory test_url_loader_factory_;
   ChromeBrowserCloudManagementControllerObserver observer_;
 };  // namespace policy
 

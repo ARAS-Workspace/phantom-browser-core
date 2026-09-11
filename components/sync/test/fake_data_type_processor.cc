@@ -33,7 +33,5 @@ void FakeDataTypeProcessor::OnUpdateReceived(
     const sync_pb::DataTypeState& type_state,
     UpdateResponseDataList updates,
     std::optional<sync_pb::GarbageCollectionDirective> gc_directive) {}
-void FakeDataTypeProcessor::StorePendingInvalidations(
-    std::vector<sync_pb::DataTypeState::Invalidation> invalidations_to_store) {}
 
 }  // namespace syncer

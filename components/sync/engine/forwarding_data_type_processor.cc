@@ -55,9 +55,4 @@ void ForwardingDataTypeProcessor::OnUpdateReceived(
                                std::move(gc_directive));
 }
 
-void ForwardingDataTypeProcessor::StorePendingInvalidations(
-    std::vector<sync_pb::DataTypeState::Invalidation> invalidations_to_store) {
-  processor_->StorePendingInvalidations(std::move(invalidations_to_store));
-}
-
 }  // namespace syncer

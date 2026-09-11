@@ -65,10 +65,6 @@ class SyncManagerImpl
                        DataTypeSet to_download,
                        SyncFeatureState sync_feature_state,
                        base::OnceClosure ready_task) override;
-  void SetInvalidatorEnabled(bool invalidator_enabled) override;
-  void OnIncomingInvalidation(
-      DataType type,
-      std::unique_ptr<SyncInvalidation> invalidation) override;
   void AddObserver(SyncManager::Observer* observer) override;
   void RemoveObserver(SyncManager::Observer* observer) override;
   void ShutdownOnSyncThread() override;
@@ -123,8 +119,6 @@ class SyncManagerImpl
   // NudgeHandler implementation.
   void NudgeForInitialDownload(DataType type) override;
   void NudgeForCommit(DataType type) override;
-  void SetHasPendingInvalidations(DataType type,
-                                  bool has_pending_invalidations) override;
 
  private:
   void NotifySyncStatusChanged(const SyncStatus& status);

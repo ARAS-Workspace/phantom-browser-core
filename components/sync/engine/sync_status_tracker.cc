@@ -101,18 +101,6 @@ void SyncStatusTracker::OnProtocolEvent(const ProtocolEvent&) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 }
 
-void SyncStatusTracker::SetNotificationsEnabled(bool notifications_enabled) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  status_.notifications_enabled = notifications_enabled;
-  status_changed_callback_.Run(status_);
-}
-
-void SyncStatusTracker::IncrementNotificationsReceived() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  ++status_.notifications_received;
-  status_changed_callback_.Run(status_);
-}
-
 void SyncStatusTracker::SetEncryptedTypes(DataTypeSet types) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   status_.encrypted_types = types;
@@ -161,18 +149,6 @@ void SyncStatusTracker::SetTrustedVaultDebugInfo(
 void SyncStatusTracker::SetCacheGuid(const std::string& cache_guid) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   status_.cache_guid = cache_guid;
-  status_changed_callback_.Run(status_);
-}
-
-void SyncStatusTracker::SetHasPendingInvalidations(
-    DataType type,
-    bool has_pending_invalidations) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (has_pending_invalidations) {
-    status_.invalidated_data_types.Put(type);
-  } else {
-    status_.invalidated_data_types.Remove(type);
-  }
   status_changed_callback_.Run(status_);
 }
 

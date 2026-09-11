@@ -46,27 +46,8 @@ void MockUpdateHandler::ApplyUpdates(StatusController* status,
   apply_updates_count_++;
 }
 
-void MockUpdateHandler::RecordRemoteInvalidation(
-    std::unique_ptr<SyncInvalidation> incoming) {}
-
-void MockUpdateHandler::RecordDownloadFailure(
-    UpdateHandler::NudgedUpdateResult failure_result) const {}
-
-void MockUpdateHandler::CollectPendingInvalidations(
-    sync_pb::GetUpdateTriggers* msg) {
-  prepare_get_updates_count_++;
-}
-
-bool MockUpdateHandler::HasPendingInvalidations() const {
-  return false;
-}
-
 int MockUpdateHandler::GetApplyUpdatesCount() {
   return apply_updates_count_;
-}
-
-int MockUpdateHandler::GetPrepareGetUpdatesCount() {
-  return prepare_get_updates_count_;
 }
 
 }  // namespace syncer

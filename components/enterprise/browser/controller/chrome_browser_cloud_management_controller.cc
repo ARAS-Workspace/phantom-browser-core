@@ -464,11 +464,6 @@ ChromeBrowserCloudManagementController::GetCertificateProvisioningService() {
   return certificate_provisioning_service_.get();
 }
 
-void ChromeBrowserCloudManagementController::SetGaiaURLLoaderFactory(
-    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
-  delegate_->SetGaiaURLLoaderFactory(url_loader_factory);
-}
-
 void ChromeBrowserCloudManagementController::NotifyPolicyRegisterFinished(
     bool succeeded) {
   for (auto& observer : observers_) {

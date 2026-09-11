@@ -146,7 +146,6 @@ class MockSyncScheduler : public FakeSyncScheduler {
                DataTypeSet types_to_download,
                base::OnceClosure ready_task),
               (override));
-  MOCK_METHOD(void, SetHasPendingInvalidations, (DataType, bool), (override));
 };
 
 class ComponentsFactory : public TestEngineComponentsFactory {
@@ -250,29 +249,6 @@ TEST_F(SyncManagerImplTest, BasicConfiguration) {
   sync_manager()->ConfigureSyncer(
       ConfigureReason::kReconfiguration, types_to_download,
       SyncManager::SyncFeatureState::ON, ready_task.Get());
-}
-
-TEST_F(SyncManagerImplTest, ShouldSetHasPendingInvalidations) {
-  Sequence s1;
-  EXPECT_CALL(*scheduler(),
-              SetHasPendingInvalidations(BOOKMARKS, /*has_invalidation=*/true))
-      .InSequence(s1);
-  EXPECT_CALL(*scheduler(),
-              SetHasPendingInvalidations(BOOKMARKS, /*has_invalidation=*/false))
-      .InSequence(s1);
-  SyncStatus status;
-  EXPECT_CALL(*manager_observer(), OnSyncStatusChanged)
-      .Times(2)
-      .WillRepeatedly(SaveArg<0>(&status));
-
-  sync_manager()->SetHasPendingInvalidations(
-      BOOKMARKS, /*has_pending_invalidations=*/true);
-  EXPECT_EQ(status.invalidated_data_types.size(), 1u);
-  EXPECT_TRUE(status.invalidated_data_types.Has(BOOKMARKS));
-
-  sync_manager()->SetHasPendingInvalidations(
-      BOOKMARKS, /*has_pending_invalidations=*/false);
-  EXPECT_TRUE(status.invalidated_data_types.empty());
 }
 
 }  // namespace

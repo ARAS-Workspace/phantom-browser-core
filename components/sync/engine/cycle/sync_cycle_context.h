@@ -68,12 +68,6 @@ class SyncCycleContext {
 
   DebugInfoGetter* debug_info_getter() { return debug_info_getter_; }
 
-  // Talk notification status.
-  void set_notifications_enabled(bool enabled) {
-    notifications_enabled_ = enabled;
-  }
-  bool notifications_enabled() { return notifications_enabled_; }
-
   const std::string& cache_guid() const { return cache_guid_; }
 
   void set_birthday(const std::string& birthday);
@@ -135,10 +129,6 @@ class SyncCycleContext {
   // We use this to stuff extensions activity into CommitMessages so the server
   // can correlate commit traffic with extension-related bookmark mutations.
   const scoped_refptr<ExtensionsActivity> extensions_activity_;
-
-  // Kept up to date with talk events to determine whether notifications are
-  // enabled. True only if the notification channel is authorized and open.
-  bool notifications_enabled_ = false;
 
   const std::string cache_guid_;
 

@@ -17,26 +17,22 @@ NormalGetUpdatesRequestEvent::NormalGetUpdatesRequestEvent(
     const sync_pb::ClientToServerMessage& request)
     : NormalGetUpdatesRequestEvent(timestamp,
                                    nudge_tracker.GetNudgedTypes(),
-                                   nudge_tracker.GetNotifiedTypes(),
                                    nudge_tracker.GetRefreshRequestedTypes(),
                                    request) {}
 
 NormalGetUpdatesRequestEvent::NormalGetUpdatesRequestEvent(
     base::Time timestamp,
     DataTypeSet nudged_types,
-    DataTypeSet notified_types,
     DataTypeSet refresh_requested_types,
     sync_pb::ClientToServerMessage request)
     : timestamp_(timestamp),
       nudged_types_(nudged_types),
-      notified_types_(notified_types),
       refresh_requested_types_(refresh_requested_types),
       request_(request) {}
 
 std::unique_ptr<ProtocolEvent> NormalGetUpdatesRequestEvent::Clone() const {
   return std::make_unique<NormalGetUpdatesRequestEvent>(
-      timestamp_, nudged_types_, notified_types_, refresh_requested_types_,
-      request_);
+      timestamp_, nudged_types_, refresh_requested_types_, request_);
 }
 
 NormalGetUpdatesRequestEvent::~NormalGetUpdatesRequestEvent() = default;
@@ -58,14 +54,6 @@ std::string NormalGetUpdatesRequestEvent::GetDetails() const {
     }
     details.append(base::StringPrintf("Nudged types: %s",
                                       DataTypeSetToDebugString(nudged_types_)));
-  }
-
-  if (!notified_types_.empty()) {
-    if (!details.empty()) {
-      details.append("\n");
-    }
-    details.append(base::StringPrintf(
-        "Notified types: %s", DataTypeSetToDebugString(notified_types_)));
   }
 
   if (!refresh_requested_types_.empty()) {

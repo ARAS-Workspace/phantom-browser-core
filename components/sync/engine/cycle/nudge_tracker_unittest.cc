@@ -13,7 +13,6 @@
 #include "components/sync/base/features.h"
 #include "components/sync/protocol/data_type_progress_marker.pb.h"
 #include "components/sync/protocol/sync_enums.pb.h"
-#include "components/sync/test/mock_invalidation.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace syncer {
@@ -34,18 +33,6 @@ testing::AssertionResult DataTypeSetEquals(DataTypeSet a, DataTypeSet b) {
 
 class NudgeTrackerTest : public ::testing::Test {
  public:
-  NudgeTrackerTest() {
-    // Override this limit so tests know when it is surpassed.
-    SetInvalidationsInSync();
-  }
-
-  bool InvalidationsOutOfSync() const {
-    // We don't currently track invalidations out of sync on a per-type basis.
-    sync_pb::GetUpdateTriggers gu_trigger;
-    nudge_tracker_.FillProtoMessage(BOOKMARKS, &gu_trigger);
-    return gu_trigger.invalidations_out_of_sync();
-  }
-
   int ProtoLocallyModifiedCount(DataType type) const {
     sync_pb::GetUpdateTriggers gu_trigger;
     nudge_tracker_.FillProtoMessage(type, &gu_trigger);
@@ -56,21 +43,6 @@ class NudgeTrackerTest : public ::testing::Test {
     sync_pb::GetUpdateTriggers gu_trigger;
     nudge_tracker_.FillProtoMessage(type, &gu_trigger);
     return gu_trigger.datatype_refresh_nudges();
-  }
-
-  void SetInvalidationsInSync() {
-    nudge_tracker_.OnInvalidationsEnabled();
-    nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked({});
-  }
-
-  std::unique_ptr<SyncInvalidation> BuildInvalidation(
-      int64_t version,
-      const std::string& payload) {
-    return MockInvalidation::Build(version, payload);
-  }
-
-  static std::unique_ptr<SyncInvalidation> BuildUnknownVersionInvalidation() {
-    return MockInvalidation::BuildUnknownVersion();
   }
 
   bool IsTypeThrottled(DataType type) {
@@ -92,48 +64,12 @@ class NudgeTrackerTest : public ::testing::Test {
 TEST_F(NudgeTrackerTest, EmptyNudgeTracker) {
   // Now we're at the normal, "idle" state.
   EXPECT_FALSE(nudge_tracker_.IsSyncRequired(DataTypeSet::All()));
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
   EXPECT_EQ(sync_pb::SyncEnums::UNKNOWN_ORIGIN, nudge_tracker_.GetOrigin());
 
   sync_pb::GetUpdateTriggers gu_trigger;
   nudge_tracker_.FillProtoMessage(BOOKMARKS, &gu_trigger);
 
   EXPECT_EQ(sync_pb::SyncEnums::UNKNOWN_ORIGIN, nudge_tracker_.GetOrigin());
-}
-
-// Checks the behaviour of the invalidations-out-of-sync flag.
-TEST_F(NudgeTrackerTest, EnableDisableInvalidations) {
-  // Start with invalidations offline.
-  nudge_tracker_.OnInvalidationsDisabled();
-  EXPECT_TRUE(InvalidationsOutOfSync());
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // Simply enabling invalidations does not bring us back into sync.
-  nudge_tracker_.OnInvalidationsEnabled();
-  EXPECT_TRUE(InvalidationsOutOfSync());
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // We must successfully complete a sync cycle while invalidations are enabled
-  // to be sure that we're in sync.
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  EXPECT_FALSE(InvalidationsOutOfSync());
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // If the invalidator malfunctions, we go become unsynced again.
-  nudge_tracker_.OnInvalidationsDisabled();
-  EXPECT_TRUE(InvalidationsOutOfSync());
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // A sync cycle while invalidations are disabled won't reset the flag.
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  EXPECT_TRUE(InvalidationsOutOfSync());
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // Nor will the re-enabling of invalidations be sufficient, even now that
-  // we've had a successful sync cycle.
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  EXPECT_TRUE(InvalidationsOutOfSync());
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
 }
 
 // Tests that locally modified types are correctly written out to the
@@ -207,54 +143,6 @@ TEST_F(NudgeTrackerTest, IsSyncRequired) {
   EXPECT_TRUE(nudge_tracker_.IsSyncRequired(DataTypeSet::All()));
   nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
   EXPECT_FALSE(nudge_tracker_.IsSyncRequired(DataTypeSet::All()));
-
-  // Invalidations.
-  nudge_tracker_.SetHasPendingInvalidations(PREFERENCES, true);
-  EXPECT_TRUE(nudge_tracker_.IsSyncRequired(DataTypeSet::All()));
-
-  // Invalidation is "added" to GetUpdates trigger message and "processed", so
-  // after RecordSuccessfulSyncCycleIfNotBlocked() it'll be deleted.
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  nudge_tracker_.SetHasPendingInvalidations(PREFERENCES, false);
-
-  EXPECT_FALSE(nudge_tracker_.IsSyncRequired(DataTypeSet::All()));
-}
-
-// Basic tests for the IsGetUpdatesRequired() flag.
-TEST_F(NudgeTrackerTest, IsGetUpdatesRequired) {
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // Initial sync request.
-  // TODO(crbug.com/40611499): This is probably wrong; a missing initial sync
-  // should not cause IsGetUpdatesRequired(): The former happens during config
-  // cycles, but the latter refers to normal cycles.
-  nudge_tracker_.RecordInitialSyncRequired(BOOKMARKS);
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-  nudge_tracker_.RecordInitialSyncDone(DataTypeSet::All());
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // Local changes.
-  nudge_tracker_.RecordLocalChange(SESSIONS, false);
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // Refresh requests.
-  nudge_tracker_.RecordLocalRefreshRequest({SESSIONS});
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // Invalidations.
-  nudge_tracker_.SetHasPendingInvalidations(PREFERENCES, true);
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // Invalidation is "added" to GetUpdates trigger message and "processed", so
-  // after RecordSuccessfulSyncCycleIfNotBlocked() it'll be deleted.
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  nudge_tracker_.SetHasPendingInvalidations(PREFERENCES, false);
-
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
 }
 
 // Test IsSyncRequired() responds correctly to data type throttling and backoff.
@@ -298,49 +186,6 @@ TEST_F(NudgeTrackerTest, IsSyncRequired_Throttling_Backoff) {
   EXPECT_FALSE(nudge_tracker_.IsTypeBlocked(SESSIONS));
   EXPECT_FALSE(nudge_tracker_.IsTypeBlocked(BOOKMARKS));
   EXPECT_TRUE(nudge_tracker_.IsSyncRequired(DataTypeSet::All()));
-}
-
-// Test IsGetUpdatesRequired() responds correctly to data type throttling and
-// backoff.
-TEST_F(NudgeTrackerTest, IsGetUpdatesRequired_Throttling_Backoff) {
-  const base::TimeTicks now = base::TimeTicks::Now();
-  const base::TimeDelta throttle_length = base::Minutes(0);
-
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // A refresh request to sessions enables the flag.
-  nudge_tracker_.RecordLocalRefreshRequest({SESSIONS});
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // But the throttling of sessions unsets it.
-  nudge_tracker_.SetTypesThrottledUntil({SESSIONS}, throttle_length, now);
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // A refresh request for bookmarks means we have reason to sync again.
-  nudge_tracker_.RecordLocalRefreshRequest({BOOKMARKS});
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // But the backoff of bookmarks unsets it.
-  nudge_tracker_.SetTypeBackedOff(BOOKMARKS, throttle_length, now);
-  EXPECT_TRUE(IsTypeThrottled(SESSIONS));
-  EXPECT_TRUE(IsTypeBackedOff(BOOKMARKS));
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // A refresh request for preferences means we have reason to sync again.
-  nudge_tracker_.RecordLocalRefreshRequest({PREFERENCES});
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // A successful sync cycle means we took care of preferences.
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  // But we still haven't dealt with sessions and bookmarks. We'll need to
-  // remember that sessions and bookmarks are out of sync and re-enable the flag
-  // when their throttling and backoff interval expires.
-  nudge_tracker_.UpdateTypeThrottlingAndBackoffState();
-  EXPECT_FALSE(nudge_tracker_.IsTypeBlocked(SESSIONS));
-  EXPECT_FALSE(nudge_tracker_.IsTypeBlocked(BOOKMARKS));
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
 }
 
 // Tests blocking-related getter functions when no types are blocked.

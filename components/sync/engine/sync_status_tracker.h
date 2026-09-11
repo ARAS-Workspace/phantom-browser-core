@@ -50,10 +50,6 @@ class SyncStatusTracker : public SyncEngineEventListener {
   void OnMigrationRequested(DataTypeSet types) override;
   void OnProtocolEvent(const ProtocolEvent& event) override;
 
-  void SetNotificationsEnabled(bool notifications_enabled);
-
-  void IncrementNotificationsReceived();
-
   void SetEncryptedTypes(DataTypeSet types);
   void SetCryptographerCanEncrypt(bool can_encrypt);
   void SetCryptoHasPendingKeys(bool has_pending_keys);
@@ -65,8 +61,6 @@ class SyncStatusTracker : public SyncEngineEventListener {
           trusted_vault_debug_info);
 
   void SetCacheGuid(const std::string& cache_guid);
-  void SetHasPendingInvalidations(DataType type,
-                                  bool has_pending_invalidations);
 
   void SetLocalBackendFolder(const std::string& folder);
 

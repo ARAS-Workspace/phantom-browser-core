@@ -117,11 +117,6 @@ const UpdateHandler* DataTypeRegistry::GetUpdateHandler(DataType type) const {
   return it == update_handler_map_.end() ? nullptr : it->second;
 }
 
-UpdateHandler* DataTypeRegistry::GetMutableUpdateHandler(DataType type) {
-  auto it = update_handler_map_.find(type);
-  return it == update_handler_map_.end() ? nullptr : it->second;
-}
-
 UpdateHandlerMap* DataTypeRegistry::update_handler_map() {
   return &update_handler_map_;
 }

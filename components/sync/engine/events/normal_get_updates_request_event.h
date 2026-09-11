@@ -26,7 +26,6 @@ class NormalGetUpdatesRequestEvent : public ProtocolEvent {
                                const sync_pb::ClientToServerMessage& request);
   NormalGetUpdatesRequestEvent(base::Time timestamp,
                                DataTypeSet nudged_types,
-                               DataTypeSet notified_types,
                                DataTypeSet refresh_requested_types,
                                sync_pb::ClientToServerMessage request);
 
@@ -47,7 +46,6 @@ class NormalGetUpdatesRequestEvent : public ProtocolEvent {
   const base::Time timestamp_;
 
   const DataTypeSet nudged_types_;
-  const DataTypeSet notified_types_;
   const DataTypeSet refresh_requested_types_;
 
   const sync_pb::ClientToServerMessage request_;

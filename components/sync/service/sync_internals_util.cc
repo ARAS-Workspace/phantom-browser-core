@@ -419,8 +419,6 @@ base::DictValue ConstructAboutInformation(
   Stat<bool>* is_any_throttled_or_backoff =
       section_network->AddBoolStat("Throttled or Backoff");
   Stat<std::string>* retry_time = section_network->AddStringStat("Retry Time");
-  Stat<bool>* are_notifications_enabled =
-      section_network->AddBoolStat("Notifications Enabled");
 
   Section* section_encryption =
       section_list.AddSection("Encryption", /*is_sensitive=*/false);
@@ -462,8 +460,6 @@ base::DictValue ConstructAboutInformation(
 
   Section* section_counters =
       section_list.AddSection("Running Totals", /*is_sensitive=*/false);
-  Stat<int>* notifications_received =
-      section_counters->AddIntStat("Notifications Received");
   Stat<int>* updates_received =
       section_counters->AddIntStat("Updates Downloaded");
   Stat<int>* tombstone_updates =
@@ -580,11 +576,6 @@ base::DictValue ConstructAboutInformation(
     retry_time->Set(GetTimeStr(full_status.retry_time,
                                "Scheduler is not in backoff or throttled"));
   }
-  if (is_status_valid) {
-    are_notifications_enabled->Set(
-        full_status.notifications_enabled,
-        /*is_good=*/full_status.notifications_enabled);
-  }
 
   // Encryption.
   if (service->IsEngineInitialized()) {
@@ -646,7 +637,6 @@ base::DictValue ConstructAboutInformation(
 
   // Running Totals.
   if (is_status_valid) {
-    notifications_received->Set(full_status.notifications_received);
     updates_received->Set(full_status.updates_received);
     tombstone_updates->Set(full_status.tombstone_updates_received);
     successful_commits->Set(full_status.num_commits_total);

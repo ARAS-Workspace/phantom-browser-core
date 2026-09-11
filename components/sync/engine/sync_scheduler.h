@@ -8,7 +8,6 @@
 #include "base/compiler_specific.h"
 #include "base/functional/callback_forward.h"
 #include "base/time/time.h"
-#include "components/sync/base/sync_invalidation.h"
 #include "components/sync/engine/cycle/sync_cycle.h"
 #include "services/network/public/mojom/network_change_manager.mojom.h"
 
@@ -71,12 +70,6 @@ class SyncScheduler : public SyncCycle::Delegate {
   // platforms where tab sync is not registered for invalidations.
   virtual void ScheduleLocalRefreshRequest(DataTypeSet types) = 0;
 
-  // Invalidations are notifications the server sends to let us know when other
-  // clients have committed data.  We need to contact the sync server (being
-  // careful to pass along the "hints" delivered with those invalidations) in
-  // order to fetch the update.
-  virtual void ScheduleInvalidationNudge(DataType type) = 0;
-
   // Requests a non-blocking initial sync request for the specified type.
   //
   // Many types can only complete initial sync while the scheduler is in
@@ -85,20 +78,12 @@ class SyncScheduler : public SyncCycle::Delegate {
   // can be requested through this function.
   virtual void ScheduleInitialSyncNudge(DataType data_type) = 0;
 
-  // Change status of notifications in the SyncCycleContext.
-  virtual void SetNotificationsEnabled(bool notifications_enabled) = 0;
-
   // Called when credentials are updated by the user.
   virtual void OnCredentialsUpdated() = 0;
 
   // Called when the network layer detects a connection status change.
   virtual void OnConnectionStatusChange(
       net::NetworkChangeNotifier::ConnectionType type) = 0;
-
-  // Update pending invalidations state in DataTypeTracker. Called whenever
-  // invalidation comes or drops.
-  virtual void SetHasPendingInvalidations(DataType type,
-                                          bool has_pending_invalidations) = 0;
 };
 
 }  // namespace syncer

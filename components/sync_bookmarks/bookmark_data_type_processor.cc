@@ -250,21 +250,6 @@ void BookmarkDataTypeProcessor::OnUpdateReceived(
   }
 }
 
-void BookmarkDataTypeProcessor::StorePendingInvalidations(
-    std::vector<sync_pb::DataTypeState::Invalidation> invalidations_to_store) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (!bookmark_tracker_) {
-    // It's possible to receive invalidations while bookmarks are not syncing,
-    // e.g. if invalidation system is initialized earlier than bookmark model.
-    return;
-  }
-  sync_pb::DataTypeState data_type_state = bookmark_tracker_->data_type_state();
-  data_type_state.mutable_invalidations()->Assign(
-      invalidations_to_store.begin(), invalidations_to_store.end());
-  bookmark_tracker_->set_data_type_state(data_type_state);
-  schedule_save_closure_.Run();
-}
-
 void BookmarkDataTypeProcessor::OnSyncStarting(
     const syncer::DataTypeActivationRequest& request,
     StartCallback start_callback) {

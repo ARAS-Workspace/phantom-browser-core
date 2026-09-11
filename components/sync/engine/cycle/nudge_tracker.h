@@ -13,7 +13,6 @@
 #include "base/compiler_specific.h"
 #include "base/time/time.h"
 #include "components/sync/base/data_type.h"
-#include "components/sync/base/sync_invalidation.h"
 #include "components/sync/engine/cycle/data_type_tracker.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
@@ -40,10 +39,6 @@ class NudgeTracker {
   // perform a sync cycle; that's the scheduler's job.
   bool IsSyncRequired(DataTypeSet types) const;
 
-  // Returns true if there is a good reason for performing a get updates
-  // request as part of the next sync cycle.
-  bool IsGetUpdatesRequired(DataTypeSet types) const;
-
   // Tells this class that a commit message has been sent (note that each sync
   // cycle may include an arbitrary number of commit messages).
   void RecordSuccessfulCommitMessage(DataTypeSet types);
@@ -66,21 +61,12 @@ class NudgeTracker {
   // Returns the nudge delay for a local refresh.
   base::TimeDelta RecordLocalRefreshRequest(DataTypeSet types);
 
-  // Takes note of the receipt of an invalidation notice from the server.
-  // Returns the nudge delay for a remote invalidation.
-  base::TimeDelta GetRemoteInvalidationDelay(DataType type) const;
-
   // Take note that an initial sync is pending for this type.
   void RecordInitialSyncRequired(DataType type);
 
   // Takes note that the conflict happended for this type, need to sync to
   // resolve conflict locally.
   void RecordCommitConflict(DataType type);
-
-  // These functions should be called to keep this class informed of the status
-  // of the connection to the invalidations server.
-  void OnInvalidationsEnabled();
-  void OnInvalidationsDisabled();
 
   // Marks `types` as being throttled from `now` until `now` + `length`.
   void SetTypesThrottledUntil(DataTypeSet types,
@@ -94,9 +80,6 @@ class NudgeTracker {
 
   // Removes any throttling and backoff that have expired.
   void UpdateTypeThrottlingAndBackoffState();
-
-  void SetHasPendingInvalidations(DataType type,
-                                  bool has_pending_invalidations);
 
   // Returns the time of the next type unthrottling or unbackoff.
   base::TimeDelta GetTimeUntilNextUnblock() const;
@@ -118,9 +101,6 @@ class NudgeTracker {
 
   // Returns the set of types with local changes pending.
   DataTypeSet GetNudgedTypes() const;
-
-  // Returns the set of types that have pending invalidations.
-  DataTypeSet GetNotifiedTypes() const;
 
   // Returns the set of types that have pending refresh requests.
   DataTypeSet GetRefreshRequestedTypes() const;
@@ -157,20 +137,6 @@ class NudgeTracker {
   friend class SyncSchedulerImplTest;
 
   TypeTrackerMap type_trackers_;
-
-  // Tracks whether or not invalidations are currently enabled.
-  bool invalidations_enabled_ = false;
-
-  // This flag is set if suspect that some technical malfunction or known bug
-  // may have left us with some unserviced invalidations.
-  //
-  // Keeps track of whether or not we're fully in sync with the invalidation
-  // server.  This can be false even if invalidations are enabled and working
-  // correctly.  For example, until we get ack-tracking working properly, we
-  // won't persist invalidations between restarts, so we may be out of sync when
-  // we restart.  The only way to get back into sync is to have invalidations
-  // enabled, then complete a sync cycle to make sure we're fully up to date.
-  bool invalidations_out_of_sync_ = true;
 };
 
 }  // namespace syncer

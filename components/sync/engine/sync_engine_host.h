@@ -55,12 +55,6 @@ class SyncEngineHost {
   // Called when the set of backed off types is changed.
   virtual void OnBackedOffTypesChanged() = 0;
 
-  // Called when invalidations are enabled or disabled.
-  virtual void OnInvalidationStatusChanged() = 0;
-
-  // Called when there are new data types with pending invalidations.
-  virtual void OnNewInvalidatedDataTypes() = 0;
-
   // Called to get an access token from the host.
   virtual void FetchAccessToken(
       base::OnceCallback<void(signin::AccessTokenInfo)> callback) = 0;

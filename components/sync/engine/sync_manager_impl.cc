@@ -20,12 +20,10 @@
 #include "base/values.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
-#include "components/sync/base/sync_invalidation.h"
 #include "components/sync/engine/cancelation_signal.h"
 #include "components/sync/engine/configure_reason.h"
 #include "components/sync/engine/cryptographer.h"
 #include "components/sync/engine/data_type_connector_proxy.h"
-#include "components/sync/engine/data_type_worker.h"
 #include "components/sync/engine/engine_components_factory.h"
 #include "components/sync/engine/keystore_keys_handler.h"
 #include "components/sync/engine/loopback_server/loopback_connection_manager.h"
@@ -35,7 +33,6 @@
 #include "components/sync/engine/polling_constants.h"
 #include "components/sync/engine/required_passphrase_verifier.h"
 #include "components/sync/engine/sync_scheduler.h"
-#include "components/sync/engine/update_handler.h"
 #include "components/sync/protocol/sync_enums.pb.h"
 
 namespace syncer {
@@ -380,15 +377,6 @@ void SyncManagerImpl::NudgeForCommit(DataType type) {
   scheduler_->ScheduleLocalNudge(type);
 }
 
-void SyncManagerImpl::SetHasPendingInvalidations(
-    DataType type,
-    bool has_pending_invalidations) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  scheduler_->SetHasPendingInvalidations(type, has_pending_invalidations);
-  sync_status_tracker_->SetHasPendingInvalidations(type,
-                                                   has_pending_invalidations);
-}
-
 void SyncManagerImpl::NotifySyncStatusChanged(const SyncStatus& status) {
   for (SyncManager::Observer& observer : observers_) {
     observer.OnSyncStatusChanged(status);
@@ -442,29 +430,6 @@ void SyncManagerImpl::OnProtocolEvent(const ProtocolEvent& event) {
   for (SyncManager::Observer& observer : observers_) {
     observer.OnProtocolEvent(event);
   }
-}
-
-void SyncManagerImpl::SetInvalidatorEnabled(bool invalidator_enabled) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  DVLOG(1) << "Invalidator enabled state is now: " << invalidator_enabled;
-  sync_status_tracker_->SetNotificationsEnabled(invalidator_enabled);
-  scheduler_->SetNotificationsEnabled(invalidator_enabled);
-}
-
-void SyncManagerImpl::OnIncomingInvalidation(
-    DataType type,
-    std::unique_ptr<SyncInvalidation> invalidation) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  UpdateHandler* handler = data_type_registry_->GetMutableUpdateHandler(type);
-  if (handler) {
-    handler->RecordRemoteInvalidation(std::move(invalidation));
-  } else {
-    DataTypeWorker::LogPendingInvalidationStatus(
-        PendingInvalidationStatus::kDataTypeNotConnected);
-  }
-  sync_status_tracker_->IncrementNotificationsReceived();
-  scheduler_->ScheduleInvalidationNudge(type);
 }
 
 void SyncManagerImpl::RefreshTypes(DataTypeSet types) {

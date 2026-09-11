@@ -486,15 +486,6 @@ class ClientTagBasedDataTypeProcessorTest : public ::testing::Test {
         bridge()->change_processor());
   }
 
-  sync_pb::DataTypeState::Invalidation BuildInvalidation(
-      int64_t version,
-      const std::string& payload) {
-    sync_pb::DataTypeState::Invalidation inv;
-    inv.set_version(version);
-    inv.set_hint(payload);
-    return inv;
-  }
-
  protected:
   void CheckPostConditions() { EXPECT_FALSE(expect_error_); }
 
@@ -617,25 +608,6 @@ TEST_F(ClientTagBasedDataTypeProcessorTest,
   OnSyncStarting(kNewGaiaId);
   EXPECT_TRUE(type_processor()->IsTrackingMetadata());
   EXPECT_EQ(kNewGaiaId, type_processor()->TrackedGaiaId());
-}
-
-TEST_F(ClientTagBasedDataTypeProcessorTest,
-       ShouldExposeNewlyAddedInvalidations) {
-  // Populate the bridge's metadata with some non-empty values for us to later
-  // check that it hasn't been cleared.
-  sync_pb::DataTypeState::Invalidation inv_1 = BuildInvalidation(1, "hint_1");
-  sync_pb::DataTypeState::Invalidation inv_2 = BuildInvalidation(2, "hint_2");
-  InitializeToReadyState();
-  type_processor()->StorePendingInvalidations({inv_1, inv_2});
-
-  DataTypeState data_type_state(db()->data_type_state());
-  EXPECT_EQ(2, data_type_state.invalidations_size());
-
-  EXPECT_EQ(inv_1.hint(), data_type_state.invalidations(0).hint());
-  EXPECT_EQ(inv_1.version(), data_type_state.invalidations(0).version());
-
-  EXPECT_EQ(inv_2.hint(), data_type_state.invalidations(1).hint());
-  EXPECT_EQ(inv_2.version(), data_type_state.invalidations(1).version());
 }
 
 TEST_F(ClientTagBasedDataTypeProcessorTest, ShouldExposeNewlyTrackedCacheGuid) {

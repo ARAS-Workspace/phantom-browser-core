@@ -220,11 +220,6 @@ ChromeBrowserCloudManagementControllerDesktop::
   return nullptr;
 }
 
-void ChromeBrowserCloudManagementControllerDesktop::SetGaiaURLLoaderFactory(
-    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
-  gaia_url_loader_factory_ = url_loader_factory;
-}
-
 bool ChromeBrowserCloudManagementControllerDesktop::
     ReadyToCreatePolicyManager() {
   return true;

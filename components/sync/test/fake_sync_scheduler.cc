@@ -20,11 +20,6 @@ void FakeSyncScheduler::ScheduleLocalNudge(DataType type) {}
 
 void FakeSyncScheduler::ScheduleLocalRefreshRequest(DataTypeSet types) {}
 
-void FakeSyncScheduler::ScheduleInvalidationNudge(DataType type) {}
-
-void FakeSyncScheduler::SetHasPendingInvalidations(DataType type,
-                                                   bool has_invalidation) {}
-
 void FakeSyncScheduler::ScheduleConfiguration(
     sync_pb::SyncEnums::GetUpdatesOrigin origin,
     DataTypeSet types_to_download,
@@ -33,8 +28,6 @@ void FakeSyncScheduler::ScheduleConfiguration(
 }
 
 void FakeSyncScheduler::ScheduleInitialSyncNudge(DataType data_type) {}
-
-void FakeSyncScheduler::SetNotificationsEnabled(bool notifications_enabled) {}
 
 void FakeSyncScheduler::OnCredentialsUpdated() {}
 

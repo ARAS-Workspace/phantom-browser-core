@@ -110,7 +110,6 @@ SyncCycleSnapshot MakeDefaultSyncCycleSnapshot() {
       syncer::ModelNeutralState(), syncer::ProgressMarkerMap(),
       /*is_silenced=*/false,
       /*num_server_conflicts=*/0,
-      /*notifications_enabled=*/true,
       /*sync_start_time=*/base::Time::Now(),
       /*poll_finish_time=*/base::Time::Now(),
       sync_pb::SyncEnums::UNKNOWN_ORIGIN,
@@ -254,13 +253,6 @@ class SyncServiceImplTest : public ::testing::Test {
         /*registered_types=*/UserSelectableTypeSet::All(),
         /*selected_types=*/UserSelectableTypeSet::All());
     sync_prefs.SetInitialSyncFeatureSetupComplete();
-  }
-
-  void SetInvalidationsEnabled() {
-    SyncStatus status = engine()->GetDetailedStatus();
-    status.notifications_enabled = true;
-    engine()->SetDetailedStatus(status);
-    service()->OnInvalidationStatusChanged();
   }
 
   void TriggerPassphraseRequired() {
@@ -1796,9 +1788,9 @@ TEST_F(SyncServiceImplTest, ShouldReturnErrorDownloadStatusWhenSyncDisabled) {
   InitializeService();
   base::RunLoop().RunUntilIdle();
 
-  // OnInvalidationStatusChanged() is used to only notify observers. This will
+  // OnBackedOffTypesChanged() is used to only notify observers. This will
   // cause the histogram recorder to check data types status.
-  service()->OnInvalidationStatusChanged();
+  service()->OnBackedOffTypesChanged();
   EXPECT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
             SyncService::DataTypeDownloadStatus::kError);
 }
@@ -1833,7 +1825,6 @@ TEST_F(SyncServiceImplTest, ShouldReturnWaitingDownloadStatus) {
 
   service()->AddObserver(&mock_sync_service_observer);
   base::RunLoop().RunUntilIdle();
-  SetInvalidationsEnabled();
 
   EXPECT_TRUE(met_configuring_data_type_manager);
   EXPECT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
@@ -1860,41 +1851,6 @@ TEST_F(SyncServiceImplTest, ShouldReturnErrorWhenDataTypeDisabled) {
   base::RunLoop().RunUntilIdle();
   EXPECT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
             SyncService::DataTypeDownloadStatus::kError);
-
-  SetInvalidationsEnabled();
-  EXPECT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
-            SyncService::DataTypeDownloadStatus::kError);
-}
-
-TEST_F(SyncServiceImplTest, ShouldWaitUntilNoInvalidations) {
-  PopulatePrefsForInitialSyncFeatureSetupComplete();
-  SignInWithSyncConsent();
-  InitializeService();
-  base::RunLoop().RunUntilIdle();
-  SetInvalidationsEnabled();
-
-  SyncStatus status = engine()->GetDetailedStatus();
-  status.invalidated_data_types.Put(BOOKMARKS);
-  engine()->SetDetailedStatus(status);
-
-  EXPECT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
-            SyncService::DataTypeDownloadStatus::kWaitingForUpdates);
-  EXPECT_EQ(service()->GetDownloadStatusFor(syncer::DEVICE_INFO),
-            SyncService::DataTypeDownloadStatus::kUpToDate);
-}
-
-TEST_F(SyncServiceImplTest, ShouldWaitForInitializedInvalidations) {
-  PopulatePrefsForInitialSyncFeatureSetupComplete();
-  SignInWithSyncConsent();
-  InitializeService();
-  base::RunLoop().RunUntilIdle();
-
-  ASSERT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
-            SyncService::DataTypeDownloadStatus::kWaitingForUpdates);
-
-  SetInvalidationsEnabled();
-  EXPECT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
-            SyncService::DataTypeDownloadStatus::kUpToDate);
 }
 
 TEST_F(SyncServiceImplTest, ShouldWaitForPollRequest) {
@@ -1903,21 +1859,19 @@ TEST_F(SyncServiceImplTest, ShouldWaitForPollRequest) {
   InitializeService();
   base::RunLoop().RunUntilIdle();
 
-  SetInvalidationsEnabled();
-
   ASSERT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
             SyncService::DataTypeDownloadStatus::kUpToDate);
 
-  // OnInvalidationStatusChanged() is used to only notify observers, this is
+  // OnBackedOffTypesChanged() is used to only notify observers, this is
   // required for metrics since they are calculated only when SyncService state
   // changes.
   engine()->SetPollIntervalElapsed(true);
-  service()->OnInvalidationStatusChanged();
+  service()->OnBackedOffTypesChanged();
   EXPECT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
             SyncService::DataTypeDownloadStatus::kWaitingForUpdates);
 
   engine()->SetPollIntervalElapsed(false);
-  service()->OnInvalidationStatusChanged();
+  service()->OnBackedOffTypesChanged();
   EXPECT_EQ(service()->GetDownloadStatusFor(syncer::BOOKMARKS),
             SyncService::DataTypeDownloadStatus::kUpToDate);
 

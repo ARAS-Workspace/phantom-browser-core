@@ -22,8 +22,6 @@ class MockNudgeHandler : public NudgeHandler {
 
   void NudgeForInitialDownload(DataType type) override;
   void NudgeForCommit(DataType type) override;
-  void SetHasPendingInvalidations(DataType type,
-                                  bool has_pending_invalidations) override;
 
   int GetNumInitialDownloadNudges() const;
   int GetNumCommitNudges() const;

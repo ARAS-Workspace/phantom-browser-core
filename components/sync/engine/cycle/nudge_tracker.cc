@@ -39,21 +39,6 @@ bool NudgeTracker::IsSyncRequired(DataTypeSet types) const {
   return false;
 }
 
-bool NudgeTracker::IsGetUpdatesRequired(DataTypeSet types) const {
-  if (invalidations_out_of_sync_) {
-    return true;
-  }
-
-  for (DataType type : types) {
-    TypeTrackerMap::const_iterator tracker_it = type_trackers_.find(type);
-    CHECK(tracker_it != type_trackers_.end()) << DataTypeToDebugString(type);
-    if (tracker_it->second->IsGetUpdatesRequired()) {
-      return true;
-    }
-  }
-  return false;
-}
-
 void NudgeTracker::RecordSuccessfulCommitMessage(DataTypeSet types) {
   for (DataType type : types) {
     TypeTrackerMap::const_iterator tracker_it = type_trackers_.find(type);
@@ -63,9 +48,6 @@ void NudgeTracker::RecordSuccessfulCommitMessage(DataTypeSet types) {
 }
 
 void NudgeTracker::RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet types) {
-  // A successful cycle while invalidations are enabled puts us back into sync.
-  invalidations_out_of_sync_ = !invalidations_enabled_;
-
   for (DataType type : types) {
     TypeTrackerMap::const_iterator tracker_it = type_trackers_.find(type);
     CHECK(tracker_it != type_trackers_.end()) << DataTypeToDebugString(type);
@@ -97,12 +79,6 @@ base::TimeDelta NudgeTracker::RecordLocalRefreshRequest(DataTypeSet types) {
   return kLocalRefreshDelay;
 }
 
-base::TimeDelta NudgeTracker::GetRemoteInvalidationDelay(DataType type) const {
-  TypeTrackerMap::const_iterator tracker_it = type_trackers_.find(type);
-  CHECK(tracker_it != type_trackers_.end());
-  return tracker_it->second->GetRemoteInvalidationDelay();
-}
-
 void NudgeTracker::RecordInitialSyncRequired(DataType type) {
   TypeTrackerMap::const_iterator tracker_it = type_trackers_.find(type);
   CHECK(tracker_it != type_trackers_.end());
@@ -113,15 +89,6 @@ void NudgeTracker::RecordCommitConflict(DataType type) {
   TypeTrackerMap::const_iterator tracker_it = type_trackers_.find(type);
   CHECK(tracker_it != type_trackers_.end());
   tracker_it->second->RecordCommitConflict();
-}
-
-void NudgeTracker::OnInvalidationsEnabled() {
-  invalidations_enabled_ = true;
-}
-
-void NudgeTracker::OnInvalidationsDisabled() {
-  invalidations_enabled_ = false;
-  invalidations_out_of_sync_ = true;
 }
 
 void NudgeTracker::SetTypesThrottledUntil(DataTypeSet types,
@@ -145,13 +112,6 @@ void NudgeTracker::UpdateTypeThrottlingAndBackoffState() {
   for (const auto& [type, tracker] : type_trackers_) {
     tracker->UpdateThrottleOrBackoffState();
   }
-}
-
-void NudgeTracker::SetHasPendingInvalidations(DataType type,
-                                              bool has_invalidation) {
-  TypeTrackerMap::const_iterator tracker_it = type_trackers_.find(type);
-  CHECK(tracker_it != type_trackers_.end());
-  tracker_it->second->SetHasPendingInvalidations(has_invalidation);
 }
 
 bool NudgeTracker::IsAnyTypeBlocked() const {
@@ -218,16 +178,6 @@ DataTypeSet NudgeTracker::GetNudgedTypes() const {
   return result;
 }
 
-DataTypeSet NudgeTracker::GetNotifiedTypes() const {
-  DataTypeSet result;
-  for (const auto& [type, tracker] : type_trackers_) {
-    if (tracker->HasPendingInvalidation()) {
-      result.Put(type);
-    }
-  }
-  return result;
-}
-
 DataTypeSet NudgeTracker::GetRefreshRequestedTypes() const {
   DataTypeSet result;
   for (const auto& [type, tracker] : type_trackers_) {
@@ -242,8 +192,7 @@ sync_pb::SyncEnums::GetUpdatesOrigin NudgeTracker::GetOrigin() const {
   // TODO(crbug.com/40252048): This appears trivial after removing GU_RETRY, either
   // simplify the code around or add an explanation why this is needed.
   for (const auto& [type, tracker] : type_trackers_) {
-    if (!tracker->IsBlocked() && (tracker->HasPendingInvalidation() ||
-                                  tracker->HasRefreshRequestPending() ||
+    if (!tracker->IsBlocked() && (tracker->HasRefreshRequestPending() ||
                                   tracker->HasLocalChangePending() ||
                                   tracker->IsInitialSyncRequired())) {
       return sync_pb::SyncEnums::GU_TRIGGER;
@@ -257,8 +206,9 @@ void NudgeTracker::FillProtoMessage(DataType type,
                                     sync_pb::GetUpdateTriggers* msg) const {
   DCHECK(type_trackers_.find(type) != type_trackers_.end());
 
-  // Fill what we can from the global data.
-  msg->set_invalidations_out_of_sync(invalidations_out_of_sync_);
+  // There is no invalidation channel, so the client is always out of sync with
+  // it.
+  msg->set_invalidations_out_of_sync(true);
 
   // Delegate the type-specific work to the DataTypeTracker class.
   type_trackers_.find(type)->second->FillGetUpdatesTriggersMessage(msg);

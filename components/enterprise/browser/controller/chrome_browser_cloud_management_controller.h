@@ -168,11 +168,6 @@ class ChromeBrowserCloudManagementController
     virtual std::unique_ptr<client_certificates::CertificateProvisioningService>
     CreateCertificateProvisioningService();
 
-    // Sets the SharedURLLoaderFactory that this object will use to make
-    // requests to GAIA.
-    virtual void SetGaiaURLLoaderFactory(
-        scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) = 0;
-
     // Returns true if the cloud policy manager can be created rightaway of if
     // it should be deferred for some reason depending on the platform (e.g. on
     // Android it should wait for PolicyService initialization).
@@ -289,11 +284,6 @@ class ChromeBrowserCloudManagementController
   // Returns a client certificate provisioning service.
   client_certificates::CertificateProvisioningService*
   GetCertificateProvisioningService();
-
-  // Sets the SharedURLLoaderFactory that this will be used to make requests to
-  // GAIA.
-  void SetGaiaURLLoaderFactory(
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory);
 
   enterprise_reporting::ReportScheduler* report_scheduler() {
     return report_scheduler_.get();

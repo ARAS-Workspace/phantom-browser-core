@@ -211,20 +211,6 @@ void NigoriDataTypeProcessor::OnUpdateReceived(
   NudgeForCommitIfNeeded();
 }
 
-void NigoriDataTypeProcessor::StorePendingInvalidations(
-    std::vector<sync_pb::DataTypeState::Invalidation> invalidations_to_store) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  if (model_error_ || !bridge_) {
-    return;
-  }
-  data_type_state_.mutable_invalidations()->Assign(
-      invalidations_to_store.begin(), invalidations_to_store.end());
-  // ApplyIncrementalSyncChanges does actually query and persist the
-  // `data_type_state_`.
-  bridge_->ApplyIncrementalSyncChanges(/*data=*/std::nullopt);
-}
-
 void NigoriDataTypeProcessor::OnSyncStarting(
     const DataTypeActivationRequest& request,
     StartCallback callback) {

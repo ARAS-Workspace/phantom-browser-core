@@ -31,11 +31,8 @@ constexpr base::TimeDelta kDefaultLocalChangeNudgeDelayForSessions =
 constexpr base::TimeDelta kDefaultLocalChangeNudgeDelayForSavedTabGroup =
     base::Seconds(11);
 
-// Nudge delay for remote invalidations. Common to all data types.
-constexpr base::TimeDelta kRemoteInvalidationDelay = base::Milliseconds(250);
-
-// Nudge delay for local changes & remote invalidations for extension-related
-// types when their quota is depleted.
+// Nudge delay for local changes for extension-related types when their quota
+// is depleted.
 constexpr base::TimeDelta kDepletedQuotaNudgeDelayForExtensionTypes =
     base::Seconds(100);
 
@@ -274,11 +271,6 @@ void DataTypeTracker::RecordSuccessfulSyncCycleIfNotBlocked() {
   local_nudge_count_ = 0;
   local_refresh_request_count_ = 0;
 
-  // TODO(rlarocque): If we want this to be correct even if we should happen to
-  // crash before writing all our state, we should wait until the results of
-  // this sync cycle have been written to disk before updating the invalidations
-  // state.  See crbug.com/324996.
-
   // The initial sync should generally have happened as part of a "configure"
   // sync cycle, before this method gets called (i.e. after a successful
   // "normal" sync cycle). However, in some cases the initial sync might not
@@ -308,8 +300,8 @@ bool DataTypeTracker::IsGetUpdatesRequired() const {
   // IsInitialSyncRequired(): The initial sync is done in a configuration cycle,
   // while this method refers to normal cycles.
   return !IsBlocked() &&
-         (HasRefreshRequestPending() || HasPendingInvalidation() ||
-          IsInitialSyncRequired() || IsSyncRequiredToResolveConflict());
+         (HasRefreshRequestPending() || IsInitialSyncRequired() ||
+          IsSyncRequiredToResolveConflict());
 }
 
 bool DataTypeTracker::HasLocalChangePending() const {
@@ -318,10 +310,6 @@ bool DataTypeTracker::HasLocalChangePending() const {
 
 bool DataTypeTracker::HasRefreshRequestPending() const {
   return local_refresh_request_count_ > 0;
-}
-
-bool DataTypeTracker::HasPendingInvalidation() const {
-  return has_pending_invalidations_;
 }
 
 bool DataTypeTracker::IsInitialSyncRequired() const {
@@ -390,11 +378,6 @@ void DataTypeTracker::UpdateThrottleOrBackoffState() {
   }
 }
 
-void DataTypeTracker::SetHasPendingInvalidations(
-    bool has_pending_invalidations) {
-  has_pending_invalidations_ = has_pending_invalidations;
-}
-
 void DataTypeTracker::UpdateLocalChangeNudgeDelay(base::TimeDelta delay) {
   // Protect against delays too small being set.
   if (delay >= kMinLocalChangeNudgeDelay) {
@@ -415,17 +398,6 @@ base::TimeDelta DataTypeTracker::GetLocalChangeNudgeDelay(
     result *= kSyncIncreaseNudgeDelayForSingleClientFactor.Get();
   }
   return result;
-}
-
-base::TimeDelta DataTypeTracker::GetRemoteInvalidationDelay() const {
-  if (quota_ && !quota_->HasTokensAvailable()) {
-    // Using the extended nudge delay for remote invalidations makes sure that
-    // two devices on a commit spree (e.g. through the same extension) don't
-    // have an escape hatch from the extended nudge delay by sending
-    // invalidations to each other.
-    return depleted_quota_nudge_delay_;
-  }
-  return kRemoteInvalidationDelay;
 }
 
 WaitInterval::BlockingMode DataTypeTracker::GetBlockingMode() const {

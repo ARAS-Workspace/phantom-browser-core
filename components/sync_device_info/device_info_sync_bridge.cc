@@ -498,12 +498,6 @@ void DeviceInfoSyncBridge::RefreshLocalDeviceInfoIfNeeded() {
   ReconcileLocalAndStored();
 }
 
-void DeviceInfoSyncBridge::SetCommittedAdditionalInterestedDataTypesCallback(
-    base::RepeatingCallback<void(const DataTypeSet&)> callback) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  new_interested_data_types_callback_ = std::move(callback);
-}
-
 void DeviceInfoSyncBridge::OnSyncStarting(
     const DataTypeActivationRequest& request) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -1055,16 +1049,6 @@ bool DeviceInfoSyncBridge::ReconcileLocalAndStored() {
                          base::Unretained(this)));
       return false;
     }
-  }
-
-  // Initiate an additional GetUpdates request if there are new data types
-  // enabled (on successful commit).
-  const DataTypeSet new_data_types =
-      Difference(current_info->interested_data_types(),
-                 previous_device_info.interested_data_types());
-  if (new_interested_data_types_callback_ && !new_data_types.empty()) {
-    device_info_synced_callback_list_.push_back(
-        base::BindOnce(new_interested_data_types_callback_, new_data_types));
   }
 
   // If there was a force-upload request, it has been satisfied now.

@@ -231,16 +231,6 @@ class SyncerTest : public testing::Test,
     mock_server_->ExpectGetUpdatesRequestTypes(enabled_datatypes_);
   }
 
-  // Configures SyncCycleContext and NudgeTracker so Syncer won't call
-  // GetUpdates prior to Commit. This method can be used to ensure a Commit is
-  // not preceeded by GetUpdates.
-  void ConfigureNoGetUpdatesRequired() {
-    nudge_tracker_.OnInvalidationsEnabled();
-    nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-
-    ASSERT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-  }
-
  protected:
   base::test::SingleThreadTaskEnvironment task_environment_;
 
@@ -595,109 +585,6 @@ TEST_F(SyncerTest, SendDebugInfoEventsOnGetUpdates_PostFailsDontDrop) {
   EXPECT_TRUE(SyncShareNudge());
   EXPECT_EQ(3U, mock_server_->requests().size());
   ASSERT_TRUE(mock_server_->last_request().has_get_updates());
-  EXPECT_EQ(0, mock_server_->last_request().debug_info().events_size());
-}
-
-// Tests that commit failure with conflict will trigger GetUpdates for next
-// cycle of sync
-TEST_F(SyncerTest, CommitFailureWithConflict) {
-  ConfigureNoGetUpdatesRequired();
-
-  GetProcessor(PREFERENCES)
-      ->AppendCommitRequest(ClientTagHash::FromHashed("tag1"),
-                            MakeSpecifics(PREFERENCES), "id1");
-
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  EXPECT_TRUE(SyncShareNudge());
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  GetProcessor(PREFERENCES)
-      ->AppendCommitRequest(ClientTagHash::FromHashed("tag1"),
-                            MakeSpecifics(PREFERENCES), "id1");
-
-  mock_server_->set_conflict_n_commits(1);
-  EXPECT_FALSE(SyncShareNudge());
-  EXPECT_TRUE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-
-  nudge_tracker_.RecordSuccessfulSyncCycleIfNotBlocked(DataTypeSet::All());
-  EXPECT_FALSE(nudge_tracker_.IsGetUpdatesRequired(DataTypeSet::All()));
-}
-
-// Tests that sending debug info events on Commit works.
-TEST_F(SyncerTest, SendDebugInfoEventsOnCommit_HappyCase) {
-  // Make sure GetUpdate isn't call as it would "steal" debug info events before
-  // Commit has a chance to send them.
-  ConfigureNoGetUpdatesRequired();
-
-  // Generate a debug info event and trigger a commit.
-  debug_info_getter_->AddDebugEvent();
-  GetProcessor(PREFERENCES)
-      ->AppendCommitRequest(ClientTagHash::FromHashed("tag1"),
-                            MakeSpecifics(PREFERENCES), "id1");
-  EXPECT_TRUE(SyncShareNudge());
-
-  // Verify that the last request received is a Commit and that it contains a
-  // debug info event.
-  EXPECT_EQ(1U, mock_server_->requests().size());
-  ASSERT_TRUE(mock_server_->last_request().has_commit());
-  EXPECT_EQ(1, mock_server_->last_request().debug_info().events_size());
-
-  // Generate another commit, but no debug info event.
-  GetProcessor(PREFERENCES)
-      ->AppendCommitRequest(ClientTagHash::FromHashed("tag2"),
-                            MakeSpecifics(PREFERENCES), "id2");
-  EXPECT_TRUE(SyncShareNudge());
-
-  // See that it was received and contains no debug info events.
-  EXPECT_EQ(2U, mock_server_->requests().size());
-  ASSERT_TRUE(mock_server_->last_request().has_commit());
-  EXPECT_EQ(0, mock_server_->last_request().debug_info().events_size());
-}
-
-// Tests that debug info events are not dropped on server error.
-TEST_F(SyncerTest, SendDebugInfoEventsOnCommit_PostFailsDontDrop) {
-  // Make sure GetUpdate isn't call as it would "steal" debug info events before
-  // Commit has a chance to send them.
-  ConfigureNoGetUpdatesRequired();
-
-  mock_server_->FailNextPostBufferToPathCall();
-
-  // Generate a debug info event and trigger a commit.
-  debug_info_getter_->AddDebugEvent();
-  GetProcessor(PREFERENCES)
-      ->AppendCommitRequest(ClientTagHash::FromHashed("tag1"),
-                            MakeSpecifics(PREFERENCES), "id1");
-  EXPECT_FALSE(SyncShareNudge());
-
-  // Verify that the last request sent is a Commit and that it contains a debug
-  // info event.
-  EXPECT_EQ(1U, mock_server_->requests().size());
-  ASSERT_TRUE(mock_server_->last_request().has_commit());
-  EXPECT_EQ(1, mock_server_->last_request().debug_info().events_size());
-
-  // Try again. Because of how MockDataTypeProcessor works, commit data needs
-  // to be provided again.
-  GetProcessor(PREFERENCES)
-      ->AppendCommitRequest(ClientTagHash::FromHashed("tag1"),
-                            MakeSpecifics(PREFERENCES), "id1");
-  EXPECT_TRUE(SyncShareNudge());
-
-  // Verify that we've received another Commit and that it contains a debug info
-  // event (just like the previous one).
-  EXPECT_EQ(2U, mock_server_->requests().size());
-  ASSERT_TRUE(mock_server_->last_request().has_commit());
-  EXPECT_EQ(1, mock_server_->last_request().debug_info().events_size());
-
-  // Generate another commit and try again.
-  GetProcessor(PREFERENCES)
-      ->AppendCommitRequest(ClientTagHash::FromHashed("tag2"),
-                            MakeSpecifics(PREFERENCES), "id2");
-  EXPECT_TRUE(SyncShareNudge());
-
-  // See that it was received and contains no debug info events.
-  EXPECT_EQ(3U, mock_server_->requests().size());
-  ASSERT_TRUE(mock_server_->last_request().has_commit());
   EXPECT_EQ(0, mock_server_->last_request().debug_info().events_size());
 }
 

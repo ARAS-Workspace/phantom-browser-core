@@ -63,8 +63,6 @@ class ChromeBrowserCloudManagementControllerDesktop
   GetSaasUsageReportingDelegateFactory() override;
   std::unique_ptr<enterprise_reporting::BrowserLaunchEventController>
   CreateBrowserLaunchEventController() override;
-  void SetGaiaURLLoaderFactory(scoped_refptr<network::SharedURLLoaderFactory>
-                                   url_loader_factory) override;
   bool ReadyToCreatePolicyManager() override;
   bool ReadyToInit() override;
   std::unique_ptr<ClientDataDelegate> CreateClientDataDelegate() override;
@@ -77,7 +75,6 @@ class ChromeBrowserCloudManagementControllerDesktop
   std::unique_ptr<ChromeBrowserCloudManagementRegisterWatcher>
       cloud_management_register_watcher_;
 
-  scoped_refptr<network::SharedURLLoaderFactory> gaia_url_loader_factory_;
   // Responsible for storing and retrieving browser-level managed identities.
   std::unique_ptr<client_certificates::CertificateStore> certificate_store_;
 

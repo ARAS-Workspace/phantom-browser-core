@@ -24,15 +24,11 @@ class FakeSyncScheduler : public SyncScheduler {
   void Stop() override;
   void ScheduleLocalNudge(DataType type) override;
   void ScheduleLocalRefreshRequest(DataTypeSet types) override;
-  void ScheduleInvalidationNudge(DataType type) override;
-  void SetHasPendingInvalidations(DataType type,
-                                  bool has_invalidation) override;
   void ScheduleConfiguration(sync_pb::SyncEnums::GetUpdatesOrigin origin,
                              DataTypeSet types_to_download,
                              base::OnceClosure ready_task) override;
 
   void ScheduleInitialSyncNudge(DataType data_type) override;
-  void SetNotificationsEnabled(bool notifications_enabled) override;
 
   void OnCredentialsUpdated() override;
   void OnConnectionStatusChange(

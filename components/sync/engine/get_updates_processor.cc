@@ -172,8 +172,7 @@ void InitDownloadUpdatesContext(SyncCycle* cycle,
   bool need_encryption_key = ShouldRequestEncryptionKey(cycle->context());
   get_updates->set_need_encryption_key(need_encryption_key);
 
-  get_updates->mutable_caller_info()->set_notifications_enabled(
-      cycle->context()->notifications_enabled());
+  get_updates->mutable_caller_info()->set_notifications_enabled(false);
 }
 
 }  // namespace
@@ -216,10 +215,6 @@ void GetUpdatesProcessor::PrepareGetUpdates(
     sync_pb::DataTypeContext context = handler_it->second->GetDataTypeContext();
     if (!context.context().empty()) {
       *get_updates->add_client_contexts() = std::move(context);
-    }
-    if (delegate_->IsNotificationInfoRequired()) {
-      handler_it->second->CollectPendingInvalidations(
-          progress_marker->mutable_get_update_triggers());
     }
   }
 
@@ -367,31 +362,11 @@ SyncerError GetUpdatesProcessor::ProcessResponse(
   return SyncerError::Success();
 }
 
-void GetUpdatesProcessor::ApplyUpdates(
-    const DataTypeSet& gu_types,
-    const DataTypeSet& data_types_with_failure,
-    StatusController* status_controller) {
+void GetUpdatesProcessor::ApplyUpdates(const DataTypeSet& gu_types,
+                                       StatusController* status_controller) {
   for (const auto& [type, update_handler] : *update_handler_map_) {
     if (gu_types.Has(type)) {
       update_handler->ApplyUpdates(status_controller, /*cycle_done=*/true);
-    }
-  }
-
-  RecordDownloadFailure(
-      data_types_with_failure,
-      UpdateHandler::NudgedUpdateResult::kDownloadPartialFailure);
-}
-
-void GetUpdatesProcessor::RecordDownloadFailure(
-    const DataTypeSet& gu_types,
-    UpdateHandler::NudgedUpdateResult failure_result) {
-  if (gu_types.empty()) {
-    return;
-  }
-
-  for (const auto& [type, update_handler] : *update_handler_map_) {
-    if (gu_types.Has(type)) {
-      update_handler->RecordDownloadFailure(failure_result);
     }
   }
 }

@@ -38,12 +38,12 @@ TEST_F(SyncCycleSnapshotTest, SyncCycleSnapshotToValue) {
   const int kNumServerConflicts = 1057;
   SyncCycleSnapshot snapshot(
       kBirthday, kBagOfChips, model_neutral, download_progress_markers,
-      kIsSilenced, kNumServerConflicts, false, base::Time::Now(),
-      base::Time::Now(), sync_pb::SyncEnums::UNKNOWN_ORIGIN,
+      kIsSilenced, kNumServerConflicts, base::Time::Now(), base::Time::Now(),
+      sync_pb::SyncEnums::UNKNOWN_ORIGIN,
       /*poll_interval=*/base::Minutes(30),
       /*has_remaining_local_changes=*/false);
   base::DictValue dict(snapshot.ToValue());
-  EXPECT_EQ(14u, dict.size());
+  EXPECT_EQ(13u, dict.size());
 
   EXPECT_THAT(
       dict,
@@ -63,7 +63,6 @@ TEST_F(SyncCycleSnapshotTest, SyncCycleSnapshotToValue) {
                    expected_download_progress_markers_value.Clone())
               .Set("isSilenced", kIsSilenced)
               .Set("numServerConflicts", kNumServerConflicts)
-              .Set("notificationsEnabled", false)
               .Set("hasRemainingLocalChanges", false)
               .Set("poll_interval", "0h 30m")));
 

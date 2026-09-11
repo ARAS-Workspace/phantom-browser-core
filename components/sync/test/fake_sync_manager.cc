@@ -47,14 +47,6 @@ ConfigureReason FakeSyncManager::GetAndResetConfigureReason() {
   return reason;
 }
 
-int FakeSyncManager::GetInvalidationCount(DataType type) const {
-  auto it = num_invalidations_received_.find(type);
-  if (it == num_invalidations_received_.end()) {
-    return 0;
-  }
-  return it->second;
-}
-
 void FakeSyncManager::WaitForSyncThread() {
   // Post a task to `sync_task_runner_` and block until it runs.
   base::RunLoop run_loop;
@@ -196,18 +188,8 @@ void FakeSyncManager::RefreshTypes(DataTypeSet types) {
   last_refresh_request_types_ = types;
 }
 
-void FakeSyncManager::OnIncomingInvalidation(
-    DataType type,
-    std::unique_ptr<SyncInvalidation> invalidation) {
-  num_invalidations_received_[type]++;
-}
-
 DataTypeSet FakeSyncManager::GetLastRefreshRequestTypes() {
   return last_refresh_request_types_;
-}
-
-void FakeSyncManager::SetInvalidatorEnabled(bool invalidator_enabled) {
-  invalidator_enabled_ = invalidator_enabled;
 }
 
 void FakeSyncManager::OnCookieJarChanged(bool account_mismatch) {}

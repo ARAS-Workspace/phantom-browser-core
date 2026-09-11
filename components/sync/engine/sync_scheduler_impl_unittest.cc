@@ -35,7 +35,6 @@
 #include "components/sync/test/fake_connection_manager.h"
 #include "components/sync/test/fake_data_type_processor.h"
 #include "components/sync/test/fake_sync_encryption_handler.h"
-#include "components/sync/test/mock_invalidation.h"
 #include "components/sync/test/mock_nudge_handler.h"
 #include "net/base/net_errors.h"
 #include "net/http/http_status_code.h"
@@ -266,7 +265,6 @@ class SyncSchedulerImplTest : public testing::Test {
         /*poll_interval=*/base::Minutes(30),
         /*account_email=*/"test@example.com",
         /*sync_access_token_fetcher=*/nullptr);
-    context_->set_notifications_enabled(true);
     RebuildScheduler();
   }
 
@@ -294,7 +292,6 @@ class SyncSchedulerImplTest : public testing::Test {
         "fake_bag_of_chips",
         /*poll_interval=*/base::Minutes(30),
         /*account_email=*/"test@example.com", access_token_fetcher);
-    context_->set_notifications_enabled(true);
     RebuildScheduler();
   }
 
@@ -392,12 +389,6 @@ class SyncSchedulerImplTest : public testing::Test {
 
   bool IsAnyTypeBlocked() {
     return scheduler_->nudge_tracker_.IsAnyTypeBlocked();
-  }
-
-  static std::unique_ptr<SyncInvalidation> BuildInvalidation(
-      int64_t version,
-      const std::string& payload) {
-    return MockInvalidation::Build(version, payload);
   }
 
   base::TimeDelta GetTypeBlockingTime(DataType type) {
@@ -764,29 +755,6 @@ TEST_F(SyncSchedulerImplTest, NudgeCoalescingWithDifferentTimings) {
   ASSERT_EQ(1U, times.size());
   EXPECT_GE(times[0], min_time);
   EXPECT_LE(times[0], max_time);
-}
-
-// Test nudge scheduling.
-TEST_F(SyncSchedulerImplTest, NudgeWithStates) {
-  StartSyncScheduler(base::Time());
-
-  SyncShareTimes times1;
-  EXPECT_CALL(*syncer(), NormalSyncShare)
-      .WillOnce(DoAll(SimulateNormalSuccess, RecordSyncShare(&times1, true)))
-      .RetiresOnSaturation();
-  scheduler()->SetHasPendingInvalidations(THEMES, true);
-  scheduler()->ScheduleInvalidationNudge(THEMES);
-  RunLoop();
-
-  Mock::VerifyAndClearExpectations(syncer());
-
-  // Make sure a second, later, nudge is unaffected by first (no coalescing).
-  SyncShareTimes times2;
-  EXPECT_CALL(*syncer(), NormalSyncShare)
-      .WillOnce(DoAll(SimulateNormalSuccess, RecordSyncShare(&times2, true)));
-  scheduler()->SetHasPendingInvalidations(HISTORY, true);
-  scheduler()->ScheduleInvalidationNudge(HISTORY);
-  RunLoop();
 }
 
 // Test that polling works as expected.
@@ -1241,10 +1209,6 @@ TEST_F(SyncSchedulerImplTest, TypeThrottlingDoesBlockOtherSources) {
   EXPECT_FALSE(scheduler()->IsGlobalBackoff());
   EXPECT_FALSE(scheduler()->IsGlobalThrottle());
 
-  // Ignore invalidations for throttled types.
-  scheduler()->ScheduleInvalidationNudge(throttled_type);
-  PumpLoop();
-
   // Ignore refresh requests for throttled types.
   scheduler()->ScheduleLocalRefreshRequest({throttled_type});
   PumpLoop();
@@ -1285,10 +1249,6 @@ TEST_F(SyncSchedulerImplTest, TypeBackingOffDoesBlockOtherSources) {
   EXPECT_TRUE(GetBackedOffTypes().Has(backed_off_type));
   EXPECT_FALSE(scheduler()->IsGlobalBackoff());
   EXPECT_FALSE(scheduler()->IsGlobalThrottle());
-
-  // Ignore invalidations for backed off types.
-  scheduler()->ScheduleInvalidationNudge(backed_off_type);
-  PumpLoop();
 
   // Ignore refresh requests for backed off types.
   scheduler()->ScheduleLocalRefreshRequest({backed_off_type});

@@ -11,14 +11,12 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <vector>
 
 #include "base/memory/raw_ptr.h"
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
 #include "base/synchronization/waitable_event.h"
-#include "base/time/time.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/passphrase_enums.h"
 #include "components/sync/engine/cancelation_signal.h"
@@ -36,7 +34,6 @@ class DataTypeContext;
 class DataTypeProgressMarker;
 class DataTypeState;
 class GarbageCollectionDirective;
-class GetUpdateTriggers;
 class SyncEntity;
 }  // namespace sync_pb
 
@@ -67,22 +64,6 @@ enum class PasswordNotesStateForUMA {
   kMaxValue = kSetOnlyInBackupButCorrupted,
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/sync/enums.xml:SyncPasswordNotesStateInUpdate)
-
-// These values are persisted to logs. Entries should not be renumbered and
-// numeric values should never be reused.
-// LINT.IfChange(PendingInvalidationStatus)
-enum class PendingInvalidationStatus {
-  kAcknowledged = 0,
-  kLost = 1,
-  kInvalidationsOverflow = 2,
-  // kSameVersion = 3,
-  // Invalidation list already has another invalidation with the same version.
-  kSameKnownVersion = 4,
-  kSameUnknownVersion = 5,
-  kDataTypeNotConnected = 6,
-  kMaxValue = kDataTypeNotConnected,
-};
-// LINT.ThenChange(/tools/metrics/histograms/metadata/sync/enums.xml:PendingInvalidationStatus)
 
 // A smart cache for sync types to communicate with the sync sequence.
 //
@@ -149,8 +130,6 @@ class DataTypeWorker : public UpdateHandler,
       const sync_pb::SyncEntity& update_entity,
       UpdateResponseData* response_data);
 
-  static void LogPendingInvalidationStatus(PendingInvalidationStatus status);
-
   // Initializes the two relevant communication channels: DataTypeWorker ->
   // DataTypeProcessor (GetUpdates) and DataTypeProcessor -> DataTypeWorker
   // (Commit). Both channels are closed when the worker is destroyed. This is
@@ -189,11 +168,6 @@ class DataTypeWorker : public UpdateHandler,
       const SyncEntityList& applicable_updates,
       StatusController* status) override;
   void ApplyUpdates(StatusController* status, bool cycle_done) override;
-  void RecordRemoteInvalidation(
-      std::unique_ptr<SyncInvalidation> incoming) override;
-  void RecordDownloadFailure(NudgedUpdateResult failure_result) const override;
-  void CollectPendingInvalidations(sync_pb::GetUpdateTriggers* msg) override;
-  bool HasPendingInvalidations() const override;
 
   // CommitQueue implementation.
   void NudgeForCommit() override;
@@ -214,33 +188,11 @@ class DataTypeWorker : public UpdateHandler,
 
   bool IsEncryptionEnabledForTest() const { return encryption_enabled_; }
 
-  static constexpr size_t kMaxPendingInvalidations = 10u;
-
  private:
   struct UnknownEncryptionKeyInfo {
     // Not increased if the cryptographer knows it's in a pending state
     // (cf. Cryptographer::CanEncrypt()).
     int get_updates_while_should_have_been_known = 0;
-  };
-
-  struct PendingInvalidation {
-    PendingInvalidation(const PendingInvalidation&) = delete;
-    PendingInvalidation& operator=(const PendingInvalidation&) = delete;
-    PendingInvalidation(PendingInvalidation&&);
-    PendingInvalidation& operator=(PendingInvalidation&&);
-    PendingInvalidation(std::unique_ptr<SyncInvalidation> invalidation,
-                        bool is_processed,
-                        std::optional<base::TimeTicks> received_time);
-    ~PendingInvalidation();
-
-    std::unique_ptr<SyncInvalidation> pending_invalidation;
-    // `is_processed` is true, if the invalidation included to GetUpdates
-    // trigger message.
-    bool is_processed = false;
-
-    // The time when the invalidation was received. Available only during the
-    // browser session, not persisted.
-    std::optional<base::TimeTicks> received_time;
   };
 
   // Sends `pending_updates_` and `data_type_state_` to the processor if there
@@ -310,13 +262,6 @@ class DataTypeWorker : public UpdateHandler,
   // the definition of an unknown key.
   void RemoveKeysNoLongerUnknown();
 
-  // Sends copy of `pending_invalidations_` vector to `data_type_processor_`
-  // to store them in storage along `data_type_state_`.
-  void SendPendingInvalidationsToProcessor();
-
-  // Copies `pending_invalidations_` vector to `data_type_state_`.
-  void UpdateDataTypeStateInvalidations();
-
   // Encrypts the specifics and hides the title if necessary.
   void EncryptPasswordSpecificsData(CommitRequestDataList* request_data_list);
 
@@ -332,14 +277,6 @@ class DataTypeWorker : public UpdateHandler,
   // Encrypts `page_context` field for `SEND_TAB_TO_SELF` specifics.
   void EncryptSendTabToSelfPageContext(
       CommitRequestDataList* request_data_list);
-
-  // The (up to kMaxPayloads) most recent invalidations received since the last
-  // successful sync cycle.
-  std::vector<PendingInvalidation> pending_invalidations_;
-
-  // Whether any invalidations were dropped due to overflow since the last
-  // GetUpdates cycle.
-  bool has_dropped_invalidation_ = false;
 
   // Returns whether `pending_updates_` contain any non-deletion update.
   bool HasNonDeletionUpdates() const;

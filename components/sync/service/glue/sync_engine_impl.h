@@ -195,15 +195,6 @@ class SyncEngineImpl : public SyncEngine {
   // this class.
   raw_ptr<network_time::NetworkTimeTracker> network_time_tracker_ = nullptr;
 
-  // Time when current object has been created. Used for metrics only.
-  const base::TimeTicks engine_created_time_for_metrics_;
-
-  // Whether the histogram for enabled invalidations has been already recorded.
-  // This is used to record only the first "invalidatons enabled" event,
-  // otherwise the metrics would be skewed by invalidations disabling and
-  // re-enabling.
-  bool invalidations_enabled_reported_ = false;
-
   // Checks that we're on the same sequence this was constructed on (UI
   // sequence).
   SEQUENCE_CHECKER(sequence_checker_);

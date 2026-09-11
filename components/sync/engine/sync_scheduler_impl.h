@@ -56,11 +56,7 @@ class SyncSchedulerImpl : public SyncScheduler {
   void Stop() override;
   void ScheduleLocalNudge(DataType type) override;
   void ScheduleLocalRefreshRequest(DataTypeSet types) override;
-  void ScheduleInvalidationNudge(DataType type) override;
   void ScheduleInitialSyncNudge(DataType data_type) override;
-  void SetNotificationsEnabled(bool notifications_enabled) override;
-  void SetHasPendingInvalidations(DataType type,
-                                  bool has_invalidations) override;
 
   void OnCredentialsUpdated() override;
   void OnConnectionStatusChange(

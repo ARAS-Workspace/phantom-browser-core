@@ -5,17 +5,14 @@
 #ifndef COMPONENTS_SYNC_ENGINE_UPDATE_HANDLER_H_
 #define COMPONENTS_SYNC_ENGINE_UPDATE_HANDLER_H_
 
-#include <memory>
 #include <vector>
 
-#include "components/sync/base/sync_invalidation.h"
 #include "components/sync/engine/syncer_error.h"
 
 namespace sync_pb {
 class DataTypeContext;
 class DataTypeProgressMarker;
 class SyncEntity;
-class GetUpdateTriggers;
 }  // namespace sync_pb
 
 using SyncEntityList = std::vector<const sync_pb::SyncEntity*>;
@@ -28,44 +25,6 @@ class StatusController;
 // from the sync server.
 class UpdateHandler {
  public:
-  // Result of a GetUpdates request for a data type that was nudged (contained
-  // at least one invalidation hint for the data type). These values are
-  // persisted to logs. Entries should not be renumbered and numeric values
-  // should never be reused.
-  // LINT.IfChange(NudgedUpdateResult)
-  enum class NudgedUpdateResult {
-    // The data type successfully downloaded at least one entity.
-    kSuccess = 0,
-
-    // No entities were downloaded when data type was invalidated.
-    kEmptyResponse = 1,
-
-    // The data type failed to download updates during a sync cycle while a
-    // GetUpdates request succeeded.
-    kDownloadPartialFailure = 2,
-
-    // Deprecated: was split into kDownloadRequestServerError and
-    // kDownloadRequestClientError.
-    // kDownloadRequestServerErrorDeprecated = 3,
-
-    // The whole GetUpdates request failed due to a network error.
-    kDownloadRequestNetworkError = 4,
-
-    // The whole GetUpdates request failed due to a server HTTP error (excluding
-    // HTTP
-    // 4xx).
-    kDownloadRequestServerHttpError = 5,
-
-    // The whole GetUpdates request failed due to a client HTTP error (4xx).
-    kDownloadRequestClientHttpError = 6,
-
-    // There was a protocol (violation) error during the GetUpdates request.
-    kDownloadRequestProtocolError = 7,
-
-    kMaxValue = kDownloadRequestProtocolError,
-  };
-  // LINT.ThenChange(/tools/metrics/histograms/metadata/sync/enums.xml:NudgedUpdateResult)
-
   virtual ~UpdateHandler() = default;
 
   // Returns true if initial sync was performed for this type.
@@ -77,19 +36,6 @@ class UpdateHandler {
 
   // Returns the per-client datatype context.
   virtual const sync_pb::DataTypeContext& GetDataTypeContext() const = 0;
-
-  // Records an incoming invalidation for this type.
-  virtual void RecordRemoteInvalidation(
-      std::unique_ptr<SyncInvalidation> incoming) = 0;
-
-  // Records a failure during a GetUpdates request.
-  virtual void RecordDownloadFailure(
-      NudgedUpdateResult failure_result) const = 0;
-
-  // Fill invalidation related fields in GetUpdates request.
-  virtual void CollectPendingInvalidations(sync_pb::GetUpdateTriggers* msg) = 0;
-  // Returns true if `pending_invalidations_` vector is not empty.
-  virtual bool HasPendingInvalidations() const = 0;
 
   // Processes the contents of a GetUpdates response message.
   //

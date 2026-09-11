@@ -7,14 +7,12 @@
 
 #include <memory>
 #include <optional>
-#include <vector>
 
 #include "base/functional/callback_forward.h"
 #include "components/sync/engine/commit_and_get_updates_types.h"
 
 namespace sync_pb {
 class DataTypeState;
-class DataTypeState_Invalidation;
 class GarbageCollectionDirective;
 }  // namespace sync_pb
 
@@ -64,12 +62,6 @@ class DataTypeProcessor {
       const sync_pb::DataTypeState& type_state,
       UpdateResponseDataList updates,
       std::optional<sync_pb::GarbageCollectionDirective> gc_directive) = 0;
-
-  // Informs this object that it should handle new invalidations to store,
-  // replacing any previously-stored invalidations.
-  virtual void StorePendingInvalidations(
-      std::vector<sync_pb::DataTypeState_Invalidation>
-          invalidations_to_store) = 0;
 };
 
 }  // namespace syncer

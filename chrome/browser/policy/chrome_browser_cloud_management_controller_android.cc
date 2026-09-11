@@ -214,11 +214,6 @@ ChromeBrowserCloudManagementControllerAndroid::
   return nullptr;
 }
 
-void ChromeBrowserCloudManagementControllerAndroid::SetGaiaURLLoaderFactory(
-    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
-  // Policy invalidations aren't currently supported on Android.
-}
-
 bool ChromeBrowserCloudManagementControllerAndroid::
     ReadyToCreatePolicyManager() {
   // On Android, policy manager creation can happen if either:

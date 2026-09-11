@@ -82,7 +82,6 @@ class DataTypeRegistry : public DataTypeConnector,
   // Returns the update handler for `type`. If UpdateHandler of `type` doesn't
   // exist, returns nullptr.
   const UpdateHandler* GetUpdateHandler(DataType type) const;
-  UpdateHandler* GetMutableUpdateHandler(DataType type);
 
   // Simple getters.
   UpdateHandlerMap* update_handler_map();

@@ -738,7 +738,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
       fake_server_->GetSyncEntitiesByDataType(syncer::DEVICE_INFO);
   ASSERT_TRUE(SetupClients());
   ASSERT_TRUE(GetClient(0)->AwaitSyncTransportActive());
-  ASSERT_TRUE(GetClient(0)->AwaitInvalidationsStatus(/*expected_status=*/true));
 
   // Ensure any pending local changes are committed.
   CommittedAllNudgedChangesChecker(GetSyncService(0)).Wait();

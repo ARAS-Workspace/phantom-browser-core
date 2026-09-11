@@ -83,8 +83,6 @@ class MockSyncEngineHost : public SyncEngineHost {
               (const SyncProtocolError& error),
               (override));
   MOCK_METHOD(void, OnBackedOffTypesChanged, (), (override));
-  MOCK_METHOD(void, OnInvalidationStatusChanged, (), (override));
-  MOCK_METHOD(void, OnNewInvalidatedDataTypes, (), (override));
   MOCK_METHOD(void,
               FetchAccessToken,
               (base::OnceCallback<void(signin::AccessTokenInfo)>),
@@ -580,7 +578,6 @@ TEST_F(SyncEngineImplTest, ShouldReturnWhetherNextPollTimePassed) {
       /*bag_of_chips=*/std::string(), ModelNeutralState(), ProgressMarkerMap(),
       /*is_silenced=*/false,
       /*num_server_conflicts=*/0,
-      /*notifications_enabled=*/true,
       /*sync_start_time=*/base::Time::Now(),
       /*poll_finish_time=*/base::Time::Now(),
       /*get_updates_origin=*/sync_pb::SyncEnums::PERIODIC,

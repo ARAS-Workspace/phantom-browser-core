@@ -45,9 +45,6 @@ class NigoriDataTypeProcessor : public DataTypeProcessor,
       const sync_pb::DataTypeState& type_state,
       UpdateResponseDataList updates,
       std::optional<sync_pb::GarbageCollectionDirective> gc_directive) override;
-  void StorePendingInvalidations(
-      std::vector<sync_pb::DataTypeState_Invalidation> invalidations_to_store)
-      override;
 
   // DataTypeControllerDelegate implementation.
   void OnSyncStarting(const DataTypeActivationRequest& request,

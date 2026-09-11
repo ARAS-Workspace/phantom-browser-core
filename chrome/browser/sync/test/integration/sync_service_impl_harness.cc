@@ -467,10 +467,6 @@ bool SyncServiceImplHarness::AwaitSyncTransportPaused() {
   return true;
 }
 
-bool SyncServiceImplHarness::AwaitInvalidationsStatus(bool expected_status) {
-  return InvalidationsStatusChecker(service(), expected_status).Wait();
-}
-
 bool SyncServiceImplHarness::EnableHistorySyncNoWaitForCompletion() {
   DVLOG(1) << GetClientInfoString("EnableHistorySync");
   if (service() == nullptr) {
@@ -646,8 +642,6 @@ std::string SyncServiceImplHarness::GetClientInfoString(
   os << profile_debug_name_ << ": " << message << ": ";
   if (service()) {
     const SyncCycleSnapshot& snap = GetLastCycleSnapshot();
-    syncer::SyncStatus status;
-    service()->QueryDetailedSyncStatusForDebugging(&status);
     // Capture select info from the sync session snapshot and syncer status.
     os << ", has_unsynced_items: " << snap.has_remaining_local_changes()
        << ", did_commit: "
@@ -659,7 +653,6 @@ std::string SyncServiceImplHarness::GetClientInfoString(
        << snap.model_neutral_state().num_updates_downloaded_total
        << ", passphrase_required: "
        << service()->GetUserSettings()->IsPassphraseRequired()
-       << ", notifications_enabled: " << status.notifications_enabled
        << ", service_is_active: " << service()->IsSyncFeatureActive();
   } else {
     os << "Sync service not available";
