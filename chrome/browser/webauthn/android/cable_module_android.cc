@@ -17,7 +17,6 @@
 #include "base/task/task_traits.h"
 #include "base/task/thread_pool.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/gcm/instance_id/instance_id_profile_service_factory.h"
 #include "chrome/browser/net/system_network_context_manager.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/sync/device_info_sync_service_factory.h"
@@ -25,7 +24,6 @@
 #include "components/cbor/reader.h"
 #include "components/cbor/values.h"
 #include "components/cbor/writer.h"
-#include "components/gcm_driver/instance_id/instance_id_profile_service.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync_device_info/device_info.h"
@@ -33,7 +31,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "device/fido/cable/v2_constants.h"
 #include "device/fido/cable/v2_handshake.h"
-#include "device/fido/cable/v2_registration.h"
 #include "device/fido/cbor_extract.h"
 #include "device/fido/public/features.h"
 

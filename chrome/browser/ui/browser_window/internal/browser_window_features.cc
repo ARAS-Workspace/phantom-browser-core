@@ -143,7 +143,6 @@
 #include "chrome/browser/ui/views/profiles/profile_menu_coordinator.h"
 #include "chrome/browser/ui/views/qrcode_generator/qrcode_window_controller.h"
 #include "chrome/browser/ui/views/send_tab_to_self/send_tab_to_self_toolbar_bubble_controller.h"
-#include "chrome/browser/ui/views/sharing/sharing_window_controller.h"
 #include "chrome/browser/ui/views/side_panel/bookmarks/bookmarks_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/comments/comments_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/extensions/extension_side_panel_manager.h"
@@ -1005,10 +1004,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
             .CreateInstance<sharing_hub::SharingHubWindowController>(*browser,
                                                                      browser);
 
-    sharing_window_controller_ =
-        GetUserDataFactory().CreateInstance<SharingWindowController>(*browser,
-                                                                     browser);
-
     if (browser_view) {
       split_tab_highlight_controller_ =
           std::make_unique<split_tabs::SplitTabHighlightController>(
@@ -1063,7 +1058,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   vertical_tab_iph_controller_.reset();
   split_view_iph_controller_.reset();
   split_tab_highlight_controller_.reset();
-  sharing_window_controller_.reset();
   sharing_hub_window_controller_.reset();
   recent_activity_bubble_coordinator_.reset();
   if (shared_tab_group_feedback_controller_) {

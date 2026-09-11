@@ -31,7 +31,6 @@
 #endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/sharing/sharing_notification_handler.h"
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -84,8 +83,6 @@ NotificationDisplayServiceImpl::NotificationDisplayServiceImpl(Profile* profile)
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
-    AddNotificationHandler(NotificationHandler::Type::SHARING,
-                           std::make_unique<SharingNotificationHandler>());
     AddNotificationHandler(NotificationHandler::Type::ANNOUNCEMENT,
                            std::make_unique<AnnouncementNotificationHandler>());
 

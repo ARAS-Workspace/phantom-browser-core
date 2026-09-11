@@ -41,7 +41,6 @@ class ChromeSyncClient : public syncer::SyncClient {
       PrefService* pref_service,
       signin::IdentityManager* identity_manager,
       trusted_vault::TrustedVaultService* trusted_vault_service,
-      syncer::SyncInvalidationsService* sync_invalidations_service,
       syncer::DeviceInfoSyncService* device_info_sync_service,
       syncer::DataTypeStoreService* data_type_store_service,
       supervised_user::FamilyLinkSettingsService* family_link_settings_service,
@@ -58,7 +57,6 @@ class ChromeSyncClient : public syncer::SyncClient {
   network_time::NetworkTimeTracker* GetNetworkTimeTracker() override;
   base::FilePath GetLocalSyncBackendFolder() override;
   trusted_vault::TrustedVaultClient* GetTrustedVaultClient() override;
-  syncer::SyncInvalidationsService* GetSyncInvalidationsService() override;
   scoped_refptr<syncer::ExtensionsActivity> GetExtensionsActivity() override;
   syncer::SyncEngineFactory* GetSyncEngineFactory() override;
   bool IsCustomPassphraseAllowed() override;
@@ -72,7 +70,6 @@ class ChromeSyncClient : public syncer::SyncClient {
   const raw_ptr<PrefService> pref_service_;
   const raw_ptr<signin::IdentityManager> identity_manager_;
   const raw_ptr<trusted_vault::TrustedVaultService> trusted_vault_service_;
-  const raw_ptr<syncer::SyncInvalidationsService> sync_invalidations_service_;
   const raw_ptr<supervised_user::FamilyLinkSettingsService>
       family_link_settings_service_;
   const std::unique_ptr<ExtensionsActivityMonitor> extensions_activity_monitor_;

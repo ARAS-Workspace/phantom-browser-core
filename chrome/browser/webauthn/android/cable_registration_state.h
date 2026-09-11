@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "base/functional/callback_forward.h"
-#include "device/fido/cable/v2_registration.h"
 #include "third_party/boringssl/src/include/openssl/base.h"
 
 namespace webauthn::authenticator {

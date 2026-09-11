@@ -32,10 +32,6 @@ class SyncClientMock : public SyncClient {
               (),
               (override));
   MOCK_METHOD(base::FilePath, GetLocalSyncBackendFolder, (), (override));
-  MOCK_METHOD(syncer::SyncInvalidationsService*,
-              GetSyncInvalidationsService,
-              (),
-              (override));
   MOCK_METHOD(trusted_vault::TrustedVaultClient*,
               GetTrustedVaultClient,
               (),

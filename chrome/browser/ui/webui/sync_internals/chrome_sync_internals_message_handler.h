@@ -15,7 +15,6 @@ class IdentityManager;
 }  // namespace signin
 
 namespace syncer {
-class SyncInvalidationsService;
 class SyncService;
 class UserEventService;
 }  // namespace syncer
@@ -28,7 +27,6 @@ class ChromeSyncInternalsMessageHandler
   ChromeSyncInternalsMessageHandler(
       signin::IdentityManager* identity_manager,
       syncer::SyncService* sync_service,
-      syncer::SyncInvalidationsService* sync_invalidations_service,
       syncer::UserEventService* user_event_service,
       const std::string& channel);
 

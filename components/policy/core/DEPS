@@ -3,7 +3,6 @@ include_rules = [
   "+components/json_schema",
   "+components/prefs",
   "+components/version_info",
-  "+components/invalidation",
   "+content/public/browser/browser_task_traits.h",
   "+content/public/browser/browser_thread.h",
   "+content/public/test/browser_task_environment.h",

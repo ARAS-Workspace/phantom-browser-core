@@ -289,17 +289,12 @@ component("fido") {
 
 if (use_blink) {
   static_library("cablev2_registration") {
-    sources = [
-      "cable/v2_registration.cc",
-      "cable/v2_registration.h",
-    ]
+    sources = []
     deps = [
       ":fido",
       "//base",
       "//components/cbor",
       "//components/device_event_log",
-      "//components/gcm_driver",
-      "//components/gcm_driver/instance_id",
       "//third_party/boringssl",
     ]
     configs += [ "//build/config/compiler:wexit_time_destructors" ]

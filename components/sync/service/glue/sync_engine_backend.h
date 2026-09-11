@@ -55,26 +55,6 @@ class SyncEngineBackend : public base::RefCountedThreadSafe<SyncEngineBackend>,
     base::TimeDelta poll_interval;
   };
 
-  // Used to record result of handling of incoming sync invalidations. These
-  // values are persisted to logs. Entries should not be renumbered and numeric
-  // values should never be reused.
-  // LINT.IfChange(SyncIncomingInvalidationStatus)
-  enum class IncomingInvalidationStatus {
-    // The payload parsed successfully and contains at least one valid data
-    // type.
-    kSuccess = 0,
-
-    // Failed to parse incoming payload, relevant only for sync standalone
-    // invalidations.
-    kPayloadParseFailed = 1,
-
-    // All data types in the payload are unknown.
-    kUnknownDataType = 2,
-
-    kMaxValue = kUnknownDataType,
-  };
-  // LINT.ThenChange(/tools/metrics/histograms/metadata/sync/enums.xml:SyncIncomingInvalidationStatus)
-
   SyncEngineBackend(const std::string& name,
                     const base::FilePath& sync_data_folder,
                     const base::WeakPtr<SyncEngineImpl>& host);
@@ -97,9 +77,6 @@ class SyncEngineBackend : public base::RefCountedThreadSafe<SyncEngineBackend>,
   // The Do* methods are the various entry points from our SyncEngineImpl.
   // They are all called on the sync thread to actually perform synchronous (and
   // potentially blocking) operations.
-
-  // Forwards an invalidation state change to the sync manager.
-  void DoOnInvalidatorStateChange(bool enabled);
 
   // Called to perform initialization of the syncapi on behalf of
   // SyncEngine::Initialize.
@@ -163,16 +140,6 @@ class SyncEngineBackend : public base::RefCountedThreadSafe<SyncEngineBackend>,
   // Notify the syncer that the cookie jar has changed.
   void DoOnCookieJarChanged(bool account_mismatch, base::OnceClosure callback);
 
-  // Forwards an invalidation to the sync manager for all data types extracted
-  // from the `payload`. This method is called for sync standalone
-  // invalidations.
-  void DoOnStandaloneInvalidationReceived(
-      const std::string& payload,
-      const DataTypeSet& interested_data_types,
-      base::Time arrival_time,
-      std::optional<base::Time> network_time,
-      std::optional<base::TimeDelta> network_time_uncertainty);
-
   // Functions to deal with NIGORI, resembling DataTypeController APIs.
   void DoClearNigoriDataForMigration();
   void GetNigoriNodeForDebugging(AllNodesCallback callback);
@@ -197,13 +164,6 @@ class SyncEngineBackend : public base::RefCountedThreadSafe<SyncEngineBackend>,
   ~SyncEngineBackend() override;
 
   void LoadAndConnectNigoriController();
-
-  IncomingInvalidationStatus DoOnStandaloneInvalidationReceivedImpl(
-      const std::string& payload,
-      const DataTypeSet& interested_data_types,
-      base::Time arrival_time,
-      std::optional<base::Time> network_time,
-      std::optional<base::TimeDelta> network_time_uncertainty);
 
   // Name used for debugging.
   const std::string name_;

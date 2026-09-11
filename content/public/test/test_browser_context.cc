@@ -121,10 +121,6 @@ TestBrowserContext::GetPlatformNotificationService() {
   return platform_notification_service_.get();
 }
 
-PushMessagingService* TestBrowserContext::GetPushMessagingService() {
-  return nullptr;
-}
-
 StorageNotificationService*
 TestBrowserContext::GetStorageNotificationService() {
   return nullptr;

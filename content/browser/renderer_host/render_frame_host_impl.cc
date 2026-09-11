@@ -131,7 +131,6 @@
 #include "content/browser/preloading/prerender/prerender_metrics.h"
 #include "content/browser/presentation/presentation_service_impl.h"
 #include "content/browser/process_lock.h"
-#include "content/browser/push_messaging/push_messaging_manager.h"
 #include "content/browser/renderer_host/agent_scheduling_group_host.h"
 #include "content/browser/renderer_host/clipboard_host_impl.h"
 #include "content/browser/renderer_host/code_cache_host_impl.h"
@@ -15470,18 +15469,6 @@ void RenderFrameHostImpl::GetWebAuthenticationService(
 #else
   GetJavaInterfaces()->GetInterface(std::move(receiver));
 #endif  // !BUILDFLAG(IS_ANDROID)
-}
-
-void RenderFrameHostImpl::GetPushMessaging(
-    mojo::PendingReceiver<blink::mojom::PushMessaging> receiver) {
-  if (!push_messaging_manager_) {
-    auto* rph = GetProcess();
-    push_messaging_manager_ = std::make_unique<PushMessagingManager>(
-        *rph, routing_id_,
-        base::WrapRefCounted(GetStoragePartition()->GetServiceWorkerContext()));
-  }
-
-  push_messaging_manager_->AddPushMessagingReceiver(std::move(receiver));
 }
 
 bool IsInitialSynchronousAboutBlankCommit(const GURL& url,

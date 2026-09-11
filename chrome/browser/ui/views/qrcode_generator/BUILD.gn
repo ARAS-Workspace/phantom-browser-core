@@ -38,7 +38,6 @@ source_set("qrcode_generator") {
     "//chrome/browser/ui/views:layout_provider",
     "//chrome/browser/ui/views/frame:toolbar_button_provider",
     "//chrome/browser/ui/views/sharing_hub",
-    "//components/sharing_message",
     "//components/url_formatter",
     "//ui/base/clipboard",
     "//ui/gfx",

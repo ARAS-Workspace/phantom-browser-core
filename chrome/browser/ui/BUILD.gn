@@ -243,7 +243,6 @@ source_set("browser_ui_prefs") {
     "//components/policy/core/common",
     "//components/pref_registry",
     "//components/prefs",
-    "//components/sharing_message",
     "//components/translate/core/browser:translate_pref_names",
   ]
   if (is_win && is_chrome_branded) {
@@ -619,7 +618,6 @@ static_library("ui") {
     "//chrome/browser/finds/core",
     "//chrome/browser/first_run",
     "//chrome/browser/first_run:impl",
-    "//chrome/browser/gcm",
     "//chrome/browser/geic",
     "//chrome/browser/glic",
     "//chrome/browser/glic:impl",
@@ -778,7 +776,6 @@ static_library("ui") {
     "//components/facilitated_payments/core/features",
     "//components/feature_engagement",
     "//components/find_in_page",
-    "//components/gcm_driver",
     "//components/history/content/browser",
     "//components/history_clusters/core",
     "//components/input",
@@ -2667,8 +2664,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/select_audio_output",
       "//chrome/browser/ui/views/select_audio_output:impl",
       "//chrome/browser/ui/views/send_tab_to_self",
-      "//chrome/browser/ui/views/sharing",
-      "//chrome/browser/ui/views/sharing:impl",
       "//chrome/browser/ui/views/sharing_hub",
       "//chrome/browser/ui/views/sharing_hub:impl",
       "//chrome/browser/ui/views/storage",
@@ -2817,7 +2812,6 @@ static_library("ui") {
       # (sharing_dialog_view.cc includes it under an IS_CHROMEOS guard, but the
       # entry is unconditional because gn check flags the guarded include on
       # platforms where it is not compiled)
-      "//chrome/browser/ui/views/sharing:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when the
       # following headers get componentized:

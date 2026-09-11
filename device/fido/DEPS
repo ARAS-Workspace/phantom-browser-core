@@ -1,7 +1,6 @@
 include_rules = [
   "+components/apdu",
   "+components/cbor",
-  "+components/gcm_driver",
   "+components/sync/protocol",
   "+components/trusted_vault",
   "+crypto",

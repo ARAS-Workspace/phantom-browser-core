@@ -20,7 +20,6 @@
 #include "content/browser/media/media_internals.h"
 #include "content/browser/memory_coordinator/browser_memory_coordinator.h"
 #include "content/browser/mime_registry_impl.h"
-#include "content/browser/push_messaging/push_messaging_manager.h"
 #include "content/browser/renderer_host/embedded_frame_sink_provider_impl.h"
 #include "content/browser/renderer_host/media/media_stream_track_metrics_host.h"
 #include "content/browser/renderer_host/render_message_filter.h"

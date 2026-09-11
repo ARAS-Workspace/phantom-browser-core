@@ -111,7 +111,6 @@
 #include "components/component_updater/timer_update_scheduler.h"
 #include "components/crash/core/common/crash_key.h"
 #include "components/embedder_support/origin_trials/origin_trials_settings_storage.h"
-#include "components/gcm_driver/gcm_driver.h"
 #include "components/javascript_dialogs/app_modal_dialog_queue.h"
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/language/core/browser/pref_names.h"
@@ -185,7 +184,6 @@ void OnLocalStatePrefsLoaded();
 #else
 #include "chrome/browser/devtools/devtools_auto_opener.h"
 #include "chrome/browser/error_reporting/chrome_js_error_report_processor.h"
-#include "chrome/browser/gcm/gcm_product_util.h"
 #include "chrome/browser/hid/hid_system_tray_icon.h"
 #include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
@@ -193,8 +191,6 @@ void OnLocalStatePrefsLoaded();
 #include "chrome/browser/usb/usb_system_tray_icon.h"
 #include "chrome/browser/web_applications/isolated_web_apps/runtime_init.h"
 #include "chrome/browser/webapps/webapps_client_desktop.h"
-#include "components/gcm_driver/gcm_client_factory.h"
-#include "components/gcm_driver/gcm_desktop_utils.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
@@ -591,15 +587,8 @@ void BrowserProcessImpl::StartTearDown() {
 #endif  // BUILDFLAG(ENABLE_CHROME_NOTIFICATIONS)
 
   // The policy providers managed by |browser_policy_connector_| need to shut
-  // down while the IO and FILE threads are still alive. The monitoring
-  // framework owned by |browser_policy_connector_| relies on |gcm_driver_|, so
-  // this must be shutdown before |gcm_driver_| below.
+  // down while the IO and FILE threads are still alive.
   browser_policy_connector_->Shutdown();
-
-  // The |gcm_driver_| must shut down while the IO thread is still alive.
-  if (gcm_driver_) {
-    gcm_driver_->Shutdown();
-  }
 
   platform_part()->StartTearDown();
 
@@ -731,24 +720,6 @@ void RundownTaskCounter::TimedWait(base::TimeDelta timeout) {
   // as such this return value is ignored.
   waitable_event_.TimedWait(timeout);
 }
-
-#if !BUILDFLAG(IS_ANDROID)
-void RequestProxyResolvingSocketFactoryOnUIThread(
-    mojo::PendingReceiver<network::mojom::ProxyResolvingSocketFactory>
-        receiver) {
-  network::mojom::NetworkContext* network_context =
-      g_browser_process->system_network_context_manager()->GetContext();
-  network_context->CreateProxyResolvingSocketFactory(std::move(receiver));
-}
-
-void RequestProxyResolvingSocketFactory(
-    mojo::PendingReceiver<network::mojom::ProxyResolvingSocketFactory>
-        receiver) {
-  content::GetUIThreadTaskRunner({})->PostTask(
-      FROM_HERE, base::BindOnce(&RequestProxyResolvingSocketFactoryOnUIThread,
-                                std::move(receiver)));
-}
-#endif
 
 }  // namespace
 
@@ -1077,16 +1048,6 @@ WebRtcLogUploader* BrowserProcessImpl::webrtc_log_uploader() {
 network_time::NetworkTimeTracker* BrowserProcessImpl::network_time_tracker() {
   return network_time_tracker_.get();
 }
-
-#if !BUILDFLAG(IS_ANDROID)
-gcm::GCMDriver* BrowserProcessImpl::gcm_driver() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (!gcm_driver_) {
-    CreateGCMDriver();
-  }
-  return gcm_driver_.get();
-}
-#endif
 
 resource_coordinator::TabManager* BrowserProcessImpl::GetTabManager() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -1594,32 +1555,6 @@ void BrowserProcessImpl::CreateSubresourceFilterRulesetService() {
           user_data_dir,
           subresource_filter::SafeBrowsingRulesetPublisher::Factory());
 }
-
-#if !BUILDFLAG(IS_ANDROID)
-// Android's GCMDriver currently makes the assumption that it's a singleton.
-// Until this gets fixed, instantiating multiple Java GCMDrivers will throw an
-// exception, but because they're only initialized on demand these crashes
-// would be very difficult to triage. See http://crbug.com/41145548.
-void BrowserProcessImpl::CreateGCMDriver() {
-  DCHECK(!gcm_driver_);
-
-  base::FilePath store_path;
-  CHECK(base::PathService::Get(chrome::DIR_GLOBAL_GCM_STORE, &store_path));
-  scoped_refptr<base::SequencedTaskRunner> blocking_task_runner(
-      base::ThreadPool::CreateSequencedTaskRunner(
-          {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
-           base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN}));
-
-  gcm_driver_ = gcm::CreateGCMDriverDesktop(
-      base::WrapUnique(new gcm::GCMClientFactory), local_state(), store_path,
-      base::BindRepeating(&RequestProxyResolvingSocketFactory),
-      system_network_context_manager()->GetSharedURLLoaderFactory(),
-      content::GetNetworkConnectionTracker(), chrome::GetChannel(),
-      gcm::GetProductCategoryForSubtypes(local_state()),
-      content::GetUIThreadTaskRunner({}), content::GetIOThreadTaskRunner({}),
-      blocking_task_runner, os_crypt_async());
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void BrowserProcessImpl::InitializeNetworkTimeTracker() {
   CHECK(!network_time_tracker_->is_initialized());

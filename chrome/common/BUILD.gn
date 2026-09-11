@@ -210,7 +210,6 @@ static_library("common_lib") {
     "//components/embedder_support/origin_trials",
     "//components/error_page/common",
     "//components/favicon_base",
-    "//components/gcm_driver/common",
     "//components/language_detection/content/common",
     "//components/metrics",
     "//components/metrics:net",

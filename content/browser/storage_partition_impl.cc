@@ -86,7 +86,6 @@
 #include "content/browser/notifications/platform_notification_context_impl.h"
 #include "content/browser/payments/payment_app_context_impl.h"
 #include "content/browser/preloading/prerender/prerender_final_status.h"
-#include "content/browser/push_messaging/push_messaging_context.h"
 #include "content/browser/quota/quota_context.h"
 #include "content/browser/renderer_host/frame_tree_node.h"
 #include "content/browser/renderer_host/navigation_request.h"
@@ -1484,9 +1483,6 @@ void StoragePartitionImpl::Initialize(
 
   shared_worker_service_ =
       std::make_unique<SharedWorkerServiceImpl>(this, service_worker_context_);
-
-  push_messaging_context_ = std::make_unique<PushMessagingContext>(
-      browser_context_, service_worker_context_);
 
   host_zoom_level_context_.reset(new HostZoomLevelContext(
       browser_context_->CreateZoomLevelDelegate(partition_path_)));

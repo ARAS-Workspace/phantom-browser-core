@@ -89,12 +89,9 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_metrics.h"
 #include "chrome/browser/profiles/profile_selections.h"
-#include "chrome/browser/push_messaging/push_messaging_service_factory.h"
-#include "chrome/browser/push_messaging/push_messaging_service_impl.h"
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/reduce_accept_language/reduce_accept_language_factory.h"
 #include "chrome/browser/sessions/exit_type_service.h"
-#include "chrome/browser/sharing/sharing_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/ssl/https_first_mode_settings_tracker.h"
@@ -734,8 +731,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
     heavy_ad_service->Initialize(GetPath());
   }
 
-  PushMessagingServiceImpl::InitializeForProfile(this);
-
   site_isolation::SiteIsolationPolicy::ApplyPersistedIsolatedOrigins(this);
 
   content::URLDataSource::Add(this,
@@ -761,8 +756,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
   NotifyProfileInitializationComplete();
 
   RecordPrefValuesAfterProfileInitialization();
-
-  SharingServiceFactory::GetForBrowserContext(this);
 
   HttpsFirstModeServiceFactory::GetForProfile(this);
 
@@ -1226,10 +1219,6 @@ content::PlatformNotificationService*
 ProfileImpl::GetPlatformNotificationService() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   return PlatformNotificationServiceFactory::GetForProfile(this);
-}
-
-content::PushMessagingService* ProfileImpl::GetPushMessagingService() {
-  return PushMessagingServiceFactory::GetForProfile(this);
 }
 
 content::StorageNotificationService*

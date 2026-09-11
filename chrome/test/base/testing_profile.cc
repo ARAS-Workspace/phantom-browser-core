@@ -768,10 +768,6 @@ TestingProfile::GetPlatformNotificationService() {
   return nullptr;
 }
 
-content::PushMessagingService* TestingProfile::GetPushMessagingService() {
-  return nullptr;
-}
-
 content::StorageNotificationService*
 TestingProfile::GetStorageNotificationService() {
   return nullptr;

@@ -346,7 +346,6 @@ class SyncServiceImpl : public SyncService,
 
   bool UseTransportOnlyMode() const;
 
-  void UpdateDataTypesForInvalidations();
 
   // Shuts down and destroys the engine. `reset_reason` specifies the reason for
   // the shutdown, and dictates if sync metadata should be kept or not.

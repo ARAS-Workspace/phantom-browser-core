@@ -69,10 +69,6 @@ namespace extensions {
 class ExtensionsBrowserClient;
 }
 
-namespace gcm {
-class GCMDriver;
-}
-
 namespace os_crypt_async {
 class KeyProvider;
 class OSCryptAsync;
@@ -222,7 +218,6 @@ class BrowserProcessImpl : public BrowserProcess,
   WebRtcLogUploader* webrtc_log_uploader() override;
   network_time::NetworkTimeTracker* network_time_tracker() override;
 #if !BUILDFLAG(IS_ANDROID)
-  gcm::GCMDriver* gcm_driver() override;
 #endif
   resource_coordinator::TabManager* GetTabManager() override;
   resource_coordinator::ResourceCoordinatorParts* resource_coordinator_parts()
@@ -274,7 +269,6 @@ class BrowserProcessImpl : public BrowserProcess,
   void CreateOptimizationGuideService();
   void CreateStatusTray();
   void CreateBackgroundModeManager();
-  void CreateGCMDriver();
   void InitializeNetworkTimeTracker();
 
   void ApplyDefaultBrowserPolicy();
@@ -289,12 +283,8 @@ class BrowserProcessImpl : public BrowserProcess,
 
   const raw_ptr<StartupData> startup_data_;
 
-  // Must be destroyed after |browser_policy_connector_|.
-  std::unique_ptr<gcm::GCMDriver> gcm_driver_;
-
   // Must be destroyed after |local_state_|.
   // Must be destroyed after |profile_manager_|.
-  // Must be destroyed before |gcm_driver_|.
   std::unique_ptr<policy::ChromeBrowserPolicyConnector> const
       browser_policy_connector_;
 

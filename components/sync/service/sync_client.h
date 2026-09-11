@@ -27,7 +27,6 @@ class TrustedVaultClient;
 namespace syncer {
 
 class SyncEngineFactory;
-class SyncInvalidationsService;
 class TrustedVaultAutoUpgradeSyntheticFieldTrialGroup;
 
 // Interface for clients of the Sync API to plumb through necessary dependent
@@ -55,7 +54,6 @@ class SyncClient {
   // It is only used when sync is running against a local backend.
   virtual base::FilePath GetLocalSyncBackendFolder() = 0;
 
-  virtual SyncInvalidationsService* GetSyncInvalidationsService() = 0;
   virtual trusted_vault::TrustedVaultClient* GetTrustedVaultClient() = 0;
   virtual scoped_refptr<ExtensionsActivity> GetExtensionsActivity() = 0;
 

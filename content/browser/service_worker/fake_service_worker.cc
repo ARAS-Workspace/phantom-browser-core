@@ -15,7 +15,6 @@
 #include "third_party/blink/public/mojom/background_fetch/background_fetch.mojom.h"
 #include "third_party/blink/public/mojom/fetch/fetch_api_response.mojom.h"
 #include "third_party/blink/public/mojom/payments/payment_app_events.mojom.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging.mojom.h"
 #include "third_party/blink/public/mojom/service_worker/dispatch_fetch_event_params.mojom.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_fetch_response_callback.mojom.h"
 
@@ -163,26 +162,6 @@ void FakeServiceWorker::DispatchNotificationCloseEvent(
     const std::string& notification_id,
     const blink::PlatformNotificationData& notification_data,
     DispatchNotificationCloseEventCallback callback) {
-  std::move(callback).Run(blink::mojom::ServiceWorkerEventStatus::COMPLETED);
-}
-
-void FakeServiceWorker::DispatchPushEvent(
-    const std::optional<std::string>& payload,
-    DispatchPushEventCallback callback) {
-  std::move(callback).Run(blink::mojom::ServiceWorkerEventStatus::COMPLETED);
-}
-
-void FakeServiceWorker::DispatchPushEventRecordingNetworkRequests(
-    const std::optional<std::string>& payload,
-    DispatchPushEventRecordingNetworkRequestsCallback callback) {
-  std::move(callback).Run(blink::mojom::ServiceWorkerEventStatus::COMPLETED,
-                          std::nullopt);
-}
-
-void FakeServiceWorker::DispatchPushSubscriptionChangeEvent(
-    blink::mojom::PushSubscriptionPtr old_subscription,
-    blink::mojom::PushSubscriptionPtr new_subscription,
-    DispatchPushSubscriptionChangeEventCallback callback) {
   std::move(callback).Run(blink::mojom::ServiceWorkerEventStatus::COMPLETED);
 }
 

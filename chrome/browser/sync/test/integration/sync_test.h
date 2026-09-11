@@ -20,7 +20,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager_observer.h"
 #include "chrome/browser/profiles/profile_observer.h"
-#include "chrome/browser/sync/test/integration/invalidations/fake_server_sync_invalidation_sender.h"
 #include "chrome/browser/sync/test/integration/sync_test_account.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/test/base/platform_browser_test.h"
@@ -37,7 +36,6 @@
 #include "url/gurl.h"
 
 #if BUILDFLAG(IS_ANDROID)
-#include "components/gcm_driver/instance_id/scoped_use_fake_instance_id_android.h"
 #else
 #include "extensions/browser/install_verifier.h"
 #endif

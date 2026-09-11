@@ -766,7 +766,6 @@ TEST(PermissionsTest, PermissionMessages) {
   skip.insert(APIPermissionID::kDownloadsUi);
   skip.insert(APIPermissionID::kFontSettings);
   skip.insert(APIPermissionID::kFullscreen);
-  skip.insert(APIPermissionID::kGcm);
   skip.insert(APIPermissionID::kIdle);
   skip.insert(APIPermissionID::kImeWindowEnabled);
   skip.insert(APIPermissionID::kLoginState);

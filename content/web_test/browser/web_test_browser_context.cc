@@ -12,7 +12,6 @@
 #include "build/build_config.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
-#include "content/public/browser/push_messaging_service.h"
 #include "content/public/test/mock_client_hints_controller_delegate.h"
 #include "content/shell/browser/shell_content_browser_client.h"
 #include "content/test/mock_background_sync_controller.h"
@@ -21,7 +20,6 @@
 #include "content/web_test/browser/web_test_background_fetch_delegate.h"
 #include "content/web_test/browser/web_test_download_manager_delegate.h"
 #include "content/web_test/browser/web_test_permission_manager.h"
-#include "content/web_test/browser/web_test_push_messaging_service.h"
 #include "content/web_test/browser/web_test_storage_access_manager.h"
 #include "services/device/public/cpp/test/scoped_geolocation_overrider.h"
 
@@ -64,12 +62,6 @@ WebTestBrowserContext::GetPlatformNotificationService() {
         std::make_unique<MockPlatformNotificationService>(this);
   }
   return platform_notification_service_.get();
-}
-
-PushMessagingService* WebTestBrowserContext::GetPushMessagingService() {
-  if (!push_messaging_service_)
-    push_messaging_service_ = std::make_unique<WebTestPushMessagingService>();
-  return push_messaging_service_.get();
 }
 
 PermissionControllerDelegate*

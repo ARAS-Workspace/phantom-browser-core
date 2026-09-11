@@ -22,7 +22,6 @@
 #include "chrome/browser/sync/account_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/device_info_sync_service_factory.h"
 #include "chrome/browser/sync/local_or_syncable_bookmark_sync_service_factory.h"
-#include "chrome/browser/sync/sync_invalidations_service_factory.h"
 #include "chrome/browser/sync/test/integration/bookmarks_helper.h"
 #include "chrome/browser/sync/test/integration/committed_all_nudged_changes_checker.h"
 #include "chrome/browser/sync/test/integration/single_client_status_change_checker.h"
@@ -47,8 +46,6 @@
 #include "components/sync/engine/bookmark_update_preprocessing.h"
 #include "components/sync/engine/cycle/entity_change_metric_recording.h"
 #include "components/sync/engine/loopback_server/loopback_server_entity.h"
-#include "components/sync/invalidations/interested_data_types_handler.h"
-#include "components/sync/invalidations/sync_invalidations_service.h"
 #include "components/sync/protocol/bookmark_specifics.pb.h"
 #include "components/sync/protocol/entity_specifics.pb.h"
 #include "components/sync/protocol/sync_entity.pb.h"
@@ -141,35 +138,16 @@ MATCHER(HasUniquePosition, "") {
 
 // Fake device info sync service that does the necessary setup to be used in a
 // SyncTest. It basically disables DEVICE_INFO commits.
-class FakeDeviceInfoSyncServiceWithInvalidations
-    : public syncer::FakeDeviceInfoSyncService,
-      public syncer::InterestedDataTypesHandler {
+class FakeDeviceInfoSyncServiceSkippingCommits
+    : public syncer::FakeDeviceInfoSyncService {
  public:
-  explicit FakeDeviceInfoSyncServiceWithInvalidations(
-      syncer::SyncInvalidationsService* sync_invalidations_service)
-      : syncer::FakeDeviceInfoSyncService(/*skip_engine_connection=*/true),
-        sync_invalidations_service_(sync_invalidations_service) {
-    sync_invalidations_service_->SetInterestedDataTypesHandler(this);
-  }
-  ~FakeDeviceInfoSyncServiceWithInvalidations() override {
-    sync_invalidations_service_->SetInterestedDataTypesHandler(nullptr);
-  }
-
-  // InterestedDataTypesHandler implementation.
-  void OnInterestedDataTypesChanged() override {}
-  void SetCommittedAdditionalInterestedDataTypesCallback(
-      base::RepeatingCallback<void(const syncer::DataTypeSet&)> callback)
-      override {}
-
- private:
-  const raw_ptr<syncer::SyncInvalidationsService> sync_invalidations_service_;
+  FakeDeviceInfoSyncServiceSkippingCommits()
+      : syncer::FakeDeviceInfoSyncService(/*skip_engine_connection=*/true) {}
 };
 
 std::unique_ptr<KeyedService> BuildFakeDeviceInfoSyncService(
     content::BrowserContext* context) {
-  return std::make_unique<FakeDeviceInfoSyncServiceWithInvalidations>(
-      SyncInvalidationsServiceFactory::GetForProfile(
-          Profile::FromBrowserContext(context)));
+  return std::make_unique<FakeDeviceInfoSyncServiceSkippingCommits>();
 }
 
 // Waits until the tasks posted by the error handler have been processed.

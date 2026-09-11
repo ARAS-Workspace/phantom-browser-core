@@ -13,10 +13,6 @@
 #include "components/feedback/feedback_uploader.h"
 #include "components/signin/public/identity_manager/access_token_info.h"
 
-#if BUILDFLAG(PLATFORM_CFM)
-#include "chrome/browser/device_identity/device_identity_provider.h"
-#endif
-
 namespace content {
 class BrowserContext;
 }  // namespace content
@@ -64,14 +60,6 @@ class FeedbackUploaderChrome final : public FeedbackUploader {
       signin::AccessTokenInfo access_token_info);
 
   void AccessTokenAvailable(GoogleServiceAuthError error, std::string token);
-
-#if BUILDFLAG(PLATFORM_CFM)
-  void ActiveAccountAccessTokenAvailable(GoogleServiceAuthError error,
-                                         std::string token);
-
-  std::unique_ptr<invalidation::ActiveAccountAccessTokenFetcher>
-      active_account_token_fetcher_;
-#endif  // BUILDFLAG(PLATFORM_CFM)
 
   std::unique_ptr<signin::PrimaryAccountAccessTokenFetcher>
       primary_account_token_fetcher_;

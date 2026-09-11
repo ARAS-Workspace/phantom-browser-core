@@ -57,6 +57,5 @@ source_set("unit_tests") {
   deps = [
     ":qrcode_generator",
     "//base/test:test_support",
-    "//components/sharing_message",
   ]
 }

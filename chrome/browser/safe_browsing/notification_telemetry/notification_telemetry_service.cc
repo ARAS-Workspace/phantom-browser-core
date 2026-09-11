@@ -14,8 +14,6 @@
 #include "base/rand_util.h"
 #include "base/time/time.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/push_messaging/push_messaging_service_factory.h"
-#include "chrome/browser/push_messaging/push_messaging_service_impl.h"
 #include "chrome/browser/safe_browsing/notification_telemetry/notification_telemetry_service_factory.h"
 #include "components/safe_browsing/content/browser/notification_content_detection/notifications_global_cache_list.h"
 #include "components/safe_browsing/core/browser/db/database_manager.h"

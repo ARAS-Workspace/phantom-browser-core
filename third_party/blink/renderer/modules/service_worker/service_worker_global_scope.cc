@@ -51,7 +51,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/mojom/fetch/fetch_api_request.mojom-blink.h"
 #include "third_party/blink/public/mojom/notifications/notification.mojom-blink.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging.mojom-blink.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_fetch_response_callback.mojom-blink.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_stream_handle.mojom-blink.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom-blink.h"
@@ -112,9 +111,6 @@
 #include "third_party/blink/renderer/modules/payments/payment_event_data_conversion.h"
 #include "third_party/blink/renderer/modules/payments/payment_request_event.h"
 #include "third_party/blink/renderer/modules/payments/payment_request_respond_with_observer.h"
-#include "third_party/blink/renderer/modules/push_messaging/push_event.h"
-#include "third_party/blink/renderer/modules/push_messaging/push_message_data.h"
-#include "third_party/blink/renderer/modules/push_messaging/push_subscription_change_event.h"
 #include "third_party/blink/renderer/modules/service_worker/cross_origin_resource_policy_checker.h"
 #include "third_party/blink/renderer/modules/service_worker/extendable_event.h"
 #include "third_party/blink/renderer/modules/service_worker/extendable_message_event.h"
@@ -1190,38 +1186,6 @@ void ServiceWorkerGlobalScope::DidHandleNotificationCloseEvent(
                    event_id, status);
 }
 
-void ServiceWorkerGlobalScope::DidHandlePushEvent(
-    int event_id,
-    mojom::ServiceWorkerEventStatus status) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker", "ServiceWorkerGlobalScope::DidHandlePushEvent",
-              perfetto::TerminatingFlow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope),
-              "status", MojoEnumToString(status));
-  if (should_record_network_requests_ ==
-      RecordNetworkRequestsDuringPushEvent::kRecord) {
-    RunEventCallback(&push_event_recording_network_requests_callback_,
-                     event_queue_.get(), event_id, status,
-                     std::make_optional(push_event_network_request_urls_));
-  } else {
-    RunEventCallback(&push_event_callbacks_, event_queue_.get(), event_id,
-                     status);
-  }
-}
-
-void ServiceWorkerGlobalScope::DidHandlePushSubscriptionChangeEvent(
-    int event_id,
-    mojom::ServiceWorkerEventStatus status) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::DidHandlePushSubscriptionChangeEvent",
-              perfetto::TerminatingFlow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope),
-              "status", MojoEnumToString(status));
-  RunEventCallback(&push_subscription_change_event_callbacks_,
-                   event_queue_.get(), event_id, status);
-}
-
 void ServiceWorkerGlobalScope::DidHandleSyncEvent(
     int event_id,
     mojom::ServiceWorkerEventStatus status) {
@@ -2165,100 +2129,6 @@ void ServiceWorkerGlobalScope::StartNotificationCloseEvent(
                                                    false /* showing */));
   Event* event = NotificationEvent::Create(event_type_names::kNotificationclose,
                                            event_init, observer);
-  DispatchExtendableEvent(event, observer);
-}
-
-void ServiceWorkerGlobalScope::DispatchPushEvent(
-    const String& payload,
-    DispatchPushEventCallback callback) {
-  DCHECK(IsContextThread());
-  const int event_id = event_queue_->NextEventId();
-  push_event_callbacks_.Set(event_id, std::move(callback));
-  event_queue_->EnqueueNormal(
-      event_id,
-      BindOnce(&ServiceWorkerGlobalScope::StartPushEvent,
-               WrapWeakPersistent(this), std::move(payload)),
-      CreateAbortCallback(&push_event_callbacks_),
-      base::Seconds(mojom::blink::kPushEventTimeoutSeconds));
-}
-
-void ServiceWorkerGlobalScope::DispatchPushEventRecordingNetworkRequests(
-    const String& payload,
-    DispatchPushEventRecordingNetworkRequestsCallback callback) {
-  DCHECK(IsContextThread());
-  should_record_network_requests_ =
-      RecordNetworkRequestsDuringPushEvent::kRecord;
-  const int event_id = event_queue_->NextEventId();
-  push_event_recording_network_requests_callback_.Set(event_id,
-                                                      std::move(callback));
-  event_queue_->EnqueueNormal(
-      event_id,
-      BindOnce(&ServiceWorkerGlobalScope::StartPushEvent,
-               WrapWeakPersistent(this), std::move(payload)),
-      CreateAbortCallback(&push_event_recording_network_requests_callback_,
-                          std::nullopt),
-      base::Seconds(mojom::blink::kPushEventTimeoutSeconds));
-}
-
-void ServiceWorkerGlobalScope::MaybeRecordNetworkRequestUrlForPushEvents(
-    const KURL& url) {
-  if (should_record_network_requests_ ==
-      RecordNetworkRequestsDuringPushEvent::kRecord) {
-    push_event_network_request_urls_.push_back(url);
-  }
-}
-
-void ServiceWorkerGlobalScope::StartPushEvent(String payload, int event_id) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker", "ServiceWorkerGlobalScope::DispatchPushEvent",
-              perfetto::Flow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope));
-
-  auto* observer = MakeGarbageCollected<WaitUntilObserver>(
-      this, WaitUntilObserver::kPush, event_id);
-  Event* event = PushEvent::Create(event_type_names::kPush,
-                                   PushMessageData::Create(payload), observer);
-  DispatchExtendableEvent(event, observer);
-}
-
-void ServiceWorkerGlobalScope::DispatchPushSubscriptionChangeEvent(
-    mojom::blink::PushSubscriptionPtr old_subscription,
-    mojom::blink::PushSubscriptionPtr new_subscription,
-    DispatchPushSubscriptionChangeEventCallback callback) {
-  DCHECK(IsContextThread());
-  const int event_id = event_queue_->NextEventId();
-  push_subscription_change_event_callbacks_.Set(event_id, std::move(callback));
-
-  event_queue_->EnqueueNormal(
-      event_id,
-      BindOnce(&ServiceWorkerGlobalScope::StartPushSubscriptionChangeEvent,
-               WrapWeakPersistent(this), std::move(old_subscription),
-               std::move(new_subscription)),
-      CreateAbortCallback(&push_subscription_change_event_callbacks_),
-      base::Seconds(mojom::blink::kPushEventTimeoutSeconds));
-}
-
-void ServiceWorkerGlobalScope::StartPushSubscriptionChangeEvent(
-    mojom::blink::PushSubscriptionPtr old_subscription,
-    mojom::blink::PushSubscriptionPtr new_subscription,
-    int event_id) {
-  DCHECK(IsContextThread());
-  TRACE_EVENT("ServiceWorker",
-              "ServiceWorkerGlobalScope::DispatchPushSubscriptionChangeEvent",
-              perfetto::Flow::ProcessScoped(
-                  event_id, kServiceWorkerGlobalScopeTraceScope));
-
-  auto* observer = MakeGarbageCollected<WaitUntilObserver>(
-      this, WaitUntilObserver::kPushSubscriptionChange, event_id);
-  Event* event = PushSubscriptionChangeEvent::Create(
-      event_type_names::kPushsubscriptionchange,
-      (new_subscription)
-          ? PushSubscription::Create(std::move(new_subscription), registration_)
-          : nullptr /* new_subscription*/,
-      (old_subscription)
-          ? PushSubscription::Create(std::move(old_subscription), registration_)
-          : nullptr /* old_subscription*/,
-      observer);
   DispatchExtendableEvent(event, observer);
 }
 

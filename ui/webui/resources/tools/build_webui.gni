@@ -587,7 +587,6 @@ template("build_webui") {
         "//components/autofill/core/browser/autofill_and_password_manager_internals",
         "//components/crash/core/browser/resources",
         "//components/download/resources/download_internals",
-        "//components/gcm_driver/resources",
         "//components/metrics/debug",
         "//components/ntp_tiles/webui/resources",
         "//components/policy/resources/webui",

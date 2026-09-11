@@ -47,7 +47,6 @@ source_set("configs") {
   }
 
   deps = [
-    ":gcm_internals_ui",
     ":memory_internals_ui",
     ":net_export_ui",
     ":ntp_tiles_internals_ui",
@@ -804,25 +803,6 @@ source_set("ntp_tiles_internals_ui") {
   if (enable_webui_ntp) {
     deps += [ "//chrome/browser/new_tab_page" ]
   }
-}
-
-source_set("gcm_internals_ui") {
-  sources = [ "gcm_internals_ui.cc" ]
-  public = [ "gcm_internals_ui.h" ]
-
-  public_deps = [
-    "//chrome/common",
-    "//content/public/browser",
-  ]
-
-  deps = [
-    "//base",
-    "//chrome/browser/gcm",
-    "//chrome/browser/profiles:profile",
-    "//components/gcm_driver",
-    "//components/gcm_driver/resources:resources_grit",
-    "//ui/webui",
-  ]
 }
 
 source_set("signin_internals_ui") {

@@ -128,8 +128,6 @@ static_library("web_test_browser") {
     "browser/web_test_origin_trial_throttle.h",
     "browser/web_test_permission_manager.cc",
     "browser/web_test_permission_manager.h",
-    "browser/web_test_push_messaging_service.cc",
-    "browser/web_test_push_messaging_service.h",
     "browser/web_test_sensor_provider_manager.cc",
     "browser/web_test_sensor_provider_manager.h",
     "browser/web_test_shell_platform_delegate.cc",

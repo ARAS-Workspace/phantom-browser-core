@@ -42,7 +42,6 @@ static_library("sync_device_info") {
   public_deps = [
     "//base",
     "//components/sync",
-    "//components/sync/invalidations",
     "//components/sync/protocol",
   ]
   deps = [

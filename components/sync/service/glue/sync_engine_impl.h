@@ -21,8 +21,6 @@
 #include "components/sync/engine/sync_credentials.h"
 #include "components/sync/engine/sync_engine.h"
 #include "components/sync/engine/sync_status.h"
-#include "components/sync/invalidations/fcm_registration_token_observer.h"
-#include "components/sync/invalidations/invalidations_listener.h"
 
 namespace network_time {
 class NetworkTimeTracker;
@@ -34,7 +32,6 @@ class ActiveDevicesProvider;
 class DataTypeConnector;
 class ProtocolEvent;
 class SyncEngineBackend;
-class SyncInvalidationsService;
 struct SyncProtocolError;
 class SyncTransportDataPrefs;
 
@@ -42,13 +39,9 @@ class SyncTransportDataPrefs;
 // definition for documentation of public methods.
 // Lives on the UI thread, and handles task-posting to SyncEngineBackend on
 // the sync sequence as necessary.
-class SyncEngineImpl : public SyncEngine,
-                       public InvalidationsListener,
-                       public FCMRegistrationTokenObserver {
+class SyncEngineImpl : public SyncEngine {
  public:
-  // `sync_invalidations_service` must not be null.
   SyncEngineImpl(const std::string& name,
-                 SyncInvalidationsService* sync_invalidations_service,
                  network_time::NetworkTimeTracker* network_time_tracker,
                  std::unique_ptr<ActiveDevicesProvider> active_devices_provider,
                  std::unique_ptr<SyncTransportDataPrefs> prefs,
@@ -71,7 +64,6 @@ class SyncEngineImpl : public SyncEngine,
   base::Time GetLastSyncedTimeForDebugging() const override;
   void StartConfiguration() override;
   void StartSyncingWithServer() override;
-  void StartHandlingInvalidations() override;
   void SetEncryptionPassphrase(const std::string& passphrase) override;
   void SetDecryptionPassphrase(const std::string& passphrase) override;
   void SetDecryptionBootstrapToken(
@@ -98,12 +90,6 @@ class SyncEngineImpl : public SyncEngine,
   void ClearNigoriDataForMigration() override;
   void GetNigoriNodeForDebugging(AllNodesCallback callback) override;
   void RecordNigoriMemoryUsageAndCountsHistograms() override;
-
-  // InvalidationsListener implementation.
-  void OnInvalidationReceived(const std::string& payload) override;
-
-  // FCMRegistrationTokenObserver implementation.
-  void OnFCMRegistrationTokenChanged() override;
 
   void OnNetworkTimeTrackerDestroyed();
 
@@ -164,14 +150,6 @@ class SyncEngineImpl : public SyncEngine,
   // Sets the last synced time to the current time.
   void UpdateLastSyncedTime();
 
-  // Updates the current state of standalone invalidations. Note that the
-  // invalidations can be handled even if the invalidation service is not fully
-  // initialized yet (e.g. while processing the incoming queue of messages
-  // received during browser startup).
-  void UpdateStandaloneInvalidationsState();
-
-  // Updates invalidator's state.
-  void OnInvalidatorStateChange(bool enabled);
 
   // The task runner where all the sync engine operations happen.
   scoped_refptr<base::SequencedTaskRunner> sync_task_runner_;
@@ -186,8 +164,6 @@ class SyncEngineImpl : public SyncEngine,
   // device), the prefs can get cleared before the SyncEngine is destroyed.
   std::string cached_cache_guid_;
   std::string cached_birthday_;
-
-  raw_ptr<SyncInvalidationsService> sync_invalidations_service_ = nullptr;
 
   // Our backend, which communicates directly to the syncapi. Use refptr instead
   // of WeakHandle because `backend_` is created on the UI thread but released

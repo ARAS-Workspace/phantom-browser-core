@@ -38,11 +38,9 @@
 #include "components/sync/engine/sync_engine_host.h"
 #include "components/sync/engine/sync_manager_factory.h"
 #include "components/sync/protocol/sync_enums.pb.h"
-#include "components/sync/protocol/sync_invalidations_payload.pb.h"
 #include "components/sync/service/active_devices_provider.h"
 #include "components/sync/service/glue/sync_transport_data_prefs.h"
 #include "components/sync/test/fake_sync_manager.h"
-#include "components/sync/test/mock_sync_invalidations_service.h"
 #include "google_apis/gaia/gaia_id.h"
 #include "services/network/test/test_network_connection_tracker.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -186,8 +184,8 @@ class SyncEngineImplTest : public testing::Test {
         .WillByDefault(Return(
             ByMove(ActiveDevicesInvalidationInfo::CreateUninitialized())));
     backend_ = std::make_unique<SyncEngineImpl>(
-        "fakeDebugName", &mock_sync_invalidations_service_,
-        network_time_tracker_.get(), std::move(mock_active_devices_provider),
+        "fakeDebugName", network_time_tracker_.get(),
+        std::move(mock_active_devices_provider),
         std::make_unique<SyncTransportDataPrefs>(
             &pref_service_, signin::GaiaIdHash::FromGaiaId(kTestGaiaId)),
         temp_dir_.GetPath().Append(base::FilePath(kTestSyncDir)),
@@ -245,8 +243,6 @@ class SyncEngineImplTest : public testing::Test {
     if (expect_success) {
       EXPECT_TRUE(engine_types_.empty());
       engine_types_ = fake_manager_->GetConnectedTypes();
-      ON_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes)
-          .WillByDefault(Return(engine_types_));
     }
   }
 
@@ -323,7 +319,6 @@ class SyncEngineImplTest : public testing::Test {
   raw_ptr<FakeSyncManager> fake_manager_ = nullptr;
   DataTypeSet engine_types_;
   DataTypeSet enabled_types_;
-  NiceMock<MockSyncInvalidationsService> mock_sync_invalidations_service_;
 
   base::WeakPtrFactory<SyncEngineImplTest> weak_ptr_factory_{this};
 };
@@ -542,104 +537,6 @@ TEST_F(SyncEngineImplTest, DataTypeConnectorValidDuringShutdown) {
   backend_.reset();
 }
 
-TEST_F(SyncEngineImplTest, ShouldInvalidateDataTypesOnIncomingInvalidation) {
-  enabled_types_.PutAll({syncer::BOOKMARKS, syncer::PREFERENCES});
-
-  InitializeBackend(/*expect_success=*/true);
-  ConfigureDataTypes();
-
-  sync_pb::SyncInvalidationsPayload payload;
-  sync_pb::SyncInvalidationsPayload::DataTypeInvalidation*
-      bookmarks_invalidation = payload.add_data_type_invalidations();
-  bookmarks_invalidation->set_data_type_id(
-      GetSpecificsFieldNumberFromDataType(DataType::BOOKMARKS));
-  sync_pb::SyncInvalidationsPayload::DataTypeInvalidation*
-      preferences_invalidation = payload.add_data_type_invalidations();
-  preferences_invalidation->set_data_type_id(
-      GetSpecificsFieldNumberFromDataType(DataType::PREFERENCES));
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-
-  fake_manager_->WaitForSyncThread();
-  EXPECT_EQ(1, fake_manager_->GetInvalidationCount(DataType::BOOKMARKS));
-  EXPECT_EQ(1, fake_manager_->GetInvalidationCount(DataType::PREFERENCES));
-}
-
-TEST_F(SyncEngineImplTest, ShouldInvalidateOnlyEnabledDataTypes) {
-  enabled_types_.Remove(syncer::BOOKMARKS);
-  enabled_types_.Put(syncer::PREFERENCES);
-
-  InitializeBackend(/*expect_success=*/true);
-  ConfigureDataTypes();
-
-  sync_pb::SyncInvalidationsPayload payload;
-  sync_pb::SyncInvalidationsPayload::DataTypeInvalidation*
-      bookmarks_invalidation = payload.add_data_type_invalidations();
-  bookmarks_invalidation->set_data_type_id(
-      GetSpecificsFieldNumberFromDataType(DataType::BOOKMARKS));
-  sync_pb::SyncInvalidationsPayload::DataTypeInvalidation*
-      preferences_invalidation = payload.add_data_type_invalidations();
-  preferences_invalidation->set_data_type_id(
-      GetSpecificsFieldNumberFromDataType(DataType::PREFERENCES));
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-
-  fake_manager_->WaitForSyncThread();
-  EXPECT_EQ(0, fake_manager_->GetInvalidationCount(DataType::BOOKMARKS));
-  EXPECT_EQ(1, fake_manager_->GetInvalidationCount(DataType::PREFERENCES));
-}
-
-TEST_F(SyncEngineImplTest, ShouldStartHandlingInvalidations) {
-  InitializeBackend(/*expect_success=*/true);
-
-  EXPECT_CALL(mock_sync_invalidations_service_, AddListener(backend_.get()));
-  backend_->StartHandlingInvalidations();
-}
-
-TEST_F(SyncEngineImplTest, DoNotUseOldInvalidationsAtAll) {
-  enabled_types_.PutAll({AUTOFILL_WALLET_DATA, AUTOFILL_WALLET_OFFER});
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillRepeatedly(Return(enabled_types_));
-  InitializeBackend(/*expect_success=*/true);
-
-  ConfigureDataTypes();
-}
-
-TEST_F(SyncEngineImplTest, ShouldEnableInvalidationsWhenStartedHandling) {
-  EXPECT_CALL(mock_sync_invalidations_service_, HasListener)
-      .WillRepeatedly(Return(true));
-  EXPECT_CALL(mock_sync_invalidations_service_, GetFCMRegistrationToken)
-      .WillRepeatedly(Return("fcm_token"));
-  InitializeBackend(/*expect_success=*/true);
-  backend_->StartHandlingInvalidations();
-  fake_manager_->WaitForSyncThread();
-  EXPECT_TRUE(fake_manager_->IsInvalidatorEnabled());
-}
-
-TEST_F(SyncEngineImplTest, ShouldEnableInvalidationsOnTokenUpdate) {
-  EXPECT_CALL(mock_sync_invalidations_service_, GetFCMRegistrationToken)
-      .WillRepeatedly(Return(std::nullopt));
-  InitializeBackend(/*expect_success=*/true);
-  fake_manager_->WaitForSyncThread();
-
-  // Simulate listening for invalidations but since an FCM token hasn't been
-  // obtained, the invalidator is still disabled.
-  ON_CALL(mock_sync_invalidations_service_, HasListener)
-      .WillByDefault(Return(true));
-  EXPECT_FALSE(fake_manager_->IsInvalidatorEnabled());
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetFCMRegistrationToken)
-      .WillRepeatedly(Return("fcm_token"));
-  backend_->OnFCMRegistrationTokenChanged();
-  fake_manager_->WaitForSyncThread();
-  EXPECT_TRUE(fake_manager_->IsInvalidatorEnabled());
-}
-
 TEST_F(SyncEngineImplTest, GenerateCacheGUID) {
   const std::string guid1 = SyncEngineImpl::GenerateCacheGUIDForTest();
   const std::string guid2 = SyncEngineImpl::GenerateCacheGUIDForTest();
@@ -660,34 +557,6 @@ TEST_F(SyncEngineImplTest, ShouldLoadSyncDataUponInitialization) {
   EXPECT_EQ(kTestGaiaId, transport_data_prefs.GetCurrentSyncingGaiaId());
   EXPECT_EQ(kTestCacheGuid, transport_data_prefs.GetCacheGuid());
   EXPECT_EQ(kTestBirthday, transport_data_prefs.GetBirthday());
-}
-
-TEST_F(SyncEngineImplTest, ShouldNotifyOnNewInvalidatedDataTypes) {
-  InitializeBackend();
-  ConfigureDataTypes();
-
-  // Use OnInvalidationStatusChanged() to verify that
-  // OnNewInvalidatedDataTypes() is caled only once in the beginning, and all
-  // the next invalidated data types updates should not notify.
-  Sequence seq;
-  EXPECT_CALL(mock_host_, OnNewInvalidatedDataTypes).InSequence(seq);
-  EXPECT_CALL(mock_host_, OnInvalidationStatusChanged).InSequence(seq);
-
-  SyncStatus sync_status;
-  sync_status.invalidated_data_types.Put(BOOKMARKS);
-  fake_manager_->NotifySyncStatusChanged(sync_status);
-  fake_manager_->WaitForSyncThread();
-
-  // Turn on notifications to trigger OnInvalidationStatusChanged().
-  sync_status.notifications_enabled = true;
-  fake_manager_->NotifySyncStatusChanged(sync_status);
-  fake_manager_->WaitForSyncThread();
-
-  // Removing an invalidated data type shouldn't invoke
-  // OnNewInvalidatedDataTypes().
-  sync_status.invalidated_data_types.Remove(BOOKMARKS);
-  fake_manager_->NotifySyncStatusChanged(sync_status);
-  fake_manager_->WaitForSyncThread();
 }
 
 TEST_F(SyncEngineImplTest, ShouldReturnWhetherNextPollTimePassed) {
@@ -721,318 +590,6 @@ TEST_F(SyncEngineImplTest, ShouldReturnWhetherNextPollTimePassed) {
   fake_manager_->WaitForSyncThread();
 
   EXPECT_FALSE(backend_->IsNextPollTimeInThePast());
-}
-
-TEST_F(SyncEngineImplTest, RecordTransitLatencyMetrics) {
-  // Enable BOOKMARKS type.
-  enabled_types_.Put(syncer::BOOKMARKS);
-
-  fake_manager_factory_->set_progress_marker_types(enabled_types_);
-  fake_manager_factory_->set_initial_sync_ended_types(enabled_types_);
-
-  // Initialize the default backend synchronously.
-  InitializeBackend();
-
-  base::HistogramTester histogram_tester;
-
-  // 1. Unsynced network time - should only log Client-Based.
-  sync_pb::SyncInvalidationsPayload payload;
-  sync_pb::SyncInvalidationsPayload::DataTypeInvalidation*
-      bookmarks_invalidation = payload.add_data_type_invalidations();
-  bookmarks_invalidation->set_data_type_id(
-      GetSpecificsFieldNumberFromDataType(DataType::BOOKMARKS));
-
-  base::TimeDelta expected_latency = base::Seconds(5);
-  // Version is microseconds since Unix Epoch.
-  base::Time issue_time = base::Time::Now() - expected_latency;
-  int64_t version_us = (issue_time - base::Time::UnixEpoch()).InMicroseconds();
-  payload.set_version(version_us);
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-
-  // Wait for background thread to process the standalone invalidation to avoid
-  // leak/crash.
-  PumpSequencedTaskRunner(sync_task_runner_.get());
-
-  histogram_tester.ExpectUniqueTimeSample(
-      "Sync.InvalidationTransitLatency.ClientBased", expected_latency, 1);
-  histogram_tester.ExpectUniqueTimeSample(
-      "Sync.InvalidationTransitLatency.ClientBased.BOOKMARK", expected_latency,
-      1);
-  histogram_tester.ExpectUniqueSample(
-      "Sync.InvalidationTransitLatency.ClockSkewDetected.ClientBased", false,
-      1);
-
-  // Server-based should not be logged since network time is not available yet.
-  histogram_tester.ExpectTotalCount(
-      "Sync.InvalidationTransitLatency.ServerBased", 0);
-  histogram_tester.ExpectTotalCount(
-      "Sync.InvalidationTransitLatency.ClockSkewDetected.ServerBased", 0);
-
-  // 2. Synced network time - should log both Client-Based and Server-Based.
-  // Set network time to be exactly base::Time::Now() + 10 seconds (so 10s
-  // clock skew ahead).
-  base::Time network_time = base::Time::Now() + base::Seconds(10);
-  network_time_tracker_->UpdateNetworkTime(network_time, base::Milliseconds(1),
-                                           base::Milliseconds(1),
-                                           test_tick_clock_->NowTicks());
-
-  // Reset the payload issue time to be 5 seconds relative to Now() so client
-  // latency stays exactly 5 seconds.
-  issue_time = base::Time::Now() - expected_latency;
-  version_us = (issue_time - base::Time::UnixEpoch()).InMicroseconds();
-  payload.set_version(version_us);
-
-  base::HistogramTester histogram_tester2;
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-  PumpSequencedTaskRunner(sync_task_runner_.get());
-
-  // Client-based latency should be identical (5 seconds).
-  histogram_tester2.ExpectUniqueTimeSample(
-      "Sync.InvalidationTransitLatency.ClientBased", expected_latency, 1);
-  histogram_tester2.ExpectUniqueSample(
-      "Sync.InvalidationTransitLatency.ClockSkewDetected.ClientBased", false,
-      1);
-
-  // Server-based latency should be (network_time - issue_time) = (Now() + 10s)
-  // - (Now() - 5s) = 15 seconds.
-  base::TimeDelta expected_server_latency =
-      expected_latency + base::Seconds(10);
-
-  base::TimeDelta expected_uncertainty =
-      base::Milliseconds(1) + base::Milliseconds(1) +
-      7 * base::Milliseconds(network_time::kTicksResolutionMs);
-  histogram_tester2.ExpectUniqueTimeSample(
-      "Sync.InvalidationTransitLatency.ServerBased.Uncertainty",
-      expected_uncertainty, 1);
-
-  // Since the uncertainty (9ms) is <= 2s, it should log to all three breakdown
-  // histograms:
-  for (const std::string& uncertainty_suffix :
-       {"Uncertainty2s", "Uncertainty10s", "Uncertainty15s"}) {
-    histogram_tester2.ExpectUniqueTimeSample(
-        base::StrCat({"Sync.InvalidationTransitLatency.ServerBased.",
-                      uncertainty_suffix}),
-        expected_server_latency, 1);
-    histogram_tester2.ExpectUniqueTimeSample(
-        base::StrCat({"Sync.InvalidationTransitLatency.ServerBased.",
-                      uncertainty_suffix, ".BOOKMARK"}),
-        expected_server_latency, 1);
-    histogram_tester2.ExpectUniqueSample(
-        base::StrCat(
-            {"Sync.InvalidationTransitLatency.ClockSkewDetected.ServerBased.",
-             uncertainty_suffix}),
-        false, 1);
-  }
-
-  // 3. Client clock behind server clock (negative latency) - should log
-  // ClockSkewDetected and NOT discard, falling into underflow bucket.
-  base::HistogramTester histogram_tester3;
-  // Payload version is in the future relative to client time (Now() + 2
-  // seconds).
-  base::Time future_issue_time = base::Time::Now() + base::Seconds(2);
-  payload.set_version(
-      (future_issue_time - base::Time::UnixEpoch()).InMicroseconds());
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-  PumpSequencedTaskRunner(sync_task_runner_.get());
-
-  histogram_tester3.ExpectUniqueSample(
-      "Sync.InvalidationTransitLatency.ClockSkewDetected.ClientBased", true, 1);
-  histogram_tester3.ExpectTotalCount(
-      "Sync.InvalidationTransitLatency.ClientBased", 1);
-  histogram_tester3.ExpectBucketCount(
-      "Sync.InvalidationTransitLatency.ClientBased", 0, 1);
-  histogram_tester3.ExpectTotalCount(
-      "Sync.InvalidationTransitLatency.ClientBased.BOOKMARK", 1);
-  histogram_tester3.ExpectBucketCount(
-      "Sync.InvalidationTransitLatency.ClientBased.BOOKMARK", 0, 1);
-
-  // 4. Outlier payload (> 7 days) - should NOT discard.
-  base::HistogramTester histogram_tester4;
-  base::Time old_issue_time = base::Time::Now() - base::Days(8);
-  payload.set_version(
-      (old_issue_time - base::Time::UnixEpoch()).InMicroseconds());
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-  PumpSequencedTaskRunner(sync_task_runner_.get());
-
-  base::TimeDelta expected_outlier_latency = base::Days(8);
-  histogram_tester4.ExpectUniqueTimeSample(
-      "Sync.InvalidationTransitLatency.ClientBased", expected_outlier_latency,
-      1);
-  histogram_tester4.ExpectUniqueSample(
-      "Sync.InvalidationTransitLatency.ClockSkewDetected.ClientBased", false,
-      1);
-}
-
-TEST_F(SyncEngineImplTest, RecordFcmDeliveryLatencyMetrics) {
-  // Enable BOOKMARKS type.
-  enabled_types_.Put(syncer::BOOKMARKS);
-
-  fake_manager_factory_->set_progress_marker_types(enabled_types_);
-  fake_manager_factory_->set_initial_sync_ended_types(enabled_types_);
-
-  // Initialize the default backend synchronously.
-  InitializeBackend();
-
-  base::HistogramTester histogram_tester;
-
-  // 1. Unsynced network time - should only log Client-Based.
-  sync_pb::SyncInvalidationsPayload payload;
-  sync_pb::SyncInvalidationsPayload::DataTypeInvalidation*
-      bookmarks_invalidation = payload.add_data_type_invalidations();
-  bookmarks_invalidation->set_data_type_id(
-      GetSpecificsFieldNumberFromDataType(DataType::BOOKMARKS));
-
-  base::TimeDelta expected_latency = base::Seconds(5);
-  base::Time dispatch_time = base::Time::Now() - expected_latency;
-  int64_t dispatch_time_ms =
-      (dispatch_time - base::Time::UnixEpoch()).InMilliseconds();
-  payload.set_server_dispatch_time_unix_epoch_millis(dispatch_time_ms);
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-
-  // Wait for background thread to process the standalone invalidation to avoid
-  // leak/crash.
-  PumpSequencedTaskRunner(sync_task_runner_.get());
-
-  histogram_tester.ExpectUniqueTimeSample(
-      "Sync.InvalidationFcmDeliveryLatency.ClientBased", expected_latency, 1);
-  histogram_tester.ExpectUniqueTimeSample(
-      "Sync.InvalidationFcmDeliveryLatency.ClientBased.BOOKMARK",
-      expected_latency, 1);
-  histogram_tester.ExpectUniqueSample(
-      "Sync.InvalidationFcmDeliveryLatency.ClockSkewDetected.ClientBased",
-      false, 1);
-
-  // Server-based should not be logged since network time is not available yet.
-  histogram_tester.ExpectTotalCount(
-      "Sync.InvalidationFcmDeliveryLatency.ServerBased", 0);
-  histogram_tester.ExpectTotalCount(
-      "Sync.InvalidationFcmDeliveryLatency.ClockSkewDetected.ServerBased", 0);
-
-  // 2. Synced network time - should log both Client-Based and Server-Based.
-  // Set network time to be exactly base::Time::Now() + 10 seconds (so 10s
-  // clock skew ahead).
-  base::Time network_time = base::Time::Now() + base::Seconds(10);
-  network_time_tracker_->UpdateNetworkTime(network_time, base::Milliseconds(1),
-                                           base::Milliseconds(1),
-                                           test_tick_clock_->NowTicks());
-
-  // Reset the payload dispatch time to be 5 seconds relative to Now() so client
-  // latency stays exactly 5 seconds.
-  dispatch_time = base::Time::Now() - expected_latency;
-  dispatch_time_ms = (dispatch_time - base::Time::UnixEpoch()).InMilliseconds();
-  payload.set_server_dispatch_time_unix_epoch_millis(dispatch_time_ms);
-
-  base::HistogramTester histogram_tester2;
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-  PumpSequencedTaskRunner(sync_task_runner_.get());
-
-  // Client-based latency should be identical (5 seconds).
-  histogram_tester2.ExpectUniqueTimeSample(
-      "Sync.InvalidationFcmDeliveryLatency.ClientBased", expected_latency, 1);
-  histogram_tester2.ExpectUniqueSample(
-      "Sync.InvalidationFcmDeliveryLatency.ClockSkewDetected.ClientBased",
-      false, 1);
-
-  // Server-based latency should be (network_time - dispatch_time) = (Now() +
-  // 10s)
-  // - (Now() - 5s) = 15 seconds.
-  base::TimeDelta expected_server_latency =
-      expected_latency + base::Seconds(10);
-
-  base::TimeDelta expected_uncertainty =
-      base::Milliseconds(1) + base::Milliseconds(1) +
-      7 * base::Milliseconds(network_time::kTicksResolutionMs);
-  histogram_tester2.ExpectUniqueTimeSample(
-      "Sync.InvalidationFcmDeliveryLatency.ServerBased.Uncertainty",
-      expected_uncertainty, 1);
-
-  // Since the uncertainty (9ms) is <= 2s, it should log to all three breakdown
-  // histograms:
-  for (const std::string& uncertainty_suffix :
-       {"Uncertainty2s", "Uncertainty10s", "Uncertainty15s"}) {
-    histogram_tester2.ExpectUniqueTimeSample(
-        base::StrCat({"Sync.InvalidationFcmDeliveryLatency.ServerBased.",
-                      uncertainty_suffix}),
-        expected_server_latency, 1);
-    histogram_tester2.ExpectUniqueTimeSample(
-        base::StrCat({"Sync.InvalidationFcmDeliveryLatency.ServerBased.",
-                      uncertainty_suffix, ".BOOKMARK"}),
-        expected_server_latency, 1);
-    histogram_tester2.ExpectUniqueSample(
-        base::StrCat({"Sync.InvalidationFcmDeliveryLatency.ClockSkewDetected."
-                      "ServerBased.",
-                      uncertainty_suffix}),
-        false, 1);
-  }
-
-  // 3. Client clock behind server clock (negative latency) - should log
-  // ClockSkewDetected and NOT discard, falling into underflow bucket.
-  base::HistogramTester histogram_tester3;
-  // Payload dispatch_time is in the future relative to client time (Now() + 2
-  // seconds).
-  base::Time future_dispatch_time = base::Time::Now() + base::Seconds(2);
-  payload.set_server_dispatch_time_unix_epoch_millis(
-      (future_dispatch_time - base::Time::UnixEpoch()).InMilliseconds());
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-  PumpSequencedTaskRunner(sync_task_runner_.get());
-
-  histogram_tester3.ExpectUniqueSample(
-      "Sync.InvalidationFcmDeliveryLatency.ClockSkewDetected.ClientBased", true,
-      1);
-  histogram_tester3.ExpectTotalCount(
-      "Sync.InvalidationFcmDeliveryLatency.ClientBased", 1);
-  histogram_tester3.ExpectBucketCount(
-      "Sync.InvalidationFcmDeliveryLatency.ClientBased", 0, 1);
-  histogram_tester3.ExpectTotalCount(
-      "Sync.InvalidationFcmDeliveryLatency.ClientBased.BOOKMARK", 1);
-  histogram_tester3.ExpectBucketCount(
-      "Sync.InvalidationFcmDeliveryLatency.ClientBased.BOOKMARK", 0, 1);
-
-  // 4. Outlier payload (> 7 days) - should NOT discard.
-  base::HistogramTester histogram_tester4;
-  base::Time old_dispatch_time = base::Time::Now() - base::Days(8);
-  payload.set_server_dispatch_time_unix_epoch_millis(
-      (old_dispatch_time - base::Time::UnixEpoch()).InMilliseconds());
-
-  EXPECT_CALL(mock_sync_invalidations_service_, GetInterestedDataTypes())
-      .WillOnce(Return(enabled_types_));
-
-  backend_->OnInvalidationReceived(payload.SerializeAsString());
-  PumpSequencedTaskRunner(sync_task_runner_.get());
-
-  base::TimeDelta expected_outlier_latency = base::Days(8);
-  histogram_tester4.ExpectUniqueTimeSample(
-      "Sync.InvalidationFcmDeliveryLatency.ClientBased",
-      expected_outlier_latency, 1);
-  histogram_tester4.ExpectUniqueSample(
-      "Sync.InvalidationFcmDeliveryLatency.ClockSkewDetected.ClientBased",
-      false, 1);
 }
 
 }  // namespace

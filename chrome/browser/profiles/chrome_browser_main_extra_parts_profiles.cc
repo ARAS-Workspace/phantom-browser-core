@@ -182,8 +182,6 @@
 #include "chrome/browser/personal_context/personal_context_service_factory.h"
 #include "chrome/browser/plugins/plugin_prefs_factory.h"
 #include "chrome/browser/policy/chrome_policy_blocklist_service_factory.h"
-#include "chrome/browser/policy/cloud/user_cloud_policy_invalidator_factory.h"
-#include "chrome/browser/policy/cloud/user_fm_registration_token_uploader_factory.h"
 #include "chrome/browser/policy/developer_tools_policy_checker_factory.h"
 #include "chrome/browser/predictors/autocomplete_action_predictor_factory.h"
 #include "chrome/browser/predictors/loading_predictor_factory.h"
@@ -203,7 +201,6 @@
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service_factory.h"
 #include "chrome/browser/profile_resetter/triggered_profile_resetter_factory.h"
 #include "chrome/browser/profiles/renderer_updater_factory.h"
-#include "chrome/browser/push_messaging/push_messaging_service_factory.h"
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/reduce_accept_language/reduce_accept_language_factory.h"
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_factory.h"
@@ -221,7 +218,6 @@
 #include "chrome/browser/serial/serial_chooser_context_factory.h"
 #include "chrome/browser/sessions/session_data_service_factory.h"
 #include "chrome/browser/sessions/tab_restore_service_factory.h"
-#include "chrome/browser/sharing/sharing_service_factory.h"
 #include "chrome/browser/sharing_hub/sharing_hub_service_factory.h"
 #include "chrome/browser/signin/about_signin_internals_factory.h"
 #include "chrome/browser/signin/account_consistency_mode_manager_factory.h"
@@ -1161,8 +1157,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   policy::ProfileTokenPolicyWebSigninServiceFactory::GetInstance();
 #endif
-  policy::UserCloudPolicyInvalidatorFactory::GetInstance();
-  policy::UserFmRegistrationTokenUploaderFactory::GetInstance();
   policy::UserPolicySigninServiceFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   policy::UserPolicyOidcSigninServiceFactory::GetInstance();
@@ -1195,7 +1189,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   ProtocolHandlerRegistryFactory::GetInstance();
   ProviderStateServiceFactory::GetInstance();
-  PushMessagingServiceFactory::GetInstance();
 #if BUILDFLAG(IS_ANDROID)
   readaloud::ReadAloudServiceFactory::GetInstance();
 #endif
@@ -1302,7 +1295,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if !BUILDFLAG(IS_ANDROID)
   sharing_hub::SharingHubServiceFactory::GetInstance();
 #endif
-  SharingServiceFactory::GetInstance();
   ShortcutsBackendFactory::GetInstance();
 #if !BUILDFLAG(IS_ANDROID)
   SigninDetectionServiceFactoryEnsureFactoryBuilt();

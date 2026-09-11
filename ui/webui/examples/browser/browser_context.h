@@ -31,7 +31,6 @@ class BrowserContext : public content::BrowserContext {
   storage::SpecialStoragePolicy* GetSpecialStoragePolicy() override;
   content::PlatformNotificationService* GetPlatformNotificationService()
       override;
-  content::PushMessagingService* GetPushMessagingService() override;
   content::StorageNotificationService* GetStorageNotificationService() override;
   content::SSLHostStateDelegate* GetSSLHostStateDelegate() override;
   content::PermissionControllerDelegate* GetPermissionControllerDelegate()

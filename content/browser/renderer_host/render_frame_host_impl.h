@@ -303,7 +303,6 @@ class PendingNavigation;
 class PrefetchedSignedExchangeCache;
 class PrerenderCancellationReason;
 class PresentationServiceImpl;
-class PushMessagingManager;
 class RenderAccessibilityHost;
 class RenderFrameHostDelegate;
 class RenderFrameHostImpl;
@@ -2175,9 +2174,6 @@ class CONTENT_EXPORT RenderFrameHostImpl
 
   void GetWebAuthenticationService(
       mojo::PendingReceiver<blink::mojom::Authenticator> receiver);
-
-  void GetPushMessaging(
-      mojo::PendingReceiver<blink::mojom::PushMessaging> receiver);
 
   void CreateDedicatedWorkerHostFactory(
       mojo::PendingReceiver<blink::mojom::DedicatedWorkerHostFactory> receiver);
@@ -5087,9 +5083,6 @@ class CONTENT_EXPORT RenderFrameHostImpl
   // Hosts blink::mojom::FileSystemManager for the RenderFrame.
   std::unique_ptr<FileSystemManagerImpl, BrowserThread::DeleteOnIOThread>
       file_system_manager_;
-
-  // Hosts blink::mojom::PushMessaging for the RenderFrame.
-  std::unique_ptr<PushMessagingManager> push_messaging_manager_;
 
   // Hosts blink::mojom::SpeechSynthesis for the RenderFrame.
   std::unique_ptr<SpeechSynthesisImpl> speech_synthesis_impl_;

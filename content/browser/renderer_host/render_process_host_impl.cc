@@ -118,7 +118,6 @@
 #include "content/browser/permissions/permission_service_context.h"
 #include "content/browser/process_lock.h"
 #include "content/browser/process_reuse_policy.h"
-#include "content/browser/push_messaging/push_messaging_manager.h"
 #include "content/browser/quota/quota_context.h"
 #include "content/browser/renderer_host/embedded_frame_sink_provider_impl.h"
 #include "content/browser/renderer_host/indexed_db_client_state_checker_factory.h"
@@ -1708,15 +1707,6 @@ RenderProcessHostImpl::RenderProcessHostImpl(
   // Initialize |child_process_activity_time_| to a reasonable value.
   mark_child_process_activity_time();
 
-  // This instance of PushMessagingManager is only used from clients
-  // bound to service workers (i.e. PushProvider), since frame-bound
-  // clients will rely on BrowserInterfaceBroker instead. Therefore,
-  // pass an invalid frame ID here.
-  push_messaging_manager_ = std::make_unique<PushMessagingManager>(
-      *this,
-      /* render_frame_id= */ ChildProcessHost::kInvalidUniqueID,
-      base::WrapRefCounted(storage_partition_impl_->GetServiceWorkerContext()));
-
   InitializeChannelProxy();
 
   const int id = GetDeprecatedID();
@@ -2781,12 +2771,6 @@ void RenderProcessHostImpl::CreatePeriodicSyncService(
   CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   storage_partition_impl_->GetBackgroundSyncContext()
       ->CreatePeriodicSyncService(origin, this, std::move(receiver));
-}
-
-void RenderProcessHostImpl::BindPushMessaging(
-    mojo::PendingReceiver<blink::mojom::PushMessaging> receiver) {
-  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
-  push_messaging_manager_->AddPushMessagingReceiver(std::move(receiver));
 }
 
 #if BUILDFLAG(IS_P2P_ENABLED)

@@ -13,7 +13,6 @@
 #include "chrome/browser/ui/tabs/tab_strip_model_observer.h"
 #include "components/desktop_to_mobile_promos/promos_types.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/sync/protocol/unencrypted_sharing_message.pb.h"
 
 class Profile;
 
@@ -77,11 +76,6 @@ class IOSPromoTriggerService : public KeyedService,
   // updated devices if form factors are the same.
   bool IsMorePreferredDevice(const syncer::DeviceInfo* current_preference,
                              const syncer::DeviceInfo* another_device);
-
-  // Configures the payload for the push notififcation.
-  sync_pb::UnencryptedSharingMessage CreateNotificationPayload(
-      desktop_to_mobile_promos::PromoType promo_type,
-      const std::string& device_guid);
 
   base::RepeatingCallbackList<void(desktop_to_mobile_promos::PromoType)>
       callback_list_;

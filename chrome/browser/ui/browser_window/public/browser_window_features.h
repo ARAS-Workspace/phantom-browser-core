@@ -97,7 +97,6 @@ class RecentActivityBubbleCoordinator;
 class ScrimViewController;
 class SearchboxContextData;
 class SessionServiceBrowserHelper;
-class SharingWindowController;
 class SidePanelCoordinator;
 class SidePanelRegistry;
 class SidePanelUI;
@@ -660,7 +659,6 @@ class BrowserWindowFeatures {
       session_service_tab_group_sync_observer_;
   std::unique_ptr<sharing_hub::SharingHubWindowController>
       sharing_hub_window_controller_;
-  std::unique_ptr<SharingWindowController> sharing_window_controller_;
   std::unique_ptr<SidePanelRegistry> side_panel_registry_;
   std::unique_ptr<SigninViewController> signin_view_controller_;
   std::unique_ptr<SplitViewIphController> split_view_iph_controller_;

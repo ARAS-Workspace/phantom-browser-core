@@ -50,8 +50,6 @@
 #if BUILDFLAG(IS_ANDROID)
 #include "base/test/test_timeouts.h"
 #include "chrome/browser/download/android/mock_download_controller.h"
-#include "components/gcm_driver/instance_id/instance_id_android.h"
-#include "components/gcm_driver/instance_id/scoped_use_fake_instance_id_android.h"
 #endif
 
 namespace offline_pages {

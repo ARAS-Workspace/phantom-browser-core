@@ -49,7 +49,6 @@
 #include "chrome/common/chrome_render_frame.mojom.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/input/native_web_keyboard_event.h"
-#include "components/sharing_message/sharing_dialog_data.h"
 #include "components/version_info/channel.h"
 #include "components/version_info/version_info.h"
 #include "components/web_modal/web_contents_modal_dialog_manager.h"

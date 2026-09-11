@@ -32,15 +32,6 @@ class DeviceInfoSyncClient {
   virtual std::optional<DeviceInfo::SharingInfo> GetLocalSharingInfo()
       const = 0;
 
-  // Returns current FCM registration token if known, empty if the invalidation
-  // service is not enabled. std::nullopt will be returned if the token has
-  // been requested but hasn't been retrieved yet.
-  virtual std::optional<std::string> GetFCMRegistrationToken() const = 0;
-
-  // A list of enabled data types, std::nullopt if the invalidation service is
-  // not initialized yet.
-  virtual std::optional<DataTypeSet> GetInterestedDataTypes() const = 0;
-
   // Returns registration information for using a phone-as-a-security-key, or
   // else one of the special `Status` values to indicate that the information
   // isn't ready yet.

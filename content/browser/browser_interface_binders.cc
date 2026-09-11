@@ -186,7 +186,6 @@
 #include "third_party/blink/public/mojom/preloading/anchor_element_interaction_host.mojom.h"
 #include "third_party/blink/public/mojom/prerender/prerender.mojom.h"
 #include "third_party/blink/public/mojom/presentation/presentation.mojom.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging.mojom.h"
 #include "third_party/blink/public/mojom/quota/quota_manager_host.mojom.h"
 #include "third_party/blink/public/mojom/sensor/web_sensor_provider.mojom.h"
 #include "third_party/blink/public/mojom/serial/serial.mojom.h"
@@ -1137,9 +1136,6 @@ void PopulateBinderMapWithContext(
   map->Add<blink::mojom::WebBluetoothService>(
       &WebBluetoothServiceImpl::BindIfAllowed);
 
-  map->Add<blink::mojom::PushMessaging>(
-      &BindRenderFrameHostImpl<&RenderFrameHostImpl::GetPushMessaging>);
-
   map->Add<blink::mojom::WebTransportConnector>(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::CreateWebTransportConnector>);
@@ -1875,8 +1871,6 @@ void PopulateServiceWorkerBinders(ServiceWorkerHost* host,
       &RenderProcessHostImpl::BindVideoDecodePerfHistory, host));
   map->Add<media::mojom::WebrtcVideoPerfHistory>(BindServiceWorkerReceiver(
       &RenderProcessHostImpl::BindWebrtcVideoPerfHistory, host));
-  map->Add<blink::mojom::PushMessaging>(BindServiceWorkerReceiver(
-      &RenderProcessHostImpl::BindPushMessaging, host));
 }
 
 void PopulateBinderMapWithContext(

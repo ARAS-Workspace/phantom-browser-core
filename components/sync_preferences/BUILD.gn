@@ -69,7 +69,6 @@ source_set("common_syncable_prefs_database") {
     "//components/plus_addresses/core/common:prefs",
     "//components/safe_browsing/core/common:safe_browsing_prefs",
     "//components/saved_tab_groups/public",
-    "//components/sharing_message",
     "//components/subscription_eligibility",
     "//components/sync_preferences/cross_device_pref_tracker/prefs",
     "//components/translate/core/browser",

@@ -33,7 +33,6 @@
 #include "content/public/browser/web_contents.h"
 #include "third_party/blink/public/common/service_worker/embedded_worker_status.h"
 #include "third_party/blink/public/common/storage_key/storage_key.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging_status.mojom.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_object.mojom.h"
 #include "url/gurl.h"
 #include "url/origin.h"
@@ -283,22 +282,7 @@ Response ServiceWorkerHandler::DeliverPushMessage(
     const std::string& origin,
     const std::string& registration_id,
     const std::string& data) {
-  if (!enabled_)
-    return CreateDomainNotEnabledErrorResponse();
-  if (!browser_context_)
-    return CreateContextErrorResponse();
-  int64_t id = 0;
-  if (!base::StringToInt64(registration_id, &id))
-    return CreateInvalidVersionIdErrorResponse();
-  std::optional<std::string> payload;
-  if (data.size() > 0)
-    payload = data;
-  browser_context_->DeliverPushMessage(
-      GURL(origin), id,
-      /* message_id= */ std::string(), std::move(payload),
-      /* record_network_requests=  */ false, base::DoNothing());
-
-  return Response::Success();
+  return Response::ServerError("Push messaging is not available");
 }
 
 Response ServiceWorkerHandler::DispatchSyncEvent(

@@ -163,7 +163,6 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/sensor/chrome_sensor_delegate.h"
 #include "chrome/browser/serial/chrome_serial_delegate.h"
-#include "chrome/browser/sharing/sms/sms_remote_fetcher.h"
 #include "chrome/browser/signin/chrome_signin_proxying_url_loader_factory.h"
 #include "chrome/browser/signin/chrome_signin_url_loader_throttle.h"
 #include "chrome/browser/signin/header_modification_delegate_impl.h"
@@ -7047,18 +7046,6 @@ void ChromeContentBrowserClient::GetMediaDeviceIDSalt(
   salt_service->GetSalt(rfh->GetStorageKey(),
                         base::BindOnce(std::move(callback), allowed));
 }
-
-#if !BUILDFLAG(IS_ANDROID)
-base::OnceClosure ChromeContentBrowserClient::FetchRemoteSms(
-    content::WebContents* web_contents,
-    const std::vector<url::Origin>& origin_list,
-    base::OnceCallback<void(std::optional<std::vector<url::Origin>>,
-                            std::optional<std::string>,
-                            std::optional<content::SmsFetchFailureType>)>
-        callback) {
-  return ::FetchRemoteSms(web_contents, origin_list, std::move(callback));
-}
-#endif
 
 std::optional<GURL>
 ChromeContentBrowserClient::MaybeOverrideSourceURLForClipboardAccess(

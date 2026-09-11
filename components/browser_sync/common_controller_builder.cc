@@ -60,8 +60,6 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/send_tab_to_self/send_tab_to_self_data_type_controller.h"
 #include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
-#include "components/sharing_message/sharing_message_bridge.h"
-#include "components/sharing_message/sharing_message_data_type_controller.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/skills/features.h"
 #include "components/skills/public/skill_data_type_controller.h"
@@ -377,11 +375,6 @@ void CommonControllerBuilder::SetTabContextSyncService(
   tab_context_sync_service_.Set(tab_context_sync_service);
 }
 
-void CommonControllerBuilder::SetSharingMessageBridge(
-    SharingMessageBridge* sharing_message_bridge) {
-  sharing_message_bridge_.Set(sharing_message_bridge);
-}
-
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
 void CommonControllerBuilder::SetFamilyLinkSettingsService(
     supervised_user::FamilyLinkSettingsService* family_link_settings_service) {
@@ -516,10 +509,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
 
   if (!disabled_types.Has(syncer::SHARED_TAB_GROUP_DATA)) {
     add_controller(CreateSharedTabGroupDataTypeController(sync_service));
-  }
-
-  if (!disabled_types.Has(syncer::SHARING_MESSAGE)) {
-    add_controller(CreateSharingMessageDataTypeController());
   }
 
   if (!disabled_types.Has(syncer::READING_LIST)) {
@@ -942,22 +931,6 @@ CommonControllerBuilder::CreateSharedTabGroupDataTypeController(
       /*delegate_for_transport_mode=*/
       std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
       sync_service, collaboration_service_.value());
-}
-
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateSharingMessageDataTypeController() {
-  if (!sharing_message_bridge_.value()) {
-    return nullptr;
-  }
-  syncer::DataTypeControllerDelegate* sharing_message_delegate =
-      sharing_message_bridge_.value()->GetControllerDelegate().get();
-  return std::make_unique<SharingMessageDataTypeController>(
-      /*delegate_for_full_sync_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-          sharing_message_delegate),
-      /*delegate_for_transport_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(
-          sharing_message_delegate));
 }
 
 std::unique_ptr<syncer::DataTypeController>

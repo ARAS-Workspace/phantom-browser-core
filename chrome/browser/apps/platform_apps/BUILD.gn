@@ -78,7 +78,6 @@ source_set("platform_apps") {
     "//components/no_state_prefetch/browser",
     "//components/pref_registry",
     "//components/services/app_service",
-    "//components/sharing_message/proto",
     "//content/public/browser",
     "//content/public/common",
     "//extensions/browser",

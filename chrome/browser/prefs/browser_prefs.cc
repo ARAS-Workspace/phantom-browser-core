@@ -72,9 +72,6 @@
 #include "chrome/browser/profiles/profile_attributes_storage.h"
 #include "chrome/browser/profiles/profile_impl.h"
 #include "chrome/browser/profiles/profiles_state.h"
-#include "chrome/browser/push_messaging/push_messaging_app_identifier.h"
-#include "chrome/browser/push_messaging/push_messaging_service_impl.h"
-#include "chrome/browser/push_messaging/push_messaging_unsubscribed_entry.h"
 #include "chrome/browser/rlz/chrome_rlz_tracker_delegate.h"
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/search/search.h"
@@ -131,7 +128,6 @@
 #include "components/feature_engagement/public/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
 #include "components/image_fetcher/core/cache/image_cache.h"
-#include "components/invalidation/impl/per_user_topic_subscription_manager.h"
 #include "components/language/content/browser/geo_language_provider.h"
 #include "components/language/content/browser/ulp_language_code_locator/ulp_language_code_locator.h"
 #include "components/language/core/browser/language_prefs.h"
@@ -188,7 +184,6 @@
 #include "components/segmentation_platform/embedder/default_model/device_switcher_result_dispatcher.h"
 #include "components/segmentation_platform/public/segmentation_platform_service.h"
 #include "components/sessions/core/session_id_generator.h"
-#include "components/sharing_message/sharing_sync_preference.h"
 #include "components/signin/core/browser/active_primary_accounts_metrics_recorder.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_prefs.h"
@@ -299,7 +294,6 @@
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/actor/ui/actor_ui_state_manager_prefs.h"
 #include "chrome/browser/desktop_to_mobile_promos/promos_utils.h"  // nogncheck crbug.com/40147906
-#include "chrome/browser/gcm/gcm_product_util.h"
 #include "chrome/browser/indigo/indigo_prefs.h"
 #include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/media/router/discovery/access_code/access_code_cast_feature.h"
@@ -1155,7 +1149,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   flags_ui::PrefServiceFlagsStorage::RegisterPrefs(registry);
   GpuModeManager::RegisterPrefs(registry);
   signin::IdentityManager::RegisterLocalStatePrefs(registry);
-  invalidation::PerUserTopicSubscriptionManager::RegisterPrefs(registry);
   language::GeoLanguageProvider::RegisterLocalStatePrefs(registry);
   language::UlpLanguageCodeLocator::RegisterLocalStatePrefs(registry);
   memory::EnterpriseMemoryLimitPrefObserver::RegisterPrefs(registry);
@@ -1229,7 +1222,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   registry->RegisterIntegerPref(first_run::kTosDialogBehavior, 0);
   registry->RegisterBooleanPref(lens::kLensCameraAssistedSearchEnabled, true);
 #else   // BUILDFLAG(IS_ANDROID)
-  gcm::RegisterPrefs(registry);
   headless::RegisterPrefs(registry);
   IntranetRedirectDetector::RegisterPrefs(registry);
   media_router::RegisterLocalStatePrefs(registry);
@@ -1384,7 +1376,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   image_fetcher::ImageCache::RegisterProfilePrefs(registry);
   site_engagement::ImportantSitesUtil::RegisterProfilePrefs(registry);
   IncognitoModePrefs::RegisterProfilePrefs(registry);
-  invalidation::PerUserTopicSubscriptionManager::RegisterProfilePrefs(registry);
   language::LanguagePrefs::RegisterProfilePrefs(registry);
   login_detection::prefs::RegisterProfilePrefs(registry);
   lookalikes::RegisterProfilePrefs(registry);
@@ -1425,8 +1416,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   ProfileImpl::RegisterProfilePrefs(registry);
   ProfileNetworkContextService::RegisterProfilePrefs(registry);
   custom_handlers::ProtocolHandlerRegistry::RegisterProfilePrefs(registry);
-  PushMessagingAppIdentifier::RegisterProfilePrefs(registry);
-  PushMessagingUnsubscribedEntry::RegisterProfilePrefs(registry);
   QuietNotificationPermissionUiState::RegisterProfilePrefs(registry);
   regional_capabilities::prefs::RegisterProfilePrefs(registry);
   RegisterBrowserUserPrefs(registry);
@@ -1464,7 +1453,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
       registry);
   SearchPreloadService::RegisterProfilePrefs(registry);
   SessionStartupPref::RegisterProfilePrefs(registry);
-  SharingSyncPreference::RegisterProfilePrefs(registry);
   SigninPrefs::RegisterProfilePrefs(registry);
   site_engagement::SiteEngagementService::RegisterProfilePrefs(registry);
   skills::prefs::RegisterProfilePrefs(registry);
@@ -1579,7 +1567,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   ChromeAuthenticatorRequestDelegate::RegisterProfilePrefs(registry);
   commerce::CommerceUiTabHelper::RegisterProfilePrefs(registry);
   first_run::RegisterProfilePrefs(registry);
-  gcm::RegisterProfilePrefs(registry);
   HatsServiceDesktop::RegisterProfilePrefs(registry);
   lens::prefs::RegisterProfilePrefs(registry);
   media_router::RegisterAccessCodeProfilePrefs(registry);

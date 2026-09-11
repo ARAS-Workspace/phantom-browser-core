@@ -29,8 +29,6 @@
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "net/http/http_request_headers.h"
 #include "third_party/blink/public/mojom/blob/blob.mojom-forward.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging.mojom-forward.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging_status.mojom-forward.h"
 #include "third_party/perfetto/include/perfetto/tracing/traced_value_forward.h"
 
 class GURL;
@@ -104,7 +102,6 @@ class OriginTrialsControllerDelegate;
 class PermissionController;
 class PermissionControllerDelegate;
 class PlatformNotificationService;
-class PushMessagingService;
 class ReduceAcceptLanguageControllerDelegate;
 class ResourceContext;
 class SSLHostStateDelegate;
@@ -281,28 +278,6 @@ class CONTENT_EXPORT BrowserContext : public base::SupportsUserData {
   mojo::PendingRemote<blink::mojom::Blob> GetBlobRemote(
       const std::string& uuid);
 
-  // Delivers a push message with |data| to the Service Worker identified by
-  // |origin| and |service_worker_registration_id|. |record_network_requests|
-  // indicates whether network request urls should be recorded during the push
-  // event.
-  void DeliverPushMessage(
-      const GURL& origin,
-      int64_t service_worker_registration_id,
-      const std::string& message_id,
-      std::optional<std::string> payload,
-      bool record_network_requests,
-      base::OnceCallback<void(blink::mojom::PushEventStatus)> callback);
-
-  // Fires a push subscription change event to the Service Worker identified by
-  // |origin| and |service_worker_registration_id| with |new_subscription| and
-  // |old_subscription| as event information.
-  void FirePushSubscriptionChangeEvent(
-      const GURL& origin,
-      int64_t service_worker_registration_id,
-      blink::mojom::PushSubscriptionPtr new_subscription,
-      blink::mojom::PushSubscriptionPtr old_subscription,
-      base::OnceCallback<void(blink::mojom::PushEventStatus)> callback);
-
   void NotifyWillBeDestroyed();
 
   // Ensures that the corresponding ResourceContext is initialized. Normally the
@@ -419,7 +394,6 @@ class CONTENT_EXPORT BrowserContext : public base::SupportsUserData {
   // Returns a push messaging service. The embedder owns the service, and is
   // responsible for ensuring that it outlives RenderProcessHost. It's valid to
   // return nullptr.
-  virtual PushMessagingService* GetPushMessagingService() = 0;
 
   // Returns a storage notification service associated with that context,
   // nullptr otherwise. In the case that nullptr is returned, QuotaManager

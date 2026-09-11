@@ -36,8 +36,7 @@ class FakeSyncEngineFactory : public SyncEngineFactory {
   // SyncEngineFactory overrides.
   std::unique_ptr<SyncEngine> CreateSyncEngine(
       const std::string& name,
-      const signin::GaiaIdHash& gaia_id_hash,
-      syncer::SyncInvalidationsService* sync_invalidations_service) override;
+      const signin::GaiaIdHash& gaia_id_hash) override;
   bool HasTransportDataIncludingFirstSync(
       const signin::GaiaIdHash& gaia_id_hash) override;
   void CleanupOnDisableSync() override;

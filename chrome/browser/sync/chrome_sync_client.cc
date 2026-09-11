@@ -64,7 +64,6 @@ ChromeSyncClient::ChromeSyncClient(
     PrefService* pref_service,
     signin::IdentityManager* identity_manager,
     trusted_vault::TrustedVaultService* trusted_vault_service,
-    syncer::SyncInvalidationsService* sync_invalidations_service,
     syncer::DeviceInfoSyncService* device_info_sync_service,
     syncer::DataTypeStoreService* data_type_store_service,
     supervised_user::FamilyLinkSettingsService* family_link_settings_service,
@@ -73,7 +72,6 @@ ChromeSyncClient::ChromeSyncClient(
       pref_service_(pref_service),
       identity_manager_(identity_manager),
       trusted_vault_service_(trusted_vault_service),
-      sync_invalidations_service_(sync_invalidations_service),
       family_link_settings_service_(family_link_settings_service),
       extensions_activity_monitor_(std::move(extensions_activity_monitor)),
       engine_factory_(this,
@@ -109,11 +107,6 @@ base::FilePath ChromeSyncClient::GetLocalSyncBackendFolder() {
 trusted_vault::TrustedVaultClient* ChromeSyncClient::GetTrustedVaultClient() {
   return trusted_vault_service_->GetTrustedVaultClient(
       trusted_vault::SecurityDomainId::kChromeSync);
-}
-
-syncer::SyncInvalidationsService*
-ChromeSyncClient::GetSyncInvalidationsService() {
-  return sync_invalidations_service_;
 }
 
 scoped_refptr<syncer::ExtensionsActivity>

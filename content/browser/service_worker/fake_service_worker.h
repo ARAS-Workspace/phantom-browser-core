@@ -103,15 +103,6 @@ class FakeServiceWorker : public blink::mojom::ServiceWorker {
       const std::string& notification_id,
       const blink::PlatformNotificationData& notification_data,
       DispatchNotificationCloseEventCallback callback) override;
-  void DispatchPushEvent(const std::optional<std::string>& payload,
-                         DispatchPushEventCallback callback) override;
-  void DispatchPushEventRecordingNetworkRequests(
-      const std::optional<std::string>& payload,
-      DispatchPushEventRecordingNetworkRequestsCallback callback) override;
-  void DispatchPushSubscriptionChangeEvent(
-      blink::mojom::PushSubscriptionPtr old_subscription,
-      blink::mojom::PushSubscriptionPtr new_subscription,
-      DispatchPushSubscriptionChangeEventCallback callback) override;
   void DispatchSyncEvent(const std::string& tag,
                          bool last_chance,
                          base::TimeDelta timeout,

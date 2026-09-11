@@ -173,7 +173,6 @@ class CORE_EXPORT ExecutionContext : public Supplementable<ExecutionContext>,
 
   virtual bool IsContextThread() const { return true; }
 
-  virtual void MaybeRecordNetworkRequestUrlForPushEvents(const KURL& url) {}
   virtual void MaybeRecordFetchError(int net_error_code,
                                      const FetchRequestData* request_data) {}
 

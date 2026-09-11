@@ -96,10 +96,6 @@ namespace component_updater {
 class ComponentUpdateService;
 }
 
-namespace gcm {
-class GCMDriver;
-}
-
 namespace metrics {
 class MetricsService;
 }
@@ -294,11 +290,6 @@ class BrowserProcess {
   virtual WebRtcLogUploader* webrtc_log_uploader() = 0;
 
   virtual network_time::NetworkTimeTracker* network_time_tracker() = 0;
-
-#if !BUILDFLAG(IS_ANDROID)
-  // Avoid using this. Prefer using GCMProfileServiceFactory.
-  virtual gcm::GCMDriver* gcm_driver() = 0;
-#endif
 
   // Returns the tab manager. On non-supported platforms, this returns null.
   // TODO(sebmarchand): Update callers to

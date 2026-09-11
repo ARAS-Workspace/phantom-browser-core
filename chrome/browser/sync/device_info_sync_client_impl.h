@@ -38,12 +38,6 @@ class DeviceInfoSyncClientImpl : public syncer::DeviceInfoSyncClient {
       const override;
 
   // syncer::DeviceInfoSyncClient:
-  std::optional<std::string> GetFCMRegistrationToken() const override;
-
-  // syncer::DeviceInfoSyncClient:
-  std::optional<syncer::DataTypeSet> GetInterestedDataTypes() const override;
-
-  // syncer::DeviceInfoSyncClient:
   syncer::DeviceInfo::PhoneAsASecurityKeyInfo::StatusOrInfo
   GetPhoneAsASecurityKeyInfo() const override;
 

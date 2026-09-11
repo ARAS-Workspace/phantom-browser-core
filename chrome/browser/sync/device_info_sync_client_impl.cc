@@ -17,9 +17,6 @@
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/chrome_device_id_helper.h"
-#include "chrome/browser/sync/sync_invalidations_service_factory.h"
-#include "components/sharing_message/sharing_sync_preference.h"
-#include "components/sync/invalidations/sync_invalidations_service.h"
 #include "components/sync/service/sync_prefs.h"
 #include "components/sync_device_info/device_info_proto_enum_util.h"
 #include "device/fido/public/features.h"
@@ -63,22 +60,7 @@ DeviceInfoSyncClientImpl::GetSendTabToSelfReceivingType() const {
 // syncer::DeviceInfoSyncClient:
 std::optional<syncer::DeviceInfo::SharingInfo>
 DeviceInfoSyncClientImpl::GetLocalSharingInfo() const {
-  return SharingSyncPreference::GetLocalSharingInfoForSync(
-      profile_->GetPrefs());
-}
-
-// syncer::DeviceInfoSyncClient:
-std::optional<std::string> DeviceInfoSyncClientImpl::GetFCMRegistrationToken()
-    const {
-  return SyncInvalidationsServiceFactory::GetForProfile(profile_)
-      ->GetFCMRegistrationToken();
-}
-
-// syncer::DeviceInfoSyncClient:
-std::optional<syncer::DataTypeSet>
-DeviceInfoSyncClientImpl::GetInterestedDataTypes() const {
-  return SyncInvalidationsServiceFactory::GetForProfile(profile_)
-      ->GetInterestedDataTypes();
+  return std::nullopt;
 }
 
 syncer::DeviceInfo::PhoneAsASecurityKeyInfo::StatusOrInfo

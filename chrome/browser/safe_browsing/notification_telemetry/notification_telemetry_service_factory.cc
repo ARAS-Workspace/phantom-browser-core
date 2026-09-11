@@ -8,7 +8,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/push_messaging/push_messaging_service_factory.h"
 #include "chrome/browser/safe_browsing/notification_telemetry/notification_telemetry_service.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "components/safe_browsing/core/browser/db/database_manager.h"

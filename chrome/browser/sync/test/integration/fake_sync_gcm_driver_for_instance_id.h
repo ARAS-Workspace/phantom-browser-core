@@ -9,7 +9,6 @@
 #include <string>
 
 #include "base/memory/scoped_refptr.h"
-#include "components/gcm_driver/instance_id/fake_gcm_driver_for_instance_id.h"
 
 class Profile;
 

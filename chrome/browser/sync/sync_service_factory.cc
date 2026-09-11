@@ -23,7 +23,6 @@
 #include "chrome/browser/data_sharing/data_sharing_service_factory.h"
 #include "chrome/browser/data_sharing/personal_collaboration_data/personal_collaboration_data_service_factory.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
-#include "chrome/browser/gcm/gcm_profile_service_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/notebooks/notebooks_service_factory.h"
@@ -39,7 +38,6 @@
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/security_events/security_event_recorder_factory.h"
-#include "chrome/browser/sharing/sharing_message_bridge_factory.h"
 #include "chrome/browser/signin/about_signin_internals_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/supervised_user/family_link_settings_service_factory.h"
@@ -54,7 +52,6 @@
 #include "chrome/browser/sync/local_or_syncable_bookmark_sync_service_factory.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/sync/session_sync_service_factory.h"
-#include "chrome/browser/sync/sync_invalidations_service_factory.h"
 #include "chrome/browser/sync/tab_context_sync_service_factory.h"
 #include "chrome/browser/sync/user_event_service_factory.h"
 #include "chrome/browser/tab_group_sync/feature_utils.h"
@@ -259,8 +256,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
       SessionSyncServiceFactory::GetForProfile(profile));
   builder.SetTabContextSyncService(
       TabContextSyncServiceFactory::GetForProfile(profile));
-  builder.SetSharingMessageBridge(
-      SharingMessageBridgeFactory::GetForBrowserContext(profile));
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
   builder.SetFamilyLinkSettingsService(
       supervised_user::FamilyLinkSettingsServiceFactory::GetForKey(
@@ -345,7 +340,6 @@ std::unique_ptr<syncer::SyncClient> BuildSyncClient(Profile* profile) {
       profile->GetBaseName(), profile->GetPrefs(),
       IdentityManagerFactory::GetForProfile(profile),
       TrustedVaultServiceFactory::GetForProfile(profile),
-      SyncInvalidationsServiceFactory::GetForProfile(profile),
       DeviceInfoSyncServiceFactory::GetForProfile(profile),
       DataTypeStoreServiceFactory::GetForProfile(profile),
       supervised_user::FamilyLinkSettingsServiceFactory::GetForKey(
@@ -412,11 +406,6 @@ std::unique_ptr<KeyedService> BuildSyncService(
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   if (!local_sync_backend_enabled) {
-    // Always create the GCMProfileService instance such that we can listen to
-    // the profile notifications and purge the GCM store when the profile is
-    // being signed out.
-    gcm::GCMProfileServiceFactory::GetForProfile(profile);
-
     AboutSigninInternalsFactory::GetForProfile(profile);
   }
 
@@ -522,7 +511,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(data_sharing::personal_collaboration_data::
                 PersonalCollaborationDataServiceFactory::GetInstance());
   DependsOn(FaviconServiceFactory::GetInstance());
-  DependsOn(gcm::GCMProfileServiceFactory::GetInstance());
   DependsOn(GoogleGroupsManagerFactory::GetInstance());
   DependsOn(HistoryServiceFactory::GetInstance());
   DependsOn(IdentityManagerFactory::GetInstance());
@@ -537,14 +525,12 @@ SyncServiceFactory::SyncServiceFactory()
 
   DependsOn(SecurityEventRecorderFactory::GetInstance());
   DependsOn(SendTabToSelfSyncServiceFactory::GetInstance());
-  DependsOn(SharingMessageBridgeFactory::GetInstance());
 #if !BUILDFLAG(IS_ANDROID)
   DependsOn(skills::SkillsServiceFactory::GetInstance());
 #endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(ENABLE_SPELLCHECK)
   DependsOn(SpellcheckServiceFactory::GetInstance());
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
-  DependsOn(SyncInvalidationsServiceFactory::GetInstance());
   DependsOn(supervised_user::FamilyLinkSettingsServiceFactory::GetInstance());
   DependsOn(SessionSyncServiceFactory::GetInstance());
   DependsOn(TabContextSyncServiceFactory::GetInstance());

@@ -841,18 +841,6 @@ BASE_FEATURE(kOriginKeyedProcessesByDefault, base::FEATURE_ENABLED_BY_DEFAULT);
 // Origin-Agent-Cluster: ?1 header.
 BASE_FEATURE(kExcludeAdsFromOriginIsolation, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Fires the `pushsubscriptionchange` event defined here:
-// https://w3c.github.io/push-api/#the-pushsubscriptionchange-event
-// for subscription refreshes, revoked permissions or subscription losses
-BASE_FEATURE(kPushSubscriptionChangeEventOnInvalidation,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Fires the `pushsubscriptionchange` event defined here:
-// https://w3c.github.io/push-api/#the-pushsubscriptionchange-event
-// upon manual resubscription to previously unsubscribed notifications.
-BASE_FEATURE(kPushSubscriptionChangeEventOnResubscribe,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // When enabled, sends SubresourceResponseStarted IPC only when the user has
 // allowed any HTTPS-related warning exceptions. From field data, ~100% of
 // subresource notifications are not required, since allowing certificate
@@ -1555,13 +1543,6 @@ bool IsVideoCaptureServiceEnabledForOutOfProcess() {
 bool IsVideoCaptureServiceEnabledForBrowserProcess() {
   return GetVideoCaptureServiceConfiguration() ==
          VideoCaptureServiceConfiguration::kEnabledForBrowserProcess;
-}
-
-bool IsPushSubscriptionChangeEventEnabled() {
-  return base::FeatureList::IsEnabled(
-             features::kPushSubscriptionChangeEventOnInvalidation) ||
-         base::FeatureList::IsEnabled(
-             features::kPushSubscriptionChangeEventOnResubscribe);
 }
 
 #if BUILDFLAG(IS_ANDROID)

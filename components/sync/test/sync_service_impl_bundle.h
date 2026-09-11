@@ -10,7 +10,6 @@
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/sync/service/sync_service_impl.h"
 #include "components/sync/test/fake_sync_engine_factory.h"
-#include "components/sync/test/mock_sync_invalidations_service.h"
 #include "components/sync/test/sync_client_mock.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/trusted_vault/test/fake_trusted_vault_client.h"
@@ -58,10 +57,6 @@ class SyncServiceImplBundle {
 
   FakeSyncEngineFactory* engine_factory() { return &engine_factory_; }
 
-  MockSyncInvalidationsService* sync_invalidations_service() {
-    return &sync_invalidations_service_;
-  }
-
   trusted_vault::FakeTrustedVaultClient* trusted_vault_client() {
     return &trusted_vault_client_;
   }
@@ -71,7 +66,6 @@ class SyncServiceImplBundle {
   network::TestURLLoaderFactory test_url_loader_factory_;
   signin::IdentityTestEnvironment identity_test_env_;
   FakeSyncEngineFactory engine_factory_;
-  testing::NiceMock<MockSyncInvalidationsService> sync_invalidations_service_;
   trusted_vault::FakeTrustedVaultClient trusted_vault_client_;
   std::unique_ptr<os_crypt_async::OSCryptAsync> os_crypt_async_;
 };

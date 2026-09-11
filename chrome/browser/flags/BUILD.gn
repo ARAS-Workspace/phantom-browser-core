@@ -107,7 +107,6 @@ static_library("flags_android_impl") {
     "//components/permissions:permissions_common",
     "//components/policy/core/common",
     "//components/privacy_sandbox:features",
-    "//components/push_messaging",
     "//components/regional_capabilities",
     "//components/safe_browsing/core/common:features",
     "//components/safety_check:features",

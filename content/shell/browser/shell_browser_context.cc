@@ -116,10 +116,6 @@ ShellBrowserContext::GetPlatformNotificationService() {
   return nullptr;
 }
 
-PushMessagingService* ShellBrowserContext::GetPushMessagingService() {
-  return nullptr;
-}
-
 StorageNotificationService*
 ShellBrowserContext::GetStorageNotificationService() {
   return nullptr;

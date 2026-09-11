@@ -874,16 +874,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       const blink::StorageKey& storage_key,
       base::OnceCallback<void(bool, const std::string&)> callback) override;
 
-#if !BUILDFLAG(IS_ANDROID)
-  base::OnceClosure FetchRemoteSms(
-      content::WebContents* web_contents,
-      const std::vector<url::Origin>& origin_list,
-      base::OnceCallback<void(std::optional<std::vector<url::Origin>>,
-                              std::optional<std::string>,
-                              std::optional<content::SmsFetchFailureType>)>
-          callback) override;
-#endif
-
   bool IsClipboardPasteAllowed(
       content::RenderFrameHost* render_frame_host) override;
 

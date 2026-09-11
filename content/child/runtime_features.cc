@@ -253,10 +253,6 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
         *mapping.chromium_feature, mapping.option, mapping.feature_enabler);
   }
 
-  if (features::IsPushSubscriptionChangeEventEnabled()) {
-    wf::EnablePushMessagingSubscriptionChange(true);
-  }
-
   // TODO(crbug.com/40571563): Cleanup the inconsistency between custom WRF
   // enabler function and using feature string name with
   // EnableFeatureFromString.
@@ -373,8 +369,6 @@ void SetRuntimeFeaturesFromCommandLine(const base::CommandLine& command_line) {
        switches::kEnableNetworkInformationDownlinkMax, true},
       {wrf::EnableNotifications, switches::kDisableNotifications, false},
       {wrf::EnablePreciseMemoryInfo, switches::kEnablePreciseMemoryInfo, true},
-      // Chrome's Push Messaging implementation relies on Web Notifications.
-      {wrf::EnablePushMessaging, switches::kDisableNotifications, false},
       {wrf::EnableScriptedSpeechRecognition, switches::kDisableSpeechAPI,
        false},
       {wrf::EnableScriptedSpeechSynthesis, switches::kDisableSpeechAPI, false},

@@ -38,11 +38,9 @@ specific_include_rules = {
     "+components/safe_browsing",
     "+components/saved_tab_groups/public",
     "+components/search_engines",
-    "+components/sharing_message",
     "+components/subscription_eligibility",
     "+components/translate",
     "+components/variations",
-    "+components/sharing_message",
     "+components/sync_preferences/cross_device_pref_tracker",
   ]
 }

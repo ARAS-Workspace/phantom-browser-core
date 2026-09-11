@@ -51,10 +51,6 @@ class FakeSyncEngine final : public SyncEngine {
     return last_configure_reason_;
   }
 
-  bool started_handling_invalidations() {
-    return started_handling_invalidations_;
-  }
-
   void SetPollIntervalElapsed(bool elapsed);
 
   // Manual completion of Initialize(), required if auto-completion was disabled
@@ -82,7 +78,6 @@ class FakeSyncEngine final : public SyncEngine {
 
   void StartConfiguration() override;
 
-  void StartHandlingInvalidations() override;
 
   void StartSyncingWithServer() override;
 
@@ -138,7 +133,6 @@ class FakeSyncEngine final : public SyncEngine {
   bool initialized_ = false;
   SyncStatus sync_status_;
   CoreAccountId authenticated_account_id_;
-  bool started_handling_invalidations_ = false;
   bool is_next_poll_time_in_the_past_ = false;
   ConfigureReason last_configure_reason_ = ConfigureReason::kUnknown;
   std::optional<SyncCredentials> last_credentials_;

@@ -237,7 +237,6 @@ source_set("impl") {
 
     deps += [
       "//chrome/browser/media/webrtc",
-      "//chrome/browser/sharing",
       "//chrome/browser/ui:chrome_pages",
       "//chrome/browser/ui/navigator",
       "//chrome/browser/ui/tabs:tab_strip",

@@ -56,8 +56,6 @@
 #include "url/gurl.h"
 
 #if BUILDFLAG(IS_ANDROID)
-#include "components/gcm_driver/instance_id/instance_id_android.h"
-#include "components/gcm_driver/instance_id/scoped_use_fake_instance_id_android.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
 namespace offline_pages {

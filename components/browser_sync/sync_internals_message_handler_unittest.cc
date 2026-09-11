@@ -22,7 +22,6 @@
 #include "components/sync/model/type_entities_count.h"
 #include "components/sync/service/sync_internals_util.h"
 #include "components/sync/service/sync_service.h"
-#include "components/sync/test/mock_sync_invalidations_service.h"
 #include "components/sync/test/mock_sync_service.h"
 #include "components/sync_user_events/fake_user_event_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -87,10 +86,6 @@ class SyncInternalsMessageHandlerTest : public testing::Test {
 
   syncer::MockSyncService* mock_sync_service() { return &mock_sync_service_; }
 
-  syncer::MockSyncInvalidationsService* mock_sync_invalidations_service() {
-    return &mock_sync_invalidations_service_;
-  }
-
   syncer::FakeUserEventService* fake_user_event_service() {
     return &fake_user_event_service_;
   }
@@ -120,7 +115,6 @@ class SyncInternalsMessageHandlerTest : public testing::Test {
   MockDelegate mock_delegate_;
   signin::IdentityTestEnvironment identity_test_environment_;
   syncer::MockSyncService mock_sync_service_;
-  syncer::MockSyncInvalidationsService mock_sync_invalidations_service_;
   syncer::FakeUserEventService fake_user_event_service_;
   std::unique_ptr<SyncInternalsMessageHandler> handler_ =
       std::make_unique<SyncInternalsMessageHandler>(
@@ -130,7 +124,6 @@ class SyncInternalsMessageHandlerTest : public testing::Test {
               base::Unretained(this)),
           identity_test_environment_.identity_manager(),
           &mock_sync_service_,
-          &mock_sync_invalidations_service_,
           &fake_user_event_service_,
           kChannel);
   int get_about_sync_data_dall_count_ = 0;
@@ -178,8 +171,7 @@ TEST_F(SyncInternalsMessageHandlerTest, AddRemoveObserversSyncDisabled) {
         return kAboutInformation.Clone();
       }),
       identity_test_environment()->identity_manager(),
-      /*sync_service=*/nullptr, mock_sync_invalidations_service(),
-      fake_user_event_service(), kChannel);
+      /*sync_service=*/nullptr, fake_user_event_service(), kChannel);
   handler->GetMessageHandlerMap()
       .at(kRequestDataAndRegisterForUpdates)
       .Run(base::ListValue());

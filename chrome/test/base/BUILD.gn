@@ -607,7 +607,6 @@ if (!is_android) {
       "//chrome/browser/ui/user_education",
       "//chrome/browser/ui/views:bubble_anchor_util_views",
       "//chrome/common:buildflags",
-      "//components/sharing_message",
       "//ui/color",
       "//ui/views",
     ]

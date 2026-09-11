@@ -11,7 +11,6 @@
 #include "content/public/test/content_test_suite_base.h"
 
 #if BUILDFLAG(IS_ANDROID)
-#include "components/gcm_driver/instance_id/scoped_use_fake_instance_id_android.h"
 #endif
 
 // Test suite for unit and browser tests. Creates services needed by both.

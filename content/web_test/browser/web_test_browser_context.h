@@ -35,7 +35,6 @@ class WebTestBrowserContext final : public ShellBrowserContext {
   // ShellBrowserContext overrides.
   DownloadManagerDelegate* GetDownloadManagerDelegate() override;
   PlatformNotificationService* GetPlatformNotificationService() override;
-  PushMessagingService* GetPushMessagingService() override;
   PermissionControllerDelegate* GetPermissionControllerDelegate() override;
   BackgroundFetchDelegate* GetBackgroundFetchDelegate() override;
   BackgroundSyncController* GetBackgroundSyncController() override;

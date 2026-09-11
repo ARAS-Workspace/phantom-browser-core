@@ -987,9 +987,7 @@ void DeviceInfoSyncBridge::OnReadAllMetadata(
   // initialize the provider immediately.
   local_cache_guid_ = local_cache_guid_in_metadata;
 
-  // Get stored sync invalidation fields to initialize local device info. This
-  // is needed to prevent an unnecessary DeviceInfo commit on browser startup
-  // when the SyncInvalidationsService is not initialized.
+  // Get the stored device info fields to initialize local device info.
   auto iter = all_data_.find(local_cache_guid_);
   CHECK(iter != all_data_.end());
 

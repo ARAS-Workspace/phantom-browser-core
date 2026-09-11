@@ -17,7 +17,6 @@
 #include "chrome/browser/ui/find_bar/find_bar.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/bubble_anchor_util_views.h"
-#include "components/sharing_message/sharing_dialog_data.h"
 #include "components/user_education/common/new_badge/new_badge_controller.h"
 #include "content/public/browser/keyboard_event_processing_result.h"
 #include "content/public/browser/web_contents.h"

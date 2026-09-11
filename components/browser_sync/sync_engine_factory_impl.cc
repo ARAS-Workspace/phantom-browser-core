@@ -15,7 +15,6 @@
 #include "components/signin/public/base/gaia_id_hash.h"
 #include "components/sync/base/legacy_directory_deletion.h"
 #include "components/sync/engine/sync_engine.h"
-#include "components/sync/invalidations/sync_invalidations_service.h"
 #include "components/sync/service/glue/sync_engine_impl.h"
 #include "components/sync/service/glue/sync_transport_data_prefs.h"
 #include "components/sync/service/sync_client.h"
@@ -42,10 +41,9 @@ SyncEngineFactoryImpl::~SyncEngineFactoryImpl() = default;
 std::unique_ptr<syncer::SyncEngine>
 SyncEngineFactoryImpl::CreateSyncEngine(
     const std::string& name,
-    const signin::GaiaIdHash& gaia_id_hash,
-    syncer::SyncInvalidationsService* sync_invalidation_service) {
+    const signin::GaiaIdHash& gaia_id_hash) {
   return std::make_unique<syncer::SyncEngineImpl>(
-      name, sync_invalidation_service, sync_client_->GetNetworkTimeTracker(),
+      name, sync_client_->GetNetworkTimeTracker(),
       std::make_unique<browser_sync::ActiveDevicesProviderImpl>(
           device_info_tracker_, base::DefaultClock::GetInstance()),
       std::make_unique<syncer::SyncTransportDataPrefs>(

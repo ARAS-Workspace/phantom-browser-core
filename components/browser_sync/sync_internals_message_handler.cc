@@ -20,9 +20,7 @@
 #include "components/sync/base/command_line_switches.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/engine/events/protocol_event.h"
-#include "components/sync/invalidations/sync_invalidations_service.h"
 #include "components/sync/model/type_entities_count.h"
-#include "components/sync/protocol/sync_invalidations_payload.pb.h"
 #include "components/sync/protocol/user_event_specifics.pb.h"
 #include "components/sync/service/sync_internals_util.h"
 #include "components/sync/service/sync_service.h"
@@ -65,7 +63,6 @@ SyncInternalsMessageHandler::SyncInternalsMessageHandler(
     Delegate* delegate,
     signin::IdentityManager* identity_manager,
     syncer::SyncService* sync_service,
-    syncer::SyncInvalidationsService* sync_invalidations_service,
     syncer::UserEventService* user_event_service,
     const std::string& channel)
     : SyncInternalsMessageHandler(
@@ -74,7 +71,6 @@ SyncInternalsMessageHandler::SyncInternalsMessageHandler(
                               syncer::sync_ui_util::IncludeSensitiveData(true)),
           identity_manager,
           sync_service,
-          sync_invalidations_service,
           user_event_service,
           channel) {
   // This class serves to display debug information to the user, so it's fine to
@@ -86,7 +82,6 @@ SyncInternalsMessageHandler::SyncInternalsMessageHandler(
     GetAboutSyncDataCb get_about_sync_data_cb,
     signin::IdentityManager* identity_manager,
     syncer::SyncService* sync_service,
-    syncer::SyncInvalidationsService* sync_invalidations_service,
     syncer::UserEventService* user_event_service,
     const std::string& channel)
     : include_specifics_(GetIncludeSpecificsInitialState()),
@@ -94,7 +89,6 @@ SyncInternalsMessageHandler::SyncInternalsMessageHandler(
       get_about_sync_data_cb_(std::move(get_about_sync_data_cb)),
       identity_manager_(identity_manager),
       sync_service_(sync_service),
-      sync_invalidations_service_(sync_invalidations_service),
       user_event_service_(user_event_service),
       channel_(channel) {}
 
@@ -108,7 +102,6 @@ void SyncInternalsMessageHandler::DisableMessagesToPage() {
   weak_ptr_factory_.InvalidateWeakPtrs();
   sync_service_observation_.Reset();
   protocol_event_observation_.Reset();
-  invalidations_observation_.Reset();
 }
 
 base::flat_map<std::string, SyncInternalsMessageHandler::PageMessageHandler>
@@ -157,10 +150,6 @@ void SyncInternalsMessageHandler::HandleRequestDataAndRegisterForUpdates(
   }
   if (sync_service_ && !protocol_event_observation_.IsObserving()) {
     protocol_event_observation_.Observe(sync_service_);
-  }
-  if (sync_invalidations_service_ &&
-      !invalidations_observation_.IsObserving()) {
-    invalidations_observation_.Observe(sync_invalidations_service_);
   }
 
   SendAboutInfoAndEntityCounts();
@@ -294,29 +283,6 @@ void SyncInternalsMessageHandler::OnProtocolEvent(
   base::DictValue dict = event.ToValue(include_specifics_);
   base::ValueView event_args[] = {dict};
   delegate_->SendEventToPage(syncer::sync_ui_util::kOnProtocolEvent,
-                             event_args);
-}
-
-void SyncInternalsMessageHandler::OnInvalidationReceived(
-    const std::string& payload) {
-  sync_pb::SyncInvalidationsPayload payload_message;
-  if (!payload_message.ParseFromString(payload)) {
-    return;
-  }
-
-  base::ListValue data_types_list;
-  for (const auto& data_type_invalidation :
-       payload_message.data_type_invalidations()) {
-    const int field_number = data_type_invalidation.data_type_id();
-    syncer::DataType type =
-        syncer::GetDataTypeFromSpecificsFieldNumber(field_number);
-    if (IsRealDataType(type)) {
-      data_types_list.Append(syncer::DataTypeToDebugString(type));
-    }
-  }
-
-  base::ValueView event_args[] = {data_types_list};
-  delegate_->SendEventToPage(syncer::sync_ui_util::kOnInvalidationReceived,
                              event_args);
 }
 

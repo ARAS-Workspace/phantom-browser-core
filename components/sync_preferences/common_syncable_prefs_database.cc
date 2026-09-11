@@ -27,7 +27,6 @@
 #include "components/plus_addresses/core/common/plus_address_prefs.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/saved_tab_groups/public/pref_names.h"
-#include "components/sharing_message/pref_names.h"
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"

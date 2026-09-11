@@ -13,15 +13,10 @@
 #include "components/policy/core/common/cloud/cloud_policy_service.h"
 #include "components/policy/policy_export.h"
 
-namespace invalidation {
-class ProfileInvalidationProvider;
-}
-
 namespace policy {
 
 class CloudPolicyCore;
 class RemoteCommandsFactory;
-class RemoteCommandsInvalidator;
 
 // A `KeyedService` of UserRemoteCommandService which is responsible for
 // initialize and maintain the ownership of a remote command service at the
@@ -47,17 +42,12 @@ class POLICY_EXPORT UserRemoteCommandsServiceBase
   void Shutdown() override;
 
  protected:
-  virtual invalidation::ProfileInvalidationProvider*
-  GetInvalidationProvider() = 0;
-
   virtual std::unique_ptr<RemoteCommandsFactory> GetFactory() = 0;
 
  private:
   raw_ptr<CloudPolicyCore> core_;
   base::ScopedObservation<CloudPolicyService, CloudPolicyService::Observer>
       cloud_policy_service_observer_{this};
-
-  std::unique_ptr<RemoteCommandsInvalidator> invalidator_;
 };
 
 }  // namespace policy

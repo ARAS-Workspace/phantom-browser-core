@@ -5,7 +5,6 @@
 #include "chrome/browser/enterprise/remote_commands/user_remote_commands_service.h"
 
 #include "chrome/browser/enterprise/remote_commands/user_remote_commands_factory.h"
-#include "chrome/browser/invalidation/profile_invalidation_provider_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/policy/core/common/cloud/user_cloud_policy_manager.h"
 
@@ -16,12 +15,6 @@ UserRemoteCommandsService::UserRemoteCommandsService(Profile* profile)
           profile->GetCloudPolicyManager()->core()),
       profile_(profile) {}
 UserRemoteCommandsService::~UserRemoteCommandsService() = default;
-
-invalidation::ProfileInvalidationProvider*
-UserRemoteCommandsService::GetInvalidationProvider() {
-  return invalidation::ProfileInvalidationProviderFactory::GetForProfile(
-      profile_);
-}
 
 std::unique_ptr<policy::RemoteCommandsFactory>
 UserRemoteCommandsService::GetFactory() {

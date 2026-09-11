@@ -122,7 +122,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
 
   // ExecutionContext overrides:
   bool IsServiceWorkerGlobalScope() const override { return true; }
-  void MaybeRecordNetworkRequestUrlForPushEvents(const KURL& url) override;
   void MaybeRecordFetchError(int net_error_code,
                              const FetchRequestData* request_data) override;
   bool IsInFencedFrame() const override;
@@ -307,10 +306,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
                                        mojom::ServiceWorkerEventStatus);
   void DidHandleNotificationCloseEvent(int event_id,
                                        mojom::ServiceWorkerEventStatus);
-  void DidHandlePushEvent(int push_event_id, mojom::ServiceWorkerEventStatus);
-  void DidHandlePushSubscriptionChangeEvent(
-      int event_id,
-      mojom::ServiceWorkerEventStatus status);
   void DidHandleSyncEvent(int sync_event_id, mojom::ServiceWorkerEventStatus);
   void DidHandlePeriodicSyncEvent(int event_id,
                                   mojom::ServiceWorkerEventStatus status);
@@ -521,15 +516,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
       const String& notification_id,
       mojom::blink::NotificationDataPtr notification_data,
       DispatchNotificationCloseEventCallback callback) override;
-  void DispatchPushEvent(const String& payload,
-                         DispatchPushEventCallback callback) override;
-  void DispatchPushEventRecordingNetworkRequests(
-      const String& payload,
-      DispatchPushEventRecordingNetworkRequestsCallback callback) override;
-  void DispatchPushSubscriptionChangeEvent(
-      mojom::blink::PushSubscriptionPtr old_subscription,
-      mojom::blink::PushSubscriptionPtr new_subscription,
-      DispatchPushSubscriptionChangeEventCallback callback) override;
   void DispatchSyncEvent(const String& tag,
                          bool last_chance,
                          base::TimeDelta timeout,
@@ -611,12 +597,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
   void StartNotificationCloseEvent(
       String notification_id,
       mojom::blink::NotificationDataPtr notification_data,
-      int event_id);
-  void StartPushEvent(String payload,
-                      int event_id);
-  void StartPushSubscriptionChangeEvent(
-      mojom::blink::PushSubscriptionPtr old_subscription,
-      mojom::blink::PushSubscriptionPtr new_subscription,
       int event_id);
   void StartSyncEvent(String tag,
                       bool last_chance,
@@ -724,11 +704,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
       notification_click_event_callbacks_;
   HashMap<int, DispatchNotificationCloseEventCallback>
       notification_close_event_callbacks_;
-  HashMap<int, DispatchPushEventCallback> push_event_callbacks_;
-  HashMap<int, DispatchPushEventRecordingNetworkRequestsCallback>
-      push_event_recording_network_requests_callback_;
-  HashMap<int, DispatchPushSubscriptionChangeEventCallback>
-      push_subscription_change_event_callbacks_;
   HashMap<int, DispatchFetchEventInternalCallback> fetch_event_callbacks_;
   HashMap<int, DispatchCookieChangeEventCallback>
       cookie_change_event_callbacks_;
@@ -784,19 +759,6 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
 
   // Whether `PrepareForEvaluation` should be deferred.
   bool defer_prepare_for_evaluation_ = false;
-
-  // Whether network requests made during a push event should be recorded for
-  // later forwarding to the browser process.
-  enum class RecordNetworkRequestsDuringPushEvent {
-    kDoNotRecord,
-    kRecord,
-  };
-  RecordNetworkRequestsDuringPushEvent should_record_network_requests_ =
-      RecordNetworkRequestsDuringPushEvent::kDoNotRecord;
-
-  // The collection of network request urls contacted during the life of a push
-  // event.
-  Vector<KURL> push_event_network_request_urls_;
 
   // Connected by the ServiceWorkerHost in the browser process and by the
   // controllees. |controller_bindings_| should be destroyed before

@@ -7,7 +7,6 @@
 #include "base/files/file_path.h"
 #include "base/task/sequenced_task_runner.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/gcm_driver/crypto/gcm_encryption_result.h"
 
 FakeSyncGCMDriver::FakeSyncGCMDriver(
     Profile* profile,

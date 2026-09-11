@@ -21,13 +21,6 @@
 #include "google_apis/gaia/gaia_constants.h"
 #include "services/network/public/cpp/resource_request.h"
 
-#if BUILDFLAG(PLATFORM_CFM)
-#include "base/check_deref.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/device_identity/device_identity_provider.h"
-#include "chrome/browser/device_identity/device_oauth2_token_service_factory.h"
-#endif  // BUILDFLAG(PLATFORM_CFM)
-
 namespace feedback {
 
 namespace {
@@ -87,16 +80,6 @@ void FeedbackUploaderChrome::PrimaryAccountAccessTokenAvailable(
   AccessTokenAvailable(error, access_token_info.token);
 }
 
-#if BUILDFLAG(PLATFORM_CFM)
-void FeedbackUploaderChrome::ActiveAccountAccessTokenAvailable(
-    GoogleServiceAuthError error,
-    std::string token) {
-  DCHECK(active_account_token_fetcher_);
-  active_account_token_fetcher_.reset();
-  AccessTokenAvailable(error, token);
-}
-#endif  // BUILDFLAG(PLATFORM_CFM)
-
 void FeedbackUploaderChrome::AccessTokenAvailable(GoogleServiceAuthError error,
                                                   std::string token) {
   if (error.state() == GoogleServiceAuthError::NONE) {
@@ -138,31 +121,6 @@ void FeedbackUploaderChrome::StartDispatchingReport() {
             signin::ConsentLevel::kSignin);
     return;
   }
-
-#if BUILDFLAG(PLATFORM_CFM)
-  // CFM Devices may need to acquire the auth token for their robot account
-  // before they submit feedback.
-  DeviceOAuth2TokenService* deviceTokenService =
-      DeviceOAuth2TokenServiceFactory::Get();
-  DCHECK(deviceTokenService);
-  auto device_identity_provider =
-      std::make_unique<DeviceIdentityProvider>(deviceTokenService);
-
-  // Flag indicating that a device was intended to be used as a CFM.
-  bool isMeetDevice = policy::EnrollmentRequisitionManager::IsMeetDevice(
-      CHECK_DEREF(g_browser_process->local_state()));
-  if (isMeetDevice && !device_identity_provider->GetActiveAccountId().empty()) {
-    char kConsumer[] = "feedback_uploader";
-    OAuth2AccessTokenManager::ScopeSet scopes;
-    scopes.insert(GaiaConstants::kSupportContentOAuth2Scope);
-    active_account_token_fetcher_ = device_identity_provider->FetchAccessToken(
-        kConsumer, scopes,
-        base::BindOnce(
-            &FeedbackUploaderChrome::ActiveAccountAccessTokenAvailable,
-            base::Unretained(this)));
-    return;
-  }
-#endif  // BUILDFLAG(PLATFORM_CFM)
 
   LOG(ERROR) << "Failed to request oauth access token. "
              << kAuthenticationErrorLogMessage;

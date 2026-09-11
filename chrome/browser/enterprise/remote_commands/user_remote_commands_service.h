@@ -23,7 +23,6 @@ class UserRemoteCommandsService : public policy::UserRemoteCommandsServiceBase {
 
  private:
   // policy::UserRemoteCommandsServiceBase
-  invalidation::ProfileInvalidationProvider* GetInvalidationProvider() override;
   std::unique_ptr<policy::RemoteCommandsFactory> GetFactory() override;
 
   raw_ptr<Profile> profile_;

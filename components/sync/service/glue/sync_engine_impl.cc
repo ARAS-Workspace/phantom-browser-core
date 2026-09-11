@@ -28,7 +28,6 @@
 #include "components/sync/engine/polling_constants.h"
 #include "components/sync/engine/sync_engine_host.h"
 #include "components/sync/engine/sync_string_conversions.h"
-#include "components/sync/invalidations/sync_invalidations_service.h"
 #include "components/sync/protocol/sync_invalidations_payload.pb.h"
 #include "components/sync/service/active_devices_provider.h"
 #include "components/sync/service/glue/sync_engine_backend.h"
@@ -129,7 +128,6 @@ class SyncEngineImpl::NetworkTimeObserverImpl
 
 SyncEngineImpl::SyncEngineImpl(
     const std::string& name,
-    SyncInvalidationsService* sync_invalidations_service,
     network_time::NetworkTimeTracker* network_time_tracker,
     std::unique_ptr<ActiveDevicesProvider> active_devices_provider,
     std::unique_ptr<SyncTransportDataPrefs> prefs,
@@ -138,16 +136,12 @@ SyncEngineImpl::SyncEngineImpl(
     : sync_task_runner_(std::move(sync_task_runner)),
       name_(name),
       prefs_(std::move(prefs)),
-      sync_invalidations_service_(sync_invalidations_service),
       active_devices_provider_(std::move(active_devices_provider)),
       network_time_tracker_(network_time_tracker),
       engine_created_time_for_metrics_(base::TimeTicks::Now()) {
   DCHECK(prefs_);
-  DCHECK(sync_invalidations_service_);
   backend_ = base::MakeRefCounted<SyncEngineBackend>(
       name_, sync_data_folder, weak_ptr_factory_.GetWeakPtr());
-  sync_invalidations_service_->AddTokenObserver(this);
-
   if (network_time_tracker_) {
     network_time_observer_ =
         std::make_unique<NetworkTimeObserverImpl>(network_time_tracker_, this);
@@ -254,23 +248,6 @@ void SyncEngineImpl::StartSyncingWithServer() {
                                 last_poll_time));
 }
 
-void SyncEngineImpl::StartHandlingInvalidations() {
-  // Sync invalidation service must be subscribed to data types by this time.
-  // Without that, incoming invalidations would be filtered out.
-  DCHECK(sync_invalidations_service_->GetInterestedDataTypes().has_value());
-
-  // Adding a listener several times is safe. Replays the last incoming messages
-  // received so far.
-  sync_invalidations_service_->AddListener(this);
-
-  // UpdateStandaloneInvalidationsState() must be called after AddListener(),
-  // the invalidations should not be considered as initialized until any
-  // outstanding FCM messages are handled.
-  // TODO(crbug.com/40260679): this logic is quite fragile and should be
-  // revisited.
-  UpdateStandaloneInvalidationsState();
-}
-
 void SyncEngineImpl::SetEncryptionPassphrase(const std::string& passphrase) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   sync_task_runner_->PostTask(
@@ -320,13 +297,6 @@ void SyncEngineImpl::Shutdown(ShutdownReason reason) {
   // StopSyncingForShutdown() (which nulls out `host_`) should be
   // called first.
   DCHECK(!host_);
-
-  // It's safe to call RemoveListener even if AddListener wasn't called
-  // before.
-  DCHECK(sync_invalidations_service_);
-  sync_invalidations_service_->RemoveListener(this);
-  sync_invalidations_service_->RemoveTokenObserver(this);
-  sync_invalidations_service_ = nullptr;
 
   last_enabled_types_.Clear();
 
@@ -500,12 +470,6 @@ void SyncEngineImpl::HandleMigrationRequestedOnFrontendLoop(DataTypeSet types) {
   host_->OnMigrationNeededForTypes(types);
 }
 
-void SyncEngineImpl::OnInvalidatorStateChange(bool enabled) {
-  sync_task_runner_->PostTask(
-      FROM_HERE, base::BindOnce(&SyncEngineBackend::DoOnInvalidatorStateChange,
-                                backend_, enabled));
-}
-
 void SyncEngineImpl::HandleConnectionStatusChangeOnFrontendLoop(
     ConnectionStatus status) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -609,43 +573,6 @@ void SyncEngineImpl::OnNetworkTimeTrackerDestroyed() {
   network_time_observer_.reset();
 }
 
-void SyncEngineImpl::OnInvalidationReceived(const std::string& payload) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  std::optional<DataTypeSet> interested_data_types =
-      sync_invalidations_service_->GetInterestedDataTypes();
-
-  // Interested data types must be initialized before handling invalidations to
-  // prevent missing incoming invalidations which were received during
-  // configuration.
-  DCHECK(interested_data_types.has_value());
-
-  const base::Time arrival_time = base::Time::Now();
-  std::optional<base::Time> network_time;
-  std::optional<base::TimeDelta> network_time_uncertainty;
-
-  if (network_time_tracker_) {
-    base::Time nt;
-    base::TimeDelta uncertainty;
-    if (network_time_tracker_->GetNetworkTime(&nt, &uncertainty) ==
-        network_time::NetworkTimeTracker::NETWORK_TIME_AVAILABLE) {
-      network_time = nt;
-      network_time_uncertainty = uncertainty;
-    }
-  }
-
-  sync_task_runner_->PostTask(
-      FROM_HERE,
-      base::BindOnce(&SyncEngineBackend::DoOnStandaloneInvalidationReceived,
-                     backend_, payload, *interested_data_types, arrival_time,
-                     network_time, network_time_uncertainty));
-}
-
-void SyncEngineImpl::OnFCMRegistrationTokenChanged() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  UpdateStandaloneInvalidationsState();
-}
-
 // static
 std::string SyncEngineImpl::GenerateCacheGUIDForTest() {
   return GenerateCacheGUID();
@@ -674,27 +601,6 @@ void SyncEngineImpl::OnActiveDevicesChanged() {
 
 void SyncEngineImpl::UpdateLastSyncedTime() {
   prefs_->SetLastSyncedTime(base::Time::Now());
-}
-
-void SyncEngineImpl::UpdateStandaloneInvalidationsState() {
-  DCHECK(sync_invalidations_service_);
-
-  // Wait for FCM registration token and until the engine actually starts
-  // listening for invalidations (and processed the incoming messages if there
-  // are any).
-  if (!sync_invalidations_service_->GetFCMRegistrationToken().has_value() ||
-      !sync_invalidations_service_->HasListener(this)) {
-    OnInvalidatorStateChange(/*enabled=*/false);
-    return;
-  }
-
-  // This code should not be called when the token is empty (which means that
-  // sync standalone invalidations are disabled).
-  DCHECK_NE(sync_invalidations_service_->GetFCMRegistrationToken().value(), "");
-
-  // TODO(crbug.com/40266819): wait for FCM token to be committed before change
-  // the state to enabled.
-  OnInvalidatorStateChange(/*enabled=*/true);
 }
 
 }  // namespace syncer

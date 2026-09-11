@@ -424,12 +424,6 @@ OffTheRecordProfileImpl::GetPlatformNotificationService() {
   return PlatformNotificationServiceFactory::GetForProfile(this);
 }
 
-content::PushMessagingService*
-OffTheRecordProfileImpl::GetPushMessagingService() {
-  // TODO(johnme): Support push messaging in incognito if possible.
-  return nullptr;
-}
-
 content::StorageNotificationService*
 OffTheRecordProfileImpl::GetStorageNotificationService() {
   return nullptr;

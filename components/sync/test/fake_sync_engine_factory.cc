@@ -21,8 +21,7 @@ void FakeSyncEngineFactory::AllowFakeEngineInitCompletion(bool allow) {
 
 std::unique_ptr<SyncEngine> FakeSyncEngineFactory::CreateSyncEngine(
     const std::string& name,
-    const signin::GaiaIdHash& gaia_id_hash,
-    syncer::SyncInvalidationsService* sync_invalidations_service) {
+    const signin::GaiaIdHash& gaia_id_hash) {
   auto engine = std::make_unique<FakeSyncEngine>(
       allow_fake_engine_init_completion_,
       /*is_first_time_sync_configure=*/!is_first_time_sync_configure_done_,

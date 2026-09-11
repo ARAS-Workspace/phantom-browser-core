@@ -20,9 +20,7 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/sync/data_type_store_service_factory.h"
 #include "chrome/browser/sync/device_info_sync_client_impl.h"
-#include "chrome/browser/sync/sync_invalidations_service_factory.h"
 #include "chrome/common/channel_info.h"
-#include "components/sync/invalidations/sync_invalidations_service.h"
 #include "components/sync/model/data_type_store_service.h"
 #include "components/sync_device_info/device_info_prefs.h"
 #include "components/sync_device_info/device_info_sync_service_impl.h"
@@ -72,7 +70,6 @@ DeviceInfoSyncServiceFactory::DeviceInfoSyncServiceFactory()
               .WithAshInternals(ProfileSelection::kNone)
               .Build()) {
   DependsOn(DataTypeStoreServiceFactory::GetInstance());
-  DependsOn(SyncInvalidationsServiceFactory::GetInstance());
 }
 
 DeviceInfoSyncServiceFactory::~DeviceInfoSyncServiceFactory() = default;
@@ -97,7 +94,6 @@ DeviceInfoSyncServiceFactory::BuildServiceInstanceForBrowserContext(
       DataTypeStoreServiceFactory::GetForProfile(profile)->GetStoreFactory(),
       std::move(local_device_info_provider), std::move(device_prefs),
       std::move(device_info_sync_client),
-      SyncInvalidationsServiceFactory::GetForProfile(profile),
       /*pulse_task_runner=*/
       base::FeatureList::IsEnabled(base::features::kReducePPMs)
           ? content::GetUIThreadTaskRunner({base::TaskPriority::BEST_EFFORT})

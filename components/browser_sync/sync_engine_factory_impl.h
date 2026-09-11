@@ -16,7 +16,6 @@
 namespace syncer {
 class DeviceInfoTracker;
 class SyncClient;
-class SyncInvalidationsService;
 }  // namespace syncer
 
 namespace browser_sync {
@@ -34,8 +33,7 @@ class SyncEngineFactoryImpl : public syncer::SyncEngineFactory {
   // SyncEngineFactory implementation:
   std::unique_ptr<syncer::SyncEngine> CreateSyncEngine(
       const std::string& name,
-      const signin::GaiaIdHash& gaia_id_hash,
-      syncer::SyncInvalidationsService* sync_invalidation_service) override;
+      const signin::GaiaIdHash& gaia_id_hash) override;
   bool HasTransportDataIncludingFirstSync(
       const signin::GaiaIdHash& gaia_id_hash) override;
   void CleanupOnDisableSync() override;

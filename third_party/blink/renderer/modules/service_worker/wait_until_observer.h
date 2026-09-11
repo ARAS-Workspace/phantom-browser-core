@@ -33,8 +33,6 @@ class MODULES_EXPORT WaitUntilObserver final
     kNotificationClick,
     kNotificationClose,
     kPaymentRequest,
-    kPush,
-    kPushSubscriptionChange,
     kSync,
     kPeriodicSync,
     kBackgroundFetchAbort,

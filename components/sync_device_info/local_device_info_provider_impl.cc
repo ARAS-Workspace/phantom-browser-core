@@ -50,21 +50,6 @@ const DeviceInfo* LocalDeviceInfoProviderImpl::GetLocalDeviceInfo() const {
       sync_client_->GetSendTabToSelfReceivingType());
   local_device_info_->set_sharing_info(sync_client_->GetLocalSharingInfo());
 
-  // Do not update previous values if the service is not fully initialized.
-  // std::nullopt means that the value is unknown yet and the previous value
-  // should be kept.
-  const std::optional<std::string> fcm_token =
-      sync_client_->GetFCMRegistrationToken();
-  if (fcm_token) {
-    local_device_info_->set_fcm_registration_token(*fcm_token);
-  }
-
-  const std::optional<DataTypeSet> interested_data_types =
-      sync_client_->GetInterestedDataTypes();
-  if (interested_data_types) {
-    local_device_info_->set_interested_data_types(*interested_data_types);
-  }
-
   DeviceInfo::PhoneAsASecurityKeyInfo::StatusOrInfo paask_status =
       sync_client_->GetPhoneAsASecurityKeyInfo();
   if (std::get_if<DeviceInfo::PhoneAsASecurityKeyInfo::NotReady>(

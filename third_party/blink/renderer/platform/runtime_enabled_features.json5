@@ -4919,24 +4919,6 @@
       status: "experimental",
     },
     {
-      name: "PushMessageDataBytes",
-      depends_on: ["PushMessaging"],
-      status: "stable",
-      base_feature: "none",
-    },
-    {
-      name: "PushMessaging",
-      public: true,
-      status: "stable",
-      base_feature: "none",
-    },
-    {
-      name: "PushMessagingSubscriptionChange",
-      public: true,
-      status: "experimental",
-      base_feature: "none",
-    },
-    {
       // ChromeStatus: https://chromestatus.com/feature/6194847180128256
       name: "QuotaExceededErrorUpdate",
       status: "stable",

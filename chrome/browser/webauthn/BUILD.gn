@@ -116,7 +116,6 @@ source_set("impl") {
     ]
     deps += [
       "//chrome/android:chrome_jni_headers",
-      "//chrome/browser/gcm",
       "//chrome/browser/net",
       "//chrome/browser/password_manager/android:utils",
       "//chrome/browser/password_manager/android/grouped_affiliations:public",

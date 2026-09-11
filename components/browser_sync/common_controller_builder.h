@@ -22,7 +22,6 @@
 class AimEligibilityService;
 class GoogleGroupsManager;
 class PrefService;
-class SharingMessageBridge;
 class TemplateURLService;
 
 namespace account_settings {
@@ -208,7 +207,6 @@ class CommonControllerBuilder {
       sync_sessions::SessionSyncService* session_sync_service);
   void SetTabContextSyncService(
       sync_tab_context::TabContextSyncService* tab_context_sync_service);
-  void SetSharingMessageBridge(SharingMessageBridge* sharing_message_bridge);
 
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
   void SetFamilyLinkSettingsService(
@@ -284,8 +282,6 @@ class CommonControllerBuilder {
   std::unique_ptr<syncer::DataTypeController>
   CreateEncryptedTabContextItemDataTypeController(
       syncer::SyncService* sync_service);
-  std::unique_ptr<syncer::DataTypeController>
-  CreateSharingMessageDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
   CreateReadingListDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
@@ -424,7 +420,6 @@ class CommonControllerBuilder {
                            PersonalCollaborationDataService>>
       personal_collaboration_data_service_;
   SafeOptional<raw_ptr<data_sharing::DataSharingService>> data_sharing_service_;
-  SafeOptional<raw_ptr<SharingMessageBridge>> sharing_message_bridge_;
   SafeOptional<raw_ptr<tab_groups::TabGroupSyncService>>
       tab_group_sync_service_;
   SafeOptional<raw_ptr<sync_tab_context::TabContextSyncService>>

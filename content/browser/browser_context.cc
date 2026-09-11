@@ -40,7 +40,6 @@
 #include "content/browser/preloading/prefetch/prefetch_request.h"
 #include "content/browser/preloading/prefetch/prefetch_service.h"
 #include "content/browser/preloading/prefetch/prefetch_type.h"
-#include "content/browser/push_messaging/push_messaging_router.h"
 #include "content/browser/site_info.h"
 #include "content/browser/storage_partition_impl_map.h"
 #include "content/public/browser/blob_handle.h"
@@ -66,7 +65,6 @@
 #include "storage/browser/blob/blob_storage_context.h"
 #include "storage/browser/file_system/external_mount_points.h"
 #include "third_party/blink/public/mojom/loader/referrer.mojom.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging.mojom.h"
 #include "third_party/perfetto/include/perfetto/tracing/traced_proto.h"
 #include "third_party/perfetto/include/perfetto/tracing/traced_value.h"
 #include "url/gurl.h"
@@ -314,31 +312,6 @@ mojo::PendingRemote<blink::mojom::Blob> BrowserContext::GetBlobRemote(
     const std::string& uuid) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   return ChromeBlobStorageContext::GetBlobRemote(this, uuid);
-}
-
-void BrowserContext::DeliverPushMessage(
-    const GURL& origin,
-    int64_t service_worker_registration_id,
-    const std::string& message_id,
-    std::optional<std::string> payload,
-    bool record_network_requests,
-    base::OnceCallback<void(blink::mojom::PushEventStatus)> callback) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  PushMessagingRouter::DeliverMessage(
-      this, origin, service_worker_registration_id, message_id,
-      std::move(payload), record_network_requests, std::move(callback));
-}
-
-void BrowserContext::FirePushSubscriptionChangeEvent(
-    const GURL& origin,
-    int64_t service_worker_registration_id,
-    blink::mojom::PushSubscriptionPtr new_subscription,
-    blink::mojom::PushSubscriptionPtr old_subscription,
-    base::OnceCallback<void(blink::mojom::PushEventStatus)> callback) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  PushMessagingRouter::FireSubscriptionChangeEvent(
-      this, origin, service_worker_registration_id, std::move(new_subscription),
-      std::move(old_subscription), std::move(callback));
 }
 
 void BrowserContext::NotifyWillBeDestroyed() {

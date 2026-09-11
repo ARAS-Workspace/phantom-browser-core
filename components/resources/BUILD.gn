@@ -43,7 +43,6 @@ group("resources") {
     "../autofill/core/browser:autofill_alternative_state_name_map_resources",
     "../autofill/core/browser/autofill_and_password_manager_internals:resources",
     "../crash/core/browser/resources",
-    "../gcm_driver/resources",
     "../metrics:server_urls_grd",
     "../net_log/resources",
     "../signin/core/browser/resources",

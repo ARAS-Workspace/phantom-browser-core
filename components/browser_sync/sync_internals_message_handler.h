@@ -19,8 +19,6 @@
 #include "base/scoped_observation_traits.h"
 #include "base/values.h"
 #include "components/sync/engine/events/protocol_event_observer.h"
-#include "components/sync/invalidations/invalidations_listener.h"
-#include "components/sync/invalidations/sync_invalidations_service.h"
 #include "components/sync/service/sync_service.h"
 #include "components/sync/service/sync_service_observer.h"
 
@@ -38,8 +36,7 @@ namespace browser_sync {
 // Class with the common logic for the chrome://sync-internals page. See also
 // ChromeSyncInternalsMessageHandler and IOSSyncInternalsMessageHandler.
 class SyncInternalsMessageHandler : public syncer::SyncServiceObserver,
-                                    public syncer::ProtocolEventObserver,
-                                    public syncer::InvalidationsListener {
+                                    public syncer::ProtocolEventObserver {
  public:
   // Interface that abstracts the platform-specific bits, namely interactions
   // with the page.
@@ -71,7 +68,6 @@ class SyncInternalsMessageHandler : public syncer::SyncServiceObserver,
       Delegate* delegate,
       signin::IdentityManager* identity_manager,
       syncer::SyncService* sync_service,
-      syncer::SyncInvalidationsService* sync_invalidations_service,
       syncer::UserEventService* user_event_service,
       const std::string& channel);
 
@@ -81,7 +77,6 @@ class SyncInternalsMessageHandler : public syncer::SyncServiceObserver,
       GetAboutSyncDataCb get_about_sync_data_cb,
       signin::IdentityManager* identity_manager,
       syncer::SyncService* sync_service,
-      syncer::SyncInvalidationsService* sync_invalidations_service,
       syncer::UserEventService* user_event_service,
       const std::string& channel);
 
@@ -147,16 +142,10 @@ class SyncInternalsMessageHandler : public syncer::SyncServiceObserver,
   // syncer::ProtocolEventObserver implementation.
   void OnProtocolEvent(const syncer::ProtocolEvent& e) override;
 
-  // syncer::InvalidationsListener implementation.
-  void OnInvalidationReceived(const std::string& payload) override;
-
   base::ScopedObservation<syncer::SyncService, syncer::SyncServiceObserver>
       sync_service_observation_{this};
   base::ScopedObservation<syncer::SyncService, syncer::ProtocolEventObserver>
       protocol_event_observation_{this};
-  base::ScopedObservation<syncer::SyncInvalidationsService,
-                          syncer::InvalidationsListener>
-      invalidations_observation_{this};
 
   // Whether specifics should be included when converting protocol events to a
   // human readable format.
@@ -167,7 +156,6 @@ class SyncInternalsMessageHandler : public syncer::SyncServiceObserver,
   const GetAboutSyncDataCb get_about_sync_data_cb_;
   const raw_ptr<signin::IdentityManager> identity_manager_;
   const raw_ptr<syncer::SyncService> sync_service_;
-  const raw_ptr<syncer::SyncInvalidationsService> sync_invalidations_service_;
   const raw_ptr<syncer::UserEventService> user_event_service_;
   const std::string channel_;
 
@@ -190,21 +178,6 @@ struct ScopedObservationTraits<syncer::SyncService,
   static void RemoveObserver(syncer::SyncService* source,
                              syncer::ProtocolEventObserver* observer) {
     source->RemoveProtocolEventObserver(observer);
-  }
-};
-
-// Required to use base::ScopedObservation with syncer::InvalidationsListener,
-// since the methods are not called AddObserver/RemoveObserver.
-template <>
-struct ScopedObservationTraits<syncer::SyncInvalidationsService,
-                               syncer::InvalidationsListener> {
-  static void AddObserver(syncer::SyncInvalidationsService* source,
-                          syncer::InvalidationsListener* observer) {
-    source->AddListener(observer);
-  }
-  static void RemoveObserver(syncer::SyncInvalidationsService* source,
-                             syncer::InvalidationsListener* observer) {
-    source->RemoveListener(observer);
   }
 };
 

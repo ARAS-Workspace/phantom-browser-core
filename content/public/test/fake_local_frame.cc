@@ -9,7 +9,6 @@
 #include "third_party/blink/public/mojom/devtools/inspector_issue.mojom.h"
 #include "third_party/blink/public/mojom/frame/media_player_action.mojom.h"
 #include "third_party/blink/public/mojom/navigation/navigation_params.mojom.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging.mojom.h"
 
 #if BUILDFLAG(IS_MAC)
 #include "ui/base/mojom/attributed_string.mojom.h"

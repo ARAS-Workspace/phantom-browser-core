@@ -50,7 +50,6 @@
 #include "components/sync/engine/net/http_post_provider_factory.h"
 #include "components/sync/engine/shutdown_reason.h"
 #include "components/sync/engine/sync_encryption_handler.h"
-#include "components/sync/invalidations/sync_invalidations_service.h"
 #include "components/sync/service/backend_migrator.h"
 #include "components/sync/service/bookmark_sync_error_state.h"
 #include "components/sync/service/configure_context.h"
@@ -88,9 +87,6 @@
 namespace syncer {
 
 namespace {
-
-BASE_FEATURE(kSyncUnsubscribeFromTypesWithPermanentErrors,
-             base::FEATURE_ENABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_ANDROID)
 constexpr int kMinGmsVersionCodeWithCustomPassphraseApi = 235204000;
@@ -320,23 +316,6 @@ void SyncServiceImpl::Initialize(DataTypeController::TypeVector controllers) {
   if (!IsLocalSyncEnabled()) {
     auth_manager_->RegisterForAuthNotifications();
 
-    // Trigger a refresh when additional data types get enabled for
-    // invalidations. This is needed to get the latest data after subscribing
-    // for the updates.
-    sync_client_->GetSyncInvalidationsService()
-        ->SetCommittedAdditionalInterestedDataTypesCallback(base::BindRepeating(
-            &SyncServiceImpl::TriggerRefresh, weak_factory_.GetWeakPtr(),
-            TriggerRefreshSource::kSyncInvalidationsService));
-
-    // TODO(crbug.com/40257467): revisit this logic. IsSignedIn() doesn't feel
-    // the right condition to check.
-    if (IsSignedIn()) {
-      // Start receiving invalidations as soon as possible since GCMDriver drops
-      // incoming FCM messages otherwise. The messages will be collected by
-      // SyncInvalidationsService until sync engine is initialized and ready to
-      // handle invalidations.
-      sync_client_->GetSyncInvalidationsService()->StartListening();
-    }
   }
 
   // *After* setting up `auth_manager_`, run pref migrations that depend on
@@ -593,8 +572,7 @@ void SyncServiceImpl::TryStartImpl(
 
   engine_ = sync_client_->GetSyncEngineFactory()->CreateSyncEngine(
       debug_identifier_,
-      signin::GaiaIdHash::FromGaiaId(authenticated_account_info.gaia),
-      sync_client_->GetSyncInvalidationsService());
+      signin::GaiaIdHash::FromGaiaId(authenticated_account_info.gaia));
   DCHECK(engine_);
 
   // Clear any old errors the first time sync starts.
@@ -629,11 +607,6 @@ void SyncServiceImpl::TryStartImpl(
 
   if (!IsLocalSyncEnabled()) {
     auth_manager_->ConnectionOpened();
-
-    // Ensures that invalidations are enabled, e.g. when the sync was just
-    // enabled or after the engine was stopped with clearing data. Note that
-    // invalidations are not supported for local sync.
-    sync_client_->GetSyncInvalidationsService()->StartListening();
   }
 
   engine_->Initialize(std::move(params));
@@ -707,17 +680,12 @@ std::unique_ptr<SyncEngine> SyncServiceImpl::ResetEngine(
   base::UmaHistogramEnumeration("Sync.ResetEngineReason", reset_reason);
   switch (shutdown_reason) {
     case ShutdownReason::STOP_SYNC_AND_KEEP_DATA:
-      // Do not stop listening for sync invalidations. Otherwise, GCMDriver
-      // would drop all the incoming messages.
       RemoveClientFromServer();
       break;
-    case ShutdownReason::DISABLE_SYNC_AND_CLEAR_DATA: {
-      sync_client_->GetSyncInvalidationsService()->StopListeningPermanently();
+    case ShutdownReason::DISABLE_SYNC_AND_CLEAR_DATA:
       RemoveClientFromServer();
       break;
-    }
     case ShutdownReason::BROWSER_SHUTDOWN_AND_KEEP_DATA:
-      sync_client_->GetSyncInvalidationsService()->StopListening();
       break;
   }
 
@@ -1246,12 +1214,6 @@ void SyncServiceImpl::OnConfigureDone(
   DVLOG(2) << "Notify observers OnConfigureDone";
   NotifyObservers();
 
-  // Update configured data types and start handling incoming invalidations. The
-  // order is important to guarantee that data types are configured to prevent
-  // filtering out invalidations.
-  UpdateDataTypesForInvalidations();
-  engine_->StartHandlingInvalidations();
-
   if (migrator_.get() && migrator_->state() != BackendMigrator::IDLE) {
     // Migration in progress.  Let the migrator know we just finished
     // configuring something.  It will be up to the migrator to call
@@ -1773,49 +1735,6 @@ bool SyncServiceImpl::UseTransportOnlyMode() const {
   return !IsSyncFeatureEnabled() && !IsLocalSyncEnabled();
 }
 
-void SyncServiceImpl::UpdateDataTypesForInvalidations() {
-  // Wait for configuring data types. This is needed to consider proxy types
-  // which become known during configuration.
-  if (!data_type_manager_ ||
-      data_type_manager_->state() != DataTypeManager::CONFIGURED) {
-    return;
-  }
-
-  // No need to register invalidations for non-protocol or commit-only types.
-  DataTypeSet types = Intersection(GetPreferredDataTypes(), ProtocolTypes());
-  types.RemoveAll(CommitOnlyTypes());
-
-  bool should_register_sessions = sessions_invalidations_enabled_;
-#if BUILDFLAG(IS_ANDROID)
-  if (!should_register_sessions &&
-      base::FeatureList::IsEnabled(
-          kAlwaysRegisterSessionsInvalidationsAndroid)) {
-    should_register_sessions = true;
-  }
-#endif
-  if (!should_register_sessions) {
-    types.Remove(SESSIONS);
-  }
-
-  if (!data_type_manager_->GetDataTypesWithPermanentErrors().empty() &&
-      base::FeatureList::IsEnabled(
-          kSyncUnsubscribeFromTypesWithPermanentErrors)) {
-    // Unsubscribe from data types with permanent errors. Types which are
-    // unready or have crypto errors are intentionally kept because they will
-    // may change their state.
-    types.RemoveAll(data_type_manager_->GetDataTypesWithPermanentErrors());
-  }
-
-#if BUILDFLAG(IS_ANDROID)
-  // On Android, don't subscribe to HISTORY invalidations, to save network
-  // traffic.
-  types.Remove(HISTORY);
-#endif
-  types.RemoveAll(data_type_manager_->GetActiveProxyDataTypes());
-
-  sync_client_->GetSyncInvalidationsService()->SetInterestedDataTypes(types);
-}
-
 SyncCycleSnapshot SyncServiceImpl::GetLastCycleSnapshotForDebugging() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return last_snapshot_;
@@ -2119,13 +2038,6 @@ void SyncServiceImpl::SetInvalidationsForSessionsEnabled(bool enabled) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
   sessions_invalidations_enabled_ = enabled;
-#if BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          kAlwaysRegisterSessionsInvalidationsAndroid)) {
-    return;
-  }
-#endif
-  UpdateDataTypesForInvalidations();
 }
 
 void SyncServiceImpl::SendExplicitPassphraseToPlatformClient() {

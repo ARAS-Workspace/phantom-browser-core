@@ -606,12 +606,6 @@ TestingBrowserProcess::network_time_tracker() {
   return network_time_tracker_.get();
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-gcm::GCMDriver* TestingBrowserProcess::gcm_driver() {
-  return nullptr;
-}
-#endif
-
 resource_coordinator::ResourceCoordinatorParts*
 TestingBrowserProcess::resource_coordinator_parts() {
   if (!resource_coordinator_parts_) {

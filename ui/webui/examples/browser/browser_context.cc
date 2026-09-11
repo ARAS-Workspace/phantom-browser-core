@@ -48,10 +48,6 @@ BrowserContext::GetPlatformNotificationService() {
   return nullptr;
 }
 
-content::PushMessagingService* BrowserContext::GetPushMessagingService() {
-  return nullptr;
-}
-
 content::StorageNotificationService*
 BrowserContext::GetStorageNotificationService() {
   return nullptr;

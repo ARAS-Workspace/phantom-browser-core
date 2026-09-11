@@ -89,7 +89,6 @@
 #include "third_party/blink/public/mojom/indexeddb/indexeddb.mojom-shared.h"
 #include "third_party/blink/public/mojom/loader/code_cache.mojom-forward.h"
 #include "third_party/blink/public/mojom/plugins/plugin_registry.mojom-forward.h"
-#include "third_party/blink/public/mojom/push_messaging/push_messaging.mojom-forward.h"
 #include "third_party/perfetto/include/perfetto/tracing/traced_proto.h"
 #include "third_party/perfetto/include/perfetto/tracing/traced_value_forward.h"
 #include "third_party/perfetto/include/perfetto/tracing/track.h"
@@ -158,7 +157,6 @@ class P2PSocketDispatcherHost;
 class PermissionServiceContext;
 class PluginRegistryImpl;
 class ProcessLock;
-class PushMessagingManager;
 class RenderProcessHostCreationObserver;
 class RenderProcessHostFactory;
 class RenderProcessHostPriorityClients;
@@ -807,11 +805,6 @@ class CONTENT_EXPORT RenderProcessHostImpl
   // process host, and is used by workers via BrowserInterfaceBroker.
   void BindWebrtcVideoPerfHistory(
       mojo::PendingReceiver<media::mojom::WebrtcVideoPerfHistory> receiver);
-
-  // Binds `receiver` to the `PushMessagingManager` instance owned by the
-  // render process host, and is used by workers via `BrowserInterfaceBroker`.
-  void BindPushMessaging(
-      mojo::PendingReceiver<blink::mojom::PushMessaging> receiver);
 
 
   // Binds |receiver| to a OneShotBackgroundSyncService instance owned by the
@@ -1563,7 +1556,6 @@ class CONTENT_EXPORT RenderProcessHostImpl
   std::unique_ptr<FileSystemManagerImpl, BrowserThread::DeleteOnIOThread>
       file_system_manager_impl_;
   std::unique_ptr<viz::GpuClient> gpu_client_;
-  std::unique_ptr<PushMessagingManager> push_messaging_manager_;
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
   std::unique_ptr<viz::GpuClient, base::OnTaskRunnerDeleter>
       oop_video_decoder_gpu_client_{nullptr,

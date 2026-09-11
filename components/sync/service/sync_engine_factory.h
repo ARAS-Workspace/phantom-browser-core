@@ -15,7 +15,6 @@ class GaiaIdHash;
 namespace syncer {
 
 class SyncEngine;
-class SyncInvalidationsService;
 
 // Class responsible for instantiating SyncEngine and restoring its state
 // (transport data including cache GUID, birthday, Nigori, etc.). In addition to
@@ -27,13 +26,11 @@ class SyncEngineFactory {
   virtual ~SyncEngineFactory() = default;
 
   // Instantiates SyncEngine for a specific account determined by
-  // `gaia_id_hash`. `sync_invalidation_service` must not be null. `name` is for
-  // logging purposes only, useful in integration tests that involve multiple
-  // clients.
+  // `gaia_id_hash`. `name` is for logging purposes only, useful in integration
+  // tests that involve multiple clients.
   virtual std::unique_ptr<SyncEngine> CreateSyncEngine(
       const std::string& name,
-      const signin::GaiaIdHash& gaia_id_hash,
-      SyncInvalidationsService* sync_invalidation_service) = 0;
+      const signin::GaiaIdHash& gaia_id_hash) = 0;
 
   // Returns whether the local transport data indicates that a sync engine
   // previously initialized successfully and hence populated at least some

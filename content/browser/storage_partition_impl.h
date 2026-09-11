@@ -107,7 +107,6 @@ class FontAccessManager;
 class GeneratedCodeCacheContext;
 class HostZoomLevelContext;
 class PaymentAppContextImpl;
-class PushMessagingContext;
 class QuotaContext;
 class ReconnectableURLLoaderFactoryForIOThreadWrapper;
 class SharedWorkerServiceImpl;
@@ -781,7 +780,6 @@ class CONTENT_EXPORT StoragePartitionImpl
   scoped_refptr<ServiceWorkerContextWrapper> service_worker_context_;
   std::unique_ptr<DedicatedWorkerServiceImpl> dedicated_worker_service_;
   std::unique_ptr<SharedWorkerServiceImpl> shared_worker_service_;
-  std::unique_ptr<PushMessagingContext> push_messaging_context_;
   scoped_refptr<storage::SpecialStoragePolicy> special_storage_policy_;
   std::unique_ptr<HostZoomLevelContext, BrowserThread::DeleteOnUIThread>
       host_zoom_level_context_;
