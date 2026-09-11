@@ -1973,19 +1973,6 @@ SyncService::DataTypeDownloadStatus SyncServiceImpl::GetDownloadStatusFor(
     return DataTypeDownloadStatus::kWaitingForUpdates;
   }
 
-  if (!engine_->GetDetailedStatus().notifications_enabled) {
-    DVLOG(1) << "Waiting for invalidations to be initialized";
-    return DataTypeDownloadStatus::kWaitingForUpdates;
-  }
-
-  // If there are any incoming invalidations or poll time elapsed, there can be
-  // new updates to download from the server.
-  if (engine_->GetDetailedStatus().invalidated_data_types.Has(type)) {
-    DVLOG(1) << "There are incoming invalidations for: "
-             << DataTypeToDebugString(type);
-    return DataTypeDownloadStatus::kWaitingForUpdates;
-  }
-
   // Wait for the poll request only during browser startup (i.e. when there were
   // not completed sync cycles). IsNextPollTimeInThePast() uses base::Time which
   // while poll scheduler uses base::TimeTicks. They may diverge in sleep mode
