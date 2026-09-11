@@ -122,6 +122,7 @@ function_registration("api_registration") {
     "chrome_web_view_internal",
     "chromeos_info_private",
     "commands",
+    "crash_report_private",
     "developer_private",
     "echo_private",
     "enterprise_login",
