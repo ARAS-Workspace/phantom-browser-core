@@ -28,8 +28,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/gmock_expected_support.h"
 #include "base/test/scoped_amount_of_physical_memory_override.h"
-#include "base/test/scoped_chromeos_version_info.h"
-#include "base/test/scoped_running_on_chromeos.h"
 #include "base/test/task_environment.h"
 #include "base/threading/platform_thread.h"
 #include "base/threading/scoped_blocking_call.h"

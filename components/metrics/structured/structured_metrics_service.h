@@ -16,7 +16,6 @@
 #include "components/metrics/delegating_provider.h"
 #include "components/metrics/metrics_provider.h"
 #include "components/metrics/structured/reporting/structured_metrics_reporting_service.h"
-#include "components/metrics/structured/storage_manager.h"
 #include "components/metrics/structured/structured_metrics_recorder.h"
 #include "components/metrics/structured/structured_metrics_scheduler.h"
 #include "components/metrics/unsent_log_store.h"

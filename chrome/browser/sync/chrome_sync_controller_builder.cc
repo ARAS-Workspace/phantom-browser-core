@@ -22,7 +22,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/channel_info.h"
-#include "components/desks_storage/core/desk_sync_service.h"
 #include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"

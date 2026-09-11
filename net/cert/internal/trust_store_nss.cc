@@ -22,7 +22,6 @@
 #include "base/notreached.h"
 #include "base/strings/string_number_conversions.h"
 #include "build/chromeos_buildflags.h"
-#include "crypto/chaps_support.h"
 #include "crypto/nss_util.h"
 #include "crypto/nss_util_internal.h"
 #include "crypto/obsolete/sha1.h"

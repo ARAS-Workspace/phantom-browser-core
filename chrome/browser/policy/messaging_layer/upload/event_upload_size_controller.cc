@@ -12,7 +12,6 @@
 #include "chrome/browser/policy/messaging_layer/upload/network_condition_service.h"
 #include "components/reporting/proto/synced/record.pb.h"
 #include "event_upload_size_controller.h"
-#include "file_upload_impl.h"
 
 namespace reporting {
 

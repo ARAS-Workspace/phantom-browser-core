@@ -8,7 +8,6 @@
 
 #include "base/command_line.h"
 #include "base/test/gtest_util.h"
-#include "base/test/scoped_chromeos_version_info.h"
 #include "base/test/scoped_feature_list.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/events/ozone/evdev/event_device_info.h"

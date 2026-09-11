@@ -11,8 +11,6 @@
 #include "content/browser/devtools/devtools_agent_host_impl.h"
 #include "content/browser/devtools/protocol/devtools_domain_handler.h"
 #include "content/browser/devtools/protocol/smart_card_emulation.h"
-#include "content/browser/smart_card/emulation/emulated_smart_card_context_factory.h"
-#include "content/browser/smart_card/emulation/smart_card_emulation_manager.h"
 #include "content/common/content_export.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "services/device/public/mojom/smart_card.mojom.h"

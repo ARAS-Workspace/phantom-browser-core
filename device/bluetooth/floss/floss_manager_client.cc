@@ -22,7 +22,6 @@
 #include "dbus/message.h"
 #include "dbus/object_proxy.h"
 #include "device/bluetooth/bluez/bluez_features.h"
-#include "device/bluetooth/chromeos_platform_features.h"
 #include "device/bluetooth/floss/floss_dbus_client.h"
 #include "device/bluetooth/floss/floss_features.h"
 

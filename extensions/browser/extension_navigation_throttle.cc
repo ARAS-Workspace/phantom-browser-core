@@ -47,7 +47,6 @@
 #include "extensions/browser/guest_view/web_view/web_view_guest.h"
 
 #if BUILDFLAG(ENABLE_PLATFORM_APPS)
-#include "extensions/browser/guest_view/app_view/app_view_guest.h"
 #endif
 #endif
 

@@ -8,7 +8,6 @@
 #include <memory>
 
 #include "content/browser/lock_screen/lock_screen_storage_impl.h"
-#include "content/public/browser/lock_screen_storage.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/web_contents.h"
 #include "url/origin.h"

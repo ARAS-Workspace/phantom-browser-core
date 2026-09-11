@@ -13,7 +13,6 @@
 #include "content/browser/smart_card/smart_card_histograms.h"
 #include "content/common/content_export.h"
 #include "content/public/browser/document_service.h"
-#include "content/public/browser/smart_card_delegate.h"
 #include "mojo/public/cpp/bindings/receiver_set.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "services/device/public/mojom/smart_card.mojom.h"

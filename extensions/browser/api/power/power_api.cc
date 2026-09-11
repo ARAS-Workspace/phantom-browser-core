@@ -8,7 +8,6 @@
 #include "base/functional/callback_helpers.h"
 #include "base/lazy_instance.h"
 #include "content/public/browser/device_service.h"
-#include "extensions/browser/api/power/activity_reporter_delegate.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/api/power.h"
 #include "extensions/common/extension.h"

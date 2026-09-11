@@ -70,7 +70,6 @@
 #include "components/policy/core/common/policy_details.h"
 #include "components/policy/core/common/policy_logger.h"
 #include "components/policy/core/common/policy_pref_names.h"
-#include "components/policy/core/common/policy_scheduler.h"
 #include "components/policy/core/common/policy_types.h"
 #include "components/policy/core/common/policy_utils.h"
 #include "components/policy/core/common/remote_commands/remote_commands_fetch_reason.h"

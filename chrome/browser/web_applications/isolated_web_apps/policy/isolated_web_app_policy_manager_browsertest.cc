@@ -30,7 +30,6 @@
 #include "base/version.h"
 #include "chrome/browser/apps/app_service/app_service_proxy.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/browser_process_platform_part_ash.h"
 #include "chrome/browser/devtools/devtools_window_testing.h"
 #include "chrome/browser/policy/developer_tools_policy_handler.h"
 #include "chrome/browser/prefs/session_startup_pref.h"

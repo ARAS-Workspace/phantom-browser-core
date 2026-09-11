@@ -17,7 +17,6 @@
 #include "components/feedback/feedback_report.h"
 #include "content/public/test/test_utils.h"
 #include "extensions/browser/api/feedback_private/feedback_private_delegate.h"
-#include "extensions/browser/api/feedback_private/mock_feedback_service.h"
 #include "extensions/browser/api_unittest.h"
 #include "extensions/common/api/feedback_private.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"

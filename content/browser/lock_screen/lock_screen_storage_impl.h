@@ -11,7 +11,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/threading/sequence_bound.h"
-#include "content/public/browser/lock_screen_storage.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "third_party/blink/public/mojom/lock_screen/lock_screen.mojom.h"
 

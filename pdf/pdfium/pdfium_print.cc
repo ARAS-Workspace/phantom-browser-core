@@ -12,7 +12,6 @@
 #include "base/check_op.h"
 #include "base/compiler_specific.h"
 #include "build/build_config.h"
-#include "pdf/flatten_pdf_result.h"
 #include "pdf/pdf_rect.h"
 #include "pdf/pdf_transform.h"
 #include "pdf/pdfium/pdfium_api_wrappers.h"

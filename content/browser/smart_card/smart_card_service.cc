@@ -11,7 +11,6 @@
 #include "content/browser/smart_card/smart_card_histograms.h"
 #include "content/public/browser/isolated_context_util.h"
 #include "content/public/browser/render_process_host.h"
-#include "content/public/browser/smart_card_delegate.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "services/device/public/mojom/smart_card.mojom.h"
 #include "third_party/blink/public/common/features_generated.h"
