@@ -9,11 +9,8 @@
 #include "components/variations/variations.mojom.h"
 #include "components/variations/variations_client.h"
 #include "components/variations/variations_ids_provider.h"
-#include "google_apis/common/api_error_codes.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "google_apis/gaia/gaia_urls.h"
 #include "google_apis/gaia/google_service_auth_error.h"
-#include "google_apis/google_api_keys.h"
 #include "net/base/url_util.h"
 #include "net/http/http_request_headers.h"
 

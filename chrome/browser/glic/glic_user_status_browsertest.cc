@@ -44,7 +44,6 @@
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/variations/variations_switches.h"
 #include "content/public/test/browser_test.h"
-#include "google_apis/common/api_error_codes.h"
 #include "net/base/net_errors.h"
 #include "net/dns/mock_host_resolver.h"
 #include "services/network/test/test_url_loader_factory.h"

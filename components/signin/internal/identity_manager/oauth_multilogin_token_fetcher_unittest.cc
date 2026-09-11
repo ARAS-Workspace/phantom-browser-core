@@ -17,7 +17,6 @@
 #include "components/signin/internal/identity_manager/oauth_multilogin_token_response.h"
 #include "components/signin/public/base/test_signin_client.h"
 #include "google_apis/gaia/core_account_id.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "google_apis/gaia/gaia_urls.h"
 #include "google_apis/gaia/oauth2_access_token_consumer.h"
 #include "testing/gmock/include/gmock/gmock.h"

@@ -16,7 +16,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/primary_account_access_token_fetcher.h"
 #include "components/variations/net/variations_http_headers.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "net/base/load_flags.h"
 #include "net/cookies/site_for_cookies.h"
 #include "net/http/http_request_headers.h"

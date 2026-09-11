@@ -27,7 +27,6 @@
 #include "google_apis/calendar/calendar_api_response_types.h"
 #include "google_apis/common/auth_service.h"
 #include "google_apis/common/request_sender.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "mojo/public/cpp/bindings/callback_helpers.h"
 
 namespace {

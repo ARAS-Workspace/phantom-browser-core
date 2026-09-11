@@ -11,7 +11,6 @@
 #include "chrome/browser/extensions/extension_service_test_base.h"
 #include "content/public/test/browser_task_environment.h"
 #include "extensions/buildflags/buildflags.h"
-#include "google_apis/gaia/gaia_id.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 

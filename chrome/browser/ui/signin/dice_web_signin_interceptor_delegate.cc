@@ -33,7 +33,6 @@
 #include "components/signin/public/identity_manager/tribool.h"
 #include "components/tabs/public/tab_interface.h"
 #include "google_apis/gaia/core_account_id.h"
-#include "google_apis/gaia/gaia_auth_util.h"
 
 namespace {
 

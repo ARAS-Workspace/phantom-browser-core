@@ -6,7 +6,6 @@
 
 #include "base/uuid.h"
 #include "build/build_config.h"
-#include "google_apis/google_api_keys.h"
 #include "remoting/base/service_urls.h"
 
 namespace remoting {

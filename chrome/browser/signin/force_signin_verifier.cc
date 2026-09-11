@@ -26,7 +26,6 @@
 #include "components/signin/public/identity_manager/primary_account_mutator.h"
 #include "components/sync/base/features.h"
 #include "content/public/browser/network_service_instance.h"
-#include "google_apis/gaia/gaia_constants.h"
 
 namespace {
 const net::BackoffEntry::Policy kForceSigninVerifierBackoffPolicy = {

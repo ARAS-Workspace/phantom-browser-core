@@ -57,7 +57,6 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/test_web_ui.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "net/base/url_util.h"
 #include "testing/gmock/include/gmock/gmock.h"

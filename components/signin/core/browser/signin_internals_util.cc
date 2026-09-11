@@ -11,7 +11,6 @@
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "crypto/sha2.h"
-#include "google_apis/gaia/gaia_constants.h"
 
 namespace signin_internals_util {
 

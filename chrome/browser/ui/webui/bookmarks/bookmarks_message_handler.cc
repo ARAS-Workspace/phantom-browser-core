@@ -32,7 +32,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/service/sync_service.h"
-#include "google_apis/gaia/gaia_id.h"
 
 namespace {
 

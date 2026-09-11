@@ -16,7 +16,6 @@
 #include "google_apis/gaia/gaia_oauth_client.h"
 #include "google_apis/gaia/gaia_urls.h"
 #include "google_apis/gaia/oauth2_access_token_fetcher.h"
-#include "google_apis/google_api_keys.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
 CredentialProviderSigninInfoFetcher::CredentialProviderSigninInfoFetcher(

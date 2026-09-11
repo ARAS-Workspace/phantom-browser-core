@@ -18,7 +18,6 @@
 #include "components/sync/service/device_statistics_request.h"
 #include "components/sync/test/fake_device_statistics_request.h"
 #include "google_apis/gaia/core_account_id.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace syncer {

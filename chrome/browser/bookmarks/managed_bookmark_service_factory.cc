@@ -15,7 +15,6 @@
 #include "chrome/browser/profiles/profile_selections.h"
 #include "components/bookmarks/managed/managed_bookmark_service.h"
 #include "components/policy/policy_constants.h"
-#include "google_apis/gaia/gaia_auth_util.h"
 
 namespace {
 

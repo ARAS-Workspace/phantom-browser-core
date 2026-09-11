@@ -5,7 +5,6 @@
 #include "components/sync/service/trusted_vault_synthetic_field_trial.h"
 
 #include "components/sync/protocol/nigori_specifics.pb.h"
-#include "google_apis/gaia/gaia_id.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 

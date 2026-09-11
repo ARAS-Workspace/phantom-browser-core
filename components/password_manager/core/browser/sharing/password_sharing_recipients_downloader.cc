@@ -16,7 +16,6 @@
 #include "components/signin/public/identity_manager/primary_account_access_token_fetcher.h"
 #include "components/sync/base/sync_util.h"
 #include "google_apis/credentials_mode.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "net/base/load_flags.h"
 #include "net/http/http_response_headers.h"
 #include "net/http/http_status_code.h"

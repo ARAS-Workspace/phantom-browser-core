@@ -5,7 +5,6 @@
 #include "chrome/browser/devtools/aida_service_handler.h"
 
 #include "chrome/browser/devtools/aida_client.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"
 
 namespace {

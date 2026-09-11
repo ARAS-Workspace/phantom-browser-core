@@ -29,7 +29,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "google_apis/common/api_error_codes.h"
 #include "google_apis/common/auth_service.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "net/base/load_flags.h"
 #include "url/gurl.h"
 

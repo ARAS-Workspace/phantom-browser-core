@@ -29,7 +29,6 @@
 #include "components/prefs/testing_pref_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
-#include "google_apis/gaia/gaia_id.h"
 #include "services/device/public/cpp/test/fake_serial_port_manager.h"
 #include "services/device/public/mojom/serial.mojom.h"
 #include "testing/gmock/include/gmock/gmock.h"

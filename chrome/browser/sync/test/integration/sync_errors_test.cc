@@ -31,7 +31,6 @@
 #include "components/sync/service/sync_service_impl.h"
 #include "components/sync_user_events/user_event_service.h"
 #include "content/public/test/browser_test.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 
 using bookmarks::BookmarkNode;
 using bookmarks_helper::AddFolder;

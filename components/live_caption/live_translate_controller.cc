@@ -24,7 +24,6 @@
 #include "components/soda/constants.h"
 #include "components/sync_preferences/pref_service_syncable.h"
 #include "content/public/browser/browser_context.h"
-#include "google_apis/google_api_keys.h"
 #include "media/mojo/mojom/speech_recognition_result.h"
 
 namespace captions {

@@ -22,7 +22,6 @@
 #include "extensions/browser/updater/null_extension_cache.h"
 #include "extensions/browser/url_request_util.h"
 #include "extensions/common/features/feature_channel.h"
-#include "google_apis/gaia/gaia_urls.h"
 #include "services/network/public/mojom/url_loader.mojom.h"
 
 using content::BrowserContext;

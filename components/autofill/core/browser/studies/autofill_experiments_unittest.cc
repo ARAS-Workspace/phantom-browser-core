@@ -25,7 +25,6 @@
 #include "components/sync/base/features.h"
 #include "components/sync/test/test_sync_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 using device_reauth::MockDeviceAuthenticator;

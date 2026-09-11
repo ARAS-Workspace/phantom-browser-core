@@ -24,7 +24,6 @@
 #include "components/signin/public/identity_manager/tribool.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "google_apis/gaia/oauth2_id_token_decoder.h"
 
 using content::BrowserThread;

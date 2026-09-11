@@ -51,7 +51,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/version_info/channel.h"
 #include "google_apis/common/api_error_codes.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "google_apis/gaia/gaia_urls.h"
 #include "google_apis/google_api_keys.h"
 #include "net/base/url_util.h"

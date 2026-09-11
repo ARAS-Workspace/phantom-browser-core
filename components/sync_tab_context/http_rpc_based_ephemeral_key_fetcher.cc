@@ -20,7 +20,6 @@
 #include "components/sync/protocol/agile_encryption_keys.pb.h"
 #include "components/sync_tab_context/proto/ephemeral_key_service.pb.h"
 #include "google_apis/credentials_mode.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "net/base/load_flags.h"
 #include "net/http/http_request_headers.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"

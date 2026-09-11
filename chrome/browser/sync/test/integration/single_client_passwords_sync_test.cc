@@ -33,7 +33,6 @@
 #include "components/version_info/version_info.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_launcher.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 #include "net/base/features.h"
 #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream_impl_lite.h"
 

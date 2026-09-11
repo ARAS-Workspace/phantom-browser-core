@@ -13,7 +13,6 @@
 #include "base/memory/ptr_util.h"
 #include "base/strings/string_split.h"
 #include "base/strings/stringize_macros.h"
-#include "google_apis/google_api_keys.h"
 #include "net/http/http_request_headers.h"
 #include "remoting/base/protobuf_http_request.h"
 #include "remoting/base/protobuf_http_request_config.h"
