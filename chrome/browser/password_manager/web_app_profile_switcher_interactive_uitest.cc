@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "ash/constants/web_app_id_constants.h"
+#include "chrome/browser/password_manager/web_app_profile_switcher.h"
+
 #include "base/files/file_path.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/test_future.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/notifications/notification_display_service_tester.h"
-#include "chrome/browser/password_manager/web_app_profile_switcher.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_test_util.h"
 #include "chrome/browser/ui/browser.h"
@@ -23,6 +23,7 @@
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/browser/web_applications/test/web_app_test_utils.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/common/pref_names.h"
@@ -178,10 +179,10 @@ IN_PROC_BROWSER_TEST_F(WebAppProfileSwitcherBrowserTest,
   InstallAppForProfile(first_profile, GetTestWebAppInstallInfo());
 
   // Launch the app for the first profile.
-  web_app::LaunchWebAppBrowser(first_profile, ash::kPasswordManagerAppId);
+  web_app::LaunchWebAppBrowser(first_profile, web_app::kPasswordManagerAppId);
   BrowserWindowInterface* first_profile_app_browser =
-      web_app::AppBrowserController::FindForWebApp(*first_profile,
-                                                   ash::kPasswordManagerAppId);
+      web_app::AppBrowserController::FindForWebApp(
+          *first_profile, web_app::kPasswordManagerAppId);
   ASSERT_TRUE(first_profile_app_browser);
   ASSERT_EQ(GetTabbedBrowserCount(first_profile), 1U);
 
@@ -189,17 +190,17 @@ IN_PROC_BROWSER_TEST_F(WebAppProfileSwitcherBrowserTest,
   Profile* second_profile = CreateAdditionalProfile();
   InstallAppForProfile(second_profile, GetTestWebAppInstallInfo());
   // Launch the app.
-  web_app::LaunchWebAppBrowser(second_profile, ash::kPasswordManagerAppId);
+  web_app::LaunchWebAppBrowser(second_profile, web_app::kPasswordManagerAppId);
   BrowserWindowInterface* second_profile_app_browser =
-      web_app::AppBrowserController::FindForWebApp(*second_profile,
-                                                   ash::kPasswordManagerAppId);
+      web_app::AppBrowserController::FindForWebApp(
+          *second_profile, web_app::kPasswordManagerAppId);
   ASSERT_TRUE(second_profile_app_browser);
   EXPECT_EQ(GlobalBrowserCollection::GetInstance()->GetLastActiveBrowser(),
             second_profile_app_browser->GetBrowserForMigrationOnly());
 
   // Switch to the first profile from the second.
   base::test::TestFuture<void> profile_switch_complete;
-  WebAppProfileSwitcher profile_switcher(ash::kPasswordManagerAppId,
+  WebAppProfileSwitcher profile_switcher(web_app::kPasswordManagerAppId,
                                          *second_profile,
                                          profile_switch_complete.GetCallback());
   profile_switcher.SwitchToProfile(first_profile->GetPath());

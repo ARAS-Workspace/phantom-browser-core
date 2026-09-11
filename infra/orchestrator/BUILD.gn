@@ -53,14 +53,7 @@ group("orchestrator_all") {
   }
 
   if (is_skylab) {
-    data += [
-      "//third_party/chromite/",
-      "//chromeos/CHROMEOS_LKGM",
-      "//chromeos/tast_control_cq_tests.txt",
-      "//chromeos/tast_control_disabled_tests.txt",
-      "//chromeos/tast_control_disabled_tests_public_builders.txt",
-      "//chromeos/tast_control_flaky_tests.txt",
-    ]
+    data += [ "//third_party/chromite/" ]
   }
 
   write_runtime_deps = "$root_out_dir/orchestrator_all.runtime_deps"

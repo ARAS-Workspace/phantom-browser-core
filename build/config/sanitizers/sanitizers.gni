@@ -54,9 +54,8 @@ declare_args() {
   # See http://clang.llvm.org/docs/ControlFlowIntegrity.html
   #
   # TODO(pcc): Remove this flag if/when CFI is enabled in all official builds.
-  is_cfi = is_official_build && is_clang &&
-           ((target_os == "linux" && target_cpu == "x64") ||
-            (is_chromeos && is_chromeos_device))
+  is_cfi = is_official_build && is_clang && target_os == "linux" &&
+           target_cpu == "x64"
 
   # Enable checks for indirect function calls via a function pointer.
   # TODO(pcc): remove this when we're ready to add these checks by default.
@@ -133,7 +132,7 @@ declare_args() {
   # Enable checks for bad casts: derived cast and unrelated cast.
   # TODO(krasin): remove this, when we're ready to add these checks by default.
   # https://crbug.com/626794
-  use_cfi_cast = is_cfi && is_chromeos
+  use_cfi_cast = false
 
   # Compile for Undefined Behaviour Sanitizer's vptr checks.
   is_ubsan_vptr = is_ubsan_security || is_ubsan
@@ -145,8 +144,7 @@ declare_args() {
   # ChromeOS device builds compile system dependencies with MSan in the target
   # sysroot and do not use these prebuilt Ubuntu libraries.
   use_prebuilt_instrumented_libraries =
-      is_msan && current_cpu == "x64" &&
-      (is_linux || (is_chromeos && !is_chromeos_device))
+      is_msan && current_cpu == "x64" && is_linux
 }
 
 # Whether we are doing a fuzzer build. Prefer this over "use_libfuzzer" as it
@@ -319,7 +317,7 @@ prebuilt_instrumented_libraries_available =
     use_prebuilt_instrumented_libraries &&
     (msan_track_origins == 0 || msan_track_origins == 2)
 
-if (use_fuzzing_engine && (is_linux || is_chromeos)) {
+if (use_fuzzing_engine && is_linux) {
   if (is_asan) {
     # We do leak checking when fuzzing with ASan on Linux. Set is_lsan for code
     # that relies on LEAK_SANITIZER define to avoid false positives.
@@ -343,7 +341,7 @@ if (use_fuzzing_engine && (is_linux || is_chromeos)) {
 assert(!is_debug || !(is_msan || is_ubsan || is_ubsan_vptr),
        "Sanitizers should generally be used in release (set is_debug=false).")
 
-assert(!is_msan || ((is_linux || is_chromeos) && current_cpu == "x64"),
+assert(!is_msan || (is_linux && current_cpu == "x64"),
        "MSan currently only works on 64-bit Linux and ChromeOS builds.")
 
 assert(!is_lsan || is_asan, "is_lsan = true requires is_asan = true also.")

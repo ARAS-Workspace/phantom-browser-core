@@ -438,7 +438,7 @@ source_set("browser_tests") {
     "tools/attempt_login_tool_browsertest.cc",
   ]
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [ "page_tool_toctou_popup_browsertest.cc" ]
   }
   deps = [

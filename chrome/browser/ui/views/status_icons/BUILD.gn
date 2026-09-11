@@ -46,25 +46,6 @@ source_set("status_icons") {
     }
   }
 
-  if (is_chromeos) {
-    sources += [
-      "status_icon_chromeos.cc",
-      "status_icon_chromeos.h",
-      "status_tray_chromeos.cc",
-      "status_tray_chromeos.h",
-    ]
-    public_deps += [
-      "//chrome/browser/status_icons",
-      "//ui/display",
-      "//ui/gfx",
-    ]
-    deps += [
-      "//ash",
-      "//ash/constants",
-      "//base",
-    ]
-  }
-
   if (is_win) {
     sources = [
       "status_icon_win.cc",

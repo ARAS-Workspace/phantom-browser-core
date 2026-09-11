@@ -98,15 +98,6 @@ source_set("impl") {
     "//components/safe_browsing/core/common:features",
   ]
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/profiles",
-      "//chromeos/components/mgs",
-      "//components/user_manager",
-    ]
-  }
-
   if (enterprise_cloud_content_analysis) {
     deps += [ "//components/enterprise/connectors/core:cloud_content_scanning" ]
 

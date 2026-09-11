@@ -44,27 +44,4 @@ generate_grd("build_grdp") {
   if (enable_pdf_ink2) {
     input_files += [ "pdf_viewer_private_custom_bindings.js" ]
   }
-
-  if (is_chromeos) {
-    input_files += [
-      "certificate_provider_custom_bindings.js",
-      "chromeos_google_tts_stream_bindings.js",
-      "chromeos_ime_service_bindings.js",
-      "enhanced_network_tts/enhanced_network_tts_custom_bindings.js",
-      "enterprise_platform_keys/crypto_key.js",
-      "enterprise_platform_keys/subtle_crypto.js",
-      "enterprise_platform_keys/token.js",
-      "enterprise_platform_keys_custom_bindings.js",
-      "file_browser_handler_custom_bindings.js",
-      "file_manager_private_custom_bindings.js",
-      "file_system_provider_custom_bindings.js",
-      "platform_keys_custom_bindings.js",
-      "platform_keys/get_crypto_key_util.js",
-      "platform_keys/key.js",
-      "platform_keys/subtle_crypto.js",
-      "platform_keys/utils.js",
-      "remote_apps/remote_apps_bindings.js",
-      "terminal_private_custom_bindings.js",
-    ]
-  }
 }

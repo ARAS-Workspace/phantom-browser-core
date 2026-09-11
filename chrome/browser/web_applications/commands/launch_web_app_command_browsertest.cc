@@ -38,7 +38,6 @@
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "chromeos/constants/chromeos_features.h"
 #include "components/services/app_service/public/cpp/app_launch_params.h"
 #include "components/services/app_service/public/cpp/app_launch_util.h"
 #include "content/public/test/browser_test.h"

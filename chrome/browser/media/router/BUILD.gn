@@ -59,10 +59,6 @@ static_library("media_router_feature") {
     "//media",
   ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/browser_context_helper" ]
-  }
 }
 
 static_library("router") {

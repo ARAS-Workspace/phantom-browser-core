@@ -4,24 +4,11 @@
 
 import("//build/buildflag_header.gni")
 import("//printing/buildflags/buildflags.gni")
-if (is_chromeos) {
-  import("//printing/backend/tools/code_generator.gni")
-}
 
 buildflag_header("printing_buildflags") {
   header = "printing_buildflags.h"
 
   flags = [ "PRINT_MEDIA_L10N_ENABLED=$enable_print_media_l10n" ]
-}
-
-if (is_chromeos) {
-  localization_map_path = "$target_gen_dir/ipp_l10n.cc"
-
-  ipp_code_generate("ipp_l10n_generate") {
-    outputs = [ localization_map_path ]
-    args = [ "--localization-map=" +
-             rebase_path(localization_map_path, root_build_dir) ]
-  }
 }
 
 source_set("printing") {
@@ -47,15 +34,6 @@ source_set("printing") {
     "//ui/base",
     "//ui/gfx/geometry",
   ]
-
-  if (is_chromeos) {
-    deps += [ ":ipp_l10n_generate" ]
-
-    sources += [
-      "ipp_l10n.h",
-      localization_map_path,
-    ]
-  }
 
   if (enable_print_media_l10n) {
     deps += [ "//components/printing/common:print_media_l10n" ]

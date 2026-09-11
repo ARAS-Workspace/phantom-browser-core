@@ -27,7 +27,7 @@ group("remoting_all") {
   if (enable_remoting_host) {
     deps += [ "//remoting/host" ]
 
-    if (!is_chromeos && !is_android) {
+    if (!is_android) {
       deps += [
         "//remoting/host:remoting_native_messaging_manifests",
         "//remoting/host:remoting_start_host",

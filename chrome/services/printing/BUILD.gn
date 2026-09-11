@@ -29,15 +29,6 @@ source_set("lib") {
     "//printing/buildflags",
   ]
 
-  if (is_chromeos) {
-    sources += [
-      "pdf_flattener.cc",
-      "pdf_flattener.h",
-    ]
-
-    deps += [ "//pdf" ]
-  }
-
   if (is_win) {
     sources += [
       "pdf_to_emf_converter.cc",

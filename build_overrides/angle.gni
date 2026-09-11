@@ -36,6 +36,6 @@ angle_dawn_dir = "//third_party/dawn"
 # Note: On ChromeOS we generate the real dylibs as system services (such as
 # cros_camera) require real libEGL.so and libGLESv2.so shared libraries with
 # their expected production names.
-if (angle_use_static_angle && !is_android && !is_chromeos) {
+if (angle_use_static_angle && !is_android) {
   angle_libs_suffix = "_test"
 }

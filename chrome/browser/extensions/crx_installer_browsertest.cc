@@ -29,7 +29,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "chrome/browser/ash/profiles/profile_helper.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/download/download_crx_util.h"
 #include "chrome/browser/extensions/extension_browser_test_util.h"

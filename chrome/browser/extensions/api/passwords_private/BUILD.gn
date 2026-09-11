@@ -29,13 +29,6 @@ source_set("passwords_private") {
     "passwords_private_utils.h",
   ]
 
-  if (is_chromeos) {
-    sources += [
-      "passwords_private_utils_chromeos.cc",
-      "passwords_private_utils_chromeos.h",
-    ]
-  }
-
   deps = [
     "//base",
     "//chrome/app:branded_strings",
@@ -72,15 +65,6 @@ source_set("passwords_private") {
     "//content/public/browser",
     "//extensions/browser",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/login/quick_unlock",
-      "//chrome/browser/ash/profiles",
-      "//chromeos/ash/components/login/auth",
-      "//components/user_manager",
-    ]
-  }
 }
 
 source_set("test_support") {

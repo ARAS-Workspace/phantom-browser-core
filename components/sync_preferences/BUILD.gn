@@ -40,10 +40,6 @@ static_library("sync_preferences") {
     "//components/signin/public/base",
     "//components/sync",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
-  }
 }
 
 source_set("common_syncable_prefs_database") {
@@ -122,10 +118,6 @@ source_set("unit_tests") {
     "//components/sync:test_support",
     "//testing/gtest",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
-  }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.

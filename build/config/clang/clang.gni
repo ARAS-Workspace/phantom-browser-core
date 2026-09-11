@@ -16,7 +16,7 @@ import("//build_overrides/build.gni")
 # Android is here because on android, sysroot.gni would introduce a circular
 # dependency. We just assume that android is always safe to use clang modules
 # for, but we can change this later down the line if that turns out to be false.
-if (is_chromeos || is_android) {
+if (is_android) {
   using_tested_sysroot = true
 } else {
   import("//build/config/sysroot.gni")
@@ -62,13 +62,13 @@ declare_args() {
 
   enable_check_raw_ptr_fields =
       build_with_chromium && !is_official_build &&
-      (is_linux || is_android || is_mac || is_ios || is_win || is_chromeos)
+      (is_linux || is_android || is_mac || is_ios || is_win)
 
   # TODO(crbug.com/40268473): Merge with enable_check_raw_ptr_fields once both
   # checks are activated on the same set of platforms.
   enable_check_raw_ref_fields =
       build_with_chromium && !is_official_build &&
-      (is_linux || is_android || is_win || is_mac || is_ios || is_chromeos)
+      (is_linux || is_android || is_win || is_mac || is_ios)
 
   # Use this instead of clang_use_chrome_plugins to enable just the unsafe
   # buffers functionality of the plugin

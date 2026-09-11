@@ -428,12 +428,6 @@ target(link_target_type, "gles2_sources") {
       "//ui/base:features",
       "//ui/ozone",
     ]
-    if (is_chromeos) {
-      deps += [
-        "//ash/constants",
-        "//ui/gfx/linux:drm",
-      ]
-    }
   }
 
   if (enable_vulkan) {
@@ -482,7 +476,7 @@ target(link_target_type, "gles2_sources") {
 
       deps += [ "//ui/ozone" ]
 
-      if (is_linux || is_chromeos) {
+      if (is_linux) {
         deps += [ "//third_party/libsync" ]
         deps += [ "//ui/gfx/linux:drm" ]
       }
@@ -557,14 +551,6 @@ target(link_target_type, "gles2_sources") {
       "shared_image/skia_graphite_dawn_image_representation.h",
     ]
     deps += [ "//third_party/dawn/src/dawn:cpp" ]
-
-    if (is_chromeos) {
-      sources += [
-        "drm_modifiers_filter_dawn.cc",
-        "drm_modifiers_filter_dawn.h",
-      ]
-      deps += [ "//ui/gfx/linux:drm" ]
-    }
   }
 
   if (is_android) {

@@ -411,10 +411,6 @@ aggregate_vector_icons("chrome_vector_icons") {
       "new_tab_mac_touchbar_old.icon",
     ]
   }
-
-  if (is_chromeos) {
-    sources += [ "notification_google.icon" ]
-  }
 }
 
 source_set("vector_icons") {

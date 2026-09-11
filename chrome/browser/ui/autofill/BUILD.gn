@@ -12,7 +12,7 @@ if (is_android) {
   import("//build/config/android/rules.gni")
 }
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 if (is_android) {
   java_cpp_enum("autofill_ai_ui_java_enums") {
@@ -489,7 +489,7 @@ source_set("test_support") {
   }
 }
 
-if (!is_android && !is_chromeos_device) {
+if (!is_android) {
   source_set("interactive_ui_tests") {
     testonly = true
 

@@ -42,10 +42,4 @@ source_set("unit_tests") {
     "//content/test:test_support",
     "//testing/gtest",
   ]
-  if (is_chromeos) {
-    deps += [
-      "//ash/constants",
-      "//ash/webui/file_manager:constants",
-    ]
-  }
 }

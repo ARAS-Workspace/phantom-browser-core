@@ -372,15 +372,6 @@ if (!is_android) {
       "//ui/events:events_base",
     ]
 
-    if (is_chromeos && enable_extensions) {
-      deps += [
-        "//chrome/browser/ash/accessibility",
-        "//chrome/browser/ash/accessibility:test_support",
-        "//extensions/browser:test_support",
-        "//ui/base:test_support",
-      ]
-    }
-
     if (use_aura) {
       deps += [ "//chrome/browser/ui/aura/accessibility" ]
     }

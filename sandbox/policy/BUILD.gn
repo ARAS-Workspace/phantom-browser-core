@@ -45,7 +45,7 @@ component("policy") {
       "//third_party/jni_zero",
     ]
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "linux/bpf_audio_policy_linux.cc",
       "linux/bpf_audio_policy_linux.h",
@@ -116,16 +116,6 @@ component("policy") {
       "//sandbox/linux:suid_sandbox_client",
     ]
   }
-  if (is_chromeos) {
-    sources += [
-      "linux/bpf_ime_policy_linux.cc",
-      "linux/bpf_ime_policy_linux.h",
-      "linux/bpf_nearby_policy_linux.cc",
-      "linux/bpf_nearby_policy_linux.h",
-      "linux/bpf_tts_policy_linux.cc",
-      "linux/bpf_tts_policy_linux.h",
-    ]
-  }
   if (is_mac) {
     sources += [
       "mac/sandbox_mac.h",
@@ -188,7 +178,7 @@ source_set("tests") {
     "//testing/gtest",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "linux/bpf_speech_recognition_policy_linux_unittest.cc" ]
     deps += [
       "//sandbox/linux:sandbox_linux_test_utils",

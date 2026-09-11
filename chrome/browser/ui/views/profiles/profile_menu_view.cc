@@ -9,7 +9,6 @@
 #include <string>
 #include <utility>
 
-#include "ash/constants/web_app_id_constants.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
@@ -65,6 +64,7 @@
 #include "chrome/browser/ui/webui/signin/signin_utils_desktop.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/browser/webauthn/passkey_unlock_manager.h"
 #include "chrome/browser/webauthn/passkey_unlock_manager_factory.h"
 #include "chrome/common/webui_url_constants.h"
@@ -445,12 +445,12 @@ void ProfileMenuView::OnOtherProfileSelected(
     const webapps::AppId& app_id =
         web_app::AppBrowserController::From(&browser())->app_id();
 #if BUILDFLAG(IS_MAC)
-    if (app_id != ash::kPasswordManagerAppId) {
+    if (app_id != web_app::kPasswordManagerAppId) {
       apps::AppShimManager::Get()->LaunchAppInProfile(app_id, profile_path);
       return;
     }
 #endif
-    CHECK_EQ(app_id, ash::kPasswordManagerAppId);
+    CHECK_EQ(app_id, web_app::kPasswordManagerAppId);
 
     app_profile_switcher_.emplace(
         app_id, profile(),
@@ -1096,7 +1096,7 @@ void ProfileMenuView::GetProfilesForOtherProfilesSection(
   const bool is_regular_web_app =
       web_app::AppBrowserController::IsWebApp(&browser()) &&
       web_app::AppBrowserController::From(&browser())->app_id() !=
-          ash::kPasswordManagerAppId;
+          web_app::kPasswordManagerAppId;
   std::set<base::FilePath> available_profile_paths;
   if (is_regular_web_app) {
     available_profile_paths =

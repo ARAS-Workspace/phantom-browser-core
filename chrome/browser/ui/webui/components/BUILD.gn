@@ -23,10 +23,6 @@ source_set("components") {
     "//ui/base",
     "//ui/webui",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//components/user_manager" ]
-  }
 }
 
 source_set("unit_tests") {

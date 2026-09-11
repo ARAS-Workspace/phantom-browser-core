@@ -47,8 +47,6 @@ action("process_json") {
     args += [ "macosx" ]
   } else if (is_android) {
     args += [ "android" ]
-  } else if (is_chromeos) {
-    args += [ "chromeos" ]
   } else {
     args += [ "linux" ]
   }
@@ -189,10 +187,10 @@ component("config") {
   if (is_ios) {
     sources += [ "gpu_info_collector_ios.mm" ]
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "gpu_info_collector_linux.cc" ]
   }
-  if (is_linux || is_chromeos || is_apple || is_android) {
+  if (is_linux || is_apple || is_android) {
     deps += [ "//third_party/angle:angle_gpu_info_util" ]
   }
   if (use_ozone) {

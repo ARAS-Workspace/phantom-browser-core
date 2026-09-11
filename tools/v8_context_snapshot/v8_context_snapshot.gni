@@ -33,8 +33,7 @@ declare_args() {
   # Disable in mac and win cross builds since building Blink twice is slow.
   use_v8_context_snapshot =
       include_both_v8_snapshots ||
-      (!is_chromeos && !is_android &&
-       !(host_toolchain == default_toolchain && is_msan) &&
+      (!is_android && !(host_toolchain == default_toolchain && is_msan) &&
        !(is_win && host_os != "win") && !(is_mac && host_os != "mac"))
 }
 

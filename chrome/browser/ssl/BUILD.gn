@@ -83,10 +83,6 @@ source_set("ssl") {
       "//ui/views",
     ]
   }
-
-  if (is_chromeos) {
-    public += [ "ssl_config_overlay.h" ]
-  }
 }
 
 source_set("impl") {
@@ -177,14 +173,6 @@ source_set("impl") {
       "//chrome/browser/extensions",
       "//chrome/browser/ui/tabs:tab_strip",
       "//chrome/browser/ui/web_applications",
-    ]
-  }
-
-  if (is_chromeos) {
-    sources += [ "ssl_config_overlay.cc" ]
-    deps += [
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/profiles",
     ]
   }
 }
@@ -288,10 +276,6 @@ source_set("unit_tests") {
   if (is_android) {
     sources += [ "known_interception_disclosure_message_delegate_unittest.cc" ]
     deps += [ "//components/messages/android:test_support" ]
-  }
-
-  if (is_chromeos) {
-    sources += [ "ssl_config_overlay_unittest.cc" ]
   }
 }
 

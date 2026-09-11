@@ -96,10 +96,6 @@ source_set("unit_tests") {
     "//ui/gfx/geometry",
   ]
 
-  if (is_chromeos) {
-    deps += [ "//printing" ]
-  }
-
   if (enable_print_media_l10n) {
     sources += [ "print_media_l10n_unittest.cc" ]
     deps += [ ":print_media_l10n" ]

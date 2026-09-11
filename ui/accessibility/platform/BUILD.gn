@@ -130,7 +130,7 @@ component("platform") {
     ]
   }
 
-  if (is_android || is_chromeos) {
+  if (is_android) {
     sources += [
       "ax_android_constants.cc",
       "ax_android_constants.h",

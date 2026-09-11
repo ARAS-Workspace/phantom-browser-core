@@ -111,16 +111,6 @@ group("resources") {
     }
   }
 
-  if (is_chromeos) {
-    public_deps += [
-      "ash/extended_updates:resources",
-      "ash/inline_login:resources",
-      "ash/settings:resources",
-      "chromeos:resources",
-      "chromeos/dlp_internals:resources",
-    ]
-  }
-
   if (enable_extensions) {
     public_deps += [
       "accessibility:reading_mode_gdocs_extension_resources",
@@ -136,15 +126,15 @@ group("resources") {
     ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos || is_desktop_android) {
+  if (is_win || is_mac || is_linux || is_desktop_android) {
     public_deps += [ "discards:resources" ]
   }
 
-  if (is_chromeos || is_desktop_android) {
+  if (is_desktop_android) {
     public_deps += [ "management:resources" ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     public_deps += [
       "skills:resources",
       "//chrome/browser/ttc/resources",
@@ -161,7 +151,7 @@ group("resources") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     public_deps += [
       "default_browser/default_browser_modal:resources",
       "signin/profile_picker:resources",
@@ -193,11 +183,7 @@ group("resources") {
   }
 
   if (enable_print_preview) {
-    if (is_chromeos) {
-      public_deps += [ "ash/print_preview:resources" ]
-    } else {
-      public_deps += [ "print_preview:resources" ]
-    }
+    public_deps += [ "print_preview:resources" ]
   }
 
   if (enable_webui_certificate_viewer) {
@@ -266,60 +252,6 @@ if (enable_extensions_core) {
     # build time so we include them as explicit dependencies here
     deps = [ "//chrome/browser/resources/glic/extension:build_ts" ]
 
-    if (is_chromeos) {
-      inputs += [
-        "chromeos/arc_input_overlay/button_placement_mode_nudge.json",
-        "chromeos/arc_input_overlay/key_edit_nudge.json",
-        "chromeos/arc_input_overlay/onboarding_illustration_dark.json",
-        "chromeos/arc_input_overlay/onboarding_illustration_light.json",
-        "chromeos/arc_support/arc_optin_focus_manager.js",
-        "chromeos/arc_support/background.js",
-        "chromeos/arc_support/bubble.css",
-        "chromeos/arc_support/bubble.js",
-        "chromeos/arc_support/bubble_button.css",
-        "chromeos/arc_support/bubble_button.js",
-        "chromeos/arc_support/controlled_indicator.css",
-        "chromeos/arc_support/controlled_indicator.js",
-        "chromeos/arc_support/cr_overlay.css",
-        "chromeos/arc_support/event_tracker.js",
-        "chromeos/arc_support/focus_manager.js",
-        "chromeos/arc_support/i18n_template_no_process.js",
-        "chromeos/arc_support/icon/192.png",
-        "chromeos/arc_support/icon/32.png",
-        "chromeos/arc_support/icon/playstore.svg",
-        "chromeos/arc_support/images/error_image.png",
-        "chromeos/arc_support/images/header.png",
-        "chromeos/arc_support/layout_style.css",
-        "chromeos/arc_support/main.css",
-        "chromeos/arc_support/main.html",
-        "chromeos/arc_support/main.js",
-        "chromeos/arc_support/overlay.css",
-        "chromeos/arc_support/overlay.js",
-        "chromeos/arc_support/playstore.css",
-        "chromeos/arc_support/playstore.js",
-        "chromeos/arc_support/progressbar.css",
-        "chromeos/arc_support/progressbar.js",
-        "chromeos/arc_support/ui.js",
-        "chromeos/desk_api/templates_icon.png",
-        "$root_gen_dir/chrome/browser/resources/chromeos/desk_api/desk_api_bundle.js",
-        "//ui/resources/default_100_percent/close_2.png",
-        "//ui/resources/default_100_percent/close_2_hover.png",
-        "//ui/resources/default_100_percent/close_2_pressed.png",
-        "//ui/resources/default_200_percent/close_2.png",
-        "//ui/resources/default_200_percent/close_2_hover.png",
-        "//ui/resources/default_200_percent/close_2_pressed.png",
-        "//ui/webui/resources/images/account_child_invert.svg",
-        "//ui/webui/resources/images/account_circle.svg",
-        "//ui/webui/resources/images/business.svg",
-        "//ui/webui/resources/images/extension.svg",
-        "//ui/webui/resources/images/group.svg",
-      ]
-      deps += [
-        "chromeos/accessibility/braille_ime:build_ts",
-        "chromeos/desk_api:generate_desk_api_bundle",
-      ]
-    }
-
     outputs = [
       "grit/component_extension_resources.h",
       "grit/component_extension_resources_map.cc",
@@ -352,21 +284,6 @@ if (!is_android) {
     output_dir = "$root_gen_dir/chrome"
   }
 
-  if (is_chromeos) {
-    grit("office_web_app_resources") {
-      source = "office_web_app/resources.grd"
-      inputs = [ "office_web_app/icons/office_192.png" ]
-      defines = chrome_grit_defines
-      outputs = [
-        "grit/office_web_app_resources.h",
-        "grit/office_web_app_resources_map.cc",
-        "grit/office_web_app_resources_map.h",
-        "office_web_app_resources.pak",
-      ]
-      output_dir = "$root_gen_dir/chrome"
-    }
-  }
-
   if (is_chrome_branded) {
     grit("preinstalled_web_apps_resources") {
       source = "preinstalled_web_apps/resources.grd"
@@ -379,14 +296,6 @@ if (!is_android) {
         "preinstalled_web_apps/internal/google_slides_192.png",
         "preinstalled_web_apps/internal/youtube_192.png",
       ]
-      if (is_chromeos) {
-        inputs += [
-          "preinstalled_web_apps/internal/gemini_192.png",
-          "preinstalled_web_apps/internal/google_calendar_192.png",
-          "preinstalled_web_apps/internal/notebook_lm_512.png",
-          "preinstalled_web_apps/internal/vids_192.png",
-        ]
-      }
       defines = chrome_grit_defines
       outputs = [
         "grit/preinstalled_web_apps_resources.h",
@@ -474,7 +383,7 @@ group("dev_ui_resources") {
     ]
   }
 
-  if (is_android || is_linux || is_chromeos || is_win) {
+  if (is_android || is_linux || is_win) {
     public_deps += [ "//chrome/browser/resources/sandbox_internals:resources" ]
   }
 
@@ -563,7 +472,7 @@ repack("dev_ui_paks") {
     ]
   }
 
-  if (is_android || is_linux || is_chromeos || is_win) {
+  if (is_android || is_linux || is_win) {
     sources += [ "$root_gen_dir/chrome/sandbox_internals_resources.pak" ]
   }
 

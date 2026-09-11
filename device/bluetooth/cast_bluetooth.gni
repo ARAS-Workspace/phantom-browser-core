@@ -6,5 +6,5 @@ import("//build/config/features.gni")
 
 declare_args() {
   force_cast_bluetooth = false
-  use_bluez = (is_linux && use_dbus) || is_chromeos
+  use_bluez = is_linux && use_dbus
 }

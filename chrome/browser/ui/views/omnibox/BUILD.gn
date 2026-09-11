@@ -302,68 +302,66 @@ source_set("browser_tests") {
   }
 }
 
-if (!is_chromeos_device) {
-  source_set("interactive_ui_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+source_set("interactive_ui_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "inline_location_signaling_interactive_uitest.cc",
-      "omnibox_popup_view_views_interactive_uitest.cc",
-      "omnibox_popup_view_webui_interactive_uitest.cc",
-      "omnibox_view_views_interactive_uitest.cc",
-    ]
+  sources = [
+    "inline_location_signaling_interactive_uitest.cc",
+    "omnibox_popup_view_views_interactive_uitest.cc",
+    "omnibox_popup_view_webui_interactive_uitest.cc",
+    "omnibox_view_views_interactive_uitest.cc",
+  ]
 
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-    deps = [
-      ":omnibox",
-      ":test_support",
-      "//chrome/browser/autocomplete",
-      "//chrome/browser/autocomplete:aim_eligibility_service",
-      "//chrome/browser/external_protocol",
-      "//chrome/browser/omnibox",
-      "//chrome/browser/permissions/system",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/send_tab_to_self",
-      "//chrome/browser/sync",
-      "//chrome/browser/themes:test_support",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/hats:test_support",
-      "//chrome/browser/ui/location_bar",
-      "//chrome/browser/ui/omnibox",
-      "//chrome/browser/ui/permission_bubble",
-      "//chrome/browser/ui/views/accessibility:dump_accessibility_events_views_browsertest_base",
-      "//chrome/browser/ui/views/frame",
-      "//chrome/browser/ui/views/location_bar",
-      "//chrome/browser/ui/views/toolbar",
-      "//chrome/browser/ui/webui/omnibox_popup",
-      "//chrome/browser/ui/webui/searchbox",
-      "//chrome/common:chrome_features",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//chrome/test/interaction",
-      "//components/content_settings/core/browser",
-      "//components/content_settings/core/common",
-      "//components/omnibox/browser",
-      "//components/prefs",
-      "//components/search_engines",
-      "//components/send_tab_to_self",
-      "//components/send_tab_to_self:test_support",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//ui/events:test_support",
-    ]
+  deps = [
+    ":omnibox",
+    ":test_support",
+    "//chrome/browser/autocomplete",
+    "//chrome/browser/autocomplete:aim_eligibility_service",
+    "//chrome/browser/external_protocol",
+    "//chrome/browser/omnibox",
+    "//chrome/browser/permissions/system",
+    "//chrome/browser/search_engines",
+    "//chrome/browser/send_tab_to_self",
+    "//chrome/browser/sync",
+    "//chrome/browser/themes:test_support",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/hats:test_support",
+    "//chrome/browser/ui/location_bar",
+    "//chrome/browser/ui/omnibox",
+    "//chrome/browser/ui/permission_bubble",
+    "//chrome/browser/ui/views/accessibility:dump_accessibility_events_views_browsertest_base",
+    "//chrome/browser/ui/views/frame",
+    "//chrome/browser/ui/views/location_bar",
+    "//chrome/browser/ui/views/toolbar",
+    "//chrome/browser/ui/webui/omnibox_popup",
+    "//chrome/browser/ui/webui/searchbox",
+    "//chrome/common:chrome_features",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//chrome/test/interaction",
+    "//components/content_settings/core/browser",
+    "//components/content_settings/core/common",
+    "//components/omnibox/browser",
+    "//components/prefs",
+    "//components/search_engines",
+    "//components/send_tab_to_self",
+    "//components/send_tab_to_self:test_support",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//ui/events:test_support",
+  ]
 
-    if (use_ozone) {
-      deps += [ "//ui/ozone" ]
-    }
+  if (use_ozone) {
+    deps += [ "//ui/ozone" ]
+  }
 
-    if (is_win) {
-      deps += [ "//chrome/browser/ui/views/accessibility:uia_test_support" ]
-    }
+  if (is_win) {
+    deps += [ "//chrome/browser/ui/views/accessibility:uia_test_support" ]
   }
 }

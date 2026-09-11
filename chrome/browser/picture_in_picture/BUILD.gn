@@ -4,13 +4,13 @@
 
 import("//chrome/common/features.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 # The window occlusion logic is currently for desktop only, and the
 # WebContentsObserver-based implementation does not work on Linux
 # since it depends on aura::WindowOcclusionTracker which is not
 # supported on Linux.
-use_web_contents_occlusion_helper = is_win || is_chromeos || is_mac
+use_web_contents_occlusion_helper = is_win || is_mac
 use_widget_occlusion_helper = is_linux
 use_stub_occlusion_helper = is_android
 
@@ -38,7 +38,7 @@ source_set("picture_in_picture") {
     "//url",
   ]
 
-  if (is_mac || is_win || is_linux || is_chromeos) {
+  if (is_mac || is_win || is_linux) {
     public_deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   if (!is_android) {
@@ -304,12 +304,6 @@ if (!is_android) {
       "//url",
     ]
 
-    if (is_chromeos) {
-      deps += [
-        "//chromeos/ui/base",
-        "//ui/aura",
-      ]
-    }
     if (use_ozone) {
       deps += [ "//ui/ozone" ]
     }

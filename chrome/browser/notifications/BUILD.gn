@@ -90,27 +90,6 @@ source_set("notifications") {
     public_deps += [ "//components/keep_alive_registry" ]
   }
 
-  if (is_chromeos) {
-    public += [
-      "arc_application_notifier_controller.h",
-      "chrome_ash_message_center_client.h",
-      "extension_notifier_controller.h",
-      "notification_platform_bridge_chromeos.h",
-      "notification_platform_bridge_delegate.h",
-      "notifier_controller.h",
-      "notifier_dataset.h",
-      "passphrase_textfield.h",
-      "web_page_notifier_controller.h",
-    ]
-
-    public_deps += [
-      "//ash/public/cpp",
-      "//components/app_icon_loader",
-      "//components/services/app_service/public/cpp:app_types",
-      "//ui/views",
-    ]
-  }
-
   if (is_win) {
     public += [
       "notification_platform_bridge_win.h",
@@ -266,33 +245,7 @@ source_set("impl") {
       "//chrome/browser/web_applications/proto",
     ]
 
-    if (!is_chromeos) {
-      deps += [ "//chrome/browser/default_browser" ]
-    }
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "arc_application_notifier_controller.cc",
-      "chrome_ash_message_center_client.cc",
-      "extension_notifier_controller.cc",
-      "notification_platform_bridge_chromeos.cc",
-      "notifier_dataset.cc",
-      "passphrase_textfield.cc",
-      "web_page_notifier_controller.cc",
-    ]
-
-    deps += [
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/content_settings",
-      "//chrome/browser/extensions",
-      "//chrome/browser/extensions/api/notifications",
-      "//chrome/browser/favicon",
-      "//chrome/browser/nearby_sharing",
-      "//chrome/browser/ui/ash/multi_user",
-      "//chromeos/ash/components/browser_context_helper",
-      "//ui/message_center",
-    ]
+    deps += [ "//chrome/browser/default_browser" ]
   }
 
   if (is_win) {
@@ -517,19 +470,6 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "chrome_ash_message_center_client_unittest.cc",
-      "notification_platform_bridge_chromeos_unittest.cc",
-      "web_page_notifier_controller_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/favicon",
-      "//chrome/browser/nearby_sharing",
-      "//components/favicon/core/test:test_support",
-    ]
-  }
-
   if (is_linux) {
     if (use_dbus) {
       sources += [ "notification_platform_bridge_linux_unittest.cc" ]
@@ -560,64 +500,51 @@ if (!is_android) {
       "//content/test:test_support",
       "//testing/gtest",
     ]
-
-    if (is_chromeos) {
-      sources += [
-        "notification_platform_bridge_chromeos_browsertest.cc",
-        "notifier_settings_test_observer.cc",
-        "notifier_settings_test_observer.h",
-      ]
-      deps += [ "//chrome/browser/ash/notifications" ]
-    }
   }
 
-  if (!is_chromeos_device) {
-    source_set("interactive_ui_tests") {
-      testonly = true
+  source_set("interactive_ui_tests") {
+    testonly = true
 
-      defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-      sources = [ "platform_notification_service_interactive_uitest.cc" ]
+    sources = [ "platform_notification_service_interactive_uitest.cc" ]
 
-      deps = [
-        ":notifications",
-        ":test_support",
-        "//base",
-        "//chrome/browser/permissions",
-        "//chrome/browser/web_applications:web_applications_test_support",
-        "//chrome/test:test_support",
-        "//chrome/test:test_support_ui",
-        "//components/infobars/content",
-        "//content/test:test_support",
-        "//testing/gtest",
+    deps = [
+      ":notifications",
+      ":test_support",
+      "//base",
+      "//chrome/browser/permissions",
+      "//chrome/browser/web_applications:web_applications_test_support",
+      "//chrome/test:test_support",
+      "//chrome/test:test_support_ui",
+      "//components/infobars/content",
+      "//content/test:test_support",
+      "//testing/gtest",
+    ]
+
+    sources += [
+      "notification_interactive_uitest.cc",
+      "notification_interactive_uitest_support.cc",
+      "notification_interactive_uitest_support.h",
+    ]
+
+    if (is_win) {
+      sources += [
+        "notification_platform_bridge_win_interactive_uitest.cc",
+        "win/fake_itoastnotifier.cc",
+        "win/fake_itoastnotifier.h",
       ]
+    }
 
-      if (!is_chromeos) {
-        sources += [
-          "notification_interactive_uitest.cc",
-          "notification_interactive_uitest_support.cc",
-          "notification_interactive_uitest_support.h",
-        ]
-      }
+    if (is_mac) {
+      sources += [ "mac/notification_interactive_uitest_mac.mm" ]
+    }
 
-      if (is_win) {
-        sources += [
-          "notification_platform_bridge_win_interactive_uitest.cc",
-          "win/fake_itoastnotifier.cc",
-          "win/fake_itoastnotifier.h",
-        ]
-      }
-
-      if (is_mac) {
-        sources += [ "mac/notification_interactive_uitest_mac.mm" ]
-      }
-
-      if (enable_chrome_notifications) {
-        sources += [
-          "notification_ui_manager_browsertest.cc",
-          "notification_ui_manager_interactive_uitest.cc",
-        ]
-      }
+    if (enable_chrome_notifications) {
+      sources += [
+        "notification_ui_manager_browsertest.cc",
+        "notification_ui_manager_interactive_uitest.cc",
+      ]
     }
   }
 }

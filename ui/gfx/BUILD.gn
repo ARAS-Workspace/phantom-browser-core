@@ -231,7 +231,7 @@ component("gfx") {
     deps += [ "//ui/linux:linux_ui" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "font_fallback_linux.cc",
       "font_fallback_linux.h",
@@ -625,7 +625,7 @@ source_set("memory_buffer_sources") {
     "//ui/gfx/geometry",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "linux/client_native_pixmap_dmabuf.cc",
       "linux/client_native_pixmap_dmabuf.h",
@@ -639,7 +639,7 @@ source_set("memory_buffer_sources") {
     deps += [ "//build/config/linux/libdrm" ]
   }
 
-  if (is_linux || is_chromeos || is_android) {
+  if (is_linux || is_android) {
     deps += [ "//third_party/libsync" ]
   }
 
@@ -661,7 +661,7 @@ source_set("memory_buffer_sources") {
     public_deps += [ "//ipc:message_support" ]
   }
 
-  if (is_linux || is_chromeos || use_ozone) {
+  if (is_linux || use_ozone) {
     sources += [
       "native_pixmap_handle.cc",
       "native_pixmap_handle.h",
@@ -768,10 +768,10 @@ test("gfx_unittests") {
     "text_elider_unittest.cc",
     "text_utils_unittest.cc",
   ]
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "font_render_params_linux_unittest.cc" ]
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "font_fallback_linux_unittest.cc" ]
   }
   if (is_apple) {
@@ -884,7 +884,7 @@ test("gfx_unittests") {
     sources += [ "system_fonts_win_unittest.cc" ]
   }
 
-  if (is_linux || is_chromeos || is_android || is_win) {
+  if (is_linux || is_android || is_win) {
     sources += [ "platform_font_skia_unittest.cc" ]
   }
 
@@ -977,7 +977,7 @@ test("gfx_unittests") {
     deps += [ "//ui/linux:test_support" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "linux/fontconfig_util_unittest.cc",
       "linux/native_pixmap_dmabuf_unittest.cc",

@@ -46,7 +46,6 @@
 #include "chrome/browser/metrics/https_engagement_metrics_provider.h"
 #include "chrome/browser/metrics/metrics_reporting_state.h"
 #include "chrome/browser/metrics/network_quality_estimator_provider_impl.h"
-#include "chrome/browser/metrics/usertype_by_devicetype_metrics_provider.h"
 #include "chrome/browser/performance_manager/metrics/metrics_provider_common.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/profiles/profile_manager.h"

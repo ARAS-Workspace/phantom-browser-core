@@ -51,14 +51,6 @@ mojom("mojom") {
     "//url/mojom:url_mojom_origin",
   ]
 
-  if (is_chromeos) {
-    sources += [
-      "mtp_file_entry.mojom",
-      "mtp_manager.mojom",
-      "mtp_storage_info.mojom",
-    ]
-  }
-
   if (is_ios && target_platform == "iphoneos") {
     enabled_features = [ "is_ios_iphoneos" ]
   }
@@ -95,7 +87,7 @@ mojom("device_service") {
   enable_js_fuzzing = false
 
   enabled_features = []
-  if ((is_linux || is_chromeos) && use_udev) {
+  if (is_linux && use_udev) {
     enabled_features += [ "enable_input_device_manager" ]
   }
 
@@ -195,7 +187,6 @@ mojom("usb") {
 
     visibility_blink = [
       ":*",
-      "//chromeos/ash/experiences/arc/mojom:mojom_blink",
       "//third_party/blink/public/mojom/usb:usb_blink",
       "//third_party/blink/renderer/modules/webusb",
       "//chrome/browser/ui/webui/usb_internals:mojo_bindings_blink",

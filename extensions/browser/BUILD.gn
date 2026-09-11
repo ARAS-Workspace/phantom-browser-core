@@ -690,14 +690,6 @@ source_set("browser_sources") {
     "//url",
   ]
 
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/constants",
-      "//extensions/browser/api/clipboard:clipboard_types",
-      "//extensions/browser/api/virtual_keyboard_private:virtual_keyboard_delegate",
-    ]
-  }
-
   if (enable_rlz) {
     deps += [ "//rlz:rlz_lib" ]
   }
@@ -723,16 +715,6 @@ source_set("browser_sources") {
   # TODO(crbug.com/41323543): Ideally web_view should be a separate target on
   # which the extension system depends.
   if (enable_guest_view) {
-    if (is_chromeos) {
-      sources += [
-        "guest_view/app_view/app_view_constants.cc",
-        "guest_view/app_view/app_view_constants.h",
-        "guest_view/app_view/app_view_guest.cc",
-        "guest_view/app_view/app_view_guest.h",
-        "guest_view/app_view/app_view_guest_delegate.cc",
-        "guest_view/app_view/app_view_guest_delegate.h",
-      ]
-    }
     if (enable_extensions) {
       sources += [
         "guest_view/mime_handler_view/mime_handler_stream_manager.cc",
@@ -846,24 +828,11 @@ source_set("browser_sources") {
     ]
 
     deps += [ "//services/device/public/cpp/hid" ]
-
-    if (is_chromeos) {
-      sources += [
-        "api/usb/usb_api.cc",
-        "api/usb/usb_api.h",
-      ]
-
-      deps += [ "//chromeos/dbus/permission_broker" ]
-    }
   }
 
   if (is_mac) {
     # For LSCopyDisplayNameForURL, path_util.cc.
     frameworks = [ "CoreServices.framework" ]
-  }
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/constants" ]
   }
 
   if (enable_pdf) {
@@ -901,10 +870,6 @@ source_set("crx_installer") {
     "//extensions/common",
     "//extensions/strings",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//components/user_manager" ]
-  }
 }
 source_set("webstore_installer") {
   sources = [
@@ -1015,17 +980,6 @@ source_set("test_support") {
     "//testing/gtest",
     "//ui/base/idle",
   ]
-
-  if (is_chromeos) {
-    sources += [
-      "api/feedback_private/mock_feedback_service.cc",
-      "api/feedback_private/mock_feedback_service.h",
-    ]
-    deps += [
-      "//components/crash/core/app",
-      "//net:test_support",
-    ]
-  }
 
   if (safe_browsing_mode == 1 || safe_browsing_mode == 2) {
     sources += [
@@ -1209,10 +1163,6 @@ source_set("unit_tests") {
     "//ui/display:test_support",
   ]
 
-  if (is_chromeos) {
-    deps += [ "//extensions/browser/api/virtual_keyboard_private:virtual_keyboard_delegate" ]
-  }
-
   # TODO(https://crbug.com/356905053): Gradually include more of these sources
   # in the desktop-android build when the related APIs are enabled.
   if (enable_extensions) {
@@ -1244,54 +1194,6 @@ source_set("unit_tests") {
 
   if (enable_platform_apps) {
     sources += [ "app_window/app_window_geometry_cache_unittest.cc" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "api/audio/audio_device_id_calculator_unittest.cc",
-      "api/bluetooth/bluetooth_event_router_unittest.cc",
-      "api/bluetooth_socket/bluetooth_socket_api_unittest.cc",
-      "api/feedback_private/access_rate_limiter_chromeos_unittest.cc",
-      "api/feedback_private/feedback_private_api_chromeos_unittest.cc",
-      "api/feedback_private/feedback_private_api_unittest_base_chromeos.cc",
-      "api/feedback_private/feedback_private_api_unittest_base_chromeos.h",
-      "api/feedback_private/log_source_access_manager_chromeos_unittest.cc",
-      "api/media_perception_private/conversion_utils_unittest.cc",
-      "api/media_perception_private/media_perception_api_manager_unittest.cc",
-      "api/networking_private/networking_private_chromeos_unittest.cc",
-      "api/virtual_keyboard_private/virtual_keyboard_private_api_unittest.cc",
-      "api/webcam_private/visca_webcam_unittest.cc",
-    ]
-
-    deps += [
-      "//ash/constants",
-      "//chrome/common:constants",
-      "//chromeos:test_support",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/dbus:test_support",
-      "//chromeos/ash/components/dbus/audio",
-      "//chromeos/ash/components/dbus/debug_daemon",
-      "//chromeos/ash/components/dbus/media_analytics",
-      "//chromeos/ash/components/dbus/media_analytics:media_perception_proto",
-      "//chromeos/ash/components/dbus/shill",
-      "//chromeos/ash/components/dbus/upstart",
-      "//chromeos/ash/components/login/login_state",
-      "//chromeos/ash/components/network:test_support",
-      "//chromeos/constants",
-      "//chromeos/dbus/permission_broker",
-      "//chromeos/dbus/power",
-      "//components/account_id",
-      "//components/account_id:test_support",
-      "//components/feedback",
-      "//components/feedback/content:factory",
-      "//components/prefs",
-      "//components/prefs:test_support",
-      "//components/session_manager/core",
-      "//components/session_manager/test:test_support",
-      "//components/user_manager",
-      "//components/user_manager:test_support",
-      "//google_apis",
-    ]
   }
 
   if (safe_browsing_mode == 1) {

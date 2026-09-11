@@ -18,7 +18,7 @@ source_set("on_device_model_sandbox_init") {
   if (enable_ml_internal) {
     deps += [ "//services/on_device_model/ml" ]
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [
       "//content/common",
       "//gpu/config",

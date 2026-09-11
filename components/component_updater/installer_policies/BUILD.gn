@@ -70,7 +70,7 @@ static_library("installer_policies_with_content_deps") {
     "//components/update_client",
   ]
 
-  if (is_chromeos || is_win || is_mac || is_linux) {
+  if (is_win || is_mac || is_linux) {
     sources += [
       "iwa_key_distribution_component_installer_policy.cc",
       "iwa_key_distribution_component_installer_policy.h",

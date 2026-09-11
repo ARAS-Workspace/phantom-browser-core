@@ -36,11 +36,7 @@ component("proxy_config") {
   # and disable include checking so GN doesn't complain about the missing
   # dependency (it still links OK). This cycle should be fixed and header
   # checking enabled.
-  if (is_chromeos) {
-    check_includes = false
-  } else {
-    deps += [ "//components/pref_registry" ]
-  }
+  deps += [ "//components/pref_registry" ]
 
   if (!is_ios) {
     sources += [

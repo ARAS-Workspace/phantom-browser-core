@@ -104,12 +104,10 @@ component("ax_base") {
     "ax_updates_and_events.h",
   ]
 
-  if (!is_chromeos) {
-    sources += [
-      "ax_enum_localization_util.cc",
-      "ax_enum_localization_util.h",
-    ]
-  }
+  sources += [
+    "ax_enum_localization_util.cc",
+    "ax_enum_localization_util.h",
+  ]
 
   configs += [
     "//build/config/compiler:wexit_time_destructors",
@@ -125,19 +123,13 @@ component("ax_base") {
     "//ui/gfx/geometry",
   ]
 
-  if (!is_chromeos) {
-    public_deps += [
-      "//base:i18n",
-      "//ui/base",
-      "//ui/strings",
-    ]
-  }
+  public_deps += [
+    "//base:i18n",
+    "//ui/base",
+    "//ui/strings",
+  ]
 
   deps = []
-
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
-  }
 
   if (is_android) {
     sources += [ "android/accessibility_features_map.cc" ]
@@ -240,7 +232,7 @@ component("accessibility_internal") {
   }
 }
 
-if (is_android || is_chromeos) {
+if (is_android) {
   source_set("ax_assistant") {
     sources = [
       "ax_assistant_structure.cc",

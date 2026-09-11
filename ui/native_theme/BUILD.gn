@@ -69,13 +69,6 @@ component("native_theme") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "os_settings_provider_ash.cc",
-      "os_settings_provider_ash.h",
-    ]
-  }
-
   if (is_mac) {
     frameworks = [
       "Accessibility.framework",

@@ -57,9 +57,6 @@ source_set("impl") {
     "//ui/base",
     "//url",
   ]
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
-  }
 
   if (is_android) {
     sources += [ "announcement_notification_delegate_android.cc" ]

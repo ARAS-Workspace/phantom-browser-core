@@ -14,7 +14,7 @@ mojom("native_pixmap_handle") {
 
   sources = [ "native_pixmap_handle.mojom" ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     cpp_typemaps = [
       {
         types = [
@@ -40,7 +40,7 @@ mojom("native_pixmap_handle") {
   }
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   source_set("unit_tests") {
     testonly = true
     sources = [ "native_pixmap_handle_mojom_traits_unittest.cc" ]

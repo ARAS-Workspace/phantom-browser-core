@@ -136,7 +136,7 @@ component("freetype") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     # Needed for content_shell on Linux and Chromecast, since fontconfig
     # requires FT_Get_BDF_Property.
     sources += [ "src/src/base/ftbdf.c" ]

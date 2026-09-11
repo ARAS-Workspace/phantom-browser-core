@@ -227,13 +227,6 @@ source_set("views_examples_proc") {
       "//ui/wm",
     ]
   }
-  if (is_chromeos) {
-    sources += [
-      "examples_views_delegate_chromeos.cc",
-      "examples_views_delegate_chromeos.h",
-    ]
-    deps += [ "//ui/wm:test_support" ]
-  }
 }
 
 source_set("views_examples_main_header") {

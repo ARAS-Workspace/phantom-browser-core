@@ -188,7 +188,7 @@ target(link_target_type, "renderer") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "renderer_main_platform_delegate_linux.cc" ]
   }
 
@@ -341,7 +341,7 @@ target(link_target_type, "renderer") {
     deps += [ "//services/screen_ai/public/mojom" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [ "//components/services/font/public/cpp" ]
   }
 
@@ -365,15 +365,8 @@ target(link_target_type, "renderer") {
     ]
   }
 
-  if (is_linux || is_chromeos || is_android) {
+  if (is_linux || is_android) {
     deps += [ "//sandbox:sandbox_buildflags" ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//chromeos:chromeos_export",
-      "//chromeos/system",
-    ]
   }
 
   if (use_ozone) {

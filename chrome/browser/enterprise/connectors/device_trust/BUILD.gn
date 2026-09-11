@@ -22,7 +22,7 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  if (is_linux || is_chromeos || is_mac || is_win) {
+  if (is_linux || is_mac || is_win) {
     sources += [
       "device_trust_connector_service_factory_unittest.cc",
       "navigation_throttle_unittest.cc",

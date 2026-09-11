@@ -65,7 +65,7 @@ source_set("content_descriptor_keys") {
 
 # This target allows other targets to depend on sandbox_support_linux.h which is
 # a header-only dependency, without bringing in all of content.
-if (is_linux || is_chromeos) {
+if (is_linux) {
   source_set("sandbox_support_linux") {
     public = [
       "//content/common/content_export.h",
@@ -320,11 +320,7 @@ source_set("common_sources") {
     deps += [ "//sandbox/win:common" ]
   }
 
-  if (is_chromeos) {
-    public_deps += [ "//media/capture/video/chromeos/public" ]
-  }
-
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "zygote/sandbox_support_linux.h",
       "zygote/send_zygote_child_ping_linux.h",
@@ -360,8 +356,6 @@ mojom("interfaces") {
   # Must depend on //content/public/common/ instead, for component build.
   visibility = [
     ":common_sources",
-    "//chrome/browser/ash/magic_boost",
-    "//chrome/browser/ash/policy/dlp/dialogs",
     "//chrome/common:mojo_bindings",
     "//chrome/common:mojo_bindings_blink",
     "//content/common/*",

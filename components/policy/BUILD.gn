@@ -22,7 +22,7 @@ gen_policy_templates_local = false
 # enable these flags (but don't check that in!).
 gen_policy_templates_common = true
 gen_policy_templates_win = is_win
-gen_policy_templates_linux = is_linux || is_chromeos
+gen_policy_templates_linux = is_linux
 gen_policy_templates_android = is_android
 gen_policy_templates_mac = is_mac
 gen_policy_templates_ios = is_ios
@@ -76,7 +76,7 @@ chrome_settings_proto_path = "$target_gen_dir/proto/chrome_settings.proto"
 
 constants_header_path = "$target_gen_dir/policy_constants.h"
 constants_source_path = "$target_gen_dir/policy_constants.cc"
-if (is_chromeos || is_linux) {
+if (is_linux) {
   constants_mutable_header_path = "$target_gen_dir/policy_constants_mutable.h"
   constants_mutable_source_path = "$target_gen_dir/policy_constants_mutable.cc"
 }
@@ -312,7 +312,7 @@ static_library("generated") {
   deps = [ "//build:branding_buildflags" ]
 }
 
-if (is_chromeos || is_linux) {
+if (is_linux) {
   static_library("generated_testonly") {
     testonly = true
     sources = [

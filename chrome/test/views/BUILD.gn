@@ -31,7 +31,4 @@ source_set("views") {
     "//content/test:test_support",
     "//ui/color",
   ]
-  if (is_chromeos) {
-    deps += [ "//ash:test_support" ]
-  }
 }

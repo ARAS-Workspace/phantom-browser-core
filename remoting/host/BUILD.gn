@@ -31,7 +31,7 @@ group("all") {
     deps += [ ":remoting_host_branded" ]
   }
 
-  if (!is_chromeos && !is_android && !is_ios) {
+  if (!is_android && !is_ios) {
     deps += [
       "//remoting/host:remoting_native_messaging_host",
       "//remoting/host:remoting_native_messaging_manifests",
@@ -144,9 +144,7 @@ source_set("common_headers") {
     ]
   }
 
-  if (!is_chromeos) {
-    sources += [ "me2me_desktop_environment.h" ]
-  }
+  sources += [ "me2me_desktop_environment.h" ]
   deps = [
     ":platform_interfaces",
     "//base",
@@ -329,7 +327,7 @@ source_set("resources") {
     "//ui/base",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "resources_linux.cc" ]
   }
 
@@ -734,37 +732,7 @@ static_library("common") {
     }
   }
 
-  if (is_chromeos) {
-    sources += [
-      "audio_capturer_chromeos.cc",
-      "audio_capturer_chromeos.h",
-      "continue_window_chromeos.cc",
-      "curtain_mode_chromeos.cc",
-      "curtain_mode_chromeos.h",
-      "desktop_display_info_loader_chromeos.cc",
-      "desktop_resizer_chromeos.cc",
-      "disconnect_window_chromeos.cc",
-      "input_injector_chromeos.cc",
-      "input_injector_chromeos.h",
-      "keyboard_layout_monitor_chromeos.cc",
-    ]
-    deps += [
-      "//ash",
-      "//media/mojo/common",
-      "//remoting/host/chromeos",
-      "//remoting/host/chromeos:features",
-      "//ui/base/ime/ash",
-    ]
-
-    if (use_ozone) {
-      deps += [
-        "//ui/events/ozone/layout",
-        "//ui/ozone",
-      ]
-    }
-  } else {
-    sources += [ "me2me_desktop_environment.cc" ]
-  }
+  sources += [ "me2me_desktop_environment.cc" ]
 
   if (is_mac) {
     sources += [
@@ -951,7 +919,7 @@ source_set("unit_tests") {
     ]
   }
 
-  if (use_ozone || is_chromeos) {
+  if (use_ozone) {
     sources -= [ "input_monitor/local_input_monitor_unittest.cc" ]
   }
 
@@ -1013,18 +981,16 @@ source_set("unit_tests") {
   ]
 
   # These tests do not work on ChromeOS.
-  if (!is_chromeos) {
-    sources += [
-      "chromoting_host_services_client_unittest.cc",
-      "chromoting_host_services_server_unittest.cc",
-    ]
+  sources += [
+    "chromoting_host_services_client_unittest.cc",
+    "chromoting_host_services_server_unittest.cc",
+  ]
 
-    deps += [
-      ":chromoting_host_services_client",
-      ":chromoting_host_services_server",
-      "//remoting/host:ipc_constants",
-    ]
-  }
+  deps += [
+    ":chromoting_host_services_client",
+    ":chromoting_host_services_server",
+    "//remoting/host:ipc_constants",
+  ]
 
   # start_host is only supported on Linux and Windows.
   if (is_linux || is_win) {
@@ -1058,27 +1024,6 @@ source_set("unit_tests") {
     deps += [ "//remoting/host/linux:platform_impls" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "audio_capturer_chromeos_unittest.cc",
-      "desktop_display_info_loader_chromeos_unittest.cc",
-      "input_injector_chromeos_unittest.cc",
-      "it2me/it2me_confirmation_dialog_chromeos_unittest.cc",
-    ]
-    deps += [
-      "//ash:test_support",
-      "//chromeos/ash/components:test_support",
-      "//components/user_manager:test_support",
-      "//media:test_support",
-      "//remoting/host/chromeos",
-      "//remoting/host/chromeos:features",
-      "//remoting/host/chromeos:reporter_unit_tests",
-      "//remoting/host/chromeos:unit_tests",
-      "//ui/message_center:test_support",
-      "//ui/ozone",
-    ]
-  }
-
   if (is_win) {
     sources += [
       "clipboard_win_unittest.cc",
@@ -1097,7 +1042,7 @@ source_set("unit_tests") {
     data_deps = [ "//remoting/test:capability_test_stub" ]
   }
 
-  if (is_posix && !is_chromeos && !is_msan) {
+  if (is_posix && !is_msan) {
     # PAM tests fail on MSan because libpam is uninstrumented
     # (crbug.com/504793694). They also don't work on ChromeOS as PAM is not used
     # there for remoting.
@@ -1325,9 +1270,7 @@ if (enable_me2me_host) {
 
     if (is_posix) {
       deps += [ ":signal_handler" ]
-      if (!is_chromeos) {
-        deps += [ ":pam_authorization" ]
-      }
+      deps += [ ":pam_authorization" ]
     }
 
     if (!is_ios) {

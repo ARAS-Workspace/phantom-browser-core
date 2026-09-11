@@ -41,7 +41,7 @@ source_set("interstitials") {
     deps += [ "//chrome/browser/safe_browsing" ]
   }
 
-  if (is_linux || is_mac || is_win || is_chromeos) {
+  if (is_linux || is_mac || is_win) {
     deps += [ "//chrome/browser/supervised_user" ]
   }
 }

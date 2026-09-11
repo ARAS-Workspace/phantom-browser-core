@@ -167,7 +167,7 @@ static_library("web_test_browser") {
     sources += [ "browser/web_test_browser_main_platform_support_win.cc" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "browser/web_test_browser_main_platform_support_linux.cc" ]
   }
 

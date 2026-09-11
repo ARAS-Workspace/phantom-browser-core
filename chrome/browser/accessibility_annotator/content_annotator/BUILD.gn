@@ -59,8 +59,4 @@ source_set("unit_tests") {
     "//content/test:test_support",
     "//testing/gtest",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/constants" ]
-  }
 }

@@ -105,12 +105,6 @@ static_library("observers") {
     "//google_apis",
     "//services/metrics/public/cpp:metrics_cpp",
   ]
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/components/kiosk",
-      "//chromeos/components/mgs",
-    ]
-  }
 
   public_deps = [ "//components/unified_consent" ]
 }
@@ -170,13 +164,6 @@ source_set("unit_tests") {
     "//third_party/zlib/google:compression_utils",
     "//url",
   ]
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/components/kiosk:test_support",
-      "//chromeos/components/mgs:test_support",
-      "//components/user_manager:test_support",
-    ]
-  }
 }
 
 # Convenience testing target

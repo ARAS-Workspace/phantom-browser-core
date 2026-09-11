@@ -5,7 +5,7 @@
 import("//build/config/ui.gni")
 
 # Enable desktop-oriented features implemented by DesktopNativeWidgetAura.
-enable_desktop_aura = use_aura && !is_chromeos
+enable_desktop_aura = use_aura
 
 # Supports accessible text offsets computation by Views. When this feature is
 # enabled, characters offsets and word boundaries become available to ATs for

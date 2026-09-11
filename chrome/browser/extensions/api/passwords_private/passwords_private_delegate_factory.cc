@@ -4,7 +4,6 @@
 
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_delegate_factory.h"
 
-#include "ash/constants/web_app_id_constants.h"
 #include "base/functional/bind.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/no_destructor.h"
@@ -20,6 +19,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 // TODO(crbug.com/528209923): //chrome/browser/ui cannot be added to deps
 // because it would cause a circular dependency. Remove this nogncheck once
 // MaybeShowProfileSwitchIPH is moved to //chrome/browser/ui/...
@@ -52,8 +52,8 @@ void MaybeShowProfileSwitchIPH(Profile* profile) {
   }
 
   BrowserWindowInterface* launched_app =
-      web_app::AppBrowserController::FindForWebApp(*profile,
-                                                   ash::kPasswordManagerAppId);
+      web_app::AppBrowserController::FindForWebApp(
+          *profile, web_app::kPasswordManagerAppId);
   if (launched_app && web_app::AppBrowserController::From(launched_app)
                           ->HasProfileMenuButton()) {
     BrowserWindow::FromBrowser(launched_app)->MaybeShowProfileSwitchIPH();

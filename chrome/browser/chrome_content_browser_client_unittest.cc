@@ -9,7 +9,6 @@
 #include <memory>
 #include <string_view>
 
-#include "ash/webui/camera_app_ui/url_constants.h"
 #include "base/command_line.h"
 #include "base/files/file_path.h"
 #include "base/files/scoped_file.h"

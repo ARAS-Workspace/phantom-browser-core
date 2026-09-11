@@ -4,16 +4,12 @@
 
 #include "device/bluetooth/chromeos/bluetooth_utils.h"
 
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_pref_names.h"
 #include "base/command_line.h"
 #include "base/functional/callback_helpers.h"
 #include "base/run_loop.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/task_environment.h"
 #include "build/build_config.h"
-#include "chromeos/ash/services/nearby/public/cpp/nearby_client_uuids.h"
-#include "chromeos/ash/services/secure_channel/public/cpp/shared/ble_constants.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
 #include "device/bluetooth/bluetooth_adapter_factory.h"

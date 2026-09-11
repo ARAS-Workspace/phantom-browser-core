@@ -8,7 +8,7 @@ if (is_android) {
   import("//third_party/jni_zero/jni_zero.gni")
 }
 
-if (is_win || ((is_linux || is_chromeos) && use_udev) || is_mac || is_android) {
+if (is_win || (is_linux && use_udev) || is_mac || is_android) {
   config("platform_support") {
     visibility = [ ":serial" ]
     if (is_win) {
@@ -56,7 +56,7 @@ if (is_win || ((is_linux || is_chromeos) && use_udev) || is_mac || is_android) {
       "//services/device/public/cpp/bluetooth",
     ]
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       sources += [
         "serial_device_enumerator_linux.cc",
         "serial_device_enumerator_linux.h",
@@ -110,10 +110,6 @@ if (is_win || ((is_linux || is_chromeos) && use_udev) || is_mac || is_android) {
 
     if (use_udev) {
       deps += [ "//device/udev_linux" ]
-    }
-
-    if (is_chromeos) {
-      deps += [ "//chromeos/dbus/permission_broker" ]
     }
 
     if (is_mac) {

@@ -34,10 +34,6 @@ if (!is_android) {
       "//ui/views:view_pixel_diff_test_support",
     ]
 
-    if (is_chromeos) {
-      deps += [ "//ash" ]
-    }
-
     if (is_mac) {
       sources += [
         "test_browser_dialog_mac.h",
@@ -164,10 +160,6 @@ if (!is_android) {
       "//ui/views",
       "//url",
     ]
-
-    if (is_chromeos) {
-      deps += [ "//ash" ]
-    }
   }
 
   if (use_aura) {

@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 import("//chrome/common/features.gni")
 
@@ -234,10 +234,6 @@ if (!is_android) {
       "//ui/base",
       "//ui/menus",
     ]
-
-    if (is_chromeos) {
-      sources += [ "existing_window_sub_menu_model_chromeos.h" ]
-    }
   }
 
   source_set("tab_model_impl") {
@@ -273,12 +269,6 @@ if (!is_android) {
       "//components/tab_groups",
       "//components/tabs:impl",
     ]
-
-    if (is_chromeos) {
-      sources += [ "existing_window_sub_menu_model_chromeos.cc" ]
-
-      deps += [ "//chromeos/ui/wm" ]
-    }
   }
 
   source_set("tab_strip") {
@@ -388,7 +378,7 @@ if (!is_android) {
       "vertical_tab_strip_state_controller.h",
     ]
 
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       sources += [ "inactive_window_mouse_event_controller.h" ]
     }
 
@@ -457,7 +447,7 @@ if (!is_android) {
       "vertical_tab_strip_state_controller.cc",
     ]
 
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       sources += [ "inactive_window_mouse_event_controller.cc" ]
     }
 
@@ -592,7 +582,7 @@ if (!is_android) {
       ]
     }
 
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       deps += [
         "//chrome/browser/multistep_filter",
         "//chrome/browser/multistep_filter/ui",
@@ -602,10 +592,6 @@ if (!is_android) {
 
     if (is_win) {
       deps += [ "//chrome/browser/ui/search_promotion" ]
-    }
-
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/apps/app_service" ]
     }
   }
 

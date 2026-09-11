@@ -60,7 +60,7 @@ proto_library("coefficient_polynomial_proto") {
 }
 
 # SHELL lib.
-if (is_chromeos || is_linux) {
+if (is_linux) {
   component("shell_encryption") {
     public_configs = [ ":shell_encryption_config" ]
     configs -= [ "//build/config/compiler:chromium_code" ]

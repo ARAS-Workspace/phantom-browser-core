@@ -116,8 +116,7 @@ config("debug") {
       # builds, and we have to tell it to turn it off.
       defines += [ "_HAS_ITERATOR_DEBUGGING=0" ]
     }
-  } else if ((is_linux || is_chromeos) && current_cpu == "x64" &&
-             enable_iterator_debugging) {
+  } else if (is_linux && current_cpu == "x64" && enable_iterator_debugging) {
     # Enable libstdc++ debugging facilities to help catch problems early, see
     # http://crbug.com/65151 .
     # TODO(phajdan.jr): Should we enable this for all of POSIX?
@@ -206,7 +205,7 @@ config("default_libs") {
     # Targets should choose to explicitly link frameworks they require. Since
     # linking can have run-time side effects, nothing should be listed here.
     libs = []
-  } else if (is_linux || is_chromeos) {
+  } else if (is_linux) {
     libs = [
       "dl",
       "pthread",
@@ -332,7 +331,7 @@ config("executable_config") {
       "//build/config/ios:ios_dynamic_flags",
       "//build/config/ios:ios_executable_flags",
     ]
-  } else if (is_linux || is_chromeos || is_android || current_os == "aix") {
+  } else if (is_linux || is_android || current_os == "aix") {
     configs += [ "//build/config/gcc:executable_config" ]
   }
 
@@ -361,7 +360,7 @@ config("shared_library_config") {
       "//build/config/ios:ios_dynamic_flags",
       "//build/config/ios:ios_shared_library_flags",
     ]
-  } else if (is_linux || is_chromeos || current_os == "aix") {
+  } else if (is_linux || current_os == "aix") {
     configs += [ "//build/config/gcc:shared_library_config" ]
   }
 

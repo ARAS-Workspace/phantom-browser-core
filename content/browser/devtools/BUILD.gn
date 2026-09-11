@@ -190,13 +190,6 @@ inspector_protocol_generate("protocol_sources") {
       "protocol/bluetooth_emulation.h",
     ]
   }
-
-  if (enable_smart_card) {
-    outputs += [
-      "protocol/smart_card_emulation.cc",
-      "protocol/smart_card_emulation.h",
-    ]
-  }
 }
 
 proto_library("devtools_background_services_proto") {

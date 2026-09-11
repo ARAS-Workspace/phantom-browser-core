@@ -16,7 +16,7 @@ if (is_mac) {
   import("//build/config/mac/mac_sdk.gni")
 }
 
-is_linux_without_udev = (is_linux || is_chromeos) && !use_udev
+is_linux_without_udev = is_linux && !use_udev
 
 test("device_unittests") {
   sources = [
@@ -272,24 +272,7 @@ test("device_unittests") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "bluetooth/bluetooth_low_energy_scan_filter_unittest.cc",
-      "bluetooth/bluez/ble_scan_parser/ble_scan_parser_unittest.cc",
-      "bluetooth/chromeos/bluetooth_connection_logger_unittest.cc",
-      "bluetooth/chromeos/bluetooth_utils_unittest.cc",
-    ]
-    deps += [
-      "//ash/constants",
-      "//chromeos/ash/services/nearby/public/cpp/",
-      "//chromeos/ash/services/secure_channel/public/cpp/shared",
-      "//chromeos/constants",
-      "//device/bluetooth/bluez/ble_scan_parser",
-      "//device/bluetooth/bluez/ble_scan_parser:lib",
-    ]
-  }
-
-  if ((is_chromeos || is_linux) && use_dbus) {
+  if (is_linux && use_dbus) {
     configs += [ "//build/config/linux/dbus" ]
 
     sources += [
@@ -328,14 +311,6 @@ test("device_unittests") {
       "//dbus",
       "//dbus:test_support",
     ]
-
-    if (is_chromeos) {
-      sources += [
-        "bluetooth/dbus/bluetooth_advertisement_monitor_application_service_provider_unittest.cc",
-        "bluetooth/dbus/bluetooth_advertisement_monitor_service_provider_unittest.cc",
-      ]
-      deps += [ "//services/data_decoder/public/mojom" ]
-    }
   }
 
   if (is_apple) {
@@ -459,10 +434,6 @@ test("device_unittests") {
       "//services/device/hid",
       "//services/device/public/cpp:test_support",
     ]
-  }
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/dbus/u2f" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

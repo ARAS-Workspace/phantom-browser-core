@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "ash/constants/web_app_id_constants.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
@@ -13,6 +12,7 @@
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/browser/web_applications/test/web_app_test_observers.h"
 #include "chrome/browser/web_applications/test/web_app_test_utils.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
@@ -83,9 +83,9 @@ IN_PROC_BROWSER_TEST_F(PreventCloseControllerBrowserTest,
       ProfileBrowserCollection::GetForProfile(profile())->GetSize();
 
   const GURL url(kCalculatorAppUrl);
-  ForceInstallWebApp(ash::kCalculatorAppId, url);
+  ForceInstallWebApp(web_app::kCalculatorAppId, url);
 
-  Browser* browser = LaunchWebAppBrowserAndWait(ash::kCalculatorAppId);
+  Browser* browser = LaunchWebAppBrowserAndWait(web_app::kCalculatorAppId);
   ++expected_browser_count;
 
   ASSERT_TRUE(browser);
@@ -95,12 +95,12 @@ IN_PROC_BROWSER_TEST_F(PreventCloseControllerBrowserTest,
   ConfigurePreventClose(url, /*prevent_close=*/true);
 
   // Act by launching PWA a second time
-  Browser* second_browser = LaunchWebAppBrowser(ash::kCalculatorAppId);
+  Browser* second_browser = LaunchWebAppBrowser(web_app::kCalculatorAppId);
 
   // On other platforms, the prevent close should not be enabled.
   EXPECT_FALSE(WebAppProvider::GetForTest(profile())
                    ->registrar_unsafe()
-                   .IsPreventCloseEnabled(ash::kCalculatorAppId));
+                   .IsPreventCloseEnabled(web_app::kCalculatorAppId));
   EXPECT_NE(browser, second_browser);
   EXPECT_EQ(expected_browser_count + 1,
             ProfileBrowserCollection::GetForProfile(profile())->GetSize());
@@ -114,9 +114,9 @@ IN_PROC_BROWSER_TEST_F(PreventCloseControllerBrowserTest,
       ProfileBrowserCollection::GetForProfile(profile())->GetSize();
 
   const GURL url(kCalculatorAppUrl);
-  ForceInstallWebApp(ash::kCalculatorAppId, url);
+  ForceInstallWebApp(web_app::kCalculatorAppId, url);
 
-  Browser* browser = LaunchWebAppBrowserAndWait(ash::kCalculatorAppId);
+  Browser* browser = LaunchWebAppBrowserAndWait(web_app::kCalculatorAppId);
   ++expected_browser_count;
 
   ASSERT_TRUE(browser);
@@ -126,7 +126,8 @@ IN_PROC_BROWSER_TEST_F(PreventCloseControllerBrowserTest,
   ConfigurePreventClose(url, /*prevent_close=*/false);
 
   // Act by launching PWA a second time
-  Browser* second_browser = LaunchWebAppBrowserAndWait(ash::kCalculatorAppId);
+  Browser* second_browser =
+      LaunchWebAppBrowserAndWait(web_app::kCalculatorAppId);
   expected_browser_count++;
 
   // Assert that the PWA only has one existing window

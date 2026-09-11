@@ -101,7 +101,7 @@ net_configs = [
   "//build/config/compiler:wexit_time_destructors",
 ]
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   net_configs += [ "//build/config/linux:libresolv" ]
 }
 
@@ -1375,15 +1375,6 @@ component("net") {
     ]
   }
 
-  if (is_chromeos && use_nss_certs) {
-    sources += [
-      "cert/nss_cert_database_chromeos.cc",
-      "cert/nss_cert_database_chromeos.h",
-      "cert/nss_profile_filter_chromeos.cc",
-      "cert/nss_profile_filter_chromeos.h",
-    ]
-  }
-
   if (is_ios) {
     sources += [
       "cert/cert_verify_proc_ios.cc",
@@ -1407,7 +1398,7 @@ component("net") {
     }
   }
 
-  if (is_linux || is_chromeos || is_android) {
+  if (is_linux || is_android) {
     sources += [
       "base/address_map_linux.cc",
       "base/address_map_linux.h",
@@ -1568,7 +1559,7 @@ component("net") {
     sources += [ "disk_cache/blockfile/mapped_file_posix.cc" ]
   }
 
-  if (is_android || is_chromeos || is_linux) {
+  if (is_android || is_linux) {
     sources += [
       "base/network_change_notifier_passive.cc",
       "base/network_change_notifier_passive.h",
@@ -1601,7 +1592,7 @@ component("net") {
   }
 
   # Use getifaddrs() on POSIX platforms, except Linux.
-  if (is_posix && !is_linux && !is_chromeos) {
+  if (is_posix && !is_linux) {
     sources += [
       "base/network_interfaces_getifaddrs.cc",
       "base/network_interfaces_getifaddrs.h",
@@ -2351,7 +2342,7 @@ static_library("test_support") {
     ]
   }
 
-  if (is_linux || is_chromeos || is_android) {
+  if (is_linux || is_android) {
     sources += [
       "base/address_tracker_linux_test_util.cc",
       "base/address_tracker_linux_test_util.h",
@@ -2572,7 +2563,7 @@ if (use_external_gssapi) {
   }
 }
 
-if (is_linux || is_chromeos || is_mac) {
+if (is_linux || is_mac) {
   executable("cachetool") {
     testonly = true
     sources = [ "tools/cachetool/cachetool.cc" ]
@@ -2622,7 +2613,7 @@ if (is_android) {
   }
 }
 
-if (is_android || is_linux || is_chromeos) {
+if (is_android || is_linux) {
   executable("disk_cache_memory_test") {
     testonly = true
     sources = [ "tools/disk_cache_memory_test/disk_cache_memory_test.cc" ]
@@ -3198,13 +3189,6 @@ target(_test_target_type, "net_unittests") {
     ]
   }
 
-  if (is_chromeos && use_nss_certs) {
-    sources += [
-      "cert/nss_cert_database_chromeos_unittest.cc",
-      "cert/nss_profile_filter_chromeos_unittest.cc",
-    ]
-  }
-
   if (is_linux) {
     sources += [
       "base/network_change_notifier_linux_unittest.cc",
@@ -3212,7 +3196,7 @@ target(_test_target_type, "net_unittests") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "base/address_tracker_linux_unittest.cc",
       "base/network_interfaces_linux_unittest.cc",
@@ -3356,7 +3340,7 @@ target(_test_target_type, "net_unittests") {
     sources += [ "base/sockaddr_util_posix_unittest.cc" ]
   }
 
-  if (is_android || is_chromeos) {
+  if (is_android) {
     sources += [ "base/network_change_notifier_passive_unittest.cc" ]
   }
 
@@ -3401,7 +3385,7 @@ target(_test_target_type, "net_unittests") {
   ]
   data_deps = [ "//testing/buildbot/filters:net_unittests_filters" ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "tools/quic/quic_simple_server_test.cc" ]
   }
 
@@ -3519,7 +3503,7 @@ target(_test_target_type, "net_unittests") {
   }
 
   # Use getifaddrs() on POSIX platforms, except Linux.
-  if (is_posix && !is_linux && !is_chromeos) {
+  if (is_posix && !is_linux) {
     sources += [ "base/network_interfaces_getifaddrs_unittest.cc" ]
   }
 
@@ -3691,7 +3675,7 @@ target(_test_target_type, "net_unittests") {
     ]
 
     # Platforms where sqlite_dev_shell is defined.
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       sources += [
         "disk_cache/sql/sql_persistent_store_queries_unittest.cc",
         "disk_cache/sql/sql_shared_cache_index_database_queries_unittest.cc",
@@ -4402,7 +4386,7 @@ if (is_apple) {
   }
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   fuzzer_test("net_base_address_tracker_linux_fuzzer") {
     sources = [ "base/address_tracker_linux_fuzzer.cc" ]
     deps = [

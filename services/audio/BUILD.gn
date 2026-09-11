@@ -83,7 +83,7 @@ source_set("audio") {
     "//services/audio/public/mojom",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "audio_sandbox_hook_linux.cc",
       "audio_sandbox_hook_linux.h",
@@ -205,7 +205,7 @@ source_set("tests") {
     "//third_party/tflite",
   ]
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [
       "public/cpp/sounds/audio_stream_handler_unittest.cc",
       "public/cpp/sounds/sounds_manager_unittest.cc",

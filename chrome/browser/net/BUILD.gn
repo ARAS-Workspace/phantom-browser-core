@@ -93,12 +93,8 @@ source_set("net") {
     "//url",
   ]
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     public += [ "disk_cache_dir_policy_handler.h" ]
-  }
-
-  if (is_chromeos) {
-    public += [ "network_annotation_monitor.h" ]
   }
 
   if (is_win) {
@@ -117,9 +113,6 @@ source_set("net") {
       "nss_service.h",
       "nss_service_factory.h",
     ]
-    if (is_chromeos) {
-      public += [ "nss_temp_certs_cache_chromeos.h" ]
-    }
   }
 
   if (chrome_root_store_cert_management_ui) {
@@ -223,42 +216,14 @@ source_set("impl") {
     deps += [ "//chrome/browser/ui/webui/extensions:headers" ]
   }
 
-  if (is_chromeos) {
-    sources += [ "net_error_diagnostics_dialog_chromeos.cc" ]
-    deps += [ "//chrome/browser/ui:chrome_pages" ]
-  } else if (is_win) {
+  if (is_win) {
     sources += [ "net_error_diagnostics_dialog_win.cc" ]
   } else {
     sources += [ "net_error_diagnostics_dialog_stub.cc" ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [ "disk_cache_dir_policy_handler.cc" ]
-  }
-
-  if (is_chromeos) {
-    sources += [ "network_annotation_monitor.cc" ]
-    deps += [
-      "//ash/constants",
-      "//ash/webui/connectivity_diagnostics",
-      "//chrome/browser/ash/certificate_provider",
-      "//chrome/browser/ash/kcer",
-      "//chrome/browser/ash/login",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/policy:onc",
-      "//chrome/browser/profiles",
-      "//chrome/browser/profiles:profile_manager",
-      "//chrome/browser/ui/ash/network",
-      "//chrome/browser/ui/ash/system_web_apps",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/network",
-      "//chromeos/ash/components/settings",
-      "//chromeos/components/kiosk",
-      "//chromeos/constants",
-      "//chromeos/dbus/regmon",
-    ]
   }
 
   if (is_win) {
@@ -300,18 +265,6 @@ source_set("impl") {
       "nss_service_factory.cc",
     ]
     deps += [ "//chrome/browser/ui:crypto_module_password_dialog" ]
-    if (is_chromeos) {
-      sources += [
-        "nss_service_chromeos.cc",
-        "nss_temp_certs_cache_chromeos.cc",
-      ]
-      deps += [
-        "//chromeos/ash/components/dbus",
-        "//chromeos/ash/components/dbus/userdataauth",
-        "//chromeos/ash/components/tpm",
-        "//chromeos/components/certificate_provider",
-      ]
-    }
     if (is_linux) {
       sources += [ "nss_service_linux.cc" ]
     }
@@ -414,21 +367,7 @@ source_set("unit_tests") {
   ]
   if (!is_android) {
     sources += [ "http_auth_cache_status_unittest.cc" ]
-    if (!is_chromeos) {
-      sources += [ "disk_cache_dir_policy_handler_unittest.cc" ]
-    }
-  }
-  if (is_chromeos) {
-    sources += [
-      "network_annotation_monitor_unittest.cc",
-      "nss_temp_certs_cache_chromeos_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/prefs",
-      "//chromeos/dbus/regmon",
-      "//components/account_id:test_support",
-      "//components/session_manager/test:test_support",
-    ]
+    sources += [ "disk_cache_dir_policy_handler_unittest.cc" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -508,17 +447,6 @@ if (!is_android) {
       "//services/network:test_support",
       "//services/network/public/cpp:ip_address_space_overrides_test_utils",
     ]
-    if (is_chromeos) {
-      sources += [
-        "network_annotation_monitor_browsertest.cc",
-        "nss_context_chromeos_browsertest.cc",
-      ]
-      deps += [
-        "//chrome/browser/ash/login:test_support",
-        "//chrome/browser/ash/net",
-        "//chromeos/dbus/regmon",
-      ]
-    }
     if (is_win) {
       sources += [ "chrome_mojo_proxy_resolver_win_browsertest.cc" ]
     }

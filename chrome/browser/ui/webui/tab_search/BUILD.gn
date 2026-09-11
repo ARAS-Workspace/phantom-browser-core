@@ -5,7 +5,7 @@
 import("//mojo/public/tools/bindings/mojom.gni")
 import("//ui/webui/webui_features.gni")
 
-assert(is_linux || is_chromeos || is_win || is_mac)
+assert(is_linux || is_win || is_mac)
 
 mojom("mojo_bindings") {
   sources = [ "tab_search.mojom" ]

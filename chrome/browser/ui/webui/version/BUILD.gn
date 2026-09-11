@@ -56,17 +56,6 @@ source_set("version") {
     deps += [ "//chrome/browser/ui/webui:theme_source" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "version_handler_chromeos.cc",
-      "version_handler_chromeos.h",
-    ]
-    deps += [
-      "//ash/strings",
-      "//chromeos/version",
-    ]
-  }
-
   if (is_win) {
     sources += [
       "version_handler_win.cc",

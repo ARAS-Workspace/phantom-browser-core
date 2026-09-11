@@ -177,12 +177,10 @@ source_set("misc") {
     ]
   }
 
-  if (!is_chromeos) {
-    # profiles_state.cc uses GAIAInfoUpdateService on non-ChromeOS platforms.
-    deps += [ ":gaia_info_update_service" ]
-  }
+  # profiles_state.cc uses GAIAInfoUpdateService on non-ChromeOS platforms.
+  deps += [ ":gaia_info_update_service" ]
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "avatar_menu.cc",
       "avatar_menu.h",
@@ -221,25 +219,6 @@ source_set("misc") {
     ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser:browser_process_platform_part",
-      "//chrome/browser/ash/account_manager",
-      "//chrome/browser/ash/app_mode",
-      "//chrome/browser/ash/arc/session:service_launcher",
-      "//chrome/browser/ash/locale",
-      "//chrome/browser/ash/login/session",
-      "//chrome/browser/ash/login/signin",
-      "//chrome/browser/ash/preferences",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/secure_channel",
-      "//chromeos/ash/components/account_manager",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/demo_mode",
-      "//chromeos/components/kiosk",
-    ]
-  }
-
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser" ]
   }
@@ -257,40 +236,38 @@ source_set("misc") {
   }
 }
 
-if (!is_chromeos) {
-  source_set("gaia_info_update_service") {
-    public = [
-      "gaia_info_update_service.h",
-      "gaia_info_update_service_factory.h",
-    ]
-    sources = [
-      "gaia_info_update_service.cc",
-      "gaia_info_update_service_factory.cc",
-    ]
-    public_deps = [
-      ":profile",
-      ":profile_downloader",
-      ":profile_util",
-      "//base",
-      "//components/keyed_service/core",
-      "//components/signin/public/identity_manager",
-      "//skia",
-      "//ui/gfx",
-    ]
-    deps = [
-      ":profile_manager",
-      ":profiles",
-      "//chrome/browser:browser_process",
-      "//chrome/browser/signin",
-      "//chrome/common:buildflags",
-      "//chrome/common:constants",
-      "//components/pref_registry",
-      "//components/prefs",
-      "//components/signin/public/base",
-      "//content/public/browser",
-      "//google_apis",
-    ]
-  }
+source_set("gaia_info_update_service") {
+  public = [
+    "gaia_info_update_service.h",
+    "gaia_info_update_service_factory.h",
+  ]
+  sources = [
+    "gaia_info_update_service.cc",
+    "gaia_info_update_service_factory.cc",
+  ]
+  public_deps = [
+    ":profile",
+    ":profile_downloader",
+    ":profile_util",
+    "//base",
+    "//components/keyed_service/core",
+    "//components/signin/public/identity_manager",
+    "//skia",
+    "//ui/gfx",
+  ]
+  deps = [
+    ":profile_manager",
+    ":profiles",
+    "//chrome/browser:browser_process",
+    "//chrome/browser/signin",
+    "//chrome/common:buildflags",
+    "//chrome/common:constants",
+    "//components/pref_registry",
+    "//components/prefs",
+    "//components/signin/public/base",
+    "//content/public/browser",
+    "//google_apis",
+  ]
 }
 
 source_set("policy_handlers") {
@@ -369,10 +346,6 @@ source_set("renderer_updater") {
     "//services/network/public/cpp",
   ]
 
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/login/signin" ]
-  }
-
   if (enable_bound_session_credentials) {
     deps += [ "//components/unexportable_keys/mojom:mojo_service" ]
   }
@@ -422,13 +395,6 @@ source_set("profile") {
   ]
   if (enable_extensions) {
     deps += [ "//extensions/browser" ]
-  }
-  if (is_chromeos) {
-    deps += [
-      "//ash/constants",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/constants",
-    ]
   }
   if (is_android) {
     deps += [ "//chrome/browser/profiles/android:jni_headers" ]
@@ -528,17 +494,6 @@ source_set("profile_manager_impl") {
       "//components/live_caption",
     ]
   }
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/account_manager",
-      "//chrome/browser/ash/arc/policy",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/chromeos/extensions/desk_api",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/experiences/arc/session:arc_base_enums",
-    ]
-  }
 }
 
 source_set("profile_io_data") {
@@ -556,7 +511,7 @@ source_set("profile_io_data") {
     "//url",
   ]
 
-  if (is_linux || is_win || is_mac || is_chromeos) {
+  if (is_linux || is_win || is_mac) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 
@@ -677,14 +632,6 @@ source_set("profile_util_impl") {
 
   if (is_android) {
     deps += [ "//components/supervised_user/core/browser/android" ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/login/users",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/profiles",
-    ]
   }
 }
 
@@ -943,48 +890,20 @@ source_set("profiles_extra_parts_impl") {
       "//chrome/browser/web_applications/isolated_web_apps/window_management",
     ]
   }
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     deps += [ "//chrome/browser/download/bubble" ]
   }
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/apps/almanac_api_client",
-      "//chrome/browser/apps/app_preload_service",
-      "//chrome/browser/ash/app_list",
-      "//chrome/browser/ash/certificate_provider",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/browser/ash/floating_sso",
-      "//chrome/browser/ash/input_method",
-      "//chrome/browser/ash/keyed_service",
-      "//chrome/browser/ash/language_packs",
-      "//chrome/browser/ash/lobster",
-      "//chrome/browser/ash/login/auth_factors_policy",
-      "//chrome/browser/ash/policy/dlp",
-      "//chrome/browser/ash/policy/skyvault",
-      "//chrome/browser/ash/scanner",
-      "//chrome/browser/chromeos/enterprise/cloud_storage",
-      "//chrome/browser/chromeos/extensions/telemetry/api:keyed_service_factory",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/media_galleries",
-      "//chrome/browser/nearby_sharing",
-      "//chrome/browser/policy:onc",
-      "//chrome/browser/push_notification",
-      "//chrome/browser/smart_card",
-    ]
-  }
 
-  if (!is_chromeos) {
-    deps += [ ":gaia_info_update_service" ]
-  }
+  deps += [ ":gaia_info_update_service" ]
 
-  if (!is_chromeos && !is_android) {
+  if (!is_android) {
     deps += [
       ":profile_util",
       "//chrome/browser/download/bubble",
     ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     deps += [
       "//chrome/browser/enterprise/network_header_injection",
       "//chrome/browser/multistep_filter",
@@ -1127,20 +1046,6 @@ source_set("unit_tests") {
     "//ui/native_theme:test_support",
   ]
 
-  if (is_chromeos) {
-    sources += [ "profile_os_sync_unittest.cc" ]
-    deps += [
-      "//ash/constants",
-      "//chrome/browser/ash/login/users",
-      "//chrome/browser/ash/login/users/avatar",
-      "//chrome/browser/ash/wallpaper_handlers:test_support",
-      "//chrome/browser/ui/ash/wallpaper",
-      "//chrome/browser/ui/ash/wallpaper:test_support",
-      "//chromeos/ash/components/system",
-      "//components/live_caption:constants",
-    ]
-  }
-
   if (is_win) {
     sources += [
       "profile_load_tracker_win_unittest.cc",
@@ -1153,18 +1058,16 @@ source_set("unit_tests") {
     deps += [ "//chrome/browser/android:profile_token" ]
   }
 
-  if (!is_chromeos) {
-    sources += [ "gaia_info_update_service_unittest.cc" ]
-    deps += [
-      ":gaia_info_update_service",
-      "//chrome/browser:global_features",
-    ]
-    if (!is_android) {
-      deps += [ "//chrome/browser/glic/test_support" ]
-    }
+  sources += [ "gaia_info_update_service_unittest.cc" ]
+  deps += [
+    ":gaia_info_update_service",
+    "//chrome/browser:global_features",
+  ]
+  if (!is_android) {
+    deps += [ "//chrome/browser/glic/test_support" ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "profile_activity_metrics_recorder_unittest.cc",
       "profile_list_desktop_unittest.cc",
@@ -1238,15 +1141,13 @@ if (!is_android) {
       "//testing/gtest",
     ]
 
-    if (!is_chromeos) {
-      sources += [
-        "avatar_menu_browsertest.cc",
-        "delete_profile_helper_browsertest.cc",
-        "profile_list_desktop_browsertest.cc",
-        "profile_window_browsertest.cc",
-      ]
-      deps += [ "//chrome/browser/profiles/keep_alive:test_support" ]
-    }
+    sources += [
+      "avatar_menu_browsertest.cc",
+      "delete_profile_helper_browsertest.cc",
+      "profile_list_desktop_browsertest.cc",
+      "profile_window_browsertest.cc",
+    ]
+    deps += [ "//chrome/browser/profiles/keep_alive:test_support" ]
 
     if (is_mac || is_win || is_linux) {
       sources += [ "profile_statistics_browsertest.cc" ]
@@ -1292,10 +1193,6 @@ source_set("test_support") {
     "//content/test:test_support",
   ]
   deps = [ "//testing/gtest" ]
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/browser_context_helper" ]
-  }
 }
 
 source_set("profile_test_util") {
@@ -1321,8 +1218,4 @@ source_set("profile_test_util") {
     "//components/signin/public/identity_manager",
     "//testing/gtest",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/login/login_state" ]
-  }
 }

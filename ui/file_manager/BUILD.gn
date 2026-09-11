@@ -10,7 +10,6 @@ import(
 import("//tools/grit/grit_rule.gni")
 import("//tools/grit/preprocess_if_expr.gni")
 import("//tools/polymer/html_to_wrapper.gni")
-import("//tools/typescript/ts_definitions.gni")
 import("//tools/typescript/webui_ts_library.gni")
 import("//ui/file_manager/file_names.gni")
 import("//ui/webui/resources/tools/generate_grd.gni")
@@ -87,7 +86,6 @@ webui_ts_library("build_ts") {
     ":copy_definitions_to_preprocess",
     ":generate_definitions",
     ":preprocess_generated",
-    "//ash/webui/common/resources:generate_definitions",
   ]
 
   if (enable_webui_inline_sourcemaps) {
@@ -98,8 +96,6 @@ webui_ts_library("build_ts") {
   }
 
   deps = [
-    "//ash/webui/common/resources:build_ts",
-    "//ash/webui/common/resources/cr_elements:build_ts",
     "//third_party/cros-components:cros_components_ts",
     "//third_party/material_web_components:bundle_lit_ts",
     "//third_party/material_web_components:library",
@@ -166,10 +162,7 @@ webui_ts_library("test_build_ts") {
 
   deps = [
     ":build_ts",
-    "//ash/webui/common/resources:build_ts",
-    "//ash/webui/common/resources/cr_elements:build_ts",
     "//chrome/test/data/webui:build_ts",
-    "//chrome/test/data/webui/chromeos:build_ts",
     "//third_party/cros-components:cros_components_ts",
     "//third_party/material_web_components:bundle_lit_ts",
     "//third_party/material_web_components:library",
@@ -191,8 +184,6 @@ webui_ts_library("test_build_ts") {
 ts_definitions("generate_definitions") {
   root_dir = "."
   out_dir = target_gen_dir
-
-  extra_deps = [ "//ash/webui/common/resources:generate_definitions" ]
 
   js_files = generate_definitions_js_files
 }

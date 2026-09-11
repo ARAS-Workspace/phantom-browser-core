@@ -17,7 +17,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/app_mode/app_mode_utils.h"
-#include "chrome/browser/ash/shimless_rma/chrome_shimless_rma_delegate.h"
 #include "chrome/browser/bluetooth/bluetooth_chooser_context_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/cookie_settings_factory.h"

@@ -99,26 +99,9 @@ if (enable_extensions) {
     "scripts_internal.webidl",
   ]
 
-  if (is_chromeos) {
-    extensions_api_schema_files_ += [
-      "app_view_guest_internal.json",
-      "bluetooth_low_energy.webidl",
-      "bluetooth_private.webidl",
-      "bluetooth_socket.webidl",
-      "bluetooth.webidl",
-      "diagnostics.webidl",
-      "media_perception_private.webidl",
-      "serial.webidl",
-      "usb.webidl",
-      "virtual_keyboard_private.json",
-      "virtual_keyboard.webidl",
-      "webcam_private.webidl",
-    ]
-  } else {
-    # On non-ChromeOS platforms the USB API is not supported but the types are
-    # still used by other APIs (e.g. printerProvider).
-    extensions_types_only_schema_files_ += [ "usb.webidl" ]
-  }
+  # On non-ChromeOS platforms the USB API is not supported but the types are
+  # still used by other APIs (e.g. printerProvider).
+  extensions_types_only_schema_files_ += [ "usb.webidl" ]
 }
 
 # In the experimental desktop-android configuration, we still need to compile

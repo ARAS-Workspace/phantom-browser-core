@@ -7,5 +7,5 @@
 # docs/chrome_browser_design_principles.md.
 
 declare_args() {
-  enable_downgrade_processing = !is_android && !is_chromeos
+  enable_downgrade_processing = !is_android
 }

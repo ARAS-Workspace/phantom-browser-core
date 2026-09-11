@@ -37,7 +37,7 @@ source_set("impl") {
     deps += [ "//chrome/browser/web_applications" ]
   }
 
-  if (is_mac || is_win || is_linux || is_chromeos) {
+  if (is_mac || is_win || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 }
@@ -130,9 +130,5 @@ if (!is_android) {
       "//ui/gfx",
       "//ui/native_theme",
     ]
-
-    if (is_chromeos) {
-      deps += [ "//ash/public/cpp" ]
-    }
   }
 }

@@ -22,19 +22,11 @@ source_set("device_notifications") {
       "//url",
     ]
 
-    if (!is_chromeos) {
-      sources += [ "device_status_icon_renderer.h" ]
-      public_deps += [
-        "//chrome/browser/profiles:profile_util",
-        "//chrome/browser/status_icons",
-      ]
-    } else {
-      sources += [ "device_pinned_notification_renderer.h" ]
-      public_deps += [
-        "//ash/constants",
-        "//ui/message_center/public/cpp",
-      ]
-    }
+    sources += [ "device_status_icon_renderer.h" ]
+    public_deps += [
+      "//chrome/browser/profiles:profile_util",
+      "//chrome/browser/status_icons",
+    ]
   }
 }
 
@@ -58,21 +50,16 @@ source_set("impl") {
       "//url",
     ]
 
-    if (!is_chromeos) {
-      sources += [ "device_status_icon_renderer.cc" ]
-      deps += [
-        "//base:i18n",
-        "//chrome/app:command_ids",
-        "//chrome/app:generated_resources",
-        "//chrome/browser:browser_process",
-        "//ui/base",
-        "//ui/gfx",
-        "//ui/gfx:color_utils",
-      ]
-    } else {
-      sources += [ "device_pinned_notification_renderer.cc" ]
-      deps += [ "//components/vector_icons" ]
-    }
+    sources += [ "device_status_icon_renderer.cc" ]
+    deps += [
+      "//base:i18n",
+      "//chrome/app:command_ids",
+      "//chrome/app:generated_resources",
+      "//chrome/browser:browser_process",
+      "//ui/base",
+      "//ui/gfx",
+      "//ui/gfx:color_utils",
+    ]
   }
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }
@@ -124,19 +111,12 @@ source_set("unit_tests") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "device_status_icon_unittest.cc",
       "device_status_icon_unittest.h",
     ]
     public_deps += [ "//chrome/browser/status_icons" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "device_pinned_notification_unittest.cc",
-      "device_pinned_notification_unittest.h",
-    ]
   }
 }
 

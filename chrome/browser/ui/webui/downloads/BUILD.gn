@@ -42,9 +42,7 @@ source_set("downloads") {
     "//chrome/browser/ui/webui:theme_source",
   ]
 
-  if (!is_chromeos) {
-    deps += [ "//chrome/browser/download/bubble" ]
-  }
+  deps += [ "//chrome/browser/download/bubble" ]
 
   deps += [
     "//chrome/app:branded_strings",

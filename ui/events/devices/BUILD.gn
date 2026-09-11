@@ -39,7 +39,7 @@ component("devices") {
     "touchscreen_device.h",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "device_util_linux.cc",
       "device_util_linux.h",

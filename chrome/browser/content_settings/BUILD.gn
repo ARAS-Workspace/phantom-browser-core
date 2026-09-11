@@ -7,7 +7,7 @@ import("//content/public/common/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 source_set("content_settings") {
   sources = [

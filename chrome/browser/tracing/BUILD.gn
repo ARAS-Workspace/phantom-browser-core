@@ -58,10 +58,6 @@ source_set("impl") {
     sources += [ "windows_system_tracing_client_impl_win.cc" ]
   }
 
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
-  }
-
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }
 
@@ -87,15 +83,6 @@ source_set("unit_tests") {
     sources += [ "windows_system_tracing_client_impl_unittest_win.cc" ]
     deps += [
       "//chrome/windows_services/elevated_tracing_service:tracing_service_idl",
-    ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/login/demo_mode",
-      "//chromeos/ash/components/login/login_state",
-      "//chromeos/ash/components/system",
-      "//chromeos/dbus/power",
     ]
   }
 }

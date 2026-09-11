@@ -4,12 +4,11 @@
 
 #include "chrome/browser/apps/app_service/metrics/app_service_metrics.h"
 
-#include "ash/constants/web_app_id_constants.h"
-#include "ash/webui/mall/app_id.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
 #include "base/time/time.h"
 #include "build/branding_buildflags.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/common/extensions/extension_constants.h"
 #include "components/app_constants/constants.h"
 #include "components/services/app_service/public/cpp/app_launch_util.h"
@@ -224,42 +223,42 @@ void RecordAppLaunch(const std::string& app_id,
 
 const std::optional<apps::DefaultAppName> PreinstalledWebAppIdToName(
     const std::string& app_id) {
-  if (app_id == ash::kCalculatorAppId) {
+  if (app_id == web_app::kCalculatorAppId) {
     return apps::DefaultAppName::kCalculator;
-  } else if (app_id == ash::kCanvasAppId) {
+  } else if (app_id == web_app::kCanvasAppId) {
     return apps::DefaultAppName::kChromeCanvas;
-  } else if (app_id == ash::kCursiveAppId) {
+  } else if (app_id == web_app::kCursiveAppId) {
     return apps::DefaultAppName::kCursive;
-  } else if (app_id == ash::kGmailAppId) {
+  } else if (app_id == web_app::kGmailAppId) {
     return apps::DefaultAppName::kGmail;
-  } else if (app_id == ash::kGoogleMoviesAppId) {
+  } else if (app_id == web_app::kGoogleMoviesAppId) {
     return apps::DefaultAppName::kPlayMovies;
-  } else if (app_id == ash::kGoogleCalendarAppId) {
+  } else if (app_id == web_app::kGoogleCalendarAppId) {
     return apps::DefaultAppName::kGoogleCalendar;
-  } else if (app_id == ash::kGoogleChatAppId ||
-             app_id == ash::kOldGoogleChatAppId) {
+  } else if (app_id == web_app::kGoogleChatAppId ||
+             app_id == web_app::kOldGoogleChatAppId) {
     return apps::DefaultAppName::kGoogleChat;
-  } else if (app_id == ash::kGoogleDocsAppId) {
+  } else if (app_id == web_app::kGoogleDocsAppId) {
     return apps::DefaultAppName::kDocs;
-  } else if (app_id == ash::kGoogleDriveAppId) {
+  } else if (app_id == web_app::kGoogleDriveAppId) {
     return apps::DefaultAppName::kDrive;
-  } else if (app_id == ash::kGoogleMeetAppId) {
+  } else if (app_id == web_app::kGoogleMeetAppId) {
     return apps::DefaultAppName::kGoogleMeet;
-  } else if (app_id == ash::kGoogleSheetsAppId) {
+  } else if (app_id == web_app::kGoogleSheetsAppId) {
     return apps::DefaultAppName::kSheets;
-  } else if (app_id == ash::kGoogleSlidesAppId) {
+  } else if (app_id == web_app::kGoogleSlidesAppId) {
     return apps::DefaultAppName::kSlides;
-  } else if (app_id == ash::kGoogleKeepAppId) {
+  } else if (app_id == web_app::kGoogleKeepAppId) {
     return apps::DefaultAppName::kKeep;
-  } else if (app_id == ash::kGoogleMapsAppId) {
+  } else if (app_id == web_app::kGoogleMapsAppId) {
     return apps::DefaultAppName::kGoogleMaps;
-  } else if (app_id == ash::kMessagesAppId) {
+  } else if (app_id == web_app::kMessagesAppId) {
     return apps::DefaultAppName::kGoogleMessages;
-  } else if (app_id == ash::kPlayBooksAppId) {
+  } else if (app_id == web_app::kPlayBooksAppId) {
     return apps::DefaultAppName::kPlayBooks;
-  } else if (app_id == ash::kYoutubeAppId) {
+  } else if (app_id == web_app::kYoutubeAppId) {
     return apps::DefaultAppName::kYouTube;
-  } else if (app_id == ash::kYoutubeMusicAppId) {
+  } else if (app_id == web_app::kYoutubeMusicAppId) {
     return apps::DefaultAppName::kYouTubeMusic;
   } else {
     return std::nullopt;

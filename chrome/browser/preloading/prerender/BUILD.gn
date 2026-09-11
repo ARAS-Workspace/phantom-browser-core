@@ -49,10 +49,6 @@ source_set("impl") {
     "//components/tabs:impl",
   ]
 
-  if (is_chromeos) {
-    deps += [ "//chromeos/components/kiosk" ]
-  }
-
   if (!is_android) {
     deps += [ "//chrome/browser/ui/web_applications" ]
   }

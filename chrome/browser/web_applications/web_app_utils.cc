@@ -14,7 +14,6 @@
 #include <utility>
 #include <vector>
 
-#include "ash/constants/web_app_id_constants.h"
 #include "base/base64.h"
 #include "base/check.h"
 #include "base/check_op.h"

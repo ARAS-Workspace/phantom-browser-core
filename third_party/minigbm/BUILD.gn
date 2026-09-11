@@ -4,7 +4,7 @@
 
 import("//build/config/linux/pkg_config.gni")
 
-assert(is_linux || is_chromeos)
+assert(is_linux)
 
 declare_args() {
   # Controls whether the build should use the version of minigbm library shipped

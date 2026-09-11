@@ -222,10 +222,6 @@ source_set("browser_tests") {
     # ui/ozone/public/ozone_platform.h behind BUILDFLAG(IS_OZONE).
     deps += [ "//ui/ozone" ]
   }
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/system_web_apps" ]
-  }
 }
 
 source_set("interactive_ui_tests") {

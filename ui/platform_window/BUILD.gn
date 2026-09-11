@@ -29,7 +29,7 @@ component("platform_window") {
     "//ui/gfx",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "extensions/system_modal_extension.cc",
       "extensions/system_modal_extension.h",

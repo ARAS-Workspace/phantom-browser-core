@@ -71,7 +71,6 @@
 #include "v8/include/v8.h"
 
 #if defined(USE_BLINK_EXTENSIONS_CHROMEOS)
-#include "third_party/blink/renderer/extensions/chromeos/chromeos_extensions.h"
 #endif
 
 #if defined(USE_BLINK_EXTENSIONS_WEBVIEW)

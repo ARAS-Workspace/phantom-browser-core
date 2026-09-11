@@ -3,6 +3,6 @@
 # found in the LICENSE file.
 
 declare_args() {
-  structured_metrics_enabled = is_win || is_mac || is_linux || is_chromeos
-  structured_metrics_debug_enabled = is_win || is_mac || is_linux || is_chromeos
+  structured_metrics_enabled = is_win || is_mac || is_linux
+  structured_metrics_debug_enabled = is_win || is_mac || is_linux
 }

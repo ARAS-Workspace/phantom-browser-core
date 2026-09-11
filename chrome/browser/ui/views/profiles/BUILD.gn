@@ -5,23 +5,7 @@
 import("//build/config/ui.gni")
 import("//components/signin/features.gni")
 
-if (is_chromeos) {
-  source_set("profile_indicator_icon") {
-    public = [ "profile_indicator_icon.h" ]
-    sources = [ "profile_indicator_icon.cc" ]
-    public_deps = [
-      "//ui/base",
-      "//ui/gfx",
-      "//ui/views",
-    ]
-    deps = [
-      "//chrome/browser/profiles:profile_util",
-      "//ui/compositor",
-    ]
-  }
-}
-
-if (is_win || is_mac || is_linux || is_chromeos) {
+if (is_win || is_mac || is_linux) {
   source_set("avatar_badge_view") {
     public = [ "avatar_badge_view.h" ]
     sources = [ "avatar_badge_view.cc" ]
@@ -197,10 +181,6 @@ if (toolkit_views) {
       "//ui/base",
       "//ui/gfx",
     ]
-
-    if (is_chromeos) {
-      deps += [ "//ash/constants" ]
-    }
   }
 }
 

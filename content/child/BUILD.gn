@@ -126,7 +126,7 @@ target(link_target_type, "child") {
     "//v8",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "child_process_sandbox_support_impl_linux.cc",
       "child_process_sandbox_support_impl_linux.h",
@@ -157,7 +157,7 @@ target(link_target_type, "child") {
     libs = [ "dwrite.lib" ]
   }
 
-  if (is_win || is_linux || is_chromeos) {
+  if (is_win || is_linux) {
     sources += [
       "font_data/font_data_manager.cc",
       "font_data/font_data_manager.h",

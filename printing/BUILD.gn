@@ -48,16 +48,12 @@ component("printing_base") {
 
   configs += [ ":strict" ]
 
-  if (use_cups_ipp || is_chromeos) {
+  if (use_cups_ipp) {
     sources += [
       "printer_query_result.h",
       "printer_status.cc",
       "printer_status.h",
     ]
-  }
-
-  if (is_chromeos) {
-    sources += [ "cups_printer_status_reason_ash.h" ]
   }
 
   if (use_cups) {
@@ -107,7 +103,7 @@ component("settings") {
   defines = [ "IS_PRINTING_SETTINGS_IMPL" ]
 }
 
-if (enable_oop_printing && (is_linux || is_chromeos)) {
+if (enable_oop_printing && is_linux) {
   source_set("printing_sandbox_hook") {
     sources = [
       "sandbox/print_backend_sandbox_hook_linux.cc",
@@ -127,10 +123,6 @@ if (enable_oop_printing && (is_linux || is_chromeos)) {
 
     if (use_cups) {
       configs += [ ":cups" ]
-    }
-
-    if (is_chromeos && use_cups) {
-      deps += [ "//printing/backend" ]
     }
   }
 }
@@ -299,29 +291,10 @@ component("printing") {
     deps += [ "//ui/aura" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "client_info_helpers.cc",
-      "client_info_helpers.h",
-      "print_settings_conversion_chromeos.cc",
-      "print_settings_conversion_chromeos.h",
-    ]
-
-    deps += [ "//third_party/re2" ]
-  }
-
   if (use_cups) {
-    if (is_chromeos) {
-      sources += [
-        "printing_context_chromeos.cc",
-        "printing_context_chromeos.h",
-      ]
-
-      deps += [ "//printing/backend" ]
-    }
   }
 
-  if (enable_oop_printing && (is_linux || is_chromeos)) {
+  if (enable_oop_printing && is_linux) {
     deps += [ ":printing_sandbox_hook" ]
   }
 }
@@ -432,21 +405,11 @@ test("printing_unittests") {
     data = [ "test/data/emf/" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "client_info_helpers_unittest.cc",
-      "print_settings_conversion_chromeos_unittest.cc",
-    ]
-  }
-
   if (use_cups) {
     if (use_cups_ipp) {
       sources += [ "backend/cups_ipp_helper_unittest.cc" ]
     }
 
-    if (is_chromeos) {
-      sources += [ "printing_context_chromeos_unittest.cc" ]
-    }
     if (is_linux) {
       sources += [
         "backend/cups_helper_unittest.cc",
@@ -461,29 +424,23 @@ test("printing_unittests") {
 }
 
 if (use_cups) {
-  if (is_chromeos_device) {
-    pkg_config("cups") {
-      packages = [ "cups" ]
-    }
-  } else {
-    config("cups") {
-      if (is_mac) {
-        libs = [ "cups" ]
-        lib_dirs = [ "$mac_sdk_path/usr/lib" ]
+  config("cups") {
+    if (is_mac) {
+      libs = [ "cups" ]
+      lib_dirs = [ "$mac_sdk_path/usr/lib" ]
+    } else {
+      # rebase_path does not accept an empty string
+      if (use_sysroot) {
+        cups_sysroot = rebase_path(sysroot)
       } else {
-        # rebase_path does not accept an empty string
-        if (use_sysroot) {
-          cups_sysroot = rebase_path(sysroot)
-        } else {
-          cups_sysroot = ""
-        }
-        libs = exec_script("cups_config_helper.py",
-                           [
-                             "--libs-for-gn",
-                             cups_sysroot,
-                           ],
-                           "value")
+        cups_sysroot = ""
       }
+      libs = exec_script("cups_config_helper.py",
+                         [
+                           "--libs-for-gn",
+                           cups_sysroot,
+                         ],
+                         "value")
     }
   }
 }

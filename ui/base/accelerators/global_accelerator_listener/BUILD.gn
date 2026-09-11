@@ -68,11 +68,4 @@ source_set("global_accelerator_listener") {
       deps += [ "//components/dbus" ]
     }
   }
-
-  if (is_chromeos) {
-    sources += [
-      "global_accelerator_listener_chromeos.cc",
-      "global_accelerator_listener_chromeos.h",
-    ]
-  }
 }

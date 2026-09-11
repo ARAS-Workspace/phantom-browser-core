@@ -9,7 +9,6 @@
 #include <string>
 #include <string_view>
 
-#include "ash/constants/ash_login_pref_names.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
 #include "base/json/values_util.h"
@@ -305,7 +304,6 @@
 #include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/media/router/discovery/access_code/access_code_cast_feature.h"
 #include "chrome/browser/media/router/media_router_feature.h"
-#include "chrome/browser/nearby_sharing/common/nearby_share_prefs.h"
 #include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.h"

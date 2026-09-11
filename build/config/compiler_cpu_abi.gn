@@ -26,29 +26,10 @@ cpu_abi_cflags = []
 cpu_abi_ldflags = []
 cpu_abi_defines = []
 
-if (is_chromeos_device && is_chromeos) {
-  if (current_cpu == "x64") {
-    cros_target = "--target=x86_64-cros-linux-gnu"
-  } else if (current_cpu == "arm") {
-    cros_target = "--target=armv7a-cros-linux-gnueabihf"
-  } else if (current_cpu == "arm64") {
-    cros_target = "--target=aarch64-cros-linux-gnu"
-  } else {
-    assert(false, "add support for $current_cpu here")
-  }
-  cros_cpu_abi_asmflags = [ cros_target ]
-  cros_cpu_abi_cflags = [ cros_target ]
-  cros_cpu_abi_ldflags = [ cros_target ]
-  if (current_cpu == "x64") {
-    cros_cpu_abi_cflags += [ "-mno-movbe" ]
-    cros_cpu_abi_ldflags += [ "-mno-movbe" ]
-  }
-}
-
 if (is_posix && !is_apple) {
   # simplicity we always explicitly set the architecture.
   if (current_cpu == "x64") {
-    if (is_clang && !is_android && !is_chromeos_device) {
+    if (is_clang && !is_android) {
       cpu_abi_cflags += [ "--target=x86_64-unknown-linux-gnu" ]
       cpu_abi_ldflags += [ "--target=x86_64-unknown-linux-gnu" ]
     } else {
@@ -62,7 +43,7 @@ if (is_posix && !is_apple) {
       cpu_abi_ldflags += [ "-march=$cros_target_cpu_arch" ]
     }
   } else if (current_cpu == "x86") {
-    if (is_clang && !is_android && !is_chromeos_device) {
+    if (is_clang && !is_android) {
       cpu_abi_cflags += [ "--target=i386-unknown-linux-gnu" ]
       cpu_abi_ldflags += [ "--target=i386-unknown-linux-gnu" ]
     } else {
@@ -74,7 +55,7 @@ if (is_posix && !is_apple) {
       "-msse3",
     ]
   } else if (current_cpu == "arm") {
-    if (is_clang && !is_android && !is_chromeos_device) {
+    if (is_clang && !is_android) {
       cpu_abi_cflags += [ "--target=arm-linux-gnueabihf" ]
       cpu_abi_ldflags += [ "--target=arm-linux-gnueabihf" ]
     }
@@ -83,7 +64,7 @@ if (is_posix && !is_apple) {
       "-mfloat-abi=$arm_float_abi",
     ]
   } else if (current_cpu == "arm64") {
-    if (is_clang && !is_android && !is_chromeos_device) {
+    if (is_clang && !is_android) {
       cpu_abi_cflags += [ "--target=aarch64-linux-gnu" ]
       cpu_abi_ldflags += [ "--target=aarch64-linux-gnu" ]
     }

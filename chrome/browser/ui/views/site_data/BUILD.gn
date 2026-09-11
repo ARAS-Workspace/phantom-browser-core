@@ -152,8 +152,4 @@ source_set("interactive_ui_tests") {
     "//ui/base",
     "//ui/views",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/system_web_apps" ]
-  }
 }

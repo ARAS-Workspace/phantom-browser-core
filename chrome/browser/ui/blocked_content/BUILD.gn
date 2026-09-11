@@ -6,7 +6,7 @@ import("//build/config/chromeos/args.gni")
 import("//build/config/ozone.gni")
 import("//extensions/buildflags/buildflags.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 source_set("blocked_content") {
   sources = [
@@ -101,7 +101,7 @@ if (!is_android) {
   }
 }
 
-if (!is_android && !is_chromeos_device) {
+if (!is_android) {
   source_set("interactive_ui_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

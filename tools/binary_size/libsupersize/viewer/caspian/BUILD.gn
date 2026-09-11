@@ -7,7 +7,7 @@ import("//testing/test.gni")
 declare_args() {
   enable_caspian = false
 }
-assert(is_linux || is_chromeos || is_wasm)
+assert(is_linux || is_wasm)
 
 source_set("caspian-lib") {
   sources = [

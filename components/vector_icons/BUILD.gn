@@ -524,10 +524,6 @@ if (current_toolchain == default_toolchain) {
       "work_old.icon",
     ]
 
-    if (is_chromeos) {
-      sources += [ "notification_download_old.icon" ]
-    }
-
     if (is_chrome_branded) {
       sources += [
         "google_chrome/audio_spark.icon",

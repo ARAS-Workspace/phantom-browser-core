@@ -83,15 +83,6 @@ source_set("v4l2") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      # TODO(crbug.com/901264): Encoders use hack for passing offset
-      # within a DMA-buf, which is not supported upstream.
-      "v4l2_video_encode_accelerator.cc",
-      "v4l2_video_encode_accelerator.h",
-    ]
-  }
-
   libs = [
     "EGL",
     "GLESv2",
@@ -119,22 +110,6 @@ source_set("v4l2") {
     "//ui/gfx/geometry",
     "//ui/ozone",
   ]
-
-  if (is_chromeos) {
-    sources += [
-      "v4l2_jpeg_encode_accelerator.cc",
-      "v4l2_jpeg_encode_accelerator.h",
-      "v4l2_mjpeg_decode_accelerator.cc",
-      "v4l2_mjpeg_decode_accelerator.h",
-    ]
-
-    deps += [
-      "//chromeos/components/cdm_factory_daemon:cdm_factory_daemon_gpu",
-      "//components/chromeos_camera:jpeg_encode_accelerator",
-      "//components/chromeos_camera:mjpeg_decode_accelerator",
-      "//media/gpu:video_frame_mapper_common",
-    ]
-  }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.

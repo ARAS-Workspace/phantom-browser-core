@@ -32,7 +32,7 @@ source_set("hid") {
     "//third_party/protobuf:protobuf_lite",
   ]
 
-  if ((is_linux || is_chromeos) && use_udev) {
+  if (is_linux && use_udev) {
     sources += [
       "hid_connection_linux.cc",
       "hid_connection_linux.h",
@@ -42,10 +42,6 @@ source_set("hid") {
       "input_service_linux.h",
     ]
     deps += [ "//device/udev_linux" ]
-  }
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/dbus/permission_broker" ]
   }
 
   if (is_win) {

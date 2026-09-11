@@ -34,7 +34,4 @@ mojom("service") {
     "//services/viz/public/mojom",
     "//ui/gfx/geometry/mojom",
   ]
-  if (is_chromeos && use_linux_video_acceleration) {
-    enabled_features = [ "is_chromeos_with_video_accelerators" ]
-  }
 }

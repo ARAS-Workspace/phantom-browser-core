@@ -103,7 +103,7 @@ component("gamepad") {
     libs = [ "hid.lib" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "gamepad_standard_mappings_linux.cc",
       "hid_writer_linux.cc",
@@ -174,10 +174,6 @@ component("gamepad") {
         "IOKit.framework",
       ]
     }
-  }
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/dbus/permission_broker" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

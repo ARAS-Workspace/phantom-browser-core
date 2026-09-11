@@ -8,7 +8,7 @@ import("//build/toolchain/toolchain.gni")
 declare_args() {
   # Indicates if Ozone is enabled. Ozone is a low-level library layer for Linux
   # that does not require X11.
-  use_ozone = is_chromeos || is_linux
+  use_ozone = is_linux
 }
 
 declare_args() {
@@ -58,11 +58,7 @@ declare_args() {
     ozone_platform = "headless"
     ozone_platform_headless = true
 
-    if (is_chromeos) {
-      ozone_platform = "x11"
-      ozone_platform_drm = true
-      ozone_platform_x11 = true
-    } else if (is_linux) {
+    if (is_linux) {
       ozone_platform = "x11"
       ozone_platform_wayland = true
       ozone_platform_x11 = true

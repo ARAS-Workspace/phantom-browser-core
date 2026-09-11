@@ -62,9 +62,6 @@ source_set("impl") {
       "//chrome/browser/ui",
       "//components/pref_registry",
     ]
-    if (is_chromeos) {
-      deps += [ "//ash/constants" ]
-    }
   }
 }
 

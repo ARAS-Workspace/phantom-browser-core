@@ -71,14 +71,4 @@ source_set("input_monitor") {
       "raw_input_handler.h",
     ]
   }
-
-  if (is_chromeos) {
-    sources += [
-      "local_hotkey_input_monitor_chromeos.cc",
-      "local_keyboard_input_monitor_chromeos.cc",
-      "local_pointer_input_monitor_chromeos.cc",
-    ]
-
-    deps += [ "//remoting/host/chromeos" ]
-  }
 }

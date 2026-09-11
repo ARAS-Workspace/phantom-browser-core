@@ -106,12 +106,6 @@ source_set("unit_tests") {
       "//components/prefs:test_support",
       "//components/sync_preferences:test_support",
     ]
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/login/users",
-        "//chrome/browser/ash/settings:test_support",
-      ]
-    }
 
     if (is_linux || is_mac || is_win) {
       sources += [ "sync_passphrase_dialog_unittest.cc" ]
@@ -120,7 +114,7 @@ source_set("unit_tests") {
   }
 }
 
-if (!is_android && !is_chromeos_device) {
+if (!is_android) {
   source_set("interactive_ui_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

@@ -4,7 +4,7 @@
 
 import("//ui/webui/resources/tools/build_webui.gni")
 
-assert(is_android || is_linux || is_chromeos || is_win)
+assert(is_android || is_linux || is_win)
 
 build_webui("build") {
   grd_prefix = "sandbox_internals"

@@ -142,33 +142,19 @@ source_set("enterprise") {
     ]
   }
 
-  if (is_chromeos) {
-    public += [
-      "connectors/analysis/file_transfer_analysis_delegate.h",
-      "connectors/analysis/source_destination_matcher_ash.h",
-      "connectors/device_trust/ash/ash_attestation_policy_observer.h",
-      "connectors/device_trust/attestation/ash/flex_attester.h",
-      "connectors/device_trust/signals/ash/ash_signals_filterer.h",
-      "connectors/device_trust/signals/decorators/ash/ash_signals_decorator.h",
-      "reporting/android_app_info_generator.h",
-      "signals/signals_aggregator_factory.h",
-      "signals/system_signals_service_host_factory.h",
-    ]
-  } else {
-    public_deps += [
-      "//components/enterprise/browser/groups",
-      "//components/enterprise/browser/groups:features",
-    ]
+  public_deps += [
+    "//components/enterprise/browser/groups",
+    "//components/enterprise/browser/groups:features",
+  ]
 
-    public += [
-      "groups/enterprise_groups_handler_factory.h",
-      "remote_commands/clear_browsing_data_job.h",
-      "remote_commands/job_profile_picker.h",
-      "remote_commands/user_remote_commands_factory.h",
-      "remote_commands/user_remote_commands_service.h",
-      "remote_commands/user_remote_commands_service_factory.h",
-    ]
-  }
+  public += [
+    "groups/enterprise_groups_handler_factory.h",
+    "remote_commands/clear_browsing_data_job.h",
+    "remote_commands/job_profile_picker.h",
+    "remote_commands/user_remote_commands_factory.h",
+    "remote_commands/user_remote_commands_service.h",
+    "remote_commands/user_remote_commands_service_factory.h",
+  ]
 
   if (is_mac || is_win || is_android) {
     public += [
@@ -233,21 +219,16 @@ source_set("enterprise") {
       "client_certificates/certificate_store_factory.h",
       "client_certificates/profile_context_delegate.h",
     ]
-
-    if (is_chromeos) {
-      public += [ "client_certificates/ash/kcer_certificate_store.h" ]
-      public_deps += [ "//chromeos/ash/components/kcer" ]
-    }
   }
 
-  if (is_linux || is_win || is_mac || is_chromeos || is_android) {
+  if (is_linux || is_win || is_mac || is_android) {
     public += [
       "signals/user_delegate_impl.h",
       "signals/user_permission_service_factory.h",
     ]
   }
 
-  if (is_linux || is_win || is_mac || is_chromeos) {
+  if (is_linux || is_win || is_mac) {
     public += [
       "connectors/device_trust/device_trust_connector_service_factory.h",
       "connectors/device_trust/device_trust_service_factory.h",
@@ -288,16 +269,6 @@ source_set("enterprise") {
         [ "//components/enterprise/connectors/core:cloud_content_scanning" ]
   }
 
-  if (is_chromeos) {
-    public += [
-      "reporting/realtime_event_upload_helper_desktop.h",
-      "reporting/saas_usage/saas_usage_report_factory_desktop.h",
-      "reporting/saas_usage/saas_usage_report_scheduler_delegate_desktop.h",
-      "reporting/saas_usage/saas_usage_report_uploader_desktop.h",
-      "reporting/saas_usage/saas_usage_reporting_delegate_factory_desktop.h",
-    ]
-  }
-
   if (is_linux || is_win || is_mac) {
     public += [
       "connectors/device_trust/browser/signing_key_policy_observer.h",
@@ -331,11 +302,11 @@ source_set("enterprise") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     public += [ "remote_commands/cbcm_remote_commands_factory.h" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     public += [ "signals/device_info_fetcher_linux.h" ]
   }
 
@@ -442,7 +413,7 @@ source_set("impl") {
     sources += [ "data_protection/view_source_navigation_throttle.cc" ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [ "remote_commands/cbcm_remote_commands_factory.cc" ]
   }
   public_deps = [
@@ -568,48 +539,13 @@ source_set("impl") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "connectors/analysis/file_transfer_analysis_delegate.cc",
-      "connectors/analysis/source_destination_matcher_ash.cc",
-      "connectors/device_trust/ash/ash_attestation_policy_observer.cc",
-      "connectors/device_trust/attestation/ash/flex_attester.cc",
-      "connectors/device_trust/signals/ash/ash_signals_filterer.cc",
-      "connectors/device_trust/signals/decorators/ash/ash_signals_decorator.cc",
-      "reporting/android_app_info_generator.cc",
-      "signals/signals_aggregator_factory.cc",
-      "signals/system_signals_service_host_factory.cc",
-    ]
-    deps += [ "//chrome/services/system_signals/public/cpp/browser" ]
-    deps += [
-      "//chrome/browser/ash/app_list/arc",
-      "//chrome/browser/ash/arc:arc_util",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/browser/ash/guest_os/public",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/settings",
-      "//chrome/browser/enterprise/connectors/device_trust/attestation/ash",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/install_attributes",
-      "//chromeos/ash/components/network",
-      "//chromeos/ash/components/system",
-      "//chromeos/components/mgs",
-      "//chromeos/dbus/constants",
-      "//components/device_signals/core/browser/ash",
-      "//ui/strings:ui_strings__strings_grit",
-    ]
-  }
-
-  if (!is_chromeos) {
-    sources += [
-      "groups/enterprise_groups_handler_factory.cc",
-      "remote_commands/clear_browsing_data_job.cc",
-      "remote_commands/user_remote_commands_factory.cc",
-      "remote_commands/user_remote_commands_service.cc",
-      "remote_commands/user_remote_commands_service_factory.cc",
-    ]
-  }
+  sources += [
+    "groups/enterprise_groups_handler_factory.cc",
+    "remote_commands/clear_browsing_data_job.cc",
+    "remote_commands/user_remote_commands_factory.cc",
+    "remote_commands/user_remote_commands_service.cc",
+    "remote_commands/user_remote_commands_service_factory.cc",
+  ]
 
   if (is_mac || is_win || is_android) {
     sources += [
@@ -684,20 +620,9 @@ source_set("impl") {
       "//components/enterprise/client_certificates/core:dm_server_client",
       "//components/enterprise/client_certificates/core:management_delegate",
     ]
-
-    if (is_chromeos) {
-      sources += [ "client_certificates/ash/kcer_certificate_store.cc" ]
-      deps += [
-        "//chrome/browser/ash/kcer",
-        "//chrome/browser/ash/profiles",
-        "//chromeos/ash/components/kcer",
-        "//components/user_manager",
-        "//net",
-      ]
-    }
   }
 
-  if (is_linux || is_win || is_mac || is_chromeos || is_android) {
+  if (is_linux || is_win || is_mac || is_android) {
     sources += [
       "signals/user_delegate_impl.cc",
       "signals/user_permission_service_factory.cc",
@@ -705,7 +630,7 @@ source_set("impl") {
     deps += [ "//components/enterprise/device_trust/core:metrics" ]
   }
 
-  if (is_linux || is_win || is_mac || is_chromeos) {
+  if (is_linux || is_win || is_mac) {
     sources += [
       "connectors/device_trust/device_trust_connector_service_factory.cc",
       "connectors/device_trust/device_trust_service_factory.cc",
@@ -773,18 +698,6 @@ source_set("impl") {
         [ "//chrome/browser/enterprise/connectors/analysis:sdk_manager" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "reporting/realtime_event_upload_helper_desktop.cc",
-      "reporting/saas_usage/saas_usage_report_factory_desktop.cc",
-      "reporting/saas_usage/saas_usage_report_scheduler_delegate_desktop.cc",
-      "reporting/saas_usage/saas_usage_report_uploader_desktop.cc",
-      "reporting/saas_usage/saas_usage_reporting_delegate_factory_desktop.cc",
-    ]
-
-    deps += [ "//components/enterprise/device_trust/core:device_trust_service" ]
-  }
-
   if (is_linux || is_win || is_mac) {
     sources += [
       "connectors/device_trust/browser/signing_key_policy_observer.cc",
@@ -824,7 +737,7 @@ source_set("impl") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "signals/device_info_fetcher_linux.cc" ]
   }
 

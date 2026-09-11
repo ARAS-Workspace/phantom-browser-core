@@ -178,20 +178,6 @@ source_set("permissions") {
     deps += [ "//extensions/browser/mime_handler" ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/app_mode/isolated_web_app",
-      "//chrome/browser/ash/app_mode/web_app",
-      "//chrome/browser/ash/privacy_hub",
-      "//chrome/browser/ash/shimless_rma",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/components/kiosk",
-    ]
-    if (use_cups) {
-      deps += [ "//chrome/browser/printing" ]
-    }
-  }
-
   if (!is_android) {
     deps += [
       "//chrome/browser/ui/permission_bubble",
@@ -311,13 +297,6 @@ source_set("unit_tests") {
     }
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/app_mode/web_app",
-      "//chrome/browser/ash/login/users:test_support",
-    ]
-  }
-
   if (is_win) {
     sources += [ "system/system_media_source_win_unittest.cc" ]
   }
@@ -376,18 +355,13 @@ if (!is_android) {
       ]
     }
 
-    if (is_chromeos) {
-      sources += [ "system/system_permission_settings_chromeos_unittest.cc" ]
-      deps += [ "//chrome/browser/ash/privacy_hub" ]
-    }
-
     # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
     # enable the diagnostic by removing this line.
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
   }
 }
 
-if (!is_android && !is_chromeos_device) {
+if (!is_android) {
   source_set("interactive_ui_tests") {
     testonly = true
 

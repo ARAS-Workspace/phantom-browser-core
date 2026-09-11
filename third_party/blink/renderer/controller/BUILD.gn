@@ -30,9 +30,6 @@ component("controller") {
     "//v8",
   ]
 
-  if (use_blink_extensions_chromeos) {
-    deps += [ "//third_party/blink/renderer/extensions/chromeos" ]
-  }
   if (use_blink_extensions_webview) {
     deps += [ "//third_party/blink/renderer/extensions/webview" ]
   }
@@ -73,7 +70,7 @@ component("controller") {
     "performance_manager/v8_worker_memory_reporter.h",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "memory_usage_monitor_posix.cc",
       "memory_usage_monitor_posix.h",
@@ -109,7 +106,7 @@ component("controller") {
 
   # HighestPmfReporter depends on MemoryUsageMonitor and MemoryUsageMonitor
   # depends on platform specific code. Explicitly specify supported platforms.
-  if (is_linux || is_chromeos || is_win || is_android || is_apple) {
+  if (is_linux || is_win || is_android || is_apple) {
     sources += [
       "highest_pmf_reporter.cc",
       "highest_pmf_reporter.h",
@@ -278,7 +275,7 @@ source_set("blink_unittests_sources") {
     "tests/run_all_tests.cc",
     "tests/thread_state_test_environment.h",
   ]
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "memory_usage_monitor_posix_test.cc" ]
   }
   if (is_android) {
@@ -289,7 +286,7 @@ source_set("blink_unittests_sources") {
     ]
   }
 
-  if (is_linux || is_chromeos || is_android || is_apple || is_win) {
+  if (is_linux || is_android || is_apple || is_win) {
     sources += [
       "highest_pmf_reporter_test.cc",
       "memory_usage_monitor_test.cc",

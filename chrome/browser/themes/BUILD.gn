@@ -4,7 +4,7 @@
 
 import("//extensions/buildflags/buildflags.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos)
+assert(is_win || is_mac || is_linux)
 
 source_set("themes") {
   public = [
@@ -176,10 +176,6 @@ if (!is_android) {
         "//ui/linux:linux_ui_factory",
         "//ui/ozone",
       ]
-    }
-
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/ash/login/users" ]
     }
   }
 

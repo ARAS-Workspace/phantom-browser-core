@@ -11,8 +11,7 @@ import("//printing/buildflags/buildflags.gni")
 import("//testing/test.gni")
 import("//tools/generate_stubs/rules.gni")
 
-assert(is_linux || is_chromeos,
-       "This file should only be referenced on Linux or Chrome OS")
+assert(is_linux, "This file should only be referenced on Linux or Chrome OS")
 assert(use_gio, "GIO is required for building with GTK")
 
 source_set("gtk_types") {

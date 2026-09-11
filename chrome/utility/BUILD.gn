@@ -102,19 +102,17 @@ static_library("utility") {
       "importer/profile_import_impl.cc",
       "importer/profile_import_impl.h",
     ]
-    if (!is_chromeos) {
-      sources += [
-        "importer/firefox_importer.cc",
-        "importer/firefox_importer.h",
-      ]
-    }
+    sources += [
+      "importer/firefox_importer.cc",
+      "importer/firefox_importer.h",
+    ]
     if (is_mac) {
       sources += [
         "importer/safari_importer.h",
         "importer/safari_importer.mm",
       ]
     }
-    if (!is_mac && !is_chromeos) {
+    if (!is_mac) {
       # NSS decryptor is not needed on ChromeOS. Additionally, it depends on
       # system NSS that is unavailable on MacOS/Fuchsia.
       sources += [
@@ -183,40 +181,8 @@ static_library("utility") {
     }
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/services/file_util",
-      "//chrome/services/sharing",
-      "//chromeos/ash/components/assistant:buildflags",
-      "//chromeos/ash/components/local_search_service",
-      "//chromeos/ash/components/local_search_service/public/mojom",
-      "//chromeos/ash/components/mojo_service_manager",
-      "//chromeos/ash/components/trash_service",
-      "//chromeos/ash/components/trash_service/public/mojom",
-      "//chromeos/ash/services/boca/babelorca/cpp",
-      "//chromeos/ash/services/boca/babelorca/mojom",
-      "//chromeos/ash/services/ime:lib",
-      "//chromeos/ash/services/ime/public/mojom",
-      "//chromeos/ash/services/nearby/public/mojom",
-      "//chromeos/ash/services/orca",
-      "//chromeos/ash/services/orca/public/mojom",
-      "//chromeos/ash/services/quick_pair",
-      "//chromeos/ash/services/recording",
-      "//chromeos/components/mahi:content_extraction",
-      "//chromeos/components/mahi/public/mojom",
-      "//chromeos/components/quick_answers/public/cpp",
-      "//chromeos/components/quick_answers/public/mojom",
-      "//chromeos/constants",
-      "//chromeos/services/tts",
-      "//chromeos/services/tts/public/mojom",
-    ]
-
-    assert(enable_pdf)
-    deps += [ "//chrome/services/pdf:lib" ]
-  }
-
   # NSS decryptor is not needed on ChromeOS.
-  if (!is_chromeos && use_nss_certs) {
+  if (use_nss_certs) {
     sources += [
       "importer/nss_decryptor_system_nss.cc",
       "importer/nss_decryptor_system_nss.h",
@@ -272,9 +238,7 @@ if (!is_android) {
     testonly = true
 
     sources = [ "importer/bookmarks_file_importer_unittest.cc" ]
-    if (!is_chromeos) {
-      sources += [ "importer/firefox_importer_unittest.cc" ]
-    }
+    sources += [ "importer/firefox_importer_unittest.cc" ]
     if (is_mac) {
       sources += [ "importer/safari_importer_unittest.mm" ]
     }

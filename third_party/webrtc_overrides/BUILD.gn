@@ -178,7 +178,7 @@ webrtc_public_deps = [
 if (defined(rtc_exclude_system_time) && rtc_exclude_system_time) {
   webrtc_public_deps += [ ":system_time" ]
 }
-if ((is_linux || is_chromeos) && rtc_use_pipewire) {
+if (is_linux && rtc_use_pipewire) {
   webrtc_public_deps += [
     "//third_party/webrtc/modules/portal",
     "//third_party/webrtc/modules/video_capture:video_capture_internal_impl",

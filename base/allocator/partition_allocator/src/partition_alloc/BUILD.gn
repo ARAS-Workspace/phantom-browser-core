@@ -309,8 +309,7 @@ if (is_clang_or_gcc) {
   }
 
   config("memory_tagging") {
-    if (current_cpu == "arm64" && is_clang &&
-        (is_linux || is_chromeos || is_android)) {
+    if (current_cpu == "arm64" && is_clang && (is_linux || is_android)) {
       # base/ has access to the MTE intrinsics because it needs to use them,
       # but they're not backwards compatible. Use base::CPU::has_mte()
       # beforehand to confirm or use indirect functions (ifuncs) to select
@@ -753,7 +752,7 @@ if (is_clang_or_gcc) {
         "partition_alloc_base/time/time_conversion_posix.cc",
       ]
 
-      if (is_linux || is_chromeos) {
+      if (is_linux) {
         sources += [ "partition_alloc_base/debug/stack_trace_linux.cc" ]
       }
 
@@ -931,7 +930,7 @@ if (is_clang_or_gcc) {
         configs -= [ partition_alloc_enable_arc_config ]
       }
     }
-    if (is_chromeos || is_linux) {
+    if (is_linux) {
       shim_headers += [
         "shim/allocator_shim_override_cpp_symbols.h",
         "shim/allocator_shim_override_glibc_weak_symbols.h",
@@ -976,7 +975,7 @@ if (is_clang_or_gcc) {
         shim_sources +=
             [ "shim/allocator_shim_default_dispatch_to_apple_zoned_malloc.cc" ]
       }
-      if (is_chromeos || is_linux) {
+      if (is_linux) {
         shim_sources += [ "shim/allocator_shim_default_dispatch_to_glibc.cc" ]
       }
       if (is_win) {
@@ -1005,7 +1004,7 @@ if (is_clang_or_gcc) {
 # TODO(crbug.com/40158212): Consider supporting building tests outside of
 # chromium and having a dedicated 'partition_alloc_unittests' target.
 if (build_with_chromium) {
-  if (is_linux || is_chromeos || is_android) {
+  if (is_linux || is_android) {
     source_set("debug_proc_maps") {
       testonly = true
 
@@ -1032,7 +1031,7 @@ if (build_with_chromium) {
     deps = []
     deps += [ ":internal_headers" ]
 
-    if (is_linux || is_chromeos || is_android) {
+    if (is_linux || is_android) {
       deps += [ ":debug_proc_maps" ]
     }
 
@@ -1161,7 +1160,7 @@ if (build_with_chromium) {
     deps = []
     deps += [ ":internal_headers" ]
 
-    if (is_linux || is_chromeos || is_android) {
+    if (is_linux || is_android) {
       deps += [ ":debug_proc_maps" ]
     }
 
@@ -1227,7 +1226,7 @@ source_set("test_support") {
       "partition_alloc_base/threading/platform_thread_apple_for_testing.mm",
     ]
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "partition_alloc_base/threading/platform_thread_linux_for_testing.cc",
     ]

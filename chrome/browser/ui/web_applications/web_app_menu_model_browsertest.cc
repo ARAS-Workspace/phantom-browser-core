@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <vector>
 
-#include "ash/constants/web_app_id_constants.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/web_applications/test/web_app_browsertest_util.h"
@@ -16,6 +15,7 @@
 #include "chrome/browser/web_applications/test/prevent_close_test_base.h"
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/browser/web_applications/web_app_icon_manager.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/browser/web_applications/web_app_install_info.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registry_update.h"
@@ -256,13 +256,13 @@ using WebAppModelMenuPreventCloseTest = PreventCloseTestBase;
 
 IN_PROC_BROWSER_TEST_F(WebAppModelMenuPreventCloseTest,
                        PreventCloseEnforedByPolicy) {
-  InstallPWA(GURL(kCalculatorAppUrl), ash::kCalculatorAppId);
-  SetPoliciesAndWaitUntilInstalled(ash::kCalculatorAppId,
+  InstallPWA(GURL(kCalculatorAppUrl), web_app::kCalculatorAppId);
+  SetPoliciesAndWaitUntilInstalled(web_app::kCalculatorAppId,
                                    kPreventCloseEnabledForCalculator,
                                    kCalculatorForceInstalled);
 
   Browser* const browser =
-      LaunchPWA(ash::kCalculatorAppId, /*launch_in_window=*/true);
+      LaunchPWA(web_app::kCalculatorAppId, /*launch_in_window=*/true);
   ASSERT_TRUE(browser);
 
   {

@@ -18,7 +18,7 @@ component("cpp") {
     "output_device.h",
   ]
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [
       "sounds/audio_stream_handler.cc",
       "sounds/audio_stream_handler.h",
@@ -55,7 +55,7 @@ source_set("test_support") {
     "fake_system_info.h",
   ]
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [ "sounds/test_data.h" ]
   }
 

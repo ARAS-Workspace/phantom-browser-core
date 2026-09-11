@@ -19,13 +19,6 @@ static_library("crash_upload_list") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "crash_upload_list_chromeos.cc",
-      "crash_upload_list_chromeos.h",
-    ]
-  }
-
   deps = [
     "//chrome/common:constants",
     "//components/crash/core/app",
@@ -45,10 +38,6 @@ static_library("crash_upload_list") {
 
 source_set("unit_tests") {
   testonly = true
-
-  if (is_chromeos) {
-    sources = [ "crash_upload_list_chromeos_unittest.cc" ]
-  }
 
   deps = [
     ":crash_upload_list",

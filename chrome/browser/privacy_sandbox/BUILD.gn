@@ -70,15 +70,6 @@ source_set("impl") {
     sources += [ "android/privacy_sandbox_bridge.cc" ]
     deps += [ "android:jni_headers" ]
   }
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/profiles",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/components/kiosk",
-      "//chromeos/components/mgs",
-    ]
-  }
 }
 
 if (!is_android) {

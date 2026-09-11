@@ -3,15 +3,6 @@ import("//build/config/python.gni")
 import("//testing/test.gni")
 
 sdk_data = []
-if (is_chromeos && is_chromeos_device) {
-  import("//build/config/chromeos/rules.gni")
-  if (cros_sdk_version != "") {
-    generate_chromeos_sdk_deps("cros_sdk_deps") {
-      deploy_chrome = false
-    }
-    sdk_data += [ ":cros_sdk_deps" ]
-  }
-}
 
 python_library("test_utils") {
   testonly = true
@@ -44,26 +35,6 @@ python_library("fixtures") {
       "//build/android:test_runner_py",
       "//clank/bin:installer_scripts",
       "//third_party/catapult/devil",
-    ]
-  }
-
-  if (is_chromeos && is_chromeos_device) {
-    data += [
-      "//third_party/catapult/common/py_utils/",
-      "//third_party/catapult/common/py_trace_event/",
-      "//third_party/catapult/common/py_vulcanize/",
-      "//third_party/catapult/dependency_manager/",
-      "//third_party/catapult/systrace/",
-      "//third_party/catapult/tracing/",
-      "//third_party/catapult/third_party/typ/",
-      "//third_party/catapult/third_party/six/",
-      "//third_party/catapult/tracing/",
-      "//third_party/chromite/",
-    ]
-
-    data_deps += [
-      "//third_party/catapult/devil",
-      "//third_party/catapult/telemetry",
     ]
   }
 

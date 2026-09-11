@@ -89,14 +89,6 @@ generate_grd("build_grdp") {
     "utils.js",
     "web_request_event.js",
   ]
-
-  if (is_chromeos) {
-    input_files += [
-      "guest_view/app_view/app_view_deny.js",
-      "guest_view/app_view/app_view_element.js",
-      "guest_view/app_view/app_view.js",
-    ]
-  }
 }
 
 generate_grd("build_mojo_grdp") {

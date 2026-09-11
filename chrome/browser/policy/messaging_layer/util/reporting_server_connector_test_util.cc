@@ -20,7 +20,6 @@
 #include "chrome/browser/policy/messaging_layer/util/reporting_server_connector.h"
 #include "chrome/browser/policy/messaging_layer/util/test_response_payload.h"
 #include "chrome/test/base/testing_browser_process.h"
-#include "chromeos/ash/components/system/fake_statistics_provider.h"
 #include "components/policy/core/common/cloud/cloud_policy_client.h"
 #include "components/policy/core/common/cloud/cloud_policy_constants.h"
 #include "components/policy/core/common/cloud/cloud_policy_core.h"

@@ -13,7 +13,6 @@ import "chrome/browser/web_applications/proto/web_app_related_applications.proto
 import "chrome/browser/web_applications/proto/web_app_share_target.proto";
 import "chrome/browser/web_applications/proto/web_app_tab_strip.proto";
 import "chrome/browser/web_applications/proto/web_app_url_pattern.proto";
-import "chromeos/ash/experiences/system_web_apps/types/proto/system_web_app_data.proto";
 
 option optimize_for = LITE_RUNTIME;
 
@@ -97,9 +96,7 @@ message ChromeOSData {
   reserved 7;
 }
 
-message ClientData {
-  optional ash.SystemWebAppDataProto system_web_app_data = 1;
-}
+message ClientData {}
 
 // Properties for a WebApp's shortcuts menu item.
 message WebAppShortcutsMenuItemInfo {

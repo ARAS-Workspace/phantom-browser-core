@@ -60,10 +60,6 @@ source_set("read_anything") {
     "//ui/webui/tracked_element",
   ]
 
-  if (is_chromeos) {
-    public_deps += [ "//chromeos/ash/components/language_packs" ]
-  }
-
   if (is_mac) {
     deps += [ "//chrome/browser:global_keyboard_shortcuts_mac" ]
   }

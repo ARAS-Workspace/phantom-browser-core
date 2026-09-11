@@ -108,10 +108,6 @@ static_library("safe_browsing") {
 
   if (enable_extensions) {
     deps += [ "//chrome/browser/ui/web_applications" ]
-
-    if (is_chromeos) {
-      deps += [ "//chromeos/ash/components/system" ]
-    }
   }
 
   # Note: is_android is not equivalent to safe_browsing_mode == 2.
@@ -138,13 +134,7 @@ static_library("safe_browsing") {
     sources += [ "generated_safe_browsing_pref.cc" ]
   }
 
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/file_manager" ]
-
-    allow_circular_includes_from += [ "//chrome/browser/ash/file_manager" ]
-  }
-
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     public += [ "security_settings_bundle_toast_helper.h" ]
     sources += [ "security_settings_bundle_toast_helper.cc" ]
     deps += [
@@ -578,20 +568,13 @@ static_library("safe_browsing") {
       } else if (is_win) {
         deps += [ "//chrome/common:version_header" ]
       }
-      if (is_chromeos) {
-        deps += [
-          "//ash/constants",
-          "//chromeos/ash/components/browser_context_helper",
-          "//chromeos/components/mgs",
-        ]
-      }
       if (!is_android) {
         deps += [
           "//chrome/browser/ui:chrome_pages",
           "//chrome/browser/user_education",
         ]
       }
-      if (!is_android && !is_chromeos) {
+      if (!is_android) {
         deps += [ "//chrome/browser/download/bubble" ]
       }
     } else if (safe_browsing_mode == 2) {
@@ -951,10 +934,6 @@ source_set("unit_tests") {
       "//extensions/common",
     ]
 
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/ash/login/users" ]
-    }
-
     if (is_mac) {
       sources += [
         "incident_reporting/binary_integrity_analyzer_mac_unittest.cc",
@@ -1017,11 +996,8 @@ source_set("unit_tests") {
       "//components/enterprise/connectors/core:test_support",
       "//components/enterprise/obfuscation/core:enterprise_obfuscation",
     ]
-    if (is_chromeos) {
-      deps += [ "//chromeos/ash/components/system" ]
-    }
   }
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [
       "generated_safe_browsing_pref_unittest.cc",
       "safe_browsing_pref_change_handler_unittest.cc",

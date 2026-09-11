@@ -65,7 +65,6 @@
 #endif
 
 #include "chrome/browser/extensions/preinstalled_extensions.h"
-#include "chromeos/ash/components/policy/device_local_account/device_local_account_type.h"
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 

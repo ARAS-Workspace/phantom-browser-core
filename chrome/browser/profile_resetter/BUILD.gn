@@ -96,13 +96,6 @@ if (!is_android) {
     } else {
       sources += [ "triggered_profile_resetter_stub.cc" ]
     }
-
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/input_method",
-        "//chromeos/ash/components/network",
-      ]
-    }
   }
 
   source_set("fake_profile_resetter") {
@@ -122,12 +115,6 @@ if (!is_android) {
       "//components/browsing_data/content",
       "//components/language/core/browser",
     ]
-    if (is_chromeos) {
-      deps += [
-        "//chromeos/ash/components/dbus/shill:test_support",
-        "//chromeos/ash/components/network",
-      ]
-    }
   }
 
   source_set("profile_resetter_test_base") {
@@ -168,14 +155,6 @@ if (!is_android) {
       "//ui/shell_dialogs",
       "//url",
     ]
-
-    if (is_chromeos) {
-      deps += [
-        "//chromeos/ash/components/dbus/hermes",
-        "//chromeos/ash/components/dbus/shill",
-        "//chromeos/ash/components/network",
-      ]
-    }
   }
 
   source_set("unit_tests") {

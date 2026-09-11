@@ -14,8 +14,7 @@ enable_nasm = (current_cpu == "x86" || current_cpu == "x64") && !is_msan
 if (is_win) {
   platform_config_root = "config/win/$current_cpu"
 } else if (is_msan) {
-  assert(current_cpu == "x64" && (is_linux || is_chromeos),
-         "Only Linux X64 MSAN is supported")
+  assert(current_cpu == "x64" && is_linux, "Only Linux X64 MSAN is supported")
   platform_config_root = "config/linux-noasm/$current_cpu"
 } else if (current_cpu == "loong64" || current_cpu == "mipsel" ||
            current_cpu == "mips64el" || current_cpu == "ppc64") {
@@ -104,7 +103,7 @@ if (is_win) {
   if (is_apple) {
     dav1d_copts += [ "-D_DARWIN_C_SOURCE" ]
   }
-  if (is_linux || is_chromeos || is_android || current_os == "aix") {
+  if (is_linux || is_android || current_os == "aix") {
     if (!is_clang) {
       dav1d_copts += [ "-D_GNU_SOURCE" ]
     }

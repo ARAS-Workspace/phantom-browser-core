@@ -344,24 +344,6 @@ mojom("mojom") {
     ]
   }
 
-  if (is_chromeos && allow_oop_video_decoder) {
-    shared_typemaps += [
-      {
-        types = [
-          {
-            mojom = "media.mojom.DecryptStatus"
-            cpp = "::media::Decryptor::Status"
-          },
-          {
-            mojom = "media.mojom.CdmContextEvent"
-            cpp = "::media::CdmContext::Event"
-          },
-        ]
-        traits_headers = [ "cdm_context_for_oopvd_types_mojom_traits.h" ]
-      },
-    ]
-  }
-
   if (is_win) {
     cpp_typemaps += [
       {
@@ -562,11 +544,8 @@ mojom("media_types") {
   # different platforms. This sets a variable for the dependencies since
   # |cpp_typemaps| is statically declared.
   video_frame_mojom_traits_public_deps = [ "//ui/gfx/geometry/mojom" ]
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     video_frame_mojom_traits_public_deps += [ "//media/gpu:buffer_validation" ]
-  }
-  if (is_chromeos) {
-    video_frame_mojom_traits_public_deps += [ "//ui/ozone" ]
   }
 
   cpp_typemaps = [
@@ -1067,7 +1046,7 @@ source_set("test_support") {
   sources = []
   deps = []
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "buffer_handle_test_util.cc",
       "buffer_handle_test_util.h",

@@ -4,7 +4,6 @@
 
 import("//chrome/common/features.gni")
 import("//chrome/test/include_js_tests.gni")
-import("//chromeos/dbus/config/use_real_dbus_clients.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//components/safe_browsing/buildflags.gni")
 import("//components/signin/features.gni")
@@ -111,11 +110,11 @@ source_set("configs") {
     "//ui/webui:buildflags",
   ]
 
-  if (is_win || is_chromeos) {
+  if (is_win) {
     deps += [ "//chrome/browser/ui/webui/signin:inline_login" ]
   }
 
-  if (is_chromeos || is_android) {
+  if (is_android) {
     deps += [ "//chrome/browser/ui/webui/management" ]
   }
 
@@ -151,15 +150,13 @@ source_set("configs") {
       "//chrome/browser/ui/webui_browser",
     ]
 
-    if (!is_chromeos) {
-      deps += [
-        "//chrome/browser/ui/webui/app_home",
-        "//chrome/browser/ui/webui/default_browser:default_browser_modal",
-      ]
-      if (is_win) {
-        deps +=
-            [ "//chrome/browser/ui/webui/default_browser:visual_guided_setter" ]
-      }
+    deps += [
+      "//chrome/browser/ui/webui/app_home",
+      "//chrome/browser/ui/webui/default_browser:default_browser_modal",
+    ]
+    if (is_win) {
+      deps +=
+          [ "//chrome/browser/ui/webui/default_browser:visual_guided_setter" ]
     }
   } else {
     #is_android
@@ -179,7 +176,7 @@ source_set("configs") {
     deps += [ "//chrome/browser/ui/webui/safe_browsing" ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/lens",
       "//chrome/browser/ui/views/side_panel",
@@ -189,20 +186,10 @@ source_set("configs") {
       "//chrome/browser/ui/webui/skills",
     ]
 
-    if (!is_chromeos) {
-      deps += [
-        "//chrome/browser/ui/webui/app_settings",
-        "//chrome/browser/ui/webui/signin:profile",
-        "//chrome/browser/ui/webui/whats_new",
-      ]
-    }
-  }
-
-  if (is_chromeos) {
     deps += [
-      "//chrome/browser/ui/webui/ash/config",
-      "//chrome/browser/ui/webui/ash/dlp_internals",
-      "//chromeos/constants",
+      "//chrome/browser/ui/webui/app_settings",
+      "//chrome/browser/ui/webui/signin:profile",
+      "//chrome/browser/ui/webui/whats_new",
     ]
   }
 
@@ -235,7 +222,7 @@ source_set("configs") {
     deps += [ "//chrome/browser/ui/webui/unexportable_keys_internals" ]
   }
 
-  if (is_win || is_linux || is_chromeos || is_android) {
+  if (is_win || is_linux || is_android) {
     deps += [ "//chrome/browser/ui/webui/sandbox" ]
   }
 
@@ -284,11 +271,11 @@ source_set("configs") {
     ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos || is_desktop_android) {
+  if (is_win || is_mac || is_linux || is_desktop_android) {
     deps += [ "//chrome/browser/ui/webui/discards" ]
   }
 
-  if (!is_chromeos && !is_android) {
+  if (!is_android) {
     deps += [ "//chrome/browser/ui/webui/intro" ]
   }
 
@@ -374,7 +361,7 @@ if (enable_extensions_core || enable_webui_ntp ||
 
     # webui_util_desktop.h is included only under #if !BUILDFLAG(IS_ANDROID);
     # the util target itself is desktop-only.
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       deps += [ "//chrome/browser/ui/webui/util" ]
     }
 
@@ -458,13 +445,6 @@ if (!is_android || enable_extensions_core) {
       deps += [
         "//chrome/browser/themes",
         "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
-      ]
-    }
-
-    if (is_chromeos) {
-      deps += [
-        "//ui/chromeos/styles:cros_styles_resources",
-        "//ui/chromeos/styles:cros_tokens_color_mappings",
       ]
     }
 
@@ -632,7 +612,7 @@ source_set("chrome_web_ui_controller_factory") {
     ]
   }
 
-  if (!is_chromeos && !is_android) {
+  if (!is_android) {
     deps += [ "//chrome/browser/ui/webui/app_home" ]
   }
 
@@ -640,7 +620,7 @@ source_set("chrome_web_ui_controller_factory") {
     deps += [ "//chrome/browser/ui/webui/conflicts" ]
   }
 
-  if (is_win || is_linux || is_chromeos || is_android) {
+  if (is_win || is_linux || is_android) {
     deps += [ "//chrome/browser/ui/webui/sandbox" ]
   }
 
@@ -659,45 +639,6 @@ source_set("chrome_web_ui_controller_factory") {
   if (enable_webui_ntp) {
     deps += [ "//chrome/browser/ui/webui/new_tab_page" ]
   }
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ui/webui/management" ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//ash/webui/camera_app_ui",
-      "//ash/webui/file_manager:constants",
-      "//ash/webui/files_internals",
-      "//ash/webui/growth_internals",
-      "//ash/webui/help_app_ui",
-      "//ash/webui/mall:url_constants",
-      "//ash/webui/multidevice_debug",
-      "//ash/webui/recorder_app_ui",
-      "//ash/webui/vc_background_ui",
-    ]
-  }
-}
-
-if (is_chromeos) {
-  source_set("managed_ui_handler") {
-    sources = [ "managed_ui_handler.cc" ]
-    public = [ "managed_ui_handler.h" ]
-    public_deps = [
-      "//components/policy/core/common",
-      "//components/prefs",
-      "//content/public/browser",
-    ]
-    deps = [
-      "//chrome/browser:browser_process",
-      "//chrome/browser/policy",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui:managed_ui",
-      "//chrome/common",
-      "//chrome/common:constants",
-      "//components/supervised_user/core/common",
-    ]
-  }
 }
 
 if (is_win || is_mac || is_linux) {
@@ -713,27 +654,6 @@ if (is_win || is_mac || is_linux) {
       "//chrome/browser/ui/startup",
       "//chrome/browser/ui/webui/signin:signin_utils",
       "//content/public/browser",
-    ]
-  }
-}
-
-if (is_chromeos) {
-  source_set("certificate_provisioning_ui_handler") {
-    sources = [ "certificate_provisioning_ui_handler.cc" ]
-    public = [ "certificate_provisioning_ui_handler.h" ]
-    public_deps = [ "//content/public/browser" ]
-    deps = [
-      "//chrome/browser:browser_process",
-      "//chrome/browser:browser_process_platform_part",
-      "//chrome/browser/ash/cert_provisioning",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/profiles",
-      "//chrome/common",
-      "//chrome/common/net",
-      "//components/policy/core/browser",
-      "//components/policy/core/common:common_constants",
-      "//components/user_manager",
-      "//ui/base",
     ]
   }
 }
@@ -806,9 +726,6 @@ if (!is_android) {
       "//ui/base",
       "//ui/webui",
     ]
-    if (is_chromeos) {
-      deps += [ "//chromeos/ash/components/demo_mode" ]
-    }
   }
 
   source_set("theme_colors_source_manager") {
@@ -1065,16 +982,6 @@ if (!is_android) {
         "//components/signin/public/base:signin_switches",
         "//components/variations",
       ]
-
-      if (is_chromeos) {
-        deps += [
-          "//ash/constants",
-          "//chrome/browser/ash/file_system_provider",
-          "//chrome/browser/ash/file_system_provider:test_support",
-          "//chromeos/constants",
-          "//components/prefs",
-        ]
-      }
     }
   }
 }
@@ -1124,22 +1031,6 @@ source_set("unit_tests") {
       "//ui/color",
       "//ui/web_dialogs:test_support",
       "//ui/webui",
-    ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "certificate_provisioning_ui_handler_unittest.cc",
-      "managed_ui_handler_unittest.cc",
-    ]
-    deps += [
-      ":certificate_provisioning_ui_handler",
-      ":managed_ui_handler",
-      "//chrome/browser/ash/cert_provisioning",
-      "//chromeos/ash/components/browser_context_helper",
-      "//components/policy/core/browser",
-      "//components/user_manager",
-      "//components/user_manager:test_support",
     ]
   }
 }

@@ -77,25 +77,6 @@ if (enable_printing) {
         "web_api/web_printing_service_binder.h",
       ]
       public_deps += [ "//chrome/browser/tab_contents" ]
-      if (is_chromeos) {
-        public += [
-          "pdf_blob_data_flattener.h",
-          "print_job_controller.h",
-        ]
-        if (use_cups) {
-          public += [
-            "web_api/in_progress_jobs_storage_chromeos.h",
-            "web_api/web_printing_permission_context.h",
-            "web_api/web_printing_service_chromeos.h",
-            "web_api/web_printing_type_converters.h",
-            "web_api/web_printing_utils.h",
-          ]
-          public_deps += [
-            "//components/permissions",
-            "//third_party/blink/public/mojom:mojom_platform",
-          ]
-        }
-      }
     } else {
       public += [ "print_view_manager_basic.h" ]
     }
@@ -216,38 +197,6 @@ if (enable_printing) {
         "//components/web_modal",
         "//ui/web_dialogs",
       ]
-      if (is_chromeos) {
-        sources += [
-          "pdf_blob_data_flattener.cc",
-          "print_job_controller.cc",
-        ]
-        deps += [
-          "//chrome/browser/ash/arc/print_spooler",
-          "//chrome/browser/ash/printing",
-          "//chrome/browser/chromeos/policy/dlp",
-        ]
-        if (use_cups) {
-          sources += [
-            "web_api/in_progress_jobs_storage_chromeos.cc",
-            "web_api/web_printing_permission_context.cc",
-            "web_api/web_printing_service_chromeos.cc",
-            "web_api/web_printing_type_converters.cc",
-            "web_api/web_printing_utils.cc",
-          ]
-          deps += [
-            "//chrome/browser/ash/printing/print_management",
-            "//chrome/browser/chromeos/printing",
-            "//chrome/browser/web_applications",
-            "//chrome/common/printing",
-            "//chromeos/ash/components/browser_context_helper",
-            "//components/content_settings/browser",
-            "//components/content_settings/core/browser",
-            "//components/content_settings/core/common",
-            "//components/printing/common:print_media_l10n",
-            "//components/session_manager/core",
-          ]
-        }
-      }
     } else {
       sources += [ "print_view_manager_basic.cc" ]
     }
@@ -315,18 +264,6 @@ if (enable_printing) {
 
       if (is_win) {
         sources += [ "pdf_to_emf_converter_browsertest.cc" ]
-      }
-
-      if (is_chromeos && use_cups) {
-        sources += [ "web_api/web_printing_browsertest.cc" ]
-        deps += [
-          "//chrome/browser/chromeos/printing",
-          "//chrome/browser/content_settings:content_settings_factory",
-          "//chrome/browser/web_applications",
-          "//chrome/browser/web_applications:web_applications_test_support",
-          "//components/content_settings/core/browser",
-          "//printing/backend",
-        ]
       }
 
       if (enable_oop_printing) {

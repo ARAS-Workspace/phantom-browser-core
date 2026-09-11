@@ -114,7 +114,7 @@ static_library("usb") {
     deps += [ "//third_party/libusb" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "usb_device_linux.cc",
       "usb_device_linux.h",
@@ -122,7 +122,7 @@ static_library("usb") {
   }
 
   if (use_udev) {
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       sources += [
         "usb_service_linux.cc",
         "usb_service_linux.h",
@@ -131,7 +131,7 @@ static_library("usb") {
     deps += [ "//device/udev_linux" ]
   }
 
-  if (is_android || is_chromeos || is_linux) {
+  if (is_android || is_linux) {
     sources += [
       "usb_device_handle_usbfs.cc",
       "usb_device_handle_usbfs.h",
@@ -142,13 +142,6 @@ static_library("usb") {
     sources += [
       "usb_interface_detach_allowlist.cc",
       "usb_interface_detach_allowlist.h",
-    ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/dbus/permission_broker",
-      "//dbus",
     ]
   }
 }

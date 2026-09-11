@@ -233,7 +233,7 @@ static_library("renderer") {
     "//v8",
   ]
 
-  if (is_mac || is_win || is_linux || is_chromeos) {
+  if (is_mac || is_win || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 
@@ -395,20 +395,6 @@ static_library("renderer") {
       "//third_party/tflite:tflite_public_headers",
       "//third_party/tflite_support",
       "//third_party/tflite_support:tflite_support_proto",
-    ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "ash_merge_session_loader_throttle.cc",
-      "ash_merge_session_loader_throttle.h",
-      "chromeos_delayed_callback_group.cc",
-      "chromeos_delayed_callback_group.h",
-    ]
-
-    deps += [
-      "//ash/constants",
-      "//ash/webui/file_manager:constants",
     ]
   }
 

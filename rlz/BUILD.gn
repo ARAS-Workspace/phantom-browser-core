@@ -74,18 +74,6 @@ if (enable_rlz_support) {
       "//build:chromeos_buildflags",
     ]
 
-    if (is_chromeos) {
-      sources += [
-        "chromeos/lib/rlz_value_store_chromeos.cc",
-        "chromeos/lib/rlz_value_store_chromeos.h",
-      ]
-      deps += [
-        "//chromeos/ash/components/dbus",
-        "//chromeos/ash/components/dbus/debug_daemon",
-        "//chromeos/ash/components/system",
-      ]
-    }
-
     if (is_apple) {
       sources += [
         "mac/lib/rlz_value_store_mac.h",
@@ -137,13 +125,6 @@ if (enable_rlz_support) {
       "//services/network/public/mojom",
       "//url",
     ]
-
-    if (is_chromeos) {
-      deps += [
-        "//chromeos/ash/components/dbus",
-        "//chromeos/ash/components/system",
-      ]
-    }
   }
 
   source_set("test_support") {
@@ -161,9 +142,6 @@ if (enable_rlz_support) {
       ":rlz_lib",
       "//build:chromeos_buildflags",
     ]
-    if (is_chromeos) {
-      public_deps += [ "//chromeos/ash/components/system" ]
-    }
   }
 
   test("rlz_unittests") {
@@ -195,13 +173,6 @@ if (enable_rlz_support) {
       "//testing/gtest",
       "//third_party/zlib",
     ]
-    if (is_chromeos) {
-      deps += [
-        "//chromeos/ash/components/dbus:test_support",
-        "//chromeos/ash/components/dbus/debug_daemon",
-        "//chromeos/ash/components/system",
-      ]
-    }
   }
 }
 

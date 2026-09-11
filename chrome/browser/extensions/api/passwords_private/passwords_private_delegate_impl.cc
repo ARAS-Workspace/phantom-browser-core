@@ -9,7 +9,6 @@
 #include <string>
 #include <utility>
 
-#include "ash/constants/web_app_id_constants.h"
 #include "base/check.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
@@ -34,6 +33,7 @@
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/web_applications/web_app_dialog_utils.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/web_applications/web_app_install_params.h"
 #include "chrome/browser/webauthn/change_pin_controller.h"
@@ -42,7 +42,6 @@
 #include "chrome/common/extensions/api/passwords_private.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
-#include "chromeos/constants/chromeos_features.h"
 #include "components/affiliations/core/browser/affiliation_utils.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/keyed_service/core/service_access_type.h"
@@ -79,7 +78,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 #include "url/scheme_host_port.h"
-
 
 namespace {
 
@@ -1200,7 +1198,7 @@ void PasswordsPrivateDelegateImpl::OnErrorStateChanged(
 
 void PasswordsPrivateDelegateImpl::OnWebAppInstalledWithOsHooks(
     const webapps::AppId& app_id) {
-  if (app_id != ash::kPasswordManagerAppId) {
+  if (app_id != web_app::kPasswordManagerAppId) {
     return;
   }
   // Post task with delay because new browser window for an app isn't created

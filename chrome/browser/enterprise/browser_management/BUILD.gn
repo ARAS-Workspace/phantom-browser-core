@@ -31,10 +31,6 @@ source_set("management_identity_impl") {
     "//components/prefs",
     "//components/signin/public/identity_manager",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/policy/core" ]
-  }
 }
 
 if (!is_android) {

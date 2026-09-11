@@ -237,10 +237,6 @@ source_set("unit_tests") {
       "//components/prefs",
       "//ui/base:test_support",
     ]
-
-    if (is_chromeos) {
-      deps += [ "//chromeos/ash/components/network:test_support" ]
-    }
   }
 
   # searchbox_handler_unittest.cc exercises the desktop-NTP-only handlers

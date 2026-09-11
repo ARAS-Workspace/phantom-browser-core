@@ -75,16 +75,14 @@ static_library("enterprise") {
     "browser/reporting/user_security_signals_service.h",
   ]
 
-  if (!is_chromeos) {
-    sources += [
-      "browser/controller/browser_dm_token_storage.cc",
-      "browser/controller/browser_dm_token_storage.h",
-      "browser/controller/chrome_browser_cloud_management_helper.cc",
-      "browser/controller/chrome_browser_cloud_management_helper.h",
-      "browser/enterprise_switches.cc",
-      "browser/enterprise_switches.h",
-    ]
-  }
+  sources += [
+    "browser/controller/browser_dm_token_storage.cc",
+    "browser/controller/browser_dm_token_storage.h",
+    "browser/controller/chrome_browser_cloud_management_helper.cc",
+    "browser/controller/chrome_browser_cloud_management_helper.h",
+    "browser/enterprise_switches.cc",
+    "browser/enterprise_switches.h",
+  ]
 
   if (!is_ios && !is_android) {
     sources += [
@@ -93,7 +91,7 @@ static_library("enterprise") {
     ]
   }
 
-  if (!is_ios && !is_android && !is_chromeos) {
+  if (!is_ios && !is_android) {
     sources += [
       "browser/reporting/startup_command_line_collector.cc",
       "browser/reporting/startup_command_line_collector.h",
@@ -136,18 +134,16 @@ static_library("enterprise") {
     "//components/reporting/util:status",
   ]
 
-  if (!is_chromeos) {
-    sources += [
-      "browser/controller/chrome_browser_cloud_management_controller.cc",
-      "browser/controller/chrome_browser_cloud_management_controller.h",
-    ]
+  sources += [
+    "browser/controller/chrome_browser_cloud_management_controller.cc",
+    "browser/controller/chrome_browser_cloud_management_controller.h",
+  ]
 
-    deps += [
-      "//components/enterprise/browser/groups",
-      "//components/enterprise/device_trust/core",
-      "//third_party/abseil-cpp:absl",
-    ]
-  }
+  deps += [
+    "//components/enterprise/browser/groups",
+    "//components/enterprise/device_trust/core",
+    "//third_party/abseil-cpp:absl",
+  ]
 
   if (enterprise_client_certificates) {
     public_deps += [ "//components/enterprise/client_certificates/core" ]
@@ -169,16 +165,14 @@ static_library("test_support") {
   testonly = true
   configs += [ "//components/enterprise:extra_warnings" ]
 
-  if (!is_chromeos) {
-    sources = [
-      "browser/controller/fake_browser_dm_token_storage.cc",
-      "browser/controller/fake_browser_dm_token_storage.h",
-    ]
-    deps = [
-      ":enterprise",
-      "//base",
-    ]
-  }
+  sources = [
+    "browser/controller/fake_browser_dm_token_storage.cc",
+    "browser/controller/fake_browser_dm_token_storage.h",
+  ]
+  deps = [
+    ":enterprise",
+    "//base",
+  ]
 }
 
 static_library("reporting_test_support") {
@@ -222,7 +216,7 @@ source_set("unit_tests") {
     sources += [ "browser/promotion/promotion_eligibility_checker_unittest.cc" ]
   }
 
-  if (!is_ios && !is_android && !is_chromeos) {
+  if (!is_ios && !is_android) {
     sources +=
         [ "browser/reporting/startup_command_line_collector_unittest.cc" ]
   }
@@ -250,22 +244,20 @@ source_set("unit_tests") {
     "//third_party/content_analysis_sdk:liblcasdk",
   ]
 
-  if (!is_chromeos) {
-    sources += [
-      "browser/controller/browser_dm_token_storage_unittest.cc",
-      "browser/groups/enterprise_groups_handler_unittest.cc",
-      "browser/reporting/cloud_reporting_policy_handler_unittest.cc",
-    ]
+  sources += [
+    "browser/controller/browser_dm_token_storage_unittest.cc",
+    "browser/groups/enterprise_groups_handler_unittest.cc",
+    "browser/reporting/cloud_reporting_policy_handler_unittest.cc",
+  ]
 
-    deps += [
-      ":test_support",
-      "//base",
-      "//components/enterprise/browser/groups",
-      "//components/enterprise/browser/groups:features",
-      "//components/policy/core/browser:test_support",
-      "//components/policy/core/common:test_support",
-    ]
-  }
+  deps += [
+    ":test_support",
+    "//base",
+    "//components/enterprise/browser/groups",
+    "//components/enterprise/browser/groups:features",
+    "//components/policy/core/browser:test_support",
+    "//components/policy/core/common:test_support",
+  ]
 
   if (!is_android && !is_ios) {
     sources += [ "browser/reporting/real_time_uploader_unittest.cc" ]
@@ -295,7 +287,7 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_win || is_linux || is_chromeos || is_mac) {
+  if (is_win || is_linux || is_mac) {
     deps +=
         [ "//components/enterprise/network_header_injection/core:unit_tests" ]
   }

@@ -6,7 +6,6 @@
 
 #include <array>
 
-#include "ash/constants/web_app_id_constants.h"
 #include "base/files/file_path.h"
 #include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
@@ -23,6 +22,7 @@
 #include "chrome/browser/web_applications/test/web_app_install_test_utils.h"
 #include "chrome/browser/web_applications/web_app_command_scheduler.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/common/chrome_switches.h"
@@ -74,47 +74,47 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppsBrowserTest, CheckInstalledFields) {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   auto kOfflineOnlyExpectations = std::to_array<OfflineOnlyExpectation>({
       {
-          ash::kGoogleDocsAppId,
+          web_app::kGoogleDocsAppId,
           "https://docs.google.com/document/installwebapp?usp=chrome_default",
           "https://docs.google.com/document/?usp=installed_webapp",
       },
       {
-          ash::kGoogleSlidesAppId,
+          web_app::kGoogleSlidesAppId,
           "https://docs.google.com/presentation/"
           "installwebapp?usp=chrome_default",
           "https://docs.google.com/presentation/?usp=installed_webapp",
       },
       {
-          ash::kGoogleSheetsAppId,
+          web_app::kGoogleSheetsAppId,
           "https://docs.google.com/spreadsheets/"
           "installwebapp?usp=chrome_default",
           "https://docs.google.com/spreadsheets/?usp=installed_webapp",
       },
       {
-          ash::kGoogleDriveAppId,
+          web_app::kGoogleDriveAppId,
           "https://drive.google.com/drive/installwebapp?usp=chrome_default",
           "https://drive.google.com/?lfhs=2&usp=installed_webapp",
       },
       {
-          ash::kGmailAppId,
+          web_app::kGmailAppId,
           "https://mail.google.com/mail/installwebapp?usp=chrome_default",
           "https://mail.google.com/mail/?usp=installed_webapp",
       },
       {
-          ash::kYoutubeAppId,
+          web_app::kYoutubeAppId,
           "https://www.youtube.com/s/notifications/manifest/cr_install.html",
           "https://www.youtube.com/?feature=ytca",
       },
       {
-          ash::kOldGoogleChatAppId,
+          web_app::kOldGoogleChatAppId,
           "https://mail.google.com/chat/download?usp=chrome_default",
           "https://mail.google.com/chat/",
       },
   });
   if (base::FeatureList::IsEnabled(features::kWebAppMigratePreinstalledChat)) {
     auto& chat_expectation = kOfflineOnlyExpectations.back();
-    CHECK_EQ(chat_expectation.app_id, ash::kOldGoogleChatAppId);
-    chat_expectation.app_id = ash::kGoogleChatAppId;
+    CHECK_EQ(chat_expectation.app_id, web_app::kOldGoogleChatAppId);
+    chat_expectation.app_id = web_app::kGoogleChatAppId;
     chat_expectation.install_url =
         "https://chat.google.com/download?usp=chrome_default";
     chat_expectation.launch_url = "https://chat.google.com/";

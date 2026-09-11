@@ -56,7 +56,7 @@ if (is_win) {
 # - building it into both places temporarily
 # - updating a bunch of scripts in internal repositories.
 # - remove it from the default toolchain's outdir.
-if (is_ios || is_android || is_chromeos) {
+if (is_ios || is_android) {
   _tests_launcher_toolchain = host_system_allocator_toolchain
   _tests_launcher_toolchain_has_exe_suffix = host_os == "win"
   _include_google_converter = true
@@ -161,9 +161,6 @@ config("client_config") {
   include_dirs = [ "breakpad/src" ]
   if (is_android) {
     include_dirs += [ "breakpad/src/common/android/include" ]
-  }
-  if (is_chromeos) {
-    defines = [ "__CHROMEOS__" ]
   }
 }
 
@@ -292,7 +289,7 @@ if (!is_win) {
         "breakpad/src/third_party/libdisasm/x86_operand_list.c",
         "breakpad/src/third_party/libdisasm/x86_operand_list.h",
       ]
-      if (is_linux || is_chromeos) {
+      if (is_linux) {
         sources += [
           "breakpad/src/common/linux/scoped_pipe.cc",
           "breakpad/src/common/linux/scoped_pipe.h",
@@ -337,7 +334,7 @@ if (!is_win) {
         "breakpad/src/processor/symbolic_constants_win.h",
       ]
 
-      if (is_linux || is_chromeos) {
+      if (is_linux) {
         sources += [
           "breakpad/src/processor/disassembler_objdump.cc",
           "breakpad/src/processor/disassembler_objdump.h",
@@ -382,7 +379,7 @@ if (!is_win) {
         "breakpad/src/processor/symbolic_constants_win.h",
       ]
 
-      if (is_linux || is_chromeos) {
+      if (is_linux) {
         sources += [
           "breakpad/src/processor/disassembler_objdump.cc",
           "breakpad/src/processor/disassembler_objdump.h",
@@ -651,7 +648,7 @@ if (is_ios) {
   }
 }
 
-if (is_linux || is_chromeos || is_android) {
+if (is_linux || is_android) {
   if (current_toolchain == host_system_allocator_toolchain ||
       current_toolchain == default_system_allocator_toolchain) {
     executable("symupload") {
@@ -834,12 +831,6 @@ if (is_linux || is_chromeos || is_android) {
     configs -= [ "//build/config/compiler:chromium_code" ]
     configs += [ "//build/config/compiler:no_chromium_code" ]
     public_configs = [ ":client_config" ]
-
-    if (current_cpu == "arm" && is_chromeos) {
-      # Avoid running out of registers in
-      # linux_syscall_support.h:sys_clone()'s inline assembly.
-      cflags = [ "-marm" ]
-    }
 
     libs = [ "dl" ]
 

@@ -33,7 +33,6 @@
 #include "remoting/base/passthrough_oauth_token_getter.h"
 #include "remoting/base/session_policies.h"
 #include "remoting/host/chromeos/chromeos_enterprise_params.h"
-#include "remoting/host/chromeos/features.h"
 #include "remoting/host/chromoting_host.h"
 #include "remoting/host/chromoting_host_context.h"
 #include "remoting/host/host_event_reporter.h"

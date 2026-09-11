@@ -30,9 +30,7 @@ static_library("net") {
     "//components/variations/proto",
   ]
 
-  if (!is_chromeos) {
-    deps += [ "//crypto" ]
-  }
+  deps += [ "//crypto" ]
 
   if (use_blink) {
     sources += [

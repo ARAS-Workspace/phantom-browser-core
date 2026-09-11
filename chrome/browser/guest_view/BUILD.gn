@@ -22,9 +22,6 @@ source_set("guest_view") {
 
   if (enable_extensions) {
     sources += [ "mime_handler_view/chrome_mime_handler_view_guest_delegate.h" ]
-    if (is_chromeos) {
-      sources += [ "app_view/chrome_app_view_guest_delegate.h" ]
-    }
   }
 
   public_deps = [
@@ -53,9 +50,6 @@ source_set("impl") {
   if (enable_extensions) {
     sources +=
         [ "mime_handler_view/chrome_mime_handler_view_guest_delegate.cc" ]
-    if (is_chromeos) {
-      sources += [ "app_view/chrome_app_view_guest_delegate.cc" ]
-    }
   }
 
   deps = [
@@ -75,13 +69,6 @@ source_set("impl") {
 
   if (enable_extensions) {
     deps += [ "//chrome/browser/controlled_frame" ]
-
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/app_mode",
-        "//chrome/browser/ui/apps",
-      ]
-    }
   }
 
   if (enable_extensions_core) {

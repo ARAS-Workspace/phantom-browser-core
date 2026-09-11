@@ -40,7 +40,7 @@ source_set("shared_memory_user_stream") {
 }
 
 use_crashpad_annotation = (is_mac || is_ios || is_win || is_android ||
-                           is_chromeos || is_linux) && !use_crash_key_stubs
+                           is_linux) && !use_crash_key_stubs
 
 # unknown unenumerated target.
 assert(use_crash_key_stubs || use_crashpad_annotation)

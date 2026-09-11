@@ -2444,7 +2444,7 @@ source_set("browser") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources -=
         [ "file_system_access/file_path_watcher/file_path_watcher_stub.cc" ]
 
@@ -2486,7 +2486,7 @@ source_set("browser") {
     deps += [ "//components/stylus_handwriting/win" ]
   }
 
-  if (is_win || is_linux || is_chromeos) {
+  if (is_win || is_linux) {
     deps += [ "//components/services/font_data:lib" ]
   }
 
@@ -2503,36 +2503,6 @@ source_set("browser") {
     deps += [ "//services/network/public/cpp:cpp_p2p" ]
   }
 
-  if (enable_smart_card) {
-    # TODO(crbug.com/470349523): Migrate more smart card files to use this flag.
-    defines += [ "ENABLE_SMART_CARD" ]
-    sources += [
-      "$target_gen_dir/devtools/protocol/smart_card_emulation.cc",
-      "$target_gen_dir/devtools/protocol/smart_card_emulation.h",
-      "devtools/protocol/smart_card_emulation_handler.cc",
-      "devtools/protocol/smart_card_emulation_handler.h",
-      "handwriting/handwriting_recognition_service_impl_cros.cc",
-      "handwriting/handwriting_recognition_service_impl_cros.h",
-      "handwriting/handwriting_recognizer_impl_cros.cc",
-      "handwriting/handwriting_recognizer_impl_cros.h",
-      "lock_screen/lock_screen_service_impl.cc",
-      "lock_screen/lock_screen_service_impl.h",
-      "lock_screen/lock_screen_storage_impl.cc",
-      "lock_screen/lock_screen_storage_impl.h",
-      "smart_card/smart_card_histograms.cc",
-      "smart_card/smart_card_histograms.h",
-      "smart_card/smart_card_service.cc",
-      "smart_card/smart_card_service.h",
-    ]
-    deps += [
-      "//chromeos/components/firewall_hole",
-      "//chromeos/services/machine_learning/public/cpp",
-      "//chromeos/services/machine_learning/public/mojom",
-      "//components/value_store",
-      "//content/browser/smart_card/emulation",
-    ]
-  }
-
   if (is_linux) {
     sources += [ "speech/tts_linux.cc" ]
     deps += [
@@ -2542,31 +2512,6 @@ source_set("browser") {
   }
 
   # ChromeOS also defines linux but their memory-monitors conflict.
-  if (is_chromeos) {
-    sources += [
-      "gpu/chromeos/delegate_to_browser_gpu_service_accelerator_factory.cc",
-      "gpu/chromeos/video_capture_dependencies.cc",
-      "gpu/chromeos/video_capture_dependencies.h",
-      "screenlock_monitor/screenlock_monitor_device_source_ash.cc",
-      "tracing/cros_tracing_agent.cc",
-      "tracing/cros_tracing_agent.h",
-    ]
-    deps += [
-      "//chromeos/ash/components/assistant:buildflags",
-      "//chromeos/ash/components/audio",
-      "//chromeos/ash/components/dbus",
-      "//chromeos/ash/components/dbus/debug_daemon",
-      "//chromeos/ash/components/network",
-      "//chromeos/ash/components/system",
-      "//chromeos/ash/resources",
-      "//components/session_manager/core",
-      "//services/data_decoder/public/cpp",
-      "//services/data_decoder/public/mojom",
-      "//ui/base/ime/ash",
-      "//ui/chromeos/styles:cros_styles_views",
-    ]
-    public_deps += [ "//ash/webui/common/resources" ]
-  }
 
   if (is_posix) {
     sources += [
@@ -2785,10 +2730,6 @@ source_set("browser") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [ "accessibility/browser_accessibility_state_impl_chromeos.cc" ]
-  }
-
   # Desktop/Window/WebContents screen capture implementations, conditionally
   # built depending on the available implementations for each platform.
   if (enable_screen_capture) {
@@ -2878,14 +2819,6 @@ source_set("browser") {
       frameworks += [
         "CoreMedia.framework",
         "ScreenCaptureKit.framework",
-      ]
-    }
-    if (is_chromeos) {
-      sources += [
-        "media/capture/desktop_capturer_ash.cc",
-        "media/capture/desktop_capturer_ash.h",
-        "media/capture/desktop_frame_skia.cc",
-        "media/capture/desktop_frame_skia.h",
       ]
     }
     if (is_android) {
@@ -3038,7 +2971,7 @@ source_set("browser") {
     }
   }
 
-  if ((is_linux || is_chromeos) && use_aura) {
+  if (is_linux && use_aura) {
     deps += [ "//third_party/fontconfig" ]
   }
 
@@ -3379,17 +3312,10 @@ source_set("browser") {
   # For platforms that support extension service workers.
   # NOTE: Fuchsia depends on this class, but probably shouldn't, as it doesn't
   # support extensions.
-  if (is_win || is_apple || is_linux || is_chromeos || is_desktop_android) {
+  if (is_win || is_apple || is_linux || is_desktop_android) {
     sources += [
       "service_worker/service_worker_usb_delegate_observer.cc",
       "service_worker/service_worker_usb_delegate_observer.h",
-    ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "//content/browser/direct_sockets/firewall_hole_delegate.cc",
-      "//content/browser/direct_sockets/firewall_hole_delegate.h",
     ]
   }
 
@@ -3467,7 +3393,7 @@ source_set("browser") {
     deps += [ "//ui/compositor" ]
   }
 
-  if ((is_linux || is_chromeos) && use_dbus) {
+  if (is_linux && use_dbus) {
     deps += [ "//dbus" ]
   }
 
@@ -3543,9 +3469,6 @@ source_set("browser") {
   }
 
   # TODO(crbug.com/371609830): Remove dep on experiment end.
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
-  }
 
   if (enable_vrp_flags) {
     sources += [

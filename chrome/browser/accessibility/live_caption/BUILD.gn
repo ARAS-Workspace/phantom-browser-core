@@ -57,10 +57,6 @@ source_set("impl") {
     "//ui/accessibility",
   ]
 
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/accessibility" ]
-  }
-
   if (is_win) {
     # live_caption_unavailability_notifier.cc includes
     # chrome/browser/ui/chrome_pages.h.

@@ -139,10 +139,6 @@ source_set("impl") {
     "//ui/webui/tracked_element",
   ]
 
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ui/ash/system_web_apps" ]
-  }
-
   if (is_mac) {
     deps += [
       "//chrome/browser:global_keyboard_shortcuts_mac",
@@ -179,9 +175,7 @@ source_set("browser_tests") {
   sources = []
 
   # TODO(crbug.com/451876195): Fix and re-enable these tests on CrOS.
-  if (!is_chromeos) {
-    sources += [ "webui_browser_browsertest.cc" ]
-  }
+  sources += [ "webui_browser_browsertest.cc" ]
 
   deps = [
     ":impl",
@@ -209,9 +203,7 @@ source_set("interactive_ui_tests") {
 
   sources = []
 
-  if (!is_chromeos) {
-    sources += [ "webui_browser_interactive_uitest.cc" ]
-  }
+  sources += [ "webui_browser_interactive_uitest.cc" ]
 
   deps = [
     ":impl",

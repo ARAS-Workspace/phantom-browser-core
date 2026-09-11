@@ -63,7 +63,7 @@ if (use_blink || (is_ios && build_with_internal_optimization_guide)) {
       deps += [ "//services/on_device_model/ml" ]
     }
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       deps += [ "//gpu/config" ]
     }
     if (is_android) {

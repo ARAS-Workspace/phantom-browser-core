@@ -78,9 +78,6 @@ source_set("web_ui_test_data_source") {
     "//ui/webui",
     "//ui/webui/resources",
   ]
-  if (is_chromeos) {
-    deps += [ "//ash/webui/common:trusted_types_util" ]
-  }
 }
 
 if (is_chrome_branded && (is_mac || is_win || is_linux)) {
@@ -153,9 +150,6 @@ source_set("chrome_render_view_host_test_harness") {
     "//chrome/browser:browser_process",
     "//chrome/browser/signin",
   ]
-  if (is_chromeos) {
-    deps += [ "//ash" ]
-  }
 }
 
 source_set("scoped_metrics_service_for_synthetic_trials") {
@@ -286,12 +280,6 @@ source_set("testing_profile") {
     "//extensions/buildflags",
     "//services/network/public/cpp",
   ]
-  if (is_chromeos) {
-    public_deps += [
-      "//chrome/browser/ash/policy/core",
-      "//components/user_manager",
-    ]
-  }
 }
 
 # Full implementation of the testing_profile cluster. Carries the ash and
@@ -364,21 +352,6 @@ source_set("testing_profile_impl") {
   }
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser" ]
-  }
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/arc/session:service_launcher",
-      "//chrome/browser/ash/login/users:test_support",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/settings:test_support",
-      "//chrome/browser/ash/system_web_apps",
-      "//chrome/browser/ash/system_web_apps/test_support",
-      "//chromeos/ash/components/account_manager",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/settings",
-      "//components/user_manager:test_support",
-    ]
   }
 }
 
@@ -458,9 +431,7 @@ source_set("testing_browser_process") {
       "//components/component_updater",
       "//components/keep_alive_registry",
     ]
-    if (!is_chromeos) {
-      deps += [ "//components/enterprise" ]
-    }
+    deps += [ "//components/enterprise" ]
   }
   if (enable_background_mode) {
     deps += [ "//chrome/browser/background/extensions" ]
@@ -484,21 +455,6 @@ source_set("testing_browser_process") {
   }
   if (enable_printing) {
     deps += [ "//chrome/browser/printing" ]
-  }
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/settings:test_support",
-      "//chrome/browser/ash/system_web_apps/test_support",
-      "//chrome/browser/media_galleries",
-    ]
-
-    # TODO(crbug.com/353332589): Remove once testing_browser_process is split
-    # into a thin header target and an impl target (see testing_profile split).
-    allow_circular_includes_from += [
-      "//chrome/browser/ash/settings:test_support",
-      "//chrome/browser/ash/system_web_apps/test_support",
-    ]
   }
   if (enable_chrome_notifications) {
     deps += [ "//chrome/browser/notifications" ]
@@ -778,63 +734,6 @@ if (!is_android) {
       ]
       deps = [ "//base" ]
     }
-  }
-}
-
-if (is_chromeos) {
-  source_set("js_test_api") {
-    testonly = true
-    sources = [
-      "ash/js_test_api.cc",
-      "ash/js_test_api.h",
-    ]
-    public_deps = [ "//base" ]
-    deps = [ "//chrome/common" ]
-  }
-
-  source_set("browser_process_platform_part_test_api_chromeos") {
-    testonly = true
-    sources = [
-      "browser_process_platform_part_test_api_chromeos.cc",
-      "browser_process_platform_part_test_api_chromeos.h",
-    ]
-    public_deps = [
-      "//base",
-      "//components/component_updater/ash",
-    ]
-    deps = [ "//chrome/browser:browser_process_platform_part" ]
-  }
-
-  source_set("aura_window_title_observer") {
-    testonly = true
-    sources = [
-      "chromeos/crosier/aura_window_title_observer.cc",
-      "chromeos/crosier/aura_window_title_observer.h",
-    ]
-    public_deps = [
-      "//base",
-      "//ui/aura",
-      "//ui/base/interaction:test_support",
-    ]
-    deps = [ "//ui/aura:test_support" ]
-  }
-
-  source_set("web_ui_test_handler") {
-    testonly = true
-    sources = [
-      "ash/web_ui_test_handler.cc",
-      "ash/web_ui_test_handler.h",
-    ]
-    public_deps = [ "//content/public/browser" ]
-    deps = [
-      "//base",
-      "//chrome/common:mojo_bindings",
-      "//content/public/common",
-      "//content/test:test_support",
-      "//mojo/public/cpp/bindings",
-      "//testing/gtest",
-      "//third_party/blink/public/common:headers",
-    ]
   }
 }
 

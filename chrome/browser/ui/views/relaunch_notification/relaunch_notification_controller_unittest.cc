@@ -8,7 +8,6 @@
 #include <optional>
 #include <utility>
 
-#include "ash/public/cpp/update_types.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/ptr_util.h"
 #include "base/memory/raw_ptr.h"

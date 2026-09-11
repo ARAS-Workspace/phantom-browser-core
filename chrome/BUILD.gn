@@ -35,7 +35,7 @@ import("//v8/gni/v8.gni")
 
 if (is_android) {
   import("//build/config/android/rules.gni")
-} else if (is_linux || is_chromeos) {
+} else if (is_linux) {
   import("//build/linux/extract_symbols.gni")
   import("//build/linux/strip_binary.gni")
 } else if (is_mac) {
@@ -58,11 +58,7 @@ if (is_android) {
 
 # b/365489014: CrOS' chrome.sections_embedded target breaks on component builds;
 # there's no clear value of supporting it there, so disable it.
-_cros_generate_embed_section_target = is_chromeos && !is_component_build
-
-if (_cros_generate_embed_section_target) {
-  import("//build/chromeos/embed_sections.gni")
-}
+_cros_generate_embed_section_target = false
 
 declare_args() {
   # On macOS, `is_chrome_branded` builds that have been signed locally will not
@@ -171,17 +167,8 @@ if (!is_android && !is_mac) {
     data = [ "$root_out_dir/resources.pak" ]
     data_deps = []
 
-    if (is_win || is_linux || is_chromeos) {
+    if (is_win || is_linux) {
       deps += [ "//components/webapps/isolated_web_apps:scheme" ]
-    }
-
-    if (is_chromeos) {
-      data_deps += [ "//sandbox/linux:chrome_sandbox" ]
-      if (build_mojo_proxy) {
-        data_deps +=
-            [ "//chromeos/ash/components/mojo_proxy/service:mojo_proxy" ]
-      }
-      deps += [ "//components/exo/wayland:ui_controls_protocol_stub" ]
     }
 
     if (is_win) {
@@ -287,7 +274,7 @@ if (!is_android && !is_mac) {
       sources += [ "app/chrome_exe_main_aura.cc" ]
     }
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       sources += [
         "app/chrome_dll_resource.h",
         "app/chrome_main.cc",
@@ -330,36 +317,18 @@ if (!is_android && !is_mac) {
 
       # On Chrome OS builds put priority to the library in the installed
       # directory. This will avoid conflicting of exposed symbols.
-      if (is_chromeos_device) {
-        ldflags += [ "-L" + rebase_path(root_out_dir) ]
-      }
 
       # On Chrome OS builds, put a metadata.json file in root directory
       # containing Chrome version.
-      if (is_chromeos) {
-        data_deps += [ "//build:version_metadata" ]
-      }
 
       # Chrome OS debug builds for arm need to pass --long-plt to the linker.
       # See https://crbug.com/41237849
-      if (is_chromeos && is_debug && target_cpu == "arm") {
-        ldflags += [ "-Wl,--long-plt" ]
-      }
 
       if (is_linux && !is_component_build && !using_sanitizer) {
         version_script = "//build/linux/chrome.map"
         inputs = [ version_script ]
         ldflags += [ "-Wl,--version-script=" +
                      rebase_path(version_script, root_build_dir) ]
-      }
-
-      if (is_chromeos) {
-        public_deps += [ "//ui/lottie" ]
-        deps += [
-          "//chrome/browser/ash/locale",
-          "//chrome/browser/ash/schedqos",
-          "//chromeos/ash/experiences/arc:arc_base_utils",
-        ]
       }
 
       if (use_ozone) {
@@ -378,9 +347,6 @@ if (!is_android && !is_mac) {
 
     # ChromeOS by design is safe to have rpath=$ORIGIN. This simplifies shared
     # library usage.
-    if (is_chromeos && !is_component_build) {
-      configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
-    }
 
     data_deps += [
       "//chrome/browser/resources/media/mei_preload:component",
@@ -1338,10 +1304,6 @@ if (is_win) {
       "//third_party/cld_3/src/src:cld_3",
     ]
 
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/ash/schedqos" ]
-    }
-
     if (is_chrome_for_testing) {
       deps += [ "//chrome/browser/chrome_for_testing:browser" ]
     }
@@ -1662,17 +1624,6 @@ group("dependencies") {
   if (enable_printing) {
     public_deps += [ "//printing" ]
   }
-
-  if (is_chromeos) {
-    public_deps += [
-      "//ash/constants",
-      "//chrome/browser/ash/boot_times_recorder",
-      "//chrome/browser/ash/dbus",
-      "//chrome/browser/ash/schedqos",
-      "//chromeos/ash/components/memory",
-      "//chromeos/dbus/constants",
-    ]
-  }
 }
 
 if (is_win) {
@@ -1840,11 +1791,6 @@ if (is_android) {
         "//ui/events/devices",
       ]
     }
-
-    if (is_chromeos) {
-      public_deps += [ "//ui/lottie" ]
-      deps += [ "//chrome/browser/ash/schedqos" ]
-    }
   }
 }
 
@@ -1858,7 +1804,7 @@ if (is_win && enable_resource_allowlist_generation) {
   }
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   if (!(is_debug && use_debug_fission)) {
     group("linux_symbols") {
       deps = [
@@ -1868,7 +1814,7 @@ if (is_linux || is_chromeos) {
       if (is_linux) {
         deps += [ ":swiftshader_vk_symbols" ]
       }
-      if (!is_chromeos && angle_shared_libvulkan) {
+      if (angle_shared_libvulkan) {
         deps += [ ":angle_libvulkan_symbols" ]
       }
       if (build_with_internal_optimization_guide) {
@@ -1934,7 +1880,7 @@ if (is_linux || is_chromeos) {
       # On ChromeOS, system services require real ANGLE shared libraries, so we
       # depend on the actual libraries (rather than dummy stubs) even when
       # use_static_angle is true.
-      if (use_static_angle && !is_chromeos) {
+      if (use_static_angle) {
         deps = [ "//ui/gl:dummy_libEGL" ]
       } else {
         deps = [ "//third_party/angle:libEGL" ]
@@ -1950,13 +1896,13 @@ if (is_linux || is_chromeos) {
         symbol_file = "$root_out_dir/angle_libgles.breakpad.$current_cpu"
       }
 
-      if (use_static_angle && !is_chromeos) {
+      if (use_static_angle) {
         deps = [ "//ui/gl:dummy_libGLESv2" ]
       } else {
         deps = [ "//third_party/angle:libGLESv2" ]
       }
     }
-    if (!is_chromeos && angle_shared_libvulkan) {
+    if (angle_shared_libvulkan) {
       extract_symbols("angle_libvulkan_symbols") {
         binary = "$root_out_dir/libvulkan.so.1"
 
@@ -2030,13 +1976,6 @@ if (is_linux || is_chromeos) {
   }
 }
 
-if (_cros_generate_embed_section_target) {
-  embed_sections("section_embedded_chrome_binary") {
-    binary_input = "$root_out_dir/chrome"
-    sections_embedded_binary_output = "$root_out_dir/chrome.sections_embedded"
-    deps = [ ":chrome" ]
-  }
-}
 if (enable_separate_renderer_binary) {
   _chrome_renderer_sources = [
     "app/chrome_main_delegate.cc",
@@ -2068,7 +2007,7 @@ if (enable_separate_renderer_binary) {
     "//content/public/app",
     "//v8",
   ]
-  if (is_win || is_linux || is_chromeos || is_mac) {
+  if (is_win || is_linux || is_mac) {
     _chrome_renderer_deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 

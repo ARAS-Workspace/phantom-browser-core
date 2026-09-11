@@ -57,10 +57,6 @@ source_set("pdf") {
     "//url",
   ]
 
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/browser_context_helper" ]
-  }
-
   if (enable_print_preview) {
     deps += [ "//chrome/common" ]
   }
@@ -71,24 +67,6 @@ source_set("pdf_pref_names") {
     "pdf_pref_names.cc",
     "pdf_pref_names.h",
   ]
-}
-
-if (is_chromeos) {
-  source_set("pdf_service") {
-    sources = [
-      "pdf_service.cc",
-      "pdf_service.h",
-    ]
-    public_deps = [
-      "//chrome/services/pdf/public/mojom",
-      "//mojo/public/cpp/bindings",
-    ]
-    deps = [
-      "//base",
-      "//chrome/app:generated_resources",
-      "//content/public/browser",
-    ]
-  }
 }
 
 source_set("pdf_extension_test_utils") {
@@ -188,18 +166,6 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/login/users",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/policy/device_local_account",
-      "//components/account_id",
-      "//components/account_id:test_support",
-      "//components/session_manager/test:test_support",
-      "//components/user_manager",
-    ]
-  }
 }
 
 if (!is_android) {

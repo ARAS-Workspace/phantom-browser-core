@@ -72,13 +72,6 @@ source_set("impl") {
     deps += [ "//extensions/browser" ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/profiles",
-      "//components/user_manager",
-    ]
-  }
-
   if (!is_android) {
     sources += [ "web_serial_chooser_desktop.cc" ]
   } else {

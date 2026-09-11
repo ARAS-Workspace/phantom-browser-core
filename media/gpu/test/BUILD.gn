@@ -30,7 +30,7 @@ if (enable_av1_decoder &&
       "//testing/gtest",
     ]
 
-    if (is_chromeos || is_linux) {
+    if (is_linux) {
       deps += [ "//media/gpu/chromeos:common" ]
     }
 
@@ -326,25 +326,5 @@ if (use_linux_video_acceleration) {
       "//third_party/libyuv",
     ]
     data = [ "//media/test/data/" ]
-  }
-}
-
-if (is_chromeos) {
-  static_library("local_gpu_memory_buffer_manager") {
-    testonly = true
-    sources = [
-      "test_gbm_buffer_manager.cc",
-      "test_gbm_buffer_manager.h",
-    ]
-    deps = [
-      "//base",
-      "//build/config/linux/libdrm",
-      "//gpu/command_buffer/client",
-      "//gpu/ipc/common:surface_handle_type",
-      "//third_party/minigbm",
-      "//ui/gfx:memory_buffer",
-      "//ui/gfx/geometry",
-      "//ui/gfx/linux:gbm",
-    ]
   }
 }

@@ -45,11 +45,6 @@ source_set("time_zone_monitor") {
     sources += [ "time_zone_monitor_linux.cc" ]
   }
 
-  if (is_chromeos) {
-    sources += [ "time_zone_monitor_ash.cc" ]
-    deps += [ "//chromeos/ash/components/settings" ]
-  }
-
   if (is_apple) {
     sources += [ "time_zone_monitor_mac.mm" ]
     frameworks = [ "Foundation.framework" ]

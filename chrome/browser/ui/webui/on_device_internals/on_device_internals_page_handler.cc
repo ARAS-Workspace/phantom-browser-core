@@ -41,7 +41,6 @@
 #include "services/preferences/public/cpp/scoped_pref_update.h"
 
 #if BUILDFLAG(USE_CHROMEOS_MODEL_SERVICE)
-#include "chromeos/ash/components/mojo_service_manager/connection.h"
 #include "third_party/cros_system_api/mojo/service_constants.h"
 #endif
 

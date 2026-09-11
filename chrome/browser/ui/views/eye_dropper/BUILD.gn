@@ -49,17 +49,10 @@ source_set("eye_dropper") {
         "//ui/linux:linux_ui",
       ]
     }
-
-    if (is_chromeos) {
-      deps += [
-        "//ash/public/cpp",
-        "//ui/aura",
-      ]
-    }
   }
 }
 
-if (!is_android && !is_chromeos_device) {
+if (!is_android) {
   source_set("interactive_ui_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

@@ -14,7 +14,7 @@ import("//printing/buildflags/buildflags.gni")
 source_set("path_parser") {
   public = [ "policy_path_parser.h" ]
 
-  if (is_chromeos || is_linux) {
+  if (is_linux) {
     sources = [ "policy_path_parser_linux.cc" ]
   } else if (is_mac) {
     sources = [ "policy_path_parser_mac.mm" ]
@@ -42,85 +42,11 @@ source_set("path_parser") {
 source_set("onc") {
   public = []
   sources = []
-
-  if (is_chromeos) {
-    public += [
-      "networking/device_network_configuration_updater_ash.h",
-      "networking/network_configuration_updater.h",
-      "networking/policy_cert_service.h",
-      "networking/policy_cert_service_factory.h",
-      "networking/user_network_configuration_updater.h",
-      "networking/user_network_configuration_updater_ash.h",
-      "networking/user_network_configuration_updater_factory.h",
-    ]
-    sources += [
-      "networking/device_network_configuration_updater_ash.cc",
-      "networking/network_configuration_updater.cc",
-      "networking/policy_cert_service.cc",
-      "networking/policy_cert_service_factory.cc",
-      "networking/user_network_configuration_updater.cc",
-      "networking/user_network_configuration_updater_ash.cc",
-      "networking/user_network_configuration_updater_factory.cc",
-    ]
-
-    deps = [
-      "//ash/constants",
-      "//base",
-      "//chrome/browser:browser_process",
-      "//chrome/browser:browser_process_platform_part",
-      "//chrome/browser/ash/login",
-      "//chrome/browser/ash/login/session",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/extensions",
-      "//chrome/browser/net",
-      "//chrome/browser/profiles",
-      "//chrome/browser/profiles:profile",
-      "//chrome/common:constants",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/install_attributes",
-      "//chromeos/ash/components/network",
-      "//chromeos/ash/components/settings",
-      "//chromeos/ash/components/system",
-      "//chromeos/components/onc",
-      "//components/keyed_service/content",
-      "//components/onc",
-      "//components/policy/core/common",
-      "//components/policy/core/common:common_constants",
-      "//components/prefs",
-      "//components/user_manager",
-      "//dbus",
-      "//extensions/browser",
-      "//net",
-    ]
-    allow_circular_includes_from = [
-      "//chrome/browser/ash/login",
-      "//chrome/browser/ash/policy/core",
-    ]
-  }
 }
 
 source_set("system_features_disable_list") {
   public = []
   sources = []
-
-  if (is_chromeos) {
-    public += [ "system_features_disable_list_policy_handler.h" ]
-    sources += [ "system_features_disable_list_policy_handler.cc" ]
-
-    public_deps = [
-      "//base",
-      "//components/policy/core/browser",
-      "//components/prefs",
-    ]
-
-    deps = [
-      "//ash/constants",
-      "//components/policy:generated",
-      "//components/policy:policy_code_generate",
-      "//components/policy/core/common:common_constants",
-    ]
-  }
 }
 
 source_set("policy_util") {
@@ -181,14 +107,6 @@ if (enable_extensions) {
       "//extensions/browser",
       "//extensions/browser:test_support",
     ]
-
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/login/test:test_support",
-        "//chrome/browser/ash/policy/core:test_support",
-        "//chrome/browser/ash/policy/test_support",
-      ]
-    }
   }
 }
 
@@ -255,14 +173,6 @@ source_set("test_support") {
 
   if (is_android) {
     sources += [ "policy_test_utils_android.cc" ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//ash",
-      "//ash/public/cpp",
-      "//chromeos/ash/components/system",
-    ]
   }
 
   if (enable_dice_support) {
@@ -366,25 +276,6 @@ source_set("policy_specific_browser_tests") {
     "//testing/gmock",
   ]
 
-  if (is_chromeos) {
-    sources += [ "test/policy_certs_browsertest.cc" ]
-    deps += [
-      "//chrome/browser/ash/login/lock:test_support",
-      "//chrome/browser/ash/login/saml:test_support",
-      "//chrome/browser/ash/login/users",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/policy/core:test_support",
-      "//chrome/browser/policy:onc",
-      "//chromeos:test_support",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/components/onc:test_support",
-      "//components/onc",
-      "//components/session_manager/core",
-      "//components/user_manager",
-      "//crypto:test_support",
-    ]
-  }
-
   if (!is_android) {
     sources += [
       "test/autofill_ai_policy_browsertest.cc",
@@ -437,17 +328,15 @@ source_set("policy_specific_browser_tests") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "policy_startup_browsertest.cc",
       "test/network_time_policy_browsertest.cc",
     ]
   }
 
-  if (!is_chromeos) {
-    sources += [ "test/variation_restrict_parameter_policy_browsertest.cc" ]
-    deps += [ "//components/variations/service" ]
-  }
+  sources += [ "test/variation_restrict_parameter_policy_browsertest.cc" ]
+  deps += [ "//components/variations/service" ]
 
   if (is_android) {
     deps += [ "//chrome/browser/safe_browsing/android:test_support" ]
@@ -552,53 +441,6 @@ source_set("browser_tests") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "test/arc_policy_browsertest.cc",
-      "test/audio_output_allowed_browsertest.cc",
-      "test/gen_ai_vc_background_policy_browsertest.cc",
-      "test/gen_ai_wallpaper_policy_browsertest.cc",
-      "test/orca_policy_browsertest.cc",
-      "test/power_sounds_policy_browsertest.cc",
-      "test/privacy_hub_policy_browsertest.cc",
-      "test/screenshot_policy_browsertest.cc",
-      "test/session_length_limit_policy_browsertest.cc",
-      "test/suggested_content_policy_browsertest.cc",
-      "test/system_features_policy_browsertest.cc",
-      "test/unified_desktop_enabled_browsertest.cc",
-      "test/user_avatar_customization_selectors_enabled_policy_browsertest.cc",
-      "test/virtual_keyboard_policy_browsertest.cc",
-    ]
-
-    deps += [
-      ":system_features_disable_list",
-      "//chrome/browser/apps/app_service/app_icon",
-      "//chrome/browser/ash/accessibility",
-      "//chrome/browser/ash/arc/session",
-      "//chrome/browser/ash/crostini:test_support",
-      "//chrome/browser/ash/guest_os",
-      "//chrome/browser/ash/input_method",
-      "//chrome/browser/ash/login/users/avatar",
-      "//chrome/browser/ash/login/users/avatar:test_support",
-      "//chrome/browser/ash/login/users/default_user_image",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/policy/handlers",
-      "//chrome/browser/ash/system_web_apps/apps/personalization_app",
-      "//chrome/browser/ash/system_web_apps/test_support",
-      "//chrome/browser/ash/test:test_support",
-      "//chrome/browser/ui/ash/keyboard",
-      "//chromeos/ash/components/audio",
-      "//chromeos/ash/components/cryptohome",
-      "//chromeos/ash/components/dbus/userdataauth",
-      "//chromeos/ash/experiences/arc:arc_test_support",
-      "//chromeos/ash/experiences/arc:prefs",
-      "//chromeos/ash/experiences/arc/session",
-      "//chromeos/ash/services/assistant/public/cpp",
-      "//chromeos/dbus/constants",
-      "//components/account_id",
-    ]
-  }
-
   if (is_linux || is_mac || is_win) {
     sources += [ "test/audio_sandbox_enabled_browsertest.cc" ]
   }
@@ -634,7 +476,7 @@ source_set("browser_tests") {
     deps += [ "//chrome/test:test_support" ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "cloud/chrome_browser_cloud_management_browsertest_delegate_desktop.cc",
       "cloud/chrome_browser_cloud_management_browsertest_delegate_desktop.h",
@@ -658,7 +500,7 @@ source_set("browser_tests") {
     ]
   }
 
-  if (is_win || is_linux || is_chromeos) {
+  if (is_win || is_linux) {
     sources += [ "test/full_screen_allowed_policy_browsertest.cc" ]
 
     if (enable_extensions) {
@@ -666,14 +508,12 @@ source_set("browser_tests") {
     }
   }
 
-  if (!is_chromeos) {
-    sources += [
-      "cloud/chrome_browser_cloud_management_browsertest.cc",
-      "cloud/chrome_browser_cloud_management_browsertest_delegate.h",
-    ]
+  sources += [
+    "cloud/chrome_browser_cloud_management_browsertest.cc",
+    "cloud/chrome_browser_cloud_management_browsertest_delegate.h",
+  ]
 
-    deps += [ "//components/signin/public/identity_manager" ]
-  }
+  deps += [ "//components/signin/public/identity_manager" ]
 
   if (is_linux || is_android) {
     sources += [ "test/out_of_process_system_dns_resolution_browsertest.cc" ]
@@ -714,23 +554,9 @@ source_set("browser_tests") {
     ]
   }
 
-  if (enable_extensions_core && !is_chromeos) {
+  if (enable_extensions_core) {
     sources += [ "cloud/extension_install_policy_service_browsertest.cc" ]
     deps += [ "//extensions/strings" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "login_policy_test_base_browsertest.cc",
-      "restricted_mgs_policy_provider_ash_browsertest.cc",
-    ]
-    deps += [
-      "//chrome/browser/ash/policy/core:test_support",
-      "//chrome/browser/ash/policy/login:test_support",
-      "//chrome/browser/ash/policy/test_support",
-      "//chrome/browser/prefs:util",
-      "//chrome/browser/ui/webui/certificate_manager",
-    ]
   }
 }
 
@@ -842,12 +668,10 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_chromeos) {
-    sources += [
-      "cloud/user_policy_signin_service_unittest.cc",
-      "cloud/user_policy_signin_service_util_unittest.cc",
-    ]
-  }
+  sources += [
+    "cloud/user_policy_signin_service_unittest.cc",
+    "cloud/user_policy_signin_service_util_unittest.cc",
+  ]
 
   if (!is_android) {
     sources += [
@@ -866,7 +690,7 @@ source_set("unit_tests") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "cbcm_invalidations_initializer_unittest.cc",
       "chrome_browser_cloud_management_register_watcher_unittest.cc",
@@ -887,7 +711,7 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "browser_dm_token_storage_linux_unittest.cc" ]
   }
 
@@ -901,40 +725,6 @@ source_set("unit_tests") {
 
   if (enable_printing) {
     sources += [ "printing_restrictions_policy_handler_unittest.cc" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "annotations/annotation_control_provider_unittest.cc",
-      "annotations/annotation_control_unittest.cc",
-      "annotations/blocklist_handler_unittest.cc",
-      "messaging_layer/upload/file_upload_impl_unittest.cc",
-      "networking/network_configuration_updater_ash_unittest.cc",
-      "networking/network_configuration_updater_unittest.cc",
-      "status_provider/device_cloud_policy_status_provider_chromeos_unittest.cc",
-      "status_provider/device_local_account_policy_status_provider_unittest.cc",
-      "system_features_disable_list_policy_handler_unittest.cc",
-    ]
-    deps += [
-      ":onc",
-      ":system_features_disable_list",
-      "//chrome/browser/ash/login/users:test_support",
-      "//chrome/browser/ash/policy/uploading",
-      "//chrome/browser/ash/settings",
-      "//chrome/browser/ash/settings:test_support",
-      "//chrome/browser/ui/webui/certificate_manager",
-      "//chromeos/ash/components/system",
-      "//chromeos/components/mgs:test_support",
-      "//chromeos/components/onc",
-      "//chromeos/components/onc:test_support",
-      "//components/onc",
-      "//components/session_manager/core:test_support",
-      "//components/session_manager/test:test_support",
-    ]
-  }
-
-  if (enable_extensions && is_chromeos) {
-    sources += [ "restricted_mgs_policy_provider_ash_unittest.cc" ]
   }
 
   if (enable_extensions && enterprise_local_content_analysis) {
@@ -1071,41 +861,20 @@ source_set("policy") {
     ]
     public_deps += [ "//chrome/browser/ui/tabs:tab_strip_model_observer" ]
 
-    if (!is_chromeos) {
-      public += [
-        "cbcm_invalidations_initializer.h",
-        "chrome_browser_cloud_management_controller_desktop.h",
-        "client_data_delegate_desktop.h",
-        "cloud/user_policy_signin_service.h",
-        "file_selection_dialogs_policy_handler.h",
-      ]
-    }
-  }
-
-  if (is_chromeos) {
     public += [
-      "annotations/annotation_control.h",
-      "annotations/annotation_control_provider.h",
-      "annotations/blocklist_handler.h",
-      "default_geolocation_policy_handler.h",
-      "device_login_screen_geolocation_access_level_policy_handler.h",
-      "drive_file_sync_available_policy_handler.h",
-      "messaging_layer/upload/file_upload_impl.h",
-      "os_color_mode_policy_handler.h",
-      "power_battery_charging_optimization_policy_handler.h",
-      "restricted_mgs_policy_provider.h",
-      "status_provider/device_cloud_policy_status_provider_chromeos.h",
-      "status_provider/user_cloud_policy_status_provider_chromeos.h",
+      "cbcm_invalidations_initializer.h",
+      "chrome_browser_cloud_management_controller_desktop.h",
+      "client_data_delegate_desktop.h",
+      "cloud/user_policy_signin_service.h",
+      "file_selection_dialogs_policy_handler.h",
     ]
   }
 
-  if (!is_chromeos) {
-    public += [
-      "browser_signin_policy_handler.h",
-      "cloud/user_policy_signin_service_factory.h",
-      "cloud/user_policy_signin_service_util.h",
-    ]
-  }
+  public += [
+    "browser_signin_policy_handler.h",
+    "cloud/user_policy_signin_service_factory.h",
+    "cloud/user_policy_signin_service_util.h",
+  ]
 
   if (is_win) {
     public += [ "browser_dm_token_storage_win.h" ]
@@ -1115,7 +884,7 @@ source_set("policy") {
     public += [ "browser_dm_token_storage_mac.h" ]
   }
 
-  if (is_linux || is_win || is_mac || is_chromeos) {
+  if (is_linux || is_win || is_mac) {
     public += [
       "battery_saver_policy_handler.h",
       "developer_tools_availability_list_policy_handler.h",
@@ -1130,11 +899,11 @@ source_set("policy") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     public += [ "browser_dm_token_storage_linux.h" ]
   }
 
-  if (is_win || is_linux || is_chromeos) {
+  if (is_win || is_linux) {
     public += [
       "messaging_layer/util/manual_test_heartbeat_event.h",
       "messaging_layer/util/manual_test_heartbeat_event_factory.h",
@@ -1325,7 +1094,7 @@ source_set("impl") {
   # Cloud Management (BrowserDMTokenStorage / BrowserCloudManagementDelegate),
   # which does not exist on ChromeOS even though enterprise_client_certificates
   # is enabled there.
-  if (enterprise_client_certificates && !is_chromeos) {
+  if (enterprise_client_certificates) {
     deps += [
       "//chrome/browser/enterprise/connectors/device_trust/key_management/browser",
       "//components/enterprise/client_certificates/core:management_delegate",
@@ -1379,87 +1148,23 @@ source_set("impl") {
       "//components/live_caption",
     ]
 
-    if (!is_chromeos) {
-      sources += [
-        "cbcm_invalidations_initializer.cc",
-        "chrome_browser_cloud_management_controller_desktop.cc",
-        "chrome_browser_cloud_management_register_watcher.cc",
-        "chrome_browser_cloud_management_register_watcher.h",
-        "client_data_delegate_desktop.cc",
-        "cloud/user_policy_signin_service.cc",
-        "file_selection_dialogs_policy_handler.cc",
-      ]
-      deps += [ "//chrome/browser/ui:enterprise_startup_dialog" ]
-    }
+    sources += [
+      "cbcm_invalidations_initializer.cc",
+      "chrome_browser_cloud_management_controller_desktop.cc",
+      "chrome_browser_cloud_management_register_watcher.cc",
+      "chrome_browser_cloud_management_register_watcher.h",
+      "client_data_delegate_desktop.cc",
+      "cloud/user_policy_signin_service.cc",
+      "file_selection_dialogs_policy_handler.cc",
+    ]
+    deps += [ "//chrome/browser/ui:enterprise_startup_dialog" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "annotations/annotation_control.cc",
-      "annotations/annotation_control_provider.cc",
-      "annotations/blocklist_handler.cc",
-      "default_geolocation_policy_handler.cc",
-      "device_login_screen_geolocation_access_level_policy_handler.cc",
-      "drive_file_sync_available_policy_handler.cc",
-      "messaging_layer/upload/file_upload_impl.cc",
-      "os_color_mode_policy_handler.cc",
-      "power_battery_charging_optimization_policy_handler.cc",
-      "restricted_mgs_policy_provider.cc",
-      "status_provider/device_cloud_policy_status_provider_chromeos.cc",
-      "status_provider/device_local_account_policy_status_provider.cc",
-      "status_provider/device_local_account_policy_status_provider.h",
-      "status_provider/user_cloud_policy_status_provider_chromeos.cc",
-    ]
-    deps += [
-      ":system_features_disable_list",
-      "//chrome/browser/ash/accessibility",
-      "//chrome/browser/ash/app_mode/auto_sleep",
-      "//chrome/browser/ash/app_restore",
-      "//chrome/browser/ash/apps/webapk:prefs",
-      "//chrome/browser/ash/arc/policy",
-      "//chrome/browser/ash/borealis",
-      "//chrome/browser/ash/bruschetta",
-      "//chrome/browser/ash/cert_provisioning",
-      "//chrome/browser/ash/crostini",
-      "//chrome/browser/ash/login",
-      "//chrome/browser/ash/login/users/avatar",
-      "//chrome/browser/ash/platform_keys/key_permissions",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/policy/handlers",
-      "//chrome/browser/ash/policy/login",
-      "//chrome/browser/ash/policy/off_hours",
-      "//chrome/browser/ash/policy/reporting/metrics_reporting",
-      "//chrome/browser/ash/policy/status_collector",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/settings",
-      "//chrome/browser/ash/wallpaper_handlers",
-      "//chrome/browser/chromeos/reporting",
-      "//chrome/browser/nearby_sharing/common",
-      "//chrome/browser/ui/webui/certificate_manager",
-      "//chromeos/ash/components/demo_mode",
-      "//chromeos/ash/components/install_attributes",
-      "//chromeos/ash/components/policy/policy_blocklist_service",
-      "//chromeos/ash/components/quickoffice",
-      "//chromeos/ash/components/system",
-      "//chromeos/ash/services/multidevice_setup/public/cpp:prefs",
-      "//chromeos/components/disks:prefs",
-      "//chromeos/components/kiosk",
-      "//chromeos/components/mgs",
-      "//chromeos/components/quick_answers/public/cpp:prefs",
-      "//chromeos/dbus/power",
-      "//chromeos/ui/wm",
-      "//chromeos/version",
-      "//components/drive",
-    ]
-  }
-
-  if (!is_chromeos) {
-    sources += [
-      "browser_signin_policy_handler.cc",
-      "cloud/user_policy_signin_service_factory.cc",
-      "cloud/user_policy_signin_service_util.cc",
-    ]
-  }
+  sources += [
+    "browser_signin_policy_handler.cc",
+    "cloud/user_policy_signin_service_factory.cc",
+    "cloud/user_policy_signin_service_util.cc",
+  ]
 
   if (is_win) {
     sources += [ "browser_dm_token_storage_win.cc" ]
@@ -1474,7 +1179,7 @@ source_set("impl") {
     deps += [ "//chrome/browser:app_controller_mac" ]
   }
 
-  if (is_linux || is_win || is_mac || is_chromeos) {
+  if (is_linux || is_win || is_mac) {
     sources += [
       "battery_saver_policy_handler.cc",
       "developer_tools_availability_list_policy_handler.cc",
@@ -1493,11 +1198,11 @@ source_set("impl") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "browser_dm_token_storage_linux.cc" ]
   }
 
-  if (is_win || is_linux || is_chromeos) {
+  if (is_win || is_linux) {
     sources += [
       "messaging_layer/util/manual_test_heartbeat_event.cc",
       "messaging_layer/util/manual_test_heartbeat_event_factory.cc",

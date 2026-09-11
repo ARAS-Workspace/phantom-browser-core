@@ -1747,7 +1747,7 @@ component("platform") {
   if (is_ios) {
     sources += [ "fonts/ios/font_cache_ios.mm" ]
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "fonts/linux/font_cache_linux.cc",
       "fonts/linux/font_unique_name_lookup_linux.cc",
@@ -2729,7 +2729,7 @@ test("blink_fuzzer_unittests") {
 
   sources = [ "testing/run_all_tests.cc" ]
 
-  if (is_linux || is_chromeos || is_fuchsia) {
+  if (is_linux || is_fuchsia) {
     deps += [
       "//third_party/blink/renderer/platform/scheduler:scheduler_fuzzer_tests",
     ]

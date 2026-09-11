@@ -346,7 +346,7 @@ source_set("common") {
     deps += [ "//ui/gfx/" ]
   }
 
-  if (is_chromeos || is_android || is_win || is_fuchsia) {
+  if (is_android || is_win || is_fuchsia) {
     defines = [ "ENABLE_PROTECTED_MEDIA_IDENTIFIER_PERMISSION" ]
   }
 }

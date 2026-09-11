@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 source_set("memory") {
   public = [
@@ -22,17 +22,6 @@ source_set("memory") {
     "//components/performance_manager",
     "//components/prefs",
   ]
-
-  if (is_chromeos) {
-    public += [
-      "memory_kills_monitor.h",
-      "oom_kills_monitor.h",
-    ]
-    public_deps += [
-      "//chromeos/ash/components/login/login_state",
-      "//components/metrics",
-    ]
-  }
 }
 
 source_set("impl") {
@@ -59,31 +48,11 @@ source_set("impl") {
     "//content/public/browser",
     "//ui/base",
   ]
-
-  if (is_chromeos) {
-    sources += [
-      "memory_kills_histogram.h",
-      "memory_kills_monitor.cc",
-      "oom_kills_monitor.cc",
-    ]
-    deps += [
-      "//chromeos/ash/components/dbus/resourced",
-      "//chromeos/ash/components/memory",
-      "//dbus",
-    ]
-  }
 }
 
 source_set("unit_tests") {
   testonly = true
   sources = [ "enterprise_memory_limit_evaluator_unittest.cc" ]
-
-  if (is_chromeos) {
-    sources += [
-      "memory_kills_monitor_unittest.cc",
-      "oom_kills_monitor_unittest.cc",
-    ]
-  }
 
   deps = [
     ":impl",

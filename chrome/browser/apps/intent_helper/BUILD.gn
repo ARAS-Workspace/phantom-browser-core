@@ -30,23 +30,3 @@ if (!is_android) {
     ]
   }
 }
-
-if (is_chromeos) {
-  source_set("chromeos_disabled_apps_throttle") {
-    public = [ "chromeos_disabled_apps_throttle.h" ]
-    sources = [ "chromeos_disabled_apps_throttle.cc" ]
-
-    public_deps = [ "//content/public/browser" ]
-
-    deps = [
-      "//base",
-      "//chrome/browser:browser_process",
-      "//chrome/browser:resources",
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/policy:system_features_disable_list",
-      "//chrome/browser/profiles:profile",
-      "//components/strings:components_strings",
-      "//ui/base",
-    ]
-  }
-}

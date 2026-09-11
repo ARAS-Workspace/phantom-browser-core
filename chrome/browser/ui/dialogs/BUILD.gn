@@ -59,7 +59,7 @@ source_set("browser_dialogs") {
     "//ui/shell_dialogs",
   ]
 
-  if (is_win || is_linux || is_mac || is_chromeos) {
+  if (is_win || is_linux || is_mac) {
     deps += [ "//chrome/browser/ui/bookmarks" ]
   }
 
@@ -72,7 +72,7 @@ source_set("browser_dialogs") {
   }
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   source_set("process_singleton_dialog_linux") {
     public = [ "process_singleton_dialog_linux.h" ]
     sources = [ "process_singleton_dialog_linux.cc" ]

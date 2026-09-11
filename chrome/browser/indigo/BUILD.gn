@@ -104,9 +104,6 @@ source_set("impl") {
     "//services/network/public/mojom",
     "//third_party/blink/public/common",
   ]
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/install_attributes" ]
-  }
 }
 source_set("test_support") {
   testonly = true
@@ -157,13 +154,6 @@ source_set("unit_tests") {
     "//testing/gtest",
     "//url",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/ash/components/install_attributes:test_support",
-      "//chromeos/ash/components/network:test_support",
-    ]
-  }
 }
 
 source_set("browser_tests") {

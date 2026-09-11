@@ -5,7 +5,7 @@
 import("//build/config/chrome_build.gni")
 import("//extensions/buildflags/buildflags.gni")
 
-assert(is_chromeos || is_android)
+assert(is_android)
 
 source_set("management") {
   sources = [
@@ -61,39 +61,8 @@ source_set("management") {
     ]
   }
 
-  if (!is_chromeos) {
-    deps += [ "//chrome/browser/ui:managed_ui" ]
-  }
+  deps += [ "//chrome/browser/ui:managed_ui" ]
 
-  if (is_chromeos) {
-    sources += [ "management_ui_handler_chromeos.cc" ]
-    public += [ "management_ui_handler_chromeos.h" ]
-    deps += [
-      "//ash/constants",
-      "//ash/strings",
-      "//chrome/app:branded_strings",
-      "//chrome/browser/ash/crostini",
-      "//chrome/browser/ash/floating_sso",
-      "//chrome/browser/ash/floating_workspace:utils",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/policy/handlers",
-      "//chrome/browser/ash/policy/reporting/metrics_reporting",
-      "//chrome/browser/ash/policy/skyvault",
-      "//chrome/browser/ash/policy/status_collector",
-      "//chrome/browser/ash/policy/uploading",
-      "//chrome/browser/bitmap_fetcher",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/chromeos/reporting",
-      "//chrome/browser/enterprise/data_controls",
-      "//chrome/browser/net",
-      "//chrome/browser/policy:onc",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/settings",
-      "//net",
-      "//ui/chromeos",
-    ]
-  }
   if (enable_extensions_core) {
     deps += [
       "//chrome/browser/extensions",
@@ -123,25 +92,6 @@ source_set("unit_tests") {
     "//content/test:test_support",
     "//testing/gtest",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/crostini",
-      "//chrome/browser/ash/crostini:test_support",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/policy/remote_commands/crd:test_support",
-      "//chrome/browser/ash/policy/reporting/metrics_reporting",
-      "//chrome/browser/ash/policy/skyvault",
-      "//chrome/browser/ash/policy/status_collector",
-      "//chrome/browser/ash/policy/uploading",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/chromeos/policy/dlp/test:test_support",
-      "//chrome/browser/chromeos/reporting",
-      "//chromeos/ash/components/dbus/shill",
-      "//chromeos/ash/components/system",
-      "//ui/chromeos",
-    ]
-  }
 }
 
 if (!is_android) {

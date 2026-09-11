@@ -117,13 +117,3 @@ if (build_with_chromium) {
     data_deps = [ "//testing:pytype_dependencies" ]
   }
 }
-
-if (is_chromeos) {
-  process_version("version_metadata") {
-    sources = [ "//chrome/VERSION" ]
-
-    template_file = "metadata.json.in"
-    output = "$root_out_dir/metadata.json"
-    process_only = true
-  }
-}

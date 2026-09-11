@@ -194,8 +194,4 @@ source_set("native_messaging_host_main") {
     "//services/network/public/cpp",
     "//services/network/public/mojom",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//remoting/host/chromeos:browser_interop" ]
-  }
 }

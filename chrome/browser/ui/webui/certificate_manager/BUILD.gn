@@ -57,24 +57,9 @@ if (chrome_root_store_cert_management_ui) {
       "//ui/webui",
     ]
 
-    if (!is_chromeos) {
-      sources += [ "platform_cert_sources.cc" ]
-      public += [ "platform_cert_sources.h" ]
-    }
+    sources += [ "platform_cert_sources.cc" ]
+    public += [ "platform_cert_sources.h" ]
 
-    if (is_chromeos) {
-      sources += [ "certificates_handler.cc" ]
-      public += [ "certificates_handler.h" ]
-      deps += [
-        "//chrome/browser/ash/certificate_provider",
-        "//chrome/browser/ash/kcer",
-        "//chrome/browser/ash/net",
-        "//chrome/browser/ash/profiles",
-        "//chrome/browser/ui/webui:certificate_provisioning_ui_handler",
-        "//chromeos/ash/components/kcer",
-        "//chromeos/components/certificate_provider",
-      ]
-    }
     if (use_nss_certs) {
       deps += [ "//chrome/browser/ui:crypto_module_password_dialog" ]
     }
@@ -106,14 +91,6 @@ if (chrome_root_store_cert_management_ui) {
         "//chrome/browser/net",
         "//net:test_support",
       ]
-      if (is_chromeos) {
-        deps += [
-          "//chrome/browser/ash/kcer",
-          "//chrome/browser/ash/login/users:test_support",
-          "//chromeos/ash/components/login/login_state",
-          "//crypto:test_support",
-        ]
-      }
     }
   }
 }

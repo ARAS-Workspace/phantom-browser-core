@@ -77,7 +77,7 @@ source_set("unit_tests") {
     "//media/mojo/test:unit_tests",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [ "//media/mojo/mojom/stable:unit_tests" ]
   }
 }

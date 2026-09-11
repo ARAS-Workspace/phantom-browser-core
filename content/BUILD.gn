@@ -89,15 +89,6 @@ grit("content_resources") {
     "grit/content_resources_map.h",
     "content_resources.pak",
   ]
-
-  if (is_chromeos) {
-    deps = [
-      "//mojo/public/mojom/base:base_js__generator",
-      "//ui/base/mojom:mojom_js__generator",
-      "//url/mojom:url_mojom_gurl_js__generator",
-      "//url/mojom:url_mojom_origin_js__generator",
-    ]
-  }
 }
 
 # This target exists to "hold" the content_export header so we can do proper

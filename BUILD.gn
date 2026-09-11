@@ -128,10 +128,6 @@ group("gn_all") {
       deps += [ "//third_party/abseil-cpp:absl_tests" ]
     }
 
-    if (is_chromeos && enable_js_type_check) {
-      deps += [ ":webui_closure_compile" ]
-    }
-
     if (!is_android) {
       deps += [
         "//crypto:crypto_unittests",
@@ -391,7 +387,7 @@ group("gn_all") {
       }
     }
 
-    if (is_linux || is_chromeos || is_android) {
+    if (is_linux || is_android) {
       deps += [
         "//third_party/breakpad:breakpad_unittests",
         "//third_party/breakpad:core-2-minidump",
@@ -401,25 +397,7 @@ group("gn_all") {
       ]
     }
 
-    if (is_chromeos) {
-      deps += [
-        "//ash:ash_unittests",
-        "//ash/keyboard/ui:keyboard_unittests",
-        "//ash/webui:ash_webui_unittests",
-        "//chrome/browser/ash/child_accounts/time_limit_consistency_test:usage_time_limit_unittests",
-        "//chrome/browser/metrics/perf:profile_provider_unittest",
-        "//chromeos:chromeos_unittests",
-        "//chromeos/ash/components/proximity_auth:proximity_auth_unittests",
-        "//chromeos/ash/experiences:ash_components_unittests",
-        "//chromeos/components:chromeos_components_unittests",
-        "//components/exo/wayland:wayland_client_compatibility_tests",
-        "//components/session_manager/core",
-        "//third_party/shell-encryption:shell_encryption_unittests",
-        "//ui/chromeos:ui_chromeos_unittests",
-      ]
-    }
-
-    if (is_chromeos || is_mac || is_win) {
+    if (is_mac || is_win) {
       deps += [
         "//rlz:rlz_id",
         "//rlz:rlz_lib",
@@ -427,7 +405,7 @@ group("gn_all") {
       ]
     }
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       # The following are definitely linux-only.
       deps += [
         "//net:disk_cache_memory_test",
@@ -436,13 +414,6 @@ group("gn_all") {
         "//sandbox/linux:chrome_sandbox",
         "//sandbox/linux:sandbox_linux_unittests",
       ]
-
-      if (is_chromeos) {
-        deps += [
-          "//chromeos/ash/components/mojo_proxy/mojo_core:mojo_legacy_unittests",
-          "//chromeos/ash/components/mojo_proxy/service:mojo_proxy_unittests",
-        ]
-      }
 
       if (!is_clang) {
         deps += [ "//testing:empty_main" ]
@@ -470,7 +441,7 @@ group("gn_all") {
       ]
     }
 
-    if ((is_win || is_mac || is_linux || is_chromeos) &&
+    if ((is_win || is_mac || is_linux) &&
         (target_cpu == "x86" || target_cpu == "x64")) {
       deps += [
         "//third_party/swiftshader/src/Vulkan:icd_file",
@@ -480,7 +451,7 @@ group("gn_all") {
 
     # TODO(GYP): Figure out which of these should (and can) build
     # for Chrome OS and iOS (without blink).
-    if (!is_chromeos && use_blink) {
+    if (use_blink) {
       deps += [
         "//cc:cc_perftests",
         "//device:device_unittests",
@@ -628,7 +599,7 @@ group("gn_all") {
       deps += [ "//third_party/breakpad:symupload($host_toolchain)" ]
     }
 
-    if (is_mac || is_win || is_android || is_linux || is_chromeos) {
+    if (is_mac || is_win || is_android || is_linux) {
       deps += [
         "//third_party/crashpad/crashpad:crashpad_tests",
         "//third_party/crashpad/crashpad/tools:crashpad_database_util",
@@ -646,15 +617,15 @@ group("gn_all") {
       deps += [ "//content/browser/bluetooth/tools:bluetooth_metrics_hash" ]
     }
 
-    if (is_win || is_linux || is_chromeos) {
+    if (is_win || is_linux) {
       deps += [ "//mojo" ]
     }
 
-    if (is_mac || is_linux || is_chromeos || is_android) {
+    if (is_mac || is_linux || is_android) {
       deps += [ "//third_party/perfetto:all" ]
     }
 
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       deps += [ "//third_party/sqlite:sqlite_shell" ]
     }
 
@@ -702,12 +673,12 @@ group("gn_all") {
         }
         deps += [ "//third_party/libjpeg_turbo:simd_asm" ]
       }
-      if ((is_linux || is_chromeos) && current_toolchain == host_toolchain) {
+      if (is_linux && current_toolchain == host_toolchain) {
         deps += [ "//v8:v8_shell" ]
       }
     }
 
-    if (is_linux || is_chromeos || ((is_win || is_mac) && use_fuzzing_engine)) {
+    if (is_linux || ((is_win || is_mac) && use_fuzzing_engine)) {
       deps += [
         "//testing/libfuzzer/fuzzers",
         "//testing/libfuzzer/research",
@@ -717,7 +688,7 @@ group("gn_all") {
       ]
     }
 
-    if ((is_linux || is_chromeos) && use_ozone) {
+    if (is_linux && use_ozone) {
       deps += [
         "//headless:headless_shell",
         "//headless:headless_tests",
@@ -815,8 +786,8 @@ group("rust_build_tests") {
 
 # TODO(https://crbug.com/1112776): ensure remoting is functional on Linux builds with
 # other than X11 Ozone backends.
-if (enable_remoting && ((is_linux && ozone_platform_x11) ||
-                        ((is_chromeos || is_win) && !use_ozone))) {
+if (enable_remoting &&
+    ((is_linux && ozone_platform_x11) || (is_win && !use_ozone))) {
   # On CQ, run the Traffic Annotation Auditor when a change affects one of these
   # targets.
   group("traffic_annotation_auditor_dependencies") {
@@ -828,15 +799,6 @@ if (enable_remoting && ((is_linux && ozone_platform_x11) ||
     if (enable_enterprise_companion) {
       deps += [ "//chrome/enterprise_companion" ]
     }
-  }
-}
-
-if (is_chromeos) {
-  group("traffic_annotation_auditor_dependencies") {
-    deps = [
-      "//chrome",
-      "//tools/traffic_annotation:annotations_xml",
-    ]
   }
 }
 
@@ -903,100 +865,6 @@ if (is_win) {
 
     if (enable_printing || enable_printing_tests) {
       deps += [ "//printing:printing_unittests" ]
-    }
-  }
-}
-
-if (is_chromeos) {
-  # This group is used to collect minimal targets used when verifying a new
-  # version of Chrome for Chrome OS for all group:mainline non-informational
-  # tast tests.
-  group("chromiumos_preflight_minimal") {
-    testonly = true
-    data_deps = [
-      "//chrome",
-      "//chrome/test/chromedriver:chromedriver_server",
-      "//components/policy/test_support:fake_dmserver",
-      "//sandbox/linux:chrome_sandbox",
-      "//sandbox/linux:sandbox_linux_unittests",
-      "//third_party/breakpad:minidump_stackwalk($host_system_allocator_toolchain)",
-
-      # Blocked on https://github.com/catapult-project/catapult/issues/2297
-      #"//third_party/catapult/telemetry:bitmaptools",
-      "//tools/perf/clear_system_cache",
-    ]
-
-    if (use_linux_video_acceleration) {
-      data_deps +=
-          [ "//components/chromeos_camera:jpeg_encode_accelerator_unittest" ]
-    }
-  }
-
-  # This group is used to collect all targets used when verifying a new version
-  # of Chrome for Chrome OS. They should be aligned with the build targets
-  # specified in chromeos-chrome-9999.ebuild.
-  group("chromiumos_preflight") {
-    testonly = true
-    data_deps = [
-      "//:chromiumos_preflight_minimal",
-
-      # tast.camera.DecodeAccelJPEG is informational.
-      "//components/chromeos_camera:jpeg_decode_accelerator_unittest",
-      "//components/exo/wayland:wayland_client_integration_tests",
-      "//components/exo/wayland:wayland_client_perftests",
-      "//components/exo/wayland:wayland_client_tests",
-      "//media:media_unittests",
-      "//media/capture:capture_unittests",
-      "//services/screen_ai:screen_ai_ocr_perf_test",
-      "//third_party/dawn/src/dawn/tests:dawn_end2end_tests",
-      "//third_party/dawn/src/dawn/tests:dawn_unittests",
-      "//ui/ozone:ozone_integration_tests",
-      "//ui/ozone/gl:ozone_gl_unittests",
-
-      # libtest_trace_processor.so
-      "//base/test:test_trace_processor",
-
-      # chromedriver
-      "//chrome/test/chromedriver:chromedriver_integrationtests",
-    ]
-
-    if (is_chromeos_device) {
-      data_deps += [ "//chrome/test/base/chromeos/crosier/helper/fake_chrome" ]
-    }
-
-    if (use_linux_video_acceleration) {
-      data_deps += [
-        "//media/gpu/chromeos:image_processor_test",
-        "//media/gpu/test/:video_decode_accelerator_perf_tests",
-        "//media/gpu/test/:video_decode_accelerator_tests",
-        "//media/gpu/test/:video_encode_accelerator_perf_tests",
-        "//media/gpu/test/:video_encode_accelerator_tests",
-      ]
-      if (use_vaapi) {
-        data_deps += [
-          "//media/gpu/vaapi:decode_test",
-
-          # tast.video.VAAPIUnittest is informational.
-          "//media/gpu/vaapi:vaapi_unittest",
-          "//media/gpu/vaapi/test/fake_libva_driver:fake_libva_driver_unittest",
-        ]
-      }
-      if (use_v4l2_codec) {
-        data_deps += [
-          "//media/gpu/chromeos:image_processor_perf_test",
-          "//media/gpu/v4l2:v4l2_stateless_decoder",
-          "//media/gpu/v4l2:v4l2_unittest",
-        ]
-        if (enable_vulkan) {
-          data_deps += [ "//media/gpu/chromeos:vulkan_overlay_adaptor_test" ]
-        }
-      }
-      if (enable_swiftshader) {
-        data_deps += [
-          # libvk_swiftshader.so
-          "//third_party/swiftshader/src/Vulkan:swiftshader_libvulkan",
-        ]
-      }
     }
   }
 }
@@ -1080,9 +948,7 @@ group("chromium_builder_perf") {
       "//chrome/test:performance_test_suite",
     ]
 
-    if (!is_chromeos) {
-      data_deps += [ "//chrome/test:performance_browser_tests" ]
-    }
+    data_deps += [ "//chrome/test:performance_browser_tests" ]
 
     if (!is_win) {
       data_deps += [ "//third_party/breakpad:minidump_stackwalk($host_system_allocator_toolchain)" ]
@@ -1123,11 +989,9 @@ if (!is_ios && !is_android && !is_cronet_build) {
     if (!is_win) {
       data_deps += [ "//skia:filter_fuzz_stub" ]
     }
-    if (!is_chromeos) {
-      data_deps += [ "//v8:v8_shell($v8_snapshot_toolchain)" ]
-      if (enable_pdf) {
-        data_deps += [ "//third_party/pdfium/testing:pdfium_test" ]
-      }
+    data_deps += [ "//v8:v8_shell($v8_snapshot_toolchain)" ]
+    if (enable_pdf) {
+      data_deps += [ "//third_party/pdfium/testing:pdfium_test" ]
     }
   }
 }
@@ -1146,17 +1010,6 @@ if (is_android && !is_cronet_build) {
       # generation.
       "//build/config/linux(//build/toolchain/linux:clang_x86)",
       "//build/config/posix(//build/toolchain/linux:clang_x86)",
-    ]
-  }
-}
-
-if (is_chromeos && enable_js_type_check) {
-  group("webui_closure_compile") {
-    testonly = true
-    data_deps = [
-      "ash/webui:closure_compile",
-      "mojo/public/tools/bindings/generators/js_templates/lite/test:closure_compile",
-      "mojo/public/tools/bindings/generators/js_templates/lite/test:closure_compile_modules",
     ]
   }
 }

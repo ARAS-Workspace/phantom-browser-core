@@ -52,12 +52,6 @@ template("webui_path_mappings") {
         "--platform",
         platform,
       ]
-    } else if (is_chromeos) {
-      platform = "chromeos_ash"
-      args += [
-        "--platform",
-        platform,
-      ]
     }
 
     if (defined(webui_context_type)) {

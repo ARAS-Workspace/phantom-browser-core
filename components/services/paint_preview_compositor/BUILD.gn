@@ -32,7 +32,7 @@ static_library("paint_preview_compositor") {
     "//url",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [ "//components/services/font/public/cpp" ]
   }
 

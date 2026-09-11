@@ -63,7 +63,7 @@ mojom("compositing") {
   if (is_linux && ozone_platform_x11) {
     enabled_features += [ "linux_x11" ]
   }
-  if (is_android || is_chromeos) {
+  if (is_android) {
     enabled_features += [ "can_set_refresh_rate" ]
   }
 

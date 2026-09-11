@@ -174,12 +174,6 @@ template("ts_library") {
         "--platform",
         platform,
       ]
-    } else if (is_chromeos) {
-      platform = "chromeos_ash"
-      args += [
-        "--platform",
-        platform,
-      ]
     }
 
     args += [ "--path_mappings" ] + path_mappings

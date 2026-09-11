@@ -44,15 +44,6 @@ source_set("policy") {
     "//ui/base",
     "//ui/webui",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/policy/off_hours",
-      "//chrome/browser/ash/profiles",
-      "//components/user_manager",
-    ]
-  }
 }
 
 if (!is_android) {

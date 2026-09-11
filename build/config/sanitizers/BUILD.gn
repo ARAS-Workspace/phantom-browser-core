@@ -28,7 +28,7 @@ declare_args() {
 # platforms, hence the restriction to Linux and ChromeOS. We might eventually
 # want to disable shared library unloading on all platforms, but we have not
 # noticed a need for it as the known-affected large fuzzers only run on Linux.
-use_dlcloseshim = use_libfuzzer && (is_linux || is_chromeos)
+use_dlcloseshim = use_libfuzzer && is_linux
 
 # Contains the dependencies needed for sanitizers to link into executables and
 # shared_libraries.
@@ -290,12 +290,6 @@ config("default_sanitizer_ldflags") {
 
     if (is_cfi && current_toolchain == default_toolchain) {
       ldflags += [ "-fsanitize=cfi-vcall" ]
-      if (use_cfi_cast) {
-        ldflags += [
-          "-fsanitize=cfi-derived-cast",
-          "-fsanitize=cfi-unrelated-cast",
-        ]
-      }
       if (use_cfi_icall) {
         ldflags += [ "-fsanitize=cfi-icall" ]
       }
@@ -418,13 +412,6 @@ config("cfi_flags") {
       rustflags += [ "-Cembed-bitcode=no" ]
     }
 
-    if (use_cfi_cast) {
-      cflags += [
-        "-fsanitize=cfi-derived-cast",
-        "-fsanitize=cfi-unrelated-cast",
-      ]
-    }
-
     if (use_cfi_icall) {
       cflags += [ "-fsanitize=cfi-icall" ]
       # TODO(crbug.com/40266913): Add cflags += [
@@ -535,8 +522,7 @@ config("lsan_flags") {
 
 config("msan_flags") {
   if (is_msan) {
-    assert(is_linux || is_chromeos,
-           "msan only supported on linux x86_64/ChromeOS")
+    assert(is_linux, "msan only supported on linux x86_64/ChromeOS")
     if (!defined(msan_ignorelist_path)) {
       msan_ignorelist_path =
           rebase_path("//tools/msan/ignorelist.txt", root_build_dir)
@@ -560,7 +546,7 @@ config("msan_flags") {
 
 config("tsan_flags") {
   if (is_tsan) {
-    assert(is_linux || is_chromeos, "tsan only supported on linux x86_64")
+    assert(is_linux, "tsan only supported on linux x86_64")
     if (!defined(tsan_ignorelist_path)) {
       tsan_ignorelist_path =
           rebase_path("//tools/memory/tsan_v2/ignores.txt", root_build_dir)
@@ -766,7 +752,7 @@ config("alloc_token") {
       }
       cflags += [ "-fsanitize-ignorelist=$alloc_token_android_ignorelist_path" ]
     }
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       ldflags = [
         # go/keep-sorted start
         "-Wl,--export-dynamic-symbol=__alloc_token_0__Znam",

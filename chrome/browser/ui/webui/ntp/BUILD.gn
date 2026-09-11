@@ -44,14 +44,6 @@ if (!is_android) {
       "//ui/native_theme",
       "//url",
     ]
-
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/policy/core",
-        "//chromeos/strings:strings_grit",
-        "//ui/chromeos",
-      ]
-    }
   }
 
   source_set("ntp") {

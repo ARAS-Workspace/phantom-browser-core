@@ -84,17 +84,6 @@ source_set("supervised_user") {
     ]
   }
 
-  if (is_chromeos) {
-    public += [
-      "chromeos/supervised_user_favicon_request_handler.h",
-      "chromeos/supervised_user_web_content_handler_impl.h",
-    ]
-    public_deps += [
-      "//chrome/browser/ui/webui/ash/parent_access",
-      "//components/favicon_base",
-    ]
-  }
-
   if (enable_extensions_core) {
     public += [
       "extension_icon_loader.h",
@@ -103,10 +92,6 @@ source_set("supervised_user") {
       "supervised_user_extensions_metrics_recorder.h",
     ]
     public_deps += [ "//extensions/browser" ]
-
-    if (is_chromeos) {
-      public += [ "chromeos/parent_access_extension_approvals_manager.h" ]
-    }
   }
 }
 
@@ -211,17 +196,6 @@ source_set("impl") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "chromeos/supervised_user_favicon_request_handler.cc",
-      "chromeos/supervised_user_web_content_handler_impl.cc",
-    ]
-    deps += [
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ui:chrome_pages",
-    ]
-  }
-
   if (enable_extensions_core) {
     sources += [
       "extension_icon_loader.cc",
@@ -234,10 +208,6 @@ source_set("impl") {
       "//chrome/browser/ui/extensions",
       "//chrome/browser/ui/supervised_user",
     ]
-
-    if (is_chromeos) {
-      sources += [ "chromeos/parent_access_extension_approvals_manager.cc" ]
-    }
   }
 }
 
@@ -287,19 +257,6 @@ source_set("unit_tests") {
 
   if (is_linux || is_mac || is_win) {
     sources += [ "linux_mac_windows/supervised_user_extensions_metrics_delegate_impl_unittest.cc" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "chromeos/mock_large_icon_service.cc",
-      "chromeos/mock_large_icon_service.h",
-      "chromeos/supervised_user_favicon_request_handler_unittest.cc",
-      "chromeos/supervised_user_web_content_handler_impl_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/ash/login/users:test_support",
-      "//components/favicon_base",
-    ]
   }
 
   if (enable_extensions_core) {
@@ -379,13 +336,6 @@ if (!is_android) {
     ]
     if (enable_extensions) {
       deps += [ "//chrome/browser/ui/views/supervised_user" ]
-    }
-
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ui/webui/ash/parent_access",
-        "//chrome/browser/ui/webui/ash/parent_access:test_support",
-      ]
     }
 
     if (is_win || is_mac || is_linux) {

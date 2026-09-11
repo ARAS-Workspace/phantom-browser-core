@@ -26,10 +26,6 @@ source_set("local_discovery") {
     ]
   }
 
-  if (is_chromeos) {
-    public += [ "endpoint_resolver.h" ]
-  }
-
   if (enable_mdns) {
     public += [ "service_discovery_client_mdns.h" ]
     public_deps += [ "//services/network/public/cpp" ]
@@ -57,11 +53,6 @@ source_set("impl") {
     ]
 
     frameworks = [ "Network.framework" ]
-  }
-
-  if (is_chromeos) {
-    sources += [ "endpoint_resolver.cc" ]
-    deps += [ "//chrome/common:non_code_constants" ]
   }
 
   if (enable_mdns) {

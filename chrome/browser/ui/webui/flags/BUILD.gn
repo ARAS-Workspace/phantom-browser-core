@@ -35,16 +35,6 @@ source_set("flags") {
     "//ui/webui/resources",
   ]
   deps += [ "//chrome/browser/infobars" ]
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/login/session",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/settings",
-      "//chromeos/ash/components/settings",
-      "//components/account_id",
-      "//components/user_manager",
-    ]
-  }
 }
 
 source_set("unit_tests") {

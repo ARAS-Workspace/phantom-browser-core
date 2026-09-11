@@ -4,7 +4,7 @@
 
 import("//printing/buildflags/buildflags.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos)
+assert(is_win || is_mac || is_linux)
 
 source_set("apps") {
   sources = [
@@ -61,9 +61,6 @@ source_set("impl") {
     "//ui/base",
   ]
 
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/chromeos/policy/dlp" ]
-  }
   if (enable_printing) {
     deps += [ "//chrome/browser/printing" ]
   }

@@ -132,13 +132,6 @@ source_set("impl") {
     "//ui/views",
   ]
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/boca/on_task",
-      "//chromeos/ash/experiences/system_web_apps/types",
-    ]
-  }
-
   public_deps = [
     ":common",
     "//chrome/browser:browser_public_dependencies",

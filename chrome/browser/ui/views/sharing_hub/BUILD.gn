@@ -21,13 +21,11 @@ source_set("sharing_hub") {
     "//ui/views",
   ]
 
-  if (!is_chromeos) {
-    public += [
-      "sharing_hub_bubble_action_button.h",
-      "sharing_hub_bubble_view_impl.h",
-    ]
-    public_deps += [ "//chrome/browser/ui/sharing_hub" ]
-  }
+  public += [
+    "sharing_hub_bubble_action_button.h",
+    "sharing_hub_bubble_view_impl.h",
+  ]
+  public_deps += [ "//chrome/browser/ui/sharing_hub" ]
 }
 
 source_set("impl") {
@@ -47,17 +45,15 @@ source_set("impl") {
     "//components/url_formatter",
     "//ui/strings:ui_strings",
   ]
-  if (!is_chromeos) {
-    sources += [
-      "sharing_hub_bubble_action_button.cc",
-      "sharing_hub_bubble_view_impl.cc",
-    ]
-    deps += [
-      "//chrome/browser/image_editor",
-      "//chrome/browser/image_editor:image_editor_component_util",
-      "//chrome/browser/ui/qrcode_generator",
-    ]
-  }
+  sources += [
+    "sharing_hub_bubble_action_button.cc",
+    "sharing_hub_bubble_view_impl.cc",
+  ]
+  deps += [
+    "//chrome/browser/image_editor",
+    "//chrome/browser/image_editor:image_editor_component_util",
+    "//chrome/browser/ui/qrcode_generator",
+  ]
 }
 
 if (is_win || is_mac || is_linux) {

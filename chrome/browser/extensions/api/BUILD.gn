@@ -90,24 +90,6 @@ group("api_implementations") {
       public_deps +=
           [ "//chrome/browser/extensions/api/web_authentication_proxy" ]
     }
-
-    if (is_chromeos) {
-      public_deps += [
-        "//chrome/browser/chromeos/extensions/smart_card_provider_private",
-        "//chrome/browser/extensions/api/crash_report_private",
-        "//chrome/browser/extensions/api/document_scan",
-        "//chrome/browser/extensions/api/enterprise_device_attributes",
-        "//chrome/browser/extensions/api/enterprise_kiosk_input",
-        "//chrome/browser/extensions/api/enterprise_login",
-        "//chrome/browser/extensions/api/enterprise_networking_attributes",
-        "//chrome/browser/extensions/api/enterprise_platform_keys",
-        "//chrome/browser/extensions/api/enterprise_platform_keys_private",
-        "//chrome/browser/extensions/api/input_ime",
-        "//chrome/browser/extensions/api/platform_keys",
-        "//chrome/browser/extensions/api/quick_unlock_private",
-        "//chrome/browser/extensions/api/terminal",
-      ]
-    }
   }  # if (enable_extensions)
 
   if (!is_android) {
@@ -176,32 +158,7 @@ function_registration("api_registration") {
 
   inputs = [
     "//chrome/browser/accessibility/accessibility_extension_api_ash.h",
-    "//chrome/browser/chromeos/extensions/accessibility_service_private/accessibility_service_private.h",
-    "//chrome/browser/chromeos/extensions/echo_private/echo_private_api.h",
-    "//chrome/browser/chromeos/extensions/file_system_provider/file_system_provider_api.h",
-    "//chrome/browser/chromeos/extensions/info_private/info_private_api.h",
-    "//chrome/browser/chromeos/extensions/login_screen/login/login_api.h",
-    "//chrome/browser/chromeos/extensions/login_screen/login_screen_storage/login_screen_storage_api.h",
-    "//chrome/browser/chromeos/extensions/login_screen/login_state/login_state_api.h",
-    "//chrome/browser/chromeos/extensions/odfs_config_private/odfs_config_private_api.h",
-    "//chrome/browser/chromeos/extensions/printing_metrics/printing_metrics_api.h",
-    "//chrome/browser/chromeos/extensions/smart_card_provider_private/smart_card_provider_private_api.h",
-    "//chrome/browser/chromeos/extensions/system_log/system_log_api.h",
-    "//chrome/browser/chromeos/extensions/vpn_provider/vpn_provider_api.h",
-    "//chrome/browser/chromeos/extensions/wallpaper/wallpaper_api.h",
-    "//chrome/browser/chromeos/extensions/wm/wm_desks_private_api.h",
-    "//chrome/browser/ash/extensions/autotest_private/autotest_private_api.h",
-    "//chrome/browser/ash/extensions/file_manager/file_manager_private_api_functions.h",
-    "//chrome/browser/ash/extensions/file_manager/image_loader_private_api.h",
-    "//chrome/browser/ash/extensions/input_method_api.h",
-    "//chrome/browser/ash/extensions/login_screen_ui/login_screen_ui_api.h",
-    "//chrome/browser/ash/extensions/media_player_api.h",
-    "//chrome/browser/ash/extensions/speech/speech_recognition_private_api.h",
-    "//chrome/browser/ash/extensions/users_private/users_private_api.h",
-    "//chrome/browser/extensions/api/enterprise_login/enterprise_login_api.h",
     "certificate_provider/certificate_provider_api.h",
-    "enterprise_platform_keys/enterprise_platform_keys_api.h",
-    "platform_keys/platform_keys_api.h",
     "commands/commands.h",
     "developer_private/developer_private_functions.h",
     "experimental_actor/experimental_actor_api.h",
@@ -210,7 +167,6 @@ function_registration("api_registration") {
     "glic_private/glic_private_api.h",
     "module/module.h",
     "tabs/tabs_api.h",
-    "terminal/terminal_private_api.h",
     "web_view/chrome_web_view_internal_api.h",
   ]
 
@@ -242,22 +198,6 @@ function_registration("api_registration") {
     "//third_party/metrics_proto",
     "//ui/accessibility:ax_enums_mojo",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/extensions/autotest_private",
-      "//chrome/browser/ash/extensions/file_manager",
-
-      # TODO: We should pull these out into a separate build and function
-      # generation step so that //chrome/browser/extensions has fewer
-      # dependencies on //chrome/browser/chromeos.
-      "//chrome/browser/chromeos/extensions/accessibility_service_private",
-      "//chrome/browser/chromeos/extensions/info_private",
-      "//chrome/browser/chromeos/extensions/login_screen/login_screen_storage",
-      "//chrome/browser/chromeos/extensions/system_log",
-      "//chrome/browser/chromeos/extensions/wallpaper",
-    ]
-  }
 }
 
 # KeyedService factories initialization.
@@ -277,11 +217,4 @@ source_set("keyed_service_factories") {
     "//pdf:buildflags",
     "//printing/buildflags",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/chromeos/extensions/login_screen/login_state",
-      "//chrome/browser/chromeos/extensions/wm",
-    ]
-  }
 }

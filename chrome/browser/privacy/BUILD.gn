@@ -104,7 +104,7 @@ if (is_android) {
   }
 }
 
-if (is_win || is_linux || is_android || is_chromeos) {
+if (is_win || is_linux || is_android) {
   import("//components/policy/tools/generate_policy_source.gni")
   import("//third_party/protobuf/proto_library.gni")
 

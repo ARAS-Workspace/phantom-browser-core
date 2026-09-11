@@ -11,7 +11,7 @@ import("//build/config/chrome_build.gni")
 declare_args() {
   # Whether the browser provides a speech recognition service
   # (//media/mojo/mojom/speech_recognition_service.mojom) to the renderer.
-  enable_speech_service = is_chromeos || is_linux || is_mac || is_win
+  enable_speech_service = is_linux || is_mac || is_win
 }
 
 declare_args() {
@@ -23,11 +23,11 @@ declare_args() {
   #   implementation); or
   # * not implemented, and corresponding features don't exist as part of Chrome
   #   (e.g. Android, where Live Caption is instead a system feature).
-  enable_browser_speech_service = enable_speech_service && !is_chromeos
+  enable_browser_speech_service = enable_speech_service
 
   # Whether the server based speech recognition recognizer is available.
   # Currently only available in official builds for ChromeOS.
-  enable_server_based_recognition = is_chromeos && is_chrome_branded
+  enable_server_based_recognition = false
 }
 
 assert(enable_speech_service || !enable_browser_speech_service)

@@ -49,20 +49,5 @@ if (enterprise_cloud_content_analysis) {
       "//components/signin/public/identity_manager:test_support",
       "//extensions/browser:test_support",
     ]
-
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/login/users",
-        "//chrome/browser/ash/login/users:test_support",
-        "//chrome/browser/ash/net",
-        "//chrome/browser/ash/profiles",
-        "//chrome/browser/ash/settings:test_support",
-        "//chromeos/ash/components/install_attributes:test_support",
-        "//chromeos/ash/components/settings",
-        "//chromeos/components/mgs",
-        "//chromeos/constants",
-        "//components/user_manager:test_support",
-      ]
-    }
   }
 }

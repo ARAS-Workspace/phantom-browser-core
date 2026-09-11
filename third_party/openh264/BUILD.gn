@@ -11,15 +11,6 @@ config("config") {
   cflags = []
   defines = []
 
-  if (is_chromeos && current_cpu == "arm") {
-    # HAVE_NEON and __chromeos__ are needed for enabling NEON on ChromeOS
-    # devices.
-    defines += [
-      "HAVE_NEON",
-      "__chromeos__",
-    ]
-  }
-
   # GCC and clang flags. MSVS (is_win && !is_clang) does not use cflags.
   if (!is_win || is_clang) {
     cflags += [
@@ -41,7 +32,7 @@ config("config") {
 
 # MSAN builds are flaky with assembler. crbug.com/685168
 
-use_assembler = (is_win || is_mac || is_linux || is_chromeos) &&
+use_assembler = (is_win || is_mac || is_linux) &&
                 (current_cpu == "x86" || current_cpu == "x64") && !is_msan
 
 # This IF statement will make the targets visible only on specific builds,
@@ -51,7 +42,7 @@ if (use_assembler) {
   if (!is_component_build) {
     if (is_apple) {
       asm_defines += [ "WELS_PRIVATE_EXTERN=private_extern" ]
-    } else if (is_linux || is_chromeos || is_android || is_fuchsia) {
+    } else if (is_linux || is_android || is_fuchsia) {
       asm_defines += [ "WELS_PRIVATE_EXTERN=hidden" ]
     }
   }
@@ -75,7 +66,7 @@ if (use_assembler) {
         ]
       } else if (is_win) {
         defines += [ "WIN64" ]
-      } else if (is_linux || is_chromeos) {
+      } else if (is_linux) {
         defines += [ "UNIX64" ]
       }
     }
@@ -101,7 +92,7 @@ if (use_assembler) {
         ]
       } else if (is_win) {
         defines += [ "WIN64" ]
-      } else if (is_linux || is_chromeos) {
+      } else if (is_linux) {
         defines += [ "UNIX64" ]
       }
     }
@@ -127,7 +118,7 @@ if (use_assembler) {
         ]
       } else if (is_win) {
         defines += [ "WIN64" ]
-      } else if (is_linux || is_chromeos) {
+      } else if (is_linux) {
         defines += [ "UNIX64" ]
       }
     }
@@ -136,9 +127,6 @@ if (use_assembler) {
 
 source_set("common") {
   sources = openh264_common_sources
-  if (is_chromeos && current_cpu == "arm") {
-    sources += openh264_common_sources_asm_arm
-  }
   include_dirs = openh264_common_include_dirs
 
   configs -= [ "//build/config/compiler:chromium_code" ]
@@ -162,9 +150,6 @@ source_set("common") {
 
 source_set("processing") {
   sources = openh264_processing_sources
-  if (is_chromeos && current_cpu == "arm") {
-    sources += openh264_processing_sources_asm_arm
-  }
   include_dirs = openh264_processing_include_dirs
 
   configs -= [ "//build/config/compiler:chromium_code" ]
@@ -179,9 +164,6 @@ source_set("processing") {
 
 source_set("encoder") {
   sources = openh264_encoder_sources
-  if (is_chromeos && current_cpu == "arm") {
-    sources += openh264_encoder_sources_asm_arm
-  }
   include_dirs = openh264_encoder_include_dirs
 
   configs -= [ "//build/config/compiler:chromium_code" ]

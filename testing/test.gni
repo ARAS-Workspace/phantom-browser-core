@@ -39,10 +39,6 @@ if (is_android) {
   import("//build/config/android/create_unwind_table.gni")
   import("//build/config/android/rules.gni")
   import("//build/config/sanitizers/sanitizers.gni")
-} else if (is_chromeos && is_chromeos_device) {
-  import("//build/config/chromeos/rules.gni")
-  import("//build/config/sanitizers/sanitizers.gni")
-  import("//build/util/generate_wrapper.gni")
 } else if (is_ios) {
   import("//build/config/ios/ios_sdk.gni")
   import("//build/config/ios/ios_test_runner_wrapper.gni")
@@ -829,62 +825,6 @@ template("test") {
         deps = []
       }
     }
-  } else if (is_chromeos && cros_board != "") {
-    assert(!defined(invoker.use_xvfb) || !invoker.use_xvfb)
-
-    # Building for a cros board (ie: not linux-chromeos).
-
-    _gen_runner_target = "${target_name}__runner"
-    _runtime_deps_file =
-        "$root_out_dir/gen.runtime/" + get_label_info(target_name, "dir") +
-        "/" + get_label_info(target_name, "name") + ".runtime_deps"
-
-    if (is_skylab && (defined(tast_attr_expr) || defined(tast_tests) ||
-                      defined(tast_disabled_tests))) {
-      generate_skylab_tast_filter(_gen_runner_target) {
-      }
-    } else {
-      generate_runner_script(_gen_runner_target) {
-        generated_script = "$root_build_dir/bin/run_" + invoker.target_name
-        test_exe = invoker.target_name
-        runtime_deps_file = _runtime_deps_file
-
-        if (tests_have_location_tags) {
-          data = [ "//testing/location_tags.json" ]
-        }
-        if (use_rts) {
-          data_deps = [ ":${invoker.target_name}__rts_filters" ]
-        }
-      }
-    }
-
-    mixed_test(target_name) {
-      target_type = "executable"
-      forward_variables_from(invoker, "*", TESTONLY_AND_VISIBILITY)
-      forward_variables_from(invoker, [ "visibility" ])
-      if (!defined(deps)) {
-        deps = []
-      }
-      if (!defined(data)) {
-        data = []
-      }
-
-      # We use a special trigger script for CrOS hardware tests.
-      data += [ "//testing/trigger_scripts/chromeos_device_trigger.py" ]
-
-      write_runtime_deps = _runtime_deps_file
-      data += [ _runtime_deps_file ]
-      deps += [ ":$_gen_runner_target" ]
-
-      if (!defined(data_deps)) {
-        data_deps = []
-      }
-
-      data_deps += [ "//testing:test_scripts_shared" ]
-      if (use_rts) {
-        data_deps += [ ":${invoker.target_name}__rts_filters" ]
-      }
-    }
   } else {
     if (is_mac || is_win) {
       assert(!defined(invoker.use_xvfb) || !invoker.use_xvfb)
@@ -894,7 +834,7 @@ template("test") {
     _executable = target_name
     _gen_runner_target = "${target_name}__runner"
 
-    if ((is_linux || is_chromeos) && defined(invoker.use_xvfb)) {
+    if (is_linux && defined(invoker.use_xvfb)) {
       _use_xvfb = invoker.use_xvfb
     } else {
       _use_xvfb = false
@@ -988,17 +928,9 @@ template("test") {
 #   args: Args to the test script.
 #   enable_android_wrapper: (optional) If true, the test will get wrapped in the
 #       logdog_wrapper on Android, which will stream logcats from the device.
-#   enable_cros_wrapper: (optional) If true, the test will get wrapped by the
-#       cros_test_wrapper on ChromeOS, which will prep the device for testing.
 template("script_test") {
   _enable_logdog_wrapper = defined(invoker.enable_android_wrapper) &&
                            invoker.enable_android_wrapper && is_android
-  _enable_cros_wrapper =
-      defined(invoker.enable_cros_wrapper) && invoker.enable_cros_wrapper &&
-      is_chromeos && is_chromeos_device
-  assert(!(_enable_logdog_wrapper && _enable_cros_wrapper),
-         "The logdog and cros_test wrappers are mutually exclusive")
-
   if (use_rts) {
     action("${target_name}__rts_filters") {
       script = "//build/add_rts_filters.py"
@@ -1029,24 +961,6 @@ template("script_test") {
   if (_enable_logdog_wrapper) {
     logdog_wrapper_script_test(target_name) {
       testonly = true
-      args = [ _wrapped_script ]
-      if (defined(invoker.args)) {
-        args += invoker.args
-      }
-      data = _shared_data
-      data_deps = _shared_data_deps
-
-      forward_variables_from(invoker,
-                             "*",
-                             TESTONLY_AND_VISIBILITY + [
-                                   "args",
-                                   "data",
-                                   "data_deps",
-                                   "script",
-                                 ])
-    }
-  } else if (_enable_cros_wrapper) {
-    cros_test_wrapper_script_test(target_name) {
       args = [ _wrapped_script ]
       if (defined(invoker.args)) {
         args += invoker.args

@@ -29,12 +29,6 @@ mojom("gl") {
     "//ui/gl/mojom",
     "//url/mojom:url_mojom_gurl",
   ]
-  if (is_chromeos) {
-    public_deps += [
-      "//chromeos/ash/experiences/arc/mojom:media",
-      "//components/chromeos_camera/common",
-    ]
-  }
 
   if (is_win) {
     sources += [ "info_collection_gpu_service.mojom" ]
@@ -44,10 +38,6 @@ mojom("gl") {
   enabled_features = []
   if (use_clang_profiling_inside_sandbox) {
     enabled_features += [ "use_clang_profiling_inside_sandbox" ]
-  }
-
-  if (is_chromeos && use_linux_video_acceleration) {
-    enabled_features += [ "enable_arc_media" ]
   }
 
   if (enable_vrp_flags) {

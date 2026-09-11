@@ -474,7 +474,7 @@ source_set("headless_browser") {
     deps += [ "//components/os_crypt/async/browser:dpapi_key_provider" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     data_deps += [ "//components/crash/core/app:chrome_crashpad_handler" ]
   }
 

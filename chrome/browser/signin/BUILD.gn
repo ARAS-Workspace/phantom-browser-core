@@ -104,22 +104,15 @@ source_set("signin") {
     public_deps += [ ":signin_promo" ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     public += [ "force_signin_verifier.h" ]
   }
 
-  if (is_chromeos) {
-    public += [
-      "signin_ui_chromeos_util.h",
-      "wait_for_network_callback_helper_ash.h",
-    ]
-  } else {
-    public += [
-      "chrome_signin_and_sync_status_metrics_provider.h",
-      "signin_ui_util_extensions.h",
-      "wait_for_network_callback_helper_chrome.h",
-    ]
-  }
+  public += [
+    "chrome_signin_and_sync_status_metrics_provider.h",
+    "signin_ui_util_extensions.h",
+    "wait_for_network_callback_helper_chrome.h",
+  ]
 
   if (is_linux || is_win || is_mac) {
     public += [
@@ -298,7 +291,7 @@ source_set("impl") {
     }
   }
 
-  if (enable_dice_support || is_chromeos) {
+  if (enable_dice_support) {
   }
 
   if (is_android) {
@@ -346,7 +339,7 @@ source_set("impl") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "force_signin_verifier.cc",
       "signin_ui_delegate.cc",
@@ -354,27 +347,11 @@ source_set("impl") {
     deps += [ "//chrome/browser/ui/webui/signin:signin_impl" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "signin_ui_chromeos_util.cc",
-      "wait_for_network_callback_helper_ash.cc",
-    ]
-    deps += [
-      "//chrome/browser/ash/account_manager",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ui/ash/account_manager",
-      "//chromeos/ash/components/account_manager",
-      "//chromeos/ash/components/install_attributes",
-      "//chromeos/ash/components/network",
-    ]
-  } else {
-    sources += [
-      "chrome_signin_and_sync_status_metrics_provider.cc",
-      "signin_ui_util_extensions.cc",
-      "wait_for_network_callback_helper_chrome.cc",
-    ]
-  }
+  sources += [
+    "chrome_signin_and_sync_status_metrics_provider.cc",
+    "signin_ui_util_extensions.cc",
+    "wait_for_network_callback_helper_chrome.cc",
+  ]
 
   if (is_linux || is_win || is_mac) {
     sources += [
@@ -602,9 +579,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_chromeos) {
-    sources += [ "wait_for_network_callback_helper_chrome_unittest.cc" ]
-  }
+  sources += [ "wait_for_network_callback_helper_chrome_unittest.cc" ]
 
   if (is_android) {
     sources += [
@@ -636,7 +611,7 @@ source_set("unit_tests") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "chrome_signin_and_sync_status_metrics_provider_unittest.cc",
       "force_signin_verifier_unittest.cc",
@@ -857,33 +832,13 @@ if (!is_android) {
       ]
     }
 
-    if (is_chromeos) {
-      sources += [
-        "chromeos_mirror_account_consistency_browsertest.cc",
-        "signin_ui_util_chromeos_browsertest.cc",
-      ]
-      deps += [
-        "//chrome/browser/ash/login:test_support",
-        "//chrome/browser/prefs",
-        "//chrome/browser/ui/ash/account_manager:test_support",
-        "//chromeos/ash/components/account_manager",
-        "//components/account_id",
-        "//components/account_manager_core",
-        "//components/account_manager_core:test_support",
-        "//components/policy/core/common:common_constants",
-        "//components/signin/core/browser",
-        "//components/supervised_user/core/browser",
-        "//components/user_manager",
-      ]
-    }
-
     # bound_session_cookie_refresh_service_impl_browsertest.cc:198 has a
     # file-scope static with a non-trivial destructor.
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
   }
 }
 
-if (!is_android && !is_chromeos_device) {
+if (!is_android) {
   source_set("interactive_ui_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
@@ -905,23 +860,6 @@ if (!is_android && !is_chromeos_device) {
         "//components/signin/public/identity_manager",
         "//components/signin/public/identity_manager:test_support",
         "//components/sync/base",
-        "//content/test:test_support",
-      ]
-    }
-
-    if (is_chromeos) {
-      sources += [ "mirror_interactive_uitest.cc" ]
-      deps += [
-        ":signin",
-        "//chrome/browser/ash/system_web_apps",
-        "//chrome/browser/ui",
-        "//chrome/browser/ui/ash/account_manager:test_support",
-        "//chrome/browser/ui/ash/system_web_apps",
-        "//chrome/browser/ui/tabs:tab_strip",
-        "//chrome/test:test_support",
-        "//chrome/test:test_support_ui",
-        "//components/account_manager_core",
-        "//components/account_manager_core:test_support",
         "//content/test:test_support",
       ]
     }

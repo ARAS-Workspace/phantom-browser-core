@@ -40,7 +40,6 @@ proto_library("policy_common_definitions_compile_proto") {
 proto_library("proto_internal") {
   visibility = [
     ":proto",
-    "//chrome/browser/ash/policy/tools:*",
     "//components/policy/test_support:*",
   ]
 
@@ -49,13 +48,6 @@ proto_library("proto_internal") {
     "policy_signing_key.proto",
     "secure_connect.proto",
   ]
-
-  if (is_chromeos) {
-    sources += [
-      "chrome_device_policy.proto",
-      "install_attributes.proto",
-    ]
-  }
 
   if ((!is_android || enable_extensions_core) && !is_ios) {
     sources += [ "chrome_extension_policy.proto" ]

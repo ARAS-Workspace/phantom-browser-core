@@ -23,10 +23,6 @@ mojom("mojom") {
 
   enabled_features = []
 
-  if (is_chromeos) {
-    sources += [ "pdf_flattener.mojom" ]
-  }
-
   if (is_win) {
     sources += [ "pdf_to_emf_converter.mojom" ]
   }

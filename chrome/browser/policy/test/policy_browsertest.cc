@@ -18,7 +18,6 @@
 // complicated and requires custom policy handler, we recommend to test the
 // handler separately.
 
-#include "ash/constants/ash_pref_names.h"
 #include "base/run_loop.h"
 #include "base/time/time.h"
 #include "base/values.h"

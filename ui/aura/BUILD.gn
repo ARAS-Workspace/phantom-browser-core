@@ -254,14 +254,7 @@ static_library("test_support") {
     sources += [ "test/ui_controls_aurawin.cc" ]
   }
 
-  if (use_ozone && is_chromeos) {
-    sources += [
-      "test/ui_controls_ozone.cc",
-      "test/ui_controls_ozone.h",
-    ]
-  }
-
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [ "//ui/platform_window/common" ]
   }
 

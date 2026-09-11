@@ -178,21 +178,6 @@ source_set("impl") {
     deps += [ "//chrome/browser/spellchecker" ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/crash_upload_list",
-      "//chromeos/ash/components/cryptohome",
-      "//chromeos/ash/components/dbus",
-      "//chromeos/ash/components/dbus/attestation",
-      "//chromeos/ash/components/dbus/attestation:attestation_proto_gen",
-      "//chromeos/ash/components/dbus/constants",
-      "//chromeos/components/mahi/public/cpp",
-      "//components/crash/core/app",
-    ]
-  }
-
   if (is_android) {
     deps += [
       "//chrome:offline_pages_enum_javagen",
@@ -319,10 +304,6 @@ source_set("unit_tests") {
     sources += [ "counters/hosted_apps_counter_unittest.cc" ]
   }
 
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/dbus/attestation" ]
-  }
-
   if (enable_webui_ntp) {
     deps += [ "//chrome/browser/new_tab_page" ]
   }
@@ -429,13 +410,6 @@ if (!is_android) {
       "//testing/gmock",
       "//testing/gtest",
     ]
-
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/net",
-        "//chromeos/ash/components/dbus/system_proxy",
-      ]
-    }
 
     if (!is_android) {
       deps +=

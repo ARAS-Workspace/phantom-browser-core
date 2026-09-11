@@ -48,13 +48,6 @@ if (enable_devtools_frontend) {
     "protocol/web_mcp.cc",
     "protocol/web_mcp.h",
   ]
-
-  if (is_chromeos) {
-    _protocol_generated += [
-      "protocol/window_manager.cc",
-      "protocol/window_manager.h",
-    ]
-  }
 }
 
 _concatenated_protocol_path =
@@ -74,10 +67,6 @@ action("concatenate_protocols") {
   outputs = [ output_file ]
 
   args = [ rebase_path(_blink_protocol_path, root_build_dir) ]
-  if (is_chromeos) {
-    inputs += [ "cros_protocol.pdl" ]
-    args += [ rebase_path("cros_protocol.pdl", root_build_dir) ]
-  }
 
   args += [ rebase_path(output_file, root_build_dir) ]
 }
@@ -243,7 +232,7 @@ static_library("devtools") {
     }
   }
 
-  if (is_mac || is_win || is_linux || is_chromeos) {
+  if (is_mac || is_win || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   if (is_android) {
@@ -315,14 +304,8 @@ static_library("devtools") {
       "//ui/views",
       "//ui/views/controls/webview",
     ]
-    if (is_mac || is_win || is_linux || is_chromeos) {
+    if (is_mac || is_win || is_linux) {
       deps += [ "//components/webapps/isolated_web_apps:scheme" ]
-    }
-    if (is_chromeos) {
-      deps += [
-        "//ash/constants",
-        "//chromeos/constants",
-      ]
     }
     sources += [
       "chrome_devtools_manager_delegate.cc",
@@ -456,16 +439,6 @@ static_library("devtools") {
       "protocol/webmcp_handler.cc",
       "protocol/webmcp_handler.h",
     ]
-    if (is_chromeos) {
-      deps += [
-        "//ash",
-        "//chromeos/dbus/constants",
-      ]
-      sources += [
-        "protocol/window_manager_handler.cc",
-        "protocol/window_manager_handler.h",
-      ]
-    }
     if (enable_printing) {
       deps += [
         "//chrome/browser/printing",
@@ -714,7 +687,7 @@ if (!is_android) {
       "//testing/gtest",
     ]
 
-    if (enable_pdf && enable_printing && !is_chromeos) {
+    if (enable_pdf && enable_printing) {
       sources += [ "protocol/devtools_printtopdf_browsertest.cc" ]
       deps += [
         "//components/headless/test",
@@ -722,33 +695,27 @@ if (!is_android) {
         "//pdf",
       ]
     }
-
-    if (enable_pdf && enable_smart_card) {
-      sources += [ "protocol/smart_card_emulation_handler_browsertest.cc" ]
-    }
   }
 
-  if (!is_chromeos_device) {
-    source_set("interactive_ui_tests") {
-      testonly = true
+  source_set("interactive_ui_tests") {
+    testonly = true
 
-      defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-      sources = [
-        "devtools_connection_dialog_browsertest.cc",
-        "devtools_interactive_uitest.cc",
-      ]
+    sources = [
+      "devtools_connection_dialog_browsertest.cc",
+      "devtools_interactive_uitest.cc",
+    ]
 
-      deps = [
-        ":devtools",
-        ":test_support",
-        "//base",
-        "//chrome/browser/web_applications:web_applications_test_support",
-        "//chrome/test:test_support",
-        "//chrome/test:test_support_ui",
-        "//content/test:test_support",
-        "//testing/gtest",
-      ]
-    }
+    deps = [
+      ":devtools",
+      ":test_support",
+      "//base",
+      "//chrome/browser/web_applications:web_applications_test_support",
+      "//chrome/test:test_support",
+      "//chrome/test:test_support_ui",
+      "//content/test:test_support",
+      "//testing/gtest",
+    ]
   }
 }

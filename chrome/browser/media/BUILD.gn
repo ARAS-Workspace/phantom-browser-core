@@ -115,17 +115,6 @@ source_set("unittests") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [ "platform_verification_chromeos_unittest.cc" ]
-    deps += [
-      ":impl",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//components/content_settings/core/browser",
-      "//components/permissions:test_support",
-      "//content/test:test_support",
-    ]
-  }
-
   if (enable_extensions) {
     sources += [ "cast_mirroring_service_host_unittest.cc" ]
     deps += [ ":impl" ]
@@ -143,7 +132,7 @@ source_set("unittests") {
     ]
   }
 
-  if (is_android || is_chromeos || is_win) {
+  if (is_android || is_win) {
     sources += [ "protected_media_identifier_permission_context_unittest.cc" ]
     deps += [
       ":impl",
@@ -154,12 +143,6 @@ source_set("unittests") {
       "//components/prefs:test_support",
       "//media",
     ]
-    if (is_chromeos) {
-      deps += [
-        "//ash/constants",
-        "//chromeos/dbus/constants",
-      ]
-    }
   }
 }
 
@@ -203,7 +186,7 @@ source_set("browser_tests") {
 
     # TODO(crbug.com/40553979): encrypted_media_browsertest is flaky on the
     # Linux Asan Lsan bot.
-    if (!((is_linux || is_chromeos) && is_asan && is_lsan)) {
+    if (!(is_linux && is_asan && is_lsan)) {
       sources += [ "encrypted_media_browsertest.cc" ]
     }
     deps += [
@@ -268,14 +251,6 @@ source_set("media") {
     "//url",
   ]
 
-  if (is_chromeos) {
-    public += [
-      "chromeos_login_and_lock_media_access_handler.h",
-      "platform_verification_chromeos.h",
-    ]
-    public_deps += [ "//ash" ]
-  }
-
   if (!is_android) {
     public += [
       "audio_ducker.h",
@@ -309,7 +284,7 @@ source_set("media") {
     ]
   }
 
-  if (is_android || is_chromeos || is_win) {
+  if (is_android || is_win) {
     public += [ "protected_media_identifier_permission_context.h" ]
     public_deps += [ "//components/permissions" ]
   }
@@ -357,10 +332,6 @@ source_set("media") {
   if (enable_library_cdms || is_win) {
     public += [ "cdm_document_service_impl.h" ]
     public_deps += [ "//media/mojo/mojom" ]
-
-    if (is_chromeos) {
-      public_deps += [ "//chrome/browser/ash/attestation" ]
-    }
   }
 }
 
@@ -408,20 +379,6 @@ source_set("impl") {
     "//third_party/blink/public/common",
   ]
 
-  if (is_chromeos) {
-    sources += [
-      "chromeos_login_and_lock_media_access_handler.cc",
-      "platform_verification_chromeos.cc",
-    ]
-    deps += [
-      "//chrome/browser/ui/ash/login",
-      "//chrome/browser/ui/webui/ash/lock_screen_reauth",
-      "//chromeos/ash/components/settings",
-      "//chromeos/dbus/constants",
-      "//components/guest_view/browser",
-    ]
-  }
-
   if (!is_android) {
     sources += [
       "audio_ducker.cc",
@@ -458,7 +415,7 @@ source_set("impl") {
     ]
   }
 
-  if (is_android || is_chromeos || is_win) {
+  if (is_android || is_win) {
     sources += [ "protected_media_identifier_permission_context.cc" ]
   }
 

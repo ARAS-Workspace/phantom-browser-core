@@ -105,28 +105,26 @@ source_set("browser_tests") {
   ]
 }
 
-if (!is_chromeos_device) {
-  source_set("interactive_ui_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+source_set("interactive_ui_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "LHS_indicators_interactive_uitest.cc",
-      "dashboard_kombucha_interactive_uitest.cc",
-      "permission_chip_interactive_uitest.cc",
-      "permission_chip_kombucha_interactive_uitest.cc",
-    ]
+  sources = [
+    "LHS_indicators_interactive_uitest.cc",
+    "dashboard_kombucha_interactive_uitest.cc",
+    "permission_chip_interactive_uitest.cc",
+    "permission_chip_kombucha_interactive_uitest.cc",
+  ]
 
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-    deps = [
-      ":chip",
-      "//chrome/browser/permissions",
-      "//chrome/browser/ui/views/page_info",
-      "//chrome/browser/ui/views/permissions",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//ui/events:test_support",
-    ]
-  }
+  deps = [
+    ":chip",
+    "//chrome/browser/permissions",
+    "//chrome/browser/ui/views/page_info",
+    "//chrome/browser/ui/views/permissions",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//ui/events:test_support",
+  ]
 }

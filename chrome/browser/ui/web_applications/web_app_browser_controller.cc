@@ -6,7 +6,6 @@
 
 #include <algorithm>
 
-#include "ash/constants/web_app_id_constants.h"
 #include "base/callback_list.h"
 #include "base/check_is_test.h"
 #include "base/containers/flat_set.h"
@@ -22,7 +21,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/apps/app_service/app_service_proxy.h"
 #include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/ash/browser_delegate/browser_controller.h"
 #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
 #include "chrome/browser/profiles/profile.h"
@@ -45,6 +43,7 @@
 #include "chrome/browser/web_applications/web_app_filter.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
 #include "chrome/browser/web_applications/web_app_icon_manager.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
@@ -308,13 +307,13 @@ bool WebAppBrowserController::HasProfileMenuButton() const {
 #if BUILDFLAG(IS_MAC)
   return true;
 #else
-  return app_id() == ash::kPasswordManagerAppId;
+  return app_id() == web_app::kPasswordManagerAppId;
 #endif
 }
 
 bool WebAppBrowserController::IsProfileMenuButtonVisible() const {
   CHECK(HasProfileMenuButton());
-  if (app_id() == ash::kPasswordManagerAppId) {
+  if (app_id() == web_app::kPasswordManagerAppId) {
     return true;
   }
 #if BUILDFLAG(IS_MAC)

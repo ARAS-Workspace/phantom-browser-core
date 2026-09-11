@@ -193,9 +193,7 @@ component("mixers") {
 
   public_deps = [ "//base" ]
 
-  if (is_chromeos) {
-    sources += [ "chromeos/native_color_mixers_chromeos.cc" ]
-  } else if (is_mac) {
+  if (is_mac) {
     sources += [
       "mac/css_system_color_mixer_mac.mm",
       "mac/native_color_mixers_mac.mm",

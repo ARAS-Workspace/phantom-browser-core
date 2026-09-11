@@ -243,7 +243,7 @@ static_library("browser") {
     deps += [ "//components/webauthn/core/browser:passkey_model" ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [
       "password_manager_blocklist_policy.cc",
       "password_manager_blocklist_policy.h",
@@ -263,7 +263,7 @@ static_library("browser") {
     deps += [ "//content/public/browser" ]
   }
 
-  if (!is_chromeos && !is_android) {
+  if (!is_android) {
     sources += [
       "password_reuse_manager_signin_notifier_impl.cc",
       "password_reuse_manager_signin_notifier_impl.h",
@@ -569,11 +569,11 @@ source_set("unit_tests") {
     sources += [ "http_credentials_cleaner_unittest.cc" ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [ "hash_password_manager_unittest.cc" ]
   }
 
-  if (!is_chromeos && !is_android) {
+  if (!is_android) {
     sources += [ "password_reuse_manager_signin_notifier_impl_unittest.cc" ]
   }
 

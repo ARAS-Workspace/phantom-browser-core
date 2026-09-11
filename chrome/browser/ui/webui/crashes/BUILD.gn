@@ -25,8 +25,4 @@ source_set("crashes") {
     "//ui/base",
     "//ui/webui",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/dbus/debug_daemon" ]
-  }
 }

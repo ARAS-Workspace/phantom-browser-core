@@ -12,10 +12,6 @@ if (is_android) {
   import("//third_party/jni_zero/jni_zero.gni")
 }
 
-if (is_chromeos) {
-  import("//third_party/protobuf/proto_library.gni")
-}
-
 # Dependency for histogram manager users: cronet and ios/webview
 source_set("library_support") {
   public = [
@@ -143,15 +139,6 @@ if (!is_cronet_build || is_ios) {
     ]
 
     defines = [ "IS_METRICS_IMPL" ]
-  }
-
-  if (is_chromeos) {
-    proto_library("system_stack_sampled_metrics_status_proto") {
-      sources = [ "//third_party/cros_system_api/proto/stack_sampled_metrics_status/stack_sampled_metrics_status.proto" ]
-
-      proto_out_dir =
-          "third_party/cros_system_api/proto/stack_sampled_metrics_status"
-    }
   }
 
   source_set("metrics") {
@@ -343,15 +330,6 @@ if (!is_cronet_build || is_ios) {
 
     if (is_ios) {
       sources += [ "clean_exit_beacon_ios.mm" ]
-    }
-
-    if (is_chromeos) {
-      sources += [
-        "call_stacks/stack_sampling_recorder.cc",
-        "call_stacks/stack_sampling_recorder.h",
-      ]
-
-      deps += [ ":system_stack_sampled_metrics_status_proto" ]
     }
 
     if (is_win) {
@@ -597,7 +575,7 @@ if (!is_cronet_build) {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     static_library("serialization") {
       sources = [
         "serialization/metric_sample.cc",
@@ -707,19 +685,9 @@ if (!is_cronet_build) {
       sources += [ "machine_id_provider_nonwin_unittest.cc" ]
     }
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       sources += [ "serialization/serialization_utils_unittest.cc" ]
       deps += [ ":serialization" ]
-    }
-
-    if (is_chromeos) {
-      sources += [ "call_stacks/stack_sampling_recorder_unittest.cc" ]
-
-      deps += [
-        ":system_stack_sampled_metrics_status_proto",
-        "//chromeos/ash/components/dbus:test_support",
-        "//chromeos/ash/components/network:test_support",
-      ]
     }
 
     if (is_android) {

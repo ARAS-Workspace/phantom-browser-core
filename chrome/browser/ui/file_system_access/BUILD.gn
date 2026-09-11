@@ -4,7 +4,7 @@
 
 import("//components/safe_browsing/buildflags.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 source_set("file_system_access") {
   sources = [

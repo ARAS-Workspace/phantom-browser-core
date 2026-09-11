@@ -38,16 +38,6 @@ source_set("unit_tests") {
       "real_time_report_generator_unittest.cc",
     ]
   }
-
-  if (is_chromeos) {
-    sources += [ "android_app_info_generator_unittest.cc" ]
-    deps += [
-      "//chrome/browser/ash/app_list/arc",
-      "//chrome/browser/ash/app_list/arc:test_support",
-      "//chromeos/ash/components/system",
-      "//chromeos/ash/experiences/arc:arc_test_support",
-    ]
-  }
 }
 
 if (!is_android) {
@@ -70,13 +60,11 @@ if (!is_android) {
       "//testing/gmock",
     ]
 
-    if (!is_chromeos) {
-      sources += [
-        "cloud_profile_reporting_browsertest.cc",
-        "report_scheduler_browsertest.cc",
-      ]
-      deps += [ "//chrome/browser:chrome_browser_main" ]
-    }
+    sources += [
+      "cloud_profile_reporting_browsertest.cc",
+      "report_scheduler_browsertest.cc",
+    ]
+    deps += [ "//chrome/browser:chrome_browser_main" ]
   }
 }
 
@@ -101,11 +89,7 @@ source_set("platform_browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-  if (is_chromeos) {
-    sources = [ "security_reporting_cros_browsertest.cc" ]
-  } else {
-    sources = [ "security_reporting_browsertest.cc" ]
-  }
+  sources = [ "security_reporting_browsertest.cc" ]
 
   deps = [
     "//base",
@@ -118,16 +102,6 @@ source_set("platform_browser_tests") {
     "//content/test:test_support",
     "//testing/gmock",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/policy/core:test_support",
-      "//chromeos/ash/components/network",
-      "//chromeos/ash/components/system",
-      "//components/device_signals/core/common",
-      "//components/policy/proto",
-    ]
-  }
 
   if (is_android) {
     deps += [

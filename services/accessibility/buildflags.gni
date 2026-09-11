@@ -15,6 +15,5 @@ declare_args() {
   # Mac, Fuchsia, and Linux when the buildflag above is enabled.
   # This is exposed with the macro ENABLE_ACCESSIBILITY_SERVICE.
   enable_accessibility_service_internal =
-      enable_accessibility_service &&
-      (is_chromeos || is_linux || is_mac || is_win)
+      enable_accessibility_service && (is_linux || is_mac || is_win)
 }

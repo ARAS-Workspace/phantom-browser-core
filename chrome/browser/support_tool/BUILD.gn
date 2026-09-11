@@ -74,17 +74,6 @@ if (!is_android) {
       "//third_party/zlib/google:zip",
     ]
 
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/system_logs",
-        "//chrome/browser/support_tool/ash",
-        "//chromeos/ash/components/browser_context_helper",
-        "//chromeos/ash/components/system",
-        "//chromeos/components/kiosk",
-        "//components/user_manager",
-      ]
-    }
-
     if (is_linux || is_win || is_mac) {
       sources += [ "updater_data_collector.cc" ]
       deps += [ "//chrome/updater:public_sources" ]
@@ -115,10 +104,6 @@ if (!is_android) {
       "//testing/gmock",
       "//testing/gtest",
     ]
-
-    if (is_chromeos) {
-      deps += [ "//chromeos/ash/components/system" ]
-    }
 
     if (is_linux || is_win || is_mac) {
       sources += [ "updater_data_collector_unittest.cc" ]
@@ -152,17 +137,5 @@ if (!is_android) {
       "//content/test:test_support",
       "//testing/gtest",
     ]
-
-    if (is_chromeos) {
-      sources += [ "signin_data_collector_browsertest.cc" ]
-      deps += [
-        "//chrome/browser/ash/app_mode/test:test_support",
-        "//chrome/browser/ash/login:test_support",
-        "//chrome/browser/ash/login/app_mode/test:test_support",
-        "//chrome/browser/ash/login/test:test_support",
-        "//chromeos/ash/components/cryptohome",
-        "//chromeos/components/kiosk",
-      ]
-    }
   }
 }

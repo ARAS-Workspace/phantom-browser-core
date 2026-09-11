@@ -28,9 +28,9 @@ declare_args() {
   proprietary_codecs = is_chrome_branded || is_chrome_for_testing_branded
 
   # libudev usage. This currently only affects the content layer.
-  use_udev = is_linux || is_chromeos
+  use_udev = is_linux
 
-  use_dbus = is_linux || is_chromeos
+  use_dbus = is_linux
 
   use_gio = is_linux && target_os != "android"
 

@@ -52,7 +52,7 @@ source_set("passwords") {
     deps += [ "//chrome/browser/ui/toasts/api:toasts" ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [
       "password_cross_domain_confirmation_popup_controller_impl.h",
       "password_cross_domain_confirmation_popup_controller_interface.h",
@@ -163,7 +163,7 @@ source_set("impl") {
     ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [ "password_cross_domain_confirmation_popup_controller_impl.cc" ]
   }
 

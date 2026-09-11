@@ -49,10 +49,6 @@ source_set("tab_sharing") {
     "//ui/base",
     "//ui/gfx",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/chromeos/policy/dlp" ]
-  }
 }
 
 source_set("test_support") {
@@ -117,10 +113,6 @@ source_set("browser_tests") {
     "//ui/gfx",
     "//ui/views",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/chromeos/policy/dlp" ]
-  }
 }
 
 source_set("interactive_ui_tests") {

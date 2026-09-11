@@ -4,7 +4,7 @@
 
 import("//ui/webui/webui_features.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 source_set("search") {
   sources = [
@@ -200,9 +200,5 @@ if (!is_android) {
       "//content/test:test_support",
       "//testing/gtest",
     ]
-
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/ash/ownership" ]
-    }
   }
 }

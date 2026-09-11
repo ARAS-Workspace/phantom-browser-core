@@ -107,7 +107,7 @@ source_set("impl_for_embedder") {
       "channel_posix.h",
     ]
 
-    if (is_linux || is_chromeos || is_android) {
+    if (is_linux || is_android) {
       sources += [
         "channel_linux.cc",
         "channel_linux.h",
@@ -138,7 +138,7 @@ source_set("impl_for_embedder") {
     ]
   }
 
-  if (is_android || is_chromeos) {
+  if (is_android) {
     defines += [ "MOJO_CORE_LEGACY_PROTOCOL" ]
   }
 

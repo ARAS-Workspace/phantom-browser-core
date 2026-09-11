@@ -71,14 +71,6 @@ component("views") {
     "//ui/views",
     "//url",
   ]
-
-  if (is_chromeos) {
-    deps += [
-      "//ash",
-      "//chromeos/ash/experiences/arc",
-      "//chromeos/ash/experiences/arc/intent_helper",
-    ]
-  }
 }
 
 source_set("bubble_anchor_util_views") {
@@ -299,7 +291,7 @@ source_set("device_chooser_content_view") {
   ]
 }
 
-if (is_win || is_linux || is_chromeos) {
+if (is_win || is_linux) {
   source_set("bluetooth_dialogs") {
     public = [
       "bluetooth_device_credentials_view.h",
@@ -327,7 +319,7 @@ if (is_win || is_linux || is_chromeos) {
   }
 }
 
-if (is_win || is_mac || is_linux || is_chromeos) {
+if (is_win || is_mac || is_linux) {
   source_set("close_bubble_on_tab_activation_helper") {
     public = [ "close_bubble_on_tab_activation_helper.h" ]
     sources = [ "close_bubble_on_tab_activation_helper.cc" ]
@@ -439,9 +431,6 @@ source_set("message_box_dialog") {
     "//ui/base/mojom",
     "//ui/display",
   ]
-  if (is_chromeos) {
-    deps += [ "//chromeos/ui/base" ]
-  }
   if (is_mac) {
     deps += [ "//chrome/browser/ui/cocoa" ]
   }

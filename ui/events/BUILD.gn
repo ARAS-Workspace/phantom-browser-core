@@ -309,7 +309,7 @@ component("events") {
     frameworks = [ "UIKit.framework" ]
   }
 
-  if (is_linux || is_chromeos || is_win) {
+  if (is_linux || is_win) {
     public += [ "keyboard_event_counter.h" ]
     sources += [ "keyboard_event_counter.cc" ]
   }
@@ -709,7 +709,7 @@ if (use_blink) {
       ]
     }
 
-    if (is_linux || is_chromeos || is_win) {
+    if (is_linux || is_win) {
       sources += [ "keyboard_event_counter_unittest.cc" ]
     }
 

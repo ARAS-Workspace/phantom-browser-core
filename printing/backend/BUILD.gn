@@ -3,17 +3,6 @@
 # found in the LICENSE file.
 
 import("//printing/buildflags/buildflags.gni")
-if (use_cups && is_chromeos) {
-  import("//printing/backend/tools/code_generator.gni")
-
-  ipp_handler_map_path = "$target_gen_dir/backend/ipp_handler_map.cc"
-
-  ipp_code_generate("ipp_handlers_generate") {
-    outputs = [ ipp_handler_map_path ]
-    args = [ "--ipp-handler-map=" +
-             rebase_path(ipp_handler_map_path, root_build_dir) ]
-  }
-}
 
 component("backend") {
   # Avoid producing a very generic "backend.dll" or "libbackend.so".
@@ -45,14 +34,6 @@ component("backend") {
     "//ui/gfx/geometry",
     "//url",
   ]
-
-  if (is_chromeos) {
-    # PRINT_BACKEND_AVAILABLE disables the default dummy implementation
-    # print backend and enables a custom implementation instead.
-    defines += [ "PRINT_BACKEND_AVAILABLE" ]
-
-    sources += [ "print_backend_chromeos.cc" ]
-  }
 
   if (is_win) {
     # PRINT_BACKEND_AVAILABLE disables the default dummy implementation of the
@@ -108,19 +89,6 @@ component("backend") {
         "cups_printer.h",
         "print_backend_cups_ipp.cc",
         "print_backend_cups_ipp.h",
-      ]
-    }
-
-    if (is_chromeos) {
-      deps += [ ":ipp_handlers_generate" ]
-
-      sources += [
-        "cups_connection_pool.cc",
-        "cups_connection_pool.h",
-        "ipp_handler_map.h",
-        "ipp_handlers.cc",
-        "ipp_handlers.h",
-        ipp_handler_map_path,
       ]
     }
 

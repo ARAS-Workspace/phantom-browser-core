@@ -6,8 +6,6 @@
 
 #include <memory>
 
-#include "ash/constants/ash_pref_names.h"
-#include "ash/constants/ash_switches.h"
 #include "base/feature_list.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
@@ -23,8 +21,6 @@
 #include "chrome/browser/extensions/api/settings_private/generated_prefs_factory.h"
 #include "chrome/browser/extensions/settings_api_helpers.h"
 #include "chrome/browser/glic/glic_pref_names.h"
-#include "chrome/browser/metrics/profile_pref_names.h"
-#include "chrome/browser/nearby_sharing/common/nearby_share_prefs.h"
 #include "chrome/browser/prefs/session_startup_pref.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/safe_browsing/generated_safe_browsing_pref.h"

@@ -134,11 +134,6 @@ source_set("unit_tests") {
     deps += [ "//chrome/browser/accessibility" ]
   }
 
-  if (use_nss_certs && is_chromeos) {
-    sources += [ "media_item_ui_cast_footer_view_unittest.cc" ]
-    deps += [ "//chromeos/ash/components/kcer" ]
-  }
-
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
@@ -164,18 +159,16 @@ source_set("browser_tests") {
   # which would leave the parameterized suite uninstantiated and fail the
   # test launcher. This mirrors the original !is_chromeos guard the test
   # had in //chrome/test:browser_tests.
-  if (!is_chromeos) {
-    sources += [ "media_item_ui_device_selector_view_dump_accessibility_events_browsertest.cc" ]
-    deps += [
-      "//chrome/browser/ui/global_media_controls",
-      "//chrome/browser/ui/views/accessibility:dump_accessibility_events_views_browsertest_base",
-      "//components/global_media_controls",
-      "//components/global_media_controls:test_support",
-      "//components/media_message_center",
-      "//ui/accessibility",
-      "//ui/views",
-    ]
-  }
+  sources += [ "media_item_ui_device_selector_view_dump_accessibility_events_browsertest.cc" ]
+  deps += [
+    "//chrome/browser/ui/global_media_controls",
+    "//chrome/browser/ui/views/accessibility:dump_accessibility_events_views_browsertest_base",
+    "//components/global_media_controls",
+    "//components/global_media_controls:test_support",
+    "//components/media_message_center",
+    "//ui/accessibility",
+    "//ui/views",
+  ]
 }
 
 source_set("interactive_ui_tests") {

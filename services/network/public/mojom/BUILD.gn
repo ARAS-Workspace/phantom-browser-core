@@ -24,12 +24,6 @@ mojom("mojom_ip_address") {
   ]
 
   # WebUI bindings are only needed on ChromeOS.
-  if (is_chromeos) {
-    webui_module_path = "chrome://resources/mojo/services/network/public/mojom"
-
-    # Still used by blink targets.
-    generate_legacy_js_bindings = true
-  }
 
   public_deps = [ "//url/mojom:url_mojom_gurl" ]
 
@@ -639,7 +633,7 @@ mojom("url_loader_base") {
   ]
 
   enabled_features = []
-  if (is_android || is_chromeos || is_linux) {
+  if (is_android || is_linux) {
     enabled_features += [ "network_change_notifier_in_browser" ]
   }
 

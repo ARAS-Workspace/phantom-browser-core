@@ -21,38 +21,26 @@ source_set("messaging") {
     "native_messaging_host_manifest.h",
   ]
 
-  if (!is_chromeos) {
+  sources += [
+    "native_messaging_policy_handler.cc",
+    "native_messaging_policy_handler.h",
+  ]
+
+  if (!is_android) {
     sources += [
-      "native_messaging_policy_handler.cc",
-      "native_messaging_policy_handler.h",
+      "launch_context.cc",
+      "launch_context.h",
+      "native_message_process_host.cc",
+      "native_message_process_host.h",
+      "native_messaging_launch_from_native.cc",
+      "native_messaging_launch_from_native.h",
+      "native_process_launcher.cc",
+      "native_process_launcher.h",
     ]
-
-    if (!is_android) {
-      sources += [
-        "launch_context.cc",
-        "launch_context.h",
-        "native_message_process_host.cc",
-        "native_message_process_host.h",
-        "native_messaging_launch_from_native.cc",
-        "native_messaging_launch_from_native.h",
-        "native_process_launcher.cc",
-        "native_process_launcher.h",
-      ]
-    }
-
-    if (is_posix) {
-      sources += [ "launch_context_posix.cc" ]
-    }
   }
 
-  if (is_chromeos) {
-    sources += [
-      "native_message_built_in_host.cc",
-      "native_message_built_in_host.h",
-      "native_message_echo_host.cc",
-      "native_message_echo_host.h",
-      "native_message_host_chromeos.cc",
-    ]
+  if (is_posix) {
+    sources += [ "launch_context_posix.cc" ]
   }
 
   if (is_win) {
@@ -86,16 +74,6 @@ source_set("messaging") {
 
   if (!is_android) {
     deps += [ "//components/keep_alive_registry" ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/arc/extensions",
-      "//chrome/browser/ash/drive",
-      "//chrome/browser/ash/guest_os",
-      "//chrome/browser/chromeos/drivefs:native_message_host_origins",
-      "//remoting/host/it2me:chrome_os_host",
-    ]
   }
 
   if (is_win) {
@@ -138,14 +116,12 @@ source_set("unit_tests") {
   sources = []
 
   if (enable_extensions) {
-    if (!is_chromeos) {
-      sources += [
-        "native_message_process_host_unittest.cc",
-        "native_messaging_host_manifest_unittest.cc",
-        "native_messaging_launch_from_native_unittest.cc",
-        "native_messaging_policy_handler_unittest.cc",
-      ]
-    }
+    sources += [
+      "native_message_process_host_unittest.cc",
+      "native_messaging_host_manifest_unittest.cc",
+      "native_messaging_launch_from_native_unittest.cc",
+      "native_messaging_policy_handler_unittest.cc",
+    ]
   }
 
   deps = [

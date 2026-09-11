@@ -26,13 +26,11 @@ source_set("accessibility") {
     "//ui/views",
   ]
 
-  if (!is_chromeos) {
-    public += [ "accessibility_focus_highlight.h" ]
-    public_deps += [
-      "//chrome/browser/ui/tabs:tab_strip_model_observer",
-      "//components/prefs",
-    ]
-  }
+  public += [ "accessibility_focus_highlight.h" ]
+  public_deps += [
+    "//chrome/browser/ui/tabs:tab_strip_model_observer",
+    "//components/prefs",
+  ]
 }
 
 source_set("impl") {
@@ -63,15 +61,8 @@ source_set("impl") {
     deps += [ "//chrome/browser/ui/waap:manager" ]
   }
 
-  if (!is_chromeos) {
-    sources += [ "accessibility_focus_highlight.cc" ]
-    deps += [ "//chrome/browser/ui/webui/tab_search:mojo_bindings" ]
-  } else {
-    deps += [
-      "//chrome/browser/ash/accessibility",
-      "//ui/events/ash",
-    ]
-  }
+  sources += [ "accessibility_focus_highlight.cc" ]
+  deps += [ "//chrome/browser/ui/webui/tab_search:mojo_bindings" ]
 }
 
 if (!is_android) {
@@ -123,74 +114,70 @@ if (!is_android) {
     sources = []
     deps = [ ":accessibility" ]
 
-    if (!is_chromeos) {
-      sources += [
-        "accessibility_focus_highlight_browsertest.cc",
-        "dump_accessibility_events_views_browsertest.cc",
-        "menu_dump_accessibility_events_browsertest.cc",
-        "tree_view_dump_accessibility_events_browsertest.cc",
-      ]
+    sources += [
+      "accessibility_focus_highlight_browsertest.cc",
+      "dump_accessibility_events_views_browsertest.cc",
+      "menu_dump_accessibility_events_browsertest.cc",
+      "tree_view_dump_accessibility_events_browsertest.cc",
+    ]
 
-      deps += [
-        ":dump_accessibility_events_views_browsertest_base",
-        "//chrome/browser/ui/color:color_headers",
-        "//chrome/common:constants",
-        "//chrome/test:test_support_ui",
-        "//components/prefs",
-        "//content/test:test_support",
-        "//ui/accessibility",
-        "//ui/base",
-        "//ui/snapshot",
-        "//ui/views",
-        "//ui/views:test_support",
-      ]
-    }
+    deps += [
+      ":dump_accessibility_events_views_browsertest_base",
+      "//chrome/browser/ui/color:color_headers",
+      "//chrome/common:constants",
+      "//chrome/test:test_support_ui",
+      "//components/prefs",
+      "//content/test:test_support",
+      "//ui/accessibility",
+      "//ui/base",
+      "//ui/snapshot",
+      "//ui/views",
+      "//ui/views:test_support",
+    ]
 
     if (is_win) {
       sources += [ "tab_strip_dump_accessibility_events_browsertest.cc" ]
     }
   }
 
-  if (!is_chromeos_device) {
-    source_set("interactive_ui_tests") {
-      testonly = true
-      defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-      sources = [ "caption_bubble_controller_views_browsertest.cc" ]
-      deps = [
-        ":accessibility",
-        "//base/test:test_support",
-        "//chrome/browser/preloading:test_support",
-        "//chrome/browser/ui",
-        "//chrome/test:test_support_ui",
-        "//components/live_caption:constants",
-        "//components/on_device_translation/buildflags",
-        "//components/soda",
-        "//ui/views:test_support",
+  source_set("interactive_ui_tests") {
+    testonly = true
+    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+    sources = [ "caption_bubble_controller_views_browsertest.cc" ]
+    deps = [
+      ":accessibility",
+      "//base/test:test_support",
+      "//chrome/browser/preloading:test_support",
+      "//chrome/browser/ui",
+      "//chrome/test:test_support_ui",
+      "//components/live_caption:constants",
+      "//components/on_device_translation/buildflags",
+      "//components/soda",
+      "//ui/views:test_support",
+    ]
+
+    if (enable_on_device_translation) {
+      deps += [ "//components/on_device_translation:public" ]
+    }
+
+    if (is_win) {
+      sources += [
+        "navigation_accessibility_uitest_win.cc",
+        "post_install_announcement_browsertest.cc",
       ]
+      deps += [
+        "//chrome/browser/ui/views/toolbar",
+        "//ui/base:test_support",
+      ]
+    }
 
-      if (enable_on_device_translation) {
-        deps += [ "//components/on_device_translation:public" ]
-      }
-
-      if (is_win) {
-        sources += [
-          "navigation_accessibility_uitest_win.cc",
-          "post_install_announcement_browsertest.cc",
-        ]
-        deps += [
-          "//chrome/browser/ui/views/toolbar",
-          "//ui/base:test_support",
-        ]
-      }
-
-      if (use_atk) {
-        sources += [ "browser_accessibility_uitest_auralinux.cc" ]
-        configs += [ "//build/config/linux/atk" ]
-        deps += [
-          "//chrome/browser/devtools:test_support",
-          "//content/test:test_support",
-        ]
-      }
+    if (use_atk) {
+      sources += [ "browser_accessibility_uitest_auralinux.cc" ]
+      configs += [ "//build/config/linux/atk" ]
+      deps += [
+        "//chrome/browser/devtools:test_support",
+        "//content/test:test_support",
+      ]
     }
   }
 }

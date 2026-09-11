@@ -14,8 +14,4 @@ source_set("unit_tests") {
     "//components/enterprise:test_support",
     "//testing/gtest",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/system" ]
-  }
 }

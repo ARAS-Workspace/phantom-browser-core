@@ -30,11 +30,6 @@ source_set("file_transfer") {
       "//remoting/host/mojom",
       "//remoting/host/win",
     ]
-  } else if (is_chromeos) {
-    deps += [
-      ":file_chooser_chromeos",
-      "//remoting/host/chromeos",
-    ]
   } else if (is_linux) {
     sources += [ "file_chooser_linux.cc" ]
     deps += [
@@ -96,32 +91,10 @@ source_set("common") {
       "ensure_user_win.cc",
       "file_chooser_common_win.cc",
     ]
-  } else if (is_chromeos) {
-    sources += [
-      "directory_helpers.cc",
-      "ensure_user_no_op.cc",
-    ]
-    deps += [ "//chrome/common:constants" ]
   } else {
     sources += [
       "directory_helpers.cc",
       "ensure_user_no_op.cc",
-    ]
-  }
-}
-
-if (is_chromeos) {
-  source_set("file_chooser_chromeos") {
-    sources = [
-      "file_chooser_chromeos.cc",
-      "file_chooser_chromeos.h",
-    ]
-    deps = [
-      ":common",
-      "//remoting/host/chromeos",
-      "//remoting/resources",
-      "//ui/display",
-      "//ui/shell_dialogs",
     ]
   }
 }
@@ -141,14 +114,10 @@ source_set("test_support") {
   ]
   public_deps = []
 
-  if (is_chromeos) {
-    public_deps += [ ":file_chooser_chromeos" ]
-  } else {
-    sources += [
-      "fake_file_chooser.cc",
-      "fake_file_chooser.h",
-    ]
-  }
+  sources += [
+    "fake_file_chooser.cc",
+    "fake_file_chooser.h",
+  ]
 }
 
 source_set("unit_tests") {
@@ -173,22 +142,12 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_chromeos) {
-    sources += [ "file_chooser_chromeos_unittest.cc" ]
-    deps += [
-      "//content/test:test_support",
-      "//remoting/host/chromeos",
-      "//remoting/host/chromeos:unit_tests",
-      "//ui/shell_dialogs",
-    ]
-  } else {
-    sources += [ "local_file_operations_unittest.cc" ]
-    if (is_win) {
-      sources += [ "file_chooser_win_unittest.cc" ]
-    }
-    if (remoting_multi_process) {
-      sources += [ "ipc_file_operations_unittest.cc" ]
-    }
+  sources += [ "local_file_operations_unittest.cc" ]
+  if (is_win) {
+    sources += [ "file_chooser_win_unittest.cc" ]
+  }
+  if (remoting_multi_process) {
+    sources += [ "ipc_file_operations_unittest.cc" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

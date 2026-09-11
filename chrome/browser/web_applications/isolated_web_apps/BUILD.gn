@@ -57,18 +57,6 @@ source_set("isolated_web_apps_no_pwa_core_deps") {
   ]
 
   assert_no_deps = [ "//chrome/browser/web_applications" ]
-
-  if (is_chromeos) {
-    public_deps += [ "//ash/constants" ]
-    deps += [
-      "//chromeos/components/kiosk",
-      "//chromeos/components/mgs",
-    ]
-    sources += [
-      "policy/isolated_web_app_cache_client.cc",
-      "policy/isolated_web_app_cache_client.h",
-    ]
-  }
 }
 
 source_set("isolated_web_apps") {
@@ -122,8 +110,4 @@ source_set("isolated_web_apps") {
     "//services/network/public/cpp",
     "//ui/base",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/browser_context_helper" ]
-  }
 }

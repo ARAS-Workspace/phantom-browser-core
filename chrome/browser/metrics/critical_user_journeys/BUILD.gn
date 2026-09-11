@@ -86,10 +86,8 @@ source_set("interactive_ui_tests") {
   ]
 
   # Download bubble UI is not used on ChromeOS.
-  if (!is_chromeos) {
-    deps += [
-      "//chrome/browser/ui/download",
-      "//chrome/browser/ui/views/download",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/download",
+    "//chrome/browser/ui/views/download",
+  ]
 }

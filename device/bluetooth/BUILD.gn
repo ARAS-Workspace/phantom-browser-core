@@ -53,7 +53,7 @@ source_set("deprecated_experimental_mojo") {
     "socket.h",
   ]
 
-  if (is_chromeos || is_linux) {
+  if (is_linux) {
     sources += [
       "bluez/metrics_recorder.cc",
       "bluez/metrics_recorder.h",
@@ -72,9 +72,7 @@ source_set("deprecated_experimental_mojo") {
     # public/mojom/README.md
 
     # Approved clients:
-    "//chrome/browser/ash/nearby:*",
     "//chrome/browser/ui/webui/bluetooth_internals:*",
-    "//chrome/services/sharing/nearby/platform:*",
 
     # Implementation tests
     # Ideally only device_unittests, however android & fushia generate
@@ -211,16 +209,6 @@ component("bluetooth") {
     deps += [ ":jni_headers" ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//ash/constants",
-      "//chromeos/ash/services/nearby/public/cpp/",
-      "//chromeos/ash/services/secure_channel/public/cpp/shared",
-      "//chromeos/constants",
-      "//device/bluetooth/bluez/ble_scan_parser",
-    ]
-  }
-
   if (is_apple) {
     sources += [
       "bluetooth_advertisement_mac.h",
@@ -332,7 +320,7 @@ component("bluetooth") {
     ]
   }
 
-  if (is_chromeos || is_linux) {
+  if (is_linux) {
     if (use_bluez) {
       if (!force_cast_bluetooth) {
         sources += [ "bluetooth_adapter_chromeos.cc" ]
@@ -588,18 +576,6 @@ component("bluetooth") {
           "dbus/dbus_bluez_manager_wrapper_linux.h",
         ]
       }
-      if (is_chromeos) {
-        import("//chromeos/dbus/config/use_real_dbus_clients.gni")
-        configs += [ "//chromeos/dbus/config:use_real_dbus_clients_config" ]
-        sources += [
-          "chromeos/bluetooth_connection_logger.cc",
-          "chromeos/bluetooth_connection_logger.h",
-          "chromeos/bluetooth_utils.cc",
-          "chromeos/bluetooth_utils.h",
-          "chromeos_platform_features.cc",
-          "chromeos_platform_features.h",
-        ]
-      }
       if (use_dbus) {
         public_deps += [
           "//components/dbus",
@@ -649,13 +625,6 @@ static_library("mocks") {
     "test/mock_bluetooth_socket.cc",
     "test/mock_bluetooth_socket.h",
   ]
-
-  if (is_chromeos) {
-    sources += [
-      "test/mock_bluetooth_low_energy_scan_session.cc",
-      "test/mock_bluetooth_low_energy_scan_session.h",
-    ]
-  }
 
   public_deps = [
     ":bluetooth",

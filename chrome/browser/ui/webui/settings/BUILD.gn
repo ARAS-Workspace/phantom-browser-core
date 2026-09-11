@@ -7,7 +7,7 @@ import("//build/config/ui.gni")
 import("//components/compose/features.gni")
 import("//components/signin/features.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos)
+assert(is_win || is_mac || is_linux)
 
 source_set("settings") {
   sources = [
@@ -108,15 +108,6 @@ source_set("settings") {
 
   if (is_mac) {
     sources += [ "mac_system_settings_handler.h" ]
-  }
-
-  if (is_chromeos) {
-    sources += [ "about_handler.h" ]
-    public_deps += [
-      "//chrome/browser/ash/accessibility",
-      "//chrome/browser/ash/tpm",
-      "//chrome/browser/ui/webui/help",
-    ]
   }
 }
 
@@ -337,42 +328,6 @@ source_set("impl") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [ "about_handler.cc" ]
-    deps += [
-      "//ash/webui/eche_app_ui",
-      "//chrome/browser/ash/account_manager",
-      "//chrome/browser/ash/arc:arc_util",
-      "//chrome/browser/ash/base",
-      "//chrome/browser/ash/eche_app",
-      "//chrome/browser/ash/extended_updates",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/browser/ash/image_source",
-      "//chrome/browser/ash/kerberos",
-      "//chrome/browser/ash/login/quick_unlock",
-      "//chrome/browser/ash/multidevice_setup",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/ownership",
-      "//chrome/browser/ash/phonehub",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/tpm",
-      "//chrome/browser/search_engine_choice",
-      "//chrome/browser/smart_card",
-      "//chrome/browser/ui/ash/system_web_apps",
-      "//chrome/browser/ui/webui:plural_string_handler",
-      "//chrome/browser/ui/webui/ash/extended_updates",
-      "//chrome/browser/ui/webui/ash/settings",
-      "//chrome/browser/ui/webui/ash/settings/pages/multidevice",
-      "//chrome/browser/ui/webui/ash/settings/pages/people",
-      "//chrome/browser/ui/webui/ash/user_image",
-      "//chromeos/ash/components/account_manager",
-      "//chromeos/ash/components/fwupd",
-      "//chromeos/ash/components/system",
-      "//chromeos/version",
-      "//ui/chromeos",
-    ]
-  }
-
   if (enable_dice_support) {
     deps += [ "//chrome/browser/ui/webui/cr_components/signin" ]
   }
@@ -447,16 +402,6 @@ source_set("browser_tests") {
 
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser:browser_process_platform_part",
-      "//chrome/browser/ash/login/session",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/policy",
-      "//components/account_id",
-    ]
   }
 }
 
@@ -630,24 +575,13 @@ if (!is_android) {
       deps += [ "//components/optimization_guide/core:features" ]
     }
 
-    if (toolkit_views && !is_chromeos) {
+    if (toolkit_views) {
       sources += [ "settings_default_browser_handler_unittest.cc" ]
       deps += [
         "//chrome/browser:global_features",
         "//chrome/browser/default_browser",
         "//chrome/browser/default_browser:test_support",
         "//ui/base/unowned_user_data",
-      ]
-    }
-
-    if (is_chromeos) {
-      deps += [
-        "//ash/constants",
-        "//chrome/browser/ash/login/users:test_support",
-        "//chrome/browser/smart_card",
-        "//chromeos/constants",
-        "//components/account_id",
-        "//components/user_manager",
       ]
     }
   }
@@ -686,10 +620,6 @@ source_set("interactive_ui_tests") {
       "//chrome/browser/win:isolated_browser_support",
       "//chrome/install_static/test:test_support",
     ]
-  }
-
-  if (is_chromeos) {
-    deps += [ "//chrome/test/base/ash/interactive:test_support" ]
   }
 
   if ((is_mac || is_linux || is_win) && enable_dice_support) {

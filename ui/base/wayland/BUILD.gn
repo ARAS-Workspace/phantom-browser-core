@@ -6,7 +6,7 @@ import("//build/config/ozone.gni")
 
 # ash-chrome depends on wayland, since components/exo is wayland compositor.
 # If platform supports wayland (as a client), it also depends on wayland.
-assert(is_chromeos || ozone_platform_wayland)
+assert(ozone_platform_wayland)
 
 source_set("wayland_input_types_impl") {
   sources = [ "wayland_input_types_impl.h" ]

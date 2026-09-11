@@ -139,9 +139,7 @@ target("component", "cpp") {
       deps += [ "//components/tracing:tracing_etw" ]
     }
 
-    if (!(is_chromeos && target_cpu == "arm64" && current_cpu == "arm")) {
-      deps += [ "//components/variations" ]
-    }
+    deps += [ "//components/variations" ]
 
     # Add the SystemProducer implementations.
     if (is_posix) {
@@ -153,10 +151,6 @@ target("component", "cpp") {
           "system_tracing_service.h",
         ]
       }
-    }
-
-    if (is_chromeos) {
-      deps += [ "//chromeos/dbus/constants" ]
     }
   }  # !is_ios
 }

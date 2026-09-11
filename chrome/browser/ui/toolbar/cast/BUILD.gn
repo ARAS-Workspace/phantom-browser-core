@@ -2,12 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-assert(is_win || is_mac || is_linux || is_chromeos)
+assert(is_win || is_mac || is_linux)
 
 source_set("cast") {
-  sources = [
-    "cast_toolbar_button_controller.h",
-  ]
+  sources = [ "cast_toolbar_button_controller.h" ]
   public_deps = [
     "//base",
     "//build:branding_buildflags",
@@ -20,9 +18,7 @@ source_set("cast") {
 }
 
 source_set("impl") {
-  sources = [
-    "cast_toolbar_button_controller.cc",
-  ]
+  sources = [ "cast_toolbar_button_controller.cc" ]
   deps = [
     ":cast",
     "//base",

@@ -88,25 +88,6 @@ source_set("extensions") {
       "//ui/base",
     ]
 
-    if (is_chromeos) {
-      sources += [
-        "api/file_browser_handler_custom_bindings.cc",
-        "api/file_browser_handler_custom_bindings.h",
-        "api/file_manager_private_custom_bindings.cc",
-        "api/file_manager_private_custom_bindings.h",
-        "api/media_galleries_custom_bindings.cc",
-        "api/media_galleries_custom_bindings.h",
-        "api/platform_keys_natives.cc",
-        "api/platform_keys_natives.h",
-      ]
-      if (use_cups) {
-        sources += [
-          "api/printing_hooks_delegate.cc",
-          "api/printing_hooks_delegate.h",
-        ]
-      }
-    }
-
     if (enable_pdf_ink2) {
       sources += [
         "api/pdf_viewer_private_custom_bindings.cc",
@@ -142,8 +123,4 @@ source_set("unit_tests") {
     "//extensions/renderer:unit_test_support",
     "//testing/gtest",
   ]
-
-  if (is_chromeos) {
-    sources += [ "api/accessibility_private_hooks_delegate_unittest.cc" ]
-  }
 }

@@ -697,7 +697,7 @@ static_library("test_support") {
   }
 
   # HID support is not available without udev.
-  is_linux_without_udev = (is_linux || is_chromeos) && !use_udev
+  is_linux_without_udev = is_linux && !use_udev
   if (!is_linux_without_udev) {
     sources += [
       "../browser/hid/hid_test_utils.cc",
@@ -718,12 +718,6 @@ static_library("test_support") {
       "//device/fido:mocks",
       "//device/fido:test_support",
     ]
-    if (is_chromeos) {
-      deps += [
-        "//chromeos/dbus/tpm_manager",
-        "//chromeos/dbus/u2f",
-      ]
-    }
   }
 
   if (use_atk) {
@@ -832,17 +826,10 @@ static_library("test_support") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "sandbox_status_service.cc",
       "sandbox_status_service.h",
-    ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "../browser/smart_card/mock_smart_card_context_factory.cc",
-      "../browser/smart_card/mock_smart_card_context_factory.h",
     ]
   }
 
@@ -1267,7 +1254,7 @@ mojom("mojo_web_test_bindings") {
 mojom("test_interfaces") {
   testonly = true
   sources = [ "echo.test-mojom" ]
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "sandbox_status.test-mojom" ]
   }
 }
@@ -1989,9 +1976,7 @@ test("content_browsertests") {
     "//ui/webui:test_support",
   ]
 
-  if (!(is_chromeos && target_cpu == "arm64" && current_cpu == "arm")) {
-    deps += [ "//components/variations" ]
-  }
+  deps += [ "//components/variations" ]
 
   data_deps = [
     "//content/shell:pak",
@@ -2060,7 +2045,7 @@ test("content_browsertests") {
   }
 
   if (enable_screen_capture) {
-    if (is_android || is_linux || is_chromeos || is_mac || is_win) {
+    if (is_android || is_linux || is_mac || is_win) {
       sources += [
         "../browser/media/capture/content_capture_device_browsertest_base.cc",
         "../browser/media/capture/content_capture_device_browsertest_base.h",
@@ -2075,19 +2060,15 @@ test("content_browsertests") {
       data += [ "$root_out_dir/content_shell.pak" ]
     }
 
-    if (is_linux || is_chromeos || is_mac || is_win) {
+    if (is_linux || is_mac || is_win) {
       # For chromecast, content_browsertests does not provide a shell window.
       if (use_aura) {
         sources += [ "../browser/media/capture/aura_window_video_capture_device_browsertest.cc" ]
       }
-
-      if (is_chromeos) {
-        deps += [ "//ui/wm" ]
-      }
     }
   }
 
-  if (is_linux || is_chromeos || is_mac || is_win) {
+  if (is_linux || is_mac || is_win) {
     deps += [ "//third_party/libyuv" ]
     data += [
       "//net/tools/testserver/",
@@ -2095,15 +2076,8 @@ test("content_browsertests") {
     ]
   }
 
-  if (!is_chromeos) {
-    sources +=
-        [ "../browser/media/media_keys_listener_manager_impl_browsertest.cc" ]
-  }
-
-  if (is_chromeos) {
-    sources +=
-        [ "../browser/lock_screen/lock_screen_service_impl_browsertest.cc" ]
-  }
+  sources +=
+      [ "../browser/media/media_keys_listener_manager_impl_browsertest.cc" ]
 
   if (is_win) {
     sources += [
@@ -2145,7 +2119,7 @@ test("content_browsertests") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "../browser/service_host/utility_process_sandbox_browsertest.cc",
       "../browser/zygote_host/zygote_browsertest.cc",
@@ -2163,10 +2137,6 @@ test("content_browsertests") {
       configs += [ "//build/config/linux/atk" ]
       deps += [ "//ui/base/glib" ]
     }
-  }
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/assistant:buildflags" ]
   }
 
   if (is_android) {
@@ -2238,10 +2208,6 @@ test("content_browsertests") {
           [ "../browser/compute_pressure/pressure_service_browsertest.cc" ]
     }
 
-    if (is_chromeos) {
-      deps += [ "//ash/constants" ]
-    }
-
     if (!is_ios) {
       data += [ "//content/test/data/clipboard/" ]
     }
@@ -2257,27 +2223,8 @@ test("content_browsertests") {
     deps += [ "//services/tracing:test_utils" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "../browser/direct_sockets/firewall_hole_browsertest.cc",
-      "../browser/smart_card/smart_card_browsertest.cc",
-    ]
-
-    deps += [
-      "//chromeos/components/firewall_hole",
-      "//chromeos/dbus/permission_broker",
-    ]
-
-    if (is_component_build) {
-      sources += [
-        "//content/browser/direct_sockets/firewall_hole_delegate.cc",
-        "//content/browser/direct_sockets/firewall_hole_delegate.h",
-      ]
-    }
-  }
-
   # HID support is not available without udev.
-  is_linux_without_udev = (is_linux || is_chromeos) && !use_udev
+  is_linux_without_udev = is_linux && !use_udev
   if (!is_linux_without_udev) {
     sources += [ "../browser/hid/hid_browsertest.cc" ]
   }
@@ -2315,15 +2262,6 @@ test("content_browsertests") {
     bundle_deps += [ ":content_shell_pak_bundle_data" ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/ash/components/audio",
-      "//chromeos/ash/components/dbus/audio",
-      "//chromeos/ash/components/dbus/debug_daemon",
-      "//chromeos/ash/components/system",
-    ]
-  }
-
   if (use_aura && !is_win) {
     deps += [ "//ui/events:test_support" ]
   }
@@ -2343,8 +2281,7 @@ test("content_browsertests") {
     deps += [ "//components/vrp_flags" ]
   }
 
-  if ((is_win || is_chromeos || is_linux) && !is_tsan &&
-      mojo_support_legacy_core) {
+  if ((is_win || is_linux) && !is_tsan && mojo_support_legacy_core) {
     # NOTE: We don't bother to build these tests when TSan is enabled, because
     # they can't properly launch a child content_shell in that environment.
     sources += [ "../browser/launch_as_mojo_client_browsertest.cc" ]
@@ -2409,10 +2346,6 @@ test("content_browsertests") {
 
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
-  }
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/dbus/constants" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -3061,14 +2994,14 @@ test("content_unittests") {
     sources += [ "../browser/media/system_media_controls/web_app_system_media_controls_manager_unittest.cc" ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [
       "../browser/file_system_access/file_system_access_observer_observation_unittest.cc",
       "../browser/renderer_host/delegated_frame_host_unittest.cc",
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "../child/sandboxed_process_thread_type_handler_unittest.cc" ]
   }
 
@@ -3076,7 +3009,7 @@ test("content_unittests") {
     sources += [ "../browser/accessibility/browser_accessibility_state_impl_auralinux_unittest.cc" ]
   }
 
-  if (is_android || is_linux || is_chromeos || is_mac || is_win) {
+  if (is_android || is_linux || is_mac || is_win) {
     data = [
       "$root_out_dir/content_shell.pak",
       "data/",
@@ -3276,22 +3209,6 @@ test("content_unittests") {
     "//url",
   ]
 
-  if (is_chromeos) {
-    sources += [
-      "//content/browser/direct_sockets/firewall_hole_delegate_unittest.cc",
-    ]
-    deps += [
-      "//chromeos/components/firewall_hole",
-      "//chromeos/dbus/permission_broker",
-    ]
-  }
-
-  if (enable_smart_card) {
-    sources +=
-        [ "../browser/smart_card/emulation/smart_card_emulation_unittest.cc" ]
-    deps += [ "//content/browser/smart_card/emulation" ]
-  }
-
   if (enable_nocompile_tests) {
     deps += [ ":content_nocompile_tests" ]
   }
@@ -3318,7 +3235,7 @@ test("content_unittests") {
     deps += [ "//services/tracing:test_utils" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [ "//components/crash/content/browser/error_reporting" ]
   }
 
@@ -3385,14 +3302,14 @@ test("content_unittests") {
     }
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     if (use_dbus) {
       deps += [ "//dbus:test_support" ]
     }
   }
 
   # Platforms with FontDataManager enabled
-  if (is_win || is_linux || is_chromeos) {
+  if (is_win || is_linux) {
     sources += [ "../child/font_data/font_data_manager_unittest.cc" ]
     deps += [ "//components/services/font_data/public/mojom" ]
   }
@@ -3442,16 +3359,6 @@ test("content_unittests") {
       "CoreVideo.framework",
       "IOSurface.framework",
       "ScreenCaptureKit.framework",
-    ]
-  }
-  if (is_chromeos) {
-    sources += [ "../browser/handwriting/handwriting_recognition_service_impl_cros_unittest.cc" ]
-    deps += [
-      "//ash/constants",
-      "//chromeos/ash/components/audio",
-      "//chromeos/ash/components/dbus/audio",
-      "//chromeos/services/machine_learning/public/cpp:stub",
-      "//chromeos/services/machine_learning/public/mojom",
     ]
   }
   if (is_android) {
@@ -3539,7 +3446,7 @@ test("content_unittests") {
   }
 
   # HID support is not available without udev.
-  is_linux_without_udev = (is_linux || is_chromeos) && !use_udev
+  is_linux_without_udev = is_linux && !use_udev
   if (!is_linux_without_udev && !is_android) {
     sources += [
       "../browser/hid/hid_service_unittest.cc",
@@ -3560,12 +3467,6 @@ test("content_unittests") {
       "//device/fido:mocks",
       "//device/fido:test_support",
     ]
-    if (is_chromeos) {
-      deps += [
-        "//chromeos/dbus/tpm_manager",
-        "//chromeos/dbus/u2f",
-      ]
-    }
     if (is_ios && use_blink) {
       deps += [ "//crypto:test_support" ]
     }

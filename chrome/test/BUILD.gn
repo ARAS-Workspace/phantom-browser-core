@@ -62,10 +62,6 @@ if (is_android) {
   import("//tools/perf/chrome_telemetry_build/android_browser_types.gni")
 }
 
-if (is_chromeos && include_js2gtest_tests) {
-  import("//chrome/test/base/ash/js2gtest.gni")
-}
-
 # This target exists to reference other test executables to bring these files
 # into the build.
 group("test") {
@@ -169,7 +165,7 @@ static_library("test_support") {
     "//ui/base/unowned_user_data",
   ]
 
-  if (is_android || is_mac || is_win || is_chromeos) {
+  if (is_android || is_mac || is_win) {
     deps += [
       "//chrome/browser/device_reauth",
       "//components/device_reauth",
@@ -235,10 +231,6 @@ static_library("test_support") {
       "//components/record_replay/content/renderer",
       "//components/storage_monitor:test_support",
     ]
-  }
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/media_galleries" ]
   }
 
   if (enable_extensions_core) {
@@ -597,9 +589,7 @@ static_library("test_support") {
       "//components/webapps/isolated_web_apps",
     ]
 
-    if (!is_chromeos) {
-      deps += [ "//chrome/browser/ui/webui/signin:profile" ]
-    }
+    deps += [ "//chrome/browser/ui/webui/signin:profile" ]
 
     if (enable_compose) {
       deps += [ "//chrome/browser/compose" ]
@@ -660,120 +650,7 @@ static_library("test_support") {
     libs = [ "runtimeobject.lib" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "base/ash/extension_js_browser_test.cc",
-      "base/ash/extension_js_browser_test.h",
-      "base/ash/scoped_test_system_nss_key_slot_mixin.cc",
-      "base/ash/scoped_test_system_nss_key_slot_mixin.h",
-    ]
-
-    public_deps += [
-      "//chrome/test/base:aura_window_title_observer",
-      "//chrome/test/base:browser_process_platform_part_test_api_chromeos",
-      "//chrome/test/base:js_test_api",
-    ]
-
-    deps += [
-      "//ash/constants",
-      "//base/test:proto_test_support",
-      "//chrome/browser/ash/app_list/arc",
-      "//chrome/browser/ash/arc",
-      "//chrome/browser/ash/arc:arc_util",
-      "//chrome/browser/ash/arc/boot_phase_monitor",
-      "//chrome/browser/ash/arc/session:service_launcher",
-      "//chrome/browser/ash/dbus",
-      "//chrome/browser/ash/extensions",
-      "//chrome/browser/ash/guest_os",
-      "//chrome/browser/ash/guest_os/public",
-      "//chrome/browser/ash/input_method",
-      "//chrome/browser/ash/login/session:test_support",
-      "//chrome/browser/ash/login/users",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/policy/core:test_support",
-      "//chrome/browser/ash/policy/test_support",
-      "//chrome/browser/ash/printing",
-      "//chrome/browser/ash/printing:test_support",
-      "//chrome/browser/ash/printing/history:print_job_info_proto",
-      "//chrome/browser/ash/settings",
-      "//chrome/browser/ash/system_web_apps/test_support",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/ui/ash/cast_config",
-      "//chrome/browser/ui/ash/system_web_apps",
-      "//chrome/browser/ui/immersive:immersive_mode_controller",
-      "//chrome/browser/ui/webui/ash/login",
-      "//chromeos/ash/components/attestation:test_support",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/cryptohome",
-      "//chromeos/ash/components/dbus",
-      "//chromeos/ash/components/dbus/concierge",
-      "//chromeos/ash/components/dbus/shill",
-      "//chromeos/ash/components/disks:test_support",
-      "//chromeos/ash/components/nearby/common/connections_manager",
-      "//chromeos/ash/components/system",
-      "//chromeos/components/mgs",
-      "//chromeos/dbus/constants",
-      "//chromeos/dbus/power",
-      "//components/component_updater/ash",
-      "//components/component_updater/ash:test_support",
-      "//components/policy/test_support",
-      "//components/session_manager/core:test_support",
-      "//crypto:test_support",
-      "//google_apis",
-      "//google_apis:test_support",
-      "//net:test_support",
-    ]
-
-    public_deps += [
-      "//ash",
-      "//ash:test_support",
-      "//ash/constants",
-      "//ash/public/cpp:test_support",
-      "//ash/webui/diagnostics_ui:url_constants",
-      "//ash/webui/firmware_update_ui:url_constants",
-      "//ash/webui/graduation:url_constants",
-      "//ash/webui/os_feedback_ui:url_constants",
-      "//ash/webui/personalization_app:test_support",
-      "//ash/webui/print_management:url_constants",
-      "//ash/webui/scanning:url_constants",
-      "//ash/webui/shortcut_customization_ui:url_constants",
-      "//chrome/browser/ash/app_mode",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/browser/ash/login/enrollment",
-      "//chrome/browser/ash/login/enrollment:test_support",
-      "//chrome/browser/ash/login/test:test_support",
-      "//chrome/browser/ash/login/users:test_support",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/settings:test_support",
-      "//chrome/browser/ash/system_web_apps",
-      "//chrome/browser/ui/views/frame:immersive_mode_tester",
-      "//chromeos/ash/components/account_manager",
-      "//chromeos/ash/components/dbus/session_manager",
-      "//chromeos/ash/components/dbus/userdataauth",
-      "//chromeos/ash/components/install_attributes:test_support",
-      "//chromeos/ash/components/login/auth:test_support",
-      "//chromeos/ash/components/login/login_state",
-      "//chromeos/ash/components/settings",
-      "//chromeos/ash/components/tpm",
-      "//chromeos/constants",
-      "//chromeos/dbus/tpm_manager",
-      "//components/exo",
-      "//components/ownership",
-      "//components/user_manager:test_support",
-      "//ui/aura",
-      "//ui/aura:test_support",
-      "//ui/base/ime/init",
-      "//ui/chromeos/resources:resources_grit",
-    ]
-
-    allow_circular_includes_from += [
-      "//chrome/browser/ash/login/users:test_support",
-      "//chrome/browser/ash/settings:test_support",
-      "//chrome/browser/ash/system_web_apps/test_support",
-    ]
-  }
-
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     public_deps += [
       "//ui/base:pixel_diff_test_support",
       "//ui/views:view_pixel_diff_test_support",
@@ -811,9 +688,7 @@ static_library("test_support") {
       "//components/omnibox/browser:test_support",
       "//components/user_education/views",
     ]
-    if (!is_chromeos) {
-      deps += [ "//chrome/browser/ui/webui/signin:profile" ]
-    }
+    deps += [ "//chrome/browser/ui/webui/signin:profile" ]
   }
 
   if (enable_message_center) {
@@ -870,108 +745,6 @@ if (is_android) {
       "//content/test:telemetry_gpu_integration_test_support",
       "//tools/perf/chrome_telemetry_build:telemetry_chrome_test",
     ]
-
-    enable_cros_wrapper = true
-  }
-}
-
-if (is_chromeos && is_chromeos_device) {
-  copy("crosier_metadata") {
-    sources = [ "base/chromeos/crosier/ash_integration_test_test.yaml" ]
-    outputs = [ "$root_out_dir/crosier_metadata/{{source_file_part}}" ]
-  }
-
-  copy("crosier_js_helpers") {
-    sources = [ "../browser/ash/accessibility/google_tts_test_support.js" ]
-    outputs = [ "$root_out_dir/crosier_js_helpers/{{source_file_part}}" ]
-  }
-
-  static_library("ash_integration_test_support") {
-    testonly = true
-
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [
-      # These cannot live in ":test_support" because they use
-      # InProcessBrowserTest which requires HAS_OUT_OF_PROC_TEST_RUNNER.
-      "base/chromeos/crosier/ash_integration_test.cc",
-      "base/chromeos/crosier/ash_integration_test.h",
-      "base/chromeos/crosier/supervised_user_integration_base_test.cc",
-      "base/chromeos/crosier/supervised_user_integration_base_test.h",
-    ]
-
-    deps = [
-      ":test_support",
-      "//base",
-      "//build:branding_buildflags",
-      "//chrome/browser/ui/ash/main_extra_parts",
-      "//chrome/common:non_code_constants",
-      "//chrome/test/base/chromeos/crosier:test_support",
-      "//google_apis",
-      "//net:test_support",
-      "//url",
-    ]
-
-    public_deps = [ "//chrome/test/base/ash/interactive:test_support" ]
-  }
-
-  test("chromeos_integration_tests") {
-    configs += [ "//build/config:precompiled_headers" ]
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [
-      "base/chromeos/crosier/chromeos_tests_main.cc",
-      "base/chromeos/crosier/demo_integration_test.cc",
-    ]
-    deps = [
-      ":test_support",
-      "//chrome/test/base/chromeos/crosier:test_support",
-      "//components/app_constants",
-    ]
-
-    # Note: for each test case in the below list, add a metadata file
-    # in the `crosier_metadata` build rule above.
-    sources += [
-      "base/chromeos/crosier/ash_integration_test_test.cc",
-      "base/chromeos/crosier/helper/test_sudo_helper_client_test.cc",
-      "base/chromeos/crosier/upstart_test.cc",
-    ]
-
-    if (is_chrome_branded) {
-      sources += [ "base/chromeos/crosier/test_accounts_test.cc" ]
-    }
-
-    data = [
-      "//chrome/test/data/chromeos/web_handwriting/",
-      "//chrome/test/data/scanning/",
-    ]
-
-    deps += [
-      ":ash_integration_test_support",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/test/base/chromeos/crosier:proto",
-      "//chrome/test/base/chromeos/crosier/helper:common",
-      "//chromeos/ash/components/dbus/printscanmgr",
-      "//ui/events:test_support",
-    ]
-
-    deps += [
-      # Gather tests from other build files:
-      "//chrome/browser/ash:integration_tests",
-      "//chrome/browser/ui/ash:integration_tests",
-      "//chrome/browser/ui/webui/ash:integration_tests",
-    ]
-
-    data_deps = [
-      ":crosier_js_helpers",
-      ":crosier_metadata",
-      "//chrome:packed_resources",
-      "//chrome/test/base/chromeos/crosier/helper",
-      "//chrome/test/base/chromeos/crosier/helper/fake_chrome",
-    ]
-
-    if (build_mojo_proxy) {
-      data_deps += [ "//chromeos/ash/components/mojo_proxy/service:mojo_proxy" ]
-    }
   }
 }
 
@@ -1154,7 +927,7 @@ source_set("platform_browser_tests") {
     }
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     deps += [ "//chrome/browser/download/bubble" ]
   }
 
@@ -1170,15 +943,8 @@ source_set("platform_browser_tests") {
         [ "//chrome/browser/web_applications:web_applications_test_support" ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/login/test:test_support",
-      "//chrome/browser/ash/policy/core",
-    ]
-  } else {
-    deps +=
-        [ "//chrome/browser/enterprise/remote_commands:platform_browser_tests" ]
-  }
+  deps +=
+      [ "//chrome/browser/enterprise/remote_commands:platform_browser_tests" ]
 
   if (!is_android || enable_desktop_android_extensions) {
     deps += [ "//chrome/browser/ui/prefs:browser_tests" ]
@@ -1265,7 +1031,7 @@ source_set("platform_browser_tests") {
   # ProvisionManagedClientCertificateFor{User,Browser} policies), none of which
   # exist on ChromeOS even though enterprise_client_certificates is enabled
   # there.
-  if (enterprise_client_certificates && !is_chromeos) {
+  if (enterprise_client_certificates) {
     deps += [
       "//chrome/browser/enterprise/client_certificates:platform_browser_tests",
       "//chrome/browser/enterprise/test:test_support",
@@ -1860,11 +1626,7 @@ static_library("browser_tests_runner") {
     "//chrome/test/base:chrome_test_launcher",
   ]
 
-  if (is_chromeos) {
-    sources += [ "base/browser_tests_main_chromeos.cc" ]
-  } else {
-    sources += [ "base/browser_tests_main.cc" ]
-  }
+  sources += [ "base/browser_tests_main.cc" ]
 
   if (is_win) {
     deps += [ "//chrome/installer/util:strings" ]
@@ -2826,11 +2588,11 @@ if (!is_android) {
     allow_circular_includes_from +=
         [ "//chrome/browser/ui/views/passwords:browser_tests" ]
 
-    if (is_win || is_linux || is_chromeos) {
+    if (is_win || is_linux) {
       deps += [ "//chrome/browser/ui/views:bluetooth_dialogs" ]
     }
 
-    if (is_win || is_chromeos) {
+    if (is_win) {
       deps += [ "//chrome/browser/ui/webui/signin:inline_login" ]
     }
 
@@ -2882,7 +2644,6 @@ if (!is_android) {
 
     data = [
       "data/",
-      "//chromeos/ash/experiences/arc/test/data/icons/",
       "//chrome/browser/page_load_metrics/integration_tests/data/",
       "//chrome/renderer/resources/extensions/",
       "//chrome/test/data/cart/",
@@ -3165,9 +2926,6 @@ if (!is_android) {
     }
 
     deps += [ "//chrome/browser/ui/webui/support_tool:browser_tests" ]
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/ui/webui/management:browser_tests" ]
-    }
 
     if (enable_compose) {
       deps += [ "//chrome/browser/compose:browser_tests" ]
@@ -3179,7 +2937,7 @@ if (!is_android) {
       ]
     }
 
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       sources += [ "../browser/ui/views/device_signals_consent/consent_dialog_browsertest.cc" ]
       deps += [
         "//chrome/browser/ui/views/device_signals_consent",
@@ -3326,7 +3084,7 @@ if (!is_android) {
       sources += [ "../browser/ui/views/web_apps/web_app_integration_browsertest_win_linux.cc" ]
     }
 
-    if (is_win || is_linux || is_chromeos) {
+    if (is_win || is_linux) {
       sources += [ "../browser/ui/views/web_apps/web_app_integration_browsertest_win_linux_cros.cc" ]
     }
 
@@ -3408,7 +3166,7 @@ if (!is_android) {
       deps += [ "//chrome/browser/enterprise/platform_auth:test_utils" ]
     }
 
-    if (!is_android && !is_chromeos) {
+    if (!is_android) {
       deps += [ "//chrome/browser/ui/webui/default_browser:browser_tests" ]
     }
 
@@ -3509,71 +3267,52 @@ if (!is_android) {
       deps += [ "//ui/ozone" ]
     }
 
-    if (!is_chromeos) {
+    sources += [
+      "../browser/ui/views/controls/button/button_dump_accessibility_events_browsertest.cc",
+      "../browser/ui/views/controls/button/checkbox_dump_accessibility_events_browsertest.cc",
+      "../browser/ui/views/controls/label_dump_accessibility_events_browsertest.cc",
+      "../browser/ui/views/controls/slider/slider_dump_accessibility_events_browsertest.cc",
+      "../browser/ui/views/controls/textfield/textfield_dump_accessibility_events_browsertest.cc",
+      "../browser/ui/views/download/bubble/download_bubble_row_list_view_browsertest.cc",
+      "../browser/ui/views/download/bubble/download_toolbar_ui_controller_browsertest.cc",
+      "../browser/ui/views/profiles/signin_view_controller_delegate_views_browsertest.cc",
+    ]
+
+    if (is_win) {
       sources += [
-        "../browser/ui/views/controls/button/button_dump_accessibility_events_browsertest.cc",
-        "../browser/ui/views/controls/button/checkbox_dump_accessibility_events_browsertest.cc",
-        "../browser/ui/views/controls/label_dump_accessibility_events_browsertest.cc",
-        "../browser/ui/views/controls/slider/slider_dump_accessibility_events_browsertest.cc",
-        "../browser/ui/views/controls/textfield/textfield_dump_accessibility_events_browsertest.cc",
-        "../browser/ui/views/download/bubble/download_bubble_row_list_view_browsertest.cc",
-        "../browser/ui/views/download/bubble/download_toolbar_ui_controller_browsertest.cc",
-        "../browser/ui/views/profiles/signin_view_controller_delegate_views_browsertest.cc",
+        # Tooltip accessibility event tests rely on Aura APIs
+        # (EventGenerator, TooltipControllerTestHelper).
+        "../browser/ui/views/toolbar/browser_app_menu_button_dump_accessibility_events_browsertest.cc",
+        "../browser/ui/views/tooltip/tooltip_dump_accessibility_events_browsertest.cc",
       ]
-
-      if (is_win) {
-        sources += [
-          # Tooltip accessibility event tests rely on Aura APIs
-          # (EventGenerator, TooltipControllerTestHelper).
-          "../browser/ui/views/toolbar/browser_app_menu_button_dump_accessibility_events_browsertest.cc",
-          "../browser/ui/views/tooltip/tooltip_dump_accessibility_events_browsertest.cc",
-        ]
-        deps += [ "//ui/wm" ]
-      }
-
-      deps += [
-        "//chrome/browser/default_browser:browser_tests",
-        "//chrome/browser/download/bubble",
-        "//chrome/browser/download/bubble:browser_tests",
-        "//chrome/browser/ui/download",
-        "//chrome/browser/ui/global_media_controls",
-        "//components/global_media_controls:test_support",
-        "//components/global_media_controls/public/mojom:device_service",
-      ]
+      deps += [ "//ui/wm" ]
     }
 
-    if (is_chromeos && include_js2gtest_tests) {
-      deps += [
-        "//ash/webui/system_apps:browser_tests",
-        "//chrome/test/data/webui/chromeos:browser_tests_js_webui",
-      ]
-
-      data += js2gtest_js_libraries
-      data_deps +=
-          [ "//chrome/test/data/webui/chromeos:browser_tests_js_webui" ]
-
-      if (!is_official_build) {
-        deps += [ "//ash/webui/sample_system_web_app_ui:browser_tests" ]
-      }
-    }
+    deps += [
+      "//chrome/browser/default_browser:browser_tests",
+      "//chrome/browser/download/bubble",
+      "//chrome/browser/download/bubble:browser_tests",
+      "//chrome/browser/ui/download",
+      "//chrome/browser/ui/global_media_controls",
+      "//components/global_media_controls:test_support",
+      "//components/global_media_controls/public/mojom:device_service",
+    ]
 
     if (enable_captive_portal_detection) {
       deps += [ "//chrome/browser/captive_portal" ]
     }
 
-    if (!is_chromeos) {
-      sources += [
-        # chromeos does not support machine level user cloud policies
-        "../browser/ui/views/enable_link_capturing_infobar_browsertest.cc",
-      ]
-      deps += [
-        "//chrome/browser/apps/link_capturing",
-        "//chrome/browser/external_protocol:browser_tests",
-        "//chrome/browser/shortcuts:browser_tests",
-      ]
-    }
+    sources += [
+      # chromeos does not support machine level user cloud policies
+      "../browser/ui/views/enable_link_capturing_infobar_browsertest.cc",
+    ]
+    deps += [
+      "//chrome/browser/apps/link_capturing",
+      "//chrome/browser/external_protocol:browser_tests",
+      "//chrome/browser/shortcuts:browser_tests",
+    ]
 
-    if (is_win || is_chromeos || is_mac) {
+    if (is_win || is_mac) {
       deps += [ "//chrome/browser/webshare:browser_tests" ]
     }
 
@@ -3591,9 +3330,7 @@ if (!is_android) {
           "//chrome/browser/ui/webui/intro",
         ]
       }
-      if (!is_chromeos) {
-        deps += [ "//chrome/browser/ui/webui/signin:profile" ]
-      }
+      deps += [ "//chrome/browser/ui/webui/signin:profile" ]
       deps += [
         "//chrome/browser/signin:signin_promo",
 
@@ -3639,9 +3376,6 @@ if (!is_android) {
         "//extensions/browser:webstore_installer",
         "//extensions/components/native_app_window",
       ]
-      if (is_chromeos) {
-        deps += [ "//chrome/browser/apps:browser_tests" ]
-      }
       if (toolkit_views) {
         deps += [ "//chrome/browser/ui/views/extensions:browser_tests" ]
       }
@@ -3779,29 +3513,19 @@ if (!is_android) {
 
         deps += [ "//chrome/browser/ui/webui/app_home" ]
       }
-      if (is_chromeos) {
-        sources += [
-          "../browser/ui/views/frame/system_web_app_frame_view_browsertest.cc",
-        ]
-        deps += [
-          "//chrome/browser/ash/fileapi",
-          "//chromeos/ash/services/multidevice_setup/public/cpp:prefs",
-        ]
-      } else {
-        sources += [
-          "../browser/ui/views/frame/opaque_browser_frame_view_browsertest.cc",
-          "../browser/ui/views/policy/enterprise_startup_dialog_view_browsertest.cc",
-          "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_browsertest.cc",
-          "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_pixel_browsertest.cc",
-        ]
-        deps += [
-          "//chrome/browser/ui/views/extensions:extension_post_install_dialog_view_utils",
-          "//chrome/browser/ui/views/policy:enterprise_startup_dialog",
-          "//chrome/browser/ui/views/relaunch_notification:browser_tests",
-          "//chrome/browser/ui/views/shortcuts:browser_tests",
-        ]
-      }
-      if (enable_dice_support || is_chromeos) {
+      sources += [
+        "../browser/ui/views/frame/opaque_browser_frame_view_browsertest.cc",
+        "../browser/ui/views/policy/enterprise_startup_dialog_view_browsertest.cc",
+        "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_browsertest.cc",
+        "../browser/ui/views/profiles/dice_web_signin_interception_bubble_view_pixel_browsertest.cc",
+      ]
+      deps += [
+        "//chrome/browser/ui/views/extensions:extension_post_install_dialog_view_utils",
+        "//chrome/browser/ui/views/policy:enterprise_startup_dialog",
+        "//chrome/browser/ui/views/relaunch_notification:browser_tests",
+        "//chrome/browser/ui/views/shortcuts:browser_tests",
+      ]
+      if (enable_dice_support) {
       }
       deps += [
         ":test_support_ui",
@@ -3901,7 +3625,7 @@ if (!is_android) {
       ]
     }
 
-    if ((is_linux || is_chromeos) && !is_component_build) {
+    if (is_linux && !is_component_build) {
       # Set rpath to find the CDM adapter even in a non-component build.
       configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
     }
@@ -3913,525 +3637,6 @@ if (!is_android) {
     }
 
     # NOTE: This is the main "browser_tests" section for |is_chromeos|.
-    if (is_chromeos) {
-      sources += [
-        "../browser/file_system_access/cloud_identifier/cloud_identifier_util_ash_browsertest.cc",
-
-        # TODO(crbug.com/510716187): Enable for other platforms once macOS
-        # native window ID translation is implemented.
-        "../browser/ui/ash/editor_menu/editor_menu_browsertest.cc",
-        "../browser/ui/ash/input_method/candidate_window_view_pixeltest.cc",
-        "../browser/ui/ash/quick_answers/quick_answers_browsertest.cc",
-        "../browser/ui/ash/quick_answers/quick_answers_browsertest_base.cc",
-        "../browser/ui/ash/quick_answers/quick_answers_browsertest_base.h",
-        "../browser/ui/ash/quick_answers/quick_answers_controller_browsertest.cc",
-        "../browser/ui/ash/quick_answers/ui/quick_answers_pixeltest.cc",
-        "../browser/ui/browser_finder_chromeos_browsertest.cc",
-        "../browser/ui/browser_tabstrip_browsertest_chromeos.cc",
-        "../browser/ui/settings_window_manager_browsertest_chromeos.cc",
-        "../browser/ui/views/frame/browser_frame_ash_browsertest.cc",
-        "../browser/ui/views/frame/browser_frame_view_chromeos_browsertest.cc",
-        "../browser/ui/views/frame/immersive_mode_browser_view_browsertest.cc",
-        "../browser/ui/views/frame/immersive_mode_controller_chromeos_browsertest.cc",
-        "../browser/ui/views/frame/system_menu_model_builder_browsertest_chromeos.cc",
-        "../browser/ui/views/frame/top_controls_slide_controller_chromeos_browsertest.cc",
-        "../browser/ui/views/intent_picker_bubble_view_browsertest_chromeos.cc",
-        "../browser/ui/views/mahi/mahi_menu_pixeltest.cc",
-        "../browser/ui/views/web_apps/protocol_handler_picker_interactve_uitest.cc",
-        "../browser/ui/views/web_apps/web_app_ash_interactive_ui_test.cc",
-        "../browser/ui/views/web_apps/web_app_integration_browsertest_cros.cc",
-        "//ash/webui/boca_ui/provider/tab_info_collector_browsertest.cc",
-        "//third_party/liblouis/wasm/liblouis_wrapper_browsertest.cc",
-        "base/ash/web_ui_browser_test_browsertest.cc",
-        "data/webui/chromeos/async_gen.cc",
-        "data/webui/chromeos/async_gen.h",
-      ]
-      data += [
-        "//ash/webui/common/resources/cr.js",
-        "//chrome/browser/resources/chromeos/arc_support/i18n_template_no_process.js",
-
-        # TODO(GYP): figure out which of these things are
-        # actually needed and also which should be pulled in via
-        # data or data_deps and through which dependencies.
-        "//chromeos/test/data/",
-        "//ui/file_manager/integration_tests/testing_provider/",
-        "$root_out_dir/chromevox_test_data/",
-        "$root_out_dir/content_shell.pak",
-        "$root_out_dir/resources/chromeos/",
-        "../browser/resources/chromeos/accessibility/switch_access/test_support.js",
-
-        # Libraries for tests that inherit from BaseWebUIBrowserTest.
-        "//chrome/test/data/webui/chromeos/chai_v4.js",
-        "//chrome/test/data/webui/chromeos/test_api.js",
-
-        # For projectorscreencast manager browser tests:
-        "//media/test/data/bear-audio-mp4a.69.ts",
-        "//media/test/data/tulip2.webm",
-      ]
-      data_deps += [
-        "//ash/keyboard/ui:resources",
-        "//testing/buildbot/filters:chromeos_filters",
-        "//third_party/liblouis:liblouis_test_data",
-        "//ui/file_manager/integration_tests:build",
-      ]
-      if (use_dbus) {
-        deps += [ "//dbus:test_support" ]
-      }
-      if (use_cups) {
-        deps += [
-          "//chrome/browser/chromeos/extensions/printing_metrics:browser_tests",
-        ]
-      }
-
-      sources -= [
-        # chromeos does not support profile list avatar menu
-        "../browser/ui/views/external_protocol_dialog_browsertest.cc",
-
-        # chromeos does not use the profile chooser view
-        "../browser/ui/views/profiles/profile_menu_view_browsertest.cc",
-      ]
-
-      deps += [
-        ":test_support_ui",
-        "//ash:test_support",
-        "//ash/app_list",
-        "//ash/app_list:test_support",
-        "//ash/app_list/model:app_list_model",
-        "//ash/constants",
-        "//ash/keyboard/ui:test_support",
-        "//ash/public/cpp/holding_space:test_support",
-        "//ash/style",
-        "//ash/webui/annotator",
-        "//ash/webui/annotator:test_support",
-        "//ash/webui/boca_ui",
-        "//ash/webui/boca_ui/mojom",
-        "//ash/webui/common:trusted_types_util",
-        "//ash/webui/demo_mode_app_ui",
-        "//ash/webui/diagnostics_ui",
-        "//ash/webui/eche_app_ui",
-        "//ash/webui/eche_app_ui:browser_tests",
-        "//ash/webui/file_manager:constants",
-        "//ash/webui/file_manager:file_manager_ui",
-        "//ash/webui/file_manager/resources:file_manager_swa_resources_grit",
-        "//ash/webui/firmware_update_ui",
-        "//ash/webui/help_app_ui",
-        "//ash/webui/help_app_ui:browser_test_support",
-        "//ash/webui/help_app_ui:buildflags",
-        "//ash/webui/help_app_ui/search:mojo_bindings",
-        "//ash/webui/media_app_ui",
-        "//ash/webui/media_app_ui:browser_test_support",
-        "//ash/webui/media_app_ui:buildflags",
-        "//ash/webui/media_app_ui:mojo_bindings_untrusted",
-        "//ash/webui/os_feedback_ui",
-        "//ash/webui/personalization_app",
-        "//ash/webui/print_management",
-        "//ash/webui/print_management/backend",
-        "//ash/webui/projector_app",
-        "//ash/webui/projector_app:buildflags",
-        "//ash/webui/projector_app:test_support",
-        "//ash/webui/scanning",
-        "//ash/webui/settings/public/constants:mojom",
-        "//ash/webui/shimless_rma",
-        "//ash/webui/shortcut_customization_ui",
-        "//ash/webui/shortcut_customization_ui/backend",
-        "//ash/webui/shortcut_customization_ui/backend/search:mojo_bindings",
-        "//ash/webui/web_applications/test:test_support",
-        "//chrome/browser:cloud_identifier_util_ash",
-        "//chrome/browser/accessibility/media_app:browser_tests",
-        "//chrome/browser/accessibility/media_app/test:test_support",
-        "//chrome/browser/apps/almanac_api_client:browser_tests",
-        "//chrome/browser/apps/app_discovery_service/recommended_arc_apps",
-        "//chrome/browser/apps/app_discovery_service/recommended_arc_apps:test_support",
-        "//chrome/browser/apps/app_preload_service:browser_tests",
-        "//chrome/browser/apps/app_service:browser_tests",
-        "//chrome/browser/apps/app_service/app_install",
-        "//chrome/browser/apps/app_service/app_install:browser_tests",
-        "//chrome/browser/apps/app_service/app_install:proto",
-        "//chrome/browser/apps/link_capturing",
-        "//chrome/browser/ash:browser_tests",
-        "//chrome/browser/ash/accessibility",
-        "//chrome/browser/ash/accessibility:test_support",
-        "//chrome/browser/ash/app_list:test_support",
-        "//chrome/browser/ash/app_list/app_service",
-        "//chrome/browser/ash/app_list/arc",
-        "//chrome/browser/ash/app_list/arc:test_support",
-        "//chrome/browser/ash/app_list/search",
-        "//chrome/browser/ash/app_list/search/test:browser_test_support",
-        "//chrome/browser/ash/app_list/search/test:test_support",
-        "//chrome/browser/ash/app_list/test:test_support",
-        "//chrome/browser/ash/app_mode/test:test_support",
-        "//chrome/browser/ash/app_mode/web_app",
-        "//chrome/browser/ash/app_restore",
-        "//chrome/browser/ash/app_restore:browser_tests",
-        "//chrome/browser/ash/app_restore:test_support",
-        "//chrome/browser/ash/apps:browser_tests",
-        "//chrome/browser/ash/arc",
-        "//chrome/browser/ash/arc:arc_util",
-        "//chrome/browser/ash/arc/accessibility",
-        "//chrome/browser/ash/arc/auth",
-        "//chrome/browser/ash/arc/boot_phase_monitor",
-        "//chrome/browser/ash/arc/enterprise/cert_store",
-        "//chrome/browser/ash/arc/extensions",
-        "//chrome/browser/ash/arc/fileapi",
-        "//chrome/browser/ash/arc/intent_helper",
-        "//chrome/browser/ash/arc/policy",
-        "//chrome/browser/ash/arc/session",
-        "//chrome/browser/ash/arc/test:arc_test_support",
-        "//chrome/browser/ash/arc/tracing",
-        "//chrome/browser/ash/arc/tracing/test:test_support",
-        "//chrome/browser/ash/arc/user_session",
-        "//chrome/browser/ash/arc/vmm",
-        "//chrome/browser/ash/attestation",
-        "//chrome/browser/ash/attestation:test_support",
-        "//chrome/browser/ash/base",
-        "//chrome/browser/ash/bluetooth",
-        "//chrome/browser/ash/boca/on_task",
-        "//chrome/browser/ash/borealis:test_support",
-        "//chrome/browser/ash/borealis/testing:test_support",
-        "//chrome/browser/ash/bruschetta",
-        "//chrome/browser/ash/child_accounts",
-        "//chrome/browser/ash/child_accounts:test_support",
-        "//chrome/browser/ash/child_accounts/parent_access_code",
-        "//chrome/browser/ash/child_accounts/parent_access_code:test_support",
-        "//chrome/browser/ash/child_accounts/time_limits",
-        "//chrome/browser/ash/child_accounts/time_limits:test_support",
-        "//chrome/browser/ash/crostini:browser_test_support",
-        "//chrome/browser/ash/crostini:test_support",
-        "//chrome/browser/ash/customization",
-        "//chrome/browser/ash/extensions",
-        "//chrome/browser/ash/extensions/autotest_private",
-        "//chrome/browser/ash/extensions/file_manager",
-        "//chrome/browser/ash/extensions/login_screen_ui",
-        "//chrome/browser/ash/extensions/speech",
-        "//chrome/browser/ash/extensions/users_private",
-        "//chrome/browser/ash/file_manager",
-        "//chrome/browser/ash/file_manager:test_support",
-        "//chrome/browser/ash/file_suggest",
-        "//chrome/browser/ash/file_suggest:test_support",
-        "//chrome/browser/ash/file_system_provider",
-        "//chrome/browser/ash/file_system_provider:test_support",
-        "//chrome/browser/ash/guest_os",
-        "//chrome/browser/ash/guest_os/public",
-        "//chrome/browser/ash/input_method",
-        "//chrome/browser/ash/input_method:test_support",
-        "//chrome/browser/ash/login",
-        "//chrome/browser/ash/login:test_support",
-        "//chrome/browser/ash/login/app_mode/test:test_support",
-        "//chrome/browser/ash/login/auth",
-        "//chrome/browser/ash/login/demo_mode",
-        "//chrome/browser/ash/login/demo_mode:test_support",
-        "//chrome/browser/ash/login/enrollment",
-        "//chrome/browser/ash/login/lock",
-        "//chrome/browser/ash/login/lock:test_support",
-        "//chrome/browser/ash/login/lock/online_reauth",
-        "//chrome/browser/ash/login/oobe_quick_start/connectivity:test_support",
-        "//chrome/browser/ash/login/quick_unlock",
-        "//chrome/browser/ash/login/saml:test_support",
-        "//chrome/browser/ash/login/screens:test_support",
-        "//chrome/browser/ash/login/session",
-        "//chrome/browser/ash/login/session:test_support",
-        "//chrome/browser/ash/login/signin",
-        "//chrome/browser/ash/login/test:test_support",
-        "//chrome/browser/ash/login/users",
-        "//chrome/browser/ash/login/users/avatar:test_support",
-        "//chrome/browser/ash/net",
-        "//chrome/browser/ash/notifications",
-        "//chrome/browser/ash/os_feedback",
-        "//chrome/browser/ash/ownership",
-        "//chrome/browser/ash/platform_keys",
-        "//chrome/browser/ash/platform_keys:test_support",
-        "//chrome/browser/ash/platform_keys/key_permissions",
-        "//chrome/browser/ash/policy/affiliation:test_support",
-        "//chrome/browser/ash/policy/core",
-        "//chrome/browser/ash/policy/core:test_support",
-        "//chrome/browser/ash/policy/display",
-        "//chrome/browser/ash/policy/dlp",
-        "//chrome/browser/ash/policy/dlp/dialogs",
-        "//chrome/browser/ash/policy/dlp/test:test_support",
-        "//chrome/browser/ash/policy/enrollment",
-        "//chrome/browser/ash/policy/enrollment:test_support",
-        "//chrome/browser/ash/policy/enrollment/psm:test_support",
-        "//chrome/browser/ash/policy/external_data",
-        "//chrome/browser/ash/policy/external_data:test_support",
-        "//chrome/browser/ash/policy/handlers",
-        "//chrome/browser/ash/policy/handlers:test_support",
-        "//chrome/browser/ash/policy/login:test_support",
-        "//chrome/browser/ash/policy/remote_commands",
-        "//chrome/browser/ash/policy/remote_commands:test_support",
-        "//chrome/browser/ash/policy/reporting/event_based_logs",
-        "//chrome/browser/ash/policy/reporting/event_based_logs/event_observers",
-        "//chrome/browser/ash/policy/reporting/metrics_reporting",
-        "//chrome/browser/ash/policy/reporting/metrics_reporting:test_support",
-        "//chrome/browser/ash/policy/reporting/metrics_reporting/fatal_crash",
-        "//chrome/browser/ash/policy/reporting/metrics_reporting/network",
-        "//chrome/browser/ash/policy/reporting/os_updates",
-        "//chrome/browser/ash/policy/reporting/user_session_activity",
-        "//chrome/browser/ash/policy/skyvault",
-        "//chrome/browser/ash/policy/status_collector",
-        "//chrome/browser/ash/policy/test_support",
-        "//chrome/browser/ash/printing",
-        "//chrome/browser/ash/printing:test_support",
-        "//chrome/browser/ash/printing/history",
-        "//chrome/browser/ash/printing/history:test_support",
-        "//chrome/browser/ash/printing/print_management",
-        "//chrome/browser/ash/remote_apps",
-        "//chrome/browser/ash/settings",
-        "//chrome/browser/ash/settings:test_support",
-        "//chrome/browser/ash/system_web_apps/test_support",
-        "//chrome/browser/ash/system_web_apps/test_support:test_support_ui",
-        "//chrome/browser/ash/test:test_support",
-        "//chrome/browser/ash/video_conference",
-        "//chrome/browser/chromeos:browser_tests",
-        "//chrome/browser/chromeos/app_mode",
-        "//chrome/browser/chromeos/arc",
-        "//chrome/browser/chromeos/enterprise/cloud_storage",
-        "//chrome/browser/chromeos/enterprise/cloud_storage:browser_tests",
-        "//chrome/browser/chromeos/network",
-        "//chrome/browser/chromeos/platform_keys",
-        "//chrome/browser/chromeos/policy/dlp",
-        "//chrome/browser/chromeos/policy/dlp/test:test_support",
-        "//chrome/browser/chromeos/tablet_mode:browser_tests",
-        "//chrome/browser/chromeos/video_conference",
-        "//chrome/browser/enterprise/connectors/device_trust:features",
-        "//chrome/browser/enterprise/connectors/device_trust/signals:browser_tests",
-        "//chrome/browser/image_decoder",
-        "//chrome/browser/invalidation:browser_tests",
-        "//chrome/browser/media/router:test_support",
-        "//chrome/browser/media_galleries",
-        "//chrome/browser/media_galleries:test_support",
-        "//chrome/browser/media_galleries/fileapi:browser_tests",
-        "//chrome/browser/metrics/structured:browser_tests",
-        "//chrome/browser/nearby_sharing/common",
-        "//chrome/browser/new_tab_page/chrome_colors",
-        "//chrome/browser/policy:onc",
-        "//chrome/browser/policy/messaging_layer/proto:add_remove_user_event_proto",
-        "//chrome/browser/policy/messaging_layer/proto:login_logout_event_proto",
-        "//chrome/browser/resources/chromeos/accessibility:browser_tests",
-        "//chrome/browser/smart_card:browser_tests",
-        "//chrome/browser/speech",
-        "//chrome/browser/support_tool/ash:browser_tests",
-        "//chrome/browser/ui/ash:browser_tests",
-        "//chrome/browser/ui/ash:test_support",
-        "//chrome/browser/ui/ash/account_manager",
-        "//chrome/browser/ui/ash/account_manager:test_support",
-        "//chrome/browser/ui/ash/arc/arc_app_dialog_view:browser_tests",
-        "//chrome/browser/ui/ash/capture_mode",
-        "//chrome/browser/ui/ash/editor_menu",
-        "//chrome/browser/ui/ash/editor_menu:utils",
-        "//chrome/browser/ui/ash/editor_menu:views",
-        "//chrome/browser/ui/ash/holding_space:test_support",
-        "//chrome/browser/ui/ash/input_method",
-        "//chrome/browser/ui/ash/keyboard",
-        "//chrome/browser/ui/ash/keyboard:ash_test_support",
-        "//chrome/browser/ui/ash/login",
-        "//chrome/browser/ui/ash/login:test_support",
-        "//chrome/browser/ui/ash/login/login_screen_extension_ui",
-        "//chrome/browser/ui/ash/multi_user",
-        "//chrome/browser/ui/ash/network",
-        "//chrome/browser/ui/ash/quick_answers",
-        "//chrome/browser/ui/ash/quick_answers/test:mock_quick_answers_client",
-        "//chrome/browser/ui/ash/read_write_cards",
-        "//chrome/browser/ui/ash/read_write_cards:read_write_cards_manager",
-        "//chrome/browser/ui/ash/session",
-        "//chrome/browser/ui/ash/shelf",
-        "//chrome/browser/ui/ash/shelf:test_support",
-        "//chrome/browser/ui/ash/system_web_apps",
-        "//chrome/browser/ui/chromeos:browser_tests",
-        "//chrome/browser/ui/tabs:test_support",
-        "//chrome/browser/ui/views/apps:browser_tests",
-        "//chrome/browser/ui/views/apps/app_dialog:browser_tests",
-        "//chrome/browser/ui/views/bruschetta:browser_tests",
-        "//chrome/browser/ui/views/crostini",
-        "//chrome/browser/ui/views/crostini:browser_test_support",
-        "//chrome/browser/ui/views/crostini:browser_tests",
-        "//chrome/browser/ui/views/frame",
-        "//chrome/browser/ui/views/frame:app_menu_button_observer",
-        "//chrome/browser/ui/views/frame:contents_container_outline",
-        "//chrome/browser/ui/views/frame:scrim_view",
-        "//chrome/browser/ui/views/frame:top_controls_slide_controller",
-        "//chrome/browser/ui/views/mahi",
-        "//chrome/browser/ui/views/profiles:profile_indicator_icon",
-        "//chrome/browser/ui/views/select_file_dialog_extension:browser_tests",
-        "//chrome/browser/ui/views/web_apps:protocol_handler_picker_dialog",
-        "//chrome/browser/ui/webui/ash:browser_tests",
-        "//chrome/browser/ui/webui/ash/add_supervision",
-        "//chrome/browser/ui/webui/ash/add_supervision:mojo_bindings",
-        "//chrome/browser/ui/webui/ash/cloud_upload",
-        "//chrome/browser/ui/webui/ash/edu_coexistence",
-        "//chrome/browser/ui/webui/ash/login",
-        "//chrome/browser/ui/webui/ash/manage_mirrorsync:mojo_bindings",
-        "//chrome/browser/ui/webui/ash/parent_access",
-        "//chrome/browser/ui/webui/ash/parent_access:mojo_bindings",
-        "//chrome/browser/ui/webui/ash/settings/pages/files/mojom",
-        "//chrome/browser/ui/webui/ash/settings/test_support",
-        "//chrome/browser/ui/webui/ash/skyvault",
-        "//chrome/browser/ui/webui/certificate_manager",
-        "//chrome/browser/ui/webui/nearby_share:browser_tests",
-        "//chrome/browser/ui/webui/signin/ash:browser_tests",
-        "//chrome/browser/web_applications/app_service",
-        "//chrome/services/file_util/public/cpp:browser_tests",
-        "//chrome/test/data/webui/chromeos:web_ui_test_bindings",
-        "//chromeos:test_support",
-        "//chromeos/ash/components/assistant:buildflags",
-        "//chromeos/ash/components/attestation",
-        "//chromeos/ash/components/attestation:test_support",
-        "//chromeos/ash/components/audio",
-        "//chromeos/ash/components/boca/proto",
-        "//chromeos/ash/components/browser_context_helper",
-        "//chromeos/ash/components/chaps_util:test_support",
-        "//chromeos/ash/components/cryptohome",
-        "//chromeos/ash/components/dbus:test_support",
-        "//chromeos/ash/components/dbus/attestation",
-        "//chromeos/ash/components/dbus/attestation:attestation_proto",
-        "//chromeos/ash/components/dbus/biod",
-        "//chromeos/ash/components/dbus/biod:biod_proto",
-        "//chromeos/ash/components/dbus/cicerone",
-        "//chromeos/ash/components/dbus/concierge",
-        "//chromeos/ash/components/dbus/cros_disks",
-        "//chromeos/ash/components/dbus/cryptohome",
-        "//chromeos/ash/components/dbus/cryptohome:cryptohome_proto",
-        "//chromeos/ash/components/dbus/debug_daemon",
-        "//chromeos/ash/components/dbus/image_burner",
-        "//chromeos/ash/components/dbus/rmad",
-        "//chromeos/ash/components/dbus/seneschal",
-        "//chromeos/ash/components/dbus/services:test_support",
-        "//chromeos/ash/components/dbus/session_manager",
-        "//chromeos/ash/components/dbus/shill",
-        "//chromeos/ash/components/dbus/spaced",
-        "//chromeos/ash/components/dbus/system_clock",
-        "//chromeos/ash/components/dbus/system_proxy",
-        "//chromeos/ash/components/dbus/system_proxy:system_proxy_proto",
-        "//chromeos/ash/components/dbus/update_engine",
-        "//chromeos/ash/components/dbus/upstart",
-        "//chromeos/ash/components/disks",
-        "//chromeos/ash/components/disks:test_support",
-        "//chromeos/ash/components/editor_menu/public/cpp",
-        "//chromeos/ash/components/geolocation",
-        "//chromeos/ash/components/hid_detection",
-        "//chromeos/ash/components/hid_detection:test_support",
-        "//chromeos/ash/components/kcer",
-        "//chromeos/ash/components/kcer:chaps_proto",
-        "//chromeos/ash/components/login/auth",
-        "//chromeos/ash/components/login/auth:test_support",
-        "//chromeos/ash/components/login/login_state:test_support",
-        "//chromeos/ash/components/login/session",
-        "//chromeos/ash/components/mojo_service_manager:test_support",
-        "//chromeos/ash/components/osauth/public",
-        "//chromeos/ash/components/osauth/test_support",
-        "//chromeos/ash/components/phonehub:debug",
-        "//chromeos/ash/components/policy/device_policy:test_support",
-        "//chromeos/ash/components/smbfs",
-        "//chromeos/ash/components/system",
-        "//chromeos/ash/components/system_web_apps:system_web_app_type",
-        "//chromeos/ash/components/timezone",
-        "//chromeos/ash/experiences/arc",
-        "//chromeos/ash/experiences/arc:arc_base",
-        "//chromeos/ash/experiences/arc:arc_metrics_constants",
-        "//chromeos/ash/experiences/arc:arc_test_support",
-        "//chromeos/ash/experiences/arc:prefs",
-        "//chromeos/ash/experiences/arc/session:arc_base_enums",
-        "//chromeos/ash/experiences/system_web_apps/types",
-        "//chromeos/ash/services/assistant/public/cpp",
-        "//chromeos/ash/services/auth_factor_config",
-        "//chromeos/ash/services/cros_healthd/public/cpp:test_support",
-        "//chromeos/ash/services/device_sync/public/cpp:test_support",
-        "//chromeos/ash/services/keymaster/public/mojom",
-        "//chromeos/ash/services/keymint/public/mojom",
-        "//chromeos/ash/services/multidevice_setup/public/cpp:test_support",
-        "//chromeos/ash/services/network_config",
-        "//chromeos/ash/services/network_config:in_process_instance",
-        "//chromeos/components/kiosk",
-        "//chromeos/components/kiosk:test_support",
-        "//chromeos/components/magic_boost/public/cpp",
-        "//chromeos/components/mahi/public/cpp",
-        "//chromeos/components/mgs",
-        "//chromeos/components/onc:test_support",
-        "//chromeos/components/quick_answers",
-        "//chromeos/components/quick_answers/public/cpp",
-        "//chromeos/components/quick_answers/public/cpp:constants",
-        "//chromeos/components/quick_answers/public/cpp:prefs",
-        "//chromeos/components/remote_apps/mojom",
-        "//chromeos/constants",
-        "//chromeos/dbus/dlp",
-        "//chromeos/dbus/missive:test_support",
-        "//chromeos/dbus/regmon",
-        "//chromeos/process_proxy",
-        "//chromeos/services/machine_learning/public/cpp:stub",
-        "//chromeos/services/network_config/public/cpp:test_support",
-        "//chromeos/services/tts",
-        "//chromeos/strings",
-        "//chromeos/ui/base",
-        "//chromeos/ui/frame",
-        "//chromeos/ui/frame:test_support",
-        "//chromeos/ui/wm",
-        "//components/access_code_cast/common:metrics",
-        "//components/account_id:test_support",
-        "//components/account_manager_core:test_support",
-        "//components/app_constants",
-        "//components/app_restore",
-        "//components/component_updater/ash:test_support",
-        "//components/crash/content/browser/error_reporting:mock_crash_endpoint",
-        "//components/desks_storage:test_support",
-        "//components/device_event_log",
-        "//components/device_signals/core/browser",
-        "//components/drive",
-        "//components/enterprise/common/proto:dlp_policy_event_proto",
-        "//components/enterprise/device_trust/core",
-        "//components/exo:test_support",
-        "//components/feedback",
-        "//components/feedback/content",
-        "//components/feedback/content:factory",
-        "//components/feedback/redaction_tool",
-        "//components/file_access:test_support",
-        "//components/global_media_controls",
-        "//components/global_media_controls:test_support",
-        "//components/live_caption:constants",
-        "//components/manta",
-        "//components/onc",
-        "//components/prefs",
-        "//components/quirks",
-        "//components/reporting/client:report_queue",
-        "//components/reporting/client:test_support",
-        "//components/reporting/proto:metric_data_proto",
-        "//components/reporting/storage:test_support",
-        "//components/reporting/util:test_callbacks_support",
-        "//components/rlz",
-        "//components/services/app_service",
-        "//components/services/app_service/public/cpp:test_support",
-        "//components/session_manager/core",
-        "//components/supervised_user/core/browser/proto",
-        "//components/upload_list",
-        "//components/user_manager:test_support",
-        "//components/variations/field_trial_config",
-        "//components/web_resource",
-        "//components/webapps/isolated_web_apps",
-        "//extensions/browser:test_support",
-        "//mojo/core/embedder",
-        "//mojo/public/cpp/test_support:test_utils",
-        "//remoting/host/chromeos:features",
-        "//services/audio/public/cpp",
-        "//services/audio/public/cpp:test_support",
-        "//services/media_session/public/mojom",
-        "//services/preferences/public/cpp",
-        "//services/preferences/public/mojom",
-        "//services/service_manager/public/cpp",
-        "//third_party/blink/public/common",
-        "//ui/base/idle",
-        "//ui/base/idle:test_support",
-        "//ui/base/ime/ash",
-        "//ui/chromeos",
-        "//ui/chromeos/styles:cros_tokens_color_mappings",
-        "//ui/display:display_manager_test_api",
-        "//ui/display/manager",
-        "//ui/events/devices:test_support",
-        "//ui/file_manager:file_manager_gen_resources_grit",
-        "//ui/file_manager:resources_grit",
-        "//ui/file_manager/integration_tests:build",
-        "//ui/webui/resources/cr_components/app_management:mojo_bindings",
-        "//ui/wm/public",
-        "//url",
-      ]
-    }
     if (safe_browsing_mode == 1) {
       sources += [
         "../browser/safe_browsing/chrome_client_side_detection_host_delegate_browsertest.cc",
@@ -4491,7 +3696,7 @@ if (!is_android) {
       sources += [ "../browser/ui/views/eula_dialog_linux_browsertest.cc" ]
       deps += [ "//chrome/browser/ui/views:eula_dialog_linux" ]
     }
-    if (!is_posix || is_chromeos) {
+    if (!is_posix) {
       sources -= [ "../common/time_format_browsertest.cc" ]
     }
 
@@ -4535,16 +3740,14 @@ if (!is_android) {
         "//printing:test_support",
       ]
 
-      if (!is_chromeos) {
-        sources +=
-            [ "../browser/printing/system_access_process_print_browsertest.cc" ]
-      }
+      sources +=
+          [ "../browser/printing/system_access_process_print_browsertest.cc" ]
     }
     if (enable_paint_preview) {
       deps += [ "//chrome/browser/paint_preview:browser_tests" ]
     }
 
-    if (toolkit_views && !is_chromeos) {
+    if (toolkit_views) {
       sources +=
           [ "../browser/ui/screen_capture_notification_ui_browsertest.cc" ]
     }
@@ -4611,12 +3814,10 @@ if (!is_android) {
       "//chrome/browser/page_load_metrics/observers:browser_tests",
     ]
 
-    if (!is_chromeos) {
-      deps += [
-        "//chrome/browser/ui/webui/whats_new:browser_tests",
-        "//chrome/browser/ui/webui/whats_new:mojo_bindings",
-      ]
-    }
+    deps += [
+      "//chrome/browser/ui/webui/whats_new:browser_tests",
+      "//chrome/browser/ui/webui/whats_new:mojo_bindings",
+    ]
 
     if (chrome_root_store_cert_management_ui) {
       deps += [ "//components/server_certificate_database" ]
@@ -4641,7 +3842,7 @@ if (!is_android) {
   }
 }
 
-if (is_linux || is_chromeos || is_mac || is_win || is_android) {
+if (is_linux || is_mac || is_win || is_android) {
   import("//tools/binary_size/sizes.gni")
 
   # TODO(b/246519185) - Py3 incompatible, decide if to keep test.
@@ -4713,7 +3914,6 @@ if (!is_android) {
       ":telemetry_perf_unittests_base",
       "//tools/perf",
     ]
-    enable_cros_wrapper = true
   }
 } else {
   template("telemetry_perf_unittests_android_template") {
@@ -4807,15 +4007,7 @@ template("performance_test_suite_template_base") {
                          ])
   script_test(target_name) {
     script = "//testing/scripts/run_performance_tests.py"
-    if (is_chromeos_device) {
-      if (defined(override_board)) {
-        args = [ "bin/cros_update_wrapper --board=${override_board} --flash ../../tools/perf/run_benchmark" ]
-      } else {
-        args = [ "bin/cros_update_wrapper ../../tools/perf/run_benchmark" ]
-      }
-    } else {
-      args = [ "../../tools/perf/run_benchmark" ]
-    }
+    args = [ "../../tools/perf/run_benchmark" ]
     args += [ "--chromium-output-directory=@WrappedPath(.)" ]
 
     if (is_desktop_android) {
@@ -4911,15 +4103,6 @@ if (is_linux) {
 # These set --board to ${board} instead of deriving it from the target.
 # This is useful for Lacros, where the generic build is deployed to
 # many different targets.
-if (is_chromeos_device && cros_boards != "") {
-  foreach(_board, string_split(cros_boards, ":")) {
-    _board_underscore = string_replace(_board, "-", "_")
-    performance_test_suite_template(
-        "performance_test_suite_${_board_underscore}") {
-      override_board = _board
-    }
-  }
-}
 
 if (is_android) {
   # Difference between this and performance_test_suite is that this runs a devil
@@ -5088,7 +4271,7 @@ test("unit_tests") {
       "$root_gen_dir/chrome/android/chrome_apk_paks/resources.pak",
     ]
   }
-  if (is_linux || is_chromeos || is_win) {
+  if (is_linux || is_win) {
     data_deps += [ "//chrome:packed_resources" ]
   }
   defines = []
@@ -5848,10 +5031,6 @@ test("unit_tests") {
     deps += [ "//chrome/browser/ui/webui/certificate_manager:unit_tests" ]
   }
 
-  if (enable_server_based_recognition) {
-    deps += [ "//chrome/services/speech/internal:unit_tests" ]
-  }
-
   if (enable_compose) {
     sources += [
       "../browser/ui/views/compose/compose_dialog_view_unittest.cc",
@@ -5883,7 +5062,7 @@ test("unit_tests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     deps += [
       "//chrome/browser/enterprise/network_header_injection:unit_tests",
       "//chrome/browser/multistep_filter:unit_tests",
@@ -6061,7 +5240,7 @@ test("unit_tests") {
     deps += [ "//chrome/browser/paint_preview:unit_tests" ]
   }
 
-  if (is_win || is_chromeos || is_mac) {
+  if (is_win || is_mac) {
     deps += [ "//chrome/browser/webshare:unit_tests" ]
   }
 
@@ -6782,12 +5961,6 @@ test("unit_tests") {
       "//ui/webui/resources/js/browser_command:mojo_bindings",
       "//ui/webui/tracked_element:unit_tests",
     ]
-
-    data += [ "//chromeos/ash/experiences/arc/test/data/icons/" ]
-
-    if (include_js2gtest_tests && is_chromeos) {
-      data += js2gtest_js_libraries
-    }
   }
 
   if (enable_webui_ntp) {
@@ -6808,7 +5981,7 @@ test("unit_tests") {
     }
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     deps += [
       "//chrome/browser/default_browser:unit_tests",
       "//chrome/browser/download/bubble:unit_tests",
@@ -6835,336 +6008,6 @@ test("unit_tests") {
 
   if (is_linux) {
     deps += [ "//chrome/browser:shell_integration_linux" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "../browser/shell_integration_chromeos_unittest.cc",
-      "../browser/ui/ash/editor_menu/editor_menu_card_context_unittest.cc",
-      "../browser/ui/ash/editor_menu/editor_menu_view_unittest.cc",
-      "../browser/ui/ash/editor_menu/utils/pre_target_handler_unittest.cc",
-      "../browser/ui/ash/editor_menu/utils/utils_unittest.cc",
-      "../browser/ui/ash/magic_boost/magic_boost_card_controller_unittest.cc",
-      "../browser/ui/ash/magic_boost/magic_boost_opt_in_card_unittest.cc",
-      "../browser/ui/ash/quick_answers/quick_answers_controller_unittest.cc",
-      "../browser/ui/ash/quick_answers/quick_answers_state_ash_unittest.cc",
-      "../browser/ui/ash/quick_answers/quick_answers_ui_controller_unittest.cc",
-      "../browser/ui/ash/quick_answers/ui/magic_boost_user_consent_view_unittest.cc",
-      "../browser/ui/ash/quick_answers/ui/quick_answers_view_unittest.cc",
-      "../browser/ui/ash/quick_answers/ui/user_consent_view_unittest.cc",
-      "../browser/ui/views/mahi/mahi_condensed_menu_view_unittest.cc",
-      "../browser/ui/views/mahi/mahi_menu_controller_unittest.cc",
-      "../browser/ui/views/mahi/mahi_menu_view_unittest.cc",
-      "../common/chrome_constants_ash_unittest.cc",
-      "../renderer/ash_merge_session_loader_throttle_unittest.cc",
-      "../renderer/chromeos_delayed_callback_group_unittest.cc",
-      "../test/base/ash/v8_unit_test.cc",
-      "../test/base/ash/v8_unit_test.h",
-    ]
-
-    deps += [
-      "//ash:test_support",
-      "//ash/app_list:test_support",
-      "//ash/app_list/model:app_list_model",
-      "//ash/public/cpp:test_support",
-      "//ash/public/cpp/resources:ash_public_unscaled_resources",
-      "//ash/resources/vector_icons",
-      "//ash/strings",
-      "//ash/webui/annotator:test_support",
-      "//ash/webui/annotator/public/mojom:annotator_mojo_bindings",
-      "//ash/webui/camera_app_ui",
-      "//ash/webui/mall:app_id",
-      "//ash/webui/personalization_app/mojom",
-      "//ash/webui/projector_app:test_support",
-      "//ash/webui/projector_app/public/cpp",
-      "//ash/webui/projector_app/public/mojom:projector_mojo_bindings",
-      "//ash/webui/recorder_app_ui",
-      "//ash/webui/scanning",
-      "//ash/webui/settings/public/constants:mojom",
-      "//chrome/browser:global_features",
-      "//chrome/browser/accessibility/live_caption:test_support",
-      "//chrome/browser/accessibility/media_app/test:test_support",
-      "//chrome/browser/apps/app_service/app_install:unit_tests",
-      "//chrome/browser/apps/app_service/promise_apps/proto",
-      "//chrome/browser/ash/app_list",
-      "//chrome/browser/ash/app_list/app_service",
-      "//chrome/browser/ash/app_list/arc:test_support",
-      "//chrome/browser/ash/app_list/search/ranking:proto",
-      "//chrome/browser/ash/app_list/search/test:test_support",
-      "//chrome/browser/ash/app_list/search/util:proto",
-      "//chrome/browser/ash/app_mode/web_app",
-      "//chrome/browser/ash/app_restore",
-      "//chrome/browser/ash/apps",
-      "//chrome/browser/ash/arc",
-      "//chrome/browser/ash/arc:arc_util",
-      "//chrome/browser/ash/arc/boot_phase_monitor",
-      "//chrome/browser/ash/arc/fileapi",
-      "//chrome/browser/ash/arc/session",
-      "//chrome/browser/ash/arc/test:arc_test_support",
-      "//chrome/browser/ash/arc/vmm",
-      "//chrome/browser/ash/attestation",
-      "//chrome/browser/ash/attestation:test_support",
-      "//chrome/browser/ash/boca/on_task",
-      "//chrome/browser/ash/browser_delegate:impl",
-      "//chrome/browser/ash/cert_provisioning",
-      "//chrome/browser/ash/certificate_provider:unit_tests",
-      "//chrome/browser/ash/crostini:test_support",
-      "//chrome/browser/ash/customization",
-      "//chrome/browser/ash/eche_app",
-      "//chrome/browser/ash/extensions",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/browser/ash/file_manager:test_support",
-      "//chrome/browser/ash/file_suggest",
-      "//chrome/browser/ash/file_suggest:test_support",
-      "//chrome/browser/ash/fileapi",
-      "//chrome/browser/ash/fusebox",
-      "//chrome/browser/ash/guest_os",
-      "//chrome/browser/ash/input_method",
-      "//chrome/browser/ash/kcer",
-      "//chrome/browser/ash/login/quick_unlock",
-      "//chrome/browser/ash/login/smart_lock",
-      "//chrome/browser/ash/login/users",
-      "//chrome/browser/ash/login/users:test_support",
-      "//chrome/browser/ash/login/users/avatar",
-      "//chrome/browser/ash/magic_boost",
-      "//chrome/browser/ash/magic_boost:test_support",
-      "//chrome/browser/ash/mahi/web_contents/test_support",
-      "//chrome/browser/ash/multidevice_setup",
-      "//chrome/browser/ash/ownership",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/policy/core:test_support",
-      "//chrome/browser/ash/policy/dlp",
-      "//chrome/browser/ash/policy/enrollment",
-      "//chrome/browser/ash/policy/remote_commands/crd:test_support",
-      "//chrome/browser/ash/policy/reporting/metrics_reporting",
-      "//chrome/browser/ash/policy/skyvault",
-      "//chrome/browser/ash/policy/status_collector",
-      "//chrome/browser/ash/policy/uploading",
-      "//chrome/browser/ash/printing:test_support",
-      "//chrome/browser/ash/release_notes",
-      "//chrome/browser/ash/scanning",
-      "//chrome/browser/ash/scanning:test_support",
-      "//chrome/browser/ash/settings",
-      "//chrome/browser/ash/settings:test_support",
-      "//chrome/browser/ash/smb_client:test_support",
-      "//chrome/browser/ash/system_logs",
-      "//chrome/browser/ash/system_web_apps/apps",
-      "//chrome/browser/ash/system_web_apps/apps/camera_app",
-      "//chrome/browser/ash/system_web_apps/apps/help_app",
-      "//chrome/browser/ash/system_web_apps/apps/media_app",
-      "//chrome/browser/ash/system_web_apps/test_support",
-      "//chrome/browser/ash/wallpaper_handlers:test_support",
-      "//chrome/browser/chromeos/office_web_app",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/chromeos/policy/dlp/test:test_support",
-      "//chrome/browser/chromeos/reporting",
-      "//chrome/browser/enterprise/connectors/device_trust/ash:unit_tests",
-      "//chrome/browser/enterprise/connectors/device_trust/attestation/ash",
-      "//chrome/browser/enterprise/connectors/device_trust/attestation/ash:unit_tests",
-      "//chrome/browser/media_galleries",
-      "//chrome/browser/media_galleries:test_support",
-      "//chrome/browser/media_galleries:unit_tests",
-      "//chrome/browser/media_galleries/fileapi:unit_tests",
-      "//chrome/browser/nearby_sharing",
-      "//chrome/browser/nearby_sharing:impl",
-      "//chrome/browser/nearby_sharing:share_target",
-      "//chrome/browser/nearby_sharing:unit_tests",
-      "//chrome/browser/nearby_sharing/certificates",
-      "//chrome/browser/nearby_sharing/certificates:test_support",
-      "//chrome/browser/nearby_sharing/common",
-      "//chrome/browser/nearby_sharing/contacts",
-      "//chrome/browser/nearby_sharing/contacts:test_support",
-      "//chrome/browser/nearby_sharing/instantmessaging/proto",
-      "//chrome/browser/nearby_sharing/local_device_data",
-      "//chrome/browser/nearby_sharing/local_device_data:test_support",
-      "//chrome/browser/nearby_sharing/proto:tachyon_proto",
-      "//chrome/browser/policy:onc",
-      "//chrome/browser/policy:system_features_disable_list",
-      "//chrome/browser/push_notification",
-      "//chrome/browser/push_notification:test_support",
-      "//chrome/browser/push_notification:unit_tests",
-      "//chrome/browser/push_notification/protos:proto",
-      "//chrome/browser/screen_ai/public:test_support",
-      "//chrome/browser/sharesheet",
-      "//chrome/browser/sharesheet:unit_tests",
-      "//chrome/browser/smart_card",
-      "//chrome/browser/task_manager:impl",
-      "//chrome/browser/ui/ash:test_support",
-      "//chrome/browser/ui/ash/assistant",
-      "//chrome/browser/ui/ash/editor_menu",
-      "//chrome/browser/ui/ash/editor_menu:utils",
-      "//chrome/browser/ui/ash/editor_menu:views",
-      "//chrome/browser/ui/ash/holding_space",
-      "//chrome/browser/ui/ash/holding_space:test_support",
-      "//chrome/browser/ui/ash/login:test_support",
-      "//chrome/browser/ui/ash/magic_boost",
-      "//chrome/browser/ui/ash/magic_boost:magic_boost_constants",
-      "//chrome/browser/ui/ash/magic_boost:test_support",
-      "//chrome/browser/ui/ash/multi_user",
-      "//chrome/browser/ui/ash/quick_answers",
-      "//chrome/browser/ui/ash/quick_answers/test:mock_quick_answers_client",
-      "//chrome/browser/ui/ash/quick_answers/ui:result_view",
-      "//chrome/browser/ui/ash/quick_answers/ui:retry_view",
-      "//chrome/browser/ui/ash/read_write_cards",
-      "//chrome/browser/ui/ash/read_write_cards:unit_tests",
-      "//chrome/browser/ui/ash/session:test_support",
-      "//chrome/browser/ui/ash/shelf",
-      "//chrome/browser/ui/ash/system",
-      "//chrome/browser/ui/ash/wallpaper",
-      "//chrome/browser/ui/ash/wallpaper:test_support",
-      "//chrome/browser/ui/browser_window/test:test_support",
-      "//chrome/browser/ui/views/crostini",
-      "//chrome/browser/ui/views/mahi",
-      "//chrome/browser/ui/webui:certificate_provisioning_ui_handler",
-      "//chrome/browser/ui/webui/about:unit_tests",
-      "//chrome/browser/ui/webui/ash/add_supervision",
-      "//chrome/browser/ui/webui/ash/enterprise_reporting:mojo_bindings",
-      "//chrome/browser/ui/webui/ash/login",
-      "//chrome/browser/ui/webui/ash/settings",
-      "//chrome/browser/ui/webui/ash/smb_shares",
-      "//chrome/browser/ui/webui/help:unit_tests",
-      "//chrome/browser/ui/webui/nearby_share:mojom",
-      "//chrome/services/sharing/nearby/decoder",
-      "//chrome/services/sharing/public/cpp",
-      "//chrome/services/speech:lib",
-      "//chrome/test:test_support",
-      "//chromeos/ash/components/assistant:buildflags",
-      "//chromeos/ash/components/audio",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/carrier_lock",
-      "//chromeos/ash/components/cryptohome",
-      "//chromeos/ash/components/dbus",
-      "//chromeos/ash/components/dbus/attestation",
-      "//chromeos/ash/components/dbus/cicerone",
-      "//chromeos/ash/components/dbus/concierge",
-      "//chromeos/ash/components/dbus/cros_disks",
-      "//chromeos/ash/components/dbus/debug_daemon",
-      "//chromeos/ash/components/dbus/hermes",
-      "//chromeos/ash/components/dbus/image_loader",
-      "//chromeos/ash/components/dbus/seneschal",
-      "//chromeos/ash/components/dbus/shill",
-      "//chromeos/ash/components/dbus/spaced",
-      "//chromeos/ash/components/dbus/update_engine",
-      "//chromeos/ash/components/dbus/update_engine:proto",
-      "//chromeos/ash/components/disks",
-      "//chromeos/ash/components/disks:test_support",
-      "//chromeos/ash/components/editor_menu/public/cpp",
-      "//chromeos/ash/components/feature_usage",
-      "//chromeos/ash/components/login/auth:test_support",
-      "//chromeos/ash/components/login/login_state:test_support",
-      "//chromeos/ash/components/login/session",
-      "//chromeos/ash/components/multidevice:test_support",
-      "//chromeos/ash/components/nearby/common/connections_manager:test_support",
-      "//chromeos/ash/components/nearby/common/scheduling:test_support",
-      "//chromeos/ash/components/policy/device_policy:test_support",
-      "//chromeos/ash/components/proximity_auth",
-      "//chromeos/ash/components/proximity_auth:test_support",
-      "//chromeos/ash/components/string_matching",
-      "//chromeos/ash/components/sync_wifi",
-      "//chromeos/ash/components/system",
-      "//chromeos/ash/experiences/arc",
-      "//chromeos/ash/experiences/arc:arc_app_constants",
-      "//chromeos/ash/experiences/arc:arc_test_support",
-      "//chromeos/ash/experiences/arc/intent_helper",
-      "//chromeos/ash/experiences/arc/intent_helper:arc_intent_helper_constants",
-      "//chromeos/ash/experiences/arc/process",
-      "//chromeos/ash/services/assistant/public/cpp",
-      "//chromeos/ash/services/device_sync/public/cpp:test_support",
-      "//chromeos/ash/services/multidevice_setup/public/cpp:test_support",
-      "//chromeos/ash/services/nearby/public/cpp:tcp_server_socket_port",
-      "//chromeos/ash/services/nearby/public/cpp:test_support",
-      "//chromeos/ash/services/nearby/public/mojom",
-      "//chromeos/ash/services/network_config",
-      "//chromeos/ash/services/network_config:in_process_instance",
-      "//chromeos/ash/services/secure_channel/public/cpp/client:test_support",
-      "//chromeos/components/disks:prefs",
-      "//chromeos/components/kiosk",
-      "//chromeos/components/kiosk:test_support",
-      "//chromeos/components/magic_boost/public/cpp",
-      "//chromeos/components/magic_boost/test:fake_magic_boost_state",
-      "//chromeos/components/mahi/public/cpp",
-      "//chromeos/components/mgs:test_support",
-      "//chromeos/components/onc",
-      "//chromeos/components/quick_answers",
-      "//chromeos/components/quick_answers:test_support",
-      "//chromeos/components/quick_answers/public/cpp",
-      "//chromeos/components/quick_answers/public/cpp:constants",
-      "//chromeos/components/quick_answers/public/cpp:prefs",
-      "//chromeos/constants",
-      "//chromeos/dbus/permission_broker",
-      "//chromeos/dbus/power",
-      "//chromeos/dbus/power:power_manager_proto",
-      "//chromeos/dbus/regmon",
-      "//chromeos/dbus/tpm_manager",
-      "//chromeos/dbus/u2f",
-      "//chromeos/ime:gencode",
-      "//chromeos/services/assistant/public/shared",
-      "//chromeos/strings",
-      "//chromeos/ui/base",
-      "//chromeos/ui/frame",
-      "//chromeos/ui/frame:test_support",
-      "//chromeos/ui/wm",
-      "//components/app_constants",
-      "//components/application_locale_storage",
-      "//components/cross_device/nearby",
-      "//components/metrics/structured:structured_events",
-      "//components/metrics/structured:structured_metrics_features",
-      "//components/metrics/structured:test_support",
-      "//components/metrics/structured/lib",
-      "//components/omnibox/browser:vector_icons",
-      "//components/push_notification",
-      "//components/push_notification:test_support",
-      "//components/services/app_service",
-      "//components/session_manager/core",
-      "//components/session_manager/core:test_support",
-      "//components/session_manager/test:test_support",
-      "//components/soda",
-      "//components/webapk:proto",
-      "//mojo/public/cpp/test_support:test_utils",
-      "//third_party/nearby:rpc_resources_proto",
-      "//third_party/nearby:wire_format_proto",
-      "//ui/base/ime/ash",
-      "//ui/base/mojom:ui_base_types",
-      "//ui/chromeos",
-      "//ui/chromeos/strings",
-      "//ui/file_manager:resources_grit",
-      "//ui/wm/public",
-    ]
-
-    # Unit tests from other build files.
-    deps += [
-      "//chrome/browser/apps/almanac_api_client:unit_tests",
-      "//chrome/browser/apps/app_discovery_service:unit_tests",
-      "//chrome/browser/apps/app_preload_service:unit_tests",
-      "//chrome/browser/ash:unit_tests",
-      "//chrome/browser/chromeos:unit_tests",
-      "//chrome/browser/nearby_sharing/certificates:unit_tests",
-      "//chrome/browser/nearby_sharing/client:unit_tests",
-      "//chrome/browser/nearby_sharing/common:unit_tests",
-      "//chrome/browser/nearby_sharing/contacts:unit_tests",
-      "//chrome/browser/nearby_sharing/local_device_data:unit_tests",
-      "//chrome/browser/smart_card:unit_tests",
-      "//chrome/browser/support_tool/ash:unit_tests",
-      "//chrome/browser/ui/ash:unit_tests",
-      "//chrome/browser/ui/views/crostini:unit_tests",
-      "//chrome/browser/ui/webui/ash:unit_tests",
-      "//chrome/browser/ui/webui/signin/ash:unit_tests",
-      "//chrome/services/pdf:pdf_progressive_searchifier_test",
-      "//chrome/services/pdf:pdf_searchifier_test",
-      "//chrome/services/pdf:pdf_thumbnailer_test",
-      "//chrome/services/sharing:unit_tests",
-      "//chrome/services/sharing/nearby:unit_tests",
-      "//chrome/services/sharing/nearby/decoder:unit_tests",
-      "//chrome/services/sharing/nearby/platform:unit_tests",
-      "//chrome/services/sharing/nearby/quick_start_decoder:unit_tests",
-      "//chrome/services/sharing/public/cpp:unit_tests",
-      "//chromeos/ash/experiences/isolated_web_app:unit_tests",
-      "//components/app_restore:unit_tests",
-      "//components/sharing_message:unit_tests",
-      "//ui/webui/resources/cr_components/app_management:unit_tests",
-    ]
-
-    data_deps += [ "//testing/buildbot/filters:chromeos_filters" ]
   }
 
   if (use_ozone) {
@@ -7261,23 +6104,10 @@ test("unit_tests") {
       deps += [ "//chrome/browser/apps/app_shim:unit_tests" ]
     }
 
-    if (is_chromeos) {
-      sources += [
-        "../common/apps/platform_apps/media_galleries_permission_unittest.cc",
-      ]
-
-      deps += [
-        "//chrome/browser/chromeos/extensions/wm:unit_tests",
-        "//chrome/browser/ui/webui/certificate_manager",
-        "//chrome/common/apps/platform_apps",
-        "//chrome/common/chromeos/extensions:unit_tests",
-      ]
-    } else {
-      deps += [
-        "//chrome/browser/extensions/api/messaging:unit_tests",
-        "//components/enterprise:test_support",
-      ]
-    }
+    deps += [
+      "//chrome/browser/extensions/api/messaging:unit_tests",
+      "//components/enterprise:test_support",
+    ]
   }
 
   if (safe_browsing_mode == 1) {
@@ -7406,11 +6236,11 @@ test("unit_tests") {
         [ "//chrome/browser/extensions/api/safe_browsing_private:unit_tests" ]
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos || is_android) {
+  if (is_win || is_mac || is_linux || is_android) {
     deps += [ "//components/enterprise/device_trust/core:test_support" ]
   }
 
-  if (is_chromeos || is_android) {
+  if (is_android) {
     deps += [ "//chrome/browser/ui/webui/management:unit_tests" ]
   }
 
@@ -7418,7 +6248,7 @@ test("unit_tests") {
     deps += [ "../browser/enterprise/client_certificates:unit_tests" ]
   }
 
-  if (is_linux || is_chromeos || is_mac || is_win) {
+  if (is_linux || is_mac || is_win) {
     sources += []
 
     deps += [
@@ -7472,7 +6302,7 @@ test("unit_tests") {
     ]
   }
 
-  if (enable_dice_support || is_chromeos) {
+  if (enable_dice_support) {
     deps += []
   }
 
@@ -7545,22 +6375,22 @@ test("unit_tests") {
     }
   }
 
-  if ((is_linux || is_chromeos) && use_aura) {
+  if (is_linux && use_aura) {
     deps += [ "//ui/aura:test_support" ]
     if (use_dbus) {
       deps += [ "//dbus:test_support" ]
     }
   }
-  if (is_chrome_branded && (is_linux || is_chromeos) && current_cpu == "x86") {
+  if (is_chrome_branded && is_linux && current_cpu == "x86") {
     ldflags = [ "-Wl,--strip-debug" ]
   }
-  if (is_win || is_mac || is_chromeos) {
+  if (is_win || is_mac) {
     deps += [ "//chrome/common/notifications:unit_tests" ]
   }
   if (enable_rlz) {
     deps += [ "//chrome/browser/rlz:unit_tests" ]
   }
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [
       "../browser/ui/views/download/bubble/download_bubble_contents_view_unittest.cc",
       "../browser/ui/views/download/bubble/download_bubble_row_view_unittest.cc",
@@ -7795,9 +6625,6 @@ test("unit_tests") {
       "//chrome/browser/ui/views/profiles:avatar_badge_view",
       "//chrome/browser/ui/views/relaunch_notification:unit_tests",
     ]
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/ash/test:test_support" ]
-    }
     if (is_linux) {
       sources += [
         "../browser/ui/views/frame/browser_frame_view_layout_linux_native_unittest.cc",
@@ -7814,12 +6641,10 @@ test("unit_tests") {
         "//services/audio/public/cpp:test_support",
       ]
     }
-    if (!is_chromeos) {
-      sources += [
-        "../browser/ui/views/frame/opaque_browser_frame_view_layout_unittest.cc",
-        "../browser/ui/views/profiles/profile_customization_bubble_sync_controller_unittest.cc",
-      ]
-    }
+    sources += [
+      "../browser/ui/views/frame/opaque_browser_frame_view_layout_unittest.cc",
+      "../browser/ui/views/profiles/profile_customization_bubble_sync_controller_unittest.cc",
+    ]
     if (use_aura) {
       sources += [
         "../browser/ui/views/bubble/webui_bubble_event_handler_aura_unittest.cc",
@@ -7923,26 +6748,6 @@ static_library("test_support_unit") {
 
   if (is_win) {
     deps += [ "//chrome/install_static/test:test_support" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "../browser/ui/ash/quick_answers/test/chrome_quick_answers_test_base.cc",
-      "../browser/ui/ash/quick_answers/test/chrome_quick_answers_test_base.h",
-      "base/chrome_ash_test_base.cc",
-      "base/chrome_ash_test_base.h",
-    ]
-
-    deps += [
-      "//ash:test_support",
-      "//chrome/browser:global_features",
-      "//chrome/browser/ash/login/users:test_support",
-      "//chrome/browser/ui/ash/quick_answers",
-      "//chrome/browser/ui/ash/read_write_cards",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/components/quick_answers:test_support",
-      "//ui/base/mojom:ui_base_types",
-    ]
   }
 
   if (enable_bound_session_credentials) {
@@ -8233,44 +7038,8 @@ if (!is_android) {
       deps += [ "//extensions/browser" ]
     }
 
-    if (is_chromeos) {
-      sources += [
-        "base/ash/javascript_browser_test.cc",
-        "base/ash/javascript_browser_test.h",
-        "base/ash/mojo_web_ui_browser_test.cc",
-        "base/ash/mojo_web_ui_browser_test.h",
-        "base/ash/web_ui_browser_test.cc",
-        "base/ash/web_ui_browser_test.h",
-      ]
-
-      public_deps += [
-        "//chrome/test/base:js_test_api",
-        "//chrome/test/base:web_ui_test_handler",
-      ]
-
-      deps += [
-        "//ash",
-        "//ash:test_support",
-        "//ash/constants",
-        "//ash/public/cpp",
-        "//ash/webui/common:trusted_types_util",
-        "//chrome/browser/ash/app_restore",
-        "//chrome/browser/ash/input_method",
-        "//chrome/browser/ash/system_web_apps",
-        "//chrome/browser/ash/system_web_apps/test_support",
-        "//chrome/browser/ui/ash/account_manager",
-        "//chrome/browser/ui/ash/multi_user",
-        "//chrome/browser/ui/views/apps/app_dialog",
-        "//chrome/test/data/webui/chromeos:web_ui_test_bindings",
-        "//chromeos/ash/components/browser_context_helper",
-        "//chromeos/ash/components/cryptohome",
-        "//chromeos/ash/services/device_sync",
-        "//chromeos/ash/services/device_sync:test_support",
-      ]
-    } else {
-      public_deps += [ "//chrome/browser/ui/webui/app_home" ]
-      public_deps += [ "//chrome/browser/first_run:test_support" ]
-    }
+    public_deps += [ "//chrome/browser/ui/webui/app_home" ]
+    public_deps += [ "//chrome/browser/first_run:test_support" ]
     if (enable_dice_support) {
       sources += [
         "../browser/ui/views/profiles/profile_picker_test_base.cc",
@@ -8302,76 +7071,12 @@ if (!is_android) {
   proto_library("test_proto") {
     sources = [ "../common/safe_browsing/ipc_protobuf_message_test.proto" ]
   }
-
-  if (is_chromeos) {
-    assert(enable_extensions)
-
-    # These tests are only meant to run on an FYI bot because they
-    # test against live sites, as a way to catch potential regressions.
-    test("accessibility_live_site_tests") {
-      sources = [
-        "../browser/ash/accessibility/accessibility_live_site_browsertest.cc",
-        "base/interactive_ui_tests_main.cc",
-      ]
-      configs += [ "//build/config:precompiled_headers" ]
-
-      defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-      ldflags = []
-
-      deps = [
-        ":test_support",
-        ":test_support_ui",
-        "//chrome:packed_resources",
-        "//chrome:resources",
-        "//chrome:strings",
-        "//chrome/browser",
-        "//chrome/browser/ash/accessibility",
-        "//chrome/browser/ash/accessibility:test_support",
-        "//chrome/browser/devtools",
-        "//chrome/renderer",
-        "//chrome/test/base:chrome_test_launcher",
-        "//components/resources",
-        "//components/sync",
-        "//components/sync:test_support",
-        "//content/test:test_support",
-        "//crypto:test_support",
-        "//extensions/buildflags",
-        "//google_apis:test_support",
-        "//net",
-        "//net:net_resources",
-        "//net:test_support",
-        "//skia",
-        "//testing/gmock",
-        "//testing/gtest",
-        "//third_party/hunspell",
-        "//third_party/icu",
-        "//third_party/libpng:libpng_for_testonly",
-        "//ui/base:test_support",
-        "//ui/events:test_support",
-        "//ui/ozone",
-        "//ui/platform_window/common",
-        "//ui/resources:ui_test_pak",
-        "//ui/web_dialogs:test_support",
-      ]
-
-      if (is_linux) {
-        deps += [ "//ui/linux:display_server_utils" ]
-      }
-
-      if (enable_extensions) {
-        deps += [
-          "//google_apis/common:test_support",
-          "//google_apis/drive",
-        ]
-      }
-    }
-  }
 }
 
 # Interactive UI test target can't run on ChromeOS device. See
 # //docs/testing/chromeos_integration for how to create an integration
 # test that works on ChromeOS VM/Device.
-if (!is_android && !is_chromeos_device) {
+if (!is_android) {
   test("interactive_ui_tests") {
     use_xvfb = use_xvfb_in_this_config
 
@@ -8413,12 +7118,12 @@ if (!is_android && !is_chromeos_device) {
           [ "../browser/ui/views/default_link_capturing_interactive_uitest.cc" ]
     }
 
-    if (is_mac || is_linux || is_win || is_chromeos) {
+    if (is_mac || is_linux || is_win) {
       sources += [ "../browser/ui/views/web_apps/web_app_navigation_capturing_iph_interactive_uitest.cc" ]
     }
 
     configs += [ "//build/config:precompiled_headers" ]
-    if ((is_linux || is_chromeos) && !is_component_build) {
+    if (is_linux && !is_component_build) {
       configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
     }
 
@@ -8818,15 +7523,6 @@ if (!is_android && !is_chromeos_device) {
         "//extensions/browser/api:extensions_api_client",
       ]
 
-      if (is_chromeos) {
-        deps += [ "//chrome/browser/apps:interactive_ui_tests" ]
-
-        # For ChromeVox tests.
-        data_deps +=
-            [ "//chrome/browser/resources/chromeos/accessibility:build" ]
-        data += [ "$root_out_dir/resources/chromeos/" ]
-      }
-
       if (is_mac || is_win) {
         sources += [ "../browser/ui/extensions/settings_overridden_dialog_interactive_uitest.cc" ]
         deps += [ "//chrome/browser/ui/views/extensions:settings_overridden_dialog_view_utils" ]
@@ -8844,7 +7540,7 @@ if (!is_android && !is_chromeos_device) {
       ]
     }
 
-    if (is_linux || is_chromeos || is_win) {
+    if (is_linux || is_win) {
       data_deps += [ "//chrome:packed_resources" ]
     }
 
@@ -8855,11 +7551,7 @@ if (!is_android && !is_chromeos_device) {
       ]
     }
 
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/smart_card" ]
-    }
-
-    if (!is_chromeos && !is_android) {
+    if (!is_android) {
       deps += [ "//chrome/browser/download/bubble" ]
     }
 
@@ -9072,71 +7764,17 @@ if (!is_android && !is_chromeos_device) {
         }
       }
 
-      if (is_chromeos) {
-        sources += [
-          "../browser/ui/web_applications/test/system_web_app_interactive_uitest.cc",
-          "//ash/drag_drop/drag_drop_interactive_uitest.cc",
-        ]
+      sources += [ "../browser/ui/views/download/bubble/download_bubble_interactive_uitest.cc" ]
 
-        deps += [
-          "//ash",
-          "//ash:interactive_ui_test_support",
-          "//ash/webui/print_management",
-          "//chrome/browser/apps/app_service",
-          "//chrome/browser/ash/accessibility",
-          "//chrome/browser/ash/accessibility:test_support",
-          "//chrome/browser/ash/app_restore",
-          "//chrome/browser/ash/boca/on_task",
-          "//chrome/browser/ash/child_accounts:test_support",
-          "//chrome/browser/ash/child_accounts/time_limits:test_support",
-          "//chrome/browser/ash/login:test_support",
-          "//chrome/browser/ash/system_web_apps/apps",
-          "//chrome/browser/ash/system_web_apps/test_support",
-          "//chrome/browser/ash/system_web_apps/test_support:test_support_ui",
-          "//chrome/browser/printing",
-          "//chrome/browser/ui/ash/account_manager",
-          "//chrome/browser/ui/ash/account_manager:test_support",
-          "//chrome/browser/ui/ash/cast_config",
-          "//chrome/browser/ui/ash/login",
-          "//chrome/browser/ui/ash/multi_user",
-          "//chrome/browser/ui/webui:chrome_web_ui_controller_factory",
-          "//chrome/test/base/ash/interactive:test_support",
-          "//chromeos/ash/components/dbus/fwupd",
-          "//chromeos/ash/components/fwupd",
-          "//components/account_manager_core",
-          "//components/account_manager_core:test_support",
-          "//components/app_constants",
-          "//device/udev_linux:test_support",
-          "//ui/chromeos",
-          "//ui/events/devices",
-          "//ui/events/devices:test_support",
-        ]
-
-        # Gather tests from other build files:
-        deps += [
-          "//chrome/browser/ash:interactive_ui_tests",
-          "//chrome/browser/ui/ash:interactive_ui_tests",
-          "//chrome/browser/ui/webui/ash:interactive_ui_tests",
-          "//chrome/browser/ui/window_sizer:interactive_ui_tests",
-          "//chrome/test/base/ash/interactive:interactive_ui_tests",
-        ]
-
-        if (is_chrome_branded) {
-          deps += [ "//chrome/browser/ui/ash/gemini_app:interactive_ui_tests" ]
-        }
-      } else {
-        sources += [ "../browser/ui/views/download/bubble/download_bubble_interactive_uitest.cc" ]
-
-        deps += [
-          "../browser/media/router:test_support",
-          "../browser/ui/views/global_media_controls:interactive_ui_tests",
-          "../browser/ui/views/global_media_controls:test_support",
-          "//chrome/browser/ui/global_media_controls",
-          "//chrome/browser/ui/views/relaunch_notification:interactive_ui_tests",
-          "//chrome/browser/ui/views/shortcuts:interactive_ui_tests",
-          "//components/media_router/browser:test_support",
-        ]
-      }
+      deps += [
+        "../browser/media/router:test_support",
+        "../browser/ui/views/global_media_controls:interactive_ui_tests",
+        "../browser/ui/views/global_media_controls:test_support",
+        "//chrome/browser/ui/global_media_controls",
+        "//chrome/browser/ui/views/relaunch_notification:interactive_ui_tests",
+        "//chrome/browser/ui/views/shortcuts:interactive_ui_tests",
+        "//components/media_router/browser:test_support",
+      ]
 
       if (is_linux) {
         # Desktop linux.
@@ -9176,40 +7814,8 @@ if (!is_android && !is_chromeos_device) {
       }
     }
 
-    if (is_chromeos) {
-      deps += [
-        "//ash/constants",
-        "//chrome/browser/ash/app_list/app_service",
-        "//chrome/browser/chromeos:interactive_ui_tests",
-        "//chrome/browser/media/router:test_support",
-        "//chrome/browser/printing:test_support",
-        "//chrome/browser/smart_card:interactive_ui_tests",
-        "//chrome/browser/ui/ash:test_support",
-        "//chrome/browser/ui/ash/privacy_hub:interactive_ui_tests",
-        "//chrome/browser/ui/ash/system_web_apps",
-        "//chromeos/ash/components/dbus",
-        "//chromeos/ash/components/login/auth",
-        "//chromeos/constants",
-        "//chromeos/dbus/dlp",
-        "//chromeos/ui/base",
-        "//chromeos/ui/frame",
-        "//chromeos/ui/frame:test_support",
-        "//components/exo/wayland:ui_controls_protocol_stub",
-        "//components/file_access:test_support",
-        "//components/reporting/client:report_queue",
-        "//components/reporting/client:test_support",
-        "//components/reporting/storage:test_support",
-        "//components/reporting/util:test_callbacks_support",
-        "//ui/display:display_manager_test_api",
-        "//ui/display/manager",
-      ]
-      if (enable_printing) {
-        deps += [ "//components/printing/common:mojo_interfaces" ]
-      }
-    } else {  # ! is_chromeos
-      # Non-ChromeOS tests.
-      deps += [ "//chrome/browser/ui/signin:interactive_ui_tests" ]
-    }
+    # Non-ChromeOS tests.
+    deps += [ "//chrome/browser/ui/signin:interactive_ui_tests" ]
 
     deps += [ "//chrome/browser/signin:interactive_ui_tests" ]
 
@@ -9441,7 +8047,7 @@ test("chrome_app_unittests") {
     "//components/safe_browsing:buildflags",
     "//components/webui/flags:switches",
   ]
-  if (is_linux || is_chromeos || is_win) {
+  if (is_linux || is_win) {
     data_deps = [ "//chrome:packed_resources" ]
   }
 }
@@ -9615,11 +8221,9 @@ if (!is_android) {
       "//components/test/data/autofill/web_page_replay_support_files/",
       "//third_party/catapult/telemetry/telemetry/bin/",
     ]
-    if (!is_chromeos) {
-      data += [ "//third_party/webpagereplay/" ]
-    }
+    data += [ "//third_party/webpagereplay/" ]
 
-    if (is_linux || is_chromeos || is_win) {
+    if (is_linux || is_win) {
       data_deps = [ "//chrome:packed_resources" ]
     }
 
@@ -9691,7 +8295,7 @@ if (!is_android) {
       deps += [ "//ui/linux:display_server_utils" ]
     }
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       deps += [ "//ui/platform_window/common" ]
     }
 
@@ -9739,7 +8343,6 @@ if (!is_android) {
     ]
 
     enable_android_wrapper = true
-    enable_cros_wrapper = true
   }
 
   group("telemetry_gpu_unittests_run") {

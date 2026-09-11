@@ -23,11 +23,6 @@ source_set("app_info_dialog") {
     "//ui/base",
     "//ui/views",
   ]
-
-  if (is_chromeos) {
-    public += [ "arc_app_info_links_panel.h" ]
-    public_deps += [ "//chrome/browser/ash/app_list/arc" ]
-  }
 }
 
 source_set("impl") {
@@ -50,17 +45,6 @@ source_set("impl") {
     "//chrome/browser/web_applications",
     "//components/app_constants",
   ]
-
-  if (is_chromeos) {
-    sources += [ "arc_app_info_links_panel.cc" ]
-    deps += [
-      "//ash/strings",
-      "//chrome/browser/ash/arc:arc_util",
-      "//chrome/browser/ui/ash/shelf",
-      "//chromeos/ash/experiences/arc:arc_app_constants",
-      "//chromeos/ash/experiences/arc/intent_helper:arc_intent_helper_constants",
-    ]
-  }
 }
 
 source_set("unit_tests") {
@@ -79,16 +63,6 @@ source_set("unit_tests") {
     "//chrome/test:test_support",
     "//components/app_constants",
   ]
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/app_list/arc:test_support",
-      "//chrome/browser/ash/browser_delegate:impl",
-      "//chrome/browser/ash/login/users:test_support",
-      "//chrome/browser/ui/ash/shelf",
-      "//chromeos/ash/experiences/arc:arc_app_constants",
-      "//components/user_manager",
-    ]
-  }
 }
 
 if (!is_android) {

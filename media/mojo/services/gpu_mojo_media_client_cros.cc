@@ -5,7 +5,6 @@
 #include "base/feature_list.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/task/sequenced_task_runner.h"
-#include "chromeos/components/cdm_factory_daemon/chromeos_cdm_factory.h"
 #include "media/base/audio_decoder.h"
 #include "media/base/audio_encoder.h"
 #include "media/base/decoder.h"

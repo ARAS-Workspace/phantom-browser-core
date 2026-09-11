@@ -20,7 +20,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/values.h"
-#include "chrome/browser/chromeos/reporting/metric_reporting_prefs.h"
 #include "chrome/browser/enterprise/connectors/test/deep_scanning_test_utils.h"
 #include "chrome/browser/enterprise/reporting/prefs.h"
 #include "chrome/browser/policy/dm_token_utils.h"

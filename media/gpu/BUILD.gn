@@ -27,7 +27,7 @@ buildflag_header("buildflags") {
 }
 
 if (use_linux_video_acceleration) {
-  assert(is_linux || is_chromeos)
+  assert(is_linux)
 }
 
 component("gpu") {
@@ -38,9 +38,6 @@ component("gpu") {
   visibility = [
     ":*",
     "//chrome/gpu",
-    "//chromeos/ash/experiences/arc/mojom:media",
-    "//chromeos/ash/experiences/arc/mojom:media_mojolpm",
-    "//chromeos/ash/experiences/arc/video_accelerator:common",
     "//components/chromeos_camera/*",
     "//components/mirroring/service:mirroring_service",
     "//components/viz/service/main",
@@ -441,7 +438,7 @@ source_set("common") {
   }
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   # The buffer validation functionality is in its own component so that it can
   # be depended on without pulling the entire //media/gpu target.
   component("buffer_validation") {
@@ -655,16 +652,13 @@ source_set("unit_tests") {
   if (enable_platform_dolby_vision) {
     sources += [ "dolby_vision_metadata_unittest.cc" ]
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "buffer_validation_unittest.cc" ]
 
     deps += [ ":buffer_validation" ]
   }
 
   # TODO(b/219079009): consider running these tests without VA-API or V4L2.
-  if (is_chromeos && (use_v4l2_codec || use_vaapi)) {
-    deps += [ "//media/gpu/chromeos:unit_tests" ]
-  }
   if (use_vaapi) {
     deps += [ "//media/gpu/vaapi:unit_test" ]
   }

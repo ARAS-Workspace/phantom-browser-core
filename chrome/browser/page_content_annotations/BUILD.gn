@@ -50,9 +50,6 @@ source_set("page_content_annotations") {
   if (enable_pdf) {
     public_deps += [ "//components/pdf/browser" ]
   }
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/profiles" ]
-  }
 }
 
 source_set("extraction_service") {
@@ -91,9 +88,6 @@ source_set("extraction_service") {
       "//chrome/browser/tabwindow",
       "//chrome/browser/ui/android/tab_model",
     ]
-  }
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/profiles" ]
   }
 }
 

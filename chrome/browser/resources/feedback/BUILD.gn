@@ -43,10 +43,6 @@ build_webui("build") {
     "feedback_shared_vars.css",
   ]
 
-  if (is_chromeos) {
-    ts_files += [ "js/jelly_colors.ts" ]
-  }
-
   ts_composite = true
   ts_definitions = [
     "//tools/typescript/definitions/chrome_send.d.ts",
@@ -59,10 +55,6 @@ build_webui("build") {
     "//ui/webui/resources/js:build_ts",
     "//ui/webui/resources/mojo:build_ts",
   ]
-  if (is_chromeos) {
-    ts_deps +=
-        [ "//ui/webui/resources/cr_components/color_change_listener:build_ts" ]
-  }
   ts_path_mappings = [ "/shared/key_value_pair_viewer/*|" + rebase_path(
                            "$root_gen_dir/chrome/browser/resources/key_value_pair_viewer_shared/tsc/*",
                            target_gen_dir) ]

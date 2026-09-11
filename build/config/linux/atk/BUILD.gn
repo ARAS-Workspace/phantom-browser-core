@@ -6,7 +6,6 @@ import("//build/config/linux/pkg_config.gni")
 import("//build/config/ui.gni")
 
 # CrOS doesn't install GTK or any gnome packages.
-assert(!is_chromeos)
 
 # These packages should _only_ be expected when building for a target.
 assert(current_toolchain == default_toolchain)

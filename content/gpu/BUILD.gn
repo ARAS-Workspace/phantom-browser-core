@@ -79,19 +79,10 @@ target(link_target_type, "gpu_sources") {
     "//ui/gl/init",
   ]
 
-  if (!is_chromeos || !is_chrome_branded) {
-    deps += [
-      "//services/shape_detection:lib",
-      "//services/shape_detection/public/mojom",
-    ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//components/services/font/public/cpp",
-      "//components/services/font/public/mojom",
-    ]
-  }
+  deps += [
+    "//services/shape_detection:lib",
+    "//services/shape_detection/public/mojom",
+  ]
 
   if (is_android) {
     deps += [
@@ -105,7 +96,7 @@ target(link_target_type, "gpu_sources") {
     deps += [ "//media/mojo/services" ]
   }
 
-  if (is_linux || is_chromeos || is_mac || is_win) {
+  if (is_linux || is_mac || is_win) {
     deps += [ "//sandbox" ]
   }
 

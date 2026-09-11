@@ -44,11 +44,6 @@ source_set("overlay") {
   if (is_mac) {
     public += [ "video_overlay_window_native_widget_mac.h" ]
   }
-
-  if (is_chromeos) {
-    # video_overlay_window_views.h embeds a HighlightBorderOverlay member.
-    public_deps += [ "//chromeos/ui/frame" ]
-  }
 }
 
 source_set("impl") {

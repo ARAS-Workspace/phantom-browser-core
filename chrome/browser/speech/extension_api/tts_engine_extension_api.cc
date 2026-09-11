@@ -10,8 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include "ash/constants/ash_extension_constants.h"
-#include "ash/webui/settings/public/constants/routes_util.h"
 #include "base/compiler_specific.h"
 #include "base/i18n/language_tag.h"
 #include "base/i18n/tag_converters.h"

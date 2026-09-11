@@ -29,10 +29,6 @@ source_set("lifetime") {
     public += [ "application_lifetime_android.h" ]
   }
 
-  if (is_chromeos) {
-    public += [ "application_lifetime_chromeos.h" ]
-  }
-
   if (!is_android) {
     public += [
       "application_lifetime_desktop.h",
@@ -48,7 +44,7 @@ source_set("lifetime") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     public += [ "switch_utils.h" ]
   }
 }
@@ -90,22 +86,6 @@ source_set("impl") {
     deps += [ "//chrome/browser/lifetime/android:jni_headers" ]
   }
 
-  if (is_chromeos) {
-    sources += [ "application_lifetime_chromeos.cc" ]
-    deps += [
-      "//ash/constants",
-      "//chrome/browser/ash/boot_times_recorder",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/dbus",
-      "//chromeos/ash/components/dbus/session_manager",
-      "//chromeos/ash/components/dbus/update_engine",
-      "//chromeos/ash/components/login/session",
-      "//chromeos/ash/components/settings",
-      "//chromeos/dbus/power",
-      "//components/user_manager",
-    ]
-  }
-
   if (is_mac) {
     sources += [ "application_lifetime_mac.mm" ]
     deps += [
@@ -121,9 +101,6 @@ source_set("impl") {
       "//ui/aura",
       "//ui/views",
     ]
-    if (is_chromeos) {
-      deps += [ "//ash" ]
-    }
   }
 
   if (is_win) {
@@ -164,7 +141,7 @@ source_set("impl") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [ "switch_utils.cc" ]
   }
 
@@ -193,18 +170,7 @@ if (!is_android) {
       "//testing/gtest",
     ]
 
-    if (is_chromeos) {
-      sources += [ "application_lifetime_chromeos_unittest.cc" ]
-      deps += [
-        ":lifetime",
-        "//base",
-        "//chrome/test:test_support",
-        "//content/test:test_support",
-        "//testing/gtest",
-      ]
-    } else {
-      sources += [ "switch_utils_unittest.cc" ]
-    }
+    sources += [ "switch_utils_unittest.cc" ]
   }
 
   source_set("browser_tests") {
@@ -242,12 +208,6 @@ if (!is_android) {
       deps += [ "//chrome/browser/background/extensions" ]
     }
 
-    if (!is_chromeos) {
-      sources += [ "application_lifetime_browsertest.cc" ]
-    }
-
-    if (is_chromeos) {
-      sources += [ "application_lifetime_chromeos_browsertest.cc" ]
-    }
+    sources += [ "application_lifetime_browsertest.cc" ]
   }
 }

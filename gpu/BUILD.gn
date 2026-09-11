@@ -135,7 +135,7 @@ static_library("test_support") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (!is_android && !is_chromeos && !is_ios) {
+if (!is_android && !is_ios) {
   proto_library("gl_lpm_fuzzer_proto") {
     sources = [ "command_buffer/tests/lpm/gl_lpm_fuzzer.proto" ]
 
@@ -386,10 +386,6 @@ test("gl_tests") {
     data_deps += [ "//clank/build/bot/filters:gl_tests_filters" ]
   }
 
-  if (is_chromeos) {
-    deps += [ "//ui/gfx/linux:gbm" ]
-  }
-
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
@@ -559,7 +555,7 @@ test("gpu_unittests") {
     ]
   }
 
-  if (is_linux || is_chromeos || use_ozone) {
+  if (is_linux || use_ozone) {
     sources += [ "command_buffer/client/internal/mappable_buffer_native_pixmap_unittest.cc" ]
   }
 
@@ -573,7 +569,7 @@ test("gpu_unittests") {
         [ "command_buffer/client/internal/mappable_buffer_ahb_unittest.cc" ]
   }
 
-  if (is_linux || is_chromeos || is_android) {
+  if (is_linux || is_android) {
     sources += [ "command_buffer/service/gpu_fence_manager_unittest.cc" ]
   }
 
@@ -849,7 +845,7 @@ fuzzer_test("gpu_swangle_passthrough_fuzzer") {
   libfuzzer_options = [ "max_len=16384" ]
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   fuzzer_test("gpu_raster_fuzzer") {
     sources = [ "command_buffer/tests/fuzzer_main.cc" ]
 

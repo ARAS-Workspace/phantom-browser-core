@@ -188,14 +188,6 @@ component("crypto") {
     configs += [ "//build/config/linux/nss" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "chaps_support.cc",
-      "chaps_support.h",
-      "nss_util_chromeos.cc",
-    ]
-  }
-
   defines = [ "CRYPTO_IMPLEMENTATION" ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 }
@@ -335,15 +327,6 @@ static_library("test_support") {
       "scoped_test_nss_db.h",
     ]
     configs += [ "//build/config/linux/nss" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "scoped_test_nss_chromeos_user.cc",
-      "scoped_test_nss_chromeos_user.h",
-      "scoped_test_system_nss_key_slot.cc",
-      "scoped_test_system_nss_key_slot.h",
-    ]
   }
 
   if (is_mac || is_ios) {

@@ -77,7 +77,7 @@ declare_args() {
   media_use_iamf_tools = true
 
   # Override to dynamically link the cras (ChromeOS audio) library.
-  use_cras = is_chromeos_device
+  use_cras = false
 
   # Enables AC3/EAC3 audio handling in chromium. This includes demuxing,
   # on-device decoding and bitstream passthrough on Android.
@@ -139,7 +139,7 @@ declare_args() {
   # Determines if a GpuChannel is needed between media capture utility process
   # and gpu process for a given platform.
   enable_gpu_channel_media_capture =
-      is_linux || is_win || is_chromeos || is_apple || is_android
+      is_linux || is_win || is_apple || is_android
 }
 
 # Use another declare_args() to allow dependence on args defined above.
@@ -167,8 +167,7 @@ declare_args() {
 
 declare_args() {
   platform_has_optional_hevc_decode_support =
-      enable_platform_hevc &&
-      (is_win || is_chromeos || is_linux || is_apple || is_android)
+      enable_platform_hevc && (is_win || is_linux || is_apple || is_android)
   platform_has_optional_hevc_encode_support =
       enable_platform_hevc && (is_win || is_apple || is_android)
 }
@@ -228,7 +227,7 @@ declare_args() {
     # TODO(crbug.com/40636948): We shouldn't have to do this, but it's unclear
     # why our test bots are hanging and all of the ones that don't hang just
     # fall back to ALSA after a connection error anyways.
-    if (!use_cras && !is_asan && !is_tsan) {
+    if (!is_asan && !is_tsan) {
       use_pulseaudio = true
     }
   }
@@ -263,8 +262,8 @@ declare_args() {
 
   # Enable Storage ID which is used by CDMs. This is only available with chrome
   # branding, but may be overridden by other embedders.
-  enable_cdm_storage_id = enable_library_cdms && is_chrome_branded &&
-                          (is_win || is_mac || is_chromeos)
+  enable_cdm_storage_id =
+      enable_library_cdms && is_chrome_branded && (is_win || is_mac)
 
   # If |enable_cdm_storage_id| is set, then an implementation specific key
   # must also be provided. It can be provided by defining CDM_STORAGE_ID_KEY

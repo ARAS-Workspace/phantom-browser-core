@@ -467,10 +467,6 @@ static_library("content_shell_lib") {
     ]
   }
 
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/dbus" ]
-  }
-
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
   }
@@ -783,11 +779,11 @@ if (is_android) {
     if (is_win) {
       data_deps +=
           [ "//third_party/crashpad/crashpad/handler:crashpad_handler" ]
-    } else if (is_linux || is_chromeos) {
+    } else if (is_linux) {
       data_deps += [ "//components/crash/core/app:chrome_crashpad_handler" ]
     }
 
-    if ((is_linux || is_chromeos) && !is_component_build) {
+    if (is_linux && !is_component_build) {
       configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
     }
   }

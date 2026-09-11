@@ -396,7 +396,7 @@ component("base") {
       ]
     }
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       sources += [
         "accelerators/menu_label_accelerator_util_linux.cc",
         "accelerators/menu_label_accelerator_util_linux.h",
@@ -409,13 +409,6 @@ component("base") {
       sources += [
         "linux/xdg_shortcut.cc",
         "linux/xdg_shortcut.h",
-      ]
-    }
-
-    if (is_chromeos) {
-      sources += [
-        "accelerators/ash/quick_insert_event_property.cc",
-        "accelerators/ash/quick_insert_event_property.h",
       ]
     }
 
@@ -434,7 +427,7 @@ component("base") {
       sources += [ "pointer/pointer_device_android.cc" ]
     } else if (is_ios && target_platform == "iphoneos") {
       sources += [ "pointer/pointer_device_ios.cc" ]
-    } else if (is_linux || is_chromeos) {
+    } else if (is_linux) {
       sources += [ "pointer/pointer_device_linux.cc" ]
     } else {
       # Empty implementation for all other cases.
@@ -556,11 +549,11 @@ component("base") {
     deps += [ "//ui/events" ]
   }
 
-  if (use_aura && (is_linux || is_chromeos)) {
+  if (use_aura && is_linux) {
     sources += [ "resource/resource_bundle_auralinux.cc" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [ "//third_party/fontconfig" ]
   }
 
@@ -568,7 +561,7 @@ component("base") {
     public_deps += [ "//ui/base/glib" ]
   }
 
-  if (is_chromeos || (use_aura && is_linux)) {
+  if (use_aura && is_linux) {
     sources += [
       "dragdrop/os_exchange_data_provider_non_backed.cc",
       "dragdrop/os_exchange_data_provider_non_backed.h",
@@ -676,20 +669,13 @@ component("features") {
     "ui_base_features.h",
   ]
 
-  if (is_chromeos) {
-    sources += [
-      "shortcut_mapping_pref_delegate.cc",
-      "shortcut_mapping_pref_delegate.h",
-    ]
-  }
-
   deps = [
     ":buildflags",
     "//base",
   ]
 }
 
-if (is_win || is_mac || is_linux || is_chromeos) {
+if (is_win || is_mac || is_linux) {
   static_library("pixel_diff_test_support") {
     testonly = true
     sources = [
@@ -826,7 +812,7 @@ static_library("test_support") {
     }
   }
 
-  if (use_aura && (is_win || is_chromeos)) {
+  if (use_aura && is_win) {
     sources += [
       "test/ui_controls_aura.cc",
       "test/ui_controls_aura.h",
@@ -884,29 +870,6 @@ static_library("test_support") {
     if (is_win) {
       deps += [ "//ui/base/ime/win" ]
     }
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "ime/ash/mock_component_extension_ime_manager.cc",
-      "ime/ash/mock_component_extension_ime_manager.h",
-      "ime/ash/mock_component_extension_ime_manager_delegate.cc",
-      "ime/ash/mock_component_extension_ime_manager_delegate.h",
-      "ime/ash/mock_ime_candidate_window_handler.cc",
-      "ime/ash/mock_ime_candidate_window_handler.h",
-      "ime/ash/mock_ime_engine_handler.cc",
-      "ime/ash/mock_ime_engine_handler.h",
-      "ime/ash/mock_ime_input_context_handler.cc",
-      "ime/ash/mock_ime_input_context_handler.h",
-      "ime/ash/mock_input_method_manager.cc",
-      "ime/ash/mock_input_method_manager.h",
-      "ime/ash/mock_input_method_manager_impl.cc",
-      "ime/ash/mock_input_method_manager_impl.h",
-    ]
-    deps += [
-      "//ui/base/ime/ash",
-      "//ui/base/ime/ash:typing_session_manager",
-    ]
   }
 
   if (is_android) {
@@ -1078,7 +1041,7 @@ test("ui_base_unittests") {
     "//url",
   ]
 
-  if (is_mac || is_win || is_linux || is_chromeos) {
+  if (is_mac || is_win || is_linux) {
     sources += [ "accelerators/global_accelerator_listener/global_accelerator_listener_unittest.cc" ]
     deps += [
       "//ui/base/accelerators/global_accelerator_listener",
@@ -1086,11 +1049,7 @@ test("ui_base_unittests") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [ "accelerators/global_accelerator_listener/global_accelerator_listener_chromeos_unittest.cc" ]
-  }
-
-  if (is_win || is_mac || is_linux || is_chromeos || is_android) {
+  if (is_win || is_mac || is_linux || is_android) {
     deps += [ "//ui/base/unowned_user_data:unit_tests" ]
   }
 
@@ -1155,7 +1114,7 @@ test("ui_base_unittests") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "accelerators/menu_label_accelerator_util_linux_unittest.cc" ]
   }
 
@@ -1191,24 +1150,6 @@ test("ui_base_unittests") {
       ]
       deps += [ "//ui/base/ime/win" ]
     }
-    if (is_chromeos) {
-      sources += [
-        "dragdrop/os_exchange_data_provider_non_backed_unittest.cc",
-        "ime/ash/component_extension_ime_manager_unittest.cc",
-        "ime/ash/extension_ime_util_unittest.cc",
-        "ime/ash/ime_keyboard_unittest.cc",
-        "ime/ash/input_method_ash_unittest.cc",
-        "ime/ash/input_method_descriptor_unittest.cc",
-        "ime/ash/input_method_util_unittest.cc",
-        "ime/ash/typing_session_manager_unittest.cc",
-      ]
-      deps += [
-        "//ash/constants",
-        "//build:branding_buildflags",
-        "//ui/base/ime/ash",
-        "//ui/base/ime/ash:typing_session_manager",
-      ]
-    }
     if (is_linux && use_aura) {
       sources += [
         "dragdrop/os_exchange_data_provider_non_backed_unittest.cc",
@@ -1223,7 +1164,7 @@ test("ui_base_unittests") {
     if (is_linux) {
       sources += [ "ime/linux/composition_text_util_pango_unittest.cc" ]
     }
-    if (is_chromeos || use_ozone) {
+    if (use_ozone) {
       sources += [ "ime/character_composer_unittest.cc" ]
     }
   }
@@ -1289,11 +1230,7 @@ test("ui_base_unittests") {
     ]
   }
 
-  if (is_chromeos) {
-    deps += [ "//ui/events:dom_keycode_converter" ]
-  }
-
-  if (is_android || is_linux || is_chromeos || is_mac || is_win) {
+  if (is_android || is_linux || is_mac || is_win) {
     # TODO(brettw): We should be able to depend on //ui/resources:ui_test_pak
     # instead of depending directly on the non-test .pak files, but depending
     # on ui_test_pak seems to have no effect.
@@ -1306,7 +1243,7 @@ test("ui_base_unittests") {
       "//ui/resources:ui_test_pak",  # TODO(brettw): this does nothing.
     ]
   }
-  if (is_linux || is_chromeos || is_win) {
+  if (is_linux || is_win) {
     data += [
       # TODO(brettw): Remove these two lines.
       "$root_out_dir/ui/en-US.pak",
@@ -1328,7 +1265,7 @@ test("ui_base_unittests") {
   }
 
   # If the platform supports wayland, run wayland library unittests, too.
-  if (is_chromeos || ozone_platform_wayland) {
+  if (ozone_platform_wayland) {
     deps += [ "//ui/base/wayland:unittests" ]
   }
 
@@ -1381,7 +1318,7 @@ if (is_win) {
   }
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   # This source set defines linux wm role names and must not have any external
   # dependencies and be kept as minimal as possible.
   source_set("wm_role_names") {

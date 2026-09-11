@@ -193,17 +193,7 @@ if (is_android) {
 
 # The base list for all platforms except Android excludes the extended locales.
 # Add or subtract platform specific locales below.
-if (is_chromeos) {
-  platform_pak_locales += [
-    "cy",
-    "eu",
-    "gl",
-    "is",
-    "mn",
-    "zu",
-  ]
-  platform_pak_locales -= [ "ur" ]
-} else if (is_ios) {
+if (is_ios) {
   platform_pak_locales -= [
     "af",
     "am",

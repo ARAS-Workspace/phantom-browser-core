@@ -196,9 +196,6 @@ if (!is_android) {
     if (is_mac) {
       deps += [ "//chrome/browser:global_keyboard_shortcuts_mac" ]
     }
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/ui/ash/multi_user" ]
-    }
     if (is_win || is_mac || is_linux) {
       deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
     }
@@ -233,9 +230,6 @@ source_set("incognito_allowed_url") {
     "//components/signin/public/base",
     "//url",
   ]
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
-  }
 }
 
 source_set("browser_ui_prefs") {
@@ -453,12 +447,6 @@ source_set("managed_ui") {
     "//ui/gfx",
     "//url",
   ]
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/ash/components/demo_mode",
-      "//ui/chromeos",
-    ]
-  }
 }
 
 source_set("crypto_module_password_dialog") {
@@ -933,7 +921,7 @@ static_library("ui") {
 
   # //chrome/browser/ui/views/relaunch_notification:impl sources include
   # :ui headers (browser.h, views/frame/browser_view.h).
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     deps += [
       "//chrome/browser/ui/webui/default_browser:default_browser_modal",
       "//chrome/browser/ui/webui/default_browser:modal_mojo_bindings",
@@ -1557,7 +1545,7 @@ static_library("ui") {
       "//ui/events",
     ]
 
-    if (is_win || is_chromeos) {
+    if (is_win) {
       deps += [
         "//chrome/browser/ui/webui/signin:inline_login",
         "//chrome/browser/ui/webui/signin:inline_login_impl",
@@ -1600,11 +1588,7 @@ static_library("ui") {
       public_deps += [ "//chrome/browser/ui:overscroll_pref_manager" ]
     }
 
-    if (is_chromeos) {
-      deps += [ "//chrome/browser/apps/app_service" ]
-    }
-
-    if (!is_chromeos && !is_android) {
+    if (!is_android) {
       deps += [
         "//chrome/browser/download/bubble",
         "//chrome/browser/download/bubble:impl",
@@ -1765,12 +1749,12 @@ static_library("ui") {
       "//chrome/browser/ui/webui/tab_search",
     ]
 
-    if (is_win || is_chromeos) {
+    if (is_win) {
       allow_circular_includes_from +=
           [ "//chrome/browser/ui/webui/signin:inline_login_impl" ]
     }
 
-    if (use_ozone && !is_chromeos) {
+    if (use_ozone) {
       deps += [ "//ui/ozone" ]
     }
 
@@ -1778,7 +1762,7 @@ static_library("ui") {
       deps += [ "//ui/base/ime/linux" ]
     }
 
-    if (enable_dice_support || is_chromeos) {
+    if (enable_dice_support) {
     }
     if (enable_dice_support) {
       deps += [
@@ -1820,7 +1804,6 @@ static_library("ui") {
       "//chrome/browser/extensions/api/web_navigation",
       "//chrome/browser/ui/views/supervised_user",
       "//chrome/browser/ui/views/supervised_user:impl",
-      "//chromeos/ui/vector_icons",
     ]
 
     allow_circular_includes_from += [
@@ -1831,331 +1814,7 @@ static_library("ui") {
     ]
   }
 
-  if (is_chromeos) {
-    assert(enable_extensions)
-    assert(enable_supervised_users)
-    assert(toolkit_views)
-    sources += [
-      "browser_commands_chromeos.cc",
-      "browser_commands_chromeos.h",
-      "platform_keys_certificate_selector_chromeos.h",
-      "settings_window_manager_chromeos.cc",
-      "settings_window_manager_chromeos.h",
-      "views/chrome_views_delegate_ash.cc",
-      "views/extensions/media_galleries_dialog_views.cc",
-      "views/extensions/media_galleries_dialog_views.h",
-      "views/external_protocol_handler_ash.cc",
-      "views/frame/browser_frame_header_chromeos.cc",
-      "views/frame/browser_frame_header_chromeos.h",
-      "views/frame/browser_frame_view_chromeos.cc",
-      "views/frame/browser_frame_view_chromeos.h",
-      "views/frame/browser_frame_view_factory_chromeos.cc",
-      "views/frame/browser_native_widget_ash.cc",
-      "views/frame/browser_native_widget_ash.h",
-      "views/frame/browser_native_widget_factory_chromeos.cc",
-      "views/frame/browser_view_ash.cc",
-      "views/frame/browser_view_ash.h",
-      "views/frame/immersive_mode_controller_chromeos.cc",
-      "views/frame/immersive_mode_controller_chromeos.h",
-      "views/frame/picture_in_picture_browser_frame_view_ash.cc",
-      "views/frame/picture_in_picture_browser_frame_view_ash.h",
-      "views/frame/top_controls_slide_controller_chromeos.cc",
-      "views/frame/top_controls_slide_controller_chromeos.h",
-      "views/platform_keys_certificate_selector_chromeos.cc",
-      "views/platform_keys_certificate_selector_chromeos.h",
-      "views/web_apps/protocol_handler_picker_coordinator.cc",
-      "views/web_apps/protocol_handler_picker_coordinator.h",
-    ]
-
-    deps += [
-      "//ash",
-      "//ash/keyboard/ui",
-      "//ash/public/cpp",
-      "//ash/public/cpp/app_list/vector_icons",
-      "//ash/public/cpp/resources:ash_public_unscaled_resources",
-      "//ash/style",
-      "//ash/webui/common:chrome_os_webui_config",
-      "//ash/webui/common/resources/office_fallback:resources",
-      "//ash/webui/diagnostics_ui",
-      "//ash/webui/firmware_update_ui",
-      "//ash/webui/graduation",
-      "//ash/webui/help_app_ui",
-      "//ash/webui/mall:app_id",
-      "//ash/webui/mall:url_constants",
-      "//ash/webui/os_feedback_ui",
-      "//ash/webui/print_management",
-      "//ash/webui/sanitize_ui",
-      "//ash/webui/shortcut_customization_ui",
-      "//ash/webui/vc_background_ui",
-      "//chrome/browser:browser_process_platform_part_ash",
-      "//chrome/browser:platform_util_ash",
-      "//chrome/browser/apps/app_discovery_service",
-      "//chrome/browser/apps/app_preload_service",
-      "//chrome/browser/apps/browser_instance",
-      "//chrome/browser/ash/accessibility/live_caption",
-      "//chrome/browser/ash/app_list",
-      "//chrome/browser/ash/app_list/arc",
-      "//chrome/browser/ash/app_list/reorder",
-      "//chrome/browser/ash/app_list/search",
-      "//chrome/browser/ash/app_list/search/games",
-      "//chrome/browser/ash/app_list/search/local_image_search",
-      "//chrome/browser/ash/app_list/search/system_info",
-      "//chrome/browser/ash/app_mode",
-      "//chrome/browser/ash/app_restore",
-      "//chrome/browser/ash/apps",
-      "//chrome/browser/ash/arc:arc_util",
-      "//chrome/browser/ash/arc/accessibility",
-      "//chrome/browser/ash/arc/auth",
-      "//chrome/browser/ash/arc/bluetooth",
-      "//chrome/browser/ash/arc/fileapi",
-      "//chrome/browser/ash/arc/input_method_manager",
-      "//chrome/browser/ash/arc/input_overlay",
-      "//chrome/browser/ash/arc/instance_throttle",
-      "//chrome/browser/ash/arc/intent_helper",
-      "//chrome/browser/ash/arc/metrics",
-      "//chrome/browser/ash/arc/nearby_share",
-      "//chrome/browser/ash/arc/notification",
-      "//chrome/browser/ash/arc/pip",
-      "//chrome/browser/ash/arc/policy",
-      "//chrome/browser/ash/arc/print_spooler",
-      "//chrome/browser/ash/arc/session",
-      "//chrome/browser/ash/arc/sharesheet",
-      "//chrome/browser/ash/arc/survey",
-      "//chrome/browser/ash/arc/tracing",
-      "//chrome/browser/ash/arc/wallpaper",
-      "//chrome/browser/ash/boca/on_task",
-      "//chrome/browser/ash/boot_times_recorder",
-      "//chrome/browser/ash/borealis",
-      "//chrome/browser/ash/browser_delegate:impl",
-      "//chrome/browser/ash/bruschetta",
-      "//chrome/browser/ash/cert_provisioning",
-      "//chrome/browser/ash/certificate_provider",
-      "//chrome/browser/ash/child_accounts",
-      "//chrome/browser/ash/child_accounts/on_device_controls",
-      "//chrome/browser/ash/child_accounts/time_limits",
-      "//chrome/browser/ash/crostini",
-      "//chrome/browser/ash/customization",
-      "//chrome/browser/ash/eche_app",
-      "//chrome/browser/ash/extensions",
-      "//chrome/browser/ash/extensions/file_manager",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/browser/ash/file_suggest",
-      "//chrome/browser/ash/file_system_provider",
-      "//chrome/browser/ash/floating_workspace",
-      "//chrome/browser/ash/growth",
-      "//chrome/browser/ash/guest_os",
-      "//chrome/browser/ash/guest_os/public",
-      "//chrome/browser/ash/input_method",
-      "//chrome/browser/ash/kcer",
-      "//chrome/browser/ash/kerberos",
-      "//chrome/browser/ash/login",
-      "//chrome/browser/ash/login/enrollment",
-      "//chrome/browser/ash/login/lock/online_reauth",
-      "//chrome/browser/ash/login/quick_unlock",
-      "//chrome/browser/ash/login/saml",
-      "//chrome/browser/ash/login/signin",
-      "//chrome/browser/ash/login/smart_lock",
-      "//chrome/browser/ash/login/users/avatar",
-      "//chrome/browser/ash/mahi/media_app",
-      "//chrome/browser/ash/mahi/web_contents",
-      "//chrome/browser/ash/multidevice_setup",
-      "//chrome/browser/ash/nearby",
-      "//chrome/browser/ash/nearby/presence",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/notifications",
-      "//chrome/browser/ash/ownership",
-      "//chrome/browser/ash/phonehub",
-      "//chrome/browser/ash/platform_keys",
-      "//chrome/browser/ash/platform_keys/key_permissions",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/policy/dlp",
-      "//chrome/browser/ash/policy/skyvault",
-      "//chrome/browser/ash/printing",
-      "//chrome/browser/ash/printing/oauth2",
-      "//chrome/browser/ash/printing/print_management",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/remote_apps",
-      "//chrome/browser/ash/scanning",
-      "//chrome/browser/ash/smb_client",
-      "//chrome/browser/ash/sync",
-      "//chrome/browser/ash/system_web_apps",
-      "//chrome/browser/ash/system_web_apps/apps/personalization_app",
-      "//chrome/browser/ash/tether",
-      "//chrome/browser/chromeos/app_mode",
-      "//chrome/browser/chromeos/arc",
-      "//chrome/browser/chromeos/extensions/login_screen/login/cleanup",
-      "//chrome/browser/chromeos/extensions/vpn_provider",
-      "//chrome/browser/chromeos/gemini_app",
-      "//chrome/browser/chromeos/office_web_app",
-      "//chrome/browser/chromeos/platform_keys",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/media_galleries",
-      "//chrome/browser/nearby_sharing",
-      "//chrome/browser/nearby_sharing:impl",
-      "//chrome/browser/push_notification",
-      "//chrome/browser/ui/ash/arc/arc_app_dialog_view",
-      "//chrome/browser/ui/ash/arc/arc_data_removal_dialog_view",
-      "//chrome/browser/ui/ash/assistant",
-      "//chrome/browser/ui/ash/birch",
-      "//chrome/browser/ui/ash/capture_mode",
-      "//chrome/browser/ui/ash/desks",
-      "//chrome/browser/ui/ash/editor_menu",
-      "//chrome/browser/ui/ash/global_media_controls",
-      "//chrome/browser/ui/ash/google_one",
-      "//chrome/browser/ui/ash/holding_space",
-      "//chrome/browser/ui/ash/in_session_auth",
-      "//chrome/browser/ui/ash/keyboard",
-      "//chrome/browser/ui/ash/login",
-      "//chrome/browser/ui/ash/main_extra_parts",
-      "//chrome/browser/ui/ash/multi_user",
-      "//chrome/browser/ui/ash/network",
-      "//chrome/browser/ui/ash/new_window",
-      "//chrome/browser/ui/ash/security_token_restriction",
-      "//chrome/browser/ui/ash/session",
-      "//chrome/browser/ui/ash/shelf",
-      "//chrome/browser/ui/ash/shell_delegate",
-      "//chrome/browser/ui/ash/system",
-      "//chrome/browser/ui/ash/system_web_apps",
-      "//chrome/browser/ui/ash/wallpaper",
-      "//chrome/browser/ui/ash/wm",
-      "//chrome/browser/ui/chromeos/locked_state",
-      "//chrome/browser/ui/views/apps/app_dialog",
-      "//chrome/browser/ui/views/extensions:media_gallery_checkbox_view",
-      "//chrome/browser/ui/views/extensions/dialogs:document_scanner_discovery_confirmation_dialog",
-      "//chrome/browser/ui/views/extensions/dialogs:document_scanner_start_scan_confirmation_dialog",
-      "//chrome/browser/ui/views/extensions/dialogs:print_job_confirmation_dialog",
-      "//chrome/browser/ui/views/extensions/dialogs:request_file_system_dialog",
-      "//chrome/browser/ui/views/profiles:profile_indicator_icon",
-      "//chrome/browser/ui/views/select_file_dialog_extension",
-      "//chrome/browser/ui/views/web_apps:protocol_handler_picker_dialog",
-      "//chrome/browser/ui/webui/ash/add_supervision",
-      "//chrome/browser/ui/webui/ash/app_install",
-      "//chrome/browser/ui/webui/ash/bluetooth",
-      "//chrome/browser/ui/webui/ash/cloud_upload",
-      "//chrome/browser/ui/webui/ash/curtain_ui",
-      "//chrome/browser/ui/webui/ash/emoji",
-      "//chrome/browser/ui/webui/ash/extended_updates",
-      "//chrome/browser/ui/webui/ash/internet",
-      "//chrome/browser/ui/webui/ash/login",
-      "//chrome/browser/ui/webui/ash/multidevice_setup",
-      "//chrome/browser/ui/webui/ash/office_fallback",
-      "//chrome/browser/ui/webui/ash/os_feedback_dialog",
-      "//chrome/browser/ui/webui/ash/set_time",
-      "//chrome/browser/ui/webui/ash/settings",
-      "//chrome/browser/ui/webui/ash/settings/pages/date_time",
-      "//chrome/browser/ui/webui/ash/settings/pages/files",
-      "//chrome/browser/ui/webui/ash/settings/pages/main",
-      "//chrome/browser/ui/webui/ash/settings/pages/search",
-      "//chrome/browser/ui/webui/ash/skyvault",
-      "//chrome/browser/ui/webui/ash/system_web_dialog",
-      "//chrome/browser/ui/webui/nearby_share",
-      "//chrome/browser/ui/webui/signin/ash",
-      "//chrome/browser/web_applications",
-      "//chromeos/ash/components/account_manager",
-      "//chromeos/ash/components/dbus/hermes",
-      "//chromeos/ash/components/dbus/printscanmgr",
-      "//chromeos/ash/components/dbus/printscanmgr:printscanmgr_proto",
-      "//chromeos/ash/components/emoji:resources",
-      "//chromeos/ash/components/local_search_service/public/cpp",
-      "//chromeos/ash/components/mojo_service_manager",
-      "//chromeos/ash/components/system_web_apps:system_web_app_type",
-      "//chromeos/ash/experiences/arc",
-      "//chromeos/ash/experiences/arc:arc_app_constants",
-      "//chromeos/ash/experiences/arc/intent_helper",
-      "//chromeos/ash/experiences/arc/intent_helper:arc_intent_helper_constants",
-      "//chromeos/ash/experiences/arc/touch_selection_menu",
-      "//chromeos/ash/experiences/arc/vector_icons",
-      "//chromeos/ash/experiences/isolated_web_app",
-      "//chromeos/ash/experiences/settings_ui",
-      "//chromeos/ash/resources",
-      "//chromeos/components/kiosk",
-      "//chromeos/components/mgs",
-      "//chromeos/components/sharesheet:constants",
-      "//chromeos/strings",
-      "//chromeos/ui/vector_icons",
-      "//chromeos/ui/wm",
-      "//components/app_constants",
-      "//components/content_relationship_verification",
-      "//components/media_gallery_util",
-      "//components/metrics/structured:structured_events",
-      "//components/services/app_service",
-      "//components/tab_groups",
-      "//content/public/common",
-      "//media/capture:capture_lib",
-      "//mojo/public/js:resources_grit",
-      "//services/device/public/cpp:device_features",
-      "//ui/chromeos",
-      "//ui/chromeos/resources",
-      "//ui/chromeos/styles:cros_styles_resources",
-      "//ui/chromeos/styles:cros_styles_views",
-      "//ui/chromeos/styles:cros_tokens_color_mappings",
-      "//ui/events/ozone/evdev",
-      "//ui/file_manager",
-      "//ui/ozone",
-    ]
-
-    public_deps += [
-      "//chrome/browser/ash/accessibility",
-      "//chrome/browser/ash/account_manager",
-      "//chrome/browser/ash/drive",
-      "//chrome/browser/ash/usb",
-      "//chrome/browser/ui/ash/login",
-      "//chrome/browser/ui/webui/ash/login",
-    ]
-
-    # Any circular includes must depend on the target
-    # "//chrome/browser:browser_public_dependencies".
-    allow_circular_includes_from += [
-      # browser_process_platform_part_ash.cc and platform_util_ash.cc include
-      # //chrome/browser/ui headers (e.g. browser.h, browser_window.h) that
-      # can't be split out of this target yet.
-      "//chrome/browser:browser_process_platform_part_ash",
-      "//chrome/browser:platform_util_ash",
-
-      "//chrome/browser/apps/browser_instance",
-      "//chrome/browser/ash/accessibility",
-      "//chrome/browser/ash/app_list",
-      "//chrome/browser/ash/arc/session",
-      "//chrome/browser/ash/boca/on_task",
-      "//chrome/browser/ash/browser_delegate:impl",
-      "//chrome/browser/ash/login/users/avatar",
-      "//chrome/browser/nearby_sharing:impl",
-      "//chrome/browser/ash/notifications",
-      "//chrome/browser/ash/sync",
-      "//chrome/browser/ash/system_web_apps/apps/personalization_app",
-      "//chrome/browser/chromeos/app_mode",
-      "//chrome/browser/chromeos/arc",
-      "//chrome/browser/chromeos/extensions/login_screen/login/cleanup",
-      "//chrome/browser/chromeos/platform_keys",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/ui/ash/assistant",
-      "//chrome/browser/ui/ash/desks",
-      "//chrome/browser/ui/ash/in_session_auth",
-      "//chrome/browser/ui/ash/main_extra_parts",
-      "//chrome/browser/ui/ash/network",
-      "//chrome/browser/ui/ash/new_window",
-      "//chrome/browser/ui/ash/shell_delegate",
-      "//chrome/browser/ui/ash/system",
-      "//chrome/browser/ui/ash/wallpaper",
-      "//chrome/browser/ui/ash/wm",
-      "//chrome/browser/ui/webui/ash/add_supervision",
-      "//chrome/browser/ui/webui/ash/cloud_upload",
-      "//chrome/browser/ui/webui/ash/settings/pages/main",
-      "//chrome/browser/ui/webui/ash/system_web_dialog",
-      "//chrome/browser/ui/webui/nearby_share",
-      "//chrome/browser/ui/webui/signin/ash",
-    ]
-
-    if (is_chrome_branded) {
-      deps += [
-        "//chrome/browser/nearby_sharing/internal/icons",
-        "//chrome/browser/nearby_sharing/internal/resources:nearby_share_internal_strings",
-        "//chromeos/ash/resources/internal/strings",
-      ]
-    }
-  }
-
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     sources += [
       "incognito_clear_browsing_data_dialog_interface.h",
       "views/autofill/payments/webauthn_dialog_view.cc",
@@ -2293,7 +1952,7 @@ static_library("ui") {
     }
   }
 
-  if (is_win || is_mac || is_linux || is_chromeos || is_android) {
+  if (is_win || is_mac || is_linux || is_android) {
     deps += [ "//components/enterprise/device_trust/core:metrics" ]
 
     if (enterprise_client_certificates) {
@@ -2445,7 +2104,7 @@ static_library("ui") {
   # Device signals sharing currently only supports win, mac, linux and
   # chromeos, so the corresponding consent functionality are
   # limited to the same set of platforms.
-  if (is_win || is_mac || is_linux || is_chromeos) {
+  if (is_win || is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/views/device_signals_consent",
       "//chrome/browser/ui/views/device_signals_consent:impl",
@@ -2466,7 +2125,7 @@ static_library("ui") {
         [ "//chrome/browser/ui/webui/certificate_viewer" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     if (use_aura) {
       deps += [ "//third_party/fontconfig" ]
     }
@@ -3370,7 +3029,7 @@ static_library("ui") {
       ]
     }
 
-    if (is_win || is_linux || is_chromeos) {
+    if (is_win || is_linux) {
       sources += [
         "views/native_widget_factory.cc",
         "views/native_widget_factory.h",
@@ -3415,41 +3074,34 @@ static_library("ui") {
       }
     }
 
-    if (is_chromeos) {
-      sources += [
-        "views/web_apps/isolated_web_apps/multi_capture_notification_details_view.cc",
-        "views/web_apps/isolated_web_apps/multi_capture_notification_details_view.h",
-      ]
-    } else {
-      sources += [
-        "idle_dialog.h",
-        "views/frame/opaque_browser_frame_view.cc",
-        "views/frame/opaque_browser_frame_view.h",
-        "views/frame/opaque_browser_frame_view_layout.cc",
-        "views/frame/opaque_browser_frame_view_layout.h",
-        "views/frame/opaque_browser_frame_view_layout_delegate.cc",
-        "views/frame/opaque_browser_frame_view_layout_delegate.h",
-        "views/screen_capture_notification_ui_views.cc",
-      ]
-      deps += [
-        "//chrome/browser/ui/views/policy:enterprise_startup_dialog",
-        "//chrome/browser/ui/views/policy:idle_dialog",
-        "//chrome/browser/ui/views/shortcuts",
-        "//chrome/browser/ui/views/shortcuts:impl",
-        "//ui/views/window/vector_icons",
-      ]
-      allow_circular_includes_from += [
-        # Circular dependency exists because the following header is not yet
-        # componentized: c/b/ui/idle_dialog.h (IdleDialogView implements
-        # IdleDialog::Show and includes idle_dialog.h)
-        "//chrome/browser/ui/views/policy:idle_dialog",
+    sources += [
+      "idle_dialog.h",
+      "views/frame/opaque_browser_frame_view.cc",
+      "views/frame/opaque_browser_frame_view.h",
+      "views/frame/opaque_browser_frame_view_layout.cc",
+      "views/frame/opaque_browser_frame_view_layout.h",
+      "views/frame/opaque_browser_frame_view_layout_delegate.cc",
+      "views/frame/opaque_browser_frame_view_layout_delegate.h",
+      "views/screen_capture_notification_ui_views.cc",
+    ]
+    deps += [
+      "//chrome/browser/ui/views/policy:enterprise_startup_dialog",
+      "//chrome/browser/ui/views/policy:idle_dialog",
+      "//chrome/browser/ui/views/shortcuts",
+      "//chrome/browser/ui/views/shortcuts:impl",
+      "//ui/views/window/vector_icons",
+    ]
+    allow_circular_includes_from += [
+      # Circular dependency exists because the following header is not yet
+      # componentized: c/b/ui/idle_dialog.h (IdleDialogView implements
+      # IdleDialog::Show and includes idle_dialog.h)
+      "//chrome/browser/ui/views/policy:idle_dialog",
 
-        # Circular dependency exists because the following headers are not yet
-        # componentized:
-        # - c/b/ui/browser.h
-        "//chrome/browser/ui/views/shortcuts:impl",
-      ]
-    }
+      # Circular dependency exists because the following headers are not yet
+      # componentized:
+      # - c/b/ui/browser.h
+      "//chrome/browser/ui/views/shortcuts:impl",
+    ]
 
     if (enable_compose) {
       deps += [
@@ -3496,13 +3148,11 @@ static_library("ui") {
       "//chrome/browser/ui/views/renderer_context_menu:impl",
     ]
 
-    if (!is_chromeos) {
-      sources += [
-        "views/frame/browser_frame_view_factory_views.cc",
-        "views/frame/browser_native_widget_aura.cc",
-        "views/frame/browser_native_widget_aura.h",
-      ]
-    }
+    sources += [
+      "views/frame/browser_frame_view_factory_views.cc",
+      "views/frame/browser_native_widget_aura.cc",
+      "views/frame/browser_native_widget_aura.h",
+    ]
 
     # Any circular includes must depend on the target
     # "//chrome/browser:browser_public_dependencies".
@@ -3691,9 +3341,6 @@ group("ui_public_dependencies") {
       "//components/feed/core/proto:proto_v2",
     ]
   }
-  if (is_chromeos) {
-    public_deps += [ "//chromeos/ash/services/multidevice_setup/public/mojom" ]
-  }
   if (is_win) {
     public_deps += [
       "//build:branding_buildflags",
@@ -3750,10 +3397,6 @@ source_set("layout_constants") {
   if (!is_android) {
     deps += [ "//chrome/browser/ui/tabs:features" ]
   }
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/constants" ]
-  }
 }
 
 source_set("session_crashed_bubble") {
@@ -3773,7 +3416,7 @@ source_set("url_identity") {
     "//extensions/buildflags",
     "//url",
   ]
-  if (is_mac || is_win || is_linux || is_chromeos) {
+  if (is_mac || is_win || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   if (enable_extensions) {
@@ -4058,11 +3701,6 @@ if (toolkit_views) {
     # through browser_public_dependencies, with an allow_circular_includes_from
     # entry on //chrome/browser/ui:ui.
     public_deps = [ "//chrome/browser:browser_public_dependencies" ]
-
-    if (is_chromeos) {
-      # sad_tab.cc / sad_tab_view.cc check kiosk mode on ChromeOS.
-      deps += [ "//chromeos/components/kiosk" ]
-    }
   }
 
   source_set("sad_tab_browser_tests") {

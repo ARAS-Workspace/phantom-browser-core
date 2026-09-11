@@ -166,19 +166,11 @@ source_set("internal") {
       ]
     }
 
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       deps += [ "//chrome/browser/ui/ai_overlay_dialog" ]
     }
 
-    if (is_chromeos) {
-      deps += [
-        "//chrome/browser/ash/boca/on_task",
-        "//chrome/browser/ui/chromeos/locked_state",
-        "//components/session_manager/core",
-      ]
-    } else {
-      deps += [ "//chrome/browser/download/bubble" ]
-    }
+    deps += [ "//chrome/browser/download/bubble" ]
     if (toolkit_views) {
       deps += [ "//chrome/browser/ui/views/extensions:extensions_views_utils" ]
     }

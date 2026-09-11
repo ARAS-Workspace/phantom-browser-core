@@ -17,7 +17,7 @@ if (is_ios) {
 }
 
 is_serial_enabled_platform =
-    is_win || ((is_linux || is_chromeos) && use_udev) || is_mac || is_android
+    is_win || (is_linux && use_udev) || is_mac || is_android
 
 source_set("lib") {
   # This should be visible only to embedders of the Device Service, and the
@@ -74,10 +74,6 @@ source_set("lib") {
 
   if (enable_compute_pressure) {
     deps += [ "//services/device/compute_pressure" ]
-  }
-
-  if (is_chromeos && use_dbus) {
-    deps += [ "//services/device/media_transfer_protocol" ]
   }
 
   if (is_serial_enabled_platform) {
@@ -220,16 +216,7 @@ source_set("tests") {
     sources += [ "public/cpp/geolocation/geolocation_system_permission_manager_unittest.cc" ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "generic_sensor/platform_sensor_chromeos_unittest.cc",
-      "generic_sensor/platform_sensor_provider_chromeos_unittest.cc",
-    ]
-    deps += [
-      "//chromeos/components/sensors",
-      "//chromeos/components/sensors:test_support",
-    ]
-  } else if (is_linux && use_udev) {
+  if (is_linux && use_udev) {
     sources +=
         [ "generic_sensor/platform_sensor_and_provider_unittest_linux.cc" ]
   }
@@ -243,20 +230,6 @@ source_set("tests") {
     deps += [
       "//components/dbus",
       "//dbus:test_support",
-    ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "fingerprint/fingerprint_chromeos_unittest.cc",
-      "geolocation/wifi_data_provider_chromeos_unittest.cc",
-    ]
-    deps += [
-      "//chromeos/ash/components/dbus/biod:test_support",
-      "//chromeos/ash/components/dbus/shill",
-      "//chromeos/ash/components/network:test_support",
-      "//services/device/fingerprint",
-      "//third_party/protobuf:protobuf_lite",
     ]
   }
 
@@ -284,13 +257,13 @@ source_set("tests") {
     "//services/device/hid",
   ]
 
-  if ((!is_linux && !is_chromeos) || use_udev) {
+  if (!is_linux || use_udev) {
     sources += [
       "hid/hid_connection_impl_unittest.cc",
       "public/cpp/hid/hid_device_filter_unittest.cc",
       "public/cpp/hid/hid_report_descriptor_unittest.cc",
     ]
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       sources += [
         "hid/hid_service_linux_unittest.cc",
         "hid/input_service_linux_unittest.cc",
@@ -319,7 +292,7 @@ source_set("tests") {
       "serial/serial_port_manager_impl_unittest.cc",
     ]
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       sources += [ "serial/serial_device_enumerator_linux_unittest.cc" ]
     }
 
@@ -339,7 +312,7 @@ source_set("tests") {
       sources += [ "serial/serial_device_enumerator_win_unittest.cc" ]
     }
 
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       deps += [ "//device/udev_linux:test_support" ]
     }
 
@@ -380,7 +353,7 @@ source_set("tests") {
       sources += [ "public/cpp/usb/usb_ids_unittest.cc" ]
     }
 
-    if (is_android || is_chromeos || is_linux) {
+    if (is_android || is_linux) {
       sources += [ "usb/usb_device_handle_usbfs_unittest.cc" ]
     }
 

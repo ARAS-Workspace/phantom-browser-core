@@ -99,19 +99,6 @@ source_set("platform_apps") {
       "//chrome/browser/ui/extensions:extension_enable_flow_delegate",
     ]
   }
-
-  if (is_chromeos) {
-    deps += [
-      "//chrome/browser/ash/login/demo_mode",
-      "//chrome/browser/ash/remote_apps",
-      "//chrome/browser/ui/ash/keyboard",
-    ]
-
-    allow_circular_includes_from += [
-      "//chrome/browser/ash/login/demo_mode",
-      "//chrome/browser/ui/ash/keyboard",
-    ]
-  }
 }
 
 source_set("browser_test_support") {
@@ -142,10 +129,6 @@ source_set("browser_test_support") {
     "//components/services/app_service",
     "//extensions/browser:test_support",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ui/ash/cast_config" ]
-  }
 }
 
 source_set("browser_tests") {
@@ -185,35 +168,6 @@ source_set("browser_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-  if (is_chromeos) {
-    sources += [
-      "api/arc_apps_private/arc_apps_private_apitest.cc",
-      "api/browser/browser_apitest.cc",
-      "api/enterprise_remote_apps/enterprise_remote_apps_apitest.cc",
-      "api/media_galleries/media_galleries_apitest.cc",
-      "api/media_galleries/media_galleries_watch_apitest.cc",
-      "platform_app_navigation_redirector_browsertest.cc",
-    ]
-    deps += [
-      "//ash/app_list",
-      "//ash/app_list/model:app_list_model",
-      "//chrome/browser/ash/app_list",
-      "//chrome/browser/ash/app_list/arc:test_support",
-      "//chrome/browser/ash/arc:arc_util",
-      "//chrome/browser/ash/policy/core:test_support",
-      "//chrome/browser/ash/policy/test_support",
-      "//chrome/browser/ash/remote_apps",
-      "//chrome/browser/ash/test:test_support",
-      "//chrome/browser/media_galleries",
-      "//chrome/browser/ui/ash/cast_config",
-      "//chrome/browser/ui/ash/shelf",
-      "//chromeos/ash/components/system",
-      "//chromeos/ash/experiences/arc:arc_test_support",
-      "//chromeos/ash/experiences/arc:notification_test_support",
-      "//components/embedder_support",
-      "//media:test_support",
-    ]
-  }
   if (enable_print_preview) {
     deps += [ "//chrome/browser/printing:test_support" ]
   }

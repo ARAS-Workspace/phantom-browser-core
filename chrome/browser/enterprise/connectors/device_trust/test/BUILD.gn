@@ -36,10 +36,6 @@ source_set("test_support") {
     ]
   }
 
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/login/test:test_support" ]
-  }
-
   if (is_win || is_mac || is_linux) {
     public += [ "device_trust_test_environment.h" ]
     sources += [ "device_trust_test_environment.cc" ]

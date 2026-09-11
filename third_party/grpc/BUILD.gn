@@ -11,8 +11,7 @@ declare_args() {
   # Use static linking on Chrome OS as a workaround for the symbol lookup
   # error(crbug/1241330) due to a gRPC version mismatch between what Chrome
   # uses and what CrOS provides.
-  grpc_use_static_linking =
-      is_android || is_win || is_chromeos || is_mac || is_ios
+  grpc_use_static_linking = is_android || is_win || is_mac || is_ios
 }
 
 if (is_android) {
@@ -94,11 +93,7 @@ config("grpc_config_private") {
     "-Wno-unreachable-code-break",
     "-Wno-unreachable-code-return",
   ]
-
   # TODO(b/260740023): Remove when gRPC has CFI checks enabled.
-  if (is_chromeos) {
-    cflags += [ "-fno-sanitize=cfi-derived-cast,cfi-unrelated-cast" ]
-  }
 }
 
 template("grpc_so") {

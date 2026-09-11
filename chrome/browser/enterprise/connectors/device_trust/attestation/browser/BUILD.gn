@@ -24,8 +24,4 @@ source_set("unit_tests") {
       "//components/enterprise:test_support",
     ]
   }
-
-  if (is_chromeos) {
-    sources += [ "browser_attestation_service_chromeos_unittest.cc" ]
-  }
 }

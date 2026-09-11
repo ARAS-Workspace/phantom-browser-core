@@ -90,18 +90,7 @@ source_set("utility") {
     ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/ash/components/assistant:buildflags",
-      "//chromeos/ash/services/ime:sandbox_hook",
-      "//chromeos/services/tts:sandbox_hook",
-    ]
-    if (use_linux_video_acceleration) {
-      deps += [ "//chromeos/ash/experiences/arc/video_accelerator" ]
-    }
-  }
-
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [
       "//content/utility/speech:speech_recognition_sandbox_hook",
       "//media/gpu/sandbox",
@@ -119,7 +108,7 @@ source_set("utility") {
     }
   }
 
-  if (is_win || ((is_chromeos || is_linux) && is_chrome_branded)) {
+  if (is_win || (is_linux && is_chrome_branded)) {
     deps += [
       "//services/shape_detection:lib",
       "//services/shape_detection/public/mojom",
@@ -131,7 +120,7 @@ source_set("utility") {
     deps += [ "//services/proxy_resolver:lib" ]
   }
 
-  if (enable_screen_ai_service && (is_linux || is_chromeos)) {
+  if (enable_screen_ai_service && is_linux) {
     deps += [ "//services/screen_ai:screen_ai_sandbox_hook" ]
   }
 

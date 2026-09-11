@@ -40,7 +40,7 @@ declare_args() {
   blink_symbol_level = -1
 
   # If true, the experimental renderer extensions library will be used.
-  use_blink_extensions_chromeos = is_chromeos
+  use_blink_extensions_chromeos = false
 
   # If true, the WebView renderer extensions library will be used.
   #
@@ -57,10 +57,6 @@ declare_args() {
 # feature_defines_list ---------------------------------------------------------
 
 feature_defines_list = []
-
-if (use_blink_extensions_chromeos) {
-  feature_defines_list += [ "USE_BLINK_EXTENSIONS_CHROMEOS=1" ]
-}
 
 if (use_blink_extensions_webview) {
   feature_defines_list += [ "USE_BLINK_EXTENSIONS_WEBVIEW=1" ]

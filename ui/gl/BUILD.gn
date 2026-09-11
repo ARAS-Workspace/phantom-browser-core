@@ -240,13 +240,13 @@ component("gl") {
   }
 
   if (use_ozone) {
-    if (!use_static_angle || is_chromeos) {
+    if (!use_static_angle) {
       data_deps += [
         "//third_party/angle:libEGL",
         "//third_party/angle:libGLESv2",
       ]
     }
-    if (angle_shared_libvulkan && !is_chromeos) {
+    if (angle_shared_libvulkan) {
       data_deps += [ "//third_party/vulkan-loader/src:libvulkan" ]
     }
   }
@@ -266,13 +266,13 @@ component("gl") {
       "//ui/gfx/linux:gbm_support_x11",
     ]
 
-    if (!use_static_angle || is_chromeos) {
+    if (!use_static_angle) {
       data_deps += [
         "//third_party/angle:libEGL",
         "//third_party/angle:libGLESv2",
       ]
     }
-    if (angle_shared_libvulkan && !is_chromeos) {
+    if (angle_shared_libvulkan) {
       data_deps += [ "//third_party/vulkan-loader/src:libvulkan" ]
     }
   }
@@ -350,7 +350,7 @@ component("gl") {
         "//third_party/angle:libGLESv2",
       ]
     }
-    if (angle_shared_libvulkan && !is_chromeos) {
+    if (angle_shared_libvulkan) {
       data_deps += [ "//third_party/vulkan-loader/src:libvulkan" ]
     }
   }
@@ -430,7 +430,7 @@ component("gl") {
     ]
   }
 
-  if (is_android || is_chromeos || is_linux) {
+  if (is_android || is_linux) {
     # Windows doesn't support base::FileDescriptor.
     # libsync isn't supported or needed on MacOSX.
     # Fuchsia is excluded due to a libsync dependency and because it's
@@ -444,12 +444,8 @@ component("gl") {
     deps += [ "//third_party/libsync" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [ "//third_party/angle:angle_gpu_info_util" ]
-  }
-
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
   }
 }
 
@@ -549,7 +545,7 @@ static_library("test_support") {
     "//ui/base",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [ "//ui/platform_window/common" ]
   }
 
@@ -560,7 +556,7 @@ static_library("test_support") {
   # If the run-time search path isn't set properly when we use ANGLE with its
   # Vulkan backend, it may end up finding the system libvulkan.so rather than
   # the one built in the output directory
-  if ((is_linux || is_chromeos) && !is_component_build) {
+  if (is_linux && !is_component_build) {
     all_dependent_configs =
         [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
   }

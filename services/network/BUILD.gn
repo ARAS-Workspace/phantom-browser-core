@@ -315,13 +315,6 @@ component("network_service") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "dhcp_pac_file_fetcher_mojo.cc",
-      "dhcp_pac_file_fetcher_mojo.h",
-    ]
-  }
-
   if (is_win) {
     sources += [
       "broker_helper_win.cc",
@@ -396,7 +389,7 @@ component("network_service") {
     "//url",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     deps += [
       ":network_sandbox_hook",
       "//sandbox/linux:sandbox_services",  # TODO(crbug.com/40220505): remove.
@@ -446,7 +439,7 @@ component("network_service") {
   defines = [ "IS_NETWORK_SERVICE_IMPL" ]
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   source_set("network_sandbox_hook") {
     sources = [
       "network_sandbox_hook_linux.cc",
@@ -579,10 +572,6 @@ source_set("tests") {
       "//services/test/data/",
       "//third_party/pywebsocket3/src/pywebsocket3/",
     ]
-  }
-
-  if (is_chromeos) {
-    sources += [ "dhcp_pac_file_fetcher_mojo_unittest.cc" ]
   }
 
   if (is_win) {
@@ -735,13 +724,6 @@ source_set("test_support") {
     "test/url_loader_context_for_tests.cc",
     "test/url_loader_context_for_tests.h",
   ]
-
-  if (is_chromeos) {
-    sources += [
-      "mock_mojo_dhcp_wpad_url_client.cc",
-      "mock_mojo_dhcp_wpad_url_client.h",
-    ]
-  }
 
   public_deps = [
     "//components/vrp_flags:buildflags",

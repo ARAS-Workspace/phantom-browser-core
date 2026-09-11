@@ -114,13 +114,6 @@ component("variations") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "variations_crash_keys_chromeos.cc",
-      "variations_crash_keys_chromeos.h",
-    ]
-  }
-
   public_deps = [
     ":variations_features",
     "proto",
@@ -264,9 +257,6 @@ source_set("unit_tests") {
 
   if (is_android || is_ios) {
     sources += [ "variations_request_scheduler_mobile_unittest.cc" ]
-  }
-  if (is_chromeos) {
-    sources += [ "variations_crash_keys_chromeos_unittest.cc" ]
   }
 
   # This test uses crash_reporter::GetCrashKeyValue(), which in a component

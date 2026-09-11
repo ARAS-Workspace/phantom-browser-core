@@ -69,7 +69,7 @@ static_library("test_support") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (enable_remoting_host && !is_android && !is_chromeos) {
+if (enable_remoting_host && !is_android) {
   if (!is_win) {
     # A binary for starting an IT2ME host from command line.
     executable("it2me_cli_host") {

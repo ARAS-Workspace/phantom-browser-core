@@ -20,7 +20,6 @@
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #include "chrome/browser/web_applications/web_app_ui_manager.h"
 #include "chrome/test/base/testing_profile.h"
-#include "chromeos/constants/chromeos_features.h"
 #include "components/services/app_service/public/cpp/types_util.h"
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"

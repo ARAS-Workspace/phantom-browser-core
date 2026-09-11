@@ -11,7 +11,7 @@ pdf_enable_brotli_override = true
 pdf_enable_v8_override = true
 
 # Enable XFA forms in Chromium builds on a per-platform basis
-pdf_enable_xfa_override = is_chromeos || is_linux || is_mac || is_win
+pdf_enable_xfa_override = is_linux || is_mac || is_win
 
 # Build PDFium either using the bundled FreeType, or using a third-party
 # FreeType, configured by the embedder in //build/config/freetype.

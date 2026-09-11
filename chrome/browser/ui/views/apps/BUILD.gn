@@ -28,18 +28,6 @@ source_set("apps") {
     ]
   }
 
-  if (is_chromeos) {
-    public += [ "chrome_native_app_window_views_aura_ash.h" ]
-    public_deps += [
-      "//ash",
-      "//chrome/browser/ui/exclusive_access",
-      "//chrome/browser/ui/views/exclusive_access",
-      "//components/services/app_service/public/cpp:app_types",
-      "//ui/base",
-      "//ui/display",
-    ]
-  }
-
   if (is_mac) {
     public += [
       "app_window_native_widget_mac.h",
@@ -93,31 +81,6 @@ source_set("impl") {
       "//chrome/browser/web_applications",
       "//ui/aura",
       "//ui/wm",
-    ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "chrome_app_window_client_views_chromeos.cc",
-      "chrome_native_app_window_views_aura_ash.cc",
-    ]
-    deps += [
-      "//ash",
-      "//ash/public/cpp",
-      "//chrome/browser/apps:icon_standardizer",
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/ash/note_taking",
-      "//chrome/browser/ui/apps",
-      "//chrome/browser/ui/ash/multi_user",
-      "//chrome/browser/ui/exclusive_access",
-      "//chrome/browser/ui/views/exclusive_access",
-      "//chromeos/components/mgs",
-      "//chromeos/constants",
-      "//chromeos/ui/base",
-      "//chromeos/ui/frame",
-      "//components/app_restore",
-      "//components/services/app_service/public/cpp:app_types",
-      "//ui/menus",
     ]
   }
 
@@ -180,39 +143,6 @@ if (use_aura) {
       "//ui/views",
       "//ui/views:test_support",
       "//ui/views/controls/webview",
-      "//ui/wm",
-    ]
-  }
-}
-
-if (is_chromeos) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [ "chrome_native_app_window_views_aura_ash_browsertest.cc" ]
-
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-
-    deps = [
-      ":apps",
-      "//ash/public/cpp",
-      "//chrome/browser/apps/platform_apps:browser_test_support",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui",
-      "//chrome/test:test_support",
-      "//chromeos/ash/components/login/login_state:test_support",
-      "//chromeos/constants",
-      "//chromeos/ui/base",
-      "//chromeos/ui/frame",
-      "//components/user_manager:test_support",
-      "//content/test:test_support",
-      "//extensions:test_support",
-      "//extensions/browser",
-      "//ui/aura",
-      "//ui/base",
-      "//ui/display",
-      "//ui/views",
       "//ui/wm",
     ]
   }

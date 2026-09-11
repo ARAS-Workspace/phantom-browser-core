@@ -97,9 +97,6 @@ source_set("channel_info") {
   } else if (is_android) {
     sources += [ "channel_info_android.cc" ]
     public_deps += [ "//components/version_info/android:channel_getter" ]
-  } else if (is_chromeos) {
-    sources += [ "channel_info_chromeos.cc" ]
-    deps += [ "//chromeos/ash/components/channel" ]
   } else if (is_posix) {
     sources += [ "channel_info_posix.cc" ]
   }
@@ -281,7 +278,7 @@ static_library("common_lib") {
     "//components/pdf/common:util",
   ]
 
-  if (is_mac || is_win || is_linux || is_chromeos) {
+  if (is_mac || is_win || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 
@@ -308,7 +305,7 @@ static_library("common_lib") {
     ]
 
     # Add controlled frame dependencies on platforms that support it.
-    if (is_win || is_mac || is_linux || is_chromeos) {
+    if (is_win || is_mac || is_linux) {
       assert(enable_extensions)
       deps += [
         "//chrome/common/apps/platform_apps",
@@ -334,15 +331,6 @@ static_library("common_lib") {
       "mac/detect_inappropriate_exit.h",
     ]
     public_deps += [ ":app_mode_app_support" ]
-  }
-
-  if (is_chromeos) {
-    assert(enable_extensions)
-    public_deps += [ "//ash/keyboard/ui" ]
-    deps += [
-      "//ash/constants",
-      "//chrome/common/chromeos/extensions",
-    ]
   }
 
   # Printing.
@@ -405,7 +393,7 @@ static_library("common_lib") {
     deps += [ "//media/cdm:cdm_paths" ]  # Needed by chrome_content_client.cc
 
     if (enable_widevine) {
-      if (is_linux || is_chromeos) {
+      if (is_linux) {
         sources += [
           "media/component_widevine_cdm_hint_file_linux.cc",
           "media/component_widevine_cdm_hint_file_linux.h",
@@ -419,7 +407,7 @@ static_library("common_lib") {
     public_deps += [ "//chrome/common/safe_browsing" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "auto_start_linux.cc",
       "auto_start_linux.h",
@@ -545,10 +533,6 @@ static_library("url_constants") {
     "//components/safe_browsing/core/common",
     "//device/vr/buildflags",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
-  }
 }
 
 static_library("constants") {
@@ -605,7 +589,7 @@ static_library("constants") {
     # implemented in //ui/base, so we need that dependency.
     deps += [ "//ui/base" ]
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "chrome_paths_linux.cc" ]
     deps += [ ":channel_info" ]
   }
@@ -615,9 +599,6 @@ static_library("constants") {
   if (is_win) {
     sources += [ "chrome_paths_win.cc" ]
     deps += [ "//chrome/install_static:install_static_util" ]
-  }
-  if (is_chromeos) {
-    deps += [ "//ash/constants" ]
   }
 
   if (enable_widevine && enable_library_cdms) {

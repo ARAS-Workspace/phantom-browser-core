@@ -25,7 +25,7 @@ source_set("lib") {
 
   public_deps = [ "//skia" ]
 
-  if (enable_pdf && (is_linux || is_chromeos)) {
+  if (enable_pdf && is_linux) {
     sources += [
       "pdf_fontconfig_matching.cc",
       "pdf_fontconfig_matching.h",

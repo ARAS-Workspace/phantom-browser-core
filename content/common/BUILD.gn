@@ -30,7 +30,7 @@ buildflag_header("buildflags") {
   ]
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   source_set("sandbox_support_linux") {
     public = [
       "zygote/zygote_commands_linux.h",
@@ -362,9 +362,7 @@ source_set("common") {
     libs += [ "android" ]
   }
 
-  if (!is_chromeos) {
-    sources -= [ "cursors/webcursor_ash.cc" ]
-  }
+  sources -= [ "cursors/webcursor_ash.cc" ]
 
   if (use_aura) {
     deps += [ "//ui/wm" ]
@@ -372,7 +370,7 @@ source_set("common") {
     sources -= [ "cursors/webcursor_aura.cc" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "gpu_pre_sandbox_hook_linux.cc",
       "gpu_pre_sandbox_hook_linux.h",
@@ -455,7 +453,7 @@ mojom("mojo_bindings") {
     "web_ui.mojom",
   ]
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "thread_type_switcher.mojom" ]
   }
 

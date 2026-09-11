@@ -74,10 +74,6 @@ source_set("identity_manager") {
 
   deps += [ "//pdf:buildflags" ]
 
-  if (is_chromeos) {
-    deps += [ "//components/user_manager" ]
-  }
-
   if (is_ios) {
     deps += [ "ios" ]
   }
@@ -160,14 +156,6 @@ source_set("unit_tests") {
     deps += [ "//components/signin/public/identity_manager/ios:test_support" ]
   }
 
-  if (is_chromeos) {
-    deps += [
-      "//chromeos/ash/components/account_manager",
-      "//components/account_manager_core",
-      "//components/account_manager_core:test_support",
-    ]
-  }
-
   deps += [ "//pdf:buildflags" ]
 
   if (is_android) {
@@ -211,10 +199,6 @@ source_set("test_support") {
     "//components/sync_preferences:test_support",
     "//testing/gtest",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chromeos/ash/components/account_manager" ]
-  }
 
   if (is_android) {
     deps += [ "//components/signin/public/android:test_support_jni_headers" ]

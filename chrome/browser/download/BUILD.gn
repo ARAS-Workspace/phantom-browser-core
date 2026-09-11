@@ -126,22 +126,10 @@ source_set("download") {
     public_deps += [ "//components/webapps/common" ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     public += [ "download_ui_context_menu.h" ]
 
     public_deps += [ "//ui/menus" ]
-  }
-
-  if (is_chromeos) {
-    public += [
-      "notification/download_item_notification.h",
-      "notification/download_notification_manager.h",
-    ]
-
-    public_deps += [
-      "//ui/message_center/public/cpp",
-      "//ui/native_theme",
-    ]
   }
 }
 
@@ -315,32 +303,9 @@ source_set("impl") {
     ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [ "download_ui_context_menu.cc" ]
     deps += [ "//chrome/browser/download/bubble" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "notification/download_item_notification.cc",
-      "notification/download_notification_manager.cc",
-    ]
-
-    deps += [
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/ash/drive",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/browser/ash/policy/dlp",
-      "//chrome/browser/ash/policy/skyvault",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/content_index",
-      "//chrome/browser/enterprise/connectors/analysis:obfuscation_rename_handler",
-      "//chrome/browser/ui/ash/system_web_apps",
-      "//chrome/browser/ui/webui/ash/cloud_upload",
-      "//chromeos/ash/components/browser_context_helper",
-      "//chromeos/ash/components/dbus/cros_disks",
-      "//ui/chromeos/styles:cros_tokens_color_mappings_generator",
-    ]
   }
 
   if (is_win) {
@@ -534,21 +499,9 @@ source_set("unit_tests") {
     deps += [ "//chrome/browser/ui/hats:test_support" ]
   }
 
-  if (!is_android && !is_chromeos) {
+  if (!is_android) {
     sources += [ "download_ui_context_menu_unittest.cc" ]
     deps += [ "//chrome/browser/download/bubble:unit_tests" ]
-  }
-
-  if (is_chromeos) {
-    sources += [ "notification/download_item_notification_unittest.cc" ]
-    deps += [
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/apps/app_service:test_support",
-      "//chrome/browser/ash/policy/dlp",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/chromeos/policy/dlp/test:test_support",
-      "//chromeos/ash/components/disks:test_support",
-    ]
   }
 }
 
@@ -595,12 +548,7 @@ if (!is_android) {
       ]
     }
 
-    if (is_chromeos) {
-      sources += [ "notification/download_notification_browsertest.cc" ]
-      deps += [ "//chromeos/dbus/dlp" ]
-    }
-
-    if (!is_chromeos && !is_android) {
+    if (!is_android) {
       deps += [
         "//chrome/browser/download/bubble",
         "//chrome/browser/download/bubble:browser_tests",

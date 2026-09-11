@@ -12,7 +12,6 @@
 #include <utility>
 #include <vector>
 
-#include "ash/constants/web_app_id_constants.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/i18n/icubridge/date_time_formatter.h"
@@ -35,6 +34,7 @@
 #include "chrome/browser/ui/passwords/settings/fake_password_import_controller.h"
 #include "chrome/browser/ui/passwords/settings/mock_password_import_controller.h"
 #include "chrome/browser/ui/passwords/settings/password_import_controller_interface.h"
+#include "chrome/browser/web_applications/web_app_id_constants.h"
 #include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/webauthn/enclave_manager_interface.h"
 #include "chrome/browser/webauthn/mock_enclave_manager.h"
@@ -1189,7 +1189,7 @@ TEST_F(PasswordsPrivateDelegateImplTest, PasswordManagerAppInstalled) {
   base::HistogramTester histogram_tester;
   scoped_refptr<PasswordsPrivateDelegateImpl> delegate = CreateDelegate();
   static_cast<web_app::WebAppInstallManagerObserver*>(delegate.get())
-      ->OnWebAppInstalledWithOsHooks(ash::kPasswordManagerAppId);
+      ->OnWebAppInstalledWithOsHooks(web_app::kPasswordManagerAppId);
 
   EXPECT_THAT(histogram_tester.GetAllSamples("PasswordManager.ShortcutMetric"),
               base::BucketsAre(base::Bucket(1, 1)));

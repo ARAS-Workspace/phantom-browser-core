@@ -8,10 +8,6 @@ import("//tools/typescript/ts_library.gni")
 import("//ui/webui/resources/tools/bundle_js.gni")
 import("//ui/webui/resources/tools/minify_js.gni")
 
-if (is_chromeos) {
-  import("//chrome/test/base/ash/js2gtest.gni")
-}
-
 group("extensions") {
   deps = [
     ":caretbrowsing",
@@ -22,9 +18,6 @@ group("extensions") {
 
 group("extension_tests") {
   testonly = true
-  if (is_chromeos) {
-    deps = [ ":colorenhancer_tests" ]
-  }
 }
 
 locale_files = [
@@ -156,32 +149,6 @@ colorenhancer_files = [
 copy("colorenhancer_copy") {
   sources = colorenhancer_files
   outputs = [ "$root_out_dir/{{source_target_relative}}" ]
-}
-
-if (is_chromeos) {
-  webui_test_deps = [ "//chrome/test:browser_tests_runner" ]
-
-  test("colorenhancer_tests") {
-    deps = [ ":colorenhancer_js_webui_tests" ]
-    deps += webui_test_deps
-    data = js2gtest_js_libraries
-  }
-
-  js2gtest("colorenhancer_js_webui_tests") {
-    test_type = "webui"
-    sources = [
-      "colorenhancer/src/matrix_test.js",
-      "colorenhancer/src/storage_test.js",
-    ]
-    gen_include_files = [
-      "colorenhancer/src/cvd_type.js",
-      "colorenhancer/src/matrix.js",
-      "colorenhancer/src/storage.js",
-      "webstore_extension_test_base.js",
-      "//chrome/browser/resources/chromeos/accessibility/common/testing/mock_storage.js",
-    ]
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  }
 }
 
 #

@@ -48,10 +48,6 @@ component("shell_dialogs") {
     "//url",
   ]
 
-  if (is_chromeos) {
-    sources += [ "shell_dialog_stub.cc" ]
-  }
-
   if (is_linux) {
     sources += [
       "select_file_dialog_linux.cc",

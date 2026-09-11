@@ -724,23 +724,13 @@ source_set("browser_sources") {
     configs += [ "//build/config/linux/atspi2" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "zygote_host/zygote_host_linux.h" ]
   }
 
   if (allow_oop_video_decoder) {
     sources += [ "oop_video_decoder_factory.h" ]
     public_deps += [ "//media/mojo/mojom" ]
-  }
-
-  if (is_chromeos) {
-    sources += [
-      "chromeos/delegate_to_browser_gpu_service_accelerator_factory.h",
-      "lock_screen_storage.h",
-      "smart_card_delegate.h",
-      "tts_controller_delegate.cc",
-      "tts_controller_delegate.h",
-    ]
   }
 
   if (!is_android) {

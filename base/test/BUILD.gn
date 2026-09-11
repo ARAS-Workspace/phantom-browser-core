@@ -305,16 +305,7 @@ static_library("test_support") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "scoped_chromeos_version_info.cc",
-      "scoped_chromeos_version_info.h",
-      "scoped_running_on_chromeos.cc",
-      "scoped_running_on_chromeos.h",
-    ]
-  }
-
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [ "test_file_util_linux.cc" ]
     public_deps += [ "//third_party/test_fonts/fontconfig:test_support" ]
   }
@@ -514,7 +505,7 @@ if (is_ios) {
   }
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   shared_library("malloc_wrapper") {
     testonly = true
     sources = [
@@ -712,7 +703,7 @@ target(_target_type, "test_trace_processor") {
   # in a non-component build.
   if (!is_component_build) {
     all_dependent_configs = []
-    if (is_linux || is_chromeos) {
+    if (is_linux) {
       all_dependent_configs +=
           [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
     }

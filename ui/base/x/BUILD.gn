@@ -102,7 +102,7 @@ component("x") {
       ]
     }
   }
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "selection_owner.cc",
       "selection_owner.h",

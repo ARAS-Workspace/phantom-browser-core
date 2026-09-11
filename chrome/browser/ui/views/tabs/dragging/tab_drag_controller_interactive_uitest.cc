@@ -72,7 +72,6 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/interactive_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "chromeos/ui/base/window_properties.h"
 #include "components/constrained_window/constrained_window_views.h"
 #include "components/prefs/pref_service.h"
 #include "components/split_tabs/split_tab_id.h"

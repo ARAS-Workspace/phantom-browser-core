@@ -62,16 +62,12 @@ source_set("fake_libva_driver_internals") {
     "//third_party/openh264:decoder",
     "//ui/gfx/linux:gbm",
   ]
-
-  if (is_chromeos) {
-    public_deps = [ "//third_party/minigbm" ]
-  }
 }
 
 test("fake_libva_driver_unittest") {
   # Depending on //media/gpu/vaapi:libva_stubs only works on Linux or ChromeOS
   # with VA-API.
-  assert(is_linux || is_chromeos)
+  assert(is_linux)
   assert(use_vaapi)
 
   sources = [ "fake_drv_video_unittest.cc" ]

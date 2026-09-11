@@ -28,7 +28,6 @@
 #include "chrome/browser/policy/messaging_layer/util/test_request_payload.h"
 #include "chrome/browser/policy/messaging_layer/util/test_response_payload.h"
 #include "chrome/test/base/testing_browser_process.h"
-#include "chromeos/ash/components/system/statistics_provider.h"
 #include "components/policy/core/common/cloud/device_management_service.h"
 #include "components/policy/core/common/cloud/mock_cloud_policy_client.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"

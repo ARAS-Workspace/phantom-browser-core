@@ -1366,10 +1366,6 @@ if (!target_os_is_android && !is_ios) {
 }
 
 # Window setShape API for allowlisted Isolated Web Apps (ChromeOS only).
-if (is_chromeos) {
-  static_idl_files_in_modules +=
-      [ "//third_party/blink/renderer/modules/set_shape/set_shape.idl" ]
-}
 
 # Installed App (getInstalledRelatedApps) is excluded on iOS because the
 # webapp infrastructure required for this API is not yet implemented.

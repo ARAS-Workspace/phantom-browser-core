@@ -155,13 +155,6 @@ source_set("unit_tests") {
     "//url",
   ]
 
-  if (is_chromeos) {
-    sources -= [
-      "account_investigator_unittest.cc",
-      "signin_status_metrics_provider_helpers_unittest.cc",
-    ]
-  }
-
   if (enable_dice_support) {
     sources += [
       "dice_account_reconcilor_delegate_unittest.cc",

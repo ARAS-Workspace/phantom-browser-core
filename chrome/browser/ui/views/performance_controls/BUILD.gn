@@ -110,16 +110,14 @@ source_set("browser_tests") {
     "//ui/views:test_support",
   ]
 
-  if (!is_chromeos) {
-    sources += [ "battery_saver_button_browsertest.cc" ]
-    deps += [
-      "//chrome/browser/ui:browser_element_identifiers",
-      "//chrome/browser/ui:chrome_pages",
-      "//chrome/browser/user_education",
-      "//chrome/test/user_education:impl",
-      "//components/user_education/views",
-    ]
-  }
+  sources += [ "battery_saver_button_browsertest.cc" ]
+  deps += [
+    "//chrome/browser/ui:browser_element_identifiers",
+    "//chrome/browser/ui:chrome_pages",
+    "//chrome/browser/user_education",
+    "//chrome/test/user_education:impl",
+    "//components/user_education/views",
+  ]
 }
 
 source_set("interactive_ui_tests") {

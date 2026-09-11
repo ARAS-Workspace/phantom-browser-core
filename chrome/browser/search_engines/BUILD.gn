@@ -5,7 +5,7 @@
 import("//extensions/buildflags/buildflags.gni")
 import("//rlz/buildflags/buildflags.gni")
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 source_set("search_engines") {
   public = [
@@ -52,10 +52,6 @@ source_set("search_engines") {
     "//ui/base",
     "//url",
   ]
-
-  if (is_chromeos) {
-    deps += [ "//chrome/browser/ash/profiles" ]
-  }
 
   if (is_android) {
     public += [ "ui_thread_search_terms_data_android.h" ]

@@ -65,6 +65,5 @@ if (enable_webui_generate_code_cache) {
 }
 
 if (load_webui_from_disk) {
-  assert(is_linux || is_mac || is_win || is_chromeos,
-         "load_webui_from_disk not available")
+  assert(is_linux || is_mac || is_win, "load_webui_from_disk not available")
 }

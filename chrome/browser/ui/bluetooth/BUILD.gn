@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-assert(is_win || is_mac || is_linux || is_chromeos || is_android)
+assert(is_win || is_mac || is_linux || is_android)
 
 source_set("bluetooth") {
   sources = [ "bluetooth_dialogs.h" ]
@@ -35,9 +35,5 @@ source_set("impl") {
       "//components/permissions:permissions_common",
       "//components/strings:components_strings_grit",
     ]
-
-    if (is_chromeos) {
-      deps += [ "//ash/webui/settings/public/constants:mojom" ]
-    }
   }
 }

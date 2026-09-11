@@ -7,9 +7,6 @@
 #include <optional>
 #include <string_view>
 
-#include "ash/constants/ash_features.h"
-#include "ash/constants/ash_pref_names.h"
-#include "ash/constants/ash_switches.h"
 #include "base/containers/fixed_flat_set.h"
 #include "base/feature_list.h"
 #include "base/metrics/field_trial_params.h"
@@ -20,9 +17,6 @@
 #include "base/strings/string_util.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "chromeos/ash/services/nearby/public/cpp/nearby_client_uuids.h"
-#include "chromeos/ash/services/secure_channel/public/cpp/shared/ble_constants.h"
-#include "chromeos/constants/chromeos_features.h"
 #include "device/base/features.h"
 
 namespace device {

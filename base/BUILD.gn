@@ -157,7 +157,7 @@ buildflag_header("ios_cronet_buildflags") {
   flags = [ "CRONET_BUILD=$is_cronet_build" ]
 }
 
-use_epoll = is_linux || is_chromeos || is_android
+use_epoll = is_linux || is_android
 
 generate_allowlist_from_histograms_file("memory_dump_provider_name_variants") {
   namespace = "trace_event_metrics"
@@ -1070,7 +1070,7 @@ component("base") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "debug/proc_maps_linux.cc",
       "debug/proc_maps_linux.h",
@@ -1091,15 +1091,7 @@ component("base") {
     ]
   }
 
-  if (is_chromeos) {
-    sources += [
-      "process/process_priority_delegate.h",
-      "threading/cross_process_platform_thread_delegate.h",
-      "threading/platform_thread_cros.cc",
-    ]
-  }
-
-  if (is_linux || is_chromeos || is_android) {
+  if (is_linux || is_android) {
     sources += [
       "files/file_path_watcher_inotify.cc",
       "files/file_path_watcher_inotify.h",
@@ -1189,7 +1181,7 @@ component("base") {
   # Needed for <atomic> if using newer C++ library than sysroot, except if
   # building inside the cros_sdk environment - use host_toolchain as a
   # more robust check for this.
-  if (!use_sysroot && (is_android || is_chromeos || is_linux) &&
+  if (!use_sysroot && (is_android || is_linux) &&
       host_toolchain != "//build/toolchain/cros:host") {
     libs += [ "atomic" ]
   }
@@ -1213,7 +1205,7 @@ component("base") {
 
   # Allow more direct string conversions on platforms with native utf8
   # strings
-  if (is_apple || is_chromeos) {
+  if (is_apple) {
     defines += [ "SYSTEM_NATIVE_UTF8" ]
   }
 
@@ -1470,21 +1462,6 @@ component("base") {
   }  # is_android || is_robolectric
 
   # Chromeos.
-  if (is_chromeos) {
-    sources += [
-      "logging_chromeos.cc",
-      "system/sys_info_chromeos.cc",
-    ]
-
-    sources += [ "power_monitor/power_monitor_device_source_chromeos.cc" ]
-
-    if (current_cpu == "x64" || current_cpu == "arm64") {
-      sources += [
-        "profiler/frame_pointer_unwinder.cc",
-        "profiler/frame_pointer_unwinder.h",
-      ]
-    }
-  }
 
   # Fuchsia.
 
@@ -1625,11 +1602,11 @@ component("base") {
   if (is_posix && !is_ios) {
     sources += [ "process/process_posix.cc" ]
   }
-  if (!is_win && !is_chromeos && !is_android && !is_linux) {
+  if (!is_win && !is_android && !is_linux) {
     sources += [ "synchronization/cancelable_event_default.cc" ]
   }
 
-  if (is_linux || is_chromeos || is_android) {
+  if (is_linux || is_android) {
     sources += [ "synchronization/cancelable_event_posix.cc" ]
   }
 
@@ -1656,7 +1633,7 @@ component("base") {
     }
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "base_paths_posix.cc",
       "debug/elf_reader.cc",
@@ -2254,7 +2231,7 @@ component("base") {
   }
 
   # Linux.
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     # TODO(brettw) this will need to be parameterized at some point.
     linux_configs = []
     if (use_glib) {
@@ -2365,13 +2342,13 @@ component("base") {
     ]
   }
 
-  if (is_posix && !is_apple && !is_android && !is_chromeos) {
+  if (is_posix && !is_apple && !is_android) {
     sources += [ "power_monitor/power_monitor_device_source_stub.cc" ]
   }
 
   # On ARC++-enabled ChromeOS system, we need TimeTicks::FromUptimeMillis to
   # interpret time values sent from Android container.
-  if (is_android || is_chromeos) {
+  if (is_android) {
     sources += [ "time/time_android.cc" ]
   }
 
@@ -2738,7 +2715,7 @@ rust_static_library("rust_feature_unittests") {
   ]
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   # Split out as a separate target for two reasons:
   # - the line number reader is 2x slower in debug builds if not optimized,
   #   leading to a worse dev experience and test timeouts.
@@ -2775,11 +2752,7 @@ buildflag_header("cfi_buildflags") {
   flags = []
 
   # TODO(pcc): remove CFI_CAST_CHECK, see https://crbug.com/626794.
-  if (is_cfi && use_cfi_cast) {
-    flags += [ "CFI_CAST_CHECK=true" ]
-  } else {
-    flags += [ "CFI_CAST_CHECK=false" ]
-  }
+  flags += [ "CFI_CAST_CHECK=false" ]
 
   if (is_cfi && use_cfi_diag) {
     flags += [ "CFI_DIAG=true" ]
@@ -2848,14 +2821,7 @@ buildflag_header("debugging_buildflags") {
 buildflag_header("feature_buildflags") {
   header = "feature_buildflags.h"
 
-  if (is_chromeos) {
-    flags = [
-      "ENABLE_BANNED_BASE_FEATURE_PREFIX=true",
-      "BANNED_BASE_FEATURE_PREFIX=\"CrOSLateBoot\"",
-    ]
-  } else {
-    flags = [ "ENABLE_BANNED_BASE_FEATURE_PREFIX=false" ]
-  }
+  flags = [ "ENABLE_BANNED_BASE_FEATURE_PREFIX=false" ]
 }
 
 buildflag_header("orderfile_buildflags") {
@@ -3225,8 +3191,7 @@ if (is_win) {
 }
 
 if ((is_win && (current_cpu == "x64" || current_cpu == "arm64")) || is_mac ||
-    (is_android && (current_cpu == "arm" || current_cpu == "arm64")) ||
-    (is_chromeos && (current_cpu == "x64" || current_cpu == "arm64"))) {
+    (is_android && (current_cpu == "arm" || current_cpu == "arm64"))) {
   # Must be a loadable module so that it can be loaded/unloaded at runtime
   # during testing.
   loadable_module("base_profiler_test_support_library") {
@@ -3379,7 +3344,7 @@ if (is_apple) {
   }
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   # This test must compile with -fstack-protector-all
   source_set("stack_canary_linux_unittests") {
     testonly = true
@@ -3933,9 +3898,7 @@ test("base_unittests") {
   # and by
   # https://ci.chromium.org/ui/p/chromium/builders/try/fuchsia-x64-cast-receiver-rel/1591660/overview
   # (not diagnosed yet).
-  if (!is_chromeos) {
-    deps += [ "//build/rust/tests" ]
-  }
+  deps += [ "//build/rust/tests" ]
 
   # TODO(https://crbug.com/405379314): This fails to build on some iOS ASAN
   # builders.
@@ -4110,7 +4073,7 @@ test("base_unittests") {
     configs += [ ":delayload_esent_dll" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "debug/proc_maps_linux_unittest.cc",
       "files/scoped_file_linux_unittest.cc",
@@ -4144,7 +4107,7 @@ test("base_unittests") {
 
   # Allow more direct string conversions on platforms with native utf8
   # strings
-  if (is_apple || is_chromeos) {
+  if (is_apple) {
     defines += [ "SYSTEM_NATIVE_UTF8" ]
   }
 
@@ -4328,7 +4291,7 @@ test("base_unittests") {
     deps += [ ":base_profiler_test_support_library" ]
   }
 
-  if (is_linux || is_chromeos) {
+  if (is_linux) {
     sources += [
       "debug/elf_reader_unittest.cc",
       "debug/test_elf_image_builder.cc",
@@ -4396,10 +4359,6 @@ test("base_unittests") {
   }
   if (is_apple) {
     sources += [ "profiler/frame_pointer_unwinder_unittest.cc" ]
-  }
-  if (is_chromeos && (current_cpu == "x64" || current_cpu == "arm64")) {
-    sources += [ "profiler/frame_pointer_unwinder_unittest.cc" ]
-    deps += [ ":base_profiler_test_support_library" ]
   }
 
   if (use_allocator_shim) {
@@ -6202,7 +6161,7 @@ fuzzer_test("file_path_fuzzer") {
   deps = [ "//base" ]
 }
 
-if (is_linux || is_chromeos) {
+if (is_linux) {
   fuzzer_test("mime_util_xdg_fuzzer") {
     sources = [ "nix/mime_util_xdg_fuzzer.cc" ]
     deps = [

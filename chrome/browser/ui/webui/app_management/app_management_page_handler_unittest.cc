@@ -22,7 +22,6 @@
 #include "chrome/browser/web_applications/web_app_registry_update.h"
 #include "chrome/browser/web_applications/web_app_sync_bridge.h"
 #include "chrome/test/base/testing_profile.h"
-#include "chromeos/ash/experiences/arc/arc_features.h"
 #include "content/public/test/browser_task_environment.h"
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
 #include "testing/gmock/include/gmock/gmock.h"

@@ -121,11 +121,6 @@ component("services") {
     sources += [ "gpu_mojo_media_client_stubs.cc" ]
   }
 
-  if (is_chromeos) {
-    deps +=
-        [ "//chromeos/components/cdm_factory_daemon:cdm_factory_daemon_gpu" ]
-  }
-
   if (use_linux_video_acceleration) {
     sources += [
       "mojo_video_encode_accelerator_provider_factory.cc",
@@ -300,12 +295,6 @@ source_set("unit_tests") {
   if (is_android) {
     sources += [ "mediadrm_support_service_unittest.cc" ]
     deps += [ "//third_party/widevine/cdm:headers" ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      "//components/chromeos_camera:mjpeg_decode_accelerator_service_unittest",
-    ]
   }
 
   if (allow_hosting_oop_video_decoder) {
