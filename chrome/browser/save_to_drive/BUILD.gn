@@ -50,7 +50,6 @@ source_set("save_to_drive") {
     "//chrome/common/extensions",
     "//chrome/common/extensions/api",
     "//components/download/public/common:public",
-    "//components/drive",
     "//components/endpoint_fetcher",
     "//components/pdf/browser",
     "//content/public/browser",

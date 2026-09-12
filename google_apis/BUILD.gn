@@ -305,10 +305,6 @@ test("google_apis_unittests") {
     deps += [ "//net/android:net_java" ]
   }
 
-  if (enable_extensions) {
-    deps += [ "//google_apis/drive:drive_unittests" ]
-  }
-
   if (is_apple) {
     sources += [ "google_api_keys_mac_unittest.mm" ]
 

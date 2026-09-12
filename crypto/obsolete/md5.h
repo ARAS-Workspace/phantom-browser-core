@@ -70,10 +70,6 @@ namespace drive {
 crypto::obsolete::Md5 MakeMd5HasherForDriveFsAccount();
 }
 
-namespace drive::util {
-crypto::obsolete::Md5 MakeMd5HasherForDriveApi();
-}
-
 namespace extensions::image_writer {
 crypto::obsolete::Md5 MakeMd5HasherForImageWriter();
 }
@@ -192,7 +188,6 @@ class CRYPTO_EXPORT Md5 {
   friend std::string content::Md5AsHexForWebTestPixels(
       base::span<const uint8_t> pixels);
   friend Md5 drive::MakeMd5HasherForDriveFsAccount();
-  friend Md5 drive::util::MakeMd5HasherForDriveApi();
   friend Md5 extensions::image_writer::MakeMd5HasherForImageWriter();
   friend std::array<uint8_t, kSize> hunspell::Md5ForBdict(
       base::span<const uint8_t> data);

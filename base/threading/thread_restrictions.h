@@ -270,9 +270,6 @@ class Bus;
 namespace dbus_xdg {
 class FileTransferPortal;
 }
-namespace drive {
-class FakeDriveService;
-}
 namespace device {
 class UsbContext;
 }
@@ -628,7 +625,6 @@ class BASE_EXPORT ScopedAllowBlocking {
   friend class cronet::CronetContext;
   friend class cronet::CronetPrefsManager;
   friend class crypto::ScopedAllowBlockingForNSS;  // http://crbug.com/59847
-  friend class drive::FakeDriveService;
   friend class extensions::InstalledLoader;
   friend class extensions::UnpackedInstaller;
   friend class font_service::internal::MappedFontFile;

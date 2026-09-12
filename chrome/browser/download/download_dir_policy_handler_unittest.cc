@@ -14,7 +14,6 @@
 #include "chrome/browser/download/download_dir_util.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/common/pref_names.h"
-#include "components/drive/drive_pref_names.h"
 #include "components/policy/core/browser/configuration_policy_handler_parameters.h"
 #include "components/policy/core/browser/configuration_policy_pref_store.h"
 #include "components/policy/core/browser/configuration_policy_pref_store_test.h"

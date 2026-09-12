@@ -290,7 +290,6 @@ source_set("impl") {
       "//chrome/browser/ui/web_applications",
       "//chrome/browser/ui/window_feature_controller",
       "//chrome/common:chrome_features",
-      "//components/drive",
     ]
   }
 
@@ -458,7 +457,6 @@ source_set("unit_tests") {
     "//components/download/public/background_service/test:test_support",
     "//components/download/public/common:public",
     "//components/download/public/common:test_support",
-    "//components/drive",
     "//components/enterprise",
     "//components/enterprise/obfuscation/core:enterprise_obfuscation",
     "//components/history/content/browser",

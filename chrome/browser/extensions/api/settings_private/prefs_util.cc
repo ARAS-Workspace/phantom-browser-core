@@ -40,7 +40,6 @@
 #include "components/contextual_search/pref_names.h"
 #include "components/contextual_tasks/public/prefs.h"
 #include "components/dom_distiller/core/pref_names.h"
-#include "components/drive/drive_pref_names.h"
 #include "components/embedder_support/pref_names.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/live_caption/pref_names.h"
@@ -272,8 +271,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[::prefs::kDownloadDefaultDirectory] =
       settings_api::PrefType::kString;
   (*s_allowlist)[::prefs::kPromptForDownload] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[drive::prefs::kDisableDrive] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kDownloadBubblePartialViewEnabled] =
       settings_api::PrefType::kBoolean;

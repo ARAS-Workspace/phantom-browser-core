@@ -2926,10 +2926,8 @@ source_set("browser") {
       "//chrome/browser/ui/web_applications",
       "//chrome/browser/web_applications/extensions",
       "//chrome/common/extensions/api",
-      "//components/drive",
       "//extensions/common:mojom",
       "//google_apis/common",
-      "//google_apis/drive",
     ]
     deps += [
       # TODO(crbug.com/41410773): mirroring shouldn't depend on

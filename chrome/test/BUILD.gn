@@ -293,7 +293,6 @@ static_library("test_support") {
       "//extensions/browser:test_support",
       "//extensions/common:test_support",
       "//google_apis/common:test_support",
-      "//google_apis/drive",
     ]
   }
 
@@ -2230,7 +2229,6 @@ if (!is_android) {
       "//components/desktop_to_mobile_promos",
       "//components/device_event_log",
       "//components/domain_reliability:prefs",
-      "//components/drive:test_support",
       "//components/embedder_support",
       "//components/embedder_support:user_agent",
       "//components/embedder_support/origin_trials",
@@ -4651,8 +4649,6 @@ test("unit_tests") {
     "//components/device_reauth",
     "//components/device_signals/core/browser",
     "//components/download/public/background_service/test:test_support",
-    "//components/drive",
-    "//components/drive:test_support",
     "//components/embedder_support",
     "//components/encrypted_messages",
     "//components/encrypted_messages:encrypted_message_proto",
@@ -8222,10 +8218,7 @@ if (!is_android) {
     ]
 
     if (enable_extensions) {
-      deps += [
-        "//google_apis/common:test_support",
-        "//google_apis/drive",
-      ]
+      deps += [ "//google_apis/common:test_support" ]
     }
 
     if (use_ozone) {

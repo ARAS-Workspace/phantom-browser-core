@@ -16,7 +16,6 @@
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/policy/policy_path_parser.h"
 #include "chrome/common/pref_names.h"
-#include "components/drive/drive_pref_names.h"
 #include "components/policy/core/browser/configuration_policy_handler_parameters.h"
 #include "components/policy/core/browser/policy_error_map.h"
 #include "components/policy/core/common/policy_map.h"
