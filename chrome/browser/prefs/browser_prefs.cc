@@ -367,7 +367,6 @@
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/device_identity/device_oauth2_token_store_desktop.h"
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt.h"
 #endif
 
@@ -1269,7 +1268,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 
 #if !BUILDFLAG(IS_ANDROID)
   RegisterDefaultBrowserPromptPrefs(registry);
-  DeviceOAuth2TokenStoreDesktop::RegisterPrefs(registry);
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)

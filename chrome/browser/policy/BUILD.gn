@@ -835,10 +835,7 @@ source_set("policy") {
   }
 
   if (!is_android) {
-    public += [
-      "device_account_initializer.h",
-      "managed_account_policy_handler.h",
-    ]
+    public += [ "managed_account_policy_handler.h" ]
     public_deps += [ "//chrome/browser/ui/tabs:tab_strip_model_observer" ]
 
     public += [
@@ -1104,12 +1101,8 @@ source_set("impl") {
   }
 
   if (!is_android) {
-    sources += [
-      "device_account_initializer.cc",
-      "managed_account_policy_handler.cc",
-    ]
+    sources += [ "managed_account_policy_handler.cc" ]
     deps += [
-      "//chrome/browser/device_identity",
       "//chrome/browser/indigo",
       "//chrome/browser/performance_manager/public/user_tuning",
       "//chrome/browser/web_applications",

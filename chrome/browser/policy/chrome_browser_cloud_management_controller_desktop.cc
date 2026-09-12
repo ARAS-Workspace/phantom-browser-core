@@ -11,7 +11,6 @@
 #include <string>
 #include <utility>
 
-#include "base/check_is_test.h"
 #include "base/command_line.h"
 #include "base/not_fatal_until.h"
 #include "base/path_service.h"
@@ -20,7 +19,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/device_identity/device_oauth2_token_service_factory.h"
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/key_loader.h"
 #include "chrome/browser/enterprise/remote_commands/cbcm_remote_commands_factory.h"
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
@@ -109,8 +107,6 @@ ChromeBrowserCloudManagementControllerDesktop::
 void ChromeBrowserCloudManagementControllerDesktop::InitializeOAuthTokenFactory(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     PrefService* local_state) {
-  DeviceOAuth2TokenServiceFactory::Initialize(
-      url_loader_factory, local_state, g_browser_process->os_crypt_async());
 }
 
 void ChromeBrowserCloudManagementControllerDesktop::StartWatchingRegistration(
@@ -165,14 +161,6 @@ void ChromeBrowserCloudManagementControllerDesktop::OnServiceAccountSet(
 }
 
 void ChromeBrowserCloudManagementControllerDesktop::ShutDown() {
-  // In some tests, `DCHECK_CURRENTLY_ON(content::BrowserThread::UI)` fails.
-  // Such tests have not initialized device_oauth2_token_service anyway, so
-  // skip calling Shutdown() for the service.
-  if (!content::BrowserThread::CurrentlyOn(content::BrowserThread::UI)) {
-    CHECK_IS_TEST();
-    return;
-  }
-  DeviceOAuth2TokenServiceFactory::Shutdown();
 }
 
 MachineLevelUserCloudPolicyManager*

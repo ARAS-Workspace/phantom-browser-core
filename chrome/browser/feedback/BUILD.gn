@@ -56,7 +56,6 @@ source_set("feedback") {
     ]
     public_deps += [
       "//base",
-      "//chrome/browser/device_identity",
       "//chrome/browser/feedback:feedback_enum",
       "//components/sessions:session_id",
     ]
@@ -112,7 +111,6 @@ source_set("feedback_impl") {
     deps += [
       "//base",
       "//chrome/browser/crash_upload_list",
-      "//chrome/browser/device_identity",
       "//chrome/browser/devtools",
       "//chrome/browser/extensions",
       "//chrome/browser/first_party_sets",

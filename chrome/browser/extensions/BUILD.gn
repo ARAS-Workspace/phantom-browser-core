@@ -922,7 +922,6 @@ source_set("extensions") {
       "//chrome/browser/affiliations",
       "//chrome/browser/apps:user_type_filter",
       "//chrome/browser/chooser_controller",
-      "//chrome/browser/device_identity",
       "//chrome/browser/feedback",
       "//chrome/browser/glic",
       "//chrome/browser/importer",

@@ -5492,7 +5492,6 @@ test("unit_tests") {
       "//chrome/browser/contextual_search:unit_tests",
       "//chrome/browser/contextual_tasks",
       "//chrome/browser/device_api:unit_tests",
-      "//chrome/browser/device_identity:unit_tests",
       "//chrome/browser/device_notifications:unit_tests",
       "//chrome/browser/engagement",
       "//chrome/browser/engagement:unit_tests",

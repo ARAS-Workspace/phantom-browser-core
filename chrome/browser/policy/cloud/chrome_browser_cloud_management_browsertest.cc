@@ -73,8 +73,6 @@
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/policy/cloud/chrome_browser_cloud_management_browsertest_delegate_android.h"
 #else
-#include "chrome/browser/device_identity/device_oauth2_token_service.h"
-#include "chrome/browser/device_identity/device_oauth2_token_service_factory.h"
 #include "chrome/browser/policy/cloud/chrome_browser_cloud_management_browsertest_delegate_desktop.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
@@ -1327,12 +1325,6 @@ IN_PROC_BROWSER_TEST_F(MachineLevelUserCloudPolicyRobotAuthTest, MAYBE_Test) {
   // Chrome is started without a DM token.
   EXPECT_EQ(token.value(), kDMToken);
 
-  base::RunLoop run_loop;
-  DeviceOAuth2TokenServiceFactory::Get()->SetRefreshTokenAvailableCallback(
-      run_loop.QuitClosure());
-  run_loop.Run();
-  EXPECT_TRUE(
-      DeviceOAuth2TokenServiceFactory::Get()->RefreshTokenIsAvailable());
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 

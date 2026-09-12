@@ -2450,7 +2450,6 @@ source_set("browser") {
       "//chrome/browser/badging:impl",
       "//chrome/browser/device_api",
       "//chrome/browser/device_api:impl",
-      "//chrome/browser/device_identity",
       "//chrome/browser/device_notifications",
       "//chrome/browser/device_notifications:impl",
       "//chrome/browser/direct_sockets:impl",
