@@ -27,8 +27,6 @@ after discussions on the right group.
       <annotation id="rlz"/>
       <annotation id="webapk_create"/>
       <annotation id="webapk_update"/>
-      <annotation id="webview_preconnect"/>
-      <annotation id="webview_proxy_config"/>
     </sender>
     <sender name="Feed Library">
       <annotation id="interest_feedv2_send"/>
@@ -40,61 +38,14 @@ after discussions on the right group.
     </sender>
   </group>
   <group name="ChromeOS" hidden="true">
-    <sender name="ChromeOS Unsorted">
-      <annotation id="ambient_client"/>
-      <annotation id="ambient_photo_cache"/>
-      <annotation id="ambient_photo_controller"/>
-      <annotation id="arc_auth_code_fetcher"/>
-      <annotation id="calendar_get_events"/>
-      <annotation id="chromebook_mail_api"/>
-      <annotation id="customization_wallpaper_downloader"/>
-      <annotation id="edu_account_login_profile_image_fetcher"/>
-      <annotation id="fast_pair_device_metadata_fetcher"/>
-      <annotation id="fast_pair_footprints_request"/>
-      <annotation id="fast_pair_image_decoder"/>
-      <annotation id="fwupd_firmware_update"/>
-      <annotation id="gaia_reauth_token_fetcher"/>
-      <annotation id="help_content_provider"/>
-      <annotation id="ime_url_downloader"/>
-      <annotation id="kiosk_app_icon"/>
-      <annotation id="management_ui_customer_logo"/>
-      <annotation id="nearby_connections_wifi_lan"/>
-      <annotation id="quick_answers_spellchecker"/>
-      <annotation id="remote_apps_image_downloader"/>
-      <annotation id="remote_command_screenshot"/>
-      <annotation id="smb_netbios_name_query"/>
-      <annotation id="tachyon_ice_config_fetcher"/>
-      <annotation id="terms_of_service_fetch"/>
-      <annotation id="timezone_lookup"/>
-      <annotation id="wallpaper_backdrop_collection_names"/>
-      <annotation id="wallpaper_backdrop_images_info"/>
-      <annotation id="wallpaper_backdrop_surprise_me_image"/>
-      <annotation id="wallpaper_fetcher"/>
-      <annotation id="wallpaper_download_google_photo"/>
-      <annotation id="wallpaper_google_photos_albums"/>
-      <annotation id="wallpaper_google_photos_enabled"/>
-      <annotation id="wallpaper_google_photos_photos"/>
-      <annotation id="wallpaper_online_downloader"/>
-    </sender>
+    <sender name="ChromeOS Unsorted"/>
     <sender name="ChromeOS Recovery">
       <annotation id="cros_recovery_image_download"/>
     </sender>
-    <sender name="ChromeOS Printers Manager">
-      <annotation id="printing_oauth2_first_token_request"/>
-      <annotation id="printing_oauth2_metadata_request"/>
-      <annotation id="printing_oauth2_next_token_request"/>
-      <annotation id="printing_oauth2_registration_request"/>
-      <annotation id="printing_oauth2_token_exchange_request"/>
-      <annotation id="printing_server_printers_query"/>
-    </sender>
-    <sender name="Report using PSM">
-      <annotation id="report_check_membership"/>
-      <annotation id="report_check_in"/>
-    </sender>
+    <sender name="ChromeOS Printers Manager"/>
+    <sender name="Report using PSM"/>
     <sender name="Device Activity"/>
-    <sender name="Enhanced Network TTS">
-      <annotation id="enhanced_network_tts"/>
-    </sender>
+    <sender name="Enhanced Network TTS"/>
   </group>
   <group name="Unsorted" hidden="true">
     <sender name="Unsorted Sender">
@@ -195,79 +146,34 @@ after discussions on the right group.
       <annotation id="device_trust_key_rotation"/>
     </sender>
     <sender name="Recently Added">
-      <annotation id="fast_pair_image_decoder"/>
-      <annotation id="drivefs_http_client"/>
       <annotation id="download_bubble_retry_download"/>
-      <annotation id="quick_answers_loader"/>
       <annotation id="chrome_commerce_price_email_pref_fetcher"/>
       <annotation id="chrome_commerce_price_email_pref_sender"/>
-      <annotation id="receive_messages_express"/>
-      <annotation id="send_message_express"/>
-      <annotation id="cryptohome_recovery_fetch_epoch"/>
-      <annotation id="cryptohome_recovery_fetch_recovery_response"/>
-      <annotation id="supervised_user_favicon_request"/>
-      <annotation id="app_preload_service"/>
-      <annotation id="user_image_downloader"/>
-      <annotation id="nearby_share_update_device"/>
-      <annotation id="nearby_share_contacts"/>
-      <annotation id="nearby_share_list_public_certificates"/>
-      <annotation id="nearby_presence_update_device"/>
-      <annotation id="nearby_presence_list_shared_credentials"/>
-      <annotation id="managed_acccount_signin_restrictions_secure_connect_chromeos"/>
       <annotation id="fenced_frame_reporting_beacon"/>
       <annotation id="ntp_custom_background"/>
       <annotation id="iwa_policy_update_manifest"/>
       <annotation id="iwa_installer_view_controller"/>
       <annotation id="iwa_policy_signed_web_bundle"/>
-      <annotation id="quick_start_challenge_bytes_fetcher"/>
-      <annotation id="customization_document"/>
-      <annotation id="password_sync_token_fetcher"/>
-      <annotation id="nearby_webrtc_connection"/>
-      <annotation id="projector_xhr_loader"/>
       <annotation id="cloud_speech_recognition"/>
-      <annotation id="bruschetta_installer_download"/>
-      <annotation id="quick_start_session_auth_requester"/>
-      <annotation id="network_diagnostics_routines"/>
-      <annotation id="trial_group_lookup"/>
-      <annotation id="wallpaper_drivefs_delegate"/>
-      <annotation id="network_diagnostics_stun"/>
-      <annotation id="network_diagnostics_tls"/>
-      <annotation id="webapk_minter_install_request"/>
       <annotation id="android_feedback_connectivity_checker"/>
-      <annotation id="printer_config_fetch"/>
-      <annotation id="projector_xhr_loader_allow_cookie"/>
-      <annotation id="chrome_support_tool_file_upload"/>
       <annotation id="service_worker_race_network_request"/>
-      <annotation id="glanceables_tasks_integration"/>
       <annotation id="bookmarks_image_fetcher"/>
-      <annotation id="screensaver_image_downloader"/>
       <annotation id="back_navigation_cache_query"/>
       <annotation id="cws_info_service"/>
-      <annotation id="promise_app_service"/>
       <annotation id="crash_file_uploader"/>
-      <annotation id="glanceables_classroom_integration"/>
-      <annotation id="promise_app_service_download_icon"/>
       <annotation id="supervised_user_request_blocked_site_permission"/>
       <annotation id="password_sharing_recipients"/>
       <annotation id="ntp_image_url_verification"/>
       <annotation id="passkey_enclave_client"/>
       <annotation id="iwa_update_discovery_update_manifest"/>
       <annotation id="iwa_update_discovery_web_bundle"/>
-      <annotation id="almanac_launcher_app"/>
-      <annotation id="almanac_icon_cache"/>
       <annotation id="blink_fetch_later_manager"/>
-      <annotation id="carrier_lock_manager_fetch_configuration"/>
-      <annotation id="carrier_lock_manager_check_membership"/>
-      <annotation id="carrier_lock_manager_fcm_topic"/>
-      <annotation id="almanac_app_install"/>
       <annotation id="remoting_report_provisioning_error"/>
       <annotation id="webauthn_rp_id_check"/>
-      <annotation id="tasks_integration"/>
       <annotation id="metrics_report_appkm"/>
       <annotation id="metrics_report_ukm_and_appkm"/>
       <annotation id="search_engine_adapter"/>
       <annotation id="prewarm_http_disk_cache"/>
-      <annotation id="admin_specified_ppd_fetch"/>
       <annotation id="wallpaper_search_handler_descriptors_fetcher"/>
       <annotation id="wallpaper_search_handler_inspirations_fetcher"/>
       <annotation id="wallpaper_search_handler_inspiration_image_downloader"/>
@@ -275,40 +181,21 @@ after discussions on the right group.
       <annotation id="wallpaper_create_themes_model_execution"/>
       <annotation id="help_me_write_model_execution"/>
       <annotation id="controlled_frame_content_scripts_download"/>
-      <annotation id="essential_search_manager"/>
-      <annotation id="app_install_service_web_app_installer"/>
       <annotation id="remoting_corp_session_authz_generate_host_token"/>
       <annotation id="remoting_corp_session_authz_verify_session_token"/>
       <annotation id="remoting_corp_session_reauthorize_host"/>
-      <annotation id="birch_calendar_provider"/>
       <annotation id="recovery_key_store_fetch"/>
       <annotation id="enterprise_logo_fetcher"/>
       <annotation id="private_metrics_encryption_key"/>
       <annotation id="remoting_corp_logging_report_session_disconnected"/>
-      <annotation id="focus_mode_sounds_image_downloader"/>
-      <annotation id="help_me_write_request"/>
-      <annotation id="camera_background_request"/>
-      <annotation id="wallpaper_request"/>
       <annotation id="cws_fetch_item_snippet"/>
       <annotation id="remoting_cloud_provision_gce_instance"/>
       <annotation id="lens_overlay"/>
-      <annotation id="register_push_notification_service"/>
-      <annotation id="youtube_music_integration"/>
-      <annotation id="personalized_recommended_apps_download"/>
-      <annotation id="focus_sounds_configuration"/>
-      <annotation id="device_image_downloader"/>
-      <annotation id="glanceables_icon_downloader"/>
       <annotation id="dbsc_registration"/>
       <annotation id="google_calendar_page_handler"/>
-      <annotation id="nearby_connections_wifi_direct"/>
       <annotation id="autofill_password_favicon_fetch"/>
-      <annotation id="peripherals_companion_app"/>
       <annotation id="enterprise_companion_event_logging"/>
-      <annotation id="get_locale_oauth2_people_api_call"/>
-      <annotation id="boca_classroom_integration"/>
-      <annotation id="android_webview_shell"/>
       <annotation id="contextual_search_resolve_debug"/>
-      <annotation id="help_me_read_request"/>
       <annotation id="chrome_data_sharing_preview"/>
       <annotation id="lens_overlay_save"/>
       <annotation id="iwa_web_app_internals_update_manifest"/>
@@ -325,21 +212,8 @@ after discussions on the right group.
       <annotation id="remoting_cloud_verify_session_token"/>
       <annotation id="lens_overlay_gen204"/>
       <annotation id="policy_proxy_config"/>
-      <annotation id="chromeos_emoji_picker_search_fetcher"/>
-      <annotation id="chromeos_emoji_picker_categories_fetcher"/>
-      <annotation id="chromeos_emoji_picker_featured_fetcher"/>
-      <annotation id="chromeos_emoji_picker_posts_fetcher"/>
       <annotation id="remoting_cloud_generate_ice_config"/>
-      <annotation id="demo_login_controller"/>
-      <annotation id="ash_babelorca_tachyon_registrar"/>
-      <annotation id="ash_babelorca_transcript_receiver"/>
-      <annotation id="ash_babelorca_transcript_sender_impl"/>
-      <annotation id="ash_babelorca_babel_orca_consumer"/>
-      <annotation id="chromeos_scanner"/>
       <annotation id="lens_overlay_languages"/>
-      <annotation id="demo_login_controller_account_clean_up"/>
-      <annotation id="chromeos_quick_insert_gif_media_fetcher"/>
-      <annotation id="chromeos_feedback_report_hpke_public_key_fetch_for_variations"/>
       <annotation id="outlook_calendar_page_handler"/>
       <annotation id="omnibox_search_aggregator_suggest"/>
       <annotation id="microsoft_files_page_handler"/>
@@ -349,11 +223,6 @@ after discussions on the right group.
       <annotation id="remoting_compute_engine_instance_access_token_scopes"/>
       <annotation id="metrics_report_dwa"/>
       <annotation id="version_history"/>
-      <annotation id="chromeos_scanner_provider"/>
-      <annotation id="chromeos_lens_web_image_search"/>
-      <annotation id="chromeos_inline_image_request"/>
-      <annotation id="baguette_image_download"/>
-      <annotation id="chromeos_walrus_provider"/>
       <annotation id="forms_classifications_model_execution"/>
       <annotation id="gemini_user_status"/>
       <annotation id="corp_register_support_host_request"/>
@@ -447,13 +316,7 @@ after discussions on the right group.
       <annotation id="webstore_install_helper"/>
       <annotation id="webstore_installer"/>
     </sender>
-    <sender name="Google Cloud Messaging">
-      <annotation id="gcm_checkin"/>
-      <annotation id="gcm_connection_factory"/>
-      <annotation id="gcm_registration"/>
-      <annotation id="gcm_unregistration"/>
-      <annotation id="per_user_topic_registration_request"/>
-    </sender>
+    <sender name="Google Cloud Messaging"/>
   </group>
   <group name="Child-protection and Safe Browsing Features">
     <sender name="Safe Browsing">
@@ -494,7 +357,6 @@ after discussions on the right group.
       <annotation id="affiliation_lookup_by_hash"/>
       <annotation id="device_bound_session_register"/>
       <annotation id="device_management_service"/>
-      <annotation id="lookup_single_password_leak"/>
     </sender>
     <sender name="OAuth 2.0 and FedCM">
       <annotation id="fedcm"/>
@@ -615,7 +477,6 @@ after discussions on the right group.
     </sender>
     <sender name="Personalization">
       <annotation id="profile_avatar"/>
-      <annotation id="profile_resetter_upload"/>
       <annotation id="signed_in_profile_avatar"/>
     </sender>
     <sender name="Favicon">
@@ -652,7 +513,6 @@ after discussions on the right group.
       <annotation id="sync_http_bridge"/>
       <annotation id="sync_stop_reporter"/>
       <annotation id="trusted_vault_request"/>
-      <annotation id="remote_copy_message_handler"/>
     </sender>
     <sender name="Assist Rank">
       <annotation id="ranker_url_fetcher"/>
