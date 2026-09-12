@@ -94,10 +94,6 @@ class MockSyncService : public SyncService {
               DataTypePreconditionChanged,
               (syncer::DataType type),
               (override));
-  MOCK_METHOD(void,
-              SetInvalidationsForSessionsEnabled,
-              (bool enabled),
-              (override));
   MOCK_METHOD(void, SendExplicitPassphraseToPlatformClient, (), (override));
   MOCK_METHOD(void, AddObserver, (SyncServiceObserver * observer), (override));
   MOCK_METHOD(void,

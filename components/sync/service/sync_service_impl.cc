@@ -2011,12 +2011,6 @@ bool SyncServiceImpl::HasSyncConsent() const {
   return auth_manager_->GetActiveAccountInfo().is_sync_consented;
 }
 
-void SyncServiceImpl::SetInvalidationsForSessionsEnabled(bool enabled) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  sessions_invalidations_enabled_ = enabled;
-}
-
 void SyncServiceImpl::SendExplicitPassphraseToPlatformClient() {
   RunOrQueueTaskOnEngineInitialized(base::BindOnce(
       &SyncServiceImpl::SendExplicitPassphraseToPlatformClientImpl,

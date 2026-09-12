@@ -573,14 +573,6 @@ class SyncService : public KeyedService {
   // if the type's state didn't actually change.
   virtual void DataTypePreconditionChanged(DataType type) = 0;
 
-  // Enables/disables invalidations for session sync related datatypes.
-  // The session sync generates a lot of changes, which results in many
-  // invalidations. This can negatively affect the battery life on Android. For
-  // that reason, on Android, the invalidations for sessions should be received
-  // only when user is interested in session sync data, e.g. the history sync
-  // page is opened.
-  virtual void SetInvalidationsForSessionsEnabled(bool enabled) = 0;
-
   // Shares the explicit passphrase content with layers outside of the browser
   // which have an independent sync client, and thus separate encryption
   // infrastructure. That way, if the user has entered their passphrase in the

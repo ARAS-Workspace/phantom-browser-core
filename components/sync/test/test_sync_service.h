@@ -176,7 +176,6 @@ class TestSyncService : public SyncService {
       const override;
   void SetCurrentDeviceCacheGuidsForAllGaiaIds(
       base::flat_set<std::string> guids);
-  void SetInvalidationsForSessionsEnabled(bool enabled) override;
   void SendExplicitPassphraseToPlatformClient() override;
   void GetTypesWithUnsyncedData(
       DataTypeSet requested_types,

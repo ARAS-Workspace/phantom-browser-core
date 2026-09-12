@@ -448,8 +448,6 @@ SyncService::DataTypeDownloadStatus TestSyncService::GetDownloadStatusFor(
   return DataTypeDownloadStatus::kUpToDate;
 }
 
-void TestSyncService::SetInvalidationsForSessionsEnabled(bool enabled) {}
-
 void TestSyncService::SendExplicitPassphraseToPlatformClient() {
   if (send_passphrase_to_platform_client_cb_) {
     send_passphrase_to_platform_client_cb_.Run();

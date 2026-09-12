@@ -620,18 +620,6 @@ bool SyncTest::SetupSyncInternal(SetupSyncMode setup_mode,
       }
     }
 
-    if (TestUsesSelfNotifications()) {
-      // On Android, invalidations for Session data type are disabled by
-      // default. This may result in test flakiness when using when using
-      // AwaitQuiescence() because Android commits Session for "about:blank"
-      // page, hence AwaitQuiescence() would wait for downloading updates
-      // forever.
-      // TODO(crbug.com/40173160): remove this workaround once SetupSync doesn't
-      // rely on self-notifications.
-      CHECK(GetSyncService(client_index)->IsEngineInitialized());
-      GetSyncService(client_index)->SetInvalidationsForSessionsEnabled(true);
-    }
-
     // It's important to wait for each client before setting up the next one,
     // otherwise multi-client tests get flaky. This may happen in some tests
     // which have local data before sync is enabled. In such tests it's
