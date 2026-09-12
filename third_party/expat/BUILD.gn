@@ -9,7 +9,6 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 expat_visibility = [
   ":*",
   "//skia:*",
-  "//third_party/libjingle_xmpp:*",
   "//third_party/wayland:*",
 ]
 
