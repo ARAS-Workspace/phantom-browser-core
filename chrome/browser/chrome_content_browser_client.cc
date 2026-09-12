@@ -220,7 +220,6 @@
 #include "chrome/common/profiler/process_type.h"
 #include "chrome/common/profiler/thread_profiler_configuration.h"
 #include "chrome/common/renderer_configuration.mojom.h"
-#include "chrome/common/request_header_integrity/buildflags.h"
 #include "chrome/common/secure_origin_allowlist.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
@@ -705,10 +704,6 @@
 #include "components/on_device_translation/component_manager.h"
 #endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 
-#if BUILDFLAG(ENABLE_REQUEST_HEADER_INTEGRITY)
-#include "chrome/common/request_header_integrity/request_header_integrity_url_loader_throttle.h"  // nogncheck crbug.com/40147906
-#endif
-
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/browser/printing/print_preview_dialog_controller.h"
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
@@ -763,12 +758,6 @@ bool g_disable_advanced_protection_caching_for_tests = false;
 BASE_FEATURE(kPrewarmServiceWorkerRegistrationForDSE,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(ENABLE_REQUEST_HEADER_INTEGRITY)
-// Kill-switch for the request integrity headers support for prefetches
-// initiated by `content::PrefetchContainer`.
-BASE_FEATURE(kPrefetchRequestIntegrityHeaders,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // Cached version of the locale so we can return the locale on the I/O
 // thread.
@@ -5387,15 +5376,6 @@ ChromeContentBrowserClient::CreateURLLoaderThrottles(
           wc_getter.Run()));
 #endif
 
-#if BUILDFLAG(ENABLE_REQUEST_HEADER_INTEGRITY)
-  if (request_header_integrity::RequestHeaderIntegrityURLLoaderThrottle::
-          IsFeatureEnabled()) {
-    result.push_back(
-        std::make_unique<request_header_integrity::
-                             RequestHeaderIntegrityURLLoaderThrottle>());
-  }
-#endif
-
   if (chrome_navigation_ui_data &&
       chrome_navigation_ui_data->is_no_state_prefetching()) {
     result.push_back(
@@ -8751,34 +8731,6 @@ bool ChromeContentBrowserClient::ShouldAllowPrefetchRedirection(
             template_url_service->IsSearchResultsPageFromDefaultSearchProvider(
                 url)) ||
            google_util::IsGoogleSearchUrl(url));
-}
-
-void ChromeContentBrowserClient::ModifyRequestHeadersForPrefetch(
-    const GURL& url,
-    std::vector<std::string>& removed_headers,
-    net::HttpRequestHeaders& modified_headers,
-    net::HttpRequestHeaders& modified_cors_exempt_headers) {
-#if BUILDFLAG(ENABLE_REQUEST_HEADER_INTEGRITY)
-  if (base::FeatureList::IsEnabled(kPrefetchRequestIntegrityHeaders) &&
-      request_header_integrity::RequestHeaderIntegrityURLLoaderThrottle::
-          IsFeatureEnabled()) {
-    request_header_integrity::RequestHeaderIntegrityURLLoaderThrottle::
-        ModifyRequestIntegrityHeadersForPrefetch(url, removed_headers,
-                                                 modified_cors_exempt_headers);
-  }
-#endif
-}
-
-void ChromeContentBrowserClient::UpdateCorsExemptHeaderForPrefetch(
-    network::mojom::NetworkContextParams* params) {
-#if BUILDFLAG(ENABLE_REQUEST_HEADER_INTEGRITY)
-  if (base::FeatureList::IsEnabled(kPrefetchRequestIntegrityHeaders) &&
-      request_header_integrity::RequestHeaderIntegrityURLLoaderThrottle::
-          IsFeatureEnabled()) {
-    request_header_integrity::RequestHeaderIntegrityURLLoaderThrottle::
-        UpdateCorsExemptHeaders(params);
-  }
-#endif
 }
 
 bool ChromeContentBrowserClient::IsFullscreenAllowedForUnfocusedWebContents(

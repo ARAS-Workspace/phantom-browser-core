@@ -1169,14 +1169,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   bool ShouldAllowSystemUiPopups(content::WebContents* web_contents) override;
 #endif
 
-  void ModifyRequestHeadersForPrefetch(
-      const GURL& url,
-      std::vector<std::string>& removed_headers,
-      net::HttpRequestHeaders& modified_headers,
-      net::HttpRequestHeaders& modified_cors_exempt_headers) override;
-  void UpdateCorsExemptHeaderForPrefetch(
-      network::mojom::NetworkContextParams* params) override;
-
   std::optional<int> GetCpuPerformanceTierOverride(
       content::BrowserContext* browser_context) override;
 
