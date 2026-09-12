@@ -161,10 +161,6 @@ exec_script_allowlist =
       "//google_apis/BUILD.gn",
       "//printing/BUILD.gn",
 
-      "//remoting/host/installer/linux/BUILD.gn",
-      "//remoting/remoting_version.gni",
-      "//remoting/host/installer/win/generate_clsids.gni",
-
       "//tools/grit/grit_rule.gni",
       "//tools/gritsettings/BUILD.gn",
 

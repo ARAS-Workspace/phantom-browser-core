@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/ui.gni")
-import("//remoting/remoting_enable.gni")
 import("//testing/test.gni")
 
 component("display_features") {
@@ -226,20 +225,7 @@ static_library("test_support") {
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
   }
 
-  if (is_linux && ozone_platform_x11 && enable_remoting) {
-    sources += [
-      "linux/test/virtual_display_util_linux.cc",
-      "linux/test/virtual_display_util_linux.h",
-    ]
-    deps += [
-      "//remoting/host:display_layout",
-      "//remoting/host/linux:x11_display_utils",
-      "//ui/gfx/x",
-    ]
-  }
-
-  if (!is_mac && !is_win &&
-      !(is_linux && ozone_platform_x11 && enable_remoting)) {
+  if (!is_mac && !is_win) {
     sources += [
       # Virtual display util stub for unimplemented platforms.
       "test/virtual_display_util_stub.cc",

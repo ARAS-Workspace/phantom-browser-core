@@ -32,7 +32,6 @@ import("//media/media_options.gni")
 import("//mojo/features.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
-import("//remoting/remoting_enable.gni")
 import("//services/on_device_model/on_device_model.gni")
 import("//third_party/closure_compiler/compile_js.gni")
 import("//tools/ipc_fuzzer/ipc_fuzzer.gni")
@@ -264,10 +263,6 @@ group("gn_all") {
         "//pdf/pdfium/fuzzers",
         "//third_party/pdfium/testing:pdfium_test",
       ]
-    }
-
-    if (enable_remoting) {
-      deps += [ "//remoting:remoting_all" ]
     }
 
     if (toolkit_views) {
@@ -779,24 +774,6 @@ group("rust_build_tests") {
   deps = [ "//build/rust/tests" ]
 }
 
-# TODO(https://crbug.com/1112776): ensure remoting is functional on Linux builds with
-# other than X11 Ozone backends.
-if (enable_remoting &&
-    ((is_linux && ozone_platform_x11) || (is_win && !use_ozone))) {
-  # On CQ, run the Traffic Annotation Auditor when a change affects one of these
-  # targets.
-  group("traffic_annotation_auditor_dependencies") {
-    deps = [
-      "//chrome",
-      "//remoting/host",
-      "//tools/traffic_annotation:annotations_xml",
-    ]
-    if (enable_enterprise_companion) {
-      deps += [ "//chrome/enterprise_companion" ]
-    }
-  }
-}
-
 if (is_android && !is_cronet_build) {
   # On CQ, run the Traffic Annotation Auditor when a change affects one of these
   # targets.
@@ -826,9 +803,6 @@ if (is_win) {
       "//tools/metrics:metrics_metadata",
     ]
 
-    if (is_chrome_branded) {
-      deps += [ "//remoting/host:remoting_host_installation" ]
-    }
     if (enable_platform_experience) {
       deps += [
         "//chrome/browser/platform_experience/win:platform_experience_helper",

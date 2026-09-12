@@ -50,7 +50,6 @@ component("gpu") {
     "//media/gpu/vaapi/*",
     "//media/mojo/*",
     "//media/parsers:unit_tests",
-    "//remoting/codec:encoder",
     "//third_party/blink/renderer/modules:unit_tests",
     "//third_party/blink/renderer/modules/mediarecorder",
     "//ui/gl:gl_unittests",

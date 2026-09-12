@@ -13,8 +13,7 @@ CALL gn gen out\gn
 :: referencing "messages.gni"
 CALL autoninja -C out\gn ^
     gen/chrome/common/win/eventlog_messages.h ^
-    gen/chrome/credential_provider/eventlog/gcp_eventlog_messages.h ^
-    gen/remoting/host/win/remoting_host_messages.h
+    gen/chrome/credential_provider/eventlog/gcp_eventlog_messages.h
 
 :: Make sure we get rid of any obsolete files
 rmdir /s /q third_party\win_build_output\mc
@@ -26,6 +25,4 @@ for %%e in (h rc bin) do (
      third_party\win_build_output\mc\chrome\common\win\
   xcopy out\gn\gen\chrome\credential_provider\eventlog\*.%%e ^
      third_party\win_build_output\mc\chrome\credential_provider\eventlog\
-  xcopy out\gn\gen\remoting\host\win\*.%%e ^
-     third_party\win_build_output\mc\remoting\host\win\
 )

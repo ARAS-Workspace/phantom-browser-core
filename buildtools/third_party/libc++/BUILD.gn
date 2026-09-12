@@ -405,12 +405,6 @@ target(libcxx_target_type, "libc++") {
     "//build/config:common_deps",
     "//third_party/catapult/devil",
   ]
-  if (is_linux) {
-    # This target packages libc++.so, so must have an explicit dependency on
-    # libc++.
-    visibility +=
-        [ "//remoting/host/linux:remoting_me2me_host_copy_user_session" ]
-  }
   if (build_with_chromium && is_win && is_component_build) {
     # PartitionAlloc uses no_default_deps=true when is_win && is_component_build
     # but it depends on libc++. So need to add an explicit dependency on

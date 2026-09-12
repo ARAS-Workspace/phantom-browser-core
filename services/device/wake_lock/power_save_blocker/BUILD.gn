@@ -15,13 +15,6 @@ source_set("power_save_blocker") {
     # Exo Wayland idle inhibit protocol needs to directly use the Ash
     # PowerSaveBlocker.
     "//components/exo/wayland",
-
-    # //remoting runs in a separate process which is outside of the context of
-    # the ServiceManager-based world. Instead of embedding a Service Manager
-    # environment and Device Service in it, we allow the power save blocker to
-    # be visible to //remoting and directly used. See crbug.com/689423
-    "//remoting/host:*",
-    "//remoting/host/win:*",
     "//services/device/wake_lock:*",
 
     # Scan Service in Ash needs to directly use the PowerSaveBlocker.
