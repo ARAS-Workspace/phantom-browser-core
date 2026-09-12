@@ -46,16 +46,12 @@ export {MicrosoftAuthProxyImpl} from './modules/authentication/microsoft_auth_mo
 export {CalendarElement} from './modules/calendar/calendar.js';
 export {CalendarEventElement} from './modules/calendar/calendar_event.js';
 export {CalendarAction} from './modules/calendar/common.js';
-export {googleCalendarDescriptor, GoogleCalendarModuleElement} from './modules/calendar/google_calendar_module.js';
-export {GoogleCalendarProxyImpl} from './modules/calendar/google_calendar_proxy.js';
 export {outlookCalendarDescriptor, OutlookCalendarModuleElement} from './modules/calendar/outlook_calendar_module.js';
 export {OutlookCalendarProxyImpl} from './modules/calendar/outlook_calendar_proxy.js';
 // <if expr="not is_official_build">
 export {FooProxy} from './modules/dummy/foo_proxy.js';
 export {dummyV2Descriptor, ModuleElement as DummyModuleElement} from './modules/dummy/module.js';
 // </if>
-export {driveModuleDescriptor, DriveModuleElement} from './modules/file_suggestion/drive_module.js';
-export {FileProxy} from './modules/file_suggestion/file_module_proxy.js';
 export {FileSuggestionElement} from './modules/file_suggestion/file_suggestion.js';
 export {microsoftFilesModuleDescriptor, MicrosoftFilesModuleElement} from './modules/file_suggestion/microsoft_files_module.js';
 export {MicrosoftFilesProxyImpl} from './modules/file_suggestion/microsoft_files_proxy.js';

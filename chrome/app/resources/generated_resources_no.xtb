@@ -408,7 +408,6 @@ Du kan når som helst sjekke passordene dine i <ph name="GOOGLE_PASSWORD_MANAGER
 <translation id="1293360286536751243">«<ph name="MAIN_GESTURE" />» overlapper muligens «<ph name="CONFLICTING_GESTURE_ONE" />», «<ph name="CONFLICTING_GESTURE_TWO" />» og «<ph name="CONFLICTING_GESTURE_THREE" />». Prøv å velge en annen bevegelse om du kan.</translation>
 <translation id="1293556467332435079">Filer</translation>
 <translation id="12951065153783848">Organisasjonen din administrerer kontoen din</translation>
-<translation id="1296410481664942178">Ikke vis Google Kalender</translation>
 <translation id="1296911687402551044">Fest den valgte fanen</translation>
 <translation id="1297175357211070620">Destinasjon</translation>
 <translation id="129770436432446029">Send tilbakemelding om <ph name="EXPERIMENT_NAME" /></translation>
@@ -1153,7 +1152,6 @@ Du kan når som helst sjekke passordene dine i <ph name="GOOGLE_PASSWORD_MANAGER
 <translation id="1884340228047885921">Den gjeldende synlighetsinnstillingen er noen kontakter</translation>
 <translation id="1884705339276589024">Endre størrelsen på Linux-disken</translation>
 <translation id="1885066963699478692">XML-filene som brukes til å angi reglene.</translation>
-<translation id="1885089541024391265">Google Kalender</translation>
 <translation id="1885106732301550621">Diskplass</translation>
 <translation id="188537499764410817">Nettsteder der Gemini kan logge deg på, vises her</translation>
 <translation id="1886996562706621347">Tillat at nettsteder kan be om å bli standardbehandlere for protokoller (anbefales)</translation>
@@ -2065,7 +2063,6 @@ Du kan administrere innstillingene for denne kontoen ved å installere Family Li
 <translation id="2586672484245266891">Skriv inn en kortere nettadresse</translation>
 <translation id="2588271083332682494">Rydd opp med fanegrupper</translation>
 <translation id="2588636910004461974">Enheter fra <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Vis aldri Disk-filer</translation>
 <translation id="2597073208962000830">Nærdeling bruker Bluetooth-skanning for å finne enheter i nærheten.</translation>
 <translation id="2598136842498757793">Tilpass knapper på verktøylinjen</translation>
 <translation id="2598710988533271874">En ny Chrome-versjon er tilgjengelig</translation>
@@ -2412,7 +2409,6 @@ Du kan administrere innstillingene for denne kontoen ved å installere Family Li
 <translation id="2844169650293029770">USB-C-enhet (porten foran på venstre side)</translation>
 <translation id="2844809857160214557">Se og administrer utskriftsjobber</translation>
 <translation id="284491292807422921">Vil du fjerne nettstedet?</translation>
-<translation id="2845276301195220700">Flere handlinger for Google Kalender</translation>
 <translation id="2845382757467349449">Vis alltid bokmerkerad</translation>
 <translation id="284581348330507117">Lag unike passord</translation>
 <translation id="2846345106886298325">Oppgaven er fullført og sendt tilbake til Gemini Spark</translation>
@@ -3548,7 +3544,6 @@ Du kan administrere innstillingene for denne kontoen ved å installere Family Li
 <translation id="3708295717182051206">Teksting</translation>
 <translation id="3708684582558000260">Ikke la lukkede nettsteder fullføre sending eller mottak av data</translation>
 <translation id="3709244229496787112">Nettleseren ble lukket før nedlastingen var ferdig.</translation>
-<translation id="3710438437470197252">Se mer i Google Disk</translation>
 <translation id="3710501561113687889">Før du kan fortsette, må <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> dele <ph name="FIELDS_STRING" /> med dette nettstedet.</translation>
 <translation id="3711931198657368127">Lim inn og gå til <ph name="URL" /></translation>
 <translation id="3711945201266135623">Fant <ph name="NUM_PRINTERS" /> skrivere på utskriftstjeneren</translation>
@@ -4100,10 +4095,6 @@ Du kan administrere innstillingene for denne kontoen ved å installere Family Li
 <translation id="4110485659976215879">Gjenopprett varsel</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (uten nett)</translation>
 <translation id="4113743276555482284">Filpassord</translation>
-<translation id="4114524937989710624">Du ser forslag til filer, slik at du enkelt kan komme tilbake til den nyligste aktiviteten din i Google Disk.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Du kan administrere innstillinger via kortmenyen eller se flere alternativer i Tilpass Chrome.</translation>
 <translation id="4115002065223188701">Nettverket er utenfor rekkevidde</translation>
 <translation id="4115378294792113321">Magenta</translation>
 <translation id="4116480382905329353">Registrert 1 gang</translation>
@@ -7177,7 +7168,6 @@ Bruk Ctrl + Alt + lysstyrke ned for å zoome ut.</translation>
 <translation id="6557290421156335491">Mine snarveier</translation>
 <translation id="6558098963164662391">&amp;Fjern fra ordlisten</translation>
 <translation id="6560061709899140565">Vis andre cast-økter</translation>
-<translation id="656065428026159829">Se mer</translation>
 <translation id="6561877237303825108">Denne filen av typen (<ph name="TYPE" />) kan være farlig. Du bør bare lagre denne filen hvis du stoler på <ph name="ORIGIN" /></translation>
 <translation id="6562117348069327379">Lagre systemlogger i Nedlastinger-katalogen.</translation>
 <translation id="656293578423618167">Filbanen- eller -navnet er for langt. Lagre med et annet navn eller på et annet sted.</translation>
@@ -7542,10 +7532,6 @@ Du har # passord til som er utsatt for sikkerhetsbrudd. Google Passordlagring an
 <translation id="6827767090350758381">Gamle versjoner av Chrome-apper lar seg ikke åpne på Windows-enheter etter desember 2022. Kontakt administratoren din for å oppdatere til en ny versjon eller fjerne denne appen.</translation>
 <translation id="6828182567531805778">Skriv inn passordfrasen for å synkronisere dataene dine</translation>
 <translation id="6828860976882136098">Kunne ikke konfigurere automatiske oppdateringer for alle brukerne (feil ved kjøring av forhåndskontroll: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Du ser kalenderen din, slik at du enkelt kan navigere til den neste aktiviteten din i Google Kalender.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Du kan administrere innstillinger via kortmenyen eller se flere alternativer i Tilpass Chrome.</translation>
 <translation id="6831043979455480757">Oversett</translation>
 <translation id="6831989891148852199">Nettsteder som ikke har lov til å bruke bevegelses- eller lyssensorer</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Vil du fjerne fanen og slette gruppen?}=1{Vil du fjerne fanene og slette gruppen?}other{Vil du fjerne fanene og slette gruppene?}}</translation>
@@ -7665,7 +7651,6 @@ Du har # passord til som er utsatt for sikkerhetsbrudd. Google Passordlagring an
 <translation id="6912007319859991306">PIN-kode for mobil-SIM</translation>
 <translation id="6912380255120084882">Prøv en annen enhet</translation>
 <translation id="691289340230098384">Valg for teksting</translation>
-<translation id="6913051485529944333">Du kommer ikke til å se Google Kalender på denne siden igjen</translation>
 <translation id="6914812290245989348">Ikke bli advart før du går til usikre nettsteder</translation>
 <translation id="6916590542764765824">Administrer utvidelser</translation>
 <translation id="6916676294509106572">Outlook-kalenderen er skjult</translation>
@@ -7740,7 +7725,6 @@ Du har # passord til som er utsatt for sikkerhetsbrudd. Google Passordlagring an
 <translation id="6978121630131642226">Søkemotorer</translation>
 <translation id="6979041727349121225">Strømsparing</translation>
 <translation id="6979044105893951891">starte og avslutte administrerte gjesteøkter</translation>
-<translation id="6979158407327259162">Google Disk</translation>
 <translation id="6979440798594660689">Kutt lyden (standard)</translation>
 <translation id="6979557074007409812">Ja, hold dataene mine atskilt fra jobbdata</translation>
 <translation id="6979737339423435258">Alle datoer</translation>
@@ -8667,7 +8651,6 @@ Dette kan omfatte informasjon om installert programvare, filer, nettleseren, enh
 <translation id="7690853182226561458">Legg til &amp;mappe</translation>
 <translation id="7691077781194517083">Kan ikke tilbakestille denne sikkerhetsnøkkelen. Feil <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Bruk dagligdags språk for å søke i nettleserloggen og finne nettsteder du har besøkt. Du kan også stille spørsmål og få svar basert på nettleserloggen din</translation>
-<translation id="7694895628076803349">Ikke vis Disk</translation>
 <translation id="7696063401938172191">På «<ph name="PHONE_NAME" />»:</translation>
 <translation id="7697109152153663933">Klikk på «Passord og autofyll»</translation>
 <translation id="769824636077131955">Dette dokumentet er for stort til at en sikkerhetssjekk kan utføres. Du kan skrive ut dokumenter på opptil 50 MB.</translation>
@@ -8817,7 +8800,6 @@ Trykk på en tilordnet bryter eller tast for å fjerne tilordningen.</translatio
 <translation id="7811263553491007091">Prøv på nytt, eller velg ett av temaene som ble generert tidligere nedenfor.</translation>
 <translation id="7811926937048662341">Høyreklikk her, og velg «Vis faner vertikalt»</translation>
 <translation id="7811986034759500329">Angi i systeminnstillingene</translation>
-<translation id="7812170317334653156">Google Kalender er skjult</translation>
 <translation id="7814458197256864873">&amp;Kopier</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Endre snarveien <ph name="SHORTCUT" /> for <ph name="EXTENSION_NAME" /></translation>
@@ -9259,7 +9241,6 @@ Oppbevar nøkkelfilen på et trygt sted. Du får bruk for den når du skal oppre
 <translation id="8146287226035613638">Legg til og rangér språkene du foretrekker. Nettsteder vises på språkene du foretrekker, når det er mulig. Disse preferansene synkroniseres med nettleserinnstillingene dine. <ph name="BEGIN_LINK_LEARN_MORE" />Finn ut mer<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Bidra til å gjøre funksjonene og ytelsen til Chrome og ChromeOS bedre ved å sende programstopprapporter, diagnostikk og bruksdata automatisk til Google.</translation>
 <translation id="8147900440966275470">Fant <ph name="NUM" /> fane</translation>
-<translation id="814870937590541483">Flere handlinger for Google Disk-filer</translation>
 <translation id="8148760431881541277">Begrens pålogging</translation>
 <translation id="8149596686567059924">Kunne ikke pakke ut oppdateringspakken.</translation>
 <translation id="8149870652370242480">For å bruke de lagrede passordene dine på telefonen, last ned Chrome for iOS og logg på Google-kontoen din.</translation>

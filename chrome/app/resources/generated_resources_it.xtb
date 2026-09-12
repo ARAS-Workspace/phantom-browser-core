@@ -408,7 +408,6 @@ Controlla le password in qualsiasi momento in <ph name="GOOGLE_PASSWORD_MANAGER"
 <translation id="1293360286536751243">"<ph name="MAIN_GESTURE" />" potrebbe coincidere con "<ph name="CONFLICTING_GESTURE_ONE" />", "<ph name="CONFLICTING_GESTURE_TWO" />" e "<ph name="CONFLICTING_GESTURE_THREE" />". Se possibile, prova a scegliere un gesto diverso.</translation>
 <translation id="1293556467332435079">File</translation>
 <translation id="12951065153783848">Il tuo account è gestito dalla tua organizzazione</translation>
-<translation id="1296410481664942178">Non mostrare Google Calendar</translation>
 <translation id="1296911687402551044">Fissa scheda selezionata</translation>
 <translation id="1297175357211070620">Destinazione</translation>
 <translation id="129770436432446029">Invia feedback su <ph name="EXPERIMENT_NAME" /></translation>
@@ -1146,7 +1145,6 @@ Controlla le password in qualsiasi momento in <ph name="GOOGLE_PASSWORD_MANAGER"
 <translation id="1884340228047885921">L'attuale impostazione di visibilità è Alcuni contatti</translation>
 <translation id="1884705339276589024">Ridimensiona disco Linux</translation>
 <translation id="1885066963699478692">I file XML usati per impostare le policy.</translation>
-<translation id="1885089541024391265">Google Calendar</translation>
 <translation id="1885106732301550621">Spazio su disco</translation>
 <translation id="188537499764410817">I siti a cui Gemini può consentirti di accedere verranno visualizzati qui</translation>
 <translation id="1886996562706621347">Consenti ai siti di chiedere di diventare gestori predefiniti dei protocolli (consigliata)</translation>
@@ -2054,7 +2052,6 @@ Puoi gestire le impostazioni dell'account installando l'app Family Link su quest
 <translation id="2586672484245266891">Inserisci un URL più breve</translation>
 <translation id="2588271083332682494">Organizza con i gruppi di schede</translation>
 <translation id="2588636910004461974">Dispositivi di <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Non mostrare mai i file di Drive</translation>
 <translation id="2597073208962000830">La funzionalità Condivisione nelle vicinanze usa la scansione Bluetooth per trovare dispositivi nelle vicinanze.</translation>
 <translation id="2598136842498757793">Personalizza i pulsanti della barra degli strumenti</translation>
 <translation id="2598710988533271874">Nuovo Chrome disponibile</translation>
@@ -2401,7 +2398,6 @@ Puoi gestire le impostazioni dell'account installando l'app Family Link su quest
 <translation id="2844169650293029770">Dispositivo USB-C (porta anteriore sinistra)</translation>
 <translation id="2844809857160214557">Visualizza e gestisci i processi di stampa</translation>
 <translation id="284491292807422921">Rimuovere sito?</translation>
-<translation id="2845276301195220700">Altre azioni per Google Calendar</translation>
 <translation id="2845382757467349449">Mostra sempre barra dei preferiti</translation>
 <translation id="284581348330507117">Crea password univoche</translation>
 <translation id="2846345106886298325">Attività completata e restituita a Gemini Spark</translation>
@@ -3537,7 +3533,6 @@ Puoi gestire le impostazioni dell'account installando l'app Family Link su quest
 <translation id="3708295717182051206">Sottotitoli codificati</translation>
 <translation id="3708684582558000260">Non consentire ai siti chiusi di terminare l'invio o la ricezione di dati</translation>
 <translation id="3709244229496787112">Il browser è stato chiuso prima del termine del download.</translation>
-<translation id="3710438437470197252">Scopri di più su Google Drive</translation>
 <translation id="3710501561113687889">Per continuare, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> condividerà il tuo <ph name="FIELDS_STRING" /> con questo sito.</translation>
 <translation id="3711931198657368127">I&amp;ncolla e vai all'indirizzo <ph name="URL" /></translation>
 <translation id="3711945201266135623"><ph name="NUM_PRINTERS" /> stampanti trovate sul server di stampa</translation>
@@ -4091,10 +4086,6 @@ Puoi gestire le impostazioni dell'account installando l'app Family Link su quest
 <translation id="4110485659976215879">Ripristina avviso</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (offline)</translation>
 <translation id="4113743276555482284">Password del file</translation>
-<translation id="4114524937989710624">Visualizzi i file suggeriti per aiutarti a tornare facilmente alle tue attività più recenti in Google Drive.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Puoi gestire le impostazioni dal menu della scheda o visualizzare altre opzioni in Personalizza Chrome.</translation>
 <translation id="4115002065223188701">Rete fuori portata</translation>
 <translation id="4115378294792113321">Magenta</translation>
 <translation id="4116480382905329353">Rilevato 1 volta</translation>
@@ -7167,7 +7158,6 @@ Puoi assegnare più sensori a questa azione.</translation>
 <translation id="6557290421156335491">Le mie scorciatoie</translation>
 <translation id="6558098963164662391">&amp;Rimuovi dal dizionario</translation>
 <translation id="6560061709899140565">Mostra altre sessioni di trasmissione</translation>
-<translation id="656065428026159829">Mostra altri</translation>
 <translation id="6561877237303825108">Questo tipo di file (<ph name="TYPE" />) può essere pericoloso. Salva questo file solo se ritieni attendibile <ph name="ORIGIN" /></translation>
 <translation id="6562117348069327379">Archivia i log di sistema nella directory Download.</translation>
 <translation id="656293578423618167">Il percorso o il nome del file è troppo lungo. Salva il file con un nome più corto o in un'altra posizione.</translation>
@@ -7532,10 +7522,6 @@ Hai altre # password compromesse. Gestore delle password di Google consiglia di 
 <translation id="6827767090350758381">Le versioni precedenti delle app di Chrome non si apriranno più sui dispositivi Windows dopo dicembre 2022. Contatta l'amministratore per eseguire l'aggiornamento a una nuova versione o per rimuovere questa app.</translation>
 <translation id="6828182567531805778">Inserisci la tua passphrase per sincronizzare i dati</translation>
 <translation id="6828860976882136098">Impostazione degli aggiornamenti automatici per tutti gli utenti non riuscita (errore di esecuzione preliminare: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Stai visualizzando il calendario per passare facilmente al prossimo evento in Google Calendar.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Puoi gestire le impostazioni dal menu della scheda o visualizzare altre opzioni in Personalizza Chrome.</translation>
 <translation id="6831043979455480757">Traduci</translation>
 <translation id="6831989891148852199">Non possono utilizzare i sensori di movimento o della luce</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Rimuovere scheda ed eliminare gruppo?}=1{Rimuovere scheda ed eliminare gruppo?}other{Rimuovere le schede ed eliminare i gruppi?}}</translation>
@@ -7655,7 +7641,6 @@ Hai altre # password compromesse. Gestore delle password di Google consiglia di 
 <translation id="6912007319859991306">PIN SIM rete mobile</translation>
 <translation id="6912380255120084882">Prova con un altro dispositivo</translation>
 <translation id="691289340230098384">Preferenze sottotitoli</translation>
-<translation id="6913051485529944333">Non rivedrai più Google Calendar in questa pagina</translation>
 <translation id="6914812290245989348">Non visualizzare avvisi prima di visitare i siti non sicuri</translation>
 <translation id="6916590542764765824">Gestisci estensioni</translation>
 <translation id="6916676294509106572">Calendario di Outlook nascosto</translation>
@@ -7730,7 +7715,6 @@ Hai altre # password compromesse. Gestore delle password di Google consiglia di 
 <translation id="6978121630131642226">Motori di ricerca</translation>
 <translation id="6979041727349121225">Risparmio energetico</translation>
 <translation id="6979044105893951891">Avvio e chiusura di sessioni Ospite gestite</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">Disattivazione audio (impostazione predefinita)</translation>
 <translation id="6979557074007409812">Sì, mantieni i miei dati separati da quelli di lavoro</translation>
 <translation id="6979737339423435258">Dall'inizio</translation>
@@ -8657,7 +8641,6 @@ Potrebbero essere incluse informazioni su software installati, file, browser, si
 <translation id="7690853182226561458">Aggiungi &amp;cartella...</translation>
 <translation id="7691077781194517083">Impossibile reimpostare questo token di sicurezza. Errore <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Usa il linguaggio di tutti i giorni per cercare nella cronologia di navigazione e trovare i siti che hai visitato. Puoi anche fare domande e ricevere risposte in base alla tua cronologia di navigazione.</translation>
-<translation id="7694895628076803349">Non mostrare Drive</translation>
 <translation id="7696063401938172191">Sul tuo telefono "<ph name="PHONE_NAME" />":</translation>
 <translation id="7697109152153663933">Fai clic su "Password e compilazione automatica"</translation>
 <translation id="769824636077131955">Il documento è troppo grande per essere sottoposto a un controllo di sicurezza. Puoi stampare documenti di dimensioni massime pari a 50 MB.</translation>
@@ -8807,7 +8790,6 @@ Premi un sensore o un tasto assegnato per rimuovere l'assegnazione.</translation
 <translation id="7811263553491007091">Riprova o seleziona uno dei temi generati in precedenza riportati di seguito.</translation>
 <translation id="7811926937048662341">Fai clic con il tasto destro del mouse qui e seleziona "Mostra schede verticalmente"</translation>
 <translation id="7811986034759500329">Imposta nelle impostazioni di sistema</translation>
-<translation id="7812170317334653156">Google Calendar nascosto</translation>
 <translation id="7814458197256864873">&amp;Copia</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Modifica la scorciatoia <ph name="SHORTCUT" /> per <ph name="EXTENSION_NAME" /></translation>
@@ -9249,7 +9231,6 @@ Conserva il file di chiave in un luogo sicuro. Ti servirà per creare nuove vers
 <translation id="8146287226035613638">Aggiungi e classifica le tue lingue preferite. Se possibile, i siti web verranno mostrati in queste lingue. Queste preferenze sono sincronizzate con le impostazioni del browser. <ph name="BEGIN_LINK_LEARN_MORE" />Scopri di più<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Contribuisci a migliorare le funzionalità e le prestazioni di Chrome e ChromeOS inviando automaticamente a Google report sugli arresti anomali e dati diagnostici e sull'utilizzo.</translation>
 <translation id="8147900440966275470">È stata trovata <ph name="NUM" /> scheda</translation>
-<translation id="814870937590541483">Altre azioni per i file di Google Drive</translation>
 <translation id="8148760431881541277">Limitare l'accesso</translation>
 <translation id="8149596686567059924">Non è stato possibile decomprimere il pacchetto di aggiornamento.</translation>
 <translation id="8149870652370242480">Per usare le password salvate sullo smartphone, scarica Chrome per iOS e accedi al tuo Account Google.</translation>

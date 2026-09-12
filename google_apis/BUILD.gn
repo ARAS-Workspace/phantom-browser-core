@@ -289,7 +289,6 @@ test("google_apis_unittests") {
     "//base",
     "//base/test:test_support",
     "//build:branding_buildflags",
-    "//google_apis/calendar:calendar_unittests",
     "//google_apis/common:common_unittests",
     "//testing/gmock",
     "//testing/gtest",

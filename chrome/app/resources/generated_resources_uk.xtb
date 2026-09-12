@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">Жест "<ph name="MAIN_GESTURE" />" може конфліктувати з жестами "<ph name="CONFLICTING_GESTURE_ONE" />", "<ph name="CONFLICTING_GESTURE_TWO" />" і "<ph name="CONFLICTING_GESTURE_THREE" />". Якщо можливо, виберіть інший.</translation>
 <translation id="1293556467332435079">Файли</translation>
 <translation id="12951065153783848">Вашим обліковим записом керує організація</translation>
-<translation id="1296410481664942178">Не показувати Google Календар</translation>
 <translation id="1296911687402551044">Закріпити вибрану вкладку</translation>
 <translation id="1297175357211070620">Місце призначення</translation>
 <translation id="129770436432446029">Надішліть відгук про експеримент "<ph name="EXPERIMENT_NAME" />"</translation>
@@ -1156,7 +1155,6 @@
 <translation id="1884340228047885921">Поточне налаштування видимості: "Деякі контакти"</translation>
 <translation id="1884705339276589024">Змінити розмір диска Linux</translation>
 <translation id="1885066963699478692">Файли XML, які використовуються для налаштування правил.</translation>
-<translation id="1885089541024391265">Google Календар</translation>
 <translation id="1885106732301550621">Місце на диску</translation>
 <translation id="188537499764410817">Тут відображатимуться сайти, на яких Gemini може входити у ваші облікові записи</translation>
 <translation id="1886996562706621347">Дозволити сайтам запитувати можливість ставати обробниками протоколів за умовчанням (рекомендовано)</translation>
@@ -2068,7 +2066,6 @@
 <translation id="2586672484245266891">Введіть коротшу URL-адресу</translation>
 <translation id="2588271083332682494">Упорядкуйте вкладки в групи</translation>
 <translation id="2588636910004461974">Пристрої від <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Ніколи не показувати файли з Диска</translation>
 <translation id="2597073208962000830">Функція "Обмін поблизу" шукає розташовані неподалік пристрої за допомогою Bluetooth.</translation>
 <translation id="2598136842498757793">Налаштувати кнопки панелі інструментів</translation>
 <translation id="2598710988533271874">Доступна нова версія Chrome</translation>
@@ -2415,7 +2412,6 @@
 <translation id="2844169650293029770">Пристрій, під’єднаний до порту USB-C (ліворуч на передній панелі)</translation>
 <translation id="2844809857160214557">Перегляд завдань друку й керування ними</translation>
 <translation id="284491292807422921">Видалити вебсайт?</translation>
-<translation id="2845276301195220700">Більше дій для Google Календаря</translation>
 <translation id="2845382757467349449">Завжди показувати панель закладок</translation>
 <translation id="284581348330507117">Створіть унікальні паролі</translation>
 <translation id="2846345106886298325">Завдання виконано. Ви повернулися до агента Gemini Spark.</translation>
@@ -3551,7 +3547,6 @@
 <translation id="3708295717182051206">Субтитри</translation>
 <translation id="3708684582558000260">Заборонити закритим сайтам завершувати надсилання чи отримання даних</translation>
 <translation id="3709244229496787112">Завантаження не закінчилося через завершення роботи веб-переглядача.</translation>
-<translation id="3710438437470197252">Переглянути більше на Google Диску</translation>
 <translation id="3710501561113687889">Щоб продовжити, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> надасть цьому сайту таку інформацію: <ph name="FIELDS_STRING" />.</translation>
 <translation id="3711931198657368127">Вставити й перейти за посиланням <ph name="URL" /></translation>
 <translation id="3711945201266135623">Кількість принтерів на сервері друку: <ph name="NUM_PRINTERS" /></translation>
@@ -4105,10 +4100,6 @@
 <translation id="4110485659976215879">Відновити попередження</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (офлайн)</translation>
 <translation id="4113743276555482284">Пароль файлу</translation>
-<translation id="4114524937989710624">Ви бачите пропозиції файлів, які допоможуть вам легко повернутися до останніх дій на Google Диску.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Ви можете керувати налаштуваннями в меню картки або переглянути інші опції в розділі "Налаштувати Chrome".</translation>
 <translation id="4115002065223188701">Мережа недосяжна</translation>
 <translation id="4115378294792113321">Пурпурний</translation>
 <translation id="4116480382905329353">Виявлено 1 раз</translation>
@@ -7180,7 +7171,6 @@
 <translation id="6557290421156335491">Мої ярлики</translation>
 <translation id="6558098963164662391">&amp;Вилучити зі словника</translation>
 <translation id="6560061709899140565">Показати інші сеанси трансляцій</translation>
-<translation id="656065428026159829">Показати більше</translation>
 <translation id="6561877237303825108">Цей файл має розширення <ph name="TYPE" /> й може бути небезпечним. Зберігайте його, лише якщо довіряєте сайту <ph name="ORIGIN" />.</translation>
 <translation id="6562117348069327379">Зберігати журнали системи в каталозі "Завантаження".</translation>
 <translation id="656293578423618167">Шлях файлу чи назва файлу задовгі. Збережіть з коротшою назвою чи в іншому місці.</translation>
@@ -7551,10 +7541,6 @@
 <translation id="6827767090350758381">Старі версії додатків Chrome не відкриватимуться на пристроях Windows після грудня 2022 року. Щоб оновити додаток або вилучити його, зв’яжіться з адміністратором.</translation>
 <translation id="6828182567531805778">Щоб синхронізувати дані, введіть парольну фразу</translation>
 <translation id="6828860976882136098">Не вдалося налаштувати автоматичні оновлення для всіх користувачів (помилка виконання: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Вікно календаря допоможе вам легко перейти до наступної події в Google Календарі.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Ви можете керувати налаштуваннями в меню картки або переглянути інші опції в розділі "Налаштувати Chrome".</translation>
 <translation id="6831043979455480757">Перекласти</translation>
 <translation id="6831989891148852199">Заборонити доступ до датчиків руху й освітлення</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Вилучити вкладку й видалити групу?}=1{Вилучити вкладки й видалити групу?}one{Вилучити вкладки й видалити групи?}few{Вилучити вкладки й видалити групи?}many{Вилучити вкладки й видалити групи?}other{Вилучити вкладки й видалити групи?}}</translation>
@@ -7674,7 +7660,6 @@
 <translation id="6912007319859991306">PIN-код SIM-карти</translation>
 <translation id="6912380255120084882">Скористайтесь іншим пристроєм</translation>
 <translation id="691289340230098384">Налаштування субтитрів</translation>
-<translation id="6913051485529944333">Ви більше не побачите Google Календар на цій сторінці</translation>
 <translation id="6914812290245989348">Не показувати попереджень перед переходом на небезпечні сайти</translation>
 <translation id="6916590542764765824">Керувати розширеннями</translation>
 <translation id="6916676294509106572">Календар Outlook приховано</translation>
@@ -7749,7 +7734,6 @@
 <translation id="6978121630131642226">Пошукові системи</translation>
 <translation id="6979041727349121225">Режим енергозбереження</translation>
 <translation id="6979044105893951891">Запустити сеанси в режимі "Гість", якими керує адміністратор, і вийти з них</translation>
-<translation id="6979158407327259162">Диск Google</translation>
 <translation id="6979440798594660689">Без звуку (за умовчанням)</translation>
 <translation id="6979557074007409812">Так, зберігати мої дані окремо від робочих</translation>
 <translation id="6979737339423435258">Увесь час</translation>
@@ -8675,7 +8659,6 @@
 <translation id="7690853182226561458">Додати &amp;папку...</translation>
 <translation id="7691077781194517083">Не вдається скинути цей ключ безпеки. Помилка: <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Шукайте інформацію в історії вебперегляду й знаходьте відвідані вебсайти за допомогою запитів розмовною мовою. Ви також можете ставити запитання й отримувати відповіді на основі історії вебперегляду.</translation>
-<translation id="7694895628076803349">Не показувати Диск</translation>
 <translation id="7696063401938172191">На телефоні <ph name="PHONE_NAME" />:</translation>
 <translation id="7697109152153663933">Натисніть "Автозаповнення й паролі"</translation>
 <translation id="769824636077131955">Не вдається перевірити безпеку цього документа, оскільки він завеликий. Ви можете друкувати документи розміром не більш як 50 МБ.</translation>
@@ -8825,7 +8808,6 @@
 <translation id="7811263553491007091">Повторіть спробу або виберіть одну з раніше створених тем нижче.</translation>
 <translation id="7811926937048662341">Натисніть правою кнопкою миші й виберіть "Показувати вкладки вертикально"</translation>
 <translation id="7811986034759500329">Системні налаштування</translation>
-<translation id="7812170317334653156">Google Календар приховано</translation>
 <translation id="7814458197256864873">&amp;Копіювати</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Змінити комбінацію клавіш <ph name="SHORTCUT" /> для розширення <ph name="EXTENSION_NAME" /></translation>
@@ -9267,7 +9249,6 @@
 <translation id="8146287226035613638">Додайте та впорядкуйте бажані мови. Текст на веб-сайтах відображатиметься ними, коли буде така можливість. Ці параметри синхронізуються з налаштуваннями веб-переглядача. <ph name="BEGIN_LINK_LEARN_MORE" />Докладніше<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Допоможіть покращувати функції та підвищувати продуктивність Chrome і ОС Chrome, автоматично надсилаючи в Google звіти про збої, а також дані про діагностику та використання.</translation>
 <translation id="8147900440966275470">Знайдено стільки вкладок: <ph name="NUM" /></translation>
-<translation id="814870937590541483">Інші дії з файлами на Google Диску</translation>
 <translation id="8148760431881541277">Обмежити вхід</translation>
 <translation id="8149596686567059924">Не вдалося розпакувати пакет оновлення.</translation>
 <translation id="8149870652370242480">Щоб користуватися збереженими паролями на телефоні, завантажте Chrome для iOS і ввійдіть у свій обліковий запис Google.</translation>

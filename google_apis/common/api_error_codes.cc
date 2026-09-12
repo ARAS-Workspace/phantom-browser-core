@@ -99,8 +99,4 @@ bool IsSuccessfulDriveApiErrorCode(ApiErrorCode error) {
   return 200 <= error && error <= 299;
 }
 
-bool IsSuccessfulCalendarApiErrorCode(ApiErrorCode error) {
-  return error == 200;
-}
-
 }  // namespace google_apis

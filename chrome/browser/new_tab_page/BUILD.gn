@@ -13,9 +13,6 @@ source_set("new_tab_page") {
     "microsoft_auth/microsoft_auth_service.h",
     "microsoft_auth/microsoft_auth_service_factory.h",
     "microsoft_auth/microsoft_auth_service_observer.h",
-    "modules/file_suggestion/drive_service.h",
-    "modules/file_suggestion/drive_service_factory.h",
-    "modules/file_suggestion/drive_suggestion_handler.h",
     "modules/file_suggestion/microsoft_files_page_handler.h",
     "modules/microsoft_modules_helper.h",
     "modules/modules_constants.h",
@@ -23,7 +20,6 @@ source_set("new_tab_page") {
     "modules/new_tab_page_modules.h",
     "modules/v2/authentication/microsoft_auth_page_handler.h",
     "modules/v2/calendar/calendar_fake_data_helper.h",
-    "modules/v2/calendar/google_calendar_page_handler.h",
     "modules/v2/calendar/outlook_calendar_page_handler.h",
     "modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler.h",
     "modules/v2/most_relevant_tab_resumption/url_visit_types_mojom_traits.h",
@@ -51,11 +47,8 @@ source_set("new_tab_page") {
     "//chrome/common:constants",
     "//components/ntp_tiles",
     "//components/search",
-    "//components/segmentation_platform/public",
     "//components/visited_url_ranking/public",
     "//content/public/browser",
-    "//google_apis/calendar",
-    "//google_apis/common",
     "//mojo/public/mojom/base",
     "//skia",
   ]
@@ -79,16 +72,12 @@ source_set("impl") {
     "feature_promo_helper/new_tab_page_feature_promo_helper.cc",
     "microsoft_auth/microsoft_auth_service.cc",
     "microsoft_auth/microsoft_auth_service_factory.cc",
-    "modules/file_suggestion/drive_service.cc",
-    "modules/file_suggestion/drive_service_factory.cc",
-    "modules/file_suggestion/drive_suggestion_handler.cc",
     "modules/file_suggestion/microsoft_files_page_handler.cc",
     "modules/microsoft_modules_helper.cc",
     "modules/modules_switches.cc",
     "modules/new_tab_page_modules.cc",
     "modules/v2/authentication/microsoft_auth_page_handler.cc",
     "modules/v2/calendar/calendar_fake_data_helper.cc",
-    "modules/v2/calendar/google_calendar_page_handler.cc",
     "modules/v2/calendar/outlook_calendar_page_handler.cc",
     "modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler.cc",
     "new_tab_page_util.cc",
@@ -113,7 +102,6 @@ source_set("impl") {
     "//chrome/browser/search",
     "//chrome/browser/search/background",
     "//chrome/browser/search_engines",
-    "//chrome/browser/segmentation_platform",
     "//chrome/browser/signin",
     "//chrome/browser/sync",
     "//chrome/browser/ui/actions:actions_headers",
@@ -172,11 +160,7 @@ source_set("test_support") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [
-    "modules/file_suggestion/drive_service_unittest.cc",
-    "modules/v2/calendar/google_calendar_page_handler_unittest.cc",
-    "modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler_unittest.cc",
-  ]
+  sources = [ "modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler_unittest.cc" ]
   deps = [
     ":impl",
     ":new_tab_page",
@@ -198,7 +182,6 @@ source_set("unit_tests") {
     "//components/sync_device_info:test_support",
     "//components/visited_url_ranking/public:test_support",
     "//content/test:test_support",
-    "//google_apis/common:test_support",
     "//services/network:test_support",
     "//testing/gmock",
     "//testing/gtest",

@@ -12,18 +12,11 @@
 
 namespace calendar::calendar_fake_data_helper {
 
-enum class CalendarType {
-  GOOGLE_CALENDAR = 0,
-  OUTLOOK_CALENDAR = 1,
-};
-
 using GetResponseCallback = base::OnceCallback<void(std::string)>;
 
 std::vector<ntp::calendar::mojom::CalendarEventPtr> GetFakeEvents(
-    CalendarType calendar_type,
     bool has_attachments_enabled);
 
-// Should only be called for CalendarType::OUTLOOK_CALENDAR.
 std::unique_ptr<std::string> GetFakeJsonResponse();
 
 }  // namespace calendar::calendar_fake_data_helper

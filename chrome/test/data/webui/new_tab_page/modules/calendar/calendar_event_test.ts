@@ -256,7 +256,7 @@ suite('NewTabPageModulesCalendarEventTest', () => {
 
     test('basic event click', async () => {
       const usagePromise = eventToPromise('usage', element);
-      const moduleName = 'GoogleCalendar';
+      const moduleName = 'OutlookCalendar';
       element.event = createEvent(1);
       element.moduleName = moduleName;
       element.index = 1;
@@ -283,7 +283,7 @@ suite('NewTabPageModulesCalendarEventTest', () => {
 
     test('expanded event click', async () => {
       const usagePromise = eventToPromise('usage', element);
-      const moduleName = 'GoogleCalendar';
+      const moduleName = 'OutlookCalendar';
       element.expanded = true;
       element.event = createEvent(1);
       element.moduleName = moduleName;
@@ -311,7 +311,7 @@ suite('NewTabPageModulesCalendarEventTest', () => {
 
     test('double booked event click', async () => {
       const usagePromise = eventToPromise('usage', element);
-      const moduleName = 'GoogleCalendar';
+      const moduleName = 'OutlookCalendar';
       element.doubleBooked = true;
       element.event = createEvent(1);
       element.moduleName = moduleName;
@@ -339,7 +339,7 @@ suite('NewTabPageModulesCalendarEventTest', () => {
 
     test('attachment click', async () => {
       const usagePromise = eventToPromise('usage', element);
-      const moduleName = 'GoogleCalendar';
+      const moduleName = 'OutlookCalendar';
       element.expanded = true;
       element.event = createEvent(1, {attachments: createAttachments(3)});
       element.moduleName = moduleName;
@@ -362,7 +362,7 @@ suite('NewTabPageModulesCalendarEventTest', () => {
 
     test('conference call click', async () => {
       const usagePromise = eventToPromise('usage', element);
-      const moduleName = 'GoogleCalendar';
+      const moduleName = 'OutlookCalendar';
       element.expanded = true;
       element.event = createEvent(1, {conferenceUrl: 'https://google.com/'});
       element.moduleName = moduleName;

@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">"<ph name="CONFLICTING_GESTURE_ONE" />", "<ph name="CONFLICTING_GESTURE_TWO" />" ಮತ್ತು "<ph name="CONFLICTING_GESTURE_THREE" />" ಜೊತೆ "<ph name="MAIN_GESTURE" />" ಓವರ್‌ಲ್ಯಾಪ್ ಆಗಬಹುದು. ಸಾಧ್ಯವಾದರೆ, ವಿಭಿನ್ನ ಜೆಸ್ಚರ್ ಅನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಪ್ರಯತ್ನಿಸಿ.</translation>
 <translation id="1293556467332435079">Files</translation>
 <translation id="12951065153783848">ನಿಮ್ಮ ಸಂಸ್ಥೆಯು ನಿಮ್ಮ ಖಾತೆಯನ್ನು ನಿರ್ವಹಿಸುತ್ತದೆ</translation>
-<translation id="1296410481664942178">Google Calendar ಅನ್ನು ತೋರಿಸಬೇಡಿ</translation>
 <translation id="1296911687402551044">ಆಯ್ಕೆ ಮಾಡಲಾದ ಟ್ಯಾಬ್ ಅನ್ನು ಪಿನ್ ಮಾಡಿ</translation>
 <translation id="1297175357211070620">ಗಮ್ಯಸ್ಥಾನ</translation>
 <translation id="129770436432446029"><ph name="EXPERIMENT_NAME" /> ಗಾಗಿ ಪ್ರತಿಕ್ರಿಯೆ ಕಳುಹಿಸಿ</translation>
@@ -1147,7 +1146,6 @@
 <translation id="1884340228047885921">ಪ್ರಸ್ತುತ ಗೋಚರತೆ ಸೆಟ್ಟಿಂಗ್ ಅನ್ನು ಕೆಲವು ಸಂಪರ್ಕಗಳು ಎಂಬುದಕ್ಕೆ ಹೊಂದಿಸಲಾಗಿದೆ</translation>
 <translation id="1884705339276589024">Linux ಡಿಸ್ಕ್ ಅನ್ನು ಮರುಗಾತ್ರಗೊಳಿಸಿ</translation>
 <translation id="1885066963699478692">ನೀತಿಗಳನ್ನು ಹೊಂದಿಸಲು XML ಫೈಲ್‌ಗಳನ್ನು ಬಳಸಲಾಗುತ್ತಿದೆ.</translation>
-<translation id="1885089541024391265">Google Calendar</translation>
 <translation id="1885106732301550621">ಡಿಸ್ಕ್ ಸ್ಥಳಾವಕಾಶ</translation>
 <translation id="188537499764410817">Gemini ನಿಮ್ಮನ್ನು ಸೈನ್ ಇನ್ ಮಾಡಬಹುದಾದ ಸೈಟ್‌ಗಳು ಇಲ್ಲಿ ಗೋಚರಿಸುತ್ತವೆ</translation>
 <translation id="1886996562706621347">ಪ್ರೊಟೋಕಾಲ್‌ಗಳಿಗಾಗಿ ಡಿಫಾಲ್ಟ್ ಹ್ಯಾಂಡ್ಲರ್‌‌ಗಳಾಗಲು ಸೈಟ್‌ಗಳನ್ನು ಅನುಮತಿಸಿ (ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ)</translation>
@@ -2059,7 +2057,6 @@
 <translation id="2586672484245266891">ಸಣ್ಣ URL ನಮೂದಿಸಿ</translation>
 <translation id="2588271083332682494">ಟ್ಯಾಬ್ ಗುಂಪುಗಳನ್ನು ವ್ಯವಸ್ಥಿತವಾಗಿರಿಸಿ</translation>
 <translation id="2588636910004461974"><ph name="VENDOR_NAME" /> ನಿಂದ ಸಾಧನಗಳು</translation>
-<translation id="2589658397149952302">Drive ಫೈಲ್‌ಗಳನ್ನು ಎಂದಿಗೂ ತೋರಿಸಬೇಡಿ</translation>
 <translation id="2597073208962000830">ಸಮೀಪದಲ್ಲಿರುವ ಸಾಧನಗಳನ್ನು ಹುಡುಕಲು, ಬ್ಲೂಟೂತ್ ಸ್ಕ್ಯಾನಿಂಗ್ ಅನ್ನು Nearby ಶೇರ್ ಬಳಸಿಕೊಳ್ಳುತ್ತದೆ.</translation>
 <translation id="2598136842498757793">ಟೂಲ್‌ಬಾರ್ ಬಟನ್‌ಗಳನ್ನು ಕಸ್ಟಮೈಸ್ ಮಾಡಿ</translation>
 <translation id="2598710988533271874">ಹೊಸ Chrome ಲಭ್ಯವಿದೆ</translation>
@@ -2406,7 +2403,6 @@
 <translation id="2844169650293029770">USB-C ಸಾಧನ (ಎಡ ಭಾಗದ ಮುಂದಿನ ಪೋರ್ಟ್‌)</translation>
 <translation id="2844809857160214557">ಮುದ್ರಣ ಕಾರ್ಯಗಳನ್ನು ವೀಕ್ಷಿಸಿ ಮತ್ತು ನಿರ್ವಹಿಸಿ</translation>
 <translation id="284491292807422921">ಸೈಟ್ ತೆಗೆದುಹಾಕಬೇಕೇ?</translation>
-<translation id="2845276301195220700">Google Calendar ಗಾಗಿ ಹೆಚ್ಚಿನ ಕ್ರಮಗಳು</translation>
 <translation id="2845382757467349449">ಯಾವಾಗಲೂ ಬುಕ್‌ಮಾರ್ಕ್‌ ಪಟ್ಟಿ ತೋರಿಸು</translation>
 <translation id="284581348330507117">ಅನನ್ಯ ಪಾಸ್‌ವರ್ಡ್‌ಗಳನ್ನು ರಚಿಸಿ</translation>
 <translation id="2846345106886298325">ಕಾರ್ಯವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲಾಗಿದೆ ಮತ್ತು Gemini Spark ಗೆ ಹಿಂತಿರುಗಿಸಲಾಗಿದೆ</translation>
@@ -3541,7 +3537,6 @@
 <translation id="3708295717182051206">ಕ್ಲೋಸ್ಡ್ ಕ್ಯಾಪ್ಷನ್‌ಗಳು</translation>
 <translation id="3708684582558000260">ಡೇಟಾವನ್ನು ಕಳುಹಿಸುವ ಅಥವಾ ಸ್ವೀಕರಿಸುವ ಕೆಲಸವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಮುಚ್ಚಿದ ಸೈಟ್‌ಗಳಿಗೆ ಅನುಮತಿಸಬೇಡಿ</translation>
 <translation id="3709244229496787112">ಡೌನ್‌ಲೋಡ್ ಪೂರ್ಣಗೊಳ್ಳುವುದಕ್ಕೂ ಮುನ್ನ ಬ್ರೌಸರ್ ಶಟ್‌ಡೌನ್ ಆಗಿದೆ.</translation>
-<translation id="3710438437470197252">Google Drive ನಲ್ಲಿ ಇನ್ನಷ್ಟು ನೋಡಿ</translation>
 <translation id="3710501561113687889">ಮುಂದುವರಿಸಲು, ಈ ಸೈಟ್‌ನ ಜೊತೆಗೆ <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> ನಿಮ್ಮ <ph name="FIELDS_STRING" /> ಅನ್ನು ಹಂಚಿಕೊಳ್ಳುತ್ತದೆ.</translation>
 <translation id="3711931198657368127">ಅಂ&amp;ಟಿಸಿ ಮತ್ತು <ph name="URL" /> ಗೆ ಹೋಗಿ</translation>
 <translation id="3711945201266135623">ಪ್ರಿಂಟ್ ಸರ್ವರ್‌ನಿಂದ <ph name="NUM_PRINTERS" /> ಪ್ರಿಂಟರ್‌ಗಳು ಕಂಡುಬಂದಿವೆ</translation>
@@ -4095,10 +4090,6 @@
 <translation id="4110485659976215879">ಎಚ್ಚರಿಕೆಯನ್ನು ಮರುಸ್ಥಾಪಿಸಿ</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (ಆಫ್‌ಲೈನ್)</translation>
 <translation id="4113743276555482284">ಫೈಲ್ ಪಾಸ್‌ವರ್ಡ್</translation>
-<translation id="4114524937989710624">Google Drive ನಲ್ಲಿನ ನಿಮ್ಮ ತೀರಾ ಇತ್ತೀಚಿನ ಚಟುವಟಿಕೆಗೆ ಸುಲಭವಾಗಿ ಹಿಂದಿರುಗಲು ನಿಮಗೆ ಸಹಾಯ ಮಾಡಲು ನಿಮಗೆ ಸಲಹೆ ಮಾಡಿರುವ ಫೈಲ್‌ಗಳನ್ನು ನೀವು ನೋಡುತ್ತಿದ್ದೀರಿ.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        ನೀವು ಕಾರ್ಡ್ ಮೆನುವಿನಿಂದ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಬಹುದು ಅಥವಾ Chrome ಅನ್ನು ಕಸ್ಟಮೈಸ್ ಮಾಡಿ ಎಂಬಲ್ಲಿ ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳನ್ನು ನೋಡಬಹುದು.</translation>
 <translation id="4115002065223188701">ನೆಟ್‌ವರ್ಕ್ ವ್ಯಾಪ್ತಿಯ ಹೊರಗಿದೆ</translation>
 <translation id="4115378294792113321">ಮಜೆಂತಾ</translation>
 <translation id="4116480382905329353">1 ಬಾರಿ ಪತ್ತೆಯಾಗಿದೆ</translation>
@@ -7175,7 +7166,6 @@
 <translation id="6557290421156335491">ನನ್ನ ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು</translation>
 <translation id="6558098963164662391">&amp;ನಿಘಂಟಿನಿಂದ ತೆಗೆದುಹಾಕಿ</translation>
 <translation id="6560061709899140565">ಇತರ ಕ್ಯಾಸ್ಟ್ ಸೆಶನ್‌ಗಳನ್ನು ತೋರಿಸಿ</translation>
-<translation id="656065428026159829">ಇನ್ನಷ್ಟು ನೋಡಿ</translation>
 <translation id="6561877237303825108">ಈ (<ph name="TYPE" />) ಪ್ರಕಾರದ ಫೈಲ್ ಅಪಾಯಕಾರಿಯಾಗಬಹುದು. <ph name="ORIGIN" /> ಮೇಲೆ ನಿಮಗೆ ನಂಬಿಕೆಯಿದ್ದರೆ ಮಾತ್ರ ಈ ಫೈಲ್ ಅನ್ನು ಸೇವ್ ಮಾಡಿ</translation>
 <translation id="6562117348069327379">ಡೌನ್‌ಲೋಡ್‌ಗಳ ಡೈರೆಕ್ಟರಿಗೆ ಸಿಸ್ಟಂ ಲಾಗ್‌ಗಳನ್ನು ಸಂಗ್ರಹಿಸಿ.</translation>
 <translation id="656293578423618167">ಫೈಲ್ ಪಾತ್ ಅಥವಾ ಹೆಸರು ತುಂಬಾ ಉದ್ದವಾಗಿದೆ. ದಯವಿಟ್ಟು ಕಿರಿದಾದ ಹೆಸರಿನೊಂದಿಗೆ ಅಥವಾ ಮತ್ತೊಂದು ಸ್ಥಳದಲ್ಲಿ ಸೇವ್‌ ಮಾಡಿ.</translation>
@@ -7542,10 +7532,6 @@
 <translation id="6827767090350758381">ಡಿಸೆಂಬರ್ 2022 ರ ನಂತರ Chrome ಆ್ಯಪ್‌ಗಳ ಹಳೆಯ ಆವೃತ್ತಿಗಳು Windows ಸಾಧನಗಳಲ್ಲಿ ತೆರೆಯುವುದಿಲ್ಲ. ಹೊಸ ಆವೃತ್ತಿಗೆ ಅಪ್‌ಡೇಟ್ ಮಾಡಲು ಅಥವಾ ಈ ಆ್ಯಪ್ ಅನ್ನು ತೆಗೆದುಹಾಕಲು ನಿಮ್ಮ ನಿರ್ವಾಹಕರನ್ನು ಸಂಪರ್ಕಿಸಿ.</translation>
 <translation id="6828182567531805778">ನಿಮ್ಮ ಡೇಟಾವನ್ನು ಸಿಂಕ್ ಮಾಡಲು ನಿಮ್ಮ ಪಾಸ್‌ಫ್ರೇಸ್ ಅನ್ನು ನಮೂದಿಸಿ</translation>
 <translation id="6828860976882136098">ಎಲ್ಲ ಬಳಕೆದಾರರಿಗೆ ಸ್ವಯಂಚಾಲಿತ ಅಪ್‌ಡೇಟ್‌ಗಳನ್ನು ಹೊಂದಿಸುವುದು ವಿಫಲವಾಗಿದೆ (ಪ್ರೀಫ್ಲೈಟ್ ಅನುಷ್ಠಾನ ದೋಷ: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Google Calendar ನಲ್ಲಿ ನಿಮ್ಮ ಮುಂದಿನ ಈವೆಂಟ್‌ಗೆ ನೀವು ಸುಲಭವಾಗಿ ನ್ಯಾವಿಗೇಟ್ ಮಾಡಲು ನಿಮ್ಮ ಕ್ಯಾಲೆಂಡರ್ ಅನ್ನು ನೋಡುತ್ತಿರುವಿರಿ.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        ನೀವು ಕಾರ್ಡ್ ಮೆನುವಿನಿಂದ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಬಹುದು ಅಥವಾ Chrome ಅನ್ನು ಕಸ್ಟಮೈಸ್ ಮಾಡಿ ಎಂಬಲ್ಲಿ ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳನ್ನು ನೋಡಬಹುದು.</translation>
 <translation id="6831043979455480757">Translate</translation>
 <translation id="6831989891148852199">ಮೋಷನ್ ಅಥವಾ ಲೈಟ್ ಸೆನ್ಸರ್‌ಗಳನ್ನು ಬಳಸಲು ಅನುಮತಿಸಲಾಗುವುದಿಲ್ಲ</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{ಟ್ಯಾಬ್ ಅನ್ನು ತೆಗೆದುಹಾಕಿ, ಗುಂಪನ್ನು ಅಳಿಸಬೇಕೇ?}=1{ಟ್ಯಾಬ್‌ಗಳನ್ನು ತೆಗೆದುಹಾಕಿ, ಗುಂಪನ್ನು ಅಳಿಸಬೇಕೆ?}one{ಟ್ಯಾಬ್‌ಗಳನ್ನು ತೆಗೆದುಹಾಕಿ, ಗುಂಪನ್ನು ಅಳಿಸಬೇಕೆ?}other{ಟ್ಯಾಬ್‌ಗಳನ್ನು ತೆಗೆದುಹಾಕಿ, ಗುಂಪನ್ನು ಅಳಿಸಬೇಕೆ?}}</translation>
@@ -7665,7 +7651,6 @@
 <translation id="6912007319859991306">ಸೆಲ್ಯುಲರ್ SIM ಪಿನ್</translation>
 <translation id="6912380255120084882">ಬೇರೆ ಸಾಧನವನ್ನು ಬಳಸಿ ನೋಡಿ</translation>
 <translation id="691289340230098384">ಶೀರ್ಷಿಕೆ ಆದ್ಯತೆಗಳು</translation>
-<translation id="6913051485529944333">ಈ ಪುಟದಲ್ಲಿ ನೀವು Google Calendar ಅನ್ನು ಮತ್ತೆ ನೋಡುವುದಿಲ್ಲ</translation>
 <translation id="6914812290245989348">ಅಸುರಕ್ಷಿತ ಸೈಟ್‌ಗಳಿಗೆ ಭೇಟಿ ನೀಡುವ ಮೊದಲು ಯಾವುದೇ ಎಚ್ಚರಿಕೆಗಳನ್ನು ನೋಡಬೇಡಿ</translation>
 <translation id="6916590542764765824">ವಿಸ್ತರಣೆಗಳನ್ನು ನಿರ್ವಹಿಸಿ</translation>
 <translation id="6916676294509106572">Outlook Calendar ಅನ್ನು ಮರೆಮಾಡಲಾಗಿದೆ</translation>
@@ -7740,7 +7725,6 @@
 <translation id="6978121630131642226">ಹುಡುಕಾಟ ಇಂಜಿನ್‌ಗಳು</translation>
 <translation id="6979041727349121225">ಎನರ್ಜಿ ಸೇವರ್</translation>
 <translation id="6979044105893951891">ನಿರ್ವಹಿಸಿದ ಅತಿಥಿ ಸೆಷನ್‌ಗಳನ್ನು ಪ್ರಾರಂಭಿಸಿ ಮತ್ತು ಅವುಗಳಿಂದ ನಿರ್ಗಮಿಸಿ</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">ಮ್ಯೂಟ್ (ಡಿಫಾಲ್ಟ್)</translation>
 <translation id="6979557074007409812">ಹೌದು, ನನ್ನ ಡೇಟಾವನ್ನು ಉದ್ಯೋಗದಿಂದ ಪ್ರತ್ಯೇಕವಾಗಿ ಇರಿಸಿ</translation>
 <translation id="6979737339423435258">ಎಲ್ಲ ಸಮಯ</translation>
@@ -8667,7 +8651,6 @@
 <translation id="7690853182226561458">&amp;ಫೋಲ್ಡರ್ ಅನ್ನು ಸೇರಿಸಿ...</translation>
 <translation id="7691077781194517083">ಈ ಭದ್ರತೆ ಕೀ ಅನ್ನು ಮರುಹೊಂದಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ದೋಷ <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">ನಿಮ್ಮ ಬ್ರೌಸಿಂಗ್ ಇತಿಹಾಸವನ್ನು ಹುಡುಕಲು ಮತ್ತು ನೀವು ಭೇಟಿ ನೀಡಿದ ಸೈಟ್‌ಗಳನ್ನು ಹುಡುಕಲು ದೈನಂದಿನ ಭಾಷೆಯನ್ನು ಬಳಸಿ. ನಿಮ್ಮ ಬ್ರೌಸಿಂಗ್ ಇತಿಹಾಸವನ್ನು ಆಧರಿಸಿ ನೀವು ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಬಹುದು ಮತ್ತು ಉತ್ತರಗಳನ್ನು ಪಡೆಯಬಹುದು</translation>
-<translation id="7694895628076803349">Drive ಅನ್ನು ತೋರಿಸಬೇಡಿ</translation>
 <translation id="7696063401938172191">ನಿಮ್ಮ'<ph name="PHONE_NAME" />' ನಲ್ಲಿ:</translation>
 <translation id="7697109152153663933">“ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಮತ್ತು ಸ್ವಯಂ ಭರ್ತಿ” ಎಂಬುದನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ</translation>
 <translation id="769824636077131955">ಭದ್ರತೆ ಪರಿಶೀಲನೆಗಾಗಿ ಈ ಡಾಕ್ಯುಮೆಂಟ್ ತುಂಬಾ ದೊಡ್ಡದಾಗಿದೆ. ನೀವು 50 MB ವರೆಗಿನ ಡಾಕ್ಯುಮೆಂಟ್‌ಗಳನ್ನು ಪ್ರಿಂಟ್ ಮಾಡಬಹುದು.</translation>
@@ -8817,7 +8800,6 @@
 <translation id="7811263553491007091">ಪುನಃ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಕೆಳಗಿನ ಈ ಹಿಂದೆ ಜನರೇಟ್ ಮಾಡಲಾದ ಥೀಮ್‌ಗಳಲ್ಲಿ ಒಂದನ್ನು ಆಯ್ಕೆಮಾಡಿ.</translation>
 <translation id="7811926937048662341">ಇಲ್ಲಿ ಬಲ-ಕ್ಲಿಕ್ ಮಾಡಿ ಮತ್ತು "ಟ್ಯಾಬ್‌ಗಳನ್ನು ವರ್ಟಿಕಲ್ ಆಗಿ ತೋರಿಸಿ" ಎಂಬುದನ್ನು ಆಯ್ಕೆಮಾಡಿ</translation>
 <translation id="7811986034759500329">ಸಿಸ್ಟಂ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಸೆಟ್ ಮಾಡಿ</translation>
-<translation id="7812170317334653156">Google Calendar ಮರೆಮಾಡಲಾಗಿದೆ</translation>
 <translation id="7814458197256864873">&amp;ನಕಲಿಸಿ</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531"><ph name="EXTENSION_NAME" /> ಗೆ ಸಂಬಂಧಿಸಿದ ಶಾರ್ಟ್‌ಕಟ್ <ph name="SHORTCUT" /> ಅನ್ನು ಎಡಿಟ್ ಮಾಡಿ</translation>
@@ -9256,7 +9238,6 @@
 <translation id="8146287226035613638">ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಗಳನ್ನು ಸೇರಿಸಿ ಮತ್ತು ಶ್ರೇಣೀಕರಿಸಿ. ಸಾಧ್ಯವಾದಾಗ, ವೆಬ್‌ಸೈಟ್‌ಗಳು ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಗಳಲ್ಲಿ ಗೋಚರಿಸುತ್ತವೆ. ಈ ಆದ್ಯತೆಗಳನ್ನು ನಿಮ್ಮ ಬ್ರೌಸರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಸಿಂಕ್ ಮಾಡಲಾಗುತ್ತದೆ. <ph name="BEGIN_LINK_LEARN_MORE" />ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">ಕ್ರ್ಯಾಶ್ ವರದಿಗಳು ಹಾಗೂ ಡಯಾಗ್ನಾಸ್ಟಿಕ್ಸ್ ಮತ್ತು ಬಳಕೆಯ ಡೇಟಾವನ್ನು Google ಗೆ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಕಳುಹಿಸುವ ಮೂಲಕ Chrome ಹಾಗೂ Chrome OS ಫೀಚರ್‌ಗಳು ಮತ್ತು ಕಾರ್ಯಕ್ಷಮತೆಯನ್ನು ಸುಧಾರಿಸಲು ಸಹಾಯ ಮಾಡಿ.</translation>
 <translation id="8147900440966275470"><ph name="NUM" /> ಟ್ಯಾಬ್ ಕಂಡುಬಂದಿದೆ</translation>
-<translation id="814870937590541483">Google Drive ಫೈಲ್‌ಗಳಿಗೆ ಇನ್ನಷ್ಟು ಕ್ರಿಯೆಗಳು</translation>
 <translation id="8148760431881541277">ಸೈನ್ ಇನ್ ಅನ್ನು ಮಿತಿಗೊಳಿಸಿ</translation>
 <translation id="8149596686567059924">ಅಪ್‌ಡೇಟ್ ಪ್ಯಾಕೇಜ್ ಅನ್ನು ಅನ್‌ಪ್ಯಾಕ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.</translation>
 <translation id="8149870652370242480">ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಸೇವ್ ಮಾಡಿದ ಪಾಸ್‌ವರ್ಡ್‌ಗಳನ್ನು ಬಳಸಲು, iOS ಗಾಗಿ Chrome ಅನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ Google ಖಾತೆಗೆ ಸೈನ್ ಇನ್ ಮಾಡಿ.</translation>

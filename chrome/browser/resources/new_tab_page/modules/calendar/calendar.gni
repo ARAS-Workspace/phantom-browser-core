@@ -6,14 +6,12 @@
 calendar_web_component_files = [
   "modules/calendar/calendar.ts",
   "modules/calendar/calendar_event.ts",
-  "modules/calendar/google_calendar_module.ts",
   "modules/calendar/outlook_calendar_module.ts",
 ]
 
 # List of files that don't need to be passed to html_to_wrapper().
 calendar_ts_files = [
   "modules/calendar/common.ts",
-  "modules/calendar/google_calendar_proxy.ts",
   "modules/calendar/outlook_calendar_proxy.ts",
 ]
 

@@ -10,10 +10,6 @@
 
 namespace {
 
-const char kGoogleCalendarDriveIconUrl[] =
-    "https://drive-thirdparty.googleusercontent.com/16/type/application/"
-    "vnd.google-apps.document";
-
 const char kOutlookCalendarDocIconUrl[] =
     "https://res.cdn.office.net/files/fabric-cdn-prod_20240925.001/assets/"
     "item-types/16/docx.png";
@@ -24,7 +20,6 @@ namespace calendar::calendar_fake_data_helper {
 
 ntp::calendar::mojom::CalendarEventPtr GetFakeEvent(
     int index,
-    CalendarType calendar_type,
     bool has_attachments_enabled) {
   ntp::calendar::mojom::CalendarEventPtr event =
       ntp::calendar::mojom::CalendarEvent::New();
@@ -41,9 +36,7 @@ ntp::calendar::mojom::CalendarEventPtr GetFakeEvent(
       attachment->resource_url =
           GURL("https://foo.com/attachment" + base::NumberToString(i));
     }
-    attachment->icon_url = calendar_type == CalendarType::GOOGLE_CALENDAR
-                               ? GURL(kGoogleCalendarDriveIconUrl)
-                               : GURL(kOutlookCalendarDocIconUrl);
+    attachment->icon_url = GURL(kOutlookCalendarDocIconUrl);
     event->attachments.push_back(std::move(attachment));
   }
   event->conference_url =
@@ -54,11 +47,10 @@ ntp::calendar::mojom::CalendarEventPtr GetFakeEvent(
 }
 
 std::vector<ntp::calendar::mojom::CalendarEventPtr> GetFakeEvents(
-    CalendarType calendar_type,
     bool has_attachments_enabled) {
   std::vector<ntp::calendar::mojom::CalendarEventPtr> events;
   for (int i = 0; i < 5; ++i) {
-    events.push_back(GetFakeEvent(i, calendar_type, has_attachments_enabled));
+    events.push_back(GetFakeEvent(i, has_attachments_enabled));
   }
   return events;
 }

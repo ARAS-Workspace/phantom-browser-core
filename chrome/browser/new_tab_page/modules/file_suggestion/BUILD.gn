@@ -9,7 +9,6 @@ assert(enable_webui_ntp)
 
 mojom("mojo_bindings") {
   sources = [
-    "drive_suggestion.mojom",
     "file_suggestion.mojom",
     "microsoft_files.mojom",
   ]

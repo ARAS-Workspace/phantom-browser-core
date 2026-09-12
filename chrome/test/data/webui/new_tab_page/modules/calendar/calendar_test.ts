@@ -218,7 +218,7 @@ suite('NewTabPageModulesCalendarTest', () => {
 
     test('see more click', async () => {
       const usagePromise = eventToPromise('usage', element);
-      const moduleName = 'GoogleCalendar';
+      const moduleName = 'OutlookCalendar';
       const numEvents = 2;
       element.events = createEvents(numEvents);
       element.moduleName = moduleName;
@@ -241,7 +241,7 @@ suite('NewTabPageModulesCalendarTest', () => {
     });
 
     test('shown events count', async () => {
-      const moduleName = 'GoogleCalendar';
+      const moduleName = 'OutlookCalendar';
       const numEvents = 3;
       element.events = createEvents(numEvents);
       element.moduleName = moduleName;

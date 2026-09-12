@@ -10,9 +10,7 @@
 namespace ntp_modules {
 
 inline constexpr char kAllModulesId[] = "all";
-inline constexpr char kDriveModuleId[] = "drive";
 inline constexpr char kDummyModuleId[] = "dummy";
-inline constexpr char kGoogleCalendarModuleId[] = "google_calendar";
 inline constexpr char kMostRelevantTabResumptionModuleId[] = "tab_resumption";
 inline constexpr char kMicrosoftAuthenticationModuleId[] =
     "microsoft_authentication";
@@ -28,12 +26,9 @@ inline constexpr std::array<const char*, 2> kMicrosoftAuthDependentModuleIds = {
 };
 
 // Default order for modules.
-inline constexpr std::array<const char*, 6> kOrderedModuleIds = {
+inline constexpr std::array<const char*, 4> kOrderedModuleIds = {
     ntp_modules::kMicrosoftAuthenticationModuleId,
-    ntp_modules::kOutlookCalendarModuleId,
-    ntp_modules::kMicrosoftFilesModuleId,
-    ntp_modules::kGoogleCalendarModuleId,
-    ntp_modules::kDriveModuleId,
+    ntp_modules::kOutlookCalendarModuleId, ntp_modules::kMicrosoftFilesModuleId,
     ntp_modules::kMostRelevantTabResumptionModuleId};
 
 }  // namespace ntp_modules

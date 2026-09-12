@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">"<ph name="MAIN_GESTURE" />" "<ph name="CONFLICTING_GESTURE_ONE" />"తోను, "<ph name="CONFLICTING_GESTURE_TWO" />"తోను, "<ph name="CONFLICTING_GESTURE_THREE" />తోను, "ఓవర్‌ల్యాప్ కావచ్చు. వీలైతే, వేరే సంజ్ఞను ఎంచుకోవడానికి ట్రై చేయండి.</translation>
 <translation id="1293556467332435079">Files</translation>
 <translation id="12951065153783848">మీ సంస్థ మీ ఖాతాను మేనేజ్ చేస్తుంది</translation>
-<translation id="1296410481664942178">Google Calendarను చూపవద్దు</translation>
 <translation id="1296911687402551044">ఎంపిక చేసిన ట్యాబ్‌ను పిన్ చేయండి</translation>
 <translation id="1297175357211070620">గమ్యం</translation>
 <translation id="129770436432446029"><ph name="EXPERIMENT_NAME" />‌పై మీ ఫీడ్‌బ్యాక్‌ను పంపండి</translation>
@@ -1154,7 +1153,6 @@
 <translation id="1884340228047885921">ప్రస్తుత విజిబిలిటీ సెట్టింగ్, 'కొన్ని కాంటాక్ట్'‌లకు సెట్ చేయబడింది</translation>
 <translation id="1884705339276589024">Linux డిస్క్ పరిమాణాన్ని మార్చండి</translation>
 <translation id="1885066963699478692">పాలసీలను సెట్ చేయడానికి ఉపయోగించబడుతున్న XML ఫైళ్లు.</translation>
-<translation id="1885089541024391265">Google Calendar</translation>
 <translation id="1885106732301550621">డిస్క్ స్పేస్</translation>
 <translation id="188537499764410817">Gemini మిమ్మల్ని సైన్ ఇన్ చేయగల సైట్‌లు ఇక్కడ కనిపిస్తాయి</translation>
 <translation id="1886996562706621347">ప్రోటోకాల్స్‌కు డిఫాల్ట్ హ్యాండ్లర్‌లుగా కావడం కోసం అడగటానికి సైట్‌లను అనుమతించండి (సిఫార్సు చేయబడింది)</translation>
@@ -2066,7 +2064,6 @@
 <translation id="2586672484245266891">దయచేసి చిన్న URLని నమోదు చేయండి</translation>
 <translation id="2588271083332682494">ట్యాబ్ గ్రూప్‌లను క్రమపద్ధతిలో అమర్చండి</translation>
 <translation id="2588636910004461974"><ph name="VENDOR_NAME" /> నుండి పరికరాలు</translation>
-<translation id="2589658397149952302">Drive ఫైళ్లను ఎప్పుడూ చూపవద్దు</translation>
 <translation id="2597073208962000830">సమీపంలోని పరికరాలను కనుగొనడానికి సమీప షేరింగ్, బ్లూటూత్ స్కానింగ్‌ను ఉపయోగిస్తుంది.</translation>
 <translation id="2598136842498757793">టూల్‌బార్ బటన్‌లను అనుకూలంగా మార్చండి</translation>
 <translation id="2598710988533271874">కొత్త Chrome అందుబాటులోకి వచ్చింది</translation>
@@ -2413,7 +2410,6 @@
 <translation id="2844169650293029770">USB-C పరికరం (ఎడమవైపు ముందు పోర్ట్)</translation>
 <translation id="2844809857160214557">ప్రింట్ టాస్క్‌లను చూడండి, మేనేజ్ చేయండి</translation>
 <translation id="284491292807422921">సైట్‌ను తీసివేయాలా?</translation>
-<translation id="2845276301195220700">Google Calendar కోసం మరిన్ని చర్యలు</translation>
 <translation id="2845382757467349449">ఎల్లప్పుడూ బుక్‌మార్క్‌ల బార్‌ను చూపు</translation>
 <translation id="284581348330507117">భిన్నమైన పాస్‌వర్డ్‌లను క్రియేట్ చేయండి</translation>
 <translation id="2846345106886298325">టాస్క్ పూర్తయింది, Gemini Sparkకు తిరిగి వచ్చింది</translation>
@@ -3549,7 +3545,6 @@
 <translation id="3708295717182051206">క్యాప్షన్‌లు</translation>
 <translation id="3708684582558000260">డేటాను పంపడం లేదా అందుకోవడాన్ని ముగించడానికి మూసివేసిన సైట్‌లను అనుమతించకండి</translation>
 <translation id="3709244229496787112">డౌన్‌లోడ్ పూర్తి కావడానికి ముందే బ్రౌజర్ షట్‌డౌన్ చేయబడింది.</translation>
-<translation id="3710438437470197252">Google Driveలో మరిన్ని చూడండి</translation>
 <translation id="3710501561113687889">కొనసాగించడానికి, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> ఈ సైట్‌తో మీ <ph name="FIELDS_STRING" />‌ను షేర్ చేస్తుంది.</translation>
 <translation id="3711931198657368127">అతికించి <ph name="URL" />కు వెళ్ళండి</translation>
 <translation id="3711945201266135623">ప్రింట్ సర్వర్‌లో <ph name="NUM_PRINTERS" /> ప్రింటర్‌లు కనుగొనబడ్డాయి</translation>
@@ -4103,10 +4098,6 @@
 <translation id="4110485659976215879">హెచ్చరికను రీస్టోర్ చేయండి</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (ఆఫ్‌లైన్)</translation>
 <translation id="4113743276555482284">ఫైల్ పాస్‌వర్డ్</translation>
-<translation id="4114524937989710624">Google Driveలోని మీ అత్యంత ఇటీవలి యాక్టివిటీకి తిరిగి వెళ్లడంలో మీకు సహాయపడటానికి సూచించబడిన ఫైల్స్ మీకు కనిపిస్తున్నాయి.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        మీరు కార్డ్ మెనూ నుండి సెట్టింగ్‌లను మేనేజ్ చేయవచ్చు లేదా, అనుకూలంగా మార్చిన Chromeలో మరిన్ని ఆప్షన్‌లను చూడండి.</translation>
 <translation id="4115002065223188701">నెట్‌వర్క్ అందుబాటులో లేదు</translation>
 <translation id="4115378294792113321">మెజెంటా</translation>
 <translation id="4116480382905329353">1 సారి గుర్తించబడింది</translation>
@@ -7182,7 +7173,6 @@
 <translation id="6557290421156335491">నా షార్ట్‌కట్‌లు</translation>
 <translation id="6558098963164662391">&amp;డిక్షనరీ నుండి తీసివేయండి</translation>
 <translation id="6560061709899140565">ఇతర ప్రసార సెషన్‌లను చూపండి</translation>
-<translation id="656065428026159829">మరిన్ని చూడండి</translation>
 <translation id="6561877237303825108">ఈ (<ph name="TYPE" />) రకం ఫైల్, ప్రమాదకరం కావచ్చు. మీరు <ph name="ORIGIN" />‌ను విశ్వసిస్తేనే ఈ ఫైల్‌ను సేవ్ చేయండి</translation>
 <translation id="6562117348069327379">'డౌన్‌లోడ్స్' డైరెక్టరీలో సిస్టమ్ లాగ్స్‌ను స్టోర్ చేయండి.</translation>
 <translation id="656293578423618167">ఫైల్ పాత్ లేదా పేరు చాలా పొడవుగా ఉంది. దయచేసి చిన్న పేరుతో, లేదా మరొక స్థానానికి సేవ్ చేయండి.</translation>
@@ -7547,10 +7537,6 @@
 <translation id="6827767090350758381">పాత వెర్షన్‌లతో కూడిన Chrome యాప్‌లు, డిసెంబర్ 2022 తర్వాత Windows పరికరాలలో తెరవబడవు. మీ అడ్మినిస్ట్రేటర్‌ను సంప్రదించి, కొత్త వెర్షన్‌కు అప్‌డేట్ చేసుకోండి లేదా ఈ యాప్‌ను తీసివేయండి.</translation>
 <translation id="6828182567531805778">మీ డేటాను సింక్ చేయడానికి మీ రహస్య పదబంధాన్ని నమోదు చేయండి</translation>
 <translation id="6828860976882136098">వినియోగదారులందరి కోసం ఆటోమేటిక్ అప్‌డేట్‌లను సెటప్ చేయడం విఫలమైంది (ప్రీఫ్లయిట్ అమలు ఎర్రర్: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Google Calendarలో మీ తర్వాతి ఈవెంట్‌కు సులభంగా నావిగేట్ చేయడంలో మీకు సహాయపడటానికి మీ క్యాలెండర్‌ను చూస్తున్నారు.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        మీరు కార్డ్ మెనూ నుండి సెట్టింగ్‌లను మేనేజ్ చేయవచ్చు లేదా అనుకూలంగా మార్చిన Chromeలో మరిన్ని ఆప్షన్‌లను చూడవచ్చు.</translation>
 <translation id="6831043979455480757">అనువదించు</translation>
 <translation id="6831989891148852199">మోషన్ లేదా లైట్ సెన్సార్‌లను ఉపయోగించడానికి అనుమతించబడలేదు</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{ట్యాబ్‌ను తీసివేసి, గ్రూప్‌ను తొలగించాలా?}=1{ట్యాబ్‌లను తీసివేసి, గ్రూప్‌ను తొలగించాలా?}other{ట్యాబ్‌లను తీసివేసి, గ్రూప్‌లను తొలగించాలా?}}</translation>
@@ -7670,7 +7656,6 @@
 <translation id="6912007319859991306">సెల్యూలార్ SIM పిన్</translation>
 <translation id="6912380255120084882">వేరొక డివైజ్‌ను ట్రై చేయండి</translation>
 <translation id="691289340230098384">క్యాప్షన్ ప్రాధాన్యతలు</translation>
-<translation id="6913051485529944333">మీకు ఈ పేజీలో Google Calendar మళ్లీ కనిపించదు</translation>
 <translation id="6914812290245989348">సురక్షితం కాని సైట్‌లకు వెళ్లే ముందు ఎలాంటి హెచ్చరికలను చూడవద్దు</translation>
 <translation id="6916590542764765824">ఎక్స్‌టెన్షన్‌లను నిర్వహించండి</translation>
 <translation id="6916676294509106572">Outlook క్యాలెండర్‌ను దాచారు</translation>
@@ -7745,7 +7730,6 @@
 <translation id="6978121630131642226">సెర్చ్ ఇంజిన్‌లు</translation>
 <translation id="6979041727349121225">ఎనర్జీ సేవర్</translation>
 <translation id="6979044105893951891">నిర్వాహిత గెస్ట్ సెషన్‌లను ప్రారంభించడం మరియు విడిచిపెట్టడం</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">మ్యూట్ (డిఫాల్ట్)</translation>
 <translation id="6979557074007409812">అవును, నా డేటాను వర్క్ నుండి వేరుగా ఉంచండి</translation>
 <translation id="6979737339423435258">మొత్తం సమయం</translation>
@@ -8672,7 +8656,6 @@
 <translation id="7690853182226561458">&amp;ఫోల్డర్‌ను జోడించండి...</translation>
 <translation id="7691077781194517083">ఈ సెక్యూరిటీ కీని రీసెట్ చేయలేకపోయింది. ఎర్రర్ <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">మీ బ్రౌజింగ్ హిస్టరీని సెర్చ్ చేయడానికి, మీరు సందర్శించిన సైట్‌లను కనుగొనడానికి రోజువారీ భాషను ఉపయోగించండి. మీరు మీ బ్రౌజింగ్ హిస్టరీ ఆధారంగా ప్రశ్నలను అడగవచ్చు, సమాధానాలను కూడా పొందవచ్చు</translation>
-<translation id="7694895628076803349">Driveను చూపవద్దు</translation>
 <translation id="7696063401938172191">మీ '<ph name="PHONE_NAME" />'లో:</translation>
 <translation id="7697109152153663933">"పాస్‌వర్డ్‌లు, ఆటోఫిల్"ను క్లిక్ చేయండి</translation>
 <translation id="769824636077131955">సెక్యూరిటీ చెక్ చేయడానికి వీల్లేనంతగా ఈ ఫైల్ చాలా పెద్దగా ఉంది. గరిష్ఠంగా 50 MB వరకు ఉన్న డాక్యుమెంట్‌లను మీరు ప్రింట్ చేయవచ్చు.</translation>
@@ -8822,7 +8805,6 @@
 <translation id="7811263553491007091">మళ్లీ ట్రై చేయండి లేదా గతంలో రూపొందించిన రూపాలలో ఒక దానిని దిగువున ఎంచుకోండి.</translation>
 <translation id="7811926937048662341">ఇక్కడ రైట్-క్లిక్ చేసి, “ట్యాబ్‌లను వర్టికల్‌గా చూపండి”ని ఎంచుకోండి</translation>
 <translation id="7811986034759500329">సిస్టమ్ సెట్టింగ్‌లలో సెట్ చేయండి</translation>
-<translation id="7812170317334653156">Google Calendar దాచబడింది</translation>
 <translation id="7814458197256864873">&amp;కాపీ</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531"><ph name="EXTENSION_NAME" /> కోసం <ph name="SHORTCUT" /> షార్ట్‌కట్‌ను ఎడిట్ చేయండి</translation>
@@ -9261,7 +9243,6 @@
 <translation id="8146287226035613638">మీ ప్రాధాన్య భాషలను జోడించి, వాటికి ర్యాంకింగ్ ఇవ్వండి. సాధ్యమైనప్పుడల్లా, వెబ్‌సైట్‌లు, తమ కంటెంట్‌ను మీ ప్రాధాన్య భాషలలో చూపుతాయి. ఈ ప్రాధాన్యతలు మీ బ్రౌజర్ సెట్టింగ్‌లతో సింక్ చేయబడతాయి. <ph name="BEGIN_LINK_LEARN_MORE" />మరింత తెలుసుకోండి<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">క్రాష్ రిపోర్ట్‌లు, సమస్య విశ్లేషణలు, వినియోగ డేటాను ఆటోమేటిక్‌గా Googleకు పంపడం ద్వారా Chrome, అలాగే ChromeOS ఫీచర్‌ల పనితీరును మెరుగుపరచడంలో సహాయపడండి.</translation>
 <translation id="8147900440966275470"><ph name="NUM" /> ట్యాబ్ కనుగొనబడింది</translation>
-<translation id="814870937590541483">Google Drive Files కోసం మరిన్ని చర్యలు</translation>
 <translation id="8148760431881541277">సైన్ ఇన్‌ను పరిమితం చేయండి</translation>
 <translation id="8149596686567059924">అప్‌డేట్ ప్యాకేజీని డెవలపర్ మోడ్‌లో ఉంచడం సాధ్యపడలేదు.</translation>
 <translation id="8149870652370242480">మీ ఫోన్‌లో మీరు సేవ్ చేసిన పాస్‌వర్డ్‌లను ఉపయోగించడానికి, iOSకు సంబంధించిన Chromeను డౌన్‌లోడ్ చేయండి, ఆపై మీ Google ఖాతాకు సైన్ ఇన్ చేయండి.</translation>

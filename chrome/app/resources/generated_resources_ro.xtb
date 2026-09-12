@@ -408,7 +408,6 @@ Verifică parolele oricând în <ph name="GOOGLE_PASSWORD_MANAGER" />.</translat
 <translation id="1293360286536751243"><ph name="MAIN_GESTURE" /> se poate suprapune cu <ph name="CONFLICTING_GESTURE_ONE" />, <ph name="CONFLICTING_GESTURE_TWO" /> și <ph name="CONFLICTING_GESTURE_THREE" />. Dacă este posibil, alege alt gest.</translation>
 <translation id="1293556467332435079">Fișiere</translation>
 <translation id="12951065153783848">Organizația ta îți gestionează contul</translation>
-<translation id="1296410481664942178">Nu afișa Google Calendar</translation>
 <translation id="1296911687402551044">Fixează fila selectată</translation>
 <translation id="1297175357211070620">Destinație</translation>
 <translation id="129770436432446029">Trimite feedback pentru <ph name="EXPERIMENT_NAME" /></translation>
@@ -1146,7 +1145,6 @@ Verifică parolele oricând în <ph name="GOOGLE_PASSWORD_MANAGER" />.</translat
 <translation id="1884340228047885921">Setarea actuală de vizibilitate este pentru anumite persoane de contact</translation>
 <translation id="1884705339276589024">Redimensionează discul Linux</translation>
 <translation id="1885066963699478692">Fișierele XML folosite pentru a seta politicile.</translation>
-<translation id="1885089541024391265">Google Calendar</translation>
 <translation id="1885106732301550621">Spațiu pe disc</translation>
 <translation id="188537499764410817">Site-urile la care te poate conecta Gemini vor apărea aici</translation>
 <translation id="1886996562706621347">Permiteți site-urilor să solicite să devină handlere prestabilite pentru protocoale (recomandat)</translation>
@@ -2055,7 +2053,6 @@ Poți gestiona setările contului dacă instalezi aplicația Family Link pe disp
 <translation id="2586672484245266891">Introdu o adresă URL mai scurtă</translation>
 <translation id="2588271083332682494">Organizează-te cu ajutorul grupurilor de file</translation>
 <translation id="2588636910004461974">Dispozitive de la <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Nu mai afișa niciodată fișierele din Drive</translation>
 <translation id="2597073208962000830">Trimiterea în apropiere folosește scanarea Bluetooth pentru a găsi dispozitive din apropiere.</translation>
 <translation id="2598136842498757793">Personalizează butoanele barei de instrumente</translation>
 <translation id="2598710988533271874">Este disponibilă o nouă versiune Chrome</translation>
@@ -2402,7 +2399,6 @@ Poți gestiona setările contului dacă instalezi aplicația Family Link pe disp
 <translation id="2844169650293029770">Dispozitiv USB-C (portul din stânga față)</translation>
 <translation id="2844809857160214557">Afișează și gestionează sarcinile de printare</translation>
 <translation id="284491292807422921">Elimini site-ul?</translation>
-<translation id="2845276301195220700">Mai multe acțiuni pentru Google Calendar</translation>
 <translation id="2845382757467349449">Afișează mereu bara de marcaje</translation>
 <translation id="284581348330507117">Creează parole unice</translation>
 <translation id="2846345106886298325">Activitatea a fost finalizată și s-a revenit la Gemini Spark</translation>
@@ -3537,7 +3533,6 @@ Mesaj de la server: <ph name="SERVER_MSG" /></translation>
 <translation id="3708295717182051206">Subtitrări</translation>
 <translation id="3708684582558000260">Nu permite site-urilor închise să finalizeze trimiterea sau primirea datelor</translation>
 <translation id="3709244229496787112">Browserul a fost oprit înainte de finalizarea descărcării.</translation>
-<translation id="3710438437470197252">Vezi mai multe în Google Drive</translation>
 <translation id="3710501561113687889">Pentru a continua, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> va permite accesul site-ului la <ph name="FIELDS_STRING" />.</translation>
 <translation id="3711931198657368127">In&amp;serează și accesează <ph name="URL" /></translation>
 <translation id="3711945201266135623">S-au găsit <ph name="NUM_PRINTERS" /> imprimante de la serverul de imprimare</translation>
@@ -4091,10 +4086,6 @@ Mesaj de la server: <ph name="SERVER_MSG" /></translation>
 <translation id="4110485659976215879">Restabilește avertismentul</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (offline)</translation>
 <translation id="4113743276555482284">Parola fișierului</translation>
-<translation id="4114524937989710624">Vezi fișierele sugerate ca să poți reveni ușor la cea mai recentă activitate din Google Drive.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Poți să gestionezi setările din meniul cardului sau să afișezi mai multe opțiuni în Personalizează Chrome.</translation>
 <translation id="4115002065223188701">Rețea în afara ariei de acoperire</translation>
 <translation id="4115378294792113321">Magenta</translation>
 <translation id="4116480382905329353">S-a detectat o dată</translation>
@@ -7169,7 +7160,6 @@ Poți atribui mai multe comutatoare acestei acțiuni.</translation>
 <translation id="6557290421156335491">Comenzile mele rapide</translation>
 <translation id="6558098963164662391">&amp;Elimină din dicționar</translation>
 <translation id="6560061709899140565">Afișează alte sesiuni de proiectare</translation>
-<translation id="656065428026159829">Vezi mai multe</translation>
 <translation id="6561877237303825108">Acest fișier de tip (<ph name="TYPE" />) poate fi periculos. Salvează fișierul doar dacă ai încredere în <ph name="ORIGIN" /></translation>
 <translation id="6562117348069327379">Stochează jurnale de sistem în directorul Descărcări.</translation>
 <translation id="656293578423618167">Calea sau numele fișierului sunt prea lungi. Salvați utilizând un nume mai scurt sau într-o altă locație.</translation>
@@ -7536,10 +7526,6 @@ Mai ai # de parole compromise. Managerul de parole Google recomandă să verific
 <translation id="6827767090350758381">Începând cu luna decembrie 2022, versiunile vechi ale aplicațiilor Chrome nu se vor mai deschide pe dispozitivele Windows. Contactează administratorul pentru a actualiza la o versiune nouă sau pentru a elimina aplicația.</translation>
 <translation id="6828182567531805778">Introdu expresia de acces pentru a sincroniza datele</translation>
 <translation id="6828860976882136098">Actualizările automate nu au putut fi configurate pentru toți utilizatorii (eroare la executarea testării pe dispozitiv: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Calendarul tău este afișat pentru a te ajuta să navighezi cu ușurință la următorul eveniment din Google Calendar.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Poți să gestionezi setările din meniul cardului sau să afișezi mai multe opțiuni în Personalizează Chrome.</translation>
 <translation id="6831043979455480757">Tradu</translation>
 <translation id="6831989891148852199">Nu au permisiunea de a folosi senzorii de mișcare sau de lumină</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Elimini fila și ștergi grupul?}=1{Elimini filele și ștergi grupul?}few{Elimini filele și ștergi grupurile?}other{Elimini filele și ștergi grupurile?}}</translation>
@@ -7659,7 +7645,6 @@ Mai ai # de parole compromise. Managerul de parole Google recomandă să verific
 <translation id="6912007319859991306">Codul PIN al cardului SIM pentru rețeaua mobilă</translation>
 <translation id="6912380255120084882">Încearcă alt dispozitiv</translation>
 <translation id="691289340230098384">Preferințe pentru subtitrări</translation>
-<translation id="6913051485529944333">Nu vei mai vedea Google Calendar în această pagină</translation>
 <translation id="6914812290245989348">Nu vezi niciun avertisment înainte de a accesa site-uri nesigure</translation>
 <translation id="6916590542764765824">Gestionează extensiile</translation>
 <translation id="6916676294509106572">Calendarul Outlook a fost ascuns</translation>
@@ -7734,7 +7719,6 @@ Mai ai # de parole compromise. Managerul de parole Google recomandă să verific
 <translation id="6978121630131642226">Motoarele de căutare</translation>
 <translation id="6979041727349121225">Economisirea energiei</translation>
 <translation id="6979044105893951891">Lansează și închide sesiunile pentru invitați gestionate</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">Dezactivează sunetul (prestabilit)</translation>
 <translation id="6979557074007409812">Da, păstrează datele separat de cele de la serviciu</translation>
 <translation id="6979737339423435258">Dintotdeauna</translation>
@@ -8661,7 +8645,6 @@ Aici pot fi incluse informații despre software-ul instalat, fișiere, browser, 
 <translation id="7690853182226561458">Adăugați un &amp;dosar...</translation>
 <translation id="7691077781194517083">Această cheie de securitate nu poate fi resetată. Eroare <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Folosește limbajul cotidian pentru a căuta în istoricul de navigare și pentru a găsi site-urile pe care le-ai accesat. În plus, poți să adresezi întrebări și să primești răspunsuri pe baza istoricului de navigare</translation>
-<translation id="7694895628076803349">Nu afișa Drive</translation>
 <translation id="7696063401938172191">Pe „<ph name="PHONE_NAME" />”:</translation>
 <translation id="7697109152153663933">Dă clic pe Parole și completare automată</translation>
 <translation id="769824636077131955">Acest document este prea mare pentru verificarea de securitate. Poți să printezi documente de până la 50 MB.</translation>
@@ -8811,7 +8794,6 @@ Apasă un comutator sau o tastă atribuită pentru a elimina atribuirea</transla
 <translation id="7811263553491007091">Încearcă din nou sau selectează una dintre temele generate anterior de mai jos.</translation>
 <translation id="7811926937048662341">Dă clic dreapta aici și selectează Afișează filele pe verticală</translation>
 <translation id="7811986034759500329">Setează în setările de sistem</translation>
-<translation id="7812170317334653156">Google Calendar a fost ascuns</translation>
 <translation id="7814458197256864873">&amp;Copiază</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Editează comanda rapidă <ph name="SHORTCUT" /> pentru <ph name="EXTENSION_NAME" /></translation>
@@ -9253,7 +9235,6 @@ Păstrează fișierul cu cheia într-un loc sigur. Acesta va fi necesar la crear
 <translation id="8146287226035613638">Adaugă și ordonează limbile preferate. Site-urile se vor afișa în limbile tale preferate, dacă este posibil. Aceste preferințe se sincronizează cu setările browserului. <ph name="BEGIN_LINK_LEARN_MORE" />Află mai multe<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Contribuie la îmbunătățirea funcțiilor și a performanței Chrome și a sistemului de operare Chrome, trimițând automat la Google rapoarte de blocare, precum și date de diagnosticare și de utilizare.</translation>
 <translation id="8147900440966275470">S-a găsit <ph name="NUM" /> filă</translation>
-<translation id="814870937590541483">Mai multe acțiuni pentru fișierele din Google Drive</translation>
 <translation id="8148760431881541277">Limitează conectarea</translation>
 <translation id="8149596686567059924">Pachetul de actualizare nu a putut fi despachetat.</translation>
 <translation id="8149870652370242480">Pentru a folosi parolele salvate pe telefon, descarcă Chrome pentru iOS și conectează-te la Contul Google.</translation>

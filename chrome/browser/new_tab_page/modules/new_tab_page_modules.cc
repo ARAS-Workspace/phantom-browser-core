@@ -28,19 +28,9 @@ const std::vector<ModuleIdDetail> MakeModuleIdDetails(bool is_managed_profile,
                                                       Profile* profile) {
   std::vector<ModuleIdDetail> details;
 
-  if (IsGoogleCalendarModuleEnabled(is_managed_profile, profile)) {
-    details.emplace_back(ntp_modules::kGoogleCalendarModuleId,
-                         IDS_NTP_MODULES_GOOGLE_CALENDAR_TITLE);
-  }
-
   if (IsOutlookCalendarModuleEnabledForProfile(profile)) {
     details.emplace_back(ntp_modules::kOutlookCalendarModuleId,
                          IDS_NTP_MODULES_OUTLOOK_CALENDAR_TITLE);
-  }
-
-  if (IsDriveModuleEnabledForProfile(is_managed_profile, profile)) {
-    details.emplace_back(ntp_modules::kDriveModuleId,
-                         IDS_NTP_MODULES_DRIVE_NAME);
   }
 
   if (IsMicrosoftFilesModuleEnabledForProfile(profile)) {

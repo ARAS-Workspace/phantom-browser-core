@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">「<ph name="MAIN_GESTURE" />」は「<ph name="CONFLICTING_GESTURE_ONE" />」、「<ph name="CONFLICTING_GESTURE_TWO" />」、「<ph name="CONFLICTING_GESTURE_THREE" />」と重複している可能性があります。可能な場合は別のジェスチャーを選択してください。</translation>
 <translation id="1293556467332435079">ファイル</translation>
 <translation id="12951065153783848">あなたのアカウントは組織が管理しています</translation>
-<translation id="1296410481664942178">Google カレンダーを表示しない</translation>
 <translation id="1296911687402551044">選択したタブを固定</translation>
 <translation id="1297175357211070620">送信先</translation>
 <translation id="129770436432446029"><ph name="EXPERIMENT_NAME" />についてのフィードバックを送信</translation>
@@ -1146,7 +1145,6 @@
 <translation id="1884340228047885921">現在の公開設定は一部の連絡先です</translation>
 <translation id="1884705339276589024">Linux ディスクのサイズ変更</translation>
 <translation id="1885066963699478692">ポリシーの設定に使用されている XML ファイルです。</translation>
-<translation id="1885089541024391265">Google カレンダー</translation>
 <translation id="1885106732301550621">ディスク容量</translation>
 <translation id="188537499764410817">Gemini でログインできるサイトがここに表示されます</translation>
 <translation id="1886996562706621347">サイトからのプロトコルのデフォルト ハンドラとしての登録要求を許可する（推奨）</translation>
@@ -2054,7 +2052,6 @@
 <translation id="2586672484245266891">URL を短くしてください</translation>
 <translation id="2588271083332682494">タブグループで整理整頓</translation>
 <translation id="2588636910004461974"><ph name="VENDOR_NAME" /> のデバイス</translation>
-<translation id="2589658397149952302">ドライブ ファイルを表示しない</translation>
 <translation id="2597073208962000830">ニアバイシェアでは Bluetooth のスキャン機能を使用して、付近のデバイスを探します。</translation>
 <translation id="2598136842498757793">ツールバーのボタンをカスタマイズ</translation>
 <translation id="2598710988533271874">新しい Chrome をご利用いただけます</translation>
@@ -2401,7 +2398,6 @@
 <translation id="2844169650293029770">USB-C デバイス（左手前のポート）</translation>
 <translation id="2844809857160214557">印刷ジョブの表示と管理</translation>
 <translation id="284491292807422921">サイトを削除しますか？</translation>
-<translation id="2845276301195220700">Google カレンダーのその他の操作</translation>
 <translation id="2845382757467349449">ブックマーク バーを常に表示</translation>
 <translation id="284581348330507117">新たなパスワードを作成してください</translation>
 <translation id="2846345106886298325">タスクが完了し、Gemini Spark に戻りました</translation>
@@ -3535,7 +3531,6 @@
 <translation id="3708295717182051206">字幕</translation>
 <translation id="3708684582558000260">閉じたサイトにデータの送受信の完了を許可しない</translation>
 <translation id="3709244229496787112">ダウンロードの完了前に、ブラウザがシャットダウンされました。</translation>
-<translation id="3710438437470197252">Google ドライブで詳細を見る</translation>
 <translation id="3710501561113687889">続行すると、<ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> からこのサイトに <ph name="FIELDS_STRING" /> が共有されます。</translation>
 <translation id="3711931198657368127">貼り付けて <ph name="URL" /> に移動</translation>
 <translation id="3711945201266135623">プリント サーバーで <ph name="NUM_PRINTERS" /> 個のプリンタが見つかりました</translation>
@@ -4089,10 +4084,6 @@
 <translation id="4110485659976215879">警告を復元</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" />（オフライン）</translation>
 <translation id="4113743276555482284">ファイルのパスワード</translation>
-<translation id="4114524937989710624">Google ドライブで最近使用したファイルに簡単にアクセスできるよう、ファイルの候補が表示されています。
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        カードメニューから設定を管理することや、[Chrome をカスタマイズ] でその他のオプションを見ることができます。</translation>
 <translation id="4115002065223188701">ネットワークが圏外です</translation>
 <translation id="4115378294792113321">マゼンタ</translation>
 <translation id="4116480382905329353">1 回検出</translation>
@@ -7165,7 +7156,6 @@
 <translation id="6557290421156335491">カスタム ショートカット</translation>
 <translation id="6558098963164662391">辞書から削除(&amp;R)</translation>
 <translation id="6560061709899140565">他のキャスト セッションを表示</translation>
-<translation id="656065428026159829">もっと見る</translation>
 <translation id="6561877237303825108">このタイプのファイル（<ph name="TYPE" />）は危険な可能性があります。<ph name="ORIGIN" /> を信頼できる場合のみ、このファイルを保存してください</translation>
 <translation id="6562117348069327379">システムログをダウンロード ディレクトリに保存します。</translation>
 <translation id="656293578423618167">ファイルのパスまたは名前が長すぎます。名前を短くするか、別の場所に保存してください。</translation>
@@ -7530,10 +7520,6 @@
 <translation id="6827767090350758381">古いバージョンの Chrome アプリを Windows デバイスで使用できるのは、2022 年 12 月までです。管理者にお問い合わせのうえ、新しいバージョンに更新するか、アプリを削除してください。</translation>
 <translation id="6828182567531805778">データを同期するにはパスフレーズを入力してください</translation>
 <translation id="6828860976882136098">すべてのユーザーで自動更新を行うよう設定できませんでした（プリフライト実行エラー: <ph name="ERROR_NUMBER" />）</translation>
-<translation id="6830787477693252535">Google カレンダーの次の予定を簡単に確認できるよう、カレンダーが表示されています。
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        カードメニューから設定を管理することや、[Chrome をカスタマイズ] でその他のオプションを見ることができます。</translation>
 <translation id="6831043979455480757">翻訳</translation>
 <translation id="6831989891148852199">モーション センサーまたは光センサーの使用を許可しないサイト</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{タブとグループを削除しますか？}=1{タブとグループを削除しますか？}other{タブとグループを削除しますか？}}</translation>
@@ -7653,7 +7639,6 @@
 <translation id="6912007319859991306">モバイル SIM PIN</translation>
 <translation id="6912380255120084882">別のデバイスを試す</translation>
 <translation id="691289340230098384">字幕の設定</translation>
-<translation id="6913051485529944333">今後このページに Google カレンダーは表示されません</translation>
 <translation id="6914812290245989348">安全でないサイトにアクセスする前に警告を表示しない</translation>
 <translation id="6916590542764765824">拡張機能を管理</translation>
 <translation id="6916676294509106572">Outlook カレンダーを非表示にしました</translation>
@@ -7728,7 +7713,6 @@
 <translation id="6978121630131642226">検索エンジン</translation>
 <translation id="6979041727349121225">省エネモード</translation>
 <translation id="6979044105893951891">管理対象のゲスト セッションの開始と終了</translation>
-<translation id="6979158407327259162">Google ドライブ</translation>
 <translation id="6979440798594660689">ミュート（デフォルト）</translation>
 <translation id="6979557074007409812">はい、自分のデータを仕事用とは別に保持します</translation>
 <translation id="6979737339423435258">全期間</translation>
@@ -8655,7 +8639,6 @@
 <translation id="7690853182226561458">フォルダを追加(&amp;F)...</translation>
 <translation id="7691077781194517083">このセキュリティ キーをリセットできません。エラー <ph name="ERROR_CODE" />。</translation>
 <translation id="7693792553740402887">普段使う表現で閲覧履歴やアクセスしたサイトを検索できます。閲覧履歴に関する質問を行って回答を取得することもできます。</translation>
-<translation id="7694895628076803349">ドライブを表示しない</translation>
 <translation id="7696063401938172191">「<ph name="PHONE_NAME" />」で次の操作を行います。</translation>
 <translation id="7697109152153663933">[パスワードと自動入力] をクリックします</translation>
 <translation id="769824636077131955">このドキュメントはセキュリティ チェックには大きすぎます。印刷できるドキュメントは 50 MB までです。</translation>
@@ -8804,7 +8787,6 @@
 <translation id="7811263553491007091">もう一度お試しいただくか、以前に生成された下のテーマから選択してください。</translation>
 <translation id="7811926937048662341">ここを右クリックすると [タブを縦方向に表示] を選択できます</translation>
 <translation id="7811986034759500329">システム設定で設定</translation>
-<translation id="7812170317334653156">Google カレンダーを非表示にしました</translation>
 <translation id="7814458197256864873">コピー(&amp;C)</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531"><ph name="EXTENSION_NAME" /> のショートカット <ph name="SHORTCUT" /> を編集</translation>
@@ -9246,7 +9228,6 @@
 <translation id="8146287226035613638">使用する言語とその順序を設定できます。ウェブサイトは指定した言語で表示されるようになります（可能な場合）。これらの設定はブラウザの設定と同期されています。<ph name="BEGIN_LINK_LEARN_MORE" />詳細<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Chrome および ChromeOS の機能とパフォーマンスを改善できるよう、クラッシュ レポートと診断データ、使用状況データの自動送信にご協力ください。</translation>
 <translation id="8147900440966275470"><ph name="NUM" /> 個のタブが見つかりました</translation>
-<translation id="814870937590541483">Google ドライブのファイルに対するその他の操作</translation>
 <translation id="8148760431881541277">ログインの制限</translation>
 <translation id="8149596686567059924">更新パッケージを解凍できませんでした。</translation>
 <translation id="8149870652370242480">スマートフォンに保存されているパスワードを使用するには、iOS 版 Chrome をダウンロードして Google アカウントにログインします。</translation>

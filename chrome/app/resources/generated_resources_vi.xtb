@@ -408,7 +408,6 @@ Bạn có thể kiểm tra mật khẩu bất cứ lúc nào trong <ph name="GOO
 <translation id="1293360286536751243">"<ph name="MAIN_GESTURE" />" có thể trùng lặp với "<ph name="CONFLICTING_GESTURE_ONE" />", "<ph name="CONFLICTING_GESTURE_TWO" />" và "<ph name="CONFLICTING_GESTURE_THREE" />". Hãy thử chọn một cử chỉ khác nếu được.</translation>
 <translation id="1293556467332435079">Tệp</translation>
 <translation id="12951065153783848">Tài khoản của bạn do tổ chức bạn quản lý</translation>
-<translation id="1296410481664942178">Không hiển thị Lịch Google</translation>
 <translation id="1296911687402551044">Ghim thẻ đã chọn</translation>
 <translation id="1297175357211070620">Máy in đích</translation>
 <translation id="129770436432446029">Gửi ý kiến phản hồi về <ph name="EXPERIMENT_NAME" /></translation>
@@ -1156,7 +1155,6 @@ Bạn có thể kiểm tra mật khẩu bất cứ lúc nào trong <ph name="GOO
 <translation id="1884340228047885921">Tùy chọn hiển thị hiện tại là một số người liên hệ</translation>
 <translation id="1884705339276589024">Thay đổi dung lượng ổ đĩa Linux</translation>
 <translation id="1885066963699478692">Các tệp XML được dùng để đặt giá trị cho chính sách.</translation>
-<translation id="1885089541024391265">Lịch Google</translation>
 <translation id="1885106732301550621">Dung lượng ổ đĩa</translation>
 <translation id="188537499764410817">Các trang web mà Gemini có thể đăng nhập bằng tài khoản của bạn sẽ xuất hiện ở đây</translation>
 <translation id="1886996562706621347">Cho phép các trang web yêu cầu trở thành trình xử lý mặc định cho giao thức (nên chọn)</translation>
@@ -2068,7 +2066,6 @@ Bạn có thể quản lý các tùy chọn cài đặt của tài khoản này 
 <translation id="2586672484245266891">Vui lòng nhập URL ngắn hơn</translation>
 <translation id="2588271083332682494">Sắp xếp gọn gàng nhờ các nhóm thẻ</translation>
 <translation id="2588636910004461974">Thiết bị của <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Không bao giờ hiển thị các tệp trên Drive</translation>
 <translation id="2597073208962000830">Tính năng Chia sẻ lân cận dùng tính năng quét tìm Bluetooth để tìm các thiết bị ở gần.</translation>
 <translation id="2598136842498757793">Tuỳ chỉnh các nút trên thanh công cụ</translation>
 <translation id="2598710988533271874">Hiện đã có Chrome mới</translation>
@@ -2415,7 +2412,6 @@ Bạn có thể quản lý các tùy chọn cài đặt của tài khoản này 
 <translation id="2844169650293029770">Thiết bị USB-C (cổng phía trước, bên trái)</translation>
 <translation id="2844809857160214557">Xem và quản lý các lệnh in</translation>
 <translation id="284491292807422921">Xoá trang web?</translation>
-<translation id="2845276301195220700">Các thao tác khác cho Lịch Google</translation>
 <translation id="2845382757467349449">Luôn Hiển thị Thanh Dấu trang</translation>
 <translation id="284581348330507117">Tạo mật khẩu khác biệt</translation>
 <translation id="2846345106886298325">Đã hoàn tất tác vụ và trả kết quả về cho Gemini Spark</translation>
@@ -3551,7 +3547,6 @@ Bạn có thể quản lý các tùy chọn cài đặt của tài khoản này 
 <translation id="3708295717182051206">Phụ đề</translation>
 <translation id="3708684582558000260">Không cho phép các trang web đã đóng hoàn tất quá trình gửi hoặc nhận dữ liệu</translation>
 <translation id="3709244229496787112">Trình duyệt bị tắt trước khi quá trình tải xuống hoàn tất.</translation>
-<translation id="3710438437470197252">Xem thêm trong Google Drive</translation>
 <translation id="3710501561113687889">Để tiếp tục, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> sẽ chia sẻ <ph name="FIELDS_STRING" /> của bạn với trang web này.</translation>
 <translation id="3711931198657368127">Dá&amp;n và truy cập <ph name="URL" /></translation>
 <translation id="3711945201266135623">Tìm thấy <ph name="NUM_PRINTERS" /> máy in trên máy chủ máy in</translation>
@@ -4105,10 +4100,6 @@ Bạn có thể quản lý các tùy chọn cài đặt của tài khoản này 
 <translation id="4110485659976215879">Khôi phục cảnh báo</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (không kết nối Internet)</translation>
 <translation id="4113743276555482284">Mật khẩu của tệp</translation>
-<translation id="4114524937989710624">Bạn đang xem những tệp được đề xuất để giúp bạn dễ dàng trở lại hoạt động gần đây nhất của mình trong Google Drive.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Bạn có thể quản lý chế độ cài đặt qua trình đơn thẻ hoặc xem tuỳ chọn khác trong phần Tuỳ chỉnh Chrome.</translation>
 <translation id="4115002065223188701">Mạng nằm ngoài phạm vi</translation>
 <translation id="4115378294792113321">Đỏ thẫm</translation>
 <translation id="4116480382905329353">Đã phát hiện 1 lần</translation>
@@ -7185,7 +7176,6 @@ Bạn có thể gán nhiều công tắc cho thao tác này.</translation>
 <translation id="6557290421156335491">Các lối tắt của tôi</translation>
 <translation id="6558098963164662391">&amp;Xoá khỏi từ điển</translation>
 <translation id="6560061709899140565">Xem các phiên truyền khác</translation>
-<translation id="656065428026159829">Xem thêm</translation>
 <translation id="6561877237303825108">Tệp này thuộc loại này (<ph name="TYPE" />) có thể nguy hiểm. Chỉ lưu tệp này nếu bạn tin tưởng <ph name="ORIGIN" /></translation>
 <translation id="6562117348069327379">Lưu trữ nhật ký hệ thống vào thư mục Tệp đã tải xuống.</translation>
 <translation id="656293578423618167">Tên hoặc đường dẫn của tệp quá dài.  Hãy lưu với tên ngắn hơn hoặc lưu vào một vị trí khác.</translation>
@@ -7550,10 +7540,6 @@ Bạn còn # mật khẩu bị lộ nữa. Trình quản lý mật khẩu của 
 <translation id="6827767090350758381">Sau tháng 12 năm 2022, các phiên bản cũ của Ứng dụng Chrome sẽ không mở trên các thiết bị Windows. Hãy liên hệ với quản trị viên để cập nhật lên phiên bản mới hoặc xoá ứng dụng này.</translation>
 <translation id="6828182567531805778">Nhập cụm mật khẩu để đồng bộ hóa dữ liệu</translation>
 <translation id="6828860976882136098">Không thiết lập được cập nhật tự động cho tất cả người dùng (lỗi thực thi kiểm tra <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Lịch bạn đang xem giúp bạn dễ dàng điều hướng đến sự kiện tiếp theo trong Lịch Google.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Bạn có thể quản lý chế độ cài đặt qua trình đơn thẻ hoặc xem lựa chọn khác trong phần Tuỳ chỉnh Chrome.</translation>
 <translation id="6831043979455480757">Dịch</translation>
 <translation id="6831989891148852199">Không được phép sử dụng cảm biến chuyển động hoặc cảm biến ánh sáng</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Loại bỏ thẻ và xoá nhóm?}=1{Loại bỏ các thẻ và xoá nhóm?}other{Loại bỏ các thẻ và xoá các nhóm?}}</translation>
@@ -7675,7 +7661,6 @@ Bạn còn # mật khẩu bị lộ nữa. Trình quản lý mật khẩu của 
 <translation id="6912007319859991306">Mã PIN của SIM di động</translation>
 <translation id="6912380255120084882">Thử dùng một thiết bị khác</translation>
 <translation id="691289340230098384">Tuỳ chọn phụ đề</translation>
-<translation id="6913051485529944333">Bạn sẽ không thấy Lịch Google trên trang này nữa</translation>
 <translation id="6914812290245989348">Không hiện cảnh báo trước khi truy cập vào các trang web không an toàn</translation>
 <translation id="6916590542764765824">Quản lý các tiện ích</translation>
 <translation id="6916676294509106572">Đã ẩn Lịch Outlook</translation>
@@ -7750,7 +7735,6 @@ Bạn còn # mật khẩu bị lộ nữa. Trình quản lý mật khẩu của 
 <translation id="6978121630131642226">Công cụ Tìm kiếm</translation>
 <translation id="6979041727349121225">Trình tiết kiệm pin</translation>
 <translation id="6979044105893951891">Chạy và thoát khỏi các phiên khách được quản lý</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">Tắt tiếng (mặc định)</translation>
 <translation id="6979557074007409812">Có, hãy tách biệt dữ liệu của tôi với dữ liệu công việc</translation>
 <translation id="6979737339423435258">Từ trước đến nay</translation>
@@ -8677,7 +8661,6 @@ Thông tin này có thể bao gồm thông tin về phần mềm đã cài đặ
 <translation id="7690853182226561458">Thêm &amp;thư mục...</translation>
 <translation id="7691077781194517083">Không thể đặt lại khóa bảo mật này. Lỗi <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Dùng ngôn ngữ giao tiếp thường ngày để tìm nhật ký duyệt web và tìm các trang web bạn đã truy cập. Bạn cũng có thể đặt câu hỏi và nhận được câu trả lời dựa trên nhật ký duyệt web</translation>
-<translation id="7694895628076803349">Không hiện Drive</translation>
 <translation id="7696063401938172191">Trên '<ph name="PHONE_NAME" />' của bạn:</translation>
 <translation id="7697109152153663933">Nhấp vào "Mật khẩu và tự động điền"</translation>
 <translation id="769824636077131955">Không kiểm tra bảo mật được do tài liệu này quá lớn. Bạn có thể in tài liệu có dung lượng tối đa 50 MB.</translation>
@@ -8827,7 +8810,6 @@ Nhấn một công tắc hoặc phím đã gán để xóa.</translation>
 <translation id="7811263553491007091">Hãy thử lại hoặc chọn một trong những giao diện đã tạo ở bên dưới.</translation>
 <translation id="7811926937048662341">Nhấp chuột phải vào đây rồi chọn "Hiện các thẻ theo chiều dọc"</translation>
 <translation id="7811986034759500329">Thiết lập trong phần cài đặt hệ thống</translation>
-<translation id="7812170317334653156">Đã ẩn Lịch Google</translation>
 <translation id="7814458197256864873">Sao &amp;chép</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Chỉnh sửa lối tắt <ph name="SHORTCUT" /> cho <ph name="EXTENSION_NAME" /></translation>
@@ -9269,7 +9251,6 @@ Giữ tệp khóa của bạn ở nơi an toàn. Bạn sẽ cần tệp khóa đ
 <translation id="8146287226035613638">Hãy thêm và xếp thứ tự ưu tiên các ngôn ngữ bạn muốn dùng. Các trang web sẽ hiển thị bằng những ngôn ngữ mà bạn ưu tiên sử dụng, khi có thể. Những lựa chọn ưu tiên này được đồng bộ hóa với chế độ cài đặt của trình duyệt. <ph name="BEGIN_LINK_LEARN_MORE" />Tìm hiểu thêm<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Giúp cải thiện hiệu suất và các tính năng của Chrome và Chrome OS bằng cách tự động gửi các báo cáo sự cố cũng như dữ liệu sử dụng và thông tin chẩn đoán cho Google.</translation>
 <translation id="8147900440966275470">Đã tìm thấy <ph name="NUM" /> thẻ</translation>
-<translation id="814870937590541483">Thao tác khác cho các tệp trên Google Drive</translation>
 <translation id="8148760431881541277">Giới hạn khả năng đăng nhập</translation>
 <translation id="8149596686567059924">Không thể giải nén gói cập nhật.</translation>
 <translation id="8149870652370242480">Để sử dụng mật khẩu mà bạn đã lưu trên điện thoại, hãy tải Chrome dành cho iOS xuống và đăng nhập vào Tài khoản Google của bạn.</translation>

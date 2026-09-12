@@ -60,7 +60,6 @@ Refer to README.md for content description and update process.
  <item id="downloads_api_run_async" added_in_milestone="62" content_hash_code="008d9d92" os_list="linux,windows,chromeos" file_path="chrome/browser/extensions/api/downloads/downloads_api.cc" />
  <item id="downloads_dom_handler" added_in_milestone="73" content_hash_code="082cc10b" os_list="linux,windows,chromeos" file_path="chrome/browser/ui/webui/downloads/downloads_dom_handler.cc" />
  <item id="drag_download_file" added_in_milestone="62" content_hash_code="078a20ba" os_list="linux,windows,chromeos,android" file_path="content/browser/download/drag_download_file.cc" />
- <item id="drive_service" added_in_milestone="90" content_hash_code="059e2023" os_list="linux,windows,chromeos" file_path="chrome/browser/new_tab_page/modules/file_suggestion/drive_service.cc" />
  <item id="early_hints_preload" added_in_milestone="91" content_hash_code="075686e5" os_list="linux,windows,chromeos,android" file_path="content/browser/loader/navigation_early_hints_manager.cc" />
  <item id="enterprise_safe_browsing_realtime_url_lookup" added_in_milestone="86" content_hash_code="00d66dca" os_list="linux,windows,android,chromeos" file_path="components/safe_browsing/core/browser/realtime/chrome_enterprise_url_lookup_service.cc" />
  <item id="extension_blacklist" added_in_milestone="62" content_hash_code="012fee19" os_list="linux,windows,chromeos" file_path="extensions/browser/blocklist_state_fetcher.cc" />
@@ -301,7 +300,6 @@ Refer to README.md for content description and update process.
  <item id="remoting_cloud_provision_gce_instance" added_in_milestone="125" content_hash_code="020ad462" os_list="linux,windows,chromeos,android" file_path="remoting/base/cloud_service_client.cc" />
  <item id="lens_overlay" added_in_milestone="125" content_hash_code="03ef5586" os_list="linux,windows,chromeos,android" file_path="chrome/browser/ui/lens/lens_overlay_query_controller.cc" />
  <item id="dbsc_registration" added_in_milestone="127" content_hash_code="03c42469" os_list="windows,linux" file_path="net/device_bound_sessions/url_fetcher.cc" />
- <item id="google_calendar_page_handler" added_in_milestone="127" content_hash_code="00ab702c" os_list="linux,windows,chromeos" file_path="chrome/browser/new_tab_page/modules/v2/calendar/google_calendar_page_handler.cc" />
  <item id="autofill_password_favicon_fetch" added_in_milestone="128" content_hash_code="00df689d" os_list="linux,windows,chromeos" file_path="chrome/browser/ui/views/autofill/popup/password_favicon_loader.cc" />
  <item id="enterprise_companion_event_logging" added_in_milestone="128" content_hash_code="06883e8e" os_list="linux,windows" file_path="chrome/enterprise_companion/event_logger.cc" />
  <item id="plus_address_preallocation" added_in_milestone="129" content_hash_code="05275659" os_list="linux,windows,android,chromeos" file_path="components/plus_addresses/core/browser/plus_address_http_client_impl.cc" />

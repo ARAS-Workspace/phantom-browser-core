@@ -408,7 +408,6 @@
 <translation id="1293360286536751243"><ph name="MAIN_GESTURE" /> може да се преклапа са покретима <ph name="CONFLICTING_GESTURE_ONE" />, <ph name="CONFLICTING_GESTURE_TWO" /> и <ph name="CONFLICTING_GESTURE_THREE" />. Пробајте да изаберете други покрет ако је то могуће.</translation>
 <translation id="1293556467332435079">Фајлови</translation>
 <translation id="12951065153783848">Организација управља налогом</translation>
-<translation id="1296410481664942178">Не приказуј Google календар</translation>
 <translation id="1296911687402551044">Закачи изабрану картицу</translation>
 <translation id="1297175357211070620">Одредиште</translation>
 <translation id="129770436432446029">Пошаљите повратне информације за:<ph name="EXPERIMENT_NAME" /></translation>
@@ -1146,7 +1145,6 @@
 <translation id="1884340228047885921">Актуелно подешавање видљивости је: Неки контакти</translation>
 <translation id="1884705339276589024">Промените величину Linux диска</translation>
 <translation id="1885066963699478692">XML фајлови који се користе за подешавање смерница.</translation>
-<translation id="1885089541024391265">Google календар</translation>
 <translation id="1885106732301550621">Простор на диску</translation>
 <translation id="188537499764410817">Овде ће се приказивати сајтови на које Gemini може да вас пријави</translation>
 <translation id="1886996562706621347">Дозволи сајтовима да захтевају да постану подразумевани обрађивачи за протоколе (препоручено)</translation>
@@ -2054,7 +2052,6 @@
 <translation id="2586672484245266891">Унесите краћи URL</translation>
 <translation id="2588271083332682494">Уредите картице помоћу група картица</translation>
 <translation id="2588636910004461974">Уређаји продавца <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Не приказуј никада фајлове са Диска</translation>
 <translation id="2597073208962000830">Дељење у близини користи Bluetooth скенирање да би пронашло уређаје у близини.</translation>
 <translation id="2598136842498757793">Прилагодите дугмад траке с алаткама</translation>
 <translation id="2598710988533271874">Доступан је нови Chrome</translation>
@@ -2401,7 +2398,6 @@
 <translation id="2844169650293029770">Уређај са USB прикључком типа C (леви предњи порт)</translation>
 <translation id="2844809857160214557">Прегледајте задатке штампања и управљајте њима</translation>
 <translation id="284491292807422921">Желите да уклоните сајт?</translation>
-<translation id="2845276301195220700">Још радњи за Google календар</translation>
 <translation id="2845382757467349449">Увек приказуј траку са обележивачима</translation>
 <translation id="284581348330507117">Направите јединствене лозинке</translation>
 <translation id="2846345106886298325">Задатак је обављен и враћен у Gemini Spark</translation>
@@ -3537,7 +3533,6 @@
 <translation id="3708295717182051206">Титл</translation>
 <translation id="3708684582558000260">Не дозвољавај затвореним сајтовима да доврше слање или пријем података</translation>
 <translation id="3709244229496787112">Прегледач је затворен пре него што је преузимање завршено.</translation>
-<translation id="3710438437470197252">Прикажи више на Google диску</translation>
 <translation id="3710501561113687889">Да бисте наставили, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> ће делити <ph name="FIELDS_STRING" /> са овим сајтом.</translation>
 <translation id="3711931198657368127">Налепи и иди на <ph name="URL" /></translation>
 <translation id="3711945201266135623">Пронађени штампачи са сервера за штампање: <ph name="NUM_PRINTERS" /></translation>
@@ -4091,10 +4086,6 @@
 <translation id="4110485659976215879">Врати упозорење</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (офлајн)</translation>
 <translation id="4113743276555482284">Лозинка за фајл</translation>
-<translation id="4114524937989710624">Предложени фајлови вам се приказују да бисте лако могли да се вратите најновијим активностима на Google диску.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Можете да управљате подешавањима из  менија картице или да видите још опција у менију Прилагодите Chrome.</translation>
 <translation id="4115002065223188701">Мрежа је ван домета</translation>
 <translation id="4115378294792113321">Циклама</translation>
 <translation id="4116480382905329353">Откривено је једном</translation>
@@ -7170,7 +7161,6 @@
 <translation id="6557290421156335491">Моје пречице</translation>
 <translation id="6558098963164662391">&amp;Уклони из речника</translation>
 <translation id="6560061709899140565">Прикажи друге сесије пребацивања</translation>
-<translation id="656065428026159829">Прикажи још</translation>
 <translation id="6561877237303825108">Овај фајл типа (<ph name="TYPE" />) може да буде опасан. Сачувајте овај фајл само ако је <ph name="ORIGIN" /> поуздан извор</translation>
 <translation id="6562117348069327379">Складиштење евиденција система у директоријуму Преузимања.</translation>
 <translation id="656293578423618167">Путања или назив датотеке су предугачки. Сачувајте са краћим називом или на другој локацији.</translation>
@@ -7539,10 +7529,6 @@
 <translation id="6827767090350758381">Старе верзије Chrome апликација неће се отварати на Windows уређајима после децембра 2022. Обратите се администратору да бисте ажурирали ову апликацију на нову верзију или је уклонили.</translation>
 <translation id="6828182567531805778">Унесите приступну фразу да бисте синхронизовали податке</translation>
 <translation id="6828860976882136098">Подешавање аутоматских ажурирања за све кориснике није успело (грешка извршавања при провери: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Календар вам се приказује да бисте лако прешли на следећи догађај у Google календару.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Можете да управљате подешавањима из менија картице или да видите још опција у менију Прилагодите Chrome.</translation>
 <translation id="6831043979455480757">Преведи</translation>
 <translation id="6831989891148852199">Немају дозволу да користе сензоре покрета и светлости</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Желите да уклоните картицу и избришете групу?}=1{Желите да уклоните картице и избришете групу?}one{Желите да уклоните картице и избришете групе?}few{Желите да уклоните картице и избришете групе?}other{Желите да уклоните картице и избришете групе?}}</translation>
@@ -7662,7 +7648,6 @@
 <translation id="6912007319859991306">PIN SIM-а за мобилну мрежу</translation>
 <translation id="6912380255120084882">Пробајте са другим уређајем</translation>
 <translation id="691289340230098384">Подешавања титла</translation>
-<translation id="6913051485529944333">Више нећете видети Google календар на овој страници</translation>
 <translation id="6914812290245989348">Не видим никаква упозорења пре одласка на небезбедне сајтове</translation>
 <translation id="6916590542764765824">Управљајте додацима</translation>
 <translation id="6916676294509106572">Outlook календар је скривен</translation>
@@ -7737,7 +7722,6 @@
 <translation id="6978121630131642226">Претраживачи</translation>
 <translation id="6979041727349121225">Уштеда енергије</translation>
 <translation id="6979044105893951891">Покретање и напуштање сесија госта којима се управља</translation>
-<translation id="6979158407327259162">Google диск</translation>
 <translation id="6979440798594660689">Искључен (подразумевано)</translation>
 <translation id="6979557074007409812">Да, не обједињуј моје податке са пословним профилом</translation>
 <translation id="6979737339423435258">Одувек</translation>
@@ -8664,7 +8648,6 @@
 <translation id="7690853182226561458">Додај &amp;директоријум...</translation>
 <translation id="7691077781194517083">Ресетовање овог безбедносног кључа није успело. Грешка <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Користите свакодневни језик да бисте претраживали историју прегледања и проналазили сајтове које сте посетили. Можете и да постављате питања и добијате одговоре на основу историје прегледања</translation>
-<translation id="7694895628076803349">Не приказуј Диск</translation>
 <translation id="7696063401938172191">На телефону „<ph name="PHONE_NAME" />“:</translation>
 <translation id="7697109152153663933">Кликните на Лозинке и аутоматско попуњавање</translation>
 <translation id="769824636077131955">Овај документ је превелик за безбедносну проверу. Можете да штампате документе величине до 50 MB.</translation>
@@ -8814,7 +8797,6 @@
 <translation id="7811263553491007091">Пробајте поново или изаберите неку од претходно генерисаних тема у наставку.</translation>
 <translation id="7811926937048662341">Кликните десним тастером овде и изаберите Прикажи картице вертикално</translation>
 <translation id="7811986034759500329">Подесите у системским подешавањима</translation>
-<translation id="7812170317334653156">Google календар је скривен</translation>
 <translation id="7814458197256864873">&amp;Копирај</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Измените пречицу <ph name="SHORTCUT" /> за: <ph name="EXTENSION_NAME" /></translation>
@@ -9256,7 +9238,6 @@
 <translation id="8146287226035613638">Додајте и рангирајте жељене језике. Веб-сајтови ће се приказивати на жељеним језицима када је то могуће. Ова подешавања се синхронизују са подешавањима прегледача. <ph name="BEGIN_LINK_LEARN_MORE" />Сазнајте више<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Аутоматски шаљите Google-у извештаје о отказивању, као и дијагностику и податке о коришћењу да бисте нам помогли да побољшамо функције и учинак Chrome ОС-а.</translation>
 <translation id="8147900440966275470">Пронађених картица: <ph name="NUM" /></translation>
-<translation id="814870937590541483">Још радњи за фајлове са Google диска</translation>
 <translation id="8148760431881541277">Ограничите пријављивање</translation>
 <translation id="8149596686567059924">Пакет за ажурирање није могао да се отпакује.</translation>
 <translation id="8149870652370242480">Да бисте користили сачуване лозинке на телефону, преузмите Chrome за iOS и пријавите се на Google налог.</translation>

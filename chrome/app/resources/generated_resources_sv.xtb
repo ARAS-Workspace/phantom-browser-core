@@ -408,7 +408,6 @@ Du kan kontrollera dina lösenord när du vill i <ph name="GOOGLE_PASSWORD_MANAG
 <translation id="1293360286536751243"><ph name="MAIN_GESTURE" /> kan krocka med <ph name="CONFLICTING_GESTURE_ONE" />, <ph name="CONFLICTING_GESTURE_TWO" /> och <ph name="CONFLICTING_GESTURE_THREE" />. Välj en annan rörelse om det går.</translation>
 <translation id="1293556467332435079">Filer</translation>
 <translation id="12951065153783848">Din organisation hanterar ditt konto</translation>
-<translation id="1296410481664942178">Visa inte Google Kalender</translation>
 <translation id="1296911687402551044">Fäst vald flik</translation>
 <translation id="1297175357211070620">Destination</translation>
 <translation id="129770436432446029">Skicka feedback om <ph name="EXPERIMENT_NAME" /></translation>
@@ -1156,7 +1155,6 @@ Du kan kontrollera dina lösenord när du vill i <ph name="GOOGLE_PASSWORD_MANAG
 <translation id="1884340228047885921">Den aktuella synlighetsinställningen är Vissa kontakter</translation>
 <translation id="1884705339276589024">Ändra storlek på Linux-disken</translation>
 <translation id="1885066963699478692">XML-filer som används för att ställa in principerna.</translation>
-<translation id="1885089541024391265">Google Kalender</translation>
 <translation id="1885106732301550621">Diskutrymme</translation>
 <translation id="188537499764410817">Webbplatser där Gemini kan logga in dig visas här</translation>
 <translation id="1886996562706621347">Tillåt att webbplatser begär att bli standardhanterare för protokoll (rekommenderas)</translation>
@@ -2068,7 +2066,6 @@ Du kan hantera inställningarna för det här kontot genom att installera Family
 <translation id="2586672484245266891">Ange en kortare webbadress</translation>
 <translation id="2588271083332682494">Få mer ordning med flikgrupper</translation>
 <translation id="2588636910004461974">Enheter från <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Visa aldrig Drive-filer</translation>
 <translation id="2597073208962000830">Med Närdelning används Bluetooth-sökning för att hitta enheter i närheten.</translation>
 <translation id="2598136842498757793">Anpassa knappar i verktygsfältet</translation>
 <translation id="2598710988533271874">Nya Chrome är tillgängligt</translation>
@@ -2415,7 +2412,6 @@ Du kan hantera inställningarna för det här kontot genom att installera Family
 <translation id="2844169650293029770">USB-C-enhet (främre porten på vänster sida)</translation>
 <translation id="2844809857160214557">Visa och hantera utskriftsjobb</translation>
 <translation id="284491292807422921">Vill du ta bort webbplatsen?</translation>
-<translation id="2845276301195220700">Fler åtgärder för Google Kalender</translation>
 <translation id="2845382757467349449">Visa alltid bokmärkesfältet</translation>
 <translation id="284581348330507117">Skapa unika lösenord</translation>
 <translation id="2846345106886298325">Uppgiften har slutförts och returnerats till Gemini Spark</translation>
@@ -3551,7 +3547,6 @@ Du kan hantera inställningarna för det här kontot genom att installera Family
 <translation id="3708295717182051206">Textning</translation>
 <translation id="3708684582558000260">Tillåt inte att stängda webbplatser fortsätter skicka eller ta emot data</translation>
 <translation id="3709244229496787112">Webbläsaren stängdes innan nedladdningen var klar.</translation>
-<translation id="3710438437470197252">Se mer i Google Drive</translation>
 <translation id="3710501561113687889"><ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> delar <ph name="FIELDS_STRING" /> med den här webbplatsen om du fortsätter.</translation>
 <translation id="3711931198657368127">Kli&amp;stra in och besök <ph name="URL" /></translation>
 <translation id="3711945201266135623"><ph name="NUM_PRINTERS" /> skrivare från utskriftsservern hittades</translation>
@@ -4105,10 +4100,6 @@ Du kan hantera inställningarna för det här kontot genom att installera Family
 <translation id="4110485659976215879">Återställ varning</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (offline)</translation>
 <translation id="4113743276555482284">Filens lösenord</translation>
-<translation id="4114524937989710624">Förslag på filer visas så att du enkelt ska kunna fortsätta med det du gjorde senast på Google Drive.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Du kan hantera inställningarna i kortmenyn. Det finns även fler alternativ i Anpassa Chrome.</translation>
 <translation id="4115002065223188701">Nätverket är utanför räckvidden</translation>
 <translation id="4115378294792113321">Magenta</translation>
 <translation id="4116480382905329353">Upptäcktes en gång</translation>
@@ -7185,7 +7176,6 @@ Du kan tilldela flera brytare denna åtgärd.</translation>
 <translation id="6557290421156335491">Mina genvägar</translation>
 <translation id="6558098963164662391">&amp;Ta bort från ordlistan</translation>
 <translation id="6560061709899140565">Visa andra Cast-sessioner</translation>
-<translation id="656065428026159829">Visa fler</translation>
 <translation id="6561877237303825108">Den här filen av typen (<ph name="TYPE" />) kan vara farlig. Spara bara den här filen om du litar på <ph name="ORIGIN" /></translation>
 <translation id="6562117348069327379">Spara systemloggar i katalogen Nedladdningar.</translation>
 <translation id="656293578423618167">För lång sökväg eller för långt filnamn. Spara med ett kortare namn eller på en annan plats.</translation>
@@ -7550,10 +7540,6 @@ Det finns # utsatta lösenord till. Du rekommenderas av Google Lösenordshanteri
 <translation id="6827767090350758381">Äldre versioner av Chrome-appar öppnas inte på Windows-enheter efter december 2022. Kontakta administratören om att uppdatera till en ny version eller ta bort appen.</translation>
 <translation id="6828182567531805778">Ange lösenfrasen för att synkronisera data</translation>
 <translation id="6828860976882136098">Det gick inte att konfigurera automatiska uppdateringar för alla användare (preliminärt körningsfel: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Din kalender visas så att du enkelt kan navigera till din nästa händelse i Google Kalender.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Du kan hantera inställningarna i kortmenyn eller hitta fler alternativ i Anpassa Chrome.</translation>
 <translation id="6831043979455480757">Översätt</translation>
 <translation id="6831989891148852199">Får inte använda rörelse- eller ljussensorer</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Vill du ta bort fliken och radera gruppen?}=1{Vill du ta bort fliken och radera gruppen?}other{Vill du ta bort flikarna och radera grupperna?}}</translation>
@@ -7673,7 +7659,6 @@ Det finns # utsatta lösenord till. Du rekommenderas av Google Lösenordshanteri
 <translation id="6912007319859991306">Pinkod för SIM-kort</translation>
 <translation id="6912380255120084882">Testa med en annan enhet</translation>
 <translation id="691289340230098384">Inställningar för textning</translation>
-<translation id="6913051485529944333">Du kommer inte att se Google Kalender på den här sidan igen</translation>
 <translation id="6914812290245989348">Visa inga varningar innan du besöker osäkra webbplatser</translation>
 <translation id="6916590542764765824">Hantera tillägg</translation>
 <translation id="6916676294509106572">Kalendern i Outlook har dolts</translation>
@@ -7748,7 +7733,6 @@ Det finns # utsatta lösenord till. Du rekommenderas av Google Lösenordshanteri
 <translation id="6978121630131642226">Sökmotorer</translation>
 <translation id="6979041727349121225">Strömsparläge</translation>
 <translation id="6979044105893951891">Starta och avsluta hanterade gästsessioner</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">Ljud av (standard)</translation>
 <translation id="6979557074007409812">Ja, håll min data åtskild från jobbet</translation>
 <translation id="6979737339423435258">Sedan start</translation>
@@ -8675,7 +8659,6 @@ Detta kan omfatta information om installerad mjukvara, filer, webbläsaren, enhe
 <translation id="7690853182226561458">Lägg till &amp;mapp ...</translation>
 <translation id="7691077781194517083">Det går inte att återställa den här säkerhetsnyckeln. Felkod <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Använd vardagligt språk för att söka i webbhistoriken och hitta webbplatser du har besökt. Du kan även ställa frågor och få svar baserat på din webbhistorik</translation>
-<translation id="7694895628076803349">Visa inte Drive</translation>
 <translation id="7696063401938172191">Gör så här på din <ph name="PHONE_NAME" />:</translation>
 <translation id="7697109152153663933">Klicka på Lösenord och Autofyll.</translation>
 <translation id="769824636077131955">Det här dokumentet är så stort att det inte går genom säkerhetskontrollen. Du kan skriva ut dokument som är upp till 50 MB stora.</translation>
@@ -8825,7 +8808,6 @@ Tryck på en brytare eller tangent som redan tilldelats en åtgärd om du vill t
 <translation id="7811263553491007091">Försök igen eller välj ett av de teman som genererats tidigare nedan.</translation>
 <translation id="7811926937048662341">Högerklicka här och välj Visa flikar vertikalt</translation>
 <translation id="7811986034759500329">Ange i systeminställningarna</translation>
-<translation id="7812170317334653156">Google Kalender har dolts</translation>
 <translation id="7814458197256864873">&amp;Kopiera</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Redigera genväg <ph name="SHORTCUT" /> för <ph name="EXTENSION_NAME" /></translation>
@@ -9267,7 +9249,6 @@ Spara nyckelfilen på ett säkert ställe. Den behövs om du ska skapa nya versi
 <translation id="8146287226035613638">Lägg till och rangordna önskade språk. När det är möjligt visas text på webbplatser på de önskade språken. Dessa inställningar synkroniseras med inställningarna för webbläsaren. <ph name="BEGIN_LINK_LEARN_MORE" />Läs mer<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Skicka felrapporter samt diagnostik- och användningsdata automatiskt till Google och hjälp oss att förbättra funktioner och prestanda i Chrome och ChromeOS.</translation>
 <translation id="8147900440966275470"><ph name="NUM" /> flikar hittades</translation>
-<translation id="814870937590541483">Fler åtgärder för Google Drive-filer</translation>
 <translation id="8148760431881541277">Begränsa inloggning</translation>
 <translation id="8149596686567059924">Det gick inte att packa upp uppdateringspaketet.</translation>
 <translation id="8149870652370242480">Om du vill använda sparade lösenord på telefonen laddar du ned Chrome för iOS och loggar in på ditt Google-konto.</translation>

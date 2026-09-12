@@ -4,7 +4,6 @@
 
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
 
-#include "base/command_line.h"
 #include "base/hash/hash.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/strcat.h"
@@ -12,11 +11,9 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/new_tab_page/modules/modules_constants.h"
-#include "chrome/browser/new_tab_page/modules/modules_switches.h"
 #include "chrome/browser/new_tab_page/prefs/ntp_pref_names.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/common/pref_names.h"
 #include "components/ntp_tiles/features.h"
 #include "components/ntp_tiles/pref_names.h"
@@ -27,9 +24,6 @@
 #include "components/search/ntp_features.h"
 #include "components/signin/public/identity_manager/accounts_in_cookie_jar_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/sync/base/user_selectable_type.h"
-#include "components/sync/service/sync_service.h"
-#include "components/sync/service/sync_user_settings.h"
 #include "components/variations/service/variations_service.h"
 
 namespace {
@@ -54,14 +48,6 @@ bool IsOsSupportedForCart() {
 #endif
 }
 
-bool IsOsSupportedForDrive() {
-#if BUILDFLAG(IS_ANDROID)
-  return false;
-#else
-  return true;
-#endif
-}
-
 bool IsInUS() {
   return g_browser_process->GetApplicationLocale() == "en-US" &&
          GetVariationsServiceCountryCode(
@@ -78,62 +64,6 @@ bool IsCartModuleEnabled() {
     return base::FeatureList::IsEnabled(ntp_features::kNtpChromeCartModule);
   }
   return IsOsSupportedForCart() && IsInUS();
-}
-
-bool IsDriveModuleEnabled() {
-  if (base::FeatureList::GetInstance()->IsFeatureOverridden(
-          ntp_features::kNtpDriveModule.name)) {
-    return IsFeatureForceEnabled(ntp_features::kNtpDriveModule);
-  }
-  const bool default_enabled = IsOsSupportedForDrive();
-  LogModuleEnablement(ntp_features::kNtpDriveModule, default_enabled,
-                      "default feature flag value");
-  return default_enabled;
-}
-
-bool IsDriveModuleEnabledForProfile(bool is_managed_profile, Profile* profile) {
-  if (!IsDriveModuleEnabled()) {
-    return false;
-  }
-
-  // Allow loading fake data in test environments.
-  if (!base::GetFieldTrialParamValueByFeature(
-           ntp_features::kNtpDriveModule,
-           ntp_features::kNtpDriveModuleDataParam)
-           .empty() &&
-      base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kSignedOutNtpModulesSwitch)) {
-    return true;
-  }
-
-  if (!IsProfileSignedIn(profile)) {
-    LogModuleEnablement(ntp_features::kNtpDriveModule, false, "not signed in");
-    return false;
-  }
-
-  auto* sync_service = SyncServiceFactory::GetForProfile(profile);
-  if (base::FeatureList::IsEnabled(
-          ntp_features::kNtpDriveModuleHistorySyncRequirement)) {
-    if (!sync_service ||
-        !sync_service->GetUserSettings()->GetSelectedTypes().Has(
-            syncer::UserSelectableType::kHistory)) {
-      LogModuleEnablement(ntp_features::kNtpDriveModule, false,
-                          "no history sync");
-      return false;
-    }
-  } else {
-    if (!sync_service || !sync_service->IsSyncFeatureEnabled()) {
-      LogModuleEnablement(ntp_features::kNtpDriveModule, false, "no sync");
-      return false;
-    }
-  }
-
-  if (!is_managed_profile) {
-    LogModuleEnablement(ntp_features::kNtpDriveModule, false,
-                        "account not managed");
-    return false;
-  }
-  return true;
 }
 
 bool IsEnUSLocaleOnlyFeatureEnabled(const base::Feature& ntp_feature) {
@@ -161,30 +91,6 @@ bool IsFeatureForceEnabled(const base::Feature& feature) {
       feature, force_enabled,
       force_enabled ? "feature flag forced on" : "feature flag forced off");
   return force_enabled;
-}
-
-bool IsGoogleCalendarModuleEnabled(bool is_managed_profile, Profile* profile) {
-  if (!IsProfileSignedIn(profile)) {
-    LogModuleEnablement(ntp_features::kNtpCalendarModule, false,
-                        "not signed in");
-    return false;
-  }
-
-  if (!is_managed_profile) {
-    LogModuleEnablement(ntp_features::kNtpCalendarModule, false,
-                        "account not managed");
-
-    // Override if in test, which must be using a command line override and
-    // fake data.                           }
-    return !base::GetFieldTrialParamValueByFeature(
-                ntp_features::kNtpCalendarModule,
-                ntp_features::kNtpCalendarModuleDataParam)
-                .empty() &&
-           base::CommandLine::ForCurrentProcess()->HasSwitch(
-               switches::kSignedOutNtpModulesSwitch);
-  }
-
-  return IsFeatureEnabled(ntp_features::kNtpCalendarModule);
 }
 
 bool IsMostRelevantTabResumeModuleEnabled(Profile* profile) {

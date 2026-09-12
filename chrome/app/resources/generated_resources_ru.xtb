@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">Назначение жестов "<ph name="MAIN_GESTURE" />", "<ph name="CONFLICTING_GESTURE_ONE" />", "<ph name="CONFLICTING_GESTURE_TWO" />" и "<ph name="CONFLICTING_GESTURE_THREE" />" может совпадать. Советуем выбрать другой жест.</translation>
 <translation id="1293556467332435079">Файлы</translation>
 <translation id="12951065153783848">Вашим аккаунтом управляет организация</translation>
-<translation id="1296410481664942178">Не показывать Google Календарь</translation>
 <translation id="1296911687402551044">Закрепить выбранную вкладку</translation>
 <translation id="1297175357211070620">Принтер</translation>
 <translation id="129770436432446029">Оставить отзыв об эксперименте "<ph name="EXPERIMENT_NAME" />"</translation>
@@ -1146,7 +1145,6 @@
 <translation id="1884340228047885921">Ваше устройство могут обнаруживать некоторые пользователи из списка контактов</translation>
 <translation id="1884705339276589024">Изменение размера диска Linux</translation>
 <translation id="1885066963699478692">XML-файлы, которые используются для настройки правил.</translation>
-<translation id="1885089541024391265">Google Календарь</translation>
 <translation id="1885106732301550621">Место на диске</translation>
 <translation id="188537499764410817">Здесь будут сайты, на которые Gemini может входить за вас.</translation>
 <translation id="1886996562706621347">Разрешить запросы на установку обработчиков протоколов (рекомендуется)</translation>
@@ -2055,7 +2053,6 @@
 <translation id="2586672484245266891">Слишком длинный URL.</translation>
 <translation id="2588271083332682494">Наводите порядок – собирайте вкладки в группы</translation>
 <translation id="2588636910004461974">Устройства от поставщика <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Никогда не показывать файлы Google Диска</translation>
 <translation id="2597073208962000830">Функция "Обмен с окружением" использует сканирование Bluetooth, чтобы находить устройства поблизости.</translation>
 <translation id="2598136842498757793">Настроить кнопки панели инструментов</translation>
 <translation id="2598710988533271874">Доступно обновление Chrome</translation>
@@ -2402,7 +2399,6 @@
 <translation id="2844169650293029770">Устройство USB-C (ближний порт слева)</translation>
 <translation id="2844809857160214557">Просмотр заданий печати и управление ими</translation>
 <translation id="284491292807422921">Удалить сайт?</translation>
-<translation id="2845276301195220700">Другие действия для Google Календаря</translation>
 <translation id="2845382757467349449">Всегда показывать панель закладок</translation>
 <translation id="284581348330507117">Создайте уникальные пароли</translation>
 <translation id="2846345106886298325">Задача выполнена. Вы вернулись в Gemini Spark.</translation>
@@ -3538,7 +3534,6 @@
 <translation id="3708295717182051206">Субтитры</translation>
 <translation id="3708684582558000260">Запретить закрытым сайтам завершать отправку и получение данных</translation>
 <translation id="3709244229496787112">Браузер был закрыт до завершения скачивания.</translation>
-<translation id="3710438437470197252">Посмотреть на Google Диске</translation>
 <translation id="3710501561113687889">Чтобы продолжить, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> передаст этому сайту ваши данные (<ph name="FIELDS_STRING" />).</translation>
 <translation id="3711931198657368127">Вс&amp;тавить и перейти на страницу <ph name="URL" /></translation>
 <translation id="3711945201266135623">Найдено принтеров на сервере печати: <ph name="NUM_PRINTERS" />.</translation>
@@ -4092,10 +4087,6 @@
 <translation id="4110485659976215879">Восстановить предупреждение</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (офлайн)</translation>
 <translation id="4113743276555482284">Пароль файла</translation>
-<translation id="4114524937989710624">Эти рекомендованные файлы помогут вам вернуться к действиям, которые вы недавно выполняли на Google Диске.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Вы можете управлять настройками в меню карточки. Чтобы посмотреть дополнительные параметры, выберите "Настроить Chrome".</translation>
 <translation id="4115002065223188701">Сеть вне зоны доступа</translation>
 <translation id="4115378294792113321">Пурпурный</translation>
 <translation id="4116480382905329353">Распознан 1 раз</translation>
@@ -7171,7 +7162,6 @@
 <translation id="6557290421156335491">Мои ярлыки</translation>
 <translation id="6558098963164662391">&amp;Удалить из словаря</translation>
 <translation id="6560061709899140565">Показать другие сеансы трансляции</translation>
-<translation id="656065428026159829">Ещё</translation>
 <translation id="6561877237303825108">Этот файл с расширением <ph name="TYPE" /> может быть опасен. Не сохраняйте его, если не доверяете источнику "<ph name="ORIGIN" />".</translation>
 <translation id="6562117348069327379">Системные журналы будут сохраняться в каталоге "Скачанные файлы".</translation>
 <translation id="656293578423618167">Слишком длинное название файла или путь к нему. Выберите другое название или каталог.</translation>
@@ -7542,10 +7532,6 @@
 <translation id="6827767090350758381">Старые версии приложений Chrome перестанут работать на устройствах с Windows после декабря 2022 года. Обратитесь к администратору, чтобы удалить или обновить приложение.</translation>
 <translation id="6828182567531805778">Чтобы синхронизировать данные, введите кодовую фразу</translation>
 <translation id="6828860976882136098">Не удалось настроить автоматические обновления для всех пользователей (ошибка <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Мы показываем Google Календарь, чтобы вы могли легко перейти к ближайшему мероприятию.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Вы можете изменить настройки в меню карточки или посмотреть дополнительные параметры на панели "Настроить Chrome".</translation>
 <translation id="6831043979455480757">Перевести</translation>
 <translation id="6831989891148852199">Следующим сайтам запрещено использовать датчики движения и освещенности</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Удалить вкладки и группу?}=1{Удалить вкладку и группу?}one{Удалить вкладки и группы?}few{Удалить вкладки и группы?}many{Удалить вкладки и группы?}other{Удалить вкладки и группы?}}</translation>
@@ -7665,7 +7651,6 @@
 <translation id="6912007319859991306">PIN-код SIM-карты</translation>
 <translation id="6912380255120084882">Используйте другое устройство</translation>
 <translation id="691289340230098384">Настройки субтитров</translation>
-<translation id="6913051485529944333">На этой странице Google Календарь больше не появится.</translation>
 <translation id="6914812290245989348">Не показывать предупреждения о переходе на незащищенные сайты</translation>
 <translation id="6916590542764765824">Управление расширениями</translation>
 <translation id="6916676294509106572">Календарь Outlook скрыт.</translation>
@@ -7740,7 +7725,6 @@
 <translation id="6978121630131642226">Поисковые системы</translation>
 <translation id="6979041727349121225">Режим энергосбережения</translation>
 <translation id="6979044105893951891">Запуск и завершение управляемых гостевых сеансов</translation>
-<translation id="6979158407327259162">Google Диск</translation>
 <translation id="6979440798594660689">Без звука (по умолчанию)</translation>
 <translation id="6979557074007409812">Да, разделить личные и рабочие данные</translation>
 <translation id="6979737339423435258">Все время</translation>
@@ -8666,7 +8650,6 @@
 <translation id="7690853182226561458">Добавить &amp;папку</translation>
 <translation id="7691077781194517083">Не удалось сбросить настройки электронного ключа. Код ошибки: <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Находите посещенные сайты в истории браузера, формулируя запросы простыми словами. Вы также можете задавать вопросы и получать ответы, основанные на этой истории.</translation>
-<translation id="7694895628076803349">Не показывать Google Диск</translation>
 <translation id="7696063401938172191">На устройстве <ph name="PHONE_NAME" />:</translation>
 <translation id="7697109152153663933">Выберите "Пароли и автозаполнение"</translation>
 <translation id="769824636077131955">Этот документ слишком большой для проверки безопасности. Вы можете печатать документы размером не более 50 МБ.</translation>
@@ -8816,7 +8799,6 @@
 <translation id="7811263553491007091">Повторите попытку или выберите одну из созданных ранее тем ниже.</translation>
 <translation id="7811926937048662341">Нажмите здесь правой кнопкой мыши и выберите "Показать вкладки вертикально".</translation>
 <translation id="7811986034759500329">Назначается в системных настройках</translation>
-<translation id="7812170317334653156">Google Календарь скрыт.</translation>
 <translation id="7814458197256864873">&amp;Копировать</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Изменить сочетание клавиш <ph name="SHORTCUT" /> для расширения "<ph name="EXTENSION_NAME" />"</translation>
@@ -9258,7 +9240,6 @@
 <translation id="8146287226035613638">Добавьте и упорядочьте предпочтительные языки. Сайты будут по возможности показываться на них. Эти настройки синхронизированы с настройками браузера. <ph name="BEGIN_LINK_LEARN_MORE" />Подробнее…<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Помогите нам повышать производительность и совершенствовать функции Chrome и ChromeOS, разрешив автоматическую отправку в Google отчетов о сбоях и информации об использовании и диагностике.</translation>
 <translation id="8147900440966275470">Найдена <ph name="NUM" /> вкладка</translation>
-<translation id="814870937590541483">Другие действия с файлами на Google Диске</translation>
 <translation id="8148760431881541277">Ограничение на вход</translation>
 <translation id="8149596686567059924">Не удалось распаковать пакет обновления.</translation>
 <translation id="8149870652370242480">Чтобы использовать сохраненные пароли на телефоне, скачайте Chrome для iOS и войдите в свой аккаунт Google.</translation>

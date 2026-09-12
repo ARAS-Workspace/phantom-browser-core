@@ -9,6 +9,7 @@
 #include <string>
 
 #include "base/memory/raw_ptr.h"
+#include "base/time/time.h"
 #include "chrome/browser/new_tab_page/microsoft_auth/microsoft_auth_service.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar.mojom.h"
 #include "chrome/browser/profiles/profile.h"
@@ -45,6 +46,8 @@ enum class OutlookCalendarRequestResult {
 class OutlookCalendarPageHandler
     : public ntp::calendar::mojom::OutlookCalendarPageHandler {
  public:
+  static const base::TimeDelta kDismissDuration;
+
   explicit OutlookCalendarPageHandler(
       mojo::PendingReceiver<ntp::calendar::mojom::OutlookCalendarPageHandler>
           handler,

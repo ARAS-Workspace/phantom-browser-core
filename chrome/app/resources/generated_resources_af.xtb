@@ -408,7 +408,6 @@ Gaan jou wagwoorde enige tyd na in <ph name="GOOGLE_PASSWORD_MANAGER" />.</trans
 <translation id="1293360286536751243">“<ph name="MAIN_GESTURE" />” kan oorvleuel met “<ph name="CONFLICTING_GESTURE_ONE" />”, “<ph name="CONFLICTING_GESTURE_TWO" />” en “<ph name="CONFLICTING_GESTURE_THREE" />”. Probeer ’n ander gebaar kies, indien moontlik.</translation>
 <translation id="1293556467332435079">Lêers</translation>
 <translation id="12951065153783848">Jou organisasie bestuur jou rekening</translation>
-<translation id="1296410481664942178">Moenie Google Kalender wys nie</translation>
 <translation id="1296911687402551044">Speld geselekteerde oortjie vas</translation>
 <translation id="1297175357211070620">Bestemming</translation>
 <translation id="129770436432446029">Stuur terugvoer vir <ph name="EXPERIMENT_NAME" /></translation>
@@ -1156,7 +1155,6 @@ Gaan jou wagwoorde enige tyd na in <ph name="GOOGLE_PASSWORD_MANAGER" />.</trans
 <translation id="1884340228047885921">Huidige sigbaarheidinstelling is sommige kontakte</translation>
 <translation id="1884705339276589024">Verander grootte van Linux-skyf</translation>
 <translation id="1885066963699478692">XML-lêers wat gebruik word om die beleide te stel.</translation>
-<translation id="1885089541024391265">Google Kalender</translation>
 <translation id="1885106732301550621">Skyfspasie</translation>
 <translation id="188537499764410817">Werwe waar Gemini jou kan aanmeld, sal hier verskyn</translation>
 <translation id="1886996562706621347">Laat werwe toe om te vra om verstekhanteerders vir protokolle te word (aanbeveel)</translation>
@@ -2068,7 +2066,6 @@ Jy kan hierdie rekening se instellings bestuur deur die Family Link-app op jou t
 <translation id="2586672484245266891">Voer asseblief 'n korter URL in</translation>
 <translation id="2588271083332682494">Hou alles georganiseerd met oortjiegroepe</translation>
 <translation id="2588636910004461974">Toestelle van <ph name="VENDOR_NAME" /> af</translation>
-<translation id="2589658397149952302">Moet nooit Drive-lêers wys nie</translation>
 <translation id="2597073208962000830">Nabydeling gebruik Bluetooth-skandering om toestelle in die omtrek te soek.</translation>
 <translation id="2598136842498757793">Pasmaak nutsbalkknoppies</translation>
 <translation id="2598710988533271874">Nuwe Chrome is beskikbaar</translation>
@@ -2415,7 +2412,6 @@ Jy kan hierdie rekening se instellings bestuur deur die Family Link-app op jou t
 <translation id="2844169650293029770">USB C-toestel (voorste poort aan linkerkant)</translation>
 <translation id="2844809857160214557">Bekyk en bestuur druktake</translation>
 <translation id="284491292807422921">Verwyder werf?</translation>
-<translation id="2845276301195220700">Meer handelinge vir Google Kalender</translation>
 <translation id="2845382757467349449">Wys altyd die boekmerkebalk</translation>
 <translation id="284581348330507117">Skep unieke wagwoorde</translation>
 <translation id="2846345106886298325">Taak is gedoen en teruggegee aan Gemini Spark</translation>
@@ -3551,7 +3547,6 @@ Jy kan hierdie rekening se instellings bestuur deur die Family Link-app op jou t
 <translation id="3708295717182051206">Onderskrifte</translation>
 <translation id="3708684582558000260">Moenie geslote werwe toelaat om data klaar te stuur of te ontvang nie</translation>
 <translation id="3709244229496787112">Die blaaier is toegemaak voor die aflaai voltooi is.</translation>
-<translation id="3710438437470197252">Sien meer in Google Drive</translation>
 <translation id="3710501561113687889">Om voort te gaan, sal <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> jou <ph name="FIELDS_STRING" /> met hierdie werf deel.</translation>
 <translation id="3711931198657368127">Plak en gaan na <ph name="URL" /></translation>
 <translation id="3711945201266135623">Het <ph name="NUM_PRINTERS" /> drukkers op die drukbediener gekry</translation>
@@ -4105,10 +4100,6 @@ Jy kan hierdie rekening se instellings bestuur deur die Family Link-app op jou t
 <translation id="4110485659976215879">Laai waarskuwing terug</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (vanlyn)</translation>
 <translation id="4113743276555482284">Lêerwagwoord</translation>
-<translation id="4114524937989710624">Jy sien tans voorgestelde lêers om jou te help om maklik terug te kom by jou mees onlangse aktiwiteit in Google Drive.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Jy kan instellings deur die kaartkieslys bestuur, of meer opsies sien in Pasmaak Chrome.</translation>
 <translation id="4115002065223188701">Netwerk buite reikwydte</translation>
 <translation id="4115378294792113321">Magenta</translation>
 <translation id="4116480382905329353">1 keer bespeur</translation>
@@ -7186,7 +7177,6 @@ Maak seker jy wys nie enige sensitiewe inligting nie.</translation>
 <translation id="6557290421156335491">My kortpaaie</translation>
 <translation id="6558098963164662391">Verwyder uit woordeboek</translation>
 <translation id="6560061709899140565">Wys ander uitsaaisessies</translation>
-<translation id="656065428026159829">Sien meer</translation>
 <translation id="6561877237303825108">Hierdie lêertipe (<ph name="TYPE" />) kan gevaarlik wees. Stoor hierdie lêer net as jy <ph name="ORIGIN" /> vertrou</translation>
 <translation id="6562117348069327379">Berg stelselloglêers in die Aflaaie-gids.</translation>
 <translation id="656293578423618167">Die lêerpad of -naam is te lank. Stoor asseblief met 'n korter naam of na 'n ander ligging.</translation>
@@ -7551,10 +7541,6 @@ Jy het nog # gekompromitteerde wagwoorde. Google Wagwoordbestuurder beveel aan d
 <translation id="6827767090350758381">Ouer weergawes van Chrome-apps sal nie ná Desember 2022 op Windows-toestelle oopmaak nie. Kontak jou admin om na ’n nuwe weergawe toe op te dateer of hierdie app te verwyder.</translation>
 <translation id="6828182567531805778">Voer jou wagfrase in om jou data te sinkroniseer</translation>
 <translation id="6828860976882136098">Kon nie outomatiese opdaterings vir alle gebruikers opstel nie (kontroleringuitvoeringfout: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Jy sien jou kalender om jou te help om maklik na jou volgende geleentheid in Google Kalender te navigeer.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Jy kan instellings van die kaartkieslys af bestuur of jy kan meer opsies in Pasmaak Chrome sien.</translation>
 <translation id="6831043979455480757">Vertaal</translation>
 <translation id="6831989891148852199">Mag nie beweging- of ligsensors gebruik nie</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Verwyder oortjie en vee groep uit?}=1{Verwyder oortjies en vee groep uit?}other{Verwyder oortjies en vee groepe uit?}}</translation>
@@ -7674,7 +7660,6 @@ Jy het nog # gekompromitteerde wagwoorde. Google Wagwoordbestuurder beveel aan d
 <translation id="6912007319859991306">Sellulêre SIM-PIN</translation>
 <translation id="6912380255120084882">Probeer ’n ander toestel</translation>
 <translation id="691289340230098384">Onderskrifvoorkeure</translation>
-<translation id="6913051485529944333">Jy sal nie weer Google Kalender op hierdie bladsy sien nie</translation>
 <translation id="6914812290245989348">Moenie enige waarskuwings wys voordat daar na onveilige werwe gegaan word nie</translation>
 <translation id="6916590542764765824">Bestuur uitbreidings</translation>
 <translation id="6916676294509106572">Outlook Kalender is versteek</translation>
@@ -7749,7 +7734,6 @@ Jy het nog # gekompromitteerde wagwoorde. Google Wagwoordbestuurder beveel aan d
 <translation id="6978121630131642226">Soekenjins</translation>
 <translation id="6979041727349121225">Energiebespaarder</translation>
 <translation id="6979044105893951891">Begin en verlaat bestuurde gastesessies</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">Demp (verstek)</translation>
 <translation id="6979557074007409812">Ja, hou my data afsonderlik van werk</translation>
 <translation id="6979737339423435258">Van die begin af</translation>
@@ -8675,7 +8659,6 @@ Dit kan inligting oor geïnstalleerde sagteware, lêers, jou blaaier, die toeste
 <translation id="7690853182226561458">Voeg vouer by …</translation>
 <translation id="7691077781194517083">Kan nie hierdie sekuriteitsleutel terugstel nie. Fout <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Gebruik alledaagse taal om jou blaaigeskiedenis te deursoek en die werwe wat jy besoek het, te kry. Jy kan ook vrae vra en antwoorde kry op grond van jou blaaigeskiedenis</translation>
-<translation id="7694895628076803349">Moenie Drive wys nie</translation>
 <translation id="7696063401938172191">Op jou "<ph name="PHONE_NAME" />":</translation>
 <translation id="7697109152153663933">Klik op “Wagwoorde en outovul”</translation>
 <translation id="769824636077131955">Hierdie dokument is te groot vir 'n sekuriteitkontrole. Jy kan dokumente van tot 50 MB druk.</translation>
@@ -8825,7 +8808,6 @@ Druk 'n toegewese skakelaar of sleutel om toewysing te verwyder.</translation>
 <translation id="7811263553491007091">Probeer weer of kies uit een van die voorheen gegenereerde temas hier onder.</translation>
 <translation id="7811926937048662341">Regsklik hier en kies “Wys oortjies vertikaal”</translation>
 <translation id="7811986034759500329">Stel in stelselinstellings</translation>
-<translation id="7812170317334653156">Google Kalender is versteek</translation>
 <translation id="7814458197256864873">Kopieer</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Wysig kortpad <ph name="SHORTCUT" /> vir <ph name="EXTENSION_NAME" /></translation>
@@ -9267,7 +9249,6 @@ Hou jou sleutellêer op 'n veilige plek. Jy gaan dit nodig hê om nuwe weergawes
 <translation id="8146287226035613638">Voeg jou voorkeurtale by en gradeer hulle. Webwerwe sal indien moontlik in jou voorkeurtale gewys word. Hierdie voorkeure word met jou blaaierinstellings gesinkroniseer. <ph name="BEGIN_LINK_LEARN_MORE" />Kom meer te wete<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Help om Chrome- en Chrome-bedryfstelsel se kenmerke en werkverrigting beter te maak deur outomaties omvalverslae en diagnostiese en gebruiksdata na Google toe te stuur.</translation>
 <translation id="8147900440966275470">Het <ph name="NUM" /> oortjie gekry</translation>
-<translation id="814870937590541483">Nog handelinge vir Google Drive-lêers</translation>
 <translation id="8148760431881541277">Beperk aanmelding</translation>
 <translation id="8149596686567059924">Die opdateringspakket kon nie uitgepak word nie.</translation>
 <translation id="8149870652370242480">Laai Chrome vir iOS af en meld by jou Google-rekening aan om jou gestoorde wagwoorde op jou foon te gebruik.</translation>

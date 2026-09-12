@@ -2930,7 +2930,6 @@ source_set("browser") {
       "//chrome/common/extensions/api",
       "//components/drive",
       "//extensions/common:mojom",
-      "//google_apis/calendar",
       "//google_apis/common",
       "//google_apis/drive",
     ]

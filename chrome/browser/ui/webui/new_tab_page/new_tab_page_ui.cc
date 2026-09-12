@@ -31,12 +31,9 @@
 #include "chrome/browser/contextual_search/contextual_search_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/new_tab_page/feature_promo_helper/new_tab_page_feature_promo_helper.h"
-#include "chrome/browser/new_tab_page/modules/file_suggestion/drive_service.h"
-#include "chrome/browser/new_tab_page/modules/file_suggestion/drive_suggestion_handler.h"
 #include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/new_tab_page_modules.h"
 #include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth_page_handler.h"
-#include "chrome/browser/new_tab_page/modules/v2/calendar/google_calendar_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups_page_handler.h"
@@ -499,20 +496,8 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(
       {"modulesTasksInfo", IDS_NTP_MODULES_TASKS_INFO},
       {"modulesDisableToastMessage",
        IDS_NTP_MODULES_HISTORY_CLUSTERS_DISABLE_TOAST_MESSAGE},
-      {"modulesDriveDisableButtonText",
-       IDS_NTP_MODULES_DRIVE_DISABLE_BUTTON_TEXT},
-      {"modulesDriveDisableButtonTextV2",
-       IDS_NTP_MODULES_DRIVE_DISABLE_BUTTON_TEXT_V2},
-      {"modulesDriveMoreActionsButtonText",
-       IDS_NTP_MODULES_DRIVE_MORE_ACTIONS_BUTTON_TEXT},
-      {"modulesDriveSentence", IDS_NTP_MODULES_DRIVE_NAME},
       {"modulesFilesSentence", IDS_NTP_MODULES_FILES_SENTENCE},
       {"modulesDummyLower", IDS_NTP_MODULES_DUMMY_LOWER},
-      {"modulesDriveTitle", IDS_NTP_MODULES_DRIVE_NAME},
-      {"modulesDriveTitleV2", IDS_NTP_MODULES_DRIVE_NAME},
-      {"modulesDriveInfo", IDS_NTP_MODULES_DRIVE_INFO},
-      {"modulesDriveSeeMore", IDS_NTP_MODULES_DRIVE_SEE_MORE},
-      {"modulesDriveSeeMoreAcc", IDS_NTP_MODULES_DRIVE_SEE_MORE_ACCNAME},
       {"modulesMicrosoftFilesInfo", IDS_NTP_MODULES_MICROSOFT_FILES_INFO},
       {"modulesMicrosoftFilesName", IDS_NTP_MODULES_MICROSOFT_FILES_NAME},
       {"modulesMicrosoftFilesDisableButtonText",
@@ -522,16 +507,6 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(
        IDS_NTP_MODULES_DISMISS_FOR_HOURS_BUTTON_TEXT},
       {"modulesDismissForDaysButtonText",
        IDS_NTP_MODULES_DISMISS_FOR_DAYS_BUTTON_TEXT},
-      {"modulesGoogleCalendarDismissToastMessage",
-       IDS_NTP_MODULES_GOOGLE_CALENDAR_DISMISS_TOAST_MESSAGE},
-      {"modulesGoogleCalendarDisableToastMessage",
-       IDS_NTP_MODULES_GOOGLE_CALENDAR_DISABLE_TOAST_MESSAGE},
-      {"moduleGoogleCalendarInfo", IDS_NTP_MODULES_GOOGLE_CALENDAR_INFO},
-      {"modulesGoogleCalendarMoreActions",
-       IDS_NTP_MODULES_GOOGLE_CALENDAR_MORE_ACTIONS},
-      {"modulesGoogleCalendarTitle", IDS_NTP_MODULES_GOOGLE_CALENDAR_TITLE},
-      {"modulesGoogleCalendarDisableButtonText",
-       IDS_NTP_MODULES_GOOGLE_CALENDAR_DISABLE_BUTTON_TEXT},
       {"modulesMicrosoftSignOutButtonText",
        IDS_NTP_MODULES_MICROSOFT_SIGN_OUT_BUTTON_TEXT},
       {"modulesOutlookCalendarTitle", IDS_NTP_MODULES_OUTLOOK_CALENDAR_TITLE},
@@ -652,17 +627,14 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(
       "hideDismissModules",
       base::FeatureList::IsEnabled(
           ntp_features::kNtpFeatureOptimizationDismissModulesRemoval));
-  source->AddBoolean(
-      "showDriveModuleSeeMoreLink",
-      base::FeatureList::IsEnabled(ntp_features::kNtpDriveModuleLink));
 
   source->AddString(
       "calendarModuleDismissHours",
       base::NumberToString(
-          ntp_features::kNtpCalendarModuleWindowEndDeltaParam.Get().InHours()));
-  source->AddString(
-      "fileSuggestionDismissHours",
-      base::NumberToString(DriveService::kDismissDuration.InHours()));
+          OutlookCalendarPageHandler::kDismissDuration.InHours()));
+  source->AddString("fileSuggestionDismissHours",
+                    base::NumberToString(
+                        MicrosoftFilesPageHandler::kDismissDuration.InHours()));
   source->AddString(
       "tabGroupsModuleDismissHours",
       base::NumberToString(
@@ -1121,13 +1093,6 @@ void NewTabPageUI::BindInterface(
   most_visited_page_factory_receiver_.Bind(std::move(pending_receiver));
 }
 
-void NewTabPageUI::BindInterface(
-    mojo::PendingReceiver<file_suggestion::mojom::DriveSuggestionHandler>
-        pending_receiver) {
-  drive_handler_ = std::make_unique<DriveSuggestionHandler>(
-      std::move(pending_receiver), profile_);
-}
-
 #if !defined(OFFICIAL_BUILD)
 void NewTabPageUI::BindInterface(
     mojo::PendingReceiver<foo::mojom::FooHandler> pending_page_handler) {
@@ -1148,13 +1113,6 @@ void NewTabPageUI::BindInterface(
   most_relevant_tab_resumption_handler_ =
       std::make_unique<MostRelevantTabResumptionPageHandler>(
           std::move(pending_page_handler), web_contents());
-}
-
-void NewTabPageUI::BindInterface(
-    mojo::PendingReceiver<ntp::calendar::mojom::GoogleCalendarPageHandler>
-        pending_page_handler) {
-  google_calendar_handler_ = std::make_unique<GoogleCalendarPageHandler>(
-      std::move(pending_page_handler), profile_);
 }
 
 void NewTabPageUI::BindInterface(

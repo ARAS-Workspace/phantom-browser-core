@@ -20,7 +20,6 @@
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_test_util.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
-#include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/testing_profile.h"
@@ -28,7 +27,6 @@
 #include "components/search/ntp_features.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
-#include "components/sync/test/test_sync_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/test/browser_task_environment.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
@@ -37,22 +35,12 @@
 
 namespace {
 
-std::unique_ptr<KeyedService> CreateTestSyncService(
-    content::BrowserContext* context) {
-  auto sync_service = std::make_unique<syncer::TestSyncService>();
-  sync_service->SetLocalSyncEnabled(true);
-  return sync_service;
-}
-
 std::unique_ptr<TestingProfile> MakeTestingProfile(
     network::TestURLLoaderFactory& url_loader_factory) {
   TestingProfile::Builder profile_builder;
   profile_builder.SetSharedURLLoaderFactory(
       base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
           &url_loader_factory));
-  profile_builder.AddTestingFactory(
-      SyncServiceFactory::GetInstance(),
-      base::BindRepeating(&CreateTestSyncService));
   profile_builder.AddTestingFactory(
       ChromeSigninClientFactory::GetInstance(),
       base::BindRepeating(&BuildChromeSigninClientWithURLLoader,
@@ -64,8 +52,8 @@ std::unique_ptr<TestingProfile> MakeTestingProfile(
 const char kSampleUserEmail[] = "user@gmail.com";
 const std::vector<ntp::ModuleIdDetail>& GetSampleModules() {
   static const base::NoDestructor<std::vector<ntp::ModuleIdDetail>> modules(
-      std::vector<ntp::ModuleIdDetail>{
-          {ntp_modules::kDriveModuleId, IDS_NTP_MODULES_DRIVE_NAME}});
+      std::vector<ntp::ModuleIdDetail>{{ntp_modules::kMicrosoftFilesModuleId,
+                                        IDS_NTP_MODULES_MICROSOFT_FILES_NAME}});
   return *modules;
 }
 
@@ -148,55 +136,6 @@ TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_OnlyPopulatesEnabledModules) {
                                  /*profile=*/&profile());
     ASSERT_EQ(1u, module_id_details.size());
   }
-}
-
-TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_WithDriveModule) {
-  base::test::ScopedFeatureList features;
-  const std::vector<base::test::FeatureRef>& enabled_features = {
-      ntp_features::kNtpDriveModule};
-  features.InitWithFeatures(
-      /*enabled_features=*/enabled_features,
-      /*disabled_features=*/ntp::ComputeDisabledFeaturesList(
-          ntp::kAllModuleFeatures, enabled_features));
-  identity_test_env().SetCookieAccounts(
-      {{kSampleUserEmail, signin::GetTestGaiaIdForEmail(kSampleUserEmail)}});
-
-  const std::vector<ntp::ModuleIdDetail> module_id_details =
-      ntp::MakeModuleIdDetails(/*is_managed_profile=*/true,
-                               /*profile=*/&profile());
-  ASSERT_EQ(1u, module_id_details.size());
-}
-
-TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_Managed) {
-  base::test::ScopedFeatureList features;
-  const std::vector<base::test::FeatureRef>& enabled_features = {
-      ntp_features::kNtpCalendarModule};
-  features.InitWithFeatures(
-      /*enabled_features=*/enabled_features,
-      /*disabled_features=*/ntp::ComputeDisabledFeaturesList(
-          ntp::kAllModuleFeatures, enabled_features));
-  identity_test_env().SetCookieAccounts(
-      {{kSampleUserEmail, signin::GetTestGaiaIdForEmail(kSampleUserEmail)}});
-
-  const std::vector<ntp::ModuleIdDetail> module_id_details =
-      ntp::MakeModuleIdDetails(/*is_managed_profile=*/true,
-                               /*profile=*/&profile());
-  ASSERT_EQ(1u, module_id_details.size());
-}
-
-TEST_F(NewTabPageModulesTest, MakeModuleIdDetails_NotManaged) {
-  base::test::ScopedFeatureList features;
-  const std::vector<base::test::FeatureRef>& enabled_features = {
-      ntp_features::kNtpCalendarModule};
-  features.InitWithFeatures(
-      /*enabled_features=*/enabled_features,
-      /*disabled_features=*/ntp::ComputeDisabledFeaturesList(
-          ntp::kAllModuleFeatures, enabled_features));
-
-  const std::vector<ntp::ModuleIdDetail> module_id_details =
-      ntp::MakeModuleIdDetails(/*is_managed_profile=*/false,
-                               /*profile=*/&profile());
-  ASSERT_EQ(0u, module_id_details.size());
 }
 
 #if !defined(OFFICIAL_BUILD)

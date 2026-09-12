@@ -82,14 +82,6 @@ BASE_FEATURE(kNtpAlphaBackgroundCollections, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kNtpBackgroundImageErrorDetection,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// If enabled, calendar module will be shown.
-BASE_FEATURE(kNtpCalendarModule,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 // If enabled, chrome cart module will be shown.
 BASE_FEATURE(kNtpChromeCartModule,
 #if BUILDFLAG(IS_ANDROID)
@@ -115,26 +107,6 @@ BASE_FEATURE(kNtpDisableBrowserInitiatedLinks,
 // This is a development switch. Keep indefinitely.
 BASE_FEATURE(kNtpDummyModules, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
-
-// If enabled, Google Drive module will be shown.
-// This is a kill switch. Keep indefinitely.
-BASE_FEATURE(kNtpDriveModule,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
-// If enabled, the NTP Drive module does not require sync.
-BASE_FEATURE(kNtpDriveModuleHistorySyncRequirement,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, the NTP Drive Module will link to the Drive page.
-BASE_FEATURE(kNtpDriveModuleLink, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, segmentation data will be collected to decide whether or not to
-// show the Drive module.
-BASE_FEATURE(kNtpDriveModuleSegmentation, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // If enabled, branded NTPs use the 2026 version of the Google logo.
 BASE_FEATURE(kNtpGoogleLogo26, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -362,7 +334,6 @@ const char kNtpModulesLoadedWithOtherModulesMaxInstanceCountParam[] =
     "NtpModulesLoadedWithOtherModulesMaxInstanceCountParam";
 const char kNtpModulesMaxColumnCountParam[] = "NtpModulesMaxColumnCountParam";
 const char kNtpModulesOrderParam[] = "NtpModulesOrderParam";
-const char kNtpCalendarModuleDataParam[] = "NtpCalendarModuleDataParam";
 const char kNtpChromeCartModuleDataParam[] = "NtpChromeCartModuleDataParam";
 const char kNtpChromeCartModuleAbandonedCartDiscountParam[] =
     "NtpChromeCartModuleAbandonedCartDiscountParam";
@@ -371,13 +342,6 @@ const char kNtpChromeCartModuleAbandonedCartDiscountUseUtmParam[] =
 const char kNtpChromeCartModuleHeuristicsImprovementParam[] =
     "NtpChromeCartModuleHeuristicsImprovementParam";
 const char kNtpChromeCartModuleCouponParam[] = "NtpChromeCartModuleCouponParam";
-const char kNtpDriveModuleDataParam[] = "NtpDriveModuleDataParam";
-const char kNtpDriveModuleManagedUsersOnlyParam[] =
-    "NtpDriveModuleManagedUsersOnlyParam";
-const char kNtpDriveModuleCacheMaxAgeSParam[] =
-    "NtpDriveModuleCacheMaxAgeSParam";
-const char kNtpDriveModuleExperimentGroupParam[] =
-    "NtpDriveModuleExperimentGroupParam";
 const char kNtpOutlookCalendarModuleDataParam[] =
     "NtpOutlookCalendarModuleDataParam";
 const char kNtpMiddleSlotPromoDismissalParam[] =
@@ -455,23 +419,6 @@ const base::FeatureParam<int> kNtpCustomizeChromeAutoShownSessionMaxCount(
     "max_customize_chrome_auto_shown_session_count",
     1);
 
-const base::FeatureParam<std::string> kNtpCalendarModuleExperimentParam(
-    &ntp_features::kNtpCalendarModule,
-    "NtpCalendarModuleMaxExperimentParam",
-    "ntp-calendar");
-const base::FeatureParam<int> kNtpCalendarModuleMaxEventsParam(
-    &ntp_features::kNtpCalendarModule,
-    "NtpCalendarModuleMaxEventsParam",
-    5);
-const base::FeatureParam<base::TimeDelta> kNtpCalendarModuleWindowEndDeltaParam(
-    &ntp_features::kNtpCalendarModule,
-    "NtpCalendarModuleWindowEndDeltaParam",
-    base::Hours(12));
-const base::FeatureParam<base::TimeDelta>
-    kNtpCalendarModuleWindowStartDeltaParam(
-        &ntp_features::kNtpCalendarModule,
-        "NtpCalendarModuleWindowStartDeltaParam",
-        base::Minutes(-15));
 const base::FeatureParam<bool> kNtpOutlookCalendarModuleAttachmentCheckParam(
     &ntp_features::kNtpOutlookCalendarModule,
     "NtpOutlookCalendarModuleAttachmentCheckParam",

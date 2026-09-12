@@ -185,6 +185,10 @@ void RecordThrottlingWaitTime(base::TimeDelta seconds) {
 }  // namespace
 
 // static
+const base::TimeDelta OutlookCalendarPageHandler::kDismissDuration =
+    base::Hours(12);
+
+// static
 void OutlookCalendarPageHandler::RegisterProfilePrefs(
     PrefRegistrySimple* registry) {
   registry->RegisterTimePref(prefs::kNtpOutlookCalendarRetryAfterTime,
@@ -214,7 +218,7 @@ void OutlookCalendarPageHandler::GetEvents(GetEventsCallback callback) {
   base::Time last_dismissed_time =
       pref_service_->GetTime(prefs::kNtpOutlookCalendarLastDismissedTime);
   if (last_dismissed_time != base::Time() &&
-      base::Time::Now() - last_dismissed_time < base::Hours(12)) {
+      base::Time::Now() - last_dismissed_time < kDismissDuration) {
     std::move(callback).Run(
         std::vector<ntp::calendar::mojom::CalendarEventPtr>());
     return;
@@ -225,7 +229,6 @@ void OutlookCalendarPageHandler::GetEvents(GetEventsCallback callback) {
   if (!fake_data_param.empty()) {
     bool has_attachments_enabled = fake_data_param == "fake-attachments";
     std::move(callback).Run(calendar::calendar_fake_data_helper::GetFakeEvents(
-        calendar::calendar_fake_data_helper::CalendarType::OUTLOOK_CALENDAR,
         has_attachments_enabled));
   } else {
     MakeRequest(std::move(callback));

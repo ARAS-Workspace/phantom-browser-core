@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">“<ph name="MAIN_GESTURE" />”可能与“<ph name="CONFLICTING_GESTURE_ONE" />”“<ph name="CONFLICTING_GESTURE_TWO" />”和“<ph name="CONFLICTING_GESTURE_THREE" />”有相似之处。如果可能，请尝试选择其他手势。</translation>
 <translation id="1293556467332435079">文件</translation>
 <translation id="12951065153783848">您的组织负责管理您的账号</translation>
-<translation id="1296410481664942178">不显示 Google 日历</translation>
 <translation id="1296911687402551044">固定所选标签页</translation>
 <translation id="1297175357211070620">目标打印机</translation>
 <translation id="129770436432446029">针对实验“<ph name="EXPERIMENT_NAME" />”发送反馈</translation>
@@ -1146,7 +1145,6 @@
 <translation id="1884340228047885921">当前的公开范围设置是“部分联系人”</translation>
 <translation id="1884705339276589024">调整 Linux 磁盘大小</translation>
 <translation id="1885066963699478692">正被用来设置政策的 XML 文件。</translation>
-<translation id="1885089541024391265">Google 日历</translation>
 <translation id="1885106732301550621">磁盘空间</translation>
 <translation id="188537499764410817">Gemini 可以为您自动登录的网站将显示在此处</translation>
 <translation id="1886996562706621347">允许网站要求成为协议的默认处理程序（推荐）</translation>
@@ -2055,7 +2053,6 @@
 <translation id="2586672484245266891">请输入一个较短的网址</translation>
 <translation id="2588271083332682494">使用标签页分组整理标签页</translation>
 <translation id="2588636910004461974">来自<ph name="VENDOR_NAME" />的设备</translation>
-<translation id="2589658397149952302">一律不显示云端硬盘文件</translation>
 <translation id="2597073208962000830">附近分享功能使用蓝牙扫描寻找附近的设备。</translation>
 <translation id="2598136842498757793">自定义工具栏按钮</translation>
 <translation id="2598710988533271874">有新版 Chrome 可用</translation>
@@ -2402,7 +2399,6 @@
 <translation id="2844169650293029770">USB-C 设备（左侧前端端口）</translation>
 <translation id="2844809857160214557">查看和管理打印任务</translation>
 <translation id="284491292807422921">移除网站？</translation>
-<translation id="2845276301195220700">可对 Google 日历执行的更多操作</translation>
 <translation id="2845382757467349449">总是显示书签栏</translation>
 <translation id="284581348330507117">创建互不重复的密码</translation>
 <translation id="2846345106886298325">任务已完成，并已返回 Gemini Spark</translation>
@@ -3536,7 +3532,6 @@
 <translation id="3708295717182051206">字幕</translation>
 <translation id="3708684582558000260">不允许已关闭的网站完成数据收发操作</translation>
 <translation id="3709244229496787112">浏览器已在下载完成前关闭。</translation>
-<translation id="3710438437470197252">在 Google 云端硬盘中查看更多信息</translation>
 <translation id="3710501561113687889">如果您继续操作，<ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> 会将您的<ph name="FIELDS_STRING" />分享给此网站。</translation>
 <translation id="3711931198657368127">粘贴并转到 <ph name="URL" /></translation>
 <translation id="3711945201266135623">通过打印服务器找到了 <ph name="NUM_PRINTERS" /> 台打印机</translation>
@@ -4089,10 +4084,6 @@
 <translation id="4110485659976215879">恢复警告</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" />（离线）</translation>
 <translation id="4113743276555482284">文件密码</translation>
-<translation id="4114524937989710624">系统会显示推荐的文件，方便您回到最近在 Google 云端硬盘中进行的活动。
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        您可以从卡片菜单中管理设置，或者在“自定义 Chrome”中查看更多选项。</translation>
 <translation id="4115002065223188701">检测不到网络</translation>
 <translation id="4115378294792113321">洋红色</translation>
 <translation id="4116480382905329353">检测到 1 次</translation>
@@ -7164,7 +7155,6 @@
 <translation id="6557290421156335491">我的快捷方式</translation>
 <translation id="6558098963164662391">从字典中移除(&amp;R)</translation>
 <translation id="6560061709899140565">显示其他投屏会话</translation>
-<translation id="656065428026159829">查看更多</translation>
 <translation id="6561877237303825108">此文件类型 (<ph name="TYPE" />) 可能存在危险。请仅在您信任 <ph name="ORIGIN" /> 的情况下保存此文件</translation>
 <translation id="6562117348069327379">将系统日志存储到“下载内容”目录中。</translation>
 <translation id="656293578423618167">该文件的路径或名称过长。请以较短的名称保存或保存到其他位置。</translation>
@@ -7529,10 +7519,6 @@
 <translation id="6827767090350758381">2022 年 12 月之后，旧版 Chrome 应用将无法在 Windows 设备上开启。请联系您的管理员以更新到新版本或移除此应用。</translation>
 <translation id="6828182567531805778">输入密码以同步您的数据</translation>
 <translation id="6828860976882136098">未能按您的要求为所有用户设置自动更新（执行预定流程时出错：<ph name="ERROR_NUMBER" />）</translation>
-<translation id="6830787477693252535">通过卡片中的日历可轻松找到 Google 日历中的下一个活动。
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        您可在卡片菜单中管理设置，或在“自定义 Chrome”部分查看更多选项。</translation>
 <translation id="6831043979455480757">翻译</translation>
 <translation id="6831989891148852199">不允许使用移动传感器或光传感器</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{要移除该标签页并删除该分组吗？}=1{要移除这些标签页并删除该分组吗？}other{要移除这些标签页并删除这些分组吗？}}</translation>
@@ -7652,7 +7638,6 @@
 <translation id="6912007319859991306">移动网络 SIM 卡 PIN 码</translation>
 <translation id="6912380255120084882">尝试改用其他设备</translation>
 <translation id="691289340230098384">字幕偏好设置</translation>
-<translation id="6913051485529944333">此页面不会再显示 Google 日历</translation>
 <translation id="6914812290245989348">在您访问不安全的网站前不发出任何警告</translation>
 <translation id="6916590542764765824">管理扩展程序</translation>
 <translation id="6916676294509106572">Outlook 日历已隐藏</translation>
@@ -7727,7 +7712,6 @@
 <translation id="6978121630131642226">搜索引擎</translation>
 <translation id="6979041727349121225">节能模式</translation>
 <translation id="6979044105893951891">启动和退出受管理访客会话</translation>
-<translation id="6979158407327259162">Google 云端硬盘</translation>
 <translation id="6979440798594660689">静音（默认）</translation>
 <translation id="6979557074007409812">是，将我的数据与工作数据分开</translation>
 <translation id="6979737339423435258">时间不限</translation>
@@ -8654,7 +8638,6 @@
 <translation id="7690853182226561458">添加文件夹(&amp;F)...</translation>
 <translation id="7691077781194517083">无法重置此安全密钥。错误代码为 <ph name="ERROR_CODE" />。</translation>
 <translation id="7693792553740402887">使用日常用语搜索您的浏览记录，并查找您访问过的网站。您还可以提出问题，系统会根据您的浏览记录提供答案</translation>
-<translation id="7694895628076803349">不显示云端硬盘</translation>
 <translation id="7696063401938172191">在您的“<ph name="PHONE_NAME" />”上：</translation>
 <translation id="7697109152153663933">点击“密码和自动填充”</translation>
 <translation id="769824636077131955">此文档太大，无法进行安全检查。您只能打印不超过 50 MB 的文档。</translation>
@@ -8804,7 +8787,6 @@
 <translation id="7811263553491007091">请重试，或从下面之前生成的主题中选择一个。</translation>
 <translation id="7811926937048662341">右键点击此处，然后选择“垂直显示标签页”</translation>
 <translation id="7811986034759500329">在系统设置中设置</translation>
-<translation id="7812170317334653156">Google 日历已隐藏</translation>
 <translation id="7814458197256864873">复制(&amp;C)</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">修改“<ph name="EXTENSION_NAME" />”的快捷方式 <ph name="SHORTCUT" /></translation>
@@ -9246,7 +9228,6 @@
 <translation id="8146287226035613638">添加您的首选语言并为它们排序。网站会尽可能以您的首选语言显示。这些偏好设置会与您的浏览器设置同步。<ph name="BEGIN_LINK_LEARN_MORE" />了解详情<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">自动向 Google 发送崩溃报告以及诊断数据和使用情况数据，协助改进 Chrome 和 Chrome 操作系统的功能和性能。</translation>
 <translation id="8147900440966275470">找到了 <ph name="NUM" /> 个标签页</translation>
-<translation id="814870937590541483">可对 Google 云端硬盘文件执行的更多操作</translation>
 <translation id="8148760431881541277">限制登录</translation>
 <translation id="8149596686567059924">无法解压缩更新包。</translation>
 <translation id="8149870652370242480">如需在手机上使用您已保存的密码，请下载 iOS 版 Chrome 并登录您的 Google 账号。</translation>

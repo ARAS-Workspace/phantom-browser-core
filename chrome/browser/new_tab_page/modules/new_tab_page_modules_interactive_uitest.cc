@@ -89,40 +89,7 @@ ModuleDetails kMostRelevantTabResumptionModuleDetails = {
       "https://www.google.com"}},
 };
 
-ModuleDetails kGoogleCalendarModuleDetails = {
-    ntp_features::kNtpCalendarModule,
-    {{ntp_features::kNtpCalendarModule,
-      {{ntp_features::kNtpCalendarModuleDataParam, "fake"}}}},
-    {"ntp-app", "ntp-modules", "ntp-module-wrapper",
-     "ntp-google-calendar-module"},
-    {"ntp-app", "ntp-modules", "ntp-module-wrapper",
-     "ntp-google-calendar-module", "ntp-module-header-v2", "#menuButton"},
-    {"ntp-app", "ntp-modules", "ntp-module-wrapper",
-     "ntp-google-calendar-module", "ntp-module-header-v2", "cr-action-menu",
-     "dialog"},
-    {"ntp-app", "ntp-modules", "ntp-module-wrapper",
-     "ntp-google-calendar-module", "ntp-module-header-v2", "#dismiss"},
-    {"ntp-app", "ntp-modules", "ntp-module-wrapper",
-     "ntp-google-calendar-module", "ntp-module-header-v2", "#disable"},
-    {{{"ntp-app", "ntp-modules", "ntp-module-wrapper",
-       "ntp-google-calendar-module", "ntp-calendar", "ntp-calendar-event",
-       "#header"},
-      "https://foo.com/0"},
-     {{"ntp-app", "ntp-modules", "ntp-module-wrapper",
-       "ntp-google-calendar-module", "ntp-calendar", "#seeMore", "a"},
-      "https://calendar.google.com"},
-     {{"ntp-app", "ntp-modules", "ntp-module-wrapper",
-       "ntp-google-calendar-module", "ntp-calendar", "ntp-calendar-event",
-       "cr-chip"},
-      "https://foo.com/attachment0"},
-     {{"ntp-app", "ntp-modules", "ntp-module-wrapper",
-       "ntp-google-calendar-module", "ntp-calendar", "ntp-calendar-event",
-       "cr-button"},
-      "https://foo.com/conference0"}},
-};
-
 std::vector<ModuleDetails> kAllModules = {
-    kGoogleCalendarModuleDetails,
     kMostRelevantTabResumptionModuleDetails,
 };
 
@@ -348,18 +315,9 @@ class NewTabPageModulesInteractiveLinkUiTest
   ModuleLink ModuleLink() const { return GetParam().second; }
 };
 
-// TODO(crbug.com/347914816): Fix test failure for
-// kMostRelevantTabResumptionModuleDetails.
-#if BUILDFLAG(IS_MAC)
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    NewTabPageModulesInteractiveLinkUiTest,
-    ::testing::ValuesIn(GetAllModuleLinks({kGoogleCalendarModuleDetails})));
-#else
 INSTANTIATE_TEST_SUITE_P(All,
                          NewTabPageModulesInteractiveLinkUiTest,
                          ::testing::ValuesIn(GetAllModuleLinks(kAllModules)));
-#endif
 
 // TODO(crbug.com/416206296): Re-enable once we have a workaround for querying
 // the `module_wrapper.html` slotted element.

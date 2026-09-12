@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">ჟესტმა „<ph name="MAIN_GESTURE" />“ შეიძლება გადაფაროს ჟესტები — „<ph name="CONFLICTING_GESTURE_ONE" />“, „<ph name="CONFLICTING_GESTURE_TWO" />“ და „<ph name="CONFLICTING_GESTURE_THREE" />“. თუ შესაძლებელია, აირჩიეთ სხვა ჟესტი.</translation>
 <translation id="1293556467332435079">ფაილები</translation>
 <translation id="12951065153783848">თქვენი ორგანიზაცია მართავს თქვენს ანგარიშს</translation>
-<translation id="1296410481664942178">Google Calendar-ის დამალვა</translation>
 <translation id="1296911687402551044">არჩეული ჩანართის ჩამაგრება</translation>
 <translation id="1297175357211070620">დანიშნულება</translation>
 <translation id="129770436432446029">გამოგვეხმაურეთ, როგორია <ph name="EXPERIMENT_NAME" /></translation>
@@ -1146,7 +1145,6 @@
 <translation id="1884340228047885921">ხილვადობის პარამეტრად ამჟამად მითითებულია ზოგიერთი კონტაქტი</translation>
 <translation id="1884705339276589024">Linux-ის დისკის ზომის შეცვლა</translation>
 <translation id="1885066963699478692">XML ფაილები, რომლებიც გამოიყენება წესების განსაზღვრისთვის.</translation>
-<translation id="1885089541024391265">Google Calendar</translation>
 <translation id="1885106732301550621">დისკის ზომა</translation>
 <translation id="188537499764410817">საიტები, რომლებშიც Gemini-ს შეუძლია თქვენი ავტორიზაცია, გამოჩნდება აქ</translation>
 <translation id="1886996562706621347">ნება მიეცი საიტებს, გახდნენ პროტოკოლების ნაგულისხმევი დამმუშავებლები (რეკომენდებულია)</translation>
@@ -2055,7 +2053,6 @@
 <translation id="2586672484245266891">გთხოვთ, შეიყვანოთ უფრო მოკლე URL.</translation>
 <translation id="2588271083332682494">ორგანიზება ჩანართების ჯგუფებით</translation>
 <translation id="2588636910004461974"><ph name="VENDOR_NAME" />-ის მოწყობილობები</translation>
-<translation id="2589658397149952302">არასოდეს გამოჩნდეს ფაილები Drive-იდან</translation>
 <translation id="2597073208962000830">მახლობლად გაზიარების ფუნქცია Bluetooth-ით სკანირებას იყენებს ახლომახლო მოწყობილობების საპოვნელად.</translation>
 <translation id="2598136842498757793">ხელსაწყოთა ზოლის ღილაკების მორგება</translation>
 <translation id="2598710988533271874">ხელმისაწვდომია ახალი Chrome</translation>
@@ -2402,7 +2399,6 @@
 <translation id="2844169650293029770">USB-C მოწყობილობა (მარცხენა წინა პორტი)</translation>
 <translation id="2844809857160214557">ბეჭდვის დავალებების ნახვა და მართვა</translation>
 <translation id="284491292807422921">გსურთ საიტის ამოშლა?</translation>
-<translation id="2845276301195220700">მეტი მოქმედება Google Calendar-ისთვის</translation>
 <translation id="2845382757467349449">ყოველთვის გამოჩნდეს სანიშნეების ზოლი</translation>
 <translation id="284581348330507117">შექმენით უნიკალური პაროლები</translation>
 <translation id="2846345106886298325">დავალება შესრულებულია და დაბრუნდა Gemini Spark-ში</translation>
@@ -3538,7 +3534,6 @@
 <translation id="3708295717182051206">სუბტიტრები</translation>
 <translation id="3708684582558000260">დახურული საიტებისთვის მონაცემთა გაგზავნისა თუ მიღების დასრულების აკრძალვა</translation>
 <translation id="3709244229496787112">ბრაუზერი გაითიშა ჩამოტვირთვის დასრულებამდე.</translation>
-<translation id="3710438437470197252">იხილეთ მეტი Google Drive-ში</translation>
 <translation id="3710501561113687889">გასაგრძელებლად <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" />-ის მიერ ამ საიტთან გაზიარდება <ph name="FIELDS_STRING" />.</translation>
 <translation id="3711931198657368127">ჩა&amp;სმა და <ph name="URL" />-ზე გადასვლა</translation>
 <translation id="3711945201266135623">ბეჭდვის სერვერზე მოიძებნა <ph name="NUM_PRINTERS" /> პრინტერი</translation>
@@ -4092,10 +4087,6 @@
 <translation id="4110485659976215879">გაფრთხილების აღდგენა</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (ხაზგარეშე)</translation>
 <translation id="4113743276555482284">ფაილის პაროლი</translation>
-<translation id="4114524937989710624">თქვენ ხედავთ შემოთავაზებულ ფაილებს, რომლებიც დაგეხმარებათ, მარტივად დაუბრუნდეთ თქვენს ყველაზე ბოლოდროინდელ აქტივობას Google Drive-ში.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        სურვილისამებრ, შეგიძლიათ მართოთ პარამეტრები ბარათის მენიუდან, ან გაეცნოთ მეტ ვარიანტს „Chrome-ის მორგების“ სექციიდან.</translation>
 <translation id="4115002065223188701">ქსელი დიაპაზონს მიღმაა</translation>
 <translation id="4115378294792113321">მაგენტა</translation>
 <translation id="4116480382905329353">აღმოჩენილია 1-ხელ</translation>
@@ -7172,7 +7163,6 @@
 <translation id="6557290421156335491">ჩემი მალსახმობები</translation>
 <translation id="6558098963164662391">ლექსიკონიდან &amp;ამოშლა</translation>
 <translation id="6560061709899140565">ტრანსლირების სხვა სესიების ჩვენება</translation>
-<translation id="656065428026159829">მეტის ნახვა</translation>
 <translation id="6561877237303825108">ამ ტიპის (<ph name="TYPE" />) ფაილი შეიძლება სახიფათო იყოს. შეინახეთ ეს ფაილი მხოლოდ იმ შემთხვევაში, თუ <ph name="ORIGIN" /> სანდოდ მიგაჩნიათ</translation>
 <translation id="6562117348069327379">სისტემის ჟურნალების „ჩამოტვირთვების“ კატალოგში შენახვა.</translation>
 <translation id="656293578423618167">ფაილის მდებარეობა ან სახელი ძალიან გრძელია. გთხოვთ, შეინახოთ იგი უფრო მოკლე სახელით ან სხვა ადგილას.</translation>
@@ -7537,10 +7527,6 @@
 <translation id="6827767090350758381">Chrome-ის აპების ძველი ვერსიები 2022 წლის დეკემბრის შემდეგ აღარ გაიხსნება Windows‑მოწყობილობებზე. ამ აპის ახალ ვერსიამდე გასაახლებლად ან მის ამოსაშლელად დაუკავშირდით თქვენს ადმინისტრატორს.</translation>
 <translation id="6828182567531805778">თქვენი მონაცემების სინქრონიზაციისთვის შეიყვანეთ თქვენი საიდუმლო ფრაზა</translation>
 <translation id="6828860976882136098">ავტომატური განახლებების ყველა მომხმარებლისთვის დაყენება ვერ მოხერხდა (წინასწარი შესრულებისას წარმოიქმნა შეცდომა: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">თქვენს კალენდარს იმიტომ ხედავთ, რომ მარტივად გადახვიდეთ მომავალ მოვლენაზე Google Calendar-ში.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        სურვილისამებრ, შეგიძლიათ მართოთ პარამეტრები ბარათის მენიუდან, ან გაეცნოთ მეტ ვარიანტს „Chrome-ის მორგების“ სექციიდან.</translation>
 <translation id="6831043979455480757">თარგმნა</translation>
 <translation id="6831989891148852199">მოძრაობის ან განათების სენსორების გამოყენება არ არის ნებადართული</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{ამოიშალოს ჩანართი და წაიშალოს ჯგუფი?}=1{ამოიშალოს ჩანართები და წაიშალოს ჯგუფი?}other{ამოიშალოს ჩანართები და წაიშალოს ჯგუფები?}}</translation>
@@ -7660,7 +7646,6 @@
 <translation id="6912007319859991306">SIM ბარათის დაბლოკვა PIN-კოდით ფიჭური ქსელის მეშვეობით</translation>
 <translation id="6912380255120084882">ცადეთ სხვა მოწყობილობა</translation>
 <translation id="691289340230098384">სუბტიტრების პარამეტრები</translation>
-<translation id="6913051485529944333">ამ გვერდზე ვეღარ ნახავთ Google Calendar-ს</translation>
 <translation id="6914812290245989348">არ მსურს გაფრთხილებების ნახვა დაუცველ საიტებზე გადასვლამდე</translation>
 <translation id="6916590542764765824">პროგრამული გაფართოებები</translation>
 <translation id="6916676294509106572">Outlook Calendar დამალულია</translation>
@@ -7735,7 +7720,6 @@
 <translation id="6978121630131642226">საძიებო სისტემები</translation>
 <translation id="6979041727349121225">ენერგიის დამზოგი</translation>
 <translation id="6979044105893951891">სტუმრების მართული სესიების გაშვება და სესიებიდან გასვლა</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">დადუმება (ნაგულისხმევი)</translation>
 <translation id="6979557074007409812">დიახ, შეინახე ჩემი მონაცემები სამსახურის მონაცემებისგან დამოუკიდებლად</translation>
 <translation id="6979737339423435258">ყველა დროის</translation>
@@ -8660,7 +8644,6 @@
 <translation id="7690853182226561458">&amp;საქაღალდის დამატება...</translation>
 <translation id="7691077781194517083">უსაფრთხოების ამ გასაღების გადაყენება ვერ მოხერხდა. შეცდომა: <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">გამოიყენეთ სალაპარაკო ენა, რომ დათვალიერების ისტორიაში მოძებნოთ უკვე მონახულებული ვებსაიტები. შეგიძლიათ, დასვათ შეკითხვებიც და მიიღოთ პასუხები თქვენი დათვალიერების ისტორიის საფუძველზე</translation>
-<translation id="7694895628076803349">არ გამოჩნდეს Drive</translation>
 <translation id="7696063401938172191">თქვენს „<ph name="PHONE_NAME" />“-ზე:</translation>
 <translation id="7697109152153663933">დაწკაპუნებით აირჩიეთ „პაროლები და ავტომატური შევსება“</translation>
 <translation id="769824636077131955">ეს დოკუმენტი ზედმეტად დიდია უსაფრთხოების შემოწმებისთვის. შესაძლებელია 50 მბაიტამდე ზომის დოკუმენტების ბეჭდვა.</translation>
@@ -8810,7 +8793,6 @@
 <translation id="7811263553491007091">სცადეთ ხელახლა, ან ქვემოთ აირჩიეთ ადრე გენერირებული ერთ-ერთი თემა.</translation>
 <translation id="7811926937048662341">მარჯვენა ღილაკზე დააწკაპუნეთ აქ და აირჩიეთ „ჩანართების ვერტიკალურად ჩვენება“</translation>
 <translation id="7811986034759500329">დაყენებულია სისტემის პარამეტრებში</translation>
-<translation id="7812170317334653156">Google Calendar დამალულია</translation>
 <translation id="7814458197256864873">&amp;კოპირება</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">მალსახმობი <ph name="SHORTCUT" />-ის რედაქტირება გაფართოებისთვის <ph name="EXTENSION_NAME" /></translation>
@@ -9252,7 +9234,6 @@
 <translation id="8146287226035613638">დაამატეთ და დაახარისხეთ სასურველი ენები. ვებსაიტები, შეძლებისდაგვარად, თქვენთვის სასურველ ენებზე გამოჩნდება. ეს პარამეტრები სინქრონიზდება თქვენი ბრაუზერის პარამეტრებთან. <ph name="BEGIN_LINK_LEARN_MORE" />შეიტყვეთ მეტი<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">ხელი შეუწყვეთ Chrome-ისა და ChromeOS-ის ფუნქციებისა თუ ეფექტურობის გაუმჯობესებას ავარიულად გათიშვის ანგარიშების, ასევე, დიაგნოსტიკისა და გამოყენების მონაცემების Google-ისთვის ავტომატურად გაგზავნის მეშვეობით.</translation>
 <translation id="8147900440966275470">მოიძებნა <ph name="NUM" /> ჩანართი</translation>
-<translation id="814870937590541483">სხვა მოქმედებები Google Drive-იდან ფაილებთან დაკავშირებით</translation>
 <translation id="8148760431881541277">შესვლის შეზღუდვა</translation>
 <translation id="8149596686567059924">განახლების პაკეტის გახსნა ვერ მოხერხდა.</translation>
 <translation id="8149870652370242480">შენახული პაროლები თქვენს ტელეფონზე რომ გამოიყენოთ, ჩამოტვირთეთ iOS-ისთვის განკუთვნილი Chrome და შედით თქვენს Google ანგარიშში.</translation>

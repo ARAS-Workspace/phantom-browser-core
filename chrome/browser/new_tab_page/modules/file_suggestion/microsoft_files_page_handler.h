@@ -58,6 +58,8 @@ enum class MicrosoftFilesSubstitutionType {
 class MicrosoftFilesPageHandler
     : public file_suggestion::mojom::MicrosoftFilesPageHandler {
  public:
+  static const base::TimeDelta kDismissDuration;
+
   explicit MicrosoftFilesPageHandler(
       mojo::PendingReceiver<file_suggestion::mojom::MicrosoftFilesPageHandler>
           handler,

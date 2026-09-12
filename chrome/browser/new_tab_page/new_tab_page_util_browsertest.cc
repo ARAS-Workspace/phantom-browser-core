@@ -19,7 +19,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/signin_browser_test_base.h"
-#include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/scoped_browser_locale.h"
@@ -35,8 +34,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/search/ntp_features.h"
-#include "components/signin/public/base/consent_level.h"
-#include "components/sync/test/test_sync_service.h"
 #include "components/variations/service/variations_service.h"
 #include "components/variations/variations_switches.h"
 #include "content/public/test/browser_test.h"
@@ -46,11 +43,6 @@ namespace {
 
 using ::base::Time;
 using ::base::TimeDelta;
-
-std::unique_ptr<KeyedService> CreateTestSyncService(
-    content::BrowserContext* context) {
-  return std::make_unique<syncer::TestSyncService>();
-}
 
 const char kSampleUserEmail[] = "user@gmail.com";
 
@@ -85,12 +77,6 @@ class NewTabPageUtilBrowserTest : public SigninBrowserTestBase,
     }
   }
 
-  void SetHistorySync(bool history_sync_enabled) {
-    GetTestSyncService()->SetSignedIn(signin::ConsentLevel::kSignin);
-    GetTestSyncService()->GetUserSettings()->SetSelectedType(
-        syncer::UserSelectableType::kHistory, history_sync_enabled);
-  }
-
   void SetUpCommandLine(base::CommandLine* cmd) override {
     cmd->AppendSwitch(optimization_guide::switches::kDebugLoggingEnabled);
   }
@@ -114,18 +100,6 @@ class NewTabPageUtilBrowserTest : public SigninBrowserTestBase,
   }
 
  private:
-  void OnWillCreateBrowserContextServices(
-      content::BrowserContext* context) override {
-    SigninBrowserTestBase::OnWillCreateBrowserContextServices(context);
-    SyncServiceFactory::GetInstance()->SetTestingFactory(
-        context, base::BindRepeating(&CreateTestSyncService));
-  }
-
-  syncer::TestSyncService* GetTestSyncService() {
-    return static_cast<syncer::TestSyncService*>(
-        SyncServiceFactory::GetForProfile(GetProfile()));
-  }
-
   base::test::ScopedFeatureList features_;
   testing::NiceMock<policy::MockConfigurationPolicyProvider> policy_provider_;
 };
@@ -134,8 +108,7 @@ class NewTabPageUtilEnableFlagBrowserTest : public NewTabPageUtilBrowserTest {
  public:
   NewTabPageUtilEnableFlagBrowserTest() {
     features().InitWithFeatures(
-        {ntp_features::kNtpChromeCartModule, ntp_features::kNtpDriveModule,
-         ntp_features::kNtpCalendarModule,
+        {ntp_features::kNtpChromeCartModule,
          ntp_features::kNtpMicrosoftAuthenticationModule,
          ntp_features::kNtpOutlookCalendarModule,
          ntp_features::kNtpSharepointModule},
@@ -147,8 +120,7 @@ class NewTabPageUtilDisableFlagBrowserTest : public NewTabPageUtilBrowserTest {
  public:
   NewTabPageUtilDisableFlagBrowserTest() {
     features().InitWithFeatures(
-        {}, {ntp_features::kNtpChromeCartModule, ntp_features::kNtpDriveModule,
-             ntp_features::kNtpCalendarModule,
+        {}, {ntp_features::kNtpChromeCartModule,
              ntp_features::kNtpMicrosoftAuthenticationModule,
              ntp_features::kNtpOutlookCalendarModule,
              ntp_features::kNtpSharepointModule});
@@ -180,92 +152,6 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilDisableFlagBrowserTest,
   auto locale = std::make_unique<ScopedBrowserLocale>("en-US");
   g_browser_process->variations_service()->OverrideStoredPermanentCountry("us");
   EXPECT_FALSE(IsCartModuleEnabled());
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilBrowserTest, EnableDriveByToT) {
-  SetHistorySync(true);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  EXPECT_EQ(
-      IsDriveModuleEnabledForProfile(/*is_managed_profile=*/true, GetProfile()),
-      GetParam());
-  CheckInternalsLog(std::string(ntp_features::kNtpDriveModule.name) +
-                    (GetParam() ? " enabled: default feature flag value"
-                                : " disabled: not signed in"));
-#else
-  EXPECT_FALSE(IsDriveModuleEnabledForProfile(/*is_managed_profile=*/true,
-                                              GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpDriveModule.name) +
-                    " disabled: default feature flag value");
-#endif
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilBrowserTest, Drive_HistorySyncDisabled) {
-  SetHistorySync(false);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  EXPECT_FALSE(IsDriveModuleEnabledForProfile(/*is_managed_profile=*/true,
-                                              GetProfile()));
-  CheckInternalsLog(
-      std::string(ntp_features::kNtpDriveModule.name) +
-      (GetParam() ? " disabled: no history sync" : " disabled: not signed in"));
-#else
-  EXPECT_FALSE(IsDriveModuleEnabledForProfile(/*is_managed_profile=*/true,
-                                              GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpDriveModule.name) +
-                    " disabled: default feature flag value");
-#endif
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest, EnableDriveByFlag) {
-  EXPECT_EQ(
-      IsDriveModuleEnabledForProfile(/*is_managed_profile=*/true, GetProfile()),
-      GetParam());
-  CheckInternalsLog(std::string(ntp_features::kNtpDriveModule.name) +
-                    (GetParam() ? " enabled: feature flag forced on"
-                                : " disabled: not signed in"));
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilDisableFlagBrowserTest,
-                       DisableDriveByFlag) {
-  EXPECT_FALSE(IsDriveModuleEnabledForProfile(/*is_managed_profile=*/true,
-                                              GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpDriveModule.name) +
-                    " disabled: feature flag forced off");
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest, DriveIsNotManaged) {
-  EXPECT_FALSE(IsDriveModuleEnabledForProfile(/*is_managed_profile=*/false,
-                                              GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpDriveModule.name) +
-                    (GetParam() ? " disabled: account not managed"
-                                : " disabled: not signed in"));
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest,
-                       EnableGoogleCalendarByFlag) {
-  EXPECT_EQ(
-      IsGoogleCalendarModuleEnabled(/*is_managed_profile=*/true, GetProfile()),
-      GetParam());
-  CheckInternalsLog(std::string(ntp_features::kNtpCalendarModule.name) +
-                    (GetParam() ? " enabled: feature flag forced on"
-                                : " disabled: not signed in"));
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilDisableFlagBrowserTest,
-                       DisableGoogleCalendarByFlag) {
-  EXPECT_FALSE(
-      IsGoogleCalendarModuleEnabled(/*is_managed_profile=*/true, GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpCalendarModule.name) +
-                    (GetParam() ? " disabled: feature flag forced off"
-                                : " disabled: not signed in"));
-}
-
-IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest,
-                       GoogleCalendarIsNotManaged) {
-  EXPECT_FALSE(IsGoogleCalendarModuleEnabled(/*is_managed_profile=*/false,
-                                             GetProfile()));
-  CheckInternalsLog(std::string(ntp_features::kNtpCalendarModule.name) +
-                    (GetParam() ? " disabled: account not managed"
-                                : " disabled: not signed in"));
 }
 
 IN_PROC_BROWSER_TEST_P(NewTabPageUtilEnableFlagBrowserTest,
@@ -383,7 +269,7 @@ IN_PROC_BROWSER_TEST_P(
     NewTabPageUtilFeatureOptimizationModuleRemovalTest,
     DisableModuleAutoRemoval) {
   // Arrange.
-  const std::string module_id = ntp_modules::kGoogleCalendarModuleId;
+  const std::string module_id = ntp_modules::kTabGroupsModuleId;
 
   // Act.
   DisableModuleAutoRemoval(browser()->GetProfile(), module_id);
@@ -403,9 +289,9 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilFeatureOptimizationModuleRemovalTest,
                        DisableModuleListAutoRemoval) {
   // Arrange.
   const std::vector<std::string> module_ids = {
-      ntp_modules::kGoogleCalendarModuleId,
+      ntp_modules::kTabGroupsModuleId,
       ntp_modules::kOutlookCalendarModuleId,
-      ntp_modules::kDriveModuleId,
+      ntp_modules::kMicrosoftFilesModuleId,
   };
 
   // Act.
@@ -452,7 +338,7 @@ class NewTabPageUtilStalenessUpdateBrowserTest
   }
 
   void InitMockModules() {
-    loaded_modules = {ntp_modules::kGoogleCalendarModuleId,
+    loaded_modules = {ntp_modules::kTabGroupsModuleId,
                       ntp_modules::kOutlookCalendarModuleId};
   }
 
@@ -616,11 +502,11 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
   // Arrange.
   InitMockPrefs();
   InitMockModules();
-  const bool is_force_disabled_google_calendar = GetParam();
-  if (is_force_disabled_google_calendar) {
+  const bool is_force_disabled_tab_groups = GetParam();
+  if (is_force_disabled_tab_groups) {
     ScopedDictPrefUpdate update(GetProfile()->GetPrefs(),
                                 ntp_prefs::kNtpModulesAutoRemovalDisabledDict);
-    update->Set(ntp_modules::kGoogleCalendarModuleId, true);
+    update->Set(ntp_modules::kTabGroupsModuleId, true);
   }
 
   const TimeDelta staleness_threshold =
@@ -630,12 +516,11 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
       ntp_prefs::kNtpLastModuleStalenessUpdate);
 
   const Time expected_time = initial_time + time_delta;
-  const int expected_google_calendar_staleness_count =
-      is_force_disabled_google_calendar ? 0 : 1;
+  const int expected_tab_groups_staleness_count =
+      is_force_disabled_tab_groups ? 0 : 1;
   const size_t expected_dict_size =
-      is_force_disabled_google_calendar ? 1u : GetModules().size();
-  const int expected_histogram_count =
-      is_force_disabled_google_calendar ? 1 : 0;
+      is_force_disabled_tab_groups ? 1u : GetModules().size();
+  const int expected_histogram_count = is_force_disabled_tab_groups ? 1 : 0;
 
   // Act.
   FastForwardBy(time_delta);
@@ -650,10 +535,10 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
       ntp_prefs::kNtpModuleStalenessCountDict);
   EXPECT_EQ(updated_dict.size(), expected_dict_size);
 
-  std::optional<int> updated_google_calendar_staleness_count =
-      updated_dict.FindInt(ntp_modules::kGoogleCalendarModuleId);
-  EXPECT_EQ(updated_google_calendar_staleness_count.value_or(0),
-            expected_google_calendar_staleness_count);
+  std::optional<int> updated_tab_groups_staleness_count =
+      updated_dict.FindInt(ntp_modules::kTabGroupsModuleId);
+  EXPECT_EQ(updated_tab_groups_staleness_count.value_or(0),
+            expected_tab_groups_staleness_count);
 
   std::optional<int> updated_outlook_calendar_staleness_count =
       updated_dict.FindInt(ntp_modules::kOutlookCalendarModuleId);
@@ -661,7 +546,7 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
 
   histogram_tester_.ExpectBucketCount(
       "NewTabPage.Modules.AutoRemovalSkipped.Disabled",
-      base::PersistentHash(ntp_modules::kGoogleCalendarModuleId),
+      base::PersistentHash(ntp_modules::kTabGroupsModuleId),
       expected_histogram_count);
 }
 
@@ -713,13 +598,12 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
   InitMockPrefs();
   InitMockModules();
   const bool is_above_staleness_count = GetParam();
-  const int google_calendar_staleness_count = is_above_staleness_count ? 10 : 0;
+  const int tab_groups_staleness_count = is_above_staleness_count ? 10 : 0;
   const int outlook_calendar_staleness_count = is_above_staleness_count ? 5 : 0;
   if (is_above_staleness_count) {
     ScopedDictPrefUpdate update(GetProfile()->GetPrefs(),
                                 ntp_prefs::kNtpModuleStalenessCountDict);
-    update->Set(ntp_modules::kGoogleCalendarModuleId,
-                google_calendar_staleness_count);
+    update->Set(ntp_modules::kTabGroupsModuleId, tab_groups_staleness_count);
     update->Set(ntp_modules::kOutlookCalendarModuleId,
                 outlook_calendar_staleness_count);
   }
@@ -742,8 +626,8 @@ IN_PROC_BROWSER_TEST_P(NewTabPageUtilStalenessUpdateBrowserTest,
   EXPECT_EQ(updated_time, expected_time);
 
   histogram_tester_.ExpectUniqueSample(
-      "NewTabPage.Modules.AutoRemovalStaleDays.google_calendar",
-      google_calendar_staleness_count, 1);
+      "NewTabPage.Modules.AutoRemovalStaleDays.tab_groups",
+      tab_groups_staleness_count, 1);
   histogram_tester_.ExpectUniqueSample(
       "NewTabPage.Modules.AutoRemovalStaleDays.outlook_calendar",
       outlook_calendar_staleness_count, 1);

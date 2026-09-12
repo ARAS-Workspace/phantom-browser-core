@@ -154,8 +154,6 @@ const char kFakeTrendingData[] =
       }
   ]})";
 
-constexpr base::TimeDelta kModuleDismissalDuration = base::Hours(12);
-
 const char kBatchRequestUrl[] = "https://graph.microsoft.com/v1.0/$batch";
 const char kNonInsightsRequestBody[] =
     R"({
@@ -361,6 +359,10 @@ void RecordSubstitutionType(MicrosoftFilesSubstitutionType substitution_type) {
 }  // namespace
 
 // static
+const base::TimeDelta MicrosoftFilesPageHandler::kDismissDuration =
+    base::Hours(12);
+
+// static
 void MicrosoftFilesPageHandler::RegisterProfilePrefs(
     PrefRegistrySimple* registry) {
   registry->RegisterTimePref(prefs::kNtpMicrosoftFilesModuleLastDismissedTime,
@@ -387,7 +389,7 @@ void MicrosoftFilesPageHandler::GetFiles(GetFilesCallback callback) {
   base::Time last_dismissed_time =
       pref_service_->GetTime(prefs::kNtpMicrosoftFilesModuleLastDismissedTime);
   if (last_dismissed_time != base::Time() &&
-      base::Time::Now() - last_dismissed_time < kModuleDismissalDuration) {
+      base::Time::Now() - last_dismissed_time < kDismissDuration) {
     std::move(callback).Run(std::vector<file_suggestion::mojom::FilePtr>());
     return;
   }

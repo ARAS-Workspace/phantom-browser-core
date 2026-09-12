@@ -60,9 +60,6 @@ std::string ApiErrorCodeToString(ApiErrorCode error);
 // Checks if the error code represents success for drive api.
 bool IsSuccessfulDriveApiErrorCode(ApiErrorCode error);
 
-// Checks if the error code represents success for calendar api.
-bool IsSuccessfulCalendarApiErrorCode(ApiErrorCode error);
-
 }  // namespace google_apis
 
 #endif  // GOOGLE_APIS_COMMON_API_ERROR_CODES_H_

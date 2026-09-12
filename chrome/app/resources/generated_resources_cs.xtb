@@ -408,7 +408,6 @@ Hesla můžete kdykoli zobrazit v nástroji <ph name="GOOGLE_PASSWORD_MANAGER" 
 <translation id="1293360286536751243">Gesto <ph name="MAIN_GESTURE" /> může kolidovat s gesty <ph name="CONFLICTING_GESTURE_ONE" />, <ph name="CONFLICTING_GESTURE_TWO" /> a <ph name="CONFLICTING_GESTURE_THREE" />. Pokud je to možné, zkuste vybrat jiné.</translation>
 <translation id="1293556467332435079">Soubory</translation>
 <translation id="12951065153783848">Váš účet spravuje vaše organizace</translation>
-<translation id="1296410481664942178">Nezobrazovat Kalendář Google</translation>
 <translation id="1296911687402551044">Připnout vybranou kartu</translation>
 <translation id="1297175357211070620">Cíl</translation>
 <translation id="129770436432446029">Poslat zpětnou vazbu k funkci <ph name="EXPERIMENT_NAME" /></translation>
@@ -1146,7 +1145,6 @@ Hesla můžete kdykoli zobrazit v nástroji <ph name="GOOGLE_PASSWORD_MANAGER" 
 <translation id="1884340228047885921">Aktuální nastavení viditelnosti je Některé kontakty</translation>
 <translation id="1884705339276589024">Změna velikosti disku Linuxu</translation>
 <translation id="1885066963699478692">Soubory XML, které se používají k nastavení zásad.</translation>
-<translation id="1885089541024391265">Kalendář Google</translation>
 <translation id="1885106732301550621">Místo na disku</translation>
 <translation id="188537499764410817">Tady se zobrazí weby, ke kterým vás Gemini může přihlásit</translation>
 <translation id="1886996562706621347">Povolit dotazy stránek, zda je chcete použít jako výchozí obslužný nástroj protokolů (doporučeno)</translation>
@@ -2055,7 +2053,6 @@ Chcete-li spravovat nastavení tohoto účtu, nainstalujte si do zařízení apl
 <translation id="2586672484245266891">Zadejte prosím kratší adresu URL</translation>
 <translation id="2588271083332682494">Udělejte si pořádek se skupinami karet</translation>
 <translation id="2588636910004461974">Zařízení od dodavatele <ph name="VENDOR_NAME" /></translation>
-<translation id="2589658397149952302">Soubory na Disku nikdy nezobrazovat</translation>
 <translation id="2597073208962000830">Sdílení nablízko vyhledává zařízení v okolí přes Bluetooth.</translation>
 <translation id="2598136842498757793">Upravit tlačítka na liště</translation>
 <translation id="2598710988533271874">K dispozici je nový Chrome</translation>
@@ -2402,7 +2399,6 @@ Chcete-li spravovat nastavení tohoto účtu, nainstalujte si do zařízení apl
 <translation id="2844169650293029770">Zařízení USB Type-C (levý přední port)</translation>
 <translation id="2844809857160214557">Zobrazení a správa tiskových úloh</translation>
 <translation id="284491292807422921">Ostranit web?</translation>
-<translation id="2845276301195220700">Další akce pro Kalendář Google</translation>
 <translation id="2845382757467349449">&amp;Vždy zobrazovat lištu záložek</translation>
 <translation id="284581348330507117">Vytvářejte unikátní hesla</translation>
 <translation id="2846345106886298325">Úkol byl dokončen a vrácen asistentovi Gemini Spark</translation>
@@ -3536,7 +3532,6 @@ Zpráva serveru: <ph name="SERVER_MSG" /></translation>
 <translation id="3708295717182051206">Skryté titulky</translation>
 <translation id="3708684582558000260">Nepovolovat zavřeným webům dokončit odeslání a příjem dat</translation>
 <translation id="3709244229496787112">Prohlížeč byl zavřen před dokončením stahování.</translation>
-<translation id="3710438437470197252">Zobrazit víc na Disku Google</translation>
 <translation id="3710501561113687889">Aby bylo možné pokračovat, bude <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> s tímto webem sdílet tyto vaše údaje: <ph name="FIELDS_STRING" />.</translation>
 <translation id="3711931198657368127">Vl&amp;ožit a přejít na adresu <ph name="URL" /></translation>
 <translation id="3711945201266135623">Na tiskovém serveru byl nalezen tento počet tiskáren: <ph name="NUM_PRINTERS" /></translation>
@@ -4089,10 +4084,6 @@ Zpráva serveru: <ph name="SERVER_MSG" /></translation>
 <translation id="4110485659976215879">Obnovit upozornění</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (offline)</translation>
 <translation id="4113743276555482284">Heslo souboru</translation>
-<translation id="4114524937989710624">Zobrazují se vám navrhované soubory, abyste se mohli snadno vrátit k nedávné aktivitě na Disku Google.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Nastavení můžete spravovat v nabídce karty. Další možnosti zobrazíte v sekci Přizpůsobit Chrome.</translation>
 <translation id="4115002065223188701">Síť je mimo dosah</translation>
 <translation id="4115378294792113321">Purpurová</translation>
 <translation id="4116480382905329353">Detekováno jednou</translation>
@@ -7164,7 +7155,6 @@ K této akci lze přiřadit několik přepínačů.</translation>
 <translation id="6557290421156335491">Moje zkratky</translation>
 <translation id="6558098963164662391">&amp;Odstranit ze slovníku</translation>
 <translation id="6560061709899140565">Zobrazit další relace odesílání</translation>
-<translation id="656065428026159829">Zobrazit další</translation>
 <translation id="6561877237303825108">Tento soubor typu (<ph name="TYPE" />) může být nebezpečný. Soubor uložte, pouze pokud webu <ph name="ORIGIN" /> důvěřujete</translation>
 <translation id="6562117348069327379">Ukládat systémové protokoly do složky Stažené soubory.</translation>
 <translation id="656293578423618167">Cesta nebo název souboru jsou příliš dlouhé. Použijte kratší název nebo vyberte jiné umístění.</translation>
@@ -7533,10 +7523,6 @@ Máte # dalších prolomených hesel. Správce hesel Google doporučuje ihned ta
 <translation id="6827767090350758381">Po prosinci 2022 již na zařízeních s Windows nebude možné otevírat staré verze aplikací pro Chrome. Požádejte administrátora o aktualizaci na novou verzi, nebo tuto aplikaci odstraňte.</translation>
 <translation id="6828182567531805778">Chcete-li synchronizovat data, zadejte heslovou frázi</translation>
 <translation id="6828860976882136098">Nastavení automatických aktualizací pro všechny uživatele se nezdařilo (chyba při předběžném spuštění: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Vidíte svůj kalendář, abyste mohli snadno přejít na další událost v Kalendáři Google.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Nastavení můžete spravovat v nabídce karty. Další možnosti zobrazíte v sekci Přizpůsobit Chrome.</translation>
 <translation id="6831043979455480757">Přeložit</translation>
 <translation id="6831989891148852199">Zákaz používat senzory pohybu nebo světla</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Odstranit kartu a smazat skupinu?}=1{Odstranit karty a smazat skupinu?}few{Odstranit karty a smazat skupiny?}many{Odstranit karty a smazat skupiny?}other{Odstranit karty a smazat skupiny?}}</translation>
@@ -7656,7 +7642,6 @@ Máte # dalších prolomených hesel. Správce hesel Google doporučuje ihned ta
 <translation id="6912007319859991306">PIN mobilní SIM karty</translation>
 <translation id="6912380255120084882">Vyzkoušejte jiné zařízení</translation>
 <translation id="691289340230098384">Předvolby titulků</translation>
-<translation id="6913051485529944333">Kalendář Google se vám už na této stránce nebude zobrazovat</translation>
 <translation id="6914812290245989348">Před přechodem na nezabezpečené weby nezobrazovat upozornění</translation>
 <translation id="6916590542764765824">Spravovat rozšíření</translation>
 <translation id="6916676294509106572">Kalendář Outlooku je skrytý</translation>
@@ -7731,7 +7716,6 @@ Máte # dalších prolomených hesel. Správce hesel Google doporučuje ihned ta
 <translation id="6978121630131642226">Vyhledávače</translation>
 <translation id="6979041727349121225">Spořič energie</translation>
 <translation id="6979044105893951891">Spouštět a ukončovat spravované relace hostů</translation>
-<translation id="6979158407327259162">Disk Google</translation>
 <translation id="6979440798594660689">Ztlumit (výchozí)</translation>
 <translation id="6979557074007409812">Ano, uchovávat má data odděleně od pracovních</translation>
 <translation id="6979737339423435258">Od počátku věků</translation>
@@ -8657,7 +8641,6 @@ To může zahrnovat informace o nainstalovaném softwaru, souborech, prohlíže
 <translation id="7690853182226561458">Přidat &amp;složku...</translation>
 <translation id="7691077781194517083">Tento bezpečnostní klíč nelze resetovat. Chyba <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Vyhledávejte běžným jazykem v historii prohlížení a najděte navštívené weby. Můžete také klást otázky a získávat odpovědi na základě své historie prohlížení</translation>
-<translation id="7694895628076803349">Disk nezobrazovat</translation>
 <translation id="7696063401938172191">Na telefonu <ph name="PHONE_NAME" />:</translation>
 <translation id="7697109152153663933">Klikněte na Hesla a automatické vyplňování</translation>
 <translation id="769824636077131955">Tento dokument je na bezpečnostní kontrolu příliš velký. Můžete vytisknout dokumenty až do velikosti 50 MB.</translation>
@@ -8807,7 +8790,6 @@ Pokud přiřazení chcete odstranit, stiskněte přiřazený přepínač nebo kl
 <translation id="7811263553491007091">Zkuste to znovu nebo vyberte některý z dříve vygenerovaných motivů níže.</translation>
 <translation id="7811926937048662341">Klikněte sem pravým tlačítkem a vyberte Zobrazit karty svisle</translation>
 <translation id="7811986034759500329">Nastavuje se v nastavení systému</translation>
-<translation id="7812170317334653156">Kalendář Google je skryt</translation>
 <translation id="7814458197256864873">&amp;Kopírovat</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Upravit zkratku <ph name="SHORTCUT" /> pro rozšíření <ph name="EXTENSION_NAME" /></translation>
@@ -9249,7 +9231,6 @@ Svůj soubor klíče uchovávejte na bezpečném místě. Budete jej potřebovat
 <translation id="8146287226035613638">Přidejte a ohodnoťte preferované jazyky. Pokud to bude možné, webové stránky se budou zobrazovat ve vašem preferovaném jazyce. Tyto předvolby jsou synchronizovány s nastavením prohlížeče. <ph name="BEGIN_LINK_LEARN_MORE" />Další informace<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Pomozte se zlepšováním funkcí a výkonu prohlížeče Chrome a systému ChromeOS tím, že budete do Googlu automaticky odesílat zprávy o selhání a údaje o využití.</translation>
 <translation id="8147900440966275470">Byla nalezena <ph name="NUM" /> karta</translation>
-<translation id="814870937590541483">Další akce se soubory na Disku Google</translation>
 <translation id="8148760431881541277">Omezit přihlášení</translation>
 <translation id="8149596686567059924">Aktualizační balíček se nepodařilo rozbalit.</translation>
 <translation id="8149870652370242480">Pokud na telefonu chcete používat svá uložená hesla, stáhněte si Chrome pro iOS a přihlaste se ke svému účtu Google.</translation>

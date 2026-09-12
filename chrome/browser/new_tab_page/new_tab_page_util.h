@@ -31,12 +31,9 @@ enum class NtpShortcutsAutoRemovalReason {
 // LINT.ThenChange(//tools/metrics/histograms/metadata/new_tab_page/enums.xml:NtpShortcutsAutoRemovalReason)
 
 bool IsCartModuleEnabled();
-bool IsDriveModuleEnabled();
-bool IsDriveModuleEnabledForProfile(bool is_managed_profile, Profile* profile);
 bool IsEnUSLocaleOnlyFeatureEnabled(const base::Feature& ntp_feature);
 bool IsFeatureEnabled(const base::Feature& feature);
 bool IsFeatureForceEnabled(const base::Feature& feature);
-bool IsGoogleCalendarModuleEnabled(bool is_managed_profile, Profile* profile);
 bool IsMicrosoftFilesModuleEnabledForProfile(Profile* profile);
 bool IsMostRelevantTabResumeModuleEnabled(Profile* profile);
 bool IsOutlookCalendarModuleEnabledForProfile(Profile* profile);

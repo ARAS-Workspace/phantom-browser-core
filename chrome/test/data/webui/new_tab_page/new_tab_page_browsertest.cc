@@ -263,18 +263,8 @@ IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, CalendarEventMetrics) {
           "runMochaSuite('NewTabPageModulesCalendarEventTest metrics')");
 }
 
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, GoogleCalendarModule) {
-  RunTest("new_tab_page/modules/calendar/google_calendar_module_test.js",
-          "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, OutlookCalendarModule) {
   RunTest("new_tab_page/modules/calendar/outlook_calendar_module_test.js",
-          "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, DriveModuleV2) {
-  RunTest("new_tab_page/modules/file_suggestion/drive_module_test.js",
           "mocha.run()");
 }
 

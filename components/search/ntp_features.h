@@ -43,15 +43,10 @@ BASE_DECLARE_FEATURE(kRealboxMatchOmniboxTheme);
 BASE_DECLARE_FEATURE(kNtpAlphaBackgroundCollections);
 BASE_DECLARE_FEATURE(kNtpAnimatedCaret);
 BASE_DECLARE_FEATURE(kNtpBackgroundImageErrorDetection);
-BASE_DECLARE_FEATURE(kNtpCalendarModule);
 BASE_DECLARE_FEATURE(kNtpChromeCartModule);
 BASE_DECLARE_FEATURE(kNtpCustomizeChromeAutoOpen);
 BASE_DECLARE_FEATURE(kNtpCustomizeWebUiAndroid);
 BASE_DECLARE_FEATURE(kNtpDisableBrowserInitiatedLinks);
-BASE_DECLARE_FEATURE(kNtpDriveModule);
-BASE_DECLARE_FEATURE(kNtpDriveModuleHistorySyncRequirement);
-BASE_DECLARE_FEATURE(kNtpDriveModuleLink);
-BASE_DECLARE_FEATURE(kNtpDriveModuleSegmentation);
 #if !defined(OFFICIAL_BUILD)
 BASE_DECLARE_FEATURE(kNtpDummyModules);
 #endif
@@ -126,8 +121,6 @@ extern const char kNtpModuleIgnoredCriteriaThreshold[];
 extern const char kNtpModulesLoadTimeoutMillisecondsParam[];
 // Parameter determining the module order.
 extern const char kNtpModulesOrderParam[];
-// Parameter determining the type of calendar data used to render module.
-extern const char kNtpCalendarModuleDataParam[];
 // Parameter determining the type of cart data used to render module.
 extern const char kNtpChromeCartModuleDataParam[];
 // Parameter for enabling the abandoned cart discount.
@@ -139,15 +132,6 @@ extern const char kNtpChromeCartModuleAbandonedCartDiscountUseUtmParam[];
 extern const char kNtpChromeCartModuleHeuristicsImprovementParam[];
 // Parameter for enabling coupons on the Cart module.
 extern const char kNtpChromeCartModuleCouponParam[];
-// Parameter determining the type of Drive data to render.
-extern const char kNtpDriveModuleDataParam[];
-// Parameter for enabling the Drive module for managed users only.
-extern const char kNtpDriveModuleManagedUsersOnlyParam[];
-// Parameter determining the max age in seconds of the cache for drive data.
-extern const char kNtpDriveModuleCacheMaxAgeSParam[];
-// Parameter for communicating the experiment group of the Drive module
-// experiment.
-extern const char kNtpDriveModuleExperimentGroupParam[];
 // Parameter determining the type of calendar data to render.
 extern const char kNtpOutlookCalendarModuleDataParam[];
 // Parameter determining the type of middle slot promo data to render.
@@ -188,19 +172,6 @@ extern const char kNtpWallpaperSearchButtonHideConditionParam[];
 // Parameter determining the trigger delay of the Wallpaper Search HaTS survey.
 extern const char kWallpaperSearchHatsDelayParam[];
 
-// Parameter determining the experiment name to pass to the Google Calendar
-// API.
-extern const base::FeatureParam<std::string> kNtpCalendarModuleExperimentParam;
-// Parameter determining the number of events to show on the calendar module.
-extern const base::FeatureParam<int> kNtpCalendarModuleMaxEventsParam;
-// Parameter determining the time delta from now for the end of the event
-// window.
-extern const base::FeatureParam<base::TimeDelta>
-    kNtpCalendarModuleWindowEndDeltaParam;
-// Parameter determining the time delta from now for the start of the event
-// window.
-extern const base::FeatureParam<base::TimeDelta>
-    kNtpCalendarModuleWindowStartDeltaParam;
 // Parameter for the maximum number of times to automatically show
 // Customize Chrome.
 extern const base::FeatureParam<int> kNtpCustomizeChromeAutoShownMaxCount;

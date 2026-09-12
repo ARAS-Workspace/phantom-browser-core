@@ -3681,9 +3681,7 @@ TEST_F(ContextualSearchboxHandlerSignedInTestTabsTest,
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures(/*enabled_features=*/{},
                                 /*disabled_features=*/{
-                                    ntp_features::kNtpCalendarModule,
                                     ntp_features::kNtpOutlookCalendarModule,
-                                    ntp_features::kNtpDriveModule,
                                 });
   // Add a regular tab, a google search tab, and another regular tab.
   auto* example_tab = AddTab(GURL("https://www.example.com"));

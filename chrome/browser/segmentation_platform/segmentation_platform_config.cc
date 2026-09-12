@@ -14,7 +14,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
 #include "components/compose/buildflags.h"
-#include "components/search/ntp_features.h"
 #include "components/segmentation_platform/embedder/default_model/chrome_user_engagement.h"
 #include "components/segmentation_platform/embedder/default_model/cross_device_user_segment.h"
 #include "components/segmentation_platform/embedder/default_model/database_api_clients.h"
@@ -129,16 +128,6 @@ std::unique_ptr<Config> GetConfigForWebAppInstallationPromo() {
   return config;
 }
 
-std::unique_ptr<Config> GetConfigForDesktopNtpModule() {
-  auto config = std::make_unique<Config>();
-  config->segmentation_key = kDesktopNtpModuleKey;
-  config->segmentation_uma_name = kDesktopNtpModuleUmaName;
-  config->AddSegmentId(
-      SegmentId::OPTIMIZATION_TARGET_SEGMENTATION_DESKTOP_NTP_MODULE);
-  config->auto_execute_and_cache = false;
-  return config;
-}
-
 }  // namespace
 
 // Note: Do not remove feature flag for models that are served on the server.
@@ -194,10 +183,6 @@ std::vector<std::unique_ptr<Config>> GetSegmentationPlatformConfig(
   if (base::FeatureList::IsEnabled(
           webapps::features::kWebAppsEnableMLModelForPromotion)) {
     configs.emplace_back(GetConfigForWebAppInstallationPromo());
-  }
-
-  if (base::FeatureList::IsEnabled(ntp_features::kNtpDriveModuleSegmentation)) {
-    configs.emplace_back(GetConfigForDesktopNtpModule());
   }
 
   std::erase_if(configs, [](const auto& config) { return !config.get(); });

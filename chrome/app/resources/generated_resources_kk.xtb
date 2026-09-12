@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">"<ph name="MAIN_GESTURE" />" қимылы "<ph name="CONFLICTING_GESTURE_ONE" />", "<ph name="CONFLICTING_GESTURE_TWO" />" және "<ph name="CONFLICTING_GESTURE_THREE" />" қимылдарына қайшы келуі мүмкін. Басқа қимыл таңдаған дұрыс.</translation>
 <translation id="1293556467332435079">Файлдар</translation>
 <translation id="12951065153783848">Аккаунтыңызды ұйымыңыз басқарады.</translation>
-<translation id="1296410481664942178">Google Calendar-ды көрсетпеу</translation>
 <translation id="1296911687402551044">Таңдалған қойындыны бекіту</translation>
 <translation id="1297175357211070620">Межелі орын</translation>
 <translation id="129770436432446029"><ph name="EXPERIMENT_NAME" /> туралы пікір жіберіңіз.</translation>
@@ -1146,7 +1145,6 @@
 <translation id="1884340228047885921">Ағымдағы көрсетілу параметрі кейбір контактіге арналған.</translation>
 <translation id="1884705339276589024">Linux дискісінің көлемін өзгерту</translation>
 <translation id="1885066963699478692">Саясаттарды тағайындау үшін пайдаланылатын XML файлдары.</translation>
-<translation id="1885089541024391265">Google Calendar</translation>
 <translation id="1885106732301550621">Дискідегі орын</translation>
 <translation id="188537499764410817">Gemini арқылы кіруге болатын сайттар тізімі осы жерде көрсетіледі.</translation>
 <translation id="1886996562706621347">Барлық сайттарға протоколдар үшін әдепкі өңдегіш болу рұқсатын беру (ұсынылады)</translation>
@@ -2055,7 +2053,6 @@
 <translation id="2586672484245266891">Қысқа URL мекенжайын енгізіңіз</translation>
 <translation id="2588271083332682494">Қойындылар топтарымен ұқыпты болыңыз</translation>
 <translation id="2588636910004461974"><ph name="VENDOR_NAME" /> құрылғылары</translation>
-<translation id="2589658397149952302">Drive файлдарын ешқашан көрсетпеу</translation>
 <translation id="2597073208962000830">Nearby Share маңайдағы құрылғыларды табу үшін Bluetooth арқылы іздеуді пайдаланады.</translation>
 <translation id="2598136842498757793">Құралдар тақтасының түймелерін бейімдеу</translation>
 <translation id="2598710988533271874">Жаңа Chrome қолжетімді</translation>
@@ -2402,7 +2399,6 @@
 <translation id="2844169650293029770">USB-C құрылғысы (сол жақ алдыңғы порты)</translation>
 <translation id="2844809857160214557">Баспа жұмыстарын көру және басқару</translation>
 <translation id="284491292807422921">Сайтты өшіру қажет пе?</translation>
-<translation id="2845276301195220700">Google Calendar-ға арналған басқа әрекеттер</translation>
 <translation id="2845382757467349449">Әрқашан бетбелгілер жолағын көрсету</translation>
 <translation id="284581348330507117">Бірегей құпия сөздер жасаңыз.</translation>
 <translation id="2846345106886298325">Тапсырма орындалды және Gemini Spark-қа қайтарылды.</translation>
@@ -3536,7 +3532,6 @@
 <translation id="3708295717182051206">Субтитр</translation>
 <translation id="3708684582558000260">Жабылған сайттардың деректерді жіберуді немесе қабылдауды аяқтауына рұқсат бермеу</translation>
 <translation id="3709244229496787112">Браузер жүктеу аяқталмасынан бұрын өшірілді.</translation>
-<translation id="3710438437470197252">Толық ақпаратты Google Drive-тан көріңіз</translation>
 <translation id="3710501561113687889">Жалғастыру үшін <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> сіздің <ph name="FIELDS_STRING" /> деректеріңізді осы сайтпен бөліседі.</translation>
 <translation id="3711931198657368127">Қою және "<ph name="URL" />" бетіне өту</translation>
 <translation id="3711945201266135623">Басып шығару серверінен <ph name="NUM_PRINTERS" /> принтер табылды.</translation>
@@ -4090,10 +4085,6 @@
 <translation id="4110485659976215879">Ескертуді қалпына келтіру</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (офлайн)</translation>
 <translation id="4113743276555482284">Файл құпия сөзі</translation>
-<translation id="4114524937989710624">Google Drive қызметіндегі соңғы іс-әрекеттерге оңай оралуға көмектесетін файлдарды көріп тұрсыз.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Параметрлерді карта мәзірінен реттей, басқа опцияларды "Chrome браузерін реттеу" бөлімінен көре аласыз.</translation>
 <translation id="4115002065223188701">Желі қолжетімді емес</translation>
 <translation id="4115378294792113321">Күлгін</translation>
 <translation id="4116480382905329353">1 рет анықталды</translation>
@@ -7165,7 +7156,6 @@
 <translation id="6557290421156335491">Таңбашаларым</translation>
 <translation id="6558098963164662391">&amp;Сөздіктен өшіру</translation>
 <translation id="6560061709899140565">Басқа трансляциялау сеанстарын көрсету</translation>
-<translation id="656065428026159829">Басқаларын көру</translation>
 <translation id="6561877237303825108">Бұл файл түрі (<ph name="TYPE" />) қауіпті болуы мүмкін. Осы файлды <ph name="ORIGIN" /> дереккөзіне сенген жағдайда ғана сақтаңыз.</translation>
 <translation id="6562117348069327379">Жүйе журналдарын "Жүктеп алынғандар" каталогіне сақтау.</translation>
 <translation id="656293578423618167">Файл жолы немесе атауы тым ұзын. Қысқа атаумен немесе басқа орынға сақтаңыз.</translation>
@@ -7530,10 +7520,6 @@
 <translation id="6827767090350758381">Chrome қолданбаларының ескі нұсқалары 2022 жылдың желтоқсанынан кейін Windows жүйесіндегі құрылғыларда ашылмайды. Қолданбаның жаңа нұсқасын орнату немесе оны жою үшін әкімшіге хабарласыңыз.</translation>
 <translation id="6828182567531805778">Деректерді синхрондау үшін құпия фразаны енгізіңіз.</translation>
 <translation id="6828860976882136098">Барлық пайдаланушылар үшін автоматты жаңартулар орнатылмады (алдын ала орындау қатесі: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Google Calendar-дағы келесі іс-шараға оңай өту үшін сізге күнтізбе көрсетіледі.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Параметрлерді карта мәзірінен реттеуге немесе "Chrome-ды бейімдеу" бөлімінен басқа опцияларды көруге болады.</translation>
 <translation id="6831043979455480757">Аудару</translation>
 <translation id="6831989891148852199">Қозғалыс немесе жарық датчиктерін пайдалануға рұқсат берілмеген</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Қойындыны өшіріп, топты жою қажет пе?}=1{Қойындыларды өшіріп, топты жою қажет пе?}other{Қойындыларды өшіріп, топтарды жою қажет пе?}}</translation>
@@ -7653,7 +7639,6 @@
 <translation id="6912007319859991306">SIM картасының PIN коды</translation>
 <translation id="6912380255120084882">Басқа құрылғыны пайдаланып көріңіз</translation>
 <translation id="691289340230098384">Субтитр параметрлері</translation>
-<translation id="6913051485529944333">Бұл бетте енді Google Calendar көрсетілмейді.</translation>
 <translation id="6914812290245989348">Қауіпті сайттарға кіру алдында ескертулер көрсетілмесін</translation>
 <translation id="6916590542764765824">Кеңейтімдерді басқару</translation>
 <translation id="6916676294509106572">Outlook Calendar жасырылды.</translation>
@@ -7728,7 +7713,6 @@
 <translation id="6978121630131642226">Іздеу жүйелері</translation>
 <translation id="6979041727349121225">Қуат үнемдеу</translation>
 <translation id="6979044105893951891">Басқарылатын қонақ сеанстарын іске қосу және олардан шығу</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">Дыбысын өшіру (әдепкі)</translation>
 <translation id="6979557074007409812">Иә, деректерімді жұмыс деректерінен бөлек сақтау</translation>
 <translation id="6979737339423435258">Барлық уақыт</translation>
@@ -8653,7 +8637,6 @@
 <translation id="7690853182226561458">&amp;Қалта қосу…</translation>
 <translation id="7691077781194517083">Қауіпсіздік кілтін бастапқы күйіне қайтару мүмкін емес. Қате: <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Браузерді қолдану тарихынан іздеу және кірген сайттарды табу үшін күнделікті тілді пайдаланыңыз. Браузерді қолдану тарихы бойынша сұрақ қоюға және жауаптар алуға да болады.</translation>
-<translation id="7694895628076803349">Drive-ды көрсетпеу</translation>
 <translation id="7696063401938172191">"<ph name="PHONE_NAME" />" телефонында:</translation>
 <translation id="7697109152153663933">"Құпия сөздер және автотолтыру" түймесін басыңыз</translation>
 <translation id="769824636077131955">Бұл құжат қауіпсіздік тексерісін жүргізу үшін тым үлкен. 50 МБ-қа дейінгі құжаттарды басып шығаруға болады.</translation>
@@ -8803,7 +8786,6 @@
 <translation id="7811263553491007091">Әрекетті қайталаңыз немесе төменнен алдыңғы жасалған тақырыптардың бірін таңдаңыз.</translation>
 <translation id="7811926937048662341">Осы жерді тінтуірдің оң жақ түймесімен басып, "Қойындыларды тігінен көрсету" опциясын таңдаңыз.</translation>
 <translation id="7811986034759500329">Жүйе параметрлерінде реттеу</translation>
-<translation id="7812170317334653156">Google Calendar жасырылды.</translation>
 <translation id="7814458197256864873">&amp;Көшіру</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531"><ph name="EXTENSION_NAME" /> <ph name="SHORTCUT" /> таңбашасын өңдеу</translation>
@@ -9245,7 +9227,6 @@
 <translation id="8146287226035613638">Қалаған тілдерді қосып, жіктеңіз. Мүмкін болған кезде веб-сайттар өзіңізге ыңғайлы тілде көрсетіледі. Бұл параметрлер браузер параметрлерімен синхрондалады. <ph name="BEGIN_LINK_LEARN_MORE" />Толығырақ<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Жаңылыс туралы есептер, диагностика және пайдалану туралы деректі Google-ға автоматты түрде жіберу арқылы Chrome және ChromeOS жүйесінің функциялары мен жұмыс өнімділігін жақсартуға көмектесіңіз.</translation>
 <translation id="8147900440966275470"><ph name="NUM" /> қойынды табылды.</translation>
-<translation id="814870937590541483">Google Drive файлдарына арналған басқа әрекеттер</translation>
 <translation id="8148760431881541277">Кіруді шектеу</translation>
 <translation id="8149596686567059924">Жаңарту пакетін ашу мүмкін болмады.</translation>
 <translation id="8149870652370242480">Телефонда сақталған құпия сөздеріңізді пайдалану үшін iOS-қа арналған Chrome браузерін жүктеп алып, Google аккаунтыңызға кіріңіз.</translation>

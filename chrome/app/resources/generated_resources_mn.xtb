@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">"<ph name="MAIN_GESTURE" />" нь "<ph name="CONFLICTING_GESTURE_ONE" />", "<ph name="CONFLICTING_GESTURE_TWO" />", "<ph name="CONFLICTING_GESTURE_THREE" />" гуравтай давхцаж магадгүй. Хэрэв боломжтой бол өөр зангаа сонгож үзнэ үү.</translation>
 <translation id="1293556467332435079">Файлууд</translation>
 <translation id="12951065153783848">Танай байгууллага бүртгэлийг тань удирддаг</translation>
-<translation id="1296410481664942178">Google Календарийг бүү харуул</translation>
 <translation id="1296911687402551044">Сонгосон табыг бэхлэх</translation>
 <translation id="1297175357211070620">Хэвлэгч машин сонгох</translation>
 <translation id="129770436432446029"><ph name="EXPERIMENT_NAME" />-н санал хүсэлт илгээх</translation>
@@ -1156,7 +1155,6 @@
 <translation id="1884340228047885921">Харагдцын одоогийн тохиргоог зарим харилцагч болгож тохируулсан байна</translation>
 <translation id="1884705339276589024">Linux дискийн хэмжээг өөрчлөх</translation>
 <translation id="1885066963699478692">Бодлогыг тохируулахад ашиглаж байгаа XML файлууд.</translation>
-<translation id="1885089541024391265">Google Календарь</translation>
 <translation id="1885106732301550621">Дискийн зай</translation>
 <translation id="188537499764410817">Gemini-н таныг нэвтрүүлж болох сайтууд энд харагдана</translation>
 <translation id="1886996562706621347">Сайтуудыг протоколуудын тогмтол удирдагч байхыг зөвшөөр (зөвлж байна)</translation>
@@ -2067,7 +2065,6 @@
 <translation id="2586672484245266891">Богино URL оруулна уу</translation>
 <translation id="2588271083332682494">Табын бүлгүүдээр цэгцлээрэй</translation>
 <translation id="2588636910004461974"><ph name="VENDOR_NAME" />-н төхөөрөмжүүд</translation>
-<translation id="2589658397149952302">Драйвын файлуудыг хэзээ ч бүү харуул</translation>
 <translation id="2597073208962000830">Ойролцоо хуваалцах нь ойролцоох төхөөрөмжүүдийг олохын тулд Bluetooth-н сканыг ашиглана.</translation>
 <translation id="2598136842498757793">Самбарын товчнуудыг өөрчлөх</translation>
 <translation id="2598710988533271874">Шинэ Chrome боломжтой</translation>
@@ -2414,7 +2411,6 @@
 <translation id="2844169650293029770">USB-C төхөөрөмж (урд талын портын зүүн тал)</translation>
 <translation id="2844809857160214557">Хэвлэх ажлуудыг харах болон удирдах</translation>
 <translation id="284491292807422921">Сайтыг хасах уу?</translation>
-<translation id="2845276301195220700">Google Календарийн бусад үйлдэл</translation>
 <translation id="2845382757467349449">Хавчуургын мөрийг байнга харуулах</translation>
 <translation id="284581348330507117">Өвөрмөц нууц үгнүүд үүсгэнэ үү</translation>
 <translation id="2846345106886298325">Даалгаврыг хийж дуусгаад, Gemini Spark руу буцаасан</translation>
@@ -3550,7 +3546,6 @@
 <translation id="3708295717182051206">Хаалттай тайлбарууд</translation>
 <translation id="3708684582558000260">Хаасан сайтуудад өгөгдөл илгээж эсвэл хүлээн авч дуусгахыг бүү зөвшөөр</translation>
 <translation id="3709244229496787112">Файлыг татаж дуусахаас өмнө веб хөтөч хаагдсан.</translation>
-<translation id="3710438437470197252">Google Драйвд илүү ихийг харах</translation>
 <translation id="3710501561113687889">Үргэлжлүүлэхийн тулд <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> таны <ph name="FIELDS_STRING" />-г энэ сайттай хуваалцана.</translation>
 <translation id="3711931198657368127"><ph name="URL" />-г буулгаад, очих</translation>
 <translation id="3711945201266135623">Хэвлэх серверээс <ph name="NUM_PRINTERS" /> хэвлэгч олдлоо</translation>
@@ -4103,10 +4098,6 @@
 <translation id="4110485659976215879">Сануулгыг сэргээх</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (офлайн)</translation>
 <translation id="4113743276555482284">Файлын нууц үг</translation>
-<translation id="4114524937989710624">Та Google Драйвт хамгийн саяхны үйл ажиллагаа руугаа хялбархан буцахад тань туслах санал болгосон файлуудыг харж байна.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Та картын цэсээс тохиргоог удирдах эсвэл Customize Chrome-с бусад сонголтыг харах боломжтой.</translation>
 <translation id="4115002065223188701">Сүлжээний хүрээнээс гарсан</translation>
 <translation id="4115378294792113321">Гүн ягаавтар улаан өнгө</translation>
 <translation id="4116480382905329353">1 удаа илэрсэн</translation>
@@ -7183,7 +7174,6 @@
 <translation id="6557290421156335491">Миний товчлол</translation>
 <translation id="6558098963164662391">&amp;Толь бичгээс хасах</translation>
 <translation id="6560061709899140565">Дамжуулах бусад харилцан үйлдлийг харуулах</translation>
-<translation id="656065428026159829">Дэлгэрэнгүй үзэх</translation>
 <translation id="6561877237303825108">Энэ төрлийн файл (<ph name="TYPE" />) аюултай байж болзошгүй. Та зөвхөн <ph name="ORIGIN" />-д итгэдэг тохиолдолд энэ файлыг хадгална уу</translation>
 <translation id="6562117348069327379">Системийн логуудыг Татаж авсан файлын лавлахад хадгална.</translation>
 <translation id="656293578423618167">Файлын зам эсвэл нэр нь хэтэрхий урт байна. Илүү богино нэрээр эсвэл өөр газарт хадгална уу.</translation>
@@ -7548,10 +7538,6 @@
 <translation id="6827767090350758381">Chrome Аппын хуучин хувилбарууд 2022 оны 12-р сараас хойш Windows төхөөрөмжүүд дээр нээгдэхгүй. Шинэ хувилбар луу шинэчлэх эсвэл энэ аппыг хасахын тулд администратортайгаа холбогдоно уу.</translation>
 <translation id="6828182567531805778">Өгөгдлөө синк хийхийн тулд нэвтрэх үгээ оруулна уу</translation>
 <translation id="6828860976882136098">Бүх хэрэглэгчид зориулсан автоматаар шинэчлэх тохируулга амжилтгүй боллоо (шалгалт гүйцэтгэлийн алдаа: <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Танд Google Календарь дахь дараагийн арга хэмжээ рүүгээ хялбархан шилжихэд туслахын тулд календарийг тань харуулж байна.
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Та картын цэсээс тохиргоог удирдах эсвэл Chrome-г өөрчлөх хэсгээс бусад сонголтыг харах боломжтой.</translation>
 <translation id="6831043979455480757">Хөрвүүлэх</translation>
 <translation id="6831989891148852199">Хөдөлгөөн, гэрэл мэдрэгчдийг ашиглахыг зөвшөөрөөгүй</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Табыг хасаж, бүлгийг устгах уу?}=1{Табуудыг хасаж, бүлгийг устгах уу?}other{Табуудыг хасаж, бүлгүүдийг устгах уу?}}</translation>
@@ -7671,7 +7657,6 @@
 <translation id="6912007319859991306">Үүрэн холбооны SIM-н ПИН</translation>
 <translation id="6912380255120084882">Өөр төхөөрөмж туршина уу</translation>
 <translation id="691289340230098384">Хадмалын тохируулга</translation>
-<translation id="6913051485529944333">Та энэ хуудсан дээр Google Календарийг дахин харахгүй</translation>
 <translation id="6914812290245989348">Аюултай сайтууд руу очихоос өмнө ямар нэг сануулга харахгүй</translation>
 <translation id="6916590542764765824">Удирдлаганд байдаг өргөтгөлүүд</translation>
 <translation id="6916676294509106572">Outlook Календарийг нуусан</translation>
@@ -7746,7 +7731,6 @@
 <translation id="6978121630131642226">Хайлтын систем</translation>
 <translation id="6979041727349121225">Эрчим хүч хэмнэгч</translation>
 <translation id="6979044105893951891">Эхлүүлээд, удирдлагатай зочны сургалтаас гарах</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">Дууг хаах (өгөгдмөл)</translation>
 <translation id="6979557074007409812">Тийм, өгөгдлөө ажлаас тусад нь байлгана</translation>
 <translation id="6979737339423435258">Бүх цаг</translation>
@@ -8672,7 +8656,6 @@
 <translation id="7690853182226561458">Хавтас нэмэх...</translation>
 <translation id="7691077781194517083">Энэ аюулгүй байдлын түлхүүрийг шинэчлэх боломжгүй байна. Алдаа <ph name="ERROR_CODE" />.</translation>
 <translation id="7693792553740402887">Хөтчийн түүхээсээ хайх, зочилсон сайтаа олоход өдөр тутмын хэрэглээний хэл ашиглаарай. Та мөн асуулт асууж, хөтчийн түүхдээ тулгуурласан хариулт авах боломжтой</translation>
-<translation id="7694895628076803349">Драйвыг бүү харуул</translation>
 <translation id="7696063401938172191">Tаны '<ph name="PHONE_NAME" />'-д:</translation>
 <translation id="7697109152153663933">“Нууц үгнүүд болон автоматаар бөглөх хэсэг”-ийг товшино уу</translation>
 <translation id="769824636077131955">Энэ документ аюулгүй байдлын шалгалт хийхэд хэт том байна. Та 50 МБ хүртэлх документыг хэвлэх боломжтой.</translation>
@@ -8822,7 +8805,6 @@
 <translation id="7811263553491007091">Дахин оролдох эсвэл өмнө нь доор үүсгэсэн загваруудаас нэгийг сонгоно уу.</translation>
 <translation id="7811926937048662341">Энд хулганын баруун талыг товшоод, “Табыг босоогоор харуулах” гэснийг сонгоно уу</translation>
 <translation id="7811986034759500329">Системийн тохиргоонд тохируулах</translation>
-<translation id="7812170317334653156">Google Календарийг нуусан</translation>
 <translation id="7814458197256864873">Хуулах</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531"><ph name="EXTENSION_NAME" />-д зориулсан <ph name="SHORTCUT" /> товчлолыг засах</translation>
@@ -9263,7 +9245,6 @@
 <translation id="8146287226035613638">Сонгосон хэлнүүдээ нэмж, зэрэглэл хийнэ үү. Боломжтой бол вебсайтуудыг таны сонгосон хэлнүүд дээр харуулна. Эдгээр сонголтыг таны хөтчийн тохиргоотой синк хийдэг. <ph name="BEGIN_LINK_LEARN_MORE" />Нэмэлт мэдээлэл авах<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Гэмтлийн тайлан болон оношилгоо, ашиглалтын өгөгдлийг Google-д автоматаар илгээснээр Chrome болон ChromeOS-н онцлогууд, гүйцэтгэлийг сайжруулахад тусална уу.</translation>
 <translation id="8147900440966275470"><ph name="NUM" /> таб оллоо</translation>
-<translation id="814870937590541483">Google Драйвын файлуудын бусад үйлдэл</translation>
 <translation id="8148760431881541277">Нэвтрэхийг хязгаарлах</translation>
 <translation id="8149596686567059924">Шинэчлэх багцыг задалж чадсангүй.</translation>
 <translation id="8149870652370242480">Утсандаа хадгалсан нууц үгнүүдээ ашиглахын тулд iOS-т зориулсан Chrome-г татаж Google Бүртгэлдээ нэвтэрнэ үү.</translation>

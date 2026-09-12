@@ -408,7 +408,6 @@
 <translation id="1293360286536751243">«<ph name="MAIN_GESTURE" />» ժեստը կարող է հակասել «<ph name="CONFLICTING_GESTURE_ONE" />», «<ph name="CONFLICTING_GESTURE_TWO" />» և «<ph name="CONFLICTING_GESTURE_THREE" />» ժեստերին։ Հնարավորության դեպքում ընտրեք մեկ այլ ժեստ։</translation>
 <translation id="1293556467332435079">Ֆայլեր</translation>
 <translation id="12951065153783848">Ձեր հաշիվը կառավարվում է կազմակերպության կողմից</translation>
-<translation id="1296410481664942178">Ցույց չտալ Google Օրացույցը</translation>
 <translation id="1296911687402551044">Ամրացնել այս ներդիրը</translation>
 <translation id="1297175357211070620">Նպատակակետ</translation>
 <translation id="129770436432446029">Կարծիք հայտնել «<ph name="EXPERIMENT_NAME" />» գործառույթի մասին</translation>
@@ -1146,7 +1145,6 @@
 <translation id="1884340228047885921">Տեսանելիության ընթացիկ կարգավորումը՝ «Որոշ կոնտակտներ»</translation>
 <translation id="1884705339276589024">Փոխել Լինուքսի սկավառակի չափը</translation>
 <translation id="1885066963699478692">XML ֆայլեր, որոնք օգտագործվում են կանոններ սահմանելու համար։</translation>
-<translation id="1885089541024391265">Google Օրացույց</translation>
 <translation id="1885106732301550621">Սկավառակի տարածքը</translation>
 <translation id="188537499764410817">Այստեղ կցուցադրվեն կայքերը, որտեղ Gemini-ը կարող է մուտք գործել ձեր փոխարեն</translation>
 <translation id="1886996562706621347">Թույլ տալ կայքերին հարցել հաղորդակարգերի մշակիչների ստանդարտ տեղադրում (հանձնարարելի)</translation>
@@ -2053,7 +2051,6 @@
 <translation id="2586672484245266891">Մուտքագրեք ավելի կարճ URL</translation>
 <translation id="2588271083332682494">Դասավորեք ձեր ներդիրները խմբերում</translation>
 <translation id="2588636910004461974">Սարքեր <ph name="VENDOR_NAME" /> մատակարարից</translation>
-<translation id="2589658397149952302">Այլևս չցուցադրել Drive-ի ֆայլերը</translation>
 <translation id="2597073208962000830">«Փոխանակում մոտակա սարքերի հետ» գործառույթը մոտակա սարքեր է փնտրում Bluetooth-ի միջոցով։</translation>
 <translation id="2598136842498757793">Անհատականացնել գործիքագոտու կոճակները</translation>
 <translation id="2598710988533271874">Հասանելի է Chrome-ի նոր տարբերակը</translation>
@@ -2400,7 +2397,6 @@
 <translation id="2844169650293029770">USB-C սարք (առջևի ձախակողմյան միացք)</translation>
 <translation id="2844809857160214557">Դիտեք և կառավարեք տպելու առաջադրանքները</translation>
 <translation id="284491292807422921">Հեռացնե՞լ կայքը</translation>
-<translation id="2845276301195220700">Google Օրացույցի այլ գործողություններ</translation>
 <translation id="2845382757467349449">Always Show Bookmarks Bar</translation>
 <translation id="284581348330507117">Ստեղծեք չկրկնվող գաղտնաբառեր</translation>
 <translation id="2846345106886298325">Առաջադրանքը կատարված է և վերադարձվել է Gemini Spark</translation>
@@ -3534,7 +3530,6 @@
 <translation id="3708295717182051206">Ենթագրեր</translation>
 <translation id="3708684582558000260">Թույլ չտալ փակված կայքերին ավարտել տվյալների ուղարկումն ու ստացումը</translation>
 <translation id="3709244229496787112">Դիտարկիչը փակվել է նախքան ներբեռնման ավարտը:</translation>
-<translation id="3710438437470197252">Տեսնել ավելին Google Drive-ում</translation>
 <translation id="3710501561113687889">Շարունակելու համար <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> ընկերությունն այս կայքին կփոխանցի հետևյալ տվյալները՝ <ph name="FIELDS_STRING" />։</translation>
 <translation id="3711931198657368127">Տեղադրել և անցնել <ph name="URL" /> կայք</translation>
 <translation id="3711945201266135623">Տպման սերվերում գտնվել է <ph name="NUM_PRINTERS" /> տպիչ</translation>
@@ -4088,10 +4083,6 @@
 <translation id="4110485659976215879">Վերականգնել նախազգուշացումը</translation>
 <translation id="4112194537011183136"><ph name="DEVICE_NAME" /> (անցանց)</translation>
 <translation id="4113743276555482284">Ֆայլի գաղտնաբառ</translation>
-<translation id="4114524937989710624">Այս առաջարկվող ֆայլերը կօգնեն ձեզ արագ անցնել վերջին գործողություններին Google-ում։
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Դուք կարող եք կառավարել կարգավորումները քարտի ընտրացանկից կամ դիտել լրացուցիչ ընտրանքները «Կարգավորել Chrome-ը» բաժնում։</translation>
 <translation id="4115002065223188701">Դուք ցանցի ծածկույթից դուրս եք</translation>
 <translation id="4115378294792113321">Ծիրանեգույն</translation>
 <translation id="4116480382905329353">Հայտնաբերվել է 1 անգամ</translation>
@@ -7164,7 +7155,6 @@
 <translation id="6557290421156335491">Իմ դյուրանցումները</translation>
 <translation id="6558098963164662391">&amp;Հեռացնել բառարանից</translation>
 <translation id="6560061709899140565">Ցույց տալ հեռարձակման այլ աշխատաշրջաններ</translation>
-<translation id="656065428026159829">Տեսնել ավելին</translation>
 <translation id="6561877237303825108">Այս (<ph name="TYPE" />) տեսակի ֆայլը կարող է վտանգավոր լինել։ Պահեք այն, միայն եթե վստահում եք <ph name="ORIGIN" /> կայքին</translation>
 <translation id="6562117348069327379">Պահել համակարգի մատյանները «Ներբեռնումներ» գրացուցակում։</translation>
 <translation id="656293578423618167">Ֆայլի ուղին կամ անունը չափազանց երկար է: Տվեք ավելի կարճ անուն կամ պահեք այլ տեղում:</translation>
@@ -7531,10 +7521,6 @@
 <translation id="6827767090350758381">Chrome-ի հավելվածների հին տարբերակները 2022 թվականի դեկտեմբերից հետո չեն բացվի Windows սարքերում։ Դիմեք ձեր ադմինիստրատորին՝ նոր տարբերակի անցնելու կամ այս հավելվածը հեռացնելու համար։</translation>
 <translation id="6828182567531805778">Տվյալները համաժամացնելու համար մուտքագրեք ձեր անցաբառը</translation>
 <translation id="6828860976882136098">Չհաջողվեց կարգավորել ավտոմատ թարմացումները բոլոր օգտատերերի համար (սխալ՝ <ph name="ERROR_NUMBER" />)</translation>
-<translation id="6830787477693252535">Օրացուցի պատուհանը կօգնի ձեզ արագ անցնել ձեր հաջորդ միջոցառմանը Google Օրացույցում։
-        <ph name="BREAK" />
-        <ph name="BREAK" />
-        Դուք կարող եք կառավարել կարգավորումները քարտի ընտրացանկից կամ դիտել լրացուցիչ ընտրանքները «Կարգավորել Chrome-ը» բաժնում։</translation>
 <translation id="6831043979455480757">Թարգմանել</translation>
 <translation id="6831989891148852199">Չի թույլատրվում օգտագործել շարժման և լուսավորության տվիչները</translation>
 <translation id="6832815922179448173">{MULTI_GROUP_TAB_COUNT,plural, =0{Հեռացնե՞լ ներդիրը և ջնջել խումբը}=1{Հեռացնե՞լ ներդիրները և ջնջել խումբը}one{Հեռացնե՞լ ներդիրները և ջնջել խումբը}other{Հեռացնե՞լ ներդիրները և ջնջել խմբերը}}</translation>
@@ -7654,7 +7640,6 @@
 <translation id="6912007319859991306">SIM քարտի PIN կոդ</translation>
 <translation id="6912380255120084882">Այլ սարք փորձեք</translation>
 <translation id="691289340230098384">Ենթագրերի կարգավորումներ</translation>
-<translation id="6913051485529944333">Դուք այլևս չեք տեսնի Google Օրացույցը այս էջում</translation>
 <translation id="6914812290245989348">Չտեսնել նախազգուշացումներ նախքան ոչ ապահով կայքեր մտնելը</translation>
 <translation id="6916590542764765824">Կառավարել ընդլայնումները</translation>
 <translation id="6916676294509106572">Outlook Calendar-ը թաքցվեց</translation>
@@ -7729,7 +7714,6 @@
 <translation id="6978121630131642226">Որոնման համակարգեր</translation>
 <translation id="6979041727349121225">Էներգիայի տնտեսում</translation>
 <translation id="6979044105893951891">Հյուրի կառավարվող աշխատաշրջանների գործարկում և դադարեցում</translation>
-<translation id="6979158407327259162">Google Drive</translation>
 <translation id="6979440798594660689">Անձայն (կանխադրված)</translation>
 <translation id="6979557074007409812">Այո, պահել իմ տվյալները աշխատանքայինից անջատ</translation>
 <translation id="6979737339423435258">Ամբողջ ժամանակաշրջանի</translation>
@@ -8655,7 +8639,6 @@
 <translation id="7690853182226561458">Հավելել &amp;թղթապանակ...</translation>
 <translation id="7691077781194517083">Չհաջողվեց զրոյացնել անվտանգության բանալու կարգավորումները։ Սխալի կոդը՝ <ph name="ERROR_CODE" />:</translation>
 <translation id="7693792553740402887">Օգտագործեք խոսակցական լեզուն՝ այցելությունների պատմության մեջ տվյալներ որոնելու և ձեր այցելած կայքերը գտնելու համար։ Դուք նաև կարող եք հարցեր տալ և պատասխաններ ստանալ՝ ձեր այցելությունների պատմության հիման վրա։</translation>
-<translation id="7694895628076803349">Չցուցադրել Drive-ը</translation>
 <translation id="7696063401938172191">Ձեր «<ph name="PHONE_NAME" />» հեռախոսում՝</translation>
 <translation id="7697109152153663933">Սեղմեք «Գաղտնաբառեր և ինքնալրացում»</translation>
 <translation id="769824636077131955">Այս փաստաթուղթը չափազանց մեծ է անվտանգության ստուգման համար։ Դուք կարող եք մինչև 50 ՄԲ չափի փաստաթղթեր տպել։</translation>
@@ -8805,7 +8788,6 @@
 <translation id="7811263553491007091">Նորից փորձեք կամ ընտրեք նախկինում ստեղծված հետևյալ թեմաներից որևէ մեկը։</translation>
 <translation id="7811926937048662341">Մկնիկի աջ կոճակով սեղմեք այստեղ և ընտրեք «Ցույց տալ ներդիրներն ուղղաձիգ դիրքով»</translation>
 <translation id="7811986034759500329">Կարգավորվում է համակարգի կարգավորումներում</translation>
-<translation id="7812170317334653156">Google Օրացույցը թաքցվեց</translation>
 <translation id="7814458197256864873">&amp;Պատճենել</translation>
 <translation id="7814857791038398352">Microsoft OneDrive</translation>
 <translation id="7815583197273433531">Փոփոխել <ph name="EXTENSION_NAME" /> ընդլայնման <ph name="SHORTCUT" /> դյուրացումը</translation>
@@ -9247,7 +9229,6 @@
 <translation id="8146287226035613638">Ավելացրեք նախընտրելի լեզուներ և դասակարգեք դրանք։ Կայքերը հնարավորության դեպքում կցուցադրվեն այդ լեզուներով։ Այս պարամետրերը համաժամացվում են ձեր դիտարկիչի կարգավորումների հետ։ <ph name="BEGIN_LINK_LEARN_MORE" />Իմանալ ավելին<ph name="END_LINK_LEARN_MORE" /></translation>
 <translation id="8147346945017130012">Օգնեք ավելի լավը դարձնել Chrome-ի և ChromeOS-ի գործառույթներն ու աշխատանքը՝ Google-ին ավտոմատ ուղարկելով խափանման մասին հաշվետվությունները, ինչպես նաև օգտագործման և դիագնոստիկ տվյալները։</translation>
 <translation id="8147900440966275470">Գտնվել է <ph name="NUM" /> ներդիր</translation>
-<translation id="814870937590541483">Այլ գործողություններ Google Drive Ֆայլերի հետ</translation>
 <translation id="8148760431881541277">Մուտքի սահմանափակում</translation>
 <translation id="8149596686567059924">Չհաջողվեց բացել թարմացման փաթեթը։</translation>
 <translation id="8149870652370242480">Պահված գաղտնաբառերը ձեր հեռախոսում օգտագործելու համար ներբեռնեք iOS-ի համար նախատեսված Chrome դիտարկիչը և մուտք գործեք ձեր Google հաշիվ։</translation>
