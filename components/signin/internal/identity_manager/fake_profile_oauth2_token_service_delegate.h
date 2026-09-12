@@ -15,7 +15,6 @@
 #include "build/build_config.h"
 #include "components/signin/internal/identity_manager/profile_oauth2_token_service_delegate.h"
 #include "components/signin/public/base/signin_buildflags.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/test/test_url_loader_factory.h"
 #if BUILDFLAG(IS_IOS)

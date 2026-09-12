@@ -21,6 +21,7 @@
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/sync/base/features.h"
 #include "content/public/test/browser_task_environment.h"
+#include "google_apis/gaia/google_service_auth_error.h"
 #include "net/http/http_util.h"
 #include "net/traffic_annotation/network_traffic_annotation_test_helper.h"
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"

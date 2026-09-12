@@ -33,6 +33,7 @@
 #include "components/signin/public/identity_manager/set_accounts_in_cookie_result.h"
 #include "google_apis/gaia/core_account_id.h"
 #include "google_apis/gaia/gaia_auth_test_util.h"
+#include "google_apis/gaia/gaia_auth_util.h"
 #include "google_apis/gaia/gaia_constants.h"
 #include "google_apis/gaia/gaia_features.h"
 #include "google_apis/gaia/gaia_id.h"

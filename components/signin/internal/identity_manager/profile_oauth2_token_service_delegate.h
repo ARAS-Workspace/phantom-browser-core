@@ -24,7 +24,6 @@
 #include "components/signin/public/identity_manager/load_credentials_state.h"
 #include "components/signin/public/identity_manager/token_binding_info.h"
 #include "crypto/signature_verifier.h"
-#include "google_apis/gaia/gaia_auth_util.h"
 #include "google_apis/gaia/google_service_auth_error.h"
 #include "google_apis/gaia/oauth2_access_token_manager.h"
 #include "net/base/backoff_entry.h"

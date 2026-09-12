@@ -28,6 +28,7 @@
 #include "crypto/apple/fake_keychain_v2.h"
 #include "crypto/apple/keychain_v2.h"
 #include "crypto/apple/scoped_fake_keychain_v2.h"
+#include "google_apis/gaia/gaia_id.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 

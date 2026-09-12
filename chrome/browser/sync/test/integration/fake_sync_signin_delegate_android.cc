@@ -9,6 +9,7 @@
 #include "base/notreached.h"
 #include "chrome/browser/sync/test/integration/sync_test_utils_android.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
+#include "google_apis/gaia/gaia_id.h"
 
 namespace {
 

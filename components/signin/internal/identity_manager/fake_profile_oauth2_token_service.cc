@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "components/signin/internal/identity_manager/fake_profile_oauth2_token_service_delegate.h"
+#include "google_apis/gaia/google_service_auth_error.h"
 
 FakeProfileOAuth2TokenService::FakeProfileOAuth2TokenService(
     PrefService* user_prefs)

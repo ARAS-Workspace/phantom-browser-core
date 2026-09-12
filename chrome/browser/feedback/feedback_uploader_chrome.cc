@@ -18,7 +18,6 @@
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/storage_partition.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "services/network/public/cpp/resource_request.h"
 
 namespace feedback {

@@ -36,6 +36,7 @@
 #include "google_apis/gaia/gaia_auth_util.h"
 #include "google_apis/gaia/gaia_id.h"
 #include "google_apis/gaia/gaia_urls.h"
+#include "google_apis/gaia/google_service_auth_error.h"
 #include "google_apis/gaia/oauth_multilogin_result.h"
 #include "net/http/http_status_code.h"
 #include "services/network/public/cpp/resource_request.h"

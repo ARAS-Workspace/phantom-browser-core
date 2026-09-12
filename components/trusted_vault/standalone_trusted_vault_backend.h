@@ -24,7 +24,6 @@
 #include "components/trusted_vault/trusted_vault_server_constants.h"
 #include "components/trusted_vault/trusted_vault_throttling_connection.h"
 #include "google_apis/gaia/gaia_id.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 
 namespace signin {
 class AccountsInCookieJarInfo;

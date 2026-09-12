@@ -17,7 +17,6 @@
 #include "components/endpoint_fetcher/endpoint_fetcher.h"
 #include "components/media_router/browser/logger_impl.h"
 #include "components/signin/public/identity_manager/primary_account_access_token_fetcher.h"
-#include "google_apis/gaia/google_service_auth_error.h"
 #include "services/network/public/cpp/resource_request.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/cpp/simple_url_loader.h"

@@ -15,7 +15,6 @@
 #include "base/metrics/field_trial_params.h"
 #include "base/types/strong_alias.h"
 #include "components/signin/public/identity_manager/primary_account_access_token_fetcher.h"
-#include "google_apis/gaia/gaia_constants.h"
 #include "net/base/backoff_entry.h"
 #include "net/base/request_priority.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"

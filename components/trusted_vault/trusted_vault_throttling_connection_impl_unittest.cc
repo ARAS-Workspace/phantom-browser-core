@@ -13,6 +13,7 @@
 #include "components/trusted_vault/test/fake_file_access.h"
 #include "components/trusted_vault/test/mock_trusted_vault_throttling_connection.h"
 #include "components/trusted_vault/trusted_vault_connection.h"
+#include "google_apis/gaia/gaia_id.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace trusted_vault {

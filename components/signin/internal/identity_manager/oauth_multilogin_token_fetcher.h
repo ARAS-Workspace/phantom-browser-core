@@ -18,7 +18,6 @@
 #include "components/signin/internal/identity_manager/oauth_multilogin_token_request.h"
 #include "components/signin/public/base/signin_buildflags.h"
 #include "google_apis/gaia/core_account_id.h"
-#include "google_apis/gaia/gaia_auth_fetcher.h"
 #include "google_apis/gaia/google_service_auth_error.h"
 
 class SigninClient;

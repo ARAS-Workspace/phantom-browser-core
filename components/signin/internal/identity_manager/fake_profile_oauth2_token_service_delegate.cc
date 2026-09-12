@@ -19,6 +19,7 @@
 #include "components/signin/public/base/signin_switches.h"
 #include "google_apis/gaia/gaia_access_token_fetcher.h"
 #include "google_apis/gaia/gaia_constants.h"
+#include "google_apis/gaia/google_service_auth_error.h"
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "components/signin/public/base/session_binding_utils.h"
