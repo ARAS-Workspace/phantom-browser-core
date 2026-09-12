@@ -2914,7 +2914,6 @@ source_set("browser") {
   if (enable_extensions) {
     public_deps += [
       "//chrome/browser/apps/platform_apps",
-      "//chrome/browser/apps/platform_apps/api",
       "//chrome/browser/controlled_frame",
       "//chrome/browser/extensions",
       "//ui/base/mojom:ui_base_types",
@@ -2924,7 +2923,6 @@ source_set("browser") {
       "//apps",
       "//chrome/browser/clipboard:impl",
       "//chrome/browser/controlled_frame:media_access_handler_impl",
-      "//chrome/browser/sync_file_system",
       "//chrome/browser/ui/web_applications",
       "//chrome/browser/web_applications/extensions",
       "//chrome/common/extensions/api",
@@ -3255,7 +3253,6 @@ group("browser_generated_files") {
       "//chrome/browser/new_tab_page/modules/v2/tab_groups:mojo_bindings",
       "//chrome/browser/share/proto",
       "//chrome/browser/support_tool:support_tool_proto",
-      "//chrome/browser/sync_file_system/drive_backend:sync_file_system_drive_proto",
       "//chrome/browser/ui:webui_name_variants",
       "//chrome/browser/ui/views/drive_picker_host:mojo_bindings",
       "//chrome/browser/ui/webui/access_code_cast:mojo_bindings",

@@ -13,7 +13,6 @@ from compiler import GenerateSchema
 
 # APIs with generated externs.
 API_SOURCES = (
-  ('chrome', 'common', 'apps', 'platform_apps', 'api'),
   ('chrome', 'common', 'extensions', 'api'),
   ('extensions', 'common', 'api'),
 )

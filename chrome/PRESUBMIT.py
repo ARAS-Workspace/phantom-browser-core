@@ -248,7 +248,6 @@ def _CheckNoBaseRunLoopInChrome(input_api, output_api):
         'chrome/browser/sessions/session_restore.cc',
         'chrome/browser/sessions/tab_restore_service_load_waiter.h',
         'chrome/browser/ssl/ssl_client_auth_requestor_mock.h',
-        'chrome/browser/sync_file_system/local/canned_syncable_file_system.cc',
         'chrome/browser/ui/ash/login/login_display_host.h',
         'chrome/browser/ui/cocoa/first_run_dialog_cocoa.mm',
         'chrome/browser/ui/cocoa/share_menu_controller.mm',

@@ -70,7 +70,6 @@
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/apps/platform_apps/chrome_apps_browser_api_provider.h"
 #include "chrome/browser/ui/apps/chrome_app_window_client.h"
 #include "components/storage_monitor/storage_monitor.h"  // nogncheck crbug.com/40147906
 #include "components/storage_monitor/test_storage_monitor.h"  // nogncheck crbug.com/40147906
@@ -294,8 +293,6 @@ void TestingBrowserProcess::Init() {
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-  extensions_browser_client_->AddAPIProvider(
-      std::make_unique<chrome_apps::ChromeAppsBrowserAPIProvider>());
   extensions::AppWindowClient::Set(ChromeAppWindowClient::GetInstance());
 #endif
 

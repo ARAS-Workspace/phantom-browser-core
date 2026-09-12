@@ -97,9 +97,5 @@
   "pointerLock": {
     "channel": "stable",
     "extension_types": ["platform_app"]
-  },
-  "syncFileSystem": {
-    "channel": "stable",
-    "extension_types": ["platform_app"]
   }
 }

@@ -19,7 +19,6 @@ source_set("platform_apps") {
 
   deps = [
     "//chrome/common:resources_grit",
-    "//chrome/common/apps/platform_apps/api",
     "//chrome/common/apps/platform_apps/api:apps_features",
     "//extensions/common",
   ]

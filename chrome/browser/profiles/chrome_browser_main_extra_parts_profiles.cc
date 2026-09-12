@@ -495,7 +495,6 @@
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "apps/browser_context_keyed_service_factories.h"
 #include "chrome/browser/apps/platform_apps/browser_context_keyed_service_factories.h"
-#include "chrome/browser/sync_file_system/sync_file_system_service_factory.h"
 #include "chrome/browser/ui/web_applications/web_app_metrics_factory.h"
 #include "chrome/browser/web_applications/web_app_provider_factory.h"
 #include "components/webapps/isolated_web_apps/reading/response_reader_registry_factory.h"  // nogncheck
@@ -1334,9 +1333,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   SupervisedUserMetricsServiceFactory::GetInstance();
   supervised_user::SupervisedUserServiceFactory::GetInstance();
   supervised_user::SupervisedUserUrlFilteringServiceFactory::GetInstance();
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  sync_file_system::SyncFileSystemServiceFactory::GetInstance();
-#endif
   SyncServiceFactory::GetInstance();
   tab_groups::TabGroupSyncServiceFactory::GetInstance();
   TabRestoreServiceFactory::GetInstance();

@@ -877,9 +877,6 @@ source_set("extensions") {
       # TODO(crbug.com/343037853): Remove this circular dependency.
       "//chrome/browser/themes",
 
-      # TODO(crbug.com/344921703): Remove circular dependencies.
-      "//chrome/browser/sync_file_system",
-
       # TODO(crbug.com/345487716): Remove this circular dependency.
       "//chrome/browser/ui/views/side_panel",
     ]
@@ -941,7 +938,6 @@ source_set("extensions") {
       "//chrome/browser/search_engine_choice",
       "//chrome/browser/search_engines",
       "//chrome/browser/sync",
-      "//chrome/browser/sync_file_system",
       "//chrome/browser/themes",
       "//chrome/browser/ui/apps",
       "//chrome/browser/ui/browser_window",
@@ -2481,7 +2477,6 @@ source_set("browser_tests") {
       "//chrome/browser/password_manager:test_support",
       "//chrome/browser/pdf:pdf_extension_test_utils",
       "//chrome/browser/prefetch",
-      "//chrome/browser/sync_file_system",
       "//chrome/browser/tab_list",
       "//chrome/browser/ui/global_error:test_support",
       "//chrome/browser/ui/hid",

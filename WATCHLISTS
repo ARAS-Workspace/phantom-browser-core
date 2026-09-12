@@ -2238,9 +2238,6 @@
     'switch_access': {
       'filepath': 'switch_access',
     },
-    'syncfs': {
-      'filepath': 'sync_file_system',
-    },
     'tab_alert_indicators': {
       'filepath': 'content/browser/media/audio_stream_monitor'\
         '|chrome/browser/ui/tabs/tab_utils'\
@@ -3384,7 +3381,6 @@
     'surface_layer_for_video': [ 'lethalantidote@chromium.org',
                                  'liberato@chromium.org'],
     'switch_access': ['anastasi+watch@google.com'],
-    'syncfs': ['kinuko+fileapi@chromium.org'],
     'tab_alert_indicators': ['jophba+watch@chromium.org'],
     'tab_alerts': ['stluong+watch@chromium.org'],
     'tab_capture': ['jophba+watch@chromium.org',

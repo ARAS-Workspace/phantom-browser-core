@@ -848,7 +848,6 @@ TEST_F(PermissionMessageCombinationsUnittest, PermissionMessageCombos) {
       "    'sessions',"
       "    'bookmarks',"
       "    'unlimitedStorage',"
-      "    'syncFileSystem',"
       "    'http://www.blogger.com/',"
       "    'http://*.google.com/',"
       "    'http://*.news.com/',"
@@ -882,7 +881,6 @@ TEST_F(PermissionMessageCombinationsUnittest, PermissionMessageCombos) {
       "    'topSites',"
       "    'storage',"
       "    'unlimitedStorage',"
-      "    'syncFileSystem',"
       "    'http://www.blogger.com/',"
       "    'http://*.google.com/',"
       "    'http://*.news.com/',"
@@ -930,7 +928,6 @@ TEST_F(PermissionMessageCombinationsUnittest, PermissionMessageCombos) {
       "    'topSites',"
       "    'storage',"
       "    'unlimitedStorage',"
-      "    'syncFileSystem',"
       "    'http://www.blogger.com/',"
       "    'http://*.google.com/',"
       "    'http://*.news.com/',"
@@ -940,7 +937,7 @@ TEST_F(PermissionMessageCombinationsUnittest, PermissionMessageCombos) {
       "}");
 
   ASSERT_TRUE(CheckManifestProducesPermissions(
-      "Read data you copy and paste", "Store data in your Google Drive account",
+      "Read data you copy and paste",
       "Read and change your accessibility settings"));
 #endif  // !BUILDFLAG(IS_ANDROID)
 }

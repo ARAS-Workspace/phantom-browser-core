@@ -5444,9 +5444,6 @@ are declared in tools/grit/grit_args.gni.
         <message name="IDS_EXTENSION_PROMPT_WARNING_MEDIA_GALLERIES_READ_WRITE_DELETE" desc="Permission string for access to read, write and delete to all of the user's media galleries.">
           Read, change and delete photos, music, and other media from your computer
         </message>
-        <message name="IDS_EXTENSION_PROMPT_WARNING_SYNCFILESYSTEM" desc="Permission string for synchronizing files to the user's Google Drive">
-          Store data in your Google Drive account
-        </message>
         <message name="IDS_EXTENSION_PROMPT_WARNING_NATIVE_MESSAGING" desc="Permission string for Native Messaging API.">
           Communicate with cooperating native applications
         </message>

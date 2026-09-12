@@ -308,7 +308,6 @@ after discussions on the right group.
       <annotation id="chrome_apps_socket_api"/>
       <annotation id="extension_blacklist"/>
       <annotation id="extension_install_signer"/>
-      <annotation id="sync_file_system"/>
     </sender>
     <sender name="Webstore">
       <annotation id="content_hash_verification_job"/>

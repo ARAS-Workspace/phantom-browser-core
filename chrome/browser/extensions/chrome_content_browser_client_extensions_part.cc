@@ -24,7 +24,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_selections.h"
-#include "chrome/browser/sync_file_system/local/sync_file_system_backend.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/url_constants.h"
@@ -847,12 +846,6 @@ void ChromeContentBrowserClientExtensionsPart::GetAdditionalFileSystemBackends(
     const base::FilePath& storage_partition_path,
     std::vector<std::unique_ptr<storage::FileSystemBackend>>*
         additional_backends) {
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-  additional_backends->push_back(
-      std::make_unique<sync_file_system::SyncFileSystemBackend>(
-          Profile::FromBrowserContext(browser_context)));
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 }
 
 void ChromeContentBrowserClientExtensionsPart::

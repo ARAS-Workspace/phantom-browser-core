@@ -1735,22 +1735,6 @@ TEST(PermissionsTest, IsEmpty) {
   EXPECT_FALSE(perm_set->IsEmpty());
 }
 
-#if BUILDFLAG(ENABLE_PLATFORM_APPS)
-// "syncFileSystem" is a platform app permission.
-TEST(PermissionsTest, SyncFileSystemPermission) {
-  scoped_refptr<Extension> extension = LoadManifest(
-      "permissions", "sync_file_system.json");
-  APIPermissionSet apis;
-  apis.insert(APIPermissionID::kSyncFileSystem);
-  EXPECT_TRUE(extension->is_platform_app());
-  EXPECT_TRUE(extension->permissions_data()->HasAPIPermission(
-      APIPermissionID::kSyncFileSystem));
-  EXPECT_TRUE(
-      VerifyOnePermissionMessage(extension->permissions_data(),
-                                 "Store data in your Google Drive account"));
-}
-#endif  // BUILDFLAG(ENABLE_PLATFORM_APPS)
-
 // Make sure that we don't crash when we're trying to show the permissions
 // even though everything with a chrome:// scheme except chrome://favicon is
 // not a valid permission.

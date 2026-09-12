@@ -23,8 +23,6 @@ source_set("platform_apps") {
     "audio_focus_web_contents_observer.h",
     "browser_context_keyed_service_factories.cc",
     "browser_context_keyed_service_factories.h",
-    "chrome_apps_browser_api_provider.cc",
-    "chrome_apps_browser_api_provider.h",
     "install_chrome_app.cc",
     "install_chrome_app.h",
     "platform_app_launch.cc",
@@ -49,9 +47,7 @@ source_set("platform_apps") {
   public_deps = [
     "//apps",
     "//chrome/browser:browser_public_dependencies",
-    "//chrome/browser/apps/platform_apps/api:api_registration",
     "//chrome/browser/profiles:profile_util",
-    "//chrome/common/apps/platform_apps/api",
   ]
 
   deps = [
@@ -134,8 +130,6 @@ source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   sources = [
-    "api/sync_file_system/sync_file_system_apitest.cc",
-    "api/sync_file_system/sync_file_system_browsertest.cc",
     "app_browsertest.cc",
     "app_speech_recognition_browsertest.cc",
     "app_window_apitest.cc",
@@ -152,14 +146,11 @@ source_set("browser_tests") {
     "//chrome/browser/devtools",
     "//chrome/browser/devtools:test_support",
     "//chrome/browser/extensions:test_support",
-    "//chrome/browser/sync_file_system",
-    "//chrome/browser/sync_file_system:test_support",
     "//chrome/browser/ui/apps",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/extensions",
     "//chrome/test:test_support",
     "//chrome/test:test_support_ui",
-    "//components/drive:test_support",
     "//components/media_router/browser",
     "//content/test:test_support",
     "//extensions/browser:test_support",

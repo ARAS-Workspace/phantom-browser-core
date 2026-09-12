@@ -204,7 +204,6 @@ void OnLocalStatePrefsLoaded();
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#include "chrome/browser/apps/platform_apps/chrome_apps_browser_api_provider.h"
 #include "chrome/browser/ui/apps/chrome_app_window_client.h"
 #include "chrome/common/extensions/chrome_extensions_client.h"
 #include "components/storage_monitor/storage_monitor.h"  // nogncheck crbug.com/40147906
@@ -375,8 +374,6 @@ void BrowserProcessImpl::Init() {
   extensions_browser_client_->Init();
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-  extensions_browser_client_->AddAPIProvider(
-      std::make_unique<chrome_apps::ChromeAppsBrowserAPIProvider>());
   extensions_browser_client_->AddAPIProvider(
       std::make_unique<
           controlled_frame::ControlledFrameExtensionsBrowserAPIProvider>());
