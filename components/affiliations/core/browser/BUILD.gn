@@ -51,8 +51,6 @@ source_set("affiliations") {
     "facet_manager.cc",
     "facet_manager.h",
     "facet_manager_host.h",
-    "hash_affiliation_fetcher.cc",
-    "hash_affiliation_fetcher.h",
     "lookup_affiliation_response_parser.cc",
     "lookup_affiliation_response_parser.h",
   ]
@@ -64,7 +62,6 @@ source_set("affiliations") {
     "//components/prefs",
     "//components/url_formatter",
     "//components/variations/net",
-    "//google_apis",
     "//net",
     "//services/network/public/cpp",
     "//sql",
@@ -114,7 +111,6 @@ source_set("unit_tests") {
     "affiliation_service_impl_unittest.cc",
     "affiliation_utils_unittest.cc",
     "facet_manager_unittest.cc",
-    "hash_affiliation_fetcher_unittest.cc",
     "lookup_affiliation_response_parser_unittest.cc",
     "sql_table_builder_unittest.cc",
   ]

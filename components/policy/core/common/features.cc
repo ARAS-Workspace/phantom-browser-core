@@ -13,9 +13,6 @@
 
 namespace policy::features {
 
-BASE_FEATURE(kPolicyBlocklistProceedUntilResponse,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kProfileSeparationDomainExceptionListRetroactive,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -40,9 +37,6 @@ BASE_FEATURE(kAndroidUseAdminsForEnterpriseInfo,
 BASE_FEATURE(kCustomPolicyRegistrationDelay, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<base::TimeDelta> kPolicyRegistrationDelay{
     &kCustomPolicyRegistrationDelay, "PolicyRegistrationDelay", base::Hours(6)};
-
-// Used to add a captive portal check in SafeSitesNavigationThrottle.
-BASE_FEATURE(kSafeSitesCaptivePortalCheck, base::FEATURE_ENABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_DESKTOP_ANDROID)
 // A blocklist of policies to be blocked/ignored on Desktop Android.

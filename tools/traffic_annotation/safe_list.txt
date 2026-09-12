@@ -9,7 +9,6 @@ missing,net/url_request/url_request_context.cc
 mutable_tag,components/download/internal/background_service/proto_conversions.cc
 mutable_tag,net/traffic_annotation/network_traffic_annotation.h
 all,net/traffic_annotation/network_traffic_annotation.h
-test_annotation,components/safe_search_api/stub_url_checker.cc
 test_annotation,net/quic/quic_chromium_client_session_peer.cc
 all,chromeos/ash/services/libassistant/chromium_http_connection.cc
 all,services/network/cors/cors_url_loader_factory.cc
@@ -130,7 +129,6 @@ missing_new_fields,chrome/browser/ui/webui/new_tab_page/new_tab_page_handler.cc
 missing_new_fields,chrome/browser/ui/webui/sanitized_image/sanitized_image_source.cc
 missing_new_fields,chrome/browser/ui/webui/whats_new/whats_new_util.cc
 missing_new_fields,chromeos/ash/components/device_activity/device_activity_client.cc
-missing_new_fields,components/affiliations/core/browser/hash_affiliation_fetcher.cc
 missing_new_fields,components/assist_ranker/ranker_url_fetcher.cc
 missing_new_fields,components/autofill/core/browser/payments/payments_network_interface.cc
 missing_new_fields,components/captive_portal/content/captive_portal_service.cc
@@ -164,7 +162,6 @@ missing_new_fields,components/password_manager/core/browser/generation/password_
 missing_new_fields,components/password_manager/core/browser/well_known_change_password_state.cc
 missing_new_fields,components/payments/core/payment_manifest_downloader.cc
 missing_new_fields,components/permissions/prediction_service/prediction_service.cc
-missing_new_fields,components/policy/content/safe_search_service.cc
 missing_new_fields,components/policy/core/browser/signin/user_cloud_signin_restriction_policy_fetcher.cc
 missing_new_fields,components/policy/core/common/cloud/external_policy_data_fetcher.cc
 missing_new_fields,components/policy/core/common/cloud/user_info_fetcher.cc

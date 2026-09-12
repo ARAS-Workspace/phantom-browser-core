@@ -23,7 +23,6 @@
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/common/url_constants.h"
 #include "components/affiliations/core/browser/affiliation_service_impl.h"
-#include "components/affiliations/core/browser/hash_affiliation_fetcher.h"
 #include "components/affiliations/core/browser/mock_affiliation_service.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/password_manager/core/browser/well_known_change_password/well_known_change_password_util.h"

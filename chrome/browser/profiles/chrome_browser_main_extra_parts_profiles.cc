@@ -296,7 +296,6 @@
 #include "components/password_manager/core/browser/password_manager_blocklist_policy.h"
 #include "components/payments/content/has_enrolled_instrument_query_factory.h"
 #include "components/permissions/features.h"
-#include "components/policy/content/safe_search_service.h"
 #include "components/policy/core/browser/url_list/policy_blocklist_service.h"
 #include "components/safe_browsing/buildflags.h"
 #include "components/safe_browsing/core/common/features.h"
@@ -1239,7 +1238,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   safe_browsing::V5SearchHashesCacheFactory::GetInstance();
 #endif
   safe_browsing::VerdictCacheManagerFactory::GetInstance();
-  SafeSearchFactory::GetInstance();
 #if BUILDFLAG(IS_ANDROID)
   SafetyHubMenuNotificationServiceFactory::GetInstance();
 #endif  // BUILDFLAG(IS_ANDROID)
