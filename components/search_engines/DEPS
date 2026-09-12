@@ -24,7 +24,6 @@ include_rules = [
   "+components/version_info/version_info.h",
   "+components/webdata",
   "+crypto",
-  "+google_apis",
   "+net",
   "+services/data_decoder/public",
   "+services/network/public/cpp",

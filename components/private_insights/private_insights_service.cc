@@ -27,7 +27,6 @@
 #include "components/private_insights/fcp_simple_task_environment.h"
 #include "components/private_insights/private_insights_features.h"
 #include "components/version_info/version_info.h"
-#include "google_apis/google_api_keys.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "third_party/abseil-cpp/absl/status/statusor.h"
 #include "third_party/federated_compute/src/fcp/client/example_query_result.pb.h"
@@ -281,7 +280,6 @@ PrivateInsightsService::UploadBlocking(
       .log_manager = &fcp_log_manager,
       .flags = &fcp_flags,
       .federated_service_uri = server_uri,
-      .api_key = google_apis::GetAPIKey(),
       .population_name = kFcpPopulationNameContextualCues.Get(),
   };
 

@@ -18,16 +18,12 @@
 #include "components/signin/public/identity_manager/access_token_info.h"
 #include "components/signin/public/identity_manager/primary_account_access_token_fetcher.h"
 #include "components/version_info/channel.h"
-#include "google_apis/google_api_keys.h"
 
 namespace private_ai {
 
 // static
 std::string PrivateAiService::GetApiKey(version_info::Channel channel) {
   std::string api_key = kPrivateAiApiKey.Get();
-  if (api_key.empty() && google_apis::IsGoogleChromeAPIKeyUsed()) {
-    return google_apis::GetAPIKey(channel);
-  }
   return api_key;
 }
 

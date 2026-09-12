@@ -4,7 +4,6 @@ include_rules = [
   "+components/metrics",
   "+components/prefs",
   "+components/version_info",
-  "+google_apis/google_api_keys.h",
   "+net",
   "+services/network/public/cpp",
   "+services/network/public/mojom",

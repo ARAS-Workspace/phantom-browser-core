@@ -111,7 +111,6 @@ static_library("search_engines") {
     "//components/strings",
     "//components/url_formatter",
     "//components/variations",
-    "//google_apis",
     "//net",
     "//services/data_decoder/public/cpp",
     "//services/network/public/cpp",

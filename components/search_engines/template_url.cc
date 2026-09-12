@@ -50,7 +50,6 @@
 #include "components/strings/grit/components_strings.h"
 #include "components/sync/base/features.h"
 #include "components/url_formatter/url_formatter.h"
-#include "google_apis/google_api_keys.h"
 #include "net/base/mime_util.h"
 #include "net/base/url_util.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
@@ -851,8 +850,6 @@ bool TemplateURLRef::ParseParameter(size_t start,
   } else if (parameter == "google:sourceId") {
     replacements->push_back(Replacement(GOOGLE_SEARCH_SOURCE_ID, start));
   } else if (parameter == "google:suggestAPIKeyParameter") {
-    url->insert(start,
-                base::EscapeQueryParamValue(google_apis::GetAPIKey(), false));
   } else if (parameter == "google:suggestPath") {
     replacements->push_back(Replacement(GOOGLE_SUGGEST_PATH, start));
   } else if (parameter == "google:suggestClient") {

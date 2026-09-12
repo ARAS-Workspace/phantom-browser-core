@@ -13,7 +13,6 @@
 #include <utility>
 #include <vector>
 
-#include "base/base64.h"
 #include "base/check_is_test.h"
 #include "base/check_op.h"
 #include "base/files/file_path.h"
@@ -125,7 +124,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/histogram_fetcher.h"
 #include "content/public/browser/network_service_instance.h"
-#include "google_apis/google_api_keys.h"
 #include "printing/buildflags/buildflags.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
@@ -1262,12 +1260,6 @@ bool ChromeMetricsServiceClient::
 
 std::string ChromeMetricsServiceClient::GetAppPackageNameIfLoggable() {
   return metrics::GetAppPackageName();
-}
-
-std::string ChromeMetricsServiceClient::GetUploadSigningKey() {
-  std::string decoded_key;
-  base::Base64Decode(google_apis::GetMetricsKey(), &decoded_key);
-  return decoded_key;
 }
 
 bool ChromeMetricsServiceClient::ShouldResetClientIdsOnClonedInstall() {

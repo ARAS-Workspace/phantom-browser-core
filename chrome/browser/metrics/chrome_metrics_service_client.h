@@ -128,7 +128,6 @@ class ChromeMetricsServiceClient
   bool IsDwaAllowedForAllProfiles() override;
   bool AreNotificationListenersEnabledOnAllProfiles() override;
   std::string GetAppPackageNameIfLoggable() override;
-  std::string GetUploadSigningKey() override;
   static void SetNotificationListenerSetupFailedForTesting(
       bool simulate_failure);
   bool ShouldResetClientIdsOnClonedInstall() override;

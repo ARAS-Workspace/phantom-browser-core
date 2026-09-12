@@ -30,7 +30,6 @@ component("private_insights") {
     "//base",
     "//base:i18n",
     "//components/version_info",
-    "//google_apis",
     "//third_party/federated_compute:fl_runner",
   ]
 }
