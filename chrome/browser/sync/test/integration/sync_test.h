@@ -5,7 +5,6 @@
 #ifndef CHROME_BROWSER_SYNC_TEST_INTEGRATION_SYNC_TEST_H_
 #define CHROME_BROWSER_SYNC_TEST_INTEGRATION_SYNC_TEST_H_
 
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -56,8 +55,6 @@
 #define E2E_ONLY(test_name) MACRO_CONCAT(DISABLED_E2ETest, test_name)
 #define E2E_ENABLED(test_name) MACRO_CONCAT(test_name, E2ETest)
 
-class FakeSyncGCMDriver;
-class KeyedService;
 class ProfileManager;
 class SyncServiceImplHarness;
 
@@ -325,10 +322,6 @@ class SyncTest : public PlatformBrowserTest,
   // determined at runtime based on server type.
   bool CreateProfile(int index);
 
-  // Creates a fake GCMProfileService to simulate sync invalidations.
-  std::unique_ptr<KeyedService> CreateGCMProfileService(
-      content::BrowserContext* context);
-
 #if !BUILDFLAG(IS_ANDROID)
   // Called when the |browser| was removed externally. This just marks the
   // |browser| in the |browsers_| list as nullptr to keep indexes in |browsers_|
@@ -422,26 +415,12 @@ class SyncTest : public PlatformBrowserTest,
   // profile with the server.
   std::vector<std::unique_ptr<SyncServiceImplHarness>> clients_;
 
-  // Used to deliver invalidations to different profiles within
-  // FakeSyncServerInvalidationSender.
-  std::map<raw_ptr<Profile, AcrossTasksDanglingUntriaged>,
-           raw_ptr<FakeSyncGCMDriver, AcrossTasksDanglingUntriaged>>
-      profile_to_fake_gcm_driver_;
-
   syncer::DataTypeSet excluded_types_from_check_for_data_type_failures_;
 
 #if !BUILDFLAG(IS_ANDROID)
   // Disable extension install verification.
   extensions::ScopedInstallVerifierBypassForTest ignore_install_verification_;
 #endif
-
-#if BUILDFLAG(IS_ANDROID)
-  instance_id::ScopedUseFakeInstanceIDAndroid
-      scoped_use_fake_instance_id_android_;
-#endif
-
-  std::unique_ptr<fake_server::FakeServerSyncInvalidationSender>
-      fake_server_sync_invalidation_sender_;
 
   std::unique_ptr<content::URLLoaderInterceptor> url_loader_interceptor_;
   content::NetworkConnectionChangeSimulator connection_change_simulator_;

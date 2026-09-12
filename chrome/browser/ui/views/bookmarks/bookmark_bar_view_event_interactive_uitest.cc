@@ -305,9 +305,7 @@ class TestingPageNavigator : public PageNavigator {
 // TearDown.
 class BookmarkBarViewEventTestBase : public ViewEventTestBase {
  public:
-  BookmarkBarViewEventTestBase()
-      : scoped_testing_factory_installer_(
-            base::BindRepeating(&gcm::FakeGCMProfileService::Build)) {}
+  BookmarkBarViewEventTestBase() = default;
   ~BookmarkBarViewEventTestBase() override = default;
 
   void SetUp() override {
@@ -476,9 +474,6 @@ class BookmarkBarViewEventTestBase : public ViewEventTestBase {
                                                base::Milliseconds(20));
                        })));
   }
-
-  gcm::GCMProfileServiceFactory::ScopedTestingFactoryInstaller
-      scoped_testing_factory_installer_;
 
   raw_ptr<BookmarkModel, AcrossTasksDanglingUntriaged> model_ = nullptr;
   raw_ptr<BookmarkBarView, AcrossTasksDanglingUntriaged> bb_view_ = nullptr;

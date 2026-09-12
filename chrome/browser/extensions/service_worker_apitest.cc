@@ -37,10 +37,7 @@
 #include "chrome/browser/extensions/error_console/error_console_test_observer.h"
 #include "chrome/browser/extensions/extension_action_runner.h"
 #include "chrome/browser/extensions/extension_apitest.h"
-#include "chrome/browser/notifications/notification_display_service_factory.h"
 #include "chrome/browser/notifications/notification_display_service_tester.h"
-#include "chrome/browser/notifications/notification_permission_context.h"
-#include "chrome/browser/notifications/stub_notification_display_service.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
@@ -899,77 +896,6 @@ class ServiceWorkerBackgroundSyncTest : public ServiceWorkerTest {
   }
 };
 
-class ServiceWorkerPushMessagingTest : public ServiceWorkerTest {
- public:
-  ServiceWorkerPushMessagingTest()
-      : scoped_testing_factory_installer_(
-            base::BindRepeating(&gcm::FakeGCMProfileService::Build)),
-        gcm_driver_(nullptr),
-        push_service_(nullptr) {
-    feature_list_.InitAndDisableFeature(
-        features::kPushMessagingDisallowSenderIDs);
-  }
-
-  ServiceWorkerPushMessagingTest(const ServiceWorkerPushMessagingTest&) =
-      delete;
-  ServiceWorkerPushMessagingTest& operator=(
-      const ServiceWorkerPushMessagingTest&) = delete;
-
-  ~ServiceWorkerPushMessagingTest() override = default;
-
-  void GrantNotificationPermissionForTest(const GURL& url) {
-    NotificationPermissionContext::UpdatePermission(
-        profile(), url.DeprecatedGetOriginAsURL(), CONTENT_SETTING_ALLOW);
-  }
-
-  push_messaging::AppIdentifier GetAppIdentifierForServiceWorkerRegistration(
-      int64_t service_worker_registration_id,
-      const GURL& origin) {
-    push_messaging::AppIdentifier app_identifier =
-        PushMessagingAppIdentifier::FindByServiceWorker(
-            profile(), origin, service_worker_registration_id);
-
-    EXPECT_FALSE(app_identifier.is_null());
-    return app_identifier;
-  }
-
-  // ExtensionApiTest overrides.
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(
-        ::switches::kEnableExperimentalWebPlatformFeatures);
-    ServiceWorkerTest::SetUpCommandLine(command_line);
-  }
-
-  void SetUpOnMainThread() override {
-    NotificationDisplayServiceFactory::GetInstance()->SetTestingFactory(
-        profile(),
-        base::BindRepeating(&StubNotificationDisplayService::FactoryForTests));
-
-    gcm::FakeGCMProfileService* gcm_service =
-        static_cast<gcm::FakeGCMProfileService*>(
-            gcm::GCMProfileServiceFactory::GetForProfile(profile()));
-    gcm_driver_ = static_cast<instance_id::FakeGCMDriverForInstanceID*>(
-        gcm_service->driver());
-    push_service_ = PushMessagingServiceFactory::GetForProfile(profile());
-
-    ServiceWorkerTest::SetUpOnMainThread();
-  }
-
-  instance_id::FakeGCMDriverForInstanceID* gcm_driver() const {
-    return gcm_driver_;
-  }
-  PushMessagingServiceImpl* push_service() const { return push_service_; }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  gcm::GCMProfileServiceFactory::ScopedTestingFactoryInstaller
-      scoped_testing_factory_installer_;
-
-  raw_ptr<instance_id::FakeGCMDriverForInstanceID, DanglingUntriaged>
-      gcm_driver_;
-  raw_ptr<PushMessagingServiceImpl, DanglingUntriaged> push_service_;
-};
-
 class ServiceWorkerLazyBackgroundTest : public ServiceWorkerTest {
  public:
   ServiceWorkerLazyBackgroundTest() = default;
@@ -1706,106 +1632,6 @@ IN_PROC_BROWSER_TEST_F(ServiceWorkerTest,
   ASSERT_TRUE(RunExtensionTest("service_worker/content_script_fetch"))
       << message_;
 }
-
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-// TODO(crbug.com/469417243): Port to desktop Android. Fails because
-// gcm_driver()->last_gettoken_app_id() is empty.
-IN_PROC_BROWSER_TEST_F(ServiceWorkerPushMessagingTest, OnPush) {
-  const Extension* extension = LoadExtension(
-      test_data_dir_.AppendASCII("service_worker/push_messaging"));
-  ASSERT_TRUE(extension);
-  GURL extension_url = extension->url();
-
-  GrantNotificationPermissionForTest(extension_url);
-
-  GURL url = extension->GetResourceURL("page.html");
-  auto* web_contents = GetActiveWebContents();
-  ASSERT_TRUE(NavigateToURL(web_contents, url));
-
-  // Start the ServiceWorker.
-  ExtensionTestMessageListener ready_listener("SERVICE_WORKER_READY");
-  ready_listener.set_failure_message("SERVICE_WORKER_FAILURE");
-  const char* kScript = "window.runServiceWorker()";
-  EXPECT_TRUE(content::ExecJs(web_contents->GetPrimaryMainFrame(), kScript));
-  EXPECT_TRUE(ready_listener.WaitUntilSatisfied());
-
-  push_messaging::AppIdentifier app_identifier =
-      GetAppIdentifierForServiceWorkerRegistration(0LL, extension_url);
-  ASSERT_EQ(app_identifier.app_id(), gcm_driver()->last_gettoken_app_id());
-  EXPECT_EQ("1234567890", gcm_driver()->last_gettoken_authorized_entity());
-
-  base::RunLoop run_loop;
-  // Send a push message via gcm and expect the ServiceWorker to receive it.
-  ExtensionTestMessageListener push_message_listener("OK");
-  push_message_listener.set_failure_message("FAIL");
-  gcm::IncomingMessage message;
-  message.sender_id = "1234567890";
-  message.raw_data = "testdata";
-  message.decrypted = true;
-  push_service()->SetMessageCallbackForTesting(run_loop.QuitClosure());
-  push_service()->OnMessage(app_identifier.app_id(), message);
-  EXPECT_TRUE(push_message_listener.WaitUntilSatisfied());
-  run_loop.Run();  // Wait until the message is handled by push service.
-}
-
-// Tests that an extension can subscribe to push notifications with
-// `userVisibleOnly: false` from its service worker and that this state is
-// accurately reported back when the worker calls `getSubscription()`.
-IN_PROC_BROWSER_TEST_F(ServiceWorkerPushMessagingTest,
-                       GetSubscriptionPersistsUserVisibleOnlyFalse) {
-  // Create an extension with a service worker background.
-  TestExtensionDir test_dir;
-  constexpr char kManifest[] =
-      R"({
-         "name": "Test Extension",
-         "manifest_version": 3,
-         "version": "0.1",
-         "background": {"service_worker": "background.js"}
-       })";
-  test_dir.WriteManifest(kManifest);
-
-  constexpr char kBackgroundScript[] =
-      R"(
-        self.addEventListener('activate', event => {
-          // 1. Subscribe to push notifications with `userVisibleOnly: false`.
-          self.registration.pushManager.subscribe({
-            userVisibleOnly: false,
-            applicationServerKey: new TextEncoder().encode('1234567890')
-          }).then(sub => {
-            // 2. Once subscribed, immediately fetch the subscription.
-            return self.registration.pushManager.getSubscription();
-          }).then(sub => {
-            // 3. Verify that the now retrieved subscription has
-            //    `userVisibleOnly: false`.
-            if (!sub) {
-              chrome.test.sendMessage('ERROR: null subscription');
-            } else if (sub.options.userVisibleOnly) {
-              chrome.test.sendMessage('ERROR: userVisibleOnly is true');
-            } else {
-              chrome.test.sendMessage('SUCCESS');
-            }
-          }).catch(err => {
-            // Report any errors during the subscription process.
-            chrome.test.sendMessage('ERROR: ' + err.message);
-          });
-        });
-      )";
-  test_dir.WriteFile(FILE_PATH_LITERAL("background.js"), kBackgroundScript);
-
-  ExtensionTestMessageListener result_listener;
-
-  const Extension* extension = LoadExtension(test_dir.UnpackedPath());
-  ASSERT_TRUE(extension);
-
-  {
-    SCOPED_TRACE(
-        "waiting for background to subscribe to push and then check its "
-        "subscription");
-    EXPECT_TRUE(result_listener.WaitUntilSatisfied());
-  }
-  EXPECT_EQ("SUCCESS", result_listener.message());
-}
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if !BUILDFLAG(IS_ANDROID)
 // This test requires chrome.mimeHandlerPrivate, which is not supported on

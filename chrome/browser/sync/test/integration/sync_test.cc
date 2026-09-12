@@ -26,9 +26,6 @@
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/task/sequenced_task_runner.h"
-#include "base/task/task_traits.h"
-#include "base/task/thread_pool.h"
 #include "base/test/test_timeouts.h"
 #include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
@@ -44,7 +41,6 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/sync/test/integration/committed_all_nudged_changes_checker.h"
-#include "chrome/browser/sync/test/integration/fake_sync_gcm_driver_for_instance_id.h"
 #include "chrome/browser/sync/test/integration/session_hierarchy_match_checker.h"
 #include "chrome/browser/sync/test/integration/sync_datatype_helper.h"
 #include "chrome/browser/sync/test/integration/sync_disabled_checker.h"
@@ -58,7 +54,6 @@
 #include "components/browser_sync/browser_sync_switches.h"
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/data_sharing/public/features.h"
-#include "components/keyed_service/core/keyed_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/signin/public/base/consent_level.h"
 #include "components/signin/public/base/signin_switches.h"
@@ -331,9 +326,6 @@ void SyncTest::PostCreateThreads() {
       embedded_fake_server_adapter_ =
           std::make_unique<fake_server::EmbeddedFakeServerAdapter>(
               fake_server_->AsWeakPtr());
-      fake_server_sync_invalidation_sender_ =
-          std::make_unique<fake_server::FakeServerSyncInvalidationSender>(
-              fake_server_.get());
 
       SetupMockGaiaResponses();
 
@@ -557,15 +549,6 @@ void SyncTest::InitializeProfile(int index, Profile* profile) {
   browser->GetWindow()->Show();
 #endif
 
-  if (server_type_ == IN_PROCESS_FAKE_SERVER) {
-    // Make sure that an instance of GCMProfileService has been created. This is
-    // required for some tests which only call SetupClients().
-    gcm::GCMProfileServiceFactory::GetForProfile(profile);
-    CHECK(profile_to_fake_gcm_driver_.contains(profile));
-    fake_server_sync_invalidation_sender_->AddFakeGCMDriver(
-        profile_to_fake_gcm_driver_[profile]);
-  }
-
   SyncServiceImplHarness::SigninType signin_type =
       server_type_ == EXTERNAL_LIVE_SERVER
           ? SyncServiceImplHarness::SigninType::UI_SIGNIN
@@ -757,7 +740,6 @@ void SyncTest::TearDownOnMainThread() {
   }
 
   if (fake_server_.get()) {
-    fake_server_sync_invalidation_sender_.reset();
     embedded_fake_server_adapter_.reset();
     fake_server_.reset();
   }
@@ -810,7 +792,6 @@ void SyncTest::TearDownOnMainThread() {
   // kDestroyProfileOnBrowserClose is enabled. So clear them out here, to make
   // sure they're not used anymore.
   profiles_.clear();
-  profile_to_fake_gcm_driver_.clear();
   // TODO(crbug.com/40798524): There are various other Profile-related members
   // around like profile_to_*_map_ - those should probably be cleaned up too.
 
@@ -836,15 +817,6 @@ void SyncTest::TearDownOnMainThread() {
 
 void SyncTest::OnProfileWillBeDestroyed(Profile* profile) {
   profile->RemoveObserver(this);
-
-  if (server_type_ == IN_PROCESS_FAKE_SERVER) {
-    CHECK(profile_to_fake_gcm_driver_.contains(profile));
-    if (fake_server_sync_invalidation_sender_) {
-      fake_server_sync_invalidation_sender_->RemoveFakeGCMDriver(
-          profile_to_fake_gcm_driver_[profile]);
-    }
-    profile_to_fake_gcm_driver_.erase(profile);
-  }
 
   for (size_t index = 0; index < profiles_.size(); ++index) {
     if (profiles_[index] != profile) {
@@ -876,33 +848,9 @@ void SyncTest::OnProfileCreationStarted(Profile* profile) {
 
   CHECK(GetFakeServer());
 
-  gcm::GCMProfileServiceFactory::GetInstance()->SetTestingFactory(
-      profile, base::BindRepeating(&SyncTest::CreateGCMProfileService,
-                                   base::Unretained(this)));
   ChromeSigninClientFactory::GetInstance()->SetTestingFactory(
       profile, base::BindRepeating(&BuildChromeSigninClientWithURLLoader,
                                    &test_url_loader_factory_));
-}
-
-std::unique_ptr<KeyedService> SyncTest::CreateGCMProfileService(
-    content::BrowserContext* context) {
-  scoped_refptr<base::SequencedTaskRunner> blocking_task_runner(
-      base::ThreadPool::CreateSequencedTaskRunner(
-          {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
-           base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN}));
-
-  Profile* profile = Profile::FromBrowserContext(context);
-  CHECK(!profile_to_fake_gcm_driver_.contains(profile))
-      << "CreateGCMProfileService called multiple times for profile: "
-      << profile->GetDebugName() << ", is_otr: " << context->IsOffTheRecord();
-
-  auto fake_gcm_driver =
-      std::make_unique<FakeSyncGCMDriver>(profile, blocking_task_runner);
-  profile_to_fake_gcm_driver_[profile] = fake_gcm_driver.get();
-  fake_gcm_driver->WaitForAppIdBeforeConnection(
-      fake_server::FakeServerSyncInvalidationSender::kSyncInvalidationsAppId);
-  return std::make_unique<gcm::FakeGCMProfileService>(
-      std::move(fake_gcm_driver));
 }
 
 bool SyncTest::ResetSyncForPrimaryAccount() {
