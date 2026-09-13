@@ -1014,6 +1014,8 @@ source_set("unit_tests") {
 source_set("test_support") {
   testonly = true
   sources = [
+    "mock_safe_browsing_database_manager.cc",
+    "mock_safe_browsing_database_manager.h",
     "notification_content_detection/mock_notification_content_detection_service.cc",
     "notification_content_detection/mock_notification_content_detection_service.h",
   ]
@@ -1023,6 +1025,8 @@ source_set("test_support") {
     "//components/optimization_guide/core:test_support",
     "//components/safe_browsing/content/browser/notification_content_detection",
     "//components/safe_browsing/content/browser/notification_content_detection:test_utils",
+    "//components/safe_browsing/core/browser/db:database_manager",
+    "//components/safe_browsing/core/browser/db:test_database_manager",
     "//content/public/browser",
     "//testing/gmock",
   ]

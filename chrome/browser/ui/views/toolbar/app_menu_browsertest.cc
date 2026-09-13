@@ -43,8 +43,6 @@
 #include "chrome/browser/ui/hats/mock_trust_safety_sentiment_service.h"
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service_factory.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_test_util.h"
 #include "chrome/browser/ui/test/test_browser_ui.h"
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
@@ -145,8 +143,6 @@ void AppMenuBrowserTest::ShowUi(const std::string& name) {
 #endif
 
       // Submenus only present after Chrome Refresh.
-      {"passwords_and_autofill",
-       AppMenuModel::kPasswordsAndAutofillMenuPlaceholder},
       {"reading_list",
        AppMenuModel::kReadingListMenuPlaceholder},  // Inside the bookmarks
                                                     // menu.
@@ -534,37 +530,6 @@ IN_PROC_BROWSER_TEST_F(
   ShowAndVerifyUi();
 }
 
-// Test case for Safety Hub notification.
-IN_PROC_BROWSER_TEST_F(AppMenuBrowserTest, Safety_Hub_shown_notification) {
-  auto* mock_sentiment_service = static_cast<MockTrustSafetySentimentService*>(
-      TrustSafetySentimentServiceFactory::GetInstance()
-          ->SetTestingFactoryAndUse(
-              browser()->GetProfile(),
-              base::BindRepeating(&BuildMockTrustSafetySentimentService)));
-  safety_hub_test_util::RunUntilPasswordCheckCompleted(browser()->GetProfile());
-  safety_hub_test_util::GenerateSafetyHubMenuNotification(
-      browser()->GetProfile());
-  menu_button()->ShowMenu(views::MenuRunner::SHOULD_SHOW_MNEMONICS);
-  // Set the elapsed timer of the menu to start 10 seconds ago.
-  {
-    base::subtle::ScopedTimeClockOverrides override(
-        /*time_override=*/
-        nullptr,
-        /*time_ticks_override=*/
-        []() {
-          return base::subtle::TimeTicksNowIgnoringOverride() -
-                 base::Seconds(10);
-        },
-        /*thread_ticks_override=*/nullptr);
-    menu_button()->SetMenuTimerForTesting(base::ElapsedTimer());
-  }
-  EXPECT_CALL(
-      *mock_sentiment_service,
-      TriggerSafetyHubSurvey(
-          TrustSafetySentimentService::FeatureArea::kSafetyHubNotification,
-          testing::_));
-  menu_button()->CloseMenu();
-}
 
 class AppMenuProfileGradientRingBrowserTest : public AppMenuBrowserTest {
  public:

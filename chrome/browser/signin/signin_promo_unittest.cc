@@ -16,8 +16,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
 #include "chrome/browser/extensions/sync/extension_sync_util.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service_factory.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service_test_helper.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/chrome_signin_client_test_util.h"
 #include "chrome/browser/signin/chrome_signin_pref_names.h"

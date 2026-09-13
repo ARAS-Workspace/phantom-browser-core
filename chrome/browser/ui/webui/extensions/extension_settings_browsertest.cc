@@ -14,7 +14,6 @@
 #include "chrome/browser/extensions/api/developer_private/developer_private_api.h"
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/safety_hub/extensions_result.h"
 #include "chrome/browser/ui/tabs/tab_enums.h"
 #include "chrome/browser/ui/webui/extensions/extension_settings_test_base.h"
 #include "chrome/common/chrome_paths.h"
@@ -256,10 +255,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionSettingsUIBrowserTest,
   const extensions::Extension* extension = InstallExtensionWithInPageOptions();
   SafetyHubMenuNotificationService* notification_service =
       SafetyHubMenuNotificationServiceFactory::GetForProfile(profile);
-  // Safety Hub services will be initialized when
-  // SafetyHubMenuNotificationService is created. Let Safety Hub services to
-  // initialize properly.
-  safety_hub_test_util::RunUntilPasswordCheckCompleted(profile);
   // No unpublished extensions yet, so there shouldn't be a menu notifications.
   std::optional<MenuNotificationEntry> notification =
       notification_service->GetNotificationToShow();
@@ -277,10 +272,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionSettingsUIBrowserTest,
       {"cws-info", extensions::kDictionary,
        extensions::PrefScope::kExtensionSpecific},
       std::move(dict));
-  notification_service->UpdateResultGetterForTesting(
-      safety_hub::SafetyHubModuleType::EXTENSIONS,
-      base::BindRepeating(&SafetyHubExtensionsResult::GetResult, profile,
-                          /*only_unpublished_extensions=*/true));
   // An extension was unpublished, so we now should get an associated menu
   // notification.
   notification = notification_service->GetNotificationToShow();

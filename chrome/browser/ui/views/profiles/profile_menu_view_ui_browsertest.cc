@@ -7,7 +7,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service_test_helper.h"
 #include "chrome/browser/signin/account_preview_data_service_factory.h"
 #include "chrome/browser/signin/signin_util.h"
 #include "chrome/browser/sync/device_info_sync_service_factory.h"
@@ -77,13 +76,6 @@ enum class ManagementStatus {
   kSupervisedUser
 };
 
-enum class WithLocalData {
-  kNoLocalData,
-  kSingleLocalData,
-  kMultipleLocalData,
-  kWithBookmarksLocalData,
-};
-
 struct ProfileMenuViewPixelTestParam {
   PixelTestParam pixel_test_param;
   ProfileTypePixelTestParam profile_type_param =
@@ -95,7 +87,6 @@ struct ProfileMenuViewPixelTestParam {
   bool account_image_available = true;
   bool sync_disabled = false;
   bool with_ai_avatar_ring = false;
-  WithLocalData with_local_data = WithLocalData::kNoLocalData;
   bool with_cross_device_signin_promo = false;
   bool with_cross_device_signin_new_badge = false;
   bool with_account_preview_preference = false;
@@ -283,44 +274,6 @@ const ProfileMenuViewPixelTestParam kPixelTestParams[] = {
             {{syncer::kReplaceSyncPromosWithSignInPromos, {}}},
     },
     {
-        .pixel_test_param = {.test_suffix = "BatchUploadPromoSingleLocalData"},
-        .signin_status = SigninStatusPixelTestParam::kSignedInNoSync,
-        .with_local_data = WithLocalData::kSingleLocalData,
-        .extra_features_and_params =
-            {{switches::kSigninWindows10DepreciationStateBypassForTesting, {}}},
-    },
-    {
-        .pixel_test_param = {.test_suffix =
-                                 "BatchUploadPromoMultipleLocalDataDarkTheme",
-                             .use_dark_theme = true},
-        .signin_status = SigninStatusPixelTestParam::kSignedInNoSync,
-        .with_local_data = WithLocalData::kMultipleLocalData,
-        .extra_features_and_params =
-            {{switches::kSigninWindows10DepreciationStateBypassForTesting, {}}},
-    },
-    {
-        .pixel_test_param = {.test_suffix = "BatchUploadPrimaryPromo"},
-        .signin_status = SigninStatusPixelTestParam::kSignedInWithHistorySync,
-        .with_local_data = WithLocalData::kMultipleLocalData,
-        .extra_features_and_params =
-            {{switches::kSigninWindows10DepreciationStateBypassForTesting, {}}},
-    },
-    {
-        .pixel_test_param = {.test_suffix = "BatchUploadBookmarksPrimaryPromo"},
-        .signin_status = SigninStatusPixelTestParam::kSignedInNoSync,
-        .with_local_data = WithLocalData::kWithBookmarksLocalData,
-        .extra_features_and_params =
-            {{switches::kSigninWindows10DepreciationStateBypassForTesting, {}}},
-    },
-    {
-        .pixel_test_param =
-            {.test_suffix = "BatchUploadWindows10DepreciationPrimaryPromo"},
-        .signin_status = SigninStatusPixelTestParam::kSignedInNoSync,
-        .with_local_data = WithLocalData::kMultipleLocalData,
-        .extra_features_and_params =
-            {{switches::kSigninWindows10DepreciationStateForTesting, {}}},
-    },
-    {
         .pixel_test_param = {.test_suffix = "AvatarSyncPromo"},
         .signin_status = SigninStatusPixelTestParam::kSignedInNoSync,
         // `switches::kAvatarButtonSyncPromoForTesting` and
@@ -448,8 +401,6 @@ class ProfileMenuViewPixelTest
   void SetUpBrowserContextKeyedServices(
       content::BrowserContext* context) override {
     ProfilesPixelTestBaseT::SetUpBrowserContextKeyedServices(context);
-    batch_upload_test_helper_.SetupBatchUploadTestingFactoryInProfile(
-        Profile::FromBrowserContext(context));
   }
 
   void OnWillCreateBrowserContextServices(
@@ -742,33 +693,6 @@ class ProfileMenuViewPixelTest
       sync_service()->SetAllowedByEnterprisePolicy(false);
     }
 
-    size_t local_data_count = 0;
-    syncer::DataType data_type = syncer::PASSWORDS;
-    switch (GetParam().with_local_data) {
-      case WithLocalData::kNoLocalData:
-        break;
-      case WithLocalData::kSingleLocalData:
-        local_data_count = 1;
-        break;
-      case WithLocalData::kMultipleLocalData:
-        local_data_count = 5;
-        break;
-      case WithLocalData::kWithBookmarksLocalData:
-        local_data_count = 5;
-        data_type = syncer::BOOKMARKS;
-        break;
-    }
-    if (local_data_count != 0) {
-      batch_upload_test_helper_.SetReturnDescriptions(data_type,
-                                                      local_data_count);
-    }
-
-    if (GetParam().with_local_data == WithLocalData::kWithBookmarksLocalData) {
-      browser()->GetProfile()->GetPrefs()->SetString(
-          prefs::kGoogleServicesLastSyncingGaiaId,
-          account_info.gaia.ToString());
-    }
-
     if (GetParam().with_ai_avatar_ring) {
       browser()->GetProfile()->GetPrefs()->SetInteger(
           subscription_eligibility::prefs::kAiSubscriptionTier, 1);
@@ -863,7 +787,6 @@ class ProfileMenuViewPixelTest
   base::test::ScopedFeatureList feature_list_;
   std::unique_ptr<policy::ScopedManagementServiceOverrideForTesting>
       scoped_browser_management_;
-  BatchUploadServiceTestHelper batch_upload_test_helper_;
   base::CallbackListSubscription create_services_subscription_;
 };
 

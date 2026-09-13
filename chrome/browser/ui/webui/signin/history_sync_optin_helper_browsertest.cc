@@ -638,16 +638,6 @@ IN_PROC_BROWSER_TEST_F(HistorySyncOptinHelperBrowserTest,
   GetTestSyncService()->GetUserSettings()->SetSelectedTypes(
       /*sync_everything=*/false, syncer::UserSelectableTypeSet());
 
-  // Simulate the promo being shown twice.
-  signin::AvatarButtonPromoManager avatar_promo_manager(
-      identity_manager(),
-      AccountPreviewDataServiceFactory::GetForProfile(browser()->GetProfile()),
-      browser()->GetProfile()->GetPrefs());
-  avatar_promo_manager.RecordPromoShown(
-      signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo);
-  avatar_promo_manager.RecordPromoShown(
-      signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo);
-
   MockHistorySyncOptinHelperDelegate delegate;
   // Accept History Sync.
   EXPECT_CALL(delegate, ShowHistorySyncOptinScreen)

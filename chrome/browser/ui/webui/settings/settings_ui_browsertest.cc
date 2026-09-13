@@ -12,7 +12,6 @@
 #include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/browser/glic/glic_pref_names_internal.h"
 #include "chrome/browser/glic/public/features.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/browser.h"
@@ -77,52 +76,6 @@ IN_PROC_BROWSER_TEST_F(SettingsUITest, TriggerHappinessTrackingSurveys) {
   base::RunLoop().RunUntilIdle();
 }
 
-// Test fixture for testing the kDisableSync flag.
-class SettingsUITestDisableSync : public SettingsUITest {
- public:
-  SettingsUITestDisableSync() {
-    std::vector<base::test::FeatureRef> enabled_features;
-    enabled_features.push_back(syncer::kUnoPhase2FollowUp);
-    scoped_feature_list_.InitWithFeatures(enabled_features,
-                                          /*disabled_features=*/{});
-  }
-
-  void SetUp() override {
-    // Append the switch *before* the profile is built.
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(syncer::kDisableSync);
-    SettingsUITest::SetUp();
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-// Regression test for crbug.com/484893496.
-// This mainly intends to check that `CreateBatchUploadPromoHandler()` does not
-// crash when the sync service is null.
-IN_PROC_BROWSER_TEST_F(
-    SettingsUITestDisableSync,
-    CreateBatchUploadPromoHandlerWithoutSyncServiceDoesNotCrash) {
-  ASSERT_TRUE(
-      NavigateToURL(browser(), GURL(base::StrCat({chrome::kChromeUISettingsURL,
-                                                  chrome::kPeopleSubPage}))));
-
-  ASSERT_EQ(nullptr,
-            SyncServiceFactory::GetForProfile(browser()->GetProfile()));
-
-  // Wait for sync controls to load which would initialize the batch upload
-  // service if the sync service was not null.
-  ASSERT_TRUE(
-      content::ExecJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                      R"((() => {
-                           return customElements.whenDefined(
-                              'settings-sync-controls');
-                         })())"));
-
-  EXPECT_EQ(nullptr,
-            BatchUploadServiceFactory::GetForProfile(browser()->GetProfile(),
-                                                     /*create=*/false));
-}
 
 IN_PROC_BROWSER_TEST_F(SettingsUITest, GoogleSearchAiModeWorkspaceUrl) {
   ASSERT_TRUE(NavigateToURL(browser(), GURL(chrome::kChromeUISettingsURL)));

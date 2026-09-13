@@ -16,7 +16,7 @@
 #include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "chrome/browser/site_protection/site_familiarity_heuristic_name.h"
 #include "chrome/browser/site_protection/site_protection_metrics.h"
-#include "chrome/browser/ui/safety_hub/mock_safe_browsing_database_manager.h"
+#include "chrome/browser/safe_browsing/mock_safe_browsing_database_manager.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/test/base/testing_browser_process.h"
