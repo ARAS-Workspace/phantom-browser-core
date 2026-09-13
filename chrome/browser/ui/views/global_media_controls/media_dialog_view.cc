@@ -12,15 +12,11 @@
 #include "base/memory/raw_ptr.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/observer_list.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/global_media_controls/media_notification_service.h"
-#include "chrome/browser/ui/navigator/browser_navigator.h"
-#include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
-#include "chrome/browser/ui/views/controls/rich_hover_button.h"
 #include "chrome/browser/ui/views/global_media_controls/media_dialog_view_observer.h"
 #include "chrome/browser/ui/views/global_media_controls/media_item_ui_helper.h"
 #include "chrome/grit/generated_resources.h"
@@ -30,12 +26,9 @@
 #include "components/global_media_controls/public/views/media_item_ui_list_view.h"
 #include "components/global_media_controls/public/views/media_item_ui_updated_view.h"
 #include "components/media_router/browser/media_router.h"
-#include "components/prefs/pref_change_registrar.h"
-#include "components/vector_icons/vector_icons.h"
 #include "content/public/browser/media_session.h"
 #include "content/public/browser/web_contents.h"
 #include "media/base/media_switches.h"
-#include "net/base/url_util.h"
 #include "services/media_session/public/mojom/media_session.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
@@ -44,11 +37,6 @@
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/background.h"
 #include "ui/views/bubble/bubble_frame_view.h"
-#include "ui/views/controls/button/toggle_button.h"
-#include "ui/views/controls/combobox/combobox.h"
-#include "ui/views/controls/image_view.h"
-#include "ui/views/controls/label.h"
-#include "ui/views/controls/separator.h"
 #include "ui/views/layout/box_layout.h"
 #include "ui/views/layout/fill_layout.h"
 #include "ui/views/layout/layout_provider.h"
@@ -56,8 +44,6 @@
 
 using global_media_controls::GlobalMediaControlsEntryPoint;
 using media_session::mojom::MediaSessionAction;
-
-namespace {}  // namespace
 
 // static
 MediaDialogView* MediaDialogView::instance_ = nullptr;

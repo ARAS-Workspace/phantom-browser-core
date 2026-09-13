@@ -132,10 +132,7 @@ class TestMediaRouter : public media_router::MockMediaRouter {
 
 class MediaDialogViewBrowserTest : public InProcessBrowserTest {
  public:
-  MediaDialogViewBrowserTest() {
-    feature_list_.InitWithFeatures({media::kFeatureManagementLiveTranslateCrOS},
-                                   {});
-  }
+  MediaDialogViewBrowserTest() = default;
 
   MediaDialogViewBrowserTest(const MediaDialogViewBrowserTest&) = delete;
   MediaDialogViewBrowserTest& operator=(const MediaDialogViewBrowserTest&) =
@@ -278,34 +275,6 @@ class MediaDialogViewBrowserTest : public InProcessBrowserTest {
         GetButtonForAction(MediaSessionAction::kExitPictureInPicture));
   }
 
-  void ClickEnableLiveCaptionOnDialog() {
-    base::RunLoop().RunUntilIdle();
-    base::RunLoop run_loop;
-    PrefChangeRegistrar change_observer;
-    change_observer.Init(browser()->GetProfile()->GetPrefs());
-    change_observer.Add(prefs::kLiveCaptionEnabled, run_loop.QuitClosure());
-
-    ASSERT_TRUE(MediaDialogView::IsShowing());
-    views::Button* live_caption_button = static_cast<views::Button*>(
-        MediaDialogView::GetDialogViewForTesting()->live_caption_button_);
-    ui_test_utils::ClickOnView(live_caption_button);
-    run_loop.Run();
-  }
-
-  void ClickEnableLiveTranslateOnDialog() {
-    base::RunLoop().RunUntilIdle();
-    base::RunLoop run_loop;
-    PrefChangeRegistrar change_observer;
-    change_observer.Init(browser()->GetProfile()->GetPrefs());
-    change_observer.Add(prefs::kLiveTranslateEnabled, run_loop.QuitClosure());
-
-    ASSERT_TRUE(MediaDialogView::IsShowing());
-    views::Button* live_translate_button = static_cast<views::Button*>(
-        MediaDialogView::GetDialogViewForTesting()->live_translate_button_);
-    ui_test_utils::ClickOnView(live_translate_button);
-    run_loop.Run();
-  }
-
   void ClickMediaViewByTitle(const std::u16string& title) {
     ASSERT_TRUE(MediaDialogView::IsShowing());
     global_media_controls::MediaItemUIUpdatedView* view = GetViewByTitle(title);
@@ -392,7 +361,6 @@ class MediaDialogViewBrowserTest : public InProcessBrowserTest {
     return nullptr;
   }
 
-  base::test::ScopedFeatureList feature_list_;
   base::CallbackListSubscription subscription_;
 };
 

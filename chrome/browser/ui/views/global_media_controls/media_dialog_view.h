@@ -11,7 +11,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/observer_list.h"
-#include "chrome/browser/ui/global_media_controls/live_translate_combobox_model.h"
 #include "components/global_media_controls/public/constants.h"
 #include "components/global_media_controls/public/media_dialog_delegate.h"
 #include "components/global_media_controls/public/media_item_ui_observer.h"
@@ -20,7 +19,6 @@
 #include "ui/views/bubble/bubble_anchor.h"
 #include "ui/views/bubble/bubble_dialog_delegate_view.h"
 
-class RichHoverButton;
 class MediaDialogViewObserver;
 class MediaNotificationService;
 class Profile;
@@ -33,13 +31,6 @@ namespace global_media_controls {
 class MediaItemUIListView;
 class MediaItemUIUpdatedView;
 }  // namespace global_media_controls
-
-namespace views {
-class Combobox;
-class Label;
-class Separator;
-class ToggleButton;
-}  // namespace views
 
 // Dialog that shows media controls that control the active media session.
 class MediaDialogView : public views::BubbleDialogDelegateView,
@@ -97,8 +88,6 @@ class MediaDialogView : public views::BubbleDialogDelegateView,
   void AddObserver(MediaDialogViewObserver* observer);
   void RemoveObserver(MediaDialogViewObserver* observer);
 
-  void TargetLanguageChanged();
-
   const std::map<
       const std::string,
       raw_ptr<global_media_controls::MediaItemUIUpdatedView, CtnExperimental>>&
@@ -130,13 +119,7 @@ class MediaDialogView : public views::BubbleDialogDelegateView,
   void Init() override;
   void WindowClosing() override;
 
-  // views::Button::PressedCallback
-  void OnSettingsButtonPressed();
-
   void UpdateBubbleSize();
-
-
-
 
   std::unique_ptr<global_media_controls::MediaItemUIUpdatedView>
   BuildMediaItemUIUpdatedView(
