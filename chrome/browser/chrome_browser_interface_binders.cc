@@ -62,7 +62,6 @@
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 #include "pdf/buildflags.h"
-#include "services/image_annotation/public/mojom/image_annotation.mojom.h"
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/features_generated.h"
 #include "third_party/blink/public/mojom/credentialmanagement/credential_manager.mojom.h"
@@ -252,8 +251,6 @@ void BindNetworkHintsHandler(
     mojo::PendingReceiver<network_hints::mojom::NetworkHintsHandler> receiver) {
   predictors::NetworkHintsHandlerImpl::Create(frame_host, std::move(receiver));
 }
-
-
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 void BindScreenAIAnnotator(
