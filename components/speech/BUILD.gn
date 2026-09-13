@@ -8,27 +8,9 @@ source_set("speech") {
   sources = [
     "audio_buffer.cc",
     "audio_buffer.h",
-    "audio_encoder.cc",
-    "audio_encoder.h",
-    "chunked_byte_buffer.cc",
-    "chunked_byte_buffer.h",
-    "downstream_loader.cc",
-    "downstream_loader.h",
-    "downstream_loader_client.h",
-    "upstream_loader.cc",
-    "upstream_loader.h",
-    "upstream_loader_client.h",
   ]
 
   public_deps = [ "//base" ]
-  deps = [
-    "//mojo/public/cpp/bindings",
-    "//mojo/public/cpp/platform",
-    "//mojo/public/cpp/system",
-    "//services/network/public/cpp",
-    "//services/network/public/mojom",
-    "//third_party/flac",
-  ]
 
   if (!is_android) {
     sources += [
@@ -56,10 +38,7 @@ source_set("speech") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [
-    "audio_buffer_unittest.cc",
-    "chunked_byte_buffer_unittest.cc",
-  ]
+  sources = [ "audio_buffer_unittest.cc" ]
 
   if (!is_android) {
     sources += [ "endpointer/endpointer_unittest.cc" ]

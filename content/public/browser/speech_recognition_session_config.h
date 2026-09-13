@@ -13,7 +13,6 @@
 #include "base/memory/weak_ptr.h"
 #include "content/common/content_export.h"
 #include "content/public/browser/speech_recognition_session_context.h"
-#include "content/public/browser/speech_recognition_session_preamble.h"
 #include "media/mojo/mojom/speech_recognition.mojom.h"
 #include "media/mojo/mojom/speech_recognition_grammar.mojom.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
@@ -44,9 +43,6 @@ struct CONTENT_EXPORT SpeechRecognitionSessionConfig {
   bool allow_cloud_fallback = false;
   media::mojom::SpeechRecognitionQuality quality =
       media::mojom::SpeechRecognitionQuality::kCommand;
-  std::string auth_token;
-  std::string auth_scope;
-  scoped_refptr<SpeechRecognitionSessionPreamble> preamble;
   SpeechRecognitionSessionContext initial_context;
   scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory;
 

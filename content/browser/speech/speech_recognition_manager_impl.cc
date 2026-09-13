@@ -22,7 +22,6 @@
 #include "content/browser/browser_main_loop.h"
 #include "content/browser/renderer_host/media/media_stream_manager.h"
 #include "content/browser/renderer_host/media/media_stream_ui_proxy.h"
-#include "content/browser/speech/network_speech_recognition_engine_impl.h"
 #include "content/browser/speech/speech_recognizer_impl.h"
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "content/public/browser/browser_task_traits.h"
@@ -764,36 +763,26 @@ int SpeechRecognitionManagerImpl::CreateSession(
   }
 
   if (!speech_recognition_engine) {
-    // A NetworkSpeechRecognitionEngineImpl (and corresponding Config) is
-    // required only when using SpeechRecognizerImpl, which performs the audio
-    // capture and endpointing in the browser. This is not the case of Android
-    // where, not only the speech recognition, but also the audio capture and
-    // endpointing activities performed outside of the browser (delegated via
-    // JNI to the Android API implementation).
-
-    NetworkSpeechRecognitionEngineImpl::Config remote_engine_config;
-    remote_engine_config.language = config.language;
-    remote_engine_config.grammars = config.grammars;
-    remote_engine_config.audio_sample_rate =
-        audio_forwarder_config.has_value()
-            ? audio_forwarder_config.value().sample_rate
-            : SpeechRecognizerImpl::kAudioSampleRate;
-    remote_engine_config.audio_num_bits_per_sample =
-        SpeechRecognizerImpl::kNumBitsPerAudioSample;
-    remote_engine_config.filter_profanities = config.filter_profanities;
-    remote_engine_config.continuous = config.continuous;
-    remote_engine_config.interim_results = config.interim_results;
-    remote_engine_config.max_hypotheses = config.max_hypotheses;
-    remote_engine_config.origin_url = config.origin.Serialize();
-    remote_engine_config.auth_token = config.auth_token;
-    remote_engine_config.auth_scope = config.auth_scope;
-    remote_engine_config.preamble = config.preamble;
-
-    std::unique_ptr<NetworkSpeechRecognitionEngineImpl> google_remote_engine =
-        std::make_unique<NetworkSpeechRecognitionEngineImpl>(
-            config.shared_url_loader_factory);
-    google_remote_engine->SetConfig(remote_engine_config);
-    speech_recognition_engine = std::move(google_remote_engine);
+    LogBackendSpecificErrorOccurred(
+        config, media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed);
+    mojo::Remote<media::mojom::SpeechRecognitionSessionClient> client(
+        std::move(client_remote));
+    if (client.is_bound()) {
+      client->ErrorOccurred(media::mojom::SpeechRecognitionError::New(
+          media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed,
+          media::mojom::SpeechAudioErrorDetails::kNone));
+      client->Ended();
+    } else if (config.event_listener) {
+      config.event_listener.get()->OnRecognitionError(
+          session_id,
+          media::mojom::SpeechRecognitionError(
+              media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed,
+              media::mojom::SpeechAudioErrorDetails::kNone));
+      config.event_listener.get()->OnRecognitionEnd(session_id);
+    } else {
+      NOTREACHED();
+    }
+    return session_id;
   }
 
   session->recognizer = new SpeechRecognizerImpl(

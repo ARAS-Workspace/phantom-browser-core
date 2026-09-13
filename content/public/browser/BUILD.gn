@@ -7,7 +7,6 @@ import("//content/common/features.gni")
 import("//content/public/common/features.gni")
 import("//device/vr/buildflags/buildflags.gni")
 import("//media/media_options.gni")
-import("//third_party/protobuf/proto_library.gni")
 import("//third_party/webrtc/webrtc.gni")
 
 if (is_android) {
@@ -444,8 +443,6 @@ source_set("browser_sources") {
     "speech_recognition_session_config.h",
     "speech_recognition_session_context.cc",
     "speech_recognition_session_context.h",
-    "speech_recognition_session_preamble.cc",
-    "speech_recognition_session_preamble.h",
     "ssl_host_state_delegate.h",
     "ssl_status.cc",
     "ssl_status.h",
@@ -778,8 +775,4 @@ if (is_android) {
   java_cpp_enum("transfer_input_to_viz_result_enum") {
     sources = [ "android/transfer_input_to_viz_result.h" ]
   }
-}
-
-proto_library("proto") {
-  sources = [ "google_streaming_api.proto" ]
 }

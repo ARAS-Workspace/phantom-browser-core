@@ -63,11 +63,9 @@ include_rules = [
   # and access tokens should usually be provided by the
   # embedder.
   #
-  # There are a couple of specific parts of content that are excepted
-  # from this rule, e.g. content/browser/speech/DEPS. These are cases of
-  # implementations that are strongly tied to Google servers, i.e. we
-  # don't expect alternate implementations to be provided by the
-  # embedder.
+  # One specific part of content is excepted from this rule:
+  # content/browser/renderer_host/DEPS, which serializes the gaia config
+  # switch onto the renderer command line.
   "-google_apis",
 
   # Don't allow inclusion of these other libs we shouldn't be calling directly.

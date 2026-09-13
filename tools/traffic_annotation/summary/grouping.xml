@@ -453,10 +453,7 @@ after discussions on the right group.
       <annotation id="popular_sites_fetch"/>
       <annotation id="promo_service"/>
     </sender>
-    <sender name="Speech Recognition">
-      <annotation id="speech_recognition_downstream"/>
-      <annotation id="speech_recognition_upstream"/>
-    </sender>
+    <sender name="Speech Recognition"/>
     <sender name="Spellcheck">
       <annotation id="spellcheck_hunspell_dictionary"/>
       <annotation id="spellcheck_lookup"/>

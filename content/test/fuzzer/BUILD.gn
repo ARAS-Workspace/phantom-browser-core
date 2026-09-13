@@ -244,22 +244,6 @@ content_mojolpm_fuzzer_test("audio_context_manager_mojolpm_fuzzer") {
   proto_deps = [ "//third_party/blink/public/mojom:mojom_platform_mojolpm" ]
 }
 
-fuzzer_test("speech_audio_encoder_fuzzer") {
-  sources = [
-    "../../browser/speech/audio_encoder_fuzzer.cc",
-    "//components/speech/audio_buffer.cc",
-    "//components/speech/audio_buffer.h",
-    "//components/speech/audio_encoder.cc",
-    "//components/speech/audio_encoder.h",
-    "//content/common/content_export.h",
-  ]
-
-  deps = [
-    "//base",
-    "//third_party/flac",
-  ]
-}
-
 fuzzer_test("browser_accessibility_fuzzer") {
   sources = [ "browser_accessibility_fuzzer.cc" ]
   deps = [

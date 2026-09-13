@@ -224,7 +224,6 @@ source_set("browser") {
     "//content/common:buildflags",
     "//content/common:mojo_bindings",
     "//content/common/memory_coordinator/mojom",
-    "//content/public/browser:proto",
     "//content/public/common:buildflags",
     "//content/public/common:common_sources",
     "//content/public/common:content_descriptor_keys",
@@ -3240,8 +3239,6 @@ source_set("browser") {
       "service_worker/service_worker_hid_delegate_observer.h",
 
       # Most speech code is non-Android.
-      "speech/network_speech_recognition_engine_impl.cc",
-      "speech/network_speech_recognition_engine_impl.h",
       "speech/speech_recognition_engine.cc",
       "speech/speech_recognition_engine.h",
       "speech/speech_recognizer_impl.cc",

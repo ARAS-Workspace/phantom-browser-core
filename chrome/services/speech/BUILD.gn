@@ -36,7 +36,6 @@ source_set("lib") {
     "//chrome/services/speech/soda:soda_api_proto",
     "//components/soda:constants",
     "//components/speech",
-    "//content/public/browser:proto",
     "//google_apis",
     "//media/mojo/common",
     "//mojo/public/cpp/bindings",

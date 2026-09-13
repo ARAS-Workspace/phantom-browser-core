@@ -351,7 +351,6 @@ FUZZERS_WITH_CORPORA = [
   'snappy_compress_fuzzer',
   'snappy_uncompress_fuzzer',
   'source_registration_fuzzer',
-  'speech_audio_encoder_fuzzer',
   'sqlite3_ossfuzz_fuzzer',
   'sqlite3_select_strftime_lpm_fuzzer',
   'sqlite3_shadow_table_fuzzer',
