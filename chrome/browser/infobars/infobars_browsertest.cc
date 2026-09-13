@@ -38,7 +38,6 @@
 #include "chrome/browser/ui/select_file_policy/chrome_select_file_policy.h"
 #include "chrome/browser/ui/startup/automation_infobar_delegate.h"
 #include "chrome/browser/ui/startup/bad_flags_prompt.h"
-#include "chrome/browser/ui/startup/google_api_keys_infobar_delegate.h"
 #include "chrome/browser/ui/startup/obsolete_system_infobar_delegate.h"
 #include "chrome/browser/ui/startup/oscryptasync_availability_infobar_delegate.h"
 #include "chrome/browser/ui/tab_sharing/mock_tab_sharing_ui.h"
@@ -322,20 +321,6 @@ void InfoBarUiTest::ShowUi(const std::string& name) {
       DefaultBrowserInfoBarDelegate::Create(GetInfoBarManager(),
                                             browser()->GetProfile(),
                                             /*can_pin_to_taskbar=*/false);
-      break;
-
-    case IBD::GOOGLE_API_KEYS_INFOBAR_DELEGATE:
-      if (infobars::IsInfoBarMigrated(
-              infobars::InfoBarDelegate::GOOGLE_API_KEYS_INFOBAR_DELEGATE)) {
-        if (auto* browser_infobar_manager =
-                infobars::BrowserInfoBarManager::From(g_browser_process)) {
-          browser_infobar_manager->Show(
-              GetTab(),
-              infobars::InfoBarDelegate::GOOGLE_API_KEYS_INFOBAR_DELEGATE);
-        }
-      } else {
-        GoogleApiKeysInfoBarDelegate::Create(GetInfoBarManager());
-      }
       break;
 
     case IBD::OBSOLETE_SYSTEM_INFOBAR_DELEGATE:

@@ -4,11 +4,9 @@
 
 #include "chrome/browser/optimization_guide/model_execution/optimization_guide_global_state.h"
 
-#include "base/test/metrics/histogram_tester.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile_manager.h"
 #include "components/component_updater/mock_component_updater_service.h"
-#include "components/optimization_guide/core/optimization_guide_features.h"
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -68,12 +66,8 @@ class OptimizationGuideGlobalStateTest : public testing::Test {
 };
 
 #if BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
-TEST_F(OptimizationGuideGlobalStateTest, FreeDiskSpaceHistogram) {
-  base::HistogramTester histogram_tester;
-  task_environment_.FastForwardBy(
-      optimization_guide::features::GetOnDeviceStartupMetricDelay());
-  histogram_tester.ExpectTotalCount(
-      "OptimizationGuide.OnDeviceModel.FreeDiskSpace", 1);
+TEST_F(OptimizationGuideGlobalStateTest, ModelBrokerStateIsNull) {
+  EXPECT_EQ(nullptr, global_state_->model_broker_state());
 }
 #endif  // BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
 
