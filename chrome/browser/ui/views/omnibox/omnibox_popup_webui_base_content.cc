@@ -288,8 +288,6 @@ void OmniboxPopupWebUIBaseContent::LoadContent() {
   OmniboxPopupWebContentsHelper::FromWebContents(GetWebContents())
       ->set_omnibox_controller(controller_);
 
-  // Set ViewType::kComponent so `ChromeSpeechRecognitionManagerDelegate`
-  // allows speech recognition in `CheckRenderFrameType()`.
   extensions::SetViewType(contents_wrapper_->web_contents(),
                           extensions::mojom::ViewType::kComponent);
   // Create PermissionRequestManager explicitly for this WebContents.

@@ -585,8 +585,6 @@ ContextualTasksSidePanelCoordinator::DetachWebContentsForTask(
                                      /*browser_window_interface=*/nullptr);
     MaybeDetachWebContents(web_contents.get());
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-    // Set ViewType to kTabContents so `ChromeSpeechRecognitionManagerDelegate`
-    // allows speech recognition in `CheckRenderFrameType()`.
     extensions::SetViewType(web_contents.get(),
                             extensions::mojom::ViewType::kTabContents);
 #endif

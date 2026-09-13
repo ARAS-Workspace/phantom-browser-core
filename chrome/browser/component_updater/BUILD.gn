@@ -188,8 +188,6 @@ source_set("impl") {
       "//chrome/browser/dictation",
       "//chrome/browser/new_tab_page",
       "//chrome/browser/ui/read_anything",
-      "//components/live_caption:constants",
-      "//components/live_caption:utils",
       "//components/webapps/isolated_web_apps",
       "//third_party/zxcvbn-cpp",
     ]
@@ -316,7 +314,6 @@ source_set("unit_tests") {
     ]
     deps += [
       "//chrome/browser/dictation",
-      "//components/live_caption:constants",
       "//third_party/zxcvbn-cpp",
     ]
   }

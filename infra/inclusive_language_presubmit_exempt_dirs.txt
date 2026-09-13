@@ -141,7 +141,6 @@ components/safe_browsing/core/common
 components/security_interstitials/content/android/java/src/org/chromium/components/security_interstitials
 components/signin/public/base
 components/signin/public/identity_manager
-components/soda
 components/strictmode/android/java/src/org/chromium/components/strictmode
 components/supervised_user/core/browser/proto
 components/surface_embed

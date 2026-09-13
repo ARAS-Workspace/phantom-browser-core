@@ -267,8 +267,6 @@ void OmniboxEverywhereUIManager::EnsureContentsWrapperInitialized(
         web_contents(), SK_ColorTRANSPARENT);
     OmniboxPopupWebContentsHelper::CreateForWebContents(web_contents());
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-    // Set ViewType::kComponent so `ChromeSpeechRecognitionManagerDelegate`
-    // allows speech recognition in `CheckRenderFrameType()`.
     extensions::SetViewType(web_contents(),
                             extensions::mojom::ViewType::kComponent);
 #endif

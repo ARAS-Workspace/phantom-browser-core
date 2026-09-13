@@ -145,7 +145,6 @@ if (!is_android) {
       "//chrome/browser/preloading:test_support",
       "//chrome/browser/ui",
       "//chrome/test:test_support_ui",
-      "//components/live_caption:constants",
       "//components/on_device_translation/buildflags",
       "//ui/views:test_support",
     ]

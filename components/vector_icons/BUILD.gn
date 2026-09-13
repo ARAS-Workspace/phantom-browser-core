@@ -264,7 +264,6 @@ if (current_toolchain == default_toolchain) {
       "lightbulb_outline_old.icon",
       "link.icon",
       "link_old.icon",
-      "live_caption_on_old.icon",
       "local_shipping.icon",
       "local_shipping_spark.icon",
       "location_off.icon",

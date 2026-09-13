@@ -58,7 +58,6 @@ grit_strings("components_strings") {
     "../history_clusters_strings.grdp",
     "../history_strings.grdp",
     "../javascript_dialogs_strings.grdp",
-    "../live_caption_strings.grdp",
     "../login_dialog_strings.grdp",
     "../management_strings.grdp",
     "../media_message_center_strings.grdp",

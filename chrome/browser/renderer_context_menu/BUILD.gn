@@ -150,8 +150,6 @@ source_set("impl") {
       "//components/compose/core/browser",
       "//components/compose/core/browser:features",
       "//components/guest_view/browser",
-      "//components/live_caption:constants",
-      "//components/live_caption:utils",
       "//components/media_router/browser",
       "//components/password_manager/content/browser",
       "//components/pdf/common:constants",

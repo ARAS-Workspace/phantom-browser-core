@@ -157,7 +157,6 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//chrome/android/java/src/org/chromium/chrome/browser/accessibility/settings/AccessibilitySettingsBridge.java:AccessibilityCaretBrowsingAction) -->
 
-<!-- LINT.IfChange(AccessibilityImageLabelModeAndroid)-->
 
 <enum name="AccessibilityImageLabelModeAndroid">
   <summary>
@@ -172,7 +171,6 @@ chromium-metrics-reviews@google.com.
   <int value="4" label="Cancel"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/image_descriptions/android/java/src/org/chromium/chrome/browser/image_descriptions/ImageDescriptionsDialog.java:ImageDescriptionsDialogAction) -->
 
 <!-- LINT.IfChange(AccessibilityModeBundleEnum)-->
 
@@ -1288,14 +1286,12 @@ Unknown properties are collapsed to zero. -->
 
 <!-- LINT.ThenChange(//third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.h:CanvasAccessibilityHeuristicResult) -->
 
-<!-- LINT.IfChange(CaptionBubbleErrorType) -->
 
 <enum name="CaptionBubbleErrorType">
   <int value="0" label="Generic"/>
   <int value="1" label="Media foundation renderer unsupported"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/live_caption/views/caption_bubble_model.h:CaptionBubbleErrorType) -->
 
 <!-- LINT.IfChange(ChromeVoxCommand) -->
 
@@ -2082,7 +2078,6 @@ Unknown properties are collapsed to zero. -->
   <int value="1" label="Bubble expanded"/>
 </enum>
 
-<!-- LINT.IfChange(LiveCaptionSessionEvent) -->
 
 <enum name="LiveCaptionSessionEvent">
   <int value="0" label="Stream started"/>
@@ -2090,9 +2085,7 @@ Unknown properties are collapsed to zero. -->
   <int value="2" label="User closed bubble"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/live_caption/views/caption_bubble.h:LiveCaptionSessionEvent) -->
 
-<!-- LINT.IfChange(LoadSodaResult) -->
 
 <enum name="LoadSodaResult">
   <int value="0" label="Unknown"/>
@@ -2103,7 +2096,6 @@ Unknown properties are collapsed to zero. -->
              null."/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/services/speech/soda/soda_client.h:LoadSodaResult) -->
 
 <!-- LINT.IfChange(MainNodeAnnotationResult) -->
 
@@ -2163,7 +2155,6 @@ Unknown properties are collapsed to zero. -->
 
 <!-- LINT.ThenChange(//services/screen_ai/screen_ai_service_impl.cc:OCRClientType) -->
 
-<!-- LINT.IfChange(OnDeviceTranslationErrorReason) -->
 
 <enum name="OnDeviceTranslationErrorReason">
   <int value="0" label="CanTranslate: Language not supported"/>
@@ -2183,7 +2174,6 @@ Unknown properties are collapsed to zero. -->
   <int value="13" label="Translate RPC: Execution failed"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/live_caption/translation_dispatcher_on_device.h:OnDeviceTranslationErrorReason) -->
 
 <!-- LINT.IfChange(ReadAnythingColor) -->
 
@@ -2514,7 +2504,6 @@ Unknown properties are collapsed to zero. -->
 
 <!-- LINT.ThenChange(//components/dom_distiller/core/mojom/distilled_page_prefs.mojom:ReaderModePrefsTheme) -->
 
-<!-- LINT.IfChange(SodaLanguageCode) -->
 
 <enum name="SodaLanguageCode">
   <int value="0" label="None"/>
@@ -2555,7 +2544,6 @@ Unknown properties are collapsed to zero. -->
   <int value="35" label="vi-VN"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/soda/constants.h:LanguageCode) -->
 
 <!-- LINT.IfChange(TextToSpeechEvent) -->
 

@@ -245,6 +245,7 @@ test("components_unittests") {
     "//components/language_detection/core:unit_tests",
     "//components/language_detection/core/browser:unit_tests",
     "//components/lens:unit_tests",
+    "//components/live_caption:unit_tests",
     "//components/leveldb_proto:unit_tests",
     "//components/local_state:unit_tests",
     "//components/lookalikes/core:unit_tests",
