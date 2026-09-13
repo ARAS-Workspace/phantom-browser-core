@@ -113,7 +113,6 @@ class ScheduledMetricsManager;
 }  // namespace metrics
 
 class AccountChecker;
-class BookmarkUpdateManager;
 class DiscountInfosStorage;
 class ShoppingBookmarkModelObserver;
 class ShoppingPowerBookmarkDataProvider;
@@ -236,33 +235,12 @@ class ShoppingService : public KeyedService,
   virtual void GetProductInfoForUrl(const GURL& url,
                                     ProductInfoCallback callback);
 
-  // Attempts to retrieve product info for all of the URLs provided in |urls|.
-  // This API behaves the same as |GetProductInfoForUrl| with the exception of
-  // how on-demand requests are handled - rather than fetching individually,
-  // they are batched. The entire set of info is provided to the callback once
-  // complete.
-  virtual void GetProductInfoForUrls(const std::vector<GURL>& urls,
-                                     ProductInfoBatchCallback callback);
-
   // This API returns whatever product information is currently available for
   // the specified |url|. This method is less reliable than GetProductInfoForUrl
   // above as it may return an empty or partial result prior to the page being
   // processed or information being available from the backend.
   virtual std::optional<ProductInfo> GetAvailableProductInfoForUrl(
       const GURL& url);
-
-  // Get updated product info (including price) for the provided list of
-  // bookmark IDs. The information for each bookmark will be provided via a
-  // repeating callback that provides the bookmark's ID, URL, and product info.
-  // Currently this API should only be used in the BookmarkUpdateManager.
-  virtual void GetUpdatedProductInfoForBookmarks(
-      const std::vector<int64_t>& bookmark_ids,
-      BookmarkProductInfoUpdatedCallback info_updated_callback);
-
-  // Gets the maximum number of bookmarks that the backend will retrieve per
-  // call to |GetUpdatedProductInfoForBookmarks|. This limit is imposed by our
-  // backend rather than the shopping service itself.
-  virtual size_t GetMaxProductBookmarkUpdatesPerBatch();
 
   // This API fetches information about a merchant for the provided |url| and
   // passes the payload back to the caller via |callback|. Call will run after
@@ -341,8 +319,7 @@ class ShoppingService : public KeyedService,
   // Fetch users' pref from server on whether to receive price tracking emails.
   void FetchPriceEmailPref();
 
-  // Schedule an update for saved product bookmarks using
-  // |bookmark_update_manager_|.
+  // Schedule an update for saved product bookmarks.
   virtual void ScheduleSavedProductUpdate();
 
   // Returns whether a feature that is restricted to a specific region and
@@ -466,53 +443,14 @@ class ShoppingService : public KeyedService,
   // The internal impl that supports the different variations of the public
   // ProductInfo APIs.
   void GetProductInfoForUrlInternal(const GURL& url,
-                                    ProductInfoCallback callback,
-                                    bool attempt_on_demand_fetch);
+                                    ProductInfoCallback callback);
 
   void HandleOptGuideProductInfoResponse(
       const GURL& url,
       WebWrapper* web,
       ProductInfoCallback callback,
-      bool attempt_on_demand,
       optimization_guide::OptimizationGuideDecision decision,
       const optimization_guide::OptimizationMetadata& metadata);
-
-  // Handle a response from the optimization guide on-demand API for product
-  // info, specifically dealing with batch updates for bookmarks.
-  void HandleOnDemandProductInfoResponseForBookmarks(
-      BookmarkProductInfoUpdatedCallback callback,
-      std::unordered_map<std::string, int64_t> url_to_id_map,
-      const GURL& url,
-      const base::flat_map<
-          optimization_guide::proto::OptimizationType,
-          optimization_guide::OptimizationGuideDecisionWithMetadata>&
-          decisions);
-
-  // Handle a generic on-demand request for product info. While this method
-  // accepts a repeating callback, it should only ever be called once.
-  void HandleOnDemandProductInfoResponse(
-      RepeatingProductInfoCallback callback,
-      const GURL& url,
-      const base::flat_map<
-          optimization_guide::proto::OptimizationType,
-          optimization_guide::OptimizationGuideDecisionWithMetadata>&
-          decisions);
-
-  // Handles the on-demand part of |GetProductInfoForUrls|, waiting for all
-  // fetches to complete before executing the callback.
-  void DoOnDemandFetchForProductInfoUrlBatch(
-      std::vector<GURL> urls,
-      std::map<GURL, std::optional<ProductInfo>> info_map,
-      ProductInfoBatchCallback callback);
-
-  // Process the result of an on-demand request for product info and handle any
-  // related cache maintenance.
-  std::optional<ProductInfo> HandleAndStoreProductInfoFromOnDemand(
-      const GURL& url,
-      const base::flat_map<
-          optimization_guide::proto::OptimizationType,
-          optimization_guide::OptimizationGuideDecisionWithMetadata>&
-          decisions);
 
   // Handle the result of running the local extraction fallback for product
   // info.
@@ -584,9 +522,6 @@ class ShoppingService : public KeyedService,
 
   void UpdateRecentlyViewedURL(WebWrapper* web);
 
-  void OnGetOnDemandProductInfo(const GURL& url,
-                                const std::optional<const ProductInfo>& info);
-
   // The two-letter country code as detected on startup.
   std::string country_on_startup_;
 
@@ -625,7 +560,6 @@ class ShoppingService : public KeyedService,
   // instance of the URL is open in a tab or mainteined by some other subsystem.
   CommerceInfoCache commerce_info_cache_;
 
-  std::unique_ptr<BookmarkUpdateManager> bookmark_update_manager_;
 
   // The object tracking metrics that are recorded at specific intervals.
   std::unique_ptr<commerce::metrics::ScheduledMetricsManager>
@@ -643,11 +577,6 @@ class ShoppingService : public KeyedService,
   // A list of UrlInfo ordered by most recently viewed. This is based on
   // selected tab (not necessarily navigation).
   std::vector<UrlInfo> recently_visited_tabs_;
-
-  // Map between URL and a list of callbacks that are waiting for product info.
-  // This is used to avoid repeated calls to get product info for the same URL.
-  std::map<GURL, std::vector<ProductInfoCallback>>
-      on_demand_product_info_callbacks_;
 
   base::ScopedObservation<history::HistoryService,
                           history::HistoryServiceObserver>

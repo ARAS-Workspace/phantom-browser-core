@@ -40,10 +40,6 @@ MockShoppingService::~MockShoppingService() = default;
 void MockShoppingService::SetupPermissiveMock() {
   SetIsReady(true);
   SetResponseForGetProductInfoForUrl(std::nullopt);
-  SetResponsesForGetUpdatedProductInfoForBookmarks(
-      std::map<int64_t, ProductInfo>());
-  ON_CALL(*this, GetMaxProductBookmarkUpdatesPerBatch)
-      .WillByDefault(testing::Return(30));
   SetResponseForGetMerchantInfoForUrl(std::nullopt);
   SetResponseForIsShoppingPage(std::nullopt);
   SetResponseForGetDiscountInfoForUrl(std::vector<DiscountInfo>());
@@ -93,27 +89,6 @@ void MockShoppingService::SetResponseForGetUrlInfosForActiveWebWrappers(
     std::vector<commerce::UrlInfo> url_infos) {
   ON_CALL(*this, GetUrlInfosForActiveWebWrappers)
       .WillByDefault(testing::Return(url_infos));
-}
-
-void MockShoppingService::SetResponsesForGetUpdatedProductInfoForBookmarks(
-    std::map<int64_t, ProductInfo> bookmark_updates) {
-  ON_CALL(*this, GetUpdatedProductInfoForBookmarks)
-      .WillByDefault(
-          [bookmark_updates = std::move(bookmark_updates)](
-              const std::vector<int64_t>& bookmark_ids,
-              BookmarkProductInfoUpdatedCallback info_updated_callback) {
-            for (auto id : bookmark_ids) {
-              auto it = bookmark_updates.find(id);
-
-              if (it == bookmark_updates.end()) {
-                continue;
-              }
-
-              base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-                  FROM_HERE, base::BindOnce(info_updated_callback, it->first,
-                                            GURL(""), it->second));
-            }
-          });
 }
 
 void MockShoppingService::SetResponseForGetMerchantInfoForUrl(

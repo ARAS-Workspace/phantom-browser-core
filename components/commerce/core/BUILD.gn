@@ -207,8 +207,6 @@ source_set("heuristics_provider") {
 
 static_library("shopping_service") {
   sources = [
-    "bookmark_update_manager.cc",
-    "bookmark_update_manager.h",
     "discount_infos_storage.cc",
     "discount_infos_storage.h",
     "metrics/scheduled_metrics_manager.cc",
@@ -335,7 +333,6 @@ source_set("shopping_service_unit_tests") {
   testonly = true
 
   sources = [
-    "bookmark_update_manager_unittest.cc",
     "commerce_info_cache_unittest.cc",
     "discount_infos_storage_unittest.cc",
     "metrics/scheduled_metrics_manager_unittest.cc",

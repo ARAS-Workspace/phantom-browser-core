@@ -25,8 +25,6 @@
 #include "components/optimization_guide/core/delivery/model_enums.h"
 #include "components/optimization_guide/core/delivery/model_info.h"
 #include "components/optimization_guide/core/delivery/model_provider_registry.h"
-#include "components/optimization_guide/core/delivery/prediction_model_download_observer.h"
-#include "components/optimization_guide/core/delivery/prediction_model_fetch_timer.h"
 #include "components/optimization_guide/core/delivery/prediction_model_store.h"
 #include "components/optimization_guide/core/optimization_guide_enums.h"
 #include "components/optimization_guide/optimization_guide_internals/webui/optimization_guide_internals.mojom.h"
@@ -53,20 +51,16 @@ class PrefService;
 namespace optimization_guide {
 
 class OptimizationTargetModelObserver;
-class PredictionModelDownloadManager;
-class PredictionModelFetcher;
 class PredictionModelStore;
 class ProfileDownloadServiceTracker;
 
 // A PredictionManager supported by the optimization guide that makes an
 // OptimizationTargetDecision by evaluating the corresponding prediction model
 // for an OptimizationTarget.
-class PredictionManager : public PredictionModelDownloadObserver,
-                          public OptimizationGuideModelProvider {
+class PredictionManager : public OptimizationGuideModelProvider {
  public:
   PredictionManager(
       PredictionModelStore* prediction_model_store,
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
       PrefService* local_state,
       const std::string& application_locale,
       OptimizationGuideLogger* optimization_guide_logger,
@@ -76,23 +70,6 @@ class PredictionManager : public PredictionModelDownloadObserver,
   PredictionManager& operator=(const PredictionManager&) = delete;
 
   ~PredictionManager() override;
-
-  // Set the prediction model fetcher for testing.
-  void SetPredictionModelFetcherForTesting(
-      std::unique_ptr<PredictionModelFetcher> prediction_model_fetcher);
-
-  PredictionModelFetcher* prediction_model_fetcher() const {
-    return prediction_model_fetcher_.get();
-  }
-
-  // Set the prediction model download manager for testing.
-  void SetPredictionModelDownloadManagerForTesting(
-      std::unique_ptr<PredictionModelDownloadManager>
-          prediction_model_download_manager);
-
-  PredictionModelDownloadManager* prediction_model_download_manager() const {
-    return prediction_model_download_manager_.get();
-  }
 
   // Return the optimization targets that are registered.
   base::flat_set<proto::OptimizationTarget> GetRegisteredOptimizationTargets()
@@ -107,29 +84,12 @@ class PredictionManager : public PredictionModelDownloadObserver,
 
   // PredictionModelDownloadObserver:
   void OnModelReady(const base::FilePath& base_model_dir,
-                    const proto::PredictionModel& model) override;
-  void OnModelDownloadStarted(
-      proto::OptimizationTarget optimization_target) override;
-  void OnModelDownloadFailed(
-      proto::OptimizationTarget optimization_target) override;
-
+                    const proto::PredictionModel& model);
   std::vector<optimization_guide_internals::mojom::DownloadedModelInfoPtr>
   GetDownloadedModelsInfoForWebUI() const;
 
   base::flat_map<std::string, bool> GetOnDeviceSupplementaryModelsInfoForWebUI()
       const;
-
-  // Initialize the model metadata fetching and downloads.
-  void MaybeInitializeModelDownloads(
-      ProfileDownloadServiceTracker& profile_download_service_tracker,
-      PrefService* local_state);
-
-  PredictionModelFetchTimer* GetPredictionModelFetchTimerForTesting() {
-    return &prediction_model_fetch_timer_;
-  }
-
-  void SetUrlLoaderFactoryForTesting(
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory);
 
   // OptimizationGuideModelProvider:
   void AddObserverForOptimizationTargetModel(
@@ -160,19 +120,6 @@ class PredictionManager : public PredictionModelDownloadObserver,
  private:
   friend class PredictionManagerTestBase;
   friend class PredictionModelStoreBrowserTestBase;
-
-  // Called to make a request to fetch models from the remote Optimization Guide
-  // Service. Used to fetch models for the registered optimization targets.
-  void FetchModels();
-
-  // Callback when the models have been fetched from the remote Optimization
-  // Guide Service and are ready for parsing. Processes the prediction models in
-  // the response and stores them for use. The metadata entry containing the
-  // time that updates should be fetched from the remote Optimization Guide
-  // Service is updated, even when the response is empty.
-  void OnModelsFetched(
-      const std::vector<proto::ModelInfo> models_request_info,
-      std::unique_ptr<proto::GetModelsResponse> get_models_response_data);
 
   // Gets the model task runner to use for the target.
   scoped_refptr<base::SequencedTaskRunner> GetModelTaskRunner(
@@ -217,47 +164,6 @@ class PredictionManager : public PredictionModelDownloadObserver,
   void StoreLoadedModelInfo(proto::OptimizationTarget optimization_target,
                             ModelInfo model_info);
 
-  // Return the time when a prediction model fetch was last attempted.
-  base::Time GetLastFetchAttemptTime() const;
-
-  // Set the last time when a prediction model fetch was last attempted to
-  // |last_attempt_time|.
-  void SetLastModelFetchAttemptTime(base::Time last_attempt_time);
-
-  // Return the time when a prediction model fetch was last successfully
-  // completed.
-  base::Time GetLastFetchSuccessTime() const;
-
-  // Set the last time when a fetch for prediction models last succeeded to
-  // |last_success_time|.
-  void SetLastModelFetchSuccessTime(base::Time last_success_time);
-
-  // Schedule first fetch for models if enabled for this profile.
-  void MaybeScheduleFirstModelFetch();
-
-  // Schedule |fetch_timer_| to fire based on:
-  // 1. The update time for models in the store and
-  // 2. The last time a fetch attempt was made.
-  void ScheduleModelsFetch();
-
-  // Updates the metadata for |model|.
-  void UpdateModelMetadata(const proto::PredictionModel& model);
-
-  // Returns whether the model should be downloaded, or the correct model
-  // version already exists in the model store.
-  bool ShouldDownloadNewModel(const proto::PredictionModel& model) const;
-
-  // Starts the model download for |optimization_target| from |download_url|.
-  void StartModelDownload(proto::OptimizationTarget optimization_target,
-                          const GURL& download_url);
-
-  // Start downloading the model if the load failed, or update the model if it
-  // is loaded fine.
-  void MaybeDownloadOrUpdatePredictionModel(
-      proto::OptimizationTarget optimization_target,
-      const proto::PredictionModel& get_models_response_model,
-      std::optional<ModelInfo> loaded_model);
-
   // Returns a new file path for the directory to download the model files for
   // |optimization_target|. The directory will not be created.
   base::FilePath GetBaseModelDirForDownload(
@@ -269,26 +175,9 @@ class PredictionManager : public PredictionModelDownloadObserver,
 
   ModelProviderRegistry registry_ GUARDED_BY_CONTEXT(sequence_checker_);
 
-  // The fetcher that handles making requests to update the models and host
-  // model features from the remote Optimization Guide Service.
-  std::unique_ptr<PredictionModelFetcher> prediction_model_fetcher_;
-
-  // The downloader that handles making requests to download the prediction
-  // models. Can be null if model downloading is disabled.
-  std::unique_ptr<PredictionModelDownloadManager>
-      prediction_model_download_manager_;
-
   // The new optimization guide model store. Will be null when the feature is
   // not enabled. Not owned and outlives |this| since its an install-wide store.
   raw_ptr<PredictionModelStore> prediction_model_store_;
-
-  // A stored response from a model and host model features fetch used to hold
-  // models to be stored once host model features are processed and stored.
-  std::unique_ptr<proto::GetModelsResponse> get_models_response_data_to_store_;
-
-  // The URL loader factory used for fetching model and host feature updates
-  // from the remote Optimization Guide Service.
-  scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_;
 
   // The logger that plumbs the debug logs to the optimization guide
   // internals page. Not owned. Guaranteed to outlive |this|, since the logger
@@ -317,9 +206,6 @@ class PredictionManager : public PredictionModelDownloadObserver,
   // TODO(crbug.com/40861855): Remove this old model store once the new model
   // store is launched.
   base::TimeTicks init_time_;
-
-  PredictionModelFetchTimer prediction_model_fetch_timer_
-      GUARDED_BY_CONTEXT(sequence_checker_);
 
   // The locale of the application.
   std::string application_locale_;

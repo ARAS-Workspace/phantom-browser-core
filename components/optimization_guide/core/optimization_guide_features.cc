@@ -292,12 +292,6 @@ bool ShouldPersistHintsToDisk() {
                                            "persist_hints_to_disk", true);
 }
 
-RequestContextSet GetAllowedContextsForPersonalizedMetadata() {
-  RequestContextSet allowed_contexts;
-  allowed_contexts.Put(proto::RequestContext::CONTEXT_PAGE_INSIGHTS_HUB);
-  return allowed_contexts;
-}
-
 OptimizationTypeSet GetAllowedOptimizationTypesForProactivePersonalization() {
   OptimizationTypeSet allowed_optimization_types;
   if (!base::FeatureList::IsEnabled(

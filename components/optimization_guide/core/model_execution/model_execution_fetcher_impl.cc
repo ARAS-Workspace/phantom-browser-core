@@ -704,16 +704,17 @@ void ModelExecutionFetcherImpl::OnAccessTokenReceived(
     return;
   }
 
-  auto resource_request = std::make_unique<network::ResourceRequest>();
-  // Use API key if no access token is attached.
-  resource_request->url = optimization_guide_service_url_;
   if (access_token.empty()) {
-    resource_request->url = net::AppendOrReplaceQueryParameter(
-        resource_request->url, "key",
-        features::GetOptimizationGuideServiceAPIKey());
-  } else {
-    PopulateAuthorizationRequestHeader(resource_request.get(), access_token);
+    std::move(model_execution_callback_)
+        .Run(base::unexpected(
+            OptimizationGuideModelExecutionError::FromModelExecutionError(
+                ModelExecutionError::kPermissionDenied)));
+    return;
   }
+
+  auto resource_request = std::make_unique<network::ResourceRequest>();
+  resource_request->url = optimization_guide_service_url_;
+  PopulateAuthorizationRequestHeader(resource_request.get(), access_token);
   if (timeout && timeout->is_positive()) {
     PopulateServerTimeoutRequestHeader(resource_request.get(), *timeout);
   }

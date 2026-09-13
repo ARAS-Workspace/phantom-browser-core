@@ -335,8 +335,7 @@ void OptimizationGuideKeyedService::Initialize() {
   DCHECK(optimization_guide_logger_);
   hints_manager_ = std::make_unique<optimization_guide::ChromeHintsManager>(
       profile, profile->GetPrefs(), hint_store, top_host_provider_.get(),
-      tab_url_provider_.get(), url_loader_factory,
-      MaybeCreatePushNotificationManager(profile),
+      tab_url_provider_.get(), MaybeCreatePushNotificationManager(profile),
       IdentityManagerFactory::GetForProfile(profile),
       optimization_guide_logger_.get());
 
@@ -491,24 +490,6 @@ void OptimizationGuideKeyedService::CanApplyOptimization(
                                        std::move(callback));
 }
 
-void OptimizationGuideKeyedService::CanApplyOptimizationOnDemand(
-    const std::vector<GURL>& urls,
-    const base::flat_set<optimization_guide::proto::OptimizationType>&
-        optimization_types,
-    optimization_guide::proto::RequestContext request_context,
-    optimization_guide::OnDemandOptimizationGuideDecisionRepeatingCallback
-        callback,
-    std::optional<optimization_guide::proto::RequestContextMetadata>
-        request_context_metadata) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  DCHECK(request_context !=
-         optimization_guide::proto::RequestContext::CONTEXT_UNSPECIFIED);
-
-  hints_manager_->CanApplyOptimizationOnDemand(urls, optimization_types,
-                                               request_context, callback,
-                                               request_context_metadata);
-}
-
 std::unique_ptr<optimization_guide::OnDeviceSession>
 OptimizationGuideKeyedService::StartSession(
     optimization_guide::mojom::OnDeviceFeature feature,
@@ -590,14 +571,6 @@ void OptimizationGuideKeyedService::AddHintWithMultipleOptimizationsForTesting(
         optimization_types_and_metadata) {
   hints_manager_->AddHintWithMultipleOptimizationsForTesting(  // IN-TEST
       url, optimization_types_and_metadata);
-}
-
-void OptimizationGuideKeyedService::AddOnDemandHintForTesting(
-    const GURL& url,
-    optimization_guide::proto::OptimizationType optimization_type,
-    const optimization_guide::OptimizationGuideDecisionWithMetadata& decision) {
-  hints_manager_->AddOnDemandHintForTesting(url, optimization_type,  // IN-TEST
-                                            decision);
 }
 
 void OptimizationGuideKeyedService::AddExecutionResultForTesting(

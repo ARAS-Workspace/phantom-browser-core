@@ -60,7 +60,6 @@ class OnDeviceModelAvailabilityObserver;
 class OptimizationGuideStore;
 class OptimizationGuideKeyedServiceBrowserTest;
 class PredictionManagerBrowserTestBase;
-class PredictionModelDownloadClient;
 class PredictionModelStoreBrowserTestBase;
 class PushNotificationManager;
 class TabUrlProvider;
@@ -235,15 +234,6 @@ class OptimizationGuideKeyedService
                     std::optional<optimization_guide::OptimizationMetadata>>>&
           optimization_types_and_metadata);
 
-  // Adds hints for a URL with provided metadata to the optimization guide.
-  // Hints added via this method will work for `CanApplyOptimizationOnDemand`
-  // calls. For testing purposes only.
-  void AddOnDemandHintForTesting(
-      const GURL& url,
-      optimization_guide::proto::OptimizationType optimization_type,
-      const optimization_guide::OptimizationGuideDecisionWithMetadata&
-          decision);
-
   // Adds a model execution result to be provided when an execution request
   // comes in with the given `feature`.
   void AddExecutionResultForTesting(
@@ -283,9 +273,7 @@ class OptimizationGuideKeyedService
 
  private:
   friend class ChromeBrowsingDataRemoverDelegate;
-  friend class glic::ZeroStateSuggestionsPageData;
   friend class glic::GlicPageContextEligibilityObserver;
-  friend class HintsFetcherBrowserTest;
   friend class on_device_internals::PageHandler;
   friend class OptimizationGuideMessageHandler;
   friend class OptimizationGuideWebContentsObserver;
@@ -293,9 +281,7 @@ class OptimizationGuideKeyedService
   friend class optimization_guide::ModelExecutionLiveTest;
   friend class optimization_guide::OptimizationGuideKeyedServiceBrowserTest;
   friend class optimization_guide::PredictionManagerBrowserTestBase;
-  friend class optimization_guide::PredictionModelDownloadClient;
   friend class optimization_guide::PredictionModelStoreBrowserTestBase;
-  friend class PersonalizedHintsFetcherBrowserTest;
   friend class settings::SettingsUI;
 
 #if BUILDFLAG(IS_ANDROID)
@@ -351,17 +337,6 @@ class OptimizationGuideKeyedService
 
   // ProfileObserver implementation:
   void OnProfileInitializationComplete(Profile* profile) override;
-
-  // optimization_guide::NewOptimizationGuideDecider implementation:
-  void CanApplyOptimizationOnDemand(
-      const std::vector<GURL>& urls,
-      const base::flat_set<optimization_guide::proto::OptimizationType>&
-          optimization_types,
-      optimization_guide::proto::RequestContext request_context,
-      optimization_guide::OnDemandOptimizationGuideDecisionRepeatingCallback
-          callback,
-      std::optional<optimization_guide::proto::RequestContextMetadata>
-          request_context_metadata = std::nullopt) override;
 
   bool ComponentUpdatesEnabledProvider() const;
 

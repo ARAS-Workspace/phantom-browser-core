@@ -157,11 +157,6 @@ COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
 extern const base::FeatureParam<base::TimeDelta>
     kGetAIPageContentGetImageBytesTimeoutParam;
 
-typedef base::EnumSet<proto::RequestContext,
-                      proto::RequestContext_MIN,
-                      proto::RequestContext_MAX>
-    RequestContextSet;
-
 typedef base::EnumSet<proto::OptimizationType,
                       proto::OptimizationType_MIN,
                       proto::OptimizationType_MAX>
@@ -221,10 +216,6 @@ size_t MaxHostKeyedHintCacheSize();
 // will just be stored in-memory and evicted if not recently used.
 COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
 bool ShouldPersistHintsToDisk();
-
-// Returns requests contexts for which personalized metadata should be enabled.
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-RequestContextSet GetAllowedContextsForPersonalizedMetadata();
 
 // Returns optimization types for which proactive personalization should be
 // enabled.

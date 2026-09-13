@@ -25,7 +25,6 @@
 #include "base/timer/timer.h"
 #include "components/optimization_guide/core/filters/hints_component_info.h"
 #include "components/optimization_guide/core/filters/optimization_hints_component_observer.h"
-#include "components/optimization_guide/core/hints/hints_fetcher.h"
 #include "components/optimization_guide/core/hints/insertion_ordered_set.h"
 #include "components/optimization_guide/core/hints/optimization_guide_decision.h"
 #include "components/optimization_guide/core/hints/push_notification_manager.h"
@@ -47,7 +46,6 @@ class IdentityManager;
 
 namespace optimization_guide {
 class HintCache;
-class HintsFetcherFactory;
 class OptimizationFilter;
 class OptimizationGuideStore;
 class OptimizationMetadata;
@@ -61,18 +59,6 @@ class TopHostProvider;
 // behavior on platforms where it is disabled. Fix tests and remove this.
 BASE_DECLARE_FEATURE(kHintsBatchUpdateForActiveTabsAndTopHosts);
 
-// The max number of concurrent fetches to the remote Optimization Guide
-// Service that should be allowed for batch updates.
-inline constexpr size_t kMaxConcurrentBatchUpdateFetches = 20;
-
-// The max number of concurrent fetches to the remote Optimization Guide
-// Service that should be allowed for navigations
-// TODO: crbug.com/421924837 - This is only a param because some tests are
-// hardcoded to a assume a value that doesn't match the real one. Fix that and
-// remove this.
-BASE_DECLARE_FEATURE_PARAM(size_t, kHintsMaxConcurrentNavigationFetches);
-
-extern const char kOptimizationGuideServiceGetHintsDefaultURL[];
 // The local histogram used to record that the component hints are stored in
 // the cache and are ready for use.
 extern const char kLoadedHintLocalHistogramString[];
@@ -87,7 +73,6 @@ class HintsManager : public OptimizationHintsComponentObserver,
       base::WeakPtr<OptimizationGuideStore> hint_store,
       TopHostProvider* top_host_provider,
       TabUrlProvider* tab_url_provider,
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
       std::unique_ptr<PushNotificationManager> push_notification_manager,
       signin::IdentityManager* identity_manager,
       OptimizationGuideLogger* optimization_guide_logger);
@@ -168,28 +153,12 @@ class HintsManager : public OptimizationHintsComponentObserver,
       proto::OptimizationType optimization_type,
       OptimizationGuideDecisionCallback callback);
 
-  // Invokes |callback| with the decision for all types contained in
-  // |optimization_types| for each URL contained in |urls|, when sufficient
-  // information has been collected to make decisions. If information is not
-  // available for all URLs, the remote Optimization Guide Service will be
-  // contacted to fetch information for those URLs using |request_context|.
-  void CanApplyOptimizationOnDemand(
-      const std::vector<GURL>& urls,
-      const base::flat_set<proto::OptimizationType>& optimization_types,
-      proto::RequestContext request_context,
-      OnDemandOptimizationGuideDecisionRepeatingCallback callback,
-      std::optional<proto::RequestContextMetadata> request_context_metadata);
-
   // Clears all fetched hints from |hint_cache_|.
   void ClearFetchedHints();
 
   // Clears the host-keyed fetched hints from |hint_cache_|, both the persisted
   // and in memory ones.
   void ClearHostKeyedHints();
-
-  // Overrides |hints_fetcher_factory| for testing.
-  void SetHintsFetcherFactoryForTesting(
-      std::unique_ptr<HintsFetcherFactory> hints_fetcher_factory);
 
   // Overrides |clock_| for testing.
   void SetClockForTesting(const base::Clock* clock);
@@ -206,24 +175,11 @@ class HintsManager : public OptimizationHintsComponentObserver,
   // |navigation_redirect_chain| has finished.
   void OnNavigationFinish(const std::vector<GURL>& navigation_redirect_chain);
 
-  // Notifies |this| that deferred startup has occurred. This enables |this|
-  // to execute background tasks while minimizing the risk of regressing
-  // metrics such as jank.
-  void OnDeferredStartup();
-
-  // Fetch the hints for the given URLs with the provided |request_context|.
-  void FetchHintsForURLs(const std::vector<GURL>& target_urls,
-                         proto::RequestContext request_context);
-
   // PushNotificationManager::Delegate:
   void RemoveFetchedEntriesByHintKeys(
       base::OnceClosure on_success,
       proto::KeyRepresentation key_representation,
       const base::flat_set<std::string>& hint_keys) override;
-
-  // Returns true if |this| is allowed to fetch hints at the navigation time for
-  // |url|.
-  bool IsAllowedToFetchNavigationHints(const GURL& url);
 
   // Returns the hint cache for |this|.
   HintCache* hint_cache();
@@ -255,29 +211,9 @@ class HintsManager : public OptimizationHintsComponentObserver,
                     std::optional<optimization_guide::OptimizationMetadata>>>&
           optimization_types_and_metadata);
 
-  // Add hints to be returned for on-demand hints requests.
-  void AddOnDemandHintForTesting(
-      const GURL& url,
-      proto::OptimizationType optimization_type,
-      const OptimizationGuideDecisionWithMetadata& decision);
-
  private:
   friend class ::OptimizationGuideTestAppInterfaceWrapper;
   friend class HintsManagerTest;
-
-  FRIEND_TEST_ALL_PREFIXES(HintsManagerFetchingTest, BatchUpdateFetcherCleanup);
-  FRIEND_TEST_ALL_PREFIXES(
-      HintsManagerFetchingTest,
-      PageInsightsHubContextRequestContextMetadataPihSentGetHintsRequest);
-  FRIEND_TEST_ALL_PREFIXES(
-      HintsManagerFetchingTest,
-      PageInsightsHubContextNotSentRequestContextMetadataPihSentGetHintsRequest);
-  FRIEND_TEST_ALL_PREFIXES(
-      HintsManagerFetchingTest,
-      PageInsightsHubContextRequestContextMetadataNotPihSentGetHintsRequest);
-  FRIEND_TEST_ALL_PREFIXES(
-      HintsManagerFetchingTest,
-      PageInsightsHubContextRequestContextMetadataPihNotSentGetHintsRequest);
 
   // Processes the optimization filters contained in the hints component.
   void ProcessOptimizationFilters(
@@ -308,79 +244,11 @@ class HintsManager : public OptimizationHintsComponentObserver,
   void OnComponentHintsUpdated(base::OnceClosure update_closure,
                                bool hints_updated);
 
-  // Initiates fetching of hints - either immediately over via a timer.
-  void InitiateHintsFetchScheduling();
-
   // Returns the URLs that are currently in the active tab model that do not
   // have a hint available in |hint_cache_|.
   const std::vector<GURL> GetActiveTabURLsToRefresh();
 
-  // Schedules |active_tabs_hints_fetch_timer_| to fire based on the last time a
-  // fetch attempt was made.
-  void ScheduleActiveTabsHintsFetch();
-
   bool HasPersonalizableTypesRegistered();
-
-  // Called to make a request to fetch hints from the remote Optimization Guide
-  // Service. Used to fetch hints for origins frequently visited by the user and
-  // URLs open in the active tab model.
-  void FetchHintsForActiveTabs();
-
-  // Called when the hints for active tabs have been fetched from the remote
-  // Optimization Guide Service and are ready for parsing. This is used when
-  // fetching hints in batch mode.
-  void OnHintsForActiveTabsFetched(
-      const base::flat_set<std::string>& hosts_fetched,
-      const base::flat_set<GURL>& urls_fetched,
-      std::optional<std::unique_ptr<proto::GetHintsResponse>>
-          get_hints_response);
-
-  // Called when the batch update hints have been fetched from the remote
-  // Optimization Guide Service and are ready for parsing. This is used when
-  // fetching hints on demand or from SRP.
-  void OnBatchUpdateHintsFetched(
-      int32_t request_id,
-      proto::RequestContext request_context,
-      const base::flat_set<std::string>& hosts_fetched,
-      const base::flat_set<GURL>& urls_fetched,
-      const base::flat_set<GURL>& urls_for_callback,
-      const base::flat_set<proto::OptimizationType>& optimization_types,
-      OnDemandOptimizationGuideDecisionRepeatingCallback callback,
-      std::optional<std::unique_ptr<proto::GetHintsResponse>>
-          get_hints_response);
-
-  // Called when information is ready such that we can invoke any callbacks that
-  // require returning decisions to consumer features.
-  //
-  // TODO(crbug.com/40208585): Clean this up when we clean up some of the
-  // existing interfaces.
-  void OnBatchUpdateHintsStored(
-      const base::flat_set<GURL>& urls_fetched,
-      const base::flat_set<proto::OptimizationType>& optimization_types,
-      OnDemandOptimizationGuideDecisionRepeatingCallback callback);
-
-  // Creates a hints fetcher and stores it in |batch_update_hints_fetchers_| and
-  // returns the request ID associated with the fetch. It is expected to call
-  // `CleanUpBatchUpdateHintsFetcher` with the returned request ID once the
-  // fetch has finished.
-  std::pair<int32_t, HintsFetcher*> CreateAndTrackBatchUpdateHintsFetcher();
-
-  // Called to inform |this| that the batch fetcher with |request_id| is no
-  // longer needed removes the request from |batch_update_hints_fetchers_|
-  void CleanUpBatchUpdateHintsFetcher(int32_t request_id);
-
-  // Fetch batch hints for all `hosts` and `urls` for the `optimization_types`
-  // with the `request_context`. `access_token` can be empty which indicates no
-  // auth is specified.
-  void FetchOptimizationGuideServiceBatchHints(
-      const InsertionOrderedSet<std::string>& hosts,
-      const InsertionOrderedSet<GURL>& urls,
-      const base::flat_set<optimization_guide::proto::OptimizationType>&
-          optimization_types,
-      optimization_guide::proto::RequestContext request_context,
-      OnDemandOptimizationGuideDecisionRepeatingCallback callback,
-      std::optional<proto::RequestContextMetadata> request_context_metadata,
-      const std::string& access_token);
 
   // Returns decisions for |url| and |optimization_types| based on what's cached
   // locally.
@@ -388,62 +256,6 @@ class HintsManager : public OptimizationHintsComponentObserver,
   GetDecisionsWithCachedInformationForURLAndOptimizationTypes(
       const GURL& url,
       const base::flat_set<proto::OptimizationType>& optimization_types);
-
-  // Invokes |callback| for |url| and |optimization_types| based on what is
-  // cached on device.
-  void InvokeOnDemandHintsCallbackForURL(
-      const GURL& url,
-      const base::flat_set<proto::OptimizationType>& optimization_types,
-      OnDemandOptimizationGuideDecisionRepeatingCallback callback);
-
-  // Invokes |callback| for |requested_urls| and |optimization_types| based on
-  // what is contained in |response|.
-  void ProcessAndInvokeOnDemandHintsCallbacks(
-      std::unique_ptr<proto::GetHintsResponse> response,
-      const base::flat_set<GURL> requested_urls,
-      const base::flat_set<proto::OptimizationType> optimization_types,
-      OnDemandOptimizationGuideDecisionRepeatingCallback callback);
-
-  // Called when the hints for a navigation have been fetched from the remote
-  // Optimization Guide Service and are ready for parsing. This is used when
-  // fetching hints in real-time. |navigation_url| is the URL associated with
-  // the navigation handle that initiated the fetch.
-  // |page_navigation_urls_requested| contains the URLs that were requested  by
-  // |this| to be fetched. |page_navigation_hosts_requested| contains the hosts
-  // that were requested by |this| to be fetched.
-  void OnPageNavigationHintsFetched(
-      base::WeakPtr<OptimizationGuideNavigationData> navigation_data_weak_ptr,
-      const std::optional<GURL>& navigation_url,
-      const base::flat_set<GURL>& page_navigation_urls_requested,
-      const base::flat_set<std::string>& page_navigation_hosts_requested,
-      std::optional<std::unique_ptr<proto::GetHintsResponse>>
-          get_hints_response);
-
-  // Called when the fetched hints have been stored in |hint_cache| and are
-  // ready to be used. This is used when hints were fetched in batch mode.
-  void OnFetchedActiveTabsHintsStored();
-
-  // Called when the fetched hints have been stored in |hint_cache| and are
-  // ready to be used. This is used when hints were fetched in real-time.
-  // |navigation_url| is the URL associated with the navigation handle that
-  // initiated the fetch. |page_navigation_hosts_requested| contains the hosts
-  // whose hints should be loaded into memory when invoked.
-  void OnFetchedPageNavigationHintsStored(
-      base::WeakPtr<OptimizationGuideNavigationData> navigation_data_weak_ptr,
-      const std::optional<GURL>& navigation_url,
-      const base::flat_set<std::string>& page_navigation_hosts_requested);
-
-  // Returns true if there is a fetch currently in-flight for |navigation_url|.
-  bool IsHintBeingFetchedForNavigation(const GURL& navigation_url);
-
-  // Cleans up the hints fetcher for |navigation_url|, if applicable.
-  void CleanUpFetcherForNavigation(const GURL& navigation_url);
-
-  // Returns the time when a hints fetch request was last attempted.
-  base::Time GetLastHintsFetchAttemptTime() const;
-
-  // Sets the time when a hints fetch was last attempted to |last_attempt_time|.
-  void SetLastHintsFetchAttemptTime(base::Time last_attempt_time);
 
   // Called when the request to load a hint has completed.
   void OnHintLoaded(base::OnceClosure callback,
@@ -461,19 +273,6 @@ class HintsManager : public OptimizationHintsComponentObserver,
   // signal for tests.
   void LoadHintForHost(const std::string& host, base::OnceClosure callback);
 
-  // Returns whether there is an optimization type to fetch for. Will return
-  // false if no optimization types are registered or if all registered
-  // optimization types are covered by optimization filters.
-  bool HasOptimizationTypeToFetchFor();
-
-  // Creates a hints fetch for navigation represented by |navigation_data|, if
-  // it is allowed. The fetch will include the host and URL of the
-  // |navigation_data| if the associated hints for each are not already in the
-  // cache.
-  void MaybeFetchHintsForNavigation(
-      base::WeakPtr<OptimizationGuideNavigationData> navigation_data_weak_ptr,
-      const std::string& access_token);
-
   // If an entry for |navigation_url| is contained in |registered_callbacks_|,
   // it will load the hint for |navigation_url|'s host and upon completion, will
   // invoke the registered callbacks for |navigation_url|.
@@ -487,22 +286,6 @@ class HintsManager : public OptimizationHintsComponentObserver,
   bool HasAllInformationForDecisionAvailable(
       const GURL& navigation_url,
       proto::OptimizationType optimization_type);
-
-  HintsFetcherFactory* GetHintsFetcherFactory();
-
-  // Returns the number of batch update hints fetches initiated.
-  //
-  // Exposed here for testing.
-  int32_t num_batch_update_hints_fetches_initiated() const {
-    return batch_update_hints_fetcher_request_id_;
-  }
-
-  // Returns the current active tabs batch update hints fetcher.
-  //
-  // Exposed here for testing.
-  HintsFetcher* active_tabs_batch_update_hints_fetcher() const {
-    return active_tabs_batch_update_hints_fetcher_.get();
-  }
 
   // The logger that plumbs the debug logs to the optimization guide
   // internals page. Not owned. Guaranteed to outlive |this|, since the logger
@@ -559,32 +342,6 @@ class HintsManager : public OptimizationHintsComponentObserver,
   // fetched from the remote Optimization Guide Service.
   std::unique_ptr<HintCache> hint_cache_;
 
-  // For testing only. Stores hints to be returned for on-demand hint requests.
-  base::flat_map<GURL,
-                 base::flat_map<proto::OptimizationType,
-                                OptimizationGuideDecisionWithMetadata>>
-      on_demand_hints_for_testing_;
-
-  // The fetcher that handles making requests for hints for active tabs from
-  // the remote Optimization Guide Service.
-  std::unique_ptr<HintsFetcher> active_tabs_batch_update_hints_fetcher_;
-
-  // A map from request ID to the fetcher that handles making requests for hints
-  // for multiple hosts from the remote Optimization Guide Service.
-  base::LRUCache<int32_t, std::unique_ptr<HintsFetcher>>
-      batch_update_hints_fetchers_;
-  int32_t batch_update_hints_fetcher_request_id_ = 0;
-
-  // A cache keyed by navigation URL to the fetcher making a request for a hint
-  // for that URL and/or host to the remote Optimization Guide Service that
-  // keeps track of when an entry has been placed in the cache.
-  base::LRUCache<GURL, std::unique_ptr<HintsFetcher>>
-      page_navigation_hints_fetchers_;
-
-  // The factory used to create hints fetchers. It is mostly used to create
-  // new fetchers for use under the page navigation context, but will also be
-  // used to create the initial fetcher for the batch update context.
-  std::unique_ptr<HintsFetcherFactory> hints_fetcher_factory_;
 
   // The top host provider that can be queried. Not owned.
   raw_ptr<TopHostProvider> top_host_provider_ = nullptr;
@@ -622,9 +379,6 @@ class HintsManager : public OptimizationHintsComponentObserver,
   // would access other member variables after they have been destroyed.
   scoped_refptr<base::SequencedTaskRunner> background_task_runner_;
 
-  // Requests contexts for which personalized metadata should be enabled.
-  const features::RequestContextSet allowed_contexts_for_personalized_metadata_;
-
   // Optimization types for which proactive personalization is enabled.
   const features::OptimizationTypeSet
       allowed_optimization_types_for_proactive_personalization_;
@@ -634,22 +388,6 @@ class HintsManager : public OptimizationHintsComponentObserver,
   // Used to get |weak_ptr_| to self.
   base::WeakPtrFactory<HintsManager> weak_ptr_factory_{this};
 
-  // Wrapper that immediately invokes HintsFetcher for the purposes of fetching
-  // hints for urls.
-  void FetchHintsForURLsInternal(
-      const InsertionOrderedSet<std::string>& target_hosts,
-      const InsertionOrderedSet<GURL>& target_urls,
-      optimization_guide::proto::RequestContext request_context,
-      const std::string& access_token);
-
-  // Wrapper that immediately invokes HintsFetcher for the purposes of fetching
-  // hints for active tabs.
-  void FetchHintsForActiveTabsInternal(
-      const std::vector<std::string>& top_hosts,
-      const std::vector<GURL>& active_tab_urls_to_refresh,
-      optimization_guide::proto::RequestContext request_context,
-      HintsFetchedCallback hints_fetched_callback,
-      const std::string& access_token);
 };
 
 // Overrides the Hints Protobuf that would come from the component updater. If

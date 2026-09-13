@@ -223,10 +223,6 @@ void SetPriceTrackingStateForBookmark(
 
     // ProductInfo can be passed in optionally and used in the event
     // that ShoppingService isn't aware of the ProductInfo.
-    // Ideally use GetProductInfoForUrls() (where a fallback is
-    // automatically provided) instead of
-    // GetAvailableProductInfoForUrl() above when synced Tabs are
-    // supported in Shopping Service TODO(crbug.com/410811501).
     if (!info.has_value() && product_info.has_value()) {
       info = product_info;
     }

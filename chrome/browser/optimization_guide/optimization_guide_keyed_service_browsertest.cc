@@ -300,15 +300,6 @@ class OptimizationGuideKeyedServiceBrowserTest
         browser()->tab_strip_model()->GetActiveWebContents());
   }
 
-  void CanApplyOptimizationOnDemand(
-      const std::vector<GURL>& urls,
-      const std::vector<proto::OptimizationType>& optimization_types,
-      OnDemandOptimizationGuideDecisionRepeatingCallback callback) {
-    OptimizationGuideKeyedServiceFactory::GetForProfile(browser()->GetProfile())
-        ->CanApplyOptimizationOnDemand(urls, optimization_types,
-                                       proto::CONTEXT_BATCH_UPDATE_ACTIVE_TABS,
-                                       callback);
-  }
 
   PredictionManager* prediction_manager() {
     auto* optimization_guide_keyed_service =
@@ -768,46 +759,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
             OptimizationTypeDecision::kNotAllowedByOptimizationFilter),
         1);
   }
-}
-
-IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
-                       CanApplyOptimizationOnDemand) {
-  PushHintsComponentAndWaitForCompletion();
-  OptimizationGuideKeyedService* ogks =
-      OptimizationGuideKeyedServiceFactory::GetForProfile(
-          browser()->GetProfile());
-  ogks->RegisterOptimizationTypes({proto::OptimizationType::NOSCRIPT,
-                                   proto::OptimizationType::FAST_HOST_HINTS});
-
-  base::HistogramTester histogram_tester;
-
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url_with_hints()));
-  RetryForHistogramUntilCountReached(&histogram_tester,
-                                     "OptimizationGuide.LoadedHint.Result", 1);
-
-  std::unique_ptr<base::RunLoop> run_loop = std::make_unique<base::RunLoop>();
-  base::flat_set<GURL> received_callbacks;
-  CanApplyOptimizationOnDemand(
-      {url_with_hints(), GURL("https://blockedhost.com/whatever")},
-      {proto::OptimizationType::NOSCRIPT,
-       proto::OptimizationType::FAST_HOST_HINTS},
-      base::BindRepeating(
-          [](base::RunLoop* run_loop, base::flat_set<GURL>* received_callbacks,
-             const GURL& url,
-             const base::flat_map<proto::OptimizationType,
-                                  OptimizationGuideDecisionWithMetadata>&
-                 decisions) {
-            received_callbacks->insert(url);
-
-            // Expect one decision per requested type.
-            EXPECT_EQ(decisions.size(), 2u);
-
-            if (received_callbacks->size() == 2) {
-              run_loop->Quit();
-            }
-          },
-          run_loop.get(), &received_callbacks));
-  run_loop->Run();
 }
 
 IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,

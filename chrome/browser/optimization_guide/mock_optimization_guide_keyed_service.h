@@ -42,19 +42,6 @@ class MockOptimizationGuideKeyedService : public OptimizationGuideKeyedService {
                optimization_guide::proto::OptimizationType,
                optimization_guide::OptimizationGuideDecisionCallback),
               (override));
-  MOCK_METHOD(
-      void,
-      CanApplyOptimizationOnDemand,
-      (const std::vector<GURL>& urls,
-       const base::flat_set<optimization_guide::proto::OptimizationType>&
-           optimization_types,
-       optimization_guide::proto::RequestContext request_context,
-       optimization_guide::OnDemandOptimizationGuideDecisionRepeatingCallback
-           callback,
-       std::optional<optimization_guide::proto::RequestContextMetadata>
-           request_context_metadata),
-      (override));
-  MOCK_METHOD(std::unique_ptr<optimization_guide::OnDeviceSession>,
               StartSession,
               (optimization_guide::mojom::OnDeviceFeature feature,
                const optimization_guide::SessionConfigParams& config_params,

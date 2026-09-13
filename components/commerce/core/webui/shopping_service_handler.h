@@ -82,8 +82,6 @@ class ShoppingServiceHandler
       GetProductInfoForCurrentUrlCallback callback) override;
   void GetProductInfoForUrl(const GURL& url,
                             GetProductInfoForUrlCallback callback) override;
-  void GetProductInfoForUrls(const std::vector<GURL>& urls,
-                             GetProductInfoForUrlsCallback callback) override;
   void GetPriceInsightsInfoForCurrentUrl(
       GetPriceInsightsInfoForCurrentUrlCallback callback) override;
   void GetPriceInsightsInfoForUrl(

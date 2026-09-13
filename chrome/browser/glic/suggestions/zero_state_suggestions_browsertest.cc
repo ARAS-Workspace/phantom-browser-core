@@ -107,27 +107,6 @@ class ZeroStateSuggestionsBrowserTest
 
   bool IsPageSettledMonitorEnabled() const { return std::get<1>(GetParam()); }
 
-  void SetUpOnDemandHints(const GURL& url,
-                          bool allow_contextual,
-                          const std::vector<std::string>& suggestions) {
-    optimization_guide::proto::GlicZeroStateSuggestionsMetadata metadata;
-    metadata.set_contextual_suggestions_eligible(allow_contextual);
-    *metadata.mutable_contextual_suggestions() = {suggestions.begin(),
-                                                  suggestions.end()};
-    optimization_guide::OptimizationGuideDecisionWithMetadata
-        decision_with_metadata;
-    decision_with_metadata.decision =
-        optimization_guide::OptimizationGuideDecision::kTrue;
-    decision_with_metadata.metadata.set_any_metadata(
-        optimization_guide::AnyWrapProto(metadata));
-
-    OptimizationGuideKeyedServiceFactory::GetInstance()
-        ->GetForProfile(browser()->GetProfile())
-        ->AddOnDemandHintForTesting(
-            url, optimization_guide::proto::GLIC_ZERO_STATE_SUGGESTIONS,
-            decision_with_metadata);
-  }
-
   void SetUpHints(const GURL& url,
                   bool allow_contextual,
                   const std::vector<std::string>& suggestions) {

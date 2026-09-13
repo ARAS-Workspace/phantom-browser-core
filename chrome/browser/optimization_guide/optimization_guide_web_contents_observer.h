@@ -44,12 +44,6 @@ class OptimizationGuideWebContentsObserver
   // Notifies |this| to flush |last_navigation_data| so metrics are recorded.
   void FlushLastNavigationData();
 
-  // Tell the observer that hints for this URL should be fetched once we reach
-  // onload in this |web_contents|. Note that |web_contents| must be the
-  // WebContents being observed by this object.
-  void AddURLsToBatchFetchBasedOnPrediction(std::vector<GURL> urls,
-                                            content::WebContents* web_contents);
-
  private:
   friend class content::WebContentsUserData<
       OptimizationGuideWebContentsObserver>;
@@ -74,12 +68,6 @@ class OptimizationGuideWebContentsObserver
   void WebContentsDestroyed() override;
 
   void DocumentOnLoadCompletedInPrimaryMainFrame() override;
-
-  // Ask |hints_manager| to fetch hints for navigations that were predicted for
-  // the current page load.
-  void FetchHintsUsingManager(
-      optimization_guide::ChromeHintsManager* hints_manager,
-      base::WeakPtr<content::Page> page);
 
   // Notifies |optimization_guide_keyed_service_| that the navigation has
   // finished.

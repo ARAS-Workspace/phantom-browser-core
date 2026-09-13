@@ -91,14 +91,11 @@ class ChromeOnDeviceModelServiceController final {
 ChromePredictionManager::ChromePredictionManager()
     : prediction_model_store_(*g_browser_process->local_state()),
       prediction_manager_(&prediction_model_store_,
-                          g_browser_process->shared_url_loader_factory(),
                           g_browser_process->local_state(),
                           g_browser_process->GetApplicationLocale(),
                           OptimizationGuideLogger::GetInstance(),
                           base::BindRepeating(&unzip::LaunchUnzipper)) {
   prediction_model_store_.Initialize(GetBaseStoreDir());
-  prediction_manager_.MaybeInitializeModelDownloads(
-      profile_download_service_tracker_, g_browser_process->local_state());
 }
 ChromePredictionManager::~ChromePredictionManager() = default;
 

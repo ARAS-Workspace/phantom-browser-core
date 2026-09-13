@@ -48,29 +48,6 @@ void LogServerRequestFailed(MultistepFilterLogRouter* log_router,
       << LogDetail("failure_reason", std::string(failure_reason));
 }
 
-void LogServerRequestSentWithFilterExecutionStrategy(
-    MultistepFilterLogRouter* log_router,
-    int64_t navigation_id,
-    std::string_view host,
-    base::span<const FilterAnnotation> filter_annotations) {
-  std::vector<std::string> annotation_strings;
-  annotation_strings.reserve(filter_annotations.size());
-  for (const FilterAnnotation& annotation : filter_annotations) {
-    annotation_strings.push_back(annotation.ToString());
-  }
-  std::string filter_annotations_str =
-      base::StrCat({"[", base::JoinString(annotation_strings, ", "), "]"});
-
-  MULTISTEP_FILTER_LOG(log_router, navigation_id,
-                       LogEventType::kServerRequestSent, host)
-      << LogDetail("request_type",
-                   std::string(OptimizationType_Name(
-                       OptimizationType::FILTER_EXECUTION_STRATEGY)))
-      << LogDetail("execution_candidate_count",
-                   static_cast<int>(filter_annotations.size()))
-      << LogDetail("execution_candidates", filter_annotations_str);
-}
-
 void LogServerRequestSentFilterTasksSupported(
     MultistepFilterLogRouter* log_router,
     int64_t navigation_id,
@@ -204,43 +181,7 @@ void OptimizationGuideAnnotationIndexClient::GetFilterSuggestionCandidates(
     base::OnceCallback<
         void(std::optional<std::vector<FilterSuggestionCandidate>>)> callback,
     int64_t navigation_id) {
-  if (!optimization_guide_decider_) {
-    LogServerRequestFailed(log_router_, navigation_id, url.host(),
-                           "optimization_guide_decider_null");
-    std::move(callback).Run(std::nullopt);
-    return;
-  }
-
-  RequestContextMetadata context_metadata =
-      ToRequestContextMetadata(filter_annotations);
-
-  LogServerRequestSentWithFilterExecutionStrategy(
-      log_router_, navigation_id, url.host(), filter_annotations);
-
-  optimization_guide_decider_->CanApplyOptimizationOnDemand(
-      {url}, {OptimizationType::FILTER_EXECUTION_STRATEGY},
-      RequestContext::CONTEXT_FILTER_EXECUTION,
-      base::BindRepeating(
-          [](base::WeakPtr<OptimizationGuideAnnotationIndexClient> client,
-             int64_t navigation_id,
-             base::OnceCallback<void(
-                 std::optional<std::vector<FilterSuggestionCandidate>>)>
-                 callback,
-             const GURL& url,
-             const base::flat_map<
-                 optimization_guide::proto::OptimizationType,
-                 optimization_guide::OptimizationGuideDecisionWithMetadata>&
-                 decisions) {
-            if (!client) {
-              std::move(callback).Run(std::nullopt);
-              return;
-            }
-            client->OnFilterExecutionStrategyDecision(
-                navigation_id, std::move(callback), url, decisions);
-          },
-          weak_ptr_factory_.GetWeakPtr(), navigation_id,
-          base::Passed(std::move(callback))),
-      context_metadata);
+  std::move(callback).Run(std::nullopt);
 }
 
 void OptimizationGuideAnnotationIndexClient::GetSupportedTasks(

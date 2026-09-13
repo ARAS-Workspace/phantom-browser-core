@@ -16,7 +16,6 @@ source_set("optimization_guide") {
     "optimization_guide_tab_url_provider.h",
     "optimization_guide_web_contents_observer.h",
     "prediction/chrome_profile_download_service_tracker.h",
-    "prediction/prediction_model_download_client.h",
   ]
   public_deps = [
     "//base",
@@ -57,7 +56,6 @@ source_set("impl") {
     "optimization_guide_tab_url_provider.cc",
     "optimization_guide_web_contents_observer.cc",
     "prediction/chrome_profile_download_service_tracker.cc",
-    "prediction/prediction_model_download_client.cc",
   ]
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
   deps = [
@@ -143,14 +141,11 @@ if (!is_android) {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
     sources = [
-      "hints_fetcher_browsertest.cc",
       "model_execution/model_execution_browsertest.cc",
       "model_execution/model_execution_live_test.cc",
       "model_execution/on_device_model_browsertest.cc",
       "optimization_guide_keyed_service_browsertest.cc",
       "optimization_guide_tab_url_provider_browsertest.cc",
-      "prediction/prediction_manager_browsertest.cc",
-      "prediction/prediction_model_store_browsertest.cc",
     ]
 
     deps = [

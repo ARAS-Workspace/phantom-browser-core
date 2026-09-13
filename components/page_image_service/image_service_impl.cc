@@ -18,7 +18,6 @@
 #include "components/omnibox/browser/autocomplete_scheme_classifier.h"
 #include "components/omnibox/browser/remote_suggestions_service.h"
 #include "components/omnibox/browser/search_suggestion_parser.h"
-#include "components/optimization_guide/core/hints/hints_fetcher.h"
 #include "components/optimization_guide/core/hints/optimization_guide_decider.h"
 #include "components/optimization_guide/proto/common_types.pb.h"
 #include "components/optimization_guide/proto/hints.pb.h"
@@ -36,13 +35,6 @@ namespace page_image_service {
 namespace {
 
 // Fulfills all `callbacks` with `result`.
-void FulfillAllCallbacks(std::vector<ImageService::ResultCallback> callbacks,
-                         const GURL& result) {
-  for (auto& callback : callbacks) {
-    std::move(callback).Run(result);
-  }
-}
-
 }  // namespace
 
 // A one-time use object that uses Suggest to get an image URL corresponding
@@ -179,7 +171,6 @@ ImageServiceImpl::ImageServiceImpl(
         autocomplete_scheme_classifier)
     : template_url_service_(template_url_service),
       remote_suggestions_service_(remote_suggestions_service),
-      opt_guide_(opt_guide),
       history_consent_helper_(std::make_unique<ImageServiceConsentHelper>(
           sync_service,
           syncer::DataType::HISTORY_DELETE_DIRECTIVES)),
@@ -188,11 +179,6 @@ ImageServiceImpl::ImageServiceImpl(
           syncer::DataType::BOOKMARKS)),
       autocomplete_scheme_classifier_(
           std::move(autocomplete_scheme_classifier)) {}
-
-ImageServiceImpl::OptGuideRequest::OptGuideRequest() = default;
-ImageServiceImpl::OptGuideRequest::~OptGuideRequest() = default;
-ImageServiceImpl::OptGuideRequest::OptGuideRequest(OptGuideRequest&& other) =
-    default;
 
 ImageServiceImpl::~ImageServiceImpl() = default;
 
@@ -267,14 +253,6 @@ void ImageServiceImpl::OnConsentResult(mojom::ClientId client_id,
     }
   }
 
-  if (options.optimization_guide_images && opt_guide_) {
-    UmaHistogramEnumerationForClient(
-        kBackendHistogramName, PageImageServiceBackend::kOptimizationGuide,
-        client_id);
-    return FetchOptimizationGuideImage(client_id, page_url,
-                                       std::move(callback));
-  }
-
   UmaHistogramEnumerationForClient(kBackendHistogramName,
                                    PageImageServiceBackend::kNoValidBackend,
                                    client_id);
@@ -307,160 +285,6 @@ void ImageServiceImpl::OnSuggestImageFetched(
   std::move(callback).Run(image_url);
 
   // `fetcher` is owned by this method and will be deleted now.
-}
-
-void ImageServiceImpl::FetchOptimizationGuideImage(mojom::ClientId client_id,
-                                               const GURL& page_url,
-                                               ResultCallback callback) {
-  DCHECK(opt_guide_) << "FetchOptimizationGuideImage is never called when "
-                        "opt_guide_ is nullptr.";
-
-  OptGuideRequest request;
-  request.url = page_url;
-  request.callback = std::move(callback);
-  auto& request_list = unsent_opt_guide_requests_[client_id];
-  request_list.push_back(std::move(request));
-
-  if (request_list.size() >= optimization_guide::HintsFetcher::kMaxUrls) {
-    // Erasing the timer also cancels the timer callback.
-    opt_guide_timers_.erase(client_id);
-    ProcessAllBatchedOptimizationGuideRequests(client_id);
-  } else if (request_list.size() == 1U) {
-    // Otherwise, if we just enqueued our FIRST request, then kick off a timer
-    // to flush the queue. One millisecond is a long enough time in CPU time.
-    auto timer = std::make_unique<base::OneShotTimer>();
-    timer->Start(FROM_HERE, kOptimizationGuideBatchingTimeout,
-                 base::BindOnce(
-                     &ImageServiceImpl::ProcessAllBatchedOptimizationGuideRequests,
-                     weak_factory_.GetWeakPtr(), client_id));
-    opt_guide_timers_[client_id] = std::move(timer);
-  }
-}
-
-void ImageServiceImpl::ProcessAllBatchedOptimizationGuideRequests(
-    mojom::ClientId client_id) {
-  optimization_guide::proto::RequestContext request_context;
-  switch (client_id) {
-    case mojom::ClientId::Journeys:
-    case mojom::ClientId::JourneysSidePanel:
-    case mojom::ClientId::HistoryEmbeddings: {
-      request_context = optimization_guide::proto::CONTEXT_JOURNEYS;
-      break;
-    }
-    case mojom::ClientId::NtpQuests:
-    case mojom::ClientId::NtpRealbox:
-    case mojom::ClientId::NtpTabResumption: {
-      request_context = optimization_guide::proto::CONTEXT_NEW_TAB_PAGE;
-      break;
-    }
-    case mojom::ClientId::Bookmarks: {
-      request_context = optimization_guide::proto::CONTEXT_BOOKMARKS;
-      break;
-    }
-  }
-
-  std::vector<OptGuideRequest>& unsent_requests =
-      unsent_opt_guide_requests_[client_id];
-  if (unsent_requests.empty()) {
-    return;
-  }
-
-  // Generate a list of URLs to request in this batch.
-  std::vector<GURL> urls;
-  for (auto& request : unsent_requests) {
-    urls.push_back(request.url);
-  }
-
-  // Move the list of unsent requests to the sent vector.
-  for (auto& request : unsent_requests) {
-    sent_opt_guide_requests_[client_id].push_back(std::move(request));
-  }
-  unsent_requests.clear();
-
-  opt_guide_->CanApplyOptimizationOnDemand(
-      urls, {optimization_guide::proto::OptimizationType::SALIENT_IMAGE},
-      request_context,
-      base::BindRepeating(&ImageServiceImpl::OnOptimizationGuideImageFetched,
-                          weak_factory_.GetWeakPtr(), client_id));
-}
-
-void ImageServiceImpl::OnOptimizationGuideImageFetched(
-    mojom::ClientId client_id,
-    const GURL& url,
-    const base::flat_map<
-        optimization_guide::proto::OptimizationType,
-        optimization_guide::OptimizationGuideDecisionWithMetadata>& decisions) {
-  // Extract all waiting callbacks matching `url` to `matching_callbacks`.
-  std::vector<ResultCallback> matching_callbacks;
-  {
-    // Take over the existing whole list via a swap.
-    std::vector<OptGuideRequest> all_requests;
-    std::swap(all_requests, sent_opt_guide_requests_[client_id]);
-
-    // Steal the matching callbacks, pushing back the other pending requests
-    // back to the original list.
-    for (auto& request : all_requests) {
-      if (request.url == url) {
-        matching_callbacks.push_back(std::move(request.callback));
-      } else {
-        sent_opt_guide_requests_[client_id].push_back(std::move(request));
-      }
-    }
-  }
-
-  auto iter = decisions.find(optimization_guide::proto::SALIENT_IMAGE);
-  if (iter == decisions.end()) {
-    UmaHistogramEnumerationForClient(
-        kBackendOptimizationGuideResultHistogramName,
-        PageImageServiceResult::kResponseMissing, client_id);
-    return FulfillAllCallbacks(std::move(matching_callbacks), GURL());
-  }
-
-  optimization_guide::OptimizationGuideDecisionWithMetadata decision =
-      iter->second;
-  if (decision.decision !=
-      optimization_guide::OptimizationGuideDecision::kTrue) {
-    UmaHistogramEnumerationForClient(
-        kBackendOptimizationGuideResultHistogramName,
-        PageImageServiceResult::kNoImage, client_id);
-    return FulfillAllCallbacks(std::move(matching_callbacks), GURL());
-  }
-  if (!decision.metadata.any_metadata().has_value()) {
-    UmaHistogramEnumerationForClient(
-        kBackendOptimizationGuideResultHistogramName,
-        PageImageServiceResult::kResponseMalformed, client_id);
-    return FulfillAllCallbacks(std::move(matching_callbacks), GURL());
-  }
-
-  auto parsed_any = optimization_guide::ParsedAnyMetadata<
-      optimization_guide::proto::SalientImageMetadata>(
-      decision.metadata.any_metadata().value());
-  if (!parsed_any) {
-    UmaHistogramEnumerationForClient(
-        kBackendOptimizationGuideResultHistogramName,
-        PageImageServiceResult::kResponseMalformed, client_id);
-    return FulfillAllCallbacks(std::move(matching_callbacks), GURL());
-  }
-
-  // Look through the metadata, returning the first valid image URL.
-  auto salient_image_metadata = *parsed_any;
-  for (const auto& thumbnail : salient_image_metadata.thumbnails()) {
-    if (thumbnail.has_image_url()) {
-      GURL image_url(thumbnail.image_url());
-      if (image_url.is_valid() && image_url.SchemeIs(url::kHttpsScheme)) {
-        UmaHistogramEnumerationForClient(
-            kBackendOptimizationGuideResultHistogramName,
-            PageImageServiceResult::kSuccess, client_id);
-        return FulfillAllCallbacks(std::move(matching_callbacks), image_url);
-      }
-    }
-  }
-
-  // Fail if we can't find any.
-  UmaHistogramEnumerationForClient(kBackendOptimizationGuideResultHistogramName,
-                                   PageImageServiceResult::kResponseMalformed,
-                                   client_id);
-  return FulfillAllCallbacks(std::move(matching_callbacks), GURL());
 }
 
 }  // namespace page_image_service

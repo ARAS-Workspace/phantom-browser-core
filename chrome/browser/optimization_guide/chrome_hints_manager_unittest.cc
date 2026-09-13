@@ -12,7 +12,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_tab_url_provider.h"
 #include "chrome/browser/optimization_guide/optimization_guide_web_contents_observer.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/optimization_guide/core/hints/hints_fetcher.h"
 #include "components/optimization_guide/core/hints/optimization_guide_decider.h"
 #include "components/optimization_guide/core/hints/optimization_guide_store.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
@@ -100,7 +99,6 @@ class ChromeHintsManagerFetchingTest
     hints_manager_ = std::make_unique<ChromeHintsManager>(
         &testing_profile_, pref_service(), hint_store_->AsWeakPtr(),
         /*top_host_provider=*/nullptr, tab_url_provider_.get(),
-        url_loader_factory_,
         OptimizationGuideKeyedService::MaybeCreatePushNotificationManager(
             &testing_profile_),
         /*identity_manager=*/nullptr, &optimization_guide_logger_);
@@ -154,14 +152,6 @@ class ChromeHintsManagerFetchingTest
     return navigation_handle->GetWebContents();
   }
 
-  void FetchHintsUsingWebContentsObserverURLs(
-      content::WebContents* web_contents) {
-    auto* observer =
-        OptimizationGuideWebContentsObserver::FromWebContents(web_contents);
-    observer->FetchHintsUsingManager(
-        hints_manager(), web_contents->GetPrimaryPage().GetWeakPtr());
-  }
-
   ChromeHintsManager* hints_manager() const { return hints_manager_.get(); }
 
   base::FilePath temp_dir() const { return temp_dir_.GetPath(); }
@@ -191,189 +181,6 @@ class ChromeHintsManagerFetchingTest
   OptimizationGuideLogger optimization_guide_logger_;
 };
 
-TEST_F(ChromeHintsManagerFetchingTest, HintsFetched_AtSRP_DuplicatesRemoved) {
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      optimization_guide::
-          kDisableCheckingUserPermissionsForTestingSwitch);
-  hints_manager()->RegisterOptimizationTypes(
-      {optimization_guide::proto::DEFER_ALL_SCRIPT});
-
-  std::vector<GURL> sorted_predicted_urls;
-  sorted_predicted_urls.emplace_back("https://foo.com/page1.html");
-  sorted_predicted_urls.emplace_back("https://foo.com/page2.html");
-  sorted_predicted_urls.emplace_back("https://foo.com/page3.html");
-  sorted_predicted_urls.emplace_back("https://bar.com/");
-
-  GURL url("https://www.google.com/search?q=a");
-  content::WebContents* web_contents = Navigate(url);
-  NavigationPredictorKeyedService::Prediction prediction(
-      web_contents, url,
-      NavigationPredictorKeyedService::PredictionSource::
-          kAnchorElementsParsedFromWebPage,
-      sorted_predicted_urls);
-
-  {
-    base::HistogramTester histogram_tester;
-
-    hints_manager()->OnPredictionUpdated(prediction);
-    FetchHintsUsingWebContentsObserverURLs(web_contents);
-
-    // Ensure that we only include 2 hosts in the request. These would be
-    // foo.com and bar.com.
-    histogram_tester.ExpectUniqueSample(
-        "OptimizationGuide.HintsFetcher.GetHintsRequest.HostCount."
-        "BatchUpdateGoogleSRP",
-        2, 1);
-    // Ensure that we include all URLs in the request.
-    histogram_tester.ExpectUniqueSample(
-        "OptimizationGuide.HintsFetcher.GetHintsRequest.UrlCount."
-        "BatchUpdateGoogleSRP",
-        4, 1);
-    RunUntilIdle();
-  }
-
-  {
-    base::HistogramTester histogram_tester;
-    hints_manager()->OnPredictionUpdated(prediction);
-    FetchHintsUsingWebContentsObserverURLs(web_contents);
-
-    // Ensure that URLs are not re-fetched.
-    histogram_tester.ExpectTotalCount(
-        "OptimizationGuide.HintsFetcher.GetHintsRequest.UrlCount."
-        "BatchUpdateGoogleSRP",
-        0);
-  }
-}
-
-TEST_F(ChromeHintsManagerFetchingTest,
-       HintsFetched_AtSRP_NonHTTPOrHTTPSHostsRemoved) {
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      optimization_guide::
-          kDisableCheckingUserPermissionsForTestingSwitch);
-  hints_manager()->RegisterOptimizationTypes(
-      {optimization_guide::proto::DEFER_ALL_SCRIPT});
-
-  base::HistogramTester histogram_tester;
-  std::vector<GURL> sorted_predicted_urls;
-  sorted_predicted_urls.emplace_back("https://foo.com/page1.html");
-  sorted_predicted_urls.emplace_back("file://non-web-bar.com/");
-  sorted_predicted_urls.emplace_back("http://httppage.com/");
-
-  GURL url("https://www.google.com/search?q=a");
-  content::WebContents* web_contents = Navigate(url);
-  NavigationPredictorKeyedService::Prediction prediction(
-      web_contents, url,
-      NavigationPredictorKeyedService::PredictionSource::
-          kAnchorElementsParsedFromWebPage,
-      sorted_predicted_urls);
-
-  hints_manager()->OnPredictionUpdated(prediction);
-  FetchHintsUsingWebContentsObserverURLs(web_contents);
-  // Ensure that we include both web hosts in the request. These would be
-  // foo.com and httppage.com.
-  histogram_tester.ExpectUniqueSample(
-      "OptimizationGuide.HintsFetcher.GetHintsRequest.HostCount."
-      "BatchUpdateGoogleSRP",
-      2, 1);
-  // Ensure that we only include 2 URLs in the request.
-  histogram_tester.ExpectUniqueSample(
-      "OptimizationGuide.HintsFetcher.GetHintsRequest.UrlCount."
-      "BatchUpdateGoogleSRP",
-      2, 1);
-}
-
-TEST_F(ChromeHintsManagerFetchingTest, HintsFetched_AtSRP) {
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      optimization_guide::
-          kDisableCheckingUserPermissionsForTestingSwitch);
-  hints_manager()->RegisterOptimizationTypes(
-      {optimization_guide::proto::DEFER_ALL_SCRIPT});
-
-  base::HistogramTester histogram_tester;
-  std::vector<GURL> sorted_predicted_urls;
-  sorted_predicted_urls.emplace_back("https://foo.com/");
-  GURL url("https://www.google.com/search?q=a");
-  content::WebContents* web_contents = Navigate(url);
-  NavigationPredictorKeyedService::Prediction prediction(
-      web_contents, url,
-      NavigationPredictorKeyedService::PredictionSource::
-          kAnchorElementsParsedFromWebPage,
-      sorted_predicted_urls);
-
-  hints_manager()->OnPredictionUpdated(prediction);
-  FetchHintsUsingWebContentsObserverURLs(web_contents);
-  histogram_tester.ExpectTotalCount(
-      "OptimizationGuide.HintsFetcher.GetHintsRequest.HostCount."
-      "BatchUpdateGoogleSRP",
-      1);
-  histogram_tester.ExpectTotalCount(
-      "OptimizationGuide.HintsFetcher.GetHintsRequest.UrlCount."
-      "BatchUpdateGoogleSRP",
-      1);
-}
-
-TEST_F(ChromeHintsManagerFetchingTest, HintsFetched_AtSRP_GoogleLinksIgnored) {
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      optimization_guide::
-          kDisableCheckingUserPermissionsForTestingSwitch);
-  hints_manager()->RegisterOptimizationTypes(
-      {optimization_guide::proto::DEFER_ALL_SCRIPT});
-
-  base::HistogramTester histogram_tester;
-  std::vector<GURL> sorted_predicted_urls;
-  sorted_predicted_urls.emplace_back("https://foo.com/");
-  sorted_predicted_urls.emplace_back("https://google.com/bar");
-  GURL url("https://www.google.com/search?q=a");
-  content::WebContents* web_contents = Navigate(url);
-  NavigationPredictorKeyedService::Prediction prediction(
-      web_contents, url,
-      NavigationPredictorKeyedService::PredictionSource::
-          kAnchorElementsParsedFromWebPage,
-      sorted_predicted_urls);
-
-  hints_manager()->OnPredictionUpdated(prediction);
-  FetchHintsUsingWebContentsObserverURLs(web_contents);
-  histogram_tester.ExpectTotalCount(
-      "OptimizationGuide.HintsFetcher.GetHintsRequest.HostCount."
-      "BatchUpdateGoogleSRP",
-      1);
-  histogram_tester.ExpectTotalCount(
-      "OptimizationGuide.HintsFetcher.GetHintsRequest.UrlCount."
-      "BatchUpdateGoogleSRP",
-      1);
-}
-
-TEST_F(ChromeHintsManagerFetchingTest, HintsFetched_AtNonSRP) {
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      optimization_guide::
-          kDisableCheckingUserPermissionsForTestingSwitch);
-  hints_manager()->RegisterOptimizationTypes(
-      {optimization_guide::proto::DEFER_ALL_SCRIPT});
-
-  base::HistogramTester histogram_tester;
-  std::vector<GURL> sorted_predicted_urls;
-  sorted_predicted_urls.emplace_back("https://foo.com/");
-  GURL url("https://www.not-google.com/");
-  content::WebContents* web_contents = Navigate(url);
-  NavigationPredictorKeyedService::Prediction prediction(
-      web_contents, url,
-      NavigationPredictorKeyedService::PredictionSource::
-          kAnchorElementsParsedFromWebPage,
-      sorted_predicted_urls);
-
-  hints_manager()->OnPredictionUpdated(prediction);
-  FetchHintsUsingWebContentsObserverURLs(web_contents);
-  histogram_tester.ExpectTotalCount(
-      "OptimizationGuide.HintsFetcher.GetHintsRequest.HostCount."
-      "BatchUpdateGoogleSRP",
-      0);
-  histogram_tester.ExpectTotalCount(
-      "OptimizationGuide.HintsFetcher.GetHintsRequest.UrlCount."
-      "BatchUpdateGoogleSRP",
-      0);
-}
-
-TEST_F(ChromeHintsManagerFetchingTest, PushManagerSet) {
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(hints_manager()->push_notification_manager());
 #else

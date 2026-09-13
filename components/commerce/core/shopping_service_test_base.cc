@@ -40,7 +40,6 @@
 #include "services/network/test/test_url_loader_factory.h"
 
 using optimization_guide::AnyWrapProto;
-using optimization_guide::OnDemandOptimizationGuideDecisionRepeatingCallback;
 using optimization_guide::OptimizationGuideDecision;
 using optimization_guide::OptimizationGuideDecisionCallback;
 using optimization_guide::OptimizationGuideDecisionWithMetadata;
@@ -55,31 +54,6 @@ namespace commerce {
 const uint64_t kInvalidDiscountId = 0;
 
 MockOptGuideDecider::MockOptGuideDecider() {
-  ON_CALL(*this, CanApplyOptimizationOnDemand)
-      .WillByDefault(
-          [&](const std::vector<GURL>& urls,
-              const base::flat_set<OptimizationType>& optimization_types,
-              RequestContext request_context,
-              OnDemandOptimizationGuideDecisionRepeatingCallback callback,
-              std::optional<RequestContextMetadata> request_context_metadata) {
-            if (optimization_types.contains(OptimizationType::PRICE_TRACKING)) {
-              for (const GURL& url : urls) {
-                if (on_demand_shopping_responses_.find(url.spec()) ==
-                    on_demand_shopping_responses_.end()) {
-                  continue;
-                }
-
-                base::flat_map<OptimizationType,
-                               OptimizationGuideDecisionWithMetadata>
-                    decision_map;
-                decision_map[OptimizationType::PRICE_TRACKING] =
-                    on_demand_shopping_responses_[url.spec()];
-                base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-                    FROM_HERE,
-                    base::BindOnce(callback, url, std::move(decision_map)));
-              }
-            }
-          });
 }
 MockOptGuideDecider::~MockOptGuideDecider() = default;
 
@@ -124,17 +98,6 @@ OptimizationGuideDecision MockOptGuideDecider::CanApplyOptimization(
     OptimizationMetadata* optimization_metadata) {
   // We don't use the synchronous API in the shopping service.
   NOTREACHED();
-}
-
-void MockOptGuideDecider::AddOnDemandShoppingResponse(
-    const GURL& url,
-    const OptimizationGuideDecision decision,
-    const OptimizationMetadata& data) {
-  optimization_guide::OptimizationGuideDecisionWithMetadata response;
-  response.decision = decision;
-  response.metadata = data;
-
-  on_demand_shopping_responses_[url.spec()] = response;
 }
 
 void MockOptGuideDecider::SetResponse(const GURL& url,

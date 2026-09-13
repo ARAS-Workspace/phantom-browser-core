@@ -47,7 +47,6 @@ export class TestPageHandler extends TestBrowserProxy implements
       'getPriceTrackingStatusForCurrentUrl',
       'getPriceInsightsInfoForUrl',
       'getProductInfoForUrl',
-      'getProductInfoForUrls',
     ]);
   }
 
@@ -59,11 +58,6 @@ export class TestPageHandler extends TestBrowserProxy implements
   getProductInfoForUrl(url: Url) {
     this.methodCalled('getProductInfoForUrl', url);
     return Promise.resolve({url, productInfo: this.product_});
-  }
-
-  getProductInfoForUrls(urls: Url[]) {
-    this.methodCalled('getProductInfoForUrls', urls);
-    return Promise.resolve({productInfos: [this.product_]});
   }
 
   getProductInfoForCurrentUrl() {

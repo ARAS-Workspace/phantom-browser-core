@@ -27,7 +27,6 @@ class ChromeHintsManager : public HintsManager,
       base::WeakPtr<optimization_guide::OptimizationGuideStore> hint_store,
       optimization_guide::TopHostProvider* top_host_provider,
       optimization_guide::TabUrlProvider* tab_url_provider,
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
       std::unique_ptr<optimization_guide::PushNotificationManager>
           push_notification_manager,
       signin::IdentityManager* identity_manager,

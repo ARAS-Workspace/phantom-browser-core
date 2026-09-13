@@ -15,7 +15,6 @@
 #include "build/build_config.h"
 #include "components/omnibox/browser/remote_suggestions_service.h"
 #include "components/omnibox/browser/test_scheme_classifier.h"
-#include "components/optimization_guide/core/hints/hints_fetcher.h"
 #include "components/optimization_guide/core/hints/optimization_guide_decision.h"
 #include "components/optimization_guide/core/hints/test_optimization_guide_decider.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
@@ -37,33 +36,6 @@ using testing::ElementsAre;
 
 namespace optimization_guide {
 namespace {
-
-class ImageServiceTestOptGuide : public TestOptimizationGuideDecider {
- public:
-  void CanApplyOptimizationOnDemand(
-      const std::vector<GURL>& urls,
-      const base::flat_set<proto::OptimizationType>& optimization_types,
-      proto::RequestContext request_context,
-      OnDemandOptimizationGuideDecisionRepeatingCallback callback,
-      std::optional<proto::RequestContextMetadata> request_context_metadata =
-          std::nullopt) override {
-    requests_received_++;
-
-    // For this test, we just want to store the parameters which were used in
-    // the call, and the test will manually send a response to `callback`.
-    on_demand_call_urls_ = urls;
-    on_demand_call_optimization_types_ = optimization_types;
-    on_demand_call_request_context_ = request_context;
-    on_demand_call_callback_ = std::move(callback);
-  }
-
-  size_t requests_received_ = 0;
-
-  std::vector<GURL> on_demand_call_urls_;
-  base::flat_set<proto::OptimizationType> on_demand_call_optimization_types_;
-  proto::RequestContext on_demand_call_request_context_;
-  OnDemandOptimizationGuideDecisionRepeatingCallback on_demand_call_callback_;
-};
 
 }  // namespace
 }  // namespace optimization_guide
@@ -327,140 +299,4 @@ TEST_F(ImageServiceImplTest, SuggestBackendEndToEnd) {
 
 // This also tests batching, because it's an integral part of how Optimization
 // Guide backend works.
-TEST_F(ImageServiceImplTest, OptimizationGuideSalientImagesEndToEnd) {
-  mojom::Options options;
-  options.suggest_images = false;
-  options.optimization_guide_images = true;
-
-  GURL response_1;
-  GURL response_2;
-  GURL response_3;
-  image_service_->FetchImageFor(
-      mojom::ClientId::Journeys, GURL("https://1.com"), options,
-      base::BindOnce(&StoreImageUrlResponse, &response_1));
-  image_service_->FetchImageFor(
-      mojom::ClientId::Journeys, GURL("https://2.com"), options,
-      base::BindOnce(&StoreImageUrlResponse, &response_2));
-  image_service_->FetchImageFor(
-      mojom::ClientId::Journeys, GURL("https://1.com"), options,
-      base::BindOnce(&StoreImageUrlResponse, &response_3));
-  image_service_->FetchImageFor(
-      mojom::ClientId::Journeys, GURL("https://httpimage.com"), options,
-      base::BindOnce(&StoreImageUrlResponse, &response_3));
-  task_environment.FastForwardBy(kOptimizationGuideBatchingTimeout);
-
-  // Verify that the OptimizationGuide backend got one appropriate call.
-  ASSERT_EQ(test_opt_guide_->requests_received_, 1U);
-  EXPECT_THAT(
-      test_opt_guide_->on_demand_call_urls_,
-      ElementsAre(GURL("https://1.com"), GURL("https://2.com"),
-                  GURL("https://1.com"), GURL("https://httpimage.com")));
-  EXPECT_THAT(test_opt_guide_->on_demand_call_optimization_types_,
-              ElementsAre(optimization_guide::proto::SALIENT_IMAGE));
-  EXPECT_EQ(test_opt_guide_->on_demand_call_request_context_,
-            optimization_guide::proto::CONTEXT_JOURNEYS);
-
-  // Test histograms with literal names to validate client-sliced names.
-  EXPECT_EQ(histogram_tester_.GetBucketCount(
-                "PageImageService.Backend",
-                PageImageServiceBackend::kOptimizationGuide),
-            4);
-  EXPECT_EQ(histogram_tester_.GetBucketCount(
-                "PageImageService.Backend.Journeys",
-                PageImageServiceBackend::kOptimizationGuide),
-            4);
-
-  // Verify the decision can be parsed and sent back to the original caller.
-  optimization_guide::OptimizationGuideDecisionWithMetadata decision;
-  {
-    decision.decision = optimization_guide::OptimizationGuideDecision::kTrue;
-
-    optimization_guide::proto::SalientImageMetadata salient_image_metadata;
-    auto* thumbnail = salient_image_metadata.add_thumbnails();
-    thumbnail->set_image_url("https://image-url.com/foo.png");
-
-    decision.metadata.set_any_metadata(
-        optimization_guide::AnyWrapProto(salient_image_metadata));
-  }
-
-  // Verify the decision can be parsed and sent back to the original caller.
-  optimization_guide::OptimizationGuideDecisionWithMetadata http_decision;
-  {
-    http_decision.decision =
-        optimization_guide::OptimizationGuideDecision::kTrue;
-
-    optimization_guide::proto::SalientImageMetadata salient_image_metadata;
-    auto* thumbnail = salient_image_metadata.add_thumbnails();
-    thumbnail->set_image_url("http://image-url.com/foo.png");
-
-    http_decision.metadata.set_any_metadata(
-        optimization_guide::AnyWrapProto(salient_image_metadata));
-  }
-
-  // Verify that the repeating callback can be called twice with the two
-  // different URLs, the "https://1.com" one being deduplicated.
-  test_opt_guide_->on_demand_call_callback_.Run(
-      GURL("https://2.com"),
-      {{optimization_guide::proto::SALIENT_IMAGE, decision}});
-  EXPECT_EQ(response_1, GURL());
-  EXPECT_EQ(response_2, GURL("https://image-url.com/foo.png"));
-  EXPECT_EQ(response_3, GURL());
-  test_opt_guide_->on_demand_call_callback_.Run(
-      GURL("https://1.com"),
-      {{optimization_guide::proto::SALIENT_IMAGE, decision}});
-  EXPECT_EQ(response_1, GURL("https://image-url.com/foo.png"));
-  EXPECT_EQ(response_2, GURL("https://image-url.com/foo.png"));
-  EXPECT_EQ(response_3, GURL("https://image-url.com/foo.png"));
-  test_opt_guide_->on_demand_call_callback_.Run(
-      GURL("https://httpimage.com"),
-      {{optimization_guide::proto::SALIENT_IMAGE, http_decision}});
-
-  // Test histograms with literal names to validate client-sliced names.
-  histogram_tester_.ExpectBucketCount(
-      "PageImageService.Backend.OptimizationGuide.Result",
-      PageImageServiceResult::kSuccess, 2);
-  histogram_tester_.ExpectBucketCount(
-      "PageImageService.Backend.OptimizationGuide.Result.Journeys",
-      PageImageServiceResult::kSuccess, 2);
-  histogram_tester_.ExpectBucketCount(
-      "PageImageService.Backend.OptimizationGuide.Result",
-      PageImageServiceResult::kResponseMalformed, 1);
-  histogram_tester_.ExpectBucketCount(
-      "PageImageService.Backend.OptimizationGuide.Result.Journeys",
-      PageImageServiceResult::kResponseMalformed, 1);
-}
-
-TEST_F(ImageServiceImplTest, OptimizationGuideBatchingRespectsMaxUrls) {
-  mojom::Options options;
-  options.suggest_images = false;
-  options.optimization_guide_images = true;
-
-  std::vector<GURL> responses;
-
-  size_t max_batch = optimization_guide::HintsFetcher::kMaxUrls;
-  // Fetch one LESS than the max batch size, to verify no requests are sent.
-  for (size_t i = 0; i < max_batch - 1; ++i) {
-    image_service_->FetchImageFor(
-        mojom::ClientId::Journeys,
-        GURL("https://" + base::NumberToString(i) + ".com"), options,
-        base::BindOnce(&AppendResponse, &responses));
-    EXPECT_EQ(test_opt_guide_->requests_received_, 0U) << "i = " << i;
-  }
-
-  image_service_->FetchImageFor(mojom::ClientId::Journeys,
-                                GURL("https://last.com"), options,
-                                base::BindOnce(&AppendResponse, &responses));
-  EXPECT_EQ(test_opt_guide_->requests_received_, 1U);
-  ASSERT_EQ(test_opt_guide_->on_demand_call_urls_.size(), max_batch);
-  EXPECT_EQ(test_opt_guide_->on_demand_call_urls_[0], GURL("https://0.com/"));
-  EXPECT_EQ(test_opt_guide_->on_demand_call_urls_[max_batch - 1],
-            GURL("https://last.com"));
-
-  image_service_->FetchImageFor(mojom::ClientId::Journeys,
-                                GURL("https://one_more.com"), options,
-                                base::BindOnce(&AppendResponse, &responses));
-  EXPECT_EQ(test_opt_guide_->requests_received_, 1U)
-      << "Expect that making more request restarts the queue.";
-}
-
 }  // namespace page_image_service

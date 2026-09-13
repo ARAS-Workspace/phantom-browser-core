@@ -91,29 +91,6 @@ class OptimizationGuideAnnotationIndexClientTest : public testing::Test {
             }));
   }
 
-  void SetupOptimizationGuideDeciderOnDemandResponse(
-      OptimizationGuideDecision decision,
-      OptimizationType optimization_type,
-      RequestContext request_context,
-      const OptimizationMetadata& metadata) {
-    EXPECT_CALL(mock_decider_,
-                CanApplyOptimizationOnDemand(
-                    std::vector<GURL>{GURL(kTestUrl)},
-                    base::flat_set<OptimizationType>{optimization_type},
-                    request_context,
-                    A<OnDemandOptimizationGuideDecisionRepeatingCallback>(),
-                    A<std::optional<RequestContextMetadata>>()))
-        .WillOnce(WithArgs<3>(
-            [decision, optimization_type, metadata](
-                OnDemandOptimizationGuideDecisionRepeatingCallback callback) {
-              base::flat_map<OptimizationType,
-                             OptimizationGuideDecisionWithMetadata>
-                  decisions = {{optimization_type, CreateDecisionWithMetadata(
-                                                       decision, metadata)}};
-              callback.Run(GURL(kTestUrl), decisions);
-            }));
-  }
-
   base::test::TaskEnvironment task_environment_;
   NiceMock<MockOptimizationGuideDecider> mock_decider_;
   std::unique_ptr<OptimizationGuideAnnotationIndexClient> client_;
@@ -264,99 +241,6 @@ TEST_F(OptimizationGuideAnnotationIndexClientTest,
                                   kTestNavigationId);
 
   EXPECT_EQ(future.Take(), std::nullopt);
-}
-
-TEST_F(OptimizationGuideAnnotationIndexClientTest,
-       GetFilterSuggestionCandidates_ValidMetadata_ReturnsCandidates) {
-  GetTaskExecutionStrategiesResponse response_proto =
-      CreateTaskExecutionStrategiesResponse(
-          GURL(kTestUrl), {{kTestAttributeKey, kTestAttributeValue}});
-  response_proto.mutable_execution_strategies(0)->set_candidate_id(
-      kTestCandidateId);
-  OptimizationMetadata metadata =
-      CreateOptimizationMetadata(AnyWrapProto(response_proto));
-  SetupOptimizationGuideDeciderOnDemandResponse(
-      OptimizationGuideDecision::kTrue,
-      OptimizationType::FILTER_EXECUTION_STRATEGY,
-      RequestContext::CONTEXT_FILTER_EXECUTION, metadata);
-
-  base::test::TestFuture<std::optional<std::vector<FilterSuggestionCandidate>>>
-      future;
-  client_->GetFilterSuggestionCandidates(
-      GURL(kTestUrl), std::vector<FilterAnnotation>(), future.GetCallback(),
-      kTestNavigationId);
-
-  std::optional<std::vector<FilterSuggestionCandidate>> candidates =
-      future.Take();
-  ASSERT_TRUE(candidates.has_value());
-  ASSERT_EQ(candidates->size(), 1u);
-  EXPECT_EQ((*candidates)[0].filter_annotation_id.AsLowercaseString(),
-            kTestCandidateId);
-  EXPECT_EQ((*candidates)[0].navigation_url.spec(), kTestUrl);
-}
-
-TEST_F(OptimizationGuideAnnotationIndexClientTest,
-       GetFilterSuggestionCandidates_FalseDecision_ReturnsNullopt) {
-  SetupOptimizationGuideDeciderOnDemandResponse(
-      OptimizationGuideDecision::kFalse,
-      OptimizationType::FILTER_EXECUTION_STRATEGY,
-      RequestContext::CONTEXT_FILTER_EXECUTION, OptimizationMetadata());
-
-  base::test::TestFuture<std::optional<std::vector<FilterSuggestionCandidate>>>
-      future;
-  client_->GetFilterSuggestionCandidates(
-      GURL(kTestUrl), std::vector<FilterAnnotation>(), future.GetCallback(),
-      kTestNavigationId);
-
-  EXPECT_FALSE(future.Take().has_value());
-}
-
-TEST_F(OptimizationGuideAnnotationIndexClientTest,
-       GetFilterSuggestionCandidates_NoMetadata_ReturnsNullopt) {
-  SetupOptimizationGuideDeciderOnDemandResponse(
-      OptimizationGuideDecision::kTrue,
-      OptimizationType::FILTER_EXECUTION_STRATEGY,
-      RequestContext::CONTEXT_FILTER_EXECUTION, OptimizationMetadata());
-
-  base::test::TestFuture<std::optional<std::vector<FilterSuggestionCandidate>>>
-      future;
-  client_->GetFilterSuggestionCandidates(
-      GURL(kTestUrl), std::vector<FilterAnnotation>(), future.GetCallback(),
-      kTestNavigationId);
-
-  EXPECT_FALSE(future.Take().has_value());
-}
-
-TEST_F(OptimizationGuideAnnotationIndexClientTest,
-       GetFilterSuggestionCandidates_MalformedMetadata_ReturnsNullopt) {
-  OptimizationMetadata metadata = CreateMalformedOptimizationMetadata(
-      kGetTaskExecutionStrategiesResponseUrl);
-  SetupOptimizationGuideDeciderOnDemandResponse(
-      OptimizationGuideDecision::kTrue,
-      OptimizationType::FILTER_EXECUTION_STRATEGY,
-      RequestContext::CONTEXT_FILTER_EXECUTION, metadata);
-
-  base::test::TestFuture<std::optional<std::vector<FilterSuggestionCandidate>>>
-      future;
-  client_->GetFilterSuggestionCandidates(
-      GURL(kTestUrl), std::vector<FilterAnnotation>(), future.GetCallback(),
-      kTestNavigationId);
-
-  EXPECT_FALSE(future.Take().has_value());
-}
-
-TEST_F(OptimizationGuideAnnotationIndexClientTest,
-       GetFilterSuggestionCandidates_NullDecider_ReturnsNullopt) {
-  auto client = std::make_unique<OptimizationGuideAnnotationIndexClient>(
-      /*optimization_guide_decider=*/nullptr, /*log_router=*/nullptr);
-
-  base::test::TestFuture<std::optional<std::vector<FilterSuggestionCandidate>>>
-      future;
-  client->GetFilterSuggestionCandidates(
-      GURL(kTestUrl), std::vector<FilterAnnotation>(), future.GetCallback(),
-      kTestNavigationId);
-
-  EXPECT_FALSE(future.Take().has_value());
 }
 
 }  // namespace

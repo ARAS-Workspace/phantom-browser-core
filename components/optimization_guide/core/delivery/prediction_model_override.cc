@@ -18,7 +18,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/thread_pool.h"
 #include "components/optimization_guide/core/delivery/model_util.h"
-#include "components/optimization_guide/core/delivery/prediction_model_download_manager.h"
 #include "components/optimization_guide/core/optimization_guide_switches.h"
 #include "components/optimization_guide/proto/models.pb.h"
 #include "components/services/unzip/public/cpp/unzip.h"
@@ -31,93 +30,6 @@ namespace {
 using BuiltCallback = PredictionModelOverrides::Entry::BuiltCallback;
 
 const char kModelOverrideSeparator[] = ":";
-
-std::unique_ptr<proto::PredictionModel> ProcessModelOverrideOnBGThread(
-    proto::OptimizationTarget optimization_target,
-    const base::FilePath& unzipped_dir_path) {
-  // Unpack and verify model info file.
-  base::FilePath model_info_path =
-      unzipped_dir_path.Append(GetBaseFileNameForModelInfo());
-  std::string binary_model_info_pb;
-  if (!base::ReadFileToString(model_info_path, &binary_model_info_pb)) {
-    LOG(ERROR) << "Failed to read " << FilePathToString(model_info_path);
-    return nullptr;
-  }
-  proto::ModelInfo model_info;
-  if (!model_info.ParseFromString(binary_model_info_pb)) {
-    LOG(ERROR) << "Failed to parse " << FilePathToString(model_info_path);
-    return nullptr;
-  }
-
-  if (!model_info.has_version() || !model_info.has_optimization_target()) {
-    LOG(ERROR) << FilePathToString(model_info_path)
-               << "is invalid because it does not contain a version and/or "
-                  "optimization target";
-    return nullptr;
-  }
-
-  if (model_info.optimization_target() != optimization_target) {
-    LOG(ERROR) << FilePathToString(model_info_path)
-               << "is invalid because it does not contain the correct "
-                  "optimization target";
-    return nullptr;
-  }
-
-  for (int i = 0; i < model_info.additional_files_size(); i++) {
-    proto::AdditionalModelFile* additional_file =
-        model_info.mutable_additional_files(i);
-
-    base::FilePath additional_file_basename =
-        *StringToFilePath(additional_file->file_path());
-    base::FilePath additional_file_absolute =
-        unzipped_dir_path.Append(additional_file_basename);
-    additional_file->set_file_path(FilePathToString(additional_file_absolute));
-  }
-
-  std::unique_ptr<proto::PredictionModel> model =
-      std::make_unique<proto::PredictionModel>();
-  *model->mutable_model_info() = model_info;
-  model->mutable_model()->set_download_url(
-      FilePathToString(unzipped_dir_path.Append(GetBaseFileNameForModels())));
-
-  return model;
-}
-
-void OnModelOverrideUnzipped(proto::OptimizationTarget optimization_target,
-                             const base::FilePath& base_model_dir,
-                             BuiltCallback callback,
-                             bool success) {
-  if (!success) {
-    LOG(ERROR) << FilePathToString(base_model_dir) << " failed to unzip";
-    std::move(callback).Run(nullptr);
-    return;
-  }
-
-  base::ThreadPool::PostTaskAndReplyWithResult(
-      FROM_HERE, {base::MayBlock(), base::TaskPriority::BEST_EFFORT},
-      base::BindOnce(&ProcessModelOverrideOnBGThread, optimization_target,
-                     base_model_dir),
-      std::move(callback));
-}
-
-void OnModelOverrideVerified(proto::OptimizationTarget optimization_target,
-                             const base::FilePath& passed_crx_file_path,
-                             const base::FilePath& base_model_dir,
-                             unzip::UnzipperFactory unzipper_factory,
-                             BuiltCallback callback,
-                             bool is_verify_success) {
-  if (!is_verify_success) {
-    LOG(ERROR) << passed_crx_file_path << " failed verification";
-    std::move(callback).Run(nullptr);
-    return;
-  }
-
-  unzip::Unzip(unzipper_factory.Run(), passed_crx_file_path, base_model_dir,
-               unzip::mojom::UnzipOptions::New(), unzip::AllContents(),
-               base::DoNothing(),
-               base::BindOnce(&OnModelOverrideUnzipped, optimization_target,
-                              base_model_dir, std::move(callback)));
-}
 
 std::optional<PredictionModelOverrides::Entry> ParseEntry(
     const std::string& model_override) {
@@ -180,25 +92,6 @@ void PredictionModelOverrides::Entry::BuildModel(
     const base::FilePath& base_model_dir,
     unzip::UnzipperFactory unzipper_factory,
     PredictionModelOverrides::Entry::BuiltCallback callback) const {
-  if (path_.MatchesFinalExtension(FILE_PATH_LITERAL(".crx3"))) {
-    DVLOG(0) << "Attempting to parse the model override at " << path_.value()
-             << " as a crx model package for "
-             << GetStringNameForOptimizationTarget(target_);
-    if (metadata_) {
-      LOG(ERROR) << "Ignoring the metadata that was passed since a crx package "
-                    "was given";
-    }
-
-    base::ThreadPool::PostTaskAndReplyWithResult(
-        FROM_HERE, {base::MayBlock(), base::TaskPriority::BEST_EFFORT},
-        base::BindOnce(PredictionModelDownloadManager::VerifyDownload, path_,
-                       base_model_dir,
-                       /*delete_file_on_error=*/false),
-        base::BindOnce(&OnModelOverrideVerified, target_, path_, base_model_dir,
-                       std::move(unzipper_factory), std::move(callback)));
-    return;
-  }
-
   auto prediction_model = std::make_unique<proto::PredictionModel>();
   prediction_model->mutable_model_info()->set_optimization_target(target_);
   prediction_model->mutable_model_info()->set_version(123);

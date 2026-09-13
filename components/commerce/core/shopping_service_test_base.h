@@ -28,7 +28,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-using optimization_guide::OnDemandOptimizationGuideDecisionRepeatingCallback;
 using optimization_guide::OptimizationGuideDecision;
 using optimization_guide::OptimizationGuideDecisionCallback;
 using optimization_guide::OptimizationMetadata;
@@ -72,15 +71,6 @@ class MockOptGuideDecider
               RegisterOptimizationTypes,
               (const std::vector<OptimizationType>& optimization_types),
               (override));
-  MOCK_METHOD(void,
-              CanApplyOptimizationOnDemand,
-              (const std::vector<GURL>& urls,
-               const base::flat_set<OptimizationType>& optimization_types,
-               RequestContext request_context,
-               OnDemandOptimizationGuideDecisionRepeatingCallback callback,
-               std::optional<RequestContextMetadata> request_context_metadata),
-              (override));
-
   void CanApplyOptimization(
       const GURL& url,
       OptimizationType optimization_type,
@@ -90,10 +80,6 @@ class MockOptGuideDecider
       const GURL& url,
       OptimizationType optimization_type,
       OptimizationMetadata* optimization_metadata) override;
-
-  void AddOnDemandShoppingResponse(const GURL& url,
-                                   const OptimizationGuideDecision decision,
-                                   const OptimizationMetadata& data);
 
   void SetResponse(const GURL& url,
                    const OptimizationType type,
@@ -155,10 +141,6 @@ class MockOptGuideDecider
   std::optional<OptimizationGuideDecision> optimization_decision_;
   std::optional<OptimizationMetadata> optimization_data_;
 
-  // Shopping responses for the on-demand API.
-  std::unordered_map<std::string,
-                     optimization_guide::OptimizationGuideDecisionWithMetadata>
-      on_demand_shopping_responses_;
   bool default_shopping_page_ = true;
 };
 

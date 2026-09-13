@@ -37,11 +37,6 @@ class MockShoppingService : public commerce::ShoppingService {
               GetProductInfoForUrl,
               (const GURL& url, commerce::ProductInfoCallback callback),
               (override));
-  MOCK_METHOD(void,
-              GetProductInfoForUrls,
-              (const std::vector<GURL>& url, ProductInfoBatchCallback callback),
-              (override));
-  MOCK_METHOD(void,
               GetPriceInsightsInfoForUrl,
               (const GURL& url, commerce::PriceInsightsInfoCallback callback),
               (override));
@@ -58,13 +53,6 @@ class MockShoppingService : public commerce::ShoppingService {
               GetUrlInfosForRecentlyViewedWebWrappers,
               (),
               (override));
-  MOCK_METHOD(void,
-              GetUpdatedProductInfoForBookmarks,
-              (const std::vector<int64_t>& bookmark_ids,
-               BookmarkProductInfoUpdatedCallback info_updated_callback),
-              (override));
-  MOCK_METHOD(size_t, GetMaxProductBookmarkUpdatesPerBatch, (), (override));
-  MOCK_METHOD(void,
               GetMerchantInfoForUrl,
               (const GURL& url, MerchantInfoCallback callback),
               (override));
@@ -132,8 +120,6 @@ class MockShoppingService : public commerce::ShoppingService {
       std::optional<commerce::PriceInsightsInfo> price_insights_info);
   void SetResponseForGetUrlInfosForActiveWebWrappers(
       std::vector<commerce::UrlInfo> url_infos);
-  void SetResponsesForGetUpdatedProductInfoForBookmarks(
-      std::map<int64_t, ProductInfo> bookmark_updates);
   void SetResponseForGetMerchantInfoForUrl(
       std::optional<commerce::MerchantInfo> merchant_info);
   void SetResponseForIsShoppingPage(std::optional<bool> is_shopping_page);

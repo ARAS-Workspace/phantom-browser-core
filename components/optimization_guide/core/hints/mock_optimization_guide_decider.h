@@ -38,16 +38,6 @@ class MockOptimizationGuideDecider : public OptimizationGuideDecider {
               CanApplyOptimization,
               (const GURL&, proto::OptimizationType, OptimizationMetadata*),
               (override));
-  MOCK_METHOD(
-      void,
-      CanApplyOptimizationOnDemand,
-      (const std::vector<GURL>&,
-       const base::flat_set<proto::OptimizationType>&,
-       proto::RequestContext,
-       OnDemandOptimizationGuideDecisionRepeatingCallback,
-       std::optional<proto::RequestContextMetadata> request_context_metadata),
-      (override));
-};
 
 }  // namespace optimization_guide
 

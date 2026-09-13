@@ -248,26 +248,11 @@ void ZeroStateSuggestionsPageData::InitiatePageContentExtraction() {
       base::StringPrintf("ZeroStateSuggestionsPageData: Starting request for "
                          "optimization metadata for %s.",
                          url.spec()));
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-  bool can_request_metadata =
-      optimization_guide::IsUserPermittedToFetchFromRemoteOptimizationGuide(
-          profile->IsOffTheRecord(), profile->GetPrefs());
-  if (can_request_metadata) {
-    optimization_guide_keyed_service_->CanApplyOptimization(
-        url, optimization_guide::proto::GLIC_ZERO_STATE_SUGGESTIONS,
-        base::BindOnce(
-            &ZeroStateSuggestionsPageData::OnReceivedOptimizationMetadata,
-            weak_ptr_factory_.GetWeakPtr()));
-  } else {
-    optimization_guide_keyed_service_->CanApplyOptimizationOnDemand(
-        {url}, {optimization_guide::proto::GLIC_ZERO_STATE_SUGGESTIONS},
-        optimization_guide::proto::RequestContext::
-            CONTEXT_GLIC_ZERO_STATE_SUGGESTIONS,
-        base::BindRepeating(&ZeroStateSuggestionsPageData::
-                                OnReceivedOptimizationMetadataOnDemand,
-                            weak_ptr_factory_.GetWeakPtr()));
-  }
+  optimization_guide_keyed_service_->CanApplyOptimization(
+      url, optimization_guide::proto::GLIC_ZERO_STATE_SUGGESTIONS,
+      base::BindOnce(
+          &ZeroStateSuggestionsPageData::OnReceivedOptimizationMetadata,
+          weak_ptr_factory_.GetWeakPtr()));
 }
 
 void ZeroStateSuggestionsPageData::GetPageContext(
@@ -320,22 +305,6 @@ void ZeroStateSuggestionsPageData::OnReceivedInnerText(
         base::TimeTicks::Now() - page_context_begin_time_);
   }
   InvokePageContextCallbacksIfComplete();
-}
-
-void ZeroStateSuggestionsPageData::OnReceivedOptimizationMetadataOnDemand(
-    const GURL& url,
-    const base::flat_map<
-        optimization_guide::proto::OptimizationType,
-        optimization_guide::OptimizationGuideDecisionWithMetadata>& decisions) {
-  auto it =
-      decisions.find(optimization_guide::proto::GLIC_ZERO_STATE_SUGGESTIONS);
-  if (it == decisions.end()) {
-    // If not found, treat it as no metadata.
-    OnReceivedOptimizationMetadata(
-        optimization_guide::OptimizationGuideDecision::kFalse, {});
-  } else {
-    OnReceivedOptimizationMetadata(it->second.decision, it->second.metadata);
-  }
 }
 
 void ZeroStateSuggestionsPageData::OnReceivedOptimizationMetadata(

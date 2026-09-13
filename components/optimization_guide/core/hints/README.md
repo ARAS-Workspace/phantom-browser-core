@@ -21,7 +21,6 @@ This interface is implemented by `OptimizationGuideKeyedService` (in
 service owns the `HintsManager` and delegates all decision-making requests to it.
 
 Other key classes in this directory include:
-*   `HintsFetcher`: Responsible for fetching hints from the remote service.
 *   `HintCache`: Responsible for caching hints in memory and on disk.
 *   `OptimizationGuideStore`: The persistent store for hints, implemented using
     a LevelDB database.
