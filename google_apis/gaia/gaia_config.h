@@ -63,12 +63,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaConfig {
   // Otherwise, returns false. |out_url| will be unmodified.
   bool GetURLIfExists(std::string_view key, GURL* out_url);
 
-  // Searches for an API key, OAuth2 client ID or secret by |key|.
-  // Returns true if |key| exists and contains a valid string.
-  // |out_api_key| will be set to that string.
-  // Otherwise, returns false. |out_api_key| will be unmodified.
-  bool GetAPIKeyIfExists(std::string_view key, std::string* out_api_key);
-
   // Searches for a boolean flag by `key`.
   // Returns the value of the flag if it exists and contains a boolean value.
   // Otherwise, returns std::nullopt.

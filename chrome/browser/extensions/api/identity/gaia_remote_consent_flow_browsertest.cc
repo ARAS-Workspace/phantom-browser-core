@@ -103,7 +103,6 @@ class GaiaRemoteConsentFlowParamBrowserTest : public InProcessBrowserTest,
     command_line->AppendSwitch("ignore-certificate-errors");
     command_line->AppendSwitchASCII(switches::kGaiaUrl, base_url.spec());
     command_line->AppendSwitchASCII(switches::kGoogleApisUrl, base_url.spec());
-    command_line->AppendSwitchASCII(switches::kOAuth2ClientID, base_url.spec());
 
     consent_url_ = fake_gaia_test_server()->GetURL("/title1.html");
 

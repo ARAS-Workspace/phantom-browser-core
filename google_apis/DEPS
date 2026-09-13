@@ -8,7 +8,6 @@ include_rules = [
   "+net",
   "+services/network/public",
   "+services/network/test",
-  "+third_party/ocmock",
 ]
 
 specific_include_rules = {

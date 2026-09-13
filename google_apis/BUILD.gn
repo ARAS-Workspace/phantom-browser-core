@@ -189,10 +189,7 @@ component("google_apis") {
   }
 
   if (is_apple) {
-    sources += [
-      "google_api_keys_mac.h",
-      "google_api_keys_mac.mm",
-    ]
+    sources += []
 
     if (is_ios) {
       sources += [ "gaia/gaia_id_ios.mm" ]
@@ -303,12 +300,6 @@ test("google_apis_unittests") {
 
   if (is_android) {
     deps += [ "//net/android:net_java" ]
-  }
-
-  if (is_apple) {
-    sources += [ "google_api_keys_mac_unittest.mm" ]
-
-    deps += [ "//third_party/ocmock" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

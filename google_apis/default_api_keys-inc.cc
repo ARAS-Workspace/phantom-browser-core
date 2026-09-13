@@ -104,7 +104,6 @@ constexpr ::google_apis::DefaultApiKeys GetDefaultApiKeysFromDefinedValues() {
       // BUILDFLAG(SUPPORT_EXTERNAL_GOOGLE_API_KEY).
       .allow_unset_values =
           !BUILDFLAG(GOOGLE_CHROME_BRANDING),
-      .allow_override_via_environment = !BUILDFLAG(GOOGLE_CHROME_BRANDING),
 #if defined(USE_OFFICIAL_GOOGLE_API_KEYS)
       .is_using_google_chrome_keys = true,
 #else

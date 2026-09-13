@@ -19,7 +19,6 @@ struct DefaultApiKeys {
   static constexpr char kUnsetApiToken[] = "dummytoken";
 
   bool allow_unset_values;
-  bool allow_override_via_environment;
   bool is_using_google_chrome_keys;
 
   const char* google_api_key;

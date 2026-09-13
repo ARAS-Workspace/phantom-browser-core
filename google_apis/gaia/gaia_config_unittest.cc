@@ -71,27 +71,6 @@ TEST(GaiaConfigTest, ShouldReturnNullIfURLDoesNotExists) {
   EXPECT_FALSE(config.GetURLIfExists("missing_url", &url));
 }
 
-TEST(GaiaConfigTest, ShouldGetAPIKeyIfExists) {
-  std::optional<base::Value> dict = base::JSONReader::Read(
-      kTestConfigContents, base::JSON_PARSE_CHROMIUM_EXTENSIONS);
-  ASSERT_TRUE(dict.has_value());
-
-  GaiaConfig config(std::move(dict->GetDict()));
-  std::string api_key;
-  EXPECT_TRUE(config.GetAPIKeyIfExists("test_api_key", &api_key));
-  EXPECT_THAT(api_key, Eq("test_api_key_value"));
-}
-
-TEST(GaiaConfigTest, ShouldReturnNullIfAPIKeyDoesNotExist) {
-  std::optional<base::Value> dict = base::JSONReader::Read(
-      kTestConfigContents, base::JSON_PARSE_CHROMIUM_EXTENSIONS);
-  ASSERT_TRUE(dict.has_value());
-
-  GaiaConfig config(std::move(dict->GetDict()));
-  std::string api_key;
-  EXPECT_FALSE(config.GetAPIKeyIfExists("missing_api_key", &api_key));
-}
-
 TEST(GaiaConfigTest, ShouldGetFlagIfExists) {
   std::optional<base::Value> dict = base::JSONReader::Read(
       kTestConfigContents, base::JSON_PARSE_CHROMIUM_EXTENSIONS);

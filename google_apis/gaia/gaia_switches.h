@@ -38,11 +38,6 @@ COMPONENT_EXPORT(GOOGLE_APIS) extern const char kLsoUrl[];
 // "https://oauthaccountmanager.googleapis.com".
 COMPONENT_EXPORT(GOOGLE_APIS) extern const char kOAuthAccountManagerUrl[];
 
-// Specifies custom OAuth2 client id for testing purposes.
-COMPONENT_EXPORT(GOOGLE_APIS) extern const char kOAuth2ClientID[];
-
-// Specifies custom OAuth2 client secret for testing purposes.
-COMPONENT_EXPORT(GOOGLE_APIS) extern const char kOAuth2ClientSecret[];
 
 }  // namespace switches
 

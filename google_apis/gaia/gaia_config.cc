@@ -57,20 +57,6 @@ bool GaiaConfig::GetURLIfExists(std::string_view key, GURL* out_url) {
   return true;
 }
 
-bool GaiaConfig::GetAPIKeyIfExists(std::string_view key,
-                                   std::string* out_api_key) {
-  const base::DictValue* api_keys = parsed_config_.FindDict("api_keys");
-  if (!api_keys)
-    return false;
-
-  const std::string* api_key = api_keys->FindString(key);
-  if (!api_key)
-    return false;
-
-  *out_api_key = *api_key;
-  return true;
-}
-
 std::optional<bool> GaiaConfig::GetFlagIfExists(std::string_view key) {
   const base::DictValue* flags = parsed_config_.FindDict("flags");
   if (!flags) {
