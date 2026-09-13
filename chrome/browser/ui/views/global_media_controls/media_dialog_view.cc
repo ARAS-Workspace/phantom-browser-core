@@ -29,11 +29,8 @@
 #include "components/global_media_controls/public/views/media_item_ui_detailed_view.h"
 #include "components/global_media_controls/public/views/media_item_ui_list_view.h"
 #include "components/global_media_controls/public/views/media_item_ui_updated_view.h"
-#include "components/live_caption/caption_util.h"
-#include "components/live_caption/pref_names.h"
 #include "components/media_router/browser/media_router.h"
 #include "components/prefs/pref_change_registrar.h"
-#include "components/soda/constants.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/browser/media_session.h"
 #include "content/public/browser/web_contents.h"
@@ -60,25 +57,7 @@
 using global_media_controls::GlobalMediaControlsEntryPoint;
 using media_session::mojom::MediaSessionAction;
 
-namespace {
-
-static constexpr int kHorizontalMarginDip = 20;
-static constexpr int kImageWidthDip = 20;
-static constexpr int kVerticalMarginDip = 10;
-
-std::u16string GetLiveCaptionTitle(PrefService* profile_prefs) {
-  // The selected language is only shown when Live Caption is enabled.
-  if (profile_prefs->GetBoolean(prefs::kLiveCaptionEnabled)) {
-    std::u16string language = speech::GetLanguageDisplayName(
-        prefs::GetLiveCaptionLanguageCode(profile_prefs),
-        g_browser_process->GetApplicationLocale());
-    return l10n_util::GetStringFUTF16(
-        IDS_GLOBAL_MEDIA_CONTROLS_LIVE_CAPTION_SHOW_LANGUAGE, language);
-  }
-  return l10n_util::GetStringUTF16(IDS_GLOBAL_MEDIA_CONTROLS_LIVE_CAPTION);
-}
-
-}  // namespace
+namespace {}  // namespace
 
 // static
 MediaDialogView* MediaDialogView::instance_ = nullptr;
@@ -145,7 +124,6 @@ views::Widget* MediaDialogView::ShowDialog(
 void MediaDialogView::HideDialog() {
   if (IsShowing()) {
     instance_->service_->media_item_manager()->SetDialogDelegate(nullptr);
-    speech::SodaInstaller::GetInstance()->RemoveObserver(instance_);
     instance_->GetWidget()->Close();
   }
 
@@ -228,7 +206,6 @@ void MediaDialogView::AddedToWidget() {
   } else {
     service_->media_item_manager()->SetDialogDelegate(this);
   }
-  speech::SodaInstaller::GetInstance()->AddObserver(this);
 }
 
 gfx::Size MediaDialogView::CalculatePreferredSize(
@@ -246,68 +223,9 @@ gfx::Size MediaDialogView::CalculatePreferredSize(
 
 void MediaDialogView::UpdateBubbleSize() {
   SizeToContents();
-  if (!captions::IsLiveCaptionFeatureSupported()) {
-    return;
-  }
-  const int width = active_sessions_view_->GetPreferredSize().width();
-  const int live_caption_height =
-      live_caption_container_->GetPreferredSize().height();
-  live_caption_container_->SetPreferredSize(
-      gfx::Size(width, live_caption_height));
-
-  if (media::IsLiveTranslateEnabled()) {
-    const int live_translate_height =
-        live_translate_container_->GetPreferredSize().height();
-    live_translate_container_->SetPreferredSize(
-        gfx::Size(width, live_translate_height));
-
-    live_translate_label_wrapper_->SetPreferredSize(gfx::Size(
-        width, live_translate_label_wrapper_->GetPreferredSize().height()));
-
-    // Align the combo box with the text labels.
-    target_language_container_->SetPreferredSize(gfx::Size(
-        width, target_language_container_->GetPreferredSize().height()));
-    target_language_combobox_->SetPreferredSize(
-        gfx::Size(width - 2 * (kImageWidthDip + kHorizontalMarginDip +
-                               ChromeLayoutProvider::Get()->GetDistanceMetric(
-                                   DISTANCE_RICH_HOVER_BUTTON_ICON_HORIZONTAL)),
-                  target_language_combobox_->GetPreferredSize().height()));
-
-    separator_->SetPreferredLength(width - 2 * kHorizontalMarginDip);
-    caption_settings_button_->SetPreferredSize(
-        gfx::Size(width, live_caption_height));
-  }
 }
 
-void MediaDialogView::OnLiveCaptionEnabledChanged() {
-  bool enabled = profile_->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled);
 
-  // Do not update the title if SODA is currently downloading.
-  if (!speech::SodaInstaller::GetInstance()->IsSodaDownloading(
-          speech::GetLanguageCode(
-              prefs::GetLiveCaptionLanguageCode(profile_->GetPrefs())))) {
-    SetLiveCaptionTitle(GetLiveCaptionTitle(profile_->GetPrefs()));
-  }
-
-  live_caption_button_->SetIsOn(enabled);
-
-  if (media::IsLiveTranslateEnabled()) {
-    live_translate_container_->SetVisible(enabled);
-    target_language_container_->SetVisible(
-        enabled &&
-        profile_->GetPrefs()->GetBoolean(prefs::kLiveTranslateEnabled));
-  }
-
-  UpdateBubbleSize();
-}
-
-void MediaDialogView::OnLiveTranslateEnabledChanged() {
-  bool enabled = profile_->GetPrefs()->GetBoolean(prefs::kLiveTranslateEnabled);
-  live_translate_button_->SetIsOn(enabled);
-
-  target_language_container_->SetVisible(enabled);
-  UpdateBubbleSize();
-}
 
 void MediaDialogView::OnMediaItemUISizeChanged() {
   UpdateBubbleSize();
@@ -333,12 +251,6 @@ void MediaDialogView::RemoveObserver(MediaDialogViewObserver* observer) {
   observers_.RemoveObserver(observer);
 }
 
-void MediaDialogView::TargetLanguageChanged() {
-  static_cast<LiveTranslateComboboxModel*>(
-      target_language_combobox_->GetModel())
-      ->UpdateTargetLanguageIndex(
-          target_language_combobox_->GetSelectedIndex().value());
-}
 
 const std::map<
     const std::string,
@@ -372,16 +284,6 @@ MediaDialogView::MediaDialogView(
       l10n_util::GetStringUTF16(IDS_GLOBAL_MEDIA_CONTROLS_DIALOG_NAME));
   CHECK(service_);
 
-  pref_change_registrar_ = std::make_unique<PrefChangeRegistrar>();
-  pref_change_registrar_->Init(profile->GetPrefs());
-  pref_change_registrar_->Add(
-      prefs::kLiveCaptionEnabled,
-      base::BindRepeating(&MediaDialogView::OnLiveCaptionEnabledChanged,
-                          base::Unretained(this)));
-  pref_change_registrar_->Add(
-      prefs::kLiveTranslateEnabled,
-      base::BindRepeating(&MediaDialogView::OnLiveTranslateEnabledChanged,
-                          base::Unretained(this)));
 
   media_color_theme_ = GetMediaColorTheme();
 }
@@ -395,276 +297,25 @@ MediaDialogView::~MediaDialogView() {
 void MediaDialogView::Init() {
   // Remove margins.
   set_margins(gfx::Insets());
-  if (!captions::IsLiveCaptionFeatureSupported()) {
-    SetLayoutManager(std::make_unique<views::FillLayout>());
-    return;
-  }
-  SetLayoutManager(std::make_unique<views::BoxLayout>(
-                       views::BoxLayout::Orientation::kVertical))
-      ->set_cross_axis_alignment(views::BoxLayout::CrossAxisAlignment::kCenter);
-
-  InitializeLiveCaptionSection();
-  if (media::IsLiveTranslateEnabled()) {
-    InitializeLiveTranslateSection();
-
-    separator_ = AddChildView(std::make_unique<views::Separator>());
-    separator_->SetOrientation(views::Separator::Orientation::kHorizontal);
-    InitializeCaptionSettingsSection();
-  }
+  SetLayoutManager(std::make_unique<views::FillLayout>());
 }
 
 void MediaDialogView::WindowClosing() {
   if (instance_ == this) {
     instance_ = nullptr;
     service_->media_item_manager()->SetDialogDelegate(nullptr);
-    speech::SodaInstaller::GetInstance()->RemoveObserver(this);
   }
 }
 
-void MediaDialogView::OnLiveCaptionButtonPressed() {
-  bool enabled = !profile_->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled);
-  profile_->GetPrefs()->SetBoolean(prefs::kLiveCaptionEnabled, enabled);
-  base::UmaHistogramBoolean(
-      "Accessibility.LiveCaption.EnableFromGlobalMediaControls", enabled);
-}
 
-void MediaDialogView::OnLiveTranslateButtonPressed() {
-  bool enabled =
-      !profile_->GetPrefs()->GetBoolean(prefs::kLiveTranslateEnabled);
-  profile_->GetPrefs()->SetBoolean(prefs::kLiveTranslateEnabled, enabled);
-  base::UmaHistogramBoolean(
-      "Accessibility.LiveTranslate.EnableFromGlobalMediaControls", enabled);
-}
 
-void MediaDialogView::OnSettingsButtonPressed() {
-  NavigateParams navigate_params(profile_,
-                                 GURL(captions::GetCaptionSettingsUrl()),
-                                 ui::PAGE_TRANSITION_LINK);
-  navigate_params.window_action = NavigateParams::WindowAction::kShowWindow;
-  navigate_params.disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
-  Navigate(&navigate_params);
-}
 
-void MediaDialogView::OnSodaInstalled(speech::LanguageCode language_code) {
-  if (!prefs::IsLanguageCodeForLiveCaption(language_code,
-                                           profile_->GetPrefs())) {
-    return;
-  }
-  speech::SodaInstaller::GetInstance()->RemoveObserver(this);
-  SetLiveCaptionTitle(GetLiveCaptionTitle(profile_->GetPrefs()));
-}
 
-void MediaDialogView::OnSodaInstallError(
-    speech::LanguageCode language_code,
-    speech::SodaInstaller::ErrorCode error_code) {
-  // Check that language code matches the selected language for Live Caption or
-  // is LanguageCode::kNone (signifying the SODA binary failed).
-  if (!prefs::IsLanguageCodeForLiveCaption(language_code,
-                                           profile_->GetPrefs()) &&
-      language_code != speech::LanguageCode::kNone) {
-    return;
-  }
 
-  std::u16string error_message;
-  switch (error_code) {
-    case speech::SodaInstaller::ErrorCode::kUnspecifiedError: {
-      error_message = l10n_util::GetStringUTF16(
-          IDS_GLOBAL_MEDIA_CONTROLS_LIVE_CAPTION_DOWNLOAD_ERROR);
-      break;
-    }
-    case speech::SodaInstaller::ErrorCode::kNeedsReboot: {
-      error_message = l10n_util::GetStringUTF16(
-          IDS_GLOBAL_MEDIA_CONTROLS_LIVE_CAPTION_DOWNLOAD_ERROR_REBOOT_REQUIRED);
-      break;
-    }
-  }
 
-  SetLiveCaptionTitle(error_message);
-}
 
-void MediaDialogView::OnSodaProgress(speech::LanguageCode language_code,
-                                     int progress) {
-  // Check that language code matches the selected language for Live Caption or
-  // is LanguageCode::kNone (signifying the SODA binary has progress).
-  if (!prefs::IsLanguageCodeForLiveCaption(language_code,
-                                           profile_->GetPrefs()) &&
-      language_code != speech::LanguageCode::kNone) {
-    return;
-  }
-  SetLiveCaptionTitle(l10n_util::GetStringFUTF16Int(
-      IDS_GLOBAL_MEDIA_CONTROLS_LIVE_CAPTION_DOWNLOAD_PROGRESS, progress));
-}
 
-void MediaDialogView::InitializeLiveCaptionSection() {
-  auto live_caption_container = std::make_unique<View>();
 
-  auto live_caption_image = std::make_unique<views::ImageView>();
-  live_caption_image->SetImage(ui::ImageModel::FromVectorIcon(
-      features::IsRoundedIconsEnabled() ? vector_icons::kSubtitlesIcon
-                                        : vector_icons::kLiveCaptionOnOldIcon,
-      ui::kColorIcon, kImageWidthDip));
-  live_caption_container->AddChildView(std::move(live_caption_image));
-
-  auto live_caption_title =
-      std::make_unique<views::Label>(GetLiveCaptionTitle(profile_->GetPrefs()));
-  live_caption_title->SetHorizontalAlignment(
-      gfx::HorizontalAlignment::ALIGN_LEFT);
-  live_caption_title->SetMultiLine(true);
-  live_caption_title_ =
-      live_caption_container->AddChildView(std::move(live_caption_title));
-
-  const bool is_managed =
-      profile_->GetPrefs()->IsManagedPreference(prefs::kLiveCaptionEnabled);
-  if (is_managed) {
-    auto* enterprise_icon = live_caption_container->AddChildView(
-        std::make_unique<views::ImageView>(ui::ImageModel::FromVectorIcon(
-            features::IsRoundedIconsEnabled() ? vector_icons::kDomainIcon
-                                              : vector_icons::kBusinessOldIcon,
-            ui::kColorIconSecondary, kImageWidthDip)));
-    enterprise_icon->SetTooltipText(
-        l10n_util::GetStringUTF16(IDS_CONTROLLED_SETTING_POLICY));
-  }
-
-  auto live_caption_button = std::make_unique<views::ToggleButton>(
-      base::BindRepeating(&MediaDialogView::OnLiveCaptionButtonPressed,
-                          base::Unretained(this)));
-  live_caption_button->SetIsOn(
-      profile_->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-  live_caption_button->GetViewAccessibility().SetName(
-      std::u16string(live_caption_title_->GetText()));
-  live_caption_button->SetEnabled(!is_managed);
-  live_caption_button_ =
-      live_caption_container->AddChildView(std::move(live_caption_button));
-
-  auto* live_caption_container_layout =
-      live_caption_container->SetLayoutManager(
-          std::make_unique<views::BoxLayout>(
-              views::BoxLayout::Orientation::kHorizontal,
-              gfx::Insets::VH(kVerticalMarginDip, kHorizontalMarginDip),
-              ChromeLayoutProvider::Get()->GetDistanceMetric(
-                  DISTANCE_RICH_HOVER_BUTTON_ICON_HORIZONTAL)));
-  live_caption_container_layout->SetFlexForView(live_caption_title_, 1);
-  live_caption_container_ = AddChildView(std::move(live_caption_container));
-}
-
-void MediaDialogView::InitializeLiveTranslateSection() {
-  auto live_translate_container = std::make_unique<View>();
-  live_translate_container->SetVisible(
-      profile_->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-
-  auto live_translate_image = std::make_unique<views::ImageView>();
-  live_translate_image->SetImage(ui::ImageModel::FromVectorIcon(
-      vector_icons::kGTranslateIcon, ui::kColorIcon, kImageWidthDip));
-  live_translate_container->AddChildView(std::move(live_translate_image));
-
-  auto live_translate_label_wrapper = std::make_unique<View>();
-  live_translate_label_wrapper->SetLayoutManager(
-      std::make_unique<views::BoxLayout>(
-          views::BoxLayout::Orientation::kVertical));
-  auto live_translate_title =
-      std::make_unique<views::Label>(l10n_util::GetStringUTF16(
-          IDS_SETTINGS_CAPTIONS_ENABLE_LIVE_TRANSLATE_TITLE));
-  live_translate_title->SetHorizontalAlignment(
-      gfx::HorizontalAlignment::ALIGN_LEFT);
-  live_translate_title->SetMultiLine(true);
-  live_translate_title_ = live_translate_label_wrapper->AddChildView(
-      std::move(live_translate_title));
-
-  live_translate_label_wrapper_ = live_translate_container->AddChildView(
-      std::move(live_translate_label_wrapper));
-
-  const bool is_managed =
-      profile_->GetPrefs()->IsManagedPreference(prefs::kLiveTranslateEnabled);
-  if (is_managed) {
-    auto* enterprise_icon = live_translate_container->AddChildView(
-        std::make_unique<views::ImageView>(ui::ImageModel::FromVectorIcon(
-            features::IsRoundedIconsEnabled() ? vector_icons::kDomainIcon
-                                              : vector_icons::kBusinessOldIcon,
-            ui::kColorIconSecondary, kImageWidthDip)));
-    enterprise_icon->SetTooltipText(
-        l10n_util::GetStringUTF16(IDS_CONTROLLED_SETTING_POLICY));
-  }
-
-  auto live_translate_button = std::make_unique<views::ToggleButton>(
-      base::BindRepeating(&MediaDialogView::OnLiveTranslateButtonPressed,
-                          base::Unretained(this)));
-  live_translate_button->SetIsOn(
-      profile_->GetPrefs()->GetBoolean(prefs::kLiveTranslateEnabled));
-  live_translate_button->GetViewAccessibility().SetName(
-      std::u16string(live_translate_title_->GetText()));
-  live_translate_button->SetEnabled(!is_managed);
-  auto* live_translate_container_layout =
-      live_translate_container->SetLayoutManager(
-          std::make_unique<views::BoxLayout>(
-              views::BoxLayout::Orientation::kHorizontal,
-              gfx::Insets::VH(kVerticalMarginDip, kHorizontalMarginDip),
-              ChromeLayoutProvider::Get()->GetDistanceMetric(
-                  DISTANCE_RICH_HOVER_BUTTON_ICON_HORIZONTAL)));
-  live_translate_container_layout->set_cross_axis_alignment(
-      views::BoxLayout::CrossAxisAlignment::kStart);
-  live_translate_container_layout->SetFlexForView(live_translate_label_wrapper_,
-                                                  1);
-  live_translate_button_ =
-      live_translate_container->AddChildView(std::move(live_translate_button));
-  live_translate_container_ = AddChildView(std::move(live_translate_container));
-
-  // Initialize the target language container.
-  auto target_language_container = std::make_unique<View>();
-  target_language_container->SetBorder(
-      views::CreateEmptyBorder(gfx::Insets::TLBR(0, 0, kVerticalMarginDip, 0)));
-  target_language_container->SetVisible(
-      profile_->GetPrefs()->GetBoolean(prefs::kLiveTranslateEnabled) &&
-      profile_->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-  target_language_container
-      ->SetLayoutManager(std::make_unique<views::BoxLayout>(
-          views::BoxLayout::Orientation::kVertical))
-      ->set_cross_axis_alignment(views::BoxLayout::CrossAxisAlignment::kCenter);
-
-  auto target_language_model =
-      std::make_unique<LiveTranslateComboboxModel>(profile_);
-  auto target_language_combobox =
-      std::make_unique<views::Combobox>(std::move(target_language_model));
-  target_language_combobox->SetCallback(base::BindRepeating(
-      &MediaDialogView::TargetLanguageChanged, base::Unretained(this)));
-  target_language_combobox->GetViewAccessibility().SetName(
-      l10n_util::GetStringUTF16(
-          IDS_GLOBAL_MEDIA_CONTROLS_LIVE_TRANSLATE_TARGET_LANGUAGE_ACCNAME));
-  target_language_combobox_ = target_language_container->AddChildView(
-      std::move(target_language_combobox));
-  target_language_container_ =
-      AddChildView(std::move(target_language_container));
-}
-
-void MediaDialogView::InitializeCaptionSettingsSection() {
-  auto caption_settings_container = std::make_unique<View>();
-  caption_settings_container->SetLayoutManager(
-      std::make_unique<views::BoxLayout>(
-          views::BoxLayout::Orientation::kHorizontal,
-          gfx::Insets::VH(kVerticalMarginDip, 0)));
-  auto caption_settings_button = std::make_unique<RichHoverButton>(
-      base::BindRepeating(&MediaDialogView::OnSettingsButtonPressed,
-                          base::Unretained(this)),
-      ui::ImageModel::FromVectorIcon(
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kSettingsIcon
-              : vector_icons::kSettingsChromeRefreshOldIcon,
-          ui::kColorIcon, kImageWidthDip),
-      l10n_util::GetStringUTF16(IDS_GLOBAL_MEDIA_CONTROLS_CAPTION_SETTINGS),
-      std::u16string(),
-      ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                         ? vector_icons::kOpenInNewFlippableIcon
-                                         : vector_icons::kLaunchOldIcon,
-                                     ui::kColorIcon, kImageWidthDip));
-  caption_settings_button_ = caption_settings_container->AddChildView(
-      std::move(caption_settings_button));
-  caption_settings_container_ =
-      AddChildView(std::move(caption_settings_container));
-}
-
-void MediaDialogView::SetLiveCaptionTitle(const std::u16string& new_text) {
-  live_caption_title_->SetText(new_text);
-  UpdateBubbleSize();
-}
 
 std::unique_ptr<global_media_controls::MediaItemUIUpdatedView>
 MediaDialogView::BuildMediaItemUIUpdatedView(

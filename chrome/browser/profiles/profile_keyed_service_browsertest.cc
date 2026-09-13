@@ -402,8 +402,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 #endif
     "HidDeviceManager",
     "HostContentSettingsMap",
-    "LiveCaptionController",
-    "LiveTranslateController",
 
     "MediaRouter",
     "MediaRouterUIService",

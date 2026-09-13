@@ -18,11 +18,10 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "components/soda/soda_util.h"
 #include "content/browser/browser_main_loop.h"
 #include "content/browser/renderer_host/media/media_stream_manager.h"
 #include "content/browser/renderer_host/media/media_stream_ui_proxy.h"
-#include "content/browser/speech/speech_recognizer_impl.h"
+#include "content/browser/speech/speech_recognizer.h"
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
@@ -53,11 +52,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "content/browser/speech/speech_recognizer_impl_android.h"
-#else
-#include "components/soda/constants.h"
-#include "components/soda/soda_util.h"
-#include "content/browser/speech/on_device_speech_recognition_engine_impl.h"
-#include "content/browser/speech/soda_speech_recognition_engine_impl.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
 namespace content {
@@ -74,14 +68,6 @@ constexpr char kWebSpeechAudioUseOnDeviceHistogram[] =
     "Accessibility.WebSpeech.UseOnDevice";
 constexpr char kWebSpeechAudioUseAudioForwarderHistogram[] =
     "Accessibility.WebSpeech.UseAudioForwarder";
-constexpr char kWebSpeechCanRenderFrameUseOnDeviceHistogram[] =
-    "Accessibility.WebSpeech.CanRenderFrameUseOnDevice";
-constexpr char kWebSpeechIsOnDeviceSpeechRecognitionInstalledHistogram[] =
-    "Accessibility.WebSpeech.IsOnDeviceSpeechRecognitionInstalled";
-constexpr char kWebSpeechIsGeminiNanoModelAvailableHistogram[] =
-    "Accessibility.WebSpeech.IsGeminiNanoModelAvailable";
-constexpr char kWebSpeechIsTinyGemmaModelAvailableHistogram[] =
-    "Accessibility.WebSpeech.IsTinyGemmaModelAvailable";
 
 }  // namespace
 
@@ -614,44 +600,13 @@ int SpeechRecognitionManagerImpl::CreateSession(
   media::mojom::SpeechRecognitionErrorCode error =
       media::mojom::SpeechRecognitionErrorCode::kNone;
 
-  if (UseOnDeviceSpeechRecognition(config)) {
-    base::UmaHistogramBoolean(kWebSpeechCanRenderFrameUseOnDeviceHistogram,
-                              can_render_frame_use_on_device);
-    if (!can_render_frame_use_on_device) {
-      error = media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed;
-    }
-
-    bool is_on_device_speech_recognition_installed = config.on_device_available;
-    base::UmaHistogramBoolean(
-        kWebSpeechIsOnDeviceSpeechRecognitionInstalledHistogram,
-        is_on_device_speech_recognition_installed);
-
-    if (IsOptimizationGuideSpeechModel(config)) {
-      const bool use_gemini_nano =
-          base::FeatureList::IsEnabled(media::kOnDeviceWebSpeechGeminiNano) &&
-          config.quality ==
-              media::mojom::SpeechRecognitionQuality::kConversation;
-      if (use_gemini_nano) {
-        base::UmaHistogramBoolean(kWebSpeechIsGeminiNanoModelAvailableHistogram,
-                                  is_on_device_speech_recognition_installed);
-      } else {
-        base::UmaHistogramBoolean(kWebSpeechIsTinyGemmaModelAvailableHistogram,
-                                  is_on_device_speech_recognition_installed);
-      }
-    }
-
-    // Set the error if on-device speech recognition must be used but is not
-    // available.
-    if (!is_on_device_speech_recognition_installed) {
-      error = media::mojom::SpeechRecognitionErrorCode::kLanguageNotSupported;
-    }
-  } else {
-    // Set the error if on-device speech recognition is not used but recognition
-    // context is set.
-    if (config.recognition_context.has_value()) {
-      error = media::mojom::SpeechRecognitionErrorCode::kPhrasesNotSupported;
-    }
+#if BUILDFLAG(IS_ANDROID)
+  if (config.recognition_context.has_value()) {
+    error = media::mojom::SpeechRecognitionErrorCode::kPhrasesNotSupported;
   }
+#else
+  error = media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed;
+#endif  // BUILDFLAG(IS_ANDROID)
 
   if (audio_forwarder_config.has_value() &&
       (audio_forwarder_config.value().sample_rate >
@@ -695,107 +650,10 @@ int SpeechRecognitionManagerImpl::CreateSession(
   session->use_microphone = !audio_forwarder_config.has_value();
 
 #if !BUILDFLAG(IS_ANDROID)
-  const bool use_gemini_nano =
-      base::FeatureList::IsEnabled(media::kOnDeviceWebSpeechGeminiNano) &&
-      config.quality == media::mojom::SpeechRecognitionQuality::kConversation;
-  const bool use_tinygemma =
-      base::FeatureList::IsEnabled(media::kOnDeviceWebSpeechSmallExpertModel) &&
-      config.quality == media::mojom::SpeechRecognitionQuality::kDictation;
-  const bool uses_optimization_guide_model = use_gemini_nano || use_tinygemma;
-  if (UseOnDeviceSpeechRecognition(config) &&
-      audio_forwarder_config.has_value() && !uses_optimization_guide_model) {
-    CHECK_GT(audio_forwarder_config.value().channel_count, 0);
-    CHECK_GT(audio_forwarder_config.value().sample_rate, 0);
-    // The speech recognition service process will create and manage the speech
-    // recognition session instead of the browser. Raw audio will be passed
-    // directly to the speech recognition process and speech recognition events
-    // will be returned directly to the renderer, bypassing the browser
-    // entirely.
-    raw_ptr<SpeechRecognitionManagerDelegate> speech_recognition_mgr_delegate =
-        SpeechRecognitionManagerImpl::GetInstance()
-            ? SpeechRecognitionManagerImpl::GetInstance()->delegate()
-            : nullptr;
-
-    CHECK(speech_recognition_mgr_delegate);
-    mojo::Remote<media::mojom::SpeechRecognitionContext>
-        speech_recognition_context;
-    speech_recognition_mgr_delegate->BindSpeechRecognitionContext(
-        speech_recognition_context.BindNewPipeAndPassReceiver(),
-        config.language, config.initial_context.global_id);
-
-    media::mojom::SpeechRecognitionOptionsPtr options =
-        media::mojom::SpeechRecognitionOptions::New();
-    options->recognition_mode = media::mojom::SpeechRecognitionMode::kCaption;
-    options->enable_formatting = config.unspoken_punctuation;
-    options->language = config.language;
-    options->recognizer_client_type =
-        media::mojom::RecognizerClientType::kLiveCaption;
-    options->skip_continuously_empty_audio = true;
-    options->recognition_context = config.recognition_context;
-    options->allow_multi_language = false;
-
-    speech_recognition_context->BindWebSpeechRecognizer(
-        std::move(session_receiver), std::move(client_remote),
-        std::move(audio_forwarder_config.value().audio_forwarder),
-        audio_forwarder_config.value().channel_count,
-        audio_forwarder_config.value().sample_rate, std::move(options),
-        config.continuous);
-
-    // The session is managed by the speech recognition service directly thus
-    // does not need to be associated with a session id in the browser.
-    return 0;
-  }
-
-  std::unique_ptr<SpeechRecognitionEngine> speech_recognition_engine;
-
-  if (UseOnDeviceSpeechRecognition(config)) {
-    if (IsOptimizationGuideSpeechModel(config)) {
-      speech_recognition_engine =
-          std::make_unique<OnDeviceSpeechRecognitionEngine>(config);
-    } else {
-      std::unique_ptr<SodaSpeechRecognitionEngineImpl>
-          soda_speech_recognition_engine =
-              std::make_unique<SodaSpeechRecognitionEngineImpl>(config);
-      if (soda_speech_recognition_engine->Initialize()) {
-        speech_recognition_engine = std::move(soda_speech_recognition_engine);
-      }
-    }
-  }
-
-  if (!speech_recognition_engine) {
-    LogBackendSpecificErrorOccurred(
-        config, media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed);
-    mojo::Remote<media::mojom::SpeechRecognitionSessionClient> client(
-        std::move(client_remote));
-    if (client.is_bound()) {
-      client->ErrorOccurred(media::mojom::SpeechRecognitionError::New(
-          media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed,
-          media::mojom::SpeechAudioErrorDetails::kNone));
-      client->Ended();
-    } else if (config.event_listener) {
-      config.event_listener.get()->OnRecognitionError(
-          session_id,
-          media::mojom::SpeechRecognitionError(
-              media::mojom::SpeechRecognitionErrorCode::kServiceNotAllowed,
-              media::mojom::SpeechAudioErrorDetails::kNone));
-      config.event_listener.get()->OnRecognitionEnd(session_id);
-    } else {
-      NOTREACHED();
-    }
-    return session_id;
-  }
-
-  session->recognizer = new SpeechRecognizerImpl(
-      this, audio_system_, session_id, config.continuous,
-      config.interim_results, std::move(speech_recognition_engine),
-      audio_forwarder_config.has_value()
-          ? std::make_optional<SpeechRecognitionAudioForwarderConfig>(
-                audio_forwarder_config.value())
-          : std::nullopt);
-
+  // Every non-Android session is rejected above; no recognizer exists here.
+  NOTREACHED();
 #else
   session->recognizer = new SpeechRecognizerImplAndroid(this, session_id);
-#endif  //! BUILDFLAG(IS_ANDROID)
 
   sessions_[session_id] = std::move(session);
 
@@ -808,6 +666,7 @@ int SpeechRecognitionManagerImpl::CreateSession(
                               weak_factory_.GetWeakPtr())));
 
   return session_id;
+#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void SpeechRecognitionManagerImpl::OnRecognitionEnd(int session_id) {
@@ -832,12 +691,7 @@ SpeechRecognitionSessionContext SpeechRecognitionManagerImpl::GetSessionContext(
 
 bool SpeechRecognitionManagerImpl::UseOnDeviceSpeechRecognition(
     const SpeechRecognitionSessionConfig& config) {
-#if !BUILDFLAG(IS_ANDROID)
-  return config.on_device &&
-         (config.on_device_available || !config.allow_cloud_fallback);
-#else
   return false;
-#endif
 }
 
 void SpeechRecognitionManagerImpl::AbortAllSessionsForRenderFrame(

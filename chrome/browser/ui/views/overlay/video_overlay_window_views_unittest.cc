@@ -23,8 +23,6 @@
 #include "chrome/browser/ui/views/overlay/close_image_button.h"
 #include "chrome/browser/ui/views/overlay/hang_up_button.h"
 #include "chrome/browser/ui/views/overlay/minimize_button.h"
-#include "chrome/browser/ui/views/overlay/overlay_window_live_caption_button.h"
-#include "chrome/browser/ui/views/overlay/overlay_window_live_caption_dialog.h"
 #include "chrome/browser/ui/views/overlay/playback_image_button.h"
 #include "chrome/browser/ui/views/overlay/simple_overlay_window_image_button.h"
 #include "chrome/browser/ui/views/overlay/toggle_camera_button.h"
@@ -36,7 +34,6 @@
 #include "components/live_caption/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/soda/mock_soda_installer.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/browser/overlay_window.h"
 #include "content/public/browser/video_picture_in_picture_window_controller.h"
@@ -186,8 +183,6 @@ class VideoOverlayWindowViewsTest : public ChromeViewsTestBase {
     ViewsTestBase::SetUp();
     test_views_delegate()->set_layout_provider(
         ChromeLayoutProvider::CreateLayoutProvider());
-    mock_soda_installer_ = std::make_unique<speech::MockSodaInstaller>();
-    mock_soda_installer_->NeverDownloadSodaForTesting();
     // web_contents_ needs to be created after the constructor, so that
     // |feature_list_| can be initialized before other threads check if a
     // feature is enabled.
@@ -274,7 +269,6 @@ class VideoOverlayWindowViewsTest : public ChromeViewsTestBase {
     return std::move(overlay_view_);
   }
 
-  std::unique_ptr<speech::MockSodaInstaller> mock_soda_installer_;
   TestingProfile profile_;
   content::TestWebContentsFactory web_contents_factory_;
   raw_ptr<content::WebContents> web_contents_;
@@ -1326,209 +1320,6 @@ TEST_F(VideoOverlayWindowViewsTest, VideoConferencingUI) {
   EXPECT_TRUE(progress_view->IsDrawn());
 }
 
-TEST_F(VideoOverlayWindowViewsTest, LiveCaption) {
-  overlay_window().ForceControlsVisibleForTesting(true);
-  profile().GetPrefs()->SetBoolean(prefs::kLiveCaptionEnabled, false);
-  OverlayWindowLiveCaptionButton* live_caption_button =
-      overlay_window().live_caption_button_for_testing();
-  OverlayWindowLiveCaptionDialog* live_caption_dialog =
-      overlay_window().live_caption_dialog_for_testing();
-
-  ASSERT_NE(nullptr, live_caption_button);
-  ASSERT_NE(nullptr, live_caption_dialog);
-
-  {
-    // The accessible data of the toggle button should show the state as
-    // collapsed.
-    ui::AXNodeData node_data;
-    live_caption_button->GetViewAccessibility().GetAccessibleNodeData(
-        &node_data);
-    EXPECT_FALSE(node_data.HasState(ax::mojom::State::kExpanded));
-    EXPECT_TRUE(node_data.HasState(ax::mojom::State::kCollapsed));
-  }
-
-  // The live caption button should start visible and the live caption dialog
-  // should start invisible.
-  WaitForLayout();
-  EXPECT_TRUE(live_caption_button->IsDrawn());
-  EXPECT_FALSE(live_caption_dialog->IsDrawn());
-
-  // Pressing the live caption button should display the live caption dialog.
-  views::test::ButtonTestApi live_caption_button_clicker(live_caption_button);
-  ui::MouseEvent dummy_event(ui::EventType::kMousePressed, gfx::Point(0, 0),
-                             gfx::Point(0, 0), ui::EventTimeForNow(), 0, 0);
-  live_caption_button_clicker.NotifyClick(dummy_event);
-  WaitForLayout();
-  EXPECT_TRUE(live_caption_dialog->IsDrawn());
-
-  {
-    // The accessible data of the toggle button should show the state as
-    // expanded once the dialog is there.
-    ui::AXNodeData node_data;
-    live_caption_button->GetViewAccessibility().GetAccessibleNodeData(
-        &node_data);
-    EXPECT_TRUE(node_data.HasState(ax::mojom::State::kExpanded));
-    EXPECT_FALSE(node_data.HasState(ax::mojom::State::kCollapsed));
-  }
-
-  // The live caption button should be enabled and toggled off, while the live
-  // translate button should be disabled and toggled off.
-  EXPECT_FALSE(profile().GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-  views::ToggleButton* live_caption_toggle_button =
-      live_caption_dialog->live_caption_button_for_testing();
-  views::ToggleButton* live_translate_toggle_button =
-      live_caption_dialog->live_translate_button_for_testing();
-  EXPECT_TRUE(live_caption_toggle_button->GetEnabled());
-  EXPECT_FALSE(live_caption_toggle_button->GetIsOn());
-  EXPECT_FALSE(live_translate_toggle_button->GetEnabled());
-  EXPECT_FALSE(live_translate_toggle_button->GetIsOn());
-
-  // Toggling the live caption button should enable the live translate button
-  // and also enable the live caption pref.
-  views::test::ButtonTestApi live_caption_toggle_button_clicker(
-      live_caption_toggle_button);
-  live_caption_toggle_button_clicker.NotifyClick(dummy_event);
-  WaitForLayout();
-  EXPECT_TRUE(profile().GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-  EXPECT_TRUE(live_caption_toggle_button->GetIsOn());
-  EXPECT_TRUE(live_translate_toggle_button->GetEnabled());
-  EXPECT_FALSE(live_translate_toggle_button->GetIsOn());
-
-  // Turn off LiveCaption, because leaving it on breaks the test harness when it
-  // tries to destroy the UI.
-  profile().GetPrefs()->SetBoolean(prefs::kLiveCaptionEnabled, false);
-}
-
-TEST_F(VideoOverlayWindowViewsTest, LiveCaption_MouseClickOutside) {
-  overlay_window().ForceControlsVisibleForTesting(true);
-  OverlayWindowLiveCaptionButton* live_caption_button =
-      overlay_window().live_caption_button_for_testing();
-  OverlayWindowLiveCaptionDialog* live_caption_dialog =
-      overlay_window().live_caption_dialog_for_testing();
-
-  ASSERT_NE(nullptr, live_caption_button);
-  ASSERT_NE(nullptr, live_caption_dialog);
-
-  // The live caption button should start visible and the live caption dialog
-  // should start invisible.
-  WaitForLayout();
-  EXPECT_TRUE(live_caption_button->IsDrawn());
-  EXPECT_FALSE(live_caption_dialog->IsDrawn());
-
-  // Pressing the live caption button should display the live caption dialog.
-  views::test::ButtonTestApi live_caption_button_clicker(live_caption_button);
-  ui::MouseEvent dummy_event(ui::EventType::kMousePressed, gfx::Point(0, 0),
-                             gfx::Point(0, 0), ui::EventTimeForNow(), 0, 0);
-  live_caption_button_clicker.NotifyClick(dummy_event);
-  WaitForLayout();
-  EXPECT_TRUE(live_caption_dialog->IsDrawn());
-
-  // Clicking outside of the live caption dialog should close the live caption
-  // dialog.
-  gfx::Point outside_point = live_caption_dialog->bounds().origin();
-  outside_point.Offset(-20, -20);
-  ui::MouseEvent click_outside_event(ui::EventType::kMousePressed,
-                                     outside_point, outside_point,
-                                     ui::EventTimeForNow(), 0, 0);
-  overlay_window().OnMouseEvent(&click_outside_event);
-  EXPECT_FALSE(live_caption_dialog->IsDrawn());
-}
-
-// Gesture events are not supported on Mac.
-#if !BUILDFLAG(IS_MAC)
-
-TEST_F(VideoOverlayWindowViewsTest, LiveCaption_GestureTapOutside) {
-  overlay_window().ForceControlsVisibleForTesting(true);
-  OverlayWindowLiveCaptionButton* live_caption_button =
-      overlay_window().live_caption_button_for_testing();
-  OverlayWindowLiveCaptionDialog* live_caption_dialog =
-      overlay_window().live_caption_dialog_for_testing();
-
-  ASSERT_NE(nullptr, live_caption_button);
-  ASSERT_NE(nullptr, live_caption_dialog);
-
-  // The live caption button should start visible and the live caption dialog
-  // should start invisible.
-  WaitForLayout();
-  EXPECT_TRUE(live_caption_button->IsDrawn());
-  EXPECT_FALSE(live_caption_dialog->IsDrawn());
-
-  // Pressing the live caption button should display the live caption dialog.
-  views::test::ButtonTestApi live_caption_button_clicker(live_caption_button);
-  ui::MouseEvent dummy_event(ui::EventType::kMousePressed, gfx::Point(0, 0),
-                             gfx::Point(0, 0), ui::EventTimeForNow(), 0, 0);
-  live_caption_button_clicker.NotifyClick(dummy_event);
-  WaitForLayout();
-  EXPECT_TRUE(live_caption_dialog->IsDrawn());
-
-  // Tapping outside of the live caption dialog should close the live caption
-  // dialog.
-  gfx::Point outside_point = live_caption_dialog->bounds().origin();
-  outside_point.Offset(-20, -20);
-  ui::GestureEvent tap_outside_event(
-      outside_point.x(), outside_point.y(), 0, base::TimeTicks::Now(),
-      ui::GestureEventDetails(ui::EventType::kGestureTap));
-  overlay_window().OnGestureEvent(&tap_outside_event);
-  EXPECT_FALSE(live_caption_dialog->IsDrawn());
-}
-
-TEST_F(VideoOverlayWindowViewsTest, LiveCaption_GestureTap) {
-  overlay_window().ShowInactive();
-  overlay_window().SetPlayPauseButtonVisibility(true);
-  overlay_window().ForceControlsVisibleForTesting(true);
-
-  OverlayWindowLiveCaptionButton* live_caption_button =
-      overlay_window().live_caption_button_for_testing();
-  OverlayWindowLiveCaptionDialog* live_caption_dialog =
-      overlay_window().live_caption_dialog_for_testing();
-  views::ToggleButton* live_caption_toggle_button =
-      live_caption_dialog->live_caption_button_for_testing();
-  views::ToggleButton* live_translate_toggle_button =
-      live_caption_dialog->live_translate_button_for_testing();
-  views::Combobox* target_language_combobox =
-      live_caption_dialog->target_language_combobox_for_testing();
-
-  profile().GetPrefs()->SetBoolean(prefs::kLiveCaptionEnabled, false);
-  profile().GetPrefs()->SetBoolean(prefs::kLiveTranslateEnabled, false);
-
-  ASSERT_NE(nullptr, live_caption_button);
-  ASSERT_NE(nullptr, live_caption_dialog);
-  ASSERT_NE(nullptr, live_caption_toggle_button);
-  ASSERT_NE(nullptr, live_translate_toggle_button);
-  ASSERT_NE(nullptr, target_language_combobox);
-
-  // Click the live caption button to display the live caption dialog.
-  WaitForLayout();
-  views::test::ButtonTestApi live_caption_button_clicker(live_caption_button);
-  ui::MouseEvent dummy_event(ui::EventType::kMousePressed, gfx::Point(0, 0),
-                             gfx::Point(0, 0), ui::EventTimeForNow(), 0, 0);
-  live_caption_button_clicker.NotifyClick(dummy_event);
-  WaitForLayout();
-  EXPECT_TRUE(live_caption_dialog->IsDrawn());
-
-  // Tap the live caption toggle button to enable live caption.
-  EXPECT_FALSE(profile().GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-  GestureTapOnView(live_caption_toggle_button);
-  WaitForLayout();
-  EXPECT_TRUE(profile().GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-
-  // Tap the live translate button to enable live translate.
-  EXPECT_FALSE(profile().GetPrefs()->GetBoolean(prefs::kLiveTranslateEnabled));
-  GestureTapOnView(live_translate_toggle_button);
-  WaitForLayout();
-  EXPECT_TRUE(profile().GetPrefs()->GetBoolean(prefs::kLiveTranslateEnabled));
-
-  // Tap the target language combobox to open the target language selection.
-  EXPECT_FALSE(target_language_combobox->IsMenuRunning());
-  GestureTapOnView(target_language_combobox);
-  WaitForLayout();
-  EXPECT_TRUE(target_language_combobox->IsMenuRunning());
-
-  profile().GetPrefs()->SetBoolean(prefs::kLiveCaptionEnabled, false);
-  profile().GetPrefs()->SetBoolean(prefs::kLiveTranslateEnabled, false);
-}
-
-#endif  // BUILDFLAG(IS_MAC)
 
 TEST_F(VideoOverlayWindowViewsTest, InitialTitleAndScrimVisibility) {
   overlay_window().ForceControlsVisibleForTesting(false);

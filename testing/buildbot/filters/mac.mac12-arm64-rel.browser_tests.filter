@@ -97,7 +97,6 @@
 -InspectUITest.LaunchUIDevtools
 -InteractiveBrowserTestBrowsertest.CheckResult
 -IntentChipButtonSkipIntentPickerBrowserTest.ShowsIntentChipCollapsed
--LiveCaptionControllerTest.OnAudioStreamEnd
 -MaybeSetMetadata/V4SafeBrowsingServiceMetadataTest.MalwareIFrame/2
 -MediaEngagementBrowserTest.SessionMultipleTabsClosingParent
 -MediaGalleriesGalleryWatchApiTest.SetupGalleryWatchWithoutListeners

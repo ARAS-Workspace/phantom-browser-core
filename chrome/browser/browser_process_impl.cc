@@ -42,7 +42,6 @@
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 #include "build/config/linux/dbus/buildflags.h"
-#include "chrome/browser/accessibility/soda_installer_impl.h"
 #include "chrome/browser/battery/battery_metrics.h"
 #include "chrome/browser/browser_process_platform_part.h"
 #include "chrome/browser/buildflags.h"
@@ -1421,10 +1420,6 @@ void BrowserProcessImpl::PreMainMessageLoopRun() {
   security_state::SetSecurityStateClient(new ChromeSecurityStateClient());
 #endif
 
-// Create the global SodaInstaller instance.
-#if !BUILDFLAG(IS_ANDROID)
-  soda_installer_impl_ = std::make_unique<speech::SodaInstallerImpl>();
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_ANDROID)
   screen_ai_download_ = screen_ai::ScreenAIInstallState::Create();

@@ -51,7 +51,6 @@
 #include "content/child/sandboxed_process_thread_type_handler.h"
 #include "content/common/gpu_pre_sandbox_hook_linux.h"
 #include "content/public/common/content_descriptor_keys.h"
-#include "content/utility/speech/speech_recognition_sandbox_hook_linux.h"
 #include "media/gpu/buildflags.h"
 #include "media/media_buildflags.h"
 #include "sandbox/policy/linux/sandbox_linux.h"
@@ -261,10 +260,6 @@ int UtilityMain(MainFunctionParams parameters) {
     case sandbox::mojom::Sandbox::kOnDeviceModelExecution:
       on_device_model::AddSandboxLinuxOptions(sandbox_options);
       pre_sandbox_hook = base::BindOnce(&on_device_model::PreSandboxHook);
-      break;
-    case sandbox::mojom::Sandbox::kSpeechRecognition:
-      pre_sandbox_hook =
-          base::BindOnce(&speech::SpeechRecognitionPreSandboxHook);
       break;
 #if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION) && BUILDFLAG(IS_LINUX)
     case sandbox::mojom::Sandbox::kOnDeviceTranslation:

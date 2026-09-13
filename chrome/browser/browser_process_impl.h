@@ -83,9 +83,6 @@ namespace webrtc_event_logging {
 class WebRtcEventLogManager;
 }  // namespace webrtc_event_logging
 
-namespace speech {
-class SodaInstaller;
-}  // namespace speech
 
 namespace screen_ai {
 class ScreenAIInstallState;
@@ -427,11 +424,6 @@ class BrowserProcessImpl : public BrowserProcess,
   std::unique_ptr<component_updater::ComponentUpdateService> component_updater_;
 
 #if !BUILDFLAG(IS_ANDROID)
-  // Used to create a singleton instance of SodaInstallerImpl, which can be
-  // retrieved using speech::SodaInstaller::GetInstance().
-  // SodaInstallerImpl depends on ComponentUpdateService, so define it here
-  // to ensure that SodaInstallerImpl gets destructed first.
-  std::unique_ptr<speech::SodaInstaller> soda_installer_impl_;
 
   // Used to download Screen AI on demand and keep track of the library
   // availability.

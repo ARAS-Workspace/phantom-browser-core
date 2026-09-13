@@ -3239,10 +3239,6 @@ source_set("browser") {
       "service_worker/service_worker_hid_delegate_observer.h",
 
       # Most speech code is non-Android.
-      "speech/speech_recognition_engine.cc",
-      "speech/speech_recognition_engine.h",
-      "speech/speech_recognizer_impl.cc",
-      "speech/speech_recognizer_impl.h",
       "tracing/tracing_ui.cc",
       "tracing/tracing_ui.h",
 
@@ -3274,22 +3270,13 @@ source_set("browser") {
       "digital_credentials/cross_device_transaction_impl.h",
     ]
 
-    sources += [
-      "speech/on_device_speech_recognition_engine_impl.cc",
-      "speech/on_device_speech_recognition_engine_impl.h",
-      "speech/soda_speech_recognition_engine_impl.cc",
-      "speech/soda_speech_recognition_engine_impl.h",
-    ]
+    sources += []
 
     deps += [ "//media/mojo/mojom:web_speech_recognition" ]
 
     deps += [
       "//components/device_event_log",
       "//components/password_manager/core/common",
-      "//components/soda",
-      "//components/soda:constants",
-      "//components/soda:utils",
-      "//components/speech",
       "//components/vector_icons",
       "//components/webauthn/json",
       "//content/browser/tracing:resources",

@@ -169,8 +169,6 @@
 #include "chrome/browser/site_protection/site_familiarity_process_selection_deferring_condition.h"
 #include "chrome/browser/site_protection/site_familiarity_process_selection_user_data.h"
 #include "chrome/browser/site_protection/site_familiarity_utils.h"
-#include "chrome/browser/speech/chrome_speech_recognition_manager_delegate.h"
-#include "chrome/browser/speech/on_device_speech_recognition_util.h"
 #include "chrome/browser/ssl/chrome_security_blocking_page_factory.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/ssl/https_upgrades_interceptor.h"
@@ -457,7 +455,6 @@
 #include "chrome/browser/enterprise/platform_auth/platform_auth_proxying_url_loader_factory.h"
 #include "chrome/common/chrome_version.h"
 #include "components/enterprise/platform_auth/platform_auth_features.h"
-#include "components/soda/constants.h"
 #include "sandbox/mac/sandbox_serializer.h"
 #include "sandbox/policy/mac/params.h"
 #include "sandbox/policy/mac/sandbox_mac.h"
@@ -538,7 +535,6 @@
 #include "components/keep_alive_registry/keep_alive_registry.h"
 #include "components/password_manager/content/common/web_ui_constants.h"
 #include "components/password_manager/core/common/password_manager_features.h"
-#include "components/soda/soda_util.h"
 #include "components/webapps/isolated_web_apps/url_loading/url_loader_factory.h"
 #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
 #include "third_party/blink/public/mojom/installedapp/related_application.mojom.h"
@@ -4199,10 +4195,6 @@ bool ChromeContentBrowserClient::CanCreateWindow(
              HostContentSettingsMapFactory::GetForProfile(profile)) != nullptr;
 }
 
-content::SpeechRecognitionManagerDelegate*
-ChromeContentBrowserClient::CreateSpeechRecognitionManagerDelegate() {
-  return new speech::ChromeSpeechRecognitionManagerDelegate();
-}
 
 std::unique_ptr<optimization_guide::ModelBrokerClient>
 ChromeContentBrowserClient::CreateModelBrokerClient(
@@ -4212,14 +4204,6 @@ ChromeContentBrowserClient::CreateModelBrokerClient(
   return service ? service->CreateModelBrokerClient() : nullptr;
 }
 
-media::mojom::AvailabilityStatus
-ChromeContentBrowserClient::GetOnDeviceSpeechRecognitionAvailabilityStatus(
-    content::BrowserContext* context,
-    const std::string& language,
-    media::mojom::SpeechRecognitionQuality quality) {
-  return speech::GetOnDeviceSpeechRecognitionAvailabilityStatus(
-      context, language, quality);
-}
 
 void ChromeContentBrowserClient::MaybeOverrideManifest(
     content::RenderFrameHost* render_frame_host,
@@ -7529,19 +7513,6 @@ void ChromeContentBrowserClient::OnFetchKeepAliveRequestDestroyed(
 bool ChromeContentBrowserClient::SetupEmbedderSandboxParameters(
     sandbox::mojom::Sandbox sandbox_type,
     sandbox::SandboxSerializer* serializer) {
-  if (sandbox_type == sandbox::mojom::Sandbox::kSpeechRecognition) {
-    base::FilePath soda_component_path = speech::GetSodaDirectory();
-    CHECK(!soda_component_path.empty());
-    CHECK(serializer->SetParameter(sandbox::policy::kParamSodaComponentPath,
-                                   soda_component_path.value()));
-
-    base::FilePath soda_language_pack_path =
-        speech::GetSodaLanguagePacksDirectory();
-    CHECK(!soda_language_pack_path.empty());
-    CHECK(serializer->SetParameter(sandbox::policy::kParamSodaLanguagePackPath,
-                                   soda_language_pack_path.value()));
-    return true;
-  }
   if (sandbox_type == sandbox::mojom::Sandbox::kScreenAI) {
     // ScreenAI service needs read access to ScreenAI component binary path to
     // load it.

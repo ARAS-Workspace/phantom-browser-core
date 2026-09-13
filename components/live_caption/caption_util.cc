@@ -19,8 +19,6 @@
 #include "ui/base/ui_base_switches.h"
 #include "ui/native_theme/caption_style.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#endif
 
 namespace {
 
@@ -119,22 +117,7 @@ std::optional<ui::CaptionStyle> GetCaptionStyleFromUserSettings(
   return style;
 }
 
-bool IsLiveCaptionFeatureSupported() {
-  return false;
-}
 
-bool IsHeadlessCaptionFeatureSupported() {
-  return base::FeatureList::IsEnabled(media::kHeadlessLiveCaption);
-}
 
-std::string GetCaptionSettingsUrl() {
-#if BUILDFLAG(IS_LINUX)
-  return "chrome://settings/captions";
-#elif BUILDFLAG(IS_MAC)
-  return "chrome://settings/accessibility";
-#else
-  NOTREACHED();
-#endif
-}
 
 }  // namespace captions

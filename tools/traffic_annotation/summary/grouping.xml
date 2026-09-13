@@ -142,7 +142,6 @@ after discussions on the right group.
       <annotation id="iwa_policy_update_manifest"/>
       <annotation id="iwa_installer_view_controller"/>
       <annotation id="iwa_policy_signed_web_bundle"/>
-      <annotation id="cloud_speech_recognition"/>
       <annotation id="android_feedback_connectivity_checker"/>
       <annotation id="service_worker_race_network_request"/>
       <annotation id="bookmarks_image_fetcher"/>

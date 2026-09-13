@@ -29,13 +29,11 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/pwc/pwc_api_binder.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/speech/on_device_speech_recognition_impl.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
 #include "chrome/browser/translate/translate_frame_binder.h"
 #include "chrome/browser/ui/search_engines/search_engine_tab_helper.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/pref_names.h"
-#include "chrome/services/speech/buildflags/buildflags.h"
 #include "components/autofill/content/browser/content_autofill_client.h"
 #include "components/credential_management/content_credential_manager.h"
 #include "components/dom_distiller/content/browser/distillability_driver.h"
@@ -44,8 +42,6 @@
 #include "components/dom_distiller/content/common/mojom/distiller_javascript_service.mojom.h"
 #include "components/dom_distiller/core/dom_distiller_service.h"
 #include "components/language_detection/content/common/language_detection.mojom.h"
-#include "components/live_caption/caption_util.h"
-#include "components/live_caption/pref_names.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_contents.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_processor_impl.h"
 #include "components/optimization_guide/public/mojom/model_broker.mojom.h"
@@ -115,20 +111,6 @@
 #include "third_party/blink/public/mojom/webshare/webshare.mojom.h"
 #endif
 
-#if BUILDFLAG(ENABLE_SPEECH_SERVICE)
-#include "chrome/browser/accessibility/live_caption/live_caption_speech_recognition_host.h"
-#include "chrome/browser/accessibility/live_caption/live_caption_unavailability_notifier.h"
-#include "chrome/browser/speech/speech_recognition_client_browser_interface.h"
-#include "chrome/browser/speech/speech_recognition_client_browser_interface_factory.h"
-#include "chrome/browser/speech/speech_recognition_service.h"
-#include "media/mojo/mojom/renderer_extensions.mojom.h"
-#include "media/mojo/mojom/speech_recognition.mojom.h"  // nogncheck
-#endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
-
-#if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
-#include "chrome/browser/speech/speech_recognition_service_factory.h"
-#include "media/mojo/mojom/speech_recognition_service.mojom.h"
-#endif  // BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
 
 #if BUILDFLAG(ENABLE_PDF)
 #include "chrome/browser/pdf/pdf_help_bubble_handler_factory.h"
@@ -271,68 +253,7 @@ void BindNetworkHintsHandler(
   predictors::NetworkHintsHandlerImpl::Create(frame_host, std::move(receiver));
 }
 
-#if BUILDFLAG(ENABLE_SPEECH_SERVICE)
-void BindSpeechRecognitionContextHandler(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<media::mojom::SpeechRecognitionContext> receiver) {
-  Profile* profile = Profile::FromBrowserContext(
-      frame_host->GetProcess()->GetBrowserContext());
-  if (!profile) {
-    return;
-  }
-  PrefService* profile_prefs = profile->GetPrefs();
-  if (!(profile_prefs->GetBoolean(prefs::kLiveCaptionEnabled) ||
-        profile_prefs->GetBoolean(prefs::kHeadlessCaptionEnabled)) ||
-      !captions::IsLiveCaptionFeatureSupported()) {
-    return;
-  }
 
-  // Bind via the appropriate factory.
-#if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
-  auto* factory = SpeechRecognitionServiceFactory::GetForProfile(profile);
-#else
-#error "No speech recognition service factory on this platform."
-#endif
-  factory->BindSpeechRecognitionContext(std::move(receiver));
-}
-
-void BindSpeechRecognitionClientBrowserInterfaceHandler(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<media::mojom::SpeechRecognitionClientBrowserInterface>
-        receiver) {
-  if (captions::IsLiveCaptionFeatureSupported()) {
-    // Bind in this process.
-    Profile* profile = Profile::FromBrowserContext(
-        frame_host->GetProcess()->GetBrowserContext());
-    SpeechRecognitionClientBrowserInterfaceFactory::GetForProfile(profile)
-        ->BindReceiver(std::move(receiver));
-  }
-}
-
-void BindSpeechRecognitionRecognizerClientHandler(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<media::mojom::SpeechRecognitionRecognizerClient>
-        client_receiver) {
-  Profile* profile = Profile::FromBrowserContext(
-      frame_host->GetProcess()->GetBrowserContext());
-  PrefService* profile_prefs = profile->GetPrefs();
-  if ((profile_prefs->GetBoolean(prefs::kLiveCaptionEnabled) ||
-       profile_prefs->GetBoolean(prefs::kHeadlessCaptionEnabled)) &&
-      captions::IsLiveCaptionFeatureSupported()) {
-    captions::LiveCaptionSpeechRecognitionHost::Create(
-        frame_host, std::move(client_receiver));
-  }
-}
-
-#endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
-
-void BindOnDeviceSpeechRecognitionHandler(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<media::mojom::OnDeviceSpeechRecognition> receiver) {
-  speech::OnDeviceSpeechRecognitionImpl::GetOrCreateForCurrentDocument(
-      frame_host)
-      ->Bind(std::move(receiver));
-}
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 void BindScreenAIAnnotator(
@@ -492,17 +413,6 @@ void PopulateChromeFrameBinders(
 #endif
 
   map->Add<network_hints::mojom::NetworkHintsHandler>(&BindNetworkHintsHandler);
-  map->Add<media::mojom::OnDeviceSpeechRecognition>(
-      &BindOnDeviceSpeechRecognitionHandler);
-
-#if BUILDFLAG(ENABLE_SPEECH_SERVICE)
-  map->Add<media::mojom::SpeechRecognitionContext>(
-      &BindSpeechRecognitionContextHandler);
-  map->Add<media::mojom::SpeechRecognitionClientBrowserInterface>(
-      &BindSpeechRecognitionClientBrowserInterfaceHandler);
-  map->Add<media::mojom::SpeechRecognitionRecognizerClient>(
-      &BindSpeechRecognitionRecognizerClientHandler);
-#endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(blink::features::kSubApps) &&

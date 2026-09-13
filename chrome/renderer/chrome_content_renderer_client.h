@@ -17,7 +17,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
 #include "chrome/common/media/webrtc_logging.mojom.h"
-#include "chrome/services/speech/buildflags/buildflags.h"
 #include "components/safe_browsing/buildflags.h"
 #include "components/spellcheck/spellcheck_buildflags.h"
 #include "content/public/common/buildflags.h"
@@ -158,10 +157,6 @@ class ChromeContentRendererClient
   std::unique_ptr<blink::WebContentSettingsClient>
   CreateWorkerContentSettingsClient(
       content::RenderFrame* render_frame) override;
-#if BUILDFLAG(ENABLE_SPEECH_SERVICE)
-  std::unique_ptr<media::SpeechRecognitionClient> CreateSpeechRecognitionClient(
-      content::RenderFrame* render_frame) override;
-#endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
   std::unique_ptr<media::KeySystemSupportRegistration> GetSupportedKeySystems(
       content::RenderFrame* render_frame,
       media::GetSupportedKeySystemsCB cb) override;

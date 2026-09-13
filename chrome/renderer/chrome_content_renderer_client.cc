@@ -73,7 +73,6 @@
 #include "chrome/renderer/websocket_handshake_throttle_provider_impl.h"
 #include "chrome/renderer/webui_browser/webui_browser_renderer_extension.h"
 #include "chrome/renderer/worker_content_settings_client.h"
-#include "chrome/services/speech/buildflags/buildflags.h"
 #include "components/autofill/content/renderer/autofill_agent.h"
 #include "components/autofill/content/renderer/password_autofill_agent.h"
 #include "components/autofill/content/renderer/password_generation_agent.h"
@@ -203,9 +202,6 @@
 #include "components/search/ntp_features.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(ENABLE_SPEECH_SERVICE)
-#include "chrome/renderer/media/chrome_speech_recognition_client.h"
-#endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
 
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -1360,13 +1356,6 @@ ChromeContentRendererClient::CreateWorkerContentSettingsClient(
   return std::make_unique<WorkerContentSettingsClient>(render_frame);
 }
 
-#if BUILDFLAG(ENABLE_SPEECH_SERVICE)
-std::unique_ptr<media::SpeechRecognitionClient>
-ChromeContentRendererClient::CreateSpeechRecognitionClient(
-    content::RenderFrame* render_frame) {
-  return std::make_unique<ChromeSpeechRecognitionClient>(render_frame);
-}
-#endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
 
 void ChromeContentRendererClient::RunScriptsAtDocumentStart(
     content::RenderFrame* render_frame) {

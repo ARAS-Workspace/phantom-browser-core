@@ -489,7 +489,6 @@ source_set("profile_manager_impl") {
       "//chrome/browser/ui/signin",
       "//chrome/browser/ui/startup",
       "//chrome/browser/web_applications",
-      "//components/live_caption",
     ]
   }
 }

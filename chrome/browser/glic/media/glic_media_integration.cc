@@ -6,7 +6,6 @@
 
 #include "base/memory/weak_ptr.h"
 #include "base/supports_user_data.h"
-#include "chrome/browser/accessibility/live_caption/live_caption_controller_factory.h"
 #include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/browser/glic/media/glic_media_context.h"
 #include "chrome/browser/glic/media/glic_media_page_cache.h"
@@ -15,9 +14,6 @@
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/live_caption/caption_controller_base.h"
-#include "components/live_caption/caption_util.h"
-#include "components/live_caption/live_caption_controller.h"
 #include "components/live_caption/pref_names.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/optimization_guide/proto/features/common_quality_data.pb.h"
@@ -28,7 +24,6 @@
 
 namespace {
 
-constexpr char kGlicMediaIntegrationKey[] = "GlicMediaIntegration";
 
 class GlicMediaPeerConnectionObserver
     : public content::PeerConnectionTrackerHostObserver {
@@ -130,7 +125,6 @@ class GlicMediaIntegrationImpl : public glic::GlicMediaIntegration,
 
   // GlicMediaIntegrationImpl:
   void OnContextUpdated(glic::GlicMediaContext* context);
-  void OnListenerDestroyed();
 
   // Returns whether `web_contents` should be excluded by origin checks.  This
   // includes subframes.
@@ -153,58 +147,10 @@ class GlicMediaIntegrationImpl : public glic::GlicMediaIntegration,
   void OnPrefChanged();
 
   PrefChangeRegistrar pref_change_registrar_;
-  raw_ptr<captions::CaptionControllerBase::Listener> listener_ = nullptr;
 
   base::WeakPtrFactory<GlicMediaIntegrationImpl> weak_ptr_factory_{this};
 };
 
-class CaptionListenerImpl : public captions::CaptionControllerBase::Listener {
- public:
-  explicit CaptionListenerImpl(
-      base::WeakPtr<GlicMediaIntegrationImpl> integration)
-      : integration_(integration) {}
-  ~CaptionListenerImpl() override {
-    if (integration_) {
-      integration_->OnListenerDestroyed();
-    }
-  }
-
-  bool OnTranscription(content::RenderFrameHost* rfh,
-                       captions::CaptionBubbleContext*,
-                       const media::SpeechRecognitionResult& result) override {
-    if (!rfh) {
-      return false;
-    }
-
-    auto* web_contents = content::WebContents::FromRenderFrameHost(rfh);
-    auto* integration = static_cast<GlicMediaIntegrationImpl*>(
-        glic::GlicMediaIntegration::GetFor(web_contents));
-    CHECK(integration);
-
-    if (integration->IsExcludedByOrigin(web_contents)) {
-      return false;
-    }
-
-    bool continue_transcribing = false;
-    if (auto* context =
-            glic::GlicMediaContext::GetOrCreateForCurrentDocument(rfh)) {
-      continue_transcribing = context->OnResult(result);
-      integration->OnContextUpdated(context);
-    }
-
-    return continue_transcribing;
-  }
-
-  void OnAudioStreamEnd(content::RenderFrameHost*,
-                        captions::CaptionBubbleContext*) override {}
-  void OnLanguageIdentificationEvent(
-      content::RenderFrameHost*,
-      captions::CaptionBubbleContext*,
-      const media::mojom::LanguageIdentificationEventPtr&) override {}
-
- private:
-  base::WeakPtr<GlicMediaIntegrationImpl> integration_;
-};
 
 GlicMediaIntegrationImpl::GlicMediaIntegrationImpl(Profile* profile)
     : profile_(profile) {
@@ -248,27 +194,14 @@ void GlicMediaIntegrationImpl::Initialize() {
 void GlicMediaIntegrationImpl::OnPrefChanged() {
   bool enabled = profile_->GetPrefs()->GetBoolean(
       glic::prefs::kGlicMediaUnderstandingEnabled);
-  auto* lc = captions::LiveCaptionControllerFactory::GetForProfile(profile_);
-  if (enabled) {
-    if (!listener_) {
-      auto listener =
-          std::make_unique<CaptionListenerImpl>(weak_ptr_factory_.GetWeakPtr());
-      listener_ = listener.get();
-      lc->AddListener(std::move(listener));
-    }
-  } else {
-    if (listener_) {
-      lc->RemoveSoon(listener_);
-      listener_ = nullptr;
-
-      // Discard all transcripts when disabled.
-      for (base::LinkNode<glic::GlicMediaPageCache::Entry>* node =
-               page_cache_.head();
-           node != page_cache_.end(); node = node->next()) {
-        auto* entry = static_cast<glic::GlicMediaPageCache::Entry*>(node);
-        auto* context = static_cast<glic::GlicMediaContext*>(entry);
-        context->ClearAllTranscripts();
-      }
+  if (!enabled) {
+    // Discard all transcripts when disabled.
+    for (base::LinkNode<glic::GlicMediaPageCache::Entry>* node =
+             page_cache_.head();
+         node != page_cache_.end(); node = node->next()) {
+      auto* entry = static_cast<glic::GlicMediaPageCache::Entry*>(node);
+      auto* context = static_cast<glic::GlicMediaContext*>(entry);
+      context->ClearAllTranscripts();
     }
   }
 }
@@ -381,9 +314,6 @@ void GlicMediaIntegrationImpl::OnContextUpdated(
   page_cache_.PlaceAtFront(context);
 }
 
-void GlicMediaIntegrationImpl::OnListenerDestroyed() {
-  listener_ = nullptr;
-}
 
 void GlicMediaIntegrationImpl::OnPeerConnectionAddedForTesting(
     content::RenderFrameHost* rfh) {
@@ -433,26 +363,8 @@ GlicMediaIntegration* GlicMediaIntegration::GetFor(
 }
 
 GlicMediaIntegration* GlicMediaIntegration::GetFor(Profile* profile) {
-  if (!profile) {
-    return nullptr;
-  }
-
-  // This should also check the pref, once it's not toggled automatically.
-  // We'll want to install a pref listener, and possibly clean up if the pref
-  // is switched off after construction.
-  if (!captions::IsHeadlessCaptionFeatureSupported()) {
-    return nullptr;
-  }
-
-  auto* data = static_cast<GlicMediaIntegrationImpl*>(
-      profile->GetUserData(kGlicMediaIntegrationKey));
-  if (!data) {
-    auto new_data = std::make_unique<GlicMediaIntegrationImpl>(profile);
-    data = new_data.get();
-    profile->SetUserData(kGlicMediaIntegrationKey, std::move(new_data));
-  }
-
-  return data;
+  // The transcript source was removed with the speech recognition surface.
+  return nullptr;
 }
 
 }  // namespace glic

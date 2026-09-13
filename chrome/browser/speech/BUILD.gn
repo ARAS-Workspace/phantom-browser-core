@@ -3,15 +3,10 @@
 # found in the LICENSE file.
 
 import("//build/config/features.gni")
-import("//components/soda/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 source_set("speech") {
-  public = [
-    "chrome_speech_recognition_manager_delegate.h",
-    "on_device_speech_recognition_impl.h",
-    "on_device_speech_recognition_util.h",
-  ]
+  public = []
 
   public_deps = [
     "//base",
@@ -21,20 +16,12 @@ source_set("speech") {
   ]
 
   if (!is_android) {
-    public += [
-      "chrome_speech_recognition_service.h",
-      "speech_recognition_client_browser_interface.h",
-      "speech_recognition_client_browser_interface_factory.h",
-      "speech_recognition_service.h",
-      "speech_recognition_service_factory.h",
-    ]
+    public += []
 
     public_deps += [
       "//chrome/browser/profiles:profile",
       "//components/optimization_guide/core:model_execution",
       "//components/optimization_guide/core:ondevice",
-      "//components/soda",
-      "//components/soda:constants",
       "//media/mojo/mojom",
       "//media/mojo/mojom:speech_recognition",
     ]
@@ -57,11 +44,7 @@ source_set("speech") {
 source_set("impl") {
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 
-  sources = [
-    "chrome_speech_recognition_manager_delegate.cc",
-    "on_device_speech_recognition_impl.cc",
-    "on_device_speech_recognition_util.cc",
-  ]
+  sources = []
 
   deps = [
     ":speech",
@@ -70,7 +53,6 @@ source_set("impl") {
     "//chrome/browser/component_updater",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile_manager",
-    "//chrome/services/speech/buildflags",
     "//components/language/core/browser",
     "//components/user_prefs",
     "//content/public/browser",
@@ -80,26 +62,15 @@ source_set("impl") {
   ]
 
   if (!is_android) {
-    sources += [
-      "chrome_speech_recognition_service.cc",
-      "speech_recognition_client_browser_interface.cc",
-      "speech_recognition_client_browser_interface_factory.cc",
-      "speech_recognition_service_factory.cc",
-    ]
+    sources += []
 
     deps += [
-      "//chrome/browser/accessibility/live_caption",
       "//chrome/browser/content_settings:content_settings_factory",
       "//chrome/browser/profiles:profile",
       "//components/content_settings/core/browser",
       "//components/keyed_service/content",
       "//components/keyed_service/core",
-      "//components/live_caption:constants",
-      "//components/live_caption:utils",
       "//components/prefs",
-      "//components/soda",
-      "//components/soda:constants",
-      "//components/soda:utils",
     ]
   }
 
@@ -120,14 +91,8 @@ source_set("impl") {
 if (!is_android) {
   source_set("test_support") {
     testonly = true
-    public = [
-      "fake_speech_recognition_service.h",
-      "fake_speech_recognizer.h",
-    ]
-    sources = [
-      "fake_speech_recognition_service.cc",
-      "fake_speech_recognizer.cc",
-    ]
+    public = []
+    sources = []
     public_deps = [
       ":speech",
       "//base",
@@ -144,7 +109,7 @@ if (!is_android) {
 
   source_set("unit_tests") {
     testonly = true
-    sources = [ "speech_recognition_service_factory_unittest.cc" ]
+    sources = []
     deps = [
       ":speech",
       "//base",
@@ -158,7 +123,7 @@ if (!is_android) {
   source_set("browser_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "speech_recognition_browsertest.cc" ]
+    sources = []
     deps = [
       ":speech",
       ":test_support",
@@ -185,38 +150,7 @@ if (!is_android) {
     if (!is_linux || target_cpu != "arm64") {
       # SODA doesn't support Linux on Arm64.
       if (is_win || is_mac || is_linux) {
-        sources += [ "on_device_speech_recognition_impl_browsertest.cc" ]
-        deps += [
-          "//chrome/browser/browsing_data:constants",
-          "//components/live_caption:utils",
-          "//components/soda",
-        ]
-      }
-    }
-
-    if (enable_soda_integration_tests) {
-      sources += [ "speech_recognition_service_browsertest.cc" ]
-      deps += [
-        "//chrome/browser:browser_process",
-        "//chrome/common:constants",
-        "//chrome/services/speech:lib",
-        "//chrome/services/speech/soda",
-        "//components/metrics",
-        "//components/prefs",
-        "//components/soda",
-        "//components/soda:constants",
-        "//sandbox/policy",
-        "//services/audio/public/cpp",
-        "//services/audio/public/cpp:test_support",
-      ]
-      if (is_mac) {
-        data_deps = [ "//third_party/soda-mac64:soda_resources" ]
-      } else if (is_win && target_cpu == "x86") {
-        data_deps = [ "//third_party/soda-win32:soda_resources" ]
-      } else if (is_win && target_cpu == "x64") {
-        data_deps = [ "//third_party/soda-win64:soda_resources" ]
-      } else {
-        data_deps = [ "//third_party/soda:soda_resources" ]
+        deps += [ "//chrome/browser/browsing_data:constants" ]
       }
     }
 

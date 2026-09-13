@@ -3,7 +3,6 @@ include_rules = [
   "+components/optimization_guide/proto",
   "+components/optimization_guide/public/mojom",
   "+components/speech",
-  "+components/soda",
   "+media/mojo/mojom",
 ]
 

@@ -25,11 +25,6 @@ class ContentBrowserTestContentBrowserClient
   void OnNetworkServiceCreated(
       network::mojom::NetworkService* network_service) override;
 
-  media::mojom::AvailabilityStatus
-  GetOnDeviceSpeechRecognitionAvailabilityStatus(
-      BrowserContext* context,
-      const std::string& language,
-      media::mojom::SpeechRecognitionQuality quality) override;
 };
 
 }  // namespace content

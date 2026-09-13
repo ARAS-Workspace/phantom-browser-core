@@ -324,8 +324,7 @@
 #include "chrome/browser/webauthn/chrome_authenticator_request_delegate.h"
 #include "components/headless/policy/headless_mode_prefs.h"  // nogncheck crbug.com/40147906
 #include "components/lens/lens_overlay_permission_utils.h"
-#include "components/live_caption/live_caption_controller.h"
-#include "components/live_caption/live_translate_controller.h"
+#include "components/live_caption/pref_names.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
@@ -1224,7 +1223,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   performance_manager::user_tuning::prefs::RegisterLocalStatePrefs(registry);
   PerformanceInterventionMetricsReporter::RegisterLocalStatePrefs(registry);
   RegisterBrowserPrefs(registry);
-  speech::SodaInstaller::RegisterLocalStatePrefs(registry);
   StartupBrowserCreator::RegisterLocalStatePrefs(registry);
   task_manager::TaskManagerInterface::RegisterPrefs(registry);
   UpgradeDetector::RegisterPrefs(registry);
@@ -1568,8 +1566,24 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   bookmarks_webui::RegisterProfilePrefs(registry);
   browser_sync::ForeignSessionHandler::RegisterProfilePrefs(registry);
   BrowserUserEducationStorageService::RegisterProfilePrefs(registry);
-  captions::LiveCaptionController::RegisterProfilePrefs(registry);
-  captions::LiveTranslateController::RegisterProfilePrefs(registry);
+  registry->RegisterBooleanPref(
+      prefs::kLiveCaptionBubbleExpanded, false,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterBooleanPref(
+      prefs::kLiveCaptionEnabled, false,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterBooleanPref(
+      prefs::kLiveCaptionMaskOffensiveWords, false,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterBooleanPref(prefs::kHeadlessCaptionEnabled, false,
+                                /*flags=*/0);
+  registry->RegisterStringPref(prefs::kLiveCaptionLanguageCode, "en-US",
+                               user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterListPref(
+      prefs::kLiveCaptionMediaFoundationRendererErrorSilenced,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterBooleanPref(prefs::kLiveTranslateEnabled, false);
+  registry->RegisterStringPref(prefs::kLiveTranslateTargetLanguageCode, "en");
   ChromeAuthenticatorRequestDelegate::RegisterProfilePrefs(registry);
   commerce::CommerceUiTabHelper::RegisterProfilePrefs(registry);
   first_run::RegisterProfilePrefs(registry);

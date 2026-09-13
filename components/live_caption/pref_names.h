@@ -9,9 +9,6 @@
 
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "components/soda/constants.h"
-#endif
 
 class PrefService;
 
@@ -48,9 +45,6 @@ inline constexpr char kLiveCaptionMediaFoundationRendererErrorSilenced[] =
 inline constexpr char kHeadlessCaptionEnabled[] =
     "accessibility.captions.headless_caption_enabled";
 
-const std::string GetLiveCaptionLanguageCode(PrefService* profile_prefs);
-bool IsLanguageCodeForLiveCaption(speech::LanguageCode language_code,
-                                  PrefService* profile_prefs);
 
 #endif  // !defined(ANDROID)
 

@@ -682,8 +682,6 @@ static_library("test_support") {
       "../browser/speech/fake_speech_recognition_manager_delegate.cc",
       "../browser/speech/fake_speech_recognition_manager_delegate.h",
     ]
-    deps += [ "//components/soda" ]
-    public_deps += [ "//components/soda:test_support" ]
 
     if (is_win) {
       sources += [
@@ -1047,10 +1045,7 @@ static_library("browsertest_support") {
   if (is_android) {
     deps += [ "//content/public/app" ]
   } else {
-    deps += [
-      "//components/soda:utils",
-      "//content/public/browser",
-    ]
+    deps += [ "//content/public/browser" ]
   }
 
   if (use_aura && toolkit_views) {
@@ -2192,7 +2187,6 @@ test("content_browsertests") {
       "../browser/zoom_browsertest.cc",
     ]
     deps += [
-      "//components/soda:utils",
       "//device/fido:mocks",
       "//media/mojo/mojom:web_speech_recognition",
     ]
@@ -3414,16 +3408,10 @@ test("content_unittests") {
       "//media/mojo/mojom:web_speech_recognition",
     ]
 
-    sources += [
-      "../browser/speech/on_device_speech_recognition_engine_unittest.cc",
-      "../browser/speech/soda_speech_recognition_engine_impl_unittest.cc",
-      "../browser/speech/speech_recognition_dispatcher_host_unittest.cc",
-      "../browser/speech/speech_recognition_manager_impl_unittest.cc",
-    ]
+    sources +=
+        [ "../browser/speech/speech_recognition_dispatcher_host_unittest.cc" ]
     deps += [
       "//components/optimization_guide/core:ondevice",
-      "//components/soda:constants",
-      "//components/soda:utils",
       "//media/mojo/mojom:speech_recognition",
     ]
   }

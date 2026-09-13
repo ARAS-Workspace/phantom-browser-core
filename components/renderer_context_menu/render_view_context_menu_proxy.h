@@ -111,8 +111,6 @@ class RenderViewContextMenuProxy {
   // Removes separator (if any) before the specified context menu item.
   virtual void RemoveSeparatorBeforeMenuItem(int command_id) = 0;
 
-  // Add accessibility labels service item to the context menu.
-  virtual void AddAccessibilityLabelsServiceItem(bool is_checked) = 0;
 
   // Retrieve the given associated objects with a context menu.
   virtual content::RenderFrameHost* GetRenderFrameHost() const = 0;

@@ -60,14 +60,9 @@ source_set("component_updater") {
     public += [
       "dictation_connector_component_installer.h",
       "iwa_key_distribution_component_installer.h",
-      "soda_component_installer.h",
-      "soda_language_pack_component_installer.h",
       "zxcvbn_data_component_installer.h",
     ]
-    public_deps += [
-      "//components/soda",
-      "//components/soda:constants",
-    ]
+    public_deps += []
   }
 
   if (!is_android) {
@@ -186,8 +181,6 @@ source_set("impl") {
     sources += [
       "dictation_connector_component_installer.cc",
       "iwa_key_distribution_component_installer.cc",
-      "soda_component_installer.cc",
-      "soda_language_pack_component_installer.cc",
       "zxcvbn_data_component_installer.cc",
     ]
     deps += [
@@ -197,7 +190,6 @@ source_set("impl") {
       "//chrome/browser/ui/read_anything",
       "//components/live_caption:constants",
       "//components/live_caption:utils",
-      "//components/soda:constants",
       "//components/webapps/isolated_web_apps",
       "//third_party/zxcvbn-cpp",
     ]
@@ -320,8 +312,6 @@ source_set("unit_tests") {
     sources += [
       "captcha_provider_component_installer_unittest.cc",
       "dictation_connector_component_installer_unittest.cc",
-      "soda_component_installer_unittest.cc",
-      "soda_language_pack_component_installer_unittest.cc",
       "zxcvbn_data_component_installer_unittest.cc",
     ]
     deps += [

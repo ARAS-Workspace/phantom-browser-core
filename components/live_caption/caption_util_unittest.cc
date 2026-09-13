@@ -63,22 +63,5 @@ TEST_F(CaptionUtilTest, CommandLineOverride) {
       ::switches::kForceCaptionStyle);
 }
 
-TEST_F(CaptionUtilTest, IsHeadlessCaptionFeatureSupportedReturnsFalse) {
-  base::test::ScopedFeatureList features;
-  features.InitAndDisableFeature(media::kHeadlessLiveCaption);
-  EXPECT_FALSE(IsHeadlessCaptionFeatureSupported());
-}
 
-TEST_F(CaptionUtilTest, IsHeadlessCaptionFeatureSupportedReturnsTrue) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeature(media::kHeadlessLiveCaption);
-  EXPECT_TRUE(IsHeadlessCaptionFeatureSupported());
-}
-TEST_F(CaptionUtilTest, ReturnsCorrectCaptionSettingsUrl) {
-#if BUILDFLAG(IS_LINUX)
-  EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://settings/captions");
-#elif BUILDFLAG(IS_MAC)
-  EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://settings/accessibility");
-#endif  // BUILDFLAG(IS_LINUX)
-}
 }  // namespace captions

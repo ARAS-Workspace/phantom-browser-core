@@ -1107,7 +1107,6 @@ source_set("impl") {
       "//chrome/browser/performance_manager/public/user_tuning",
       "//chrome/browser/web_applications",
       "//components/headless/policy",
-      "//components/live_caption",
     ]
 
     sources += [

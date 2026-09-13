@@ -6,7 +6,6 @@
 
 #include "base/strings/stringprintf.h"
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/accessibility/soda_installer_impl.h"
 #include "chrome/browser/media/router/chrome_media_router_factory.h"
 #include "chrome/browser/ui/global_media_controls/media_notification_service.h"
 #include "chrome/test/base/testing_profile.h"
@@ -48,7 +47,6 @@ class MediaDialogViewTest : public ChromeViewsTestBase {
         CreateTestWidget(views::Widget::InitParams::CLIENT_OWNS_WIDGET,
                          views::Widget::InitParams::TYPE_WINDOW);
     anchor_widget_->Show();
-    soda_installer_impl_ = std::make_unique<speech::SodaInstallerImpl>();
 
     MediaDialogView::ShowDialogFromToolbar(
         views::BubbleAnchor(anchor_widget_->GetContentsView()),
@@ -131,7 +129,6 @@ class MediaDialogViewTest : public ChromeViewsTestBase {
       global_media_controls::test::MockMediaSessionNotificationItemDelegate>
       delegate_;
   raw_ptr<media_router::MockMediaRouter> media_router_;
-  std::unique_ptr<speech::SodaInstallerImpl> soda_installer_impl_;
 };
 
 TEST_F(MediaDialogViewTest, BuildDeviceSelectorView_RemotePlaybackSource) {

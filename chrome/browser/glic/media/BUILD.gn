@@ -29,13 +29,9 @@ source_set("media") {
       "media_transcript_provider_impl.h",
     ]
     deps += [
-      "//chrome/browser/accessibility/live_caption",
       "//chrome/browser/glic:mojo_bindings",
       "//chrome/browser/media/webrtc",
       "//chrome/browser/picture_in_picture",
-      "//components/live_caption",
-      "//components/live_caption:constants",
-      "//components/live_caption:utils",
       "//components/optimization_guide/content/browser",
       "//components/optimization_guide/proto:optimization_guide_proto",
       "//services/media_session/public/cpp",
@@ -48,24 +44,18 @@ if (!is_android) {
     testonly = true
     sources = [
       "glic_media_context_unittest.cc",
-      "glic_media_integration_unittest.cc",
       "glic_media_link_helper_unittest.cc",
-      "glic_media_page_cache_unittest.cc",
       "media_transcript_provider_impl_unittest.cc",
     ]
     deps = [
       ":media",
       "//base/test:test_support",
-      "//chrome/browser/accessibility/live_caption",
       "//chrome/browser/glic",
       "//chrome/browser/glic/test_support",
       "//chrome/browser/prefs",
       "//chrome/test:test_support",
-      "//components/live_caption",
-      "//components/live_caption:constants",
       "//components/optimization_guide/content/browser",
       "//components/optimization_guide/content/browser:test_support",
-      "//components/soda",
       "//testing/gmock",
       "//testing/gtest",
     ]

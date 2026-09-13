@@ -1,6 +1,4 @@
 include_rules = [
-  "+components/live_caption",
-  "+components/soda",
   "+testing/gmock",
   "+testing/gtest",
 ]

@@ -172,8 +172,6 @@
 #include "components/lens/lens_metadata.mojom.h"
 #include "components/lens/lens_metrics.h"
 #include "components/lens/lens_overlay_invocation_source.h"
-#include "components/live_caption/caption_util.h"
-#include "components/live_caption/pref_names.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
@@ -982,7 +980,6 @@ RenderViewContextMenu::RenderViewContextMenu(
           ProtocolHandlerRegistryFactory::GetForBrowserContext(GetProfile())),
       inspect_submenu_model_(this),
       video_frame_submenu_model_(this),
-      accessibility_labels_submenu_model_(this),
       embedder_web_contents_(GetWebContentsToUse(&render_frame_host)),
       autofill_context_menu_manager_(this, &menu_model_),
       is_paste_enabled_(is_paste_enabled),
@@ -1382,15 +1379,6 @@ void RenderViewContextMenu::InitMenu() {
     AppendCurrentExtensionItems();
   }
 
-  // Accessibility label items are appended to all menus (with the exception of
-  // within the dev tools and PDF Viewer) when a screen reader is enabled. It
-  // can be difficult to open a specific context menu with a screen reader, so
-  // this is a UX approved solution.
-  bool added_accessibility_labels_items = false;
-  if (!IsDevToolsURL(params_.page_url) &&
-      !IsFrameInPdfViewer(GetRenderFrameHost())) {
-    added_accessibility_labels_items = AppendAccessibilityLabelsItems();
-  }
 
   if (content_type_->SupportsGroup(
           ContextMenuContentType::ITEM_GROUP_DEVELOPER)) {
@@ -1414,14 +1402,6 @@ void RenderViewContextMenu::InitMenu() {
     menu_model_.RemoveItemAt(count - 1);
   }
 
-  // If there is only one item and it is the Accessibility labels item, remove
-  // it. We only show this item when it is not the only item.
-  // Note that the separator added in AppendAccessibilityLabelsItems will not
-  // actually be added if this is the first item in the list, so we don't need
-  // to check for or remove the initial separator.
-  if (added_accessibility_labels_items && menu_model_.GetItemCount() == 1) {
-    menu_model_.RemoveItemAt(0);
-  }
 
   // Always add read write cards UI last, as it is rendered next to the context
   // menu, meaning that each menu item added/removed in this function will cause
@@ -2298,7 +2278,6 @@ void RenderViewContextMenu::AppendPageItems() {
                                     IDS_CONTENT_CONTEXT_SAVEPAGEAS);
     menu_model_.AddItemWithStringId(IDC_PRINT, IDS_CONTENT_CONTEXT_PRINT);
 
-    AppendLiveCaptionItem();
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
 
     if (!glic_below_search) {
@@ -2355,7 +2334,6 @@ void RenderViewContextMenu::AppendPageItems() {
   menu_model_.AddItemWithStringId(IDC_SAVE_PAGE,
                                   IDS_CONTENT_CONTEXT_SAVEPAGEAS);
   menu_model_.AddItemWithStringId(IDC_PRINT, IDS_CONTENT_CONTEXT_PRINT);
-  AppendLiveCaptionItem();
 
   if (features::IsReadAnythingMenuShuffleExperimentEnabled()) {
     if (IsRegionSearchEnabled()) {
@@ -2802,16 +2780,6 @@ void RenderViewContextMenu::AppendLanguageSettings() {
                                   IDS_CONTENT_CONTEXT_LANGUAGE_SETTINGS);
 }
 
-bool RenderViewContextMenu::AppendAccessibilityLabelsItems() {
-  menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
-  if (!accessibility_labels_menu_observer_) {
-    accessibility_labels_menu_observer_ =
-        std::make_unique<AccessibilityLabelsMenuObserver>(this);
-  }
-  observers_.AddObserver(accessibility_labels_menu_observer_.get());
-  accessibility_labels_menu_observer_->InitMenu(params_);
-  return accessibility_labels_menu_observer_->ShouldShowLabelsItem();
-}
 
 void RenderViewContextMenu::AppendDictationItems() {
   if (!base::FeatureList::IsEnabled(dictation::kDictation)) {
@@ -2923,16 +2891,6 @@ void RenderViewContextMenu::AppendRegionSearchItem() {
   }
 }
 
-void RenderViewContextMenu::AppendLiveCaptionItem() {
-  if (captions::IsLiveCaptionFeatureSupported() &&
-      base::FeatureList::IsEnabled(media::kLiveCaptionRightClick)) {
-    PrefService* prefs = GetPrefs(browser_context_);
-    int string_id = prefs->GetBoolean(prefs::kLiveCaptionEnabled)
-                        ? IDS_CONTENT_CONTEXT_LIVE_CAPTION_DISABLE
-                        : IDS_CONTENT_CONTEXT_LIVE_CAPTION_ENABLE;
-    menu_model_.AddItemWithStringId(IDC_LIVE_CAPTION, string_id);
-  }
-}
 
 // Menu delegate functions -----------------------------------------------------
 
@@ -2990,9 +2948,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
 
     case IDC_RELOAD:
       return IsReloadEnabled();
-
-    case IDC_LIVE_CAPTION:
-      return true;
 
     case IDC_VIEW_SOURCE:
     case IDC_CONTENT_CONTEXT_VIEWFRAMESOURCE:
@@ -3577,10 +3532,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       chrome::Reload(GetBrowser(), WindowOpenDisposition::CURRENT_TAB);
       break;
 
-    case IDC_LIVE_CAPTION:
-      ExecLiveCaption();
-      break;
-
     case IDC_CONTENT_CONTEXT_RELOAD_PACKAGED_APP:
       ExecReloadPackagedApp();
       break;
@@ -3782,26 +3733,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
   }
 }
 
-void RenderViewContextMenu::AddAccessibilityLabelsServiceItem(bool is_checked) {
-  if (is_checked) {
-    menu_model_.AddCheckItemWithStringId(
-        IDC_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_TOGGLE,
-        IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_MENU_OPTION);
-  } else {
-    // Add the submenu if the whole feature is not enabled.
-    accessibility_labels_submenu_model_.AddItemWithStringId(
-        IDC_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_TOGGLE,
-        IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_SEND);
-    accessibility_labels_submenu_model_.AddItemWithStringId(
-        IDC_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_TOGGLE_ONCE,
-        IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_SEND_ONCE);
-    menu_model_.AddSubMenu(
-        kAccessibilityLabelsMenuId,
-        l10n_util::GetStringUTF16(
-            IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_MENU_OPTION),
-        &accessibility_labels_submenu_model_);
-  }
-}
 
 // static
 void RenderViewContextMenu::RegisterMenuShownCallbackForTesting(
@@ -4868,13 +4799,6 @@ void RenderViewContextMenu::ExecSearchForVideoFrame(int event_flags,
                      is_lens_query));
 }
 
-void RenderViewContextMenu::ExecLiveCaption() {
-  PrefService* prefs = GetPrefs(browser_context_);
-  bool is_enabled = !prefs->GetBoolean(prefs::kLiveCaptionEnabled);
-  prefs->SetBoolean(prefs::kLiveCaptionEnabled, is_enabled);
-  base::UmaHistogramBoolean("Accessibility.LiveCaption.EnableFromContextMenu",
-                            is_enabled);
-}
 
 void RenderViewContextMenu::ExecRotateCW() {
   base::RecordAction(UserMetricsAction("PluginContextMenu_RotateClockwise"));

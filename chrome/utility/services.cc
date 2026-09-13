@@ -62,11 +62,6 @@
 #include "chrome/services/redirection/redirection_service.h"
 #endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
 
-#if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
-#include "chrome/services/speech/speech_recognition_service_impl.h"  // nogncheck
-#include "media/mojo/mojom/speech_recognition_service.mojom.h"  // nogncheck
-#endif  // BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
-
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
 #include "chrome/services/file_util/file_util_service.h"  // nogncheck
 #endif
@@ -202,13 +197,6 @@ auto RunPassageEmbeddingsService(
       std::move(receiver));
 }
 
-#if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
-auto RunSpeechRecognitionService(
-    mojo::PendingReceiver<media::mojom::SpeechRecognitionService> receiver) {
-  return std::make_unique<speech::SpeechRecognitionServiceImpl>(
-      std::move(receiver));
-}
-#endif  // !BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
 
 #if !BUILDFLAG(IS_ANDROID)
 
@@ -339,9 +327,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunRedirectionService);
 #endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
 
-#if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
-  services.Add(RunSpeechRecognitionService);
-#endif  // !BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   services.Add(RunSystemSignalsService);

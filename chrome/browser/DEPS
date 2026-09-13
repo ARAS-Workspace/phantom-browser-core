@@ -200,7 +200,6 @@ include_rules = [
   "+components/lens",
   "+components/leveldb_proto/public",
   "+components/leveldb_proto/testing",
-  "+components/live_caption",
   "+components/local_state",
   "+components/location/android",
   "+components/lookalikes/core",
@@ -349,7 +348,6 @@ include_rules = [
   "+components/site_engagement",
   "+components/site_isolation",
   "+components/skills",
-  "+components/soda",
   "+components/spellcheck",
   "+components/split_tabs",
   "+components/sqlite_proto",
@@ -505,7 +503,6 @@ include_rules = [
   "+third_party/tflite_support",
   "+third_party/widevine/cdm/buildflags.h",
   "+third_party/widevine/cdm/widevine_cdm_common.h",
-  "+chrome/services/speech",
   "+ui/edge_to_edge",
 
   # Code under //ash should be accessed via its public API. See //ash/README.md.

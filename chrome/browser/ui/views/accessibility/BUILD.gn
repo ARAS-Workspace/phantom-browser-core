@@ -9,8 +9,6 @@ assert(toolkit_views)
 
 source_set("accessibility") {
   public = [
-    "caption_bubble_context_views.h",
-    "caption_bubble_session_observer_views.h",
     "caret_browsing_dialog_delegate.h",
     "non_accessible_image_view.h",
     "theme_tracking_non_accessible_image_view.h",
@@ -19,7 +17,6 @@ source_set("accessibility") {
   public_deps = [
     "//base",
     "//chrome/browser/accessibility",
-    "//components/live_caption",
     "//content/public/browser",
     "//ui/base",
     "//ui/gfx",
@@ -35,8 +32,6 @@ source_set("accessibility") {
 
 source_set("impl") {
   sources = [
-    "caption_bubble_context_views.cc",
-    "caption_bubble_session_observer_views.cc",
     "caret_browsing_dialog_delegate.cc",
     "non_accessible_image_view.cc",
     "theme_tracking_non_accessible_image_view.cc",
@@ -143,7 +138,7 @@ if (!is_android) {
   source_set("interactive_ui_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "caption_bubble_controller_views_browsertest.cc" ]
+    sources = []
     deps = [
       ":accessibility",
       "//base/test:test_support",
@@ -152,7 +147,6 @@ if (!is_android) {
       "//chrome/test:test_support_ui",
       "//components/live_caption:constants",
       "//components/on_device_translation/buildflags",
-      "//components/soda",
       "//ui/views:test_support",
     ]
 

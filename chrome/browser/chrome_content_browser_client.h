@@ -494,15 +494,8 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
                        bool user_gesture,
                        bool opener_suppressed,
                        bool* no_javascript_access) override;
-  content::SpeechRecognitionManagerDelegate*
-  CreateSpeechRecognitionManagerDelegate() override;
   std::unique_ptr<optimization_guide::ModelBrokerClient>
   CreateModelBrokerClient(content::BrowserContext* browser_context) override;
-  media::mojom::AvailabilityStatus
-  GetOnDeviceSpeechRecognitionAvailabilityStatus(
-      content::BrowserContext* context,
-      const std::string& language,
-      media::mojom::SpeechRecognitionQuality quality) override;
   void MaybeOverrideManifest(content::RenderFrameHost* render_frame_host,
                              blink::mojom::ManifestPtr& manifest) override;
   content::TtsPlatform* GetTtsPlatform() override;

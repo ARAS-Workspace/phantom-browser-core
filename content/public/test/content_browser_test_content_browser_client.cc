@@ -11,7 +11,6 @@
 #include "media/mojo/mojom/speech_recognizer.mojom.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "components/soda/soda_util.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
@@ -46,16 +45,5 @@ void ContentBrowserTestContentBrowserClient::OnNetworkServiceCreated(
   // TODO(crbug.com/41494161): Remove this override once the flakiness is fixed.
 }
 
-media::mojom::AvailabilityStatus ContentBrowserTestContentBrowserClient::
-    GetOnDeviceSpeechRecognitionAvailabilityStatus(
-        BrowserContext* context,
-        const std::string& language,
-        media::mojom::SpeechRecognitionQuality quality) {
-#if BUILDFLAG(IS_ANDROID)
-  return media::mojom::AvailabilityStatus::kUnavailable;
-#else
-  return speech::GetSodaAvailabilityStatus(language);
-#endif  // BUILDFLAG(IS_ANDROID)
-}
 
 }  // namespace content

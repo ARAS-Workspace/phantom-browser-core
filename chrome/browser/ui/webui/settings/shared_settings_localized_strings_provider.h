@@ -20,7 +20,6 @@ void AddAxAnnotationsSectionStrings(content::WebUIDataSource* html_source);
 void AddCaptionSubpageStrings(content::WebUIDataSource* html_source);
 
 // Adds strings used by the <settings-live-caption> element.
-void AddLiveCaptionSectionStrings(content::WebUIDataSource* html_source);
 
 // Adds strings used by both <settings-sync-page> and <os-settings-sync-subpage>
 // elements.

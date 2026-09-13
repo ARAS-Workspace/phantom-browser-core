@@ -12,7 +12,6 @@
 #include "components/component_updater/component_updater_service.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/component_updater/soda_component_installer.h"
 #endif
 
 namespace component_updater {

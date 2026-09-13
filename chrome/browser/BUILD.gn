@@ -14,7 +14,6 @@ import("//build/config/ui.gni")
 import("//chrome/browser/buildflags.gni")
 import("//chrome/browser/downgrade/buildflags.gni")
 import("//chrome/common/features.gni")
-import("//chrome/services/speech/buildflags/buildflags.gni")
 import("//components/captive_portal/core/features.gni")
 import("//components/compose/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
@@ -879,7 +878,6 @@ source_set("core") {
     "//chrome/browser/webauthn:chrome_web_authentication_delegate",
     "//chrome/browser/webid",
     "//chrome/common:version_header",
-    "//chrome/services/speech/buildflags",
     "//components/activity_reporter",
     "//components/actor/core",
     "//components/actor/public/mojom:mojo_bindings",
@@ -937,8 +935,6 @@ source_set("core") {
     "//components/language/core/common",
     "//components/language_detection/content/browser",
     "//components/lens:buildflags",
-    "//components/live_caption:constants",
-    "//components/live_caption:utils",
     "//components/manta",
     "//components/media_device_salt",
     "//components/media_router/browser",
@@ -1059,7 +1055,6 @@ source_set("core") {
       ":chrome_process_singleton",
       ":intranet_redirect_detector",
       ":repost_form_warning_controller",
-      "//chrome/browser/accessibility/live_caption",
       "//chrome/browser/apps/app_service",
       "//chrome/browser/apps/app_service/publishers",
       "//chrome/browser/apps/link_capturing",
@@ -1094,9 +1089,6 @@ source_set("core") {
       "//chrome/browser/web_applications/isolated_web_apps",
       "//chrome/browser/webapps:desktop",
       "//components/keep_alive_registry",
-      "//components/soda",
-      "//components/soda:constants",
-      "//components/soda:utils",
       "//components/webapps/isolated_web_apps",
     ]
   }
@@ -1241,7 +1233,6 @@ source_set("core") {
       "//components/crash/core/app",
       "//components/crash/core/app:crash_export_thunk_include",
       "//components/device_signals/core/browser/win",
-      "//components/live_caption:utils",
       "//components/os_crypt/async/browser:dpapi_key_provider",
       "//components/stylus_handwriting/win",
       "//media/mojo/services",
@@ -2084,8 +2075,6 @@ source_set("browser") {
     "//components/language/core/common",
     "//components/lens",
     "//components/lens:enterprise_policy",
-    "//components/live_caption:constants",
-    "//components/live_caption:utils",
     "//components/lookalikes/core",
     "//components/manta",
     "//components/metrics:content",
@@ -2409,7 +2398,6 @@ source_set("browser") {
   } else {
     #!is_android
     deps += [
-      "//chrome/browser/accessibility/live_caption:impl",
       "//chrome/browser/dictation",
       "//chrome/browser/dictation:impl",
       "//chrome/browser/payments:impl",
@@ -2585,7 +2573,6 @@ source_set("browser") {
       "//components/headless/policy",
       "//components/image_fetcher/core",
       "//components/keep_alive_registry",
-      "//components/live_caption",
       "//components/manta",
       "//components/manta/proto",
       "//components/media_gallery_util",
@@ -2600,9 +2587,6 @@ source_set("browser") {
       "//components/safe_browsing/core/browser/realtime:url_lookup_service_base",
       "//components/services/app_service",
       "//components/shared_highlighting/core/common",
-      "//components/soda",
-      "//components/soda:constants",
-      "//components/soda:utils",
       "//components/ukm/content",
       "//components/unexportable_keys",
       "//components/user_education/common",

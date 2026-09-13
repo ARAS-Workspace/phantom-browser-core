@@ -131,7 +131,6 @@ class RenderViewContextMenu
   bool IsItemForCommandIdDynamic(int command_id) const override;
   std::u16string GetLabelForCommandId(int command_id) const override;
   ui::ImageModel GetIconForCommandId(int command_id) const override;
-  void AddAccessibilityLabelsServiceItem(bool is_checked) override;
 
   // Registers a one-time callback that will be called the next time a context
   // menu is shown.
@@ -304,9 +303,6 @@ class RenderViewContextMenu
   void AppendSpellingAndSearchSuggestionItems();
   void AppendOtherEditableItems();
   void AppendLanguageSettings();
-  // Returns true if the items were appended. This might not happen in all
-  // cases, e.g. these are only appended if a screen reader is enabled.
-  bool AppendAccessibilityLabelsItems();
   void AppendDictationItems();
   void AppendSearchProvider();
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -322,7 +318,6 @@ class RenderViewContextMenu
   void AppendProtocolHandlerSubMenu();
   void AppendSharingItems();
   void AppendRegionSearchItem();
-  void AppendLiveCaptionItem();
   void AppendSendTabToSelfItem(bool add_separator);
   bool AppendQRCodeGeneratorItem(bool for_image,
                                  bool draw_icon,
@@ -389,7 +384,6 @@ class RenderViewContextMenu
   void ExecSaveVideoFrameAs();
   void ExecCopyVideoFrame();
   void ExecSearchForVideoFrame(int event_flags, bool is_lens_query);
-  void ExecLiveCaption();
   void ExecRotateCW();
   void ExecRotateCCW();
   void ExecReloadPackagedApp();
@@ -504,9 +498,6 @@ class RenderViewContextMenu
   ui::SimpleMenuModel video_frame_submenu_model_;
 
   // An observer that handles accessibility labels items.
-  std::unique_ptr<AccessibilityLabelsMenuObserver>
-      accessibility_labels_menu_observer_;
-  ui::SimpleMenuModel accessibility_labels_submenu_model_;
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
   // An observer that disables menu items when print preview is active.

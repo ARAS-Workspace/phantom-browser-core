@@ -35,9 +35,6 @@
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "components/soda/soda_util.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 
@@ -207,16 +204,7 @@ void SpeechRecognitionDispatcherHost::StartRequestOnUI(
           params->language,
           GetContentClient()->browser()->GetAcceptLangs(browser_context));
 
-#if !BUILDFLAG(IS_ANDROID)
-  bool on_device_available =
-      GetContentClient()
-          ->browser()
-          ->GetOnDeviceSpeechRecognitionAvailabilityStatus(
-              browser_context, language, params->quality) ==
-      media::mojom::AvailabilityStatus::kAvailable;
-#else
   bool on_device_available = false;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   GetIOThreadTaskRunner({})->PostTask(
       FROM_HERE,

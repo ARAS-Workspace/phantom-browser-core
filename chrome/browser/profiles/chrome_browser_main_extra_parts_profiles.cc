@@ -354,8 +354,6 @@
 #endif
 #else  // !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/accessibility/ax_main_node_annotator_controller_factory.h"
-#include "chrome/browser/accessibility/live_caption/live_caption_controller_factory.h"
-#include "chrome/browser/accessibility/live_caption/live_translate_controller_factory.h"
 #include "chrome/browser/accessibility/phrase_segmentation/dependency_parser_model_loader_factory.h"
 #include "chrome/browser/accessibility/tree_fixing/ax_tree_fixing_services_router_factory.h"
 #include "chrome/browser/accessibility_annotator/content_annotator/content_annotator_service_factory.h"
@@ -383,8 +381,6 @@
 #include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
 #include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service_factory.h"
-#include "chrome/browser/speech/speech_recognition_client_browser_interface_factory.h"
-#include "chrome/browser/speech/speech_recognition_service_factory.h"
 #include "chrome/browser/storage/storage_notification_service_factory.h"
 #include "chrome/browser/ui/browser_manager_service_factory.h"
 #include "chrome/browser/ui/desktop_to_mobile_promos/ios_promo_trigger_service_factory.h"
@@ -751,10 +747,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   BulkLeakCheckServiceFactory::GetInstance();
 #endif  // !BUILDFLAG(IS_ANDROID)
 #if !BUILDFLAG(IS_ANDROID)
-  captions::LiveCaptionControllerFactory::GetInstance();
-  if (media::IsLiveTranslateEnabled()) {
-    captions::LiveTranslateControllerFactory::GetInstance();
-  }
 #endif
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
   CaptivePortalServiceFactory::GetInstance();
@@ -1303,8 +1295,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   }
   skills::SkillsServiceFactory::GetInstance();
 #if !BUILDFLAG(IS_ANDROID)
-  SpeechRecognitionClientBrowserInterfaceFactory::EnsureFactoryBuilt();
-  SpeechRecognitionServiceFactory::EnsureFactoryBuilt();
 #endif
 #if BUILDFLAG(ENABLE_SPELLCHECK)
   SpellcheckServiceFactory::GetInstance();

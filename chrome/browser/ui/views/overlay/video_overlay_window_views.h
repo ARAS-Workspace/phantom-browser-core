@@ -37,8 +37,6 @@ class CloseImageButton;
 class HangUpButton;
 class OverlayControlsFadeAnimation;
 class OverlayWindowBackToTabButton;
-class OverlayWindowLiveCaptionButton;
-class OverlayWindowLiveCaptionDialog;
 class OverlayWindowMinimizeButton;
 class PictureInPictureTucker;
 class PlaybackImageButton;
@@ -159,9 +157,6 @@ class VideoOverlayWindowViews : public content::VideoOverlayWindow,
   // true if the controls were shown.
   bool ShowControlsForGestureIfNecessary(ui::GestureEvent* event);
 
-  // Hides the live caption dialog on a gesture tap if it's shown and the tap is
-  // outside of the dialog. Returns true if the dialog was hidden.
-  bool HideLiveCaptionDialogForGestureIfNecessary(ui::GestureEvent* event);
 
   // Returns true if the controls (e.g. close button, play/pause button) are
   // visible.
@@ -188,8 +183,6 @@ class VideoOverlayWindowViews : public content::VideoOverlayWindow,
   gfx::Rect GetToggleCameraButtonBounds();
   gfx::Rect GetHangUpButtonBounds();
   gfx::Rect GetProgressViewBounds();
-  gfx::Rect GetLiveCaptionButtonBounds();
-  gfx::Rect GetLiveCaptionDialogBounds();
   gfx::Rect GetToggleMuteButtonBounds();
 
   PlaybackImageButton* play_pause_controls_view_for_testing() const;
@@ -206,8 +199,6 @@ class VideoOverlayWindowViews : public content::VideoOverlayWindow,
   global_media_controls::MediaProgressView* progress_view_for_testing() const;
   views::Label* timestamp_for_testing() const;
   views::Label* live_status_for_testing() const;
-  OverlayWindowLiveCaptionButton* live_caption_button_for_testing() const;
-  OverlayWindowLiveCaptionDialog* live_caption_dialog_for_testing() const;
   views::ImageView* favicon_view_for_testing() const;
   views::Label* origin_for_testing() const;
   CloseImageButton* close_button_for_testing() const;
@@ -359,8 +350,6 @@ class VideoOverlayWindowViews : public content::VideoOverlayWindow,
   void UpdateTimestampLabel(base::TimeDelta current_time,
                             base::TimeDelta duration);
 
-  void OnLiveCaptionButtonPressed();
-  void SetLiveCaptionDialogVisibility(bool wanted_visibility);
 
   void OnFaviconReceived(const SkBitmap& image);
   void UpdateFavicon(const gfx::ImageSkia& favicon);
@@ -483,8 +472,6 @@ class VideoOverlayWindowViews : public content::VideoOverlayWindow,
   raw_ptr<global_media_controls::MediaProgressView> progress_view_ = nullptr;
   raw_ptr<views::Label> timestamp_ = nullptr;
   raw_ptr<views::Label> live_status_ = nullptr;
-  raw_ptr<OverlayWindowLiveCaptionButton> live_caption_button_ = nullptr;
-  raw_ptr<OverlayWindowLiveCaptionDialog> live_caption_dialog_ = nullptr;
   raw_ptr<AutoPipSettingOverlayView> overlay_view_ = nullptr;
   raw_ptr<views::View> title_view_ = nullptr;
 

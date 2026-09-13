@@ -92,7 +92,6 @@ source_set("utility") {
 
   if (is_linux) {
     deps += [
-      "//content/utility/speech:speech_recognition_sandbox_hook",
       "//media/gpu/sandbox",
       "//media/mojo/services",
       "//services/network:network_sandbox_hook",

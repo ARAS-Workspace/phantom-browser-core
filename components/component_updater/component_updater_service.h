@@ -37,7 +37,6 @@ class ScreenAIDownloaderNonChromeOS;
 }
 
 namespace speech {
-class SodaInstallerImpl;
 }
 
 namespace update_client {
@@ -209,7 +208,6 @@ class ComponentUpdateService {
 
  private:
   friend class screen_ai::ScreenAIDownloaderNonChromeOS;
-  friend class speech::SodaInstallerImpl;
   friend class ::ComponentsHandler;
   FRIEND_TEST_ALL_PREFIXES(ComponentInstallerTest, RegisterComponent);
   FRIEND_TEST_ALL_PREFIXES(ComponentUpdaterTest, UpdatesDisabled);
@@ -233,9 +231,7 @@ class OnDemandUpdater {
   friend class OptimizationGuideOnDeviceModelInstallerPolicy;
   friend class ::PluginObserver;
   friend class SwReporterOnDemandFetcher;
-  friend class SodaComponentInstallerPolicy;
   friend class WasmTtsEngineComponentInstallerPolicy;
-  friend class SodaLanguagePackComponentInstallerPolicy;
   friend class TranslateKitComponentInstallerPolicy;
   friend class TranslateKitLanguagePackComponentInstallerPolicy;
   friend class ::extensions::AutotestPrivateLoadSmartDimComponentFunction;

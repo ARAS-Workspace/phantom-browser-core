@@ -799,7 +799,6 @@ source_set("unit_tests") {
       "//chrome/browser/status_icons",
       "//chrome/common:chrome_features",
       "//chrome/test:test_support",
-      "//components/live_caption",
       "//components/live_caption:constants",
       "//components/skills:features",
       "//components/skills/public",

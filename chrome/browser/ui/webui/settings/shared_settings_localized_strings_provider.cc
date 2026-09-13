@@ -20,8 +20,6 @@
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/google/core/common/google_util.h"
-#include "components/live_caption/caption_util.h"
-#include "components/soda/constants.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/sync/base/features.h"
 #include "content/public/browser/web_ui_data_source.h"
@@ -104,35 +102,9 @@ void AddCaptionSubpageStrings(content::WebUIDataSource* html_source) {
       "captionsManageLanguagesSubtitle",
       IDS_SETTINGS_CAPTIONS_MANAGE_LANGUAGES_SUBTITLE);
 
-  AddLiveCaptionSectionStrings(html_source);
 }
 
 
-void AddLiveCaptionSectionStrings(content::WebUIDataSource* html_source) {
-  html_source->AddLocalizedString(
-      "captionsEnableLiveCaptionTitle",
-      IDS_SETTINGS_CAPTIONS_ENABLE_LIVE_CAPTION_TITLE);
-  html_source->AddLocalizedString(
-      "captionsEnableLiveTranslateTitle",
-      IDS_SETTINGS_CAPTIONS_ENABLE_LIVE_TRANSLATE_TITLE);
-  html_source->AddLocalizedString(
-      "captionsEnableLiveTranslateSubtitle",
-      IDS_SETTINGS_CAPTIONS_ENABLE_LIVE_TRANSLATE_SUBTITLE);
-  html_source->AddLocalizedString(
-      "captionsMaskOffensiveWordsTitle",
-      IDS_SETTINGS_CAPTIONS_MASK_OFFENSIVE_WORDS_TITLE);
-
-  const bool liveTranslateEnabled = media::IsLiveTranslateEnabled();
-
-  html_source->AddLocalizedString(
-      "captionsEnableLiveCaptionSubtitle",
-      IDS_SETTINGS_CAPTIONS_ENABLE_LIVE_CAPTION_SUBTITLE);
-  html_source->AddBoolean("enableLiveCaption",
-                          captions::IsLiveCaptionFeatureSupported());
-  html_source->AddBoolean("enableLiveCaptionMultiLanguage", true);
-
-  html_source->AddBoolean("enableLiveTranslate", liveTranslateEnabled);
-}
 
 
 void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
