@@ -25,7 +25,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service_test_helper.h"
 #include "chrome/browser/profiles/keep_alive/profile_keep_alive_types.h"
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
 #include "chrome/browser/profiles/profile.h"
@@ -264,39 +263,6 @@ class MockSigninUiDelegate : public signin_ui_util::SigninUiDelegate {
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 };
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-class MockBatchUploadDelegate : public BatchUploadDelegate {
- public:
-  MockBatchUploadDelegate() {
-    // Make sure to simulate closing the dialog  when it opens (to ensure that
-    // it happens before the browser closes). This is needed because the dialog
-    // is never actually opened, and the browser is not aware of it. In
-    // production `complete_callback` would be called in the destructor of the
-    // dialog, which would clear the `BatchUploadService` resources tied to the
-    // dialog. Since this a mock, we have to explicitly call
-    // `complete_callback`, for simplicity we use an empty map, which simulates
-    // a "Cancel" event.
-    ON_CALL(*this, ShowBatchUploadDialog)
-        .WillByDefault(
-            [&](BrowserWindowInterface* browser,
-                const std::vector<syncer::LocalDataDescription>&
-                    local_data_description_list,
-                BatchUploadService::EntryPoint entry_point,
-                BatchUploadSelectedDataTypeItemsCallback complete_callback) {
-              std::move(complete_callback).Run({});
-            });
-  }
-
-  MOCK_METHOD(void,
-              ShowBatchUploadDialog,
-              (BrowserWindowInterface*,
-               std::vector<syncer::LocalDataDescription>,
-               BatchUploadService::EntryPoint,
-               BatchUploadSelectedDataTypeItemsCallback),
-              (override));
-};
-#endif
-
 }  // namespace
 
 class AvatarToolbarButtonInterfaceBaseBrowserTest {
@@ -318,8 +284,6 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
     SetInfiniteAvatarDelay(AvatarDelayType::kOnSignin);
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
     SetInfiniteAvatarDelay(AvatarDelayType::kSigninPendingText);
-    SetInfiniteAvatarDelay(AvatarDelayType::kPromo);
-    SetInfiniteAvatarDelay(AvatarDelayType::kSignedOutPromo);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
   }
 
@@ -456,17 +420,6 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
     AccountInfo account_info = MakePrimaryAccountAvailableWithName(
         signin::ConsentLevel::kSignin, email, name);
 
-    // This simplifies the setup for tests that expect to show the SyncPromo.
-    if (switches::IsAvatarSyncPromoFeatureEnabled()) {
-      // Simulate setting enough time passing for the cookie change.
-      GetBrowser()->GetProfile()->GetPrefs()->SetDouble(
-          prefs::kGaiaCookieChangedTime,
-          (base::Time::Now() -
-           (switches::GetAvatarSyncPromoFeatureMinimumCookeAgeParam() +
-            base::Minutes(1)))
-              .InSecondsFSinceUnixEpoch());
-    }
-
     return account_info;
   }
 
@@ -541,27 +494,15 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
     CHECK(AvatarToolbarButtonTestAccessor(browser).WaitForTextNotEqual(
         std::u16string()));
     avatar->ClearActiveStateForTesting();
-    if (!switches::IsAvatarSyncPromoFeatureEnabled() ||
-        syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-      CHECK(AvatarToolbarButtonTestAccessor(browser).WaitForText(
-          std::u16string()));
-    }
+    CHECK(AvatarToolbarButtonTestAccessor(browser).WaitForText(
+        std::u16string()));
     // Make sure the cross window animation replay is not triggered. This is
     // needed to clear the animation in all windows.
     delay_resets_.push_back(
         signin_ui_util::
             CreateZeroOverrideDelayForCrossWindowAnimationReplayForTesting());
 
-    // Clears the sync optin promo if it is enabled. This is a no-op if the
-    // promo is disabled. When `syncer::kReplaceSyncPromosWithSignInPromos` is
-    // enabled, there is no promo after signing in.
-    if (switches::IsAvatarSyncPromoFeatureEnabled() &&
-        !syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-      CHECK(AvatarToolbarButtonTestAccessor(browser).WaitForTextNotEqual(
-          std::u16string()));
-      avatar->ClearActiveStateForTesting();
-      CHECK(AvatarToolbarButtonTestAccessor(browser).WaitForText(
-          std::u16string()));
+    {
     }
 
     return account_info;
@@ -779,71 +720,7 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
     GetTestSyncService()->FireStateChanged();
   }
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  BatchUploadServiceTestHelper& batch_upload_test_helper() {
-    return batch_upload_test_helper_;
-  }
-
-  MockBatchUploadDelegate* mock_batch_upload_delegate() {
-    return mock_batch_upload_delegate_;
-  }
-
-  // Sets up the needed information to give priortiy to `promo_type`.
-  void SetupRequirementsForPromoType(
-      signin::ProfileMenuAvatarButtonPromoInfo::Type promo_type) {
-    // By default disable the preferences related to History sync to allow
-    // History sync promos. Those are enabled by default in the
-    // `syncer::TestSyncService`.
-    SetHistoryAndTabsSyncingPreference(/*enable_sync=*/false);
-
-    switch (promo_type) {
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo:
-        break;
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo:
-        // History Sync must be set to give priority to this promo.
-        SetHistoryAndTabsSyncingPreference(/*enable_sync=*/true);
-        // Set some local data.
-        batch_upload_test_helper().SetReturnDescriptions(syncer::PASSWORDS,
-                                                         /*item_count=*/5);
-        break;
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-          kBatchUploadBookmarksPromo: {
-        // Set local bookmarks.
-        batch_upload_test_helper().SetReturnDescriptions(syncer::BOOKMARKS,
-                                                         /*item_count=*/5);
-        // The user must be previously syncing with the currently signed in
-        // account.
-        AccountInfo primary_account =
-            GetIdentityManager()->FindExtendedAccountInfo(
-                GetIdentityManager()->GetPrimaryAccountInfo(
-                    signin::ConsentLevel::kSignin));
-        CHECK(!primary_account.IsEmpty());
-        GetBrowser()->GetProfile()->GetPrefs()->SetString(
-            prefs::kGoogleServicesLastSyncingGaiaId,
-            primary_account.gaia.ToString());
-        break;
-      }
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-          kBatchUploadWindows10DepreciationPromo:
-        CHECK(switches::IsSigninWindows10DepreciationState());
-        // Set some local data.
-        batch_upload_test_helper().SetReturnDescriptions(syncer::PASSWORDS,
-                                                         /*item_count=*/5);
-        break;
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
-        CHECK(switches::IsAvatarSyncPromoFeatureEnabled());
-        break;
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo:
-        // TODO(crbug.com/486109449): Adapt the tests to support this promo.
-        NOTREACHED() << "Test for this promo is not supported yet.";
-    }
-  }
-#endif
-
  protected:
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  void ClearMockBatchUploadDelegate() { mock_batch_upload_delegate_ = nullptr; }
-#endif
 
  private:
   void SetTestingFactories(content::BrowserContext* context) {
@@ -852,15 +729,6 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
                      &TestingSyncFactoryFunction,
                      GetIdentityManager(Profile::FromBrowserContext(context))));
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-    auto mock_batch_upload_delegate =
-        std::make_unique<MockBatchUploadDelegate>();
-    mock_batch_upload_delegate_ = mock_batch_upload_delegate.get();
-
-    batch_upload_test_helper_.SetupBatchUploadTestingFactoryInProfile(
-        Profile::FromBrowserContext(context), /*identity_manager=*/nullptr,
-        std::move(mock_batch_upload_delegate));
-#endif
   }
 
   base::CallbackListSubscription dependency_manager_subscription_;
@@ -869,10 +737,6 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
       gfx::ScopedAnimationDurationScaleMode(
           gfx::ScopedAnimationDurationScaleMode::ZERO_DURATION);
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  BatchUploadServiceTestHelper batch_upload_test_helper_;
-  raw_ptr<MockBatchUploadDelegate> mock_batch_upload_delegate_ = nullptr;
-#endif
 };
 
 class AvatarToolbarButtonBrowserTestBase
@@ -901,9 +765,6 @@ class AvatarToolbarButtonBrowserTestBase
           }
           return true;
         });
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-    ClearMockBatchUploadDelegate();
-#endif
     InProcessBrowserTest::TearDownOnMainThread();
   }
 };
@@ -1062,11 +923,7 @@ TEST_WITH_SIGNED_IN_FROM_PRE(
                                        test_given_name()));
   avatar->ClearActiveStateForTesting();
 
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_HISTORY));
-  avatar->ClearActiveStateForTesting();
-
-  // Once the greeting and promo are not shown anymore, we expect no text.
+  // Once the greeting is not shown anymore, we expect no text.
   EXPECT_EQ(avatar_accessor.GetText(), std::u16string());
 }
 
@@ -1486,15 +1343,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
   EXPECT_TRUE(avatar_accessor.WaitForText(
       l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SIGNIN_PAUSED)));
 
-  // Activates the promo state provider after already showing a higher priority
-  // state. This scenario is actually possible on startup.
-  SetupRequirementsForPromoType(
-      signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo);
-  avatar_button->ForceShowingPromoForTesting();
-  // Sync Error still has priority and is showing.
-  EXPECT_TRUE(avatar_accessor.WaitForText(
-      l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SIGNIN_PAUSED)));
-
   // This will also clear the Sync Error through
   // `TestSyncServiceWithIdentityManagerReaction::OnPrimaryAccountChanged()`.
   Signout();
@@ -1644,244 +1492,11 @@ class AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest
             GetAvatarToolbarButtonInterface(browser())) {
       button->ClearActiveStateForTesting();
     }
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-    ClearMockBatchUploadDelegate();
-#endif
     InteractiveFeaturePromoTest::TearDownOnMainThread();
   }
 };
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-// The tests relying on this base class can test the different Promos to be
-// shown on the AvatarToolbarButton, more specifically the promo types in
-// `signin::ProfileMenuAvatarButtonPromoInfo::Type`.
-// One special scenario is when testing the SyncPromo (related to
-// `switches::IsAvatarSyncPromoFeatureEnabled()`), it is important to ensure
-// that specific feature flags are not enabled at the same time, since some
-// features are not compatible (SyncPromo have a higher priority than
-// HistorySync), this is handled in the constructor.
-#define MAYBE_AvatarToolbarButtonPromoBrowserTest \
-  AvatarToolbarButtonPromoBrowserTest
-class MAYBE_AvatarToolbarButtonPromoBrowserTest
-    : public AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest,
-      public testing::WithParamInterface<
-          signin::ProfileMenuAvatarButtonPromoInfo::Type> {
- protected:
-  MAYBE_AvatarToolbarButtonPromoBrowserTest() {
-    switch (GetAvatarPromoType()) {
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo:
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo:
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-          kBatchUploadBookmarksPromo:
-        feature_list_.InitWithFeatureStates(
-            {{syncer::kReplaceSyncPromosWithSignInPromos, true},
-             {switches::kAvatarButtonSyncPromoForTesting, false},
-             // Ensure to ignore the feature for Windows 10 bots not indirectly
-             // triggering it.
-             {switches::kSigninWindows10DepreciationStateBypassForTesting,
-              true}});
-        break;
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-          kBatchUploadWindows10DepreciationPromo:
-        feature_list_.InitWithFeatureStates(
-            {{syncer::kReplaceSyncPromosWithSignInPromos, true},
-             {switches::kAvatarButtonSyncPromoForTesting, false},
-             // Ensure to force the feature for testing the promo type.
-             {switches::kSigninWindows10DepreciationStateForTesting, true}});
-        break;
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
-        feature_list_.InitWithFeatureStates(
-            // `enable_replace_sync_with_signin` is ignored.
-            {{syncer::kReplaceSyncPromosWithSignInPromos, false},
-             {syncer::kReplaceSyncPromosWithSigninPromosNewSignin, false},
-             {switches::kAvatarButtonSyncPromoForTesting, true}});
-        break;
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo:
-        // TODO(crbug.com/486109449): Adapt the tests to support this promo.
-        NOTREACHED() << "Test for this promo is not supported yet.";
-    }
-  }
-
-  signin::ProfileMenuAvatarButtonPromoInfo::Type GetAvatarPromoType() {
-    return GetParam();
-  }
-
-  std::u16string GetExpectedPromoText() {
-    switch (GetAvatarPromoType()) {
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo:
-        return l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_HISTORY);
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo:
-        return l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_BATCH_UPLOAD_PROMO);
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-          kBatchUploadBookmarksPromo:
-        return l10n_util::GetStringUTF16(
-            IDS_AVATAR_BUTTON_BATCH_UPLOAD_PROMO_WITH_BOOKMARK_CLEANUP_PROMO);
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-          kBatchUploadWindows10DepreciationPromo:
-        // This string does not mention "Sync".
-        return l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_PROMO);
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
-        return l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_PROMO);
-      case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo:
-        // TODO(crbug.com/486109449): Adapt the tests to support this promo.
-        NOTREACHED() << "Test for this promo is not supported yet.";
-    }
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_P(MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                       PRE_PromoNotShownIfGreetingNotShown) {
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  // Explicitly sign in without an image.
-  Signin(test_email(), test_given_name());
-  switch (GetAvatarPromoType()) {
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo:
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo:
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-        kBatchUploadBookmarksPromo:
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-        kBatchUploadWindows10DepreciationPromo:
-      EXPECT_EQ(
-          avatar_accessor.GetText(),
-          l10n_util ::GetStringUTF16(IDS_AVATAR_BUTTON_MAKING_CHROME_YOURS));
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
-      EXPECT_EQ(avatar_accessor.GetText(), std::u16string());
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo:
-      // TODO(crbug.com/486109449): Adapt the tests to support this promo.
-      NOTREACHED() << "Test for this promo is not supported yet.";
-  }
-}
-
-IN_PROC_BROWSER_TEST_P(MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                       PromoNotShownIfGreetingNotShown) {
-  ASSERT_TRUE(
-      GetIdentityManager()->HasPrimaryAccount(signin::ConsentLevel::kSignin));
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  // The button is in a waiting for image state, the greeting is not yet
-  // displayed, hence the promo should not be shown.
-  EXPECT_EQ(avatar_accessor.GetText(), std::u16string());
-
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  // Only after adding the image that the greeting is shown.
-  AddSignedInImage(
-      GetIdentityManager()->GetPrimaryAccountId(signin::ConsentLevel::kSignin));
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-
-  // Then the promo.
-  ASSERT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  avatar->ClearActiveStateForTesting();
-
-  // Then normal state.
-  EXPECT_EQ(avatar_accessor.GetText(), std::u16string());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             NoPromoShownUntilSyncServiceIsInitialized) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  SetSyncServiceTransportState(
-      syncer::SyncService::TransportState::INITIALIZING);
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // No Promo shown as long as the sync service is not active.
-  ASSERT_EQ(avatar_accessor.GetText(), std::u16string());
-
-  // Check crbug.com/454927990.
-  SetSyncServiceTransportState(
-      syncer::SyncService::TransportState::CONFIGURING);
-  // No Promo shown as long as the sync service is not active.
-  ASSERT_EQ(avatar_accessor.GetText(), std::u16string());
-
-  SetSyncServiceTransportState(syncer::SyncService::TransportState::ACTIVE);
-  ASSERT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  avatar->ClearActiveStateForTesting();
-
-  // Once the greeting and promo are not shown anymore, we expect no text.
-  EXPECT_EQ(avatar_accessor.GetText(), std::u16string());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoThenSyncError) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-
-  SimulateSyncError();
-  // The sync error should be shown.
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SIGNIN_PAUSED));
-  ClearSyncError();
-  // After clearing the sync error, the promo should NOT be shown anymore.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-#if !BUILDFLAG(IS_LINUX)
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoNotShownWhenPromotionsDisabled) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  g_browser_process->local_state()->SetBoolean(prefs::kPromotionsEnabled,
-                                               false);
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should NOT be followed by any promo if promotions are
-  // disabled.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-#endif
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoNotShownWhenSyncNotAllowed) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-  SimulateDisableSyncByPolicyWithError();
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  // Normal state.
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should NOT be followed by the promo if sync is not allowed.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
 enum class ManagedBy {
   kPolicy,
   kCustodian,
@@ -1948,608 +1563,6 @@ TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
 INSTANTIATE_TEST_SUITE_P(HistorySyncOptinManagedType,
                          AvatarToolbarButtonHistorySyncOptinManagedTypeTest,
                          ValuesIn(kHistorySyncOptinSyncManagedTypeTestCases));
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoThenPassphraseError) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should be followed by the the promo.
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  SimulatePassphraseError();
-  // The promo should be replaced by the passphrase error message.
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(
-                IDS_SYNC_STATUS_NEEDS_PASSWORD_BUTTON_MAYBE_TITLE_CASE));
-  ClearPassphraseError();
-  // After clearing the passphrase error, the promo should NOT be shown.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoThenClientUpgradeError) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should be followed by the promo.
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  SimulateUpgradeClientError();
-  // The promo should be replaced by the passphrase error message.
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(IDS_SYNC_UPGRADE_CLIENT_BUTTON));
-  ClearUpgradeClientError();
-  // After clearing the passphrase error, the promo should NOT be shown.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoThenSigninPending) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should be followed by the promo.
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  SimulateSigninPending(/*web_sign_out=*/false);
-  // The promo should be replaced by the signin pending message.
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SIGNIN_PAUSED));
-  ClearSigninPending();
-  // After clearing the sign in error, the promo should NOT be shown.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoThenExplicitText) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should be followed by the promo.
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  const std::u16string explicit_text(u"Explicit Text");
-  base::ScopedClosureRunner hide_callback = avatar->SetExplicitButtonState(
-      explicit_text, /*accessibility_label=*/std::nullopt,
-      /*explicit_action=*/std::nullopt);
-  // The promo should be replaced by the explicit text message.
-  EXPECT_EQ(avatar_accessor.GetText(), explicit_text);
-  hide_callback.RunAndReset();
-  // After clearing the explicit text, the promo should NOT be shown.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoNotShownIfErrorBeforeGreetingTimesOut) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  SimulatePassphraseError();
-  avatar->ClearActiveStateForTesting();
-  // No promo should be shown if the error is shown before the greeting times
-  // out.
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(
-                IDS_SYNC_STATUS_NEEDS_PASSWORD_BUTTON_MAYBE_TITLE_CASE));
-  ClearPassphraseError();
-  // After clearing the passphrase error, the promo should NOT be shown.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             CollapsesOnPromoNoLongerElligible) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should be followed by the promo.
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-
-  switch (GetAvatarPromoType()) {
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo:
-      // Enabling history should suppress the promo.
-      SetHistoryAndTabsSyncingPreference(/*enable_sync=*/true);
-      GetTestSyncService()->FireStateChanged();
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo:
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-        kBatchUploadBookmarksPromo:
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-        kBatchUploadWindows10DepreciationPromo:
-      // Removing the local data should suppress the promo.
-      batch_upload_test_helper().ClearReturnDescriptions();
-      GetTestSyncService()->FireStateChanged();
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
-      EnableSync(test_email(), test_given_name());
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo:
-      // TODO(crbug.com/486109449): Adapt the tests to support this promo.
-      NOTREACHED() << "Test for this promo is not supported yet.";
-  }
-
-  // The button should return to the normal state.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             CollapsesOnSignOut) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  ASSERT_TRUE(
-      GetIdentityManager()->HasPrimaryAccount(signin::ConsentLevel::kSignin));
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should be followed by the promo.
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  Signout();
-  // Once the user signs out, the button should return to the normal state.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoBrowserTest,
-                             PromoNotShownIfMaxShownCountReached) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-
-  AccountInfo account = signin_ui_util::GetSingleAccountForPromos(
-      GetIdentityManager(),
-      AccountPreviewDataServiceFactory::GetForProfile(browser()->GetProfile()));
-
-  // Reset the count to 0 to avoid being affected by the PRE_ test.
-  // The PRE_ test might have triggered the promo during shutdown.
-  {
-    ScopedDictPrefUpdate scoped_update(browser()->GetProfile()->GetPrefs(),
-                                       "signin.accounts_metadata_dict");
-    base::DictValue* account_dict =
-        scoped_update->EnsureDict(account.gaia.ToString());
-    account_dict->Set("SyncPromoIdentityPillShownCount", 0);
-  }
-
-  ASSERT_TRUE(avatar_accessor.WaitForText(l10n_util::GetStringFUTF16(
-      IDS_AVATAR_BUTTON_GREETING, test_given_name())));
-  avatar->ClearActiveStateForTesting();
-
-  // The greeting should be followed by the promo.
-  EXPECT_TRUE(avatar_accessor.WaitForText(GetExpectedPromoText()));
-
-  int shown_count = 1;
-  avatar->ClearActiveStateForTesting();
-  // The button comes back to the normal state.
-  EXPECT_TRUE(avatar_accessor.WaitForText(std::u16string()));
-  for (; shown_count < user_education::features::GetNewBadgeShowCount();
-       ++shown_count) {
-    avatar->ForceShowingPromoForTesting();
-    EXPECT_TRUE(avatar_accessor.WaitForText(GetExpectedPromoText()));
-
-    avatar->ClearActiveStateForTesting();
-    // The button comes back to the normal state.
-    EXPECT_TRUE(avatar_accessor.WaitForText(std::u16string()));
-  }
-  avatar->ForceShowingPromoForTesting();
-  // The promo should NOT be shown even after forcing it to show if the max
-  // shown count has been reached.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    MAYBE_AvatarToolbarButtonPromoBrowserTest,
-    ValuesIn({signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo,
-              signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo,
-              signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo,
-              signin::ProfileMenuAvatarButtonPromoInfo::Type::
-                  kBatchUploadBookmarksPromo,
-              signin::ProfileMenuAvatarButtonPromoInfo::Type::
-                  kBatchUploadWindows10DepreciationPromo}));
-
-#define MAYBE_AvatarToolbarButtonPromoClickBrowserTest \
-  AvatarToolbarButtonPromoClickBrowserTest
-class MAYBE_AvatarToolbarButtonPromoClickBrowserTest
-    : public MAYBE_AvatarToolbarButtonPromoBrowserTest {
- protected:
-  MAYBE_AvatarToolbarButtonPromoClickBrowserTest()
-      : delegate_auto_reset_(signin_ui_util::SetSigninUiDelegateForTesting(
-            &mock_signin_ui_delegate_)) {}
-
-  void ClickIdentityButton(ProfileMenuViewBase* profile_menu_view) {
-    ASSERT_NE(profile_menu_view, nullptr);
-    auto* button = profile_menu_view->GetIdentityButtonForTesting();
-    ASSERT_NE(button, nullptr);
-    button->AcceleratorPressed(ui::Accelerator());
-  }
-
-  StrictMock<MockSigninUiDelegate> mock_signin_ui_delegate_;
-
- private:
-  base::AutoReset<signin_ui_util::SigninUiDelegate*> delegate_auto_reset_;
-};
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoClickBrowserTest,
-                             CollapsesOnClickAndTriggersProfileMenuStartup) {
-  ASSERT_TRUE(
-      GetIdentityManager()->HasPrimaryAccount(signin::ConsentLevel::kSignin));
-
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  base::HistogramTester histogram_tester;
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should be followed by the promo.
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  histogram_tester.ExpectBucketCount("Signin.AvatarPillPromo.Shown",
-                                     GetAvatarPromoType(),
-                                     /*expected_count=*/1);
-  // The button action should be overridden.
-  histogram_tester.ExpectTotalCount(
-      "Signin.AvatarPillPromo.DurationBeforeClick",
-      /*expected_count=*/0);
-  avatar_accessor.Click();
-  histogram_tester.ExpectTotalCount(
-      "Signin.AvatarPillPromo.DurationBeforeClick",
-      /*expected_count=*/1);
-  auto* coordinator = browser()->GetFeatures().profile_menu_coordinator();
-  ASSERT_NE(coordinator, nullptr);
-  EXPECT_TRUE(coordinator->IsShowing());
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-  // Once the promo collapses, the button action should be reset to the default
-  // behavior.
-  CoreAccountId primary_account_id =
-      GetIdentityManager()->GetPrimaryAccountId(signin::ConsentLevel::kSignin);
-  switch (GetAvatarPromoType()) {
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo:
-      // Clicking the history sync button in the profile menu should trigger the
-      // history sync dialog with the correct access point
-      // (`kHistorySyncOptinExpansionPillOnStartup`).
-      EXPECT_CALL(
-          mock_signin_ui_delegate_,
-          ShowHistorySyncOptinUI(browser()->GetProfile(), primary_account_id,
-                                 signin_metrics::AccessPoint::
-                                     kHistorySyncOptinExpansionPillOnStartup));
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
-      // Clicking the sync button in the profile menu should trigger the sync
-      // dialog with the correct access point
-      // (`kHistorySyncOptinExpansionPillOnStartup`).
-      EXPECT_CALL(mock_signin_ui_delegate_,
-                  ShowTurnSyncOnUI(
-                      browser()->GetProfile(),
-                      signin_metrics::AccessPoint::
-                          kHistorySyncOptinExpansionPillOnStartup,
-                      signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT,
-                      primary_account_id,
-                      TurnSyncOnHelper::SigninAbortedMode::KEEP_ACCOUNT,
-                      /*is_sync_promo=*/false,
-                      /*user_already_signed_in=*/true));
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo:
-      // Batch Upload dialog should open with the right entry point.
-      EXPECT_CALL(*mock_batch_upload_delegate(),
-                  ShowBatchUploadDialog(
-                      testing::_, testing::_,
-                      BatchUploadService::EntryPoint::
-                          kProfileMenuPrimaryButtonActionFromAvatarPromo,
-                      testing::_));
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-        kBatchUploadBookmarksPromo:
-      // Batch Upload dialog should open with the right entry point.
-      EXPECT_CALL(
-          *mock_batch_upload_delegate(),
-          ShowBatchUploadDialog(
-              testing::_, testing::_,
-              BatchUploadService::EntryPoint::
-                  kProfileMenuPrimaryButtonWithBookmarksActionFromAvatarPromo,
-              testing::_));
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-        kBatchUploadWindows10DepreciationPromo:
-      // Batch Upload dialog should open with the right entry point.
-      EXPECT_CALL(
-          *mock_batch_upload_delegate(),
-          ShowBatchUploadDialog(
-              testing::_, testing::_,
-              BatchUploadService::EntryPoint::
-                  kProfileMenuPrimaryButtonWithWindows10DepreciationActionFromAvatarPromo,
-              testing::_));
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo:
-      // TODO(crbug.com/486109449): Adapt the tests to support this promo.
-      NOTREACHED() << "Test for this promo is not supported yet.";
-  }
-  ASSERT_NO_FATAL_FAILURE(
-      ClickIdentityButton(coordinator->GetProfileMenuViewBaseForTesting()));
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             MAYBE_AvatarToolbarButtonPromoClickBrowserTest,
-                             PromoNotShownIfUsedLimitReached) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should be followed by the promo.
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-  // The button action should be overridden.
-  avatar_accessor.Click();
-  // The button comes back to the normal state.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-  int used_count = 1;
-  for (; used_count < user_education::features::GetNewBadgeFeatureUsedCount();
-       ++used_count) {
-    avatar->ForceShowingPromoForTesting();
-    EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-    avatar_accessor.Click();
-    // The button comes back to the normal state.
-    EXPECT_TRUE(avatar_accessor.GetText().empty());
-  }
-  avatar->ForceShowingPromoForTesting();
-  // The promo should NOT be shown even after forcing it to show if the max used
-  // count has been reached.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-
-  Signout();
-  const std::u16string account_name_2(u"Account name 2");
-  SigninWithImage(/*email=*/u"test2@gmail.com", account_name_2);
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  switch (GetAvatarPromoType()) {
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo:
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo:
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-        kBatchUploadBookmarksPromo:
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-        kBatchUploadWindows10DepreciationPromo:
-      ASSERT_EQ(
-          avatar_accessor.GetText(),
-          l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_MAKING_CHROME_YOURS));
-      avatar->ClearActiveStateForTesting();
-      avatar->ForceShowingPromoForTesting();
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
-      ASSERT_EQ(avatar_accessor.GetText(),
-                l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                           account_name_2));
-      avatar->ClearActiveStateForTesting();
-      break;
-    case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo:
-      // TODO(crbug.com/486109449): Adapt the tests to support this promo.
-      NOTREACHED() << "Test for this promo is not supported yet.";
-  }
-  // The promo should be shown for the new account (rate limiting is per
-  // account).
-  EXPECT_EQ(avatar_accessor.GetText(), GetExpectedPromoText());
-}
-
-TEST_WITH_SIGNED_IN_FROM_PRE(
-    IN_PROC_BROWSER_TEST_P,
-    MAYBE_AvatarToolbarButtonPromoClickBrowserTest,
-    TriggersAndCollapsesConsistentlyAcrossMultipleBrowsers) {
-  SetupRequirementsForPromoType(GetAvatarPromoType());
-
-  // Make the delay for cross window animation replay zero to avoid flakiness.
-  base::AutoReset<std::optional<base::TimeDelta>> delay_override_reset =
-      signin_ui_util::
-          CreateZeroOverrideDelayForCrossWindowAnimationReplayForTesting();
-  base::HistogramTester histogram_tester;
-  Profile* profile = browser()->GetProfile();
-  Browser* browser_1 = browser();
-  AvatarToolbarButtonInterface* avatar_1 =
-      GetAvatarToolbarButtonInterface(browser_1);
-  AvatarToolbarButtonTestAccessor avatar_accessor1(browser_1);
-  ASSERT_EQ(avatar_accessor1.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar_1->ClearActiveStateForTesting();
-
-  // The greeting should be followed by the promo.
-  EXPECT_EQ(avatar_accessor1.GetText(), GetExpectedPromoText());
-  // Open the second browser before the promo collapses.
-  Browser* browser_2 = CreateBrowser(profile);
-  AvatarToolbarButtonTestAccessor avatar_accessor2(browser_2);
-  // The promo should be shown in the second browser as well.
-  EXPECT_EQ(avatar_accessor2.GetText(), GetExpectedPromoText());
-  // `Signin.AvatarPillPromo.Shown` histogram should be recorded only once.
-  histogram_tester.ExpectBucketCount("Signin.AvatarPillPromo.Shown",
-                                     GetAvatarPromoType(),
-                                     /*expected_count=*/1);
-  avatar_1->ClearActiveStateForTesting();
-  // The button in both browsers comes back to the normal state.
-  EXPECT_TRUE(avatar_accessor1.GetText().empty());
-  EXPECT_TRUE(avatar_accessor2.GetText().empty());
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    MAYBE_AvatarToolbarButtonPromoClickBrowserTest,
-    ValuesIn({signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo,
-              signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo,
-              signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo,
-              signin::ProfileMenuAvatarButtonPromoInfo::Type::
-                  kBatchUploadBookmarksPromo,
-              signin::ProfileMenuAvatarButtonPromoInfo::Type::
-                  kBatchUploadWindows10DepreciationPromo}));
-
-// TODO(crbug.com/331746545): Check flaky test issue on windows.
-#define MAYBE_AvatarToolbarButtonSignedOutPromoBrowserTest \
-  AvatarToolbarButtonSignedOutPromoBrowserTest
-class MAYBE_AvatarToolbarButtonSignedOutPromoBrowserTest
-    : public AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest {
- public:
-  MAYBE_AvatarToolbarButtonSignedOutPromoBrowserTest() {
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{syncer::kReplaceSyncPromosWithSignInPromos,
-                              switches::kSigninPromoOnAvatarPill},
-        /*disabled_features=*/{});
-  }
-
-  void SetUpDefaultCommandLine(base::CommandLine* command_line) override {
-    AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest::
-        SetUpDefaultCommandLine(command_line);
-    command_line->RemoveSwitch(
-        switches::kDisableSigninPromoOnAvatarPillForTesting);
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(MAYBE_AvatarToolbarButtonSignedOutPromoBrowserTest,
-                       SignedOutPromoTriggeredOnStartupAfterDelayExpired) {
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(), std::u16string());
-
-  ASSERT_TRUE(avatar->GetStateAndFireSignedOutTriggerDelayTimerForTesting());
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SIGNIN_PROMO));
-
-  Browser* new_browser = CreateBrowser(browser()->GetProfile());
-  EXPECT_FALSE(avatar->GetStateAndFireSignedOutTriggerDelayTimerForTesting());
-  EXPECT_EQ(AvatarToolbarButtonTestAccessor(new_browser).GetText(),
-            l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SIGNIN_PROMO));
-}
-
-// TODO(crbug.com/331746545): Check flaky test issue on windows.
-#define MAYBE_AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest \
-  AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest
-// This test setup does not load the RefreshTokens until explicitly dnoe through
-// the `LoadRefreshTokens()`.
-class
-    MAYBE_AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest
-    : public AvatarToolbarButtonInterfaceBaseBrowserTest,
-      public InProcessBrowserTest {
- public:
-  MAYBE_AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest() {
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{syncer::kReplaceSyncPromosWithSignInPromos,
-                              switches::kSigninPromoOnAvatarPill},
-        /*disabled_features=*/{});
-  }
-
-  void SetUpDefaultCommandLine(base::CommandLine* command_line) override {
-    InProcessBrowserTest::SetUpDefaultCommandLine(command_line);
-    command_line->RemoveSwitch(
-        switches::kDisableSigninPromoOnAvatarPillForTesting);
-  }
-
-  // AvatarToolbarButtonInterfaceBaseBrowserTest
-  Browser* GetBrowser() const override { return browser(); }
-
-  // InProcessBrowserTest
-  void SetUpBrowserContextKeyedServices(
-      content::BrowserContext* context) override {
-    IdentityTestEnvironmentProfileAdaptor::
-        SetIdentityTestEnvironmentFactoriesOnBrowserContext(context);
-
-    // Sets up the identity test environment and reset the refresh token
-    // loading, before a browser is created.
-    CHECK(!browser());
-    identity_test_env_adaptor_ =
-        std::make_unique<IdentityTestEnvironmentProfileAdaptor>(
-            Profile::FromBrowserContext(context));
-    identity_test_env()->ResetToAccountsNotYetLoadedFromDiskState();
-  }
-
-  void TearDownOnMainThread() override {
-    ClearMockBatchUploadDelegate();
-    identity_test_env_adaptor_.reset();
-  }
-
-  void LoadRefreshTokens() {
-    identity_test_env()->ReloadAccountsFromDisk();
-    signin::WaitForRefreshTokensLoaded(GetIdentityManager());
-  }
-
- private:
-  signin::IdentityTestEnvironment* identity_test_env() {
-    return identity_test_env_adaptor_->identity_test_env();
-  }
-
-  std::unique_ptr<IdentityTestEnvironmentProfileAdaptor>
-      identity_test_env_adaptor_;
-
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(
-    MAYBE_AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest,
-    SignedOutPromoTriggerDelayTimerStartAfterRefreshTokensAreLoaded) {
-  ASSERT_FALSE(GetIdentityManager()->AreRefreshTokensLoaded());
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(), std::u16string());
-  // Timer is not started as long as the refresh tokens are not loaded.
-  EXPECT_FALSE(avatar->GetStateAndFireSignedOutTriggerDelayTimerForTesting());
-
-  LoadRefreshTokens();
-  ASSERT_TRUE(GetIdentityManager()->AreRefreshTokensLoaded());
-  // Timer is now started and the promo computation happens.
-  EXPECT_TRUE(avatar->GetStateAndFireSignedOutTriggerDelayTimerForTesting());
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SIGNIN_PROMO));
-}
 
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
@@ -3002,10 +2015,6 @@ IN_PROC_BROWSER_TEST_F(AvatarToolbarButtonEnterpriseBadgingBrowserTest,
             l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
                                        test_given_name()));
   avatar->ClearActiveStateForTesting();
-  // The greeting is followed by the history sync opt-in.
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_HISTORY));
-  avatar->ClearActiveStateForTesting();
   EXPECT_EQ(avatar_accessor.GetText(),
             l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_WORK));
 }
@@ -3052,12 +2061,8 @@ IN_PROC_BROWSER_TEST_F(AvatarToolbarButtonEnterpriseBadgingBrowserTest,
             l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
                                        test_given_name()));
   avatar->ClearActiveStateForTesting();
-  // The greeting is followed by the history sync opt-in.
-  EXPECT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_HISTORY));
-  avatar->ClearActiveStateForTesting();
 
-  // Once the promo is not shown anymore, we expect the work badge to be shown.
+  // We expect the work badge to be shown.
   EXPECT_EQ(avatar_accessor.GetText(), work_badge());
   EXPECT_EQ(GetProfileAttributesEntry(browser()->GetProfile())
                 ->GetEnterpriseProfileLabel(),
@@ -4066,63 +3071,6 @@ IN_PROC_BROWSER_TEST_F(AvatarToolbarButtonGradientRingBrowserTest,
 }
 
 // Regression test for crbug.com/533663292
-class AvatarToolbarButtonAsyncPromoRaceRegressionTest
-    : public AvatarToolbarButtonBrowserTestBase {
- public:
-  AvatarToolbarButtonAsyncPromoRaceRegressionTest() {
-    scoped_feature_list_.InitWithFeatures(
-        {syncer::kReplaceSyncPromosWithSignInPromos,
-         syncer::kReplaceSyncPromosWithSigninPromosNewSignin},
-        {features::kWebUIAvatarButton});
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_F,
-                             AvatarToolbarButtonAsyncPromoRaceRegressionTest,
-                             CrashOnPromoStateCollapseRegressionTest) {
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-
-  // Wait for the identity name to show up and then clear it, since its higher
-  // priority prevents the promo from displaying and making the test timeout.
-  ASSERT_TRUE(avatar_accessor.WaitForTextNotEqual(std::u16string()));
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  avatar->ClearActiveStateForTesting();
-  ASSERT_TRUE(avatar_accessor.WaitForText(std::u16string()));
-
-  // Specifically enable BatchUploadPromo conditions and disable
-  // HistorySyncPromo
-  SetHistoryAndTabsSyncingPreference(true);
-  batch_upload_test_helper().SetLocalDataDescriptionForAllAvailableTypes();
-  batch_upload_test_helper().SetReturnDescriptionOnRequest(true);
-
-  // Manually set some delay to be sure tests don't timeout/fail from instant
-  // collapse
-  SetInfiniteAvatarDelay(AvatarDelayType::kPromo);
-
-  // Trigger both fetches.
-  avatar->ForceShowingPromoForTesting();
-  avatar->ForceShowingPromoForTesting();
-
-  // The first request will be implicitly cancelled by the second request
-  // starting. We fire it, and it should silently drop. (In the buggy code, it
-  // would be processed and start the promo).
-  batch_upload_test_helper().FireReturnDescriptionRequest();
-
-  // Fire second request, it resolves to NO promo.
-  // In the buggy code, this would collapse the underlying state but leaves the
-  // UI showing the promo, leading to a crash on click.
-  // With the fix, the UI never showed a promo so it's a no-op.
-  batch_upload_test_helper().ClearReturnDescriptions();
-  batch_upload_test_helper().FireReturnDescriptionRequest();
-
-  // Click the button to trigger a crash in the original code.
-  avatar_accessor.Click();
-}
-
 INSTANTIATE_TEST_SUITE_P(All, AvatarToolbarButtonBrowserTest, testing::Bool());
 INSTANTIATE_TEST_SUITE_P(All,
                          AvatarToolbarButtonWithSyncBrowserTest,
