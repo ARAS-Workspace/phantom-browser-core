@@ -247,7 +247,6 @@ browser_exposed_mojom_targets = [
   "//services/device/public/mojom:mojom",
   "//services/device/public/mojom:usb_test",
   "//services/device/public/mojom:usb",
-  "//services/image_annotation/public/mojom:mojom",
   "//services/media_session/public/mojom:mojom",
   "//services/metrics/public/mojom:mojom",
   "//services/network/public/mojom:cookies_mojom",

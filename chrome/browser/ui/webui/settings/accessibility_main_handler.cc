@@ -9,7 +9,6 @@
 #include "base/functional/bind.h"
 #include "base/values.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/renderer_context_menu/accessibility_labels_bubble_model.h"
 #include "chrome/browser/ui/confirm_bubble.h"
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/render_widget_host.h"
@@ -30,11 +29,6 @@ void AccessibilityMainHandler::RegisterMessages() {
       "getScreenReaderState",
       base::BindRepeating(&AccessibilityMainHandler::HandleGetScreenReaderState,
                           base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "confirmA11yImageLabels",
-      base::BindRepeating(
-          &AccessibilityMainHandler::HandleCheckAccessibilityImageLabels,
-          base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "getScreenAiInstallState",
       base::BindRepeating(
@@ -99,22 +93,6 @@ void AccessibilityMainHandler::HandleGetScreenReaderState(
   ResolveJavascriptCallback(callback_id, is_screen_reader_active);
 }
 
-void AccessibilityMainHandler::HandleCheckAccessibilityImageLabels(
-    const base::ListValue& args) {
-  // When the user tries to enable the feature, show the modal dialog. The
-  // dialog will disable the feature again if it is not accepted.
-  content::WebContents* web_contents = web_ui()->GetWebContents();
-  content::RenderWidgetHostView* view = web_contents->GetPrimaryMainFrame()
-                                            ->GetRenderViewHost()
-                                            ->GetWidget()
-                                            ->GetView();
-  gfx::Rect rect = view->GetViewBounds();
-  auto model = std::make_unique<AccessibilityLabelsBubbleModel>(
-      Profile::FromWebUI(web_ui()), web_contents, true /* enable always */);
-  chrome::ShowConfirmBubble(
-      web_contents->GetTopLevelNativeWindow(), view->GetNativeView(),
-      gfx::Point(rect.CenterPoint().x(), rect.y()), std::move(model));
-}
 
 void AccessibilityMainHandler::SendScreenReaderStateChanged() {
   base::Value result(ui::AXPlatform::GetInstance().IsScreenReaderActive());

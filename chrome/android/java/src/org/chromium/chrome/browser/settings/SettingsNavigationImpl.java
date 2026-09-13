@@ -39,7 +39,6 @@ import org.chromium.chrome.browser.download.settings.DownloadSettings;
 import org.chromium.chrome.browser.glic.GlicActorLoginPermissionsFragment;
 import org.chromium.chrome.browser.glic.GlicSettings;
 import org.chromium.chrome.browser.homepage.settings.HomepageSettings;
-import org.chromium.chrome.browser.image_descriptions.ImageDescriptionsSettings;
 import org.chromium.chrome.browser.language.settings.LanguageSettings;
 import org.chromium.chrome.browser.night_mode.settings.ThemeSettingsFragment;
 import org.chromium.chrome.browser.prefetch.settings.ExtendedPreloadingSettingsFragment;
@@ -136,7 +135,6 @@ public class SettingsNavigationImpl implements SettingsNavigation {
             case SettingsFragment.GROUPED_WEBSITES:
             case SettingsFragment.HOMEPAGE:
             case SettingsFragment.HTTPS_FIRST_MODE:
-            case SettingsFragment.IMAGE_DESCRIPTIONS:
             case SettingsFragment.LANGUAGE:
             case SettingsFragment.LEGAL_INFORMATION:
             case SettingsFragment.LOCATION_PERMISSION:
@@ -337,8 +335,6 @@ public class SettingsNavigationImpl implements SettingsNavigation {
                 return HomepageSettings.class;
             case SettingsFragment.HTTPS_FIRST_MODE:
                 return HttpsFirstModeSettingsFragment.class;
-            case SettingsFragment.IMAGE_DESCRIPTIONS:
-                return ImageDescriptionsSettings.class;
             case SettingsFragment.LANGUAGE:
                 return LanguageSettings.class;
             case SettingsFragment.LEGAL_INFORMATION:

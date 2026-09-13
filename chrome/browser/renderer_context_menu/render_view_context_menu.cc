@@ -86,7 +86,6 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
-#include "chrome/browser/renderer_context_menu/accessibility_labels_menu_observer.h"
 #include "chrome/browser/renderer_context_menu/context_menu_content_type_factory.h"
 #include "chrome/browser/renderer_context_menu/dictation_menu_observer.h"
 #include "chrome/browser/renderer_context_menu/link_to_text_menu_observer.h"

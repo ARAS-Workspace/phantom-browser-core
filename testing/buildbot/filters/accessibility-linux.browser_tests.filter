@@ -217,14 +217,12 @@
 -WebUiJsTest.TrackedElement__TrackedElementTest_fixed_element_tracking
 
 # These tests are run on the main builders and don't need to also be run here.
--AccessibilityLabelsMenuObserverTest.*
 -All/DumpAccessibility*
 -AutomationApiTest.*
 
 # These tests require that accessibility is disabled at startup, or that there
 # is some other AXMode during the test, which will not be the case when
 # --force-renderer-accessibility is used.
--AccessibilityLabelsBrowserTest.NotEnabledWithoutScreenReader
 -All/PdfOcrControllerBrowserTest.NotEnabledWithoutScreenReader/0
 -AXMainNodeAnnotatorControllerBrowserTest.NotEnabledWithoutScreenReader
 -PersistentBackground/AutomationApiTestWithContextType.ImageLabels/0

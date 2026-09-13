@@ -10,8 +10,6 @@
 #include "base/functional/bind.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "chrome/browser/accessibility/accessibility_labels_service.h"
-#include "chrome/browser/accessibility/accessibility_labels_service_factory.h"
 #include "chrome/browser/actor/actor_script_tool_receiver.h"
 #include "chrome/browser/buildflags.h"
 #include "chrome/browser/dom_distiller/dom_distiller_service_factory.h"
@@ -172,16 +170,6 @@ void BindUnhandledTapWebContentsObserver(
       std::move(receiver));
 }
 #endif  // BUILDFLAG(ENABLE_UNHANDLED_TAP)
-
-// Forward image Annotator requests to the profile's AccessibilityLabelsService.
-void BindImageAnnotator(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<image_annotation::mojom::Annotator> receiver) {
-  AccessibilityLabelsServiceFactory::GetForProfile(
-      Profile::FromBrowserContext(
-          frame_host->GetProcess()->GetBrowserContext()))
-      ->BindImageAnnotator(std::move(receiver));
-}
 
 void BindDistillabilityService(
     content::RenderFrameHost* const frame_host,
@@ -419,7 +407,6 @@ void PopulateChromeFrameBinders(
     map->Add<pwc::mojom::PrivilegedBridge>(&pwc::BindPrivilegedBridge);
     map->Add<geic::mojom::GeicApi>(&geic::BindGeicApi);
   }
-  map->Add<image_annotation::mojom::Annotator>(&BindImageAnnotator);
 
   map->Add<blink::mojom::ScriptToolHost>(
       &actor::ActorScriptToolReceiver::Create);

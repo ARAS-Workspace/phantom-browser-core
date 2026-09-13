@@ -262,7 +262,6 @@ class CONTENT_EXPORT RenderAccessibilityImpl : public RenderAccessibility,
   base::WeakPtrFactory<RenderAccessibilityImpl>
       weak_factory_for_pending_events_{this};
 
-  friend class AXImageAnnotatorTest;
   friend class PluginActionHandlingTest;
   friend class RenderAccessibilityImplTest;
   friend class RenderAccessibilityImplUKMTest;

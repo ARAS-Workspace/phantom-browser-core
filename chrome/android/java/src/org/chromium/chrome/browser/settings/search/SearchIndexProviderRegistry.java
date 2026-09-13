@@ -28,7 +28,6 @@ import org.chromium.chrome.browser.contextualsearch.ContextualSearchSettingsFrag
 import org.chromium.chrome.browser.download.settings.DownloadSettings;
 import org.chromium.chrome.browser.glic.GlicSettings;
 import org.chromium.chrome.browser.homepage.settings.HomepageSettings;
-import org.chromium.chrome.browser.image_descriptions.ImageDescriptionsSettings;
 import org.chromium.chrome.browser.language.settings.LanguageSettings;
 import org.chromium.chrome.browser.night_mode.settings.ThemeSettingsFragment;
 import org.chromium.chrome.browser.prefetch.settings.PreloadPagesSettingsFragment;
@@ -105,7 +104,6 @@ public final class SearchIndexProviderRegistry {
                     SingleWebsiteSettings.SEARCH_INDEX_DATA_PROVIDER,
                     SiteSettings.SEARCH_INDEX_DATA_PROVIDER,
                     AccessibilitySettings.SEARCH_INDEX_DATA_PROVIDER,
-                    ImageDescriptionsSettings.SEARCH_INDEX_DATA_PROVIDER,
                     PreloadPagesSettingsFragment.SEARCH_INDEX_DATA_PROVIDER,
                     SafeBrowsingSettingsFragment.SEARCH_INDEX_DATA_PROVIDER,
                     StandardProtectionSettingsFragment.SEARCH_INDEX_DATA_PROVIDER,

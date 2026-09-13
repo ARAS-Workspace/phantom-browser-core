@@ -7,8 +7,6 @@ import("//services/screen_ai/buildflags/features.gni")
 
 source_set("accessibility") {
   public = [
-    "accessibility_labels_service.h",
-    "accessibility_labels_service_factory.h",
     "pdf_ocr_metrics.h",
     "prefers_default_scrollbar_styles_prefs.h",
   ]
@@ -41,7 +39,6 @@ source_set("accessibility") {
     "//components/prefs",
     "//mojo/public/cpp/bindings",
     "//net",
-    "//services/image_annotation/public/mojom",
   ]
 
   if (!is_android) {
@@ -66,8 +63,6 @@ source_set("accessibility") {
 
 source_set("impl") {
   sources = [
-    "accessibility_labels_service.cc",
-    "accessibility_labels_service_factory.cc",
     "pdf_ocr_metrics.cc",
     "prefers_default_scrollbar_styles_prefs.cc",
   ]
@@ -134,14 +129,9 @@ source_set("impl") {
     "//components/sync_preferences",
     "//components/update_client",
     "//content/public/browser",
-    "//services/image_annotation:service",
     "//ui/accessibility",
     "//ui/accessibility/platform",
   ]
-
-  if (is_android) {
-    deps += [ "//chrome/browser/image_descriptions:jni_headers" ]
-  }
 
   allow_circular_includes_from =
       [ "//chrome/browser:browser_public_dependencies" ]
@@ -177,10 +167,8 @@ if (!is_android) {
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
     data_deps = []
     sources = [
-      "accessibility_labels_service_browsertest.cc",
       "ax_main_node_annotator_controller_browsertest.cc",
       "canvas_accessibility_browsertest.cc",
-      "image_annotation_browsertest.cc",
       "interstitial_accessibility_browsertest.cc",
       "page_colors_controller_browsertest.cc",
     ]
@@ -200,7 +188,6 @@ if (!is_android) {
       "//components/live_caption:live_translate",
       "//content/test:browsertest_support",
       "//content/test:test_support",
-      "//services/image_annotation/public/cpp",
     ]
 
     if (is_win) {

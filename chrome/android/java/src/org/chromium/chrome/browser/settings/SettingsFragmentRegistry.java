@@ -26,7 +26,6 @@ import org.chromium.chrome.browser.browsing_data.ClearBrowsingDataFragment;
 import org.chromium.chrome.browser.download.settings.DownloadSettings;
 import org.chromium.chrome.browser.glic.GlicSettings;
 import org.chromium.chrome.browser.homepage.settings.HomepageSettings;
-import org.chromium.chrome.browser.image_descriptions.ImageDescriptionsSettings;
 import org.chromium.chrome.browser.language.settings.LanguageSettings;
 import org.chromium.chrome.browser.night_mode.NightModeMetrics;
 import org.chromium.chrome.browser.night_mode.settings.ThemeSettingsFragment;
@@ -151,7 +150,6 @@ public class SettingsFragmentRegistry {
 
         // Accessibility
         registerMapping("/accessibility", AccessibilitySettings.class);
-        registerMapping("/savedZoomForSites", ImageDescriptionsSettings.class);
 
         // Content / Site Settings
         registerMapping("/siteSettings", SiteSettings.class);

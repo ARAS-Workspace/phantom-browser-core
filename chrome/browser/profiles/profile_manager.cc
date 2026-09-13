@@ -42,8 +42,6 @@
 #include "base/version_info/version_info.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "chrome/browser/accessibility/accessibility_labels_service.h"
-#include "chrome/browser/accessibility/accessibility_labels_service_factory.h"
 #include "chrome/browser/browser_features.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.h"
@@ -1331,12 +1329,6 @@ void ProfileManager::DoFinalInitForServices(Profile* profile,
   // because SyncService needs the URL context getter.
   UnifiedConsentServiceFactory::GetForProfile(profile);
 
-  // TODO(accessibility): Dynamically create AccessibilityLabelsService when
-  // needed and destroy it when no longer needed.
-  auto* accessibility_service =
-      AccessibilityLabelsServiceFactory::GetForProfile(profile);
-  if (accessibility_service)
-    accessibility_service->Init();
 
 }
 

@@ -6,7 +6,6 @@ package org.chromium.chrome.browser.accessibility.settings;
 
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.chrome.browser.dom_distiller.DomDistillerServiceFactory;
-import org.chromium.chrome.browser.image_descriptions.ImageDescriptionsController;
 import org.chromium.chrome.browser.preferences.Pref;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.settings.SettingsNavigationFactory;
@@ -79,7 +78,7 @@ public class ChromeAccessibilitySettingsDelegate implements AccessibilitySetting
 
     @Override
     public boolean shouldShowImageDescriptionsSetting() {
-        return ImageDescriptionsController.getInstance().shouldShowImageDescriptionsMenuItem();
+        return false;
     }
 
     @Override

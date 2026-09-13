@@ -35,7 +35,6 @@ class AccessibilityMainHandler
 
  private:
   void HandleGetScreenReaderState(const base::ListValue& args);
-  void HandleCheckAccessibilityImageLabels(const base::ListValue& args);
 
   void HandleGetScreenAIInstallState(const base::ListValue& args);
 

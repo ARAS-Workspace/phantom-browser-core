@@ -44,7 +44,6 @@
 #include "chrome/browser/extensions/menu_manager.h"
 #endif
 
-class AccessibilityLabelsMenuObserver;
 class BrowserWindowInterface;
 #if BUILDFLAG(ENABLE_COMPOSE)
 class ChromeComposeClient;

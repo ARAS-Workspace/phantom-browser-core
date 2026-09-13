@@ -108,7 +108,6 @@ import org.chromium.chrome.browser.fullscreen.FullscreenOptions;
 import org.chromium.chrome.browser.glic.GlicKeyedService.GlicInvocationSource;
 import org.chromium.chrome.browser.handoff.HandoffController;
 import org.chromium.chrome.browser.host_zoom.HostZoomListenerFactory;
-import org.chromium.chrome.browser.image_descriptions.ImageDescriptionsController;
 import org.chromium.chrome.browser.incognito.reauth.IncognitoReauthController;
 import org.chromium.chrome.browser.incognito.reauth.IncognitoReauthControllerImpl;
 import org.chromium.chrome.browser.incognito.reauth.IncognitoReauthCoordinatorFactory;
@@ -1943,16 +1942,6 @@ public class RootUiCoordinator
         } else if (id == R.id.paint_preview_show_id) {
             DemoPaintPreview.showForTab(mActivityTabProvider.get());
             RecordUserAction.record("MobileMenuPaintPreview");
-            return true;
-        } else if (id == R.id.get_image_descriptions_id) {
-            Tab tab = mActivityTabProvider.get();
-            if (tab != null) {
-                WebContents webContents = tab.getWebContents();
-                assert webContents != null;
-                ImageDescriptionsController.getInstance()
-                        .onImageDescriptionsMenuItemSelected(
-                                mActivity, mModalDialogManagerSupplier.get(), webContents);
-            }
             return true;
         } else if (id == R.id.page_zoom_id) {
             Tab tab = mActivityTabProvider.get();

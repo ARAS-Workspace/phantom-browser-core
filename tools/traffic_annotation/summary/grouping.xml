@@ -439,9 +439,7 @@ after discussions on the right group.
       <annotation id="icon_catcher_get_large_icon"/>
       <annotation id="favicon_fetcher_get_favicon"/>
     </sender>
-    <sender name="Images">
-      <annotation id="image_annotation"/>
-    </sender>
+    <sender name="Images"/>
     <sender name="Early Hints">
       <annotation id="early_hints_preload"/>
     </sender>

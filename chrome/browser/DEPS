@@ -472,7 +472,6 @@ include_rules = [
   "+services/cert_verifier",
   "+services/data_decoder/public",
   "+services/device/public",
-  "+services/image_annotation/public",
   "+services/media_session/public",
   "+services/metrics/public",
   "+services/metrics",

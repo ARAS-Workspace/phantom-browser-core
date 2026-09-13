@@ -7,7 +7,6 @@
 #include <utility>
 
 #include "build/build_config.h"
-#include "content/renderer/accessibility/annotations/ax_image_annotator.h"
 #include "content/renderer/accessibility/render_accessibility_impl.h"
 #include "content/renderer/render_frame_impl.h"
 #include "services/screen_ai/buildflags/buildflags.h"
@@ -26,8 +25,6 @@ AXAnnotatorsManager::AXAnnotatorsManager(
     : render_accessibility_(render_accessibility) {
   DCHECK(render_accessibility_);
 
-  ax_annotators_.emplace_back(
-      std::make_unique<AXImageAnnotator>(render_accessibility_));
 #if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
   ax_annotators_.emplace_back(
       std::make_unique<AXCanvasAnnotator>(render_accessibility_));

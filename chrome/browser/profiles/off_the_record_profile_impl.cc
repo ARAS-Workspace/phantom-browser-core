@@ -19,7 +19,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "chrome/browser/accessibility/accessibility_labels_service.h"
 #include "chrome/browser/background/background_contents_service_factory.h"
 #include "chrome/browser/background_fetch/background_fetch_delegate_factory.h"
 #include "chrome/browser/background_fetch/background_fetch_delegate_impl.h"
@@ -61,6 +60,7 @@
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
+#include "chrome/common/pref_names.h"
 #include "components/background_sync/background_sync_controller_impl.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/guest_view/buildflags/buildflags.h"
@@ -207,8 +207,9 @@ void OffTheRecordProfileImpl::Init() {
   // as a URLDataSource early.
   dom_distiller::RegisterViewerSource(this);
 
-  // AccessibilityLabelsService has a default prefs behavior in incognito.
-  AccessibilityLabelsService::InitOffTheRecordPrefs(this);
+  // Image labels default to off in incognito.
+  GetPrefs()->SetBoolean(prefs::kAccessibilityImageLabelsEnabled, false);
+  GetPrefs()->SetBoolean(prefs::kAccessibilityImageLabelsOptInAccepted, false);
 
 #if !BUILDFLAG(IS_ANDROID)
   // To avoid using any server-side tree fixing service, it is disabled in

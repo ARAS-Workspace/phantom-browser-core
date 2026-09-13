@@ -3141,7 +3141,6 @@ group("browser_public_dependencies") {
     "//ipc",
     "//pdf:buildflags",
     "//services/data_decoder/public/mojom",
-    "//services/image_annotation/public/mojom",
     "//services/network/public/mojom",
     "//services/screen_ai/buildflags",
     "//sql",

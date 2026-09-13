@@ -13,8 +13,6 @@ import("//printing/buildflags/buildflags.gni")
 # //chrome/browser/ui:ui (e.g. from //chrome/browser/ui/webui/settings).
 source_set("bubble_models") {
   if (!is_android) {
-    public = [ "accessibility_labels_bubble_model.h" ]
-
     public_deps = [
       "//base",
       "//chrome/browser/ui:confirm_bubble_model",
@@ -84,14 +82,11 @@ source_set("impl") {
 
   if (!is_android) {
     public += [
-      "accessibility_labels_menu_observer.h",
       "dictation_menu_observer.h",
       "link_to_text_menu_observer.h",
     ]
 
     sources += [
-      "accessibility_labels_bubble_model.cc",
-      "accessibility_labels_menu_observer.cc",
       "context_menu_content_type_read_anything.cc",
       "context_menu_content_type_read_anything.h",
       "dictation_menu_observer.cc",
@@ -314,11 +309,7 @@ if (!is_android) {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "accessibility_labels_bubble_model_browsertest.cc",
-      "accessibility_labels_menu_observer_browsertest.cc",
-      "render_view_context_menu_browsertest.cc",
-    ]
+    sources = [ "render_view_context_menu_browsertest.cc" ]
 
     deps = [
       ":impl",

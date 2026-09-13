@@ -146,7 +146,6 @@ to the classpath for downstream development. See "additional_entries" below.
     <classpathentry kind="src" path="chrome/browser/fullscreen/android/java/src"/>
     <classpathentry kind="src" path="chrome/browser/gsa/java/src"/>
     <classpathentry kind="src" path="chrome/browser/history_clusters/java/src"/>
-    <classpathentry kind="src" path="chrome/browser/image_descriptions/android/java/src"/>
     <classpathentry kind="src" path="chrome/browser/image_editor/internal/android/java/src"/>
     <classpathentry kind="src" path="chrome/browser/image_editor/public/android/java/src"/>
     <classpathentry kind="src" path="chrome/browser/incognito/android/java/src"/>

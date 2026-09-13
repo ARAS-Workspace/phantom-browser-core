@@ -89,8 +89,6 @@ test("services_unittests") {
       "//services/audio:tests",
       "//services/data_decoder:tests",
       "//services/device:tests",
-      "//services/image_annotation:tests",
-      "//services/image_annotation/public/cpp:tests",
       "//services/media_session:tests",
       "//services/media_session/public/cpp:tests",
       "//services/on_device_model:tests",

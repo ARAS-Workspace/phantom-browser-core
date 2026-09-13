@@ -24,8 +24,6 @@ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFrag
 import org.chromium.chrome.browser.autofill.settings.personal_context.AutofillPersonalContextCoordinator;
 import org.chromium.chrome.browser.autofill.settings.personal_context.AutofillPersonalContextFragment;
 import org.chromium.chrome.browser.device_lock.DeviceLockActivityLauncherImpl;
-import org.chromium.chrome.browser.image_descriptions.ImageDescriptionsController;
-import org.chromium.chrome.browser.image_descriptions.ImageDescriptionsSettings;
 import org.chromium.chrome.browser.language.settings.LanguageSettings;
 import org.chromium.chrome.browser.lifetime.ApplicationLifetime;
 import org.chromium.chrome.browser.locale.LocaleManager;
@@ -168,20 +166,6 @@ public class FragmentDependencyProvider extends FragmentManager.FragmentLifecycl
             SearchEngineSettings settings = (SearchEngineSettings) fragment;
             settings.setDisableAutoSwitchRunnable(
                     () -> LocaleManager.getInstance().setSearchEngineAutoSwitch(false));
-        }
-        if (fragment instanceof ImageDescriptionsSettings) {
-            ImageDescriptionsSettings imageFragment = (ImageDescriptionsSettings) fragment;
-            Bundle extras = imageFragment.getArguments();
-            if (extras != null) {
-                extras.putBoolean(
-                        ImageDescriptionsSettings.IMAGE_DESCRIPTIONS,
-                        ImageDescriptionsController.getInstance()
-                                .imageDescriptionsEnabled(mProfile));
-                extras.putBoolean(
-                        ImageDescriptionsSettings.IMAGE_DESCRIPTIONS_DATA_POLICY,
-                        ImageDescriptionsController.getInstance().onlyOnWifiEnabled(mProfile));
-            }
-            imageFragment.setDelegate(ImageDescriptionsController.getInstance().getDelegate());
         }
         if (fragment instanceof LanguageSettings) {
             ((LanguageSettings) fragment)

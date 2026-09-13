@@ -18,7 +18,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/about_flags.h"
-#include "chrome/browser/accessibility/accessibility_labels_service.h"
 #include "chrome/browser/accessibility/invert_bubble_prefs.h"
 #include "chrome/browser/accessibility/page_colors_controller.h"
 #include "chrome/browser/accessibility/prefers_default_scrollbar_styles_prefs.h"
@@ -1329,7 +1328,20 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
                           const std::string& locale) {
   TRACE_EVENT0("browser", "chrome::RegisterProfilePrefs");
   // User prefs. Please keep this list alphabetized.
-  AccessibilityLabelsService::RegisterProfilePrefs(registry);
+  registry->RegisterBooleanPref(
+      prefs::kAccessibilityImageLabelsEnabled, false,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterBooleanPref(
+      prefs::kAccessibilityImageLabelsOptInAccepted, false,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+#if BUILDFLAG(IS_ANDROID)
+  registry->RegisterBooleanPref(
+      prefs::kAccessibilityImageLabelsEnabledAndroid, false,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterBooleanPref(
+      prefs::kAccessibilityImageLabelsOnlyOnWifi, true,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+#endif
   AccessibilityUIMessageHandler::RegisterProfilePrefs(registry);
   accessibility_annotator::prefs::RegisterProfilePrefs(registry);
   AimEligibilityService::RegisterProfilePrefs(registry);

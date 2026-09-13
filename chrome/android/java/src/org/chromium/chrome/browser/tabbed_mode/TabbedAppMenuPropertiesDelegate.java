@@ -46,7 +46,6 @@ import org.chromium.chrome.browser.homepage.HomepageManager;
 import org.chromium.chrome.browser.hub.HubManager;
 import org.chromium.chrome.browser.hub.Pane;
 import org.chromium.chrome.browser.hub.PaneId;
-import org.chromium.chrome.browser.image_descriptions.ImageDescriptionsController;
 import org.chromium.chrome.browser.incognito.IncognitoUtils;
 import org.chromium.chrome.browser.incognito.reauth.IncognitoReauthController;
 import org.chromium.chrome.browser.layouts.LayoutStateProvider;
@@ -541,11 +540,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             modelList.add(mSaveAndShareItemBuilder.buildPaintPreviewItem(shouldShowIconBeforeItem));
         }
 
-        // Get Image Descriptions
-        if (shouldShowGetImageDescriptionsItem(currentTab)) {
-            modelList.add(buildGetImageDescriptionsItem(currentTab));
-        }
-
         // Listen to the Feed
         if (shouldShowListenToFeedItem(currentTab)) {
             modelList.add(buildListenToFeedItem());
@@ -731,11 +725,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         // Auto Dark
         if (shouldShowAutoDarkItem(currentTab, isNativePage)) {
             modelList.add(buildAutoDarkItem(currentTab, isNativePage, shouldShowIconBeforeItem));
-        }
-
-        // Get Image Descriptions
-        if (shouldShowGetImageDescriptionsItem(currentTab)) {
-            modelList.add(buildGetImageDescriptionsItem(currentTab));
         }
 
         // Listen to the Feed
@@ -1337,42 +1326,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 ? R.drawable.ic_more_tools_24dp
                                 : Resources.ID_NULL,
                         submenuItemsSupplier,
-                        isMenuIconAtStart()));
-    }
-
-    @Contract("null -> false")
-    private boolean shouldShowGetImageDescriptionsItem(@Nullable Tab currentTab) {
-        return currentTab != null
-                && shouldShowWebContentsDependentMenuItem(currentTab)
-                && ImageDescriptionsController.getInstance().shouldShowImageDescriptionsMenuItem();
-    }
-
-    private ListItem buildGetImageDescriptionsItem(Tab currentTab) {
-        assert shouldShowGetImageDescriptionsItem(currentTab);
-
-        @StringRes int titleId = R.string.menu_stop_image_descriptions;
-        Profile profile = currentTab.getProfile();
-        // If image descriptions are not enabled, then we want the menu item to be "Get".
-        if (!ImageDescriptionsController.getInstance().imageDescriptionsEnabled(profile)) {
-            titleId = R.string.menu_get_image_descriptions;
-        } else if (ImageDescriptionsController.getInstance().onlyOnWifiEnabled(profile)
-                && DeviceConditions.getCurrentNetConnectionType(mContext)
-                        != ConnectionType.CONNECTION_WIFI) {
-            // If image descriptions are enabled, then we want "Stop", except in the special
-            // case that the user specified only on Wifi, and we are not currently on Wifi.
-            titleId = R.string.menu_get_image_descriptions;
-        }
-
-        return new ListItem(
-                AppMenuHandler.AppMenuItemType.STANDARD,
-                AppMenuItemUtils.buildModelForStandardMenuItem(
-                        mContext,
-                        getAppMenuItemTheme(),
-                        R.id.get_image_descriptions_id,
-                        titleId,
-                        shouldShowIconBeforeItem()
-                                ? R.drawable.ic_image_descriptions
-                                : Resources.ID_NULL,
                         isMenuIconAtStart()));
     }
 

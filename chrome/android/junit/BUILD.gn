@@ -138,7 +138,6 @@ if (is_android) {
       "//chrome/browser/hub:factory_java",
       "//chrome/browser/hub:java",
       "//chrome/browser/hub/internal:java",
-      "//chrome/browser/image_descriptions:java",
       "//chrome/browser/incognito:java",
       "//chrome/browser/keyboard_accessory/android/java",
       "//chrome/browser/language/android:java",
