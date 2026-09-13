@@ -10,7 +10,6 @@
 // This is a little unorthodox, but it lets us test the behavior as
 // close to unmodified as possible.
 
-#include "google_apis/google_api_keys_unittest.h"
 
 #include "base/command_line.h"
 #include "base/files/file_path.h"
@@ -26,67 +25,6 @@
 #include "google_apis/gaia/gaia_config.h"
 #include "google_apis/gaia/gaia_switches.h"
 #include "google_apis/google_api_keys.h"
-
-GoogleAPIKeysTest::GoogleAPIKeysTest() : env_(base::Environment::Create()) {
-#if BUILDFLAG(SUPPORT_CDM_SERVER_CERTIFICATE)
-  static constexpr int kExpectedNumberOfEntries = 10;
-#else
-  static constexpr int kExpectedNumberOfEntries = 9;
-#endif
-  static_assert(kExpectedNumberOfEntries == kTotalCacheLength,
-                "Unexpected number of key entries.");
-
-  env_cache_[0].variable_name = "GOOGLE_API_KEY";
-  env_cache_[1].variable_name = "GOOGLE_CLIENT_ID_MAIN";
-  env_cache_[2].variable_name = "GOOGLE_CLIENT_SECRET_MAIN";
-  env_cache_[3].variable_name = "GOOGLE_CLIENT_ID_REMOTING";
-  env_cache_[4].variable_name = "GOOGLE_CLIENT_SECRET_REMOTING";
-  env_cache_[5].variable_name = "GOOGLE_CLIENT_ID_REMOTING_HOST";
-  env_cache_[6].variable_name = "GOOGLE_CLIENT_SECRET_REMOTING_HOST";
-  env_cache_[7].variable_name = "GOOGLE_DEFAULT_CLIENT_ID";
-  env_cache_[8].variable_name = "GOOGLE_DEFAULT_CLIENT_SECRET";
-#if BUILDFLAG(SUPPORT_CDM_SERVER_CERTIFICATE)
-  env_cache_[9].variable_name = "GOOGLE_CDM_SERVER_CERTIFICATE";
-#endif
-}
-
-GoogleAPIKeysTest::~GoogleAPIKeysTest() {}
-
-void GoogleAPIKeysTest::SetUp() {
-  // Unset all environment variables that can affect these tests,
-  // for the duration of the tests.
-  for (size_t i = 0; i < std::size(env_cache_); ++i) {
-    EnvironmentCache& cache = env_cache_[i];
-    cache.was_set = env_->HasVar(cache.variable_name);
-    cache.value.clear();
-    if (cache.was_set) {
-      cache.value = env_->GetVar(cache.variable_name).value();
-      env_->UnSetVar(cache.variable_name);
-    }
-  }
-}
-
-void GoogleAPIKeysTest::TearDown() {
-  // Restore environment.
-  for (size_t i = 0; i < std::size(env_cache_); ++i) {
-    EnvironmentCache& cache = env_cache_[i];
-    if (cache.was_set) {
-      env_->SetVar(cache.variable_name, cache.value);
-    }
-  }
-}
-
-base::FilePath GetTestFilePath(const std::string& relative_path) {
-  base::FilePath path;
-  if (!base::PathService::Get(base::DIR_SRC_TEST_DATA_ROOT, &path)) {
-    return base::FilePath();
-  }
-  return path.AppendASCII("google_apis")
-      .AppendASCII("test")
-      .AppendASCII("data")
-      .AppendASCII("gaia")
-      .AppendASCII(relative_path);
-}
 
 #if defined(USE_OFFICIAL_GOOGLE_API_KEYS)
 // Test official build behavior, since we are in a checkout where this
@@ -122,7 +60,7 @@ namespace official_build {
 
 }  // namespace official_build
 
-TEST_F(GoogleAPIKeysTest, OfficialKeys) {
+TEST(GoogleAPIKeysTest, OfficialKeys) {
   google_apis::ApiKeyCache api_key_cache(
       official_build::GetDefaultApiKeysFromDefinedValues());
   auto scoped_override =
@@ -178,70 +116,6 @@ TEST_F(GoogleAPIKeysTest, OfficialKeys) {
 #endif
 }
 
-// While in an official build, override all the keys using GaiaConfig.
-namespace override_all_official_keys_config {
-
-// We start every test by creating a clean environment for the
-// preprocessor defines used in define_baked_in_api_keys-inc.cc
-#undef GOOGLE_API_KEY
-#undef GOOGLE_CLIENT_ID_MAIN
-#undef GOOGLE_CLIENT_SECRET_MAIN
-#undef GOOGLE_CLIENT_ID_REMOTING
-#undef GOOGLE_CLIENT_SECRET_REMOTING
-#undef GOOGLE_CLIENT_ID_REMOTING_HOST
-#undef GOOGLE_CLIENT_SECRET_REMOTING_HOST
-#undef GOOGLE_DEFAULT_CLIENT_ID
-#undef GOOGLE_DEFAULT_CLIENT_SECRET
-#undef GOOGLE_CDM_SERVER_CERTIFICATE
-
-// Undef include guard so things get defined again, within this namespace.
-#undef GOOGLE_APIS_INTERNAL_GOOGLE_CHROME_API_KEYS_
-#undef GOOGLE_APIS_INTERNAL_METRICS_SIGNING_KEY_H_
-#include "google_apis/internal/google_chrome_api_keys.h"
-#include "google_apis/internal/metrics_signing_key.h"
-
-// This file must be included after the internal files defining official keys.
-#include "google_apis/default_api_keys-inc.cc"
-
-}  // namespace override_all_official_keys_config
-
-TEST_F(GoogleAPIKeysTest, OverrideAllOfficialKeysUsingConfig) {
-  base::test::ScopedCommandLine scoped_command_line;
-  scoped_command_line.GetProcessCommandLine()->AppendSwitchPath(
-      switches::kGaiaConfigPath, GetTestFilePath("api_keys.json"));
-  auto scoped_config_override = GaiaConfig::SetScopedConfigForTesting(
-      GaiaConfig::CreateFromCommandLineForTesting(
-          scoped_command_line.GetProcessCommandLine()));
-
-  google_apis::ApiKeyCache api_key_cache(
-      override_all_official_keys_config::GetDefaultApiKeysFromDefinedValues());
-  auto scoped_override =
-      google_apis::SetScopedApiKeyCacheForTesting(&api_key_cache);
-
-  EXPECT_TRUE(google_apis::HasAPIKeyConfigured());
-  EXPECT_TRUE(google_apis::HasOAuthClientConfigured());
-  // Still returns true, even though the keys were overridden.
-  EXPECT_TRUE(google_apis::IsGoogleChromeAPIKeyUsed());
-
-  EXPECT_EQ(google_apis::GetAPIKey(), "config-API_KEY");
-  EXPECT_EQ(google_apis::GetOAuth2ClientID(google_apis::CLIENT_MAIN),
-            "config-ID_MAIN");
-  EXPECT_EQ(google_apis::GetOAuth2ClientSecret(google_apis::CLIENT_MAIN),
-            "config-SECRET_MAIN");
-  EXPECT_EQ(google_apis::GetOAuth2ClientID(google_apis::CLIENT_REMOTING),
-            "config-ID_REMOTING");
-  EXPECT_EQ(google_apis::GetOAuth2ClientSecret(google_apis::CLIENT_REMOTING),
-            "config-SECRET_REMOTING");
-  EXPECT_EQ(google_apis::GetOAuth2ClientID(google_apis::CLIENT_REMOTING_HOST),
-            "config-ID_REMOTING_HOST");
-  EXPECT_EQ(
-      google_apis::GetOAuth2ClientSecret(google_apis::CLIENT_REMOTING_HOST),
-      "config-SECRET_REMOTING_HOST");
-#if BUILDFLAG(SUPPORT_CDM_SERVER_CERTIFICATE)
-  EXPECT_EQ("config-CDM_SERVER_CERTIFICATE",
-            google_apis::GetCdmServerCertificate());
-#endif
-}
 #endif  // defined(USE_OFFICIAL_GOOGLE_API_KEYS)
 
 // After this test, for the remainder of this compilation unit, we
@@ -272,7 +146,7 @@ namespace default_keys {
 
 }  // namespace default_keys
 
-TEST_F(GoogleAPIKeysTest, DefaultKeys) {
+TEST(GoogleAPIKeysTest, DefaultKeys) {
   google_apis::ApiKeyCache api_key_cache(
       default_keys::GetDefaultApiKeysFromDefinedValues());
   auto scoped_override =
@@ -332,7 +206,7 @@ namespace override_some_keys {
 
 }  // namespace override_some_keys
 
-TEST_F(GoogleAPIKeysTest, OverrideSomeKeys) {
+TEST(GoogleAPIKeysTest, OverrideSomeKeys) {
   google_apis::ApiKeyCache api_key_cache(
       override_some_keys::GetDefaultApiKeysFromDefinedValues());
   auto scoped_override =
@@ -398,7 +272,7 @@ namespace override_all_keys {
 
 }  // namespace override_all_keys
 
-TEST_F(GoogleAPIKeysTest, OverrideAllKeys) {
+TEST(GoogleAPIKeysTest, OverrideAllKeys) {
   google_apis::ApiKeyCache api_key_cache(
       override_all_keys::GetDefaultApiKeysFromDefinedValues());
   auto scoped_override =
@@ -465,7 +339,7 @@ namespace override_all_keys_setters {
 
 }  // namespace override_all_keys_setters
 
-TEST_F(GoogleAPIKeysTest, OverrideAllKeysUsingSetters) {
+TEST(GoogleAPIKeysTest, OverrideAllKeysUsingSetters) {
   google_apis::ApiKeyCache api_key_cache(
       override_all_keys_setters::GetDefaultApiKeysFromDefinedValues());
   auto scoped_override =

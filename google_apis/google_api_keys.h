@@ -31,20 +31,9 @@ enum class Channel;
 // https://developers.google.com/console/help/ and
 // https://developers.google.com/console/.
 //
-// The keys must either be provided using preprocessor variables (set via e.g.
-// GN args). Alternatively, they can be overridden at runtime using one of the
-// following methods (in priority order):
-// - Command line parameters (only for GOOGLE_CLIENT_ID_MAIN and
-//   GOOGLE_CLIENT_SECRET_MAIN values). The command-line parameters are
-//   --oauth2-client-id and --oauth2-client-secret.
-// - Config file entry of the same name. Path to a config file is set via the
-//   --gaia-config command line parameter. See google_apis/gaia/gaia_config.h
-//   for syntax reference.
-// - Environment variables of the same name. Environment variable overrides will
-//   be ignored for official Google Chrome builds.
+// The keys are provided using preprocessor variables (set via e.g. GN args).
 //
-// The names of the preprocessor variables (or environment variables
-// to override them at runtime in Chromium builds) are as follows:
+// The names of the preprocessor variables are as follows:
 // - GOOGLE_API_KEY: The API key, a.k.a. developer key.
 // - GOOGLE_DEFAULT_CLIENT_ID: If set, this is used as the default for
 //   all client IDs not otherwise set.  This is intended only for
@@ -143,9 +132,7 @@ const std::string& GetOAuth2ClientSecret(OAuth2Client client);
 // Returns true if the current build was built with official Google Chrome API
 // keys.
 //
-// This is a build-time check and does not verify whether the keys were
-// overridden at runtime (e.g. through environment variables, command-line
-// switches or a Gaia config file).
+// This is a build-time check.
 COMPONENT_EXPORT(GOOGLE_APIS) bool IsGoogleChromeAPIKeyUsed();
 
 #if BUILDFLAG(SUPPORT_EXTERNAL_GOOGLE_API_KEY)

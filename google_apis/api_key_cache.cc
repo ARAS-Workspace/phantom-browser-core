@@ -10,17 +10,12 @@
 #include <memory>
 #include <string>
 
-#include "base/command_line.h"
-#include "base/feature_list.h"
-#include "base/features.h"
 #include "base/logging.h"
 #include "base/strings/cstring_view.h"
 #include "base/strings/stringize_macros.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "google_apis/buildflags.h"
 #include "google_apis/default_api_keys.h"
-#include "google_apis/gaia/gaia_switches.h"
 
 namespace google_apis {
 
@@ -52,7 +47,6 @@ static std::string CalculateKeyValue(const char* baked_in_value,
   return key_value;
 }
 }  // namespace
-
 
 ApiKeyCache::ApiKeyCache(const DefaultApiKeys& default_api_keys)
     : is_initialized_using_google_chrome_keys_(
@@ -114,12 +108,6 @@ ApiKeyCache::ApiKeyCache(const DefaultApiKeys& default_api_keys)
                         STRINGIZE_NO_EXPANSION(GOOGLE_DEFAULT_CLIENT_SECRET),
                         std::string(), default_api_keys.allow_unset_values);
 
-  // We currently only allow overriding the baked-in values for the
-  // default OAuth2 client ID and secret using a command-line
-  // argument and gaia config, since that is useful to enable testing against
-  // staging servers, and since that was what was possible and
-  // likely practiced by the QA team before this implementation was
-  // written.
   client_ids_[CLIENT_MAIN] =
       CalculateKeyValue(default_api_keys.google_client_id_main,
                         STRINGIZE_NO_EXPANSION(GOOGLE_CLIENT_ID_MAIN),

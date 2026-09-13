@@ -12,7 +12,6 @@
 #include "base/component_export.h"
 #include "base/functional/callback_helpers.h"
 #include "base/values.h"
-#include "google_apis/google_api_keys.h"
 
 class GURL;
 
@@ -21,7 +20,7 @@ class CommandLine;
 class FilePath;
 }  // namespace base
 
-// Class representing a configuration for Gaia URLs and Google API keys.
+// Class representing a configuration for Gaia URLs.
 // Parses a JSON config file specified by |switches::kGaiaConfigPath| or
 // |switches::kGaiaConfigContents| and provides convenient getters for reading
 // this config.
@@ -32,10 +31,6 @@ class FilePath;
 //     "gaia_url": {
 //       "url": "https://accounts.example.com"
 //     },
-//     ...
-//   },
-//   "api_keys": {
-//     "GOOGLE_CLIENT_ID_MAIN": "example_key",
 //     ...
 //   },
 //   "flags": {

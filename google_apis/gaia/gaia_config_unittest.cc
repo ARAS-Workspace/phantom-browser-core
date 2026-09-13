@@ -30,9 +30,6 @@ const char kTestConfigContents[] = R"(
       "url": "https://accounts.example.com/"
     }
   },
-  "api_keys": {
-    "test_api_key": "test_api_key_value"
-  },
   "flags": {
     "test_flag": true
   }

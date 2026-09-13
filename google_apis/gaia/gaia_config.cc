@@ -17,7 +17,6 @@
 #include "base/no_destructor.h"
 #include "base/threading/thread_restrictions.h"
 #include "google_apis/gaia/gaia_switches.h"
-#include "google_apis/google_api_keys.h"
 #include "url/gurl.h"
 
 // static

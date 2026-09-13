@@ -189,8 +189,6 @@ component("google_apis") {
   }
 
   if (is_apple) {
-    sources += []
-
     if (is_ios) {
       sources += [ "gaia/gaia_id_ios.mm" ]
     }
@@ -273,7 +271,6 @@ test("google_apis_unittests") {
     "gaia/oauth_multilogin_result_unittest.cc",
     "gaia/register_bound_session_payload_unittest.cc",
     "google_api_keys_unittest.cc",
-    "google_api_keys_unittest.h",
   ]
 
   configs += [ ":key_defines" ]
@@ -313,7 +310,6 @@ bundle_data("google_apis_unittest_bundle_data") {
     "test/data/gaia/all_base_urls.json",
     "test/data/gaia/all_flags.json",
     "test/data/gaia/all_urls.json",
-    "test/data/gaia/api_keys.json",
     "test/data/gaia/bad_url.json",
     "test/data/gaia/bad_url_key.json",
     "test/data/gaia/bad_urls_key.json",
