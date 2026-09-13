@@ -19,7 +19,6 @@
 #include "chrome/browser/ui/webui/on_device_internals/on_device_internals_page.mojom.h"
 #include "components/optimization_guide/core/delivery/prediction_manager.h"
 #include "components/optimization_guide/core/model_execution/model_execution_features.h"
-#include "components/optimization_guide/core/model_execution/model_execution_manager.h"
 #include "components/optimization_guide/core/model_execution/model_execution_prefs.h"
 #include "components/optimization_guide/core/model_execution/model_execution_util.h"
 #include "components/optimization_guide/core/model_execution/on_device_features.h"

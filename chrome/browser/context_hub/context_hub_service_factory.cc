@@ -24,7 +24,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
 #include "chrome/browser/ui/webui/context_hub/context_hub.mojom-features.h"
-#include "components/optimization_guide/core/model_execution/remote_model_executor.h"
 #include "components/page_content_annotations/content/page_content_extraction_service.h"
 #include "components/saved_tab_groups/public/tab_group_sync_service.h"
 #include "sql/database.h"

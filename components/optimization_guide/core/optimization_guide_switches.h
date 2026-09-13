@@ -60,23 +60,6 @@ bool ShouldGetFreeDiskSpaceWithUserVisiblePriorityTask();
 COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
 extern const char kOnDeviceModelAdaptationsOverride[];
 
-// TODO(crbug.com/514743962): Move to chrome/browser/optimization_guide/model_validator_keyed_service.h.
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-extern const char kModelExecutionValidate[];
-// Returns whether the server-side AI model execution validation should happen.
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-bool ShouldValidateModelExecution();
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-extern const char kOnDeviceValidationRequestOverride[];
-// Returns the file path to the text file to use for the on-device request
-// override.
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-std::optional<base::FilePath> GetOnDeviceValidationRequestOverride();
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-extern const char kOnDeviceValidationWriteToFile[];
-// Returns the file path to write the on-device validation response to.
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-std::optional<base::FilePath> GetOnDeviceValidationWriteToFile();
 
 // TODO(crbug.com/514743962): Move to components/optimization_guide/core/model_quality/model_quality_logs_uploader_service.h.
 COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)

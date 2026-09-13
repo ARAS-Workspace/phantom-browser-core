@@ -18,7 +18,6 @@
 #include "components/accessibility_annotator/content/content_annotator/content_annotator_service.h"
 #include "components/accessibility_annotator/core/accessibility_annotator_features.h"
 #include "components/history/core/browser/history_service.h"
-#include "components/optimization_guide/core/model_execution/remote_model_executor.h"
 #include "components/passage_embeddings/core/passage_embeddings_service_controller.h"
 
 // static

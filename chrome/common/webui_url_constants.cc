@@ -11,7 +11,6 @@
 #include "base/no_destructor.h"
 #include "build/build_config.h"
 #include "components/history_clusters/history_clusters_internals/webui/url_constants.h"
-#include "components/optimization_guide/optimization_guide_internals/webui/url_constants.h"
 #include "components/safe_browsing/core/common/web_ui_constants.h"
 #include "device/vr/buildflags/buildflags.h"
 #include "extensions/buildflags/buildflags.h"
@@ -61,7 +60,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
 #if !BUILDFLAG(IS_ANDROID)
       kChromeUIOnDeviceInternalsHost,
 #endif
-      optimization_guide_internals::kChromeUIOptimizationGuideInternalsHost,
       kChromeUIPolicyHost,
       kChromeUIPredictorsHost,
       kChromeUIPrefsInternalsHost,

@@ -18,7 +18,6 @@
 
 #include "base/containers/flat_map.h"
 #include "components/optimization_guide/core/model_execution/model_broker_client.h"  // nogncheck crbug.com/40147906
-#include "components/optimization_guide/core/model_execution/remote_model_executor.h"  // nogncheck crbug.com/40147906
 #include "components/soda/soda_installer.h"  // nogncheck crbug.com/40147906
 #endif  // !BUILDFLAG(IS_ANDROID)
 

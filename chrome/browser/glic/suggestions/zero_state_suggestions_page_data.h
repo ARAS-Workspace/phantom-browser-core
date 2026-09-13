@@ -15,7 +15,6 @@
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
 #include "components/optimization_guide/core/hints/optimization_guide_decision.h"
 #include "components/optimization_guide/core/hints/optimization_metadata.h"
-#include "components/optimization_guide/core/model_execution/remote_model_executor.h"
 #include "components/page_content_annotations/content/page_content_extraction_service.h"
 #include "components/page_content_annotations/core/page_content_extraction_types.h"
 #include "content/public/browser/page_user_data.h"

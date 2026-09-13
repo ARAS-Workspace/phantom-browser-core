@@ -146,7 +146,6 @@
 #include "chrome/browser/notifications/platform_notification_service_factory.h"
 #include "chrome/browser/omnibox/autocomplete_controller_emitter_factory.h"
 #include "chrome/browser/omnibox/geolocation_header_service_factory.h"
-#include "chrome/browser/optimization_guide/model_validator_keyed_service_factory.h"
 #include "chrome/browser/optimization_guide/optimization_guide_global_state_holder_keyed_service_factory.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/origin_trials/origin_trials_factory.h"
@@ -290,7 +289,6 @@
 #include "components/enterprise/content/clipboard_restriction_service.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/on_device_translation/buildflags/buildflags.h"
-#include "components/optimization_guide/core/optimization_guide_util.h"
 #include "components/password_manager/content/browser/password_manager_log_router_factory.h"
 #include "components/password_manager/content/browser/password_requirements_service_factory.h"
 #include "components/password_manager/core/browser/password_manager_blocklist_policy.h"
@@ -1080,9 +1078,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   // TODO(b/502297163): Implement for Android.
   OneTimePermissionsTrackerFactory::GetInstance();
 #endif
-  if (optimization_guide::ShouldStartModelValidator()) {
-    optimization_guide::ModelValidatorKeyedServiceFactory::GetInstance();
-  }
   OptimizationGuideGlobalStateHolderKeyedServiceFactory::GetInstance();
   OptimizationGuideKeyedServiceFactory::GetInstance();
   OriginKeyedPermissionActionServiceFactory::GetInstance();
