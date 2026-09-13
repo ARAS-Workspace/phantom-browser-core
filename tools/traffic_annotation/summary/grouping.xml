@@ -373,11 +373,6 @@ after discussions on the right group.
       <annotation id="domain_reliability_report_upload"/>
       <annotation id="http_server_error_response"/>
     </sender>
-    <sender name="Data Reduction Proxy">
-      <annotation id="hintsfetcher_gethintsrequest"/>
-      <annotation id="optimization_guide_model"/>
-      <annotation id="optimization_guide_model_download"/>
-    </sender>
     <sender name="Network">
       <annotation id="network_time_component"/>
     </sender>

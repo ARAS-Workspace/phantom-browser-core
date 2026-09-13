@@ -181,7 +181,6 @@ size_t MaxResultsForSRPFetch();
 
 // The API key for the One Platform Optimization Guide Service.
 COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-std::string GetOptimizationGuideServiceAPIKey();
 
 // The host for the One Platform Optimization Guide Service for Models and Host
 // Model Features.
@@ -421,7 +420,7 @@ std::optional<base::TimeDelta> GetMainFrameGetAIPageContentTimeout();
 COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
 std::optional<base::TimeDelta> GetAIPageContentGetImageBytesTimeout();
 
-// Overrides the Optimization Guide Service URL that the PredictionModelFetcher
+// Overrides the Optimization Guide Service URL for model metadata
 // will request remote models and host features from.
 inline constexpr char kOptimizationGuideServiceGetModelsURLSwitch[] =
     "optimization-guide-service-get-models-url";

@@ -13,13 +13,6 @@ namespace optimization_guide {
 inline constexpr char kDisableCheckingUserPermissionsForTestingSwitch[] =
     "disable-checking-optimization-guide-user-permissions";
 
-// Enables overriding Google API key configuration check for permissions.
-inline constexpr char kGoogleApiKeyConfigurationCheckOverrideSwitch[] =
-    "optimization-guide-google-api-key-configuration-check-override";
-
-// Returns true if Google API key configuration check should be skipped.
-bool ShouldSkipGoogleApiKeyConfigurationCheck();
-
 // Returns true if the user, as represented by |profile| is permitted to make
 // calls to the remote Optimization Guide Service.
 //

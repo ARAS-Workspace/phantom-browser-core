@@ -73,10 +73,7 @@ ModelQualityLogsUploaderService::ModelQualityLogsUploaderService(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     PrefService* pref_service)
     : model_quality_logs_uploader_service_url_(
-          net::AppendOrReplaceQueryParameter(
-              GetModelQualityLogsUploaderServiceURL(),
-              "key",
-              switches::GetModelQualityServiceAPIKey())),
+          GetModelQualityLogsUploaderServiceURL()),
       pref_service_(pref_service),
       url_loader_factory_(url_loader_factory) {
   CHECK(model_quality_logs_uploader_service_url_.SchemeIs(url::kHttpsScheme));

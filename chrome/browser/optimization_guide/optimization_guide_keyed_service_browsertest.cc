@@ -59,7 +59,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
 #include "components/ukm/test_ukm_recorder.h"
-#include "components/variations/active_field_trials.h"
 #include "components/variations/hashing.h"
 #include "components/variations/service/variations_service.h"
 #include "content/public/browser/navigation_handle.h"
@@ -513,14 +512,6 @@ class OptimizationGuideKeyedServiceOnDeviceModelDisabledBrowserTest
  private:
   base::test::ScopedFeatureList feature_list_;
 };
-
-IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
-                       RemoteFetchingDisabled) {
-  histogram_tester()->ExpectUniqueSample(
-      "OptimizationGuide.RemoteFetchingEnabled", false, 1);
-  EXPECT_TRUE(variations::IsInSyntheticTrialGroup(
-      "SyntheticOptimizationGuideRemoteFetching", "Disabled"));
-}
 
 IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
                        NavigateToPageWithAsyncCallbackReturnsAnswerRedirect) {
@@ -1129,15 +1120,6 @@ class OptimizationGuideKeyedServicePermissionsCheckDisabledTest
         kDisableFetchingHintsAtNavigationStartForTestingSwitch);
   }
 };
-
-IN_PROC_BROWSER_TEST_F(
-    OptimizationGuideKeyedServicePermissionsCheckDisabledTest,
-    RemoteFetchingAllowed) {
-  histogram_tester()->ExpectUniqueSample(
-      "OptimizationGuide.RemoteFetchingEnabled", true, 1);
-  EXPECT_TRUE(variations::IsInSyntheticTrialGroup(
-      "SyntheticOptimizationGuideRemoteFetching", "Enabled"));
-}
 
 IN_PROC_BROWSER_TEST_F(
     OptimizationGuideKeyedServicePermissionsCheckDisabledTest,

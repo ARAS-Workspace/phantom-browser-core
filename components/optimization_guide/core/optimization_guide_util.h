@@ -105,11 +105,6 @@ void PopulateAuthorizationRequestHeader(
     network::ResourceRequest* resource_request,
     std::string_view access_token);
 
-// Populates the api key header for the `resource_request` in the right
-// format with the `api_key`.
-void PopulateApiKeyRequestHeader(network::ResourceRequest* resource_request,
-                                 std::string_view api_key);
-
 // Populates the x-server-timeout header for the `resource_request` in the right
 // format with `timeout`.
 void PopulateServerTimeoutRequestHeader(

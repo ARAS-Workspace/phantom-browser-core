@@ -28,22 +28,11 @@
 #include "components/optimization_guide/core/optimization_guide_enums.h"
 #include "components/optimization_guide/proto/common_types.pb.h"
 #include "components/variations/hashing.h"
-#include "google_apis/google_api_keys.h"
 #include "net/base/url_util.h"
 #include "ui/base/l10n/l10n_util.h"
-
-#if BUILDFLAG(IS_ANDROID)
-#include "components/version_info/android/channel_getter.h"
-#endif
-
 namespace optimization_guide::features {
 
 namespace {
-
-// Overrides the Optimization Guide Service API Key for remote requests to be
-// made.
-constexpr char kOptimizationGuideServiceAPIKeySwitch[] =
-    "optimization-guide-service-api-key";
 
 constexpr auto enabled_by_default_mobile_only =
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
@@ -219,21 +208,6 @@ size_t MaxResultsForSRPFetch() {
   static int max_urls = GetFieldTrialParamByFeatureAsInt(
       kOptimizationGuideFetchingForSRP, "max_urls_for_srp_fetch", 10);
   return max_urls;
-}
-
-std::string GetOptimizationGuideServiceAPIKey() {
-  // Command line override takes priority.
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  if (command_line->HasSwitch(kOptimizationGuideServiceAPIKeySwitch)) {
-    return command_line->GetSwitchValueASCII(
-        kOptimizationGuideServiceAPIKeySwitch);
-  }
-
-#if BUILDFLAG(IS_ANDROID)
-  return google_apis::GetAPIKey(version_info::android::GetChannel());
-#else
-  return google_apis::GetAPIKey();
-#endif
 }
 
 GURL GetOptimizationGuideServiceGetModelsURL() {

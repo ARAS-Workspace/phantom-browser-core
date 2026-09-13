@@ -14,7 +14,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/metrics/histogram_macros.h"
 #include "base/path_service.h"
 #include "base/strings/strcat.h"
 #include "base/system/sys_info.h"
@@ -299,16 +298,6 @@ void OptimizationGuideKeyedService::Initialize() {
     // Only create a top host provider from the command line if provided.
     top_host_provider_ =
         optimization_guide::CommandLineTopHostProvider::CreateIfEnabled();
-
-    bool optimization_guide_fetching_enabled =
-        optimization_guide::IsUserPermittedToFetchFromRemoteOptimizationGuide(
-            profile->IsOffTheRecord(), profile->GetPrefs());
-    UMA_HISTOGRAM_BOOLEAN("OptimizationGuide.RemoteFetchingEnabled",
-                          optimization_guide_fetching_enabled);
-    ChromeMetricsServiceAccessor::RegisterSyntheticFieldTrial(
-        "SyntheticOptimizationGuideRemoteFetching",
-        optimization_guide_fetching_enabled ? "Enabled" : "Disabled",
-        variations::SyntheticTrialAnnotationMode::kCurrentLog);
 
 #if BUILDFLAG(IS_ANDROID)
     tab_url_provider_ = std::make_unique<

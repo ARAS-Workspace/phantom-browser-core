@@ -64,11 +64,6 @@ extern const char kOnDeviceModelAdaptationsOverride[];
 // TODO(crbug.com/514743962): Move to components/optimization_guide/core/model_quality/model_quality_logs_uploader_service.h.
 COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
 extern const char kModelQualityServiceURL[];
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-extern const char kModelQualityServiceAPIKey[];
-// The API key for the ModelQualityLoggingService.
-COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)
-std::string GetModelQualityServiceAPIKey();
 
 // TODO(crbug.com/514743962): Move to components/optimization_guide/core/model_execution/model_execution_features_controller.h.
 COMPONENT_EXPORT(OPTIMIZATION_GUIDE_FEATURES)

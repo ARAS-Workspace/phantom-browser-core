@@ -15,7 +15,6 @@
 #include "components/optimization_guide/core/optimization_guide_logger.h"
 #include "components/optimization_guide/core/optimization_guide_prefs.h"
 #include "components/prefs/pref_service.h"
-#include "google_apis/common/api_key_request_util.h"
 #include "net/base/url_util.h"
 #include "net/http/http_request_headers.h"
 #include "services/network/public/cpp/resource_request.h"
@@ -227,12 +226,6 @@ void PopulateAuthorizationRequestHeader(
   resource_request->headers.SetHeader(
       net::HttpRequestHeaders::kAuthorization,
       base::StrCat({kAuthHeaderBearer, access_token}));
-}
-
-void PopulateApiKeyRequestHeader(network::ResourceRequest* resource_request,
-                                 std::string_view api_key) {
-  CHECK(!api_key.empty());
-  google_apis::AddAPIKeyToRequest(*resource_request, api_key);
 }
 
 void PopulateServerTimeoutRequestHeader(
