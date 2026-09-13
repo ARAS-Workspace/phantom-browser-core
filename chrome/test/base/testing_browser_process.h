@@ -142,7 +142,9 @@ class TestingBrowserProcess
       std::unique_ptr<BackgroundModeManager> manager) override;
 #endif
   StatusTray* status_tray() override;
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   safe_browsing::SafeBrowsingService* safe_browsing_service() override;
+#endif
   subresource_filter::RulesetService* subresource_filter_ruleset_service()
       override;
   BrowserProcessPlatformPart* platform_part() override;
@@ -209,7 +211,9 @@ class TestingBrowserProcess
 
   void SetMetricsService(metrics::MetricsService* metrics_service);
   void SetProfileManager(std::unique_ptr<ProfileManager> profile_manager);
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   void SetSafeBrowsingService(safe_browsing::SafeBrowsingService* sb_service);
+#endif
   void SetVariationsService(variations::VariationsService* variations_service);
   void SetWebRtcLogUploader(std::unique_ptr<WebRtcLogUploader> uploader);
   void SetRulesetService(
@@ -324,7 +328,9 @@ class TestingBrowserProcess
       device_parental_controls_;
 #endif
 
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   scoped_refptr<safe_browsing::SafeBrowsingService> sb_service_;
+#endif
   std::unique_ptr<subresource_filter::RulesetService>
       subresource_filter_ruleset_service_;
   std::unique_ptr<WebRtcLogUploader> webrtc_log_uploader_;

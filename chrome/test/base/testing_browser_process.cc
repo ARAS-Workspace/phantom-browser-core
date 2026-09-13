@@ -445,10 +445,12 @@ StatusTray* TestingBrowserProcess::status_tray() {
   return status_tray_.get();
 }
 
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 safe_browsing::SafeBrowsingService*
 TestingBrowserProcess::safe_browsing_service() {
   return sb_service_.get();
 }
+#endif
 
 WebRtcLogUploader* TestingBrowserProcess::webrtc_log_uploader() {
   return webrtc_log_uploader_.get();
@@ -748,10 +750,12 @@ TestingBrowserProcess::GetTestPlatformPart() {
   return platform_part_.get();
 }
 
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 void TestingBrowserProcess::SetSafeBrowsingService(
     safe_browsing::SafeBrowsingService* sb_service) {
   sb_service_ = sb_service;
 }
+#endif
 
 void TestingBrowserProcess::SetWebRtcLogUploader(
     std::unique_ptr<WebRtcLogUploader> uploader) {
