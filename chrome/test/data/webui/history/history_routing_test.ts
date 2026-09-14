@@ -115,12 +115,6 @@ import {navigateTo} from './test_util.js';
       assertEquals('history', sidebar.$.menu.selected);
       assertEquals('chrome://history/', window.location.href);
 
-      sidebar.$.syncedTabs.click();
-      await eventToPromise('iron-select', sidebar.$.menu);
-      await microtasksFinished();
-      assertEquals('syncedTabs', sidebar.$.menu.selected);
-      assertEquals('chrome://history/syncedTabs', window.location.href);
-
       // Currently selected history view is preserved in sidebar menu item.
       keyDownOn(sidebar.$.history, 0, [], ' ');
       await eventToPromise('iron-select', sidebar.$.menu);
@@ -137,12 +131,6 @@ import {navigateTo} from './test_util.js';
         await microtasksFinished();
         assertEquals('grouped', sidebar.$.menu.selected);
         assertEquals('chrome://history/grouped', window.location.href);
-
-        keyDownOn(sidebar.$.syncedTabs, 0, [], ' ');
-        await eventToPromise('iron-select', sidebar.$.menu);
-        await microtasksFinished();
-        assertEquals('syncedTabs', sidebar.$.menu.selected);
-        assertEquals('chrome://history/syncedTabs', window.location.href);
 
         // Currently selected history view is preserved in sidebar menu item.
         keyDownOn(sidebar.$.history, 0, [], ' ');
@@ -183,15 +171,6 @@ import {navigateTo} from './test_util.js';
           const searchTerm = 'Soldier76';
           assertEquals('history', sidebar.$.menu.selected);
           navigateTo('/?q=' + searchTerm, app);
-
-          sidebar.$.syncedTabs.click();
-          await eventToPromise('iron-select', sidebar.$.menu);
-          await microtasksFinished();
-          assertEquals('syncedTabs', sidebar.$.menu.selected);
-          assertEquals(searchTerm, app.$.toolbar.searchTerm);
-          assertEquals(
-              'chrome://history/syncedTabs?q=' + searchTerm,
-              window.location.href);
 
           sidebar.$.history.click();
           await eventToPromise('iron-select', sidebar.$.menu);

@@ -178,10 +178,6 @@ suite('PeoplePageIndex', function() {
     Router.getInstance().navigateTo(routes.ACCOUNT);
     await microtasksFinished();
     assertActiveView('account');
-
-    Router.getInstance().navigateTo(routes.GOOGLE_SERVICES);
-    await microtasksFinished();
-    assertActiveView('googleServices');
   });
 
   // Test that the child views are properly annotated.

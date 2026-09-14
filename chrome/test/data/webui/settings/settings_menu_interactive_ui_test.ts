@@ -18,21 +18,10 @@ suite('SettingsMenuInteractiveUITest', () => {
   test('focusFirstItem', () => {
     resetPageVisibilityForTesting({
       people: true,
-      yourSavedInfo: true,
     });
 
     createMenu();
     settingsMenu.focusFirstItem();
     assertEquals(settingsMenu.$.people, settingsMenu.shadowRoot!.activeElement);
-
-    resetPageVisibilityForTesting({
-      people: false,
-      yourSavedInfo: true,
-    });
-
-    createMenu();
-    settingsMenu.focusFirstItem();
-    assertEquals(
-        settingsMenu.$.autofill, settingsMenu.shadowRoot!.activeElement);
   });
 });

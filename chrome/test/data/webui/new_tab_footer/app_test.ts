@@ -7,11 +7,10 @@ import {CustomizeDialogPage, FooterCustomizeChromeEntryPoint, FooterElement} fro
 import type {CustomizeButtonsDocumentRemote} from 'chrome://newtab-footer/customize_buttons.mojom-webui.js';
 import {browserProxyFactory as customizeButtonsproxyFactory, CustomizeButtonsHandlerRemote, SidePanelOpenTrigger} from 'chrome://newtab-footer/customize_buttons.mojom-webui.js';
 import {CustomizeChromeSection} from 'chrome://newtab-footer/customize_chrome.mojom-webui.js';
-import type {BackgroundAttribution, ManagementNotice, NewTabFooterDocumentRemote} from 'chrome://newtab-footer/new_tab_footer.mojom-webui.js';
+import type {BackgroundAttribution, NewTabFooterDocumentRemote} from 'chrome://newtab-footer/new_tab_footer.mojom-webui.js';
 import {browserProxyFactory as newTabFooterproxyFactory, NewTabFooterHandlerRemote, NewTabPageType} from 'chrome://newtab-footer/new_tab_footer.mojom-webui.js';
 import {WindowProxy} from 'chrome://newtab-footer/window_proxy.js';
 import type {CrButtonElement} from 'chrome://resources/cr_elements/cr_button/cr_button.js';
-import type {CrIconElement} from 'chrome://resources/cr_elements/cr_icon/cr_icon.js';
 import {assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import type {MetricsTracker} from 'chrome://webui-test/metrics_test_support.js';
 import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
@@ -132,110 +131,6 @@ suite('NewTabFooterAppTest', () => {
             assertEquals(expected, !!name);
           });
         });
-  });
-
-  suite('Managed', () => {
-    setup(async () => {
-      await setupFooter();
-    });
-
-    test('Get management notice', async () => {
-      // Arrange.
-      const managementNotice: ManagementNotice = {
-        text: 'Managed by your organization',
-        customBitmapDataUrl: 'chrome://resources/images/chrome_logo_dark.svg',
-      };
-
-      // Act.
-      callbackRouter.setManagementNotice(managementNotice);
-      await callbackRouter.$.flushForTesting();
-
-      // Assert.
-      const managementNoticeContainer =
-          $$(element, '#managementNoticeContainer');
-      assertTrue(!!managementNoticeContainer);
-      let managementNoticeLink =
-          $$(element, '#managementNoticeContainer [role="link"]');
-      assertTrue(!!managementNoticeLink);
-      assertEquals(
-          managementNoticeLink.innerText, 'Managed by your organization');
-      let managementNoticeLogo =
-          $$<HTMLImageElement>(element, '#managementNoticeLogo');
-      assertTrue(!!managementNoticeLogo);
-      assertEquals(
-          managementNoticeLogo.src,
-          'chrome://resources/images/chrome_logo_dark.svg');
-
-      // Act.
-      callbackRouter.setManagementNotice(null);
-      await callbackRouter.$.flushForTesting();
-
-      // Assert.
-      managementNoticeLink =
-          $$(element, '#managementNoticeContainer [role="link"]');
-      managementNoticeLogo = $$(element, '#managementNoticeLogo');
-      assertFalse(!!managementNoticeLink);
-      assertFalse(!!managementNoticeLogo);
-    });
-
-    test('Management notice logo style', async () => {
-      // Arrange.
-      const managementNoticeWithCustomLogo: ManagementNotice = {
-        text: 'Managed by your organization',
-        customBitmapDataUrl: 'chrome://resources/images/chrome_logo_dark.svg',
-      };
-
-      // Act.
-      callbackRouter.setManagementNotice(managementNoticeWithCustomLogo);
-      await callbackRouter.$.flushForTesting();
-
-      // Assert.
-      let logoContainter = $$(element, '#managementNoticeLogoContainer');
-      assertTrue(!!logoContainter);
-      assertTrue(logoContainter.classList.contains('custom_logo'));
-      const customManagementNoticeLogo =
-          $$<HTMLImageElement>(element, '#managementNoticeLogo');
-      assertTrue(!!customManagementNoticeLogo);
-
-      const managementNoticeWithDefaultLogo: ManagementNotice = {
-        text: 'Managed by your organization',
-        customBitmapDataUrl: null,
-      };
-
-      // Act.
-      callbackRouter.setManagementNotice(managementNoticeWithDefaultLogo);
-      await callbackRouter.$.flushForTesting();
-
-      logoContainter = $$(element, '#managementNoticeLogoContainer');
-      assertTrue(!!logoContainter);
-      assertEquals(logoContainter.classList.length, 0);
-      const defaultManagementNoticeLogo =
-          $$<CrIconElement>(element, '#managementNoticeLogo');
-      assertTrue(!!defaultManagementNoticeLogo);
-      assertEquals('cr:domain', defaultManagementNoticeLogo.icon);
-    });
-
-    test('Click manageemnt notice link', async () => {
-      // Arrange.
-      const managementNotice: ManagementNotice = {
-        text: 'Managed by your organization',
-        customBitmapDataUrl: null,
-      };
-      callbackRouter.setManagementNotice(managementNotice);
-      await callbackRouter.$.flushForTesting();
-
-      // Act.
-      const link = $$(element, '#managementNoticeContainer [role="link"]');
-      assertTrue(!!link);
-      link.click();
-
-      // Assert.
-      assertEquals(1, handler.getCallCount('openManagementPage'));
-      assertEquals(
-          1,
-          metrics.count(
-              'NewTabPage.Footer.Click', FooterElement.MANAGEMENT_NOTICE));
-    });
   });
 
   suite('CustomizeChromeButton', () => {

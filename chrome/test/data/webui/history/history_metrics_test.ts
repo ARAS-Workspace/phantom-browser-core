@@ -5,19 +5,17 @@
 import 'chrome://history/history.js';
 
 import type {HistoryAppElement, HistoryEntry, HistoryItemElement} from 'chrome://history/history.js';
-import {BrowserProxyImpl, foreignSessionBrowserProxyFactory, HistoryPageViewHistogram, HistorySignInState, SYNCED_TABS_HISTOGRAM_NAME, SyncedTabsHistogram, SyncState, VisitContextMenuAction} from 'chrome://history/history.js';
+import {BrowserProxyImpl, HistoryPageViewHistogram, HistorySignInState, SyncState, VisitContextMenuAction} from 'chrome://history/history.js';
 import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
-import {FakeForeignSessionPageHandler} from './fake_foreign_session_page_handler.js';
 import {TestHistoryBrowserProxy} from './test_browser_proxy.js';
-import {createHistoryEntry, createHistoryInfo, createSession, createWindow, disableLinkClicks, navigateTo} from './test_util.js';
+import {createHistoryEntry, createHistoryInfo, disableLinkClicks, navigateTo} from './test_util.js';
 
 suite('Metrics', function() {
   let testProxy: TestHistoryBrowserProxy;
-  let foreignSessionProxy: FakeForeignSessionPageHandler;
   let app: HistoryAppElement;
   let histogramMap: {[key: string]: {[key: string]: number}};
   let actionMap: {[key: string]: number};
@@ -33,10 +31,6 @@ suite('Metrics', function() {
 
     testProxy = new TestHistoryBrowserProxy();
     BrowserProxyImpl.setInstance(testProxy);
-    foreignSessionProxy = new FakeForeignSessionPageHandler();
-    const {instance} =
-        foreignSessionBrowserProxyFactory.createForTest(foreignSessionProxy);
-    foreignSessionBrowserProxyFactory.setInstance(instance);
 
     actionMap = testProxy.actionMap;
     histogramMap = testProxy.histogramMap;
@@ -185,71 +179,6 @@ suite('Metrics', function() {
     //   testProxy.handler.whenCalled('removeVisits'),
     //   microtasksFinished(),
     // ]);
-  });
-
-  test('synced-device-manager', async () => {
-    const sessionList = [
-      createSession(
-          'Nexus 5',
-          [createWindow(['http://www.google.com', 'http://example.com'])]),
-      createSession(
-          'Nexus 6',
-          [
-            createWindow(['http://test.com']),
-            createWindow(['http://www.gmail.com', 'http://badssl.com']),
-          ]),
-    ];
-    foreignSessionProxy.setForeignSessions(sessionList);
-    await finishSetup([]);
-    await microtasksFinished();
-
-    navigateTo('/syncedTabs', app);
-    await microtasksFinished();
-
-    webUIListenerCallback('history-identity-state-changed', {
-      signIn: HistorySignInState.SIGNED_IN,
-      tabsSync: SyncState.TURNED_ON,
-      historySync: SyncState.TURNED_OFF,
-    });
-
-    const histogram = histogramMap[SYNCED_TABS_HISTOGRAM_NAME];
-    assertTrue(!!histogram);
-    assertEquals(1, histogram[SyncedTabsHistogram.INITIALIZED]);
-
-    await foreignSessionProxy.whenCalled('getForeignSessions');
-    await microtasksFinished();
-
-    assertEquals(1, histogram[SyncedTabsHistogram.HAS_FOREIGN_DATA]);
-
-    const syncedDeviceManager =
-        app.shadowRoot.querySelector('history-synced-device-manager');
-    assertTrue(!!syncedDeviceManager);
-
-    const cards = syncedDeviceManager.shadowRoot.querySelectorAll(
-        'history-synced-device-card');
-    assertTrue(!!cards[0]);
-    cards[0].$.cardHeading.click();
-    assertEquals(1, histogram[SyncedTabsHistogram.COLLAPSE_SESSION]);
-    cards[0].$.cardHeading.click();
-    assertEquals(1, histogram[SyncedTabsHistogram.EXPAND_SESSION]);
-    cards[0].shadowRoot.querySelectorAll<HTMLElement>(
-                           '.website-link')[0]!.click();
-    assertEquals(1, histogram[SyncedTabsHistogram.LINK_CLICKED]);
-
-    const menuButton = cards[0].$.menuButton;
-    menuButton.click();
-    await microtasksFinished();
-
-    syncedDeviceManager.shadowRoot
-        .querySelector<HTMLElement>('#menuOpenButton')!.click();
-    assertEquals(1, histogram[SyncedTabsHistogram.OPEN_ALL]);
-
-    menuButton.click();
-    await microtasksFinished();
-
-    syncedDeviceManager.shadowRoot
-        .querySelector<HTMLElement>('#menuDeleteButton')!.click();
-    assertEquals(1, histogram[SyncedTabsHistogram.HIDE_FOR_NOW]);
   });
 
   test('history-clusters-duration', async () => {

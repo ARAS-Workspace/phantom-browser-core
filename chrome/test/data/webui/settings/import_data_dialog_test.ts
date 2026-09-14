@@ -49,32 +49,26 @@ class TestImportDataBrowserProxy extends TestBrowserProxy implements
 suite('ImportDataDialog', function() {
   const browserProfiles: BrowserProfile[] = [
     {
-      autofillFormData: true,
       favorites: true,
       history: true,
       index: 0,
       name: 'Mozilla Firefox',
-      passwords: true,
       profileName: '',
       search: true,
     },
     {
-      autofillFormData: true,
       favorites: true,
       history: false,  // Emulate unsupported import option
       index: 1,
       name: 'Mozilla Firefox',
-      passwords: true,
       profileName: 'My profile',
       search: true,
     },
     {
-      autofillFormData: false,
       favorites: true,
       history: false,
       index: 2,
       name: 'Bookmarks HTML File',
-      passwords: false,
       profileName: '',
       search: false,
     },

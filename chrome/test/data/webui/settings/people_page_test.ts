@@ -664,15 +664,6 @@ suite('PeoplePageAccountSettings', function() {
     assertEquals(routes.ACCOUNT, Router.getInstance().getCurrentRoute());
   });
 
-  test('ClickingGoogleServicesLeadsToGoogleServicesPage', async function() {
-    await simulateSignedInState(SignedInState.SIGNED_OUT, []);
-
-    peoplePage.shadowRoot!.querySelector<HTMLElement>(
-                              '#google-services')!.click();
-    assertEquals(
-        routes.GOOGLE_SERVICES, Router.getInstance().getCurrentRoute());
-  });
-
   test('AccountLinkRowHasAccountInfo', async function() {
     const image = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAA' +
         'AAABAAEAAAICTAEAOw==';

@@ -10,16 +10,13 @@ import type {SettingsSyncControlsElement} from 'chrome://settings/lazy_load.js';
 import type {CrRadioButtonElement, CrToggleElement, SyncPrefs} from 'chrome://settings/settings.js';
 import {loadTimeData, Router, resetRouterForTesting, SignedInState, StatusAction, SyncBrowserProxyImpl} from 'chrome://settings/settings.js';
 import {assertEquals, assertDeepEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {eventToPromise, isChildVisible, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
+import {eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {getSyncAllPrefs, getSyncAllPrefsManaged} from './sync_test_util.js';
 import {TestSyncBrowserProxy} from './test_sync_browser_proxy.js';
 
 import {PageStatus, routes, UserSelectableType, PluralStringProxyImpl} from 'chrome://settings/settings.js';
-import {BatchUploadPromoProxyImpl} from 'chrome://settings/lazy_load.js';
 import {TestPluralStringProxy} from 'chrome://webui-test/test_plural_string_proxy.js';
-
-import {TestBatchUploadPromoProxy} from './test_batch_upload_promo_browser_proxy.js';
 
 // clang-format on
 
@@ -337,15 +334,11 @@ suite('SyncControlsSubpageTest', function() {
 suite('SyncControlsAccountSettingsTest', function() {
   let syncControls: SettingsSyncControlsElement;
   let browserProxy: TestSyncBrowserProxy;
-  let batchUploadPromoProxy: TestBatchUploadPromoProxy;
   let pluralStringProxy: TestPluralStringProxy;
 
   setup(async function() {
     browserProxy = new TestSyncBrowserProxy();
     SyncBrowserProxyImpl.setInstance(browserProxy);
-
-    batchUploadPromoProxy = new TestBatchUploadPromoProxy();
-    BatchUploadPromoProxyImpl.setInstance(batchUploadPromoProxy);
 
     pluralStringProxy = new TestPluralStringProxy();
     PluralStringProxyImpl.setInstance(pluralStringProxy);
@@ -749,104 +742,6 @@ suite('SyncControlsAccountSettingsTest', function() {
     router.navigateTo(routes.ACCOUNT);
     await microtasksFinished();
     assertFalse(syncControls.hidden);
-  });
-
-  test('BatchUploadPromoNotVisibleWithoutLocalData', async () => {
-    await setupPrefs();
-    await microtasksFinished();
-
-    assertFalse(isChildVisible(syncControls, '#batchUploadPromo'));
-  });
-
-  test('BatchUploadPromoWithLocalDataItemUponInitialization', async () => {
-    const localDataCount = 5;
-    batchUploadPromoProxy.handler.setBatchUploadPromoLocalDataCount(
-        localDataCount);
-
-    // Create the sync controls again with the initial local data count.
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    syncControls = document.createElement('settings-sync-controls');
-    document.body.appendChild(syncControls);
-    syncControls.syncStatus = {
-      signedInState: SignedInState.SIGNED_IN,
-      statusAction: StatusAction.NO_ACTION,
-    };
-    await setupPrefs();
-    const pluralStringArgs =
-        await pluralStringProxy.whenCalled('getPluralString');
-    await microtasksFinished();
-
-    assertEquals(localDataCount, pluralStringArgs.itemCount);
-    assertTrue(isChildVisible(syncControls, '#batchUploadPromo'));
-  });
-
-  test('BatchUploadPromoWithOneLocalDataItem', async () => {
-    const localDataCount = 1;
-    await setupPrefs();
-
-    // Notify the UI that there is one item to be uploaded and wait for the
-    // batch upload promo to show.
-    batchUploadPromoProxy.page.onLocalDataCountChanged(localDataCount);
-    const pluralStringArgs =
-        await pluralStringProxy.whenCalled('getPluralString');
-    await microtasksFinished();
-
-    const batchUploadElement =
-        syncControls.shadowRoot.querySelector(`#batchUploadPromo`);
-    assertTrue(!!batchUploadElement);
-    assertTrue(isVisible(batchUploadElement));
-
-    // Check that the correct version of the string would be displayed.
-    assertEquals(localDataCount, pluralStringArgs.itemCount);
-  });
-
-  test('BatchUploadPromoWithMultipleLocalDataItems', async () => {
-    const localDataCount = 5;
-    await setupPrefs();
-
-    // Notify the UI that there are multiple items to be uploaded and wait for
-    // the batch upload promo to show.
-    batchUploadPromoProxy.page.onLocalDataCountChanged(localDataCount);
-    const pluralStringArgs =
-        await pluralStringProxy.whenCalled('getPluralString');
-    await microtasksFinished();
-
-    const batchUploadElement =
-        syncControls.shadowRoot.querySelector(`#batchUploadPromo`);
-    assertTrue(!!batchUploadElement);
-    assertTrue(isVisible(batchUploadElement));
-
-    // Check that the correct version of the string would be displayed.
-    assertEquals(localDataCount, pluralStringArgs.itemCount);
-  });
-
-  test('BatchUploadPromoClickOpensDialog', async () => {
-    const localDataCount = 5;
-    await setupPrefs();
-
-    pluralStringProxy.text += ' <a id="openBatchUploadLink">link</a>';
-
-    // Notify the UI that there are multiple items to be uploaded and wait for
-    // the batch upload promo to show.
-    batchUploadPromoProxy.page.onLocalDataCountChanged(localDataCount);
-    const pluralStringArgs =
-        await pluralStringProxy.whenCalled('getPluralString');
-    await microtasksFinished();
-
-    assertTrue(isChildVisible(syncControls, '#batchUploadPromo'));
-    assertEquals(localDataCount, pluralStringArgs.itemCount);
-
-    const batchUploadLinkElement =
-        syncControls.shadowRoot.querySelector<HTMLElement>(
-            '#openBatchUploadLink');
-    assertTrue(!!batchUploadLinkElement);
-    batchUploadLinkElement.click();
-
-    // Make sure the call to open the batch upload dialog is executed.
-    assertEquals(
-        1,
-        batchUploadPromoProxy.handler.getCallCount(
-            'onBatchUploadPromoClicked'));
   });
 });
 

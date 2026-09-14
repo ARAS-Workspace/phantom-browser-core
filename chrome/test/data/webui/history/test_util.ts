@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import type {ForeignSession, ForeignSessionTab, ForeignSessionWindow, HistoryAppElement} from 'chrome://history/history.js';
+import type {HistoryAppElement} from 'chrome://history/history.js';
 import type {HistoryEntry, HistoryQuery} from 'chrome://resources/cr_components/history/history.mojom-webui.js';
 import type {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import {middleOfNode} from 'chrome://webui-test/mouse_mock_interactions.js';
@@ -180,35 +180,6 @@ export function disableLinkClicks() {
 
     e.preventDefault();
   });
-}
-
-export function createSession(
-    name: string, windows: ForeignSessionWindow[]): ForeignSession {
-  return {
-    collapsed: false,
-    name,
-    modifiedTime: '2 seconds ago',
-    tag: name,
-    timestamp: 0,
-    windows,
-  };
-}
-
-export function createWindow(tabUrls: string[]): ForeignSessionWindow {
-  const tabs: ForeignSessionTab[] = tabUrls.map(function(tabUrl) {
-    return {
-      direction: '',
-      remoteIconUrlForUma: '',
-      sessionId: 456,
-      timestamp: 0,
-      timestampDisplayStr: '',
-      title: tabUrl,
-      url: tabUrl,
-      windowId: 0,
-    };
-  });
-
-  return {tabs: tabs, sessionId: 123, timestamp: 0};
 }
 
 export function navigateTo(route: string, _app: HistoryAppElement) {

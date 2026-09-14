@@ -397,11 +397,6 @@ suite('HistoryAppUnoPhase2FollowUpTest', () => {
     });
     browserProxy = new TestHistoryBrowserProxy();
     BrowserProxyImpl.setInstance(browserProxy);
-    browserProxy.handler.setResultFor(
-        'shouldShowHistoryPageHistorySyncPromo', Promise.resolve({
-          shouldShow: true,
-        }));
-
     element = document.createElement('history-app');
     document.body.appendChild(element);
     return microtasksFinished();
@@ -417,21 +412,6 @@ suite('HistoryAppUnoPhase2FollowUpTest', () => {
 
     assertTrue(
         isChildVisible(element, 'history-sync-promo'), 'Promo should be shown');
-  });
-
-  test('HidesHistorySyncPromoElementWhenDataIsFalse', async () => {
-    browserProxy.handler.setResultFor(
-        'shouldShowHistoryPageHistorySyncPromo',
-        Promise.resolve({shouldShow: false}));
-    // Re-create the element to pick up the new loadTimeData.
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    element = document.createElement('history-app');
-    document.body.appendChild(element);
-    await microtasksFinished();
-
-    assertFalse(
-        isChildVisible(element, 'history-sync-promo'),
-        'Promo should not be shown');
   });
 
   test('HidesHistorySyncPromoElementWhenHistorySyncIsDisabled', async () => {

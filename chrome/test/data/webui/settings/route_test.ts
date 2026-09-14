@@ -3,10 +3,8 @@
 // found in the LICENSE file.
 
 // clang-format off
-import type {SettingsRoutes} from 'chrome://settings/settings.js';
 import {resetRouterForTesting, buildRouter, loadTimeData, Route, Router, routes, resetPageVisibilityForTesting} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {flushTasks} from 'chrome://webui-test/polymer_test_util.js';
 
 // clang-format on
 
@@ -281,7 +279,6 @@ suite('Basic', function() {
   test('pageVisibility affects route availability', function() {
     resetPageVisibilityForTesting({
       appearance: false,
-      yourSavedInfo: false,
       defaultBrowser: false,
       onStartup: false,
       reset: false,
@@ -344,18 +341,6 @@ suite('Basic', function() {
     loadTimeData.overrideValues({replaceSyncPromosWithSignInPromos: true});
     resetRouterForTesting();
     assertTrue(!!routes.ACCOUNT);
-  });
-
-  test('google services route existence', function() {
-    resetPageVisibilityForTesting({people: true});
-
-    loadTimeData.overrideValues({replaceSyncPromosWithSignInPromos: false});
-    resetRouterForTesting();
-    assertFalse(!!routes.GOOGLE_SERVICES);
-
-    loadTimeData.overrideValues({replaceSyncPromosWithSignInPromos: true});
-    resetRouterForTesting();
-    assertTrue(!!routes.GOOGLE_SERVICES);
   });
   // </if>
 

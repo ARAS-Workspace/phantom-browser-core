@@ -22,7 +22,7 @@ suite('ProfileCardMenuTest', function() {
   let browserProxy: TestManageProfilesBrowserProxy;
 
   const statisticsDataTypes: string[] =
-      ['BrowsingHistory', 'Passwords', 'Bookmarks', 'Autofill'];
+      ['BrowsingHistory', 'Bookmarks'];
 
   setup(function() {
     browserProxy = new TestManageProfilesBrowserProxy();
@@ -169,9 +169,7 @@ suite('ProfileCardMenuTest', function() {
 
     const statistics: Statistics = {
       BrowsingHistory: 1,
-      Passwords: 2,
       Bookmarks: 3,
-      Autofill: 4,
     };
     const statisticsResult: StatisticsResult = {
       profilePath: 'profilePath',
@@ -198,8 +196,6 @@ suite('ProfileCardMenuTest', function() {
 
     const statistics: Statistics = {
       BrowsingHistory: 1,
-      Passwords: 0,
-      Autofill: 0,
       Bookmarks: 0,
     };
     const statisticsResult: StatisticsResult = {

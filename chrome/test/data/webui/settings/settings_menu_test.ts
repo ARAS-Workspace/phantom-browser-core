@@ -10,7 +10,6 @@ import type {SettingsMenuElement, SettingsRoutes} from 'chrome://settings/settin
 import {AutofillSettingsReferrer, resetRouterForTesting, loadTimeData, MetricsBrowserProxyImpl, resetPageVisibilityForTesting, Router} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
-import {flushTasks} from 'chrome://webui-test/polymer_test_util.js';
 import {eventToPromise} from 'chrome://webui-test/test_util.js';
 
 import {TestMetricsBrowserProxy} from './test_metrics_browser_proxy.js';
@@ -321,38 +320,5 @@ suite('SettingsMenu', function() {
       assertEquals(testCase.action, action);
       assertEquals(testCase.route, Router.getInstance().getCurrentRoute());
     }
-  });
-});
-
-suite('SettingsMenuAutofill', () => {
-  let settingsMenu: SettingsMenuElement;
-
-  function createSettingsMenu() {
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    settingsMenu = document.createElement('settings-menu');
-    document.body.appendChild(settingsMenu);
-    flush();
-  }
-
-  test('Update yourSavedInfo visibility', async () => {
-    resetRouterForTesting();
-    createSettingsMenu();
-    await flushTasks();
-
-    const autofillEntry = settingsMenu.shadowRoot!.querySelector<HTMLElement>(
-        'a[href=\'/autofill\']');
-    assertTrue(!!autofillEntry);
-    assertTrue(isVisible(autofillEntry));
-
-    // Hide the your saved info page.
-    resetPageVisibilityForTesting({
-      yourSavedInfo: false,
-    });
-    createSettingsMenu();
-    const newAutofillEntry =
-        settingsMenu.shadowRoot!.querySelector<HTMLElement>(
-            'a[href=\'/autofill\']');
-    assertTrue(!!newAutofillEntry);
-    assertFalse(isVisible(newAutofillEntry));
   });
 });
