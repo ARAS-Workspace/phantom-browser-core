@@ -14,6 +14,7 @@ mojom("common") {
   }
 
   public_deps = [
+    "//components/language_detection/content/common",
     "//mojo/public/mojom/base",
     "//url/mojom:url_mojom_gurl",
   ]
@@ -22,17 +23,12 @@ mojom("common") {
     {
       types = [
         {
-          mojom = "translate.mojom.LanguageDetectionDetails"
-          cpp = "::language_detection::LanguageDetectionDetails"
-        },
-        {
           mojom = "translate.mojom.TranslateError"
           cpp = "::translate::TranslateErrors"
         },
       ]
       traits_headers = [ "translate_mojom_traits.h" ]
       traits_sources = [ "translate_mojom_traits.cc" ]
-      traits_public_deps = [ "//components/language_detection/core" ]
     },
   ]
 }

@@ -7,5 +7,22 @@ import("//mojo/public/tools/bindings/mojom.gni")
 mojom("common") {
   sources = [ "language_detection.mojom" ]
 
-  public_deps = [ "//mojo/public/mojom/base" ]
+  public_deps = [
+    "//mojo/public/mojom/base",
+    "//url/mojom:url_mojom_gurl",
+  ]
+
+  cpp_typemaps = [
+    {
+      types = [
+        {
+          mojom = "language_detection.mojom.LanguageDetectionDetails"
+          cpp = "::language_detection::LanguageDetectionDetails"
+        },
+      ]
+      traits_headers = [ "language_detection_mojom_traits.h" ]
+      traits_sources = [ "language_detection_mojom_traits.cc" ]
+      traits_public_deps = [ "//components/language_detection/core" ]
+    },
+  ]
 }

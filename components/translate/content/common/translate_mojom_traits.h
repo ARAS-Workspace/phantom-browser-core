@@ -5,13 +5,9 @@
 #ifndef COMPONENTS_TRANSLATE_CONTENT_COMMON_TRANSLATE_MOJOM_TRAITS_H_
 #define COMPONENTS_TRANSLATE_CONTENT_COMMON_TRANSLATE_MOJOM_TRAITS_H_
 
-#include <string>
-
-#include "base/time/time.h"
-#include "components/language_detection/core/language_detection_details.h"
 #include "components/translate/content/common/translate.mojom-shared.h"
 #include "components/translate/core/common/translate_errors.h"
-#include "mojo/public/cpp/bindings/struct_traits.h"
+#include "mojo/public/cpp/bindings/enum_traits.h"
 
 namespace mojo {
 
@@ -22,73 +18,6 @@ struct EnumTraits<translate::mojom::TranslateError,
       translate::TranslateErrors input);
   static translate::TranslateErrors FromMojom(
       translate::mojom::TranslateError input);
-};
-
-template <>
-struct StructTraits<translate::mojom::LanguageDetectionDetailsDataView,
-                    language_detection::LanguageDetectionDetails> {
-  static bool has_run_lang_detection(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.has_run_lang_detection;
-  }
-
-  static const base::Time& time(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.time;
-  }
-
-  static const GURL& url(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.url;
-  }
-
-  static const std::string& content_language(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.content_language;
-  }
-
-  static const std::string& model_detected_language(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.model_detected_language;
-  }
-
-  static bool is_model_reliable(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.is_model_reliable;
-  }
-
-  static bool has_notranslate(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.has_notranslate;
-  }
-
-  static const std::string& html_root_language(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.html_root_language;
-  }
-
-  static const std::string& adopted_language(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.adopted_language;
-  }
-
-  static const std::u16string& contents(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.contents;
-  }
-
-  static float model_reliability_score(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.model_reliability_score;
-  }
-
-  static const std::string& detection_model_version(
-      const language_detection::LanguageDetectionDetails& r) {
-    return r.detection_model_version;
-  }
-
-  static bool Read(translate::mojom::LanguageDetectionDetailsDataView data,
-                   language_detection::LanguageDetectionDetails* out);
 };
 
 }  // namespace mojo
