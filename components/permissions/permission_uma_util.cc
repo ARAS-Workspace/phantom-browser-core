@@ -1562,43 +1562,6 @@ void PermissionUmaUtil::RecordDSEEffectiveSetting(
 }
 
 // static
-void PermissionUmaUtil::RecordPermissionPredictionConcurrentRequests(
-    RequestType request_type) {
-  permissions::PermissionPredictionSupportedType prediction_supported_type =
-      request_type == permissions::RequestType::kNotifications
-          ? permissions::PermissionPredictionSupportedType::kNotifications
-          : permissions::PermissionPredictionSupportedType::kGeolocation;
-
-  base::UmaHistogramEnumeration(
-      "Permissions.PredictionService.ConcurrentRequests",
-      prediction_supported_type);
-}
-
-// static
-void PermissionUmaUtil::RecordPermissionPredictionSource(
-    PermissionPredictionSource prediction_source,
-    const PermissionRequest& request) {
-  std::string permission_string = GetPermissionRequestString(
-      PermissionUtil::GetUmaValueForRequest(request));
-  base::UmaHistogramEnumeration(
-      "Permissions.PredictionServiceSource." + permission_string,
-      prediction_source);
-}
-
-// static
-void PermissionUmaUtil::RecordPermissionPredictionServiceHoldback(
-    RequestType request_type,
-    PredictionModelType model_type,
-    bool is_heldback) {
-  base::UmaHistogramBoolean(
-      base::StrCat(
-          {"Permissions.", GetPredictionModelString(model_type), ".Response.",
-           GetPermissionRequestString(
-               PermissionUtil::GetUmaValueForRequestType(request_type))}),
-      is_heldback);
-}
-
-// static
 std::string PermissionUmaUtil::GetOneTimePermissionEventHistogram(
     ContentSettingsType type) {
   // `FILE_SYSTEM_WRITE_GUARD` is not part of `OneTimePermission`,
@@ -1612,22 +1575,6 @@ std::string PermissionUmaUtil::GetOneTimePermissionEventHistogram(
           ContentSettingsTypeToRequestType(type)));
   return base::StrCat(
       {"Permissions.OneTimePermission.", permission_type, ".Event"});
-}
-
-// static
-std::string PermissionUmaUtil::GetPredictionModelString(
-    PredictionModelType model_type) {
-  switch (model_type) {
-    case PredictionModelType::kServerSideCpssV3Model:
-      return "PredictionService";
-    case PredictionModelType::kOnDeviceCpssV1Model:
-      return "OnDevicePredictionService";
-    case PredictionModelType::kOnDeviceAiV4Model:
-      return "AIv4";
-    case PredictionModelType::kUnknown:
-      NOTREACHED();
-  }
-  NOTREACHED();
 }
 
 // static
@@ -2142,29 +2089,6 @@ void PermissionUmaUtil::RecordPermissionIndicatorElapsedTimeSinceLastUsage(
 }
 
 // static
-void PermissionUmaUtil::RecordPermissionRequestRelevance(
-    permissions::RequestType permission_request_type,
-    PermissionRequestRelevance permission_request_relevance,
-    PredictionModelType model_type) {
-  switch (model_type) {
-    case permissions::PredictionModelType::kOnDeviceAiV4Model: {
-      std::string permission_request_type_string =
-          permission_request_type == permissions::RequestType::kNotifications
-              ? "Notifications"
-              : "Geolocation";
-      base::UmaHistogramEnumeration(
-          base::StrCat({"Permissions.", GetPredictionModelString(model_type),
-                        ".", permission_request_type_string,
-                        ".PermissionRequestRelevance"}),
-          permission_request_relevance);
-      break;
-    }
-    default:
-      NOTREACHED();
-  }
-}
-
-// static
 void PermissionUmaUtil::RecordPromptShownInActiveBrowser(
     RequestTypeForUma request_type,
     bool embedded_permission_element_initiated,
@@ -2199,129 +2123,6 @@ void PermissionUmaUtil::RecordActionBrowserAlwaysActive(
       {"Permissions.Prompt.", GetPermissionRequestString(request_type), ".",
        permission_action, ".WithBrowser"});
   base::UmaHistogramBoolean(histogram_name, always_active);
-}
-
-// static
-void PermissionUmaUtil::RecordRenderedTextSize(PredictionModelType model_type,
-                                               RequestType request_type,
-                                               size_t text_size) {
-  base::UmaHistogramCounts10000(
-      base::StrCat({"Permissions.", GetPredictionModelString(model_type), ".",
-                    GetRequestTypeString(request_type), ".RenderedTextSize"}),
-      text_size);
-}
-
-// static
-void PermissionUmaUtil::RecordPredictionModelInquireTime(
-    PredictionModelType model_type,
-    base::TimeTicks model_inquire_start_time) {
-  std::string histogram_name =
-      base::StrCat({"Permissions.", GetPredictionModelString(model_type),
-                    ".InquiryDuration"});
-  base::UmaHistogramMediumTimes(
-      histogram_name, base::TimeTicks::Now() - model_inquire_start_time);
-}
-
-// static
-void PermissionUmaUtil::RecordRenderedTextAcquireSuccessForAivX(
-    PredictionModelType model_type,
-    bool success) {
-  // Only AIv4 models use the rendered text as input.
-  DCHECK(model_type == PredictionModelType::kOnDeviceAiV4Model);
-
-  std::string success_histogram_name =
-      base::StrCat({"Permissions.", GetPredictionModelString(model_type),
-                    ".RenderedTextAcquireSuccess"});
-  base::UmaHistogramBoolean(success_histogram_name, success);
-}
-
-// static
-void PermissionUmaUtil::RecordTryCancelPreviousEmbeddingsModelExecution(
-    PredictionModelType model_type,
-    bool cancel_previous_job) {
-  // Only the AIv4 model requires the passage embedding model.
-  DCHECK_EQ(model_type, PredictionModelType::kOnDeviceAiV4Model);
-
-  std::string success_histogram_name =
-      base::StrCat({"Permissions.", GetPredictionModelString(model_type),
-                    ".TryCancelPreviousEmbeddingsModelExecution"});
-  base::UmaHistogramBoolean(success_histogram_name, cancel_previous_job);
-}
-
-// static
-void PermissionUmaUtil::RecordFinishedPassageEmbeddingsJobOutdated(
-    PredictionModelType model_type,
-    bool outdated) {
-  // Only the AIv4 model requires the passage embedding model.
-  DCHECK_EQ(model_type, PredictionModelType::kOnDeviceAiV4Model);
-
-  std::string success_histogram_name =
-      base::StrCat({"Permissions.", GetPredictionModelString(model_type),
-                    ".FinishedPassageEmbeddingsTaskOutdated"});
-  base::UmaHistogramBoolean(success_histogram_name, outdated);
-}
-
-// static
-void PermissionUmaUtil::RecordPassageEmbeddingModelExecutionTimeAndStatus(
-    PredictionModelType model_type,
-    base::TimeTicks model_inquire_start_time,
-    passage_embeddings::ComputeEmbeddingsStatus status) {
-  // Only the AIv4 model requires the passage embedding model.
-  DCHECK_EQ(model_type, PredictionModelType::kOnDeviceAiV4Model);
-
-  std::string status_histogram_name =
-      base::StrCat({"Permissions.", GetPredictionModelString(model_type),
-                    ".ComputeEmbeddingsStatus"});
-  base::UmaHistogramEnumeration(status_histogram_name, status);
-
-  std::string time_histogram_name =
-      base::StrCat({"Permissions.", GetPredictionModelString(model_type),
-                    ".ComputeEmbeddingsDuration"});
-  base::UmaHistogramMediumTimes(
-      time_histogram_name, base::TimeTicks::Now() - model_inquire_start_time);
-}
-
-// static
-void PermissionUmaUtil::RecordSnapshotTakenTimeAndSuccessForAivX(
-    PredictionModelType model_type,
-    base::TimeTicks snapshot_inquire_start_time,
-    bool success) {
-  // Only AIvX models use snapshots as input.
-  DCHECK(model_type == PredictionModelType::kOnDeviceAiV4Model);
-
-  std::string success_histogram_name = base::StrCat(
-      {"Permissions.", GetPredictionModelString(model_type), ".SnapshotTaken"});
-  base::UmaHistogramBoolean(success_histogram_name, success);
-
-  std::string duration_histogram_name =
-      base::StrCat({success_histogram_name, "Duration"});
-  base::UmaHistogramMediumTimes(
-      duration_histogram_name,
-      base::TimeTicks::Now() - snapshot_inquire_start_time);
-}
-
-// static
-void PermissionUmaUtil::RecordLanguageDetectionStatus(
-    LanguageDetectionStatus status) {
-  base::UmaHistogramEnumeration("Permissions.AIv4.LanguageDetectionStatus",
-                                status);
-}
-
-// static
-void PermissionUmaUtil::RecordPassageEmbeddingsCalculationTimeout(
-    bool timeout) {
-  base::UmaHistogramBoolean(
-      "Permissions.AIv4.PassageEmbeddingsComputationTimeout", timeout);
-}
-
-// static
-void PermissionUmaUtil::RecordPassageEmbedderMetadataValid(bool valid) {
-  base::UmaHistogramBoolean("Permissions.AIv4.EmbedderMetadataValid", valid);
-}
-
-// static
-void PermissionUmaUtil::RecordPredictionServiceTimeout(bool timeout) {
-  base::UmaHistogramBoolean("Permissions.PredictionService.Timeout", timeout);
 }
 
 // static

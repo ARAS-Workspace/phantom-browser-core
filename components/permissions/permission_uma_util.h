@@ -193,18 +193,6 @@ class PermissionUmaUtil {
   static void RecordDSEEffectiveSetting(ContentSettingsType permission_type,
                                         PermissionSetting setting);
 
-  static void RecordPermissionPredictionConcurrentRequests(
-      RequestType request_type);
-
-  static void RecordPermissionPredictionSource(
-      PermissionPredictionSource prediction_source,
-      const PermissionRequest& request);
-
-  static void RecordPermissionPredictionServiceHoldback(
-      RequestType request_type,
-      PredictionModelType model_type,
-      bool is_heldback);
-
   static std::string GetOneTimePermissionEventHistogram(
       ContentSettingsType type);
 
@@ -230,8 +218,6 @@ class PermissionUmaUtil {
 
   static std::string GetPermissionActionString(
       PermissionAction permission_action);
-
-  static std::string GetPredictionModelString(PredictionModelType model_type);
 
   static std::string GetPromptDispositionString(
       PermissionPromptDisposition ui_disposition);
@@ -309,11 +295,6 @@ class PermissionUmaUtil {
       RequestTypeForUma request_type,
       base::TimeDelta time_delta);
 
-  static void RecordPermissionRequestRelevance(
-      permissions::RequestType permission_request_type,
-      PermissionRequestRelevance permission_request_relevance,
-      PredictionModelType model_type);
-
   // Records if the browser was always active while the prompt was
   // displaying.
   static void RecordBrowserAlwaysActiveWhilePrompting(
@@ -326,62 +307,6 @@ class PermissionUmaUtil {
       RequestTypeForUma request_type,
       std::string_view permission_action,
       bool always_active);
-
-  // Records the execution time of prediction model inquiries.
-  static void RecordPredictionModelInquireTime(
-      PredictionModelType model_type,
-      base::TimeTicks model_inquire_start_time);
-
-  // Records the success and duration of taking a screenshot for AIvX models.
-  static void RecordSnapshotTakenTimeAndSuccessForAivX(
-      PredictionModelType model_type,
-      base::TimeTicks snapshot_inquire_start_time,
-      bool success);
-
-  // Records whether we could fetch the rendered text successfully and it was
-  // useful for prediction (i.e. longer than 10 characters).
-  static void RecordRenderedTextAcquireSuccessForAivX(
-      PredictionModelType model_type,
-      bool success);
-
-  // Records the size of the rendered text when it was fetched successfully and
-  // was suitable as input for model execution.
-  static void RecordRenderedTextSize(PredictionModelType model_type,
-                                     RequestType request_type,
-                                     size_t text_size);
-
-  // Records whether we needed to cancel the previous passage embeddings model
-  // call before starting a new one.
-  static void RecordTryCancelPreviousEmbeddingsModelExecution(
-      PredictionModelType model_type,
-      bool cancel_previous_job);
-
-  // Records whether the returning passage embedder job is outdated (a new
-  // passage embedder job has started).
-  static void RecordFinishedPassageEmbeddingsJobOutdated(
-      PredictionModelType model_type,
-      bool outdated);
-
-  // Records the success and duration of taking a screenshot for AIvX models.
-  static void RecordPassageEmbeddingModelExecutionTimeAndStatus(
-      PredictionModelType model_type,
-      base::TimeTicks snapshot_inquire_start_time,
-      passage_embeddings::ComputeEmbeddingsStatus status);
-
-  // Records the status of language detection during the Aiv4 workflow.
-  static void RecordLanguageDetectionStatus(LanguageDetectionStatus status);
-
-  // Records whether the passage embeddings calculation ran into a timeout
-  // during the Aiv4 workflow.
-  static void RecordPassageEmbeddingsCalculationTimeout(bool timeout);
-
-  // Records whether the passage embedder metadata was valid when the AIv4
-  // workflow was initiated.
-  static void RecordPassageEmbedderMetadataValid(bool valid);
-
-  // Records whether the UI selection logic of the
-  // PermissionBasedPredictionUiSelector ran into a timeout.
-  static void RecordPredictionServiceTimeout(bool timeout);
 
   // Records if the browser was active at the time the prompt started displaying
   static void RecordPromptShownInActiveBrowser(
