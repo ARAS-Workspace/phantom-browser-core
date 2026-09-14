@@ -50,6 +50,7 @@
 #include "components/language/core/common/locale_util.h"
 #include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/pdf/browser/pdf_frame_util.h"
 #include "components/prefs/pref_service.h"

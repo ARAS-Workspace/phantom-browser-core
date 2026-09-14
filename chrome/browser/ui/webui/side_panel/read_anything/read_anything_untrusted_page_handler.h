@@ -27,8 +27,6 @@
 #include "chrome/common/read_anything/read_anything.mojom.h"
 #include "components/dom_distiller/core/task_tracker.h"
 #include "components/language_detection/core/language_detection_driver.h"
-#include "components/translate/core/browser/translate_client.h"
-#include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/tts_controller.h"
 #include "extensions/browser/extension_registry_observer.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"

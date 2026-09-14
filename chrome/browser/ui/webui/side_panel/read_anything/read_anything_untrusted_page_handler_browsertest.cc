@@ -43,6 +43,7 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/prefs/pref_value_map.h"
 #include "components/tabs/public/tab_interface.h"

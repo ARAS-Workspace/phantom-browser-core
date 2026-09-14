@@ -7,11 +7,9 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "components/favicon/core/favicon_driver_observer.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/sessions/core/session_id.h"
-#include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/visibility.h"
 #include "content/public/browser/web_contents_observer.h"
 
@@ -34,12 +32,10 @@ class SyncSessionsRouterTabHelper
       public language_detection::LanguageDetectionDriver::Observer,
       public favicon::FaviconDriverObserver {
  public:
-  // TODO(https://crbug.com/373057420): `chrome_translate_client` and
-  // `favicon_driver` can be null in tests but not in production code. The tests
-  // should be fixed.
+  // TODO(https://crbug.com/373057420): `favicon_driver` can be null in tests
+  // but not in production code. The tests should be fixed.
   SyncSessionsRouterTabHelper(content::WebContents* web_contents,
                               SyncSessionsWebContentsRouter* router,
-                              ChromeTranslateClient* chrome_translate_client,
                               favicon::FaviconDriver* favicon_driver);
   SyncSessionsRouterTabHelper(const SyncSessionsRouterTabHelper&) = delete;
   SyncSessionsRouterTabHelper& operator=(const SyncSessionsRouterTabHelper&) =
@@ -83,8 +79,6 @@ class SyncSessionsRouterTabHelper
 
   // |router_| is a KeyedService and is guaranteed to outlive |this|.
   const raw_ptr<SyncSessionsWebContentsRouter, DanglingUntriaged> router_;
-
-  const raw_ptr<ChromeTranslateClient> chrome_translate_client_;
 
   const raw_ptr<favicon::FaviconDriver> favicon_driver_;
 

@@ -16,7 +16,6 @@
 #include "chrome/browser/preloading/prefetch/no_state_prefetch/no_state_prefetch_manager_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/renderer_host/chrome_navigation_ui_data.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "components/actor/core/task_id.h"
 #include "components/history/content/browser/history_context_helper.h"
 #include "components/history/core/browser/features.h"
@@ -24,6 +23,7 @@
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_types.h"
 #include "components/language_detection/content/browser/language_detection_host.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
 #include "components/sessions/content/navigation_task_id.h"
 #include "components/sessions/content/session_tab_helper.h"
@@ -211,14 +211,9 @@ ConvertSessionsPasswordStateToHistory(
 HistoryTabHelper::HistoryTabHelper(WebContents* web_contents)
     : content::WebContentsObserver(web_contents),
       content::WebContentsUserData<HistoryTabHelper>(*web_contents) {
-  // A translate client is not always attached to web contents (e.g. tests).
-  if (ChromeTranslateClient::FromWebContents(web_contents)) {
-    language_detection::LanguageDetectionHost::CreateForWebContents(
-        web_contents);
-    translate_observation_.Observe(
-        language_detection::LanguageDetectionHost::FromWebContents(
-            web_contents));
-  }
+  language_detection::LanguageDetectionHost::CreateForWebContents(web_contents);
+  translate_observation_.Observe(
+      language_detection::LanguageDetectionHost::FromWebContents(web_contents));
 }
 
 HistoryTabHelper::~HistoryTabHelper() {

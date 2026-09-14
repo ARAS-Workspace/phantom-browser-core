@@ -416,7 +416,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
           tab.GetContents(),
           sync_sessions::SyncSessionsWebContentsRouterFactory::GetForProfile(
               profile),
-          ChromeTranslateClient::FromWebContents(tab.GetContents()),
           favicon::ContentFaviconDriver::FromWebContents(tab.GetContents()));
 
   focus_tab_after_navigation_helper_ =
@@ -585,7 +584,6 @@ void TabFeatures::WillDiscardContents(tabs::TabInterface* tab,
           new_contents,
           sync_sessions::SyncSessionsWebContentsRouterFactory::GetForProfile(
               profile),
-          ChromeTranslateClient::FromWebContents(new_contents),
           favicon::ContentFaviconDriver::FromWebContents(new_contents));
 
   if (permission_indicators_tab_data_) {

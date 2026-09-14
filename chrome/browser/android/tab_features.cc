@@ -28,7 +28,6 @@
 #include "chrome/browser/ssl/security_state_event_observer.h"
 #include "chrome/browser/sync/sessions/sync_sessions_router_tab_helper.h"
 #include "chrome/browser/sync/sessions/sync_sessions_web_contents_router_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/contextual_search/tab_contextualization_controller.h"
 #include "chrome/browser/ui/side_panel/android/android_side_panel_enabled_fn.h"
 #include "chrome/browser/ui/side_panel/internal/android/dev/side_panel_tab_scoped_dev_feature.h"
@@ -64,7 +63,6 @@ TabFeatures::TabFeatures(content::WebContents* web_contents, Profile* profile) {
           web_contents,
           sync_sessions::SyncSessionsWebContentsRouterFactory::GetForProfile(
               profile),
-          ChromeTranslateClient::FromWebContents(web_contents),
           favicon::ContentFaviconDriver::FromWebContents(web_contents));
 
   http_auth_cache_status_ = std::make_unique<HttpAuthCacheStatus>(web_contents);

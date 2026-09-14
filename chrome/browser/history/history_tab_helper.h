@@ -18,7 +18,6 @@
 #include "components/history/core/browser/history_types.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/sessions/core/serialized_navigation_entry.h"
-#include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/browser/web_contents_user_data.h"
 

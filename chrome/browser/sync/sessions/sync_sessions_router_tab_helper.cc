@@ -11,6 +11,7 @@
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/language/core/common/language_experiments.h"
 #include "components/language_detection/content/browser/language_detection_host.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "components/sync/base/features.h"
 #include "components/sync_sessions/synced_tab_delegate.h"
@@ -25,20 +26,13 @@ namespace sync_sessions {
 SyncSessionsRouterTabHelper::SyncSessionsRouterTabHelper(
     content::WebContents* web_contents,
     SyncSessionsWebContentsRouter* router,
-    ChromeTranslateClient* chrome_translate_client,
     favicon::FaviconDriver* favicon_driver)
     : content::WebContentsObserver(web_contents),
       router_(router),
-      chrome_translate_client_(chrome_translate_client),
       favicon_driver_(favicon_driver) {
-  // A translate client is not always attached to web contents (e.g. tests).
-  if (chrome_translate_client_) {
-    language_detection::LanguageDetectionHost::CreateForWebContents(
-        web_contents);
-    language_detection_observation_.Observe(
-        language_detection::LanguageDetectionHost::FromWebContents(
-            web_contents));
-  }
+  language_detection::LanguageDetectionHost::CreateForWebContents(web_contents);
+  language_detection_observation_.Observe(
+      language_detection::LanguageDetectionHost::FromWebContents(web_contents));
 
   if (favicon_driver_) {
     favicon_driver_->AddObserver(this);
