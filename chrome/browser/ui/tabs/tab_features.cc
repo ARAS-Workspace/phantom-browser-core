@@ -9,8 +9,6 @@
 #include "base/feature_list.h"
 #include "base/memory/ptr_util.h"
 #include "base/no_destructor.h"
-#include "chrome/browser/accessibility_annotator/content_annotator/content_annotator_service_factory.h"
-#include "chrome/browser/accessibility_annotator/content_annotator/content_annotator_tab_helper.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/commerce/in_stock_notification/in_stock_notification_manager.h"
 #include "chrome/browser/commerce/shopping_service_factory.h"
@@ -340,15 +338,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
           GetUserDataFactory()
               .CreateInstance<glic::GlicSidePanelCoordinatorImpl>(
                   tab, &tab, side_panel_registry_.get());
-    }
-
-    if (accessibility_annotator::
-            ContentAnnotatorService* content_annotator_service =
-                ContentAnnotatorServiceFactory::GetForProfile(profile)) {
-      content_annotator_tab_helper_ =
-          std::make_unique<accessibility_annotator::ContentAnnotatorTabHelper>(
-              tab, *content_annotator_service,
-              ChromeTranslateClient::FromWebContents(tab.GetContents()));
     }
   }  // IsInNormalWindow() end.
 

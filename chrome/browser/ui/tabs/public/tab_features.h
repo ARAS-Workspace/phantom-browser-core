@@ -67,10 +67,6 @@ namespace back_to_opener {
 class BackToOpenerController;
 }  // namespace back_to_opener
 
-namespace accessibility_annotator {
-class ContentAnnotatorTabHelper;
-}  // namespace accessibility_annotator
-
 namespace autofill {
 class BubbleManager;
 class OmniboxAutofillBubbleController;
@@ -560,9 +556,6 @@ class TabFeatures {
 
   std::unique_ptr<contextual_tasks::ContextualTasksTabVisitTracker>
       contextual_tasks_tab_visit_tracker_;
-
-  std::unique_ptr<accessibility_annotator::ContentAnnotatorTabHelper>
-      content_annotator_tab_helper_;
 
   std::unique_ptr<multistep_filter::FilterUiController> filter_ui_controller_;
   std::unique_ptr<multistep_filter::ChromeFilterNavigationObserver>
