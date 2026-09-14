@@ -619,8 +619,6 @@ Unsupported non-ascii characters will cause issues with xml presubmits.
   </int>
 </enum>
 
-<!--LINT.IfChange(jp_settings_hist_enums)-->
-
 <enum name="JpSettingsInputMode">
   <int value="0" label="Romaji"/>
   <int value="1" label="Kana"/>
@@ -666,8 +664,6 @@ Unsupported non-ascii characters will cause issues with xml presubmits.
   <int value="2" label="CornerBracketSlash"/>
   <int value="3" label="SquareBracketMiddleDot"/>
 </enum>
-
-<!--LINT.ThenChange(/chrome/browser/ash/input_method/japanese_settings.h:jp_settings_hist_enums)-->
 
 <enum name="KoreanAction">
   <summary>Actions that are available on the Korean IME.</summary>

@@ -828,8 +828,6 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="NotDeferFailed"/>
 </enum>
 
-<!-- LINT.IfChange(InstallationCounterReasonEnum) -->
-
 <enum name="InstallationCounterReasonEnum">
   <int value="0" label="User"/>
   <int value="1" label="Default App"/>
@@ -837,8 +835,6 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="Policy based App"/>
   <int value="4" label="Unknown Reason"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/ash/app_list/arc/arc_app_list_prefs.cc:InstallationCounterReasonEnum) -->
 
 <enum name="NearbyShareArcBridgeFailResult">
   <int value="0" label="Instance is null."/>
@@ -870,13 +866,9 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="Disabled on unaffiliated device"/>
 </enum>
 
-<!-- LINT.IfChange(UninstallCounterReasonEnum) -->
-
 <enum name="UninstallCounterReasonEnum">
   <int value="0" label="User"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/ash/app_list/arc/arc_app_list_prefs.cc:UninstallCounterReasonEnum) -->
 
 <enum name="VmmSwapOutState">
   <int value="0" label="Not Swapped Out"/>

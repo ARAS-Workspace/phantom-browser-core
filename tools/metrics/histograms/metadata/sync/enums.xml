@@ -35,8 +35,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Signout"/>
 </enum>
 
-<!-- LINT.IfChange(BatchUploadEntryPoint) -->
-
 <enum name="BatchUploadEntryPoint">
   <int value="0" label="Password manager settings"/>
   <int value="1" label="Password promo card"/>
@@ -57,8 +55,6 @@ chromium-metrics-reviews@google.com.
       label="Profile menu primary button with Windows10 depreciation action
              following Avatar button promo click"/>
 </enum>
-
-<!-- LINT.ThenChange(/chrome/browser/profiles/batch_upload/batch_upload_service.h:EntryPoint) -->
 
 <!-- LINT.IfChange(BookmarkAccountStorageMoveDialogType) -->
 
@@ -409,7 +405,8 @@ chromium-metrics-reviews@google.com.
   <int value="100008" label="(obsolete) AccessibilityReadAnythingFontScale"/>
   <int value="100009" label="(obsolete) AccessibilityReadAnythingColorInfo"/>
   <int value="100010" label="(obsolete) AccessibilityReadAnythingLineSpacing"/>
-  <int value="100011" label="(obsolete) AccessibilityReadAnythingLetterSpacing"/>
+  <int value="100011"
+      label="(obsolete) AccessibilityReadAnythingLetterSpacing"/>
   <int value="100012" label="LensRegionSearchEnabled"/>
   <int value="100013" label="HatsSurveyMetadata"/>
   <int value="100014" label="HomePage"/>
@@ -643,7 +640,8 @@ chromium-metrics-reviews@google.com.
   <int value="100227" label="SpeakOnMuteOptInNudgeShownCount"/>
   <int value="100228" label="(obsolete) AccessibilityReadAnythingVoiceName"/>
   <int value="100229" label="(obsolete) AccessibilityReadAnythingSpeechRate"/>
-  <int value="100230" label="(obsolete) AccessibilityReadAnythingHighlightGranularity"/>
+  <int value="100230"
+      label="(obsolete) AccessibilityReadAnythingHighlightGranularity"/>
   <int value="100231"
       label="(Obsolete) AccessibilityReadAnythingHighlightColor"/>
   <int value="100232" label="PinnedActions"/>
@@ -707,7 +705,8 @@ chromium-metrics-reviews@google.com.
       label="(obsolete) ProfileDefaultContentSettingValuesTrackingProtection"/>
   <int value="100276" label="ShowForwardButton"/>
   <int value="100277" label="AccessibilityMagnifierFollowsSts"/>
-  <int value="100278" label="(obsolete) AccessibilityReadAnythingLanguagesEnabled"/>
+  <int value="100278"
+      label="(obsolete) AccessibilityReadAnythingLanguagesEnabled"/>
   <int value="100279" label="KeyboardDefaultSplitModifierSettings"/>
   <int value="100280" label="DisplayAmbientLightSensorLastEnabled"/>
   <int value="100281" label="AccessibilityMainNodeAnnotationsEnabled"/>
@@ -718,7 +717,8 @@ chromium-metrics-reviews@google.com.
   <int value="100286" label="kAccessibilityFaceGazeCursorControlEnabled"/>
   <int value="100287" label="kAccessibilityFaceGazeAdjustSpeedSeparately"/>
   <int value="100288" label="KeyboardAmbientLightSensorLastEnabled"/>
-  <int value="100289" label="(obsolete) AccessibilityReadAnythingImagesEnabled"/>
+  <int value="100289"
+      label="(obsolete) AccessibilityReadAnythingImagesEnabled"/>
   <int value="100290" label="ShelfMallAppPinRolls"/>
   <int value="100291" label="DesktopToiOSAddressPromoLastImpressionTimestamp"/>
   <int value="100292" label="DesktopToiOSAddressPromoImpressionsCounter"/>
@@ -804,7 +804,8 @@ chromium-metrics-reviews@google.com.
   <int value="100367" label="ClassManagementToolsOOBEAccessCountSetting"/>
   <int value="100368" label="ClassManagementToolsKioskReceiverCodes"/>
   <int value="100369" label="PinContextualTaskButton"/>
-  <int value="100370" label="(obsolete) AccessibilityReadAnythingOmniboxChipIgnoredCount"/>
+  <int value="100370"
+      label="(obsolete) AccessibilityReadAnythingOmniboxChipIgnoredCount"/>
   <int value="100371" label="(obsolete) AccessibilityReadAnythingLineFocus"/>
   <int value="100372" label="OrganizerPanelEntrypointEnabled"/>
   <int value="100373" label="iOSTabGroupsPromoLastImpressionTimestamp"/>
@@ -813,7 +814,8 @@ chromium-metrics-reviews@google.com.
   <int value="100376" label="iOSPriceTrackingPromoLastImpressionTimestamp"/>
   <int value="100377" label="iOSPriceTrackingPromoImpressionsCounter"/>
   <int value="100378" label="iOSPriceTrackingPromoOptOut"/>
-  <int value="100379" label="(obsolete) AccessibilityReadAnythingLineFocusEnabledMode"/>
+  <int value="100379"
+      label="(obsolete) AccessibilityReadAnythingLineFocusEnabledMode"/>
   <int value="100380" label="AppRatingPromptShown"/>
   <int value="100381"
       label="(obsolete) AccessibilityReadAnythingLastOpenedPresentationState"/>
@@ -824,8 +826,6 @@ chromium-metrics-reviews@google.com.
   <int value="100385" label="ExtensionsPinnedByDefault"/>
   <int value="100386" label="AudioFocusEnforcementEnabled"/>
 <!-- LINT.ThenChange(/chrome/browser/sync/prefs/chrome_syncable_prefs_database.cc:ChromeSyncablePref)-->
-
-<!-- LINT.IfChange(IosSyncablePref) -->
 
   <int value="200000" label="ArticlesForYouEnabled"/>
   <int value="200001" label="(obsolete) ContextualSearchEnabled_IOS"/>
@@ -848,8 +848,6 @@ chromium-metrics-reviews@google.com.
   <int value="200018" label="LevelUpTypingSavedStat"/>
   <int value="200019" label="LevelUpPasswordsVerifiedStat"/>
   <int value="200020" label="LevelUpPhotoSearchesPerformedStat"/>
-<!-- LINT.ThenChange(/ios/chrome/browser/sync/model/prefs/ios_chrome_syncable_prefs_database.cc:IosSyncablePref)-->
-
 </enum>
 
 <!-- LINT.IfChange(SyncBookmarkModelMetadataCorruptionReason) -->
@@ -1339,8 +1337,6 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(/components/sync/engine/syncer.h:SyncerErrorValues) -->
 
-<!-- LINT.IfChange(SyncErrorInfobarTypes) -->
-
 <enum name="SyncErrorInfobarTypes">
   <summary>Possible errors that can trigger a sync error infobar.</summary>
   <int value="1" label="Sign in needs update"/>
@@ -1353,10 +1349,6 @@ chromium-metrics-reviews@google.com.
   <int value="8" label="Bookmarks limit exceeded"/>
   <int value="9" label="Device management error"/>
 </enum>
-
-<!-- LINT.ThenChange(/ios/chrome/browser/settings/model/sync/utils/sync_util.mm:SyncErrorInfobarTypes) -->
-
-<!-- LINT.IfChange(SyncErrorType) -->
 
 <enum name="SyncErrorType">
   <summary>Possible errors that can be returned by the sync server.</summary>
@@ -1383,8 +1375,6 @@ chromium-metrics-reviews@google.com.
   <int value="14" label="ENCRYPTION_OBSOLETE"/>
   <int value="100" label="UNKNOWN"/>
 </enum>
-
-<!-- LINT.ThenChange(/ios/chrome/browser/settings/model/sync/utils/sync_util.mm:SyncErrorType) -->
 
 <!-- LINT.IfChange(SyncErrorUiAction) -->
 

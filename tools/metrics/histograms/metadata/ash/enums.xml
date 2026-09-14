@@ -214,8 +214,6 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="2" label="Fingerprint"/>
 </enum>
 
-<!-- LINT.IfChange(AuthMethod) -->
-
 <enum name="AuthMethod">
   <int value="0" label="Password"/>
   <int value="1" label="PIN"/>
@@ -224,10 +222,6 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="4" label="Challenge-response"/>
   <int value="5" label="Nothing"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/ash/login/login_auth_recorder.h:AuthMethod) -->
-
-<!-- LINT.IfChange(AuthMethodSwitchType) -->
 
 <enum name="AuthMethodSwitchType">
   <int value="0" label="Password to PIN"/>
@@ -250,10 +244,6 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="17" label="Nothing to Challenge-response"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/ash/login/login_auth_recorder.h:AuthMethodSwitchType) -->
-
-<!-- LINT.IfChange(BabelOrcaReceivingStoppedReason) -->
-
 <enum name="BabelOrcaReceivingStoppedReason">
   <int value="0" label="Class Tools session ended"/>
   <int value="1" label="Session captions turned off"/>
@@ -263,19 +253,11 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="5" label="Receive messages request error"/>
 </enum>
 
-<!-- LINT.ThenChange(//chromeos/ash/components/boca/babelorca/babel_orca_consumer.h:ReceivingStoppedReason) -->
-
-<!-- LINT.IfChange(BabelOrcaSendingStoppedReason) -->
-
 <enum name="BabelOrcaSendingStoppedReason">
   <int value="0" label="Class Tools session ended"/>
   <int value="1" label="Session captions turned off"/>
   <int value="2" label="Send messages requests error"/>
 </enum>
-
-<!-- LINT.ThenChange(//chromeos/ash/components/boca/babelorca/babel_orca_producer.h:SendingStoppedReason) -->
-
-<!-- LINT.IfChange(BabelOrcaStreamEndReason) -->
 
 <enum name="BabelOrcaStreamEndReason">
   <int value="0" label="Ended by client"/>
@@ -285,8 +267,6 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="4" label="Parsing service disconnected"/>
   <int value="5" label="Timeout waiting for data"/>
 </enum>
-
-<!-- LINT.ThenChange(//chromeos/ash/components/boca/babelorca/tachyon_streaming_client.h:StreamEndReason) -->
 
 <enum name="BackgroundBlurState">
   <int value="0" label="Off"/>
@@ -468,8 +448,6 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="10" label="Sunfish"/>
 </enum>
 
-<!-- LINT.IfChange(CaptureModeImageSearchResult) -->
-
 <enum name="CaptureModeImageSearchResult">
   <int value="0" label="Success"/>
   <int value="1"
@@ -478,8 +456,6 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="3" label="Failure, empty access token"/>
   <int value="4" label="Failure, unsuccessful status code"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/capture_mode/capture_mode_metrics.h:CaptureModeImageSearchResult) -->
 
 <enum name="CaptureModeSaveToLocation">
   <int value="0" label="Default downloads folder"/>
@@ -499,8 +475,6 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
       label="User selects the default downloads folder from settings menu"/>
 </enum>
 
-<!-- LINT.IfChange(CaptureModeTextDetectionResult) -->
-
 <enum name="CaptureModeTextDetectionResult">
   <int value="0" label="Unreached, image search failure"/>
   <int value="1" label="Success, text present"/>
@@ -513,8 +487,6 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="7" label="Failure, missing response body"/>
   <int value="8" label="Failure, issues parsing QFMetadata"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/capture_mode/capture_mode_metrics.h:CaptureModeTextDetectionResult) -->
 
 <enum name="CaptureQuickAction">
   <int value="0" label="Edit file in backlight"/>
@@ -675,15 +647,11 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="15" label="Google Built-in button click"/>
 </enum>
 
-<!-- LINT.IfChange(DemoModeHighlightsError) -->
-
 <enum name="DemoModeHighlightsError">
   <int value="0" label="Attract loop break timestamp is invalid"/>
   <int value="1" label="Page view duration is invalid"/>
   <int value="2" label="Details page view duration is invalid"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/webui/demo_mode_app_ui/resources/demo_mode_metrics_service.ts:DemoModeHighlightsError) -->
 
 <enum name="DemoModeIdleLogoutWarningEvent">
   <int value="0" label="Shown"/>
@@ -777,15 +745,11 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="10" label="Out of quota not retriable"/>
 </enum>
 
-<!-- LINT.IfChange(DeskBarVisibility) -->
-
 <enum name="DeskBarVisibility">
   <int value="0" label="Shown in first overview frame"/>
   <int value="1" label="Shown after first overview frame"/>
   <int value="2" label="Not shown during overview session"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/wm/overview/overview_controller.cc:DeskBarVisibility) -->
 
 <enum name="DeskCloseType">
   <int value="0" label="Combine desks."/>
@@ -1399,16 +1363,10 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="3" label="Collapse Group"/>
 </enum>
 
-<!-- LINT.IfChange(ExtendedUpdatesDialogEventEnum) -->
-
 <enum name="ExtendedUpdatesDialogEventEnum">
   <int value="0" label="Dialog shown"/>
   <int value="1" label="Opt in confirmed"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/system/extended_updates/extended_updates_metrics.h:ExtendedUpdatesDialogEvent) -->
-
-<!-- LINT.IfChange(ExtendedUpdatesEntryPointEventEnum) -->
 
 <enum name="ExtendedUpdatesEntryPointEventEnum">
   <int value="0" label="Settings page set up button shown"/>
@@ -1419,26 +1377,16 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="5" label="No ARC notification clicked"/>
 </enum>
 
-<!-- LINT.ThenChange(//ash/system/extended_updates/extended_updates_metrics.h:ExtendedUpdatesEntryPointEvent) -->
-
-<!-- LINT.IfChange(FloatingWorkspaceStartupUiClosureReason) -->
-
 <enum name="FloatingWorkspaceStartupUiClosureReason">
   <int value="0" label="Closed manually"/>
   <int value="1" label="Closed automatically"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/ash/floating_workspace/floating_workspace_metrics_util.h:StartupUiClosureReason) -->
-
-<!-- LINT.IfChange(FloatingWorkspaceV2LaunchTemplateFailureType) -->
 
 <enum name="FloatingWorkspaceV2LaunchTemplateFailureType">
   <int value="0" label="Unknown failure type"/>
   <int value="1" label="Storage error"/>
   <int value="2" label="The desk count requirement not met"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/ash/floating_workspace/floating_workspace_metrics_util.h:LaunchTemplateFailureType) -->
 
 <enum name="FloatingWorkspaceV2UploadTemplateStatusType">
   <int value="0" label="Unknown upload status"/>
@@ -1607,15 +1555,11 @@ ash/webui/personalization_app/mojom/personalization_app.mojom -->
   <int value="9" label="Parent access button"/>
 </enum>
 
-<!-- LINT.IfChange(LoginReadaheadResult) -->
-
 <enum name="LoginReadaheadResult">
   <int value="0" label="Failed"/>
   <int value="1" label="Succeeded"/>
   <int value="2" label="Canceled"/>
 </enum>
-
-<!-- LINT.ThenChange(//chromeos/ash/components/login/readahead/login_readahead_performer.cc:LoginReadaheadResult) -->
 
 <enum name="LoginScreenUserClickTarget">
   <int value="0" label="Shut down button"/>
@@ -2314,8 +2258,6 @@ chromeos/ash/components/peripheral_notification/peripheral_notification_manager.
   <int value="6" label="Invalid JSON format"/>
 </enum>
 
-<!-- LINT.IfChange(ScannerFeatureUserState) -->
-
 <enum name="ScannerFeatureUserState">
   <int value="0" label="Consent disclaimer accepted"/>
   <int value="1" label="Consent disclaimer rejected"/>
@@ -2417,8 +2359,6 @@ chromeos/ash/components/peripheral_notification/peripheral_notification_manager.
       label="Sunfish-session started using the non-debug keyboard shortcut"/>
 </enum>
 
-<!-- LINT.ThenChange(//ash/scanner/scanner_metrics.h:ScannerFeatureUserState) -->
-
 <enum name="ScreenshotOnShutdownStatus">
   <int value="0" label="Succeeded"/>
   <int value="1" label="Failed as in overview"/>
@@ -2500,23 +2440,15 @@ chromeos/ash/components/peripheral_notification/peripheral_notification_manager.
   <int value="1000" label="VcBackgroundFreeform"/>
 </enum>
 
-<!-- LINT.IfChange(SearchResultsPanelEntryType) -->
-
 <enum name="SearchResultsPanelEntryType">
   <int value="0" label="Sunfish session region selection"/>
   <int value="1" label="Default session search action button"/>
 </enum>
 
-<!-- LINT.ThenChange(//ash/capture_mode/capture_mode_metrics.h:SearchResultsPanelEntryType) -->
-
-<!-- LINT.IfChange(SessionLockEvent) -->
-
 <enum name="SessionLockEvent">
   <int value="0" label="Lock"/>
   <int value="1" label="Unlock"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/session/session_controller_impl.cc:SessionLockEvent) -->
 
 <enum name="SetWallpaperResult">
   <int value="0" label="Success"/>
@@ -2622,8 +2554,6 @@ chromeos/ash/components/peripheral_notification/peripheral_notification_manager.
       label="Shutdown confirmation bubbble dismissed by clicking ouside"/>
 </enum>
 
-<!-- LINT.IfChange(SimpleGeolocationClientId) -->
-
 <enum name="SimpleGeolocationClientId">
   <int value="0" label="kGeolocationController"/>
   <int value="1" label="kWizardController"/>
@@ -2631,8 +2561,6 @@ chromeos/ash/components/peripheral_notification/peripheral_notification_manager.
   <int value="3" label="kForTesting"/>
   <int value="4" label="kQueryGeolocationCommand"/>
 </enum>
-
-<!-- LINT.ThenChange(//chromeos/ash/components/geolocation/system_location_provider.h:ClientId) -->
 
 <enum name="SnapGroupExitPoint">
   <int value="0" label="Drag window out"/>
@@ -2808,8 +2736,6 @@ chromeos/ash/components/peripheral_notification/peripheral_notification_manager.
   <int value="26" label="Chrome Custom"/>
 </enum>
 
-<!-- LINT.IfChange(VideoConferenceAppType) -->
-
 <enum name="VideoConferenceAppType">
   <summary>
     Possible different app types that a running media app (which the Video
@@ -2828,8 +2754,6 @@ chromeos/ash/components/peripheral_notification/peripheral_notification_manager.
   <int value="10" label="Ash Client Unknown"/>
   <int value="11" label="Ash Capture Mode"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/system/video_conference/video_conference_common.h:VideoConferenceAppType) -->
 
 <enum name="WallpaperCollection">
   <int value="-1993504462" label="Native American Artists"/>

@@ -101,9 +101,7 @@ chromium-metrics-reviews@google.com.
   <variant name=".Unknown" summary="Unknown drag and drop type"/>
 </variants>
 
-<!-- LINT.ThenChange(//ios/chrome/browser/composebox/shared/metrics/composebox_metrics_recorder.h:ComposeboxDragAndDropType, //tools/metrics/histograms/metadata/omnibox/enums.xml:ComposeboxDragAndDropType) -->
-
-<!-- LINT.IfChange(ComposeboxEntrypoint) -->
+<!-- LINT.ThenChange( //tools/metrics/histograms/metadata/omnibox/enums.xml:ComposeboxDragAndDropType) -->
 
 <variants name="ComposeboxEntrypoint">
   <variant name="" summary="Overall"/>
@@ -113,8 +111,6 @@ chromium-metrics-reviews@google.com.
   <variant name=".NTPPlusButton" summary="NTP plus button entrypoint"/>
   <variant name=".Other" summary="Other entrypoint (Omnibox)"/>
 </variants>
-
-<!-- LINT.ThenChange(//ios/chrome/browser/composebox/public/composebox_entrypoint.h:ComposeboxEntrypoint) -->
 
 <variants name="CrossDeviceTabTarget">
   <variant name="Action"

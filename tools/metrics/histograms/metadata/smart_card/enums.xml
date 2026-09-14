@@ -19,8 +19,6 @@ found in the LICENSE file.
 
 <!-- LINT.ThenChange(//content/browser/smart_card/smart_card_histograms.h:SmartCardConnectionClosedReason) -->
 
-<!-- LINT.IfChange(SmartCardOneTimePermissionExpiryReason) -->
-
 <enum name="SmartCardOneTimePermissionExpiryReason">
   <int value="0" label="LastWindowClosed"/>
   <int value="1" label="AllWindowsInTheBackgroundTimeout"/>
@@ -29,8 +27,6 @@ found in the LICENSE file.
   <int value="4" label="ReaderRemoved"/>
   <int value="5" label="CardRemoved"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/smart_card/smart_card_histograms.h:SmartCardOneTimePermissionExpiryReason) -->
 
 </enums>
 

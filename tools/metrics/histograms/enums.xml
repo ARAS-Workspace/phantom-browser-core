@@ -281,8 +281,6 @@ uploading your change for review.  These are checked by presubmit scripts.
   <int value="17" label="Package was updated"/>
 </enum>
 
-<!-- LINT.IfChange(AndroidWebViewPreconnectEvent) -->
-
 <enum name="AndroidWebViewPreconnectEvent">
   <int value="0" label="preconnect called"/>
   <int value="1" label="(Obsolete) session closed"/>
@@ -296,8 +294,6 @@ uploading your change for review.  These are checked by presubmit scripts.
   <int value="9" label="connection closed, wasn't used, HTTP2"/>
   <int value="10" label="connection closed, wasn't used, other"/>
 </enum>
-
-<!-- LINT.ThenChange(//android_webview/browser/aw_preconnector.cc:AwPreconnectEvent) -->
 
 <enum name="AnrSkippedReason">
   <int value="0" label="Filesystem Read Failure"/>
@@ -382,16 +378,12 @@ uploading your change for review.  These are checked by presubmit scripts.
 
 <!-- LINT.ThenChange(//chrome/browser/apps/app_shim/app_shim_host_mac.h:AppShimLaunchResult) -->
 
-<!-- LINT.IfChange(AppStreamLaunchEntryPoint) -->
-
 <enum name="AppStreamLaunchEntryPoint">
   <int value="0" label="Launched from full apps list"/>
   <int value="1" label="Launched from a notification"/>
   <int value="2" label="Launched from recent apps in Phone Hub"/>
   <int value="3" label="Unknown launch entrypoint."/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/webui/eche_app_ui/mojom/eche_app.mojom:AppStreamLaunchEntryPoint) -->
 
 <enum name="AppType">
   <int value="0" label="Unknown"/>
@@ -438,8 +430,6 @@ uploading your change for review.  These are checked by presubmit scripts.
 
 <!-- These values must be in sync with ProvisionConstants in CloudDPC code -->
 
-<!-- LINT.IfChange(AssistantNewEntryPointEligibility) -->
-
 <enum name="AssistantNewEntryPointEligibility">
   <int value="0" label="kEligible"/>
   <int value="1" label="kErrorProfileNotReady"/>
@@ -448,8 +438,6 @@ uploading your change for review.  These are checked by presubmit scripts.
   <int value="4" label="kNotEligibleNotInstalled"/>
   <int value="5" label="kNotEligibleNonGoogleChrome"/>
 </enum>
-
-<!-- LINT.ThenChange(/chrome/browser/ui/ash/assistant/assistant_browser_delegate_impl.cc:AssistantNewEntryPointEligibility) -->
 
 <enum name="AuctionResult">
   <int value="0" label="Success"/>
@@ -2214,8 +2202,6 @@ Called by update_net_error_codes.py.-->
   <int value="3" label="TapThenHold"/>
 </enum>
 
-<!-- LINT.IfChange(ConnectionFailReason) -->
-
 <enum name="ConnectionFailReason">
   <int value="0" label="Unknown"/>
   <int value="1" label="No signaling response and no signaling request"/>
@@ -2226,8 +2212,6 @@ Called by update_net_error_codes.py.-->
   <int value="6" label="Devices are on different Wi-Fi networks"/>
   <int value="7" label="Phone is on cellular"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/system/eche/eche_tray.h:ConnectionFailReason) -->
 
 <enum name="ConnectivityDetectorConnectionState">
   <int value="0" label="Initial state or connection state can't be evaluated"/>
@@ -3625,15 +3609,11 @@ shown properly on the user-facing crash UI.
   <int value="2" label="kCbcs"/>
 </enum>
 
-<!-- LINT.IfChange(EnhancedCalendarResponseStatus) -->
-
 <enum name="EnhancedCalendarResponseStatus">
   <int value="0" label="Success"/>
   <int value="1" label="GenericFailure"/>
   <int value="2" label="CancelRequest"/>
 </enum>
-
-<!-- LINT.ThenChange(//ios/chrome/browser/intelligence/enhanced_calendar/metrics/enhanced_calendar_metrics.h:EnhancedCalendarResponseStatus) -->
 
 <enum name="EnrollmentStatus">
   <int value="0" label="Non-managed"/>
@@ -3824,8 +3804,6 @@ shown properly on the user-facing crash UI.
 
 <!-- LINT.ThenChange(//extensions/browser/api/constants.h:ExtensionSearchRedirectedByApi) -->
 
-<!-- LINT.IfChange(FastPairPairFailure) -->
-
 <enum name="FastPairPairFailure">
   <int value="0" label="Failed to create a GATT connection to the device"/>
   <int value="1" label="Failed to find the expected GATT service"/>
@@ -3889,8 +3867,6 @@ shown properly on the user-facing crash UI.
   <int value="33"
       label="Timed out while writing to Additional Data characteristic."/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/quick_pair/common/pair_failure.h:FastPairPairFailure) -->
 
 <!-- LINT.IfChange(FedCmThirdPartyCookiesStatus) -->
 
@@ -6140,18 +6116,12 @@ shown properly on the user-facing crash UI.
   <int value="2" label="User leaves the interstitial by closing the page"/>
 </enum>
 
-<!-- LINT.IfChange(IOSAppBarAssistantButtonState) -->
-
 <enum name="IOSAppBarAssistantButtonState">
   <int value="0" label="Lens"/>
   <int value="1" label="Ask (Gemini)"/>
   <int value="2" label="AIM SRP"/>
   <int value="3" label="Account"/>
 </enum>
-
-<!-- LINT.ThenChange(//ios/chrome/browser/app_bar/ui/app_bar_consumer.h:AppBarAssistantButtonState) -->
-
-<!-- LINT.IfChange(IOSContentSizeCategory) -->
 
 <enum name="IOSContentSizeCategory">
   <int value="0" label="Unspecified"/>
@@ -6169,10 +6139,6 @@ shown properly on the user-facing crash UI.
   <int value="12" label="AccessibilityExtraExtraExtraLarge"/>
 </enum>
 
-<!-- LINT.ThenChange(//ios/components/ui_util/dynamic_type_util.h:IOSContentSizeCategory) -->
-
-<!-- LINT.IfChange(IOSContextualPanelDismissedReason) -->
-
 <enum name="IOSContextualPanelDismissedReason">
   <int value="0" label="User dismissed"/>
   <int value="1" label="Tab changed"/>
@@ -6181,18 +6147,10 @@ shown properly on the user-facing crash UI.
   <int value="4" label="Keyboard opened"/>
 </enum>
 
-<!-- LINT.ThenChange(//ios/chrome/browser/contextual_panel/utils/contextual_panel_metrics.h:ContextualPanelDismissedReason) -->
-
-<!-- LINT.IfChange(IOSContextualPanelEntrypointInteractionType) -->
-
 <enum name="IOSContextualPanelEntrypointInteractionType">
   <int value="0" label="Displayed"/>
   <int value="1" label="Tapped"/>
 </enum>
-
-<!-- LINT.ThenChange(//ios/chrome/browser/contextual_panel/utils/contextual_panel_metrics.h:EntrypointInteractionType) -->
-
-<!-- LINT.IfChange(IOSContextualPanelInfoBlockImpression) -->
 
 <enum name="IOSContextualPanelInfoBlockImpression">
   <int value="0" label="Never Visible"/>
@@ -6204,10 +6162,6 @@ shown properly on the user-facing crash UI.
              IPH)"/>
 </enum>
 
-<!-- LINT.ThenChange(//ios/chrome/browser/contextual_panel/utils/contextual_panel_metrics.h:PanelBlockImpressionType) -->
-
-<!-- LINT.IfChange(ContextualPanelIPHDismissedReason) -->
-
 <enum name="IOSContextualPanelIPHDismissedReason">
   <int value="0" label="Other/unknown, such as switching tabs"/>
   <int value="1"
@@ -6216,26 +6170,16 @@ shown properly on the user-facing crash UI.
   <int value="3" label="User clicked IPH or entrypoint"/>
 </enum>
 
-<!-- LINT.ThenChange(//ios/chrome/browser/contextual_panel/utils/contextual_panel_metrics.h:ContextualPanelIPHDismissedReason) -->
-
-<!-- LINT.IfChange(IOSContextualPanelItemType) -->
-
 <enum name="IOSContextualPanelItemType">
   <int value="0" label="Sample Panel Item"/>
   <int value="1" label="Price Insights Item"/>
 </enum>
-
-<!-- LINT.ThenChange(//ios/chrome/browser/contextual_panel/model/contextual_panel_item_type.h:ContextualPanelItemType) -->
-
-<!-- LINT.IfChange(IOSContextualPanelModelRelevance) -->
 
 <enum name="IOSContextualPanelModelRelevance">
   <int value="0" label="No Data"/>
   <int value="1" label="Low"/>
   <int value="2" label="High"/>
 </enum>
-
-<!-- LINT.ThenChange(//ios/chrome/browser/contextual_panel/utils/contextual_panel_metrics.h:ModelRelevanceType) -->
 
 <enum name="IOSParcelCarrier">
   <int value="0" label="Unkown"/>
@@ -22161,8 +22105,6 @@ from previous Chrome versions.
   <int value="11" label="11"/>
 </enum>
 
-<!-- LINT.IfChange(MultiDeviceFeatureState) -->
-
 <enum name="MultiDevice_FeatureState">
   <int value="0" label="Prohibited by policy"/>
   <int value="1" label="Disabled by user"/>
@@ -22183,8 +22125,6 @@ from previous Chrome versions.
       label="Unable, eligible host exists but no host set or set host is
              unverified"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/resources/ash/settings/multidevice_page/multidevice_constants.ts:MultiDeviceFeatureState) -->
 
 <enum name="MultiDisplayModeDisplayCountRanges">
   <summary>
@@ -22625,8 +22565,6 @@ Called by update_net_error_codes.py.-->
   <int value="3" label="Disabled"/>
 </enum>
 
-<!-- LINT.IfChange(NotificationCatalogName) -->
-
 <enum name="NotificationCatalogName">
 <!-- Defined in ash/constants/notifier_catalogs.h -->
 
@@ -22835,8 +22773,6 @@ Called by update_net_error_codes.py.-->
   <int value="205" label="Local Auth Factors Complexity"/>
   <int value="206" label="Isolated Web App Update"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/constants/notifier_catalogs.h:NotificationCatalogName) -->
 
 <enum name="NQEObservationSource">
   <int value="0" label="HTTP"/>
@@ -23234,8 +23170,6 @@ Called by update_net_error_codes.py.-->
 
 <!-- LINT.ThenChange(//components/search_engines/search_engine_type.h:SearchEngineType) -->
 
-<!-- LINT.IfChange(OnboardingUserActionMetric) -->
-
 <enum name="OnboardingUserActionMetric">
   <int value="0" label="Unknown"/>
   <int value="1" label="Onboarding is started by user action"/>
@@ -23251,8 +23185,6 @@ Called by update_net_error_codes.py.-->
   <int value="9"
       label="The permission request is delivered to phone's Exo package"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/webui/eche_app_ui/apps_access_manager.h:OnboardingUserActionMetric) -->
 
 <enum name="OpenDownloadDialogEvent">
   <int value="0" label="Dialog shown"/>
@@ -25680,8 +25612,6 @@ Called by update_net_error_codes.py.-->
 
 <!-- LINT.ThenChange(//chrome/browser/preloading/search_preload/search_preload_service.h:SearchPreloadServiceNoVarySearchDataCacheUpdate) -->
 
-<!-- LINT.IfChange(SecureChannelConnectionAttemptFailureReason) -->
-
 <enum name="SecureChannelConnectionAttemptFailureReason">
   <int value="0" label="Authentication error"/>
   <int value="1" label="Could not generate advertisement"/>
@@ -25701,8 +25631,6 @@ Called by update_net_error_codes.py.-->
   <int value="15"
       label="Connection was intentionally cancelled due to a status change"/>
 </enum>
-
-<!-- LINT.ThenChange(//chromeos/ash/services/secure_channel/public/mojom/secure_channel.mojom:SecureChannelConnectionAttemptFailureReason) -->
 
 <enum name="SecurityDomainId">
   <int value="0" label="Invalid"/>

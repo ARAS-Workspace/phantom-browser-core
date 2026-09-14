@@ -410,15 +410,11 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//components/page_load_metrics/browser/observers/soft_navigation_page_load_metrics_observer.h:SoftNavigationPageLoadMetricsObserverState) -->
 
-<!-- LINT.IfChange(WebViewPageAttemptResult) -->
-
 <enum name="WebViewPageAttemptResult">
   <int value="0" label="Success: Reached FirstContentfulPaint"/>
   <int value="1" label="Early Finish: Load ended before FirstContentfulPaint"/>
   <int value="2" label="Failure"/>
 </enum>
-
-<!-- LINT.ThenChange(//android_webview/browser/page_load_metrics/service_level_page_load_metrics_observer.h:WebViewPageAttemptResult) -->
 
 </enums>
 

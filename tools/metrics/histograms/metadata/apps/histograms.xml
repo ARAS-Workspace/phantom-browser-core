@@ -115,8 +115,6 @@ chromium-metrics-reviews@google.com.
   <variant name="Swipe" summary="Open launcher by swiping on the shelf"/>
 </variants>
 
-<!-- LINT.IfChange(LauncherSearchSessionConclusion) -->
-
 <variants name="LauncherSearchSessionConclusionVariants">
   <variant name="" summary="All variants"/>
   <variant name=".AnswerCardSeen"
@@ -124,8 +122,6 @@ chromium-metrics-reviews@google.com.
   <variant name=".Launch" summary="A result is launched"/>
   <variant name=".Quit" summary="Launcher is dismissed"/>
 </variants>
-
-<!-- LINT.ThenChange(//ash/public/cpp/app_list/app_list_metrics.cc:SearchSessionConclusion) -->
 
 <variants name="SearchAction">
   <variant name="Abandon" summary="abandon"/>

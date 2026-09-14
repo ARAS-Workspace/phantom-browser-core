@@ -402,8 +402,6 @@ chromium-metrics-reviews@google.com.
   <int value="15" label="kImportCertificateInstructionReceived"/>
 </enum>
 
-<!-- LINT.IfChange(ChromeOSCameraClientType) -->
-
 <enum name="ChromeOSCameraClientType">
   <int value="0" label="Unknown"/>
   <int value="1" label="Testing"/>
@@ -413,8 +411,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="AshChrome"/>
   <int value="6" label="DEPRECATED: LacrosChrome"/>
 </enum>
-
-<!-- LINT.ThenChange(//media/capture/video/chromeos/mojom/cros_camera_service.mojom:CameraClientType) -->
 
 <enum name="ChromeOSCameraErrorType">
   <int value="1" label="Device"/>
@@ -436,8 +432,6 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="External"/>
 </enum>
 
-<!-- LINT.IfChange(ChromeOSFallbackCountry) -->
-
 <enum name="ChromeOSFallbackCountry">
   <int value="0" label="No statistics provider is available"/>
   <int value="1" label="Statistics provider hasn't finished loading data"/>
@@ -452,8 +446,6 @@ chromium-metrics-reviews@google.com.
   <int value="8" label="Region in VPD is empty"/>
   <int value="9" label="Region in VPD is not a valid country code"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/regional_capabilities/regional_capabilities_service_client_chromeos.h:ChromeOSFallbackCountry) -->
 
 <enum name="ChromeOSIioServiceSensorUsage">
   <int value="0" label="ACCEL_base"/>
@@ -1160,7 +1152,7 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="K12 user age equal or above 18"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/metrics/k12_age_classification_metrics_provider.h:K12AgeClassificationSegment,//components/policy/proto/device_management_backend.proto:K12AgeClassificationSegment) -->
+<!-- LINT.ThenChange(//components/policy/proto/device_management_backend.proto:K12AgeClassificationSegment) -->
 
 <enum name="KcerPkcs12ImportEvent">
   <summary>Events related to KcerChapsUtil processing PKCS#12 Import.</summary>
@@ -1782,17 +1774,10 @@ chromeos/ash/components/language/language_packs/language_pack_manager.h -->
   <int value="2" label="Geolocation"/>
 </enum>
 
-<!-- LINT.IfChange(PrivacyHubNavigationOrigin) -->
-
 <enum name="PrivacyHubNavigationOrigin">
   <int value="0" label="System settings"/>
   <int value="1" label="Notification"/>
 </enum>
-
-<!-- LINT.ThenChange(
-  //ash/system/privacy_hub/privacy_hub_metrics.h:PrivacyHubNavigationOrigin,
-  //chrome/browser/resources/ash/settings/os_privacy_page/privacy_hub_subpage.ts:PrivacyHubNavigationOrigin
-) -->
 
 <enum name="RgbKeyboardBacklightChangeType">
   <int value="0" label="StaticBackgroundColorChanged"/>
@@ -1845,8 +1830,6 @@ chromeos/ash/components/language/language_packs/language_pack_manager.h -->
   <int value="8" label="API error: no sync token in Get response."/>
 </enum>
 
-<!-- LINT.IfChange(SamlRedirectEvent) -->
-
 <enum name="SamlRedirectEvent">
   <summary>
     Track the usage of /samlredirect Gaia endpoint: whether it is supplied with
@@ -1858,8 +1841,6 @@ chromeos/ash/components/language/language_packs/language_pack_manager.h -->
   <int value="1" label="Start on default 3P IdP page based on a domain."/>
   <int value="2" label="User switched to the default Google sign-in."/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/resources/chromeos/login/components/online_auth_utils.ts:SamlRedirectEvent, //chrome/browser/ash/login/saml/saml_test_utils.h:SamlRedirectEvent) -->
 
 <enum name="SecagentdAuthFactor">
 <!--

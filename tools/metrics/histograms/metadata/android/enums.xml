@@ -421,8 +421,6 @@ chromium-metrics-reviews@google.com.
   <int value="1" label="Auto dark mode message"/>
 </enum>
 
-<!-- LINT.IfChange(AndroidUidType) -->
-
 <enum name="AndroidUidType">
   <int value="0" label="root"/>
   <int value="1" label="system"/>
@@ -433,8 +431,6 @@ chromium-metrics-reviews@google.com.
   <int value="6" label="shell"/>
   <int value="7" label="Other non-app UID"/>
 </enum>
-
-<!-- LINT.ThenChange(//android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java:UidType)-->
 
 <!-- LINT.IfChange(AndroidVerticalTabsDragDropResult) -->
 
@@ -621,8 +617,6 @@ chromium-metrics-reviews@google.com.
 </enum>
 
 <enum name="AndroidWebViewSafeModeActionName">
-<!-- LINT.IfChange(SafeModeActionIds) -->
-
   <int value="0" label="Delete Variations Seed"/>
   <int value="1" label="Fast Variations Seed"/>
   <int value="2" label="Noop"/>
@@ -634,8 +628,6 @@ chromium-metrics-reviews@google.com.
   <int value="8" label="Disable Supervision Checks"/>
   <int value="9" label="Disable Startup Tasks Logic"/>
   <int value="10" label="Disable Crashy Class"/>
-<!-- LINT.ThenChange(/android_webview/java/src/org/chromium/android_webview/common/SafeModeActionIds.java:SafeModeActionIds) -->
-
 </enum>
 
 <enum name="AndroidWebViewSafeModeResult">
@@ -661,8 +653,6 @@ chromium-metrics-reviews@google.com.
 </enum>
 
 <enum name="AndroidXWebkitApiCall">
-<!-- LINT.IfChange(AndroidXWebkitApiCall) -->
-
   <int value="0" label="WebViewCompat.addWebMessageListener"/>
   <int value="1" label="ProxyController.clearProxyOverride"/>
   <int value="2" label="ProxyController.getInstance"/>
@@ -908,8 +898,6 @@ chromium-metrics-reviews@google.com.
   <int value="205" label="Profile.getCrossOriginIsolatedAllowList"/>
   <int value="206" label="Navigation.getResponseHeaders"/>
   <int value="207" label="WebViewProviderFactory.buildWebContent"/>
-<!-- LINT.ThenChange(/android_webview/support_library/java/src/org/chromium/support_lib_glue/SupportLibWebViewChromiumFactory.java:ApiCall) -->
-
 </enum>
 
 <enum name="AsyncTaskStatus">
@@ -918,8 +906,6 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="FINISHED">AsyncTask is done.</int>
 </enum>
 
-<!-- LINT.IfChange(AwPrefetchApiCallResult) -->
-
 <enum name="AwPrefetchApiCallResult">
   <int value="0" label="UI_THREAD_SUCCESS"/>
   <int value="1" label="UI_THREAD_FAILURE"/>
@@ -927,8 +913,6 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="WORKER_THREAD_PREFETCH_SUCCESS"/>
   <int value="4" label="WORKER_THREAD_PREFETCH_FAILURE"/>
 </enum>
-
-<!-- LINT.ThenChange(/android_webview/java/src/org/chromium/android_webview/AwPrefetchManager.java:ApiCallResult) -->
 
 <enum name="BackgroundTaskId">
   <int value="-1" label="Not found"/>
@@ -1296,8 +1280,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="ERROR_NO_PADDING_WITH_NEW_INSETS"/>
 </enum>
 
-<!-- LINT.IfChange(FixupResult) -->
-
 <enum name="FixupResult">
   <int value="0" label="Both fixups left the input unchanged"/>
   <int value="1" label="Only the bare hostname fixup changed the input"/>
@@ -1311,8 +1293,6 @@ chromium-metrics-reviews@google.com.
       label="WebAddressParser threw an exception, the bare hostname fixup
              changed the input"/>
 </enum>
-
-<!-- LINT.ThenChange(//android_webview/java/src/org/chromium/android_webview/AwCookieManager.java:FixupResult) -->
 
 <enum name="GlicPromoBottomSheetDismissReason">
   <int value="0" label="Accept"/>
@@ -1355,15 +1335,11 @@ chromium-metrics-reviews@google.com.
   <int value="11" label="NeitherNav Regressed"/>
 </enum>
 
-<!-- LINT.IfChange(HttpCacheQuotaChangeHistory) -->
-
 <enum name="HttpCacheQuotaChangeHistory">
   <int value="0" label="FirstTime"/>
   <int value="1" label="RepeatedCallWithoutChange"/>
   <int value="2" label="RepeatedCallWithChange"/>
 </enum>
-
-<!-- LINT.ThenChange(/android_webview/browser/aw_http_cache_manager.cc:HttpCacheQuotaChangeHistory) -->
 
 <!-- LINT.IfChange(HubPaneId) -->
 
@@ -2483,8 +2459,6 @@ chromium-metrics-reviews@google.com.
 </enum>
 
 <enum name="WebViewApiCall">
-<!-- LINT.IfChange(WebViewApiCall) -->
-
   <int value="0" label="WebView.addJavascriptInterface"/>
   <int value="1" label="WebView.autofill"/>
   <int value="2" label="WebView.canGoBack"/>
@@ -2725,13 +2699,9 @@ chromium-metrics-reviews@google.com.
   <int value="235" label="WebViewChromium constructor"/>
   <int value="236" label="WebViewChromium init"/>
   <int value="237" label="WebViewChromium initForReal"/>
-<!-- LINT.ThenChange(/android_webview/glue/java/src/com/android/webview/chromium/ApiCallLogger.java:ApiCall) -->
-
 </enum>
 
 <enum name="WebViewApiCallStatic">
-<!-- LINT.IfChange(WebViewApiCallStatic) -->
-
   <int value="0" label="WebView.findAddress"/>
   <int value="1" label="WebView.getDefaultUserAgent"/>
   <int value="2" label="WebView.setWebContentsDebuggingEnabled"/>
@@ -2750,8 +2720,6 @@ chromium-metrics-reviews@google.com.
       label="(Obsolete) WebViewCompat.setRendererLibraryPrefetchMode"/>
   <int value="15"
       label="(Obsolete) WebViewCompat.getRendererLibraryPrefetchMode"/>
-<!-- LINT.ThenChange(/android_webview/glue/java/src/com/android/webview/chromium/SharedStatics.java:ApiCall) -->
-
 </enum>
 
 <enum name="WebViewApiCallSystem">
@@ -2773,12 +2741,8 @@ chromium-metrics-reviews@google.com.
 </enum>
 
 <enum name="WebViewApiCallTracingController">
-<!-- LINT.IfChange(WebViewApiCallTracingController) -->
-
   <int value="0" label="WebView.TracingStart"/>
   <int value="1" label="WebView.TracingStartWithMemoryDump"/>
-<!-- LINT.ThenChange(/android_webview/browser/tracing/aw_tracing_controller.h:WebViewApiCallTracingController) -->
-
 </enum>
 
 <enum name="WebViewCallbackType">
@@ -2927,25 +2891,17 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Renderer-initiated cross-origin"/>
 </enum>
 
-<!-- LINT.IfChange(WebViewRendererKeepAliveEvent) -->
-
 <enum name="WebViewRendererKeepAliveEvent">
   <int value="0" label="Reused"/>
   <int value="1" label="Timed out"/>
   <int value="2" label="Pending reuse"/>
 </enum>
 
-<!-- LINT.ThenChange(//android_webview/browser/aw_render_process_keep_alive.cc:RendererKeepAliveEvent) -->
-
-<!-- LINT.IfChange(WebViewSendIntentState) -->
-
 <enum name="WebViewSendIntentState">
   <int value="0" label="Did not invoke sendBrowsingIntent"/>
   <int value="1" label="Invoked sendBrowsingIntent"/>
   <int value="2" label="New activity started"/>
 </enum>
-
-<!-- LINT.ThenChange(//android_webview/java/src/org/chromium/android_webview/AwContentsClient.java:SendIntentState) -->
 
 <enum name="WebViewShouldInterceptRequestOverridden">
   <int value="0"
@@ -3109,7 +3065,7 @@ chromium-metrics-reviews@google.com.
   <int value="144" label="profileGetCrossOriginIsolatedAllowList"/>
 </enum>
 
-<!-- LINT.ThenChange(//base/tracing/protos/chrome_track_event.proto:WebViewStartup,//android_webview/java/src/org/chromium/android_webview/StartupCallSite.java:StartupCallSite) -->
+<!-- LINT.ThenChange(//base/tracing/protos/chrome_track_event.proto:WebViewStartup) -->
 
 <enum name="WebViewUrlScheme">
   <int value="0" label="Empty URL"/>

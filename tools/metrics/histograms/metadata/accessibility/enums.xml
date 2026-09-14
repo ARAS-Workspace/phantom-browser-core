@@ -157,7 +157,6 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//chrome/android/java/src/org/chromium/chrome/browser/accessibility/settings/AccessibilitySettingsBridge.java:AccessibilityCaretBrowsingAction) -->
 
-
 <enum name="AccessibilityImageLabelModeAndroid">
   <summary>
     Tracks what mode the user has selected for accessibility image labels on
@@ -170,7 +169,6 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="Just once (Don't ask again)"/>
   <int value="4" label="Cancel"/>
 </enum>
-
 
 <!-- LINT.IfChange(AccessibilityModeBundleEnum)-->
 
@@ -1230,8 +1228,6 @@ Unknown properties are collapsed to zero. -->
   <int value="1" label="Ended"/>
 </enum>
 
-<!-- LINT.IfChange(AutoclickActionType) -->
-
 <enum name="AutoclickActionType">
   <int value="0" label="Left click"/>
   <int value="1" label="Right click"/>
@@ -1240,8 +1236,6 @@ Unknown properties are collapsed to zero. -->
   <int value="4" label="Pause"/>
   <int value="5" label="Scroll"/>
 </enum>
-
-<!-- LINT.ThenChange(//ash/public/cpp/accessibility_controller_enums.h:AutoclickEventType) -->
 
 <!-- LINT.IfChange(AXTreeFixingClientScreenAIRequestType) -->
 
@@ -1286,12 +1280,10 @@ Unknown properties are collapsed to zero. -->
 
 <!-- LINT.ThenChange(//third_party/blink/renderer/core/html/canvas/html_canvas_accessibility_manager.h:CanvasAccessibilityHeuristicResult) -->
 
-
 <enum name="CaptionBubbleErrorType">
   <int value="0" label="Generic"/>
   <int value="1" label="Media foundation renderer unsupported"/>
 </enum>
-
 
 <!-- LINT.IfChange(ChromeVoxCommand) -->
 
@@ -1586,27 +1578,17 @@ Unknown properties are collapsed to zero. -->
   <int value="200" label="2.0"/>
 </enum>
 
-<!-- LINT.IfChange(CrosSelectToSpeakStartSpeechMethod) -->
-
 <enum name="CrosSelectToSpeakStartSpeechMethod">
   <int value="0" label="Hold Search and click or drag"/>
   <int value="1" label="Search + S to read selection"/>
   <int value="2" label="Context menu option to read selection"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/resources/chromeos/accessibility/select_to_speak/metrics_utils.ts:StartSpeechMethod) -->
-
-<!-- LINT.IfChange(CrosSelectToSpeakStateChangeEvent) -->
-
 <enum name="CrosSelectToSpeakStateChangeEvent">
   <int value="0" label="Start selection"/>
   <int value="1" label="Cancel speech"/>
   <int value="2" label="Cancel selection"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/resources/chromeos/accessibility/select_to_speak/metrics_utils.ts:StateChangeEvent) -->
-
-<!-- LINT.IfChange(CrosSelectToSpeakTtsEngineUsed) -->
 
 <enum name="CrosSelectToSpeakTtsEngineUsed">
   <int value="0" label="Unknown"/>
@@ -1615,10 +1597,6 @@ Unknown properties are collapsed to zero. -->
   <int value="3" label="Google local TTS"/>
   <int value="4" label="Google network TTS"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/resources/chromeos/accessibility/select_to_speak/metrics_utils.ts:TtsEngineUsed) -->
-
-<!-- LINT.IfChange(CrosSwitchAccessError) -->
 
 <enum name="CrosSwitchAccessError">
   <int value="0" label="Unknown"/>
@@ -1640,8 +1618,6 @@ Unknown properties are collapsed to zero. -->
   <int value="16" label="Uninitialized"/>
   <int value="17" label="Duplicate initialization"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/resources/chromeos/accessibility/switch_access/switch_access_constants.ts:ErrorType) -->
 
 <!-- LINT.IfChange(DependencyParserModelState) -->
 
@@ -2078,14 +2054,11 @@ Unknown properties are collapsed to zero. -->
   <int value="1" label="Bubble expanded"/>
 </enum>
 
-
 <enum name="LiveCaptionSessionEvent">
   <int value="0" label="Stream started"/>
   <int value="1" label="Stream finished"/>
   <int value="2" label="User closed bubble"/>
 </enum>
-
-
 
 <enum name="LoadSodaResult">
   <int value="0" label="Unknown"/>
@@ -2095,7 +2068,6 @@ Unknown properties are collapsed to zero. -->
       label="Binary successfully loaded but one or more function pointers are
              null."/>
 </enum>
-
 
 <!-- LINT.IfChange(MainNodeAnnotationResult) -->
 
@@ -2155,7 +2127,6 @@ Unknown properties are collapsed to zero. -->
 
 <!-- LINT.ThenChange(//services/screen_ai/screen_ai_service_impl.cc:OCRClientType) -->
 
-
 <enum name="OnDeviceTranslationErrorReason">
   <int value="0" label="CanTranslate: Language not supported"/>
   <int value="1" label="CanTranslate: Service crashed"/>
@@ -2173,7 +2144,6 @@ Unknown properties are collapsed to zero. -->
   <int value="12" label="CreateTranslator: Unknown error"/>
   <int value="13" label="Translate RPC: Execution failed"/>
 </enum>
-
 
 <!-- LINT.IfChange(ReadAnythingColor) -->
 
@@ -2504,7 +2474,6 @@ Unknown properties are collapsed to zero. -->
 
 <!-- LINT.ThenChange(//components/dom_distiller/core/mojom/distilled_page_prefs.mojom:ReaderModePrefsTheme) -->
 
-
 <enum name="SodaLanguageCode">
   <int value="0" label="None"/>
   <int value="1" label="en-US"/>
@@ -2543,7 +2512,6 @@ Unknown properties are collapsed to zero. -->
   <int value="34" label="ru-RU"/>
   <int value="35" label="vi-VN"/>
 </enum>
-
 
 <!-- LINT.IfChange(TextToSpeechEvent) -->
 

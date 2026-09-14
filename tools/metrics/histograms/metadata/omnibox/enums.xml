@@ -76,7 +76,7 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="Implicit"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/fusebox/FuseboxMetrics.java:AiModeActivationSource,//ios/chrome/browser/composebox/shared/metrics/composebox_metrics_recorder.h:AiModeActivationSource) -->
+<!-- LINT.ThenChange(//chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/fusebox/FuseboxMetrics.java:AiModeActivationSource) -->
 
 <!-- LINT.IfChange(AiModePageActionIconSource) -->
 
@@ -103,7 +103,7 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Deep Search"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteRequestType.java,//ios/chrome/browser/composebox/shared/metrics/composebox_metrics_recorder.h:AutocompleteRequestType)-->
+<!-- LINT.ThenChange(//components/omnibox/browser/android/java/src/org/chromium/components/omnibox/AutocompleteRequestType.java)-->
 
 <enum name="BooleanNonNull">
   <int value="0" label="Null"/>
@@ -131,7 +131,7 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Raw File"/>
 </enum>
 
-<!-- LINT.ThenChange(//ios/chrome/browser/composebox/shared/metrics/composebox_metrics_recorder.h:ComposeboxDragAndDropType, //tools/metrics/histograms/metadata/omnibox/histograms.xml:ComposeboxDragAndDropType) -->
+<!-- LINT.ThenChange( //tools/metrics/histograms/metadata/omnibox/histograms.xml:ComposeboxDragAndDropType) -->
 
 <!-- LINT.IfChange(ContextUploadErrorType) -->
 
@@ -236,7 +236,7 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="Navigation, with attachments"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/OmniboxMetrics.java:FocusResultedInNavigationTypes,//ios/chrome/browser/composebox/shared/metrics/composebox_metrics_recorder.h:FocusResultedInNavigationType) -->
+<!-- LINT.ThenChange(//chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/OmniboxMetrics.java:FocusResultedInNavigationTypes) -->
 
 <!-- LINT.IfChange(FuseboxAttachmentButtonType) -->
 
@@ -252,7 +252,7 @@ chromium-metrics-reviews@google.com.
   <int value="8" label="Drive Files"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/fusebox/FuseboxMetrics.java:FuseboxAttachmentButtonType,//ios/chrome/browser/composebox/shared/metrics/composebox_metrics_recorder.h:FuseboxAttachmentButtonType) -->
+<!-- LINT.ThenChange(//chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/fusebox/FuseboxMetrics.java:FuseboxAttachmentButtonType) -->
 
 <!-- LINT.IfChange(FuseboxAttachmentSizeLimitCheck) -->
 

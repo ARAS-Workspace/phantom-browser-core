@@ -33,15 +33,11 @@ chromium-metrics-reviews@google.com.
                record them here."/>
 </variants>
 
-<!-- LINT.IfChange(ContextualPanelItemType) -->
-
 <variants name="ContextualPanelItemType">
   <variant name="PriceInsightsItem" summary="Price insights item"/>
   <variant name="ReaderModeItem" summary="Reader mode item"/>
   <variant name="SamplePanelItem" summary="Sample panel item"/>
 </variants>
-
-<!-- LINT.ThenChange(//ios/chrome/browser/contextual_panel/model/contextual_panel_item_type.h:ContextualPanelItemType) -->
 
 <variants name="IOSSaveToDriveQueryTypeVariant">
   <variant name="CreateFolder"
@@ -103,8 +99,6 @@ chromium-metrics-reviews@google.com.
                final state of the task is 'Not Started'."/>
 </variants>
 
-<!-- LINT.IfChange(IOSTurnOnCredentialProviderExtensionPromptSource) -->
-
 <variants name="IOSTurnOnCredentialProviderExtensionPromptSource">
   <variant name="CredentialImport"
       summary="The prompt was presented after a successful credential import."/>
@@ -114,8 +108,6 @@ chromium-metrics-reviews@google.com.
       summary="The prompt was presented from the Credential Provider
                Extension promo."/>
 </variants>
-
-<!-- LINT.ThenChange(/ios/chrome/browser/shared/coordinator/utils/credential_provider_settings_utils.mm:TurnOnCredentialProviderExtensionPromptSourceToString) -->
 
 <variants name="MXVersion">
   <variant name=""
@@ -153,8 +145,6 @@ chromium-metrics-reviews@google.com.
       summary="Rich sparse DOM extraction including actionable elements"/>
 </variants>
 
-<!-- LINT.IfChange(PageContextStatusVariants) -->
-
 <variants name="PageContextStatusVariants">
   <variant name="Failure"/>
   <variant name="NotExtractable"/>
@@ -163,10 +153,6 @@ chromium-metrics-reviews@google.com.
   <variant name="Success"/>
   <variant name="Timeout"/>
 </variants>
-
-<!-- LINT.ThenChange(/ios/chrome/browser/intelligence/proto_wrappers/page_context_wrapper_metrics.h:PageContextStatusVariants) -->
-
-<!-- LINT.IfChange(PageContextTaskVariants) -->
 
 <variants name="PageContextTaskVariants">
   <variant name="AnnotatedPageContent"
@@ -178,17 +164,9 @@ chromium-metrics-reviews@google.com.
   <variant name="Screenshot"/>
 </variants>
 
-<!-- LINT.ThenChange(/ios/chrome/browser/intelligence/proto_wrappers/page_context_wrapper_metrics.h:PageContextTaskVariants) -->
-
-<!-- LINT.IfChange(PictureInPictureFeature) -->
-
 <variants name="PictureInPictureFeature">
   <variant name="DefaultBrowser" summary="Default Browser Instructions"/>
 </variants>
-
-<!-- LINT.ThenChange(/ios/chrome/browser/picture_in_picture/public/picture_in_picture_constants.h:PictureInPictureFeature) -->
-
-<!-- LINT.IfChange(PromosManagerPromo) -->
 
 <variants name="PromosManagerPromo">
   <variant name="AllTabsDefaultBrowser"
@@ -223,8 +201,6 @@ chromium-metrics-reviews@google.com.
   <variant name="WelcomeBack" summary="Welcome Back promo."/>
   <variant name="WhatsNew" summary="What's New Promo"/>
 </variants>
-
-<!-- LINT.ThenChange(/ios/chrome/browser/promos_manager/model/constants.h:Promo) -->
 
 <histogram name="IOS.AIHub.Action" enum="IOSAIHubAction"
     expires_after="2027-02-07">
@@ -1667,8 +1643,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<!-- LINT.IfChange(CohortNumber) -->
-
 <histogram name="IOS.DefaultStatusAPI.IsDefaultBrowser.Cohort{Number}"
     enum="Boolean" expires_after="2027-02-07">
   <owner>gujen@google.com</owner>
@@ -1696,8 +1670,6 @@ chromium-metrics-reviews@google.com.
     <variant name="4" summary="4 (April, August, December)"/>
   </token>
 </histogram>
-
-<!-- LINT.ThenChange(/ios/chrome/browser/default_browser/default_status/model/default_status_helper_constants.mm:kCohortCount) -->
 
 <!-- TODO(crbug.com/401551080) Mark this "expires-never" after validating it works as intended. -->
 
@@ -6294,8 +6266,6 @@ chromium-metrics-reviews@google.com.
     associated with a user Profile, broken down by the client responsible for
     the notification.
   </summary>
-<!-- LINT.IfChange(ClientId) -->
-
   <token key="ClientId">
     <variant name="CONTENT" summary="Content feature"/>
     <variant name="PRICE_DROP" summary="Commerce feature"/>
@@ -6306,8 +6276,6 @@ chromium-metrics-reviews@google.com.
     <variant name="TIPS" summary="Tips feature"/>
     <variant name="XPLAT_PROMOS" summary="Cross-Platform Promos feature"/>
   </token>
-<!-- LINT.ThenChange(/ios/chrome/browser/push_notification/model/constants.mm:ClientId) -->
-
 </histogram>
 
 <histogram name="IOS.PushNotification.ProminenceAlert.Result"
