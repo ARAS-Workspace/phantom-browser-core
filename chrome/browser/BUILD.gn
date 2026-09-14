@@ -2119,7 +2119,6 @@ source_set("browser") {
     "//components/performance_manager",
     "//components/performance_manager/scenario_api",
     "//components/permissions",
-    "//components/permissions/prediction_service",
     "//components/policy:generated",
     "//components/policy/content/",
     "//components/policy/core/browser",

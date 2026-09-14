@@ -24,7 +24,7 @@
 #include "components/permissions/permission_prompt.h"
 #include "components/permissions/permission_request_enums.h"
 #include "components/permissions/permission_request_manager.h"
-#include "components/permissions/prediction_service/permission_ui_selector.h"
+#include "components/permissions/permission_ui_selector.h"
 #include "components/permissions/resolvers/permission_prompt_options.h"
 #include "components/permissions/test/enums_to_string.h"
 #include "components/permissions/test/mock_permission_request.h"

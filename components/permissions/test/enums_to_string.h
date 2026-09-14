@@ -6,7 +6,7 @@
 #define COMPONENTS_PERMISSIONS_TEST_ENUMS_TO_STRING_H_
 
 #include "components/permissions/permission_request_enums.h"
-#include "components/permissions/prediction_service/permission_ui_selector.h"
+#include "components/permissions/permission_ui_selector.h"
 #include "components/permissions/request_type.h"
 
 // Contains methods that convert permission relevant enums into strings. As

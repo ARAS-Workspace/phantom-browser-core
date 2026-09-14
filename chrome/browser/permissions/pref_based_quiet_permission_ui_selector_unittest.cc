@@ -11,7 +11,7 @@
 #include "base/test/mock_callback.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/permissions/prediction_service/permission_ui_selector.h"
+#include "components/permissions/permission_ui_selector.h"
 #include "components/permissions/request_type.h"
 #include "components/permissions/test/mock_permission_request.h"
 #include "components/prefs/testing_pref_service.h"

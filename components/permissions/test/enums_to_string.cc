@@ -6,7 +6,7 @@
 
 #include "base/containers/fixed_flat_map.h"
 #include "components/permissions/permission_request_enums.h"
-#include "components/permissions/prediction_service/permission_ui_selector.h"
+#include "components/permissions/permission_ui_selector.h"
 #include "components/permissions/request_type.h"
 
 namespace test {
