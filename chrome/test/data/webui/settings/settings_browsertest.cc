@@ -20,7 +20,6 @@
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/browsing_data/core/features.h"
 #include "components/compose/buildflags.h"
-#include "components/compose/core/browser/compose_features.h"
 #include "components/content_settings/core/common/features.h"
 #include "components/history/core/browser/features.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
@@ -39,9 +38,6 @@
 #include "chrome/browser/ui/toasts/toast_features.h"  // nogncheck
 
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/compose/compose_enabling.h"
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
 
 class SettingsBrowserTest : public WebUIMochaBrowserTest {
  protected:
@@ -60,12 +56,6 @@ class SettingsBrowserTest : public WebUIMochaBrowserTest {
 using SettingsTest = SettingsBrowserTest;
 
 // Note: Keep tests below in alphabetical ordering.
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(SettingsTest, A11yPage) {
-  RunTest("settings/a11y_page_test.js", "mocha.run()");
-}
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, AccountPage) {
   RunTest("settings/account_page_test.js", "mocha.run()");
@@ -86,34 +76,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, AppearancePageIndex) {
 IN_PROC_BROWSER_TEST_F(SettingsTest, AppearancePage) {
   RunTest("settings/appearance_page_test.js", "mocha.run()");
 }
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, ContactInfoAddressValidation) {
-  RunTest("settings/contact_info_page_address_validation_test.js",
-          "mocha.run()");
-}
-
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, ContactInfoPage) {
-  RunTest("settings/contact_info_page_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, AutofillAiEntriesList) {
-  RunTest("settings/autofill_ai_entries_list_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, AutofillAiAddOrEditDialog) {
-  RunTest("settings/autofill_ai_add_or_edit_dialog_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, WalletablePassDetectionToggle) {
-  RunTest("settings/walletable_pass_detection_toggle_test.js", "mocha.run()");
-}
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(SettingsTest, AxAnnotationsSection) {
-  RunTest("settings/ax_annotations_section_test.js", "mocha.run()");
-}
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, BatteryPage) {
   RunTest("settings/battery_page_test.js", "mocha.run()");
@@ -165,56 +127,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, DownloadsPage) {
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, DropdownMenu) {
   RunTest("settings/dropdown_menu_test.js", "mocha.run()");
-}
-
-// TODO(crbug.com/448517054): Flaky on Linux debug builds.
-#if (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
-#define MAYBE_AiPageIndex DISABLED_AiPageIndex
-#else
-#define MAYBE_AiPageIndex AiPageIndex
-#endif
-IN_PROC_BROWSER_TEST_F(SettingsTest, MAYBE_AiPageIndex) {
-  RunTest("settings/ai_page_index_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, AiPage) {
-  RunTest("settings/ai_page_test.js", "runMochaSuite('AiPage')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, AiInfoCard) {
-  RunTest("settings/ai_info_card_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, HistorySearchSubpage) {
-  RunTest("settings/ai_history_search_subpage_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, AiModeSearchPage) {
-  RunTest("settings/ai_mode_search_page_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, InlineCueMenuPage) {
-  RunTest("settings/inline_cue_menu_page_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, DictationPage) {
-  RunTest("settings/dictation_page_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, AiSuggestionsPage) {
-  RunTest("settings/ai_suggestions_page_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, LoggingInfoBullet) {
-  RunTest("settings/ai_logging_info_bullet_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, PolicyIndicator) {
-  RunTest("settings/ai_policy_indicator_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, SkillsPage) {
-  RunTest("settings/skills_page_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, ExtensionControlledIndicator) {
@@ -285,54 +197,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, MetricsConsentRestructureDisabled) {
           "runMochaSuite('MetricsConsentRestructureDisabled')");
 }
 #endif
-
-#if BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(SettingsTest, PasskeysSubpage) {
-  RunTest("settings/passkeys_subpage_test.js", "mocha.run()");
-}
-#endif
-
-#if BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(SettingsTest, PasskeyEditDialog) {
-  RunTest("settings/passkey_edit_dialog_test.js", "mocha.run()");
-}
-#endif
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, PaymentsPage) {
-  RunTest("settings/payments_page_test.js", "mocha.run()");
-}
-
-// TODO(crbug.com/448517054): Flaky on Linux debug builds.
-#if (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
-#define MAYBE_PaymentsPageCardDialogs DISABLED_PaymentsPageCardDialogs
-#else
-#define MAYBE_PaymentsPageCardDialogs PaymentsPageCardDialogs
-#endif
-IN_PROC_BROWSER_TEST_F(SettingsTest, MAYBE_PaymentsPageCardDialogs) {
-  RunTest("settings/payments_page_card_dialogs_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, PaymentsPageCardRows) {
-  RunTest("settings/payments_page_card_rows_test.js",
-          "runMochaSuite('PaymentsPageCardRows')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, PaymentsPageEditCreditCardLink) {
-  RunTest("settings/payments_page_card_rows_test.js",
-          "runMochaSuite('PaymentsPageEditCreditCardLink')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, PaymentsPageIban) {
-  RunTest("settings/payments_page_iban_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, PaymentsPagePayOverTime) {
-  RunTest("settings/payments_page_pay_over_time_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, PaymentsPagePaymentsList) {
-  RunTest("settings/payments_page_payments_list_test.js", "mocha.run()");
-}
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, PerformancePageIndex) {
   RunTest("settings/performance_page_index_test.js", "mocha.run()");
@@ -525,26 +389,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, SecureDnsV2) {
           "runMochaSuite('SettingsSecureDnsV2')");
 }
 
-IN_PROC_BROWSER_TEST_F(SettingsTest, SecurityKeysBioEnrollment) {
-  RunTest("settings/security/security_keys_bio_enrollment_test.js",
-          "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, SecurityKeysCredentialManagement) {
-  RunTest("settings/security/security_keys_credential_management_test.js",
-          "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, SecurityKeysResetDialog) {
-  RunTest("settings/security/security_keys_reset_dialog_test.js",
-          "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTest, SecurityKeysSetPinDialog) {
-  RunTest("settings/security/security_keys_set_pin_dialog_test.js",
-          "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(SettingsTest, SettingsCategoryDefaultRadioGroup) {
   RunTest("settings/settings_category_default_radio_group_test.js",
           "mocha.run()");
@@ -652,31 +496,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, ToggleButton) {
   RunTest("settings/settings_toggle_button_test.js", "mocha.run()");
 }
 
-#if BUILDFLAG(ENABLE_COMPOSE)
-class SettingsComposePageTest : public SettingsBrowserTest {
- public:
-  SettingsComposePageTest() {
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{compose::features::kEnableComposeProactiveNudge},
-        /*disabled_features=*/{});
-  }
-
-  void SetUpOnMainThread() override {
-    SettingsBrowserTest::SetUpOnMainThread();
-    scoped_enable_compose_ = ComposeEnabling::ScopedEnableComposeForTesting();
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-  ComposeEnabling::ScopedOverride scoped_enable_compose_;
-};
-
-IN_PROC_BROWSER_TEST_F(SettingsComposePageTest, ComposePage) {
-  RunTest("settings/offer_writing_help_page_test.js",
-          "runMochaSuite('ComposePage')");
-}
-#endif  // BUILDFLAG(ENABLE_COMPOSE)
-
 IN_PROC_BROWSER_TEST_F(SettingsTest, ZoomLevels) {
   RunTest("settings/zoom_levels_test.js", "mocha.run()");
 }
@@ -688,18 +507,6 @@ class SettingsSystemPageTest : public SettingsBrowserTest {
 IN_PROC_BROWSER_TEST_F(SettingsSystemPageTest, SystemPage) {
   RunTest("settings/system_page_test.js", "mocha.run()");
 }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-class SettingsAiPageOfficialTest : public SettingsBrowserTest {
- private:
-  base::test::ScopedFeatureList scoped_feature_list_{
-      features::kShowOnDeviceAiSettings};
-};
-
-IN_PROC_BROWSER_TEST_F(SettingsAiPageOfficialTest, AiPageOfficial) {
-  RunTest("settings/ai_page_official_test.js", "mocha.run()");
-}
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 using SettingsAllSitesTest = SettingsBrowserTest;
 
@@ -713,22 +520,12 @@ IN_PROC_BROWSER_TEST_F(SettingsAllSitesTest, WithoutRelatedWebsiteSetsData) {
           "runMochaSuite('WithoutRelatedWebsiteSetsData')");
 }
 
-IN_PROC_BROWSER_TEST_F(SettingsTest, PrivacyGuidePromoVisibility) {
-  RunTest("settings/privacy_guide_promo_visibility_test.js", "mocha.run()");
-}
-
 using SettingsClearBrowsingDataTest = SettingsBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(SettingsClearBrowsingDataTest,
                        DeleteBrowsingDataAccountIndicator) {
   RunTest("settings/clear_browsing_data_account_indicator_test.js",
           "runMochaSuite('DeleteBrowsingDataAccountIndicator')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsClearBrowsingDataTest,
-                       DeleteBrowsingDataDialog) {
-  RunTest("settings/clear_browsing_data_dialog_test.js",
-          "runMochaSuite('DeleteBrowsingDataDialog')");
 }
 
 IN_PROC_BROWSER_TEST_F(SettingsClearBrowsingDataTest,
@@ -834,88 +631,6 @@ IN_PROC_BROWSER_TEST_F(SettingsPersonalizationOptionsTest, OfficialBuild) {
           "runMochaSuite('OfficialBuild')");
 }
 #endif
-
-// Privacy guide page tests.
-class SettingsPrivacyGuideTest : public SettingsBrowserTest {
- protected:
-  SettingsPrivacyGuideTest() {
-    scoped_feature_list_.InitWithFeatures(
-        {features::kPrivacyGuideForceAvailable}, {});
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, PrivacyGuidePage) {
-  RunTest("settings/privacy_guide_page_test.js",
-          "runMochaSuite('PrivacyGuidePage')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, FlowLength) {
-  RunTest("settings/privacy_guide_page_test.js", "runMochaSuite('FlowLength')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, MsbbCardNavigations) {
-  RunTest("settings/privacy_guide_page_test.js",
-          "runMochaSuite('MsbbCardNavigations')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, HistorySyncCardNavigations) {
-  RunTest("settings/privacy_guide_page_test.js",
-          "runMochaSuite('HistorySyncCardNavigations')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, SafeBrowsingCardNavigations) {
-  RunTest("settings/privacy_guide_page_test.js",
-          "runMochaSuite('SafeBrowsingCardNavigations')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, CookiesCardNavigations) {
-  RunTest("settings/privacy_guide_page_test.js",
-          "runMochaSuite('CookiesCardNavigations')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, PrivacyGuideDialog) {
-  RunTest("settings/privacy_guide_page_test.js",
-          "runMochaSuite('PrivacyGuideDialog')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, Integration) {
-  RunTest("settings/privacy_guide_integration_test.js",
-          "runMochaSuite('PrivacyGuideEligibleReachedMetrics')");
-}
-
-// Privacy guide fragment tests.
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, WelcomeFragment) {
-  RunTest("settings/privacy_guide_welcome_fragment_test.js",
-          "runMochaSuite('WelcomeFragment')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, MsbbFragment) {
-  RunTest("settings/privacy_guide_msbb_fragment_test.js",
-          "runMochaSuite('MsbbFragment')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, HistorySyncFragment) {
-  RunTest("settings/privacy_guide_history_sync_fragment_test.js",
-          "runMochaSuite('HistorySyncFragment')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, SafeBrowsingFragment) {
-  RunTest("settings/privacy_guide_safe_browsing_fragment_test.js",
-          "runMochaSuite('SafeBrowsingFragment')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, CookiesFragment) {
-  RunTest("settings/privacy_guide_cookies_fragment_test.js",
-          "runMochaSuite('CookiesFragment')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsPrivacyGuideTest, CompletionFragment) {
-  RunTest("settings/privacy_guide_completion_fragment_test.js",
-          "runMochaSuite('CompletionFragment')");
-}
 
 class SettingsPrivacyPageTest : public SettingsBrowserTest {
  protected:
@@ -1090,58 +805,8 @@ IN_PROC_BROWSER_TEST_F(SettingsSiteSettingsPageTest, SoundPage) {
   RunTest("settings/sound_page_test.js", "runMochaSuite('SoundPage')");
 }
 
-using SettingsTranslatePageTest = SettingsBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(SettingsTranslatePageTest, TranslateSettings) {
-  RunTest("settings/translate_page_test.js",
-          "runMochaSuite('TranslatePage TranslateSettings')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTranslatePageTest, AlwaysTranslateDialog) {
-  RunTest("settings/translate_page_test.js",
-          "runMochaSuite('TranslatePage AlwaysTranslateDialog')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTranslatePageTest, NeverTranslateDialog) {
-  RunTest("settings/translate_page_test.js",
-          "runMochaSuite('TranslatePage NeverTranslateDialog')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsTranslatePageTest, MetricsBrowser) {
-  RunTest("settings/translate_page_metrics_test_browser.js", "mocha.run()");
-}
-
 using YourSavedInfoTest = SettingsBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, AutofillAccount) {
   RunTest("settings/autofill_account_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, CollapsibleAutofillSettingsCard) {
-  RunTest("settings/collapsible_autofill_settings_card_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, AutofillPage) {
-  RunTest("settings/autofill_page_test.js", "mocha.run()");
-}
-
-#define MAYBE_AutofillPageIndex AutofillPageIndex
-IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, MAYBE_AutofillPageIndex) {
-  RunTest("settings/autofill_page_index_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, IdentityDocsPageTest) {
-  RunTest("settings/identity_docs_page_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, ShoppingPageTest) {
-  RunTest("settings/shopping_page_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, SuggestionsFromGeminiSubpage) {
-  RunTest("settings/suggestions_from_gemini_subpage_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, TravelPageTest) {
-  RunTest("settings/travel_page_test.js", "mocha.run()");
 }
