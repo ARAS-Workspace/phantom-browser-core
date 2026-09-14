@@ -172,8 +172,6 @@
 #include "chrome/browser/permissions/origin_keyed_permission_action_service_factory.h"
 #include "chrome/browser/permissions/permission_actions_history_factory.h"
 #include "chrome/browser/permissions/permission_decision_auto_blocker_factory.h"
-#include "chrome/browser/permissions/prediction_service/prediction_model_handler_provider_factory.h"
-#include "chrome/browser/permissions/prediction_service/prediction_service_factory.h"
 #include "chrome/browser/persisted_state_db/session_proto_db_factory.h"
 #include "chrome/browser/personal_context/first_run/personal_context_first_run_service_factory.h"
 #include "chrome/browser/personal_context/personal_context_eligibility_service_factory.h"
@@ -1142,8 +1140,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   policy::UserPolicyOidcSigninServiceFactory::GetInstance();
 #endif
-  PredictionModelHandlerProviderFactory::GetInstance();
-  PredictionServiceFactory::GetInstance();
   predictors::AutocompleteActionPredictorFactory::GetInstance();
   predictors::LoadingPredictorFactory::GetInstance();
   predictors::PredictorDatabaseFactory::GetInstance();

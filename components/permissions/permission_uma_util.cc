@@ -4,6 +4,7 @@
 
 #include "components/permissions/permission_uma_util.h"
 
+#include <cmath>
 #include <cstdint>
 #include <utility>
 #include <variant>
@@ -35,8 +36,7 @@
 #include "components/permissions/permission_uma_constants.h"
 #include "components/permissions/permission_util.h"
 #include "components/permissions/permissions_client.h"
-#include "components/permissions/prediction_service/prediction_common.h"
-#include "components/permissions/prediction_service/prediction_request_features.h"
+#include "components/permissions/prediction_service/prediction_service_messages.pb.h"
 #include "components/permissions/request_type.h"
 #include "components/permissions/resolvers/permission_prompt_options.h"
 #include "components/prefs/pref_service.h"
@@ -84,6 +84,35 @@ using blink::PermissionType;
 
 namespace {
 
+constexpr float kRoundToMultiplesOf = 0.1f;
+
+constexpr int kCountBuckets[] = {20, 15, 12, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+
+// Returns the ratio rounded to the nearest 10%, between 0 and 1 in steps
+// of 0.1.
+float GetRoundedRatio(int numerator, int denominator) {
+  if (denominator == 0) {
+    return 0;
+  }
+  return roundf(numerator / kRoundToMultiplesOf / denominator) *
+         kRoundToMultiplesOf;
+}
+
+// Normalises GetRoundedRatio() for ukm: 0 to 100 in steps of 10.
+int GetRoundedRatioForUkm(int numerator, int denominator) {
+  return GetRoundedRatio(numerator, denominator) * 100;
+}
+
+// Returns the appropriate bucket for `count`.
+int BucketizeValue(int count) {
+  for (const int bucket : kCountBuckets) {
+    if (count >= bucket) {
+      return bucket;
+    }
+  }
+  return 0;
+}
+
 const int kPriorCountCap = 10;
 
 struct PermissionActionUkmParams {
@@ -104,11 +133,10 @@ struct PermissionActionUkmParams {
   std::optional<PermissionRequestRelevance> permission_request_relevance;
   std::optional<permissions::PermissionAiRelevanceModel>
       permission_ai_relevance_model;
-  PredictionRequestFeatures::ActionCounts
-      loud_ui_actions_counts_for_request_type;
-  PredictionRequestFeatures::ActionCounts loud_ui_actions_counts;
-  PredictionRequestFeatures::ActionCounts actions_counts_for_request_type;
-  PredictionRequestFeatures::ActionCounts actions_counts;
+  PermissionActionCounts loud_ui_actions_counts_for_request_type;
+  PermissionActionCounts loud_ui_actions_counts;
+  PermissionActionCounts actions_counts_for_request_type;
+  PermissionActionCounts actions_counts;
   std::optional<bool> prediction_decision_held_back;
   std::optional<UkmPermissionPromptOptions> prompt_options;
   std::optional<GeolocationAccuracy> initial_geolocation_accuracy_selection;
@@ -1462,11 +1490,10 @@ void PermissionUmaUtil::RecordPermissionAction(
   PermissionActionsHistory* permission_actions_history =
       PermissionsClient::Get()->GetPermissionActionsHistory(browser_context);
 
-  PredictionRequestFeatures::ActionCounts
-      loud_ui_actions_counts_per_request_type;
-  PredictionRequestFeatures::ActionCounts loud_ui_actions_counts;
-  PredictionRequestFeatures::ActionCounts actions_counts_per_request_type;
-  PredictionRequestFeatures::ActionCounts actions_counts;
+  PermissionActionCounts loud_ui_actions_counts_per_request_type;
+  PermissionActionCounts loud_ui_actions_counts;
+  PermissionActionCounts actions_counts_per_request_type;
+  PermissionActionCounts actions_counts;
 
   if (permission_actions_history != nullptr) {
     DCHECK(IsRequestablePermissionType(permission));

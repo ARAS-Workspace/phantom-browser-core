@@ -39,20 +39,6 @@ source_set("permissions") {
     "permission_manager_factory.h",
     "permission_revocation_request.cc",
     "permission_revocation_request.h",
-    "prediction_service/language_detection_observer.cc",
-    "prediction_service/language_detection_observer.h",
-    "prediction_service/passage_embedder_delegate.cc",
-    "prediction_service/passage_embedder_delegate.h",
-    "prediction_service/permissions_ai_ui_selector.cc",
-    "prediction_service/permissions_ai_ui_selector.h",
-    "prediction_service/prediction_model_handler_provider.cc",
-    "prediction_service/prediction_model_handler_provider.h",
-    "prediction_service/prediction_model_handler_provider_factory.cc",
-    "prediction_service/prediction_model_handler_provider_factory.h",
-    "prediction_service/prediction_service_factory.cc",
-    "prediction_service/prediction_service_factory.h",
-    "prediction_service/prediction_service_request.cc",
-    "prediction_service/prediction_service_request.h",
     "pref_based_quiet_permission_ui_selector.cc",
     "pref_based_quiet_permission_ui_selector.h",
     "quiet_notification_permission_ui_config.cc",
@@ -120,7 +106,6 @@ source_set("permissions") {
     "//components/optimization_guide/proto:optimization_guide_proto",
     "//components/passage_embeddings/core",
     "//components/permissions",
-    "//components/permissions/prediction_service",
     "//components/pref_registry",
     "//components/prefs",
     "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
@@ -184,13 +169,6 @@ source_set("permissions") {
       "//third_party/tflite_support",
     ]
   }
-
-  if (safe_browsing_mode != 0) {
-    sources += [
-      "prediction_service/contextual_notification_permission_ui_selector.cc",
-      "prediction_service/contextual_notification_permission_ui_selector.h",
-    ]
-  }
 }
 
 proto_library("permissions_proto") {
@@ -201,10 +179,6 @@ source_set("test_support") {
   testonly = true
 
   sources = [
-    "//chrome/browser/permissions/test/enums_to_string.cc",
-    "//chrome/browser/permissions/test/enums_to_string.h",
-    "//chrome/browser/permissions/test/mock_passage_embedder.cc",
-    "//chrome/browser/permissions/test/mock_passage_embedder.h",
     "crowd_deny_fake_safe_browsing_database_manager.cc",
     "crowd_deny_fake_safe_browsing_database_manager.h",
     "system/mock_platform_handle.cc",
@@ -239,9 +213,6 @@ source_set("unit_tests") {
     "permission_request_manager_unittest.cc",
     "permission_revocation_request_unittest.cc",
     "permission_subscription_unittest.cc",
-    "prediction_service/contextual_notification_permission_ui_selector_unittest.cc",
-    "prediction_service/passage_embedder_delegate_unittest.cc",
-    "prediction_service/permissions_ai_ui_selector_unittest.cc",
     "pref_based_quiet_permission_ui_selector_unittest.cc",
   ]
 
@@ -262,7 +233,6 @@ source_set("unit_tests") {
     "//chrome/test:test_support",
     "//components/optimization_guide/core:test_support",
     "//components/passage_embeddings/core",
-    "//components/permissions/prediction_service",
     "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
     "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
     "//components/site_engagement/content",
@@ -344,7 +314,6 @@ if (!is_android) {
       "//components/contextual_tasks/public",
       "//components/optimization_guide/core:test_support",
       "//components/passage_embeddings/core:test_support",
-      "//components/permissions/prediction_service",
     ]
 
     if (enable_extensions) {

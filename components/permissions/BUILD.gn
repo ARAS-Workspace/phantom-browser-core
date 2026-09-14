@@ -281,12 +281,8 @@ source_set("test_support") {
   sources = [
     "mock_chooser_controller_view.cc",
     "mock_chooser_controller_view.h",
-    "test/aivx_modelhandler_utils.cc",
-    "test/aivx_modelhandler_utils.h",
     "test/enums_to_string.cc",
     "test/enums_to_string.h",
-    "test/fake_permissions_aivx_modelhandlers.cc",
-    "test/fake_permissions_aivx_modelhandlers.h",
     "test/mock_permission_prompt.cc",
     "test/mock_permission_prompt.h",
     "test/mock_permission_prompt_delegate.cc",

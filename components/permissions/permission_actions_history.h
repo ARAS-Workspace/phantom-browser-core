@@ -13,7 +13,6 @@
 #include "components/permissions/permission_request_enums.h"
 #include "components/permissions/permission_uma_constants.h"
 #include "components/permissions/permission_util.h"
-#include "components/permissions/prediction_service/prediction_request_features.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 
 enum class PermissionAction;
@@ -26,6 +25,16 @@ class PrefRegistrySyncable;
 }
 
 namespace permissions {
+
+// Grant/deny/dismiss/ignore tallies for a set of permission actions.
+struct PermissionActionCounts {
+  size_t grants = 0;
+  size_t denies = 0;
+  size_t dismissals = 0;
+  size_t ignores = 0;
+  size_t total() const { return grants + denies + dismissals + ignores; }
+};
+
 // This class records and stores all actions related to permission prompts in a
 // global, browser-wide scope, offering utility functions for history
 // interaction. Additionally, it manages heuristic permission grants,
@@ -85,7 +94,7 @@ class PermissionActionsHistory : public KeyedService {
   PrefService* GetPrefServiceForTesting();
 
   static void FillInActionCounts(
-      PredictionRequestFeatures::ActionCounts* counts,
+      PermissionActionCounts* counts,
       const std::vector<PermissionActionsHistory::Entry>& permission_actions);
 
   // Registers the preferences related to blocklisting in the given PrefService.

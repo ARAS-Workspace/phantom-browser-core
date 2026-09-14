@@ -221,7 +221,7 @@ A quiet UI prompt can be triggered if any of these conditions are met:
     bad reputation.
 
 The
-[ContextualNotificationPermissionUiSelector][ContextualNotificationPermissionUiSelector]
+[PrefBasedQuietPermissionUiSelector][PrefBasedQuietPermissionUiSelector]
 checks if the quiet UI is enabled in settings (among other things) when choosing
 the appropriate UI flavor.
 
@@ -388,7 +388,7 @@ Certain requests bypass the embargo system entirely:
 [DENIED]: https://source.chromium.org/chromium/chromium/src/+/main:components/permissions/permission_util.h?q=DENIED
 [GRANTED]: https://source.chromium.org/chromium/chromium/src/+/main:components/permissions/permission_util.h?q=GRANTED
 [PermissionPrompt]: https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/permission_bubble/permission_prompt.h
-[ContextualNotificationPermissionUiSelector]: https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/permissions/prediction_service/contextual_notification_permission_ui_selector.h
+[PrefBasedQuietPermissionUiSelector]: https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/permissions/pref_based_quiet_permission_ui_selector.h
 [PermissionsSecurityModelInteractiveUITest]: https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/permissions/permissions_security_model_interactive_uitest.cc
 [RenderFrameHost]: https://source.chromium.org/chromium/chromium/src/+/main:content/public/browser/render_frame_host.h
 [add_new_permissionmd]: https://source.chromium.org/chromium/chromium/src/+/main:components/permissions/add_new_permission.md

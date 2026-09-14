@@ -338,7 +338,7 @@ TEST_P(PermissionActionHistoryTest, FillInActionCountsTest) {
   auto all_entries =
       GetHistory(RequestType::kNotifications,
                  PermissionActionsHistory::EntryFilter::WANT_ALL_PROMPTS);
-  PredictionRequestFeatures::ActionCounts actions_counts;
+  PermissionActionCounts actions_counts;
   PermissionActionsHistory::FillInActionCounts(&actions_counts, all_entries);
   EXPECT_EQ(3u, actions_counts.grants);
   EXPECT_EQ(7u, actions_counts.total());
