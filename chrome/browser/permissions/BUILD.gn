@@ -292,7 +292,6 @@ if (!is_android) {
       "permission_request_manager_browsertest.cc",
       "permission_settings_page_browsertest.cc",
       "permission_ukm_browsertest.cc",
-      "prediction_service/prediction_service_browsertest.cc",
     ]
 
     deps = [
