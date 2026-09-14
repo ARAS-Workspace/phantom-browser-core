@@ -52,7 +52,6 @@
 #include "components/autofill/core/common/password_form_fill_data.h"
 #include "components/autofill/core/common/signatures.h"
 #include "components/autofill/core/common/unique_ids.h"
-#include "components/translate/core/browser/translate_driver.h"
 #include "ui/gfx/geometry/rect.h"
 
 namespace autofill {
@@ -77,8 +76,7 @@ class FormInteractionsUkmLogger;
 // - BrowserAutofillManager for Chrome.
 //
 // It is owned by the AutofillDriver.
-class AutofillManager
-    : public translate::TranslateDriver::LanguageDetectionObserver {
+class AutofillManager {
  public:
   class RendererEventPassKey {
    private:
@@ -123,9 +121,6 @@ class AutofillManager
     virtual void OnAutofillManagerStateChanged(AutofillManager& manager,
                                                LifecycleState previous,
                                                LifecycleState new_state) {}
-
-    virtual void OnBeforeLanguageDetermined(AutofillManager& manager) {}
-    virtual void OnAfterLanguageDetermined(AutofillManager& manager) {}
 
     // Unlike other events, OnFormsSeen() determines both heuristic and server
     // types. OnAfterFormsSeen() is fired after the heuristic type detection is
@@ -316,7 +311,7 @@ class AutofillManager
   AutofillManager(const AutofillManager&) = delete;
   AutofillManager& operator=(const AutofillManager&) = delete;
 
-  ~AutofillManager() override;
+  virtual ~AutofillManager();
 
   // Notifies `Observer`s and calls Reset() if applicable.
   void OnAutofillDriverLifecycleStateChanged(
@@ -411,17 +406,6 @@ class AutofillManager
 
   virtual void ReportAutofillWebOTPMetrics(bool used_web_otp) = 0;
 
-  // translate::TranslateDriver::LanguageDetectionObserver:
-  void OnTranslateDriverDestroyed(
-      translate::TranslateDriver* translate_driver) override;
-  // Invoked when the language has been detected by the Translate component.
-  // As this usually happens after Autofill has parsed the forms for the first
-  // time, the heuristics need to be re-run by this function in order to use
-  // language-specific patterns. Since the ML model doesn't depend on the page
-  // language, its predictions are not recomputed.
-  void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override;
-
   FormStructure* FindCachedFormById(const FormGlobalId& form_id,
                                     const FormMutationPassKey& pass_key);
 
@@ -502,9 +486,6 @@ class AutofillManager
   virtual void Reset();
 
   LogManager* log_manager() { return client().GetCurrentLogManager(); }
-
-  // Retrieves the page language from |client_|
-  LanguageCode GetCurrentPageLanguage();
 
   // Return whether the |forms| from OnFormSeen() should be parsed to
   // form_structures.
@@ -685,11 +666,6 @@ class AutofillManager
   // Provides driver-level context to the shared code of the component.
   // `*driver_` owns this object.
   const raw_ref<AutofillDriver> driver_;
-
-  // Observer needed to re-run heuristics when the language has been detected.
-  base::ScopedObservation<translate::TranslateDriver,
-                          translate::TranslateDriver::LanguageDetectionObserver>
-      translate_observation_{this};
 
   // Our copy of the form data.
   std::map<FormGlobalId, std::unique_ptr<FormStructure>> form_structures_;

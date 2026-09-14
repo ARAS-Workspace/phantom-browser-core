@@ -33,7 +33,6 @@
 #include "components/autofill/core/common/signatures.h"
 #include "components/optimization_guide/core/delivery/test_optimization_guide_model_provider.h"
 #include "components/password_manager/core/browser/features/password_features.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -468,38 +467,6 @@ TEST_F(AutofillManagerTest_ObserverCalls, OnFormsSeen) {
                                  AutofillManagerTestApi::pass_key());
   EXPECT_CALL(observer(),
               OnAfterFormsSeen(m, ElementsAre(f, g), ElementsAre(id_to_remove)))
-      .WillOnce(RunClosure(run_loop.QuitClosure()));
-  EXPECT_CALL(observer(),
-              OnFieldTypesDetermined(m, f, heuristics, small_forms_parsing));
-  EXPECT_CALL(observer(),
-              OnFieldTypesDetermined(m, g, heuristics, small_forms_parsing));
-  std::move(run_loop).Run();
-}
-
-// Tests that determining the page language fires OnBeforeLanguageDetermined(),
-// OnAfterLanguageDetermined(), and re-determines field types for known forms.
-TEST_F(AutofillManagerTest_ObserverCalls, OnLanguageDetermined) {
-  std::vector<FormData> forms = CreateTestForms(2);
-  SeeForms(forms);
-
-  auto m = Ref(autofill_manager());
-  auto f = Eq(forms[0].global_id());
-  auto g = Eq(forms[1].global_id());
-  auto heuristics = Eq(FieldTypeSource::kHeuristicsOrAutocomplete);
-  auto small_forms_parsing = Eq(autofill_client().IsTabInActorMode());
-
-  base::RunLoop run_loop;
-  EXPECT_CALL(observer(), OnBeforeLanguageDetermined(m));
-  EXPECT_CALL(observer(),
-              OnBeforeLoadedServerPredictions(m, UnorderedElementsAre(f, g)));
-  EXPECT_CALL(observer(),
-              OnAfterLoadedServerPredictions(m, UnorderedElementsAre(f, g)));
-  autofill_manager().OnLanguageDetermined([] {
-    translate::LanguageDetectionDetails details;
-    details.adopted_language = "en";
-    return details;
-  }());
-  EXPECT_CALL(observer(), OnAfterLanguageDetermined(m))
       .WillOnce(RunClosure(run_loop.QuitClosure()));
   EXPECT_CALL(observer(),
               OnFieldTypesDetermined(m, f, heuristics, small_forms_parsing));

@@ -163,7 +163,6 @@
 #include "components/strings/grit/components_strings.h"
 #include "components/sync/base/features.h"
 #include "components/sync/test/test_sync_service.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/variations/variations_associated_data.h"
 #include "net/base/url_util.h"
 #include "services/metrics/public/cpp/ukm_builders.h"
@@ -837,8 +836,6 @@ class TestBrowserAutofillManager : public autofill::TestBrowserAutofillManager {
   }
 
   using autofill::TestBrowserAutofillManager::TestBrowserAutofillManager;
-
-  using AutofillManager::GetCurrentPageLanguage;
 };
 
 AutofillProfile FillDataToAutofillProfile(const TestAddressFillData& data) {
@@ -5489,68 +5486,6 @@ TEST_F(BrowserAutofillManagerTest, DidShowSuggestions_FormNonSecureContext) {
   EXPECT_EQ(updated_suggestions[0].main_text.value,
             l10n_util::GetStringUTF16(IDS_AUTOFILL_AT_MEMORY_NO_DATA));
 }
-
-TEST_F(BrowserAutofillManagerTest, PageLanguageGetsCorrectlySet) {
-  FormData form = CreateTestAddressFormData();
-
-  autofill_manager().OnFormsSeen({form}, {},
-                                 AutofillManagerTestApi::pass_key());
-  const FormStructure* parsed_form =
-      autofill_manager().FindCachedFormById(form.global_id());
-
-  ASSERT_TRUE(parsed_form);
-  EXPECT_EQ(autofill_manager().GetCurrentPageLanguage(), LanguageCode(""));
-
-  autofill_client().GetLanguageState()->SetCurrentLanguage("zh");
-
-  autofill_manager().OnFormsSeen({form}, {},
-                                 AutofillManagerTestApi::pass_key());
-  parsed_form = autofill_manager().FindCachedFormById(form.global_id());
-
-  EXPECT_EQ(autofill_manager().GetCurrentPageLanguage(), LanguageCode("zh"));
-}
-
-// Test language detection on frames depending on whether the frame is active or
-// not.
-class BrowserAutofillManagerTestPageLanguageDetection
-    : public BrowserAutofillManagerTest,
-      public testing::WithParamInterface<bool> {
- public:
-  BrowserAutofillManagerTestPageLanguageDetection() {
-    scoped_features_.InitWithFeatures(
-        /*enabled_features=*/{features::kAutofillPageLanguageDetection},
-        /*disabled_features=*/{});
-  }
-
-  bool is_active() const { return GetParam(); }
-
- private:
-  base::test::ScopedFeatureList scoped_features_;
-};
-
-TEST_P(BrowserAutofillManagerTestPageLanguageDetection, GetsCorrectlyDetected) {
-  FormData form = CreateTestAddressFormData();
-
-  autofill_manager().OnFormsSeen({form}, {},
-                                 AutofillManagerTestApi::pass_key());
-
-  translate::LanguageDetectionDetails language_detection_details;
-  language_detection_details.adopted_language = "hu";
-  autofill_client().GetLanguageState()->SetCurrentLanguage("hu");
-
-  MockAutofillManagerObserver observer;
-  base::ScopedObservation<AutofillManager, MockAutofillManagerObserver>
-      observation{&observer};
-  observation.Observe(&autofill_manager());
-  EXPECT_CALL(observer, OnBeforeLanguageDetermined).Times(is_active());
-
-  autofill_driver().SetIsActive(is_active());
-  autofill_manager().OnLanguageDetermined(language_detection_details);
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         BrowserAutofillManagerTestPageLanguageDetection,
-                         testing::Bool());
 
 // BrowserAutofillManagerTest with different browser profile types.
 class BrowserAutofillManagerProfileMetricsTest

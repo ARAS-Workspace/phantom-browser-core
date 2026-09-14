@@ -30,7 +30,7 @@ class AutofillDriver;
 //   }
 //
 //   // AutofillManager::Observer:
-//   void OnAfterLanguageDetermined(AutofillManager& manager) {
+//   void OnAfterFormsSeen(AutofillManager& manager) {
 //     // Do something.
 //   }
 //

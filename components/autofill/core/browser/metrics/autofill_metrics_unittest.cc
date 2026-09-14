@@ -83,7 +83,6 @@
 #include "components/autofill/core/common/unique_ids.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync/test/test_sync_service.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/ukm/test_ukm_recorder.h"
 #include "components/webdata/common/web_data_results.h"
 #include "services/metrics/public/cpp/ukm_builders.h"

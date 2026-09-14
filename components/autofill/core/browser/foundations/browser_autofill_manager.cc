@@ -905,7 +905,7 @@ void BrowserAutofillManager::OnFormSubmittedImpl(const FormData& form,
   MaybeAddAddressSuggestionStrikes(client(), *submitted_form);
   client().GetVotesUploader().MaybeStartVoteUploadProcess(
       std::move(submitted_form),
-      /*observed_submission=*/true, GetCurrentPageLanguage(),
+      /*observed_submission=*/true, LanguageCode(),
       metrics_->initial_interaction_timestamp, last_unlocked_credit_card_cvc_,
       driver().GetPageUkmSourceId());
 
@@ -946,7 +946,7 @@ void BrowserAutofillManager::ProcessPendingFormForUpload() {
 
   client().GetVotesUploader().MaybeStartVoteUploadProcess(
       std::move(upload_form),
-      /*observed_submission=*/false, GetCurrentPageLanguage(),
+      /*observed_submission=*/false, LanguageCode(),
       metrics_->initial_interaction_timestamp, last_unlocked_credit_card_cvc_,
       driver().GetPageUkmSourceId());
 }
@@ -2623,7 +2623,7 @@ void BrowserAutofillManager::AddCachedAutofillAiPredictions(
     }
   }
   form.RationalizeAndAssignSections(client().GetVariationConfigCountryCode(),
-                                    GetCurrentPageLanguage(), log_manager());
+                                    LanguageCode(), log_manager());
   LogCurrentFieldTypes(&form);
   NotifyObservers(&Observer::OnFieldTypesDetermined, form.global_id(),
                   Observer::FieldTypeSource::kAutofillAiModel,
