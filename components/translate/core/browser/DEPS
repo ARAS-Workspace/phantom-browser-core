@@ -2,7 +2,6 @@ include_rules = [
   "+components/keyed_service/core",
   "+components/language_detection/core",
   "+components/metrics",
-  "+components/assist_ranker",
   "+components/optimization_guide/core",
   "+components/optimization_guide/proto",
   "+mojo/public/cpp",
@@ -11,9 +10,6 @@ include_rules = [
 ]
 
 specific_include_rules = {
-  "translate_ranker_impl_unittest\\.cc": [
-    "+components/ukm",
-  ],
   "translate_metrics_logger_impl_unittest\\.cc": [
     "+components/ukm",
   ]

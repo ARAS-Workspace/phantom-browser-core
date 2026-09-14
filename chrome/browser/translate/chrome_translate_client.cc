@@ -53,7 +53,6 @@
 #include "components/variations/service/variations_service.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/web_contents.h"
-#include "third_party/metrics_proto/translate_event.pb.h"
 #include "url/gurl.h"
 
 #if BUILDFLAG(IS_ANDROID)

@@ -31,9 +31,6 @@ class MockTranslateMetricsLogger : public TranslateMetricsLogger {
   MOCK_METHOD1(OnForegroundChange, void(bool));
   MOCK_METHOD1(RecordMetrics, void(bool));
   MOCK_METHOD1(SetUkmSourceId, void(ukm::SourceId));
-  MOCK_METHOD2(LogRankerMetrics, void(RankerDecision, uint32_t));
-  MOCK_METHOD0(LogRankerStart, void());
-  MOCK_METHOD0(LogRankerFinish, void());
   MOCK_METHOD1(LogTriggerDecision, void(TriggerDecision));
   MOCK_METHOD0(LogInitialState, void());
   MOCK_METHOD1(LogHTMLContentLanguage, void(std::string_view));

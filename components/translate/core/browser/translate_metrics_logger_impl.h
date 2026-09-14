@@ -6,7 +6,6 @@
 #define COMPONENTS_TRANSLATE_CORE_BROWSER_TRANSLATE_METRICS_LOGGER_IMPL_H_
 
 #include <memory>
-#include <optional>
 #include <string>
 #include <string_view>
 
@@ -46,9 +45,6 @@ extern const char
 extern const char kTranslatePageLoadNumTargetLanguageChanges[];
 extern const char kTranslatePageLoadNumTranslations[];
 extern const char kTranslatePageLoadNumReversions[];
-extern const char kTranslatePageLoadRankerDecision[];
-extern const char kTranslatePageLoadRankerTimerShouldOfferTranslation[];
-extern const char kTranslatePageLoadRankerVersion[];
 extern const char kTranslatePageLoadTriggerDecision[];
 
 // Session frequency UMA histograms.
@@ -67,10 +63,6 @@ class NullTranslateMetricsLogger : public TranslateMetricsLogger {
   void OnForegroundChange(bool is_foreground) override {}
   void RecordMetrics(bool is_final) override {}
   void SetUkmSourceId(ukm::SourceId ukm_source_id) override {}
-  void LogRankerMetrics(RankerDecision ranker_decision,
-                        uint32_t ranker_version) override {}
-  void LogRankerStart() override {}
-  void LogRankerFinish() override {}
   void LogTriggerDecision(TriggerDecision trigger_decision) override {}
   void LogInitialState() override {}
   void LogTranslationStarted(TranslationType translation_type) override {}
@@ -128,10 +120,6 @@ class TranslateMetricsLoggerImpl : public TranslateMetricsLogger {
   void OnForegroundChange(bool is_foreground) override;
   void RecordMetrics(bool is_final) override;
   void SetUkmSourceId(ukm::SourceId ukm_source_id) override;
-  void LogRankerMetrics(RankerDecision ranker_decision,
-                        uint32_t ranker_version) override;
-  void LogRankerStart() override;
-  void LogRankerFinish() override;
   void LogTriggerDecision(TriggerDecision trigger_decision) override;
   void LogInitialState() override;
   void LogTranslationStarted(TranslationType translation_type) override;
@@ -211,12 +199,6 @@ class TranslateMetricsLoggerImpl : public TranslateMetricsLogger {
   // Tracks if the associated page is in the foreground (|true|) or the
   // background (|false|)
   bool is_foreground_ = false;
-
-  // Stores state about TranslateRanker for this page load.
-  RankerDecision ranker_decision_ = RankerDecision::kUninitialized;
-  uint32_t ranker_version_ = 0;
-  base::TimeTicks ranker_start_time_;
-  std::optional<base::TimeDelta> ranker_duration_;
 
   // Stores the reason for the initial state of the page load. In the case there
   // are multiple reasons, only the first reported reason is stored.

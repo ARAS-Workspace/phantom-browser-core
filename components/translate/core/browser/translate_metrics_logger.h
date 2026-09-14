@@ -18,16 +18,6 @@ namespace translate {
 
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
-enum class RankerDecision {
-  kUninitialized = 0,
-  kNotQueried = 1,
-  kShowUI = 2,
-  kDontShowUI = 3,
-  kMaxValue = kDontShowUI,
-};
-
-// These values are persisted to logs. Entries should not be renumbered and
-// numeric values should never be reused.
 enum class TranslateState {
   kUninitialized = 0,
   kNotTranslatedNoUI = 1,
@@ -177,12 +167,6 @@ class TranslateMetricsLogger {
 
   // Sets the UKM source ID for the current page load.
   virtual void SetUkmSourceId(ukm::SourceId ukm_source_id) = 0;
-
-  // Tracks information about the Translate Ranker.
-  virtual void LogRankerMetrics(RankerDecision ranker_decision,
-                                uint32_t ranker_version) = 0;
-  virtual void LogRankerStart() = 0;
-  virtual void LogRankerFinish() = 0;
 
   // Records trigger decision that impacts the initial state of Translate. The
   // highest priority trigger decision will be logged to UMA at the end of the

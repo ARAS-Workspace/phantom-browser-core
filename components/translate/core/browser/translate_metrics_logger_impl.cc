@@ -52,12 +52,6 @@ const char kTranslatePageLoadNumTranslations[] =
     "Translate.PageLoad.NumTranslations";
 const char kTranslatePageLoadNumReversions[] =
     "Translate.PageLoad.NumReversions";
-const char kTranslatePageLoadRankerDecision[] =
-    "Translate.PageLoad.Ranker.Decision";
-const char kTranslatePageLoadRankerTimerShouldOfferTranslation[] =
-    "Translate.PageLoad.Ranker.Timer.ShouldOffereTranslation";
-const char kTranslatePageLoadRankerVersion[] =
-    "Translate.PageLoad.Ranker.Version";
 const char kTranslatePageLoadTriggerDecision[] =
     "Translate.PageLoad.TriggerDecision";
 
@@ -166,8 +160,6 @@ void TranslateMetricsLoggerImpl::RecordMetrics(bool is_final) {
   ukm::builders::TranslatePageLoad(ukm_source_id_)
       .SetSequenceNumber(sequence_no_)
       .SetTriggerDecision(int(trigger_decision_))
-      .SetRankerDecision(int(ranker_decision_))
-      .SetRankerVersion(int(ranker_version_))
       .SetInitialState(int(ConvertToTranslateState(
           this_initial_state_is_translated, initial_state_is_ui_shown_,
           initial_state_is_omnibox_icon_shown_)))
@@ -221,14 +213,6 @@ void TranslateMetricsLoggerImpl::SetUkmSourceId(ukm::SourceId ukm_source_id) {
 void TranslateMetricsLoggerImpl::RecordPageLoadUmaMetrics(
     bool initial_state_is_translated,
     bool current_state_is_translated) {
-  base::UmaHistogramEnumeration(kTranslatePageLoadRankerDecision,
-                                ranker_decision_);
-  base::UmaHistogramSparse(kTranslatePageLoadRankerVersion,
-                           int(ranker_version_));
-  if (ranker_duration_)
-    base::UmaHistogramTimes(kTranslatePageLoadRankerTimerShouldOfferTranslation,
-                            ranker_duration_.value());
-
   base::UmaHistogramEnumeration(kTranslatePageLoadTriggerDecision,
                                 trigger_decision_);
   if (has_href_translate_target_) {
@@ -285,23 +269,6 @@ void TranslateMetricsLoggerImpl::RecordTranslationStatus(
     TranslationStatus translation_status) {
   base::UmaHistogramEnumeration(kTranslateTranslationStatus,
                                 translation_status);
-}
-
-void TranslateMetricsLoggerImpl::LogRankerMetrics(
-    RankerDecision ranker_decision,
-    uint32_t ranker_version) {
-  ranker_decision_ = ranker_decision;
-  ranker_version_ = ranker_version;
-}
-
-void TranslateMetricsLoggerImpl::LogRankerStart() {
-  if (!ranker_duration_)
-    ranker_start_time_ = clock_->NowTicks();
-}
-
-void TranslateMetricsLoggerImpl::LogRankerFinish() {
-  if (!ranker_duration_)
-    ranker_duration_ = clock_->NowTicks() - ranker_start_time_;
 }
 
 void TranslateMetricsLoggerImpl::LogTriggerDecision(

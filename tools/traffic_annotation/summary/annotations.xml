@@ -137,7 +137,6 @@ Refer to README.md for content description and update process.
  <item id="qr_code_save" added_in_milestone="84" content_hash_code="045593bd" os_list="linux,windows,chromeos" file_path="chrome/browser/ui/views/qrcode_generator/qrcode_generator_bubble.cc" />
  <item id="quic_chromium_incoming_session" added_in_milestone="66" content_hash_code="04aeee25" os_list="linux,windows,chromeos,android" file_path="net/quic/quic_chromium_client_session.cc" />
  <item id="quic_chromium_packet_writer" added_in_milestone="66" content_hash_code="01c48aa5" os_list="linux,windows,chromeos,android" file_path="net/quic/quic_chromium_packet_writer.cc" />
- <item id="ranker_url_fetcher" added_in_milestone="62" content_hash_code="02bd45e2" os_list="linux,windows,chromeos,android" file_path="components/assist_ranker/ranker_url_fetcher.cc" />
  <item id="render_view_context_menu" added_in_milestone="62" content_hash_code="04240bc2" os_list="linux,windows,chromeos" file_path="chrome/browser/renderer_context_menu/render_view_context_menu.cc" />
  <item id="renderer_initiated_download" added_in_milestone="62" content_hash_code="02417da4" os_list="linux,windows,chromeos,android" file_path="content/browser/renderer_host/render_frame_host_impl.cc" />
  <item id="reporting" added_in_milestone="62" content_hash_code="077eedd0" os_list="linux,windows,chromeos,android" file_path="net/reporting/reporting_uploader.cc" />

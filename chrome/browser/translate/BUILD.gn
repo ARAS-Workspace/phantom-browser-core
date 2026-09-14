@@ -8,8 +8,6 @@ source_set("translate") {
   public = [
     "chrome_translate_client.h",
     "translate_frame_binder.h",
-    "translate_ranker_factory.h",
-    "translate_ranker_metrics_provider.h",
     "translate_service.h",
   ]
 
@@ -19,7 +17,6 @@ source_set("translate") {
     "//components/language/core/browser",
     "//components/language_detection/content/browser",
     "//components/language_detection/content/common",
-    "//components/metrics",
     "//components/translate/content/browser",
     "//components/translate/content/common",
     "//components/translate/core/browser",
@@ -34,8 +31,6 @@ source_set("impl") {
   sources = [
     "chrome_translate_client.cc",
     "translate_frame_binder.cc",
-    "translate_ranker_factory.cc",
-    "translate_ranker_metrics_provider.cc",
     "translate_service.cc",
   ]
 
@@ -60,8 +55,6 @@ source_set("impl") {
     "//components/translate/core/common",
     "//components/variations/service",
     "//pdf:buildflags",
-    "//services/metrics/public/cpp:ukm_builders",
-    "//third_party/metrics_proto",
     "//ui/base",
     "//url",
   ]

@@ -29,8 +29,6 @@ namespace {
 constexpr const char* kAllUkmMetricNames[] = {
     ukm::builders::TranslatePageLoad::kSequenceNumberName,
     ukm::builders::TranslatePageLoad::kTriggerDecisionName,
-    ukm::builders::TranslatePageLoad::kRankerDecisionName,
-    ukm::builders::TranslatePageLoad::kRankerVersionName,
     ukm::builders::TranslatePageLoad::kInitialStateName,
     ukm::builders::TranslatePageLoad::kFinalStateName,
     ukm::builders::TranslatePageLoad::kNumTranslationsName,
@@ -245,22 +243,6 @@ class TranslateMetricsLoggerImplTest : public ::testing::Test {
               int(expected_trigger_decision));
   }
 
-  void CheckUkmEntryRankerDecision(
-      const ukm::TestUkmRecorder::HumanReadableUkmEntry& ukm_entry,
-      RankerDecision expected_ranker_decision) {
-    EXPECT_EQ(ukm_entry.metrics.at(
-                  ukm::builders::TranslatePageLoad::kRankerDecisionName),
-              int(expected_ranker_decision));
-  }
-
-  void CheckUkmEntryRankerVersion(
-      const ukm::TestUkmRecorder::HumanReadableUkmEntry& ukm_entry,
-      uint32_t expected_ranker_version) {
-    EXPECT_EQ(ukm_entry.metrics.at(
-                  ukm::builders::TranslatePageLoad::kRankerVersionName),
-              int(expected_ranker_version));
-  }
-
   void CheckUkmEntryInitialState(
       const ukm::TestUkmRecorder::HumanReadableUkmEntry& ukm_entry,
       TranslateState expected_initial_state) {
@@ -473,9 +455,6 @@ TEST_F(TranslateMetricsLoggerImplTest, RecordUkmMetrics) {
 
   const ukm::SourceId ukm_source_id = 4321;
 
-  const RankerDecision ranker_decision = RankerDecision::kShowUI;
-  const uint32_t ranker_model_version = 1234;
-
   const TriggerDecision trigger_decision =
       TriggerDecision::kDisabledNeverTranslateSite;
 
@@ -491,13 +470,12 @@ TEST_F(TranslateMetricsLoggerImplTest, RecordUkmMetrics) {
   const std::string model_detected_language = "es";
   const float model_detection_reliability_score = .5;
 
-  // Simulate a page load where the following happens: the Ranker decides to
-  // show the translate UI, the user initiates a manual translation which
-  // finishes without an error, the user reverts the translations, the user
-  // changes the source and target language, the user starts another
-  // translation but this one fails due to a network error, the user tries to
-  // translate again and this time the translation succeeds, and then finally
-  // the user closes the translate UI.
+  // Simulate a page load where the following happens: the user initiates a
+  // manual translation which finishes without an error, the user reverts the
+  // translations, the user changes the source and target language, the user
+  // starts another translation but this one fails due to a network error, the
+  // user tries to translate again and this time the translation succeeds, and
+  // then finally the user closes the translate UI.
   translate_metrics_logger()->SetInternalClockForTesting(&test_clock);
   translate_metrics_logger()->OnPageLoadStart(true);
   translate_metrics_logger()->SetUkmSourceId(ukm_source_id);
@@ -508,8 +486,6 @@ TEST_F(TranslateMetricsLoggerImplTest, RecordUkmMetrics) {
   translate_metrics_logger()->LogTargetLanguage(
       initial_target_language,
       TranslateBrowserMetrics::TargetLanguageOrigin::kLanguageModel);
-  translate_metrics_logger()->LogRankerMetrics(ranker_decision,
-                                               ranker_model_version);
   translate_metrics_logger()->LogTriggerDecision(trigger_decision);
   translate_metrics_logger()->LogUIChange(true);
   translate_metrics_logger()->LogInitialState();
@@ -589,8 +565,6 @@ TEST_F(TranslateMetricsLoggerImplTest, RecordUkmMetrics) {
   // Check each metric in the UKM entry.
   CheckUkmEntrySequenceNumber(ukm_entries[0], 0);
   CheckUkmEntryTriggerDecision(ukm_entries[0], trigger_decision);
-  CheckUkmEntryRankerDecision(ukm_entries[0], ranker_decision);
-  CheckUkmEntryRankerVersion(ukm_entries[0], ranker_model_version);
   CheckUkmEntryInitialState(ukm_entries[0],
                             TranslateState::kNotTranslatedUIShown);
   CheckUkmEntryFinalState(ukm_entries[0], TranslateState::kTranslatedNoUI);
@@ -621,14 +595,9 @@ TEST_F(TranslateMetricsLoggerImplTest, RecordUkmMetrics) {
 
 TEST_F(TranslateMetricsLoggerImplTest, MultipleRecordMetrics) {
   // Set test constants and log them with the test target.
-  RankerDecision ranker_decision = RankerDecision::kShowUI;
-  uint32_t ranker_model_version = 1234;
-
   TriggerDecision trigger_decision =
       TriggerDecision::kDisabledNeverTranslateLanguage;
 
-  translate_metrics_logger()->LogRankerMetrics(ranker_decision,
-                                               ranker_model_version);
   translate_metrics_logger()->LogTriggerDecision(trigger_decision);
   translate_metrics_logger()->LogInitialState();
   translate_metrics_logger()->LogUIChange(true);
@@ -647,39 +616,10 @@ TEST_F(TranslateMetricsLoggerImplTest, MultipleRecordMetrics) {
   // The page-load UMA metrics should only be logged when the first
   // |RecordMetrics| is called. Subsequent calls shouldn't cause UMA metrics to
   // be logged.
-  histogram_tester()->ExpectUniqueSample(kTranslatePageLoadRankerDecision,
-                                         ranker_decision, 1);
-  histogram_tester()->ExpectUniqueSample(kTranslatePageLoadRankerVersion,
-                                         ranker_model_version, 1);
   histogram_tester()->ExpectUniqueSample(kTranslatePageLoadTriggerDecision,
                                          trigger_decision, 1);
   CheckTranslateStateHistograms(TranslateState::kNotTranslatedNoUI,
                                 TranslateState::kNotTranslatedUIShown, 1, 1);
-}
-
-TEST_F(TranslateMetricsLoggerImplTest, LogRankerMetrics) {
-  base::SimpleTestTickClock test_clock;
-  translate_metrics_logger()->SetInternalClockForTesting(&test_clock);
-
-  RankerDecision ranker_decision = RankerDecision::kDontShowUI;
-  uint32_t ranker_model_version = 4321;
-
-  translate_metrics_logger()->LogRankerStart();
-  test_clock.Advance(base::Seconds(10));
-  translate_metrics_logger()->LogRankerFinish();
-
-  translate_metrics_logger()->LogRankerMetrics(ranker_decision,
-                                               ranker_model_version);
-
-  translate_metrics_logger()->RecordMetrics(true);
-
-  histogram_tester()->ExpectUniqueSample(
-      kTranslatePageLoadRankerTimerShouldOfferTranslation,
-      base::Seconds(10).InMilliseconds(), 1);
-  histogram_tester()->ExpectUniqueSample(kTranslatePageLoadRankerDecision,
-                                         ranker_decision, 1);
-  histogram_tester()->ExpectUniqueSample(kTranslatePageLoadRankerVersion,
-                                         ranker_model_version, 1);
 }
 
 TEST_F(TranslateMetricsLoggerImplTest, LogTriggerDecision) {
