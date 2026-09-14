@@ -19,6 +19,7 @@
 #include "base/time/time.h"
 #include "chrome/common/chrome_isolated_world_ids.h"
 #include "chrome/test/base/chrome_render_view_test.h"
+#include "components/language_detection/content/renderer/language_detection_agent.h"
 #include "components/language_detection/core/constants.h"
 #include "components/translate/content/common/translate.mojom.h"
 #include "components/translate/core/common/translate_util.h"
@@ -105,8 +106,12 @@ base::FilePath model_file_path() {
 
 class TestTranslateAgent : public translate::TranslateAgent {
  public:
-  explicit TestTranslateAgent(content::RenderFrame* render_frame)
-      : translate::TranslateAgent(render_frame, ISOLATED_WORLD_ID_TRANSLATE) {}
+  TestTranslateAgent(
+      content::RenderFrame* render_frame,
+      language_detection::LanguageDetectionAgent* language_detection_agent)
+      : translate::TranslateAgent(render_frame,
+                                  ISOLATED_WORLD_ID_TRANSLATE,
+                                  language_detection_agent) {}
 
   TestTranslateAgent(const TestTranslateAgent&) = delete;
   TestTranslateAgent& operator=(const TestTranslateAgent&) = delete;
@@ -191,15 +196,17 @@ class TranslateAgentBrowserTest : public ChromeRenderViewTest {
  protected:
   void SetUp() override {
     ChromeRenderViewTest::SetUp();
-    translate_agent_ =
-        std::make_unique<TestTranslateAgent>(GetMainRenderFrame());
+    language_detection_agent_ =
+        new language_detection::LanguageDetectionAgent(GetMainRenderFrame());
+    translate_agent_ = std::make_unique<TestTranslateAgent>(
+        GetMainRenderFrame(), language_detection_agent_);
 
     GetMainRenderFrame()->GetBrowserInterfaceBroker().SetBinderForTesting(
         translate::mojom::ContentTranslateDriver::Name_,
         base::BindRepeating(&FakeContentTranslateDriver::BindHandle,
                             base::Unretained(&fake_translate_driver_)));
     base::File model_file = LoadModelFile(model_file_path());
-    translate_agent_->SeedLanguageDetectionModelForTesting(
+    language_detection_agent_->SeedLanguageDetectionModelForTesting(
         std::move(model_file));
   }
 
@@ -211,6 +218,8 @@ class TranslateAgentBrowserTest : public ChromeRenderViewTest {
     ChromeRenderViewTest::TearDown();
   }
 
+  // Owned by the render frame.
+  raw_ptr<language_detection::LanguageDetectionAgent> language_detection_agent_;
   std::unique_ptr<TestTranslateAgent> translate_agent_;
   FakeContentTranslateDriver fake_translate_driver_;
 };
@@ -655,8 +664,8 @@ TEST_F(TranslateAgentBrowserTest, AgentDeletedDuringCheckTranslateStatus) {
 #if BUILDFLAG(ENABLE_PDF)
 TEST_F(TranslateAgentBrowserTest, PdfPageCaptured) {
   GURL url("https://example.com");
-  translate_agent_->PdfPageCaptured(u"A random page with random content.", "fr",
-                                    url);
+  language_detection_agent_->PdfPageCaptured(
+      u"A random page with random content.", "fr", url);
   base::RunLoop().RunUntilIdle();
 
   ASSERT_TRUE(fake_translate_driver_.called_new_page_);
@@ -668,7 +677,7 @@ TEST_F(TranslateAgentBrowserTest, PdfPageCaptured) {
 
 TEST_F(TranslateAgentBrowserTest, PdfUnsupportedTranslateSchemes) {
   GURL url("chrome://foo.com");
-  translate_agent_->PdfPageCaptured(u"pdf content", "en", url);
+  language_detection_agent_->PdfPageCaptured(u"pdf content", "en", url);
   base::RunLoop().RunUntilIdle();
 
   ASSERT_FALSE(fake_translate_driver_.called_new_page_);
@@ -691,7 +700,7 @@ TEST_F(TranslateAgentBrowserTest, PageCapturedPdfIgnored) {
   scoped_refptr<const base::RefCountedString16> contents =
       base::MakeRefCounted<const base::RefCountedString16>(
           u"A random page with random content.");
-  translate_agent_->PageCaptured(contents);
+  language_detection_agent_->PageCaptured(contents);
   base::RunLoop().RunUntilIdle();
 
   // PageCaptured should return early and not register page.

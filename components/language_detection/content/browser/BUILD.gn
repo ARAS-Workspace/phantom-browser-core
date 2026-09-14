@@ -18,13 +18,17 @@ static_library("browser") {
 
 static_library("host") {
   sources = [
+    "language_detection_frame_binder.cc",
+    "language_detection_frame_binder.h",
     "language_detection_host.cc",
     "language_detection_host.h",
   ]
 
   public_deps = [
+    "//components/language_detection/content/common",
     "//components/language_detection/core",
     "//content/public/browser",
+    "//mojo/public/cpp/bindings",
   ]
 
   deps = [ "//base" ]

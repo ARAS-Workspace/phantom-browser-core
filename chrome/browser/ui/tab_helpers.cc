@@ -44,6 +44,7 @@
 #include "chrome/browser/history_embeddings/history_embeddings_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_tab_helper.h"
 #include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
+#include "chrome/browser/language/url_language_histogram_recorder.h"
 #include "chrome/browser/login_detection/login_detection_tab_helper.h"
 #include "chrome/browser/lookalikes/safety_tip_web_contents_observer.h"
 #include "chrome/browser/media/media_engagement_service.h"
@@ -391,6 +392,7 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
       web_contents);
 #endif
   ChromeTranslateClient::CreateForWebContents(web_contents);
+  UrlLanguageHistogramRecorder::CreateForWebContents(web_contents);
 #if BUILDFLAG(IS_ANDROID)
   // Register LanguagePersistedTabDataAndroid for non-incognito tabs to
   // persist language details.

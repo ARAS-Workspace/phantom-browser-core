@@ -381,20 +381,8 @@ void ContentTranslateDriver::RegisterPage(
   ReportLanguageDeterminedDuration(finish_navigation_time_,
                                    language_determined_time);
 
-  // If we have a language histogram (i.e. we're not in incognito), update it
-  // with the detected language of every page visited.
-  if (language_histogram_ && details.is_model_reliable) {
-    language_histogram_->OnPageVisited(details.model_detected_language);
-  }
-
   int page_seq_no = UpdatePageSequenceNumber();
   BindTranslateAgent(page_seq_no, std::move(translate_agent), details.url);
-
-  // Intercept if this is the Reading Mode side panel WebContents registering
-  if (details.url.SchemeIs("chrome-untrusted") &&
-      details.url.host() == "read-anything-side-panel.top-chrome") {
-    return;
-  }
 
   translate_manager_->GetLanguageState()->LanguageDetermined(
       details.adopted_language, page_level_translation_criteria_met);
@@ -415,22 +403,6 @@ void ContentTranslateDriver::RegisterPage(
     translate_manager_->InitiateTranslation(details.adopted_language);
 #endif
 
-    // Save the page language on the navigation entry so it can be synced.
-    // TODO(crbug.com/40779913): The mojo IPC coming from the renderer might
-    // race with a navigation, so the page that sent this message might already
-    // be in the pending delete state after being navigated away from.
-    // Rearchitect the renderer-browser Mojo connection to be able to explicitly
-    // determine the document/content::Page with which this language
-    // determination event is associated, thus avoiding the potential for corner
-    // cases where the detected language is attributed to the wrong page.
-    auto* const entry = web_contents()->GetController().GetLastCommittedEntry();
-    SetPageLanguageInNavigation(details.adopted_language, entry);
-  }
-
-  if (content::WebContents* contents = web_contents()) {
-    language_detection::LanguageDetectionHost::CreateForWebContents(contents);
-    language_detection::LanguageDetectionHost::FromWebContents(contents)
-        ->NotifyLanguageDetermined(details);
   }
 
   translate_manager_->GetActiveTranslateMetricsLogger()

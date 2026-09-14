@@ -41,6 +41,7 @@
 #include "components/dom_distiller/content/common/mojom/distillability_service.mojom.h"
 #include "components/dom_distiller/content/common/mojom/distiller_javascript_service.mojom.h"
 #include "components/dom_distiller/core/dom_distiller_service.h"
+#include "components/language_detection/content/browser/language_detection_frame_binder.h"
 #include "components/language_detection/content/common/language_detection.mojom.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_contents.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_processor_impl.h"
@@ -352,6 +353,9 @@ void PopulateChromeFrameBinders(
   if (pm_registry) {
     pm_registry->GetBinders().ExposeInterfacesToRenderFrame(map);
   }
+
+  map->Add<language_detection::mojom::LanguageDetectionHost>(
+      &language_detection::BindLanguageDetectionHost);
 
   map->Add<translate::mojom::ContentTranslateDriver>(
       &translate::BindContentTranslateDriver);

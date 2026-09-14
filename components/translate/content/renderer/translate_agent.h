@@ -17,7 +17,6 @@
 #include "components/language_detection/content/renderer/language_detection_agent.h"
 #include "components/translate/content/common/translate.mojom.h"
 #include "components/translate/core/common/translate_errors.h"
-#include "components/translate/core/language_detection/language_detection_model.h"
 #include "content/public/renderer/render_frame_observer.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
@@ -35,18 +34,15 @@ namespace translate {
 class TranslateAgent : public content::RenderFrameObserver,
                        public mojom::TranslateAgent {
  public:
-  TranslateAgent(content::RenderFrame* render_frame, int world_id);
+  TranslateAgent(
+      content::RenderFrame* render_frame,
+      int world_id,
+      language_detection::LanguageDetectionAgent* language_detection_agent);
 
   TranslateAgent(const TranslateAgent&) = delete;
   TranslateAgent& operator=(const TranslateAgent&) = delete;
 
   ~TranslateAgent() override;
-
-  // Informs us that the page's text has been extracted.
-  void PageCaptured(scoped_refptr<const base::RefCountedString16> contents);
-
-  // Updates page registration in translate driver.
-  void RenewPageRegistration();
 
   // Lets the translation system know that we are preparing to navigate.
   // If there is anything that can or should be done before
@@ -59,14 +55,6 @@ class TranslateAgent : public content::RenderFrameObserver,
                       const std::string& target_lang,
                       TranslateFrameCallback callback) override;
   void RevertTranslation() override;
-#if BUILDFLAG(ENABLE_PDF)
-  void PdfPageCaptured(const std::u16string& contents,
-                       const std::string& pdf_lang,
-                       const GURL& url) override;
-#endif
-
-  // Set the language detection model for used by |this|. For testing only.
-  void SeedLanguageDetectionModelForTesting(base::File model_file);
 
  protected:
   // Returns true if the translate library is available, meaning the JavaScript
@@ -138,9 +126,10 @@ class TranslateAgent : public content::RenderFrameObserver,
 
   const mojo::Remote<mojom::ContentTranslateDriver>& GetTranslateHandler();
 
-  // Helper to send the page registration Mojo call to the browser.
-  void RegisterPageInternal(
-      language_detection::LanguageDetectionDetails details,
+  // Sends the page registration Mojo call to the browser with the result of
+  // the language detection run by |language_detection_agent_|.
+  void OnLanguageDetermined(
+      const language_detection::LanguageDetectionDetails& details,
       bool page_level_translation_criteria_met);
 
   // Cleanups all states and pending callbacks associated with the current
@@ -153,13 +142,6 @@ class TranslateAgent : public content::RenderFrameObserver,
   // Cancels any translation that is currently being performed.  This does not
   // revert existing translations.
   void CancelPendingTranslation();
-
-  // Runs language detection on the provided contents and registers the page.
-  void RunLanguageDetectionAndRegisterPage(const std::u16string& contents,
-                                           const std::string& content_language,
-                                           const std::string& html_lang,
-                                           const GURL& url,
-                                           bool has_notranslate);
 
   // Checks if the current running page translation is finished or errored and
   // notifies the browser accordingly.  If the translation has not terminated,
@@ -186,10 +168,6 @@ class TranslateAgent : public content::RenderFrameObserver,
   // The world ID to use for script execution.
   int world_id_;
 
-  // The page content length at language detection time. Recorded to UMA when a
-  // user translates the page.
-  size_t page_contents_length_ = 0;
-
   // The task runner responsible for the translation task, freezing it
   // when the frame is backgrounded.
   scoped_refptr<base::SingleThreadTaskRunner> translate_task_runner_;
@@ -200,12 +178,10 @@ class TranslateAgent : public content::RenderFrameObserver,
   // Mojo interface).
   mojo::Remote<mojom::ContentTranslateDriver> translate_handler_;
 
-  const raw_ref<translate::LanguageDetectionModel>
-      translate_language_detection_model_;
-
-  // Same lifetime as this.
-  raw_ptr<language_detection::LanguageDetectionAgent> language_detection_agent_;
-  std::optional<language_detection::LanguageDetectionDetails> last_details_;
+  // Owned by the ChromeRenderFrameObserver of the same frame. It outlives
+  // `this`.
+  const raw_ptr<language_detection::LanguageDetectionAgent>
+      language_detection_agent_;
 
   mojo::Receiver<mojom::TranslateAgent> receiver_{this};
 

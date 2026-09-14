@@ -109,12 +109,6 @@ class MockTranslateAgent : public translate::mojom::TranslateAgent {
 
   void RevertTranslation() override {}
 
-#if BUILDFLAG(ENABLE_PDF)
-  void PdfPageCaptured(const std::u16string& contents,
-                       const std::string& pdf_lang,
-                       const GURL& url) override {}
-#endif
-
   bool called_translate_ = false;
   std::optional<std::string> source_lang_;
   std::optional<std::string> target_lang_;

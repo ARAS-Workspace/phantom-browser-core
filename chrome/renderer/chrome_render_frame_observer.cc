@@ -41,6 +41,7 @@
 #include "components/crash/core/common/crash_key.h"
 #include "components/guest_view/buildflags/buildflags.h"
 #include "components/guest_view/renderer/slim_web_view/slim_web_view_bindings.h"
+#include "components/language_detection/content/renderer/language_detection_agent.h"
 #include "components/lens/lens_metadata.mojom.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_helper.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_utils.h"
@@ -207,6 +208,7 @@ ChromeRenderFrameObserver::ChromeRenderFrameObserver(
     content::RenderFrame* render_frame,
     web_cache::WebCacheImpl* web_cache_impl)
     : content::RenderFrameObserver(render_frame),
+      language_detection_agent_(nullptr),
       translate_agent_(nullptr),
       page_text_agent_(new optimization_guide::PageTextAgent(render_frame)),
       actor_journal_(std::make_unique<actor::Journal>()),
@@ -230,8 +232,10 @@ ChromeRenderFrameObserver::ChromeRenderFrameObserver(
                             switches::kTopChromeWebUI);
 
   if (!skip_translate) {
+    language_detection_agent_ =
+        new language_detection::LanguageDetectionAgent(render_frame);
     translate_agent_ = new translate::TranslateAgent(
-        render_frame, ISOLATED_WORLD_ID_TRANSLATE);
+        render_frame, ISOLATED_WORLD_ID_TRANSLATE, language_detection_agent_);
   }
 }
 
@@ -271,12 +275,18 @@ void ChromeRenderFrameObserver::ReadyToCommitNavigation(
   if (!translate_agent_ && render_frame()->IsMainFrame() && document_loader) {
     GURL url = GURL(document_loader->GetUrl());
     if (ShouldForceTranslateAgentCreation(url)) {
+      language_detection_agent_ =
+          new language_detection::LanguageDetectionAgent(render_frame());
       translate_agent_ = new translate::TranslateAgent(
-          render_frame(), ISOLATED_WORLD_ID_TRANSLATE);
+          render_frame(), ISOLATED_WORLD_ID_TRANSLATE,
+          language_detection_agent_);
     }
   }
 
-  // Let translate_agent do any preparatory work before the new document loads.
+  // Let the agents do any preparatory work before the new document loads.
+  if (language_detection_agent_) {
+    language_detection_agent_->PrepareForNewDocument();
+  }
   if (translate_agent_) {
     translate_agent_->PrepareForNewDocument();
   }
@@ -285,8 +295,8 @@ void ChromeRenderFrameObserver::ReadyToCommitNavigation(
 void ChromeRenderFrameObserver::DidSetPageLifecycleState(
     blink::BFCacheStateChange bfcache_change) {
   if (bfcache_change == blink::BFCacheStateChange::kRestoredFromBFCache &&
-      translate_agent_) {
-    translate_agent_->RenewPageRegistration();
+      language_detection_agent_) {
+    language_detection_agent_->RenewPageRegistration();
   }
   if (bfcache_change == blink::BFCacheStateChange::kStoredToBFCache) {
     // Reset actor state if entering the BFCache
@@ -756,8 +766,8 @@ void ChromeRenderFrameObserver::SetClientSidePhishingDetection() {
 void ChromeRenderFrameObserver::PdfPageCaptured(const std::u16string& contents,
                                                 const std::string& pdf_lang,
                                                 const GURL& page_url) {
-  if (translate_agent_) {
-    translate_agent_->PdfPageCaptured(contents, pdf_lang, page_url);
+  if (language_detection_agent_) {
+    language_detection_agent_->PdfPageCaptured(contents, pdf_lang, page_url);
   }
 }
 #endif
@@ -815,7 +825,7 @@ bool ChromeRenderFrameObserver::ShouldCapturePageTextForTranslateOrPhishing(
 
   //////////////////////////////////////////////////////////////////////////////
   // Translate specific checks.
-  bool should_capture_for_translate = !!translate_agent_;
+  bool should_capture_for_translate = !!language_detection_agent_;
 
   //////////////////////////////////////////////////////////////////////////////
   // Phishing specific checks.
@@ -856,9 +866,9 @@ void ChromeRenderFrameObserver::CapturePageText(
 
   // Language detection should run only once. Parsing finishes before the page
   // loads, so attempt detection here first.
-  if (translate_agent_ &&
+  if (language_detection_agent_ &&
       (layout_type == blink::WebMeaningfulLayout::kFinishedParsing)) {
-    translate_agent_->PageCaptured(contents);
+    language_detection_agent_->PageCaptured(contents);
   }
 
   if (text_callback) {

@@ -58,12 +58,6 @@ class FakeTranslateAgent : public translate::mojom::TranslateAgent {
 
   void RevertTranslation() override;
 
-#if BUILDFLAG(ENABLE_PDF)
-  void PdfPageCaptured(const std::u16string& contents,
-                       const std::string& pdf_lang,
-                       const GURL& page_url) override;
-#endif
-
   void PageTranslated(bool cancelled,
                       const std::string& source_lang,
                       const std::string& target_lang,

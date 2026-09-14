@@ -2408,6 +2408,7 @@ if (!is_android) {
       "//components/tab_groups",
       "//components/tracing:background_tracing_utils",
       "//components/translate/content/browser:test_support",
+      "//components/language_detection/content/renderer:agent",
       "//components/translate/content/renderer",
       "//components/translate/core/language_detection",
       "//components/trusted_vault",

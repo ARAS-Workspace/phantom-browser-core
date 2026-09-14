@@ -50,6 +50,10 @@ class ContentPhishingImageEmbedderDelegate;
 
 namespace translate {
 class TranslateAgent;
+}  // namespace translate
+
+namespace language_detection {
+class LanguageDetectionAgent;
 }
 
 namespace web_cache {
@@ -205,6 +209,8 @@ class ChromeRenderFrameObserver : public content::RenderFrameObserver,
   static bool IsAnimatedWebp(const std::vector<uint8_t>& image_data);
 
   // Have the same lifetime as us.
+  // Both are self owned RenderFrameObservers of the same frame.
+  raw_ptr<language_detection::LanguageDetectionAgent> language_detection_agent_;
   raw_ptr<translate::TranslateAgent> translate_agent_;
   raw_ptr<optimization_guide::PageTextAgent> page_text_agent_;
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)

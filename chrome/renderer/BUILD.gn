@@ -190,6 +190,7 @@ static_library("renderer") {
     "//components/supervised_user/core/common:buildflags",
     "//components/surface_embed/common",
     "//components/surface_embed/renderer",
+    "//components/language_detection/content/renderer:agent",
     "//components/translate/content/renderer",
     "//components/translate/core/common",
     "//components/translate/core/language_detection",

@@ -14,6 +14,17 @@ LanguageDetectionHost::LanguageDetectionHost(content::WebContents* web_contents)
 
 LanguageDetectionHost::~LanguageDetectionHost() = default;
 
+void LanguageDetectionHost::AddReceiver(
+    mojo::PendingReceiver<mojom::LanguageDetectionHost> receiver) {
+  receivers_.Add(this, std::move(receiver));
+}
+
+void LanguageDetectionHost::LanguageDetermined(
+    const LanguageDetectionDetails& details) {
+  last_details_ = details;
+  NotifyLanguageDetermined(details);
+}
+
 void LanguageDetectionHost::NotifyLanguageDetermined(
     const LanguageDetectionDetails& details) {
   for (auto& observer : language_detection_observers()) {

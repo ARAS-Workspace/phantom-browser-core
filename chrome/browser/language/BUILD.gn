@@ -7,11 +7,14 @@ source_set("language") {
     "accept_languages_service_factory.h",
     "language_model_manager_factory.h",
     "url_language_histogram_factory.h",
+    "url_language_histogram_recorder.h",
   ]
   public_deps = [
     "//base",
     "//chrome/browser/profiles:profile",
     "//components/keyed_service/core",
+    "//components/language_detection/core",
+    "//content/public/browser",
   ]
 }
 
@@ -20,6 +23,7 @@ source_set("impl") {
     "accept_languages_service_factory.cc",
     "language_model_manager_factory.cc",
     "url_language_histogram_factory.cc",
+    "url_language_histogram_recorder.cc",
   ]
   deps = [
     ":language",
@@ -31,6 +35,8 @@ source_set("impl") {
     "//components/language/core/browser",
     "//components/language/core/common",
     "//components/language/core/language_model",
+    "//components/language_detection/content/browser:host",
+    "//components/language_detection/core",
     "//components/pref_registry",
     "//components/prefs",
     "//components/translate/core/browser",
