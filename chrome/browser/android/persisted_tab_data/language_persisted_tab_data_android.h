@@ -11,7 +11,6 @@
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/android/persisted_tab_data/persisted_tab_data_android.h"
 #include "components/language_detection/core/language_detection_driver.h"
-#include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/web_contents.h"
 
 // Client of PersistedTabDataAndroid class for persisting language details.
@@ -32,8 +31,9 @@ class LanguagePersistedTabDataAndroid
   // which would lead to key collisions for all subclasses.
   static const void* UserDataKey();
 
-  // Subscribes this instance as an observer to the ContentTranslateDriver.
-  void RegisterTranslateDriver(translate::TranslateDriver* driver);
+  // Subscribes this instance as an observer to the LanguageDetectionDriver.
+  void RegisterLanguageDetectionDriver(
+      language_detection::LanguageDetectionDriver* driver);
 
   // language_detection::LanguageDetectionDriver::Observer implementation.
   void OnLanguageDetermined(
@@ -58,8 +58,9 @@ class LanguagePersistedTabDataAndroid
   std::string detected_language_code_;
   float language_confidence_ = 0.0f;
   const raw_ptr<TabAndroid> tab_;
-  // Not owned, Register manually through RegisterTranslateDriver
-  raw_ptr<translate::TranslateDriver> translate_driver_ = nullptr;
+  // Not owned, Register manually through RegisterLanguageDetectionDriver
+  raw_ptr<language_detection::LanguageDetectionDriver>
+      language_detection_driver_ = nullptr;
 
   // Determine if LanguagePersistedTabDataAndroid exists for |tab_android|.
   // true/false result returned in |exists_callback|.

@@ -29,6 +29,7 @@ static_library("browser") {
   deps = [
     "//components/keyed_service/core",
     "//components/language/core/browser",
+    "//components/language_detection/content/browser:host",
     "//components/language_detection/core/browser:language_detection_model_service",
     "//components/optimization_guide/content/browser",
     "//components/optimization_guide/core",
@@ -98,6 +99,7 @@ static_library("test_support") {
   public_deps = [
     ":browser",
     "//base",
+    "//components/language_detection/content/browser:host",
     "//components/translate/core/common",
   ]
 }

@@ -24,8 +24,8 @@ LanguagePersistedTabDataAndroid::LanguagePersistedTabDataAndroid(
       tab_(tab_android) {}
 
 LanguagePersistedTabDataAndroid::~LanguagePersistedTabDataAndroid() {
-  if (translate_driver_) {
-    translate_driver_->RemoveLanguageDetectionObserver(this);
+  if (language_detection_driver_) {
+    language_detection_driver_->RemoveLanguageDetectionObserver(this);
   }
 }
 
@@ -46,20 +46,20 @@ const void* LanguagePersistedTabDataAndroid::UserDataKey() {
   return &LanguagePersistedTabDataAndroid::kUserDataKey;
 }
 
-void LanguagePersistedTabDataAndroid::RegisterTranslateDriver(
-    translate::TranslateDriver* translate_driver) {
-  DCHECK(translate_driver);
-  if (translate_driver_ == translate_driver) {
+void LanguagePersistedTabDataAndroid::RegisterLanguageDetectionDriver(
+    language_detection::LanguageDetectionDriver* driver) {
+  DCHECK(driver);
+  if (language_detection_driver_ == driver) {
     return;
   }
-  if (translate_driver_ != nullptr) {
-    translate_driver_->RemoveLanguageDetectionObserver(this);
+  if (language_detection_driver_ != nullptr) {
+    language_detection_driver_->RemoveLanguageDetectionObserver(this);
   }
 
-  translate_driver_ = translate_driver;
+  language_detection_driver_ = driver;
 
-  if (translate_driver_) {
-    translate_driver_->AddLanguageDetectionObserver(this);
+  if (language_detection_driver_) {
+    language_detection_driver_->AddLanguageDetectionObserver(this);
   }
 }
 
@@ -93,10 +93,10 @@ void LanguagePersistedTabDataAndroid::OnLanguageDetermined(
 
 void LanguagePersistedTabDataAndroid::OnLanguageDetectionDriverDestroyed(
     language_detection::LanguageDetectionDriver* driver) {
-  if (translate_driver_) {
-    translate_driver_->RemoveLanguageDetectionObserver(this);
+  if (language_detection_driver_) {
+    language_detection_driver_->RemoveLanguageDetectionObserver(this);
   }
-  translate_driver_ = nullptr;
+  language_detection_driver_ = nullptr;
 }
 
 std::unique_ptr<const std::vector<uint8_t>>

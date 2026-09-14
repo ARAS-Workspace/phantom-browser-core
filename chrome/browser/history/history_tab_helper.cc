@@ -23,6 +23,7 @@
 #include "components/history/core/browser/history_constants.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_types.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
 #include "components/sessions/content/navigation_task_id.h"
 #include "components/sessions/content/session_tab_helper.h"
@@ -211,9 +212,12 @@ HistoryTabHelper::HistoryTabHelper(WebContents* web_contents)
     : content::WebContentsObserver(web_contents),
       content::WebContentsUserData<HistoryTabHelper>(*web_contents) {
   // A translate client is not always attached to web contents (e.g. tests).
-  if (ChromeTranslateClient* translate_client =
-          ChromeTranslateClient::FromWebContents(web_contents)) {
-    translate_observation_.Observe(translate_client->GetTranslateDriver());
+  if (ChromeTranslateClient::FromWebContents(web_contents)) {
+    language_detection::LanguageDetectionHost::CreateForWebContents(
+        web_contents);
+    translate_observation_.Observe(
+        language_detection::LanguageDetectionHost::FromWebContents(
+            web_contents));
   }
 }
 

@@ -50,6 +50,7 @@ source_set("read_anything") {
     "//chrome/common",
     "//components/dom_distiller/content/browser",
     "//components/language/core/common",
+    "//components/language_detection/content/browser:host",
     "//components/language_detection/core",
     "//components/pdf/common:util",
     "//components/user_education/webui",

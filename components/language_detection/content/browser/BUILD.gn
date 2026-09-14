@@ -15,3 +15,17 @@ static_library("browser") {
     "//mojo/public/cpp/bindings",
   ]
 }
+
+static_library("host") {
+  sources = [
+    "language_detection_host.cc",
+    "language_detection_host.h",
+  ]
+
+  public_deps = [
+    "//components/language_detection/core",
+    "//content/public/browser",
+  ]
+
+  deps = [ "//base" ]
+}

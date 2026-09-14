@@ -5,6 +5,7 @@
 #include "components/translate/content/browser/translate_waiter.h"
 
 #include "base/run_loop.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/language_detection_driver.h"
 
 namespace translate {
@@ -16,7 +17,10 @@ TranslateWaiter::TranslateWaiter(ContentTranslateDriver* translate_driver,
       // fetch events. This is required for macOS.
       run_loop_(base::RunLoop::Type::kNestableTasksAllowed) {
   scoped_translation_observation_.Observe(translate_driver);
-  scoped_language_detection_observation_.Observe(translate_driver);
+  content::WebContents* contents = translate_driver->web_contents();
+  language_detection::LanguageDetectionHost::CreateForWebContents(contents);
+  scoped_language_detection_observation_.Observe(
+      language_detection::LanguageDetectionHost::FromWebContents(contents));
 }
 
 TranslateWaiter::~TranslateWaiter() = default;

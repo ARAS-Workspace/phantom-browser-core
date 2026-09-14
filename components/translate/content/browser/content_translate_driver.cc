@@ -24,6 +24,7 @@
 #include "base/task/single_thread_task_runner.h"
 #include "components/google/core/common/google_util.h"
 #include "components/language/core/browser/url_language_histogram.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/translate/content/browser/content_record_page_language.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_manager.h"
@@ -426,8 +427,10 @@ void ContentTranslateDriver::RegisterPage(
     SetPageLanguageInNavigation(details.adopted_language, entry);
   }
 
-  for (auto& observer : language_detection_observers()) {
-    observer.OnLanguageDetermined(details);
+  if (content::WebContents* contents = web_contents()) {
+    language_detection::LanguageDetectionHost::CreateForWebContents(contents);
+    language_detection::LanguageDetectionHost::FromWebContents(contents)
+        ->NotifyLanguageDetermined(details);
   }
 
   translate_manager_->GetActiveTranslateMetricsLogger()

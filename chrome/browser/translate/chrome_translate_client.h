@@ -12,6 +12,7 @@
 #include "base/gtest_prod_util.h"
 #include "base/i18n/language_tag.h"
 #include "base/memory/weak_ptr.h"
+#include "base/scoped_observation.h"
 #include "build/build_config.h"
 #include "components/language/core/browser/accept_languages_service.h"
 #include "components/language/core/browser/url_language_histogram.h"
@@ -132,6 +133,8 @@ class ChromeTranslateClient
   // language_detection::LanguageDetectionDriver::Observer implementation.
   void OnLanguageDetermined(
       const language_detection::LanguageDetectionDetails& details) override;
+  void OnLanguageDetectionDriverDestroyed(
+      language_detection::LanguageDetectionDriver* driver) override;
 
  private:
   explicit ChromeTranslateClient(content::WebContents* web_contents);
@@ -161,6 +164,10 @@ class ChromeTranslateClient
   std::unique_ptr<language_detection::ContentLanguageDetectionDriver>
       language_detection_driver_;
   std::unique_ptr<translate::TranslateManager> translate_manager_;
+
+  base::ScopedObservation<language_detection::LanguageDetectionDriver,
+                          language_detection::LanguageDetectionDriver::Observer>
+      language_detection_observation_{this};
 
 #if BUILDFLAG(IS_ANDROID)
   // Whether to trigger a manual translation when ready.

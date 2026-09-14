@@ -36,6 +36,7 @@
 #include "components/language/core/browser/language_model_manager.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/language_detection/content/browser/content_language_detection_driver.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/browser/language_detection_model_service.h"
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/language_detection/core/language_detection_driver.h"
@@ -115,12 +116,13 @@ ChromeTranslateClient::ChromeTranslateClient(content::WebContents* web_contents)
           LanguageModelManagerFactory::GetForBrowserContext(
               web_contents->GetBrowserContext())
               ->GetPrimaryModel())) {
-  translate_driver_->AddLanguageDetectionObserver(this);
+  language_detection::LanguageDetectionHost::CreateForWebContents(web_contents);
+  language_detection_observation_.Observe(
+      language_detection::LanguageDetectionHost::FromWebContents(web_contents));
   translate_driver_->set_translate_manager(translate_manager_.get());
 }
 
 ChromeTranslateClient::~ChromeTranslateClient() {
-  translate_driver_->RemoveLanguageDetectionObserver(this);
   translate_driver_->set_translate_manager(nullptr);
 }
 
@@ -349,6 +351,11 @@ void ChromeTranslateClient::OnVisibilityChanged(
 #endif  // IS_ANDROID
 
 // language_detection::LanguageDetectionDriver::Observer implementation.
+void ChromeTranslateClient::OnLanguageDetectionDriverDestroyed(
+    language_detection::LanguageDetectionDriver* driver) {
+  language_detection_observation_.Reset();
+}
+
 void ChromeTranslateClient::OnLanguageDetermined(
     const language_detection::LanguageDetectionDetails& details) {
   if (details.has_run_lang_detection) {

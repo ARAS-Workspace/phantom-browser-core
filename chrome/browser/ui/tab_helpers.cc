@@ -123,6 +123,7 @@
 #include "components/history/core/browser/top_sites.h"
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/javascript_dialogs/tab_modal_dialog_manager.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/metrics/content/metrics_services_web_contents_observer.h"
 #include "components/metrics_services_manager/metrics_services_manager.h"
 #include "components/offline_pages/buildflags/buildflags.h"
@@ -414,8 +415,12 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
                 auto* language_persisted_tab_data_android =
                     static_cast<LanguagePersistedTabDataAndroid*>(
                         persisted_tab_data);
-                language_persisted_tab_data_android->RegisterTranslateDriver(
-                    chrome_translate_client->translate_driver());
+                language_detection::LanguageDetectionHost::CreateForWebContents(
+                    web_contents.get());
+                language_persisted_tab_data_android
+                    ->RegisterLanguageDetectionDriver(
+                        language_detection::LanguageDetectionHost::
+                            FromWebContents(web_contents.get()));
               },
               web_contents->GetWeakPtr()));
     }

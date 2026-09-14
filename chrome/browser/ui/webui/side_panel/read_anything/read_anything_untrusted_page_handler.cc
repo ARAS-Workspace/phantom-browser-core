@@ -48,6 +48,7 @@
 #include "components/language/core/browser/language_model.h"
 #include "components/language/core/browser/language_model_manager.h"
 #include "components/language/core/common/locale_util.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/constants.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/pdf/browser/pdf_frame_util.h"
@@ -1355,7 +1356,9 @@ void ReadAnythingUntrustedPageHandler::OnActiveAXTreeIDChanged() {
   // determined.
   if (ChromeTranslateClient* translate_client =
           ChromeTranslateClient::FromWebContents(contents)) {
-    translate::TranslateDriver* driver = translate_client->GetTranslateDriver();
+    language_detection::LanguageDetectionHost::CreateForWebContents(contents);
+    language_detection::LanguageDetectionDriver* driver =
+        language_detection::LanguageDetectionHost::FromWebContents(contents);
     const std::string& source_language =
         translate_client->GetLanguageState().source_language();
     // If we're not already observing these web contents, then observe them so

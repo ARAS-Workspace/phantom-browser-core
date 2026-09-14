@@ -10,6 +10,7 @@
 #include "chrome/browser/sync/sessions/sync_sessions_web_contents_router.h"
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/language/core/common/language_experiments.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "components/sync/base/features.h"
 #include "components/sync_sessions/synced_tab_delegate.h"
@@ -32,8 +33,11 @@ SyncSessionsRouterTabHelper::SyncSessionsRouterTabHelper(
       favicon_driver_(favicon_driver) {
   // A translate client is not always attached to web contents (e.g. tests).
   if (chrome_translate_client_) {
-    chrome_translate_client_->GetTranslateDriver()
-        ->AddLanguageDetectionObserver(this);
+    language_detection::LanguageDetectionHost::CreateForWebContents(
+        web_contents);
+    language_detection_observation_.Observe(
+        language_detection::LanguageDetectionHost::FromWebContents(
+            web_contents));
   }
 
   if (favicon_driver_) {
@@ -53,10 +57,6 @@ SyncSessionsRouterTabHelper::~SyncSessionsRouterTabHelper() {
     router_->NotifyTabClosed();
   }
 #endif
-  if (chrome_translate_client_) {
-    chrome_translate_client_->GetTranslateDriver()
-        ->RemoveLanguageDetectionObserver(this);
-  }
   if (favicon_driver_) {
     favicon_driver_->RemoveObserver(this);
   }
@@ -103,6 +103,11 @@ void SyncSessionsRouterTabHelper::OnVisibilityChanged(
   if (visibility == content::Visibility::VISIBLE) {
     NotifyRouter();
   }
+}
+
+void SyncSessionsRouterTabHelper::OnLanguageDetectionDriverDestroyed(
+    language_detection::LanguageDetectionDriver* driver) {
+  language_detection_observation_.Reset();
 }
 
 void SyncSessionsRouterTabHelper::OnLanguageDetermined(

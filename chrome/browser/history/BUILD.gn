@@ -22,6 +22,7 @@ source_set("history") {
     "//components/bookmarks/browser",
     "//components/history/core/browser",
     "//components/keyed_service/core",
+    "//components/language_detection/content/browser:host",
     "//components/sessions",
     "//components/translate/core/browser",
     "//content/public/browser",

@@ -49,6 +49,7 @@ source_set("impl") {
     "//components/infobars/content",
     "//components/keyed_service/core",
     "//components/language/core/browser",
+    "//components/language_detection/content/browser:host",
     "//components/language_detection/core/browser:language_detection_model_service",
     "//components/prefs",
     "//components/translate/core/browser",

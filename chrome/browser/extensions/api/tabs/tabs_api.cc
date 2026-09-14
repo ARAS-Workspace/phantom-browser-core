@@ -43,6 +43,7 @@
 #include "chrome/browser/web_applications/web_app_helpers.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/pref_registry/pref_registry_syncable.h"
@@ -3467,8 +3468,9 @@ TabsDetectLanguageFunction::StartLanguageDetection(
   // Observe the WebContents' lifetime and navigations.
   Observe(contents);
   // Wait until the language is determined.
-  chrome_translate_client->GetTranslateDriver()->AddLanguageDetectionObserver(
-      this);
+  language_detection::LanguageDetectionHost::CreateForWebContents(contents);
+  language_detection::LanguageDetectionHost::FromWebContents(contents)
+      ->AddLanguageDetectionObserver(this);
   is_observing_ = true;
   return RespondLater();
 }
@@ -3503,8 +3505,7 @@ void TabsDetectLanguageFunction::RespondWithLanguage(
     const std::string& language) {
   // Stop observing.
   if (is_observing_) {
-    ChromeTranslateClient::FromWebContents(web_contents())
-        ->GetTranslateDriver()
+    language_detection::LanguageDetectionHost::FromWebContents(web_contents())
         ->RemoveLanguageDetectionObserver(this);
     Observe(nullptr);
     is_observing_ = false;

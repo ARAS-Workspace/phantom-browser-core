@@ -13,6 +13,7 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/language/core/common/language_experiments.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/sync_sessions/synced_tab_delegate.h"
 #include "components/translate/core/browser/translate_driver.h"
@@ -105,8 +106,10 @@ class SyncSessionsRouterTabHelperBrowserTest : public InProcessBrowserTest {
     if (!chrome_translate_client) {
       return;
     }
-    chrome_translate_client->GetTranslateDriver()->AddLanguageDetectionObserver(
-        &observer_);
+    language_detection::LanguageDetectionHost::CreateForWebContents(
+        web_contents());
+    language_detection::LanguageDetectionHost::FromWebContents(web_contents())
+        ->AddLanguageDetectionObserver(&observer_);
   }
 
   void RemoveLanguageDetectionObserver() {
@@ -116,7 +119,7 @@ class SyncSessionsRouterTabHelperBrowserTest : public InProcessBrowserTest {
     if (!chrome_translate_client) {
       return;
     }
-    chrome_translate_client->GetTranslateDriver()
+    language_detection::LanguageDetectionHost::FromWebContents(web_contents())
         ->RemoveLanguageDetectionObserver(&observer_);
   }
 

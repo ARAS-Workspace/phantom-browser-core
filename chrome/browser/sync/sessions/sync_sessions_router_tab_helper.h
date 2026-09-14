@@ -6,6 +6,7 @@
 #define CHROME_BROWSER_SYNC_SESSIONS_SYNC_SESSIONS_ROUTER_TAB_HELPER_H_
 
 #include "base/memory/raw_ptr.h"
+#include "base/scoped_observation.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
 #include "components/favicon/core/favicon_driver_observer.h"
 #include "components/language_detection/core/language_detection_driver.h"
@@ -65,6 +66,8 @@ class SyncSessionsRouterTabHelper
   // language_detection::LanguageDetectionDriver::Observer implementation.
   void OnLanguageDetermined(
       const language_detection::LanguageDetectionDetails& details) override;
+  void OnLanguageDetectionDriverDestroyed(
+      language_detection::LanguageDetectionDriver* driver) override;
 
   // favicon::FaviconDriverObserver implementation.
   void OnFaviconUpdated(
@@ -84,6 +87,10 @@ class SyncSessionsRouterTabHelper
   const raw_ptr<ChromeTranslateClient> chrome_translate_client_;
 
   const raw_ptr<favicon::FaviconDriver> favicon_driver_;
+
+  base::ScopedObservation<language_detection::LanguageDetectionDriver,
+                          language_detection::LanguageDetectionDriver::Observer>
+      language_detection_observation_{this};
 };
 
 }  // namespace sync_sessions

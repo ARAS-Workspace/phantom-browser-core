@@ -41,6 +41,7 @@
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/constants.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/prefs/pref_value_map.h"
@@ -1134,7 +1135,8 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_CALL(page_, SetLanguageCode(kLang1)).Times(1);
 
   OnLanguageDetectionDriverDestroyed(
-      GetChromeTranslateClient()->GetTranslateDriver());
+      language_detection::LanguageDetectionHost::FromWebContents(
+          web_contents()));
   SetTranslateSourceLanguage(kLang2);
   OnActiveAXTreeIDChanged();
 
