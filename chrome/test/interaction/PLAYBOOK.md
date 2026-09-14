@@ -391,7 +391,7 @@ Finally, if you can observe the state directly, you can create a **StateObserver
 ```cpp
 class DetectedLanguageObserver
     : public StateObserver<std::string>,
-      public TranslateDriver::LanguageDetectionObserver {
+      public LanguageDetectionDriver::Observer {
   // Read initial state from `client`, but observe the TranslateDriver.
   explicit DetectedLanguageObserver(ChromeTranslateClient* client);
   ~DetectedLanguageObserver() override;
@@ -418,7 +418,7 @@ IN_PROC_BROWSER_TEST_F(TranslateBubbleViewUiTest, SomeTest) {
 }
 ```
 
-As you can see, this is *much* more concise, but you will need to implement a **StateObserver** to connect the system events with your test. Note that you cannot use an **ObservationStateObserver** because **TranslateDriver** and **TranslateDriver::LanguageDetectionObserver** do not follow the normal observer naming conventions\! (In most cases, they will, and that will save you at least some boilerplate.)
+As you can see, this is *much* more concise, but you will need to implement a **StateObserver** to connect the system events with your test. Note that you cannot use an **ObservationStateObserver** because **TranslateDriver** and **LanguageDetectionDriver::Observer** do not follow the normal observer naming conventions\! (In most cases, they will, and that will save you at least some boilerplate.)
 
 Finally, you can use **PollState** for an even more concise test; this is especially useful if there’s no easy way to observe the value changing:
 

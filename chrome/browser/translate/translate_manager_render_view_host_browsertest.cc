@@ -31,6 +31,7 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/language/core/browser/accept_languages_service.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/translate/content/browser/content_translate_driver.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_language_list.h"
@@ -38,7 +39,6 @@
 #include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "components/translate/core/browser/translate_ui_delegate.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/translate/core/common/translate_switches.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
@@ -201,7 +201,7 @@ class TranslateManagerRenderViewHostTest : public InProcessBrowserTest {
 
   void SimulateOnTranslateLanguageDetermined(const std::string& lang,
                                              bool page_translatable) {
-    translate::LanguageDetectionDetails details;
+    language_detection::LanguageDetectionDetails details;
     details.adopted_language = lang;
     details.model_detected_language = lang;
     details.is_model_reliable = true;

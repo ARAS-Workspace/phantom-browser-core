@@ -23,7 +23,7 @@ mojom("common") {
       types = [
         {
           mojom = "translate.mojom.LanguageDetectionDetails"
-          cpp = "::translate::LanguageDetectionDetails"
+          cpp = "::language_detection::LanguageDetectionDetails"
         },
         {
           mojom = "translate.mojom.TranslateError"
@@ -32,6 +32,7 @@ mojom("common") {
       ]
       traits_headers = [ "translate_mojom_traits.h" ]
       traits_sources = [ "translate_mojom_traits.cc" ]
+      traits_public_deps = [ "//components/language_detection/core" ]
     },
   ]
 }

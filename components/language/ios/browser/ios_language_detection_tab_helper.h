@@ -18,8 +18,11 @@ namespace net {
 class HttpResponseHeaders;
 }
 
-namespace translate {
+namespace language_detection {
 struct LanguageDetectionDetails;
+}  // namespace language_detection
+
+namespace translate {
 class LanguageDetectionModel;
 }  // namespace translate
 
@@ -41,7 +44,7 @@ class IOSLanguageDetectionTabHelper
    public:
     // Called when language detection details become available.
     virtual void OnLanguageDetermined(
-        const translate::LanguageDetectionDetails& details) = 0;
+        const language_detection::LanguageDetectionDetails& details) = 0;
     // Called when the observed instance is being destroyed so that observers
     // can call RemoveObserver on the instance.
     virtual void IOSLanguageDetectionTabHelperWasDestroyed(
@@ -99,7 +102,8 @@ class IOSLanguageDetectionTabHelper
   void WebStateDestroyed(web::WebState* web_state) override;
 
   // Called on page language detection.
-  void OnLanguageDetermined(const translate::LanguageDetectionDetails& details);
+  void OnLanguageDetermined(
+      const language_detection::LanguageDetectionDetails& details);
 
   // Extracts "content-language" header into content_language_header_ variable.
   void ExtractContentLanguageHeader(net::HttpResponseHeaders* headers);

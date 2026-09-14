@@ -173,7 +173,7 @@ void TranslateAgent::PageCaptured(
   // ok as the translate service will make the final call and only results in a
   // slight overhead in running the model when unnecessary.
   if (ShouldSkipLanguageDetection(url)) {
-    LanguageDetectionDetails details;
+    language_detection::LanguageDetectionDetails details;
     details.time = base::Time::Now();
     details.url = url;
     details.has_run_lang_detection = false;
@@ -233,7 +233,7 @@ void TranslateAgent::RunLanguageDetectionAndRegisterPage(
 
   if (ShouldOverrideLanguageDetectionForTesting()) {
     std::string language = "fr";
-    LanguageDetectionDetails details;
+    language_detection::LanguageDetectionDetails details;
     details.adopted_language = language;
     details.contents = contents;
     details.has_run_lang_detection = true;
@@ -249,7 +249,7 @@ void TranslateAgent::RunLanguageDetectionAndRegisterPage(
   std::string detection_model_version;
   float model_reliability_score = 0.0;
 
-  LanguageDetectionDetails details;
+  language_detection::LanguageDetectionDetails details;
   std::string language;
   if (page_contents_length_ == 0) {
     // If captured content is empty do not run language detection and
@@ -310,7 +310,7 @@ void TranslateAgent::RunLanguageDetectionAndRegisterPage(
 }
 
 void TranslateAgent::RegisterPageInternal(
-    LanguageDetectionDetails details,
+    language_detection::LanguageDetectionDetails details,
     bool page_level_translation_criteria_met) {
   WebLocalFrame* main_frame = render_frame()->GetWebFrame();
   if (!main_frame) {
@@ -333,7 +333,8 @@ void TranslateAgent::RenewPageRegistration() {
     return;
   }
 
-  LanguageDetectionDetails details = std::move(*last_details_);
+  language_detection::LanguageDetectionDetails details =
+      std::move(*last_details_);
   bool criteria = !details.has_notranslate && !details.adopted_language.empty();
   RegisterPageInternal(std::move(details), criteria);
 }

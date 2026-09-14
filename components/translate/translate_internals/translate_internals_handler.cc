@@ -14,6 +14,7 @@
 #include "base/functional/callback_helpers.h"
 #include "base/values.h"
 #include "components/language/core/browser/pref_names.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/prefs/pref_service.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_error_details.h"
@@ -21,7 +22,6 @@
 #include "components/translate/core/browser/translate_init_details.h"
 #include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/variations/service/variations_service.h"
 #include "ui/base/l10n/l10n_util.h"
 
@@ -88,7 +88,7 @@ void TranslateInternalsHandler::RegisterMessageCallbacks() {
 }
 
 void TranslateInternalsHandler::AddLanguageDetectionDetails(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   base::DictValue dict;
   dict.Set("has_run_lang_detection", details.has_run_lang_detection);
   dict.Set("time", details.time.InMillisecondsFSinceUnixEpoch());

@@ -11,10 +11,10 @@
 #include "base/strings/utf_string_conversions.h"
 #import "base/test/task_environment.h"
 #import "components/language/ios/browser/language_detection_java_script_feature.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/translate/core/browser/translate_pref_names.h"
-#include "components/translate/core/common/language_detection_details.h"
 #import "ios/web/public/test/fakes/fake_web_frames_manager.h"
 #import "ios/web/public/test/fakes/fake_web_state.h"
 #include "testing/gtest_mac.h"
@@ -27,7 +27,7 @@
     BOOL didDetermineLanguageCalled;
 
 @property(nonatomic)
-    translate::LanguageDetectionDetails languageDetectionDetails;
+    language_detection::LanguageDetectionDetails languageDetectionDetails;
 
 @end
 
@@ -38,7 +38,8 @@
 - (void)iOSLanguageDetectionTabHelper:
             (language::IOSLanguageDetectionTabHelper*)tabHelper
                  didDetermineLanguage:
-                     (const translate::LanguageDetectionDetails&)details {
+                     (const language_detection::LanguageDetectionDetails&)
+                         details {
   self.didDetermineLanguageCalled = YES;
   self.languageDetectionDetails = details;
 }
@@ -94,7 +95,7 @@ TEST_F(IOSLanguageDetectionTabHelperObserverBridgeTest, OnLanguageDetermined) {
                                 kRootLanguage, GURL(), &contents);
 
   EXPECT_TRUE(observer().isDidDetermineLanguageCalled);
-  const translate::LanguageDetectionDetails& forwarded_details =
+  const language_detection::LanguageDetectionDetails& forwarded_details =
       observer().languageDetectionDetails;
   EXPECT_EQ(kContentLanguage, forwarded_details.content_language);
   EXPECT_EQ(kUndefined, forwarded_details.model_detected_language);

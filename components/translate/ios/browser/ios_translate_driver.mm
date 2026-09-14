@@ -12,10 +12,10 @@
 #include "base/time/time.h"
 #include "components/language_detection/core/browser/language_detection_model_service.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/language_detection/ios/browser/language_detection_model_loader_service_ios.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_manager.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/translate/core/common/translate_metrics.h"
 #include "components/translate/core/common/translate_util.h"
 #include "components/translate/core/language_detection/language_detection_model.h"
@@ -86,7 +86,7 @@ IOSTranslateDriver::~IOSTranslateDriver() {
 }
 
 void IOSTranslateDriver::OnLanguageDetermined(
-    const LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   if (!translate_manager_)
     return;
   translate_manager_->GetLanguageState()->LanguageDetermined(

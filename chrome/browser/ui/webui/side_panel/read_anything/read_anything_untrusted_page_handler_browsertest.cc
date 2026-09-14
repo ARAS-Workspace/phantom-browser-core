@@ -42,6 +42,7 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/prefs/pref_value_map.h"
 #include "components/tabs/public/tab_interface.h"
 #include "components/translate/core/browser/translate_manager.h"
@@ -399,7 +400,7 @@ class ReadAnythingUntrustedPageHandlerTest : public InProcessBrowserTest {
   }
 
   void OnLanguageDetermined(const std::string& code) {
-    translate::LanguageDetectionDetails details;
+    language_detection::LanguageDetectionDetails details;
     details.adopted_language = code;
     handler_->OnLanguageDetermined(details);
   }
@@ -422,8 +423,9 @@ class ReadAnythingUntrustedPageHandlerTest : public InProcessBrowserTest {
 
   void OnActiveAXTreeIDChanged() { handler_->OnActiveAXTreeIDChanged(); }
 
-  void OnTranslateDriverDestroyed(translate::TranslateDriver* driver) {
-    handler_->OnTranslateDriverDestroyed(driver);
+  void OnLanguageDetectionDriverDestroyed(
+      language_detection::LanguageDetectionDriver* driver) {
+    handler_->OnLanguageDetectionDriverDestroyed(driver);
   }
 
  protected:
@@ -1131,7 +1133,8 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_CALL(page_, SetLanguageCode).Times(1);
   EXPECT_CALL(page_, SetLanguageCode(kLang1)).Times(1);
 
-  OnTranslateDriverDestroyed(GetChromeTranslateClient()->GetTranslateDriver());
+  OnLanguageDetectionDriverDestroyed(
+      GetChromeTranslateClient()->GetTranslateDriver());
   SetTranslateSourceLanguage(kLang2);
   OnActiveAXTreeIDChanged();
 

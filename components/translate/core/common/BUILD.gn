@@ -10,8 +10,6 @@ if (is_android) {
 
 static_library("common") {
   sources = [
-    "language_detection_details.cc",
-    "language_detection_details.h",
     "translate_constants.cc",
     "translate_constants.h",
     "translate_errors.h",

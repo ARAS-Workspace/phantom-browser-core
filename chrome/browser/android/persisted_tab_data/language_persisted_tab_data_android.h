@@ -10,13 +10,14 @@
 
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/android/persisted_tab_data/persisted_tab_data_android.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/web_contents.h"
 
 // Client of PersistedTabDataAndroid class for persisting language details.
 class LanguagePersistedTabDataAndroid
     : public PersistedTabDataAndroid,
-      public translate::TranslateDriver::LanguageDetectionObserver {
+      public language_detection::LanguageDetectionDriver::Observer {
  public:
   explicit LanguagePersistedTabDataAndroid(TabAndroid* tab_android);
   ~LanguagePersistedTabDataAndroid() override;
@@ -34,10 +35,11 @@ class LanguagePersistedTabDataAndroid
   // Subscribes this instance as an observer to the ContentTranslateDriver.
   void RegisterTranslateDriver(translate::TranslateDriver* driver);
 
-  // translate::TranslateDriver::LanguageDetectionObserver implementation.
+  // language_detection::LanguageDetectionDriver::Observer implementation.
   void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override;
-  void OnTranslateDriverDestroyed(translate::TranslateDriver* driver) override;
+      const language_detection::LanguageDetectionDetails& details) override;
+  void OnLanguageDetectionDriverDestroyed(
+      language_detection::LanguageDetectionDriver* driver) override;
 
   const std::string& detected_language_code() const {
     return detected_language_code_;

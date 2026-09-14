@@ -6,16 +6,16 @@
 
 #include <memory>
 
+#include "base/run_loop.h"
 #include "components/language/core/browser/language_model.h"
 #include "components/language/core/browser/language_prefs.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
-#include "components/translate/core/common/language_detection_details.h"
-#include "base/run_loop.h"
 #include "content/public/test/test_renderer_host.h"
 #include "content/public/test/web_contents_tester.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
@@ -194,7 +194,7 @@ TEST_F(ContentTranslateDriverTest, RegisterPageMainAndSidePanel) {
   MockTranslateAgent side_panel_agent;
 
   // 1. Register the standard main page first.
-  translate::LanguageDetectionDetails main_details;
+  language_detection::LanguageDetectionDetails main_details;
   main_details.url = GURL("https://example.com");
   main_details.adopted_language = "en";
   main_details.is_model_reliable = true;
@@ -214,7 +214,7 @@ TEST_F(ContentTranslateDriverTest, RegisterPageMainAndSidePanel) {
   main_agent.called_translate_ = false;
 
   // 2. Register the side panel page using the Reading Mode host.
-  translate::LanguageDetectionDetails side_panel_details;
+  language_detection::LanguageDetectionDetails side_panel_details;
   side_panel_details.url =
       GURL("chrome-untrusted://read-anything-side-panel.top-chrome/");
   side_panel_details.adopted_language = "en";
@@ -246,7 +246,7 @@ TEST_F(ContentTranslateDriverTest, SidePanelDisconnectDoesNotEraseMainAgent) {
   MockTranslateAgent side_panel_agent;
 
   // 1. Register main page
-  translate::LanguageDetectionDetails main_details;
+  language_detection::LanguageDetectionDetails main_details;
   main_details.url = GURL("https://example.com");
   main_details.adopted_language = "en";
   main_details.is_model_reliable = true;
@@ -255,7 +255,7 @@ TEST_F(ContentTranslateDriverTest, SidePanelDisconnectDoesNotEraseMainAgent) {
   constexpr int kActiveSeqNo = 1;
 
   // 2. Register side panel agent
-  translate::LanguageDetectionDetails side_panel_details;
+  language_detection::LanguageDetectionDetails side_panel_details;
   side_panel_details.url =
       GURL("chrome-untrusted://read-anything-side-panel.top-chrome/");
   side_panel_details.adopted_language = "en";

@@ -5,6 +5,7 @@
 #include "components/translate/content/browser/translate_waiter.h"
 
 #include "base/run_loop.h"
+#include "components/language_detection/core/language_detection_driver.h"
 
 namespace translate {
 
@@ -24,9 +25,9 @@ void TranslateWaiter::Wait() {
   run_loop_.Run();
 }
 
-// TranslateDriver::LanguageDetectionObserver:
+// language_detection::LanguageDetectionDriver::Observer:
 void TranslateWaiter::OnLanguageDetermined(
-    const LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   if (wait_event_ == WaitEvent::kLanguageDetermined)
     run_loop_.Quit();
 }

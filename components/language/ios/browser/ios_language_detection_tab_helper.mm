@@ -13,9 +13,9 @@
 #include "components/language/core/browser/url_language_histogram.h"
 #include "components/language/ios/browser/language_detection_java_script_feature.h"
 #include "components/language/ios/browser/string_clipping_util.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/prefs/pref_member.h"
 #include "components/translate/core/browser/translate_pref_names.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/translate/core/common/translate_constants.h"
 #include "components/translate/core/common/translate_util.h"
 #include "components/translate/core/language_detection/language_detection_model.h"
@@ -90,7 +90,7 @@ void IOSLanguageDetectionTabHelper::RemoveObserver(Observer* observer) {
 }
 
 void IOSLanguageDetectionTabHelper::OnLanguageDetermined(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   // Update language histogram.
   if (url_language_histogram_ && details.is_model_reliable) {
     url_language_histogram_->OnPageVisited(details.model_detected_language);
@@ -248,7 +248,7 @@ void IOSLanguageDetectionTabHelper::OnTextRetrieved(
   // Avoid an unnecessary copy of the full text content (which can be
   // ~64kB) until we need it on iOS (e.g. for the translate internals
   // page).
-  translate::LanguageDetectionDetails details;
+  language_detection::LanguageDetectionDetails details;
   details.time = base::Time::Now();
   details.url = url;
   details.has_notranslate = has_notranslate;

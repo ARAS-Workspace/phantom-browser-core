@@ -43,12 +43,13 @@
 #include "chrome/browser/web_applications/web_app_helpers.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
+#include "components/language_detection/core/language_detection_details.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "components/tabs/public/split_tab_data.h"
 #include "components/tabs/public/tab_interface.h"
 #include "components/translate/core/browser/language_state.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/zoom/zoom_controller.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
@@ -3485,8 +3486,8 @@ void TabsDetectLanguageFunction::WebContentsDestroyed() {
   RespondWithLanguage(std::string());
 }
 
-void TabsDetectLanguageFunction::OnTranslateDriverDestroyed(
-    translate::TranslateDriver* driver) {
+void TabsDetectLanguageFunction::OnLanguageDetectionDriverDestroyed(
+    language_detection::LanguageDetectionDriver* driver) {
   // Typically, we'd return an error in these cases, since we weren't able to
   // detect a valid language. However, this matches the behavior in other cases
   // (like the tab going away), so we aim for consistency.
@@ -3494,7 +3495,7 @@ void TabsDetectLanguageFunction::OnTranslateDriverDestroyed(
 }
 
 void TabsDetectLanguageFunction::OnLanguageDetermined(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   RespondWithLanguage(details.adopted_language);
 }
 

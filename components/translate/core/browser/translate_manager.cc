@@ -27,6 +27,7 @@
 #include "components/language/core/common/language_experiments.h"
 #include "components/language/core/common/locale_util.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/prefs/pref_service.h"
 #include "components/translate/core/browser/language_state.h"
 #include "components/translate/core/browser/page_translated_details.h"
@@ -44,7 +45,6 @@
 #include "components/translate/core/browser/translate_script.h"
 #include "components/translate/core/browser/translate_trigger_decision.h"
 #include "components/translate/core/browser/translate_url_util.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/translate/core/common/translate_features.h"
 #include "components/translate/core/common/translate_language_matcher.h"
 #include "components/translate/core/common/translate_switches.h"
@@ -519,7 +519,7 @@ void TranslateManager::NotifyTranslateInit(std::string page_language_code,
 }
 
 void TranslateManager::NotifyLanguageDetected(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   if (!g_detection_callback_list_)
     return;
 

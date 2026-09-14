@@ -49,6 +49,7 @@
 #include "components/language/core/browser/language_model_manager.h"
 #include "components/language/core/common/locale_util.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/pdf/browser/pdf_frame_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
@@ -1700,12 +1701,12 @@ void ReadAnythingUntrustedPageHandler::SetLanguageCode(
 }
 
 void ReadAnythingUntrustedPageHandler::OnLanguageDetermined(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   SetLanguageCode(details.adopted_language);
 }
 
-void ReadAnythingUntrustedPageHandler::OnTranslateDriverDestroyed(
-    translate::TranslateDriver* driver) {
+void ReadAnythingUntrustedPageHandler::OnLanguageDetectionDriverDestroyed(
+    language_detection::LanguageDetectionDriver* driver) {
   translate_observation_.Reset();
 }
 

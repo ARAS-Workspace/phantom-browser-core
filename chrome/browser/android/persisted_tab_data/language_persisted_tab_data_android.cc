@@ -11,8 +11,9 @@
 #include "chrome/browser/android/persisted_tab_data/language_data.pb.h"
 #include "chrome/browser/android/tab_android.h"
 #include "components/content_capture/browser/onscreen_content_provider.h"
+#include "components/language_detection/core/language_detection_details.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/translate/core/browser/translate_driver.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
 
@@ -63,7 +64,7 @@ void LanguagePersistedTabDataAndroid::RegisterTranslateDriver(
 }
 
 void LanguagePersistedTabDataAndroid::OnLanguageDetermined(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   if (!tab_ || !tab_->web_contents()) {
     return;
   }
@@ -90,8 +91,8 @@ void LanguagePersistedTabDataAndroid::OnLanguageDetermined(
            << " (Confidence: " << language_confidence_ << ")";
 }
 
-void LanguagePersistedTabDataAndroid::OnTranslateDriverDestroyed(
-    translate::TranslateDriver* driver) {
+void LanguagePersistedTabDataAndroid::OnLanguageDetectionDriverDestroyed(
+    language_detection::LanguageDetectionDriver* driver) {
   if (translate_driver_) {
     translate_driver_->RemoveLanguageDetectionObserver(this);
   }

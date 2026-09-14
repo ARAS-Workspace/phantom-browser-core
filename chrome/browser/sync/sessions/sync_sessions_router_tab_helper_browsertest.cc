@@ -13,6 +13,7 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/language/core/common/language_experiments.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/sync_sessions/synced_tab_delegate.h"
 #include "components/translate/core/browser/translate_driver.h"
 #include "content/public/test/browser_test.h"
@@ -47,10 +48,10 @@ class TestLocalSessionEventHandler
 };
 
 class TestTranslateDriverObserver
-    : public translate::TranslateDriver::LanguageDetectionObserver {
+    : public language_detection::LanguageDetectionDriver::Observer {
  public:
   void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override {
+      const language_detection::LanguageDetectionDetails& details) override {
     if (interested_url_ != details.url) {
       return;
     }

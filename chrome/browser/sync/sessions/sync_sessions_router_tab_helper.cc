@@ -106,7 +106,7 @@ void SyncSessionsRouterTabHelper::OnVisibilityChanged(
 }
 
 void SyncSessionsRouterTabHelper::OnLanguageDetermined(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   if (details.adopted_language.empty()) {
     return;
   }

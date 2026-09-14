@@ -61,7 +61,7 @@ class FakeContentTranslateDriver
   // translate::mojom::ContentTranslateDriver implementation.
   void RegisterPage(
       mojo::PendingRemote<translate::mojom::TranslateAgent> translate_agent,
-      const translate::LanguageDetectionDetails& details,
+      const language_detection::LanguageDetectionDetails& details,
       bool page_level_translation_criteria_met) override {
     register_page_count_ += 1;
     page_level_translation_criteria_met_ = page_level_translation_criteria_met;

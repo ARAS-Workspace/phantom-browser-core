@@ -612,7 +612,7 @@ void HistoryTabHelper::DidOpenRequestedURL(
 }
 
 void HistoryTabHelper::OnLanguageDetermined(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   if (history::HistoryService* hs = GetHistoryService()) {
     NavigationEntry* entry =
         web_contents()->GetController().GetLastCommittedEntry();

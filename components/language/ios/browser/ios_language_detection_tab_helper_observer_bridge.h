@@ -16,7 +16,8 @@
 - (void)iOSLanguageDetectionTabHelper:
             (language::IOSLanguageDetectionTabHelper*)tabHelper
                  didDetermineLanguage:
-                     (const translate::LanguageDetectionDetails&)details;
+                     (const language_detection::LanguageDetectionDetails&)
+                         details;
 
 @end
 
@@ -40,7 +41,7 @@ class IOSLanguageDetectionTabHelperObserverBridge
 
   // IOSLanguageDetectionTabHelper::Observer.
   void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override;
+      const language_detection::LanguageDetectionDetails& details) override;
   void IOSLanguageDetectionTabHelperWasDestroyed(
       IOSLanguageDetectionTabHelper* tab_helper) override;
 

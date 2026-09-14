@@ -19,6 +19,10 @@ component("core") {
     "constants.h",
     "features.cc",
     "features.h",
+    "language_detection_details.cc",
+    "language_detection_details.h",
+    "language_detection_driver.cc",
+    "language_detection_driver.h",
     "language_detection_model.cc",
     "language_detection_model.h",
   ]
@@ -36,6 +40,7 @@ component("core") {
     "//third_party/tflite",
     "//third_party/tflite_support",
     "//third_party/tflite_support:tflite_support_proto",
+    "//url",
   ]
   defines = [ "IS_LANGUAGE_DETECTION_IMPL" ]
 }

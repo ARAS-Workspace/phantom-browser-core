@@ -16,6 +16,7 @@
 #include "components/language/core/browser/accept_languages_service.h"
 #include "components/language/core/browser/url_language_histogram.h"
 #include "components/language_detection/content/browser/content_language_detection_driver.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/translate/content/browser/content_translate_driver.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_step.h"
@@ -36,6 +37,10 @@ namespace language {
 class AcceptLanguagesService;
 }
 
+namespace language_detection {
+struct LanguageDetectionDetails;
+}  // namespace language_detection
+
 namespace translate {
 class AutoTranslateSnackbarController;
 class LanguageState;
@@ -43,14 +48,13 @@ class TranslatePrefs;
 class TranslateManager;
 class TranslateMessage;
 
-struct LanguageDetectionDetails;
 }  // namespace translate
 
 enum class ShowTranslateBubbleResult;
 
 class ChromeTranslateClient
     : public translate::TranslateClient,
-      public translate::TranslateDriver::LanguageDetectionObserver,
+      public language_detection::LanguageDetectionDriver::Observer,
       public content::WebContentsObserver,
       public content::WebContentsUserData<ChromeTranslateClient> {
  public:
@@ -125,9 +129,9 @@ class ChromeTranslateClient
   // bubble.
   void UndoTranslate();
 
-  // TranslateDriver::LanguageDetectionObserver implementation.
+  // language_detection::LanguageDetectionDriver::Observer implementation.
   void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override;
+      const language_detection::LanguageDetectionDetails& details) override;
 
  private:
   explicit ChromeTranslateClient(content::WebContents* web_contents);

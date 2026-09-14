@@ -139,8 +139,9 @@ class TranslateAgent : public content::RenderFrameObserver,
   const mojo::Remote<mojom::ContentTranslateDriver>& GetTranslateHandler();
 
   // Helper to send the page registration Mojo call to the browser.
-  void RegisterPageInternal(LanguageDetectionDetails details,
-                            bool page_level_translation_criteria_met);
+  void RegisterPageInternal(
+      language_detection::LanguageDetectionDetails details,
+      bool page_level_translation_criteria_met);
 
   // Cleanups all states and pending callbacks associated with the current
   // running page translation.
@@ -204,7 +205,7 @@ class TranslateAgent : public content::RenderFrameObserver,
 
   // Same lifetime as this.
   raw_ptr<language_detection::LanguageDetectionAgent> language_detection_agent_;
-  std::optional<LanguageDetectionDetails> last_details_;
+  std::optional<language_detection::LanguageDetectionDetails> last_details_;
 
   mojo::Receiver<mojom::TranslateAgent> receiver_{this};
 

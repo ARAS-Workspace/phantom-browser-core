@@ -25,7 +25,7 @@ IOSLanguageDetectionTabHelperObserverBridge::
 }
 
 void IOSLanguageDetectionTabHelperObserverBridge::OnLanguageDetermined(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   [owner_ iOSLanguageDetectionTabHelper:tab_helper_
                    didDetermineLanguage:details];
 }

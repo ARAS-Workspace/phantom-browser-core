@@ -8,42 +8,24 @@
 #include <string>
 #include <string_view>
 
-#include "base/observer_list.h"
-#include "base/scoped_observation_traits.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 
 class GURL;
 
 namespace translate {
 
-struct LanguageDetectionDetails;
-
 // Interface that allows Translate core code to interact with its driver (i.e.,
 // obtain information from it and give information to it). A concrete
 // implementation must be provided by the driver.
-class TranslateDriver {
+class TranslateDriver : public language_detection::LanguageDetectionDriver {
  public:
-  class LanguageDetectionObserver : public base::CheckedObserver {
-   public:
-    // Called when the observed instance is being destroyed so that observers
-    // can reset their pointers to the TranslateDriver.
-    virtual void OnTranslateDriverDestroyed(TranslateDriver* driver) {}
-
-    // Called when the page language has been detected.
-    virtual void OnLanguageDetermined(
-        const translate::LanguageDetectionDetails& details) {}
-  };
-
   TranslateDriver();
   TranslateDriver(TranslateDriver&&) = delete;
   TranslateDriver& operator=(TranslateDriver&&) = delete;
   TranslateDriver(const TranslateDriver&) = delete;
   TranslateDriver& operator=(const TranslateDriver&) = delete;
-  virtual ~TranslateDriver();
-
-  // Adds or removes observers.
-  void AddLanguageDetectionObserver(LanguageDetectionObserver* observer);
-  void RemoveLanguageDetectionObserver(LanguageDetectionObserver* observer);
+  ~TranslateDriver() override;
 
   // Returns true if the current page was navigated through a link.
   virtual bool IsLinkNavigation() = 0;
@@ -88,38 +70,8 @@ class TranslateDriver {
 
   // Returns whether the driver has access to the current page.
   virtual bool HasCurrentPage() const = 0;
-
- protected:
-  const base::ObserverList<LanguageDetectionObserver, true>&
-  language_detection_observers() const {
-    return language_detection_observers_;
-  }
-
- private:
-  base::ObserverList<LanguageDetectionObserver, true>
-      language_detection_observers_;
 };
 
 }  // namespace translate
-
-namespace base {
-
-template <>
-struct ScopedObservationTraits<
-    translate::TranslateDriver,
-    translate::TranslateDriver::LanguageDetectionObserver> {
-  static void AddObserver(
-      translate::TranslateDriver* source,
-      translate::TranslateDriver::LanguageDetectionObserver* observer) {
-    source->AddLanguageDetectionObserver(observer);
-  }
-  static void RemoveObserver(
-      translate::TranslateDriver* source,
-      translate::TranslateDriver::LanguageDetectionObserver* observer) {
-    source->RemoveLanguageDetectionObserver(observer);
-  }
-};
-
-}  // namespace base
 
 #endif  // COMPONENTS_TRANSLATE_CORE_BROWSER_TRANSLATE_DRIVER_H_

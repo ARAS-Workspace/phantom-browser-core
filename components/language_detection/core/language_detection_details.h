@@ -2,19 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_TRANSLATE_CORE_COMMON_LANGUAGE_DETECTION_DETAILS_H_
-#define COMPONENTS_TRANSLATE_CORE_COMMON_LANGUAGE_DETECTION_DETAILS_H_
+#ifndef COMPONENTS_LANGUAGE_DETECTION_CORE_LANGUAGE_DETECTION_DETAILS_H_
+#define COMPONENTS_LANGUAGE_DETECTION_CORE_LANGUAGE_DETECTION_DETAILS_H_
 
 #include <string>
 
+#include "base/component_export.h"
 #include "base/time/time.h"
 #include "url/gurl.h"
 
-namespace translate {
+namespace language_detection {
 
 // This struct corresponds to LanguageDetectionDetails defined in
 // translate.mojom, any changes need to be made to both definitions.
-struct LanguageDetectionDetails {
+struct COMPONENT_EXPORT(LANGUAGE_DETECTION) LanguageDetectionDetails {
   LanguageDetectionDetails();
   LanguageDetectionDetails(const LanguageDetectionDetails& other);
   ~LanguageDetectionDetails();
@@ -58,6 +59,6 @@ struct LanguageDetectionDetails {
   std::string detection_model_version;
 };
 
-}  // namespace translate
+}  // namespace language_detection
 
-#endif  // COMPONENTS_TRANSLATE_CORE_COMMON_LANGUAGE_DETECTION_DETAILS_H_
+#endif  // COMPONENTS_LANGUAGE_DETECTION_CORE_LANGUAGE_DETECTION_DETAILS_H_

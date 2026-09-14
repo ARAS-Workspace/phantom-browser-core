@@ -27,6 +27,10 @@ namespace metrics {
 class TranslateEventProto;
 }  // namespace metrics
 
+namespace language_detection {
+struct LanguageDetectionDetails;
+}  // namespace language_detection
+
 namespace translate {
 
 class TranslateClient;
@@ -41,7 +45,6 @@ namespace testing {
 class TranslateManagerTest;
 }  // namespace testing
 
-struct LanguageDetectionDetails;
 struct TranslateErrorDetails;
 struct TranslateInitDetails;
 
@@ -177,8 +180,8 @@ class TranslateManager {
   using TranslateInitCallback = TranslateInitCallbackList::CallbackType;
 
   // Callback types for language detection.
-  using LanguageDetectedCallbackList =
-      base::RepeatingCallbackList<void(const LanguageDetectionDetails&)>;
+  using LanguageDetectedCallbackList = base::RepeatingCallbackList<void(
+      const language_detection::LanguageDetectionDetails&)>;
   using LanguageDetectedCallback = LanguageDetectedCallbackList::CallbackType;
 
   // Registers a callback for translate errors.
@@ -242,7 +245,8 @@ class TranslateManager {
       base::WeakPtr<TranslateMetricsLogger> translate_metrics_logger);
 
   // Called when the language of a page has been detected.
-  void NotifyLanguageDetected(const LanguageDetectionDetails& details);
+  void NotifyLanguageDetected(
+      const language_detection::LanguageDetectionDetails& details);
 
  private:
   friend class translate::testing::TranslateManagerTest;

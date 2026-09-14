@@ -16,6 +16,7 @@
 #include "build/build_config.h"
 #include "components/history/core/browser/history_service_observer.h"
 #include "components/history/core/browser/history_types.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/sessions/core/serialized_navigation_entry.h"
 #include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/web_contents_observer.h"
@@ -28,7 +29,7 @@ class HistoryService;
 
 class HistoryTabHelper
     : public content::WebContentsObserver,
-      public translate::TranslateDriver::LanguageDetectionObserver,
+      public language_detection::LanguageDetectionDriver::Observer,
       public history::HistoryServiceObserver,
       public content::WebContentsUserData<HistoryTabHelper> {
  public:
@@ -108,9 +109,9 @@ class HistoryTabHelper
   void OnURLVisited(history::HistoryService* history_service,
                     const history::VisitedURLInfo& visited_url_info) override;
 
-  // TranslateDriver::LanguageDetectionObserver implementation.
+  // language_detection::LanguageDetectionDriver::Observer implementation.
   void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override;
+      const language_detection::LanguageDetectionDetails& details) override;
 
   // Helper function to return the history service.  May return null.
   history::HistoryService* GetHistoryService();
@@ -120,8 +121,8 @@ class HistoryTabHelper
 
   // Observes LanguageDetectionObserver, which notifies us when the language of
   // the contents of the current page has been determined.
-  base::ScopedObservation<translate::TranslateDriver,
-                          translate::TranslateDriver::LanguageDetectionObserver>
+  base::ScopedObservation<language_detection::LanguageDetectionDriver,
+                          language_detection::LanguageDetectionDriver::Observer>
       translate_observation_{this};
 
   // True after navigation to a page is complete and the page is currently

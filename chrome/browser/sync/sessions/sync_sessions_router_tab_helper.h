@@ -8,6 +8,7 @@
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
 #include "components/favicon/core/favicon_driver_observer.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/sessions/core/session_id.h"
 #include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/visibility.h"
@@ -29,7 +30,7 @@ class SyncSessionsWebContentsRouter;
 // https://chromium.googlesource.com/chromium/src/+/main/docs/tab_helpers.md
 class SyncSessionsRouterTabHelper
     : public content::WebContentsObserver,
-      public translate::TranslateDriver::LanguageDetectionObserver,
+      public language_detection::LanguageDetectionDriver::Observer,
       public favicon::FaviconDriverObserver {
  public:
   // TODO(https://crbug.com/373057420): `chrome_translate_client` and
@@ -61,9 +62,9 @@ class SyncSessionsRouterTabHelper
                            bool renderer_initiated) override;
   void OnVisibilityChanged(content::Visibility visibility) override;
 
-  // TranslateDriver::LanguageDetectionObserver implementation.
+  // language_detection::LanguageDetectionDriver::Observer implementation.
   void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override;
+      const language_detection::LanguageDetectionDetails& details) override;
 
   // favicon::FaviconDriverObserver implementation.
   void OnFaviconUpdated(

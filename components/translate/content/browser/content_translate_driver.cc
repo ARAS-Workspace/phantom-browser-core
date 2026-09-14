@@ -374,7 +374,7 @@ void ContentTranslateDriver::AddReceiver(
 
 void ContentTranslateDriver::RegisterPage(
     mojo::PendingRemote<translate::mojom::TranslateAgent> translate_agent,
-    const translate::LanguageDetectionDetails& details,
+    const language_detection::LanguageDetectionDetails& details,
     const bool page_level_translation_criteria_met) {
   base::TimeTicks language_determined_time = base::TimeTicks::Now();
   ReportLanguageDeterminedDuration(finish_navigation_time_,

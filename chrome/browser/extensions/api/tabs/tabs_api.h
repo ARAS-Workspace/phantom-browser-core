@@ -18,6 +18,7 @@
 #include "chrome/browser/extensions/window_controller.h"
 #include "chrome/common/extensions/api/tabs.h"
 #include "chrome/common/extensions/api/windows.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/safe_browsing/buildflags.h"
 #include "components/translate/core/browser/translate_driver.h"
 #include "components/zoom/zoom_controller.h"
@@ -429,7 +430,7 @@ class TabsUngroupFunction : public ExtensionFunction {
 class TabsDetectLanguageFunction
     : public ExtensionFunction,
       public content::WebContentsObserver,
-      public translate::TranslateDriver::LanguageDetectionObserver {
+      public language_detection::LanguageDetectionDriver::Observer {
  private:
   ~TabsDetectLanguageFunction() override = default;
   ResponseAction Run() override;
@@ -442,10 +443,11 @@ class TabsDetectLanguageFunction
       const content::LoadCommittedDetails& load_details) override;
   void WebContentsDestroyed() override;
 
-  // translate::TranslateDriver::LanguageDetectionObserver:
-  void OnTranslateDriverDestroyed(translate::TranslateDriver* driver) override;
+  // language_detection::LanguageDetectionDriver::Observer:
+  void OnLanguageDetectionDriverDestroyed(
+      language_detection::LanguageDetectionDriver* driver) override;
   void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override;
+      const language_detection::LanguageDetectionDetails& details) override;
 
   // Resolves the API call with the detected `language`.
   void RespondWithLanguage(const std::string& language);

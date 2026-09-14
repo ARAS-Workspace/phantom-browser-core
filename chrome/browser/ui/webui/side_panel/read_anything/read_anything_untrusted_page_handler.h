@@ -26,9 +26,11 @@
 #include "chrome/common/read_anything/distillation_evaluator.mojom.h"
 #include "chrome/common/read_anything/read_anything.mojom.h"
 #include "components/dom_distiller/core/task_tracker.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/tts_controller.h"
+#include "extensions/browser/extension_registry_observer.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/receiver.h"
@@ -36,8 +38,6 @@
 #include "ui/accessibility/ax_action_data.h"
 #include "ui/accessibility/ax_action_handler_registry.h"
 #include "ui/accessibility/ax_updates_and_events.h"
-
-#include "extensions/browser/extension_registry_observer.h"
 
 using read_anything::mojom::ReadAnythingOpenTrigger;
 
@@ -131,15 +131,14 @@ class ReadAnythingWebContentsObserver : public content::WebContentsObserver {
 //  This class is created and owned by ReadAnythingUntrustedUI and has the same
 //  lifetime as the Side Panel view.
 //
-class ReadAnythingUntrustedPageHandler :
-    public content::UpdateLanguageStatusDelegate,
-    public extensions::ExtensionRegistryObserver,
-    public ui::AXActionHandlerObserver,
-    public read_anything::mojom::UntrustedPageHandler,
-    public ReadAnythingLifecycleObserver,
-    public PinnedToolbarActionsModel::Observer,
-    public translate::TranslateDriver::LanguageDetectionObserver {
-
+class ReadAnythingUntrustedPageHandler
+    : public content::UpdateLanguageStatusDelegate,
+      public extensions::ExtensionRegistryObserver,
+      public ui::AXActionHandlerObserver,
+      public read_anything::mojom::UntrustedPageHandler,
+      public ReadAnythingLifecycleObserver,
+      public PinnedToolbarActionsModel::Observer,
+      public language_detection::LanguageDetectionDriver::Observer {
  public:
   ReadAnythingUntrustedPageHandler(
       mojo::PendingRemote<read_anything::mojom::UntrustedPage> page,
@@ -230,10 +229,11 @@ class ReadAnythingUntrustedPageHandler :
   // of read anything immersive
   void MaybeUpdateImmersivePinStatus();
 
-  // TranslateDriver::LanguageDetectionObserver:
+  // language_detection::LanguageDetectionDriver::Observer:
   void OnLanguageDetermined(
-      const translate::LanguageDetectionDetails& details) override;
-  void OnTranslateDriverDestroyed(translate::TranslateDriver* driver) override;
+      const language_detection::LanguageDetectionDetails& details) override;
+  void OnLanguageDetectionDriverDestroyed(
+      language_detection::LanguageDetectionDriver* driver) override;
 
   // ReadAnythingLifecycleObserver:
   void OnDestroyed() override;
@@ -444,8 +444,8 @@ class ReadAnythingUntrustedPageHandler :
 
   // Observes LanguageDetectionObserver, which notifies us when the language of
   // the contents of the current page has been determined.
-  base::ScopedObservation<translate::TranslateDriver,
-                          translate::TranslateDriver::LanguageDetectionObserver>
+  base::ScopedObservation<language_detection::LanguageDetectionDriver,
+                          language_detection::LanguageDetectionDriver::Observer>
       translate_observation_{this};
 
   // Timer used for checking for pdf contents after the page has loaded.

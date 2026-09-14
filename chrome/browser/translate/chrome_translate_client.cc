@@ -38,6 +38,8 @@
 #include "components/language/core/browser/pref_names.h"
 #include "components/language_detection/content/browser/content_language_detection_driver.h"
 #include "components/language_detection/core/browser/language_detection_model_service.h"
+#include "components/language_detection/core/language_detection_details.h"
+#include "components/language_detection/core/language_detection_driver.h"
 #include "components/prefs/pref_service.h"
 #include "components/translate/content/browser/content_translate_driver.h"
 #include "components/translate/core/browser/language_state.h"
@@ -47,7 +49,6 @@
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/translate/core/browser/translate_metrics_logger.h"
 #include "components/translate/core/browser/translate_prefs.h"
-#include "components/translate/core/common/language_detection_details.h"
 #include "components/translate/core/common/translate_features.h"
 #include "components/translate/core/common/translate_util.h"
 #include "components/variations/service/variations_service.h"
@@ -376,9 +377,9 @@ void ChromeTranslateClient::OnVisibilityChanged(
 }
 #endif  // IS_ANDROID
 
-// TranslateDriver::LanguageDetectionObserver implementation.
+// language_detection::LanguageDetectionDriver::Observer implementation.
 void ChromeTranslateClient::OnLanguageDetermined(
-    const translate::LanguageDetectionDetails& details) {
+    const language_detection::LanguageDetectionDetails& details) {
   if (details.has_run_lang_detection) {
     translate::TranslateBrowserMetrics::ReportLanguageDetectionContentLength(
         details.contents.size());

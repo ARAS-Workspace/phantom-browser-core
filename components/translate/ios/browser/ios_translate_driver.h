@@ -71,7 +71,8 @@ class IOSTranslateDriver
   void WebStateDestroyed(web::WebState* web_state) override;
 
   // language::IOSLanguageDetectionTabHelper::Observer.
-  void OnLanguageDetermined(const LanguageDetectionDetails& details) override;
+  void OnLanguageDetermined(
+      const language_detection::LanguageDetectionDetails& details) override;
   void IOSLanguageDetectionTabHelperWasDestroyed(
       language::IOSLanguageDetectionTabHelper* tab_helper) override;
 

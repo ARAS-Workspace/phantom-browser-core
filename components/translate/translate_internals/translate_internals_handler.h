@@ -20,8 +20,11 @@ class ListValue;
 class ValueView;
 }  // namespace base
 
-namespace translate {
+namespace language_detection {
 struct LanguageDetectionDetails;
+}  // namespace language_detection
+
+namespace translate {
 struct TranslateErrorDetails;
 struct TranslateEventDetails;
 struct TranslateInitDetails;
@@ -57,7 +60,8 @@ class TranslateInternalsHandler {
   // Subclasses should call this in order to handle messages from JavaScript.
   void RegisterMessageCallbacks();
   // Subclasses should call this when language detection details are available.
-  void AddLanguageDetectionDetails(const LanguageDetectionDetails& details);
+  void AddLanguageDetectionDetails(
+      const language_detection::LanguageDetectionDetails& details);
 
  private:
   // Callback for translate errors.

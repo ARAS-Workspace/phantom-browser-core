@@ -33,9 +33,12 @@ namespace language {
 class UrlLanguageHistogram;
 }  // namespace language
 
+namespace language_detection {
+struct LanguageDetectionDetails;
+}  // namespace language_detection
+
 namespace translate {
 
-struct LanguageDetectionDetails;
 class TranslateManager;
 
 // Content implementation of TranslateDriver.
@@ -122,7 +125,7 @@ class ContentTranslateDriver : public TranslateDriver,
   // Called when a page has been loaded and can be potentially translated.
   void RegisterPage(
       mojo::PendingRemote<translate::mojom::TranslateAgent> translate_agent,
-      const translate::LanguageDetectionDetails& details,
+      const language_detection::LanguageDetectionDetails& details,
       bool page_level_translation_criteria_met) override;
 
  private:
