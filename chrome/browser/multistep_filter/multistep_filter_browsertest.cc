@@ -86,12 +86,9 @@ constexpr char kTestAllowedDomain[] = "example.com";
 constexpr char kTestAllowedDomain2[] = "example2.com";
 constexpr char kExtractionUrlPath[] = "/extraction.html";
 constexpr char kSuggestionTriggerUrlPath[] = "/suggestion_trigger.html";
-constexpr char kSuggestionUrlPath[] = "/suggestion.html";
 constexpr char kTestTaskType[] = "test_task";
 constexpr char kTestAttributeKey[] = "color";
 constexpr char kTestAttributeValue[] = "red";
-constexpr char kTestAttributeKey2[] = "size";
-constexpr char kTestAttributeValue2[] = "large";
 
 FilterTabController* GetTabController(Browser* browser) {
   tabs::TabInterface* active_tab = browser->tab_strip_model()->GetActiveTab();
@@ -220,6 +217,7 @@ class MultistepFilterBrowserTest : public InProcessBrowserTest,
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
+IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
                        ClearHistoryDeletesSuggestions) {
   GURL extraction_url =
       embedded_test_server()->GetURL(kTestAllowedDomain, kExtractionUrlPath);
@@ -260,6 +258,7 @@ class MultistepFilterBrowserTest : public InProcessBrowserTest,
   EXPECT_THAT(get_future2.Get(), testing::SizeIs(0));
 }
 
+IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
                        ExecuteSettingsCommandOpensAiPage) {
   tabs::TabInterface* active_tab = browser()->tab_strip_model()->GetActiveTab();
   auto* ui_controller = multistep_filter::FilterUiController::From(active_tab);

@@ -38,6 +38,7 @@ class MockOptimizationGuideDecider : public OptimizationGuideDecider {
               CanApplyOptimization,
               (const GURL&, proto::OptimizationType, OptimizationMetadata*),
               (override));
+};
 
 }  // namespace optimization_guide
 

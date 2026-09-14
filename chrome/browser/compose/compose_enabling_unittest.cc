@@ -80,6 +80,7 @@ class CustomMockOptimizationGuideKeyedService
               RegisterOptimizationTypes,
               (const std::vector<optimization_guide::proto::OptimizationType>&
                    optimization_types));
+};
 
 void RegisterMockOptimizationGuideKeyedServiceFactory(
     content::BrowserContext* context) {

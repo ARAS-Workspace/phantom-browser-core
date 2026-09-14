@@ -42,6 +42,7 @@ class MockOptimizationGuideKeyedService : public OptimizationGuideKeyedService {
                optimization_guide::proto::OptimizationType,
                optimization_guide::OptimizationGuideDecisionCallback),
               (override));
+  MOCK_METHOD(std::unique_ptr<optimization_guide::OnDeviceSession>,
               StartSession,
               (optimization_guide::mojom::OnDeviceFeature feature,
                const optimization_guide::SessionConfigParams& config_params,

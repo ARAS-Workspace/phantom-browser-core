@@ -37,6 +37,7 @@ class MockShoppingService : public commerce::ShoppingService {
               GetProductInfoForUrl,
               (const GURL& url, commerce::ProductInfoCallback callback),
               (override));
+  MOCK_METHOD(void,
               GetPriceInsightsInfoForUrl,
               (const GURL& url, commerce::PriceInsightsInfoCallback callback),
               (override));
@@ -53,6 +54,7 @@ class MockShoppingService : public commerce::ShoppingService {
               GetUrlInfosForRecentlyViewedWebWrappers,
               (),
               (override));
+  MOCK_METHOD(void,
               GetMerchantInfoForUrl,
               (const GURL& url, MerchantInfoCallback callback),
               (override));
