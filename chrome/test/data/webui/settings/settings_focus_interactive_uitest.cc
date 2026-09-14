@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/glic/test_support/glic_test_environment.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
@@ -47,13 +46,6 @@ IN_PROC_BROWSER_TEST_F(SettingsFocusTest, StartupUrlsPage) {
   RunTest("settings/startup_urls_page_focus_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(SettingsFocusTest, EditDictionaryPage) {
-  RunTest("settings/edit_dictionary_page_test.js",
-          "runMochaSuite('EditDictionaryPageFocus')");
-}
-#endif
-
 // Times out on Mac. See https://crbug.com/40679346.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_SettingsUIToolbarAndDrawer DISABLED_SettingsUIToolbarAndDrawer
@@ -77,22 +69,4 @@ IN_PROC_BROWSER_TEST_F(SettingsFocusTest, MAYBE_SettingsUISearch) {
 
 IN_PROC_BROWSER_TEST_F(SettingsFocusTest, Menu) {
   RunTest("settings/settings_menu_interactive_ui_test.js", "mocha.run()");
-}
-
-class SettingsGlicSubpageFocusTest : public SettingsFocusTest {
- public:
-  SettingsGlicSubpageFocusTest() = default;
-
- private:
-  glic::GlicTestEnvironment glic_test_env_;
-};
-
-// TODO(crbug.com/424864547): Investigate flakiness and enable on Mac64.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_GlicSubpageFocus DISABLED_GlicSubpageFocus
-#else
-#define MAYBE_GlicSubpageFocus GlicSubpageFocus
-#endif  // BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(SettingsGlicSubpageFocusTest, MAYBE_GlicSubpageFocus) {
-  RunTest("settings/glic_subpage_focus_test.js", "mocha.run()");
 }
