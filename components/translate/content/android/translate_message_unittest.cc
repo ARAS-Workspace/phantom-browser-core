@@ -23,7 +23,6 @@
 #include "components/translate/core/browser/language_state.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_manager.h"
@@ -45,7 +44,6 @@ using ::testing::DoAll;
 using ::testing::InvokeWithoutArgs;
 using ::testing::Mock;
 using testing::MockTranslateClient;
-using testing::MockTranslateRanker;
 using ::testing::Return;
 using ::testing::Test;
 using ::testing::Truly;
@@ -331,10 +329,9 @@ class TranslateMessageTest : public ::testing::Test {
     pref_service_->registry()->RegisterBooleanPref(
         prefs::kOfferTranslateEnabled, true);
     TranslatePrefs::RegisterProfilePrefs(pref_service_->registry());
-    ranker_ = std::make_unique<MockTranslateRanker>();
     client_ =
         std::make_unique<MockTranslateClient>(&driver_, pref_service_.get());
-    manager_ = std::make_unique<TranslateManager>(client_.get(), ranker_.get(),
+    manager_ = std::make_unique<TranslateManager>(client_.get(),
                                                   language_model_.get());
     manager_->GetLanguageState()->set_translation_declined(false);
     TranslateDownloadManager::GetInstance()->set_application_locale("en");
@@ -358,7 +355,6 @@ class TranslateMessageTest : public ::testing::Test {
   std::unique_ptr<MockTranslateClient> client_;
   std::unique_ptr<TestLanguageModel> language_model_;
   std::unique_ptr<TranslateManager> manager_;
-  std::unique_ptr<MockTranslateRanker> ranker_;
   std::unique_ptr<TranslatePrefs> translate_prefs_;
 
   base::WeakPtr<TestBridge> bridge_;

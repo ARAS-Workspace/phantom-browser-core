@@ -35,7 +35,6 @@
 #include "components/translate/core/browser/language_state.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/unified_consent/pref_names.h"
 #include "content/public/test/browser_task_environment.h"
@@ -119,13 +118,10 @@ class ComposeEnablingTest : public ChromeRenderViewHostTestHarness {
          compose::features::kEnableComposeSavedStateNotification},
         {compose::features::kEnableComposeProactiveNudge});
 
-    mock_translate_ranker_ =
-        std::make_unique<translate::testing::MockTranslateRanker>();
     mock_translate_client_ =
         std::make_unique<MockTranslateClient>(&translate_driver_, nullptr);
     translate_manager_ = std::make_unique<translate::TranslateManager>(
-        mock_translate_client_.get(), mock_translate_ranker_.get(),
-        language_model_.get());
+        mock_translate_client_.get(), language_model_.get());
 
     NavigateAndCommit(GURL(kExampleURL));
     context_menu_params_.is_content_editable_for_autofill = true;
@@ -237,8 +233,6 @@ class ComposeEnablingTest : public ChromeRenderViewHostTestHarness {
   translate::testing::MockTranslateDriver translate_driver_;
   std::unique_ptr<translate::testing::MockTranslateClient>
       mock_translate_client_;
-  std::unique_ptr<translate::testing::MockTranslateRanker>
-      mock_translate_ranker_;
   std::unique_ptr<TestLanguageModel> language_model_;
   std::unique_ptr<translate::TranslateManager> translate_manager_;
 

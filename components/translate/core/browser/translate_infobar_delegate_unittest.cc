@@ -19,7 +19,6 @@
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/translate/core/browser/translate_pref_names.h"
@@ -33,7 +32,6 @@ namespace {
 using ::testing::_;
 using testing::MockTranslateClient;
 using testing::MockTranslateDriver;
-using testing::MockTranslateRanker;
 using ::testing::Return;
 using ::testing::Test;
 
@@ -109,10 +107,9 @@ class TranslateInfoBarDelegateTest : public ::testing::Test {
     pref_service_->registry()->RegisterBooleanPref(
         prefs::kOfferTranslateEnabled, true);
     TranslatePrefs::RegisterProfilePrefs(pref_service_->registry());
-    ranker_ = std::make_unique<MockTranslateRanker>();
     client_ =
         std::make_unique<MockTranslateClient>(&driver_, pref_service_.get());
-    manager_ = std::make_unique<TranslateManager>(client_.get(), ranker_.get(),
+    manager_ = std::make_unique<TranslateManager>(client_.get(),
                                                   language_model_.get());
     manager_->GetLanguageState()->set_translation_declined(false);
     infobar_manager_ = std::make_unique<TestInfoBarManager>();
@@ -135,7 +132,6 @@ class TranslateInfoBarDelegateTest : public ::testing::Test {
   std::unique_ptr<sync_preferences::TestingPrefServiceSyncable> pref_service_;
   std::unique_ptr<MockTranslateClient> client_;
   std::unique_ptr<TestLanguageModel> language_model_;
-  std::unique_ptr<MockTranslateRanker> ranker_;
   std::unique_ptr<TranslateManager> manager_;
   std::unique_ptr<TestInfoBarManager> infobar_manager_;
 };

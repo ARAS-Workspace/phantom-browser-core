@@ -9,7 +9,6 @@
 #import "components/sync_preferences/testing_pref_service_syncable.h"
 #import "components/translate/core/browser/mock_translate_client.h"
 #import "components/translate/core/browser/mock_translate_driver.h"
-#import "components/translate/core/browser/mock_translate_ranker.h"
 #import "components/translate/core/browser/translate_manager.h"
 #import "components/translate/core/browser/translate_pref_names.h"
 #import "components/translate/ios/browser/translate_java_script_feature.h"
@@ -55,8 +54,7 @@ class IOSTranslateDriverTest : public PlatformTest {
             driver_.get(), &pref_service_);
 
     translate_manager_ = std::make_unique<TranslateManager>(
-        mock_translate_client_.get(), &mock_translate_ranker_,
-        &mock_language_model_);
+        mock_translate_client_.get(), &mock_language_model_);
     driver_->Initialize(nullptr, translate_manager_.get());
   }
 
@@ -70,7 +68,6 @@ class IOSTranslateDriverTest : public PlatformTest {
   std::unique_ptr<::testing::NiceMock<testing::MockTranslateClient>>
       mock_translate_client_;
   MockLanguageModel mock_language_model_;
-  testing::MockTranslateRanker mock_translate_ranker_;
   std::unique_ptr<TranslateManager> translate_manager_;
 };
 

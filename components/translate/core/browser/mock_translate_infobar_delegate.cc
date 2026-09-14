@@ -54,10 +54,9 @@ MockTranslateInfoBarDelegateFactory::MockTranslateInfoBarDelegateFactory(
                                                  true);
   client_ =
       std::make_unique<MockTranslateClient>(&driver_, pref_service_.get());
-  ranker_ = std::make_unique<MockTranslateRanker>();
   language_model_ = std::make_unique<MockLanguageModel>();
   manager_ = std::make_unique<translate::TranslateManager>(
-      client_.get(), ranker_.get(), language_model_.get());
+      client_.get(), language_model_.get());
   delegate_ = std::make_unique<MockTranslateInfoBarDelegate>(
       manager_->GetWeakPtr(),
       translate::TranslateStep::TRANSLATE_STEP_BEFORE_TRANSLATE,

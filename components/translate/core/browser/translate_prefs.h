@@ -170,7 +170,7 @@ class TranslatePrefs {
   bool IsTranslateAllowedByPolicy() const;
 
   // Sets the country that the application is run in. Determined by the
-  // VariationsService, can be left empty. Used by the TranslateRanker.
+  // VariationsService, can be left empty.
   void SetCountry(std::string_view country);
   std::string GetCountry() const;
 

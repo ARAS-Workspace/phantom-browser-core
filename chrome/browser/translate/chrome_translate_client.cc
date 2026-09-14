@@ -25,7 +25,6 @@
 #include "chrome/browser/language_detection/language_detection_model_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_key.h"
-#include "chrome/browser/translate/translate_ranker_factory.h"
 #include "chrome/browser/translate/translate_service.h"
 #include "chrome/browser/ui/translate/translate_bubble_factory.h"
 #include "chrome/common/chrome_paths.h"
@@ -78,27 +77,7 @@
 #endif
 
 namespace {
-using metrics::TranslateEventProto;
-
 #if !BUILDFLAG(IS_ANDROID)
-TranslateEventProto::EventType BubbleResultToTranslateEvent(
-    ShowTranslateBubbleResult result) {
-  switch (result) {
-    case ShowTranslateBubbleResult::kBrowserWindowNotValid:
-      return TranslateEventProto::BROWSER_WINDOW_IS_INVALID;
-    case ShowTranslateBubbleResult::kBrowserWindowMinimized:
-      return TranslateEventProto::BROWSER_WINDOW_IS_MINIMIZED;
-    case ShowTranslateBubbleResult::kBrowserWindowNotActive:
-      return TranslateEventProto::BROWSER_WINDOW_NOT_ACTIVE;
-    case ShowTranslateBubbleResult::kWebContentsNotActive:
-      return TranslateEventProto::WEB_CONTENTS_NOT_ACTIVE;
-    case ShowTranslateBubbleResult::kEditableFieldIsActive:
-      return TranslateEventProto::EDITABLE_FIELD_IS_ACTIVE;
-    default:
-      NOTREACHED();
-  }
-}
-
 bool IsReadAnythingWebContents(content::WebContents* web_contents) {
   return web_contents->GetLastCommittedURL().GetWithEmptyPath() ==
          GURL(chrome::kChromeUIUntrustedReadAnythingSidePanelURL)
@@ -134,8 +113,6 @@ ChromeTranslateClient::ChromeTranslateClient(content::WebContents* web_contents)
                       web_contents->GetBrowserContext())))),
       translate_manager_(new translate::TranslateManager(
           this,
-          translate::TranslateRankerFactory::GetForBrowserContext(
-              web_contents->GetBrowserContext()),
           LanguageModelManagerFactory::GetForBrowserContext(
               web_contents->GetBrowserContext())
               ->GetPrimaryModel())) {
@@ -276,13 +253,8 @@ bool ChromeTranslateClient::ShowTranslateUI(
     return false;
   }
 
-  ShowTranslateBubbleResult result = ShowBubble(
-      step, source_language, target_language, error_type, triggered_from_menu);
-  if (result != ShowTranslateBubbleResult::kSuccess &&
-      step == translate::TRANSLATE_STEP_BEFORE_TRANSLATE) {
-    translate_manager_->RecordTranslateEvent(
-        BubbleResultToTranslateEvent(result));
-  }
+  ShowBubble(step, source_language, target_language, error_type,
+             triggered_from_menu);
 #endif
 
   return true;

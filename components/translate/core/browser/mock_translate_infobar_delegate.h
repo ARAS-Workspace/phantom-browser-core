@@ -14,7 +14,6 @@
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_infobar_delegate.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/translate/core/browser/translate_pref_names.h"
@@ -86,7 +85,6 @@ class MockTranslateInfoBarDelegateFactory {
   MockTranslateDriver driver_;
   std::unique_ptr<sync_preferences::TestingPrefServiceSyncable> pref_service_;
   std::unique_ptr<MockTranslateClient> client_;
-  std::unique_ptr<MockTranslateRanker> ranker_;
   std::unique_ptr<MockLanguageModel> language_model_;
   std::unique_ptr<translate::TranslateManager> manager_;
   std::unique_ptr<MockTranslateInfoBarDelegate> delegate_;

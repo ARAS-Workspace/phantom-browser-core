@@ -18,7 +18,6 @@
 #include "components/prefs/testing_pref_service.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/variations/pref_names.h"
 #include "components/variations/service/test_variations_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -27,7 +26,6 @@
 namespace {
 using translate::testing::MockTranslateClient;
 using translate::testing::MockTranslateDriver;
-using translate::testing::MockTranslateRanker;
 
 using ActorLoginQuality = optimization_guide::proto::ActorLoginQuality;
 using GetCredentialsDetails =
@@ -216,14 +214,11 @@ TEST_F(ActorLoginQualityLoggerTest, SetsDomainAndLanguage) {
   ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
   translate::testing::MockTranslateDriver translate_driver;
-  auto mock_translate_ranker =
-      std::make_unique<translate::testing::MockTranslateRanker>();
   auto mock_translate_client =
       std::make_unique<MockTranslateClient>(&translate_driver, nullptr);
   auto language_model = std::make_unique<FakeLanguageModel>();
   auto translate_manager = std::make_unique<translate::TranslateManager>(
-      mock_translate_client.get(), mock_translate_ranker.get(),
-      language_model.get());
+      mock_translate_client.get(), language_model.get());
   translate_manager->GetLanguageState()->SetSourceLanguage("en-us");
 
   const GURL url1("https://subdomain.example.com/login");

@@ -61,13 +61,6 @@ bool TranslateTriggerDecision::can_show_predefined_language_translate_ui()
   return can_show_predefined_language_translate_ui_;
 }
 
-void TranslateTriggerDecision::SuppressFromRanker() {
-  should_suppress_from_ranker_ = true;
-}
-bool TranslateTriggerDecision::should_suppress_from_ranker() const {
-  return should_suppress_from_ranker_;
-}
-
 bool TranslateTriggerDecision::IsTriggeringPossible() const {
   return can_auto_translate() || can_show_ui_;
 }
@@ -77,6 +70,6 @@ bool TranslateTriggerDecision::ShouldAutoTranslate() const {
 }
 
 bool TranslateTriggerDecision::ShouldShowUI() const {
-  return !can_auto_translate() && can_show_ui_ && !should_suppress_from_ranker_;
+  return !can_auto_translate() && can_show_ui_;
 }
 }  // namespace translate

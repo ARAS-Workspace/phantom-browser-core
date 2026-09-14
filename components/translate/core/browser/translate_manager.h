@@ -23,10 +23,6 @@ namespace language {
 class LanguageModel;
 }  // namespace language
 
-namespace metrics {
-class TranslateEventProto;
-}  // namespace metrics
-
 namespace language_detection {
 struct LanguageDetectionDetails;
 }  // namespace language_detection
@@ -36,7 +32,6 @@ namespace translate {
 class TranslateClient;
 class TranslateDriver;
 class TranslatePrefs;
-class TranslateRanker;
 struct TranslateTriggerDecision;
 
 class NullTranslateMetricsLogger;
@@ -56,7 +51,6 @@ class TranslateManager {
  public:
   // |translate_client| is expected to outlive the TranslateManager.
   TranslateManager(TranslateClient* translate_client,
-                   TranslateRanker* translate_ranker,
                    language::LanguageModel* language_model);
 
   TranslateManager(const TranslateManager&) = delete;
@@ -73,10 +67,6 @@ class TranslateManager {
   // Sets the sequence number of the current page, for use while sending
   // messages to the renderer.
   void set_current_seq_no(int page_seq_no) { page_seq_no_ = page_seq_no; }
-
-  metrics::TranslateEventProto* mutable_translate_event() {
-    return translate_event_.get();
-  }
 
   // Returns the target language to show in the UI representing the current
   // page state.
@@ -199,11 +189,6 @@ class TranslateManager {
   // Gets the LanguageState associated with the TranslateManager
   LanguageState* GetLanguageState();
 
-  // Record an event of the given |event_type| using the currently saved
-  // |translate_event_| as context. |event_type| must be one of the values
-  // defined by metrics::TranslateEventProto::EventType.
-  void RecordTranslateEvent(int event_type);
-
   // By default, don't offer to translate in builds lacking an API key. For
   // testing, set to true to offer anyway.
   static void SetIgnoreMissingKeyForTesting(bool ignore);
@@ -271,11 +256,6 @@ class TranslateManager {
                                       std::string target_lang,
                                       bool success);
 
-  // Helper function to initialize a translate event metric proto.
-  void InitTranslateEvent(std::string_view src_lang,
-                          std::string_view dst_lang,
-                          const TranslatePrefs& translate_prefs);
-
   void AddTargetLanguageToAcceptLanguages(
       std::string_view target_language_code);
 
@@ -338,8 +318,8 @@ class TranslateManager {
       TranslateBrowserMetrics::TargetLanguageOrigin& target_language_origin);
 
   // Enables or disables the translate omnibox icon depending on |decision|. The
-  // icon is always shown if translate UI is shown, auto-translation happens, or
-  // the UI is suppressed by ranker.
+  // icon is always shown if translate UI is shown or auto-translation
+  // happens.
   void MaybeShowOmniboxIcon(const TranslateTriggerDecision& decision);
 
   // Shows the UI or auto-translates based on the state of |decision|. Returns
@@ -354,18 +334,11 @@ class TranslateManager {
                              std::string_view page_language_code,
                              bool ui_shown);
 
-  // Records the RankerEvent associated with the current |decision|.
-  void RecordDecisionRankerEvent(const TranslateTriggerDecision& decision,
-                                 TranslatePrefs* translate_prefs,
-                                 std::string_view page_language_code,
-                                 std::string_view target_lang);
-
   // Sequence number of the current page.
   int page_seq_no_;
 
   raw_ptr<TranslateClient> translate_client_;        // Weak.
   raw_ptr<TranslateDriver> translate_driver_;        // Weak.
-  raw_ptr<TranslateRanker> translate_ranker_;        // Weak.
   raw_ptr<language::LanguageModel> language_model_;  // Weak.
 
   base::WeakPtr<TranslateMetricsLogger> active_translate_metrics_logger_;
@@ -375,8 +348,6 @@ class TranslateManager {
 
   // Whether page auto translation is enabled for the translate manager.
   bool enable_auto_translate_ = true;
-
-  std::unique_ptr<metrics::TranslateEventProto> translate_event_;
 
   base::WeakPtrFactory<TranslateManager> weak_method_factory_{this};
 

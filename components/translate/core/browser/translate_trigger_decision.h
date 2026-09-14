@@ -48,8 +48,6 @@ struct TranslateTriggerDecision {
   void SetIsInSiteBlocklist() { is_in_site_blocklist_ = true; }
   bool is_in_site_blocklist() const { return is_in_site_blocklist_; }
 
-  void SuppressFromRanker();
-  bool should_suppress_from_ranker() const;
   bool IsTriggeringPossible() const;
 
   bool ShouldAutoTranslate() const;
@@ -60,10 +58,8 @@ struct TranslateTriggerDecision {
   //    the UI).
   // 2. It's possible to show the UI (language/site not blocklisted, connected
   //    to the internet, etc)
-  // 3. Ranker isn't requesting that the UI be suppressed.
   bool ShouldShowUI() const;
 
-  std::vector<int> ranker_events;
   std::string auto_translate_target;
   std::string href_translate_source;
   std::string href_translate_target;
@@ -86,8 +82,6 @@ struct TranslateTriggerDecision {
   // which was set via SetPredefinedTargetLanguage call.
   bool can_show_predefined_language_translate_ui_ = true;
   bool can_auto_translate_for_predefined_language_ = true;
-
-  bool should_suppress_from_ranker_ = false;
 
   bool is_in_language_blocklist_ = false;
   bool is_in_site_blocklist_ = false;

@@ -41,7 +41,6 @@
 #include "components/translate/core/browser/translate_metrics_logger.h"
 #include "components/translate/core/browser/translate_metrics_logger_impl.h"
 #include "components/translate/core/browser/translate_prefs.h"
-#include "components/translate/core/browser/translate_ranker.h"
 #include "components/translate/core/browser/translate_script.h"
 #include "components/translate/core/browser/translate_trigger_decision.h"
 #include "components/translate/core/browser/translate_url_util.h"
@@ -55,7 +54,6 @@
 #include "net/base/network_change_notifier.h"
 #include "net/base/url_util.h"
 #include "net/http/http_status_code.h"
-#include "third_party/metrics_proto/translate_event.pb.h"
 
 namespace translate {
 namespace {
@@ -128,17 +126,14 @@ TranslateManager::RegisterLanguageDetectedCallback(
 }
 
 TranslateManager::TranslateManager(TranslateClient* translate_client,
-                                   TranslateRanker* translate_ranker,
                                    language::LanguageModel* language_model)
     : page_seq_no_(0),
       translate_client_(translate_client),
       translate_driver_(translate_client_->GetTranslateDriver()),
-      translate_ranker_(translate_ranker),
       language_model_(language_model),
       null_translate_metrics_logger_(
           std::make_unique<NullTranslateMetricsLogger>()),
-      language_state_(translate_driver_),
-      translate_event_(std::make_unique<metrics::TranslateEventProto>()) {}
+      language_state_(translate_driver_) {}
 
 base::WeakPtr<TranslateManager> TranslateManager::GetWeakPtr() {
   return weak_method_factory_.GetWeakPtr();
@@ -154,10 +149,6 @@ void TranslateManager::InitiateTranslation(std::string_view page_lang) {
   std::string target_lang =
       GetTargetLanguage(translate_prefs.get(), language_model_,
                         page_language_code, target_language_origin);
-
-  // TODO(crbug.com/40610937): The ranker event shouldn't be a global on this
-  // object. It should instead be passed around to code that uses it.
-  InitTranslateEvent(page_language_code, target_lang, *translate_prefs);
 
   // Logs the initial source and target languages, as well as whether the
   // initial source language is blocked (i.e. on the never translate list).
@@ -177,8 +168,6 @@ void TranslateManager::InitiateTranslation(std::string_view page_lang) {
   NotifyTranslateInit(page_language_code, target_lang, decision, ui_shown);
 
   RecordDecisionMetrics(decision, page_language_code, ui_shown);
-  RecordDecisionRankerEvent(decision, translate_prefs.get(), page_language_code,
-                            target_lang);
 
   // Mark the current state as the initial state now that we are done
   // initializing Translate.
@@ -413,12 +402,6 @@ void TranslateManager::TranslatePage(std::string_view original_source_lang,
   if (!TranslateDownloadManager::IsSupportedLanguage(source_lang))
     source_lang = std::string(language_detection::kUnknownLanguageCode);
 
-  // Capture the translate event if we were triggered from the menu.
-  if (triggered_from_menu) {
-    RecordTranslateEvent(
-        metrics::TranslateEventProto::USER_CONTEXT_MENU_TRANSLATE);
-  }
-
   if (source_lang == target_lang) {
     // If the languages are the same, try the translation using the unknown
     // language code. The source and target languages should only be equal if
@@ -463,9 +446,6 @@ void TranslateManager::RevertTranslation() {
   if (!GetLanguageState()->IsPageTranslated()) {
     return;
   }
-  // Capture the revert event in the translate metrics
-  RecordTranslateEvent(metrics::TranslateEventProto::USER_REVERT);
-
   // Revert the translation.
   translate_driver_->RevertTranslation(page_seq_no_);
   language_state_.SetCurrentLanguage(language_state_.source_language());
@@ -544,13 +524,6 @@ void TranslateManager::PageTranslated(std::string_view source_lang,
       !TranslateDownloadManager::IsSupportedLanguage(source_lang)) {
     error_type = TranslateErrors::UNSUPPORTED_LANGUAGE;
   }
-
-  // Currently we only want to log any error happens during the translation
-  // script initialization phase such as translation script failed because of
-  // CSP issues (crbug.com/738277).
-  // Note: NotifyTranslateError and ShowTranslateUI will not log the errors.
-  if (error_type == TranslateErrors::INITIALIZATION_ERROR)
-    RecordTranslateEvent(metrics::TranslateEventProto::INITIALIZATION_ERROR);
 
   translate_client_->ShowTranslateUI(
       translate::TRANSLATE_STEP_AFTER_TRANSLATE, std::string(source_lang),
@@ -746,30 +719,6 @@ bool TranslateManager::IsAvailable(const TranslatePrefs* prefs) {
          prefs->IsOfferTranslateEnabled();
 }
 
-void TranslateManager::InitTranslateEvent(std::string_view src_lang,
-                                          std::string_view dst_lang,
-                                          const TranslatePrefs& prefs) {
-  translate_event_->Clear();
-  translate_event_->set_source_language(src_lang);
-  translate_event_->set_target_language(dst_lang);
-  translate_event_->set_country(prefs.GetCountry());
-  translate_event_->set_accept_count(
-      prefs.GetTranslationAcceptedCount(src_lang));
-  translate_event_->set_decline_count(
-      prefs.GetTranslationDeniedCount(src_lang));
-  translate_event_->set_ignore_count(
-      prefs.GetTranslationIgnoredCount(src_lang));
-  translate_event_->set_ranker_response(
-      metrics::TranslateEventProto::NOT_QUERIED);
-  translate_event_->set_event_type(metrics::TranslateEventProto::UNKNOWN);
-  // TODO(rogerm): Populate the language list.
-}
-
-void TranslateManager::RecordTranslateEvent(int event_type) {
-  translate_ranker_->RecordTranslateEvent(
-      event_type, translate_driver_->GetUkmSourceId(), translate_event_.get());
-}
-
 bool TranslateManager::ShouldSuppressBubbleUI(
     std::string_view target_language) {
   // Suppress the UI if the user navigates to a page with the same language as
@@ -783,8 +732,6 @@ bool TranslateManager::ShouldSuppressBubbleUI(
       language_state_.HasLanguageChanged()) {
     return false;
   }
-
-  RecordTranslateEvent(metrics::TranslateEventProto::MATCHES_PREVIOUS_LANGUAGE);
 
   GetActiveTranslateMetricsLogger()->LogTriggerDecision(
       TriggerDecision::kDisabledMatchesPreviousLanguage);
@@ -848,21 +795,7 @@ const TranslateTriggerDecision TranslateManager::ComputePossibleOutcomes(
   FilterIsTranslatePossible(&decision, translate_prefs, page_language_code,
                             target_lang);
 
-  // Querying the ranker now, but not exiting immediately so that we may log
-  // other potential suppression reasons.
-  if (!translate_ranker_->ShouldOfferTranslation(
-          translate_event_.get(), GetActiveTranslateMetricsLogger())) {
-    decision.SuppressFromRanker();
-  }
-
   FilterForUserPrefs(&decision, translate_prefs, page_language_code);
-
-  if (decision.should_suppress_from_ranker()) {
-    // Delay logging this until after FilterForUserPrefs because TriggerDecision
-    // values from FilterForUserPrefs have higher priority.
-    GetActiveTranslateMetricsLogger()->LogTriggerDecision(
-        TriggerDecision::kDisabledByRanker);
-  }
 
   FilterForForcedTranslateLanguage(page_language_code, &decision,
                                   translate_prefs);
@@ -944,8 +877,6 @@ void TranslateManager::FilterIsTranslatePossible(
 
   if (!translate_prefs->IsOfferTranslateEnabled()) {
     decision->PreventAllTriggering();
-    decision->ranker_events.push_back(
-        metrics::TranslateEventProto::DISABLED_BY_PREF);
     GetActiveTranslateMetricsLogger()->LogTriggerDecision(
         TriggerDecision::kDisabledNeverOfferTranslations);
   }
@@ -970,8 +901,6 @@ void TranslateManager::FilterIsTranslatePossible(
     // regular auto-translate/show UI.
     decision->PreventAutoTranslate();
     decision->PreventShowingUI();
-    decision->ranker_events.push_back(
-        metrics::TranslateEventProto::UNSUPPORTED_LANGUAGE);
     GetActiveTranslateMetricsLogger()->LogTriggerDecision(
         TriggerDecision::kDisabledUnsupportedLanguage);
   }
@@ -1000,15 +929,11 @@ void TranslateManager::FilterAutoTranslate(
     // disable that feature; the user will get an infobar, so they can control
     // whether the page's text is sent to the translate server.
     decision->auto_translate_target = always_translate_target;
-    decision->ranker_events.push_back(
-        metrics::TranslateEventProto::AUTO_TRANSLATION_BY_PREF);
     GetActiveTranslateMetricsLogger()->LogTriggerDecision(
         TriggerDecision::kAutomaticTranslationByPref);
   } else if (!link_auto_translate_target.empty()) {
     // This page was navigated through a click from a translated page.
     decision->auto_translate_target = link_auto_translate_target;
-    decision->ranker_events.push_back(
-        metrics::TranslateEventProto::AUTO_TRANSLATION_BY_LINK);
     GetActiveTranslateMetricsLogger()->LogTriggerDecision(
         TriggerDecision::kAutomaticTranslationByLink);
   }
@@ -1034,8 +959,6 @@ void TranslateManager::FilterForUserPrefs(TranslateTriggerDecision* decision,
     // language blocklist.
     decision->PreventShowingPredefinedLanguageTranslateUI();
 
-    decision->ranker_events.push_back(
-        metrics::TranslateEventProto::LANGUAGE_DISABLED_BY_USER_CONFIG);
     GetActiveTranslateMetricsLogger()->LogTriggerDecision(
         TriggerDecision::kDisabledNeverTranslateLanguage);
   }
@@ -1056,8 +979,6 @@ void TranslateManager::FilterForUserPrefs(TranslateTriggerDecision* decision,
     decision->PreventShowingPredefinedLanguageTranslateUI();
     decision->PreventPredefinedLanguageAutoTranslate();
 
-    decision->ranker_events.push_back(
-        metrics::TranslateEventProto::URL_DISABLED_BY_USER_CONFIG);
     GetActiveTranslateMetricsLogger()->LogTriggerDecision(
         TriggerDecision::kDisabledNeverTranslateSite);
   }
@@ -1185,7 +1106,7 @@ bool TranslateManager::MaterializeDecision(
   }
 
   // Auto-translate didn't happen, so check if the UI should be shown. It must
-  // not be suppressed by preference, system state, or the Ranker.
+  // not be suppressed by preference or system state.
 
   // Will be true if we've decided to show the infobar/bubble UI to the user.
   bool did_show_ui = false;
@@ -1270,28 +1191,6 @@ void TranslateManager::RecordDecisionMetrics(
       (decision.can_auto_translate_for_predefined_language() ||
        decision.can_show_predefined_language_translate_ui())) {
     return;
-  }
-}
-
-void TranslateManager::RecordDecisionRankerEvent(
-    const TranslateTriggerDecision& decision,
-    TranslatePrefs* translate_prefs,
-    std::string_view page_language_code,
-    std::string_view target_lang) {
-  if (!decision.auto_translate_target.empty()) {
-    translate_event_->set_modified_target_language(
-        decision.auto_translate_target);
-  }
-
-  if (!decision.ranker_events.empty()) {
-    auto event = decision.ranker_events[0];
-    RecordTranslateEvent(event);
-  }
-
-  // Finally, if the decision was to show UI and ranker suppressed it, log that.
-  if (!decision.can_auto_translate() && decision.can_show_ui() &&
-      decision.should_suppress_from_ranker()) {
-    RecordTranslateEvent(metrics::TranslateEventProto::DISABLED_BY_RANKER);
   }
 }
 

@@ -12,7 +12,6 @@
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/translate/core/browser/mock_translate_client.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
@@ -109,8 +108,7 @@ class ContentTranslateDriverTest : public content::RenderViewHostTestHarness {
         .WillByDefault(::testing::Return(nullptr));
 
     translate_manager_ = std::make_unique<TranslateManager>(
-        mock_translate_client_.get(), &mock_translate_ranker_,
-        &mock_language_model_);
+        mock_translate_client_.get(), &mock_language_model_);
 
     driver_->set_translate_manager(translate_manager_.get());
   }
@@ -129,7 +127,6 @@ class ContentTranslateDriverTest : public content::RenderViewHostTestHarness {
   sync_preferences::TestingPrefServiceSyncable pref_service_;
   std::unique_ptr<ContentTranslateDriver> driver_;
   std::unique_ptr<translate::testing::MockTranslateClient> mock_translate_client_;
-  translate::testing::MockTranslateRanker mock_translate_ranker_;
   MockLanguageModel mock_language_model_;
   std::unique_ptr<TranslateManager> translate_manager_;
 };

@@ -15,7 +15,6 @@
 #include "components/translate/core/browser/language_state.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_manager.h"
@@ -121,11 +120,10 @@ class AutoTranslateSnackbarControllerTest : public ::testing::Test {
     language::LanguagePrefs::RegisterProfilePrefs(pref_service_->registry());
     TranslatePrefs::RegisterProfilePrefs(pref_service_->registry());
 
-    ranker_ = std::make_unique<testing::MockTranslateRanker>();
     client_ = std::make_unique<testing::MockTranslateClient>(
         &driver_, pref_service_.get());
     // Make Translate Manager
-    manager_ = std::make_unique<TranslateManager>(client_.get(), ranker_.get(),
+    manager_ = std::make_unique<TranslateManager>(client_.get(),
                                                   language_model_.get());
     manager_->GetLanguageState()->set_translation_declined(false);
     TranslateDownloadManager::GetInstance()->set_application_locale("en");
@@ -142,7 +140,6 @@ class AutoTranslateSnackbarControllerTest : public ::testing::Test {
   TestTranslateDriver driver_;
   std::unique_ptr<sync_preferences::TestingPrefServiceSyncable> pref_service_;
   std::unique_ptr<testing::MockTranslateClient> client_;
-  std::unique_ptr<testing::MockTranslateRanker> ranker_;
   std::unique_ptr<TestLanguageModel> language_model_;
   std::unique_ptr<TranslateManager> manager_;
 

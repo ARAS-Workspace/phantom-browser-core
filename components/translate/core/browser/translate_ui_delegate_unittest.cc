@@ -19,7 +19,6 @@
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_manager.h"
@@ -29,7 +28,6 @@
 #include "components/variations/variations_associated_data.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "third_party/metrics_proto/translate_event.pb.h"
 #include "url/gurl.h"
 
 namespace translate {
@@ -38,7 +36,6 @@ namespace {
 using ::testing::_;
 using testing::MockTranslateClient;
 using testing::MockTranslateDriver;
-using testing::MockTranslateRanker;
 using ::testing::Return;
 using ::testing::Test;
 
@@ -67,9 +64,8 @@ class TranslateUIDelegateTest : public ::testing::Test {
 
     client_ =
         std::make_unique<MockTranslateClient>(&driver_, pref_service_.get());
-    ranker_ = std::make_unique<MockTranslateRanker>();
     language_model_ = std::make_unique<MockLanguageModel>();
-    manager_ = std::make_unique<TranslateManager>(client_.get(), ranker_.get(),
+    manager_ = std::make_unique<TranslateManager>(client_.get(),
                                                   language_model_.get());
     manager_->GetLanguageState()->set_translation_declined(false);
 
@@ -110,17 +106,12 @@ class TranslateUIDelegateTest : public ::testing::Test {
       variations::VariationsIdsProvider::Mode::kUseSignedInState};
   std::unique_ptr<sync_preferences::TestingPrefServiceSyncable> pref_service_;
   std::unique_ptr<MockTranslateClient> client_;
-  std::unique_ptr<MockTranslateRanker> ranker_;
   std::unique_ptr<MockLanguageModel> language_model_;
   std::unique_ptr<TranslateManager> manager_;
   std::unique_ptr<TranslateUIDelegate> delegate_;
 };
 
 TEST_F(TranslateUIDelegateTest, CheckDeclinedFalse) {
-  EXPECT_CALL(*ranker_, RecordTranslateEvent(
-                            metrics::TranslateEventProto::USER_IGNORE, _, _))
-      .Times(1);
-
   std::unique_ptr<TranslatePrefs> prefs(client_->GetTranslatePrefs());
   for (int i = 0; i < 10; i++) {
     prefs->IncrementTranslationAcceptedCount("ar");
@@ -139,10 +130,6 @@ TEST_F(TranslateUIDelegateTest, CheckDeclinedFalse) {
 }
 
 TEST_F(TranslateUIDelegateTest, CheckDeclinedTrue) {
-  EXPECT_CALL(*ranker_, RecordTranslateEvent(
-                            metrics::TranslateEventProto::USER_DECLINE, _, _))
-      .Times(1);
-
   std::unique_ptr<TranslatePrefs> prefs(client_->GetTranslatePrefs());
   for (int i = 0; i < 10; i++) {
     prefs->IncrementTranslationAcceptedCount("ar");
@@ -160,12 +147,6 @@ TEST_F(TranslateUIDelegateTest, CheckDeclinedTrue) {
 }
 
 TEST_F(TranslateUIDelegateTest, SetLanguageBlocked) {
-  EXPECT_CALL(
-      *ranker_,
-      RecordTranslateEvent(
-          metrics::TranslateEventProto::USER_NEVER_TRANSLATE_LANGUAGE, _, _))
-      .Times(1);
-
   std::unique_ptr<TranslatePrefs> prefs(client_->GetTranslatePrefs());
   manager_->GetLanguageState()->SetTranslateEnabled(true);
   prefs->UnblockLanguage("ar");
@@ -228,44 +209,6 @@ TEST_F(TranslateUIDelegateTest, ShouldShowNeverTranslateShortcut) {
 
 TEST_F(TranslateUIDelegateTest, ContentLanguagesWhenPrefChange) {
   testContentLanguages();
-}
-
-TEST_F(TranslateUIDelegateTest, UpdateSourceLanguageTranslateEvent) {
-  // Test source language and corresponding TranslateEvent field.
-  EXPECT_EQ(
-      "ar",
-      delegate_->translate_ui_languages_manager()->GetSourceLanguageCode());
-  EXPECT_FALSE(
-      manager_->mutable_translate_event()->has_modified_source_language());
-
-  // Test that updating with current language does not update TranslateEvent.
-  delegate_->UpdateAndRecordSourceLanguage("ar");
-  EXPECT_FALSE(
-      manager_->mutable_translate_event()->has_modified_source_language());
-
-  // Test that updating with different language does update TranslateEvent.
-  delegate_->UpdateAndRecordSourceLanguage("es");
-  EXPECT_TRUE(
-      manager_->mutable_translate_event()->has_modified_source_language());
-}
-
-TEST_F(TranslateUIDelegateTest, UpdateTargetLanguageTranslateEvent) {
-  // Test target language and corresponding TranslateEvent field.
-  EXPECT_EQ(
-      "fr",
-      delegate_->translate_ui_languages_manager()->GetTargetLanguageCode());
-  EXPECT_FALSE(
-      manager_->mutable_translate_event()->has_modified_target_language());
-
-  // Test that updating with current language does not update TranslateEvent.
-  delegate_->UpdateAndRecordTargetLanguage("fr");
-  EXPECT_FALSE(
-      manager_->mutable_translate_event()->has_modified_target_language());
-
-  // Test that updating with different language does update TranslateEvent.
-  delegate_->UpdateAndRecordTargetLanguage("es");
-  EXPECT_TRUE(
-      manager_->mutable_translate_event()->has_modified_target_language());
 }
 
 }  // namespace

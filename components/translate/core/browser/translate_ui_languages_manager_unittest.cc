@@ -9,7 +9,6 @@
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/mock_translate_ranker.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/translate/core/browser/translate_pref_names.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -19,7 +18,6 @@ namespace {
 
 using testing::MockTranslateClient;
 using testing::MockTranslateDriver;
-using testing::MockTranslateRanker;
 using ::testing::Test;
 
 class MockLanguageModel : public language::LanguageModel {
@@ -47,7 +45,6 @@ class TranslateUILanguagesManagerTest : public ::testing::Test {
 
     client_ =
         std::make_unique<MockTranslateClient>(&driver_, pref_service_.get());
-    ranker_ = std::make_unique<MockTranslateRanker>();
     language_model_ = std::make_unique<MockLanguageModel>();
 
     std::vector<std::string> languages = {"ar", "de", "es", "fr"};
@@ -60,7 +57,6 @@ class TranslateUILanguagesManagerTest : public ::testing::Test {
   MockTranslateDriver driver_;
   std::unique_ptr<sync_preferences::TestingPrefServiceSyncable> pref_service_;
   std::unique_ptr<MockTranslateClient> client_;
-  std::unique_ptr<MockTranslateRanker> ranker_;
   std::unique_ptr<MockLanguageModel> language_model_;
   std::unique_ptr<TranslateUILanguagesManager> languages_manager_;
 };

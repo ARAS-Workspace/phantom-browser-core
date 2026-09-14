@@ -20,7 +20,6 @@
 #include "components/translate/core/browser/translate_ui_languages_manager.h"
 #include "components/translate/core/common/translate_util.h"
 #include "net/base/url_util.h"
-#include "third_party/metrics_proto/translate_event.pb.h"
 
 namespace {
 
@@ -79,11 +78,6 @@ void TranslateUIDelegate::UpdateAndRecordSourceLanguage(
   if (!translate_ui_languages_manager_->UpdateSourceLanguage(language_code)) {
     return;
   }
-
-  if (translate_manager_) {
-    translate_manager_->mutable_translate_event()->set_modified_source_language(
-        language_code);
-  }
 }
 
 void TranslateUIDelegate::UpdateAndRecordTargetLanguageIndex(
@@ -104,11 +98,6 @@ void TranslateUIDelegate::UpdateAndRecordTargetLanguage(
     const std::string& language_code) {
   if (!translate_ui_languages_manager_->UpdateTargetLanguage(language_code)) {
     return;
-  }
-
-  if (translate_manager_) {
-    translate_manager_->mutable_translate_event()->set_modified_target_language(
-        language_code);
   }
 }
 
@@ -155,8 +144,6 @@ void TranslateUIDelegate::Translate() {
       translate_ui_languages_manager_->GetTargetLanguageCode());
 
   if (translate_manager_) {
-    translate_manager_->RecordTranslateEvent(
-        metrics::TranslateEventProto::USER_ACCEPT);
     translate_manager_->TranslatePage(
         translate_ui_languages_manager_->GetSourceLanguageCode(),
         translate_ui_languages_manager_->GetTargetLanguageCode(), false,
@@ -190,9 +177,6 @@ void TranslateUIDelegate::TranslationDeclined(bool explicitly_closed) {
   // stops. That could happen multiple times, including after the user already
   // declined the translation.)
   if (translate_manager_) {
-    translate_manager_->RecordTranslateEvent(
-        explicitly_closed ? metrics::TranslateEventProto::USER_DECLINE
-                          : metrics::TranslateEventProto::USER_IGNORE);
     if (explicitly_closed)
       translate_manager_->GetLanguageState()->set_translation_declined(true);
   }
@@ -209,13 +193,6 @@ void TranslateUIDelegate::SetLanguageBlocked(bool value) {
             base::i18n::GetLanguageTagFromString(
                 translate_ui_languages_manager_->GetSourceLanguageCode())) {
       prefs_->AddToLanguageList(*parsed_tag, /*force_blocked=*/true);
-    }
-    if (translate_manager_) {
-      // Translation has been blocked for this language. Capture that in the
-      // metrics. Note that we don't capture a language being unblocked... which
-      // is not the same as accepting a given translation for this language.
-      translate_manager_->RecordTranslateEvent(
-          metrics::TranslateEventProto::USER_NEVER_TRANSLATE_LANGUAGE);
     }
   } else {
     prefs_->UnblockLanguage(
@@ -244,13 +221,6 @@ void TranslateUIDelegate::SetNeverPromptSite(bool value) {
 
   if (value) {
     prefs_->AddSiteToNeverPromptList(host);
-    if (translate_manager_) {
-      // Translation has been blocked for this site. Capture that in the metrics
-      // Note that we don't capture a language being unblocked... which is not
-      // the same as accepting a given translation for this site.
-      translate_manager_->RecordTranslateEvent(
-          metrics::TranslateEventProto::USER_NEVER_TRANSLATE_SITE);
-    }
   } else {
     prefs_->RemoveSiteFromNeverPromptList(host);
   }
@@ -273,14 +243,6 @@ void TranslateUIDelegate::SetAlwaysTranslate(bool value) {
       translate_ui_languages_manager_->GetTargetLanguageCode();
   if (value) {
     prefs_->AddLanguagePairToAlwaysTranslateList(source_lang, target_lang);
-    // A default translation mapping has been accepted for this language.
-    // Capture that in the metrics. Note that we don't capture a language being
-    // unmapped... which is not the same as accepting some other translation
-    // for this language.
-    if (translate_manager_) {
-      translate_manager_->RecordTranslateEvent(
-          metrics::TranslateEventProto::USER_ALWAYS_TRANSLATE_LANGUAGE);
-    }
     // If a language is being added to the always translate list on a
     // blocklisted site, remove that site from the blocklist.
     if (IsSiteOnNeverPromptList())
