@@ -45,7 +45,6 @@
 #include "components/permissions/permission_uma_util.h"
 #include "components/permissions/permission_util.h"
 #include "components/permissions/prediction_service/permission_ui_selector.h"
-#include "components/permissions/prediction_service/prediction_service_messages.pb.h"
 #include "components/permissions/request_type.h"
 #include "components/permissions/resolvers/permission_prompt_options.h"
 #include "components/permissions/test/mock_permission_prompt_factory.h"
@@ -77,10 +76,6 @@
 #include "url/origin.h"
 
 namespace {
-using PredictionGrantLikelihood =
-    permissions::PermissionUiSelector::PredictionGrantLikelihood;
-using ::permissions::PermissionRequestRelevance;
-
 using ::testing::_;
 using ::testing::DoAll;
 using ::testing::IsEmpty;
@@ -1031,80 +1026,6 @@ IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,
   GetPermissionRequestManager()->Dismiss(/*prompt_options=*/std::monostate());
   base::RunLoop().RunUntilIdle();
   EXPECT_EQ(0u, GetPermissionRequestManager()->Requests().size());
-}
-
-IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,
-                       PopulatesMetricFieldsForSupportedRequests) {
-  const bool kWasDecisionHeldBack = true;
-  const PredictionGrantLikelihood kRequestGrantLikelihood =
-      PredictionGrantLikelihood::
-          PermissionPrediction_Likelihood_DiscretizedLikelihood_NEUTRAL;
-  constexpr PermissionRequestRelevance kPermissionRequestRelevance =
-      PermissionRequestRelevance::kVeryLow;
-
-  MockPermissionUiSelector* selector =
-      SetUiSelectorWithCannedDecision(UiDecision::UseQuietUi(
-          QuietUiReason::kEnabledInPrefs, UiDecision::ShowNoWarning()));
-  selector->was_decision_held_back_ = std::make_optional(kWasDecisionHeldBack);
-  selector->last_request_grant_likelihood_ =
-      std::make_optional(kRequestGrantLikelihood);
-  selector->last_permission_request_relevance_ =
-      std::make_optional(kPermissionRequestRelevance);
-
-  auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
-  auto request_supported = std::make_unique<permissions::MockPermissionRequest>(
-      permissions::RequestType::kNotifications, /*request_state=*/nullptr);
-  GetPermissionRequestManager()->AddRequest(web_contents->GetPrimaryMainFrame(),
-                                            std::move(request_supported));
-
-  bubble_factory()->WaitForPermissionBubble();
-  auto* manager = GetPermissionRequestManager();
-
-  EXPECT_THAT(manager->was_decision_held_back_for_testing(),
-              Optional(kWasDecisionHeldBack));
-  EXPECT_THAT(manager->prediction_grant_likelihood_for_testing(),
-              Optional(kRequestGrantLikelihood));
-  EXPECT_THAT(manager->permission_request_relevance_for_testing(),
-              Optional(kPermissionRequestRelevance));
-
-  manager->Dismiss(/*prompt_options=*/std::monostate());
-  base::RunLoop().RunUntilIdle();
-}
-
-IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,
-                       DoesntPopulateMetricFieldsForUnsupportedRequests) {
-  const bool kWasDecisionHeldBack = true;
-  const PredictionGrantLikelihood kRequestGrantLikelihood =
-      PredictionGrantLikelihood::
-          PermissionPrediction_Likelihood_DiscretizedLikelihood_NEUTRAL;
-  constexpr PermissionRequestRelevance kPermissionRequestRelevance =
-      PermissionRequestRelevance::kVeryLow;
-
-  MockPermissionUiSelector* selector =
-      SetUiSelectorWithCannedDecision(UiDecision::UseQuietUi(
-          QuietUiReason::kEnabledInPrefs, UiDecision::ShowNoWarning()));
-  selector->was_decision_held_back_ = std::make_optional(kWasDecisionHeldBack);
-  selector->last_request_grant_likelihood_ =
-      std::make_optional(kRequestGrantLikelihood);
-  selector->last_permission_request_relevance_ =
-      std::make_optional(kPermissionRequestRelevance);
-
-  auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
-  auto request_not_supported =
-      std::make_unique<permissions::MockPermissionRequest>(
-          permissions::RequestType::kClipboard);
-  GetPermissionRequestManager()->AddRequest(web_contents->GetPrimaryMainFrame(),
-                                            std::move(request_not_supported));
-
-  bubble_factory()->WaitForPermissionBubble();
-  auto* manager = GetPermissionRequestManager();
-
-  EXPECT_EQ(manager->was_decision_held_back_for_testing(), std::nullopt);
-  EXPECT_EQ(manager->prediction_grant_likelihood_for_testing(), std::nullopt);
-  EXPECT_EQ(manager->permission_request_relevance_for_testing(), std::nullopt);
-
-  manager->Dismiss(/*prompt_options=*/std::monostate());
-  base::RunLoop().RunUntilIdle();
 }
 
 IN_PROC_BROWSER_TEST_F(PermissionRequestManagerQuietUiBrowserTest,

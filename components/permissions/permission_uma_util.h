@@ -135,12 +135,6 @@ class PermissionUmaUtil {
       PermissionPromptDisposition ui_disposition,
       std::optional<PermissionPromptDispositionReason> ui_reason,
       std::optional<std::vector<ElementAnchoredBubbleVariant>> variants,
-      std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-          predicted_grant_likelihood,
-      std::optional<PermissionRequestRelevance> permission_request_relevance,
-      std::optional<permissions::PermissionAiRelevanceModel>
-          permission_ai_relevance_model,
-      std::optional<bool> prediction_decision_held_back,
       std::optional<permissions::PermissionIgnoredReason> ignored_reason,
       bool did_show_prompt,
       bool did_click_manage,
@@ -463,12 +457,6 @@ class PermissionUmaUtil {
       const GURL& requesting_origin,
       content::BrowserContext* browser_context,
       content::RenderFrameHost* render_frame_host,
-      std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-          predicted_grant_likelihood,
-      std::optional<PermissionRequestRelevance> permission_request_relevance,
-      std::optional<permissions::PermissionAiRelevanceModel>
-          permission_ai_relevance_model,
-      std::optional<bool> prediction_decision_held_back,
       const PromptOptions& prompt_options,
       std::optional<GeolocationAccuracy> initial_geolocation_accuracy_selection,
       std::optional<GeolocationPromptType> geolocation_prompt_type,

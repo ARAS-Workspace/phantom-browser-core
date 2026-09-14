@@ -85,20 +85,4 @@ std::string_view ToString(permissions::RequestType request_type) {
   return (it == map.end()) ? "Unknown" : it->second;
 }
 
-std::string_view ToString(
-    permissions::PermissionRequestRelevance request_relevance) {
-  using RequestRelevance = ::permissions::PermissionRequestRelevance;
-  static constexpr auto map =
-      base::MakeFixedFlatMap<RequestRelevance, std::string_view>({
-          {RequestRelevance::kVeryLow, "VeryLow"},
-          {RequestRelevance::kLow, "Low"},
-          {RequestRelevance::kMedium, "Medium"},
-          {RequestRelevance::kHigh, "High"},
-          {RequestRelevance::kVeryHigh, "VeryHigh"},
-      });
-
-  auto it = map.find(request_relevance);
-  return (it == map.end()) ? "Unknown" : it->second;
-}
-
 }  // namespace test

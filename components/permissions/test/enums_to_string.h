@@ -20,9 +20,6 @@ std::string_view ToString(
 
 std::string_view ToString(permissions::RequestType request_type);
 
-std::string_view ToString(
-    permissions::PermissionRequestRelevance request_relevance);
-
 }  // namespace test
 
 #endif  // COMPONENTS_PERMISSIONS_TEST_ENUMS_TO_STRING_H_

@@ -18,7 +18,6 @@ class WebContents;
 namespace permissions {
 
 class PermissionRequest;
-enum PermissionPrediction_Likelihood_DiscretizedLikelihood : int;
 
 // The interface for implementations that decide if the quiet prompt UI should
 // be used to display a permission |request|, whether a warning should be
@@ -28,9 +27,6 @@ enum PermissionPrediction_Likelihood_DiscretizedLikelihood : int;
 // can support multiple requests, but only one at a time.
 class PermissionUiSelector {
  public:
-  using PredictionGrantLikelihood =
-      PermissionPrediction_Likelihood_DiscretizedLikelihood;
-
   // LINT.IfChange(QuietUiReason)
   enum class QuietUiReason {
     kEnabledInPrefs,
@@ -120,28 +116,6 @@ class PermissionUiSelector {
   virtual void Cancel() {}
 
   virtual bool IsPermissionRequestSupported(RequestType request_type) = 0;
-
-  // Will return the selector's discretized prediction value, if any is
-  // applicable to be recorded in UKMs. This is specific only to a selector that
-  // uses of the Web Permission Predictions Service to make decisions.
-  virtual std::optional<PredictionGrantLikelihood>
-  PredictedGrantLikelihoodForUKM();
-
-  // Will return the selector's discretized permission request relevance, if any
-  // is applicable to be recorded in UKMs. This is specific only to a selector
-  // that uses Gemini Nano on-device model to make decisions.
-  virtual std::optional<PermissionRequestRelevance>
-  PermissionRequestRelevanceForUKM();
-
-  // Will return the selector's AI model version, if any is applicable to be
-  // recorded in UKMs. This is specific only to a selector that uses an
-  // on-device AI model to predict permission relevance score.
-  virtual std::optional<permissions::PermissionAiRelevanceModel>
-  PermissionAiRelevanceModelForUKM();
-
-  // Will return if the selector's decision was heldback. Currently only the
-  // Web Prediction Service selector supports holdbacks.
-  virtual std::optional<bool> WasSelectorDecisionHeldback();
 };
 
 }  // namespace permissions

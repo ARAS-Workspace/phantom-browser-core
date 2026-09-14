@@ -2,16 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//third_party/protobuf/proto_library.gni")
-
-proto_library("prediction_service_messages_proto") {
-  sources = [
-    "permissions_aiv4_model_metadata.proto",
-    "prediction_model_metadata.proto",
-    "prediction_service_messages.proto",
-  ]
-}
-
 source_set("prediction_service") {
   sources = [
     "permission_ui_selector.cc",
@@ -22,5 +12,4 @@ source_set("prediction_service") {
     "//components/permissions:permissions_common",
     "//content/public/browser",
   ]
-  public_deps = [ ":prediction_service_messages_proto" ]
 }

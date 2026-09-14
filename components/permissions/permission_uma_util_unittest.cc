@@ -372,10 +372,6 @@ TEST_F(PermissionUmaUtilTest, GeolocationPermissionPromptResolved) {
         PermissionPromptDisposition::ANCHORED_BUBBLE,
         /*ui_reason=*/std::nullopt,
         /*variants=*/{},
-        /*predicted_grant_likelihood=*/std::nullopt,
-        /*permission_request_relevance=*/std::nullopt,
-        /*permission_ai_relevance_model=*/std::nullopt,
-        /*prediction_decision_held_back=*/std::nullopt,
         /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/false,
         /*did_click_manage=*/false,
         /*did_click_learn_more=*/false,
@@ -414,10 +410,6 @@ TEST_F(PermissionsDelegationUmaUtilTest, UsageAndPromptInTopLevelFrame) {
       PermissionPromptDisposition::NOT_APPLICABLE,
       /*ui_reason=*/std::nullopt,
       /*variants=*/{},
-      /*predicted_grant_likelihood=*/std::nullopt,
-      /*permission_request_relevance=*/std::nullopt,
-      /*permission_ai_relevance_model=*/std::nullopt,
-      /*prediction_decision_held_back=*/std::nullopt,
       /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/false,
       /*did_click_manage=*/false,
       /*did_click_learn_more=*/false,
@@ -821,10 +813,6 @@ TEST_F(PermissionsDelegationUmaUtilTest, SiteLevelAndOSPromptVariantsTest) {
       /*time_to_decision*/ base::TimeDelta(),
       PermissionPromptDisposition::ELEMENT_ANCHORED_BUBBLE,
       /*ui_reason=*/std::nullopt, variants,
-      /*predicted_grant_likelihood=*/std::nullopt,
-      /*permission_request_relevance=*/std::nullopt,
-      /*permission_ai_relevance_model=*/std::nullopt,
-      /*prediction_decision_held_back=*/std::nullopt,
       /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/true,
       /*did_click_manage=*/false,
       /*did_click_learn_more=*/false,
@@ -842,37 +830,6 @@ TEST_F(PermissionsDelegationUmaUtilTest, SiteLevelAndOSPromptVariantsTest) {
       *ukm_recorder.GetEntryMetric(entry, "OsSystemSettingsScreen"),
       static_cast<int64_t>(ElementAnchoredBubbleVariant::kOsSystemSettings));
 #endif
-}
-
-TEST_F(PermissionsDelegationUmaUtilTest, PermissionAiRelevanceModelUkmTest) {
-  ukm::InitializeSourceUrlRecorderForWebContents(web_contents());
-  ukm::TestAutoSetUkmRecorder ukm_recorder;
-  auto* main_frame = primary_main_frame();
-  AddRequest(main_frame,
-             CreateRequest(RequestType::kCameraStream, kTopLevelUrl));
-  const std::optional<permissions::PermissionAiRelevanceModel>
-      test_relvance_model = permissions::PermissionAiRelevanceModel::kAIv4;
-
-  PermissionUmaUtil::PermissionPromptResolved(
-      manager_->Requests(), browser_context(), PermissionAction::GRANTED,
-      /*prompt_options=*/std::monostate(),
-      /*time_to_decision*/ base::TimeDelta(),
-      PermissionPromptDisposition::ELEMENT_ANCHORED_BUBBLE,
-      /*ui_reason=*/std::nullopt, /*variants*/ {},
-      /*predicted_grant_likelihood=*/std::nullopt,
-      /*permission_request_relevance=*/std::nullopt,
-      /*permission_ai_relevance_model=*/test_relvance_model,
-      /*prediction_decision_held_back=*/std::nullopt,
-      /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/true,
-      /*did_click_manage=*/false,
-      /*did_click_learn_more=*/false,
-      /*initial_geolocation_accuracy_selection=*/std::nullopt);
-
-  const auto entries = ukm_recorder.GetEntriesByName("Permission");
-  ASSERT_EQ(1u, entries.size());
-  const auto* entry = entries.back().get();
-  EXPECT_EQ(*ukm_recorder.GetEntryMetric(entry, "PermissionAiRelevanceModel"),
-            static_cast<int64_t>(test_relvance_model.value()));
 }
 
 TEST_F(PermissionsDelegationUmaUtilTest, SameOriginFrame) {
@@ -902,10 +859,6 @@ TEST_F(PermissionsDelegationUmaUtilTest, SameOriginFrame) {
       PermissionPromptDisposition::NOT_APPLICABLE,
       /*ui_reason=*/std::nullopt,
       /*variants=*/{},
-      /*predicted_grant_likelihood=*/std::nullopt,
-      /*permission_request_relevance=*/std::nullopt,
-      /*permission_ai_relevance_model=*/std::nullopt,
-      /*prediction_decision_held_back=*/std::nullopt,
       /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/false,
       /*did_click_manage=*/false,
       /*did_click_learn_more=*/false,
@@ -1073,10 +1026,6 @@ TEST_P(CrossFramePermissionsDelegationUmaUtilTest, CrossOriginFrame) {
       PermissionPromptDisposition::NOT_APPLICABLE,
       /*ui_reason=*/std::nullopt,
       /*variants=*/{},
-      /*predicted_grant_likelihood=*/std::nullopt,
-      /*permission_request_relevance=*/std::nullopt,
-      /*permission_ai_relevance_model=*/std::nullopt,
-      /*prediction_decision_held_back=*/std::nullopt,
       /*ignored_reason=*/std::nullopt, /*did_show_prompt=*/false,
       /*did_click_manage=*/false,
       /*did_click_learn_more=*/false,
@@ -1289,10 +1238,6 @@ TEST_P(PredictionServiceActionTest, PredictionServiceAction) {
       GetParam().disposition,
       /*ui_reason=*/std::nullopt,
       /*variants=*/{},
-      /*predicted_grant_likelihood=*/std::nullopt,
-      /*permission_request_relevance=*/std::nullopt,
-      /*permission_ai_relevance_model=*/std::nullopt,
-      /*prediction_decision_held_back=*/std::nullopt,
       /*ignored_reason=*/std::nullopt,
       /*did_show_prompt=*/false,
       /*did_click_manage=*/false,

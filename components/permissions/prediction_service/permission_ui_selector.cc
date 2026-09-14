@@ -66,23 +66,4 @@ PermissionUiSelector::Decision PermissionUiSelector::Decision::UseQuietUi(
                   GeolocationAccuracy::kUnspecified);
 }
 
-std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-PermissionUiSelector::PredictedGrantLikelihoodForUKM() {
-  return std::nullopt;
-}
-
-std::optional<PermissionRequestRelevance>
-PermissionUiSelector::PermissionRequestRelevanceForUKM() {
-  return std::nullopt;
-}
-
-std::optional<permissions::PermissionAiRelevanceModel>
-PermissionUiSelector::PermissionAiRelevanceModelForUKM() {
-  return std::nullopt;
-}
-
-std::optional<bool> PermissionUiSelector::WasSelectorDecisionHeldback() {
-  return std::nullopt;
-}
-
 }  // namespace permissions

@@ -33,7 +33,6 @@
 #include "components/permissions/permission_uma_util.h"
 #include "components/permissions/permission_util.h"
 #include "components/permissions/prediction_service/permission_ui_selector.h"
-#include "components/permissions/prediction_service/prediction_service_messages.pb.h"
 #include "components/permissions/request_type.h"
 #include "components/permissions/resolvers/content_setting_permission_resolver.h"
 #include "components/permissions/resolvers/permission_prompt_options.h"
@@ -1056,11 +1055,8 @@ class MockNotificationGeolocationPermissionUiSelector
  public:
   explicit MockNotificationGeolocationPermissionUiSelector(
       const Decision& decision,
-      std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-          prediction_likelihood,
       std::optional<base::TimeDelta> async_delay)
       : decision_(decision),
-        prediction_likelihood_(prediction_likelihood),
         async_delay_(async_delay) {}
 
   void SelectUiToUse(content::WebContents* web_contents,
@@ -1081,28 +1077,18 @@ class MockNotificationGeolocationPermissionUiSelector
            request_type == RequestType::kGeolocation;
   }
 
-  std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-  PredictedGrantLikelihoodForUKM() override {
-    return prediction_likelihood_;
-  }
-
-  static void CreateForManager(
-      PermissionRequestManager* manager,
-      const Decision& decision,
-      std::optional<base::TimeDelta> async_delay,
-      std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-          prediction_likelihood = std::nullopt) {
+  static void CreateForManager(PermissionRequestManager* manager,
+                               const Decision& decision,
+                               std::optional<base::TimeDelta> async_delay) {
     manager->add_permission_ui_selector_for_testing(
         std::make_unique<MockNotificationGeolocationPermissionUiSelector>(
-            decision, prediction_likelihood, async_delay));
+            decision, async_delay));
   }
 
   bool selected_ui_to_use() const { return selected_ui_to_use_; }
 
  private:
   Decision decision_;
-  std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-      prediction_likelihood_;
   std::optional<base::TimeDelta> async_delay_;
   bool selected_ui_to_use_ = false;
 };
@@ -1114,26 +1100,20 @@ class MockCameraStreamPermissionUiSelector
  public:
   explicit MockCameraStreamPermissionUiSelector(
       const Decision& decision,
-      std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-          prediction_likelihood,
       std::optional<base::TimeDelta> async_delay)
-      : MockNotificationGeolocationPermissionUiSelector(decision,
-                                                        prediction_likelihood,
-                                                        async_delay) {}
+      : MockNotificationGeolocationPermissionUiSelector(decision, async_delay) {
+  }
 
   bool IsPermissionRequestSupported(RequestType request_type) override {
     return request_type == RequestType::kCameraStream;
   }
 
-  static void CreateForManager(
-      PermissionRequestManager* manager,
-      const Decision& decision,
-      std::optional<base::TimeDelta> async_delay,
-      std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-          prediction_likelihood = std::nullopt) {
+  static void CreateForManager(PermissionRequestManager* manager,
+                               const Decision& decision,
+                               std::optional<base::TimeDelta> async_delay) {
     manager->add_permission_ui_selector_for_testing(
-        std::make_unique<MockCameraStreamPermissionUiSelector>(
-            decision, prediction_likelihood, async_delay));
+        std::make_unique<MockCameraStreamPermissionUiSelector>(decision,
+                                                               async_delay));
   }
 };
 
@@ -1605,80 +1585,6 @@ TEST_F(PermissionRequestManagerTest, MultipleUiSelectors) {
     }
     EXPECT_EQ(test.expected_accuracy,
               manager_->GetInitialGeolocationAccuracySelection());
-
-    Accept();
-    EXPECT_TRUE(request_state.granted);
-  }
-}
-
-TEST_F(PermissionRequestManagerTest, SelectorsPredictionLikelihood) {
-  using PredictionLikelihood = PermissionUiSelector::PredictionGrantLikelihood;
-  const auto VeryLikely = PredictionLikelihood::
-      PermissionPrediction_Likelihood_DiscretizedLikelihood_VERY_LIKELY;
-  const auto Neutral = PredictionLikelihood::
-      PermissionPrediction_Likelihood_DiscretizedLikelihood_NEUTRAL;
-
-  const struct {
-    std::vector<bool> enable_quiet_uis;
-    std::vector<std::optional<PredictionLikelihood>> prediction_likelihoods;
-    std::vector<bool> simulate_delayed_decision;
-    std::optional<PredictionLikelihood> expected_prediction_likelihood;
-  } kTests[] = {
-      // Sanity check: prediction likelihood is populated correctly.
-      {{true}, {VeryLikely}, {false}, VeryLikely},
-      {{false}, {Neutral}, {false}, Neutral},
-
-      // Prediction likelihood is populated only if the selector was considered.
-      {{true, true}, {std::nullopt, VeryLikely}, {false, false}, std::nullopt},
-      {{false, true}, {std::nullopt, VeryLikely}, {false, false}, VeryLikely},
-      {{false, false}, {std::nullopt, VeryLikely}, {false, false}, VeryLikely},
-
-      // Prediction likelihood is populated only if the selector was considered,
-      // even if the second selector returns first.
-      {{true, true}, {std::nullopt, VeryLikely}, {true, false}, std::nullopt},
-      {{false, true}, {std::nullopt, VeryLikely}, {true, false}, VeryLikely},
-      {{false, false}, {std::nullopt, VeryLikely}, {true, false}, VeryLikely},
-
-      // First considered selector is preserved.
-      {{true, true}, {Neutral, VeryLikely}, {false, false}, Neutral},
-      {{false, true}, {Neutral, VeryLikely}, {false, false}, Neutral},
-      {{false, false}, {Neutral, VeryLikely}, {false, false}, Neutral},
-
-      // First considered selector is preserved, even if the second selector
-      // returns first.
-      {{true, true}, {Neutral, VeryLikely}, {true, false}, Neutral},
-      {{false, true}, {Neutral, VeryLikely}, {true, false}, Neutral},
-      {{false, false}, {Neutral, VeryLikely}, {true, false}, Neutral},
-  };
-
-  for (const auto& test : kTests) {
-    manager_->clear_permission_ui_selector_for_testing();
-    for (size_t i = 0; i < test.enable_quiet_uis.size(); ++i) {
-      MockNotificationGeolocationPermissionUiSelector::CreateForManager(
-          manager_,
-          test.enable_quiet_uis[i]
-              ? Decision::UseQuietUi(QuietUiReason::kEnabledInPrefs,
-                                     Decision::ShowNoWarning())
-              : Decision::UseNormalUiAndShowNoWarning(),
-          test.simulate_delayed_decision[i]
-              ? std::make_optional<base::TimeDelta>()
-              : std::nullopt,
-          test.prediction_likelihoods[i]);
-    }
-
-    MockPermissionRequest::MockPermissionRequestState request_state;
-    auto request = std::make_unique<MockPermissionRequest>(
-        RequestType::kNotifications, PermissionRequestGestureType::GESTURE,
-        request_state.GetWeakPtr());
-
-    manager_->AddRequest(web_contents()->GetPrimaryMainFrame(),
-                         std::move(request));
-    WaitForBubbleToBeShown();
-
-    EXPECT_TRUE(prompt_factory_->is_visible());
-    EXPECT_TRUE(prompt_factory_->RequestTypeSeen(request_state.request_type));
-    EXPECT_EQ(test.expected_prediction_likelihood,
-              manager_->prediction_grant_likelihood_for_testing());
 
     Accept();
     EXPECT_TRUE(request_state.granted);
@@ -2877,7 +2783,6 @@ class PermissionRequestManagerSameOriginGestureTest
     manager_->add_permission_ui_selector_for_testing(
         std::make_unique<MockNotificationGeolocationPermissionUiSelector>(
             Decision::UseNormalUiAndShowNoWarning(),
-            /*prediction_likelihood=*/std::nullopt,
             /*async_delay=*/std::nullopt));
   }
 };
@@ -2994,7 +2899,6 @@ class PermissionRequestManagerEnforceGestureTest
     manager_->add_permission_ui_selector_for_testing(
         std::make_unique<MockNotificationGeolocationPermissionUiSelector>(
             Decision::UseNormalUiAndShowNoWarning(),
-            /*prediction_likelihood=*/std::nullopt,
             /*async_delay=*/std::nullopt));
   }
 

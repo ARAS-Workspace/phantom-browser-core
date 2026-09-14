@@ -36,7 +36,6 @@
 #include "components/permissions/permission_uma_constants.h"
 #include "components/permissions/permission_util.h"
 #include "components/permissions/permissions_client.h"
-#include "components/permissions/prediction_service/prediction_service_messages.pb.h"
 #include "components/permissions/request_type.h"
 #include "components/permissions/resolvers/permission_prompt_options.h"
 #include "components/prefs/pref_service.h"
@@ -128,16 +127,10 @@ struct PermissionActionUkmParams {
   std::optional<std::vector<ElementAnchoredBubbleVariant>> variants;
   std::optional<bool> has_three_consecutive_denies;
   std::optional<bool> has_previously_revoked_permission;
-  std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-      predicted_grant_likelihood;
-  std::optional<PermissionRequestRelevance> permission_request_relevance;
-  std::optional<permissions::PermissionAiRelevanceModel>
-      permission_ai_relevance_model;
   PermissionActionCounts loud_ui_actions_counts_for_request_type;
   PermissionActionCounts loud_ui_actions_counts;
   PermissionActionCounts actions_counts_for_request_type;
   PermissionActionCounts actions_counts;
-  std::optional<bool> prediction_decision_held_back;
   std::optional<UkmPermissionPromptOptions> prompt_options;
   std::optional<GeolocationAccuracy> initial_geolocation_accuracy_selection;
   std::optional<GeolocationPromptType> geolocation_prompt_type;
@@ -469,26 +462,6 @@ void RecordPermissionActionUkm(
         static_cast<int64_t>(params->ui_reason.value()));
   }
 
-  if (params->predicted_grant_likelihood.has_value()) {
-    builder.SetPredictionsApiResponse_GrantLikelihood(
-        static_cast<int64_t>(params->predicted_grant_likelihood.value()));
-  }
-
-  if (params->permission_request_relevance.has_value()) {
-    builder.SetPermissionRequestRelevance(
-        static_cast<int64_t>(params->permission_request_relevance.value()));
-  }
-
-  if (params->permission_ai_relevance_model.has_value()) {
-    builder.SetPermissionAiRelevanceModel(
-        static_cast<int64_t>(params->permission_ai_relevance_model.value()));
-  }
-
-  if (params->prediction_decision_held_back.has_value()) {
-    builder.SetPredictionsApiResponse_Heldback(
-        params->prediction_decision_held_back.value());
-  }
-
   if (params->has_three_consecutive_denies.has_value()) {
     int64_t satisfied_adaptive_triggers = 0;
     if (params->has_three_consecutive_denies.value()) {
@@ -739,31 +712,6 @@ std::string GetPermissionStringForUma(
                << " not accounted for";
 }
 
-const char* GetPredictionGrantLikelihoodString(
-    PermissionUiSelector::PredictionGrantLikelihood likelihood) {
-  switch (likelihood) {
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_DISCRETIZED_LIKELIHOOD_UNSPECIFIED:
-      return "Unspecified";
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_VERY_UNLIKELY:
-      return "VeryUnlikely";
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_UNLIKELY:
-      return "Unlikely";
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_NEUTRAL:
-      return "Neutral";
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_LIKELY:
-      return "Likely";
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_VERY_LIKELY:
-      return "VeryLikely";
-  }
-  NOTREACHED();
-}
-
 const char* GetProminenceString(PermissionPromptDisposition disposition) {
   if (PermissionUmaUtil::IsPromptDispositionQuiet(disposition)) {
     return "Quiet";
@@ -773,31 +721,6 @@ const char* GetProminenceString(PermissionPromptDisposition disposition) {
 
   DUMP_WILL_BE_NOTREACHED();
   return "";
-}
-
-PermissionRequestLikelihood
-ConvertPredictionGrantLikelihoodToPermissionRequestLikelihood(
-    PermissionUiSelector::PredictionGrantLikelihood likelihood) {
-  switch (likelihood) {
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_DISCRETIZED_LIKELIHOOD_UNSPECIFIED:
-      return PermissionRequestLikelihood::kUnspecified;
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_VERY_UNLIKELY:
-      return PermissionRequestLikelihood::kVeryUnlikely;
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_UNLIKELY:
-      return PermissionRequestLikelihood::kUnlikely;
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_NEUTRAL:
-      return PermissionRequestLikelihood::kNeutral;
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_LIKELY:
-      return PermissionRequestLikelihood::kLikely;
-    case PermissionUiSelector::PredictionGrantLikelihood::
-        PermissionPrediction_Likelihood_DiscretizedLikelihood_VERY_LIKELY:
-      return PermissionRequestLikelihood::kVeryLikely;
-  }
 }
 
 }  // anonymous namespace
@@ -945,11 +868,7 @@ void PermissionUmaUtil::PermissionRevoked(
       PermissionPromptDisposition::NOT_APPLICABLE,
       /*ui_reason=*/std::nullopt, /*variants=*/std::nullopt, revoked_origin,
       browser_context,
-      /*render_frame_host*/ nullptr,
-      /*predicted_grant_likelihood=*/std::nullopt,
-      /*permission_request_relevance=*/std::nullopt,
-      /*permission_ai_relevance_model=*/std::nullopt,
-      /*prediction_decision_held_back=*/std::nullopt, std::monostate(),
+      /*render_frame_host*/ nullptr, std::monostate(),
       /*initial_geolocation_accuracy_selection=*/std::nullopt,
       /*geolocation_prompt_type=*/std::nullopt,
       /*source_id=*/std::nullopt);
@@ -1081,12 +1000,6 @@ void PermissionUmaUtil::PermissionPromptResolved(
     PermissionPromptDisposition ui_disposition,
     std::optional<PermissionPromptDispositionReason> ui_reason,
     std::optional<std::vector<ElementAnchoredBubbleVariant>> variants,
-    std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-        predicted_grant_likelihood,
-    std::optional<PermissionRequestRelevance> permission_request_relevance,
-    std::optional<permissions::PermissionAiRelevanceModel>
-        permission_ai_relevance_model,
-    std::optional<bool> prediction_decision_held_back,
     std::optional<permissions::PermissionIgnoredReason> ignored_reason,
     bool did_show_prompt,
     bool did_click_managed,
@@ -1133,8 +1046,6 @@ void PermissionUmaUtil::PermissionPromptResolved(
         time_to_action, ui_disposition, ui_reason, variants, requesting_origin,
         browser_context,
         content::RenderFrameHost::FromID(request->get_requesting_frame_id()),
-        predicted_grant_likelihood, permission_request_relevance,
-        permission_ai_relevance_model, prediction_decision_held_back,
         prompt_options, initial_geolocation_accuracy_selection,
         request->GetGeolocationPromptType(), request->get_ukm_source_id());
 
@@ -1215,60 +1126,6 @@ void PermissionUmaUtil::PermissionPromptResolved(
                         permission_disposition, ".", action_string,
                         ".DidClickLearnMore"}),
           did_click_learn_more);
-    }
-  }
-
-  // Record the permission action for the prediction service if the prediction
-  // is UNLIKELY or VERY_UNLIKELY. `predicted_grant_likelihood` is only
-  // populated by the prediction service for Notification and Geolocation
-  // permissions.
-  if (predicted_grant_likelihood.has_value() &&
-      (predicted_grant_likelihood.value() ==
-           PermissionPrediction_Likelihood_DiscretizedLikelihood_VERY_UNLIKELY ||
-       predicted_grant_likelihood.value() ==
-           PermissionPrediction_Likelihood_DiscretizedLikelihood_UNLIKELY) &&
-      ui_disposition != PermissionPromptDisposition::NONE_VISIBLE &&
-      ui_disposition != PermissionPromptDisposition::NOT_APPLICABLE) {
-    const char* prominence_string = GetProminenceString(ui_disposition);
-    std::string histogram_name = base::StrCat(
-        {"Permissions.PredictionService.Action.", permission_type, ".",
-         GetPredictionGrantLikelihoodString(predicted_grant_likelihood.value()),
-         ".", prominence_string});
-    base::UmaHistogramEnumeration(histogram_name, permission_action,
-                                  PermissionAction::NUM);
-  }
-
-  if (predicted_grant_likelihood.has_value() &&
-      (requests[0]->request_type() == RequestType::kGeolocation ||
-       requests[0]->request_type() == RequestType::kNotifications)) {
-    PermissionRequestGestureType gesture_type =
-        requests.size() == 1 ? requests[0]->GetGestureType()
-                             : PermissionRequestGestureType::UNKNOWN;
-    if (gesture_type != PermissionRequestGestureType::UNKNOWN) {
-      std::string gesture_suffix;
-      if (gesture_type == PermissionRequestGestureType::GESTURE) {
-        gesture_suffix = ".Gesture";
-      } else {
-        gesture_suffix = ".NoGesture";
-      }
-
-      PrefService* prefs = user_prefs::UserPrefs::Get(browser_context);
-      const bool is_msbb_enabled = prefs->GetBoolean(
-          unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled);
-
-      std::string histogram_name;
-      if (is_msbb_enabled) {
-        histogram_name = base::StrCat({"Permissions.PredictionService.",
-                                       permission_type, gesture_suffix});
-      } else {
-        histogram_name = base::StrCat({"Permissions.PredictionService.NoMSBB.",
-                                       permission_type, gesture_suffix});
-      }
-
-      base::UmaHistogramEnumeration(
-          histogram_name,
-          ConvertPredictionGrantLikelihoodToPermissionRequestLikelihood(
-              predicted_grant_likelihood.value()));
     }
   }
 
@@ -1468,12 +1325,6 @@ void PermissionUmaUtil::RecordPermissionAction(
     const GURL& requesting_origin,
     content::BrowserContext* browser_context,
     content::RenderFrameHost* render_frame_host,
-    std::optional<PermissionUiSelector::PredictionGrantLikelihood>
-        predicted_grant_likelihood,
-    std::optional<PermissionRequestRelevance> permission_request_relevance,
-    std::optional<permissions::PermissionAiRelevanceModel>
-        permission_ai_relevance_model,
-    std::optional<bool> prediction_decision_held_back,
     const PromptOptions& prompt_options,
     std::optional<GeolocationAccuracy> initial_geolocation_accuracy_selection,
     std::optional<GeolocationPromptType> geolocation_prompt_type,
@@ -1555,15 +1406,11 @@ void PermissionUmaUtil::RecordPermissionAction(
           .has_previously_revoked_permission =
               PermissionsClient::Get()->HasPreviouslyAutoRevokedPermission(
                   browser_context, requesting_origin, permission),
-          .predicted_grant_likelihood = predicted_grant_likelihood,
-          .permission_request_relevance = permission_request_relevance,
-          .permission_ai_relevance_model = permission_ai_relevance_model,
           .loud_ui_actions_counts_for_request_type =
               loud_ui_actions_counts_per_request_type,
           .loud_ui_actions_counts = loud_ui_actions_counts,
           .actions_counts_for_request_type = actions_counts_per_request_type,
           .actions_counts = actions_counts,
-          .prediction_decision_held_back = prediction_decision_held_back,
           .prompt_options = ukm_prompt_options,
           .initial_geolocation_accuracy_selection =
               initial_geolocation_accuracy_selection,
