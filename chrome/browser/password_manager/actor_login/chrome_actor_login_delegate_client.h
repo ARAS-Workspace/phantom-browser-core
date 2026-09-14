@@ -5,6 +5,8 @@
 #ifndef CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_CHROME_ACTOR_LOGIN_DELEGATE_CLIENT_H_
 #define CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_CHROME_ACTOR_LOGIN_DELEGATE_CLIENT_H_
 
+#include <string>
+
 #include "base/callback_list.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
@@ -21,10 +23,6 @@ namespace content {
 class Page;
 class WebContents;
 }  // namespace content
-
-namespace translate {
-class TranslateManager;
-}
 
 namespace actor_login {
 
@@ -54,7 +52,7 @@ class ChromeActorLoginDelegateClient
   GetPasswordManagerDriverForMainFrame() override;
   ukm::SourceId GetPageUkmSourceIdForMainFrame() override;
   url::Origin GetLastCommittedOriginForMainFrame() override;
-  translate::TranslateManager* GetTranslateManager() override;
+  std::string GetPageLanguage() override;
   ActorLoginPermissionCleaningService* GetPermissionCleaningService() override;
   std::unique_ptr<ActorLoginCredentialsFetcher>
   CreateFederatedCredentialsFetcher(

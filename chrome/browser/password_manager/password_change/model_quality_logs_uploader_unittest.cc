@@ -13,12 +13,13 @@
 #include "base/test/test_future.h"
 #include "chrome/browser/optimization_guide/mock_optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/autofill/core/browser/proto/password_requirements.pb.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/metrics/metrics_state_manager.h"
 #include "components/metrics/startup_visibility.h"
 #include "components/metrics/test/test_enabled_state_provider.h"
@@ -27,7 +28,6 @@
 #include "components/password_manager/core/browser/password_manager.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "components/variations/pref_names.h"
 #include "components/variations/service/test_variations_service.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -276,10 +276,12 @@ class ModelQualityLogsUploaderTest : public ChromeRenderViewHostTestHarness {
 
  protected:
   void SetLanguageForClient(const std::string& language) {
-    ChromeTranslateClient::FromWebContents(web_contents())
-        ->GetTranslateManager()
-        ->GetLanguageState()
-        ->SetSourceLanguage(language);
+    language_detection::LanguageDetectionHost::CreateForWebContents(
+        web_contents());
+    language_detection::LanguageDetectionDetails details;
+    details.adopted_language = language;
+    language_detection::LanguageDetectionHost::FromWebContents(web_contents())
+        ->LanguageDetermined(details);
   }
 
   void VerifyUniqueLoginAttemptLog(const std::string& expected_domain,
@@ -816,7 +818,6 @@ TEST_F(ModelQualityLogsUploaderTest, FormNotDetectedAfterOpening) {
 }
 
 TEST_F(ModelQualityLogsUploaderTest, LogGeneralInformationSetOnCreation) {
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   const std::string expected_language = "pt-br";
   const std::string expected_country = "US";
   SetLanguageForClient(expected_language);
@@ -831,7 +832,6 @@ TEST_F(ModelQualityLogsUploaderTest, LogGeneralInformationSetOnCreation) {
 }
 
 TEST_F(ModelQualityLogsUploaderTest, CompleteLogWithGeneralInformation) {
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   const std::string expected_language = "bd";
   const std::string expected_country = "PE";
   SetLanguageForClient(expected_language);

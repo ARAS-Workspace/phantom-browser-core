@@ -6,6 +6,7 @@
 #define COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_INTERNAL_ACTOR_LOGIN_DELEGATE_CLIENT_H_
 
 #include <memory>
+#include <string>
 
 #include "base/functional/callback_forward.h"
 #include "base/memory/weak_ptr.h"
@@ -16,10 +17,6 @@
 #include "url/origin.h"
 
 class PrefService;
-
-namespace translate {
-class TranslateManager;
-}
 
 namespace password_manager {
 class PasswordManagerClient;
@@ -71,8 +68,9 @@ class ActorLoginDelegateClient : public base::SupportsUserData {
   // Returns the last committed origin of the primary main frame of the page.
   virtual url::Origin GetLastCommittedOriginForMainFrame() = 0;
 
-  // Returns the translate manager associated with the profile.
-  virtual translate::TranslateManager* GetTranslateManager() = 0;
+  // Returns the language detected on the page, or the empty string when no
+  // language has been detected on it.
+  virtual std::string GetPageLanguage() = 0;
 
   // Returns the permission cleaning service associated with the profile.
   virtual ActorLoginPermissionCleaningService*

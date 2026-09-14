@@ -5,6 +5,7 @@
 #include "chrome/browser/compose/compose_enabling.h"
 
 #include <memory>
+#include <utility>
 
 #include "base/json/values_util.h"
 #include "base/memory/raw_ptr.h"
@@ -18,7 +19,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/test/base/testing_browser_process.h"
@@ -27,15 +27,10 @@
 #include "components/autofill/core/common/aliases.h"
 #include "components/compose/core/browser/compose_features.h"
 #include "components/compose/core/browser/config.h"
-#include "components/language/core/browser/language_model.h"
 #include "components/optimization_guide/core/optimization_guide_proto_util.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/supervised_user/core/common/pref_names.h"
 #include "components/supervised_user/core/common/supervised_user_constants.h"
-#include "components/translate/core/browser/language_state.h"
-#include "components/translate/core/browser/mock_translate_client.h"
-#include "components/translate/core/browser/mock_translate_driver.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "components/unified_consent/pref_names.h"
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -50,13 +45,6 @@ namespace {
 constexpr char kEmail[] = "example@gmail.com";
 constexpr char kExampleURL[] = "https://example.com";
 constexpr char kExampleBadURL[] = "chrome://version";
-using translate::testing::MockTranslateClient;
-
-class TestLanguageModel : public language::LanguageModel {
-  std::vector<LanguageDetails> GetLanguages() override {
-    return {LanguageDetails("en", 1.0)};
-  }
-};
 
 class CustomMockOptimizationGuideKeyedService
     : public MockOptimizationGuideKeyedService {
@@ -118,11 +106,6 @@ class ComposeEnablingTest : public ChromeRenderViewHostTestHarness {
          compose::features::kEnableComposeLanguageBypassForContextMenu,
          compose::features::kEnableComposeSavedStateNotification},
         {compose::features::kEnableComposeProactiveNudge});
-
-    mock_translate_client_ =
-        std::make_unique<MockTranslateClient>(&translate_driver_, nullptr);
-    translate_manager_ = std::make_unique<translate::TranslateManager>(
-        mock_translate_client_.get(), language_model_.get());
 
     NavigateAndCommit(GURL(kExampleURL));
     context_menu_params_.is_content_editable_for_autofill = true;
@@ -204,9 +187,7 @@ class ComposeEnablingTest : public ChromeRenderViewHostTestHarness {
   CustomMockOptimizationGuideKeyedService& opt_guide() { return *opt_guide_; }
 
  protected:
-  void SetLanguage(std::string lang) {
-    translate_manager_->GetLanguageState()->SetSourceLanguage(lang);
-  }
+  void SetLanguage(std::string lang) { page_language_ = std::move(lang); }
 
   TestingProfile* GetProfile() { return profile(); }
 
@@ -231,11 +212,7 @@ class ComposeEnablingTest : public ChromeRenderViewHostTestHarness {
   raw_ptr<testing::NiceMock<CustomMockOptimizationGuideKeyedService>>
       opt_guide_;
 
-  translate::testing::MockTranslateDriver translate_driver_;
-  std::unique_ptr<translate::testing::MockTranslateClient>
-      mock_translate_client_;
-  std::unique_ptr<TestLanguageModel> language_model_;
-  std::unique_ptr<translate::TranslateManager> translate_manager_;
+  std::string page_language_;
 
   std::unique_ptr<ComposeEnabling> compose_enabling_;
   ComposeEnabling::ScopedOverride scoped_skip_user_check_;
@@ -266,8 +243,8 @@ TEST_F(ComposeEnablingTest, NotSignedInTest) {
   // Check that the proactive nudge does not show.
   auto should_trigger = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL), /*is_msbb_enabled*/ true);
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL), /*is_msbb_enabled*/ true);
 
   EXPECT_EQ(should_trigger.error(), compose::ComposeShowStatus::kSignedOut);
 }
@@ -328,7 +305,7 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuDisabledTest) {
       {compose::features::kEnableCompose});
 
   EXPECT_FALSE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(),
+      GetProfile(), page_language_,
       /*rfh=*/GetRenderFrameHost(), context_menu_params_));
 }
 
@@ -345,18 +322,16 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuLanguageTest) {
   // Set the mock to return a language we support (English).
   SetLanguage("en");
   EXPECT_TRUE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
-  EXPECT_TRUE(
-      compose_enabling_->IsPageLanguageSupported(translate_manager_.get()));
+  EXPECT_TRUE(compose_enabling_->IsPageLanguageSupported(page_language_));
 
   // Set the mock to return a language we don't support (Esperanto).
   SetLanguage("eo");
   EXPECT_FALSE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
-  EXPECT_FALSE(
-      compose_enabling_->IsPageLanguageSupported(translate_manager_.get()));
+  EXPECT_FALSE(compose_enabling_->IsPageLanguageSupported(page_language_));
 }
 
 TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuLanguageBypassTest) {
@@ -369,10 +344,9 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuLanguageBypassTest) {
   // Although the language is unsupported, ShouldTrigger should return true as
   // the bypass is enabled.
   EXPECT_TRUE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
-  EXPECT_FALSE(
-      compose_enabling_->IsPageLanguageSupported(translate_manager_.get()));
+  EXPECT_FALSE(compose_enabling_->IsPageLanguageSupported(page_language_));
 }
 
 TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuEmptyLanguageTest) {
@@ -385,14 +359,13 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuEmptyLanguageTest) {
   auto scoped_compose_enabled =
       ComposeEnabling::ScopedEnableComposeForTesting();
 
-  // Set the mock to return the empty string, simluating that translate doesn't
-  // have the answer yet.
+  // Use the empty string, simulating a page whose language has not been
+  // determined yet.
   SetLanguage("");
   EXPECT_TRUE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
-  EXPECT_TRUE(
-      compose_enabling_->IsPageLanguageSupported(translate_manager_.get()));
+  EXPECT_TRUE(compose_enabling_->IsPageLanguageSupported(page_language_));
 }
 
 TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuUndeterminedLangugeTest) {
@@ -405,14 +378,12 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuUndeterminedLangugeTest) {
   auto scoped_compose_enabled =
       ComposeEnabling::ScopedEnableComposeForTesting();
 
-  // Set the mock to return "und", simluating that translate could not determine
-  // the page language.
+  // Use "und", simulating a page whose language could not be determined.
   SetLanguage("und");
   EXPECT_TRUE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
-  EXPECT_TRUE(
-      compose_enabling_->IsPageLanguageSupported(translate_manager_.get()));
+  EXPECT_TRUE(compose_enabling_->IsPageLanguageSupported(page_language_));
 }
 
 TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuFieldTypeTest) {
@@ -427,7 +398,7 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuFieldTypeTest) {
       blink::mojom::FormControlType::kInputButton;
 
   EXPECT_FALSE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
 }
 
@@ -441,7 +412,7 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuIncorrectSchemeTest) {
   auto* rfh = main_rfh();
 
   EXPECT_FALSE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), rfh, context_menu_params_));
+      GetProfile(), page_language_, rfh, context_menu_params_));
 }
 
 TEST_F(ComposeEnablingTest,
@@ -451,7 +422,7 @@ TEST_F(ComposeEnablingTest,
       ComposeEnabling::ScopedEnableComposeForTesting();
 
   EXPECT_TRUE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
 }
 
@@ -466,7 +437,7 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuAllEnabledTextAreaTest) {
       blink::mojom::FormControlType::kTextArea;
 
   EXPECT_TRUE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
 }
 
@@ -483,8 +454,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerPopupDefaultTest) {
                    ->ShouldTriggerNoStatePopup(
                        autocomplete_attribute,
                        /*allows_writing_suggestions=*/true, GetProfile(),
-                       GetProfile()->GetPrefs(), translate_manager_.get(),
-                       GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                       GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                       GetOrigin(), GURL(kExampleURL),
                        /*is_msbb_enabled*/ true)
                    .has_value());
 }
@@ -520,8 +491,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerPopupLanguageTests) {
                    ->ShouldTriggerNoStatePopup(
                        autocomplete_attribute,
                        /*allows_writing_suggestions=*/true, GetProfile(),
-                       GetProfile()->GetPrefs(), translate_manager_.get(),
-                       GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                       GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                       GetOrigin(), GURL(kExampleURL),
                        /*is_msbb_enabled*/ true)
                    .has_value());
 
@@ -535,8 +506,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerPopupLanguageTests) {
                   ->ShouldTriggerNoStatePopup(
                       autocomplete_attribute,
                       /*allows_writing_suggestions=*/true, GetProfile(),
-                      GetProfile()->GetPrefs(), translate_manager_.get(),
-                      GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                      GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                      GetOrigin(), GURL(kExampleURL),
                       /*is_msbb_enabled*/ true)
                   .has_value());
 
@@ -550,8 +521,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerPopupLanguageTests) {
                   ->ShouldTriggerNoStatePopup(
                       autocomplete_attribute,
                       /*allows_writing_suggestions=*/true, GetProfile(),
-                      GetProfile()->GetPrefs(), translate_manager_.get(),
-                      GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                      GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                      GetOrigin(), GURL(kExampleURL),
                       /*is_msbb_enabled*/ true)
                   .has_value());
 }
@@ -572,8 +543,8 @@ TEST_F(ComposeEnablingTest, ShouldNotTriggerProactivePopupAutocompleteOffTest) {
   // The autocomplete attribute is checked for the proactive nudge.
   auto should_trigger = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL),
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL),
       /*is_msbb_enabled*/ true);
 
   EXPECT_EQ(should_trigger.error(),
@@ -592,8 +563,8 @@ TEST_F(ComposeEnablingTest, ShouldNotTriggerProactivePopupIfMSBBDisabled) {
   // The proactive nudge does not show when msbb is disabled.
   auto should_trigger = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL),
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL),
       /*is_msbb_enabled=*/false);
   ASSERT_EQ(should_trigger.error(),
             compose::ComposeShowStatus::kProactiveNudgeDisabledByMSBB);
@@ -603,8 +574,8 @@ TEST_F(ComposeEnablingTest, ShouldNotTriggerProactivePopupIfMSBBDisabled) {
                   ->ShouldTriggerNoStatePopup(
                       autocomplete_attribute,
                       /*allows_writing_suggestions=*/true, GetProfile(),
-                      GetProfile()->GetPrefs(), translate_manager_.get(),
-                      GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                      GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                      GetOrigin(), GURL(kExampleURL),
                       /*is_msbb_enabled=*/true)
                   .has_value());
 }
@@ -633,8 +604,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerPopupWithSavedStateTest) {
                   ->ShouldTriggerNoStatePopup(
                       autocomplete_attribute,
                       /*allows_writing_suggestions=*/true, GetProfile(),
-                      GetProfile()->GetPrefs(), translate_manager_.get(),
-                      GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                      GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                      GetOrigin(), GURL(kExampleURL),
                       /*is_msbb_enabled*/ true)
                   .has_value());
   }
@@ -694,8 +665,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerPopupIncorrectSchemeTest) {
   // Use URL with incorrect scheme is checked when no previous state.
   auto should_trigger = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      url::Origin(), GURL(kExampleBadURL),
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), url::Origin(),
+      GURL(kExampleBadURL),
       /*is_msbb_enabled*/ true);
   ASSERT_EQ(should_trigger.error(),
             compose::ComposeShowStatus::kIncorrectScheme);
@@ -717,8 +688,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerPopupCrossOrigin) {
                    ->ShouldTriggerNoStatePopup(
                        autocomplete_attribute,
                        /*allows_writing_suggestions=*/true, GetProfile(),
-                       GetProfile()->GetPrefs(), translate_manager_.get(),
-                       GetOrigin(), url::Origin(), GURL(kExampleURL),
+                       GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                       url::Origin(), GURL(kExampleURL),
                        /*is_msbb_enabled*/ true)
                    .has_value());
 }
@@ -731,7 +702,7 @@ TEST_F(ComposeEnablingTest, ShouldTriggerContextMenuCrossOrigin) {
 
   context_menu_params_.frame_origin = url::Origin();
   EXPECT_FALSE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
 
   // Check that a response result OK metric was emitted.
@@ -855,7 +826,7 @@ TEST_F(ComposeEnablingTest, ShouldTriggerDisableComposeByPolicyTest) {
               optimization_guide::OptimizationGuideDecision::kTrue)));
 
   EXPECT_FALSE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
 
   // Check that the proactive nudge is also disabled.
@@ -863,8 +834,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerDisableComposeByPolicyTest) {
                    ->ShouldTriggerNoStatePopup(
                        autocomplete_attribute,
                        /*allows_writing_suggestions=*/true, GetProfile(),
-                       GetProfile()->GetPrefs(), translate_manager_.get(),
-                       GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                       GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                       GetOrigin(), GURL(kExampleURL),
                        /*is_msbb_enabled*/ true)
                    .has_value());
 
@@ -912,7 +883,7 @@ TEST_F(ComposeEnablingTest, ShouldTriggerDisableNudgeByPolicy) {
 
   // The context is not disabled.
   EXPECT_TRUE(compose_enabling_->ShouldTriggerContextMenu(
-      GetProfile(), translate_manager_.get(), /*rfh=*/GetRenderFrameHost(),
+      GetProfile(), page_language_, /*rfh=*/GetRenderFrameHost(),
       context_menu_params_));
 
   // The saved state nudge is not disabled.
@@ -924,8 +895,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerDisableNudgeByPolicy) {
                    ->ShouldTriggerNoStatePopup(
                        autocomplete_attribute,
                        /*allows_writing_suggestions=*/true, GetProfile(),
-                       GetProfile()->GetPrefs(), translate_manager_.get(),
-                       GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                       GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                       GetOrigin(), GURL(kExampleURL),
                        /*is_msbb_enabled*/ true)
                    .has_value());
   // Check that the proactive nudge is not disabled if override is set in the
@@ -936,8 +907,8 @@ TEST_F(ComposeEnablingTest, ShouldTriggerDisableNudgeByPolicy) {
                   ->ShouldTriggerNoStatePopup(
                       autocomplete_attribute,
                       /*allows_writing_suggestions=*/true, GetProfile(),
-                      GetProfile()->GetPrefs(), translate_manager_.get(),
-                      GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                      GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                      GetOrigin(), GURL(kExampleURL),
                       /*is_msbb_enabled*/ true)
                   .has_value());
 }
@@ -955,8 +926,8 @@ TEST_F(ComposeEnablingTest, ProactiveNudgeGlobalPreferenceTest) {
                   ->ShouldTriggerNoStatePopup(
                       autocomplete_attribute,
                       /*allows_writing_suggestions=*/true, GetProfile(),
-                      GetProfile()->GetPrefs(), translate_manager_.get(),
-                      GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                      GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                      GetOrigin(), GURL(kExampleURL),
                       /*is_msbb_enabled*/ true)
                   .has_value());
 
@@ -964,8 +935,8 @@ TEST_F(ComposeEnablingTest, ProactiveNudgeGlobalPreferenceTest) {
   SetProactiveNudgePref(false);
   auto should_trigger = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL),
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL),
       /*is_msbb_enabled*/ true);
   EXPECT_EQ(should_trigger.error(),
             compose::ComposeShowStatus::
@@ -986,8 +957,8 @@ TEST_F(ComposeEnablingTest, ProactiveNudgeDisabledSitesPreferenceTest) {
                   ->ShouldTriggerNoStatePopup(
                       autocomplete_attribute,
                       /*allows_writing_suggestions=*/true, GetProfile(),
-                      GetProfile()->GetPrefs(), translate_manager_.get(),
-                      GetOrigin(), GetOrigin(), GURL(kExampleURL),
+                      GetProfile()->GetPrefs(), page_language_, GetOrigin(),
+                      GetOrigin(), GURL(kExampleURL),
                       /*is_msbb_enabled*/ true)
                   .has_value());
 
@@ -996,8 +967,8 @@ TEST_F(ComposeEnablingTest, ProactiveNudgeDisabledSitesPreferenceTest) {
   AddDomainToProactiveNudgeDisabledSitesPref();
   auto should_trigger = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL),
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL),
       /*is_msbb_enabled*/ true);
   EXPECT_EQ(should_trigger.error(),
             compose::ComposeShowStatus::
@@ -1060,8 +1031,8 @@ TEST_F(ComposeEnablingTest,
   std::string autocomplete_attribute;
   auto no_state_status = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL), /*is_msbb_enabled*/ true);
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL), /*is_msbb_enabled*/ true);
   EXPECT_THAT(no_state_status,
               ErrorIs(compose::ComposeShowStatus::kComposeNotEnabledInCountry));
 }
@@ -1079,8 +1050,8 @@ TEST_F(ComposeEnablingTest, ClientCountryUndefinedForProactiveNudge) {
   std::string autocomplete_attribute;
   auto no_state_status = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL), /*is_msbb_enabled*/ true);
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL), /*is_msbb_enabled*/ true);
   EXPECT_THAT(no_state_status,
               ErrorIs(compose::ComposeShowStatus::kUndefinedCountry));
 }
@@ -1098,8 +1069,8 @@ TEST_F(ComposeEnablingTest, AnyAndAllCountriesAllowedForProactiveNudge) {
   std::string autocomplete_attribute;
   auto no_state_status = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL), /*is_msbb_enabled*/ true);
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL), /*is_msbb_enabled*/ true);
   // If the country check passes the signed out check will fail next.
   EXPECT_THAT(no_state_status, ErrorIs(compose::ComposeShowStatus::kSignedOut));
 
@@ -1109,8 +1080,8 @@ TEST_F(ComposeEnablingTest, AnyAndAllCountriesAllowedForProactiveNudge) {
 
   no_state_status = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL), /*is_msbb_enabled*/ true);
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL), /*is_msbb_enabled*/ true);
   EXPECT_THAT(no_state_status, ErrorIs(compose::ComposeShowStatus::kSignedOut));
 
   // Replace the client country override with an undefined country.
@@ -1119,7 +1090,7 @@ TEST_F(ComposeEnablingTest, AnyAndAllCountriesAllowedForProactiveNudge) {
 
   no_state_status = compose_enabling_->ShouldTriggerNoStatePopup(
       autocomplete_attribute, /*allows_writing_suggestions=*/true, GetProfile(),
-      GetProfile()->GetPrefs(), translate_manager_.get(), GetOrigin(),
-      GetOrigin(), GURL(kExampleURL), /*is_msbb_enabled*/ true);
+      GetProfile()->GetPrefs(), page_language_, GetOrigin(), GetOrigin(),
+      GURL(kExampleURL), /*is_msbb_enabled*/ true);
   EXPECT_THAT(no_state_status, ErrorIs(compose::ComposeShowStatus::kSignedOut));
 }

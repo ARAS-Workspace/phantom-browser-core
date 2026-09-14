@@ -30,7 +30,6 @@
 #include "chrome/browser/resource_coordinator/lifecycle_unit_state.mojom-forward.h"
 #include "chrome/browser/resource_coordinator/utils.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/translate/translate_service.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
@@ -50,7 +49,6 @@
 #include "components/sessions/content/session_tab_helper.h"
 #include "components/tabs/public/split_tab_data.h"
 #include "components/tabs/public/tab_interface.h"
-#include "components/translate/core/browser/language_state.h"
 #include "components/zoom/zoom_controller.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
@@ -3449,16 +3447,15 @@ TabsDetectLanguageFunction::StartLanguageDetection(
     content::WebContents* contents) {
   AddRef();  // Balanced in RespondWithLanguage().
 
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(contents);
-  if (!chrome_translate_client->GetLanguageState().source_language().empty()) {
+  std::string adopted_language =
+      language_detection::GetAdoptedLanguage(contents);
+  if (!adopted_language.empty()) {
     // Delay the callback invocation until after the current JS call has
     // returned.
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE,
-        base::BindOnce(
-            &TabsDetectLanguageFunction::RespondWithLanguage, this,
-            chrome_translate_client->GetLanguageState().source_language()));
+        base::BindOnce(&TabsDetectLanguageFunction::RespondWithLanguage, this,
+                       std::move(adopted_language)));
     return RespondLater();
   }
 

@@ -206,5 +206,5 @@ IN_PROC_BROWSER_TEST_F(ComposeEnablingWithFencedFramesBrowserTest,
   params.is_content_editable_for_autofill = true;
   params.frame_origin = fenced_child1->GetLastCommittedOrigin();
   EXPECT_FALSE(client->GetComposeEnabling().ShouldTriggerContextMenu(
-      browser()->GetProfile(), nullptr, fenced_child1, params));
+      browser()->GetProfile(), /*page_language=*/"", fenced_child1, params));
 }

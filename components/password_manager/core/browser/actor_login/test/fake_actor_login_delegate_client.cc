@@ -4,6 +4,7 @@
 
 #include "components/password_manager/core/browser/actor_login/test/fake_actor_login_delegate_client.h"
 
+#include <string>
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
@@ -82,9 +83,8 @@ url::Origin FakeActorLoginDelegateClient::GetLastCommittedOriginForMainFrame() {
   return origin_;
 }
 
-translate::TranslateManager*
-FakeActorLoginDelegateClient::GetTranslateManager() {
-  return nullptr;
+std::string FakeActorLoginDelegateClient::GetPageLanguage() {
+  return std::string();
 }
 
 ActorLoginPermissionCleaningService*

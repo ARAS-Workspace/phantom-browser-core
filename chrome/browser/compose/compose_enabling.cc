@@ -262,7 +262,7 @@ ComposeEnabling::ShouldTriggerNoStatePopup(
     bool allows_writing_suggestions,
     Profile* profile,
     PrefService* prefs,
-    translate::TranslateManager* translate_manager,
+    const std::string& page_language,
     const url::Origin& top_level_frame_origin,
     const url::Origin& element_frame_origin,
     GURL url,
@@ -285,15 +285,15 @@ ComposeEnabling::ShouldTriggerNoStatePopup(
   // entry point.
   bool is_in_fenced_frame = false;
   if (auto page_checks =
-          PageLevelChecks(translate_manager, url, top_level_frame_origin,
-                          element_frame_origin, is_in_fenced_frame);
+          PageLevelChecks(url, top_level_frame_origin, element_frame_origin,
+                          is_in_fenced_frame);
       !page_checks.has_value()) {
     return base::unexpected(page_checks.error());
   }
 
   // The no state popup should not show for unsupported languages even if the
   // language bypass feature is enabled.
-  if (!IsPageLanguageSupported(translate_manager)) {
+  if (!IsPageLanguageSupported(page_language)) {
     DVLOG(2) << "language not supported";
     return base::unexpected(compose::ComposeShowStatus::kUnsupportedLanguage);
   }
@@ -379,7 +379,7 @@ bool ComposeEnabling::ShouldTriggerSavedStatePopup(
 
 bool ComposeEnabling::ShouldTriggerContextMenu(
     Profile* profile,
-    translate::TranslateManager* translate_manager,
+    const std::string& page_language,
     content::RenderFrameHost* rfh,
     content::ContextMenuParams& params) {
   // Make sure the underlying field is one the feature works for.
@@ -407,9 +407,9 @@ bool ComposeEnabling::ShouldTriggerContextMenu(
     return false;
   }
 
-  auto show_status = PageLevelChecks(
-      translate_manager, url, rfh->GetMainFrame()->GetLastCommittedOrigin(),
-      params.frame_origin, rfh->IsNestedWithinFencedFrame());
+  auto show_status =
+      PageLevelChecks(url, rfh->GetMainFrame()->GetLastCommittedOrigin(),
+                      params.frame_origin, rfh->IsNestedWithinFencedFrame());
   if (!show_status.has_value()) {
     compose::LogComposeContextMenuShowStatus(show_status.error());
     DVLOG(2) << "page level checks failed";
@@ -418,7 +418,7 @@ bool ComposeEnabling::ShouldTriggerContextMenu(
 
   if (!base::FeatureList::IsEnabled(
           compose::features::kEnableComposeLanguageBypassForContextMenu) &&
-      !IsPageLanguageSupported(translate_manager)) {
+      !IsPageLanguageSupported(page_language)) {
     DVLOG(2) << "language not supported";
     compose::LogComposeContextMenuShowStatus(
         compose::ComposeShowStatus::kUnsupportedLanguage);
@@ -431,8 +431,7 @@ bool ComposeEnabling::ShouldTriggerContextMenu(
 }
 
 base::expected<void, compose::ComposeShowStatus>
-ComposeEnabling::PageLevelChecks(translate::TranslateManager* translate_manager,
-                                 GURL url,
+ComposeEnabling::PageLevelChecks(GURL url,
                                  const url::Origin& top_level_frame_origin,
                                  const url::Origin& element_frame_origin,
                                  bool is_nested_within_fenced_frame) {
@@ -468,17 +467,12 @@ ComposeEnabling::PageLevelChecks(translate::TranslateManager* translate_manager,
 }
 
 bool ComposeEnabling::IsPageLanguageSupported(
-    translate::TranslateManager* translate_manager) {
-  std::string page_language =
-      translate_manager
-          ? translate_manager->GetLanguageState()->source_language()
-          : "";
-
+    const std::string& page_language) {
   // TODO(b/307814938): Make this finch configurable.
   // Only English is supported for MVP, we will add more languages over time.
-  // We accept the empty string which might be returned if the translate system
-  // has not yet deterimed the language, and "und" which means translate
-  // couldn't find an answer.
+  // We accept the empty string which is what a page whose language has not
+  // been determined yet reads as, and "und" which means the detection could
+  // not find an answer.
   return (page_language == "en" || page_language == "und" ||
           page_language.empty());
 }

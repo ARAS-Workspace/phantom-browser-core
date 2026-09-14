@@ -12,9 +12,9 @@
 #include "chrome/browser/password_manager/actor_login/internal/actor_login_federated_credentials_fetcher.h"
 #include "chrome/browser/password_manager/actor_login/internal/actor_login_siwg_controller.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/common/buildflags.h"
+#include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/password_manager/content/browser/content_password_manager_driver.h"
 #include "components/password_manager/content/browser/content_password_manager_driver_factory.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_web_content_interface.h"
@@ -79,9 +79,8 @@ ChromeActorLoginDelegateClient::GetLastCommittedOriginForMainFrame() {
   return GetWebContents().GetPrimaryMainFrame()->GetLastCommittedOrigin();
 }
 
-translate::TranslateManager*
-ChromeActorLoginDelegateClient::GetTranslateManager() {
-  return ChromeTranslateClient::GetManagerFromWebContents(&GetWebContents());
+std::string ChromeActorLoginDelegateClient::GetPageLanguage() {
+  return language_detection::GetAdoptedLanguage(&GetWebContents());
 }
 
 ActorLoginPermissionCleaningService*

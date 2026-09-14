@@ -5,9 +5,11 @@
 #ifndef COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_ACTOR_LOGIN_QUALITY_LOGGER_INTERFACE_H_
 #define COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_ACTOR_LOGIN_QUALITY_LOGGER_INTERFACE_H_
 
+#include <string>
+
 #include "components/optimization_guide/proto/features/actor_login.pb.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_types.h"
-#include "components/translate/core/browser/translate_manager.h"
+#include "url/gurl.h"
 
 namespace optimization_guide {
 class ModelQualityLogsUploaderService;
@@ -24,9 +26,8 @@ class ActorLoginQualityLoggerInterface {
  public:
   virtual ~ActorLoginQualityLoggerInterface() = default;
 
-  virtual void SetDomainAndLanguage(
-      translate::TranslateManager* translate_manager,
-      const GURL& url) = 0;
+  virtual void SetDomainAndLanguage(const std::string& page_language,
+                                    const GURL& url) = 0;
   virtual void SetGetCredentialsDetails(
       optimization_guide::proto::ActorLoginQuality_GetCredentialsDetails
           get_credentials_details) = 0;

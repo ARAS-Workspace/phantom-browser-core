@@ -5,10 +5,11 @@
 #ifndef COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_TEST_MOCK_ACTOR_LOGIN_QUALITY_LOGGER_H_
 #define COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_TEST_MOCK_ACTOR_LOGIN_QUALITY_LOGGER_H_
 
+#include <string>
+
 #include "components/optimization_guide/core/model_quality/model_quality_logs_uploader_service.h"
 #include "components/optimization_guide/proto/features/actor_login.pb.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_quality_logger_interface.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
 namespace actor_login {
@@ -19,7 +20,7 @@ class MockActorLoginQualityLogger : public ActorLoginQualityLoggerInterface {
 
   MOCK_METHOD(void,
               SetDomainAndLanguage,
-              (translate::TranslateManager*, const GURL&),
+              (const std::string&, const GURL&),
               (override));
   MOCK_METHOD(
       void,

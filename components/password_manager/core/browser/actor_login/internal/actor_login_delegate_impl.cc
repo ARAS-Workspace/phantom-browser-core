@@ -112,8 +112,7 @@ void ActorLoginDelegateImpl::GetCredentials(
   const url::Origin request_origin =
       actor_login_delegate_client_->GetLastCommittedOriginForMainFrame();
   mqls_logger->SetDomainAndLanguage(
-      actor_login_delegate_client_->GetTranslateManager(),
-      request_origin.GetURL());
+      actor_login_delegate_client_->GetPageLanguage(), request_origin.GetURL());
 
   std::vector<std::unique_ptr<ActorLoginCredentialsFetcher>> fetchers;
 
@@ -196,7 +195,7 @@ void ActorLoginDelegateImpl::AttemptLogin(
   const url::Origin origin =
       actor_login_delegate_client_->GetLastCommittedOriginForMainFrame();
   mqls_logger->SetDomainAndLanguage(
-      actor_login_delegate_client_->GetTranslateManager(), origin.GetURL());
+      actor_login_delegate_client_->GetPageLanguage(), origin.GetURL());
 
   if (!metrics_helper_) {
     metrics_helper_ = std::make_unique<ActorLoginMetricsHelper>(

@@ -8,7 +8,6 @@
 
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
-#include "components/language/core/browser/language_model.h"
 #include "components/metrics/metrics_state_manager.h"
 #include "components/metrics/startup_visibility.h"
 #include "components/metrics/test/test_enabled_state_provider.h"
@@ -16,17 +15,12 @@
 #include "components/optimization_guide/core/model_quality/test_model_quality_logs_uploader_service.h"
 #include "components/optimization_guide/proto/features/actor_login.pb.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/translate/core/browser/mock_translate_client.h"
-#include "components/translate/core/browser/mock_translate_driver.h"
 #include "components/variations/pref_names.h"
 #include "components/variations/service/test_variations_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace {
-using translate::testing::MockTranslateClient;
-using translate::testing::MockTranslateDriver;
-
 using ActorLoginQuality = optimization_guide::proto::ActorLoginQuality;
 using GetCredentialsDetails =
     optimization_guide::proto::ActorLoginQuality_GetCredentialsDetails;
@@ -44,11 +38,6 @@ MATCHER_P(ProtoEquals, expected_message, "") {
   arg.SerializeToString(&actual_serialized);
   return expected_serialized == actual_serialized;
 }
-class FakeLanguageModel : public language::LanguageModel {
-  std::vector<LanguageDetails> GetLanguages() override {
-    return {LanguageDetails("en", 1.0)};
-  }
-};
 
 void VerifyUniqueLogDetails(
     const std::vector<
@@ -213,18 +202,10 @@ TEST_F(ActorLoginQualityLoggerTest,
 TEST_F(ActorLoginQualityLoggerTest, SetsDomainAndLanguage) {
   ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
-  translate::testing::MockTranslateDriver translate_driver;
-  auto mock_translate_client =
-      std::make_unique<MockTranslateClient>(&translate_driver, nullptr);
-  auto language_model = std::make_unique<FakeLanguageModel>();
-  auto translate_manager = std::make_unique<translate::TranslateManager>(
-      mock_translate_client.get(), language_model.get());
-  translate_manager->GetLanguageState()->SetSourceLanguage("en-us");
-
   const GURL url1("https://subdomain.example.com/login");
   const GURL url2("https://someotherdomain.com");
-  logger.SetDomainAndLanguage(translate_manager.get(), url1);
-  logger.SetDomainAndLanguage(translate_manager.get(), url2);
+  logger.SetDomainAndLanguage("en-us", url1);
+  logger.SetDomainAndLanguage("en-us", url2);
 
   // Only the first domain should be recorded and only the eTLD+1.
   ActorLoginQuality expected_log;

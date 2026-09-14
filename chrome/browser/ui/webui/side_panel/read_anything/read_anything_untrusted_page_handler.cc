@@ -1355,29 +1355,26 @@ void ReadAnythingUntrustedPageHandler::OnActiveAXTreeIDChanged() {
 
   // Observe the new contents so we can get the page language once it's
   // determined.
-  if (ChromeTranslateClient* translate_client =
-          ChromeTranslateClient::FromWebContents(contents)) {
-    language_detection::LanguageDetectionHost::CreateForWebContents(contents);
-    language_detection::LanguageDetectionDriver* driver =
-        language_detection::LanguageDetectionHost::FromWebContents(contents);
-    const std::string& source_language =
-        translate_client->GetLanguageState().source_language();
-    // If we're not already observing these web contents, then observe them so
-    // we can get a callback when the language is determined. Otherwise, we
-    // just set the language directly.
-    if (!translate_observation_.IsObservingSource(driver)) {
-      translate_observation_.Reset();
-      translate_observation_.Observe(driver);
-      // The language may have already been determined before (and then
-      // unobserved), so send the language if it's not empty. If the language
-      // is outdated, we'll receive a call in OnLanguageDetermined and send
-      // the updated lang there.
-      if (!source_language.empty()) {
-        SetLanguageCode(source_language);
-      }
-    } else {
+  language_detection::LanguageDetectionHost::CreateForWebContents(contents);
+  language_detection::LanguageDetectionDriver* driver =
+      language_detection::LanguageDetectionHost::FromWebContents(contents);
+  const std::string source_language =
+      language_detection::GetAdoptedLanguage(contents);
+  // If we're not already observing these web contents, then observe them so
+  // we can get a callback when the language is determined. Otherwise, we
+  // just set the language directly.
+  if (!translate_observation_.IsObservingSource(driver)) {
+    translate_observation_.Reset();
+    translate_observation_.Observe(driver);
+    // The language may have already been determined before (and then
+    // unobserved), so send the language if it's not empty. If the language
+    // is outdated, we'll receive a call in OnLanguageDetermined and send
+    // the updated lang there.
+    if (!source_language.empty()) {
       SetLanguageCode(source_language);
     }
+  } else {
+    SetLanguageCode(source_language);
   }
 
 #if BUILDFLAG(ENABLE_PDF)

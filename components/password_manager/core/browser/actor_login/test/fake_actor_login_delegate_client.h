@@ -6,6 +6,7 @@
 #define COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_TEST_FAKE_ACTOR_LOGIN_DELEGATE_CLIENT_H_
 
 #include <memory>
+#include <string>
 
 #include "base/functional/callback_forward.h"
 #include "base/memory/raw_ptr.h"
@@ -50,7 +51,7 @@ class FakeActorLoginDelegateClient : public ActorLoginDelegateClient {
   GetPasswordManagerDriverForMainFrame() override;
   ukm::SourceId GetPageUkmSourceIdForMainFrame() override;
   url::Origin GetLastCommittedOriginForMainFrame() override;
-  translate::TranslateManager* GetTranslateManager() override;
+  std::string GetPageLanguage() override;
   ActorLoginPermissionCleaningService* GetPermissionCleaningService() override;
   std::unique_ptr<ActorLoginCredentialsFetcher>
   CreateFederatedCredentialsFetcher(
