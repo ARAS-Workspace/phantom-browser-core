@@ -12,11 +12,9 @@
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
 #include "chrome/browser/ui/views/page_action/page_action_view.h"
 #include "chrome/browser/ui/views/page_action/test_support/page_action_test_support.h"
-#include "chrome/browser/ui/views/translate/partial_translate_bubble_view.h"
 #include "chrome/browser/ui/views/translate/translate_bubble_controller.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/in_process_browser_test.h"
-#include "chrome/test/base/interactive_test_utils.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "content/public/test/browser_test.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -53,11 +51,6 @@ class TranslatePageActionInteractiveUiTest : public InProcessBrowserTest {
     return TranslateBubbleController::From(browser())->GetTranslateBubble();
   }
 
-  PartialTranslateBubbleView* GetPartialTranslateBubble() {
-    return TranslateBubbleController::From(browser())
-        ->GetPartialTranslateBubble();
-  }
-
   std::unique_ptr<views::Widget> CreateTestWidget(
       views::Widget::InitParams::Ownership ownership) {
     auto widget = std::make_unique<views::Widget>();
@@ -77,42 +70,6 @@ class TranslatePageActionInteractiveUiTest : public InProcessBrowserTest {
     return widget;
   }
 };
-
-// Verifies that clicking the Translate icon closes the Partial Translate bubble
-// and results in neither of the two Translate bubbles being shown.
-IN_PROC_BROWSER_TEST_F(TranslatePageActionInteractiveUiTest,
-                       ClosePartialTranslateBubble) {
-  // Show the Translate icon.
-  ChromeTranslateClient::FromWebContents(
-      browser()->tab_strip_model()->GetActiveWebContents())
-      ->GetTranslateManager()
-      ->GetLanguageState()
-      ->SetTranslateEnabled(true);
-  auto* translate_icon = GetTranslateIcon();
-  EXPECT_THAT(translate_icon, ::testing::NotNull());
-
-  TranslateBubbleController* controller =
-      TranslateBubbleController::From(browser());
-  auto anchor_widget =
-      CreateTestWidget(views::Widget::InitParams::CLIENT_OWNS_WIDGET);
-  views::View* anchor_view = anchor_widget->GetContentsView();
-  controller->SetAnchorViewForTesting(anchor_view);
-  controller->StartPartialTranslate("fr", "en", std::u16string());
-  base::RunLoop().RunUntilIdle();
-  EXPECT_THAT(GetPartialTranslateBubble(), ::testing::NotNull());
-
-  // Clicking the icon should close the Partial Translate bubble and should not
-  // open the Full Page Translate bubble.
-  base::RunLoop loop;
-  ui_test_utils::MoveMouseToCenterAndClick(translate_icon, ui_controls::LEFT,
-                                           ui_controls::DOWN | ui_controls::UP,
-                                           loop.QuitClosure());
-  loop.Run();
-
-  EXPECT_THAT(GetPartialTranslateBubble(), ::testing::IsNull());
-  EXPECT_THAT(GetBubble(), ::testing::IsNull());
-  controller->SetAnchorViewForTesting(nullptr);
-}
 
 IN_PROC_BROWSER_TEST_F(TranslatePageActionInteractiveUiTest,
                        IconViewAccessibleName) {

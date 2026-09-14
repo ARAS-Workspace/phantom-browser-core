@@ -126,8 +126,6 @@
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/tabs/split_view_layout_menu_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/translate/partial_translate_bubble_model.h"
-#include "chrome/browser/ui/translate/translate_controller.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
@@ -553,7 +551,7 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        // Removed: {IDC_FOLLOW, 119},
        // Removed: {IDC_UNFOLLOW, 120},
        // Removed: {IDC_CONTENT_CONTEXT_AUTOFILL_CUSTOM_FIRST, 121},
-       {IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE, 123},
+       // Removed: {IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE, 123},
        // Removed: {IDC_CONTENT_CONTEXT_ADD_A_NOTE, 124},
        {IDC_LIVE_CAPTION, 125},
        // Removed: {IDC_CONTENT_CONTEXT_PDF_OCR, 126},
@@ -1312,21 +1310,10 @@ void RenderViewContextMenu::InitMenu() {
     }
   }
 
-  if (content_type_->SupportsGroup(
-          ContextMenuContentType::ITEM_GROUP_PARTIAL_TRANSLATE) &&
-      !features::IsMenuSimplificationEnabled() &&
+  if (!features::IsMenuSimplificationEnabled() &&
       search::DefaultSearchProviderIsGoogle(GetProfile()) &&
       CanTranslate(/*menu_logging=*/false)) {
-    // If the target language isn't supported in partial translation, fall
-    // back to showing the full page translate menu item. Partial translate
-    // uses a different backend that supports a subset of translation
-    // languages, so the current full page target language may not be
-    // supported.
-    if (CanPartiallyTranslateTargetLanguage()) {
-      AppendPartialTranslateItem();
-    } else {
-      AppendTranslateItem();
-    }
+    AppendTranslateItem();
   }
 
   // Spell check, language settings, and writing direction.
@@ -2473,41 +2460,6 @@ void RenderViewContextMenu::AppendPrintItem() {
 #endif  // BUILDFLAG(ENABLE_PRINTING)
 }
 
-void RenderViewContextMenu::AppendPartialTranslateItem() {
-  const bool is_menu_simplification_enabled =
-      features::IsMenuSimplificationEnabled();
-  if (is_menu_simplification_enabled && IsPasswordField()) {
-    return;
-  }
-
-  const std::u16string printable_selection_text = PrintableSelectionText();
-  std::u16string label;
-
-  if (is_menu_simplification_enabled) {
-    if (printable_selection_text.empty()) {
-      label =
-          l10n_util::GetStringUTF16(IDS_CONTENT_CONTEXT_PARTIAL_TRANSLATE_V2);
-    } else {
-      label = l10n_util::GetStringFUTF16(
-          IDS_CONTENT_CONTEXT_PARTIAL_TRANSLATE_SELECTION_V2,
-          printable_selection_text);
-    }
-  } else {
-    label = l10n_util::GetStringFUTF16(
-        IDS_CONTENT_CONTEXT_PARTIAL_TRANSLATE,
-        GetTargetLanguageDisplayName(/*is_full_page_translation=*/false));
-  }
-
-  menu_model_.AddItem(IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE, label);
-
-  if (is_menu_simplification_enabled) {
-    menu_model_.SetIconForCommandId(
-        IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE,
-        ui::ImageModel::FromVectorIcon(vector_icons::kGTranslateIcon,
-                                       ui::kColorMenuIcon, kTabMenuIconSize));
-  }
-}
-
 void RenderViewContextMenu::AppendTranslateItem() {
   if (features::IsMenuSimplificationEnabled() && IsPasswordField()) {
     return;
@@ -2756,9 +2708,7 @@ void RenderViewContextMenu::AppendOtherEditableItems() {
       MaybeAppendOpenGlicItem(/*add_separator=*/false);
     }
     AppendPrintItem();
-    if (CanPartiallyTranslateTargetLanguage()) {
-      AppendPartialTranslateItem();
-    } else if (CanTranslate(/*menu_logging=*/false)) {
+    if (CanTranslate(/*menu_logging=*/false)) {
       AppendTranslateItem();
     }
   }
@@ -2962,9 +2912,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
 
     case IDC_CONTENT_CONTEXT_TRANSLATE:
       return navigation_allowed && IsTranslateEnabled();
-
-    case IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE:
-      return navigation_allowed;
 
     case IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP:
     case IDC_CONTENT_CONTEXT_OPENLINKINPROFILE:
@@ -3583,10 +3530,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
 
     case IDC_CONTENT_CONTEXT_TRANSLATE:
       ExecTranslate();
-      break;
-
-    case IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE:
-      ExecPartialTranslate();
       break;
 
     case IDC_CONTENT_CONTEXT_RELOADFRAME:
@@ -4862,27 +4805,6 @@ void RenderViewContextMenu::ExecTranslate() {
                            /*triggered_from_menu=*/true);
 }
 
-void RenderViewContextMenu::ExecPartialTranslate() {
-  std::string source_language;
-  std::string target_language;
-
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(embedder_web_contents_);
-  if (chrome_translate_client) {
-    chrome_translate_client->GetTranslateLanguages(
-        embedder_web_contents_, &source_language, &target_language,
-        /*for_display=*/false);
-    BrowserWindowInterface* browser = GetBrowser();
-    if (browser) {
-      TranslateController* controller = TranslateController::From(browser);
-      if (controller) {
-        controller->StartPartialTranslate(source_language, target_language,
-                                          params_.selection_text);
-      }
-    }
-  }
-}
-
 void RenderViewContextMenu::ExecLanguageSettings(int event_flags) {
   WindowOpenDisposition disposition = ui::DispositionFromEventFlags(
       event_flags, WindowOpenDisposition::NEW_FOREGROUND_TAB);
@@ -5147,14 +5069,6 @@ bool RenderViewContextMenu::CanTranslate(bool menu_logging) {
              menu_logging);
 }
 
-bool RenderViewContextMenu::CanPartiallyTranslateTargetLanguage() {
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(embedder_web_contents_);
-  return chrome_translate_client &&
-         chrome_translate_client->GetTranslateManager()
-             ->CanPartiallyTranslateTargetLanguage();
-}
-
 void RenderViewContextMenu::MaybePrepareForLensQuery() {
   if (!search::DefaultSearchProviderIsGoogle(GetProfile())) {
     return;
@@ -5323,9 +5237,7 @@ void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
     AppendSaveToMemoryBanksItem();
     AppendPrintItem();
 
-    if (CanPartiallyTranslateTargetLanguage()) {
-      AppendPartialTranslateItem();
-    } else if (CanTranslate(/*menu_logging=*/false)) {
+    if (CanTranslate(/*menu_logging=*/false)) {
       AppendTranslateItem();
     }
   } else {
@@ -5345,9 +5257,7 @@ void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
     }
     AppendSaveToMemoryBanksItem();
 
-    if (CanPartiallyTranslateTargetLanguage()) {
-      AppendPartialTranslateItem();
-    } else if (CanTranslate(/*menu_logging=*/false)) {
+    if (CanTranslate(/*menu_logging=*/false)) {
       AppendTranslateItem();
     }
   }

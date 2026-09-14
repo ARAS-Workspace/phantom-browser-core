@@ -126,18 +126,6 @@ TEST_F(TranslateLanguageListTest, IsSupportedLanguage) {
   EXPECT_FALSE(language_list.IsSupportedLanguage("xx"));
 }
 
-// Test that IsSupportedPartialTranslateLanguage() is true for languages that
-// should be supported, and false for invalid languages.
-TEST_F(TranslateLanguageListTest, IsSupportedPartialTranslateLanguage) {
-  TranslateLanguageList language_list(
-      std::make_unique<DummyTranslateUrlFetcher>());
-  EXPECT_TRUE(language_list.IsSupportedPartialTranslateLanguage("en"));
-  EXPECT_TRUE(language_list.IsSupportedPartialTranslateLanguage("zh-CN"));
-  EXPECT_FALSE(language_list.IsSupportedPartialTranslateLanguage("xx"));
-  EXPECT_FALSE(language_list.IsSupportedPartialTranslateLanguage("ilo"));
-  EXPECT_FALSE(language_list.IsSupportedPartialTranslateLanguage("mni-Mtei"));
-}
-
 // Test that all "old" languages are still supported.
 TEST_F(TranslateLanguageListTest, SanityCheckAllLanguages) {
   TranslateLanguageList language_list(
@@ -304,35 +292,6 @@ TEST_F(TranslateLanguageListTest, GetSupportedLanguages) {
   EXPECT_TRUE(std::ranges::contains(languages, "ru"));
   EXPECT_TRUE(std::ranges::contains(languages, "zh-CN"));
   EXPECT_TRUE(std::ranges::contains(languages, "zh-TW"));
-}
-
-// Sanity test for the default set of partial translate supported languages. The
-// default set of languages should be large (> 100) and must contain very common
-// languages. If either of these tests are not true, the default language
-// configuration is likely to be incorrect.
-TEST_F(TranslateLanguageListTest, GetSupportedPartialTranslateLanguages) {
-  TranslateLanguageList language_list(
-      std::make_unique<DummyTranslateUrlFetcher>());
-  std::vector<std::string> languages;
-  language_list.GetSupportedPartialTranslateLanguages(&languages);
-  // Check there are a lot of default languages.
-  EXPECT_GE(languages.size(), 100ul);
-  // Check that some very common languages are there.
-  EXPECT_TRUE(std::ranges::contains(languages, "en"));
-  EXPECT_TRUE(std::ranges::contains(languages, "es"));
-  EXPECT_TRUE(std::ranges::contains(languages, "fr"));
-  EXPECT_TRUE(std::ranges::contains(languages, "ru"));
-  EXPECT_TRUE(std::ranges::contains(languages, "zh-CN"));
-  EXPECT_TRUE(std::ranges::contains(languages, "zh-TW"));
-
-  // Check that unsupported languages are not there
-  EXPECT_FALSE(std::ranges::contains(languages, "ilo"));
-  EXPECT_FALSE(std::ranges::contains(languages, "lus"));
-  EXPECT_FALSE(std::ranges::contains(languages, "mni-Mtei"));
-  EXPECT_FALSE(std::ranges::contains(languages, "gom"));
-  EXPECT_FALSE(std::ranges::contains(languages, "doi"));
-  EXPECT_FALSE(std::ranges::contains(languages, "bm"));
-  EXPECT_FALSE(std::ranges::contains(languages, "ckb"));
 }
 
 // Check that we contact the translate server to update the supported language

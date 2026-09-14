@@ -8,7 +8,6 @@
 
 #include "base/android/jni_string.h"
 #include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "components/translate/core/common/translate_constants.h"
 #include "components/translate/core/language_detection/language_detection_util.h"
 #include "content/public/browser/browser_thread.h"
 

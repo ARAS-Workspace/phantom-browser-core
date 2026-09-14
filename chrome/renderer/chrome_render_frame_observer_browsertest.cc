@@ -27,7 +27,6 @@
 #include "components/safe_browsing/core/common/proto/client_model.pb.h"
 #include "components/translate/content/common/translate.mojom.h"
 #include "components/translate/content/renderer/translate_agent.h"
-#include "components/translate/core/common/translate_constants.h"
 #include "components/translate/core/common/translate_util.h"
 #include "components/variations/variations_switches.h"
 #include "content/public/common/content_features.h"

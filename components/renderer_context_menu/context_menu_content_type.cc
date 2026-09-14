@@ -128,9 +128,6 @@ bool ContextMenuContentType::SupportsGroupInternal(int group) {
     case ITEM_GROUP_COPY:
       return !params_.is_editable && has_selection;
 
-    case ITEM_GROUP_PARTIAL_TRANSLATE:
-      return has_selection;
-
     case ITEM_GROUP_EXISTING_LINK_TO_TEXT:
       return params_.annotation_type.has_value();
 

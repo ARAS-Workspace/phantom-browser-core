@@ -6,11 +6,6 @@ import("//build/config/ui.gni")
 
 source_set("translate") {
   sources = [
-    "partial_translate_bubble_model.h",
-    "partial_translate_bubble_model_impl.cc",
-    "partial_translate_bubble_model_impl.h",
-    "partial_translate_bubble_ui_action_logger.cc",
-    "partial_translate_bubble_ui_action_logger.h",
     "source_language_combobox_model.cc",
     "source_language_combobox_model.h",
     "target_language_combobox_model.cc",
@@ -18,8 +13,6 @@ source_set("translate") {
     "translate_bubble_model.h",
     "translate_bubble_model_impl.cc",
     "translate_bubble_model_impl.h",
-    "translate_controller.cc",
-    "translate_controller.h",
     "translate_language_list_model.h",
   ]
 

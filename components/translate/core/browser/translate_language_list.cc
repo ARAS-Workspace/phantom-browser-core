@@ -12,7 +12,6 @@
 #include <string_view>
 
 #include "base/check.h"
-#include "base/containers/fixed_flat_set.h"
 #include "base/containers/flat_set.h"
 #include "base/functional/bind.h"
 #include "base/i18n/language_tag.h"
@@ -43,139 +42,6 @@ namespace {
 using ::base::i18n::GetKnownLanguageTag;
 using ::base::i18n::GetLanguageTagFromString;
 using ::base::i18n::LanguageTag;
-
-// The default list of languages the Partial Translation service supports.
-// This list must be sorted in alphabetical order and contain no duplicates.
-// This list is identical to above except that it excludes
-// {ilo lus mni-Mtei gom doi bm ckb}.
-constexpr auto kDefaultSupportedPartialTranslateLanguages =
-    base::MakeFixedFlatSet<LanguageTag>({
-        GetKnownLanguageTag("af"),     // Afrikaans
-        GetKnownLanguageTag("ak"),     // Akan
-        GetKnownLanguageTag("am"),     // Amharic
-        GetKnownLanguageTag("ar"),     // Arabic
-        GetKnownLanguageTag("as"),     // Assamese
-        GetKnownLanguageTag("ay"),     // Aymara
-        GetKnownLanguageTag("az"),     // Azerbaijani
-        GetKnownLanguageTag("be"),     // Belarusian
-        GetKnownLanguageTag("bg"),     // Bulgarian
-        GetKnownLanguageTag("bho"),    // Bhojpuri
-        GetKnownLanguageTag("bn"),     // Bengali
-        GetKnownLanguageTag("bs"),     // Bosnian
-        GetKnownLanguageTag("ca"),     // Catalan
-        GetKnownLanguageTag("ceb"),    // Cebuano
-        GetKnownLanguageTag("co"),     // Corsican
-        GetKnownLanguageTag("cs"),     // Czech
-        GetKnownLanguageTag("cy"),     // Welsh
-        GetKnownLanguageTag("da"),     // Danish
-        GetKnownLanguageTag("de"),     // German
-        GetKnownLanguageTag("dv"),     // Dhivehi
-        GetKnownLanguageTag("ee"),     // Ewe
-        GetKnownLanguageTag("el"),     // Greek
-        GetKnownLanguageTag("en"),     // English
-        GetKnownLanguageTag("eo"),     // Esperanto
-        GetKnownLanguageTag("es"),     // Spanish
-        GetKnownLanguageTag("et"),     // Estonian
-        GetKnownLanguageTag("eu"),     // Basque
-        GetKnownLanguageTag("fa"),     // Persian
-        GetKnownLanguageTag("fi"),     // Finnish
-        GetKnownLanguageTag("fil"),    // Filipino
-        GetKnownLanguageTag("fr"),     // French
-        GetKnownLanguageTag("fy"),     // Frisian
-        GetKnownLanguageTag("ga"),     // Irish
-        GetKnownLanguageTag("gd"),     // Scots Gaelic
-        GetKnownLanguageTag("gl"),     // Galician
-        GetKnownLanguageTag("gu"),     // Gujarati
-        GetKnownLanguageTag("ha"),     // Hausa
-        GetKnownLanguageTag("haw"),    // Hawaiian
-        GetKnownLanguageTag("he"),     // Hebrew
-        GetKnownLanguageTag("hi"),     // Hindi
-        GetKnownLanguageTag("hmn"),    // Hmong
-        GetKnownLanguageTag("hr"),     // Croatian
-        GetKnownLanguageTag("ht"),     // Haitian Creole
-        GetKnownLanguageTag("hu"),     // Hungarian
-        GetKnownLanguageTag("hy"),     // Armenian
-        GetKnownLanguageTag("id"),     // Indonesian
-        GetKnownLanguageTag("ig"),     // Igbo
-        GetKnownLanguageTag("is"),     // Icelandic
-        GetKnownLanguageTag("it"),     // Italian
-        GetKnownLanguageTag("ja"),     // Japanese
-        GetKnownLanguageTag("jv"),     // Javanese
-        GetKnownLanguageTag("ka"),     // Georgian
-        GetKnownLanguageTag("kk"),     // Kazakh
-        GetKnownLanguageTag("km"),     // Khmer
-        GetKnownLanguageTag("kn"),     // Kannada
-        GetKnownLanguageTag("ko"),     // Korean
-        GetKnownLanguageTag("kri"),    // Krio
-        GetKnownLanguageTag("ku"),     // Kurdish (Kurmanji)
-        GetKnownLanguageTag("ky"),     // Kyrgyz
-        GetKnownLanguageTag("la"),     // Latin
-        GetKnownLanguageTag("lb"),     // Luxembourgish
-        GetKnownLanguageTag("lg"),     // Luganda
-        GetKnownLanguageTag("ln"),     // Lingala
-        GetKnownLanguageTag("lo"),     // Lao
-        GetKnownLanguageTag("lt"),     // Lithuanian
-        GetKnownLanguageTag("lv"),     // Latvian
-        GetKnownLanguageTag("mai"),    // Maithili
-        GetKnownLanguageTag("mg"),     // Malagasy
-        GetKnownLanguageTag("mi"),     // Maori
-        GetKnownLanguageTag("mk"),     // Macedonian
-        GetKnownLanguageTag("ml"),     // Malayalam
-        GetKnownLanguageTag("mn"),     // Mongolian
-        GetKnownLanguageTag("mr"),     // Marathi
-        GetKnownLanguageTag("ms"),     // Malay
-        GetKnownLanguageTag("mt"),     // Maltese
-        GetKnownLanguageTag("my"),     // Myanmar (Burmese)
-        GetKnownLanguageTag("ne"),     // Nepali
-        GetKnownLanguageTag("nl"),     // Dutch
-        GetKnownLanguageTag("no"),     // Norwegian
-        GetKnownLanguageTag("nso"),    // Sepedi
-        GetKnownLanguageTag("ny"),     // Chichewa
-        GetKnownLanguageTag("om"),     // Oromo
-        GetKnownLanguageTag("or"),     // Odia (Oriya)
-        GetKnownLanguageTag("pa"),     // Punjabi
-        GetKnownLanguageTag("pl"),     // Polish
-        GetKnownLanguageTag("ps"),     // Pashto
-        GetKnownLanguageTag("pt"),     // Portuguese
-        GetKnownLanguageTag("qu"),     // Quechua
-        GetKnownLanguageTag("ro"),     // Romanian
-        GetKnownLanguageTag("ru"),     // Russian
-        GetKnownLanguageTag("rw"),     // Kinyarwanda
-        GetKnownLanguageTag("sa"),     // Sanskrit
-        GetKnownLanguageTag("sd"),     // Sindhi
-        GetKnownLanguageTag("si"),     // Sinhala
-        GetKnownLanguageTag("sk"),     // Slovak
-        GetKnownLanguageTag("sl"),     // Slovenian
-        GetKnownLanguageTag("sm"),     // Samoan
-        GetKnownLanguageTag("sn"),     // Shona
-        GetKnownLanguageTag("so"),     // Somali
-        GetKnownLanguageTag("sq"),     // Albanian
-        GetKnownLanguageTag("sr"),     // Serbian
-        GetKnownLanguageTag("st"),     // Sesotho
-        GetKnownLanguageTag("su"),     // Sundanese
-        GetKnownLanguageTag("sv"),     // Swedish
-        GetKnownLanguageTag("sw"),     // Swahili
-        GetKnownLanguageTag("ta"),     // Tamil
-        GetKnownLanguageTag("te"),     // Telugu
-        GetKnownLanguageTag("tg"),     // Tajik
-        GetKnownLanguageTag("th"),     // Thai
-        GetKnownLanguageTag("ti"),     // Tigrinya
-        GetKnownLanguageTag("tk"),     // Turkmen
-        GetKnownLanguageTag("tr"),     // Turkish
-        GetKnownLanguageTag("ts"),     // Tsonga
-        GetKnownLanguageTag("tt"),     // Tatar
-        GetKnownLanguageTag("ug"),     // Uyghur
-        GetKnownLanguageTag("uk"),     // Ukrainian
-        GetKnownLanguageTag("ur"),     // Urdu
-        GetKnownLanguageTag("uz"),     // Uzbek
-        GetKnownLanguageTag("vi"),     // Vietnamese
-        GetKnownLanguageTag("xh"),     // Xhosa
-        GetKnownLanguageTag("yi"),     // Yiddish
-        GetKnownLanguageTag("yo"),     // Yoruba
-        GetKnownLanguageTag("zh-CN"),  // Chinese (Simplified)
-        GetKnownLanguageTag("zh-TW"),  // Chinese (Traditional)
-        GetKnownLanguageTag("zu"),     // Zulu
-    });
 
 // Constant URL string to fetch server supporting language list.
 constexpr std::string_view kLanguageListFetchPath =
@@ -227,15 +93,6 @@ void TranslateLanguageList::GetSupportedLanguages(
 }
 
 // static
-void TranslateLanguageList::GetSupportedPartialTranslateLanguages(
-    std::vector<std::string>* languages) {
-  DCHECK(languages && languages->empty());
-
-  for (const LanguageTag& tag : kDefaultSupportedPartialTranslateLanguages) {
-    languages->emplace_back(tag.tag_string());
-  }
-}
-
 std::string TranslateLanguageList::GetLanguageCode(std::string_view language) {
   // Only remove the country code for country specific languages we don't
   // support specifically yet.
@@ -255,16 +112,6 @@ bool TranslateLanguageList::IsSupportedLanguage(std::string_view language) {
     return false;
   }
   return supported_languages_.contains(*tag);
-}
-
-// static
-bool TranslateLanguageList::IsSupportedPartialTranslateLanguage(
-    std::string_view language) {
-  std::optional<LanguageTag> tag = GetLanguageTagFromString(language);
-  if (!tag) {
-    return false;
-  }
-  return kDefaultSupportedPartialTranslateLanguages.contains(*tag);
 }
 
 // static

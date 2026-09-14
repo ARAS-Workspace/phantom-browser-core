@@ -8,7 +8,6 @@ assert(toolkit_views)
 
 source_set("translate") {
   public = [
-    "partial_translate_bubble_view.h",
     "translate_bubble_controller.h",
     "translate_bubble_view.h",
     "translate_language_search_view.h",
@@ -40,7 +39,6 @@ source_set("translate") {
 
 source_set("impl") {
   sources = [
-    "partial_translate_bubble_view.cc",
     "translate_bubble_controller.cc",
     "translate_bubble_view.cc",
     "translate_language_search_view.cc",
@@ -69,7 +67,6 @@ source_set("impl") {
     "//components/language_detection/core",
     "//components/prefs",
     "//components/strings:components_strings",
-    "//components/touch_to_search/core/browser",
     "//components/vector_icons",
     "//services/network/public/cpp",
     "//ui/strings:ui_strings",
@@ -92,11 +89,7 @@ source_set("test_support") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [
-    "partial_translate_bubble_view_unittest.cc",
-    "translate_bubble_controller_unittest.cc",
-    "translate_bubble_view_unittest.cc",
-  ]
+  sources = [ "translate_bubble_view_unittest.cc" ]
   deps = [
     ":translate",
     "//base",
@@ -157,10 +150,7 @@ source_set("browser_tests") {
 source_set("interactive_ui_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  sources = [
-    "translate_bubble_view_interactive_uitest.cc",
-    "translate_page_action_interactive_uitest.cc",
-  ]
+  sources = [ "translate_bubble_view_interactive_uitest.cc" ]
   deps = [
     ":translate",
     "//base",

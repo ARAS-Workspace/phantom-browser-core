@@ -282,21 +282,6 @@ bool TranslateManager::CanManuallyTranslate(bool menu_logging) {
   return can_translate;
 }
 
-bool TranslateManager::CanPartiallyTranslateTargetLanguage() {
-  std::unique_ptr<TranslatePrefs> translate_prefs(
-      translate_client_->GetTranslatePrefs());
-  const std::string& source_language = language_state_.source_language();
-  const std::string target_lang = GetTargetLanguage(
-      translate_prefs.get(), language_model_,
-      TranslateDownloadManager::GetLanguageCode(source_language));
-
-  if (target_lang.empty()) {
-    return false;
-  }
-  return TranslateLanguageList::IsSupportedPartialTranslateLanguage(
-      target_lang);
-}
-
 bool TranslateManager::IsMimeTypeSupported(std::string_view mime_type) {
   if (net::MatchesMimeType("image/*", mime_type))
     return false;

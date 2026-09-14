@@ -16,7 +16,6 @@
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/prefs/pref_member.h"
 #include "components/translate/core/browser/translate_pref_names.h"
-#include "components/translate/core/common/translate_constants.h"
 #include "components/translate/core/common/translate_util.h"
 #include "components/translate/core/language_detection/language_detection_model.h"
 #include "components/translate/core/language_detection/language_detection_util.h"

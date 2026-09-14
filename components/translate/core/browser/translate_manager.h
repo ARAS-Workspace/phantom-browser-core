@@ -136,11 +136,6 @@ class TranslateManager {
   // Full Page Translate menu item.
   bool CanManuallyTranslate(bool menu_logging = false);
 
-  // Whether or not partial translation is supported for the current target
-  // language. Partial translate supports a subset of translation languages,
-  // but shares a target language with full page translation.
-  bool CanPartiallyTranslateTargetLanguage();
-
   bool IsMimeTypeSupported(std::string_view mime_type);
 
   // Shows the after translate or error infobar depending on the details.

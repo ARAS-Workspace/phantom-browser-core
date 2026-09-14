@@ -12,7 +12,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "components/language_detection/core/language_detection_model.h"
 #include "components/language_detection/testing/language_detection_test_utils.h"
-#include "components/translate/core/common/translate_constants.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace language_detection {
