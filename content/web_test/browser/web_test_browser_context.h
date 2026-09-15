@@ -16,10 +16,8 @@ namespace content {
 class BackgroundSyncController;
 class DownloadManagerDelegate;
 class PermissionControllerDelegate;
-class PushMessagingService;
 class WebTestBackgroundFetchDelegate;
 class WebTestPermissionManager;
-class WebTestPushMessagingService;
 class WebTestStorageAccessManager;
 class MockPlatformNotificationService;
 
@@ -48,7 +46,6 @@ class WebTestBrowserContext final : public ShellBrowserContext {
  private:
   std::unique_ptr<MockPlatformNotificationService>
       platform_notification_service_;
-  std::unique_ptr<WebTestPushMessagingService> push_messaging_service_;
   std::unique_ptr<PermissionControllerDelegate> permission_manager_;
   std::unique_ptr<WebTestBackgroundFetchDelegate> background_fetch_delegate_;
   std::unique_ptr<BackgroundSyncController> background_sync_controller_;
