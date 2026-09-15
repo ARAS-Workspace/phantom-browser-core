@@ -5,12 +5,12 @@
 #import "components/translate/ios/browser/ios_translate_driver.h"
 
 #import "components/language/core/browser/language_model.h"
+#import "components/language/core/browser/pref_names.h"
 #import "components/language/ios/browser/ios_language_detection_tab_helper.h"
 #import "components/sync_preferences/testing_pref_service_syncable.h"
 #import "components/translate/core/browser/mock_translate_client.h"
 #import "components/translate/core/browser/mock_translate_driver.h"
 #import "components/translate/core/browser/translate_manager.h"
-#import "components/translate/core/browser/translate_pref_names.h"
 #import "components/translate/ios/browser/translate_java_script_feature.h"
 #import "ios/web/public/test/fakes/fake_browser_state.h"
 #import "ios/web/public/test/fakes/fake_web_frames_manager.h"
@@ -36,8 +36,8 @@ class IOSTranslateDriverTest : public PlatformTest {
   IOSTranslateDriverTest()
       : fake_browser_state_(std::make_unique<web::FakeBrowserState>()),
         fake_web_state_(std::make_unique<web::FakeWebState>()) {
-    pref_service_.registry()->RegisterBooleanPref(prefs::kOfferTranslateEnabled,
-                                                  true);
+    pref_service_.registry()->RegisterBooleanPref(
+        language::prefs::kOfferTranslateEnabled, true);
 
     auto web_frames_manager = std::make_unique<web::FakeWebFramesManager>();
     web::ContentWorld content_world =

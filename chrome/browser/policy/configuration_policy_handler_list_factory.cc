@@ -139,7 +139,6 @@
 #include "components/sync/base/pref_names.h"
 #include "components/sync/service/sync_policy_handler.h"
 #include "components/themes/theme_color_policy_handler.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/variations/pref_names.h"
 #include "components/variations/service/variations_service.h"
 #include "components/version_info/channel.h"
@@ -366,7 +365,7 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     prefs::kTabCaptureAllowedByOrigins,
     base::Value::Type::LIST },
   { key::kTranslateEnabled,
-    translate::prefs::kOfferTranslateEnabled,
+    language::prefs::kOfferTranslateEnabled,
     base::Value::Type::BOOLEAN },
 #if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
   { key::kTranslatorAPIAllowed,

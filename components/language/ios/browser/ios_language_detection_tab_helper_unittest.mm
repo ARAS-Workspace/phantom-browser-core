@@ -10,12 +10,12 @@
 #import "base/test/metrics/histogram_tester.h"
 #import "base/test/task_environment.h"
 #import "base/values.h"
+#import "components/language/core/browser/pref_names.h"
 #import "components/language/ios/browser/language_detection_java_script_feature.h"
 #import "components/language_detection/core/language_detection_model.h"
 #import "components/language_detection/core/page_language_detector.h"
 #import "components/prefs/pref_registry_simple.h"
 #import "components/prefs/testing_pref_service.h"
-#import "components/translate/core/browser/translate_pref_names.h"
 #import "components/translate/core/common/translate_util.h"
 #import "ios/web/public/test/fakes/fake_web_frames_manager.h"
 #import "ios/web/public/test/fakes/fake_web_state.h"
@@ -37,7 +37,7 @@ class IOSLanguageDetectionTabHelperTest : public PlatformTest {
     web_state_.SetWebFramesManager(content_world, std::move(frames_manager));
 
     pref_service_.registry()->RegisterBooleanPref(
-        translate::prefs::kOfferTranslateEnabled, true);
+        language::prefs::kOfferTranslateEnabled, true);
     language::IOSLanguageDetectionTabHelper::CreateForWebState(
         &web_state_, /*url_language_histogram=*/nullptr, &model_,
         &pref_service_);

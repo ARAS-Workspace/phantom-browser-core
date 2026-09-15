@@ -10,11 +10,11 @@
 #import "base/memory/raw_ptr.h"
 #include "base/strings/utf_string_conversions.h"
 #import "base/test/task_environment.h"
+#include "components/language/core/browser/pref_names.h"
 #import "components/language/ios/browser/language_detection_java_script_feature.h"
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #import "ios/web/public/test/fakes/fake_web_frames_manager.h"
 #import "ios/web/public/test/fakes/fake_web_state.h"
 #include "testing/gtest_mac.h"
@@ -50,7 +50,7 @@ class IOSLanguageDetectionTabHelperObserverBridgeTest : public PlatformTest {
  protected:
   IOSLanguageDetectionTabHelperObserverBridgeTest() {
     pref_service_.registry()->RegisterBooleanPref(
-        translate::prefs::kOfferTranslateEnabled, true);
+        language::prefs::kOfferTranslateEnabled, true);
 
     auto frames_manager = std::make_unique<web::FakeWebFramesManager>();
     web::ContentWorld content_world =

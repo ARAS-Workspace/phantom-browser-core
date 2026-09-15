@@ -12,10 +12,10 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "build/build_config.h"
+#include "components/language/core/browser/pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/translate/core/browser/translate_download_manager.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/common/translate_features.h"
 #include "components/translate/core/common/translate_switches.h"
 #include "components/translate/core/common/translate_util.h"
@@ -271,10 +271,11 @@ TEST_F(TranslateScriptTest, CheckScriptRegionalization) {
   scoped_feature_list.InitAndEnableFeature(kTranslateElementRegionalization);
 
   TestingPrefServiceSimple prefs;
-  prefs.registry()->RegisterIntegerPref(prefs::kTranslateDataRegionSetting, 0);
+  prefs.registry()->RegisterIntegerPref(
+      language::prefs::kTranslateDataRegionSetting, 0);
 
   // Test US region.
-  prefs.SetInteger(prefs::kTranslateDataRegionSetting, 1);
+  prefs.SetInteger(language::prefs::kTranslateDataRegionSetting, 1);
   network::ResourceRequest last_resource_request;
   GetTestURLLoaderFactory()->SetInterceptor(
       base::BindLambdaForTesting([&](const network::ResourceRequest& request) {
@@ -288,7 +289,7 @@ TEST_F(TranslateScriptTest, CheckScriptRegionalization) {
 
   // Test EU region.
   script_ = std::make_unique<TranslateScript>();
-  prefs.SetInteger(prefs::kTranslateDataRegionSetting, 2);
+  prefs.SetInteger(language::prefs::kTranslateDataRegionSetting, 2);
   RequestWithPrefs(&prefs);
   std::string region_eu;
   net::GetValueForKeyInQuery(last_resource_request.url, "region", &region_eu);
@@ -296,7 +297,7 @@ TEST_F(TranslateScriptTest, CheckScriptRegionalization) {
 
   // Test no preference region.
   script_ = std::make_unique<TranslateScript>();
-  prefs.SetInteger(prefs::kTranslateDataRegionSetting, 0);
+  prefs.SetInteger(language::prefs::kTranslateDataRegionSetting, 0);
   RequestWithPrefs(&prefs);
   std::string region_none;
   bool has_region = net::GetValueForKeyInQuery(last_resource_request.url,
@@ -310,7 +311,8 @@ TEST_F(TranslateScriptTest, CheckScriptRegionalizationCacheClear) {
   scoped_feature_list.InitAndEnableFeature(kTranslateElementRegionalization);
 
   TestingPrefServiceSimple prefs;
-  prefs.registry()->RegisterIntegerPref(prefs::kTranslateDataRegionSetting, 0);
+  prefs.registry()->RegisterIntegerPref(
+      language::prefs::kTranslateDataRegionSetting, 0);
 
   GetTestURLLoaderFactory()->SetInterceptor(
       base::BindLambdaForTesting([&](const network::ResourceRequest& request) {
@@ -319,7 +321,7 @@ TEST_F(TranslateScriptTest, CheckScriptRegionalizationCacheClear) {
       }));
 
   // Start with US region.
-  prefs.SetInteger(prefs::kTranslateDataRegionSetting, 1);
+  prefs.SetInteger(language::prefs::kTranslateDataRegionSetting, 1);
   RequestWithPrefsAndWait(&prefs);
 
   EXPECT_FALSE(GetData().empty());
@@ -330,7 +332,7 @@ TEST_F(TranslateScriptTest, CheckScriptRegionalizationCacheClear) {
   EXPECT_FALSE(GetData().empty());
 
   // Change region to EU.
-  prefs.SetInteger(prefs::kTranslateDataRegionSetting, 2);
+  prefs.SetInteger(language::prefs::kTranslateDataRegionSetting, 2);
   ClearIfDataRegionChanged(&prefs);
   EXPECT_TRUE(GetData().empty());
 
@@ -339,7 +341,7 @@ TEST_F(TranslateScriptTest, CheckScriptRegionalizationCacheClear) {
   EXPECT_FALSE(GetData().empty());
 
   // Change region to NO_PREFERENCE.
-  prefs.SetInteger(prefs::kTranslateDataRegionSetting, 0);
+  prefs.SetInteger(language::prefs::kTranslateDataRegionSetting, 0);
   ClearIfDataRegionChanged(&prefs);
   EXPECT_TRUE(GetData().empty());
   script_.reset();

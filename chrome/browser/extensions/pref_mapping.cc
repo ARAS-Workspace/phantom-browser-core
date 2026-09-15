@@ -25,7 +25,7 @@
 #if BUILDFLAG(ENABLE_SPELLCHECK)
 #include "components/spellcheck/browser/pref_names.h"
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
-#include "components/translate/core/browser/translate_pref_names.h"
+#include "components/language/core/browser/pref_names.h"
 #include "extensions/browser/pref_transformer_interface.h"
 #include "extensions/buildflags/buildflags.h"
 
@@ -87,7 +87,7 @@ const PrefMappingEntry kMappings[] = {
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
     {"adMeasurementEnabled", prefs::kPrivacySandboxM1AdMeasurementEnabled,
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
-    {"translationServiceEnabled", translate::prefs::kOfferTranslateEnabled,
+    {"translationServiceEnabled", language::prefs::kOfferTranslateEnabled,
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},
     {"webRTCIPHandlingPolicy", prefs::kWebRTCIPHandlingPolicy,
      APIPermissionID::kPrivacy, APIPermissionID::kPrivacy},

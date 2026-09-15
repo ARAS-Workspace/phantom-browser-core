@@ -31,7 +31,6 @@
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
 #include "components/sync_preferences/cross_device_pref_tracker/prefs/cross_device_pref_names.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "components/variations/service/google_groups_manager_prefs.h"
 
@@ -361,23 +360,23 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {translate::TranslatePrefs::kPrefTranslateDeniedCount,
          {syncable_prefs_ids::kPrefTranslateDeniedCount, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {translate::prefs::kBlockedLanguages,
+        {language::prefs::kBlockedLanguages,
          {syncable_prefs_ids::kBlockedLanguages, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {translate::prefs::kOfferTranslateEnabled,
+        {language::prefs::kOfferTranslateEnabled,
          {syncable_prefs_ids::kOfferTranslateEnabled, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {translate::prefs::kPrefAlwaysTranslateList,
+        {language::prefs::kPrefAlwaysTranslateList,
          {syncable_prefs_ids::kPrefAlwaysTranslateList, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {translate::prefs::kPrefNeverPromptSitesWithTime,
+        {language::prefs::kPrefNeverPromptSitesWithTime,
          {syncable_prefs_ids::kPrefNeverPromptSitesWithTime,
           syncer::PREFERENCES, PrefSensitivity::kSensitiveRequiresHistory,
           MergeBehavior::kNone}},
-        {translate::prefs::kPrefTranslateRecentTarget,
+        {language::prefs::kPrefTranslateRecentTarget,
          {syncable_prefs_ids::kPrefTranslateRecentTarget, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {translate::prefs::kPrefTranslateRecentTargets,
+        {language::prefs::kPrefTranslateRecentTargets,
          {syncable_prefs_ids::kPrefTranslateRecentTargets, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
         // For Ash, the OS_PRIORITY_PREFERENCES equivalent is defined in

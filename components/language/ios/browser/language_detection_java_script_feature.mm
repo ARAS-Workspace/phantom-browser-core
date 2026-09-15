@@ -5,9 +5,9 @@
 #import "components/language/ios/browser/language_detection_java_script_feature.h"
 
 #import "base/metrics/histogram_macros.h"
+#import "components/language/core/browser/pref_names.h"
 #import "components/language/ios/browser/ios_language_detection_tab_helper.h"
 #import "components/prefs/pref_member.h"
-#import "components/translate/core/browser/translate_pref_names.h"
 #import "ios/web/public/browser_state.h"
 #import "ios/web/public/js_messaging/script_message.h"
 #import "ios/web/public/js_messaging/web_frame.h"

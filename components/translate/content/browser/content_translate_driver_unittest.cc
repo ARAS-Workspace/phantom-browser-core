@@ -9,11 +9,11 @@
 #include "base/run_loop.h"
 #include "components/language/core/browser/language_model.h"
 #include "components/language/core/browser/language_prefs.h"
+#include "components/language/core/browser/pref_names.h"
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/translate/core/browser/mock_translate_client.h"
 #include "components/translate/core/browser/translate_manager.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "content/public/test/test_renderer_host.h"
 #include "content/public/test/web_contents_tester.h"
@@ -95,7 +95,7 @@ class ContentTranslateDriverTest : public content::RenderViewHostTestHarness {
     language::LanguagePrefs::RegisterProfilePrefs(pref_service_.registry());
     translate::TranslatePrefs::RegisterProfilePrefs(pref_service_.registry());
     pref_service_.registry()->RegisterBooleanPref(
-        prefs::kOfferTranslateEnabled, true);
+        language::prefs::kOfferTranslateEnabled, true);
 
     driver_ = std::make_unique<ContentTranslateDriver>(
         *web_contents(), /*url_language_histogram=*/nullptr);

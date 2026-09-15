@@ -66,9 +66,9 @@
 #if BUILDFLAG(ENABLE_SPELLCHECK)
 #include "components/spellcheck/browser/pref_names.h"
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
+#include "components/language/core/browser/pref_names.h"
 #include "components/supervised_user/core/common/pref_names.h"
 #include "components/themes/pref_names.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "components/url_formatter/url_fixer.h"
 #include "extensions/browser/extension_pref_value_map.h"
@@ -377,11 +377,11 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[spellcheck::prefs::kSpellCheckUseSpellingService] =
       settings_api::PrefType::kBoolean;
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
-  (*s_allowlist)[translate::prefs::kOfferTranslateEnabled] =
+  (*s_allowlist)[language::prefs::kOfferTranslateEnabled] =
       settings_api::PrefType::kBoolean;
-  (*s_allowlist)[translate::prefs::kBlockedLanguages] =
+  (*s_allowlist)[language::prefs::kBlockedLanguages] =
       settings_api::PrefType::kList;
-  (*s_allowlist)[translate::prefs::kPrefNeverPromptSitesWithTime] =
+  (*s_allowlist)[language::prefs::kPrefNeverPromptSitesWithTime] =
       settings_api::PrefType::kList;
   (*s_allowlist)[language::prefs::kSelectedLanguages] =
       settings_api::PrefType::kString;
@@ -389,9 +389,9 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kList;
   (*s_allowlist)[::language::prefs::kAcceptLanguages] =
       settings_api::PrefType::kString;
-  (*s_allowlist)[translate::prefs::kPrefTranslateRecentTarget] =
+  (*s_allowlist)[language::prefs::kPrefTranslateRecentTarget] =
       settings_api::PrefType::kString;
-  (*s_allowlist)[translate::prefs::kPrefAlwaysTranslateList] =
+  (*s_allowlist)[language::prefs::kPrefAlwaysTranslateList] =
       settings_api::PrefType::kList;
 
   // Search page.

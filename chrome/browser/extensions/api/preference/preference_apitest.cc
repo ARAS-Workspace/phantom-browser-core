@@ -27,12 +27,12 @@
 #include "components/embedder_support/pref_names.h"
 #include "components/keep_alive_registry/keep_alive_types.h"
 #include "components/keep_alive_registry/scoped_keep_alive.h"
+#include "components/language/core/browser/pref_names.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
 #include "components/privacy_sandbox/privacy_sandbox_prefs.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_devtools_protocol_client.h"
 #include "content/public/test/test_utils.h"
@@ -95,7 +95,7 @@ class ExtensionPreferenceApiTest : public extensions::ExtensionApiTest {
     EXPECT_EQ(GetCookieControlsMode(prefs), CookieControlsMode::kOff);
     EXPECT_TRUE(prefs->GetBoolean(prefs::kEnableHyperlinkAuditing));
     EXPECT_TRUE(prefs->GetBoolean(prefs::kEnableReferrers));
-    EXPECT_TRUE(prefs->GetBoolean(translate::prefs::kOfferTranslateEnabled));
+    EXPECT_TRUE(prefs->GetBoolean(language::prefs::kOfferTranslateEnabled));
     EXPECT_EQ(static_cast<int>(prefetch::NetworkPredictionOptions::kDefault),
               prefs->GetInteger(prefetch::prefs::kNetworkPredictionOptions));
     EXPECT_TRUE(
@@ -134,7 +134,7 @@ class ExtensionPreferenceApiTest : public extensions::ExtensionApiTest {
               CookieControlsMode::kBlockThirdParty);
     EXPECT_FALSE(prefs->GetBoolean(prefs::kEnableHyperlinkAuditing));
     EXPECT_FALSE(prefs->GetBoolean(prefs::kEnableReferrers));
-    EXPECT_FALSE(prefs->GetBoolean(translate::prefs::kOfferTranslateEnabled));
+    EXPECT_FALSE(prefs->GetBoolean(language::prefs::kOfferTranslateEnabled));
     EXPECT_EQ(static_cast<int>(prefetch::NetworkPredictionOptions::kDisabled),
               prefs->GetInteger(prefetch::prefs::kNetworkPredictionOptions));
     EXPECT_FALSE(
@@ -219,7 +219,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionPreferenceApiTest, Standard) {
   SetCookieControlsMode(prefs, CookieControlsMode::kBlockThirdParty);
   prefs->SetBoolean(prefs::kEnableHyperlinkAuditing, false);
   prefs->SetBoolean(prefs::kEnableReferrers, false);
-  prefs->SetBoolean(translate::prefs::kOfferTranslateEnabled, false);
+  prefs->SetBoolean(language::prefs::kOfferTranslateEnabled, false);
   prefs->SetInteger(
       prefetch::prefs::kNetworkPredictionOptions,
       static_cast<int>(prefetch::NetworkPredictionOptions::kDisabled));

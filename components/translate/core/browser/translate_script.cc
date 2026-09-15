@@ -16,8 +16,8 @@
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
 #include "components/grit/components_resources.h"
+#include "components/language/core/browser/pref_names.h"
 #include "components/prefs/pref_service.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_url_fetcher.h"
 #include "components/translate/core/browser/translate_url_util.h"
 #include "components/translate/core/common/translate_features.h"
@@ -36,8 +36,9 @@ namespace {
 const int kExpirationDelayDays = 1;
 
 DataRegion GetDataRegionFromPref(PrefService* prefs) {
-  if (prefs && prefs->HasPrefPath(prefs::kTranslateDataRegionSetting)) {
-    switch (prefs->GetInteger(prefs::kTranslateDataRegionSetting)) {
+  if (prefs &&
+      prefs->HasPrefPath(language::prefs::kTranslateDataRegionSetting)) {
+    switch (prefs->GetInteger(language::prefs::kTranslateDataRegionSetting)) {
       case 0:
         return DataRegion::kNoPreference;
       case 1:

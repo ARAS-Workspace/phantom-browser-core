@@ -21,7 +21,6 @@
 #include "components/translate/core/browser/mock_translate_driver.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_manager.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -105,7 +104,7 @@ class TranslateInfoBarDelegateTest : public ::testing::Test {
     pref_service_->SetString(testing::accept_languages_prefs, std::string());
     pref_service_->SetString(language::prefs::kAcceptLanguages, std::string());
     pref_service_->registry()->RegisterBooleanPref(
-        prefs::kOfferTranslateEnabled, true);
+        language::prefs::kOfferTranslateEnabled, true);
     TranslatePrefs::RegisterProfilePrefs(pref_service_->registry());
     client_ =
         std::make_unique<MockTranslateClient>(&driver_, pref_service_.get());
@@ -278,7 +277,7 @@ TEST_F(TranslateInfoBarDelegateTest, IsTranslatableLanguage) {
   ON_CALL(*(client_.get()), GetAcceptLanguagesService())
       .WillByDefault(Return(&accept_languages));
   ScopedListPrefUpdate update(pref_service_.get(),
-                              translate::prefs::kBlockedLanguages);
+                              language::prefs::kBlockedLanguages);
   base::ListValue& update_list = update.Get();
   update_list.Append(kSourceLanguage);
   pref_service_->SetString(language::prefs::kAcceptLanguages, kSourceLanguage);

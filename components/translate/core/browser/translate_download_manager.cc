@@ -8,7 +8,7 @@
 
 #include "base/check.h"
 #include "base/memory/singleton.h"
-#include "components/translate/core/browser/translate_pref_names.h"
+#include "components/language/core/browser/pref_names.h"
 #include "components/translate/core/common/translate_switches.h"
 
 namespace translate {

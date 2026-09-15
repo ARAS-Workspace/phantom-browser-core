@@ -240,10 +240,10 @@ source_set("browser_ui_prefs") {
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/upgrade_detector",
     "//chrome/common",
+    "//components/language/core/browser",
     "//components/policy/core/common",
     "//components/pref_registry",
     "//components/prefs",
-    "//components/translate/core/browser:translate_pref_names",
   ]
   if (is_win && is_chrome_branded) {
     deps += [ "//chrome/browser/win/installer_downloader:prefs" ]

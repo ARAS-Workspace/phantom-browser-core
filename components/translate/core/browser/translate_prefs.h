@@ -45,7 +45,7 @@ enum class DataRegion {
   kUnitedStates = 1,
   kEurope = 2,
 };
-// LINT.ThenChange(//components/translate/core/browser/translate_pref_names.h:DataRegion)
+// LINT.ThenChange(//components/language/core/browser/pref_names.h:DataRegion)
 
 // Enables or disables using the most recent target language as the default
 // target language option.

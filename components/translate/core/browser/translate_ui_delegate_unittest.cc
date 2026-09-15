@@ -22,7 +22,6 @@
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_manager.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "components/variations/scoped_variations_ids_provider.h"
 #include "components/variations/variations_associated_data.h"
@@ -59,7 +58,7 @@ class TranslateUIDelegateTest : public ::testing::Test {
     pref_service_->SetString(language::prefs::kAcceptLanguages, std::string());
 
     pref_service_->registry()->RegisterBooleanPref(
-        prefs::kOfferTranslateEnabled, true);
+        language::prefs::kOfferTranslateEnabled, true);
     TranslatePrefs::RegisterProfilePrefs(pref_service_->registry());
 
     client_ =

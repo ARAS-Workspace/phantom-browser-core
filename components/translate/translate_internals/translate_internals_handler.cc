@@ -20,7 +20,6 @@
 #include "components/translate/core/browser/translate_error_details.h"
 #include "components/translate/core/browser/translate_event_details.h"
 #include "components/translate/core/browser/translate_init_details.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "components/variations/service/variations_service.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -232,12 +231,12 @@ void TranslateInternalsHandler::SendPrefsToJs() {
 
   static const char* const keys[] = {
       language::prefs::kAcceptLanguages,
-      prefs::kBlockedLanguages,
-      prefs::kOfferTranslateEnabled,
-      prefs::kPrefAlwaysTranslateList,
-      prefs::kPrefTranslateRecentTarget,
+      language::prefs::kBlockedLanguages,
+      language::prefs::kOfferTranslateEnabled,
+      language::prefs::kPrefAlwaysTranslateList,
+      language::prefs::kPrefTranslateRecentTarget,
       translate::TranslatePrefs::kPrefNeverPromptSitesDeprecated,
-      prefs::kPrefNeverPromptSitesWithTime,
+      language::prefs::kPrefNeverPromptSitesWithTime,
       translate::TranslatePrefs::kPrefTranslateDeniedCount,
       translate::TranslatePrefs::kPrefTranslateIgnoredCount,
       translate::TranslatePrefs::kPrefTranslateAcceptedCount,

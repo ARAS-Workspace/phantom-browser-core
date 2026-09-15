@@ -69,7 +69,7 @@ static_library("browser") {
   ]
 
   public_deps = [
-    ":translate_pref_names",
+    "//components/language/core/browser",
     "//components/language_detection/core",
     "//components/translate/core/common",
   ]
@@ -82,10 +82,6 @@ static_library("browser") {
 
     public_deps += [ "//components/infobars/core" ]
   }
-}
-
-source_set("translate_pref_names") {
-  sources = [ "translate_pref_names.h" ]
 }
 
 source_set("unit_tests") {

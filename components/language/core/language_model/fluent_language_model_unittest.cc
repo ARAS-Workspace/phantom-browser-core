@@ -17,7 +17,6 @@
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -82,7 +81,7 @@ TEST_F(FluentLanguageModelTest, ThreeBlockedLanguages) {
   fluent_languages.Append("fr");
   fluent_languages.Append("ja");
   fluent_languages.Append("en");
-  prefs_->SetList(translate::prefs::kBlockedLanguages,
+  prefs_->SetList(language::prefs::kBlockedLanguages,
                   std::move(fluent_languages));
 
   FluentLanguageModel model(prefs_.get());

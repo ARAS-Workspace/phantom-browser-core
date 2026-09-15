@@ -10,6 +10,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "base/timer/elapsed_timer.h"
+#include "components/language/core/browser/pref_names.h"
 #include "components/language/core/browser/url_language_histogram.h"
 #include "components/language/ios/browser/language_detection_java_script_feature.h"
 #include "components/language/ios/browser/string_clipping_util.h"
@@ -18,7 +19,6 @@
 #include "components/language_detection/core/language_detection_util.h"
 #include "components/language_detection/core/page_language_detector.h"
 #include "components/prefs/pref_member.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #import "ios/web/common/url_scheme_util.h"
 #include "ios/web/public/js_messaging/web_frame.h"
 #import "ios/web/public/navigation/navigation_context.h"
@@ -59,7 +59,7 @@ IOSLanguageDetectionTabHelper::IOSLanguageDetectionTabHelper(
       weak_method_factory_(this) {
   DCHECK(web_state_);
 
-  translate_enabled_.Init(translate::prefs::kOfferTranslateEnabled, prefs);
+  translate_enabled_.Init(language::prefs::kOfferTranslateEnabled, prefs);
   // Attempt to detect language since preloaded tabs will not execute
   // WebStateObserver::PageLoaded.
   StartLanguageDetection();

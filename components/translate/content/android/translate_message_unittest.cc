@@ -26,7 +26,6 @@
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_manager.h"
-#include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "components/translate/core/browser/translate_ui_delegate.h"
 #include "components/translate/core/browser/translate_ui_languages_manager.h"
@@ -327,7 +326,7 @@ class TranslateMessageTest : public ::testing::Test {
     pref_service_->SetString(testing::accept_languages_prefs, std::string());
     pref_service_->SetString(language::prefs::kAcceptLanguages, std::string());
     pref_service_->registry()->RegisterBooleanPref(
-        prefs::kOfferTranslateEnabled, true);
+        language::prefs::kOfferTranslateEnabled, true);
     TranslatePrefs::RegisterProfilePrefs(pref_service_->registry());
     client_ =
         std::make_unique<MockTranslateClient>(&driver_, pref_service_.get());
