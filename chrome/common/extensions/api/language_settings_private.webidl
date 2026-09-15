@@ -20,10 +20,6 @@ dictionary Language {
   // Whether this language can be used for spell checking. Defaults to false.
   boolean supportsSpellcheck;
 
-  // Whether this language has translations for the current target language.
-  // Defaults to false.
-  boolean supportsTranslate;
-
   // Whether this language is prohibited as a UI locale (not in the list of
   // the 'AllowedLanguages' policy). Defaults to false.
   boolean isProhibitedLanguage;
@@ -130,10 +126,6 @@ interface LanguageSettingsPrivate {
 
   // Disables a language, removing it from the Accept-Language list.
   static undefined disableLanguage(DOMString languageCode);
-
-  // Enables or disables translation for a given language.
-  static undefined setEnableTranslationForLanguage(DOMString languageCode,
-                                                   boolean enable);
 
   // Moves a language inside the language list.
   static undefined moveLanguage(DOMString languageCode, MoveType moveType);

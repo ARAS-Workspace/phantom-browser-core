@@ -81,31 +81,6 @@ class LanguageSettingsPrivateDisableLanguageFunction
   ResponseAction Run() override;
 };
 
-// Implements the languageSettingsPrivate.setEnableTranslationForLanguage
-// method.
-class LanguageSettingsPrivateSetEnableTranslationForLanguageFunction
-    : public ExtensionFunction {
- public:
-  LanguageSettingsPrivateSetEnableTranslationForLanguageFunction();
-
-  LanguageSettingsPrivateSetEnableTranslationForLanguageFunction(
-      const LanguageSettingsPrivateSetEnableTranslationForLanguageFunction&) =
-      delete;
-  LanguageSettingsPrivateSetEnableTranslationForLanguageFunction& operator=(
-      const LanguageSettingsPrivateSetEnableTranslationForLanguageFunction&) =
-      delete;
-
-  DECLARE_EXTENSION_FUNCTION(
-      "languageSettingsPrivate.setEnableTranslationForLanguage",
-      LANGUAGESETTINGSPRIVATE_SETENABLETRANSLATIONFORLANGUAGE)
-
- protected:
-  ~LanguageSettingsPrivateSetEnableTranslationForLanguageFunction() override;
-
-  // ExtensionFunction overrides.
-  ResponseAction Run() override;
-};
-
 // Implements the languageSettingsPrivate.moveLanguage method.
 class LanguageSettingsPrivateMoveLanguageFunction : public ExtensionFunction {
  public:

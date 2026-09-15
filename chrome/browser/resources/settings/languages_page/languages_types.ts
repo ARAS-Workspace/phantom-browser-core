@@ -85,18 +85,6 @@ export interface LanguageHelper {
    */
   moveLanguageToFront(languageCode: string): void;
 
-  /**
-   * Enables translate for the given language by removing the translate
-   * language from the blocked languages preference.
-   */
-  enableTranslateLanguage(languageCode: string): void;
-
-  /**
-   * Disables translate for the given language by adding the translate
-   * language to the blocked languages preference.
-   */
-  disableTranslateLanguage(languageCode: string): void;
-
 
   getLanguage(languageCode: string): chrome.languageSettingsPrivate.Language
       |undefined;

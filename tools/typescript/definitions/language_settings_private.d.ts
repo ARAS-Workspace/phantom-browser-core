@@ -23,7 +23,6 @@ declare global {
         nativeDisplayName: string;
         supportsUI?: boolean;
         supportsSpellcheck?: boolean;
-        supportsTranslate?: boolean;
         isProhibitedLanguage?: boolean;
       }
 
@@ -54,8 +53,6 @@ declare global {
       export function getLanguageList(): Promise<Language[]>;
       export function enableLanguage(languageCode: string): void;
       export function disableLanguage(languageCode: string): void;
-      export function setEnableTranslationForLanguage(
-          languageCode: string, enable: boolean): void;
       export function moveLanguage(languageCode: string, moveType: MoveType):
           void;
       export function getSpellcheckDictionaryStatuses():

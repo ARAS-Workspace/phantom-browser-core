@@ -33,6 +33,7 @@ static_library("browser") {
     "//components/pref_registry",
     "//components/prefs",
     "//components/strings",
+    "//third_party/icu",
     "//ui/base",
   ]
 }

@@ -410,24 +410,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
     this.languageSettingsPrivate_.moveLanguage(languageCode, MoveType.TOP);
   }
 
-  /**
-   * Enables translate for the given language by removing the translate
-   * language from the blocked languages preference.
-   */
-  enableTranslateLanguage(languageCode: string) {
-    this.languageSettingsPrivate_.setEnableTranslationForLanguage(
-        languageCode, true);
-  }
-
-  /**
-   * Disables translate for the given language by adding the translate
-   * language to the blocked languages preference.
-   */
-  disableTranslateLanguage(languageCode: string) {
-    this.languageSettingsPrivate_.setEnableTranslationForLanguage(
-        languageCode, false);
-  }
-
   getLanguage(languageCode: string): chrome.languageSettingsPrivate.Language
       |undefined {
     if (this.supportedLanguageMap_.has(languageCode)) {

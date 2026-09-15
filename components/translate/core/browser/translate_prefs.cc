@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -15,13 +14,11 @@
 
 #include "base/feature_list.h"
 #include "base/i18n/language_tag.h"
-#include "base/i18n/rtl.h"
 #include "base/i18n/tag_converters.h"
 #include "base/json/values_util.h"
 #include "base/logging.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
-#include "base/strings/utf_string_conversions.h"
 #include "base/values.h"
 #include "build/build_config.h"
 #include "components/language/core/browser/accept_languages_service.h"
@@ -38,8 +35,6 @@
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 #include "ui/base/l10n/chromium_language_matcher.h"
-#include "ui/base/l10n/l10n_util.h"
-#include "ui/base/l10n/l10n_util_collator.h"
 
 namespace translate {
 namespace {
@@ -64,24 +59,6 @@ LanguageTag ResolveLanguagTag(const LanguageTag& language_tag) {
   return language_detection::GetSupportedLanguageMatcher()
       .Match(language_tag)
       .value_or(language_tag);
-}
-
-// Returns whether or not the given list includes at least one language with
-// the same base as the input language.
-// For example: "en-US" and "en-UK" share the same base "en".
-bool ContainsSameBaseLanguage(const std::vector<base::i18n::LanguageTag>& list,
-                              std::string_view language_code) {
-  std::optional<base::i18n::LanguageTag> parsed_input =
-      GetLanguageTagFromString(language_code);
-  if (!parsed_input) {
-    return false;
-  }
-  for (const auto& item : list) {
-    if (parsed_input->language_subtag() == item.language_subtag()) {
-      return true;
-    }
-  }
-  return false;
 }
 
 // Merge old always-translate languages from the deprecated pref to the new
@@ -221,41 +198,17 @@ void TranslatePrefs::ResetToDefaults() {
 }
 
 bool TranslatePrefs::IsBlockedLanguage(std::string_view input_language) const {
-  LanguageTag canonical_lang = ToTranslateLanguageTag(input_language);
-  const base::ListValue& blocked =
-      prefs_->GetList(language::prefs::kBlockedLanguages);
-  return blocked.contains(canonical_lang.tag_string());
+  return language_prefs_->IsBlockedLanguage(input_language);
 }
 
 void TranslatePrefs::BlockLanguage(std::string_view input_language) {
-  DCHECK(!input_language.empty());
-
-  // Get the translate version of the string to add to the blocked list.
-  LanguageTag translate_lang = ToTranslateLanguageTag(input_language);
-
-  // If neither the translate or Chrome language is a possible accept
-  // language skip adding to blocked language list.
-  if (!l10n_util::IsPossibleAcceptLanguage(translate_lang.tag_string())) {
-    return;
-  }
-
-  if (!IsBlockedLanguage(translate_lang.tag_string())) {
-    ScopedListPrefUpdate update(prefs_, language::prefs::kBlockedLanguages);
-    update->Append(translate_lang.tag_string());
-  }
+  language_prefs_->BlockLanguage(input_language);
   // Remove the blocked language from the always translate list if present.
   RemoveLanguagePairFromAlwaysTranslateList(input_language);
 }
 
 void TranslatePrefs::UnblockLanguage(std::string_view input_language) {
-  DCHECK(!input_language.empty());
-  // Never remove last fluent language.
-  if (GetNeverTranslateLanguages().size() <= 1) {
-    return;
-  }
-  LanguageTag canonical_lang = ToTranslateLanguageTag(input_language);
-  ScopedListPrefUpdate update(prefs_, language::prefs::kBlockedLanguages);
-  update->EraseValue(base::Value(canonical_lang.tag_string()));
+  language_prefs_->UnblockLanguage(input_language);
 }
 
 void TranslatePrefs::ResetEmptyBlockedLanguagesToDefaults() {
@@ -279,66 +232,12 @@ std::vector<std::string> TranslatePrefs::GetNeverTranslateLanguages() const {
 void TranslatePrefs::AddToLanguageList(
     const base::i18n::LanguageTag& language_tag,
     const bool force_blocked) {
-  DCHECK(!language_tag.tag_string().empty());
-
-  std::vector<base::i18n::LanguageTag> languages = GetLanguageList();
-  std::vector<base::i18n::LanguageTag> user_selected_languages =
-      GetUserSelectedLanguageList();
-
-  // We should block the language if the list does not already contain another
-  // language with the same base language. Policy-forced languages aren't
-  // counted as "blocking", so only user-selected languages are checked.
-  const bool should_block = !ContainsSameBaseLanguage(
-      user_selected_languages, language_tag.tag_string());
-
-  if (force_blocked || should_block) {
-    BlockLanguage(language_tag.tag_string());
-  }
-
-  // Add the language to the list.
-  if (!std::ranges::contains(languages, language_tag)) {
-    user_selected_languages.push_back(language_tag);
-    std::vector<std::string> user_selected_language_codes;
-    user_selected_language_codes.reserve(user_selected_languages.size());
-    for (const auto& tag : user_selected_languages) {
-      user_selected_language_codes.push_back(std::string(tag.tag_string()));
-    }
-    language_prefs_->SetUserSelectedLanguagesList(user_selected_language_codes);
-  }
+  language_prefs_->AddToLanguageList(language_tag, force_blocked);
 }
 
 void TranslatePrefs::RemoveFromLanguageList(
     const base::i18n::LanguageTag& language_tag) {
-  DCHECK(!language_tag.tag_string().empty());
-
-  std::vector<base::i18n::LanguageTag> user_selected_languages =
-      GetUserSelectedLanguageList();
-
-  // Remove the language from the list.
-  const auto& it = std::ranges::find(user_selected_languages, language_tag);
-  if (it != user_selected_languages.end()) {
-    user_selected_languages.erase(it);
-    std::vector<std::string> user_selected_language_codes;
-    user_selected_language_codes.reserve(user_selected_languages.size());
-    for (const auto& tag : user_selected_languages) {
-      user_selected_language_codes.push_back(std::string(tag.tag_string()));
-    }
-    language_prefs_->SetUserSelectedLanguagesList(user_selected_language_codes);
-
-    // We should unblock the language if this was the last one from the same
-    // language family.
-    if (!ContainsSameBaseLanguage(GetLanguageList(),
-                                  language_tag.tag_string())) {
-      UnblockLanguage(language_tag.tag_string());
-      // If the recent translate target matches the last language of a family
-      // being removed, reset the most recent target language so it will not be
-      // used the next time Translate is triggered.
-      LanguageTag translate_language = ResolveLanguagTag(language_tag);
-      if (translate_language.tag_string() == GetRecentTargetLanguage()) {
-        ResetRecentTargetLanguage();
-      }
-    }
-  }
+  language_prefs_->RemoveFromLanguageList(language_tag);
 }
 
 void TranslatePrefs::RearrangeLanguage(
@@ -346,80 +245,24 @@ void TranslatePrefs::RearrangeLanguage(
     const TranslatePrefs::RearrangeSpecifier where,
     int offset,
     const std::vector<std::string>& enabled_languages) {
-  // Negative offset is not supported.
-  DCHECK(!(offset < 1 && (where == kUp || where == kDown)));
-
-  std::vector<std::string> languages;
-  for (const auto& tag : GetUserSelectedLanguageList()) {
-    languages.push_back(std::string(tag.tag_string()));
-  }
-
-  auto pos = std::ranges::find(languages, language);
-  if (pos == languages.end())
-    return;
-
-  // Sort the vector of enabled languages for fast lookup.
-  std::vector<std::string_view> enabled(enabled_languages.begin(),
-                                        enabled_languages.end());
-  std::sort(enabled.begin(), enabled.end());
-  if (!std::binary_search(enabled.begin(), enabled.end(), language))
-    return;
-
+  language::LanguagePrefs::RearrangeSpecifier target =
+      language::LanguagePrefs::kNone;
   switch (where) {
-    case kTop:
-      // To avoid code duplication, set |offset| to max int and re-use the logic
-      // to move |language| up in the list as far as possible.
-      offset = std::numeric_limits<int>::max();
-      [[fallthrough]];
-    case kUp:
-      if (pos == languages.begin())
-        return;
-      while (pos != languages.begin()) {
-        auto next_pos = pos - 1;
-        // Skip over non-enabled languages without decrementing |offset|.
-        // Also skip over languages hidden due to duplication between forced
-        // and user-selected languages.
-        if (std::binary_search(enabled.begin(), enabled.end(), *next_pos) &&
-            !language_prefs_->IsForcedLanguage(*next_pos)) {
-          // By only checking |offset| when an enabled, non-forced language is
-          // found, and decrementing |offset| after checking it (instead of
-          // before), this means that |language| will be moved up the list until
-          // it has either reached the next enabled language or the top of the
-          // list.
-          if (offset <= 0)
-            break;
-          --offset;
-        }
-        std::swap(*next_pos, *pos);
-        pos = next_pos;
-      }
-      break;
-
-    case kDown:
-      if (pos + 1 == languages.end())
-        return;
-      for (auto next_pos = pos + 1; next_pos != languages.end() && offset > 0;
-           pos = next_pos++) {
-        // Skip over non-enabled or forced languages without decrementing
-        // offset. Unlike moving languages up in the list, moving languages down
-        // in the list stops as soon as |offset| reaches zero, instead of
-        // continuing to skip non-enabled languages after |offset| has reached
-        // zero.
-        if (std::binary_search(enabled.begin(), enabled.end(), *next_pos) &&
-            !language_prefs_->IsForcedLanguage(*next_pos))
-          --offset;
-        std::swap(*next_pos, *pos);
-      }
-      break;
-
     case kNone:
-      return;
-
-    default:
-      NOTREACHED();
+      target = language::LanguagePrefs::kNone;
+      break;
+    case kTop:
+      target = language::LanguagePrefs::kTop;
+      break;
+    case kUp:
+      target = language::LanguagePrefs::kUp;
+      break;
+    case kDown:
+      target = language::LanguagePrefs::kDown;
+      break;
   }
-
-  language_prefs_->SetUserSelectedLanguagesList(languages);
+  language_prefs_->RearrangeLanguage(language, target, offset,
+                                     enabled_languages);
 }
 
 void TranslatePrefs::SetLanguageOrder(
@@ -438,55 +281,25 @@ void TranslatePrefs::GetLanguageInfoList(
     return;
   }
 
-  language_list->clear();
-
-  // Collect the language codes from the supported accept-languages.
-  std::vector<std::string> language_codes =
-      l10n_util::GetAcceptLanguagesForLocale(app_locale);
-
-  // Collator used to sort display names in the given locale.
-  UErrorCode error = U_ZERO_ERROR;
-  std::unique_ptr<icu::Collator> collator(
-      icu::Collator::createInstance(icu::Locale(app_locale.c_str()), error));
-  if (U_FAILURE(error)) {
-    collator.reset();
-  }
-  // Map of [display name -> language code].
-  std::map<std::u16string, std::string,
-           l10n_util::StringComparator<std::u16string>>
-      language_map(l10n_util::StringComparator<std::u16string>(collator.get()));
-
-  // Build the list of display names and the language map.
-  for (std::string& code : language_codes) {
-    language_map[l10n_util::GetDisplayNameForLocale(code, app_locale, false)] =
-        std::move(code);
-  }
+  std::vector<language::LanguageInfo> languages;
+  language::LanguagePrefs::GetLanguageInfoList(app_locale, &languages);
 
   if (translate_allowed) {
-    translate::TranslateDownloadManager::RequestLanguageList();
+    TranslateDownloadManager::RequestLanguageList();
   }
 
-  // Build the language list from the language map.
-  for (auto& entry : language_map) {
+  language_list->clear();
+  for (auto& entry : languages) {
     TranslateLanguageInfo language;
-    language.code = std::move(entry.second);
+    language.code = std::move(entry.code);
+    language.display_name = std::move(entry.display_name);
+    language.native_display_name = std::move(entry.native_display_name);
 
-    std::u16string adjusted_display_name = entry.first;
-    base::i18n::AdjustStringForLocaleDirection(&adjusted_display_name);
-    language.display_name = base::UTF16ToUTF8(adjusted_display_name);
-
-    std::u16string adjusted_native_display_name =
-        l10n_util::GetDisplayNameForLocale(language.code, language.code, false);
-    base::i18n::AdjustStringForLocaleDirection(&adjusted_native_display_name);
-    language.native_display_name =
-        base::UTF16ToUTF8(adjusted_native_display_name);
-
-    // Extract the base language: if the base language can be translated, then
-    // even the regional one should be marked as such.
+    // Extract the base language: if the base language can be translated,
+    // then even the regional one should be marked as such.
     LanguageTag translate_code = ToTranslateLanguageTag(language.code);
-    language.supports_translate =
-        translate::TranslateDownloadManager::IsSupportedLanguage(
-            translate_code.tag_string());
+    language.supports_translate = TranslateDownloadManager::IsSupportedLanguage(
+        translate_code.tag_string());
     language_list->push_back(std::move(language));
   }
 }

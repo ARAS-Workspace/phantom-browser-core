@@ -55,7 +55,6 @@ export class FakeLanguageSettingsPrivate extends TestBrowserProxy {
         code: 'en',
         displayName: 'English',
         nativeDisplayName: 'English',
-        supportsTranslate: true,
       },
       {
         code: 'en-CA',
@@ -70,7 +69,6 @@ export class FakeLanguageSettingsPrivate extends TestBrowserProxy {
         nativeDisplayName: 'English (United States)',
         supportsSpellcheck: true,
         supportsUI: true,
-        supportsTranslate: true,
       },
       {
         // A standalone language.
@@ -78,7 +76,6 @@ export class FakeLanguageSettingsPrivate extends TestBrowserProxy {
         displayName: 'Swahili',
         nativeDisplayName: 'Kiswahili',
         supportsSpellcheck: true,
-        supportsTranslate: true,
         supportsUI: true,
       },
       {
@@ -93,7 +90,6 @@ export class FakeLanguageSettingsPrivate extends TestBrowserProxy {
         code: 'no',
         displayName: 'Norwegian',
         nativeDisplayName: 'norsk',
-        supportsTranslate: true,
       },
       {
         // Norwegian language codes don't start with "no-" but should still
@@ -103,7 +99,6 @@ export class FakeLanguageSettingsPrivate extends TestBrowserProxy {
         displayName: 'Norwegian Bokmål',
         nativeDisplayName: 'norsk bokmål',
         supportsSpellcheck: true,
-        supportsTranslate: true,
         supportsUI: true,
       },
       {
@@ -232,32 +227,6 @@ export class FakeLanguageSettingsPrivate extends TestBrowserProxy {
     languages.splice(index, 1);
     PrefService.getInstance().setPrefValue(
         'intl.accept_languages', languages.join(','));
-  }
-
-  /**
-   * Enables/Disables translation for the given language.
-   * This respectively removes/adds the language to the blocked set in the
-   * preferences.
-   */
-  setEnableTranslationForLanguage(languageCode: string, enable: boolean) {
-    const pref = PrefService.getInstance().getPref<string[]>(
-        'translate_blocked_languages');
-    const index = pref.value.indexOf(languageCode);
-    if (enable) {
-      if (index === -1) {
-        return;
-      }
-      const updated = [...pref.value];
-      updated.splice(index, 1);
-      PrefService.getInstance().setPrefValue(
-          'translate_blocked_languages', updated);
-    } else {
-      if (index !== -1) {
-        return;
-      }
-      PrefService.getInstance().appendPrefListItem(
-          'translate_blocked_languages', languageCode);
-    }
   }
 
   /**
