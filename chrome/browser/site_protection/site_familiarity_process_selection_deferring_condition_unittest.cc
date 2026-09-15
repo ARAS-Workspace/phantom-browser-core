@@ -16,21 +16,18 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/engagement/site_engagement_service_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "chrome/browser/search_engines/template_url_service_factory_test_util.h"
 #include "chrome/browser/site_protection/site_familiarity_fetcher.h"
 #include "chrome/browser/site_protection/site_familiarity_process_selection_user_data.h"
 #include "chrome/browser/site_protection/site_familiarity_utils.h"
-#include "chrome/browser/safe_browsing/mock_safe_browsing_database_manager.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
-#include "chrome/test/base/testing_browser_process.h"
 #include "components/history/core/browser/history_database_params.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_types.h"
 #include "components/history/core/test/test_history_database.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/safe_browsing/core/browser/db/test_database_manager.h"
 #include "components/safe_browsing/core/common/features.h"
+#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/site_engagement/content/site_engagement_service.h"
@@ -51,68 +48,6 @@ const int kMinSiteEngagementScoreForFamiliarity =
         kMigrateToBlockV8OptimizerOnUnfamiliarSitesMinSiteEngagementScore
             .default_value;
 
-// MockSafeBrowsingDatabaseManager which enables adding URL to high confidence
-// allowlist.
-//
-// This mock also supports a "manual callback mode" to simulate asynchronous
-// lookups in tests. When manual mode is enabled via
-// `SetManualCallbackMode(true)`:
-// 1. Incoming Safe Browsing lookups are queued up in `pending_callbacks_`
-//    instead of completing immediately.
-// 2. You must manually trigger the callbacks by calling `RunNextCallback()`.
-// 3. You can inspect how many lookups are pending using
-// `GetNumPendingCallbacks()`.
-//
-// By default, manual mode is disabled and lookups complete synchronously.
-class TestSafeBrowsingDatabaseManager : public MockSafeBrowsingDatabaseManager {
- public:
-  TestSafeBrowsingDatabaseManager() = default;
-
-  void SetUrlOnHighConfidenceAllowlist(const GURL& url) {
-    url_on_high_confidence_allowlist_ = url;
-  }
-
-  void CheckUrlForHighConfidenceAllowlist(
-      const GURL& url,
-      CheckUrlForHighConfidenceAllowlistCallback callback) override {
-    num_queries_++;
-    if (manual_callback_mode_) {
-      pending_callbacks_.push(base::BindOnce(
-          std::move(callback), url == url_on_high_confidence_allowlist_,
-          std::nullopt));
-      return;
-    }
-    std::move(callback).Run(
-        /*url_on_high_confidence_allowlist=*/(
-            url == url_on_high_confidence_allowlist_),
-        /*logging_details=*/std::nullopt);
-  }
-
-  void SetManualCallbackMode(bool enabled) { manual_callback_mode_ = enabled; }
-
-  void RunNextCallback() {
-    if (pending_callbacks_.empty()) {
-      return;
-    }
-    std::move(pending_callbacks_.front()).Run();
-    pending_callbacks_.pop();
-  }
-
-  size_t GetNumPendingCallbacks() const { return pending_callbacks_.size(); }
-
-  int num_queries() const { return num_queries_; }
-  void ResetQueryCount() { num_queries_ = 0; }
-
- protected:
-  ~TestSafeBrowsingDatabaseManager() override = default;
-
- private:
-  GURL url_on_high_confidence_allowlist_;
-  bool manual_callback_mode_ = false;
-  std::queue<base::OnceClosure> pending_callbacks_;
-  int num_queries_ = 0;
-};
-
 std::unique_ptr<KeyedService> BuildTestSiteEngagementService(
     content::BrowserContext* context) {
   return std::make_unique<site_engagement::SiteEngagementService>(context);
@@ -126,18 +61,6 @@ class SiteFamiliarityProcessSelectionDeferringConditionTest
  public:
   void SetUp() override {
     ChromeRenderViewHostTestHarness::SetUp();
-
-    safe_browsing_database_manager_ =
-        base::MakeRefCounted<TestSafeBrowsingDatabaseManager>();
-    safe_browsing_factory_ =
-        std::make_unique<safe_browsing::TestSafeBrowsingServiceFactory>();
-    safe_browsing_factory_->SetTestDatabaseManager(
-        safe_browsing_database_manager_.get());
-
-    browser_process_ = TestingBrowserProcess::GetGlobal();
-    browser_process_->SetSafeBrowsingService(
-        safe_browsing_factory_->CreateSafeBrowsingService());
-    browser_process_->safe_browsing_service()->Initialize();
   }
 
   TestingProfile::TestingFactories GetTestingFactories() const override {
@@ -150,8 +73,6 @@ class SiteFamiliarityProcessSelectionDeferringConditionTest
 
   void TearDown() override {
     site_protection::SiteFamiliarityFetcher::ResetFamiliarUrlsForTesting();
-    browser_process_->safe_browsing_service()->ShutDown();
-    browser_process_->SetSafeBrowsingService(nullptr);
 
     ChromeRenderViewHostTestHarness::TearDown();
   }
@@ -205,14 +126,6 @@ class SiteFamiliarityProcessSelectionDeferringConditionTest
     ASSERT_TRUE(user_data);
     EXPECT_FALSE(user_data->is_site_familiar());
   }
-
- protected:
-  raw_ptr<TestingBrowserProcess> browser_process_;
-
-  scoped_refptr<TestSafeBrowsingDatabaseManager>
-      safe_browsing_database_manager_;
-  std::unique_ptr<safe_browsing::TestSafeBrowsingServiceFactory>
-      safe_browsing_factory_;
 };
 
 // Test that data URLs are considered unfamiliar.
@@ -336,22 +249,6 @@ TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
             content::ProcessSelectionDeferringCondition::Result::kProceed);
   // Returned site familiarity will be overwritten by
   // ChromeContentBrowserClient::AreV8OptimizationsDisabledForSite().
-}
-
-// Test that URLs on the safe-browsing-high-confidence-allowlist are considered
-// familiar.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
-       FamiliarityHeuristic_OnHighConfidenceAllowlist) {
-  GURL kTestUrl("https://www.example.com");
-  url::Origin kTestOrigin = url::Origin::Create(kTestUrl);
-
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  safe_browsing_database_manager_->SetUrlOnHighConfidenceAllowlist(kTestUrl);
-
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  BuildAndWaitForConditionToRunCallback(navigation_handle);
-  CheckSiteFamiliar(navigation_handle);
 }
 
 // Test that if chrome://history has an entry for the origin older than a day
@@ -584,34 +481,13 @@ std::unique_ptr<KeyedService> BuildManualCallbackEmptyHistoryService(
   return service;
 }
 
-// This test fixture allows simulating asynchronous behavior of Safe Browsing
-// and History lookups.
+// This test fixture allows simulating asynchronous behavior of the
+// History lookup.
 //
-// By default, both lookups are asynchronous in the real implementation, but
-// in tests, we can control them manually:
-//
-// 1. History Lookup:
-//    The `ManualCallbackEmptyHistoryService` is used by default in this
-//    fixture. Lookups are ALWAYS queued. They will NOT execute their callbacks
-//    until `RunNextCallback()` is explicitly called on the history service.
-//
-// 2. Safe Browsing Lookup:
-//    In these tests, Safe Browsing lookups complete synchronously by default.
-//    To simulate a pending/asynchronous Safe Browsing check, you must
-//    explicitly call:
-//      `safe_browsing_database_manager_->SetManualCallbackMode(true);`
-//    This queues up the Safe Browsing callbacks. You must then manually trigger
-//    their execution by calling:
-//      `safe_browsing_database_manager_->RunNextCallback();`
-//
-// Example pattern to test a pending state where both are waiting:
-//   safe_browsing_database_manager_->SetManualCallbackMode(true);
-//   ... start navigation ...
-//   // Both are now pending.
-//   ... resume/complete history ...
-//   history_service->RunNextCallback();
-//   ... resume/complete safe browsing ...
-//   safe_browsing_database_manager_->RunNextCallback();
+// The `ManualCallbackEmptyHistoryService` is used by default in this
+// fixture. Lookups are ALWAYS queued. They will NOT execute their
+// callbacks until `RunNextCallback()` is explicitly called on the
+// history service.
 class SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest
     : public SiteFamiliarityProcessSelectionDeferringConditionTest {
  public:
@@ -622,67 +498,6 @@ class SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest
 };
 
 }  // anonymous namespace
-
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
-       Defer_LowEngagement_PendingSB_PendingHistory) {
-  GURL kTestUrl("https://www.example.com");
-  base::HistogramTester histogram_tester;
-
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  // 1. Low engagement.
-  // 2. SB lookup pending (enable manual mode).
-  safe_browsing_database_manager_->SetManualCallbackMode(true);
-  // 3. History lookup pending (mock history service is pending by default).
-
-  base::MockCallback<base::OnceClosure> mock_callback;
-  EXPECT_CALL(mock_callback, Run()).Times(0);
-
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  // Should defer because we don't know yet.
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(mock_callback.Get()));
-
-  // Verify tasks are queued.
-  EXPECT_EQ(1u, safe_browsing_database_manager_->GetNumPendingCallbacks());
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  EXPECT_EQ(1u, mock_history_service->GetNumQueuedCallbacks());
-}
-
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
-       Defer_LowEngagement_PendingSB_UnfamiliarHistory) {
-  GURL kTestUrl("https://www.example.com");
-  base::HistogramTester histogram_tester;
-
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  // 1. Low engagement.
-  // 2. SB lookup pending (enable manual mode).
-  safe_browsing_database_manager_->SetManualCallbackMode(true);
-  // 3. History lookup done but unfamiliar.
-
-  base::MockCallback<base::OnceClosure> mock_callback;
-  EXPECT_CALL(mock_callback, Run()).Times(0);
-
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(mock_callback.Get()));
-
-  // Complete history as unfamiliar.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-
-  // Should still defer because SB is still pending.
-  EXPECT_EQ(1u, safe_browsing_database_manager_->GetNumPendingCallbacks());
-}
 
 // Test that chrome-extension:// URLs are considered familiar.
 TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
@@ -704,73 +519,6 @@ TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
   EXPECT_EQ(0u, mock_history_service->GetNumQueuedCallbacks());
 }
 
-// Test that
-// SiteFamiliarityProcessSelectionDeferringCondition::OnWillSelectFinalProcess()
-// returns Result::kDefer if all the data has not yet been fetched when
-// OnWillSelectFinalProcess() is called.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
-       Proceed_LowEngagement_FamiliarSB_PendingHistory) {
-  GURL kTestUrl("https://www.example.com");
-  url::Origin kTestOrigin = url::Origin::Create(kTestUrl);
-
-  base::HistogramTester histogram_tester;
-
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  safe_browsing_database_manager_->SetUrlOnHighConfidenceAllowlist(kTestUrl);
-
-  base::MockCallback<base::OnceClosure> mock_callback;
-  EXPECT_CALL(mock_callback, Run()).Times(0);
-
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kProceed,
-            condition.OnWillSelectFinalProcess(mock_callback.Get()));
-
-  CheckSiteFamiliar(navigation_handle);
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.DeferNavigationToComputeSiteFamiliarity", false,
-      1);
-}
-
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
-       Defer_LowEngagement_UnfamiliarSB_PendingHistory) {
-  GURL kTestUrl("https://www.example.com");
-  url::Origin kTestOrigin = url::Origin::Create(kTestUrl);
-
-  base::HistogramTester histogram_tester;
-
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  // SB is unfamiliar by default (not set on allowlist).
-  // History is pending.
-
-  base::MockCallback<base::OnceClosure> mock_callback;
-  EXPECT_CALL(mock_callback, Run());
-
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  // Should defer because SB is unfamiliar and History is pending.
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(mock_callback.Get()));
-
-  // Complete the history fetch (still unfamiliar).
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-
-  CheckSiteUnfamiliar(navigation_handle);
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.DeferNavigationToComputeSiteFamiliarity", true,
-      1);
-  histogram_tester.ExpectTotalCount(
-      kSiteFamiliarityDeferNavigationDurationHistogram, 1);
-}
-
 TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
        Proceed_HighEngagement_NoTasksQueued) {
   GURL kTestUrl("https://www.example.com");
@@ -779,9 +527,6 @@ TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
   base::HistogramTester histogram_tester;
 
   SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity);
-
-  safe_browsing_database_manager_->SetManualCallbackMode(true);
-  safe_browsing_database_manager_->ResetQueryCount();
 
   base::MockCallback<base::OnceClosure> mock_callback;
   EXPECT_CALL(mock_callback, Run()).Times(0);
@@ -803,137 +548,10 @@ TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
   raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
       static_cast<ManualCallbackEmptyHistoryService*>(history_service());
   EXPECT_EQ(0u, mock_history_service->GetNumQueuedCallbacks());
-
-  // Verify no Safe Browsing query was made.
-  EXPECT_EQ(0, safe_browsing_database_manager_->num_queries());
-  EXPECT_EQ(0u, safe_browsing_database_manager_->GetNumPendingCallbacks());
 }
 
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
-       Proceed_LowEngagement_PendingSB_FamiliarHistory) {
-  GURL kTestUrl("https://www.example.com");
-  url::Origin kTestOrigin = url::Origin::Create(kTestUrl);
-
-  base::HistogramTester histogram_tester;
-
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  // 1. Low engagement.
-  // 2. SB lookup pending (enable manual mode).
-  safe_browsing_database_manager_->SetManualCallbackMode(true);
-  // 3. History lookup pending initially.
-
-  base::MockCallback<base::OnceClosure> mock_callback;
-  EXPECT_CALL(mock_callback, Run());  // Should be run when history completes.
-
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  // Should defer initially because both are pending.
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(mock_callback.Get()));
-
-  // Complete history as familiar.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-
-  history::HistoryLastVisitResult familiar_result;
-  familiar_result.success = true;
-  familiar_result.last_visit = base::Time::Now() - base::Hours(25);
-
-  mock_history_service->RunNextCallback(familiar_result);
-
-  // Should proceed now because History is familiar, even though SB is still
-  // pending.
-  CheckSiteFamiliar(navigation_handle);
-
-  // It should have deferred.
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.DeferNavigationToComputeSiteFamiliarity", true,
-      1);
-
-  // Verify SB is still pending (we haven't run it, but the fetcher should have
-  // cancelled it).
-  EXPECT_EQ(1u, safe_browsing_database_manager_->GetNumPendingCallbacks());
-}
-
-// Test that
-// SiteFamiliarityProcessSelectionDeferringCondition::OnWillSelectFinalProcess()
-// returns Result::kProceed if all the data has been fetched when
-// OnWillSelectFinalProcess() is called.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
-       DoNotDefer) {
-  GURL kTestUrl("https://www.example.com");
-  url::Origin kTestOrigin = url::Origin::Create(kTestUrl);
-
-  base::HistogramTester histogram_tester;
-
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  safe_browsing_database_manager_->SetUrlOnHighConfidenceAllowlist(kTestUrl);
-
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  // Complete the history fetch.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-
-  base::MockCallback<base::OnceClosure> mock_callback;
-  EXPECT_CALL(mock_callback, Run()).Times(0);
-
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kProceed,
-            condition.OnWillSelectFinalProcess(mock_callback.Get()));
-  CheckSiteFamiliar(navigation_handle);
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.DeferNavigationToComputeSiteFamiliarity", false,
-      1);
-  histogram_tester.ExpectTotalCount(
-      kSiteFamiliarityDeferNavigationDurationHistogram, 0);
-}
-
-// Test that the safe-browsing-high-confidence-allowlist is re-queried when the
-// navigation is redirected.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
-       RequestRedirected) {
-  GURL kTestUrl1("https://www.example.com");
-  GURL kTestUrl2("https://www.bar.com");
-  url::Origin kTestOrigin1 = url::Origin::Create(kTestUrl1);
-  url::Origin kTestOrigin2 = url::Origin::Create(kTestUrl2);
-
-  base::HistogramTester histogram_tester;
-  SetSiteEngagementScore(kTestUrl1, kMinSiteEngagementScoreForFamiliarity - 1);
-  SetSiteEngagementScore(kTestUrl2, kMinSiteEngagementScoreForFamiliarity - 1);
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-
-  safe_browsing_database_manager_->SetUrlOnHighConfidenceAllowlist(kTestUrl1);
-
-  content::MockNavigationHandle navigation_handle(kTestUrl1, main_rfh());
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-  // Complete the history fetch.
-  mock_history_service->RunNextCallback();
-
-  navigation_handle.set_url(kTestUrl2);
-
-  condition.OnRequestRedirected();
-  mock_history_service->RunNextCallback();
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kProceed,
-            condition.OnWillSelectFinalProcess(base::OnceClosure()));
-
-  CheckSiteUnfamiliar(navigation_handle);
-  histogram_tester.ExpectTotalCount(
-      kSiteFamiliarityDeferNavigationDurationHistogram, 0);
-}
-
-// Test that the safe-browsing-high-confidence-allowlist and history are
-// re-queried when the navigation is redirected. This test differs from the
-// RequestRedirected test because the redirect occurs while the history request
-// is still pending.
+// Test that history is re-queried when the navigation is redirected.
+// The redirect occurs while the history request is still pending.
 TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
        RequestRedirectedDuringQuery) {
   GURL kTestUrl1("https://www.example.com");
@@ -1134,8 +752,7 @@ TEST_F(SiteFamiliaritySameSiteSkipFamiliarityCheckTest,
   EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kProceed,
             condition.OnWillSelectFinalProcess(mock_callback.Get()));
 
-  // Verify that the services are not queried.
-  EXPECT_EQ(0, safe_browsing_database_manager_->num_queries());
+  // Verify that the history service is not queried.
   EXPECT_EQ(0u,
             static_cast<ManualCallbackEmptyHistoryService*>(history_service())
                 ->GetNumQueuedCallbacks());
@@ -1166,8 +783,7 @@ TEST_F(SiteFamiliaritySameSiteSkipFamiliarityCheckTest,
   EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kProceed,
             condition.OnWillSelectFinalProcess(mock_callback.Get()));
 
-  // Verify that the services are not queried.
-  EXPECT_EQ(0, safe_browsing_database_manager_->num_queries());
+  // Verify that the history service is not queried.
   EXPECT_EQ(0u,
             static_cast<ManualCallbackEmptyHistoryService*>(history_service())
                 ->GetNumQueuedCallbacks());
@@ -1198,8 +814,7 @@ TEST_F(SiteFamiliaritySameSiteSkipFamiliarityCheckTest,
   EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kProceed,
             condition.OnWillSelectFinalProcess(mock_callback.Get()));
 
-  // Verify that the services are not queried.
-  EXPECT_EQ(0, safe_browsing_database_manager_->num_queries());
+  // Verify that the history service is not queried.
   EXPECT_EQ(0u,
             static_cast<ManualCallbackEmptyHistoryService*>(history_service())
                 ->GetNumQueuedCallbacks());
@@ -1231,8 +846,7 @@ TEST_F(SiteFamiliaritySameSiteSkipFamiliarityCheckTest,
   EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kProceed,
             condition.OnWillSelectFinalProcess(mock_callback.Get()));
 
-  // Verify that the services are not queried.
-  EXPECT_EQ(0, safe_browsing_database_manager_->num_queries());
+  // Verify that the history service is not queried.
   EXPECT_EQ(0u,
             static_cast<ManualCallbackEmptyHistoryService*>(history_service())
                 ->GetNumQueuedCallbacks());

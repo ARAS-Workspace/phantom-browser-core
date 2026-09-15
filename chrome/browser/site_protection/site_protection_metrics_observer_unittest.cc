@@ -13,17 +13,13 @@
 #include "build/build_config.h"
 #include "chrome/browser/engagement/site_engagement_service_factory.h"
 #include "chrome/browser/history/history_service_factory.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
 #include "chrome/browser/site_protection/site_familiarity_heuristic_name.h"
 #include "chrome/browser/site_protection/site_protection_metrics.h"
-#include "chrome/browser/safe_browsing/mock_safe_browsing_database_manager.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
-#include "chrome/test/base/testing_browser_process.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_types.h"
 #include "components/prefs/pref_registry_simple.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/site_engagement/content/site_engagement_helper.h"
 #include "components/site_engagement/content/site_engagement_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
@@ -42,35 +38,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace site_protection {
-namespace {
-
-// MockSafeBrowsingDatabaseManager which enables adding URL to high confidence
-// allowlist.
-class TestSafeBrowsingDatabaseManager : public MockSafeBrowsingDatabaseManager {
- public:
-  TestSafeBrowsingDatabaseManager() = default;
-
-  void SetUrlOnHighConfidenceAllowlist(const GURL& url) {
-    url_on_high_confidence_allowlist_ = url;
-  }
-
-  void CheckUrlForHighConfidenceAllowlist(
-      const GURL& url,
-      CheckUrlForHighConfidenceAllowlistCallback callback) override {
-    std::move(callback).Run(
-        /*url_on_high_confidence_allowlist=*/(
-            url == url_on_high_confidence_allowlist_),
-        /*logging_details=*/std::nullopt);
-  }
-
- protected:
-  ~TestSafeBrowsingDatabaseManager() override = default;
-
- private:
-  GURL url_on_high_confidence_allowlist_;
-};
-
-}  // anonymous namespace
 
 // Test for SiteProtectionMetricsObserver.
 class SiteProtectionMetricsObserverTest
@@ -87,27 +54,7 @@ class SiteProtectionMetricsObserverTest
   void SetUp() override {
     ChromeRenderViewHostTestHarness::SetUp();
 
-    browser_process_ = TestingBrowserProcess::GetGlobal();
-
     SetUpForNewWebContents();
-
-    safe_browsing_database_manager_ =
-        base::MakeRefCounted<TestSafeBrowsingDatabaseManager>();
-    safe_browsing_factory_ =
-        std::make_unique<safe_browsing::TestSafeBrowsingServiceFactory>();
-    safe_browsing_factory_->SetTestDatabaseManager(
-        safe_browsing_database_manager_.get());
-
-    browser_process_->SetSafeBrowsingService(
-        safe_browsing_factory_->CreateSafeBrowsingService());
-    browser_process_->safe_browsing_service()->Initialize();
-  }
-
-  void TearDown() override {
-    browser_process_->safe_browsing_service()->ShutDown();
-    browser_process_->SetSafeBrowsingService(nullptr);
-
-    ChromeRenderViewHostTestHarness::TearDown();
   }
 
   TestingProfile::TestingFactories GetTestingFactories() const override {
@@ -216,14 +163,6 @@ class SiteProtectionMetricsObserverTest
   bool AreV8OptimizersEnabled(content::RenderFrameHost* rfh) {
     return !rfh->GetProcess()->AreV8OptimizationsDisabled();
   }
-
- protected:
-  raw_ptr<TestingBrowserProcess> browser_process_;
-
-  scoped_refptr<TestSafeBrowsingDatabaseManager>
-      safe_browsing_database_manager_;
-  std::unique_ptr<safe_browsing::TestSafeBrowsingServiceFactory>
-      safe_browsing_factory_;
 };
 
 // Test that SiteProtectionMetricsObserver logs the correct histogram and UKM if
@@ -369,34 +308,6 @@ TEST_F(SiteProtectionMetricsObserverTest, SiteEngagementScoreUkm) {
 
   NavigateAndCheckRecordedHeuristicUkm(kUrl, "SiteEngagementScore",
                                        kExpectedUkmSiteEngagement);
-}
-
-// Test that SiteProtectionMetricsObserver logs the correct histograms and UKM
-// if the site is on the safe browsing global allowlist.
-TEST_F(SiteProtectionMetricsObserverTest, GlobalAllowlistMatch) {
-  AddPageVisitedYesterdayToRegularProfile(GURL("https://baz.com"));
-
-  GURL kUrlOnHighConfidenceAllowlist("https://foo.com");
-  GURL kRegularUrl("https://bar.com");
-  safe_browsing_database_manager_->SetUrlOnHighConfidenceAllowlist(
-      kUrlOnHighConfidenceAllowlist);
-
-  {
-    ukm::TestAutoSetUkmRecorder ukm_recorder;
-    NavigateAndCheckRecordedHeuristicHistograms(
-        kUrlOnHighConfidenceAllowlist,
-        {SiteFamiliarityHeuristicName::kGlobalAllowlistMatch});
-    EXPECT_EQ(true, GetUkmFamiliarityHeuristicValue(
-                        ukm_recorder, "OnHighConfidenceAllowlist"));
-  }
-
-  {
-    ukm::TestAutoSetUkmRecorder ukm_recorder;
-    NavigateAndCheckRecordedHeuristicHistograms(
-        kRegularUrl, {SiteFamiliarityHeuristicName::kNoHeuristicMatch});
-    EXPECT_EQ(false, GetUkmFamiliarityHeuristicValue(
-                         ukm_recorder, "OnHighConfidenceAllowlist"));
-  }
 }
 
 // Test that SiteProtectionMetricsObserver logs the correct histograms and UKM
@@ -571,13 +482,6 @@ TEST_F(SiteProtectionMetricsObserverTest, MatchesHeuristicCandidate) {
                            history::SOURCE_BROWSED);
   NavigateAndCheckCandidate1HeuristicHistogram(kUrlVisitedYesterday,
                                                /*expected_value=*/true);
-
-  GURL kUrlVisitedNeverHighConfidenceAllowlist("https://hi.com");
-  safe_browsing_database_manager_->SetUrlOnHighConfidenceAllowlist(
-      kUrlVisitedNeverHighConfidenceAllowlist);
-  NavigateAndCheckCandidate1HeuristicHistogram(
-      kUrlVisitedNeverHighConfidenceAllowlist,
-      /*expected_value=*/true);
 }
 
 // MockRenderProcessHost subclass with custom v8-optimizer state.

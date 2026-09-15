@@ -72,7 +72,6 @@
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service.h"
 #include "chrome/browser/private_verification_tokens/private_verification_tokens_service_factory.h"
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/safe_browsing/verdict_cache_manager_factory.h"
 #include "chrome/browser/segmentation_platform/segmentation_platform_service_factory.h"
 #include "chrome/browser/segmentation_platform/ukm_data_manager_test_utils.h"
@@ -421,49 +420,6 @@ class RemoveCookieTester {
   const GURL cookie_url_{"http://host1.com:1"};
 
   mojo::Remote<network::mojom::CookieManager> cookie_manager_;
-};
-
-class RemoveSafeBrowsingCookieTester : public RemoveCookieTester {
- public:
-  explicit RemoveSafeBrowsingCookieTester(Profile* profile)
-      : browser_process_(TestingBrowserProcess::GetGlobal()) {
-    // TODO(crbug.com/41437292): Port consumers of the |sb_service| to use the
-    // interface in components/safe_browsing, and remove this cast.
-    scoped_refptr<safe_browsing::SafeBrowsingService> sb_service =
-        static_cast<safe_browsing::SafeBrowsingService*>(
-            safe_browsing::SafeBrowsingService::CreateSafeBrowsingService());
-    browser_process_->SetSafeBrowsingService(sb_service.get());
-    sb_service->Initialize();
-    base::RunLoop().RunUntilIdle();
-
-    // Make sure the safe browsing cookie store has no cookies.
-    // TODO(mmenke): Is this really needed?
-    base::RunLoop run_loop;
-    mojo::Remote<network::mojom::CookieManager> cookie_manager;
-    sb_service->GetNetworkContext(profile)->GetCookieManager(
-        cookie_manager.BindNewPipeAndPassReceiver());
-    cookie_manager->DeleteCookies(
-        network::mojom::CookieDeletionFilter::New(),
-        base::BindLambdaForTesting(
-            [&](uint32_t num_deleted) { run_loop.Quit(); }));
-    run_loop.Run();
-
-    SetCookieManager(std::move(cookie_manager));
-  }
-
-  RemoveSafeBrowsingCookieTester(const RemoveSafeBrowsingCookieTester&) =
-      delete;
-  RemoveSafeBrowsingCookieTester& operator=(
-      const RemoveSafeBrowsingCookieTester&) = delete;
-
-  virtual ~RemoveSafeBrowsingCookieTester() {
-    browser_process_->safe_browsing_service()->ShutDown();
-    base::RunLoop().RunUntilIdle();
-    browser_process_->SetSafeBrowsingService(nullptr);
-  }
-
- private:
-  raw_ptr<TestingBrowserProcess> browser_process_;
 };
 
 class RemoveHistoryTester {
@@ -1465,77 +1421,6 @@ class ChromeBrowsingDataRemoverDelegateWithPasswordsTest
             .get());
   }
 };
-
-// TODO(crbug.com/41370786): Disabled due to flakiness in cookie store
-//                         initialization.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       DISABLED_RemoveSafeBrowsingCookieForever) {
-  RemoveSafeBrowsingCookieTester tester(GetProfile());
-
-  tester.AddCookie();
-  ASSERT_TRUE(tester.ContainsCookie());
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                                false);
-
-  EXPECT_EQ(content::BrowsingDataRemover::DATA_TYPE_COOKIES, GetRemovalMask());
-  EXPECT_EQ(content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB,
-            GetOriginTypeMask());
-  EXPECT_FALSE(tester.ContainsCookie());
-}
-
-// TODO(crbug.com/41370786): Disabled due to flakiness in cookie store
-//                         initialization.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       DISABLED_RemoveSafeBrowsingCookieLastHour) {
-  RemoveSafeBrowsingCookieTester tester(GetProfile());
-
-  tester.AddCookie();
-  ASSERT_TRUE(tester.ContainsCookie());
-
-  BlockUntilBrowsingDataRemoved(AnHourAgo(), base::Time::Max(),
-                                content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                                false);
-
-  EXPECT_EQ(content::BrowsingDataRemover::DATA_TYPE_COOKIES, GetRemovalMask());
-  EXPECT_EQ(content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB,
-            GetOriginTypeMask());
-  // Removing with time period other than all time should not clear safe
-  // browsing cookies.
-  EXPECT_TRUE(tester.ContainsCookie());
-}
-
-// TODO(crbug.com/41370786): Disabled due to flakiness in cookie store
-//                         initialization.
-TEST_F(ChromeBrowsingDataRemoverDelegateTest,
-       DISABLED_RemoveSafeBrowsingCookieForeverWithPredicate) {
-  RemoveSafeBrowsingCookieTester tester(GetProfile());
-
-  tester.AddCookie();
-  ASSERT_TRUE(tester.ContainsCookie());
-  std::unique_ptr<BrowsingDataFilterBuilder> filter(
-      BrowsingDataFilterBuilder::Create(
-          BrowsingDataFilterBuilder::Mode::kPreserve));
-  filter->AddRegisterableDomain(kTestRegisterableDomain1);
-  BlockUntilOriginDataRemoved(base::Time(), base::Time::Max(),
-                              content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                              std::move(filter));
-
-  EXPECT_EQ(content::BrowsingDataRemover::DATA_TYPE_COOKIES, GetRemovalMask());
-  EXPECT_EQ(content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB,
-            GetOriginTypeMask());
-  EXPECT_TRUE(tester.ContainsCookie());
-
-  std::unique_ptr<BrowsingDataFilterBuilder> filter2(
-      BrowsingDataFilterBuilder::Create(
-          BrowsingDataFilterBuilder::Mode::kDelete));
-  filter2->AddRegisterableDomain(kTestRegisterableDomain1);
-  BlockUntilOriginDataRemoved(base::Time(), base::Time::Max(),
-                              content::BrowsingDataRemover::DATA_TYPE_COOKIES,
-                              std::move(filter2));
-  EXPECT_FALSE(tester.ContainsCookie());
-}
 
 #if !BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeBrowsingDataRemoverDelegateTest, ClearWebAppData) {
