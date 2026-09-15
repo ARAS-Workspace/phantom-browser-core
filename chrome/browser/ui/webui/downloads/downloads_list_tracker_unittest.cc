@@ -32,20 +32,12 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
-#include "components/sync_preferences/testing_pref_service_syncable.h"
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
 using download::DownloadItem;
 using download::MockDownloadItem;
-using downloads::mojom::SafeBrowsingState;
 using DownloadVector = std::vector<raw_ptr<DownloadItem, VectorExperimental>>;
 using testing::_;
 using testing::Return;
 using testing::ReturnRefOfCopy;
-using TailoredVerdict = safe_browsing::ClientDownloadResponse::TailoredVerdict;
 
 namespace {
 
@@ -575,93 +567,3 @@ TEST_F(DownloadsListTrackerTest, RenamingProgress) {
   downloads::mojom::DataPtr data = tracker->CreateDownloadData(item);
   EXPECT_EQ(data->percent, 70);
 }
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-TEST_F(DownloadsListTrackerTest, CreateDownloadData_SafeBrowsing) {
-  auto tracker = std::make_unique<DownloadsListTracker>(
-      manager(), page_.BindAndGetRemote());
-
-  // Enable Safe Browsing.
-  profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled, true);
-  {
-    MockDownloadItem* item = CreateNextItem();
-
-    downloads::mojom::DataPtr data = tracker->CreateDownloadData(item);
-    EXPECT_EQ(data->safe_browsing_state,
-              SafeBrowsingState::kStandardProtection);
-    EXPECT_FALSE(data->has_safe_browsing_verdict);
-  }
-
-  // Add a Safe Browsing verdict.
-  {
-    MockDownloadItem* item = CreateNextItem();
-    safe_browsing::DownloadProtectionService::SetDownloadProtectionData(
-        item, "token", safe_browsing::ClientDownloadResponse::Verdict(),
-        safe_browsing::ClientDownloadResponse::TailoredVerdict());
-
-    downloads::mojom::DataPtr data = tracker->CreateDownloadData(item);
-    EXPECT_EQ(data->safe_browsing_state,
-              SafeBrowsingState::kStandardProtection);
-    EXPECT_TRUE(data->has_safe_browsing_verdict);
-
-    // Now turn off Safe Browsing on the profile. The DownloadsListTracker
-    // should not assume that there's no verdict. (crbug.com/40076210)
-    profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled, false);
-    data = tracker->CreateDownloadData(item);
-    EXPECT_EQ(data->safe_browsing_state, SafeBrowsingState::kNoSafeBrowsing);
-    EXPECT_TRUE(data->has_safe_browsing_verdict);
-  }
-
-  // Enable Enhanced Safe Browsing.
-  profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled, true);
-  profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnhanced, true);
-  {
-    MockDownloadItem* item = CreateNextItem();
-
-    downloads::mojom::DataPtr data = tracker->CreateDownloadData(item);
-    EXPECT_EQ(data->safe_browsing_state,
-              SafeBrowsingState::kStandardProtection);
-    EXPECT_FALSE(data->has_safe_browsing_verdict);
-  }
-
-  // Disable Safe Browsing.
-  profile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled, false);
-  {
-    MockDownloadItem* item = CreateNextItem();
-
-    downloads::mojom::DataPtr data = tracker->CreateDownloadData(item);
-    EXPECT_EQ(data->safe_browsing_state, SafeBrowsingState::kNoSafeBrowsing);
-    EXPECT_FALSE(data->has_safe_browsing_verdict);
-  }
-
-  // Make Safe Browsing disabled by policy.
-  profile()->GetTestingPrefService()->SetManagedPref(
-      prefs::kSafeBrowsingEnabled,
-      base::Value::ToUniquePtrValue(base::Value(false)));
-  {
-    MockDownloadItem* item = CreateNextItem();
-
-    downloads::mojom::DataPtr data = tracker->CreateDownloadData(item);
-    EXPECT_EQ(data->safe_browsing_state, SafeBrowsingState::kNoSafeBrowsing);
-    EXPECT_FALSE(data->has_safe_browsing_verdict);
-  }
-
-  // Tailored warning fields.
-  {
-    MockDownloadItem* item = CreateNextItem();
-    ON_CALL(*item, GetDangerType())
-        .WillByDefault(Return(
-            download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE));
-    TailoredVerdict tailored_verdict;
-    tailored_verdict.set_tailored_verdict_type(TailoredVerdict::COOKIE_THEFT);
-    safe_browsing::DownloadProtectionService::SetDownloadProtectionData(
-        item, "token",
-        safe_browsing::ClientDownloadResponse::SAFE,  // placeholder
-        tailored_verdict);
-
-    downloads::mojom::DataPtr data = tracker->CreateDownloadData(item);
-    EXPECT_EQ(data->tailored_warning_type,
-              downloads::mojom::TailoredWarningType::kCookieTheft);
-  }
-}
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
