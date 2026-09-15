@@ -102,13 +102,6 @@ interface AiOverlayTools {
   // timecode: from the video transcript. Format: "1:45", "0:30", "1:02:15"
   SeekToTimestamp(string timecode) => result<mojo_base.mojom.Empty, string>;
 
-  // Translate the current page.
-  //
-  // target_language: Target language code (e.g. "en", "es", "fr").
-  //                  If empty, translates to the user's default language.
-  TranslatePage(string target_language)
-      => result<mojo_base.mojom.Empty, string>;
-
   // Bookmark tools
 
   // Bookmark the current active tab.

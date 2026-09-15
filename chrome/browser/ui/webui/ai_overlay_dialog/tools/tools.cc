@@ -30,7 +30,6 @@
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ttc/resources/generated_tool_definitions.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -45,8 +44,6 @@
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/sessions/content/session_tab_helper.h"
-#include "components/translate/core/browser/translate_download_manager.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "content/public/browser/media_session.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/render_frame_host.h"
@@ -463,47 +460,6 @@ void AiOverlayTools::SeekToTimestamp(const std::string& timecode,
   } else {
     std::move(callback).Run(base::unexpected("No active media session"));
   }
-}
-
-void AiOverlayTools::TranslatePage(const std::string& target_language,
-                                   TranslatePageCallback callback) {
-  content::WebContents* contents =
-      browser_->GetTabStripModel()->GetActiveWebContents();
-  if (!contents) {
-    std::move(callback).Run(base::unexpected("No active tab"));
-    return;
-  }
-
-  ChromeTranslateClient* translate_client =
-      ChromeTranslateClient::FromWebContents(contents);
-  if (!translate_client) {
-    std::move(callback).Run(base::unexpected("Translation not supported"));
-    return;
-  }
-
-  translate::TranslateManager* translate_manager =
-      translate_client->GetTranslateManager();
-  if (!translate_manager) {
-    std::move(callback).Run(base::unexpected("Translation not available"));
-    return;
-  }
-
-  if (target_language.empty()) {
-    translate_manager->ShowTranslateUI(/*auto_translate=*/true,
-                                       /*triggered_from_menu=*/true);
-  } else {
-    if (!translate::TranslateDownloadManager::IsSupportedLanguage(
-            target_language)) {
-      std::move(callback).Run(base::unexpected("Unsupported language"));
-      return;
-    }
-
-    translate_manager->ShowTranslateUI(std::nullopt, target_language,
-                                       /*auto_translate=*/true,
-                                       /*triggered_from_menu=*/true);
-  }
-
-  std::move(callback).Run(std::monostate());
 }
 
 void AiOverlayTools::AddBookmark(AddBookmarkCallback callback) {

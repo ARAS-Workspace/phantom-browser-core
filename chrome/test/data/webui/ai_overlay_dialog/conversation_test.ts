@@ -31,7 +31,6 @@ class MockToolsRemote extends TestBrowserProxy {
       'playVideo',
       'pauseVideo',
       'seekToTimestamp',
-      'translatePage',
       'invokeGlic',
     ]);
   }

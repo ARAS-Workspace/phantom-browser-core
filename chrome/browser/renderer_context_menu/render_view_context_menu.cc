@@ -95,8 +95,6 @@
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
 #include "chrome/browser/supervised_user/supervised_user_url_filtering_service_factory.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/translate/translate_service.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -193,10 +191,6 @@
 #include "components/strings/grit/components_strings.h"
 #include "components/supervised_user/core/browser/supervised_user_preferences.h"
 #include "components/supervised_user/core/browser/supervised_user_url_filtering_service.h"
-#include "components/translate/core/browser/translate_download_manager.h"
-#include "components/translate/core/browser/translate_manager.h"
-#include "components/translate/core/browser/translate_prefs.h"
-#include "components/translate/core/common/translate_util.h"
 #include "components/url_formatter/url_formatter.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
@@ -472,7 +466,7 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        {IDC_CONTENT_CONTEXT_INSPECTELEMENT, 29},
        {IDC_CONTENT_CONTEXT_INSPECTBACKGROUNDPAGE, 30},
        // Removed: {IDC_CONTENT_CONTEXT_VIEWPAGEINFO, 31},
-       {IDC_CONTENT_CONTEXT_TRANSLATE, 32},
+       // Removed: {IDC_CONTENT_CONTEXT_TRANSLATE, 32},
        {IDC_CONTENT_CONTEXT_RELOADFRAME, 33},
        {IDC_CONTENT_CONTEXT_VIEWFRAMESOURCE, 34},
        // Removed: {IDC_CONTENT_CONTEXT_VIEWFRAMEINFO, 35},
@@ -1310,12 +1304,6 @@ void RenderViewContextMenu::InitMenu() {
     }
   }
 
-  if (!features::IsMenuSimplificationEnabled() &&
-      search::DefaultSearchProviderIsGoogle(GetProfile()) &&
-      CanTranslate(/*menu_logging=*/false)) {
-    AppendTranslateItem();
-  }
-
   // Spell check, language settings, and writing direction.
   if (editable && params_.misspelled_word.empty()) {
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
@@ -1631,17 +1619,6 @@ void RenderViewContextMenu::AppendPrintPreviewItems() {
 const Extension* RenderViewContextMenu::GetExtension() const {
   return extensions::ProcessManager::Get(browser_context_)
       ->GetExtensionForWebContents(source_web_contents_);
-}
-
-std::u16string RenderViewContextMenu::GetTargetLanguageDisplayName(
-    bool is_full_page_translation) const {
-  std::string source;
-  std::string target;
-
-  ChromeTranslateClient::FromWebContents(embedder_web_contents_)
-      ->GetTranslateLanguages(embedder_web_contents_, &source, &target,
-                              is_full_page_translation);
-  return l10n_util::GetDisplayNameForLocale(target, target, true);
 }
 
 #if BUILDFLAG(ENABLE_COMPOSE)
@@ -2302,11 +2279,6 @@ void RenderViewContextMenu::AppendPageItems() {
                               /*add_separator=*/false,
                               /*ignore_simplification=*/true);
 
-    // Translate to language
-    if (CanTranslate(/*menu_logging=*/true)) {
-      AppendTranslateItem();
-    }
-
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
     return;
   }
@@ -2360,10 +2332,6 @@ void RenderViewContextMenu::AppendPageItems() {
   // Close out sharing section if appropriate.
   if (has_sharing_menu_items) {
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
-  }
-
-  if (CanTranslate(/*menu_logging=*/true)) {
-    AppendTranslateItem();
   }
 }
 
@@ -2458,20 +2426,6 @@ void RenderViewContextMenu::AppendPrintItem() {
     }
   }
 #endif  // BUILDFLAG(ENABLE_PRINTING)
-}
-
-void RenderViewContextMenu::AppendTranslateItem() {
-  if (features::IsMenuSimplificationEnabled() && IsPasswordField()) {
-    return;
-  }
-
-  menu_model_.AddItemWithIcon(
-      IDC_CONTENT_CONTEXT_TRANSLATE,
-      l10n_util::GetStringFUTF16(
-          IDS_CONTENT_CONTEXT_TRANSLATE,
-          GetTargetLanguageDisplayName(/*is_full_page_translation=*/true)),
-      ui::ImageModel::FromVectorIcon(vector_icons::kGTranslateIcon,
-                                     ui::kColorMenuIcon, kTabMenuIconSize));
 }
 
 void RenderViewContextMenu::AppendSaveToMemoryBanksItem() {
@@ -2708,9 +2662,6 @@ void RenderViewContextMenu::AppendOtherEditableItems() {
       MaybeAppendOpenGlicItem(/*add_separator=*/false);
     }
     AppendPrintItem();
-    if (CanTranslate(/*menu_logging=*/false)) {
-      AppendTranslateItem();
-    }
   }
 
   menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
@@ -2909,9 +2860,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_RELOAD_PACKAGED_APP:
     case IDC_CONTENT_CONTEXT_RESTART_PACKAGED_APP:
       return IsDevCommandEnabled(id);
-
-    case IDC_CONTENT_CONTEXT_TRANSLATE:
-      return navigation_allowed && IsTranslateEnabled();
 
     case IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP:
     case IDC_CONTENT_CONTEXT_OPENLINKINPROFILE:
@@ -3528,10 +3476,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       ExecInspectElement();
       break;
 
-    case IDC_CONTENT_CONTEXT_TRANSLATE:
-      ExecTranslate();
-      break;
-
     case IDC_CONTENT_CONTEXT_RELOADFRAME:
       source_web_contents_->ReloadFocusedFrame();
       break;
@@ -3818,30 +3762,6 @@ bool RenderViewContextMenu::IsDevCommandEnabled(int id) const {
   return true;
 }
 
-bool RenderViewContextMenu::IsTranslateEnabled() const {
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(embedder_web_contents_);
-  // If no |chrome_translate_client| attached with this WebContents, or
-  // the translate manager has been shut down, or we're viewing in a
-  // MimeHandlerViewGuest translate will be disabled.
-  if (!chrome_translate_client ||
-      !chrome_translate_client->GetTranslateManager() ||
-      !!extensions::MimeHandlerViewGuest::FromRenderFrameHost(
-          GetRenderFrameHost())) {
-    return false;
-  }
-  std::string source_lang =
-      chrome_translate_client->GetLanguageState().source_language();
-  // Note that we intentionally enable the menu even if the source and
-  // target languages are identical.  This is to give a way to user to
-  // translate a page that might contains text fragments in a different
-  // language.
-  return ((params_.edit_flags & ContextMenuDataEditFlags::kCanTranslate) !=
-          0) &&
-         !source_lang.empty() &&  // Did we receive the page language yet?
-         // Disable on the Instant Extended NTP.
-         !search::IsInstantNTP(embedder_web_contents_);
-}
 
 bool RenderViewContextMenu::IsSaveLinkAsEnabled() const {
   if (!IsSaveAsItemAllowedByPolicy(params_.link_url)) {
@@ -4791,20 +4711,6 @@ void RenderViewContextMenu::ExecPrint() {
 #endif  // BUILDFLAG(ENABLE_PRINTING)
 }
 
-void RenderViewContextMenu::ExecTranslate() {
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(embedder_web_contents_);
-  if (!chrome_translate_client) {
-    return;
-  }
-
-  translate::TranslateManager* manager =
-      chrome_translate_client->GetTranslateManager();
-  DCHECK(manager);
-  manager->ShowTranslateUI(/*auto_translate=*/true,
-                           /*triggered_from_menu=*/true);
-}
-
 void RenderViewContextMenu::ExecLanguageSettings(int event_flags) {
   WindowOpenDisposition disposition = ui::DispositionFromEventFlags(
       event_flags, WindowOpenDisposition::NEW_FOREGROUND_TAB);
@@ -5061,14 +4967,6 @@ ToastController* RenderViewContextMenu::GetToastController() const {
   return browser ? browser->GetFeatures().toast_controller() : nullptr;
 }
 
-bool RenderViewContextMenu::CanTranslate(bool menu_logging) {
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(embedder_web_contents_);
-  return chrome_translate_client &&
-         chrome_translate_client->GetTranslateManager()->CanManuallyTranslate(
-             menu_logging);
-}
-
 void RenderViewContextMenu::MaybePrepareForLensQuery() {
   if (!search::DefaultSearchProviderIsGoogle(GetProfile())) {
     return;
@@ -5236,10 +5134,6 @@ void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
     }
     AppendSaveToMemoryBanksItem();
     AppendPrintItem();
-
-    if (CanTranslate(/*menu_logging=*/false)) {
-      AppendTranslateItem();
-    }
   } else {
     // Pure Selection case
     AppendCopyItem();
@@ -5256,10 +5150,6 @@ void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
       MaybeAppendOpenGlicItem(/*add_separator=*/false);
     }
     AppendSaveToMemoryBanksItem();
-
-    if (CanTranslate(/*menu_logging=*/false)) {
-      AppendTranslateItem();
-    }
   }
 }
 

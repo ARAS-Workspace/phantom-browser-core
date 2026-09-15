@@ -41,7 +41,6 @@ source_set("page_load_metrics") {
     "observers/security_state_page_load_metrics_observer.h",
     "observers/signed_exchange_page_load_metrics_observer.h",
     "observers/tab_strip_page_load_metrics_observer.h",
-    "observers/translate_page_load_metrics_observer.h",
     "observers/webui_page_load_metrics_observer.h",
     "page_load_metrics_initialize.h",
   ]
@@ -119,7 +118,6 @@ source_set("impl") {
     "observers/security_state_page_load_metrics_observer.cc",
     "observers/signed_exchange_page_load_metrics_observer.cc",
     "observers/tab_strip_page_load_metrics_observer.cc",
-    "observers/translate_page_load_metrics_observer.cc",
     "observers/webui_page_load_metrics_observer.cc",
     "page_load_metrics_initialize.cc",
   ]
@@ -233,7 +231,6 @@ source_set("unit_tests") {
     "observers/protocol_page_load_metrics_observer_unittest.cc",
     "observers/scheme_page_load_metrics_observer_unittest.cc",
     "observers/signed_exchange_page_load_metrics_observer_unittest.cc",
-    "observers/translate_page_load_metrics_observer_unittest.cc",
   ]
 
   deps = [

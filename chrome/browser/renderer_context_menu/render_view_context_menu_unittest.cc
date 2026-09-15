@@ -42,7 +42,6 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/browser/ui/chrome_pages.h"
@@ -91,8 +90,6 @@
 #include "components/sync/test/test_sync_service.h"
 #include "components/tabs/public/mock_tab_interface.h"
 #include "components/tabs/public/tab_interface.h"
-#include "components/translate/core/browser/language_state.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "components/user_education/common/user_education_features.h"
 #include "content/public/browser/global_routing_id.h"
 #include "content/public/browser/preconnect_manager.h"
@@ -1473,39 +1470,6 @@ TEST_F(RenderViewContextMenuPrefsTest, LensRegionSearchChromeUIScheme) {
   EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH));
 }
 
-// Test that the context menu item for translate is shown, and has an icon on
-// relevant platforms.
-TEST_F(RenderViewContextMenuPrefsTest, TranslateContextMenuHasIcon) {
-  NavigateAndCommit(GURL("https://www.example.com"));
-
-  ChromeTranslateClient::CreateForWebContents(web_contents());
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(web_contents());
-  ASSERT_TRUE(chrome_translate_client);
-  translate::TranslateManager* translate_manager =
-      chrome_translate_client->GetTranslateManager();
-  translate_manager->GetLanguageState()->LanguageDetermined("fr", true);
-
-  content::ContextMenuParams params = CreateParams(0);
-  params.edit_flags = blink::ContextMenuDataEditFlags::kCanTranslate;
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.SetBrowser(GetBrowser());
-  menu.Init();
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_TRANSLATE));
-  std::optional<std::pair<ui::MenuModel*, size_t>> model_and_index =
-      menu.GetMenuModelAndItemIndex(IDC_CONTENT_CONTEXT_TRANSLATE);
-  ASSERT_TRUE(model_and_index);
-  ui::MenuModel* model = model_and_index->first;
-  size_t index = model_and_index->second;
-// Context menu items typically do not have icons on Mac.
-#if BUILDFLAG(IS_MAC)
-  EXPECT_TRUE(model->GetIconAt(index).IsEmpty());
-#else
-  EXPECT_FALSE(model->GetIconAt(index).IsEmpty());
-#endif
-}
-
 // Verify that the adding the Lens image search option to the menu
 // issues a preconnection request to lens.google.com.
 TEST_F(RenderViewContextMenuPrefsTest,
@@ -1768,33 +1732,6 @@ TEST_F(RenderViewContextMenuPrefsTest,
 
 #endif  // BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
 
-TEST_F(RenderViewContextMenuPrefsTest,
-       TextSelectionShowsPartialTranslateWhenMenuSimplificationDisabled) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndDisableFeature(features::kMenuSimplification);
-  translate::TranslateManager::SetIgnoreMissingKeyForTesting(true);
-  base::ScopedClosureRunner reset_ignore_missing_key(base::BindOnce(
-      &translate::TranslateManager::SetIgnoreMissingKeyForTesting, false));
-
-  NavigateAndCommit(GURL("https://www.example.com"));
-  SetUserSelectedDefaultSearchProvider("https://www.google.com", true);
-  ChromeTranslateClient::CreateForWebContents(web_contents());
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(web_contents());
-  ASSERT_TRUE(chrome_translate_client);
-  chrome_translate_client->GetTranslateManager()
-      ->GetLanguageState()
-      ->LanguageDetermined("fr", true);
-
-  content::ContextMenuParams params = CreateParams(MenuItem::SELECTION);
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.SetBrowser(GetBrowser());
-  menu.Init();
-
-  EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE));
-}
-
 #if BUILDFLAG(ENABLE_PRINTING)
 TEST_F(RenderViewContextMenuPrefsTest, PrintSelectionLabel) {
   base::test::ScopedFeatureList feature_list;
@@ -1806,9 +1743,6 @@ TEST_F(RenderViewContextMenuPrefsTest, PrintSelectionLabel) {
 
   content::ContextMenuParams params = CreateParams(MenuItem::SELECTION);
   params.selection_text = u"hello world";
-
-  // Setup TranslateClient to avoid crash in AppendTranslateItem.
-  ChromeTranslateClient::CreateForWebContents(web_contents());
 
   // Ensure printing is enabled.
   profile()->GetPrefs()->SetBoolean(prefs::kPrintingEnabled, true);
@@ -1843,8 +1777,6 @@ TEST_F(RenderViewContextMenuPrefsTest, CopySelectionLabel) {
   AutocompleteClassifierFactory::GetInstance()->SetTestingFactoryAndUse(
       profile(),
       base::BindRepeating(&AutocompleteClassifierFactory::BuildInstanceFor));
-
-  ChromeTranslateClient::CreateForWebContents(web_contents());
 
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
@@ -2165,21 +2097,6 @@ class RenderViewContextMenuMenuSimplificationTest
     feature_list_.InitAndEnableFeature(features::kMenuSimplification);
   }
 
-  base::ScopedClosureRunner SetUpTranslateClient() {
-    translate::TranslateManager::SetIgnoreMissingKeyForTesting(true);
-    NavigateAndCommit(GURL("https://www.example.com"));
-    SetUserSelectedDefaultSearchProvider("https://www.google.com", true);
-    ChromeTranslateClient::CreateForWebContents(web_contents());
-    ChromeTranslateClient* chrome_translate_client =
-        ChromeTranslateClient::FromWebContents(web_contents());
-    DCHECK(chrome_translate_client);
-    chrome_translate_client->GetTranslateManager()
-        ->GetLanguageState()
-        ->LanguageDetermined("fr", true);
-    return base::ScopedClosureRunner(base::BindOnce(
-        &translate::TranslateManager::SetIgnoreMissingKeyForTesting, false));
-  }
-
   int CountOccurrences(const TestRenderViewContextMenu& menu, int command_id) {
     int count = 0;
     const ui::SimpleMenuModel& model = menu.menu_model();
@@ -2200,7 +2117,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest, CopySelectionTruncated) {
   params.selection_text = u"Long text exceeding twenty five characters";
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   menu.Init();
 
   size_t index =
@@ -2214,7 +2130,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest, PasswordFieldRestricted) {
   params.form_control_type = blink::mojom::FormControlType::kInputPassword;
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   menu.Init();
 
   EXPECT_FALSE(menu.IsItemPresent(IDC_PRINT));
@@ -2235,7 +2150,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest,
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
   menu.SetBrowser(GetBrowser());
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   menu.Init();
 
   EXPECT_FALSE(menu.IsItemPresent(IDC_PRINT));
@@ -2257,7 +2171,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest,
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
   menu.SetBrowser(GetBrowser());
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   menu.Init();
 
   EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_GLIC));
@@ -2271,7 +2184,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest, EmailFieldSearchHidden) {
   params.selection_text = u"user@test.com";
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   menu.Init();
 
   EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
@@ -2285,7 +2197,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest, PureSelectionLayout) {
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
   menu.SetBrowser(GetBrowser());
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   menu.Init();
 
   EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_COPY));
@@ -2300,7 +2211,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest, PageMenuSeparators) {
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
   menu.SetBrowser(GetBrowser());
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   menu.Init();
 
   const ui::MenuModel& model = menu.menu_model();
@@ -2347,52 +2257,11 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest, LinkAndSelectionLayout) {
   TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
                                  params);
   menu.SetBrowser(GetBrowser());
-  ChromeTranslateClient::CreateForWebContents(web_contents());
   menu.Init();
 
   EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_COPY));
   EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFOR));
   EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE));
-}
-
-TEST_F(RenderViewContextMenuMenuSimplificationTest,
-       TranslateSelectionOnlyOnce_NonEditable) {
-  auto reset_ignore_missing_key = SetUpTranslateClient();
-
-  content::ContextMenuParams params;
-  params.selection_text = u"hello world";
-  params.is_editable = false;
-
-  auto menu = std::make_unique<TestRenderViewContextMenu>(
-      *web_contents()->GetPrimaryMainFrame(), params);
-  menu->SetBrowser(GetBrowser());
-  menu->Init();
-
-  // Verify that the partial translate item is present.
-  EXPECT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE));
-
-  // Verify that it is present exactly once.
-  EXPECT_EQ(1, CountOccurrences(*menu, IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE));
-}
-
-TEST_F(RenderViewContextMenuMenuSimplificationTest,
-       TranslateSelectionOnlyOnce_Editable) {
-  auto reset_ignore_missing_key = SetUpTranslateClient();
-
-  content::ContextMenuParams params;
-  params.selection_text = u"hello world";
-  params.is_editable = true;
-
-  auto menu = std::make_unique<TestRenderViewContextMenu>(
-      *web_contents()->GetPrimaryMainFrame(), params);
-  menu->SetBrowser(GetBrowser());
-  menu->Init();
-
-  // Verify that the partial translate item is present.
-  EXPECT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE));
-
-  // Verify that it is present exactly once.
-  EXPECT_EQ(1, CountOccurrences(*menu, IDC_CONTENT_CONTEXT_PARTIAL_TRANSLATE));
 }
 
 using send_tab_to_self::EntryPointDisplayReason;

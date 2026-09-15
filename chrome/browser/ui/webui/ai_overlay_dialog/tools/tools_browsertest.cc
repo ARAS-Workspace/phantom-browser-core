@@ -16,16 +16,12 @@
 #include "build/build_config.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/translate/translate_test_utils.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/webui/ai_overlay_dialog/ai_overlay_dialog_page_handler.h"
 #include "chrome/browser/ui/webui/ai_overlay_dialog/page_context_monitor.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/bookmarks/browser/bookmark_model.h"
-#include "components/translate/core/browser/language_state.h"
-#include "components/translate/core/common/translate_switches.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
@@ -51,7 +47,6 @@ using CloseTabResult = base::expected<std::monostate, std::string>;
 using GoBackResult = base::expected<std::monostate, std::string>;
 using GoForwardResult = base::expected<std::monostate, std::string>;
 using ReloadResult = base::expected<std::monostate, std::string>;
-using TranslatePageResult = base::expected<std::monostate, std::string>;
 using FollowLinkResult = base::expected<std::monostate, std::string>;
 
 class FakePage : public ai_overlay_dialog::mojom::Page {
@@ -85,16 +80,8 @@ class AiOverlayToolsBrowserTest : public InProcessBrowserTest {
     InProcessBrowserTest::SetUp();
   }
 
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitchASCII(
-        translate::switches::kTranslateScriptURL,
-        embedded_test_server()->GetURL("/mock_translate_script.js").spec());
-  }
-
   void SetUpOnMainThread() override {
     InProcessBrowserTest::SetUpOnMainThread();
-    embedded_test_server()->RegisterRequestHandler(base::BindRepeating(
-        &AiOverlayToolsBrowserTest::HandleRequest, base::Unretained(this)));
     embedded_test_server()->StartAcceptingConnections();
 
     mojo::PendingReceiver<ai_overlay_dialog::mojom::PageHandler>
@@ -120,41 +107,6 @@ class AiOverlayToolsBrowserTest : public InProcessBrowserTest {
   AiOverlayTools* tools() { return tools_.get(); }
   PageContextMonitor* page_context_monitor() {
     return page_context_monitor_.get();
-  }
-
-  std::unique_ptr<net::test_server::HttpResponse> HandleRequest(
-      const net::test_server::HttpRequest& request) {
-    if (request.GetURL().GetPath() != "/mock_translate_script.js") {
-      return nullptr;
-    }
-
-    auto http_response =
-        std::make_unique<net::test_server::BasicHttpResponse>();
-    http_response->set_code(net::HTTP_OK);
-
-    std::string script = R"JS(
-      var google = {};
-      google.translate = (function() {
-        return {
-          TranslateService: function() {
-            return {
-              isAvailable : function() { return true; },
-              restore : function() { return; },
-              getDetectedLanguage : function() { return "es"; },
-              translatePage : function(sourceLang, targetLang,
-                                       onTranslateProgress) {
-                onTranslateProgress(100, true, false);
-              }
-            };
-          }
-        };
-      })();
-      cr.googleTranslate.onTranslateElementLoad();
-    )JS";
-
-    http_response->set_content(script);
-    http_response->set_content_type("text/javascript");
-    return std::move(http_response);
   }
 
   void AddTabWithTitle(const GURL& url, const std::string& title) {
@@ -467,75 +419,6 @@ IN_PROC_BROWSER_TEST_F(AiOverlayToolsBrowserTest,
   // The media session isn't available, so it fails with this error before
   // parsing timecode.
   EXPECT_EQ("No active media session", future.Get().error());
-}
-
-// TODO(crbug.com/542894342): Re-enable flaky translate tests on Mac.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_TranslatePageDefault DISABLED_TranslatePageDefault
-#define MAYBE_TranslatePageSpecificTarget \
-  DISABLED_TranslatePageSpecificTarget
-#else
-#define MAYBE_TranslatePageDefault TranslatePageDefault
-#define MAYBE_TranslatePageSpecificTarget TranslatePageSpecificTarget
-#endif
-
-IN_PROC_BROWSER_TEST_F(AiOverlayToolsBrowserTest, MAYBE_TranslatePageDefault) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL("/empty.html")));
-
-  base::test::TestFuture<TranslatePageResult> future;
-  tools()->TranslatePage("", future.GetCallback());
-
-  EXPECT_TRUE(future.Get().has_value());
-
-  content::WebContents* contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // Wait for the translation to be processed by the mock script.
-  translate::CreateTranslateWaiter(
-      contents, translate::TranslateWaiter::WaitEvent::kPageTranslated)
-      ->Wait();
-
-  // Validate that the translation was invoked with the correct target language
-  // by checking the active LanguageState.
-  ChromeTranslateClient* translate_client =
-      ChromeTranslateClient::FromWebContents(contents);
-  ASSERT_TRUE(translate_client);
-
-  std::string source_language;
-  std::string expected_target_language;
-  translate_client->GetTranslateLanguages(contents, &source_language,
-                                          &expected_target_language,
-                                          /*for_display=*/false);
-
-  EXPECT_EQ(expected_target_language,
-            translate_client->GetLanguageState().current_language());
-}
-
-IN_PROC_BROWSER_TEST_F(AiOverlayToolsBrowserTest,
-                       MAYBE_TranslatePageSpecificTarget) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL("/empty.html")));
-
-  base::test::TestFuture<TranslatePageResult> future;
-  tools()->TranslatePage("fr", future.GetCallback());
-
-  EXPECT_TRUE(future.Get().has_value());
-
-  content::WebContents* contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // Wait for the translation to be processed by the mock script.
-  translate::CreateTranslateWaiter(
-      contents, translate::TranslateWaiter::WaitEvent::kPageTranslated)
-      ->Wait();
-
-  // Validate that the translation was invoked with the correct target language
-  // by checking the active LanguageState.
-  ChromeTranslateClient* translate_client =
-      ChromeTranslateClient::FromWebContents(contents);
-  ASSERT_TRUE(translate_client);
-  EXPECT_EQ("fr", translate_client->GetLanguageState().current_language());
 }
 
 IN_PROC_BROWSER_TEST_F(AiOverlayToolsBrowserTest, FollowLink) {

@@ -13,8 +13,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/translate/translate_test_utils.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/actions/chrome_actions.h"
 #include "chrome/browser/ui/browser_actions.h"
@@ -46,8 +44,6 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
-#include "components/translate/content/browser/translate_waiter.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -96,19 +92,6 @@ class PinnedToolbarActionsContainerBrowserTest : public InProcessBrowserTest {
         << "Test needs modification to support WebUIPinnedToolbarActions";
     return static_cast<PinnedToolbarActionsContainer*>(
         browser_view()->toolbar_button_provider()->GetPinnedToolbarActions());
-  }
-
-  void TranslatePage(content::WebContents* web_contents) {
-    ChromeTranslateClient* chrome_translate_client =
-        ChromeTranslateClient::FromWebContents(web_contents);
-
-    chrome_translate_client->GetTranslateManager()
-        ->GetLanguageState()
-        ->SetSourceLanguage("fr");
-
-    chrome_translate_client->GetTranslateManager()
-        ->GetLanguageState()
-        ->SetCurrentLanguage("en");
   }
 
   Browser* CreateBrowser() {
@@ -173,38 +156,6 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
       incognito_browser, actions::kActionCut,
       container()->GetWeakPtrForTesting());
   EXPECT_FALSE(pinned_button->menu_model()->IsEnabledAt(2));
-}
-
-IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,
-                       TranslateStatusIndicator) {
-  PinnedToolbarActionsModel* const actions_model =
-      PinnedToolbarActionsModel::Get(browser()->GetProfile());
-  actions_model->UpdatePinnedState(kActionShowTranslate, true);
-
-  EXPECT_EQ(container()->IsActionPinned(kActionShowTranslate), true);
-
-  auto* pinned_button = container()->GetButtonFor(kActionShowTranslate);
-  EXPECT_EQ(pinned_button->GetVisible(), true);
-  EXPECT_EQ(pinned_button->GetEnabled(), false);
-  EXPECT_EQ(pinned_button->GetStatusIndicatorForTesting()->GetVisible(), false);
-
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // Open a new tab with a page in French.
-  ASSERT_TRUE(AddTabAtIndex(
-      0, GURL(embedded_test_server()->GetURL("/french_page.html")),
-      ui::PAGE_TRANSITION_TYPED));
-
-  TranslatePage(browser()->tab_strip_model()->GetActiveWebContents());
-  EXPECT_EQ(pinned_button->GetStatusIndicatorForTesting()->GetVisible(), true);
-
-  // Status indicator should still be visible after creating a new browser.
-  CreateBrowser();
-  EXPECT_EQ(pinned_button->GetStatusIndicatorForTesting()->GetVisible(), true);
-
-  // Navigate to non-translated page.
-  browser()->tab_strip_model()->ActivateTabAt(1);
-  EXPECT_EQ(pinned_button->GetStatusIndicatorForTesting()->GetVisible(), false);
 }
 
 IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsContainerBrowserTest,

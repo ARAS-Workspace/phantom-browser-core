@@ -86,7 +86,6 @@
 #include "chrome/browser/sync/sessions/sync_sessions_web_contents_router_factory.h"
 #include "chrome/browser/tab_contents/navigation_metrics_recorder.h"
 #include "chrome/browser/task_manager/web_contents_tags.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/trusted_vault/trusted_vault_encryption_keys_tab_helper.h"
 #include "chrome/browser/ui/autofill/autofill_client_provider.h"
 #include "chrome/browser/ui/autofill/autofill_client_provider_factory.h"
@@ -391,7 +390,6 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   ChromeRLZTrackerWebContentsObserver::CreateForWebContentsIfNeeded(
       web_contents);
 #endif
-  ChromeTranslateClient::CreateForWebContents(web_contents);
   UrlLanguageHistogramRecorder::CreateForWebContents(web_contents);
 #if BUILDFLAG(IS_ANDROID)
   // Register LanguagePersistedTabDataAndroid for non-incognito tabs to
@@ -407,13 +405,6 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
                 if (!web_contents) {
                   return;
                 }
-                ChromeTranslateClient* chrome_translate_client =
-                    ChromeTranslateClient::FromWebContents(web_contents.get());
-
-                if (!chrome_translate_client) {
-                  return;
-                }
-
                 auto* language_persisted_tab_data_android =
                     static_cast<LanguagePersistedTabDataAndroid*>(
                         persisted_tab_data);

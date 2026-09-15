@@ -7,7 +7,6 @@
 #include "base/run_loop.h"
 #include "chrome/browser/sync/sessions/sync_sessions_web_contents_router.h"
 #include "chrome/browser/sync/sessions/sync_sessions_web_contents_router_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -102,11 +101,6 @@ class SyncSessionsRouterTabHelperBrowserTest : public InProcessBrowserTest {
 
   void AddLanguageDetectionObserver(const GURL& url) {
     observer_.SetInterestedURL(url);
-    ChromeTranslateClient* chrome_translate_client =
-        ChromeTranslateClient::FromWebContents(web_contents());
-    if (!chrome_translate_client) {
-      return;
-    }
     language_detection::LanguageDetectionHost::CreateForWebContents(
         web_contents());
     language_detection::LanguageDetectionHost::FromWebContents(web_contents())
@@ -115,11 +109,6 @@ class SyncSessionsRouterTabHelperBrowserTest : public InProcessBrowserTest {
 
   void RemoveLanguageDetectionObserver() {
     observer_.SetInterestedURL(GURL());
-    ChromeTranslateClient* chrome_translate_client =
-        ChromeTranslateClient::FromWebContents(web_contents());
-    if (!chrome_translate_client) {
-      return;
-    }
     language_detection::LanguageDetectionHost::FromWebContents(web_contents())
         ->RemoveLanguageDetectionObserver(&observer_);
   }

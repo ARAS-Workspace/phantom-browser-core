@@ -60,8 +60,6 @@ class AiOverlayTools : public ai_overlay_dialog::mojom::AiOverlayTools,
   void PauseVideo(PauseVideoCallback callback) override;
   void SeekToTimestamp(const std::string& timecode,
                        SeekToTimestampCallback callback) override;
-  void TranslatePage(const std::string& target_language,
-                     TranslatePageCallback callback) override;
   void AddBookmark(AddBookmarkCallback callback) override;
   void RemoveBookmark(RemoveBookmarkCallback callback) override;
   void OpenPage(const std::string& query,
