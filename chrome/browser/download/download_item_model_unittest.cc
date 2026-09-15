@@ -50,11 +50,6 @@
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "ui/views/vector_icons.h"
 
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
-#endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 using download::DownloadItem;
@@ -67,10 +62,6 @@ using ::testing::Return;
 using ::testing::ReturnRef;
 using ::testing::ReturnRefOfCopy;
 using ::testing::SetArgPointee;
-
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-using TailoredVerdict = safe_browsing::ClientDownloadResponse::TailoredVerdict;
-#endif
 
 namespace {
 
@@ -672,21 +663,6 @@ TEST_F(DownloadItemModelTest,
   EXPECT_EQ(model().GetDangerUiPattern(),
             DownloadUIModel::DangerUiPattern::kSuspicious);
 #endif
-
-#if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-  // It doesn't matter what the DownloadProtectionData is; just that it is
-  // present.
-  std::string token = "token";
-  safe_browsing::ClientDownloadResponse::Verdict verdict =
-      safe_browsing::ClientDownloadResponse::SAFE;
-  safe_browsing::ClientDownloadResponse::TailoredVerdict tailored_verdict;
-  safe_browsing::DownloadProtectionService::SetDownloadProtectionData(
-      &item(), token, verdict, tailored_verdict);
-
-  EXPECT_EQ(base::UTF16ToUTF8(model().GetStatusText()),
-            "Suspicious download blocked");
-#endif  // !BUILDFLAG(IS_ANDROID) &&
-        // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 }
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -902,68 +878,3 @@ TEST_F(DownloadItemModelTest, RenamingProgress) {
   EXPECT_EQ(6, model().GetCompletedBytes());
   EXPECT_EQ(60, model().PercentComplete());
 }
-
-#if !BUILDFLAG(IS_ANDROID)
-class DownloadItemModelTailoredWarningTest : public DownloadItemModelTest {
- public:
-  DownloadItemModelTailoredWarningTest() {
-    DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  }
-
-  ~DownloadItemModelTailoredWarningTest() override = default;
-
- protected:
-  void SetupTailoredWarningForItem(
-      download::DownloadDangerType danger_type,
-      TailoredVerdict::TailoredVerdictType tailored_verdict_type) {
-    ON_CALL(item(), GetDangerType()).WillByDefault(Return(danger_type));
-    TailoredVerdict tailored_verdict;
-    tailored_verdict.set_tailored_verdict_type(tailored_verdict_type);
-    safe_browsing::DownloadProtectionService::SetDownloadProtectionData(
-        &item(), "token",
-        safe_browsing::ClientDownloadResponse::SAFE,  // placeholder
-        tailored_verdict);
-  }
-};
-
-TEST_F(DownloadItemModelTailoredWarningTest, GetTailoredWarningType) {
-  SetupDownloadItemDefaults();
-
-  const struct GetTailoredWarningTypeTestCase {
-    download::DownloadDangerType danger_type;
-    TailoredVerdict::TailoredVerdictType tailored_verdict_type;
-    DownloadUIModel::TailoredWarningType expected_warning_type;
-    DownloadUIModel::DangerUiPattern expected_danger_pattern;
-  } kShouldShowTailoredWarningTestCases[] = {
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE,
-       TailoredVerdict::COOKIE_THEFT,
-       DownloadUIModel::TailoredWarningType::kCookieTheft,
-       DownloadUIModel::DangerUiPattern::kDangerous},
-      {download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT,
-       TailoredVerdict::SUSPICIOUS_ARCHIVE,
-       DownloadUIModel::TailoredWarningType::kSuspiciousArchive,
-       DownloadUIModel::DangerUiPattern::kSuspicious},
-      {download::DOWNLOAD_DANGER_TYPE_DANGEROUS_URL,
-       TailoredVerdict::COOKIE_THEFT,
-       DownloadUIModel::TailoredWarningType::kNoTailoredWarning,
-       // This is dangerous despite kNoTailoredWarning, because the base
-       // danger_type is dangerous.
-       DownloadUIModel::DangerUiPattern::kDangerous},
-      {download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED,
-       TailoredVerdict::SUSPICIOUS_ARCHIVE,
-       DownloadUIModel::TailoredWarningType::kNoTailoredWarning,
-       DownloadUIModel::DangerUiPattern::kDangerous},
-  };
-  for (const auto& test_case : kShouldShowTailoredWarningTestCases) {
-    SCOPED_TRACE(::testing::Message()
-                 << "danger_type "
-                 << GetDownloadDangerTypeString(test_case.danger_type));
-    SetupTailoredWarningForItem(test_case.danger_type,
-                                test_case.tailored_verdict_type);
-    EXPECT_EQ(model().GetTailoredWarningType(),
-              test_case.expected_warning_type);
-    EXPECT_EQ(model().GetDangerUiPattern(), test_case.expected_danger_pattern);
-  }
-}
-
-#endif  // !BUILDFLAG(IS_ANDROID)

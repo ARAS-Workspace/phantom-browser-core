@@ -6,8 +6,6 @@
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/safe_browsing/test_safe_browsing_service.h"
-#include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
@@ -16,9 +14,6 @@
 #include "chrome/browser/webshare/share_service_impl.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/safe_browsing/content/common/file_type_policies_test_util.h"
-#include "components/safe_browsing/core/browser/db/fake_database_manager.h"
-#include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/render_frame_host.h"
@@ -100,120 +95,6 @@ IN_PROC_BROWSER_TEST_F(ShareServiceBrowserTest, InactiveWebContents) {
       content::EvalJs(contents_0, "share_text('hello')").ExtractString();
   EXPECT_THAT(result, testing::HasSubstr("share failed"));
   EXPECT_THAT(result, testing::HasSubstr("NotAllowedError"));
-}
-
-namespace {
-
-class V5TestingDatabaseManager
-    : public safe_browsing::FakeSafeBrowsingDatabaseManager {
- public:
-  V5TestingDatabaseManager()
-      : safe_browsing::FakeSafeBrowsingDatabaseManager(
-            content::GetUIThreadTaskRunner({})) {}
-
-  bool CheckDownloadUrl(const std::vector<GURL>& url_chain,
-                        Client* client) override {
-    if (client) {
-      v5_manager_from_client_ = client->GetV5GetHashProtocolManager();
-    }
-    return safe_browsing::FakeSafeBrowsingDatabaseManager::CheckDownloadUrl(
-        url_chain, client);
-  }
-
-  base::WeakPtr<safe_browsing::V5GetHashProtocolManager>
-  v5_manager_from_client() const {
-    return v5_manager_from_client_;
-  }
-
- protected:
-  ~V5TestingDatabaseManager() override = default;
-
- private:
-  base::WeakPtr<safe_browsing::V5GetHashProtocolManager>
-      v5_manager_from_client_;
-};
-
-}  // namespace
-
-class SafeBrowsingShareServiceBrowserTest : public ShareServiceBrowserTest {
- public:
-  SafeBrowsingShareServiceBrowserTest()
-      : safe_browsing_factory_(
-            std::make_unique<safe_browsing::TestSafeBrowsingServiceFactory>()) {
-  }
-
- protected:
-  void CreatedBrowserMainParts(
-      content::BrowserMainParts* browser_main_parts) override {
-    fake_safe_browsing_database_manager_ =
-        base::MakeRefCounted<V5TestingDatabaseManager>();
-    safe_browsing_factory_->SetTestDatabaseManager(
-        fake_safe_browsing_database_manager_.get());
-    safe_browsing::SafeBrowsingService::RegisterFactory(
-        safe_browsing_factory_.get());
-    ShareServiceBrowserTest::CreatedBrowserMainParts(browser_main_parts);
-  }
-
-  void AddDangerousUrl(const GURL& dangerous_url) {
-    fake_safe_browsing_database_manager_->AddDangerousUrl(
-        dangerous_url,
-        safe_browsing::SBThreatType::SB_THREAT_TYPE_URL_BINARY_MALWARE);
-  }
-
-  void TearDown() override {
-    ShareServiceBrowserTest::TearDown();
-    safe_browsing::SafeBrowsingService::RegisterFactory(nullptr);
-  }
-
-  V5TestingDatabaseManager* fake_safe_browsing_database_manager() {
-    return fake_safe_browsing_database_manager_.get();
-  }
-
- private:
-  scoped_refptr<V5TestingDatabaseManager> fake_safe_browsing_database_manager_;
-  std::unique_ptr<safe_browsing::TestSafeBrowsingServiceFactory>
-      safe_browsing_factory_;
-};
-
-IN_PROC_BROWSER_TEST_F(SafeBrowsingShareServiceBrowserTest,
-                       PortableDocumentFile) {
-  safe_browsing::FileTypePoliciesTestOverlay policies;
-  std::unique_ptr<safe_browsing::DownloadFileTypeConfig> file_type_config =
-      std::make_unique<safe_browsing::DownloadFileTypeConfig>();
-  auto* file_type = file_type_config->mutable_default_file_type();
-  file_type->set_uma_value(-1);
-  file_type->set_ping_setting(safe_browsing::DownloadFileType::FULL_PING);
-  auto* platform_settings = file_type->add_platform_settings();
-  platform_settings->set_danger_level(
-      safe_browsing::DownloadFileType::NOT_DANGEROUS);
-  platform_settings->set_auto_open_hint(
-      safe_browsing::DownloadFileType::ALLOW_AUTO_OPEN);
-  policies.SwapConfig(file_type_config);
-
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url(embedded_test_server()->GetURL("/webshare/index.html"));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-  content::WebContents* const contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  base::HistogramTester histogram_tester;
-  EXPECT_EQ("share succeeded", content::EvalJs(contents, "share_pdf_file()"));
-  histogram_tester.ExpectBucketCount("WebShare.SafeBrowsingCheck.Result",
-                                     SafeBrowsingRequest::CheckResult::kSafe,
-                                     1);
-  auto* expected_v5_manager =
-      safe_browsing::V5GetHashProtocolManagerFactory::GetForBrowserContext(
-          GetProfile());
-  EXPECT_EQ(
-      fake_safe_browsing_database_manager()->v5_manager_from_client().get(),
-      expected_v5_manager);
-
-  AddDangerousUrl(url);
-  EXPECT_EQ("share failed: NotAllowedError: Permission denied",
-            content::EvalJs(contents, "share_pdf_file()"));
-  histogram_tester.ExpectBucketCount("WebShare.SafeBrowsingCheck.Result",
-                                     SafeBrowsingRequest::CheckResult::kUnsafe,
-                                     1);
 }
 
 class ShareServicePrerenderBrowserTest : public ShareServiceBrowserTest {

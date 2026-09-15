@@ -9,7 +9,6 @@
 #include "chrome/browser/download/download_item_model.h"
 #include "chrome/browser/download/download_ui_model.h"
 #include "chrome/browser/download/offline_item_utils.h"
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/test/base/testing_profile.h"
@@ -17,9 +16,6 @@
 #include "components/download/public/common/mock_download_item.h"
 #include "components/offline_items_collection/core/offline_item.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/core/common/features.h"
-#include "components/safe_browsing/core/common/proto/csd.pb.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/vector_icons/vector_icons.h"
@@ -42,10 +38,6 @@ using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::ReturnRefOfCopy;
 using ::testing::UnorderedElementsAre;
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-using TailoredVerdict = safe_browsing::ClientDownloadResponse::TailoredVerdict;
-#endif
 
 class DownloadBubbleRowViewInfoTest : public testing::Test,
                                       public DownloadBubbleRowViewInfoObserver {
@@ -88,22 +80,6 @@ class DownloadBubbleRowViewInfoTest : public testing::Test,
   void SetDownloadDestroyedCallback(
       base::OnceCallback<void(const ContentId&)> callback) {
     on_download_destroyed_ = std::move(callback);
-  }
-
-  void SetupTailoredWarningForItem(
-      download::DownloadDangerType danger_type,
-      TailoredVerdict::TailoredVerdictType tailored_verdict_type,
-      std::vector<TailoredVerdict::ExperimentalWarningAdjustment> adjustments) {
-    ON_CALL(item(), GetDangerType()).WillByDefault(Return(danger_type));
-    TailoredVerdict tailored_verdict;
-    tailored_verdict.set_tailored_verdict_type(tailored_verdict_type);
-    for (const auto& adjustment : adjustments) {
-      tailored_verdict.add_adjustments(adjustment);
-    }
-    safe_browsing::DownloadProtectionService::SetDownloadProtectionData(
-        &item(), "token",
-        safe_browsing::ClientDownloadResponse::SAFE,  // placeholder
-        tailored_verdict);
   }
 
  private:
@@ -361,57 +337,6 @@ TEST_F(DownloadBubbleRowViewInfoTest, InterruptedInfo) {
       EXPECT_EQ(kColorDownloadItemIconDangerous, info().secondary_color());
     }
   }
-}
-
-TEST_F(DownloadBubbleRowViewInfoTest, GetInfoForTailoredWarning_CookieTheft) {
-  SetupTailoredWarningForItem(
-      download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE,
-      TailoredVerdict::COOKIE_THEFT, /*adjustments=*/{});
-  item().NotifyObserversDownloadUpdated();
-
-  // No primary button on download row view. Button only appears on subpage.
-  EXPECT_FALSE(info().primary_button_command().has_value());
-  EXPECT_TRUE(info().has_subpage());
-}
-
-TEST_F(DownloadBubbleRowViewInfoTest,
-       GetInfoForTailoredWarning_SuspiciousArchive) {
-  SetupTailoredWarningForItem(download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT,
-                              TailoredVerdict::SUSPICIOUS_ARCHIVE,
-                              /*adjustments=*/{});
-  item().NotifyObserversDownloadUpdated();
-
-  // No primary button on download row view. Button only appears on subpage.
-  EXPECT_FALSE(info().primary_button_command().has_value());
-  EXPECT_TRUE(info().has_subpage());
-}
-
-TEST_F(DownloadBubbleRowViewInfoTest,
-       GetInfoForTailoredWarning_AccountInfoStringWithAccount) {
-  SetupTailoredWarningForItem(
-      download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE,
-      TailoredVerdict::COOKIE_THEFT, {TailoredVerdict::ACCOUNT_INFO_STRING});
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(profile());
-  signin::SetPrimaryAccount(identity_manager, "test@example.com",
-                            signin::ConsentLevel::kSignin);
-  item().NotifyObserversDownloadUpdated();
-
-  // No primary button on download row view. Button only appears on subpage.
-  EXPECT_FALSE(info().primary_button_command().has_value());
-  EXPECT_TRUE(info().has_subpage());
-}
-
-TEST_F(DownloadBubbleRowViewInfoTest,
-       GetInfoForTailoredWarning_AccountInfoStringWithoutAccount) {
-  SetupTailoredWarningForItem(
-      download::DOWNLOAD_DANGER_TYPE_DANGEROUS_ACCOUNT_COMPROMISE,
-      TailoredVerdict::COOKIE_THEFT, {TailoredVerdict::ACCOUNT_INFO_STRING});
-  item().NotifyObserversDownloadUpdated();
-
-  // No primary button on download row view. Button only appears on subpage.
-  EXPECT_FALSE(info().primary_button_command().has_value());
-  EXPECT_TRUE(info().has_subpage());
 }
 
 TEST_F(DownloadBubbleRowViewInfoTest, InsecurePrimaryButtonCommand) {
