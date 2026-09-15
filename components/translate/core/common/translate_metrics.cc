@@ -17,8 +17,6 @@ namespace translate {
 
 namespace metrics_internal {
 
-const char kTranslateLanguageDetectionLanguageVerification[] =
-    "Translate.LanguageDetection.LanguageVerification";
 const char kTranslateTimeToBeReady[] = "Translate.Translation.TimeToBeReady";
 const char kTranslateTimeToLoad[] = "Translate.Translation.TimeToLoad";
 const char kTranslateTimeToTranslate[] =
@@ -31,12 +29,6 @@ const char kTranslatedLanguageDetectionContentLength[] =
 const char kTranslateCompactInfobarEvent[] = "Translate.CompactInfobar.Event";
 
 }  // namespace metrics_internal
-
-void ReportLanguageVerification(LanguageVerificationType type) {
-  base::UmaHistogramEnumeration(
-      metrics_internal::kTranslateLanguageDetectionLanguageVerification, type,
-      LanguageVerificationType::kMaxValue);
-}
 
 void ReportTimeToBeReady(double time_in_msec) {
   DEPRECATED_UMA_HISTOGRAM_MEDIUM_TIMES(

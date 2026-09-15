@@ -28,7 +28,6 @@ static_library("agent") {
     "//components/language_detection/content/common",
     "//components/language_detection/core",
     "//components/translate/core/common",
-    "//components/translate/core/language_detection",
     "//content/public/common",
     "//content/public/renderer",
     "//mojo/public/cpp/bindings",

@@ -34,45 +34,6 @@ class MetricsRecorder {
   MetricsRecorder(const MetricsRecorder&) = delete;
   MetricsRecorder& operator=(const MetricsRecorder&) = delete;
 
-  void CheckLanguageVerification(int expected_model_only,
-                                 int expected_unknown,
-                                 int expected_model_agree,
-                                 int expected_model_disagree,
-                                 int expected_trust_model,
-                                 int expected_model_complement_sub_code,
-                                 int expected_no_page_content,
-                                 int expected_model_not_available) {
-    ASSERT_EQ(metrics_internal::kTranslateLanguageDetectionLanguageVerification,
-              key_);
-
-    Snapshot();
-
-    // EXPECT_EQ(expected_model_disabled,
-    //           GetCountWithoutSnapshot(kModelDisabled)); -- obsolete
-    EXPECT_EQ(expected_model_only, GetCountWithoutSnapshot(static_cast<int>(
-                                       LanguageVerificationType::kModelOnly)));
-    EXPECT_EQ(expected_unknown, GetCountWithoutSnapshot(static_cast<int>(
-                                    LanguageVerificationType::kModelUnknown)));
-    EXPECT_EQ(expected_model_agree,
-              GetCountWithoutSnapshot(
-                  static_cast<int>(LanguageVerificationType::kModelAgrees)));
-    EXPECT_EQ(expected_model_disagree,
-              GetCountWithoutSnapshot(
-                  static_cast<int>(LanguageVerificationType::kModelDisagrees)));
-    EXPECT_EQ(expected_trust_model,
-              GetCountWithoutSnapshot(
-                  static_cast<int>(LanguageVerificationType::kModelOverrides)));
-    EXPECT_EQ(expected_model_complement_sub_code,
-              GetCountWithoutSnapshot(static_cast<int>(
-                  LanguageVerificationType::kModelComplementsCountry)));
-    EXPECT_EQ(expected_no_page_content,
-              GetCountWithoutSnapshot(
-                  static_cast<int>(LanguageVerificationType::kNoPageContent)));
-    EXPECT_EQ(expected_model_not_available,
-              GetCountWithoutSnapshot(static_cast<int>(
-                  LanguageVerificationType::kModelNotAvailable)));
-  }
-
   void CheckTotalCount(int count) {
     Snapshot();
     EXPECT_EQ(count, GetTotalCount());
@@ -130,31 +91,6 @@ class MetricsRecorder {
   std::unique_ptr<HistogramSamples> base_samples_;
   std::unique_ptr<HistogramSamples> samples_;
 };
-
-TEST(TranslateMetricsTest, ReportLanguageVerification) {
-  MetricsRecorder recorder(
-      metrics_internal::kTranslateLanguageDetectionLanguageVerification);
-
-  // ReportLanguageVerification(kModelDisabled); -- obsolete
-  recorder.CheckLanguageVerification(0, 0, 0, 0, 0, 0, 0, 0);
-  ReportLanguageVerification(LanguageVerificationType::kModelOnly);
-  recorder.CheckLanguageVerification(1, 0, 0, 0, 0, 0, 0, 0);
-  ReportLanguageVerification(LanguageVerificationType::kModelUnknown);
-  recorder.CheckLanguageVerification(1, 1, 0, 0, 0, 0, 0, 0);
-  ReportLanguageVerification(LanguageVerificationType::kModelAgrees);
-  recorder.CheckLanguageVerification(1, 1, 1, 0, 0, 0, 0, 0);
-  ReportLanguageVerification(LanguageVerificationType::kModelDisagrees);
-  recorder.CheckLanguageVerification(1, 1, 1, 1, 0, 0, 0, 0);
-  ReportLanguageVerification(LanguageVerificationType::kModelOverrides);
-  recorder.CheckLanguageVerification(1, 1, 1, 1, 1, 0, 0, 0);
-  ReportLanguageVerification(
-      LanguageVerificationType::kModelComplementsCountry);
-  recorder.CheckLanguageVerification(1, 1, 1, 1, 1, 1, 0, 0);
-  ReportLanguageVerification(LanguageVerificationType::kNoPageContent);
-  recorder.CheckLanguageVerification(1, 1, 1, 1, 1, 1, 1, 0);
-  ReportLanguageVerification(LanguageVerificationType::kModelNotAvailable);
-  recorder.CheckLanguageVerification(1, 1, 1, 1, 1, 1, 1, 1);
-}
 
 TEST(TranslateMetricsTest, ReportTimeToBeReady) {
   MetricsRecorder recorder(metrics_internal::kTranslateTimeToBeReady);

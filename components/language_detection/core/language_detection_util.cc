@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/translate/core/language_detection/language_detection_util.h"
+#include "components/language_detection/core/language_detection_util.h"
 
 #include <stddef.h>
 
@@ -22,11 +22,11 @@
 #include "base/strings/utf_string_conversions.h"
 #include "components/language_detection/core/chinese_script_classifier.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/language_detection_metrics.h"
 #include "components/language_detection/core/language_matcher.h"
-#include "components/translate/core/common/translate_metrics.h"
 #include "third_party/cld_3/src/src/nnet_language_identifier.h"
 
-namespace translate {
+namespace language_detection {
 namespace {
 
 using ::base::i18n::GetKnownLanguageTag;
@@ -60,7 +60,7 @@ std::optional<LanguageTag> GetTranslateLanguage(
   if (!tag) {
     return std::nullopt;
   }
-  return language_detection::GetSupportedLanguageMatcher().Match(*tag);
+  return GetSupportedLanguageMatcher().Match(*tag);
 }
 
 // Get page language from html language code if it is not empty, otherwise get
@@ -100,8 +100,9 @@ std::optional<LanguageTag> FilterDetectedLanguage(
     bool is_detection_reliable) {
   // Ignore unreliable, "unknown", and xx-Latn predictions that are currently
   // not supported.
-  if (!is_detection_reliable)
+  if (!is_detection_reliable) {
     return std::nullopt;
+  }
   // TODO(crbug.com/40169055): Determine if ar-Latn and hi-Latn need to be added
   // for the TFLite-based detection model.
   if (detected_language == "bg-Latn" || detected_language == "el-Latn" ||
@@ -119,10 +120,12 @@ std::optional<LanguageTag> FilterDetectedLanguage(
     // The Classify function returns either "zh-Hant" or "zh-Hans".
     // Convert to the old-style language codes used by the Translate API.
     const std::string zh_classification = zh_classifier.Classify(utf8_text);
-    if (zh_classification == "zh-Hant")
+    if (zh_classification == "zh-Hant") {
       return GetKnownLanguageTag("zh-TW");
-    if (zh_classification == "zh-Hans")
+    }
+    if (zh_classification == "zh-Hans") {
       return GetKnownLanguageTag("zh-CN");
+    }
     return std::nullopt;
   }
   // The detection is reliable and none of the cases that are not handled by the
@@ -180,11 +183,12 @@ std::string DeterminePageLanguage(std::string_view code,
   if (model_detected_language != nullptr) {
     *model_detected_language = std::string(detected_language_tag.tag_string());
   }
-  if (is_model_reliable != nullptr)
+  if (is_model_reliable != nullptr) {
     *is_model_reliable = is_reliable;
+  }
   model_reliability_score = model_score;
   LanguageTag translate_detected_tag =
-      language_detection::GetSupportedLanguageMatcher()
+      GetSupportedLanguageMatcher()
           .Match(detected_language_tag)
           .value_or(GetKnownLanguageTag("und"));
 
@@ -196,7 +200,7 @@ std::string DeterminePageLanguageNoModel(
     std::string_view code,
     std::string_view html_lang,
     LanguageVerificationType language_verification_type) {
-  translate::ReportLanguageVerification(language_verification_type);
+  ReportLanguageVerification(language_verification_type);
   std::optional<LanguageTag> language =
       GetHTMLOrHTTPContentLanguage(code, html_lang);
   return !language.has_value() ? language_detection::kUnknownLanguageCode
@@ -213,45 +217,40 @@ std::string DeterminePageLanguage(std::string_view code,
   // If |language| is nullopt, just use model result even though it might be
   // language_detection::kUnknownLanguageCode.
   if (!language.has_value()) {
-    translate::ReportLanguageVerification(
-        translate::LanguageVerificationType::kModelOnly);
+    ReportLanguageVerification(LanguageVerificationType::kModelOnly);
     return std::string(model_detected_language);
   }
 
   // If |model_detected_language| is empty, just use |language|.
   if (model_detected_language.empty() ||
       model_detected_language == language_detection::kUnknownLanguageCode) {
-    translate::ReportLanguageVerification(
-        translate::LanguageVerificationType::kModelUnknown);
+    ReportLanguageVerification(LanguageVerificationType::kModelUnknown);
     return std::string(language->tag_string());
   }
 
   if (CanModelComplementSubCode(language->tag_string(),
                                 model_detected_language)) {
-    translate::ReportLanguageVerification(
-        translate::LanguageVerificationType::kModelComplementsCountry);
+    ReportLanguageVerification(
+        LanguageVerificationType::kModelComplementsCountry);
     return std::string(model_detected_language);
   }
 
   if (IsSameOrSimilarLanguages(language->tag_string(),
                                model_detected_language)) {
-    translate::ReportLanguageVerification(
-        translate::LanguageVerificationType::kModelAgrees);
+    ReportLanguageVerification(LanguageVerificationType::kModelAgrees);
     return std::string(language->tag_string());
   }
 
   if (MaybeServerWrongConfiguration(language->tag_string(),
                                     model_detected_language)) {
-    translate::ReportLanguageVerification(
-        translate::LanguageVerificationType::kModelOverrides);
+    ReportLanguageVerification(LanguageVerificationType::kModelOverrides);
     return std::string(model_detected_language);
   }
 
   // Content-Language value might be wrong because model says that this page is
   // written in another language with confidence. In this case, Chrome doesn't
   // rely on any of the language codes, and gives up suggesting a translation.
-  translate::ReportLanguageVerification(
-      translate::LanguageVerificationType::kModelDisagrees);
+  ReportLanguageVerification(LanguageVerificationType::kModelDisagrees);
   return language_detection::kUnknownLanguageCode;
 }
 
@@ -267,14 +266,15 @@ void CorrectLanguageCodeTypo(std::string* code) {
 
   // An underscore instead of a dash is a frequent mistake.
   size_t underscore_index = code->find('_');
-  if (underscore_index != std::string::npos)
+  if (underscore_index != std::string::npos) {
     (*code)[underscore_index] = '-';
+  }
 
   // Change everything up to a dash to lower-case and everything after to upper.
   size_t dash_index = code->find('-');
   if (dash_index != std::string::npos) {
     *code = base::ToLowerASCII(code->substr(0, dash_index)) +
-        base::ToUpperASCII(code->substr(dash_index));
+            base::ToUpperASCII(code->substr(dash_index));
   } else {
     *code = base::ToLowerASCII(*code);
   }
@@ -286,30 +286,36 @@ bool IsValidLanguageCode(std::string_view code) {
   std::vector<std::string_view> chunks = base::SplitStringPiece(
       code, "-", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
 
-  if (chunks.size() < 1 || 2 < chunks.size())
+  if (chunks.size() < 1 || 2 < chunks.size()) {
     return false;
+  }
 
   std::string_view main_code = chunks[0];
 
-  if (main_code.size() < 1 || 3 < main_code.size())
+  if (main_code.size() < 1 || 3 < main_code.size()) {
     return false;
-
-  for (char c : main_code) {
-    if (!base::IsAsciiAlpha(c))
-      return false;
   }
 
-  if (chunks.size() == 1)
+  for (char c : main_code) {
+    if (!base::IsAsciiAlpha(c)) {
+      return false;
+    }
+  }
+
+  if (chunks.size() == 1) {
     return true;
+  }
 
   std::string_view sub_code = chunks[1];
 
-  if (sub_code.size() != 2)
+  if (sub_code.size() != 2) {
     return false;
+  }
 
   for (char c : sub_code) {
-    if (!base::IsAsciiAlpha(c))
+    if (!base::IsAsciiAlpha(c)) {
       return false;
+    }
   }
 
   return true;
@@ -329,8 +335,9 @@ bool MaybeServerWrongConfiguration(std::string_view page_language,
                                    std::string_view model_detected_language) {
   // If |page_language| is not "en-*", respect it and just return false here.
   if (!base::StartsWith(page_language, "en",
-                        base::CompareCase::INSENSITIVE_ASCII))
+                        base::CompareCase::INSENSITIVE_ASCII)) {
     return false;
+  }
 
   // A server provides a language meta information representing "en-*". But it
   // might be just a default value due to missing user configuration.
@@ -341,4 +348,4 @@ bool MaybeServerWrongConfiguration(std::string_view page_language,
   return IsServerWrongConfigurationLanguage(model_detected_language);
 }
 
-}  // namespace translate
+}  // namespace language_detection

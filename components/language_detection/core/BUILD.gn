@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/config/features.gni")
+import("//testing/test.gni")
 
 # We need a component because this gives access to a per-process
 # singleton instance of the model. Without a component, we end up an
@@ -23,10 +24,16 @@ component("core") {
     "language_detection_details.h",
     "language_detection_driver.cc",
     "language_detection_driver.h",
+    "language_detection_metrics.cc",
+    "language_detection_metrics.h",
     "language_detection_model.cc",
     "language_detection_model.h",
+    "language_detection_util.cc",
+    "language_detection_util.h",
     "language_matcher.cc",
     "language_matcher.h",
+    "page_language_detector.cc",
+    "page_language_detector.h",
   ]
   if (use_blink) {
     sources += [
@@ -40,6 +47,7 @@ component("core") {
     "//base:i18n",
     "//components/language/core/common",
     "//components/optimization_guide/core:features",
+    "//third_party/cld_3/src/src:cld_3",
     "//third_party/icu",
     "//third_party/tflite",
     "//third_party/tflite_support",
@@ -82,9 +90,12 @@ source_set("unit_tests") {
   sources = [
     "background_file_unittest.cc",
     "chinese_script_classifier_test.cc",
+    "language_detection_metrics_unittest.cc",
     "language_detection_model_unittest.cc",
+    "language_detection_util_unittest.cc",
     "language_matcher_unittest.cc",
     "ngram_hash_ops_utils_unittest.cc",
+    "page_language_detector_unittest.cc",
     "quantization_utils_unittest.cc",
   ]
   if (use_blink) {
@@ -98,6 +109,17 @@ source_set("unit_tests") {
     "//base:i18n",
     "//base/test:test_support",
     "//components/language_detection/testing",
-    "//components/translate/core/common",
+  ]
+}
+
+test("language_detection_util_fuzztest") {
+  sources = [ "language_detection_util_fuzztest.cc" ]
+  fuzztests =
+      [ "LanguageDetectionUtilFuzzTest.DeterminePageLanguageDoesNotCrash" ]
+
+  deps = [
+    ":core",
+    "//testing/gtest",
+    "//third_party/fuzztest:fuzztest_gtest_main",
   ]
 }

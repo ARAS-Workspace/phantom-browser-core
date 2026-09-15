@@ -31,7 +31,7 @@ class LanguageDetectionModelLoaderServiceIOS : public KeyedService {
   ~LanguageDetectionModelLoaderServiceIOS() override;
 
   // Get for the actual TFLite language detection model.
-  translate::LanguageDetectionModel* GetLanguageDetectionModel();
+  PageLanguageDetector* GetLanguageDetectionModel();
 
   // Utility function to check if the model is already loaded.
   // |GetLanguageDetectionModel| can be used even if this return false.
@@ -50,7 +50,7 @@ class LanguageDetectionModelLoaderServiceIOS : public KeyedService {
       language_detection_model_service_;
 
   // The managed language detection model.
-  std::unique_ptr<translate::LanguageDetectionModel> language_detection_model_;
+  std::unique_ptr<PageLanguageDetector> language_detection_model_;
 
   base::WeakPtrFactory<LanguageDetectionModelLoaderServiceIOS>
       weak_ptr_factory_{this};

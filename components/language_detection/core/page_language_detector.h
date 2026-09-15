@@ -2,40 +2,30 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_LANGUAGE_DETECTION_MODEL_H_
-#define COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_LANGUAGE_DETECTION_MODEL_H_
+#ifndef COMPONENTS_LANGUAGE_DETECTION_CORE_PAGE_LANGUAGE_DETECTOR_H_
+#define COMPONENTS_LANGUAGE_DETECTION_CORE_PAGE_LANGUAGE_DETECTOR_H_
 
 #include <memory>
 #include <string>
 #include <string_view>
 
+#include "base/component_export.h"
 #include "base/files/file.h"
 #include "build/build_config.h"
 #include "components/language_detection/core/language_detection_model.h"
 #include "partition_alloc/pointers/raw_ref.h"
 
-namespace translate {
+namespace language_detection {
 
-// Exposed for testing.
-
-// The number of characters to sample and provide as a buffer to the model
-// for determining its language.
-inline constexpr size_t kTextSampleLength = 256;
-
-// The number of samples of |kTextSampleLength| to evaluate the model when
-// determining the language of the page content.
-inline constexpr int kNumTextSamples = 3;
-
-// A language detection model that will use a TFLite model to determine the
-// language of the content of the web page.
-class LanguageDetectionModel {
+// Determines the language of the content of a web page with a TFLite model.
+class COMPONENT_EXPORT(LANGUAGE_DETECTION) PageLanguageDetector {
  public:
-  explicit LanguageDetectionModel(
+  explicit PageLanguageDetector(
       language_detection::LanguageDetectionModel& shared_tflite_model);
-  explicit LanguageDetectionModel(
+  explicit PageLanguageDetector(
       std::unique_ptr<language_detection::LanguageDetectionModel>
           owned_tflite_model);
-  ~LanguageDetectionModel();
+  ~PageLanguageDetector();
 
   // Updates the language detection model for use by memory-mapping
   // |model_file| used to detect the language of the page.
@@ -80,5 +70,5 @@ class LanguageDetectionModel {
   const raw_ref<language_detection::LanguageDetectionModel> tflite_model_;
 };
 
-}  // namespace translate
-#endif  // COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_LANGUAGE_DETECTION_MODEL_H_
+}  // namespace language_detection
+#endif  // COMPONENTS_LANGUAGE_DETECTION_CORE_PAGE_LANGUAGE_DETECTOR_H_

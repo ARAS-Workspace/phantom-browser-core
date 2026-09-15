@@ -1,10 +1,16 @@
 include_rules = [
+  "+partition_alloc/pointers/raw_ref.h",
   "+components/language/core/common",
+  "+components/language_detection/testing",
   "+components/optimization_guide/core",
-  "+components/translate/core/common",
+  # CLD library.
+  "+third_party/cld_3",
   "+third_party/smhasher",
   "+third_party/flatbuffers",
   "+third_party/tflite",
   "+third_party/tflite_support",
   "+third_party/utf",
+
+  # Fuzzers
+  "+third_party/fuzztest",
 ]

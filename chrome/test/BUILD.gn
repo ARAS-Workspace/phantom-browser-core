@@ -2409,7 +2409,6 @@ if (!is_android) {
       "//components/translate/content/browser:test_support",
       "//components/language_detection/content/renderer:agent",
       "//components/translate/content/renderer",
-      "//components/translate/core/language_detection",
       "//components/trusted_vault",
       "//components/ukm/content",
       "//components/unexportable_keys",

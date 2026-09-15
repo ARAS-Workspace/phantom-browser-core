@@ -2,18 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_LANGUAGE_DETECTION_UTIL_H_
-#define COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_LANGUAGE_DETECTION_UTIL_H_
+#ifndef COMPONENTS_LANGUAGE_DETECTION_CORE_LANGUAGE_DETECTION_UTIL_H_
+#define COMPONENTS_LANGUAGE_DETECTION_CORE_LANGUAGE_DETECTION_UTIL_H_
 
 #include <optional>
 #include <string>
 #include <string_view>
 
+#include "base/component_export.h"
+
 namespace base::i18n {
 class LanguageTag;
 }
 
-namespace translate {
+namespace language_detection {
 enum class LanguageVerificationType;
 
 // Given a detected language and whether that detection is reliable, returns the
@@ -21,6 +23,7 @@ enum class LanguageVerificationType;
 // |language_detection::kUnknownLanguageCode|
 //  for unreliable, "unknown", and xx-Latn predictions that are currently not
 // supported.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 std::optional<base::i18n::LanguageTag> FilterDetectedLanguage(
     const std::string& utf8_text,
     const std::string& detected_language,
@@ -31,6 +34,7 @@ std::optional<base::i18n::LanguageTag> FilterDetectedLanguage(
 // will be set as true if CLD says the detection is reliable and
 // |model_reliability_score| will contain the model's confidence in that
 // detection.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 std::optional<base::i18n::LanguageTag> DetermineTextLanguage(
     const std::string& utf8_text,
     bool* is_model_reliable,
@@ -38,15 +42,17 @@ std::optional<base::i18n::LanguageTag> DetermineTextLanguage(
 
 // Determines page language from content header and html lang when no model is
 // available.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 std::string DeterminePageLanguageNoModel(
     std::string_view content_lang,
     std::string_view html_lang,
-    translate::LanguageVerificationType language_verification_type);
+    LanguageVerificationType language_verification_type);
 
 // Determines page language from content header, html lang and contents.
 // Returns the contents language results in |model_detected_language| and
 // |is_model_reliable| and the model's confidence it its detection language
 // in |model_reliability_score|.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 std::string DeterminePageLanguage(std::string_view code,
                                   std::string_view html_lang,
                                   const std::u16string& contents,
@@ -56,6 +62,7 @@ std::string DeterminePageLanguage(std::string_view code,
 
 // Determines content page language from Content-Language code and contents
 // language.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 std::string DeterminePageLanguage(std::string_view code,
                                   std::string_view html_lang,
                                   std::string_view model_detected_language,
@@ -63,22 +70,26 @@ std::string DeterminePageLanguage(std::string_view code,
 
 // Corrects language code if it contains well-known mistakes.
 // Called only by tests.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 void CorrectLanguageCodeTypo(std::string* code);
 
 // Checks if the language code's format is valid.
 // Called only by tests.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 bool IsValidLanguageCode(std::string_view code);
 
 // Checks if languages pair is one of well-known pairs of wrong server
 // configuration.
 // Called only by tests.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 bool MaybeServerWrongConfiguration(std::string_view page_language,
                                    std::string_view model_detected_language);
 
 // Returns true if the specified language often has the wrong server
 // configuration language, false otherwise.
+COMPONENT_EXPORT(LANGUAGE_DETECTION)
 bool IsServerWrongConfigurationLanguage(std::string_view language);
 
-}  // namespace translate
+}  // namespace language_detection
 
-#endif  // COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_LANGUAGE_DETECTION_UTIL_H_
+#endif  // COMPONENTS_LANGUAGE_DETECTION_CORE_LANGUAGE_DETECTION_UTIL_H_

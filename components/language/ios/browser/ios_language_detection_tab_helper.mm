@@ -13,12 +13,12 @@
 #include "components/language/core/browser/url_language_histogram.h"
 #include "components/language/ios/browser/language_detection_java_script_feature.h"
 #include "components/language/ios/browser/string_clipping_util.h"
+#include "components/language_detection/core/features.h"
 #include "components/language_detection/core/language_detection_details.h"
+#include "components/language_detection/core/language_detection_util.h"
+#include "components/language_detection/core/page_language_detector.h"
 #include "components/prefs/pref_member.h"
 #include "components/translate/core/browser/translate_pref_names.h"
-#include "components/translate/core/common/translate_util.h"
-#include "components/translate/core/language_detection/language_detection_model.h"
-#include "components/translate/core/language_detection/language_detection_util.h"
 #import "ios/web/common/url_scheme_util.h"
 #include "ios/web/public/js_messaging/web_frame.h"
 #import "ios/web/public/navigation/navigation_context.h"
@@ -51,7 +51,7 @@ enum class LanguageDetectionMethod {
 IOSLanguageDetectionTabHelper::IOSLanguageDetectionTabHelper(
     web::WebState* web_state,
     UrlLanguageHistogram* url_language_histogram,
-    translate::LanguageDetectionModel* language_detection_model,
+    language_detection::PageLanguageDetector* language_detection_model,
     PrefService* prefs)
     : web_state_(web_state),
       url_language_histogram_(url_language_histogram),
@@ -178,7 +178,7 @@ std::string IOSLanguageDetectionTabHelper::DeterminePageLanguage(
     bool* is_model_reliable,
     float& model_reliability_score,
     std::string* detection_model_version) {
-  if (translate::IsTFLiteLanguageDetectionEnabled() &&
+  if (language_detection::features::IsTFLiteLanguageDetectionEnabled() &&
       language_detection_model_ && language_detection_model_->IsAvailable()) {
     base::ElapsedTimer timer;
     std::string tflite_language =
@@ -196,7 +196,7 @@ std::string IOSLanguageDetectionTabHelper::DeterminePageLanguage(
     return tflite_language;
   }
 
-  if (translate::IsTFLiteLanguageDetectionEnabled()) {
+  if (language_detection::features::IsTFLiteLanguageDetectionEnabled()) {
     base::UmaHistogramEnumeration(
         "IOS.Translate.PageLoad.LanguageDetectionMethod",
         LanguageDetectionMethod::kTFLiteModelUnavailable);
@@ -205,7 +205,7 @@ std::string IOSLanguageDetectionTabHelper::DeterminePageLanguage(
         "IOS.Translate.PageLoad.LanguageDetectionMethod",
         LanguageDetectionMethod::kTFLiteModelDisabled);
   }
-  return ::translate::DeterminePageLanguage(
+  return ::language_detection::DeterminePageLanguage(
       code, html_lang, contents, model_detected_language, is_model_reliable,
       model_reliability_score);
 }

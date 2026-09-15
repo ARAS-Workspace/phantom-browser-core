@@ -14,7 +14,6 @@ namespace translate {
 namespace metrics_internal {
 
 // Constant string values to indicate UMA names.
-extern const char kTranslateLanguageDetectionLanguageVerification[];
 extern const char kTranslateTimeToBeReady[];
 extern const char kTranslateTimeToLoad[];
 extern const char kTranslateTimeToTranslate[];
@@ -27,24 +26,6 @@ extern const char kTranslatedLanguageDetectionContentLength[];
 extern const char kTranslateCompactInfobarEvent[];
 
 }  // namespace metrics_internal
-
-// When a valid Content-Language is provided, TranslateAgent checks if a
-// server provided Content-Language matches to a language the model determined.
-// This enum is used for recording metrics. This enum should remain synchronized
-// with the enum "TranslateLanguageVerification" in enums.xml.
-enum class LanguageVerificationType {
-  // kModelDisabled = 0, -- obsolete
-  kModelOnly = 1,
-  kModelUnknown = 2,
-  kModelAgrees = 3,
-  kModelDisagrees = 4,
-  kModelOverrides = 5,
-  kModelComplementsCountry = 6,
-  kNoPageContent = 7,
-  kModelNotAvailable = 8,
-  kModelHistogramBoundary = 9,
-  kMaxValue = kModelHistogramBoundary,
-};
 
 // Enum for the Translate.CompactInfobar.Event UMA histogram.
 // Note: This enum is used to back an UMA histogram, and should be treated as
@@ -83,9 +64,6 @@ enum class InfobarEvent {
   INFOBAR_HISTOGRAM_BOUNDARY = 28,
   kMaxValue = INFOBAR_HISTOGRAM_BOUNDARY,
 };
-
-// Called when CLD verifies Content-Language header.
-void ReportLanguageVerification(LanguageVerificationType type);
 
 // Called when the Translate Element library is ready.
 void ReportTimeToBeReady(double time_in_msec);

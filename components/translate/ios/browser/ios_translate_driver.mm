@@ -12,13 +12,13 @@
 #include "base/time/time.h"
 #include "components/language_detection/core/browser/language_detection_model_service.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/features.h"
 #include "components/language_detection/core/language_detection_details.h"
+#include "components/language_detection/core/page_language_detector.h"
 #include "components/language_detection/ios/browser/language_detection_model_loader_service_ios.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/translate/core/common/translate_metrics.h"
-#include "components/translate/core/common/translate_util.h"
-#include "components/translate/core/language_detection/language_detection_model.h"
 #import "components/translate/ios/browser/translate_controller.h"
 #include "components/ukm/ios/ukm_url_recorder.h"
 #import "ios/web/public/annotations/annotations_text_manager.h"
@@ -65,8 +65,9 @@ void IOSTranslateDriver::Initialize(
   translate_manager_ = translate_manager->GetWeakPtr();
   web_state_observation_.Observe(web_state_);
 
-  LanguageDetectionModel* language_detection_model = nullptr;
-  if (language_detection_model_service_ && IsTFLiteLanguageDetectionEnabled()) {
+  language_detection::PageLanguageDetector* language_detection_model = nullptr;
+  if (language_detection_model_service_ &&
+      language_detection::features::IsTFLiteLanguageDetectionEnabled()) {
     language_detection_model =
         language_detection_model_service_->GetLanguageDetectionModel();
   }

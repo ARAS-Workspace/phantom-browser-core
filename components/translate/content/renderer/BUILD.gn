@@ -16,7 +16,6 @@ static_library("renderer") {
     "//components/language_detection/core",
     "//components/translate/content/common",
     "//components/translate/core/common",
-    "//components/translate/core/language_detection",
     "//content/public/common",
     "//content/public/renderer",
     "//pdf:buildflags",

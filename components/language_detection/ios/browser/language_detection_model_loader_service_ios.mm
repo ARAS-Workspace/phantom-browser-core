@@ -10,7 +10,7 @@
 #include "components/language_detection/core/browser/language_detection_model_service.h"
 #include "components/language_detection/core/language_detection_model.h"
 #include "components/language_detection/core/language_detection_provider.h"
-#include "components/translate/core/language_detection/language_detection_model.h"
+#include "components/language_detection/core/page_language_detector.h"
 
 namespace language_detection {
 
@@ -18,9 +18,8 @@ LanguageDetectionModelLoaderServiceIOS::LanguageDetectionModelLoaderServiceIOS(
     language_detection::LanguageDetectionModelService*
         language_detection_model_service)
     : language_detection_model_service_(language_detection_model_service),
-      language_detection_model_(
-          std::make_unique<translate::LanguageDetectionModel>(
-              std::make_unique<language_detection::LanguageDetectionModel>())) {
+      language_detection_model_(std::make_unique<PageLanguageDetector>(
+          std::make_unique<language_detection::LanguageDetectionModel>())) {
   if (language_detection_model_service_) {
     language_detection_model_service_->GetLanguageDetectionModelFile(
         base::BindOnce(&LanguageDetectionModelLoaderServiceIOS::
@@ -32,7 +31,7 @@ LanguageDetectionModelLoaderServiceIOS::LanguageDetectionModelLoaderServiceIOS(
 LanguageDetectionModelLoaderServiceIOS::
     ~LanguageDetectionModelLoaderServiceIOS() = default;
 
-translate::LanguageDetectionModel*
+PageLanguageDetector*
 LanguageDetectionModelLoaderServiceIOS::GetLanguageDetectionModel() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return language_detection_model_.get();

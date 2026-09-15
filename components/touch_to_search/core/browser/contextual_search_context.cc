@@ -5,7 +5,7 @@
 #include "components/touch_to_search/core/browser/contextual_search_context.h"
 
 #include "components/language_detection/core/constants.h"
-#include "components/translate/core/language_detection/language_detection_util.h"
+#include "components/language_detection/core/language_detection_util.h"
 
 ContextualSearchContext::ContextualSearchContext() = default;
 ContextualSearchContext::~ContextualSearchContext() = default;
@@ -60,7 +60,7 @@ std::string ContextualSearchContext::GetReliableLanguage(
   std::string model_detected_language;
   bool is_model_reliable;
   float model_reliability_score;
-  std::string language = translate::DeterminePageLanguage(
+  std::string language = language_detection::DeterminePageLanguage(
       /*code=*/std::string(),
       /*html_lang=*/std::string(), contents, &model_detected_language,
       &is_model_reliable, model_reliability_score);

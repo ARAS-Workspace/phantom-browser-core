@@ -16,12 +16,11 @@
 #include "components/language_detection/content/renderer/language_detection_model_manager.h"
 #include "components/language_detection/core/constants.h"
 #include "components/language_detection/core/features.h"
+#include "components/language_detection/core/language_detection_metrics.h"
 #include "components/language_detection/core/language_detection_model.h"
 #include "components/language_detection/core/language_detection_provider.h"
-#include "components/translate/core/common/translate_metrics.h"
-#include "components/translate/core/common/translate_util.h"
-#include "components/translate/core/language_detection/language_detection_model.h"
-#include "components/translate/core/language_detection/language_detection_util.h"
+#include "components/language_detection/core/language_detection_util.h"
+#include "components/language_detection/core/page_language_detector.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/common/url_constants.h"
 #include "content/public/renderer/render_frame.h"
@@ -41,11 +40,12 @@ namespace {
 // The current CLD model version.
 constexpr char kCLDModelVersion[] = "CLD3";
 
-// Returns the translate model wrapper that is shared across the RenderFrames
-// in the renderer. Named apart from language_detection::GetLanguageDetectionModel
-// so that unqualified lookup inside namespace language_detection finds this one.
-translate::LanguageDetectionModel& GetSharedModelWrapper() {
-  static base::NoDestructor<translate::LanguageDetectionModel> instance(
+// Returns the page language detector that is shared across the RenderFrames
+// in the renderer. Named apart from
+// language_detection::GetLanguageDetectionModel so that unqualified lookup
+// inside namespace language_detection finds this one.
+language_detection::PageLanguageDetector& GetSharedModelWrapper() {
+  static base::NoDestructor<language_detection::PageLanguageDetector> instance(
       language_detection::GetLanguageDetectionModel());
   return *instance;
 }
@@ -84,7 +84,7 @@ LanguageDetectionAgent::LanguageDetectionAgent(
       language_detection_model_(&GetSharedModelWrapper()),
       language_detection_model_manager_(
           language_detection_model_->tflite_model()) {
-  if (!translate::IsTFLiteLanguageDetectionEnabled()) {
+  if (!features::IsTFLiteLanguageDetectionEnabled()) {
     return;
   }
 
@@ -217,23 +217,20 @@ void LanguageDetectionAgent::RunLanguageDetection(
   if (page_contents_length_ == 0) {
     // If captured content is empty do not run language detection and
     // only use page-provided languages.
-    language = translate::DeterminePageLanguageNoModel(
-        content_language, html_lang,
-        translate::LanguageVerificationType::kNoPageContent);
-  } else if (translate::IsTFLiteLanguageDetectionEnabled()) {
+    language = DeterminePageLanguageNoModel(
+        content_language, html_lang, LanguageVerificationType::kNoPageContent);
+  } else if (features::IsTFLiteLanguageDetectionEnabled()) {
     // Use TFLite and page contents to assist with language detection.
     bool is_available = language_detection_model_->IsAvailable();
-    language =
-        is_available
-            ? language_detection_model_->DeterminePageLanguage(
-                  content_language, html_lang, contents,
-                  &model_detected_language, &is_model_reliable,
-                  model_reliability_score)
-            // If the model is not available do not run language
-            // detection and only use page-provided languages.
-            : translate::DeterminePageLanguageNoModel(
-                  content_language, html_lang,
-                  translate::LanguageVerificationType::kModelNotAvailable);
+    language = is_available ? language_detection_model_->DeterminePageLanguage(
+                                  content_language, html_lang, contents,
+                                  &model_detected_language, &is_model_reliable,
+                                  model_reliability_score)
+                            // If the model is not available do not run language
+                            // detection and only use page-provided languages.
+                            : DeterminePageLanguageNoModel(
+                                  content_language, html_lang,
+                                  LanguageVerificationType::kModelNotAvailable);
     UMA_HISTOGRAM_BOOLEAN(
         "LanguageDetection.TFLiteModel.WasModelAvailableForDetection",
         is_available);
@@ -244,7 +241,7 @@ void LanguageDetectionAgent::RunLanguageDetection(
     details.has_run_lang_detection = true;
   } else {
     // Use CLD3 and page contents to assist with language detection.
-    language = translate::DeterminePageLanguage(
+    language = DeterminePageLanguage(
         content_language, html_lang, contents, &model_detected_language,
         &is_model_reliable, model_reliability_score);
     detection_model_version = kCLDModelVersion;
@@ -322,7 +319,7 @@ void LanguageDetectionAgent::WasShown() {
 
   waiting_for_first_foreground_ = false;
 
-  if (!translate::IsTFLiteLanguageDetectionEnabled()) {
+  if (!features::IsTFLiteLanguageDetectionEnabled()) {
     return;
   }
 

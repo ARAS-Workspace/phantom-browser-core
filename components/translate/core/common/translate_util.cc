@@ -40,17 +40,6 @@ GURL GetTranslateSecurityOrigin() {
   return GURL(security_origin);
 }
 
-bool IsTFLiteLanguageDetectionEnabled() {
-// The feature is explicitly disabled on WebView.
-// TODO(crbug.com/40819484): Enable the feature on WebView.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_IOS)
-  return true;
-#else
-  return false;
-#endif
-}
-
 int GetAutoAlwaysThreshold() {
   return kAutoAlwaysThreshold;
 }

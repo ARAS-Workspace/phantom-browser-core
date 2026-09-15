@@ -15,6 +15,5 @@ source_set("browser") {
     "//components/keyed_service/core",
     "//components/language_detection/core",
     "//components/language_detection/core/browser:language_detection_model_service",
-    "//components/translate/core/language_detection",
   ]
 }

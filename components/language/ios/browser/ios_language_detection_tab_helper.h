@@ -84,7 +84,7 @@ class IOSLanguageDetectionTabHelper
   IOSLanguageDetectionTabHelper(
       web::WebState* web_state,
       UrlLanguageHistogram* url_language_histogram,
-      translate::LanguageDetectionModel* language_detection_model,
+      language_detection::PageLanguageDetector* language_detection_model,
       PrefService* prefs);
 
   // web::WebFramesManager::Observer
@@ -121,7 +121,7 @@ class IOSLanguageDetectionTabHelper
   // WebStateDestroyed has been called.
   raw_ptr<web::WebState> web_state_ = nullptr;
   const raw_ptr<UrlLanguageHistogram> url_language_histogram_;
-  raw_ptr<translate::LanguageDetectionModel> language_detection_model_ =
+  raw_ptr<language_detection::PageLanguageDetector> language_detection_model_ =
       nullptr;
   BooleanPrefMember translate_enabled_;
   std::string content_language_header_;

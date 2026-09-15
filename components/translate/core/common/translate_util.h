@@ -10,18 +10,12 @@
 
 namespace translate {
 
-// The minimum score for the TFLite model prediction to be considered reliable.
-inline constexpr double kTFLiteReliabilityThreshold = 0.7;
-
 // Isolated world sets following security-origin by default.
 extern const char kSecurityOrigin[];
 
 // Gets Security origin with which Translate runs. This is used both for
 // language checks and to obtain the list of available languages.
 GURL GetTranslateSecurityOrigin();
-
-// Return whether TFLite-based language detection is enabled.
-bool IsTFLiteLanguageDetectionEnabled();
 
 // Return the threshold used to determine if TFLite language detection model's
 // prediction is reliable.

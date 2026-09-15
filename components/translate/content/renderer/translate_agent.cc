@@ -30,8 +30,6 @@
 #include "components/translate/content/renderer/isolated_world_util.h"
 #include "components/translate/core/common/translate_metrics.h"
 #include "components/translate/core/common/translate_util.h"
-#include "components/translate/core/language_detection/language_detection_model.h"
-#include "components/translate/core/language_detection/language_detection_util.h"
 #include "content/public/common/content_constants.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/common/url_constants.h"

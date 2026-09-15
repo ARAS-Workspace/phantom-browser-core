@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/translate/core/language_detection/language_detection_model.h"
+#include "components/language_detection/core/page_language_detector.h"
 
 #include <memory>
 #include <string>
@@ -19,21 +19,21 @@
 #include "components/language_detection/testing/language_detection_test_utils.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace translate {
+namespace language_detection {
 
-class LanguageDetectionModelValidTest : public testing::Test {
+class PageLanguageDetectorValidTest : public testing::Test {
  public:
-  LanguageDetectionModelValidTest()
-      : language_detection_model_(std::make_unique<LanguageDetectionModel>(
+  PageLanguageDetectorValidTest()
+      : language_detection_model_(std::make_unique<PageLanguageDetector>(
             language_detection::GetValidLanguageModel())) {}
 
  protected:
   base::test::TaskEnvironment environment_;
   base::HistogramTester histogram_tester_;
-  std::unique_ptr<LanguageDetectionModel> language_detection_model_;
+  std::unique_ptr<PageLanguageDetector> language_detection_model_;
 };
 
-TEST_F(LanguageDetectionModelValidTest, DetectLanguageMetrics) {
+TEST_F(PageLanguageDetectorValidTest, DetectLanguageMetrics) {
   std::u16string contents = u"This is a page apparently written in English.";
   language_detection::Prediction prediction =
       language_detection_model_->DetectLanguage(contents);
@@ -55,7 +55,7 @@ void pad(std::u16string& s, size_t len) {
   }
 }
 
-TEST_F(LanguageDetectionModelValidTest, ReliableLanguageDetermination) {
+TEST_F(PageLanguageDetectorValidTest, ReliableLanguageDetermination) {
   bool is_prediction_reliable;
   float model_reliability_score = 0.0;
   std::string predicted_language;
@@ -70,7 +70,7 @@ TEST_F(LanguageDetectionModelValidTest, ReliableLanguageDetermination) {
       "LanguageDetection.TFLite.DidAttemptDetection", true, 1);
 }
 
-TEST_F(LanguageDetectionModelValidTest, LanguageDetectionAR) {
+TEST_F(PageLanguageDetectorValidTest, LanguageDetectionAR) {
   // This test will fail if the UTF-8 is used to sample the content.
   const char* const ar_content_string =
       "متصفح الويب أو مستعرض الويب هو تطبيق برمجي لاسترجاع المعلومات "
@@ -107,7 +107,7 @@ TEST_F(LanguageDetectionModelValidTest, LanguageDetectionAR) {
       "LanguageDetection.TFLite.DidAttemptDetection", true, 1);
 }
 
-TEST_F(LanguageDetectionModelValidTest, UnreliableLanguageDetermination) {
+TEST_F(PageLanguageDetectorValidTest, UnreliableLanguageDetermination) {
   bool is_prediction_reliable;
   float model_reliability_score = 0.0;
   std::string predicted_language;
@@ -123,7 +123,7 @@ TEST_F(LanguageDetectionModelValidTest, UnreliableLanguageDetermination) {
       "LanguageDetection.TFLite.DidAttemptDetection", true, 1);
 }
 
-TEST_F(LanguageDetectionModelValidTest, BelowMinimumContentSizeUnreliable) {
+TEST_F(PageLanguageDetectorValidTest, BelowMinimumContentSizeUnreliable) {
   bool is_prediction_reliable;
   float model_reliability_score = 0.0;
   std::string predicted_language;
@@ -141,7 +141,7 @@ TEST_F(LanguageDetectionModelValidTest, BelowMinimumContentSizeUnreliable) {
   EXPECT_EQ("es", language);
 }
 
-TEST_F(LanguageDetectionModelValidTest, LongTextLanguageDetemination) {
+TEST_F(PageLanguageDetectorValidTest, LongTextLanguageDetemination) {
   bool is_prediction_reliable;
   float model_reliability_score = 0.0;
   std::string predicted_language;
@@ -199,4 +199,4 @@ TEST_F(LanguageDetectionModelValidTest, LongTextLanguageDetemination) {
       "LanguageDetection.TFLite.DidAttemptDetection", true, 1);
 }
 
-}  // namespace translate
+}  // namespace language_detection

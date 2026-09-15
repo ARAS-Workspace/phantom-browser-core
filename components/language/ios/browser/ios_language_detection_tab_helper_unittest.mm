@@ -12,11 +12,11 @@
 #import "base/values.h"
 #import "components/language/ios/browser/language_detection_java_script_feature.h"
 #import "components/language_detection/core/language_detection_model.h"
+#import "components/language_detection/core/page_language_detector.h"
 #import "components/prefs/pref_registry_simple.h"
 #import "components/prefs/testing_pref_service.h"
 #import "components/translate/core/browser/translate_pref_names.h"
 #import "components/translate/core/common/translate_util.h"
-#import "components/translate/core/language_detection/language_detection_model.h"
 #import "ios/web/public/test/fakes/fake_web_frames_manager.h"
 #import "ios/web/public/test/fakes/fake_web_state.h"
 #import "testing/platform_test.h"
@@ -47,7 +47,7 @@ class IOSLanguageDetectionTabHelperTest : public PlatformTest {
   base::test::TaskEnvironment task_environment_;
   base::HistogramTester histogram_tester_;
   TestingPrefServiceSimple pref_service_;
-  translate::LanguageDetectionModel model_{
+  language_detection::PageLanguageDetector model_{
       std::make_unique<language_detection::LanguageDetectionModel>()};
   web::FakeWebState web_state_;
 };

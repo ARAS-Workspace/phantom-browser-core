@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/translate/core/language_detection/language_detection_util.h"
+#include "components/language_detection/core/language_detection_util.h"
 
 #include <string>
 
@@ -13,7 +13,7 @@
 #include "components/language_detection/core/constants.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace translate {
+namespace language_detection {
 namespace {
 
 // Tests that well-known language code typos are fixed.
@@ -22,17 +22,17 @@ TEST(LanguageDetectionUtilTest, LanguageCodeTypoCorrection) {
 
   // Strip the second and later codes.
   language = std::string("ja,en");
-  translate::CorrectLanguageCodeTypo(&language);
+  language_detection::CorrectLanguageCodeTypo(&language);
   EXPECT_EQ("ja", language);
 
   // Replace dash with hyphen.
   language = std::string("ja_JP");
-  translate::CorrectLanguageCodeTypo(&language);
+  language_detection::CorrectLanguageCodeTypo(&language);
   EXPECT_EQ("ja-JP", language);
 
   // Correct wrong cases.
   language = std::string("JA-jp");
-  translate::CorrectLanguageCodeTypo(&language);
+  language_detection::CorrectLanguageCodeTypo(&language);
   EXPECT_EQ("ja-JP", language);
 }
 
@@ -41,38 +41,38 @@ TEST(LanguageDetectionUtilTest, IsValidLanguageCode) {
   std::string language;
 
   language = std::string("ja");
-  EXPECT_TRUE(translate::IsValidLanguageCode(language));
+  EXPECT_TRUE(language_detection::IsValidLanguageCode(language));
 
   language = std::string("ja-JP");
-  EXPECT_TRUE(translate::IsValidLanguageCode(language));
+  EXPECT_TRUE(language_detection::IsValidLanguageCode(language));
 
   language = std::string("ceb");
-  EXPECT_TRUE(translate::IsValidLanguageCode(language));
+  EXPECT_TRUE(language_detection::IsValidLanguageCode(language));
 
   language = std::string("ceb-XX");
-  EXPECT_TRUE(translate::IsValidLanguageCode(language));
+  EXPECT_TRUE(language_detection::IsValidLanguageCode(language));
 
   // Invalid because the sub code consists of a number.
   language = std::string("utf-8");
-  EXPECT_FALSE(translate::IsValidLanguageCode(language));
+  EXPECT_FALSE(language_detection::IsValidLanguageCode(language));
 
   // Invalid because of six characters after hyphen.
   language = std::string("ja-YUKARI");
-  EXPECT_FALSE(translate::IsValidLanguageCode(language));
+  EXPECT_FALSE(language_detection::IsValidLanguageCode(language));
 
   // Invalid because of four characters.
   language = std::string("DHMO");
-  EXPECT_FALSE(translate::IsValidLanguageCode(language));
+  EXPECT_FALSE(language_detection::IsValidLanguageCode(language));
 }
 
 // Tests that well-known languages which often have wrong server configuration
 // are handles.
 TEST(LanguageDetectionUtilTest, WellKnownWrongConfiguration) {
-  EXPECT_TRUE(translate::MaybeServerWrongConfiguration("en", "ja"));
-  EXPECT_TRUE(translate::MaybeServerWrongConfiguration("en-US", "ja"));
-  EXPECT_TRUE(translate::MaybeServerWrongConfiguration("en", "zh-CN"));
-  EXPECT_FALSE(translate::MaybeServerWrongConfiguration("ja", "en"));
-  EXPECT_FALSE(translate::MaybeServerWrongConfiguration("en", "he"));
+  EXPECT_TRUE(language_detection::MaybeServerWrongConfiguration("en", "ja"));
+  EXPECT_TRUE(language_detection::MaybeServerWrongConfiguration("en-US", "ja"));
+  EXPECT_TRUE(language_detection::MaybeServerWrongConfiguration("en", "zh-CN"));
+  EXPECT_FALSE(language_detection::MaybeServerWrongConfiguration("ja", "en"));
+  EXPECT_FALSE(language_detection::MaybeServerWrongConfiguration("en", "he"));
 }
 
 // Tests that the language meta tag providing wrong information is ignored by
@@ -87,7 +87,7 @@ TEST(LanguageDetectionUtilTest, CLDDisagreeWithWrongLanguageCode) {
   std::string model_detected_language;
   bool is_model_reliable;
   float model_reliability_score = 0.0;
-  std::string language = translate::DeterminePageLanguage(
+  std::string language = language_detection::DeterminePageLanguage(
       std::string("ja"), std::string(), contents, &model_detected_language,
       &is_model_reliable, model_reliability_score);
   EXPECT_EQ(language_detection::kUnknownLanguageCode, language);
@@ -108,7 +108,7 @@ TEST(LanguageDetectionUtilTest, CLDAgreeWithLanguageCodeHavingCountryCode) {
   std::string model_detected_language;
   bool is_model_reliable;
   float model_reliability_score = 0.0;
-  std::string language = translate::DeterminePageLanguage(
+  std::string language = language_detection::DeterminePageLanguage(
       std::string("en-US"), std::string(), contents, &model_detected_language,
       &is_model_reliable, model_reliability_score);
   EXPECT_EQ("en", language);
@@ -130,7 +130,7 @@ TEST(LanguageDetectionUtilTest, InvalidLanguageMetaTagProviding) {
   std::string model_detected_language;
   bool is_model_reliable;
   float model_reliability_score = 0.0;
-  std::string language = translate::DeterminePageLanguage(
+  std::string language = language_detection::DeterminePageLanguage(
       std::string("utf-8"), std::string(), contents, &model_detected_language,
       &is_model_reliable, model_reliability_score);
   EXPECT_EQ("en", language);
@@ -151,7 +151,7 @@ TEST(LanguageDetectionUtilTest, AdoptHtmlLang) {
   std::string model_detected_language;
   bool is_model_reliable;
   float model_reliability_score = 0.0;
-  std::string language = translate::DeterminePageLanguage(
+  std::string language = language_detection::DeterminePageLanguage(
       std::string("ja"), std::string("en"), contents, &model_detected_language,
       &is_model_reliable, model_reliability_score);
   EXPECT_EQ("en", language);
@@ -170,14 +170,16 @@ TEST(LanguageDetectionUtilTest, IsServerWrongConfigurationLanguage) {
                                          "de", "zh-CN", "zh-TW", "ar",
                                          "id", "fr",    "it",    "th"};
   for (const char* const language : wrong_languages) {
-    EXPECT_TRUE(translate::IsServerWrongConfigurationLanguage(language));
+    EXPECT_TRUE(
+        language_detection::IsServerWrongConfigurationLanguage(language));
   }
   // These languages should all be identified as having the right server
   // configuration.
   const char* const right_languages[] = {"en", "en-AU", "en-US",
                                          "xx", "gg",    "rr"};
   for (const char* const language : right_languages) {
-    EXPECT_FALSE(translate::IsServerWrongConfigurationLanguage(language));
+    EXPECT_FALSE(
+        language_detection::IsServerWrongConfigurationLanguage(language));
   }
 }
 
@@ -185,7 +187,7 @@ TEST(LanguageDetectionUtilTest, ShortContentHttpLanguage) {
   std::string model_detected_language;
   bool is_model_reliable = false;
   float model_reliability_score = 0.0;
-  std::string language = translate::DeterminePageLanguage(
+  std::string language = language_detection::DeterminePageLanguage(
       "fr", "", u"123456", &model_detected_language, &is_model_reliable,
       model_reliability_score);
   EXPECT_EQ("fr", language);
@@ -193,4 +195,4 @@ TEST(LanguageDetectionUtilTest, ShortContentHttpLanguage) {
 }
 
 }  // namespace
-}  // namespace translate
+}  // namespace language_detection

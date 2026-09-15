@@ -19,11 +19,9 @@
 #include "mojo/public/cpp/bindings/remote.h"
 #include "url/gurl.h"
 
-namespace translate {
-class LanguageDetectionModel;
-}  // namespace translate
-
 namespace language_detection {
+
+class PageLanguageDetector;
 
 // Runs language detection on the content of a main frame and reports the
 // result to the browser over mojom::LanguageDetectionHost. There is one
@@ -95,7 +93,7 @@ class LanguageDetectionAgent : public content::RenderFrameObserver {
   size_t page_contents_length_ = 0;
 
   // The shared model wrapper. Not owned by `this`. It outlives `this`.
-  const raw_ptr<translate::LanguageDetectionModel> language_detection_model_;
+  const raw_ptr<PageLanguageDetector> language_detection_model_;
 
   LanguageDetectionModelManager language_detection_model_manager_;
 

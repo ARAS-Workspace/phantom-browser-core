@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/translate/core/language_detection/language_detection_model.h"
+#include "components/language_detection/core/page_language_detector.h"
 
 #include "base/functional/callback.h"
 #include "base/i18n/language_tag.h"
@@ -15,23 +15,26 @@
 #include "base/trace_event/trace_event.h"
 #include "build/build_config.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/features.h"
 #include "components/language_detection/core/language_detection_model.h"
+#include "components/language_detection/core/language_detection_util.h"
 #include "components/language_detection/core/language_matcher.h"
-#include "components/translate/core/common/translate_util.h"
-#include "components/translate/core/language_detection/language_detection_util.h"
 
-namespace translate {
+namespace language_detection {
 
 // The minimum number of bytes required for the language detection model to
 // provide a reliable prediction. Predictions for text shorter than this are
 // considered unreliable and are ignored.
 constexpr size_t kMinimumContentLengthBytes = 25;
 
-LanguageDetectionModel::LanguageDetectionModel(
+// The minimum score for the TFLite model prediction to be considered reliable.
+constexpr double kTFLiteReliabilityThreshold = 0.7;
+
+PageLanguageDetector::PageLanguageDetector(
     language_detection::LanguageDetectionModel& shared_tflite_model)
     : tflite_model_(shared_tflite_model) {}
 
-LanguageDetectionModel::LanguageDetectionModel(
+PageLanguageDetector::PageLanguageDetector(
     std::unique_ptr<language_detection::LanguageDetectionModel>
         owned_tflite_model)
     : owned_tflite_model_(std::move(owned_tflite_model)),
@@ -39,23 +42,23 @@ LanguageDetectionModel::LanguageDetectionModel(
   owned_tflite_model_->DetachFromSequence();
 }
 
-LanguageDetectionModel::~LanguageDetectionModel() = default;
+PageLanguageDetector::~PageLanguageDetector() = default;
 
-void LanguageDetectionModel::UpdateWithFile(base::File model_file) {
+void PageLanguageDetector::UpdateWithFile(base::File model_file) {
   tflite_model_->UpdateWithFile(std::move(model_file));
 }
 
-void LanguageDetectionModel::UpdateWithFileAsync(base::File model_file,
-                                                 base::OnceClosure callback) {
+void PageLanguageDetector::UpdateWithFileAsync(base::File model_file,
+                                               base::OnceClosure callback) {
   tflite_model_->UpdateWithFileAsync(std::move(model_file),
                                      std::move(callback));
 }
 
-bool LanguageDetectionModel::IsAvailable() const {
+bool PageLanguageDetector::IsAvailable() const {
   return tflite_model_->IsAvailable();
 }
 
-std::string LanguageDetectionModel::DeterminePageLanguage(
+std::string PageLanguageDetector::DeterminePageLanguage(
     std::string_view code,
     std::string_view html_lang,
     const std::u16string& contents,
@@ -77,7 +80,7 @@ std::string LanguageDetectionModel::DeterminePageLanguage(
   // If the content is shorter than the minimum content length, return early
   // without attempting detection.
   if (utf8_contents.length() < kMinimumContentLengthBytes) {
-    return translate::DeterminePageLanguage(
+    return language_detection::DeterminePageLanguage(
         code, html_lang, language_detection::kUnknownLanguageCode, false);
   }
 
@@ -93,8 +96,7 @@ std::string LanguageDetectionModel::DeterminePageLanguage(
   bool is_reliable = prediction_reliability_score > kTFLiteReliabilityThreshold;
 
   std::optional<base::i18n::LanguageTag> final_prediction =
-      translate::FilterDetectedLanguage(utf8_contents, prediction.language,
-                                        is_reliable);
+      FilterDetectedLanguage(utf8_contents, prediction.language, is_reliable);
   *is_prediction_reliable = is_reliable;
 
   base::i18n::LanguageTag translate_final_prediction =
@@ -102,16 +104,15 @@ std::string LanguageDetectionModel::DeterminePageLanguage(
   if (final_prediction) {
     *predicted_language = std::string(final_prediction->tag_string());
     translate_final_prediction =
-        language_detection::GetSupportedLanguageMatcher().MatchOrDefault(
-            *final_prediction);
+        GetSupportedLanguageMatcher().MatchOrDefault(*final_prediction);
   }
 
   LOCAL_HISTOGRAM_BOOLEAN("LanguageDetection.TFLite.DidAttemptDetection", true);
-  return translate::DeterminePageLanguage(
+  return language_detection::DeterminePageLanguage(
       code, html_lang, translate_final_prediction.tag_string(), is_reliable);
 }
 
-language_detection::Prediction LanguageDetectionModel::DetectLanguage(
+language_detection::Prediction PageLanguageDetector::DetectLanguage(
     const std::u16string& contents) const {
   base::ElapsedTimer timer;
   auto prediction = tflite_model_->PredictTopLanguageWithSamples(contents);
@@ -124,8 +125,8 @@ language_detection::Prediction LanguageDetectionModel::DetectLanguage(
   return prediction;
 }
 
-std::string LanguageDetectionModel::GetModelVersion() const {
+std::string PageLanguageDetector::GetModelVersion() const {
   return tflite_model_->GetModelVersion();
 }
 
-}  // namespace translate
+}  // namespace language_detection

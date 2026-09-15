@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "components/translate/core/language_detection/language_detection_util.h"
+#include "components/language_detection/core/language_detection_util.h"
 #include "third_party/fuzztest/src/fuzztest/fuzztest.h"
 
 namespace {
@@ -18,9 +18,9 @@ void DeterminePageLanguageDoesNotCrash(std::string code,
   float model_reliability_score;
 
   // Fuzzed function call:
-  translate::DeterminePageLanguage(code, html_lang, content,
-                                   &model_detected_language, &is_model_reliable,
-                                   model_reliability_score);
+  language_detection::DeterminePageLanguage(
+      code, html_lang, content, &model_detected_language, &is_model_reliable,
+      model_reliability_score);
 }
 
 // Note: Once chromium support adding fuzztests in unittests, this file could

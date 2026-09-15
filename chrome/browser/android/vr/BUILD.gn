@@ -62,7 +62,7 @@ test("vr_android_unittests") {
     "//base/test:test_support",
     "//chrome/browser",
     "//chrome/browser/payments:impl",
-    "//components/translate/core/language_detection",
+    "//components/language_detection/core",
     "//components/webxr",
     "//device/vr:vr_fakes",
     "//device/vr/android:vr_android",
