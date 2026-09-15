@@ -694,23 +694,6 @@ bool ClientSideDetectionServiceBase::IsSubscribedToImageClassifierModelUpdates()
              ->IsSubscribedToImageClassifierModelUpdates();
 }
 
-void ClientSideDetectionServiceBase::SetModelAndVisualTfLiteForTesting(
-    const base::FilePath& model,
-    const base::FilePath& visual_tf_lite) {
-  if (client_side_phishing_model_) {
-    client_side_phishing_model_->SetModelAndVisualTfLiteForTesting(  // IN-TEST
-        model, visual_tf_lite);
-  }
-}
-
-void ClientSideDetectionServiceBase::SetTargetImageEmbeddingsForTesting(
-    std::vector<TargetEmbedding> target_embeddings) {
-  if (client_side_phishing_model_) {
-    client_side_phishing_model_->SetTargetImageEmbeddingsForTesting(  // IN-TEST
-        std::move(target_embeddings));
-  }
-}
-
 const base::File& ClientSideDetectionServiceBase::GetVisualTfLiteModel() const {
   if (client_side_phishing_model_) {
     return client_side_phishing_model_->GetVisualTfLiteModel();

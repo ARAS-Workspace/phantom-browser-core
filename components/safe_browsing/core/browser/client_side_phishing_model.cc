@@ -601,11 +601,6 @@ ClientSidePhishingModel::GetTargetImageEmbeddings() const {
   return target_image_embeddings_;
 }
 
-void ClientSidePhishingModel::SetTargetImageEmbeddingsForTesting(
-    std::vector<TargetEmbedding> target_embeddings) {
-  target_image_embeddings_ = std::move(target_embeddings);
-}
-
 int ClientSidePhishingModel::GetClassificationInputWidth() {
   return classification_input_width_.has_value()
              ? classification_input_width_.value()
@@ -856,19 +851,6 @@ void ClientSidePhishingModel::OnGetOverridenModelData(
   ui_task_runner_->PostTask(
       FROM_HERE, base::BindOnce(&ClientSidePhishingModel::NotifyCallbacksOnUI,
                                 weak_ptr_factory_.GetWeakPtr()));
-}
-
-// For browser unit testing in client_side_detection_service_browsertest
-void ClientSidePhishingModel::SetModelAndVisualTfLiteForTesting(
-    const base::FilePath& model_file_path,
-    const base::FilePath& visual_tf_lite_model_path) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  background_task_runner_->PostTaskAndReplyWithResult(
-      FROM_HERE,
-      base::BindOnce(&LoadModelAndVisualTfLiteFile, model_file_path,
-                     std::vector<base::FilePath>{visual_tf_lite_model_path}),
-      base::BindOnce(&ClientSidePhishingModel::OnModelAndVisualTfLiteFileLoaded,
-                     weak_ptr_factory_.GetWeakPtr(), std::nullopt));
 }
 
 void ClientSidePhishingModel::SetModelDoneCallbackForTesting(  // IN-TEST

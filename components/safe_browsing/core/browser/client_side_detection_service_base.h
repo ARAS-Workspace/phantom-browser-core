@@ -186,12 +186,6 @@ class ClientSideDetectionServiceBase : public KeyedService {
   bool IsSubscribedToImageEmbeddingModelUpdates() const;
   bool IsSubscribedToImageClassifierModelUpdates() const;
 
-  // For testing the model in browser test.
-  void SetModelAndVisualTfLiteForTesting(const base::FilePath& model,
-                                         const base::FilePath& visual_tf_lite);
-  void SetTargetImageEmbeddingsForTesting(
-      std::vector<TargetEmbedding> target_embeddings);
-
   base::WeakPtr<ClientSideDetectionServiceBase> GetWeakPtr() {
     return weak_factory_.GetWeakPtr();
   }

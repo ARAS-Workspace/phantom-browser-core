@@ -116,9 +116,6 @@ class ClientSidePhishingModel
 
   const std::vector<TargetEmbedding>& GetTargetImageEmbeddings() const;
 
-  void SetTargetImageEmbeddingsForTesting(
-      std::vector<TargetEmbedding> target_embeddings);
-
   // This function is used to override internal model for testing in
   // client_side_phishing_model_unittest
   void MaybeOverrideModel();
@@ -130,10 +127,6 @@ class ClientSidePhishingModel
   void OnImageEmbeddingModelFileAndEmbeddingListLoaded(
       std::optional<optimization_guide::proto::Any> model_metadata,
       std::pair<base::File, std::optional<EmbeddingList>> model_and_list);
-
-  void SetModelAndVisualTfLiteForTesting(
-      const base::FilePath& model_file_path,
-      const base::FilePath& visual_tf_lite_model_path);
 
   // Updates the internal model string, when one is received from testing in
   // client_side_phishing_model_unittest
