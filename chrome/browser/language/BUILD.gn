@@ -39,7 +39,6 @@ source_set("impl") {
     "//components/language_detection/core",
     "//components/pref_registry",
     "//components/prefs",
-    "//components/translate/core/browser",
     "//content/public/browser",
   ]
 

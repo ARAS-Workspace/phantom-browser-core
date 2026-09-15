@@ -29,6 +29,7 @@ static_library("browser") {
     "//base:i18n",
     "//components/keyed_service/core",
     "//components/language/core/common",
+    "//components/language_detection/core",
     "//components/pref_registry",
     "//components/prefs",
     "//components/strings",

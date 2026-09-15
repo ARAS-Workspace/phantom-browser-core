@@ -5,11 +5,13 @@
 #include "components/language/core/browser/language_prefs.h"
 
 #include <algorithm>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
+#include "base/i18n/tag_converters.h"
 #include "base/strings/strcat.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
@@ -19,6 +21,7 @@
 #include "components/language/core/browser/pref_names.h"
 #include "components/language/core/common/language_util.h"
 #include "components/language/core/common/locale_util.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
@@ -26,6 +29,56 @@
 #include "ui/base/l10n/l10n_util.h"
 
 namespace language {
+namespace {
+
+base::i18n::LanguageTag ToTranslateLanguageTag(std::string_view language) {
+  std::optional<base::i18n::LanguageTag> parsed =
+      base::i18n::GetLanguageTagFromString(language);
+  if (!parsed) {
+    return base::i18n::GetKnownLanguageTag("und");
+  }
+  return language_detection::GetSupportedLanguageMatcher()
+      .Match(*parsed)
+      .value_or(*parsed);
+}
+
+// Returns the languages that should be blocked by default as a
+// base::ListValue.
+base::ListValue GetDefaultBlockedLanguages() {
+  base::ListValue languages;
+  // Accept languages.
+#pragma GCC diagnostic push
+// See comment above the |break;| in the loop just below for why.
+#pragma GCC diagnostic ignored "-Wunreachable-code"
+  for (std::string& language :
+       base::SplitString(l10n_util::GetStringUTF8(IDS_ACCEPT_LANGUAGES), ",",
+                         base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL)) {
+    base::i18n::LanguageTag translate_language_tag =
+        ToTranslateLanguageTag(language);
+    languages.Append(translate_language_tag.tag_string());
+
+    // crbug.com/958348: The default value for Accept-Language *should* be the
+    // same as the one for Blocked Languages. However, Accept-Language contains
+    // English (and more) in addition to the local language in most locales due
+    // to historical reasons. Exiting early from this loop is a temporary fix
+    // that allows Blocked Languages to be at least populated with the UI
+    // language while still allowing Translate to trigger on other languages,
+    // most importantly English.
+    // Once the change to remove English from Accept-Language defaults lands,
+    // this break should be removed to enable the Blocked Language List and the
+    // Accept-Language list to be initialized to the same values.
+    break;
+#pragma GCC diagnostic pop
+  }
+
+  std::sort(languages.begin(), languages.end());
+  languages.erase(std::unique(languages.begin(), languages.end()),
+                  languages.end());
+
+  return languages;
+}
+
+}  // namespace
 
 void LanguagePrefs::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
@@ -38,6 +91,19 @@ void LanguagePrefs::RegisterProfilePrefs(
                                user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 
   registry->RegisterListPref(language::prefs::kForcedLanguages);
+  registry->RegisterDictionaryPref(
+      language::prefs::kPrefNeverPromptSitesWithTime,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterDictionaryPref(
+      language::prefs::kPrefAlwaysTranslateList,
+      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterStringPref(language::prefs::kPrefTranslateRecentTarget, "",
+                               user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterListPref(language::prefs::kPrefTranslateRecentTargets,
+                             user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+  registry->RegisterListPref(language::prefs::kBlockedLanguages,
+                             GetDefaultBlockedLanguages(),
+                             user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 #if BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(
       language::prefs::kAppLanguagePromptShown, false,
@@ -58,6 +124,32 @@ LanguagePrefs::LanguagePrefs(PrefService* user_prefs) : prefs_(user_prefs) {
 
 LanguagePrefs::~LanguagePrefs() {
   pref_change_registrar_.RemoveAll();
+}
+
+std::vector<std::string> LanguagePrefs::GetNeverTranslateLanguages() const {
+  const base::ListValue& fluent_languages_value =
+      prefs_->GetList(language::prefs::kBlockedLanguages);
+
+  std::vector<std::string> languages;
+  for (const auto& language : fluent_languages_value) {
+    const std::string* language_as_string = language.GetIfString();
+    // This needs to be checked here as there can be corrupt entries in the pref
+    // list which causes a crash.
+    if (!language_as_string) {
+      continue;
+    }
+
+    std::optional<base::i18n::LanguageTag> parsed_tag =
+        base::i18n::GetLanguageTagFromString(*language_as_string);
+    if (parsed_tag) {
+      languages.emplace_back(parsed_tag->tag_string());
+    }
+  }
+  return languages;
+}
+
+std::string LanguagePrefs::GetRecentTargetLanguage() const {
+  return prefs_->GetString(language::prefs::kPrefTranslateRecentTarget);
 }
 
 void LanguagePrefs::GetAcceptLanguagesList(

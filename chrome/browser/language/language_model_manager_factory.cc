@@ -26,7 +26,6 @@
 #include "components/language/core/language_model/ulp_language_model.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
-#include "components/translate/core/browser/translate_prefs.h"
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/jni_string.h"
@@ -56,7 +55,7 @@ void RecordULPInitMetrics(
       ULPMetricsLogger::DetermineLanguageStatus(app_locale, ulp_languages));
 
   const std::string target_language =
-      translate::TranslatePrefs(pref_service).GetRecentTargetLanguage();
+      language::LanguagePrefs(pref_service).GetRecentTargetLanguage();
   logger.RecordInitiationTranslateTargetInULP(
       ULPMetricsLogger::DetermineLanguageStatus(target_language,
                                                 ulp_languages));
@@ -78,7 +77,7 @@ void RecordULPInitMetrics(
 
   std::vector<std::string> never_languages_not_in_ulp =
       ULPMetricsLogger::RemoveULPLanguages(
-          translate::TranslatePrefs(pref_service).GetNeverTranslateLanguages(),
+          language::LanguagePrefs(pref_service).GetNeverTranslateLanguages(),
           ulp_languages);
   logger.RecordInitiationNeverLanguagesMissingFromULP(
       never_languages_not_in_ulp);

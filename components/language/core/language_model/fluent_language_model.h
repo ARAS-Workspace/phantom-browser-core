@@ -12,11 +12,10 @@
 #include "components/language/core/browser/language_model.h"
 
 class PrefService;
-namespace translate {
-class TranslatePrefs;
-}
 
 namespace language {
+
+class LanguagePrefs;
 
 // A language model that returns the user's fluent languages.
 class FluentLanguageModel : public LanguageModel {
@@ -28,7 +27,7 @@ class FluentLanguageModel : public LanguageModel {
   std::vector<LanguageDetails> GetLanguages() override;
 
  private:
-  std::unique_ptr<translate::TranslatePrefs> translate_prefs_;
+  std::unique_ptr<LanguagePrefs> language_prefs_;
 };
 
 }  // namespace language

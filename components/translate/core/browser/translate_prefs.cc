@@ -220,40 +220,6 @@ void TranslatePrefs::ResetToDefaults() {
   prefs_->ClearPref(language::prefs::kOfferTranslateEnabled);
 }
 
-// static
-base::ListValue TranslatePrefs::GetDefaultBlockedLanguages() {
-  base::ListValue languages;
-  // Accept languages.
-#pragma GCC diagnostic push
-// See comment above the |break;| in the loop just below for why.
-#pragma GCC diagnostic ignored "-Wunreachable-code"
-  for (std::string& language :
-       base::SplitString(l10n_util::GetStringUTF8(IDS_ACCEPT_LANGUAGES), ",",
-                         base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL)) {
-    LanguageTag translate_language_tag = ToTranslateLanguageTag(language);
-    languages.Append(translate_language_tag.tag_string());
-
-    // crbug.com/958348: The default value for Accept-Language *should* be the
-    // same as the one for Blocked Languages. However, Accept-Language contains
-    // English (and more) in addition to the local language in most locales due
-    // to historical reasons. Exiting early from this loop is a temporary fix
-    // that allows Blocked Languages to be at least populated with the UI
-    // language while still allowing Translate to trigger on other languages,
-    // most importantly English.
-    // Once the change to remove English from Accept-Language defaults lands,
-    // this break should be removed to enable the Blocked Language List and the
-    // Accept-Language list to be initialized to the same values.
-    break;
-#pragma GCC diagnostic pop
-  }
-
-  std::sort(languages.begin(), languages.end());
-  languages.erase(std::unique(languages.begin(), languages.end()),
-                  languages.end());
-
-  return languages;
-}
-
 bool TranslatePrefs::IsBlockedLanguage(std::string_view input_language) const {
   LanguageTag canonical_lang = ToTranslateLanguageTag(input_language);
   const base::ListValue& blocked =
@@ -303,25 +269,7 @@ void TranslatePrefs::ResetBlockedLanguagesToDefault() {
 }
 
 std::vector<std::string> TranslatePrefs::GetNeverTranslateLanguages() const {
-  const base::ListValue& fluent_languages_value =
-      prefs_->GetList(language::prefs::kBlockedLanguages);
-
-  std::vector<std::string> languages;
-  for (const auto& language : fluent_languages_value) {
-    const std::string* language_as_string = language.GetIfString();
-    // This needs to be checked here as there can be corrupt entries in the pref
-    // list which causes a crash.
-    if (!language_as_string) {
-      continue;
-    }
-
-    std::optional<LanguageTag> parsed_tag =
-        GetLanguageTagFromString(*language_as_string);
-    if (parsed_tag) {
-      languages.emplace_back(parsed_tag->tag_string());
-    }
-  }
-  return languages;
+  return language_prefs_->GetNeverTranslateLanguages();
 }
 
 // Note: the language codes used in the language settings list have the Chrome
@@ -921,7 +869,7 @@ void TranslatePrefs::ResetRecentTargetLanguage() {
 }
 
 std::string TranslatePrefs::GetRecentTargetLanguage() const {
-  return prefs_->GetString(language::prefs::kPrefTranslateRecentTarget);
+  return language_prefs_->GetRecentTargetLanguage();
 }
 
 std::vector<std::string> TranslatePrefs::GetRecentTargetLanguages() const {
@@ -964,28 +912,15 @@ void TranslatePrefs::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterListPref(kPrefNeverPromptSitesDeprecated);
   registry->RegisterDictionaryPref(
-      language::prefs::kPrefNeverPromptSitesWithTime,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterDictionaryPref(
-      language::prefs::kPrefAlwaysTranslateList,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterDictionaryPref(
       kPrefTranslateDeniedCount,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
   registry->RegisterDictionaryPref(kPrefTranslateIgnoredCount);
   registry->RegisterDictionaryPref(
       kPrefTranslateAcceptedCount,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterStringPref(language::prefs::kPrefTranslateRecentTarget, "",
-                               user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterListPref(language::prefs::kPrefTranslateRecentTargets,
-                             user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
   registry->RegisterIntegerPref(
       kPrefForceTriggerTranslateCount, 0,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterListPref(language::prefs::kBlockedLanguages,
-                             TranslatePrefs::GetDefaultBlockedLanguages(),
-                             user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   registry->RegisterDictionaryPref(
       kPrefTranslateAutoAlwaysCount,

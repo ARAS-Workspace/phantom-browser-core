@@ -53,6 +53,11 @@ class LanguagePrefs {
   void SetUserSelectedLanguagesList(const std::vector<std::string>& languages);
   // Returns true if the target language is forced through policy.
   bool IsForcedLanguage(std::string_view language);
+  // Get the languages that for which translation should never be prompted
+  // formatted as Chrome language codes.
+  std::vector<std::string> GetNeverTranslateLanguages() const;
+  // Returns the last-observed translate target language.
+  std::string GetRecentTargetLanguage() const;
 
 #if BUILDFLAG(IS_ANDROID)
   // Get the ULP languages from a preference. This is an unfiltered list of
