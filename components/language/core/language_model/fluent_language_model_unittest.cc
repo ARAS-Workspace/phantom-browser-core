@@ -13,12 +13,12 @@
 #include "base/values.h"
 #include "components/language/core/browser/language_prefs.h"
 #include "components/language/core/browser/pref_names.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
-#include "components/translate/core/common/translate_language_matcher.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -71,7 +71,7 @@ TEST_F(FluentLanguageModelTest, Defaults) {
 
   EXPECT_EQ(size_t(1), languages.size());
   std::string expected_locale_code =
-      std::string(translate::GetTranslateLanguageMatcher()
+      std::string(language_detection::GetSupportedLanguageMatcher()
                       .MatchOrDefault(default_locale_tag)
                       .tag_string());
   EXPECT_THAT(languages[0], EqualsLd(Ld(expected_locale_code, 1.0)));

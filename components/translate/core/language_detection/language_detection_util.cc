@@ -22,7 +22,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "components/language_detection/core/chinese_script_classifier.h"
 #include "components/language_detection/core/constants.h"
-#include "components/translate/core/common/translate_language_matcher.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/translate/core/common/translate_metrics.h"
 #include "third_party/cld_3/src/src/nnet_language_identifier.h"
 
@@ -60,7 +60,7 @@ std::optional<LanguageTag> GetTranslateLanguage(
   if (!tag) {
     return std::nullopt;
   }
-  return GetTranslateLanguageMatcher().Match(*tag);
+  return language_detection::GetSupportedLanguageMatcher().Match(*tag);
 }
 
 // Get page language from html language code if it is not empty, otherwise get
@@ -184,7 +184,7 @@ std::string DeterminePageLanguage(std::string_view code,
     *is_model_reliable = is_reliable;
   model_reliability_score = model_score;
   LanguageTag translate_detected_tag =
-      GetTranslateLanguageMatcher()
+      language_detection::GetSupportedLanguageMatcher()
           .Match(detected_language_tag)
           .value_or(GetKnownLanguageTag("und"));
 

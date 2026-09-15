@@ -16,7 +16,7 @@
 #include "build/build_config.h"
 #include "components/language_detection/core/constants.h"
 #include "components/language_detection/core/language_detection_model.h"
-#include "components/translate/core/common/translate_language_matcher.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/translate/core/common/translate_util.h"
 #include "components/translate/core/language_detection/language_detection_util.h"
 
@@ -102,7 +102,8 @@ std::string LanguageDetectionModel::DeterminePageLanguage(
   if (final_prediction) {
     *predicted_language = std::string(final_prediction->tag_string());
     translate_final_prediction =
-        GetTranslateLanguageMatcher().MatchOrDefault(*final_prediction);
+        language_detection::GetSupportedLanguageMatcher().MatchOrDefault(
+            *final_prediction);
   }
 
   LOCAL_HISTOGRAM_BOOLEAN("LanguageDetection.TFLite.DidAttemptDetection", true);

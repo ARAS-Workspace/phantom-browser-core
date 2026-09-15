@@ -28,6 +28,7 @@
 #include "components/language/core/common/locale_util.h"
 #include "components/language_detection/core/constants.h"
 #include "components/language_detection/core/language_detection_details.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/prefs/pref_service.h"
 #include "components/translate/core/browser/language_state.h"
 #include "components/translate/core/browser/page_translated_details.h"
@@ -45,7 +46,6 @@
 #include "components/translate/core/browser/translate_trigger_decision.h"
 #include "components/translate/core/browser/translate_url_util.h"
 #include "components/translate/core/common/translate_features.h"
-#include "components/translate/core/common/translate_language_matcher.h"
 #include "components/translate/core/common/translate_switches.h"
 #include "components/translate/core/common/translate_util.h"
 #include "components/variations/variations_associated_data.h"
@@ -83,8 +83,9 @@ LanguageTag GetTranslateLanguage(std::string_view tag) {
   if (!parsed) {
     return GetKnownLanguageTag("und");
   }
-  return GetTranslateLanguageMatcher().Match(*parsed).value_or(
-      GetKnownLanguageTag("und"));
+  return language_detection::GetSupportedLanguageMatcher()
+      .Match(*parsed)
+      .value_or(GetKnownLanguageTag("und"));
 }
 
 std::optional<LanguageTag> GetTranslateLanguageIfValid(std::string_view tag) {
@@ -93,7 +94,7 @@ std::optional<LanguageTag> GetTranslateLanguageIfValid(std::string_view tag) {
     return std::nullopt;
   }
 
-  return GetTranslateLanguageMatcher().Match(*parsed_tag);
+  return language_detection::GetSupportedLanguageMatcher().Match(*parsed_tag);
 }
 
 }  // namespace

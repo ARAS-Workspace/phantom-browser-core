@@ -25,12 +25,12 @@
 #include "base/values.h"
 #include "components/language/core/browser/accept_languages_service.h"
 #include "components/language/core/common/locale_util.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/translate/core/browser/translate_browser_metrics.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_event_details.h"
 #include "components/translate/core/browser/translate_url_fetcher.h"
 #include "components/translate/core/browser/translate_url_util.h"
-#include "components/translate/core/common/translate_language_matcher.h"
 #include "components/translate/core/common/translate_util.h"
 #include "net/base/url_util.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -69,10 +69,10 @@ TranslateLanguageList::TranslateLanguageList(
     : resource_requests_allowed_(false),
       request_pending_(false),
       // We default to our hard coded list of languages in
-      // |translate::GetDefaultSupportedLanguages()|. This list will be
+      // |language_detection::GetDefaultSupportedLanguages()|. This list will be
       // overridden by a server providing supported languages list.
       supported_languages_(std::from_range,
-                           translate::GetDefaultSupportedLanguages()),
+                           language_detection::GetDefaultSupportedLanguages()),
       language_list_fetcher_(std::move(fetcher)) {}
 
 TranslateLanguageList::~TranslateLanguageList() = default;

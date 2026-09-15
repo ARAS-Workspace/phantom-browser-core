@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/translate/core/common/translate_language_matcher.h"
+#include "components/language_detection/core/language_matcher.h"
 
 #include <optional>
 #include <string>
@@ -11,10 +11,10 @@
 #include "base/i18n/tag_converters.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace translate {
+namespace language_detection {
 
-TEST(TranslateLanguageMatcherTest, MatcherFallback) {
-  const auto& matcher = GetTranslateLanguageMatcher();
+TEST(LanguageMatcherTest, MatcherFallback) {
+  const auto& matcher = GetSupportedLanguageMatcher();
   const auto& converter = base::i18n::LanguageTagConverter::GetInstance();
 
   // Norwegian (nb) maps to Norwegian (no).
@@ -63,4 +63,4 @@ TEST(TranslateLanguageMatcherTest, MatcherFallback) {
   EXPECT_EQ("zh-TW", matched->tag_string());
 }
 
-}  // namespace translate
+}  // namespace language_detection

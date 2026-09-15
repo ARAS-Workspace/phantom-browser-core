@@ -15,12 +15,12 @@
 #include "build/build_config.h"
 #include "components/language/core/common/language_experiments.h"
 #include "components/language_detection/core/constants.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/translate/core/browser/language_state.h"
 #include "components/translate/core/browser/translate_client.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_driver.h"
-#include "components/translate/core/common/translate_language_matcher.h"
 #include "components/translate/core/common/translate_util.h"
 #include "components/variations/variations_associated_data.h"
 #include "net/base/url_util.h"
@@ -37,7 +37,7 @@ LanguageTag GetTranslateLanguageTag(std::string_view tag) {
   if (tag == "und") {
     return GetKnownLanguageTag("und");
   }
-  return GetTranslateLanguageMatcher().MatchOrDefault(
+  return language_detection::GetSupportedLanguageMatcher().MatchOrDefault(
       GetLanguageTagFromString(tag).value_or(GetKnownLanguageTag("und")));
 }
 

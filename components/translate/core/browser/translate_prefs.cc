@@ -30,13 +30,13 @@
 #include "components/language/core/common/language_experiments.h"
 #include "components/language/core/common/language_util.h"
 #include "components/language/core/common/locale_util.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/strings/grit/components_locale_settings.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_pref_names.h"
-#include "components/translate/core/common/translate_language_matcher.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 #include "ui/base/l10n/chromium_language_matcher.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -56,12 +56,13 @@ LanguageTag ToTranslateLanguageTag(std::string_view language) {
   if (!parsed) {
     return GetKnownLanguageTag("und");
   }
-  return translate::GetTranslateLanguageMatcher().Match(*parsed).value_or(
-      *parsed);
+  return language_detection::GetSupportedLanguageMatcher()
+      .Match(*parsed)
+      .value_or(*parsed);
 }
 
 LanguageTag ResolveLanguagTag(const LanguageTag& language_tag) {
-  return translate::GetTranslateLanguageMatcher()
+  return language_detection::GetSupportedLanguageMatcher()
       .Match(language_tag)
       .value_or(language_tag);
 }

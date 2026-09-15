@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/translate/core/common/translate_language_matcher.h"
+#include "components/language_detection/core/language_matcher.h"
 
 #include <array>
 #include <optional>
@@ -15,13 +15,13 @@
 #include "base/strings/string_util.h"
 #include "components/language/core/common/locale_util.h"
 
-namespace translate {
+namespace language_detection {
 namespace {
 
 using ::base::i18n::GetKnownLanguageTag;
 using ::base::i18n::LanguageTag;
 
-// The default list of languages the Google translation server supports.
+// The default list of languages page language detection recognizes.
 // This list must be sorted in alphabetical order and contain no duplicates.
 constexpr auto kDefaultSupportedLanguages = std::to_array<LanguageTag>({
     GetKnownLanguageTag("af"),        // Afrikaans
@@ -164,11 +164,11 @@ base::span<const base::i18n::LanguageTag> GetDefaultSupportedLanguages() {
   return base::span(kDefaultSupportedLanguages);
 }
 
-const base::i18n::LanguageTagMatcherWithDefault& GetTranslateLanguageMatcher() {
+const base::i18n::LanguageTagMatcherWithDefault& GetSupportedLanguageMatcher() {
   static base::NoDestructor<base::i18n::LanguageTagMatcherWithDefault> matcher(
       base::i18n::LanguageTagMatcherWithDefault::Create(
           GetKnownLanguageTag("en"), kDefaultSupportedLanguages));
   return *matcher;
 }
 
-}  // namespace translate
+}  // namespace language_detection

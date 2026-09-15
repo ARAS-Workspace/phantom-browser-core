@@ -25,6 +25,8 @@ component("core") {
     "language_detection_driver.h",
     "language_detection_model.cc",
     "language_detection_model.h",
+    "language_matcher.cc",
+    "language_matcher.h",
   ]
   if (use_blink) {
     sources += [
@@ -35,6 +37,8 @@ component("core") {
   deps = [
     ":internals",
     "//base",
+    "//base:i18n",
+    "//components/language/core/common",
     "//components/optimization_guide/core:features",
     "//third_party/icu",
     "//third_party/tflite",
@@ -79,6 +83,7 @@ source_set("unit_tests") {
     "background_file_unittest.cc",
     "chinese_script_classifier_test.cc",
     "language_detection_model_unittest.cc",
+    "language_matcher_unittest.cc",
     "ngram_hash_ops_utils_unittest.cc",
     "quantization_utils_unittest.cc",
   ]
@@ -90,6 +95,7 @@ source_set("unit_tests") {
     ":core",
     ":internals",
     "//base",
+    "//base:i18n",
     "//base/test:test_support",
     "//components/language_detection/testing",
     "//components/translate/core/common",

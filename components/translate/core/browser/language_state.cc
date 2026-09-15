@@ -5,9 +5,9 @@
 #include "components/translate/core/browser/language_state.h"
 
 #include "base/check.h"
+#include "components/language_detection/core/language_matcher.h"
 #include "components/translate/core/browser/translate_driver.h"
 #include "components/translate/core/browser/translate_metrics_logger.h"
-#include "components/translate/core/common/translate_language_matcher.h"
 
 namespace translate {
 
@@ -131,8 +131,10 @@ void LanguageState::SetIsPageTranslated(bool value) {
 void LanguageState::SetPredefinedTargetLanguage(
     const base::i18n::LanguageTag& language,
     bool should_auto_translate) {
-  predefined_target_language_ = std::string(
-      GetTranslateLanguageMatcher().MatchOrDefault(language).tag_string());
+  predefined_target_language_ =
+      std::string(language_detection::GetSupportedLanguageMatcher()
+                      .MatchOrDefault(language)
+                      .tag_string());
   if (should_auto_translate) {
     should_auto_translate_to_predefined_target_language_ = language;
   } else {

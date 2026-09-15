@@ -11,7 +11,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "components/language_detection/core/constants.h"
-#include "components/translate/core/common/translate_language_matcher.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace translate {
