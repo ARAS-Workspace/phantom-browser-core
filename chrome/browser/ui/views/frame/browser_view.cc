@@ -70,7 +70,6 @@
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/accelerator_table.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/actions/chrome_action_properties.h"
@@ -221,7 +220,6 @@
 #include "chrome/browser/ui/views/toolbar/reload_control.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/ui/views/translate/translate_bubble_controller.h"
-#include "chrome/browser/ui/views/translate/translate_bubble_view.h"
 #include "chrome/browser/ui/views/update_recommended_message_box.h"
 #include "chrome/browser/ui/views/user_education/browser_user_education_service.h"
 #include "chrome/browser/ui/views/web_apps/frame_toolbar/web_app_frame_toolbar_view.h"
@@ -269,8 +267,6 @@
 #include "components/tabs/public/tab_alert.h"
 #include "components/tabs/public/tab_group.h"
 #include "components/tabs/public/tab_interface.h"
-#include "components/translate/core/browser/language_state.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "components/user_education/common/feature_promo/feature_promo_handle.h"
 #include "components/user_education/common/feature_promo/feature_promo_result.h"
 #include "components/user_education/common/help_bubble/help_bubble_factory_registry.h"
@@ -2843,48 +2839,6 @@ void BrowserView::ShowIntentPickerBubble(
 
 void BrowserView::ShowBookmarkBubble(const GURL& url, bool already_bookmarked) {
   toolbar_->ShowBookmarkBubble(url, already_bookmarked);
-}
-
-
-ShowTranslateBubbleResult BrowserView::ShowTranslateBubble(
-    content::WebContents* web_contents,
-    translate::TranslateStep step,
-    const std::string& source_language,
-    const std::string& target_language,
-    translate::TranslateErrors error_type,
-    bool is_user_gesture) {
-  views::View* contents_view = GetActiveContentsWebView();
-
-  if (contents_view->HasFocus() && !GetLocationBar()->IsMouseHovered() &&
-      web_contents->IsFocusedElementEditable()) {
-    return ShowTranslateBubbleResult::kEditableFieldIsActive;
-  }
-
-  ChromeTranslateClient::FromWebContents(web_contents)
-      ->GetTranslateManager()
-      ->GetLanguageState()
-      ->SetTranslateEnabled(true);
-
-  if (IsMinimized()) {
-    return ShowTranslateBubbleResult::kBrowserWindowMinimized;
-  }
-
-  std::optional<ui::ElementIdentifier> highlight_element =
-      kTranslatePageActionElementId;
-
-  views::BubbleAnchor anchor =
-      toolbar_button_provider()->GetBubbleAnchor(kActionShowTranslate);
-  if (bubble_anchor_util::IsHighlightable(anchor)) {
-    // No need for a separate highlight.
-    highlight_element = std::nullopt;
-  }
-  CHECK_DEREF(TranslateBubbleController::From(browser_.get()))
-      .ShowTranslateBubble(web_contents, anchor, highlight_element, step,
-                           source_language, target_language, error_type,
-                           is_user_gesture ? TranslateBubbleView::USER_GESTURE
-                                           : TranslateBubbleView::AUTOMATIC);
-
-  return ShowTranslateBubbleResult::kSuccess;
 }
 
 DownloadBubbleUIController* BrowserView::GetDownloadBubbleUIController() {

@@ -115,14 +115,6 @@ class WebUIBrowserWindow : public BrowserWindow,
       const std::optional<url::Origin>& initiating_origin,
       IntentPickerResponse callback) override;
   void ShowBookmarkBubble(const GURL& url, bool already_bookmarked) override;
-  ShowTranslateBubbleResult ShowTranslateBubble(
-      content::WebContents* contents,
-      translate::TranslateStep step,
-      const std::string& source_language,
-      const std::string& target_language,
-      translate::TranslateErrors error_type,
-      bool is_user_gesture) override;
-
   DownloadBubbleUIController* GetDownloadBubbleUIController() override;
   void ConfirmBrowserCloseWithPendingDownloads(
       int download_count,

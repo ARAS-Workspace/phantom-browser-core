@@ -425,7 +425,6 @@ if (!is_android) {
         "webui_home_control_interactive_uitest.cc",
         "webui_home_control_test_base.cc",
         "webui_home_control_test_base.h",
-        "webui_pinned_toolbar_actions_interactive_uitest.cc",
         "webui_pinned_toolbar_actions_test_base.cc",
         "webui_pinned_toolbar_actions_test_base.h",
         "webui_toolbar_interactive_uitest.cc",

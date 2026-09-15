@@ -50,7 +50,6 @@
 #include "chrome/browser/signin/signin_promo.h"
 #include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/sync/sync_ui_util.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/actions/chrome_action_properties.h"
 #include "chrome/browser/ui/actions/command_action_updater.h"
@@ -122,7 +121,6 @@
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/tabs/public/tab_interface.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/render_frame_host.h"
@@ -933,9 +931,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       OpenFeedbackDialog(browser_, feedback::kFeedbackSourceDesktopTabGroups,
                          /*description_template=*/std::string(),
                          /*category_tag=*/"tab_group_share");
-      break;
-    case IDC_SHOW_TRANSLATE:
-      ShowTranslateBubble(browser_);
       break;
     case IDC_MANAGE_PASSWORDS_FOR_PAGE:
       ManagePasswordsForPage(browser_);
@@ -1973,14 +1968,6 @@ void BrowserCommandController::UpdateCommandsForTabState() {
 
   UpdateCommandAndActionEnabled(IDC_QRCODE_GENERATOR, kActionQrCodeGenerator,
                                 CanGenerateQrCode(browser_));
-
-  ChromeTranslateClient* chrome_translate_client =
-      ChromeTranslateClient::FromWebContents(current_web_contents);
-  const bool can_translate =
-      chrome_translate_client &&
-      chrome_translate_client->GetTranslateManager()->CanManuallyTranslate();
-  UpdateCommandAndActionEnabled(IDC_SHOW_TRANSLATE, kActionShowTranslate,
-                                can_translate);
 
   bool is_isolated_app =
       web_app::AppBrowserController::From(browser_) &&

@@ -875,18 +875,6 @@ void WebUIBrowserWindow::ShowBookmarkBubble(const GURL& url,
   NOTIMPLEMENTED_LOG_ONCE();
 }
 
-
-ShowTranslateBubbleResult WebUIBrowserWindow::ShowTranslateBubble(
-    content::WebContents* contents,
-    translate::TranslateStep step,
-    const std::string& source_language,
-    const std::string& target_language,
-    translate::TranslateErrors error_type,
-    bool is_user_gesture) {
-  NOTIMPLEMENTED_LOG_ONCE();
-  return ShowTranslateBubbleResult::kBrowserWindowNotValid;
-}
-
 DownloadBubbleUIController*
 WebUIBrowserWindow::GetDownloadBubbleUIController() {
   NOTIMPLEMENTED_LOG_ONCE();

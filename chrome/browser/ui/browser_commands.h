@@ -265,7 +265,6 @@ void SaveAutofillAddress(BrowserWindowInterface* browser);
 void ShowFilledCardInformationBubble(BrowserWindowInterface* browser);
 void ShowVirtualCardEnrollBubble(BrowserWindowInterface* browser);
 void StartTabOrganizationRequest(BrowserWindowInterface* browser);
-void ShowTranslateBubble(BrowserWindowInterface* browser);
 void ManagePasswordsForPage(BrowserWindowInterface* browser);
 bool CanSendTabToSelf(BrowserWindowInterface* browser);
 void SendTabToSelf(BrowserWindowInterface* browser);

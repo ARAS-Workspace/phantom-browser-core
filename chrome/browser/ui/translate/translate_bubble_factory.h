@@ -12,7 +12,19 @@
 #include "components/translate/core/common/translate_errors.h"
 
 class BrowserWindow;
-enum class ShowTranslateBubbleResult;
+
+enum class ShowTranslateBubbleResult {
+  // The Full Page Translate bubble was successfully shown.
+  kSuccess,
+
+  // The various reasons for which the Full Page Translate bubble could fail to
+  // be shown.
+  kBrowserWindowNotValid,
+  kBrowserWindowMinimized,
+  kBrowserWindowNotActive,
+  kWebContentsNotActive,
+  kEditableFieldIsActive,
+};
 
 namespace content {
 class WebContents;

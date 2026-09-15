@@ -18,13 +18,7 @@ ShowTranslateBubbleResult ShowDefault(BrowserWindow* window,
                                       const std::string& target_language,
                                       translate::TranslateErrors error_type,
                                       bool is_user_gesture) {
-  // |window| might be null when testing.
-  if (!window) {
-    return ShowTranslateBubbleResult::kBrowserWindowNotValid;
-  }
-  return window->ShowTranslateBubble(web_contents, step, source_language,
-                                     target_language, error_type,
-                                     is_user_gesture);
+  return ShowTranslateBubbleResult::kBrowserWindowNotValid;
 }
 
 }  // namespace

@@ -34,8 +34,6 @@
 #include "chrome/browser/signin/dice_tab_helper.h"
 #endif
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/translate/translate_test_utils.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -75,8 +73,6 @@
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/sync/base/features.h"
-#include "components/translate/core/browser/language_state.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/test_navigation_observer.h"
@@ -123,31 +119,6 @@ class BrowserCommandControllerBrowserTestRefreshOnly
       const BrowserCommandControllerBrowserTestRefreshOnly&) = delete;
 
   ~BrowserCommandControllerBrowserTestRefreshOnly() override = default;
-
- protected:
-  void LoadAndWaitForLanguage(std::string_view relative_url) {
-    ASSERT_TRUE(embedded_test_server()->Start());
-
-    GURL url = embedded_test_server()->GetURL(relative_url);
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-    ChromeTranslateClient* chrome_translate_client =
-        ChromeTranslateClient::FromWebContents(
-            browser()->tab_strip_model()->GetActiveWebContents());
-
-    std::unique_ptr<translate::TranslateWaiter> translate_waiter =
-        translate::CreateTranslateWaiter(
-            browser()->tab_strip_model()->GetActiveWebContents(),
-            translate::TranslateWaiter::WaitEvent::kLanguageDetermined);
-
-    while (
-        chrome_translate_client->GetLanguageState().source_language().empty()) {
-      translate_waiter->Wait();
-    }
-    translate::TranslateManager::SetIgnoreMissingKeyForTesting(true);
-    net::NetworkChangeNotifier::CreateMockIfNeeded();
-    chrome::BrowserCommandController::From(browser())->TabStateChanged();
-  }
 };
 // Test case for actions behind Toolbar Pinning.
 using BrowserCommandControllerBrowserTestToolbarPinningOnly =
@@ -493,74 +464,6 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestRefreshOnly,
   EXPECT_TRUE(chrome::ExecuteCommand(browser(), IDC_MANAGE_CHROME_PROFILES));
   profiles::testing::WaitForPickerWidgetCreated();
   EXPECT_TRUE(ProfilePicker::IsOpen());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestRefreshOnly,
-                       ShowTranslateStatusChromePage) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url = GURL("chrome://new-tab-page/");
-  translate::TranslateManager::SetIgnoreMissingKeyForTesting(true);
-  net::NetworkChangeNotifier::CreateMockIfNeeded();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  chrome::BrowserCommandController::From(browser())->TabStateChanged();
-
-  EXPECT_FALSE(
-      chrome::BrowserCommandController::From(browser())->IsCommandEnabled(
-          IDC_SHOW_TRANSLATE));
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestRefreshOnly,
-                       ShowTranslateStatusEnglishPage) {
-  LoadAndWaitForLanguage("/english_page.html");
-  EXPECT_TRUE(
-      chrome::BrowserCommandController::From(browser())->IsCommandEnabled(
-          IDC_SHOW_TRANSLATE));
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestRefreshOnly,
-                       ShowTranslateStatusFrenchPage) {
-  LoadAndWaitForLanguage("/french_page.html");
-  EXPECT_TRUE(
-      chrome::BrowserCommandController::From(browser())->IsCommandEnabled(
-          IDC_SHOW_TRANSLATE));
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestRefreshOnly,
-                       ExecuteShowTranslateBubble) {
-  LoadAndWaitForLanguage("/french_page.html");
-  EXPECT_TRUE(chrome::ExecuteCommand(browser(), IDC_SHOW_TRANSLATE));
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestToolbarPinningOnly,
-                       ShowTranslateStatusChromePage) {
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url = GURL("chrome://new-tab-page/");
-  translate::TranslateManager::SetIgnoreMissingKeyForTesting(true);
-  net::NetworkChangeNotifier::CreateMockIfNeeded();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  chrome::BrowserCommandController::From(browser())->TabStateChanged();
-
-  EXPECT_FALSE(actions::ActionManager::GetForTesting()
-                   .FindAction(kActionShowTranslate)
-                   ->GetEnabled());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestToolbarPinningOnly,
-                       ShowTranslateStatusEnglishPage) {
-  LoadAndWaitForLanguage("/english_page.html");
-  EXPECT_TRUE(actions::ActionManager::GetForTesting()
-                  .FindAction(kActionShowTranslate)
-                  ->GetEnabled());
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserCommandControllerBrowserTestToolbarPinningOnly,
-                       ShowTranslateStatusFrenchPage) {
-  LoadAndWaitForLanguage("/french_page.html");
-  EXPECT_TRUE(actions::ActionManager::GetForTesting()
-                  .FindAction(kActionShowTranslate)
-                  ->GetEnabled());
 }
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

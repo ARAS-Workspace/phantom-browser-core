@@ -320,17 +320,6 @@ void TestBrowserWindow::DeleteBrowserWindow() {
   delete this;
 }
 
-ShowTranslateBubbleResult TestBrowserWindow::ShowTranslateBubble(
-    content::WebContents* contents,
-    translate::TranslateStep step,
-    const std::string& source_language,
-    const std::string& target_language,
-    translate::TranslateErrors error_type,
-    bool is_user_gesture) {
-  return ShowTranslateBubbleResult::kSuccess;
-}
-
-
 
 DownloadBubbleUIController* TestBrowserWindow::GetDownloadBubbleUIController() {
   return nullptr;

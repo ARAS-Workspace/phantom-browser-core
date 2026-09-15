@@ -147,14 +147,6 @@ class TestBrowserWindow : public BrowserWindow,
       const std::optional<url::Origin>& initiating_origin,
       IntentPickerResponse callback) override {}
 #endif  //  !define(OS_ANDROID)
-  ShowTranslateBubbleResult ShowTranslateBubble(
-      content::WebContents* contents,
-      translate::TranslateStep step,
-      const std::string& source_language,
-      const std::string& target_language,
-      translate::TranslateErrors error_type,
-      bool is_user_gesture) override;
-
   DownloadBubbleUIController* GetDownloadBubbleUIController() override;
   void ConfirmBrowserCloseWithPendingDownloads(
       int download_count,

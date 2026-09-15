@@ -1233,18 +1233,6 @@ void BrowserActions::InitializeChromeMenuActions() {
   }
 
   root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowTranslateBubble(bwi);
-              },
-              bwi),
-          kActionShowTranslate, IDS_SHOW_TRANSLATE, IDS_TOOLTIP_TRANSLATE,
-          vector_icons::kGTranslateIcon)
-          .Build());
-
-  root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
