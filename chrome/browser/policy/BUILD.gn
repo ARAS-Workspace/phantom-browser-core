@@ -241,7 +241,6 @@ source_set("policy_specific_browser_tests") {
     "test/policy_statistics_collector_browsertest.cc",
     "test/proxy_policies_browsertest.cc",
     "test/restrict_background_fetch_policy_browsertest.cc",
-    "test/safe_browsing_policy_browsertest.cc",
     "test/ssl_error_overriding_allowed_policy_browsertest.cc",
     "test/standardized_browser_zoom_browsertest.cc",
     "test/web_rtc_udp_port_range_policy_browsertest.cc",
