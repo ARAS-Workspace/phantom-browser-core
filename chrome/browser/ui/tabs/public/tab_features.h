@@ -50,7 +50,6 @@ class LensOverlayController;
 class LensSearchController;
 class MemorySaverChipTabHelper;
 class NewTabPagePreloadPipelineManager;
-class PinnedTranslateActionListener;
 class Profile;
 class QwacWebContentsObserver;
 class RecordReplayPageActionController;
@@ -60,7 +59,6 @@ class SecurityStateEventObserver;
 class SidePanelRegistry;
 class TabResourceUsageTabHelper;
 class TabUIHelper;
-class TranslatePageActionController;
 class ZeroSuggestPrefetchTabHelper;
 
 namespace back_to_opener {
@@ -359,10 +357,6 @@ class TabFeatures {
   std::unique_ptr<commerce::InStockNotificationManager>
       in_stock_notification_manager_;
 
-  // Responsible for updating status indicator of the pinned translate button.
-  std::unique_ptr<PinnedTranslateActionListener>
-      pinned_translate_action_listener_;
-
   // The tab-scoped extension side-panel manager. There is a separate
   // window-scoped extension side-panel manager.
   std::unique_ptr<extensions::ExtensionSidePanelManager>
@@ -405,10 +399,6 @@ class TabFeatures {
   // Responsible for managing all page actions of a tab. Other controllers
   // interact with this to have their feature's page action shown.
   std::unique_ptr<page_actions::PageActionController> page_action_controller_;
-
-  // Responsible for managing the "Translate" page action.
-  std::unique_ptr<TranslatePageActionController>
-      translate_page_action_controller_;
 
   // Responsible for managing the "Zoom" page action and bubble.
   std::unique_ptr<zoom::ZoomViewController> zoom_view_controller_;

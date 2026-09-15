@@ -79,7 +79,6 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model_delegate.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
-#include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_translate_action_listener.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_page_action_controller.h"
 #include "chrome/browser/ui/views/commerce/discounts_page_action_view_controller.h"
@@ -90,7 +89,6 @@
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_page_action_controller.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/side_panel_controller_views.h"
 #include "chrome/browser/ui/views/side_panel/extensions/extension_side_panel_manager.h"
-#include "chrome/browser/ui/views/translate/translate_page_action_controller.h"
 #include "chrome/browser/ui/views/zoom/zoom_view_controller.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
@@ -185,11 +183,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
               page_actions::PageActionPropertiesProvider(),
               pinned_actions_model);
 
-  if (page_action_controller_->ActionExists(kActionShowTranslate)) {
-    translate_page_action_controller_ =
-        std::make_unique<TranslatePageActionController>(tab);
-  }
-
   if (page_action_controller_->ActionExists(kActionShowMemorySaverChip)) {
     memory_saver_chip_controller_ =
         std::make_unique<memory_saver::MemorySaverChipController>(
@@ -261,9 +254,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
     permission_indicators_tab_data_ =
         std::make_unique<permissions::PermissionIndicatorsTabData>(
             tab.GetContents());
-
-    pinned_translate_action_listener_ =
-        std::make_unique<PinnedTranslateActionListener>(&tab);
 
     if (!profile->IsIncognitoProfile()) {
       // TODO(crbug.com/40863325): Consider using the in-memory cache instead.

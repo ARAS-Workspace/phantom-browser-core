@@ -110,7 +110,6 @@ class TabStripServiceFeature;
 class TabsFromOtherDevicesSidePanelCoordinator;
 class ToastController;
 class ToastService;
-class TranslateBubbleController;
 class UnloadController;
 class UpgradeNotificationController;
 class VerticalTabIphController;
@@ -677,7 +676,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<TabsFromOtherDevicesSidePanelCoordinator>
       tabs_from_other_devices_side_panel_coordinator_;
   std::unique_ptr<ToastService> toast_service_;
-  std::unique_ptr<TranslateBubbleController> translate_bubble_controller_;
   std::unique_ptr<UpgradeNotificationController>
       upgrade_notification_controller_;
   std::unique_ptr<BrowserUserEducationInterface> user_education_;

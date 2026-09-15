@@ -48,7 +48,6 @@ class ToastServiceBrowserTest : public InProcessBrowserTest {
         {{autofill::features::kAutofillAiWalletPrivatePasses, {}},
          {safe_browsing::kEsbAsASyncedSetting, {}},
          {data_sharing::features::kDataSharingFeature, {}},
-         {toast_features::kTranslateToast, {}},
          {features::kGlicActorUi, {{features::kGlicActorUiToastName, "true"}}},
          {multistep_filter::kMultistepFilter, {}},
          {features::kIndigo, {}},

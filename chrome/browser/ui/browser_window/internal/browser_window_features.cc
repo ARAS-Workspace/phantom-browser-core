@@ -156,7 +156,6 @@
 #include "chrome/browser/ui/views/tabs/tab_strip_action_container.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/browser/ui/views/translate/translate_bubble_controller.h"
 #include "chrome/browser/ui/views/upgrade_notification_controller.h"
 #include "chrome/browser/ui/views/user_education/impl/browser_user_education_interface_impl.h"
 #include "chrome/browser/ui/waap/initial_web_ui_manager.h"
@@ -525,10 +524,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
         std::make_unique<TabsFromOtherDevicesSidePanelCoordinator>(browser,
                                                                    profile);
   }
-
-  translate_bubble_controller_ =
-      GetUserDataFactory().CreateInstance<TranslateBubbleController>(
-          *browser, browser, browser_actions_->root_action_item());
 
   user_education_ =
       GetUserDataFactory().CreateInstance<BrowserUserEducationInterfaceImpl>(

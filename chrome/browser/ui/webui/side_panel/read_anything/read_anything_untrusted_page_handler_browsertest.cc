@@ -32,7 +32,6 @@
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
-#include "chrome/browser/ui/views/translate/translate_bubble_controller.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/common/extensions/extension_constants.h"
@@ -337,8 +336,6 @@ class ReadAnythingUntrustedPageHandlerTest : public InProcessBrowserTest {
   void OnLinksEnabledChanged(bool enabled) {
     handler_->OnLinksEnabledChanged(enabled);
   }
-
-  void OnTranslationRequested() { handler_->OnTranslationRequested(); }
 
   void OnImagesEnabledChanged(bool enabled) {
     handler_->OnImagesEnabledChanged(enabled);
@@ -1669,41 +1666,6 @@ IN_PROC_BROWSER_TEST_F(
 
   EXPECT_EQ(controller->GetPresentationState(),
             ReadAnythingController::PresentationState::kInImmersiveOverlay);
-}
-
-class ReadAnythingUntrustedPageHandlerTranslateEntryPointTest
-    : public ReadAnythingUntrustedPageHandlerTest {
- public:
-  ReadAnythingUntrustedPageHandlerTranslateEntryPointTest()
-      : ReadAnythingUntrustedPageHandlerTest(
-            {features::kReadAnythingTranslateEntryPoint}) {}
-};
-
-IN_PROC_BROWSER_TEST_F(ReadAnythingUntrustedPageHandlerTranslateEntryPointTest,
-                       OnTranslationRequested) {
-  // Navigate to a simple page and set up the handler.
-  ASSERT_TRUE(embedded_test_server()->Start());
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL("/simple.html")));
-  translate::TranslateManager::SetIgnoreMissingKeyForTesting(true);
-
-  // Set the side panel URL on the test web contents so that
-  // ChromeTranslateClient can find the browser window.
-  content::NavigationController::LoadURLParams params{
-      GURL(chrome::kChromeUIUntrustedReadAnythingSidePanelURL)};
-  web_contents_->GetController().LoadURLWithParams(params);
-  content::WaitForLoadStop(web_contents_.get());
-
-  handler_ = CreateHandler();
-  TranslateBubbleController* controller =
-      TranslateBubbleController::From(browser());
-  EXPECT_TRUE(!controller || !controller->GetTranslateBubble());
-
-  OnTranslationRequested();
-
-  controller = TranslateBubbleController::From(browser());
-  ASSERT_NE(controller, nullptr);
-  EXPECT_NE(controller->GetTranslateBubble(), nullptr);
 }
 
 class ReadAnythingUntrustedPageHandlerDistillerTest

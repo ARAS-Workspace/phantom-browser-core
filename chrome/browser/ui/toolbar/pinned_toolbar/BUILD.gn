@@ -11,7 +11,6 @@ source_set("pinned_toolbar") {
       "pinned_toolbar_actions_ids.h",
       "pinned_toolbar_actions_model.h",
       "pinned_toolbar_actions_model_factory.h",
-      "pinned_translate_action_listener.h",
     ]
     public_deps += [
       "//base",
@@ -20,7 +19,6 @@ source_set("pinned_toolbar") {
       "//components/keyed_service/core",
       "//components/prefs",
       "//components/tabs:public",
-      "//components/translate/content/browser",
       "//ui/actions:actions_headers",
       "//ui/base/unowned_user_data",
     ]
@@ -36,11 +34,9 @@ source_set("impl") {
       "pinned_toolbar_actions_ids.cc",
       "pinned_toolbar_actions_model.cc",
       "pinned_toolbar_actions_model_factory.cc",
-      "pinned_translate_action_listener.cc",
     ]
     deps = [
       "//chrome/browser:primitives",
-      "//chrome/browser/translate",
       "//chrome/browser/ui:browser_actions",
       "//chrome/browser/ui:browser_element_identifiers",
       "//chrome/browser/ui:ui_features",

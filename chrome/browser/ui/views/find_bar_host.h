@@ -100,7 +100,6 @@ class FindBarHost : public FindBar,
   bool CanPopulateFromSelectedText() override;
   const FindBarTesting* GetFindBarTesting() const override;
   bool HasFocus() const override;
-  void CloseOverlappingBubbles() override;
 
   // Overridden from ui::AcceleratorTarget
   bool AcceleratorPressed(const ui::Accelerator& accelerator) override;

@@ -103,9 +103,6 @@ class FindBar {
   // Return |true| if find bar has focus.
   virtual bool HasFocus() const = 0;
 
-  // Closes any overlapping bubbles, such as the translate bubble.
-  virtual void CloseOverlappingBubbles() = 0;
-
   // Get the host widget. Used by immersive fullscreen to detect the find bar
   // widget and reparent as necessary.
   virtual views::Widget* GetHostWidget() = 0;
