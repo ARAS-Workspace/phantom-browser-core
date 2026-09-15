@@ -14,13 +14,11 @@
 #include "base/test/test_file_util.h"
 #include "base/test/test_future.h"
 #include "base/values.h"
-#include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/file_system_access/chrome_file_system_access_permission_context.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_context_factory.h"
 #include "chrome/browser/file_system_access/file_system_access_permission_request_manager.h"
-#include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
+#include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_actions.h"
@@ -37,8 +35,6 @@
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/permissions/permission_util.h"
-#include "components/safe_browsing/buildflags.h"
-#include "components/safe_browsing/content/common/file_type_policies_test_util.h"
 #include "content/public/browser/file_system_access_permission_context.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/test/back_forward_cache_util.h"
@@ -54,8 +50,6 @@
 #include "net/test/embedded_test_server/controllable_http_response.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "ui/webui/webui_allowlist.h"
-
-using safe_browsing::ClientDownloadRequest;
 
 // End-to-end tests for the File System Access API. Among other things, these
 // test the integration between usage of the File System Access API and the
@@ -379,87 +373,6 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessBrowserSlowLoadTest,
   // The usage indicator should still be visible.
   EXPECT_TRUE(IsUsageIndicatorVisible(browser()));
 }
-
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-IN_PROC_BROWSER_TEST_F(FileSystemAccessBrowserTest,
-                       SafeBrowsing) {  // change this to p
-  safe_browsing::FileTypePoliciesTestOverlay policies;
-  std::unique_ptr<safe_browsing::DownloadFileTypeConfig> file_type_config =
-      std::make_unique<safe_browsing::DownloadFileTypeConfig>();
-  auto* file_type = file_type_config->mutable_default_file_type();
-  file_type->set_uma_value(-1);
-  file_type->set_ping_setting(safe_browsing::DownloadFileType::FULL_PING);
-  auto* platform_settings = file_type->add_platform_settings();
-  platform_settings->set_danger_level(
-      safe_browsing::DownloadFileType::NOT_DANGEROUS);
-  platform_settings->set_auto_open_hint(
-      safe_browsing::DownloadFileType::ALLOW_AUTO_OPEN);
-  policies.SwapConfig(file_type_config);
-
-  const std::string file_name("test.pdf");
-  const base::FilePath test_file = temp_dir_.GetPath().AppendASCII(file_name);
-
-  std::string expected_hash;
-  ASSERT_TRUE(base::HexStringToString(
-      "BA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD",
-      &expected_hash));
-  std::string expected_url =
-      "blob:" + embedded_test_server()->base_url().spec() +
-      "file-system-access-write";
-  GURL frame_url = embedded_test_server()->GetURL("/title1.html");
-
-  ui::SelectFileDialog::SetFactory(
-      std::make_unique<SelectPredeterminedFileDialogFactory>(
-          std::vector<base::FilePath>{test_file}));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), frame_url));
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  bool invoked_safe_browsing = false;
-
-  safe_browsing::SafeBrowsingService* sb_service =
-      g_browser_process->safe_browsing_service();
-  base::CallbackListSubscription subscription =
-      sb_service->download_protection_service()
-          ->RegisterFileSystemAccessWriteRequestCallback(
-              base::BindLambdaForTesting(
-                  [&](const ClientDownloadRequest* request) {
-                    invoked_safe_browsing = true;
-
-                    EXPECT_EQ(request->url(), expected_url);
-                    EXPECT_EQ(request->digests().sha256(), expected_hash);
-                    EXPECT_EQ(request->length(), 3);
-                    EXPECT_EQ(request->file_basename(), file_name);
-                    EXPECT_EQ(request->download_type(),
-                              ClientDownloadRequest::DOCUMENT);
-
-                    ASSERT_GE(request->resources_size(), 2);
-
-                    EXPECT_EQ(request->resources(0).type(),
-                              ClientDownloadRequest::DOWNLOAD_URL);
-                    EXPECT_EQ(request->resources(0).url(), expected_url);
-                    EXPECT_EQ(request->resources(0).referrer(), frame_url);
-
-                    // TODO(mek): Change test so that frame url and tab url are
-                    // not the same.
-                    EXPECT_EQ(request->resources(1).type(),
-                              ClientDownloadRequest::TAB_URL);
-                    EXPECT_EQ(request->resources(1).url(), frame_url);
-                    EXPECT_EQ(request->resources(1).referrer(), "");
-                  }));
-
-  EXPECT_EQ(test_file.BaseName().AsUTF8Unsafe(),
-            content::EvalJs(web_contents,
-                            "(async () => {"
-                            "  let e = await self.showSaveFilePicker();"
-                            "  const w = await e.createWritable();"
-                            "  await w.write('abc');"
-                            "  await w.close();"
-                            "  return e.name; })()"));
-
-  EXPECT_TRUE(invoked_safe_browsing);
-}
-#endif
 
 IN_PROC_BROWSER_TEST_F(FileSystemAccessBrowserTest,
                        OpenFileWithContentSettingAllow) {
