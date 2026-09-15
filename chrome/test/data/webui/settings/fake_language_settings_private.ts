@@ -201,48 +201,6 @@ export class FakeLanguageSettingsPrivate extends TestBrowserProxy {
   }
 
   /**
-   * Gets languages that should always be automatically translated.
-   */
-  getAlwaysTranslateLanguages() {
-    const alwaysTranslateMap =
-        PrefService.getInstance()
-            .getPref<Record<string, string>>('translate_allowlists')
-            .value;
-    return Promise.resolve(Object.keys(alwaysTranslateMap));
-  }
-
-  /**
-   * Sets whether a given language should always be automatically translated.
-   */
-  setLanguageAlwaysTranslateState(
-      languageCode: string, alwaysTranslate: boolean) {
-    // Need to create a copy of the translate_allowlist object so that
-    // preference observers are notified during tests.
-    const alwaysTranslateMap = Object.assign(
-        {},
-        PrefService.getInstance()
-            .getPref<Record<string, string>>('translate_allowlists')
-            .value);
-    if (alwaysTranslate) {
-      // The target language is not used in tests so set to 'en'.
-      alwaysTranslateMap[languageCode] = 'en';
-    } else {
-      delete alwaysTranslateMap[languageCode];
-    }
-    PrefService.getInstance().setPrefValue(
-        'translate_allowlists', alwaysTranslateMap);
-  }
-
-  /**
-   * Gets languages that should never be offered to translate.
-   */
-  getNeverTranslateLanguages() {
-    return Promise.resolve(PrefService.getInstance()
-                               .getPref<string[]>('translate_blocked_languages')
-                               .value);
-  }
-
-  /**
    * Enables a language, adding it to the Accept-Language list (used to decide
    * which languages to translate, generate the Accept-Language header, etc.).
    */
@@ -341,21 +299,6 @@ export class FakeLanguageSettingsPrivate extends TestBrowserProxy {
 
     PrefService.getInstance().setPrefValue(
         'intl.accept_languages', languages.join(','));
-  }
-
-  /**
-   * Gets the translate target language (in most cases, the display locale).
-   */
-  getTranslateTargetLanguage() {
-    return Promise.resolve('en');
-  }
-
-  /**
-   * Sets the translate target language.
-   */
-  setTranslateTargetLanguage(languageCode: string) {
-    PrefService.getInstance().setPrefValue(
-        'translate_recent_target', languageCode);
   }
 
   /**

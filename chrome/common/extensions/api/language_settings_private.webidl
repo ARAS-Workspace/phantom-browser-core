@@ -138,18 +138,6 @@ interface LanguageSettingsPrivate {
   // Moves a language inside the language list.
   static undefined moveLanguage(DOMString languageCode, MoveType moveType);
 
-  // Gets languages that should always be automatically translated.
-  // |PromiseValue|: languageCodes
-  static Promise<sequence<DOMString>> getAlwaysTranslateLanguages();
-
-  // Sets whether a given language should always be automatically translated.
-  static undefined setLanguageAlwaysTranslateState(DOMString languageCode,
-                                                   boolean alwaysTranslate);
-
-  // Gets languages that should never be offered to translate.
-  // |PromiseValue|: languageCodes
-  static Promise<sequence<DOMString>> getNeverTranslateLanguages();
-
   // Gets the current status of the chosen spell check dictionaries.
   // |PromiseValue|: status
   static Promise<sequence<SpellcheckDictionaryStatus>>
@@ -164,13 +152,6 @@ interface LanguageSettingsPrivate {
 
   // Removes a word from the custom dictionary.
   static undefined removeSpellcheckWord(DOMString word);
-
-  // Gets the translate target language (in most cases, the display locale).
-  // |PromiseValue|: languageCode
-  static Promise<DOMString> getTranslateTargetLanguage();
-
-  // Sets the translate target language given a language code.
-  static undefined setTranslateTargetLanguage(DOMString languageCode);
 
   // Gets all supported input methods, including third-party IMEs.
   // Chrome OS only.

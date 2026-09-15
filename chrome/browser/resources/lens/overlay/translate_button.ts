@@ -465,11 +465,8 @@ export class TranslateButtonElement extends PolymerElement {
       }
     }
 
-    // Get the default translate target language. This needs to happen after
-    // fetching the language list so we can use the list to fetch the language's
-    // display name.
-    this.languageBrowserProxy.getTranslateTargetLanguage().then(
-        this.onTargetLanguageRetrieved.bind(this));
+    // Default to the first language in the list.
+    this.targetLanguage = this.getTargetLanguageList()[0];
   }
 
   private maybeSetRecentLanguages() {
@@ -490,21 +487,6 @@ export class TranslateButtonElement extends PolymerElement {
             return recentTargetLanguageCodes.includes(language.languageCode);
           });
     }
-  }
-
-  private onTargetLanguageRetrieved(targetLanguageCode: string) {
-    const defaultLanguage = this.getTargetLanguageList().find(
-        language => language.languageCode === targetLanguageCode);
-
-    // If the target language is set to one supported by Lens, then we set it
-    // and are done.
-    if (defaultLanguage) {
-      this.targetLanguage = defaultLanguage;
-      return;
-    }
-
-    // Otherwise, we default to the first language in the list.
-    this.targetLanguage = this.getTargetLanguageList()[0];
   }
 
   private onAutoDetectMenuItemClick() {

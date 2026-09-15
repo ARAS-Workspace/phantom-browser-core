@@ -29,10 +29,6 @@ export class TestLanguageBrowserProxy extends LanguageBrowserProxyImpl {
     ]));
   }
 
-  override getTranslateTargetLanguage(): Promise<string> {
-    return Promise.resolve('en');
-  }
-
   override storeLanguages(
       locale: string, sourceLanguages: Language[],
       targetLanguages: Language[]): void {

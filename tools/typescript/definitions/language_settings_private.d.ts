@@ -58,17 +58,11 @@ declare global {
           languageCode: string, enable: boolean): void;
       export function moveLanguage(languageCode: string, moveType: MoveType):
           void;
-      export function getAlwaysTranslateLanguages(): Promise<string[]>;
-      export function setLanguageAlwaysTranslateState(
-          languageCode: string, alwaysTranslate: boolean): void;
-      export function getNeverTranslateLanguages(): Promise<string[]>;
       export function getSpellcheckDictionaryStatuses():
           Promise<SpellcheckDictionaryStatus[]>;
       export function getSpellcheckWords(): Promise<string[]>;
       export function addSpellcheckWord(word: string): void;
       export function removeSpellcheckWord(word: string): void;
-      export function getTranslateTargetLanguage(): Promise<string>;
-      export function setTranslateTargetLanguage(languageCode: string): void;
       export function getInputMethodLists(): Promise<InputMethodLists>;
       export function addInputMethod(inputMethodId: string): void;
       export function removeInputMethod(inputMethodId: string): void;

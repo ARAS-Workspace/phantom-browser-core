@@ -64,7 +64,7 @@ export {SettingsDefaultBrowserPageElement} from './default_browser_page/default_
 // </if>
 export {loadTimeData} from './i18n_setup.js';
 // <if expr="not is_chromeos">
-export {convertLanguageCodeForChrome, convertLanguageCodeForTranslate, getBaseLanguage, isTranslateBaseLanguage} from './languages_page/languages_util.js';
+export {convertLanguageCodeForChrome, getBaseLanguage} from './languages_page/languages_util.js';
 // </if>
 export {AiPageComposeInteractions, AiPageHistorySearchInteractions, AiPageInteractions, AiPageSuggestionsInteractions, AutofillSettingsReferrer, CardBenefitsUserAction, CvcDeletionUserAction, DeleteBrowsingDataAction, MetricsBrowserProxyImpl, PrivacyElementInteractions, PrivacyGuideInteractions, PrivacyGuideSettingsStates, PrivacyGuideStepsEligibleAndReached, SuggestionsFromGeminiAction, SuggestionsFromGeminiEntryPoint, YourSavedInfoDataCategory, YourSavedInfoDataChip, YourSavedInfoRelatedService} from './metrics_browser_proxy.js';
 export type {MetricsBrowserProxy} from './metrics_browser_proxy.js';

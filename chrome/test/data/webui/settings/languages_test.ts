@@ -5,7 +5,7 @@
 // clang-format off
 import type {LanguageHelper} from 'chrome://settings/lazy_load.js';
 import {LanguagesBrowserProxyImpl, getLanguageHelperInstance} from 'chrome://settings/lazy_load.js';
-import {CrSettingsPrefs, isTranslateBaseLanguage, getBaseLanguage, convertLanguageCodeForTranslate, convertLanguageCodeForChrome, PrefsBrowserProxy, PrefService} from 'chrome://settings/settings.js';
+import {CrSettingsPrefs, getBaseLanguage, convertLanguageCodeForChrome, PrefsBrowserProxy, PrefService} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 
 import type {FakeLanguageSettingsPrivate} from './fake_language_settings_private.js';
@@ -66,7 +66,6 @@ suite('settings-languages', function() {
           languageHelper.languages!.supported[i]!.code);
     }
     assertLanguageOrder(['en-US', 'sw']);
-    assertEquals('en', languageHelper.languages!.translateTarget);
 
     // TODO(michaelpg): Test other aspects of the model.
   });
@@ -85,13 +84,6 @@ suite('settings-languages', function() {
     assertEquals('fil', lang.code);
   });
 
-  test('is translate base language', function() {
-    assertFalse(isTranslateBaseLanguage(languageHelper.getLanguage('nb')!));
-    assertFalse(isTranslateBaseLanguage(languageHelper.getLanguage('en-US')!));
-    assertTrue(isTranslateBaseLanguage(languageHelper.getLanguage('en')!));
-    assertTrue(isTranslateBaseLanguage(languageHelper.getLanguage('sw')!));
-  });
-
   test('get language code without region', function() {
     const cases: Array<[string, string]> = [
       ['en', 'en'],
@@ -106,23 +98,6 @@ suite('settings-languages', function() {
 
     for (const [code, base] of cases) {
       assertEquals(getBaseLanguage(code), base);
-    }
-  });
-
-  test('to translate format', function() {
-    const cases: Array<[string, string]> = [
-      ['en', 'en'],
-      ['en-AU', 'en'],
-      ['zh-HK', 'zh-TW'],
-      ['zh-TW', 'zh-TW'],
-      ['fil', 'tl'],
-      ['nb', 'no'],
-      ['nn', 'nn'],
-      ['he', 'iw'],
-    ];
-
-    for (const [code, converted] of cases) {
-      assertEquals(convertLanguageCodeForTranslate(code), converted);
     }
   });
 

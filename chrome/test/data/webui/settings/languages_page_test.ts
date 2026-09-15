@@ -9,7 +9,7 @@ import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min
 import type {CrCheckboxElement, LanguageHelper, SettingsAddLanguagesDialogElement, SettingsLanguagesPageElement} from 'chrome://settings/lazy_load.js';
 import {LanguagesBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
 import type {CrActionMenuElement, CrButtonElement} from 'chrome://settings/settings.js';
-import {CrSettingsPrefs, loadTimeData, convertLanguageCodeForTranslate, PrefsBrowserProxy, PrefService} from 'chrome://settings/settings.js';
+import {CrSettingsPrefs, loadTimeData, PrefsBrowserProxy, PrefService} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertGE, assertGT, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
 import {fakeDataBind} from 'chrome://webui-test/polymer_test_util.js';
@@ -272,47 +272,6 @@ suite('LanguagesPage', function() {
   });
 
   suite('LanguageMenu', function() {
-    /*
-     * This suite tests that the translate target language is labelled
-     */
-    test('translate target language is labelled', function() {
-      // Translate target language disabled.
-      const targetLanguageCode = languageHelper.languages!.translateTarget;
-      assertTrue(!!targetLanguageCode);
-      assertTrue(languageHelper.languages!.enabled.some(
-          l => convertLanguageCodeForTranslate(l.language.code) ===
-              targetLanguageCode));
-      assertTrue(languageHelper.languages!.enabled.some(
-          l => convertLanguageCodeForTranslate(l.language.code) !==
-              targetLanguageCode));
-      let translateTargetLabel = null;
-      let item = null;
-
-      const listItems =
-          languagesPage.shadowRoot!.querySelector('#languagesSection')!
-              .querySelectorAll<HTMLElement>('.list-item');
-      const domRepeat = languagesPage.shadowRoot!.querySelector('dom-repeat');
-      assertTrue(!!domRepeat);
-
-      let num_visibles = 0;
-      Array.from(listItems).forEach(function(el) {
-        item = domRepeat.itemForElement(el);
-        if (item) {
-          translateTargetLabel = el.querySelector('.target-info');
-          assertTrue(!!translateTargetLabel);
-          if (getComputedStyle(translateTargetLabel).display !== 'none') {
-            num_visibles++;
-            assertEquals(
-                targetLanguageCode,
-                convertLanguageCodeForTranslate(item.language.code));
-          }
-        }
-        assertEquals(
-            1, num_visibles,
-            'Not exactly one target info label (' + num_visibles + ').');
-      });
-    });
-
     /*
      * Checks the visibility of each expected menu item button.
      * @param Dictionary from i18n keys to expected visibility of those menu

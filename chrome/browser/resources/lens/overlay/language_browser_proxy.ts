@@ -26,7 +26,6 @@ export interface LanguageBrowserProxy {
   getClientLanguageList(): Promise<Language[]>;
   getLastUsedSourceLanguage(): string|null;
   getLastUsedTargetLanguage(): string|null;
-  getTranslateTargetLanguage(): Promise<string>;
   getRecentSourceLanguages(): string[];
   getRecentTargetLanguages(): string[];
   getStoredServerLanguages(browserProxy: BrowserProxy):
@@ -65,10 +64,6 @@ export class LanguageBrowserProxyImpl implements LanguageBrowserProxy {
 
   getLastUsedTargetLanguage(): string|null {
     return window.localStorage.getItem(LAST_USED_TARGET_LANGUAGE_KEY);
-  }
-
-  getTranslateTargetLanguage(): Promise<string> {
-    return chrome.languageSettingsPrivate.getTranslateTargetLanguage();
   }
 
   getRecentSourceLanguages(): string[] {

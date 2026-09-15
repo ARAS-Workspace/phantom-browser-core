@@ -23,12 +23,9 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "chrome/browser/language/language_model_manager_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/translate/translate_service.h"
 #include "chrome/common/extensions/api/language_settings_private.h"
-#include "components/language/core/browser/language_model_manager.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/language/core/common/language_util.h"
 #include "components/language/core/common/locale_util.h"
@@ -195,80 +192,6 @@ LanguageSettingsPrivateSetEnableTranslationForLanguageFunction::Run() {
   }
 
   return RespondNow(NoArguments());
-}
-
-LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction::
-    LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction() = default;
-
-LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction::
-    ~LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction() = default;
-
-ExtensionFunction::ResponseAction
-LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction::Run() {
-  const std::unique_ptr<translate::TranslatePrefs> translate_prefs =
-      CreateTranslatePrefsForBrowserContext(browser_context());
-
-  std::vector<std::string> languages =
-      translate_prefs->GetAlwaysTranslateLanguages();
-
-  base::ListValue always_translate_languages;
-  for (const auto& entry : languages) {
-    always_translate_languages.Append(entry);
-  }
-
-  return RespondNow(WithArguments(std::move(always_translate_languages)));
-}
-
-LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction::
-    LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction() = default;
-
-LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction::
-    ~LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction() = default;
-
-ExtensionFunction::ResponseAction
-LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction::Run() {
-  const auto params = language_settings_private::
-      SetLanguageAlwaysTranslateState::Params::Create(args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-  const std::unique_ptr<translate::TranslatePrefs> translate_prefs =
-      CreateTranslatePrefsForBrowserContext(browser_context());
-
-  if (params->always_translate) {
-    language::LanguageModel* language_model =
-        LanguageModelManagerFactory::GetForBrowserContext(browser_context())
-            ->GetPrimaryModel();
-    std::string target_language = TranslateService::GetTargetLanguage(
-        Profile::FromBrowserContext(browser_context())->GetPrefs(),
-        language_model);
-    translate_prefs->AddLanguagePairToAlwaysTranslateList(params->language_code,
-                                                          target_language);
-  } else {
-    translate_prefs->RemoveLanguagePairFromAlwaysTranslateList(
-        params->language_code);
-  }
-
-  return RespondNow(NoArguments());
-}
-
-LanguageSettingsPrivateGetNeverTranslateLanguagesFunction::
-    LanguageSettingsPrivateGetNeverTranslateLanguagesFunction() = default;
-
-LanguageSettingsPrivateGetNeverTranslateLanguagesFunction::
-    ~LanguageSettingsPrivateGetNeverTranslateLanguagesFunction() = default;
-
-ExtensionFunction::ResponseAction
-LanguageSettingsPrivateGetNeverTranslateLanguagesFunction::Run() {
-  const std::unique_ptr<translate::TranslatePrefs> translate_prefs =
-      CreateTranslatePrefsForBrowserContext(browser_context());
-
-  std::vector<std::string> languages =
-      translate_prefs->GetNeverTranslateLanguages();
-
-  base::ListValue never_translate_languages;
-  for (auto& entry : languages) {
-    never_translate_languages.Append(std::move(entry));
-  }
-  return RespondNow(WithArguments(std::move(never_translate_languages)));
 }
 
 LanguageSettingsPrivateMoveLanguageFunction::
@@ -462,49 +385,6 @@ LanguageSettingsPrivateRemoveSpellcheckWordFunction::Run() {
 #else
   return RespondNow(Error("Spell check is not available in this build."));
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
-}
-
-LanguageSettingsPrivateGetTranslateTargetLanguageFunction::
-    LanguageSettingsPrivateGetTranslateTargetLanguageFunction() = default;
-
-LanguageSettingsPrivateGetTranslateTargetLanguageFunction::
-    ~LanguageSettingsPrivateGetTranslateTargetLanguageFunction() = default;
-
-ExtensionFunction::ResponseAction
-LanguageSettingsPrivateGetTranslateTargetLanguageFunction::Run() {
-  language::LanguageModel* language_model =
-      LanguageModelManagerFactory::GetForBrowserContext(browser_context())
-          ->GetPrimaryModel();
-  return RespondNow(WithArguments(TranslateService::GetTargetLanguage(
-      Profile::FromBrowserContext(browser_context())->GetPrefs(),
-      language_model)));
-}
-
-LanguageSettingsPrivateSetTranslateTargetLanguageFunction::
-    LanguageSettingsPrivateSetTranslateTargetLanguageFunction() = default;
-
-LanguageSettingsPrivateSetTranslateTargetLanguageFunction::
-    ~LanguageSettingsPrivateSetTranslateTargetLanguageFunction() = default;
-
-ExtensionFunction::ResponseAction
-LanguageSettingsPrivateSetTranslateTargetLanguageFunction::Run() {
-  const auto parameters =
-      language_settings_private::SetTranslateTargetLanguage::Params::Create(
-          args());
-  EXTENSION_FUNCTION_VALIDATE(parameters);
-  const std::string& language_code = parameters->language_code;
-
-  std::unique_ptr<translate::TranslatePrefs> translate_prefs =
-      CreateTranslatePrefsForBrowserContext(browser_context());
-
-  std::string chrome_language = language_code;
-
-  if (language_code == translate_prefs->GetRecentTargetLanguage()) {
-    return RespondNow(NoArguments());
-  }
-  translate_prefs->SetRecentTargetLanguage(language_code);
-
-  return RespondNow(NoArguments());
 }
 
 LanguageSettingsPrivateGetInputMethodListsFunction::

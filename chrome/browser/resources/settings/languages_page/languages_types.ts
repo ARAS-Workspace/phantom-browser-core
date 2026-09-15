@@ -13,7 +13,6 @@
 export interface LanguageState {
   language: chrome.languageSettingsPrivate.Language;
   removable: boolean;
-  translateEnabled: boolean;
   isManaged: boolean;
   isForced: boolean;
 }
@@ -23,7 +22,6 @@ export interface LanguageState {
  * supported: an array of languages, ordered alphabetically, set once
  *     at initialization.
  * enabled: an array of enabled language states, ordered by preference.
- * translateTarget: the default language to translate into.
  * prospectiveUILanguage: the "prospective" UI language, i.e., the one to be
  *     used on next restart. Matches the current UI language preference unless
  *     the user has chosen a different language without restarting. May differ
@@ -33,10 +31,6 @@ export interface LanguageState {
 export interface LanguagesModel {
   supported: chrome.languageSettingsPrivate.Language[];
   enabled: LanguageState[];
-  translateTarget: string;
-  alwaysTranslate: chrome.languageSettingsPrivate.Language[];
-  neverTranslate: chrome.languageSettingsPrivate.Language[];
-  neverTranslateSites: string[];
   // TODO(dpapad): Wrap prospectiveUILanguage with if expr "is_win" block.
   prospectiveUILanguage?: string;
 }
@@ -102,17 +96,6 @@ export interface LanguageHelper {
    * language to the blocked languages preference.
    */
   disableTranslateLanguage(languageCode: string): void;
-
-  /**
-   * Sets the translate target language.
-   */
-  setTranslateTargetLanguage(languageCode: string): void;
-
-  /**
-   * Sets whether a given language should always be automatically translated.
-   */
-  setLanguageAlwaysTranslateState(
-      languageCode: string, alwaysTranslate: boolean): void;
 
 
   getLanguage(languageCode: string): chrome.languageSettingsPrivate.Language

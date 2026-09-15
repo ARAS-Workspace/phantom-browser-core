@@ -99,7 +99,8 @@ suite('OverlayTranslateButton', function() {
     assertFalse(isRendered(overlayTranslateButtonElement.$.languagePicker));
 
     const expectedTargetLanguage =
-        await testLanguageBrowserProxy.getTranslateTargetLanguage();
+        (await testLanguageBrowserProxy.getClientLanguageList())[0]!
+            .languageCode;
     const focusRegionEventPromise =
         eventToPromise<FocusRegionEvent>('focus-region', document.body);
     let translateModeStateChangePromise =
@@ -282,7 +283,8 @@ suite('OverlayTranslateButton', function() {
     let sourceLanguage = args[0];
     let targetLanguage = args[1];
     const expectedTargetLanguage =
-        await testLanguageBrowserProxy.getTranslateTargetLanguage();
+        (await testLanguageBrowserProxy.getClientLanguageList())[0]!
+            .languageCode;
     assertEquals(sourceLanguage, 'en');
     assertEquals(targetLanguage, expectedTargetLanguage);
 

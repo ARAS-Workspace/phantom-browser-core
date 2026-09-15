@@ -126,79 +126,6 @@ class LanguageSettingsPrivateMoveLanguageFunction : public ExtensionFunction {
   ResponseAction Run() override;
 };
 
-// Implements the languageSettingsPrivate.getAlwaysTranslateLanguages method.
-class LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction
-    : public ExtensionFunction {
- public:
-  LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction();
-
-  LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction(
-      const LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction&) =
-      delete;
-  LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction& operator=(
-      const LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction&) =
-      delete;
-
-  DECLARE_EXTENSION_FUNCTION(
-      "languageSettingsPrivate.getAlwaysTranslateLanguages",
-      LANGUAGESETTINGSPRIVATE_GETALWAYSTRANSLATELANGUAGES)
-
- protected:
-  ~LanguageSettingsPrivateGetAlwaysTranslateLanguagesFunction() override;
-
-  // ExtensionFunction overrides.
-  ResponseAction Run() override;
-};
-
-// Implements the languageSettingsPrivate.setLanguageAlwaysTranslateState
-// method.
-class LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction
-    : public ExtensionFunction {
- public:
-  LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction();
-
-  LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction(
-      const LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction&) =
-      delete;
-  LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction& operator=(
-      const LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction&) =
-      delete;
-
-  DECLARE_EXTENSION_FUNCTION(
-      "languageSettingsPrivate.setLanguageAlwaysTranslateState",
-      LANGUAGESETTINGSPRIVATE_SETLANGUAGEALWAYSTRANSLATESTATE)
-
- protected:
-  ~LanguageSettingsPrivateSetLanguageAlwaysTranslateStateFunction() override;
-
-  // ExtensionFunction overrides.
-  ResponseAction Run() override;
-};
-
-// Implements the languageSettingsPrivate.getNeverTranslateLanguages method.
-class LanguageSettingsPrivateGetNeverTranslateLanguagesFunction
-    : public ExtensionFunction {
- public:
-  LanguageSettingsPrivateGetNeverTranslateLanguagesFunction();
-
-  LanguageSettingsPrivateGetNeverTranslateLanguagesFunction(
-      const LanguageSettingsPrivateGetNeverTranslateLanguagesFunction&) =
-      delete;
-  LanguageSettingsPrivateGetNeverTranslateLanguagesFunction& operator=(
-      const LanguageSettingsPrivateGetNeverTranslateLanguagesFunction&) =
-      delete;
-
-  DECLARE_EXTENSION_FUNCTION(
-      "languageSettingsPrivate.getNeverTranslateLanguages",
-      LANGUAGESETTINGSPRIVATE_GETNEVERTRANSLATELANGUAGES)
-
- protected:
-  ~LanguageSettingsPrivateGetNeverTranslateLanguagesFunction() override;
-
-  // ExtensionFunction overrides.
-  ResponseAction Run() override;
-};
-
 // Implements the languageSettingsPrivate.getSpellcheckDictionaryStatuses
 // method.
 class LanguageSettingsPrivateGetSpellcheckDictionaryStatusesFunction
@@ -297,54 +224,6 @@ class LanguageSettingsPrivateRemoveSpellcheckWordFunction
 
  protected:
   ~LanguageSettingsPrivateRemoveSpellcheckWordFunction() override;
-
-  // ExtensionFunction overrides.
-  ResponseAction Run() override;
-};
-
-// Implements the languageSettingsPrivate.getTranslateTargetLanguage method.
-class LanguageSettingsPrivateGetTranslateTargetLanguageFunction
-    : public ExtensionFunction {
- public:
-  LanguageSettingsPrivateGetTranslateTargetLanguageFunction();
-
-  LanguageSettingsPrivateGetTranslateTargetLanguageFunction(
-      const LanguageSettingsPrivateGetTranslateTargetLanguageFunction&) =
-      delete;
-  LanguageSettingsPrivateGetTranslateTargetLanguageFunction& operator=(
-      const LanguageSettingsPrivateGetTranslateTargetLanguageFunction&) =
-      delete;
-
-  DECLARE_EXTENSION_FUNCTION(
-      "languageSettingsPrivate.getTranslateTargetLanguage",
-      LANGUAGESETTINGSPRIVATE_GETTRANSLATETARGETLANGUAGE)
-
- protected:
-  ~LanguageSettingsPrivateGetTranslateTargetLanguageFunction() override;
-
-  // ExtensionFunction overrides.
-  ResponseAction Run() override;
-};
-
-// Implements the languageSettingsPrivate.setTranslateTargetLanguage method.
-class LanguageSettingsPrivateSetTranslateTargetLanguageFunction
-    : public ExtensionFunction {
- public:
-  LanguageSettingsPrivateSetTranslateTargetLanguageFunction();
-
-  LanguageSettingsPrivateSetTranslateTargetLanguageFunction(
-      const LanguageSettingsPrivateSetTranslateTargetLanguageFunction&) =
-      delete;
-  LanguageSettingsPrivateSetTranslateTargetLanguageFunction& operator=(
-      const LanguageSettingsPrivateSetTranslateTargetLanguageFunction&) =
-      delete;
-
-  DECLARE_EXTENSION_FUNCTION(
-      "languageSettingsPrivate.setTranslateTargetLanguage",
-      LANGUAGESETTINGSPRIVATE_SETTRANSLATETARGETLANGUAGE)
-
- protected:
-  ~LanguageSettingsPrivateSetTranslateTargetLanguageFunction() override;
 
   // ExtensionFunction overrides.
   ResponseAction Run() override;
