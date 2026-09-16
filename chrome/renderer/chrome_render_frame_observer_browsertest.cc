@@ -46,7 +46,7 @@ namespace {
 
 class FakeLanguageDetectionHost
     : public language_detection::mojom::LanguageDetectionHost {
-public:
+ public:
   FakeLanguageDetectionHost() = default;
   ~FakeLanguageDetectionHost() override = default;
 
@@ -59,7 +59,7 @@ public:
 
   // language_detection::mojom::LanguageDetectionHost implementation.
   void LanguageDetermined(
-      const language_detection::LanguageDetectionDetails &details) override {
+      const language_detection::LanguageDetectionDetails& details) override {
     language_determined_count_ += 1;
     has_run_lang_detection_ = details.has_run_lang_detection;
   }
@@ -67,7 +67,7 @@ public:
   int language_determined_count_ = 0;
   bool has_run_lang_detection_ = false;
 
-private:
+ private:
   mojo::ReceiverSet<language_detection::mojom::LanguageDetectionHost>
       receivers_;
 };

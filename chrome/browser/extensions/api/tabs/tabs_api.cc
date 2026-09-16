@@ -633,7 +633,7 @@ bool IsDSERemoval(const ExtensionId& extension_id,
 //   - chrome:// and chrome-native:// for all platforms
 // - the devtools (which is considered UI)
 // - about:blank
-bool IsLanguageDetectableURL(const GURL &url) {
+bool IsLanguageDetectableURL(const GURL& url) {
   return !url.is_empty() && !url.SchemeIs(content::kChromeUIScheme) &&
          !url.SchemeIs(chrome::kChromeNativeScheme) &&
          !url.SchemeIs(content::kChromeDevToolsScheme) && !url.IsAboutBlank();
