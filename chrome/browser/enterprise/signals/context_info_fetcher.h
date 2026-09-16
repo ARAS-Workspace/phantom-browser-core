@@ -12,7 +12,6 @@
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
 #include "components/device_signals/core/common/common_types.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/common.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
@@ -87,16 +86,6 @@ class ContextInfoFetcher {
   std::vector<std::string> GetBrowserAffiliationIDs();
 
   std::vector<std::string> GetProfileAffiliationIDs();
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  std::vector<std::string> GetAnalysisConnectorProviders(
-      enterprise_connectors::AnalysisConnector connector);
-
-  enterprise_connectors::EnterpriseRealTimeUrlCheckMode
-  GetRealtimeUrlCheckMode();
-
-  std::vector<std::string> GetOnSecurityEventProviders();
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
   device_signals::SettingValue GetOSFirewall();
 

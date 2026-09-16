@@ -26,10 +26,6 @@
 #include "components/version_info/version_info.h"
 #include "device_management_backend.pb.h"
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
-#endif
-
 namespace enterprise_signals {
 
 using SettingValue = device_signals::SettingValue;
@@ -89,18 +85,6 @@ void ContextInfoFetcher::Fetch(ContextInfoCallback callback) {
 
   info.browser_affiliation_ids = GetBrowserAffiliationIDs();
   info.profile_affiliation_ids = GetProfileAffiliationIDs();
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  info.on_file_attached_providers =
-      GetAnalysisConnectorProviders(enterprise_connectors::FILE_ATTACHED);
-  info.on_file_downloaded_providers =
-      GetAnalysisConnectorProviders(enterprise_connectors::FILE_DOWNLOADED);
-  info.on_bulk_data_entry_providers =
-      GetAnalysisConnectorProviders(enterprise_connectors::BULK_DATA_ENTRY);
-  info.on_print_providers =
-      GetAnalysisConnectorProviders(enterprise_connectors::PRINT);
-  info.realtime_url_check_mode = GetRealtimeUrlCheckMode();
-  info.on_security_event_providers = GetOnSecurityEventProviders();
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
   info.browser_version = version_info::GetVersionNumber();
   info.site_isolation_enabled = device_signals::GetSiteIsolationEnabled();
   info.built_in_dns_client_enabled =
@@ -138,22 +122,6 @@ std::vector<std::string> ContextInfoFetcher::GetProfileAffiliationIDs() {
                  ->user_affiliation_ids();
   return {ids.begin(), ids.end()};
 }
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-std::vector<std::string> ContextInfoFetcher::GetAnalysisConnectorProviders(
-    enterprise_connectors::AnalysisConnector connector) {
-  return connectors_service_->GetAnalysisServiceProviderNames(connector);
-}
-
-enterprise_connectors::EnterpriseRealTimeUrlCheckMode
-ContextInfoFetcher::GetRealtimeUrlCheckMode() {
-  return connectors_service_->GetAppliedRealTimeUrlCheck();
-}
-
-std::vector<std::string> ContextInfoFetcher::GetOnSecurityEventProviders() {
-  return connectors_service_->GetReportingServiceProviderNames();
-}
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
 SettingValue ContextInfoFetcher::GetOSFirewall() {
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

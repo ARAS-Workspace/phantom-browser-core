@@ -15,27 +15,9 @@
 #include "components/prefs/pref_service.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/analysis/content_analysis_sdk_manager.h"  // nogncheck
-#include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
-#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/tabs/tab_strip_model.h"
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-
 namespace enterprise_connectors {
 
 namespace {
-
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-static constexpr enterprise_connectors::AnalysisConnector
-    kLocalAnalysisConnectors[] = {
-        AnalysisConnector::BULK_DATA_ENTRY,
-        AnalysisConnector::FILE_ATTACHED,
-        AnalysisConnector::PRINT,
-};
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
 
 }  // namespace
 
@@ -43,65 +25,13 @@ ConnectorsManager::ConnectorsManager(PrefService* pref_service,
                                      const ServiceProviderConfig* config,
                                      bool observe_prefs)
     : ConnectorsManagerBase(pref_service, config, observe_prefs) {
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-  // Start observing tab strip models for all browsers.
-  ForEachCurrentBrowserWindowInterfaceOrderedByActivation(
-      [this](BrowserWindowInterface* browser) {
-        OnBrowserCreated(browser);
-        return true;
-      });
-  browser_collection_observation_.Observe(
-      GlobalBrowserCollection::GetInstance());
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
 
   if (observe_prefs) {
     StartObservingPrefs(pref_service);
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-    MaybeCloseLocalContentAnalysisAgentConnection();
-#endif
   }
 }
 
 ConnectorsManager::~ConnectorsManager() = default;
-
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-bool ConnectorsManager::IsConnectorEnabledForLocalAgent(
-    AnalysisConnector connector) const {
-  if (!IsAnalysisConnectorEnabled(connector)) {
-    return false;
-  }
-  return analysis_connector_settings_.at(connector)[0]->is_local_analysis();
-}
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-void ConnectorsManager::OnBrowserCreated(BrowserWindowInterface* browser) {
-  // TODO(crbug.com/452120900): TabStripModel auto-unregistered by dtor
-  browser->GetTabStripModel()->AddObserver(this);
-}
-
-void ConnectorsManager::OnTabStripModelChanged(
-    TabStripModel* tab_strip_model,
-    const TabStripModelChange& change,
-    const TabStripSelectionChange& selection) {
-  // Checking only when new tab is open.
-  if (change.type() != TabStripModelChange::kInserted) {
-    return;
-  }
-
-  for (auto connector : kLocalAnalysisConnectors) {
-    if (!IsConnectorEnabledForLocalAgent(connector)) {
-      continue;
-    }
-
-    // Send a connection event to the local agent. If all the enabled connectors
-    // are configured to use the same agent, the same connection is reused here.
-    auto configs = GetAnalysisServiceConfigs(connector);
-    enterprise_connectors::ContentAnalysisSdkManager::Get()->GetClient(
-        {configs[0]->local_path, configs[0]->user_specific});
-  }
-}
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
 
 void ConnectorsManager::CacheAnalysisConnectorPolicy(
     AnalysisConnector connector) const {
@@ -119,25 +49,8 @@ void ConnectorsManager::CacheAnalysisConnectorPolicy(
   }
 }
 
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-void ConnectorsManager::MaybeCloseLocalContentAnalysisAgentConnection() {
-  for (auto connector : kLocalAnalysisConnectors) {
-    if (IsConnectorEnabledForLocalAgent(connector)) {
-      // Return early because at lease one access point is enabled for local
-      // agent.
-      return;
-    }
-  }
-  // Delete connection with local agents when no access point is enabled.
-  ContentAnalysisSdkManager::Get()->ResetAllClients();
-}
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-
 void ConnectorsManager::OnAnalysisPrefChanged(AnalysisConnector connector) {
   CacheAnalysisConnectorPolicy(connector);
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-  MaybeCloseLocalContentAnalysisAgentConnection();
-#endif
 }
 
 DataRegion ConnectorsManager::GetDataRegion(AnalysisConnector connector) const {

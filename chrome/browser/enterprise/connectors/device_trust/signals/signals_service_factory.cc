@@ -19,10 +19,6 @@
 #include "components/enterprise/device_trust/core/signals/signals_service_impl.h"
 #include "components/policy/core/common/management/management_service.h"
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "base/check.h"
 #include "chrome/browser/enterprise/connectors/device_trust/signals/decorators/browser/browser_signals_decorator.h"
@@ -50,12 +46,6 @@ std::unique_ptr<SignalsService> CreateSignalsService(Profile* profile) {
   std::vector<std::unique_ptr<SignalsDecorator>> decorators;
 
   decorators.push_back(std::make_unique<CommonSignalsDecorator>());
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  decorators.push_back(std::make_unique<ContextSignalsDecorator>(
-      enterprise_signals::ContextInfoFetcher::CreateInstance(
-          profile, ConnectorsServiceFactory::GetForBrowserContext(profile))));
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 

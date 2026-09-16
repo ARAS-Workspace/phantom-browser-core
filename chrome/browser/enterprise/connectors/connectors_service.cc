@@ -22,7 +22,6 @@
 #include "chrome/browser/safe_browsing/cloud_content_scanning/deep_scanning_utils.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/enterprise/browser/controller/browser_dm_token_storage.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/common/proto/connectors.pb.h"
 #include "components/enterprise/connectors/core/connectors_manager_base.h"
 #include "components/enterprise/connectors/core/connectors_prefs.h"
@@ -41,11 +40,6 @@
 #include "content/public/common/url_constants.h"
 #include "device_management_backend.pb.h"
 #include "google_apis/gaia/gaia_auth_util.h"
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-#include "chrome/browser/extensions/chrome_content_browser_client_extensions_part.h"  // nogncheck crbug.com/40147906
-#include "extensions/browser/extension_registry_factory.h"  // nogncheck crbug.com/40147906
-#endif
 
 #include "components/policy/core/common/cloud/profile_cloud_policy_manager.h"
 
@@ -176,8 +170,7 @@ std::string ConnectorsService::GetManagementDomain() {
 }
 
 bool ConnectorsService::IsProfileAffiliated() const {
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(FULL_SAFE_BROWSING)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
   return IsAffiliated(Profile::FromBrowserContext(context_));
 #else
   return false;
@@ -321,9 +314,6 @@ ConnectorsServiceFactory::ConnectorsServiceFactory()
     : BrowserContextKeyedServiceFactory(
           "ConnectorsService",
           BrowserContextDependencyManager::GetInstance()) {
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  DependsOn(extensions::ExtensionRegistryFactory::GetInstance());
-#endif
 }
 
 ConnectorsServiceFactory::~ConnectorsServiceFactory() = default;
@@ -339,14 +329,6 @@ ConnectorsServiceFactory::BuildServiceInstanceForBrowserContext(
 
 content::BrowserContext* ConnectorsServiceFactory::GetBrowserContextToUse(
     content::BrowserContext* context) const {
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  // Do not construct the connectors service if the extensions are disabled for
-  // the given context.
-  if (extensions::ChromeContentBrowserClientExtensionsPart::
-          AreExtensionsDisabledForProfile(context)) {
-    return nullptr;
-  }
-#endif
 
   // On Chrome OS, settings from the primary/main profile apply to all
   // profiles, besides incognito.

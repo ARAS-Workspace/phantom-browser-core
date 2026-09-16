@@ -7,7 +7,6 @@
 
 #include "base/task/sequenced_task_runner.h"
 #include "chrome/browser/chrome_browser_main_extra_parts.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/reporting/client/report_queue_provider.h"
 
 namespace reporting {
@@ -29,10 +28,6 @@ class ChromeBrowserMainExtraPartsEnterprise
   ~ChromeBrowserMainExtraPartsEnterprise() override;
 
   // ChromeBrowserMainExtraParts:
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && \
-    BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-  void PostProfileInit(Profile* profile, bool is_initial_profile) override;
-#endif
   void PostCreateMainMessageLoop() override;
 
  private:

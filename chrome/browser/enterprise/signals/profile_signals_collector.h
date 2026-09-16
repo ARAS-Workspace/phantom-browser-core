@@ -8,7 +8,6 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "components/device_signals/core/browser/base_signals_collector.h"
-#include "components/enterprise/buildflags/buildflags.h"
 
 class PrefService;
 class Profile;
@@ -49,7 +48,7 @@ class ProfileSignalsCollector : public BaseSignalsCollector {
   const raw_ptr<PolicyBlocklistService, DisableDanglingPtrDetection> policy_blocklist_service_;
   const raw_ptr<PrefService, DisableDanglingPtrDetection> profile_prefs_;
   const raw_ptr<policy::CloudPolicyManager, DisableDanglingPtrDetection> policy_manager_;
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   const raw_ptr<enterprise_connectors::ConnectorsService, DisableDanglingPtrDetection> connectors_service_;
 #endif
   const raw_ptr<enterprise::ProfileIdService, DisableDanglingPtrDetection> profile_id_service_;
