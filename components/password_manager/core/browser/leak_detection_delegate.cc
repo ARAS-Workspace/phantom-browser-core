@@ -42,15 +42,6 @@ namespace {
 
 using Logger = autofill::SavePasswordProgressLogger;
 
-std::unique_ptr<autofill::SavePasswordProgressLogger> GetLogger(
-    PasswordManagerClient* client) {
-  if (client && password_manager_util::IsLoggingActive(client)) {
-    return std::make_unique<BrowserSavePasswordProgressLogger>(
-        client->GetCurrentLogManager());
-  }
-  return nullptr;
-}
-
 std::variant<LeakedPasswordDetails, GURL> PassUrl(GURL url) {
   return url;
 }
@@ -115,8 +106,7 @@ void LeakDetectionDelegate::StartLeakCheck(
   }
 
   if (!leak_factory_ ||
-      !LeakDetectionCheck::CanStartLeakCheck(*client_->GetPrefs(), form_url,
-                                             GetLogger(client_))) {
+      !LeakDetectionCheck::CanStartLeakCheck(*client_->GetPrefs(), form_url)) {
     return;
   }
 

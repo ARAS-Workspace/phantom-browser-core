@@ -9,7 +9,6 @@
 
 #include "base/check.h"
 #include "base/containers/flat_set.h"
-#include "components/autofill/core/common/save_password_progress_logger.h"
 #include "components/password_manager/core/browser/leak_detection/bulk_leak_check.h"
 #include "components/password_manager/core/browser/leak_detection/encryption_utils.h"
 #include "components/password_manager/core/browser/leak_detection/leak_detection_check.h"
@@ -83,8 +82,7 @@ size_t BulkLeakCheckServiceAdapter::GetPendingChecksCount() const {
 
 void BulkLeakCheckServiceAdapter::OnEdited(
     const CredentialUIEntry& credential) {
-  if (LeakDetectionCheck::CanStartLeakCheck(*prefs_, credential.GetURL(),
-                                            nullptr)) {
+  if (LeakDetectionCheck::CanStartLeakCheck(*prefs_, credential.GetURL())) {
     // Here no extra canonicalization is needed, as there are no other
     // credentials we could de-dupe before we pass it on to the service.
     std::vector<LeakCheckCredential> credentials;

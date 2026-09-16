@@ -12,10 +12,6 @@
 #include "components/password_manager/core/browser/leak_detection/leak_detection_types.h"
 #include "url/gurl.h"
 
-namespace autofill {
-class SavePasswordProgressLogger;
-}  // namespace autofill
-
 class PrefService;
 
 namespace password_manager {
@@ -47,18 +43,16 @@ class LeakDetectionCheck {
                      const PasswordForm& credentials,
                      LeakDetectionCallback callback) = 0;
 
-  // Determines whether the leak check can be started depending on `prefs`. Will
-  // use `logger` for logging if non-null. Leak check can be blocked if
-  // |origin_url| appears on SafeBrowsingAllowlistDomains setting.
+  // Determines whether the leak check can be started depending on `prefs`.
+  // Leak check can be blocked if |origin_url| appears on
+  // SafeBrowsingAllowlistDomains setting.
   // It should be set to either:
   // - URL of the frame that contains the submitted password form
   // - top frame URL
   // - credential URL if none of above are available (ie in
   // BulkLeakCheckServiceAdapter::OnEdited)
-  static bool CanStartLeakCheck(
-      const PrefService& prefs,
-      const GURL& form_url,
-      std::unique_ptr<autofill::SavePasswordProgressLogger> logger) {
+  static bool CanStartLeakCheck(const PrefService& prefs,
+                                const GURL& form_url) {
     return false;
   }
 };
