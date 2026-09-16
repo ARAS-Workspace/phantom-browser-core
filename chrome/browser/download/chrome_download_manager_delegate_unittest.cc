@@ -55,7 +55,6 @@
 #include "components/download/public/common/download_stats.h"
 #include "components/download/public/common/download_target_info.h"
 #include "components/download/public/common/mock_download_item.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/buildflags.h"
@@ -2718,51 +2717,7 @@ TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
                                                  base::OnceClosure()));
 }
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
-       TrustedSourcesDontExemptEnterpriseScans) {
-  base::CommandLine* command_line(base::CommandLine::ForCurrentProcess());
-  DCHECK(command_line);
-  command_line->AppendSwitchASCII(switches::kTrustedDownloadSources,
-                                  "trusted.com");
-
-  policy::SetDMTokenForTesting(policy::DMToken::CreateValidToken("dm_token"));
-  enterprise_connectors::test::SetAnalysisConnector(
-      pref_service(), enterprise_connectors::FILE_DOWNLOADED,
-      R"({
-        "service_provider": "google",
-        "enable": [
-          {
-            "url_list": ["*"],
-            "tags": ["malware"]
-          }
-        ],
-        "block_until_verdict": 1
-      })");
-
-  GURL download_url("http://trusted.com/best-download-ever.exe");
-  pref_service()->SetBoolean(prefs::kSafeBrowsingForTrustedSourcesEnabled,
-                             false);
-  std::unique_ptr<download::MockDownloadItem> download_item =
-      CreateActiveDownloadItem(0);
-  EXPECT_CALL(*download_item, GetURL()).WillRepeatedly(ReturnRef(download_url));
-  EXPECT_CALL(*download_item, RequireSafetyChecks())
-      .WillRepeatedly(Return(true));
-  EXPECT_CALL(*delegate(), GetDownloadProtectionService());
-  EXPECT_CALL(*download_protection_service(), MockCheckClientDownload())
-      .WillOnce(Return(safe_browsing::DownloadCheckResult::SAFE));
-  EXPECT_CALL(*download_item, GetDangerType())
-      .WillRepeatedly(Return(download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS));
-
-  base::RunLoop run_loop;
-  ASSERT_FALSE(delegate()->ShouldCompleteDownload(download_item.get(),
-                                                  run_loop.QuitClosure()));
-  run_loop.Run();
-  policy::SetDMTokenForTesting(policy::DMToken::CreateEmptyToken());
-}
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
        ShouldObfuscateDownload) {
   base::test::ScopedFeatureList scoped_feature_list;
@@ -2829,11 +2784,11 @@ TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
 
   EXPECT_FALSE(delegate()->ShouldObfuscateDownload(download_item.get()));
 }
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #endif  // SAFE_BROWSING_DOWNLOAD_PROTECTION
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeDownloadManagerDelegateTest, DeobfuscationBeforeCompletion) {
   base::test::ScopedFeatureList enable_feature(
       enterprise_obfuscation::kEnterpriseFileObfuscation);
@@ -2935,7 +2890,7 @@ TEST_F(ChromeDownloadManagerDelegateTest,
   ASSERT_TRUE(final_data);
   EXPECT_FALSE(final_data->is_obfuscated);
 }
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 

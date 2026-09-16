@@ -628,11 +628,7 @@ bool DownloadUIModel::IsCommandEnabled(
     case DownloadCommands::CANCEL_DEEP_SCAN:
       return true;
     case DownloadCommands::REVIEW:
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-      return true;
-#else
       return false;
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
     case DownloadCommands::OPEN_SAFE_BROWSING_SETTING:
       return CanUserTurnOnSafeBrowsing(profile());
   }

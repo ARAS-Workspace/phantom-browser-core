@@ -152,7 +152,7 @@
 #include "components/offline_pages/core/client_namespace_constants.h"  // nogncheck crbug.com/40147906
 #endif
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/connectors/core/cloud_content_scanning/binary_upload_service.h"  // nogncheck crbug.com/40147906
 #include "components/enterprise/obfuscation/core/download_obfuscator.h"
 #include "components/enterprise/obfuscation/core/utils.h"
@@ -168,11 +168,6 @@
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/reporting/reporting_event_router_factory.h"  // nogncheck crbug.com/40147906
-#include "components/enterprise/connectors/core/reporting_constants.h"  // nogncheck crbug.com/40147906
-#include "components/enterprise/connectors/core/reporting_event_router.h"  // nogncheck crbug.com/40147906
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 #endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 using content::BrowserThread;
@@ -229,16 +224,6 @@ enum PlatformDownloadPathType {
 // How the platform path is determined is based on PlatformDownloadPathType.
 base::FilePath GetPlatformDownloadPath(const DownloadItem* download,
                                        PlatformDownloadPathType path_type) {
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  auto* obfuscation_data =
-      static_cast<enterprise_obfuscation::DownloadObfuscationData*>(
-          download->GetUserData(
-              enterprise_obfuscation::DownloadObfuscationData::kUserDataKey));
-  if (obfuscation_data && !obfuscation_data->original_target_path.empty() &&
-      path_type == PLATFORM_TARGET_PATH) {
-    return obfuscation_data->original_target_path;
-  }
-#endif
 
   if (path_type == PLATFORM_TARGET_PATH) {
     return download->GetTargetFilePath();
@@ -495,35 +480,6 @@ void MaybeReportDangerousDownloadBlocked(
     }
   }
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  auto* router =
-      enterprise_connectors::ReportingEventRouterFactory::GetForBrowserContext(
-          browser_context);
-  if (router) {
-    std::string raw_digest_sha256;
-    if (download->GetState() == DownloadItem::DownloadState::COMPLETE) {
-      raw_digest_sha256 = download->GetHash();
-    }
-    google::protobuf::RepeatedPtrField<safe_browsing::ReferrerChainEntry>
-        referrer_chain;
-    if (base::FeatureList::IsEnabled(safe_browsing::kEnhancedFieldsForSecOps)) {
-      referrer_chain =
-          safe_browsing::GetOrIdentifyReferrerChainForEnterprise(*download);
-    }
-
-    router->OnDangerousDownloadEvent(
-        download->GetURL(), download->GetTabUrl(), /*source*/ "",
-        /*destination=*/"", download_path, base::HexEncode(raw_digest_sha256),
-        danger_type, download->GetMimeType(),
-        enterprise_connectors::kFileDownloadDataTransferEventTrigger,
-        /*scan_id=*/"", /*content_transfer_method=*/"",
-        download->GetTotalBytes(), referrer_chain,
-        enterprise_connectors::CollectFrameUrls(
-            content::DownloadItemUtils::GetWebContents(download),
-            enterprise_connectors::DeepScanAccessPoint::DOWNLOAD),
-        enterprise_connectors::EventResult::BLOCKED);
-  }
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 #endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 }
 
@@ -924,7 +880,7 @@ bool ChromeDownloadManagerDelegate::IsDownloadReadyForCompletion(
     DownloadItem* item,
     base::OnceClosure internal_complete_callback) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (item->GetDangerType() == download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED) {
     // For obfuscated files, deobfuscate after validation.
     enterprise_obfuscation::DownloadObfuscationData* obfuscation_data =
@@ -1038,7 +994,7 @@ bool ChromeDownloadManagerDelegate::IsDownloadReadyForCompletion(
   return true;
 }
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 void ChromeDownloadManagerDelegate::OnDeobfuscationComplete(
     uint32_t download_id,
     base::OnceClosure callback,
@@ -1124,7 +1080,7 @@ bool ChromeDownloadManagerDelegate::ShouldOpenDownload(
 
 bool ChromeDownloadManagerDelegate::ShouldObfuscateDownload(
     download::DownloadItem* item) {
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (!base::FeatureList::IsEnabled(
           enterprise_obfuscation::kEnterpriseFileObfuscation)) {
     return false;

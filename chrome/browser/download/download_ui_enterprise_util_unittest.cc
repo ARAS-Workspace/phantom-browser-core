@@ -13,7 +13,6 @@
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/testing_profile_manager.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/common/proto/connectors.pb.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
@@ -85,11 +84,7 @@ TEST_F(DownloadUiEnterpriseUtilTest, DoesDownloadConnectorBlock) {
           enterprise_connectors::FILE_DOWNLOADED),
       *base::JSONReader::Read(kDownloadConnectorEnabledBlockingPref,
                               base::JSON_PARSE_CHROMIUM_EXTENSIONS));
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  EXPECT_TRUE(DoesDownloadConnectorBlock(profile_, GURL()));
-#else
   EXPECT_FALSE(DoesDownloadConnectorBlock(profile_, GURL()));
-#endif
 }
 
 }  // namespace

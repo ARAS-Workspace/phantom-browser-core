@@ -473,15 +473,7 @@ downloads::mojom::DataPtr DownloadsListTracker::CreateDownloadData(
   file_value->tailored_warning_type = tailored_warning_type;
   file_value->is_dangerous = download_item->IsDangerous();
   file_value->is_insecure = download_item->IsInsecure();
-  file_value->is_reviewable =
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-      enterprise_connectors::ShouldPromptReviewForDownload(
-          Profile::FromBrowserContext(
-              content::DownloadItemUtils::GetBrowserContext(download_item)),
-          download_item);
-#else
-      false;
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
+  file_value->is_reviewable = false;
 
   file_value->last_reason_text = base::UTF16ToUTF8(last_reason_text);
   file_value->percent = percent;

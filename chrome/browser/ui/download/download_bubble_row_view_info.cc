@@ -10,17 +10,12 @@
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/browser/ui/download/download_item_mode.h"
 #include "components/download/public/common/download_danger_type.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/views/vector_icons.h"
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/common.h"
-#endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
@@ -115,27 +110,6 @@ void DownloadBubbleRowViewInfo::PopulateForInProgressOrComplete() {
     case download::DownloadItem::InsecureDownloadStatus::SILENT_BLOCK:
       break;
   }
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  if (enterprise_connectors::ShouldPromptReviewForDownload(
-          model_->profile(), model_->GetDownloadItem())) {
-    switch (model_->GetDangerType()) {
-      case download::DOWNLOAD_DANGER_TYPE_DANGEROUS_CONTENT:
-        primary_button_command_ = DownloadCommands::Command::REVIEW;
-        return;
-      case download::DOWNLOAD_DANGER_TYPE_POTENTIALLY_UNWANTED:
-        secondary_text_color_ = kColorDownloadItemTextWarning;
-        primary_button_command_ = DownloadCommands::Command::REVIEW;
-        return;
-      case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING:
-        secondary_text_color_ = kColorDownloadItemTextWarning;
-        primary_button_command_ = DownloadCommands::Command::REVIEW;
-        return;
-      default:
-        break;
-    }
-  }
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
   if (TailoredWarningType type = model_->GetTailoredWarningType();
       type != TailoredWarningType::kNoTailoredWarning) {
@@ -246,13 +220,6 @@ void DownloadBubbleRowViewInfo::PopulateForInterrupted(
     case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_GDRIVE:
     case download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_ONEDRIVE:
     case download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK: {
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-      if (enterprise_connectors::ShouldPromptReviewForDownload(
-              model_->profile(), model_->GetDownloadItem())) {
-        primary_button_command_ = DownloadCommands::Command::REVIEW;
-        return;
-      }
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
       has_subpage_ = true;
       return;
     }
