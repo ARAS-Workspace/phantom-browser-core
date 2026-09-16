@@ -72,7 +72,6 @@ constexpr std::string_view kHashSourcePrefixes[] = {
 constexpr char kChromeResourcesUrl[] = "chrome://resources";
 constexpr const char* const kExtensionsAllowedToUseChromeResources[] = {
     extension_misc::kChromeVoxExtensionId,
-    extension_misc::kIndigoExtensionId,
     // Used for ComponentExtensionWorkerChromeResourcesBrowserTest.
     extension_misc::kChromeResourcesTestExtensionId,
     extension_misc::kAimEligibilityExtensionId,

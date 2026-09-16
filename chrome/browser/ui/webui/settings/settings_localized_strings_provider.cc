@@ -25,7 +25,6 @@
 #include "chrome/browser/file_system_access/chrome_file_system_access_permission_context.h"
 #include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
-#include "chrome/browser/indigo/resources/grit/indigo_strings.h"
 #include "chrome/browser/net/system_network_context_manager.h"
 #include "chrome/browser/obsolete_system/obsolete_system.h"
 #include "chrome/browser/performance_manager/public/user_tuning/battery_saver_mode_manager.h"

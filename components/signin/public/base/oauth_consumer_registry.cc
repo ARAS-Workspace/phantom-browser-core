@@ -693,7 +693,7 @@ OAuthConsumer OAuthConsumerRegistry::GetOAuthConsumerFromId(
     case OAuthConsumerId::kGlicUserStatus:
       return GetOAuthConsumerForGlicUserStatus();
     case OAuthConsumerId::kIndigo:
-      return GetOAuthConsumerForIndigo();
+      NOTREACHED();
     case OAuthConsumerId::kDevtoolsGdp:
       return OAuthConsumer(
           /*name=*/kDevtoolsGdpName,

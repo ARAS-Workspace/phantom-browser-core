@@ -254,16 +254,6 @@ class ChromeOAuthConsumerRegistry : public signin::OAuthConsumerRegistry {
         {"https://www.googleapis.com/auth/drive.readonly"});
   }
 
-  signin::OAuthConsumer GetOAuthConsumerForIndigo() const override {
-    CHECK(base::FeatureList::IsEnabled(features::kIndigo));
-    std::string scopes_str = features::kIndigoScopes.Get();
-    std::vector<std::string> scopes_vec = base::SplitString(
-        scopes_str, ",", base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-    signin::ScopeSet scopes(scopes_vec.begin(), scopes_vec.end());
-    return signin::OAuthConsumer(signin::oauth_consumer_name::kIndigoName,
-                                 std::move(scopes));
-  }
-
   signin::OAuthConsumer GetOAuthConsumerForBrowserActuator() const override {
     CHECK(base::FeatureList::IsEnabled(browser_actuator::kBrowserActuator));
 

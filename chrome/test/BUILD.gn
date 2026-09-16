@@ -1783,10 +1783,6 @@ if (!is_android) {
       "//chrome/browser/image_fetcher:browser_tests",
       "//chrome/browser/importer",
       "//chrome/browser/importer:browser_tests",
-      "//chrome/browser/indigo",
-      "//chrome/browser/indigo:browser_tests",
-      "//chrome/browser/indigo:test_support",
-      "//chrome/browser/indigo/onboarding:browser_tests",
       "//chrome/browser/interstitials:idn_test_support",
       "//chrome/browser/language",
       "//chrome/browser/language_detection:browser_tests",
@@ -2540,7 +2536,6 @@ if (!is_android) {
       "//chrome/browser/ui/views/passwords/password_change:password_change_toast",
     ]
 
-    deps += [ "//chrome/browser/indigo/onboarding" ]
 
     allow_circular_includes_from = []
 
@@ -2780,7 +2775,6 @@ if (!is_android) {
       "../renderer/chrome_content_settings_agent_delegate_browsertest.cc",
       "../renderer/chrome_render_frame_observer_browsertest.cc",
       "../renderer/commerce/commerce_web_extractor_browsertest.cc",
-      "../renderer/indigo/indigo_agent_browsertest.cc",
       "base/devtools_listener_browsertest.cc",
       "base/in_process_browser_test_browsertest.cc",
       "base/memory_tracing_browsertest.cc",
@@ -5460,7 +5454,6 @@ test("unit_tests") {
       "//chrome/browser/geolocation",
       "//chrome/browser/geolocation:unit_tests",
       "//chrome/browser/glic/suggestions:unit_tests",
-      "//chrome/browser/indigo:unit_tests",
       "//chrome/browser/lookalikes:unit_tests",
       "//chrome/browser/media:access_handler",
       "//chrome/browser/metrics/critical_user_journeys:unit_tests",
@@ -6371,7 +6364,6 @@ test("unit_tests") {
       "//chrome/browser/ui/views/frame:test_with_browser_view",
       "//chrome/browser/ui/views/fullscreen_control",
       "//chrome/browser/ui/views/global_media_controls:unit_tests",
-      "//chrome/browser/ui/views/indigo:unit_tests",
       "//chrome/browser/ui/views/infobars",
       "//chrome/browser/ui/views/infobars:unit_tests",
       "//chrome/browser/ui/views/location_bar:unit_tests",
@@ -7848,7 +7840,6 @@ if (!is_android) {
       "//chrome/browser/glic",
       "//chrome/browser/glic:interactive_ui_tests",
       "//chrome/browser/glic/test_support",
-      "//chrome/browser/indigo:interactive_ui_tests",
       "//chrome/browser/skills:interactive_ui_tests",
       "//chrome/browser/ui/views/glic",
       "//chrome/browser/ui/views/tabs/glic",
@@ -7864,7 +7855,6 @@ if (!is_android) {
     data_deps += [
       "//chrome/browser/background/glic:interactive_ui_tests",
       "//chrome/browser/glic:interactive_ui_tests",
-      "//chrome/browser/indigo:interactive_ui_tests",
     ]
 
     sources += [ "../browser/media/router/discovery/access_code/access_code_cast_sink_service_browsertest.cc" ]

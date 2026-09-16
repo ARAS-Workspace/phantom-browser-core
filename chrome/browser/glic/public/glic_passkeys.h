@@ -18,10 +18,6 @@ class GlicPrivateInvokeFunction;
 class PdfViewerPrivateGlicSummarizeFunction;
 }
 
-namespace indigo {
-class IndigoPageActionController;
-}
-
 class GlicPasswordChangeActuator;
 
 namespace ttc {
@@ -67,7 +63,6 @@ class InvokeWithAutoSubmitPasskeyProvider {
   friend class GlicExperimentalTriggeringCoordinator;
   friend class GlicCueTarget;
   friend class GlicSelectionObserver;
-  friend class ::indigo::IndigoPageActionController;
   friend class ::ttc::AiOverlayTools;
   friend class ::skills::SkillsUiTabController;
   friend class ::skills::SkillsInvocationInteractiveUiTest;

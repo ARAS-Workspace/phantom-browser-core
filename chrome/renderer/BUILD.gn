@@ -388,12 +388,4 @@ static_library("renderer") {
     ]
   }
 
-  if (!is_android) {
-    sources += [
-      "indigo/indigo_agent.cc",
-      "indigo/indigo_agent.h",
-      "indigo/onboarding_agent.cc",
-      "indigo/onboarding_agent.h",
-    ]
-  }
 }

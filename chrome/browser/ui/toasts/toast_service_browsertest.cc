@@ -50,7 +50,6 @@ class ToastServiceBrowserTest : public InProcessBrowserTest {
          {data_sharing::features::kDataSharingFeature, {}},
          {features::kGlicActorUi, {{features::kGlicActorUiToastName, "true"}}},
          {multistep_filter::kMultistepFilter, {}},
-         {features::kIndigo, {}},
          {autofill::features::kAutofillAmbientAutofill, {}},
          {autofill::features::kAutofillAtMemory, {}},
          {dictation::kDictation, {}}},

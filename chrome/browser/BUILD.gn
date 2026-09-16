@@ -1073,8 +1073,6 @@ source_set("core") {
       "//chrome/browser/ui/webui:chrome_content_browser_client_webui_part",
       "//chrome/browser/ui/webui/history",
       "//chrome/browser/ui/webui/image",
-      "//chrome/browser/ui/webui/indigo_internals",
-      "//chrome/browser/ui/webui/indigo_internals:mojo_bindings",
       "//chrome/browser/ui/webui/new_tab_page",
       "//chrome/browser/ui/webui/signin/cross_device_signin_qr_bubble:mojo_bindings",
       "//chrome/browser/ui/webui/user_education_internals",
@@ -1114,7 +1112,6 @@ source_set("core") {
       "//chrome/browser/captive_portal",
       "//chrome/browser/enterprise/network_header_injection",
       "//chrome/browser/headless:headless_extra_parts",
-      "//chrome/browser/indigo/onboarding",
       "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
       "//chrome/browser/printing",
       "//chrome/browser/record_replay:impl",
@@ -2429,8 +2426,6 @@ source_set("browser") {
       "//chrome/browser/glic/selection",
       "//chrome/browser/importer",
       "//chrome/browser/importer:impl",
-      "//chrome/browser/indigo",
-      "//chrome/browser/indigo:impl",
       "//chrome/browser/lens/region_search",
       "//chrome/browser/media/router:mojo_impl",
       "//chrome/browser/media/router:providers_wired_display_impl",
@@ -3203,7 +3198,6 @@ group("browser_generated_files") {
     ]
   } else {
     public_deps += [
-      "//chrome/browser/indigo/resources:indigo_strings",
       "//chrome/browser/lens/core/mojom:mojo_bindings",
       "//chrome/browser/new_tab_page/modules/file_suggestion:mojo_bindings",
       "//chrome/browser/new_tab_page/modules/v2/authentication:mojo_bindings",

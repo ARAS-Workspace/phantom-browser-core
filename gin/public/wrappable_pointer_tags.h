@@ -42,8 +42,6 @@ enum WrappablePointerTag : uint16_t {
   kGinPerContextData,                // gin::PerContextData
   kGinPort,                          // extensions::GinPort
   kGpuBenchmarking,                  // content::GpuBenchmarking
-  kIndigoContext,                    // indigo::IndigoContext
-  kIndigoOnboarding,                 // indigo::OnboardingContext
   kJsBinding,                        // js_injection::JsBinding
   kJSHookInterface,                  // extensions::JSHookInterface
   kJsMessageEvent,                   // android_webview::JsMessageEvent

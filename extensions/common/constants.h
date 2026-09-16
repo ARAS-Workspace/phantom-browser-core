@@ -310,10 +310,6 @@ inline constexpr char kMimeHandlerPrivateTestExtensionId[] =
 inline constexpr char kChromeResourcesTestExtensionId[] =
     "gappgneknoemdkoefaaiaefeamkamdpf";
 
-// The extension id of the component extension used to render Indigo's image
-// replacement.
-inline constexpr char kIndigoExtensionId[] = "gcgachbpjjonjloecffgdajegokngglh";
-
 // The extension id of the AIM Eligibility component extension.
 inline constexpr char kAimEligibilityExtensionId[] =
     "kgjeljgkbckpoekmgjfplammhcggiiaf";

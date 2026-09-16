@@ -54,7 +54,6 @@ source_set("impl") {
     "//chrome/browser/dictation",
     "//chrome/browser/glic",
     "//chrome/browser/glic/browser_ui",
-    "//chrome/browser/indigo",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/send_tab_to_self",
     "//chrome/browser/skills:public",

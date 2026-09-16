@@ -740,7 +740,6 @@ mojom("mojo_bindings") {
 
   if (!is_android) {
     sources += [
-      "indigo/indigo.mojom",
       "password_manager/remote_actor_credential_sharing.mojom",
     ]
   }

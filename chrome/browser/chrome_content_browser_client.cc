@@ -492,7 +492,6 @@
 #include "chrome/browser/digital_credentials/digital_identity_provider_desktop.h"
 #include "chrome/browser/direct_sockets/chrome_direct_sockets_delegate.h"
 #include "chrome/browser/glic/public/features.h"
-#include "chrome/browser/indigo/onboarding/indigo_onboarding_dialog.h"
 #include "chrome/browser/loader/features.h"
 #include "chrome/browser/loader/fetch_keepalive_process_manager.h"
 #include "chrome/browser/metrics/usage_scenario/chrome_responsiveness_calculator_delegate.h"
@@ -4556,10 +4555,6 @@ void ChromeContentBrowserClient::OverrideWebPreferences(
     web_prefs->ai_ot_apis_enabled = true;
   }
 
-#if !BUILDFLAG(IS_ANDROID)
-  web_prefs->is_indigo_onboarding =
-      indigo::IndigoOnboardingDialog::IsOnboardingWebContents(web_contents);
-#endif
 }
 
 bool ChromeContentBrowserClientParts::OverrideWebPreferencesAfterNavigation(

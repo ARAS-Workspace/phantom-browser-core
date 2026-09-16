@@ -65,7 +65,6 @@ group("resources") {
       "gaia_auth_host:resources",
       "glic/selection_overlay:resources",
       "history:resources",
-      "indigo:resources",
       "inspect:resources",
       "iwa_dev:resources",
       "key_value_pair_viewer_shared:resources",
@@ -370,7 +369,6 @@ group("dev_ui_resources") {
   } else {
     public_deps += [
       "color_pipeline_internals:resources",
-      "indigo_internals:resources",
       "infobar_internals:resources",
       "media_router/internals:resources",
       "multistep_filter_internals:resources",
@@ -459,7 +457,6 @@ repack("dev_ui_paks") {
   } else {
     sources += [
       "$root_gen_dir/chrome/color_pipeline_internals_resources.pak",
-      "$root_gen_dir/chrome/indigo_internals_resources.pak",
       "$root_gen_dir/chrome/infobar_internals_resources.pak",
       "$root_gen_dir/chrome/media_router_internals_resources.pak",
       "$root_gen_dir/chrome/multistep_filter_internals_resources.pak",
