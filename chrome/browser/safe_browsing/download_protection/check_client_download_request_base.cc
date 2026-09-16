@@ -639,13 +639,6 @@ void CheckClientDownloadRequestBase::OnURLLoaderComplete(
 #endif
       );
     }
-
-#if !BUILDFLAG(IS_ANDROID)
-    bool upload_requested = response.upload();
-    MaybeBeginFeedbackForDownload(result, upload_requested,
-                                  client_download_request_data_,
-                                  *response_body);
-#endif
   }
 
   // We don't need the loader anymore.

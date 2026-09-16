@@ -363,10 +363,8 @@ std::string GetFailedUploadDurationUmaMetricName(
     EnterpriseReportingEventType event_type);
 
 // Access points used to record UMA metrics and specify which code location is
-// initiating a deep scan. Any new caller of
-// ContentAnalysisDelegate::CreateForWebContents should add an access point
-// here instead of reusing an existing value. histograms.xml should also be
-// updated by adding histograms with names
+// initiating a deep scan. histograms.xml should also be updated by adding
+// histograms with names
 //   "SafeBrowsing.DeepScan.<access-point>.BytesPerSeconds"
 //   "SafeBrowsing.DeepScan.<access-point>.Duration"
 //   "SafeBrowsing.DeepScan.<access-point>.<result>.Duration"

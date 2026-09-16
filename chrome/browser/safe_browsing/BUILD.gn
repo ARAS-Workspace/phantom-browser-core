@@ -368,8 +368,6 @@ static_library("safe_browsing") {
       # "Safe Browsing Full" files in addition to the "basic" ones to use for
       # full safe browsing. This has some in common with "mobile."
       public += [
-        "download_protection/download_feedback.h",
-        "download_protection/download_feedback_service.h",
         "download_protection/download_protection_delegate_desktop.h",
         "download_protection/path_sanitizer.h",
         "extension_telemetry/activity_log_ingester.h",
@@ -430,8 +428,6 @@ static_library("safe_browsing") {
         "tailored_security/notification_handler_desktop.h",
       ]
       sources += [
-        "download_protection/download_feedback.cc",
-        "download_protection/download_feedback_service.cc",
         "download_protection/download_protection_delegate_desktop.cc",
         "download_protection/path_sanitizer.cc",
         "extension_telemetry/activity_log_ingester.cc",
@@ -826,7 +822,6 @@ source_set("unit_tests") {
       "client_side_detection_intelligent_scan_delegate_factory_unittest.cc",
       "client_side_detection_service_factory_unittest.cc",
       "client_side_detection_service_unittest.cc",
-      "download_protection/download_feedback_service_unittest.cc",
       "download_protection/path_sanitizer_unittest.cc",
       "extension_telemetry/activity_log_ingester_unittest.cc",
       "extension_telemetry/cookies_get_all_signal_processor_unittest.cc",

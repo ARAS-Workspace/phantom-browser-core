@@ -44,48 +44,9 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/safe_browsing/android/download_protection_metrics_data.h"
-#else
-#include "chrome/browser/safe_browsing/download_protection/download_feedback.h"
-#include "chrome/browser/safe_browsing/download_protection/download_feedback_service.h"
 #endif
 
 namespace safe_browsing {
-
-namespace {
-
-#if !BUILDFLAG(IS_ANDROID)
-bool ShouldUploadToDownloadFeedback(DownloadCheckResult result) {
-  switch (result) {
-    case DownloadCheckResult::DANGEROUS_HOST:
-    case DownloadCheckResult::DANGEROUS:
-    case DownloadCheckResult::DANGEROUS_ACCOUNT_COMPROMISE:
-    case DownloadCheckResult::POTENTIALLY_UNWANTED:
-    case DownloadCheckResult::UNCOMMON:
-    case DownloadCheckResult::UNKNOWN:
-      return true;
-
-    case DownloadCheckResult::SENSITIVE_CONTENT_WARNING:
-    case DownloadCheckResult::DEEP_SCANNED_SAFE:
-    case DownloadCheckResult::DEEP_SCANNED_FAILED:
-    case DownloadCheckResult::SAFE:
-    case DownloadCheckResult::PROMPT_FOR_SCANNING:
-    case DownloadCheckResult::PROMPT_FOR_LOCAL_PASSWORD_SCANNING:
-    case DownloadCheckResult::IMMEDIATE_DEEP_SCAN:
-    case DownloadCheckResult::ASYNC_SCANNING:
-    case DownloadCheckResult::ASYNC_LOCAL_PASSWORD_SCANNING:
-    case DownloadCheckResult::BLOCKED_PASSWORD_PROTECTED:
-    case DownloadCheckResult::BLOCKED_TOO_LARGE:
-    case DownloadCheckResult::SENSITIVE_CONTENT_BLOCK:
-    case DownloadCheckResult::FORCE_SAVE_TO_GDRIVE:
-    case DownloadCheckResult::FORCE_SAVE_TO_ONEDRIVE:
-    case DownloadCheckResult::ALLOWLISTED_BY_POLICY:
-    case DownloadCheckResult::BLOCKED_SCAN_FAILED:
-      return false;
-  }
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-}  // namespace
 
 using content::BrowserThread;
 
@@ -231,28 +192,6 @@ void CheckClientDownloadRequest::SetDownloadProtectionData(
   DownloadProtectionService::SetDownloadProtectionData(item_, token, verdict,
                                                        tailored_verdict);
 }
-
-#if !BUILDFLAG(IS_ANDROID)
-void CheckClientDownloadRequest::MaybeBeginFeedbackForDownload(
-    DownloadCheckResult result,
-    bool upload_requested,
-    const std::string& request_data,
-    const std::string& response_body) {
-  if (!upload_requested) {
-    return;
-  }
-
-  if (item_->GetReceivedBytes() > DownloadFeedback::kMaxUploadSize) {
-    return;
-  }
-
-  if (ShouldUploadToDownloadFeedback(result) && !item_->IsInsecure()) {
-    Profile* profile = Profile::FromBrowserContext(GetBrowserContext());
-    service()->MaybeBeginFeedbackForDownload(profile, item_, request_data,
-                                             response_body);
-  }
-}
-#endif
 
 void CheckClientDownloadRequest::LogDeepScanningPrompt(bool did_prompt) const {
   if (did_prompt) {

@@ -115,16 +115,6 @@ void CheckFileSystemAccessWriteRequest::SetDownloadProtectionData(
   // IncidentReportingService usage.
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-void CheckFileSystemAccessWriteRequest::MaybeBeginFeedbackForDownload(
-    DownloadCheckResult result,
-    bool upload_requested,
-    const std::string& request_data,
-    const std::string& response_body) {
-  // TODO(crbug.com/41477698): Integrate with DownloadFeedbackService.
-}
-#endif
-
 std::optional<enterprise_connectors::AnalysisSettings>
 CheckFileSystemAccessWriteRequest::ShouldUploadBinary(
     DownloadCheckResultReason reason) {

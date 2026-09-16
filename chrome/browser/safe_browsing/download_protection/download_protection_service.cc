@@ -64,12 +64,6 @@
 #include "chrome/browser/extensions/api/safe_browsing_private/safe_browsing_private_event_router_factory.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "base/task/task_traits.h"
-#include "base/task/thread_pool.h"
-#include "chrome/browser/safe_browsing/download_protection/download_feedback_service.h"
-#endif
-
 using content::BrowserThread;
 
 namespace safe_browsing {
@@ -138,13 +132,6 @@ DownloadProtectionService::DownloadProtectionService(
     : sb_service_(sb_service),
       delegate_(std::move(delegate)),
       binary_feature_extractor_(base::MakeRefCounted<BinaryFeatureExtractor>()),
-#if !BUILDFLAG(IS_ANDROID)
-      feedback_service_(std::make_unique<DownloadFeedbackService>(
-          this,
-          base::ThreadPool::CreateSequencedTaskRunner(
-              {base::MayBlock(), base::TaskPriority::BEST_EFFORT})
-              .get())),
-#endif
       weak_ptr_factory_(this) {
   CHECK(delegate_);
   if (sb_service) {
@@ -453,8 +440,6 @@ void DownloadProtectionService::ReportSensitiveFileBypassEnterpriseEvent(
   if (!reporting_event_router) {
     return;
   }
-  enterprise_connectors::DownloadContentAreaUserProvider info(*item);
-
   reporting_event_router->OnSensitiveDataEvent(
       item->GetURL(), item->GetTabUrl(), /*source=*/"",
       /*destination=*/"", metadata.filename, metadata.sha256,
@@ -462,7 +447,7 @@ void DownloadProtectionService::ReportSensitiveFileBypassEnterpriseEvent(
       enterprise_connectors::kFileDownloadDataTransferEventTrigger,
       metadata.scan_response.request_token(),
       /*content_transfer_method=*/"", /*source_email=*/"",
-      info.GetContentAreaAccountEmail(),
+      /*content_area_email=*/"",
       /*user_justification=*/std::nullopt, result, metadata.size,
       referrer_chain, frame_urls, enterprise_connectors::EventResult::BYPASSED);
 }
@@ -576,7 +561,6 @@ void DownloadProtectionService::OnDangerousDownloadOpened(
   if (scan_result &&
       item->GetDangerType() ==
           download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING) {
-    enterprise_connectors::DownloadContentAreaUserProvider info(*item);
     for (const auto& metadata : scan_result->file_metadata) {
       for (const auto& result : metadata.scan_response.results()) {
         if (result.tag() != "dlp") {
@@ -610,23 +594,6 @@ const GURL& DownloadProtectionService::GetDownloadRequestUrl() const {
 
 base::TimeDelta DownloadProtectionService::GetDownloadRequestTimeout() const {
   return kDownloadRequestTimeoutMs;
-}
-
-bool DownloadProtectionService::MaybeBeginFeedbackForDownload(
-    Profile* profile,
-    download::DownloadItem* download,
-    const std::string& ping_request,
-    const std::string& ping_response) {
-#if !BUILDFLAG(IS_ANDROID)
-  PrefService* prefs = profile->GetPrefs();
-  bool is_extended_reporting = IsExtendedReportingEnabled(*prefs);
-  if (!profile->IsOffTheRecord() && is_extended_reporting) {
-    feedback_service_->BeginFeedbackForDownload(profile, download, ping_request,
-                                                ping_response);
-    return true;
-  }
-#endif
-  return false;
 }
 
 // static

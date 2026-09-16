@@ -62,10 +62,6 @@ class ClientDownloadRequest;
 class DownloadRequestMaker;
 class SafeBrowsingUIManager;
 
-#if !BUILDFLAG(IS_ANDROID)
-class DownloadFeedbackService;
-#endif
-
 // This class provides an asynchronous API to check whether a particular
 // client download is malicious or not.
 class DownloadProtectionService {
@@ -168,13 +164,6 @@ class DownloadProtectionService {
 
   // Returns the timeout that is used by CheckClientDownload().
   base::TimeDelta GetDownloadRequestTimeout() const;
-
-  // Checks the user permissions, and submits the downloaded file if
-  // appropriate. Returns whether the submission was successful.
-  bool MaybeBeginFeedbackForDownload(Profile* profile,
-                                     download::DownloadItem* download,
-                                     const std::string& ping_request,
-                                     const std::string& ping_response);
 
   // Registers a callback that will be run when a ClientDownloadRequest has
   // been formed.
@@ -360,10 +349,6 @@ class DownloadProtectionService {
 
   // BinaryFeatureExtractor object, may be overridden for testing.
   scoped_refptr<BinaryFeatureExtractor> binary_feature_extractor_;
-
-#if !BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<DownloadFeedbackService> feedback_service_;
-#endif
 
   // A list of callbacks to be run on the main thread when a
   // ClientDownloadRequest has been formed.

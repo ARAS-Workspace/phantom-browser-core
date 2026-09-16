@@ -139,8 +139,6 @@
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/download_protection/download_feedback.h"
-#include "chrome/browser/safe_browsing/download_protection/download_feedback_service.h"
 #include "chrome/browser/safe_browsing/incident_reporting/incident_reporting_service.h"
 #else
 #include "chrome/browser/safe_browsing/android/download_protection_metrics_data.h"
@@ -282,21 +280,6 @@ class MockSafeBrowsingDatabaseManager : public TestSafeBrowsingDatabaseManager {
  protected:
   ~MockSafeBrowsingDatabaseManager() override = default;
 };
-
-#if !BUILDFLAG(IS_ANDROID)
-class MockDownloadFeedbackService : public DownloadFeedbackService {
- public:
-  MockDownloadFeedbackService() : DownloadFeedbackService(nullptr, nullptr) {}
-  ~MockDownloadFeedbackService() override = default;
-
-  MOCK_METHOD(void,
-              BeginFeedbackForDownload,
-              (Profile * profile,
-               download::DownloadItem* download,
-               const std::string& ping_request,
-               const std::string& ping_response));
-};
-#endif
 
 class FakeSafeBrowsingService : public TestSafeBrowsingService {
  public:
@@ -483,11 +466,6 @@ class DownloadProtectionServiceTestBase
     ON_CALL(*binary_feature_extractor_, ExtractImageFeatures(_, _, _, _))
         .WillByDefault(Return(true));
     download_service_ = sb_service_->download_protection_service();
-#if !BUILDFLAG(IS_ANDROID)
-    auto feedback_service = std::make_unique<MockDownloadFeedbackService>();
-    feedback_service_ = feedback_service.get();
-    download_service_->feedback_service_ = std::move(feedback_service);
-#endif
     download_service_->binary_feature_extractor_ = binary_feature_extractor_;
     download_service_->SetEnabled(true);
     client_download_request_subscription_ =
@@ -556,9 +534,6 @@ class DownloadProtectionServiceTestBase
   void TearDown() override {
     client_download_request_subscription_ = {};
     file_system_access_write_request_subscription_ = {};
-#if !BUILDFLAG(IS_ANDROID)
-    feedback_service_ = nullptr;
-#endif
     sb_service_->ShutDown();
     sb_service_ = nullptr;
     TestingBrowserProcess::GetGlobal()->SetSafeBrowsingService(nullptr);
@@ -909,9 +884,6 @@ class DownloadProtectionServiceTestBase
 
   scoped_refptr<FakeSafeBrowsingService> sb_service_;
   scoped_refptr<MockBinaryFeatureExtractor> binary_feature_extractor_;
-#if !BUILDFLAG(IS_ANDROID)
-  raw_ptr<MockDownloadFeedbackService> feedback_service_;
-#endif
   raw_ptr<DownloadProtectionService, DanglingUntriaged> download_service_;
   DownloadCheckResult result_;
   bool has_result_;
@@ -1675,11 +1647,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
                   tmp_path_, BinaryFeatureExtractor::kDefaultOptions, _, _))
       .Times(9);
   SetEnhancedProtectionPrefForTests(profile()->GetPrefs(), true);
-#if !BUILDFLAG(IS_ANDROID)
-  std::string feedback_ping;
-  std::string feedback_response;
-#endif
-  ClientDownloadResponse expected_response;
 
   {
     base::HistogramTester histogram_tester;
@@ -1712,9 +1679,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
     EXPECT_TRUE(IsResult(DownloadCheckResult::SAFE));
     EXPECT_TRUE(HasClientDownloadRequest());
     ClearClientDownloadRequest();
-#if !BUILDFLAG(IS_ANDROID)
-    Mock::VerifyAndClearExpectations(feedback_service_);
-#endif
   }
   {
     // If the response is dangerous the result should also be marked as
@@ -1730,28 +1694,18 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
     EXPECT_TRUE(IsResult(DownloadCheckResult::DANGEROUS));
     EXPECT_TRUE(HasClientDownloadRequest());
     ClearClientDownloadRequest();
-#if !BUILDFLAG(IS_ANDROID)
-    Mock::VerifyAndClearExpectations(feedback_service_);
-#endif
   }
   {
     // If the response is dangerous and the server requests an upload,
     // we should upload.
     PrepareResponse(ClientDownloadResponse::DANGEROUS, net::HTTP_OK, net::OK,
                     true /* upload_requested */);
-#if !BUILDFLAG(IS_ANDROID)
-    EXPECT_CALL(*feedback_service_,
-                BeginFeedbackForDownload(profile(), &item, _, _));
-#endif
     RunLoop run_loop;
     download_service_->CheckClientDownload(
         &item,
         base::BindRepeating(&DownloadProtectionServiceTest::CheckDoneCallback,
                             base::Unretained(this), run_loop.QuitClosure()));
     run_loop.Run();
-#if !BUILDFLAG(IS_ANDROID)
-    Mock::VerifyAndClearExpectations(feedback_service_);
-#endif
     EXPECT_TRUE(IsResult(DownloadCheckResult::DANGEROUS));
     EXPECT_TRUE(HasClientDownloadRequest());
     ClearClientDownloadRequest();
@@ -1760,12 +1714,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
     // If the response is uncommon the result should also be marked as uncommon.
     PrepareResponse(ClientDownloadResponse::UNCOMMON, net::HTTP_OK, net::OK,
                     true /* upload_requested */);
-#if !BUILDFLAG(IS_ANDROID)
-    EXPECT_CALL(*feedback_service_,
-                BeginFeedbackForDownload(profile(), &item, _, _))
-        .WillOnce(
-            DoAll(SaveArg<2>(&feedback_ping), SaveArg<3>(&feedback_response)));
-#endif
     RunLoop run_loop;
     download_service_->CheckClientDownload(
         &item,
@@ -1773,17 +1721,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
                             base::Unretained(this), run_loop.QuitClosure()));
     run_loop.Run();
     EXPECT_TRUE(IsResult(DownloadCheckResult::UNCOMMON));
-#if !BUILDFLAG(IS_ANDROID)
-    Mock::VerifyAndClearExpectations(feedback_service_);
-    ClientDownloadRequest decoded_request;
-    EXPECT_TRUE(decoded_request.ParseFromString(feedback_ping));
-    EXPECT_EQ(url_chain_.back().spec(), decoded_request.url());
-    expected_response.set_verdict(ClientDownloadResponse::UNCOMMON);
-    expected_response.set_upload(true);
-    expected_response.set_request_deep_scan(false);
-    expected_response.set_token("response_token");
-    EXPECT_EQ(expected_response.SerializeAsString(), feedback_response);
-#endif
     EXPECT_TRUE(HasClientDownloadRequest());
     ClearClientDownloadRequest();
   }
@@ -1792,12 +1729,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
     // dangerous_host.
     PrepareResponse(ClientDownloadResponse::DANGEROUS_HOST, net::HTTP_OK,
                     net::OK, true /* upload_requested */);
-#if !BUILDFLAG(IS_ANDROID)
-    EXPECT_CALL(*feedback_service_,
-                BeginFeedbackForDownload(profile(), &item, _, _))
-        .WillOnce(
-            DoAll(SaveArg<2>(&feedback_ping), SaveArg<3>(&feedback_response)));
-#endif
     RunLoop run_loop;
     download_service_->CheckClientDownload(
         &item,
@@ -1805,12 +1736,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
                             base::Unretained(this), run_loop.QuitClosure()));
     run_loop.Run();
     EXPECT_TRUE(IsResult(DownloadCheckResult::DANGEROUS_HOST));
-#if !BUILDFLAG(IS_ANDROID)
-    Mock::VerifyAndClearExpectations(feedback_service_);
-    expected_response.set_verdict(ClientDownloadResponse::DANGEROUS_HOST);
-    expected_response.set_upload(true);
-    EXPECT_EQ(expected_response.SerializeAsString(), feedback_response);
-#endif
     EXPECT_TRUE(HasClientDownloadRequest());
     ClearClientDownloadRequest();
   }
@@ -1821,12 +1746,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
 
     PrepareResponse(ClientDownloadResponse::DANGEROUS_ACCOUNT_COMPROMISE,
                     net::HTTP_OK, net::OK, true /* upload_requested */);
-#if !BUILDFLAG(IS_ANDROID)
-    EXPECT_CALL(*feedback_service_,
-                BeginFeedbackForDownload(profile(), &item, _, _))
-        .WillOnce(
-            DoAll(SaveArg<2>(&feedback_ping), SaveArg<3>(&feedback_response)));
-#endif
     RunLoop run_loop;
     download_service_->CheckClientDownload(
         &item,
@@ -1834,13 +1753,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
                             base::Unretained(this), run_loop.QuitClosure()));
     run_loop.Run();
     EXPECT_TRUE(IsResult(DownloadCheckResult::DANGEROUS_ACCOUNT_COMPROMISE));
-#if !BUILDFLAG(IS_ANDROID)
-    Mock::VerifyAndClearExpectations(feedback_service_);
-    expected_response.set_verdict(
-        ClientDownloadResponse::DANGEROUS_ACCOUNT_COMPROMISE);
-    expected_response.set_upload(true);
-    EXPECT_EQ(expected_response.SerializeAsString(), feedback_response);
-#endif
     EXPECT_TRUE(HasClientDownloadRequest());
     ClearClientDownloadRequest();
   }
@@ -1865,21 +1777,12 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadSuccess) {
     // UNKNOWN. And if the server requests an upload, we should upload.
     PrepareResponse(ClientDownloadResponse::UNKNOWN, net::HTTP_OK, net::OK,
                     true /* upload_requested */);
-#if !BUILDFLAG(IS_ANDROID)
-    EXPECT_CALL(*feedback_service_,
-                BeginFeedbackForDownload(profile(), &item, _, _))
-        .WillOnce(
-            DoAll(SaveArg<2>(&feedback_ping), SaveArg<3>(&feedback_response)));
-#endif
     RunLoop run_loop;
     download_service_->CheckClientDownload(
         &item,
         base::BindRepeating(&DownloadProtectionServiceTest::CheckDoneCallback,
                             base::Unretained(this), run_loop.QuitClosure()));
     run_loop.Run();
-#if !BUILDFLAG(IS_ANDROID)
-    Mock::VerifyAndClearExpectations(feedback_service_);
-#endif
     EXPECT_TRUE(IsResult(DownloadCheckResult::UNKNOWN));
     EXPECT_TRUE(HasClientDownloadRequest());
     ClearClientDownloadRequest();
@@ -3592,22 +3495,6 @@ TEST_F(DownloadProtectionServiceTest, CheckClientDownloadAllowlistedByPolicy) {
   EXPECT_TRUE(IsResult(DownloadCheckResult::ALLOWLISTED_BY_POLICY));
 }
 
-// TODO(crbug.com/397407934): Support download feedback on Android.
-#if !BUILDFLAG(IS_ANDROID)
-TEST_F(DownloadProtectionServiceTest, CheckOffTheRecordDoesNotSendFeedback) {
-  NiceMockDownloadItem item;
-  EXPECT_FALSE(download_service_->MaybeBeginFeedbackForDownload(
-      profile()->GetPrimaryOTRProfile(/*create_if_needed=*/true), &item, "",
-      ""));
-
-  EXPECT_FALSE(download_service_->MaybeBeginFeedbackForDownload(
-      profile()->GetOffTheRecordProfile(
-          Profile::OTRProfileID::CreateUniqueForTesting(),
-          /*create_if_needed=*/true),
-      &item, "", ""));
-}
-#endif
-
 // ------------ class DownloadProtectionServiceFlagTest ----------------
 class DownloadProtectionServiceFlagTest
     : public DownloadProtectionServiceTest,
@@ -5147,80 +5034,6 @@ TEST_F(DownloadProtectionServiceTest, ESBRequestScanPolicyDisabled) {
   run_loop.Run();
   EXPECT_TRUE(IsResult(DownloadCheckResult::UNCOMMON));
 }
-
-// TODO(crbug.com/397407934): Support download feedback on Android.
-#if !BUILDFLAG(IS_ANDROID)
-TEST_F(DownloadProtectionServiceTest, DownloadFeedbackOnDangerous) {
-  NiceMockDownloadItem item;
-  PrepareBasicDownloadItem(&item, {"http://www.evil.com/a.exe"},  // url_chain
-                           "http://www.google.com/",              // referrer
-                           FILE_PATH_LITERAL("a.tmp"),            // tmp_path
-                           FILE_PATH_LITERAL("a.exe"));           // final_path
-  content::DownloadItemUtils::AttachInfoForTesting(&item, profile(), nullptr);
-  SetEnhancedProtectionPrefForTests(profile()->GetPrefs(), true);
-
-  EXPECT_CALL(*sb_service_->mock_database_manager(),
-              MatchDownloadAllowlistUrl(_, _))
-      .WillRepeatedly(
-          [](const GURL& url, base::OnceCallback<void(bool)> callback) {
-            std::move(callback).Run(false);
-          });
-  EXPECT_CALL(*binary_feature_extractor_.get(), CheckSignature(tmp_path_, _))
-      .Times(4);
-  EXPECT_CALL(*binary_feature_extractor_.get(),
-              ExtractImageFeatures(
-                  tmp_path_, BinaryFeatureExtractor::kDefaultOptions, _, _))
-      .Times(4);
-
-  {
-    PrepareResponse(ClientDownloadResponse::DANGEROUS, net::HTTP_OK, net::OK,
-                    true /* upload_requested */);
-    EXPECT_CALL(*feedback_service_, BeginFeedbackForDownload(_, _, _, _));
-    RunLoop run_loop;
-    download_service_->CheckClientDownload(
-        &item,
-        base::BindRepeating(&DownloadProtectionServiceTest::CheckDoneCallback,
-                            base::Unretained(this), run_loop.QuitClosure()));
-    run_loop.Run();
-    Mock::VerifyAndClearExpectations(feedback_service_);
-  }
-  {
-    PrepareResponse(ClientDownloadResponse::SAFE, net::HTTP_OK, net::OK,
-                    true /* upload_requested */);
-    RunLoop run_loop;
-    download_service_->CheckClientDownload(
-        &item,
-        base::BindRepeating(&DownloadProtectionServiceTest::CheckDoneCallback,
-                            base::Unretained(this), run_loop.QuitClosure()));
-    run_loop.Run();
-    Mock::VerifyAndClearExpectations(feedback_service_);
-  }
-  {
-    PrepareResponse(ClientDownloadResponse::SAFE, net::HTTP_OK, net::OK,
-                    false /* upload_requested */);
-    RunLoop run_loop;
-    download_service_->CheckClientDownload(
-        &item,
-        base::BindRepeating(&DownloadProtectionServiceTest::CheckDoneCallback,
-                            base::Unretained(this), run_loop.QuitClosure()));
-    run_loop.Run();
-    Mock::VerifyAndClearExpectations(feedback_service_);
-  }
-  {
-    PrepareResponse(ClientDownloadResponse::DANGEROUS, net::HTTP_OK, net::OK,
-                    /*upload_requested=*/true);
-    EXPECT_CALL(item, GetReceivedBytes())
-        .WillRepeatedly(Return(DownloadFeedback::kMaxUploadSize + 1));
-    RunLoop run_loop;
-    download_service_->CheckClientDownload(
-        &item,
-        base::BindRepeating(&DownloadProtectionServiceTest::CheckDoneCallback,
-                            base::Unretained(this), run_loop.QuitClosure()));
-    run_loop.Run();
-    Mock::VerifyAndClearExpectations(feedback_service_);
-  }
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Deep scans, Advanced Protection, and encrypted archives are not supported on
 // Android.

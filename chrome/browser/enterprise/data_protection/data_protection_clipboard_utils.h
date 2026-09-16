@@ -121,7 +121,6 @@ bool IsPastePolicyCheckRequired(const BasicPasteSource& source,
 // written to the OS clipboard according to the following policies:
 // - CopyPreventionSettings
 // - DataControlsRules
-// - CopyIfAllowedByContentAnalysis
 //
 // If the copy is not allowed, `callback` is called with a replacement string
 // that should instead be put into the OS clipboard.

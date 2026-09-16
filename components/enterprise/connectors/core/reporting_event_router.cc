@@ -76,8 +76,6 @@ std::string DangerTypeToThreatType(download::DownloadDangerType danger_type) {
 }
 
 #if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
-// TODO(crbug.com/311679168): Move this to share logic with
-// ContentAnalysisDelegate.
 std::string GetMimeType(const ui::ClipboardFormatType& clipboard_format) {
   if (clipboard_format == ui::ClipboardFormatType::PlainTextType()) {
     return ui::kMimeTypePlainText;

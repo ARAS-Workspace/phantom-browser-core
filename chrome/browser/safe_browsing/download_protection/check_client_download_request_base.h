@@ -142,17 +142,6 @@ class CheckClientDownloadRequestBase {
       const ClientDownloadResponse::Verdict& verdict,
       const ClientDownloadResponse::TailoredVerdict& tailored_verdict) = 0;
 
-  // TODO(crbug.com/397407934): Download feedback is not supported on Android
-  // yet, but it will be.
-#if !BUILDFLAG(IS_ANDROID)
-  // Called when a valid response has been received from the server.
-  virtual void MaybeBeginFeedbackForDownload(
-      DownloadCheckResult result,
-      bool upload_requested,
-      const std::string& request_data,
-      const std::string& response_body) = 0;
-#endif
-
   // Returns whether or not the file should be uploaded to Safe Browsing for
   // deep scanning. Returns the settings to apply for analysis if the file
   // should be uploaded for deep scanning, or std::nullopt if it should not.

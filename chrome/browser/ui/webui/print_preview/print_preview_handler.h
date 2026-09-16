@@ -140,8 +140,6 @@ class PrintPreviewHandler : public content::WebUIMessageHandler {
   friend class PrintPreviewHandlerFailingTest;
   FRIEND_TEST_ALL_PREFIXES(PrintPreviewHandlerFailingTest,
                            GetPrinterCapabilities);
-  FRIEND_TEST_ALL_PREFIXES(ContentAnalysisPrintPreviewHandlerTest,
-                           LocalScanBeforePrinting);
   content::WebContents* preview_web_contents();
 
   PrintPreviewUI* print_preview_ui();
