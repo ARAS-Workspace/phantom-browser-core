@@ -2353,19 +2353,9 @@
     },
     'translate': {
       'filepath': 'chrome/android/java/src/org/chromium/chrome/browser/translate|'\
-                  'chrome/android/java/src/org/chromium/chrome/browser/infobar/translate|'\
-                  'chrome/android/javatests/src/org/chromium/chrome/browser/translate|'\
                   'chrome/browser/translate|'\
-                  'chrome/browser/ui/translate|'\
-                  'chrome/browser/ui/webui/translate_internals|'\
-                  'chrome/browser/ui/views/translate|'\
-                  'chrome/renderer/translate|'\
-                  'chrome/test/data/translate|'\
-                  'components/resources/translate_resources.grdp|'\
                   'components/translate|'\
-                  'components/translate_strings_grdp|'\
-                  'ios/chrome/browser/translate|'\
-                  'ios/web_view/internal/translate'
+                  'components/translate_strings_grdp'
     },
     'turtledove': {
       'filepath': 'content/browser/interest_group/|'\
