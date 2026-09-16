@@ -22,15 +22,12 @@
 #include "base/threading/hang_watcher.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/connectors/common.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/select_file_policy/chrome_select_file_policy.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/enterprise/buildflags/buildflags.h"
-#include "components/enterprise/common/proto/connectors.pb.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
@@ -294,95 +291,8 @@ void FileSelectHelper::PerformContentAnalysisIfNeeded(
   if (AbortIfWebContentsDestroyed())
     return;
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  enterprise_connectors::ContentAnalysisDelegate::Data data;
-  if (enterprise_connectors::ContentAnalysisDelegate::IsEnabled(
-          profile_, web_contents_->GetLastCommittedURL(), &data,
-          enterprise_connectors::AnalysisConnector::FILE_ATTACHED)) {
-    if (render_frame_host_) {
-      data.initiating_frame_id = render_frame_host_->GetGlobalId();
-    }
-    data.reason =
-        enterprise_connectors::ContentAnalysisRequest::FILE_PICKER_DIALOG;
-    data.paths.reserve(list.size());
-    for (const auto& file : list) {
-      if (!file) {
-        continue;
-      }
-      if (file->is_native_file()) {
-        data.paths.push_back(file->get_native_file()->file_path);
-      }
-    }
-
-    if (data.paths.empty()) {
-      NotifyListenerAndEnd(std::move(list));
-    } else {
-      enterprise_connectors::ContentAnalysisDelegate::CreateForWebContents(
-          web_contents_, std::move(data),
-          base::BindOnce(&FileSelectHelper::ContentAnalysisCompletionCallback,
-                         this, std::move(list)),
-          enterprise_connectors::DeepScanAccessPoint::UPLOAD);
-    }
-  } else {
-    NotifyListenerAndEnd(std::move(list));
-  }
-#else
-  NotifyListenerAndEnd(std::move(list));
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-}
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-void FileSelectHelper::ContentAnalysisCompletionCallback(
-    std::vector<blink::mojom::FileChooserFileInfoPtr> list,
-    const enterprise_connectors::ContentAnalysisDelegate::Data& data,
-    enterprise_connectors::ContentAnalysisDelegate::Result& result) {
-  if (AbortIfWebContentsDestroyed())
-    return;
-
-  DCHECK_EQ(data.text.size(), 0u);
-  DCHECK_EQ(result.text_results.size(), 0u);
-  DCHECK_EQ(data.paths.size(), result.paths_results.size());
-  DCHECK_GE(list.size(), result.paths_results.size());
-
-  // If the user chooses to upload a folder and the folder contains sensitive
-  // files, block the entire folder and update `result` to reflect the block
-  // verdict for all files scanned.
-  if (dialog_type_ == ui::SelectFileDialog::SELECT_UPLOAD_FOLDER) {
-    if (std::ranges::contains(result.paths_results, false)) {
-      list.clear();
-      for (size_t index = 0; index < data.paths.size(); ++index) {
-        result.paths_results[index] = false;
-      }
-    }
-    // Early return for folder upload, regardless of list being empty or not.
-    NotifyListenerAndEnd(std::move(list));
-    return;
-  }
-
-  // For single or multiple file uploads, remove any files that did not pass the
-  // deep scan. Non-native files not backed by fusebox are skipped.
-  size_t i = 0;
-  for (auto it = list.begin(); it != list.end();) {
-    bool is_scanned = false;
-    if ((*it)->is_native_file()) {
-      is_scanned = true;
-    }
-
-    if (is_scanned) {
-      if (!result.paths_results[i]) {
-        it = list.erase(it);
-      } else {
-        ++it;
-      }
-      ++i;
-    } else {
-      ++it;
-    }
-  }
-
   NotifyListenerAndEnd(std::move(list));
 }
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
 void FileSelectHelper::NotifyListenerAndEnd(
     std::vector<blink::mojom::FileChooserFileInfoPtr> list) {

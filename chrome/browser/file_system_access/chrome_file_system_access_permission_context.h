@@ -23,7 +23,6 @@
 #include "chrome/browser/file_system_access/file_system_access_permission_request_manager.h"
 #include "chrome/browser/permissions/one_time_permissions_tracker.h"
 #include "chrome/browser/permissions/one_time_permissions_tracker_observer.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/permissions/features.h"
 #include "components/permissions/object_permission_context_base.h"
 #include "content/public/browser/file_system_access_permission_context.h"
@@ -31,10 +30,6 @@
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/web_applications/web_app_install_manager_observer.h"
-#endif
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-#include "components/enterprise/common/files_scan_data.h"
 #endif
 
 class HostContentSettingsMap;
@@ -493,14 +488,6 @@ class ChromeFileSystemAccessPermissionContext
   // e.g. by a `remove()` call.
   void MaybeRestoreReadPermission(const url::Origin& origin,
                                   const base::FilePath& path);
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  void OnContentAnalysisComplete(
-      std::vector<content::PathInfo> entries,
-      EntriesAllowedByEnterprisePolicyCallback callback,
-      std::vector<base::FilePath> paths,
-      std::vector<bool> allowed);
-#endif
 
   void CheckShouldBlockAccessToPathAndReply(
       base::FilePath path,

@@ -108,7 +108,6 @@
 #endif
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/enterprise/connectors/analysis/content_analysis_delegate.h"
 #include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
 #include "chrome/browser/ui/file_system_access/file_system_access_dangerous_file_dialog.h"
 #include "components/safe_browsing/content/common/file_type_policies.h"
@@ -1994,82 +1993,8 @@ void ChromeFileSystemAccessPermissionContext::CheckPathsAgainstEnterprisePolicy(
     std::vector<content::PathInfo> entries,
     content::GlobalRenderFrameHostId frame_id,
     EntriesAllowedByEnterprisePolicyCallback callback) {
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  // Get WebContents pointer in order to perform enterprise content analysis.
-  content::RenderFrameHost* rfh = content::RenderFrameHost::FromID(frame_id);
-  content::WebContents* web_contents = nullptr;
-  if (!entries.empty()) {
-    if (rfh && rfh->IsActive()) {
-      web_contents = content::WebContents::FromRenderFrameHost(rfh);
-    }
-  }
-
-  if (!web_contents) {
-    std::move(callback).Run(std::move(entries));
-    return;
-  }
-
-  Profile* browser_profile = Profile::FromBrowserContext(profile());
-  enterprise_connectors::ContentAnalysisDelegate::Data data;
-  if (!enterprise_connectors::ContentAnalysisDelegate::IsEnabled(
-          browser_profile, web_contents->GetLastCommittedURL(), &data,
-          enterprise_connectors::AnalysisConnector::FILE_ATTACHED)) {
-    std::move(callback).Run(std::move(entries));
-    return;
-  }
-
-  data.reason =
-      enterprise_connectors::ContentAnalysisRequest::FILE_PICKER_DIALOG;
-  data.initiating_frame_id = frame_id;
-
-  // Resolve virtual paths for kExternal files to their physical paths
-  // so they can be scanned, but keep the original entries (with virtual paths)
-  // to return to the caller.
-  data.paths.reserve(entries.size());
-  for (const auto& entry : entries) {
-    base::FilePath path_to_scan = entry.path;
-    data.paths.push_back(std::move(path_to_scan));
-  }
-
-  // CreateForFilesInWebContents() only handles real OS files. Any kExternal
-  // entries that failed to resolve will be ignored by the scanner and
-  // reconciled based on the policy's default action (fail-open or fail-closed).
-  // TODO(crbug.com/535207208): Add a test to validate that unscannedFileEvent
-  // is reported for these unresolved files.
-  enterprise_connectors::ContentAnalysisDelegate::CreateForFilesInWebContents(
-      web_contents, std::move(data),
-      base::BindOnce(
-          &ChromeFileSystemAccessPermissionContext::OnContentAnalysisComplete,
-          weak_factory_.GetWeakPtr(), std::move(entries), std::move(callback)),
-      enterprise_connectors::DeepScanAccessPoint::UPLOAD);
-#else
   std::move(callback).Run(std::move(entries));
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 }
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-
-// TODO(crbug.com/534804380): Remove the unused `paths` parameter.
-void ChromeFileSystemAccessPermissionContext::OnContentAnalysisComplete(
-    std::vector<content::PathInfo> entries,
-    EntriesAllowedByEnterprisePolicyCallback callback,
-    std::vector<base::FilePath> paths,
-    std::vector<bool> allowed) {
-  CHECK_EQ(paths.size(), allowed.size());
-  CHECK_EQ(paths.size(), entries.size());
-
-  std::vector<content::PathInfo> result_entries;
-  for (size_t i = 0; i < paths.size(); ++i) {
-    if (allowed[i]) {
-      result_entries.emplace_back(entries[i].type, std::move(entries[i].path),
-                                  std::move(entries[i].display_name));
-    }
-  }
-
-  std::move(callback).Run(std::move(result_entries));
-}
-
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
 void ChromeFileSystemAccessPermissionContext::
     CheckShouldBlockAccessToPathAndReply(

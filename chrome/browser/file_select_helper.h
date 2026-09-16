@@ -14,17 +14,12 @@
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
 #include "build/build_config.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/common/files_scan_data.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "net/base/directory_lister.h"
 #include "third_party/blink/public/mojom/choosers/file_chooser.mojom.h"
 #include "ui/shell_dialogs/select_file_dialog.h"
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/analysis/content_analysis_delegate.h"
-#endif
 
 class Profile;
 class ScopedDisallowPictureInPicture;
@@ -239,14 +234,6 @@ class FileSelectHelper : public base::RefCountedThreadSafe<
   // ChromeOS.
   base::FilePath MaybeSubstituteFuseboxFilePath(
       const blink::mojom::FileSystemFileInfo& file_system_info);
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  // Callback used to receive the results of a content analysis scan.
-  void ContentAnalysisCompletionCallback(
-      std::vector<blink::mojom::FileChooserFileInfoPtr> list,
-      const enterprise_connectors::ContentAnalysisDelegate::Data& data,
-      enterprise_connectors::ContentAnalysisDelegate::Result& result);
-#endif
 
   // Finish the PerformContentAnalysisIfNeeded() handling after the
   // deep scanning checks have been performed.  Deep scanning may change the
