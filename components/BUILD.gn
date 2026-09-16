@@ -13,6 +13,7 @@ import("//components/guest_view/buildflags/buildflags.gni")
 import("//components/on_device_translation/buildflags/features.gni")
 import("//components/optimization_guide/features.gni")
 import("//components/safe_browsing/buildflags.gni")
+import("//components/spellcheck/spellcheck_build_features.gni")
 import("//components/supervised_user/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//media/media_options.gni")
@@ -619,12 +620,17 @@ test("components_unittests") {
       "//components/services/quarantine:unit_tests",
       "//components/site_engagement/content:unit_tests",
       "//components/site_isolation:unit_tests",
-      "//components/spellcheck/browser:unit_tests",
-      "//components/spellcheck/renderer:unit_tests",
       "//components/tabs:unit_tests",
       "//components/user_data_importer/content:unit_tests",
       "//components/user_education/webui:unit_tests",
     ]
+
+    if (enable_spellcheck) {
+      deps += [
+        "//components/spellcheck/browser:unit_tests",
+        "//components/spellcheck/renderer:unit_tests",
+      ]
+    }
 
     deps += [
       "//components/crash/content/browser:unit_tests",
