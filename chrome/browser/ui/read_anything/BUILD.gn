@@ -101,7 +101,6 @@ source_set("browser_tests") {
   sources = [
     "read_anything_controller_browsertest.cc",
     "read_anything_entry_point_controller_browsertest.cc",
-    "read_anything_omnibox_controller_browsertest.cc",
     "read_anything_side_panel_navigation_throttle_browsertest.cc",
   ]
 
@@ -137,7 +136,6 @@ source_set("interactive_ui_tests") {
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
   sources = [
-    "read_anything_omnibox_controller_interactive_uitest.cc",
     "read_anything_service_interactive_uitest.cc",
     "read_anything_side_panel_controller_interactive_uitest.cc",
   ]
