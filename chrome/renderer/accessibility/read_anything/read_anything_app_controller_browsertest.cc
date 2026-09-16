@@ -115,7 +115,6 @@ class MockReadAnythingUntrustedPageHandler
   MOCK_METHOD(void, OnFontChange, (const std::string& font), (override));
   MOCK_METHOD(void, OnFontSizeChange, (double font_size), (override));
   MOCK_METHOD(void, OnLinksEnabledChanged, (bool enabled), (override));
-  MOCK_METHOD(void, OnTranslationRequested, (), (override));
   MOCK_METHOD(void, OnImagesEnabledChanged, (bool enabled), (override));
   MOCK_METHOD(void, OnSpeechRateChange, (double rate), (override));
   MOCK_METHOD(void,
@@ -405,12 +404,6 @@ class ReadAnythingAppControllerTest : public ChromeRenderViewTest {
     scoped_feature_list_.Reset();
     scoped_feature_list_.InitAndEnableFeature(
         ax::mojom::features::kReadAnythingDocsIntegration);
-  }
-
-  void EnableReadAnythingTranslateEntryPoint() {
-    scoped_feature_list_.Reset();
-    scoped_feature_list_.InitAndEnableFeature(
-        features::kReadAnythingTranslateEntryPoint);
   }
 
   void EnableLineFocus() {
@@ -2648,13 +2641,6 @@ TEST_F(ReadAnythingAppControllerTest,
   const bool links_enabled = model().links_enabled();
   EXPECT_CALL(page_handler_, OnLinksEnabledChanged(!links_enabled)).Times(1);
   controller().OnLinksEnabledToggled();
-}
-
-TEST_F(ReadAnythingAppControllerTest,
-       OnTranslationRequested_ForwardsToPageHandler) {
-  EnableReadAnythingTranslateEntryPoint();
-  EXPECT_CALL(page_handler_, OnTranslationRequested()).Times(1);
-  controller().OnTranslationRequested();
 }
 
 TEST_F(ReadAnythingAppControllerTest, TurnedHighlightOn_SavesHighlightState) {

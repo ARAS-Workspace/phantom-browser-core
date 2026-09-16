@@ -249,10 +249,6 @@ AX_BASE_EXPORT bool IsReadAnythingReadAloudPhraseHighlightingEnabled();
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kReadAnythingOmniboxChip);
 AX_BASE_EXPORT bool IsReadAnythingOmniboxChipEnabled();
 
-// Enable the translate entrypoint for Read Anything.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kReadAnythingTranslateEntryPoint);
-AX_BASE_EXPORT bool IsReadAnythingTranslateEntryPointEnabled();
-
 // Enable improved UI layouts and controls in Read Anything.
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kReadAnythingImprovedUi);
 AX_BASE_EXPORT bool IsReadAnythingImprovedUiEnabled();

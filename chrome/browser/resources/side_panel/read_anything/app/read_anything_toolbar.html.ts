@@ -174,8 +174,7 @@ export function getHtml(this: ReadAnythingToolbarElement) {
       .showLineFocusNewBadge="${this.showLineFocusNewBadge}"
       @close-submenu-requested="${this.onCloseSubmenuRequested_}"
       @close-all-menus="${this.onCloseAllMenus_}"
-      @open-settings-submenu="${this.onOpenSettingsSubmenu_}"
-      @translation-requested="${this.onTranslationRequested_}">
+      @open-settings-submenu="${this.onOpenSettingsSubmenu_}">
     </settings-menu>
     <presentation-menu id="presentationMenu"
       class="settings-submenu"

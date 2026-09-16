@@ -20,7 +20,7 @@ import type {SettingsPrefs} from '../content/read_anything_types.js';
 import {DEFAULT_SETTINGS, SettingsOption, ToolbarEvent} from '../content/read_anything_types.js';
 import {openMenu} from '../shared/common.js';
 import {isActivationKey, isBackwardArrow, isForwardArrow, isVerticalArrow} from '../shared/keyboard_util.js';
-import {ReadAnythingSettingsAction, ReadAnythingSettingsChange} from '../shared/metrics_browser_proxy.js';
+import {ReadAnythingSettingsChange} from '../shared/metrics_browser_proxy.js';
 import {ReadAnythingLogger} from '../shared/read_anything_logger.js';
 
 import {SettingsItemType} from './menu_util.js';
@@ -138,12 +138,6 @@ const MENU_ITEM_DATA: Record<SettingsOption, SettingsItem> = {
         'read-anything:font-old',
     title: 'textSettingsTitle',
     itemType: SettingsItemType.MENU,
-  },
-  [SettingsOption.TRANSLATION_REQUESTED]: {
-    id: SettingsOption.TRANSLATION_REQUESTED,
-    icon: 'read-anything:translate',
-    title: 'translateLabel',
-    itemType: SettingsItemType.ACTION,
   },
   [SettingsOption.VOICE_SELECTION]: {
     id: SettingsOption.VOICE_SELECTION,
@@ -269,9 +263,6 @@ export class SettingsMenuElement extends SettingsMenuElementBase {
     }
 
     optionIDs.push(SettingsOption.PRESENTATION);
-    if (chrome.readingMode.isReadAnythingTranslateEntryPointEnabled) {
-      optionIDs.push(SettingsOption.TRANSLATION_REQUESTED);
-    }
     optionIDs.push(SettingsOption.LINKS);
     optionIDs.push(SettingsOption.IMAGES);
 
@@ -290,10 +281,6 @@ export class SettingsMenuElement extends SettingsMenuElementBase {
       SettingsOption.VOICE_SELECTION,
       SettingsOption.VOICE_HIGHLIGHT,
     ];
-
-    if (chrome.readingMode.isReadAnythingTranslateEntryPointEnabled) {
-      optionIDs.push(SettingsOption.TRANSLATION_REQUESTED);
-    }
 
     if (this.isImmersiveMode) {
       optionIDs.push(SettingsOption.PINNED_TO_TOOLBAR);
@@ -402,19 +389,6 @@ export class SettingsMenuElement extends SettingsMenuElementBase {
     }
 
     if (item.itemType === SettingsItemType.ACTION) {
-      if (item.id === SettingsOption.TRANSLATION_REQUESTED) {
-        // Close any open submenus before firing the translate event.
-        if (this.currentOpenId_) {
-          this.fire(ToolbarEvent.CLOSE_SUBMENU_REQUESTED, {
-            previousId: this.currentOpenId_,
-          });
-          this.currentOpenId_ = null;
-        }
-        this.logger_.logSettingsAction(
-            ReadAnythingSettingsAction.TRANSLATE_ACTION);
-        this.fire(ToolbarEvent.TRANSLATION_REQUESTED);
-        this.close();
-      }
       return;
     }
 

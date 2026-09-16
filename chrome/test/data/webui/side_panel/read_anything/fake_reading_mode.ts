@@ -101,9 +101,6 @@ export class FakeReadingMode {
   // Whether the Immersive Read Anything feature flag is enabled.
   isImmersiveEnabled: boolean = false;
 
-  // Whether the Read Anything Translate Entry Point feature flag is enabled.
-  isReadAnythingTranslateEntryPointEnabled: boolean = false;
-
   // Whether the line focus feature flag is enabled.
   isLineFocusEnabled: boolean = false;
 
@@ -304,9 +301,6 @@ export class FakeReadingMode {
   onLinksEnabledToggled() {
     this.linksEnabled = !this.linksEnabled;
   }
-
-  // Called when a user requests translation via the webui toolbar.
-  onTranslationRequested() {}
 
   // Called when a user toggles images via the webui toolbar.
   onImagesEnabledToggled() {

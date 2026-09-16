@@ -225,7 +225,6 @@ class ReadAnythingAppController
   void OnFontSizeChanged(bool increase);
   void OnFontSizeReset();
   void OnLinksEnabledToggled();
-  void OnTranslationRequested();
   void OnImagesEnabledToggled();
   int LetterSpacing() const;
   int LineSpacing() const;
@@ -333,7 +332,6 @@ class ReadAnythingAppController
   bool IsImmersiveEnabled() const;
   bool IsImprovedReadAloudEnabled() const;
   bool IsReadAnythingImprovedUiEnabled() const;
-  bool IsReadAnythingTranslateEntryPointEnabled() const;
   bool IsReadAnythingReadAloudExperimentalPlaybackUiEnabled() const;
   bool IsTsTextSegmentationEnabled() const;
   bool IsReadabilityEnabled() const;

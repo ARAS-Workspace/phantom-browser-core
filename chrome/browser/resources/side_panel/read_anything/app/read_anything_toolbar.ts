@@ -880,13 +880,6 @@ export class ReadAnythingToolbarElement extends ReadAnythingToolbarElementBase {
     this.closeSubmenu_(event.detail.previousId);
   }
 
-  protected onTranslationRequested_() {
-    if (!chrome.readingMode.isReadAnythingTranslateEntryPointEnabled) {
-      return;
-    }
-    chrome.readingMode.onTranslationRequested();
-  }
-
   protected onOpenSettingsSubmenu_(event: CustomEvent<{
     id: SettingsOption,
     previousId: SettingsOption|null,

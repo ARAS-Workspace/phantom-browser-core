@@ -113,9 +113,6 @@ declare namespace chrome {
     // Whether the Read Anything Improved UI feature flag is enabled.
     let isReadAnythingImprovedUiEnabled: boolean;
 
-    // Whether the Read Anything Translate Entry Point feature flag is enabled.
-    let isReadAnythingTranslateEntryPointEnabled: boolean;
-
     // Whether the Read Anything Read Aloud Experimental Playback UI flag is
     // enabled.
     let isReadAnythingReadAloudExperimentalPlaybackUiEnabled: boolean;
@@ -285,9 +282,6 @@ declare namespace chrome {
 
     // Called when a user toggles links via the webui toolbar.
     function onLinksEnabledToggled(): void;
-
-    // Called when a user requests translation via the webui toolbar.
-    function onTranslationRequested(): void;
 
     // Called when a user toggles images via the webui toolbar.
     function onImagesEnabledToggled(): void;

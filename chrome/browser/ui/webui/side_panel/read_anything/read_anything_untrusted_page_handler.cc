@@ -761,58 +761,6 @@ std::string ReadAnythingUntrustedPageHandler::GetDisplayLanguage() {
   return source_lang;
 }
 
-void ReadAnythingUntrustedPageHandler::OnTranslationRequested() {
-  if (!features::IsReadAnythingTranslateEntryPointEnabled()) {
-    mojo::ReportBadMessage("Translate entry point not enabled");
-    return;
-  }
-  content::WebContents* side_panel_contents = web_ui_->GetWebContents();
-  if (!side_panel_contents) {
-    return;
-  }
-
-  ChromeTranslateClient::CreateForWebContents(side_panel_contents);
-  ChromeTranslateClient* translate_client =
-      ChromeTranslateClient::FromWebContents(side_panel_contents);
-  if (!translate_client) {
-    return;
-  }
-
-  translate::TranslateManager* translate_manager =
-      translate_client->GetTranslateManager();
-  if (translate_manager) {
-    // Sync the article's true source language to the side panel
-    // TranslateManager (using the current language if the main page was
-    // translated) and preserve any existing target language before opening the
-    // Translate bubble.
-    std::optional<std::string> target_lang;
-    translate::LanguageState* language_state =
-        translate_manager->GetLanguageState();
-
-    if (language_state) {
-      if (language_state->IsPageTranslated()) {
-        target_lang = language_state->current_language();
-      }
-
-      std::string source_lang = GetDisplayLanguage();
-
-      if (target_lang == source_lang) {
-        target_lang = std::nullopt;
-      }
-      if (!source_lang.empty() && source_lang != "und" &&
-          source_lang != "und-und") {
-        language_state->LanguageDetermined(
-            source_lang, /*page_level_translation_criteria_met=*/true);
-      }
-      language_state->set_translation_pending(false);
-    }
-    translate_manager->ShowTranslateUI(/*source_code=*/std::nullopt,
-                                       /*target_code=*/target_lang,
-                                       /*auto_translate=*/true,
-                                       /*triggered_from_menu=*/true);
-  }
-}
-
 void ReadAnythingUntrustedPageHandler::OnImagesEnabledChanged(bool enabled) {
   profile_->GetPrefs()->SetBoolean(
       prefs::kAccessibilityReadAnythingImagesEnabled, enabled);

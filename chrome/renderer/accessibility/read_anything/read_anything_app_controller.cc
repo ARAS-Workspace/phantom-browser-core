@@ -1532,9 +1532,6 @@ gin::ObjectTemplateBuilder ReadAnythingAppController::GetObjectTemplateBuilder(
                    &ReadAnythingAppController::IsImprovedReadAloudEnabled)
       .SetProperty("isReadAnythingImprovedUiEnabled",
                    &ReadAnythingAppController::IsReadAnythingImprovedUiEnabled)
-      .SetProperty(
-          "isReadAnythingTranslateEntryPointEnabled",
-          &ReadAnythingAppController::IsReadAnythingTranslateEntryPointEnabled)
       .SetProperty("isReadAnythingReadAloudExperimentalPlaybackUiEnabled",
                    &ReadAnythingAppController::
                        IsReadAnythingReadAloudExperimentalPlaybackUiEnabled)
@@ -1591,8 +1588,6 @@ gin::ObjectTemplateBuilder ReadAnythingAppController::GetObjectTemplateBuilder(
       .SetMethod("onFontSizeReset", &ReadAnythingAppController::OnFontSizeReset)
       .SetMethod("onLinksEnabledToggled",
                  &ReadAnythingAppController::OnLinksEnabledToggled)
-      .SetMethod("onTranslationRequested",
-                 &ReadAnythingAppController::OnTranslationRequested)
       .SetMethod("requestShouldShowLineFocusNewBadge",
                  &ReadAnythingAppController::RequestShouldShowLineFocusNewBadge)
       .SetMethod("onLineFocusFeatureUsed",
@@ -2282,11 +2277,6 @@ bool ReadAnythingAppController::
   return features::IsReadAnythingReadAloudExperimentalPlaybackUiEnabled();
 }
 
-bool ReadAnythingAppController::IsReadAnythingTranslateEntryPointEnabled()
-    const {
-  return features::IsReadAnythingTranslateEntryPointEnabled();
-}
-
 // Returns true if the experimental flag allowing testing with alternative
 // distillation methods such as Readability.js is enabled.
 bool ReadAnythingAppController::IsReadabilityEnabled() const {
@@ -2585,13 +2575,6 @@ void ReadAnythingAppController::OnFontSizeReset() {
 void ReadAnythingAppController::OnLinksEnabledToggled() {
   model_.set_links_enabled(!model_.links_enabled());
   page_handler_->OnLinksEnabledChanged(model_.links_enabled());
-}
-
-void ReadAnythingAppController::OnTranslationRequested() {
-  if (!IsReadAnythingTranslateEntryPointEnabled()) {
-    return;
-  }
-  page_handler_->OnTranslationRequested();
 }
 
 void ReadAnythingAppController::OnImagesEnabledToggled() {
