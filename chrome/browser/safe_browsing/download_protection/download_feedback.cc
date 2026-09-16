@@ -9,7 +9,6 @@
 #include "base/memory/ptr_util.h"
 #include "base/task/task_runner.h"
 #include "base/task/thread_pool.h"
-#include "components/enterprise/connectors/core/cloud_content_scanning/multipart_uploader.h"
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "content/public/browser/browser_thread.h"
 #include "net/base/net_errors.h"

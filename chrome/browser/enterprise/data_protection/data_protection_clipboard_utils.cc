@@ -15,7 +15,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "base/timer/elapsed_timer.h"
 #include "base/types/optional_util.h"
-#include "chrome/browser/enterprise/connectors/analysis/content_analysis_info.h"
 #include "chrome/browser/enterprise/data_controls/chrome_clipboard_context.h"
 #include "chrome/browser/enterprise/data_controls/chrome_rules_service.h"
 #include "chrome/browser/enterprise/data_controls/data_controls_dialog_factory.h"
@@ -134,12 +133,6 @@ void MaybeReportDataControlsPasteFromGemini(
   }
 
   std::string email;
-  if (auto* profile =
-          Profile::FromBrowserContext(destination->GetBrowserContext())) {
-    email = enterprise_connectors::ContentAreaUserProvider::GetUser(
-        profile, content::WebContents::FromRenderFrameHost(destination),
-        GetSourceURL(destination));
-  }
 
   router->ReportPasteFromGemini(GetSourceURL(destination), email, verdict,
                                 content_size, bypassed);

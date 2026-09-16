@@ -633,7 +633,6 @@
 #include "chrome/browser/safe_browsing/chrome_enterprise_url_lookup_service_factory.h"
 #include "chrome/browser/safe_browsing/chrome_password_protection_service.h"
 #include "chrome/browser/safe_browsing/chrome_ping_manager_factory.h"
-#include "chrome/browser/safe_browsing/cloud_content_scanning/deep_scanning_utils.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/safe_browsing/url_checker_delegate_impl.h"
 #include "chrome/browser/safe_browsing/url_lookup_service_factory.h"
@@ -651,10 +650,6 @@
 #include "chrome/browser/on_device_translation/translation_manager_impl.h"
 #include "third_party/blink/public/mojom/on_device_translation/translation_manager.mojom.h"
 #endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-
-#if BUILDFLAG(FULL_SAFE_BROWSING)
-#include "chrome/browser/enterprise/connectors/analysis/content_analysis_delegate.h"
-#endif
 
 #if BUILDFLAG(ENABLE_VR)
 #include "chrome/browser/vr/chrome_xr_integration_client.h"

@@ -1206,10 +1206,6 @@ source_set("extensions") {
     if (!is_android) {
       deps += [ "//chrome/browser/ui/toasts" ]
     }
-
-    if (enterprise_cloud_content_analysis) {
-      deps += [ "//components/enterprise/common/proto:browser_events_proto" ]
-    }
   }  # if (enable_extensions)
 
   if (enable_printing) {
@@ -2393,30 +2389,12 @@ source_set("browser_tests") {
       ]
     }
 
-    if (enterprise_cloud_content_analysis || is_android) {
-      # Use this scope to migrate files/deps from
-      # `enterprise_cloud_content_analysis` conditions that now need to
-      # compile on Android.
+    if (is_android) {
       sources += [ "//chrome/browser/enterprise/connectors/connectors_service_browsertest.cc" ]
-      deps += [
-        "//chrome/browser/enterprise/connectors/reporting:browser_tests",
-        "//components/enterprise/connectors/core:cloud_content_scanning",
-      ]
+      deps +=
+          [ "//chrome/browser/enterprise/connectors/reporting:browser_tests" ]
     }
 
-    if (enterprise_cloud_content_analysis) {
-      sources += [
-        "//chrome/browser/enterprise/connectors/analysis/content_analysis_dialog_browsertest.cc",
-        "api/enterprise_reporting_private/enterprise_reporting_private_apitest.cc",
-        "api/enterprise_reporting_private/enterprise_reporting_private_browsertest.cc",
-      ]
-      deps += [
-        "//chrome/browser/enterprise/connectors/test:test_support",
-        "//chrome/browser/ui/webui:chrome_web_contents_handler",
-        "//components/enterprise/buildflags",
-        "//components/enterprise/connectors/core",
-      ]
-    }
     if (is_win || is_linux || is_mac) {
       sources += [ "//chrome/browser/enterprise/connectors/device_trust/device_trust_browsertest.cc" ]
 

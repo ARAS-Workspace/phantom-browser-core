@@ -14,16 +14,15 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/connectors/common.h"
-#include "chrome/browser/enterprise/connectors/test/deep_scanning_browsertest_base.h"
 #include "chrome/browser/enterprise/connectors/test/deep_scanning_test_utils.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/policy/dm_token_utils.h"
 #include "chrome/browser/profiles/reporting_util.h"
 #include "chrome/browser/ui/browser.h"
+#include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
 #include "components/enterprise/browser/enterprise_switches.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/connectors_prefs.h"
 #include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/mock_cloud_policy_client.h"
@@ -116,8 +115,7 @@ bool ContainsClientId(const AnalysisSettings& settings) {
 
 enum class ManagementStatus { kAffiliated, kUnaffiliated, kUnmanaged };
 
-class ConnectorsServiceProfileBrowserTest
-    : public test::DeepScanningBrowserTestBase {
+class ConnectorsServiceProfileBrowserTest : public InProcessBrowserTest {
  public:
   explicit ConnectorsServiceProfileBrowserTest(
       ManagementStatus management_status)
@@ -135,7 +133,7 @@ class ConnectorsServiceProfileBrowserTest
   }
 
   void SetUpOnMainThread() override {
-    test::DeepScanningBrowserTestBase::SetUpOnMainThread();
+    InProcessBrowserTest::SetUpOnMainThread();
 
     SetUpProfileData();
 
@@ -422,12 +420,10 @@ IN_PROC_BROWSER_TEST_P(ConnectorsServiceAnalysisProfileBrowserTest,
           ->GetAnalysisSettings(GURL(kTestUrl), FILE_ATTACHED);
 
   // Expect no local analysis settings on platforms where it is unsupported.
-#if !BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
   if (settings_value() == kNormalLocalAnalysisSettingsPref) {
     ASSERT_FALSE(settings.has_value());
     return;
   }
-#endif
 
   if (management_status() == ManagementStatus::kUnmanaged) {
     if (settings_value() == kNormalLocalAnalysisSettingsPref) {
@@ -468,12 +464,10 @@ IN_PROC_BROWSER_TEST_P(ConnectorsServiceAnalysisProfileBrowserTest,
           ->GetAnalysisSettings(GURL(kTestUrl), FILE_DOWNLOADED);
 
   // Expect no local analysis settings on platforms where it is unsupported.
-#if !BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
   if (settings_value() == kNormalLocalAnalysisSettingsPref) {
     ASSERT_FALSE(settings.has_value());
     return;
   }
-#endif
 
   std::string management_domain =
       ConnectorsServiceFactory::GetForBrowserContext(browser()->GetProfile())
@@ -541,12 +535,10 @@ IN_PROC_BROWSER_TEST_P(ConnectorsServiceAnalysisProfileBrowserTest,
           ->GetAnalysisSettings(GURL(kTestUrl), PRINT);
 
   // Expect no local analysis settings on platforms where it is unsupported.
-#if !BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
   if (settings_value() == kNormalLocalAnalysisSettingsPref) {
     ASSERT_FALSE(settings.has_value());
     return;
   }
-#endif
 
   std::string management_domain =
       ConnectorsServiceFactory::GetForBrowserContext(browser()->GetProfile())
@@ -624,19 +616,7 @@ IN_PROC_BROWSER_TEST_P(ConnectorsServiceAnalysisProfileBrowserTest,
 
   if (settings_value() == kNormalLocalAnalysisSettingsPref) {
     // Expect no local analysis settings on platforms where it is unsupported.
-#if !BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
     ASSERT_FALSE(settings.has_value());
-#else
-    // Since they don't use anything tied to DM tokens and rely on a separately
-    // installed agent, local analysis policies are always returned regardless
-    // of the management status.
-    ASSERT_TRUE(settings.has_value());
-    ASSERT_TRUE(settings.value().cloud_or_local_settings.is_local_analysis());
-    ASSERT_TRUE(settings.value().per_profile);
-    ASSERT_EQ("path_user",
-              settings.value().cloud_or_local_settings.local_path());
-    ASSERT_TRUE(settings.value().cloud_or_local_settings.user_specific());
-#endif
   } else {
     switch (management_status()) {
       case ManagementStatus::kUnaffiliated:

@@ -47,8 +47,6 @@
 #else
 #include "chrome/browser/safe_browsing/download_protection/download_feedback.h"
 #include "chrome/browser/safe_browsing/download_protection/download_feedback_service.h"
-#include "components/enterprise/connectors/core/cloud_content_scanning/binary_upload_service.h"
-#include "components/enterprise/connectors/core/cloud_content_scanning/deep_scanning_utils.h"
 #endif
 
 namespace safe_browsing {
@@ -313,17 +311,6 @@ void CheckClientDownloadRequest::UploadBinary(
   if (!IsDeepScanningEnabled()) {
     return;
   }
-  auto metadata = std::make_unique<DownloadItemMetadata>(item_);
-  metadata->SetCallback(callback_);
-  auto weak_metadata = metadata->GetWeakPtr();
-
-  service()->UploadForDeepScanning(
-      std::move(metadata),
-      base::BindRepeating(&DownloadItemMetadata::ProcessScanResult,
-                          weak_metadata, reason),
-      DownloadItemWarningData::DeepScanTrigger::TRIGGER_POLICY, result,
-      std::move(settings),
-      /*password=*/std::nullopt);
 }
 
 void CheckClientDownloadRequest::NotifyRequestFinished(
@@ -384,12 +371,6 @@ bool CheckClientDownloadRequest::ShouldPromptForDeepScanning(
   }
 
 #if !BUILDFLAG(IS_ANDROID)
-  // Too large uploads would fail immediately, so don't prompt in this case.
-  if (static_cast<size_t>(item_->GetTotalBytes()) >=
-      enterprise_connectors::BinaryUploadService::kMaxUploadSizeBytes) {
-    return false;
-  }
-
   Profile* profile = Profile::FromBrowserContext(GetBrowserContext());
   if (!profile) {
     return false;

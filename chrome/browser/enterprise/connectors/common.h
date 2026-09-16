@@ -10,17 +10,11 @@
 
 #include "base/functional/callback_forward.h"
 #include "base/supports_user_data.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/analysis_settings.h"
 #include "components/enterprise/connectors/core/common.h"
 #include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/download_manager_delegate.h"
 #include "content/public/browser/global_routing_id.h"
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-#include "chrome/browser/safe_browsing/cloud_content_scanning/deep_scanning_utils.h"  // nogncheck crbug.com/40147906
-#include "components/enterprise/connectors/core/cloud_content_scanning/binary_upload_service.h"
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
 class Profile;
 
@@ -80,32 +74,6 @@ google::protobuf::RepeatedPtrField<std::string> CollectFrameUrls(
     DeepScanAccessPoint access_point,
     std::optional<content::GlobalRenderFrameHostId> initiating_frame_id =
         std::nullopt);
-
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
-// Returns the appropriate BinaryUploadService for the given `profile` and
-// `settings`. This can be a cloud or local service.
-BinaryUploadService* GetBinaryUploadServiceForConnector(
-    Profile* profile,
-    const enterprise_connectors::AnalysisSettings& settings);
-
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-// Returns whether the download danger type implies the user should be allowed
-// to review the download.
-bool ShouldPromptReviewForDownload(Profile* profile,
-                                   const download::DownloadItem* download_item);
-
-// Shows the review dialog after a user has clicked the "Review" button
-// corresponding to a download.
-void ShowDownloadReviewDialog(const std::u16string& filename,
-                              Profile* profile,
-                              download::DownloadItem* download_item,
-                              content::WebContents* web_contents,
-                              base::OnceClosure keep_closure,
-                              base::OnceClosure discard_closure);
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
 
 }  // namespace enterprise_connectors
 

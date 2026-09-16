@@ -9,22 +9,13 @@ import("//extensions/buildflags/buildflags.gni")
 source_set("reporting") {
   sources = []
 
-  if (enterprise_cloud_content_analysis || is_android ||
-      safe_browsing_mode == 1) {
+  if (is_android || safe_browsing_mode == 1) {
     sources += [
       "browser_crash_event_router.h",
       "crash_reporting_context.h",
       "realtime_reporting_client.h",
       "realtime_reporting_client_factory.h",
       "reporting_event_router_factory.h",
-    ]
-  }
-
-  if (enterprise_cloud_content_analysis && enable_extensions_core) {
-    sources += [
-      "extension_install_event_router.h",
-      "extension_telemetry_event_router.h",
-      "extension_telemetry_event_router_factory.h",
     ]
   }
 
@@ -45,34 +36,18 @@ source_set("reporting") {
     "//components/safe_browsing/core/common/proto:csd_proto",
     "//third_party/crashpad/crashpad/client",
   ]
-
-  if (enterprise_cloud_content_analysis && enable_extensions_core) {
-    public_deps += [
-      "//extensions/browser",
-      "//extensions/common",
-    ]
-  }
 }
 
 source_set("impl") {
   sources = []
 
-  if (enterprise_cloud_content_analysis || is_android ||
-      safe_browsing_mode == 1) {
+  if (is_android || safe_browsing_mode == 1) {
     sources += [
       "browser_crash_event_router.cc",
       "crash_reporting_context.cc",
       "realtime_reporting_client.cc",
       "realtime_reporting_client_factory.cc",
       "reporting_event_router_factory.cc",
-    ]
-  }
-
-  if (enterprise_cloud_content_analysis && enable_extensions_core) {
-    sources += [
-      "extension_install_event_router.cc",
-      "extension_telemetry_event_router.cc",
-      "extension_telemetry_event_router_factory.cc",
     ]
   }
 
@@ -98,14 +73,6 @@ source_set("impl") {
     "//components/safe_browsing/core/common:features",
   ]
 
-  if (enterprise_cloud_content_analysis) {
-    deps += [ "//components/enterprise/connectors/core:cloud_content_scanning" ]
-
-    if (enable_extensions_core) {
-      deps += [ "//chrome/browser/extensions" ]
-    }
-  }
-
   # This target has circular dependencies with //chrome/browser:browser
   # until more of //chrome/browser is modularized.
   deps += [ "//chrome/browser:browser_public_dependencies" ]
@@ -119,13 +86,6 @@ source_set("unit_tests") {
     "realtime_reporting_client_unittest.cc",
     "reporting_event_router_unittest.cc",
   ]
-
-  if (enterprise_cloud_content_analysis && enable_extensions_core) {
-    sources += [
-      "extension_install_event_router_unittest.cc",
-      "extension_telemetry_event_router_unittest.cc",
-    ]
-  }
 
   deps = [
     ":impl",

@@ -714,10 +714,6 @@ source_set("unit_tests") {
     sources += [ "printing_restrictions_policy_handler_unittest.cc" ]
   }
 
-  if (enable_extensions && enterprise_local_content_analysis) {
-    sources += [ "local_sync_policy_handler_unittest.cc" ]
-  }
-
   if (enable_extensions) {
     sources += [ "chrome_extension_policy_migrator_unittest.cc" ]
     deps += [ ":policy_migrator" ]

@@ -19,6 +19,13 @@ namespace enterprise_connectors {
 
 namespace {
 
+class AnalysisServiceSettings : public AnalysisServiceSettingsBase {
+ public:
+  AnalysisServiceSettings(const base::Value& settings_value,
+                          const ServiceProviderConfig& service_provider_config)
+      : AnalysisServiceSettingsBase(settings_value, service_provider_config) {}
+};
+
 }  // namespace
 
 ConnectorsManager::ConnectorsManager(PrefService* pref_service,

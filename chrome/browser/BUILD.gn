@@ -2684,25 +2684,10 @@ source_set("browser") {
     ]
   }
 
-  if (enterprise_cloud_content_analysis || is_android ||
-      safe_browsing_mode == 1) {
-    deps += [
-      "//components/enterprise/connectors/core",
-      "//components/enterprise/connectors/core:cloud_content_scanning",
-    ]
+  if (is_android || safe_browsing_mode == 1) {
+    deps += [ "//components/enterprise/connectors/core" ]
     public_deps +=
         [ "//components/enterprise/common/proto:browser_events_proto" ]
-  }
-
-  if (enterprise_cloud_content_analysis) {
-    deps += [ "//components/enterprise/connectors/core:cloud_content_scanning" ]
-    public_deps +=
-        [ "//components/enterprise/common/proto:browser_events_proto" ]
-  }
-
-  if (enterprise_local_content_analysis) {
-    public_deps +=
-        [ "//chrome/browser/enterprise/connectors/analysis:sdk_manager" ]
   }
 
   if (is_linux || is_win || is_mac) {

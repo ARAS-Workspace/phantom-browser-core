@@ -12,7 +12,6 @@ source_set("enterprise") {
     "browser_management/browser_management_status_provider.h",
     "browser_management/management_service_factory.h",
     "chrome_browser_main_extra_parts_enterprise.h",
-    "connectors/analysis/analysis_service_settings.h",
     "connectors/connectors_manager.h",
     "connectors/connectors_service.h",
     "connectors/interstitials/enterprise_block_controller_client.h",
@@ -259,14 +258,8 @@ source_set("enterprise") {
     public_deps += [ "//components/enterprise/idle" ]
   }
 
-  if (enterprise_cloud_content_analysis || is_android ||
-      safe_browsing_mode == 1) {
-    public += [
-      "connectors/analysis/content_analysis_info.h",
-      "connectors/common.h",
-    ]
-    public_deps +=
-        [ "//components/enterprise/connectors/core:cloud_content_scanning" ]
+  if (is_android || safe_browsing_mode == 1) {
+    public += [ "connectors/common.h" ]
   }
 
   if (is_linux || is_win || is_mac) {
@@ -310,33 +303,6 @@ source_set("enterprise") {
     public += [ "signals/device_info_fetcher_linux.h" ]
   }
 
-  if (enterprise_cloud_content_analysis) {
-    public += [
-      "connectors/analysis/content_analysis_delegate.h",
-      "connectors/analysis/content_analysis_dialog_controller.h",
-      "connectors/analysis/content_analysis_dialog_delegate.h",
-      "connectors/analysis/content_analysis_downloads_delegate.h",
-      "connectors/analysis/content_analysis_views.h",
-      "connectors/analysis/copy_warning_delegate_tracker.h",
-      "connectors/analysis/files_request_handler.h",
-      "connectors/analysis/page_print_analysis_request.h",
-      "connectors/analysis/page_print_request_handler.h",
-    ]
-  }
-
-  if (enterprise_local_content_analysis) {
-    public += [
-      "connectors/analysis/local_binary_upload_service.h",
-      "connectors/analysis/local_binary_upload_service_factory.h",
-    ]
-    public_deps +=
-        [ "//chrome/browser/enterprise/connectors/analysis:sdk_manager" ]
-  }
-
-  if (enterprise_content_analysis) {
-    public += [ "data_protection/print_utils.h" ]
-  }
-
   if (enable_extensions_core) {
     public += [
       "reporting/extension_info.h",
@@ -371,7 +337,6 @@ source_set("impl") {
     "browser_management/browser_management_status_provider.cc",
     "browser_management/management_service_factory.cc",
     "chrome_browser_main_extra_parts_enterprise.cc",
-    "connectors/analysis/analysis_service_settings.cc",
     "connectors/connectors_manager.cc",
     "connectors/connectors_service.cc",
     "connectors/interstitials/enterprise_block_controller_client.cc",
@@ -664,37 +629,9 @@ source_set("impl") {
     deps += [ "//components/enterprise/idle" ]
   }
 
-  if (enterprise_cloud_content_analysis || is_android ||
-      safe_browsing_mode == 1) {
-    sources += [
-      "connectors/analysis/content_analysis_info.cc",
-      "connectors/common.cc",
-    ]
+  if (is_android || safe_browsing_mode == 1) {
+    sources += [ "connectors/common.cc" ]
     deps += [ "//components/enterprise/common/proto:chrome_reporting_entity" ]
-  }
-
-  if (enterprise_cloud_content_analysis) {
-    sources += [
-      "connectors/analysis/content_analysis_delegate.cc",
-      "connectors/analysis/content_analysis_dialog_controller.cc",
-      "connectors/analysis/content_analysis_dialog_delegate.cc",
-      "connectors/analysis/content_analysis_downloads_delegate.cc",
-      "connectors/analysis/content_analysis_views.cc",
-      "connectors/analysis/copy_warning_delegate_tracker.cc",
-      "connectors/analysis/files_request_handler.cc",
-      "connectors/analysis/page_print_analysis_request.cc",
-      "connectors/analysis/page_print_request_handler.cc",
-    ]
-    deps += [ "//components/enterprise/connectors/core:cloud_content_scanning" ]
-  }
-
-  if (enterprise_local_content_analysis) {
-    sources += [
-      "connectors/analysis/local_binary_upload_service.cc",
-      "connectors/analysis/local_binary_upload_service_factory.cc",
-    ]
-    public_deps +=
-        [ "//chrome/browser/enterprise/connectors/analysis:sdk_manager" ]
   }
 
   if (is_linux || is_win || is_mac) {
@@ -738,10 +675,6 @@ source_set("impl") {
 
   if (is_linux) {
     sources += [ "signals/device_info_fetcher_linux.cc" ]
-  }
-
-  if (enterprise_content_analysis) {
-    sources += [ "data_protection/print_utils.cc" ]
   }
 
   if (enable_extensions_core) {

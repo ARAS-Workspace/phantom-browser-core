@@ -193,10 +193,6 @@ void DownloadBubbleContentsView::ProcessDeepScanPress(
         model->GetDownloadItem(),
         DownloadItemWarningData::WarningSurface::BUBBLE_SUBPAGE,
         DownloadItemWarningData::WarningAction::ACCEPT_DEEP_SCAN);
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-    safe_browsing::DownloadProtectionService::UploadForConsumerDeepScanning(
-        model->GetDownloadItem(), trigger, password);
-#endif
   }
 }
 

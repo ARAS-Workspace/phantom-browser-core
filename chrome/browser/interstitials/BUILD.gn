@@ -112,7 +112,7 @@ if (!is_android) {
   }
 }
 
-if (enterprise_cloud_content_analysis || is_android) {
+if (is_android) {
   source_set("unit_tests") {
     testonly = true
     sources = [ "enterprise_util_unittest.cc" ]

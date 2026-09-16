@@ -547,7 +547,6 @@
 #include "chrome/browser/safe_browsing/chrome_ping_manager_factory.h"
 #include "chrome/browser/safe_browsing/client_side_detection_intelligent_scan_delegate_factory.h"
 #include "chrome/browser/safe_browsing/client_side_detection_service_factory.h"
-#include "chrome/browser/safe_browsing/cloud_content_scanning/cloud_binary_upload_service_factory.h"
 #include "chrome/browser/safe_browsing/gemini_antiscam_protection/gemini_antiscam_protection_service_factory.h"
 #include "chrome/browser/safe_browsing/notification_content_detection/notification_content_detection_service_factory.h"
 #include "chrome/browser/safe_browsing/notification_telemetry/notification_telemetry_service_factory.h"
@@ -1167,7 +1166,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   safe_browsing::ClientSideDetectionIntelligentScanDelegateFactory::
       GetInstance();
   safe_browsing::ClientSideDetectionServiceFactory::GetInstance();
-  safe_browsing::CloudBinaryUploadServiceFactory::GetInstance();
 #endif
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   safe_browsing::ExtensionTelemetryServiceFactory::GetInstance();

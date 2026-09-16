@@ -2997,19 +2997,6 @@ if (!is_android) {
       "//third_party/federated_compute:confidential_compute_crypto_test_util",
     ]
 
-    if (enterprise_cloud_content_analysis) {
-      sources += [
-        "../browser/safe_browsing/cloud_content_scanning/cloud_binary_upload_service_browsertest.cc",
-        "../browser/safe_browsing/download_protection/deep_scanning_browsertest.cc",
-      ]
-
-      deps += [
-        "//chrome/browser/enterprise/connectors/analysis:browser_tests",
-        "//chrome/browser/enterprise/test:test_support",
-        "//components/enterprise/connectors/core:content_analysis_browser_test_base",
-      ]
-    }
-
     if (is_win) {
       sources += [
         "../browser/ui/views/device_id/pen_id_browsertest_win.cc",
@@ -4313,7 +4300,6 @@ test("unit_tests") {
     "//chrome/browser/engagement:unit_tests",
     "//chrome/browser/enterprise:unit_tests",
     "//chrome/browser/enterprise/connectors:unit_tests",
-    "//chrome/browser/enterprise/connectors/analysis:unit_tests",
     "//chrome/browser/enterprise/connectors/device_trust:unit_tests",
     "//chrome/browser/enterprise/connectors/device_trust/attestation/browser:unit_tests",
     "//chrome/browser/enterprise/connectors/device_trust/signals:unit_tests",
@@ -5966,10 +5952,6 @@ test("unit_tests") {
       ]
     }
 
-    if (enterprise_local_content_analysis) {
-      deps += [ "../browser/enterprise/connectors/test:test_support" ]
-    }
-
     allow_circular_includes_from = [
       "//chrome/browser/web_applications:web_applications_unit_tests",
       "//chrome/browser/web_applications/extensions:unit_tests",
@@ -6121,11 +6103,6 @@ test("unit_tests") {
       "//components/safe_browsing/core/common/hashprefix_realtime:hash_realtime_utils",
       "//ipc:protobuf_support",
     ]
-  }
-
-  if (enterprise_cloud_content_analysis) {
-    deps +=
-        [ "//chrome/browser/extensions/api/safe_browsing_private:unit_tests" ]
   }
 
   if (is_win || is_mac || is_linux || is_android) {
@@ -7844,14 +7821,6 @@ if (!is_android) {
       "//chrome/browser/ui/views/glic",
       "//chrome/browser/ui/views/tabs/glic",
     ]
-    if (enterprise_cloud_content_analysis) {
-      deps += [
-        "//chrome/browser/enterprise/connectors/test:test_support",
-        "//components/enterprise/connectors/core:cloud_content_scanning",
-        "//components/enterprise/content",
-        "//third_party/content_analysis_sdk:liblcasdk",
-      ]
-    }
     data_deps += [
       "//chrome/browser/background/glic:interactive_ui_tests",
       "//chrome/browser/glic:interactive_ui_tests",

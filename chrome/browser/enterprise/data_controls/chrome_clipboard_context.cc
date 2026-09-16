@@ -11,10 +11,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/buildflags.h"
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
-#include "chrome/browser/enterprise/connectors/analysis/content_analysis_info.h"
-#endif
-
 namespace data_controls {
 
 namespace {
@@ -214,17 +210,7 @@ std::string ChromeClipboardContext::destination_active_user() const {
   if (!destination_) {
     return "";
   }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
-  auto* profile = Profile::FromBrowserContext(destination_->browser_context());
-  if (!profile) {
-    return "";
-  }
-
-  return enterprise_connectors::ContentAreaUserProvider::GetUser(
-      profile, destination_->web_contents(), destination_url());
-#else
   return "";
-#endif
 }
 
 }  // namespace data_controls

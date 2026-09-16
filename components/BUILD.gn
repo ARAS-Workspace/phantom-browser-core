@@ -440,10 +440,6 @@ test("components_unittests") {
     "//components/visited_url_ranking/internal:unit_tests",
   ]
 
-  if (enterprise_cloud_content_analysis || is_android) {
-    deps += [ "//components/enterprise/connectors/core:cloud_content_scanning_unit_tests" ]
-  }
-
   if (use_blink) {
     deps += [
       "//components/autofill/content/browser:unit_tests",

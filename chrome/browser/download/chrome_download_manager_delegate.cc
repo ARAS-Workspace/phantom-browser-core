@@ -153,7 +153,6 @@
 #endif
 
 #if BUILDFLAG(IS_ANDROID)
-#include "components/enterprise/connectors/core/cloud_content_scanning/binary_upload_service.h"  // nogncheck crbug.com/40147906
 #include "components/enterprise/obfuscation/core/download_obfuscator.h"
 #include "components/enterprise/obfuscation/core/utils.h"
 #endif
@@ -1092,12 +1091,6 @@ bool ChromeDownloadManagerDelegate::ShouldObfuscateDownload(
     return false;
   }
 
-  // Skip obfuscation for large files if size is known.
-  if (static_cast<size_t>(item->GetTotalBytes()) >
-      enterprise_connectors::BinaryUploadService::kMaxUploadSizeBytes) {
-    return false;
-  }
-
   // Skip obfuscation if there are no matching connector policies and for
   // report-only scans.
   Profile* profile = Profile::FromBrowserContext(
@@ -1898,13 +1891,6 @@ void ChromeDownloadManagerDelegate::CheckClientDownloadDone(
         danger_type = download::DOWNLOAD_DANGER_TYPE_BLOCKED_SCAN_FAILED;
         break;
       case safe_browsing::DownloadCheckResult::IMMEDIATE_DEEP_SCAN:
-#if !BUILDFLAG(IS_ANDROID)
-        safe_browsing::DownloadProtectionService::UploadForConsumerDeepScanning(
-            item,
-            DownloadItemWarningData::DeepScanTrigger::
-                TRIGGER_IMMEDIATE_DEEP_SCAN,
-            /*password=*/std::nullopt);
-#endif
         // We return early because starting deep scanning immediately triggers
         // this function with a `DownloadCheckResult` of `ASYNC_SCANNING`. Doing
         // two updates would lead to two announced accessible alerts. See
@@ -2345,13 +2331,6 @@ void ChromeDownloadManagerDelegate::CheckSavePackageAllowed(
           enterprise_connectors::SavePackageScanningData::kKey,
           std::make_unique<enterprise_connectors::SavePackageScanningData>(
               std::move(callback)));
-
-      service->UploadSavePackageForDeepScanning(
-          download_item, std::move(save_package_files),
-          base::BindRepeating(
-              &ChromeDownloadManagerDelegate::CheckSavePackageScanningDone,
-              weak_ptr_factory_.GetWeakPtr(), download_item->GetId()),
-          std::move(settings.value()));
       return;
     }
   }

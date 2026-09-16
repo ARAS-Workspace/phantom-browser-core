@@ -19,7 +19,6 @@
 #include "chrome/browser/policy/dm_token_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/reporting_util.h"
-#include "chrome/browser/safe_browsing/cloud_content_scanning/deep_scanning_utils.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/enterprise/browser/controller/browser_dm_token_storage.h"
 #include "components/enterprise/common/proto/connectors.pb.h"

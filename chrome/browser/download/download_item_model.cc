@@ -76,10 +76,6 @@
 #if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "chrome/browser/safe_browsing/download_protection/download_feedback_service.h"
 #include "chrome/browser/enterprise/connectors/connectors_manager.h"
-
-#if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/download_protection/deep_scanning_request.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
 #endif  // BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
@@ -810,13 +806,6 @@ void DownloadItemModel::ExecuteCommand(DownloadCommands* download_commands,
       DownloadUIModel::ExecuteCommand(download_commands, command);
       break;
     case DownloadCommands::DEEP_SCAN: {
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION) && !BUILDFLAG(IS_ANDROID)
-      // Deep scanning is not supported on Android.
-      safe_browsing::DownloadProtectionService::UploadForConsumerDeepScanning(
-          download_,
-          DownloadItemWarningData::DeepScanTrigger::TRIGGER_CONSUMER_PROMPT,
-          /*password=*/std::nullopt);
-#endif
       break;
     }
     case DownloadCommands::CANCEL_DEEP_SCAN: {

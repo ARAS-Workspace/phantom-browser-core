@@ -173,16 +173,11 @@ static_library("safe_browsing") {
       "client_side_detection_intelligent_scan_delegate_factory.h",
       "client_side_detection_intelligent_scan_delegate_util.h",
       "client_side_detection_service_factory.h",
-      "cloud_content_scanning/cloud_binary_upload_service.h",
-      "cloud_content_scanning/cloud_binary_upload_service_factory.h",
-      "cloud_content_scanning/deep_scanning_utils.h",
-      "cloud_content_scanning/file_analysis_request.h",
       "delayed_warning_navigation_throttle.h",
       "download_protection/check_client_download_request.h",
       "download_protection/check_client_download_request_base.h",
       "download_protection/check_file_system_access_write_request.h",
       "download_protection/deep_scanning_metadata.h",
-      "download_protection/deep_scanning_request.h",
       "download_protection/download_item_metadata.h",
       "download_protection/download_protection_delegate.h",
       "download_protection/download_protection_observer.h",
@@ -238,16 +233,11 @@ static_library("safe_browsing") {
       "client_side_detection_intelligent_scan_delegate_factory.cc",
       "client_side_detection_intelligent_scan_delegate_util.cc",
       "client_side_detection_service_factory.cc",
-      "cloud_content_scanning/cloud_binary_upload_service.cc",
-      "cloud_content_scanning/cloud_binary_upload_service_factory.cc",
-      "cloud_content_scanning/deep_scanning_utils.cc",
-      "cloud_content_scanning/file_analysis_request.cc",
       "delayed_warning_navigation_throttle.cc",
       "download_protection/check_client_download_request.cc",
       "download_protection/check_client_download_request_base.cc",
       "download_protection/check_file_system_access_write_request.cc",
       "download_protection/deep_scanning_metadata.cc",
-      "download_protection/deep_scanning_request.cc",
       "download_protection/download_item_metadata.cc",
       "download_protection/download_protection_delegate.cc",
       "download_protection/download_protection_observer.cc",
@@ -320,7 +310,6 @@ static_library("safe_browsing") {
       "//components/content_extraction/content/browser",
       "//components/content_settings/core/browser",
       "//components/enterprise/connectors/core",
-      "//components/enterprise/connectors/core:cloud_content_scanning",
       "//components/no_state_prefetch/browser",
       "//components/omnibox/browser",
       "//components/password_manager/content/browser",
@@ -534,7 +523,6 @@ static_library("safe_browsing") {
         "//chrome/common/extensions",
         "//chrome/services/file_util/public/cpp",
         "//components/content_settings/core/browser",
-        "//components/enterprise/connectors/core:cloud_content_scanning",
         "//components/file_access",
         "//components/keyed_service/content",
         "//components/language/core/common",
@@ -812,14 +800,6 @@ source_set("unit_tests") {
     if (is_android) {
       deps += [ "//chrome/browser/password_manager/android:unit_tests" ]
     }
-
-    if (enterprise_cloud_content_analysis) {
-      sources += [
-        "chrome_enterprise_url_lookup_service_factory_unittest.cc",
-        "chrome_enterprise_url_lookup_service_unittest.cc",
-      ]
-      deps += [ "//components/safe_browsing/core/browser/realtime:enterprise_url_lookup_service" ]
-    }
   }
 
   if (safe_browsing_mode == 0) {
@@ -846,11 +826,7 @@ source_set("unit_tests") {
       "client_side_detection_intelligent_scan_delegate_factory_unittest.cc",
       "client_side_detection_service_factory_unittest.cc",
       "client_side_detection_service_unittest.cc",
-      "cloud_content_scanning/cloud_binary_upload_service_unittest.cc",
-      "cloud_content_scanning/deep_scanning_utils_unittest.cc",
-      "cloud_content_scanning/file_analysis_request_unittest.cc",
       "download_protection/download_feedback_service_unittest.cc",
-      "download_protection/download_feedback_unittest.cc",
       "download_protection/path_sanitizer_unittest.cc",
       "extension_telemetry/activity_log_ingester_unittest.cc",
       "extension_telemetry/cookies_get_all_signal_processor_unittest.cc",
@@ -977,8 +953,7 @@ source_set("unit_tests") {
       "//components/safe_browsing/android:safe_browsing_api_handler_util",
     ]
   }
-  if (enterprise_cloud_content_analysis || is_android) {
-    sources += [ "download_protection/deep_scanning_request_unittest.cc" ]
+  if (is_android) {
     deps += [
       "//chrome/browser/enterprise/connectors/reporting:unit_tests",
       "//chrome/browser/enterprise/connectors/test:test_support",
@@ -986,7 +961,6 @@ source_set("unit_tests") {
       "//components/enterprise/common/proto:browser_events_proto",
       "//components/enterprise/common/proto:chrome_reporting_entity",
       "//components/enterprise/connectors/core",
-      "//components/enterprise/connectors/core:cloud_content_scanning",
       "//components/enterprise/connectors/core:test_support",
       "//components/enterprise/obfuscation/core:enterprise_obfuscation",
     ]
@@ -1030,8 +1004,6 @@ source_set("test_support") {
 
   if (safe_browsing_mode != 0) {
     sources += [
-      "cloud_content_scanning/test_binary_upload_service.cc",
-      "cloud_content_scanning/test_binary_upload_service.h",
       "test_safe_browsing_service.cc",
       "test_safe_browsing_service.h",
     ]
@@ -1050,7 +1022,6 @@ source_set("test_support") {
       "//chrome/browser/ui/browser_window",
       "//chrome/common",
       "//components/enterprise/common/proto:connectors_proto",
-      "//components/enterprise/connectors/core:cloud_content_scanning",
       "//components/safe_browsing:buildflags",
       "//components/safe_browsing/content/browser",
       "//components/safe_browsing/content/browser:safe_browsing_blocking_page",

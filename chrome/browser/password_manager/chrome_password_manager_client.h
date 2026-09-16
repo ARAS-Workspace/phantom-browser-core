@@ -275,11 +275,6 @@ class ChromePasswordManagerClient
                                    const GURL& frame_url) override;
 #endif
 
-// Reporting login event is supported on desktop platforms (mapped by
-// `ENTERPRISE_CONTENT_ANALYSIS`) and on the Android platform, when the
-// enterprise reporting feature flag is turned on. `IS_ANDROID` cannot be added
-// to `ENTERPRISE_CONTENT_ANALYSIS`, because the build flag is also used by
-// other features that are not yet supported on Android.
 #if BUILDFLAG(IS_ANDROID)
   void MaybeReportEnterpriseLoginEvent(
       const GURL& url,
@@ -287,11 +282,6 @@ class ChromePasswordManagerClient
       const url::SchemeHostPort& federated_origin,
       const std::u16string& login_user_name) const override;
 
-  // Reporting password breach event is supported on desktop platforms (mapped
-  // by `ENTERPRISE_CONTENT_ANALYSIS`) and on the Android platform, when the
-  // enterprise reporting feature flag is turned on. `IS_ANDROID` cannot be
-  // added to `ENTERPRISE_CONTENT_ANALYSIS`, because the build flag is also used
-  // by other features that are not yet supported on Android.
   void MaybeReportEnterprisePasswordBreachEvent(
       const std::vector<std::pair<GURL, std::u16string>>& identities)
       const override;

@@ -7,19 +7,16 @@
 #include "base/strings/string_number_conversions.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/download/simple_download_manager_coordinator_factory.h"
-#include "chrome/browser/enterprise/connectors/analysis/content_analysis_info.h"
 #include "chrome/browser/enterprise/connectors/common.h"
 #include "chrome/browser/enterprise/connectors/reporting/reporting_event_router_factory.h"
 #include "chrome/browser/profiles/profile_key.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/safe_browsing/cloud_content_scanning/deep_scanning_utils.h"
 #include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
 #include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/download_item.h"
 #include "components/download/public/common/simple_download_manager_coordinator.h"
-#include "components/enterprise/connectors/core/cloud_content_scanning/deep_scanning_utils.h"
 #include "components/enterprise/connectors/core/reporting_constants.h"
 #include "components/enterprise/connectors/core/reporting_event_router.h"
 #include "components/enterprise/connectors/core/reporting_utils.h"
@@ -48,44 +45,6 @@ bool DangerTypeIsDangerous(download::DownloadDangerType danger_type) {
 }
 
 void MaybeReportDangerousDownloadWarning(download::DownloadItem* download) {
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  // If |download| has a deep scanning malware verdict, then it means the
-  // dangerous file has already been reported.
-  auto* scan_result = static_cast<enterprise_connectors::ScanResult*>(
-      download->GetUserData(enterprise_connectors::ScanResult::kKey));
-  if (scan_result) {
-    for (const auto& metadata : scan_result->file_metadata) {
-      if (enterprise_connectors::ContainsMalwareVerdict(metadata.scan_response))
-        return;
-    }
-  }
-
-  content::BrowserContext* browser_context =
-      content::DownloadItemUtils::GetBrowserContext(download);
-
-  auto* router =
-      enterprise_connectors::ReportingEventRouterFactory::GetForBrowserContext(
-          browser_context);
-  if (!router)
-    return;
-
-  ReferrerChain referrer_chain;
-  if (base::FeatureList::IsEnabled(kEnhancedFieldsForSecOps)) {
-    referrer_chain = GetOrIdentifyReferrerChainForEnterprise(*download);
-  }
-
-  router->OnDangerousDownloadEvent(
-      download->GetURL(), download->GetTabUrl(),
-      download->GetTargetFilePath().AsUTF8Unsafe(),
-      base::HexEncode(download->GetHash()), download->GetDangerType(),
-      download->GetMimeType(),
-      enterprise_connectors::kFileDownloadDataTransferEventTrigger,
-      /*scan_id=*/"", download->GetTotalBytes(), referrer_chain,
-      enterprise_connectors::CollectFrameUrls(
-          content::DownloadItemUtils::GetWebContents(download),
-          enterprise_connectors::DeepScanAccessPoint::DOWNLOAD),
-      enterprise_connectors::EventResult::WARNED);
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 }
 
 void ReportDangerousDownloadWarningBypassed(
@@ -134,46 +93,6 @@ void ReportDangerousDownloadWarningBypassed(
         enterprise_connectors::kFileDownloadDataTransferEventTrigger,
         /*scan_id*/ "", download->GetTotalBytes(), referrer_chain,
         frame_url_chain, enterprise_connectors::EventResult::BYPASSED);
-  }
-}
-
-void ReportAnalysisConnectorWarningBypassed(download::DownloadItem* download) {
-  if (!IsDeepScanningEnabled()) {
-    return;
-  }
-
-  content::BrowserContext* browser_context =
-      content::DownloadItemUtils::GetBrowserContext(download);
-  Profile* profile = Profile::FromBrowserContext(browser_context);
-  if (!profile)
-    return;
-
-  enterprise_connectors::ScanResult* stored_result =
-      static_cast<enterprise_connectors::ScanResult*>(
-          download->GetUserData(enterprise_connectors::ScanResult::kKey));
-
-  auto* router =
-      enterprise_connectors::ReportingEventRouterFactory::GetForBrowserContext(
-          profile);
-
-  enterprise_connectors::DownloadContentAreaUserProvider info(*download);
-  if (stored_result) {
-    for (const auto& metadata : stored_result->file_metadata) {
-      enterprise_connectors::ReportAnalysisConnectorWarningBypass(
-          router, &info, "", "", metadata.filename, metadata.sha256,
-          metadata.mime_type,
-          enterprise_connectors::kFileDownloadDataTransferEventTrigger, "",
-          metadata.size, metadata.scan_response,
-          stored_result->user_justification);
-    }
-  } else {
-    enterprise_connectors::ReportAnalysisConnectorWarningBypass(
-        router, &info, "", "", download->GetTargetFilePath().AsUTF8Unsafe(),
-        base::HexEncode(download->GetHash()), download->GetMimeType(),
-        enterprise_connectors::kFileDownloadDataTransferEventTrigger, "",
-        download->GetTotalBytes(),
-        enterprise_connectors::ContentAnalysisResponse(),
-        /*user_justification=*/std::nullopt);
   }
 }
 
@@ -246,8 +165,6 @@ void DownloadProtectionObserver::OnDownloadUpdated(
   if (old_danger_type ==
           download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING &&
       current_danger_type == download::DOWNLOAD_DANGER_TYPE_USER_VALIDATED) {
-    ReportAnalysisConnectorWarningBypassed(download);
-
     // This is called when a SavePackage warning is bypassed so that the final
     // renaming takes place.
     if (download->IsSavePackageDownload())
@@ -270,11 +187,6 @@ void DownloadProtectionObserver::ReportDelayedBypassEvent(
     download::DownloadDangerType danger_type) {
   // Because the file was opened before the verdict was available, it's possible
   // that the danger type is "BLOCK" but the file was opened anyways.
-  if (danger_type == download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_WARNING ||
-      danger_type == download::DOWNLOAD_DANGER_TYPE_SENSITIVE_CONTENT_BLOCK) {
-    ReportAnalysisConnectorWarningBypassed(download);
-  }
-
   if (DangerTypeIsDangerous(danger_type)) {
     ReportAndRecordDangerousDownloadWarningBypassed(download, danger_type);
   }

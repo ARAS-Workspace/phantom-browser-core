@@ -20,9 +20,8 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (enterprise_cloud_content_analysis || is_android) {
+  if (is_android) {
     sources += [
-      "common_unittest.cc",
       "connectors_manager_unittest.cc",
       "connectors_service_unittest.cc",
     ]

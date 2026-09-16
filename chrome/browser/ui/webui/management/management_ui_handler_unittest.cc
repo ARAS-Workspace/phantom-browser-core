@@ -658,7 +658,7 @@ TEST_F(ManagementUIHandlerTests, CloudReportingPolicy) {
       kManagementExtensionReportExtensionsPlugin
 #endif
   };
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   expected_messages.insert(kManagementExtensionReportVisitedUrl);
 #endif
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -715,9 +715,6 @@ TEST_F(ManagementUIHandlerTests,
       kManagementExtensionReportMachineName, kManagementExtensionReportUsername,
       kManagementExtensionReportVersion,
       kManagementExtensionReportExtensionsPlugin};
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  expected_messages.insert(kManagementExtensionReportVisitedUrl);
-#endif
 
   policy::SetDMTokenForTesting(policy::DMToken::CreateValidToken("fake-token"));
   ASSERT_PRED_FORMAT2(MessagesToBeEQ,

@@ -144,7 +144,7 @@ CheckFileSystemAccessWriteRequest::ShouldUploadBinary(
     return std::nullopt;
   }
 
-  auto settings = DeepScanningRequest::ShouldUploadBinary(*weak_metadata_);
+  std::optional<enterprise_connectors::AnalysisSettings> settings;
 
   // Malware scanning is redundant if the URL is allowlisted, but DLP scanning
   // might still need to happen.
@@ -173,15 +173,6 @@ void CheckFileSystemAccessWriteRequest::UploadBinary(
   // callback is only run once.
   metadata_->SetCallback(TakeCallback());
 
-  // Ownership of metadata moved as `CheckFileSystemAccessWriteRequest` will be
-  // destroyed before the deep scan finishes.
-  service()->UploadForDeepScanning(
-      std::move(metadata_),
-      base::BindRepeating(&FileSystemAccessMetadata::ProcessScanResult,
-                          weak_metadata_, reason),
-      DownloadItemWarningData::DeepScanTrigger::TRIGGER_POLICY, result,
-      std::move(settings),
-      /*password=*/std::nullopt);
 #endif
 }
 

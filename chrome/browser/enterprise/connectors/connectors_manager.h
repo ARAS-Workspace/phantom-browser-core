@@ -9,7 +9,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
-#include "chrome/browser/enterprise/connectors/analysis/analysis_service_settings.h"
 #include "components/enterprise/connectors/core/analysis_settings.h"
 #include "components/enterprise/connectors/core/connectors_manager_base.h"
 #include "components/enterprise/connectors/core/reporting_service_settings.h"

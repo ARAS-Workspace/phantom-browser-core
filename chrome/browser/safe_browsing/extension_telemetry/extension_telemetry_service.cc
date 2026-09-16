@@ -53,7 +53,6 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/common/pref_names.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "components/prefs/pref_service.h"
@@ -79,11 +78,6 @@
 #include "extensions/common/mojom/manifest.mojom-shared.h"
 #include "extensions/common/switches.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/connectors_service.h"
-#include "chrome/browser/enterprise/connectors/reporting/extension_telemetry_event_router.h"
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
 namespace safe_browsing {
 
@@ -158,12 +152,6 @@ base::TimeDelta kOffstoreFileDataCollectionStartupDelaySeconds =
 // Limit the off-store file data collection duration.
 base::TimeDelta kOffstoreFileDataCollectionDurationLimitSeconds =
     base::Seconds(60);
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-// Interval for generating and send extension telemetry for enterprise
-base::TimeDelta kExtensionTelemetryEnterpriseReportingIntervalSeconds =
-    base::Seconds(300);
-#endif
 
 void RecordWhenFileWasPersisted(bool persisted_at_write_interval) {
   base::UmaHistogramBoolean(
@@ -435,14 +423,6 @@ extensions::ExtensionSet CollectCommandLineExtensionInfo() {
   return commandline_extensions;
 }
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-// Retrieves the ExtensionTelemetryEventRouter associated with the profile.
-enterprise_connectors::ExtensionTelemetryEventRouter*
-GetExtensionTelemetryEventRouter(Profile* profile) {
-  return enterprise_connectors::ExtensionTelemetryEventRouter::Get(profile);
-}
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-
 }  // namespace
 
 // Adds extension installation mode and managed status to extension telemetry
@@ -480,20 +460,6 @@ ExtensionTelemetryService::ExtensionTelemetryService(
   // Set initial enable/disable state for ESB.
   SetEnabledForESB(IsEnhancedProtectionEnabled(*pref_service_));
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-    // Register for enterprise policy changes.
-    auto* connector_service =
-        enterprise_connectors::ConnectorsServiceFactory::GetForBrowserContext(
-            profile);
-    connector_service->ObserveTelemetryReporting(base::BindRepeating(
-        &ExtensionTelemetryService::OnEnterprisePolicyChanged,
-        base::Unretained(this)));
-
-    // Set initial enable/disable state for enterprise.
-    SetEnabledForEnterprise(
-        GetExtensionTelemetryEventRouter(profile_)->IsPolicyEnabled());
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-
     UpdateDOMActivityLoggingState();
 }
 
@@ -518,12 +484,7 @@ void ExtensionTelemetryService::OnEnterprisePolicyChanged() {
     return;
   }
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  SetEnabledForEnterprise(
-      GetExtensionTelemetryEventRouter(profile_)->IsPolicyEnabled());
-#else
   SetEnabledForEnterprise(false);
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 }
 
 // Telemetry features for ESB include:
@@ -638,16 +599,6 @@ void ExtensionTelemetryService::SetEnabledForEnterprise(bool enable) {
       SetUpSignalProcessorsAndSubscribersForEnterprise();
       SetUpOffstoreFileDataCollection();
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-      base::TimeDelta interval =
-          base::FeatureList::IsEnabled(
-              kExtensionTelemetryEnterpriseShortReportingInterval)
-              ? base::Seconds(30)
-              : kExtensionTelemetryEnterpriseReportingIntervalSeconds;
-      enterprise_timer_.Start(
-          FROM_HERE, interval, this,
-          &ExtensionTelemetryService::CreateAndSendEnterpriseReport);
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
     } else {
       // Cancel any pending enterprise telemetry reports.
       enterprise_timer_.Stop();
@@ -826,10 +777,6 @@ void ExtensionTelemetryService::CreateAndSendEnterpriseReport() {
       CreateReportForEnterprise();
   if (enterprise_report) {
     RecordEnterpriseReportSize(enterprise_report->ByteSizeLong());
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-    GetExtensionTelemetryEventRouter(profile_)->UploadTelemetryReport(
-        std::move(enterprise_report));
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
   } else {
     DLOG(WARNING) << "Upload skipped due to empty enterprise report.";
   }
@@ -1845,15 +1792,6 @@ void ExtensionTelemetryService::UpdateDOMActivityLoggingState() {
   }
 
   bool dom_telemetry_enabled = false;
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  dom_telemetry_enabled =
-      enterprise_enabled_ &&
-      base::FeatureList::IsEnabled(
-          extensions_features::kEnterpriseExtensionDOMActivityTelemetry) &&
-      GetExtensionTelemetryEventRouter(profile_)
-          ->IsDOMActivityTelemetryEnabled();
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
   if (dom_telemetry_enabled && !activity_log_ingester_) {
     activity_log_ingester_ =

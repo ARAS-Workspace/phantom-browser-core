@@ -5,8 +5,10 @@
 #ifndef CHROME_BROWSER_INTERSTITIALS_ENTERPRISE_UTIL_H_
 #define CHROME_BROWSER_INTERSTITIALS_ENTERPRISE_UTIL_H_
 
-#include "chrome/browser/safe_browsing/cloud_content_scanning/deep_scanning_utils.h"
+#include <string>
+
 #include "components/safe_browsing/buildflags.h"
+#include "url/gurl.h"
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "components/safe_browsing/core/browser/db/v4_protocol_manager_util.h"

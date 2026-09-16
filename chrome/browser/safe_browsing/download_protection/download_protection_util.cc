@@ -31,10 +31,6 @@
 #include "chrome/browser/safe_browsing/download_protection/download_protection_service.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/download_protection/deep_scanning_request.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/connectors/core/features.h"
 #endif
@@ -476,9 +472,7 @@ ShouldUploadBinaryForDeepScanning(download::DownloadItem* item) {
   if (!IsDeepScanningEnabled()) {
     return std::nullopt;
   }
-  // Create temporary metadata wrapper on the stack.
-  DownloadItemMetadata metadata(item);
-  return DeepScanningRequest::ShouldUploadBinary(metadata);
+  return std::nullopt;
 }
 
 bool IsFiletypeSupportedForFullDownloadProtection(

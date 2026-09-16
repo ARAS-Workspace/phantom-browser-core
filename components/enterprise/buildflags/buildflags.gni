@@ -6,14 +6,6 @@ import("//build/config/chromeos/args.gni")
 import("//build/config/ui.gni")
 
 declare_args() {
-  # Indicates support for content analysis against a cloud agent for Enterprise
-  # Connector policies.
-  enterprise_cloud_content_analysis = false
-
-  # Indicates support for content analysis against a cloud agent for Enterprise
-  # Connector policies.
-  enterprise_local_content_analysis = false
-
   # Indicates support for Data Control rules.
   enterprise_data_controls =
       is_win || is_mac || is_linux || is_android || is_ios
@@ -33,13 +25,4 @@ declare_args() {
 
   # Indicates support for Enterprise Proxy policy and service.
   enterprise_proxy = is_win || is_mac || is_linux || is_android || is_ios
-}
-
-declare_args() {
-  # Indicates if any content analysis support is present, whether local or
-  # cloud. This is used to improve readability of code and avoid relying on
-  # the fact that `enterprise_cloud_content_analysis` is a superset of
-  # `enterprise_local_content_analysis`.
-  enterprise_content_analysis =
-      enterprise_cloud_content_analysis || enterprise_local_content_analysis
 }

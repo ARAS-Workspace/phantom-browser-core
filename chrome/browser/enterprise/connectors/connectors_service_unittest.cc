@@ -38,78 +38,12 @@ namespace enterprise_connectors {
 
 namespace {
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-constexpr char kEmptySettingsPref[] = "[]";
-
-constexpr char kNormalReportingSettingsPref[] = R"([
-  {
-    "service_provider": "google"
-  }
-])";
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-constexpr char kWildcardAnalysisSettingsPref[] = R"([
-  {
-    "service_provider": "google",
-    "enable": [
-      {"url_list": ["*"], "tags": ["dlp", "malware"]}
-    ]
-  }
-])";
-
-constexpr char kCustomMessage[] = "Custom Admin Message";
-constexpr char kCustomUrl[] = "https://learn.more.com";
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-
 constexpr char kFakeDmToken[] = "fake-token";
 constexpr char kFakeDeviceId[] = "fake-device-id";
 #if BUILDFLAG(ENTERPRISE_WATERMARK)
 constexpr char kAffiliationId1[] = "affiliation-id-1";
 constexpr char kAffiliationId2[] = "affiliation-id-2";
 #endif
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-std::string CreateCustomUIPref(const char* custom_message,
-                               const char* custom_url,
-                               bool bypass_enabled) {
-  std::string custom_messages_section;
-
-  if (custom_message || custom_url) {
-    std::string message_section =
-        custom_message
-            ? base::StringPrintf(R"("message": "%s" ,)", custom_message)
-            : "";
-    std::string learn_more_url_section =
-        custom_url
-            ? base::StringPrintf(R"("learn_more_url": "%s" ,)", custom_url)
-            : "";
-
-    custom_messages_section = base::StringPrintf(
-        R"( "custom_messages": [
-          { "language": "default",
-            %s
-            %s
-            "tag": "dlp"
-          } ] ,)",
-        message_section.c_str(), learn_more_url_section.c_str());
-  }
-
-  std::string bypass_enabled_section;
-  if (bypass_enabled) {
-    bypass_enabled_section = R"("require_justification_tags": [ "dlp"],)";
-  }
-
-  std::string pref = base::StringPrintf(
-      R"({  "enable": [{"url_list": ["*"], "tags": ["dlp"]}],
-            %s
-            %s
-            "service_provider": "google"
-          })",
-      custom_messages_section.c_str(), bypass_enabled_section.c_str());
-  return pref;
-}
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
 
 }  // namespace
 
@@ -148,43 +82,6 @@ class ConnectorsServiceTest : public ConnectorsServiceTestBase {
   ConnectorsServiceTest() : ConnectorsServiceTestBase("test-user") {}
 };
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-// Test to make sure that HasExtraUiToDisplay returns the right value to
-// show the extra UI from opt in features like custom message, URL and bypass
-// on Download.
-class ConnectorsServiceHasExtraUiTest
-    : public ConnectorsServiceTest,
-      public testing::WithParamInterface<std::tuple<std::string, bool>> {
- public:
-  std::string pref() { return std::get<0>(GetParam()); }
-  bool has_extra_ui() { return std::get<1>(GetParam()); }
-};
-
-TEST_P(ConnectorsServiceHasExtraUiTest, AnalysisConnectors) {
-  test::SetAnalysisConnector(profile_->GetPrefs(), FILE_DOWNLOADED, pref());
-  auto* service = ConnectorsServiceFactory::GetForBrowserContext(profile_);
-  bool show_extra_ui = service->HasExtraUiToDisplay(FILE_DOWNLOADED, kDlpTag);
-  ASSERT_EQ(show_extra_ui, has_extra_ui());
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    ConnectorsServiceHasExtraUiTest,
-    testing::Values(
-        std::make_tuple(CreateCustomUIPref(kCustomMessage, kCustomUrl, true),
-                        true),
-        std::make_tuple(CreateCustomUIPref(kCustomMessage, kCustomUrl, false),
-                        true),
-        std::make_tuple(CreateCustomUIPref(kCustomMessage, nullptr, true),
-                        true),
-        std::make_tuple(CreateCustomUIPref(kCustomMessage, nullptr, false),
-                        true),
-        std::make_tuple(CreateCustomUIPref(nullptr, kCustomUrl, true), true),
-        std::make_tuple(CreateCustomUIPref(nullptr, kCustomUrl, false), true),
-        std::make_tuple(CreateCustomUIPref(nullptr, nullptr, true), true),
-        std::make_tuple(CreateCustomUIPref(nullptr, nullptr, false), false)));
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-
 // Tests to make sure getting reporting settings work with both the feature flag
 // and the OnSecurityEventEnterpriseConnector policy. The parameter for these
 // tests is a tuple of:
@@ -192,67 +89,6 @@ INSTANTIATE_TEST_SUITE_P(
 //   enum class ReportingConnector[]: array of all reporting connectors.
 //   bool: enable feature flag.
 //   int: policy value.  0: don't set, 1: set to normal, 2: set to empty.
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-class ConnectorsServiceReportingFeatureTest
-    : public ConnectorsServiceTest,
-      public testing::WithParamInterface<const char*> {
- public:
-  const char* pref_value() const { return GetParam(); }
-
-  const char* pref() const { return kOnSecurityEventPref; }
-
-  const char* scope_pref() const { return kOnSecurityEventScopePref; }
-
-  PrefService* pref_service() const { return profile_->GetPrefs(); }
-
-  bool reporting_enabled() const {
-    return pref_value() == kNormalReportingSettingsPref;
-  }
-};
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-TEST_P(ConnectorsServiceReportingFeatureTest, CheckTelemetryPolicyObserver) {
-  ConnectorsService* connectors_service =
-      ConnectorsServiceFactory::GetForBrowserContext(profile_);
-  ConnectorsManagerBase* connectors_manager_base =
-      connectors_service->ConnectorsManagerBaseForTesting();
-
-  base::test::TestFuture<void> future;
-  connectors_service->ObserveTelemetryReporting(future.GetRepeatingCallback());
-
-  ASSERT_FALSE(connectors_manager_base->GetTelemetryObserverCallbackForTesting()
-                   .is_null());
-  // Cache initially empty
-  ASSERT_TRUE(
-      connectors_manager_base->GetReportingConnectorsSettingsForTesting()
-          .empty());
-
-  // Enable browser crash event
-  test::SetOnSecurityEventReporting(pref_service(), true, {kBrowserCrashEvent},
-                                    {});
-  EXPECT_TRUE(future.WaitAndClear());
-
-  // Clear enabled events (not cached when cleared)
-  test::SetOnSecurityEventReporting(pref_service(), false, {}, {});
-  ASSERT_TRUE(
-      connectors_manager_base->GetReportingConnectorsSettingsForTesting()
-          .empty());
-  EXPECT_TRUE(future.WaitAndClear());
-
-  // Enable telemetry event
-  test::SetOnSecurityEventReporting(pref_service(), true,
-                                    {kExtensionTelemetryEvent}, {});
-  EXPECT_TRUE(future.WaitAndClear());
-}
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-
-INSTANTIATE_TEST_SUITE_P(,
-                         ConnectorsServiceReportingFeatureTest,
-                         testing::Values(nullptr,
-                                         kNormalReportingSettingsPref,
-                                         kEmptySettingsPref));
-
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
 
 TEST_F(ConnectorsServiceTest, RealtimeURLCheck) {
   profile_->GetPrefs()->SetInteger(
@@ -284,121 +120,6 @@ TEST_F(ConnectorsServiceTest, RealtimeURLCheck) {
                    ->GetRealTimeUrlCheckIdentifier();
   EXPECT_TRUE(identifier.empty());
 }
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-class ConnectorsServiceExemptURLsTest
-    : public ConnectorsServiceTest,
-      public testing::WithParamInterface<AnalysisConnector> {
- public:
-  ConnectorsServiceExemptURLsTest() = default;
-
-  void SetUp() override {
-    ConnectorsServiceTest::SetUp();
-    profile_->GetPrefs()->Set(
-        AnalysisConnectorPref(connector()),
-        *base::JSONReader::Read(kWildcardAnalysisSettingsPref,
-                                base::JSON_PARSE_CHROMIUM_EXTENSIONS));
-    profile_->GetPrefs()->SetInteger(AnalysisConnectorScopePref(connector()),
-                                     policy::POLICY_SCOPE_MACHINE);
-  }
-
-  AnalysisConnector connector() { return GetParam(); }
-};
-
-TEST_P(ConnectorsServiceExemptURLsTest, WebUI) {
-  auto* service = ConnectorsServiceFactory::GetForBrowserContext(profile_);
-  for (const char* url :
-       {"chrome://settings", "chrome://help-app/background",
-        "chrome://foo/bar/baz.html", "chrome://foo/bar/baz.html?param=value"}) {
-    auto settings = service->GetAnalysisSettings(GURL(url), connector());
-    ASSERT_FALSE(settings.has_value());
-  }
-}
-
-TEST_P(ConnectorsServiceExemptURLsTest, ThirdPartyExtensions) {
-  auto* service = ConnectorsServiceFactory::GetForBrowserContext(profile_);
-
-  for (const char* url :
-       {"chrome-extension://fake_id", "chrome-extension://fake_id/background",
-        "chrome-extension://fake_id/main.html",
-        "chrome-extension://fake_id/main.html?param=value"}) {
-    ASSERT_TRUE(GURL(url).is_valid());
-    auto settings = service->GetAnalysisSettings(GURL(url), connector());
-    ASSERT_TRUE(settings.has_value());
-  }
-}
-
-TEST_P(ConnectorsServiceExemptURLsTest, DevTools) {
-  auto* service = ConnectorsServiceFactory::GetForBrowserContext(profile_);
-
-  for (const char* url :
-       {"devtools://fake_id", "devtools://fake_id/background",
-        "devtools://devtools/main.html",
-        "devtools://devtools/bundled/main.html?param=value"}) {
-    ASSERT_TRUE(GURL(url).is_valid());
-    auto settings = service->GetAnalysisSettings(GURL(url), connector());
-    ASSERT_NE(settings.has_value(),
-              connector() == AnalysisConnector::BULK_DATA_ENTRY ||
-                  connector() == AnalysisConnector::FILE_ATTACHED);
-  }
-}
-
-TEST_P(ConnectorsServiceExemptURLsTest, BlobAndFilesystem) {
-  auto* service = ConnectorsServiceFactory::GetForBrowserContext(profile_);
-
-  // Test against wildcard policy.
-  for (const char* url_string :
-       {"blob:https://foo.com", "blob:ftp://foo.com/with/path",
-        "filesystem:http://foo.com/with.extension",
-        "filesystem:http://foo.com/with/path"}) {
-    GURL url(url_string);
-    ASSERT_TRUE(url.is_valid());
-    ASSERT_TRUE(url.SchemeIsFileSystem() || url.SchemeIsBlob());
-    auto settings = service->GetAnalysisSettings(GURL(url), connector());
-    ASSERT_TRUE(settings.has_value());
-  }
-
-  // Test against a specific pattern policy to validate the correct inner URL is
-  // used.
-  profile_->GetPrefs()->Set(
-      AnalysisConnectorPref(connector()),
-      *base::JSONReader::Read(R"([
-        {
-          "service_provider": "google",
-          "enable": [
-            {"url_list": ["foo.com"], "tags": ["dlp", "malware"]}
-          ]
-        }
-      ])",
-                              base::JSON_PARSE_CHROMIUM_EXTENSIONS));
-
-  for (const char* url_string :
-       {"blob:https://foo.com", "blob:ftp://foo.com/with/path",
-        "filesystem:http://foo.com/with.extension",
-        "filesystem:http://foo.com/with/path"}) {
-    GURL url(url_string);
-    ASSERT_TRUE(url.is_valid());
-    ASSERT_TRUE(url.SchemeIsFileSystem() || url.SchemeIsBlob());
-    auto settings = service->GetAnalysisSettings(GURL(url), connector());
-    ASSERT_TRUE(settings.has_value());
-  }
-  for (const char* url_string :
-       {"blob:https://notfoo.com", "blob:ftp://notfoo.com/with/path",
-        "filesystem:http://notfoo.com/with.extension",
-        "filesystem:http://notfoo.com/with/path"}) {
-    GURL url(url_string);
-    ASSERT_TRUE(url.is_valid());
-    ASSERT_TRUE(url.SchemeIsFileSystem() || url.SchemeIsBlob());
-    auto settings = service->GetAnalysisSettings(GURL(url), connector());
-    ASSERT_FALSE(settings.has_value());
-  }
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    ,
-    ConnectorsServiceExemptURLsTest,
-    testing::Values(FILE_ATTACHED, FILE_DOWNLOADED, BULK_DATA_ENTRY, PRINT));
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
 
 class ConnectorsServiceProfileTypeBrowserTest : public testing::Test {
  public:
