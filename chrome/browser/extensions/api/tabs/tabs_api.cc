@@ -30,7 +30,6 @@
 #include "chrome/browser/resource_coordinator/lifecycle_unit_state.mojom-forward.h"
 #include "chrome/browser/resource_coordinator/utils.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
-#include "chrome/browser/translate/translate_service.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/browser_window/public/create_browser_window.h"
@@ -41,6 +40,7 @@
 #include "chrome/browser/ui/tabs/tab_muted_utils.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
 #include "chrome/common/pref_names.h"
+#include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/language_detection_details.h"
@@ -53,6 +53,7 @@
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/navigation_handle.h"
+#include "content/public/common/url_constants.h"
 #include "extensions/browser/api/constants.h"
 #include "extensions/browser/extension_user_activation_service.h"
 #include "extensions/browser/extension_zoom_request_client.h"
@@ -624,6 +625,18 @@ bool IsDSERemoval(const ExtensionId& extension_id,
       has_user_activation ? RemoveActionType::kDSERemovalsWithUserGesture
                           : RemoveActionType::kDSERemovalsWithoutUserGesture);
   return !has_user_activation;
+}
+
+// A URL can have its language detected unless it is one of the following:
+// - empty (can happen for popups created with window.open(""))
+// - an internal URL:
+//   - chrome:// and chrome-native:// for all platforms
+// - the devtools (which is considered UI)
+// - about:blank
+bool IsLanguageDetectableURL(const GURL &url) {
+  return !url.is_empty() && !url.SchemeIs(content::kChromeUIScheme) &&
+         !url.SchemeIs(chrome::kChromeNativeScheme) &&
+         !url.SchemeIs(content::kChromeDevToolsScheme) && !url.IsAboutBlank();
 }
 
 }  // namespace
@@ -3434,7 +3447,7 @@ ExtensionFunction::ResponseAction TabsDetectLanguageFunction::Run() {
     return RespondNow(Error(kCannotDetermineLanguageOfUnloadedTab));
   }
 
-  if (!TranslateService::IsTranslatableURL(contents->GetLastCommittedURL())) {
+  if (!IsLanguageDetectableURL(contents->GetLastCommittedURL())) {
     return RespondNow(Error(kLanguageDetectionNotSupported));
   }
 

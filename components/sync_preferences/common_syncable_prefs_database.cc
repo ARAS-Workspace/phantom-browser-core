@@ -31,7 +31,6 @@
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
 #include "components/sync_preferences/cross_device_pref_tracker/prefs/cross_device_pref_names.h"
-#include "components/translate/core/browser/translate_prefs.h"
 #include "components/variations/service/google_groups_manager_prefs.h"
 
 namespace sync_preferences {
@@ -342,23 +341,6 @@ constexpr auto kCommonSyncablePrefsAllowlist =
           PrefSensitivity::kNone, MergeBehavior::kNone}},
         {tab_groups::prefs::kAutoPinNewTabGroups,
          {syncable_prefs_ids::kAutoPinNewTabGroups, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {translate::TranslatePrefs::kPrefForceTriggerTranslateCount,
-         {syncable_prefs_ids::kPrefForceTriggerTranslateCount,
-          syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {translate::TranslatePrefs::kPrefTranslateAcceptedCount,
-         {syncable_prefs_ids::kPrefTranslateAcceptedCount, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
-        {translate::TranslatePrefs::kPrefTranslateAutoAlwaysCount,
-         {syncable_prefs_ids::kPrefTranslateAutoAlwaysCount,
-          syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {translate::TranslatePrefs::kPrefTranslateAutoNeverCount,
-         {syncable_prefs_ids::kPrefTranslateAutoNeverCount, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
-        {translate::TranslatePrefs::kPrefTranslateDeniedCount,
-         {syncable_prefs_ids::kPrefTranslateDeniedCount, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kNone}},
         {language::prefs::kBlockedLanguages,
          {syncable_prefs_ids::kBlockedLanguages, syncer::PREFERENCES,

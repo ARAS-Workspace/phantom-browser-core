@@ -69,7 +69,6 @@
 #include "components/language/core/browser/pref_names.h"
 #include "components/supervised_user/core/common/pref_names.h"
 #include "components/themes/pref_names.h"
-#include "components/translate/core/browser/translate_prefs.h"
 #include "components/url_formatter/url_fixer.h"
 #include "extensions/browser/extension_pref_value_map.h"
 #include "extensions/browser/extension_pref_value_map_factory.h"

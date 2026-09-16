@@ -546,6 +546,7 @@ void LanguagePrefs::InitializeSelectedLanguagesPref() {
 void ResetLanguagePrefs(PrefService* prefs) {
   prefs->ClearPref(language::prefs::kSelectedLanguages);
   prefs->ClearPref(language::prefs::kAcceptLanguages);
+  prefs->ClearPref(language::prefs::kBlockedLanguages);
 #if BUILDFLAG(IS_ANDROID)
   prefs->ClearPref(language::prefs::kULPLanguages);
 #endif

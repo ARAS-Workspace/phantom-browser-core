@@ -17,7 +17,6 @@
 #include "components/pref_registry/pref_registry_syncable.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
-#include "components/translate/core/browser/translate_prefs.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -35,7 +34,6 @@ constexpr static float kFloatEps = 0.00001f;
 struct PrefRegistration {
   explicit PrefRegistration(user_prefs::PrefRegistrySyncable* registry) {
     language::LanguagePrefs::RegisterProfilePrefs(registry);
-    translate::TranslatePrefs::RegisterProfilePrefs(registry);
   }
 };
 

@@ -178,7 +178,6 @@
 #include "chrome/browser/task_manager/sampling/task_manager_impl.h"
 #include "chrome/browser/task_manager/task_manager_interface.h"
 #include "chrome/browser/tracing/chrome_tracing_delegate.h"
-#include "chrome/browser/translate/translate_service.h"
 #include "chrome/browser/ui/blocked_content/blocked_window_params.h"
 #include "chrome/browser/ui/blocked_content/chrome_popup_navigation_delegate.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
@@ -326,7 +325,6 @@
 #include "components/site_isolation/site_isolation_policy.h"
 #include "components/subresource_filter/content/browser/content_subresource_filter_throttle_manager.h"
 #include "components/supervised_user/core/common/features.h"
-#include "components/translate/core/common/translate_switches.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/variations/variations_associated_data.h"
 #include "components/variations/variations_switches.h"
@@ -2958,7 +2956,6 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
         embedder_support::kOriginTrialDisabledFeatures,
         embedder_support::kOriginTrialPublicKey,
         switches::kReaderModeHeuristics,
-        translate::switches::kTranslateSecurityOrigin,
     };
 
     command_line->CopySwitchesFrom(browser_command_line, kSwitchNames);
@@ -4518,8 +4515,6 @@ void ChromeContentBrowserClient::OverrideWebPreferences(
 
   web_prefs->root_scrollbar_theme_color =
       GetRootScrollbarThemeColor(web_contents);
-
-  web_prefs->translate_service_available = TranslateService::IsAvailable(prefs);
 
   std::optional<ui::CaptionStyle> style =
       captions::GetCaptionStyleFromUserSettings(prefs,

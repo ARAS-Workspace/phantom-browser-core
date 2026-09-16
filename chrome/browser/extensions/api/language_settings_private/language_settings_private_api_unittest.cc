@@ -29,7 +29,6 @@
 #include "components/language/core/browser/pref_names.h"
 #include "components/prefs/pref_member.h"
 #include "components/spellcheck/common/spellcheck_features.h"
-#include "components/translate/core/browser/translate_download_manager.h"
 #include "extensions/browser/api_test_utils.h"
 #include "extensions/browser/event_router_factory.h"
 #include "extensions/browser/extension_prefs.h"

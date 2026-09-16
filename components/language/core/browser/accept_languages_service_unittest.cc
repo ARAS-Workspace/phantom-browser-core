@@ -6,31 +6,9 @@
 
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/translate/core/browser/translate_download_manager.h"
 #include "testing/gtest/include/gtest/gtest.h"
-
-using translate::TranslateDownloadManager;
-
 namespace language {
 namespace {
-
-// RAII class to set the TranslateDownloadManager application locale, and then
-// restore it to the original value when the object goes out of scope.
-class TranslateLocaleRestorer {
- public:
-  explicit TranslateLocaleRestorer(const std::string& new_locale)
-      : existing_locale_(
-            TranslateDownloadManager::GetInstance()->application_locale()) {
-    TranslateDownloadManager::GetInstance()->set_application_locale(new_locale);
-  }
-  ~TranslateLocaleRestorer() {
-    TranslateDownloadManager::GetInstance()->set_application_locale(
-        existing_locale_);
-  }
-
- private:
-  const std::string existing_locale_;
-};
 
 TEST(AcceptLanguagesServiceTest, TestIsAcceptLanguage) {
   const char* const pref_setting = "translate-accept-languages";
@@ -54,8 +32,6 @@ TEST(AcceptLanguagesServiceTest, TestIsAcceptLanguage) {
 }
 
 TEST(AcceptLanguagesServiceTest, TestCanBeAcceptLanguage) {
-  TranslateLocaleRestorer locale_restorer("es");
-
   // Valid accept languages.
   EXPECT_TRUE(AcceptLanguagesService::CanBeAcceptLanguage("en"));
   EXPECT_TRUE(AcceptLanguagesService::CanBeAcceptLanguage("en-US"));

@@ -30,7 +30,6 @@
 #include "chrome/browser/pwc/pwc_api_binder.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ssl/chrome_security_state_util.h"
-#include "chrome/browser/translate/translate_frame_binder.h"
 #include "chrome/browser/ui/search_engines/search_engine_tab_helper.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/pref_names.h"
@@ -53,7 +52,6 @@
 #include "components/security_state/core/security_state.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/spellcheck/spellcheck_buildflags.h"
-#include "components/translate/content/common/translate.mojom.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_process_host.h"
@@ -356,9 +354,6 @@ void PopulateChromeFrameBinders(
 
   map->Add<language_detection::mojom::LanguageDetectionHost>(
       &language_detection::BindLanguageDetectionHost);
-
-  map->Add<translate::mojom::ContentTranslateDriver>(
-      &translate::BindContentTranslateDriver);
 
   map->Add<optimization_guide::mojom::ModelBroker>(&BindModelBroker);
 

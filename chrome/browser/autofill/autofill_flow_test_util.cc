@@ -14,13 +14,10 @@
 #include "base/test/bind.h"
 #include "base/time/time.h"
 #include "chrome/browser/autofill/autofill_uitest.h"
-#include "chrome/browser/translate/translate_test_utils.h"
 #include "chrome/browser/ui/autofill/autofill_popup_controller_impl.h"
 #include "chrome/browser/ui/autofill/autofill_popup_controller_impl_test_api.h"
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller.h"
 #include "chrome/browser/ui/autofill/chrome_autofill_client.h"
-#include "chrome/browser/ui/translate/translate_bubble_model.h"
-#include "chrome/browser/ui/translate/translate_bubble_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/autofill/core/common/autofill_util.h"
 #include "content/public/browser/browser_accessibility_state.h"
@@ -181,12 +178,9 @@ struct ShowAutofillSuggestionsParams {
   bool field_was_focused_initially = IsFocusedField(e, rfh);
   for (size_t i = 1; i <= p.max_tries; ++i) {
     m << "\nIteration " << i << "/" << p.max_tries << ". ";
-    // A Translate bubble may overlap with the Autofill popup, which causes
-    // flakiness. See crbug.com/40168071#comment11.
-    // Also, the address-save prompts and others may overlap with the Autofill
+    // The address-save prompts and others may overlap with the Autofill
     // popup. So we preemptively close all bubbles, which however is not
     // reliable on Windows.
-    translate::test_utils::CloseCurrentBubble(test->browser());
     TryToCloseAllPrompts(test->GetWebContents());
     if (i > 1) {
       test->DoNothingAndWaitAndIgnoreEvents(p.timeout);

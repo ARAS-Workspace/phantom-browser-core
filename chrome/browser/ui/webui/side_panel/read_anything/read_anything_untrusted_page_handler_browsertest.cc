@@ -19,7 +19,6 @@
 #include "base/values.h"
 #include "chrome/browser/pdf/pdf_extension_test_util.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/read_anything/read_anything_immersive_web_view.h"
@@ -46,7 +45,6 @@
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/prefs/pref_value_map.h"
 #include "components/tabs/public/tab_interface.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "components/user_education/common/new_badge/new_badge_specification.h"
 #include "components/user_education/common/user_education_features.h"
 #include "content/public/common/content_switches.h"
@@ -304,17 +302,6 @@ class ReadAnythingUntrustedPageHandlerTest : public InProcessBrowserTest {
     views::WebView* web_view =
         static_cast<views::WebView*>(overlay_view->children()[0]);
     return web_view->GetWebContents();
-  }
-
-  ChromeTranslateClient* GetChromeTranslateClient() {
-    return ChromeTranslateClient::FromWebContents(GetReadAnythingWebContents());
-  }
-
-  void SetTranslateSourceLanguage(const std::string& language) {
-    GetChromeTranslateClient()
-        ->GetTranslateManager()
-        ->GetLanguageState()
-        ->SetSourceLanguage(language);
   }
 
   bool HasAudio() { return GetReadAnythingWebContents()->IsCurrentlyAudible(); }
@@ -1086,59 +1073,6 @@ IN_PROC_BROWSER_TEST_F(ReadAnythingUntrustedPageHandlerTest,
 
   // This is called once during construction, so we check for 2 calls here.
   EXPECT_CALL(page_, OnActiveAXTreeIDChanged).Times(2);
-}
-
-IN_PROC_BROWSER_TEST_F(ReadAnythingUntrustedPageHandlerTest,
-                       OnActiveAXTreeIDChanged_SendsExistingLanguageCode) {
-  const char kLang[] = "pt-br";
-  SetTranslateSourceLanguage(kLang);
-
-  handler_ = CreateHandler();
-
-  // Sets the default language code.
-  EXPECT_CALL(page_, SetLanguageCode).Times(1);
-  // Sends the detected language code.
-  EXPECT_CALL(page_, SetLanguageCode(kLang)).Times(1);
-}
-
-IN_PROC_BROWSER_TEST_F(ReadAnythingUntrustedPageHandlerTest,
-                       OnActiveAXTreeIDChanged_SendsNewLanguageCode) {
-  handler_ = CreateHandler();
-  // The default language code.
-  EXPECT_CALL(page_, SetLanguageCode).Times(1);
-  const char kLang1[] = "pt-br";
-  const char kLang2[] = "bd";
-
-  // Send a new language code.
-  SetTranslateSourceLanguage(kLang1);
-  OnActiveAXTreeIDChanged();
-
-  EXPECT_CALL(page_, SetLanguageCode(kLang1)).Times(1);
-
-  // Send another language code.
-  SetTranslateSourceLanguage(kLang2);
-  OnActiveAXTreeIDChanged();
-
-  EXPECT_CALL(page_, SetLanguageCode(kLang2)).Times(1);
-}
-
-IN_PROC_BROWSER_TEST_F(
-    ReadAnythingUntrustedPageHandlerTest,
-    OnActiveAXTreeIDChanged_AfterTranslateDriverDestroyed_StillSendsLanguage) {
-  const char kLang1[] = "pt-br";
-  const char kLang2[] = "es-es";
-  SetTranslateSourceLanguage(kLang1);
-  handler_ = CreateHandler();
-  EXPECT_CALL(page_, SetLanguageCode).Times(1);
-  EXPECT_CALL(page_, SetLanguageCode(kLang1)).Times(1);
-
-  OnLanguageDetectionDriverDestroyed(
-      language_detection::LanguageDetectionHost::FromWebContents(
-          web_contents()));
-  SetTranslateSourceLanguage(kLang2);
-  OnActiveAXTreeIDChanged();
-
-  EXPECT_CALL(page_, SetLanguageCode(kLang2)).Times(1);
 }
 
 IN_PROC_BROWSER_TEST_F(ReadAnythingUntrustedPageHandlerTest, GetVoicePackInfo) {

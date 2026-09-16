@@ -18,7 +18,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/browser/performance_manager/public/user_tuning/user_performance_tuning_manager.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/browsing_data/core/browsing_data_utils.h"
 #include "components/browsing_data/core/pref_names.h"
@@ -282,13 +281,8 @@ TEST_F(SiteSettingsCounterTest, AllSiteSettingsMixed) {
       ProtocolHandler("news", GURL("https://slides.google.com"), now,
                       blink::ProtocolHandlerSecurityLevel::kStrict));
 
-  auto translate_prefs =
-      ChromeTranslateClient::CreateTranslatePrefs(profile()->GetPrefs());
-  translate_prefs->AddSiteToNeverPromptList("www.google.com");
-  translate_prefs->AddSiteToNeverPromptList("docs.google.com");
-  translate_prefs->AddSiteToNeverPromptList("photos.google.com");
   counter()->Restart();
-  EXPECT_EQ(6, GetResult());
+  EXPECT_EQ(5, GetResult());
 }
 #endif
 
@@ -308,16 +302,6 @@ TEST_F(SiteSettingsCounterTest, ProtocolHandlerCounting) {
   EXPECT_EQ(2, GetResult());
   SetDeletionPeriodPref(browsing_data::TimePeriod::LAST_HOUR);
   EXPECT_EQ(1, GetResult());
-}
-
-TEST_F(SiteSettingsCounterTest, TranslatedSitesCounting) {
-  auto translate_prefs =
-      ChromeTranslateClient::CreateTranslatePrefs(profile()->GetPrefs());
-  translate_prefs->AddSiteToNeverPromptList("www.google.com");
-  translate_prefs->AddSiteToNeverPromptList("maps.google.com");
-
-  SetDeletionPeriodPref(browsing_data::TimePeriod::ALL_TIME);
-  EXPECT_EQ(2, GetResult());
 }
 
 TEST_F(SiteSettingsCounterTest, DiscardingExceptionsCounting) {

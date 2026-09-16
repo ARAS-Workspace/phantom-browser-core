@@ -21,7 +21,6 @@
 #include "components/pdf/browser/pdf_document_helper.h"
 #include "components/pdf/browser/pdf_frame_util.h"
 #include "components/tabs/public/tab_interface.h"
-#include "components/translate/core/common/translate_features.h"
 #include "components/user_education/common/feature_promo/feature_promo_controller.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
@@ -106,19 +105,6 @@ void ChromePDFDocumentHelperClient::OnDocumentLoadComplete(
         pdf_extension_util::ShouldShowGlicSummarizeButton(web_contents)) {
       MaybeShowFeaturePromo(feature_engagement::kIPHPdfGlicSummarizeFeature,
                             web_contents);
-    }
-  }
-
-  if (base::FeatureList::IsEnabled(translate::kEnableTranslatePdf)) {
-    auto* pdf_helper =
-        pdf::PDFDocumentHelper::GetForCurrentDocument(&render_frame_host);
-    if (pdf_helper) {
-      // Get the text of the first page and send it to the main frame for
-      // language detection.
-      pdf_helper->GetPageText(
-          0, base::BindOnce(&ChromePDFDocumentHelperClient::OnPdfTextExtracted,
-                            weak_factory_.GetWeakPtr(),
-                            render_frame_host.GetGlobalId()));
     }
   }
 }

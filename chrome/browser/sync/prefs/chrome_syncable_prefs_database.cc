@@ -25,7 +25,6 @@
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 #include "components/sync/base/data_type.h"
 #include "components/sync_preferences/syncable_prefs_database.h"
-#include "components/translate/core/browser/translate_prefs.h"
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "components/supervised_user/core/common/pref_names.h"

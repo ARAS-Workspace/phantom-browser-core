@@ -16,7 +16,6 @@
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/language_detection/core/language_detection_driver.h"
 #include "components/sync_sessions/synced_tab_delegate.h"
-#include "components/translate/core/browser/translate_driver.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "content/public/test/prerender_test_util.h"

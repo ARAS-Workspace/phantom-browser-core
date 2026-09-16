@@ -86,7 +86,6 @@
 #include "chrome/browser/strike_database/strike_database_factory.h"
 #include "chrome/browser/subresource_filter/subresource_filter_profile_context_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/trusted_vault/trusted_vault_service_factory.h"
 #include "chrome/browser/ui/find_bar/find_bar_state.h"
 #include "chrome/browser/ui/find_bar/find_bar_state_factory.h"
@@ -3038,28 +3037,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, RemoveTabDiscardExceptionsList) {
                     .size());
 }
 #endif
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, RemoveTranslateBlocklist) {
-  auto translate_prefs =
-      ChromeTranslateClient::CreateTranslatePrefs(GetProfile()->GetPrefs());
-  translate_prefs->AddSiteToNeverPromptList("google.com");
-  task_environment()->AdvanceClock(base::Days(1));
-  base::Time t = base::Time::Now();
-  translate_prefs->AddSiteToNeverPromptList("maps.google.com");
-
-  EXPECT_TRUE(translate_prefs->IsSiteOnNeverPromptList("google.com"));
-  EXPECT_TRUE(translate_prefs->IsSiteOnNeverPromptList("maps.google.com"));
-
-  BlockUntilBrowsingDataRemoved(t, base::Time::Max(),
-                                constants::DATA_TYPE_CONTENT_SETTINGS, false);
-  EXPECT_TRUE(translate_prefs->IsSiteOnNeverPromptList("google.com"));
-  EXPECT_FALSE(translate_prefs->IsSiteOnNeverPromptList("maps.google.com"));
-
-  BlockUntilBrowsingDataRemoved(base::Time(), base::Time::Max(),
-                                constants::DATA_TYPE_CONTENT_SETTINGS, false);
-  EXPECT_FALSE(translate_prefs->IsSiteOnNeverPromptList("google.com"));
-  EXPECT_FALSE(translate_prefs->IsSiteOnNeverPromptList("maps.google.com"));
-}
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest, RemovePersistentPermission) {
   // Add our settings.

@@ -21,13 +21,12 @@
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/chrome_render_view_test.h"
+#include "components/language_detection/content/common/language_detection.mojom.h"
+#include "components/language_detection/core/language_detection_details.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_helper.h"
 #include "components/optimization_guide/content/renderer/page_text_agent.h"
 #include "components/safe_browsing/core/common/phishing_classifier/scorer.h"
 #include "components/safe_browsing/core/common/proto/client_model.pb.h"
-#include "components/translate/content/common/translate.mojom.h"
-#include "components/translate/content/renderer/translate_agent.h"
-#include "components/translate/core/common/translate_util.h"
 #include "components/variations/variations_switches.h"
 #include "content/public/common/content_features.h"
 #include "content/public/common/content_switches.h"
@@ -45,32 +44,32 @@
 
 namespace {
 
-class FakeContentTranslateDriver
-    : public translate::mojom::ContentTranslateDriver {
- public:
-  FakeContentTranslateDriver() = default;
-  ~FakeContentTranslateDriver() override = default;
+class FakeLanguageDetectionHost
+    : public language_detection::mojom::LanguageDetectionHost {
+public:
+  FakeLanguageDetectionHost() = default;
+  ~FakeLanguageDetectionHost() override = default;
 
   void BindHandle(mojo::ScopedMessagePipeHandle handle) {
     receivers_.Add(
-        this, mojo::PendingReceiver<translate::mojom::ContentTranslateDriver>(
-                  std::move(handle)));
+        this,
+        mojo::PendingReceiver<language_detection::mojom::LanguageDetectionHost>(
+            std::move(handle)));
   }
 
-  // translate::mojom::ContentTranslateDriver implementation.
-  void RegisterPage(
-      mojo::PendingRemote<translate::mojom::TranslateAgent> translate_agent,
-      const language_detection::LanguageDetectionDetails& details,
-      bool page_level_translation_criteria_met) override {
-    register_page_count_ += 1;
-    page_level_translation_criteria_met_ = page_level_translation_criteria_met;
+  // language_detection::mojom::LanguageDetectionHost implementation.
+  void LanguageDetermined(
+      const language_detection::LanguageDetectionDetails &details) override {
+    language_determined_count_ += 1;
+    has_run_lang_detection_ = details.has_run_lang_detection;
   }
 
-  int register_page_count_ = 0;
-  bool page_level_translation_criteria_met_ = false;
+  int language_determined_count_ = 0;
+  bool has_run_lang_detection_ = false;
 
- private:
-  mojo::ReceiverSet<translate::mojom::ContentTranslateDriver> receivers_;
+private:
+  mojo::ReceiverSet<language_detection::mojom::LanguageDetectionHost>
+      receivers_;
 };
 
 class TestOptGuideConsumer
@@ -111,14 +110,14 @@ class ChromeRenderFrameObserverTest : public ChromeRenderViewTest {
     ChromeRenderViewTest::SetUp();
 
     GetMainRenderFrame()->GetBrowserInterfaceBroker().SetBinderForTesting(
-        translate::mojom::ContentTranslateDriver::Name_,
-        base::BindRepeating(&FakeContentTranslateDriver::BindHandle,
-                            base::Unretained(&fake_translate_driver_)));
+        language_detection::mojom::LanguageDetectionHost::Name_,
+        base::BindRepeating(&FakeLanguageDetectionHost::BindHandle,
+                            base::Unretained(&fake_language_detection_host_)));
   }
 
   void TearDown() override {
     GetMainRenderFrame()->GetBrowserInterfaceBroker().SetBinderForTesting(
-        translate::mojom::ContentTranslateDriver::Name_, {});
+        language_detection::mojom::LanguageDetectionHost::Name_, {});
 
     ChromeRenderViewTest::TearDown();
   }
@@ -126,7 +125,7 @@ class ChromeRenderFrameObserverTest : public ChromeRenderViewTest {
   content::RenderFrame* render_frame() { return GetMainRenderFrame(); }
 
  protected:
-  FakeContentTranslateDriver fake_translate_driver_;
+  FakeLanguageDetectionHost fake_language_detection_host_;
 };
 
 class ChromeRenderFrameObserverWithBenchmarkingTest
@@ -145,8 +144,8 @@ TEST_F(ChromeRenderFrameObserverTest, CapturePageTextCalled) {
 
 
   base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(fake_translate_driver_.register_page_count_, 1);
-  EXPECT_TRUE(fake_translate_driver_.page_level_translation_criteria_met_);
+  EXPECT_EQ(fake_language_detection_host_.language_determined_count_, 1);
+  EXPECT_TRUE(fake_language_detection_host_.has_run_lang_detection_);
 }
 
 TEST_F(ChromeRenderFrameObserverTest, CapturePageTextNotCalledForSubframe) {
@@ -159,8 +158,8 @@ TEST_F(ChromeRenderFrameObserverTest, CapturePageTextNotCalledForSubframe) {
 
 
   base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(fake_translate_driver_.register_page_count_, 1);
-  EXPECT_TRUE(fake_translate_driver_.page_level_translation_criteria_met_);
+  EXPECT_EQ(fake_language_detection_host_.language_determined_count_, 1);
+  EXPECT_TRUE(fake_language_detection_host_.has_run_lang_detection_);
 }
 
 TEST_F(ChromeRenderFrameObserverTest,
@@ -173,8 +172,8 @@ TEST_F(ChromeRenderFrameObserverTest,
 
 
   base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(fake_translate_driver_.register_page_count_, 0);
-  EXPECT_FALSE(fake_translate_driver_.page_level_translation_criteria_met_);
+  EXPECT_EQ(fake_language_detection_host_.language_determined_count_, 0);
+  EXPECT_FALSE(fake_language_detection_host_.has_run_lang_detection_);
 }
 
 TEST_F(ChromeRenderFrameObserverTest,
@@ -186,8 +185,8 @@ TEST_F(ChromeRenderFrameObserverTest,
 
 
   base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(fake_translate_driver_.register_page_count_, 0);
-  EXPECT_FALSE(fake_translate_driver_.page_level_translation_criteria_met_);
+  EXPECT_EQ(fake_language_detection_host_.language_determined_count_, 0);
+  EXPECT_FALSE(fake_language_detection_host_.has_run_lang_detection_);
 }
 
 TEST_F(ChromeRenderFrameObserverTest,
@@ -201,8 +200,8 @@ TEST_F(ChromeRenderFrameObserverTest,
 
 
   base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(fake_translate_driver_.register_page_count_, 0);
-  EXPECT_FALSE(fake_translate_driver_.page_level_translation_criteria_met_);
+  EXPECT_EQ(fake_language_detection_host_.language_determined_count_, 0);
+  EXPECT_FALSE(fake_language_detection_host_.has_run_lang_detection_);
 }
 
 TEST_F(ChromeRenderFrameObserverTest,
@@ -215,8 +214,8 @@ TEST_F(ChromeRenderFrameObserverTest,
 
 
   base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(fake_translate_driver_.register_page_count_, 0);
-  EXPECT_FALSE(fake_translate_driver_.page_level_translation_criteria_met_);
+  EXPECT_EQ(fake_language_detection_host_.language_determined_count_, 0);
+  EXPECT_FALSE(fake_language_detection_host_.has_run_lang_detection_);
 }
 
 TEST_F(ChromeRenderFrameObserverTest, OptGuideGetsText) {
@@ -585,43 +584,5 @@ TEST_F(ChromeRenderFrameObserverTest, LoadTimesAndCsiValues) {
       u"})()",
       &result));
   EXPECT_EQ(1, result);
-}
-
-TEST_F(ChromeRenderFrameObserverTest, DynamicTranslateAgentCreation) {
-  // Enable Top Chrome WebUI lazy-translate behavior.
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitWithFeatures({features::kInitialWebUI}, {});
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kTopChromeWebUI);
-
-  // Remove the duplicate associated interface binders registered by the default
-  // observer to avoid DCHECK failures.
-  render_frame()->GetAssociatedInterfaceRegistry()->RemoveInterface(
-      "optimization_guide.mojom.PageTextService");
-  render_frame()->GetAssociatedInterfaceRegistry()->RemoveInterface(
-      "chrome.mojom.ChromeRenderFrame");
-  render_frame()->GetAssociatedInterfaceRegistry()->RemoveInterface(
-      "safe_browsing.mojom.PhishingDetector");
-  render_frame()->GetAssociatedInterfaceRegistry()->RemoveInterface(
-      "safe_browsing.mojom.PhishingImageEmbedderDetector");
-
-  // Construct our own observer. Because skip_translate is now true,
-  // translate_agent_ should start as nullptr.
-  ChromeRenderFrameObserver observer(render_frame(), nullptr);
-  EXPECT_EQ(observer.translate_agent_, nullptr);
-
-  // Navigate to a normal WebUI page. translate_agent_ should remain nullptr.
-  LoadHTMLWithUrlOverride("<html><body>WebUI</body></html>",
-                          "chrome://settings/");
-  EXPECT_EQ(observer.translate_agent_, nullptr);
-
-  // Navigate to the Reading Mode side panel. translate_agent_ should be
-  // created.
-  std::string read_anything_url =
-      base::StrCat({"chrome-untrusted://",
-                    chrome::kChromeUIUntrustedReadAnythingSidePanelHost, "/"});
-  LoadHTMLWithUrlOverride("<html><body>Reading Mode</body></html>",
-                          read_anything_url.c_str());
-  EXPECT_NE(observer.translate_agent_, nullptr);
 }
 

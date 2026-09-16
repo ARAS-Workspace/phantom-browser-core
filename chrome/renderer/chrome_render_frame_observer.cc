@@ -26,7 +26,6 @@
 #include "build/build_config.h"
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_features.h"
-#include "chrome/common/chrome_isolated_world_ids.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/open_search_description_document_handler.mojom.h"
 #include "chrome/common/webui_url_constants.h"
@@ -48,8 +47,6 @@
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/optimization_guide/content/renderer/page_text_agent.h"
 #include "components/page_content_annotations/content/renderer/page_stability_monitor.h"
-#include "components/translate/content/renderer/translate_agent.h"
-#include "components/translate/core/common/translate_util.h"
 #include "components/variations/variations_switches.h"
 #include "components/web_cache/renderer/web_cache_impl.h"
 #include "content/public/common/bindings_policy.h"
@@ -191,17 +188,6 @@ void UpdateLoadedOriginCrashKeys() {
   }
 }
 
-bool ShouldForceTranslateAgentCreation(const GURL& url) {
-#if !BUILDFLAG(IS_ANDROID)
-  // The Reading Mode side panel is a Top Chrome WebUI, but it exceptionally
-  // requires a TranslateAgent to support PDF translation.
-  return url.SchemeIs("chrome-untrusted") &&
-         url.host() == chrome::kChromeUIUntrustedReadAnythingSidePanelHost;
-#else
-  return false;
-#endif
-}
-
 }  // namespace
 
 ChromeRenderFrameObserver::ChromeRenderFrameObserver(
@@ -209,7 +195,6 @@ ChromeRenderFrameObserver::ChromeRenderFrameObserver(
     web_cache::WebCacheImpl* web_cache_impl)
     : content::RenderFrameObserver(render_frame),
       language_detection_agent_(nullptr),
-      translate_agent_(nullptr),
       page_text_agent_(new optimization_guide::PageTextAgent(render_frame)),
       actor_journal_(std::make_unique<actor::Journal>()),
       web_cache_impl_(web_cache_impl) {
@@ -234,8 +219,6 @@ ChromeRenderFrameObserver::ChromeRenderFrameObserver(
   if (!skip_translate) {
     language_detection_agent_ =
         new language_detection::LanguageDetectionAgent(render_frame);
-    translate_agent_ = new translate::TranslateAgent(
-        render_frame, ISOLATED_WORLD_ID_TRANSLATE, language_detection_agent_);
   }
 }
 
@@ -270,25 +253,9 @@ void ChromeRenderFrameObserver::ReadyToCommitNavigation(
   if (render_frame()->IsMainFrame() && web_cache_impl_)
     web_cache_impl_->ExecutePendingClearCache();
 
-  // Dynamically instantiate TranslateAgent on-the-fly if this WebUI
-  // exceptionally requires it.
-  if (!translate_agent_ && render_frame()->IsMainFrame() && document_loader) {
-    GURL url = GURL(document_loader->GetUrl());
-    if (ShouldForceTranslateAgentCreation(url)) {
-      language_detection_agent_ =
-          new language_detection::LanguageDetectionAgent(render_frame());
-      translate_agent_ = new translate::TranslateAgent(
-          render_frame(), ISOLATED_WORLD_ID_TRANSLATE,
-          language_detection_agent_);
-    }
-  }
-
   // Let the agents do any preparatory work before the new document loads.
   if (language_detection_agent_) {
     language_detection_agent_->PrepareForNewDocument();
-  }
-  if (translate_agent_) {
-    translate_agent_->PrepareForNewDocument();
   }
 }
 

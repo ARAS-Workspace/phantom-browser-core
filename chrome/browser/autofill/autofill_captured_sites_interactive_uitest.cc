@@ -36,7 +36,6 @@
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller.h"
 #include "chrome/browser/ui/autofill/chrome_autofill_client.h"
 #include "chrome/browser/ui/browser_window.h"
-#include "chrome/browser/ui/translate/translate_bubble_test_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -260,10 +259,8 @@ class AutofillCapturedSitesInteractiveTest
       tries++;
       LOG(INFO) << "Autofill attempt " << tries << " of " << attempts;
 
-      // Translation bubbles and address-save prompts and others may overlap
-      // with and thus prevent the Autofill popup, so we preemptively close all
-      // bubbles.
-      translate::test_utils::CloseCurrentBubble(browser());
+      // Address-save prompts and others may overlap with and thus prevent
+      // the Autofill popup, so we preemptively close all bubbles.
       TryToCloseAllPrompts(web_contents);
 
       autofill_manager.client().HideSuggestions(

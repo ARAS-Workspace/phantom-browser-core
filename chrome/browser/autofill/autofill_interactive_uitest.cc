@@ -36,16 +36,11 @@
 #include "chrome/browser/autofill/autofill_uitest_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_io_data.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/translate/translate_service.h"
-#include "chrome/browser/translate/translate_test_utils.h"
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller.h"
 #include "chrome/browser/ui/autofill/chrome_autofill_client.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/browser/ui/translate/translate_bubble_model.h"
-#include "chrome/browser/ui/translate/translate_bubble_test_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -69,8 +64,6 @@
 #include "components/autofill/core/common/autofill_util.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
 #include "components/network_session_configurator/common/network_switches.h"
-#include "components/translate/core/browser/translate_manager.h"
-#include "components/translate/core/common/translate_switches.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/render_view_host.h"
 #include "content/public/browser/render_widget_host.h"
@@ -570,11 +563,6 @@ class AutofillInteractiveTestBase : public AutofillUiTest {
     ASSERT_TRUE(https_server_.InitializeAndListen());
     https_server_.StartAcceptingConnections();
 
-    controllable_http_response_ =
-        std::make_unique<net::test_server::ControllableHttpResponse>(
-            embedded_test_server(), "/mock_translate_script.js",
-            true /*relative_url_is_prefix*/);
-
     // Ensure that `embedded_test_server()` serves both domains used below.
     host_resolver()->AddRule("*", "127.0.0.1");
     embedded_test_server()->RegisterRequestHandler(base::BindRepeating(
@@ -617,66 +605,6 @@ class AutofillInteractiveTestBase : public AutofillUiTest {
     response->set_content_type("text/html;charset=utf-8");
     response->set_content(path_keyed_response_bodies_[request.relative_url]);
     return std::move(response);
-  }
-
-  translate::LanguageState& GetLanguageState() {
-    ChromeTranslateClient* client = ChromeTranslateClient::FromWebContents(
-        browser()->tab_strip_model()->GetActiveWebContents());
-    return *client->GetTranslateManager()->GetLanguageState();
-  }
-
-  // This is largely a copy of CheckForTranslateUI() from Translate's
-  // translate_language_browsertest.cc.
-  void NavigateToContentAndWaitForLanguageDetection(const char* content) {
-    ASSERT_TRUE(browser());
-    auto waiter = CreateTranslateWaiter(
-        browser()->tab_strip_model()->GetActiveWebContents(),
-        translate::TranslateWaiter::WaitEvent::kLanguageDetermined);
-
-    SetTestUrlResponse(content);
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetTestUrl()));
-    waiter->Wait();
-
-    // Language detection sometimes fires early with an "und" (= undetermined)
-    // detected code.
-    size_t wait_counter = 0;
-    constexpr size_t kMaxWaits = 2;
-    while (GetLanguageState().source_language() == "und" ||
-           GetLanguageState().source_language().empty()) {
-      ++wait_counter;
-      ASSERT_LE(wait_counter, kMaxWaits)
-          << "Translate reported no/undetermined language " << wait_counter
-          << " times";
-      CreateTranslateWaiter(
-          browser()->tab_strip_model()->GetActiveWebContents(),
-          translate::TranslateWaiter::WaitEvent::kLanguageDetermined)
-          ->Wait();
-    }
-
-    const TranslateBubbleModel* model =
-        translate::test_utils::GetCurrentModel(browser());
-    ASSERT_NE(nullptr, model);
-  }
-
-  // This is largely a copy of Translate() from Translate's
-  // translate_language_browsertest.cc.
-  void Translate(const bool first_translate) {
-    auto waiter = CreateTranslateWaiter(
-        browser()->tab_strip_model()->GetActiveWebContents(),
-        translate::TranslateWaiter::WaitEvent::kPageTranslated);
-
-    EXPECT_EQ(
-        TranslateBubbleModel::VIEW_STATE_BEFORE_TRANSLATE,
-        translate::test_utils::GetCurrentModel(browser())->GetViewState());
-
-    translate::test_utils::PressTranslate(browser());
-    if (first_translate)
-      SimulateURLFetch();
-
-    waiter->Wait();
-    EXPECT_EQ(
-        TranslateBubbleModel::VIEW_STATE_AFTER_TRANSLATE,
-        translate::test_utils::GetCurrentModel(browser())->GetViewState());
   }
 
   void CreateTestProfile() {
@@ -724,43 +652,6 @@ class AutofillInteractiveTestBase : public AutofillUiTest {
     test::SetCreditCardInfo(&card, "Milton Waddams", "4111111111111111", "09",
                             "2999", "");
     AddTestCreditCard(browser()->GetProfile(), card);
-  }
-
-  void SimulateURLFetch() {
-    std::string script = R"(
-        var google = {};
-        google.translate = (function() {
-          return {
-            TranslateService: function() {
-              return {
-                isAvailable : function() {
-                  return true;
-                },
-                restore : function() {
-                  return;
-                },
-                getDetectedLanguage : function() {
-                  return "ja";
-                },
-                translatePage : function(sourceLang, targetLang,
-                                         onTranslateProgress) {
-                  document.getElementsByTagName("body")[0].innerHTML = `)" +
-                         std::string(kTestShippingFormString) + R"(`;
-                  onTranslateProgress(100, true, false);
-                }
-              };
-            }
-          };
-        })();
-        cr.googleTranslate.onTranslateElementLoad(); )";
-
-    controllable_http_response_->WaitForRequest();
-    controllable_http_response_->Send(
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/javascript\r\n"
-        "\r\n");
-    controllable_http_response_->Send(script);
-    controllable_http_response_->Done();
   }
 
   // Make a pointless round trip to the renderer, giving the popup a chance to
@@ -840,10 +731,6 @@ class AutofillInteractiveTestBase : public AutofillUiTest {
   // ends up going off that the `event` doesn't have an `os_event` associated
   // with it.
   content::RenderWidgetHost::KeyPressEventCallback key_press_event_sink_;
-
-  std::unique_ptr<net::test_server::ControllableHttpResponse>
-      controllable_http_response_;
-
   // A map of relative paths to content that shall be served with an HTTP_OK
   // response. If the map contains no entry, the request falls through to the
   // serving from disk.
@@ -869,14 +756,6 @@ class AutofillInteractiveTest : public AutofillInteractiveTestBase {
  protected:
   AutofillInteractiveTest() = default;
   ~AutofillInteractiveTest() override = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    AutofillInteractiveTestBase::SetUpCommandLine(command_line);
-
-    command_line->AppendSwitchASCII(
-        translate::switches::kTranslateScriptURL,
-        embedded_test_server()->GetURL("/mock_translate_script.js").spec());
-  }
 };
 
 class AutofillInteractiveTestWithHistogramTester
@@ -1762,67 +1641,6 @@ IN_PROC_BROWSER_TEST_F(AutofillInteractiveTest, AutofillEvents) {
   EXPECT_EQ(true, content::EvalJs(GetWebContents(), "selectinput;"));
   EXPECT_EQ(true, content::EvalJs(GetWebContents(), "selectchange;"));
   EXPECT_EQ(true, content::EvalJs(GetWebContents(), "selectblur;"));
-}
-
-IN_PROC_BROWSER_TEST_F(AutofillInteractiveTest, AutofillAfterTranslate) {
-  ASSERT_TRUE(TranslateService::IsTranslateBubbleEnabled());
-  translate::TranslateManager::SetIgnoreMissingKeyForTesting(true);
-  CreateTestProfile();
-
-  static const char kForm[] =
-      R"( <form action="https://www.example.com/" method="POST">
-          <label for="fn">Nom</label>
-           <input type="text" id="fn"><br>
-          <label for="ln">Nom de famille</label>
-           <input type="text" id="ln"><br>
-          <label for="a1">Address line 1:</label>
-           <input type="text" id="a1"><br>
-          <label for="a2">Address line 2:</label>
-           <input type="text" id="a2"><br>
-          <label for="ci">City:</label>
-           <input type="text" id="ci"><br>
-          <label for="st">State:</label>
-           <select id="st">
-           <option value="" selected="yes">--</option>
-           <option value="CA">California</option>
-           <option value="TX">Texas</option>
-           </select><br>
-          <label for="z">ZIP code:</label>
-           <input type="text" id="z"><br>
-          <label for="co">Country:</label>
-           <select style="appearance:base-select" id="co">
-           <option value="" selected="yes">--</option>
-           <option value="CA">Canada</option>
-           <option value="US">United States</option>
-           </select><br>
-          <label for="ph">Phone number:</label>
-           <input type="text" id="ph"><br>
-          </form>
-          Nous serons importants et intéressants, mais les épreuves et les
-          peines peuvent lui en procurer de grandes en raison de situations
-          occasionnelles.
-          Puis quelques avantages
-          )";
-  // The above additional French words ensure the translate bar will appear.
-  //
-  // TODO(crbug.com/40200965): The current translate testing overrides the
-  // result to be Adopted Language: 'fr' (the language the Chrome's
-  // translate feature believes the page language to be in). The behavior
-  // required here is to only force a translation which should not rely on
-  // language detection. The override simply just seeds the translate code
-  // so that a translate event occurs in a more testable way.
-
-  NavigateToContentAndWaitForLanguageDetection(kForm);
-  ASSERT_EQ("fr", GetLanguageState().current_language());
-  ASSERT_NO_FATAL_FAILURE(Translate(true));
-  ASSERT_EQ("fr", GetLanguageState().source_language());
-  ASSERT_EQ("en", GetLanguageState().current_language());
-
-  ASSERT_TRUE(AutofillFlow(GetElementById("firstname"), this,
-                           {.show_method = ShowMethod::ByChar('M'),
-                            .after_select = ExpectValues(MergeValue(
-                                kEmptyAddress, {"firstname", "M"}))}));
-  EXPECT_THAT(GetFormValues(), ValuesAre(kDefaultAddress));
 }
 
 // Test phone fields parse correctly from a given profile.

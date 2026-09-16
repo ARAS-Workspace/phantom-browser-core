@@ -27,7 +27,6 @@
 #include "chrome/browser/screen_ai/screen_ai_service_router.h"
 #include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
 #include "chrome/browser/speech/extension_api/tts_engine_extension_api.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/read_anything/read_anything_controller.h"
 #include "chrome/browser/ui/read_anything/read_anything_enums.h"
 #include "chrome/browser/ui/read_anything/read_anything_prefs.h"
@@ -55,9 +54,6 @@
 #include "components/pdf/browser/pdf_frame_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
-#include "components/translate/core/browser/language_state.h"
-#include "components/translate/core/browser/translate_driver.h"
-#include "components/translate/core/browser/translate_manager.h"
 #include "content/public/browser/browser_accessibility_state.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/render_frame_host.h"
@@ -732,33 +728,7 @@ void ReadAnythingUntrustedPageHandler::OnLinksEnabledChanged(bool enabled) {
 }
 
 std::string ReadAnythingUntrustedPageHandler::GetDisplayLanguage() {
-  std::string source_lang = current_language_code_;
-
-  content::WebContents* main_contents = GetWebContents();
-  if (!main_contents) {
-    return source_lang;
-  }
-
-  ChromeTranslateClient* main_client =
-      ChromeTranslateClient::FromWebContents(main_contents);
-  if (!main_client) {
-    return source_lang;
-  }
-
-  const translate::LanguageState& main_language_state =
-      main_client->GetLanguageState();
-
-  // Use the main page's translated language if it has already been translated.
-  if (main_language_state.IsPageTranslated()) {
-    return main_language_state.current_language();
-  }
-
-  // Fall back to the main page's source language if ours is unknown.
-  if (source_lang.empty() || source_lang == "und" || source_lang == "und-und") {
-    return main_language_state.source_language();
-  }
-
-  return source_lang;
+  return current_language_code_;
 }
 
 void ReadAnythingUntrustedPageHandler::OnImagesEnabledChanged(bool enabled) {

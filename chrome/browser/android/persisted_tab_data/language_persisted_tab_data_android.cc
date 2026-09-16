@@ -13,7 +13,6 @@
 #include "components/content_capture/browser/onscreen_content_provider.h"
 #include "components/language_detection/core/language_detection_details.h"
 #include "components/language_detection/core/language_detection_driver.h"
-#include "components/translate/core/browser/translate_driver.h"
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
 
