@@ -17,7 +17,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "content/public/browser/global_routing_id.h"
 #include "printing/print_settings.h"
 
@@ -93,13 +92,6 @@ class PrintJob : public base::RefCountedThreadSafe<PrintJob> {
   // The caller must have a reference to the PrintJob before calling Cancel(),
   // since Cancel() calls Stop(). See WARNING above for Stop().
   virtual void Cancel();
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  // Cleanup a printing job after content analysis denies printing.  Performs
-  // any extra cleanup for this particular case that can't be safely done from
-  // within Cancel().
-  void CleanupAfterContentAnalysisDenial();
-#endif
 
   // Synchronously wait for the job to finish. It is mainly useful when the
   // process is about to be shut down and we're waiting for the spooler to eat

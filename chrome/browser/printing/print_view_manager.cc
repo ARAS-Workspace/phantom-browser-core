@@ -23,7 +23,6 @@
 #include "chrome/browser/ui/webui/print_preview/print_preview_ui.h"
 #include "chrome/common/pref_names.h"
 #include "components/device_event_log/device_event_log.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/prefs/pref_service.h"
 #include "components/printing/browser/print_composite_client.h"
 #include "components/printing/browser/print_manager_utils.h"
@@ -41,10 +40,6 @@
 
 #if BUILDFLAG(ENABLE_OOP_PRINTING)
 #include "chrome/browser/printing/oop_features.h"
-#endif
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/data_protection/print_utils.h"
 #endif
 
 using content::BrowserThread;
@@ -473,9 +468,6 @@ void PrintViewManager::ShowScriptedPrintPreview() {
     return;
   }
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  set_analyzing_content(/*analyzing=*/true);
-#endif
   RejectPrintPreviewRequestIfRestricted(
       print_preview_rfh_->GetGlobalId(),
       base::BindOnce(&PrintViewManager::OnScriptedPrintPreviewCallback,
@@ -486,9 +478,6 @@ void PrintViewManager::ShowScriptedPrintPreview() {
 void PrintViewManager::OnScriptedPrintPreviewCallback(
     content::GlobalRenderFrameHostId rfh_id,
     bool should_proceed) {
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  set_analyzing_content(/*analyzing=*/false);
-#endif
   if (!should_proceed) {
     OnPrintPreviewRequestRejected(rfh_id);
     return;
@@ -532,9 +521,6 @@ void PrintViewManager::RequestPrintPreview(
     return;
   }
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  set_analyzing_content(/*analyzing=*/true);
-#endif
   content::GlobalRenderFrameHostId id = CurrentTargetFrame().GetGlobalId();
   RejectPrintPreviewRequestIfRestricted(
       id, base::BindOnce(&PrintViewManager::OnRequestPrintPreviewCallback,
@@ -545,9 +531,6 @@ void PrintViewManager::OnRequestPrintPreviewCallback(
     mojom::RequestPrintPreviewParamsPtr params,
     content::GlobalRenderFrameHostId rfh_id,
     bool should_proceed) {
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  set_analyzing_content(/*analyzing=*/false);
-#endif
   if (!should_proceed) {
     OnPrintPreviewRequestRejected(rfh_id);
     return;

@@ -44,7 +44,6 @@
 #include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/prefs/pref_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "content/public/browser/render_frame_host.h"
@@ -67,21 +66,6 @@
 #include "mojo/public/cpp/bindings/remote.h"
 #endif
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/common.h"
-#include "chrome/browser/enterprise/connectors/test/deep_scanning_test_utils.h"
-#include "chrome/browser/enterprise/connectors/test/fake_content_analysis_delegate.h"
-#include "chrome/browser/policy/dm_token_utils.h"
-
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/test/fake_content_analysis_sdk_manager.h"  // nogncheck
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-#include "chrome/test/base/testing_profile_manager.h"
-#endif
-
 namespace printing {
 
 namespace {
@@ -90,11 +74,6 @@ const char kDummyInitiatorName[] = "TestInitiator";
 const char16_t kDummyInitiatorName16[] = u"TestInitiator";
 const char kEmptyPrinterName[] = "EmptyPrinter";
 const char kTestData[] = "abc";
-
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-constexpr char kFakeDmToken[] = "fake-dm-token";
-constexpr char kCallbackId[] = "test-callback-id-1";
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
 
 // Array of all mojom::PrinterTypes.
 constexpr std::array kAllTypes{mojom::PrinterType::kExtension,
@@ -349,34 +328,6 @@ class TestPrintPreviewHandler : public PrintPreviewHandler {
   const raw_ptr<content::WebContents, DanglingUntriaged> initiator_;
 };
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-class TestPrintPreviewHandlerForContentAnalysis
-    : public TestPrintPreviewHandler {
- public:
-  TestPrintPreviewHandlerForContentAnalysis(
-      std::unique_ptr<PrinterHandler> printer_handler,
-      content::WebContents* web_contents)
-      : TestPrintPreviewHandler(std::move(printer_handler), web_contents) {}
-
-  ~TestPrintPreviewHandlerForContentAnalysis() override = default;
-
-  bool print_called_after_scan() const { return print_called_after_scan_; }
-
- private:
-  void FinishHandleDoPrint(UserActionBuckets user_action,
-                           base::DictValue settings,
-                           scoped_refptr<base::RefCountedMemory> data,
-                           const std::string& callback_id) override {
-    ASSERT_EQ(base::as_string_view(*data), kTestData);
-    print_called_after_scan_ = true;
-    PrintPreviewHandler::FinishHandleDoPrint(user_action, std::move(settings),
-                                             data, callback_id);
-  }
-
-  bool print_called_after_scan_ = false;
-};
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-
 }  // namespace
 
 class PrintPreviewHandlerTest : public testing::Test {
@@ -409,9 +360,6 @@ class PrintPreviewHandlerTest : public testing::Test {
       print_backend_service_ = PrintBackendServiceTestImpl::LaunchForTesting(
           test_remote_, test_print_backend_, /*sandboxed=*/true);
     }
-#endif
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-    ASSERT_TRUE(testing_profile_manager_.SetUp());
 #endif
 
     // Create the initiator.
@@ -721,18 +669,9 @@ class PrintPreviewHandlerTest : public testing::Test {
   TestingProfile* profile() { return &profile_; }
   TestPrinterHandler* printer_handler() { return printer_handler_; }
   std::vector<PrinterInfo>& printers() { return printers_; }
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  TestingProfileManager* testing_profile_manager() {
-    return &testing_profile_manager_;
-  }
-#endif
 
  private:
   content::BrowserTaskEnvironment task_environment_;
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  TestingProfileManager testing_profile_manager_{
-      TestingBrowserProcess::GetGlobal()};
-#endif
 
   TestingProfile profile_;
   scoped_refptr<TestPrintBackend> test_print_backend_;
@@ -1398,109 +1337,5 @@ TEST_F(PrintPreviewHandlerFailingTest, GetPrinterCapabilities) {
     EXPECT_TRUE(settings->is_none());
   }
 }
-
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-class ContentAnalysisPrintPreviewHandlerTest
-    : public PrintPreviewHandlerTest,
-      public testing::WithParamInterface<bool> {
- public:
-  void SetUp() override {
-    enterprise_connectors::ContentAnalysisDelegate::SetFactoryForTesting(
-        base::BindRepeating(
-            &enterprise_connectors::test::FakeContentAnalysisDelegate::Create,
-            run_loop_.QuitClosure(),
-            base::BindRepeating(
-                &ContentAnalysisPrintPreviewHandlerTest::ScanningResponse,
-                base::Unretained(this)),
-            kFakeDmToken));
-
-    enterprise_connectors::ContentAnalysisDelegate::DisableUIForTesting();
-    PrintPreviewHandlerTest::SetUp();
-
-    // Set the policy that enables local content analysis for print.
-    enterprise_connectors::test::SetAnalysisConnector(
-        profile()->GetPrefs(), enterprise_connectors::AnalysisConnector::PRINT,
-        R"({
-          "service_provider": "local_system_agent",
-          "enable": [ {"url_list": ["*"], "tags": ["dlp"]} ],
-          "block_until_verdict": 1
-        })");
-  }
-
-  void TearDown() override {
-    PrintPreviewHandlerTest::TearDown();
-    enterprise_connectors::ContentAnalysisDelegate::EnableUIAfterTesting();
-  }
-
-  std::unique_ptr<TestPrintPreviewHandler> CreateHandler(
-      std ::unique_ptr<TestPrinterHandler> printer_handler,
-      content::WebContents* web_contents) override {
-    return std::make_unique<TestPrintPreviewHandlerForContentAnalysis>(
-        std::move(printer_handler), web_contents);
-  }
-
-  bool scanning_allows_print() const { return GetParam(); }
-
-  enterprise_connectors::ContentAnalysisResponse ScanningResponse(
-      const std::string& content,
-      const base::FilePath& path) {
-    enterprise_connectors::ContentAnalysisResponse response;
-
-    auto* result = response.add_results();
-    result->set_tag("dlp");
-    result->set_status(
-        enterprise_connectors::ContentAnalysisResponse::Result::SUCCESS);
-
-    if (!scanning_allows_print()) {
-      auto* rule = result->add_triggered_rules();
-      rule->set_rule_name("blocking_rule_name");
-      rule->set_action(enterprise_connectors::TriggeredRule::BLOCK);
-    }
-
-    return response;
-  }
-
-  void WaitForScan() { run_loop_.Run(); }
-
- private:
-  base::RunLoop run_loop_;
-
-  // This installs a fake SDK manager that creates fake SDK clients when
-  // its GetClient() method is called. This is needed so that calls to
-  // ContentAnalysisSdkManager::Get()->GetClient() do not fail.
-  enterprise_connectors::FakeContentAnalysisSdkManager sdk_manager_;
-};
-
-TEST_P(ContentAnalysisPrintPreviewHandlerTest, LocalScanBeforePrinting) {
-  TestingProfile* main_profile =
-      testing_profile_manager()->CreateTestingProfile("Main Profile");
-  SetProfileForInitialSettings(main_profile);
-  Initialize();
-
-  base::ListValue print_args;
-  print_args.Append(kCallbackId);
-  base::Value print_ticket(test::GetPrintTicket(kAllTypes[0]));
-  print_args.Append(base::WriteJson(print_ticket).value_or(""));
-
-  handler()->HandleDoPrint(print_args);
-  WaitForScan();
-
-  auto* print_preview_handler =
-      static_cast<TestPrintPreviewHandlerForContentAnalysis*>(handler());
-
-  // Check if printing was allowed or not depending on the parameter.
-  ASSERT_EQ(print_preview_handler->print_called_after_scan(),
-            scanning_allows_print());
-
-  // Verify that printing went through or not based on the parameter.
-  const content::TestWebUI::CallData& data = *web_ui()->call_data().back();
-  CheckWebUIResponse(data, kCallbackId, scanning_allows_print());
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         ContentAnalysisPrintPreviewHandlerTest,
-                         /*scanning_allows_print=*/testing::Bool());
-
-#endif  // BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
 
 }  // namespace printing

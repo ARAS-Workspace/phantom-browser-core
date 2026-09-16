@@ -18,7 +18,6 @@
 #include "chrome/browser/printing/print_job.h"
 #include "chrome/services/printing/public/mojom/print_backend_service.mojom.h"
 #include "components/device_event_log/device_event_log.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/global_routing_id.h"
@@ -114,13 +113,6 @@ void PrintJobWorkerOop::Cancel() {
   PrintJobWorker::Cancel();
   PrintJobWorkerOop::OnCancel();
 }
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-void PrintJobWorkerOop::CleanupAfterContentAnalysisDenial() {
-  PrintJobWorker::CleanupAfterContentAnalysisDenial();
-  UnregisterServiceManagerClient();
-}
-#endif
 
 void PrintJobWorkerOop::OnDidStartPrinting(mojom::ResultCode result,
                                            int job_id) {

@@ -14,7 +14,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/threading/thread.h"
 #include "build/build_config.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "content/public/browser/browser_thread.h"
 #include "printing/page_number.h"
 #include "printing/printing_context.h"
@@ -69,14 +68,6 @@ class PrintJobWorker {
 
   // Cancels the job.
   virtual void Cancel();
-
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  // The job is canceled due to content analysis denying printing.  Called
-  // only from UI thread, before any platform calls are made for the job.
-  // Performs any extra cleanup for this particular case that can't be safely
-  // safely done from within Cancel().
-  virtual void CleanupAfterContentAnalysisDenial();
-#endif
 
   // Returns true if the thread has been started, and not yet stopped.
   bool IsRunning() const;
