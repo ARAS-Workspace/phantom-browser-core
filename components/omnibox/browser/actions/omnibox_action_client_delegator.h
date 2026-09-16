@@ -27,7 +27,6 @@ class OmniboxActionClientDelegator : public OmniboxAction::Client {
   void NewIncognitoWindow() override;
   void OpenIncognitoClearBrowsingDataDialog() override;
   void CloseIncognitoWindows() override;
-  void PromptPageTranslation() override;
   bool OpenJourneys(const std::string& query) override;
   void OpenLensOverlay(
       bool show,

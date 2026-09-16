@@ -221,7 +221,6 @@ class MockAutocompleteProviderClient
   MOCK_METHOD0(NewIncognitoWindow, void());
   MOCK_METHOD0(OpenIncognitoClearBrowsingDataDialog, void());
   MOCK_METHOD0(CloseIncognitoWindows, void());
-  MOCK_METHOD0(PromptPageTranslation, void());
   MOCK_METHOD(void,
               OpenLensOverlay,
               (bool show, lens::LensOverlayInvocationSource invocation_source),

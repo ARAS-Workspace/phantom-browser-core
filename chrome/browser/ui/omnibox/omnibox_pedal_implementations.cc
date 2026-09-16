@@ -220,73 +220,6 @@ class OmniboxPedalLaunchIncognito : public OmniboxPedal {
 // =============================================================================
 
 #if !BUILDFLAG(IS_ANDROID)
-class OmniboxPedalTranslate : public OmniboxPedal {
- public:
-  OmniboxPedalTranslate()
-      : OmniboxPedal(
-            OmniboxPedalId::TRANSLATE,
-            LabelStrings(IDS_OMNIBOX_PEDAL_TRANSLATE_HINT,
-                         IDS_OMNIBOX_PEDAL_TRANSLATE_SUGGESTION_CONTENTS,
-                         IDS_ACC_OMNIBOX_PEDAL_TRANSLATE_SUFFIX,
-                         IDS_ACC_OMNIBOX_PEDAL_TRANSLATE),
-            // Fake URL to distinguish matches.
-            GURL("chrome://translate/pedals")) {}
-
-  std::vector<SynonymGroupSpec> SpecifySynonymGroups(
-      bool locale_is_english) const override {
-    if (locale_is_english) {
-      return {
-          {
-              false,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_TRANSLATE_ONE_OPTIONAL_GOOGLE_CHROME,
-          },
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_TRANSLATE_ONE_REQUIRED_CHANGE_LANGUAGE,
-          },
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_TRANSLATE_ONE_REQUIRED_THIS_PAGE,
-          },
-      };
-    } else {
-      return {
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_TRANSLATE_ONE_REQUIRED_TRANSLATE_THIS_PAGE,
-          },
-      };
-    }
-  }
-
-  void Execute(ExecutionContext& context) const override {
-    context.client_->PromptPageTranslation();
-  }
-
-  bool IsReadyToTrigger(
-      const AutocompleteInput& input,
-      const AutocompleteProviderClient& client) const override {
-    // Built-in chrome:// URLs do not generally support translation, and the
-    // translate UI does not yet inform users with a clear helpful error message
-    // when requesting translation for a page that doesn't support translation,
-    // so this is a quick early-out to prevent bad message crashes.
-    // See: https://crbug.com/40721236
-    return !input.current_url().SchemeIs(
-        client.GetEmbedderRepresentationOfAboutScheme());
-  }
-
- protected:
-  ~OmniboxPedalTranslate() override = default;
-};
-#endif  // !BUILDFLAG(IS_ANDROID)
-
-// =============================================================================
-
-#if !BUILDFLAG(IS_ANDROID)
 class OmniboxPedalUpdateChrome : public OmniboxPedal {
  public:
   OmniboxPedalUpdateChrome()
@@ -1933,7 +1866,6 @@ GetPedalImplementations(bool incognito, bool guest, bool testing) {
   }
   add(new OmniboxPedalUpdateCreditCard());
   add(new OmniboxPedalLaunchIncognito());
-  add(new OmniboxPedalTranslate());
   add(new OmniboxPedalUpdateChrome());
   add(new OmniboxPedalManageSecuritySettings());
   add(new OmniboxPedalManageCookies());

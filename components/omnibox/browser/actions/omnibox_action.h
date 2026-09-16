@@ -99,9 +99,6 @@ class OmniboxAction : public base::RefCountedThreadSafe<OmniboxAction> {
     // Closes incognito browser windows.
     virtual void CloseIncognitoWindows() = 0;
 
-    // Presents translation prompt for current tab web contents.
-    virtual void PromptPageTranslation() = 0;
-
     // Opens Journeys in an embedder-specific way. If this returns true, that
     // means that the embedder successfully opened Journeys, and the caller can
     // early exit. If this returns false, the caller should open the WebUI.

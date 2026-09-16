@@ -26,10 +26,6 @@ void OmniboxActionClientDelegator::CloseIncognitoWindows() {
   delegate_->CloseIncognitoWindows();
 }
 
-void OmniboxActionClientDelegator::PromptPageTranslation() {
-  delegate_->PromptPageTranslation();
-}
-
 bool OmniboxActionClientDelegator::OpenJourneys(const std::string& query) {
   return delegate_->OpenJourneys(query);
 }
