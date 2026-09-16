@@ -192,8 +192,6 @@ static_library("renderer") {
     "//components/surface_embed/common",
     "//components/surface_embed/renderer",
     "//components/language_detection/content/renderer:agent",
-    "//components/translate/content/renderer",
-    "//components/translate/core/common",
     "//components/visitedlink/renderer",
     "//components/wallet/content/renderer",
     "//components/wallet/core/common:features",

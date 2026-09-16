@@ -37,7 +37,6 @@ source_set("global_media_controls") {
     "//components/media_router/browser",
     "//components/media_router/common",
     "//components/media_router/common/mojom:media_controller",
-    "//components/translate/core/browser",
     "//content/public/browser",
     "//mojo/public/cpp/bindings",
     "//services/media_session/public/cpp:base_cpp",

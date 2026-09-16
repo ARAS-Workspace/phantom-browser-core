@@ -438,6 +438,7 @@ if (!is_android) {
       "//components/embedder_support:user_agent",
       "//components/enterprise/encryption/core:features",
       "//components/error_page/content/browser",
+      "//components/language/core/browser",
       "//components/proxy_config",
       "//content/test:browsertest_support",
       "//content/test:test_support",

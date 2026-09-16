@@ -24,7 +24,6 @@ source_set("history") {
     "//components/keyed_service/core",
     "//components/language_detection/content/browser:host",
     "//components/sessions",
-    "//components/translate/core/browser",
     "//content/public/browser",
   ]
 }
@@ -57,7 +56,6 @@ source_set("impl") {
     "//chrome/browser/search_engines",
     "//chrome/browser/signin",
     "//chrome/browser/sync:factories",
-    "//chrome/browser/translate",
     "//chrome/browser/ui/profiles",
     "//chrome/common",
     "//chrome/common:constants",

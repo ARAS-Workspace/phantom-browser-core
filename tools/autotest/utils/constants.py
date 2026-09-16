@@ -55,7 +55,6 @@ TEST_TARGET_ALLOWLIST: list[str] = [
   '//components/paint_preview/common:paint_preview_common_unit_tests',
   '//components/paint_preview/renderer:paint_preview_renderer_unit_tests',
   '//components/services/paint_preview_compositor:paint_preview_compositor_unit_tests',
-  '//components/translate/core/language_detection:language_detection_util_fuzztest',
   '//components/webcrypto:webcrypto_testing_fuzzer',
   '//components/zucchini:zucchini_integration_test',
   '//content/test/fuzzer:devtools_protocol_encoding_json_fuzzer',

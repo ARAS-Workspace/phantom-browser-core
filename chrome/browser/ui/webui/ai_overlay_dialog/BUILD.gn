@@ -61,7 +61,6 @@ source_set("impl") {
     "//chrome/browser/page_content_annotations:screenshot_service",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/search_engines",
-    "//chrome/browser/translate",
     "//chrome/browser/ttc/resources",
     "//chrome/browser/ttc/resources:generate_tool_definitions",
     "//chrome/browser/ui",

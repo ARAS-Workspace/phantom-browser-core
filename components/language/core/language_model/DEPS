@@ -1,6 +1,4 @@
 include_rules = [
   "+components/keyed_service/core",
   "+components/language_detection/core",
-  "+components/translate/core/browser",
-  "+components/translate/core/common",
 ]

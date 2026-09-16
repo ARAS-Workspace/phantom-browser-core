@@ -81,7 +81,6 @@ source_set("impl") {
     "//chrome/browser/safe_browsing",
     "//chrome/browser/ssl",
     "//chrome/browser/subresource_filter",
-    "//chrome/browser/translate",
     "//chrome/browser/ui:accelerator_table",
     "//chrome/browser/ui:browser_actions",
     "//chrome/browser/ui:tab_dialogs",

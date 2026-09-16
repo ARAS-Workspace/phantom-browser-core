@@ -691,7 +691,6 @@ static_library("ui") {
     "//chrome/browser/sync",
     "//chrome/browser/task_manager/common",
     "//chrome/browser/task_manager/common:impl",
-    "//chrome/browser/translate:impl",
     "//chrome/browser/trusted_vault",
     "//chrome/browser/trusted_vault:impl",
     "//chrome/browser/ui/autofill",
@@ -735,7 +734,6 @@ static_library("ui") {
     "//chrome/browser/ui/tab_contents:impl",
     "//chrome/browser/ui/toolbar",
     "//chrome/browser/ui/toolbar:impl",
-    "//chrome/browser/ui/translate",
     "//chrome/browser/ui/views/eye_dropper",
     "//chrome/browser/ui/views/file_system_access",
     "//chrome/browser/ui/views/file_system_access:impl",
@@ -1159,7 +1157,6 @@ static_library("ui") {
 
     # TODO(crbug.com/353332589): Remove this circular dependency when
     # translate's impl no longer includes headers from //chrome/browser/ui.
-    "//chrome/browser/translate:impl",
 
     # policy's impl includes headers from //chrome/browser/ui that can't
     # be split out yet.
@@ -1370,7 +1367,6 @@ static_library("ui") {
       "//chrome/browser/ui/tabs/saved_tab_groups:impl",
       "//chrome/browser/ui/task_manager",
       "//chrome/browser/ui/thumbnails",
-      "//chrome/browser/ui/translate:impl",
       "//chrome/browser/ui/views/data_sharing",
       "//chrome/browser/ui/views/data_sharing:impl",
       "//chrome/browser/ui/views/glic",
@@ -1706,7 +1702,6 @@ static_library("ui") {
 
       # TODO(crbug.com/430013958): Remove this circular dependency when
       # `translate_bubble_factory.cc` stop including c/b/ui/browser_window.h.
-      "//chrome/browser/ui/translate:impl",
 
       # TODO(crbug.com/430078439): Remove this circular dependency when .cc
       # files stop including browser.h, browser_window.h.
@@ -2682,8 +2677,6 @@ static_library("ui") {
       "//chrome/browser/ui/views/tabs/tab:impl",
       "//chrome/browser/ui/views/tabs/vertical",
       "//chrome/browser/ui/views/tabs/vertical:impl",
-      "//chrome/browser/ui/views/translate",
-      "//chrome/browser/ui/views/translate:impl",
       "//chrome/browser/ui/views/user_education",
       "//chrome/browser/ui/views/user_education:impl",
       "//chrome/browser/ui/views/web_apps",
@@ -2978,7 +2971,6 @@ static_library("ui") {
       # following headers get componentized:
       # c/b/ui/scoped_tabbed_browser_displayer.h
       # c/b/ui/views/frame/browser_view.h
-      "//chrome/browser/ui/views/translate:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when the
       # following headers get componentized:
@@ -3309,7 +3301,6 @@ group("ui_public_dependencies") {
     "//components/segmentation_platform/public",
     "//components/sync",
     "//components/sync_user_events",
-    "//components/translate/content/browser",
     "//content/public/browser",
     "//mojo/public/cpp/bindings",
     "//services/webnn/public/cpp",
@@ -3537,7 +3528,6 @@ static_library("test_support") {
     "//components/payments/content",
     "//components/permissions",
     "//components/sessions",
-    "//components/translate/content/browser",
     "//components/url_formatter",
     "//components/zoom",
     "//content/public/browser",

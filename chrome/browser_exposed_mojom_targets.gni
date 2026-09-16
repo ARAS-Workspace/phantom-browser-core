@@ -177,7 +177,6 @@ browser_exposed_mojom_targets = [
   "//components/subresource_filter/core/mojom:mojom",
   "//components/surface_embed/common:mojom",
   "//components/tab_groups/public/mojom:mojo_bindings",
-  "//components/translate/content/common:common",
   "//components/variations:variations_mojom",
   "//components/visitedlink/common:interfaces",
   "//components/viz/service/debugger/mojom:mojom",

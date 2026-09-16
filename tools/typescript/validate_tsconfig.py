@@ -189,7 +189,6 @@ def validateJavaScriptAllowed(source_dir, out_dir, platform):
     'components/autofill/core/browser/autofill_and_password_manager_internals',
     'components/net_log/resources',
     'components/safe_browsing/content/browser/web_ui/resources',
-    'components/translate/translate_internals',
     'content/browser/webrtc/resources',
     'ui/webui/resources/js',
     'ui/webui/resources/mojo',

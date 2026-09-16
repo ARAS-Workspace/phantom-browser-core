@@ -66,7 +66,6 @@ per-file subresource_filter_strings.grdp=file://components/subresource_filter/OW
 per-file supervised_user_strings.grdp=file://components/supervised_user/OWNERS
 per-file sync_ui_strings.grdp=file://components/sync/OWNERS
 per-file tab_groups_strings.grdp=file://components/tab_groups/OWNERS
-per-file translate_strings.grdp=file://components/translate/OWNERS
 per-file tab_resume_strings.grdp=file://components/visited_url_ranking/OWNERS
 per-file undo_strings.grdp=file://components/undo/OWNERS
 per-file user_data_importer_strings.grdp=file://components/user_data_importer/OWNERS

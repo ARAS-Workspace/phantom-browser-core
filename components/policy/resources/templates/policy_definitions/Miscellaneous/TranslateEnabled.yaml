@@ -19,7 +19,6 @@ items:
 - caption: Allow the user to decide
   value: null
 owners:
-- file://components/translate/OWNERS
 - megjablon@chromium.org
 - perrier@chromium.org
 schema:

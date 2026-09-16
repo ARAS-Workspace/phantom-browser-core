@@ -253,6 +253,7 @@ source_set("impl") {
     "//components/custom_handlers",
     "//components/desktop_to_mobile_promos",
     "//components/device_reauth",
+    "//components/language/core/browser",
     "//components/language/core/common",
     "//components/media_effects",
     "//components/password_manager/core/browser/actor_login:permissions_manager_impl",

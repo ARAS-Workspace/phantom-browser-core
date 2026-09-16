@@ -53,7 +53,6 @@ include_rules = [
   "+components/signin/public/base/signin_switches.h",
   "+components/strings/grit/components_strings.h",
   "+components/supervised_user/core/common",
-  "+components/translate/core/common",
   "+components/url_formatter",
   "+components/variations/net",
   "+components/version_info",

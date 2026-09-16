@@ -65,7 +65,6 @@ include_rules = [
   "+components/supervised_user/android",
   "+components/tabs/public/android",
   "+components/tab_groups/android/java",
-  "+components/translate/content/android",
   "+components/user_prefs/android",
   "+components/version_info/android",
   "+components/viz/common/java",

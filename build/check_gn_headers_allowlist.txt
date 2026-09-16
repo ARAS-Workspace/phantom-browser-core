@@ -62,7 +62,6 @@ components/session_manager/session_manager_types.h
 components/sessions/core/sessions_export.h
 components/sync/engine/connection_status.h
 components/sync/engine/net/network_time_update_callback.h
-components/translate/core/browser/translate_infobar_delegate.h
 components/user_manager/user.h
 components/user_manager/user_image/user_image.h
 components/user_manager/user_manager.h

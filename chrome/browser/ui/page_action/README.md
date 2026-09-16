@@ -255,8 +255,7 @@ Typically, a feature can “set and forget” its page action. However, the feat
 may wish to observe the actual state of its page action (for example, to see if
 its requested chip was able to show). The framework provides an
 [observation](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/page_action/page_action_observer.h)
-mechanism to watch this state. An example usage is
-[here](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/views/translate/translate_page_action_controller.h;l=16-18;drc=f0cb0ae3f9b142a11fdc5efc77e27a5d53b6b6cf).
+mechanism to watch this state.
 
 ### Log metrics
 

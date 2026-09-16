@@ -129,6 +129,7 @@ source_set("misc") {
     "//components/guest_view/buildflags",
     "//components/heavy_ad_intervention",
     "//components/keyed_service/content",
+    "//components/language/core/browser",
     "//components/language/core/common",
     "//components/policy/core/browser",
     "//components/policy/core/common",
