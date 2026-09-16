@@ -40,8 +40,7 @@
 #include "content/public/browser/web_contents.h"
 #include "google_apis/gaia/gaia_auth_util.h"
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || \
-    BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
+#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
 #include "chrome/browser/enterprise/data_protection/data_protection_clipboard_utils.h"
 #endif
 
@@ -533,8 +532,7 @@ void GlicActorPolicyChecker::ValidateContentSentToRenderer(
     return;
   }
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || \
-    BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
+#if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
   enterprise_data_protection::PasteFromGeminiIfAllowedByPolicy(
       frame, content,
       base::BindOnce(

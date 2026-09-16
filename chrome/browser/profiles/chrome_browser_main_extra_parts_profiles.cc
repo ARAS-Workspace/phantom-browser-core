@@ -450,9 +450,6 @@
 #include "chrome/browser/search_integrity/search_integrity_factory.h"  // nogncheck
 #include "chrome/browser/signin/accounts_policy_manager_factory.h"
 
-#if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/analysis/local_binary_upload_service_factory.h"
-#endif
 #endif
 
 // Feature-specific #includes, in alphabetical order.
@@ -529,16 +526,9 @@
 #include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service_factory.h"
 #endif
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(FULL_SAFE_BROWSING)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
 #include "chrome/browser/enterprise/connectors/reporting/browser_crash_event_router.h"
 #include "chrome/browser/enterprise/connectors/reporting/reporting_event_router_factory.h"
-#endif
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) && \
-    BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "chrome/browser/enterprise/connectors/reporting/extension_install_event_router.h"
-#include "chrome/browser/enterprise/connectors/reporting/extension_telemetry_event_router_factory.h"
 #endif
 
 #if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
@@ -826,8 +816,7 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   enterprise::ProfileIdServiceFactory::GetInstance();
   enterprise_commands::UserRemoteCommandsServiceFactory::GetInstance();
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(FULL_SAFE_BROWSING)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
   enterprise_connectors::BrowserCrashEventRouterFactory::GetInstance();
 #endif
   enterprise_connectors::ConnectorsServiceFactory::GetInstance();
@@ -835,18 +824,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   enterprise_connectors::DeviceTrustConnectorServiceFactory::GetInstance();
   enterprise_connectors::DeviceTrustServiceFactory::GetInstance();
 #endif
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) && \
-    BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  enterprise_connectors::ExtensionInstallEventRouterFactory::GetInstance();
-  enterprise_connectors::ExtensionTelemetryEventRouterFactory::GetInstance();
-#endif
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) &&   \
-    BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS) && \
-    BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  enterprise_connectors::LocalBinaryUploadServiceFactory::GetInstance();
-#endif
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(FULL_SAFE_BROWSING)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(FULL_SAFE_BROWSING)
   enterprise_connectors::ReportingEventRouterFactory::GetInstance();
 #endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

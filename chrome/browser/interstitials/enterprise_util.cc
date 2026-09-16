@@ -6,7 +6,6 @@
 
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/reporting_utils.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
@@ -20,10 +19,10 @@
 #include "chrome/browser/extensions/api/safe_browsing_private/safe_browsing_private_event_router_factory.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/enterprise/connectors/reporting/reporting_event_router_factory.h"
 #include "components/enterprise/connectors/core/reporting_event_router.h"
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/connectors/core/features.h"
@@ -53,7 +52,7 @@ extensions::SafeBrowsingPrivateEventRouter* GetSafeBrowsingEventRouter(
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 enterprise_connectors::ReportingEventRouter* GetReportingEventRouter(
     content::WebContents* web_contents) {
   // |web_contents| can be null in tests.
@@ -96,7 +95,7 @@ void SetReferrerChain(
         &referrer_chain);
   }
 }
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -116,7 +115,7 @@ void MaybeTriggerSecurityInterstitialShownEvent(
                                                           net_error_code);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   content::BrowserContext* browser_context = web_contents->GetBrowserContext();
   PrefService* prefs = Profile::FromBrowserContext(browser_context)->GetPrefs();
   enterprise_connectors::ReportingEventRouter* reporting_event_router =
@@ -137,7 +136,7 @@ void MaybeTriggerSecurityInterstitialShownEvent(
       prefs->GetBoolean(prefs::kSafeBrowsingProceedAnywayDisabled),
       referrer_chain);
 
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void MaybeTriggerSecurityInterstitialProceededEvent(
@@ -155,7 +154,7 @@ void MaybeTriggerSecurityInterstitialProceededEvent(
                                                               net_error_code);
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   enterprise_connectors::ReportingEventRouter* reporting_event_router =
       GetReportingEventRouter(web_contents);
   if (!reporting_event_router) {
@@ -170,7 +169,7 @@ void MaybeTriggerSecurityInterstitialProceededEvent(
 
   reporting_event_router->OnSecurityInterstitialProceeded(
       page_url, reason, net_error_code, referrer_chain);
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
@@ -179,19 +178,6 @@ void MaybeTriggerUrlFilteringInterstitialEvent(
     const GURL& page_url,
     const std::string& threat_type,
     safe_browsing::RTLookupResponse rt_lookup_response) {
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-  google::protobuf::RepeatedPtrField<safe_browsing::ReferrerChainEntry>
-      referrer_chain;
-  enterprise_connectors::ReportingEventRouter* router =
-      GetReportingEventRouter(web_contents);
-
-  if (base::FeatureList::IsEnabled(safe_browsing::kEnhancedFieldsForSecOps)) {
-    SetReferrerChain(web_contents, page_url, referrer_chain);
-  }
-
-  router->OnUrlFilteringInterstitial(page_url, threat_type, rt_lookup_response,
-                                     referrer_chain);
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
 
 #if BUILDFLAG(IS_ANDROID)
   google::protobuf::RepeatedPtrField<safe_browsing::ReferrerChainEntry>

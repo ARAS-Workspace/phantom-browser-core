@@ -147,11 +147,9 @@ ConnectorsServiceBase::GetCommonAnalysisSettings(
     return std::nullopt;
   }
 
-#if !BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
   if (settings->cloud_or_local_settings.is_local_analysis()) {
     return std::nullopt;
   }
-#endif
 
   std::optional<DmToken> dm_token =
       GetDmToken(AnalysisConnectorScopePref(connector));

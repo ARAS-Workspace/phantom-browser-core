@@ -24,7 +24,6 @@
 #include "chrome/test/base/profile_waiter.h"
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/contextual_tasks/public/features.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/keyed_service/core/dependency_graph.h"
 #include "components/keyed_service/core/keyed_service_base_factory.h"
@@ -259,9 +258,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     "PasswordManagerInternalsService",
     "PasswordRequirementsServiceFactory",
     "PolicyClipboardRestriction",
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-    "ReportingEventRouter",
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
     "SafeSearch",
     "WebDataService",
 
@@ -311,9 +307,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     "PasswordManagerBlocklist",
 #endif
     "PolicyClipboardRestriction",
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-    "ReportingEventRouter",
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
     "SafeSearch",
 
     // in chrome: using `BrowserContextKeyedServiceShutdownNotifierFactory`:
@@ -378,9 +371,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ContextualTasksService",
     "ContextualTasksUiService",
     "CookieSettings",
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-    "ExtensionInstallEventRouter",
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
     "ChromeEnterpriseRealTimeUrlLookupService",
 #if !BUILDFLAG(IS_ANDROID)
     "ChromePolicyBlocklistService",
@@ -566,9 +556,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
     "ComponentLoader",
 #endif
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-    "ConnectorsService",
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
     "ContentIndexProvider",
     "ContentSettingsService",
     "ContextualTasksService",
@@ -596,9 +583,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ExtensionGCMAppHandler",
     "ExtensionGarbageCollector",
     "ExtensionHostRegistry",
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-    "ExtensionInstallEventRouter",
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
     "ExtensionKeybindingRegistryShutdownNotifierFactory",
     "ExtensionManagement",
     "ExtensionNavigationRegistry",

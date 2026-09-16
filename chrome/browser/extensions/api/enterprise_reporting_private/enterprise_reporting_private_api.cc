@@ -25,7 +25,6 @@
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/device_signals/core/common/common_types.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/reporting_constants.h"
 #include "google_apis/gaia/gaia_id.h"
 
@@ -42,14 +41,6 @@
 #include "components/device_signals/core/common/signals_features.h"  // nogncheck
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client.h"
-#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
-#include "components/enterprise/common/proto/synced/browser_events.pb.h"
-#include "components/enterprise/connectors/core/reporting_utils.h"
-#include "components/policy/core/common/cloud/realtime_reporting_job_configuration.h"
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-
 #include "components/content_settings/core/common/pref_names.h"
 #include "components/enterprise/browser/controller/browser_dm_token_storage.h"
 #include "net/cert/x509_util.h"
@@ -58,117 +49,10 @@ namespace extensions {
 
 namespace {
 
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-using TriggeredRuleInfo = ::chrome::cros::reporting::proto::TriggeredRuleInfo;
-using MatchedDetector = ::chrome::cros::reporting::proto::MatchedDetector;
-
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-
 const char kEndpointVerificationRetrievalFailed[] =
     "Failed to retrieve the endpoint verification data.";
 const char kEndpointVerificationStoreFailed[] =
     "Failed to store the endpoint verification data.";
-
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-
-MatchedDetector::DetectorType ConvertToDetectorTypeProto(
-    api::enterprise_reporting_private::DetectorType detector_type) {
-  if (detector_type == api::enterprise_reporting_private::DetectorType::kNone) {
-    return MatchedDetector::DETECTOR_TYPE_UNSPECIFIED;
-  }
-  if (detector_type ==
-      api::enterprise_reporting_private::DetectorType::kPredefinedDlp) {
-    return MatchedDetector::PREDEFINED_DLP;
-  }
-  if (detector_type ==
-      api::enterprise_reporting_private::DetectorType::kUserDefined) {
-    return MatchedDetector::USER_DEFINED;
-  }
-  NOTREACHED();
-}
-
-chrome::cros::reporting::proto::EventResult ConvertToEventResultProto(
-    api::enterprise_reporting_private::EventResult event_result) {
-  if (event_result == api::enterprise_reporting_private::EventResult::kNone) {
-    return chrome::cros::reporting::proto::EVENT_RESULT_UNSPECIFIED;
-  }
-  if (event_result ==
-      api::enterprise_reporting_private::EventResult::kEventResultDataMasked) {
-    return chrome::cros::reporting::proto::EVENT_RESULT_DATA_MASKED;
-  }
-  if (event_result == api::enterprise_reporting_private::EventResult::
-                          kEventResultDataUnmasked) {
-    return chrome::cros::reporting::proto::EVENT_RESULT_DATA_UNMASKED;
-  }
-  NOTREACHED();
-}
-
-google::protobuf::RepeatedPtrField<TriggeredRuleInfo> GetTriggeredRuleInfo(
-    const std::vector<api::enterprise_reporting_private::TriggeredRuleInfo>&
-        rules) {
-  google::protobuf::RepeatedPtrField<TriggeredRuleInfo> triggered_rules;
-  for (auto& rule : rules) {
-    TriggeredRuleInfo triggered_rule;
-    triggered_rule.set_rule_name(rule.rule_name);
-
-    int rule_id_int = 0;
-    if (base::StringToInt(rule.rule_id, &rule_id_int)) {
-      triggered_rule.set_rule_id(rule_id_int);
-    }
-
-    google::protobuf::RepeatedPtrField<MatchedDetector> matched_detectors;
-    for (auto& detector : rule.matched_detectors) {
-      MatchedDetector matched_detector;
-      matched_detector.set_display_name(detector.display_name);
-      matched_detector.set_detector_type(
-          ConvertToDetectorTypeProto(detector.detector_type));
-      matched_detector.set_detector_id(detector.detector_id);
-
-      *matched_detectors.Add() = matched_detector;
-    }
-    *triggered_rule.mutable_matched_detectors() = matched_detectors;
-    *triggered_rules.Add() = triggered_rule;
-  }
-
-  return triggered_rules;
-}
-
-void ReportDataMaskingEvent(
-    content::BrowserContext* browser_context,
-    api::enterprise_reporting_private::DataMaskingEvent data_masking_event) {
-  CHECK(browser_context);
-
-  auto* reporting_client =
-      enterprise_connectors::RealtimeReportingClientFactory::GetForProfile(
-          browser_context);
-  std::optional<enterprise_connectors::ReportingSettings> settings =
-      reporting_client->GetReportingSettings();
-  if (!settings.has_value() ||
-      !settings->enabled_event_names.contains(
-          enterprise_connectors::kKeySensitiveDataEvent)) {
-    return;
-  }
-
-  chrome::cros::reporting::proto::DlpSensitiveDataEvent sensitive_data_event;
-  sensitive_data_event.set_url(data_masking_event.url);
-  sensitive_data_event.set_tab_url(data_masking_event.url);
-  sensitive_data_event.set_event_result(
-      ConvertToEventResultProto(data_masking_event.event_result));
-  *sensitive_data_event.mutable_triggered_rule_info() =
-      GetTriggeredRuleInfo(data_masking_event.triggered_rule_info);
-  sensitive_data_event.set_profile_identifier(
-      reporting_client->GetProfileIdentifier());
-  sensitive_data_event.set_profile_user_name(
-      reporting_client->GetProfileUserName());
-
-  chrome::cros::reporting::proto::Event event;
-  *event.mutable_sensitive_data_event() = sensitive_data_event;
-  *event.mutable_time() =
-      enterprise_connectors::ToProtoTimestamp(base::Time::Now());
-
-  reporting_client->ReportEvent(std::move(event), settings.value());
-}
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
 api::enterprise_reporting_private::SettingValue ToInfoSettingValue(
     device_signals::SettingValue value) {
@@ -548,23 +432,7 @@ EnterpriseReportingPrivateGetContextInfoFunction::
 
 ExtensionFunction::ResponseAction
 EnterpriseReportingPrivateGetContextInfoFunction::Run() {
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  auto* connectors_service =
-      enterprise_connectors::ConnectorsServiceFactory::GetInstance()
-          ->GetForBrowserContext(browser_context());
-  DCHECK(connectors_service);
-
-  context_info_fetcher_ =
-      enterprise_signals::ContextInfoFetcher::CreateInstance(
-          browser_context(), connectors_service);
-  context_info_fetcher_->Fetch(base::BindOnce(
-      &EnterpriseReportingPrivateGetContextInfoFunction::OnContextInfoRetrieved,
-      this));
-
-  return RespondLater();
-#else
   return RespondNow(NoArguments());
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 }
 
 void EnterpriseReportingPrivateGetContextInfoFunction::OnContextInfoRetrieved(
@@ -792,14 +660,6 @@ EnterpriseReportingPrivateReportDataMaskingEventFunction::
 
 ExtensionFunction::ResponseAction
 EnterpriseReportingPrivateReportDataMaskingEventFunction::Run() {
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  auto params =
-      api::enterprise_reporting_private::ReportDataMaskingEvent::Params::Create(
-          args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-
-  ReportDataMaskingEvent(browser_context(), std::move(params->event));
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
   return RespondNow(NoArguments());
 }
@@ -815,17 +675,6 @@ EnterpriseReportingPrivateReportForceSaveToCloudEventHandledFunction::
 
 ExtensionFunction::ResponseAction
 EnterpriseReportingPrivateReportForceSaveToCloudEventHandledFunction::Run() {
-#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-  auto params = api::enterprise_reporting_private::
-      ReportForceSaveToCloudEventHandled::Params::Create(args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-
-  if (params->event.download_id.empty()) {
-    return RespondNow(Error("Download ID cannot be empty."));
-  }
-
-  // TODO(krashi): Implement handling of the Force Save to Cloud event.
-#endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
   return RespondNow(NoArguments());
 }

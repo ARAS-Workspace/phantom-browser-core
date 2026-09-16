@@ -22,7 +22,6 @@
 #include "components/autofill/core/common/unique_ids.h"
 #include "components/credential_management/content_credential_manager.h"
 #include "components/critical_actions/core/browser/critical_action_types.h"
-#include "components/enterprise/buildflags/buildflags.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/browser/history_service_observer.h"
 #include "components/password_manager/content/browser/content_password_manager_driver_factory.h"
@@ -281,7 +280,7 @@ class ChromePasswordManagerClient
 // enterprise reporting feature flag is turned on. `IS_ANDROID` cannot be added
 // to `ENTERPRISE_CONTENT_ANALYSIS`, because the build flag is also used by
 // other features that are not yet supported on Android.
-#if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   void MaybeReportEnterpriseLoginEvent(
       const GURL& url,
       bool is_federated,
@@ -296,7 +295,7 @@ class ChromePasswordManagerClient
   void MaybeReportEnterprisePasswordBreachEvent(
       const std::vector<std::pair<GURL, std::u16string>>& identities)
       const override;
-#endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   ukm::SourceId GetUkmSourceId() override;
   password_manager::PasswordManagerMetricsRecorder* GetMetricsRecorder()
