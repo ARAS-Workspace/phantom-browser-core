@@ -357,7 +357,6 @@ inline constexpr char kChromeUIWebUIToolbarURL[] =
     "chrome://webui-toolbar.top-chrome";
 inline constexpr char kChromeUIWebUIToolbarHost[] = "webui-toolbar.top-chrome";
 inline constexpr char kChromeUIWebNNInternalsHost[] = "webnn-internals";
-inline constexpr char kChromeUIIndigoInternalsHost[] = "indigo-internals";
 
 #if BUILDFLAG(IS_ANDROID)
 inline constexpr char kChromeUIJavaCrashURL[] = "chrome://java-crash/";

@@ -395,8 +395,7 @@ TEST_F(ImageReplacementSimTest, ImageReplacementSendsTrackedElementId) {
       std::move(result.value()));
 
   MockImageReplacementHost mock_host;
-  // Start replacement with layout tracking enabled (using kIndigoToolbar as
-  // feature ID).
+  // Start replacement with layout tracking enabled.
   replacement_remote->StartReplacement(
       mock_host.receiver().BindNewPipeAndPassRemote(), 0);
   test::RunPendingTasks();

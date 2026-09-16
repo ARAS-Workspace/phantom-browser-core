@@ -1270,50 +1270,6 @@ BASE_FEATURE(kHttpsFirstModeIncognito, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIncomingCallNotifications,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Experimental image replacement feature. b/482792874
-BASE_FEATURE(kIndigo, base::FEATURE_DISABLED_BY_DEFAULT);
-
-const base::FeatureParam<bool> kIndigoRequireGlicEnabling{
-    &kIndigo, "indigo_require_glic_enabling", false};
-const base::FeatureParam<bool> kIndigoAllowForEnterprise{
-    &kIndigo, "allow_indigo_for_enterprise", false};
-const base::FeatureParam<bool> kIndigoSkipEnterpriseCheck{
-    &kIndigo, "indigo_skip_enterprise_check", false};
-
-const base::FeatureParam<base::TimeDelta> kIndigoAnchoredMessageResetDuration{
-    &kIndigo, "indigo_anchored_message_reset_duration", base::Hours(24)};
-const base::FeatureParam<std::string> kIndigoGenerateUrl{
-    &kIndigo, "indigo_generate_url", ""};
-const base::FeatureParam<std::string> kIndigoStatusUrl{&kIndigo,
-                                                       "indigo_status_url", ""};
-const base::FeatureParam<std::string> kIndigoDeleteUrl{&kIndigo,
-                                                       "indigo_delete_url", ""};
-const base::FeatureParam<std::string> kIndigoOnboardingUrl{
-    &kIndigo, "indigo_onboarding_url", ""};
-const base::FeatureParam<std::string> kIndigoSavedUrl{
-    &kIndigo, "indigo_saved_url", "about:blank"};
-const base::FeatureParam<std::string> kIndigoScopes{
-    &kIndigo, "indigo_scopes",
-    "https://www.googleapis.com/auth/userinfo.email"};
-
-BASE_FEATURE(kIndigoMetadataKeywordHeuristic,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kIndigoMetadataKeywordHeuristicSameDocumentNavigationDelay{
-        &kIndigoMetadataKeywordHeuristic,
-        "same_document_navigation_metadata_delay", base::Seconds(4)};
-
-// Experimental image replacement feature opens glic.
-BASE_FEATURE(kIndigoOpenGlic, base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<std::string> kIndigoGlicPrompt{
-    &kIndigoOpenGlic, "indigo_glic_prompt", ""};
-const base::FeatureParam<std::string> kIndigoGlicPromptKey{
-    &kIndigoOpenGlic, "indigo_glic_prompt_key", ""};
-const base::FeatureParam<std::string> kIndigoGlicSkillId{
-    &kIndigoOpenGlic, "indigo_glic_skill_id", ""};
-const base::FeatureParam<base::TimeDelta> kIndigoGlicTriggerDelay{
-    &kIndigoOpenGlic, "indigo_glic_trigger_delay", base::Milliseconds(300)};
-
 #if !BUILDFLAG(IS_ANDROID)
 // A feature that controls whether Instant uses a spare renderer.
 BASE_FEATURE(kInstantUsesSpareRenderer, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -1366,12 +1322,6 @@ BASE_FEATURE_PARAM(bool,
 // Center for displaying the toasts. The feature is hardcoded to enabled for
 // Chrome OS.
 BASE_FEATURE(kNativeNotifications, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables installation of the content script for chrome/browser/indigo/ via
-// component update.
-BASE_FEATURE(kIndigoComponent, base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<std::string> kIndigoComponentAttribute{
-    &kIndigoComponent, "indigo_component_attribute", ""};
 
 // If enabled, the initial WebUI skips spell check initialization on startup for
 // NTP.

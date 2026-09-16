@@ -82,9 +82,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://history-side-panel.top-chrome",
       "chrome://indexeddb-internals",
       "chrome://infobar-internals",
-#if !BUILDFLAG(IS_ANDROID)
-      "chrome://indigo-internals",
-#endif
       "chrome://inspect",
 #if !BUILDFLAG(IS_ANDROID)
       "chrome://iwa-dev",

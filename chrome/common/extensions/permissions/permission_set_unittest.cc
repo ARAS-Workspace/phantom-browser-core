@@ -879,7 +879,6 @@ TEST(PermissionsTest, PermissionMessages) {
   skip.insert(APIPermissionID::kWmDesksPrivate);
   skip.insert(APIPermissionID::kSystemLog);
   skip.insert(APIPermissionID::kOdfsConfigPrivate);
-  skip.insert(APIPermissionID::kIndigoPrivate);
   skip.insert(APIPermissionID::kDictationPrivate);
 
   // Warned as part of host permissions.

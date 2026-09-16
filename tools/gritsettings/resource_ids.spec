@@ -117,13 +117,7 @@
   "chrome/browser/dev_ui_browser_resources.grd": {
     "includes": [2250],
   },
-  # Both indigo_strings.grd for chrome/browser/indigo/resources and
-  # chrome/browser/indigo/resources/internal start with the same ids because
-  # only one of them is built.
   "chrome/browser/indigo/resources/internal/indigo_strings.grd": {
-    "messages": [2255],
-  },
-  "chrome/browser/indigo/resources/indigo_strings.grd": {
     "messages": [2255],
   },
   "chrome/browser/nearby_sharing/internal/nearby_share_internal_icons.grd": {
@@ -179,14 +173,7 @@
     "messages": [2540],
     "includes": [2600],
   },
-  # chrome/browser/indigo/resources/internal/browser_resources.grd and
-  # chrome/browser/indigo/resources/browser_resources.grd must share the same id
-  # because they define the same resources, but only one of them is built
-  # depending on whether src_internal is available.
   "chrome/browser/indigo/resources/internal/browser_resources.grd": {
-    "includes": [2640],
-  },
-  "chrome/browser/indigo/resources/browser_resources.grd": {
     "includes": [2640],
   },
   # END chrome/browser section.
@@ -540,14 +527,6 @@
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/history/resources.grd": {
     "META": {"sizes": {"includes": [60]}},
     "includes": [4040],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/indigo/resources.grd": {
-    "META": {"sizes": {"includes": [20],}},
-    "includes": [4043],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/indigo_internals/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-     "includes": [4045],
   },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/infobar_internals/resources.grd": {
     "META": {"sizes": {"includes": [10],}},
