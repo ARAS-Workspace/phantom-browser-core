@@ -6447,9 +6447,6 @@
       status: "experimental",
     },
     {
-      name: "UAImageReplacementAPI",
-    },
-    {
       // The Unbounded Element API. See crbug.com/508672616.
       // Note that this flag is enabled by default, to enable WebUI and other
       // privileged UI to depend on this feature. The flag is here as a kill

@@ -971,10 +971,6 @@ class CORE_EXPORT LayoutObject : public GarbageCollected<LayoutObject>,
     NOT_DESTROYED();
     return false;
   }
-  virtual bool IsLayoutImageReplacement() const {
-    NOT_DESTROYED();
-    return false;
-  }
   virtual bool IsLayoutReplaced() const {
     NOT_DESTROYED();
     return false;

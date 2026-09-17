@@ -349,8 +349,6 @@
     "transitionrun",
     "transitionstart",
     "typechange",
-    "uareplaceend",
-    "uareplacestart",
     "unbounded",
     "uncapturederror",
     "unhandledrejection",
