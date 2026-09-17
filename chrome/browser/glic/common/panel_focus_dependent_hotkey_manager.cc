@@ -41,12 +41,6 @@ bool PanelFocusDependentHotkeyManager::AcceleratorPressed(
 
   switch (command) {
     case LocalHotkeyManager::Command::kClose: {
-#if !BUILDFLAG(IS_ANDROID)
-      if (panel_->HasSelectionOverlay()) {
-        panel_->CloseSelectionOverlay();
-        return true;
-      }
-#endif
       panel_->Close(CloseOptions());
       return true;
     }

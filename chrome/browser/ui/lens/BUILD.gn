@@ -106,7 +106,6 @@ if (!is_android) {
     ]
     friend = [
       ":*",
-      "//chrome/browser/glic/selection:interactive_ui_tests",
     ]
     sources = [
       "lens_composebox_handler.h",

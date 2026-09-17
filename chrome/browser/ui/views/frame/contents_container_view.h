@@ -203,10 +203,6 @@ class ContentsContainerView : public views::View,
   // overlay that is shown on top of the web contents.
   raw_ptr<ActorOverlayWebView> actor_overlay_web_view_ = nullptr;
 
-  // Contains glic selection overlay. The overlay renders a static screenshot
-  // of the WebContents and is drawn on top of the WebContents.
-  raw_ptr<views::View> glic_selection_overlay_view_ = nullptr;
-
   // The glic browser view that renders around the web contents area.
   raw_ptr<glic::ContextSharingBorderView> glic_border_ = nullptr;
 

@@ -38,7 +38,6 @@ source_set("browser_ui") {
   if (!is_android) {
     sources += [
       "glic_iph_controller.h",
-      "glic_selection_widget.h",
       "glic_vector_icon_manager.h",
     ]
 
@@ -69,7 +68,6 @@ source_set("impl") {
   if (!is_android) {
     sources += [
       "glic_iph_controller.cc",
-      "glic_selection_widget.cc",
       "glic_vector_icon_manager.cc",
     ]
   } else {
@@ -206,7 +204,6 @@ if (!is_android) {
     sources = [
       "glic_actor_task_icon_manager_unittest.cc",
       "glic_button_controller_unittest.cc",
-      "glic_selection_widget_unittest.cc",
     ]
     deps = [
       ":browser_ui",

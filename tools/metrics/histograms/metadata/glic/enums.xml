@@ -1108,8 +1108,6 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//chrome/browser/glic/host/glic.mojom:ScrollToErrorReason) -->
 
-<!-- LINT.IfChange(GlicSelectionAction) -->
-
 <enum name="GlicSelectionAction">
   <int value="0" label="Nudge Shown"/>
   <int value="1" label="Widget Shown"/>
@@ -1118,8 +1116,6 @@ chromium-metrics-reviews@google.com.
   <int value="4" label="Widget Dismissed By Button"/>
   <int value="5" label="Widget Dismissed By Click Outside"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/glic/glic_selection_observer.cc:GlicSelectionAction) -->
 
 <!-- LINT.IfChange(GlicSwitchConversationTarget) -->
 

@@ -104,12 +104,10 @@
 #endif
 
 #include "chrome/browser/glic/browser_ui/glic_tab_indicator_helper.h"
-#include "chrome/browser/glic/glic_selection_observer.h"
 #include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/glic/public/widget/glic_side_panel_coordinator_impl.h"
-#include "chrome/browser/glic/selection/selection_overlay_controller.h"
 #include "chrome/browser/glic/service/glic_instance_helper.h"
 #include "chrome/browser/ui/contextual_search/tab_contextualization_controller.h"
 #include "chrome/browser/ui/tabs/features.h"
@@ -308,14 +306,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
       glic_tab_indicator_helper_ =
           GetUserDataFactory().CreateInstance<glic::GlicTabIndicatorHelper>(
               tab, &tab);
-      glic_selection_overlay_controller_ =
-          GetUserDataFactory().CreateInstance<glic::SelectionOverlayController>(
-              tab, &tab, profile->GetPrefs());
-
-      if (glic::GlicEnabling::IsSelectionPromptEnabledForProfile(profile)) {
-        glic_selection_observer_ =
-            std::make_unique<glic::GlicSelectionObserver>(tab.GetContents());
-      }
       if (base::FeatureList::IsEnabled(
               features::kGlicSummarizeVideoSuggestion)) {
         glic_page_features_manager_ =
@@ -592,11 +582,6 @@ void TabFeatures::WillDiscardContents(tabs::TabInterface* tab,
     new_tab_page_preload_pipeline_manager_.reset();
     new_tab_page_preload_pipeline_manager_ =
         std::make_unique<NewTabPagePreloadPipelineManager>(new_contents);
-  }
-
-  if (glic_selection_observer_) {
-    glic_selection_observer_ =
-        std::make_unique<glic::GlicSelectionObserver>(new_contents);
   }
 
   if (omnibox_autofill_bubble_controller_) {

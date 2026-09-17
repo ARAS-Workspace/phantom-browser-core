@@ -66,8 +66,6 @@ class LocalHotkeyManager : public ui::AcceleratorTarget {
     virtual void ShowTitleBarContextMenuAt(gfx::Point event_loc) {}
     virtual BrowserWindowInterface* GetBrowserWindowInterface();
 #if !BUILDFLAG(IS_ANDROID)
-    virtual bool HasSelectionOverlay() = 0;
-    virtual void CloseSelectionOverlay() = 0;
     virtual base::WeakPtr<views::View> GetView() = 0;
 #endif
   };

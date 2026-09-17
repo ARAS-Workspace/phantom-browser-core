@@ -121,14 +121,6 @@ ContentsContainerView::ContentsContainerView(BrowserView* browser_view)
     actor_overlay_web_view_ = AddChildView(std::move(actor_overlay_web_view));
   }
 
-  glic_selection_overlay_view_ = AddChildView(std::make_unique<views::View>());
-  glic_selection_overlay_view_->SetProperty(views::kElementIdentifierKey,
-                                            kGlicSelectionOverlayViewElementId);
-  glic_selection_overlay_view_->SetVisible(false);
-  glic_selection_overlay_view_->SetLayoutManager(
-      std::make_unique<views::FillLayout>());
-  glic_selection_overlay_view_->SetPaintToLayer();
-
   if (glic::GlicEnabling::IsProfileEligible(browser_view->GetProfile())) {
     glic_border_ = AddChildView(
         views::Builder<glic::ContextSharingBorderView>(
@@ -263,10 +255,6 @@ void ContentsContainerView::SetBorderRoundedCornersFrom(
     // ai_overlay_dialog_view_ should use the same radii as the contents view
     // since it acts as a layer directly over the main web content.
     ai_overlay_dialog_view_->holder()->SetNativeViewCornerRadii(radii);
-  }
-
-  if (glic_selection_overlay_view_) {
-    glic_selection_overlay_view_->layer()->SetRoundedCornerRadius(radii);
   }
 
   if (glic_border_) {
@@ -545,13 +533,6 @@ views::ProposedLayout ContentsContainerView::CalculateProposedLayout(
     layouts.child_layouts.emplace_back(ai_overlay_dialog_view_.get(),
                                        ai_overlay_dialog_view_->GetVisible(),
                                        rect, views::SizeBounds(rect.size()));
-  }
-
-  if (glic_selection_overlay_view_) {
-    layouts.child_layouts.emplace_back(
-        glic_selection_overlay_view_.get(),
-        glic_selection_overlay_view_->GetVisible(),
-        non_devtools_contents_bounds, size_bounds);
   }
 
   if (mini_toolbar_) {

@@ -97,7 +97,6 @@
 #include "chrome/browser/feedback/system_logs/chrome_system_logs_fetcher.h"
 #include "chrome/browser/glic/glic_hotkey.h"
 #include "chrome/browser/glic/host/context/glic_focused_browser_manager.h"
-#include "chrome/browser/glic/selection/selection_overlay_controller.h"
 #include "chrome/browser/media/audio_ducker.h"
 #include "chrome/browser/ui/tabs/tab_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -934,50 +933,12 @@ class GlicWebClientHandler
 
   void CaptureRegion(mojo::PendingRemote<mojom::CaptureRegionObserver> observer,
                      mojom::CaptureRegionParamsPtr params) override {
-#if !BUILDFLAG(IS_ANDROID)  // NEEDS_ANDROID_IMPL: CaptureRegion (b/494315475)
-    std::optional<int32_t> tab_id =
-        params ? std::optional<int32_t>(params->tab_id) : std::nullopt;
-    mojom::TabContextOptionsPtr tab_context_options =
-        params ? std::move(params->options) : nullptr;
-    tabs::TabInterface* tab = nullptr;
-    if (tab_id.has_value()) {
-      tab = tabs::TabHandle(*tab_id).Get();
-    } else {
-      const FocusedTabData& focus =
-          GetSharingManagerInternal().GetFocusedTabData();
-      // Prioritize the focused tab, but fall back to the unfocused tab if one
-      // is available. This is useful in cases where the active tab is not
-      // "focusable" by Glic (e.g. chrome:// pages).
-      tab = focus.is_focus() ? focus.focus() : focus.unfocused_tab();
-    }
-    SelectionOverlayController::CaptureRegion(tab, GetSharingManagerInternal(),
-                                              std::move(observer),
-                                              std::move(tab_context_options));
-#else
     NOTIMPLEMENTED();
-#endif
   }
 
   void DeleteCapturedRegion(int32_t tab_id,
                             const base::UnguessableToken& id) override {
-#if !BUILDFLAG(IS_ANDROID)  // NEEDS_ANDROID_IMPL: CaptureRegion (b/494315475)
-    tabs::TabInterface* tab = tabs::TabHandle(tab_id).Get();
-    if (!tab) {
-      return;
-    }
-    if (tab->GetProfile() != profile_) {
-      return;
-    }
-    if (auto* web_contents = tab->GetContents()) {
-      if (auto* selection_overlay_controller =
-              SelectionOverlayController::FromTabWebContents(web_contents)) {
-        selection_overlay_controller->DeleteRegion(id,
-                                                   /*is_using_keyboard=*/false);
-      }
-    }
-#else
     NOTIMPLEMENTED();
-#endif
   }
 
   void SetAudioDucking(bool enabled,

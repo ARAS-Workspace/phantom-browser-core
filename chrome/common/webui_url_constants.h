@@ -167,8 +167,6 @@ inline constexpr char kChromeUIGlicHost[] = "glic";
 inline constexpr char kChromeUIGlicURL[] = "chrome://glic/";
 inline constexpr char kChromeUIGlicUntrustedHost[] = "glic";
 inline constexpr char kChromeUIGlicUntrustedURL[] = "chrome-untrusted://glic/";
-inline constexpr char kChromeUIGlicSelectionOverlayURL[] =
-    "chrome-untrusted://glic/selection-overlay/";
 inline constexpr char kChromeUIGlicExperimentalOptInHost[] =
     "glic-experimental-opt-in";
 inline constexpr char kChromeUIGlicExperimentalOptInURL[] =

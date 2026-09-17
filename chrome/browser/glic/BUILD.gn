@@ -138,7 +138,6 @@ source_set("glic") {
     # desktop-only section.
     sources += [
       "gemini_spark_settings_policy_handler.h",
-      "glic_selection_observer.h",
       "host/context/glic_focused_tab_manager.h",
       "public/widget/glic_side_panel_coordinator_impl.h",
       "widget/glic_view.h",
@@ -293,9 +292,6 @@ source_set("glic_metrics") {
     "//content/public/browser",
     "//services/metrics/public/cpp:ukm_builders",
   ]
-  if (!is_android) {
-    deps += [ "//chrome/browser/glic/selection" ]
-  }
 }
 
 # TODO(b/430371855): This is the better target for resources only needed
@@ -549,14 +545,12 @@ source_set("impl") {
   if (!is_android) {
     # TODO(b/470059315): Make these work on Android, or move them to the
     # desktop-only section.
-    public_deps += [ "//chrome/browser/glic/selection" ]
     sources += [
       "common/view_scoped_registration_delegate_impl.cc",
       "experimental_opt_in/glic_experimental_opt_in_dialog_view.cc",
       "experimental_opt_in/glic_experimental_opt_in_dialog_view.h",
       "experimental_opt_in/glic_experimental_opt_in_ui_host_desktop.cc",
       "gemini_spark_settings_policy_handler.cc",
-      "glic_selection_observer.cc",
       "glic_settings_util_desktop.cc",
       "host/context/favicon_impl/glic_tab_favicon_adapter_desktop.cc",
       "host/context/favicon_impl/glic_tab_favicon_adapter_desktop.h",
@@ -586,7 +580,6 @@ source_set("impl") {
     deps += [
       "//chrome/browser/actor/ui",
       "//chrome/browser/glic/browser_ui:impl",
-      "//chrome/browser/glic/selection",
       "//chrome/browser/lens/region_search",
       "//chrome/browser/themes",
       "//chrome/browser/ui:browser_tab_strip",
@@ -768,7 +761,6 @@ source_set("unit_tests") {
       "common/local_hotkey_manager_unittest.cc",
       "glic_metrics_provider_unittest.cc",
       "glic_metrics_unittest.cc",
-      "glic_selection_observer_unittest.cc",
       "host/context/glic_page_features_manager_unittest.cc",
       "host/context/glic_pin_candidate_comparator_unittest.cc",
       "host/context/glic_screenshot_capturer_unittest.cc",
@@ -927,8 +919,6 @@ source_set("browser_tests") {
       "//chrome/browser/glic/browser_ui:browser_tests",
       "//chrome/browser/glic/common",
       "//chrome/browser/glic/common:browser_tests",
-      "//chrome/browser/glic/selection",
-      "//chrome/browser/glic/selection:browser_tests",
       "//chrome/browser/glic/suggestions:impl",
       "//chrome/browser/glic/suggestions:test_support",
       "//chrome/browser/glic/test_support",
@@ -1013,7 +1003,6 @@ if (!is_android) {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
     sources = [
-      "glic_selection_observer_interactive_uitest.cc",
       "glic_settings_util_interactive_uitest.cc",
       "glic_user_status_interactive_uitest.cc",
       "host/glic_actor_attempt_form_filling_interactive_ui_test.cc",
@@ -1065,7 +1054,6 @@ if (!is_android) {
       "//chrome/browser/glic/actor:test_support",
       "//chrome/browser/glic/browser_ui:interactive_ui_tests",
       "//chrome/browser/glic/public:features",
-      "//chrome/browser/glic/selection:interactive_ui_tests",
       "//chrome/browser/glic/suggestions",
       "//chrome/browser/glic/suggestions:test_support",
       "//chrome/browser/glic/test_support",

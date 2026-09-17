@@ -122,7 +122,6 @@ source_set("configs") {
       "//chrome/browser/actor/ui",
       "//chrome/browser/actor/ui:actor_overlay_web_view",
       "//chrome/browser/contextual_cueing/internals",
-      "//chrome/browser/glic/selection",
       "//chrome/browser/ui/webui/access_code_cast",
       "//chrome/browser/ui/webui/app_service_internals",
       "//chrome/browser/ui/webui/autofill_ml_internals",

@@ -197,7 +197,6 @@ template("chrome_extra_paks") {
         "$root_gen_dir/chrome/drive_picker_host_untrusted_resources.pak",
         "$root_gen_dir/chrome/feedback_resources.pak",
         "$root_gen_dir/chrome/gaia_auth_host_resources.pak",
-        "$root_gen_dir/chrome/glic_untrusted_resources.pak",
         "$root_gen_dir/chrome/history_resources.pak",
         "$root_gen_dir/chrome/inspect_resources.pak",
         "$root_gen_dir/chrome/iwa_dev_resources.pak",

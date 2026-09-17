@@ -63,7 +63,6 @@ group("resources") {
       "drive_picker_host/untrusted:resources",
       "feedback:resources",
       "gaia_auth_host:resources",
-      "glic/selection_overlay:resources",
       "history:resources",
       "inspect:resources",
       "iwa_dev:resources",

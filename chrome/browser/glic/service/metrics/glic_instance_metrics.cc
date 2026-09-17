@@ -45,10 +45,6 @@
 #include "services/metrics/public/cpp/ukm_recorder.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/glic/selection/selection_overlay_controller.h"
-#endif
-
 namespace glic {
 
 namespace {
@@ -105,38 +101,6 @@ enum class GlicTurnSource {
   kMaxValue = kTabAudio,
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/glic/enums.xml:GlicTurnSource)
-
-void RecordSelectionOverlayMetrics(
-    const std::vector<tabs::TabInterface*>& pinned_tabs) {
-// Selection Overlays are not currently implemented on Android.
-#if !BUILDFLAG(IS_ANDROID)
-  int selection_areas_count = 0;
-  std::vector<int> polyline_point_counts;
-  for (tabs::TabInterface* tab : pinned_tabs) {
-    if (auto* web_contents = tab->GetContents()) {
-      if (auto* selection_overlay_controller =
-              SelectionOverlayController::FromTabWebContents(web_contents)) {
-        selection_areas_count +=
-            selection_overlay_controller->GetSelectedRegionCount();
-        std::vector<int> counts =
-            selection_overlay_controller->GetPolylineCounts();
-        polyline_point_counts.insert(polyline_point_counts.end(),
-                                     counts.begin(), counts.end());
-      }
-    }
-  }
-  if (base::FeatureList::IsEnabled(features::kGlicCaptureRegion)) {
-    base::UmaHistogramExactLinear("Glic.Instance.InputSubmitted.SelectionCount",
-                                  selection_areas_count, 10);
-  }
-  if (base::FeatureList::IsEnabled(features::kGlicRegionSelectionLine)) {
-    for (int count : polyline_point_counts) {
-      base::UmaHistogramCounts1000(
-          "Glic.Instance.InputSubmitted.Selection.PolylinePointCount", count);
-    }
-  }
-#endif
-}
 
 }  // namespace
 
@@ -1066,10 +1030,6 @@ void GlicInstanceMetrics::OnUserInputSubmitted(mojom::WebClientMode mode) {
   cui_trackers_.push_back(std::make_unique<GlicSubmitQueryCuiTracker>());
 
   base::RecordAction(base::UserMetricsAction("GlicResponseInputSubmit"));
-
-  if (sharing_manager_) {
-    RecordSelectionOverlayMetrics(sharing_manager_->GetPinnedTabs());
-  }
 
   // Reset turn data and start populating it for the new turn being started.
   turn_ = {};

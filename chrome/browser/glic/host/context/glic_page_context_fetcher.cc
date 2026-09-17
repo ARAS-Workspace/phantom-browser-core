@@ -38,7 +38,6 @@
 #if !BUILDFLAG(IS_ANDROID)  // NEEDS_ANDROID_IMPL
 #include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/glic/media/glic_media_integration.h"
-#include "chrome/browser/glic/selection/selection_overlay_controller.h"
 #endif
 
 namespace glic {

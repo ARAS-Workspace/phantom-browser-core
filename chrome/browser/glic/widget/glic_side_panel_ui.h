@@ -82,8 +82,6 @@ class GlicSidePanelUi
   bool HasFocus() override;
   bool ActivateBrowser() override;
   void Zoom(mojom::ZoomAction zoom_action) override;
-  bool HasSelectionOverlay() override;
-  void CloseSelectionOverlay() override;
   base::WeakPtr<views::View> GetView() override;
   BrowserWindowInterface* GetBrowserWindowInterface() override;
 

@@ -30,10 +30,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/views/widget/widget_delegate.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/glic/selection/selection_overlay_controller.h"
-#endif
-
 namespace glic {
 
 namespace {
@@ -207,36 +203,6 @@ void GlicFloatingUi::Zoom(mojom::ZoomAction zoom_action) {
 void GlicFloatingUi::ShowTitleBarContextMenuAt(gfx::Point event_loc) {
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-bool GlicFloatingUi::HasSelectionOverlay() {
-  tabs::TabInterface* focused_tab =
-      delegate_->host().GetSharingManagerInternal().GetFocusedTabData().focus();
-  if (!focused_tab || !focused_tab->IsActivated()) {
-    return false;
-  }
-  auto* selection_overlay_controller =
-      SelectionOverlayController::FromTabWebContents(
-          focused_tab->GetContents());
-  return selection_overlay_controller->state() ==
-         SelectionOverlayController::State::kOverlay;
-}
-
-void GlicFloatingUi::CloseSelectionOverlay() {
-  tabs::TabInterface* focused_tab =
-      delegate_->host().GetSharingManagerInternal().GetFocusedTabData().focus();
-  if (!focused_tab || !focused_tab->IsActivated()) {
-    return;
-  }
-  auto* selection_overlay_controller =
-      SelectionOverlayController::FromTabWebContents(
-          focused_tab->GetContents());
-  if (!selection_overlay_controller) {
-    return;
-  }
-  selection_overlay_controller->Close();
-}
-#endif
-
 void GlicFloatingUi::EnableDragResize(bool enabled) {
   user_resizable_ = enabled;
 
@@ -340,7 +306,6 @@ void GlicFloatingUi::Close(const CloseOptions& options) {
         &web_modal::ModalDialogHostObserver::OnHostDestroying);
   }
   ClearWebContentsDelegate();
-  CloseSelectionOverlay();
   if (screenshot_capturer_) {
     screenshot_capturer_->CloseScreenPicker();
   }

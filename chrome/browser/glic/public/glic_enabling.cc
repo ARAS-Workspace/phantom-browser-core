@@ -1086,12 +1086,6 @@ bool GlicEnabling::IsContextualMenuItemEnabled(
 }
 
 // static
-bool GlicEnabling::IsSelectionPromptEnabledForProfile(Profile* profile) {
-  return IsEnabledForProfile(profile) &&
-         base::FeatureList::IsEnabled(features::kGlicSelectionPrompt);
-}
-
-// static
 bool GlicEnabling::IsLiveAndFloatyEnabledByFlags() {
   // Despite the name, when off, this disables live mode and floaty.
   return base::FeatureList::IsEnabled(features::kGlicLiveMode);
