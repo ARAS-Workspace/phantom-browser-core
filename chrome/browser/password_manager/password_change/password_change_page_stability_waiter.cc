@@ -13,7 +13,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
 #include "chrome/browser/password_manager/password_change/password_change_logging_util.h"
-#include "chrome/common/chrome_render_frame.mojom.h"
 #include "components/autofill/content/browser/content_autofill_client.h"
 #include "components/autofill/core/browser/form_predictions_tracker.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
@@ -72,18 +71,31 @@ void PasswordChangePageStabilityWaiter::CheckPageStability() {
   CHECK(web_contents());
   CHECK(web_contents()->GetPrimaryMainFrame());
 
-  mojo::AssociatedRemote<chrome::mojom::ChromeRenderFrame> chrome_render_frame;
+  mojo::AssociatedRemote<
+      page_content_annotations::mojom::PageStabilityMonitorManager>
+      monitor_manager;
   web_contents()
       ->GetPrimaryMainFrame()
       ->GetRemoteAssociatedInterfaces()
-      ->GetInterface(&chrome_render_frame);
+      ->GetInterface(&monitor_manager);
 
-  if (!chrome_render_frame) {
+  if (!monitor_manager) {
     OnTimeout();
     return;
   }
 
-  CheckVisualState();
+  monitor_manager->CreatePageStabilityMonitor(
+      monitor_.BindNewPipeAndPassReceiver(),
+      /*supports_paint_stability=*/true);
+
+  monitor_.set_disconnect_handler(
+      base::BindOnce(&PasswordChangePageStabilityWaiter::CheckVisualState,
+                     weak_ptr_factory_.GetWeakPtr()));
+
+  monitor_->NotifyWhenStable(
+      base::Seconds(0),
+      base::BindOnce(&PasswordChangePageStabilityWaiter::CheckVisualState,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
 PasswordChangePageStabilityWaiter::~PasswordChangePageStabilityWaiter() =
