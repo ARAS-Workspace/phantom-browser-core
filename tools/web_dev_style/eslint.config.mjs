@@ -578,7 +578,6 @@ export default [
       'chrome/browser/resources/new_tab_page/app.ts',
       'chrome/browser/resources/new_tab_page/lazy_load.ts',
       'chrome/browser/resources/omnibox_popup/aim_app.ts',
-      'chrome/test/data/webui/contextual_tasks/composebox_misc_inputs_test.ts',
       'chrome/test/data/webui/cr_components/composebox/composebox_drag_drop_test.ts',
       'chrome/test/data/webui/cr_components/composebox/composebox_input_placeholder_test.ts',
       'chrome/test/data/webui/cr_components/composebox/composebox_test.ts',
@@ -586,7 +585,6 @@ export default [
       'chrome/test/data/webui/cr_components/composebox/composebox_voice_search_recognition_test.ts',
       'chrome/test/data/webui/cr_components/composebox/composebox_voice_search_flags_test.ts',
       'chrome/test/data/webui/cr_components/composebox/composebox_test_utils.ts',
-      'chrome/test/data/webui/lens/side_panel/composebox_test.ts',
     ],
     rules: {
       'no-restricted-imports': [
