@@ -39,7 +39,6 @@
     "LensOverlayResults")                                                     \
   V(kMerchantTrust, kActionSidePanelShowMerchantTrust, "MerchantTrust")       \
   V(kComments, kActionSidePanelShowComments, "Comments")                      \
-  V(kGeic, kActionSidePanelShowGeic, "Geic")                                  \
   V(kGlic, kActionSidePanelShowGlic, "Glic")                                  \
   V(kTabsFromOtherDevices, kActionSidePanelShowTabsFromOtherDevices,          \
     "TabsFromOtherDevices")                                                   \

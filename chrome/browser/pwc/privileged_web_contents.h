@@ -69,10 +69,10 @@ class PrivilegedWebContents : public content::WebContentsDelegate,
   PwcApiBinder& bridge() { return *bridge_; }
 
   // Registry for the serving component's PWC-scoped browser-side state. The
-  // component (e.g. //chrome/browser/geic) creates and owns its own helper --
-  // typically alongside the PrivilegedWebContents it creates -- and registers
-  // it here via ScopedUnownedUserData; consumers with the PrivilegedWebContents
-  // retrieve it by type (e.g. GeicHost::Get(pwc.unowned_user_data_host())).
+  // component creates and owns its own helper -- typically alongside the
+  // PrivilegedWebContents it creates -- and registers it here via
+  // ScopedUnownedUserData; consumers with the PrivilegedWebContents
+  // retrieve it by type from the host.
   // PrivilegedWebContents does not own or depend on the component's helper, so
   // there is no dependency cycle. The host must outlive everything registered
   // in it, which holds because the component scopes its helper to this PWC.

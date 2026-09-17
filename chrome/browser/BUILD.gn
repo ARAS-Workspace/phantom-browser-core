@@ -735,7 +735,6 @@ source_set("core") {
     "//chrome/browser/finds/core",
     "//chrome/browser/first_party_sets",
     "//chrome/browser/first_run",
-    "//chrome/browser/geic",
     "//chrome/browser/glic",
     "//chrome/browser/glic:impl",
     "//chrome/browser/glic/public:features",

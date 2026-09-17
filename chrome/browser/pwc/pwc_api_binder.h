@@ -18,7 +18,7 @@ namespace pwc {
 class PrivilegedWebContents;
 
 // The single shared security gate for every privileged capability binder --
-// the bridge itself and per-component APIs such as //chrome/browser/geic.
+// the bridge itself and per-component APIs.
 // Returns the PrivilegedWebContents whose privileged capability surface
 // `render_frame_host` is entitled to, or null if the request must be
 // rejected. Enforcement is folded in here, in two tiers, so a binder cannot
@@ -36,8 +36,7 @@ class PrivilegedWebContents;
 //
 // Either way, on null the caller just returns, dropping the receiver. On
 // non-null the caller may bind, after any component-specific checks of its
-// own (a component mismatch is again a compromised renderer; see
-// BindGeicApi).
+// own (a component mismatch is again a compromised renderer).
 PrivilegedWebContents* EnforceCapabilityGate(
     content::RenderFrameHost* render_frame_host);
 

@@ -13,7 +13,6 @@
 #include "chrome/browser/actor/actor_script_tool_receiver.h"
 #include "chrome/browser/buildflags.h"
 #include "chrome/browser/dom_distiller/dom_distiller_service_factory.h"
-#include "chrome/browser/geic/geic_host.h"
 #include "chrome/browser/glic/host/glic_page_handler.h"
 #include "chrome/browser/glic/host/guest_util.h"
 #include "chrome/browser/glic/public/features.h"
@@ -322,7 +321,6 @@ void PopulateChromeFrameBinders(
   // remains the security boundary for frames that do get the binders.
   if (render_frame_host->GetProcess()->IsPrivileged()) {
     map->Add<pwc::mojom::PrivilegedBridge>(&pwc::BindPrivilegedBridge);
-    map->Add<geic::mojom::GeicApi>(&geic::BindGeicApi);
   }
 
   map->Add<blink::mojom::ScriptToolHost>(
