@@ -317,7 +317,6 @@ source_set("interactive_ui_tests") {
   if (!is_android) {
     sources += [
       "bookmarks/bookmarks_focus_interactive_uitest.cc",
-      "contextual_tasks/contextual_tasks_pixel_interactive_ui_test.cc",
       "cr_components/cr_components_interactive_uitest.cc",
       "downloads/downloads_focus_interactive_uitest.cc",
       "history/history_focus_interactive_uitest.cc",
