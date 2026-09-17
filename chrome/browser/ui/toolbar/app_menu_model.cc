@@ -28,9 +28,6 @@
 #include "chrome/browser/defaults.h"
 #include "chrome/browser/extensions/extension_ui_util.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
-#include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
@@ -2068,17 +2065,6 @@ void AppMenuModel::Build() {
   AddItemWithStringIdAndVectorIcon(
       this, IDC_PRINT, IDS_PRINT,
       features::IsRoundedIconsEnabled() ? kPrintIcon : kPrintMenuOldIcon);
-
-  if (glic::GlicEnabling::IsEnabledForProfile(browser_->GetProfile())) {
-    AddItemWithStringIdAndVectorIcon(this, IDC_OPEN_GLIC,
-                                     IDS_GLIC_THREE_DOT_MENU_ITEM,
-                                     glic::GlicVectorIconManager::GetVectorIcon(
-                                         IDR_GLIC_BUTTON_VECTOR_ICON));
-    SetIsNewFeatureAt(
-        GetIndexOfCommandId(IDC_OPEN_GLIC).value(),
-        BrowserUserEducationInterface::From(browser())->MaybeShowNewBadgeFor(
-            features::kGlicAppMenuNewBadge));
-  }
 
   if (auto* controller = lens::LensOverlayEntryPointController::From(browser());
       controller && controller->IsEnabled()) {

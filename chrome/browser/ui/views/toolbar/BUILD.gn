@@ -9,7 +9,6 @@ import("//ui/webui/webui_features.gni")
 
 source_set("toolbar") {
   public = [
-    "ai_overlay_toolbar_button.h",
     "app_menu.h",
     "app_menu_control.h",
     "app_menu_dynamic_helper.h",
@@ -56,8 +55,6 @@ source_set("toolbar") {
     "//build:buildflag_header_h",
     "//chrome/browser:command_updater_impl",
     "//chrome/browser/bookmarks",
-    "//chrome/browser/glic",
-    "//chrome/browser/glic/browser_ui",
     "//chrome/browser/lifetime",
     "//chrome/browser/ui:browser_element_identifiers",
     "//chrome/browser/ui/browser_window",
@@ -104,7 +101,6 @@ source_set("toolbar") {
 
 source_set("impl") {
   sources = [
-    "ai_overlay_toolbar_button.cc",
     "app_menu.cc",
     "app_menu_dynamic_helper.cc",
     "avatar_toolbar_button_interface.cc",
@@ -167,7 +163,6 @@ source_set("impl") {
     "//chrome/browser/extensions",
     "//chrome/browser/external_protocol",
     "//chrome/browser/feedback",
-    "//chrome/browser/glic/browser_ui",
     "//chrome/browser/lifetime",
     "//chrome/browser/media/router:media_router_feature",
     "//chrome/browser/performance_manager/public/user_tuning",
@@ -281,7 +276,6 @@ source_set("impl") {
   }
 
   if (is_win || is_mac || is_linux) {
-    deps += [ "//chrome/browser/ui/ai_overlay_dialog" ]
   }
 }
 

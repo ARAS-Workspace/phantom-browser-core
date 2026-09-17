@@ -122,8 +122,6 @@ chromium-metrics-reviews@google.com.
   <variant name="WebClientInitialized"/>
 </variants>
 
-<!-- LINT.ThenChange(//chrome/browser/resources/glic/glic_api_impl/request_types.ts:ApiRequestType) -->
-
 <variants name="AttachedTabCount">
   <variant name="0" summary="0 tabs attached"/>
   <variant name="1" summary="1 tab attached"/>
@@ -149,8 +147,6 @@ chromium-metrics-reviews@google.com.
   <variant name="SidePanel" summary="a side panel embedder"/>
   <variant name="Tab" summary="a tab embedder"/>
 </variants>
-
-<!-- LINT.IfChange(GlicInvocationSource) -->
 
 <variants name="GlicInvocationSource">
   <variant name="ActorTaskIcon"/>
@@ -197,8 +193,6 @@ chromium-metrics-reviews@google.com.
   <variant name="WhatsNew"/>
   <variant name="ZeroStateAutoSummarize"/>
 </variants>
-
-<!-- LINT.ThenChange(//chrome/browser/glic/host/glic.mojom:InvocationSource) -->
 
 <variants name="MemoryTriggerEvent">
   <variant name="CriticalPressure"
@@ -980,7 +974,6 @@ chromium-metrics-reviews@google.com.
     Records the amount of time a particular loading step took to complete.
     {LoadingStage}
   </summary>
-<!-- LINT.IfChange(LoadingStage) -->
 
   <token key="LoadingStage">
     <variant name="AWAITING_COOKIE_SYNC"/>
@@ -988,7 +981,6 @@ chromium-metrics-reviews@google.com.
     <variant name="AWAITING_PROFILE_READY"/>
     <variant name="LOADING_WEB_CLIENT"/>
   </token>
-<!-- LINT.ThenChange(//chrome/browser/resources/glic/glic_app_controller.ts:LoadingStage) -->
 
 </histogram>
 
@@ -1082,7 +1074,6 @@ chromium-metrics-reviews@google.com.
     This metric should eventually replace
     Glic.Instance.FirstActionInDaisyChainPanel.
   </summary>
-<!-- LINT.IfChange(Source) -->
 
   <token key="Source">
     <variant name="ActorAddTab" summary="actor adding a new tab"/>
@@ -1097,7 +1088,6 @@ chromium-metrics-reviews@google.com.
     <variant name="WebHandoff"
         summary="opened via navigation capture / web handoff"/>
   </token>
-<!-- LINT.ThenChange(//chrome/browser/glic/service/metrics/metrics_types.h:DaisyChainSource) -->
 
 </histogram>
 

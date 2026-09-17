@@ -37,8 +37,6 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//components/sync/protocol/skill_specifics.proto:SkillSource) -->
 
-<!-- LINT.IfChange(SkillsDialogAction) -->
-
 <enum name="SkillsDialogAction">
   <int value="0" label="Opened Dialog"/>
   <int value="1" label="Saved New Skill"/>
@@ -47,20 +45,12 @@ chromium-metrics-reviews@google.com.
   <int value="4" label="Deleted Skill"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsDialogAction) -->
-
-<!-- LINT.IfChange(SkillsDownloadRequestStatus) -->
-
 <enum name="SkillsDownloadRequestStatus">
   <int value="0" label="Download Request Sent"/>
   <int value="1" label="Download Response Received"/>
   <int value="2" label="Download Already Running"/>
   <int value="3" label="Download Timed Out"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsDownloadRequestStatus) -->
-
-<!-- LINT.IfChange(SkillsFetchResult) -->
 
 <enum name="SkillsFetchResult">
   <int value="0" label="Success"/>
@@ -69,10 +59,6 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="Proto Parse Failure"/>
   <int value="4" label="Network Error (any non-200)"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsFetchResult) -->
-
-<!-- LINT.IfChange(SkillsInvokeAction) -->
 
 <enum name="SkillsInvokeAction">
   <int value="0" label="Used 1st Party Skill"/>
@@ -83,19 +69,11 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Used Derived from Enterprise Skill"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsInvokeAction) -->
-
-<!-- LINT.IfChange(SkillsInvokeResult) -->
-
 <enum name="SkillsInvokeResult">
   <int value="0" label="Success"/>
   <int value="1" label="Skill Not Found"/>
   <int value="2" label="Timeout"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsInvokeResult) -->
-
-<!-- LINT.IfChange(SkillsManagementAction) -->
 
 <enum name="SkillsManagementAction">
   <int value="0" label="Page Opened"/>
@@ -108,29 +86,17 @@ chromium-metrics-reviews@google.com.
   <int value="7" label="Empty Search"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/skills/public/skill_metrics.mojom:SkillsManagementAction) -->
-
-<!-- LINT.IfChange(SkillsManagementError) -->
-
 <enum name="SkillsManagementError">
   <int value="0" label="Tab Controller Does Not Exist"/>
   <int value="1" label="Skills Service Not Ready"/>
   <int value="2" label="1P Skill Does Not Exist"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsManagementError) -->
-
-<!-- LINT.IfChange(SkillsPromptRefinementOutcome) -->
-
 <enum name="SkillsPromptRefinementOutcome">
   <int value="0" label="Not Refined"/>
   <int value="1" label="Used Refined Prompt"/>
   <int value="2" label="Reverted and Not Used"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/skills/public/skill_metrics.mojom:SkillsPromptRefinementOutcome) -->
-
-<!-- LINT.IfChange(SkillsRefineResult) -->
 
 <enum name="SkillsRefineResult">
   <int value="0" label="Success"/>
@@ -141,10 +107,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Invalid Request"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsRefineResult) -->
-
-<!-- LINT.IfChange(SkillsSaveResult) -->
-
 <enum name="SkillsSaveResult">
   <int value="0" label="Success"/>
   <int value="1" label="UI Context Lost"/>
@@ -154,8 +116,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Service Not Ready"/>
   <int value="6" label="Invalid Request"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsSaveResult) -->
 
 </enums>
 

@@ -22,8 +22,6 @@ chromium-metrics-reviews@google.com.
 
 <histograms>
 
-<!-- LINT.IfChange(ActorTaskState) -->
-
 <variants name="ActorTaskState">
   <variant name="Acting" summary="Acting"/>
   <variant name="Cancelled" summary="Cancelled"/>
@@ -36,18 +34,10 @@ chromium-metrics-reviews@google.com.
   <variant name="WaitingOnUser" summary="WaitingOnUser"/>
 </variants>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_task.h:State, enums.xml:ActorTaskState) -->
-
-<!-- LINT.IfChange(GlicInvocationSourceForActor) -->
-
 <variants name="GlicInvocationSourceForActor">
   <variant name="Other"/>
   <variant name="UniversalCart"/>
 </variants>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_metrics.cc:ToString) -->
-
-<!-- LINT.IfChange(StoppedReason) -->
 
 <variants name="StoppedReason">
   <variant name="Cancelled" summary="Stopped by user."/>
@@ -62,10 +52,6 @@ chromium-metrics-reviews@google.com.
   <variant name="Timeout" summary="Forcefully stopped due to timeout."/>
   <variant name="UserNavigatedAway" summary="User manually navigated away."/>
 </variants>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_task.h:StoppedReason) -->
-
-<!-- LINT.IfChange(ToolRequest) -->
 
 <variants name="ToolRequest">
   <variant name="ActivateTab" summary="Activate Tab"/>
@@ -94,10 +80,6 @@ chromium-metrics-reviews@google.com.
   <variant name="Wait" summary="Wait"/>
 </variants>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/tool_request_variant.h:ToolRequestVariant) -->
-
-<!-- LINT.IfChange(UiEvent) -->
-
 <variants name="UiEvent">
   <variant name="MouseClick" summary="MouseClick UiEvent"/>
   <variant name="MouseMove" summary="MouseMove UiEvent"/>
@@ -107,8 +89,6 @@ chromium-metrics-reviews@google.com.
   <variant name="StopTask" summary="StopTask UiEvent"/>
   <variant name="TaskStateChanged" summary="TaskStateChanged UiEvent"/>
 </variants>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/ui/ui_event_debugstring.h:GetUiEventName) -->
 
 <histogram name="Actor.DomNodeGeometry.GetDomNodeResult"
     enum="GetDomNodeResult" expires_after="2027-08-11">

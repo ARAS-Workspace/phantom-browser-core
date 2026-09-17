@@ -10,12 +10,8 @@
 #include "base/functional/bind.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "chrome/browser/actor/actor_script_tool_receiver.h"
 #include "chrome/browser/buildflags.h"
 #include "chrome/browser/dom_distiller/dom_distiller_service_factory.h"
-#include "chrome/browser/glic/host/glic_page_handler.h"
-#include "chrome/browser/glic/host/guest_util.h"
-#include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
@@ -314,7 +310,6 @@ void BindCredentialManager(
 void PopulateChromeFrameBinders(
     mojo::BinderMapWithContext<content::RenderFrameHost*>* map,
     content::RenderFrameHost* render_frame_host) {
-  map->Add<glic::mojom::WebClientHandler>(&glic::BindGlicWebClientHandler);
   // Defense in depth: privileged capability interfaces are not even registered
   // for a frame outside a privileged process, so a non-PWC frame cannot
   // request them at all. The bind-time gate (pwc::EnforceCapabilityGate)
@@ -322,9 +317,6 @@ void PopulateChromeFrameBinders(
   if (render_frame_host->GetProcess()->IsPrivileged()) {
     map->Add<pwc::mojom::PrivilegedBridge>(&pwc::BindPrivilegedBridge);
   }
-
-  map->Add<blink::mojom::ScriptToolHost>(
-      &actor::ActorScriptToolReceiver::Create);
 
   map->Add<blink::mojom::AnchorElementMetricsHost>(
       &NavigationPredictor::Create);

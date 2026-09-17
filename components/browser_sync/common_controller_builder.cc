@@ -61,9 +61,6 @@
 #include "components/send_tab_to_self/send_tab_to_self_data_type_controller.h"
 #include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
 #include "components/signin/public/base/signin_switches.h"
-#include "components/skills/features.h"
-#include "components/skills/public/skill_data_type_controller.h"
-#include "components/skills/public/skills_service.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/report_unrecoverable_error.h"
@@ -307,11 +304,6 @@ void CommonControllerBuilder::SetIdentityManager(
 void CommonControllerBuilder::SetDataTypeStoreService(
     syncer::DataTypeStoreService* data_type_store_service) {
   data_type_store_service_.Set(data_type_store_service);
-}
-
-void CommonControllerBuilder::SetSkillsService(
-    skills::SkillsService* skills_service) {
-  skills_service_.Set(skills_service);
 }
 
 void CommonControllerBuilder::SetNotebooksService(
@@ -570,12 +562,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
   if (!disabled_types.Has(syncer::CONTEXTUAL_TASK)) {
     add_controller(CreateContextualTaskDataTypeController());
   }
-
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-  if (!disabled_types.Has(syncer::SKILL)) {
-    add_controller(CreateSkillDataTypeController(sync_service));
-  }
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   if (!disabled_types.Has(syncer::WEBAUTHN_CREDENTIAL)) {
@@ -1217,28 +1203,6 @@ CommonControllerBuilder::CreateJourneyDataTypeController() {
   // In CLs #5, #6, ..., implement the bridge and keep adding unit tests.
   return nullptr;
 }
-
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateSkillDataTypeController(
-    syncer::SyncService* sync_service) {
-  if (!base::FeatureList::IsEnabled(features::kSkillsEnabled) ||
-      !skills_service_.value()) {
-    return nullptr;
-  }
-  syncer::DataTypeControllerDelegate* delegate =
-      skills_service_.value()->GetControllerDelegate().get();
-  if (!delegate) {
-    return nullptr;
-  }
-  return std::make_unique<skills::SkillDataTypeController>(
-      sync_service, pref_service_.value(),
-      /*delegate_for_full_sync_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
-      /*delegate_for_transport_mode=*/
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate));
-}
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
 std::unique_ptr<syncer::DataTypeController>

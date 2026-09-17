@@ -178,8 +178,6 @@ class ChromeMetricsServiceAccessor : public metrics::MetricsServiceAccessor {
   friend class GlobalFeatures;
   friend class subscription_eligibility::SubscriptionEligibilityMetricsProvider;
   friend class supervised_user::MetricsServiceAccessorDelegateImpl;
-  friend class glic::GlicMetricsProvider;
-  friend class glic::GlicSyntheticTrialManager;
   friend class OptimizationGuideKeyedService;
   friend class optimization_guide::ChromeOnDeviceModelServiceController;
   friend class WebUITabStripFieldTrial;

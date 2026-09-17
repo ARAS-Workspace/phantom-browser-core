@@ -273,7 +273,6 @@ class OptimizationGuideKeyedService
 
  private:
   friend class ChromeBrowsingDataRemoverDelegate;
-  friend class glic::GlicPageContextEligibilityObserver;
   friend class on_device_internals::PageHandler;
   friend class OptimizationGuideMessageHandler;
   friend class OptimizationGuideWebContentsObserver;

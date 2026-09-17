@@ -513,10 +513,6 @@ class RenderViewContextMenu
 
   std::unique_ptr<ui::SimpleMenuModel> split_layout_submenu_;
 
-  //  Used for CTR metrics of menu item for opening Glic.
-  bool glic_item_shown_ = false;
-  bool glic_item_executed_ = false;
-
   base::WeakPtrFactory<RenderViewContextMenu> weak_pointer_factory_{this};
 };
 

@@ -9,7 +9,6 @@
 #include "base/check_deref.h"
 #include "base/functional/callback.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/signin/public/identity_manager/account_capabilities.h"
@@ -128,8 +127,5 @@ void GeminiStepEligibilityChecker::MaybeResolveEligibility() {
 
   StopWaiting();
 
-  const bool is_eligible = glic::GlicEnabling::IsEnabledForFirstRunProfile(
-      profile_, country_data_->stored_permanent_country,
-      country_data_->latest_country, *account_info_);
-  std::move(callback_).Run(is_eligible);
+  std::move(callback_).Run(false);
 }

@@ -14,9 +14,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/glic/glic_profile_manager.h"               // nogncheck
-#include "chrome/browser/glic/host/glic_synthetic_trial_manager.h"  // nogncheck
-#include "chrome/browser/glic/public/glic_enabling.h"               // nogncheck
 #include "chrome/browser/infobars/browser_infobar_manager.h"
 #include "chrome/browser/infobars/infobar_features.h"
 #include "chrome/browser/local_network_access/ip_address_space_overrides_prefs_observer.h"
@@ -38,7 +35,6 @@
 #if !BUILDFLAG(IS_ANDROID)
 // This causes a gn error on Android builds, because gn does not understand
 // buildflags, so we include it only on platforms where it is used.
-#include "chrome/browser/background/glic/glic_background_mode_manager.h"  // nogncheck
 #include "chrome/browser/ui/omnibox/omnibox_everywhere/omnibox_everywhere_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/browser/ui/tabs/tab_drag_api/desktop_tab_drag_impl/tab_drag_session_desktop_injector.h"
@@ -105,21 +101,6 @@ void GlobalFeatures::ReplaceGlobalFeaturesForTesting(
 void GlobalFeatures::PostBrowserProcessInit() {
 
   PostBrowserProcessInitCore();
-
-  // Create Glic global features for all users in case they are only
-  // temporarily ineligible (in which case we continue to show the entrypoint
-  // but surface IPH dialogs instead of the webclient).
-  // Many tests do not initialize profile_manager so we gate on that too.
-  if (g_browser_process->profile_manager()) {
-    glic_profile_manager_ = std::make_unique<glic::GlicProfileManager>();
-#if !BUILDFLAG(IS_ANDROID)
-    glic_background_mode_manager_ =
-        std::make_unique<glic::GlicBackgroundModeManager>(
-            g_browser_process->status_tray());
-#endif
-    synthetic_trial_manager_ =
-        std::make_unique<glic::GlicSyntheticTrialManager>();
-  }
 
 #if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(omnibox::kOmniboxEverywhere)) {
@@ -194,8 +175,6 @@ void GlobalFeatures::PostBrowserProcessInitCore() {
 
   application_locale_storage_ = std::make_unique<ApplicationLocaleStorage>();
 
-  glic_global_enabling_ = std::make_unique<glic::GlicGlobalEnabling>();
-
   optimization_guide_global_feature_ =
       std::make_unique<optimization_guide::OptimizationGuideGlobalFeature>();
 
@@ -234,17 +213,8 @@ void GlobalFeatures::PostMainMessageLoopRun() {
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_ANDROID)
-  if (glic_background_mode_manager_) {
-    glic_background_mode_manager_->Shutdown();
-    glic_background_mode_manager_.reset();
-  }
   omnibox_everywhere_controller_.reset();
 #endif
-  if (glic_profile_manager_) {
-    glic_profile_manager_->Shutdown();
-    glic_profile_manager_.reset();
-  }
-  synthetic_trial_manager_.reset();
   audio_process_ml_model_forwarder_.reset();
   optimization_guide_global_feature_.reset();
 

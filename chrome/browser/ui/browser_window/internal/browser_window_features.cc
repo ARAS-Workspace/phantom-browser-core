@@ -12,8 +12,6 @@
 #include "base/memory/ptr_util.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/no_destructor.h"
-#include "chrome/browser/actor/ui/actor_border_view_controller.h"
-#include "chrome/browser/actor/ui/actor_ui_window_controller.h"
 #include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
@@ -30,17 +28,12 @@
 #include "chrome/browser/devtools/devtools_ui_controller.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_ui_controller.h"
 #include "chrome/browser/extensions/browser_extension_window_controller.h"
-#include "chrome/browser/glic/browser_ui/glic_iph_controller.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/lens/region_search/lens_region_search_controller.h"
 #include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/ai_mode_button_service_factory.h"
 #include "chrome/browser/sessions/session_service_factory.h"
-#include "chrome/browser/skills/skills_ui_window_controller.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
-#include "chrome/browser/ui/ai_overlay_dialog/ai_overlay_dialog_controller.h"
 #include "chrome/browser/ui/animation/browser_animation_controller.h"
 #include "chrome/browser/ui/bookmarks/bookmark_bar_controller.h"
 #include "chrome/browser/ui/bookmarks/bookmarks_service_feature.h"
@@ -246,12 +239,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
   // UnloadController must be created first / destroyed last to ensure
   // features are able to register / de-register close callbacks.
   unload_controller_ = std::make_unique<UnloadController>(browser);
-
-  if (base::FeatureList::IsEnabled(features::kGlicActorUi) &&
-      features::kGlicActorUiBorderGlow.Get()) {
-    actor_border_view_controller_ =
-        std::make_unique<ActorBorderViewController>(browser);
-  }
 
   app_browser_controller_ =
       GetUserDataFactory().CreateInstanceWithFactoryMethod(
@@ -526,20 +513,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
   // instantiated in this block (please keep this list ordered without taking
   // into consideration buildflags, repeating buildflags is ok):
   if (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL) {
-    if (base::FeatureList::IsEnabled(features::kAiOverlayDialog)) {
-      ai_overlay_dialog_controller_ =
-          GetUserDataFactory().CreateInstance<ttc::AiOverlayDialogController>(
-              *browser, browser);
-    }
-
-    if (glic::GlicEnabling::IsProfileEligible(profile)) {
-      if (glic::GlicKeyedService* glic_service =
-              glic::GlicKeyedService::Get(profile)) {
-        glic_iph_controller_ =
-            std::make_unique<glic::GlicIphController>(browser, *glic_service);
-      }
-    }
-
     initial_web_ui_manager_ = std::make_unique<InitialWebUIManager>(browser);
 
     if (search::IsInstantExtendedAPIEnabled()) {
@@ -837,11 +810,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
         std::make_unique<WebUIBrowserSidePanelUI>(browser);
   }
 
-  if (browser_view) {
-    skills_ui_window_controller_ =
-        std::make_unique<skills::SkillsUiWindowController>(browser_);
-  }
-
   synced_window_delegate_ = std::make_unique<BrowserSyncedWindowDelegate>(
       browser, browser->GetTabStripModel(), browser->GetSessionID(),
       browser->GetType());
@@ -879,22 +847,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
   // instantiated in this block (please keep this list ordered without taking
   // into consideration buildflags, repeating buildflags is ok):
   if (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL) {
-    if (browser_view) {
-      if (base::FeatureList::IsEnabled(features::kGlicActorUi)) {
-        std::vector<std::pair<views::WebView*, ActorOverlayWebView*>>
-            container_overlay_view_pairs;
-        for (auto& contents_container :
-             browser_view->GetContentsContainerViews()) {
-          container_overlay_view_pairs.emplace_back(
-              contents_container->contents_view(),
-              contents_container->actor_overlay_web_view());
-        }
-        actor_ui_window_controller_ =
-            GetUserDataFactory().CreateInstance<ActorUiWindowController>(
-                *browser_, browser_, std::move(container_overlay_view_pairs));
-      }
-    }
-
     if (browser_view && AiModeButtonServiceFactory::GetForProfile(profile)) {
       LocationBar* location_bar = browser_view->GetLocationBar();
       if (location_bar) {
@@ -1050,10 +1002,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   ios_promo_controller_.reset();
   cast_browser_controller_.reset();
   ai_mode_page_action_controller_.reset();
-  if (actor_ui_window_controller_) {
-    actor_ui_window_controller_->TearDown();
-  }
-
   // Owned-by-all members.
   zoom_bubble_coordinator_.reset();
   zoom_bubble_manager_.reset();
@@ -1063,7 +1011,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   upgrade_notification_controller_.reset();
   toast_service_.reset();
   synced_window_delegate_.reset();
-  skills_ui_window_controller_.reset();
   // TODO(crbug.com/346148093): This logic should not be gated behind a
   // conditional.
   if (side_panel_coordinator_) {
@@ -1113,9 +1060,7 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   // Init (reverse).
 
   // TYPE_NORMAL members.
-  glic_iph_controller_.reset();
   initial_web_ui_manager_.reset();
-  ai_overlay_dialog_controller_.reset();
 
   // Owned-by-all members.
   // contextual_tasks_* are reset first because the group is constructed last
@@ -1140,7 +1085,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
     provider->TearDown();
   }
   browser_animation_controller_.reset();
-  actor_border_view_controller_.reset();
 }
 
 SidePanelUI* BrowserWindowFeatures::side_panel_ui() {

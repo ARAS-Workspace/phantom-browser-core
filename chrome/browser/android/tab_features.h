@@ -27,10 +27,6 @@ namespace contextual_tasks {
 class ContextualTasksTabVisitTracker;
 }  // namespace contextual_tasks
 
-namespace actor::ui {
-class ActorUiTabControllerInterface;
-}  // namespace actor::ui
-
 namespace content {
 class WebContents;
 }  // namespace content
@@ -105,8 +101,6 @@ class TabFeatures {
   std::unique_ptr<AskBeforeHttpDialogController>
       ask_before_http_dialog_controller_;
 
-  std::unique_ptr<actor::ActorTabData> actor_tab_data_;
-
   std::unique_ptr<sync_sessions::SyncSessionsRouterTabHelper>
       sync_sessions_router_;
   std::unique_ptr<HttpAuthCacheStatus> http_auth_cache_status_;
@@ -123,15 +117,10 @@ class TabFeatures {
       enterprise_data_protection::DataProtectionNavigationController>
       data_protection_tab_controller_;
 
-  std::unique_ptr<glic::ContextualCueingHelper> contextual_cueing_helper_;
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   std::unique_ptr<customize_chrome::SidePanelController>
       customize_chrome_side_panel_controller_;
 #endif
-  std::unique_ptr<glic::GlicInstanceHelper> glic_instance_helper_;
-  std::unique_ptr<glic::GlicSidePanelCoordinator> glic_side_panel_coordinator_;
-  std::unique_ptr<actor::ui::ActorUiTabControllerInterface>
-      actor_ui_tab_controller_;
 
   // Holds the WebUI embedding context subscription.
   base::CallbackListSubscription tab_subscription_;

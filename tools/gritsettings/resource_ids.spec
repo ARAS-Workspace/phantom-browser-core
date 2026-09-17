@@ -97,22 +97,10 @@
     "includes": [2200],
     "structures": [2220],
   },
-  # Both browser_resources.grd for chrome/browser/actor/resources and
-  # chrome/browser/actor/resources/internal start with the same ids because only
-  # one of them is built depending on if is_chrome_branded is true.
   "chrome/browser/actor/resources/internal/browser_resources.grd": {
     "structures": [2230],
     "messages": [2235],
     "includes": [2240],
-  },
-  "chrome/browser/actor/resources/browser_resources.grd": {
-    "structures": [2230],
-    "messages": [2235],
-    "includes": [2240],
-  },
-  "chrome/browser/actor/resources/common_resources.grd": {
-    "META": {"join": 2},
-    "messages": [2245],
   },
   "chrome/browser/dev_ui_browser_resources.grd": {
     "includes": [2250],
@@ -169,10 +157,6 @@
     "messages": [2540],
     "includes": [2600],
   },
-  "chrome/browser/glic/resources/browser_resources.grd": {
-    "messages": [2540],
-    "includes": [2600],
-  },
   "chrome/browser/indigo/resources/internal/browser_resources.grd": {
     "includes": [2640],
   },
@@ -191,14 +175,6 @@
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/accessibility/resources.grd": {
     "META": {"sizes": {"includes": [10],}},
     "includes": [2740],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/components/actor/core/internals/resources/resources.grd": {
-    "META": {"sizes": {"includes": [10],}},
-    "includes": [2750],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/actor_overlay/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [2755],
   },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/app_home/resources.grd": {
     "META": {"sizes": {"includes": [20]}},
@@ -508,14 +484,6 @@
     "META": {"sizes": {"includes": [20],}},
     "includes": [4000],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/glic/resources.grd": {
-    "META": {"sizes": {"includes": [60]}},
-    "includes": [4010],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/glic/experimental_opt_in/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [4020],
-  },
     "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/guest_view_shared/resources.grd": {
     "META": {"sizes": {"includes": [10]}},
     "includes": [4035],
@@ -788,10 +756,6 @@
     "META": {"sizes": {"includes": [10],}},
     "includes": [4990],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/skills/resources.grd": {
-    "META": {"sizes": {"includes": [50],}},
-    "includes": [4991],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/subresource_filter/resources.grd": {
     "META": {"sizes": {"includes": [10]}},
     "includes": [4995],
@@ -882,10 +846,6 @@
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/tab_strip_internals/resources.grd": {
     "META": {"sizes": {"includes": [20]}},
     "includes": [5350],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/ttc/resources/resources.grd": {
-    "META": {"sizes": {"includes": [30]}},
-    "includes": [5370],
   },
   # END chrome/ WebUI resources section
 

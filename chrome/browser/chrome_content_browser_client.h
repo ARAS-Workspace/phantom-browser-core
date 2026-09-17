@@ -1153,11 +1153,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
 
   bool UsePrefetchPrerenderIntegration() override;
 
-#if !BUILDFLAG(IS_ANDROID)
-  bool ShouldDisallowCredentialRequest(
-      content::WebContents* web_contents) override;
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_ANDROID)
   bool ShouldAllowSystemUiPopups(content::WebContents* web_contents) override;
 #endif

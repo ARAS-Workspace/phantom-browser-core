@@ -12,7 +12,6 @@
 #include "chrome/browser/password_manager/password_change/features.h"
 #include "chrome/browser/password_manager/password_change/login_state_checker.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/affiliations/core/browser/affiliation_utils.h"
 #include "components/autofill/core/browser/proto/password_requirements.pb.h"
 #include "components/autofill/core/common/form_field_data.h"
@@ -175,28 +174,6 @@ LoginPasswordType GetLoginAttemptPasswordType(
 
 bool ReachedAttemptsLimit(int state_checks_count) {
   return state_checks_count >= LoginStateChecker::kMaxLoginChecks;
-}
-
-ModelQualityLogsUploader::QualityStatus GetStepStatus(
-    actor::mojom::ActionResultCode failure) {
-  CHECK_NE(actor::mojom::ActionResultCode::kOk, failure);
-  switch (failure) {
-    case actor::mojom::ActionResultCode::kInvalidDomNodeId:
-      return ModelQualityLogsUploader::QualityStatus::
-          PasswordChangeQuality_StepQuality_SubmissionStatus_ELEMENT_NOT_FOUND;
-    case actor::mojom::ActionResultCode::kElementDisabled:
-      return ModelQualityLogsUploader::QualityStatus::
-          PasswordChangeQuality_StepQuality_SubmissionStatus_ELEMENT_DISABLED;
-    case actor::mojom::ActionResultCode::kElementOffscreen:
-      return ModelQualityLogsUploader::QualityStatus::
-          PasswordChangeQuality_StepQuality_SubmissionStatus_ELEMENT_OFFSCREEN;
-    case actor::mojom::ActionResultCode::kTargetNodeInteractionPointObscured:
-      return ModelQualityLogsUploader::QualityStatus::
-          PasswordChangeQuality_StepQuality_SubmissionStatus_ELEMENT_OBSCURED;
-    default:
-      return ModelQualityLogsUploader::QualityStatus::
-          PasswordChangeQuality_StepQuality_SubmissionStatus_UNEXPECTED_STATE;
-  }
 }
 
 FieldType GetFieldType(const autofill::FormFieldData& field,
@@ -522,15 +499,6 @@ void ModelQualityLogsUploader::MarkStepSkipped(
       ->set_status(
           QualityStatus::
               PasswordChangeQuality_StepQuality_SubmissionStatus_STEP_SKIPPED);
-}
-
-void ModelQualityLogsUploader::RecordButtonClickFailure(
-    FlowStep step,
-    actor::mojom::ActionResultCode failure) {
-  CHECK_NE(FlowStep::PasswordChangeRequest_FlowStep_IS_LOGGED_IN_STEP, step);
-  CHECK_NE(FlowStep::PasswordChangeRequest_FlowStep_VERIFY_SUBMISSION_STEP,
-           step);
-  GetStepQuality(step, final_log_data_)->set_status(GetStepStatus(failure));
 }
 
 void ModelQualityLogsUploader::SetLoginPasswordFormInfo(

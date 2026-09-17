@@ -42,12 +42,9 @@ source_set("tabs_impl") {
 
   deps = [
     ":tabs_public",
-    "//chrome/browser/actor",
-    "//chrome/browser/actor/android",
     "//chrome/browser/contextual_search",
     "//chrome/browser/contextual_tasks",
     "//chrome/browser/enterprise",
-    "//chrome/browser/glic",
     "//chrome/browser/net",
     "//chrome/browser/preloading/new_tab_page_preload",
     "//chrome/browser/sync",
@@ -458,7 +455,6 @@ if (is_android) {
       "//chrome/browser:browser_public_dependencies",
       "//chrome/browser/accessibility/accessibility_prefs",
       "//chrome/browser/android/webapk:webapk_sources",
-      "//chrome/browser/glic/browser_ui",
       "//chrome/browser/ui/tabs/alert:tab_alert",
     ]
 
@@ -513,9 +509,6 @@ if (is_android) {
       "//chrome/browser/flags:flags_android_impl",
       "//chrome/browser/gesturenav/android:gesturenav",
       "//chrome/browser/gesturenav/android:impl",
-      "//chrome/browser/glic/android",
-      "//chrome/browser/glic/android:jni_headers",
-      "//chrome/browser/glic/browser_ui:impl",
       "//chrome/browser/keyboard_accessory/android",
       "//chrome/browser/keyboard_accessory/android:impl",
       "//chrome/browser/language/android:jni_headers",
@@ -778,9 +771,6 @@ if (is_android) {
       "//chrome/browser/engagement",
       "//chrome/browser/favicon",
       "//chrome/browser/file_system_access",
-      "//chrome/browser/glic:impl",
-      "//chrome/browser/glic/browser_ui:glow",
-      "//chrome/browser/glic/common",
       "//chrome/browser/history:impl",
       "//chrome/browser/image_decoder",
       "//chrome/browser/metrics:impl",

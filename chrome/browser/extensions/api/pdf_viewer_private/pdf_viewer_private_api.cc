@@ -12,9 +12,6 @@
 #include "base/numerics/safe_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/values.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service_factory.h"
 #include "chrome/browser/pdf/pdf_pref_names.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
@@ -336,42 +333,6 @@ ExtensionFunction::ResponseAction PdfViewerPrivateGlicSummarizeFunction::Run() {
       tabs::TabInterface::MaybeGetFromContents(contents);
   if (!tab_interface) {
     return RespondNow(Error("No tab."));
-  }
-
-  if (!glic::GlicEnabling::IsEnabledForProfile(
-          Profile::FromBrowserContext(contents->GetBrowserContext()))) {
-    return RespondNow(Error("Glic is not enabled."));
-  }
-
-  glic::GlicKeyedService* glic_service =
-      glic::GlicKeyedServiceFactory::GetGlicKeyedService(
-          contents->GetBrowserContext());
-  CHECK(glic_service);
-
-  int arm = features::kPdfGlicSummarizeArm.Get();
-  bool has_consented = glic::GlicEnabling::HasConsentedForProfile(
-      Profile::FromBrowserContext(contents->GetBrowserContext()));
-
-  glic::GlicInvokeOptions options(
-      glic::Target(*tab_interface, glic::NewConversation()),
-      glic::mojom::InvocationSource::kPdfSummarizeButton);
-  options.prompts.push_back(
-      l10n_util::GetStringUTF8(IDS_PDF_GLIC_SUMMARIZE_PROMPT));
-
-  if (has_consented) {
-    glic_service->InvokeWithAutoSubmit(
-        glic::InvokeWithAutoSubmitPasskeyProvider::GetPassKey(),
-        std::move(options));
-  } else {
-    if (arm == 3) {
-      options.fre_override = glic::mojom::FreOverride::kTrustFirstInline;
-      glic_service->InvokeWithAutoSubmit(
-          glic::InvokeWithAutoSubmitPasskeyProvider::GetPassKey(),
-          std::move(options));
-    } else {
-      options.fre_override = glic::mojom::FreOverride::kTrustFirstText;
-      glic_service->Invoke(std::move(options));
-    }
   }
 
   if (auto* user_education =

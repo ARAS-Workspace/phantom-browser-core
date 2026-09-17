@@ -21,9 +21,6 @@
 #include "chrome/browser/contextual_tasks/contextual_tasks_ui_service_factory.h"
 #include "chrome/browser/devtools/features.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
-#include "chrome/browser/glic/host/glic.mojom.h"
-#include "chrome/browser/glic/public/features.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/performance_manager/public/user_tuning/user_performance_tuning_manager.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/search.h"
@@ -806,63 +803,6 @@ void MaybeRegisterChromeFeaturePromos(
           IDS_LIVE_CAPTION_PROMO_SCREENREADER,
           FeaturePromoSpecification::AcceleratorInfo())
           .SetBubbleArrow(HelpBubbleArrow::kTopCenter)));
-
-  // kIPHGlicPromoFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForSnoozePromo(
-          feature_engagement::kIPHGlicPromoFeature, kGlicButtonElementId,
-          IDS_GLIC_PROMO_BODY)
-          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-          .SetBubbleTitleText(IDS_GLIC_PROMO_TITLE)
-          // Since this can appear randomly, we do not want to steal focus from
-          // the user; see https://crbug.com/418579754
-          .OverrideFocusOnShow(false)
-          .SetMetadata(
-              133, "dfried@chromium.org",
-              "Attempts to trigger when the user is on a supported page.")));
-
-  // kIPHGlicTryItFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForCustomAction(
-          feature_engagement::kIPHGlicTryItFeature, kGlicButtonElementId,
-          IDS_GLIC_TRYIT_BODY, IDS_GLIC_PROMO_CONFIRM,
-          base::BindRepeating(
-              [](ContextPtr ctx,
-                 user_education::FeaturePromoHandle promo_handle) {
-                auto* browser = GetBrowser(ctx);
-                if (!browser) {
-                  return;
-                }
-                if (auto* glic_service =
-                        glic::GlicKeyedService::Get(browser->GetProfile())) {
-                  glic_service->ShowUI(browser,
-                                       glic::mojom::InvocationSource::kIph);
-                }
-              }))
-          .SetBubbleTitleText(IDS_GLIC_TRYIT_TITLE)
-          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-          .SetCustomActionIsDefault(true)
-          // Since this can appear randomly, we do not want to steal focus from
-          // the user; see https://crbug.com/418579754
-          .OverrideFocusOnShow(false)
-          .SetMetadata(
-              142, "dewittj@chromium.org",
-              "Attempts to trigger when the user is on a supported page.")));
-
-  // kGlicTrustFirstOnboarding shortcut snooze IPH:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForSnoozePromo(
-          feature_engagement::
-              kIPHGlicTrustFirstOnboardingShortcutSnoozePromoFeature,
-          kGlicButtonElementId, IDS_GLIC_SHORTCUT_IPH_TEXT_TEMPLATE)
-          .SetAdditionalConditions(std::move(
-              AdditionalConditions().AddAdditionalCondition(AdditionalCondition{
-                  feature_engagement::events::kGlicOnboardingCompleted,
-                  AdditionalConditions::Constraint::kAtLeast, 1})))
-          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-          .SetMetadata(144, "zalmashni@google.com",
-                       "Triggered after the Glic side panel is closed or the "
-                       "user navigates to a new tab.")));
 
   // kIPHGMCCastStartStopFeature:
   registry.RegisterFeature(FeaturePromoSpecification::CreateForLegacyPromo(
@@ -2262,11 +2202,6 @@ void MaybeRegisterChromeNewBadges(user_education::NewBadgeRegistry& registry) {
       features::kGlicAppMenuNewBadge,
       user_education::Metadata(136, "sophey@chromium.org",
                                "Shown in the three dot menu.")));
-
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      features::kGlicContextMenu,
-      user_education::Metadata(146, "basiaz@google.com",
-                               "Shown in the contextual menu.")));
 
   registry.RegisterFeature(user_education::NewBadgeSpecification(
       tabs::kVerticalTabsPreviewBadge,

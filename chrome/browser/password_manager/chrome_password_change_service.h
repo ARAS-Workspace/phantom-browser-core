@@ -17,7 +17,6 @@
 #include "components/password_manager/core/browser/password_form.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/password_manager/password_change/password_change_from_checkup_delegate.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
 class GURL;
@@ -104,16 +103,6 @@ class ChromePasswordChangeService
   virtual PasswordChangeDelegate* GetPasswordChangeDelegate(
       content::WebContents* web_contents);
 
-#if !BUILDFLAG(IS_ANDROID)
-  // Starts the password change flow from the Password Checkup page for the
-  // given `credential`.
-  virtual base::WeakPtr<PasswordChangeFromCheckupDelegate>
-  StartPasswordChangeFromCheckup(
-      password_manager::StoredCredential credential,
-      content::WebContents* web_contents,
-      PasswordChangeFromCheckupDelegate::StateChangeCallback callback);
-#endif
-
   // PasswordChangeServiceInterface implementation.
   bool IsPasswordChangeAvailable() const override;
   bool IsPasswordChangeSupported(
@@ -159,11 +148,6 @@ class ChromePasswordChangeService
 
   // The router for logs. Maybe be null in tests.
   const raw_ptr<autofill::LogRouter> log_router_;
-
-#if !BUILDFLAG(IS_ANDROID)
-  std::vector<std::unique_ptr<PasswordChangeFromCheckupDelegate>>
-      password_change_from_checkup_delegates_;
-#endif
 
   std::vector<GURL> override_urls_;
 

@@ -11,8 +11,6 @@ _default_allowed_violations = [
   # Defines public counterpart with same entries.
   "../../components/metrics/internal/server_urls.grd",
   "../../components/autofill/core/browser/geo/chrome_alternative_state_name_maps/*",
-  "../../chrome/browser/actor/resources/internal/*",
-  "../../chrome/browser/glic/resources/internal/*",
   "../../chrome/browser/resources/preinstalled_web_apps/internal/*",
 
   # Internal-only webui resources (but no .grd).

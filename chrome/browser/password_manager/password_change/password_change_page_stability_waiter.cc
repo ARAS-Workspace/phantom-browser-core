@@ -14,7 +14,6 @@
 #include "base/time/time.h"
 #include "chrome/browser/password_manager/password_change/password_change_logging_util.h"
 #include "chrome/common/chrome_render_frame.mojom.h"
-#include "components/actor/core/task_id.h"
 #include "components/autofill/content/browser/content_autofill_client.h"
 #include "components/autofill/core/browser/form_predictions_tracker.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
@@ -84,18 +83,7 @@ void PasswordChangePageStabilityWaiter::CheckPageStability() {
     return;
   }
 
-  chrome_render_frame->CreatePageStabilityMonitor(
-      monitor_.BindNewPipeAndPassReceiver(), actor::TaskId(),
-      /*supports_paint_stability=*/true);
-
-  monitor_.set_disconnect_handler(
-      base::BindOnce(&PasswordChangePageStabilityWaiter::CheckVisualState,
-                     weak_ptr_factory_.GetWeakPtr()));
-
-  monitor_->NotifyWhenStable(
-      base::Seconds(0),
-      base::BindOnce(&PasswordChangePageStabilityWaiter::CheckVisualState,
-                     weak_ptr_factory_.GetWeakPtr()));
+  CheckVisualState();
 }
 
 PasswordChangePageStabilityWaiter::~PasswordChangePageStabilityWaiter() =

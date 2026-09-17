@@ -26,7 +26,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 #include "chrome/browser/account_settings/account_setting_service_factory.h"
-#include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/autofill/address_normalizer_factory.h"
 #include "chrome/browser/autofill/android/save_update_address_profile_prompt_mode.h"
 #include "chrome/browser/autofill/at_memory/at_memory_query_service_factory.h"
@@ -48,10 +47,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/consent_auditor/consent_auditor_factory.h"
 #include "chrome/browser/device_reauth/chrome_device_authenticator_factory.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_invoke_options.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service_factory.h"
 #include "chrome/browser/global_features.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/metrics/profile_metrics_service_factory.h"
@@ -100,7 +95,6 @@
 #include "components/autofill/content/browser/content_autofill_driver_factory.h"
 #include "components/autofill/content/browser/content_identity_credential_delegate.h"
 #include "components/autofill/content/browser/integrators/email_verifier/email_verifier_delegate.h"
-#include "components/autofill/core/browser/actor/actor_key_metrics_recorder.h"
 #include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/at_memory/at_memory_manager.h"
 #include "components/autofill/core/browser/at_memory_cross_tab_copy_paste_tracker.h"
@@ -982,18 +976,6 @@ void ChromeAutofillClient::TriggerAutofillAiFillingJourneySurvey(
         GetStringRepresentatioOfSavedEntitiesTypes(saved_entities)}});
 }
 
-bool ChromeAutofillClient::IsTabInActorMode() const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (base::FeatureList::IsEnabled(features::debug::kAutofillForceActorMode)) {
-    return true;
-  }
-  return active_actor_task_.has_value();
-}
-
-ActorKeyMetricsRecorder* ChromeAutofillClient::GetActorKeyMetricsRecorder() {
-  return actor_key_metrics_recorder_.get();
-}
-
 bool ChromeAutofillClient::IsAutofillEnabled() const {
   if (IsAutofillProfileEnabled() || AutofillClient::GetPaymentsAutofillClient()
                                         ->IsAutofillPaymentMethodsEnabled()) {
@@ -1264,21 +1246,7 @@ ChromeAutofillClient::ChromeAutofillClient(content::WebContents* web_contents)
       TouchToFillAutofillController::Create(this);
 #endif
 
-  if (actor::ActorKeyedService* actor_service =
-          base::FeatureList::IsEnabled(features::kAutofillActorMode)
-              ? actor::ActorKeyedService::Get(GetProfile())
-              : nullptr) {
-    // `base::Unretained(this)` is safe since
-    // `actor_task_state_changed_subscription_` removes the subscription when
-    // `this` is destroyed.
-    actor_task_state_changed_subscription_ =
-        actor_service->AddTaskStateChangedCallback(
-            base::BindRepeating(&ChromeAutofillClient::OnActorTaskStateChange,
-                                base::Unretained(this)));
-  }
-
   form_predictions_tracker_ = std::make_unique<FormPredictionsTracker>(this);
-  actor_key_metrics_recorder_ = std::make_unique<ActorKeyMetricsRecorder>(this);
 
   // Notify the EntityDataManager about the availability of device re-auth.
   // This information is injected through the client because the device
@@ -1603,70 +1571,6 @@ ToastController* ChromeAutofillClient::GetToastController() {
   return window_interface ? window_interface->GetFeatures().toast_controller()
                           : nullptr;
 #endif  // BUILDFLAG(IS_ANDROID)
-}
-
-void ChromeAutofillClient::OnActorTaskStateChange(actor::ActorTask& task) {
-  const actor::TaskId task_id = task.id();
-  const actor::ActorTask::State state = task.GetState();
-
-  if (active_actor_task_ && *active_actor_task_ != task_id) {
-    // The update is for an actor that isn't working on the current tab.
-    return;
-  }
-
-  // The actor task on this tab has finished.
-  // TODO(crbug.com/472336281): The state changes leading to the task
-  // completion should be issued before the `ActorTask` gets removed.
-  if (actor::ActorTask::IsCompletedState(state)) {
-    active_actor_task_.reset();
-    return;
-  }
-
-  const tabs::TabInterface* tab_interface = GetTabInterface();
-  if (tab_interface && !task.HasTab(tab_interface->GetHandle())) {
-    // The status update is for an actor that isn't interacting with this tab.
-    // The value of `is_actor_mode_` shouldn't be updated.
-    return;
-  }
-
-  // If the task was just created, known forms should be reparsed to ensure that
-  // actor specific behaviors are in place.
-  if (!active_actor_task_.has_value()) {
-    for (AutofillDriver* driver :
-         GetAutofillDriverFactory().GetExistingDrivers()) {
-      driver->GetAutofillManager().ReparseKnownForms();
-    }
-  }
-
-  // TODO(crbug.com/469428128): Evaluate whether
-  // `actor::ActorTask::State::kCreated` state should enable the actor mode.
-  active_actor_task_ = task_id;
-}
-
-void ChromeAutofillClient::OpenGeminiInSidebar(const std::u16string& prompt) {
-  Profile* profile = GetProfile();
-  if (!profile || !glic::GlicEnabling::IsEnabledForProfile(profile)) {
-    return;
-  }
-  glic::GlicKeyedService* glic_keyed_service =
-      glic::GlicKeyedServiceFactory::GetGlicKeyedService(profile);
-  if (!glic_keyed_service) {
-    return;
-  }
-  tabs::TabInterface* tab = GetTabInterface();
-  if (!tab) {
-    return;
-  }
-  glic::Target target(*tab);
-  glic::GlicInvokeOptions options(std::move(target),
-                                  glic::mojom::InvocationSource::kAutofill);
-  options.prompts.push_back(base::UTF16ToUTF8(prompt));
-  glic_keyed_service->Invoke(std::move(options));
-}
-
-bool ChromeAutofillClient::IsGlicEnabled() const {
-  Profile* profile = GetProfile();
-  return profile && glic::GlicEnabling::IsEnabledForProfile(profile);
 }
 
 }  // namespace autofill

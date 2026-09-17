@@ -26,8 +26,6 @@ chromium-metrics-reviews@google.com.
 
 <enums>
 
-<!-- LINT.IfChange(ActorFormFillingOutcome) -->
-
 <enum name="ActorFormFillingOutcome">
   <int value="0" label="Success"/>
   <int value="1" label="Other error"/>
@@ -35,10 +33,6 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="Form not found"/>
   <int value="4" label="Suggestion not found"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/autofill/core/browser/integrators/actor/actor_form_filling_types.h:ActorFormFillingError) -->
-
-<!-- LINT.IfChange(ActorFormFillingRequestedData) -->
 
 <enum name="ActorFormFillingRequestedData">
   <int value="0" label="Unknown"/>
@@ -51,10 +45,6 @@ chromium-metrics-reviews@google.com.
   <int value="7" label="ContactInformation"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/autofill/core/browser/integrators/actor/actor_form_filling_types.h:ActorFormFillingRequestedData) -->
-
-<!-- LINT.IfChange(RetargetTriggerFieldResult) -->
-
 <enum name="ActorFormFillingRetargetTriggerFieldResult">
   <int value="0" label="Not attempted: no split"/>
   <int value="1" label="Retargeted to a new field"/>
@@ -63,10 +53,6 @@ chromium-metrics-reviews@google.com.
   <int value="4" label="Error: contact info not found"/>
   <int value="5" label="Error: address not found"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/autofill/actor/actor_form_section_splitter.h:RetargetTriggerFieldResult) -->
-
-<!-- LINT.IfChange(ShouldSplitOutContactInfoResult) -->
 
 <enum name="ActorFormFillingShouldSplitOutContactInfoResult">
   <int value="0" label="Should split"/>
@@ -77,8 +63,6 @@ chromium-metrics-reviews@google.com.
       label="Should not split: no contact info before first address field"/>
   <int value="5" label="Should not split: no address field in section"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/autofill/actor/actor_form_section_splitter.h:ShouldSplitOutContactInfoResult) -->
 
 <enum name="AndroidAutofillAvailabilityStatus">
   <summary>
@@ -114,8 +98,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Prefill request not sent - not enough time."/>
 </enum>
 
-<!--  LINT.IfChange(AttemptFormFillingToolEvent) -->
-
 <enum name="AttemptFormFillingToolEvent">
   <int value="0" label="Tool was invoked by the actor"/>
   <int value="1"
@@ -126,8 +108,6 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="Autofill Attention Dialog presented to the user"/>
   <int value="4" label="Autofill Attention Dialog accepted by the user"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/tools/attempt_form_filling_tool_metrics.h:AttemptFormFillingToolEvent) -->
 
 <enum name="AufofillStructuredTokenVerificationStatus">
   <int value="0" label="No Status"/>

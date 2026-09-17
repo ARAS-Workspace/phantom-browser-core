@@ -40,7 +40,6 @@ source_set("history") {
       "//chrome/browser/critical_actions",
       "//chrome/browser/favicon",
       "//chrome/browser/feature_engagement",
-      "//chrome/browser/glic",
       "//chrome/browser/history",
       "//chrome/browser/history_embeddings",
       "//chrome/browser/page_image_service",

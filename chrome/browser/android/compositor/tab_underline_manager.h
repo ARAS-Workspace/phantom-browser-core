@@ -10,7 +10,6 @@
 
 #include "base/android/jni_android.h"
 #include "base/android/scoped_java_ref.h"
-#include "chrome/browser/glic/browser_ui/tab_underline_controller.h"
 #include "third_party/jni_zero/jni_zero.h"
 
 namespace android {
@@ -44,14 +43,11 @@ class TabUnderlineManager {
   struct TabIndicatorContext {
     TabIndicatorContext();
     TabIndicatorContext(
-        std::unique_ptr<glic::TabUnderlineController> controller,
-        std::unique_ptr<UiDelegateImpl> delegate);
     ~TabIndicatorContext();
 
     // Destroying the delegate after the controller ensures the controller can
     // safely reference its delegate during teardown.
     std::unique_ptr<UiDelegateImpl> delegate;
-    std::unique_ptr<glic::TabUnderlineController> controller;
   };
 
   base::android::ScopedJavaGlobalRef<jobject> java_obj_;

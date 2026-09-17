@@ -5,7 +5,6 @@
 #include "chrome/browser/webauthn/android/chrome_webauthn_client_android.h"
 
 #include "base/feature_list.h"
-#include "chrome/browser/actor/actor_util.h"
 #include "chrome/browser/webauthn/android/webauthn_request_delegate_android.h"
 #include "components/password_manager/core/browser/features/password_features.h"
 #include "components/webauthn/android/webauthn_cred_man_delegate.h"
@@ -52,7 +51,5 @@ bool ChromeWebAuthnClientAndroid::ShouldDisallowCredentialRequest(
       !base::FeatureList::IsEnabled(password_manager::features::kActorLogin)) {
     return false;
   }
-  content::WebContents* web_contents =
-      content::WebContents::FromRenderFrameHost(render_frame_host);
-  return actor::HaveActiveTaskForContents(web_contents);
+  return false;
 }

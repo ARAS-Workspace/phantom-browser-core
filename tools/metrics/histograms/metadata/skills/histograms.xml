@@ -22,17 +22,11 @@ chromium-metrics-reviews@google.com.
 
 <histograms>
 
-<!-- LINT.IfChange(SkillsManagementPage) -->
-
 <variants name="Page">
   <variant name="BrowseSkills" summary="Browse skills page"/>
   <variant name="ErrorPage" summary="Error page"/>
   <variant name="YourSkills" summary="Your skills page"/>
 </variants>
-
-<!-- LINT.ThenChange(//components/skills/public/skill_metrics.mojom:SkillsManagementPage) -->
-
-<!-- LINT.IfChange(SkillsDialogEntryPointAndState) -->
 
 <variants name="SkillsDialogEntryPointAndState">
   <variant name="" summary="all entry points (aggregate)"/>
@@ -51,10 +45,6 @@ chromium-metrics-reviews@google.com.
       summary="the WebClient (editing a 1P template)"/>
 </variants>
 
-<!-- LINT.ThenChange(//components/skills/public/skills_metrics.h:SkillsDialogEntryPoint) -->
-
-<!-- LINT.IfChange(SkillsLoadingStage) -->
-
 <variants name="SkillsLoadingStage">
   <variant name="COOKIE_SYNC"
       summary="Time spent copying cookies from main profile."/>
@@ -69,8 +59,6 @@ chromium-metrics-reviews@google.com.
   <variant name="NAVIGATION"
       summary="Time for webview to load and commit URL."/>
 </variants>
-
-<!-- LINT.ThenChange(//chrome/browser/resources/skills/v2/skills_webview_bridge_constants.ts:LoadingStage) -->
 
 <histogram name="Skills.Dialog.PromptRefinementOutcome"
     enum="SkillsPromptRefinementOutcome" expires_after="2027-02-01">

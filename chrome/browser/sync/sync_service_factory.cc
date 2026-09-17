@@ -112,7 +112,6 @@
 #include "chrome/browser/sync/android/jni_headers/SyncServiceFactory_jni.h"
 #else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/contextual_tasks/contextual_tasks_service_factory.h"
-#include "chrome/browser/skills/skills_service_factory.h"
 #include "chrome/browser/webauthn/passkey_model_factory.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
@@ -263,13 +262,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
 #endif  // BUILDFLAG(ENABLE_SUPERVISED_USERS)
   builder.SetUserEventService(
       browser_sync::UserEventServiceFactory::GetForProfile(profile));
-  builder.SetSkillsService(
-#if BUILDFLAG(IS_ANDROID)
-      nullptr
-#else   // BUILDFLAG(IS_ANDROID)
-      skills::SkillsServiceFactory::GetForProfile(profile)
-#endif  // BUILDFLAG(IS_ANDROID)
-  );
   builder.SetNotebooksService(
       notebooks::NotebooksServiceFactory::GetForProfile(profile));
 
@@ -526,7 +518,6 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(SecurityEventRecorderFactory::GetInstance());
   DependsOn(SendTabToSelfSyncServiceFactory::GetInstance());
 #if !BUILDFLAG(IS_ANDROID)
-  DependsOn(skills::SkillsServiceFactory::GetInstance());
 #endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(ENABLE_SPELLCHECK)
   DependsOn(SpellcheckServiceFactory::GetInstance());

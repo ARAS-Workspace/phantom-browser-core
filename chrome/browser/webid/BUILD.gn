@@ -145,7 +145,6 @@ source_set("impl") {
     ":webid",
     "//base",
     "//chrome/browser:browser_features",
-    "//chrome/browser/actor",
     "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/permissions",
     "//chrome/browser/profiles:profile",
@@ -218,9 +217,6 @@ if (!is_android) {
         [ "federated_identity_auto_reauthn_permission_context_browsertest.cc" ]
     deps = [
       ":webid",
-      "//chrome/browser/actor",
-      "//chrome/browser/actor:test_support",
-      "//chrome/browser/actor/ui:test_support",
       "//chrome/browser/password_manager/factories",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/ui",

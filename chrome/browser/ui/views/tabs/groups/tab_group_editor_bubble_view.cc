@@ -23,10 +23,6 @@
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/collaboration/collaboration_service_factory.h"
 #include "chrome/browser/data_sharing/data_sharing_service_factory.h"
-#include "chrome/browser/glic/public/features.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service_factory.h"
-#include "chrome/browser/glic/service/glic_instance_impl.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/tab_group_sync/feature_utils.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
@@ -564,10 +560,6 @@ void TabGroupEditorBubbleView::RebuildMenuContents() {
     }
     simple_menu_items_.push_back(
         AddChildView(BuildMoveGroupToNewWindowButton()));
-    if (base::FeatureList::IsEnabled(features::kGlicTabGroups)) {
-      AddChildView(BuildSeparator());
-      simple_menu_items_.push_back(AddChildView(BuildAskGeminiButton()));
-    }
     AddChildView(BuildSeparator());
     simple_menu_items_.push_back(AddChildView(BuildUngroupButton()));
     simple_menu_items_.push_back(AddChildView(BuildCloseGroupButton()));
@@ -603,10 +595,6 @@ void TabGroupEditorBubbleView::RebuildMenuContents() {
     }
 
     simple_menu_items_.push_back(AddChildView(BuildCloseGroupButton()));
-    if (base::FeatureList::IsEnabled(features::kGlicTabGroups)) {
-      AddChildView(BuildSeparator());
-      simple_menu_items_.push_back(AddChildView(BuildAskGeminiButton()));
-    }
     AddChildView(BuildSeparator());
 
     if (!IsGroupShared()) {
@@ -893,12 +881,6 @@ TabGroupEditorBubbleView::BuildAskGeminiButton() {
 }
 
 void TabGroupEditorBubbleView::AskGeminiPressed() {
-  glic::GlicKeyedService* service =
-      glic::GlicKeyedServiceFactory::GetGlicKeyedService(browser_->GetProfile(),
-                                                         /*create=*/true);
-  if (service) {
-    service->instance_coordinator().ShowInstanceForTabGroup(group_);
-  }
   GetWidget()->Close();
 }
 

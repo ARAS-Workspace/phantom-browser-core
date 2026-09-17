@@ -80,7 +80,6 @@ void TabUnderlineManager::RegisterTab(JNIEnv* env,
   }
 
   auto controller =
-      std::make_unique<glic::TabUnderlineController>(tab_android->GetHandle());
   auto delegate = std::make_unique<UiDelegateImpl>(this, tab_id);
 
   controller->Initialize(delegate.get());

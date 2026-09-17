@@ -5,7 +5,6 @@
 #include "chrome/browser/contextual_tasks/smart_tab_sharing_settings_policy_handler.h"
 
 #include "base/logging.h"
-#include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/common/pref_names.h"
 #include "components/contextual_search/pref_names.h"
 #include "components/contextual_tasks/public/prefs.h"

@@ -603,8 +603,6 @@ if (enable_devtools_frontend) {
       ":devtools",
       ":test_support",
       "//base",
-      "//chrome/browser/actor:test_support",
-      "//chrome/browser/actor:tools_test_support",
       "//chrome/browser/autofill:test_support",
       "//chrome/browser/custom_handlers",
       "//chrome/browser/data_saver",

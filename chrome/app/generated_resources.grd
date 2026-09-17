@@ -281,7 +281,6 @@ are declared in tools/grit/grit_args.gni.
       <part file="access_code_cast_strings.grdp" />
 
       <!-- Actor specific strings -->
-      <part file="actor_strings.grdp" />
 
       <!-- App Management specific strings -->
       <part file="app_management_strings.grdp" />
@@ -290,7 +289,6 @@ are declared in tools/grit/grit_args.gni.
       <part file="bookmarks_strings.grdp" />
 
       <!-- Glic specific strings -->
-      <part file="glic_strings.grdp" />
 
       <!-- Global Media Controls specific strings -->
       <part file="gmc_strings.grdp" />
@@ -360,7 +358,6 @@ are declared in tools/grit/grit_args.gni.
       </if>
 
       <!-- Skills specific strings -->
-      <part file="skills_strings.grdp" />
 
       <!-- Strings that are only used when VR devices are supported -->
       <if expr="enable_vr">

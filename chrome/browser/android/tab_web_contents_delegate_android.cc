@@ -23,7 +23,6 @@
 #include "base/metrics/histogram_macros.h"
 #include "base/rand_util.h"
 #include "base/task/single_thread_task_runner.h"
-#include "chrome/browser/actor/actor_util.h"
 #include "chrome/browser/android/customtabs/client_data_header_web_contents_observer.h"
 #include "chrome/browser/android/framebust_intervention/framebust_blocked_delegate_android.h"
 #include "chrome/browser/android/tab_android.h"
@@ -273,23 +272,6 @@ bool TabWebContentsDelegateAndroid::IsWebContentsCreationOverridden(
     const GURL& opener_url,
     const std::string& frame_name,
     const GURL& target_url) {
-  if (actor::HasActorTaskPreventingNewWebContents(opener)) {
-    // If an ExecutionEngine is acting on the opener, prevent it from creating a
-    // new WebContents. We'll instead force the navigation to happen in the same
-    // tab. Note, we do this even if the task isn't active (e.g. paused) so that
-    // a user action on behalf of the actor has the same behavior since the
-    // resumed task will still be fixed to the tab.
-
-    // However, if the opener is sandboxed and restricted from top-level
-    // navigation, we cannot force a same-tab redirection as it would violate
-    // the sandbox. Instead, we decline to override creation, allowing the
-    // browser to safely open a new popup window (since kPopups is allowed).
-    if (opener &&
-        opener->IsSandboxed(network::mojom::WebSandboxFlags::kTopNavigation)) {
-      return false;
-    }
-    return true;
-  }
 
   return WebContentsDelegateAndroid::IsWebContentsCreationOverridden(
       opener, source_site_instance, window_container_type, opener_url,
@@ -309,22 +291,6 @@ content::WebContents* TabWebContentsDelegateAndroid::CreateCustomWebContents(
     const blink::mojom::WindowFeatures& window_features,
     const content::StoragePartitionConfig& partition_config,
     content::SessionStorageNamespace* session_storage_namespace) {
-  if (actor::HasActorTaskPreventingNewWebContents(opener)) {
-    // If an ExecutionEngine is acting on the opener, we force the navigation
-    // to happen in the same tab.
-    content::NavigationController::LoadURLParams params(target_url);
-    params.initiator_frame_token = opener->GetFrameToken();
-    params.initiator_process_id = opener->GetProcess()->GetID();
-    params.initiator_origin = opener->GetLastCommittedOrigin();
-    params.source_site_instance = source_site_instance;
-    params.transition_type = ui::PAGE_TRANSITION_LINK;
-    params.is_renderer_initiated = true;
-    auto* opener_contents = content::WebContents::FromRenderFrameHost(opener);
-    opener_contents->GetController().LoadURLWithParams(params);
-    VLOG(1) << "Actor treated window open as same tab navigation. "
-            << target_url;
-    return nullptr;
-  }
 
   return WebContentsDelegateAndroid::CreateCustomWebContents(
       opener, source_site_instance, is_new_browsing_instance, opener_url,

@@ -44,7 +44,6 @@ if (enable_dice_support) {
     deps = [
       "//base",
       "//chrome/browser:browser_process",
-      "//chrome/browser/glic",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/signin",
       "//chrome/browser/sync:factories",

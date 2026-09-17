@@ -10,7 +10,6 @@
 #include "base/notimplemented.h"
 #include "base/uuid.h"
 #include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/glic/glic_tab_restore_helper.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/sessions/session_restore.h"
 #include "chrome/browser/ui/android/tab_model/tab_model.h"
@@ -85,7 +84,6 @@ std::map<std::string, std::string> AndroidLiveTabContext::GetExtraDataForTab(
   std::map<std::string, std::string> extra_data;
   TabAndroid* tab_android = tab_model_->GetTabAt(index);
   if (tab_android) {
-    glic::PopulateGlicExtraData(tab_android, &extra_data);
   }
   return extra_data;
 }
@@ -210,7 +208,6 @@ sessions::LiveTab* AndroidLiveTabContext::AddRestoredTab(
   std::unique_ptr<content::WebContents> web_contents =
       content::WebContents::Create(params);
   content::WebContents* raw_web_contents = web_contents.get();
-  glic::RestoreGlicStateFromExtraData(raw_web_contents, tab.extra_data);
   web_contents->GetController().Restore(tab.normalized_navigation_index(),
                                         content::RestoreType::kRestored,
                                         &nav_entries);

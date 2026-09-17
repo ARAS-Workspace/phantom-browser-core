@@ -11,7 +11,6 @@
 #include "base/notimplemented.h"
 #include "build/branding_buildflags.h"
 #include "build/buildflag.h"
-#include "chrome/browser/actor/ui/actor_ui_window_controller.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_actions.h"
@@ -844,13 +843,6 @@ void WebUILocationBar::OnMovedOrShown(ui::TrackedElement* element) {
 
 void WebUILocationBar::OnPopupStateChanged(OmniboxPopupState old_state,
                                            OmniboxPopupState new_state) {
-  if (browser_ && base::FeatureList::IsEnabled(
-                      features::kGlicHandoffButtonHideWhenOmniboxPopupOpened)) {
-    if (auto* window_controller = ActorUiWindowController::From(browser_)) {
-      window_controller->OnOmniboxPopupStateChanged(new_state !=
-                                                    OmniboxPopupState::kNone);
-    }
-  }
 
   if (new_state != OmniboxPopupState::kNone) {
     // Close any overlapping user education bubbles when any popup opens.

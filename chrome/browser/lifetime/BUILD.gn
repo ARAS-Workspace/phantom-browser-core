@@ -118,10 +118,8 @@ source_set("impl") {
     ]
     deps += [
       "//chrome/browser:global_features",
-      "//chrome/browser/background/glic",
       "//chrome/browser/download",
       "//chrome/browser/first_run",
-      "//chrome/browser/glic",
       "//chrome/browser/metrics",
       "//chrome/browser/metrics/desktop_session_duration",
       "//chrome/browser/notifications",

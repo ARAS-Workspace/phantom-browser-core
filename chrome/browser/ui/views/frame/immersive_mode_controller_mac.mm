@@ -13,7 +13,6 @@
 #include "base/auto_reset.h"
 #include "base/check.h"
 #include "base/feature_list.h"
-#include "chrome/browser/glic/widget/glic_widget.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/find_bar/find_bar.h"
@@ -438,12 +437,6 @@ bool ImmersiveModeControllerMac::ShouldMoveChild(views::Widget* child) {
 
   const void* widget_identifier =
       child->GetNativeWindowProperty(views::kWidgetIdentifierKey);
-  if (widget_identifier ==
-          constrained_window::kConstrainedWindowWidgetIdentifier
-      || widget_identifier == glic::kGlicWidgetIdentifier
-  ) {
-    return true;
-  }
 
   // Reparent the Omnibox popup. Popup is not a BubbleDialogDelegate, so it
   // fails the check below.

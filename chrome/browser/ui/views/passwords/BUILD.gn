@@ -242,7 +242,6 @@ source_set("interactive_ui_tests") {
   deps = [
     ":passwords",
     ":test_support",
-    "//chrome/browser/actor:test_support",
     "//chrome/browser/ui/passwords",
     "//chrome/browser/ui/passwords:test_support",
     "//chrome/browser/ui/views/controls",

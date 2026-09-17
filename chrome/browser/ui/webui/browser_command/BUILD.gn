@@ -18,7 +18,6 @@ source_set("browser_command") {
     "//chrome/browser:browser_process",
     "//chrome/browser:command_updater_impl",
     "//chrome/browser/feedback",
-    "//chrome/browser/glic",
     "//chrome/browser/new_tab_page",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/search",

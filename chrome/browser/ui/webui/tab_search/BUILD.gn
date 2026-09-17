@@ -37,7 +37,6 @@ source_set("tab_search") {
     "//base",
     "//chrome/app:command_ids",
     "//chrome/browser/favicon",
-    "//chrome/browser/glic/resources:grit",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/resources/tab_search:resources",
     "//chrome/browser/sessions",

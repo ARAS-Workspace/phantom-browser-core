@@ -707,7 +707,6 @@ message TabObservation {
 // Next ID: 9
 message ActionsResult {
   // The result of the actions. See
-  // https://source.chromium.org/chromium/chromium/src/+/main:chrome/common/actor.mojom
   // for definition.
   int32 action_result = 1 [features = { field_presence: EXPLICIT }];
 

@@ -19,8 +19,6 @@ assert(!is_ios, "Chromium/iOS shouldn't use anything in //chrome")
 group("resources") {
   public_deps = [
     "contextual_tasks:resources",
-    "glic:resources",
-    "glic/experimental_opt_in:resources",
     "saved_tab_groups_unsupported:resources",
     "segmentation_internals:resources",
     "//components/enterprise/connectors/resources",
@@ -50,7 +48,6 @@ group("resources") {
       ":dev_ui_paks",
       "about_sys:resources",
       "access_code_cast:resources",
-      "actor_overlay:resources",
       "app_service_internals:resources",
       "autofill_ml_internals:resources",
       "bookmarks:resources",
@@ -133,8 +130,6 @@ group("resources") {
 
   if (is_win || is_mac || is_linux) {
     public_deps += [
-      "skills:resources",
-      "//chrome/browser/ttc/resources",
     ]
   }
 
@@ -218,7 +213,6 @@ if (enable_extensions_core) {
     source = "component_extension_resources.grd"
 
     inputs = [
-      "glic/extension/manifest.json",
       "network_speech_synthesis/mv3/audio.html",
       "network_speech_synthesis/mv3/audio.js",
       "network_speech_synthesis/mv3/service_worker.js",
@@ -226,7 +220,6 @@ if (enable_extensions_core) {
       "network_speech_synthesis/tts_extension.js",
       "reading_mode_gdocs_helper/content.js",
       "reading_mode_gdocs_helper/gdocs_script.js",
-      "$root_gen_dir/chrome/browser/resources/glic/extension/tsc/background.js",
     ]
 
     if (is_chrome_branded || enable_hangout_services_extension) {
@@ -247,7 +240,6 @@ if (enable_extensions_core) {
 
     # Some resources within component_extension_resources.grd are generated at
     # build time so we include them as explicit dependencies here
-    deps = [ "//chrome/browser/resources/glic/extension:build_ts" ]
 
     outputs = [
       "grit/component_extension_resources.h",
@@ -326,7 +318,6 @@ group("dev_ui_resources") {
     "subresource_filter:resources",
     "suggest_internals:resources",
     "usb_internals:resources",
-    "//components/actor/core/internals/resources",
     "//components/autofill/core/browser/autofill_and_password_manager_internals:resources",
     "//components/commerce/core/internals/resources",
     "//components/data_sharing/data_sharing_internals/resources",
@@ -414,7 +405,6 @@ repack("dev_ui_paks") {
     "$root_gen_dir/chrome/subresource_filter_internals_resources.pak",
     "$root_gen_dir/chrome/suggest_internals_resources.pak",
     "$root_gen_dir/chrome/usb_internals_resources.pak",
-    "$root_gen_dir/components/actor_internals_resources.pak",
     "$root_gen_dir/components/autofill_and_password_manager_internals_resources.pak",
     "$root_gen_dir/components/commerce_internals_resources.pak",
     "$root_gen_dir/components/connectors_internals_resources.pak",

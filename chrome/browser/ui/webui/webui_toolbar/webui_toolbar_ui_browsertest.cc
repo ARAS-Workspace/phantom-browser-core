@@ -10,7 +10,6 @@
 #include "base/json/json_reader.h"
 #include "base/run_loop.h"
 #include "base/values.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/webui/theme_colors_source_manager.h"

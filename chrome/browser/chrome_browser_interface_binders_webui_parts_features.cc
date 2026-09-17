@@ -4,7 +4,6 @@
 
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
-#include "chrome/browser/glic/host/glic_ui.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
 #include "components/compose/buildflags.h"
@@ -91,11 +90,8 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
 #if !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (base::FeatureList::IsEnabled(contextual_tasks::kContextualTasks)) {
     RegisterWebUIControllerInterfaceBinder<
-        guest_view::mojom::PageHandlerFactory, glic::GlicUI, ContextualTasksUI>(
-        map);
   } else {
     RegisterWebUIControllerInterfaceBinder<
-        guest_view::mojom::PageHandlerFactory, glic::GlicUI>(map);
   }
 #endif
 

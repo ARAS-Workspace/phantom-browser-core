@@ -58,7 +58,6 @@ if (!is_android) {
 
   source_set("tab_menu") {
     sources = [
-      "glic_tab_sub_menu_model.h",
       "tab_menu_model.h",
       "tab_menu_model_delegate.h",
       "tab_menu_model_factory.h",
@@ -66,7 +65,6 @@ if (!is_android) {
 
     public_deps = [
       "//base",
-      "//chrome/browser/glic",
       "//ui/base/interaction",
       "//ui/menus",
     ]
@@ -110,7 +108,6 @@ if (!is_android) {
     public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 
     sources = [
-      "glic_tab_sub_menu_model.cc",
       "tab_menu_model.cc",
       "tab_menu_model_factory.cc",
     ]
@@ -123,8 +120,6 @@ if (!is_android) {
       "//chrome/app/vector_icons",
       "//chrome/browser/commerce",
       "//chrome/browser/extensions",
-      "//chrome/browser/glic",
-      "//chrome/browser/glic/browser_ui",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/send_tab_to_self",
       "//chrome/browser/ui:ui_features",
@@ -319,7 +314,6 @@ if (!is_android) {
       "//chrome/browser/commerce",
       "//chrome/browser/content_settings:content_settings_factory",
       "//chrome/browser/extensions",
-      "//chrome/browser/glic",
       "//chrome/browser/lifetime",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/reading_list",
@@ -459,8 +453,6 @@ if (!is_android) {
       ":utils",
       "//chrome/app:command_ids",
       "//chrome/app/vector_icons",
-      "//chrome/browser/actor",
-      "//chrome/browser/actor/ui",
       "//chrome/browser/bookmarks",
       "//chrome/browser/collaboration/messaging",
       "//chrome/browser/commerce",
@@ -468,9 +460,6 @@ if (!is_android) {
       "//chrome/browser/content_settings:content_settings_factory",
       "//chrome/browser/contextual_tasks",
       "//chrome/browser/favicon",
-      "//chrome/browser/glic",
-      "//chrome/browser/glic/browser_ui",
-      "//chrome/browser/glic/suggestions",
       "//chrome/browser/image_fetcher",
       "//chrome/browser/lifetime",
       "//chrome/browser/media/webrtc",
@@ -485,8 +474,6 @@ if (!is_android) {
       "//chrome/browser/search",
       "//chrome/browser/sessions",
       "//chrome/browser/signin",
-      "//chrome/browser/skills:public",
-      "//chrome/browser/skills:ui",
       "//chrome/browser/ssl",
       "//chrome/browser/sync",
       "//chrome/browser/sync:factories",
@@ -556,7 +543,6 @@ if (!is_android) {
       "//components/privacy_sandbox:features",
       "//components/security_interstitials/content:security_interstitial_page",
       "//components/sessions",
-      "//components/skills:features",
       "//components/sync_sessions",
       "//components/tab_groups",
       "//components/tabs:impl",
@@ -647,7 +633,6 @@ if (!is_android) {
       ":tabs_public",
       "//base",
       "//chrome/browser/extensions",
-      "//chrome/browser/glic",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/ui/tab_contents",
       "//content/public/browser",
@@ -664,7 +649,6 @@ if (!is_android) {
     sources = [
       "existing_base_sub_menu_model_browsertest.cc",
       "existing_window_sub_menu_model_browsertest.cc",
-      "glic_tab_sub_menu_model_browsertest.cc",
       "pinned_tab_codec_browsertest.cc",
       "pinned_tab_service_browsertest.cc",
       "recent_tabs_builder_test_helper.cc",
@@ -693,9 +677,6 @@ if (!is_android) {
       "//base/test:test_support",
       "//chrome/browser",
       "//chrome/browser/favicon",
-      "//chrome/browser/glic",
-      "//chrome/browser/glic:impl",
-      "//chrome/browser/glic/test_support",
       "//chrome/browser/policy:test_support",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/profiles/keep_alive",
@@ -799,14 +780,9 @@ if (!is_android) {
       "//base/test:test_support",
       "//chrome/app:command_ids",
       "//chrome/browser",
-      "//chrome/browser/actor",
-      "//chrome/browser/actor:test_support",
       "//chrome/browser/commerce",
       "//chrome/browser/content_settings:content_settings_factory",
       "//chrome/browser/extensions",
-      "//chrome/browser/glic",
-      "//chrome/browser/glic/browser_ui",
-      "//chrome/browser/glic/test_support",
       "//chrome/browser/optimization_guide",
       "//chrome/browser/prefs",
       "//chrome/browser/sync",

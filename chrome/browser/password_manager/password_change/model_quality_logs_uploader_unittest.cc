@@ -16,7 +16,6 @@
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/autofill/core/browser/proto/password_requirements.pb.h"
 #include "components/language_detection/content/browser/language_detection_host.h"
 #include "components/language_detection/core/language_detection_details.h"

@@ -77,7 +77,6 @@ source_set("impl") {
   ]
 
   deps = [
-    "//chrome/browser/glic",
     "//chrome/browser/lifetime",
   ]
 

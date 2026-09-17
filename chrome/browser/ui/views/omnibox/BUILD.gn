@@ -119,7 +119,6 @@ source_set("impl") {
     "//chrome/browser:file_select_helper",
     "//chrome/browser/autocomplete:aim_eligibility_service",
     "//chrome/browser/external_protocol",
-    "//chrome/browser/glic",
     "//chrome/browser/history_clusters",
     "//chrome/browser/media/webrtc",
     "//chrome/browser/page_load_metrics",

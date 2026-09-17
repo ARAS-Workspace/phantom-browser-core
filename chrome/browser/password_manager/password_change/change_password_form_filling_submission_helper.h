@@ -12,10 +12,8 @@
 #include "base/memory/weak_ptr.h"
 #include "base/timer/timer.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
-#include "chrome/browser/password_manager/password_change/button_click_helper.h"
 #include "chrome/browser/password_manager/password_change/password_change_submission_verifier.h"
 #include "chrome/common/chrome_render_frame.mojom.h"
-#include "components/actor/public/mojom/actor_types.mojom-forward.h"
 #include "components/autofill/core/common/form_data.h"
 #include "components/autofill/core/common/unique_ids.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
@@ -93,8 +91,6 @@ class ChangePasswordFormFillingSubmissionHelper {
 #if defined(UNIT_TEST)
   ChangePasswordFormFiller* form_filler() { return filler_.get(); }
 
-  ButtonClickHelper* click_helper() { return click_helper_.get(); }
-
   password_manager::PasswordFormManager* form_manager() {
     return form_manager_.get();
   }
@@ -102,7 +98,6 @@ class ChangePasswordFormFillingSubmissionHelper {
   AnnotatedPageContentCapturer* capturer() { return capturer_.get(); }
 #endif
   // Whether helper has submitted change password form or not.
-  bool IsPasswordFormSubmitted() const { return click_helper_ != nullptr; }
 
  private:
   void OnFormFilled(
@@ -120,8 +115,6 @@ class ChangePasswordFormFillingSubmissionHelper {
       std::unique_ptr<
           optimization_guide::proto::PasswordChangeSubmissionLoggingData>
           logging_data);
-
-  void OnButtonClicked(actor::mojom::ActionResultCode result);
 
   void OnTimeout();
 
@@ -145,8 +138,6 @@ class ChangePasswordFormFillingSubmissionHelper {
 
   // Timeout for verifying submission detection.
   base::OneShotTimer timeout_timer_;
-
-  std::unique_ptr<ButtonClickHelper> click_helper_;
 
   base::WeakPtrFactory<ChangePasswordFormFillingSubmissionHelper>
       weak_ptr_factory_{this};

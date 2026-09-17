@@ -35,8 +35,6 @@
 #include "chrome/browser/browser_about_handler.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "chrome/browser/glic/browser_ui/glic_tab_indicator_helper.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/notifications/notification_permission_context.h"
 #include "chrome/browser/profiles/profile.h"
@@ -416,10 +414,6 @@ void TabAndroid::InitWebContents(
   ShowBadFlagsPrompt(web_contents());
 
   MediaStateObserver::CreateForWebContents(web_contents_.get());
-  if (glic::GlicEnabling::IsProfileEligible(profile())) {
-    glic_tab_indicator_helper_ =
-        std::make_unique<glic::GlicTabIndicatorHelper>(this);
-  }
   tab_alert_controller_ = std::make_unique<tabs::TabAlertController>(*this);
   alert_to_show_subscription_ =
       tab_alert_controller_->AddAlertToShowChangedCallback(base::BindRepeating(

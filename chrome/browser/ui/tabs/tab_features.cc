@@ -15,8 +15,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/contextual_cueing/contextual_cueing_controller.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_navigation_controller.h"
-#include "chrome/browser/glic/host/context/glic_page_features_manager.h"
-#include "chrome/browser/glic/suggestions/contextual_cueing_helper.h"
 #include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
 #include "chrome/browser/loader/from_gws_navigation_and_keep_alive_request_observer.h"
 #include "chrome/browser/multistep_filter/chrome_filter_navigation_observer.h"
@@ -103,12 +101,6 @@
 #include "components/record_replay/core/common/record_replay_features.h"
 #endif
 
-#include "chrome/browser/glic/browser_ui/glic_tab_indicator_helper.h"
-#include "chrome/browser/glic/public/features.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/widget/glic_side_panel_coordinator_impl.h"
-#include "chrome/browser/glic/service/glic_instance_helper.h"
 #include "chrome/browser/ui/contextual_search/tab_contextualization_controller.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/tab_attachment_tracker.h"
@@ -266,8 +258,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
               side_panel_registry_.get());
     }
 
-    contextual_cueing_helper_ = glic::ContextualCueingHelper::MaybeCreate(&tab);
-
     if (tab_groups::TabGroupSyncService* tab_group_sync_service =
             tab_groups::TabGroupSyncServiceFactory::GetForProfile(profile)) {
       saved_tab_group_web_contents_listener_ =
@@ -299,26 +289,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
               .CreateInstance<commerce::InStockNotificationManager>(tab, &tab);
     }
 
-    if (glic::GlicEnabling::IsProfileEligible(profile)) {
-      glic_instance_helper_ =
-          GetUserDataFactory().CreateInstance<glic::GlicInstanceHelper>(tab,
-                                                                        &tab);
-      glic_tab_indicator_helper_ =
-          GetUserDataFactory().CreateInstance<glic::GlicTabIndicatorHelper>(
-              tab, &tab);
-      if (base::FeatureList::IsEnabled(
-              features::kGlicSummarizeVideoSuggestion)) {
-        glic_page_features_manager_ =
-            GetUserDataFactory().CreateInstance<glic::GlicPageFeaturesManager>(
-                tab, &tab);
-      }
-    }
-    if (glic::GlicKeyedService::Get(profile)) {
-      glic_side_panel_coordinator_ =
-          GetUserDataFactory()
-              .CreateInstance<glic::GlicSidePanelCoordinatorImpl>(
-                  tab, &tab, side_panel_registry_.get());
-    }
   }  // IsInNormalWindow() end.
 
   // This block instantiates the page action controllers that depends on the

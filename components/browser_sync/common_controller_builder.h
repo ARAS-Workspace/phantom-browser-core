@@ -87,10 +87,6 @@ namespace signin {
 class IdentityManager;
 }  // namespace signin
 
-namespace skills {
-class SkillsService;
-}  // namespace skills
-
 namespace supervised_user {
 class FamilyLinkSettingsService;
 }  // namespace supervised_user
@@ -180,7 +176,6 @@ class CommonControllerBuilder {
   void SetIdentityManager(signin::IdentityManager* identity_manager);
   void SetDataTypeStoreService(
       syncer::DataTypeStoreService* data_type_store_service);
-  void SetSkillsService(skills::SkillsService* skills_service);
   void SetNotebooksService(notebooks::NotebooksService* notebooks_service);
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -312,10 +307,6 @@ class CommonControllerBuilder {
   std::unique_ptr<syncer::DataTypeController>
   CreateNotebookDataTypeController();
   std::unique_ptr<syncer::DataTypeController> CreateJourneyDataTypeController();
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-  std::unique_ptr<syncer::DataTypeController> CreateSkillDataTypeController(
-      syncer::SyncService* sync_service);
-#endif
 #if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<syncer::DataTypeController>
   CreateWebauthnCredentialDataTypeController(syncer::SyncService* sync_service);
@@ -425,7 +416,6 @@ class CommonControllerBuilder {
   SafeOptional<raw_ptr<sync_tab_context::TabContextSyncService>>
       tab_context_sync_service_;
   SafeOptional<raw_ptr<TemplateURLService>> template_url_service_;
-  SafeOptional<raw_ptr<skills::SkillsService>> skills_service_;
   SafeOptional<raw_ptr<notebooks::NotebooksService>> notebooks_service_;
 };
 

@@ -231,7 +231,6 @@ source_set("webrtc") {
       "display_media_access_handler.h",
     ]
     deps += [
-      "//chrome/browser/glic",
       "//chrome/browser/ui:url_identity",
     ]
 

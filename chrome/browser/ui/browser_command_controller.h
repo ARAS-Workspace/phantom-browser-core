@@ -37,10 +37,6 @@ namespace input {
 struct NativeWebKeyboardEvent;
 }
 
-namespace glic {
-class GlicInstance;
-}
-
 
 namespace chrome {
 
@@ -78,7 +74,6 @@ class BrowserCommandController : public CommandUpdater,
   void ContentRestrictionsChanged();
   void FullscreenStateChanged();
   void PrintingStateChanged();
-  void GlicActiveInstanceChanged(glic::GlicInstance* instance);
   void LoadingStateChanged(bool is_loading, bool force);
   void FindBarVisibilityChanged();
   void ExtensionStateChanged();
@@ -197,9 +192,6 @@ class BrowserCommandController : public CommandUpdater,
   // Updates the printing command state.
   void UpdatePrintingState();
 
-  // Updates the Glic command state.
-  void UpdateGlicState();
-
   // Updates the SHOW_SYNC_SETUP menu entry.
   void OnSigninAllowedPrefChange();
 
@@ -233,9 +225,6 @@ class BrowserCommandController : public CommandUpdater,
   // Updates commands that depend on the state of the tab strip model.
   void UpdateCommandsForTabStripStateChanged();
 
-  // Updates commands that depend on the enabled state of glic.
-  void UpdateCommandsForEnableGlicChanged();
-
   void UpdateCommandAndActionEnabled(int command_id,
                                      actions::ActionId action_id,
                                      bool enabled);
@@ -253,7 +242,6 @@ class BrowserCommandController : public CommandUpdater,
 
   PrefChangeRegistrar profile_pref_registrar_;
   PrefChangeRegistrar local_pref_registrar_;
-  std::unique_ptr<base::CallbackListSubscription> glic_enabling_subscription_;
 
 
   // If the Customize Chrome side panel is shown, determines which section to
@@ -261,9 +249,6 @@ class BrowserCommandController : public CommandUpdater,
   CustomizeChromeSection customize_chrome_section_ =
       CustomizeChromeSection::kUnspecified;
 
-  // Callback subscription for listening to changes to the Glic window
-  // activation changes.
-  base::CallbackListSubscription glic_active_instance_changed_subscription_;
   // Observes for extension state changes (load/unload).
   class ExtensionStateObserver;
   std::unique_ptr<ExtensionStateObserver> extension_state_observer_;

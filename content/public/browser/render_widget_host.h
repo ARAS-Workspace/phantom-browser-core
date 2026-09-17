@@ -117,8 +117,7 @@ class CONTENT_EXPORT RenderWidgetHost {
 
   // This is a method to manually trigger user interaction notifications. This
   // is useful for mechanisms that do not use the normal input stack and thus
-  // would not normally send notifications to observers (e.g. tools in
-  // `actor::`).
+  // would not normally send notifications to observers.
   virtual void SimulateUserInteraction(const blink::WebInputEvent& event) = 0;
 
   // Returns the viz::FrameSinkId that this object uses to put things on screen.

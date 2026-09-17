@@ -66,9 +66,6 @@ BASE_DECLARE_FEATURE(kApiOdfsConfigPrivate);
 // Controls the availability of the contextualTasksPrivate API.
 BASE_DECLARE_FEATURE(kApiContextualTasksPrivate);
 
-// Controls the availability of the glicPrivate API.
-BASE_DECLARE_FEATURE(kApiGlicPrivate);
-
 // Controls the availability of the
 // `enterprise.reportingPrivate.onDataMaskingRulesTriggered` API.
 BASE_DECLARE_FEATURE(kApiEnterpriseReportingPrivateOnDataMaskingRulesTriggered);

@@ -28,7 +28,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/affiliations/affiliation_service_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/critical_actions/critical_action_factory.h"
@@ -1843,15 +1842,7 @@ ChromePasswordManagerClient::GetUndoPasswordChangeController() {
 }
 
 bool ChromePasswordManagerClient::IsActorTaskActive() {
-  actor::ActorKeyedService* actor_service =
-      actor::ActorKeyedService::Get(GetProfile());
-  if (!actor_service) {
-    return false;
-  }
-
-  const tabs::TabInterface* tab_interface =
-      tabs::TabInterface::MaybeGetFromContents(web_contents());
-  return tab_interface && actor_service->IsActiveOnTab(*tab_interface);
+  return false;
 }
 
 ChromePasswordManagerClient::ChromePasswordManagerClient(

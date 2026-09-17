@@ -257,10 +257,6 @@ chromium-metrics-reviews@google.com.
   </int>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/glic/suggestions/contextual_cueing_enums.h:NudgeDecision) -->
-
-<!-- LINT.IfChange(NudgeInteraction) -->
-
 <enum name="ContextualCueingNudgeInteraction">
   <int value="0" label="Unknown"/>
   <int value="1" label="Shown">
@@ -291,8 +287,6 @@ chromium-metrics-reviews@google.com.
     omnibox.
   </int>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/glic/suggestions/contextual_cueing_enums.h:NudgeInteraction) -->
 
 <enum name="ContextualCueingZeroStateSuggestionsPageContextIneligibilityType">
   <int value="0" label="None"/>
@@ -327,8 +321,6 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//chrome/browser/contextual_cueing/cue_target.h:CueTargetType) -->
 
-<!-- LINT.IfChange(GlicAutoOpenResult) -->
-
 <enum name="GlicAutoOpenResult">
   <int value="0" label="Success"/>
   <int value="1" label="Prevented From Split View"/>
@@ -340,8 +332,6 @@ chromium-metrics-reviews@google.com.
   <int value="7" label="Prevented From PDF Page Count Below Threshold"/>
   <int value="8" label="Prevented From Cooldown"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/glic/suggestions/contextual_cueing_enums.h:GlicAutoOpenResult) -->
 
 </enums>
 

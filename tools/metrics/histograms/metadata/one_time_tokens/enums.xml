@@ -8,8 +8,6 @@ found in the LICENSE file.
 
 <enums>
 
-<!-- LINT.IfChange(ActorOneTimeTokenFillingServiceFillOtpEvent) -->
-
 <enum name="ActorOneTimeTokenFillingServiceFillOtpEvent">
   <int value="0" label="Start"/>
   <int value="1" label="NullTab"/>
@@ -22,10 +20,6 @@ found in the LICENSE file.
   <int value="8" label="Success"/>
   <int value="9" label="Error"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/autofill/actor/one_time_tokens/actor_one_time_token_filling_service_metrics.h:ActorOneTimeTokenFillingServiceFillOtp) -->
-
-<!-- LINT.IfChange(ActorOneTimeTokenFillingServiceRetrieveOtpEvent) -->
 
 <enum name="ActorOneTimeTokenFillingServiceRetrieveOtpEvent">
   <int value="0" label="Start"/>
@@ -40,18 +34,10 @@ found in the LICENSE file.
   <int value="9" label="RetrievalTimeout"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/autofill/actor/one_time_tokens/actor_one_time_token_filling_service_metrics.h:ActorOneTimeTokenFillingServiceRetrieveOtp) -->
-
-<!-- LINT.IfChange(ActorOtpRetrieveOtpCallbackSupersededEvent) -->
-
 <enum name="ActorOtpRetrieveOtpCallbackSupersededEvent">
   <int value="0" label="RetrieveOtpStarted"/>
   <int value="1" label="CallbackSuperseded"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/autofill/actor/one_time_tokens/actor_one_time_token_filling_service_metrics.h:ActorOtpRetrieveOtpCallbackSuperseded) -->
-
-<!-- LINT.IfChange(AttemptOtpFillingEvent) -->
 
 <enum name="AttemptOtpFillingEvent">
   <int value="0" label="StartFillingAttempt"/>
@@ -75,20 +61,12 @@ found in the LICENSE file.
   <int value="18" label="GmailOtpConfirmationDeclinedByUser"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/tools/attempt_otp_filling_metrics.h:AttemptOtpFillingEvent) -->
-
-<!-- LINT.IfChange(AttemptOtpFillingPredictedOtpType) -->
-
 <enum name="AttemptOtpFillingPredictedOtpType">
   <int value="0" label="Unknown"/>
   <int value="1" label="SMS"/>
   <int value="2" label="Email"/>
   <int value="3" label="Authenticator App"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/tools/attempt_otp_filling_tool_request.h:AttemptOtpFillingPredictedOtpType) -->
-
-<!-- LINT.IfChange(GmailOtpConfirmationDialogInteraction) -->
 
 <enum name="GmailOtpConfirmationDialogInteraction">
   <int value="0" label="ShowDialog"/>
@@ -97,18 +75,12 @@ found in the LICENSE file.
   <int value="3" label="PermissionGranted"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/tools/attempt_otp_filling_metrics.h:GmailOtpConfirmationDialogInteraction) -->
-
-<!-- LINT.IfChange(GmailOtpOptInCardInteraction) -->
-
 <enum name="GmailOtpOptInCardInteraction">
   <int value="0" label="ShowCard"/>
   <int value="1" label="ErrorResponse"/>
   <int value="2" label="PermissionDenied"/>
   <int value="3" label="PermissionGranted"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/tools/attempt_otp_filling_metrics.h:GmailOtpOptInCardInteraction) -->
 
 <!-- LINT.IfChange(GmailOtpSenderDomainMatchRejectionReason) -->
 
@@ -121,8 +93,6 @@ found in the LICENSE file.
 </enum>
 
 <!-- LINT.ThenChange(//components/one_time_tokens/core/browser/gmail_otp_retriever.h:GmailOtpSenderDomainMatchRejectionReason) -->
-
-<!-- LINT.IfChange(VerifyIsActorLoginFlowEvent) -->
 
 <enum name="VerifyIsActorLoginFlowEvent">
   <int value="0" label="Start"/>
@@ -137,8 +107,6 @@ found in the LICENSE file.
   <int value="9" label="AffiliatedMatchAllowed"/>
   <int value="10" label="MainFrameOriginMismatch"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/tools/attempt_otp_filling_metrics.h:VerifyIsActorLoginFlowEvent) -->
 
 </enums>
 

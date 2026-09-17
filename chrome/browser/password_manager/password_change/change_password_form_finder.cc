@@ -13,13 +13,11 @@
 #include "base/task/single_thread_task_runner.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/password_manager/password_change/annotated_page_content_capturer.h"
-#include "chrome/browser/password_manager/password_change/button_click_helper.h"
 #include "chrome/browser/password_manager/password_change/change_password_form_waiter.h"
 #include "chrome/browser/password_manager/password_change/model_quality_logs_uploader.h"
 #include "chrome/browser/password_manager/password_change/password_change_logging_util.h"
 #include "chrome/browser/password_manager/password_change/password_change_page_stability_waiter.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
 #include "components/optimization_guide/core/model_quality/model_execution_logging_wrappers.h"
 #include "components/optimization_guide/proto/features/password_change_submission.pb.h"
@@ -236,35 +234,7 @@ void ChangePasswordFormFinder::OnExecutionResponseCallback(
 
   form_waiter_.reset();
   button_click_attempted_ = true;
-  click_helper_ = std::make_unique<ButtonClickHelper>(
-      web_contents_, client_, dom_node_id,
-      base::BindOnce(&ChangePasswordFormFinder::OnButtonClicked,
-                     weak_ptr_factory_.GetWeakPtr()));
-}
-
-void ChangePasswordFormFinder::OnButtonClicked(
-    actor::mojom::ActionResultCode result) {
-  CHECK(web_contents_);
-  CHECK(failure_callback_);
-
-  click_helper_.reset();
-
-  if (result != actor::mojom::ActionResultCode::kOk) {
-    logs_uploader_->RecordButtonClickFailure(kOpenFormFlowStep, result);
-    std::move(failure_callback_).Run(ErrorCase::kFailedToClickButton);
-    return;
-  }
-
-  if (base::FeatureList::IsEnabled(
-          password_manager::features::kAwaitPageStabilityForPasswordChange)) {
-    page_stability_waiter_ =
-        std::make_unique<PasswordChangePageStabilityWaiter>(
-            web_contents_, client_,
-            base::BindOnce(&ChangePasswordFormFinder::OnPageStableAfterClick,
-                           weak_ptr_factory_.GetWeakPtr()));
-  } else {
-    OnPageStableAfterClick();
-  }
+  std::move(failure_callback_).Run(ErrorCase::kNoButtonToClick);
 }
 
 void ChangePasswordFormFinder::OnPageStableAfterClick() {

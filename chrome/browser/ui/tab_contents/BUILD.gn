@@ -79,7 +79,6 @@ source_set("impl") {
     deps += [ "//chrome/browser/ui/android/tab_contents" ]
   } else {
     deps += [
-      "//chrome/browser/glic",
       "//chrome/browser/ui/views/side_panel",
     ]
   }

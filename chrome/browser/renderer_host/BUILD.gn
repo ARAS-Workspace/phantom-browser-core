@@ -12,14 +12,12 @@ source_set("renderer_host") {
   ]
   public_deps = [
     "//chrome/common",
-    "//components/actor/core:task_id",
     "//components/offline_pages/buildflags",
     "//components/offline_pages/core/request_header",
     "//content/public/browser",
     "//extensions/buildflags",
   ]
   deps = [
-    "//chrome/browser/actor",
     "//chrome/browser/preloading/prefetch/no_state_prefetch",
   ]
 
@@ -80,9 +78,7 @@ if (is_mac) {
       ":history_swiper",
       ":history_swiping_control",
       "//base",
-      "//chrome/browser/actor/ui:actor_overlay",
       "//chrome/browser/devtools",
-      "//chrome/browser/glic",
       "//chrome/browser/ui",
     ]
 

@@ -223,24 +223,6 @@ void ChromePasswordChangeService::OfferPasswordChangeUi(
 #endif  // BUILDFLAG(IS_ANDROID)
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-base::WeakPtr<PasswordChangeFromCheckupDelegate>
-ChromePasswordChangeService::StartPasswordChangeFromCheckup(
-    password_manager::StoredCredential credential,
-    content::WebContents* web_contents,
-    PasswordChangeFromCheckupDelegate::StateChangeCallback callback) {
-  if (!web_contents) {
-    return nullptr;
-  }
-
-  auto delegate = std::make_unique<PasswordChangeFromCheckupDelegate>();
-  delegate->StartPasswordChangeFlow(
-      std::move(credential), web_contents->GetWeakPtr(), std::move(callback));
-  password_change_from_checkup_delegates_.push_back(std::move(delegate));
-  return password_change_from_checkup_delegates_.back()->GetWeakPtr();
-}
-#endif  // BUILDFLAG(IS_ANDROID)
-
 PasswordChangeDelegate* ChromePasswordChangeService::GetPasswordChangeDelegate(
     content::WebContents* web_contents) {
   for (const auto& delegate : password_change_delegates_) {
@@ -270,12 +252,6 @@ void ChromePasswordChangeService::Shutdown() {
     delegate->RemoveObserver(this);
   }
   password_change_delegates_.clear();
-#if !BUILDFLAG(IS_ANDROID)
-  for (const auto& delegate : password_change_from_checkup_delegates_) {
-    delegate->Stop(actor::ActorTask::StoppedReason::kShutdown);
-  }
-  password_change_from_checkup_delegates_.clear();
-#endif
 }
 
 #if !BUILDFLAG(IS_ANDROID)

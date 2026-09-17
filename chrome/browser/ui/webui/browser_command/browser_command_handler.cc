@@ -13,10 +13,6 @@
 #include "chrome/browser/command_updater_impl.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
-#include "chrome/browser/glic/glic_settings_util.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service_factory.h"
 #include "chrome/browser/new_tab_page/promos/promo_service.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search/search.h"
@@ -301,39 +297,9 @@ void BrowserCommandHandler::StartSavedTabGroupTutorial() {
   StartTutorial(std::move(params));
 }
 
-void BrowserCommandHandler::OpenGlic() {
-  glic::GlicKeyedService* glic_service = glic::GlicKeyedService::Get(profile_);
+void BrowserCommandHandler::OpenGlic() {}
 
-  if (!glic_service) {
-    return;
-  }
-
-  auto* browser_window = webui::GetBrowserWindowInterface(web_contents_);
-
-  glic_service->ToggleUI(browser_window, /*prevent_close=*/false,
-                         glic::mojom::InvocationSource::kWhatsNew);
-}
-
-void BrowserCommandHandler::OpenGlicSettings() {
-  if (glic::GlicEnabling::ShouldShowSettingsPage(profile_)) {
-    glic::OpenGlicKeyboardShortcutSetting(profile_);
-  } else {
-    // Link to help center article.
-    auto* command_line = base::CommandLine::ForCurrentProcess();
-    bool has_url =
-        command_line->HasSwitch(::switches::kGlicShortcutsLearnMoreURL);
-    const std::string url = has_url
-                                ? command_line->GetSwitchValueASCII(
-                                      ::switches::kGlicShortcutsLearnMoreURL)
-                                : features::kGlicShortcutsLearnMoreURL.Get();
-    if (url.empty()) {
-      return;
-    }
-
-    NavigateToURL(glic::GetHelpCenterUrl(url),
-                  WindowOpenDisposition::SINGLETON_TAB);
-  }
-}
+void BrowserCommandHandler::OpenGlicSettings() {}
 
 void BrowserCommandHandler::OpenSplitView() {
   tabs::TabInterface* tab =

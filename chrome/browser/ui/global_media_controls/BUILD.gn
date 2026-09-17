@@ -67,7 +67,6 @@ source_set("impl") {
     ":global_media_controls",
     "//chrome/browser:browser_process",
     "//chrome/browser/feature_engagement",
-    "//chrome/browser/glic",
     "//chrome/browser/media/router:media_router_feature",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/tabs:tab_strip",

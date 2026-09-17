@@ -51,7 +51,6 @@ android_library("metrics_java") {
   deps = [
     "//base:base_java",
     "//build/android:build_java",
-    "//chrome/browser/glic/android:common_java",
     "//third_party/androidx:androidx_annotation_annotation_java",
   ]
 }
@@ -83,8 +82,6 @@ android_library("java") {
     "//build/android:build_java",
     "//chrome/browser/feature_engagement:java",
     "//chrome/browser/flags:java",
-    "//chrome/browser/glic:public_java",
-    "//chrome/browser/glic/android:common_java",
     "//chrome/browser/preferences:java",
     "//chrome/browser/profiles/android:java",
     "//chrome/browser/search_engines/android:java",
@@ -144,8 +141,6 @@ robolectric_library("junit") {
     "//base:base_shared_preferences_java",
     "//chrome/browser/feature_engagement:java",
     "//chrome/browser/flags:java",
-    "//chrome/browser/glic:public_java",
-    "//chrome/browser/glic/android:jni_headers_java",
     "//chrome/browser/preferences:java",
     "//chrome/browser/profiles/android:java",
     "//chrome/browser/search_engines/android:java",

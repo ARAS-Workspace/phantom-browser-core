@@ -20,7 +20,6 @@
 #include "chrome/browser/contextual_cueing/features.h"
 #include "chrome/browser/contextual_cueing/prefs.h"
 #include "chrome/browser/contextual_cueing/test_cue_target.h"
-#include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/browser/optimization_guide/browser_test_util.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"

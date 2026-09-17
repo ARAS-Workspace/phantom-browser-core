@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 #include "chrome/browser/extensions/api/pdf_viewer_private/pdf_viewer_private_api.h"
-#include "chrome/browser/glic/public/glic_side_panel_coordinator.h"
-#include "chrome/browser/glic/test_support/glic_browser_test.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "content/public/test/browser_test.h"

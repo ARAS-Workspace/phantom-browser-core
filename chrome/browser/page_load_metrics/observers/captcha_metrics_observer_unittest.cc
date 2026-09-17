@@ -17,8 +17,6 @@
 #include "content/public/test/test_devtools_protocol_client.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/actor/actor_keyed_service.h"
-#include "chrome/browser/actor/actor_test_util.h"
 #include "components/tabs/public/tab_interface.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 

@@ -165,10 +165,6 @@ chromium-metrics-reviews@google.com.
   <int value="1416" label="OtpFieldNotFound"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/actor/public/mojom/actor_types.mojom:ActionResultCode) -->
-
-<!-- LINT.IfChange(ActorEngineState) -->
-
 <enum name="ActorEngineState">
   <int value="0" label="Init"/>
   <int value="1" label="StartAction"/>
@@ -179,19 +175,11 @@ chromium-metrics-reviews@google.com.
   <int value="6" label="Complete"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/execution_engine.h:State) -->
-
-<!-- LINT.IfChange(ActorForegroundServiceLifecycle) -->
-
 <enum name="ActorForegroundServiceLifecycle">
   <int value="0" label="Started"/>
   <int value="1" label="Updated"/>
   <int value="2" label="Stopped"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/android/java/src/org/chromium/chrome/browser/actor/ActorForegroundServiceUmaHelper.java:ForegroundLifecycle) -->
-
-<!-- LINT.IfChange(ActorForegroundServiceStopReason) -->
 
 <enum name="ActorForegroundServiceStopReason">
   <int value="0" label="Stopped"/>
@@ -200,20 +188,12 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="LowMemory"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/android/java/src/org/chromium/chrome/browser/actor/ActorForegroundServiceUmaHelper.java:StopReason) -->
-
-<!-- LINT.IfChange(ActorLoginAccountTypes) -->
-
 <enum name="ActorLoginAccountTypes">
   <int value="0" label="None"/>
   <int value="1" label="Password"/>
   <int value="2" label="Federated"/>
   <int value="3" label="Password and Federated"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/password_manager/core/browser/actor_login/internal/actor_login_metrics.h:ActorLoginAccountTypes) -->
-
-<!-- LINT.IfChange(ActorLoginFederatedLoginResult) -->
 
 <enum name="ActorLoginFederatedLoginResult">
   <int value="0" label="Success"/>
@@ -229,19 +209,11 @@ chromium-metrics-reviews@google.com.
   <int value="11" label="TimeoutByEmbedder"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/password_manager/core/browser/actor_login/internal/actor_login_metrics.h:ActorLoginFederatedLoginResult) -->
-
-<!-- LINT.IfChange(ActorLoginSelectedAccountType) -->
-
 <enum name="ActorLoginSelectedAccountType">
   <int value="0" label="None"/>
   <int value="1" label="Password"/>
   <int value="2" label="Federated"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/password_manager/core/browser/actor_login/internal/actor_login_metrics.h:ActorLoginSelectedAccountType) -->
-
-<!-- LINT.IfChange(ActorObservationOutcome) -->
 
 <enum name="ActorObservationOutcome">
   <int value="0" label="Succeeded"/>
@@ -250,28 +222,16 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="FailedAfterRetry"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_metrics.cc:ActorObservationOutcome) -->
-
-<!-- LINT.IfChange(ActorPipExitReason) -->
-
 <enum name="ActorPipExitReason">
   <int value="0" label="Close"/>
   <int value="1" label="Expand"/>
   <int value="2" label="Completed"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_metrics.cc:ActorPipExitReason) -->
-
-<!-- LINT.IfChange(ActorPipStatus) -->
-
 <enum name="ActorPipStatus">
   <int value="0" label="Entered"/>
   <int value="1" label="Exited"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_metrics.cc:ActorPipStatus) -->
-
-<!-- LINT.IfChange(ActorPipUserInteraction) -->
 
 <enum name="ActorPipUserInteraction">
   <int value="0" label="Pause"/>
@@ -279,19 +239,11 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="Expand"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_metrics.cc:ActorPipUserInteraction) -->
-
-<!-- LINT.IfChange(ActorServerConfirmationResult) -->
-
 <enum name="ActorServerConfirmationResult">
   <int value="0" label="NotRequired"/>
   <int value="1" label="Accepted"/>
   <int value="2" label="Rejected"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/execution_engine.h:ActorServerConfirmationResult) -->
-
-<!-- LINT.IfChange(ActorTabObservationResult) -->
 
 <enum name="ActorTabObservationResult">
   <int value="0" label="Success"/>
@@ -306,10 +258,6 @@ chromium-metrics-reviews@google.com.
   <int value="9" label="Screenshot error"/>
   <int value="10" label="Both APC and Screenshot not OK"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_metrics.cc:ActorTabObservationResult) -->
-
-<!-- LINT.IfChange(ActorTaskCreateFailedReason) -->
 
 <enum name="ActorTaskCreateFailedReason">
   <int value="0" label="None">Browser can actuate.</int>
@@ -328,10 +276,6 @@ chromium-metrics-reviews@google.com.
   </int>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/glic/actor/glic_actor_policy_checker.h:CannotActReason) -->
-
-<!-- LINT.IfChange(ActorTaskState) -->
-
 <enum name="ActorTaskState">
   <int value="0" label="Created"/>
   <int value="1" label="Acting"/>
@@ -344,27 +288,15 @@ chromium-metrics-reviews@google.com.
   <int value="8" label="Failed"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_task.h:State, histograms.xml:ActorTaskState) -->
-
-<!-- LINT.IfChange(ActorUiTabControllerError) -->
-
 <enum name="ActorUiTabControllerError">
   <int value="0" label="kRequestedForNonExistentTab"/>
   <int value="1" label="kCallbackError"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/ui/actor_ui_metrics_types.h:ActorUiTabControllerError) -->
-
-<!-- LINT.IfChange(ActorUiTaskIconError) -->
-
 <enum name="ActorUiTaskIconError">
   <int value="0" label="kBubbleTaskDoesntExist"/>
   <int value="1" label="kNudgeTaskDoesntExist"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/ui/actor_ui_metrics_types.h:ActorUiTaskIconError) -->
-
-<!-- LINT.IfChange(ComputedTargetResult) -->
 
 <enum name="ComputedTargetResult">
   <int value="0" label="kSuccess"/>
@@ -372,10 +304,6 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="kMissingAnnotatedPageContent"/>
   <int value="3" label="kTargetNotResolvedInApc"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/ui/actor_ui_metrics_types.h:ComputedTargetResult) -->
-
-<!-- LINT.IfChange(GatingDecision) -->
 
 <enum name="GatingDecision">
   <int value="0" label="kAllowSameOrigin"/>
@@ -386,10 +314,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="kBlockByContainerConfig"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/execution_engine.h:GatingDecision) -->
-
-<!-- LINT.IfChange(GetDomNodeResult) -->
-
 <enum name="GetDomNodeResult">
   <int value="0" label="kSuccess"/>
   <int value="1" label="kNoApcMainFrameData"/>
@@ -399,18 +323,10 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="kEmptyBoundingBox"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/ui/dom_node_geometry_types.h:GetDomNodeResult) -->
-
-<!-- LINT.IfChange(ModelPageTargetType) -->
-
 <enum name="ModelPageTargetType">
   <int value="0" label="kDomNode"/>
   <int value="1" label="kPoint"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/ui/actor_ui_metrics_types.h:ModelPageTargetType) -->
-
-<!-- LINT.IfChange(PageStabilityOutcome) -->
 
 <enum name="PageStabilityOutcome">
   <int value="0" label="kUnknown"/>
@@ -423,19 +339,11 @@ chromium-metrics-reviews@google.com.
   <int value="7" label="kMojoDisconnected"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/common/actor/page_stability_metrics_common.h:PageStabilityOutcome) -->
-
-<!-- LINT.IfChange(RendererResolvedTargetResult) -->
-
 <enum name="RendererResolvedTargetResult">
   <int value="0" label="kSuccess"/>
   <int value="1" label="kMissingActorTabData"/>
   <int value="2" label="kRendererResolvedTargetHasNoValue"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/ui/actor_ui_metrics_types.h:RendererResolvedTargetResult) -->
-
-<!-- LINT.IfChange(SafetyListParseResult) -->
 
 <enum name="SafetyListParseResult">
   <int value="0" label="kSuccess"/>
@@ -448,19 +356,11 @@ chromium-metrics-reviews@google.com.
   <int value="7" label="kInvalidFromUrlPattern"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/safety_list_manager.h:SafetyListParseResult) -->
-
-<!-- LINT.IfChange(SplitModeTimeOfUseFrameStatus) -->
-
 <enum name="SplitModeTimeOfUseFrameStatus">
   <int value="0" label="kMatch"/>
   <int value="1" label="kInitializedFrameDestroyed"/>
   <int value="2" label="kFrameMismatch"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_metrics.h:SplitModeTimeOfUseFrameStatus) -->
-
-<!-- LINT.IfChange(StoppedReasonEnum) -->
 
 <enum name="StoppedReasonEnum">
   <int value="0" label="Stopped By User"/>
@@ -475,16 +375,12 @@ chromium-metrics-reviews@google.com.
   <int value="9" label="Timeout"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/actor/actor_task.h:StoppedReason) -->
-
 <enum name="TaskNudgeState">
   <int value="0" label="kDefault"/>
   <int value="1" label="kNeedsAttention"/>
   <int value="2" label="(Obsolete) kMultipleTasksNeedAttention"/>
   <int value="3" label="kCompleteTasks"/>
 </enum>
-
-<!-- LINT.IfChange(TimeOfUseResult) -->
 
 <enum name="TimeOfUseResult">
   <int value="0" label="Valid"/>
@@ -495,8 +391,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Target node is missing APC geometry"/>
   <int value="6" label="No valid APC node for target"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/renderer/actor/tool_base.cc:TimeOfUseResult) -->
 
 </enums>
 

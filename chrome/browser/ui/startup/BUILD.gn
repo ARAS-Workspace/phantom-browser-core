@@ -137,7 +137,6 @@ source_set("impl") {
     "//chrome/browser:browser_features",
     "//chrome/browser:browser_process",
     "//chrome/browser:defaults",
-    "//chrome/browser/actor",
     "//chrome/browser/devtools",
     "//chrome/browser/first_run",
     "//chrome/browser/headless",

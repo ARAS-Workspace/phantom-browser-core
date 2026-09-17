@@ -18,7 +18,6 @@
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
 #include "build/build_config.h"
-#include "chrome/browser/actor/actor_task.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller.h"
 #include "chrome/browser/ui/autofill/payments/chrome_payments_autofill_client.h"
@@ -80,7 +79,6 @@ class AutofillDialogController;
 class TouchToFillAutofillController;
 #endif
 
-class ActorKeyMetricsRecorder;
 class AutofillAiPersonalContextAccessManager;
 class AutofillOptimizationGuideDecider;
 class EmailVerificationPopupController;
@@ -216,8 +214,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
       AutofillSuggestionsIgnoreFocusLoss ignore_focus_loss) final;
   void HideSuggestions(SuggestionHidingReason reason,
                        std::optional<FillingProduct> product) final;
-  void OpenGeminiInSidebar(const std::u16string& prompt) final;
-  bool IsGlicEnabled() const final;
   void TriggerUserPerceptionOfAutofillSurvey(
       FillingProduct filling_product,
       const std::map<std::string, std::string>& field_filling_stats_data) final;
@@ -227,8 +223,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
       EntityType entity_type,
       const base::flat_set<EntityTypeName>& saved_entities,
       const FieldTypeSet& triggering_field_types) final;
-  bool IsTabInActorMode() const final;
-  ActorKeyMetricsRecorder* GetActorKeyMetricsRecorder() final;
   bool IsAutofillEnabled() const final;
   bool IsAutofillProfileEnabled() const final;
   bool IsAutofillTypeBlockedByPolicy(
@@ -393,11 +387,6 @@ class ChromeAutofillClient : public ContentAutofillClient {
       base::WeakPtr<AutofillSuggestionDelegate> delegate,
       FieldGlobalId expected_field_id);
 
-  // Called when an actor task is created or an existing one changes state. It
-  // may be called for actors unrelated to the current tab. If an update is
-  // related to the current tab.
-  void OnActorTaskStateChange(actor::ActorTask& task);
-
   const raw_ptr<LogRouter> log_router_ =
       AutofillLogRouterFactory::GetForBrowserContext(
           GetWebContents().GetBrowserContext());
@@ -453,17 +442,7 @@ class ChromeAutofillClient : public ContentAutofillClient {
   std::unique_ptr<EmailVerifierDelegate> email_verifier_delegate_;
   std::unique_ptr<ChromeOtpPhishGuardDelegate> otp_phish_guard_delegate_;
 
-  // Removes the subscription when the `ChromeAutofillClient` is destroyed.
-  base::CallbackListSubscription actor_task_state_changed_subscription_;
-
-  // Responsible for keeping track if (and which) actor is interacting with
-  // the current tab. When present, some parts of Autofill may behave
-  // differently. There can be at most one actor on a given tab. If there is no
-  // actor interacting with the current tab it is `std::nullopt`.
-  std::optional<actor::TaskId> active_actor_task_;
-
   std::unique_ptr<FormPredictionsTracker> form_predictions_tracker_;
-  std::unique_ptr<ActorKeyMetricsRecorder> actor_key_metrics_recorder_;
 
   AtMemoryCopyPasteObserver at_memory_copy_paste_observer_{this};
 

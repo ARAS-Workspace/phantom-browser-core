@@ -13,7 +13,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "components/autofill/content/browser/content_autofill_client.h"
 #include "components/autofill/content/browser/content_autofill_driver.h"
-#include "components/autofill/content/browser/integrators/actor/autofill_annotations_provider_impl.h"
 #include "components/autofill/core/browser/foundations/browser_autofill_manager.h"
 #include "components/autofill/core/browser/payments/autofill_offer_manager.h"
 #include "components/autofill/core/browser/payments/payments_autofill_client.h"
@@ -90,11 +89,7 @@ void ContentAutofillDriverFactory::BindAutofillDriver(
 ContentAutofillDriverFactory::ContentAutofillDriverFactory(
     content::WebContents* web_contents,
     ContentAutofillClient* client)
-    : content::WebContentsObserver(web_contents), client_(*client) {
-  optimization_guide::AutofillAnnotationsProviderImpl::SetFor(
-      web_contents,
-      std::make_unique<optimization_guide::AutofillAnnotationsProviderImpl>());
-}
+    : content::WebContentsObserver(web_contents), client_(*client) {}
 
 ContentAutofillDriverFactory::~ContentAutofillDriverFactory() {
   for (auto& observer : observers()) {

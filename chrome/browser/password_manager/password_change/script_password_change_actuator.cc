@@ -359,10 +359,7 @@ void ScriptPasswordChangeActuator::ReportFlowInterruption(
 
   if (form_submission_helper_) {
     logs_uploader_->SetFlowInterrupted(
-        form_submission_helper_->IsPasswordFormSubmitted()
-            ? FlowStep::PasswordChangeRequest_FlowStep_VERIFY_SUBMISSION_STEP
-            : FlowStep::PasswordChangeRequest_FlowStep_SUBMIT_FORM_STEP,
-        status);
+        FlowStep::PasswordChangeRequest_FlowStep_SUBMIT_FORM_STEP, status);
     return;
   }
 

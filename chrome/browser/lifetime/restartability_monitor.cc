@@ -9,9 +9,6 @@
 #include <utility>
 
 #include "chrome/browser/download/download_core_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service_factory.h"
-#include "chrome/browser/glic/public/service/glic_instance_coordinator.h"
 #include "chrome/browser/metrics/desktop_session_duration/desktop_session_duration_tracker.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -223,15 +220,6 @@ void AddTabBlockers(content::WebContents* contents,
       web_app::WebAppTabHelper::FromWebContents(contents);
   if (web_app_helper && web_app_helper->is_in_app_window()) {
     state.AddBlocker(Blocker::kWebApp);
-  }
-
-  auto* glic_service = glic::GlicKeyedServiceFactory::GetGlicKeyedService(
-      contents->GetBrowserContext());
-  auto* tab_interface = tabs::TabInterface::MaybeGetFromContents(contents);
-  if (glic_service && tab_interface &&
-      glic_service->instance_coordinator().IsTabPinnedToAnyInstance(
-          tab_interface->GetHandle())) {
-    state.AddBlocker(Blocker::kGlicShared);
   }
 
   auto* lens_controller = LensOverlayController::FromTabWebContents(contents);

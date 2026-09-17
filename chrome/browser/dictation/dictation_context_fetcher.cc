@@ -11,7 +11,6 @@
 #include "base/memory/weak_ptr.h"
 #include "chrome/browser/dictation/logging.h"
 #include "chrome/browser/dictation/target.h"
-#include "chrome/browser/glic/host/guest_util.h"
 #include "chrome/browser/page_content_annotations/multi_source_page_context_fetcher.h"
 #include "chrome/browser/ui/tabs/page_context_eligibility_helper.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
@@ -113,17 +112,6 @@ void DictationContextFetcher::Fetch(const Target& target,
   content::WebContents* web_contents =
       content::WebContents::FromRenderFrameHost(rfh);
   if (!web_contents) {
-    DictationContext context;
-    std::move(callback).Run(std::move(context));
-    return;
-  }
-
-  if (glic::IsGlicGuest(web_contents)) {
-    // TODO(b/535731618): Straightforward context fetch appears to never return
-    // and needs more investigation. For now, just eliding context is better
-    // than breaking the feature. (Also, we probably want to include the web
-    // page content _in addition to_ the side panel content since that's likely
-    // relevant for speech biasing)
     DictationContext context;
     std::move(callback).Run(std::move(context));
     return;

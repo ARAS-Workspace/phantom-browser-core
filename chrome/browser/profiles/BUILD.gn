@@ -696,9 +696,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/file_system_access",
     "//chrome/browser/finds",
     "//chrome/browser/first_party_sets",
-    "//chrome/browser/glic",
-    "//chrome/browser/glic/browser_ui",
-    "//chrome/browser/glic/suggestions",
     "//chrome/browser/heavy_ad_intervention",
     "//chrome/browser/hid",
     "//chrome/browser/history",
@@ -725,7 +722,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/page_info",
     "//chrome/browser/passage_embeddings",
     "//chrome/browser/password_manager",
-    "//chrome/browser/password_manager/actor_login:factories",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/payments",
     "//chrome/browser/payments/browser_binding:browser_bound_key_deleter",
@@ -762,7 +758,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/sessions",
     "//chrome/browser/signin",
     "//chrome/browser/site_token_provider",
-    "//chrome/browser/skills",
     "//chrome/browser/speech",
     "//chrome/browser/ssl",
     "//chrome/browser/storage",
@@ -1054,7 +1049,6 @@ source_set("unit_tests") {
     "//chrome/browser:global_features",
   ]
   if (!is_android) {
-    deps += [ "//chrome/browser/glic/test_support" ]
   }
 
   if (!is_android) {
@@ -1064,7 +1058,6 @@ source_set("unit_tests") {
       "profile_statistics_aggregator_unittest.cc",
     ]
     deps += [
-      "//chrome/browser/glic/test_support",
       "//chrome/browser/ui/browser_window/test:test_support",
       "//chrome/browser/ui/tabs:test_support",
     ]

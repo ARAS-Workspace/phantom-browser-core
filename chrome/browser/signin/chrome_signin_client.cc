@@ -59,7 +59,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/primary_account_change_event.h"
 #include "components/site_token_provider/features.h"
-#include "components/skills/features.h"
 #include "components/version_info/channel.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/storage_partition.h"
@@ -189,28 +188,15 @@ class ChromeOAuthConsumerRegistry : public signin::OAuthConsumerRegistry {
   }
 
   signin::OAuthConsumer GetOAuthConsumerForGlicUserStatus() const override {
-    CHECK(base::FeatureList::IsEnabled(features::kGlicUserStatusCheck));
-    return signin::OAuthConsumer(
-        signin::oauth_consumer_name::kGlicUserStatusName,
-        {features::kGeminiOAuth2Scope.Get()});
+    NOTREACHED();
   }
 
   signin::OAuthConsumer GetOAuthConsumerForGlicInvokeApi() const override {
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-    return signin::OAuthConsumer(
-        signin::oauth_consumer_name::kGlicInvokeApiName,
-        {extensions_features::kGlicInvokeApiOAuth2ScopeParam.Get()});
-#else
     NOTREACHED();
-#endif
   }
 
   signin::OAuthConsumer GetOAuthConsumerForSkillsService() const override {
-    CHECK(base::FeatureList::IsEnabled(features::kSkillsEnabled));
-    CHECK(base::FeatureList::IsEnabled(features::kSkillsServiceApi));
-    return signin::OAuthConsumer(
-        signin::oauth_consumer_name::kSkillsServiceName,
-        {features::kSkillsServiceApiOAuth2Scope.Get()});
+    NOTREACHED();
   }
 
   signin::OAuthConsumer GetOAuthConsumerForContextualTasks() const override {

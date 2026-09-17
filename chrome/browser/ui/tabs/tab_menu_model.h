@@ -83,9 +83,6 @@ class TabMenuModel : public ui::SimpleMenuModel {
   void BuildForWebApp(int index);
   void BuildSendTabToSelfSubmenu(int index, const std::vector<int>& indices);
   void BuildLegacySendTabToSelfItem();
-  void AppendGlicItems(int index,
-                       int num_tabs,
-                       const std::vector<int>& indices);
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   // Support for appending and executing commands for extension items in the
@@ -102,7 +99,6 @@ class TabMenuModel : public ui::SimpleMenuModel {
   std::unique_ptr<ui::SimpleMenuModel> swap_with_split_submenu_;
   std::unique_ptr<ui::SimpleMenuModel> split_layout_submenu_;
   std::unique_ptr<ui::SimpleMenuModel> arrange_split_view_submenu_;
-  std::unique_ptr<ui::SimpleMenuModel> glic_tab_sub_menu_model_;
   std::unique_ptr<ui::SimpleMenuModel> send_tab_to_self_submenu_;
   std::unique_ptr<send_tab_to_self::SendTabToSelfContextMenuDelegate>
       send_tab_to_self_submenu_delegate_;

@@ -705,8 +705,6 @@ source_set("core") {
     "//base/allocator:buildflags",
     "//build/config/linux/dbus:buildflags",
     "//chrome/browser/accessibility",
-    "//chrome/browser/actor",
-    "//chrome/browser/actor:impl",
     "//chrome/browser/ai",
     "//chrome/browser/app_mode",
     "//chrome/browser/autocomplete:aim_eligibility_service",
@@ -735,9 +733,6 @@ source_set("core") {
     "//chrome/browser/finds/core",
     "//chrome/browser/first_party_sets",
     "//chrome/browser/first_run",
-    "//chrome/browser/glic",
-    "//chrome/browser/glic:impl",
-    "//chrome/browser/glic/public:features",
     "//chrome/browser/google",
     "//chrome/browser/gpu",
     "//chrome/browser/headless",
@@ -844,7 +839,6 @@ source_set("core") {
     "//chrome/browser/ui/webui:chrome_web_ui_controller_factory",
     "//chrome/browser/ui/webui:configs",
     "//chrome/browser/ui/webui:log_web_ui_url",
-    "//chrome/browser/ui/webui/actor_internals",
     "//chrome/browser/ui/webui/bluetooth_internals",
     "//chrome/browser/ui/webui/bluetooth_internals:mojo_bindings",
     "//chrome/browser/ui/webui/chrome_finds_internals",
@@ -877,8 +871,6 @@ source_set("core") {
     "//chrome/browser/webid",
     "//chrome/common:version_header",
     "//components/activity_reporter",
-    "//components/actor/core",
-    "//components/actor/public/mojom:mojo_bindings",
     "//components/application_locale_storage",
     "//components/blocked_content",
     "//components/breadcrumbs/core",
@@ -985,7 +977,6 @@ source_set("core") {
     "//components/sessions",
     "//components/site_engagement/core/mojom:mojo_bindings",
     "//components/site_isolation",
-    "//components/skills:features",
     "//components/spellcheck:buildflags",
     "//components/startup_metric_utils",
     "//components/strike_database:features",
@@ -1508,7 +1499,6 @@ source_set("core") {
   }
 
   if ((!is_android || enable_webui_ntp) && toolkit_views) {
-    deps += [ "//chrome/browser/ui/webui/skills" ]
   }
 
   if (enable_pdf) {
@@ -1702,8 +1692,6 @@ source_set("browser") {
     "//chrome/browser/autofill",
     "//chrome/browser/background",
     "//chrome/browser/background:impl",
-    "//chrome/browser/background/glic",
-    "//chrome/browser/background/glic:impl",
     "//chrome/browser/background_fetch",
     "//chrome/browser/background_fetch:impl",
     "//chrome/browser/background_sync",
@@ -1774,11 +1762,6 @@ source_set("browser") {
     "//chrome/browser/first_party_sets:impl",
     "//chrome/browser/geolocation",
     "//chrome/browser/geolocation:impl",
-    "//chrome/browser/glic",
-    "//chrome/browser/glic:impl",
-    "//chrome/browser/glic/browser_ui:glow_impl",
-    "//chrome/browser/glic/suggestions",
-    "//chrome/browser/glic/suggestions:impl",
     "//chrome/browser/heavy_ad_intervention",
     "//chrome/browser/hid",
     "//chrome/browser/hid:impl",
@@ -1906,7 +1889,6 @@ source_set("browser") {
     "//chrome/browser/share:impl",
     "//chrome/browser/signin",
     "//chrome/browser/signin:impl",
-    "//chrome/browser/skills",
     "//chrome/browser/ssl",
     "//chrome/browser/ssl:impl",
     "//chrome/browser/status_icons",
@@ -1989,8 +1971,6 @@ source_set("browser") {
 
     # TODO(crbug.com/417228688): Remove this dependency when
     # c/b/profiles/profile_manager.h gets modularized.
-    "//chrome/browser/actor",
-    "//chrome/browser/actor:impl",
     "//chrome/browser/language_detection",
     "//chrome/browser/language_detection:impl",
     "//chrome/browser/loader",
@@ -2199,7 +2179,6 @@ source_set("browser") {
     "//components/site_engagement/content",
     "//components/site_engagement/core/mojom:mojo_bindings",
     "//components/site_isolation",
-    "//components/skills:features",
     "//components/sqlite_proto",
     "//components/startup_metric_utils",
     "//components/storage_monitor",
@@ -2407,8 +2386,6 @@ source_set("browser") {
     #!is_android
     deps += [
       "//chrome/app/theme:chrome_unscaled_resources_grit",
-      "//chrome/browser/actor/ui",
-      "//chrome/browser/actor/ui:window_controller_impl",
       "//chrome/browser/apps/app_service",
       "//chrome/browser/apps/app_service/publishers",
       "//chrome/browser/apps/link_capturing",
@@ -2671,7 +2648,6 @@ source_set("browser") {
 
   if (is_linux || is_win || is_mac) {
     deps += [
-      "//chrome/browser/ui/webui/skills:mojo_bindings",
       "//components/device_signals/core/browser",
       "//components/policy/proto",
       "//components/power_metrics",
@@ -2741,8 +2717,6 @@ source_set("browser") {
 
   if (is_win || is_mac || is_linux) {
     deps += [
-      "//chrome/browser/ui/webui/ai_overlay_dialog:impl",
-      "//chrome/browser/ui/webui/ai_overlay_dialog:mojo_bindings",
     ]
   }
 
@@ -3243,8 +3217,6 @@ group("browser_generated_files") {
   }
   if (is_win || is_mac || is_linux) {
     public_deps += [
-      "//chrome/browser/ui/webui/ai_overlay_dialog:mojo_bindings",
-      "//chrome/browser/ui/webui/skills:mojo_bindings",
       "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
     ]
   }
@@ -3686,7 +3658,6 @@ if (!is_android) {
       "//chrome/browser/custom_handlers",
       "//chrome/browser/devtools:test_support",
       "//chrome/browser/enterprise/connectors/test:test_support",
-      "//chrome/browser/glic/test_support",
       "//chrome/browser/login_detection",
       "//chrome/browser/pdf:pdf_extension_test_utils",
       "//chrome/browser/policy:test_support",

@@ -5,7 +5,6 @@
 #include "chrome/browser/ui/views/user_education/impl/browser_feature_promo_preconditions.h"
 
 #include "base/time/default_clock.h"
-#include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_dialog_service_factory.h"
@@ -51,8 +50,6 @@ DEFINE_FEATURE_PROMO_PRECONDITION_IDENTIFIER_VALUE(
 DEFINE_FEATURE_PROMO_PRECONDITION_IDENTIFIER_VALUE(kUserNotActivePrecondition);
 DEFINE_FEATURE_PROMO_PRECONDITION_IDENTIFIER_VALUE(
     kEnterprisePolicyNotBlockingPrecondition);
-DEFINE_FEATURE_PROMO_PRECONDITION_IDENTIFIER_VALUE(
-    kActorNotActuatingActiveTabPrecondition);
 
 WindowActivePrecondition::WindowActivePrecondition()
     : FeaturePromoPreconditionBase(kWindowActivePrecondition,
@@ -257,28 +254,4 @@ EnterprisePolicyNotBlockingPrecondition::CheckPrecondition(
   return DoesEnterprisePolicyBlockPromotions()
              ? user_education::FeaturePromoResult::kBlockedByContext
              : user_education::FeaturePromoResult::Success();
-}
-
-ActorNotActuatingActiveTabPrecondition::ActorNotActuatingActiveTabPrecondition(
-    BrowserWindowInterface& browser_window_interface)
-    : FeaturePromoPreconditionBase(kActorNotActuatingActiveTabPrecondition,
-                                   "Active tab is not being actuated"),
-      browser_window_interface_(browser_window_interface) {}
-
-ActorNotActuatingActiveTabPrecondition::
-    ~ActorNotActuatingActiveTabPrecondition() = default;
-
-user_education::FeaturePromoResult
-ActorNotActuatingActiveTabPrecondition::CheckPrecondition(
-    user_education::UnownedTypedDataCollection&) const {
-  auto* tab = browser_window_interface_->GetActiveTabInterface();
-  if (!tab) {
-    return user_education::FeaturePromoResult::Success();
-  }
-  auto* actor_service =
-      actor::ActorKeyedService::Get(browser_window_interface_->GetProfile());
-  if (actor_service && actor_service->IsActiveOnTab(*tab)) {
-    return user_education::FeaturePromoResult::kBlockedByUi;
-  }
-  return user_education::FeaturePromoResult::Success();
 }

@@ -33,8 +33,6 @@
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
 #include "chrome/browser/finds/core/finds_service.h"
 #include "chrome/browser/first_run/first_run.h"
-#include "chrome/browser/glic/glic_pref_names.h"
-#include "chrome/browser/glic/suggestions/contextual_cueing_prefs.h"
 #include "chrome/browser/gpu/gpu_mode_manager.h"
 #include "chrome/browser/hid/hid_policy_allowed_devices.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
@@ -187,7 +185,6 @@
 #include "components/signin/public/base/signin_prefs.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/site_engagement/content/site_engagement_service.h"
-#include "components/skills/public/skills_prefs.h"
 #include "components/subresource_filter/content/browser/ruleset_service.h"
 #include "components/subresource_filter/core/common/constants.h"
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
@@ -287,7 +284,6 @@
 #endif  // BUILDFLAG(IS_ANDROID)
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/actor/ui/actor_ui_state_manager_prefs.h"
 #include "chrome/browser/desktop_to_mobile_promos/promos_utils.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/intranet_redirect_detector.h"
 #include "chrome/browser/media/router/discovery/access_code/access_code_cast_feature.h"
@@ -1299,8 +1295,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 
   registry->RegisterIntegerPref(prefs::kChromeDataRegionSetting, 0);
 
-  glic::prefs::RegisterLocalStatePrefs(registry);
-
   registry->RegisterIntegerPref(prefs::kToastAlertLevel, 0);
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -1370,8 +1364,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   dom_distiller::DistilledPagePrefs::RegisterProfilePrefs(registry);
   DownloadPrefs::RegisterProfilePrefs(registry);
   finds::FindsService::RegisterProfilePrefs(registry);
-  glic::prefs::RegisterProfilePrefs(registry);
-  glic::contextual_cueing::prefs::RegisterProfilePrefs(registry);
   permissions::PermissionHatsTriggerHelper::RegisterProfilePrefs(registry);
   history_clusters::prefs::RegisterProfilePrefs(registry);
   HostContentSettingsMap::RegisterProfilePrefs(registry);
@@ -1454,7 +1446,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   SessionStartupPref::RegisterProfilePrefs(registry);
   SigninPrefs::RegisterProfilePrefs(registry);
   site_engagement::SiteEngagementService::RegisterProfilePrefs(registry);
-  skills::prefs::RegisterProfilePrefs(registry);
   subscription_eligibility::prefs::RegisterProfilePrefs(registry);
   supervised_user::RegisterProfilePrefs(registry);
   sync_sessions::SessionSyncPrefs::RegisterProfilePrefs(registry);
@@ -1661,8 +1652,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   tabs::RegisterProfilePrefs(registry);
 
   CertificateManagerPageHandler::RegisterProfilePrefs(registry);
-
-  actor::ui::RegisterProfilePrefs(registry);
 
   organizer::RegisterProfilePrefs(registry);
 #endif  // !BUILDFLAG(IS_ANDROID)

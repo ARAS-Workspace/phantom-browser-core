@@ -16,7 +16,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/extensions/api/pdf_viewer_private.h"
 #include "chrome/grit/browser_resources.h"
@@ -461,12 +460,6 @@ bool ShouldShowGlicSummarizeButton(content::WebContents* web_contents) {
         return false;
       }
     }
-  }
-
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-  if (!glic::GlicEnabling::IsEnabledForProfile(profile)) {
-    return false;
   }
 
   auto* tab_interface = tabs::TabInterface::MaybeGetFromContents(web_contents);

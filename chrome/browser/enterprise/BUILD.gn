@@ -400,7 +400,6 @@ source_set("impl") {
     "//chrome/browser/enterprise/connectors/reporting:impl",
     "//chrome/browser/enterprise/core",
     "//chrome/browser/enterprise/platform_auth:features",
-    "//chrome/browser/glic",
     "//chrome/browser/image_fetcher",
     "//chrome/browser/interstitials",
     "//chrome/browser/net",

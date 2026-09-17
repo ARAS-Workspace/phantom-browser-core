@@ -23,14 +23,12 @@
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/command_updater.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/performance_manager/public/user_tuning/user_tuning_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profiles_state.h"
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
-#include "chrome/browser/ui/ai_overlay_dialog/ai_overlay_dialog_controller.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_actions.h"
 #include "chrome/browser/ui/browser_command_controller.h"
@@ -469,22 +467,6 @@ void ToolbarView::Init() {
     media_button_ = toolbar_webview_->GetMediaToolbarButton();
   } else if (media_button) {
     media_button_ = AddChildView(std::move(media_button));
-  }
-
-  if (glic::GlicEnabling::IsProfileEligible(browser_view_->GetProfile())) {
-    if (base::FeatureList::IsEnabled(features::kAiOverlayDialog) &&
-        ttc::AiOverlayDialogController::From(browser_)) {
-      actions::ActionItem* action_item =
-          actions::ActionManager::Get().FindAction(
-              kActionShowAiOverlayDialog,
-              browser_->GetFeatures().browser_actions()->root_action_item());
-      if (action_item) {
-        action_item->SetVisible(true);
-        action_item->SetEnabled(true);
-        PinnedToolbarActionsModel::Get(browser_->GetProfile())
-            ->UpdatePinnedState(kActionShowAiOverlayDialog, true);
-      }
-    }
   }
 
   if (!features::IsWebUIAvatarButtonEnabled()) {

@@ -35,13 +35,6 @@ class DefaultBrowserManager;
 }  // namespace default_browser
 #endif
 
-namespace glic {
-class GlicBackgroundModeManager;
-class GlicGlobalEnabling;
-class GlicProfileManager;
-class GlicSyntheticTrialManager;
-}  // namespace glic
-
 namespace omnibox_everywhere {
 class OmniboxEverywhereController;
 }
@@ -151,29 +144,12 @@ class GlobalFeatures {
     return whats_new_registry_.get();
   }
 #endif
-
-  glic::GlicProfileManager* glic_profile_manager() {
-    return glic_profile_manager_.get();
-  }
-#if !BUILDFLAG(IS_ANDROID)
-  glic::GlicBackgroundModeManager* glic_background_mode_manager() {
-    return glic_background_mode_manager_.get();
-  }
-#endif
 #if !BUILDFLAG(IS_ANDROID)
   omnibox_everywhere::OmniboxEverywhereController*
   omnibox_everywhere_controller() {
     return omnibox_everywhere_controller_.get();
   }
 #endif
-
-  glic::GlicSyntheticTrialManager* glic_synthetic_trial_manager() {
-    return synthetic_trial_manager_.get();
-  }
-
-  glic::GlicGlobalEnabling& glic_global_enabling() {
-    return *glic_global_enabling_.get();
-  }
 
   ApplicationLocaleStorage* application_locale_storage() {
     return application_locale_storage_.get();
@@ -244,15 +220,10 @@ class GlobalFeatures {
       default_browser_manager_;
 #endif
 
-  std::unique_ptr<glic::GlicGlobalEnabling> glic_global_enabling_;
-  std::unique_ptr<glic::GlicProfileManager> glic_profile_manager_;
 #if !BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<glic::GlicBackgroundModeManager>
-      glic_background_mode_manager_;
   std::unique_ptr<omnibox_everywhere::OmniboxEverywhereController>
       omnibox_everywhere_controller_;
 #endif
-  std::unique_ptr<glic::GlicSyntheticTrialManager> synthetic_trial_manager_;
 
   std::unique_ptr<ApplicationLocaleStorage> application_locale_storage_;
 

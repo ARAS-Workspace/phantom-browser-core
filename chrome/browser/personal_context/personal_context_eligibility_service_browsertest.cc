@@ -19,7 +19,6 @@
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "components/account_settings/mock_account_setting_service.h"
-#include "components/glic/glic_pref_names.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/personal_context/core/country_type.h"
 #include "components/personal_context/core/personal_context_debug_features.h"

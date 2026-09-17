@@ -77,8 +77,6 @@ source_set("impl") {
   public_deps = [ ":user_education" ]
 
   deps = [
-    "//chrome/browser/actor",
-    "//chrome/browser/background/glic",
     "//chrome/browser/desktop_to_mobile_promos:utils",
     "//chrome/browser/devtools",
     "//chrome/browser/profiles",
@@ -255,7 +253,6 @@ source_set("interactive_ui_tests") {
     ":impl",
     ":user_education",
     "//chrome/browser:chrome_content_browser_client",
-    "//chrome/browser/actor:test_support",
     "//chrome/browser/apps/app_service:app_registry_cache_waiter",
     "//chrome/browser/banners:test_support",
     "//chrome/browser/profiles:profile",

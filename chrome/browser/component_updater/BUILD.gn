@@ -122,7 +122,6 @@ source_set("impl") {
     "//chrome/browser:browser_features",
     "//chrome/browser:browser_process",
     "//chrome/browser/accessibility",
-    "//chrome/browser/actor:impl",
     "//chrome/browser/ai",
     "//chrome/browser/history_embeddings",
     "//chrome/browser/media",
@@ -182,7 +181,6 @@ source_set("impl") {
       "zxcvbn_data_component_installer.cc",
     ]
     deps += [
-      "//chrome/browser/actor:impl",
       "//chrome/browser/dictation",
       "//chrome/browser/new_tab_page",
       "//chrome/browser/ui/read_anything",

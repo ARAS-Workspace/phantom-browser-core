@@ -7,7 +7,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "chrome/common/chrome_render_frame.mojom.h"
-#include "components/actor/public/mojom/actor_types.mojom-forward.h"
 #include "components/optimization_guide/core/model_quality/model_quality_log_entry.h"
 #include "components/optimization_guide/core/model_quality/model_quality_logs_uploader_service.h"
 
@@ -94,11 +93,6 @@ class ModelQualityLogsUploader {
   // Marks a flow step as skipped, indicating no
   // model call was made for this step.
   void MarkStepSkipped(FlowStep step);
-
-  // To be called if element to click was not found
-  // in Step=OPEN_FORM_STEP.
-  void RecordButtonClickFailure(FlowStep step,
-                                actor::mojom::ActionResultCode failure);
 
   // Called when the leak check is shown to the user. Sets information about the
   // password form which triggered the leak check.

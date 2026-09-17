@@ -9,7 +9,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/trace_event/trace_event.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -117,9 +116,6 @@ TabSearchUI::TabSearchUI(content::WebUI* web_ui)
 
   source->AddInteger("recentlyClosedDefaultItemDisplayCount",
                      TabSearchPageHandler::kMinRecentlyClosedItemDisplayCount);
-
-  source->AddResourcePath("alert_indicators/tab_media_glic_active.svg",
-                          IDR_GLIC_TAB_MEDIA_GLIC_ACTIVE);
 
   ui::Accelerator accelerator(ui::VKEY_A,
                               ui::EF_SHIFT_DOWN | ui::EF_PLATFORM_ACCELERATOR);

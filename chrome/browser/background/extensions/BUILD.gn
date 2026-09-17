@@ -56,7 +56,6 @@ source_set("impl") {
     "//chrome/browser:browser_public_dependencies",
     "//chrome/browser/background",
     "//chrome/browser/extensions",
-    "//chrome/browser/glic",
     "//chrome/browser/lifetime",
     "//chrome/browser/lifetime:termination_notification",
     "//chrome/browser/profiles:profile_manager",

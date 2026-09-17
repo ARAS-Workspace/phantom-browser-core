@@ -19,7 +19,6 @@ source_set("password_manager") {
   ]
 
   public_deps = [
-    "//chrome/browser/actor",
     "//chrome/browser/password_manager/factories",
 
     # deps for public headers
@@ -116,7 +115,6 @@ source_set("password_manager") {
       # TODO(crbug.com/485620841): Make delegate not dependent on client and
       # move this back to /password_change.
       "password_change/password_change_actuator.h",
-      "password_change/password_change_from_checkup_delegate.h",
       "remote_actor/remote_actor_credential_sharing_impl.h",
       "web_app_profile_switcher.h",
     ]
@@ -148,14 +146,12 @@ source_set("impl") {
   ]
 
   deps = [
-    "//chrome/browser/actor",
     "//chrome/browser/affiliations",
     "//chrome/browser/autofill",
     "//chrome/browser/critical_actions",
     "//chrome/browser/device_reauth",
     "//chrome/browser/enterprise/connectors/reporting",
     "//chrome/browser/favicon",
-    "//chrome/browser/glic",
     "//chrome/browser/history",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile",
@@ -242,9 +238,6 @@ source_set("impl") {
     ]
   } else {
     sources += [
-      "password_change/glic_password_change_actuator.cc",
-      "password_change/glic_password_change_actuator.h",
-      "password_change/password_change_from_checkup_delegate.cc",
       "password_change/script_password_change_actuator.cc",
       "password_change/script_password_change_actuator.h",
       "password_change_delegate_impl.cc",
@@ -253,7 +246,6 @@ source_set("impl") {
       "web_app_profile_switcher.cc",
     ]
     deps += [
-      "//chrome/browser/glic/actor",
       "//chrome/browser/password_manager/password_change",
       "//chrome/browser/password_manager/remote_actor",
       "//chrome/browser/ui/passwords",
@@ -262,7 +254,6 @@ source_set("impl") {
       "//chrome/browser/ui/user_education",
       "//chrome/browser/ui/web_applications",
       "//chrome/browser/web_applications",
-      "//components/password_manager/core/browser/actor_login:actor_login_service_impl",
     ]
   }
 
@@ -489,7 +480,6 @@ source_set("unit_tests") {
     ]
   } else {
     sources += [
-      "password_change/password_change_from_checkup_delegate_unittest.cc",
       "password_change/script_password_change_actuator_unittest.cc",
       "password_change_delegate_impl_unittest.cc",
       "remote_actor/remote_actor_credential_sharing_impl_unittest.cc",
@@ -538,7 +528,6 @@ if (!is_android) {
     sources = [
       "credential_manager_browsertest.cc",
       "password_change_browsertest.cc",
-      "password_change_from_checkup_browsertest.cc",
       "password_manager_browsertest.cc",
       "remote_actor/remote_actor_credential_sharing_browsertest.cc",
     ]
@@ -549,11 +538,7 @@ if (!is_android) {
       "//base",
       "//base/test:test_support",
       "//chrome/browser:browser_process",
-      "//chrome/browser/actor",
-      "//chrome/browser/actor:test_support",
       "//chrome/browser/affiliations",
-      "//chrome/browser/glic",
-      "//chrome/browser/glic/test_support",
       "//chrome/browser/optimization_guide",
       "//chrome/browser/optimization_guide:test_support",
       "//chrome/browser/password_manager",

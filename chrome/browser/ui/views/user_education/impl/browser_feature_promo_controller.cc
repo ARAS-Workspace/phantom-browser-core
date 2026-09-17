@@ -68,11 +68,6 @@ void BrowserFeaturePromoController::AddPreconditionProviders(
               kNoCriticalNoticeShowingPrecondition));
 
           const auto info = policy->GetPromoPriorityInfo(spec);
-          if (info.priority != Priority::kHigh) {
-            preconditions.AddPrecondition(
-                browser_context->GetSharedPrecondition(
-                    kActorNotActuatingActiveTabPrecondition));
-          }
           if (info.priority == Priority::kLow &&
               spec.promo_type() != user_education::FeaturePromoSpecification::
                                        PromoType::kToast) {

@@ -27,7 +27,6 @@ static_library("impl") {
   deps = [
     ":record_replay",
     "//base",
-    "//chrome/browser/glic",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui:simple_message_box_headers",
     "//chrome/browser/ui/tabs",
@@ -48,15 +47,12 @@ source_set("unit_tests") {
   testonly = true
   sources = [
     "chrome_record_replay_client_unittest.cc",
-    "task_executor_unittest.cc",
     "task_service_factory_unittest.cc",
   ]
   deps = [
     ":impl",
     ":record_replay",
     "//base/test:test_support",
-    "//chrome/browser/glic",
-    "//chrome/browser/glic/test_support",
     "//chrome/test:test_support",
     "//components/record_replay/content/browser",
     "//components/record_replay/core/browser",

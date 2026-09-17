@@ -27,8 +27,7 @@ class TaskDiscoveryService {
     std::string instructions;
 
     // The tooltip message text shown anchored to the entry point button.
-    // Note: The feature flag `glic::kUseAnchoredMessage` must be enabled for
-    // this to be visible and auto-submit the instructions.
+      // this to be visible and auto-submit the instructions.
     std::string anchored_message;
   };
 

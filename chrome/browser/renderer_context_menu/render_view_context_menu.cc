@@ -58,15 +58,6 @@
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/download/download_stats.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_clipboard_utils.h"
-#include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
-#include "chrome/browser/glic/host/guest_util.h"
-#include "chrome/browser/glic/public/features.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_invoke_options.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service_factory.h"
-#include "chrome/browser/glic/public/glic_passkeys.h"
-#include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
 #include "chrome/browser/language/language_model_manager_factory.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_features.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service.h"
@@ -376,28 +367,6 @@ base::OnceCallback<void(RenderViewContextMenu*)>* GetMenuShownCallback() {
 
 // This IDC_ "value" is a sentinel for the UMA max value.
 constexpr int kUmaMaxValueKey = 0;
-
-// LINT.IfChange(GlicWebContentsContextMenuResult)
-enum class GlicWebContentsContextMenuResult {
-  kShownAndIgnored = 0,
-  kExecuted = 1,
-  kMaxValue = kExecuted,
-};
-// LINT.ThenChange(//tools/metrics/histograms/metadata/glic/enums.xml:GlicWebContentsContextMenuResult)
-
-std::string GetGlicWebContentsContextToken(
-    const content::ContextMenuParams& params) {
-  if (params.selection_text.empty() && params.link_url.is_empty()) {
-    return "Page";
-  }
-  if (!params.selection_text.empty() && !params.link_url.is_empty()) {
-    return "TextSelectionWithLink";
-  }
-  if (!params.link_url.is_empty()) {
-    return "Link";
-  }
-  return "TextSelection";
-}
 
 ui::ImageModel GetLensContextMenuIcon() {
 #if BUILDFLAG(IS_MAC)
@@ -868,10 +837,6 @@ bool IsLensOptionEnteredThroughKeyboard(int event_flags) {
 
 bool IsGlicWindow(const RenderViewContextMenu* menu,
                   content::BrowserContext* browser_context) {
-  if (glic::GlicEnabling::IsEnabledByGlobalCriteria()) {
-    return glic::GetGlicGuestWebContents(
-               menu->GetWebContents()->GetOuterWebContents()) != nullptr;
-  }
   return false;
 }
 
@@ -991,22 +956,6 @@ RenderViewContextMenu::RenderViewContextMenu(
 RenderViewContextMenu::~RenderViewContextMenu() = default;
 
 void RenderViewContextMenu::MenuClosed(ui::SimpleMenuModel* source) {
-  if (source == &menu_model_) {
-    if (glic_item_shown_) {
-      std::string token = GetGlicWebContentsContextToken(params_);
-      if (glic_item_executed_) {
-        base::UmaHistogramEnumeration(
-            base::StrCat({"Glic.WebContentsContextMenu.", token}),
-            GlicWebContentsContextMenuResult::kExecuted);
-      } else {
-        base::UmaHistogramEnumeration(
-            base::StrCat({"Glic.WebContentsContextMenu.", token}),
-            GlicWebContentsContextMenuResult::kShownAndIgnored);
-      }
-    }
-    glic_item_shown_ = false;
-    glic_item_executed_ = false;
-  }
   RenderViewContextMenuBase::MenuClosed(source);
 }
 
@@ -1267,7 +1216,7 @@ void RenderViewContextMenu::InitMenu() {
   show_glic = show_glic && !use_simplified_menu_for_text_selection;
 
   const bool glic_below_search =
-      base::FeatureList::IsEnabled(features::kGlicContextMenuBelowSearch);
+      false;
 
   if (show_glic && !glic_below_search) {
     MaybeAppendOpenGlicItem(/*add_separator=*/false);
@@ -1297,11 +1246,6 @@ void RenderViewContextMenu::InitMenu() {
       !(features::IsMenuSimplificationEnabled() && editable) &&
       content_type_->SupportsGroup(ContextMenuContentType::ITEM_GROUP_PRINT)) {
     AppendPrintItem();
-  } else {
-    if (IsGlicWindow(this, browser_context_) &&
-        base::FeatureList::IsEnabled(features::kGlicPrintMenuItem)) {
-      AppendPrintItem();
-    }
   }
 
   // Spell check, language settings, and writing direction.
@@ -2043,27 +1987,7 @@ void RenderViewContextMenu::AppendSearchWebForImageItems() {
   MaybePrepareForLensQuery();
 }
 
-void RenderViewContextMenu::AppendGlicShareImageItem() {
-  if (!CanAppendGlicShareImageItem()) {
-    return;
-  }
-  tabs::TabInterface* tab =
-      tabs::TabInterface::MaybeGetFromContents(source_web_contents_);
-  // Ensure we're in a tab for these items.
-  if (tab) {
-    menu_model_.AddItemWithIcon(
-        IDC_CONTENT_CONTEXT_GLICSHAREIMAGE,
-        l10n_util::GetStringUTF16(IDS_CONTENT_CONTEXT_GLICSHAREIMAGE),
-        ui::ImageModel::FromVectorIcon(
-            glic::GlicVectorIconManager::GetVectorIcon(
-                IDR_GLIC_BUTTON_VECTOR_ICON),
-            ui::kColorMenuIcon, kTabMenuIconSize));
-    menu_model_.SetElementIdentifierAt(
-        menu_model_.GetIndexOfCommandId(IDC_CONTENT_CONTEXT_GLICSHAREIMAGE)
-            .value(),
-        kGlicShareImageMenuItem);
-  }
-}
+void RenderViewContextMenu::AppendGlicShareImageItem() {}
 
 void RenderViewContextMenu::AppendAudioItems() {
   AppendMediaItems();
@@ -2227,7 +2151,7 @@ void RenderViewContextMenu::AppendPageItems() {
   AppendExitFullscreenItem();
 
   const bool glic_below_search =
-      base::FeatureList::IsEnabled(features::kGlicContextMenuBelowSearch);
+      false;
 
   if (features::IsMenuSimplificationEnabled() &&
       params_.selection_text.empty() && !params_.is_editable) {
@@ -2435,25 +2359,7 @@ void RenderViewContextMenu::AppendSaveToMemoryBanksItem() {
   }
 }
 
-void RenderViewContextMenu::AppendGlicItems() {
-  if (IsGlicWindow(this, browser_context_)) {
-    menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_RELOAD_GLIC,
-                                    IDS_CONTENT_CONTEXT_RELOAD);
-    menu_model_.SetElementIdentifierAt(
-        menu_model_.GetIndexOfCommandId(IDC_CONTENT_CONTEXT_RELOAD_GLIC)
-            .value(),
-        kGlicReloadMenuItem);
-    if (base::FeatureList::IsEnabled(features::kGlicArchiveConversation)) {
-      // Archive  Glic conversation.
-      menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_ARCHIVE_GLIC,
-                                      IDS_CONTENT_CONTEXT_ARCHIVE_GLIC);
-      menu_model_.SetElementIdentifierAt(
-          menu_model_.GetIndexOfCommandId(IDC_CONTENT_CONTEXT_ARCHIVE_GLIC)
-              .value(),
-          kGlicArchiveConversationMenuItem);
-    }
-  }
-}
+void RenderViewContextMenu::AppendGlicItems() {}
 
 void RenderViewContextMenu::AppendRotationItems() {
   if (params_.media_flags & ContextMenuData::kMediaCanRotate) {
@@ -2552,7 +2458,7 @@ void RenderViewContextMenu::AppendSpellingAndSearchSuggestionItems() {
     bool show_glic =
         !params_.selection_text.empty() || !params_.link_url.is_empty();
     const bool glic_below_search =
-        base::FeatureList::IsEnabled(features::kGlicContextMenuBelowSearch);
+        false;
     if (show_glic && !glic_below_search) {
       MaybeAppendOpenGlicItem(/*add_separator=*/false);
     }
@@ -2652,7 +2558,7 @@ void RenderViewContextMenu::AppendOtherEditableItems() {
   if (features::IsMenuSimplificationEnabled() &&
       !params_.selection_text.empty()) {
     const bool glic_below_search =
-        base::FeatureList::IsEnabled(features::kGlicContextMenuBelowSearch);
+        false;
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
     if (!glic_below_search) {
       MaybeAppendOpenGlicItem(/*add_separator=*/false);
@@ -3316,22 +3222,7 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       break;
 
     case IDC_CONTENT_CONTEXT_RELOAD_GLIC:
-      if (glic::GlicEnabling::IsEnabledByGlobalCriteria()) {
-        auto* glic_service = glic::GlicKeyedService::Get(browser_context_);
-        if (glic_service) {
-          glic_service->Reload(GetRenderFrameHost());
-        }
-      }
-      break;
-
-    case IDC_CONTENT_CONTEXT_ARCHIVE_GLIC:  // Added for archive conversation
-      if (base::FeatureList::IsEnabled(features::kGlicArchiveConversation)) {
-        auto* glic_service = glic::GlicKeyedService::Get(browser_context_);
-        if (glic_service) {
-          // Call the Archive method on the Glic service.
-          glic_service->Archive(GetRenderFrameHost()->GetOutermostMainFrame());
-        }
-      }
+    case IDC_CONTENT_CONTEXT_ARCHIVE_GLIC:
       break;
 
     case IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH:
@@ -3863,12 +3754,6 @@ bool RenderViewContextMenu::IsPasteAndMatchStyleEnabled() const {
 }
 
 bool RenderViewContextMenu::IsPrintPreviewEnabled() const {
-  if (IsGlicWindow(this, browser_context_) &&
-      base::FeatureList::IsEnabled(features::kGlicPrintMenuItem)) {
-    return GetPrefs(browser_context_)->GetBoolean(prefs::kPrintingEnabled) &&
-           (source_web_contents_ && !source_web_contents_->IsCrashed());
-  }
-
   if (params_.media_type != ContextMenuDataMediaType::kNone &&
       !(params_.media_flags & ContextMenuData::kMediaCanPrint)) {
     return false;
@@ -4385,27 +4270,9 @@ void RenderViewContextMenu::ExecSaveAs() {
                                              target_frame_host, is_subresource);
 }
 
-void RenderViewContextMenu::ExecGlic() {
-  if (glic::GlicEnabling::IsContextualMenuItemEnabled(GetProfile(),
-                                                      params_.selection_text)) {
-    glic_item_executed_ = true;
-    glic::GlicContextMenuInvocationHelper::HandleContextualMenuClick(
-        tabs::TabInterface::MaybeGetFromContents(source_web_contents_),
-        params_.selection_text, GetRenderFrameHost()->GetGlobalId());
-  }
-}
+void RenderViewContextMenu::ExecGlic() {}
 
-void RenderViewContextMenu::ExecGlicShareImage() {
-  if (!glic::GlicEnabling::IsShareImageEnabledForProfile(GetProfile())) {
-    // If this has changed since the context menu was summoned, bail early.
-    return;
-  }
-  if (auto* glic_service = glic::GlicKeyedService::Get(browser_context_)) {
-    glic_service->ShareContextImage(
-        tabs::TabInterface::MaybeGetFromContents(source_web_contents_),
-        GetRenderFrameHost(), params().src_url);
-  }
-}
+void RenderViewContextMenu::ExecGlicShareImage() {}
 
 void RenderViewContextMenu::ExecExitFullscreen() {
   BrowserWindowInterface* browser = GetBrowser();
@@ -4727,75 +4594,7 @@ void RenderViewContextMenu::ExecProtocolHandlerSettings(int event_flags) {
   OpenURL(url, GURL(), {}, disposition, ui::PAGE_TRANSITION_LINK);
 }
 
-void RenderViewContextMenu::MaybeAppendOpenGlicItem(bool add_separator) {
-  if (glic_item_shown_) {
-    return;
-  }
-  if (!content_type_->SupportsGroup(ContextMenuContentType::ITEM_GROUP_GLIC)) {
-    return;
-  }
-
-  // Append an item for opening Glic
-  if (!IsNormalBrowser()) {
-    return;
-  }
-
-  if (IsPasswordField()) {
-    return;
-  }
-
-  if (glic::GlicEnabling::IsContextualMenuItemEnabled(GetProfile(),
-                                                      params_.selection_text) &&
-      !IsGlicWindow(this, browser_context_)) {
-    base::ReplaceChars(params_.selection_text, AutocompleteInput::kInvalidChars,
-                       u" ", &params_.selection_text);
-    base::TrimWhitespace(params_.selection_text, base::TRIM_ALL,
-                         &params_.selection_text);
-    tabs::TabInterface* tab_interface =
-        tabs::TabInterface::MaybeGetFromContents(source_web_contents_);
-    tabs::PageContextEligibilityHelper* helper =
-        tab_interface ? tabs::PageContextEligibilityHelper::From(tab_interface)
-                      : nullptr;
-    const bool is_page_eligible =
-        helper &&
-        helper->IsPageContextEligible() ==
-            optimization_guide::PageContextEligibilityStatus::kEligible;
-    const bool show_text_selection_menu_item =
-        base::FeatureList::IsEnabled(features::kGlicTextSelectionContextMenu) &&
-        !params_.selection_text.empty() && is_page_eligible;
-
-    const std::string arm = features::kGlicContextMenuArm.Get();
-    const bool show_summarize_page = (arm == "arm2");
-
-    std::u16string label;
-    if (show_text_selection_menu_item) {
-      std::u16string printable_selection_text = PrintableSelectionText();
-      EscapeAmpersands(&printable_selection_text);
-      label = l10n_util::GetStringFUTF16(IDS_GLIC_CONTEXT_MENU_ASK_GEMINI_ABOUT,
-                                         printable_selection_text);
-    } else if (show_summarize_page) {
-      label = l10n_util::GetStringUTF16(
-          IDS_GLIC_CONTEXT_MENU_SUMMARIZE_PAGE_WITH_GEMINI);
-    } else {
-      label = l10n_util::GetStringUTF16(
-          IDS_GLIC_BUTTON_ENTRYPOINT_ASK_GEMINI_LABEL);
-    }
-
-    menu_model_.AddItemWithIcon(IDC_CONTENT_CONTEXT_GLIC, label,
-                                ui::ImageModel::FromVectorIcon(
-                                    glic::GlicVectorIconManager::GetVectorIcon(
-                                        IDR_GLIC_BUTTON_VECTOR_ICON),
-                                    ui::kColorMenuIcon, kTabMenuIconSize));
-    menu_model_.SetIsNewFeatureAt(
-        menu_model_.GetItemCount() - 1,
-        UserEducationService::MaybeShowNewBadge(GetBrowserContext(),
-                                                features::kGlicContextMenu));
-    if (add_separator) {
-      menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
-    }
-    glic_item_shown_ = true;
-  }
-}
+void RenderViewContextMenu::MaybeAppendOpenGlicItem(bool add_separator) {}
 
 void RenderViewContextMenu::ExecPictureInPicture() {
   bool picture_in_picture_active =
@@ -5120,7 +4919,7 @@ void RenderViewContextMenu::AppendLensGeminiSection() {
 
 void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
   const bool glic_below_search =
-      base::FeatureList::IsEnabled(features::kGlicContextMenuBelowSearch);
+      false;
   if (!params_.link_url.is_empty()) {
     // Link + Selection case
     AppendCopyItem();

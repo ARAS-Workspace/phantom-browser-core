@@ -13,14 +13,12 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/password_manager/password_change/annotated_page_content_capturer.h"
-#include "chrome/browser/password_manager/password_change/button_click_helper.h"
 #include "chrome/browser/password_manager/password_change/change_password_form_filler.h"
 #include "chrome/browser/password_manager/password_change/change_password_form_waiter.h"
 #include "chrome/browser/password_manager/password_change/model_quality_logs_uploader.h"
 #include "chrome/browser/password_manager/password_change/password_change_logging_util.h"
 #include "chrome/browser/password_manager/password_change/password_change_submission_verifier.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/optimization_guide/core/model_quality/model_execution_logging_wrappers.h"
 #include "components/password_manager/content/browser/content_password_manager_driver.h"
 #include "components/password_manager/core/browser/browser_save_password_progress_logger.h"
@@ -234,25 +232,6 @@ void ChangePasswordFormFillingSubmissionHelper::OnExecutionResponseCallback(
   // negatives.
   timeout_timer_.Stop();
 
-  click_helper_ = std::make_unique<ButtonClickHelper>(
-      web_contents_.get(), client_, dom_node_id,
-      base::BindOnce(
-          &ChangePasswordFormFillingSubmissionHelper::OnButtonClicked,
-          weak_ptr_factory_.GetWeakPtr()));
-}
-
-void ChangePasswordFormFillingSubmissionHelper::OnButtonClicked(
-    actor::mojom::ActionResultCode result) {
-  CHECK(web_contents_);
-
-  if (result == actor::mojom::ActionResultCode::kOk) {
-    std::move(callback_).Run(std::move(form_manager_));
-    return;
-  }
-
-  if (logs_uploader_) {
-    logs_uploader_->RecordButtonClickFailure(kSubmitFormFlowStep, result);
-  }
   std::move(callback_).Run(
       base::unexpected(SubmissionError::kFailedToClickSubmit));
 }

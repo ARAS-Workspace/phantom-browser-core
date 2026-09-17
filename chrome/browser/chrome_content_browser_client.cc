@@ -97,7 +97,6 @@
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
 #include "chrome/browser/favicon/favicon_utils.h"
 #include "chrome/browser/font_family_cache.h"
-#include "chrome/browser/glic/host/guest_util.h"
 #include "chrome/browser/headless/headless_mode_util.h"
 #include "chrome/browser/hid/chrome_hid_delegate.h"
 #include "chrome/browser/history/history_service_factory.h"
@@ -486,12 +485,9 @@
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/actor/actor_keyed_service.h"
-#include "chrome/browser/actor/actor_keyed_service_factory.h"
 #include "chrome/browser/devtools/chrome_devtools_manager_delegate.h"
 #include "chrome/browser/digital_credentials/digital_identity_provider_desktop.h"
 #include "chrome/browser/direct_sockets/chrome_direct_sockets_delegate.h"
-#include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/loader/features.h"
 #include "chrome/browser/loader/fetch_keepalive_process_manager.h"
 #include "chrome/browser/metrics/usage_scenario/chrome_responsiveness_calculator_delegate.h"
@@ -527,7 +523,6 @@
 #include "chrome/browser/webauthn/chrome_authenticator_request_delegate.h"
 #include "chrome/browser/webauthn/chrome_web_authentication_delegate.h"
 #include "chrome/grit/chrome_unscaled_resources.h"  // nogncheck crbug.com/40147906
-#include "components/actor/core/actor_features.h"
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/keep_alive_registry/keep_alive_registry.h"
 #include "components/password_manager/content/common/web_ui_constants.h"
@@ -1313,20 +1308,6 @@ bool IsDefaultSearchEngine(Profile* profile, const GURL& url) {
   return false;
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-bool IsActorActingOnWebContents(WebContents* web_contents) {
-  auto* actor_service =
-      actor::ActorKeyedService::Get(web_contents->GetBrowserContext());
-  if (!actor_service) {
-    return false;
-  }
-
-  const auto* tab_interface =
-      tabs::TabInterface::MaybeGetFromContents(web_contents);
-  return tab_interface && actor_service->IsActiveOnTab(*tab_interface);
-}
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 bool ShouldGrantWindowManagementPrivilegesToIwaChildWindow(
     WebContents* web_contents,
@@ -2088,9 +2069,6 @@ bool ChromeContentBrowserClient::IsWebUIAllowedToMakeNetworkRequests(
 
 bool ChromeContentBrowserClient::ShouldAllowMojoJsBindingsForFrame(
     content::RenderFrameHost& render_frame_host) {
-  if (glic::IsFrameAllowedGlicApi(render_frame_host)) {
-    return true;
-  }
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   const GURL& site_url = render_frame_host.GetSiteInstance()
                              ->GetSecurityPrincipal()
@@ -6448,15 +6426,6 @@ bool ChromeContentBrowserClient::HandleExternalProtocol(
   }
 #endif
 
-#if !BUILDFLAG(IS_ANDROID)
-  content::WebContents* web_contents = web_contents_getter.Run();
-  if (web_contents && IsActorActingOnWebContents(web_contents)) {
-    // If actor is active, bail out early to prevent it from launching external
-    // applications.
-    return false;
-  }
-#endif  //! BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   // External protocols are disabled for guests. An exception is made for the
   // "mailto" protocol, so that pages that utilize it work properly in a
@@ -7096,14 +7065,6 @@ void ChromeContentBrowserClient::IsClipboardPasteAllowedByPolicy(
     IsClipboardPasteAllowedCallback callback) {
   // TODO(b/508693696): Add copy and paste support on AL.
 #if !BUILDFLAG(IS_ANDROID)
-  if (destination.web_contents() &&
-      glic::IsGlicGuest(destination.web_contents())) {
-    glic::LogPasteAttempt(source, metadata);
-    if (!glic::IsClipboardPasteAllowed(source, destination, metadata)) {
-      std::move(callback).Run(ClipboardPasteData());
-      return;
-    }
-  }
 #endif
 
 // TODO(b/352728209): Add Android-specific hook for Data Controls.
@@ -7129,7 +7090,6 @@ void ChromeContentBrowserClient::IsClipboardCopyAllowedByPolicy(
     const ClipboardPasteData& data,
     IsClipboardCopyAllowedCallback callback) {
 #if !BUILDFLAG(IS_ANDROID)
-  glic::OnBeforeClipboardCopy(source);
 #endif
 
 #if BUILDFLAG(ENTERPRISE_DATA_CONTROLS)
@@ -8558,45 +8518,16 @@ bool ChromeContentBrowserClient::UsePrefetchPrerenderIntegration() {
          base::FeatureList::IsEnabled(features::kDsePreload2);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-bool ChromeContentBrowserClient::ShouldDisallowCredentialRequest(
-    content::WebContents* web_contents) {
-  if (!base::FeatureList::IsEnabled(password_manager::features::kActorLogin)) {
-    return false;
-  }
-  return IsActorActingOnWebContents(web_contents);
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 bool ChromeContentBrowserClient::IsFileSystemAccessApiFilePickerAllowed(
     WebContents* web_contents) {
 #if !BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          actor::kGlicBlockFileSystemAccessApiFilePicker)) {
-    return !IsActorActingOnWebContents(web_contents);
-  }
 #endif
   return true;
 }
 
 bool ChromeContentBrowserClient::ShouldSkipBeforeUnloadDialog(
     content::RenderFrameHost* rfh) {
-#if !BUILDFLAG(IS_ANDROID)
-  if (!base::FeatureList::IsEnabled(
-          actor::kGlicSkipBeforeUnloadDialogAndNavigate)) {
-    return false;
-  }
-
-  auto* web_contents = content::WebContents::FromRenderFrameHost(rfh);
-  if (!web_contents) {
-    return false;
-  }
-
-  return IsActorActingOnWebContents(web_contents);
-
-#else
   return false;
-#endif
 }
 
 std::optional<int> ChromeContentBrowserClient::GetCpuPerformanceTierOverride(
@@ -8706,7 +8637,6 @@ bool ChromeContentBrowserClient::IsFullscreenAllowedForUnfocusedWebContents(
 bool ChromeContentBrowserClient::ShouldAllowSystemUiPopups(
     content::WebContents* web_contents) {
   auto* actor_service =
-      actor::ActorKeyedService::Get(web_contents->GetBrowserContext());
   if (!actor_service) {
     return true;
   }

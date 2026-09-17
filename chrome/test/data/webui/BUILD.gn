@@ -63,7 +63,6 @@ source_set("browser_tests") {
     sources += [
       "about_sys/about_sys_browsertest.cc",
       "access_code_cast/access_code_cast_browsertest.cc",
-      "actor_overlay/actor_overlay_browsertest.cc",
       "bookmarks/bookmarks_browsertest.cc",
       "chrome_apis/chrome_histograms_browsertest.cc",
       "chrome_apis/chrome_timeticks_browsertest.cc",
@@ -75,7 +74,6 @@ source_set("browser_tests") {
       "drive_picker/drive_picker_browsertest.cc",
       "engagement/site_engagement_browsertest.cc",
       "feedback/feedback_browsertest.cc",
-      "glic/glic_browsertest.cc",
       "histograms/histograms_internals_browsertest.cc",
       "history/history_supervised_user_browsertest.cc",
       "history/history_ui_browsertest.cc",
@@ -114,10 +112,7 @@ source_set("browser_tests") {
     ]
 
     deps += [
-      "//chrome/browser/actor",
       "//chrome/browser/engagement",
-      "//chrome/browser/glic",
-      "//chrome/browser/glic/test_support",
       "//chrome/browser/preloading",
       "//chrome/browser/signin:signin_promo",
       "//chrome/browser/subscription_eligibility",
@@ -190,11 +185,8 @@ source_set("browser_tests") {
   if (is_win || is_mac || is_linux) {
     sources += [
       "discards/discards_browsertest.cc",
-      "skills/skills_browsertest.cc",
     ]
-    deps += [ "//components/skills:features" ]
     if (is_chrome_branded) {
-      sources += [ "ai_overlay_dialog/ai_overlay_dialog_browsertest.cc" ]
     }
   }
 
@@ -309,8 +301,6 @@ source_set("interactive_ui_tests") {
 
   sources = [ "cr_elements/cr_elements_focus_interactive_uitest.cc" ]
 
-  deps = [ "//chrome/browser/glic/test_support" ]
-
   if (!is_android) {
     sources += [
       "bookmarks/bookmarks_focus_interactive_uitest.cc",
@@ -326,7 +316,7 @@ source_set("interactive_ui_tests") {
       "webui_toolbar/webui_toolbar_js_interactive_uitest.cc",
     ]
 
-    deps += [ "//chrome/test/data/webui:composebox_pixel_test_support" ]
+    deps = [ "//chrome/test/data/webui:composebox_pixel_test_support" ]
   }
 
   if (enable_extensions_core) {
@@ -522,7 +512,6 @@ generate_grd("build_grd") {
     deps += [
       "about_sys:build_grdp",
       "access_code_cast:build_grdp",
-      "actor_overlay:build_grdp",
       "bookmarks:build_grdp",
       "chrome_apis:build_grdp",
       "content_settings:build_grdp",
@@ -540,7 +529,6 @@ generate_grd("build_grd") {
       "drive_picker:build_grdp",
       "engagement:build_grdp",
       "feedback:build_grdp",
-      "glic:build_grdp",
       "histograms:build_grdp",
       "history:build_grdp",
       "history_clusters_internals:build_grdp",
@@ -578,7 +566,6 @@ generate_grd("build_grd") {
     grdp_files += [
       "$target_gen_dir/about_sys/resources.grdp",
       "$target_gen_dir/access_code_cast/resources.grdp",
-      "$target_gen_dir/actor_overlay/resources.grdp",
       "$target_gen_dir/chrome_apis/resources.grdp",
 
       "$target_gen_dir/webview/resources.grdp",
@@ -598,7 +585,6 @@ generate_grd("build_grd") {
       "$target_gen_dir/drive_picker/resources.grdp",
       "$target_gen_dir/engagement/resources.grdp",
       "$target_gen_dir/feedback/resources.grdp",
-      "$target_gen_dir/glic/resources.grdp",
       "$target_gen_dir/histograms/resources.grdp",
       "$target_gen_dir/history/resources.grdp",
       "$target_gen_dir/history_clusters_internals/resources.grdp",
@@ -700,11 +686,7 @@ generate_grd("build_grd") {
   }
 
   if (is_win || is_mac || is_linux) {
-    deps += [ "skills:build_grdp" ]
-    grdp_files += [ "$target_gen_dir/skills/resources.grdp" ]
     if (is_chrome_branded) {
-      deps += [ "ai_overlay_dialog:build_grdp" ]
-      grdp_files += [ "$target_gen_dir/ai_overlay_dialog/resources.grdp" ]
     }
   }
 

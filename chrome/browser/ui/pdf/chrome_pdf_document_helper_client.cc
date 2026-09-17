@@ -8,7 +8,6 @@
 #include "base/files/file_path.h"
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/download/download_stats.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/pdf/pdf_extension_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/screen_ai/screen_ai_install_state.h"
@@ -63,22 +62,6 @@ void MaybeHideSearchifyFeaturePromo(tabs::TabInterface* tab_interface) {
   }
 }
 
-void LogGlicSummarizeMetrics(content::RenderFrameHost& render_frame_host) {
-  content::WebContents* web_contents_to_use =
-      GetWebContentsToUse(render_frame_host);
-  if (!web_contents_to_use) {
-    return;
-  }
-
-  bool glic_enabled = glic::GlicEnabling::IsEnabledForProfile(
-      Profile::FromBrowserContext(web_contents_to_use->GetBrowserContext()));
-  base::UmaHistogramBoolean("PDF.GlicEnabled", glic_enabled);
-  bool glic_summarize_button_enabled =
-      pdf_extension_util::ShouldShowGlicSummarizeButton(web_contents_to_use);
-  base::UmaHistogramBoolean("PDF.GlicSummarizeButtonEnabled",
-                            glic_summarize_button_enabled);
-}
-
 }  // namespace
 
 ChromePDFDocumentHelperClient::ChromePDFDocumentHelperClient() = default;
@@ -92,21 +75,6 @@ void ChromePDFDocumentHelperClient::OnDocumentLoadComplete(
                         web_contents);
   MaybeShowFeaturePromo(feature_engagement::kIPHPdfTextAnnotationsFeature,
                         web_contents);
-
-  auto* parent = render_frame_host.GetParent();
-  bool is_pdf_viewer =
-      parent && parent->GetLastCommittedURL().GetWithEmptyPath() ==
-                    base::FilePath(ChromeContentClient::kPDFExtensionPluginPath)
-                        .MaybeAsASCII();
-
-  if (is_pdf_viewer) {
-    LogGlicSummarizeMetrics(render_frame_host);
-    if (web_contents &&
-        pdf_extension_util::ShouldShowGlicSummarizeButton(web_contents)) {
-      MaybeShowFeaturePromo(feature_engagement::kIPHPdfGlicSummarizeFeature,
-                            web_contents);
-    }
-  }
 }
 
 void ChromePDFDocumentHelperClient::OnPdfTextExtracted(

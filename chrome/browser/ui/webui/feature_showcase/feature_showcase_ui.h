@@ -25,7 +25,6 @@
 
 class FeatureShowcaseHandler;
 class DefaultBrowserHandler;
-class GeminiHandler;
 class GoogleLensHandler;
 class PasswordManagerHandler;
 class ThemesAndCustomizationHandler;
@@ -180,7 +179,6 @@ class FeatureShowcaseUI
   base::RepeatingClosure next_step_shown_callback_;
   std::unique_ptr<FeatureShowcaseHandler> page_handler_;
   std::unique_ptr<DefaultBrowserHandler> default_browser_page_handler_;
-  std::unique_ptr<GeminiHandler> gemini_handler_;
   std::unique_ptr<GoogleLensHandler> google_lens_handler_;
   std::unique_ptr<PasswordManagerHandler> password_manager_handler_;
   std::unique_ptr<ThemesAndCustomizationHandler>

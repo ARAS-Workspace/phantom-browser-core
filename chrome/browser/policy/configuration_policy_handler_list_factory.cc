@@ -23,9 +23,6 @@
 #include "chrome/browser/browsing_data/browsing_data_lifetime_policy_handler.h"
 #include "chrome/browser/contextual_tasks/smart_tab_sharing_settings_policy_handler.h"
 #include "chrome/browser/enterprise/reporting/legacy_tech/legacy_tech_report_policy_handler.h"
-#include "chrome/browser/glic/gemini_act_on_web_settings_policy_handler.h"
-#include "chrome/browser/glic/gemini_spark_settings_policy_handler.h"
-#include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/browser/media/webrtc/capture_policy_utils.h"
 #include "chrome/browser/net/disk_cache_dir_policy_handler.h"
 #include "chrome/browser/net/explicitly_allowed_network_ports_policy_handler.h"
@@ -133,8 +130,6 @@
 #include "components/security_interstitials/core/pref_names.h"
 #include "components/signin/public/base/signin_buildflags.h"
 #include "components/signin/public/base/signin_pref_names.h"
-#include "components/skills/internal/enterprise_published_skills_policy_handler.h"
-#include "components/skills/public/skills_prefs.h"
 #include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/sync/base/pref_names.h"
 #include "components/sync/service/sync_policy_handler.h"
@@ -426,9 +421,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     optimization_guide::prefs::kGeminiSettings,
     base::Value::Type::INTEGER },
 #if !BUILDFLAG(IS_ANDROID)
-  { key::kGeminiChromeFileUploadSettings,
-    glic::prefs::kGlicFileUploadAllowed,
-    base::Value::Type::INTEGER },
   { key::kVoiceTypingSettings,
     prefs::kVoiceTypingSettings,
     base::Value::Type::INTEGER },
@@ -1592,12 +1584,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           key::kLocalNetworkAccessIpAddressSpaceOverrides));
 
   handlers->AddHandler(std::make_unique<DefaultSensorsSettingPolicyHandler>());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  handlers->AddHandler(
-      std::make_unique<skills::EnterprisePublishedSkillsPolicyHandler>(
-          chrome_schema));
-#endif
-
   handlers->AddHandler(
       std::make_unique<autofill::AutofillSettingsPolicyHandler>(chrome_schema));
 
@@ -2274,10 +2260,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       std::vector<GenAiDefaultSettingsPolicyHandler::GenAiPolicyDetails>(
           gen_ai_default_policies)));
 #if !BUILDFLAG(IS_ANDROID)
-  handlers->AddHandler(std::make_unique<GeminiSparkSettingsPolicyHandler>(
-      std::make_unique<GenAiDefaultSettingsPolicyHandler>(
-          std::vector<GenAiDefaultSettingsPolicyHandler::GenAiPolicyDetails>(
-              gen_ai_default_policies))));
   handlers->AddHandler(std::make_unique<SmartTabSharingSettingsPolicyHandler>(
       std::make_unique<GenAiDefaultSettingsPolicyHandler>(
           std::vector<GenAiDefaultSettingsPolicyHandler::GenAiPolicyDetails>(
@@ -2288,24 +2270,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       std::make_unique<GenAiDefaultSettingsPolicyHandler>(
           std::vector<GenAiDefaultSettingsPolicyHandler::GenAiPolicyDetails>(
               gen_ai_default_policies))));
-  handlers->AddHandler(std::make_unique<GeminiActOnWebSettingsPolicyHandler>(
-      std::make_unique<GenAiDefaultSettingsPolicyHandler>(
-          std::move(gen_ai_default_policies))));
-  handlers->AddHandler(std::make_unique<URLSchemeListPolicyHandler>(
-      key::kGeminiActOnWebAllowedForURLs,
-      glic::prefs::kGlicActuationOnWebAllowedForURLs));
-  handlers->AddHandler(std::make_unique<URLSchemeListPolicyHandler>(
-      key::kGeminiActOnWebBlockedForURLs,
-      glic::prefs::kGlicActuationOnWebBlockedForURLs));
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  handlers->AddHandler(std::make_unique<SimpleSchemaValidatingPolicyHandler>(
-      key::kGeminiEnterpriseSettings, glic::prefs::kGlicGeminiEnterpriseSettings,
-      chrome_schema, SCHEMA_ALLOW_UNKNOWN,
-      SimpleSchemaValidatingPolicyHandler::RECOMMENDED_ALLOWED,
-      SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED));
-#endif
-
   handlers->AddHandler(std::make_unique<CloudUserOnlyPolicyChecker>(
       std::make_unique<SimplePolicyHandler>(
           key::kTabGroupSharingSettings,

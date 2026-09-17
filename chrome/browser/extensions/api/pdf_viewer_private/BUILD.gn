@@ -19,7 +19,6 @@ source_set("pdf_viewer_private") {
   deps = [
     "//base",
     "//chrome/browser/extensions",
-    "//chrome/browser/glic",
     "//chrome/browser/pdf",
     "//chrome/browser/pdf:pdf_pref_names",
     "//chrome/browser/profiles:profile",
@@ -51,8 +50,6 @@ source_set("browser_tests") {
   sources = [ "pdf_viewer_private_browsertest.cc" ]
   deps = [
     ":pdf_viewer_private",
-    "//chrome/browser/glic",
-    "//chrome/browser/glic/test_support",
     "//chrome/test:test_support",
     "//content/test:test_support",
   ]

@@ -20,9 +20,6 @@
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
-#include "chrome/browser/glic/glic_pref_names.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/page_image_service/image_service_factory.h"
@@ -100,16 +97,8 @@ content::WebUIDataSource* CreateAndAddHistoryUIHTMLSource(Profile* profile) {
   source->AddString("sidebarFooterGMALink", chrome::kMyActivityUrlInHistory);
   source->AddString("sidebarFooterGAALink", chrome::kMyActivityGeminiAppsUrl);
 
-  const bool is_glic_enabled =
-      glic::GlicEnabling::ShouldShowSettingsPage(profile);
-  auto* glic_service = glic::GlicKeyedService::Get(profile);
-  const bool is_glic_web_actuation_available =
-      glic::GlicEnabling::IsEnabledAndConsentForProfile(profile) &&
-      glic_service && glic_service->enabling().GetUserEnabledActuationOnWeb();
-
-  source->AddBoolean("isGlicEnabled", is_glic_enabled);
-  source->AddBoolean("isGlicWebActuationAvailable",
-                     is_glic_web_actuation_available);
+  source->AddBoolean("isGlicEnabled", false);
+  source->AddBoolean("isGlicWebActuationAvailable", false);
 
   bool enable_history_embeddings =
       history_embeddings::IsHistoryEmbeddingsEnabledForProfile(profile);

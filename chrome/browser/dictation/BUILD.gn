@@ -70,7 +70,6 @@ source_set("impl") {
     "//base",
     "//chrome/browser/component_updater",
     "//chrome/browser/extensions",
-    "//chrome/browser/glic",
     "//chrome/browser/page_content_annotations:fetcher",
     "//chrome/browser/ui",
     "//chrome/browser/ui:browser_element_identifiers",
@@ -161,7 +160,6 @@ source_set("browser_tests") {
     ":impl",
     ":metrics",
     ":test_support",
-    "//chrome/browser/glic/test_support",
     "//chrome/browser/policy:test_support",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui/tabs",
@@ -181,7 +179,6 @@ source_set("interactive_ui_tests") {
   deps = [
     ":impl",
     ":test_support",
-    "//chrome/browser/glic/test_support",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui/tabs",
     "//chrome/browser/ui/toasts",

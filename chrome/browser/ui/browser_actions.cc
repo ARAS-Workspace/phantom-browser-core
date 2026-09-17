@@ -26,12 +26,6 @@
 #include "chrome/browser/contextual_tasks/contextual_tasks_utils.h"
 #include "chrome/browser/contextual_tasks/entry_point_eligibility_manager.h"
 #include "chrome/browser/devtools/devtools_window.h"
-#include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
-#include "chrome/browser/glic/glic_pref_names.h"
-#include "chrome/browser/glic/host/glic.mojom.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
@@ -61,7 +55,6 @@
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/devtools/features.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/multistep_filter/ui/filter_ui_controller.h"
 #include "chrome/browser/platform_util.h"
@@ -75,7 +68,6 @@
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/actions/chrome_action_properties.h"
 #include "chrome/browser/ui/actions/chrome_actions.h"
-#include "chrome/browser/ui/ai_overlay_dialog/ai_overlay_dialog_controller.h"
 #include "chrome/browser/ui/autofill/address_bubbles_icon_controller.h"
 #include "chrome/browser/ui/autofill/autofill_bubble_base.h"
 #include "chrome/browser/ui/autofill/payments/filled_card_information_bubble_controller_impl.h"
@@ -147,7 +139,6 @@
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/tabs/groups/recent_activity_bubble_dialog_view.h"
 #include "chrome/browser/ui/views/tabs/organizer/organizer_panel_utils.h"
-#include "chrome/browser/ui/views/toolbar/ai_overlay_toolbar_button.h"
 #include "chrome/browser/ui/views/toolbar/pinned_action_toolbar_button.h"
 #include "chrome/browser/ui/views/toolbar/pinned_action_toolbar_button_menu_model.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions.h"
@@ -521,16 +512,6 @@ void BrowserActions::InitializeSidePanelActions() {
             .SetVisible(
                 contextual_tasks::EntryPointEligibilityManager::IsEligible(
                     profile))
-            .Build());
-  }
-
-  if (glic::GlicEnabling::IsEnabledByGlobalCriteria()) {
-    root_action_item_->AddChild(
-        SidePanelAction(
-            SidePanelEntryId::kGlic, IDS_SETTINGS_SIDE_PANEL_ALIGNMENT_GLIC,
-            IDS_SETTINGS_SIDE_PANEL_ALIGNMENT_GLIC, omnibox::kSparkIcon,
-            kActionSidePanelShowGlic, bwi, false)
-            .SetVisible(glic::GlicEnabling::ShouldShowGlicButton(profile))
             .Build());
   }
 }
@@ -1793,106 +1774,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
                     ? vector_icons::kArrowBackIcon
                     : vector_icons::kArrowBackOldIcon,
                 ui::kColorIcon))
-            .Build());
-  }
-
-  if (glic::GlicEnabling::IsProfileEligible(profile) &&
-      base::FeatureList::IsEnabled(features::kAiOverlayDialog)) {
-    std::unique_ptr<actions::ActionItem> item =
-        actions::ActionItem::Builder(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  if (auto* controller =
-                          ttc::AiOverlayDialogController::From(bwi)) {
-                    controller->ToggleOverlay();
-                  }
-                },
-                bwi))
-            .SetActionId(kActionShowAiOverlayDialog)
-            .SetText(l10n_util::GetStringUTF16(IDS_APPMENU_TOOLTIP))
-            .SetTooltipText(l10n_util::GetStringUTF16(IDS_APPMENU_TOOLTIP))
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                features::IsRoundedIconsEnabled() ? vector_icons::kMicFilledIcon
-                                                  : vector_icons::kMicOldIcon,
-                ui::kColorIcon, ui::SimpleMenuModel::kDefaultIconSize))
-            .SetProperty(
-                actions::kActionItemPinnableKey,
-                static_cast<
-                    std::underlying_type_t<actions::ActionPinnableState>>(
-                    actions::ActionPinnableState::kPinnable))
-            .Build();
-
-    item->SetProperty(
-        kCustomPinnedActionToolbarButtonFactoryKey,
-        std::make_unique<CreateCustomPinnedActionToolbarButtonCallback>(
-            base::BindRepeating(
-                [](Browser* browser, actions::ActionId action_id,
-                   base::WeakPtr<PinnedToolbarActionsContainer> container)
-                    -> std::unique_ptr<PinnedActionToolbarButton> {
-                  return std::make_unique<AiOverlayToolbarButton>(
-                      browser, action_id, container);
-                })));
-    root_action_item_->AddChild(std::move(item));
-  }
-
-  // Registration of Gemini in Chrome Anchored Cues, but requires call-time
-  // configuration to update the label, button text, and suggested prompt. As
-  // such, this action is disabled upon registration, and enabled at call time
-  // by OnTriggerAnchoredMessage().
-  auto* glic_service = glic::GlicKeyedService::Get(bwi->GetProfile());
-  if (glic_service) {
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating([](actions::ActionItem* item,
-                                   actions::ActionInvocationContext context) {
-              DUMP_WILL_BE_NOTREACHED()
-                  << "Contextual cueing action invoked without being "
-                     "configured by OnTriggerAnchoredMessage";
-            }))
-            .SetActionId(kActionGlicContextualCueing)
-            .SetEnabled(false)
-            .SetVisible(false)
-            .SetText(l10n_util::GetStringUTF16(IDS_SETTINGS_GLIC_PAGE_TITLE))
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                glic::GlicVectorIconManager::GetVectorIcon(
-                    IDR_GLIC_BUTTON_VECTOR_ICON),
-                ui::kColorIcon))
-            .Build());
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  PrefService* profile_prefs = bwi->GetProfile()->GetPrefs();
-                  profile_prefs->SetBoolean(
-                      glic::prefs::kGlicPinnedToTabstrip,
-                      !profile_prefs->GetBoolean(
-                          glic::prefs::kGlicPinnedToTabstrip));
-                },
-                bwi))
-            .SetActionId(kActionGlicTogglePin)
-            .SetText(l10n_util::GetStringUTF16(IDS_GLIC_PIN))
-            .Build());
-    root_action_item_->AddChild(
-        ChromeMenuAction(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  auto* service =
-                      glic::GlicKeyedService::Get(bwi->GetProfile());
-                  if (service) {
-                    service->ToggleUI(
-                        bwi, /*prevent_close=*/true,
-                        glic::mojom::InvocationSource::kThreeDotsMenu);
-                  }
-                },
-                bwi),
-            kActionOpenGlic, IDS_GLIC_THREE_DOT_MENU_ITEM,
-            IDS_GLIC_THREE_DOT_MENU_ITEM,
-            glic::GlicVectorIconManager::GetVectorIcon(
-                IDR_GLIC_BUTTON_VECTOR_ICON),
-            /*is_pinnable=*/false)
             .Build());
   }
 

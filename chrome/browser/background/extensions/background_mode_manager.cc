@@ -29,7 +29,6 @@
 #include "chrome/browser/background/extensions/background_application_list_model.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/extensions/extension_service.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
 #include "chrome/browser/lifetime/termination_notification.h"
@@ -934,18 +933,11 @@ void BackgroundModeManager::UpdateStatusTrayIconContextMenu() {
   }
 
   menu->AddSeparator(ui::NORMAL_SEPARATOR);
-  bool use_background_setting = glic::GlicEnabling::IsEnabledByGlobalCriteria();
-  if (use_background_setting) {
-    menu->AddCheckItemWithStringId(
-        IDC_STATUS_TRAY_KEEP_CHROME_RUNNING_IN_BACKGROUND_SETTING,
-        IDS_STATUS_TRAY_KEEP_CHROME_RUNNING_IN_BACKGROUND_SETTING);
-  } else {
-    menu->AddCheckItemWithStringId(
-        IDC_STATUS_TRAY_KEEP_CHROME_RUNNING_IN_BACKGROUND,
-        IDS_STATUS_TRAY_KEEP_CHROME_RUNNING_IN_BACKGROUND);
-    menu->SetCommandIdChecked(IDC_STATUS_TRAY_KEEP_CHROME_RUNNING_IN_BACKGROUND,
-                              true);
-  }
+  menu->AddCheckItemWithStringId(
+      IDC_STATUS_TRAY_KEEP_CHROME_RUNNING_IN_BACKGROUND,
+      IDS_STATUS_TRAY_KEEP_CHROME_RUNNING_IN_BACKGROUND);
+  menu->SetCommandIdChecked(IDC_STATUS_TRAY_KEEP_CHROME_RUNNING_IN_BACKGROUND,
+                            true);
 
   PrefService* service = g_browser_process->local_state();
   DCHECK(service);

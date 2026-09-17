@@ -132,8 +132,6 @@ static_library("renderer") {
     "//chrome/common:mojo_bindings",
     "//chrome/common/net",
     "//chrome/common/search:mojo_bindings",
-    "//chrome/renderer/actor",
-    "//components/actor/core:task_id",
     "//components/autofill/content/renderer",
     "//components/autofill/core/common:features",
     "//components/base32",

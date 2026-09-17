@@ -99,7 +99,6 @@ source_set("side_panel") {
     "//chrome/app/vector_icons",
     "//chrome/browser/contextual_tasks",
     "//chrome/browser/favicon",
-    "//chrome/browser/glic",
     "//chrome/browser/media/webrtc",
     "//chrome/browser/new_tab_page",
     "//chrome/browser/performance_manager",
@@ -182,5 +181,4 @@ source_set("side_panel") {
     deps += [ "//chrome/common/extensions/api" ]
   }
 
-  allow_circular_includes_from = [ "//chrome/browser/glic" ]
 }

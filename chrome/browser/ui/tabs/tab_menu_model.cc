@@ -15,12 +15,6 @@
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service_factory.h"
-#include "chrome/browser/glic/public/service/glic_instance_coordinator.h"
-#include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
@@ -31,7 +25,6 @@
 #include "chrome/browser/ui/tabs/existing_tab_group_sub_menu_model.h"
 #include "chrome/browser/ui/tabs/existing_window_sub_menu_model.h"
 #include "chrome/browser/ui/tabs/features.h"
-#include "chrome/browser/ui/tabs/glic_tab_sub_menu_model.h"
 #include "chrome/browser/ui/tabs/split_tab_menu_model.h"
 #include "chrome/browser/ui/tabs/split_tab_swap_menu_model.h"
 #include "chrome/browser/ui/tabs/split_view_layout_menu_model.h"
@@ -204,40 +197,6 @@ void TabMenuModel::BuildLegacySendTabToSelfItem() {
       ui::ImageModel::FromVectorIcon(
           features::IsRoundedIconsEnabled() ? kDevicesIcon : kDevicesOldIcon));
 #endif
-}
-
-void TabMenuModel::AppendGlicItems(int index,
-                                   int num_tabs,
-                                   const std::vector<int>& indices) {
-  glic_tab_sub_menu_model_ =
-      std::make_unique<glic::GlicTabSubMenuModel>(tab_strip_, index);
-
-  if (features::IsMenuSimplificationEnabled()) {
-    AddSubMenuWithIcon(TabStripModel::CommandGlicShare,
-                       l10n_util::GetPluralStringFUTF16(
-                           IDS_TAB_CXMENU_GLIC_START_SHARE, num_tabs),
-                       glic_tab_sub_menu_model_.get(),
-                       ui::ImageModel::FromVectorIcon(
-                           glic::GlicVectorIconManager::GetVectorIcon(
-                               IDR_GLIC_BUTTON_VECTOR_ICON),
-                           ui::kColorMenuIcon, kTabMenuIconSize));
-  } else {
-    AddSubMenu(TabStripModel::CommandGlicShare,
-               l10n_util::GetPluralStringFUTF16(IDS_TAB_CXMENU_GLIC_START_SHARE,
-                                                num_tabs),
-               glic_tab_sub_menu_model_.get());
-  }
-
-  auto* service =
-      glic::GlicKeyedServiceFactory::GetGlicKeyedService(tab_strip_->profile());
-  CHECK(service);
-  if (std::ranges::any_of(indices, [&](int index) {
-        return service->instance_coordinator().IsTabPinnedToAnyInstance(
-            tab_strip_->GetTabAtIndex(index)->GetHandle());
-      })) {
-    AddItem(TabStripModel::CommandGlicUnshare,
-            l10n_util::GetStringUTF16(IDS_TAB_CXMENU_GLIC_UNSHARE));
-  }
 }
 
 void TabMenuModel::Build(int index) {
@@ -453,23 +412,13 @@ void TabMenuModel::Build(int index) {
             ui::kColorMenuIcon, ui::SimpleMenuModel::kDefaultIconSize));
   }
 
-  const bool show_glic_items =
-      glic::GlicEnabling::IsReadyForProfile(tab_strip_->profile());
-  bool glic_displayed = false;
-  if (features::IsMenuSimplificationEnabled() && show_glic_items) {
-    AddSeparator(ui::NORMAL_SEPARATOR);
-    AppendGlicItems(index, num_tabs, indices);
-    AddSeparator(ui::NORMAL_SEPARATOR);
-    glic_displayed = true;
-  }
-
   const bool display_read_later = tab_strip_->delegate()->SupportsReadLater();
   const std::optional<send_tab_to_self::EntryPointDisplayReason>
       send_tab_to_self_reason = send_tab_to_self::GetEntryPointDisplayReason(
           tab_strip_->GetWebContentsAt(index));
   const bool display_send_to_self = send_tab_to_self_reason.has_value();
 
-  if ((display_read_later || display_send_to_self) && !glic_displayed) {
+  if (display_read_later || display_send_to_self) {
     AddSeparator(ui::NORMAL_SEPARATOR);
   }
 
@@ -484,10 +433,6 @@ void TabMenuModel::Build(int index) {
                                              kTabMenuIconSize));
     SetEnabledAt(GetItemCount() - 1,
                  tab_strip_->IsReadLaterSupportedForAny(indices));
-  }
-
-  if (show_glic_items && !glic_displayed) {
-    AppendGlicItems(index, num_tabs, indices);
   }
 
   if (display_send_to_self) {

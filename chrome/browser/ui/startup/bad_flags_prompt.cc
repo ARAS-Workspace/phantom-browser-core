@@ -57,7 +57,6 @@
 #include "chrome/browser/android/flags/bad_flags_snackbar_manager.h"
 #include "chrome/browser/flags/android/chrome_feature_list.h"
 #else
-#include "components/actor/core/actor_switches.h"
 #include "services/device/public/cpp/hid/hid_switches.h"
 #endif
 
@@ -186,9 +185,6 @@ const char* const kBadFlags[] = {
     // service process instead of collecting dump about their occurrence.
     network::switches::kIgnoreBadMessageForTesting,
 
-    // This flag bypasses several safety checks in the glic actor (e.g. an
-    // origin blocklist) for testing purposes.
-    actor::switches::kDisableActorSafetyChecks,
 };
 #endif  // !BUILDFLAG(IS_ANDROID)
 

@@ -6,20 +6,11 @@
 
 #include <memory>
 
-#include "chrome/browser/actor/actor_keyed_service.h"
-#include "chrome/browser/actor/actor_tab_data.h"
-#include "chrome/browser/actor/android/ui/actor_ui_tab_controller_android.h"
 #include "chrome/browser/android/tab_android.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_tab_visit_tracker.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_navigation_controller.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "chrome/browser/glic/public/features.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/glic/public/widget/glic_side_panel_coordinator_android.h"
-#include "chrome/browser/glic/public/widget/glic_side_panel_coordinator_desktop_android.h"
-#include "chrome/browser/glic/service/glic_instance_helper.h"
-#include "chrome/browser/glic/suggestions/contextual_cueing_helper.h"
 #include "chrome/browser/net/http_auth_cache_status.h"
 #include "chrome/browser/net/qwac_web_contents_observer.h"
 #include "chrome/browser/preloading/new_tab_page_preload/new_tab_page_preload_pipeline_manager.h"
@@ -36,7 +27,6 @@
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
-#include "components/actor/core/actor_features.h"
 #include "components/contextual_tasks/public/features.h"
 #include "components/enterprise/data_protection/features.h"
 #include "components/favicon/content/content_favicon_driver.h"
@@ -104,15 +94,6 @@ TabFeatures::TabFeatures(content::WebContents* web_contents, Profile* profile) {
 
   if (base::FeatureList::IsEnabled(features::kGlicActor)) {
     actor_tab_data_ =
-        GetUserDataFactory().CreateInstance<actor::ActorTabData>(*tab, tab);
-  }
-
-  auto* actor_service = actor::ActorKeyedService::Get(profile);
-  if (glic::GlicEnabling::IsProfileEligible(profile) && actor_service) {
-    actor_ui_tab_controller_ =
-        GetUserDataFactory()
-            .CreateInstance<actor::ui::ActorUiTabControllerAndroid>(
-                *tab, *tab, actor_service);
   }
 
   if (base::FeatureList::IsEnabled(contextual_tasks::kContextualTasksContext)) {
@@ -135,20 +116,14 @@ TabFeatures::TabFeatures(content::WebContents* web_contents, Profile* profile) {
   }
 
   glic_instance_helper_ =
-      GetUserDataFactory().CreateInstance<glic::GlicInstanceHelper>(*tab, tab);
   if (base::FeatureList::IsEnabled(features::kGlicAndroidSidePanel) &&
       AndroidSidePanelEnabledFn::IsEnabled()) {
     glic_side_panel_coordinator_ =
         GetUserDataFactory()
-            .CreateInstance<glic::GlicSidePanelCoordinatorDesktopAndroid>(
-                *tab, tab, tab_scoped_side_panel_registry_.get(), profile);
   } else {
     glic_side_panel_coordinator_ =
         GetUserDataFactory()
-            .CreateInstance<glic::GlicSidePanelCoordinatorAndroid>(*tab, tab);
   }
-
-  contextual_cueing_helper_ = glic::ContextualCueingHelper::MaybeCreate(tab);
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
   if (base::FeatureList::IsEnabled(ntp_features::kNtpCustomizeWebUiAndroid)) {

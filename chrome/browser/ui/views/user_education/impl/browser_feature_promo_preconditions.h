@@ -40,8 +40,6 @@ DECLARE_FEATURE_PROMO_PRECONDITION_IDENTIFIER_VALUE(
 DECLARE_FEATURE_PROMO_PRECONDITION_IDENTIFIER_VALUE(kUserNotActivePrecondition);
 DECLARE_FEATURE_PROMO_PRECONDITION_IDENTIFIER_VALUE(
     kEnterprisePolicyNotBlockingPrecondition);
-DECLARE_FEATURE_PROMO_PRECONDITION_IDENTIFIER_VALUE(
-    kActorNotActuatingActiveTabPrecondition);
 
 // Requires that the window a promo will be shown in is active.
 class WindowActivePrecondition
@@ -181,22 +179,6 @@ class EnterprisePolicyNotBlockingPrecondition
   // FeaturePromoPreconditionBase:
   user_education::FeaturePromoResult CheckPrecondition(
       user_education::UnownedTypedDataCollection& data) const override;
-};
-
-// Requires that the active tab is not being actuated by an actor.
-class ActorNotActuatingActiveTabPrecondition
-    : public user_education::FeaturePromoPreconditionBase {
- public:
-  explicit ActorNotActuatingActiveTabPrecondition(
-      BrowserWindowInterface& browser_window_interface);
-  ~ActorNotActuatingActiveTabPrecondition() override;
-
-  // FeaturePromoPreconditionBase:
-  user_education::FeaturePromoResult CheckPrecondition(
-      user_education::UnownedTypedDataCollection& data) const override;
-
- private:
-  const raw_ref<BrowserWindowInterface> browser_window_interface_;
 };
 
 #endif  // CHROME_BROWSER_UI_VIEWS_USER_EDUCATION_IMPL_BROWSER_FEATURE_PROMO_PRECONDITIONS_H_

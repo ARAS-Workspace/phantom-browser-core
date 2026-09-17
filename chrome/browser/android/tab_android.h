@@ -364,7 +364,6 @@ class TabAndroid : public tabs::TabInterface,
       will_detach_callback_list_;
   base::RepeatingCallbackList<void(TabInterface*)> did_insert_callback_list_;
 
-  std::unique_ptr<glic::GlicTabIndicatorHelper> glic_tab_indicator_helper_;
   std::unique_ptr<tabs::TabAlertController> tab_alert_controller_;
   base::CallbackListSubscription alert_to_show_subscription_;
   const base::WeakPtr<Profile> profile_;

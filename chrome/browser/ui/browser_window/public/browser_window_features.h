@@ -31,8 +31,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "ui/base/unowned_user_data/user_data_factory.h"
 
-class ActorBorderViewController;
-class ActorUiWindowController;
 class BookmarkBarController;
 class BookmarksSidePanelCoordinator;
 class BookmarksServiceFeature;
@@ -167,10 +165,6 @@ class ExtensionBrowserWindowHelper;
 class ExtensionSidePanelManager;
 }  // namespace extensions
 
-namespace glic {
-class GlicIphController;
-}  // namespace glic
-
 namespace lens {
 class LensOverlayEntryPointController;
 class LensRegionSearchController;
@@ -218,7 +212,6 @@ class SharingHubWindowController;
 }  // namespace sharing_hub
 
 namespace skills {
-class SkillsUiWindowController;
 }  // namespace skills
 
 namespace split_tabs {
@@ -239,10 +232,6 @@ class VerticalTabStripStateController;
 namespace tabs_api {
 class TabStripUIControllerImpl;
 }  // namespace tabs_api
-
-namespace ttc {
-class AiOverlayDialogController;
-}  // namespace ttc
 
 namespace ui {
 class AcceleratorProvider;
@@ -353,10 +342,6 @@ class BrowserWindowFeatures {
   FindBarController* GetFindBarController();
 
   actions::ActionItem* GetRootActionItem();
-
-  glic::GlicIphController* glic_iph_controller() {
-    return glic_iph_controller_.get();
-  }
 
   // Returns true if a FindBarController exists for this browser window.
   bool HasFindBarController() const;
@@ -521,8 +506,6 @@ class BrowserWindowFeatures {
 
   // Members owned by all browser window types.
   std::unique_ptr<UnloadController> unload_controller_;
-  std::unique_ptr<ActorBorderViewController> actor_border_view_controller_;
-  std::unique_ptr<ttc::AiOverlayDialogController> ai_overlay_dialog_controller_;
 
   // Helper which handles bookmark app specific browser configuration.
   // This must be initialized before |command_controller_| to ensure the correct
@@ -601,7 +584,6 @@ class BrowserWindowFeatures {
 
   std::unique_ptr<FindBarOwner> find_bar_owner_;
   std::unique_ptr<BrowserWindowFullscreenController> fullscreen_controller_;
-  std::unique_ptr<glic::GlicIphController> glic_iph_controller_;
   std::unique_ptr<HistoryClustersSidePanelCoordinator>
       history_clusters_side_panel_coordinator_;
   std::unique_ptr<HistorySidePanelCoordinator> history_side_panel_coordinator_;
@@ -683,7 +665,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<ZoomBubbleCoordinator> zoom_bubble_coordinator_;
 
   // Members owned only when a BrowserView is attached.
-  std::unique_ptr<ActorUiWindowController> actor_ui_window_controller_;
   std::unique_ptr<omnibox::AiModePageActionController>
       ai_mode_page_action_controller_;
   std::unique_ptr<media_router::CastBrowserController> cast_browser_controller_;
@@ -708,8 +689,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<tab_groups::SharedTabGroupFeedbackController>
       shared_tab_group_feedback_controller_;
   std::unique_ptr<SidePanelCoordinator> side_panel_coordinator_;
-  std::unique_ptr<skills::SkillsUiWindowController>
-      skills_ui_window_controller_;
   std::unique_ptr<split_tabs::SplitTabHighlightController>
       split_tab_highlight_controller_;
 

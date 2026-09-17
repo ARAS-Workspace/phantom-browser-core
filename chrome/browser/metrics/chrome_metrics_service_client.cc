@@ -30,7 +30,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/glic/glic_metrics_provider.h"
 #include "chrome/browser/google/google_brand.h"
 #include "chrome/browser/history/history_service_factory.h"
 #include "chrome/browser/metrics/accessibility_state_provider.h"
@@ -134,9 +133,7 @@
 #else
 #include "chrome/browser/metrics/browser_activity_watcher.h"
 #include "chrome/browser/performance_manager/metrics/metrics_provider_desktop.h"
-#include "chrome/browser/skills/skills_metrics_provider.h"  // nogncheck
 #include "chrome/browser/ui/tabs/tab_metrics_provider.h"
-#include "components/skills/features.h"  // nogncheck
 #endif
 
 #if BUILDFLAG(IS_POSIX)
@@ -780,16 +777,6 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<TabMetricsProvider>(
           g_browser_process->profile_manager()));
-  if (base::FeatureList::IsEnabled(features::kSkillsMetricsProviderEnabled)) {
-    metrics_service_->RegisterMetricsProvider(
-        std::make_unique<skills::SkillsMetricsProvider>(
-            base::BindRepeating([]() {
-              return g_browser_process->profile_manager()
-                         ? g_browser_process->profile_manager()
-                               ->GetLoadedProfiles()
-                         : std::vector<Profile*>();
-            })));
-  }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
@@ -803,9 +790,6 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<UpdateMetricsProvider>());
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<glic::GlicMetricsProvider>());
 
   // Only register the RegionalCapabilitiesMetricsProvider if the dynamic
   // profile country feature is enabled. This is because that feature

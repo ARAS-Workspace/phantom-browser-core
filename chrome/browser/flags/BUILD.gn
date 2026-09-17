@@ -67,7 +67,6 @@ static_library("flags_android_impl") {
     "//chrome/browser:browser_features",
     "//chrome/browser/android/webapk:webapk_sources",
     "//chrome/browser/finds/core",
-    "//chrome/browser/glic/public:features",
     "//chrome/browser/notifications/chime/android",
     "//chrome/browser/predictors",
     "//chrome/browser/task_manager/common",

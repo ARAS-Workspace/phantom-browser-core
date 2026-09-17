@@ -448,24 +448,6 @@ android_library("chrome_test_java_helper") {
   }
 }
 
-android_library("chrome_test_java_org.chromium.chrome.browser.actor") {
-  resources_package = "org.chromium.chrome"
-
-  sources = [
-    "src/org/chromium/chrome/browser/actor/ActorOverlayDesktopPTTest.java",
-    "src/org/chromium/chrome/browser/actor/ActorOverlayPTTest.java",
-  ]
-
-  deps = [
-    ":chrome_test_java_helper",
-    "//chrome/browser/actor/android:java",
-    "//chrome/browser/glic:public_java",
-    "//chrome/browser/glic/android:java",
-    "//chrome/browser/glic/android:test_support_java",
-    "//chrome/test/android:chrome_java_transit",
-  ]
-}
-
 # Partition tests into one target per-package to keep incremental build times
 # down.
 android_library("chrome_test_java_org.chromium.chrome.browser") {
@@ -1582,7 +1564,6 @@ android_library("chrome_test_java_org.chromium.chrome.browser.tasks") {
   deps = [
     ":chrome_test_java_helper",
     "//base:holder_java",
-    "//chrome/browser/actor/android:java",
     "//chrome/browser/composeplate/android:java",
     "//chrome/browser/educational_tip:java",
     "//chrome/browser/hub/internal:java",
@@ -1772,11 +1753,7 @@ android_library("chrome_test_java_various") {
     "//base:base_java_test_support",
     "//base:holder_java",
     "//base/test:leak_canary_java",
-    "//chrome/browser/actor/android:java",
     "//chrome/browser/educational_tip:java",
-    "//chrome/browser/glic:public_java",
-    "//chrome/browser/glic/android:java",
-    "//chrome/browser/glic/android:jni_headers_java",
     "//chrome/browser/gsa:java",
     "//chrome/browser/ntp_customization:java",
     "//chrome/browser/personal_context/first_run:java",
@@ -1931,16 +1908,6 @@ java_group("common_unit_test_deps_java") {
 
 # Partition tests into one target per-package to keep incremental build times
 # down.
-android_library("chrome_unit_test_java_org.chromium.chrome.browser.actor") {
-  resources_package = "org.chromium.chrome"
-
-  sources = [
-    "src/org/chromium/chrome/browser/actor/ActorForegroundServiceTest.java",
-  ]
-
-  deps = [ ":common_unit_test_deps_java" ]
-}
-
 android_library(
     "chrome_unit_test_java_org.chromium.chrome.browser.compositor") {
   resources_package = "org.chromium.chrome"
@@ -1973,7 +1940,6 @@ android_library(
 
   deps = [
     ":common_unit_test_deps_java",
-    "//chrome/browser/glic:public_java",
     "//chrome/browser/gsa:java",
     "//chrome/browser/language/android:java",
     "//chrome/browser/ui/android/signin:java",

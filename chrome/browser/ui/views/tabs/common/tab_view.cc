@@ -12,9 +12,6 @@
 #include "base/metrics/user_metrics.h"
 #include "base/metrics/user_metrics_action.h"
 #include "base/time/time.h"
-#include "chrome/browser/glic/browser_ui/tab_underline_controller.h"
-#include "chrome/browser/glic/browser_ui/tab_underline_view.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -315,25 +312,6 @@ TabView::TabView(TabCollectionNode* collection_node)
                                   kGlowHoverAnimationDuration)
                             : nullptr) {
   tabs::TabInterface* tab = const_cast<tabs::TabInterface*>(GetTabInterface());
-  BrowserWindowInterface* browser_window = tab->GetBrowserWindowInterface();
-  if (browser_window &&
-      (glic::GlicEnabling::IsProfileEligible(browser_window->GetProfile()) ||
-       contextual_tasks::IsContextualTasksUIEnabled())) {
-    glic_tab_underline_view_ =
-        AddChildView(views::Builder<glic::TabUnderlineView>(
-                         glic::TabUnderlineView::Factory::Create(
-                             std::make_unique<glic::TabUnderlineController>(
-                                 tab->GetHandle()),
-                             browser_window, tab->GetHandle()))
-                         .Build());
-    const bool is_horizontal = orientation_ == TabStripOrientation::kHorizontal;
-    glic_tab_underline_view_->SetOrientation(
-        is_horizontal ? glic::TabUnderlineView::Orientation::kHorizontal
-                      : glic::TabUnderlineView::Orientation::kVertical);
-    if (is_horizontal) {
-      glic_tab_underline_view_->SetInsets(tab_styling_->GetContentsInsets());
-    }
-  }
 
   title_->SetProperty(views::kElementIdentifierKey, kVerticalTabTitleElementId);
   SetProperty(views::kElementIdentifierKey, kTabElementId);

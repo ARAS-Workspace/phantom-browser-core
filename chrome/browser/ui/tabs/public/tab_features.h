@@ -435,14 +435,7 @@ class TabFeatures {
   std::unique_ptr<BookmarkPageActionController>
       bookmark_page_action_controller_;
 
-  std::unique_ptr<glic::GlicInstanceHelper> glic_instance_helper_;
-  std::unique_ptr<glic::GlicTabIndicatorHelper> glic_tab_indicator_helper_;
-  std::unique_ptr<glic::GlicSidePanelCoordinator> glic_side_panel_coordinator_;
-
-  std::unique_ptr<glic::GlicPageFeaturesManager> glic_page_features_manager_;
-
   // Observes page loads to decide when to offer glic contextual cueing.
-  std::unique_ptr<glic::ContextualCueingHelper> contextual_cueing_helper_;
 
   std::unique_ptr<memory_saver::MemorySaverChipController>
       memory_saver_chip_controller_;

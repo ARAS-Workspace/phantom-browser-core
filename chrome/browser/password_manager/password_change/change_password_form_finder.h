@@ -12,7 +12,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/password_manager/password_change/change_password_form_waiter.h"
 #include "chrome/common/chrome_render_frame.mojom.h"
-#include "components/actor/public/mojom/actor_types.mojom-forward.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
 
 namespace password_manager {
@@ -25,7 +24,6 @@ class WebContents;
 }
 
 class AnnotatedPageContentCapturer;
-class ButtonClickHelper;
 class ModelQualityLogsUploader;
 class PasswordChangePageStabilityWaiter;
 
@@ -71,7 +69,6 @@ class ChangePasswordFormFinder {
   void TriggerPageStabilityForTesting() { OnPageStableInitially(); }
 
   ChangePasswordFormWaiter* form_waiter() { return form_waiter_.get(); }
-  ButtonClickHelper* click_helper() { return click_helper_.get(); }
   AnnotatedPageContentCapturer* capturer() { return capturer_.get(); }
 #endif
 
@@ -95,8 +92,6 @@ class ChangePasswordFormFinder {
           optimization_guide::proto::PasswordChangeSubmissionLoggingData>
           logging_data);
 
-  void OnButtonClicked(actor::mojom::ActionResultCode result);
-
   void OnChangePasswordFormFoundAfterClick(
       password_manager::PasswordFormManager* form_manager);
   void OnFormNotFound();
@@ -113,8 +108,6 @@ class ChangePasswordFormFinder {
 
   std::unique_ptr<ChangePasswordFormWaiter> form_waiter_;
   std::unique_ptr<PasswordChangePageStabilityWaiter> page_stability_waiter_;
-
-  std::unique_ptr<ButtonClickHelper> click_helper_;
 
   base::OneShotTimer timeout_timer_;
   bool button_click_attempted_ = false;

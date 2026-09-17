@@ -18,7 +18,6 @@
 #include "chrome/browser/dictation/session_controller.h"
 #include "chrome/browser/dictation/session_ui_impl.h"
 #include "chrome/browser/dictation/target.h"
-#include "chrome/browser/glic/host/guest_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
@@ -34,18 +33,7 @@ namespace {
 constexpr int kVoiceTypingSettingsDisabled = 2;
 
 tabs::TabInterface* GetActiveTabFromGlic(content::WebContents* web_contents) {
-  if (!glic::IsGlicGuest(web_contents)) {
-    return nullptr;
-  }
-
-  content::WebContents* outermost_web_contents =
-      web_contents->GetOutermostWebContents();
-  gfx::NativeWindow native_window =
-      outermost_web_contents->GetTopLevelNativeWindow();
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithWindow(
-          native_window);
-  return browser ? browser->GetActiveTabInterface() : nullptr;
+  return nullptr;
 }
 
 tabs::TabInterface* GetTabFromTargetId(

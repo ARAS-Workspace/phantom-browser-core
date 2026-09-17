@@ -20,7 +20,6 @@
 #include "chrome/browser/extensions/api/settings_private/generated_prefs.h"
 #include "chrome/browser/extensions/api/settings_private/generated_prefs_factory.h"
 #include "chrome/browser/extensions/settings_api_helpers.h"
-#include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/browser/prefs/session_startup_pref.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/safe_browsing/generated_safe_browsing_pref.h"
@@ -60,7 +59,6 @@
 #include "components/search_engines/default_search_manager.h"
 #include "components/search_engines/search_engines_pref_names.h"
 #include "components/signin/public/base/signin_pref_names.h"
-#include "components/skills/public/skills_prefs.h"
 #include "components/spellcheck/spellcheck_buildflags.h"
 
 #if BUILDFLAG(ENABLE_SPELLCHECK)
@@ -577,9 +575,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       optimization_guide::UserVisibleFeatureKey::kContextualCueing)] =
       settings_api::PrefType::kNumber;
 
-  (*s_allowlist)[skills::prefs::kChromeSkillsEnabled] =
-      settings_api::PrefType::kBoolean;
-
   // AI enterprise prefs
   (*s_allowlist)[optimization_guide::prefs::kComposeEnterprisePolicyAllowed] =
       settings_api::PrefType::kNumber;
@@ -601,32 +596,8 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kNumber;
 
   // Glic prefs
-  (*s_allowlist)[glic::prefs::kGlicPinnedToTabstrip] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicLauncherEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicClosedCaptioningEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicMediaUnderstandingEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicGeolocationEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicMicrophoneEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicTabContextEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicDefaultTabContextEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicUserStatus] =
-      settings_api::PrefType::kDictionary;
   (*s_allowlist)[optimization_guide::prefs::kGeminiSettings] =
       settings_api::PrefType::kNumber;
-  (*s_allowlist)[glic::prefs::kGlicKeepSidepanelOpenOnNewTabsEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicShakeTriggerEnabled] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[glic::prefs::kGlicHotkeyGlobalScopeEnabled] =
-      settings_api::PrefType::kBoolean;
 
   // Dictation / Voice typing prefs
   (*s_allowlist)[prefs::kVoiceTypingHotkey] = settings_api::PrefType::kString;

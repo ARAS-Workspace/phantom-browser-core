@@ -16,7 +16,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/bad_message.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/glic/host/guest_util.h"
 #include "chrome/browser/media/capture_access_handler_base.h"
 #include "chrome/browser/media/webrtc/capture_policy_utils.h"
 #include "chrome/browser/media/webrtc/desktop_capture_devices_util.h"
@@ -87,7 +86,7 @@ std::u16string GetApplicationTitle(WebContents* web_contents) {
 #if !BUILDFLAG(IS_ANDROID)
 
 bool IsGlicWebUI(const WebContents* web_contents) {
-  return glic::IsGlicWebUI(web_contents);
+  return false;
 }
 
 // If bypassing the media selection dialog is allowed for this request, this
