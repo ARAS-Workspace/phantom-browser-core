@@ -12,7 +12,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_controller.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/omnibox/omnibox_context_menu_controller.h"
@@ -183,32 +182,6 @@ void OmniboxContextMenu::RunMenuAt(const gfx::Point& point,
   menu_runner_->RunMenuAt(parent_widget_, nullptr,
                           gfx::Rect(point, gfx::Size()),
                           views::MenuAnchorPosition::kTopLeft, source_type);
-
-  if (!web_contents_) {
-    return;
-  }
-  // Hide the GLIC nudge when the side panel is opened.
-  auto* browser_window_interface =
-      webui::GetBrowserWindowInterface(web_contents_.get());
-  if (!browser_window_interface) {
-    return;
-  }
-  auto* glic_nudge_controller =
-      browser_window_interface->GetFeatures().glic_nudge_controller();
-  if (!glic_nudge_controller) {
-    return;
-  }
-  auto* active_tab_interface =
-      browser_window_interface->GetActiveTabInterface();
-  if (!active_tab_interface) {
-    return;
-  }
-
-  glic_nudge_controller->UpdateNudgeLabel(
-      browser_window_interface->GetActiveTabInterface()->GetContents(), "",
-      std::nullopt,
-      glic::GlicNudgeActivity::kNudgeIgnoredOmniboxContextMenuInteraction,
-      base::DoNothing());
 }
 
 void OmniboxContextMenu::ExecuteCommand(int command_id, int event_flags) {

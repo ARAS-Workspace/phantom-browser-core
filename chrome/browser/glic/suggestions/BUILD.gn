@@ -84,7 +84,6 @@ source_set("impl") {
       "//chrome/browser/contextual_tasks:ui",
       "//chrome/browser/ui/browser_window",
       "//chrome/browser/ui/user_education",
-      "//chrome/browser/ui/views/glic",
     ]
   }
   if (enable_pdf) {

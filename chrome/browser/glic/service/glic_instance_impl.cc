@@ -88,8 +88,6 @@
 #include "chrome/browser/glic/widget/glic_inactive_side_panel_ui_android.h"
 #include "chrome/browser/glic/widget/glic_side_panel_ui_android.h"
 #else
-#include "chrome/browser/glic/browser_ui/glic_actor_task_icon_manager.h"
-#include "chrome/browser/glic/browser_ui/glic_actor_task_icon_manager_factory.h"
 #include "chrome/browser/glic/host/context/glic_focused_tab_manager.h"
 #include "chrome/browser/glic/widget/glic_floating_ui.h"
 #include "chrome/browser/glic/widget/glic_inactive_side_panel_ui.h"
@@ -2112,13 +2110,6 @@ void GlicInstanceImpl::OnTabAddedToTask(
                                    /*success=*/false);
     return;
   }
-
-#if !BUILDFLAG(IS_ANDROID)
-  if (auto* icon_manager =
-          glic::GlicActorTaskIconManagerFactory::GetForProfile(profile_)) {
-    icon_manager->OnTabAddedToTask(task_id);
-  }
-#endif
 
   if (IsActiveEmbedder(SidePanelEmbedderKey(tab))) {
     return;

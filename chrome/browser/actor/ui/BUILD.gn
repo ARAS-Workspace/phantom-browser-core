@@ -21,7 +21,6 @@ if (is_android) {
 source_set("states") {
   public = [
     "states/actor_overlay_state.h",
-    "states/actor_task_nudge_state.h",
     "states/handoff_button_state.h",
     "states/tab_indicator_state.h",
   ]
@@ -419,7 +418,6 @@ source_set("unit_tests") {
       "actor_border_view_controller_unittest.cc",
       "actor_overlay_handler_unittest.cc",
       "actor_overlay_web_view_unittest.cc",
-      "actor_ui_metrics_unittest.cc",
       "actor_ui_state_manager_unittest.cc",
       "actor_ui_tab_controller_unittest.cc",
       "actor_ui_window_controller_unittest.cc",

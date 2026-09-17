@@ -24,7 +24,6 @@ class ActionViewController;
 class Button;
 }
 class NewTabButton;
-class TabStripActionContainer;
 class TabStripComboButton;
 class TabStrip;
 class TabStripScrollContainer;
@@ -122,7 +121,6 @@ class HorizontalTabStripRegionViewOld : public TabStripRegionView {
   bool tab_strip_set_ = false;
 
   raw_ptr<BrowserView> browser_view_ = nullptr;
-  raw_ptr<TabStripActionContainer> tab_strip_action_container_ = nullptr;
   raw_ptr<views::View> tab_strip_container_ = nullptr;
   raw_ptr<views::View> reserved_grab_handle_space_ = nullptr;
   raw_ptr<TabStrip> tab_strip_ = nullptr;
@@ -177,17 +175,12 @@ class HorizontalTabStripRegionViewNew : public BaseTabStripRegionView {
   // if we did not show the scroll buttons. To be used only in Layout().
   bool ComputeIsUnpinnedTabsScrollable(views::ManualLayoutUtil& layout_util);
 
-  void UpdateButtonBorders();
-
-  raw_ptr<TabStripActionContainer> tab_strip_action_container_ = nullptr;
   raw_ptr<views::View> reserved_grab_handle_space_ = nullptr;
   raw_ptr<TabStripComboButton> combo_button_ = nullptr;
   raw_ptr<views::Button> new_tab_button_ = nullptr;
   raw_ptr<TabScrollButtonContainer> scroll_button_container_ = nullptr;
 
   std::unique_ptr<views::ActionViewController> action_view_controller_;
-
-  base::CallbackListSubscription subscription_;
 };
 
 using HorizontalTabStripRegionView = HorizontalTabStripRegionViewOld;

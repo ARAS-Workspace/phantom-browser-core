@@ -13,7 +13,6 @@
 #include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/actor/actor_keyed_service_factory.h"
 #include "chrome/browser/contextual_cueing/features.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_controller.h"
 #include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/public/glic_instance.h"
@@ -62,8 +61,6 @@
 #include "chrome/browser/glic/public/glic_side_panel_coordinator.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
-#include "chrome/browser/ui/views/glic/glic_button_interface.h"  // nogncheck crbug.com/40147906
-#include "ui/views/controls/button/label_button.h"  // nogncheck crbug.com/40147906
 #endif
 
 namespace glic {
@@ -129,22 +126,6 @@ ContextualCueingHelper::ContextualCueingHelper(
 
 ContextualCueingHelper::~ContextualCueingHelper() = default;
 
-glic::GlicNudgeController* ContextualCueingHelper::GetGlicNudgeController() {
-  if (!IsContextualCueingEnabled()) {
-    return nullptr;
-  }
-  tabs::TabInterface* tab =
-      tabs::TabInterface::MaybeGetFromContents(web_contents());
-  if (!tab) {
-    return nullptr;
-  }
-  BrowserWindowInterface* browser = tab->GetBrowserWindowInterface();
-  if (!browser) {
-    return nullptr;
-  }
-  return glic::GlicNudgeController::From(browser);
-}
-
 void ContextualCueingHelper::PrimaryPageChanged(content::Page& page) {
   has_first_contentful_paint_ = false;
 }
@@ -195,15 +176,6 @@ void ContextualCueingHelper::DidFinishNavigation(
     return;
   }
 
-  // Make sure we always clear the nudge label anyway despite operating on
-  // pages.
-  auto* glic_nudge_controller = GetGlicNudgeController();
-  if (glic_nudge_controller) {
-    glic_nudge_controller->UpdateNudgeLabel(
-        web_contents(), std::string(), /*prompt_suggestion=*/std::nullopt,
-        glic::GlicNudgeActivity::kNudgeIgnoredNavigation, base::DoNothing());
-  }
-
   // Do not report page loads for these types of navigations.
   if (navigation_handle->IsErrorPage() ||
       !navigation_handle->ShouldUpdateHistory()) {
@@ -243,9 +215,7 @@ void ContextualCueingHelper::PrimaryMainDocumentElementAvailable() {
     return;
   }
 
-  auto* glic_nudge_controller = GetGlicNudgeController();
-  if (!glic_nudge_controller ||
-      !web_contents()->GetLastCommittedURL().SchemeIsHTTPOrHTTPS()) {
+  if (!web_contents()->GetLastCommittedURL().SchemeIsHTTPOrHTTPS()) {
     return;
   }
   // Determine if server data indicates a nudge should be shown.
@@ -446,26 +416,6 @@ void ContextualCueingHelper::OnCueingDecision(
         NudgeDecision::kNudgeNotShownContextualCueingV2);
     return;
   }
-
-  if (can_show_decision != NudgeDecision::kSuccess) {
-    return;
-  }
-
-  auto* glic_nudge_controller = GetGlicNudgeController();
-  if (!glic_nudge_controller) {
-    return;
-  }
-
-  glic_nudge_controller->UpdateNudgeLabel(
-      web_contents(), decision_result->cue_label,
-      decision_result->prompt_suggestion.empty()
-          ? std::nullopt
-          : std::make_optional(decision_result->prompt_suggestion),
-      /*activity=*/std::nullopt,
-      base::BindRepeating(&ContextualCueingService::OnNudgeActivity,
-                          contextual_cueing_service_->GetWeakPtr(),
-                          web_contents()->GetWeakPtr(), document_available_time,
-                          decision_result->is_dynamic));
 }
 
 ContextualCueingHelper::AutoOpenResult
@@ -497,14 +447,6 @@ ContextualCueingHelper::AutoOpenGlicSidePanel(
   if (vertical_tabs_enabled) {
     return RecordAutoOpenResult(GlicAutoOpenResult::kPreventedFromVerticalTabs);
   }
-
-#if !BUILDFLAG(IS_ANDROID)
-  views::LabelButton* glic_button = glic::GlicButtonInterface::FromBrowser(bwi);
-  if (!glic_button || !glic_button->GetVisible()) {
-    return RecordAutoOpenResult(
-        GlicAutoOpenResult::kPreventedFromButtonNotVisible);
-  }
-#endif
 
   if (is_pdf_candidate) {
     // Prevention reasons for auto-opening on pdfs

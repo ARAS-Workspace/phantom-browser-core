@@ -494,8 +494,6 @@ BASE_FEATURE(kToolbarAppMenuLabelResizing, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kToolbarProfileChipResizing, base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kToolbarGlicButtonResizing, base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kOSCryptAsyncAvailabilityInfoBar,
 #if BUILDFLAG(IS_MAC)
              base::FEATURE_ENABLED_BY_DEFAULT

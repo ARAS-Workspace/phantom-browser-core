@@ -28,7 +28,6 @@ static_library("impl") {
     ":record_replay",
     "//base",
     "//chrome/browser/glic",
-    "//chrome/browser/glic/browser_ui",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui:simple_message_box_headers",
     "//chrome/browser/ui/tabs",

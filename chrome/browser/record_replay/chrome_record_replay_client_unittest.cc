@@ -8,8 +8,6 @@
 
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/record_replay/task_parameters_extractor_factory.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_features.h"
-#include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "components/record_replay/core/browser/task_discovery_service.h"
 #include "components/record_replay/core/browser/task_parameters_extractor.h"
@@ -26,7 +24,6 @@ namespace {
 
 using testing::_;
 using testing::Return;
-using testing::ReturnRef;
 
 class MockTaskParametersExtractor : public TaskParametersExtractor {
  public:
@@ -95,12 +92,6 @@ TEST_F(ChromeRecordReplayClientTest, DidFinishNavigation_OffersTask) {
         std::move(callback).Run(true);
       });
   ReinitializeClient(std::move(mock_service));
-
-  MockBrowserWindowInterface bwi;
-  EXPECT_CALL(tab(), GetBrowserWindowInterface()).WillRepeatedly(Return(&bwi));
-
-  BrowserWindowFeatures features;
-  EXPECT_CALL(bwi, GetFeatures()).WillRepeatedly(ReturnRef(features));
 
   content::MockNavigationHandle handle(web_contents());
   handle.set_is_in_primary_main_frame(true);

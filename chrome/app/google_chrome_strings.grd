@@ -3079,11 +3079,6 @@ Google Chrome is unable to recover your settings.
         To use a different Google Account with Gemini in Chrome, <ph name="BEGIN_LINK">&lt;a class="learn-more-link" href="#" target=&quot;_blank&quot;&gt;</ph>create a new profile<ph name="END_LINK">&lt;/a&gt;</ph> and sign in with the account you want
       </message>
 
-      <!-- Glic button and tab strip context menu -->
-      <message name="IDS_GLIC_CONTEXTUAL_CUEING_ANNOUNCEMENT" desc="Polite voice over announcement that happens when a contextual nudge is shown next to the Gemini button.">
-        To open Gemini in Chrome, press <ph name="GLOBAL_HOTKEY">$1<ex>⌘+G</ex></ph>
-      </message>
-
       <!-- UNO Promo strings for extensions -->
       <if expr="enable_extensions">
         <message name="IDS_EXTENSION_INSTALLED_PROMO_EXPLICIT_SIGNIN_MESSAGE" desc="Text of the promo displayed at the bottom of the extension installed bubble asking the user to enable UNO.">

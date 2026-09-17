@@ -20,10 +20,6 @@ generate_jni("jni_headers") {
   ]
 }
 
-java_cpp_enum("java_enums_srcjar") {
-  sources = [ "//chrome/browser/glic/browser_ui/glic_nudge_controller.h" ]
-}
-
 java_cpp_enum("glic_settings_enums_srcjar") {
   sources = [ "glic_navigation_utils_android.h" ]
 }
@@ -101,7 +97,6 @@ android_library("common_java") {
     "java/src/org/chromium/chrome/browser/glic/GlicSplitButtonDelegate.java",
     "java/src/org/chromium/chrome/browser/glic/GlicSplitButtonDelegateBridge.java",
   ]
-  srcjar_deps = [ ":java_enums_srcjar" ]
   deps = [
     ":java_resources",
     ":jni_headers_java",

@@ -169,8 +169,6 @@ class ExtensionSidePanelManager;
 
 namespace glic {
 class GlicIphController;
-class GlicNudgeController;
-class GlicSplitButtonController;
 }  // namespace glic
 
 namespace lens {
@@ -359,8 +357,6 @@ class BrowserWindowFeatures {
   glic::GlicIphController* glic_iph_controller() {
     return glic_iph_controller_.get();
   }
-
-  glic::GlicNudgeController* glic_nudge_controller();
 
   // Returns true if a FindBarController exists for this browser window.
   bool HasFindBarController() const;
@@ -568,7 +564,6 @@ class BrowserWindowFeatures {
       context_highlight_window_feature_;
 
   // Member order dependencies:
-  //   glic_nudge_controller_ depends on tab_list_bridge_.
   //   extension_window_controller_ depends on tab_list_bridge_.
   std::unique_ptr<TabListBridge> tab_list_bridge_;
 
@@ -607,8 +602,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<FindBarOwner> find_bar_owner_;
   std::unique_ptr<BrowserWindowFullscreenController> fullscreen_controller_;
   std::unique_ptr<glic::GlicIphController> glic_iph_controller_;
-  std::unique_ptr<glic::GlicSplitButtonController>
-      glic_split_button_controller_;
   std::unique_ptr<HistoryClustersSidePanelCoordinator>
       history_clusters_side_panel_coordinator_;
   std::unique_ptr<HistorySidePanelCoordinator> history_side_panel_coordinator_;

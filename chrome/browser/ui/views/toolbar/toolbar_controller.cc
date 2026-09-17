@@ -332,14 +332,6 @@ ToolbarController::GetDefaultResponsiveElements(Browser* browser) {
                kToolbarAvatarButtonElementId, kToolbarAvatarBubbleElementId),
            /*is_section_end=*/false)});
 
-  if (base::FeatureList::IsEnabled(features::kToolbarGlicButtonResizing)) {
-    elements.emplace_back(
-        ToolbarController::ElementIdInfo(
-            kGlicButtonElementId, IDS_GLIC_BUTTON_ENTRYPOINT_ASK_GEMINI_LABEL,
-            nullptr, kGlicButtonElementId),
-        /*is_section_end=*/false);
-  }
-
   return elements;
 }
 
@@ -356,11 +348,6 @@ ToolbarController::GetDefaultOverflowOrder() {
       kWebUIToolbarElementIdentifier, kToolbarForwardButtonElementId,
       kToolbarAvatarButtonElementId, kToolbarSplitTabsToolbarButtonElementId,
       kPinnedToolbarActionShowSidePanelContextualTasksElementId};
-  if (base::FeatureList::IsEnabled(features::kToolbarGlicButtonResizing)) {
-    const auto it =
-        std::find(order.begin(), order.end(), kToolbarAvatarButtonElementId);
-    order.insert(it, kGlicButtonElementId);
-  }
   return order;
 }
 
@@ -421,8 +408,7 @@ std::string ToolbarController::GetActionNameFromElementIdentifier(
            {kActionTabSearch, "PinnedTabSearchButton"},
            {kActionSidePanelShowGlic, "PinnedGlicButton"},
            {kActionSidePanelShowTabsFromOtherDevices,
-            "PinnedTabsFromOtherDevicesButton"},
-           {kGlicButtonElementId, "GlicButtonElementId"}});
+            "PinnedTabsFromOtherDevicesButton"}});
 
   const auto it = identifier_to_action_name_map->find(identifier);
   return it == identifier_to_action_name_map->end()

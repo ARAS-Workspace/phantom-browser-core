@@ -11,6 +11,5 @@ per-file tab_search_button*=tluk@chromium.org
 per-file tab_drag_controller*=max@igalia.com
 
 # For changes related to the glic/actor tab alert indicator/button.
-per-file tab_strip_action_container*=mfoltz@chromium.org
 per-file tab_alert_indicator_button*=mfoltz@chromium.org
 

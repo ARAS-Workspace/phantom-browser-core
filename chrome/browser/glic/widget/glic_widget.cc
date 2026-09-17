@@ -16,7 +16,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/views/chrome_widget_sublevel.h"
-#include "chrome/browser/ui/views/glic/glic_button_interface.h"
 #include "chrome/common/chrome_features.h"
 #include "ui/base/base_window.h"
 #include "ui/base/hit_test.h"
@@ -197,34 +196,6 @@ display::Display GetDisplayForOpeningDetached() {
   return display::Screen::Get()->GetPrimaryDisplay();
 }
 
-std::optional<gfx::Rect> GetInitialDetachedBoundsFromBrowser(
-    BrowserWindowInterface* browser,
-    const gfx::Size& target_size) {
-  if (!browser) {
-    return std::nullopt;
-  }
-
-  // Set the origin so the top right of the glic widget meets the bottom left
-  // of the glic button.
-  views::LabelButton* glic_button =
-      glic::GlicButtonInterface::FromBrowser(browser);
-  if (!glic_button) {
-    return std::nullopt;
-  }
-  gfx::Rect glic_bounds = glic_button->GetBoundsInScreen();
-  glic_bounds.Inset(glic_button->GetInsets());
-  gfx::Rect glic_button_inset_bounds = glic_bounds;
-
-  gfx::Point origin(glic_button_inset_bounds.x() - target_size.width() -
-                        kInitialPositionBuffer,
-                    glic_button_inset_bounds.bottom() + kInitialPositionBuffer);
-  gfx::Rect bounds = {origin, target_size};
-
-  return GlicWidget::IsWidgetLocationAllowed(bounds)
-             ? std::make_optional(bounds)
-             : std::nullopt;
-}
-
 gfx::Rect GetInitialDetachedBoundsNoBrowser(const gfx::Size& target_size) {
   // Get the default position offset equal distances from the top right corner
   // of the work area (which excludes system UI such as the taskbar).
@@ -259,10 +230,7 @@ gfx::Size GlicWidget::GetInitialSize() {
 
 gfx::Rect GlicWidget::GetInitialBounds(BrowserWindowInterface* browser,
                                        gfx::Size target_size) {
-  std::optional<gfx::Rect> bounds_with_browser =
-      GetInitialDetachedBoundsFromBrowser(browser, target_size);
-  return bounds_with_browser.value_or(
-      GetInitialDetachedBoundsNoBrowser(target_size));
+  return GetInitialDetachedBoundsNoBrowser(target_size);
 }
 
 gfx::Size GlicWidget::ClampSize(std::optional<gfx::Size> current_size,

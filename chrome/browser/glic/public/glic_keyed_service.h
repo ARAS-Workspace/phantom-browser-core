@@ -89,9 +89,6 @@ class GlicKeyedService : public KeyedService, public base::SupportsUserData {
       GlicKeyedService* glic_keyed_service);
   bool IsGlicShortcutActive();
   bool IsBottomBarEnabled();
-
-  class GlicNudgeController* GetOrCreateNudgeController(
-      BrowserWindowInterface* browser);
 #endif  // BUILDFLAG(IS_ANDROID)
 
   // Convenience method, may return nullptr.
@@ -296,16 +293,6 @@ class GlicKeyedService : public KeyedService, public base::SupportsUserData {
       experimental_triggering_transport_handler_factory_;
 
   base::CallbackListSubscription experimental_triggering_state_subscription_;
-
-#if BUILDFLAG(IS_ANDROID)
-  void OnBrowserWindowClosed(BrowserWindowInterface* browser);
-
-  base::flat_map<BrowserWindowInterface*,
-                 std::unique_ptr<class GlicSplitButtonController>>
-      button_controllers_;
-  base::flat_map<BrowserWindowInterface*, base::CallbackListSubscription>
-      window_close_subscriptions_;
-#endif
 
   base::WeakPtrFactory<GlicKeyedService> weak_ptr_factory_{this};
 };

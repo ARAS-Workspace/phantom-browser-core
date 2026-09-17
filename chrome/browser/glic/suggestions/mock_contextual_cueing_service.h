@@ -21,11 +21,6 @@ class MockContextualCueingService : public ContextualCueingService {
   ~MockContextualCueingService() override;
 
   MOCK_METHOD(void, ReportPageLoad, ());
-  MOCK_METHOD(void,
-              OnNudgeActivity,
-              (content::WebContents*,
-               base::TimeTicks,
-               glic::GlicNudgeActivity));
   MOCK_METHOD(void, CueingNudgeShown, (const GURL&));
   MOCK_METHOD(void, CueingNudgeDismissed, ());
   MOCK_METHOD(void, CueingNudgeClicked, ());

@@ -52,7 +52,6 @@
 #include "chrome/browser/extensions/browser_extension_window_controller.h"
 #include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
-#include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/headless/headless_mode_util.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
@@ -176,7 +175,6 @@
 #include "chrome/browser/ui/views/frame/vertical_tab_strip_region_view.h"
 #include "chrome/browser/ui/views/frame/web_contents_close_handler.h"
 #include "chrome/browser/ui/views/fullscreen_control/fullscreen_control_host.h"
-#include "chrome/browser/ui/views/glic/glic_button_interface.h"
 #include "chrome/browser/ui/views/global_media_controls/media_toolbar_button_view.h"
 #include "chrome/browser/ui/views/hats/hats_next_web_dialog.h"
 #include "chrome/browser/ui/views/incognito_clear_browsing_data_dialog_coordinator.h"
@@ -1160,18 +1158,6 @@ TabStripRegionView* BrowserView::tab_strip_view() const {
   }
 
   return horizontal_tab_strip_region_view_.get();
-}
-
-views::LabelButton* BrowserView::GetGlicButton() {
-  auto* controller = tabs::VerticalTabStripStateController::From(browser_);
-  if ((vertical_tab_strip_region_view_ && controller &&
-       controller->ShouldDisplayVerticalTabs()) ||
-      base::FeatureList::IsEnabled(features::kGlicHorizontalTabToolbarButton)) {
-    return toolbar()->GetGlicButton();
-  }
-
-  return BrowserElementsViews::From(browser_.get())
-      ->GetViewAs<views::LabelButton>(kGlicButtonElementId);
 }
 
 TabSearchBubbleHost* BrowserView::GetTabSearchBubbleHost() {

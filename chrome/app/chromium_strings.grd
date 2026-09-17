@@ -3058,11 +3058,6 @@ Chromium is unable to recover your settings.
         To add a new profile and use it with Glic, sign in to Chromium with a different Google Account. <ph name="BEGIN_LINK">&lt;a class="learn-more-link" href="#" target=&quot;_blank&quot;&gt;</ph>Learn how to add a new Chromium profile<ph name="END_LINK">&lt;/a&gt;</ph>
       </message>
 
-      <!-- Glic button and tab strip context menu -->
-      <message name="IDS_GLIC_CONTEXTUAL_CUEING_ANNOUNCEMENT" desc="Polite announcement that happens when a contextual nudge is shown next to the Glic button." translateable="false">
-        To open Gemini in Chromium, press <ph name="GLOBAL_HOTKEY">$1<ex>⌘+G</ex></ph>
-      </message>
-
       <!-- UNO Promo strings for extensions -->
       <if expr="enable_extensions">
         <message name="IDS_EXTENSION_INSTALLED_PROMO_EXPLICIT_SIGNIN_MESSAGE" desc="Text of the promo displayed at the bottom of the extension installed bubble asking the user to enable UNO.">

@@ -31,11 +31,8 @@
 #include "chrome/browser/enterprise/data_protection/data_protection_ui_controller.h"
 #include "chrome/browser/extensions/browser_extension_window_controller.h"
 #include "chrome/browser/glic/browser_ui/glic_iph_controller.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_controller.h"
-#include "chrome/browser/glic/browser_ui/glic_split_button_controller.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/glic/public/glic_keyed_service_factory.h"
 #include "chrome/browser/lens/region_search/lens_region_search_controller.h"
 #include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/profiles/profile.h"
@@ -151,7 +148,6 @@
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/tabs/groups/recent_activity_bubble_dialog_view.h"
 #include "chrome/browser/ui/views/tabs/organizer/organizer_panel_utils.h"
-#include "chrome/browser/ui/views/tabs/tab_strip_action_container.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/ui/views/upgrade_notification_controller.h"
@@ -541,9 +537,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
               glic::GlicKeyedService::Get(profile)) {
         glic_iph_controller_ =
             std::make_unique<glic::GlicIphController>(browser, *glic_service);
-        glic_split_button_controller_ =
-            std::make_unique<glic::GlicSplitButtonController>(browser,
-                                                              glic_service);
       }
     }
 
@@ -1121,7 +1114,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
 
   // TYPE_NORMAL members.
   glic_iph_controller_.reset();
-  glic_split_button_controller_.reset();
   initial_web_ui_manager_.reset();
   ai_overlay_dialog_controller_.reset();
 
@@ -1149,12 +1141,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   }
   browser_animation_controller_.reset();
   actor_border_view_controller_.reset();
-}
-
-glic::GlicNudgeController* BrowserWindowFeatures::glic_nudge_controller() {
-  return glic_split_button_controller_
-             ? glic_split_button_controller_->nudge_controller()
-             : nullptr;
 }
 
 SidePanelUI* BrowserWindowFeatures::side_panel_ui() {

@@ -25,10 +25,6 @@ class TabInterface;
 }  // namespace tabs
 
 namespace glic {
-class GlicNudgeController;
-}  // namespace glic
-
-namespace glic {
 
 class ContextualCueingService;
 class ScopedNudgeDecisionRecorder;
@@ -74,8 +70,6 @@ class ContextualCueingHelper : public content::WebContentsObserver {
   bool has_first_contentful_paint() const {
     return has_first_contentful_paint_;
   }
-
-  glic::GlicNudgeController* GetGlicNudgeController();
 
  private:
   // All pointers must be non-null and must outlive `this`.

@@ -7,7 +7,6 @@
 #include "base/check.h"
 #include "base/functional/bind.h"
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/glic/browser_ui/glic_nudge_controller.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/record_replay/task_parameters_extractor_factory.h"
 #include "chrome/browser/record_replay/task_service_factory.h"
@@ -223,23 +222,4 @@ void ChromeRecordReplayClient::PerformParametersExtraction(const GURL& url) {
   }
 }
 
-void ChromeRecordReplayClient::OnShouldOfferTask(bool offered) {
-  if (!offered) {
-    return;
-  }
-
-  if (glic::GlicNudgeController* nudge_controller =
-          tab()
-              .GetBrowserWindowInterface()
-              ->GetFeatures()
-              .glic_nudge_controller()) {
-    std::optional<record_replay::TaskDiscoveryService::AutomationMetadata>
-        metadata = task_discovery_service_->GetMetadata();
-    if (metadata.has_value()) {
-      nudge_controller->UpdateNudgeLabel(
-          tab().GetContents(), metadata->title,
-          std::make_optional(metadata->instructions), /*task=*/std::nullopt,
-          base::DoNothing());
-    }
-  }
-}
+void ChromeRecordReplayClient::OnShouldOfferTask(bool offered) {}

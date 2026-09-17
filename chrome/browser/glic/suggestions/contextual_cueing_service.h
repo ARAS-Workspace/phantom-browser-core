@@ -42,7 +42,6 @@ class LoadingPredictor;
 
 namespace glic {
 
-enum class GlicNudgeActivity;
 class ZeroStateSuggestionsRequest;
 
 using GlicSuggestionsCallbackList =
@@ -66,12 +65,6 @@ class ContextualCueingService
   // Reports a page load happened to `url`, and is used to keep track of quiet
   // page loads requirement after a cueing UI is shown.
   void ReportPageLoad();
-
-  // Called when cueing nudge activity happens.
-  void OnNudgeActivity(base::WeakPtr<content::WebContents> web_contents,
-                       base::TimeTicks document_available_time,
-                       bool is_dynamic,
-                       glic::GlicNudgeActivity activity);
 
   // Should be called when the cueing UI is shown for the tab with `url`.
   void CueingNudgeShown(const GURL& url);

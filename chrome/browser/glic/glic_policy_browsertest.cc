@@ -37,9 +37,7 @@
 #include "chrome/browser/ui/side_panel/side_panel_entry.h"
 #include "chrome/browser/ui/side_panel/side_panel_registry.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
-#include "chrome/browser/ui/views/glic/glic_button_interface.h"
 #include "chrome/browser/ui/views/interaction/browser_elements_views.h"
-#include "chrome/browser/ui/views/tabs/tab_strip_action_container.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/webui_url_constants.h"
@@ -65,8 +63,6 @@ using optimization_guide::prefs::kGeminiSettings;
 using policy::PolicyTest;
 
 namespace glic {
-
-class GlicButtonInterface;
 
 namespace {
 
@@ -201,12 +197,6 @@ class GlicPolicyTest : public PolicyTest {
     profile_2_ = nullptr;
   }
 
-  bool IsGlicButtonVisible(BrowserWindowInterface* browser) {
-    views::LabelButton* button =
-        glic::GlicButtonInterface::FromBrowser(browser);
-    return button && button->GetVisible();
-  }
-
   void SetGlicPolicy(
       testing::NiceMock<policy::MockConfigurationPolicyProvider>& provider,
       GeminiSettingsPolicyState value) {
@@ -311,88 +301,6 @@ IN_PROC_BROWSER_TEST_F(GlicPolicyTest, PrefDisabledByPolicy) {
   // Verify the policy value cannot be overridden.
   prefs->SetInteger(kGeminiSettings, kEnabledValue);
   EXPECT_EQ(kDisabledValue, prefs->GetInteger(kGeminiSettings));
-}
-
-// Ensure that when policy disables Glic, a browser window doesn't show the Glic
-// button.
-IN_PROC_BROWSER_TEST_F(GlicPolicyTest, PolicyAffectsGlicButtonInNewWindows) {
-  ASSERT_EQ(browser()->GetProfile(), profile_1_);
-  ASSERT_NE(profile_1_, profile_2_);
-
-  // Disable the policy in the default profile.
-  SetGlicPolicy(policy_for_profile_1(), GeminiSettingsPolicyState::kDisabled);
-  ASSERT_EQ(kDisabledValue,
-            profile_1_->GetPrefs()->GetInteger(kGeminiSettings));
-
-  {
-    // A new window in profile 1 shouldn't have the Glic button.
-    BrowserWindowInterface* new_window_profile_1 = CreateBrowser(profile_1_);
-    EXPECT_FALSE(IsGlicButtonVisible(new_window_profile_1));
-
-    // A new window in profile 2 should continue to have the Glic button since
-    // only profile 1 disabled Glic.
-    BrowserWindowInterface* new_window_profile_2 = CreateBrowser(profile_2_);
-    EXPECT_TRUE(IsGlicButtonVisible(new_window_profile_2));
-  }
-
-  // Re-enable the policy. Ensure the button is recreated.
-  SetGlicPolicy(policy_for_profile_1(), GeminiSettingsPolicyState::kEnabled);
-  ASSERT_EQ(kEnabledValue, profile_1_->GetPrefs()->GetInteger(kGeminiSettings));
-
-  {
-    // A new window in profile 1 should again get the Glic button now that the
-    // policy is re-enabled.
-    BrowserWindowInterface* new_window_profile_1 = CreateBrowser(profile_1_);
-    EXPECT_TRUE(IsGlicButtonVisible(new_window_profile_1));
-  }
-}
-
-// Ensure that when policy disables Glic, a browser window doesn't show the Glic
-// button.
-IN_PROC_BROWSER_TEST_F(GlicPolicyTest, GlicButtonInExistingWindows) {
-  ASSERT_EQ(browser()->GetProfile(), profile_1_);
-  ASSERT_NE(profile_1_, profile_2_);
-
-  // Create two windows in each profile.
-  BrowserWindowInterface* profile_1_window_1 = browser();
-  BrowserWindowInterface* profile_1_window_2 = CreateBrowser(profile_1_);
-  BrowserWindowInterface* profile_2_window_1 = CreateBrowser(profile_2_);
-  BrowserWindowInterface* profile_2_window_2 = CreateBrowser(profile_2_);
-
-  // Ensure the button was created in each window.
-  EXPECT_TRUE(IsGlicButtonVisible(profile_1_window_1));
-  EXPECT_TRUE(IsGlicButtonVisible(profile_1_window_2));
-  EXPECT_TRUE(IsGlicButtonVisible(profile_2_window_1));
-  EXPECT_TRUE(IsGlicButtonVisible(profile_2_window_2));
-
-  // Disable the policy in the first profile.
-  SetGlicPolicy(policy_for_profile_1(), GeminiSettingsPolicyState::kDisabled);
-  ASSERT_EQ(kDisabledValue,
-            profile_1_->GetPrefs()->GetInteger(kGeminiSettings));
-
-  {
-    // The windows in profile 1 should have lost their Glic button.
-    EXPECT_FALSE(IsGlicButtonVisible(profile_1_window_1));
-    EXPECT_FALSE(IsGlicButtonVisible(profile_1_window_2));
-
-    // The windows in profile 2 should have kept their Glic button.
-    EXPECT_TRUE(IsGlicButtonVisible(profile_2_window_1));
-    EXPECT_TRUE(IsGlicButtonVisible(profile_2_window_2));
-  }
-
-  // Re-enable the policy. Ensure the button is recreated.
-  SetGlicPolicy(policy_for_profile_1(), GeminiSettingsPolicyState::kEnabled);
-  ASSERT_EQ(kEnabledValue, profile_1_->GetPrefs()->GetInteger(kGeminiSettings));
-
-  {
-    // The windows in profile 1 should get back their Glic button.
-    EXPECT_TRUE(IsGlicButtonVisible(profile_1_window_1));
-    EXPECT_TRUE(IsGlicButtonVisible(profile_1_window_2));
-
-    // The windows in profile 2 still have their Glic button.
-    EXPECT_TRUE(IsGlicButtonVisible(profile_2_window_1));
-    EXPECT_TRUE(IsGlicButtonVisible(profile_2_window_2));
-  }
 }
 
 // Ensure that background mode is entered if and only if a profile with the

@@ -83,7 +83,6 @@
 #include "ui/base/page_transition_types.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/glic/browser_ui/glic_nudge_controller.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser_actions.h"
 #include "chrome/browser/ui/hats/hats_service.h"
@@ -365,15 +364,6 @@ void ContextualTasksSidePanelCoordinator::Show(
   NotifyActiveTaskContextProvider();
 
 #if !BUILDFLAG(IS_ANDROID)
-  // Hide the GLIC nudge when the panel is opened.
-  if (auto* glic_nudge_controller =
-          browser_window_->GetFeatures().glic_nudge_controller()) {
-    glic_nudge_controller->UpdateNudgeLabel(
-        active_tab_interface->GetContents(), "", std::nullopt,
-        glic::GlicNudgeActivity::kNudgeIgnoredOpenedContextualTasksSidePanel,
-        base::DoNothing());
-  }
-
   // Feature engagement session notice and IPH trigger checks.
   feature_engagement::Tracker* tracker =
       feature_engagement::TrackerFactory::GetForBrowserContext(

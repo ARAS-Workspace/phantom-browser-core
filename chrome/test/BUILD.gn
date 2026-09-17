@@ -2052,7 +2052,6 @@ if (!is_android) {
       "//chrome/browser/ui/views/frame:app_menu_button_observer",
       "//chrome/browser/ui/views/frame:contents_container_outline",
       "//chrome/browser/ui/views/frame:scrim_view",
-      "//chrome/browser/ui/views/glic",
       "//chrome/browser/ui/views/importer:browser_tests",
       "//chrome/browser/ui/views/interaction:browser_tests",
       "//chrome/browser/ui/views/location_bar:browser_tests",
@@ -2065,7 +2064,6 @@ if (!is_android) {
       "//chrome/browser/ui/views/profiles:avatar_toolbar_button_browser_tests",
       "//chrome/browser/ui/views/side_panel",
       "//chrome/browser/ui/views/storage",
-      "//chrome/browser/ui/views/tabs/glic",
       "//chrome/browser/ui/views/tabs/hovercard:hovercard_helpers",
       "//chrome/browser/ui/views/tabs/organizer",
       "//chrome/browser/ui/views/tabs/vertical:browser_tests",
@@ -2730,10 +2728,8 @@ if (!is_android) {
       "../browser/ui/views/tabs/dragging/dragging_tabs_session_browsertest.cc",
       "../browser/ui/views/tabs/fake_base_tab_strip_controller.cc",
       "../browser/ui/views/tabs/fake_base_tab_strip_controller.h",
-      "../browser/ui/views/tabs/glic/glic_button_browsertest.cc",
       "../browser/ui/views/tabs/groups/recent_activity_bubble_dialog_view_browsertest.cc",
       "../browser/ui/views/tabs/hovercard/tab_hover_card_controller_browsertest.cc",
-      "../browser/ui/views/tabs/tab_strip_action_container_browsertest.cc",
       "../browser/ui/views/tabs/tab_strip_browsertest.cc",
       "../browser/ui/views/web_apps/frame_toolbar/web_app_frame_toolbar_browsertest.cc",
       "../browser/ui/views/web_apps/frame_toolbar/web_app_menu_browsertest.cc",
@@ -2907,7 +2903,6 @@ if (!is_android) {
 
     deps += [
       "//chrome/browser:flags",
-      "//chrome/browser/actor/ui/task_list_bubble:controller",
       "//chrome/browser/apps/link_capturing:app_service_browser_tests",
       "//chrome/browser/autocomplete",
       "//chrome/browser/autocomplete:aim_eligibility_service",
@@ -5419,7 +5414,6 @@ test("unit_tests") {
 
     deps += [
       "//chrome/browser/actor",
-      "//chrome/browser/actor/ui/task_list_bubble:unit_tests",
       "//chrome/browser/autocomplete:aim_eligibility_service",
       "//chrome/browser/autofill/actor:unit_tests",
       "//chrome/browser/bluetooth",
@@ -5502,7 +5496,6 @@ test("unit_tests") {
       "//chrome/browser/ui/views/dictation:unit_tests",
       "//chrome/browser/ui/views/drive_picker_host",
       "//chrome/browser/ui/views/drive_picker_host:unit_tests",
-      "//chrome/browser/ui/views/glic",
       "//chrome/browser/ui/views/page_action:test_support",
       "//chrome/browser/ui/views/page_action:unit_tests",
       "//chrome/browser/ui/views/passwords:test_support",
@@ -5510,7 +5503,6 @@ test("unit_tests") {
       "//chrome/browser/ui/views/passwords/password_change:successful_password_change_view",
       "//chrome/browser/ui/views/payments:unit_tests",
       "//chrome/browser/ui/views/tabs/common:unit_tests",
-      "//chrome/browser/ui/views/tabs/glic",
       "//chrome/browser/ui/views/tabs/vertical:unit_tests",
       "//chrome/browser/ui/views/toolbar:unit_tests",
       "//chrome/browser/ui/views/user_education",
@@ -6450,7 +6442,6 @@ test("unit_tests") {
       "../browser/ui/views/tabs/tab_group_views_unittest.cc",
       "../browser/ui/views/tabs/tab_strip_control_button_unittest.cc",
       "../browser/ui/views/tabs/tab_strip_layout_unittest.cc",
-      "../browser/ui/views/tabs/tab_strip_nudge_button_unittest.cc",
       "../browser/ui/views/tabs/tab_strip_unittest.cc",
       "../browser/ui/views/tabs/tab_unittest.cc",
       "../browser/ui/views/task_manager_search_bar_view_unittest.cc",
@@ -6461,7 +6452,6 @@ test("unit_tests") {
     ]
     sources += [
       "../browser/ui/views/profiles/avatar_badge_view_unittest.cc",
-      "../browser/ui/views/tabs/tab_strip_action_container_unittest.cc",
     ]
 
     # TODO(crbug.com/353332589): Remove this dependency when the
@@ -7026,7 +7016,6 @@ if (!is_android) {
       "//chrome/browser/actor",
       "//chrome/browser/actor:test_support",
       "//chrome/browser/actor/ui:interactive_ui_tests",
-      "//chrome/browser/actor/ui/task_list_bubble:interactive_ui_tests",
       "//chrome/browser/ai:interactive_ui_tests",
       "//chrome/browser/apps/app_service",
       "//chrome/browser/apps/app_service:app_registry_cache_waiter",
@@ -7813,8 +7802,6 @@ if (!is_android) {
       "//chrome/browser/glic:interactive_ui_tests",
       "//chrome/browser/glic/test_support",
       "//chrome/browser/skills:interactive_ui_tests",
-      "//chrome/browser/ui/views/glic",
-      "//chrome/browser/ui/views/tabs/glic",
     ]
     data_deps += [
       "//chrome/browser/background/glic:interactive_ui_tests",

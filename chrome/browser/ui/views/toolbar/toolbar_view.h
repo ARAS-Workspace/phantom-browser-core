@@ -13,7 +13,6 @@
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
 #include "chrome/browser/command_observer.h"
-#include "chrome/browser/glic/browser_ui/glic_split_button_delegate.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/page_action/page_action_icon_type.h"
 #include "chrome/browser/ui/toolbar/app_menu_icon_controller.h"
@@ -36,11 +35,9 @@
 #include "ui/views/accessible_pane_view.h"
 #include "ui/views/animation/animation_delegate_views.h"
 #include "ui/views/controls/button/menu_button.h"
-#include "ui/views/mouse_watcher.h"
 #include "ui/views/view.h"
 #include "url/origin.h"
 
-class ActorTaskListBubble;
 class AvatarToolbarButton;
 class AvatarToolbarButtonInterface;
 class BatterySaverButton;
@@ -66,32 +63,15 @@ class FlexLayout;
 class LabelButton;
 }  // namespace views
 
-namespace glic {
-class ToolbarGlicButton;
-class ToolbarGlicActorTaskIcon;
-class GlicButtonInterface;
-class GlicSplitButtonController;
-}  // namespace glic
-
-class GlicAndActorButtonsContainer;
-
-enum class ExpansionMode {
-  kNone = 0,
-  kWillShow,
-  kWillHide,
-};
-
 // The Browser Window's toolbar.
 class ToolbarView : public views::AccessiblePaneView,
                     public ui::AcceleratorProvider,
                     public views::AnimationDelegateViews,
                     public LocationBarView::Delegate,
                     public CommandObserver,
-                    public views::MouseWatcherListener,
                     public AppMenuIconController::Delegate,
                     public ToolbarButtonProvider,
-                    public BrowserRootView::DropTarget,
-                    public glic::GlicSplitButtonDelegate {
+                    public BrowserRootView::DropTarget {
   METADATA_HEADER(ToolbarView, views::AccessiblePaneView)
 
  public:
@@ -183,8 +163,6 @@ class ToolbarView : public views::AccessiblePaneView,
   MediaToolbarButton* media_button() const { return media_button_; }
   HomeButton* home_button() const { return home_; }
 
-  views::LabelButton* GetGlicButton();
-
   // TODO(crbug.com/513238408): Remove this once toolbar layout/overflow is
   // fixed.
   AvatarToolbarButton* avatar_toolbar_button() { return avatar_; }
@@ -201,10 +179,6 @@ class ToolbarView : public views::AccessiblePaneView,
 
   WebUIToolbarWebView* detached_toolbar_webview_for_testing() {
     return detached_toolbar_webview_.get();
-  }
-
-  glic::ToolbarGlicActorTaskIcon* glic_actor_task_icon() {
-    return glic_actor_task_icon_;
   }
 
   // LocationBarView::Delegate:
@@ -232,29 +206,6 @@ class ToolbarView : public views::AccessiblePaneView,
   void ChildVisibilityChanged(View* child) override;
 
   friend class AvatarToolbarButtonBaseBrowserTest;
-
-  // GlicSplitButtonDelegate:
-  void SetGlicShowState(bool show) override;
-  void SetGlicPanelIsOpen(bool open) override;
-  // Called when the glic nudge UI needs to be triggered. `label' holds the
-  // nudge label. `anchored_message_text` and `prompt_suggestion` are unused in
-  // this UI.
-  void OnTriggerGlicNudgeUI(glic::NudgeParams params) override;
-  void OnHideGlicNudgeUI() override;
-  bool GetIsShowingGlicNudge() override;
-  void ShowGlicActorTaskIcon() override;
-  void HideGlicActorTaskIcon() override;
-  bool GetIsShowingGlicActorTaskIconNudge() override;
-  void SetGlicActorNudgeLabel(const std::u16string& nudge_label) override;
-  void TriggerGlicActorNudge(const std::u16string& nudge_text) override;
-  void SetGlicActorNudgePressedState(bool pressed) override;
-  void ShowActorTaskListBubble() override;
-  void CloseActorTaskListBubble() override;
-  bool IsActorTaskListBubbleShowing() override;
-
-  // Updates glic button parenting after hiding glic actor task icon.
-  void FinalizeHideGlicActorTaskIcon();
-
  protected:
   // This controls Toolbar, LocationBar and CustomTabBar visibility.
   // If we don't set all three, tab navigation from the app menu breaks
@@ -310,10 +261,6 @@ class ToolbarView : public views::AccessiblePaneView,
   BrowserRootView::DropTarget* GetDropTarget(
       gfx::Point loc_in_local_coords) override;
   views::View* GetViewForDrop() override;
-
-  // views::MouseWatcherListener:
-  void MouseMovedOutOfHost() override;
-
   // Loads the images for all the child views.
   void LoadImages();
 
@@ -323,39 +270,9 @@ class ToolbarView : public views::AccessiblePaneView,
 
   void OnTouchUiChanged();
 
-  void InitGlicContainer();
-
-  void OnVerticalTabStripModeChanged(
-      tabs::VerticalTabStripStateController* controller);
-
   void SetForwardButtonVisibility(bool visible);
 
   gfx::Size GetBackForwardButtonSize(bool minimum_size = false) const;
-
-  std::unique_ptr<glic::ToolbarGlicButton> CreateGlicButton();
-  void OnGlicButtonClicked();
-  void OnGlicButtonDismissed();
-  void OnGlicButtonAnimationEnded();
-  void ShowToolbarNudge(glic::GlicButtonInterface* button);
-  void HideToolbarNudge(glic::GlicButtonInterface* button);
-  void ShowGlicActorNudge(const std::u16string nudge_text);
-  void ExecuteShowToolbarNudge(glic::GlicButtonInterface* button);
-  void ExecuteHideToolbarNudge(glic::GlicButtonInterface* button);
-  void UpdateGlicActorVisibility();
-  void UpdateGlicButtonVisibility();
-  void SetGlicActorShowState(bool show);
-  void UpdateGlicActorButtonContainerBorders();
-
-  std::unique_ptr<glic::ToolbarGlicActorTaskIcon> CreateGlicActorTaskIcon();
-  void OnGlicActorTaskIconClicked();
-  std::unique_ptr<GlicAndActorButtonsContainer>
-  CreateGlicActorButtonContainer();
-
-  // Update the expansion mode to be executed once the mouse is no longer over
-  // the nudge. This button will be what is expanded, either the glic button or
-  // actor button.
-  void SetLockedExpansionMode(ExpansionMode mode,
-                              glic::GlicButtonInterface* button);
 
   gfx::SlideAnimation size_animation_{this};
 
@@ -388,28 +305,10 @@ class ToolbarView : public views::AccessiblePaneView,
   raw_ptr<AvatarToolbarButton> avatar_ = nullptr;
   raw_ptr<MediaToolbarButton> media_button_ = nullptr;
   raw_ptr<BrowserAppMenuButton> app_menu_button_ = nullptr;
-
-  // The button currently holding the lock to be shown/hidden.
-  raw_ptr<glic::GlicButtonInterface> locked_expansion_button_ = nullptr;
-  raw_ptr<GlicAndActorButtonsContainer> glic_actor_button_container_ = nullptr;
-  raw_ptr<glic::ToolbarGlicButton> glic_button_ = nullptr;
-  raw_ptr<glic::ToolbarGlicActorTaskIcon> glic_actor_task_icon_ = nullptr;
-  raw_ptr<ToolbarDivider> glic_button_divider_ = nullptr;
-  std::unique_ptr<ActorTaskListBubble> actor_task_list_bubble_;
-
-  // When locked, the container is unable to change its expanded state.
-  // Changes will be staged until after this is unlocked.
-  ExpansionMode locked_expansion_mode_ = ExpansionMode::kNone;
-
-  // MouseWatcher is used to lock and unlock the expansion state of this
-  // container.
-  std::unique_ptr<views::MouseWatcher> mouse_watcher_;
-
   raw_ptr<ToolbarButton> ai_overlay_dialog_button_ = nullptr;
 
   const raw_ptr<Browser> browser_;
   const raw_ptr<BrowserView> browser_view_;
-  base::WeakPtr<glic::GlicSplitButtonController> glic_split_button_controller_;
 
   // ToolbarView may or may not serve as the `ToolbarButtonProvider` for a given
   // browser instance depending on the browser type (e.g. WebApp browsers set
@@ -446,13 +345,6 @@ class ToolbarView : public views::AccessiblePaneView,
   // due to small toolbar view width. Visibility controlled by
   // `toolbar_controller_`.
   raw_ptr<OverflowButton> overflow_button_ = nullptr;
-
-  // Subscription for when tab strip mode changes
-  base::CallbackListSubscription vertical_tab_subscription_;
-
-  bool should_display_vertical_tabs_ = false;
-  bool should_show_glic_button_ = false;
-  bool should_show_glic_actor_ = false;
 
   bool was_mouse_down_ = false;
 };
