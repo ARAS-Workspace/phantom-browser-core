@@ -45,8 +45,6 @@ class SettingsBrowserTest : public WebUIMochaBrowserTest {
   }
 
  private:
-  glic::GlicTestEnvironment glic_test_environment_{
-      {.force_signin_and_glic_capability = false}};
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 

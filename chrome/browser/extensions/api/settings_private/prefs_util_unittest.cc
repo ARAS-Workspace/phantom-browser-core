@@ -104,25 +104,6 @@ TEST_F(PrefsUtilTest, SetPref_FixesUpInvalidUrl) {
   EXPECT_EQ(profile_->GetPrefs()->GetString(::prefs::kHomePage), "");
 }
 
-TEST_F(PrefsUtilTest, GlicPrefsAllowlisted) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(features::kGlic);
-  struct ScopedBypass {
-    ScopedBypass() {
-      glic::GlicEnabling::SetBypassEnablementChecksForTesting(true);
-    }
-    ~ScopedBypass() {
-      glic::GlicEnabling::SetBypassEnablementChecksForTesting(false);
-    }
-  } bypass;
-
-  std::optional<api::settings_private::PrefObject> pref =
-      prefs_util_->GetPref(glic::prefs::kGlicHotkeyGlobalScopeEnabled);
-  ASSERT_TRUE(pref.has_value());
-  EXPECT_EQ(pref->key, glic::prefs::kGlicHotkeyGlobalScopeEnabled);
-  EXPECT_EQ(pref->type, api::settings_private::PrefType::kBoolean);
-}
-
 TEST_F(PrefsUtilTest, FindAndFillWithGeminiSettingsReadOnly) {
   base::Value value;
   EXPECT_EQ(

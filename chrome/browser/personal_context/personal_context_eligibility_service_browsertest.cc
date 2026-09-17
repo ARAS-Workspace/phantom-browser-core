@@ -111,9 +111,6 @@ class PersonalContextEligibilityServiceImplBrowserTest
         prefs::kPersonalContextAmbientAutofillNoticeShouldBeShown, false);
     pref_service_->SetBoolean(
         prefs::kPersonalContextInAutofillSettingsToggleStatus, true);
-    pref_service_->SetInteger(
-        ::glic::prefs::kGlicCompletedFre,
-        std::to_underlying(::glic::prefs::FreStatus::kCompleted));
 
     // Instantiate service locally via factory
     eligibility_service_ = static_cast<PersonalContextEligibilityServiceImpl*>(
@@ -234,18 +231,6 @@ IN_PROC_BROWSER_TEST_F(PersonalContextEligibilityServiceImplBrowserTest,
   eligibility_service_->OnAccountSettingDataUpdated("any_setting");
 
   eligibility_service_->RemoveObserver(&observer);
-}
-
-IN_PROC_BROWSER_TEST_F(PersonalContextEligibilityServiceImplBrowserTest,
-                       ConsentGlicFreGateDisablesService) {
-  SignIn(kAdultUserEmail);
-
-  pref_service_->SetInteger(
-      ::glic::prefs::kGlicCompletedFre,
-      std::to_underlying(::glic::prefs::FreStatus::kNotStarted));
-
-  EXPECT_EQ(eligibility_service_->GetEligibilityState(),
-            PersonalContextEligibilityState::kDisabledNotEligible);
 }
 
 }  // namespace

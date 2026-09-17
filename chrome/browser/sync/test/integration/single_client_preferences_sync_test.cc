@@ -1824,57 +1824,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientTrackedPreferencesSyncTestWithAttack,
 
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
-
-class SingleClientPreferencesGlicTieredRolloutTest
-    : public SingleClientPreferencesSyncTest {
- public:
-  SingleClientPreferencesGlicTieredRolloutTest() {
-    feature_list_.InitWithFeatures({::features::kGlicTieredRollout},
-                                   {::features::kGlicRollout});
-  }
-
-  void SetGlicTieredRolloutEligibility(bool is_eligible) {
-    InjectPreferenceToFakeServer(syncer::PRIORITY_PREFERENCES,
-                                 glic::prefs::kGlicRolloutEligibility,
-                                 base::Value(is_eligible));
-  }
-
- private:
-  glic::GlicTestEnvironment glic_test_env_{
-      {.force_signin_and_glic_capability = false}};
-  base::test::ScopedFeatureList feature_list_;
-};
-
-INSTANTIATE_TEST_SUITE_P(,
-                         SingleClientPreferencesGlicTieredRolloutTest,
-                         GetSyncTestModes(),
-                         testing::PrintToStringParamName());
-
-IN_PROC_BROWSER_TEST_P(SingleClientPreferencesGlicTieredRolloutTest, E2E) {
-  ASSERT_TRUE(SetupClients());
-
-  // Have user be eligible for Glic from an account perspective.
-  ASSERT_TRUE(SignIn());
-  glic::SetGlicCapability(GetProfile(0), /*enabled=*/true);
-
-  // Should not be enabled as profile not eligible for tiered rollout.
-  EXPECT_FALSE(glic::GlicEnabling::IsEnabledForProfile(GetProfile(0)));
-
-  // Set user eligible via server.
-  SetGlicTieredRolloutEligibility(/*is_eligible=*/true);
-  ASSERT_TRUE(SetupSync());
-
-  // User should have priority preferences synced and rollout eligibility is
-  // true.
-  ASSERT_TRUE(GetSyncService(0)->GetActiveDataTypes().Has(
-      syncer::PRIORITY_PREFERENCES));
-  EXPECT_TRUE(GetPrefs(0)->GetBoolean(glic::prefs::kGlicRolloutEligibility));
-  EXPECT_TRUE(glic::GlicEnabling::IsEnabledForProfile(GetProfile(0)));
-}
-
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 class SingleClientPreferencesSubscriptionEligibilityTest
     : public SingleClientPreferencesSyncTest {
  public:

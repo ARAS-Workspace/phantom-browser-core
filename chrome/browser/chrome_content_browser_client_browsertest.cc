@@ -33,6 +33,7 @@
 #include "chrome/browser/search/instant_service_factory.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
+#include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/browser.h"
@@ -422,7 +423,7 @@ IN_PROC_BROWSER_TEST_F(PageColorsBrowserClientTest,
                    "getPropertyValue('color').toString()"));
 }
 
-using PrefersColorSchemeTestBase = glic::GlicBrowserTest;
+using PrefersColorSchemeTestBase = PlatformBrowserTest;
 
 // Tests for the preferred color scheme for a given WebContents. The first param
 // controls whether the web NativeTheme is light or dark the second controls
@@ -432,6 +433,8 @@ class PrefersColorSchemeTest
       public PrefersColorSchemeTestBase {
  public:
   using PlatformBrowserTest::CreateIncognitoBrowser;
+
+  BrowserWindowInterface* GetBrowser() { return GetBrowserWindowInterface(); }
 
   void SetUpOnMainThread() override {
     PrefersColorSchemeTestBase::SetUpOnMainThread();
@@ -534,24 +537,6 @@ IN_PROC_BROWSER_TEST_P(PrefersColorSchemeTest, FeatureOverridesChromeSchemes) {
   EXPECT_EQ(
       true,
       EvalJs(GetTabListInterface()->GetActiveTab()->GetContents(),
-             base::StringPrintf(
-                 "window.matchMedia('(prefers-color-scheme: %s)').matches",
-                 ExpectedColorScheme())));
-}
-
-IN_PROC_BROWSER_TEST_P(PrefersColorSchemeTest, PrefersColorSchemeGlic) {
-  ASSERT_OK_AND_ASSIGN(auto* instance, OpenGlicForActiveTab());
-  ASSERT_OK(WaitForGlicClient(instance));
-  content::WebContents* webui_contents = instance->host().webui_contents();
-  ASSERT_TRUE(webui_contents);
-  ApplyColorProvider(*webui_contents);
-
-  content::RenderFrameHost* frame = instance->host().GetGuestMainFrame();
-  ASSERT_TRUE(frame);
-
-  EXPECT_EQ(
-      true,
-      EvalJs(frame,
              base::StringPrintf(
                  "window.matchMedia('(prefers-color-scheme: %s)').matches",
                  ExpectedColorScheme())));

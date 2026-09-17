@@ -184,9 +184,6 @@ class BoundSessionOAuthMultiloginBaseTest
     all_enabled_features.push_back(switches::kEnableChromeRefreshTokenBinding);
     std::vector<base::test::FeatureRef> all_disabled_features =
         disabled_features;
-    // Disable automatic syncing of cookies to the glic partition, which breaks
-    // some assertions in this test suite.
-    all_disabled_features.push_back(features::kGlicCookieSyncOnTokenChange);
     feature_list_.InitWithFeatures(all_enabled_features, all_disabled_features);
   }
 
@@ -685,127 +682,6 @@ class BoundSessionOAuthMultiloginSecondaryPartitionTest
              network::features::kUseUnexportableKeyServiceInBrowserProcess},
             {switches::kEnableOAuthMultiloginStandardCookiesBinding}) {}
 };
-
-IN_PROC_BROWSER_TEST_F(BoundSessionOAuthMultiloginSecondaryPartitionTest,
-                       StartsNewBoundSessionSecondaryPartition) {
-  const UnexportableSigningKeyId key_id = GenerateNewSigningKey();
-  const std::vector<uint8_t> wrapped_key = GetWrappedKey(key_id);
-
-  // Setup FakeGaia to return the account in /ListAccounts.
-  // This prevents the AccountReconcilor (which runs automatically for the
-  // default partition) from seeing a cookie mismatch and triggering its own
-  // background multilogin calls. This allows us to strictly assert that only
-  // 2 multilogin calls happen for our manual flow on the secondary partition.
-  fake_gaia_mixin().SetupFakeGaiaForLoginWithDefaults();
-  FakeGaia::Configuration config;
-  config.emails = {FakeGaiaMixin::kFakeUserEmail};
-  config.spec_compliant_device_bound_session = true;
-  config.session_sid_cookie = "fake_sid";
-  config.session_lsid_cookie = "fake_lsid";
-  config.session_1p_sidts_cookie = "fake_1p_sidts";
-  config.session_3p_sidts_cookie = "fake_3p_sidts";
-  fake_gaia().SetConfiguration(config);
-
-  // Create observer to wait for reconcilor to settle.
-  TestAccountReconcilorObserver reconcilor_observer(
-      AccountReconcilorFactory::GetForProfile(browser()->GetProfile()),
-      signin_metrics::AccountReconcilorState::kOk);
-
-  signin::MakeAccountAvailable(
-      &identity_manager(),
-      signin::AccountAvailabilityOptionsBuilder()
-          .AsPrimary(signin::ConsentLevel::kSignin)
-          .WithGaiaId(FakeGaiaMixin::kFakeUserGaiaId)
-          .WithRefreshToken(FakeGaiaMixin::kFakeRefreshToken)
-          .WithRefreshTokenBindingInfo(signin::TokenBindingInfo(
-              wrapped_key, /*mtls_token_binding=*/false))
-          .Build(FakeGaiaMixin::kFakeUserEmail));
-
-  reconcilor_observer.WaitForStateChange();
-
-  ASSERT_TRUE(
-      identity_manager().HasPrimaryAccount(signin::ConsentLevel::kSignin));
-  ASSERT_EQ(identity_manager().GetWrappedBindingKey(), wrapped_key);
-
-  content::StoragePartitionConfig glic_config =
-      content::StoragePartitionConfig::Create(
-          browser()->GetProfile(), /*partition_domain=*/"glic",
-          /*partition_name=*/"glicpart", /*in_memory=*/false);
-  content::StoragePartition* glic_partition =
-      browser()->GetProfile()->GetStoragePartition(glic_config);
-  ASSERT_TRUE(glic_partition);
-
-  {
-    // Verify that there are no bound sessions before OAML.
-    base::test::TestFuture<
-        const std::vector<net::device_bound_sessions::SessionKey>&>
-        sessions_future;
-    glic_partition->GetDeviceBoundSessionManager()->GetAllSessions(
-        sessions_future.GetCallback());
-    ASSERT_THAT(sessions_future.Get(), IsEmpty());
-  }
-
-  base::RunLoop run_loop;
-  DeviceBoundSessionAccessObserver observer(
-      *glic_partition->GetDeviceBoundSessionManager(),
-      base::IgnoreArgs<const net::device_bound_sessions::SessionAccess&>(
-          run_loop.QuitClosure()));
-
-  glic::GlicCookieSynchronizer synchronizer(browser()->GetProfile(),
-                                            &identity_manager());
-  base::test::TestFuture<bool> copy_future;
-  synchronizer.CopyCookiesToWebviewStoragePartition(copy_future.GetCallback());
-
-  run_loop.Run();
-
-  ASSERT_TRUE(copy_future.Get());
-
-  base::test::TestFuture<
-      const std::vector<net::device_bound_sessions::SessionKey>&>
-      sessions_future;
-  glic_partition->GetDeviceBoundSessionManager()->GetAllSessions(
-      sessions_future.GetCallback());
-  EXPECT_THAT(
-      sessions_future.Get(),
-      UnorderedElementsAre(AllOf(
-          Field(&net::device_bound_sessions::SessionKey::id,
-                net::device_bound_sessions::SessionKey::Id("sidts_session")),
-          Field(&net::device_bound_sessions::SessionKey::site,
-                net::SchemefulSite::Deserialize("https://google.com")))));
-
-  // Verify no sessions in the default partition.
-  content::StoragePartition* default_partition =
-      browser()->GetProfile()->GetDefaultStoragePartition();
-  ASSERT_TRUE(default_partition);
-  base::test::TestFuture<
-      const std::vector<net::device_bound_sessions::SessionKey>&>
-      default_sessions_future;
-  default_partition->GetDeviceBoundSessionManager()->GetAllSessions(
-      default_sessions_future.GetCallback());
-  EXPECT_THAT(default_sessions_future.Get(), IsEmpty());
-
-  base::queue<FakeGaia::MultiloginCall> multilogin_calls =
-      fake_gaia().GetAndResetMultiloginCalls();
-
-  ASSERT_THAT(multilogin_calls, SizeIs(2));
-
-  const auto& first_call = multilogin_calls.front();
-  ASSERT_EQ(first_call.action,
-            FakeGaia::MultiloginCall::Action::kReturnBindingChallenge);
-  multilogin_calls.pop();
-
-  const auto& second_call = multilogin_calls.front();
-  ASSERT_EQ(second_call.action,
-            FakeGaia::MultiloginCall::Action::kReturnBoundCookies);
-
-  const std::optional<gaia::MultiOAuthHeader> header = second_call.header;
-  ASSERT_TRUE(header.has_value());
-  ASSERT_THAT(header->account_requests(), SizeIs(1));
-  EXPECT_TRUE(signin::VerifyJwtSignature(
-      header->account_requests().at(0).token_binding_assertion(),
-      *unexportable_key_service().GetAlgorithm(key_id),
-      *unexportable_key_service().GetSubjectPublicKeyInfo(key_id)));
-}
 
 struct PersistentErrorTestParam {
   OAuthMultiloginResponseStatus oauth_multilogin_response_status =

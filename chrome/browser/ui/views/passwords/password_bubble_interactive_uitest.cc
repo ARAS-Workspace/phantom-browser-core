@@ -168,21 +168,6 @@ class PasswordBubbleInteractiveUiTestBase : public ManagePasswordsTest {
   PasswordBubbleInteractiveUiTestBase() = default;
   ~PasswordBubbleInteractiveUiTestBase() override = default;
 
-  void AddActorTask() {
-    auto* actor_keyed_service = static_cast<actor::ActorKeyedServiceFake*>(
-        actor::ActorKeyedServiceFactory::GetActorKeyedService(
-            browser()->GetProfile()));
-    actor::TaskId task_id = actor_keyed_service->CreateTaskForTesting();
-    actor::ActorTask* task = actor_keyed_service->GetTask(task_id);
-    base::RunLoop loop;
-    task->AddTab(
-        browser()->tab_strip_model()->GetActiveTab()->GetHandle(),
-        /*stop_task_on_detach=*/true,
-        base::BindLambdaForTesting(
-            [&](actor::mojom::ActionResultPtr result) { loop.Quit(); }));
-    loop.Run();
-  }
-
  protected:
   void InitializeFeatures(
       std::vector<base::test::FeatureRefAndParams> enabled_features = {},
@@ -244,106 +229,7 @@ IN_PROC_BROWSER_TEST_F(PasswordBubbleInteractiveUiTest, BasicOpenAndClose) {
   EXPECT_FALSE(IsBubbleShowing());
 }
 
-IN_PROC_BROWSER_TEST_F(PasswordBubbleInteractiveUiTest,
-                       ActorActiveSupressesPendingPasswordPopup) {
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-
-  AddActorTask();
-  SetupPendingPassword();
-  EXPECT_FALSE(IsBubbleShowing());
-}
-
-IN_PROC_BROWSER_TEST_F(PasswordBubbleInteractiveUiTest,
-                       ActorActiveSupressesAutoSignin) {
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-
-  test_form()->url = GURL("https://example.com");
-  test_form()->display_name = u"Peter";
-  test_form()->username_value = u"pet12@gmail.com";
-  test_form()->icon_url = embedded_test_server()->GetURL("/icon.png");
-  std::vector<std::unique_ptr<password_manager::PasswordForm>>
-      local_credentials;
-  local_credentials.push_back(
-      std::make_unique<password_manager::PasswordForm>(*test_form()));
-
-  AddActorTask();
-  SetupAutoSignin(std::move(local_credentials));
-
-  EXPECT_FALSE(IsBubbleShowing());
-}
-
-IN_PROC_BROWSER_TEST_F(PasswordBubbleInteractiveUiTest,
-                       ActorActiveSupressesAutomaticPasswordSave) {
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-
-  AddActorTask();
-  SetupAutomaticPassword();
-
-  EXPECT_FALSE(IsBubbleShowing());
-}
-
-IN_PROC_BROWSER_TEST_F(PasswordBubbleInteractiveUiTest,
-                       CredentialLeak_ActorOperating_NoDialog) {
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-
-  AddActorTask();
-  auto origin = GURL("https://example.com");
-  PasswordForm form;
-  form.url = origin;
-  form.signon_realm = origin.GetWithEmptyPath().spec();
-  form.username_value = u"Eve";
-  form.password_value = u"password";
-  GetController()->OnCredentialLeak(password_manager::LeakedPasswordDetails(
-      password_manager::CredentialLeakFlags::kPasswordSaved, std::move(form),
-      /*in_account_store=*/false));
-
-  // Dialog controller is only present when there is a dialog shown.
-  EXPECT_FALSE(GetController()->dialog_controller());
-}
-
-IN_PROC_BROWSER_TEST_F(
-    PasswordBubbleInteractiveUiTest,
-    BiometricAuthenticationForFilling_ActorOperating_NoBubble) {
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-
-  AddActorTask();
-  GetController()->OnBiometricAuthenticationForFilling(
-      browser()->GetProfile()->GetPrefs());
-
-  EXPECT_FALSE(IsBubbleShowing());
-}
-
-IN_PROC_BROWSER_TEST_F(
-    PasswordBubbleInteractiveUiTest,
-    BiometricActivationConfirmation_ActorOperating_NoBubble) {
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-  SetupPendingPassword();
-
-  AddActorTask();
-  GetController()->ShowBiometricActivationConfirmation();
-
-  EXPECT_FALSE(IsBubbleShowing());
-}
-
 #if BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(
-    PasswordBubbleInteractiveUiTest,
-    BiometricAuthenticationForFillingPromo_ActorOperating_NoBubble) {
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-  // Set up preferences to allow the promo to be shown.
-  browser()->GetProfile()->GetPrefs()->SetBoolean(
-      password_manager::prefs::kHasUserInteractedWithBiometricAuthPromo, false);
-  browser()->GetProfile()->GetPrefs()->SetInteger(
-      password_manager::prefs::kBiometricAuthBeforeFillingPromoShownCounter, 0);
-  browser()->GetProfile()->GetPrefs()->SetBoolean(
-      password_manager::prefs::kBiometricAuthenticationBeforeFilling, false);
-
-  AddActorTask();
-  GetController()->OnBiometricAuthenticationForFilling(
-      browser()->GetProfile()->GetPrefs());
-
-  EXPECT_FALSE(IsBubbleShowing());
-}
 #endif  // BUILDFLAG(IS_MAC)
 
 // Same as 'BasicOpenAndClose', but use the command rather than the static

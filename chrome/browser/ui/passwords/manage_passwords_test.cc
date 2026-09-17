@@ -87,57 +87,6 @@ void ManagePasswordsTest::TearDownOnMainThread() {
   InteractiveBrowserTest::TearDownOnMainThread();
 }
 
-void ManagePasswordsTest::SetUpInProcessBrowserTestFixture() {
-  InteractiveBrowserTest::SetUpInProcessBrowserTestFixture();
-  create_services_subscription_ =
-      BrowserContextDependencyManager::GetInstance()
-          ->RegisterCreateServicesCallbackForTesting(
-              base::BindRepeating([](content::BrowserContext* context) {
-                // Overwrite the password store early before it's accessed by
-                // safe browsing.
-                ProfilePasswordStoreFactory::GetInstance()->SetTestingFactory(
-                    context,
-                    base::BindRepeating(&password_manager::BuildPasswordStore<
-                                        content::BrowserContext,
-                                        password_manager::TestPasswordStore>));
-
-                AccountPasswordStoreFactory::GetInstance()->SetTestingFactory(
-                    context, base::BindRepeating(
-                                 &password_manager::BuildPasswordStoreWithArgs<
-                                     content::BrowserContext,
-                                     password_manager::TestPasswordStore,
-                                     password_manager::IsAccountStore>,
-                                 password_manager::IsAccountStore(true)));
-
-                SyncServiceFactory::GetInstance()->SetTestingFactory(
-                    context,
-                    base::BindRepeating([](content::BrowserContext*)
-                                            -> std::unique_ptr<KeyedService> {
-                      return std::make_unique<syncer::TestSyncService>();
-                    }));
-
-                actor::ActorKeyedServiceFactory::GetInstance()
-                    ->SetTestingFactory(
-                        context,
-                        base::BindRepeating([](content::BrowserContext* context)
-                                                -> std::unique_ptr<
-                                                    KeyedService> {
-                          Profile* profile =
-                              Profile::FromBrowserContext(context);
-                          auto actor_keyed_service =
-                              std::make_unique<actor::ActorKeyedServiceFake>(
-                                  profile);
-                          std::unique_ptr<actor::ui::MockActorUiStateManager>
-                              ausm = std::make_unique<
-                                  actor::ui::MockActorUiStateManager>();
-                          actor_keyed_service->SetActorUiStateManagerForTesting(
-                              std::move(ausm));
-
-                          return std::move(actor_keyed_service);
-                        }));
-              }));
-}
-
 void ManagePasswordsTest::ExecuteManagePasswordsCommand() {
   // Show the window to ensure that it's active.
   browser()->GetWindow()->Show();

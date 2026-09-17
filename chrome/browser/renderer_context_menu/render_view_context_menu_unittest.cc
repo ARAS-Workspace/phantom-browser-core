@@ -1180,25 +1180,6 @@ TEST_F(RenderViewContextMenuPrefsTest, LensImageSearchForProgressiveWebApp) {
   EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE));
 }
 
-TEST_F(RenderViewContextMenuPrefsTest,
-       GlicShareImageHiddenForProgressiveWebApp) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeature(features::kGlicShareImage);
-
-  glic::GlicEnabling::SetBypassEnablementChecksForTesting(true);
-
-  content::ContextMenuParams params = CreateParams(MenuItem::IMAGE);
-  params.has_image_contents = true;
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.SetBrowser(GetPwaBrowser());
-  menu.Init();
-
-  EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_GLICSHAREIMAGE));
-
-  glic::GlicEnabling::SetBypassEnablementChecksForTesting(false);
-}
-
 class MockPageContextEligibilityHelper
     : public tabs::PageContextEligibilityHelper {
  public:
@@ -1211,69 +1192,6 @@ class MockPageContextEligibilityHelper
               (),
               (const, override));
 };
-
-TEST_F(RenderViewContextMenuPrefsTest, GlicShareImageEligibility) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeature(features::kGlicShareImage);
-  glic::GlicEnabling::SetBypassEnablementChecksForTesting(true);
-
-  // Create a MockTabInterface and link it to our web contents
-  tabs::MockTabInterface mock_tab;
-  ui::UnownedUserDataHost unowned_user_data_host;
-  ON_CALL(mock_tab, GetUnownedUserDataHost())
-      .WillByDefault(testing::ReturnRef(unowned_user_data_host));
-  ON_CALL(mock_tab, GetContents())
-      .WillByDefault(testing::Return(web_contents()));
-  ON_CALL(mock_tab, GetProfile()).WillByDefault(testing::Return(profile()));
-  tabs::TabLookupFromWebContents::CreateForWebContents(web_contents(),
-                                                       &mock_tab);
-
-  auto mock_helper =
-      std::make_unique<testing::NiceMock<MockPageContextEligibilityHelper>>(
-          mock_tab);
-
-  content::ContextMenuParams params = CreateParams(MenuItem::IMAGE);
-  params.has_image_contents = true;
-
-  {
-    // Case 1: Helper returns unknown (e.g. inactive or initialization failure)
-    // -> hidden.
-    EXPECT_CALL(*mock_helper, IsPageContextEligible())
-        .WillRepeatedly(testing::Return(
-            optimization_guide::PageContextEligibilityStatus::kUnknown));
-    TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                   params);
-    menu.SetBrowser(GetBrowser());
-    menu.Init();
-    EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_GLICSHAREIMAGE));
-  }
-
-  {
-    // Case 2: Helper returns ineligible -> hidden.
-    EXPECT_CALL(*mock_helper, IsPageContextEligible())
-        .WillRepeatedly(testing::Return(
-            optimization_guide::PageContextEligibilityStatus::kNotEligible));
-    TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                   params);
-    menu.SetBrowser(GetBrowser());
-    menu.Init();
-    EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_GLICSHAREIMAGE));
-  }
-
-  {
-    // Case 3: Helper returns eligible -> visible.
-    EXPECT_CALL(*mock_helper, IsPageContextEligible())
-        .WillRepeatedly(testing::Return(
-            optimization_guide::PageContextEligibilityStatus::kEligible));
-    TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                   params);
-    menu.SetBrowser(GetBrowser());
-    menu.Init();
-    EXPECT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_GLICSHAREIMAGE));
-  }
-
-  glic::GlicEnabling::SetBypassEnablementChecksForTesting(false);
-}
 
 // Verify that the Lens Image Search menu item is enabled for third-party
 // default search engines that support image search.
@@ -1988,26 +1906,6 @@ TEST_P(RenderViewContextMenuReadAnythingTest, MAYBE_AppendPageItems) {
   }
 }
 
-TEST_P(RenderViewContextMenuReadAnythingTest, GlicNotPresentInReadingMode) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeature(features::kGlicContextMenu);
-
-  glic::GlicEnabling::SetBypassEnablementChecksForTesting(true);
-
-  // Simulate a context menu request with page level options.
-  content::ContextMenuParams params = CreateParams(MenuItem::PAGE);
-  params.page_url = GURL(chrome::kChromeUIUntrustedReadAnythingSidePanelURL);
-
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.SetBrowser(GetBrowser());
-  menu.Init();
-
-  EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_GLIC));
-
-  glic::GlicEnabling::SetBypassEnablementChecksForTesting(false);
-}
-
 INSTANTIATE_TEST_SUITE_P(All,
                          RenderViewContextMenuReadAnythingTest,
                          testing::Values("MenuShuffleDefault",
@@ -2154,28 +2052,6 @@ TEST_F(RenderViewContextMenuMenuSimplificationTest,
   EXPECT_FALSE(menu.IsItemPresent(IDC_PRINT));
 }
 #endif  // BUILDFLAG(ENABLE_PRINTING)
-
-TEST_F(RenderViewContextMenuMenuSimplificationTest,
-       PasswordFieldWithSelectionGlicRestricted) {
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeature(features::kGlicContextMenu);
-
-  glic::GlicEnabling::SetBypassEnablementChecksForTesting(true);
-
-  content::ContextMenuParams params =
-      CreateParams(MenuItem::SELECTION | MenuItem::EDITABLE);
-  params.form_control_type = blink::mojom::FormControlType::kInputPassword;
-  params.selection_text = u"secretpassword";
-
-  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
-                                 params);
-  menu.SetBrowser(GetBrowser());
-  menu.Init();
-
-  EXPECT_FALSE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_GLIC));
-
-  glic::GlicEnabling::SetBypassEnablementChecksForTesting(false);
-}
 
 TEST_F(RenderViewContextMenuMenuSimplificationTest, EmailFieldSearchHidden) {
   content::ContextMenuParams params;

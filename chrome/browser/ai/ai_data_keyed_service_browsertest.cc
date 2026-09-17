@@ -94,10 +94,6 @@ class AiDataKeyedServiceBrowserTest : public InProcessBrowserTest {
         browser()->GetProfile());
   }
 
-  actor::ActorKeyedService& actor_service() {
-    return *actor::ActorKeyedService::Get(browser()->GetProfile());
-  }
-
   content::WebContents* web_contents() {
     return browser()->tab_strip_model()->GetActiveWebContents();
   }

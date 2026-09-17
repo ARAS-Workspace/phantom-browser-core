@@ -683,16 +683,6 @@ class ChromeAutofillClientTestWithMockWindow : public ChromeAutofillClientTest {
   TestingProfile::TestingFactories GetTestingFactories() const override {
     TestingProfile::TestingFactories factories =
         ChromeAutofillClientTest::GetTestingFactories();
-    // Register the fake actor service before any tabs are added, so that
-    // any TabFeatures created (including the first tab) use the fake service
-    // instead of creating a real one that gets destroyed later.
-    factories.push_back(
-        {actor::ActorKeyedServiceFactory::GetInstance(),
-         base::BindRepeating([](content::BrowserContext* context)
-                                 -> std::unique_ptr<KeyedService> {
-           return std::make_unique<actor::ActorKeyedServiceFake>(
-               Profile::FromBrowserContext(context));
-         })});
     return factories;
   }
 
@@ -718,7 +708,6 @@ class ChromeAutofillClientTestWithMockWindow : public ChromeAutofillClientTest {
   }
 
   void TearDown() override {
-    glic::GlicEnabling::SetBypassEnablementChecksForTesting(false);
     manager_injector_.reset();
     ChromeAutofillClientTest::TearDown();
     profile_manager_.reset();
@@ -730,28 +719,6 @@ class ChromeAutofillClientTestWithMockWindow : public ChromeAutofillClientTest {
   }
   ui::UnownedUserDataHost& unowned_user_data_host() {
     return main_mocks_.user_data_host;
-  }
-
-  glic::MockGlicKeyedService* SetUpMockGlicKeyedService() {
-    glic::GlicEnabling::SetBypassEnablementChecksForTesting(true);
-    glic::GlicKeyedServiceFactory::GetInstance()->SetTestingFactory(
-        profile(),
-        base::BindRepeating(
-            [](glic::GlicProfileManager* glic_profile_manager,
-               content::BrowserContext* context)
-                -> std::unique_ptr<KeyedService> {
-              Profile* profile = Profile::FromBrowserContext(context);
-              return std::make_unique<glic::MockGlicKeyedService>(
-                  context, IdentityManagerFactory::GetForProfile(profile),
-                  TestingBrowserProcess::GetGlobal()->profile_manager(),
-                  glic_profile_manager,
-                  /*contextual_cueing_service=*/nullptr,
-                  /*actor_keyed_service=*/nullptr);
-            },
-            &glic_profile_manager_));
-    return static_cast<glic::MockGlicKeyedService*>(
-        glic::GlicKeyedServiceFactory::GetGlicKeyedService(profile(),
-                                                           /*create=*/true));
   }
 
  protected:
@@ -800,7 +767,6 @@ class ChromeAutofillClientTestWithMockWindow : public ChromeAutofillClientTest {
 
  private:
   TabAndWindowMocks main_mocks_;
-  glic::GlicProfileManager glic_profile_manager_;
   std::unique_ptr<TestingProfileManager> profile_manager_;
   base::test::ScopedFeatureList scoped_feature_list_;
 };
@@ -816,58 +782,6 @@ TEST_F(ChromeAutofillClientTestWithMockWindow,
                   FeaturePromoFeatureUsedAction::kClosePromoIfPresent));
   client()->NotifyIphFeatureUsed(AutofillClient::IphFeature::kAutofillAi);
 }
-
-// Tests that `OpenGeminiInSidebar` invokes Glic with the correct options and
-// prompt.
-TEST_F(ChromeAutofillClientTestWithMockWindow, OpenGeminiInSidebar) {
-  glic::MockGlicKeyedService* mock_glic_service = SetUpMockGlicKeyedService();
-  ASSERT_TRUE(mock_glic_service);
-
-  // We expect that the glic service is invoked with kAutofill as the invocation
-  // source and containing the correct prompt.
-  EXPECT_CALL(
-      *mock_glic_service,
-      Invoke(AllOf(
-          Property(&glic::GlicInvokeOptions::GetInvocationSource,
-                   glic::mojom::InvocationSource::kAutofill),
-          Field(&glic::GlicInvokeOptions::prompts, ElementsAre("test prompt")),
-          Field(&glic::GlicInvokeOptions::focus_on_show, true))))
-      .WillOnce(testing::Return(base::WeakPtr<glic::GlicInstance>()));
-
-  client()->OpenGeminiInSidebar(u"test prompt");
-}
-
-// Tests that `OnActorTaskStateChange` calls `ReparseKnownForms` on all drivers
-// when a new task gets assigned.
-TEST_F(ChromeAutofillClientTestWithMockWindow,
-       OnActorTaskStateChange_ReparseForms) {
-  actor::ActorKeyedServiceFake* actor_service =
-      static_cast<actor::ActorKeyedServiceFake*>(
-          actor::ActorKeyedService::Get(profile()));
-  ASSERT_TRUE(actor_service);
-
-  MockAutofillManager* mock_manager = (*manager_injector_)[web_contents()];
-  ASSERT_TRUE(mock_manager);
-
-  actor::TaskId task_id = actor_service->CreateTaskForTesting();
-  actor::ActorTask* task = actor_service->GetTask(task_id);
-  ASSERT_TRUE(task);
-
-  // Associate the active tab with the task.
-  task->AddTab(mock_tab_interface().GetHandle(),
-               /*stop_task_on_detach=*/true, base::DoNothing());
-
-  // Verify first call (assignment) triggers `ReparseKnownForms`.
-  EXPECT_CALL(*mock_manager, ReparseKnownForms()).Times(1);
-  actor_service->NotifyTaskStateChanged(*task);
-  testing::Mock::VerifyAndClearExpectations(mock_manager);
-
-  // Verify second call (no new task) does NOT trigger ReparseKnownForms
-  EXPECT_CALL(*mock_manager, ReparseKnownForms()).Times(0);
-  actor_service->NotifyTaskStateChanged(*task);
-  testing::Mock::VerifyAndClearExpectations(mock_manager);
-}
-
 #endif  //  !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

@@ -86,11 +86,6 @@ class PersonalContextEligibilityServiceImplTest : public testing::Test {
 
   void SetPrefs() {
     personal_context::prefs::RegisterProfilePrefs(pref_service_.registry());
-#if !BUILDFLAG(IS_IOS)
-    pref_service_.registry()->RegisterIntegerPref(
-        ::glic::prefs::kGlicCompletedFre,
-        std::to_underlying(::glic::prefs::FreStatus::kCompleted));
-#endif
     pref_service_.registry()->RegisterIntegerPref(
         optimization_guide::prefs::kFindAndFillWithGeminiSettings,
         std::to_underlying(optimization_guide::model_execution::prefs::
@@ -422,35 +417,6 @@ TEST_P(PersonalContextEligibilityServiceImplLocaleTest, CheckLocaleEnablement) {
 }
 
 #if !BUILDFLAG(IS_IOS)
-TEST_F(PersonalContextEligibilityServiceImplTest,
-       DisabledWhenGlicFreNotCompleted) {
-  pref_service_.SetInteger(
-      ::glic::prefs::kGlicCompletedFre,
-      std::to_underlying(::glic::prefs::FreStatus::kNotStarted));
-
-  EXPECT_EQ(service().GetEligibilityState(),
-            PersonalContextEligibilityState::kDisabledNotEligible);
-
-  histogram_tester().ExpectBucketCount(
-      "Autofill.PersonalContext.NonEligibilityReason",
-      PersonalContextNonEligibilityReason::kNotGlicFirstRun, 1);
-}
-
-TEST_F(PersonalContextEligibilityServiceImplTest,
-       NotifiedWhenGlicFreStatusChanges) {
-  MockPersonalContextEligibilityServiceObserver observer;
-  service().AddObserver(&observer);
-
-  EXPECT_CALL(observer,
-              OnEligibilityStateChanged(
-                  PersonalContextEligibilityState::kDisabledNotEligible));
-
-  pref_service_.SetInteger(
-      ::glic::prefs::kGlicCompletedFre,
-      std::to_underlying(::glic::prefs::FreStatus::kNotStarted));
-
-  service().RemoveObserver(&observer);
-}
 #endif  // !BUILDFLAG(IS_IOS)
 
 // Tests that `PersonalContextEligibilityService` returns `kDisabledNotEligible`

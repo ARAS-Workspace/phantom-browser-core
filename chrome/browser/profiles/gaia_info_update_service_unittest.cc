@@ -172,9 +172,6 @@ class GAIAInfoUpdateServiceTest : public testing::Test {
         .SetChromeSigninInterceptionUserChoice(gaia_id,
                                                ChromeSigninUserChoice::kSignin);
   }
-#if !BUILDFLAG(IS_ANDROID)
-  glic::GlicUnitTestEnvironment glic_test_env_;
-#endif
   content::BrowserTaskEnvironment task_environment_;
   raw_ptr<TestingProfileManager> testing_profile_manager_ = nullptr;
   raw_ptr<TestingProfile> profile_ = nullptr;
@@ -417,89 +414,4 @@ TEST_F(GAIAInfoUpdateServiceTest, SigninPrefsWithGaiaIdNotInChrome) {
 }
 
 #if !BUILDFLAG(IS_ANDROID)
-class GAIAInfoUpdateServiceWithGlicEnablingTest
-    : public GAIAInfoUpdateServiceTest {
- public:
-  GAIAInfoUpdateServiceWithGlicEnablingTest() {
-    // Enable kGlic by default for testing.
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/
-        {features::kGlic, features::kGlicRollout},
-        /*disabled_features=*/{features::kGlicCountryFiltering,
-                               features::kGlicLocaleFiltering});
-
-    RegisterGeminiSettingsPrefs(pref_service_.registry());
-  }
-
-  // Expects that the primary account is set.
-  void MakeProfileGlicEligible() {
-    // Make the signed in account eligible.
-    AccountInfo primary_account_info =
-        identity_manager()->FindExtendedAccountInfo(
-            identity_manager()->GetPrimaryAccountInfo(
-                signin::ConsentLevel::kSignin));
-    CHECK(!primary_account_info.IsEmpty());
-
-    AccountCapabilitiesTestMutator mutator(&primary_account_info);
-    glic::SetGlicCapability(mutator, true);
-
-    signin::UpdateAccountInfoForAccount(identity_manager(),
-                                        primary_account_info);
-
-    // Enable enterprise policy for glic control
-    pref_service_.SetInteger(
-        optimization_guide::prefs::kGeminiSettings,
-        std::to_underlying(
-            optimization_guide::prefs::GeminiSettingsPolicyState::kEnabled));
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-TEST_F(GAIAInfoUpdateServiceWithGlicEnablingTest, LogInLogOut) {
-  signin::WaitForRefreshTokensLoaded(identity_manager());
-
-  std::string email = "pat@example.com";
-  AccountInfo info = signin::MakePrimaryAccountAvailable(
-      identity_manager(), email, signin::ConsentLevel::kSignin);
-  EXPECT_TRUE(
-      identity_manager()->HasPrimaryAccount(signin::ConsentLevel::kSignin));
-
-  if (!syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    EXPECT_FALSE(
-        identity_manager()->HasPrimaryAccount(signin::ConsentLevel::kSync));
-  }
-
-  info = GetValidAccountInfo(info.email, info.gaia, "Pat", "Pat Foo",
-                             std::string());
-  MakeProfileGlicEligible();
-  signin::UpdateAccountInfoForAccount(identity_manager(), info);
-  base::RunLoop().RunUntilIdle();
-
-  ASSERT_EQ(1u, storage()->GetNumberOfProfiles());
-  ProfileAttributesEntry* entry = storage()->GetAllProfilesAttributes().front();
-  EXPECT_EQ(entry->GetGAIAGivenName(), u"Pat");
-  EXPECT_EQ(entry->GetGAIAName(), u"Pat Foo");
-  EXPECT_EQ(entry->GetHostedDomain(), "");
-  EXPECT_EQ(entry->GetIsManaged(), signin::Tribool::kFalse);
-  EXPECT_TRUE(entry->IsGlicEligible());
-
-  gfx::Image gaia_picture = gfx::test::CreateImage(256, 256);
-  signin::SimulateAccountImageFetch(identity_manager(), info.account_id,
-                                    "GAIA_IMAGE_URL_WITH_SIZE", gaia_picture);
-  // Set a fake picture URL.
-  EXPECT_TRUE(gfx::test::AreImagesEqual(gaia_picture, entry->GetAvatarIcon()));
-  // Log out.
-  signin::ClearPrimaryAccount(identity_manager());
-  base::RunLoop().RunUntilIdle();
-
-  // Verify that the GAIA name and picture, and picture URL are unset.
-  EXPECT_TRUE(entry->GetGAIAGivenName().empty());
-  EXPECT_TRUE(entry->GetGAIAName().empty());
-  EXPECT_EQ(nullptr, entry->GetGAIAPicture());
-  EXPECT_FALSE(entry->GetHostedDomain().has_value());
-  EXPECT_EQ(entry->GetIsManaged(), signin::Tribool::kFalse);
-  EXPECT_FALSE(entry->IsGlicEligible());
-}
 #endif

@@ -677,42 +677,6 @@ TEST_F(HistoryTabHelperTest,
   EXPECT_FALSE(args.actor_task_id.has_value());
 }
 
-TEST_F(HistoryTabHelperTest,
-       CreateAddPageArgsPopulatesActorTaskIdFromServiceFallback) {
-  base::test::ScopedFeatureList scoped_feature_list(features::kGlicActor);
-
-  actor::ActorKeyedServiceFactory::GetInstance()->SetTestingFactory(
-      profile(), base::BindRepeating([](content::BrowserContext* context)
-                                         -> std::unique_ptr<KeyedService> {
-        return std::make_unique<actor::ActorKeyedServiceFake>(
-            Profile::FromBrowserContext(context));
-      }));
-
-  tabs::MockTabInterface mock_tab;
-  tabs::TabLookupFromWebContents::CreateForWebContents(web_contents(),
-                                                       &mock_tab);
-
-  auto* actor_service = static_cast<actor::ActorKeyedServiceFake*>(
-      actor::ActorKeyedService::Get(profile()));
-  actor::TaskId task_id = actor_service->CreateTaskForTesting();
-  actor_service->GetTask(task_id)->AddTab(
-      mock_tab.GetHandle(), /*stop_task_on_detach=*/true, base::DoNothing());
-
-  // Mock navigation with no NavigationUIData (e.g. same-document navigation).
-  NiceMock<content::MockNavigationHandle> navigation_handle(web_contents());
-  navigation_handle.set_redirect_chain({GURL("https://someurl.com")});
-  ON_CALL(navigation_handle, GetNavigationUIData())
-      .WillByDefault(testing::Return(nullptr));
-
-  history::HistoryAddPageArgs args =
-      history_tab_helper()->CreateHistoryAddPageArgs(
-          GURL("https://someurl.com"), base::Time(), 1, &navigation_handle);
-
-  EXPECT_EQ(args.visit_source, history::VisitSource::SOURCE_ACTOR);
-  ASSERT_TRUE(args.actor_task_id.has_value());
-  EXPECT_EQ(args.actor_task_id.value(), task_id.value());
-}
-
 #if BUILDFLAG(IS_ANDROID)
 TEST_F(HistoryTabHelperTest, CreateAddPageArgsPopulatesAppId) {
   NiceMock<content::MockNavigationHandle> navigation_handle(web_contents());

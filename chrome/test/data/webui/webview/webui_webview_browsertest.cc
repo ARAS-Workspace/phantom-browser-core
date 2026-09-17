@@ -203,9 +203,6 @@ class WebUIWebViewBrowserTest : public WebUIMochaBrowserTest {
             false);
   }
 
-  // Required to enable chrome://glic.
-  glic::GlicTestEnvironment glic_test_env_;
-
   std::unique_ptr<content::ScopedWebUIConfigRegistration>
       web_ui_config_registration_;
 };

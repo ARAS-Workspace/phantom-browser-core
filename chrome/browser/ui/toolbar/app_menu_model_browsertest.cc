@@ -726,30 +726,7 @@ IN_PROC_BROWSER_TEST_F(
 
 class TabSearchMenuModelTest : public AppMenuModelTest {
  public:
-  TabSearchMenuModelTest() {
-    glic_enabled_feature_list_.InitWithFeatures(
-        {
-        },
-        /*disabled_features=*/{features::kGlicLocaleFiltering,
-                               features::kGlicCountryFiltering});
-  }
-
   ~TabSearchMenuModelTest() override = default;
-
-  void SetUpOnMainThread() override {
-    AppMenuModelTest::SetUpOnMainThread();
-    // This is necessary because the global features that GlicEnabling depends
-    // on are not initialized for glic.
-    glic::GlicEnabling::SetBypassEnablementChecksForTesting(true);
-  }
-
-  void TearDownOnMainThread() override {
-    glic::GlicEnabling::SetBypassEnablementChecksForTesting(false);
-    AppMenuModelTest::TearDownOnMainThread();
-  }
-
- private:
-  base::test::ScopedFeatureList glic_enabled_feature_list_;
 };
 
 IN_PROC_BROWSER_TEST_F(TabSearchMenuModelTest, TabSearchItem) {
