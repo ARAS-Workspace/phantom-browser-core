@@ -1259,28 +1259,6 @@ deps = {
       'dep_type': 'cipd',
   },
 
-  'src/chrome/android/orderfiles/arm': {
-      'packages': [
-          {
-              'package': 'chromium/chrome/android/orderfiles/arm',
-              'version_file': 'chrome/build/android-arm.orderfile.txt',
-          },
-      ],
-      'condition': 'checkout_android and non_git_source',
-      'dep_type': 'cipd',
-  },
-
-  'src/chrome/android/orderfiles/arm64': {
-      'packages': [
-          {
-              'package': 'chromium/chrome/android/orderfiles/arm64',
-              'version_file': 'chrome/build/android-arm64.orderfile.txt',
-          },
-      ],
-      'condition': 'checkout_android and non_git_source',
-      'dep_type': 'cipd',
-  },
-
   'src/chrome/browser/resources/preinstalled_web_apps/internal': {
     'url': Var('chrome_git') + '/chrome/components/default_apps.git' + '@' + 'fbc0f36186884f936537d5f74758550dd772b980',
     'condition': 'checkout_src_internal',
@@ -4521,30 +4499,6 @@ hooks = [
     'action': [ 'python3',
                 'src/chrome/test/data/android/manage_wpr_archives.py',
                 'download',
-    ],
-  },
-  {
-    'name': 'Fetch Android AFDO profile',
-    'pattern': '.',
-    'condition': 'checkout_android and checkout_pgo_profiles',
-    'action': [ 'vpython3',
-                'src/tools/download_optimization_profile.py',
-                '--newest_state=src/chrome/android/profiles/newest.txt',
-                '--local_state=src/chrome/android/profiles/local.txt',
-                '--output_name=src/chrome/android/profiles/afdo.prof',
-                '--gs_url_base=chromeos-prebuilt/afdo-job/llvm',
-    ],
-  },
-  {
-    'name': 'Fetch Android Arm AFDO profile',
-    'pattern': '.',
-    'condition': 'checkout_android and checkout_pgo_profiles',
-    'action': [ 'vpython3',
-                'src/tools/download_optimization_profile.py',
-                '--newest_state=src/chrome/android/profiles/arm.newest.txt',
-                '--local_state=src/chrome/android/profiles/arm.local.txt',
-                '--output_name=src/chrome/android/profiles/arm.afdo.prof',
-                '--gs_url_base=chromeos-prebuilt/afdo-job/llvm',
     ],
   },
   # DOWNLOAD AR test APKs only if the environment variable is set

@@ -214,7 +214,6 @@ source_set("impl") {
 
     deps += [
       ":jni_headers",
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/android:shortcut_helper",
       "//chrome/browser/flags:flags_android",
       "//chrome/browser/notifications/chime/android",
@@ -574,7 +573,6 @@ if (is_android) {
       ":java_resources",
       "//base:base_java",
       "//build/android:build_java",
-      "//chrome/android:base_module_java",
       "//chrome/browser/flags:java",
       "//chrome/browser/preferences:java",
       "//chrome/browser/profiles/android:java",

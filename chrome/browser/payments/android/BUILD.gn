@@ -10,7 +10,6 @@ source_set("service_worker_payment_app_bridge") {
 
   deps = [
     "//base",
-    "//chrome/android:chrome_jni_headers",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/webdata_services",
     "//components/payments/content",
@@ -29,7 +28,6 @@ source_set("service_worker_payment_app_bridge") {
 robolectric_library("junit_test_support") {
   deps = [
     "//base:base_java",
-    "//chrome/android:chrome_java",
     "//chrome/browser/android/lifecycle:java",
     "//chrome/browser/profiles/android:java",
     "//chrome/browser/tabmodel:java",
@@ -61,7 +59,6 @@ robolectric_library("junit") {
     "//base:base_java_test_support",
     "//base:base_junit_test_support",
     "//base:callback_java",
-    "//chrome/android:chrome_java",
     "//chrome/browser/autofill/android:java",
     "//chrome/browser/profiles/android:java",
     "//components/autofill/android:main_autofill_java",

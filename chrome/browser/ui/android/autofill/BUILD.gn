@@ -57,8 +57,6 @@ source_set("autofill") {
   ]
   deps = [
     "//base",
-    "//chrome/android:chrome_jni_headers",
-    "//chrome/android/features/keyboard_accessory:jni_headers",
     "//chrome/browser/android:resource_mapper",
     "//chrome/browser/autofill",
     "//chrome/browser/autofill/android:jni_headers",

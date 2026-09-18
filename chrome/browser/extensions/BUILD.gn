@@ -675,7 +675,6 @@ source_set("extensions") {
       "system_display/display_info_provider_android.h",
     ]
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/ui/android/tab_model",
     ]
 
@@ -2157,8 +2156,7 @@ source_set("browser_tests") {
       "//components/messages/android:test_support",
     ]
   } else {
-    sources += [
-    ]
+    sources += []
 
     deps += [
       "//chrome/browser/ui/search:test_support_ui",

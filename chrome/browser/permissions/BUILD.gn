@@ -139,7 +139,6 @@ source_set("permissions") {
     ]
 
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/android:tabs_public",
       "//chrome/browser/ui/safety_hub",
       "//components/messages/android",

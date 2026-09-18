@@ -73,7 +73,6 @@ source_set("impl") {
     ]
     deps += [
       ":jni_headers",
-      "//chrome/android:chrome_jni_headers",
       "//components/history/core/browser",
       "//components/ukm/content",
       "//ui/android",

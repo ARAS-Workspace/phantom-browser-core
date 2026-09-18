@@ -22,7 +22,6 @@ android_resources("java_resources") {
 android_library("java") {
   visibility = [
     ":*",
-    "//chrome/android:chrome_all_java",
   ]
 
   sources = [

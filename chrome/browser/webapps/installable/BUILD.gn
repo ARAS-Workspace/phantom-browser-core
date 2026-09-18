@@ -39,7 +39,6 @@ if (is_android) {
 
     deps = [
       "//base",
-      "//chrome/android:jni_headers",
       "//components/content_settings/core/browser",
       "//components/content_settings/core/common",
       "//components/permissions",
@@ -60,7 +59,6 @@ if (is_android) {
     deps = [
       ":android",
       "//base",
-      "//chrome/android:jni_headers",
       "//components/content_settings/core/browser",
       "//components/content_settings/core/common",
       "//components/permissions",

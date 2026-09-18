@@ -49,7 +49,6 @@ source_set("impl") {
       "tab_utils_android.cc",
     ]
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/android:tabs_public",
       "//components/navigation_interception",
     ]

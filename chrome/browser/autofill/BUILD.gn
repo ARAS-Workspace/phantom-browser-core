@@ -147,7 +147,6 @@ static_library("autofill") {
     ]
     public_deps += [ "//components/messages/android" ]
     deps += [
-      "//chrome/android:jni_headers",
       "//chrome/browser/autofill/android:jni_headers",
       "//chrome/browser/consent_auditor",
       "//chrome/browser/keyboard_accessory/android",

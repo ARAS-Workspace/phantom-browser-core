@@ -305,7 +305,6 @@ source_set("impl") {
       "signin_ui_delegate_impl_android.cc",
     ]
     deps += [
-      "//chrome/android:jni_headers",
       "//chrome/browser/android:tabs_public",
       "//chrome/browser/bookmarks/android",
       "//chrome/browser/browsing_data:constants",

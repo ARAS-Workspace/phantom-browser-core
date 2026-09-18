@@ -12,8 +12,6 @@ source_set("passwords") {
   ]
   deps = [
     "//base",
-    "//chrome/android:chrome_jni_headers",
-    "//chrome/android/features/keyboard_accessory:jni_headers",
     "//chrome/browser/password_manager",
     "//chrome/browser/profiles",
     "//chrome/browser/ui/passwords",

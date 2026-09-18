@@ -13,7 +13,6 @@ source_set("overlay") {
   deps = [
     "//base",
     "//cc/slim",
-    "//chrome/android:chrome_jni_headers",
     "//chrome/browser/android:tabs_public",
     "//chrome/browser/picture_in_picture",
     "//components/thin_webview",

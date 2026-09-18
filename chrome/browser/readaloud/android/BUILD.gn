@@ -28,8 +28,6 @@ android_library("java") {
     ":metrics_java",
     "//base:base_java",
     "//base:service_loader_java",
-    "//chrome/android:chrome_app_java_resources",
-    "//chrome/android/modules/readaloud/public:java",
     "//chrome/browser/android/lifecycle:java",
     "//chrome/browser/browser_controls/android:java",
     "//chrome/browser/device:java",
@@ -93,7 +91,6 @@ android_library("metrics_java") {
 
   deps = [
     "//base:base_java",
-    "//chrome/android/modules/readaloud/public:java",
     "//third_party/androidx:androidx_annotation_annotation_java",
   ]
 }
@@ -203,7 +200,6 @@ android_library("hooks_java") {
   ]
   deps = [
     "//base:base_java",
-    "//chrome/android/modules/readaloud/public:java",
     "//chrome/browser/profiles/android:java",
     "//chrome/browser/tab:java",
     "//third_party/android_deps:guava_android_java",
@@ -250,8 +246,6 @@ robolectric_library("junit") {
     "//base:base_java",
     "//base:base_java_test_support",
     "//base:base_junit_test_support",
-    "//chrome/android:chrome_java",
-    "//chrome/android/modules/readaloud/public:java",
     "//chrome/browser/android/lifecycle:java",
     "//chrome/browser/browser_controls/android:java",
     "//chrome/browser/commerce/price_tracking/android:java",
@@ -335,9 +329,6 @@ android_library("player_java") {
     ":features_java",
     ":java_resources",
     "//base:base_java",
-    "//chrome/android:chrome_app_java_resources",
-    "//chrome/android/modules/on_demand:provider_java",
-    "//chrome/android/modules/readaloud/public:java",
     "//chrome/browser/android/lifecycle:java",
     "//chrome/browser/browser_controls/android:java",
     "//chrome/browser/device:java",
@@ -388,7 +379,6 @@ robolectric_library("player_junit_java") {
     "//base:base_java",
     "//base:base_java_test_support",
     "//base:base_junit_test_support",
-    "//chrome/android/modules/readaloud/public:java",
     "//chrome/browser/browser_controls/android:java",
     "//chrome/browser/device:java",
     "//chrome/browser/flags:java",

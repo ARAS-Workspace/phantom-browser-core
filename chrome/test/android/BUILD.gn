@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/android/rules.gni")
-import("//chrome/android/chrome_public_apk_tmpl.gni")
 import("//third_party/jni_zero/jni_zero.gni")
 
 android_library("pagecontroller_utils_java") {
@@ -44,8 +43,6 @@ android_library("chrome_java_test_pagecontroller") {
   ]
   deps = [
     "//base:base_java",
-    "//chrome/android:chrome_app_java_resources",
-    "//chrome/android:chrome_java",
     "//third_party/androidx:androidx_test_core_java",
     "//third_party/androidx:androidx_test_monitor_java",
     "//third_party/junit",
@@ -270,11 +267,6 @@ android_library("chrome_java_transit") {
     "//base/test:public_transit_java",
     "//build/android:build_java",
     "//cc:cc_java",
-    "//chrome/android:chrome_app_java_resources",
-    "//chrome/android:chrome_java",
-    "//chrome/android:chrome_test_util_java",
-    "//chrome/android/features/tab_ui:java_resources",
-    "//chrome/android/features/tab_ui:test_support_javalib",
     "//chrome/browser/browser_controls/android:java",
     "//chrome/browser/browsing_data/android:java",
     "//chrome/browser/collaboration:factory_java",
@@ -405,10 +397,6 @@ android_library("chrome_java_integration_test_support") {
     "//base/test:public_transit_java",
     "//base/version_info/android:version_constants_java",
     "//build/android:build_java",
-    "//chrome/android:base_module_java",
-    "//chrome/android:browser_java_test_support",
-    "//chrome/android:chrome_app_java_resources",
-    "//chrome/android:chrome_java",
     "//chrome/browser/android/browserservices/intents:java",
     "//chrome/browser/bookmarks/android:java",
     "//chrome/browser/feature_engagement:java",
@@ -542,8 +530,6 @@ android_library("chrome_java_test_support_common") {
     "//base:base_java_test_support",
     "//base/version_info/android:version_constants_java",
     "//build/android:build_java",
-    "//chrome/android:chrome_app_java_resources",
-    "//chrome/android:chrome_java",
     "//chrome/browser/android/browserservices/intents:java",
     "//chrome/browser/flags:java",
     "//chrome/browser/omaha/android:java",

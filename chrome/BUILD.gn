@@ -1794,7 +1794,6 @@ if (is_android) {
 }
 
 # Android also supports this, but uses
-# //chrome/android:${_variant}_resource_allowlist.
 if (is_win && enable_resource_allowlist_generation) {
   generate_resource_allowlist("resource_allowlist") {
     deps = [ ":chrome_dll_inputs" ]

@@ -15,7 +15,6 @@ source_set("device_dialog") {
   ]
   deps = [
     "//base",
-    "//chrome/android:chrome_jni_headers",
     "//chrome/browser/profiles",
     "//chrome/browser/ssl",
     "//chrome/common",

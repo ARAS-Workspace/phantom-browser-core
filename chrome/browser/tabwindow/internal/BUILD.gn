@@ -5,11 +5,7 @@
 import("//build/config/android/rules.gni")
 
 android_library("java") {
-  visibility = [
-    "//chrome/android:*",
-    "//chrome/android/javatests:*",
-    "//chrome/android/junit:*",
-  ]
+  visibility = []
 
   sources = [
     # This factory needs to stay as a Java file for the

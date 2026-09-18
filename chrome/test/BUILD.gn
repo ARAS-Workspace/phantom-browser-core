@@ -52,7 +52,6 @@ assert(enable_supervised_users)
 
 if (is_android) {
   import("//build/config/android/rules.gni")
-  import("//chrome/android/features/dev_ui/dev_ui_module.gni")
   import("//third_party/jni_zero/jni_zero.gni")
   import("//tools/perf/chrome_telemetry_build/android_browser_types.gni")
 }
@@ -77,7 +76,6 @@ if (is_android) {
       ":payment_test_support_jni_headers_java",
       ":test_support_jni_headers_java",
       "//base:base_java",
-      "//chrome/android:chrome_all_java",
       "//chrome/browser/autofill/android:test_support_java",
       "//chrome/browser/commerce/price_tracking/android:java",
       "//chrome/browser/feedback/android:java",
@@ -101,7 +99,6 @@ if (is_android) {
     ]
     sources = [
       "../android/java/src/org/chromium/chrome/browser/tab/TabAndroidTestHelper.java",
-      "//chrome/android/java/src/org/chromium/chrome/browser/app/tabwindow/TabWindowManagerNativeTestSupport.java",
       "android/test_support/src/org/chromium/chrome/test_support/FamilyInfoFeedbackSourceTestBridge.java",
       "android/test_support/src/org/chromium/chrome/test_support/PaymentRequestTestBridge.java",
     ]
@@ -110,7 +107,6 @@ if (is_android) {
   generate_jni("test_support_jni_headers") {
     testonly = true
     sources = [
-      "//chrome/android/java/src/org/chromium/chrome/browser/app/tabwindow/TabWindowManagerNativeTestSupport.java",
       "android/test_support/src/org/chromium/chrome/test_support/FamilyInfoFeedbackSourceTestBridge.java",
     ]
   }
@@ -1088,8 +1084,6 @@ if (is_android) {
       ":test_support_ui_android",
       "//base",
       "//chrome:chrome_android_core",
-      "//chrome/android:chrome_jni_headers",
-      "//chrome/android:delegate_public_impl_java",
       "//chrome/browser:chrome_content_browser_client",
       "//chrome/browser/accessibility/accessibility_prefs:browser_tests",
       "//chrome/browser/android",
@@ -1423,10 +1417,7 @@ if (is_android) {
     if (dfmify_dev_ui) {
       # If DevUI DFM is on, include Java classes and native resource split so
       # that DevUI page tests would work.
-      deps += [
-        "//chrome/android/features/dev_ui:java",
-        "//chrome/android/modules/dev_ui/provider:java",
-      ]
+      deps += []
     }
 
     if (enable_desktop_android_extensions) {
@@ -1537,7 +1528,6 @@ if (is_android) {
 
     # These are assets rules so we can just depend on them.
     deps += [
-      "//chrome/android:chrome_apk_pak_assets",
       "//gin:v8_snapshot_assets",
       "//third_party/icu:icu_assets",
     ]
@@ -1549,8 +1539,6 @@ if (is_android) {
       "//base:base_java",
       "//base:base_java_test_support",
       "//build/android/gtest_apk:native_test_instrumentation_test_runner_java",
-      "//chrome/android:base_module_java",
-      "//chrome/android:chrome_all_java",
       "//chrome/browser/tabmodel:java",
       "//components/crash/android:java",
       "//components/module_installer/android:module_installer_java",
@@ -5141,11 +5129,6 @@ test("unit_tests") {
       ":test_support_java",
       ":test_support_jni_headers",
       "//chrome:chrome_android_core",
-      "//chrome/android:chrome_apk_paks",
-      "//chrome/android:chrome_java",
-      "//chrome/android:chrome_jni_headers",
-      "//chrome/android:delegate_public_impl_java",
-      "//chrome/android/modules/dev_ui/provider:native",
       "//chrome/browser/android",
       "//chrome/browser/android:delta_file_proto",
       "//chrome/browser/android:profile_token",
@@ -5302,8 +5285,6 @@ test("unit_tests") {
       deps += [
         # If DevUI DFM is on, include Java classes and native resource split so
         # that DevUI page tests would work.
-        "//chrome/android/features/dev_ui:java",
-        "//chrome/android/modules/dev_ui/provider:java",
         "//chrome/browser/dev_ui:unit_tests",
       ]
     }
@@ -7684,10 +7665,8 @@ if (!is_android) {
       ]
     }
 
-    deps += [
-    ]
-    data_deps += [
-    ]
+    deps += []
+    data_deps += []
 
     sources += [ "../browser/media/router/discovery/access_code/access_code_cast_sink_service_browsertest.cc" ]
 
@@ -7777,7 +7756,6 @@ if (is_android) {
     deps = [
       "//base:base_java",
       "//base:log_java",
-      "//chrome/android:chrome_all_java",
       "//chrome/browser/profiles/android:java",
       "//chrome/browser/tab:java",
       "//chrome/browser/tabmodel:java",

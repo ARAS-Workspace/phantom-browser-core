@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//chrome/android/webapk/shell_apk/request_update_for_version.gni")
 
 source_set("webapk_sources") {
   sources = [
@@ -36,7 +35,6 @@ source_set("webapk_sources") {
     "//url",
   ]
   deps = [
-    "//chrome/android:jni_headers",
     "//chrome/browser/android/webapk/proto",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/web_share_target",

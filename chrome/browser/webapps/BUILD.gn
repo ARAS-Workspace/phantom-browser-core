@@ -59,7 +59,6 @@ if (is_android) {
       ":android",
       ":webapps",
       "//base",
-      "//chrome/android:jni_headers",
       "//chrome/browser:browser_public_dependencies",
       "//chrome/browser/android:shortcut_helper",
       "//chrome/browser/android:tabs_public",

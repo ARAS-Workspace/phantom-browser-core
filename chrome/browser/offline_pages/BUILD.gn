@@ -115,7 +115,6 @@ source_set("impl") {
     ]
 
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser:browser_process",
       "//chrome/browser/android:tabs_public",
       "//chrome/browser/android/locale",

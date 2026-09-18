@@ -221,7 +221,6 @@ source_set("impl") {
       "android/save_update_password_message_delegate.cc",
     ]
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/keyboard_accessory/android",
       "//chrome/browser/password_manager/android:password_manager_android",
       "//chrome/browser/touch_to_fill/password_manager:public",

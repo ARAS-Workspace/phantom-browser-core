@@ -167,7 +167,6 @@ robolectric_library("junit") {
     "//base:base_java",
     "//base:base_java_test_support",
     "//base:base_junit_test_support",
-    "//chrome/android:chrome_java",
     "//chrome/browser/android/lifecycle:java",
     "//chrome/browser/flags:java",
     "//chrome/browser/magic_stack/android:java",
@@ -234,8 +233,6 @@ android_library("javatests") {
     "//base:tasks_java",
     "//base:time_utils_java",
     "//build/android:build_java",
-    "//chrome/android:chrome_java",
-    "//chrome/android/javatests:chrome_test_java_helper",
     "//chrome/browser/flags:java",
     "//chrome/browser/omaha/android:java",
     "//chrome/browser/password_manager/android:java",
@@ -343,7 +340,6 @@ android_resources("java_resources") {
     "java/res/xml/safety_hub_subpage_preferences.xml",
   ]
   deps = [
-    "//chrome/android:chrome_app_java_resources",
     "//chrome/browser/ui/android/strings:ui_strings_grd",
     "//components/browser_ui/settings/android:java_resources",
   ]

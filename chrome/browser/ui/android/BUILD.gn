@@ -25,7 +25,6 @@ if (is_android) {
     ]
     deps = [
       "//base",
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/android:tabs_public",
       "//chrome/browser/profiles",
       "//chrome/browser/ssl",
@@ -64,7 +63,6 @@ if (is_android) {
     ]
     deps = [
       "//base",
-      "//chrome/android:chrome_jni_headers",
       "//chrome/common:mojo_bindings",
       "//components/embedder_support/android:context_menu",
       "//content/public/browser",

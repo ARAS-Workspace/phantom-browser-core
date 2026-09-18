@@ -19,7 +19,6 @@ source_set("safe_browsing") {
   deps = [
     ":jni_headers",
     "//base",
-    "//chrome/android:chrome_jni_headers",
     "//chrome/browser/safe_browsing/android",
     "//ui/android",
   ]

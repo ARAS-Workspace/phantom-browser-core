@@ -33,7 +33,6 @@ android_resources("java_resources") {
   ]
 
   deps = [
-    "//chrome/android:chrome_app_java_resources",
     "//components/strings:components_strings_grd",
   ]
 }
@@ -101,7 +100,6 @@ robolectric_library("junit") {
     "//base:base_java",
     "//base:base_java_test_support",
     "//base:base_junit_test_support",
-    "//chrome/android:chrome_java",
     "//chrome/browser/commerce/android:java",
     "//chrome/browser/commerce/price_insights/android:java",
     "//chrome/browser/flags:java",

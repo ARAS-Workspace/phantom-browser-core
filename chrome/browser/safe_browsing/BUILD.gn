@@ -588,7 +588,6 @@ static_library("safe_browsing") {
         "telemetry/android/android_telemetry_service.cc",
       ]
       deps += [
-        "//chrome/android:chrome_jni_headers",
         "//chrome/app/vector_icons",
         "//chrome/browser/safe_browsing/android",
         "//chrome/browser/ui/android/hats",

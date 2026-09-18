@@ -11,7 +11,6 @@ android_library("java") {
       "org.chromium.chrome.browser.ui.android.digital_credentials"
   deps = [
     "//base:base_java",
-    "//chrome/android:chrome_app_java_resources",
     "//components/browser_ui/bottomsheet/android:java",
     "//components/url_formatter/android:url_formatter_java",
     "//content/public/android:content_full_java",
@@ -49,8 +48,6 @@ android_library("javatests") {
     ":java",
     "//base:base_java",
     "//base:base_java_test_support",
-    "//chrome/android:chrome_java",
-    "//chrome/android/javatests:chrome_test_java_helper",
     "//chrome/browser/flags:java",
     "//chrome/browser/tab:java",
     "//chrome/browser/webid:java",

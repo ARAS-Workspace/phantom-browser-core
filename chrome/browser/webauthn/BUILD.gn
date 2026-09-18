@@ -115,7 +115,6 @@ source_set("impl") {
       "android/credential_sorter_android.cc",
     ]
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/net",
       "//chrome/browser/password_manager/android:utils",
       "//chrome/browser/password_manager/android/grouped_affiliations:public",

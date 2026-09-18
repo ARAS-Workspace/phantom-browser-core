@@ -60,8 +60,6 @@ if (is_android) {
     deps = [
       ":subresource_filter_java_test_support",
       "//base:base_java_test_support",
-      "//chrome/android:chrome_java",
-      "//chrome/android/javatests:chrome_test_java_helper",
       "//chrome/browser/flags:java",
       "//chrome/browser/tab:java",
       "//chrome/browser/tabmodel:java",

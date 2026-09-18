@@ -200,7 +200,6 @@ source_set("sync") {
       "glue/web_contents_state_synced_tab_delegate.h",
     ]
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/android:tabs_public",
       "//chrome/browser/ntp_customization",
       "//chrome/browser/ntp_customization:jni_headers",

@@ -335,7 +335,6 @@ source_set("sync_integration_tests_impl") {
 if (is_android) {
   java_group("sync_integration_tests_java") {
     deps = [
-      "//chrome/android:delegate_public_impl_java",
       "//chrome/test:android_browsertests_assets",
       "//chrome/test:android_browsertests_java",
       "//chrome/test:sync_integration_test_support_java",

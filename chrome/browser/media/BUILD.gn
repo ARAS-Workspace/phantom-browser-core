@@ -408,7 +408,6 @@ source_set("impl") {
       "android/router/chrome_media_router_client.cc",
     ]
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/net",
       "//components/cdm/browser",
       "//third_party/widevine/cdm:headers",

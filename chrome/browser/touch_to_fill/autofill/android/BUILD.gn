@@ -29,7 +29,6 @@ source_set("android") {
 
   deps = [
     ":public",
-    "//chrome/android:chrome_jni_headers",
     "//chrome/browser/autofill",
     "//chrome/browser/profiles",
     "//chrome/browser/ui/autofill/payments",
@@ -64,7 +63,6 @@ source_set("impl") {
   deps = [
     ":android",
     "//base",
-    "//chrome/android:chrome_jni_headers",
     "//chrome/browser/android:resource_mapper",
     "//chrome/browser/ui/android/tab_model",
     "//chrome/browser/ui/autofill",

@@ -332,8 +332,6 @@ group("gn_all") {
         "//build/android/stacktrace:java_deobfuscate",
         "//build/config/android/test/proto:test_build_protos",
         "//build/private_code_test:private_paths",
-        "//chrome/android/webapk/shell_apk:webapk",
-        "//chrome/android/webapk/shell_apk/prepare_upload_dir:prepare_webapk_shell_upload_dir",
         "//chrome/test:android_browsertests",
         "//components:components_junit_tests",
         "//content/public/android:content_junit_tests",
@@ -358,10 +356,6 @@ group("gn_all") {
       ]
 
       deps += [
-        "//chrome/android:chrome_junit_tests",
-        "//chrome/android:chrome_public_apk",
-        "//chrome/android:chrome_public_test_apk",
-        "//chrome/android:chrome_public_unit_test_apk",
         "//chrome/browser/android/examples/custom_tabs_client:custom_tabs_client_example_apk",
         "//chrome/browser/android/examples/inline_autofill_service:inline_autofill_service_example_apk",
         "//chrome/browser/android/examples/partner_browser_customizations_provider:partner_browser_customizations_example_apk",
@@ -778,7 +772,6 @@ if (is_android && !is_cronet_build) {
   # targets.
   group("traffic_annotation_auditor_dependencies") {
     deps = [
-      "//chrome/android:chrome_public_apk",
       "//tools/traffic_annotation:annotations_xml",
     ]
   }

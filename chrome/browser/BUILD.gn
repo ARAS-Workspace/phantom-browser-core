@@ -46,7 +46,6 @@ assert(enable_supervised_users)
 # produces a conflict for the "grit" template so we have to only include one.
 if (is_android) {
   import("//build/config/android/rules.gni")
-  import("//chrome/android/features/dev_ui/dev_ui_module.gni")
 }
 
 if (is_win) {
@@ -1389,7 +1388,6 @@ source_set("core") {
     ]
     deps += [
       ":profile_key_startup_accessor",
-      "//chrome/android:jni_headers",
       "//chrome/browser/accessibility/accessibility_prefs",
       "//chrome/browser/android",
       "//chrome/browser/autocomplete",
@@ -2683,8 +2681,7 @@ source_set("browser") {
   }
 
   if (is_win || is_mac || is_linux) {
-    deps += [
-    ]
+    deps += []
   }
 
   if (enable_downgrade_processing) {
@@ -3030,7 +3027,6 @@ group("browser_public_dependencies") {
   ]
   if (is_android) {
     public_deps += [
-      "//chrome/android/features/dev_ui:buildflags",
       "//chrome/browser/android:resource_mapper",
       "//components/image_fetcher/core",
     ]

@@ -9,7 +9,6 @@ import("//tools/grit/grit_rule.gni")
 android_library("java") {
   visibility = [
     ":*",
-    "//chrome/android:chrome_all_java",
     "//chrome/browser/recent_tabs:helper_java",
   ]
 
@@ -80,7 +79,6 @@ android_library("java") {
 android_resources("java_resources") {
   deps = [
     ":java_strings_grd",
-    "//chrome/android:chrome_app_java_resources",
     "//components/browser_ui/widget/android:java_resources",
     "//ui/android:ui_java_resources",
   ]
@@ -184,9 +182,6 @@ android_library("recent_tabs_javatests") {
     ":java",
     ":java_resources",
     "//base:base_java_test_support",
-    "//chrome/android:chrome_java",
-    "//chrome/android/features/tab_ui:test_support_javalib",
-    "//chrome/android/javatests:chrome_test_java_helper",
     "//chrome/browser/feature_engagement:java",
     "//chrome/browser/flags:java",
     "//chrome/browser/profiles/android:java",

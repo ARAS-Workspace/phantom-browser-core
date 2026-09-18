@@ -4709,7 +4709,6 @@ if (!is_robolectric && enable_java_templates) {
   #
   # Example:
   #   android_app_bundle("chrome_public_bundle") {
-  #      base_module_target = "//chrome/android:chrome_public_apk"
   #      extra_modules = [
   #        { # NOTE: Scopes require one field per line, and no comma separators.
   #          name = "my_module"

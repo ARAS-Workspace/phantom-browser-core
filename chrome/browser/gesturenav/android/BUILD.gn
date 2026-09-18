@@ -37,7 +37,6 @@ android_library("javatests") {
     ":java",
     "//base:base_java",
     "//base:base_java_test_support",
-    "//chrome/android:chrome_java",
     "//chrome/browser/flags:java",
     "//chrome/browser/tab:java",
     "//chrome/test/android:chrome_java_integration_test_support",
@@ -72,7 +71,6 @@ source_set("impl") {
   deps = [
     ":gesturenav",
     ":jni_headers",
-    "//chrome/android:jni_headers",
     "//content/public/browser",
     "//content/public/common",
     "//third_party/blink/public/common",
@@ -85,7 +83,6 @@ source_set("test_support") {
   testonly = true
   sources = [ "screenshot_capture_test_helper.cc" ]
   deps = [
-    "//chrome/android:test_support_jni_headers",
     "//content/test:test_support",
     "//ui/gfx",
   ]

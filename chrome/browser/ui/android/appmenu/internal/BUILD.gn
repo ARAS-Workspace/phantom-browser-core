@@ -7,7 +7,6 @@ import("//build/config/android/rules.gni")
 android_library("java") {
   visibility = [
     ":*",
-    "//chrome/android:chrome_all_java",
     "//chrome/browser/ui/android/appmenu/test:*",
   ]
 
@@ -131,7 +130,6 @@ android_resources("test_java_resources") {
   ]
   deps = [
     ":java_resources",
-    "//chrome/android:chrome_app_java_resources",
     "//chrome/browser/ui/android/theme:java_resources",
     "//components/browser_ui/widget/android:java_test_resources",
   ]

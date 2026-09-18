@@ -242,7 +242,6 @@ source_set("impl") {
       "android/messaging/messaging_backend_service_factory_android.cc",
     ]
     deps += [
-      "//chrome/android:jni_headers",
       "//chrome/browser/collaboration/comments",
       "//chrome/browser/collaboration/messaging",
       "//components/collaboration/internal:comments_internal",

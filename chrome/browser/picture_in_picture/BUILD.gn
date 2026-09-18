@@ -130,7 +130,6 @@ source_set("impl") {
       "picture_in_picture_bounds_cache_bridge.cc",
     ]
     deps += [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/ui/android/overlay",
       "//components/strings:components_strings",
     ]

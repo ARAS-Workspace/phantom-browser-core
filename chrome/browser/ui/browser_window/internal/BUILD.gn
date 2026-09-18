@@ -216,7 +216,6 @@ if (is_android) {
   android_library("java") {
     visibility = [
       ":*",
-      "//chrome/android:chrome_all_java",
       "//chrome/browser/ui/android/extensions/windowing/internal:javatests",
       "//chrome/browser/ui/browser_window/test:junit_test_support",
       "//chrome/browser/ui/browser_window/test:native_unit_test_support_java",
@@ -330,8 +329,6 @@ if (is_android) {
       "//base:base_java_test_support",
       "//base:flagged_apis_java",
       "//base/test:public_transit_java",
-      "//chrome/android:chrome_test_java",
-      "//chrome/android/javatests:chrome_test_java_helper",
       "//chrome/browser/flags:java",
       "//chrome/browser/profiles/android:java",
       "//chrome/browser/tab:java",

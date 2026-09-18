@@ -9,7 +9,6 @@ if (is_android) {
       "android/accessibility_settings_bridge.h",
     ]
     deps = [
-      "//chrome/android:chrome_jni_headers",
       "//chrome/browser/profiles",
       "//chrome/common:constants",
       "//components/prefs",

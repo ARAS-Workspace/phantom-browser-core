@@ -53,7 +53,6 @@ source_set("impl") {
 
   deps = [
     ":tab_model",
-    "//chrome/android:chrome_jni_headers",
     "//chrome/browser:browser_process",
     "//chrome/browser/android:tabs_public",
     "//chrome/browser/content_settings:content_settings_factory",

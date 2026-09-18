@@ -50,7 +50,6 @@ source_set("first_run") {
   if (is_android) {
     deps += [
       ":jni_headers",
-      "//chrome/android:jni_headers",
       "//ui/android",
     ]
   }

@@ -8,12 +8,8 @@ android_library("java") {
   resources_package = "org.chromium.chrome.browser.hub"
   visibility = [
     ":*",
-    "//chrome/android:*",
-    "//chrome/android/javatests:*",
-    "//chrome/android/junit:*",
 
     # For access to resource IDs and view names for test code.
-    "//chrome/android/features/tab_ui:test_support_javalib",
     "//chrome/browser/incognito:incognito_java_tests",
     "//chrome/test/android:chrome_java_transit",
   ]

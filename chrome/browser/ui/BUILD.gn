@@ -1181,7 +1181,6 @@ static_library("ui") {
     sources += [ "screen_capture_notification_ui_stub.cc" ]
 
     deps += [
-      "//chrome/android:jni_headers",
       "//chrome/browser/android/webapk:webapk_sources",
       "//chrome/browser/autofill/android:jni_headers",
       "//chrome/browser/facilitated_payments",
