@@ -78,30 +78,7 @@ BASE_DECLARE_FEATURE(
 // Controls the availability of Glic access from Google webpages.
 BASE_DECLARE_FEATURE(kApiGlicAccessFromGoogleWebpage);
 
-// Controls the availability of Glic access from Chrome promotion pages.
-BASE_DECLARE_FEATURE(kApiGlicAccessFromPromotionPage);
-
-// Controls the availability of Glic access from Web Continuity.
-BASE_DECLARE_FEATURE(kApiGlicAccessFromWebContinuity);
-
 extern const base::FeatureParam<std::string> kProdPromptEndpointUrlParam;
-extern const base::FeatureParam<std::string> kGlicInvokeApiOAuth2ScopeParam;
-extern const base::FeatureParam<bool> kGlicRequireConsentForInvokeParam;
-
-enum class GlicOpenNewTabDisposition {
-  kForeground,                // Always open in foreground.
-  kBackground,                // Always open in background.
-  kForegroundIfNotConsented,  // Open in foreground if user has not consented,
-                              // else in background.
-};
-extern const base::FeatureParam<GlicOpenNewTabDisposition>
-    kGlicOpenNewTabDispositionParam;
-
-// String constants for GlicOpenNewTabDisposition.
-inline constexpr char kGlicOpenNewTabDispositionForeground[] = "foreground";
-inline constexpr char kGlicOpenNewTabDispositionBackground[] = "background";
-inline constexpr char kGlicOpenNewTabDispositionForegroundIfNotConsented[] =
-    "foreground_if_not_consented";
 
 // Controls the availability of the enterprise.webrtc API. Acts as a remote
 // kill switch: with this disabled the API is not present in the extension

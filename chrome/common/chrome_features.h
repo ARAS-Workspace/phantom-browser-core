@@ -146,118 +146,14 @@ BASE_DECLARE_FEATURE(kEnableFullscreenToAnyScreenAndroid);
 
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicActor);
 
-// Enables comparison of AnnotatedPageContent. This is potentially expensive for
-// large pages and is gated for performance monitoring.
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorApcComparison);
-
-// The sampling rate to log metrics for APC comparison, default to 0.1.
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<double> kGlicActorApcComparisonSamplingRate;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicIgnoreDogfoodClient);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicExperimentalTriggering);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicExperimentalTriggeringOptInTabFocus);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicExperimentalTriggeringScreenshot);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicExperimentalTriggeringSuppressDoneNotification);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicExperimentalTriggeringOptInBypass);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicExperimentalTriggeringOpenWindowIfNone);
 BASE_DECLARE_FEATURE(kGlicBackgroundTriggering);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicExperimentalTriggeringOptInURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicExperimentalTriggeringTabFocusHosts;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicExperimentalTriggeringTabFocusPathSubstring;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicExperimentalTriggeringTabFocusFallbackURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicActorPageToolTimeout;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicActorClickDelay;
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicActorUi);
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicConfirmTabClose);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorUiTabIndicatorSpinnerIgnoreReducedMotion);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorUiTaskIconUiFixes);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorUiTaskListBubbleDelayShow);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicActorUiTaskListBubbleDelayMs;
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kActorUiThemed);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorPostTaskUiUpdateEnabled);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicHandoffButtonShowInImmersiveMode);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicHandoffButtonResetFocusAndHoverStatus);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicHandoffButtonHideWhenOmniboxPopupOpened);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicHandoffButtonHideWhenModalUIShown);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorUiMagicCursor);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<double> kGlicActorUiMagicCursorSpeed;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicActorUiMagicCursorMinDuration;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicActorUiMagicCursorMaxDuration;
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorSplitValidateAndExecute);
 
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const char kGlicActorUiTaskIconName[];
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const char kGlicActorUiOverlayName[];
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const char kGlicActorUiToastName[];
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const char kGlicActorUiHandoffButtonName[];
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const char kGlicActorUiTabIndicatorName[];
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const char kGlicActorUiBorderGlowName[];
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const char kGlicActorUiDebounceTimerName[];
 
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>(kGlicActorUiTaskIcon);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>(kGlicActorUiOverlay);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>(kGlicActorUiToast);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>(kGlicActorUiHandoffButton);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>(kGlicActorUiTabIndicator);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>(kGlicActorUiBorderGlow);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>(kGlicActorUiDebounceTimer);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int>(
-    kGlicActorUiCompletedTaskExpiryDelaySeconds);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>(
-    kGlicActorPageStabilityTimeout);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicActorPageStabilityMinWait;
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<base::TimeDelta>(kActorObservationDelayTimeout);
 COMPONENT_EXPORT(CHROME_FEATURES)
@@ -266,103 +162,14 @@ COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
                            kActorObservationDelayAutofillPredictionsTimeout);
 
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorObservationDelayExcludeAdFrameLoading);
-
-// Specifies the default pref value for `glic:prefs::kGlicActuationOnWeb` for
-// enterprise users. Does not affect non-enterprise users.
-enum class GlicActorEnterprisePrefDefault {
-  kEnabledByDefault = 0,
-  kDisabledByDefault,
-  // When this is set, the browser does not have the capability, regardless of
-  // the policy value (the pref value is ignored).
-  kForcedDisabled,
-};
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<GlicActorEnterprisePrefDefault>(
-    kGlicActorEnterprisePrefDefault);
-
 // Exempts the user from ActorPolicyChecker.
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<bool> kGlicActorPolicyControlExemption;
 
 COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(
-    kGlicActorWorkspaceExemptFromTierCheckRegressionFixKillswitch);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorIncrementalTyping);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicActorKeyDownDuration;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicActorKeyUpDuration;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<double>
-    kGlicActorIncrementalTypingLongMultiplier;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<size_t>
-    kGlicActorIncrementalTypingLongTextThreshold;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicActorTypeToolEnterDelay;
-// Configures which tiers of users are eligible for Actor. It should be a
-// comma-separated list of tier ints ("1,2,3").
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicActorEligibleTiers;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<size_t>
-    kGlicActorIncrementalTypingLongTextPasteThreshold;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>
-    kGlicActorIncrementalTypingWaitForEditableElement;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>
-    kGlicActorIncrementalTypingClearAutoSelection;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorPermissionsBypass);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorRejectInteractionDisallowedTargets);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorToctouValidation);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorDomIdClicksOnZeroAreaTargets);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorOccludedDirectActivation);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorInternalPopups);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorIterativeInteractionPointDiscovery);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<size_t>
-    kGlicActorInterationPointDiscoveryMaxIterations;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorMoveBeforeClick);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicActorMoveBeforeClickDelay;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicCountryFiltering);
 COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicUseSessionCountryForFiltering);
-COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicLocaleFiltering);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicUseMainPartitionForUnifiedFre);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicMessageFirstFre);
 
 // Controls whether the Glic feature is enabled.
 // IMPORTANT: this feature should never be expired! It is used as the main
@@ -374,142 +181,9 @@ COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicBackgroundActuation);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicSupportLinks);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicLocationMismatchHelpUrl;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicIneligibleAccountHelpUrl;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicMinRequiredRamMb;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicAdaptiveToolbarAutoPin;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicBottomSheetPromo;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicDevelopmentSyncGoogleCookies);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicClearDeviceBoundSessionsOnFirstSync);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicStatusIconOpenMenuWithSecondaryClick;
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicForceSimplifiedBorder);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicForceNonSkSLBorder);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicInitialWidth;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicInitialHeight;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicFreInitialWidth;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicFreInitialHeight;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicScreenshotEncodeQuality;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicDefaultHotkey;
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicURLConfig);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicGuestURL;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicContextualCueBubble);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicUserStatusCheck);
 COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicUserStatusUrl;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicUserStatusRequestDelay;
-COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<std::string> kGeminiOAuth2Scope;
-COMPONENT_EXPORT(CHROME_FEATURES)
-// This is the maximum deviation. The jitter to the delay is a uniformly random
-// sample from the chosen deviation. The value should be less than 1.
-extern const base::FeatureParam<double> kGlicUserStatusRequestDelayJitter;
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicUserStatusHandlesRefreshTokenLoss);
-
-enum class GlicEnterpriseCheckStrategy {
-  // Use ManagementService to check if the account is managed.
-  kPolicy,
-  // Use AccountManagedStatusFinder to check if the account is managed.
-  kManaged,
-};
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<GlicEnterpriseCheckStrategy>
-    kGlicUserStatusEnterpriseCheckStrategy;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicUserStatusRefreshApi;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>
-    kGlicUserStatusThrottleInterval;
-
-// TODO(b/414418994): remove features/parameters when URLs are finalized.
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicLearnMoreURLConfig);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicShortcutsLearnMoreURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicSettingsPageLearnMoreURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicLauncherToggleLearnMoreURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicLocationToggleLearnMoreURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicTabAccessToggleLearnMoreURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicTabAccessToggleLearnMoreURLDataProtected;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicDefaultTabAccessToggleLearnMoreURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicDefaultTabAccessToggleLearnMoreURLDataProtected;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicExtensionsManagementUrl;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicWebActuationToggleLearnMoreURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicExperimentalTriggeringLearnMoreURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicExperimentalTriggeringSafetyURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicWebActuationToggleConsiderSafelyURL;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicWebActuationToggleConsiderUnexpectedResultsURL;
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicCSPConfig);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicAllowedOriginsOverride;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicApiAllowedOrigins;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicClientResponsivenessCheck);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicClientResponsivenessCheckIntervalMs;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicClientResponsivenessCheckTimeoutMs;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicClientUnresponsiveUiMaxTimeMs;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool>
-    kGlicClientResponsivenessCheckIgnoreWhenDebuggerAttached;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicEnableCachedGetUserProfileInfo);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicKeyboardShortcutNewBadge);
@@ -517,242 +191,26 @@ BASE_DECLARE_FEATURE(kGlicKeyboardShortcutNewBadge);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicAppMenuNewBadge);
 
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicMultiInstance);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicWebContentsWarming);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta> kGlicWebContentsWarmingDelay;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>
-    kGlicWebContentsWarmingPoolExpiryDelay;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicSidePanelMinWidth;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicMultiInstanceFloatyWidth;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicMultiInstanceFloatyHeight;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicZOrderChanges);
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicDebugWebview);
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicScrollTo);
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicCaptureRegion);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicScrollToEnforceDocumentId;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicScrollToPDF;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicScrollToEnforceURLForPDF;
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicWarming);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicWarmingDelayMs;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicWarmingJitterMs;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<size_t> kGlicWarmingMinRequiredRamMb;
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicTieredRollout);
-
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicRollout);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicDefaultTabContextSetting);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicDefaultContextPinOnBind);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicUnloadOnClose);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicBindPinnedUnboundTab);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicExplicitBackgroundColor);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicPersonalContext);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicGeminiInstructions);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicPopupWindowsEnabled);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicRecordActorJournal);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicRecordActorJournalFeedbackProductId;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string>
-    kGlicRecordActorJournalFeedbackCategoryTag;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicRecordMemoryFootprintMetrics);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicRegionSelectionLine);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicWebClientUnresponsiveMetrics);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicUseShaderCache);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicDragAndDropFileUpload);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicParameterizedShader);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicParameterizedShaderColors;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicParameterizedShaderFloats;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicTabFocusDataDedupDebounce);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicTabFocusDataDebounceDelayMs;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicTabFocusDataMaxDebounces;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicGetTabByIdApi);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicOpenPasswordManagerSettingsPageApi);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicAssetsV2);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicFaviconDataUrls);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicIgnoreOfflineState);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicMultitabUnderlines);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicCaaGuestError);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicCaaLinkUrl;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicCaaLinkText;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicCaaGuestRedirectPatterns;
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicDaisyChainNewTabs);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicGeminiContinueURLRedirect);
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicWebContinuity);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicWebContinuityUrl;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicWebContinuityOriginatingHost;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicWebContinuityMaxCIDLength;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicWebContinuityMaxTargetUrlLength;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicWebContinuityMaxTurnIdLength;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicUseToolbarHeightSidePanel);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicButtonPressedState);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicButtonContainerBackground;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicButtonPressedForceSolidIcon;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<bool> kGlicButtonCustomThemeFallback;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicLiveModeOnlyGlow);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicPrintMenuItem);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicCompositeViewWidth;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicCompositeViewHeight;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicArchiveConversation);
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicExtensions);
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicHeader);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicHeaderRequestTypes;
-
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicShareImage);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicShareImageNoNewConversation);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicActorAutofillOneTimePassword);
 
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorAutofillPreClick);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicActorAutofillSectionLabel);
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGoogleChromeScheme);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGoogleSearchAiModeWorkspace);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicWebActuationSetting);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicWebActuationAllowedTiers;
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicWebActuationSettingsToggle);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicSettingsA11yContextFix);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kPrivacyGuideForceAvailable);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicMetricsSession);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>
-    kGlicMetricsSessionInactivityTimeout;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>
-    kGlicMetricsSessionHiddenTimeout;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>
-    kGlicMetricsSessionRestartDebounceTimer;
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>
-    kGlicMetricsSessionStartTimeout;
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicGuestUrlPresets);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kGlicGuestUrlPresetType;
 
 #if BUILDFLAG(ENABLE_PDF)
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kPdfGlicSummarize);
 COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<int> kPdfGlicSummarizeArm;
-COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<bool> kPdfGlicSummarizeUseLongButtonText;
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kPdfGlicSummarizeFre);
 #endif
 
 COMPONENT_EXPORT(CHROME_FEATURES)
