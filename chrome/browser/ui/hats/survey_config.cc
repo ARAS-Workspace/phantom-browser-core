@@ -16,7 +16,6 @@
 #include "chrome/browser/ui/extensions/extension_settings_overridden_dialog.h"
 #include "chrome/common/chrome_features.h"
 #include "components/autofill/core/common/autofill_features.h"
-#include "components/lens/lens_features.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/page_info/core/features.h"
 #include "components/permissions/features.h"
@@ -810,12 +809,6 @@ std::vector<hats::SurveyConfig> GetAllSurveyConfigs() {
       &metrics::kHappinessTrackingSurveysForClearBrowsingHistory,
       metrics::kHatsSurveyTriggerClearBrowsingHistory,
       /*presupplied_trigger_id=*/"R8iDTcjjT0ugnJ3q1cK0TiRRjjy4");
-
-  // Lens overlay surveys.
-  survey_configs.emplace_back(
-      &lens::features::kLensOverlaySurvey, kHatsSurveyTriggerLensOverlayResults,
-      /*presupplied_trigger_id=*/std::nullopt, std::vector<std::string>{},
-      std::vector<std::string>{"ID that's tied to your Google Lens session"});
 
 #else  // BUILDFLAG(IS_ANDROID)
   survey_configs.emplace_back(&chrome::android::kChromeSurveyNextAndroid,

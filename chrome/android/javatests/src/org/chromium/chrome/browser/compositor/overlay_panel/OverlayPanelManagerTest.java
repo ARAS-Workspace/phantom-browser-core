@@ -74,7 +74,7 @@ public class OverlayPanelManagerTest {
     // MockOverlayPanel
     // --------------------------------------------------------------------------------------------
 
-    /** Mocks the ContextualSearchPanel, so it doesn't create WebContents. */
+    /** Mocks an overlay panel, so it doesn't create WebContents. */
     private static class MockOverlayPanel extends OverlayPanel {
         private final @PanelPriority int mPriority;
         private final boolean mCanBeSuppressed;

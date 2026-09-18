@@ -29,7 +29,6 @@
 #import "chrome/browser/ui/cocoa/touchbar/browser_window_touch_bar_controller.h"
 #include "chrome/browser/ui/immersive/immersive_mode_controller.h"
 #include "chrome/browser/ui/layout_constants.h"
-#include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_metrics.h"
@@ -48,8 +47,8 @@
 #include "components/dom_distiller/content/browser/distillable_page_utils.h"
 #include "components/dom_distiller/core/url_utils.h"
 #include "components/input/native_web_keyboard_event.h"
-#include "components/lens/lens_features.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
+#include "components/prefs/pref_service.h"
 #import "components/omnibox/common/omnibox_feature_configs.h"
 #import "components/remote_cocoa/app_shim/native_widget_mac_nswindow.h"
 #import "components/remote_cocoa/app_shim/native_widget_ns_window_bridge.h"
@@ -493,25 +492,6 @@ void BrowserNativeWidgetMac::ValidateUserInterfaceItem(
       result->enable =
           !prefs->FindPreference(omnibox::kPreventUrlElisionsInOmnibox)
                ->IsManaged();
-      break;
-    }
-    case IDC_SHOW_GOOGLE_LENS_SHORTCUT: {
-      PrefService* prefs = browser->GetProfile()->GetPrefs();
-      result->new_toggle_state =
-          prefs->GetBoolean(omnibox::kShowGoogleLensShortcut);
-      // Disable this menu option if the LensOverlay feature is not enabled.
-      result->enable =
-          lens::features::IsOmniboxEntryPointEnabled() &&
-          lens::LensOverlayEntryPointController::From(browser)->IsEnabled();
-      break;
-    }
-    case IDC_SHOW_AI_MODE_OMNIBOX_BUTTON: {
-      PrefService* prefs = browser->GetProfile()->GetPrefs();
-      result->new_toggle_state =
-          prefs->GetBoolean(omnibox::kShowAiModeOmniboxButton);
-      // Disable this menu option if the AI Mode feature is not enabled.
-      result->enable =
-          omnibox::ShouldShowAimContextMenuOption(browser->GetProfile());
       break;
     }
     case IDC_SHOW_SEARCH_TOOLS: {

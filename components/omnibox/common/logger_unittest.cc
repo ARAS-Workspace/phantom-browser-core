@@ -11,7 +11,7 @@
 #include "base/time/time.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "third_party/lens_server_proto/aim_communication.pb.h"
+#include "third_party/omnibox_proto/chrome_searchbox_stats.pb.h"
 
 namespace omnibox {
 
@@ -39,20 +39,22 @@ TEST_F(LoggerTest, LogMessageWithProto) {
   MockLoggerObserver observer;
   logger.AddObserver(&observer);
 
-  lens::ClientToAimMessage proto;
-  proto.mutable_open_threads_view()->mutable_payload();
+  ::omnibox::metrics::ChromeSearchboxStats proto;
+  proto.set_client_name("chrome");
 
   EXPECT_CALL(
       observer,
       OnLogMessageAdded(
           testing::_, testing::Eq("TestTag"), testing::_, testing::_,
           testing::Eq("Test message"),
-          testing::Optional(std::string("lens.chrome.ClientToAimMessage")),
+          testing::Optional(
+              std::string("omnibox.metrics.ChromeSearchboxStats")),
           testing::Ne(std::nullopt)))
       .Times(1);
 
   logger.OnLogMessageAdded(base::Time::Now(), "TestTag", "test_file.cc", 123,
-                           "Test message", "lens.chrome.ClientToAimMessage",
+                           "Test message",
+                           "omnibox.metrics.ChromeSearchboxStats",
                            "base64data");
 
   logger.RemoveObserver(&observer);
@@ -63,19 +65,20 @@ TEST_F(LoggerTest, LogMessageBuilderWithProto) {
   MockLoggerObserver observer;
   logger.AddObserver(&observer);
 
-  lens::ClientToAimMessage proto;
-  proto.mutable_open_threads_view()->mutable_payload();
+  ::omnibox::metrics::ChromeSearchboxStats proto;
+  proto.set_client_name("chrome");
 
   EXPECT_CALL(
       observer,
       OnLogMessageAdded(
           testing::_, testing::Eq("BuilderTag"), testing::_, testing::_,
           testing::Eq("Hello world"),
-          testing::Optional(std::string("lens.chrome.ClientToAimMessage")),
+          testing::Optional(
+              std::string("omnibox.metrics.ChromeSearchboxStats")),
           testing::Ne(std::nullopt)))
       .Times(1);
 
-  std::string type_name = "lens.chrome.ClientToAimMessage";
+  std::string type_name = "omnibox.metrics.ChromeSearchboxStats";
   {
     Logger::LogMessageBuilder("BuilderTag", "file.cc", 1, &logger)
             .WithProto(proto, type_name)
@@ -90,15 +93,16 @@ TEST_F(LoggerTest, LogMessageBuilderWithProtoDefaultType) {
   MockLoggerObserver observer;
   logger->AddObserver(&observer);
 
-  lens::ClientToAimMessage proto;
-  proto.mutable_open_threads_view()->mutable_payload();
+  ::omnibox::metrics::ChromeSearchboxStats proto;
+  proto.set_client_name("chrome");
 
-  // lens::ClientToAimMessage's type name is "lens.ClientToAimMessage"
+  // GetTypeName() returns the proto package name, not the C++ namespace.
   EXPECT_CALL(observer,
               OnLogMessageAdded(
                   testing::_, testing::Eq("MacroTag"), testing::_, testing::_,
                   testing::Eq("Macro message"),
-                  testing::Optional(std::string("lens.ClientToAimMessage")),
+                  testing::Optional(
+                      std::string("omnibox.metrics.ChromeSearchboxStats")),
                   testing::Ne(std::nullopt)))
       .Times(1);
 

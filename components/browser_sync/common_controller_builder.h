@@ -15,11 +15,9 @@
 #include "base/task/sequenced_task_runner.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "components/contextual_tasks/public/ai_thread_data_type_controller.h"
 #include "components/supervised_user/core/common/buildflags.h"
 #include "components/sync/base/data_type.h"
 
-class AimEligibilityService;
 class GoogleGroupsManager;
 class PrefService;
 class TemplateURLService;
@@ -151,7 +149,6 @@ class CommonControllerBuilder {
           web_data_service_on_disk,
       const scoped_refptr<autofill::AutofillWebDataService>&
           web_data_service_in_memory);
-  void SetAimEligibilityService(AimEligibilityService* aim_eligibility_service);
   void SetBookmarkModel(bookmarks::BookmarkModel* bookmark_model);
   void SetBookmarkSyncService(
       sync_bookmarks::BookmarkSyncService*
@@ -160,8 +157,6 @@ class CommonControllerBuilder {
   void SetConsentAuditor(consent_auditor::ConsentAuditor* consent_auditor);
   void SetCollaborationService(
       collaboration::CollaborationService* collaboration_service);
-  void SetContextualTasksService(
-      contextual_tasks::ContextualTasksService* contextual_tasks_service);
   void SetPersonalCollaborationDataService(
       data_sharing::personal_collaboration_data::
           PersonalCollaborationDataService*
@@ -299,10 +294,6 @@ class CommonControllerBuilder {
   std::unique_ptr<syncer::DataTypeController>
   CreateSharedCommentDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
-  CreateAiThreadDataTypeController();
-  std::unique_ptr<syncer::DataTypeController>
-  CreateGeminiThreadDataTypeController();
-  std::unique_ptr<syncer::DataTypeController>
   CreateContextualTaskDataTypeController();
   std::unique_ptr<syncer::DataTypeController>
   CreateNotebookDataTypeController();
@@ -391,7 +382,6 @@ class CommonControllerBuilder {
       profile_autofill_web_data_service_;
   SafeOptional<scoped_refptr<autofill::AutofillWebDataService>>
       account_autofill_web_data_service_;
-  SafeOptional<raw_ptr<AimEligibilityService>> aim_eligibility_service_;
   SafeOptional<scoped_refptr<password_manager::PasswordStoreInterface>>
       profile_password_store_;
   SafeOptional<scoped_refptr<password_manager::PasswordStoreInterface>>
@@ -405,8 +395,6 @@ class CommonControllerBuilder {
       family_link_settings_service_;
   SafeOptional<raw_ptr<collaboration::CollaborationService>>
       collaboration_service_;
-  SafeOptional<raw_ptr<contextual_tasks::ContextualTasksService>>
-      contextual_tasks_service_;
   SafeOptional<raw_ptr<data_sharing::personal_collaboration_data::
                            PersonalCollaborationDataService>>
       personal_collaboration_data_service_;

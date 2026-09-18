@@ -5,11 +5,7 @@
 import {createAutocompleteMatch} from '//resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import type {SearchboxIconElement} from '//resources/cr_components/searchbox/searchbox_icon.js';
 import type {AutocompleteMatch} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import type {InputState} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
-import {ToolMode as ComposeboxToolMode} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import {assertEquals} from '//webui-test/chai_assert.js';
-
-export type {InputState};
 
 /**
  * Asserts the computed style value for an element.
@@ -53,66 +49,6 @@ export function waitForAttributeChange(
     });
   });
 }
-
-// TODO(crbug.com/452983498): This class is mirrored in composebox_test_utils.ts
-// to allow composebox tests to build on Android without depending on the
-// Desktop New Tab Page bundle.
-// LINT.IfChange
-export class MockInputState implements InputState {
-  allowedTools: number[] = [];
-  disabledTools: number[] = [];
-  activeTool: number = 0;
-  toolConfigs: any[] = [
-    {
-      tool: ComposeboxToolMode.kDeepSearch,
-      hintText: 'Research anything',
-      menuLabel: '',
-      chipLabel: '',
-      disableActiveModelSelection: false,
-      aimUrlParams: [],
-      menuTooltip: '',
-    },
-    {
-      tool: ComposeboxToolMode.kImageGen,
-      hintText: 'Describe your image',
-      menuLabel: '',
-      chipLabel: '',
-      disableActiveModelSelection: false,
-      aimUrlParams: [],
-      menuTooltip: '',
-    },
-    {
-      tool: ComposeboxToolMode.kCanvas,
-      hintText: 'Create anything',
-      menuLabel: '',
-      chipLabel: '',
-      disableActiveModelSelection: false,
-      aimUrlParams: [],
-      menuTooltip: '',
-    },
-  ];
-  toolsSectionConfig: any|null = null;
-
-  allowedModels: number[] = [];
-  disabledModels: number[] = [];
-  activeModel: number = 0;
-  modelConfigs: any[] = [];
-  modelSectionConfig: any|null = null;
-
-  allowedInputTypes: number[] = [];
-  disabledInputTypes: number[] = [];
-  inputTypeConfigs: any[] = [];
-  maxInputsByType: {[key: number]: number} = {};
-  maxTotalInputs: number = 0;
-  isCanvasQuerySubmitted: boolean = false;
-
-  hintText: string = '';
-
-  constructor(overrides?: Partial<InputState>) {
-    Object.assign(this, overrides);
-  }
-}
-// LINT.ThenChange(//chrome/test/data/webui/cr_components/composebox/composebox_test_utils.ts)
 
 export function createClipboardEvent(name: string): ClipboardEvent {
   return new ClipboardEvent(

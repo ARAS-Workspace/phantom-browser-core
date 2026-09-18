@@ -12,7 +12,6 @@ import("//chrome/common/features.gni")
 import("//components/captive_portal/core/features.gni")
 import("//components/compose/features.gni")
 import("//components/enterprise/buildflags/buildflags.gni")
-import("//components/lens/features.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//components/spellcheck/spellcheck_build_features.gni")
 import("//content/browser/devtools/features.gni")
@@ -118,7 +117,6 @@ if (!is_android) {
       "//chrome/app/vector_icons",
       "//chrome/browser/browsing_data",
       "//chrome/browser/contextual_cueing",
-      "//chrome/browser/contextual_tasks:ui",
       "//chrome/browser/devtools",
       "//chrome/browser/media/router:media_router_feature",
       "//chrome/browser/multistep_filter/ui",
@@ -138,7 +136,6 @@ if (!is_android) {
       "//chrome/browser/ui/commerce",
       "//chrome/browser/ui/customize_chrome",
       "//chrome/browser/ui/interaction",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/page_info",
       "//chrome/browser/ui/passwords",
       "//chrome/browser/ui/performance_controls",
@@ -297,8 +294,6 @@ if (!is_android) {
       "//chrome/app:command_ids",
       "//chrome/browser/ui:ui_features",
       "//chrome/browser/ui/tabs",
-      "//components/lens:buildflags",
-      "//components/lens:features",
       "//ui/base",
       "//ui/base:features",
       "//ui/events:event_constants",
@@ -595,7 +590,6 @@ static_library("ui") {
     "//chrome/browser/content_settings:content_settings_util",
     "//chrome/browser/content_settings:content_settings_util_impl",
     "//chrome/browser/contextual_cueing",
-    "//chrome/browser/contextual_tasks:ui",
     "//chrome/browser/data_sharing",
     "//chrome/browser/device_reauth",
     "//chrome/browser/device_reauth:impl",
@@ -771,9 +765,6 @@ static_library("ui") {
     "//components/keyed_service/content",
     "//components/keyed_service/core",
     "//components/language_detection/core",
-    "//components/lens",
-    "//components/lens:buildflags",
-    "//components/lens:enterprise_policy",
     "//components/metrics/debug:resources",
     "//components/metrics/private_metrics",
     "//components/omnibox/browser:vector_icons",
@@ -1167,7 +1158,6 @@ static_library("ui") {
       "//chrome/browser/apps/intent_helper:intent_chip_display_prefs",
       "//chrome/browser/profile_resetter",
       "//chrome/browser/ui/sessions",
-      "//chrome/browser/ui/views/drive_picker_host",
       "//chrome/browser/ui/web_modal:browser_window_modal_dialog_delegate",
       "//chrome/browser/ui/webui/webui_gallery",
       "//chrome/browser/ui/zoom:browser_window_zoom_observer",
@@ -1176,7 +1166,6 @@ static_library("ui") {
 
   if (!is_android || enable_webui_ntp) {
     deps += [
-      "//chrome/browser/contextual_search",
       "//chrome/browser/desktop_to_mobile_promos:utils",
       "//chrome/browser/preloading/new_tab_page_preload",
       "//chrome/browser/search/background",
@@ -1352,8 +1341,6 @@ static_library("ui") {
       "//chrome/browser/ui/webui/access_code_cast:impl",
       "//chrome/browser/ui/webui/bookmarks",
       "//chrome/browser/ui/webui/data_sharing:impl",
-      "//chrome/browser/ui/webui/drive_picker_host",
-      "//chrome/browser/ui/webui/drive_picker_host/untrusted",
       "//chrome/browser/ui/webui/iwa_dev",
       "//chrome/browser/ui/webui/iwa_dev:mojo_bindings",
       "//chrome/browser/ui/webui/new_tab_page_third_party",
@@ -1380,7 +1367,6 @@ static_library("ui") {
       "//chrome/browser/download:impl",
       "//chrome/browser/hid",
       "//chrome/browser/hid:impl",
-      "//chrome/browser/lens/region_search",
       "//chrome/browser/media/router",
       "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
       "//chrome/browser/metrics/desktop_session_duration",
@@ -1436,8 +1422,6 @@ static_library("ui") {
       "//chrome/browser/ui/user_education:impl",
       "//chrome/browser/ui/views/app_menu",
       "//chrome/browser/ui/views/app_menu:impl",
-      "//chrome/browser/ui/views/contextual_tasks",
-      "//chrome/browser/ui/views/contextual_tasks:impl",
       "//chrome/browser/ui/views/js_optimization",
       "//chrome/browser/ui/views/location_bar",
       "//chrome/browser/ui/views/new_tab_footer",
@@ -1605,7 +1589,6 @@ static_library("ui") {
 
       # TODO(crbug.com/40246046): Remove allow_circular_includes_from when
       # dependencies for controller are fixed.
-      "//chrome/browser/lens/region_search",
 
       # TODO(crbug.com/359593415): Remove allow_circular_includes_from.
       # //c/b/ui/apps/directory_access_confirmation_dialog.cc includes
@@ -1619,7 +1602,6 @@ static_library("ui") {
       "//chrome/browser/ui/performance_controls:impl",
       "//chrome/browser/ui/tabs/saved_tab_groups:impl",
       "//chrome/browser/ui/toasts:impl",
-      "//chrome/browser/ui/views/contextual_tasks:impl",
       "//chrome/browser/ui/webui/customize_buttons:impl",
       "//chrome/browser/ui/views/toolbar",
       "//chrome/browser/ui/views/toolbar:impl",
@@ -1630,7 +1612,6 @@ static_library("ui") {
       "//chrome/browser/ui/webui_browser:impl",
 
       # TODO(crbug.com/382237520): Remove this once NTP code is modularized.
-      "//chrome/browser/ui/lens:impl",
 
       "//chrome/browser/ui/signin:impl",
       "//chrome/browser/ui/webui/commerce:impl",
@@ -1719,8 +1700,6 @@ static_library("ui") {
     }
 
     if (enable_dice_support) {
-    }
-    if (enable_dice_support) {
       deps += [
         "//chrome/browser/ui/webui/signin/signout_confirmation",
         "//chrome/browser/ui/webui/signin/signout_confirmation:signout_confirmation_impl",
@@ -1792,8 +1771,6 @@ static_library("ui") {
       "//chrome/browser/ui/autofill/payments",
       "//chrome/browser/ui/frame",
       "//chrome/browser/ui/frame:impl",
-      "//chrome/browser/ui/lens",
-      "//chrome/browser/ui/lens:impl",
       "//chrome/browser/ui/views:close_bubble_on_tab_activation_helper",
       "//chrome/browser/ui/views/hats",
       "//chrome/browser/ui/views/hats:impl",
@@ -2837,7 +2814,6 @@ static_library("ui") {
       # c/b/ui/views/content_setting_bubble_contents.h
       # c/b/ui/views/frame/browser_view.h
       # c/b/ui/views/intent_picker_bubble_view.h
-      # c/b/ui/views/omnibox/omnibox_context_menu.h
       # c/b/ui/views/omnibox/omnibox_popup_aim_presenter.h
       # c/b/ui/views/omnibox/omnibox_popup_closer.h
       # c/b/ui/views/omnibox/omnibox_popup_presenter.h
@@ -2896,11 +2872,6 @@ static_library("ui") {
       # - c/b/ui/views/tabs/new_tab_button.h
       # - c/b/ui/views/tabs/tab_slot_view.h
       "//chrome/browser/ui/views/tabs/vertical:impl",
-
-      # TODO(crbug.com/512979192): Remove this circular dependency when the
-      # following headers get componentized:
-      # - c/b/ui/views/frame/browser_view.h
-      "//chrome/browser/ui/views/drive_picker_host",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when
       # the following headers get modularized:
@@ -3163,7 +3134,6 @@ static_library("ui") {
 
     if (is_mac) {
       sources += [ "views/javascript_app_modal_event_blocker_mac.h" ]
-    } else {
     }
 
     if (use_aura) {

@@ -22,14 +22,10 @@
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/browsing_data/browsing_data_important_sites_util.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_side_panel_coordinator.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_utils.h"
-#include "chrome/browser/contextual_tasks/entry_point_eligibility_manager.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search_engines/ai_mode_button_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
 #include "chrome/browser/ui/accelerator_table.h"
@@ -40,7 +36,6 @@
 #include "chrome/browser/ui/web_applications/web_app_launch_utils.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/search_engines/ai_mode_button_config.h"
-#include "components/search_engines/ai_mode_button_service.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/page_zoom.h"
 #include "ui/base/interaction/element_identifier.h"
@@ -94,9 +89,6 @@
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/intent_picker_tab_helper.h"
-#include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
-#include "chrome/browser/ui/lens/lens_string_utils.h"
-#include "chrome/browser/ui/omnibox/ai_mode_page_action_controller.h"
 #include "chrome/browser/ui/page_action/page_action_controller.h"
 #include "chrome/browser/ui/page_action/page_action_triggers.h"
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
@@ -163,9 +155,7 @@
 #include "components/collaboration/public/messaging/activity_log.h"
 #include "components/commerce/core/metrics/discounts_metric_collector.h"
 #include "components/content_settings/core/common/features.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
-#include "components/lens/lens_features.h"
 #include "components/multistep_filter/core/features.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/vector_icons.h"
@@ -414,40 +404,6 @@ void BrowserActions::InitializeSidePanelActions() {
             .Build());
   }
 
-  if (lens::features::IsLensOverlayEnabled()) {
-    const gfx::VectorIcon& icon =
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-        vector_icons::kGoogleLensMonochromeLogoIcon;
-#else
-        features::IsRoundedIconsEnabled()
-            ? vector_icons::kSearchIcon
-            : vector_icons::kSearchChromeRefreshOldIcon;
-#endif
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  if (!bwi) {
-                    return;
-                  }
-                  lens::LensOverlayEntryPointController::InvokeAction(
-                      bwi->GetActiveTabInterface(), context);
-                },
-                bwi))
-            .SetActionId(kActionSidePanelShowLensOverlayResults)
-            .SetText(l10n_util::GetStringUTF16(
-                lens::GetLensOverlayEntrypointLabelAltIds()))
-            .SetTooltipText(l10n_util::GetStringUTF16(
-                lens::GetLensOverlayEntrypointLabelAltIds()))
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                icon, ui::kColorIcon, ui::SimpleMenuModel::kDefaultIconSize))
-            .SetProperty(actions::kActionItemPinnableKey,
-                         std::underlying_type_t<actions::ActionPinnableState>(
-                             actions::ActionPinnableState::kPinnable))
-            .Build());
-  }
-
   if (CommentsSidePanelCoordinator::IsSupported()) {
     root_action_item_->AddChild(
         SidePanelAction(SidePanelEntryId::kComments,
@@ -460,60 +416,6 @@ void BrowserActions::InitializeSidePanelActions() {
             .Build());
   }
 
-  if (contextual_tasks::IsContextualTasksUIEnabled()) {
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  if (!bwi) {
-                    return;
-                  }
-                  auto* controller =
-                      contextual_tasks::ContextualTasksPanelController::From(
-                          bwi);
-                  if (controller) {
-                    bool is_open = controller->IsPanelOpenForContextualTask();
-                    const char* user_action =
-                        is_open ? "ContextualTasks.PermanentToolbarButton."
-                                  "UserAction."
-                                  "CloseSidePanel"
-                                : "ContextualTasks.PermanentToolbarButton."
-                                  "UserAction."
-                                  "OpenSidePanel";
-                    base::RecordAction(base::UserMetricsAction(user_action));
-                    base::UmaHistogramBoolean(user_action, true);
-                  }
-                  if (contextual_tasks::
-                          IsContextualTasksPinButtonInToolbarEnabled() &&
-                      contextual_tasks::GetEffectivePinState(
-                          bwi->GetProfile())) {
-                    chrome::ToggleContextualTasksSidePanelZeroState(bwi);
-                  } else {
-                    chrome::ToggleContextualTasksSidePanel(bwi);
-                  }
-                },
-                bwi))
-            .SetActionId(kActionSidePanelShowContextualTasks)
-            .SetText(l10n_util::GetStringUTF16(
-                IDS_CONTEXTUAL_TASKS_CUSTOMIZE_CHROME_LABEL))
-            .SetTooltipText(l10n_util::GetStringUTF16(
-                IDS_CONTEXTUAL_TASKS_CUSTOMIZE_CHROME_LABEL))
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                features::IsRoundedIconsEnabled()
-                    ? omnibox::kSearchSparkIcon
-                    : omnibox::kSearchSparkOldIcon,
-                ui::kColorIcon))
-            .SetProperty(
-                actions::kActionItemPinnableKey,
-                static_cast<
-                    std::underlying_type_t<actions::ActionPinnableState>>(
-                    actions::ActionPinnableState::kPinnable))
-            .SetVisible(
-                contextual_tasks::EntryPointEligibilityManager::IsEligible(
-                    profile))
-            .Build());
-  }
 }
 
 void BrowserActions::InitializePageActionIconActions() {
@@ -1580,54 +1482,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
                   : kPersonFilledPaddedSmallOldIcon,
               ui::kColorIcon))
           .Build());
-
-  auto* ai_mode_button_service =
-      AiModeButtonServiceFactory::GetForProfile(base::to_address(profile_));
-  if (ai_mode_button_service) {
-    // If `ai_mode_button_service` is null, it will remain null and the button
-    // will not be needed.
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  bool via_keyboard = false;
-
-                  std::underlying_type_t<page_actions::PageActionTrigger>
-                      page_action_trigger = context.GetProperty(
-                          page_actions::kPageActionTriggerKey);
-
-                  if ((page_action_trigger !=
-                       page_actions::kInvalidPageActionTrigger) &&
-                      page_action_trigger ==
-                          std::to_underlying(
-                              page_actions::PageActionTrigger::kKeyboard)) {
-                    via_keyboard = true;
-                  }
-
-                  tabs::TabInterface* active_tab = bwi->GetActiveTabInterface();
-                  CHECK(active_tab);
-
-                  content::WebContents* web_contents =
-                      active_tab->GetContents();
-                  CHECK(web_contents);
-
-                  OmniboxController* omnibox_controller =
-                      search::GetOmniboxController(web_contents);
-                  CHECK(omnibox_controller);
-
-                  omnibox::AiModePageActionController::OpenAiMode(
-                      *omnibox_controller, via_keyboard);
-                },
-                bwi))
-            .SetActionId(kActionAiMode)
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                features::IsRoundedIconsEnabled()
-                    ? omnibox::kSearchSparkIcon
-                    : omnibox::kSearchSparkOldIcon))
-            .SetProperty(actions::kActionItemPinnableKey, false)
-            .Build());
-  }
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
@@ -3200,17 +3054,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionShowFullUrls)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ToggleShowAiModeOmniboxButton(bwi);
-              },
-              bwi))
-          .SetActionId(kActionShowAiModeOmniboxButton)
           .Build());
 
   root_action_item_->AddChild(

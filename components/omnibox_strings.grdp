@@ -60,16 +60,6 @@
   <message name="IDS_AI_MODE_ENTRYPOINT_ACC_FOCUSED" desc="Accessibility announcement when the omnibox AI Mode entrypoint gains focus.">
     <ph name="AI_ENGINE_NAME">$1<ex>AI Mode</ex></ph> button, press Enter to ask <ph name="AI_ENGINE_NAME">$1<ex>AI Mode</ex></ph>
   </message>
-  <if expr="use_titlecase">
-    <message name="IDS_AI_MODE_ENTRYPOINT_CONTEXT_MENU_SHOW" desc="In Title Case: Text label for the omnibox context menu option to toggle showing the omnibox AI Mode entrypoint.">
-      Always Show <ph name="AI_ENGINE_NAME">$1<ex>AI Mode</ex></ph>
-    </message>
-  </if>
-  <if expr="not use_titlecase">
-    <message name="IDS_AI_MODE_ENTRYPOINT_CONTEXT_MENU_SHOW" desc="Text label for the omnibox context menu option to toggle showing the omnibox AI Mode entrypoint.">
-      Always show <ph name="AI_ENGINE_NAME">$1<ex>AI Mode</ex></ph>
-    </message>
-  </if>
   <message name="IDS_AI_MODE_OMNIBOX_PLACEHOLDER" desc="The text shown and announced, prompting the user to use the omnibox AI mode entrypoint. conditionally displayed in the Omnibox when it is focused with no input and AI Mode is enabled." formatter_data="android_java">
     Press tab then enter to ask <ph name="AI_ENGINE_NAME">$1<ex>AI Mode</ex></ph>
   </message>

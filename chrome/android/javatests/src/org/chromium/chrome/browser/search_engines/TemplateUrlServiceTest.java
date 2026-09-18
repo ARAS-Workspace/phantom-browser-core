@@ -32,7 +32,6 @@ import org.chromium.components.search_engines.TemplateUrlService;
 import org.chromium.components.search_engines.TemplateUrlService.LoadListener;
 import org.chromium.content_public.browser.test.NativeLibraryTestUtils;
 import org.chromium.ui.base.DeviceFormFactor;
-import org.chromium.url.GURL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,17 +48,6 @@ import java.util.stream.Collectors;
 @DoNotBatch(reason = "AI automated batching attempt was unsuccessful.")
 public class TemplateUrlServiceTest {
     private static final String QUERY_PARAMETER = "q";
-    private static final String QUERY_VALUE = "cat";
-
-    private static final String ALTERNATIVE_PARAMETER = "ctxsl_alternate_term";
-    private static final String ALTERNATIVE_VALUE = "lion";
-
-    private static final String VERSION_PARAMETER = "ctxs";
-    private static final String VERSION_VALUE_TWO_REQUEST_PROTOCOL = "2";
-    private static final String VERSION_VALUE_SINGLE_REQUEST_PROTOCOL = "3";
-
-    private static final String PREFETCH_PARAMETER = "pf";
-    private static final String PREFETCH_VALUE = "c";
 
     private static final String PLAY_API_SEARCH_URL = "https://play.search.engine?q={searchTerms}";
     private static final String PLAY_API_SUGGEST_URL = "https://suggest.engine?q={searchTerms}";
@@ -81,55 +69,6 @@ public class TemplateUrlServiceTest {
                         () ->
                                 TemplateUrlServiceFactory.getForProfile(
                                         ProfileManager.getLastUsedRegularProfile()));
-    }
-
-    @Test
-    @SmallTest
-    @Feature({"ContextualSearch"})
-    public void testUrlForContextualSearchQueryValid() throws ExecutionException {
-        waitForTemplateUrlServiceToLoad();
-
-        Assert.assertTrue(
-                ThreadUtils.runOnUiThreadBlocking(
-                        new Callable<>() {
-                            @Override
-                            public Boolean call() {
-                                return mTemplateUrlService.isLoaded();
-                            }
-                        }));
-
-        validateQuery(QUERY_VALUE, ALTERNATIVE_VALUE, true, VERSION_VALUE_TWO_REQUEST_PROTOCOL);
-        validateQuery(QUERY_VALUE, ALTERNATIVE_VALUE, false, VERSION_VALUE_TWO_REQUEST_PROTOCOL);
-        validateQuery(QUERY_VALUE, null, true, VERSION_VALUE_TWO_REQUEST_PROTOCOL);
-        validateQuery(QUERY_VALUE, null, false, VERSION_VALUE_TWO_REQUEST_PROTOCOL);
-        validateQuery(QUERY_VALUE, null, true, VERSION_VALUE_SINGLE_REQUEST_PROTOCOL);
-    }
-
-    private void validateQuery(
-            final String query,
-            final String alternative,
-            final boolean prefetch,
-            final String protocolVersion)
-            throws ExecutionException {
-        GURL result =
-                ThreadUtils.runOnUiThreadBlocking(
-                        new Callable<>() {
-                            @Override
-                            public GURL call() {
-                                return mTemplateUrlService.getUrlForContextualSearchQuery(
-                                        query, alternative, prefetch, protocolVersion);
-                            }
-                        });
-        Assert.assertNotNull(result);
-        Uri uri = Uri.parse(result.getSpec());
-        Assert.assertEquals(query, uri.getQueryParameter(QUERY_PARAMETER));
-        Assert.assertEquals(alternative, uri.getQueryParameter(ALTERNATIVE_PARAMETER));
-        Assert.assertEquals(protocolVersion, uri.getQueryParameter(VERSION_PARAMETER));
-        if (prefetch) {
-            Assert.assertEquals(PREFETCH_VALUE, uri.getQueryParameter(PREFETCH_PARAMETER));
-        } else {
-            Assert.assertNull(uri.getQueryParameter(PREFETCH_PARAMETER));
-        }
     }
 
     private void validateSearchQuery(

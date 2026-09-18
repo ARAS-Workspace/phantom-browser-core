@@ -35,8 +35,6 @@ template("build_webui") {
     # folders. A temporary exception is added for the folders below, which will
     # be removed once experimentation in these folders concludes.
     _in_folder_exceptions = [
-      "//chrome/browser/resources/omnibox/aim_eligibility_extension:build",
-      "//chrome/browser/resources/contextual_tasks/extension:build",
     ]
     _current_label = get_label_info(":$target_name", "label_no_toolchain")
     assert(
@@ -617,11 +615,6 @@ template("build_webui") {
         "//chrome/browser/resources/tab_search",
         "//ui/webui/resources/js",
       ]
-
-      if (is_android) {
-        no_explicit_any_exceptions +=
-            [ "//chrome/browser/resources/contextual_tasks" ]
-      }
 
       if (!is_ash_webui && filter_include([ get_label_info(":lint_ts", "dir") ],
                                           no_explicit_any_exceptions) == []) {

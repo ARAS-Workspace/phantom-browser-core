@@ -29,8 +29,6 @@ class TestLocationBarModel : public LocationBarModel {
   std::u16string GetFormattedFullURL() const override;
   std::u16string GetURLForDisplay() const override;
   GURL GetURL() const override;
-  bool IsContextualTasksPage() const override;
-  GURL GetContextualTasksInnerFrameURL() const override;
   security_state::SecurityLevel GetSecurityLevel() const override;
   net::CertStatus GetCertStatus() const override;
   metrics::OmniboxEventProto::PageClassification GetPageClassification(
@@ -74,9 +72,6 @@ class TestLocationBarModel : public LocationBarModel {
       metrics::OmniboxEventProto::PageClassification page_classification) {
     page_classification_ = page_classification;
   }
-  void set_is_contextual_tasks_page(bool is_contextual_tasks_page) {
-    is_contextual_tasks_page_ = is_contextual_tasks_page;
-  }
 
  private:
   // If either of these is not explicitly set, the test class will return
@@ -95,7 +90,6 @@ class TestLocationBarModel : public LocationBarModel {
   bool should_prevent_elision_ = false;
   metrics::OmniboxEventProto::PageClassification page_classification_ =
       metrics::OmniboxEventProto::OTHER;
-  bool is_contextual_tasks_page_ = false;
 };
 
 #endif  // COMPONENTS_OMNIBOX_BROWSER_TEST_LOCATION_BAR_MODEL_H_

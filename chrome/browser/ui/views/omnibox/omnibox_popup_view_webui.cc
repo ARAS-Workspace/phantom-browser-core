@@ -77,17 +77,8 @@ void OmniboxPopupViewWebUI::UpdatePopupAppearance() {
   // a bug where the popup will be visible if the user types something and
   // backspaces when chips are enabled but no chips are actually shown due to
   // the Typescript logic.
-  const bool has_contextual_chips =
-      controller()->autocomplete_controller()->result().has_contextual_chips();
-  const bool contextual_chips_feature_enabled =
-      omnibox::IsAimPopupEnabled(location_bar_->GetProfile()) &&
-      omnibox::kShowLensSearchChip.Get();
-  const bool has_results_or_chips =
-      has_results || (contextual_chips_feature_enabled && has_contextual_chips);
   const bool should_be_visible =
-      controller()->popup_state_manager()->popup_state() !=
-          OmniboxPopupState::kAim &&
-      (has_results_or_chips ||
+      (has_results ||
        (base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup) &&
         controller()->edit_model()->has_focus())) &&
       !omnibox_view_->IsImeShowingPopup();
@@ -98,8 +89,7 @@ void OmniboxPopupViewWebUI::UpdatePopupAppearance() {
     // Do this AFTER widget operations. LocationBarView is subscribed to state
     // changes and attempts to call `UpdatePopupAppearance()` again if the
     // widget is open.
-    // Only update the state if it's currently kClassic. If it's already
-    // transitioning to another state (e.g., kAim), don't override it.
+    // Only update the state if it's currently kClassic.
     if (controller()->popup_state_manager()->popup_state() ==
         OmniboxPopupState::kClassic) {
       controller()->popup_state_manager()->SetPopupState(
@@ -133,13 +123,6 @@ void OmniboxPopupViewWebUI::UpdatePopupAppearance() {
       }
     }
 
-    auto* controller = presenter()
-                           ->GetWebUIContent()
-                           ->contents_wrapper()
-                           ->GetWebUIController();
-    if (auto* handler = controller ? controller->omnibox_handler() : nullptr) {
-      handler->SetAimButtonVisible(omnibox_view_->AimButtonVisible());
-    }
   }
 }
 
@@ -162,7 +145,6 @@ void OmniboxPopupViewWebUI::StepSelection(
   auto* controller =
       presenter()->GetWebUIContent()->contents_wrapper()->GetWebUIController();
   if (auto* handler = controller ? controller->omnibox_handler() : nullptr) {
-    handler->SetAimButtonVisible(omnibox_view_->AimButtonVisible());
     if (!omnibox::ShouldUseWebUIOmniboxFullHandler()) {
       // Full webui omnibox avoids this code path by intentionally excluding
       // the edit model. Use of downcast here seems better than complicating
@@ -192,7 +174,6 @@ void OmniboxPopupViewWebUI::ResetPopupToInitialState() {
   auto* controller =
       presenter()->GetWebUIContent()->contents_wrapper()->GetWebUIController();
   if (auto* handler = controller ? controller->omnibox_handler() : nullptr) {
-    handler->SetAimButtonVisible(omnibox_view_->AimButtonVisible());
     if (!omnibox::ShouldUseWebUIOmniboxFullHandler()) {
       static_cast<WebuiOmniboxHandler*>(handler)->ResetPopupToInitialState();
     }

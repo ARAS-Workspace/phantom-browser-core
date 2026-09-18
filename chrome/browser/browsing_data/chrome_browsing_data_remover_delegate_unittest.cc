@@ -243,7 +243,6 @@
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/lens/lens_features.h"
 #include "components/search/ntp_features.h"
 #include "components/services/storage/public/mojom/local_storage_control.mojom.h"
 #include "components/services/storage/public/mojom/storage_usage_info.mojom.h"
@@ -1295,42 +1294,6 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest,
   data = storage_service.ReadRecentSessionData();
   ASSERT_EQ(0U, data.recent_session_start_times.size());
   ASSERT_FALSE(data.enabled_time.has_value());
-}
-
-TEST_F(ChromeBrowsingDataRemoverDelegateTest, RemoveLensOverlayWebUIStorage) {
-  // Enable the translate languages feature.
-  base::test::ScopedFeatureList features;
-  features.InitAndEnableFeature(lens::features::kLensOverlayTranslateLanguages);
-
-  // Setup local storage data to the Lens Overlay WebUI origin.
-  const GURL lens_overlay_url = GURL(chrome::kChromeUILensOverlayUntrustedURL);
-  storage::mojom::LocalStorageControl* local_storage_control =
-      GetProfile()->GetDefaultStoragePartition()->GetLocalStorageControl();
-  blink::StorageKey storage_key =
-      blink::StorageKey::CreateFromStringForTesting(lens_overlay_url.spec());
-  mojo::Remote<blink::mojom::StorageArea> area;
-  local_storage_control->BindStorageArea(storage_key,
-                                         area.BindNewPipeAndPassReceiver());
-
-  // Add the fake data to the Lens Overlay WebUI origin.
-  base::test::TestFuture<bool> added_data_future;
-  area->Put({'k', 'e', 'y'}, {'v', 'a', 'l', 'u', 'e'}, std::nullopt,
-            /*source=*/nullptr, added_data_future.GetCallback());
-  ASSERT_TRUE(added_data_future.Get());
-
-  // Next, run the function that is supposed to remove this storage.
-  BlockUntilBrowsingDataRemoved(base::Time::Now(), base::Time::Max(),
-                                constants::DATA_TYPE_HISTORY, false);
-
-  // Check if the local storage was successfully removed. ClearData only
-  // guarantees that tasks to delete data are scheduled when its callback is
-  // invoked. It doesn't guarantee data has actually been cleared. Use
-  // TestFuture to verify that data is cleared.
-  base::test::TestFuture<std::vector<blink::mojom::KeyValuePtr>> get_all_future;
-  area->GetAll(/*new_observer=*/mojo::NullRemote(),
-               get_all_future.GetCallback());
-  EXPECT_TRUE(get_all_future.Wait());
-  EXPECT_EQ(0UL, get_all_future.Get().size());
 }
 #endif
 

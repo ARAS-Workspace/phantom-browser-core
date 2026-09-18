@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "chrome/browser/android/tab_android.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_tab_visit_tracker.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_navigation_controller.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/flags/android/chrome_feature_list.h"
@@ -19,7 +18,6 @@
 #include "chrome/browser/ssl/security_state_event_observer.h"
 #include "chrome/browser/sync/sessions/sync_sessions_router_tab_helper.h"
 #include "chrome/browser/sync/sessions/sync_sessions_web_contents_router_factory.h"
-#include "chrome/browser/ui/contextual_search/tab_contextualization_controller.h"
 #include "chrome/browser/ui/side_panel/android/android_side_panel_enabled_fn.h"
 #include "chrome/browser/ui/side_panel/internal/android/dev/side_panel_tab_scoped_dev_feature.h"
 #include "chrome/browser/ui/side_panel/side_panel_registry.h"
@@ -27,7 +25,6 @@
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/enterprise/data_protection/features.h"
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/search/ntp_features.h"
@@ -95,17 +92,6 @@ TabFeatures::TabFeatures(content::WebContents* web_contents, Profile* profile) {
   if (base::FeatureList::IsEnabled(features::kGlicActor)) {
     actor_tab_data_ =
   }
-
-  if (base::FeatureList::IsEnabled(contextual_tasks::kContextualTasksContext)) {
-    contextual_tasks_tab_visit_tracker_ =
-        GetUserDataFactory()
-            .CreateInstance<contextual_tasks::ContextualTasksTabVisitTracker>(
-                *tab, *tab);
-  }
-
-  tab_contextualization_controller_ =
-      GetUserDataFactory().CreateInstance<lens::TabContextualizationController>(
-          *tab, tab);
 
   if (base::FeatureList::IsEnabled(
           enterprise_data_protection::

@@ -12,7 +12,6 @@
 #include "base/memory/ptr_util.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/no_destructor.h"
-#include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_merged_surface_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/bookmarks/managed_bookmark_service_factory.h"
@@ -21,17 +20,11 @@
 #include "chrome/browser/commerce/shopping_service_factory.h"
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/contextual_tasks/active_task_context_provider_impl.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_service_factory.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_side_panel_coordinator.h"
-#include "chrome/browser/contextual_tasks/entry_point_eligibility_manager.h"
 #include "chrome/browser/devtools/devtools_ui_controller.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_ui_controller.h"
 #include "chrome/browser/extensions/browser_extension_window_controller.h"
-#include "chrome/browser/lens/region_search/lens_region_search_controller.h"
 #include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search_engines/ai_mode_button_service_factory.h"
 #include "chrome/browser/sessions/session_service_factory.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
 #include "chrome/browser/ui/animation/browser_animation_controller.h"
@@ -59,7 +52,6 @@
 #include "chrome/browser/ui/browser_window_theme_observer.h"
 #include "chrome/browser/ui/call_to_action/call_to_action_lock.h"
 #include "chrome/browser/ui/context_highlight/context_highlight_window_feature.h"
-#include "chrome/browser/ui/contextual_search/searchbox_context_data.h"
 #include "chrome/browser/ui/desktop_to_mobile_promos/ios_promo_controller.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/extensions/extension_installed_watcher.h"
@@ -70,8 +62,6 @@
 #include "chrome/browser/ui/focus/browser_focus_controller_webui.h"
 #include "chrome/browser/ui/fullscreen/browser_window_fullscreen_controller.h"
 #include "chrome/browser/ui/immersive/immersive_mode_controller.h"
-#include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
-#include "chrome/browser/ui/omnibox/ai_mode_page_action_controller.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_controller.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_opt_in_iph_controller.h"
 #include "chrome/browser/ui/sessions/session_service_browser_helper.h"
@@ -107,7 +97,6 @@
 #include "chrome/browser/ui/views/animations/side_panel_animations.h"
 #include "chrome/browser/ui/views/animations/tab_strip_animations.h"
 #include "chrome/browser/ui/views/color_provider_browser_helper.h"
-#include "chrome/browser/ui/views/contextual_tasks/contextual_tasks_browser_controller.h"
 #include "chrome/browser/ui/views/data_sharing/data_sharing_bubble_controller.h"
 #include "chrome/browser/ui/views/extensions/extension_keybinding_registry_views.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
@@ -169,10 +158,8 @@
 #include "components/commerce/core/shopping_service.h"
 #include "components/content_settings/browser/ui/cookie_controls_controller.h"
 #include "components/content_settings/core/browser/cookie_settings.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/desktop_to_mobile_promos/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
-#include "components/lens/lens_features.h"
 #include "components/omnibox/browser/location_bar_model.h"
 #include "components/omnibox/browser/location_bar_model_impl.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
@@ -401,17 +388,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
         std::make_unique<InitialWebUIWindowMetricsManager>(browser);
   }
 
-  // The LensOverlayEntryPointController is constructed for all browser types
-  // but is only initialized for normal browser windows. This simplifies the
-  // logic for code shared by both normal and non-normal windows.
-  lens_overlay_entry_point_controller_ =
-      GetUserDataFactory()
-          .CreateInstance<lens::LensOverlayEntryPointController>(*browser,
-                                                                 browser);
-
-  lens_region_search_controller_ =
-      std::make_unique<lens::LensRegionSearchController>();
-
   // Must be before location_bar_model_.
   location_bar_model_delegate_ =
       std::make_unique<BrowserLocationBarModelDelegate>(tab_strip_model_);
@@ -453,8 +429,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
   reading_list_side_panel_coordinator_ =
       GetUserDataFactory().CreateInstance<ReadingListSidePanelCoordinator>(
           *browser, browser, profile, browser->GetTabStripModel());
-
-  searchbox_context_data_ = std::make_unique<SearchboxContextData>();
 
   session_service_browser_helper_ =
       std::make_unique<SessionServiceBrowserHelper>(
@@ -573,12 +547,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
   //   CloseButtonController depends on VerticalTabStripStateController.
   //   CloseButtonController depends on ImmersiveModeController.
   // TODO(crbug.com/481268779): Pass these dependencies explicitly.
-  if (contextual_tasks::IsContextualTasksUIEnabled()) {
-    contextual_tasks_browser_controller_ =
-        GetUserDataFactory()
-            .CreateInstance<contextual_tasks::ContextualTasksBrowserController>(
-                *browser_, browser_);
-  }
 
   // Initialize embedder features last.
   embedder_browser_window_features_ =
@@ -847,15 +815,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
   // instantiated in this block (please keep this list ordered without taking
   // into consideration buildflags, repeating buildflags is ok):
   if (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL) {
-    if (browser_view && AiModeButtonServiceFactory::GetForProfile(profile)) {
-      LocationBar* location_bar = browser_view->GetLocationBar();
-      if (location_bar) {
-        ai_mode_page_action_controller_ =
-            GetUserDataFactory()
-                .CreateInstance<omnibox::AiModePageActionController>(
-                    *browser, *browser, *profile, *location_bar);
-      }
-    }
 
     if (browser_view) {
       if (media_router::MediaRouterEnabled(
@@ -877,18 +836,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
     // we need browser to properly determine if the lens overlay is enabled.
     // Cannot be in Init since needs to listen to the fullscreen controller
     // and location bar view which are initialized after Init.
-    if (lens::features::IsLensOverlayEnabled()) {
-      LocationBar* location_bar = nullptr;
-      // TODO(crbug.com/360163254): We should really be using
-      // Browser::GetBrowserView, which always returns a non-null BrowserView
-      // in production, but this crashes during unittests using
-      // BrowserWithTestWindowTest; these should eventually be refactored.
-      if (browser_view) {
-        location_bar = browser_view->GetLocationBar();
-      }
-      lens_overlay_entry_point_controller_->Initialize(
-          browser, browser_command_controller_.get(), location_bar);
-    }
 
     if (browser_view) {
       // Memory Saver mode is default off but is available to turn on.
@@ -1001,7 +948,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   memory_saver_opt_in_iph_controller_.reset();
   ios_promo_controller_.reset();
   cast_browser_controller_.reset();
-  ai_mode_page_action_controller_.reset();
   // Owned-by-all members.
   zoom_bubble_coordinator_.reset();
   zoom_bubble_manager_.reset();
@@ -1063,15 +1009,7 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   initial_web_ui_manager_.reset();
 
   // Owned-by-all members.
-  // contextual_tasks_* are reset first because the group is constructed last
-  // in Init (it observes other features such as immersive_mode_controller_
-  // via ScopedObservation), and ContextualTasksCloseButtonController must
-  // outlive nothing observable.
-  if (contextual_tasks_browser_controller_) {
-    contextual_tasks_browser_controller_->Shutdown();
-  }
   signin_view_controller_->TearDownPreBrowserWindowDestruction();
-  lens_overlay_entry_point_controller_.reset();
   // Must be before window_feature_controller_ (raw pointer).
   immersive_mode_controller_.reset();
   history_clusters_side_panel_coordinator_.reset();

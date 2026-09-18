@@ -151,37 +151,6 @@ class SearchboxInteractiveTestMixin : public T {
         T::InAnyContext(T::WaitForStateChange(contents_id, state_change)));
   }
 
-  // Triggers a voice search with the final result matching `result`.
-  auto TriggerAimVoiceSearch(
-      const ui::ElementIdentifier& contents_id,
-      const WebContentsInteractionTestUtil::DeepQuery& voice_search_element,
-      const std::string& result) {
-    return T::Steps(T::InSameContext(T::ExecuteJsAt(
-        contents_id, voice_search_element,
-        base::StringPrintf("el => el.dispatchEvent(new CustomEvent("
-                           "'voice-search-final-result', "
-                           "{detail: '%s', bubbles: true, composed: true}))",
-                           result.c_str()))));
-  }
-
-  // Waits for AIM contextual entrypoint state to be eligible and ready.
-  auto WaitForOmniboxAimStateReady(
-      const ui::ElementIdentifier& omnibox_context_entrypoint_contents_id,
-      const WebContentsInteractionTestUtil::DeepQuery& where) {
-    DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kAimStateReady);
-    WebContentsInteractionTestUtil::StateChange state_ready;
-    state_ready.event = kAimStateReady;
-    state_ready.where = where;
-    state_ready.test_function =
-        "(el) => { const ep = "
-        "el?.shadowRoot?.querySelector('omnibox-popup-contextual-entrypoint'); "
-        "return ep && ep.isAimPopupEligible && ep.inputState && "
-        "ep.inputState.allowedTools.length > 0; }";
-    state_ready.continue_across_navigation = true;
-    return T::Steps(T::InAnyContext(T::WaitForStateChange(
-        omnibox_context_entrypoint_contents_id, state_ready)));
-  }
-
   void SetUpOnMainThread() override {
     T::SetUpOnMainThread();
     SetUpUrlLoaderInterceptor();

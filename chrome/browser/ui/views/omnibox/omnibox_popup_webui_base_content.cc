@@ -19,9 +19,6 @@
 #include "chrome/browser/ui/omnibox/omnibox_edit_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/location_bar/location_bar_view.h"
-#include "chrome/browser/ui/views/location_bar/omnibox_popup_file_selector.h"
-#include "chrome/browser/ui/views/omnibox/omnibox_context_menu.h"
-#include "chrome/browser/ui/views/omnibox/omnibox_popup_aim_presenter.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_popup_presenter_base.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_popup_tab_selection_listener.h"
 #include "chrome/browser/ui/views/omnibox/rounded_omnibox_results_frame.h"
@@ -178,21 +175,6 @@ void OmniboxPopupWebUIBaseContent::ShowUI() {
   OnLocationBarBoundsChanged();
 
   is_shown_ = true;
-}
-
-void OmniboxPopupWebUIBaseContent::ShowCustomContextMenu(
-    gfx::Point point,
-    std::unique_ptr<ui::MenuModel> menu_model) {
-  ConvertPointToScreen(this, &point);
-  context_menu_ = std::make_unique<OmniboxContextMenu>(
-      GetWidget(), popup_presenter_->delegate().GetOmniboxPopupFileSelector(),
-      popup_presenter_->delegate()
-          .GetOmniboxPopupAimPresenter()
-          ->GetWebUIContent()
-          ->GetWrappedWebContents(),
-      base::BindRepeating(&OmniboxPopupWebUIBaseContent::OnMenuClosed,
-                          base::Unretained(this)));
-  context_menu_->RunMenuAt(point, ui::mojom::MenuSourceType::kMouse);
 }
 
 void OmniboxPopupWebUIBaseContent::ResizeDueToAutoResize(
@@ -354,23 +336,6 @@ void OmniboxPopupWebUIBaseContent::Detach() {
 
 content::WebContents* OmniboxPopupWebUIBaseContent::GetWrappedWebContents() {
   return contents_wrapper_ ? contents_wrapper_->web_contents() : nullptr;
-}
-
-void OmniboxPopupWebUIBaseContent::OnMenuClosed() {
-  std::move(context_menu_).reset();
-  OnContextMenuClosed();
-  // Synthesize a mouse leave event from the context menu to trigger
-  // re-rendering of the web ui pop up state. This is to ensure entrypoint
-  // button to the context menu does not get stuck in the :hover state.
-  if (auto* web_contents = GetWebContents()) {
-    if (auto* rwh =
-            web_contents->GetPrimaryMainFrame()->GetRenderWidgetHost()) {
-      blink::WebMouseEvent mouse_event(blink::WebInputEvent::Type::kMouseLeave,
-                                       blink::WebInputEvent::kNoModifiers,
-                                       base::TimeTicks::Now());
-      rwh->ForwardMouseEvent(mouse_event);
-    }
-  }
 }
 
 void OmniboxPopupWebUIBaseContent::PrimaryMainFrameRenderProcessGone(

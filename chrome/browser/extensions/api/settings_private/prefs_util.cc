@@ -36,8 +36,6 @@
 #include "components/component_updater/pref_names.h"
 #include "components/compose/buildflags.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/contextual_search/pref_names.h"
-#include "components/contextual_tasks/public/prefs.h"
 #include "components/dom_distiller/core/pref_names.h"
 #include "components/embedder_support/pref_names.h"
 #include "components/language/core/browser/pref_names.h"
@@ -206,8 +204,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kBoolean;
 #endif
   (*s_allowlist)[::prefs::kShowHomeButton] = settings_api::PrefType::kBoolean;
-  (*s_allowlist)[contextual_search::kDriveConsentState] =
-      settings_api::PrefType::kNumber;
   (*s_allowlist)[::prefs::kShowForwardButton] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kPinContextualTaskButton] =
@@ -567,10 +563,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[optimization_guide::prefs::GetSettingEnabledPrefName(
       optimization_guide::UserVisibleFeatureKey::kPasswordChangeSubmission)] =
       settings_api::PrefType::kNumber;
-  (*s_allowlist)[contextual_tasks::kContextualTasksShareOpenTabsEveryThread] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[contextual_tasks::kContextualTasksSiteExclusions] =
-      settings_api::PrefType::kDictionary;
   (*s_allowlist)[optimization_guide::prefs::GetSettingEnabledPrefName(
       optimization_guide::UserVisibleFeatureKey::kContextualCueing)] =
       settings_api::PrefType::kNumber;
@@ -591,8 +583,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
                      kAutofillPredictionImprovementsEnterprisePolicyAllowed] =
       settings_api::PrefType::kNumber;
   (*s_allowlist)[optimization_guide::prefs::kChromeSuggestionsSettings] =
-      settings_api::PrefType::kNumber;
-  (*s_allowlist)[contextual_tasks::kContextualTasksSmartTabSharingSettings] =
       settings_api::PrefType::kNumber;
 
   // Glic prefs

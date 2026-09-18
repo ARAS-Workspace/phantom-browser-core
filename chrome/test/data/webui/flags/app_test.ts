@@ -501,7 +501,7 @@ suite('FlagsAppTest', function() {
         app.getRequiredElement<HTMLInputElement>('#import-file-input');
     const invalidJson = JSON.stringify({
       customized_flags: {},
-      end_flags: ['composebox-voice-search-coherence@3'],
+      end_flags: ['flag1@3'],
     });
 
     const file =

@@ -14,7 +14,6 @@
 #include "base/no_destructor.h"
 #include "build/build_config.h"
 #include "chrome/browser/account_settings/account_setting_service_factory.h"
-#include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/browser_process.h"
@@ -111,7 +110,6 @@
 // Must come after other includes, because FromJniType() uses Profile.
 #include "chrome/browser/sync/android/jni_headers/SyncServiceFactory_jni.h"
 #else  // BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/contextual_tasks/contextual_tasks_service_factory.h"
 #include "chrome/browser/webauthn/passkey_model_factory.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
@@ -211,10 +209,6 @@ syncer::DataTypeController::TypeVector CreateCommonControllers(
   builder.SetCollaborationService(
       collaboration::CollaborationServiceFactory::GetForProfile(profile));
 #if !BUILDFLAG(IS_ANDROID)
-  builder.SetAimEligibilityService(
-      AimEligibilityServiceFactory::GetForProfile(profile));
-  builder.SetContextualTasksService(
-      contextual_tasks::ContextualTasksServiceFactory::GetForProfile(profile));
 #endif
   builder.SetDataSharingService(
       data_sharing::DataSharingServiceFactory::GetForProfile(profile));
@@ -487,14 +481,12 @@ SyncServiceFactory::SyncServiceFactory()
   DependsOn(AccountSettingServiceFactory::GetInstance());
   DependsOn(AccountBookmarkSyncServiceFactory::GetInstance());
   DependsOn(AccountPasswordStoreFactory::GetInstance());
-  DependsOn(AimEligibilityServiceFactory::GetInstance());
   DependsOn(BookmarkModelFactory::GetInstance());
   DependsOn(BookmarkUndoServiceFactory::GetInstance());
   DependsOn(browser_sync::UserEventServiceFactory::GetInstance());
   DependsOn(collaboration::CollaborationServiceFactory::GetInstance());
   DependsOn(ConsentAuditorFactory::GetInstance());
 #if !BUILDFLAG(IS_ANDROID)
-  DependsOn(contextual_tasks::ContextualTasksServiceFactory::GetInstance());
 #endif  // !BUILDFLAG(IS_ANDROID)
   DependsOn(CrossDeviceThemeTrackerFactory::GetInstance());
   DependsOn(DataTypeStoreServiceFactory::GetInstance());

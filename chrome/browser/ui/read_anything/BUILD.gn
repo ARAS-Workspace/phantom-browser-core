@@ -61,6 +61,7 @@ source_set("read_anything") {
     "//chrome/browser/ui/webui_browser:headers",
     "//chrome/common",
     "//chrome/common/read_anything:mojo_bindings",
+    "//components/pdf/browser:browser",
     "//content/public/browser",
     "//ui/base",
     "//ui/views",

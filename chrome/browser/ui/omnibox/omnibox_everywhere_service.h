@@ -29,8 +29,6 @@ class OmniboxEverywhereService : public KeyedService {
   virtual void HidePopup();
   virtual bool IsPopupVisible() const;
   virtual void ShowProfilePicker();
-  virtual void OnDrivePickerOpened();
-  virtual void OnDrivePickerClosed();
   void OnScreensharePickerOpened();
   void OnScreensharePickerClosed();
   virtual void OpenUrl(const GURL& url,

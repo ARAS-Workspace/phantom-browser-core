@@ -1,8 +1,4 @@
-<!-- #html_wrapper_imports_start
-import {SubmitButtonIconType} from '//resources/cr_components/composebox/composebox.js';
-#html_wrapper_imports_end -->
-<div id="content"
-  ?ntp-threads-rail-open="${this.showComposebox_ && this.enableThreadsRail_}">
+<div id="content">
   ${this.lazyRender_ && this.microsoftModuleEnabled_ ? html`
     <iframe id="microsoftAuth" src="${this.microsoftAuthIframePath_}"></iframe>
   ` : ''}
@@ -46,69 +42,22 @@ import {SubmitButtonIconType} from '//resources/cr_components/composebox/compose
     <ntp-searchbox id="searchbox" ?is-dark="${this.isThemeDark_()}"
         placeholder-text="$i18n{searchBoxPlaceholder}"
         ?color-source-is-baseline="${this.colorSourceIsBaseline}"
-        @open-composebox="${this.onOpenComposebox_}"
         @open-lens-search="${this.onOpenLensSearch_}"
         @open-voice-search="${this.onOpenVoiceSearch_}" ?shown="${this.realboxShown_}"
-        @context-menu-entrypoint-click="${this.onContextMenuEntrypointClick_}"
         ?had-secondary-side="${this.realboxHadSecondarySide}"
         @had-secondary-side-changed="${this.onRealboxHadSecondarySideChanged_}"
         ?can-show-secondary-side="${this.realboxCanShowSecondarySide}"
-        ?compose-button-enabled="${this.composeButtonEnabled}"
-        ?composebox-enabled="${this.composeboxEnabled}"
         .hasVoiceSearchError="${this.hasVoiceSearchError}"
         searchbox-layout-mode="${this.ntpRealboxNextEnabled_ ? 'Compact' : ''}"
         .inVoiceSearchMode="${this.showVoiceSearchOverlay_}"
         ?ntp-realbox-next-enabled="${this.ntpRealboxNextEnabled_}"
         ?cycling-placeholders="${this.searchboxCyclingPlaceholders_}"
-        context-menu-glif-animation-state="${this.contextMenuGlifAnimationState_}"
         .energyEffectAnimationEnabled="${this.energyEffectAnimationEnabled_}"
-        .contextManagementInComposeboxEnabled="${this.contextManagementInComposeboxEnabled_}"
         ?multi-line-enabled="${this.multiLineEnabled_}"
         ?inert="${!this.realboxShown_}">
     </ntp-searchbox>
     <div id="dialogAnchor"></div>
-    ${this.showComposebox_ ? html`
-      <div id="composeboxDialog">
-        <ntp-composebox id="composebox"
-              searchbox-layout-mode="Compact"
-              searchbox-next-enabled
-              ?disable-caret-color-animation="${!this.caretAnimationsEnabled_}"
-              .state="${this.composeboxState_}"
-              .usePecApi="${this.usePecApi_}"
-              .showVoiceSearch="${true}"
-              .smartTabSharingVisible="${this.smartTabSharingVisible_}"
-              .contextManagementInComposeboxEnabled="${this.contextManagementInComposeboxEnabled_}"
-              @context-menu-opened="${this.onComposeboxContextMenuOpened_}"
-              @close-composebox="${this.onCloseComposebox_}"
-              @voice-search-action="${this.onComposeVoiceSearchAction_}"
-              .submitButtonIconType="${SubmitButtonIconType.FORWARD}"
-              .clearAllInputsWhenSubmittingQuery="${true}"
-              .closeOnEscape="${false}"
-              .energyEffectEnabled="${this.energyEffectEnabled_}"
-              .energyEffectAnimationEnabled="${this.energyEffectAnimationEnabled_}"
-              >
-          </ntp-composebox>
-        ${this.enableThreadsRail_ ? html`
-          <cr-threads-rail id="threadsRail">
-          </cr-threads-rail>
-        ` : ''}
-      </div>
-    ` : ''}
-    ${this.showLensUploadDialog_ ? html`
-      <ntp-lens-upload-dialog id="lensUploadDialog"
-          @close-lens-search="${this.onCloseLensSearch_}">
-      </ntp-lens-upload-dialog>
-    ` : ''}
   </div>
-  ${this.lazyRender_ && this.ntpNextFeaturesEnabled_
-  && this.isActionChipsVisible_ && this.composeboxEnabled ? html`
-    <ntp-action-chips
-        ?show-background="${this.showActionChipsBackground_()}"
-        @action-chip-click="${this.onActionChipClick_}"
-        @action-chips-retrieval-state-changed="${this.onActionChipsRetrievalStateChanged_}"
-        @action-chips-disabled="${this.onActionChipsDisabled_}">
-    </ntp-action-chips>
-  ` : ''}
   ${this.lazyRender_ ? html`
     <cr-toast id="webstoreToast" duration="10000" hidden>
       <div>$i18n{webstoreThemesToastMessage}</div>
@@ -215,28 +164,6 @@ ${this.voiceSearchCoherenceAnySearchboxExperimentEnabled_ &&
             .receivedSpeech="${this.voiceSearchReceivedSpeech_}">
         </search-animated-glow>
       ` : ''}
-      <!-- Pass metricSource synchronously to avoid microtask race in unit tests. -->
-      <cr-composebox-voice-search id="voiceSearch"
-          in-voice-search-mode
-          @voice-permission-changed="${this.onVoicePermissionChanged_}"
-          @voice-search-cancel="${this.onVoiceSearchCancel_}"
-          @voice-search-final-result="${this.onVoiceSearchFinalResult_}"
-          @voice-search-error="${this.onVoiceSearchError}"
-          @voice-search-restart="${this.onVoiceSearchRestart_}"
-          @transcript-update="${this.onVoiceSearchTranscriptUpdate_}"
-          @speech-received="${this.onVoiceSearchSpeechReceived_}"
-          @recording-stopped="${this.onVoiceSearchRecordingStopped_}"
-          .hasErrorTimer="${true}"
-          .pageCallbackRouter="${this.searchboxCallbackRouter_}"
-          .autosubmitEnabled="${true}"
-          .dynamicTimeoutEnabled="${true}"
-          .queryLengthLimit="${this.voiceQueryLengthLimit_}"
-          .idleTimeout="${this.voiceIdleTimeoutMs_}"
-          .liveTranscriptEnabled="${
-            this.voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled_}"
-          .submitStopButtonsEnabled="${true}"
-          .metricSource="${'NTP_REALBOX'}">
-      </cr-composebox-voice-search>
     </div>
   </dialog>
 ` : ''}
@@ -245,8 +172,7 @@ ${this.showVoiceSearchOverlay_ &&
   <ntp-voice-search-overlay @close="${this.onVoiceSearchOverlayClose}">
   </ntp-voice-search-overlay>
 ` : ''}
-${!this.ntpRealboxNextEnabled_ &&
-    (this.showComposebox_ || this.showVoiceSearchScrim_) ? html`
+${!this.ntpRealboxNextEnabled_ && this.showVoiceSearchScrim_ ? html`
   <div id="scrim"
       @click="${this.onScrimClick_}"></div>
 ` : ''}

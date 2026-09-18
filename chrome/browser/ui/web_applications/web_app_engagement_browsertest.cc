@@ -154,8 +154,7 @@ class WebAppEngagementBrowserTest : public WebAppBrowserTestBase {
     // and then remove this.
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features=*/{},
-        /*disabled_features=*/{omnibox::internal::kWebUIOmniboxPopup,
-                               omnibox::internal::kWebUIOmniboxAimPopup});
+        /*disabled_features=*/{omnibox::internal::kWebUIOmniboxPopup});
   }
   WebAppEngagementBrowserTest(const WebAppEngagementBrowserTest&) = delete;
   WebAppEngagementBrowserTest& operator=(const WebAppEngagementBrowserTest&) =

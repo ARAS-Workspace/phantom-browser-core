@@ -155,8 +155,6 @@ static_library("browser") {
   configs = []
   configs = [ "//third_party/tflite:tflite_shim_config" ] + _configs
   sources = [
-    "actions/contextual_search_action.cc",
-    "actions/contextual_search_action.h",
     "actions/cross_device_tab_action.cc",
     "actions/cross_device_tab_action.h",
     "actions/omnibox_action.cc",
@@ -177,8 +175,6 @@ static_library("browser") {
     "actions/omnibox_pedal_provider.h",
     "actions/tab_switch_action.cc",
     "actions/tab_switch_action.h",
-    "aim_eligibility_service.cc",
-    "aim_eligibility_service.h",
     "answers_cache.cc",
     "answers_cache.h",
     "autocomplete_classifier.cc",
@@ -230,8 +226,6 @@ static_library("browser") {
     "calculator_provider.h",
     "clipboard_provider.cc",
     "clipboard_provider.h",
-    "contextual_search_provider.cc",
-    "contextual_search_provider.h",
     "cross_device_tab_provider.cc",
     "cross_device_tab_provider.h",
     "document_provider.cc",
@@ -274,7 +268,6 @@ static_library("browser") {
     "keyword_extensions_delegate.h",
     "keyword_provider.cc",
     "keyword_provider.h",
-    "lens_suggest_inputs_utils.h",
     "local_history_zero_suggest_provider.cc",
     "local_history_zero_suggest_provider.h",
     "match_compare.h",
@@ -391,8 +384,6 @@ static_library("browser") {
     "//components/content_settings/core/browser",
     "//components/google/core/common",
     "//components/history/core/browser",
-    "//components/lens",
-    "//components/lens/proto/server:proto",
     "//components/omnibox/common",
     "//components/omnibox/resources:omnibox_pedal_synonyms",
     "//components/saved_tab_groups/public",
@@ -411,7 +402,6 @@ static_library("browser") {
     "//build:branding_buildflags",
     "//components/bookmarks/browser",
     "//components/component_updater",
-    "//components/contextual_tasks/public:feature_list",
     "//components/dom_distiller/core",
     "//components/favicon/core",
     "//components/favicon_base",
@@ -534,8 +524,6 @@ source_set("pref_names") {
 
 source_set("aim_eligibility_service_features") {
   sources = [
-    "aim_eligibility_service_features.cc",
-    "aim_eligibility_service_features.h",
   ]
   deps = [ "//base" ]
 }
@@ -566,9 +554,7 @@ static_library("location_bar") {
   ]
   deps = [
     ":buildflags",
-    "//components/contextual_tasks/public:feature_list",
     "//components/dom_distiller/core",
-    "//components/lens/proto/server:proto",
     "//components/safe_browsing/core/common",
     "//components/search_engines",
     "//components/security_interstitials/core",
@@ -809,8 +795,6 @@ static_library("test_support") {
     "fake_tab_matcher.h",
     "history_test_util.cc",
     "history_test_util.h",
-    "mock_aim_eligibility_service.cc",
-    "mock_aim_eligibility_service.h",
     "mock_autocomplete_provider_client.cc",
     "mock_autocomplete_provider_client.h",
     "mock_tab_matcher.cc",
@@ -887,12 +871,10 @@ bundle_data("unit_tests_bundle_data") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "actions/contextual_search_action_unittest.cc",
     "actions/omnibox_action_in_suggest_unittest.cc",
     "actions/omnibox_extension_action_unittest.cc",
     "actions/omnibox_pedal_provider_unittest.cc",
     "actions/omnibox_pedal_unittest.cc",
-    "aim_eligibility_service_unittest.cc",
     "answers_cache_unittest.cc",
     "autocomplete_controller_metrics_unittest.cc",
     "autocomplete_controller_unittest.cc",
@@ -911,7 +893,6 @@ source_set("unit_tests") {
     "builtin_provider_unittest.cc",
     "calculator_provider_unittest.cc",
     "clipboard_provider_unittest.cc",
-    "contextual_search_provider_unittest.cc",
     "cross_device_tab_provider_unittest.cc",
     "document_provider_unittest.cc",
     "document_suggestions_service_unittest.cc",
@@ -980,14 +961,12 @@ source_set("unit_tests") {
     "//components/bookmarks/browser",
     "//components/bookmarks/test",
     "//components/content_settings/core/browser",
-    "//components/contextual_tasks/public:feature_list",
     "//components/dom_distiller/core",
     "//components/favicon/core/test:test_support",
     "//components/history/core/test",
     "//components/history_embeddings/core",
     "//components/ntp_tiles",
     "//components/omnibox/common",
-    "//components/omnibox/composebox:unit_tests",
     "//components/open_from_clipboard:test_support",
     "//components/optimization_guide/core",
     "//components/optimization_guide/core:test_support",
@@ -1043,14 +1022,10 @@ source_set("unit_tests") {
   # //content
   if (!is_ios) {
     sources += [
-      "fusebox_action_mojo_utils_unittest.cc",
       "geolocation_header_service_unittest.cc",
       "history_cluster_provider_unittest.cc",
     ]
     deps += [
-      ":fusebox_action_mojo_bindings",
-      ":fusebox_action_mojo_test_utils",
-      ":fusebox_action_mojo_utils",
       "//components/permissions:test_support",
       "//content/test:test_support",
       "//services/device/public/cpp:test_support",
@@ -1117,7 +1092,6 @@ mojom("mojo_bindings") {
   webui_module_path = "chrome://resources/mojo/components/omnibox/browser"
 
   public_deps = [
-    "//components/omnibox/composebox:mojo_bindings",
     "//mojo/public/mojom/base",
     "//ui/base/mojom",
     "//ui/gfx/mojom",
@@ -1140,41 +1114,6 @@ mojom("mojo_bindings") {
         traits_sources = [ "searchbox_mojom_traits.cc" ]
         traits_deps = [ "//third_party/omnibox_proto" ]
       },
-    ]
-  }
-}
-
-if (!is_ios) {
-  mojom("fusebox_action_mojo_bindings") {
-    sources = [ "fusebox_action.mojom" ]
-    webui_module_path = "/"
-    public_deps = [
-      ":mojo_bindings",
-      "//components/omnibox/composebox:mojo_bindings",
-    ]
-  }
-
-  source_set("fusebox_action_mojo_utils") {
-    sources = [
-      "fusebox_action_mojo_utils.cc",
-      "fusebox_action_mojo_utils.h",
-    ]
-    deps = [
-      ":fusebox_action_mojo_bindings",
-      ":mojo_bindings",
-      "//third_party/omnibox_proto",
-    ]
-  }
-
-  source_set("fusebox_action_mojo_test_utils") {
-    testonly = true
-    sources = [
-      "fusebox_action_mojo_test_utils.cc",
-      "fusebox_action_mojo_test_utils.h",
-    ]
-    deps = [
-      ":fusebox_action_mojo_bindings",
-      ":mojo_bindings",
     ]
   }
 }

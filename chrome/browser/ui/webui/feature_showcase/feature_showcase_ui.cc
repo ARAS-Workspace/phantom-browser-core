@@ -21,7 +21,6 @@
 #include "chrome/browser/ui/webui/feature_showcase/default_browser_handler.h"
 #include "chrome/browser/ui/webui/feature_showcase/feature_showcase_handler.h"
 #include "chrome/browser/ui/webui/feature_showcase/gemini_disclosure.h"
-#include "chrome/browser/ui/webui/feature_showcase/google_lens_handler.h"
 #include "chrome/browser/ui/webui/feature_showcase/password_manager_handler.h"
 #include "chrome/browser/ui/webui/feature_showcase/themes_and_customization_handler.h"
 #include "chrome/common/chrome_features.h"
@@ -63,23 +62,6 @@ void AddDefaultBrowserStepResources(content::WebUIDataSource* source) {
   source->AddResourcePath(
       "images/refresh_showcase_illustration.png",
       IDR_INTRO_IMAGES_REFRESH_SHOWCASE_ILLUSTRATION_CHROMIUM_PNG);
-#endif
-}
-
-void AddGoogleLensStepResources(content::WebUIDataSource* source) {
-  source->AddLocalizedStrings({
-      {"lensTitle", IDS_FEATURE_SHOWCASE_LENS_OVERLAY_TITLE},
-      {"lensSubtitle", IDS_FEATURE_SHOWCASE_LENS_OVERLAY_SUBTITLE},
-      {"lensDisclosure", IDS_FEATURE_SHOWCASE_LENS_OVERLAY_DISCLOSURE},
-      {"lensYesImIn", IDS_FEATURE_SHOWCASE_LENS_OVERLAY_YES_IM_IN},
-      {"lensNotNow", IDS_FEATURE_SHOWCASE_LENS_OVERLAY_NOT_NOW},
-  });
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  source->AddResourcePath("images/lens_overlay_illustration_light.png",
-                          IDR_FEATURE_SHOWCASE_GOOGLE_LENS_ILLUSTRATION_LIGHT);
-  source->AddResourcePath("images/lens_overlay_illustration_dark.png",
-                          IDR_FEATURE_SHOWCASE_GOOGLE_LENS_ILLUSTRATION_DARK);
 #endif
 }
 
@@ -158,7 +140,6 @@ FeatureShowcaseUI::FeatureShowcaseUI(content::WebUI* web_ui)
                              IDS_FEATURE_SHOWCASE_STEPPER_A11Y_LABEL);
 
   AddDefaultBrowserStepResources(source);
-  AddGoogleLensStepResources(source);
   AddPasswordManagerStepResources(source);
   AddThemesAndCustomizationStepResources(source);
 }
@@ -216,13 +197,6 @@ void FeatureShowcaseUI::BindInterface(
 }
 
 void FeatureShowcaseUI::BindInterface(
-    mojo::PendingReceiver<feature_showcase::mojom::GoogleLensPageHandlerFactory>
-        receiver) {
-  google_lens_factory_receiver_.reset();
-  google_lens_factory_receiver_.Bind(std::move(receiver));
-}
-
-void FeatureShowcaseUI::BindInterface(
     mojo::PendingReceiver<
         feature_showcase::mojom::PasswordManagerPageHandlerFactory> receiver) {
   password_manager_factory_receiver_.reset();
@@ -274,13 +248,6 @@ void FeatureShowcaseUI::CreatePageHandler(
 
 void FeatureShowcaseUI::CreateGeminiPageHandler(
     mojo::PendingReceiver<feature_showcase::mojom::GeminiPageHandler> handler) {}
-
-void FeatureShowcaseUI::CreateGoogleLensPageHandler(
-    mojo::PendingReceiver<feature_showcase::mojom::GoogleLensPageHandler>
-        handler) {
-  google_lens_handler_ = std::make_unique<GoogleLensHandler>(
-      std::move(handler), Profile::FromWebUI(web_ui()));
-}
 
 void FeatureShowcaseUI::CreatePasswordManagerPageHandler(
     mojo::PendingReceiver<feature_showcase::mojom::PasswordManagerPageHandler>

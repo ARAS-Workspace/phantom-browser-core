@@ -26,7 +26,6 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.content.ContentUtils;
 import org.chromium.chrome.browser.content.WebContentsFactory;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager;
 import org.chromium.chrome.browser.externalnav.ExternalNavigationDelegateImpl;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.tab.Tab;
@@ -97,19 +96,6 @@ public class OverlayPanelContent {
      * crbug.com/40502510 for details.
      */
     private boolean mShouldReuseWebContents;
-
-    /**
-     * Whether the WebContents is processing a pending navigation. NOTE(pedrosimonetti): This is
-     * being used to prevent redirections on the SERP to be interpreted as a regular navigation,
-     * which should cause the Contextual Search Panel to be promoted as a Tab. This was added to
-     * work around a server bug that has been fixed. Just checking for whether the Content has been
-     * touched is enough to determine whether a navigation should be promoted (assuming it was
-     * caused by the touch), as done in {@link
-     * ContextualSearchManager#shouldPromoteSearchNavigation()}. For more details, see
-     * crbug.com/40397775 TODO(pedrosimonetti): remove this from M48 or move it to Contextual Search
-     * Panel.
-     */
-    private boolean mIsProcessingPendingNavigation;
 
     /** Whether the content view is currently being displayed. */
     private boolean mIsContentViewShowing;
@@ -343,7 +329,6 @@ public class OverlayPanelContent {
             createNewWebContents();
             mLoadedUrl = url;
             mDidStartLoadingUrl = true;
-            mIsProcessingPendingNavigation = true;
             assumeNonNull(mWebContents).getNavigationController().loadUrl(new LoadUrlParams(url));
         }
     }
@@ -475,7 +460,6 @@ public class OverlayPanelContent {
                     @Override
                     public void didFinishNavigationInPrimaryMainFrame(NavigationHandle navigation) {
                         if (navigation.hasCommitted()) {
-                            mIsProcessingPendingNavigation = false;
                             mContentDelegate.onMainFrameNavigation(
                                     navigation.getUrl().getSpec(),
                                     !TextUtils.equals(navigation.getUrl().getSpec(), mLoadedUrl),
@@ -515,7 +499,6 @@ public class OverlayPanelContent {
             }
 
             mDidStartLoadingUrl = false;
-            mIsProcessingPendingNavigation = false;
             mShouldReuseWebContents = false;
         }
     }
@@ -534,13 +517,6 @@ public class OverlayPanelContent {
     public void updateBrowserControlsState(boolean areControlsHidden) {
         OverlayPanelContentJni.get()
                 .updateBrowserControlsState(mNativeOverlayPanelContentPtr, areControlsHidden);
-    }
-
-    /**
-     * @return Whether a pending navigation if being processed.
-     */
-    public boolean isProcessingPendingNavigation() {
-        return mIsProcessingPendingNavigation;
     }
 
     /** Reset the content's scroll position to (0, 0). */

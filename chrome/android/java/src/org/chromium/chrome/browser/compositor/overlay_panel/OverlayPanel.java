@@ -358,13 +358,6 @@ public class OverlayPanel extends OverlayPanelAnimation
     }
 
     /**
-     * @return True if a URL has been loaded in the panel's current WebContents.
-     */
-    public boolean isProcessingPendingNavigation() {
-        return mContent != null && mContent.isProcessingPendingNavigation();
-    }
-
-    /**
      * @param activity The {@link Activity} associated with the panel.
      */
     @Initializer

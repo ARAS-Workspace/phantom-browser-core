@@ -16,7 +16,6 @@
 #include "base/gtest_prod_util.h"
 #include "base/memory/raw_ptr.h"
 #include "base/time/time.h"
-#include "components/lens/proto/server/lens_overlay_response.pb.h"
 #include "components/omnibox/common/input_state.h"
 #include "components/search_engines/search_engine_type.h"
 #include "components/search_engines/search_terms_data.h"
@@ -231,8 +230,6 @@ class TemplateURLRef {
 
     // The lens overlay suggest inputs to be sent in query parameters in
     // the suggest requests.
-    std::optional<lens::proto::LensOverlaySuggestInputs>
-        lens_overlay_suggest_inputs;
 
     // Input state. This is specifically the contextual state, with regards to
     // the tools and models that may be selected.

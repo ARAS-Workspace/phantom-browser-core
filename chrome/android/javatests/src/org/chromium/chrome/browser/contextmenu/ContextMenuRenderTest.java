@@ -153,7 +153,7 @@ public class ContextMenuRenderTest {
         // Test types of items that can be registered by extensions.
 
         // We choose an arbitrary icon for testing.
-        Bitmap testBitmap = drawableToBitmap(sActivity.getDrawable(R.drawable.lens_icon));
+        Bitmap testBitmap = drawableToBitmap(sActivity.getDrawable(R.drawable.ic_domain));
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
                     // Submenu back header

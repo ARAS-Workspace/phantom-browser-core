@@ -146,10 +146,6 @@ class MockAutocompleteProviderClient
     return session_sync_service_;
   }
 
-  AimEligibilityService* GetAimEligibilityService() const override {
-    return nullptr;
-  }
-
   MOCK_CONST_METHOD0(GetAcceptLanguages, std::string());
   MOCK_CONST_METHOD0(GetEmbedderRepresentationOfAboutScheme, std::string());
   MOCK_METHOD0(GetBuiltinURLs, std::vector<std::u16string>());
@@ -166,13 +162,7 @@ class MockAutocompleteProviderClient
   MOCK_CONST_METHOD0(IsLensEnabled, bool());
   MOCK_CONST_METHOD0(AreLensEntrypointsVisible, bool());
   MOCK_CONST_METHOD0(IsPagePaywalled, std::optional<bool>());
-  MOCK_METHOD(bool, ShouldSendContextualUrlSuggestParam, (), (const));
-  MOCK_METHOD(bool, ShouldSendPageTitleSuggestParam, (), (const));
   MOCK_METHOD(bool, IsWebUiNtpEnabledForDesktopAndroid, (), (const, override));
-  MOCK_CONST_METHOD1(GetLensSuggestInputsWhenReady,
-                     base::CallbackListSubscription(
-                         LensOverlaySuggestInputsCallback callback));
-  MOCK_METHOD(bool, IsAimEligible, (), (const));
   MOCK_METHOD(bool,
               IsOmniboxNextFeatureParamEnabled,
               (const std::string&),
@@ -221,18 +211,6 @@ class MockAutocompleteProviderClient
   MOCK_METHOD0(NewIncognitoWindow, void());
   MOCK_METHOD0(OpenIncognitoClearBrowsingDataDialog, void());
   MOCK_METHOD0(CloseIncognitoWindows, void());
-  MOCK_METHOD(void,
-              OpenLensOverlay,
-              (bool show, lens::LensOverlayInvocationSource invocation_source),
-              (override));
-  MOCK_METHOD(bool, ShouldOpenCoBrowsePanel, (), (const, override));
-  MOCK_METHOD(void, OpenCoBrowsePanel, (), (override));
-  MOCK_METHOD(bool, ShouldOpenComposeboxForAskG, (), (const, override));
-  MOCK_METHOD(void, OpenComposeboxForAskG, (), (override));
-  MOCK_METHOD3(IssueContextualSearchRequest,
-               void(const GURL& destination_url,
-                    AutocompleteMatchType::Type match_type,
-                    bool is_zero_prefix_suggestion));
 
  private:
   network::TestURLLoaderFactory test_url_loader_factory_;

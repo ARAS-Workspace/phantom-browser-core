@@ -650,8 +650,7 @@ class RequestStorageAccessForWithFirstPartySetsBrowserTest
   std::vector<base::test::FeatureRef> GetDisabledFeatures() const override {
     // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox is
     // enabled and then remove this.
-    return {omnibox::internal::kWebUIOmniboxPopup,
-            omnibox::internal::kWebUIOmniboxAimPopup};
+    return {omnibox::internal::kWebUIOmniboxPopup};
   }
 
   RequestStorageAccessForWithFirstPartySetsBrowserTest() {

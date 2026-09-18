@@ -4,36 +4,23 @@
 
 import 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
 
-import type {OmniboxPopupPageRemote} from 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
 import {omniboxPopupBrowserProxyFactory, OmniboxPopupPageHandlerRemote, SearchboxBrowserProxy} from 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
-import type {OmniboxPopupAppElement, OmniboxPopupContextualEntrypointButtonElement} from 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
+import type {OmniboxPopupAppElement} from 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
 import {createAutocompleteResultForTesting, createSearchMatchForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {RenderType, SelectionDirection, SelectionLineState, SelectionStep, SideType} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import type {TabInfo} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {WindowOpenDisposition} from 'chrome://resources/mojo/ui/base/mojom/window_open_disposition.mojom-webui.js';
 import {assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {$$, eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
-import {createDefaultInputState, TestSearchboxBrowserProxy} from './test_searchbox_browser_proxy.js';
-
-function getContextualEntrypointButton(appElement: OmniboxPopupAppElement):
-    OmniboxPopupContextualEntrypointButtonElement|null {
-  const popupEntrypoint = $$(appElement, 'omnibox-popup-contextual-entrypoint');
-  if (!popupEntrypoint) {
-    return null;
-  }
-  return $$<OmniboxPopupContextualEntrypointButtonElement>(
-      popupEntrypoint, 'omnibox-popup-contextual-entrypoint-button');
-}
+import {TestSearchboxBrowserProxy} from './test_searchbox_browser_proxy.js';
 
 suite('AppTest', function() {
   let app: OmniboxPopupAppElement;
   let testProxy: TestSearchboxBrowserProxy;
   let handler: TestMock<OmniboxPopupPageHandlerRemote>&
       OmniboxPopupPageHandlerRemote;
-  let callbackRouter: OmniboxPopupPageRemote;
 
   setup(async () => {
     document.body.innerHTML = window.trustedTypes!.emptyHTML;
@@ -50,9 +37,7 @@ suite('AppTest', function() {
     SearchboxBrowserProxy.setInstance(testProxy);
 
     handler = TestMock.fromClass(OmniboxPopupPageHandlerRemote);
-    const {instance, remote} =
-        omniboxPopupBrowserProxyFactory.createForTest(handler);
-    callbackRouter = remote;
+    const {instance} = omniboxPopupBrowserProxyFactory.createForTest(handler);
     omniboxPopupBrowserProxyFactory.setInstance(instance);
 
     app = document.createElement('omnibox-popup-app');
@@ -67,86 +52,6 @@ suite('AppTest', function() {
         new Event('contextmenu', {cancelable: true}));
     const e = await whenFired;
     assertTrue(e.defaultPrevented);
-  });
-
-  test('CurrentTabChipShown', async () => {
-    loadTimeData.overrideValues({
-      composeboxShowCurrentTabChip: true,
-      composeboxShowLensSearchChip: true,
-    });
-
-    // Re-create app to apply loadTimeData overrides.
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    app = document.createElement('omnibox-popup-app');
-    document.body.appendChild(app);
-    testProxy.initVisibilityPrefs();
-    await microtasksFinished();
-
-    const mockTab: TabInfo = {
-      tabId: 1,
-      title: 'Tab 1',
-      url: 'https://tab1.com/',
-      showInCurrentTabChip: true,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 1n},
-    };
-
-    testProxy.handler.setPromiseResolveFor('getRecentTabs', {tabs: [mockTab]});
-
-    // Set eligibility.
-    testProxy.page.updateLensSearchEligibility(true);
-    testProxy.page.updateContentSharingPolicy(true);
-
-    // Set autocomplete result with empty input.
-    const result = createAutocompleteResultForTesting({
-      input: '',
-      matches: [],
-    });
-    testProxy.page.autocompleteResultChanged(result);
-    await microtasksFinished();
-
-    // Trigger show.
-    callbackRouter.onShow();
-    await testProxy.handler.whenCalled('getRecentTabs');
-    await microtasksFinished();
-
-    const popupEntrypoint = $$(app, 'omnibox-popup-contextual-entrypoint');
-    assertTrue(!!popupEntrypoint);
-    const chip = $$(popupEntrypoint, 'composebox-current-tab-chip');
-    assertTrue(!!chip);
-    assertTrue(isVisible(chip));
-  });
-
-  test('LensIconShown', async () => {
-    loadTimeData.overrideValues({
-      composeboxShowLensIcon: true,
-    });
-
-    // Re-create app to apply loadTimeData overrides.
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    app = document.createElement('omnibox-popup-app');
-    document.body.appendChild(app);
-    testProxy.initVisibilityPrefs();
-    await microtasksFinished();
-
-    // Set eligibility.
-    testProxy.page.updateLensSearchEligibility(true);
-
-    // Set autocomplete result with empty input.
-    const result = createAutocompleteResultForTesting({
-      input: '',
-      matches: [],
-    });
-    testProxy.page.autocompleteResultChanged(result);
-    await microtasksFinished();
-
-    // Trigger show.
-    callbackRouter.onShow();
-    await microtasksFinished();
-
-    const popupEntrypoint = $$(app, 'omnibox-popup-contextual-entrypoint');
-    assertTrue(!!popupEntrypoint);
-    assertTrue(isVisible($$(popupEntrypoint, '#lensSearchIcon')));
   });
 
   test('OnlyShowsDropdownIfVisibleMatches', async () => {
@@ -233,191 +138,6 @@ suite('AppTest', function() {
     assertFalse(isVisible($$(dropdown, '.secondary-side')));
   });
 
-  suite('TallSearchbox', () => {
-    let localApp: OmniboxPopupAppElement;
-
-    setup(async () => {
-      // Use setup instead of suiteSetup to ensure a clean state for each test.
-      document.body.innerHTML = window.trustedTypes!.emptyHTML;
-      loadTimeData.overrideValues({
-        omniboxAimPopupEnabled: true,
-        omniboxShowContextButtonSuggestionLabel: false,
-        searchboxLayoutMode: 'TallBottomContext',
-      });
-
-      localApp = document.createElement('omnibox-popup-app');
-      document.body.appendChild(localApp);
-      testProxy.initVisibilityPrefs();
-      await microtasksFinished();
-    });
-
-    test('ContextMenuEntrypointHiddenWhenDisabled', async () => {
-      testProxy.page.updateAimPopupEligibility(false);
-      await microtasksFinished();
-      assertFalse(!!getContextualEntrypointButton(localApp));
-    });
-
-    // TODO(b/539623520): Move to
-    // `omnibox_popup_contextual_entrypoint_button_test.ts`. Left here for now
-    // to verify refactor (b/539624759).
-    test('OnShowCallsBlur', async () => {
-      // Arrange: Focus the button and confirm it's focused.
-      const contextualEntrypoint = getContextualEntrypointButton(localApp);
-      assertTrue(!!contextualEntrypoint);
-      await microtasksFinished();
-      const innerEntrypoint = $$(
-          contextualEntrypoint, 'cr-composebox-contextual-entrypoint-button');
-      assertTrue(!!innerEntrypoint);
-      const entrypointButton = $$<HTMLElement>(innerEntrypoint, '#entrypoint');
-      assertTrue(!!entrypointButton);
-      entrypointButton.focus();
-      await microtasksFinished();
-      assertTrue(entrypointButton.matches(':focus-within'));
-
-      // Act: Show the popup.
-      callbackRouter.onShow();
-      await microtasksFinished();
-
-      // Assert: The button is no longer focused.
-      assertFalse(entrypointButton.matches(':focus-within'));
-    });
-
-    test('HideClassicContextButton', async () => {
-      const contextualEntrypoint = getContextualEntrypointButton(localApp);
-      assertTrue(!!contextualEntrypoint);
-      assertTrue(isVisible(contextualEntrypoint));
-
-      // Re-create app with `hideClassicContextButton` set to true.
-      document.body.innerHTML = window.trustedTypes!.emptyHTML;
-      loadTimeData.overrideValues({
-        omniboxShowContextButtonSuggestionLabel: false,
-        hideClassicContextButton: true,
-      });
-      localApp = document.createElement('omnibox-popup-app');
-      document.body.appendChild(localApp);
-
-      testProxy.initVisibilityPrefs();
-      testProxy.page.updateAimPopupEligibility(true);
-      await microtasksFinished();
-
-      assertFalse(!!getContextualEntrypointButton(localApp));
-    });
-
-    // TODO(b/539623520): Move to
-    // `omnibox_popup_contextual_entrypoint_button_test.ts`. Left here for now
-    // to verify refactor (b/539624759).
-    test('ShowContextButtonText', async () => {
-      let contextualEntrypoint = getContextualEntrypointButton(localApp);
-      assertTrue(!!contextualEntrypoint);
-      const innerEntrypoint = $$(
-          contextualEntrypoint, 'cr-composebox-contextual-entrypoint-button');
-      assertTrue(!!innerEntrypoint);
-      assertFalse(!!$$(innerEntrypoint, '#description'));
-
-      // Re-create app with `composeboxShowContextMenuDescription` set to true.
-      document.body.innerHTML = window.trustedTypes!.emptyHTML;
-      loadTimeData.overrideValues({
-        omniboxAimPopupEnabled: true,
-        omniboxShowContextButtonSuggestionLabel: false,
-        composeboxShowContextMenuDescription: true,
-        searchboxLayoutMode: 'TallBottomContext',
-      });
-      localApp = document.createElement('omnibox-popup-app');
-      document.body.appendChild(localApp);
-
-      testProxy.initVisibilityPrefs();
-      testProxy.page.updateAimPopupEligibility(true);
-      await microtasksFinished();
-
-      contextualEntrypoint = getContextualEntrypointButton(localApp);
-      assertTrue(!!contextualEntrypoint);
-      const newInnerEntrypoint = $$(
-          contextualEntrypoint, 'cr-composebox-contextual-entrypoint-button');
-      assertTrue(!!newInnerEntrypoint);
-      const description = $$(newInnerEntrypoint, '#description');
-      assertTrue(!!description);
-      assertEquals('Add tabs and more', description.textContent.trim());
-    });
-
-    // TODO(b/539623520): Move to
-    // `omnibox_popup_contextual_entrypoint_button_test.ts`. Left here for now
-    // to verify refactor (b/539624759).
-    test('ContextMenuEntrypointMenuOpenWorkaround', async () => {
-      const contextualEntrypoint = getContextualEntrypointButton(localApp);
-      assertTrue(!!contextualEntrypoint);
-      const innerEntrypoint = $$(
-          contextualEntrypoint, 'cr-composebox-contextual-entrypoint-button');
-      assertTrue(!!innerEntrypoint);
-
-      // Click fires event and applies workaround.
-      innerEntrypoint.dispatchEvent(
-          new CustomEvent('context-menu-entrypoint-click', {
-            detail: {x: 10, y: 20},
-            bubbles: true,
-            composed: true,
-          }));
-
-      assertTrue(contextualEntrypoint.classList.contains('menu-open'));
-
-      // Mojom callback clears class.
-      callbackRouter.onContextMenuClosed();
-      await microtasksFinished();
-
-      assertFalse(contextualEntrypoint.classList.contains('menu-open'));
-    });
-  });
-
-  suite('AimEligibility', () => {
-    let localApp: OmniboxPopupAppElement;
-
-    setup(async () => {
-      document.body.innerHTML = window.trustedTypes!.emptyHTML;
-      localApp = document.createElement('omnibox-popup-app');
-      document.body.appendChild(localApp);
-
-      testProxy.initVisibilityPrefs();
-      await microtasksFinished();
-    });
-
-    test('AimEligibility', async () => {
-      testProxy.page.updateAimPopupEligibility(false);
-      await microtasksFinished();
-      let contextualEntrypoint = getContextualEntrypointButton(localApp);
-      assertFalse(!!contextualEntrypoint);
-
-      testProxy.page.updateAimPopupEligibility(true);
-      await microtasksFinished();
-      contextualEntrypoint = getContextualEntrypointButton(localApp);
-      assertTrue(!!contextualEntrypoint);
-      assertTrue(isVisible(contextualEntrypoint));
-
-      testProxy.page.updateAimPopupEligibility(false);
-      await microtasksFinished();
-      contextualEntrypoint = getContextualEntrypointButton(localApp);
-      assertFalse(!!contextualEntrypoint);
-    });
-
-    test('DisallowedInputsHidesEntrypoint', async () => {
-      document.body.innerHTML = window.trustedTypes!.emptyHTML;
-      loadTimeData.overrideValues({contextualMenuUsePecApi: true});
-      localApp = document.createElement('omnibox-popup-app');
-      document.body.appendChild(localApp);
-
-      testProxy.initVisibilityPrefs();
-      testProxy.page.updateAimPopupEligibility(true);
-      await microtasksFinished();
-
-      testProxy.page.onInputStateChanged({
-        ...createDefaultInputState(),
-        allowedModels: [],
-        allowedTools: [],
-        allowedInputTypes: [],
-      });
-      await microtasksFinished();
-
-      assertFalse(!!getContextualEntrypointButton(localApp));
-    });
-  });
 });
 
 suite('AppTestSelectionControl', () => {

@@ -19,7 +19,6 @@
 #include "components/omnibox/browser/omnibox_client.h"
 #include "ui/gfx/image/image.h"
 
-class AiModeButtonService;
 class Browser;
 class ChromeAutocompleteSchemeClassifier;
 class GURL;
@@ -67,7 +66,6 @@ class ChromeOmniboxClient final : public OmniboxClient {
   bookmarks::BookmarkModel* GetBookmarkModel() override;
   AutocompleteControllerEmitter* GetAutocompleteControllerEmitter() override;
   TemplateURLService* GetTemplateURLService() override;
-  AiModeButtonService* GetAiModeButtonService() override;
   const AutocompleteSchemeClassifier& GetSchemeClassifier() const override;
   AutocompleteClassifier* GetAutocompleteClassifier() override;
   omnibox::OmniboxPopupCloser* GetOmniboxPopupCloser() override;
@@ -82,8 +80,6 @@ class ChromeOmniboxClient final : public OmniboxClient {
   std::u16string GetFormattedFullURL() const override;
   std::u16string GetURLForDisplay() const override;
   GURL GetNavigationEntryURL() const override;
-  bool IsContextualTasksPage() const override;
-  GURL GetContextualTasksInnerFrameURL() const override;
   metrics::OmniboxEventProto::PageClassification GetPageClassification(
       bool is_prefetch) const override;
   metrics::OmniboxEventProto::PageClassification
@@ -153,9 +149,6 @@ class ChromeOmniboxClient final : public OmniboxClient {
           callback);
   void OpenIphLink(GURL gurl) override;
   bool IsHistoryEmbeddingsEnabled() const override;
-  bool IsAimPopupEnabled() const override;
-  std::optional<lens::proto::LensOverlaySuggestInputs>
-  GetLensOverlaySuggestInputs() const override;
   void MaybePrewarmForDefaultSearchEngine(PrewarmTrigger trigger) override;
   base::WeakPtr<OmniboxClient> AsWeakPtr() override;
   Profile* profile() { return profile_; }

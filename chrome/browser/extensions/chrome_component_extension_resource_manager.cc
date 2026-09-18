@@ -23,9 +23,7 @@
 #include "chrome/grit/aim_eligibility_extension_resources_map.h"
 #include "chrome/grit/chrome_unscaled_resources.h"
 #include "chrome/grit/component_extension_resources_map.h"
-#include "chrome/grit/contextual_tasks_extension_resources_map.h"
 #include "chrome/grit/theme_resources.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "content/public/browser/browser_thread.h"
 #include "extensions/buildflags/buildflags.h"
@@ -87,14 +85,6 @@ ChromeComponentExtensionResourceManager::Data::Data() {
 
   AddComponentResourceEntries(kComponentExtensionResources);
   AddComponentResourceEntries(kExtraComponentExtensionResources);
-  if (base::FeatureList::IsEnabled(
-          omnibox::kAimEligibilityComponentExtension)) {
-    AddComponentResourceEntries(kAimEligibilityExtensionResources);
-  }
-  if (base::FeatureList::IsEnabled(
-          extensions_features::kApiContextualTasksPrivate)) {
-    AddComponentResourceEntries(kContextualTasksExtensionResources);
-  }
 
 #if BUILDFLAG(ENABLE_PDF)
   AddComponentResourceEntries(pdf_extension_util::GetResources(

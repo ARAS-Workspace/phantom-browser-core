@@ -176,9 +176,6 @@
   E(kActionShowCollaborationRecentActivity) \
   E(kActionPasteAndGo, IDC_PASTE_AND_GO) \
   E(kActionShowFullUrls, IDC_SHOW_FULL_URLS) \
-  E(kActionShowGoogleLensShortcut, IDC_SHOW_GOOGLE_LENS_SHORTCUT) \
-  E(kActionShowLensOverlayFromAppMenu, IDC_CONTENT_CONTEXT_LENS_OVERLAY) \
-  E(kActionShowAiModeOmniboxButton, IDC_SHOW_AI_MODE_OMNIBOX_BUTTON) \
   E(kActionRecordReplay) \
   E(kActionShowSearchTools, IDC_SHOW_SEARCH_TOOLS) \
   E(kActionShowContactInfo, IDC_SHOW_CONTACT_INFO) \
@@ -238,8 +235,7 @@
   E(kActionContentContextOpenOriginalImageNewTab, \
     IDC_CONTENT_CONTEXT_OPEN_ORIGINAL_IMAGE_NEW_TAB) \
   E(kActionContentContextLoadImage, IDC_CONTENT_CONTEXT_LOAD_IMAGE) \
-  E(kActionContentContextSearchLensForImage, \
-    IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE) \
+  E(kActionContentContextSearchLensForImage) \
   E(kActionContentContextGlicShareImage, \
     IDC_CONTENT_CONTEXT_GLICSHAREIMAGE) \
   E(kActionContentContextTranslateImageWithWeb) \
@@ -291,8 +287,7 @@
     IDC_CONTENT_CONTEXT_RELOAD_PACKAGED_APP) \
   E(kActionContentContextRestartPackagedApp, \
     IDC_CONTENT_CONTEXT_RESTART_PACKAGED_APP) \
-  E(kActionContentContextLensRegionSearch, \
-    IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH) \
+  E(kActionContentContextLensRegionSearch) \
   E(kActionAiMode) \
   E(kActionLensOverlayHomework) \
   E(kActionContentContextWebRegionSearch, \
@@ -415,15 +410,6 @@
   E(kActionVerticalTabsSendFeedback, IDC_VERTICAL_TABS_SEND_FEEDBACK) \
   /*Organizer Panel*/ \
   E(kActionToggleOrganizerPanel) \
-  /*Omnibox Context Menu*/       \
-  E(kActionOmniboxContextAddImage, IDC_OMNIBOX_CONTEXT_ADD_IMAGE)\
-  E(kActionOmniboxContextAddFile, IDC_OMNIBOX_CONTEXT_ADD_FILE)  \
-  E(kActionOmniboxContextCreateImages, IDC_OMNIBOX_CONTEXT_CREATE_IMAGES)  \
-  E(kActionOmniboxContextDeepResearch, IDC_OMNIBOX_CONTEXT_DEEP_RESEARCH)  \
-  E(kActionOmniboxContextCanvas, IDC_OMNIBOX_CONTEXT_CANVAS)  \
-  E(kActionOmniboxContextSetModelAuto, IDC_OMNIBOX_CONTEXT_SET_MODEL_AUTO)  \
-  E(kActionOmniboxContextSetModelThinking, IDC_OMNIBOX_CONTEXT_SET_MODEL_THINKING)  \
-  E(kActionOmniboxContextSetModelRegular, IDC_OMNIBOX_CONTEXT_SET_MODEL_REGULAR)  \
   /*Omnibox Everywhere Status Icon Menu*/ \
   E(kActionOmniboxEverywhereStatusIconMenuToggle, \
     IDC_OMNIBOX_EVERYWHERE_STATUS_ICON_MENU_TOGGLE) \

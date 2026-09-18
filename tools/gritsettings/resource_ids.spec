@@ -141,14 +141,6 @@
   "chrome/browser/resources/preinstalled_web_apps/resources.grd": {
     "includes": [2500],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/drive_picker_host/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [2505],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/drive_picker_host/untrusted/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [2515],
-  },
   # chrome/browser/glic/resources/internal/browser_resources.grd and
   # chrome/browser/glic/resources/browser_resources.grd must share the same id
   # because they define the same resources, but only one of them is built
@@ -416,14 +408,6 @@
     "META": {"sizes": {"includes": [10]}},
     "includes": [3769],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/contextual_tasks/extension/resources.grd": {
-    "META": {"sizes": {"includes": [10]}},
-    "includes": [3770],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/contextual_tasks/resources.grd": {
-    "META": {"sizes": {"includes": [100]}},
-    "includes": [3771],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/data_sharing/resources.grd": {
    "META": {"sizes": {"includes": [20]}},
     "includes": [3780],
@@ -523,14 +507,6 @@
   "<(SHARED_INTERMEDIATE_DIR)/components/private_ai/private_ai_internals/resources/resources.grd": {
     "META": {"sizes": {"includes": [10]}},
     "includes": [4170],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/lens/overlay/resources.grd": {
-    "META": {"sizes": {"includes": [90]}},
-    "includes": [4180],
-  },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/lens/shared/resources.grd": {
-    "META": {"sizes": {"includes": [20]}},
-    "includes": [4240],
   },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/location_internals/resources.grd": {
     "META": {"sizes": {"includes": [10],}},

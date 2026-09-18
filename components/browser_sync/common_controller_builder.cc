@@ -37,9 +37,6 @@
 #include "components/collaboration/public/data_type_controller/shared_tab_group_data_type_controller.h"
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/consent_auditor/consent_auditor.h"
-#include "components/contextual_tasks/public/ai_thread_data_type_controller.h"
-#include "components/contextual_tasks/public/contextual_tasks_service.h"
-#include "components/contextual_tasks/public/gemini_thread_data_type_controller.h"
 #include "components/data_sharing/public/data_sharing_service.h"
 #include "components/data_sharing/public/features.h"
 #include "components/data_sharing/public/personal_collaboration_data/personal_collaboration_data_service.h"
@@ -231,11 +228,6 @@ void CommonControllerBuilder::SetAutofillWebDataService(
   account_autofill_web_data_service_.Set(web_data_service_in_memory);
 }
 
-void CommonControllerBuilder::SetAimEligibilityService(
-    AimEligibilityService* aim_eligibility_service) {
-  aim_eligibility_service_.Set(aim_eligibility_service);
-}
-
 void CommonControllerBuilder::SetBookmarkModel(
     bookmarks::BookmarkModel* bookmark_model) {
   bookmark_model_.Set(bookmark_model);
@@ -258,11 +250,6 @@ void CommonControllerBuilder::SetConsentAuditor(
 void CommonControllerBuilder::SetCollaborationService(
     collaboration::CollaborationService* collaboration_service) {
   collaboration_service_.Set(collaboration_service);
-}
-
-void CommonControllerBuilder::SetContextualTasksService(
-    contextual_tasks::ContextualTasksService* contextual_tasks_service) {
-  contextual_tasks_service_.Set(contextual_tasks_service);
 }
 
 void CommonControllerBuilder::SetPersonalCollaborationDataService(
@@ -336,7 +323,6 @@ void CommonControllerBuilder::SetPasswordStore(
   profile_password_store_.Set(profile_password_store);
   account_password_store_.Set(account_password_store);
 }
-
 
 void CommonControllerBuilder::SetPrefService(PrefService* pref_service) {
   pref_service_.Set(pref_service);
@@ -476,7 +462,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
         CreateOutgoingPasswordSharingInvitationDataTypeController(sync_service));
   }
 
-
   if (!disabled_types.Has(syncer::PREFERENCES)) {
     add_controller(CreatePreferencesDataTypeController(channel));
   }
@@ -541,14 +526,6 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
 
   if (!disabled_types.Has(syncer::SHARED_COMMENT)) {
     add_controller(CreateSharedCommentDataTypeController());
-  }
-
-  if (!disabled_types.Has(syncer::AI_THREAD)) {
-    add_controller(CreateAiThreadDataTypeController());
-  }
-
-  if (!disabled_types.Has(syncer::GEMINI_THREAD)) {
-    add_controller(CreateGeminiThreadDataTypeController());
   }
 
   if (!disabled_types.Has(syncer::NOTEBOOK)) {
@@ -808,7 +785,6 @@ std::unique_ptr<syncer::DataTypeController> CommonControllerBuilder::
       password_manager::OutgoingPasswordSharingInvitationDataTypeController>(
       sync_service, password_sender_service_.value(), pref_service_.value());
 }
-
 
 std::unique_ptr<syncer::DataTypeController>
 CommonControllerBuilder::CreatePreferencesDataTypeController(
@@ -1103,46 +1079,6 @@ CommonControllerBuilder::CreateSharedCommentDataTypeController() {
   //   on it to create the DataTypeController.
   // In following CLs implement the bridge and keep adding unit tests.
   return nullptr;
-}
-
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateAiThreadDataTypeController() {
-  if (!base::FeatureList::IsEnabled(syncer::kSyncAIThread) ||
-      !contextual_tasks_service_.value() || !aim_eligibility_service_.value()) {
-    return nullptr;
-  }
-  syncer::DataTypeControllerDelegate* delegate =
-      contextual_tasks_service_.value()->GetAiThreadControllerDelegate().get();
-  if (!delegate) {
-    return nullptr;
-  }
-  return std::make_unique<contextual_tasks::AIThreadDataTypeController>(
-      aim_eligibility_service_.value(),
-      /*delegate_for_full_sync_mode= */
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
-      /*delegate_for_transport_mode= */
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate));
-}
-
-std::unique_ptr<syncer::DataTypeController>
-CommonControllerBuilder::CreateGeminiThreadDataTypeController() {
-  if (!base::FeatureList::IsEnabled(syncer::kSyncGeminiThread) ||
-      !contextual_tasks_service_.value()) {
-    return nullptr;
-  }
-  syncer::DataTypeControllerDelegate* delegate =
-      contextual_tasks_service_.value()
-          ->GetGeminiThreadControllerDelegate()
-          .get();
-  if (!delegate) {
-    return nullptr;
-  }
-  return std::make_unique<contextual_tasks::GeminiThreadDataTypeController>(
-      /*contextual_tasks_service=*/contextual_tasks_service_.value(),
-      /*delegate_for_full_sync_mode= */
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate),
-      /*delegate_for_transport_mode= */
-      std::make_unique<syncer::ForwardingDataTypeControllerDelegate>(delegate));
 }
 
 std::unique_ptr<syncer::DataTypeController>

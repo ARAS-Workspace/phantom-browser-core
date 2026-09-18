@@ -40,7 +40,6 @@ public interface SettingsNavigation {
         SettingsFragment.AUTOFILL_TRAVEL,
         SettingsFragment.CHOSEN_OBJECT,
         SettingsFragment.CLEAR_BROWSING_DATA,
-        SettingsFragment.CONTEXTUAL_SEARCH,
         SettingsFragment.COOKIES,
         SettingsFragment.DEVELOPER,
         SettingsFragment.DO_NOT_TRACK,
@@ -108,7 +107,6 @@ public interface SettingsNavigation {
         int AUTOFILL_TRAVEL = 15;
         int CHOSEN_OBJECT = 16;
         int CLEAR_BROWSING_DATA = 17;
-        int CONTEXTUAL_SEARCH = 18;
         int COOKIES = 19;
         int DEVELOPER = 20;
         int DO_NOT_TRACK = 21;

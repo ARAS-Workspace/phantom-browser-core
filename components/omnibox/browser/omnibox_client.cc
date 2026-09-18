@@ -64,10 +64,6 @@ TemplateURLService* OmniboxClient::GetTemplateURLService() {
   return nullptr;
 }
 
-AiModeButtonService* OmniboxClient::GetAiModeButtonService() {
-  return nullptr;
-}
-
 AutocompleteClassifier* OmniboxClient::GetAutocompleteClassifier() {
   return nullptr;
 }
@@ -82,14 +78,6 @@ bool OmniboxClient::ShouldDefaultTypedNavigationsToHttps() const {
 
 int OmniboxClient::GetHttpsPortForTesting() const {
   return 0;
-}
-
-bool OmniboxClient::IsContextualTasksPage() const {
-  return false;
-}
-
-GURL OmniboxClient::GetContextualTasksInnerFrameURL() const {
-  return GURL();
 }
 
 metrics::OmniboxEventProto::PageClassification
@@ -117,16 +105,6 @@ gfx::Image OmniboxClient::GetSizedIcon(const gfx::VectorIcon& vector_icon_type,
 
 gfx::Image OmniboxClient::GetSizedIcon(const gfx::Image& icon) const {
   return gfx::Image();
-}
-
-std::optional<lens::proto::LensOverlaySuggestInputs>
-OmniboxClient::GetLensOverlaySuggestInputs() const {
-  return std::nullopt;
-}
-
-std::optional<lens::ContextualInputData> OmniboxClient::GetContextualInputData()
-    const {
-  return std::nullopt;
 }
 
 bool OmniboxClient::HasPreviousSubmittedThreadContext() const {
@@ -169,10 +147,6 @@ gfx::Image OmniboxClient::GetFaviconForIconUrl(
 }
 
 bool OmniboxClient::IsHistoryEmbeddingsEnabled() const {
-  return false;
-}
-
-bool OmniboxClient::IsAimPopupEnabled() const {
   return false;
 }
 

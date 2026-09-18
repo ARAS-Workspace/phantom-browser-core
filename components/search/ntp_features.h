@@ -62,8 +62,6 @@ BASE_DECLARE_FEATURE(kNtpModulesLoad);
 BASE_DECLARE_FEATURE(kNtpModuleSignInRequirement);
 BASE_DECLARE_FEATURE(kNtpOutlookCalendarModule);
 BASE_DECLARE_FEATURE(kNtpOneGoogleBar);
-BASE_DECLARE_FEATURE(kNtpScaledActionChips);
-BASE_DECLARE_FEATURE(kNtpScaledActionChipsSmall);
 BASE_DECLARE_FEATURE(kNtpSharepointModule);
 enum class NtpSharepointModuleDataType {
   kTrendingInsights,
@@ -246,20 +244,6 @@ extern const base::FeatureParam<bool> kNtpNextDisablementContextMenuParam;
 
 // Parameter determining if the disablement is enabled for NTP Next.
 extern const base::FeatureParam<bool> kNtpNextDisablementParam;
-
-// Parameter determining if the tab upload should be delayed when tab context is
-// added from an action chip.
-extern const base::FeatureParam<bool> kAddTabUploadDelayOnActionChipClick;
-
-// Parameter determining the maximum number of small action chips to show.
-extern const base::FeatureParam<int> kNtpMaxSmallChips;
-
-// Parameter determining if in test mode for small action chips.
-extern const base::FeatureParam<bool> kNtpScaledActionChipsSmallInTestMode;
-
-// Parameter determining if fallback action chips should be shown.
-// Used for local testing.
-extern const base::FeatureParam<bool> kNtpScaledActionChipsShowFallback;
 
 // Parameter determining the minimum amount of time that must pass before
 // shortcuts staleness counters will be incremented.

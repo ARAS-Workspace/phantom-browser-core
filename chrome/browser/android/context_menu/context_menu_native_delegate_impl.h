@@ -49,15 +49,6 @@ class ContextMenuNativeDelegateImpl {
                           content::RenderFrameHost* render_frame_host);
 
  protected:
-  using ImageRetrieveCallback = base::OnceCallback<void(
-      mojo::AssociatedRemote<chrome::mojom::ChromeRenderFrame>
-          chrome_render_frame_ptr,
-      const base::android::JavaRef<jobject>& jcallback,
-      const std::vector<uint8_t>& thumbnail_data,
-      const gfx::Size& original_size,
-      const gfx::Size& downscaled_size,
-      const std::string& image_extension,
-      const std::vector<lens::mojom::LatencyLogPtr>)>;
 
  private:
   void RetrieveImageInternal(JNIEnv* env,

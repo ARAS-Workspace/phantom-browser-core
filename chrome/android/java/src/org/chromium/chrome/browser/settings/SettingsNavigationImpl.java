@@ -34,7 +34,6 @@ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFrag
 import org.chromium.chrome.browser.autofill.settings.personal_context.AutofillPersonalContextFragment;
 import org.chromium.chrome.browser.browsing_data.ClearBrowsingDataFragment;
 import org.chromium.chrome.browser.commerce.PriceNotificationSettingsFragment;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchSettingsFragment;
 import org.chromium.chrome.browser.download.settings.DownloadSettings;
 import org.chromium.chrome.browser.glic.GlicActorLoginPermissionsFragment;
 import org.chromium.chrome.browser.glic.GlicSettings;
@@ -123,7 +122,6 @@ public class SettingsNavigationImpl implements SettingsNavigation {
             case SettingsFragment.AUTOFILL_SHOPPING:
             case SettingsFragment.AUTOFILL_TRAVEL:
             case SettingsFragment.CHOSEN_OBJECT:
-            case SettingsFragment.CONTEXTUAL_SEARCH:
             case SettingsFragment.COOKIES:
             case SettingsFragment.DEVELOPER:
             case SettingsFragment.DO_NOT_TRACK:
@@ -311,8 +309,6 @@ public class SettingsNavigationImpl implements SettingsNavigation {
                 return ChosenObjectSettings.class;
             case SettingsFragment.CLEAR_BROWSING_DATA:
                 return ClearBrowsingDataFragment.class;
-            case SettingsFragment.CONTEXTUAL_SEARCH:
-                return ContextualSearchSettingsFragment.class;
             case SettingsFragment.COOKIES:
                 return CookieSettings.class;
             case SettingsFragment.DEVELOPER:

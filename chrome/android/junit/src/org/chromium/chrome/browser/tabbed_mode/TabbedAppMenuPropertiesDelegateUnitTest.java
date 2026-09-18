@@ -132,7 +132,6 @@ import org.chromium.chrome.browser.ui.default_browser_promo.DefaultBrowserPromoU
 import org.chromium.chrome.browser.ui.extensions.FakeExtensionUiBackendRule;
 import org.chromium.chrome.browser.ui.favicon.FaviconHelper;
 import org.chromium.chrome.browser.ui.favicon.FaviconHelperJni;
-import org.chromium.chrome.browser.ui.lens.LensOverlayTabHelper;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
 import org.chromium.chrome.browser.ui.native_page.NativePage;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiId;
@@ -192,7 +191,6 @@ import java.util.Set;
 @RunWith(BaseRobolectricTestRunner.class)
 @DisableFeatures({
     ChromeFeatureList.FEED_AUDIO_OVERVIEWS,
-    ChromeFeatureList.LENS_OVERLAY_ANDROID,
     ChromeFeatureList.TASK_MANAGER_CLANK,
     ContentFeatureList.ANDROID_DEV_TOOLS_FRONTEND,
     // TODO(crbug.com/504757384): Add test for three dot menu flag.
@@ -3780,82 +3778,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         options.isAutoDarkEnabled()
                                 ? ContentSetting.DEFAULT
                                 : ContentSetting.BLOCK);
-    }
-
-    @Test
-    @EnableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    public void lensOverlayItemEnabled() {
-        setUpMocksForPageMenu();
-        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
-        when(mTab.isIncognito()).thenReturn(false);
-
-        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
-
-        assertTrue(isMenuVisible(modelList, R.id.lens_overlay_menu_id));
-    }
-
-    @Test
-    @EnableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    public void lensOverlayItemDisabled_Incognito() {
-        setUpMocksForPageMenu();
-        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
-        when(mTab.isIncognito()).thenReturn(true);
-
-        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
-
-        assertFalse(isMenuVisible(modelList, R.id.lens_overlay_menu_id));
-    }
-
-    @Test
-    @EnableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    public void lensOverlayItemDisabled_NotHttp() {
-        setUpMocksForPageMenu();
-        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.NTP_URL);
-        when(mTab.isIncognito()).thenReturn(false);
-
-        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
-
-        assertFalse(isMenuVisible(modelList, R.id.lens_overlay_menu_id));
-    }
-
-    @Test
-    @DisableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    public void lensOverlayItemDisabled_FeatureDisabled() {
-        setUpMocksForPageMenu();
-        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
-        when(mTab.isIncognito()).thenReturn(false);
-
-        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
-
-        assertFalse(isMenuVisible(modelList, R.id.lens_overlay_menu_id));
-    }
-
-    @Test
-    @EnableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    public void lensOverlayItemDisabled_OverlayShowing() {
-        setUpMocksForPageMenu();
-        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
-        when(mTab.isIncognito()).thenReturn(false);
-
-        // 1. Default state: Overlay is NOT showing.
-        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
-        assertTrue(isMenuVisible(modelList, R.id.lens_overlay_menu_id));
-        ListItem item = findItemById(modelList, R.id.lens_overlay_menu_id);
-        assertTrue(item.model.get(AppMenuItemProperties.ENABLED));
-
-        // 2. State change: Overlay is NOW showing.
-        LensOverlayTabHelper.setOverlayShowing(mTab, true);
-        modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
-        assertTrue(isMenuVisible(modelList, R.id.lens_overlay_menu_id));
-        item = findItemById(modelList, R.id.lens_overlay_menu_id);
-        assertFalse(item.model.get(AppMenuItemProperties.ENABLED));
-
-        // 3. State reset: Overlay is NO LONGER showing.
-        LensOverlayTabHelper.setOverlayShowing(mTab, false);
-        modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
-        assertTrue(isMenuVisible(modelList, R.id.lens_overlay_menu_id));
-        item = findItemById(modelList, R.id.lens_overlay_menu_id);
-        assertTrue(item.model.get(AppMenuItemProperties.ENABLED));
     }
 
     @Test

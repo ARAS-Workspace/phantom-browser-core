@@ -58,8 +58,7 @@ class DocumentPictureInPicturePixelTest : public UiBrowserTest,
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
         // is enabled and then remove the two omnibox features.
         /*disabled_features=*/
-        {omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+        {omnibox::internal::kWebUIOmniboxPopup});
 
     // Disable animation for stability.
     animation_duration_ =

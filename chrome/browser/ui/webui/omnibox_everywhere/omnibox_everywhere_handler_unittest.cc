@@ -10,10 +10,11 @@
 #include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
 #include "base/test/scoped_feature_list.h"
+#include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ui/omnibox/omnibox_everywhere_service.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
-#include "chrome/browser/ui/webui/searchbox/contextual_searchbox_test_utils.h"
 #include "chrome/browser/ui/webui/searchbox/searchbox_test_utils.h"
+#include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_data.h"
 #include "components/search_engines/template_url_service.h"
@@ -43,12 +44,9 @@ class MockOmniboxEverywhereService : public OmniboxEverywhereService {
                ui::PageTransition transition),
               (override));
   MOCK_METHOD(void, ShowProfilePicker, (), (override));
-  MOCK_METHOD(void, OnDrivePickerOpened, (), (override));
-  MOCK_METHOD(void, OnDrivePickerClosed, (), (override));
 };
 
-class OmniboxEverywhereHandlerTest
-    : public ContextualSearchboxHandlerTestHarness {
+class OmniboxEverywhereHandlerTest : public ChromeRenderViewHostTestHarness {
  public:
   OmniboxEverywhereHandlerTest() {
     feature_list_.InitAndEnableFeature(omnibox::kOmniboxEverywhere);
@@ -56,28 +54,39 @@ class OmniboxEverywhereHandlerTest
   ~OmniboxEverywhereHandlerTest() override = default;
 
   void SetUp() override {
-    ContextualSearchboxHandlerTestHarness::SetUp();
+    ChromeRenderViewHostTestHarness::SetUp();
+
+    template_url_service_ = TemplateURLServiceFactory::GetForProfile(profile());
+    ASSERT_TRUE(template_url_service_);
+    template_url_service_->Load();
+    TemplateURLData data;
+    data.SetShortName(u"Google");
+    data.SetKeyword(u"google.com");
+    data.SetURL("https://www.google.com/search?q={searchTerms}");
+    TemplateURL* template_url =
+        template_url_service_->Add(std::make_unique<TemplateURL>(data));
+    template_url_service_->SetUserSelectedDefaultSearchProvider(template_url);
 
     web_ui_.set_web_contents(web_contents());
     mock_service_ = std::make_unique<MockOmniboxEverywhereService>(profile());
 
     handler_ = std::make_unique<OmniboxEverywhereHandler>(
         handler_remote_.BindNewPipeAndPassReceiver(), page_.BindAndGetRemote(),
-        /*metrics_reporter=*/nullptr, &web_ui_, mock_service_.get(),
-        base::BindRepeating(
-            []() -> contextual_search::ContextualSearchSessionHandle* {
-              return nullptr;
-            }));
+        /*metrics_reporter=*/nullptr, &web_ui_, mock_service_.get());
   }
 
   void TearDown() override {
     handler_.reset();
     mock_service_.reset();
-    ContextualSearchboxHandlerTestHarness::TearDown();
+    template_url_service_ = nullptr;
+    ChromeRenderViewHostTestHarness::TearDown();
   }
+
+  TemplateURLService* template_url_service() { return template_url_service_; }
 
  protected:
   base::test::ScopedFeatureList feature_list_;
+  raw_ptr<TemplateURLService> template_url_service_ = nullptr;
   content::TestWebUI web_ui_;
   std::unique_ptr<MockOmniboxEverywhereService> mock_service_;
   testing::NiceMock<MockSearchboxPage> page_;
@@ -167,12 +176,6 @@ TEST_F(OmniboxEverywhereHandlerTest, OpenProfilePickerCallsService) {
   EXPECT_CALL(*mock_service_, ShowProfilePicker()).Times(1);
 
   handler_->OpenProfilePicker();
-}
-
-TEST_F(OmniboxEverywhereHandlerTest, CleanupDrivePickerNotifiesService) {
-  EXPECT_CALL(*mock_service_, OnDrivePickerClosed()).Times(1);
-
-  handler_->CleanupDrivePicker();
 }
 
 }  // namespace

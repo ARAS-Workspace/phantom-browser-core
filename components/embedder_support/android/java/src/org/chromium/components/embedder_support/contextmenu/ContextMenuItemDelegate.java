@@ -177,7 +177,7 @@ public interface ContextMenuItemDelegate {
     }
 
     /**
-     * @return Whether searching by image / Google Lens is supported.
+     * @return Whether searching by image is supported.
      */
     default boolean supportsSearchByImage() {
         return false;

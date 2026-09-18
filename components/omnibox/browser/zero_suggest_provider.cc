@@ -63,17 +63,6 @@ using OIT = metrics::OmniboxInputType;
 
 namespace {
 
-// Maximum length of page title sent to Suggest via `pageTitle` CGI param,
-// expressed as number of Unicode characters (codepoints).
-//
-// NOTE: The actual string value for the CGI param could be longer (in bytes)
-// than this number, due to the way we're encoding the page title before sending
-// it to Suggest. In the worst-case scenario, the total number of bytes sent
-// could be up to 12x the value specified here:
-// `kMaxPageTitleLength` (# of codepoints) x 4 (UTF-8 code-units per codepoint
-// [maximum]) x 3 (due to URL-encoding [worst-case]).
-const size_t kMaxPageTitleLength = 128;
-
 using ResultType = ZeroSuggestProvider::ResultType;
 constexpr bool is_ios = !!BUILDFLAG(IS_IOS);
 
@@ -145,26 +134,13 @@ void LogOmniboxZeroSuggestRequest(const RemoteRequestEvent request_event,
 bool ShouldCacheResultTypeInContext(const ResultType result_type,
                                     const AutocompleteInput& input) {
   const auto page_class = input.current_page_classification();
-  const bool has_contextual_input =
-      input.lens_overlay_suggest_inputs().has_value();
-  const auto& input_state = input.input_state();
+  const bool has_contextual_input = false;
 
   switch (result_type) {
     case ResultType::kRemoteNoURL:
       // Only cache results for the NTP realbox if there is no contextual input.
       if (page_class == OEP::NTP_REALBOX) {
         return !has_contextual_input;
-      }
-      // Composebox requests can't have contextual inputs and must not have any
-      // tools or suggest inventory enabled to use stored response.
-      if (omnibox::IsNTPComposebox(page_class)) {
-        return base::FeatureList::IsEnabled(
-                   omnibox::kZeroSuggestPrefetchingForComposebox) &&
-               !has_contextual_input &&
-               input_state.active_tool ==
-                   omnibox::ToolMode::TOOL_MODE_UNSPECIFIED &&
-               input.suggest_inventory() ==
-                   omnibox::SuggestInventory::SUGGEST_INVENTORY_DEFAULT;
       }
       // All other composebox's should not be using cached zps results.
       return !(omnibox::IsLensSearchbox(page_class) ||
@@ -355,29 +331,13 @@ ResultType ResultTypeForInput(const AutocompleteInput& input) {
   return ResultType::kNone;
 }
 
-std::u16string TruncateUTF16(const std::u16string& input, size_t max_length) {
-  if (input.empty()) {
-    return u"";
-  }
-
-  size_t num_chars = 0;
-  base::i18n::UTF16CharIterator it(input);
-  while (!it.end() && (num_chars < max_length)) {
-    it.Advance();
-    num_chars++;
-  }
-
-  return input.substr(0, it.array_pos());
-}
-
 void MaybeAddContextualSuggestParams(
     const AutocompleteProviderClient* client,
     const AutocompleteInput& input,
     TemplateURLRef::SearchTermsArgs& search_terms_args) {
-  // Do not add the contextual suggest params if Lens is not enabled to fulfill
-  // the suggestion, unless the input contains context data, in which case lens
-  // will not be used to fulfill the suggestion.
-  if (!client->IsLensEnabled() && input.context_tab_title().empty()) {
+  // Do not add the contextual suggest params unless the input contains context
+  // data.
+  if (input.context_tab_title().empty()) {
     return;
   }
 
@@ -386,30 +346,10 @@ void MaybeAddContextualSuggestParams(
   if ((!search_terms_args.current_page_url.empty() &&
        omnibox::IsOtherWebPage(search_terms_args.page_classification)) ||
       !input.context_tab_title().empty()) {
-    // Add "ctxus=" CGI param.
-    std::string_view contextual_url_suggest_param =
-        omnibox_feature_configs::ContextualSearch::Get()
-            .contextual_url_suggest_param;
-    if (client->ShouldSendContextualUrlSuggestParam() &&
-        !contextual_url_suggest_param.empty()) {
-      additional_query_params.push_back(
-          base::StrCat({"ctxus=", contextual_url_suggest_param}));
-    }
-
     // Add "pageTitle=" CGI param.
     if (omnibox_feature_configs::ContextualSearch::Get()
             .send_page_title_suggest_param &&
         client->IsPersonalizedUrlDataCollectionActive()) {
-      std::string page_title =
-          !input.context_tab_title().empty()
-              ? url::EncodeUriComponent(base::UTF16ToUTF8(TruncateUTF16(
-                    input.context_tab_title(), kMaxPageTitleLength)))
-              : url::EncodeUriComponent(base::UTF16ToUTF8(
-                    TruncateUTF16(input.current_title(), kMaxPageTitleLength)));
-      if (client->ShouldSendPageTitleSuggestParam() && !page_title.empty()) {
-        additional_query_params.push_back(
-            base::StrCat({"pageTitle=", page_title}));
-      }
       if (!input.context_tab_url().is_empty()) {
         search_terms_args.current_page_url = input.context_tab_url().spec();
       }
@@ -420,8 +360,6 @@ void MaybeAddContextualSuggestParams(
       // delayed context data is found in the input. This is done to switch over
       // to the "chrome-contextual" client to only retrieve contextual
       // suggestions.
-      search_terms_args.lens_overlay_suggest_inputs =
-          lens::proto::LensOverlaySuggestInputs();
     }
 
     search_terms_args.additional_query_params =
@@ -547,20 +485,6 @@ void ZeroSuggestProvider::StartPrefetch(const AutocompleteInput& input) {
   } else {
     RunZeroSuggestPrefetch(input, result_type);
   }
-
-  // Make a composebox prefetch request when the NTP zero suggest prefetch is
-  // requested.
-  if (input.current_page_classification() == OEP::NTP_ZPS_PREFETCH &&
-      base::FeatureList::IsEnabled(
-          omnibox::kZeroSuggestPrefetchingForComposebox)) {
-    if (base::FeatureList::IsEnabled(omnibox::kZeroSuggestPrefetchDebouncing)) {
-      composebox_debouncer_->RequestRun(
-          base::BindOnce(&ZeroSuggestProvider::RunComposeboxPrefetch,
-                         base::Unretained(this), input));
-    } else {
-      RunComposeboxPrefetch(input);
-    }
-  }
 }
 
 void ZeroSuggestProvider::StartZeroSuggestPrefetchRequest(
@@ -612,8 +536,6 @@ void ZeroSuggestProvider::RunZeroSuggestPrefetch(const AutocompleteInput& input,
   search_terms_args.current_page_url = result_type == ResultType::kRemoteSendURL
                                            ? input.current_url().spec()
                                            : std::string();
-  search_terms_args.lens_overlay_suggest_inputs =
-      input.lens_overlay_suggest_inputs();
 
   std::unique_ptr<network::SimpleURLLoader>* prefetch_loader = nullptr;
   if (result_type == ResultType::kRemoteNoURL) {
@@ -626,35 +548,6 @@ void ZeroSuggestProvider::RunZeroSuggestPrefetch(const AutocompleteInput& input,
 
   StartZeroSuggestPrefetchRequest(input, result_type, search_terms_args,
                                   prefetch_loader);
-}
-
-void ZeroSuggestProvider::RunComposeboxPrefetch(
-    const AutocompleteInput& input) {
-  auto* aim_eligibility_service = client()->GetAimEligibilityService();
-  if (!aim_eligibility_service ||
-      !aim_eligibility_service->IsFuseboxEligible()) {
-    return;
-  }
-
-  TemplateURLRef::SearchTermsArgs search_terms_args;
-  search_terms_args.page_classification = OEP::NTP_COMPOSEBOX_PREFETCH;
-  search_terms_args.request_source = TemplateURLRef::RequestSource::COMPOSEBOX;
-  search_terms_args.focus_type = input.focus_type();
-  search_terms_args.current_page_url = std::string();
-  search_terms_args.lens_overlay_suggest_inputs =
-      input.lens_overlay_suggest_inputs();
-  search_terms_args.input_state = input.input_state();
-  search_terms_args.suggest_inventory = input.suggest_inventory();
-
-  AutocompleteInput composebox_input(input.text(), OEP::NTP_COMPOSEBOX_PREFETCH,
-                                     client()->GetSchemeClassifier());
-  composebox_input.set_current_url(input.current_url());
-  composebox_input.set_current_title(input.current_title());
-  composebox_input.set_focus_type(input.focus_type());
-
-  StartZeroSuggestPrefetchRequest(composebox_input, ResultType::kRemoteNoURL,
-                                  search_terms_args,
-                                  &composebox_prefetch_loader_);
 }
 
 void ZeroSuggestProvider::Start(const AutocompleteInput& input,
@@ -695,8 +588,6 @@ void ZeroSuggestProvider::Start(const AutocompleteInput& input,
       result_type_running_ == ResultType::kRemoteSendURL
           ? input.current_url().spec()
           : std::string();
-  search_terms_args.lens_overlay_suggest_inputs =
-      input.lens_overlay_suggest_inputs();
   search_terms_args.input_state = input.input_state();
   search_terms_args.suggest_inventory = input.suggest_inventory();
 
@@ -768,9 +659,6 @@ ZeroSuggestProvider::ZeroSuggestProvider(AutocompleteProviderClient* client,
 
   if (base::FeatureList::IsEnabled(omnibox::kZeroSuggestPrefetchDebouncing)) {
     debouncer_ = std::make_unique<AutocompleteProviderDebouncer>(
-        OmniboxFieldTrial::kZeroSuggestPrefetchDebounceFromLastRun.Get(),
-        OmniboxFieldTrial::kZeroSuggestPrefetchDebounceDelay.Get());
-    composebox_debouncer_ = std::make_unique<AutocompleteProviderDebouncer>(
         OmniboxFieldTrial::kZeroSuggestPrefetchDebounceFromLastRun.Get(),
         OmniboxFieldTrial::kZeroSuggestPrefetchDebounceDelay.Get());
   }

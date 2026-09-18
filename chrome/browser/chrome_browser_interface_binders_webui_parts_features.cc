@@ -3,11 +3,9 @@
 // found in the LICENSE file.
 
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
 #include "components/compose/buildflags.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/enterprise/buildflags/buildflags.h"
 #include "components/on_device_translation/buildflags/buildflags.h"
 #include "components/safe_browsing/buildflags.h"
@@ -88,11 +86,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
 #endif
 
 #if !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  if (base::FeatureList::IsEnabled(contextual_tasks::kContextualTasks)) {
-    RegisterWebUIControllerInterfaceBinder<
-  } else {
-    RegisterWebUIControllerInterfaceBinder<
-  }
 #endif
 
 

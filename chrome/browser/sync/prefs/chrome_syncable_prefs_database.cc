@@ -57,7 +57,7 @@ enum {
   // kAccessibilityReadAnythingColorInfo = 100009,  // deprecated
   // kAccessibilityReadAnythingLineSpacing = 100010,  // deprecated
   // kAccessibilityReadAnythingLetterSpacing = 100011,  // deprecated
-  kLensRegionSearchEnabled = 100012,
+  // kLensRegionSearchEnabled = 100012,  (obsolete).
   kHatsSurveyMetadata = 100013,
   kHomePage = 100014,
   kHomePageIsNewTabPage = 100015,
@@ -499,10 +499,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
       sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
 #else
-    {prefs::kLensRegionSearchEnabled,
-     {syncable_prefs_ids::kLensRegionSearchEnabled, syncer::PREFERENCES,
-      sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
     {prefs::kHatsSurveyMetadata,
      {syncable_prefs_ids::kHatsSurveyMetadata, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,

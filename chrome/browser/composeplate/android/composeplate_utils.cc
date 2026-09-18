@@ -3,11 +3,8 @@
 // found in the LICENSE file.
 
 #include "base/android/jni_android.h"
-#include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/flags/android/chrome_feature_list.h"
 #include "chrome/browser/profiles/profile.h"
-#include "components/contextual_search/contextual_search_service.h"
-#include "components/omnibox/browser/aim_eligibility_service.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 
 // Must come after all headers that specialize FromJniType() / ToJniType().
@@ -17,8 +14,6 @@
 static bool JNI_ComposeplateUtils_IsAimEntrypointEligible(JNIEnv* env,
                                                           Profile* profile) {
   DCHECK(profile);
-  AimEligibilityService* aim_service =
-      AimEligibilityServiceFactory::GetForProfile(profile);
   return aim_service != nullptr && aim_service->IsAimEligible();
 }
 

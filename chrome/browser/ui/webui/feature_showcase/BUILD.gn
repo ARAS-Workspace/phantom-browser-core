@@ -12,7 +12,6 @@ mojom("mojo_bindings") {
     "default_browser.mojom",
     "feature_showcase.mojom",
     "gemini.mojom",
-    "google_lens.mojom",
     "password_manager.mojom",
     "themes_and_customization.mojom",
   ]
@@ -29,8 +28,6 @@ source_set("feature_showcase") {
     "feature_showcase_ui.h",
     "gemini_disclosure.cc",
     "gemini_disclosure.h",
-    "google_lens_handler.cc",
-    "google_lens_handler.h",
     "password_manager_handler.cc",
     "password_manager_handler.h",
     "themes_and_customization_handler.cc",
@@ -39,6 +36,8 @@ source_set("feature_showcase") {
 
   public_deps = [
     ":mojo_bindings",
+    "//chrome/browser/search/background:background",
+    "//chrome/browser/themes:themes",
     "//chrome/common",
     "//content/public/browser",
   ]
@@ -53,7 +52,6 @@ source_set("feature_showcase") {
     "//chrome/browser/resources/feature_showcase:resources",
     "//chrome/browser/resources/intro:resources",
     "//chrome/browser/ui/actions:actions_headers",
-    "//chrome/browser/ui/lens",
     "//chrome/browser/ui/toolbar/pinned_toolbar",
     "//chrome/browser/ui/views/profiles/feature_showcase:metrics",
     "//chrome/browser/ui/webui:theme_source",
@@ -61,8 +59,6 @@ source_set("feature_showcase") {
     "//chrome/browser/ui/webui/cr_components/theme_color_picker:impl",
     "//chrome/browser/ui/webui/intro",
     "//chrome/common:constants",
-    "//components/lens",
-    "//components/lens:enterprise_policy",
     "//components/prefs",
     "//components/regional_capabilities",
     "//components/signin/public/base:signin_switches",
@@ -85,7 +81,6 @@ source_set("unit_tests") {
     "default_browser_handler_unittest.cc",
     "feature_showcase_handler_unittest.cc",
     "gemini_disclosure_unittest.cc",
-    "google_lens_handler_unittest.cc",
     "password_manager_handler_unittest.cc",
     "themes_and_customization_handler_unittest.cc",
   ]
@@ -97,12 +92,10 @@ source_set("unit_tests") {
     "//chrome/browser/themes",
     "//chrome/browser/ui/actions",
     "//chrome/browser/ui/actions:actions_headers",
-    "//chrome/browser/ui/lens",
     "//chrome/browser/ui/toolbar/pinned_toolbar",
     "//chrome/browser/ui/views/profiles/feature_showcase:metrics",
     "//chrome/browser/ui/webui/intro",
     "//chrome/test:test_support",
-    "//components/lens",
     "//components/prefs",
     "//components/prefs:test_support",
     "//content/test:test_support",

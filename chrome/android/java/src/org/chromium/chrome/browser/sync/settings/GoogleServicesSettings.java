@@ -25,8 +25,6 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.commerce.ShoppingServiceFactory;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchFieldTrial;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager;
 import org.chromium.chrome.browser.metrics.ChangeMetricsReportingStateCalledFrom;
 import org.chromium.chrome.browser.metrics.UmaSessionStats;
 import org.chromium.chrome.browser.preferences.Pref;
@@ -47,7 +45,6 @@ import org.chromium.components.browser_ui.settings.ManagedPreferenceDelegate;
 import org.chromium.components.browser_ui.settings.SettingsUtils;
 import org.chromium.components.browser_ui.settings.search.SettingsIndexData;
 import org.chromium.components.commerce.core.CommerceFeatureUtils;
-import org.chromium.components.omnibox.OmniboxCapabilities;
 import org.chromium.components.prefs.PrefService;
 import org.chromium.components.signin.identitymanager.IdentityManager;
 import org.chromium.components.signin.metrics.SignoutReason;
@@ -75,7 +72,6 @@ public class GoogleServicesSettings extends ChromeBaseSettingsFragment
     public static final String PREF_USAGE_AND_CRASH_REPORTING = "usage_and_crash_reports";
 
     private static final String PREF_URL_KEYED_ANONYMIZED_DATA = "url_keyed_anonymized_data";
-    private static final String PREF_CONTEXTUAL_SEARCH = "contextual_search";
 
     @VisibleForTesting
     public static final String PREF_USAGE_STATS_REPORTING = "usage_stats_reporting";
@@ -96,7 +92,6 @@ public class GoogleServicesSettings extends ChromeBaseSettingsFragment
     private ChromeSwitchPreference mUsageAndCrashReporting;
     private ChromeSwitchPreference mUrlKeyedAnonymizedData;
     private @Nullable ChromeSwitchPreference mPriceTrackingAnnotations;
-    private @Nullable Preference mContextualSearch;
     private @Nullable Preference mPriceNotificationSection;
     private @Nullable Preference mUsageStatsReporting;
     private @Nullable OneshotSupplier<SnackbarManager> mSnackbarManagerSupplier;
@@ -141,12 +136,6 @@ public class GoogleServicesSettings extends ChromeBaseSettingsFragment
                 (ChromeSwitchPreference) findPreference(PREF_URL_KEYED_ANONYMIZED_DATA);
         mUrlKeyedAnonymizedData.setOnPreferenceChangeListener(this);
         mUrlKeyedAnonymizedData.setManagedPreferenceDelegate(mManagedPreferenceDelegate);
-
-        mContextualSearch = findPreference(PREF_CONTEXTUAL_SEARCH);
-        if (!shouldShowContextualSearch()) {
-            removePreference(getPreferenceScreen(), mContextualSearch);
-            mContextualSearch = null;
-        }
 
         mPriceTrackingAnnotations =
                 (ChromeSwitchPreference) findPreference(PREF_PRICE_TRACKING_ANNOTATIONS);
@@ -262,12 +251,6 @@ public class GoogleServicesSettings extends ChromeBaseSettingsFragment
                 UnifiedConsentServiceBridge.isUrlKeyedAnonymizedDataCollectionEnabled(
                         getProfile()));
 
-        if (mContextualSearch != null) {
-            boolean isContextualSearchEnabled =
-                    !ContextualSearchManager.isContextualSearchDisabled(getProfile());
-            mContextualSearch.setSummary(
-                    isContextualSearchEnabled ? R.string.text_on : R.string.text_off);
-        }
         if (mPriceTrackingAnnotations != null) {
             mPriceTrackingAnnotations.setChecked(
                     PriceTrackingUtilities.isTrackPricesOnTabsEnabled(getProfile()));
@@ -297,10 +280,6 @@ public class GoogleServicesSettings extends ChromeBaseSettingsFragment
 
     private static boolean shouldShowAllowSignIn(Profile profile) {
         return !profile.isChild();
-    }
-
-    private static boolean shouldShowContextualSearch() {
-        return ContextualSearchFieldTrial.isEnabled() && !OmniboxCapabilities.isDesktopPlatform();
     }
 
     private static boolean shouldShowPriceTrackingAnnotations(Profile profile) {
@@ -358,10 +337,6 @@ public class GoogleServicesSettings extends ChromeBaseSettingsFragment
                         Context context, SettingsIndexData indexData, Profile profile) {
                     if (!shouldShowAllowSignIn(profile)) {
                         indexData.removeEntry(getUniqueId(PREF_ALLOW_SIGNIN));
-                    }
-
-                    if (!shouldShowContextualSearch()) {
-                        indexData.removeEntry(getUniqueId(PREF_CONTEXTUAL_SEARCH));
                     }
 
                     if (!shouldShowPriceTrackingAnnotations(profile)) {

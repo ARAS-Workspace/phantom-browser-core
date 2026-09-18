@@ -140,7 +140,6 @@ class SplitTabButtonInteractiveTest
     // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox is
     // enabled and then remove these.
     features.push_back(omnibox::internal::kWebUIOmniboxPopup);
-    features.push_back(omnibox::internal::kWebUIOmniboxAimPopup);
     return features;
   }
 

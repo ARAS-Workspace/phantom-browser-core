@@ -4,7 +4,6 @@
 
 module chrome.mojom;
 
-import "components/lens/lens_metadata.mojom";
 import "components/page_content_annotations/content/mojom/page_stability.mojom";
 import "mojo/public/mojom/base/string16.mojom";
 import "mojo/public/mojom/base/unguessable_token.mojom";
@@ -74,8 +73,7 @@ interface ChromeRenderFrame {
       => (array<uint8> image_data,
           gfx.mojom.Size original_size,
           gfx.mojom.Size downscaled_size,
-          string mime_type,
-          array<lens.mojom.LatencyLog> log_data);
+          string mime_type);
 
   // For WebUI testing, this message requests JavaScript to be executed at a
   // time which is late enough to not be thrown out, and early enough to be

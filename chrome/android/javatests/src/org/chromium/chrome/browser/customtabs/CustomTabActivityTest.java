@@ -2284,14 +2284,6 @@ public class CustomTabActivityTest {
 
     @Test
     @SmallTest
-    public void testCanHideBrowserControls_notPartial() throws Exception {
-        var session = warmUpAndLaunchUrlWithSession();
-        assertEquals(getActivity().getIntentDataProvider().getSession(), session);
-        assertOverlayPanelCanHideAndroidBrowserControls(true);
-    }
-
-    @Test
-    @SmallTest
     @Restriction(DeviceRestriction.RESTRICTION_TYPE_NON_AUTO)
     @EnableFeatures({ChromeFeatureList.CCT_RESIZABLE_FOR_THIRD_PARTIES})
     // TODO(crbug.com/428056054): Test assume view hierarchy, does not work with e2e everywhere.
@@ -2590,21 +2582,6 @@ public class CustomTabActivityTest {
     @LargeTest
     public void testOpaqueOriginFromIntent_Enabled() throws Exception {
         doOpaqueOriginTest(false);
-    }
-
-    /** Asserts that the Overlay Panel is set to allow or not allow ever hiding the Toolbar. */
-    private void assertOverlayPanelCanHideAndroidBrowserControls(boolean canEverHide) {
-        // Wait for CS to get initialized.
-        CriteriaHelper.pollUiThread(
-                () -> getActivity().getContextualSearchManagerForTesting() != null);
-
-        // The toolbar cannot go away for Partial Height Custom Tabs, but can for full height ones.
-        CriteriaHelper.pollUiThread(
-                () ->
-                        getActivity()
-                                        .getContextualSearchManagerForTesting()
-                                        .getCanHideAndroidBrowserControls()
-                                == canEverHide);
     }
 
     private void verifyHistoryAfterHiddenTab(boolean speculationWasAHit) throws Exception {

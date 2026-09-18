@@ -22,6 +22,7 @@ source_set("read_anything") {
     "//chrome/browser/ui/webui/top_chrome",
     "//chrome/common/read_anything:mojo_bindings",
     "//components/language/core/browser",
+    "//components/pdf/browser:browser",
     "//content/public/browser",
     "//mojo/public/cpp/bindings",
   ]

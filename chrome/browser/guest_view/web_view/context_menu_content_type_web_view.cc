@@ -23,20 +23,6 @@
 using extensions::Extension;
 using extensions::ProcessManager;
 
-namespace {
-
-bool IsContextualTaskWebUIHost(
-    base::WeakPtr<extensions::WebViewGuest> web_view_guest) {
-  if (!web_view_guest || !web_view_guest->owner_rfh()) {
-    return false;
-  }
-  const GURL& url =
-      web_view_guest->owner_rfh()->GetMainFrame()->GetLastCommittedURL();
-  return url.scheme() == content::kChromeUIScheme &&
-         url.host() == chrome::kChromeUIContextualTasksHost;
-}
-}  // namespace
-
 // static
 std::optional<version_info::Channel>
     ContextMenuContentTypeWebView::channel_override_ = std::nullopt;
@@ -69,26 +55,13 @@ bool ContextMenuContentTypeWebView::SupportsGroup(int group) {
     case ITEM_GROUP_ALL_EXTENSION:
     case ITEM_GROUP_PRINT_PREVIEW:
       return false;
-    case ITEM_GROUP_LINK: {
-      // Enable links context menu items for contextual tasks WebUI page, which
-      // has a webview embedding an external URL.
-      // TODO(crbug.com/470110425): Support more menu items for contextual tasks
-      // webview if needed.
-      if (IsContextualTaskWebUIHost(web_view_guest_)) {
-        return ContextMenuContentType::SupportsGroup(group);
-      }
+    case ITEM_GROUP_LINK:
       return false;
-    }
     case ITEM_GROUP_CURRENT_EXTENSION:
       // Show contextMenus API items.
       return true;
     case ITEM_GROUP_DEVELOPER:
       {
-      // Contextual Tasks embeds an external URL, and as such needs to be
-      // allowed to use the developer tools for the embedded page.
-      if (IsContextualTaskWebUIHost(web_view_guest_)) {
-        return ContextMenuContentType::SupportsGroup(group);
-      }
       const extensions::Extension* embedder_extension = GetExtension();
       if (GetChannel() >= version_info::Channel::DEV) {
         // Hide dev tools items in guests inside WebUI if we are not running

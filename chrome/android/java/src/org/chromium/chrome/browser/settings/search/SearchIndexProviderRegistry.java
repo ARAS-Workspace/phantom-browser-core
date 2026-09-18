@@ -24,7 +24,6 @@ import org.chromium.chrome.browser.autofill.settings.options.AutofillOptionsFrag
 import org.chromium.chrome.browser.autofill.settings.personal_context.AutofillPersonalContextFragment;
 import org.chromium.chrome.browser.browsing_data.ClearBrowsingDataFragment;
 import org.chromium.chrome.browser.commerce.PriceNotificationSettingsFragment;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchSettingsFragment;
 import org.chromium.chrome.browser.download.settings.DownloadSettings;
 import org.chromium.chrome.browser.glic.GlicSettings;
 import org.chromium.chrome.browser.homepage.settings.HomepageSettings;
@@ -86,7 +85,6 @@ public final class SearchIndexProviderRegistry {
                     AboutChromeSettings.SEARCH_INDEX_DATA_PROVIDER,
                     AdaptiveToolbarSettingsFragment.SEARCH_INDEX_DATA_PROVIDER,
                     AutofillOptionsFragment.SEARCH_INDEX_DATA_PROVIDER,
-                    ContextualSearchSettingsFragment.SEARCH_INDEX_DATA_PROVIDER,
                     GlicSettings.SEARCH_INDEX_DATA_PROVIDER,
                     DoNotTrackSettings.SEARCH_INDEX_DATA_PROVIDER,
                     HomepageSettings.SEARCH_INDEX_DATA_PROVIDER,

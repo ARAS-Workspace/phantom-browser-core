@@ -18,8 +18,6 @@
 class LocationBar;
 class OmniboxController;
 
-struct AiModeButtonUiConfig;
-
 namespace content {
 struct ContextMenuParams;
 class WebContents;
@@ -113,8 +111,6 @@ class OmniboxContextMenuMixinBase {
   // Helper that adds a menu entry to send current tab to other devices if
   // appropriate.
   void MaybeAddSendTabToSelfItem(ui::SimpleMenuModel* menu_contents);
-
-  const AiModeButtonUiConfig* GetAiModeUiConfig() const;
 
   raw_ptr<LocationBar> location_bar_;
   raw_ptr<OmniboxController> controller_;

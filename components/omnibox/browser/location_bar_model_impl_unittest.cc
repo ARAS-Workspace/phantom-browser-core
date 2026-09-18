@@ -8,7 +8,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "build/build_config.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/dom_distiller/core/url_constants.h"
 #include "components/dom_distiller/core/url_utils.h"
 #include "components/omnibox/browser/location_bar_model_delegate.h"
@@ -47,12 +46,6 @@ class TestLocationBarModelDelegate : public LocationBarModelDelegate {
   }
   void SetVisibleSecurityStateConnectionInfoUninitialized() {
     connection_info_initialized_ = false;
-  }
-  void SetIsContextualTasksPage(bool is_contextual_tasks_page) {
-    is_contextual_tasks_page_ = is_contextual_tasks_page;
-  }
-  void SetContextualTasksInnerFrameURL(const GURL& url) {
-    contextual_tasks_inner_frame_url_ = url;
   }
 
   // LocationBarModelDelegate:
@@ -95,22 +88,12 @@ class TestLocationBarModelDelegate : public LocationBarModelDelegate {
     return omnibox_client_.GetTemplateURLService();
   }
 
-  bool IsContextualTasksPage() const override {
-    return is_contextual_tasks_page_;
-  }
-
-  GURL GetContextualTasksInnerFrameURL() const override {
-    return contextual_tasks_inner_frame_url_;
-  }
-
  private:
   GURL url_;
   security_state::SecurityLevel security_level_ = security_state::NONE;
   TestOmniboxClient omnibox_client_;
   bool should_prevent_elision_ = false;
   bool connection_info_initialized_ = true;
-  bool is_contextual_tasks_page_ = false;
-  GURL contextual_tasks_inner_frame_url_;
 };
 
 class MockLocationBarModelDelegate
@@ -309,55 +292,6 @@ TEST_F(LocationBarModelImplTest, GetPageClassification) {
   EXPECT_EQ(OmniboxEventProto::OTHER, model.GetPageClassification());
   EXPECT_EQ(OmniboxEventProto::OTHER_ZPS_PREFETCH, model.GetPageClassification(
                                                        /*is_prefetch=*/true));
-}
-
-class LocationBarModelImplContextualTasksUrlTest
-    : public LocationBarModelImplTest {
- public:
-  void SetUp() override {
-    LocationBarModelImplTest::SetUp();
-    delegate()->SetIsContextualTasksPage(true);
-    delegate()->SetContextualTasksInnerFrameURL(
-        GURL("https://www.google.com/search?q=hello+world"));
-  }
-};
-
-TEST_F(LocationBarModelImplContextualTasksUrlTest, DefaultDisplayUrl) {
-  feature_list()->InitAndEnableFeature(contextual_tasks::kContextualTasks);
-  EXPECT_EQ(u"chrome://google.com/search?q=hello+world",
-            model()->GetURLForDisplay());
-}
-
-TEST_F(LocationBarModelImplContextualTasksUrlTest, CustomScheme) {
-  feature_list()->InitAndEnableFeatureWithParameters(
-      contextual_tasks::kContextualTasks,
-      {{"ContextualTasksDisplayUrlScheme", "test"}});
-  EXPECT_EQ(u"test://google.com/search?q=hello+world",
-            model()->GetURLForDisplay());
-}
-
-TEST_F(LocationBarModelImplContextualTasksUrlTest, CustomHost) {
-  feature_list()->InitAndEnableFeatureWithParameters(
-      contextual_tasks::kContextualTasks,
-      {{"ContextualTasksDisplayUrlHost", "test"}});
-  EXPECT_EQ(u"chrome://test/search?q=hello+world", model()->GetURLForDisplay());
-}
-
-TEST_F(LocationBarModelImplContextualTasksUrlTest, CustomPath) {
-  feature_list()->InitAndEnableFeatureWithParameters(
-      contextual_tasks::kContextualTasks,
-      {{"ContextualTasksDisplayUrlPath", "/test"}});
-  EXPECT_EQ(u"chrome://google.com/test?q=hello+world",
-            model()->GetURLForDisplay());
-}
-
-TEST_F(LocationBarModelImplContextualTasksUrlTest, CustomSchemeHostPath) {
-  feature_list()->InitAndEnableFeatureWithParameters(
-      contextual_tasks::kContextualTasks,
-      {{"ContextualTasksDisplayUrlScheme", "test"},
-       {"ContextualTasksDisplayUrlHost", "foo"},
-       {"ContextualTasksDisplayUrlPath", "/bar"}});
-  EXPECT_EQ(u"test://foo/bar?q=hello+world", model()->GetURLForDisplay());
 }
 
 }  // namespace

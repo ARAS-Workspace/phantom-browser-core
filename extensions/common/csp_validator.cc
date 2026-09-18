@@ -74,7 +74,6 @@ constexpr const char* const kExtensionsAllowedToUseChromeResources[] = {
     extension_misc::kChromeVoxExtensionId,
     // Used for ComponentExtensionWorkerChromeResourcesBrowserTest.
     extension_misc::kChromeResourcesTestExtensionId,
-    extension_misc::kAimEligibilityExtensionId,
     extension_misc::kContextualTasksExtensionId,
 };
 

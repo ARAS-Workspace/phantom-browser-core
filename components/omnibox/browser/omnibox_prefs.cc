@@ -24,12 +24,6 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
       kKeywordSpaceTriggeringEnabled, true,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
   registry->RegisterBooleanPref(
-      kShowGoogleLensShortcut, true,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(
-      kShowAiModeOmniboxButton, true,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-  registry->RegisterBooleanPref(
       kShowSearchTools, true, user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 
   registry->RegisterBooleanPref(omnibox::kDismissedGeminiIph, false);
@@ -52,9 +46,6 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterIntegerPref(kShownCountHistoryEmbeddingsScopePromo, 0);
   registry->RegisterIntegerPref(kFocusedSrpWebCount, 0);
 
-  registry->RegisterIntegerPref(kAimHintLastImpressionDay, 0);
-  registry->RegisterIntegerPref(kAimHintDailyImpressionsCount, 0);
-  registry->RegisterIntegerPref(kAimHintTotalImpressions, 0);
 }
 
 void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {

@@ -31,7 +31,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/image_editor/event_capture_mac.h"
-#include "components/lens/lens_features.h"
 #include "content/public/browser/render_view_host.h"
 #include "ui/views/widget/widget.h"
 #endif

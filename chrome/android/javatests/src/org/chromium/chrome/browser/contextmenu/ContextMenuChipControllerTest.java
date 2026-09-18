@@ -124,8 +124,8 @@ public class ContextMenuChipControllerTest {
                 () -> {
                     ChipRenderParams chipRenderParams = new ChipRenderParams();
                     chipRenderParams.titleResourceId =
-                            R.string.contextmenu_shop_image_with_google_lens;
-                    chipRenderParams.iconResourceId = R.drawable.lens_icon;
+                            R.string.contextmenu_copy_image;
+                    chipRenderParams.iconResourceId = R.drawable.ic_domain;
                     chipRenderParams.onClickCallback = mMockChipClickRunnable;
                     chipController.showChip(chipRenderParams);
                     chipController.dismissChipIfShowing();
@@ -151,8 +151,8 @@ public class ContextMenuChipControllerTest {
                 () -> {
                     ChipRenderParams chipRenderParams = new ChipRenderParams();
                     chipRenderParams.titleResourceId =
-                            R.string.contextmenu_shop_image_with_google_lens;
-                    chipRenderParams.iconResourceId = R.drawable.lens_icon;
+                            R.string.contextmenu_copy_image;
+                    chipRenderParams.iconResourceId = R.drawable.ic_domain;
                     chipRenderParams.onClickCallback = mMockChipClickRunnable;
                     chipController.showChip(chipRenderParams);
                     chipController.clickChipForTesting();

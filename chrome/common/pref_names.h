@@ -1396,10 +1396,6 @@ inline constexpr char kNtpCustomBackgroundLocalToDeviceId[] =
 inline constexpr char kNtpCustomBackgroundInspiration[] =
     "ntp.custom_background_inspiration";
 
-// Name of preference to count of times compose button was shown.
-inline const char kNtpComposeButtonShownCountPrefName[] =
-    "ntp.compose_button.shown_count";
-
 #if BUILDFLAG(IS_ANDROID)
 // Keeps track of recently closed tabs collapsed state in the Other Devices
 // menu.
@@ -2487,11 +2483,6 @@ inline constexpr char kDesktopSharingHubEnabled[] =
 // the page again.
 inline constexpr char kLastWhatsNewVersion[] = "browser.last_whats_new_version";
 #endif
-
-// A boolean indicating whether the Lens Region search feature should be enabled
-// if supported.
-inline constexpr char kLensRegionSearchEnabled[] =
-    "policy.lens_region_search_enabled";
 
 // A boolean indicating whether the Lens NTP searchbox feature should be enabled
 // if supported.

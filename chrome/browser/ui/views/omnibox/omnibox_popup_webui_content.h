@@ -50,7 +50,6 @@ class OmniboxPopupWebUIContent : public OmniboxPopupWebUIBaseContent {
 
   // OmniboxPopupWebUIBaseContent:
   void Clear() override;
-  void OnContextMenuClosed() override;
 
  protected:
   std::string_view GetMetricPrefix() const override;

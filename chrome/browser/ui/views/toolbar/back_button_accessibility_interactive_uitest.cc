@@ -37,16 +37,14 @@ class BackButtonAccessibilityTest : public ToolbarAccessibilityTest {
           // Omnibox is enabled and then remove the omnibox features here and
           // below.
           /*disabled_features=*/
-          {omnibox::internal::kWebUIOmniboxPopup,
-           omnibox::internal::kWebUIOmniboxAimPopup});
+          {omnibox::internal::kWebUIOmniboxPopup});
     } else {
       feature_list_.InitWithFeatures(
           /*enabled_features=*/
           {},
           /*disabled_features=*/
           {features::kInitialWebUI, features::kWebUIBackForwardButton,
-           features::kWebUIReloadButton, omnibox::internal::kWebUIOmniboxPopup,
-           omnibox::internal::kWebUIOmniboxAimPopup});
+           features::kWebUIReloadButton, omnibox::internal::kWebUIOmniboxPopup});
     }
   }
 

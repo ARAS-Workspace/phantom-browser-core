@@ -241,12 +241,8 @@ interface PageHandler {
   SetModulesDisabled(array<string> module_ids,
                      bool disabled,
                      bool is_user_action);
-  // Updates the visibility of the action chips in the NTP on any pref changes.
-  UpdateActionChipsVisibility();
   // Triggers a call to |FooterVisibilityUpdated|.
   UpdateFooterVisibility();
-  // Increments count of times the compose button was shown.
-  IncrementComposeButtonShownCount();
   // Opens Customize Chrome if eligibility conditions are met.
   MaybeTriggerAutomaticCustomizeChromePromo();
 
@@ -281,11 +277,6 @@ interface PageHandler {
   OnPromoLinkClicked();
   // Logs that the <ntp-app> element's |ready| callback method was called.
   OnAppRendered(double time);
-  // Queries whether the Realbox "+" context menu button animation should be shown.
-  CanShowRealboxContextMenuAnimation() => (bool can_show);
-  // Records that the Realbox "+" context menu button animation was shown or
-  // blocked.
-  RecordRealboxContextMenuAnimationImpression(bool shown);
   // Records that the user engaged with the contextual search IPH.
   OnContextualSearchIPHEngaged();
 };
@@ -300,8 +291,6 @@ interface Page {
   // Allows modules to load on NTP when the UI has postponed module loading for
   // some reason.
   SetModulesLoadable();
-  // Sets the action chips visibility.
-  SetActionChipsVisibility(bool visible);
   // Sets NTP homepage promo.
   SetPromo(Promo? promo);
   // Shows a toast with information about Chrome Webstore themes.

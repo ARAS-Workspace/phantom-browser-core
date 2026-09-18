@@ -126,7 +126,6 @@ android_library("chrome_test_java_helper") {
     "//chrome/browser/keyboard_accessory/android/java",
     "//chrome/browser/language/android:base_module_java",
     "//chrome/browser/language/android:java",
-    "//chrome/browser/lens:java",
     "//chrome/browser/locale:java",
     "//chrome/browser/magic_stack/android:java",
     "//chrome/browser/notifications:java",
@@ -676,24 +675,6 @@ android_library(
   resources_package = "org.chromium.chrome"
 
   sources = [
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchCalloutTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchCriticalTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchFakeServer.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchHistogramTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchInstrumentationBase.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchInstrumentationTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchInternalStateControllerWrapper.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchManagerTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchObserverTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchPolicyTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchRelatedSearchesTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchRequestTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchSettingsFragmentTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchSystemTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchTriggerTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/ContextualSearchUnbatchedTest.java",
-    "src/org/chromium/chrome/browser/contextualsearch/MockContextualSearchPolicy.java",
   ]
 
   deps = [
@@ -1802,7 +1783,6 @@ java_group("common_unit_test_deps_java") {
     "//chrome/browser/first_run/android:java",
     "//chrome/browser/flags:java",
     "//chrome/browser/incognito:java",
-    "//chrome/browser/lens:java",
     "//chrome/browser/preferences:java",
     "//chrome/browser/preferences:pref_service_java",
     "//chrome/browser/profiles/android:java",

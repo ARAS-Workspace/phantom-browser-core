@@ -77,7 +77,6 @@
 #include "components/keyed_service/core/service_access_type.h"
 #include "components/ntp_tiles/tile_type.h"
 #include "components/omnibox/browser/omnibox.mojom.h"
-#include "components/omnibox/common/composebox_features.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/search/ntp_features.h"
@@ -611,11 +610,6 @@ NewTabPageHandler::NewTabPageHandler(
       base::BindRepeating(&NewTabPageHandler::MaybeShowWebstoreToast,
                           base::Unretained(this)));
 
-  pref_change_registrar_.Add(
-      prefs::kNtpToolChipsVisible,
-      base::BindRepeating(&NewTabPageHandler::UpdateActionChipsVisibility,
-                          base::Unretained(this)));
-
 // TODO(b/502297163): Implement for Android.
 #if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
@@ -647,7 +641,6 @@ NewTabPageHandler::~NewTabPageHandler() {
 
 // static
 void NewTabPageHandler::RegisterProfilePrefs(PrefRegistrySimple* registry) {
-  registry->RegisterIntegerPref(prefs::kNtpComposeButtonShownCountPrefName, 0);
   registry->RegisterListPref(prefs::kNtpDisabledModules);
   registry->RegisterListPref(prefs::kNtpHiddenModules);
   registry->RegisterListPref(prefs::kNtpModulesOrder);
@@ -980,10 +973,6 @@ void NewTabPageHandler::UpdateModulesLoadable() {
   }
 }
 
-void NewTabPageHandler::UpdateActionChipsVisibility() {
-  page_->SetActionChipsVisibility(IsActionChipsVisible());
-}
-
 void NewTabPageHandler::UpdateFooterVisibility() {
 // TODO(b/502297163): Implement for Android.
 #if !BUILDFLAG(IS_ANDROID)
@@ -1170,81 +1159,6 @@ void NewTabPageHandler::OnDoodleShared(
 
 void NewTabPageHandler::OnPromoLinkClicked() {
   LogEvent(NTP_MIDDLE_SLOT_PROMO_LINK_CLICKED);
-}
-
-void NewTabPageHandler::IncrementComposeButtonShownCount() {
-  const int shown_count = profile_->GetPrefs()->GetInteger(
-      prefs::kNtpComposeButtonShownCountPrefName);
-  profile_->GetPrefs()->SetInteger(prefs::kNtpComposeButtonShownCountPrefName,
-                                   shown_count + 1);
-}
-
-void NewTabPageHandler::CanShowRealboxContextMenuAnimation(
-    CanShowRealboxContextMenuAnimationCallback callback) {
-  PrefService* prefs = profile_->GetPrefs();
-  const base::DictValue& state_dict =
-      prefs->GetDict(prefs::kContextMenuAnimationState);
-
-  int lifetime_count = state_dict.FindInt("realbox_lifetime_count").value_or(0);
-  if (lifetime_count >=
-      omnibox::kContextMenuAnimationLifetimeLimit.Get()) {
-    std::move(callback).Run(false);
-    return;
-  }
-
-  base::Time last_impression_time =
-      base::ValueToTime(state_dict.Find("realbox_last_impression_time"))
-          .value_or(base::Time());
-  int daily_count = state_dict.FindInt("realbox_daily_count").value_or(0);
-
-  base::Time today_time = base::Time::Now().LocalMidnight();
-
-  if (last_impression_time != today_time) {
-    daily_count = 0;
-  }
-
-  bool can_show =
-      daily_count < omnibox::kContextMenuAnimationDailyLimit.Get();
-  std::move(callback).Run(can_show);
-}
-
-void NewTabPageHandler::RecordRealboxContextMenuAnimationImpression(
-    bool shown) {
-  base::UmaHistogramBoolean("Omnibox.ContextMenu.AnimationShown.NTP", shown);
-
-  if (!shown) {
-    return;
-  }
-
-  PrefService* prefs = profile_->GetPrefs();
-  const base::DictValue& state_dict =
-      prefs->GetDict(prefs::kContextMenuAnimationState);
-
-  base::Time last_impression_time =
-      base::ValueToTime(state_dict.Find("realbox_last_impression_time"))
-          .value_or(base::Time());
-  int daily_count = state_dict.FindInt("realbox_daily_count").value_or(0);
-  int lifetime_count = state_dict.FindInt("realbox_lifetime_count").value_or(0);
-
-  base::Time today_time = base::Time::Now().LocalMidnight();
-
-  if (last_impression_time != today_time) {
-    daily_count = 0;
-  }
-
-  if (lifetime_count <
-          omnibox::kContextMenuAnimationLifetimeLimit.Get() &&
-      daily_count <
-          omnibox::kContextMenuAnimationDailyLimit.Get()) {
-    daily_count++;
-    lifetime_count++;
-
-    ScopedDictPrefUpdate update(profile_->GetPrefs(),
-                                prefs::kContextMenuAnimationState);
-    update->Set("realbox_last_impression_time", base::TimeToValue(today_time));
-    update->Set("realbox_daily_count", daily_count);
-    update->Set("realbox_lifetime_count", lifetime_count);
-  }
 }
 
 void NewTabPageHandler::OnContextualSearchIPHEngaged() {
@@ -1516,10 +1430,6 @@ ntp_tiles::TileType NewTabPageHandler::GetTileType() const {
   return profile_->GetPrefs()->GetBoolean(ntp_prefs::kNtpCustomLinksVisible)
              ? ntp_tiles::TileType::kCustomLinks
              : ntp_tiles::TileType::kTopSites;
-}
-
-bool NewTabPageHandler::IsActionChipsVisible() const {
-  return profile_->GetPrefs()->GetBoolean(prefs::kNtpToolChipsVisible);
 }
 
 bool NewTabPageHandler::IsShortcutsVisible() const {

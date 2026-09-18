@@ -8,7 +8,4 @@
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 #include "third_party/omnibox_proto/chrome_aim_entry_point.pb.h"
 
-omnibox::ChromeAimEntryPoint PageClassificationToAimEntryPoint(
-    ::metrics::OmniboxEventProto::PageClassification classification);
-
 #endif  // CHROME_BROWSER_UI_WEBUI_CR_COMPONENTS_SEARCHBOX_SEARCHBOX_UTILS_H_

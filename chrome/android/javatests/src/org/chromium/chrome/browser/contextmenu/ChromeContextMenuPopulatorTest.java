@@ -88,8 +88,6 @@ import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.gsa.GSAUtils;
 import org.chromium.chrome.browser.incognito.IncognitoUtils;
-import org.chromium.chrome.browser.lens.LensEntryPoint;
-import org.chromium.chrome.browser.lens.LensIntentParams;
 import org.chromium.chrome.browser.multiwindow.MultiWindowUtils;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.profiles.ProfileJni;
@@ -112,7 +110,6 @@ import org.chromium.components.embedder_support.util.EmbedderSupportFeatures;
 import org.chromium.components.externalauth.ExternalAuthUtils;
 import org.chromium.components.search_engines.TemplateUrlService;
 import org.chromium.components.signin.identitymanager.IdentityManager;
-import org.chromium.components.signin.test.util.TestAccounts;
 import org.chromium.content_public.browser.RenderFrameHost;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.content_public.browser.test.NativeLibraryTestUtils;
@@ -135,7 +132,6 @@ import java.util.List;
 @UseRunnerDelegate(BaseJUnit4RunnerDelegate.class)
 @Batch(Batch.UNIT_TESTS)
 @DisableFeatures({
-    ChromeFeatureList.LENS_OVERLAY_ANDROID,
     ChromeFeatureList.ENABLE_DOWNLOAD_SAVE_AS_CONTEXT_MENU,
     ChromeFeatureList.CLANK_GLIC_CONTEXT_MENU,
 })
@@ -146,7 +142,6 @@ public class ChromeContextMenuPopulatorTest {
     private static final String LINK_TEXT = "BLAH!";
     private static final String IMAGE_SRC_URL = "http://www.blah.com/image.jpg";
     private static final String IMAGE_TITLE_TEXT = "IMAGE!";
-    private static final String RETRIEVED_IMAGE_URL = "http://www.blah.com/retrieved_image.jpg";
     private static final Uri RETRIEVED_IMAGE_URI =
             Uri.parse("content://com.my.app.testing/mock/image.png");
 
@@ -2379,87 +2374,6 @@ public class ChromeContextMenuPopulatorTest {
     @Test
     @SmallTest
     @UiThreadTest
-    public void testGetLensIntentParams() {
-        when(mIdentityManager.getPrimaryAccountInfo()).thenReturn(TestAccounts.ACCOUNT1);
-        ContextMenuParams params =
-                new ContextMenuParams(
-                        0,
-                        mMenuModelBridge,
-                        ContextMenuDataMediaType.NONE,
-                        ContextMenuDataMediaFlags.MEDIA_NONE,
-                        new GURL(PAGE_URL),
-                        new GURL(LINK_URL),
-                        LINK_TEXT,
-                        GURL.emptyGURL(),
-                        new GURL(IMAGE_SRC_URL),
-                        IMAGE_TITLE_TEXT,
-                        null,
-                        false,
-                        0,
-                        0,
-                        MenuSourceType.TOUCH,
-                        false,
-                        /* openedFromInterestFor= */ false,
-                        /* interestForNodeID= */ 0,
-                        /* additionalNavigationParams= */ null);
-
-        // Test Non-Incognito.
-        when(mItemDelegate.isIncognito()).thenReturn(false);
-        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
-
-        LensIntentParams lensIntentParams =
-                mPopulator.getLensIntentParams(
-                        LensEntryPoint.CONTEXT_MENU_SEARCH_MENU_ITEM,
-                        Uri.parse(RETRIEVED_IMAGE_URL));
-        assertEquals(
-                "Lens intent parameters has incorrect image URI.",
-                RETRIEVED_IMAGE_URL,
-                lensIntentParams.getImageUri().toString());
-        assertFalse(
-                "Lens intent parameters has incorrect incognito value.",
-                lensIntentParams.getIsIncognito());
-        assertEquals(
-                "Lens intent parameters has incorrect src URL.",
-                IMAGE_SRC_URL,
-                lensIntentParams.getSrcUrl());
-        assertEquals(
-                "Lens intent parameters has incorrect title or alt text.",
-                IMAGE_TITLE_TEXT,
-                lensIntentParams.getImageTitleOrAltText());
-        assertEquals(
-                "Lens intent parameters has incorrect page URL.",
-                PAGE_URL,
-                lensIntentParams.getPageUrl());
-        assertEquals(
-                "Lens intent parameters has incorrect account name.",
-                TestAccounts.ACCOUNT1.getEmail(),
-                lensIntentParams.getAccountName());
-        assertTrue(
-                "Lens intent parameters should have forceUnlockOrientation true.",
-                lensIntentParams.getForceUnlockOrientation());
-
-        // Test Incognito.
-        when(mItemDelegate.isIncognito()).thenReturn(true);
-        when(mProfile.isOffTheRecord()).thenReturn(true);
-        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
-        lensIntentParams =
-                mPopulator.getLensIntentParams(
-                        LensEntryPoint.CONTEXT_MENU_SEARCH_MENU_ITEM,
-                        Uri.parse(RETRIEVED_IMAGE_URL));
-        assertTrue(
-                "Lens intent parameters has incorrect incognito value.",
-                lensIntentParams.getIsIncognito());
-        assertNull(
-                "Lens intent parameters should have null account name in incognito.",
-                lensIntentParams.getAccountName());
-        assertTrue(
-                "Lens intent parameters should have forceUnlockOrientation true.",
-                lensIntentParams.getForceUnlockOrientation());
-    }
-
-    @Test
-    @SmallTest
-    @UiThreadTest
     public void testOpenFromHighlight() {
         setAllMandatoryFlowsComplete();
 
@@ -2594,90 +2508,6 @@ public class ChromeContextMenuPopulatorTest {
             R.id.contextmenu_open_image, R.id.contextmenu_copy_image, R.id.contextmenu_save_image
         };
         checkMenuOptions(image2Expected);
-    }
-
-    @Test
-    @SmallTest
-    @UiThreadTest
-    @EnableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    public void testPage_LensOverlay() {
-        setAllMandatoryFlowsComplete();
-        ContextMenuParams params = getPageParams();
-
-        int[][] expected = {
-            {
-                R.id.contextmenu_back, R.id.contextmenu_forward, R.id.contextmenu_reload,
-            },
-            {
-                R.id.contextmenu_save_page,
-                R.id.contextmenu_print_page,
-                R.id.contextmenu_share_page,
-                R.id.contextmenu_search_tab_with_google_lens,
-                R.id.contextmenu_open_in_reading_mode,
-            },
-            {R.id.contextmenu_send_tab_to_self, R.id.contextmenu_create_qr_code},
-        };
-
-        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
-        checkMenuOptions(expected);
-    }
-
-    @Test
-    @SmallTest
-    @UiThreadTest
-    @EnableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    public void testPage_LensOverlay_Incognito() {
-        setAllMandatoryFlowsComplete();
-        when(mItemDelegate.isIncognito()).thenReturn(true);
-        when(mTab.isIncognito()).thenReturn(true);
-        when(mSendTabToSelfAndroidBridgeNatives.getEntryPointDisplayReason(any(), anyString()))
-                .thenReturn(null);
-        ContextMenuParams params = getPageParams();
-
-        int[][] expected = {
-            {
-                R.id.contextmenu_back, R.id.contextmenu_forward, R.id.contextmenu_reload,
-            },
-            {
-                R.id.contextmenu_save_page,
-                R.id.contextmenu_print_page,
-                R.id.contextmenu_share_page,
-                R.id.contextmenu_open_in_reading_mode,
-            },
-            {R.id.contextmenu_create_qr_code},
-        };
-
-        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
-        checkMenuOptions(expected);
-    }
-
-    @Test
-    @SmallTest
-    @UiThreadTest
-    @EnableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    public void testPage_LensOverlay_GsaNotSupported() {
-        setAllMandatoryFlowsComplete();
-        ContextMenuParams params = getPageParams();
-
-        int[][] expected = {
-            {
-                R.id.contextmenu_back, R.id.contextmenu_forward, R.id.contextmenu_reload,
-            },
-            {
-                R.id.contextmenu_save_page,
-                R.id.contextmenu_print_page,
-                R.id.contextmenu_share_page,
-                R.id.contextmenu_open_in_reading_mode,
-            },
-            {R.id.contextmenu_send_tab_to_self, R.id.contextmenu_create_qr_code},
-        };
-
-        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
-        // Override the default test environment to simulate AGSA not being installed/supported.
-        GSAUtils.setFakePassableGsaEnvironmentForTesting(false);
-        GSAUtils.setAgsaPackageInfoForTesting(null);
-        when(mExternalAuthUtils.isGoogleSigned(anyString())).thenReturn(false);
-        checkMenuOptions(expected);
     }
 
     @Test

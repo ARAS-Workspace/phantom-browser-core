@@ -2294,20 +2294,6 @@ Google Chrome is unable to recover your settings.
           Remind me later
         </message>
 
-        <!-- Title Case Dependent -->
-        <if expr="use_titlecase">
-          <message name="IDS_CONTEXT_MENU_SHOW_GOOGLE_LENS_SHORTCUT"
-            desc="In Title Case: The text label of the omnibox context menu option to show the 'Search with Google Lens' shortcut button">
-            Always Show Google Lens Shortcut
-          </message>
-        </if>
-        <if expr="not use_titlecase">
-          <message name="IDS_CONTEXT_MENU_SHOW_GOOGLE_LENS_SHORTCUT"
-            desc="The text label of the omnibox context menu option to show the 'Search with Google Lens' shortcut button">
-            Always show Google Lens shortcut
-          </message>
-        </if>
-
         <!-- CSB Strings -->
 
         <!-- AI Mode Strings -->

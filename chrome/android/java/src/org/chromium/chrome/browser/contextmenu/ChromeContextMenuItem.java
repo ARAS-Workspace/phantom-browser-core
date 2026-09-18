@@ -61,8 +61,6 @@ class ChromeContextMenuItem {
         Item.OPEN_IMAGE_IN_EPHEMERAL_TAB,
         Item.COPY_IMAGE,
         Item.SEARCH_BY_IMAGE,
-        Item.SEARCH_IMAGE_WITH_GOOGLE_LENS,
-        Item.SHOP_IMAGE_WITH_GOOGLE_LENS,
         Item.SHARE_IMAGE,
         Item.DIRECT_SHARE_IMAGE,
         Item.CALL,
@@ -79,7 +77,6 @@ class ChromeContextMenuItem {
         Item.SAVE_PAGE,
         Item.SHARE_PAGE,
         Item.PRINT_PAGE,
-        Item.SEARCH_TAB_WITH_GOOGLE_LENS,
         Item.VIEW_PAGE_SOURCE,
         Item.BACK,
         Item.FORWARD,
@@ -124,44 +121,41 @@ class ChromeContextMenuItem {
         int OPEN_IMAGE_IN_EPHEMERAL_TAB = 21;
         int COPY_IMAGE = 22;
         int SEARCH_BY_IMAGE = 23;
-        int SEARCH_IMAGE_WITH_GOOGLE_LENS = 24;
-        int SHOP_IMAGE_WITH_GOOGLE_LENS = 25;
-        int SHARE_IMAGE = 26;
-        int DIRECT_SHARE_IMAGE = 27;
+        int SHARE_IMAGE = 24;
+        int DIRECT_SHARE_IMAGE = 25;
         // Message Group
-        int CALL = 28;
-        int SEND_MESSAGE = 29;
-        int ADD_TO_CONTACTS = 30;
-        int COPY = 31;
+        int CALL = 26;
+        int SEND_MESSAGE = 27;
+        int ADD_TO_CONTACTS = 28;
+        int COPY = 29;
         // Video Group
-        int SAVE_VIDEO = 32;
-        int PICTURE_IN_PICTURE = 33;
+        int SAVE_VIDEO = 30;
+        int PICTURE_IN_PICTURE = 31;
         // Other
-        int OPEN_IN_CHROME = 34;
+        int OPEN_IN_CHROME = 32;
         // Shared Highlighting options
-        int SHARE_HIGHLIGHT = 35;
-        int REMOVE_HIGHLIGHT = 36;
-        int LEARN_MORE = 37;
+        int SHARE_HIGHLIGHT = 33;
+        int REMOVE_HIGHLIGHT = 34;
+        int LEARN_MORE = 35;
         // Page Group
-        int SAVE_PAGE = 38;
-        int SHARE_PAGE = 39;
-        int PRINT_PAGE = 40;
-        int SEARCH_TAB_WITH_GOOGLE_LENS = 41;
-        int BACK = 42;
-        int FORWARD = 43;
-        int RELOAD = 44;
+        int SAVE_PAGE = 36;
+        int SHARE_PAGE = 37;
+        int PRINT_PAGE = 38;
+        int BACK = 39;
+        int FORWARD = 40;
+        int RELOAD = 41;
         // Developer Group
-        int VIEW_PAGE_SOURCE = 45;
-        int INSPECT_ELEMENT = 46;
-        int COPY_VIDEO_FRAME = 47;
-        int DOWNLOAD_VIDEO_FRAME = 48;
-        int READING_MODE = 49;
-        int SEND_TAB_TO_SELF = 50;
-        int TRANSLATE = 51;
-        int CREATE_QR_CODE = 52;
-        int ASK_GEMINI = 53;
+        int VIEW_PAGE_SOURCE = 42;
+        int INSPECT_ELEMENT = 43;
+        int COPY_VIDEO_FRAME = 44;
+        int DOWNLOAD_VIDEO_FRAME = 45;
+        int READING_MODE = 46;
+        int SEND_TAB_TO_SELF = 47;
+        int TRANSLATE = 48;
+        int CREATE_QR_CODE = 49;
+        int ASK_GEMINI = 50;
         // ALWAYS UPDATE!
-        int NUM_ENTRIES = 54;
+        int NUM_ENTRIES = 51;
     }
 
     /** Mapping from {@link Item} to the ID found in the ids.xml. */
@@ -190,8 +184,6 @@ class ChromeContextMenuItem {
         R.id.contextmenu_open_image_in_ephemeral_tab, // Item.OPEN_IMAGE_IN_EPHEMERAL_TAB
         R.id.contextmenu_copy_image, // Item.COPY_IMAGE
         R.id.contextmenu_search_by_image, // Item.SEARCH_BY_IMAGE
-        R.id.contextmenu_search_image_with_google_lens, // Item.SEARCH_IMAGE_WITH_GOOGLE_LENS
-        R.id.contextmenu_shop_image_with_google_lens, // Item.SHOP_IMAGE_WITH_GOOGLE_LENS
         R.id.contextmenu_share_image, // Item.SHARE_IMAGE
         R.id.contextmenu_direct_share_image, // Item.DIRECT_SHARE_IMAGE
         R.id.contextmenu_call, // Item.CALL
@@ -207,7 +199,6 @@ class ChromeContextMenuItem {
         R.id.contextmenu_save_page, // Item.SAVE_PAGE
         R.id.contextmenu_share_page, // Item.SHARE_PAGE
         R.id.contextmenu_print_page, // Item.PRINT_PAGE
-        R.id.contextmenu_search_tab_with_google_lens, // Item.SEARCH_TAB_WITH_GOOGLE_LENS
         R.id.contextmenu_back, // Item.BACK
         R.id.contextmenu_forward, // Item.FORWARD
         R.id.contextmenu_reload, // Item.RELOAD
@@ -248,8 +239,6 @@ class ChromeContextMenuItem {
         R.string.contextmenu_open_image_in_ephemeral_tab, // Item.OPEN_IMAGE_IN_EPHEMERAL_TAB:
         R.string.contextmenu_copy_image, // Item.COPY_IMAGE:
         R.string.contextmenu_search_web_for_image, // Item.SEARCH_BY_IMAGE:
-        R.string.contextmenu_search_image_with_google_lens, // Item.SEARCH_IMAGE_WITH_GOOGLE_LENS:
-        R.string.contextmenu_shop_image_with_google_lens, // Item.SHOP_IMAGE_WITH_GOOGLE_LENS:
         R.string.contextmenu_share_image, // Item.SHARE_IMAGE
         0, // Item.DIRECT_SHARE_IMAGE is not handled by this mapping.
         R.string.contextmenu_call, // Item.CALL:
@@ -265,7 +254,6 @@ class ChromeContextMenuItem {
         R.string.contextmenu_save_page, // Item.SAVE_PAGE
         R.string.contextmenu_share_page, // Item.SHARE_PAGE
         R.string.contextmenu_print_page, // Item.PRINT_PAGE
-        R.string.contextmenu_search_tab_with_google_lens, // Item.SEARCH_TAB_WITH_GOOGLE_LENS
         R.string.contextmenu_back, // Item.BACK
         R.string.contextmenu_forward, // Item.FORWARD
         R.string.contextmenu_reload, // Item.RELOAD
@@ -355,24 +343,6 @@ class ChromeContextMenuItem {
                         context,
                         item,
                         ChromePreferenceKeys.CONTEXT_MENU_OPEN_IMAGE_IN_EPHEMERAL_TAB_CLICKED,
-                        showInProductHelp);
-            case Item.SEARCH_TAB_WITH_GOOGLE_LENS:
-                return addOrRemoveNewLabel(
-                        context,
-                        item,
-                        ChromePreferenceKeys.CONTEXT_MENU_SEARCH_TAB_WITH_GOOGLE_LENS_CLICKED,
-                        showInProductHelp);
-            case Item.SEARCH_IMAGE_WITH_GOOGLE_LENS:
-                return addOrRemoveNewLabel(
-                        context,
-                        item,
-                        ChromePreferenceKeys.CONTEXT_MENU_SEARCH_IMAGE_WITH_GOOGLE_LENS_CLICKED,
-                        showInProductHelp);
-            case Item.SHOP_IMAGE_WITH_GOOGLE_LENS:
-                return addOrRemoveNewLabel(
-                        context,
-                        item,
-                        ChromePreferenceKeys.CONTEXT_MENU_SHOP_IMAGE_WITH_GOOGLE_LENS_CLICKED,
                         showInProductHelp);
             case Item.OPEN_IN_CHROME_INCOGNITO_TAB:
                 if (IncognitoUtils.shouldOpenIncognitoAsWindow()) {

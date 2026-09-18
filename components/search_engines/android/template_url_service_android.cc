@@ -325,43 +325,7 @@ TemplateUrlServiceAndroid::GetComposeplateUrl(JNIEnv* env,
                    omnibox::ANDROID_CHROME_NTP_FAKE_OMNIBOX_ENTRY_POINT,
                    /*query_start_time=*/base::Time::Now(),
                    /*query_text=*/std::u16string(),
-                   lens::LensOverlayInvocationSource::kOmniboxContextualQuery,
                    /*additional_params=*/{}));
-}
-
-base::android::ScopedJavaLocalRef<jobject>
-TemplateUrlServiceAndroid::GetUrlForContextualSearchQuery(
-    JNIEnv* env,
-    const JavaRef<jstring>& jquery,
-    const JavaRef<jstring>& jalternate_term,
-    bool jshould_prefetch,
-    const JavaRef<jstring>& jprotocol_version) {
-  std::u16string query(base::android::ConvertJavaStringToUTF16(env, jquery));
-
-  if (!query.empty()) {
-    GURL gurl(GetDefaultSearchURLForSearchTerms(template_url_service_, query));
-    if (IsDefaultSearchEngineGoogle()) {
-      std::string protocol_version(
-          base::android::ConvertJavaStringToUTF8(env, jprotocol_version));
-      gurl = net::AppendQueryParameter(gurl, "ctxs", protocol_version);
-      if (jshould_prefetch) {
-        // Indicate that the search page is being prefetched.
-        gurl = net::AppendQueryParameter(gurl, "pf", "c");
-      }
-
-      if (jalternate_term) {
-        std::string alternate_term(
-            base::android::ConvertJavaStringToUTF8(env, jalternate_term));
-        if (!alternate_term.empty()) {
-          gurl = net::AppendQueryParameter(gurl, "ctxsl_alternate_term",
-                                           alternate_term);
-        }
-      }
-    }
-    return url::GURLAndroid::FromNativeGURL(env, gurl);
-  }
-
-  return url::GURLAndroid::EmptyGURL(env);
 }
 
 base::android::ScopedJavaLocalRef<jobject>

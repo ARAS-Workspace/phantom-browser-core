@@ -20,8 +20,6 @@
 #include "chrome/common/chrome_render_frame.mojom.h"
 #include "components/compose/buildflags.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
-#include "components/lens/buildflags.h"
-#include "components/lens/lens_overlay_invocation_source.h"
 #include "components/renderer_context_menu/context_menu_content_type.h"
 #include "components/renderer_context_menu/render_view_context_menu_base.h"
 #include "components/renderer_context_menu/render_view_context_menu_observer.h"
@@ -165,12 +163,6 @@ class RenderViewContextMenu
   // Returns the correct IDC for the Search by Image context menu string
   int GetSearchForImageIdc() const;
 
-  // Returns the correct IDC for the Region Search context menu string
-  int GetRegionSearchIdc() const;
-
-  // Returns the correct IDC for the Video Frame Search context menu string
-  int GetSearchForVideoFrameIdc() const;
-
   // Returns the provider for image search.
   const TemplateURL* GetImageSearchProvider() const;
 
@@ -300,13 +292,10 @@ class RenderViewContextMenu
   void AppendPrintPreviewItems();
   void AppendSearchWebForImageItems();
   void AppendGlicShareImageItem();
-  bool CanAppendRegionSearchItem() const;
   bool CanAppendGlicShareImageItem() const;
-  void AppendLensGeminiSection();
   void AppendRevisedTextSelectionSection();
   void AppendProtocolHandlerSubMenu();
   void AppendSharingItems();
-  void AppendRegionSearchItem();
   void AppendSendTabToSelfItem(bool add_separator);
   bool AppendQRCodeGeneratorItem(bool for_image,
                                  bool draw_icon,
@@ -327,11 +316,6 @@ class RenderViewContextMenu
   // Helper functions for checking policies.
   bool IsSearchAllowedByPolicy() const;
 
-  // Helper function for checking if text query should be opened in Lens. Checks
-  // whether Lens is available and whether the text selection entrypoint flag is
-  // enabled.
-  bool ShouldOpenTextQueryInLens() const;
-
   // Command enabled query functions.
   bool IsReloadEnabled() const;
   bool IsViewSourceEnabled() const;
@@ -345,7 +329,6 @@ class RenderViewContextMenu
   bool IsPrintPreviewEnabled() const;
   bool IsQRCodeGeneratorEnabled() const;
   bool IsOpenLinkAllowedByDlp(const GURL& link_url) const;
-  bool IsRegionSearchEnabled() const;
   bool IsAddANoteEnabled() const;
   bool IsVideoFrameItemEnabled(int id) const;
 
@@ -361,17 +344,14 @@ class RenderViewContextMenu
   void ExecExitFullscreen();
   void ExecCopyLinkText();
   void ExecCopyImageAt();
-  void ExecSearchLensForImage(int event_flags);
   void ExecAddANote();
-  void ExecRegionSearch(int event_flags,
-                        bool is_google_default_search_provider);
   void ExecSearchWebForImage();
   void ExecLoadImage();
   void ExecLoop();
   void ExecControls();
   void ExecSaveVideoFrameAs();
   void ExecCopyVideoFrame();
-  void ExecSearchForVideoFrame(int event_flags, bool is_lens_query);
+  void ExecSearchForVideoFrame(int event_flags);
   void ExecRotateCW();
   void ExecRotateCCW();
   void ExecReloadPackagedApp();
@@ -386,13 +366,8 @@ class RenderViewContextMenu
   void ExecSaveToMemoryBanks();
 
   void MediaPlayerAction(const blink::mojom::MediaPlayerAction& action);
-  void SearchForVideoFrame(int event_flags,
-                           bool is_lens_query,
-                           const SkBitmap& bitmap,
-                           const gfx::Rect& region_bounds);
   void PluginActionAt(const gfx::Point& location,
                       blink::mojom::PluginActionType plugin_action);
-  void OpenTextQueryInLens();
 
   // Returns the WebContents used for data control policy checks. This usually
   // returns the source WebContents, but if the context menu is shown in a
@@ -410,7 +385,6 @@ class RenderViewContextMenu
 
   // Under the correct conditions, issues a preconnection to the Lens URL and
   // warms up a renderer process.
-  void MaybePrepareForLensQuery();
 
   // Does not execute "Save link as" if the URL is blocked by the URL filter.
   void CheckSupervisedUserURLFilterAndSaveLinkAs();
@@ -424,15 +398,6 @@ class RenderViewContextMenu
   // relative to the screen and in DP, while image bounds are relative to the
   // view and in physical pixels. The device scale factor is supplied to scale
   // the image bounds properly.
-  void OpenLensOverlayWithPreselectedRegion(
-      mojo::AssociatedRemote<chrome::mojom::ChromeRenderFrame>
-          chrome_render_frame,
-      lens::LensOverlayInvocationSource invocation_source,
-      const gfx::Rect& tab_bounds,
-      const gfx::Rect& view_bounds,
-      float device_scale_factor,
-      const SkBitmap& region_bytes,
-      const gfx::Rect& region_bitmap);
 
 #if !BUILDFLAG(IS_ANDROID)
   // Opens the link in a new split view so that the linked page will be visible

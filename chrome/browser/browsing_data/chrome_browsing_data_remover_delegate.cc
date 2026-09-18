@@ -117,7 +117,6 @@
 #include "components/history/core/common/pref_names.h"
 #include "components/keyed_service/core/service_access_type.h"
 #include "components/language/core/browser/url_language_histogram.h"
-#include "components/lens/lens_features.h"
 #include "components/media_device_salt/media_device_salt_service.h"
 #include "components/no_state_prefetch/browser/no_state_prefetch_manager.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
@@ -494,11 +493,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
 #if !BUILDFLAG(IS_ANDROID)
     // Remove localStorage data from Lens Overlay UI whenever any history is
     // deleted.
-    if (lens::features::IsLensOverlayTranslateLanguagesFetchEnabled()) {
-      profile_->GetDefaultStoragePartition()->ClearDataForOrigin(
-          content::StoragePartition::REMOVE_DATA_MASK_LOCAL_STORAGE,
-          GURL(chrome::kChromeUILensOverlayUntrustedURL), base::DoNothing());
-    }
 #endif
 
     content::PrefetchServiceDelegate::ClearData(profile_);

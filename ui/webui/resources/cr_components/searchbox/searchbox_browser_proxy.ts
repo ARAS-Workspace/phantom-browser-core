@@ -40,7 +40,6 @@ export function createAutocompleteMatch(
     imageDominantColor: '',
     imageUrl: '',
     isContextualSuggestion: false,
-    isNoncannedAimSuggestion: false,
     removeButtonA11yLabel: '',
     type: '',
     isRichSuggestion: false,

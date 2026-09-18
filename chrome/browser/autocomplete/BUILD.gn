@@ -77,8 +77,6 @@ source_set("impl") {
     "//chrome/browser:global_features",
     "//chrome/browser/bitmap_fetcher",
     "//chrome/browser/bookmarks",
-    "//chrome/browser/contextual_search",
-    "//chrome/browser/contextual_tasks:ui",
     "//chrome/browser/custom_handlers",
     "//chrome/browser/external_protocol",
     "//chrome/browser/history",
@@ -112,7 +110,6 @@ source_set("impl") {
     "//components/history_embeddings/content",
     "//components/history_embeddings/core",
     "//components/language/core/browser",
-    "//components/lens",
     "//components/unified_consent",
     "//components/variations/service",
     "//content/public/browser",
@@ -123,7 +120,6 @@ source_set("impl") {
     deps += [
       "//chrome/browser/android:tabs_public",
       "//chrome/browser/flags:flags_android",
-      "//chrome/browser/lens:jni_headers",
       "//chrome/browser/ui/android/omnibox:jni_headers",
       "//chrome/browser/ui/android/tab_model",
     ]
@@ -132,7 +128,6 @@ source_set("impl") {
     deps += [
       "//chrome/browser/sharing_hub",
       "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/tabs:tab_strip",
       "//chrome/browser/ui/views/side_panel",
       "//chrome/browser/web_applications/app_service",
@@ -158,12 +153,6 @@ source_set("impl") {
 
 source_set("aim_eligibility_service") {
   sources = [
-    "aim_eligibility_refresh_navigation_throttle.cc",
-    "aim_eligibility_refresh_navigation_throttle.h",
-    "aim_eligibility_service_factory.cc",
-    "aim_eligibility_service_factory.h",
-    "chrome_aim_eligibility_service.cc",
-    "chrome_aim_eligibility_service.h",
   ]
   deps = [
     "//base",
@@ -173,7 +162,6 @@ source_set("aim_eligibility_service") {
     "//chrome/browser/search_engines",
     "//chrome/browser/signin",
     "//components/application_locale_storage",
-    "//components/contextual_tasks/public:feature_list",
     "//components/embedder_support:user_agent",
     "//components/keyed_service/core",
     "//components/omnibox/browser",
@@ -186,7 +174,6 @@ source_set("aim_eligibility_service") {
   ]
 
   if (is_android) {
-    sources += [ "aim_eligibility_service_factory_android.cc" ]
     deps += [ "//chrome/browser/search_engines/android:jni_headers" ]
   }
 }
@@ -197,7 +184,6 @@ if (!is_android) {
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
     sources = [
       "autocomplete_browsertest.cc",
-      "chrome_aim_eligibility_service_browsertest.cc",
       "chrome_autocomplete_provider_client_browsertest.cc",
       "tab_matcher_desktop_browsertest.cc",
     ]
@@ -209,7 +195,6 @@ if (!is_android) {
       "//build:buildflag_header_h",
       "//chrome/browser",
       "//chrome/browser:browser_process",
-      "//chrome/browser/contextual_tasks",
       "//chrome/browser/extensions",
       "//chrome/browser/history",
       "//chrome/browser/profiles:profile",
@@ -217,7 +202,6 @@ if (!is_android) {
       "//chrome/browser/signin",
       "//chrome/browser/ui",
       "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/lens:test_support",
       "//chrome/browser/ui/location_bar",
       "//chrome/browser/ui/tabs:tab_strip",
       "//chrome/browser/ui/tabs:tabs_public",
@@ -227,7 +211,6 @@ if (!is_android) {
       "//chrome/test:test_support",
       "//chrome/test:test_support_ui",
       "//components/history/core/browser",
-      "//components/lens",
       "//components/omnibox/browser",
       "//components/omnibox/browser:location_bar",
       "//components/prefs",
@@ -252,7 +235,6 @@ if (!is_android) {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "aim_eligibility_refresh_navigation_throttle_unittest.cc",
     "chrome_autocomplete_scheme_classifier_unittest.cc",
     "provider_state_service_factory_unittest.cc",
     "remote_suggestions_service_factory_unittest.cc",
@@ -274,8 +256,6 @@ source_set("unit_tests") {
     "//chrome/test:test_support",
     "//components/google/core/common",
     "//components/history/core/browser",
-    "//components/lens:features",
-    "//components/lens/proto/server:proto",
     "//components/omnibox/browser",
     "//components/omnibox/browser:location_bar",
     "//components/omnibox/browser:test_support",

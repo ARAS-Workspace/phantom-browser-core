@@ -67,7 +67,6 @@
 #include "base/memory/ref_counted_memory.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/types/expected_macros.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
 #include "chrome/browser/media/router/discovery/access_code/access_code_cast_feature.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/app_service_internals/app_service_internals_ui.h"
@@ -326,9 +325,7 @@ bool ChromeWebUIControllerFactory::IsWebUIAllowedToMakeNetworkRequests(
       // https://crbug.com/40583261
       origin.host() == chrome::kChromeUIDownloadsHost ||
       // https://crbug.com/376417346
-      origin.host() == chrome::kChromeUIExtensionsHost ||
-      // https://crbug.com/509216218
-      origin.host() == chrome::kChromeUIDrivePickerHostHost;
+      origin.host() == chrome::kChromeUIExtensionsHost;
 }
 
 ChromeWebUIControllerFactory::ChromeWebUIControllerFactory() = default;
@@ -417,11 +414,6 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
     return NewTabPageUI::GetFaviconResourceBytes(scale_factor);
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  if (page_url.host() == chrome::kChromeUIContextualTasksHost) {
-    return ContextualTasksUI::GetFaviconResourceBytes(scale_factor);
-  }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)

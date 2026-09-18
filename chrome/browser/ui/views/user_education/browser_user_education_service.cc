@@ -16,9 +16,6 @@
 #include "build/build_config.h"
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui_service.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui_service_factory.h"
 #include "chrome/browser/devtools/features.h"
 #include "chrome/browser/feature_engagement/tracker_factory.h"
 #include "chrome/browser/performance_manager/public/user_tuning/user_performance_tuning_manager.h"
@@ -53,7 +50,6 @@
 #include "chrome/browser/ui/views/autofill/at_memory_promo_bubble_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_view_views.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_bar_view.h"
-#include "chrome/browser/ui/views/contextual_tasks/contextual_tasks_button.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/frame/contents_web_view.h"
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
@@ -90,13 +86,11 @@
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/compose/buildflags.h"
 #include "components/compose/core/browser/compose_features.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/data_sharing/public/features.h"
 #include "components/desktop_to_mobile_promos/features.h"
 #include "components/desktop_to_mobile_promos/promos_types.h"
 #include "components/feature_engagement/public/event_constants.h"
 #include "components/feature_engagement/public/feature_constants.h"
-#include "components/lens/lens_features.h"
 #include "components/pdf/browser/pdf_document_helper.h"
 #include "components/safe_browsing/core/common/safebrowsing_referral_methods.h"
 #include "components/saved_tab_groups/public/features.h"
@@ -1012,55 +1006,6 @@ void MaybeRegisterChromeFeaturePromos(
                        "Triggered once per-app when is in quiet notification "
                        "mode and a notification is triggered in a PWA.")));
 
-  // kIPHSmartTabSharingFeature:
-  auto smart_tab_sharing_iph_first_time_prompt_option =
-      contextual_tasks::kSmartTabSharingIphFirstTimePromptOption.Get();
-  int smart_tab_sharing_iph_body_text_id = 0;
-  int smart_tab_sharing_iph_header_text_id = 0;
-  switch (smart_tab_sharing_iph_first_time_prompt_option) {
-    case contextual_tasks::SmartTabSharingIphFirstTimePromptOption::
-        kIphFirstTimePromptV1:
-      smart_tab_sharing_iph_body_text_id =
-          IDS_STS_IPH_PROMPT_FIRST_TIME_ADDING_CONTEXT_MESSAGE_BODY;
-      smart_tab_sharing_iph_header_text_id =
-          IDS_STS_IPH_PROMPT_FIRST_TIME_ADDING_CONTEXT_HEADER;
-      break;
-    case contextual_tasks::SmartTabSharingIphFirstTimePromptOption::
-        kIphFirstTimePromptV2:
-      smart_tab_sharing_iph_body_text_id =
-          IDS_STS_IPH_PROMPT_FIRST_TIME_ADDING_CONTEXT_MESSAGE_BODY_V2;
-      smart_tab_sharing_iph_header_text_id =
-          IDS_STS_IPH_PROMPT_FIRST_TIME_ADDING_CONTEXT_HEADER_V2;
-      break;
-  }
-  registry.RegisterFeature(std::move(
-      user_education::FeaturePromoSpecification::CreateForCustomAction(
-          feature_engagement::kIPHSmartTabSharingFeature,
-          ContextualTasksUI::kSmartTabSharingMenuItemElementId,
-          smart_tab_sharing_iph_body_text_id,
-          IDS_STS_IPH_PROMPT_FIRST_TIME_ADDING_CONTEXT_TURN_ON,
-          base::BindRepeating(
-              [](ContextPtr ctx,
-                 user_education::FeaturePromoHandle promo_handle) {
-                Browser* const browser = GetBrowser(ctx);
-                auto* service =
-                    contextual_tasks::ContextualTasksUiServiceFactory::
-                        GetForBrowserContext(browser->GetProfile());
-                if (service) {
-                  service->TurnOnSmartTabSharing(browser);
-                }
-              }))
-          .SetBubbleTitleText(smart_tab_sharing_iph_header_text_id)
-          .SetCustomActionDismissText(IDS_NO_THANKS)
-          .SetCustomActionIsDefault(true)
-          .SetBubbleArrow(user_education::HelpBubbleArrow::kBottomRight)
-          .SetInAnyContext(true)
-          .SetMetadata(
-              148, "orinj@chromium.org",
-              "Triggered when the user opens the '+' context menu in "
-              "composebox "
-              "and Smart Tab Sharing is available but hasn't been used yet.")));
-
   // kIPHReadingListDiscoveryFeature:
   registry.RegisterFeature(
       std::move(FeaturePromoSpecification::CreateForLegacyPromo(
@@ -1766,20 +1711,6 @@ void MaybeRegisterChromeFeaturePromos(
               "the size of the tabs are shrunk significantly compared to their "
               "ideal width.")));
 
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForTutorialPromo(
-          feature_engagement::kIPHSidePanelContextualTasksPinnableFeature,
-          kContextualTasksWebUIToolbarElementId,
-          IDS_SIDE_PANEL_CONTEXTUAL_TASKS_PINNABLE_IPH,
-          kContextualTasksTutorialId)
-          .SetBubbleArrow(HelpBubbleArrow::kNone)
-          .SetBubbleIcon(kLightbulbOutlineIcon)
-          .SetInAnyContext(true)
-          .SetMetadata(
-              147, "dianaou@google.com",
-              "Triggered automatically when the user opens Contextual Tasks "
-              "to smoothly onboard them into the pinning tutorial.")));
-
   // kIPHVerticalTabsExpandOnHoverFeature:
   const auto expand_on_hover_iph_body_string_id =
       tabs::kVerticalTabsExpandOnHoverDefaultEnabled.Get()
@@ -2097,42 +2028,6 @@ void MaybeRegisterChromeTutorials(
     tutorial_registry.AddTutorial(kVerticalTabsTutorialId,
                                   std::move(vertical_tabs_tutorial));
   }
-
-  {  // Contextual Tasks tutorial
-    auto contextual_tasks_tutorial =
-        TutorialDescription::Create<kContextualTasksTutorialMetricPrefix>(
-
-            // Bubble step - overflow menu button
-            BubbleStep(kContextualTasksWebUIOverflowMenuElementId)
-                .SetBubbleBodyText(IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP1)
-                .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-                .InAnyContext(),
-
-            // Bubble step - pin button
-            BubbleStep(kContextualTasksWebUIOverflowMenuPinButtonElementId)
-                .SetBubbleBodyText(IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP2)
-                .SetBubbleArrow(HelpBubbleArrow::kRightCenter)
-                .InAnyContext(),
-
-            // Hidden step - wait for pin button to be hidden?
-            HiddenStep::WaitForHidden(
-                kContextualTasksWebUIOverflowMenuPinButtonElementId),
-
-            // Completion of the tutorial after side panel appears.
-            BubbleStep(
-                kPinnedToolbarActionShowSidePanelContextualTasksElementId)
-                .SetBubbleBodyText(IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP3)
-                .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-                .InAnyContext());
-
-    contextual_tasks_tutorial.metadata.additional_description =
-        "Tutorial for pinning Google Search AI Mode.";
-    contextual_tasks_tutorial.metadata.launch_milestone = 147;
-    contextual_tasks_tutorial.metadata.owners = "dianaou@google.com";
-
-    tutorial_registry.AddTutorial(kContextualTasksTutorialId,
-                                  std::move(contextual_tasks_tutorial));
-  }
 }
 
 // NOTES FOR FEATURE TEAMS:
@@ -2174,11 +2069,6 @@ void MaybeRegisterChromeNewBadges(user_education::NewBadgeRegistry& registry) {
                                "Shown in autofill-style suggestion UI when "
                                "Compose proactive nudge is shown.",
                                {}, kComposePlatforms)));
-
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      lens::features::kLensOverlay,
-      user_education::Metadata(126, "jdonnelly@google.com, dfried@google.com",
-                               "Shown in app and web context menus.")));
 
   // This is a custom UI new badge that uses a small help bubble to annotate the
   // element instead of a badge.

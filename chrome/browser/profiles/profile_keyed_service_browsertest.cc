@@ -23,7 +23,6 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/profile_waiter.h"
 #include "components/commerce/core/commerce_feature_list.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/keyed_service/core/dependency_graph.h"
 #include "components/keyed_service/core/keyed_service_base_factory.h"
@@ -196,7 +195,6 @@ class ProfileKeyedServiceBrowserTest : public InProcessBrowserTest {
           omnibox::kOnDeviceTailModel,
           omnibox::kOnDeviceHeadProviderNonIncognito,
           switches::kSyncEnableBookmarksInTransportMode,
-          contextual_tasks::kContextualTasks,
         },
         {});
     // clang-format on
@@ -344,8 +342,7 @@ class ProfileKeyedServiceGuestBrowserTest
     // enabled and then remove this.
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features=*/{},
-        /*disabled_features=*/{omnibox::internal::kWebUIOmniboxPopup,
-                               omnibox::internal::kWebUIOmniboxAimPopup});
+        /*disabled_features=*/{omnibox::internal::kWebUIOmniboxPopup});
   }
   ~ProfileKeyedServiceGuestBrowserTest() override = default;
 
@@ -367,9 +364,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "BrowserManagerService",
     "BrowsingDataLifetimeManager",
 
-    "ContextualSearchService",
-    "ContextualTasksService",
-    "ContextualTasksUiService",
     "CookieSettings",
     "ChromeEnterpriseRealTimeUrlLookupService",
 #if !BUILDFLAG(IS_ANDROID)
@@ -472,11 +466,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     guest_otr_active_services.insert("SearchEnginePreconnector");
   }
   if (base::FeatureList::IsEnabled(
-          omnibox::kAimEligibilityComponentExtension)) {
-    guest_otr_active_services.insert("AimEligibilityExtensionBridge");
-    guest_otr_active_services.insert("ExtensionMojoBinderRegistry");
-  }
-  if (base::FeatureList::IsEnabled(
           universal_optout::features::kUniversalOptOut)) {
     guest_otr_active_services.insert("UniversalOptOutService");
   }
@@ -510,8 +499,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ActivityLog",
     "ActivityLogPrivateAPI",
     "AdvancedProtectionStatusManager",
-    "AiModeButtonService",
-    "AimEligibilityService",
     "AlarmManager",
     "AnnouncementNotificationService",
     "AppLifetimeMonitor",
@@ -558,8 +545,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 #endif
     "ContentIndexProvider",
     "ContentSettingsService",
-    "ContextualTasksService",
-    "ContextualTasksUiService",
     "CookieSettings",
     "CookiesAPI",
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -772,11 +757,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 
   if (SearchEnginePreconnector::ShouldBeEnabledAsKeyedService()) {
     guest_active_services.insert("SearchEnginePreconnector");
-  }
-  if (base::FeatureList::IsEnabled(
-          omnibox::kAimEligibilityComponentExtension)) {
-    guest_active_services.insert("AimEligibilityExtensionBridge");
-    guest_active_services.insert("ExtensionMojoBinderRegistry");
   }
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (base::FeatureList::IsEnabled(

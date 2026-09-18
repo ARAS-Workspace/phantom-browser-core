@@ -58,9 +58,6 @@
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/immersive/immersive_mode_controller.h"
 #include "chrome/browser/ui/layout_constants.h"
-#include "chrome/browser/ui/lens/lens_overlay_controller.h"
-#include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
-#include "chrome/browser/ui/lens/lens_string_utils.h"
 #include "chrome/browser/ui/profiles/profile_colors_util.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_context_menu_delegate.h"
@@ -106,7 +103,6 @@
 #include "components/enterprise/isolated_mode/settings.h"
 #include "components/feature_engagement/public/event_constants.h"
 #include "components/feature_engagement/public/feature_constants.h"
-#include "components/lens/lens_features.h"
 #include "components/omnibox/browser/vector_icons.h"
 #include "components/password_manager/content/common/web_ui_constants.h"
 #include "components/password_manager/core/common/password_manager_features.h"
@@ -1307,14 +1303,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       }
       LogMenuAction(MENU_ACTION_BOOKMARK_ALL_TABS);
       break;
-    // Lens overlay.
-    case IDC_CONTENT_CONTEXT_LENS_OVERLAY:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.ShowLensOverlay",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_SHOW_LENS_OVERLAY);
-      break;
     // Extensions menu.
     case IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS:
       // Logging the original histograms for experiment comparison purposes.
@@ -2065,28 +2053,6 @@ void AppMenuModel::Build() {
   AddItemWithStringIdAndVectorIcon(
       this, IDC_PRINT, IDS_PRINT,
       features::IsRoundedIconsEnabled() ? kPrintIcon : kPrintMenuOldIcon);
-
-  if (auto* controller = lens::LensOverlayEntryPointController::From(browser());
-      controller && controller->IsEnabled()) {
-    const gfx::VectorIcon& icon =
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-        vector_icons::kGoogleLensMonochromeLogoIcon;
-#else
-        features::IsRoundedIconsEnabled()
-            ? vector_icons::kSearchIcon
-            : vector_icons::kSearchChromeRefreshOldIcon;
-#endif
-    AddItemWithStringIdAndVectorIcon(
-        this, IDC_CONTENT_CONTEXT_LENS_OVERLAY,
-        lens::GetLensOverlayEntrypointLabelAltIds(), icon);
-    const int lens_command_index =
-        GetIndexOfCommandId(IDC_CONTENT_CONTEXT_LENS_OVERLAY).value();
-    SetElementIdentifierAt(lens_command_index, kShowLensOverlay);
-    SetIsNewFeatureAt(
-        lens_command_index,
-        BrowserUserEducationInterface::From(browser())->MaybeShowNewBadgeFor(
-            lens::features::kLensOverlay));
-  }
 
   CreateFindAndEditSubMenu();
 

@@ -16,7 +16,6 @@
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/search_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/lens/lens_features.h"
 #include "components/page_load_metrics/browser/observers/core/uma_page_load_metrics_observer.h"
 #include "components/page_load_metrics/browser/page_load_metrics_test_waiter.h"
 #include "components/page_load_metrics/google/browser/google_url_util.h"
@@ -404,15 +403,7 @@ IN_PROC_BROWSER_TEST_P(GWSActualNavigationStartBasedBrowserTest, Uma) {
 }
 
 class GWSPageLoadMetricsObserverContextMenuNaviBrowserTest
-    : public GWSPageLoadMetricsObserverBrowserTest {
- public:
-  GWSPageLoadMetricsObserverContextMenuNaviBrowserTest() {
-    feature_list_.InitAndDisableFeature(lens::features::kLensOverlay);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
+    : public GWSPageLoadMetricsObserverBrowserTest {};
 
 IN_PROC_BROWSER_TEST_F(GWSPageLoadMetricsObserverContextMenuNaviBrowserTest,
                        ContextMenuSearchNavigation) {

@@ -12,8 +12,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
 #include "chrome/browser/flags/android/chrome_feature_list.h"
-#include "chrome/browser/ui/contextual_search/tab_contextualization_controller.h"
-#include "components/lens/contextual_input.h"
 #include "components/pdf/common/constants.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_contents.h"

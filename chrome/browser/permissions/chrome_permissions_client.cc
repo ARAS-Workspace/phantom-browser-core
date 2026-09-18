@@ -144,12 +144,6 @@ const url::Origin& GetOmniboxEverywhereOrigin() {
   return *origin;
 }
 
-const url::Origin& GetContextualTasksOrigin() {
-  static const base::NoDestructor<url::Origin> origin(
-      url::Origin::Create(GURL(chrome::kChromeUIContextualTasksURL)));
-  return *origin;
-}
-
 #if BUILDFLAG(IS_ANDROID)
 bool ShouldUseQuietUI(content::WebContents* web_contents,
                       const permissions::PermissionRequest& request) {
@@ -667,11 +661,10 @@ bool ChromePermissionsClient::CanBypassEmbeddingOriginCheck(
     return true;
   }
 
-  // Omnibox Popup, Omnibox Everywhere, and Contextual Tasks:
+  // Omnibox Popup and Omnibox Everywhere:
   // Bypass embedding origin check as the `requesting_origin` will later be
   // transformed to the DSE origin in `GetCanonicalOriginOverride()`.
-  if (embedder == GetContextualTasksOrigin() ||
-      embedder == GetOmniboxPopupOrigin() ||
+  if (embedder == GetOmniboxPopupOrigin() ||
       embedder == GetOmniboxEverywhereOrigin()) {
     return true;
   }
@@ -699,14 +692,6 @@ std::optional<GURL> ChromePermissionsClient::GetCanonicalOriginOverride(
           .DeprecatedGetOriginAsURL();
     }
     return requesting_origin;
-  }
-
-  // Contextual Tasks:
-  // Transform chrome:// origins to the DSE origin so that permissions are
-  // stored under and shared with the DSE.
-  if (embedder == requester && embedder == GetContextualTasksOrigin()) {
-    return GURL(UIThreadSearchTermsData().GoogleBaseURLValue())
-        .DeprecatedGetOriginAsURL();
   }
 
   // Omnibox:
@@ -750,10 +735,9 @@ std::optional<GURL> ChromePermissionsClient::GetEmbeddingOriginOverride(
     return embedder.GetURL();
   }
 
-  if (embedder == GetContextualTasksOrigin() ||
-      embedder == GetOmniboxPopupOrigin() ||
+  if (embedder == GetOmniboxPopupOrigin() ||
       embedder == GetOmniboxEverywhereOrigin()) {
-    // Omnibox Popup, Omnibox Everywhere, and Contextual Tasks:
+    // Omnibox Popup and Omnibox Everywhere:
     // Use the WebContents origin as the embedding origin.
     // Note that the embedding origin is later transformed to the DSE origin via
     // `GetCanonicalOriginOverride()`.
@@ -854,8 +838,7 @@ bool ChromePermissionsClient::IsPrivilegedInternalWebUIForUIRouting(
 bool ChromePermissionsClient::
     IsPrivilegedInternalWebUIForUIRouting(  // overloaded private version
         const url::Origin& embedding_origin) {
-  return embedding_origin == GetContextualTasksOrigin() ||
-         embedding_origin == GetOmniboxPopupOrigin() ||
+  return embedding_origin == GetOmniboxPopupOrigin() ||
          embedding_origin == GetOmniboxEverywhereOrigin();
 }
 

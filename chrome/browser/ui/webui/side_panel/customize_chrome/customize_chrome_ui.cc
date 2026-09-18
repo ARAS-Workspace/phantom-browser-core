@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "base/rand_util.h"
-#include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/bad_message.h"
 #include "chrome/browser/image_fetcher/image_decoder_impl.h"
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
@@ -20,7 +19,6 @@
 #include "chrome/browser/ui/views/side_panel/customize_chrome/customize_chrome_utils.h"
 #include "chrome/browser/ui/webui/cr_components/customize_color_scheme_mode/customize_color_scheme_mode_handler.h"
 #include "chrome/browser/ui/webui/cr_components/theme_color_picker/theme_color_picker_handler.h"
-#include "chrome/browser/ui/webui/new_tab_page/composebox/variations/composebox_fieldtrial.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/sanitized_image/sanitized_image_source.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_page_handler.h"
@@ -38,7 +36,6 @@
 #include "chrome/grit/side_panel_shared_resources.h"
 #include "chrome/grit/side_panel_shared_resources_map.h"
 #include "components/ntp_tiles/features.h"
-#include "components/omnibox/browser/aim_eligibility_service.h"
 #include "components/search/ntp_features.h"
 #include "components/strings/grit/components_strings.h"
 #include "content/public/browser/render_frame_host.h"
@@ -283,10 +280,8 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
       base::FeatureList::IsEnabled(
           ntp_features::kCustomizeChromeSidePanelExtensionsCard));
 
-  bool ntp_next_features_enabled =
-      ntp_realbox::IsNtpRealboxNextEnabled(profile_) &&
-      base::FeatureList::IsEnabled(ntp_features::kNtpNextFeatures);
-  source->AddBoolean("ntpNextFeaturesEnabled", ntp_next_features_enabled);
+  source->AddBoolean("ntpNextFeaturesEnabled", false);
+  source->AddBoolean("aimPolicyEnabled", false);
   source->AddBoolean("ntpNextDisablementEnabled",
                      ntp_features::kNtpNextDisablementParam.Get());
   source->AddBoolean("wallpaperSearchEnabled", wallpaper_search_enabled);
@@ -303,33 +298,6 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
   source->AddBoolean("imageErrorDetectionEnabled",
                      base::FeatureList::IsEnabled(
                          ntp_features::kNtpBackgroundImageErrorDetection));
-
-  const auto* aim_eligibility_service =
-      AimEligibilityServiceFactory::GetForProfile(profile_);
-  int num_tools_eligible = 0;
-  if (aim_eligibility_service) {
-    if (aim_eligibility_service->IsDeepSearchEligible()) {
-      num_tools_eligible++;
-    }
-    if (aim_eligibility_service->IsCreateImagesEligible()) {
-      num_tools_eligible++;
-      if (base::FeatureList::IsEnabled(ntp_features::kNtpStarterChip)) {
-        num_tools_eligible++;
-      }
-    }
-    if (base::FeatureList::IsEnabled(ntp_features::kNtpNextCanvasChip) &&
-        aim_eligibility_service->IsCanvasEligible()) {
-      num_tools_eligible++;
-    }
-  }
-  bool action_chips_eligible =
-      (base::FeatureList::IsEnabled(ntp_features::kNtpScaledActionChips) ||
-       base::FeatureList::IsEnabled(ntp_features::kNtpScaledActionChipsSmall))
-          ? ntp_next_features_enabled
-          : (aim_eligibility_service &&
-             aim_eligibility_service->IsAimEligible() &&
-             num_tools_eligible >= 2);
-  source->AddBoolean("aimPolicyEnabled", action_chips_eligible);
 
   source->AddBoolean("footerEnabled",
                      base::FeatureList::IsEnabled(ntp_features::kNtpFooter));

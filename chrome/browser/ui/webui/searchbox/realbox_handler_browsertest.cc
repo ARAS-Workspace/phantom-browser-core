@@ -34,7 +34,6 @@
 #include "chrome/browser/ui/webui/searchbox/searchbox_test_utils.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/contextual_search/contextual_search_types.h"
 #include "components/omnibox/browser/actions/history_clusters_action.h"
 #include "components/omnibox/browser/actions/omnibox_action.h"
 #include "components/omnibox/browser/actions/omnibox_pedal.h"
@@ -48,7 +47,6 @@
 #include "components/omnibox/browser/suggestion_answer.h"
 #include "components/omnibox/browser/vector_icons.h"
 #include "components/omnibox/common/omnibox_features.h"
-#include "components/omnibox/composebox/composebox_query.mojom.h"
 #include "components/search_engines/search_engines_switches.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_data.h"
@@ -77,24 +75,12 @@ class RealboxSearchBrowserTestPage : public searchbox::mojom::Page {
   void SetInputText(const std::string& input_text) override {}
   void SetThumbnail(const std::string& thumbnail_url,
                     bool is_deletable) override {}
-  void OnContextualInputStatusChanged(
-      const base::UnguessableToken& token,
-      contextual_search::ContextUploadStatus status,
-      std::optional<contextual_search::ContextUploadErrorType> error_type)
-      override {}
-  void OnInputStateChanged(const omnibox::InputState& input_state) override {}
-  void OnTabStripChanged() override {}
   void AddFileContext(
       const base::UnguessableToken& token,
       searchbox::mojom::SelectedFileInfoPtr file_info) override {}
-  void UpdateAutoSuggestedTabContext(
-      searchbox::mojom::TabInfoPtr tab_info,
-      const std::optional<std::string>& invocation_source) override {}
   void OnPermissionPromptChanged(bool is_showing,
                                  const gfx::Size& prompt_size) override {}
   MOCK_METHOD(void, UpdateContentSharingPolicy, (bool enabled), (override));
-  MOCK_METHOD(void, UpdateLensSearchEligibility, (bool eligible), (override));
-  MOCK_METHOD(void, UpdateAimPopupEligibility, (bool eligible), (override));
 #if !BUILDFLAG(IS_ANDROID)
   MOCK_METHOD(void, UpdateSmartTabSharingActive, (bool active), (override));
 #endif
@@ -103,22 +89,12 @@ class RealboxSearchBrowserTestPage : public searchbox::mojom::Page {
               (const std::vector<int32_t>& ids),
               (override));
   MOCK_METHOD(void,
-              SetAimThreadRestoredTabs,
-              (std::vector<searchbox::mojom::TabInfoPtr> tabs),
-              (override));
-  MOCK_METHOD(void,
               StepSelection,
               (searchbox::mojom::SelectionDirection,
                searchbox::mojom::SelectionStep),
               (override));
   MOCK_METHOD(void, OpenCurrentSelection, (WindowOpenDisposition), (override));
   MOCK_METHOD(void, ResetPopupToInitialState, (), (override));
-  MOCK_METHOD(void, SetAimButtonVisible, (bool visible), (override));
-  MOCK_METHOD(
-      void,
-      SetAimButtonConfig,
-      (const std::string&, const std::string&, const std::string&, const GURL&),
-      (override));
 
   mojo::PendingRemote<searchbox::mojom::Page> GetRemotePage() {
     return receiver_.BindNewPipeAndPassRemote();
@@ -149,11 +125,7 @@ class RealboxSearchPreloadBrowserTest : public SearchPrefetchBaseBrowserTest {
     RealboxSearchBrowserTestPage page;
     RealboxHandler realbox_handler = RealboxHandler(
         remote_page_handler.BindNewPipeAndPassReceiver(), page.GetRemotePage(),
-        browser()->GetProfile(), GetWebContents(),
-        base::BindLambdaForTesting(
-            []() -> contextual_search::ContextualSearchSessionHandle* {
-              return nullptr;
-            }));
+        browser()->GetProfile(), GetWebContents());
     content::test::PrerenderHostRegistryObserver registry_observer(
         *GetWebContents());
 
@@ -281,8 +253,7 @@ class RealboxHandlerTest : public InProcessBrowserTest,
  public:
   RealboxHandlerTest() {
     scoped_feature_list_.InitWithFeatures(
-        /*enabled_features*/ {omnibox::internal::kWebUIOmniboxPopup,
-                              omnibox::internal::kWebUIOmniboxAimPopup},
+        /*enabled_features*/ {omnibox::internal::kWebUIOmniboxPopup},
         /*disabled_features*/ {});
   }
 
@@ -299,11 +270,7 @@ class RealboxHandlerTest : public InProcessBrowserTest,
     handler_ = std::make_unique<RealboxHandlerPublic>(
         mojo::PendingReceiver<searchbox::mojom::PageHandler>(),
         page_.BindAndGetRemote(), browser()->GetProfile(),
-        /*web_contents=*/browser()->tab_strip_model()->GetActiveWebContents(),
-        base::BindLambdaForTesting(
-            []() -> contextual_search::ContextualSearchSessionHandle* {
-              return nullptr;
-            }));
+        /*web_contents=*/browser()->tab_strip_model()->GetActiveWebContents());
   }
 
   void TearDownOnMainThread() override { handler_.reset(); }

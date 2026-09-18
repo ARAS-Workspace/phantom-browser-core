@@ -34,10 +34,6 @@ namespace content {
 class BrowserContext;
 }  // namespace content
 
-namespace contextual_search {
-class ContextualSearchSessionHandle;
-}  // namespace contextual_search
-
 namespace ui {
 class TrackedElementHandler;
 }  // namespace ui
@@ -141,12 +137,8 @@ class WebUIBrowserUI : public ui::MojoWebUIController,
 
   // Lazily creates and returns a reference to the owned contextual search
   // session handle for `realbox_handler_`.
-  contextual_search::ContextualSearchSessionHandle*
-  GetOrCreateContextualSessionHandle();
 
   // Must outlive `realbox_handler_`.
-  std::unique_ptr<contextual_search::ContextualSearchSessionHandle>
-      session_handle_;
   std::unique_ptr<RealboxHandler> realbox_handler_;
   std::unique_ptr<WebUIBrowserBookmarkBarPageHandler>
       bookmark_bar_page_handler_;

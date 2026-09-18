@@ -523,6 +523,7 @@ if (!is_android) {
       "//components/infobars/content",
       "//components/lookalikes/core:safety_tips",
       "//components/page_load_metrics/browser:test_support",
+      "//components/pdf/browser:browser",
       "//components/safe_browsing/content/browser:safe_browsing_service",
       "//components/services/quarantine:test_support",
       "//content/public/browser",

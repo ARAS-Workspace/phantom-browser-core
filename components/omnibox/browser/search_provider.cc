@@ -35,7 +35,6 @@
 #include "components/history/core/browser/in_memory_database.h"
 #include "components/history/core/browser/keyword_search_term.h"
 #include "components/history/core/browser/keyword_search_term_util.h"
-#include "components/lens/lens_features.h"
 #include "components/omnibox/browser/autocomplete_enums.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
@@ -298,13 +297,6 @@ void SearchProvider::Start(const AutocompleteInput& input,
   // Ablate composebox warmup requests if the flag is enabled. Composebox does
   // not show any personalized requests and therefore warmup requests don't
   // add benefit.
-  if (omnibox::IsComposebox(input.current_page_classification()) &&
-      input.IsZeroSuggest() &&
-      base::FeatureList::IsEnabled(omnibox::kDisableComposeboxWarmupRequests)) {
-    Stop(AutocompleteStopReason::kClobbered);
-    return;
-  }
-
   keyword_input_ = input;
   const TemplateURL* keyword_provider =
       AutocompleteInput::GetSubstitutingTemplateURLForInput(model,
@@ -775,11 +767,6 @@ void SearchProvider::StartOrStopSuggestQuery(bool minimal_changes) {
   // Since there is currently no contextual search suggest or typed AI mode
   // suggest, lens contextual searchboxes and the composebox, shouldn't query
   // suggest and only the verbatim matches should be shown.
-  if (input_.current_page_classification() ==
-          OmniboxEventProto::CONTEXTUAL_SEARCHBOX &&
-      !lens::features::ShowContextualSearchboxSearchSuggest()) {
-    return;
-  }
   // Make sure the current query can be sent to at least one suggest service.
   // Don't send potentially private data to the default search provider. It's
   // okay to send potentially private data to a keyword suggest server, if any.
@@ -965,8 +952,6 @@ std::unique_ptr<network::SimpleURLLoader> SearchProvider::CreateSuggestLoader(
     search_term_args.prefetch_query_type =
         base::NumberToString(prefetch_data_.query_type);
   }
-  search_term_args.lens_overlay_suggest_inputs =
-      input.lens_overlay_suggest_inputs();
   search_term_args.input_state = input.input_state();
   search_term_args.previous_query = input.previous_query();
   search_term_args.suggest_inventory = input.suggest_inventory();

@@ -151,7 +151,6 @@ class NewTabPageHandler
   void SetModulesOrder(const std::vector<std::string>& module_ids) override;
   void GetModulesOrder(GetModulesOrderCallback callback) override;
   void UpdateModulesLoadable() override;
-  void UpdateActionChipsVisibility() override;
   void OnAppRendered(double time) override;
   void OnOneGoogleBarRendered(double time) override;
   void OnPromoRendered(double time,
@@ -168,11 +167,7 @@ class NewTabPageHandler
                       const std::string& doodle_id,
                       const std::optional<std::string>& share_id) override;
   void OnPromoLinkClicked() override;
-  void IncrementComposeButtonShownCount() override;
   void MaybeTriggerAutomaticCustomizeChromePromo() override;
-  void CanShowRealboxContextMenuAnimation(
-      CanShowRealboxContextMenuAnimationCallback callback) override;
-  void RecordRealboxContextMenuAnimationImpression(bool shown) override;
   void OnContextualSearchIPHEngaged() override;
 
  private:
@@ -221,7 +216,6 @@ class NewTabPageHandler
                         std::optional<std::string> body);
 
   ntp_tiles::TileType GetTileType() const;
-  bool IsActionChipsVisible() const;
   bool IsShortcutsVisible() const;
   void MaybeLaunchInteractionSurvey(std::string_view interaction,
                                     const std::string& module_id,

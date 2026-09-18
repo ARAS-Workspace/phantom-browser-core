@@ -77,15 +77,10 @@ import org.chromium.chrome.browser.browserservices.intents.WebappConstants;
 import org.chromium.chrome.browser.commerce.ShoppingServiceFactory;
 import org.chromium.chrome.browser.compositor.CompositorViewHolder;
 import org.chromium.chrome.browser.compositor.layouts.LayoutManagerImpl;
-import org.chromium.chrome.browser.compositor.overlay_panel.OverlayPanel;
 import org.chromium.chrome.browser.compositor.overlay_panel.OverlayPanelManager;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutHelperManager;
 import org.chromium.chrome.browser.contextmenu.ChromeContextMenuPopulator;
 import org.chromium.chrome.browser.contextmenu.ChromeContextMenuPopulatorFactory;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager.ContextualSearchTabPromotionDelegate;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManagerSupplier;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchObserver;
 import org.chromium.chrome.browser.crash.ChromePureJavaExceptionReporter;
 import org.chromium.chrome.browser.data_sharing.DataSharingTabManager;
 import org.chromium.chrome.browser.desktop_site.DesktopSiteUtils;
@@ -163,7 +158,6 @@ import org.chromium.chrome.browser.tab.AutofillSessionLifetimeController;
 import org.chromium.chrome.browser.tab.CurrentTabObserver;
 import org.chromium.chrome.browser.tab.EmptyTabObserver;
 import org.chromium.chrome.browser.tab.Tab;
-import org.chromium.chrome.browser.tab.TabLaunchType;
 import org.chromium.chrome.browser.tab.TabObscuringHandler;
 import org.chromium.chrome.browser.tab.TabObscuringHandlerSupplier;
 import org.chromium.chrome.browser.tab_ui.RecyclerViewPosition;
@@ -206,8 +200,6 @@ import org.chromium.chrome.browser.ui.edge_to_edge.EdgeToEdgeUtils;
 import org.chromium.chrome.browser.ui.edge_to_edge.EdgeToEdgeUtils.MissingNavbarInsetsReason;
 import org.chromium.chrome.browser.ui.edge_to_edge.TopInsetProvider;
 import org.chromium.chrome.browser.ui.edge_to_edge.TransitiveTopInsetProvider;
-import org.chromium.chrome.browser.ui.lens.LensOverlayCoordinator;
-import org.chromium.chrome.browser.ui.lens.LensOverlayInvocationSource;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
 import org.chromium.chrome.browser.ui.native_page.NativePage;
 import org.chromium.chrome.browser.ui.side_ui.SideUiStateProvider;
@@ -223,10 +215,7 @@ import org.chromium.components.browser_ui.accessibility.PageZoomManager;
 import org.chromium.components.browser_ui.accessibility.PageZoomManagerDelegate;
 import org.chromium.components.browser_ui.accessibility.ZoomEventsObserver;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
-import org.chromium.components.browser_ui.bottomsheet.BottomSheetController.SheetState;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetControllerFactory;
-import org.chromium.components.browser_ui.bottomsheet.BottomSheetObserver;
-import org.chromium.components.browser_ui.bottomsheet.EmptyBottomSheetObserver;
 import org.chromium.components.browser_ui.bottomsheet.ExpandedSheetHelper;
 import org.chromium.components.browser_ui.bottomsheet.ManagedBottomSheetController;
 import org.chromium.components.browser_ui.desktop_windowing.DesktopWindowStateManager;
@@ -252,7 +241,6 @@ import org.chromium.components.signin.SigninFeatures;
 import org.chromium.components.signin.metrics.SigninAccessPoint;
 import org.chromium.components.ukm.UkmRecorder;
 import org.chromium.content_public.browser.BrowserContextHandle;
-import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.content_public.browser.NavigationHandle;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.content_public.browser.WebContentsAccessibility;
@@ -261,7 +249,6 @@ import org.chromium.ui.base.ActivityWindowAndroid;
 import org.chromium.ui.base.DeviceFormFactor;
 import org.chromium.ui.base.IntentRequestTracker;
 import org.chromium.ui.base.MimeTypeUtils;
-import org.chromium.ui.base.PageTransition;
 import org.chromium.ui.display.DisplayAndroid;
 import org.chromium.ui.display.DisplayUtil;
 import org.chromium.ui.edge_to_edge.EdgeToEdgeManager;
@@ -290,16 +277,12 @@ public class RootUiCoordinator
                 NativeInitObserver,
                 MenuOrKeyboardActionController.MenuOrKeyboardActionHandler,
                 AppMenuBlocker,
-                ContextualSearchTabPromotionDelegate,
                 WindowFocusChangedObserver {
     private static final String TAG = "RootUiCoordinator";
     protected final NonNullObservableSupplier<TabObscuringHandler> mTabObscuringHandlerSupplier;
 
     private final SettableMonotonicObservableSupplier<DeviceLockActivityLauncher>
             mDeviceLockActivityLauncherSupplier = ObservableSuppliers.createMonotonic();
-
-    protected final SettableMonotonicObservableSupplier<ContextualSearchManager>
-            mContextualSearchManagerSupplier = ObservableSuppliers.createMonotonic();
 
     private final SettableMonotonicObservableSupplier<BottomSheetSigninAndHistorySyncCoordinator>
             mWebSigninAndHistorySyncCoordinatorSupplier = ObservableSuppliers.createMonotonic();
@@ -391,7 +374,6 @@ public class RootUiCoordinator
     protected final NullableObservableSupplier<BookmarkModel> mBookmarkModelSupplier;
     protected final MonotonicObservableSupplier<TabBookmarker> mTabBookmarkerSupplier;
     private final OneshotSupplierImpl<AppMenuCoordinator> mAppMenuSupplier;
-    private @Nullable BottomSheetObserver mBottomSheetObserver;
     protected final CallbackController mCallbackController;
     protected final BrowserControlsManager mBrowserControlsManager;
     private BrowserControlsStateProvider.@Nullable Observer mBrowserControlsObserver;
@@ -442,7 +424,6 @@ public class RootUiCoordinator
     protected final TopControlsStacker mTopControlsStacker;
     protected final @Nullable TopControlsLockCoordinator mTopControlsLockCoordinator;
     protected final NonNullObservableSupplier<Integer> mOverviewColorSupplier;
-    private @Nullable ContextualSearchObserver mReadAloudContextualSearchObserver;
     private PageZoomBarCoordinator mPageZoomBarCoordinator;
     private @Nullable CurrentTabObserver mReaderModeTabObserver;
     private @Nullable ReaderModeBottomSheetManager mReaderModeBottomSheetManager;
@@ -1067,9 +1048,6 @@ public class RootUiCoordinator
 
         ManagedBottomSheetController bottomSheetController = getBottomSheetController();
         if (bottomSheetController != null) {
-            if (mBottomSheetObserver != null) {
-                bottomSheetController.removeObserver(mBottomSheetObserver);
-            }
             BottomSheetControllerFactory.detach(bottomSheetController);
             bottomSheetController.destroy();
         }
@@ -1122,12 +1100,6 @@ public class RootUiCoordinator
         mReadAloudControllerSupplier.destroy();
         if (readAloudController != null) {
             readAloudController.destroy();
-        }
-
-        ContextualSearchManager contextualSearchManager = mContextualSearchManagerSupplier.get();
-        mContextualSearchManagerSupplier.destroy();
-        if (contextualSearchManager != null) {
-            contextualSearchManager.destroy();
         }
 
         BottomSheetSigninAndHistorySyncCoordinator webSigninAndHistorySyncCoordinator =
@@ -1226,7 +1198,6 @@ public class RootUiCoordinator
         TabObscuringHandlerSupplier.attach(userDataHost, mTabObscuringHandlerSupplier);
         DeviceLockActivityLauncherSupplier.attach(
                 userDataHost, mDeviceLockActivityLauncherSupplier);
-        ContextualSearchManagerSupplier.attach(userDataHost, mContextualSearchManagerSupplier);
         ReadAloudControllerSupplier.attach(userDataHost, mReadAloudControllerSupplier);
         BottomSheetSigninAndHistorySyncCoordinatorSupplier.attachForFlow(
                 userDataHost, mWebSigninAndHistorySyncCoordinatorSupplier, SupplierFlow.WEB_SIGNIN);
@@ -1242,7 +1213,6 @@ public class RootUiCoordinator
         // TabObscuringHandler doesn't have a destroy method.
         TabObscuringHandlerSupplier.destroy(mTabObscuringHandlerSupplier);
         DeviceLockActivityLauncherSupplier.destroy(mDeviceLockActivityLauncherSupplier);
-        ContextualSearchManagerSupplier.destroy(mContextualSearchManagerSupplier);
         ReadAloudControllerSupplier.destroy(mReadAloudControllerSupplier);
         BottomSheetSigninAndHistorySyncCoordinatorSupplier.destroyForFlow(
                 mWebSigninAndHistorySyncCoordinatorSupplier, SupplierFlow.WEB_SIGNIN);
@@ -1266,7 +1236,6 @@ public class RootUiCoordinator
     @Override
     public void onPostInflationStartup() {
         initAppMenu();
-        initBottomSheetObserver();
         initSnackbarObserver();
         initBrowserControlsObserver();
         var modalDialogManager = mModalDialogManagerSupplier.get();
@@ -1402,22 +1371,6 @@ public class RootUiCoordinator
                         mFullscreenManager,
                         getSideUiStateProviderSupplier());
         mReadAloudControllerSupplier.set(controller);
-        mReadAloudContextualSearchObserver =
-                new ContextualSearchObserver() {
-                    @Override
-                    public void onShowContextualSearch() {
-                        controller.maybeHidePlayer();
-                    }
-
-                    @Override
-                    public void onHideContextualSearch() {
-                        controller.maybeShowPlayer();
-                    }
-                };
-        ContextualSearchManager contextualSearchManager = mContextualSearchManagerSupplier.get();
-        if (contextualSearchManager != null) {
-            contextualSearchManager.addObserver(mReadAloudContextualSearchObserver);
-        }
         if (!ChromeFeatureList.sAndroidStartupImprovements.isEnabled()) {
             initReaderModeBottomSheetManager();
         } else {
@@ -1533,100 +1486,11 @@ public class RootUiCoordinator
         }
     }
 
-    protected boolean isContextualSearchEnabled() {
-        // Caution: this cannot return anything else. A lot of code implicitly assumes the
-        // mContextualSearchManager is always available.
-        // Only special cases can currently override this value - ones where no logic ever
-        // calls `assumeNonNull` on `mContextualSearchManagerSupplier`.
-        return true;
-    }
-
-    public void createContextualSearchManager(Profile profile) {
-        if (!isContextualSearchEnabled()) return;
-
-        mContextualSearchManagerSupplier.set(
-                new ContextualSearchManager(
-                        mActivity,
-                        profile,
-                        this,
-                        getScrimManager(),
-                        mActivityTabProvider,
-                        mFullscreenManager,
-                        mBrowserControlsManager,
-                        mWindowAndroid,
-                        mTabModelSelectorSupplier.asNonNull().get(),
-                        mEdgeToEdgeControllerSupplier));
-    }
-
-    public void initContextualSearchManager() {
-        var manager = mContextualSearchManagerSupplier.get();
-        if (manager == null) return;
-
-        int controlContainerHeightId = getControlContainerHeightResource();
-        float toolbarHeightDp =
-                controlContainerHeightId == ActivityUtils.NO_RESOURCE_ID
-                        ? 0f
-                        : mActivity.getResources().getDimension(controlContainerHeightId);
-
-        assert mLayoutManager != null;
-
-        manager.initialize(
-                mActivity.findViewById(android.R.id.content),
-                mLayoutManager,
-                mCompositorViewHolderSupplier.asNonNull().get(),
-                toolbarHeightDp,
-                assertNonNull(mToolbarManager),
-                canContextualSearchPromoteToNewTab(),
-                getDesktopWindowStateManager(),
-                mBottomControlsStacker);
-    }
-
-    public MonotonicObservableSupplier<ContextualSearchManager>
-            getContextualSearchManagerSupplier() {
-        return mContextualSearchManagerSupplier;
-    }
-
-    /** Whether contextual search panel is opened. */
-    public boolean isContextualSearchOpened() {
-        var manager = mContextualSearchManagerSupplier.get();
-        return manager != null && manager.isSearchPanelOpened();
-    }
-
-    /** Hide contextual search panel. */
-    public void hideContextualSearch() {
-        var manager = mContextualSearchManagerSupplier.get();
-        if (manager != null) {
-            manager.hideContextualSearch(OverlayPanel.StateChangeReason.UNKNOWN);
-        }
-    }
-
     /**
      * @return The resource id that contains how large the browser controls are.
      */
     public int getControlContainerHeightResource() {
         return ActivityUtils.NO_RESOURCE_ID;
-    }
-
-    protected boolean canContextualSearchPromoteToNewTab() {
-        return false;
-    }
-
-    @Override
-    public void createContextualSearchTab(String searchUrl) {
-        Tab currentTab = mActivityTabProvider.get();
-        if (currentTab == null) return;
-
-        TabCreator tabCreator =
-                mTabCreatorManagerSupplier
-                        .asNonNull()
-                        .get()
-                        .getTabCreator(currentTab.isIncognito());
-        if (tabCreator == null) return;
-
-        tabCreator.createNewTab(
-                new LoadUrlParams(searchUrl, PageTransition.LINK),
-                TabLaunchType.FROM_LINK,
-                mActivityTabProvider.get());
     }
 
     /** Handle post native initialization of features that require the Profile to be available. */
@@ -1928,14 +1792,6 @@ public class RootUiCoordinator
                 RecordUserAction.record("MobileShortcutFindInPage");
             }
             return true;
-        } else if (id == R.id.lens_overlay_menu_id) {
-            Tab tab = mActivityTabProvider.get();
-            if (tab != null && tab.getWebContents() != null) {
-                LensOverlayCoordinator.getOrCreateForTab(tab)
-                        .start(LensOverlayInvocationSource.APP_MENU);
-                RecordUserAction.record("MobileMenuLensOverlay");
-            }
-            return true;
         } else if (id == R.id.share_menu_id || id == R.id.direct_share_menu_id) {
             onShareMenuItemSelected(id == R.id.direct_share_menu_id);
             return true;
@@ -1989,14 +1845,8 @@ public class RootUiCoordinator
 
     @Override
     public boolean canShowAppMenu() {
-        // TODO(https:crbug.com/40613711): Eventually the ContextualSearchManager,
-        // EphemeralTabCoordinator, and FindToolbarManager will all be owned by this class.
-
-        // Do not show the menu if Contextual Search panel is opened.
-        var manager = mContextualSearchManagerSupplier.get();
-        if (manager != null && manager.isSearchPanelOpened()) {
-            return false;
-        }
+        // TODO(https:crbug.com/40613711): Eventually the EphemeralTabCoordinator and
+        // FindToolbarManager will all be owned by this class.
 
         // Do not show the menu if we are in find in page view.
         if (mFindToolbarManager != null
@@ -2302,16 +2152,6 @@ public class RootUiCoordinator
                 new LayoutStateObserver() {
                     @Override
                     public void onStartedShowing(int layoutType) {
-                        if (layoutType != LayoutType.BROWSING
-                                && layoutType != LayoutType.SIMPLE_ANIMATION) {
-                            // Hide contextual search.
-                            ContextualSearchManager contextualSearchManager =
-                                    mContextualSearchManagerSupplier.get();
-                            if (contextualSearchManager != null) {
-                                contextualSearchManager.dismissContextualSearchBar();
-                            }
-                        }
-
                         if (layoutType == LayoutType.HUB) {
                             // Hide find toolbar and app menu.
                             if (mFindToolbarManager != null) mFindToolbarManager.hideToolbar();
@@ -2462,10 +2302,6 @@ public class RootUiCoordinator
      * cross-feature interaction, e.g. hide other features when this feature is shown.
      */
     protected void onFindToolbarShown() {
-        ContextualSearchManager contextualSearchManager = mContextualSearchManagerSupplier.get();
-        if (contextualSearchManager != null) {
-            contextualSearchManager.hideContextualSearch(OverlayPanel.StateChangeReason.UNKNOWN);
-        }
     }
 
     /**
@@ -2756,43 +2592,6 @@ public class RootUiCoordinator
 
     public boolean getBookmarkBarVisibility() {
         return false;
-    }
-
-    /**
-     * Initializes a glue logic that suppresses Contextual Search and hides the Page Zoom slider
-     * while a Bottom Sheet feature is in action.
-     */
-    private void initBottomSheetObserver() {
-        ManagedBottomSheetController bottomSheetController = mBottomSheetControllerSupplier.get();
-        if (bottomSheetController == null) return;
-
-        mBottomSheetObserver =
-                new EmptyBottomSheetObserver() {
-                    private boolean mOpened;
-
-                    @Override
-                    public void onSheetStateChanged(int newState, int reason) {
-                        switch (newState) {
-                            case SheetState.PEEK:
-                            case SheetState.HALF:
-                            case SheetState.FULL:
-                                if (!mOpened) {
-                                    mOpened = true;
-                                    ContextualSearchManager manager =
-                                            mContextualSearchManagerSupplier.get();
-                                    if (manager != null) manager.onBottomSheetVisible(true);
-                                }
-                                break;
-                            case SheetState.HIDDEN:
-                                mOpened = false;
-                                ContextualSearchManager manager =
-                                        mContextualSearchManagerSupplier.get();
-                                if (manager != null) manager.onBottomSheetVisible(false);
-                                break;
-                        }
-                    }
-                };
-        bottomSheetController.addObserver(mBottomSheetObserver);
     }
 
     /** Initialize logic for hiding page zoom slider when snackbar is showing */

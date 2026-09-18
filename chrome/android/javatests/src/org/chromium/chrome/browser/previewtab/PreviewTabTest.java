@@ -24,7 +24,6 @@ import org.chromium.base.test.util.Feature;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.ChromeTabbedActivity;
 import org.chromium.chrome.browser.app.ChromeActivity;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager;
 import org.chromium.chrome.browser.ephemeraltab.EphemeralTabCoordinator;
 import org.chromium.chrome.browser.ephemeraltab.EphemeralTabObserver;
 import org.chromium.chrome.browser.ephemeraltab.EphemeralTabSheetContent;
@@ -252,34 +251,6 @@ public class PreviewTabTest {
                     endAnimations();
                 });
         Assert.assertEquals(SheetState.HIDDEN, bottomSheet.getSheetState());
-    }
-
-    /** Test preview tab suppresses contextual search. */
-    @Test
-    @MediumTest
-    @Feature({"PreviewTab"})
-    public void testSuppressContextualSearch() throws Throwable {
-        ChromeActivity activity = mActivityTestRule.getActivity();
-        ContextualSearchManager csManager = activity.getContextualSearchManagerForTesting();
-        Assert.assertFalse("Contextual Search should be active", csManager.isSuppressed());
-
-        ThreadUtils.runOnUiThreadBlocking(
-                () ->
-                        mEphemeralTabCoordinator.requestOpenSheet(
-                                new GURL(mActivityTestRule.getTestServer().getURL(PREVIEW_TAB)),
-                                null,
-                                "PreviewTab",
-                                mActivityTestRule.getProfile(false),
-                                /* canPromoteToNewTab= */ true,
-                                /* shouldHaveContextMenu= */ true,
-                                /* initiatorOrigin= */ null,
-                                () -> {}));
-        endAnimations();
-        Assert.assertTrue("The Preview Tab did not open", mEphemeralTabCoordinator.isOpened());
-        Assert.assertTrue("Contextual Search should be suppressed", csManager.isSuppressed());
-
-        closePreviewTab();
-        Assert.assertFalse("Contextual Search should be active", csManager.isSuppressed());
     }
 
     /** Test that the observer methods are being notified on events. */

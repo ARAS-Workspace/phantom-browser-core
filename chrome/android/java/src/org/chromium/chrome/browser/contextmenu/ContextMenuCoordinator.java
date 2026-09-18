@@ -145,7 +145,7 @@ public class ContextMenuCoordinator implements ContextMenuUi, FlyoutHandler<Cont
      * <p>This method handles the setup and display of the context menu, including: - Determining
      * whether to use a popup window or a full-screen dialog. - Adjusting the layout for features
      * like "interesttarget", which may reserve screen space. - Inflating and populating the menu
-     * with items. - Optionally displaying a chip (e.g., for Google Lens) if a {@link ChipDelegate}
+     * with items. - Optionally displaying a chip if a {@link ChipDelegate}
      * is provided and conditions are met. - Setting up listeners for menu events (shown, closed,
      * item clicks). - Observing WebContents for events that should dismiss the menu (navigation,
      * visibility change).

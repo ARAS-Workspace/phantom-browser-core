@@ -122,9 +122,6 @@ class OmniboxEverywhereUIManager : public views::WidgetObserver,
   void OnFileChooserOpened();
   void OnFileChooserClosed();
 
-  void OnDrivePickerOpened();
-  void OnDrivePickerClosed();
-
   void OnScreensharePickerOpened();
   void OnScreensharePickerClosed();
 
@@ -153,9 +150,6 @@ class OmniboxEverywhereUIManager : public views::WidgetObserver,
   }
   bool is_file_chooser_open_for_testing() const {
     return is_file_chooser_open_;
-  }
-  bool is_drive_picker_open_for_testing() const {
-    return is_drive_picker_open_;
   }
   bool is_screenshare_picker_open_for_testing() const {
     return is_screenshare_picker_open_;
@@ -205,7 +199,6 @@ class OmniboxEverywhereUIManager : public views::WidgetObserver,
   std::unique_ptr<views::Widget> widget_;
 
   bool is_file_chooser_open_ = false;
-  bool is_drive_picker_open_ = false;
   bool is_context_menu_open_ = false;
   bool is_screenshare_picker_open_ = false;
   bool is_dragging_ = false;

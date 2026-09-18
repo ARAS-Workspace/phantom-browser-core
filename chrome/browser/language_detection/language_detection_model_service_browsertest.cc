@@ -166,8 +166,7 @@ class LanguageDetectionModelServiceBrowserTest : public InProcessBrowserTest {
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
         // is enabled and then remove the two omnibox features below.
         /*disabled_features=*/
-        {omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+        {omnibox::internal::kWebUIOmniboxPopup});
   }
 
   void SetUp() override {
@@ -256,8 +255,7 @@ class LanguageDetectionModelServiceWithoutOptimizationGuideBrowserTest
         // is enabled and then remove the two omnibox features below.
         /*disabled_features=*/
         {optimization_guide::features::kOptimizationHints,
-         omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+         omnibox::internal::kWebUIOmniboxPopup});
   }
 
   ~LanguageDetectionModelServiceWithoutOptimizationGuideBrowserTest() override =

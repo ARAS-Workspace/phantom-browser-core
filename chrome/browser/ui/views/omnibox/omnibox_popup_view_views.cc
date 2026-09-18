@@ -55,42 +55,6 @@ namespace {
 //  2. The widget is positioned on the far right of the content area.
 //  3. The top of the results aligns with the top of the content area.
 // Returns std::nullopt if the bounds could not be determined.
-std::optional<gfx::Rect> GetDebugWidgetBounds(
-    LocationBarView* location_bar_view,
-    int popup_results_height) {
-  Browser* browser = location_bar_view->browser();
-  if (!browser) {
-    return std::nullopt;
-  }
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
-  if (!browser_view || !browser_view->contents_web_view()) {
-    return std::nullopt;
-  }
-
-  gfx::Rect contents_bounds =
-      browser_view->contents_web_view()->GetBoundsInScreen();
-  int frame_width = contents_bounds.width() / 2;
-  int frame_height = popup_results_height;
-
-  gfx::Rect frame_bounds;
-  frame_bounds.set_width(frame_width);
-  frame_bounds.set_height(frame_height);
-
-  // Calculate the frame's X position so the widget's right edge aligns with the
-  // content area's right edge.
-  const gfx::Insets shadow_insets =
-      RoundedOmniboxResultsFrame::GetShadowInsets();
-  frame_bounds.set_x(contents_bounds.right() - shadow_insets.right() -
-                     frame_width);
-
-  // Calculate the frame's Y position so the top of the results area
-  // (frame_y + non_result_height) aligns with the content area's top.
-  frame_bounds.set_y(contents_bounds.y() -
-                     RoundedOmniboxResultsFrame::GetNonResultSectionHeight());
-
-  return frame_bounds;
-}
-
 }  // namespace
 
 class OmniboxPopupViewViews::PopupWidget final : public ThemeCopyingWidget {
@@ -330,11 +294,8 @@ void OmniboxPopupViewViews::InvalidateLine(size_t line) {
 
 void OmniboxPopupViewViews::UpdatePopupAppearance() {
   const auto* autocomplete_controller = controller()->autocomplete_controller();
-  const bool should_be_open =
-      controller()->popup_state_manager()->popup_state() !=
-          OmniboxPopupState::kAim &&
-      !autocomplete_controller->result().empty() &&
-      !omnibox_view_->IsImeShowingPopup();
+  const bool should_be_open = !autocomplete_controller->result().empty() &&
+                              !omnibox_view_->IsImeShowingPopup();
   const bool was_open = !!widget_;
 
   if (!should_be_open) {
@@ -354,8 +315,7 @@ void OmniboxPopupViewViews::UpdatePopupAppearance() {
       // Do this AFTER widget operations. `LocationBarView` is subscribed to
       // state changes and attempts to call `UpdatePopupAppearance()` again if
       // the widget is open.
-      // Only update the state if it's currently `kClassic`. If it's already
-      // transitioning to another state (e.g., `kAim`), don't override it.
+      // Only update the state if it's currently `kClassic`.
       if (controller()->popup_state_manager()->popup_state() ==
           OmniboxPopupState::kClassic) {
         controller()->popup_state_manager()->SetPopupState(
@@ -743,16 +703,6 @@ gfx::Rect OmniboxPopupViewViews::GetTargetBounds() const {
   content_rect.Inset(
       -RoundedOmniboxResultsFrame::GetLocationBarAlignmentInsets());
   content_rect.set_height(popup_height);
-
-  if (omnibox::IsWebUIOmniboxPopupEnabled() &&
-      !omnibox::IsWebUIOmniboxFullPopupEnabled() &&
-      !omnibox::IsAimPopupFeatureEnabled() &&
-      base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxPopupDebug) &&
-      omnibox::kWebUIOmniboxPopupDebugSxSParam.Get()) {
-    if (auto bounds = GetDebugWidgetBounds(location_bar_view_, popup_height)) {
-      content_rect = *bounds;
-    }
-  }
 
   // Finally, expand the widget to accommodate the custom-drawn shadows.
   content_rect.Inset(-RoundedOmniboxResultsFrame::GetShadowInsets());

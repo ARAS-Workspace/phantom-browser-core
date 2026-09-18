@@ -167,8 +167,7 @@ class VerticalTabDragTest
   const std::vector<base::test::FeatureRef> GetDisabledFeatures() override {
     // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox is
     // enabled and then remove this.
-    return {omnibox::internal::kWebUIOmniboxPopup,
-            omnibox::internal::kWebUIOmniboxAimPopup};
+    return {omnibox::internal::kWebUIOmniboxPopup};
   }
 
  protected:

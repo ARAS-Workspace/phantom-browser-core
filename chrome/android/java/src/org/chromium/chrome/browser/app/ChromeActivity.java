@@ -115,7 +115,6 @@ import org.chromium.chrome.browser.compositor.layouts.Layout;
 import org.chromium.chrome.browser.compositor.layouts.LayoutManagerImpl;
 import org.chromium.chrome.browser.compositor.layouts.SceneChangeObserver;
 import org.chromium.chrome.browser.compositor.layouts.content.TabContentManagerHandler;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager;
 import org.chromium.chrome.browser.customtabs.PopupCreatorFactory;
 import org.chromium.chrome.browser.desktop_site.DesktopSiteUtils;
 import org.chromium.chrome.browser.device.DeviceClassManager;
@@ -644,7 +643,7 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
                             () -> mRootUiCoordinator.getAppBrowserControlsVisibilityDelegate(),
                             this::getTabObscuringHandler,
                             mRootUiCoordinator.getToolbarManagerSupplier(),
-                            mRootUiCoordinator::hideContextualSearch,
+                            () -> {},
                             getTabModelSelectorSupplier(),
                             this::getBrowserControlsManager,
                             this::getFullscreenManager,
@@ -1089,7 +1088,6 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
         assert windowAndroid != null;
         assumeNonNull(mCompositorViewHolderSupplier.get())
                 .onNativeLibraryReady(windowAndroid, getTabContentManager(), prefs);
-        mRootUiCoordinator.createContextualSearchManager(originalProfile);
         TraceEvent.end("ChromeActivity:CompositorInitialization");
     }
 
@@ -2369,7 +2367,7 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
                         windowAndroid,
                         profileProvider.getOriginalProfile(),
                         mRootUiCoordinator.getBottomSheetController(),
-                        mRootUiCoordinator::isContextualSearchOpened,
+                        () -> false,
                         (ChromeKeyboardVisibilityDelegate) windowAndroid.getKeyboardDelegate(),
                         mBackPressManager,
                         mEdgeToEdgeControllerSupplier,
@@ -2665,7 +2663,6 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
         }
 
         mActivityTabProvider.setLayoutStateProvider(layoutManager);
-        mRootUiCoordinator.initContextualSearchManager();
     }
 
     /**
@@ -3419,10 +3416,6 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
 
     public RootUiCoordinator getRootUiCoordinatorForTesting() {
         return mRootUiCoordinator;
-    }
-
-    public @Nullable ContextualSearchManager getContextualSearchManagerForTesting() {
-        return mRootUiCoordinator.getContextualSearchManagerSupplier().get();
     }
 
     public ReadAloudController getReadAloudControllerForTesting() {

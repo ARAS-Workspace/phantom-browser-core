@@ -22,14 +22,12 @@ import org.chromium.base.Callback;
 import org.chromium.base.CallbackController;
 import org.chromium.base.ObserverList;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
-import org.chromium.base.supplier.NullableObservableSupplier;
 import org.chromium.build.annotations.EnsuresNonNullIf;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.browser_controls.BottomControlsStacker;
 import org.chromium.chrome.browser.browser_controls.BrowserControlsStateProvider;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager;
 import org.chromium.chrome.browser.fullscreen.FullscreenManager;
 import org.chromium.chrome.browser.fullscreen.FullscreenOptions;
 import org.chromium.chrome.browser.keyboard_accessory.ManualFillingComponent;
@@ -126,8 +124,6 @@ class TabbedNavigationBarColorController
      *     checking the state of the bottom browser controls.
      * @param browserControlsStateProvider A {@link BrowserControlsStateProvider} to watch for
      *     changes to the browser controls.
-     * @param contextualSearchManagerSupplier Supplies a {@link ContextualSearchManager} to watch
-     *     for changes to contextual search and the overlay panel.
      * @param bottomSheetController A {@link BottomSheetController} to interact with and watch for
      *     changes to the bottom sheet.
      * @param omniboxSuggestionsVisualState An optional {@link OmniboxSuggestionsVisualState} for
@@ -146,7 +142,6 @@ class TabbedNavigationBarColorController
             MonotonicObservableSupplier<EdgeToEdgeController> edgeToEdgeControllerSupplier,
             BottomControlsStacker bottomControlsStacker,
             BrowserControlsStateProvider browserControlsStateProvider,
-            NullableObservableSupplier<ContextualSearchManager> contextualSearchManagerSupplier,
             BottomSheetController bottomSheetController,
             @Nullable OmniboxSuggestionsVisualState omniboxSuggestionsVisualState,
             @Nullable ManualFillingComponent manualFillingComponent,
@@ -165,7 +160,6 @@ class TabbedNavigationBarColorController
                         context,
                         bottomControlsStacker,
                         browserControlsStateProvider,
-                        contextualSearchManagerSupplier,
                         bottomSheetController,
                         omniboxSuggestionsVisualState,
                         manualFillingComponent,

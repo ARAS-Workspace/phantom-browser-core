@@ -690,11 +690,9 @@ class StorageAccessAPIOriginIsolationBrowserTest
     // enabled and then remove the two omnibox Features below.
     if (!GetParam()) {
       return {features::kOriginKeyedProcessesByDefault,
-              omnibox::internal::kWebUIOmniboxPopup,
-              omnibox::internal::kWebUIOmniboxAimPopup};
+              omnibox::internal::kWebUIOmniboxPopup};
     }
-    return {omnibox::internal::kWebUIOmniboxPopup,
-            omnibox::internal::kWebUIOmniboxAimPopup};
+    return {omnibox::internal::kWebUIOmniboxPopup};
   }
 };
 

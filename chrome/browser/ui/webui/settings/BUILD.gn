@@ -164,7 +164,6 @@ source_set("impl") {
     "//chrome/browser/browsing_data:constants",
     "//chrome/browser/content_settings",
     "//chrome/browser/content_settings:content_settings_util",
-    "//chrome/browser/contextual_tasks",
     "//chrome/browser/custom_handlers",
     "//chrome/browser/dictation",
     "//chrome/browser/engagement",

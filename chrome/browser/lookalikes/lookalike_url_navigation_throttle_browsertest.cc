@@ -252,8 +252,7 @@ class LookalikeUrlNavigationThrottleBrowserTest : public InProcessBrowserTest {
     // TODO(b:507481593): Some tests are failing when enabling these features.
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features*/ {},
-        /*disabled_features*/ {omnibox::internal::kWebUIOmniboxPopup,
-                               omnibox::internal::kWebUIOmniboxAimPopup});
+        /*disabled_features*/ {omnibox::internal::kWebUIOmniboxPopup});
     InProcessBrowserTest::SetUp();
   }
 

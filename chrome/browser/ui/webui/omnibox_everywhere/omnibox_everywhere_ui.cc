@@ -6,9 +6,7 @@
 
 #include "base/feature_list.h"
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/contextual_search/contextual_search_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
 #include "chrome/browser/profiles/profile_attributes_storage.h"
@@ -23,8 +21,6 @@
 #include "chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.h"
 #include "chrome/browser/ui/webui/favicon_source.h"
 #include "chrome/browser/ui/webui/metrics_reporter/metrics_reporter_service.h"
-#include "chrome/browser/ui/webui/new_tab_page/composebox/variations/composebox_fieldtrial.h"
-#include "chrome/browser/ui/webui/omnibox_everywhere/composebox_everywhere_handler.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/debug/omnibox_everywhere_debug_page_handler.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_handler.h"
 #include "chrome/browser/ui/webui/plural_string_handler.h"
@@ -33,12 +29,7 @@
 #include "chrome/grit/generated_resources.h"
 #include "chrome/grit/omnibox_everywhere_resources.h"
 #include "chrome/grit/omnibox_everywhere_resources_map.h"
-#include "components/contextual_search/contextual_search_metrics_recorder.h"
-#include "components/contextual_search/contextual_search_service.h"
 #include "components/favicon_base/favicon_url_parser.h"
-#include "components/lens/lens_features.h"
-#include "components/omnibox/browser/aim_eligibility_service.h"
-#include "components/omnibox/common/composebox_features.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/search/ntp_features.h"
 #include "components/strings/grit/components_strings.h"
@@ -51,18 +42,6 @@
 #include "ui/webui/webui_util.h"
 
 namespace {
-
-bool IsAimEligible(Profile* profile) {
-  auto* aim_eligibility_service =
-      AimEligibilityServiceFactory::GetForProfile(profile);
-  return aim_eligibility_service && aim_eligibility_service->IsAimEligible();
-}
-
-bool IsFuseboxEligible(Profile* profile) {
-  return IsAimEligible(profile) &&
-         AimEligibilityServiceFactory::GetForProfile(profile)
-             ->IsFuseboxEligible();
-}
 
 void AddMostVisitedSourceStrings(content::WebUIDataSource* source) {
   source->AddBoolean("omniboxEverywhereMostVisitedEnabled",
@@ -202,18 +181,12 @@ OmniboxEverywhereUI::OmniboxEverywhereUI(content::WebUI* web_ui)
       profile_, std::make_unique<FaviconSource>(
                     profile_, chrome::FaviconUrlFormat::kFavicon2));
 
-  bool session_allows_drag_and_drop = false;
-  if (auto* session_handle = GetOrCreateContextualSessionHandle()) {
-    session_allows_drag_and_drop =
-        session_handle->CheckSearchContentSharingSettings(profile_->GetPrefs());
-  }
-
   // Configure WebUIDataSource dictionary
   source->AddLocalizedStrings(SearchboxHandler::GetWebUIDataSourceDict(
       profile_,
       {.enable_voice_search = true,
        .enable_lens_search = true,
-       .session_allows_drag_and_drop = session_allows_drag_and_drop}));
+       .session_allows_drag_and_drop = false}));
 
   source->AddBoolean("isTopChromeSearchbox", false);
   source->AddBoolean(
@@ -227,83 +200,22 @@ OmniboxEverywhereUI::OmniboxEverywhereUI(content::WebUI* web_ui)
       "resultChangedToPaintMetricName",
       "Omnibox.Popup.WebUI.ResultChangedToRepaintLatency.ToPaint");
 
-  // Add composebox data.
-  auto composebox_config = omnibox::FeatureConfig::Get().config.composebox();
-  const std::string attachment_mime_types =
-      composebox_config.attachment_upload().mime_types_allowed();
-  source->AddString("composeboxAttachmentFileTypes", attachment_mime_types);
-  source->AddInteger("composeboxFileMaxSize",
-                     composebox_config.attachment_upload().max_size_bytes());
-  const std::string image_mime_types =
-      composebox_config.image_upload().mime_types_allowed();
-  source->AddString("composeboxImageFileTypes", image_mime_types);
-  source->AddBoolean("lensSendRawFileMediaTypesEnabled",
-                     lens::features::IsLensSendRawFileMediaTypesEnabled());
   source->AddBoolean(
       "caretAnimationEnabled",
       base::FeatureList::IsEnabled(omnibox::kOmniboxAnimatedCaret));
-  source->AddBoolean("composeboxContextMenuEnableMultiTabSelection",
-                     omnibox::kContextMenuEnableMultiTabSelection.Get());
-  source->AddBoolean("composeboxShowContextMenu",
-                     omnibox::kShowContextMenu.Get());
-  source->AddBoolean(
-      "composeboxShowContextMenuDescription",
-      omnibox::kShowContextMenuDescription.Get() &&
-          omnibox::kWebUIOmniboxAimPopupAddContextButtonVariantParam.Get() !=
-              omnibox::AddContextButtonVariant::kInline);
-  source->AddBoolean("composeboxShowContextMenuTabPreviews",
-                     omnibox::kShowContextMenuTabPreviews.Get());
-  source->AddBoolean("composeboxShowImageSuggest",
-                     omnibox::kShowComposeboxImageSuggestions.Get());
 
   AddMostVisitedSourceStrings(source);
 
-  source->AddBoolean("searchboxShowComposeEntrypoint", IsAimEligible(profile_));
-  source->AddBoolean("isFuseboxEnabled", IsFuseboxEligible(profile_));
-  source->AddBoolean("ntpRealboxDynamicAiModeButton",
-                     IsFuseboxEligible(profile_) &&
-                         base::FeatureList::IsEnabled(
-                             ntp_realbox::kNtpRealboxDynamicAiModeButton));
-  source->AddBoolean("composeboxShowTypedSuggest",
-                     omnibox::kShowComposeboxTypedSuggest.Get());
-  source->AddBoolean("composeboxShowZps", omnibox::kShowComposeboxZps.Get());
-  source->AddBoolean("composeboxSmartComposeEnabled",
-                     omnibox::kShowSmartCompose.Get());
+  source->AddBoolean("isFuseboxEnabled", false);
   source->AddBoolean("webuiOmniboxSimplificationEnabled",
                      base::FeatureList::IsEnabled(
                          omnibox::internal::kWebUIOmniboxSimplification));
-  source->AddBoolean(
-      "contextManagementInComposeboxEnabled",
-      base::FeatureList::IsEnabled(omnibox::kContextManagementInComposebox) &&
-          base::FeatureList::IsEnabled(omnibox::kContextManagementInOmnibox));
-  source->AddBoolean(
-      "tabFaviconChipsToCoinsEnabled",
-      base::FeatureList::IsEnabled(omnibox::kContextManagementInComposebox) &&
-          base::FeatureList::IsEnabled(omnibox::kContextManagementInOmnibox) &&
-          base::FeatureList::IsEnabled(omnibox::kTabFaviconChipsToCoins));
-  source->AddBoolean(
-      "composeboxSkillsEnabled",
-      base::FeatureList::IsEnabled(omnibox::kComposeboxSkillsOmniboxEverywhere));
-
   source->AddString("searchboxLayoutMode", "TallBottomContext");
-  source->AddString(
-      "composeboxSource",
-      contextual_search::ContextualSearchMetricsRecorder::
-          ContextualSearchSourceToString(
-              contextual_search::ContextualSearchSource::kOmniboxEverywhere));
   source->AddBoolean("caretColorAnimationDisabled",
                      base::FeatureList::IsEnabled(
                          omnibox::kWebUIOmniboxDisableCaretColorAnimation));
-  source->AddBoolean("composeboxAnimationDisabled",
-                     base::FeatureList::IsEnabled(
-                         omnibox::kWebUIOmniboxAimPopupDisableAnimation));
-  // Disable the energy effect for the searchbox in Omnibox Everywhere so the
-  // AIM compose button renders the outer conic rainbow glow animation instead
-  // of the energy effect. The composebox explicitly enables energy effect for
-  // its own expanding glow animation.
   source->AddBoolean("energyEffectEnabled", false);
   source->AddBoolean("energyEffectAnimationEnabled", false);
-  source->AddBoolean("composeboxEnergyEffectAnimationEnabled", true);
   source->AddBoolean("contextButtonShapeIsOblong",
                      omnibox::kContextButtonShapeIsOblong.Get());
 
@@ -315,35 +227,6 @@ OmniboxEverywhereUI::OmniboxEverywhereUI(content::WebUI* web_ui)
 }
 
 OmniboxEverywhereUI::~OmniboxEverywhereUI() = default;
-
-void OmniboxEverywhereUI::BindInterface(
-    mojo::PendingReceiver<composebox::mojom::PageHandlerFactory> receiver) {
-  if (!omnibox::IsOmniboxEverywhereEnabled(profile_)) {
-    return;
-  }
-  if (composebox_page_factory_receiver_.is_bound()) {
-    composebox_page_factory_receiver_.reset();
-  }
-  composebox_page_factory_receiver_.Bind(std::move(receiver));
-}
-
-void OmniboxEverywhereUI::CreatePageHandler(
-    mojo::PendingReceiver<composebox::mojom::PageHandler> pending_page_handler,
-    mojo::PendingRemote<searchbox::mojom::Page> pending_searchbox_page,
-    mojo::PendingReceiver<searchbox::mojom::PageHandler>
-        pending_searchbox_handler) {
-  // TODO(crbug.com/526629960): Create new EverywhereComposeboxHandler or allow
-  // the ComposeboxHandler to parameterize the OmniboxClient.
-  composebox_handler_ = std::make_unique<ComposeboxEverywhereHandler>(
-      std::move(pending_page_handler), std::move(pending_searchbox_handler),
-      std::move(pending_searchbox_page), profile_, web_ui()->GetWebContents(),
-      base::BindRepeating(
-          &OmniboxEverywhereUI::GetOrCreateContextualSessionHandle,
-          base::Unretained(this)),
-      base::BindRepeating(&OmniboxEverywhereUI::ClearContextualSessionHandle,
-                          base::Unretained(this)),
-      this);
-}
 
 void OmniboxEverywhereUI::BindInterface(
     content::RenderFrameHost* host,
@@ -368,26 +251,7 @@ void OmniboxEverywhereUI::CreatePageHandler(
       MetricsReporterService::GetFromWebContents(web_ui()->GetWebContents());
   omnibox_handler_ = std::make_unique<OmniboxEverywhereHandler>(
       std::move(pending_page_handler), std::move(page),
-      metrics_reporter_service->metrics_reporter(), web_ui(), service,
-      base::BindRepeating(
-          &OmniboxEverywhereUI::GetOrCreateContextualSessionHandle,
-          base::Unretained(this)),
-      this);
-}
-
-void OmniboxEverywhereUI::OnScreensharePickerOpened() {
-  if (auto* service =
-          OmniboxEverywhereServiceFactory::GetForProfile(profile_)) {
-    service->OnScreensharePickerOpened();
-    service->HidePopup();
-  }
-}
-
-void OmniboxEverywhereUI::OnScreensharePickerClosed() {
-  if (auto* service =
-          OmniboxEverywhereServiceFactory::GetForProfile(profile_)) {
-    service->OnScreensharePickerClosed();
-  }
+      metrics_reporter_service->metrics_reporter(), web_ui(), service);
 }
 
 void OmniboxEverywhereUI::BindInterface(
@@ -430,27 +294,6 @@ void OmniboxEverywhereUI::CreatePageHandler(
       std::make_unique<MostVisitedMetricsLogger>("Omnibox"));
   most_visited_pref_observer_ = std::make_unique<MostVisitedPrefObserver>(
       profile_, most_visited_handler_.get());
-}
-
-contextual_search::ContextualSearchSessionHandle*
-OmniboxEverywhereUI::GetOrCreateContextualSessionHandle() {
-  if (!shared_session_handle_) {
-    auto* contextual_search_service =
-        ContextualSearchServiceFactory::GetForProfile(profile_);
-    if (contextual_search_service) {
-      shared_session_handle_ = contextual_search_service->CreateSession(
-          omnibox::CreateQueryControllerConfigParams(),
-          contextual_search::ContextualSearchSource::kOmniboxEverywhere,
-          lens::LensOverlayInvocationSource::kOmniboxEverywhereComposebox);
-      shared_session_handle_->CheckSearchContentSharingSettings(
-          profile_->GetPrefs());
-    }
-  }
-  return shared_session_handle_.get();
-}
-
-void OmniboxEverywhereUI::ClearContextualSessionHandle() {
-  shared_session_handle_.reset();
 }
 
 WEB_UI_CONTROLLER_TYPE_IMPL(OmniboxEverywhereUI)

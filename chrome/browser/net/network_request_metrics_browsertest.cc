@@ -120,8 +120,7 @@ class NetworkRequestMetricsBrowserTest
     // samples in the test's histograms.
     scoped_feature_list_.InitWithFeatures(
         {}, {features::kInitialWebUI, features::kWebUIReloadButton,
-             omnibox::internal::kWebUIOmniboxPopup,
-             omnibox::internal::kWebUIOmniboxAimPopup});
+             omnibox::internal::kWebUIOmniboxPopup});
   }
   ~NetworkRequestMetricsBrowserTest() override = default;
 

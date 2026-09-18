@@ -27,7 +27,6 @@
 #include "chrome/test/base/interactive_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
-#include "components/lens/lens_features.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_navigation_observer.h"
@@ -126,19 +125,12 @@ MATCHER(IsChipCollapsed, "Check if the chip is collapsed") {
 class PageActionUiTestBase {
  public:
   PageActionUiTestBase() {
-    // TODO(crbug.com/424806660): These tests should not be reliant on
-    // kLensOverlayOmniboxEntryPoint being enabled, but disabling it causes them
-    // to fail.
     // TODO(crbug.com/482339938): SuggestionChipReordersMultipleActions is
     // failing when kPageActionsPrioritySelector is enabled, since those 2 chips
     // are no longer allowed to show at the same time.
     feature_list_.InitWithFeaturesAndParameters(
-        /*enabled_features=*/
-        {
-            {lens::features::kLensOverlayOmniboxEntryPoint, {}},
-        },
+        /*enabled_features=*/{},
         /*disabled_features=*/{
-            lens::features::kLensOverlay,
             features::kPageActionsPrioritySelector,
         });
   }

@@ -170,13 +170,6 @@ BASE_FEATURE(kNtpOutlookCalendarModule,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif
 
-// If enabled, scaled merchandising action chips (e.g., dynamic tool
-// suggestions and resource pickers) will be shown on the NTP.
-BASE_FEATURE(kNtpScaledActionChips, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, scaled merchandising action chips will be in a smaller format.
-BASE_FEATURE(kNtpScaledActionChipsSmall, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // If enabled, sharepoint module will be shown.
 BASE_FEATURE(kNtpSharepointModule,
 #if BUILDFLAG(IS_ANDROID)
@@ -392,22 +385,6 @@ const base::FeatureParam<bool> kNtpNextDisablementContextMenuParam(
 const base::FeatureParam<bool> kNtpNextDisablementParam(
     &ntp_features::kNtpNextFeatures,
     "NtpNextDisablementParam",
-    false);
-const base::FeatureParam<bool> kAddTabUploadDelayOnActionChipClick(
-    &ntp_features::kNtpNextFeatures,
-    "AddTabUploadDelayOnActionChipClick",
-    false);
-const base::FeatureParam<int> kNtpMaxSmallChips(
-    &ntp_features::kNtpScaledActionChipsSmall,
-    "kNtpMaxSmallChips",
-    6);
-const base::FeatureParam<bool> kNtpScaledActionChipsSmallInTestMode(
-    &ntp_features::kNtpScaledActionChipsSmall,
-    "kNtpScaledActionChipsSmallInTestMode",
-    false);
-const base::FeatureParam<bool> kNtpScaledActionChipsShowFallback(
-    &ntp_features::kNtpScaledActionChips,
-    "kNtpScaledActionChipsShowFallback",
     false);
 
 const base::FeatureParam<int> kNtpCustomizeChromeAutoShownMaxCount(

@@ -33,7 +33,6 @@
 #include "chrome/browser/autocomplete/chrome_autocomplete_provider_client.h"
 #include "chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.h"
 #include "chrome/browser/autocomplete/shortcuts_backend_factory.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_utils.h"
 #include "chrome/browser/omnibox/autocomplete_controller_emitter_factory.h"
 #include "chrome/browser/page_load_metrics/chrome_initiator_location.h"
 #include "chrome/browser/predictors/autocomplete_action_predictor.h"
@@ -62,7 +61,6 @@
 #include "components/omnibox/browser/geolocation_header_service.h"
 #include "components/omnibox/browser/history_fuzzy_provider.h"
 #include "components/omnibox/browser/keyword_provider.h"
-#include "components/omnibox/browser/lens_suggest_inputs_utils.h"
 #include "components/omnibox/browser/omnibox_event_global_tracker.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/omnibox_log.h"
@@ -201,11 +199,6 @@ void AutocompleteControllerAndroid::Start(
     AndroidComposeboxNonZPSSection::num_attachments_ =
         bridge->GetAttachmentCount();
 
-    std::unique_ptr<lens::proto::LensOverlaySuggestInputs> inputs =
-        bridge->CreateLensOverlaySuggestInputs();
-    if (AreLensSuggestInputsReady(*inputs)) {
-      input_.set_lens_overlay_suggest_inputs(std::move(inputs));
-    }
     omnibox::InputState input_state;
     input_state.active_tool = tool_mode;
     input_.set_input_state(input_state);
@@ -319,14 +312,6 @@ void AutocompleteControllerAndroid::OnOmniboxFocused(
         bridge->GetAttachmentCount();
     AndroidComposeboxNonZPSSection::tool_mode_ = tool_mode;
 
-    std::unique_ptr<lens::proto::LensOverlaySuggestInputs> inputs =
-        bridge->CreateLensOverlaySuggestInputs();
-    // Don't set lens params if in "Create Image" mode. This prevents the
-    // contextual client from being used in this tool mode.
-    if (AreLensSuggestInputsReady(*inputs) &&
-        tool_mode != omnibox::TOOL_MODE_IMAGE_GEN_UPLOAD) {
-      input_.set_lens_overlay_suggest_inputs(std::move(inputs));
-    }
     omnibox::InputState input_state;
     input_state.active_tool = tool_mode;
     input_.set_input_state(input_state);
@@ -688,19 +673,6 @@ void AutocompleteControllerAndroid::WarmUpRenderProcess() const {
 
 void AutocompleteControllerAndroid::PostProcessResult(
     AutocompleteResult& result) {
-  if (auto* web_contents = GetContextualTasksWebContents()) {
-    for (auto& match : result) {
-      if (contextual_tasks::IsContextualTasksUrl(match.destination_url)) {
-        GURL pretty_url =
-            contextual_tasks::GetContextualTasksDisplayURL(web_contents);
-        if (pretty_url.is_valid()) {
-          match.contents = base::UTF8ToUTF16(pretty_url.spec());
-          match.contents_class.clear();
-          match.contents_class.emplace_back(0, ACMatchClassification::URL);
-        }
-      }
-    }
-  }
 }
 
 content::WebContents*

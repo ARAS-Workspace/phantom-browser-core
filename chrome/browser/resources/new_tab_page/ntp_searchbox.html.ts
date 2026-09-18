@@ -4,20 +4,15 @@
 
 import '//resources/cr_components/searchbox/searchbox_input.js';
 
-import {html, nothing} from '//resources/lit/v3_0/lit.rollup.js';
+import {html} from '//resources/lit/v3_0/lit.rollup.js';
 
 import type {NtpSearchboxElement} from './ntp_searchbox.js';
-import {getHtml as getContextualEntrypointHtml} from './ntp_searchbox_contextual_entrypoint.html.js';
 
 export function getHtml(this: NtpSearchboxElement) {
   // clang-format off
   return html`<!--_html_template_start_-->
 <div id="inputWrapper" @focusout="${this.onInputWrapperFocusout}"
-    @keydown="${this.onInputWrapperKeydown}"
-    @dragenter="${this.dragAndDropHandler?.handleDragEnter || nothing}"
-    @dragover="${this.dragAndDropHandler?.handleDragOver || nothing}"
-    @dragleave="${this.dragAndDropHandler?.handleDragLeave || nothing}"
-    @drop="${this.dragAndDropHandler?.handleDrop || nothing}">
+    @keydown="${this.onInputWrapperKeydown}">
   ${this.ntpRealboxNextEnabled ?
     html`
       <search-animated-glow
@@ -43,14 +38,8 @@ export function getHtml(this: NtpSearchboxElement) {
       ?allow-file-paste="${this.ntpRealboxNextEnabled}"
       @focusin="${this.onInputFocusin_}"
       @searchbox-input-pasted="${this.onSearchboxInputPasted_}"
-      @searchbox-input-files-pasted="${this.onSearchboxInputFilesPasted_}"
       @searchbox-input-text-updated="${this.onSearchboxInputTextUpdated_}"
       @input-focus-changed="${this.onInputFocusChanged}">
-    ${this.ntpRealboxNextEnabled ? html`
-      <div class="contextualEntrypointContainer contextualEntrypointContainerCompact" slot="contextual-entrypoint">
-        ${getContextualEntrypointHtml.bind(this)()}
-      </div>
-    ` : ''}
     ${this.shouldShowVoiceLens_(this.searchboxVoiceSearchEnabled_) ? html`
       <div slot="action-buttons" class="searchbox-icon-button-container voice">
         <button id="voiceSearchButton" class="searchbox-icon-button"
@@ -66,13 +55,6 @@ export function getHtml(this: NtpSearchboxElement) {
             title="${this.i18n('lensSearchButtonLabel')}">
         </button>
       </div>
-    ` : ''}
-    ${this.showComposeButton_ ? html`
-      <cr-searchbox-compose-button id="composeButton" slot="compose-button"
-          ?dynamic="${this.ntpRealboxDynamicAiModeButtonEnabled_}"
-          ?has-user-input="${this.hasUserInput_}"
-          @compose-click="${this.onComposeClick_}">
-      </cr-searchbox-compose-button>
     ` : ''}
   </cr-searchbox-input>
   <div class="dropdownContainer">

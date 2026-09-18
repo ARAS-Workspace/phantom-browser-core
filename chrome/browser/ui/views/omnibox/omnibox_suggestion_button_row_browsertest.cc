@@ -31,8 +31,7 @@ class OmniboxSuggestionButtonRowBrowserTest : public DialogBrowserTest {
   OmniboxSuggestionButtonRowBrowserTest() {
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features*/ {},
-        /*disabled_features*/ {omnibox::internal::kWebUIOmniboxPopup,
-                               omnibox::internal::kWebUIOmniboxAimPopup});
+        /*disabled_features*/ {omnibox::internal::kWebUIOmniboxPopup});
   }
 
   OmniboxSuggestionButtonRowBrowserTest(

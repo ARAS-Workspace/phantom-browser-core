@@ -27,7 +27,6 @@
 #include "chrome/browser/content_settings/mixed_content_settings_tab_helper.h"
 #include "chrome/browser/content_settings/page_specific_content_settings_delegate.h"
 #include "chrome/browser/content_settings/sound_content_setting_observer.h"
-#include "chrome/browser/contextual_tasks/aim_user_agent_tab_helper.h"
 #include "chrome/browser/external_protocol/external_protocol_observer.h"
 #include "chrome/browser/favicon/favicon_utils.h"
 #include "chrome/browser/file_system_access/file_system_access_features.h"
@@ -112,7 +111,6 @@
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/compose/buildflags.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/dom_distiller/core/dom_distiller_features.h"
 #include "components/download/content/factory/navigation_monitor_factory.h"
 #include "components/download/content/public/download_navigation_observer.h"
@@ -584,10 +582,6 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   SafetyTipWebContentsObserver::CreateForWebContents(web_contents);
   SearchEngineTabHelper::CreateForWebContents(web_contents);
 #if !BUILDFLAG(IS_ANDROID)
-  if (contextual_tasks::IsContextualTasksUIEnabled()) {
-    // Manages User-Agent override for tab navigations to AIM / AI URLs.
-    contextual_tasks::AimUserAgentTabHelper::CreateForWebContents(web_contents);
-  }
 #endif  // !BUILDFLAG(IS_ANDROID)
   if (site_engagement::SiteEngagementService::IsEnabled()) {
     site_engagement::SiteEngagementService::Helper::CreateForWebContents(

@@ -290,8 +290,6 @@ void FindInPage(BrowserWindowInterface* browser, bool find_next, bool forward_di
 void ShowTabSearch(BrowserWindowInterface* browser);
 void CloseTabSearch(BrowserWindowInterface* browser);
 void ToggleTabSearchPin(BrowserWindowInterface* browser);
-void ToggleContextualTasksSidePanel(BrowserWindowInterface* browser);
-void ToggleContextualTasksSidePanelZeroState(BrowserWindowInterface* browser);
 void ToggleVerticalTabs(BrowserWindowInterface* browser);
 void ToggleVerticalTabsExpandOnHover(BrowserWindowInterface* browser);
 void ToggleCollapseVerticalTabs(BrowserWindowInterface* browser);
@@ -324,8 +322,6 @@ void ToggleBookmarkBar(BrowserWindowInterface* browser);
 void SetBookmarkBarVisibilityState(BrowserWindowInterface* browser,
                                    bookmarks::BookmarkBarVisibilityState state);
 void ToggleShowFullURLs(BrowserWindowInterface* browser);
-void ToggleShowGoogleLensShortcut(BrowserWindowInterface* browser);
-void ToggleShowAiModeOmniboxButton(BrowserWindowInterface* browser);
 void ToggleShowSearchTools(BrowserWindowInterface* browser);
 void ShowAppMenu(BrowserWindowInterface* browser);
 void ShowAvatarMenu(BrowserWindowInterface* browser);
@@ -365,8 +361,6 @@ bool ShouldInterceptChromeURLNavigationInIncognito(BrowserWindowInterface* brows
                                                    const GURL& url);
 void ProcessInterceptedChromeURLNavigationInIncognito(BrowserWindowInterface* browser,
                                                       const GURL& url);
-void ExecLensOverlay(BrowserWindowInterface* browser);
-void ExecLensRegionSearch(BrowserWindowInterface* browser);
 
 }  // namespace chrome
 

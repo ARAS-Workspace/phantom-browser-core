@@ -15,8 +15,6 @@ import org.chromium.chrome.browser.settings.SettingsNavigationFactory;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tabwindow.TabWindowInfo;
 import org.chromium.chrome.browser.tabwindow.TabWindowManager;
-import org.chromium.chrome.browser.ui.lens.LensOverlayCoordinator;
-import org.chromium.chrome.browser.ui.lens.LensOverlayInvocationSource;
 import org.chromium.components.browser_ui.settings.SettingsNavigation.SettingsFragment;
 import org.chromium.components.omnibox.AutocompleteInput.SiteSearchData;
 import org.chromium.components.omnibox.action.OmniboxAction;
@@ -150,12 +148,4 @@ public class OmniboxActionDelegateImpl implements OmniboxActionDelegate {
         mOnKeywordModeEnteredCb = onKeywordModeEnteredCb;
     }
 
-    @Override
-    public void openLensOverlay() {
-        var tab = mTabSupplier.get();
-        if (tab != null) {
-            LensOverlayCoordinator.getOrCreateForTab(tab)
-                    .start(LensOverlayInvocationSource.OMNIBOX_PAGE_ACTION);
-        }
-    }
 }

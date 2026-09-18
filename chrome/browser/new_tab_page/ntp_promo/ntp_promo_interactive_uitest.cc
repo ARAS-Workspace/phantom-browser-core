@@ -23,7 +23,6 @@
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_view_views.h"
 #include "chrome/browser/ui/views/user_education/impl/browser_user_education_context.h"
-#include "chrome/browser/ui/webui/new_tab_page/composebox/variations/composebox_fieldtrial.h"
 #include "chrome/browser/ui/webui/new_tab_page/ntp_promo/ntp_promo.mojom.h"
 #include "chrome/browser/ui/webui/test_support/webui_interactive_test_mixin.h"
 #include "chrome/browser/user_education/ntp_promo_identifiers.h"
@@ -442,12 +441,6 @@ IN_PROC_BROWSER_TEST_F(NtpPromoUiTest,
 class NtpPromoVisualUiTest
     : public NtpPromoUiTest,
       public testing::WithParamInterface<NtpPromoUiTestParams> {
- public:
-  NtpPromoVisualUiTest() {
-    // TODO(crbug.com/453086432): Fix test to work with Compose enabled.
-    feature_list_.InitAndDisableFeature(ntp_composebox::kNtpComposebox);
-  }
-
  protected:
   ui::MockOsSettingsProvider& os_settings_provider() {
     return os_settings_provider_;
@@ -455,7 +448,6 @@ class NtpPromoVisualUiTest
 
  private:
   ui::MockOsSettingsProvider os_settings_provider_;
-  base::test::ScopedFeatureList feature_list_;
 };
 
 // Screenshot the promo UI across the available presentation styles, along

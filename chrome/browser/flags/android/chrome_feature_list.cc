@@ -33,7 +33,6 @@
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/content_capture/common/content_capture_features.h"
 #include "components/content_settings/core/common/features.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/credential_management/android/features.h"
 #include "components/data_sharing/public/features.h"
 #include "components/download/public/common/download_features.h"
@@ -47,7 +46,6 @@
 #include "components/history/core/browser/features.h"
 #include "components/history_clusters/core/features.h"
 #include "components/language/core/common/language_experiments.h"
-#include "components/lens/lens_features.h"
 #include "components/ntp_tiles/features.h"
 #include "components/offline_pages/core/offline_page_feature.h"
 #include "components/omnibox/common/omnibox_features.h"
@@ -78,7 +76,6 @@
 #include "components/sync_sessions/features.h"
 #include "components/tab_groups/features.h"
 #include "components/themes/cross_device/features.h"
-#include "components/touch_to_search/core/browser/contextual_search_field_trial.h"
 #include "components/visited_url_ranking/public/features.h"
 #include "components/viz/common/features.h"
 #include "components/webapps/browser/features.h"
@@ -343,8 +340,6 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &kCommandLineOnNonRooted,
     &kCompositorViewRemeasureFix,
     &kContextualPanelCloseButton,
-    &kContextualSearchDisableOnlineDetection,
-    &kContextualSearchSuppressShortView,
     &kControlsVisibilityFromNavigations,
     &kCopyLinkToHighlight,
     &kCrossDeviceTabPaneAndroid,
@@ -403,7 +398,6 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &kInlinePdfV2Incognito,
     &kKeyboardEscBackNavigation,
     &kLaunchCauseScreenOffFix,
-    &kLensOnQuickActionSearchWidget,
     &kLinkHoverStatusBar,
     &kLoadAllTabsAtStartup,
     &kLockTopControlsOnLargeTabletsV2,
@@ -530,8 +524,6 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &language::kCctAutoTranslate,
     &language::kDetailedLanguageSettings,
     &language::kGmsCoreUlp,
-    &lens::features::kLensOverlayAndroid,
-    &lens::features::kLensSendRawFileMediaTypes,
     &media::kAutoDocPiPPermissionPromptAndroid,
     &media::kAutoPictureInPictureAndroid,
     &media::kContextMenuCopyVideoFrame,
@@ -749,8 +741,6 @@ BASE_FEATURE(kClearIntentWhenRecreated, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kCommandLineOnNonRooted, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kCompositorViewRemeasureFix, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kContextualPanelCloseButton, base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kContextualSearchDisableOnlineDetection, base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kContextualSearchSuppressShortView, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kControlsVisibilityFromNavigations, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kCopyLinkToHighlight, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kCrossDeviceTabPaneAndroid, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -810,7 +800,6 @@ BASE_FEATURE(kInlinePdfV2Download, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kInlinePdfV2Incognito, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kKeyboardEscBackNavigation, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kLaunchCauseScreenOffFix, base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kLensOnQuickActionSearchWidget, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kLinkHoverStatusBar, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kLoadAllTabsAtStartup, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kLockTopControlsOnLargeTabletsV2, base::FEATURE_DISABLED_BY_DEFAULT);

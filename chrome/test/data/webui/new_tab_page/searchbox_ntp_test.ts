@@ -6,14 +6,13 @@ import 'chrome://new-tab-page/new_tab_page.js';
 
 import type {NtpSearchboxElement, SearchboxIconElement, SearchboxMatchElement} from 'chrome://new-tab-page/new_tab_page.js';
 import {BrowserProxyImpl, MetricsReporterImpl, SearchboxBrowserProxy} from 'chrome://new-tab-page/new_tab_page.js';
-import type {ContextualEntrypointAndMenuElement} from 'chrome://resources/cr_components/composebox/contextual_entrypoint_and_menu.js';
 import {createAutocompleteResultForTesting, createSearchMatchForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {PageMetricsCallbackRouter} from 'chrome://resources/js/metrics_reporter.mojom-webui.js';
 import {getDeepActiveElement} from 'chrome://resources/js/util.js';
-import {DriveDisclaimerStatus, RenderType, SideType} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
+import {RenderType, SideType} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {assertIconMaskImageUrl, assertStyle, createClipboardEvent, createUrlMatch, MockInputState} from 'chrome://webui-test/cr_components/searchbox/searchbox_test_utils.js';
+import {assertIconMaskImageUrl, assertStyle, createClipboardEvent, createUrlMatch} from 'chrome://webui-test/cr_components/searchbox/searchbox_test_utils.js';
 import {TestSearchboxBrowserProxy} from 'chrome://webui-test/cr_components/searchbox/test_searchbox_browser_proxy.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
@@ -50,7 +49,6 @@ async function setupRealboxTest(): Promise<{
   testMetricsReporterProxy: TestMock<BrowserProxyImpl>,
 }> {
   loadTimeData.overrideValues({
-    contextualMenuUsePecApi: false,
     isLensSearchbox: false,
     searchboxCyclingPlaceholders: false,
     searchboxDefaultIcon: 'search.svg',
@@ -72,14 +70,6 @@ async function setupRealboxTest(): Promise<{
   testMetricsReporterProxy.setResultFor('getMark', Promise.resolve(null));
   BrowserProxyImpl.setInstance(testMetricsReporterProxy);
   MetricsReporterImpl.setInstanceForTest(new MetricsReporterImpl());
-
-  testProxy.handler.setResultFor('getInputState', {
-    state: new MockInputState({
-      toolConfigs: [],
-      toolsSectionConfig: {header: ''},
-      modelSectionConfig: {header: ''},
-    }),
-  });
   const realbox = await createAndAppendRealbox();
   return {realbox, testProxy, testMetricsReporterProxy};
 }
@@ -1131,204 +1121,4 @@ suite('SearchboxTest', () => {
         assertEquals(0, testProxy.handler.getCallCount('queryAutocomplete'));
       });
 
-  test('onOpenDriveUpload_ handles accepted disclaimer', async () => {
-    testProxy.handler.setResultFor('getDriveDisclaimerStatus', Promise.resolve({
-      status: DriveDisclaimerStatus.kAccepted,
-    }));
-    testProxy.handler.setResultFor('onDriveUploadClicked', Promise.resolve({
-      response: {
-        files: [{
-          token: {high: 1n, low: 1n},
-          mimeType: 'image/png',
-          fileName: 'file.png',
-          thumbnailUrl: 'thumb',
-          iconUrl: {url: 'icon'},
-        }],
-        error: null,
-      },
-    }));
-
-    const whenOpenComposebox =
-        eventToPromise<CustomEvent>('open-composebox', realbox);
-
-    // Call the protected method.
-    await (realbox as unknown as {
-      onOpenDriveUpload_: () => Promise<void>,
-    }).onOpenDriveUpload_();
-
-    const event = await whenOpenComposebox;
-    assertEquals(1n, event.detail.files[0].token.high);
-    assertEquals(1n, event.detail.files[0].token.low);
-    assertEquals('image/png', event.detail.files[0].mimeType);
-    assertEquals('file.png', event.detail.files[0].fileName);
-    assertEquals('thumb', event.detail.files[0].thumbnailUrl);
-    assertEquals('icon', event.detail.files[0].iconUrl.url);
-    assertEquals(1, testProxy.handler.getCallCount('onDriveUploadClicked'));
-  });
-
-  test('onOpenDriveUpload_ handles restricted disclaimer', async () => {
-    testProxy.handler.setResultFor('getDriveDisclaimerStatus', Promise.resolve({
-      status: DriveDisclaimerStatus.kRestricted,
-    }));
-
-    // Call the protected method.
-    await (realbox as unknown as {
-      onOpenDriveUpload_: () => Promise<void>,
-    }).onOpenDriveUpload_();
-
-    await microtasksFinished();
-
-    assertEquals(0, testProxy.handler.getCallCount('onDriveUploadClicked'));
-  });
-
-  test('onOpenDriveUpload_ handles drive upload error', async () => {
-    testProxy.handler.setResultFor('getDriveDisclaimerStatus', Promise.resolve({
-      status: DriveDisclaimerStatus.kAccepted,
-    }));
-    testProxy.handler.setResultFor('onDriveUploadClicked', Promise.resolve({
-      response: {
-        files: [],
-        error: {
-          errorType: 1,  // kBrowserProcessingError or similar
-        },
-      },
-    }));
-
-    const whenOpenComposebox =
-        eventToPromise<CustomEvent>('open-composebox', realbox);
-
-    // Call the protected method.
-    await (realbox as unknown as {
-      onOpenDriveUpload_: () => Promise<void>,
-    }).onOpenDriveUpload_();
-
-    const event = await whenOpenComposebox;
-    assertEquals(0, event.detail.files.length);
-    assertEquals(1, event.detail.error.errorType);
-    assertEquals(1, testProxy.handler.getCallCount('onDriveUploadClicked'));
-  });
-
-  test('onOpenDriveUpload_ handles empty selection without opening composebox', async () => {
-    testProxy.handler.setResultFor('getDriveDisclaimerStatus', Promise.resolve({
-      status: DriveDisclaimerStatus.kAccepted,
-    }));
-    testProxy.handler.setResultFor('onDriveUploadClicked', Promise.resolve({
-      response: {
-        files: [],
-        error: null,
-      },
-    }));
-
-    let openComposeboxCalled = false;
-    realbox.addEventListener('open-composebox', () => {
-      openComposeboxCalled = true;
-    });
-
-    // Call the protected method.
-    await (realbox as unknown as {
-      onOpenDriveUpload_: () => Promise<void>,
-    }).onOpenDriveUpload_();
-
-    await microtasksFinished();
-
-    assertFalse(openComposeboxCalled);
-    assertEquals(1, testProxy.handler.getCallCount('onDriveUploadClicked'));
-  });
-
-  test(
-      'openComposebox_ does not close menu when' +
-          'keepMenuOpenOnTabSelectForRealbox is enabled',
-      async () => {
-        loadTimeData.overrideValues({
-          keepMenuOpenOnTabSelectForRealbox: true,
-          contextManagementInComposeboxEnabled: true,
-        });
-        const realbox = await createAndAppendRealbox({
-          ntpRealboxNextEnabled: true,
-          keepMenuOpenOnTabSelectForRealbox: true,
-          contextManagementInComposeboxEnabled: true,
-        });
-        const context =
-            realbox.shadowRoot.querySelector<HTMLElement>('#context');
-        assertTrue(!!context);
-
-        let closeMenuCalled = false;
-        (context as unknown as {closeMenu: () => void}).closeMenu = () => {
-          closeMenuCalled = true;
-        };
-
-        await (realbox as unknown as {
-          openComposebox_: () => void,
-        }).openComposebox_();
-
-        assertFalse(closeMenuCalled);
-      });
-
-  test(
-      'openComposebox_ closes menu when' +
-          'keepMenuOpenOnTabSelectForRealbox is disabled',
-      async () => {
-        loadTimeData.overrideValues({});
-        const realbox = await createAndAppendRealbox({
-          ntpRealboxNextEnabled: true,
-          keepMenuOpenOnTabSelectForRealbox: false,
-        });
-        const context =
-            realbox.shadowRoot.querySelector<HTMLElement>('#context')!;
-        assertTrue(!!context);
-
-        let closeMenuCalled = false;
-        (context as unknown as {closeMenu: () => void}).closeMenu = () => {
-          closeMenuCalled = true;
-        };
-
-        await (realbox as unknown as {
-          openComposebox_: () => void,
-        }).openComposebox_();
-
-        assertTrue(closeMenuCalled);
-      });
-
-  test(
-      'openComposebox_ closes menu when' +
-          'contextManagementInComposeboxEnabled is disabled',
-      async () => {
-        const realbox = await createAndAppendRealbox({
-          ntpRealboxNextEnabled: true,
-          keepMenuOpenOnTabSelectForRealbox: true,
-          contextManagementInComposeboxEnabled: false,
-        });
-        const context =
-            realbox.shadowRoot.querySelector<HTMLElement>('#context');
-        assertTrue(!!context);
-
-        let closeMenuCalled = false;
-        (context as unknown as {closeMenu: () => void}).closeMenu = () => {
-          closeMenuCalled = true;
-        };
-
-        await (realbox as unknown as {
-          openComposebox_: () => void,
-        }).openComposebox_();
-
-        assertTrue(closeMenuCalled);
-      });
-
-  test('closeContextMenu closes context menu', async () => {
-    const realbox = await createAndAppendRealbox({
-      ntpRealboxNextEnabled: true,
-    });
-    const context =
-        realbox.shadowRoot.querySelector<ContextualEntrypointAndMenuElement>(
-            '#context');
-    assertTrue(!!context);
-
-    let closeMenuCalled = false;
-    context.closeMenu = () => {
-      closeMenuCalled = true;
-    };
-
-    realbox.closeContextMenu();
-    assertTrue(closeMenuCalled);
-  });
 });

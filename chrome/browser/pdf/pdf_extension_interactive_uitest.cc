@@ -74,8 +74,7 @@ class PDFExtensionInteractiveUITest : public base::test::WithFeatureOverride,
     webui_omnibox_feature_list_.InitWithFeatures(
         /*enabled_features=*/{},
         /*disabled_features=*/
-        {omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+        {omnibox::internal::kWebUIOmniboxPopup});
   }
 
   void SetUpCommandLine(base::CommandLine* command_line) override {

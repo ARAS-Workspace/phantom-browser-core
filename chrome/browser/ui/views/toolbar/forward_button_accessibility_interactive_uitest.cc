@@ -35,14 +35,12 @@ class ForwardButtonAccessibilityTest : public ToolbarAccessibilityTest {
       feature_list_.InitWithFeatures(
           {features::kInitialWebUI, features::kWebUIBackForwardButton,
            features::kWebUIReloadButton},
-          {omnibox::internal::kWebUIOmniboxPopup,
-           omnibox::internal::kWebUIOmniboxAimPopup});
+          {omnibox::internal::kWebUIOmniboxPopup});
     } else {
       feature_list_.InitWithFeatures(
           {},
           {features::kInitialWebUI, features::kWebUIBackForwardButton,
-           features::kWebUIReloadButton, omnibox::internal::kWebUIOmniboxPopup,
-           omnibox::internal::kWebUIOmniboxAimPopup});
+           features::kWebUIReloadButton, omnibox::internal::kWebUIOmniboxPopup});
     }
   }
 

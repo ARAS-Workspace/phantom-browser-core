@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "base/check.h"
-#include "chrome/browser/ui/contextual_search/tab_contextualization_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_view.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
 #include "components/omnibox/browser/autocomplete_controller_config.h"
@@ -47,12 +46,3 @@ MockOmniboxEditModel::MockOmniboxEditModel(
     OmniboxController* omnibox_controller)
     : OmniboxEditModel(omnibox_controller) {}
 MockOmniboxEditModel::~MockOmniboxEditModel() = default;
-
-MockLensSearchboxClient::MockLensSearchboxClient() = default;
-MockLensSearchboxClient::~MockLensSearchboxClient() = default;
-
-MockTabContextualizationController::MockTabContextualizationController(
-    tabs::TabInterface* tab_interface)
-    : lens::TabContextualizationController(tab_interface) {}
-MockTabContextualizationController::~MockTabContextualizationController() =
-    default;

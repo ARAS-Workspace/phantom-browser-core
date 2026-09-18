@@ -130,7 +130,6 @@ if (toolkit_views) {
       "//chrome/browser/ui/browser_web_contents_delegate",
       "//chrome/browser/ui/dialogs",
       "//chrome/browser/ui/exclusive_access",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/omnibox",
       "//chrome/browser/ui/tabs",
       "//chrome/browser/ui/views:bubble_anchor_util_views",

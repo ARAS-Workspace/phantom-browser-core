@@ -14,7 +14,6 @@ import org.jni_zero.NativeMethods;
 import org.chromium.base.ResettersForTesting;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
-import org.chromium.chrome.browser.contextual_tasks.ContextualTasksBridge;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.ui.UiUtils;
 

@@ -99,7 +99,7 @@ class ContextMenuChipController implements View.OnClickListener {
     }
 
     /**
-     * Dismiss the lens chip. Needed for cases where a user dismisses
+     * Dismiss the chip. Needed for cases where a user dismisses
      * the context menu without closing the chip manually.
      */
     void dismissChipIfShowing() {

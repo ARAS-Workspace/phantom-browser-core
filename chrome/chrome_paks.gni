@@ -102,7 +102,6 @@ template("chrome_extra_paks") {
       "$root_gen_dir/chrome/browser_resources.pak",
       "$root_gen_dir/chrome/chrome_unscaled_resources.pak",
       "$root_gen_dir/chrome/common_resources.pak",
-      "$root_gen_dir/chrome/contextual_tasks_resources.pak",
       "$root_gen_dir/chrome/saved_tab_groups_unsupported_resources.pak",
       "$root_gen_dir/components/autofill/core/browser/geo/autofill_address_rewriter_resources.pak",
       "$root_gen_dir/components/autofill/core/browser/geo/autofill_alternative_state_name_map_resources.pak",
@@ -186,16 +185,12 @@ template("chrome_extra_paks") {
         "$root_gen_dir/chrome/data_sharing_resources.pak",
         "$root_gen_dir/chrome/dev_ui_resources.pak",
         "$root_gen_dir/chrome/downloads_resources.pak",
-        "$root_gen_dir/chrome/drive_picker_host_resources.pak",
-        "$root_gen_dir/chrome/drive_picker_host_untrusted_resources.pak",
         "$root_gen_dir/chrome/feedback_resources.pak",
         "$root_gen_dir/chrome/gaia_auth_host_resources.pak",
         "$root_gen_dir/chrome/history_resources.pak",
         "$root_gen_dir/chrome/inspect_resources.pak",
         "$root_gen_dir/chrome/iwa_dev_resources.pak",
         "$root_gen_dir/chrome/key_value_pair_viewer_shared_resources.pak",
-        "$root_gen_dir/chrome/lens_shared_resources.pak",
-        "$root_gen_dir/chrome/lens_untrusted_resources.pak",
         "$root_gen_dir/chrome/new_tab_footer_resources.pak",
         "$root_gen_dir/chrome/omnibox_everywhere_resources.pak",
         "$root_gen_dir/chrome/omnibox_popup_resources.pak",
@@ -291,17 +286,13 @@ template("chrome_extra_paks") {
 
     if (enable_extensions_core) {
       sources += [
-        "$root_gen_dir/chrome/aim_eligibility_extension_resources.pak",
-        "$root_gen_dir/chrome/contextual_tasks_extension_resources.pak",
         "$root_gen_dir/chrome/extensions_resources.pak",
         "$root_gen_dir/extensions/extensions_renderer_generated_resources.pak",
         "$root_gen_dir/extensions/extensions_renderer_resources.pak",
         "$root_gen_dir/extensions/extensions_resources.pak",
       ]
       deps += [
-        "//chrome/browser/resources/contextual_tasks/extension:resources",
         "//chrome/browser/resources/extensions:resources",
-        "//chrome/browser/resources/omnibox/aim_eligibility_extension:resources",
         "//extensions:extensions_resources",
       ]
     } else if (is_android) {

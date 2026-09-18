@@ -33,8 +33,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.h"
 #include "chrome/browser/chained_back_navigation_tracker.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_side_panel_coordinator.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_utils.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/favicon/favicon_utils.h"
@@ -85,7 +83,6 @@
 #include "chrome/browser/ui/find_bar/find_bar_controller.h"
 #include "chrome/browser/ui/focus/browser_focus_controller.h"
 #include "chrome/browser/ui/intent_picker_tab_helper.h"
-#include "chrome/browser/ui/lens/lens_search_controller.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
@@ -141,7 +138,6 @@
 #include "components/browsing_data/content/browsing_data_helper.h"
 #include "components/commerce/core/commerce_utils.h"
 #include "components/commerce/core/pref_names.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/embedder_support/user_agent_utils.h"
 #include "components/favicon/content/content_favicon_driver.h"
 #include "components/feature_engagement/public/feature_constants.h"
@@ -149,9 +145,6 @@
 #include "components/find_in_page/find_types.h"
 #include "components/google/core/common/google_util.h"
 #include "components/language_detection/core/constants.h"
-#include "components/lens/buildflags.h"
-#include "components/lens/lens_features.h"
-#include "components/lens/lens_overlay_invocation_source.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
@@ -238,17 +231,10 @@
 #include "chrome/browser/web_applications/extensions/launch.h"
 #endif
 
-#if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-#include "chrome/browser/lens/region_search/lens_region_search_controller.h"
-#include "chrome/browser/lens/region_search/lens_region_search_helper.h"
-#include "components/lens/lens_features.h"
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/toasts/api/toast_id.h"
 #include "chrome/browser/ui/toasts/toast_controller.h"
 #include "chrome/browser/ui/toasts/toast_features.h"
-#include "chrome/browser/ui/views/contextual_tasks/contextual_tasks_close_button_controller.h"
 #endif
 
 namespace {
@@ -1396,16 +1382,6 @@ void CloseTab(BrowserWindowInterface* browser) {
   }
 
 #if !BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(
-          contextual_tasks::kContextualTasksCloseTabExpandsSidePanel)) {
-    ContextualTasksCloseButtonController* const close_button_controller =
-        ContextualTasksCloseButtonController::From(browser);
-    if (close_button_controller &&
-        close_button_controller->ShouldShowCloseButton()) {
-      close_button_controller->MaybeCloseTabExpandSidePanel();
-      return;
-    }
-  }
 #endif
 
   ToastController* toast_controller = browser->GetFeatures().toast_controller();
@@ -2406,28 +2382,6 @@ void ToggleTabSearchPin(BrowserWindowInterface* browser) {
   prefs->SetBoolean(prefs::kTabSearchPinnedToTabstrip, !is_pinned);
 }
 
-void ToggleContextualTasksSidePanel(BrowserWindowInterface* browser) {
-  auto* controller =
-      contextual_tasks::ContextualTasksPanelController::From(browser);
-  CHECK(controller);
-  if (controller->IsPanelOpenForContextualTask()) {
-    controller->Close();
-  } else {
-    controller->Show();
-  }
-}
-
-void ToggleContextualTasksSidePanelZeroState(BrowserWindowInterface* browser) {
-  auto* controller =
-      contextual_tasks::ContextualTasksPanelController::From(browser);
-  CHECK(controller);
-  if (controller->IsPanelOpenForContextualTask()) {
-    controller->Close();
-  } else {
-    controller->OpenInZeroState();
-  }
-}
-
 void ToggleVerticalTabs(BrowserWindowInterface* browser) {
   tabs::VerticalTabStripStateController* controller =
       tabs::VerticalTabStripStateController::From(browser);
@@ -2582,20 +2536,6 @@ void ToggleShowFullURLs(BrowserWindowInterface* browser) {
       omnibox::kPreventUrlElisionsInOmnibox);
   browser->GetProfile()->GetPrefs()->SetBoolean(
       omnibox::kPreventUrlElisionsInOmnibox, !pref_enabled);
-}
-
-void ToggleShowGoogleLensShortcut(BrowserWindowInterface* browser) {
-  bool pref_enabled = browser->GetProfile()->GetPrefs()->GetBoolean(
-      omnibox::kShowGoogleLensShortcut);
-  browser->GetProfile()->GetPrefs()->SetBoolean(
-      omnibox::kShowGoogleLensShortcut, !pref_enabled);
-}
-
-void ToggleShowAiModeOmniboxButton(BrowserWindowInterface* browser) {
-  bool pref_enabled = browser->GetProfile()->GetPrefs()->GetBoolean(
-      omnibox::kShowAiModeOmniboxButton);
-  browser->GetProfile()->GetPrefs()->SetBoolean(
-      omnibox::kShowAiModeOmniboxButton, !pref_enabled);
 }
 
 void ToggleShowSearchTools(BrowserWindowInterface* browser) {
@@ -2874,41 +2814,6 @@ void ProcessInterceptedChromeURLNavigationInIncognito(
   } else {
     NOTREACHED();
   }
-}
-
-void ExecLensOverlay(BrowserWindowInterface* browser) {
-  content::WebContents* web_contents =
-      browser->GetTabStripModel()->GetActiveWebContents();
-  CHECK(web_contents);
-
-  LensSearchController* const controller =
-      LensSearchController::FromTabWebContents(web_contents);
-  CHECK(controller);
-  controller->OpenLensOverlay(lens::LensOverlayInvocationSource::kAppMenu);
-  BrowserUserEducationInterface::From(browser)->NotifyNewBadgeFeatureUsed(
-      lens::features::kLensOverlay);
-}
-
-void ExecLensRegionSearch(BrowserWindowInterface* browser) {
-#if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-  Profile* profile = browser->GetProfile();
-  TemplateURLService* service =
-      TemplateURLServiceFactory::GetForProfile(profile);
-  WebContents* contents = browser->GetTabStripModel()->GetActiveWebContents();
-  GURL url = contents->GetController().GetLastCommittedEntry()->GetURL();
-
-  if (lens::IsRegionSearchEnabled(browser, profile, service, url)) {
-    const bool is_google_dsp = search::DefaultSearchProviderIsGoogle(profile);
-    const lens::AmbientSearchEntryPoint entry_point =
-        is_google_dsp ? lens::AmbientSearchEntryPoint::
-                            CONTEXT_MENU_SEARCH_REGION_WITH_GOOGLE_LENS
-                      : lens::AmbientSearchEntryPoint::
-                            CONTEXT_MENU_SEARCH_REGION_WITH_WEB;
-    browser->GetFeatures().lens_region_search_controller()->Start(
-        contents,
-        /*use_fullscreen_capture=*/false, is_google_dsp, entry_point);
-  }
-#endif  // BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
 }
 
 }  // namespace chrome

@@ -90,7 +90,6 @@ class OrganizerPanelStateController;
 class ReadingListSidePanelCoordinator;
 class RecentActivityBubbleCoordinator;
 class ScrimViewController;
-class SearchboxContextData;
 class SessionServiceBrowserHelper;
 class SidePanelCoordinator;
 class SidePanelRegistry;
@@ -133,7 +132,6 @@ namespace actions {
 class ActionItem;
 }  // namespace actions
 
-
 namespace chrome {
 class BrowserCommandController;
 }  // namespace chrome
@@ -141,7 +139,6 @@ class BrowserCommandController;
 namespace content_settings {
 class CookieControlsController;
 }  // namespace content_settings
-
 
 namespace contextual_tasks {
 class ContextualTasksBrowserController;
@@ -165,11 +162,6 @@ class ExtensionBrowserWindowHelper;
 class ExtensionSidePanelManager;
 }  // namespace extensions
 
-namespace lens {
-class LensOverlayEntryPointController;
-class LensRegionSearchController;
-}  // namespace lens
-
 namespace media_router {
 class CastBrowserController;
 }  // namespace media_router
@@ -183,7 +175,6 @@ class NewTabFooterController;
 }  // namespace new_tab_footer
 
 namespace omnibox {
-class AiModePageActionController;
 class OmniboxPopupCloser;
 }  // namespace omnibox
 
@@ -360,10 +351,6 @@ class BrowserWindowFeatures {
     return incognito_clear_browsing_data_dialog_coordinator_.get();
   }
 
-  lens::LensRegionSearchController* lens_region_search_controller() {
-    return lens_region_search_controller_.get();
-  }
-
   BrowserLiveTabContext* live_tab_context() { return live_tab_context_.get(); }
 
   // Returns the LocationBar for this browser window. Currently delegates to
@@ -419,10 +406,6 @@ class BrowserWindowFeatures {
 
   ProfileMenuCoordinator* profile_menu_coordinator() {
     return profile_menu_coordinator_.get();
-  }
-
-  SearchboxContextData* searchbox_context_data() {
-    return searchbox_context_data_.get();
   }
 
   SessionServiceBrowserHelper* session_service_browser_helper() {
@@ -496,7 +479,6 @@ class BrowserWindowFeatures {
     return webui_browser_exclusive_access_context_.get();
   }
 
-
   static ui::UserDataFactoryWithOwner<BrowserWindowInterface>&
   GetUserDataFactoryForTesting();
 
@@ -550,8 +532,6 @@ class BrowserWindowFeatures {
   //   extension_window_controller_ depends on tab_list_bridge_.
   std::unique_ptr<TabListBridge> tab_list_bridge_;
 
-  std::unique_ptr<contextual_tasks::ContextualTasksBrowserController>
-      contextual_tasks_browser_controller_;
   std::unique_ptr<CookieControlsBubbleCoordinator>
       cookie_controls_bubble_coordinator_;
   std::unique_ptr<content_settings::CookieControlsController>
@@ -594,10 +574,6 @@ class BrowserWindowFeatures {
       initial_webui_window_metrics_manager_;
   std::unique_ptr<BrowserInstantController> instant_controller_;
   std::unique_ptr<IOSPromoController> ios_promo_controller_;
-  std::unique_ptr<lens::LensOverlayEntryPointController>
-      lens_overlay_entry_point_controller_;
-  std::unique_ptr<lens::LensRegionSearchController>
-      lens_region_search_controller_;
 
   // Helper which implements the LiveTabContext interface.
   std::unique_ptr<BrowserLiveTabContext> live_tab_context_;
@@ -621,7 +597,6 @@ class BrowserWindowFeatures {
       reading_list_side_panel_coordinator_;
   std::unique_ptr<RecentActivityBubbleCoordinator>
       recent_activity_bubble_coordinator_;
-  std::unique_ptr<SearchboxContextData> searchbox_context_data_;
   std::unique_ptr<send_tab_to_self::SendTabToSelfToolbarBubbleController>
       send_tab_to_self_toolbar_bubble_controller_;
   std::unique_ptr<SessionServiceBrowserHelper> session_service_browser_helper_;
@@ -665,8 +640,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<ZoomBubbleCoordinator> zoom_bubble_coordinator_;
 
   // Members owned only when a BrowserView is attached.
-  std::unique_ptr<omnibox::AiModePageActionController>
-      ai_mode_page_action_controller_;
   std::unique_ptr<media_router::CastBrowserController> cast_browser_controller_;
   std::unique_ptr<ColorProviderBrowserHelper> color_provider_browser_helper_;
   std::unique_ptr<ContentsBorderController> contents_border_controller_;
@@ -711,7 +684,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<session_restore_infobar::SessionRestoreInfobarController>
       session_restore_infobar_controller_;
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
 
   std::unique_ptr<DownloadToolbarUIController> download_toolbar_ui_controller_;
 

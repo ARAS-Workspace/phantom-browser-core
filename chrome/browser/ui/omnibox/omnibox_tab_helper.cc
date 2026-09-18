@@ -20,7 +20,6 @@
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/omnibox/omnibox_view.h"
-#include "components/omnibox/browser/lens_suggest_inputs_utils.h"
 #include "components/omnibox/common/omnibox_feature_configs.h"
 #include "components/omnibox/common/omnibox_focus_state.h"
 #include "components/optimization_guide/proto/features/common_quality_data.pb.h"
@@ -62,6 +61,22 @@ void LogNavigationToPopupUma(std::string_view event_name,
                     ".", kByPageContextHistogramPrefix, ".", page_context}),
       time_to_log, base::Milliseconds(0), base::Seconds(60), 60);
 }
+
+// Localized from the removed lens suggest inputs header. These values are
+// persisted to logs. Entries should not be renumbered and numeric values
+// should never be reused.
+// LINT.IfChange(PaywallSignal)
+enum class PaywallSignal {
+  // Whether the paywall signal was unavailable because the page content was
+  // not available.
+  kUnknown = 0,
+  // Whether the paywall signal was present on the current page.
+  kSignalPresent = 1,
+  // Whether the paywall signal was not present on the current page.
+  kSignalNotPresent = 2,
+  kMaxValue = kSignalNotPresent,
+};
+// LINT.ThenChange(//tools/metrics/histograms/metadata/omnibox/enums.xml:PaywallSignal)
 
 PaywallSignal ToPaywallSignal(std::optional<bool> paywall_signal) {
   if (paywall_signal.has_value()) {

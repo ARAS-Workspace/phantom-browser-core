@@ -10,9 +10,6 @@ inline constexpr char kFeatureShowcaseDefaultBrowserStepIdentifier[] =
 
 inline constexpr char kFeatureShowcaseGeminiStepIdentifier[] = "gemini";
 
-inline constexpr char kFeatureShowcaseGoogleLensStepIdentifier[] =
-    "google-lens";
-
 inline constexpr char kFeatureShowcasePasswordManagerStepIdentifier[] =
     "password-manager";
 

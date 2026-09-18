@@ -18,8 +18,6 @@
 #include "build/build_config.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/browser/ui/views/permissions/permission_prompt_observer.h"
-#include "components/contextual_search/contextual_search_types.h"
-#include "components/contextual_search/pref_names.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
 #include "components/omnibox/browser/omnibox_client.h"
 #include "components/omnibox/browser/omnibox_popup_selection.h"
@@ -33,7 +31,6 @@
 #include "third_party/omnibox_proto/model_mode.pb.h"
 #include "third_party/omnibox_proto/tool_mode.pb.h"
 #include "ui/gfx/vector_icon_types.h"
-#include "ui/webui/resources/cr_components/composebox/composebox.mojom.h"
 
 class GURL;
 class OmniboxController;
@@ -84,9 +81,7 @@ class SearchboxHandler : public searchbox::mojom::PageHandler,
     bool is_lens = false;
   };
 
-  static bool GetAllVoiceSearchCoherenceComposeboxesEnabled();
   static bool GetVoiceSearchCoherenceAnySearchboxExperimentEnabled();
-  static bool GetVoiceSearchCoherenceCobrowsingComposeboxEnabled();
 
   static base::DictValue GetWebUIDataSourceDict(Profile* profile);
   static base::DictValue GetWebUIDataSourceDict(Profile* profile,
@@ -97,16 +92,7 @@ class SearchboxHandler : public searchbox::mojom::PageHandler,
   virtual std::string AutocompleteIconToResourceName(
       const gfx::VectorIcon& icon) const;
 
-  // Adds file context to the searchbox from the browser.
-  void AddFileContextFromBrowser(
-      base::UnguessableToken token,
-      searchbox::mojom::SelectedFileInfoPtr file_info);
-
   // Notifies the WebUI that the contextual input status has changed.
-  void OnContextualInputStatusChanged(
-      base::UnguessableToken token,
-      contextual_search::ContextUploadStatus status,
-      std::optional<contextual_search::ContextUploadErrorType> error_type);
 
   // AutocompleteController::Observer:
   void OnResultChanged(AutocompleteController* controller,
@@ -164,16 +150,8 @@ class SearchboxHandler : public searchbox::mojom::PageHandler,
   void GetTabPreview(int32_t tab_id, GetTabPreviewCallback callback) override {}
   void WaitForTabFaviconLoad(int32_t tab_id,
                              WaitForTabFaviconLoadCallback callback) override;
-  void GetInputState(GetInputStateCallback callback) override;
   void NotifySessionStarted() override {}
   void NotifySessionAbandoned() override {}
-  void AddFileContext(searchbox::mojom::SelectedFileInfoPtr file_info,
-                      mojo_base::BigBuffer file_bytes,
-                      AddFileContextCallback callback) override {}
-  void AddTabContext(int32_t tab_id,
-                     bool delay_upload,
-                     searchbox::mojom::TabAttachmentSource source,
-                     AddTabContextCallback) override {}
   void DeleteContext(const base::UnguessableToken& file_token,
                      bool from_automatic_chip) override {}
   void DeleteTabContext(int32_t tab_id) override {}
@@ -185,13 +163,6 @@ class SearchboxHandler : public searchbox::mojom::PageHandler,
                    bool meta_key,
                    bool shift_key,
                    bool is_voice_search) override {}
-  void OpenLensSearch() override {}
-  void SetActiveToolMode(omnibox::ToolMode tool,
-                         bool is_set_by_server) override {}
-  void RecordToolSelectionAction(omnibox::ToolMode tool) override {}
-  void SetActiveModelMode(omnibox::ModelMode model,
-                          bool is_set_by_aim) override {}
-  void RecordModelSelectionAction(omnibox::ModelMode model) override {}
   void ActivateMetricsFunnel(const std::string& funnel_name) override {}
   void GetDriveDisclaimerStatus(
       GetDriveDisclaimerStatusCallback callback) override;
@@ -208,6 +179,8 @@ class SearchboxHandler : public searchbox::mojom::PageHandler,
 #endif
   void set_delegate(Delegate* delegate) { omnibox_delegate_ = delegate; }
 
+  ~SearchboxHandler() override;
+
  protected:
   SearchboxHandler(
       mojo::PendingReceiver<searchbox::mojom::PageHandler> pending_page_handler,
@@ -217,8 +190,6 @@ class SearchboxHandler : public searchbox::mojom::PageHandler,
       std::unique_ptr<OmniboxClient> client,
       std::optional<base::TimeDelta> autocomplete_stop_timer_duration =
           std::nullopt);
-
-  ~SearchboxHandler() override;
 
   OmniboxController* omnibox_controller() const;
   OmniboxClient* client() const;

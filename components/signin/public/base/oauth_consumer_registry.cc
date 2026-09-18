@@ -6,7 +6,6 @@
 
 #include "base/feature_list.h"
 #include "base/notreached.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/wallet/core/common/wallet_features.h"
 #include "google_apis/gaia/gaia_constants.h"
 
@@ -299,6 +298,7 @@ constexpr char kExtensionsIdentityAPIName[] = "extensions_identity_api";
 constexpr char kMantaName[] = "manta";
 constexpr char kChromeMemexName[] = "chrome_memex";
 constexpr char kDevtoolsAidaName[] = "devtools_aida_client";
+constexpr char kAimEligibilityServiceName[] = "aim_eligibility_service";
 constexpr char kDevtoolsAiCodeName[] = "devtools_aicode_client";
 constexpr char kChromeOsBabelOrcaName[] = "chromeos_babel_orca";
 constexpr char kChromeOsBocaSchoolToolsAuthName[] =
@@ -321,7 +321,6 @@ constexpr char kSyncDeviceStatisticsMetricsName[] =
     "sync_device_statistics_metrics";
 constexpr char kPrivateAiServiceName[] = "private_ai_service";
 constexpr char kWalletPassesName[] = "wallet_passes";
-constexpr char kAimEligibilityServiceName[] = "aim_eligibility_service";
 constexpr char kAccessibilityAnnotatorName[] = "accessibility_annotator";
 constexpr char kActorLoginPermissionServiceName[] =
     "actor_login_permission_service";

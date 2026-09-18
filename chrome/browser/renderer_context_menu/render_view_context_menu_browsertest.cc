@@ -44,7 +44,6 @@
 #include "chrome/browser/context_hub/memory_bank/memory_bank.h"
 #include "chrome/browser/devtools/features.h"
 #include "chrome/browser/enterprise/data_controls/desktop_data_controls_dialog_test_helper.h"
-#include "chrome/browser/lens/region_search/lens_region_search_controller.h"
 #include "chrome/browser/pdf/pdf_extension_test_base.h"
 #include "chrome/browser/pdf/pdf_extension_test_util.h"
 #include "chrome/browser/pdf/test_mime_handler_stream_manager.h"
@@ -110,10 +109,6 @@
 #include "components/enterprise/data_controls/core/browser/test_utils.h"
 #include "components/guest_view/browser/guest_view_manager_delegate.h"
 #include "components/guest_view/browser/test_guest_view_manager.h"
-#include "components/lens/buildflags.h"
-#include "components/lens/lens_features.h"
-#include "components/lens/lens_metadata.mojom.h"
-#include "components/lens/lens_testing_utils.h"
 #include "components/pdf/browser/pdf_frame_util.h"
 #include "components/policy/core/browser/url_list/url_list_policy_pref_names.h"
 #include "components/policy/core/common/policy_pref_names.h"
@@ -194,13 +189,6 @@
 
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
-#endif
-
-#if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-#include "base/test/run_until.h"
-#include "chrome/browser/ui/lens/lens_overlay_controller.h"
-#include "components/lens/lens_overlay_permission_utils.h"
-#include "ui/events/test/event_generator.h"
 #endif
 
 using content::WebContents;
@@ -411,16 +399,13 @@ class ContextMenuBrowserTestBase : public MixinBasedInProcessBrowserTest {
         [](std::vector<uint8_t>* response_image_data,
            gfx::Size* response_original_size,
            gfx::Size* response_downscaled_size, std::string* response_mime_type,
-           std::vector<lens::mojom::LatencyLogPtr>* response_log_data,
            base::OnceClosure quit, const std::vector<uint8_t>& image_data,
            const gfx::Size& original_size, const gfx::Size& downscaled_size,
-           const std::string& mime_type,
-           std::vector<lens::mojom::LatencyLogPtr> log_data) {
+           const std::string& mime_type) {
           *response_image_data = image_data;
           *response_original_size = original_size;
           *response_downscaled_size = downscaled_size;
           *response_mime_type = mime_type;
-          *response_log_data = std::move(log_data);
           std::move(quit).Run();
         };
 
@@ -429,12 +414,11 @@ class ContextMenuBrowserTestBase : public MixinBasedInProcessBrowserTest {
     gfx::Size response_original_size;
     gfx::Size response_downscaled_size;
     std::string response_mime_type;
-    std::vector<lens::mojom::LatencyLogPtr> response_log_data;
     chrome_render_frame->RequestImageForContextNode(
         0, request_size, request_image_format, chrome::mojom::kDefaultQuality,
         base::BindOnce(callback, &response_image_data, &response_original_size,
                        &response_downscaled_size, &response_mime_type,
-                       &response_log_data, run_loop.QuitClosure()));
+                       run_loop.QuitClosure()));
     run_loop.Run();
 
     ASSERT_EQ(expected_original_size.width(), response_original_size.width());
@@ -1398,8 +1382,6 @@ IN_PROC_BROWSER_TEST_F(DataControlsContextMenuBrowserTest,
                                  })");
 
   // Search items should be hidden by clipboard policy.
-  EXPECT_FALSE(
-      menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME));
   EXPECT_FALSE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME));
 }
 
@@ -1443,9 +1425,6 @@ IN_PROC_BROWSER_TEST_P(DataControlsContextMenuMenuSimplificationBrowserTest,
   EXPECT_TRUE(
       menu->GetMenuModelAndItemIndex(IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME)
           .has_value());
-  EXPECT_FALSE(menu->GetMenuModelAndItemIndex(
-                       IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME)
-                   .has_value());
 
   data_controls::DesktopDataControlsDialogTestHelper helper(
       data_controls::DataControlsDialog::Type::kClipboardActionWarn);
@@ -2465,469 +2444,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, OpenProfileNoneReferrer) {
   ASSERT_EQ("", content::EvalJs(tab, "window.document.referrer;"));
 }
 
-#if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-// The Lens Overlay is a new Lens feature that replaces those used in
-// LensBrowserBaseTest. However, enterprise users can turn off the Lens Overlay
-// feature, so this test suite is needed in addition to LensBrowserBaseTest.
-class LensBrowserBaseTest : public InProcessBrowserTest {
- protected:
-  void SetUp() override {
-    // The test server must start first, so that we know the port that the test
-    // server is using.
-    ASSERT_TRUE(embedded_test_server()->Start());
-    feature_list_.InitWithFeaturesAndParameters(
-        {
-            {lens::features::kLensStandalone,
-             {{lens::features::kHomepageURLForLens.name, GetLensURL().spec()}}},
-        },
-        /*disabled_features=*/{lens::features::kLensOverlay});
-    InProcessBrowserTest::SetUp();
-  }
-  void SetUpOnMainThread() override {
-    InProcessBrowserTest::SetUpOnMainThread();
-    CreateAndSetEventGenerator();
-  }
-
-  // Sets the event generator to the current Browser window
-  void CreateAndSetEventGenerator() {
-    gfx::NativeWindow window = browser()->GetWindow()->GetNativeWindow();
-#if defined(USE_AURA)
-    // When using aura, we need to get the root window in order to send events
-    // properly.
-    window = window->GetRootWindow();
-#endif
-    event_generator_ = std::make_unique<ui::test::EventGenerator>(window);
-    // This is needed to send the mouse event to the correct window on Mac. A
-    // no-op on other platforms.
-    event_generator_->set_target(ui::test::EventGenerator::Target::APPLICATION);
-  }
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    // Tests in this suite make use of documents with no significant
-    // rendered content, and such documents do not accept input for 500ms
-    // unless we allow it.
-    command_line->AppendSwitch(blink::switches::kAllowPreCommitInput);
-  }
-
-  void SetupAndLoadPage(const std::string& page_path) {
-    // Load a simple initial page.
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(
-        browser(), GURL(embedded_test_server()->GetURL(page_path))));
-  }
-
-  void AttemptLensRegionSearch() {
-    // |menu_observer_| will cause the search lens for image menu item to be
-    // clicked. Sets a callback to simulate dragging a region on the screen once
-    // the region search UI has been set up.
-    menu_observer_ = std::make_unique<ContextMenuNotificationObserver>(
-        IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH, ui::EF_MOUSE_BUTTON,
-        base::BindOnce(&LensBrowserBaseTest::SimulateDragAndVerifyOverlayUI,
-                       base::Unretained(this)));
-    RightClickToOpenContextMenu();
-  }
-
-  // This attempts region search on the menu item designated for non-Google
-  // DSEs with mouse button event flags.
-  void AttemptNonGoogleRegionSearch() {
-    // |menu_observer_| will cause the search lens for image menu item to be
-    // clicked.
-    menu_observer_ = std::make_unique<ContextMenuNotificationObserver>(
-        IDC_CONTENT_CONTEXT_WEB_REGION_SEARCH, ui::EF_MOUSE_BUTTON,
-        base::BindOnce(&LensBrowserBaseTest::SimulateDragAndVerifyOverlayUI,
-                       base::Unretained(this)));
-    RightClickToOpenContextMenu();
-  }
-
-  GURL GetLensURL() {
-    return GURL(lens::features::GetHomepageURLForLens() + "upload");
-  }
-
-  GURL GetNonGoogleRegionSearchURL() {
-    static const char kImageSearchURL[] = "/imagesearch";
-    return embedded_test_server()->GetURL(kImageSearchURL);
-  }
-
-  void RightClickToOpenContextMenu() {
-    content::WebContents* tab =
-        browser()->tab_strip_model()->GetActiveWebContents();
-    content::SimulateMouseClick(tab, 0, blink::WebMouseEvent::Button::kRight);
-  }
-
-  // Simulates a valid drag for Lens region search. Must be called after the UI
-  // is set up or else the event will not be properly received by the feature.
-  void SimulateDrag() {
-    content::WebContents* tab =
-        browser()->tab_strip_model()->GetActiveWebContents();
-    gfx::Point center = tab->GetContainerBounds().CenterPoint();
-    event_generator_->MoveMouseTo(center);
-    event_generator_->DragMouseBy(100, 100);
-  }
-
-  void SimulateDragAndVerifyOverlayUI(RenderViewContextMenu* menu) {
-    // Verify Lens Region Search Controller was created after using the menu
-    // item.
-    lens::LensRegionSearchController* const controller =
-        browser()->GetFeatures().lens_region_search_controller();
-    ASSERT_NE(controller, nullptr);
-    ASSERT_TRUE(menu->lens_region_search_controller_started_for_testing());
-    ASSERT_TRUE(controller->IsOverlayUIVisibleForTesting());
-    SimulateDrag();
-    // The UI should be closed after the drag.
-    ASSERT_FALSE(controller->IsOverlayUIVisibleForTesting());
-  }
-
-  // Asserts that the Lens region search controller overlay UI was not visible.
-  void AssertOverlayUIHidden(RenderViewContextMenu* menu) {
-    // Verify Lens Region Search Controller was created after using the menu
-    // item.
-    lens::LensRegionSearchController* const controller =
-        browser()->GetFeatures().lens_region_search_controller();
-    ASSERT_NE(controller, nullptr);
-    ASSERT_TRUE(menu->lens_region_search_controller_started_for_testing());
-    ASSERT_FALSE(controller->IsOverlayUIVisibleForTesting());
-  }
-
-  void VerifyLensUrl(std::string content, std::string expected_content) {
-    // Match strings up to the query.
-    std::size_t query_start_pos = content.find("?");
-    // Match the query parameters, without the value of start_time.
-    EXPECT_THAT(content,
-                testing::MatchesRegex(
-                    expected_content.substr(0, query_start_pos) +
-                    ".*ep=crs&re=dcsp&s=4&st=\\d+&lm=.+&sideimagesearch=1"));
-  }
-
-  // Ensures the last request seen by |web_contents| contained encoded image
-  // data
-  void ExpectThatRequestContainsImageData(content::WebContents* web_contents) {
-    auto* last_entry = web_contents->GetController().GetLastCommittedEntry();
-    EXPECT_TRUE(last_entry);
-    EXPECT_TRUE(last_entry->GetHasPostData());
-
-    std::string post_data = last_entry->GetPageState().ToEncodedData();
-    std::string image_bytes = lens::GetImageBytesFromEncodedPostData(post_data);
-    EXPECT_FALSE(image_bytes.empty());
-  }
-
-  // Sets up a custom test default search engine in order to test image search
-  // and region search for non-Google DSEs.
-  void SetupNonGoogleSearchEngine() {
-    static const char16_t kShortName[] = u"test";
-    static const char kRegionSearchPostParams[] =
-        "thumb={google:imageThumbnail}";
-
-    TemplateURLService* model =
-        TemplateURLServiceFactory::GetForProfile(browser()->GetProfile());
-    ASSERT_NE(model, nullptr);
-    search_test_utils::WaitForTemplateURLServiceToLoad(model);
-    ASSERT_TRUE(model->loaded());
-
-    TemplateURLData data;
-    data.SetShortName(kShortName);
-    data.SetKeyword(data.short_name());
-    data.SetURL(GetNonGoogleRegionSearchURL().spec());
-    data.image_url = GetNonGoogleRegionSearchURL().spec();
-    data.image_url_post_params = kRegionSearchPostParams;
-
-    TemplateURL* template_url = model->Add(std::make_unique<TemplateURL>(data));
-    ASSERT_TRUE(template_url);
-    model->SetUserSelectedDefaultSearchProvider(template_url);
-  }
-
-  void TearDownInProcessBrowserTestFixture() override {
-    menu_observer_.reset();
-    event_generator_.reset();
-  }
-
- protected:
-  base::test::ScopedFeatureList feature_list_;
-
-  void OpenImagePageAndContextMenuForLensImageSearch(
-      std::string image_path,
-      int event_flags,
-      ContextMenuNotificationObserver::MenuShownCallback callback) {
-    GURL image_url(embedded_test_server()->GetURL(image_path));
-    GURL page("data:text/html,<img src='" + image_url.spec() + "'>");
-    ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), page));
-
-    menu_observer_ = std::make_unique<ContextMenuNotificationObserver>(
-        IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE, event_flags,
-        std::move(callback));
-    content::WebContents* tab =
-        browser()->tab_strip_model()->GetActiveWebContents();
-    content::SimulateMouseClickAt(tab, 0, blink::WebMouseEvent::Button::kRight,
-                                  gfx::Point(15, 15));
-  }
-
-  std::unique_ptr<ui::test::EventGenerator> event_generator_;
-  std::unique_ptr<ContextMenuNotificationObserver> menu_observer_;
-};
-
-IN_PROC_BROWSER_TEST_F(LensBrowserBaseTest, LensRegionSearch) {
-  SetupAndLoadPage("/empty.html");
-
-  // The browser should open a draggable UI for a region search. The result
-  // should open in a new tab.
-  ui_test_utils::AllBrowserTabAddedWaiter add_tab;
-
-  // Perform the region search.
-  AttemptLensRegionSearch();
-
-  // Get the result URL in the new tab and verify.
-  content::WebContents* new_tab = add_tab.Wait();
-  content::WaitForLoadStop(new_tab);
-
-  std::string new_tab_content = new_tab->GetLastCommittedURL().GetContent();
-  std::string expected_content = GetLensURL().GetContent();
-
-  // Match strings up to the query.
-  std::size_t query_start_pos = new_tab_content.find("?");
-  // Match the query parameters, without the value of start_time.
-  EXPECT_THAT(new_tab_content, testing::MatchesRegex(
-                                   expected_content.substr(0, query_start_pos) +
-                                   ".*ep=crs&re=df&s=4&st=\\d+&lm=.+"));
-  ExpectThatRequestContainsImageData(new_tab);
-}
-
-IN_PROC_BROWSER_TEST_F(LensBrowserBaseTest, LensRegionSearchNonGoogleDSE) {
-  SetupNonGoogleSearchEngine();
-  SetupAndLoadPage("/empty.html");
-
-  // The browser should open a draggable UI for a region search. The result
-  // should open in a new tab.
-  ui_test_utils::AllBrowserTabAddedWaiter add_tab;
-
-  // Perform the region search.
-  AttemptNonGoogleRegionSearch();
-
-  // Get the result URL in the new tab and verify.
-  content::WebContents* new_tab = add_tab.Wait();
-  content::WaitForLoadStop(new_tab);
-
-  std::string new_tab_content = new_tab->GetLastCommittedURL().GetContent();
-  std::string expected_content = GetNonGoogleRegionSearchURL().GetContent();
-
-  // Match strings up to the query.
-  EXPECT_THAT(new_tab_content, expected_content);
-  ExpectThatRequestContainsImageData(new_tab);
-}
-
-IN_PROC_BROWSER_TEST_F(LensBrowserBaseTest, LensImageSearch) {
-  // The browser should open a draggable UI for a region search. The result
-  // should open in a new tab.
-  ui_test_utils::AllBrowserTabAddedWaiter add_tab;
-
-  OpenImagePageAndContextMenuForLensImageSearch(
-      "/google/logo.gif", ui::EF_MOUSE_BUTTON,
-      // Callback that will be called after the context menu item is clicked.
-      base::NullCallback());
-
-  // Get the result URL in the new tab and verify.
-  content::WebContents* new_tab = add_tab.Wait();
-  content::WaitForLoadStop(new_tab);
-
-  std::string new_tab_content = new_tab->GetLastCommittedURL().GetContent();
-  std::string expected_content = GetLensURL().GetContent();
-
-  // Match strings up to the query.
-  std::size_t query_start_pos = new_tab_content.find("?");
-  // Match the query parameters, without the value of start_time.
-  EXPECT_THAT(new_tab_content, testing::MatchesRegex(
-                                   expected_content.substr(0, query_start_pos) +
-                                   ".*ep=ccm&re=df&s=4&st=\\d+&lm=.+"));
-  ExpectThatRequestContainsImageData(new_tab);
-}
-
-class LensOverlayBrowserTest : public LensBrowserBaseTest {
- protected:
-  void SetUp() override {
-    feature_list_.InitWithFeatures(
-        {lens::features::kLensOverlay,
-         lens::features::kLensOverlayTextSelectionContextMenuEntrypoint},
-        {lens::features::kLensOverlayKeyboardSelection});
-
-    // This does not use LensBrowserBaseTest::SetUp because that
-    // function does its own conflicting initialization of a FeatureList.
-    InProcessBrowserTest::SetUp();
-  }
-
-  void SetUpOnMainThread() override {
-    InProcessBrowserTest::SetUpOnMainThread();
-
-    // Permits sharing the page screenshot and content by default.
-    PrefService* prefs = browser()->GetProfile()->GetPrefs();
-    prefs->SetBoolean(lens::prefs::kLensSharingPageScreenshotEnabled, true);
-    prefs->SetBoolean(lens::prefs::kLensSharingPageContentEnabled, true);
-  }
-
-  void TearDownOnMainThread() override {
-    InProcessBrowserTest::TearDownOnMainThread();
-
-    // Disallow sharing the page screenshot by default.
-    PrefService* prefs = browser()->GetProfile()->GetPrefs();
-    prefs->SetBoolean(lens::prefs::kLensSharingPageScreenshotEnabled, false);
-  }
-
-  void OpenContextMenuAndSelectRegionSearchEntrypoint(
-      int event_flags,
-      ContextMenuNotificationObserver::MenuShownCallback callback) {
-    // `menu_observer_` will cause the search lens for image menu item to be
-    // clicked.
-    menu_observer_ = std::make_unique<ContextMenuNotificationObserver>(
-        IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH, event_flags,
-        std::move(callback));
-    RightClickToOpenContextMenu();
-  }
-
-  void OpenContextMenuAndSelectSelectAll(
-      int event_flags,
-      ContextMenuNotificationObserver::MenuShownCallback callback) {
-    // `menu_observer_` will cause the select all menu item to be clicked.
-    menu_observer_ = std::make_unique<ContextMenuNotificationObserver>(
-        IDC_CONTENT_CONTEXT_SELECTALL, event_flags, std::move(callback));
-    RightClickToOpenContextMenu();
-  }
-
-  void OpenContextMenuAndSelectSearchWebFor(
-      int event_flags,
-      ContextMenuNotificationObserver::MenuShownCallback callback) {
-    // `menu_observer_` will cause the search web for text menu item to be
-    // clicked.
-    menu_observer_ = std::make_unique<ContextMenuNotificationObserver>(
-        IDC_CONTENT_CONTEXT_SEARCHWEBFOR, event_flags, std::move(callback));
-    RightClickToOpenContextMenu();
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(LensOverlayBrowserTest,
-                       RegionSearchContextMenuOpensLensOverlay) {
-  // State should start in off.
-  auto* controller = browser()
-                         ->tab_strip_model()
-                         ->GetActiveTab()
-                         ->GetTabFeatures()
-                         ->lens_overlay_controller();
-  ASSERT_EQ(controller->state(), LensOverlayController::State::kOff);
-
-  OpenContextMenuAndSelectRegionSearchEntrypoint(ui::EF_MOUSE_BUTTON,
-                                                 base::NullCallback());
-
-  // Clicking the region search entrypoint should eventually result in overlay
-  // state.
-  ASSERT_TRUE(base::test::RunUntil([&]() {
-    return controller->state() == LensOverlayController::State::kOverlay;
-  }));
-}
-
-IN_PROC_BROWSER_TEST_F(LensOverlayBrowserTest,
-                       SearchForTextContextMenuOpensLensOverlay) {
-  GURL page("data:text/html,text");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), page));
-
-  // State should start in off.
-  auto* controller = browser()
-                         ->tab_strip_model()
-                         ->GetActiveTab()
-                         ->GetTabFeatures()
-                         ->lens_overlay_controller();
-  ASSERT_EQ(controller->state(), LensOverlayController::State::kOff);
-
-  OpenContextMenuAndSelectSelectAll(
-      ui::EF_MOUSE_BUTTON,
-      // Callback that will be called after the context menu item is clicked.
-      base::BindLambdaForTesting([&](RenderViewContextMenu* menu) {
-        OpenContextMenuAndSelectSearchWebFor(ui::EF_MOUSE_BUTTON,
-                                             base::NullCallback());
-      }));
-
-  // Wait for the side panel to load.
-  ASSERT_TRUE(base::test::RunUntil(
-      [&]() { return controller->GetSidePanelWebContentsForTesting(); }));
-  EXPECT_TRUE(content::WaitForLoadStop(
-      controller->GetSidePanelWebContentsForTesting()));
-  ASSERT_EQ(controller->state(), LensOverlayController::State::kOff);
-}
-
-IN_PROC_BROWSER_TEST_F(LensOverlayBrowserTest,
-                       RegionSearchContextMenuDoesNotOpenRegionSearch) {
-  bool run = false;
-  OpenContextMenuAndSelectRegionSearchEntrypoint(
-      ui::EF_MOUSE_BUTTON,
-      // Callback that will be called after the context menu item is clicked.
-      base::BindLambdaForTesting([&](RenderViewContextMenu* menu) {
-        // Verify the normal region search flow does not activate
-        ASSERT_FALSE(menu->lens_region_search_controller_started_for_testing());
-        run = true;
-      }));
-
-  // Verify the callback above finished running before finishing the test.
-  ASSERT_TRUE(base::test::RunUntil([&]() { return run == true; }));
-}
-
-IN_PROC_BROWSER_TEST_F(LensOverlayBrowserTest,
-                       RegionSearchContextMenuOpensRegionSearchForKeyboard) {
-  bool run = false;
-  // EF_NONE event_type will be treated as a keyboard press.
-  OpenContextMenuAndSelectRegionSearchEntrypoint(
-      ui::EF_NONE,
-      // Callback that will be called after the context menu item is clicked.
-      base::BindLambdaForTesting([&](RenderViewContextMenu* menu) {
-        // Verify the normal region search flow activates.
-        ASSERT_TRUE(menu->lens_region_search_controller_started_for_testing());
-        run = true;
-      }));
-
-  // Verify the callback above finished running before finishing the test.
-  ASSERT_TRUE(base::test::RunUntil([&]() { return run == true; }));
-}
-
-IN_PROC_BROWSER_TEST_F(LensOverlayBrowserTest,
-                       ImageSearchContextMenuDoesNotOpenImageSearch) {
-  bool run = false;
-  int starting_tab_index = browser()->tab_strip_model()->active_index();
-  OpenImagePageAndContextMenuForLensImageSearch(
-      "/google/logo.gif", ui::EF_MOUSE_BUTTON,
-      // Callback that will be called after the context menu item is clicked.
-      base::BindLambdaForTesting([&](RenderViewContextMenu* menu) {
-        // Verify the normal image search flow does not activate.
-        ASSERT_FALSE(menu->lens_region_search_controller_started_for_testing());
-        run = true;
-      }));
-
-  // Verify the callback above finished running before finishing the test.
-  ASSERT_TRUE(base::test::RunUntil([&]() { return run == true; }));
-  // Verify that the tab has not been changed.
-  ASSERT_EQ(browser()->tab_strip_model()->active_index(), starting_tab_index);
-}
-
-// https://crbug.com/40064516
-#if BUILDFLAG(IS_LINUX)
-#define MAYBE_ImageSearchContextMenuOpensImageSearchForKeyboard \
-  DISABLED_ImageSearchContextMenuOpensImageSearchForKeyboard
-#else
-#define MAYBE_ImageSearchContextMenuOpensImageSearchForKeyboard \
-  ImageSearchContextMenuOpensImageSearchForKeyboard
-#endif
-IN_PROC_BROWSER_TEST_F(
-    LensOverlayBrowserTest,
-    MAYBE_ImageSearchContextMenuOpensImageSearchForKeyboard) {
-  bool run = false;
-  int starting_tab_index = browser()->tab_strip_model()->active_index();
-  // EF_NONE event_type will be treated as a keyboard press.
-  OpenImagePageAndContextMenuForLensImageSearch(
-      "/google/logo.gif", ui::EF_NONE,
-      // Callback that will be called after the context menu item is clicked.
-      base::BindLambdaForTesting(
-          [&](RenderViewContextMenu* menu) { run = true; }));
-
-  // Verify the callback above finished running before finishing the test.
-  ASSERT_TRUE(base::test::RunUntil([&]() { return run == true; }));
-  // Verify that a new tab opens with Lens results.
-  ASSERT_NE(browser()->tab_strip_model()->active_index(), starting_tab_index);
-}
-
-#endif  // BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-
 #if BUILDFLAG(ENABLE_PDF)
 class OopifPdfExtensionContextMenuBrowserTest : public PDFExtensionTestBase {
  public:
@@ -3301,10 +2817,6 @@ IN_PROC_BROWSER_TEST_P(ContextMenuBrowserTestMenuSimplification,
   EXPECT_TRUE(menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_SAVEVIDEOFRAMEAS));
   EXPECT_TRUE(IsItemPresent(menu.get(), IDC_CONTENT_CONTEXT_COPYVIDEOFRAME));
   EXPECT_TRUE(menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_COPYVIDEOFRAME));
-  EXPECT_TRUE(
-      IsItemPresent(menu.get(), IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME));
-  EXPECT_TRUE(
-      menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME));
 }
 
 IN_PROC_BROWSER_TEST_P(ContextMenuBrowserTestMenuSimplification,
@@ -3318,10 +2830,6 @@ IN_PROC_BROWSER_TEST_P(ContextMenuBrowserTestMenuSimplification,
   EXPECT_FALSE(menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_SAVEVIDEOFRAMEAS));
   EXPECT_TRUE(IsItemPresent(menu.get(), IDC_CONTENT_CONTEXT_COPYVIDEOFRAME));
   EXPECT_FALSE(menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_COPYVIDEOFRAME));
-  EXPECT_TRUE(
-      IsItemPresent(menu.get(), IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME));
-  EXPECT_FALSE(
-      menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME));
 }
 
 IN_PROC_BROWSER_TEST_P(ContextMenuBrowserTestMenuSimplification,

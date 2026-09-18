@@ -97,9 +97,6 @@
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/exclusive_access/keyboard_lock_controller.h"
-#include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
-#include "chrome/browser/ui/lens/lens_search_controller.h"
-#include "chrome/browser/ui/lens/lens_string_utils.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/passwords/ui_utils.h"
@@ -147,18 +144,12 @@
 #include "components/compose/buildflags.h"
 #include "components/compose/core/browser/compose_features.h"
 #include "components/content_extraction/content/browser/inner_text.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/custom_handlers/protocol_handler.h"
 #include "components/download/public/common/download_url_parameters.h"
 #include "components/enterprise/isolated_mode/settings.h"
 #include "components/google/core/common/google_util.h"
 #include "components/guest_view/browser/guest_view_base.h"
 #include "components/language/core/browser/language_model_manager.h"
-#include "components/lens/lens_constants.h"
-#include "components/lens/lens_features.h"
-#include "components/lens/lens_metadata.mojom.h"
-#include "components/lens/lens_metrics.h"
-#include "components/lens/lens_overlay_invocation_source.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
@@ -294,12 +285,6 @@
 #endif  // BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #endif  // BUILDFLAG(ENABLE_PRINTING)
 
-#if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-#include "chrome/browser/lens/region_search/lens_region_search_controller.h"
-#include "chrome/grit/theme_resources.h"
-#include "ui/base/resource/resource_bundle.h"
-#endif
-
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #include "ui/base/menu_source_utils.h"
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
@@ -367,25 +352,6 @@ base::OnceCallback<void(RenderViewContextMenu*)>* GetMenuShownCallback() {
 
 // This IDC_ "value" is a sentinel for the UMA max value.
 constexpr int kUmaMaxValueKey = 0;
-
-ui::ImageModel GetLensContextMenuIcon() {
-#if BUILDFLAG(IS_MAC)
-  if (!base::FeatureList::IsEnabled(
-          lens::features::kShowContextualTasksMenuIcon)) {
-    return ui::ImageModel();
-  }
-#endif
-
-  return ui::ImageModel::FromVectorIcon(
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      vector_icons::kGoogleLensMonochromeLogoIcon
-#else
-      features::IsRoundedIconsEnabled()
-          ? vector_icons::kSearchIcon
-          : vector_icons::kSearchChromeRefreshOldIcon
-#endif
-  );
-}
 
 enum class UmaEnumIdLookupType {
   GeneralEnumId,
@@ -505,9 +471,9 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        {IDC_CONTENT_CONTEXT_GENERATE_QR_CODE, 110},
        // Removed: {IDC_CONTENT_CLIPBOARD_HISTORY_MENU, 111},
        {IDC_CONTENT_CONTEXT_COPYLINKTOTEXT, 112},
-       {IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE, 113},
+       // Removed: {IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE, 113},
        {IDC_CONTENT_CONTEXT_REMOVELINKTOTEXT, 114},
-       {IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH, 115},
+       // Removed: {IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH, 115},
        {IDC_CONTENT_CONTEXT_WEB_REGION_SEARCH, 116},
        {IDC_CONTENT_CONTEXT_RESHARELINKTOTEXT, 117},
        {IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE, 118},
@@ -533,7 +499,7 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        {IDC_CONTEXT_COMPOSE, 139},
        // Removed: {IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PAYMENTS, 140},
        {IDC_CONTENT_CONTEXT_SAVEVIDEOFRAMEAS, 141},
-       {IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME, 142},
+       // Removed: {IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME, 142},
        {IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME, 143},
        // Removed: {IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PLUS_ADDRESS, 145},
        // Removed: {IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS, 146},
@@ -597,8 +563,8 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        {IDC_CONTENT_CONTEXT_PASTE, 18},
        {IDC_CONTENT_CONTEXT_GOTOURL, 19},
        {IDC_CONTENT_CONTEXT_COPYLINKTOTEXT, 20},
-       {IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE, 21},
-       {IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH, 22},
+       // Removed: {IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE, 21},
+       // Removed: {IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH, 22},
        {IDC_CONTENT_CONTEXT_WEB_REGION_SEARCH, 23},
        {IDC_CONTENT_CONTEXT_RESHARELINKTOTEXT, 24},
        {IDC_OPEN_LINK_IN_PROFILE_FIRST, 25},
@@ -824,29 +790,9 @@ bool MaybePdfViewerHandlesSave(RenderFrameHost* frame_host) {
 }
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-bool IsLensOptionEnteredThroughKeyboard(int event_flags) {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // This check must be done inside the BUILDFLAG block because
-  // GetMenuSourceType is only available in this case.
-  return ui::GetMenuSourceType(event_flags) ==
-         ui::mojom::MenuSourceType::kKeyboard;
-#else
-  return false;
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-}
-
 bool IsGlicWindow(const RenderViewContextMenu* menu,
                   content::BrowserContext* browser_context) {
   return false;
-}
-
-bool IsPrintPreviewContent(const GURL& current_url) {
-#if BUILDFLAG(ENABLE_PRINT_PREVIEW)
-  return printing::PrintPreviewDialogController::IsPrintPreviewContentURL(
-      current_url);
-#else
-  return false;
-#endif
 }
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -1097,11 +1043,7 @@ void RenderViewContextMenu::InitMenu() {
   const bool use_simplified_menu_for_text_selection =
       ShouldUseSimplifiedTextSelection();
 
-  bool took_simplified_page_items_path = false;
   if (content_type_->SupportsGroup(ContextMenuContentType::ITEM_GROUP_PAGE)) {
-    took_simplified_page_items_path = features::IsMenuSimplificationEnabled() &&
-                                      params_.selection_text.empty() &&
-                                      !params_.is_editable;
     AppendPageItems();
   }
 
@@ -1126,11 +1068,7 @@ void RenderViewContextMenu::InitMenu() {
     AppendImageItems();
   }
 
-  if (features::IsMenuSimplificationEnabled()) {
-    if (!took_simplified_page_items_path) {
-      AppendLensGeminiSection();
-    }
-  } else {
+  if (!features::IsMenuSimplificationEnabled()) {
     if (content_type_->SupportsGroup(
             ContextMenuContentType::ITEM_GROUP_SEARCHWEBFORIMAGE)) {
       AppendSearchWebForImageItems();
@@ -1344,23 +1282,7 @@ Profile* RenderViewContextMenu::GetProfile() const {
 }
 
 int RenderViewContextMenu::GetSearchForImageIdc() const {
-  if (base::FeatureList::IsEnabled(lens::features::kLensStandalone) &&
-      search::DefaultSearchProviderIsGoogle(GetProfile())) {
-    return IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE;
-  }
   return IDC_CONTENT_CONTEXT_SEARCHWEBFORIMAGE;
-}
-
-int RenderViewContextMenu::GetRegionSearchIdc() const {
-  return search::DefaultSearchProviderIsGoogle(GetProfile())
-             ? IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH
-             : IDC_CONTENT_CONTEXT_WEB_REGION_SEARCH;
-}
-
-int RenderViewContextMenu::GetSearchForVideoFrameIdc() const {
-  return search::DefaultSearchProviderIsGoogle(GetProfile())
-             ? IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME
-             : IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME;
 }
 
 const TemplateURL* RenderViewContextMenu::GetImageSearchProvider() const {
@@ -1439,17 +1361,6 @@ void RenderViewContextMenu::RecordUsedItem(int id) {
       base::RecordAction(base::UserMetricsAction(
           "NewTabPage.LinkOpenedFromContextMenu.WebUI"));
     }
-  }
-
-  // Log UKM for Lens context menu items.
-  if (id == IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH ||
-      id == IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE) {
-    // Enum id should correspond to the RenderViewContextMenuItem enum.
-    ukm::SourceId source_id =
-        source_web_contents_->GetPrimaryMainFrame()->GetPageUkmSourceId();
-    ukm::builders::RenderViewContextMenu_Used(source_id)
-        .SetSelectedMenuItem(enum_id)
-        .Record(ukm::UkmRecorder::Get());
   }
 
   // Log for specific contexts. Note that since the menu is displayed for
@@ -1960,31 +1871,10 @@ void RenderViewContextMenu::AppendSearchWebForImageItems() {
   }
 
   const int search_for_image_idc = GetSearchForImageIdc();
-  auto* entry_point_controller =
-      GetBrowser() ? lens::LensOverlayEntryPointController::From(GetBrowser())
-                   : nullptr;
-  ui::ImageModel icon = GetLensContextMenuIcon();
-  if (entry_point_controller && entry_point_controller->IsEnabled() &&
-      lens::features::UseLensOverlayForImageSearch()) {
-    // If the entrypoint is ephermally hidden, don't add the item.
-    if (!entry_point_controller->AreVisible()) {
-      return;
-    }
-    menu_model_.AddItemWithStringIdAndIcon(
-        search_for_image_idc, IDS_LENS_OVERLAY_IMAGE_ENTRYPOINT_LABEL_ALT3,
-        icon);
-  } else {
-    menu_model_.AddItemWithIcon(
-        search_for_image_idc,
-        l10n_util::GetStringFUTF16(IDS_CONTENT_CONTEXT_SEARCHLENSFORIMAGE,
-                                   provider->short_name()),
-        icon);
-  }
   const int command_index =
       menu_model_.GetIndexOfCommandId(search_for_image_idc).value();
   menu_model_.SetElementIdentifierAt(command_index, kSearchForImageItem);
 
-  MaybePrepareForLensQuery();
 }
 
 void RenderViewContextMenu::AppendGlicShareImageItem() {}
@@ -2054,46 +1944,6 @@ void RenderViewContextMenu::AppendVideoItems() {
   if (!use_submenu) {
     menu_model_.AddCheckItemWithStringId(IDC_CONTENT_CONTEXT_PICTUREINPICTURE,
                                          IDS_CONTENT_CONTEXT_PICTUREINPICTURE);
-  }
-
-  // Search for video frame menu item.
-  if (base::FeatureList::IsEnabled(media::kContextMenuSearchForVideoFrame) &&
-      IsSearchAllowedByPolicy()) {
-    const int search_for_video_frame_idc = GetSearchForVideoFrameIdc();
-    auto* entry_point_controller =
-        GetBrowser() ? lens::LensOverlayEntryPointController::From(GetBrowser())
-                     : nullptr;
-    bool item_added = false;
-    ui::ImageModel icon = GetLensContextMenuIcon();
-
-    if (entry_point_controller && entry_point_controller->IsEnabled() &&
-        lens::features::UseLensOverlayForVideoFrameSearch()) {
-      // Add the item only if the entrypoint is visible.
-      if (entry_point_controller->AreVisible()) {
-        target_model->AddItemWithStringIdAndIcon(
-            search_for_video_frame_idc,
-            IDS_LENS_OVERLAY_VIDEO_ENTRYPOINT_LABEL_ALT3, icon);
-        item_added = true;
-      }
-    } else {
-      const auto* provider = GetImageSearchProvider();
-      if (provider) {
-        target_model->AddItemWithIcon(
-            search_for_video_frame_idc,
-            l10n_util::GetStringFUTF16(IDS_CONTENT_CONTEXT_SEARCHFORVIDEOFRAME,
-                                       GetImageSearchProviderName(provider)),
-            icon);
-        item_added = true;
-      }
-    }
-
-    if (item_added) {
-      // Used for interactive tests. See LensOverlayControllerCUJTest.
-      target_model->SetElementIdentifierAt(target_model->GetItemCount() - 1,
-                                           kSearchForVideoFrameItem);
-
-      MaybePrepareForLensQuery();
-    }
   }
 
   if (use_submenu && video_frame_submenu_model_.GetItemCount() > 0) {
@@ -2175,16 +2025,7 @@ void RenderViewContextMenu::AppendPageItems() {
       // Save to Memory Banks
       AppendSaveToMemoryBanksItem();
 
-      // Search with google lens
-      if (IsRegionSearchEnabled()) {
-        AppendRegionSearchItem();
-      }
     } else {
-      // Search with google lens
-      if (IsRegionSearchEnabled()) {
-        AppendRegionSearchItem();
-      }
-
       // Ask gemini
       MaybeAppendOpenGlicItem(/*add_separator=*/false);
 
@@ -2219,17 +2060,11 @@ void RenderViewContextMenu::AppendPageItems() {
   menu_model_.AddItemWithStringId(IDC_PRINT, IDS_CONTENT_CONTEXT_PRINT);
 
   if (features::IsReadAnythingMenuShuffleExperimentEnabled()) {
-    if (IsRegionSearchEnabled()) {
-      AppendRegionSearchItem();
-    }
     if (glic_below_search) {
       MaybeAppendOpenGlicItem(/*add_separator=*/false);
     }
   } else {  // No ReadAnythingMenuShuffleExperiment -- keep default code.
     if (!features::IsMenuSimplificationEnabled()) {
-      if (IsRegionSearchEnabled()) {
-        AppendRegionSearchItem();
-      }
       if (glic_below_search) {
         MaybeAppendOpenGlicItem(/*add_separator=*/false);
       }
@@ -2418,13 +2253,7 @@ void RenderViewContextMenu::AppendSearchProvider() {
       return;
     }
 
-    // When the Lens text selection entrypoint flag is enabled, checking for the
-    // availability of Lens requires the browser, so hide the menu item if the
-    // flag is enabled and there is no browser (e.g. when selecting in the side
-    // panel). However, show the menu item in print preview.
-    if (!lens::features::
-            IsLensOverlayTextSelectionContextMenuEntrypointEnabled() ||
-        GetBrowser() || IsPrintPreviewContent(current_url_)) {
+    {
       menu_model_.AddItem(
           IDC_CONTENT_CONTEXT_SEARCHWEBFOR,
           l10n_util::GetStringFUTF16(IDS_CONTENT_CONTEXT_SEARCHWEBFOR,
@@ -2649,54 +2478,6 @@ void RenderViewContextMenu::AppendSharingItems() {
 
 
 
-void RenderViewContextMenu::AppendRegionSearchItem() {
-  auto* entry_point_controller =
-      GetBrowser() ? lens::LensOverlayEntryPointController::From(GetBrowser())
-                   : nullptr;
-  ui::ImageModel icon = GetLensContextMenuIcon();
-
-  if (entry_point_controller && entry_point_controller->IsEnabled()) {
-    // If the entrypoint is ephermally hidden, exit early so the item is not
-    // added.
-    if (!entry_point_controller->AreVisible()) {
-      return;
-    }
-    menu_model_.AddItemWithStringIdAndIcon(
-        IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH,
-        lens::GetLensOverlayEntrypointLabelAltIds(), icon);
-    const int command_index =
-        menu_model_.GetIndexOfCommandId(IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH)
-            .value();
-    menu_model_.SetElementIdentifierAt(command_index, kRegionSearchItem);
-    return;
-  }
-
-  // GetImageSearchProvider can return null in unit tests or when the default
-  // search provider is disabled by policy. In these cases, we align with the
-  // search web for image menu item by not adding the region search menu item.
-  const TemplateURL* provider = GetImageSearchProvider();
-  if (provider) {
-    const int region_search_idc = GetRegionSearchIdc();
-    const int resource_id = IDS_CONTENT_CONTEXT_LENS_REGION_SEARCH;
-
-    ui::ImageModel fallback_icon = icon;
-    if (!search::DefaultSearchProviderIsGoogle(GetProfile())) {
-      fallback_icon = ui::ImageModel();
-    }
-
-    menu_model_.AddItemWithIcon(
-        region_search_idc,
-        l10n_util::GetStringFUTF16(resource_id,
-                                   GetImageSearchProviderName(provider)),
-        fallback_icon);
-
-    menu_model_.SetElementIdentifierAt(
-        menu_model_.GetIndexOfCommandId(region_search_idc).value(),
-        kRegionSearchItem);
-
-    MaybePrepareForLensQuery();
-  }
-}
 
 
 // Menu delegate functions -----------------------------------------------------
@@ -2800,7 +2581,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_LOAD_IMAGE:
     case IDC_CONTENT_CONTEXT_OPENIMAGENEWTAB:
     case IDC_CONTENT_CONTEXT_SEARCHWEBFORIMAGE:
-    case IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE:
     case IDC_CONTENT_CONTEXT_GLICSHAREIMAGE:
       return navigation_allowed && params_.src_url.is_valid() &&
              (params_.src_url.GetScheme() != content::kChromeUIScheme);
@@ -2829,7 +2609,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
 
     case IDC_CONTENT_CONTEXT_SAVEVIDEOFRAMEAS:
     case IDC_CONTENT_CONTEXT_COPYVIDEOFRAME:
-    case IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME:
     case IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME:
       return IsVideoFrameItemEnabled(id);
 
@@ -2908,7 +2687,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_SEND_TAB_TO_SELF:
       return true;
 
-    case IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH:
     case IDC_CONTENT_CONTEXT_WEB_REGION_SEARCH:
       // These region search items will not be added if there is no default
       // search provider available.
@@ -3191,14 +2969,11 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       ExecCopyVideoFrame();
       break;
 
-    case IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME:
     case IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME:
       enterprise_data_protection::ShouldAllowSearchWith(
           GetWebContentsForDataControls(), /*selection_size=*/0,
           base::BindOnce(&RenderViewContextMenu::ExecSearchForVideoFrame,
-                         weak_pointer_factory_.GetWeakPtr(), event_flags,
-                         /*is_lens_query=*/id ==
-                             IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME));
+                         weak_pointer_factory_.GetWeakPtr(), event_flags));
       break;
 
     case IDC_CONTENT_CONTEXT_GLIC:
@@ -3213,23 +2988,12 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       ExecGlicShareImage();
       break;
 
-    case IDC_CONTENT_CONTEXT_SEARCHLENSFORIMAGE:
-      ExecSearchLensForImage(event_flags);
-      break;
-
     case IDC_CONTENT_CONTEXT_SAVE_TO_MEMORY_BANKS:
       ExecSaveToMemoryBanks();
       break;
 
     case IDC_CONTENT_CONTEXT_RELOAD_GLIC:
     case IDC_CONTENT_CONTEXT_ARCHIVE_GLIC:
-      break;
-
-    case IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH:
-      ExecRegionSearch(event_flags, true);
-      break;
-    case IDC_CONTENT_CONTEXT_WEB_REGION_SEARCH:
-      ExecRegionSearch(event_flags, false);
       break;
 
     case IDC_CONTENT_CONTEXT_OPEN_ORIGINAL_IMAGE_NEW_TAB:
@@ -3403,17 +3167,8 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       source_web_contents_->SelectAll();
       break;
 
-    case IDC_CONTENT_CONTEXT_SEARCHWEBFOR: {
-      RecordAmbientSearchQuery(
-          lens::AmbientSearchEntryPoint::CONTEXT_MENU_SEARCH_WEB_FOR);
-#if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-      if (ShouldOpenTextQueryInLens()) {
-        OpenTextQueryInLens();
-        break;
-      }
-#endif  // BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
+    case IDC_CONTENT_CONTEXT_SEARCHWEBFOR:
       [[fallthrough]];
-    }
     case IDC_CONTENT_CONTEXT_SEARCHWEBFORNEWTAB: {
       auto disposition = ui::DispositionFromEventFlags(
           event_flags, WindowOpenDisposition::NEW_FOREGROUND_TAB);
@@ -3602,14 +3357,6 @@ bool RenderViewContextMenu::IsSearchAllowedByPolicy() const {
       GetWebContentsForDataControls());
 }
 
-bool RenderViewContextMenu::ShouldOpenTextQueryInLens() const {
-  BrowserWindowInterface* browser = GetBrowser();
-  return lens::features::
-             IsLensOverlayTextSelectionContextMenuEntrypointEnabled() &&
-         browser &&
-         lens::LensOverlayEntryPointController::From(browser)->IsEnabled();
-}
-
 // Controller functions --------------------------------------------------------
 
 bool RenderViewContextMenu::IsReloadEnabled() const {
@@ -3788,33 +3535,6 @@ bool RenderViewContextMenu::IsQRCodeGeneratorEnabled() const {
       IsGeneratorAvailable(entry->GetURL());
 }
 
-bool RenderViewContextMenu::IsRegionSearchEnabled() const {
-  if (!GetBrowser()) {
-    return false;
-  }
-
-  if (lens::LensOverlayEntryPointController::From(GetBrowser())->IsEnabled()) {
-    return true;
-  }
-
-#if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-#if BUILDFLAG(IS_MAC)
-  // Region selection is broken in PWAs on Mac b/250074889
-  if (IsInProgressiveWebApp()) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_MAC)
-
-  return base::FeatureList::IsEnabled(lens::features::kLensStandalone) &&
-         GetImageSearchProvider() &&
-         !params_.frame_url.SchemeIs(content::kChromeUIScheme) &&
-         GetPrefs(browser_context_)
-             ->GetBoolean(prefs::kLensRegionSearchEnabled);
-#else
-  return false;
-#endif  // BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-}
-
 bool RenderViewContextMenu::IsVideoFrameItemEnabled(int id) const {
   if ((params_.media_flags & ContextMenuData::kMediaEncrypted) != 0 ||
       (params_.media_flags & ContextMenuData::kMediaHasReadableVideoFrame) ==
@@ -3823,7 +3543,6 @@ bool RenderViewContextMenu::IsVideoFrameItemEnabled(int id) const {
   }
 
   switch (id) {
-    case IDC_CONTENT_CONTEXT_SEARCHLENSFORVIDEOFRAME:
     case IDC_CONTENT_CONTEXT_SEARCHWEBFORVIDEOFRAME:
       return IsSearchAllowedByPolicy();
     default:
@@ -4314,138 +4033,6 @@ void RenderViewContextMenu::ExecCopyImageAt() {
 #endif
 }
 
-void RenderViewContextMenu::ExecSearchLensForImage(int event_flags) {
-  CoreTabHelper* core_tab_helper =
-      CoreTabHelper::FromWebContents(source_web_contents_);
-  if (!core_tab_helper) {
-    return;
-  }
-  RenderFrameHost* render_frame_host = GetRenderFrameHost();
-  if (!render_frame_host) {
-    return;
-  }
-
-  // TODO(crbug.com/428031945): Clean up once LensOverlayKeyboardSelection
-  // lands.
-  bool use_keyboard_accessibility_fallback =
-      IsLensOptionEnteredThroughKeyboard(event_flags) &&
-      !lens::features::IsLensOverlayKeyboardSelectionEnabled();
-  bool lens_overlay_for_image_search_enabled =
-      lens::LensOverlayEntryPointController::From(GetBrowser())->IsEnabled() &&
-      lens::features::UseLensOverlayForImageSearch();
-  if (lens_overlay_for_image_search_enabled &&
-      !use_keyboard_accessibility_fallback) {
-    lens::RecordAmbientSearchQuery(
-        lens::AmbientSearchEntryPoint::
-            CONTEXT_MENU_SEARCH_IMAGE_WITH_LENS_OVERLAY);
-
-    auto view_bounds = render_frame_host->GetView()->GetViewBounds();
-    auto tab_bounds = source_web_contents_->GetViewBounds();
-    float device_scale_factor =
-        render_frame_host->GetView()->GetDeviceScaleFactor();
-    mojo::AssociatedRemote<chrome::mojom::ChromeRenderFrame>
-        chrome_render_frame;
-    render_frame_host->GetRemoteAssociatedInterfaces()->GetInterface(
-        &chrome_render_frame);
-    // Bind the InterfacePtr into the callback so that it's kept alive until
-    // there's either a connection error or a response.
-    auto* frame = chrome_render_frame.get();
-
-    frame->RequestBitmapForContextNodeWithBoundsHint(base::BindOnce(
-        &RenderViewContextMenu::OpenLensOverlayWithPreselectedRegion,
-        weak_pointer_factory_.GetWeakPtr(), std::move(chrome_render_frame),
-        lens::LensOverlayInvocationSource::kContentAreaContextMenuImage,
-        tab_bounds, view_bounds, device_scale_factor));
-  } else {
-    // If keyboard selection in Lens Overlay is disabled, when the Lens image
-    // search feature is entered via the context menu with a Keyboard action,
-    // use the Lens region search flow through core_tab_helper instead of the
-    // Lens Overlay flow.
-    lens::RecordAmbientSearchQuery(
-        lens_overlay_for_image_search_enabled
-            ? lens::AmbientSearchEntryPoint::
-                  CONTEXT_MENU_SEARCH_IMAGE_WITH_LENS_OVERLAY_ACCESSIBILITY_FALLBACK
-            : lens::AmbientSearchEntryPoint::
-                  CONTEXT_MENU_SEARCH_IMAGE_WITH_GOOGLE_LENS);
-    core_tab_helper->SearchWithLens(
-        render_frame_host, params().src_url,
-        lens::EntryPoint::CHROME_SEARCH_WITH_GOOGLE_LENS_CONTEXT_MENU_ITEM);
-  }
-}
-
-void RenderViewContextMenu::OpenLensOverlayWithPreselectedRegion(
-    mojo::AssociatedRemote<chrome::mojom::ChromeRenderFrame>
-        chrome_render_frame,
-    lens::LensOverlayInvocationSource invocation_source,
-    const gfx::Rect& tab_bounds,
-    const gfx::Rect& view_bounds,
-    float device_scale_factor,
-    const SkBitmap& region_bitmap,
-    const gfx::Rect& region_bounds) {
-  // Scale the region bounds, which are in physical pixels, to device pixels.
-  auto scaled_region_bounds =
-      gfx::ScaleToEnclosedRect(region_bounds, 1.f / device_scale_factor);
-  LensSearchController* const controller =
-      LensSearchController::FromTabWebContents(source_web_contents_);
-  CHECK(controller);
-  controller->OpenLensOverlayWithPendingRegionFromBounds(
-      invocation_source, tab_bounds, view_bounds, scaled_region_bounds,
-      region_bitmap);
-}
-
-void RenderViewContextMenu::ExecRegionSearch(
-    int event_flags,
-    bool is_google_default_search_provider) {
-  BrowserWindowInterface* browser = GetBrowser();
-  CHECK(browser);
-
-  bool lens_overlay_for_region_search_enabled =
-      lens::LensOverlayEntryPointController::From(GetBrowser())->IsEnabled();
-  // If Lens overlay is enabled but keyboard selection is disabled and the user
-  // triggered the context menu option via keyboard, use the Lens region search
-  // flow (with results forced into a new tab) instead of the Lens Overlay flow.
-  // TODO(crbug.com/428031945): Clean up once LensOverlayKeyboardSelection
-  // lands.
-  bool use_keyboard_accessibility_fallback =
-      IsLensOptionEnteredThroughKeyboard(event_flags) &&
-      !lens::features::IsLensOverlayKeyboardSelectionEnabled();
-  if (lens_overlay_for_region_search_enabled) {
-    UserEducationService::MaybeNotifyNewBadgeFeatureUsed(
-        GetBrowserContext(), lens::features::kLensOverlay);
-    if (!use_keyboard_accessibility_fallback) {
-      lens::RecordAmbientSearchQuery(
-          lens::AmbientSearchEntryPoint::
-              CONTEXT_MENU_SEARCH_REGION_WITH_LENS_OVERLAY);
-      LensSearchController* const controller =
-          LensSearchController::FromTabWebContents(embedder_web_contents_);
-      CHECK(controller);
-      controller->OpenLensOverlay(
-          lens::LensOverlayInvocationSource::kContentAreaContextMenuPage);
-      return;
-    }
-  }
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // If Lens fullscreen search is enabled, we want to send every region search
-  // as a fullscreen capture.
-  // TODO(crbug.com/428031945): Clean up once LensOverlayKeyboardSelection
-  // lands.
-  const bool use_fullscreen_capture = use_keyboard_accessibility_fallback;
-  const lens::AmbientSearchEntryPoint entry_point =
-      lens_overlay_for_region_search_enabled
-          ? lens::AmbientSearchEntryPoint::
-                CONTEXT_MENU_SEARCH_REGION_WITH_LENS_OVERLAY_ACCESSIBILITY_FALLBACK
-      : is_google_default_search_provider
-          ? lens::AmbientSearchEntryPoint::
-                CONTEXT_MENU_SEARCH_REGION_WITH_GOOGLE_LENS
-          : lens::AmbientSearchEntryPoint::CONTEXT_MENU_SEARCH_REGION_WITH_WEB;
-  browser->GetFeatures().lens_region_search_controller()->Start(
-      embedder_web_contents_, use_fullscreen_capture,
-      is_google_default_search_provider, entry_point);
-  lens_region_search_controller_started_for_testing_ = true;
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-}
-
 void RenderViewContextMenu::ExecSearchWebForImage() {
   CoreTabHelper* core_tab_helper =
       CoreTabHelper::FromWebContents(source_web_contents_);
@@ -4456,8 +4043,6 @@ void RenderViewContextMenu::ExecSearchWebForImage() {
   if (!render_frame_host) {
     return;
   }
-  lens::RecordAmbientSearchQuery(
-      lens::AmbientSearchEntryPoint::CONTEXT_MENU_SEARCH_IMAGE_WITH_WEB);
   core_tab_helper->SearchByImage(render_frame_host, params().src_url);
 }
 
@@ -4511,8 +4096,7 @@ void RenderViewContextMenu::ExecCopyVideoFrame() {
 #endif
 }
 
-void RenderViewContextMenu::ExecSearchForVideoFrame(int event_flags,
-                                                    bool is_lens_query) {
+void RenderViewContextMenu::ExecSearchForVideoFrame(int event_flags) {
   base::RecordAction(UserMetricsAction("MediaContextMenu_SearchForVideoFrame"));
 
   RenderFrameHost* frame_host = GetRenderFrameHost();
@@ -4520,13 +4104,6 @@ void RenderViewContextMenu::ExecSearchForVideoFrame(int event_flags,
     return;
   }
 
-  frame_host->RequestVideoFrameAtWithBoundsHint(
-      gfx::Point(params_.x, params_.y),
-      gfx::Size(lens::kMaxPixelsForImageSearch, lens::kMaxPixelsForImageSearch),
-      lens::kMaxAreaForImageSearch,
-      base::BindOnce(&RenderViewContextMenu::SearchForVideoFrame,
-                     weak_pointer_factory_.GetWeakPtr(), event_flags,
-                     is_lens_query));
 }
 
 
@@ -4621,72 +4198,6 @@ void RenderViewContextMenu::MediaPlayerAction(
   }
 }
 
-void RenderViewContextMenu::SearchForVideoFrame(
-    int event_flags,
-    bool is_lens_query,
-    const SkBitmap& bitmap,
-    const gfx::Rect& region_bounds) {
-  if (bitmap.isNull()) {
-    return;
-  }
-
-  bool lens_overlay_for_video_search_enabled =
-      lens::LensOverlayEntryPointController::From(GetBrowser())->IsEnabled() &&
-      lens::features::UseLensOverlayForVideoFrameSearch() && is_lens_query;
-  // TODO(crbug/353984457): Clean this branching when the new server
-  // results flow is ready.
-  if (lens_overlay_for_video_search_enabled) {
-    RenderFrameHost* render_frame_host = GetRenderFrameHost();
-    if (!render_frame_host) {
-      return;
-    }
-
-    auto tab_bounds = source_web_contents_->GetViewBounds();
-    auto view_bounds = render_frame_host->GetView()->GetViewBounds();
-    float device_scale_factor =
-        render_frame_host->GetView()->GetDeviceScaleFactor();
-
-    RecordAmbientSearchQuery(
-        lens::AmbientSearchEntryPoint::
-            CONTEXT_MENU_SEARCH_VIDEO_FRAME_WITH_LENS_OVERLAY);
-
-    // OpenLensOverlayWithPreselectedRegion() only takes a `ChromeRenderFrame`
-    // to keep it alive while the mojo calls run, which is not needed here.
-    OpenLensOverlayWithPreselectedRegion(
-        /*chrome_render_frame=*/mojo::AssociatedRemote<
-            chrome::mojom::ChromeRenderFrame>(),
-        lens::LensOverlayInvocationSource::kContentAreaContextMenuVideo,
-        tab_bounds, view_bounds, device_scale_factor, bitmap, region_bounds);
-    return;
-  }
-
-  // If not using Lens overlay for video frame search, fallback to use
-  // CoreTabHelper.
-  CoreTabHelper* core_tab_helper =
-      CoreTabHelper::FromWebContents(source_web_contents_);
-  if (!core_tab_helper) {
-    return;
-  }
-
-  auto image =
-      gfx::Image(gfx::ImageSkia::CreateFromBitmap(bitmap, /*scale=*/1));
-
-  if (is_lens_query) {
-    RecordAmbientSearchQuery(
-        lens_overlay_for_video_search_enabled
-            ? lens::AmbientSearchEntryPoint::
-                  CONTEXT_MENU_SEARCH_VIDEO_WITH_LENS_OVERLAY_ACCESSIBILITY_FALLBACK
-            : lens::AmbientSearchEntryPoint::
-                  CONTEXT_MENU_SEARCH_VIDEO_FRAME_WITH_GOOGLE_LENS);
-    core_tab_helper->SearchWithLens(
-        image, lens::EntryPoint::CHROME_VIDEO_FRAME_SEARCH_CONTEXT_MENU_ITEM);
-  } else {
-    RecordAmbientSearchQuery(lens::AmbientSearchEntryPoint::
-                                 CONTEXT_MENU_SEARCH_VIDEO_FRAME_WITH_WEB);
-    core_tab_helper->SearchByImage(image);
-  }
-}
-
 void RenderViewContextMenu::PluginActionAt(
     const gfx::Point& location,
     blink::mojom::PluginActionType plugin_action) {
@@ -4719,23 +4230,6 @@ void RenderViewContextMenu::PluginActionAt(
   }
 }
 
-void RenderViewContextMenu::OpenTextQueryInLens() {
-  auto* const controller =
-      LensSearchController::FromTabWebContents(source_web_contents_);
-  CHECK(controller);
-  controller->IssueTextSearchRequest(
-      lens::LensOverlayInvocationSource::kContentAreaContextMenuText,
-      base::UTF16ToUTF8(params_.selection_text),
-      /*additional_query_parameters=*/{},
-      // TODO(crbug.com/432490312): Match type here is likely not ideal.
-      // Investigate removing match type from this function.
-      AutocompleteMatchType::Type::SEARCH_WHAT_YOU_TYPED,
-      /*is_zero_prefix_suggestion=*/false,
-      /*suppress_contextualization=*/
-      !lens::features::
-          IsLensOverlayTextSelectionContextMenuEntrypointContextualized());
-}
-
 content::WebContents* RenderViewContextMenu::GetWebContentsForDataControls()
     const {
   return source_web_contents_;
@@ -4765,23 +4259,6 @@ ToastController* RenderViewContextMenu::GetToastController() const {
 
   return browser ? browser->GetFeatures().toast_controller() : nullptr;
 }
-
-void RenderViewContextMenu::MaybePrepareForLensQuery() {
-  if (!search::DefaultSearchProviderIsGoogle(GetProfile())) {
-    return;
-  }
-
-  // Lens preparation
-  if (lens::features::GetShouldIssuePreconnectForLens()) {
-    IssuePreconnectionToUrl(lens::features::GetPreconnectKeyForLens(),
-                            lens::features::GetHomepageURLForLens());
-  }
-  if (lens::features::GetShouldIssueProcessPrewarmingForLens() &&
-      !base::SysInfo::IsLowEndDevice()) {
-    content::SpareRenderProcessHostManager::Get().WarmupSpare(browser_context_);
-  }
-}
-
 
 #if !BUILDFLAG(IS_ANDROID)
 void RenderViewContextMenu::OpenLinkInSplitView(
@@ -4861,60 +4338,8 @@ bool RenderViewContextMenu::ShouldUseSimplifiedTextSelection() const {
          !params_.selection_text.empty() && !params_.is_editable;
 }
 
-bool RenderViewContextMenu::CanAppendRegionSearchItem() const {
-  if (!IsRegionSearchEnabled()) {
-    return false;
-  }
-
-  auto* entry_point_controller =
-      GetBrowser() ? lens::LensOverlayEntryPointController::From(GetBrowser())
-                   : nullptr;
-
-  if (entry_point_controller && entry_point_controller->IsEnabled()) {
-    return entry_point_controller->AreVisible();
-  }
-
-  return GetImageSearchProvider() != nullptr;
-}
-
 bool RenderViewContextMenu::CanAppendGlicShareImageItem() const {
   return false;
-}
-
-void RenderViewContextMenu::AppendLensGeminiSection() {
-  if (!features::IsMenuSimplificationEnabled()) {
-    return;
-  }
-
-  bool can_region =
-      content_type_->SupportsGroup(ContextMenuContentType::ITEM_GROUP_PAGE) &&
-      CanAppendRegionSearchItem();
-  bool can_glic = content_type_->SupportsGroup(
-                      ContextMenuContentType::ITEM_GROUP_GLICSHAREIMAGE) &&
-                  CanAppendGlicShareImageItem();
-  bool can_image_search =
-      content_type_->SupportsGroup(
-          ContextMenuContentType::ITEM_GROUP_SEARCHWEBFORIMAGE) &&
-      params_.has_image_contents && IsSearchAllowedByPolicy() &&
-      GetImageSearchProvider() != nullptr;
-
-  if (!can_region && !can_glic && !can_image_search) {
-    return;
-  }
-
-  menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
-
-  if (can_region) {
-    AppendRegionSearchItem();
-  }
-  if (can_image_search) {
-    AppendSearchWebForImageItems();
-  }
-  if (can_glic) {
-    AppendGlicShareImageItem();
-  }
-
-  menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
 }
 
 void RenderViewContextMenu::AppendRevisedTextSelectionSection() {

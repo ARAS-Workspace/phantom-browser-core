@@ -14,11 +14,8 @@
 #include "base/memory/weak_ptr.h"
 #include "components/history/core/browser/keyword_id.h"
 #include "components/omnibox/browser/actions/omnibox_action.h"
-#include "components/omnibox/browser/lens_suggest_inputs_utils.h"
 #include "third_party/metrics_proto/omnibox_event.pb.h"
 
-class AiModeButtonService;
-class AimEligibilityService;
 class AutocompleteClassifier;
 class AutocompleteSchemeClassifier;
 class AutocompleteScoringModelService;
@@ -122,12 +119,8 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
       const = 0;
   virtual OnDeviceTailModelService* GetOnDeviceTailModelService() const = 0;
   virtual ProviderStateService* GetProviderStateService() const = 0;
-  virtual base::CallbackListSubscription GetLensSuggestInputsWhenReady(
-      LensOverlaySuggestInputsCallback callback) const = 0;
   virtual tab_groups::TabGroupSyncService* GetTabGroupSyncService() const = 0;
   virtual sync_sessions::SessionSyncService* GetSessionSyncService() const = 0;
-  virtual AimEligibilityService* GetAimEligibilityService() const = 0;
-  virtual AiModeButtonService* GetAiModeButtonService() const;
 
   // The value to use for Accept-Languages HTTP header when making an HTTP
   // request.
@@ -238,17 +231,6 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
   // Returns true if history embeddings is enabled and user can opt in/out.
   virtual bool IsHistoryEmbeddingsSettingVisible() const;
 
-  // Returns true if the current profile is eligible for Lens. This is used to
-  // control whether Lens entrypoints can be shown during this browsing session.
-  // Can be changed on demand via enterprise policy.
-  virtual bool IsLensEnabled() const;
-
-  // Returns true if the Lens entrypoints can be shown to the user at this
-  // instant in time. This is false if Lens is already active, and therefore the
-  // entrypoint shouldn't be shown as it will cause nothing to happen if
-  // clicked. This is per tab dependent.
-  virtual bool AreLensEntrypointsVisible() const;
-
   // Returns true if the page contains the paywall hint in the HTML. Returns
   // false if the page does not contain the paywall hint. Returns std::nullopt
   // if the page content wasn't extracted and therefore the signal could not be
@@ -256,24 +238,10 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
   // shown to the user.
   virtual std::optional<bool> IsPagePaywalled() const;
 
-  // Whether the client should send the `ctxus=` URL parameter to Suggest in
-  // order to request contextual search suggestions in the Omnibox.
-  virtual bool ShouldSendContextualUrlSuggestParam() const;
-
-  // Whether the client should send the `pageTitle=` URL parameter to Suggest
-  // when requesting ZPS suggestions in the Omnibox.
-  virtual bool ShouldSendPageTitleSuggestParam() const;
-
   // Returns whether the app is currently in the background state (Mobile only).
   virtual bool in_background_state() const;
 
   virtual void set_in_background_state(bool in_background_state) {}
-
-  // Whether the "Omnibox Next" Lens search chip feature is enabled.
-  virtual bool IsOmniboxNextLensSearchChipEnabled() const;
-
-  // Whether the "Omnibox Next" AIM popup is enabled.
-  virtual bool IsOmniboxNextAimPopupEnabled() const;
 
   // Returns whether the Gemini starter pack is enabled by enterprise policy.
   virtual bool IsGeminiStarterPackEnabled() const;
@@ -287,10 +255,6 @@ class AutocompleteProviderClient : public OmniboxAction::Client {
   virtual bool IsWebUiNtpEnabledForDesktopAndroid() const;
 
   // OmniboxAction::Client overrides:
-  bool ShouldOpenCoBrowsePanel() const override;
-  void OpenCoBrowsePanel() override;
-  bool ShouldOpenComposeboxForAskG() const override;
-  void OpenComposeboxForAskG() override;
 };
 
 #endif  // COMPONENTS_OMNIBOX_BROWSER_AUTOCOMPLETE_PROVIDER_CLIENT_H_

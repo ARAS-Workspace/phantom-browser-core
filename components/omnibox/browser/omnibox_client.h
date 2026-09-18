@@ -12,7 +12,6 @@
 #include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
-#include "components/lens/contextual_input.h"
 #include "components/omnibox/browser/actions/omnibox_action.h"
 #include "components/omnibox/browser/autocomplete_match_type.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
@@ -31,7 +30,6 @@ class AutocompleteResult;
 class GURL;
 class SessionID;
 class SkBitmap;
-class AiModeButtonService;
 class TemplateURL;
 class TemplateURLService;
 struct AutocompleteMatch;
@@ -145,10 +143,6 @@ class OmniboxClient {
   const TemplateURLService* GetTemplateURLService() const {
     return const_cast<OmniboxClient*>(this)->GetTemplateURLService();
   }
-  virtual AiModeButtonService* GetAiModeButtonService();
-  const AiModeButtonService* GetAiModeButtonService() const {
-    return const_cast<OmniboxClient*>(this)->GetAiModeButtonService();
-  }
   virtual const AutocompleteSchemeClassifier& GetSchemeClassifier() const = 0;
   virtual AutocompleteClassifier* GetAutocompleteClassifier();
   virtual omnibox::OmniboxPopupCloser* GetOmniboxPopupCloser();
@@ -195,13 +189,6 @@ class OmniboxClient {
   // Returns the URL of the current navigation entry.
   virtual GURL GetNavigationEntryURL() const = 0;
 
-  // Returns true if the current page is a contextual tasks UI page (i.e.
-  // chrome://contextual-tasks/).
-  virtual bool IsContextualTasksPage() const;
-
-  // Returns the inner frame URL for the current contextual tasks page.
-  virtual GURL GetContextualTasksInnerFrameURL() const;
-
   // Classify the current page being viewed as, for example, the new tab
   // page or a normal web page.  Used for logging omnibox events for
   // UMA opted-in users.  Examines the user's profile to determine if the
@@ -228,12 +215,8 @@ class OmniboxClient {
   virtual const gfx::VectorIcon& GetVectorIcon() const = 0;
 
   // Returns the LensOverlaySuggestInputs if available.
-  virtual std::optional<lens::proto::LensOverlaySuggestInputs>
-  GetLensOverlaySuggestInputs() const;
 
   // Returns ContextualInputData if available.
-  virtual std::optional<lens::ContextualInputData> GetContextualInputData()
-      const;
 
   // Returns true if there is previous submitted thread context (files, tabs,
   // etc.) in the session. Only relevant for co-browsing / composebox sessions.
@@ -407,7 +390,6 @@ class OmniboxClient {
 
   // Whether WebUi Omnibox's aim popup is enabled and the user is eligible to
   // use it.
-  virtual bool IsAimPopupEnabled() const;
 
   // Returns the current input state if any.
   virtual omnibox::InputState GetInputState() const;

@@ -14,7 +14,6 @@ import androidx.core.view.WindowInsetsCompat;
 import org.chromium.base.Callback;
 import org.chromium.base.ObserverList;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
-import org.chromium.base.supplier.NullableObservableSupplier;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.browser_controls.BottomControlsStacker;
@@ -22,15 +21,12 @@ import org.chromium.chrome.browser.browser_controls.BottomControlsStacker.LayerT
 import org.chromium.chrome.browser.browser_controls.BrowserControlsStateProvider;
 import org.chromium.chrome.browser.browser_controls.BrowserControlsStateProvider.ControlsPosition;
 import org.chromium.chrome.browser.browser_controls.BrowserControlsUtils;
-import org.chromium.chrome.browser.compositor.overlay_panel.OverlayPanelStateProvider;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.keyboard_accessory.AccessorySheetVisualStateProvider;
 import org.chromium.chrome.browser.keyboard_accessory.KeyboardAccessoryVisualStateProvider;
 import org.chromium.chrome.browser.keyboard_accessory.ManualFillingComponent;
 import org.chromium.chrome.browser.omnibox.suggestions.AutocompleteCoordinator;
 import org.chromium.chrome.browser.omnibox.suggestions.OmniboxSuggestionsVisualState;
-import org.chromium.chrome.browser.overlay_panel.PanelState;
 import org.chromium.chrome.browser.ui.BottomSheetUtils;
 import org.chromium.chrome.browser.ui.bottombar.BottomBarConfigUtils;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetContent;
@@ -52,7 +48,6 @@ import java.util.Set;
 @NullMarked
 public class BottomAttachedUiObserver
         implements BrowserControlsStateProvider.Observer,
-                OverlayPanelStateProvider.Observer,
                 BottomSheetObserver,
                 AutocompleteCoordinator.OmniboxSuggestionsVisualStateObserver,
                 KeyboardAccessoryVisualStateProvider.Observer,
@@ -98,11 +93,6 @@ public class BottomAttachedUiObserver
 
     private final BottomControlsStacker mBottomControlsStacker;
 
-    private @Nullable OverlayPanelStateProvider mOverlayPanelStateProvider;
-    private @Nullable @ColorInt Integer mOverlayPanelColor;
-    private boolean mOverlayPanelVisible;
-    @PanelState private int mOverlayPanelState;
-
     private final @Nullable OmniboxSuggestionsVisualState mOmniboxSuggestionsVisualState;
     private boolean mOmniboxSuggestionsVisible;
     private @Nullable @ColorInt Integer mOmniboxSuggestionsColor;
@@ -134,8 +124,6 @@ public class BottomAttachedUiObserver
      *     checking the state of the bottom browser controls.
      * @param browserControlsStateProvider Supplies a {@link BrowserControlsStateProvider} for the
      *     browser controls.
-     * @param contextualSearchManagerSupplier Supplies a {@link ContextualSearchManager} to watch
-     *     for changes to contextual search and the overlay panel.
      * @param bottomSheetController A {@link BottomSheetController} to interact with and watch for
      *     changes to the bottom sheet.
      * @param omniboxSuggestionsVisualState An optional {@link OmniboxSuggestionsVisualState} for
@@ -148,7 +136,6 @@ public class BottomAttachedUiObserver
             Context context,
             BottomControlsStacker bottomControlsStacker,
             BrowserControlsStateProvider browserControlsStateProvider,
-            NullableObservableSupplier<ContextualSearchManager> contextualSearchManagerSupplier,
             BottomSheetController bottomSheetController,
             @Nullable OmniboxSuggestionsVisualState omniboxSuggestionsVisualState,
             @Nullable ManualFillingComponent manualFillingComponent,
@@ -202,24 +189,6 @@ public class BottomAttachedUiObserver
                     mAccessorySheetProviderSupplierObserver);
         }
 
-        contextualSearchManagerSupplier.addSyncObserverAndPostIfNonNull(
-                (manager) -> {
-                    if (manager == null) return;
-                    manager.getOverlayPanelStateProviderSupplier()
-                            .addSyncObserverAndPostIfNonNull(
-                                    (provider) -> {
-                                        if (mOverlayPanelStateProvider != null) {
-                                            mOverlayPanelStateProvider.removeObserver(this);
-                                        }
-                                        mOverlayPanelVisible = false;
-                                        mOverlayPanelColor = null;
-                                        mOverlayPanelStateProvider = provider;
-                                        if (mOverlayPanelStateProvider != null) {
-                                            mOverlayPanelStateProvider.addObserver(this);
-                                        }
-                                    });
-                });
-
         mOmniboxSuggestionsVisualState = omniboxSuggestionsVisualState;
         if (mOmniboxSuggestionsVisualState != null) {
             mOmniboxSuggestionsVisualState.setOmniboxSuggestionsVisualStateObserver(this);
@@ -253,9 +222,6 @@ public class BottomAttachedUiObserver
         }
         if (mBottomSheetController != null) {
             mBottomSheetController.removeObserver(this);
-        }
-        if (mOverlayPanelStateProvider != null) {
-            mOverlayPanelStateProvider.removeObserver(this);
         }
         if (mBrowserControlsStateProvider != null) {
             mBrowserControlsStateProvider.removeObserver(this);
@@ -305,12 +271,6 @@ public class BottomAttachedUiObserver
         // If this check returns false, the overlay panel logic below could be applicable.
         if (shouldMatchBottomControlsColor()) {
             return mBottomControlsColor;
-        }
-        if (mOverlayPanelVisible
-                && assumeNonNull(mOverlayPanelStateProvider).isFullWidthSizePanel()) {
-            // Return null if the overlay panel is visible but not peeked - the overlay panel's
-            // content will be "bottom attached".
-            return mOverlayPanelState == PanelState.PEEKED ? mOverlayPanelColor : null;
         }
         if (mUseBottomControlsColor) {
             return mBottomControlsColor;
@@ -367,10 +327,6 @@ public class BottomAttachedUiObserver
         }
 
         if (mBottomSheetVisible) {
-            return true;
-        }
-
-        if (mOverlayPanelVisible) {
             return true;
         }
 
@@ -443,12 +399,8 @@ public class BottomAttachedUiObserver
                 mBottomSheetVisible
                         && mBottomSheetController.getSheetState() == SheetState.PEEK
                         && mBottomSheetController.isAnchoredToBottomControls();
-        boolean isOverlayPanelUnexpanded =
-                mOverlayPanelState != PanelState.EXPANDED
-                        && mOverlayPanelState != PanelState.MAXIMIZED;
 
-        return isPeekedSheetAnchoredToBottomControls
-                || (mUseBottomControlsColor && isOverlayPanelUnexpanded);
+        return isPeekedSheetAnchoredToBottomControls || mUseBottomControlsColor;
     }
 
     private boolean isFullWidthBottomSheetExpanded() {
@@ -515,19 +467,6 @@ public class BottomAttachedUiObserver
             return;
         }
         mUseBottomControlsColor = useBottomControlsColor;
-        updateBottomAttachedColor();
-    }
-
-    // Overlay Panel
-
-    @Override
-    public void onOverlayPanelStateChanged(@PanelState int state, int color) {
-        mOverlayPanelColor = color;
-        mOverlayPanelVisible =
-                (state == PanelState.PEEKED)
-                        || (state == PanelState.EXPANDED)
-                        || (state == PanelState.MAXIMIZED);
-        mOverlayPanelState = state;
         updateBottomAttachedColor();
     }
 

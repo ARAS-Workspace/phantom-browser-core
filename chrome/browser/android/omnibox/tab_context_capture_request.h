@@ -26,11 +26,6 @@ class TabInterface;
 // Helper class to defer capturing the tab context until it is ready.
 class TabContextCaptureRequest : content::WebContentsObserver {
  public:
-  TabContextCaptureRequest(
-      lens::TabContextualizationController* tab_contextualization_controller,
-      tabs::TabInterface* tab,
-      base::OnceCallback<void(std::unique_ptr<lens::ContextualInputData>)>
-          callback);
   ~TabContextCaptureRequest() override;
 
   TabContextCaptureRequest(const TabContextCaptureRequest&) = delete;
@@ -54,15 +49,11 @@ class TabContextCaptureRequest : content::WebContentsObserver {
   base::CancelableOnceClosure scheduled_capture_;
 
   // This is assumed to exist so long as `weak_tab_` is valid.
-  raw_ptr<lens::TabContextualizationController>
-      tab_contextualization_controller_;
 
   // Used to guard against trying to capture after the tab is gone.
   base::WeakPtr<tabs::TabInterface> weak_tab_;
 
   // The presence of this callback guards against repeated captures.
-  base::OnceCallback<void(std::unique_ptr<lens::ContextualInputData>)>
-      callback_;
 
   base::WeakPtrFactory<TabContextCaptureRequest> weak_ptr_factory_{this};
 };

@@ -471,10 +471,6 @@ public abstract class ChromeFeatureList {
     public static final String CONTEXTUAL_PAGE_ACTION_TAB_GROUPING =
             "ContextualPageActionTabGrouping";
     public static final String CONTEXTUAL_PANEL_CLOSE_BUTTON = "ContextualPanelCloseButton";
-    public static final String CONTEXTUAL_SEARCH_DISABLE_ONLINE_DETECTION =
-            "ContextualSearchDisableOnlineDetection";
-    public static final String CONTEXTUAL_SEARCH_SUPPRESS_SHORT_VIEW =
-            "ContextualSearchSuppressShortView";
     public static final String CONTEXTUAL_TASKS = "ContextualTasks";
     public static final String CONTEXT_MENU_COPY_VIDEO_FRAME_ANDROID = "ContextMenuCopyVideoFrame";
     public static final String CONTEXT_MENU_DOWNLOAD_VIDEO_FRAME_ANDROID =
@@ -599,8 +595,6 @@ public abstract class ChromeFeatureList {
     public static final String IN_APP_WINDOW_MANAGER_DEPRECATION = "InAppWindowManagerDeprecation";
     public static final String KEYBOARD_ESC_BACK_NAVIGATION = "KeyboardEscBackNavigation";
     public static final String LAUNCH_CAUSE_SCREEN_OFF_FIX = "LaunchCauseScreenOffFix";
-    public static final String LENS_ON_QUICK_ACTION_SEARCH_WIDGET = "LensOnQuickActionSearchWidget";
-    public static final String LENS_OVERLAY_ANDROID = "LensOverlayAndroid";
     public static final String LENS_SEND_RAW_FILE_MEDIA_TYPES = "LensSendRawFileMediaTypes";
     public static final String LINK_HOVER_STATUS_BAR = "LinkHoverStatusBar";
     public static final String LOADING_PREDICTOR_LIMIT_PRECONNECT_SOCKET_COUNT =

@@ -5,7 +5,6 @@
 #include "chrome/browser/ui/views/side_panel/side_panel_toolbar_pinning_controller.h"
 
 #include "base/check_deref.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_panel_controller.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_actions.h"
@@ -152,16 +151,6 @@ void SidePanelToolbarPinningController::UpdatePinState(
 
 bool SidePanelToolbarPinningController::ShouldShowActiveInToolbar(
     const SidePanelEntry* entry) {
-  if (entry && entry->key().id() == SidePanelEntryId::kContextualTasks) {
-    auto* contextual_tasks_controller =
-        contextual_tasks::ContextualTasksPanelController::From(&*browser_);
-    if (contextual_tasks_controller &&
-        contextual_tasks_controller->GetActiveEntrySource() ==
-            contextual_tasks::ContextualTasksPanelController::EntrySource::
-                kLensOverlay) {
-      return true;
-    }
-  }
   return entry && (entry->should_show_ephemerally_in_toolbar() ||
                    GetPinnedStateFor(entry->key()));
 }
@@ -187,17 +176,6 @@ void SidePanelToolbarPinningController::UpdateActiveState(
     std::optional<SidePanelEntryId> other_id;
 
     if (target_id == SidePanelEntryId::kContextualTasks) {
-      auto* contextual_tasks_controller =
-          contextual_tasks::ContextualTasksPanelController::From(&*browser_);
-      if (contextual_tasks_controller &&
-          contextual_tasks_controller->GetActiveEntrySource() ==
-              contextual_tasks::ContextualTasksPanelController::EntrySource::
-                  kLensOverlay) {
-        target_id = SidePanelEntryId::kLensOverlayResults;
-        other_id = SidePanelEntryId::kContextualTasks;
-      } else {
-        other_id = SidePanelEntryId::kLensOverlayResults;
-      }
     } else if (target_id == SidePanelEntryId::kLensOverlayResults) {
       other_id = SidePanelEntryId::kContextualTasks;
     }

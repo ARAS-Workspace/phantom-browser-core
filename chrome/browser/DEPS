@@ -114,7 +114,6 @@ include_rules = [
   "+components/content_settings/browser",
   "+components/content_settings/core/browser",
   "+components/content_settings/core/test",
-  "+components/contextual_tasks/public",
   "+components/cookie_config",
   "+components/country_codes",
   "+components/crash/content/browser",
@@ -196,7 +195,6 @@ include_rules = [
   "+components/language/core/common",
   "+components/language/core/language_model",
   "+components/language_detection/core/browser",
-  "+components/lens",
   "+components/leveldb_proto/public",
   "+components/leveldb_proto/testing",
   "+components/local_state",
@@ -380,7 +378,6 @@ include_rules = [
   "+components/tracing/common",
   "+components/language_detection/content/browser",
   "+components/language_detection/content/common",
-  "+components/touch_to_search/core/browser",
   "+components/trusted_vault",
   "+components/ui_devtools",
   "+components/ui_metrics",
@@ -549,7 +546,6 @@ include_rules = [
   "+third_party/icu/source/common/unicode",
   "+third_party/icu/source/i18n/unicode",
   "+third_party/leveldatabase",
-  "+third_party/lens_server_proto",
   "+third_party/libxml/chromium/xml_writer.h",
   "+third_party/protobuf/src/google/protobuf",
   "+third_party/re2",
@@ -564,8 +560,6 @@ include_rules = [
   "+third_party/blink/public/public_buildflags.h",
 
   # Ensure that only the public interface of contextual search gets used.
-  "-components/contextual_search/internal",
-  "+components/contextual_search",
 ]
 
 specific_include_rules = {
@@ -647,7 +641,6 @@ specific_include_rules = {
     "+components/saved_tab_groups",
   ],
   r"android/omnibox/composebox_query_controller_bridge\.cc": [
-    "+components/contextual_search/internal",
   ],
   "spellcheck_service.cc": [
     "+chrome/browser/search/search.h",

@@ -50,8 +50,6 @@
 #include "chrome/browser/ui/commerce/commerce_ui_tab_helper.h"
 #include "chrome/browser/ui/context_highlight/context_highlight_tab_feature.h"
 #include "chrome/browser/ui/focus_tab_after_navigation_helper.h"
-#include "chrome/browser/ui/lens/lens_overlay_controller.h"
-#include "chrome/browser/ui/lens/lens_search_controller.h"
 #include "chrome/browser/ui/page_action/action_ids.h"
 #include "chrome/browser/ui/page_action/page_action_controller.h"
 #include "chrome/browser/ui/page_action/page_action_icon_type.h"
@@ -90,18 +88,15 @@
 #include "chrome/browser/ui/views/zoom/zoom_view_controller.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/enterprise/browser/reporting/reporting_features.h"
 #include "components/multistep_filter/core/features.h"
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/contextual_tasks/contextual_tasks_tab_visit_tracker.h"
 #include "chrome/browser/record_replay/chrome_record_replay_client.h"
 #include "chrome/browser/ui/views/location_bar/record_replay_page_action_controller.h"
 #include "chrome/browser/wallet/chrome_walletable_pass_client.h"
 #include "components/record_replay/core/common/record_replay_features.h"
 #endif
 
-#include "chrome/browser/ui/contextual_search/tab_contextualization_controller.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/tab_attachment_tracker.h"
 #include "chrome/browser/web_applications/web_app_tab_helper.h"
@@ -125,20 +120,6 @@ namespace tabs {
 
 TabFeatures::TabFeatures() = default;
 TabFeatures::~TabFeatures() = default;
-
-LensOverlayController* TabFeatures::lens_overlay_controller() {
-  // LensSearchController won't exist on non-normal windows.
-  return lens_search_controller_
-             ? lens_search_controller_->lens_overlay_controller()
-             : nullptr;
-}
-
-const LensOverlayController* TabFeatures::lens_overlay_controller() const {
-  // LensSearchController won't exist on non-normal windows.
-  return lens_search_controller_
-             ? lens_search_controller_->lens_overlay_controller()
-             : nullptr;
-}
 
 void TabFeatures::Init(TabInterface& tab, Profile* profile) {
   CHECK(!initialized_);
@@ -233,14 +214,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
   // Features that are only enabled for normal browser windows. By default most
   // features should be instantiated in this block.
   if (tab.IsInNormalWindow()) {
-    lens_search_controller_ =
-        GetUserDataFactory().CreateInstance<LensSearchController>(tab, &tab);
-    lens_search_controller_->Initialize(
-        profile->GetVariationsClient(),
-        IdentityManagerFactory::GetForProfile(profile), profile->GetPrefs(),
-        SyncServiceFactory::GetForProfile(profile),
-        ThemeServiceFactory::GetForProfile(profile));
-
     permission_indicators_tab_data_ =
         std::make_unique<permissions::PermissionIndicatorsTabData>(
             tab.GetContents());
@@ -408,12 +381,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
         std::make_unique<wallet::ChromeWalletablePassClient>(&tab);
   }
 
-  if (base::FeatureList::IsEnabled(contextual_tasks::kContextualTasksContext)) {
-    contextual_tasks_tab_visit_tracker_ =
-        GetUserDataFactory()
-            .CreateInstance<contextual_tasks::ContextualTasksTabVisitTracker>(
-                tab, tab);
-  }
 #endif
 
   if (base::FeatureList::IsEnabled(net::features::kVerifyQWACs)) {
@@ -446,10 +413,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
         GetUserDataFactory().CreateInstance<ChromeRecordReplayClient>(tab, tab);
   }
 
-  tab_contextualization_controller_ =
-      GetUserDataFactory().CreateInstance<lens::TabContextualizationController>(
-          tab, &tab);
-
   // The controller is created for all tabs but only affects back button
   // behavior for destination tabs with opener relationships.
   if (base::FeatureList::IsEnabled(tabs::kBackToOpener)) {
@@ -478,15 +441,6 @@ TabUIHelper* TabFeatures::SetTabUIHelperForTesting(
     std::unique_ptr<TabUIHelper> tab_ui_helper) {
   tab_ui_helper_ = std::move(tab_ui_helper);
   return tab_ui_helper_.get();
-}
-
-lens::TabContextualizationController*
-TabFeatures::SetTabContextualizationControllerForTesting(
-    std::unique_ptr<lens::TabContextualizationController>
-        tab_contextualization_controller) {
-  tab_contextualization_controller_ =
-      std::move(tab_contextualization_controller);
-  return tab_contextualization_controller_.get();
 }
 
 autofill::BubbleManager* TabFeatures::SetBubbleManagerForTesting(

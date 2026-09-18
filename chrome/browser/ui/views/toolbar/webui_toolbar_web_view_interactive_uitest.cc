@@ -29,7 +29,6 @@
 #include "chrome/test/interaction/interactive_browser_test.h"
 #include "components/browser_apis/ui_controllers/toolbar/toolbar_ui_api_data_model.mojom.h"
 #include "components/collaboration/public/features.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/data_sharing/public/features.h"
 #include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"

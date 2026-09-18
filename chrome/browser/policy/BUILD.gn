@@ -953,7 +953,6 @@ source_set("impl") {
     "//chrome/browser:browser_process_platform_part",
     "//chrome/browser/bookmarks",
     "//chrome/browser/browsing_data",
-    "//chrome/browser/contextual_tasks",
     "//chrome/browser/download",
     "//chrome/browser/external_protocol",
     "//chrome/browser/first_party_sets",
@@ -980,9 +979,6 @@ source_set("impl") {
     "//components/collaboration/public:prefs",
     "//components/commerce/core:pref_names",
     "//components/content_settings/core/browser",
-    "//components/contextual_search:policy_handler",
-    "//components/contextual_search:prefs",
-    "//components/contextual_tasks/public",
     "//components/custom_handlers",
     "//components/domain_reliability",
     "//components/domain_reliability:prefs",
@@ -997,7 +993,6 @@ source_set("impl") {
     "//components/history_clusters/core",
     "//components/infobars/content",
     "//components/language/core/browser",
-    "//components/lens:enterprise_policy",
     "//components/live_caption:constants",
     "//components/network_time",
     "//components/pref_registry",
@@ -1080,7 +1075,6 @@ source_set("impl") {
     ]
     deps += [
       "//chrome/browser/android:tabs_public",
-      "//chrome/browser/lens",
       "//chrome/browser/policy/android",
       "//chrome/browser/policy/android:jni_headers",
       "//chrome/browser/ui/android",

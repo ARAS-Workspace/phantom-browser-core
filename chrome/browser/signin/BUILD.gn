@@ -217,7 +217,6 @@ source_set("impl") {
     "//chrome/browser/webdata_services",
     "//components/application_locale_storage",
     "//components/browser_actuator/public:feature_list",
-    "//components/contextual_tasks/public:feature_list",
     "//components/embedder_support:user_agent",
     "//components/plus_addresses/core/common:features",
     "//components/profile_metrics",
@@ -288,9 +287,6 @@ source_set("impl") {
     if (!is_android) {
       deps += [ "//chrome/browser/ui/webui/signin/signout_confirmation" ]
     }
-  }
-
-  if (enable_dice_support) {
   }
 
   if (is_android) {
@@ -593,7 +589,6 @@ source_set("unit_tests") {
       "//chrome/browser/password_manager/factories",
       "//chrome/browser/reading_list",
       "//chrome/browser/ui/android/tab_model:test_support",
-      "//components/contextual_tasks/public:feature_list",
       "//components/reading_list/core",
       "//components/reading_list/core:test_support",
       "//services/tracing/public/cpp/background_tracing",

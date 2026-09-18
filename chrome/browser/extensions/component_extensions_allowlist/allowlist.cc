@@ -38,7 +38,6 @@ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
       extension_misc::kComponentUpdaterTTSEngineExtensionId,
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #if !BUILDFLAG(IS_ANDROID)
-      extension_misc::kAimEligibilityExtensionId,
       extension_misc::kDictationConnectorExtensionId,
 #endif  // !BUILDFLAG(IS_ANDROID)
   });

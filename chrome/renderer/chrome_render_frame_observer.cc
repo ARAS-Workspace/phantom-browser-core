@@ -38,7 +38,6 @@
 #include "components/guest_view/buildflags/buildflags.h"
 #include "components/guest_view/renderer/slim_web_view/slim_web_view_bindings.h"
 #include "components/language_detection/content/renderer/language_detection_agent.h"
-#include "components/lens/lens_metadata.mojom.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_helper.h"
 #include "components/no_state_prefetch/renderer/no_state_prefetch_utils.h"
 #include "components/offline_pages/buildflags/buildflags.h"
@@ -107,7 +106,6 @@ using content::RenderFrame;
 // Maximum number of characters in the document to index.
 // Any text beyond this point will be clipped.
 static const size_t kMaxIndexChars = 65535;
-
 
 // For a page that auto-refreshes, we still show the bubble, if
 // the refresh delay is less than this value (in seconds).
@@ -399,26 +397,12 @@ void ChromeRenderFrameObserver::RequestImageForContextNode(
   std::vector<uint8_t> image_data;
   gfx::Size original_size;
   std::string mime_type;
-  std::vector<lens::mojom::LatencyLogPtr> latency_logs;
-
-  // Map for converting between multiple mojom ImageFormat structures to
-  // prevent a circular dependency (go/lens-logging-in-chromium)
-  // TODO(shivpatel): add default value UNKNOWN for if ImageFormat is updated
-  const std::map<chrome::mojom::ImageFormat, lens::mojom::ImageFormat>
-      image_format_conversion = {
-          {chrome::mojom::ImageFormat::ORIGINAL,
-           lens::mojom::ImageFormat::ORIGINAL},
-          {chrome::mojom::ImageFormat::PNG, lens::mojom::ImageFormat::PNG},
-          {chrome::mojom::ImageFormat::JPEG, lens::mojom::ImageFormat::JPEG},
-          {chrome::mojom::ImageFormat::WEBP, lens::mojom::ImageFormat::WEBP},
-      };
 
   if (context_node.IsNull() || !context_node.IsElementNode()) {
     // The downscaled size is the original size, since no downscaling was
     // required.
     std::move(callback).Run(image_data, original_size,
-                            /*downscaled_size=*/original_size, mime_type,
-                            std::move(latency_logs));
+                            /*downscaled_size=*/original_size, mime_type);
     return;
   }
 
@@ -434,26 +418,13 @@ void ChromeRenderFrameObserver::RequestImageForContextNode(
     // The downscaled size is the original size, since no downscaling was
     // required.
     std::move(callback).Run(std::move(image_data), original_size,
-                            /*downscaled_size=*/original_size, mime_type,
-                            std::move(latency_logs));
+                            /*downscaled_size=*/original_size, mime_type);
     return;
   }
   SkBitmap image = web_element.ImageContents();
-  if (needs_downscale) {
-    latency_logs.push_back(lens::mojom::LatencyLog::New(
-        lens::mojom::Phase::DOWNSCALE_START, original_size, gfx::Size(),
-        image_format_conversion.at(image_format), base::Time::Now(),
-        /*encoded_size_bytes=*/0));
-  }
   SkBitmap thumbnail =
       Downscale(image, thumbnail_min_area_pixels, thumbnail_max_size_pixels);
   gfx::Size downscaled_size = gfx::Size(thumbnail.width(), thumbnail.height());
-  if (needs_downscale) {
-    latency_logs.push_back(lens::mojom::LatencyLog::New(
-        lens::mojom::Phase::DOWNSCALE_END, original_size, downscaled_size,
-        image_format_conversion.at(image_format), base::Time::Now(),
-        /*encoded_size_bytes=*/0));
-  }
 
   SkBitmap bitmap;
   if (thumbnail.colorType() == kN32_SkColorType) {
@@ -475,12 +446,6 @@ void ChromeRenderFrameObserver::RequestImageForContextNode(
     }
   }
 
-  if (needs_encode) {
-    latency_logs.push_back(lens::mojom::LatencyLog::New(
-        lens::mojom::Phase::ENCODE_START, original_size, downscaled_size,
-        image_format_conversion.at(image_format), base::Time::Now(),
-        /*encoded_size_bytes=*/0));
-  }
   std::optional<std::vector<uint8_t>> data;
   switch (image_format) {
     case chrome::mojom::ImageFormat::PNG:
@@ -508,15 +473,9 @@ void ChromeRenderFrameObserver::RequestImageForContextNode(
       }
       break;
   }
-  if (needs_encode) {
-    latency_logs.push_back(lens::mojom::LatencyLog::New(
-        lens::mojom::Phase::ENCODE_END, original_size, downscaled_size,
-        image_format_conversion.at(image_format), base::Time::Now(),
-        sizeof(uint8_t) * image_data.size()));
-  }
 
-  std::move(callback).Run(image_data, original_size, downscaled_size, mime_type,
-                          std::move(latency_logs));
+  std::move(callback).Run(image_data, original_size, downscaled_size,
+                          mime_type);
 }
 
 void ChromeRenderFrameObserver::RequestBitmapForContextNode(

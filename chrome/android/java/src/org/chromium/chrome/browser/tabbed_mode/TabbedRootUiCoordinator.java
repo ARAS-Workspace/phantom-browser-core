@@ -92,8 +92,6 @@ import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutHelperMa
 import org.chromium.chrome.browser.compositor.overlays.strip.TabContextMenuCoordinator.TabStripLayoutType;
 import org.chromium.chrome.browser.contextmenu.ChromeContextMenuPopulator;
 import org.chromium.chrome.browser.contextmenu.ChromeContextMenuPopulatorFactory;
-import org.chromium.chrome.browser.contextual_tasks.ContextualTasksBridge;
-import org.chromium.chrome.browser.contextual_tasks.ContextualTasksUtils;
 import org.chromium.chrome.browser.customtabs.CustomTabActivity;
 import org.chromium.chrome.browser.data_sharing.DataSharingNotificationManager;
 import org.chromium.chrome.browser.data_sharing.DataSharingServiceFactory;
@@ -1022,7 +1020,6 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                         mEdgeToEdgeControllerSupplier,
                         mBottomControlsStacker,
                         mBrowserControlsManager,
-                        mContextualSearchManagerSupplier,
                         bottomSheetController,
                         toolbarManager.getLocationBar().getOmniboxSuggestionsVisualState(),
                         mManualFillingComponentSupplier.get(),
@@ -1067,11 +1064,6 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
     @Override
     public int getControlContainerHeightResource() {
         return R.dimen.control_container_height;
-    }
-
-    @Override
-    protected boolean canContextualSearchPromoteToNewTab() {
-        return true;
     }
 
     @Override
@@ -2238,17 +2230,6 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                 MultiWindowUtils.launchIntentInMaybeClosedWindow(mActivity, intent, windowId);
             }
         };
-    }
-
-    @Override
-    public void initContextualSearchManager() {
-        super.initContextualSearchManager();
-        if (AndroidSidePanelEnabledFn.isEnabled()) {
-            mContextualSearchManagerSupplier
-                    .asNonNull()
-                    .get()
-                    .setSideUiStateProviderSupplier(mSideUiStateProviderSupplier);
-        }
     }
 
     private void initializeSideUi(Profile currentlySelectedProfile) {

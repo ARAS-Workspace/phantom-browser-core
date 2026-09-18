@@ -36,7 +36,6 @@
 #include "chrome/browser/ui/views/location_bar/location_icon_view.h"
 #include "chrome/browser/ui/views/location_bar/zoom_bubble_coordinator.h"
 #include "chrome/browser/ui/views/location_bar/zoom_bubble_view.h"
-#include "chrome/browser/ui/views/omnibox/omnibox_context_menu.h"
 #include "chrome/browser/ui/views/omnibox/omnibox_view_views.h"
 #include "chrome/browser/ui/views/page_action/page_action_container_view.h"
 #include "chrome/browser/ui/views/page_action/page_action_view.h"
@@ -44,8 +43,6 @@
 #include "chrome/grit/generated_resources.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/lens/lens_features.h"
-#include "components/omnibox/browser/aim_eligibility_service_features.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/permissions/permission_request_manager.h"
 #include "components/security_state/core/security_state.h"
@@ -599,154 +596,6 @@ IN_PROC_BROWSER_TEST_F(LocationBarViewPageActionHideWhileEditingTests,
 
   EnsureLayout();
   EXPECT_TRUE(zoom_view->GetVisible());
-}
-
-class LocationBarViewAddContextButtonBrowserTest
-    : public LocationBarViewBrowserTest {
- public:
-  LocationBarViewAddContextButtonBrowserTest() {
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        /*enabled_features=*/
-        {{omnibox::internal::kWebUIOmniboxAimPopup,
-          {{omnibox::kShowToolsAndModels.name, "true"}}},
-         {omnibox::internal::kWebUIOmniboxSimplification,
-          {{omnibox::kWebUIOmniboxAimPopupAddContextButtonVariantParam.name,
-            "inline"}}},
-         {omnibox::internal::kWebUIOmniboxPopup, {}},
-         {omnibox::kAimEnabled, {}}},
-        /*disabled_features=*/{omnibox::kAimServerEligibilityEnabled,
-                               omnibox::kAimFuseboxEligibilityCheckEnabled,
-                               omnibox::kAimUsePecApi});
-  }
-
-  ~LocationBarViewAddContextButtonBrowserTest() override = default;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-// TODO(crbug.com/459561205): This test is flaky on Linux.
-#if BUILDFLAG(IS_LINUX)
-#define MAYBE_AddContextButtonVisibilityAndClick \
-  DISABLED_AddContextButtonVisibilityAndClick
-#else
-#define MAYBE_AddContextButtonVisibilityAndClick \
-  AddContextButtonVisibilityAndClick
-#endif
-IN_PROC_BROWSER_TEST_F(LocationBarViewAddContextButtonBrowserTest,
-                       MAYBE_AddContextButtonVisibilityAndClick) {
-  LocationBarView* location_bar_view = GetLocationBarView();
-  OmniboxViewViews* omnibox_view = location_bar_view->omnibox_view();
-  LocationIconView* location_icon_view =
-      location_bar_view->location_icon_view();
-
-  // The "Add Context" button doesn't show up when the Omnibox popup is
-  // closed.
-  EXPECT_FALSE(location_bar_view->GetOmniboxController()->IsPopupOpen());
-  EXPECT_FALSE(location_bar_view->ShouldShowAddContextButton());
-  const auto icon_when_closed =
-      location_icon_view->GetImageModel(views::Button::STATE_NORMAL);
-
-  // The "Add Context" button does show up when the Omnibox popup is open.
-  location_bar_view->FocusLocation(/*is_user_initiated=*/true,
-                                   /*clear_focus_if_failed=*/false);
-  omnibox_view->SetUserText(u"test");
-  EXPECT_TRUE(base::test::RunUntil([&]() {
-    return location_bar_view->GetOmniboxController()->IsPopupOpen() &&
-           location_bar_view->ShouldShowAddContextButton();
-  }));
-  const auto icon_when_open =
-      location_icon_view->GetImageModel(views::Button::STATE_NORMAL);
-  EXPECT_NE(icon_when_closed->GetVectorIcon().vector_icon(),
-            icon_when_open->GetVectorIcon().vector_icon());
-
-  // Clicking on the "Add Context" button causes
-  // `OmniboxContextMenu::RunMenuAt()` to get called.
-  bool run_menu_called = false;
-  location_bar_view->SetRunOmniboxContextMenuForTesting(
-      base::BindLambdaForTesting(
-          [&](OmniboxContextMenu*, gfx::Point) { run_menu_called = true; }));
-
-  ui::MouseEvent click_event(
-      ui::EventType::kMousePressed, gfx::Point(), gfx::Point(),
-      base::TimeTicks(), ui::EF_LEFT_MOUSE_BUTTON, ui::EF_LEFT_MOUSE_BUTTON);
-  location_icon_view->OnMousePressed(click_event);
-
-  EXPECT_TRUE(run_menu_called);
-}
-
-// TODO(crbug.com/467998506): This test is flaky on Linux.
-#if BUILDFLAG(IS_LINUX)
-#define MAYBE_PrefChangesAddContextButtonVisibility \
-  DISABLED_PrefChangesAddContextButtonVisibility
-#else
-#define MAYBE_PrefChangesAddContextButtonVisibility \
-  PrefChangesAddContextButtonVisibility
-#endif
-IN_PROC_BROWSER_TEST_F(LocationBarViewAddContextButtonBrowserTest,
-                       MAYBE_PrefChangesAddContextButtonVisibility) {
-  LocationBarView* location_bar_view = GetLocationBarView();
-  OmniboxViewViews* omnibox_view = location_bar_view->omnibox_view();
-  PrefService* prefs = browser()->GetProfile()->GetPrefs();
-
-  // pref is initially true to show the button.
-  prefs->SetBoolean(omnibox::kShowAiModeOmniboxButton, true);
-
-  // Force "Add content" button to show by focusing and typing.
-  location_bar_view->FocusLocation(/*is_user_initiated=*/true,
-                                   /*clear_focus_if_failed=*/false);
-  omnibox_view->SetUserText(u"test");
-  ASSERT_TRUE(base::test::RunUntil([&]() {
-    return location_bar_view->GetOmniboxController()->IsPopupOpen();
-  }));
-  ASSERT_TRUE(base::test::RunUntil(
-      [&]() { return location_bar_view->ShouldShowAddContextButton(); }));
-
-  // Set pref to false.
-  prefs->SetBoolean(omnibox::kShowAiModeOmniboxButton, false);
-  ASSERT_TRUE(base::test::RunUntil(
-      [&]() { return !location_bar_view->ShouldShowAddContextButton(); }));
-  // Set pref to true again.
-  prefs->SetBoolean(omnibox::kShowAiModeOmniboxButton, true);
-  ASSERT_TRUE(base::test::RunUntil(
-      [&]() { return location_bar_view->ShouldShowAddContextButton(); }));
-}
-
-IN_PROC_BROWSER_TEST_F(LocationBarViewBrowserTest, OmniboxActionsRegistered) {
-  LocationBarView* location_bar_view = GetLocationBarView();
-  ASSERT_TRUE(location_bar_view);
-
-  auto* action_manager = &actions::ActionManager::Get();
-  ASSERT_TRUE(action_manager);
-
-  struct ExpectedAction {
-    actions::ActionId action_id;
-    int string_id;
-  };
-
-  std::vector<ExpectedAction> expected_actions = {
-      {kActionOmniboxContextAddImage, IDS_NTP_COMPOSE_ADD_IMAGE},
-      {kActionOmniboxContextAddFile, IDS_NTP_COMPOSE_ADD_FILE},
-      {kActionOmniboxContextCreateImages, IDS_NTP_COMPOSE_CREATE_IMAGES},
-      {kActionOmniboxContextDeepResearch, IDS_NTP_COMPOSE_DEEP_SEARCH},
-      {kActionOmniboxContextCanvas, IDS_NTP_COMPOSE_CANVAS},
-      {kActionOmniboxContextSetModelAuto, IDS_NTP_COMPOSE_AUTO_MODEL},
-      {kActionOmniboxContextSetModelThinking, IDS_NTP_COMPOSE_THINKING_3_PRO},
-  };
-
-  for (const auto& expected : expected_actions) {
-    auto* action = action_manager->FindAction(expected.action_id);
-    ASSERT_TRUE(action) << "Action not found: " << expected.action_id;
-    EXPECT_EQ(action->GetText(), l10n_util::GetStringUTF16(expected.string_id));
-    EXPECT_FALSE(action->GetImage().IsEmpty());
-  }
-
-  // kActionOmniboxContextSetModelRegular has no text (only icon).
-  auto* regular_model_action =
-      action_manager->FindAction(kActionOmniboxContextSetModelRegular);
-  ASSERT_TRUE(regular_model_action);
-  EXPECT_TRUE(regular_model_action->GetText().empty());
-  EXPECT_FALSE(regular_model_action->GetImage().IsEmpty());
 }
 
 // Tests that unsafe schemes are not allowed to be opened from middle clicks.

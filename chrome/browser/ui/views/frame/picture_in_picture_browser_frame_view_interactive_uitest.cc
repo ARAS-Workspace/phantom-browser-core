@@ -299,8 +299,7 @@ class PictureInPictureBrowserFrameViewTest : public WebRtcTestBase,
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features=*/{blink::features::kDocumentPictureInPictureAPI,
                               media::kPictureInPictureOcclusionTracking},
-        /*disabled_features=*/{omnibox::internal::kWebUIOmniboxPopup,
-                               omnibox::internal::kWebUIOmniboxAimPopup});
+        /*disabled_features=*/{omnibox::internal::kWebUIOmniboxPopup});
     InProcessBrowserTest::SetUp();
   }
 

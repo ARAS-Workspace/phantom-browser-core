@@ -1010,36 +1010,6 @@ For more settings that use data to improve your Chrome experience, go to <ph nam
       <message name="IDS_SECURITY_SECTION_TITLE" desc="Title for the Security settings section.">
         Security
       </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_TITLE" desc="Name for the Contextual Search feature, which allows users to search for a term in a web page by tapping on it.">
-        Touch to Search
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_DESCRIPTION" desc="Description for Contextual Search preference">
-        Learn about topics on websites without leaving the page. Select one or more words on the page to search for them.
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_PROMO_TITLE" desc="The title of the promo message for the contextual search.">
-        Include surrounding text in Google searches?
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_PROMO_DESCRIPTION" desc="A promo message shown to users with Touch to Search to explain the new behavior and provide an option to opt in or out">
-        By including more of a page’s text, you might see better results when using Touch to Search. You can always visit <ph name="BEGIN_LINK">&lt;link&gt;</ph>settings<ph name="END_LINK">&lt;/link&gt;</ph> to change this.
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_INCLUDE_BUTTON" desc="A button to confirm and dismiss opt in promo">
-        Include
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_NO_THANKS_BUTTON" desc="A button to confirm and dismiss opt out promo">
-        No thanks
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_DEFAULT_CAPTION" desc="Summary help text that is shown as a second line in the Contextual Search peeking bottom sheet telling the user that they can tap the text in order to open the sheet and see search results there.">
-        Tap to see search results
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_SEE_BETTER_RESULTS_TITLE" desc="Title for the see better results switch in Contextual Search preference.">
-        Include surrounding text in Google searches
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_SEE_BETTER_RESULTS_SUMMARY" desc="Summary for the see better results switch in Contextual Search preference.">
-        By including more of a page’s text, you might see better results
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_CALLOUT_IPH" desc="Text shown on in-product-help bubble to inform a user that dragging up on the panel will expand it, opening the latest search results for the currently selected text.">
-        Drag up to see search results
-      </message>
       <message name="IDS_DO_NOT_TRACK_TITLE" desc="Title for the 'Do Not Track' preference. Please leave the 'Do Not Track' part in English according to the glossary.">
         Send a “Do Not Track” request
       </message>
@@ -2713,9 +2683,6 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
         Listen to this page with AI
       </message>
 
-      <message name="IDS_MENU_SEARCH_TAB_WITH_GOOGLE_LENS" desc="Text for the Lens overlay item in the app menu. [CHAR_LIMIT=35]">
-        Search tab with Google Lens
-      </message>
       <message name="IDS_MENU_PRINT" desc="Menu item for printing the current page. [CHAR_LIMIT=27]">
         Print…
       </message>
@@ -2781,10 +2748,6 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
       </message>
       <message name="IDS_CONTEXTMENU_SAVE_PAGE" desc="This string is shown in the context menu for saving the current page. [CHAR_LIMIT=30]">
         Download
-      </message>
-      <!-- TODO(b/527098378): Remove the "New" label, reduce CHAR_LIMIT back to 35, and deprecate CONTEXT_MENU_SEARCH_TAB_WITH_GOOGLE_LENS_CLICKED preference after feature is established. -->
-      <message name="IDS_CONTEXTMENU_SEARCH_TAB_WITH_GOOGLE_LENS" desc="Context sensitive menu item for deep linking into google lens. [CHAR_LIMIT=42]">
-        Search tab with Google Lens <ph name="BEGIN_NEW">&lt;new&gt;</ph>New<ph name="END_NEW">&lt;/new&gt;</ph>
       </message>
       <message name="IDS_CONTEXTMENU_SHARE_PAGE" desc="This string is shown in the context menu for sharing the current page. [CHAR_LIMIT=30]">
         Share
@@ -2902,14 +2865,8 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
       <message name="IDS_CONTEXTMENU_COPY_IMAGE" desc="Context sensitive menu item for copying the selected image to the system clipboard. [CHAR_LIMIT=30]">
         Copy image
       </message>
-      <message name="IDS_CONTEXTMENU_SEARCH_IMAGE_WITH_GOOGLE_LENS" desc="Context sensitive menu item for deep linking into google lens. [CHAR_LIMIT=30]">
-        Search image with Google Lens <ph name="BEGIN_NEW">&lt;new&gt;</ph>New<ph name="END_NEW">&lt;/new&gt;</ph>
-      </message>
       <message name="IDS_CONTEXTMENU_TRANSLATE_IMAGE_WITH_GOOGLE_LENS" desc="Context sensitive chip for deep linking into google lens for translate results. [CHAR_LIMIT=30]">
           Translate image with Google Lens <ph name="BEGIN_NEW">&lt;new&gt;</ph>New<ph name="END_NEW">&lt;/new&gt;</ph>
-      </message>
-      <message name="IDS_CONTEXTMENU_SHOP_IMAGE_WITH_GOOGLE_LENS" desc="Context sensitive menu item for deep linking into google lens for shopping results. [CHAR_LIMIT=30]">
-        Shop image with Google Lens <ph name="BEGIN_NEW">&lt;new&gt;</ph>New<ph name="END_NEW">&lt;/new&gt;</ph>
       </message>
       <message name="IDS_CONTEXTMENU_SEARCH_WEB_FOR_IMAGE" desc="Context sensitive menu item for search-for-Image command in a new tab. [CHAR_LIMIT=30]">
         Search <ph name="SEARCH_ENGINE">%1$s<ex>Google</ex></ph> for this image
@@ -5471,36 +5428,6 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
       </message>
 
       <!-- Contextual Search -->
-      <message name="IDS_CONTEXTUAL_SEARCH_NETWORK_UNAVAILABLE" desc="Tells the user the network is not accessible.">
-        Unable to access the network
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_ERROR" desc="A network error message">
-        Error: <ph name="ERROR_CODE">%1$s<ex>404</ex></ph>
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_QUICK_ACTION_CAPTION_OPEN" desc="Caption displayed in the Contextual Search bar prompting the user to open an app related to the selected text e.g. when an address is selected the caption will say 'Open in Maps'.">
-        Open in <ph name="APP_NAME">%1$s<ex>Maps</ex></ph>
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_QUICK_ACTION_CAPTION_GENERIC_MAP" desc="Caption displayed in the Contextual Search bar prompting the user to open a maps app with the selected address. This is displayed if more than one app may be used to open the address.">
-        Open in maps app
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_QUICK_ACTION_CAPTION_EMAIL" desc="Caption displayed in the Contextual Search bar prompting the user to create an email addressed to the selected email address.">
-        Create email in <ph name="APP_NAME">%1$s<ex>Gmail</ex></ph>
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_QUICK_ACTION_CAPTION_GENERIC_EMAIL" desc="Caption displayed in the Contextual Search bar prompting the user to create an email addressed to the selected email address. This is displayed if more than one app may be used to create the email.">
-        Create email
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_QUICK_ACTION_CAPTION_EVENT" desc="Caption displayed in the Contextual Search bar prompting the user to create an event using the selected date/time.">
-        Create event in <ph name="APP_NAME">%1$s<ex>Calendar</ex></ph>
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_QUICK_ACTION_CAPTION_GENERIC_EVENT" desc="Caption displayed in the Contextual Search bar prompting the user to create an event using the selected date/time. This is displayed if more than one app may be used to create the event.">
-        Create event
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_QUICK_ACTION_CAPTION_PHONE" desc="Caption displayed in the Contextual Search bar prompting the user to call the selected phone number.">
-        Call
-      </message>
-      <message name="IDS_CONTEXTUAL_SEARCH_QUICK_ACTION_CAPTION_GENERIC_WEBSITE" desc="Caption displayed in the Contextual Search bar prompting the user to navigate to a web page.">
-        Go to page
-      </message>
 
       <!-- Edit Shortcut (also Add Shortcut) -->
       <message name="IDS_EDIT_SHORTCUT_TITLE_ADD" desc="The title for Custom Links Edit Shortcut dialog (on the NTP) when adding a new shortcut.">

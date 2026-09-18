@@ -52,16 +52,6 @@ export function getHtml(this: OmniboxPopupSearchboxElement) {
           </div>
         ` :
                                                                     ''}
-        <cr-searchbox-compose-button id="composeButton" slot="compose-button"
-            ?dynamic="${this.searchboxDynamicAnimation_}"
-            ?has-user-input="${this.hasUserInput_}"
-            ?hidden="${!this.aimButtonVisible_}"
-            label-text="${this.aimButtonConfig_.text}"
-            tooltip-title="${this.aimButtonConfig_.title}"
-            a11y-label="${this.aimButtonConfig_.a11yLabel}"
-            compose-icon="${this.aimButtonConfig_.icon}"
-            @compose-click="${this.onComposeClick_}">
-        </cr-searchbox-compose-button>
       </cr-searchbox-input>
       <div class="dropdownContainer">
         <cr-searchbox-dropdown id="matches" part="searchbox-dropdown"
@@ -77,9 +67,6 @@ export function getHtml(this: OmniboxPopupSearchboxElement) {
             @keyword-click="${this.onKeywordClick}"
             ?hidden="${!this.dropdownIsVisible}">
         </cr-searchbox-dropdown>
-        <omnibox-popup-contextual-entrypoint
-            .dropdownIsVisible="${this.dropdownIsVisible}">
-        </omnibox-popup-contextual-entrypoint>
       </div>
     </div>
   `;

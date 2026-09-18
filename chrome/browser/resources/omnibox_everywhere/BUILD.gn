@@ -13,8 +13,6 @@ build_webui("build") {
     "debug/debug.html",
   ]
   ts_files = [
-    "composebox.html.ts",
-    "composebox.ts",
     "app.html.ts",
     "app.ts",
     "omnibox.html.ts",
@@ -27,7 +25,6 @@ build_webui("build") {
     "unbounded_utils.ts",
   ]
   css_files = [
-    "composebox.css",
     "app.css",
     "omnibox.css",
     "profile_icon.css",
@@ -43,7 +40,6 @@ build_webui("build") {
 
   ts_deps = [
     "//third_party/lit/v3_0:build_ts",
-    "//ui/webui/resources/cr_components/composebox:build_ts",
     "//ui/webui/resources/cr_components/most_visited:build_ts",
     "//ui/webui/resources/cr_components/search:build_ts",
     "//ui/webui/resources/cr_components/searchbox:build_ts",

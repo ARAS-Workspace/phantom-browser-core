@@ -59,10 +59,6 @@ void TestOmniboxView::SelectAll(bool reversed) {
   }
 }
 
-bool TestOmniboxView::AimButtonVisible() const {
-  return false;
-}
-
 void TestOmniboxView::OnTemporaryTextMaybeChanged(
     const std::u16string& display_text,
     const AutocompleteMatch& match,

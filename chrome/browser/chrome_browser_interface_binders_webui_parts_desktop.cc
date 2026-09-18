@@ -7,9 +7,6 @@
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks.mojom.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_internals.mojom.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
 #include "chrome/browser/history_clusters/history_clusters_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files.mojom.h"
@@ -17,8 +14,6 @@
 #include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups.mojom.h"
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
-#include "chrome/browser/ui/lens/lens_overlay_untrusted_ui.h"
-#include "chrome/browser/ui/lens/lens_side_panel_untrusted_ui.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/side_panel/history/history_side_panel_coordinator.h"
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
@@ -33,10 +28,6 @@
 #include "chrome/browser/ui/webui/data_sharing/data_sharing_ui.h"
 #include "chrome/browser/ui/webui/downloads/downloads.mojom.h"
 #include "chrome/browser/ui/webui/downloads/downloads_ui.h"
-#include "chrome/browser/ui/webui/drive_picker_host/drive_picker_host.mojom.h"
-#include "chrome/browser/ui/webui/drive_picker_host/drive_picker_host_ui.h"
-#include "chrome/browser/ui/webui/drive_picker_host/untrusted/drive_picker_host_untrusted.mojom.h"
-#include "chrome/browser/ui/webui/drive_picker_host/untrusted/drive_picker_host_untrusted_ui.h"
 #include "chrome/browser/ui/webui/history/history_ui.h"
 #include "chrome/browser/ui/webui/infobar_internals/infobar_internals.mojom.h"
 #include "chrome/browser/ui/webui/infobar_internals/infobar_internals_ui.h"
@@ -86,11 +77,9 @@
 #include "components/browser_apis/tab_drag/tab_drag_api.mojom.h"
 #include "components/browser_apis/ui_controllers/toolbar/toolbar_ui_api.mojom.h"
 #include "components/commerce/core/mojom/shopping_service.mojom.h"  // nogncheck crbug.com/40147906
-#include "components/contextual_tasks/public/features.h"
 #include "components/data_sharing/public/features.h"
 #include "components/guest_contents/common/guest_contents.mojom.h"
 #include "components/history_clusters/core/history_clusters_service.h"
-#include "components/lens/lens_features.h"
 #include "components/omnibox/browser/searchbox.mojom.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
@@ -111,7 +100,6 @@
 #include "ui/webui/color_change_listener/color_change_handler.h"
 #include "ui/webui/resources/cr_components/app_management/app_management.mojom.h"
 #include "ui/webui/resources/cr_components/color_change_listener/color_change_listener.mojom.h"
-#include "ui/webui/resources/cr_components/composebox/composebox.mojom.h"
 #include "ui/webui/resources/cr_components/customize_color_scheme_mode/customize_color_scheme_mode.mojom.h"
 #include "ui/webui/resources/cr_components/help_bubble/custom_help_bubble.mojom.h"
 #include "ui/webui/resources/cr_components/history/foreign_sessions.mojom.h"
@@ -191,14 +179,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
 
   RegisterWebUIControllerInterfaceBinder<downloads::mojom::PageHandlerFactory,
                                          DownloadsUI>(map);
-
-  if (lens::features::IsLensOverlayEnabled()) {
-    RegisterWebUIControllerInterfaceBinder<
-        lens::mojom::LensSidePanelPageHandlerFactory,
-        lens::LensSidePanelUntrustedUI>(map);
-    RegisterWebUIControllerInterfaceBinder<lens::mojom::LensPageHandlerFactory,
-                                           lens::LensOverlayUntrustedUI>(map);
-  }
 
   if (user_education::features::GetNtpBrowserPromoType() !=
       user_education::features::NtpBrowserPromoType::kNone) {
@@ -305,15 +285,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       ProfileCustomizationUI
       >(map);
 
-  RegisterWebUIControllerInterfaceBinder<
-      help_bubble::mojom::HelpBubbleHandlerFactory, UserEducationInternalsUI,
-      ReadingListUI, NewTabPageUI, CustomizeChromeUI,
-      HistoryUI, lens::LensOverlayUntrustedUI, lens::LensSidePanelUntrustedUI,
-      ContextualTasksUI
-      ,
-      ProfilePickerUI
-      >(map);
-
 #if !defined(OFFICIAL_BUILD)
   RegisterWebUIControllerInterfaceBinder<foo::mojom::FooHandler, NewTabPageUI>(
       map);
@@ -407,14 +378,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   RegisterWebUIControllerInterfaceBinder<
       guest_contents::mojom::GuestContentsHost, WebUIBrowserUI>(map);
 
-  const bool is_contextual_tasks_enabled =
-      contextual_tasks::IsContextualTasksUIEnabled();
-
-  if (is_contextual_tasks_enabled) {
-    RegisterWebUIControllerInterfaceBinder<
-        omnibox::logging::mojom::PageHandlerFactory, OmniboxUI>(map);
-  }
-
   // Registering bindings for all WebUIControllers, even if only one of the
   // features is enabled, as it is too cumbersome and not scalable to account
   // for all combinations of feature flags here.
@@ -422,19 +385,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   // registry.ForWebUI() pattern used in
   // PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop below which
   // eliminates the need to account for feature flag combinations.
-  RegisterWebUIControllerInterfaceBinder<
-      composebox::mojom::PageHandlerFactory, NewTabPageUI, ContextualTasksUI,
-      OmniboxPopupUI, OmniboxEverywhereUI>(map);
-
-  if (base::FeatureList::IsEnabled(
-          omnibox::kComposeboxDriveContextMenuOption)) {
-    RegisterWebUIControllerInterfaceBinder<
-        drive_picker_host::mojom::DrivePickerHostHandler, DrivePickerHostUI>(
-        map);
-    RegisterWebUIControllerInterfaceBinder<
-        drive_picker_host_untrusted::mojom::PageHandlerFactory,
-        DrivePickerUntrustedHostUI>(map);
-  }
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   RegisterWebUIControllerInterfaceBinder<
@@ -497,12 +447,6 @@ void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
       .Add<most_visited::mojom::MostVisitedPageHandlerFactory>()
       .Add<new_tab_page_third_party::mojom::PageHandlerFactory>();
 
-  if (base::FeatureList::IsEnabled(
-          omnibox::kComposeboxDriveContextMenuOption)) {
-    registry.ForWebUI<DrivePickerHostUI>()
-        .Add<drive_picker_host::mojom::DrivePickerHostHandler>();
-  }
-
   registry
       .ForWebUI<settings::SettingsUI>()
       .Add<theme_color_picker::mojom::ThemeColorPickerHandlerFactory>()
@@ -540,21 +484,6 @@ void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
 
 void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop(
     content::WebUIBrowserInterfaceBrokerRegistry& registry) {
-  if (lens::features::IsLensOverlayEnabled()) {
-    registry.ForWebUI<lens::LensSidePanelUntrustedUI>()
-        .Add<lens::mojom::LensSidePanelPageHandlerFactory>()
-        .Add<lens::mojom::LensGhostLoaderPageHandlerFactory>()
-        .Add<searchbox::mojom::PageHandlerFactory>()
-        .Add<help_bubble::mojom::HelpBubbleHandlerFactory>()
-        .Add<composebox::mojom::PageHandlerFactory>();
-  }
-  if (lens::features::IsLensOverlayEnabled()) {
-    registry.ForWebUI<lens::LensOverlayUntrustedUI>()
-        .Add<lens::mojom::LensPageHandlerFactory>()
-        .Add<lens::mojom::LensGhostLoaderPageHandlerFactory>()
-        .Add<help_bubble::mojom::HelpBubbleHandlerFactory>()
-        .Add<searchbox::mojom::PageHandlerFactory>();
-  }
   registry.ForWebUI<ReadAnythingUntrustedUI>()
       .Add<help_bubble::mojom::HelpBubbleHandlerFactory>();
 
@@ -566,12 +495,6 @@ void PopulateChromeWebUIFrameInterfaceBrokersUntrustedPartsDesktop(
   registry.ForWebUI<NtpMicrosoftAuthUntrustedUI>()
       .Add<new_tab_page::mojom::
                MicrosoftAuthUntrustedDocumentInterfacesFactory>();
-
-  if (base::FeatureList::IsEnabled(
-          omnibox::kComposeboxDriveContextMenuOption)) {
-    registry.ForWebUI<DrivePickerUntrustedHostUI>()
-        .Add<drive_picker_host_untrusted::mojom::PageHandlerFactory>();
-  }
 }
 
 }  // namespace chrome::internal

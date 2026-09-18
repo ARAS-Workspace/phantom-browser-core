@@ -194,9 +194,6 @@ class AutocompleteResult {
   // Sets a takeover action on all matches to issue a contextual search.
   void AttachContextualSearchFulfillmentActionToMatches();
 
-  // Sets a takeover action on all matches to open Lens.
-  void AttachContextualSearchOpenLensActionToMatches();
-
   // Sets |action| in matches that have associated keywords.
   void AttachSiteSearchActionToMatches(const TemplateURLService* service);
 

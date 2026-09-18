@@ -337,32 +337,6 @@ public class TemplateUrlService {
     }
 
     /**
-     * Finds the default search engine for the default provider and returns the url query {@link
-     * String} for {@code query} with the contextual search version param set.
-     *
-     * @param query The search term to use as the main query in the returned search url.
-     * @param alternateTerm The alternate search term to use as an alternate suggestion.
-     * @param shouldPrefetch Whether the returned url should include a prefetch parameter.
-     * @param protocolVersion The version of the Contextual Search API protocol to use.
-     * @return A {@link String} that contains the url of the default search engine with {@code
-     *     query} and {@code alternateTerm} inserted as parameters and contextual search and
-     *     prefetch parameters conditionally set.
-     */
-    public GURL getUrlForContextualSearchQuery(
-            @Nullable String query,
-            @Nullable String alternateTerm,
-            boolean shouldPrefetch,
-            String protocolVersion) {
-        return TemplateUrlServiceJni.get()
-                .getUrlForContextualSearchQuery(
-                        mNativeTemplateUrlServiceAndroid,
-                        query,
-                        alternateTerm,
-                        shouldPrefetch,
-                        protocolVersion);
-    }
-
-    /**
      * Finds the TemplateUrl for the search engine for the given keyword.
      *
      * @param keyword The templateUrl keyword to look up.
@@ -686,13 +660,6 @@ public class TemplateUrlService {
         GURL getUrlForVoiceSearchQuery(long nativeTemplateUrlServiceAndroid, String query);
 
         GURL getComposeplateUrl(long nativeTemplateUrlServiceAndroid, TemplateUrlService caller);
-
-        GURL getUrlForContextualSearchQuery(
-                long nativeTemplateUrlServiceAndroid,
-                @Nullable String query,
-                @Nullable String alternateTerm,
-                boolean shouldPrefetch,
-                String protocolVersion);
 
         TemplateUrl getTemplateUrlForKeyword(
                 long nativeTemplateUrlServiceAndroid, @JniType("std::u16string") String keyword);

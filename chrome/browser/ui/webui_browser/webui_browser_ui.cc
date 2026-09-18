@@ -6,7 +6,6 @@
 
 #include "base/notimplemented.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
-#include "chrome/browser/contextual_search/contextual_search_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/bookmarks/bookmark_bar_controller.h"
 #include "chrome/browser/ui/bookmarks/bookmarks_service_feature.h"
@@ -36,8 +35,6 @@
 #include "chrome/grit/webui_browser_resources_map.h"
 #include "chrome/grit/webui_toolbar_shared_resources.h"
 #include "chrome/grit/webui_toolbar_shared_resources_map.h"
-#include "components/contextual_search/contextual_search_service.h"
-#include "components/contextual_search/contextual_search_session_handle.h"
 #include "components/favicon_base/favicon_url_parser.h"
 #include "components/guest_contents/browser/guest_contents_host_impl.h"
 #include "components/surface_embed/common/features.h"
@@ -202,9 +199,7 @@ void WebUIBrowserUI::CreatePageHandler(
   // WebUIOmniboxHandler.
   realbox_handler_ = std::make_unique<RealboxHandler>(
       std::move(pending_page_handler), std::move(page),
-      Profile::FromWebUI(web_ui()), web_contents,
-      base::BindRepeating(&WebUIBrowserUI::GetOrCreateContextualSessionHandle,
-                          base::Unretained(this)));
+      Profile::FromWebUI(web_ui()), web_contents);
 }
 
 void WebUIBrowserUI::BindInterface(
@@ -331,26 +326,6 @@ void WebUIBrowserUI::ShowSidePanel(SidePanelEntryKey side_panel_entry_key) {
 
 void WebUIBrowserUI::CloseSidePanel() {
   page_->CloseSidePanel();
-}
-
-contextual_search::ContextualSearchSessionHandle*
-WebUIBrowserUI::GetOrCreateContextualSessionHandle() {
-  if (!session_handle_) {
-    auto* service = ContextualSearchServiceFactory::GetForProfile(
-        Profile::FromWebUI(web_ui()));
-    if (service) {
-      // TODO(crbug.com/445510209): Use appropriate config and source
-      session_handle_ = service->CreateSession(
-          omnibox::CreateQueryControllerConfigParams(),
-          contextual_search::ContextualSearchSource::kOmnibox,
-          lens::LensOverlayInvocationSource::kOmniboxContextualQuery);
-      // TODO(crbug.com/469877646): Determine what to do with the return value
-      // of this call, or move this call to a different location.
-      session_handle_->CheckSearchContentSharingSettings(
-          Profile::FromWebUI(web_ui())->GetPrefs());
-    }
-  }
-  return session_handle_.get();
 }
 
 WEB_UI_CONTROLLER_TYPE_IMPL(WebUIBrowserUI)

@@ -77,10 +77,6 @@
 #include "chrome/browser/chrome_content_browser_client_parts.h"
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui_service.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui_service_factory.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_url_loader_factory_interceptor.h"
-#include "chrome/browser/contextual_tasks/guest_opener_user_data.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/browser/data_saver/data_saver.h"
 #include "chrome/browser/defaults.h"
@@ -234,8 +230,6 @@
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "components/content_settings/core/common/cookie_settings_base.h"
-#include "components/contextual_tasks/public/features.h"
-#include "components/contextual_tasks/public/utils.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
 #include "components/custom_handlers/protocol_handler_throttle.h"
 #include "components/dom_distiller/core/dom_distiller_switches.h"
@@ -268,7 +262,6 @@
 #include "components/language/core/browser/pref_names.h"
 #include "components/language_detection/content/browser/content_language_detection_driver.h"
 #include "components/language_detection/content/common/language_detection.mojom.h"
-#include "components/lens/buildflags.h"
 #include "components/live_caption/caption_util.h"
 #include "components/media_device_salt/media_device_salt_service.h"
 #include "components/media_router/browser/presentation/controller_presentation_service_delegate_impl.h"
@@ -1936,16 +1929,6 @@ bool ChromeContentBrowserClient::ShouldTreatAsFirstPartyWhenTopLevel(
       top_frame_origin.scheme() == content::kChromeUIScheme) {
     return true;
   }
-  // TODO(crbug.com/483614998): Granting Lens side panel is a temporary
-  // exception to use SameSite cookies while it migrates to a <webview>
-  // approach. This should not be done for other untrusted WebUI.
-#if !BUILDFLAG(IS_ANDROID)
-  if (is_embedded_origin_secure &&
-      top_frame_origin == url::Origin::Create(GURL(
-                              chrome::kChromeUILensUntrustedSidePanelURL))) {
-    return true;
-  }
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   return top_frame_origin.scheme() == extensions::kExtensionScheme;
@@ -1958,17 +1941,8 @@ bool ChromeContentBrowserClient::
     ShouldIgnoreSameSiteCookieRestrictionsWhenTopLevel(
         const url::Origin& top_frame_origin,
         bool is_embedded_origin_secure) {
-  // TODO(crbug.com/483614998): Granting Lens side panel is a temporary
-  // exception to use SameSite cookies while it migrates to a <webview>
-  // approach. This should not be done for other untrusted WebUI.
   return is_embedded_origin_secure &&
-         (top_frame_origin.scheme() == content::kChromeUIScheme
-#if !BUILDFLAG(IS_ANDROID)
-          ||
-          (top_frame_origin == url::Origin::Create(GURL(
-                                   chrome::kChromeUILensUntrustedSidePanelURL)))
-#endif
-         );
+         top_frame_origin.scheme() == content::kChromeUIScheme;
 }
 
 // TODO(crbug.com/40694933): This is based on SubframeTask::GetTitle()
@@ -3781,23 +3755,6 @@ GetPreferredColorScheme(const WebPreferences& web_prefs,
 #endif  // BUILDFLAG(ENABLE_GUEST_VIEW)
 
   // To prevent a UI flicker when the CS param is enforcing dark mode, force set
-  // the blink renderer so the initial load respects the prefers-color-scheme
-  // media query.
-  // TODO(crbug.com/506209287): Investigate if there is a feature specific place
-  // to add this logic to prevent flick on initial render.
-  if (web_contents) {
-    GURL url = web_contents->GetVisibleURL();
-    if (url.SchemeIs(content::kChromeUIScheme) &&
-        url.host() == chrome::kChromeUIContextualTasksHost) {
-      std::optional<bool> is_dark_mode =
-          contextual_tasks::GetDarkModeFromUrl(url);
-      if (is_dark_mode.has_value()) {
-        preferred_color_scheme =
-            is_dark_mode.value() ? blink::mojom::PreferredColorScheme::kDark
-                                 : blink::mojom::PreferredColorScheme::kLight;
-      }
-    }
-  }
   return {preferred_color_scheme, preferred_root_scrollbar_color_scheme};
 }
 
@@ -4069,33 +4026,6 @@ bool ChromeContentBrowserClient::CanCreateWindow(
   // navigation throttle. When a new tab/window is created, it is done before
   // the WebContents is created, so if we only let the navigation throttle
   // handle it, we would end up with an empty tab or window.
-  contextual_tasks::ContextualTasksUiService* contextual_tasks_ui_service =
-      contextual_tasks::ContextualTasksUiServiceFactory::GetForBrowserContext(
-          profile);
-  if (contextual_tasks::IsContextualTasksUIEnabled()) {
-    content::OpenURLParams url_params(
-        target_url, referrer, disposition,
-        ui::PageTransition::PAGE_TRANSITION_AUTO_TOPLEVEL, true);
-    url_params.user_gesture = user_gesture;
-    content::WebContents* responsible_web_contents =
-        web_contents->GetResponsibleWebContents();
-    bool is_from_embedded_page =
-        web_contents != responsible_web_contents ||
-        guest_view::GuestViewBase::FromRenderFrameHost(opener);
-    content::SiteInstance* site = opener->GetSiteInstance();
-    bool is_same_site_or_from_ui = site && site->IsSameSiteWithURL(target_url);
-    if (contextual_tasks_ui_service &&
-        contextual_tasks_ui_service->HandleNavigation(
-            std::move(url_params), responsible_web_contents,
-            is_from_embedded_page,
-            /*from_can_create_window=*/true, is_same_site_or_from_ui,
-            /*is_mobile_ua=*/false,
-            /*initiator_origin=*/opener->GetLastCommittedOrigin(),
-            /*initiator_frame_token=*/opener->GetGlobalFrameToken(),
-            features)) {
-      return false;
-    }
-  }
 
   // If the opener is trying to create a background window but doesn't have
   // the appropriate permission, fail the attempt.
@@ -4415,20 +4345,6 @@ void ChromeContentBrowserClient::OverrideWebPreferences(
       }
     }
 #endif
-
-    contextual_tasks::ContextualTasksUiService* ui_service =
-        contextual_tasks::ContextualTasksUiServiceFactory::GetForBrowserContext(
-            profile);
-    if (ui_service && ui_service->IsTrackedWindow(web_contents)) {
-      // This preference must be set here because OverrideWebPreferences is
-      // the central place in Chrome to modify WebPreferences for renderers.
-      // There is no component-specific hook in
-      // chrome/browser/contextual_tasks that allows overriding these
-      // preferences directly. We need to allow scripts to close windows for
-      // tracked guest windows so that the page that was opened via
-      // window.open can close itself if needed (e.g., via window.close()).
-      web_prefs->allow_scripts_to_close_windows = true;
-    }
 
     web_prefs->is_initial_profile =
         profile->GetOriginalProfile()->GetBaseName() ==
@@ -5889,9 +5805,6 @@ void ChromeContentBrowserClient::WillCreateURLLoaderFactory(
 
 #if BUILDFLAG(ENABLE_GUEST_VIEW)
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  if (contextual_tasks::IsContextualTasksUIEnabled()) {
-    contextual_tasks::MaybeInterceptURLLoaderFactory(frame, factory_builder);
-  }
 #else   // !BUILDFLAG (ENABLE_EXTENSIONS_CORE)
   guest_view::MaybeInterceptURLLoaderFactoryForSlimWebView(
       frame, factory_builder, header_client);
@@ -7913,28 +7826,6 @@ ChromeContentBrowserClient::GetPostMessageTargetOverride(
       content::WebContents::FromRenderFrameHost(target_rfh);
   if (!web_contents) {
     return nullptr;
-  }
-
-  // Don't proceed to looking up the ContextualTasksUiService if the WebContents
-  // is not marked as a guest opener. In other words, this post message is
-  // unrelated to Contextual Tasks.
-  if (!contextual_tasks::GuestOpenerUserData::IsGuestOpener(web_contents)) {
-    return nullptr;
-  }
-
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents->GetBrowserContext());
-  if (!profile) {
-    return nullptr;
-  }
-
-  // The ContextualTasks feature manually tracks window opens to be able to
-  // route messages back to the appropriate RenderFrameHost. If that feature
-  // returns a frame, use that instead.
-  contextual_tasks::ContextualTasksUiService* service = contextual_tasks::
-      ContextualTasksUiServiceFactory::GetForBrowserContextIfExists(profile);
-  if (service) {
-    return service->GetGuestForMessage(target_rfh, source_origin);
   }
 
   return nullptr;

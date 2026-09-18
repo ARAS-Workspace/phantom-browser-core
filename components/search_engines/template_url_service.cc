@@ -374,34 +374,6 @@ bool ShouldCommitUpdateToAccount(
   return account_data_changed;
 }
 
-// Checks if `url` is a Google AI mode URL. Uses the `udm` query param. Only
-// works for Google URLs because it's unknown what other search providers will
-// use to distinguish their AI mode and traditional search URLs.
-bool IsGoogleAiModeUrl(GURL url) {
-  // Check that:
-  // 1. `url` contains a `udm=50` query param which distinguish Google AI mode
-  //    and traditional search URLs. This check alone isn't sufficient because
-  //    any website could coincidentally use the same query param for its own
-  //    purposes.
-  // 2. `url` is a Google URL. This check is done 2nd because it's slower (0.5us
-  //    v 5us).
-
-  std::string_view query = url.query();
-  url::Component query_iterator(0, query.length());
-  url::Component key, value;
-  bool udm_50 = false;
-  while (url::ExtractQueryKeyValue(query, &query_iterator, &key, &value) &&
-         !udm_50) {
-    std::string_view key_string = query.substr(key.begin, key.len);
-    std::string_view value_string = query.substr(value.begin, value.len);
-    udm_50 = key_string == "udm" && value_string == "50";
-  }
-
-  return udm_50 && google_util::IsGoogleDomainUrl(
-                       url, google_util::DISALLOW_SUBDOMAIN,
-                       google_util::DISALLOW_NON_STANDARD_PORTS);
-}
-
 }  // namespace
 
 // TemplateURLService::LessWithPrefix -----------------------------------------
@@ -2913,11 +2885,6 @@ void TemplateURLService::UpdateKeywordSearchTermsForURL(
   // AI mode URLs should not be stored. Otherwise, since they fit the
   // traditional search `TemplateURL`'s URL, those would be incorrectly
   // attributed.
-  if (omnibox_feature_configs::AiMode::Get()
-          .do_not_show_historic_aim_suggestions &&
-      IsGoogleAiModeUrl(details.url)) {
-    return;
-  }
 
   const TemplateURLSet* urls_for_host =
       provider_map_->GetURLsForHost(details.url.GetHost());
@@ -3792,4 +3759,3 @@ void TemplateURLService::AddOverriddenKeywordForTemplateURL(
         base::UTF16ToUTF8(template_url->keyword()));
   }
 }
-

@@ -16,7 +16,6 @@ import androidx.annotation.StyleRes;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.feed.FeedSurfaceScrollDelegate;
-import org.chromium.chrome.browser.lens.LensEntryPoint;
 import org.chromium.chrome.browser.omnibox.status.StatusProperties.StatusIconResource;
 
 import java.util.function.Supplier;

@@ -4,7 +4,6 @@
 
 import {assert, assertNotReached} from '//resources/js/assert.js';
 import {EventTracker} from '//resources/js/event_tracker.js';
-import {loadTimeData} from '//resources/js/load_time_data.js';
 import {isMac} from '//resources/js/platform.js';
 import {hasKeyModifiers} from '//resources/js/util.js';
 import type {CrLitElement, PropertyValues} from '//resources/lit/v3_0/lit.rollup.js';
@@ -78,9 +77,6 @@ export const SearchboxMixin = <T extends Constructor<CrLitElement>>(
         },
       };
     }
-    composeboxSource: string = loadTimeData.valueExists('composeboxSource') ?
-        loadTimeData.getString('composeboxSource') :
-        'Unknown';
     accessor searchboxAriaDescription: string = '';
     accessor dropdownIsVisible: boolean = false;
     // Tracks the latest query sent for autocompletion. Used to filter out
@@ -729,7 +725,6 @@ export const SearchboxMixin = <T extends Constructor<CrLitElement>>(
 };
 
 export interface SearchboxMixinInterface {
-  composeboxSource: string;
   dropdownIsVisible: boolean;
   initialInputScrollHeight: number;
   inputAriaLive: string;

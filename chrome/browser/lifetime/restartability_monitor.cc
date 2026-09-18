@@ -13,7 +13,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/lens/lens_overlay_controller.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/web_applications/web_app_tab_helper.h"
 #include "chrome/common/chrome_features.h"
@@ -220,11 +219,6 @@ void AddTabBlockers(content::WebContents* contents,
       web_app::WebAppTabHelper::FromWebContents(contents);
   if (web_app_helper && web_app_helper->is_in_app_window()) {
     state.AddBlocker(Blocker::kWebApp);
-  }
-
-  auto* lens_controller = LensOverlayController::FromTabWebContents(contents);
-  if (lens_controller && lens_controller->IsOverlayActive()) {
-    state.AddBlocker(Blocker::kLensShared);
   }
 }
 

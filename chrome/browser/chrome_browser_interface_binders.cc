@@ -70,8 +70,6 @@
 #include "ui/accessibility/accessibility_features.h"
 
 #if BUILDFLAG(ENABLE_UNHANDLED_TAP)
-#include "chrome/browser/android/contextualsearch/unhandled_tap_notifier_impl.h"  // nogncheck crbug.com/40147906
-#include "chrome/browser/android/contextualsearch/unhandled_tap_web_contents_observer.h"  // nogncheck crbug.com/40147906
 #include "third_party/blink/public/mojom/unhandled_tap_notifier/unhandled_tap_notifier.mojom.h"
 #endif  // BUILDFLAG(ENABLE_UNHANDLED_TAP)
 
@@ -133,16 +131,10 @@ void BindUnhandledTapWebContentsObserver(
     return;
   }
 
-  auto* unhandled_tap_notifier_observer =
-      contextual_search::UnhandledTapWebContentsObserver::FromWebContents(
-          web_contents);
   if (!unhandled_tap_notifier_observer) {
     return;
   }
 
-  contextual_search::CreateUnhandledTapNotifierImpl(
-      unhandled_tap_notifier_observer->unhandled_tap_callback(),
-      std::move(receiver));
 }
 #endif  // BUILDFLAG(ENABLE_UNHANDLED_TAP)
 

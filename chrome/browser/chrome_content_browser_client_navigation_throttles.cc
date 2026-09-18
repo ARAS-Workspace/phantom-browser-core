@@ -8,9 +8,7 @@
 #include "base/feature_list.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "chrome/browser/autocomplete/aim_eligibility_refresh_navigation_throttle.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_navigation_throttle.h"
 #include "chrome/browser/custom_handlers/chrome_protocol_handler_navigation_throttle.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/browser/data_sharing/data_sharing_navigation_throttle.h"
@@ -41,7 +39,6 @@
 #include "chrome/common/pref_names.h"
 #include "components/captive_portal/content/captive_portal_service.h"
 #include "components/captive_portal/core/buildflags.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/custom_handlers/protocol_handler_navigation_throttle.h"
 #include "components/dom_distiller/content/browser/distiller_page_web_contents.h"
 #include "components/dom_distiller/content/browser/distiller_referrer_throttle.h"
@@ -50,7 +47,6 @@
 #include "components/error_page/content/browser/net_error_auto_reloader.h"
 #include "components/guest_view/buildflags/buildflags.h"
 #include "components/history/content/browser/visited_link_navigation_throttle.h"
-#include "components/lens/lens_features.h"
 #include "components/offline_pages/buildflags/buildflags.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/page_load_metrics/browser/metrics_navigation_throttle.h"
@@ -88,7 +84,6 @@
 #include "chrome/browser/devtools/devtools_navigation_throttle.h"
 #include "chrome/browser/page_info/web_view_side_panel_throttle.h"
 #include "chrome/browser/themes/theme_service_factory.h"
-#include "chrome/browser/ui/lens/lens_overlay_side_panel_navigation_throttle.h"
 #include "chrome/browser/ui/search/chrome_search_navigation_throttle.h"
 #include "chrome/browser/ui/search/new_tab_page_navigation_throttle.h"
 #include "chrome/browser/ui/web_applications/tabbed_web_app_navigation_throttle.h"
@@ -422,14 +417,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   // AimEligibilityRefreshNavigationThrottle must be registered before
   // ContextualTasksNavigationThrottle so it can detect AIM URL navigations
   // before ContextualTasksNavigationThrottle intercepts them.
-  AimEligibilityRefreshNavigationThrottle::MaybeCreateAndAdd(registry);
-
-  if (contextual_tasks::IsContextualTasksUIEnabled() ||
-      base::FeatureList::IsEnabled(
-          contextual_tasks::kContextualTasksUrlRedirectToAimUrl)) {
-    contextual_tasks::ContextualTasksNavigationThrottle::MaybeCreateAndAdd(
-        registry);
-  }
 
 #if BUILDFLAG(ENABLE_DEVTOOLS_FRONTEND)
   DevToolsWindow::MaybeCreateAndAddNavigationThrottle(registry);
@@ -490,15 +477,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   payments::PaymentHandlerNavigationThrottle::MaybeCreateAndAdd(registry);
 
 #if !BUILDFLAG(IS_ANDROID)
-  if (lens::features::IsLensOverlayEnabled()) {
-    if (profile) {
-      if (ThemeService* theme_service =
-              ThemeServiceFactory::GetForProfile(profile)) {
-        lens::LensOverlaySidePanelNavigationThrottle::MaybeCreateAndAdd(
-            registry, theme_service);
-      }
-    }
-  }
 
   NtpMicrosoftAuthResponseCaptureNavigationThrottle::MaybeCreateAndAdd(
       registry);

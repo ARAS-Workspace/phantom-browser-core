@@ -97,10 +97,6 @@ if (enable_extensions) {
     schema_sources_ += [ "web_authentication_proxy.webidl" ]
   }
 
-  if (is_win || is_mac || is_linux) {
-    schema_sources_ += [ "contextual_tasks_private.webidl" ]
-  }
-
   if (is_linux || is_win) {
     schema_sources_ += [ "input_ime.json" ]
   }

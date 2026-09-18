@@ -39,7 +39,6 @@ import org.chromium.chrome.browser.browser_controls.BrowserControlsVisibilityMan
 import org.chromium.chrome.browser.compositor.layouts.Layout.Orientation;
 import org.chromium.chrome.browser.compositor.layouts.components.LayoutTab;
 import org.chromium.chrome.browser.compositor.overlay_panel.OverlayPanelManager;
-import org.chromium.chrome.browser.compositor.overlay_panel.contextualsearch.ContextualSearchPanel;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutHelperManager;
 import org.chromium.chrome.browser.fullscreen.BrowserControlsManager;
 import org.chromium.chrome.browser.gesturenav.OverscrollGlowCoordinator;
@@ -387,7 +386,6 @@ public class LayoutManagerImpl
                     // ScrollingBottomViewSceneLayer Since ScrollingBottomViewSceneLayer change
                     // the container size, it causes relocation tab strip scene layer.
                     ScrollingBottomViewSceneLayer.class,
-                    ContextualSearchPanel.class,
                     EdgeToEdgeBottomChinSceneLayer.class,
                     StatusIndicatorCoordinator.getSceneOverlayClass()
                 };

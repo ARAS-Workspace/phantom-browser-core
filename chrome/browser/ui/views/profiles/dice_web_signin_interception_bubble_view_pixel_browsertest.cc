@@ -318,7 +318,6 @@ class DiceWebSigninInterceptionBubblePixelTest
     // TODO(crbug.com/452061489): Remove this and fix the test failures while
     // WebUI Omnibox is enabled.
     disabled_features.push_back(omnibox::internal::kWebUIOmniboxPopup);
-    disabled_features.push_back(omnibox::internal::kWebUIOmniboxAimPopup);
 
     scoped_feature_list_.InitWithFeatures(enabled_features, disabled_features);
   }

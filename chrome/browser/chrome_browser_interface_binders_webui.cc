@@ -7,7 +7,6 @@
 #include "build/android_buildflags.h"
 #include "chrome/browser/chrome_browser_interface_binders.h"
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
 #include "chrome/browser/media/media_engagement_score_details.mojom.h"
 #include "chrome/browser/ui/webui/chrome_finds_internals/chrome_finds_internals.mojom.h"
 #include "chrome/browser/ui/webui/chrome_finds_internals/chrome_finds_internals_ui.h"
@@ -40,7 +39,6 @@
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/history/history_ui.h"
 #include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup.mojom.h"
-#include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup_aim.mojom.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
@@ -52,7 +50,6 @@
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
 #include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption.mojom.h"
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
-#include "chrome/browser/ui/webui/new_tab_page/action_chips/action_chips.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "components/search/ntp_features.h"
 #endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
@@ -63,7 +60,6 @@
 #endif
 
 #if BUILDFLAG(ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX)
-#include "ui/webui/resources/cr_components/composebox/composebox.mojom.h"
 #endif
 
 #if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
@@ -128,7 +124,7 @@ void BindTrackedElementHandlerRestricted(
       controller->GetAs<HistoryUI>() ||
       controller->GetAs<ProfilePickerUI>() ||
 #endif  // !BUILDFLAG(IS_ANDROID)
-      controller->GetAs<ContextualTasksUI>();
+      false;
 
   if (!is_allowed) {
     mojo::ReportBadMessage(
@@ -151,8 +147,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
       map);
 
 #if !BUILDFLAG(IS_ANDROID)
-  RegisterWebUIControllerInterfaceBinder<
-      omnibox_popup_aim::mojom::PageHandlerFactory, OmniboxPopupUI>(map);
   RegisterWebUIControllerInterfaceBinder<
       omnibox_popup::mojom::PageHandlerFactory, OmniboxPopupUI>(map);
 #endif
@@ -210,10 +204,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   content::RegisterWebUIControllerInterfaceBinder<
       customize_buttons::mojom::CustomizeButtonsHandlerFactory, NewTabPageUI>(
       map);
-  if (base::FeatureList::IsEnabled(ntp_features::kNtpNextFeatures)) {
-    content::RegisterWebUIControllerInterfaceBinder<
-        action_chips::mojom::ActionChipsHandlerFactory, NewTabPageUI>(map);
-  }
   if (base::FeatureList::IsEnabled(
           ntp_features::kNtpMostRelevantTabResumptionModule)) {
     content::RegisterWebUIControllerInterfaceBinder<
@@ -236,32 +226,10 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
       searchbox::mojom::PageHandlerFactory, NewTabPageUI>(map);
 #endif  // BUILDFLAG(ENABLE_WEBUI_NTP) && BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) &&        \
-    (BUILDFLAG(ENABLE_WEBUI_NTP) || \
-     BUILDFLAG(ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX))
-  RegisterWebUIControllerInterfaceBinder<composebox::mojom::PageHandlerFactory
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-                                         ,
-                                         NewTabPageUI
-#endif
-#if BUILDFLAG(ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX)
-                                         ,
-                                         ContextualTasksUI
-#endif
-                                         >(map);
-
+#if BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_WEBUI_NTP)
   RegisterWebUIControllerInterfaceBinder<
-      help_bubble::mojom::HelpBubbleHandlerFactory
-#if BUILDFLAG(ENABLE_WEBUI_NTP)
-      ,
-      NewTabPageUI
-#endif
-#if BUILDFLAG(ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX)
-      ,
-      ContextualTasksUI
-#endif
-      >(map);
-#endif  // BUILDFLAG(IS_ANDROID)
+      help_bubble::mojom::HelpBubbleHandlerFactory, NewTabPageUI>(map);
+#endif  // BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_WEBUI_NTP)
 
   map->Add<tracked_element::mojom::TrackedElementHandler>(
       base::BindRepeating(&BindTrackedElementHandlerRestricted));

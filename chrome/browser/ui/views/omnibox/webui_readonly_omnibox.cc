@@ -13,7 +13,6 @@
 #include "base/supports_user_data.h"
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/omnibox/ai_mode_page_action_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_edit_model.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
@@ -283,17 +282,6 @@ void WebUIReadOnlyOmnibox::SetFocus(bool is_user_initiated) {
           : toolbar_ui_api::mojom::FocusRequestTarget::kLocationBar);
 }
 
-void WebUIReadOnlyOmnibox::ApplyFocusRingToAimButton(bool focus_aim) {
-  aim_page_action_icon_has_fake_focus_ = focus_aim;
-  update_propagator_->PropagateApplyFocusRingToAimButton(focus_aim);
-}
-
-bool WebUIReadOnlyOmnibox::AimButtonVisible() const {
-  return location_bar_ &&
-         omnibox::AiModePageActionController::From(location_bar_->GetBrowser())
-             ->IsVisible();
-}
-
 void WebUIReadOnlyOmnibox::ApplyCaretVisibility() {
   NOTIMPLEMENTED();
 }
@@ -528,18 +516,9 @@ WebUIReadOnlyOmnibox::ComputeMojoState() {
 
   omnibox::ComputePlaceholderText(location_bar_, placeholder_text,
                                   maybe_a11y_placeholder);
-  if (has_focus_ && !aim_hint_currently_shown_ &&
-      omnibox::IsAimPlaceholderText(location_bar_, placeholder_text)) {
-    omnibox::RecordAimHintImpression(location_bar_);
-    aim_hint_currently_shown_ = true;
-  }
 
   if (!placeholder_text.empty() &&
-      omnibox::ShouldShowPlaceholderText(
-          location_bar_,
-          /*in_popup_state_transition=*/false,
-          /*aim_button_visible=*/AimButtonVisible(),
-          /*aim_hint_currently_shown=*/aim_hint_currently_shown_)) {
+      omnibox::ShouldShowPlaceholderText(location_bar_)) {
     state->placeholder = toolbar_ui_api::mojom::OmniboxTextPortion::New(
         placeholder_text,
         /*strikethrough=*/false,
@@ -601,7 +580,6 @@ WebUIReadOnlyOmnibox::OnFocusChange(
     RequestUpdateWebUI();
   } else {
     has_focus_ = false;
-    aim_hint_currently_shown_ = false;
     controller()->edit_model()->OnWillKillFocus();
     if (auto* popup_closer = controller()->client()->GetOmniboxPopupCloser()) {
       popup_closer->CloseWithReason(omnibox::PopupCloseReason::kBlur);
@@ -659,19 +637,6 @@ WebUIReadOnlyOmnibox::OnKey(
 
   switch (dom_key) {
     case ui::DomKey::ENTER: {
-      if (omnibox::kShowRhsAimHint.Get()) {
-#if BUILDFLAG(IS_MAC)
-        const bool ai_mode_modifier = command;
-#else
-        const bool ai_mode_modifier = control;
-#endif
-        if (ai_mode_modifier && !shift) {
-          controller()->edit_model()->OpenAiMode(
-              OmniboxEditModel::AimActivation::kKeyboard);
-          return base::ok(std::monostate());
-        }
-      }
-
       WindowOpenDisposition disposition =
           searchbox::ComputeOpenDispositionFromModifiersAndLogToUma(
               shift, control, alt, command);
@@ -731,22 +696,6 @@ WebUIReadOnlyOmnibox::OnKey(
       break;
 
     case ui::DomKey::FromCharacter(' '):
-      if (aim_page_action_icon_has_fake_focus_) {
-        if (base::FeatureList::IsEnabled(
-                omnibox::kAiModeSpaceDoesNotActivate)) {
-          ApplyFocusRingToAimButton(false);
-          // The JS side will apply space.
-        } else {
-          controller()->edit_model()->OpenSelection(
-              OmniboxPopupSelection(
-                  OmniboxPopupSelection::kNoMatch,
-                  OmniboxPopupSelection::LineState::FOCUSED_BUTTON_AIM),
-              base::TimeTicks::Now(), WindowOpenDisposition::CURRENT_TAB,
-              /*via_keyboard=*/true);
-        }
-        return base::ok(std::monostate());
-      }
-
       if (controller()->IsPopupOpen() && !control && !alt && !shift) {
         // This is relying on search keyword activation incrementing browser
         // version to resolve the conflict with text input with ' ' appended

@@ -41,12 +41,6 @@ void OmniboxPopupWebUIContent::Clear() {
   Detach();
 }
 
-void OmniboxPopupWebUIContent::OnContextMenuClosed() {
-  if (auto* handler = popup_handler()) {
-    handler->OnContextMenuClosed();
-  }
-}
-
 void OmniboxPopupWebUIContent::ShowUI() {
   OmniboxPopupWebUIBaseContent::ShowUI();
 

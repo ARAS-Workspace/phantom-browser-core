@@ -63,18 +63,6 @@ void OmniboxEverywhereService::ShowProfilePicker() {
   }
 }
 
-void OmniboxEverywhereService::OnDrivePickerOpened() {
-  if (ui_manager()) {
-    ui_manager()->OnDrivePickerOpened();
-  }
-}
-
-void OmniboxEverywhereService::OnDrivePickerClosed() {
-  if (ui_manager()) {
-    ui_manager()->OnDrivePickerClosed();
-  }
-}
-
 void OmniboxEverywhereService::OnScreensharePickerOpened() {
   if (ui_manager()) {
     ui_manager()->OnScreensharePickerOpened();

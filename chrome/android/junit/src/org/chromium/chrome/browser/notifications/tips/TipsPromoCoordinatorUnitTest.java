@@ -42,7 +42,6 @@ import org.chromium.base.test.util.UserActionTester;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.layouts.LayoutManager;
 import org.chromium.chrome.browser.layouts.LayoutType;
-import org.chromium.chrome.browser.lens.LensController;
 import org.chromium.chrome.browser.notifications.tips.TipsPromoCoordinator.TipsPromoSheetContent;
 import org.chromium.chrome.browser.notifications.tips.TipsPromoProperties.ScreenType;
 import org.chromium.chrome.browser.profiles.Profile;

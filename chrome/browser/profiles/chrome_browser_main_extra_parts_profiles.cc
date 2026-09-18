@@ -15,7 +15,6 @@
 #include "chrome/browser/account_settings/account_setting_service_factory.h"
 #include "chrome/browser/affiliations/affiliation_service_factory.h"
 #include "chrome/browser/ai/ai_data_keyed_service_factory.h"
-#include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/autocomplete/autocomplete_classifier_factory.h"
 #include "chrome/browser/autocomplete/autocomplete_scoring_model_service_factory.h"
 #include "chrome/browser/autocomplete/document_suggestions_service_factory.h"
@@ -66,10 +65,6 @@
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/context_hub/context_hub_service_factory.h"
-#include "chrome/browser/contextual_search/contextual_search_service_factory.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_context_service_factory.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_service_factory.h"
-#include "chrome/browser/contextual_tasks/contextual_tasks_ui_service_factory.h"
 #include "chrome/browser/critical_actions/critical_action_factory.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/browser/data_sharing/data_sharing_service_factory.h"
@@ -196,7 +191,6 @@
 #include "chrome/browser/search/background/ntp_background_service_factory.h"
 #include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/search_engine_choice/search_engine_choice_service_factory.h"
-#include "chrome/browser/search_engines/ai_mode_button_service_factory.h"
 #include "chrome/browser/search_engines/template_url_fetcher_factory.h"
 #include "chrome/browser/search_engines/template_url_prepopulate_data_resolver_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
@@ -373,7 +367,6 @@
 #include "chrome/browser/ui/desktop_to_mobile_promos/ios_promo_trigger_service_factory.h"
 #include "chrome/browser/ui/global_error/global_error_service_factory.h"
 #include "chrome/browser/ui/global_media_controls/media_notification_service_factory.h"
-#include "chrome/browser/ui/lens/lens_keyed_service_factory.h"
 #include "chrome/browser/ui/media_router/media_router_ui_service_factory.h"
 #include "chrome/browser/ui/performance_controls/performance_controls_hats_service_factory.h"
 #include "chrome/browser/ui/read_anything/read_anything_service_factory.h"
@@ -479,14 +472,11 @@
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#include "chrome/browser/contextual_tasks/contextual_tasks_extension_bridge_factory.h"
 #include "chrome/browser/extensions/keyed_services/browser_context_keyed_service_factories.h"
 #include "chrome/browser/omnibox/omnibox_input_watcher_factory.h"
 #include "chrome/browser/omnibox/omnibox_suggestions_watcher_factory.h"
 #include "chrome/browser/policy/cloud/extension_install_policy_service_factory.h"
 #include "chrome/browser/speech/extension_api/tts_extension_api.h"
-#include "chrome/browser/ui/webui/omnibox/aim_eligibility_extension/aim_eligibility_extension_bridge_factory.h"
-#include "components/contextual_tasks/public/features.h"
 #include "extensions/browser/browser_context_keyed_service_factories.h"
 #include "extensions/browser/extensions_browser_client.h"
 #endif
@@ -638,8 +628,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   AffiliationServiceFactory::GetInstance();
   AiDataKeyedServiceFactory::GetInstance();
-  AiModeButtonServiceFactory::GetInstance();
-  AimEligibilityServiceFactory::GetInstance();
 #if BUILDFLAG(IS_ANDROID)
   AndroidProfileBrowserCollectionServiceFactory::GetInstance();
   AndroidSmsOtpBackendFactory::GetInstance();
@@ -755,14 +743,9 @@ void ChromeBrowserMainExtraPartsProfiles::
 
   ContextHubServiceFactory::GetInstance();
 
-  contextual_tasks::ContextualTasksContextServiceFactory::GetInstance();
-  contextual_tasks::ContextualTasksServiceFactory::GetInstance();
-  contextual_tasks::ContextualTasksUiServiceFactory::GetInstance();
-
   ContentIndexProviderFactory::GetInstance();
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #endif
-  ContextualSearchServiceFactory::GetInstance();
   CookieSettingsFactory::GetInstance();
 #if !BUILDFLAG(IS_ANDROID)
   metrics::CriticalUserJourneyServiceFactory::GetInstance();
@@ -909,9 +892,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   LanguageDetectionModelServiceFactory::GetInstance();
   LanguageModelManagerFactory::GetInstance();
-#if !BUILDFLAG(IS_ANDROID)
-  LensKeyedServiceFactory::GetInstance();
-#endif
 #if BUILDFLAG(IS_ANDROID)
   LevelDBPersistedTabDataStorageAndroidFactory::GetInstance();
 #endif
@@ -1001,11 +981,6 @@ void ChromeBrowserMainExtraPartsProfiles::
   OfflineItemModelManagerFactory::GetInstance();
 #endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-  AimEligibilityExtensionBridgeFactory::GetInstance();
-  if (base::FeatureList::IsEnabled(
-          contextual_tasks::kContextualTasksRearchitecture)) {
-    contextual_tasks::ContextualTasksExtensionBridgeFactory::GetInstance();
-  }
   OmniboxInputWatcherFactory::GetInstance();
   OmniboxSuggestionsWatcherFactory::GetInstance();
 #endif

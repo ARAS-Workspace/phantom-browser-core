@@ -1,6 +1,5 @@
 include_rules = [
   "+components/compose",
-  "+components/touch_to_search/core",
   "+components/keyed_service/core",
   "+components/pref_registry",
   "+components/prefs",

@@ -8515,51 +8515,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
         You can only add up to <ph name="COUNT">$1<ex>10</ex></ph> files
       </message>
 
-      <message name="IDS_NTP_ACTION_CHIP_TAB_HEADING_1" desc="Heading of the tab action chip on the NTP." >
-        Ask about previous tab
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_TAB_HEADING_2" desc="Heading of the tab action chip on the NTP." >
-        Ask about a tab
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_TAB_BODY_1" desc="Body text in the tab action chip describing the use of the chip." >
-        Ask about this tab
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_TAB_BODY_2" desc="Body text in the tab action chip describing the use of the chip." >
-        Search deeply on a tab
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_CREATE_IMAGE_HEADING" desc="Heading of the create image action chip on the NTP." >
-        Create image
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_CREATE_IMAGE_BODY_1" desc="Body text in the create image action chip describing the use of the chip.">
-        Add an image and reimagine it
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_CREATE_IMAGE_BODY_2" desc="Body text in the create image action chip describing the use of the chip.">
-        Reimagine a photo
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_DEEP_SEARCH_HEADING" desc="Heading of the deep search action chip on the NTP.">
-        Research a topic
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_DEEP_SEARCH_BODY" desc="Body text in the deep search action chip describing the use of the chip.">
-        Dive deep into something new
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_CANVAS_HEADING" desc="Heading of the canvas action chip on the NTP.">
-        Canvas
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_CANVAS_BODY" desc="Body text in the canvas action chip describing the use of the chip.">
-        Write, plan, code, and more
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_STARTER_HEADING" desc="Heading of the conversation starter action chip on the NTP.">
-        Do more with AI Mode
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_STARTER_BODY" desc="Body text in the conversation starter action chip describing the use of the chip.">
-        Create, plan, summarize
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_DISABLE_TEXT" desc="Text for menu option to disable action chip feature.">
-        Disable suggestions
-      </message>
-      <message name="IDS_NTP_ACTION_CHIPS_UNDO_DISABLEMENT_TOAST_MESSAGE" desc="Text for the toast that appears when the user disables action chips from the NTP. Clicking on it re-enables the action chips.">
-        You won't see suggestions on this page again
-      </message>
       <message name="IDS_COMPOSE_REMOVE_TOOL_CHIP_A11Y_LABEL" desc="A11y text for removing a tool in the composebox.">
         Remove <ph name="TOOL_NAME">$1<ex>Deep Search</ex></ph>
       </message>
@@ -8574,15 +8529,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       </message>
       <message name="IDS_COMPOSE_ASK_ABOUT_THIS_PAGE_ARIA_LABEL" desc="The aria-label for the button that allows the user to ask a question about the content of their most recent tab. The $1 is a placeholder for the page title.">
         Ask Google about previous page: <ph name="PAGE_TITLE">$1</ph>
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_BRAINSTORM_HEADING" desc="Heading of the brainstorm action chip on the NTP." >
-        Brainstorm
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_HELP_ME_LEARN_HEADING" desc="Heading of the help me learn action chip on the NTP." >
-        Help me learn
-      </message>
-      <message name="IDS_NTP_ACTION_CHIP_WRITE_EDIT_HEADING" desc="Heading of the write or edit action chip on the NTP." >
-        Write or edit
       </message>
       <!-- NTP Modules -->
       <message name="IDS_NTP_MODULES_SETUP_LIST_DISABLE_TOAST_MESSAGE" desc="Text shown in the toast confirming a module has been disabled.">

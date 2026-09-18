@@ -61,9 +61,7 @@ source_set("internal") {
       "//chrome/browser:global_features",
       "//chrome/browser/autocomplete:aim_eligibility_service",
       "//chrome/browser/collaboration",
-      "//chrome/browser/contextual_tasks:ui",
       "//chrome/browser/devtools",
-      "//chrome/browser/lens/region_search",
       "//chrome/browser/media/router:media_router_feature",
       "//chrome/browser/prefs",
       "//chrome/browser/tab_group_sync:factories",
@@ -77,14 +75,12 @@ source_set("internal") {
       "//chrome/browser/ui/call_to_action",
       "//chrome/browser/ui/commerce",
       "//chrome/browser/ui/context_highlight",
-      "//chrome/browser/ui/contextual_search",
       "//chrome/browser/ui/desktop_to_mobile_promos:controller",
       "//chrome/browser/ui/exclusive_access",
       "//chrome/browser/ui/extensions",
       "//chrome/browser/ui/find_bar",
       "//chrome/browser/ui/focus",
       "//chrome/browser/ui/fullscreen",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/performance_controls",
       "//chrome/browser/ui/sessions",
       "//chrome/browser/ui/sharing_hub",
@@ -104,7 +100,6 @@ source_set("internal") {
       "//chrome/browser/ui/tabs/tab_strip_api/tab_strip_model_impl",
       "//chrome/browser/ui/toasts",
       "//chrome/browser/ui/views/animations",
-      "//chrome/browser/ui/views/contextual_tasks",
       "//chrome/browser/ui/views/data_sharing",
       "//chrome/browser/ui/views/download",
       "//chrome/browser/ui/views/fullscreen_control",
@@ -133,7 +128,6 @@ source_set("internal") {
       "//components/commerce/core:feature_list",
       "//components/data_sharing/public",
       "//components/desktop_to_mobile_promos",
-      "//components/lens:features",
       "//components/profile_metrics",
       "//components/saved_tab_groups/public",
       "//components/search",
@@ -155,9 +149,6 @@ source_set("internal") {
         "//chrome/browser/download/bubble",
         "//chrome/browser/ui/views/session_restore_infobar",
       ]
-    }
-
-    if (is_win || is_mac || is_linux) {
     }
 
     deps += [ "//chrome/browser/download/bubble" ]

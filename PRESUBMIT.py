@@ -5645,8 +5645,7 @@ def CheckNoDeprecatedCss(input_api, output_api):
             # ellipsis effect which can only be used with -webkit-box.
             r'ui/webui/resources/cr_components/most_visited/.*\.css$',
             r'ui/webui/resources/cr_components/composebox/composebox_match.css$',
-            r'ui/webui/resources/cr_components/searchbox/searchbox_match.css$',
-            r'^chrome/browser/resources/new_tab_page/action_chips/action_chips\.css$'
+            r'ui/webui/resources/cr_components/searchbox/searchbox_match.css$'
         ))
     file_filter = lambda f: input_api.FilterSourceFile(
         f, files_to_check=file_inclusion_pattern, files_to_skip=files_to_skip)

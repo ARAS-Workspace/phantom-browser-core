@@ -43,7 +43,6 @@ BASE_DECLARE_FEATURE(kHideContextualGroupHeaders);
 BASE_DECLARE_FEATURE(kHideSuggestionGroupHeaders);
 BASE_DECLARE_FEATURE(kLocalHistoryZeroSuggestBeyondNTP);
 BASE_DECLARE_FEATURE(kZeroSuggestPrefetchDebouncing);
-BASE_DECLARE_FEATURE(kZeroSuggestPrefetchingForComposebox);
 BASE_DECLARE_FEATURE(kZeroSuggestPrefetchingOnSRP);
 BASE_DECLARE_FEATURE(kZeroSuggestPrefetchingOnWeb);
 
@@ -64,12 +63,6 @@ BASE_DECLARE_FEATURE(kDrivePickerV2Scope);
 BASE_DECLARE_FEATURE(kShowPopupOnMouseReleased);
 BASE_DECLARE_FEATURE(kMostVisitedTilesHorizontalRenderGroup);
 BASE_DECLARE_FEATURE(kRichAutocompletion);
-BASE_DECLARE_FEATURE(kAIMSuppressVerbatimMatch);
-BASE_DECLARE_FEATURE(kOmniboxAimDeferShowUntilVisualStateReady);
-inline constexpr base::FeatureParam<int>
-    kOmniboxAimDeferShowUntilVisualStateReadyTimeoutMs{
-        &kOmniboxAimDeferShowUntilVisualStateReady,
-        "omnibox_aim_defer_show_until_visual_state_ready_timeout_ms", 250};
 BASE_DECLARE_FEATURE(kOmniboxWebUIDeferShowUntilVisualStateReady);
 inline constexpr base::FeatureParam<int>
     kOmniboxWebUIDeferShowUntilVisualStateReadyTimeoutMs{
@@ -82,23 +75,12 @@ inline constexpr base::FeatureParam<int>
         "omnibox_full_webui_defer_show_until_visual_state_ready_timeout_ms",
         250};
 BASE_DECLARE_FEATURE(kOmniboxWebUIPopupStabilizeStartupShow);
-BASE_DECLARE_FEATURE(kOmniboxAimDetachWebContentsOnHide);
 BASE_DECLARE_FEATURE(kOmniboxWebUIDetachWebContentsOnHide);
 BASE_DECLARE_FEATURE(kOmniboxFullWebUIDetachWebContentsOnHide);
 BASE_DECLARE_FEATURE(kOmniboxWebUIPopupMarkAsHidden);
 BASE_DECLARE_FEATURE(kWebUISearchboxWithoutModelController);
 
-// Omnibox UI - these affect the UI or function of the location bar (not the
-// popup).
-BASE_DECLARE_FEATURE(kAimEligibilityComponentExtension);
-BASE_DECLARE_FEATURE(kDynamicAimSubmit);
-extern const base::FeatureParam<bool> kShowRhsAimHint;
-BASE_DECLARE_FEATURE(kHideAimEntrypointOnUserInput);
-BASE_DECLARE_FEATURE(kHideAimEntrypointForUrlSuggestions);
 BASE_DECLARE_FEATURE(kOmniboxMultimodalInput);
-BASE_DECLARE_FEATURE(kAndroidDesktopAimGate);
-BASE_DECLARE_FEATURE(kAim3pEntrypoint);
-extern const base::FeatureParam<bool> kAim3pEntrypointDebug;
 
 // Navigation experiments.
 BASE_DECLARE_FEATURE(kDefaultTypedNavigationsToHttps);
@@ -131,7 +113,6 @@ BASE_DECLARE_FEATURE(kOmniboxSearchPrefetchOnEnterKeyDown);
 BASE_DECLARE_FEATURE(kOmniboxSiteSearch);
 BASE_DECLARE_FEATURE(kStarterPackExpansion);
 BASE_DECLARE_FEATURE(kStarterPackIPH);
-BASE_DECLARE_FEATURE(kAiModeStartPack);
 
 // Search and Suggest requests and params.
 BASE_DECLARE_FEATURE(kAblateSearchProviderWarmup);
@@ -146,7 +127,6 @@ BASE_DECLARE_FEATURE(kOmniboxMobileParityUpdate);
 BASE_DECLARE_FEATURE(kOmniboxMobileParityUpdateV2);
 BASE_DECLARE_FEATURE(kOmniboxXGeoPermissionGranularity);
 BASE_DECLARE_FEATURE(kExactMatchFavicons);
-BASE_DECLARE_FEATURE(kOmniboxAimImageDownscaling);
 
 // Omnibox suggestions tuning
 BASE_DECLARE_FEATURE(kNumNtpZpsRecentSearches);
@@ -167,54 +147,8 @@ BASE_DECLARE_FEATURE(kEnableSiteSearchAllowUserOverridePolicy);
 // Preconnect/prerender behavior for suggestions
 BASE_DECLARE_FEATURE(kPreconnectNonSearchOmniboxSuggestions);
 
-// Whether the composebox should use the new `chrome-compose` client.
-BASE_DECLARE_FEATURE(kComposeboxUsesChromeComposeClient);
-inline constexpr base::FeatureParam<std::string> kComposeboxClientOverride{
-    &kComposeboxUsesChromeComposeClient, "composebox_client_name_override",
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
-    "chrome-mobile-aim"
-#else
-    "chrome-compose"
-#endif
-};
-
-// Controls whether or not contextual composebox should display suggestions.
-BASE_DECLARE_FEATURE(kComposeboxAttachmentsTypedState);
-
-// Whether to enable Google Drive context menu option in the composebox.
-BASE_DECLARE_FEATURE(kComposeboxDriveContextMenuOption);
-extern const base::FeatureParam<bool> kComposeboxDriveIdentityFallback;
-
-// Whether to enable Google Drive context menu option's disclaimer flow in the
-// composebox.
-BASE_DECLARE_FEATURE(kComposeboxDriveContextMenuOptionDisclaimer);
-extern const base::FeatureParam<int> kComposeboxDriveConsentFlowId;
-extern const base::FeatureParam<int> kComposeboxDriveConsentProductId;
-extern const base::FeatureParam<std::string>
-    kComposeboxDriveConsentEntrypointId;
-
-// Whether to force the Google Drive disclaimer to be accepted.
-BASE_DECLARE_FEATURE(kForceDriveDisclaimerAccepted);
-
-// Whether the composebox should show a verbatim match for context in
-// zero-suggest.
-BASE_DECLARE_FEATURE(kComposeboxVerbatimMatchZeroSuggest);
-
-// Whether to disable warmup requests for the composebox.
-BASE_DECLARE_FEATURE(kDisableComposeboxWarmupRequests);
-
-// A flag that allows params from experiment configs to be passed through to
-// the AIM eligibility service to control aspects of URL interception.
-BASE_DECLARE_FEATURE(kAimUrlInterceptPassthrough);
-inline constexpr base::FeatureParam<std::string> kAimUrlInterceptionParams{
-    &kAimUrlInterceptPassthrough, "aim_url_interception_params", ""};
-
 // Enable debug logs that can be read from an internals page.
 BASE_DECLARE_FEATURE(kOmniboxDebugLogs);
-
-BASE_DECLARE_FEATURE(kVoiceSearchCoherenceComposeboxes);
-extern const base::FeatureParam<bool>
-    kVoiceSearchCoherenceComposeboxCobrowsingOnly;
 
 BASE_DECLARE_FEATURE(kVoiceSearchCoherenceSearchbox);
 extern const base::FeatureParam<bool>
@@ -261,8 +195,6 @@ BASE_DECLARE_FEATURE(kWebUIOmniboxAskGAboutThisPage);
 extern const base::FeatureParam<bool> kAskGCoBrowse;
 // Whether to open the next panel with cobrowse and visual selection.
 extern const base::FeatureParam<bool> kAskGCoBrowseWithVisualSelection;
-// Whether to open the composebox for AskG.
-extern const base::FeatureParam<bool> kAskGComposeBox;
 // Determines how to route the lens chip.
 extern const base::FeatureParam<bool> kAskGLensChipRoute;
 // Whether to swap the icon to spark loupe for the AskG button.
@@ -278,14 +210,10 @@ extern const base::FeatureParam<bool> kAskGLensSearchHintText;
 // Whether to show the description for the first contextual suggestion when
 // header is hidden.
 extern const base::FeatureParam<bool> kAskGShowFirstDescription;
-// Whether to show the lens chip in omnibox composebox.
-extern const base::FeatureParam<bool> kAskGComposeboxLensChip;
 // Whether to block initial zero state suggestions in omnibox composebox
 // when we have auto added tabs so we can show the user contextual suggestions
 // from the auto added tabs instead.
 extern const base::FeatureParam<bool> kAskGBlockAutoTabZeroStateSuggestions;
-// Whether to use "Ask about this page" placeholder text in omnibox composebox.
-extern const base::FeatureParam<bool> kAskGComposeboxPlaceholder;
 // Whether to bypass the Lens privacy notice.
 extern const base::FeatureParam<bool> kAskGBypassPrivacyNotice;
 // Note: no new flags beyond this point.

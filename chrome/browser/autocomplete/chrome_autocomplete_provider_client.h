@@ -22,8 +22,6 @@
 #include "chrome/browser/autocomplete/tab_matcher_desktop.h"
 #endif
 
-class AiModeButtonService;
-class AimEligibilityService;
 class AutocompleteScoringModelService;
 class OnDeviceTailModelService;
 class Profile;
@@ -104,8 +102,6 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
   ProviderStateService* GetProviderStateService() const override;
   tab_groups::TabGroupSyncService* GetTabGroupSyncService() const override;
   sync_sessions::SessionSyncService* GetSessionSyncService() const override;
-  AimEligibilityService* GetAimEligibilityService() const override;
-  AiModeButtonService* GetAiModeButtonService() const override;
 
   bool IsOffTheRecord() const override;
   bool IsIncognitoProfile() const override;
@@ -133,16 +129,8 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
   bool IsSharingHubAvailable() const override;
   bool IsHistoryEmbeddingsEnabled() const override;
   bool IsHistoryEmbeddingsSettingVisible() const override;
-  bool IsLensEnabled() const override;
-  bool AreLensEntrypointsVisible() const override;
   std::optional<bool> IsPagePaywalled() const override;
-  bool ShouldSendContextualUrlSuggestParam() const override;
-  bool ShouldSendPageTitleSuggestParam() const override;
-  bool IsOmniboxNextLensSearchChipEnabled() const override;
-  bool IsOmniboxNextAimPopupEnabled() const override;
   bool IsGeminiStarterPackEnabled() const override;
-  base::CallbackListSubscription GetLensSuggestInputsWhenReady(
-      LensOverlaySuggestInputsCallback callback) const override;
   base::WeakPtr<AutocompleteProviderClient> GetWeakPtr() override;
   bool IsWebUiNtpEnabledForDesktopAndroid() const override;
 
@@ -152,16 +140,6 @@ class ChromeAutocompleteProviderClient : public AutocompleteProviderClient {
   void OpenIncognitoClearBrowsingDataDialog() override;
   void CloseIncognitoWindows() override;
   bool OpenJourneys(const std::string& query) override;
-  void OpenLensOverlay(
-      bool show,
-      lens::LensOverlayInvocationSource invocation_source) override;
-  bool ShouldOpenCoBrowsePanel() const override;
-  void OpenCoBrowsePanel() override;
-  bool ShouldOpenComposeboxForAskG() const override;
-  void OpenComposeboxForAskG() override;
-  void IssueContextualSearchRequest(const GURL& destination_url,
-                                    AutocompleteMatchType::Type match_type,
-                                    bool is_zero_prefix_suggestion) override;
 
   // For testing.
   void set_storage_partition(content::StoragePartition* storage_partition) {

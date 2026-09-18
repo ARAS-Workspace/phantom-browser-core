@@ -57,7 +57,6 @@ class WebUILocationBar : public LocationBar,
   // WebUIReadOnlyOmnibox::UpdatePropagator:
   void PropagateOmniboxUpdate(
       toolbar_ui_api::mojom::OmniboxViewStatePtr update) override;
-  void PropagateApplyFocusRingToAimButton(bool force_focus) override;
   void PropagateFocusRequest(
       toolbar_ui_api::mojom::FocusRequestTarget target) override;
   std::optional<GURL> ConsumeDroppedUrl(
@@ -156,8 +155,6 @@ class WebUILocationBar : public LocationBar,
 
   // OmniboxPopupPresenterDelegate:
   views::Widget* GetLocationBarWidget() override;
-  OmniboxPopupFileSelector* GetOmniboxPopupFileSelector() const override;
-  OmniboxPopupAimPresenter* GetOmniboxPopupAimPresenter() const override;
   views::View* GetLocationBarFocusRestoreView() override;
 
   void SetSuppressionThresholdForTesting(base::TimeDelta threshold);
@@ -177,7 +174,6 @@ class WebUILocationBar : public LocationBar,
 
   void UpdateLocationBarFlagsState();
   void UpdateSelectedKeywordState();
-  void RefreshAiModePageAction();
 
   // Updates the state of the LHS location bar chips (e.g. security chip) and
   // pushes it to the WebUI.
@@ -220,8 +216,6 @@ class WebUILocationBar : public LocationBar,
   std::unique_ptr<WebUIReadOnlyOmnibox> omnibox_view_;
   std::unique_ptr<OmniboxPopupViewWebUI> omnibox_popup_view_;
   // The presenter controlling the showing of the AI mode popup.
-  std::unique_ptr<OmniboxPopupAimPresenter> omnibox_popup_aim_presenter_;
-  std::unique_ptr<OmniboxPopupFileSelector> omnibox_popup_file_selector_;
   base::CallbackListSubscription popup_state_changed_subscription_;
 
   bool is_initialized_ = false;
@@ -232,7 +226,6 @@ class WebUILocationBar : public LocationBar,
   bool focus_within_ = false;
 
   // Whether to paint AIM button as focused (with focus still on omnibox).
-  bool force_aim_button_focus_ring_ = false;
 
   toolbar_ui_api::IconHandle location_icon_;
   security_state::SecurityLevel last_update_security_level_ =

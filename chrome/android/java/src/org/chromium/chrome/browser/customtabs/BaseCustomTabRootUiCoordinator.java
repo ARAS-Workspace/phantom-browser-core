@@ -90,7 +90,6 @@ import org.chromium.chrome.browser.share.ShareDelegate;
 import org.chromium.chrome.browser.signin.SigninAndHistorySyncActivityLauncherImpl;
 import org.chromium.chrome.browser.signin.services.IdentityServicesProvider;
 import org.chromium.chrome.browser.signin.services.SigninPreferencesManager;
-import org.chromium.chrome.browser.tab.EmptyTabObserver;
 import org.chromium.chrome.browser.tab.RequestDesktopUtils;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab_ui.TabContentManager;
@@ -117,7 +116,6 @@ import org.chromium.chrome.browser.ui.web_app_header.WebAppHeaderUtils;
 import org.chromium.components.browser_ui.desktop_windowing.DesktopWindowStateManager;
 import org.chromium.components.browser_ui.widget.MenuOrKeyboardActionController;
 import org.chromium.components.feature_engagement.Tracker;
-import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.ui.base.ActivityResultTracker;
 import org.chromium.ui.base.ActivityWindowAndroid;
 import org.chromium.ui.base.DeviceFormFactor;
@@ -476,16 +474,6 @@ public class BaseCustomTabRootUiCoordinator extends RootUiCoordinator {
 
             var tabController = mTabController.get();
             tabController.registerTabObserver(new PartialCustomTabTabObserver(softInputCallback));
-            var csManager = mContextualSearchManagerSupplier.get();
-            if (csManager != null) {
-                tabController.registerTabObserver(
-                        new EmptyTabObserver() {
-                            @Override
-                            public void didFirstVisuallyNonEmptyPaint(Tab tab) {
-                                csManager.setCanHideAndroidBrowserControls(false);
-                            }
-                        });
-            }
         }
 
         if (omniboxParams != null) {
@@ -579,18 +567,6 @@ public class BaseCustomTabRootUiCoordinator extends RootUiCoordinator {
     @Override
     public int getControlContainerHeightResource() {
         return R.dimen.custom_tabs_control_container_height;
-    }
-
-    @Override
-    protected boolean isContextualSearchEnabled() {
-        if (mIntentDataProvider.get().isAuthTab()) return false;
-        return super.isContextualSearchEnabled();
-    }
-
-    @Override
-    public void createContextualSearchTab(String searchUrl) {
-        if (mActivityTabProvider.get() == null) return;
-        mActivityTabProvider.get().loadUrl(new LoadUrlParams(searchUrl));
     }
 
     // Google Bottom bar

@@ -260,13 +260,11 @@ TEST_F(ChromePermissionsClientTest, CanBypassEmbeddingOriginCheckWebUI) {
   EXPECT_TRUE(client->CanBypassEmbeddingOriginCheck(
       dummy_requesting, chrome::ChromeUINewTabPageURLAsGURL()));
 
-  // Omnibox Popup, Omnibox Everywhere & Contextual Tasks:
+  // Omnibox Popup and Omnibox Everywhere:
   EXPECT_TRUE(client->CanBypassEmbeddingOriginCheck(
       dummy_requesting, GURL(chrome::kChromeUIOmniboxPopupURL)));
   EXPECT_TRUE(client->CanBypassEmbeddingOriginCheck(
       dummy_requesting, GURL(chrome::kChromeUIOmniboxEverywhereURL)));
-  EXPECT_TRUE(client->CanBypassEmbeddingOriginCheck(
-      dummy_requesting, GURL(chrome::kChromeUIContextualTasksURL)));
 
   // Non-WebUI origin should not bypass:
   EXPECT_FALSE(client->CanBypassEmbeddingOriginCheck(dummy_requesting,
@@ -280,16 +278,13 @@ TEST_F(ChromePermissionsClientTest,
   auto* client = ChromePermissionsClient::GetInstance();
   GURL dummy_requesting("about:blank");
 
-  // New Tab, NTP, Omnibox Popup, and Contextual Tasks with subpaths/query
-  // strings:
+  // New Tab, NTP, and Omnibox Popup with subpaths/query strings:
   GURL newtab_subpath =
       chrome::ChromeUINewTabURLAsGURL().Resolve("subpath/page?param=1#hash");
   GURL ntp_subpath = GURL(chrome::ChromeUINewTabPageURLAsGURL().spec())
                          .Resolve("subpath/page?param=1#hash");
   GURL omnibox_subpath = GURL(chrome::kChromeUIOmniboxPopupURL)
                              .Resolve("subpath/page?param=1#hash");
-  GURL contextual_tasks_subpath = GURL(chrome::kChromeUIContextualTasksURL)
-                                      .Resolve("subpath/page?param=1#hash");
 
   EXPECT_TRUE(
       client->CanBypassEmbeddingOriginCheck(dummy_requesting, newtab_subpath));
@@ -297,8 +292,6 @@ TEST_F(ChromePermissionsClientTest,
       client->CanBypassEmbeddingOriginCheck(dummy_requesting, ntp_subpath));
   EXPECT_TRUE(
       client->CanBypassEmbeddingOriginCheck(dummy_requesting, omnibox_subpath));
-  EXPECT_TRUE(client->CanBypassEmbeddingOriginCheck(dummy_requesting,
-                                                    contextual_tasks_subpath));
 }
 
 TEST_F(ChromePermissionsClientTest, GetCanonicalOriginOverrideWebUI) {
@@ -307,7 +300,6 @@ TEST_F(ChromePermissionsClientTest, GetCanonicalOriginOverrideWebUI) {
   GURL ntp_url = chrome::ChromeUINewTabPageURLAsGURL();
   GURL newtab_url = chrome::ChromeUINewTabURLAsGURL();
   GURL omnibox_url(chrome::kChromeUIOmniboxPopupURL);
-  GURL contextual_tasks_url(chrome::kChromeUIContextualTasksURL);
 
   // NTP embedder + NTP requester -> Overridden to DSE (Google) origin:
   std::optional<GURL> ntp_override =
@@ -328,12 +320,6 @@ TEST_F(ChromePermissionsClientTest, GetCanonicalOriginOverrideWebUI) {
       omnibox_everywhere_url, omnibox_everywhere_url);
   EXPECT_TRUE(everywhere_override.has_value());
   EXPECT_EQ(everywhere_override->host(), "www.google.com");
-
-  // Contextual tasks embedder + requester -> Overridden to DSE (Google) origin:
-  std::optional<GURL> contextual_override = client->GetCanonicalOriginOverride(
-      contextual_tasks_url, contextual_tasks_url);
-  EXPECT_TRUE(contextual_override.has_value());
-  EXPECT_EQ(contextual_override->host(), "www.google.com");
 
   // Unmatched requester:
   GURL other_url("about:blank");
@@ -357,8 +343,6 @@ TEST_F(ChromePermissionsClientTest,
                          .Resolve("subpath/page?param=1#hash");
   GURL omnibox_subpath = GURL(chrome::kChromeUIOmniboxPopupURL)
                              .Resolve("subpath/page?param=1#hash");
-  GURL contextual_tasks_subpath = GURL(chrome::kChromeUIContextualTasksURL)
-                                      .Resolve("subpath/page?param=1#hash");
 
   // NTP subpath embedder + NTP subpath requester -> Overridden to DSE (Google)
   // origin:
@@ -373,13 +357,6 @@ TEST_F(ChromePermissionsClientTest,
       client->GetCanonicalOriginOverride(omnibox_subpath, omnibox_subpath);
   EXPECT_TRUE(omnibox_override.has_value());
   EXPECT_EQ(omnibox_override->host(), "www.google.com");
-
-  // Contextual tasks subpath embedder + requester -> Overridden to DSE (Google)
-  // origin:
-  std::optional<GURL> contextual_override = client->GetCanonicalOriginOverride(
-      contextual_tasks_subpath, contextual_tasks_subpath);
-  EXPECT_TRUE(contextual_override.has_value());
-  EXPECT_EQ(contextual_override->host(), "www.google.com");
 }
 
 // Test that GURL is converted to origin so that way subpaths are ignored
@@ -410,8 +387,6 @@ TEST_F(ChromePermissionsClientTest, IsPrivilegedInternalWebUIWithSubpaths) {
 
   GURL omnibox_subpath = GURL(chrome::kChromeUIOmniboxPopupURL)
                              .Resolve("subpath/page?param=1#hash");
-  GURL contextual_tasks_subpath = GURL(chrome::kChromeUIContextualTasksURL)
-                                      .Resolve("subpath/page?param=1#hash");
 
   content::OverrideLastCommittedOrigin(web_contents()->GetPrimaryMainFrame(),
                                        url::Origin::Create(omnibox_subpath));
@@ -426,14 +401,6 @@ TEST_F(ChromePermissionsClientTest, IsPrivilegedInternalWebUIWithSubpaths) {
   EXPECT_TRUE(
       client->IsPrivilegedInternalWebUI(web_contents(), everywhere_subpath,
                                         /*already_overrode_requester=*/false));
-  EXPECT_TRUE(client->IsPrivilegedInternalWebUIForUIRouting(web_contents()));
-
-  content::OverrideLastCommittedOrigin(
-      web_contents()->GetPrimaryMainFrame(),
-      url::Origin::Create(contextual_tasks_subpath));
-  EXPECT_TRUE(client->IsPrivilegedInternalWebUI(
-      web_contents(), contextual_tasks_subpath,
-      /*already_overrode_requester=*/false));
   EXPECT_TRUE(client->IsPrivilegedInternalWebUIForUIRouting(web_contents()));
 }
 #endif  // !BUILDFLAG(IS_ANDROID)

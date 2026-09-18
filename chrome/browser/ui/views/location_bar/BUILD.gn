@@ -22,7 +22,6 @@ source_set("location_bar") {
       "location_icon_view.h",
       "omnibox_chip_button.h",
       "omnibox_chip_theme.h",
-      "omnibox_popup_file_selector.h",
       "record_replay_page_action_controller.h",
       "selected_keyword_view.h",
       "webui_content_setting_image_control.h",
@@ -35,7 +34,6 @@ source_set("location_bar") {
     public_deps = [
       ":icon_label_bubble",
       "//base",
-      "//chrome/browser/lens/region_search",
       "//chrome/browser/ui:layout_constants",
       "//chrome/browser/ui/color:color_headers",
       "//chrome/browser/ui/exclusive_access",
@@ -91,7 +89,6 @@ source_set("impl") {
       "location_icon_state_helper.cc",
       "location_icon_view.cc",
       "omnibox_chip_button.cc",
-      "omnibox_popup_file_selector.cc",
       "record_replay_page_action_controller.cc",
       "selected_keyword_view.cc",
       "webui_content_setting_image_control.cc",
@@ -109,7 +106,6 @@ source_set("impl") {
       "//chrome/browser:primitives",
       "//chrome/browser/autocomplete",
       "//chrome/browser/autocomplete:aim_eligibility_service",
-      "//chrome/browser/contextual_search",
       "//chrome/browser/extensions",
       "//chrome/browser/extensions/api/omnibox",
       "//chrome/browser/history_embeddings",
@@ -128,9 +124,7 @@ source_set("impl") {
       "//chrome/browser/ui/browser_window",
       "//chrome/browser/ui/call_to_action",
       "//chrome/browser/ui/color:color_headers",
-      "//chrome/browser/ui/contextual_search",
       "//chrome/browser/ui/find_bar",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/omnibox",
       "//chrome/browser/ui/passwords",
       "//chrome/browser/ui/record_replay",
@@ -151,20 +145,17 @@ source_set("impl") {
       "//chrome/browser/ui/views/zoom",
       "//chrome/browser/ui/web_applications",
       "//chrome/browser/ui/webui:webui_util",
-      "//chrome/browser/ui/webui/cr_components/composebox",
       "//chrome/browser/ui/webui/omnibox_popup",
       "//chrome/browser/ui/window_metadata",
       "//chrome/browser/web_applications",
       "//chrome/browser/web_applications:features",
       "//components/autofill/core/common:features",
       "//components/commerce/core:feature_list",
-      "//components/contextual_search:public",
       "//components/dom_distiller/core",
       "//components/favicon/content",
       "//components/feature_engagement/public:feature_constants",
       "//components/history_embeddings/content",
       "//components/history_embeddings/core",
-      "//components/lens",
       "//components/omnibox/browser",
       "//components/omnibox/browser:vector_icons",
       "//components/omnibox/common",
@@ -227,23 +218,6 @@ source_set("icon_label_bubble") {
       "//ui/gfx",
     ]
   }
-}
-
-source_set("omnibox_popup_file_selector_browsertest") {
-  testonly = true
-  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  sources = [ "omnibox_popup_file_selector_browsertest.cc" ]
-  deps = [
-    ":location_bar",
-    "//chrome/browser/ui",
-    "//chrome/browser/ui/omnibox",
-    "//chrome/browser/ui/webui:webui_util",
-    "//chrome/browser/ui/webui/searchbox:searchbox_test_utils",
-    "//chrome/test:test_support",
-    "//content/test:test_support",
-    "//testing/gmock",
-    "//ui/shell_dialogs:test_support",
-  ]
 }
 
 source_set("browser_tests") {
@@ -329,7 +303,6 @@ source_set("interactive_ui_tests") {
     "content_setting_image_view_interactive_uitest.cc",
     "content_setting_interactive_uitest.cc",
     "find_bar_interactive_uitest.cc",
-    "lens_overlay_page_action_icon_view_interactive_uitest.cc",
     "location_icon_view_interactive_uitest.cc",
     "record_replay_page_action_controller_interactive_uitest.cc",
     "selected_keyword_view_interactive_uitest.cc",
@@ -338,7 +311,6 @@ source_set("interactive_ui_tests") {
   deps = [
     ":location_bar",
     "//chrome/browser/ui:ui_features",
-    "//chrome/browser/ui/lens",
     "//chrome/browser/ui/views/frame",
     "//chrome/browser/ui/views/page_action",
     "//chrome/browser/ui/views/page_info",

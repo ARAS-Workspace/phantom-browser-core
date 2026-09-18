@@ -71,7 +71,6 @@ found in the LICENSE file.
     <item type="id" name="contextmenu_print_page" />
     <item type="id" name="contextmenu_reload" />
     <item type="id" name="contextmenu_save_page" />
-    <item type="id" name="contextmenu_search_tab_with_google_lens" />
     <item type="id" name="contextmenu_send_tab_to_self" />
     <item type="id" name="contextmenu_share_page" />
     <item type="id" name="contextmenu_translate" />
@@ -111,10 +110,8 @@ found in the LICENSE file.
     <item type="id" name="contextmenu_open_image_in_new_tab" />
     <item type="id" name="contextmenu_save_image" />
     <item type="id" name="contextmenu_search_by_image" />
-    <item type="id" name="contextmenu_search_image_with_google_lens" />
     <item type="id" name="contextmenu_search_similar_products" />
     <item type="id" name="contextmenu_share_image" />
-    <item type="id" name="contextmenu_shop_image_with_google_lens" />
     <item type="id" name="contextmenu_shop_similar_products" />
     <!-- go/keep-sorted end -->
 
@@ -217,7 +214,6 @@ found in the LICENSE file.
     <item type="id" name="homepage_menu_id" />
     <item type="id" name="icon_row_menu_id" />
     <item type="id" name="info_menu_id" />
-    <item type="id" name="lens_overlay_menu_id" />
     <item type="id" name="listen_to_feed_id" />
     <item type="id" name="manage_all_windows_menu_id" />
     <item type="id" name="manage_extensions_menu_id" />

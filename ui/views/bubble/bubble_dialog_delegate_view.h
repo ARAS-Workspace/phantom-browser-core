@@ -915,8 +915,6 @@ class VIEWS_EXPORT BubbleDialogDelegateView : public View,
   friend class ::autofill::LocalCardMigrationErrorDialogView;
   friend class ::captions::CaptionBubble;
   friend class ::chromeos::MultitaskMenu;
-  friend class ::lens::LensPreselectionBubble;
-  friend class ::lens::LensRegionSearchInstructionsView;
   friend class ::media_router::CastDialogView;
   friend class ::media_router::MediaRemotingDialogView;
   friend class ::send_tab_to_self::SendTabToSelfToolbarBubbleView;

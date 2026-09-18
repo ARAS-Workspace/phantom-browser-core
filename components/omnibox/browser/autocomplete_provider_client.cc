@@ -27,11 +27,6 @@ AutocompleteProviderClient::GetDocumentSuggestionsService() const {
   return nullptr;
 }
 
-AiModeButtonService* AutocompleteProviderClient::GetAiModeButtonService()
-    const {
-  return nullptr;
-}
-
 bool AutocompleteProviderClient::AllowDeletingBrowserHistory() const {
   return true;
 }
@@ -56,35 +51,11 @@ bool AutocompleteProviderClient::IsHistoryEmbeddingsSettingVisible() const {
   return false;
 }
 
-bool AutocompleteProviderClient::IsLensEnabled() const {
-  return false;
-}
-
-bool AutocompleteProviderClient::AreLensEntrypointsVisible() const {
-  return false;
-}
-
 std::optional<bool> AutocompleteProviderClient::IsPagePaywalled() const {
   return std::nullopt;
 }
 
-bool AutocompleteProviderClient::ShouldSendContextualUrlSuggestParam() const {
-  return false;
-}
-
-bool AutocompleteProviderClient::ShouldSendPageTitleSuggestParam() const {
-  return false;
-}
-
 bool AutocompleteProviderClient::in_background_state() const {
-  return false;
-}
-
-bool AutocompleteProviderClient::IsOmniboxNextLensSearchChipEnabled() const {
-  return false;
-}
-
-bool AutocompleteProviderClient::IsOmniboxNextAimPopupEnabled() const {
   return false;
 }
 
@@ -100,15 +71,3 @@ AutocompleteProviderClient::GetWeakPtr() {
 bool AutocompleteProviderClient::IsWebUiNtpEnabledForDesktopAndroid() const {
   return false;
 }
-
-bool AutocompleteProviderClient::ShouldOpenCoBrowsePanel() const {
-  return false;
-}
-
-void AutocompleteProviderClient::OpenCoBrowsePanel() {}
-
-bool AutocompleteProviderClient::ShouldOpenComposeboxForAskG() const {
-  return false;
-}
-
-void AutocompleteProviderClient::OpenComposeboxForAskG() {}

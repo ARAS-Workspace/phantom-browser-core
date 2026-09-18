@@ -928,8 +928,7 @@ class EnclaveAuthenticatorBrowserTest : public EnclaveAuthenticatorTestBase {
         /*disabled_features=*/
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
         // is enabled and then remove the two omnibox features.
-        {omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+        {omnibox::internal::kWebUIOmniboxPopup});
   }
   ~EnclaveAuthenticatorBrowserTest() override = default;
 

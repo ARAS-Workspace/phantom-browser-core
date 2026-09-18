@@ -49,12 +49,6 @@ class DummyOmniboxPopupPresenterDelegate
     : public OmniboxPopupPresenterDelegate {
  public:
   views::Widget* GetLocationBarWidget() override { return nullptr; }
-  OmniboxPopupFileSelector* GetOmniboxPopupFileSelector() const override {
-    return nullptr;
-  }
-  OmniboxPopupAimPresenter* GetOmniboxPopupAimPresenter() const override {
-    return nullptr;
-  }
   views::View* GetLocationBarFocusRestoreView() override { return nullptr; }
 };
 

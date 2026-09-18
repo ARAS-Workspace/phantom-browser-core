@@ -49,8 +49,6 @@ FeatureShowcaseStep GetFeatureShowcaseStep(std::string_view step_id) {
       kStepMap({
           {kFeatureShowcaseDefaultBrowserStepIdentifier,
            FeatureShowcaseStep::kDefaultBrowser},
-          {kFeatureShowcaseGoogleLensStepIdentifier,
-           FeatureShowcaseStep::kGoogleLens},
           {kFeatureShowcasePasswordManagerStepIdentifier,
            FeatureShowcaseStep::kPasswordManager},
           {kFeatureShowcaseThemesAndCustomizationStepIdentifier,

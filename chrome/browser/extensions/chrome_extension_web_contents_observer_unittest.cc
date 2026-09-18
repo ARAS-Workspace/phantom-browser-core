@@ -13,8 +13,6 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/extensions/test_extension_system.h"
-#include "chrome/browser/ui/webui/omnibox/aim_eligibility_extension/aim_eligibility_extension_binder_provider.h"
-#include "chrome/common/extensions/extension_constants.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "components/crash/content/browser/error_reporting/javascript_error_report.h"
 #include "components/crash/content/browser/error_reporting/js_error_report_processor.h"
@@ -72,7 +70,6 @@ class ChromeExtensionWebContentsObserverUnitTest
         static_cast<TestExtensionSystem*>(ExtensionSystem::Get(profile()));
     extension_system->CreateExtensionService(
         base::CommandLine::ForCurrentProcess(), base::FilePath(), false);
-    AimEligibilityExtensionBinderProvider::Register(profile());
     ChromeExtensionWebContentsObserver::CreateForWebContents(web_contents());
   }
 
@@ -82,109 +79,6 @@ class ChromeExtensionWebContentsObserverUnitTest
     ChromeRenderViewHostTestHarness::TearDown();
   }
 };
-
-TEST_F(ChromeExtensionWebContentsObserverUnitTest,
-       ComponentExtensionJavaScriptErrorReporting) {
-  auto mock_processor = base::MakeRefCounted<MockJsErrorReportProcessor>();
-  mock_processor->SetAsDefault();
-
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("Test Component Extension")
-          .SetLocation(mojom::ManifestLocation::kComponent)
-          .SetID(extension_misc::kAimEligibilityExtensionId)
-          .Build();
-  ExtensionRegistrar::Get(profile())->AddExtension(extension);
-
-  GURL extension_url = extension->GetResourceURL("popup.html");
-  NavigateAndCommit(extension_url);
-
-  ChromeExtensionWebContentsObserver* observer =
-      ChromeExtensionWebContentsObserver::FromWebContents(web_contents());
-  ASSERT_TRUE(observer);
-
-  static_cast<content::WebContentsObserver*>(observer)
-      ->OnDidAddMessageToConsole(
-          main_rfh(), blink::mojom::ConsoleMessageLevel::kError,
-          u"Testing component extension JS crash telemetry", 42,
-          base::UTF8ToUTF16(extension_url.spec()),
-          u"Error: Testing...\n    at popup.html:42:1");
-
-  const JavaScriptErrorReport& report = mock_processor->last_report();
-  EXPECT_EQ(report.message, "Testing component extension JS crash telemetry");
-  EXPECT_EQ(report.source_system,
-            JavaScriptErrorReport::SourceSystem::kExtensionObserver);
-  EXPECT_TRUE(report.product.empty());
-  EXPECT_EQ(report.url, extension_url.spec());
-  ASSERT_TRUE(report.stack_trace.has_value());
-  EXPECT_EQ(report.stack_trace.value(),
-            "Error: Testing...\n    at popup.html:42:1");
-}
-
-TEST_F(ChromeExtensionWebContentsObserverUnitTest,
-       ComponentExtensionJavaScriptErrorReporting_RedactsUrl) {
-  auto mock_processor = base::MakeRefCounted<MockJsErrorReportProcessor>();
-  mock_processor->SetAsDefault();
-
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("Test Component Extension")
-          .SetLocation(mojom::ManifestLocation::kComponent)
-          .SetID(extension_misc::kAimEligibilityExtensionId)
-          .Build();
-  ExtensionRegistrar::Get(profile())->AddExtension(extension);
-
-  GURL extension_url =
-      extension->GetResourceURL("popup.html?secret=token#section");
-  NavigateAndCommit(extension_url);
-
-  ChromeExtensionWebContentsObserver* observer =
-      ChromeExtensionWebContentsObserver::FromWebContents(web_contents());
-  ASSERT_TRUE(observer);
-
-  static_cast<content::WebContentsObserver*>(observer)
-      ->OnDidAddMessageToConsole(
-          main_rfh(), blink::mojom::ConsoleMessageLevel::kError,
-          u"Testing url redaction", 42, base::UTF8ToUTF16(extension_url.spec()),
-          std::nullopt);
-
-  const JavaScriptErrorReport& report = mock_processor->last_report();
-  EXPECT_EQ(report.url, extension->GetResourceURL("popup.html").spec());
-  ASSERT_TRUE(report.page_url.has_value());
-  EXPECT_EQ(report.page_url.value(),
-            extension->GetResourceURL("popup.html").spec());
-}
-
-TEST_F(ChromeExtensionWebContentsObserverUnitTest,
-       ComponentExtensionJavaScriptErrorCrashesInDevBuild) {
-  if (version_info::IsOfficialBuild()) {
-    return;
-  }
-  base::CommandLine::ForCurrentProcess()->RemoveSwitch(
-      switches::kDisableCrashOnComponentExtensionJsError);
-
-  scoped_refptr<const Extension> extension =
-      ExtensionBuilder("Test Component Extension")
-          .SetLocation(mojom::ManifestLocation::kComponent)
-          .SetID(extension_misc::kAimEligibilityExtensionId)
-          .Build();
-  ExtensionRegistrar::Get(profile())->AddExtension(extension);
-
-  GURL extension_url = extension->GetResourceURL("popup.html");
-  NavigateAndCommit(extension_url);
-
-  ChromeExtensionWebContentsObserver* observer =
-      ChromeExtensionWebContentsObserver::FromWebContents(web_contents());
-  ASSERT_TRUE(observer);
-
-  EXPECT_DEATH_IF_SUPPORTED(
-      {
-        static_cast<content::WebContentsObserver*>(observer)
-            ->OnDidAddMessageToConsole(
-                main_rfh(), blink::mojom::ConsoleMessageLevel::kError,
-                u"Fatal JS error in dev build", 42,
-                base::UTF8ToUTF16(extension_url.spec()), std::nullopt);
-      },
-      "");
-}
 
 TEST_F(ChromeExtensionWebContentsObserverUnitTest,
        NonComponentExtensionJavaScriptErrorsIgnored) {

@@ -55,7 +55,6 @@
 #include "chrome/browser/preloading/prerender/prerender_utils.h"
 #include "chrome/browser/preloading/search_preload/search_preload_service.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search_engines/ai_mode_button_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/ssl/typed_navigation_upgrade_throttle.h"
 #include "chrome/browser/ui/bookmarks/bookmark_stats.h"
@@ -66,8 +65,6 @@
 #include "chrome/browser/ui/hats/hats_service.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/layout_constants.h"
-#include "chrome/browser/ui/lens/lens_search_controller.h"
-#include "chrome/browser/ui/lens/lens_searchbox_controller.h"
 #include "chrome/browser/ui/location_bar/location_bar.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/omnibox/chrome_omnibox_navigation_observer.h"
@@ -145,12 +142,6 @@ namespace {
 using ExtensionControlledDialogResult =
     ChromeOmniboxClient::ExtensionControlledDialogResult;
 using predictors::AutocompleteActionPredictor;
-
-LensSearchController* GetLensSearchController(
-    content::WebContents* web_contents) {
-  return web_contents ? LensSearchController::FromTabWebContents(web_contents)
-                      : nullptr;
-}
 
 #if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_MAC)
 // Guards a withheld navigation against a continuation that is never invoked.
@@ -373,10 +364,6 @@ TemplateURLService* ChromeOmniboxClient::GetTemplateURLService() {
   return TemplateURLServiceFactory::GetForProfile(profile_);
 }
 
-AiModeButtonService* ChromeOmniboxClient::GetAiModeButtonService() {
-  return AiModeButtonServiceFactory::GetForProfile(profile_);
-}
-
 const AutocompleteSchemeClassifier& ChromeOmniboxClient::GetSchemeClassifier()
     const {
   return *scheme_classifier_;
@@ -466,15 +453,6 @@ std::u16string ChromeOmniboxClient::GetURLForDisplay() const {
 
 GURL ChromeOmniboxClient::GetNavigationEntryURL() const {
   return location_bar_->GetLocationBarModel()->GetURL();
-}
-
-bool ChromeOmniboxClient::IsContextualTasksPage() const {
-  return location_bar_->GetLocationBarModel()->IsContextualTasksPage();
-}
-
-GURL ChromeOmniboxClient::GetContextualTasksInnerFrameURL() const {
-  return location_bar_->GetLocationBarModel()
-      ->GetContextualTasksInnerFrameURL();
 }
 
 metrics::OmniboxEventProto::PageClassification
@@ -1045,20 +1023,6 @@ void ChromeOmniboxClient::OpenIphLink(GURL gurl) {
 
 bool ChromeOmniboxClient::IsHistoryEmbeddingsEnabled() const {
   return history_embeddings::IsHistoryEmbeddingsEnabledForProfile(profile_);
-}
-
-bool ChromeOmniboxClient::IsAimPopupEnabled() const {
-  return omnibox::IsAimPopupEnabled(profile_);
-}
-
-std::optional<lens::proto::LensOverlaySuggestInputs>
-ChromeOmniboxClient::GetLensOverlaySuggestInputs() const {
-  if (LensSearchController* lens_search_controller =
-          GetLensSearchController(location_bar_->GetWebContents())) {
-    return lens_search_controller->lens_searchbox_controller()
-        ->GetLensSuggestInputs();
-  }
-  return std::nullopt;
 }
 
 void ChromeOmniboxClient::MaybePrewarmForDefaultSearchEngine(

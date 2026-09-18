@@ -486,7 +486,7 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="Signal not present"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/omnibox/browser/lens_suggest_inputs_utils.h:PaywallSignal) -->
+<!-- LINT.ThenChange(//chrome/browser/ui/omnibox/omnibox_tab_helper.cc:PaywallSignal) -->
 
 <!-- LINT.IfChange(PrepopulatedEngineMigrationAction) -->
 

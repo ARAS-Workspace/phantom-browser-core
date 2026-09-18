@@ -1512,13 +1512,6 @@ std::string TemplateURLRef::HandleReplacements(
               break;
             }
 #endif
-            if (search_terms_args.page_classification ==
-                    metrics::OmniboxEventProto::NTP_REALBOX &&
-                search_terms_args.lens_overlay_suggest_inputs.has_value()) {
-              // No replacement. `gs_ri` is not recommended for contextual
-              // queries.
-              break;
-            }
             HandleReplacement(std::string(), "chrome-ext-ansg", replacement,
                               &url);
             break;
@@ -1858,20 +1851,7 @@ std::string TemplateURL::GetSuggestionClient(
       // "chrome-omni" for delayed context uploads.
       // TODO(crbug.com/460858102): Figure out how to support delayed uploads
       // using "chrome-compose."
-      if (base::FeatureList::IsEnabled(
-              omnibox::kComposeboxUsesChromeComposeClient)) {
-        // `kComposeboxUsesChromeComposeClient` is ENABLED
-        if (search_terms_args.page_classification ==
-                metrics::OmniboxEventProto::NTP_COMPOSEBOX &&
-            !search_terms_args.current_page_url.empty()) {
-          return "chrome-omni";
-        } else {
-          return omnibox::kComposeboxClientOverride.Get();
-        }
-      } else {
-        // `kComposeboxUsesChromeComposeClient` is DISABLED
-        return "chrome-omni";
-      }
+      return "chrome-omni";
     }
     case SearchTermsData::RequestSource::NTP_ACTION_CHIPS: {
       return "chrome-ntp-action";

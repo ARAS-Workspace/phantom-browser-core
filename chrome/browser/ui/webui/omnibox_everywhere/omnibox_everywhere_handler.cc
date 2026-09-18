@@ -33,12 +33,12 @@ namespace {
 constexpr char kVoiceSearchQueryParameterKey[] = "gs_ivs";
 constexpr char kVoiceSearchQueryParameterValue[] = "1";
 
-class OmniboxEverywhereClient : public ContextualOmniboxClient {
+class OmniboxEverywhereClient : public SearchboxOmniboxClient {
  public:
   OmniboxEverywhereClient(Profile* profile,
                           content::WebContents* web_contents,
                           OmniboxEverywhereService* service)
-      : ContextualOmniboxClient(profile, web_contents), service_(service) {}
+      : SearchboxOmniboxClient(profile, web_contents), service_(service) {}
   ~OmniboxEverywhereClient() override = default;
 
   metrics::OmniboxEventProto::PageClassification GetPageClassification(
@@ -86,59 +86,20 @@ OmniboxEverywhereHandler::OmniboxEverywhereHandler(
     mojo::PendingRemote<searchbox::mojom::Page> pending_page,
     MetricsReporter* metrics_reporter,
     content::WebUI* web_ui,
-    OmniboxEverywhereService* service,
-    GetSessionHandleCallback get_session_callback,
-    ScreenshareDelegate* screenshare_delegate)
-    : ContextualSearchboxHandler(
+    OmniboxEverywhereService* service)
+    : SearchboxHandler(
           std::move(pending_page_handler),
           std::move(pending_page),
           Profile::FromWebUI(web_ui),
           web_ui->GetWebContents(),
           std::make_unique<OmniboxEverywhereClient>(Profile::FromWebUI(web_ui),
                                                     web_ui->GetWebContents(),
-                                                    service),
-          std::move(get_session_callback),
-          screenshare_delegate),
+                                                    service)),
       service_(service) {
-  static_cast<ContextualOmniboxClient*>(client())->SetSuggestInputsCallback(
-      base::BindRepeating(&OmniboxEverywhereHandler::GetSuggestInputs,
-                          base::Unretained(this)));
   autocomplete_controller_observation_.Observe(autocomplete_controller());
 }
 
 OmniboxEverywhereHandler::~OmniboxEverywhereHandler() = default;
-
-void OmniboxEverywhereHandler::OnDriveUploadClicked(
-    OnDriveUploadClickedCallback callback) {
-  // Notify the service that the Google Drive picker is being opened so it can
-  // suppress auto-dismissal of the standalone Omnibox Everywhere widget.
-  service_->OnDrivePickerOpened();
-
-  // Since the Omnibox Everywhere widget is a standalone popup without a native
-  // embedding browser window, we must dynamically associate the WebContents
-  // with the latest active browser window interface. Doing this on each click
-  // ensures that even if the previously associated browser tab/window was
-  // closed, the flow can still resolve a valid BrowserWindowInterface and
-  // successfully reopen the modal picker dialog. If no active browser window
-  // exists (e.g. Chrome is running in the background), we pass nullptr and
-  // let the DrivePickerHostController handle the top-level dialog.
-  ProfileBrowserCollection* profile_collection =
-      ProfileBrowserCollection::GetForProfile(profile_);
-  CHECK(profile_collection);
-  BrowserWindowInterface* active_bwi =
-      profile_collection->GetLastActiveBrowser();
-  webui::SetBrowserWindowInterface(web_contents_, active_bwi);
-
-  ContextualSearchboxHandler::OnDriveUploadClicked(std::move(callback));
-}
-
-void OmniboxEverywhereHandler::CleanupDrivePicker() {
-  ContextualSearchboxHandler::CleanupDrivePicker();
-  // Notify the service that the Drive picker has closed (either via success,
-  // cancel, or error) so that the widget can regain focus and restore standard
-  // auto-dismissal.
-  service_->OnDrivePickerClosed();
-}
 
 void OmniboxEverywhereHandler::SubmitQuery(const std::string& query_text,
                                            uint8_t mouse_button,
@@ -147,26 +108,13 @@ void OmniboxEverywhereHandler::SubmitQuery(const std::string& query_text,
                                            bool meta_key,
                                            bool shift_key,
                                            bool is_voice_search) {
-  if (!is_voice_search) {
-    ContextualSearchboxHandler::SubmitQuery(query_text, mouse_button, alt_key,
-                                            ctrl_key, meta_key, shift_key,
-                                            is_voice_search);
-    return;
-  }
-
-  // In classic Omnibox mode, unlike Composebox mode (which handles contextual
-  // file/tab attachments via ComposeboxEverywhereHandler and routes through
-  // ComposeboxQueryController), there are no contextual attachments. Voice
-  // searches from classic Omnibox mode should navigate directly to the user's
-  // default search provider rather than being routed to AI Mode (udm=50).
-  //
   // Unlike the New Tab Page, which can perform a client-side navigation inside
   // its own tab, Omnibox Everywhere runs in a standalone popup window. We must
   // route query submissions through OpenUrl so that the navigation redirects
   // to the active browser window/tab and dismisses the popup widget.
   //
   // This override lives specifically in OmniboxEverywhereHandler to avoid
-  // altering default behavior in the shared base ContextualSearchboxHandler.
+  // altering default behavior in the shared base SearchboxHandler.
   TemplateURLService* template_url_service = client()->GetTemplateURLService();
   if (!template_url_service) {
     return;
@@ -189,8 +137,6 @@ void OmniboxEverywhereHandler::SubmitQuery(const std::string& query_text,
       shift_key);
   GURL search_url = GURL(default_provider->url_ref().ReplaceSearchTerms(
       search_terms_args, template_url_service->search_terms_data()));
-  ClearFiles(/*should_block_auto_suggested_tabs=*/false,
-             /*query_submitted=*/true);
   client()->OpenUrl(search_url, disposition);
 }
 

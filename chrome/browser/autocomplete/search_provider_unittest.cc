@@ -49,8 +49,6 @@
 #include "components/google/core/common/google_switches.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/history/core/common/pref_names.h"
-#include "components/lens/lens_features.h"
-#include "components/lens/proto/server/lens_overlay_response.pb.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
 #include "components/omnibox/browser/autocomplete_controller_config.h"
 #include "components/omnibox/browser/autocomplete_input.h"
@@ -4248,28 +4246,6 @@ TEST_F(SearchProviderRequestTest, SendRequestWithURL) {
       "suggest?q=foo&url=https%3A%2F%2Fwww.example.com%2F&"));
 }
 
-TEST_F(SearchProviderRequestTest, LensContextualSearchboxSuggestRequest) {
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitWithFeaturesAndParameters(
-      {{lens::features::kLensOverlayContextualSearchbox,
-        {
-            {"show-contextual-searchbox-search-suggest", "true"},
-        }}},
-      /*disabled_features=*/{});
-  // Start a query.
-  AutocompleteInput input(u"foo",
-                          metrics::OmniboxEventProto::CONTEXTUAL_SEARCHBOX,
-                          ChromeAutocompleteSchemeClassifier(profile_.get()));
-  provider_->Start(input, false);
-
-  // Make sure the default provider's suggest endpoint is queried when
-  // contextual searchbox search suggest is enabled.
-  base::RunLoop().RunUntilIdle();
-  EXPECT_FALSE(provider_->done());
-  EXPECT_TRUE(test_url_loader_factory_.IsPending(
-      "https://www.google.com/suggest?q=foo&client=chrome-contextual"));
-}
-
 TEST_F(SearchProviderRequestTest, NoRequestWithAimToolMode) {
   // Start a query.
   AutocompleteInput input(u"foo", metrics::OmniboxEventProto::NTP_COMPOSEBOX,
@@ -4296,24 +4272,6 @@ TEST_F(SearchProviderRequestTest, LensContextualSearchboxNoSuggestRequest) {
   EXPECT_FALSE(test_url_loader_factory_.IsPending(
       "https://www.google.com/suggest?q=foo&client=chrome-contextual"));
   EXPECT_TRUE(provider_->done());
-}
-
-TEST_F(SearchProviderRequestTest, SendRequestWithLensInteractionResponse) {
-  // Start a query.
-  AutocompleteInput input(u"foo",
-                          metrics::OmniboxEventProto::LENS_SIDE_PANEL_SEARCHBOX,
-                          ChromeAutocompleteSchemeClassifier(profile_.get()));
-  lens::proto::LensOverlaySuggestInputs lens_overlay_suggest_inputs;
-  lens_overlay_suggest_inputs.set_encoded_image_signals("xyz");
-  input.set_lens_overlay_suggest_inputs(lens_overlay_suggest_inputs);
-  provider_->Start(input, false);
-
-  // Make sure the default provider's suggest endpoint was queried with the
-  // expected client and Lens Suggest signals.
-  base::RunLoop().RunUntilIdle();
-  EXPECT_FALSE(provider_->done());
-  EXPECT_TRUE(test_url_loader_factory_.IsPending(
-      "https://www.google.com/suggest?q=foo&client=chrome-multimodal&iil=xyz"));
 }
 
 // SearchProviderInvalidSuggestEndpointTest ------------------------------------

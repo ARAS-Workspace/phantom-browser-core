@@ -52,7 +52,6 @@
 #include "chrome/common/buildflags.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/grit/theme_resources.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/tabs/public/tab_alert.h"
 #include "components/tabs/public/tab_collection_types.h"
 #include "components/tabs/public/tab_interface.h"

@@ -46,8 +46,6 @@ class FromGWSNavigationAndKeepAliveRequestObserver;
 class HttpAuthCacheStatus;
 class IntentPickerViewPageActionController;
 class JsOptimizationsPageActionController;
-class LensOverlayController;
-class LensSearchController;
 class MemorySaverChipTabHelper;
 class NewTabPagePreloadPipelineManager;
 class Profile;
@@ -149,10 +147,6 @@ class RecordReplayClient;
 }  // namespace record_replay
 #endif
 
-namespace lens {
-class TabContextualizationController;
-}  // namespace lens
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace wallet {
 class ChromeWalletablePassClient;
@@ -252,9 +246,6 @@ class TabFeatures {
     return memory_saver_chip_controller_.get();
   }
 
-  LensOverlayController* lens_overlay_controller();
-  const LensOverlayController* lens_overlay_controller() const;
-
 #if !BUILDFLAG(IS_ANDROID)
   record_replay::RecordReplayClient* record_replay_client() {
     return record_replay_client_.get();
@@ -275,11 +266,6 @@ class TabFeatures {
 
   TabUIHelper* SetTabUIHelperForTesting(
       std::unique_ptr<TabUIHelper> tab_ui_helper);
-
-  lens::TabContextualizationController*
-  SetTabContextualizationControllerForTesting(
-      std::unique_ptr<lens::TabContextualizationController>
-          tab_contextualization_controller);
 
   TabAlertController* SetTabAlertControllerForTesting(
       std::unique_ptr<TabAlertController> tab_alert_controller);
@@ -344,7 +330,6 @@ class TabFeatures {
       permission_indicators_tab_data_;
 
   std::unique_ptr<SidePanelRegistry> side_panel_registry_;
-  std::unique_ptr<LensSearchController> lens_search_controller_;
 
   // Responsible for the customize chrome tab-scoped side panel.
   std::unique_ptr<customize_chrome::SidePanelController>
@@ -429,8 +414,6 @@ class TabFeatures {
   std::unique_ptr<CookieControlsPageActionController>
       cookie_controls_page_action_controller_;
 
-  // Manages the Lens Overlay Homework page action.
-
   // Manages the Bookmark page action.
   std::unique_ptr<BookmarkPageActionController>
       bookmark_page_action_controller_;
@@ -509,9 +492,6 @@ class TabFeatures {
   std::unique_ptr<record_replay::RecordReplayClient> record_replay_client_;
 #endif
 
-  std::unique_ptr<lens::TabContextualizationController>
-      tab_contextualization_controller_;
-
   // Watches for an opportunity to show the search engine choice dialog.
   // Only created when SearchEngineChoiceTabHelper::IsHelperNeeded().
   std::unique_ptr<SearchEngineChoiceTabHelper> search_engine_choice_tab_helper_;
@@ -531,9 +511,6 @@ class TabFeatures {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   std::unique_ptr<wallet::ChromeWalletablePassClient> walletable_pass_client_;
 #endif
-
-  std::unique_ptr<contextual_tasks::ContextualTasksTabVisitTracker>
-      contextual_tasks_tab_visit_tracker_;
 
   std::unique_ptr<multistep_filter::FilterUiController> filter_ui_controller_;
   std::unique_ptr<multistep_filter::ChromeFilterNavigationObserver>

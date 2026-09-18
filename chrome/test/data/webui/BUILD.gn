@@ -42,7 +42,6 @@ source_set("browser_tests") {
     "//chrome/browser/ui/tabs/tab_group_home:constants",
     "//chrome/test:test_support",
     "//components/commerce/core:commerce_constants",
-    "//components/contextual_tasks/public",
     "//components/metrics_services_manager",
     "//components/notebooks/public",
     "//components/ukm",
@@ -71,7 +70,6 @@ source_set("browser_tests") {
       "data_sharing/data_sharing_browsertest.cc",
       "device_log/device_log_ui_browsertest.cc",
       "downloads/downloads_browsertest.cc",
-      "drive_picker/drive_picker_browsertest.cc",
       "engagement/site_engagement_browsertest.cc",
       "feedback/feedback_browsertest.cc",
       "histograms/histograms_internals_browsertest.cc",
@@ -131,10 +129,8 @@ source_set("browser_tests") {
   if (!is_android || is_desktop_android) {
     sources += [ "cr_components/cr_components_browsertest.cc" ]
     deps += [
-      "//components/contextual_tasks/public:feature_list",
       "//components/history_clusters/core",
       "//components/history_embeddings/core",
-      "//components/lens:features",
     ]
   }
 
@@ -186,8 +182,6 @@ source_set("browser_tests") {
     sources += [
       "discards/discards_browsertest.cc",
     ]
-    if (is_chrome_branded) {
-    }
   }
 
   if (is_win || is_mac || is_linux) {
@@ -217,7 +211,6 @@ source_set("browser_tests") {
       "//chrome/browser/search/background",
       "//chrome/browser/ui:ui_features",
       "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/tabs:tabs_public",
       "//chrome/browser/ui/views/side_panel",
       "//chrome/browser/ui/webui",
@@ -236,8 +229,6 @@ source_set("browser_tests") {
       "//components/history_embeddings/content",
       "//components/history_embeddings/core",
       "//components/language/core/browser",
-      "//components/lens:enterprise_policy",
-      "//components/lens:features",
       "//components/multistep_filter/core",
       "//components/optimization_guide/core",
       "//components/password_manager/content/browser",
@@ -341,10 +332,7 @@ source_set("interactive_ui_tests") {
   if (!is_android) {
     deps += [
       "//chrome/browser/autocomplete:aim_eligibility_service",
-      "//chrome/browser/contextual_tasks:test_support",
-      "//chrome/browser/contextual_tasks:ui",
       "//chrome/browser/ui:ui_features",
-      "//components/contextual_tasks/public",
       "//components/history_clusters/core",
       "//components/password_manager/content/common",
       "//components/search",
@@ -526,7 +514,6 @@ generate_grd("build_grd") {
       "device_log:build_grdp",
       "discards:build_grdp",
       "downloads:build_grdp",
-      "drive_picker:build_grdp",
       "engagement:build_grdp",
       "feedback:build_grdp",
       "histograms:build_grdp",
@@ -582,7 +569,6 @@ generate_grd("build_grd") {
       "$target_gen_dir/device_log/resources.grdp",
       "$target_gen_dir/discards/resources.grdp",
       "$target_gen_dir/downloads/resources.grdp",
-      "$target_gen_dir/drive_picker/resources.grdp",
       "$target_gen_dir/engagement/resources.grdp",
       "$target_gen_dir/feedback/resources.grdp",
       "$target_gen_dir/histograms/resources.grdp",
@@ -625,10 +611,8 @@ generate_grd("build_grd") {
   if (!is_android || is_desktop_android) {
     deps += [
       "cr_components:build_grdp",
-      "cr_components/composebox:build_grdp",
     ]
     grdp_files += [
-      "$target_gen_dir/cr_components/composebox/resources.grdp",
       "$target_gen_dir/cr_components/resources.grdp",
     ]
   }
@@ -685,11 +669,6 @@ generate_grd("build_grd") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
-    if (is_chrome_branded) {
-    }
-  }
-
   if (is_win) {
     deps += [ "gaia_auth_host:build_grdp" ]
     grdp_files += [ "$target_gen_dir/gaia_auth_host/resources.grdp" ]
@@ -743,8 +722,6 @@ if (!is_android) {
   source_set("composebox_pixel_test_support") {
     testonly = true
     sources = [
-      "webui_composebox_pixel_test.cc",
-      "webui_composebox_pixel_test.h",
     ]
     deps = [
       "//chrome/test:test_support",

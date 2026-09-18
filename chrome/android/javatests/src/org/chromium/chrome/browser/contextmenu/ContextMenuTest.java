@@ -786,7 +786,6 @@ public class ContextMenuTest {
         Integer[] expectedItems = {
             R.id.contextmenu_save_image,
             R.id.contextmenu_open_image_in_new_tab,
-            R.id.contextmenu_search_image_with_google_lens,
             R.id.contextmenu_share_image,
             R.id.contextmenu_copy_image
         };
@@ -822,31 +821,6 @@ public class ContextMenuTest {
     @Test
     @SmallTest
     @Feature({"Browser", "ContextMenu"})
-    @Policies.Add({@Policies.Item(key = "DefaultSearchProviderEnabled", string = "false")})
-    public void testContextMenuRetrievesImageOptions_NoDefaultSearchEngineLensEnabled()
-            throws TimeoutException {
-        GSAUtils.setFakePassableGsaEnvironmentForTesting(true);
-
-        Tab tab = mActivityTestRule.getActivityTab();
-        mMenuCoordinator = ContextMenuUtils.openContextMenu(tab, "testImage");
-
-        // Search with Google Lens is only supported when Google is the default search provider.
-        Integer[] expectedItems = {
-            R.id.contextmenu_save_image,
-            R.id.contextmenu_open_image_in_new_tab,
-            R.id.contextmenu_share_image,
-            R.id.contextmenu_copy_image
-        };
-        Integer[] featureItems = {R.id.contextmenu_open_image_in_ephemeral_tab};
-        expectedItems =
-                addItemsIf(EphemeralTabCoordinator.isSupported(), expectedItems, featureItems);
-        expectedItems = maybeAddInspectElementItem(expectedItems);
-        assertMenuItemsAreEqual(mMenuCoordinator, expectedItems);
-    }
-
-    @Test
-    @SmallTest
-    @Feature({"Browser", "ContextMenu"})
     public void testContextMenuRetrievesImageLinkOptions() throws TimeoutException {
         GSAUtils.setFakePassableGsaEnvironmentForTesting(true);
 
@@ -864,7 +838,6 @@ public class ContextMenuTest {
             R.id.contextmenu_save_link_as,
             R.id.contextmenu_save_image,
             R.id.contextmenu_open_image_in_new_tab,
-            R.id.contextmenu_search_image_with_google_lens,
             R.id.contextmenu_share_image,
             R.id.contextmenu_share_link,
             R.id.contextmenu_copy_image
@@ -901,38 +874,6 @@ public class ContextMenuTest {
         expectedItems = maybeAddDownloadVideoFrameItem(expectedItems);
         expectedItems = maybeAddPictureInPictureItem(expectedItems);
         expectedItems = maybeAddInspectElementItem(expectedItems);
-        assertMenuItemsAreEqual(mMenuCoordinator, expectedItems);
-    }
-
-    @Test
-    @SmallTest
-    @Feature({"Browser", "ContextMenu"})
-    public void testSearchImageWithGoogleLensMenuItemName() throws Throwable {
-        Tab tab = mActivityTestRule.getActivityTab();
-
-        GSAUtils.setFakePassableGsaEnvironmentForTesting(true);
-        hardcodeTestImageForSharing(TEST_JPG_IMAGE_FILE_EXTENSION);
-
-        mMenuCoordinator = ContextMenuUtils.openContextMenu(tab, "testImage");
-        Integer[] expectedItems = {
-            R.id.contextmenu_save_image,
-            R.id.contextmenu_open_image_in_new_tab,
-            R.id.contextmenu_share_image,
-            R.id.contextmenu_copy_image,
-            R.id.contextmenu_search_image_with_google_lens
-        };
-        expectedItems =
-                addItemsIf(
-                        EphemeralTabCoordinator.isSupported(),
-                        expectedItems,
-                        new Integer[] {R.id.contextmenu_open_image_in_ephemeral_tab});
-        expectedItems = maybeAddInspectElementItem(expectedItems);
-        String title =
-                getMenuTitleFromItem(
-                        mMenuCoordinator, R.id.contextmenu_search_image_with_google_lens);
-        Assert.assertTrue(
-                "Context menu item name should be \'Search image with Google Lens\'.",
-                title.startsWith("Search image with Google Lens"));
         assertMenuItemsAreEqual(mMenuCoordinator, expectedItems);
     }
 
@@ -1272,22 +1213,6 @@ public class ContextMenuTest {
         ArgumentCaptor<Printable> printableCaptor = ArgumentCaptor.forClass(Printable.class);
         verify(mPrintingController).startPrint(printableCaptor.capture(), any());
         Assert.assertEquals(tab.getTitle(), printableCaptor.getValue().getTitle());
-    }
-
-    @Test
-    @MediumTest
-    @EnableFeatures(ChromeFeatureList.LENS_OVERLAY_ANDROID)
-    @Restriction(DeviceFormFactor.TABLET_OR_DESKTOP)
-    public void testContextMenuRetrievesPageOptions_LensOverlay() throws TimeoutException {
-        GSAUtils.setFakePassableGsaEnvironmentForTesting(true);
-        Tab tab = mActivityTestRule.getActivityTab();
-        switchToDesktopUserAgent(tab);
-        mMenuCoordinator = ContextMenuUtils.openContextMenu(tab, "testEmptySpace");
-
-        Assert.assertNotNull(
-                "Lens Overlay item should be present in the context menu",
-                getMenuTitleFromItem(
-                        mMenuCoordinator, R.id.contextmenu_search_tab_with_google_lens));
     }
 
     @Test

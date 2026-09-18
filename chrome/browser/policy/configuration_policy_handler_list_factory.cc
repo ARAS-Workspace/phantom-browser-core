@@ -21,7 +21,6 @@
 #include "build/buildflag.h"
 #include "chrome/browser/bookmarks/bookmark_bar_policy_handler.h"
 #include "chrome/browser/browsing_data/browsing_data_lifetime_policy_handler.h"
-#include "chrome/browser/contextual_tasks/smart_tab_sharing_settings_policy_handler.h"
 #include "chrome/browser/enterprise/reporting/legacy_tech/legacy_tech_report_policy_handler.h"
 #include "chrome/browser/media/webrtc/capture_policy_utils.h"
 #include "chrome/browser/net/disk_cache_dir_policy_handler.h"
@@ -67,8 +66,6 @@
 #include "components/component_updater/pref_names.h"
 #include "components/content_settings/core/browser/cookie_settings_policy_handler.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/contextual_search/pref_names.h"
-#include "components/contextual_search/search_content_sharing_policy_handler.h"
 #include "components/custom_handlers/pref_names.h"
 #include "components/domain_reliability/domain_reliability_prefs.h"
 #include "components/embedder_support/pref_names.h"
@@ -145,8 +142,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/first_run/android/first_run_prefs.h"
-#include "chrome/browser/lens/android/lens_prefs.h"
-#include "chrome/browser/search/contextual_search_policy_handler_android.h"
 #include "ui/accessibility/accessibility_prefs.h"
 #else  // BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/download/default_download_dir_policy_handler.h"
@@ -159,9 +154,7 @@
 #include "chrome/browser/policy/managed_account_policy_handler.h"
 #include "chrome/browser/web_applications/policy/web_app_settings_policy_handler.h"
 #include "chrome/browser/web_applications/policy/web_app_user_install_policy_handler.h"
-#include "components/contextual_tasks/public/prefs.h"
 #include "components/headless/policy/headless_mode_policy_handler.h"
-#include "components/lens/lens_overlay_permission_utils.h"
 #include "components/media_router/common/pref_names.h"
 #include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/search_engines/enterprise/search_aggregator_policy_handler.h"
@@ -1504,9 +1497,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     policy_prefs::kBuiltInAIAPIsEnabled,
     base::Value::Type::BOOLEAN },
 #endif  // BUILDFLAG(IS_ANDROID)
-  { key::kAIModeSettings,
-    omnibox::kAIModeSettings,
-    base::Value::Type::INTEGER },
   { key::kThirdPartyAiChatSettings,
     omnibox::kThirdPartyAiChatSettings,
     base::Value::Type::INTEGER },
@@ -2193,47 +2183,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       optimization_guide::prefs::kFindsEnterprisePolicyAllowed);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID)
-  gen_ai_default_policies.emplace_back(
-      key::kLensOverlaySettings, lens::prefs::kLensOverlaySettings,
-      key::kSearchContentSharingSettings,
-      GenAiDefaultSettingsPolicyHandler::PolicyValueToPrefMap(
-          {{0, 0}, {1, 0}, {2, 1}}));
-
-  handlers->AddHandler(std::make_unique<SimpleDeprecatingPolicyHandler>(
-      std::make_unique<SimplePolicyHandler>(key::kLensOverlaySettings,
-                                            lens::prefs::kLensOverlaySettings,
-                                            base::Value::Type::INTEGER),
-      std::make_unique<contextual_search::SearchContentSharingPolicyHandler>(
-          lens::prefs::kLensOverlaySettings,
-          /* convert_policy_value_to_enabled_boolean= */ false)));
-  handlers->AddHandler(std::make_unique<SimpleDeprecatingPolicyHandler>(
-      std::make_unique<SimplePolicyHandler>(key::kLensDesktopNTPSearchEnabled,
-                                            prefs::kLensDesktopNTPSearchEnabled,
-                                            base::Value::Type::BOOLEAN),
-      std::make_unique<contextual_search::SearchContentSharingPolicyHandler>(
-          prefs::kLensDesktopNTPSearchEnabled,
-          /* convert_policy_value_to_enabled_boolean= */ true)));
-  handlers->AddHandler(std::make_unique<SimpleDeprecatingPolicyHandler>(
-      std::make_unique<SimplePolicyHandler>(key::kLensRegionSearchEnabled,
-                                            prefs::kLensRegionSearchEnabled,
-                                            base::Value::Type::BOOLEAN),
-      std::make_unique<contextual_search::SearchContentSharingPolicyHandler>(
-          prefs::kLensRegionSearchEnabled,
-          /* convert_policy_value_to_enabled_boolean= */ true)));
-#else
-  handlers->AddHandler(std::make_unique<policy::SimpleDeprecatingPolicyHandler>(
-      std::make_unique<SimplePolicyHandler>(
-          key::kLensCameraAssistedSearchEnabled,
-          lens::kLensCameraAssistedSearchEnabled, base::Value::Type::BOOLEAN),
-      std::make_unique<contextual_search::SearchContentSharingPolicyHandler>(
-          lens::kLensCameraAssistedSearchEnabled,
-          /* convert_policy_value_to_enabled_boolean= */ true)));
-#endif  // !BUILDFLAG(IS_ANDROID)
-  gen_ai_default_policies.emplace_back(
-      key::kAIModeSettings, omnibox::kAIModeSettings,
-      GenAiDefaultSettingsPolicyHandler::PolicyValueToPrefMap(
-          {{0, 0}, {1, 0}, {2, 1}}));
   gen_ai_default_policies.emplace_back(
       key::kThirdPartyAiChatSettings, omnibox::kThirdPartyAiChatSettings,
       GenAiDefaultSettingsPolicyHandler::PolicyValueToPrefMap(
@@ -2246,25 +2195,12 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
   gen_ai_default_policies.emplace_back(key::kVoiceTypingSettings,
                                        prefs::kVoiceTypingSettings);
 #endif
-  // Default value for SearchContentSharingSettings is 0 if
-  // GenAiDefaultSettings value is 0 or 1, or 1 if the latter is 2.
-  gen_ai_default_policies.emplace_back(
-      key::kSearchContentSharingSettings,
-      contextual_search::kSearchContentSharingSettings,
-      GenAiDefaultSettingsPolicyHandler::PolicyValueToPrefMap(
-          {{0, 0}, {1, 0}, {2, 1}}));
   gen_ai_default_policies.emplace_back(
       key::kFindAndFillWithGeminiSettings,
       optimization_guide::prefs::kFindAndFillWithGeminiSettings);
   handlers->AddHandler(std::make_unique<GenAiDefaultSettingsPolicyHandler>(
       std::vector<GenAiDefaultSettingsPolicyHandler::GenAiPolicyDetails>(
           gen_ai_default_policies)));
-#if !BUILDFLAG(IS_ANDROID)
-  handlers->AddHandler(std::make_unique<SmartTabSharingSettingsPolicyHandler>(
-      std::make_unique<GenAiDefaultSettingsPolicyHandler>(
-          std::vector<GenAiDefaultSettingsPolicyHandler::GenAiPolicyDetails>(
-              gen_ai_default_policies))));
-#endif
   handlers->AddHandler(std::make_unique<
                        FindAndFillWithGeminiSettingsPolicyHandler>(
       std::make_unique<GenAiDefaultSettingsPolicyHandler>(

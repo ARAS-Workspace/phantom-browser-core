@@ -42,7 +42,6 @@ grit_strings("components_strings") {
     "../components_settings_strings.grdp",
     "../compose_strings.grdp",
     "../contextual_cueing_strings.grdp",
-    "../contextual_tasks_strings.grdp",
     "../crash_strings.grdp",
     "../dialog_strings.grdp",
     "../dom_distiller_strings.grdp",

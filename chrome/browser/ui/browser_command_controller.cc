@@ -60,7 +60,6 @@
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/fullscreen/browser_window_fullscreen_controller.h"
-#include "chrome/browser/ui/lens/lens_overlay_controller.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
@@ -104,7 +103,6 @@
 #include "components/dom_distiller/core/dom_distiller_features.h"
 #include "components/enterprise/isolated_mode/settings.h"
 #include "components/input/native_web_keyboard_event.h"
-#include "components/lens/buildflags.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/sessions/content/session_tab_helper.h"
@@ -1071,12 +1069,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_SHOW_FULL_URLS:
       ToggleShowFullURLs(browser_);
       break;
-    case IDC_SHOW_GOOGLE_LENS_SHORTCUT:
-      ToggleShowGoogleLensShortcut(browser_);
-      break;
-    case IDC_SHOW_AI_MODE_OMNIBOX_BUTTON:
-      ToggleShowAiModeOmniboxButton(browser_);
-      break;
     case IDC_SHOW_SEARCH_TOOLS:
       ToggleShowSearchTools(browser_);
       break;
@@ -1310,15 +1302,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       ExecuteUIDebugCommand(id, browser_);
       break;
 
-    case IDC_CONTENT_CONTEXT_LENS_OVERLAY:
-      ExecLensOverlay(browser_);
-      break;
-
-#if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
-    case IDC_CONTENT_CONTEXT_LENS_REGION_SEARCH:
-      ExecLensRegionSearch(browser_);
-      break;
-#endif  // BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
     case IDC_READING_LIST_MENU_ADD_TAB:
       chrome::MoveCurrentTabToReadLater(browser_);
       break;
@@ -1525,9 +1508,7 @@ void BrowserCommandController::InitCommandState() {
 
   // Omnibox commands
   command_updater_->UpdateCommandEnabled(IDC_SHOW_FULL_URLS, true);
-  command_updater_->UpdateCommandEnabled(IDC_SHOW_GOOGLE_LENS_SHORTCUT, true);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_SEARCH_TOOLS, true);
-  command_updater_->UpdateCommandEnabled(IDC_SHOW_AI_MODE_OMNIBOX_BUTTON, true);
 
   // Window management commands
   command_updater_->UpdateCommandEnabled(IDC_CLOSE_WINDOW, true);

@@ -107,8 +107,6 @@
 #include "components/commerce/core/prefs.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/contextual_search/contextual_search_service.h"
-#include "components/contextual_tasks/public/prefs.h"
 #include "components/custom_handlers/protocol_handler_registry.h"
 #include "components/dom_distiller/core/distilled_page_prefs.h"
 #include "components/domain_reliability/domain_reliability_prefs.h"
@@ -127,7 +125,6 @@
 #include "components/language/content/browser/geo_language_provider.h"
 #include "components/language/content/browser/ulp_language_code_locator/ulp_language_code_locator.h"
 #include "components/language/core/browser/language_prefs.h"
-#include "components/lens/buildflags.h"
 #include "components/lookalikes/core/lookalike_url_util.h"
 #include "components/media_device_salt/media_device_id_salt.h"
 #include "components/metrics/demographics/user_demographics.h"
@@ -140,7 +137,6 @@
 #include "components/ntp_tiles/pref_names.h"
 #include "components/ntp_tiles/tile_type.h"
 #include "components/offline_pages/buildflags/buildflags.h"
-#include "components/omnibox/browser/aim_eligibility_service.h"
 #include "components/omnibox/browser/document_provider.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
 #include "components/omnibox/browser/zero_suggest_provider.h"
@@ -266,7 +262,6 @@
 #include "chrome/browser/android/usage_stats/usage_stats_bridge.h"
 #include "chrome/browser/auxiliary_search/auxiliary_search_donation_service.h"
 #include "chrome/browser/first_run/android/first_run_prefs.h"
-#include "chrome/browser/lens/android/lens_prefs.h"
 #include "chrome/browser/media/android/cdm/media_drm_origin_id_manager.h"
 #include "chrome/browser/notifications/notification_channels_provider_android.h"
 #include "chrome/browser/ntp_customization/ntp_android_custom_background_service.h"
@@ -316,7 +311,6 @@
 #include "chrome/browser/user_education/browser_user_education_storage_service.h"
 #include "chrome/browser/webauthn/chrome_authenticator_request_delegate.h"
 #include "components/headless/policy/headless_mode_prefs.h"  // nogncheck crbug.com/40147906
-#include "components/lens/lens_overlay_permission_utils.h"
 #include "components/live_caption/pref_names.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
@@ -1208,7 +1202,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   ::android::RegisterPrefs(registry);
 
   registry->RegisterIntegerPref(first_run::kTosDialogBehavior, 0);
-  registry->RegisterBooleanPref(lens::kLensCameraAssistedSearchEnabled, true);
 #else   // BUILDFLAG(IS_ANDROID)
   headless::RegisterPrefs(registry);
   IntranetRedirectDetector::RegisterPrefs(registry);
@@ -1332,7 +1325,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
 #endif
   AccessibilityUIMessageHandler::RegisterProfilePrefs(registry);
-  AimEligibilityService::RegisterProfilePrefs(registry);
   AnnouncementNotificationService::RegisterProfilePrefs(registry);
   autofill::prefs::RegisterProfilePrefs(registry);
   browsing_data::prefs::RegisterBrowserUserPrefs(registry);
@@ -1348,8 +1340,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   commerce::RegisterProfilePrefs(registry);
   context_hub::prefs::RegisterProfilePrefs(registry);
   contextual_cueing::prefs::RegisterProfilePrefs(registry);
-  contextual_search::ContextualSearchService::RegisterProfilePrefs(registry);
-  contextual_tasks::RegisterProfilePrefs(registry);
   registry->RegisterIntegerPref(prefs::kContextualTasksNextPanelOpenCount, 0);
   registry->RegisterBooleanPref(prefs::kCtrlTabMru, false);
   cross_device::RegisterProfilePrefs(registry);
@@ -1571,7 +1561,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   commerce::CommerceUiTabHelper::RegisterProfilePrefs(registry);
   first_run::RegisterProfilePrefs(registry);
   HatsServiceDesktop::RegisterProfilePrefs(registry);
-  lens::prefs::RegisterProfilePrefs(registry);
   media_router::RegisterAccessCodeProfilePrefs(registry);
   media_router::RegisterProfilePrefs(registry);
   MicrosoftAuthPageHandler::RegisterProfilePrefs(registry);
@@ -1624,12 +1613,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   RegisterBrowserViewProfilePrefs(registry);
 #endif
 
-#if BUILDFLAG(ENABLE_LENS_DESKTOP)
-  registry->RegisterBooleanPref(
-      prefs::kLensRegionSearchEnabled, true,
-      user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
-#endif
-#if BUILDFLAG(ENABLE_LENS_DESKTOP) || BUILDFLAG(ENABLE_WEBUI_NTP)
+#if BUILDFLAG(ENABLE_WEBUI_NTP)
   registry->RegisterBooleanPref(prefs::kLensDesktopNTPSearchEnabled, true);
 #endif
 

@@ -22,7 +22,6 @@
 #include "ui/views/metadata/view_factory.h"
 #include "ui/views/view_observer.h"
 
-class OmniboxContextMenu;
 class OmniboxController;
 class OmniboxPopupPresenterBase;
 class OmniboxPopupDeactivationBlocker;
@@ -72,9 +71,6 @@ class OmniboxPopupWebUIBaseContent : public views::WebView,
   void CloseUI() override;
   void ShowUI() override;
   void OnPreHandleEscapeKey() override;
-  void ShowCustomContextMenu(
-      gfx::Point point,
-      std::unique_ptr<ui::MenuModel> menu_model) override;
   void ResizeDueToAutoResize(content::WebContents* source,
                              const gfx::Size& new_size) override;
   bool HandleKeyboardEvent(content::WebContents* source,
@@ -107,11 +103,6 @@ class OmniboxPopupWebUIBaseContent : public views::WebView,
   virtual bool EscClosesUI() const;
 
  protected:
-  // Callback for cleaning up the `context_menu_` field.
-  void OnMenuClosed();
-
-  virtual void OnContextMenuClosed() = 0;
-
   // Set up the WebUI content page and hook up the Omnibox handlers.
   void SetContentURL(std::string_view url);
 
@@ -158,7 +149,6 @@ class OmniboxPopupWebUIBaseContent : public views::WebView,
   bool top_rounded_corners_ = true;
 
   std::unique_ptr<WebUIContentsWrapperT<OmniboxPopupUI>> contents_wrapper_;
-  std::unique_ptr<OmniboxContextMenu> context_menu_;
 
   std::unique_ptr<OmniboxPopupTabSelectionListener> tab_selection_listener_;
 
@@ -189,8 +179,6 @@ class OmniboxPopupWebUIBaseContent : public views::WebView,
   // If the browser window is currently being resized. If so, ignore bouncer for
   // delay.
   bool is_window_resizing_ = false;
-
-  friend class OmniboxAimPopupBrowserTest;
 
   void OnFileChooserClosed();
 

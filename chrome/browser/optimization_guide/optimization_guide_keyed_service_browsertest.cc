@@ -188,8 +188,7 @@ class OptimizationGuideKeyedServiceDisabledBrowserTest
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
         // is enabled and then remove the two omnibox features below.
         /*disabled_features=*/
-        {features::kOptimizationHints, omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+        {features::kOptimizationHints, omnibox::internal::kWebUIOmniboxPopup});
   }
 
  private:
@@ -224,8 +223,7 @@ class OptimizationGuideKeyedServiceBrowserTest
         /*disabled_features=*/
         {features::internal::kWallpaperSearchGraduated,
          features::internal::kComposeGraduated,
-         omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+         omnibox::internal::kWebUIOmniboxPopup});
   }
 
   OptimizationGuideKeyedServiceBrowserTest(

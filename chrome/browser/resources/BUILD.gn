@@ -18,7 +18,6 @@ assert(!is_ios, "Chromium/iOS shouldn't use anything in //chrome")
 
 group("resources") {
   public_deps = [
-    "contextual_tasks:resources",
     "saved_tab_groups_unsupported:resources",
     "segmentation_internals:resources",
     "//components/enterprise/connectors/resources",
@@ -37,8 +36,6 @@ group("resources") {
   if (enable_extensions_core) {
     public_deps += [
       ":component_extension_resources",
-      "contextual_tasks/extension:resources",
-      "omnibox/aim_eligibility_extension:resources",
     ]
   }
 
@@ -56,16 +53,12 @@ group("resources") {
       "contextual_cueing/internals:resources",
       "data_sharing:resources",
       "downloads:resources",
-      "drive_picker_host:resources",
-      "drive_picker_host/untrusted:resources",
       "feedback:resources",
       "gaia_auth_host:resources",
       "history:resources",
       "inspect:resources",
       "iwa_dev:resources",
       "key_value_pair_viewer_shared:resources",
-      "lens/overlay:resources",
-      "lens/shared:resources",
       "new_tab_footer:resources",
       "omnibox_everywhere:resources",
       "omnibox_popup:resources",

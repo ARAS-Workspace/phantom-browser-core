@@ -5,7 +5,7 @@
 import 'chrome://new-tab-page/new_tab_page.js';
 
 import type {Module} from 'chrome://new-tab-page/lazy_load.js';
-import {ComposeboxProxyImpl, ModuleRegistry} from 'chrome://new-tab-page/lazy_load.js';
+import {ModuleRegistry} from 'chrome://new-tab-page/lazy_load.js';
 import {CustomizeButtonsDocumentCallbackRouter, CustomizeButtonsHandlerRemote} from 'chrome://new-tab-page/new_tab_page.js';
 import type {AppElement, NtpSearchboxElement} from 'chrome://new-tab-page/new_tab_page.js';
 import {$$, BackgroundManager, CustomizeButtonsProxy, NewTabPageProxy, SearchboxBrowserProxy, WindowProxy} from 'chrome://new-tab-page/new_tab_page.js';
@@ -36,8 +36,6 @@ suite('NewTabPageAppFocusTest', () => {
 
   suiteSetup(() => {
     loadTimeData.overrideValues({
-      searchboxShowComposeEntrypoint: true,
-      searchboxShowComposebox: true,
       ntpRealboxNextEnabled: true,
     });
   });
@@ -70,8 +68,6 @@ suite('NewTabPageAppFocusTest', () => {
       doodle: null,
     });
     handler.setPromiseResolveFor('getModulesIdNames', {data: []});
-    handler.setPromiseResolveFor(
-        'canShowRealboxContextMenuAnimation', {canShow: false});
     installMock(
         CustomizeButtonsHandlerRemote,
         mock => CustomizeButtonsProxy.setInstance(
@@ -84,7 +80,6 @@ suite('NewTabPageAppFocusTest', () => {
     moduleResolver = new PromiseResolver();
     moduleRegistry.setResultFor('initializeModules', moduleResolver.promise);
     searchboxHandler = installMock(SearchboxPageHandlerRemote, mock => {
-      ComposeboxProxyImpl.getInstance().searchboxHandler = mock;
       SearchboxBrowserProxy.getInstance().handler = mock;
     });
     searchboxHandler.setPromiseResolveFor('getRecentTabs', {tabs: []});

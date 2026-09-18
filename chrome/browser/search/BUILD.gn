@@ -32,8 +32,6 @@ source_set("search") {
   ]
   if (is_android) {
     sources += [
-      "contextual_search_policy_handler_android.cc",
-      "contextual_search_policy_handler_android.h",
     ]
     public_deps += [ "//components/policy/core/browser" ]
     deps += [ "//components/prefs" ]
@@ -91,7 +89,6 @@ source_set("search") {
       "//mojo/public/cpp/bindings",
       "//ui/base",
       "//ui/gfx:color_utils",
-      "//ui/webui/resources/cr_components/composebox:mojo_bindings",
     ]
 
     # InstantService constructs ThemeSource while theme_source.cc includes
@@ -134,7 +131,6 @@ source_set("unit_tests") {
   }
 
   if (is_android) {
-    sources += [ "contextual_search_policy_handler_android_unittest.cc" ]
     deps += [
       ":search",
       "//base",

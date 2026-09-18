@@ -57,8 +57,6 @@ component("views") {
     "//chrome/app:generated_resources",
     "//chrome/browser/ui:layout_constants",
     "//components/keep_alive_registry",
-    "//components/lens",
-    "//components/lens:buildflags",
     "//components/vector_icons",
     "//content/public/browser",
     "//printing/buildflags",

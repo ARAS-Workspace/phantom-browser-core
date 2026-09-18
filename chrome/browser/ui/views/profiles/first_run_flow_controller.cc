@@ -45,7 +45,6 @@
 #include "chrome/browser/ui/views/profiles/feature_showcase/feature_showcase_metrics.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/feature_showcase_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/gemini_step_eligibility_checker.h"
-#include "chrome/browser/ui/views/profiles/feature_showcase/google_lens_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/themes_and_customization_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/profile_management_flow_controller_impl.h"
 #include "chrome/browser/ui/views/profiles/profile_management_step_controller.h"
@@ -61,7 +60,6 @@
 #include "chrome/common/channel_info.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/browser_resources.h"
-#include "components/lens/lens_overlay_metrics.h"
 #include "components/prefs/pref_service.h"
 #include "components/regional_capabilities/regional_capabilities_service.h"
 #include "components/signin/public/base/consent_level.h"
@@ -618,18 +616,10 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
             switches::kFirstRunFeatureShowcaseGeminiStep)) {
       checkers.push_back(std::make_unique<GeminiStepEligibilityChecker>());
     }
-    checkers.push_back(std::make_unique<GoogleLensStepEligibilityChecker>());
     checkers.push_back(
         std::make_unique<ThemesAndCustomizationStepEligibilityChecker>());
 
     base::flat_map<std::string, std::string> conflicting_steps;
-    if (base::FeatureList::IsEnabled(
-            switches::kFirstRunFeatureShowcaseGeminiStep)) {
-      conflicting_steps = {
-          {kFeatureShowcaseGeminiStepIdentifier,
-           kFeatureShowcaseGoogleLensStepIdentifier},
-      };
-    }
     tracker_ = std::make_unique<FeatureShowcaseEligibilityTracker>(
         std::move(checkers), std::move(conflicting_steps));
   }
@@ -755,9 +745,6 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     base::UmaHistogramEnumeration(
         "ProfilePicker.FREFlow.FeatureShowcase.StepShown",
         last_active_step_shown());
-    if (last_active_step_shown() == FeatureShowcaseStep::kGoogleLens) {
-      lens::RecordFirstRunPermissionNoticeToBeShown();
-    }
   }
 
   raw_ptr<Profile> profile_;

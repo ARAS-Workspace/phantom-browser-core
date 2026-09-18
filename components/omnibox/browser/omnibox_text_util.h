@@ -61,10 +61,6 @@ std::u16string SanitizeTextForPaste(const std::u16string& text);
 //  - |text| is full UTF-16 and not %-escaped. This is because we are not
 //    interpreting |text| as a URL, so we leave the Unicode characters as-is.
 //
-// Copied text that looks like a "contextual tasks" URL will have
-// "origin-swapping" logic applied to it, in order to ensure that users copy a
-// valid, shareable URL.
-//
 void AdjustTextForCopy(
     int sel_min,
     std::u16string* text,
@@ -74,7 +70,6 @@ void AdjustTextForCopy(
     const GURL& navigation_entry_url,
     AutocompleteClassifier* autocomplete_classifier,
     ::metrics::OmniboxEventProto::PageClassification page_classification,
-    const GURL& contextual_tasks_inner_frame_url,
     GURL* url_from_text,
     bool* write_url);
 

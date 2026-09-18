@@ -5,13 +5,11 @@
 if (!is_android) {
   source_set("omnibox_popup") {
     sources = [
-      "omnibox_popup_aim_handler.cc",
       "omnibox_popup_handler.cc",
       "omnibox_popup_ui.cc",
       "omnibox_popup_web_contents_helper.cc",
     ]
     public = [
-      "omnibox_popup_aim_handler.h",
       "omnibox_popup_handler.h",
       "omnibox_popup_ui.h",
       "omnibox_popup_web_contents_helper.h",
@@ -20,13 +18,11 @@ if (!is_android) {
     deps = [
       "//base",
       "//chrome/browser/autocomplete:aim_eligibility_service",
-      "//chrome/browser/contextual_search",
       "//chrome/browser/history_clusters",
       "//chrome/browser/profiles:profile",
       "//chrome/browser/resources/omnibox_popup:resources",
       "//chrome/browser/search_engines",
       "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/contextual_search",
       "//chrome/browser/ui/location_bar",
       "//chrome/browser/ui/omnibox",
       "//chrome/browser/ui/views/omnibox",
@@ -39,8 +35,6 @@ if (!is_android) {
       "//chrome/browser/ui/webui/searchbox",
       "//chrome/browser/ui/webui/top_chrome",
       "//chrome/common",
-      "//components/contextual_search:public",
-      "//components/lens",
       "//components/omnibox/browser",
       "//components/omnibox/browser:mojo_bindings",
       "//components/omnibox/common:features",
@@ -49,7 +43,6 @@ if (!is_android) {
       "//ui/base",
       "//ui/gfx/geometry",
       "//ui/native_theme",
-      "//ui/webui/resources/cr_components/composebox:mojo_bindings",
     ]
     allow_circular_includes_from = [
       # searchbox files include omnibox_popup headers and vice versa.
@@ -60,14 +53,11 @@ if (!is_android) {
   source_set("unit_tests") {
     testonly = true
     sources = [
-      "omnibox_popup_aim_handler_unittest.cc",
       "omnibox_popup_handler_unittest.cc",
-      "omnibox_popup_ui_unittest.cc",
     ]
     deps = [
       ":omnibox_popup",
       "//base/test:test_support",
-      "//chrome/browser/contextual_search",
       "//chrome/browser/search_engines",
       "//chrome/browser/ui",
       "//chrome/browser/ui/webui/searchbox:searchbox_test_utils",
@@ -79,7 +69,6 @@ if (!is_android) {
       "//testing/gmock",
       "//testing/gtest",
       "//ui/base/clipboard:clipboard_test_support",
-      "//ui/webui/resources/cr_components/composebox:mojo_bindings",
     ]
   }
 }

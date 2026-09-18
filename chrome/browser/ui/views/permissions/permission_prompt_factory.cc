@@ -9,7 +9,6 @@
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/lens/lens_overlay_controller.h"
 #include "chrome/browser/ui/permission_bubble/permission_prompt.h"
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
@@ -110,8 +109,6 @@ bool ShouldIgnorePermissionRequest(
       committed_origin.IsSameOriginWith(
           GURL(chrome::kChromeUIOmniboxPopupURL)) ||
       committed_origin.IsSameOriginWith(
-          GURL(chrome::kChromeUIContextualTasksURL)) ||
-      committed_origin.IsSameOriginWith(
           GURL(chrome::kChromeUIOmniboxEverywhereURL))) {
     return false;
   }
@@ -119,21 +116,6 @@ bool ShouldIgnorePermissionRequest(
   // Suppress permission prompts if the omnibox is being edited or is empty.
   LocationBar* location_bar = GetLocationBar(web_contents);
   bool can_display_prompt = !(location_bar && location_bar->IsEditingOrEmpty());
-
-  BrowserWindowInterface* browser = GetBrowser(web_contents);
-  if (browser) {
-    LensOverlayController* lens_overlay_controller =
-        browser->GetTabStripModel()
-            ->GetActiveTab()
-            ->GetTabFeatures()
-            ->lens_overlay_controller();
-    // Don't show prompt if Lens Overlay is showing
-    // TODO(b/331940245): Refactor to be decoupled from LensOverlayController
-    if (lens_overlay_controller &&
-        lens_overlay_controller->IsOverlayShowing()) {
-      can_display_prompt = false;
-    }
-  }
 
   permissions::PermissionUmaUtil::RecordPermissionPromptAttempt(
       delegate->Requests(), can_display_prompt);

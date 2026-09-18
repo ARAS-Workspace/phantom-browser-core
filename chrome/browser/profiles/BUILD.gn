@@ -679,9 +679,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/context_hub",
     "//chrome/browser/contextual_cueing",
-    "//chrome/browser/contextual_search",
-    "//chrome/browser/contextual_tasks",
-    "//chrome/browser/contextual_tasks:ui",
     "//chrome/browser/critical_actions",
     "//chrome/browser/custom_handlers",
     "//chrome/browser/data_sharing",
@@ -859,7 +856,6 @@ source_set("profiles_extra_parts_impl") {
       "//chrome/browser/ui/desktop_to_mobile_promos:service",
       "//chrome/browser/ui/global_error",
       "//chrome/browser/ui/global_media_controls",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/media_router",
       "//chrome/browser/ui/performance_controls",
       "//chrome/browser/ui/read_anything",
@@ -912,7 +908,6 @@ source_set("profiles_extra_parts_impl") {
   if (enable_extensions_core) {
     deps += [
       "//chrome/browser/extensions/keyed_services:keyed_service_factories",
-      "//chrome/browser/ui/webui/omnibox/aim_eligibility_extension",
       "//extensions/browser",
     ]
   }
@@ -1048,8 +1043,6 @@ source_set("unit_tests") {
     ":gaia_info_update_service",
     "//chrome/browser:global_features",
   ]
-  if (!is_android) {
-  }
 
   if (!is_android) {
     sources += [

@@ -38,12 +38,10 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/unload_controller.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
-#include "chrome/browser/ui/views/contextual_tasks/contextual_tasks_close_button_controller.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
 #include "chrome/browser/ui/web_applications/web_app_tabbed_utils.h"
 #include "chrome/browser/ui/window_feature_controller/window_feature_controller.h"
 #include "chrome/common/chrome_switches.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/reading_list/core/reading_list_model.h"
 #include "components/saved_tab_groups/internal/saved_tab_group_model.h"
@@ -436,18 +434,6 @@ void BrowserTabStripModelDelegate::CloseTab(
 
   if (!web_app::IsTabClosable(model, tab_index)) {
     return;
-  }
-
-  if (base::FeatureList::IsEnabled(
-          contextual_tasks::kContextualTasksCloseTabExpandsSidePanel)) {
-    ContextualTasksCloseButtonController* const close_button_controller =
-        ContextualTasksCloseButtonController::From(browser_);
-    if (tab_interface && tab_interface->IsActivated() &&
-        close_button_controller &&
-        close_button_controller->ShouldShowCloseButton()) {
-      close_button_controller->MaybeCloseTabExpandSidePanel();
-      return;
-    }
   }
 
   auto [cb1, cb2] = base::SplitOnceCallback(std::move(on_approved));

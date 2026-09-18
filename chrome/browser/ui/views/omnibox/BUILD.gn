@@ -9,8 +9,6 @@ assert(toolkit_views)
 source_set("omnibox") {
   public = [
     "full_webui_omnibox_frame.h",
-    "omnibox_aim_popup_webui_content.h",
-    "omnibox_context_menu.h",
     "omnibox_context_menu_mixin.h",
     "omnibox_full_popup_webui_content.h",
     "omnibox_header_view.h",
@@ -18,7 +16,6 @@ source_set("omnibox") {
     "omnibox_match_cell_view.h",
     "omnibox_mouse_enter_exit_handler.h",
     "omnibox_placeholder_util.h",
-    "omnibox_popup_aim_presenter.h",
     "omnibox_popup_closer.h",
     "omnibox_popup_full_presenter.h",
     "omnibox_popup_presenter.h",
@@ -80,8 +77,6 @@ source_set("omnibox") {
 source_set("impl") {
   sources = [
     "full_webui_omnibox_frame.cc",
-    "omnibox_aim_popup_webui_content.cc",
-    "omnibox_context_menu.cc",
     "omnibox_context_menu_mixin.cc",
     "omnibox_full_popup_webui_content.cc",
     "omnibox_header_view.cc",
@@ -89,7 +84,6 @@ source_set("impl") {
     "omnibox_match_cell_view.cc",
     "omnibox_mouse_enter_exit_handler.cc",
     "omnibox_placeholder_util.cc",
-    "omnibox_popup_aim_presenter.cc",
     "omnibox_popup_closer.cc",
     "omnibox_popup_full_presenter.cc",
     "omnibox_popup_presenter.cc",
@@ -129,9 +123,7 @@ source_set("impl") {
     "//chrome/browser/ui:browser_actions",
     "//chrome/browser/ui:layout_constants",
     "//chrome/browser/ui:ui_features",
-    "//chrome/browser/ui/contextual_search",
     "//chrome/browser/ui/immersive:immersive_mode_controller",
-    "//chrome/browser/ui/lens",
     "//chrome/browser/ui/omnibox",
     "//chrome/browser/ui/page_action:icon_type",
     "//chrome/browser/ui/send_tab_to_self",
@@ -147,7 +139,6 @@ source_set("impl") {
     "//chrome/browser/ui/webui/top_chrome",
     "//chrome/browser/user_education",
     "//chrome/common:buildflags",
-    "//components/lens:features",
     "//components/omnibox/browser",
     "//components/omnibox/common",
     "//components/omnibox/common:features",
@@ -164,6 +155,7 @@ source_set("impl") {
     "//extensions/common:common_constants",
     "//ui/base:data_exchange",
     "//ui/strings:ui_strings_grit",
+    "//ui/touch_selection:touch_selection",
   ]
 
   # These .cc files include headers still compiled in //chrome/browser/ui:ui:
@@ -255,7 +247,6 @@ source_set("browser_tests") {
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
   sources = [
-    "omnibox_aim_popup_browsertest.cc",
     "omnibox_popup_view_browser_view_browsertest.cc",
     "omnibox_popup_view_views_browsertest.cc",
     "omnibox_row_grouped_view_browsertest.cc",

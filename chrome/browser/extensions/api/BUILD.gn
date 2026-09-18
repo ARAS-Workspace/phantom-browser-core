@@ -91,7 +91,6 @@ group("api_implementations") {
 
   if (!is_android) {
     public_deps += [
-      "//chrome/browser/extensions/api/contextual_tasks_private",
     ]
   }
 }
@@ -199,7 +198,6 @@ source_set("keyed_service_factories") {
 
   deps = [
     ":api_implementations",
-    "//chrome/browser/contextual_tasks",
     "//chrome/browser/extensions",
     "//chrome/common:buildflags",
     "//components/safe_browsing:buildflags",

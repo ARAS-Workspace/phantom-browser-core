@@ -73,7 +73,6 @@ import org.chromium.chrome.browser.ui.default_browser_promo.DefaultBrowserPromoU
 import org.chromium.chrome.browser.ui.extensions.ExtensionUi;
 import org.chromium.chrome.browser.ui.favicon.FaviconHelper;
 import org.chromium.chrome.browser.ui.favicon.FaviconUtils;
-import org.chromium.chrome.browser.ui.lens.LensOverlayTabHelper;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
 import org.chromium.chrome.browser.ui.native_page.NativePage;
 import org.chromium.chrome.browser.ui.side_panel.AndroidSidePanelEnabledFn;
@@ -489,9 +488,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         // Find in page
         if (shouldShowFindInPageItem(currentTab)) modelList.add(buildFindInPageItem(currentTab));
 
-        // Lens Overlay
-        if (shouldShowLensOverlayItem(currentTab)) modelList.add(buildLensOverlayItem(currentTab));
-
         // Translate
         if (shouldShowTranslateMenuItem(currentTab)) {
             modelList.add(buildTranslateMenuItem(currentTab, shouldShowIconBeforeItem));
@@ -692,9 +688,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
         // Find in page
         if (shouldShowFindInPageItem(currentTab)) modelList.add(buildFindInPageItem(currentTab));
-
-        // Lens Overlay
-        if (shouldShowLensOverlayItem(currentTab)) modelList.add(buildLensOverlayItem(currentTab));
 
         // Translate
         if (shouldShowTranslateMenuItem(currentTab)) {
@@ -1545,30 +1538,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         R.string.menu_find_in_page,
                         shouldShowIconBeforeItem() ? R.drawable.ic_find_in_page : Resources.ID_NULL,
                         isMenuIconAtStart()));
-    }
-
-    private boolean shouldShowLensOverlayItem(@Nullable Tab currentTab) {
-        return LensOverlayTabHelper.shouldShowLensOverlay(currentTab);
-    }
-
-    private MVCListAdapter.ListItem buildLensOverlayItem(@Nullable Tab currentTab) {
-        assert shouldShowLensOverlayItem(currentTab);
-        PropertyModel model =
-                AppMenuItemUtils.buildModelForStandardMenuItem(
-                        mContext,
-                        getAppMenuItemTheme(),
-                        R.id.lens_overlay_menu_id,
-                        R.string.menu_search_tab_with_google_lens,
-                        shouldShowIconBeforeItem()
-                                ? R.drawable.lens_camera_icon
-                                : Resources.ID_NULL,
-                        isMenuIconAtStart());
-
-        // Disable the item if the overlay is already showing.
-        model.set(
-                AppMenuItemProperties.ENABLED, !LensOverlayTabHelper.isOverlayShowing(currentTab));
-
-        return new MVCListAdapter.ListItem(AppMenuHandler.AppMenuItemType.STANDARD, model);
     }
 
     private boolean shouldShowDefaultBrowserPromo() {

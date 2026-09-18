@@ -119,7 +119,6 @@ static_library("renderer") {
 
   public_deps = [
     "//components/signin/public/base:signin_buildflags",
-    "//components/touch_to_search:buildflags",
   ]
 
   deps = [
@@ -151,8 +150,6 @@ static_library("renderer") {
     "//components/history_clusters/core",
     "//components/language/core/common",
     "//components/language_detection/core",
-    "//components/lens",
-    "//components/lens:lens_mojo",
     "//components/metrics:child_call_stack_profile_builder",
     "//components/network_hints/renderer",
     "//components/no_state_prefetch/common",

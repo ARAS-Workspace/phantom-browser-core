@@ -65,7 +65,6 @@ class WebUIReadOnlyOmnibox
     virtual ~UpdatePropagator();
     virtual void PropagateOmniboxUpdate(
         toolbar_ui_api::mojom::OmniboxViewStatePtr update) = 0;
-    virtual void PropagateApplyFocusRingToAimButton(bool force_focus) = 0;
     virtual void PropagateFocusRequest(
         toolbar_ui_api::mojom::FocusRequestTarget target) = 0;
     virtual std::optional<GURL> ConsumeDroppedUrl(
@@ -121,8 +120,6 @@ class WebUIReadOnlyOmnibox
   void RevertAll() override;
   void UpdatePopup() override;
   void SetFocus(bool is_user_initiated) override;
-  void ApplyFocusRingToAimButton(bool focus_aim) override;
-  bool AimButtonVisible() const override;
   void ApplyCaretVisibility() override;
   void SetAccessibilityLabel(const std::u16string& display_text,
                              const AutocompleteMatch& match,
@@ -238,8 +235,6 @@ class WebUIReadOnlyOmnibox
   State state_before_change_;
 
   bool has_focus_ = false;
-  bool aim_hint_currently_shown_ = false;
-  bool aim_page_action_icon_has_fake_focus_ = false;
 
   // Used to show the context menu.
   content::ContextMenuParams menu_params_;

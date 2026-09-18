@@ -9,7 +9,6 @@
 #include "chrome/browser/ui/webui/whats_new/whats_new_storage_service_impl.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
-#include "components/lens/lens_features.h"
 #include "components/performance_manager/public/features.h"
 #include "components/search/ntp_features.h"
 #include "components/user_education/webui/whats_new_registry.h"

@@ -42,7 +42,6 @@ source_set("configs") {
     public_deps = [
       "//chrome/browser/ui/tabs/tab_group_home",
       "//chrome/browser/ui/webui/commerce",
-      "//chrome/browser/ui/webui/drive_picker_host",
     ]
   }
 
@@ -52,7 +51,6 @@ source_set("configs") {
     ":ntp_tiles_internals_ui",
     ":signin_internals_ui",
     ":webui",
-    "//chrome/browser/contextual_tasks:ui",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/ui",
     "//chrome/browser/ui/webui/about",
@@ -93,7 +91,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/usb_internals",
     "//chrome/browser/ui/webui/version",
     "//components/compose:buildflags",
-    "//components/lens:buildflags",
     "//components/notebooks/internals/webui",
     "//components/security_interstitials/content:security_interstitial_page",
     "//components/webui/user_actions",
@@ -152,7 +149,6 @@ source_set("configs") {
   } else {
     #is_android
     deps += [
-      "//chrome/browser/ui/android/lens",
       "//chrome/browser/ui/webui/feed_internals",
       "//chrome/browser/ui/webui/notifications_internals",
       "//chrome/browser/ui/webui/webapks",
@@ -169,7 +165,6 @@ source_set("configs") {
 
   if (is_win || is_mac || is_linux) {
     deps += [
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/views/side_panel",
       "//chrome/browser/ui/webui/settings",
       "//chrome/browser/ui/webui/signin",
@@ -547,7 +542,6 @@ source_set("chrome_web_ui_controller_factory") {
   ]
   deps = [
     "//chrome/browser:flags",
-    "//chrome/browser/contextual_tasks:ui",
     "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
     "//chrome/browser/optimization_guide",
     "//chrome/browser/profiles:profile",

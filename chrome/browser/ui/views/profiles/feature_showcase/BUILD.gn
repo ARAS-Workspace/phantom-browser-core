@@ -28,8 +28,6 @@ if (enable_dice_support) {
       "feature_showcase_step_eligibility_checker.h",
       "gemini_step_eligibility_checker.cc",
       "gemini_step_eligibility_checker.h",
-      "google_lens_step_eligibility_checker.cc",
-      "google_lens_step_eligibility_checker.h",
       "themes_and_customization_step_eligibility_checker.cc",
       "themes_and_customization_step_eligibility_checker.h",
     ]
@@ -49,7 +47,6 @@ if (enable_dice_support) {
       "//chrome/browser/sync:factories",
       "//chrome/browser/themes",
       "//chrome/browser/ui/actions:actions_headers",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/toolbar/pinned_toolbar",
       "//chrome/common",
       "//components/password_manager/core/common",
@@ -64,7 +61,6 @@ if (enable_dice_support) {
       "default_browser_step_eligibility_checker_unittest.cc",
       "feature_showcase_eligibility_tracker_unittest.cc",
       "gemini_step_eligibility_checker_unittest.cc",
-      "google_lens_step_eligibility_checker_unittest.cc",
       "themes_and_customization_step_eligibility_checker_unittest.cc",
     ]
 
@@ -78,10 +74,8 @@ if (enable_dice_support) {
       "//chrome/browser/themes",
       "//chrome/browser/ui/actions",
       "//chrome/browser/ui/actions:actions_headers",
-      "//chrome/browser/ui/lens",
       "//chrome/browser/ui/toolbar/pinned_toolbar",
       "//chrome/test:test_support",
-      "//components/lens:lens_url_utils",
       "//components/metrics",
       "//components/metrics:test_support",
       "//components/password_manager/core/common",

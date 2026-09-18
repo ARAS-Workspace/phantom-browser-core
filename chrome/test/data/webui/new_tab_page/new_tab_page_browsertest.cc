@@ -2,17 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include <tuple>
-
-#include "base/strings/stringprintf.h"
 #include "base/test/scoped_feature_list.h"
-#include "build/build_config.h"
-#include "chrome/browser/ui/webui/new_tab_page/composebox/variations/composebox_fieldtrial.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/history_clusters/core/features.h"
-#include "components/omnibox/browser/aim_eligibility_service.h"
 #include "components/search/ntp_features.h"
 #include "content/public/test/browser_test.h"
 
@@ -20,29 +13,7 @@ class NewTabPageBrowserTest : public WebUIMochaBrowserTest {
  protected:
   NewTabPageBrowserTest() {
     set_test_loader_host(chrome::kChromeUINewTabPageHost);
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{},
-        /*disabled_features=*/{omnibox::kAimServerEligibilityEnabled,
-                               ntp_realbox::kNtpRealboxNext,
-                               contextual_tasks::kContextualTasksContext});
   }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-class NewTabPageNextBrowserTest : public WebUIMochaBrowserTest {
- protected:
-  NewTabPageNextBrowserTest() {
-    set_test_loader_host(chrome::kChromeUINewTabPageHost);
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{omnibox::kAimServerEligibilityEnabled,
-                              ntp_realbox::kNtpRealboxNext},
-        /*disabled_features=*/{});
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
 using NewTabPageTest = NewTabPageBrowserTest;
@@ -55,29 +26,15 @@ IN_PROC_BROWSER_TEST_F(NewTabPageTest, VoiceSearchOverlay) {
   RunTest("new_tab_page/voice_search_overlay_test.js", "mocha.run()");
 }
 
-using NewTabPageNextTest = NewTabPageNextBrowserTest;
+using NewTabPageNextTest = NewTabPageBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(NewTabPageNextTest, Realbox) {
   RunTest("new_tab_page/realbox_test.js", "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, RealboxLens) {
-  RunTest("new_tab_page/searchbox_lens_button_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(NewTabPageTest, RealboxSearchbox) {
   RunTest("new_tab_page/searchbox_ntp_test.js",
           "runMochaSuite('SearchboxTest');");
-}
-
-// TODO(crbug.com/40933410):  Re-enable once no longer fails.
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, DISABLED_LensForm) {
-  RunTest("new_tab_page/lens_form_test.js", "mocha.run()");
-}
-
-// TODO(crbug.com/40902230): Test is flaky across platforms.
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, DISABLED_LensUploadDialog) {
-  RunTest("new_tab_page/lens_upload_dialog_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(NewTabPageTest, Logo) {
@@ -107,102 +64,6 @@ IN_PROC_BROWSER_TEST_F(NewTabPageTest, ImageProcessor) {
 IN_PROC_BROWSER_TEST_F(NewTabPageTest, Transparency) {
   RunTest("new_tab_page/transparency_test.js", "mocha.run()");
 }
-
-// TODO(crbug.com/545788432): Flaky on Linux.
-#if BUILDFLAG(IS_LINUX)
-#define MAYBE_Composebox DISABLED_Composebox
-#else
-#define MAYBE_Composebox Composebox
-#endif
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, MAYBE_Composebox) {
-  RunTest("new_tab_page/composebox/composebox_test.js",
-          "runMochaSuite('NewTabPageComposeboxTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxResizeObserver) {
-  RunTest("new_tab_page/composebox/composebox_test.js",
-          "runMochaSuite('NewTabPageComposeboxResizeObserverTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxSubmit) {
-  RunTest("new_tab_page/composebox/composebox_submit_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxAutocompleteDropdown) {
-  RunTest("new_tab_page/composebox/composebox_autocomplete_test.js",
-          "runMochaSuite('NewTabPageComposeboxAutocompleteDropdownTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest,
-                       ComposeboxAutocompleteKeyboardNavigation) {
-  RunTest("new_tab_page/composebox/composebox_autocomplete_test.js",
-          "runMochaSuite('"
-          "NewTabPageComposeboxAutocompleteKeyboardNavigationTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxAutocompleteMatchRemoval) {
-  RunTest("new_tab_page/composebox/composebox_autocomplete_test.js",
-          "runMochaSuite('NewTabPageComposeboxAutocompleteMatchRemovalTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxAutocompleteSmartCompose) {
-  RunTest("new_tab_page/composebox/composebox_autocomplete_test.js",
-          "runMochaSuite('NewTabPageComposeboxAutocompleteSmartComposeTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxAutocompleteQuerying) {
-  RunTest("new_tab_page/composebox/composebox_autocomplete_test.js",
-          "runMochaSuite('NewTabPageComposeboxAutocompleteQueryingTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, CrComposeboxAutocompleteContextTest) {
-  RunTest("new_tab_page/composebox/composebox_autocomplete_test.js",
-          "runMochaSuite('CrComposeboxAutocompleteContextTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxAutocompleteVoiceSearch) {
-  RunTest("new_tab_page/composebox/composebox_autocomplete_test.js",
-          "runMochaSuite('NewTabPageComposeboxAutocompleteVoiceSearchTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxContextMenu) {
-  RunTest("new_tab_page/composebox/composebox_context_menu_test.js",
-          "runMochaSuite('NewTabPageComposeboxContextMenuTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxUploadFileTest) {
-  RunTest("new_tab_page/composebox/composebox_upload_test.js",
-          "runMochaSuite('NewTabPageComposeboxUploadFileTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxUploadPasteTest) {
-  RunTest("new_tab_page/composebox/composebox_upload_test.js",
-          "runMochaSuite('NewTabPageComposeboxUploadPasteTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxUploadToolModeTest) {
-  RunTest("new_tab_page/composebox/composebox_upload_test.js",
-          "runMochaSuite('NewTabPageComposeboxUploadToolModeTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ComposeboxUploadContextTest) {
-  RunTest("new_tab_page/composebox/composebox_upload_test.js",
-          "runMochaSuite('NewTabPageComposeboxUploadContextTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, CrComposeboxUploadContextTest) {
-  RunTest("new_tab_page/composebox/composebox_upload_test.js",
-          "runMochaSuite('CrComposeboxUploadContextTest')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ThreadsRail) {
-  RunTest("new_tab_page/composebox/threads_rail_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageTest, ActionChips) {
-  RunTest("new_tab_page/action_chips/action_chips_test.js", "mocha.run()");
-}
-
 
 using NewTabPageNtpPromoTest = NewTabPageBrowserTest;
 
@@ -335,63 +196,6 @@ IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, CustomizeChromeSidePanel) {
           "runMochaSuite('NewTabPageAppTest CustomizeChromeSidePanel')");
 }
 
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, LensUploadDialog) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest LensUploadDialog')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, Composebox) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest Composebox')");
-}
-
-class NewTabPageAppComposeboxInvariantTest
-    : public NewTabPageBrowserTest,
-      public testing::WithParamInterface<std::tuple<const char*, bool>> {
- public:
-  const char* GetVariant() const { return std::get<0>(GetParam()); }
-  bool GetAnimationEnabled() const { return std::get<1>(GetParam()); }
-};
-
-IN_PROC_BROWSER_TEST_P(NewTabPageAppComposeboxInvariantTest, InvariantChecks) {
-  RunTest("new_tab_page/app_test.js",
-          base::StringPrintf("runMochaSuite('NewTabPageAppTest "
-                             "ComposeboxInvariantChecks_%s_%s')",
-                             GetVariant(),
-                             GetAnimationEnabled() ? "AnimationEnabled"
-                                                   : "AnimationDisabled"));
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    NewTabPageAppComposeboxInvariantTest,
-    testing::Combine(testing::Values("Control",
-                                     "energy-effect-original",
-                                     "energy-effect-darker-shadow",
-                                     "pre-energy-effect-with-border",
-                                     "energy-effect-fusebox"),
-                     testing::Bool()));
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, ComposeEntryPoint) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest ComposeEntryPoint')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, RealboxNext) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest RealboxNext')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, ActionChips) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest ActionChips')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, ThreadsRail) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest ThreadsRail')");
-}
-
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, ReducedMotion) {
   RunTest("new_tab_page/app_test.js",
           "runMochaSuite('NewTabPageAppReducedMotionTest')");
@@ -418,19 +222,9 @@ IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, AutoRemovalToast) {
           "runMochaSuite('NewTabPageAppTest AutoRemovalToast')");
 }
 
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, VoiceSearchCoherence) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppTest VoiceSearchCoherence')");
-}
-
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, VoiceSearchAndSpeechRecognition) {
   RunTest("new_tab_page/app_test.js",
           "runMochaSuite('NewTabPageAppTest VoiceSearchAndSpeechRecognition')");
-}
-
-IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, ContextMenuAnimation) {
-  RunTest("new_tab_page/app_test.js",
-          "runMochaSuite('NewTabPageAppContextMenuAnimationTest')");
 }
 
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, EnergyEffectVariant) {

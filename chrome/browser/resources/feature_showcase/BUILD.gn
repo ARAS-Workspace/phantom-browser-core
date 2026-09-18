@@ -17,8 +17,6 @@ build_webui("build") {
     "feature_showcase.html",
     "images/gemini_illustration_light.png",
     "images/gemini_illustration_dark.png",
-    "images/lens_overlay_illustration_light.png",
-    "images/lens_overlay_illustration_dark.png",
     "images/password_manager_illustration_light.png",
     "images/password_manager_illustration_dark.png",
   ]
@@ -34,8 +32,6 @@ build_webui("build") {
     "feature_showcase_step.html.ts",
     "gemini/gemini_step.ts",
     "gemini/gemini_step.html.ts",
-    "google_lens/google_lens_step.ts",
-    "google_lens/google_lens_step.html.ts",
     "themes_and_customization/themes_and_customization_step.ts",
     "themes_and_customization/themes_and_customization_step.html.ts",
     "password_manager/password_manager_step.ts",
@@ -47,7 +43,6 @@ build_webui("build") {
     "feature_showcase_stepper.css",
     "feature_showcase_step.css",
     "gemini/gemini_step.css",
-    "google_lens/google_lens_step.css",
     "themes_and_customization/themes_and_customization_step.css",
     "password_manager/password_manager_step.css",
   ]
@@ -70,7 +65,6 @@ build_webui("build") {
     "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/default_browser.mojom-webui.ts",
     "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/feature_showcase.mojom-webui.ts",
     "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/gemini.mojom-webui.ts",
-    "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/google_lens.mojom-webui.ts",
     "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/password_manager.mojom-webui.ts",
     "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/themes_and_customization.mojom-webui.ts",
   ]

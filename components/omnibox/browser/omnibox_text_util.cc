@@ -8,7 +8,6 @@
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "build/build_config.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/dom_distiller/core/url_constants.h"
 #include "components/dom_distiller/core/url_utils.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
@@ -144,7 +143,6 @@ void AdjustTextForCopy(
     const GURL& navigation_entry_url,
     AutocompleteClassifier* autocomplete_classifier,
     ::metrics::OmniboxEventProto::PageClassification page_classification,
-    const GURL& contextual_tasks_inner_frame_url,
     GURL* url_from_text,
     bool* write_url) {
   DCHECK(text);
@@ -173,12 +171,6 @@ void AdjustTextForCopy(
       *url_from_text = dom_distiller::url_utils::GetOriginalUrlFromDistillerUrl(
           *url_from_text);
     }
-    // Don't let users copy Contextual Task URLs. We should let them copy the
-    // inner frame URL instead.
-    if (!contextual_tasks_inner_frame_url.is_empty()) {
-      *url_from_text = contextual_tasks_inner_frame_url;
-    }
-
     *text = base::UTF8ToUTF16(url_from_text->spec());
     return;
   }
@@ -211,19 +203,6 @@ void AdjustTextForCopy(
       // current page, since the URL in the Omnibox will be from that match.
       current_page_url = current_match.destination_url;
     }
-  }
-
-  // If `url_from_text` looks like a "contextual tasks" display URL, then apply
-  // "origin-swapping" logic to generate a valid shareable URL.
-  GURL replacement_url = location_bar_model::AdjustContextualTasksURLForCopy(
-      *url_from_text, contextual_tasks_inner_frame_url);
-  if (replacement_url.is_valid()) {
-    *url_from_text = replacement_url;
-    *text = base::UTF8ToUTF16(url_from_text->spec());
-    // In order for "origin-swapping" to work properly, we need to ensure that
-    // callers interpret the copied text as "plain text" content.
-    *write_url = false;
-    return;
   }
 
   // If the user has altered the host piece of the omnibox text, then we cannot

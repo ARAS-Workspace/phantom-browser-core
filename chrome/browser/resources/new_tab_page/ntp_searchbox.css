@@ -5,9 +5,8 @@
 /* #css_wrapper_metadata_start
  * #type=style-lit
  * #import=//resources/cr_elements/cr_icons_lit.css.js
- * #import=//resources/cr_components/composebox/composebox_shared_style.css.js
  * #scheme=relative
- * #include=cr-icons-lit composebox-shared-style
+ * #include=cr-icons-lit
  * #css_wrapper_metadata_end */
 
 :host {
@@ -18,7 +17,6 @@
   --cr-searchbox-inner-icon-margin: 8px;
   --cr-searchbox-voice-icon-offset: 16px;
   --cr-searchbox-voice-search-button-width: 0px;
-  --cr-compose-button-width: 104px;
   --cr-searchbox-icon-spacing: 11px;
   border-radius: var(--cr-searchbox-border-radius);
   font-size: var(--cr-searchbox-font-size, 16px);
@@ -134,10 +132,6 @@ cr-searchbox-input::part(searchbox-input) {
   padding-top: 2px;
 }
 
-:host([compose-button-enabled]) cr-searchbox-input::part(searchbox-input) {
-  padding-inline-end: 16px;
-}
-
 :host([ntp-realbox-next-enabled]) cr-searchbox-input::part(searchbox-input) {
   padding-inline-start: 0;
 }
@@ -231,15 +225,6 @@ cr-searchbox-input::part(searchbox-input) {
   background-color: var(--color-searchbox-lens-voice-icon-background);
 }
 
-:host([use-webkit-search-icons_][compose-button-enabled]) #voiceSearchButton,
-:host([use-webkit-search-icons_][compose-button-enabled]) #lensSearchButton {
-  background-color: #1F1F1F;
-}
-
-:host([compose-button-enabled][searchbox-lens-search-enabled_]) {
-  --cr-searchbox-voice-icon-offset: calc(16px + 2 * var(--cr-searchbox-icon-spacing) + var(--cr-searchbox-icon-width) + var(--cr-compose-button-width));
-}
-
 :host([ntp-realbox-next-enabled]) cr-searchbox-input::part(searchbox-input)::placeholder {
   color: var(--cr-composebox-input-placeholder-color, var(--color-composebox-type-ahead));
   font-weight: 400;
@@ -254,10 +239,6 @@ cr-searchbox-input::part(searchbox-input) {
   --cr-searchbox-dropdown-padding-bottom: 10px;
   --cr-searchbox-dropdown-padding-top: 10px;
   --cr-searchbox-height: 56px;
-  /* Cannot touch this searchbox icon size var;
-    it's used by the rainbow outline AI button class in
-    searchbox_compose_button.css. Should be different
-    from other searchbox icons (composebox, voice, lens). */
   --cr-searchbox-icon-size: 40px;
   --cr-searchbox-voice-lens-size: 36px;
   --contextual-entrypoint-and-carousel-context-menu-container-padding-inline-start: 0px;
@@ -286,31 +267,8 @@ cr-searchbox-dropdown::part(dropdown-content) {
   padding-top: unset;
 }
 
-:host([ntp-realbox-next-enabled]) cr-composebox-contextual-entrypoint-and-menu::part(context-menu-entrypoint-icon) {
-  --cr-icon-button-icon-size: 24px;
-  --cr-icon-button-margin-start: 2px;
-  --cr-icon-button-size: 36px;
-}
-
-:host([ntp-realbox-next-enabled]:not([context-menu-glif-animation-state='ineligible'])) cr-composebox-contextual-entrypoint-and-menu::part(context-menu-entrypoint-icon) {
-  /* Account for the margin of the glow container */
-  --cr-icon-button-margin-start: 0px;
-}
-
 :host([ntp-realbox-next-enabled]) .context-menu-container {
   padding-block: 10px;
-}
-
-:host([ntp-realbox-next-enabled]) cr-composebox-contextual-entrypoint-and-menu {
-  color: var(--color-searchbox-results-foreground);
-  padding-inline-end: 6px;
-  padding-inline-start: 8px;
-  position: relative;
-  z-index: 100;
-}
-
-:host-context([ntp-realbox-next-enabled][context-menu-glif-animation-state='ineligible']) cr-composebox-contextual-entrypoint-and-menu {
-  padding-inline-end: 14px;
 }
 
 #inputContainer {
@@ -347,21 +305,6 @@ cr-searchbox-dropdown::part(dropdown-content) {
 
 :host([ntp-realbox-next-enabled]) .searchbox-icon-button-container {
   top: 10px;
-}
-
-:host([ntp-realbox-next-enabled][compose-button-enabled]
-    [searchbox-lens-search-enabled_]) .searchbox-icon-button-container.lens {
-  inset-inline-end: calc(var(--cr-searchbox-icon-spacing) + var(--cr-compose-button-width));
-}
-
-:host([ntp-realbox-next-enabled][compose-button-enabled]
-    [searchbox-lens-search-enabled_]) .searchbox-icon-button-container.voice {
-  inset-inline-end: calc(var(--cr-searchbox-voice-lens-size)
-      + var(--cr-searchbox-icon-spacing) + var(--cr-compose-button-width));
-}
-
-:host([ntp-realbox-next-enabled][is-dragging-file]) {
-  --cr-searchbox-compose-button-z-index: 99;
 }
 
 :host([ntp-realbox-next-enabled][is-dragging-file]) cr-searchbox-input::part(searchbox-input),

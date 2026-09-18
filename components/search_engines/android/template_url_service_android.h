@@ -64,12 +64,6 @@ class TemplateUrlServiceAndroid : public TemplateURLServiceObserver {
   base::android::ScopedJavaLocalRef<jobject> GetComposeplateUrl(
       JNIEnv* env,
       const base::android::JavaRef<jobject>& obj);
-  base::android::ScopedJavaLocalRef<jobject> GetUrlForContextualSearchQuery(
-      JNIEnv* env,
-      const base::android::JavaRef<jstring>& jquery,
-      const base::android::JavaRef<jstring>& jalternate_term,
-      bool jshould_prefetch,
-      const base::android::JavaRef<jstring>& jprotocol_version);
   base::android::ScopedJavaLocalRef<jobject> GetTemplateUrlForKeyword(
       JNIEnv* env,
       const std::u16string& keyword);

@@ -18,7 +18,6 @@
 #include "base/time/time_override.h"
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.h"
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
 #include "chrome/browser/interstitials/security_interstitial_page_test_utils.h"
@@ -51,13 +50,9 @@
 #include "chrome/test/base/interactive_test_utils.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/ui_test_utils.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/lens/lens_features.h"
-#include "components/omnibox/browser/aim_eligibility_service_features.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/location_bar_model.h"
-#include "components/omnibox/browser/mock_aim_eligibility_service.h"
 #include "components/omnibox/browser/omnibox_pref_names.h"
 #include "components/omnibox/browser/omnibox_triggered_feature_service.h"
 #include "components/omnibox/browser/test_scheme_classifier.h"
@@ -130,8 +125,7 @@ class OmniboxViewViewsTest : public InProcessBrowserTest {
         /*disabled_features=*/
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
         // is enabled and then remove these two Features.
-        {omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+        {omnibox::internal::kWebUIOmniboxPopup});
   }
   ~OmniboxViewViewsTest() override = default;
 
@@ -1191,298 +1185,6 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewViewsOnFocusZpsTest,
   location_bar->omnibox_view()->RequestFocus();
 }
 
-class OmniboxViewViewsAIMBrowserTest : public OmniboxViewViewsTest {
- public:
-  void SetUpOnMainThread() override {
-    ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-  }
-
-  void SetUpBrowserContextKeyedServices(
-      content::BrowserContext* context) override {
-    OmniboxViewViewsTest::SetUpBrowserContextKeyedServices(context);
-    SetUpAimEligibilityService(context,
-                               /*is_locally_eligible=*/true,
-                               /*is_server_eligible=*/true,
-                               /*server_eligibility_enabled=*/true);
-  }
-
- protected:
-  void SetUpAimEligibilityService(content::BrowserContext* context,
-                                  bool is_locally_eligible,
-                                  bool is_server_eligible,
-                                  bool server_eligibility_enabled) {
-    AimEligibilityServiceFactory::GetInstance()->SetTestingFactory(
-        Profile::FromBrowserContext(context),
-        base::BindLambdaForTesting([=](content::BrowserContext* context) {
-          Profile* profile = Profile::FromBrowserContext(context);
-          auto mock_service =
-              std::make_unique<testing::NiceMock<MockAimEligibilityService>>(
-                  *profile->GetPrefs(),
-                  TemplateURLServiceFactory::GetForProfile(profile),
-                  /*url_loader_factory=*/nullptr,
-                  /*identity_manager=*/nullptr,
-                  AimEligibilityService::Configuration{});
-          ON_CALL(*mock_service, IsAimLocallyEligible())
-              .WillByDefault(Return(is_locally_eligible));
-          ON_CALL(*mock_service, IsServerEligibilityEnabled())
-              .WillByDefault(Return(server_eligibility_enabled));
-          ON_CALL(*mock_service, IsAimEligible())
-              .WillByDefault(
-                  Return(is_locally_eligible &&
-                         (!server_eligibility_enabled || is_server_eligible)));
-          return static_cast<std::unique_ptr<KeyedService>>(
-              std::move(mock_service));
-        }));
-  }
-
-  PrefService* prefs() { return browser()->GetProfile()->GetPrefs(); }
-
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-class OmniboxViewViewsHintTextLimitingBrowserTest
-    : public OmniboxViewViewsAIMBrowserTest {
- public:
-  OmniboxViewViewsHintTextLimitingBrowserTest() {
-    scoped_feature_list_.InitAndDisableFeature(lens::features::kLensOverlay);
-  }
-
- protected:
-  void FocusAndPaint() {
-    omnibox()->SetUserText(u"");
-    OmniboxViewViews* view = static_cast<OmniboxViewViews*>(omnibox());
-    view->RequestFocus();
-    ui_test_utils::WaitForViewFocus(browser(), VIEW_ID_OMNIBOX, true);
-    gfx::Canvas canvas(gfx::Size(200, 200), 1.0f, true);
-    view->OnPaint(&canvas);
-  }
-
-  static base::Time GetMockTime() { return fake_time_; }
-  static void SetMockTime(base::Time time) { fake_time_ = time; }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-  inline static base::Time fake_time_;
-};
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
-                       HintTextPrefsStartAtZero) {
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 0);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 0);
-}
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
-                       HintTextPrefsIncrementOnFirstImpression) {
-  SetMockTime(base::Time::Now());
-  base::subtle::ScopedTimeClockOverrides time_override(
-      &GetMockTime, /* time_ticks_override */ nullptr,
-      /* thread_ticks_override */ nullptr);
-
-  FocusAndPaint();
-
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 1);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 1);
-  const int today = (GetMockTime() - base::Time::UnixEpoch()).InDays();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintLastImpressionDay), today);
-}
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
-                       HintTextPrefsIncrementOnSecondImpressionSameDay) {
-  SetMockTime(base::Time::Now());
-  base::subtle::ScopedTimeClockOverrides time_override(
-      &GetMockTime, /* time_ticks_override */ nullptr,
-      /* thread_ticks_override */ nullptr);
-
-  // First impression.
-  FocusAndPaint();
-
-  // Blur and refocus for a second impression on the same day.
-  ClickBrowserWindowCenter();
-  FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 2);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 2);
-  const int today = (GetMockTime() - base::Time::UnixEpoch()).InDays();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintLastImpressionDay), today);
-}
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
-                       HintTextPrefsResetDailyCountOnNewDay) {
-  // Set the initial time and install the override.
-  SetMockTime(base::Time::Now());
-  base::subtle::ScopedTimeClockOverrides time_override(
-      &GetMockTime, /* time_ticks_override */ nullptr,
-      /* thread_ticks_override */ nullptr);
-
-  // First impression on the initial day.
-  FocusAndPaint();
-  const int initial_day = (GetMockTime() - base::Time::UnixEpoch()).InDays();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 1);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 1);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintLastImpressionDay),
-            initial_day);
-
-  // Advance time by one day to simulate a new day.
-  SetMockTime(GetMockTime() + base::Days(1));
-
-  // Blur and refocus for a second impression on the new day.
-  ClickBrowserWindowCenter();
-  FocusAndPaint();
-
-  // The daily count should reset to 1, and the total should be 2.
-  const int new_day = (GetMockTime() - base::Time::UnixEpoch()).InDays();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 2);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 1);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintLastImpressionDay), new_day);
-  EXPECT_NE(initial_day, new_day);
-}
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
-                       HintTextPrefsRespectDailyLimit) {
-  SetMockTime(base::Time::Now());
-  base::subtle::ScopedTimeClockOverrides time_override(
-      &GetMockTime, /* time_ticks_override */ nullptr,
-      /* thread_ticks_override */ nullptr);
-
-  // Three impressions to hit the daily limit of 3.
-  FocusAndPaint();
-  ClickBrowserWindowCenter();
-  FocusAndPaint();
-  ClickBrowserWindowCenter();
-  FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 3);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 3);
-
-  // Try to record another impression. Prefs should not change.
-  ClickBrowserWindowCenter();
-  FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 3);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 3);
-}
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
-                       HintTextPrefsRespectTotalLimit) {
-  SetMockTime(base::Time::Now());
-  base::subtle::ScopedTimeClockOverrides time_override(
-      &GetMockTime, /* time_ticks_override */ nullptr,
-      /* thread_ticks_override */ nullptr);
-
-  // Hit the total limit.
-  prefs()->SetInteger(omnibox::kAimHintTotalImpressions, 15);
-
-  // Try to record another impression. Prefs should not change.
-  FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 15);
-  // Daily count should not have been reset or incremented.
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 0);
-}
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
-                       HintTextPrefsIncrementOncePerFocusSession) {
-  // Second paint in the same focus session should NOT increment prefs.
-  FocusAndPaint();
-  FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 1);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 1);
-
-  // Blur and re-focus should now increment prefs.
-  ClickBrowserWindowCenter();
-  FocusAndPaint();
-
-  // Prefs should still not have changed.
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 2);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 2);
-}
-
-class OmniboxViewViewsAIMButtonPreferenceTest
-    : public OmniboxViewViewsAIMBrowserTest {
- public:
-  OmniboxViewViewsAIMButtonPreferenceTest() {
-    scoped_feature_list_.InitAndDisableFeature(lens::features::kLensOverlay);
-  }
-
- protected:
-  void FocusOmnibox() {
-    omnibox()->SetUserText(u"");
-    OmniboxViewViews* view = static_cast<OmniboxViewViews*>(omnibox());
-    view->RequestFocus();
-    ui_test_utils::WaitForViewFocus(browser(), VIEW_ID_OMNIBOX, true);
-  }
-
-  OmniboxViewViews* omnibox_views() {
-    return static_cast<OmniboxViewViews*>(omnibox());
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsAIMButtonPreferenceTest,
-                       ButtonVisibilityTogglesWithPref_OmniboxFocused) {
-  FocusOmnibox();
-  IconLabelBubbleView* ai_mode_icon =
-      omnibox_views()->GetAiModePageActionIconView();
-  ASSERT_TRUE(ai_mode_icon);
-  EXPECT_TRUE(ai_mode_icon->GetVisible());
-
-  chrome::ToggleShowAiModeOmniboxButton(browser());
-  EXPECT_FALSE(ai_mode_icon->GetVisible());
-
-  chrome::ToggleShowAiModeOmniboxButton(browser());
-  EXPECT_TRUE(ai_mode_icon->GetVisible());
-}
-
-class OmniboxViewViewsAIMButtonDynamicTest
-    : public OmniboxViewViewsAIMBrowserTest {
- public:
-  OmniboxViewViewsAIMButtonDynamicTest() {
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        {{omnibox::kWebUIOmniboxDynamicAiModeButton,
-          {{"Omnibox_DynamicAnimation", "true"}}}},
-        {lens::features::kLensOverlay});
-  }
-
- protected:
-  void FocusOmnibox() {
-    omnibox()->SetUserText(u"");
-    OmniboxViewViews* view = static_cast<OmniboxViewViews*>(omnibox());
-    view->RequestFocus();
-    ui_test_utils::WaitForViewFocus(browser(), VIEW_ID_OMNIBOX, true);
-  }
-
-  OmniboxViewViews* omnibox_views() {
-    return static_cast<OmniboxViewViews*>(omnibox());
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsAIMButtonDynamicTest,
-                       QueryShowsArrowIcon) {
-  FocusOmnibox();
-
-  IconLabelBubbleView* ai_mode_icon =
-      omnibox_views()->GetAiModePageActionIconView();
-  ASSERT_TRUE(ai_mode_icon);
-  EXPECT_TRUE(ai_mode_icon->GetVisible());
-
-  // Animation progress starts at 0.0 (Spark icon active)
-  ai_mode_icon->slide_animation_for_testing().SetSlideDuration(
-      base::Seconds(0));
-  EXPECT_EQ(ai_mode_icon->slide_animation_for_testing().GetCurrentValue(), 0.0);
-
-  // Simulate typing in progress
-  auto* edit_model = BrowserWindow::FromBrowser(browser())
-                         ->GetLocationBar()
-                         ->GetOmniboxController()
-                         ->edit_model();
-  edit_model->SetInputInProgress(true);
-  omnibox()->SetUserText(u"a", true);
-
-  // Animation should finish and progress should end at 1.0 (Arrow active)
-  EXPECT_EQ(ai_mode_icon->slide_animation_for_testing().GetCurrentValue(), 1.0);
-}
-
 // OmniboxViewViewsPlaceholderTest
 // -----------------------------------------------------------------------------
 
@@ -1490,38 +1192,11 @@ class OmniboxViewViewsPlaceholderTest : public InProcessBrowserTest {
  public:
   OmniboxViewViewsPlaceholderTest() {
     scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/
-        {contextual_tasks::kContextualTasks,
-         contextual_tasks::kContextualTasksForceEntryPointEligibility},
+        /*enabled_features=*/{},
         /*disabled_features=*/
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
         // is enabled and then remove these two Features.
-        {omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
-  }
-
-  void SetUpInProcessBrowserTestFixture() override {
-    create_services_subscription_ =
-        BrowserContextDependencyManager::GetInstance()
-            ->RegisterCreateServicesCallbackForTesting(
-                base::BindRepeating(&OmniboxViewViewsPlaceholderTest::
-                                        OnWillCreateBrowserContextServices,
-                                    base::Unretained(this)));
-  }
-
-  virtual void OnWillCreateBrowserContextServices(
-      content::BrowserContext* context) {
-    AimEligibilityServiceFactory::GetInstance()->SetTestingFactory(
-        context, base::BindRepeating([](content::BrowserContext* context)
-                                         -> std::unique_ptr<KeyedService> {
-          auto service =
-              std::make_unique<testing::NiceMock<MockAimEligibilityService>>(
-                  *Profile::FromBrowserContext(context)->GetPrefs(), nullptr,
-                  nullptr, nullptr);
-          ON_CALL(*service, IsAimEligible())
-              .WillByDefault(testing::Return(true));
-          return service;
-        }));
+        {omnibox::internal::kWebUIOmniboxPopup});
   }
 
  protected:
@@ -1541,27 +1216,7 @@ class OmniboxViewViewsPlaceholderTest : public InProcessBrowserTest {
 
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
-  base::CallbackListSubscription create_services_subscription_;
 };
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsPlaceholderTest,
-                       ContextualTasksPlaceholderForContextualTasksPage) {
-  // Navigate to the Contextual Tasks page.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), GURL(chrome::kChromeUIContextualTasksURL)));
-
-  // Verify the Contextual Tasks placeholder text should be applied.
-  EXPECT_TRUE(
-      omnibox::ShouldInstallContextualTasksPlaceholderText(location_bar()));
-
-  // Verify the placeholder text is set to the page title.
-  std::u16string page_title = web_contents()->GetTitle();
-  EXPECT_FALSE(page_title.empty());
-  EXPECT_EQ(page_title, omnibox_view()->GetPlaceholderText());
-  // Verify the display text is empty.
-  EXPECT_EQ(u"", omnibox_view()->GetText());
-}
-
 IN_PROC_BROWSER_TEST_F(OmniboxViewViewsPlaceholderTest,
                        DefaultSearchEnginePlaceholderForNewTabPage) {
   // Navigate to the New Tab Page.
@@ -1571,112 +1226,10 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewViewsPlaceholderTest,
   ASSERT_NO_FATAL_FAILURE(
       ui_test_utils::ClickOnView(browser(), VIEW_ID_TAB_CONTAINER));
 
-  // Verify the Contextual Tasks placeholder text should NOT be applied.
-  EXPECT_FALSE(
-      omnibox::ShouldInstallContextualTasksPlaceholderText(location_bar()));
-
   // Verify the placeholder text is set to the default search engine.
   EXPECT_EQ(u"Search Google or type a URL",
             omnibox_view()->GetPlaceholderText());
   // Verify the display text is empty.
-  EXPECT_EQ(u"", omnibox_view()->GetText());
-}
-
-// TODO(crbug.com/470861729): Crashes on linux blink web tests. Re-enable after
-// fixing.
-#if BUILDFLAG(IS_LINUX)
-#define MAYBE_NavigationToAndFromContextualTasks \
-  DISABLED_NavigationToAndFromContextualTasks
-#else
-#define MAYBE_NavigationToAndFromContextualTasks \
-  NavigationToAndFromContextualTasks
-#endif
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsPlaceholderTest,
-                       MAYBE_NavigationToAndFromContextualTasks) {
-  // Navigate to about:blank.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("about:blank")));
-  EXPECT_FALSE(
-      omnibox::ShouldInstallContextualTasksPlaceholderText(location_bar()));
-
-  // Verify the placeholder text is the default search engine.
-  EXPECT_EQ(u"Search Google or type a URL",
-            omnibox_view()->GetPlaceholderText());
-  // Verify the display text is set to the page URL.
-  EXPECT_EQ(u"about:blank", omnibox_view()->GetText());
-
-  // Navigate to the Contextual Tasks page.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), GURL(chrome::kChromeUIContextualTasksURL)));
-  EXPECT_TRUE(
-      omnibox::ShouldInstallContextualTasksPlaceholderText(location_bar()));
-
-  // Verify the placeholder is set to the page title.
-  EXPECT_EQ(web_contents()->GetTitle(), omnibox_view()->GetPlaceholderText());
-  // Verify the display text is empty.
-  EXPECT_EQ(u"", omnibox_view()->GetText());
-
-  // Navigate to the New Tab Page.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(),
-                                           chrome::ChromeUINewTabURLAsGURL()));
-  ASSERT_NO_FATAL_FAILURE(
-      ui_test_utils::ClickOnView(browser(), VIEW_ID_TAB_CONTAINER));
-  EXPECT_FALSE(
-      omnibox::ShouldInstallContextualTasksPlaceholderText(location_bar()));
-
-  // Verify the placeholder text is set to the default search engine.
-  EXPECT_EQ(u"Search Google or type a URL",
-            omnibox_view()->GetPlaceholderText());
-  // Verify the display text is empty.
-  EXPECT_EQ(u"", omnibox_view()->GetText());
-
-  // Navigate back to the Contextual Tasks page.
-  web_contents()->GetController().GoBack();
-  EXPECT_TRUE(content::WaitForLoadStop(web_contents()));
-  EXPECT_TRUE(
-      omnibox::ShouldInstallContextualTasksPlaceholderText(location_bar()));
-
-  // Verify the placeholder is set to the page title.
-  EXPECT_EQ(web_contents()->GetTitle(), omnibox_view()->GetPlaceholderText());
-  // Verify the display text is empty.
-  EXPECT_EQ(u"", omnibox_view()->GetText());
-
-  // Navigate forward to the New Tab Page.
-  web_contents()->GetController().GoForward();
-  EXPECT_TRUE(content::WaitForLoadStop(web_contents()));
-  EXPECT_FALSE(
-      omnibox::ShouldInstallContextualTasksPlaceholderText(location_bar()));
-
-  // Verify the placeholder text is set to the default search engine.
-  EXPECT_EQ(u"Search Google or type a URL",
-            omnibox_view()->GetPlaceholderText());
-  // Verify the display text is empty.
-  EXPECT_EQ(u"", omnibox_view()->GetText());
-}
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsPlaceholderTest,
-                       TitleChangeUpdatesPlaceholder) {
-  // Navigate to the Contextual Tasks page.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), GURL(chrome::kChromeUIContextualTasksURL)));
-
-  // Verify the placeholder text is set to the initial page title.
-  EXPECT_EQ(web_contents()->GetTitle(), omnibox_view()->GetPlaceholderText());
-  // Verify the display text is empty.
-  EXPECT_EQ(u"", omnibox_view()->GetText());
-
-  // Update the title through the navigation entry which notifies the observers
-  // immediately.
-  content::NavigationEntry* entry =
-      web_contents()->GetController().GetLastCommittedEntry();
-  const std::u16string kNewTitle = u"New Contextual Task Title";
-  web_contents()->UpdateTitleForEntry(entry, kNewTitle);
-
-  // Verify the placeholder text is updated to the new page title.
-  EXPECT_TRUE(
-      omnibox::ShouldInstallContextualTasksPlaceholderText(location_bar()));
-  EXPECT_EQ(kNewTitle, web_contents()->GetTitle());
-  EXPECT_EQ(kNewTitle, omnibox_view()->GetPlaceholderText());
-  // Verify the display text remains empty.
   EXPECT_EQ(u"", omnibox_view()->GetText());
 }
 

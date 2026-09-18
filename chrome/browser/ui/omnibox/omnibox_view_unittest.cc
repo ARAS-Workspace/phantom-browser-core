@@ -57,11 +57,6 @@ class OmniboxViewTest : public testing::Test {
  public:
   OmniboxViewTest()
       : bookmark_model_(bookmarks::TestBookmarkClient::CreateModel()) {
-    // Register the preference needed by `OmniboxEditModel`.
-    pref_service_ = std::make_unique<TestingPrefServiceSimple>();
-    pref_service_->registry()->RegisterBooleanPref(
-        omnibox::kShowAiModeOmniboxButton, true);
-
     // Create the controller and the view and wire them together.
     auto omnibox_client = std::make_unique<TestOmniboxClient>();
     omnibox_client_ = omnibox_client.get();
@@ -101,11 +96,6 @@ class OmniboxViewTest : public testing::Test {
 class OmniboxViewPopupTest : public testing::Test {
  public:
   OmniboxViewPopupTest() {
-    // Register the preference needed by `OmniboxEditModel`.
-    pref_service_ = std::make_unique<TestingPrefServiceSimple>();
-    pref_service_->registry()->RegisterBooleanPref(
-        omnibox::kShowAiModeOmniboxButton, true);
-
     // Create the controller and the view and wire them together.
     auto omnibox_client = std::make_unique<TestOmniboxClient>();
     omnibox_client_ = omnibox_client.get();

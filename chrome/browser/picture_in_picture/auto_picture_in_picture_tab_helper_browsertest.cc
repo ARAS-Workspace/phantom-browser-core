@@ -998,8 +998,7 @@ class AutoPictureInPictureTabHelperBrowserTest : public WebRtcTestBase {
     // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox is
     // enabled and then remove the two omnibox features.
     return {blink::features::kBrowserInitiatedAutomaticPictureInPicture,
-            omnibox::internal::kWebUIOmniboxPopup,
-            omnibox::internal::kWebUIOmniboxAimPopup};
+            omnibox::internal::kWebUIOmniboxPopup};
   }
 
   base::SimpleTestTickClock& test_clock() { return test_clock_; }

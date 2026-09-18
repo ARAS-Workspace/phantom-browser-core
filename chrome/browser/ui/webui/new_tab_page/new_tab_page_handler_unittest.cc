@@ -130,7 +130,6 @@ class MockPage : public new_tab_page::mojom::Page {
   MOCK_METHOD(void, SetModulesFreVisibility, (bool));
   MOCK_METHOD(void, SetCustomizeChromeSidePanelVisibility, (bool));
 #endif
-  MOCK_METHOD(void, SetActionChipsVisibility, (bool));
   MOCK_METHOD(void, SetPromo, (new_tab_page::mojom::PromoPtr));
   MOCK_METHOD(void, ShowWebstoreToast, ());
   MOCK_METHOD(void, SetWallpaperSearchButtonVisibility, (bool));
@@ -1796,21 +1795,6 @@ TEST_F(NewTabPageHandlerTest, ModulesVisiblePrefChangeTriggersPageCall) {
   mock_page_.FlushForTesting();
 }
 
-// Tests that UpdateActionChipsVisibility calls the page with
-// SetActionChipsVisibility
-TEST_F(NewTabPageHandlerTest, UpdateActionChipsVisibility) {
-  bool visible;
-  EXPECT_CALL(mock_page_, SetActionChipsVisibility)
-      .Times(1)
-      .WillOnce([&visible](bool visible_arg) { visible = visible_arg; });
-
-  profile_->GetPrefs()->SetBoolean(prefs::kNtpToolChipsVisible, true);
-  mock_page_.FlushForTesting();
-
-  EXPECT_TRUE(visible);
-  EXPECT_TRUE(profile_->GetPrefs()->GetBoolean(prefs::kNtpToolChipsVisible));
-}
-
 #if !BUILDFLAG(IS_ANDROID)
 TEST_F(NewTabPageHandlerTest, ShowWebstoreToast) {
   profile_->GetPrefs()->SetInteger(prefs::kSeedColorChangeCount, 1);
@@ -1826,18 +1810,6 @@ TEST_F(NewTabPageHandlerTest, DoNotShowWebstoreToastOnCountExceeded) {
   mock_page_.FlushForTesting();
 }
 #endif
-
-TEST_F(NewTabPageHandlerTest, IncrementComposeButtonShownCount) {
-  EXPECT_EQ(profile_->GetPrefs()->GetInteger(
-                prefs::kNtpComposeButtonShownCountPrefName),
-            0);
-
-  handler_->IncrementComposeButtonShownCount();
-
-  EXPECT_EQ(profile_->GetPrefs()->GetInteger(
-                prefs::kNtpComposeButtonShownCountPrefName),
-            1);
-}
 
 #if !BUILDFLAG(IS_ANDROID)
 class NewTabPageHandlerHaTSTest : public NewTabPageHandlerTest {
@@ -1965,131 +1937,3 @@ TEST_F(NewTabPageHandlerHaTSTest, InteractedModuleDoesNotTriggerIgnoredHaTS) {
                           NewTabPageHandlerHaTSTest::kSampleModuleId));
 }
 #endif
-
-TEST_F(NewTabPageHandlerTest, RealboxContextMenuAnimation) {
-  PrefService* prefs = profile_->GetPrefs();
-
-  // 1. Initially allowed, counts are 0.
-  {
-    base::test::TestFuture<bool> future;
-    handler_->CanShowRealboxContextMenuAnimation(future.GetCallback());
-    EXPECT_TRUE(future.Take());
-
-    const base::DictValue& dict =
-        prefs->GetDict(prefs::kContextMenuAnimationState);
-    EXPECT_EQ(std::nullopt, dict.FindInt("realbox_daily_count"));
-    EXPECT_EQ(std::nullopt, dict.FindInt("realbox_lifetime_count"));
-  }
-
-  // 2. Record 1st impression.
-  {
-    handler_->RecordRealboxContextMenuAnimationImpression(/*shown=*/true);
-
-    const base::DictValue& dict =
-        prefs->GetDict(prefs::kContextMenuAnimationState);
-    EXPECT_THAT(dict.FindInt("realbox_daily_count"), testing::Optional(1));
-    EXPECT_THAT(dict.FindInt("realbox_lifetime_count"), testing::Optional(1));
-    histogram_tester_.ExpectBucketCount(
-        "Omnibox.ContextMenu.AnimationShown.NTP", true, 1);
-  }
-
-  // 3. Play 4 more times (total 5 daily impressions recorded).
-  for (int i = 0; i < 4; ++i) {
-    base::test::TestFuture<bool> future;
-    handler_->CanShowRealboxContextMenuAnimation(future.GetCallback());
-    EXPECT_TRUE(future.Take());
-    handler_->RecordRealboxContextMenuAnimationImpression(/*shown=*/true);
-  }
-
-  // Verify counts are now 5 daily and 5 lifetime.
-  {
-    const base::DictValue& dict =
-        prefs->GetDict(prefs::kContextMenuAnimationState);
-    EXPECT_THAT(dict.FindInt("realbox_daily_count"), testing::Optional(5));
-    EXPECT_THAT(dict.FindInt("realbox_lifetime_count"), testing::Optional(5));
-    histogram_tester_.ExpectBucketCount(
-        "Omnibox.ContextMenu.AnimationShown.NTP", true, 5);
-  }
-
-  // 4. The 6th time, it should not be allowed and record should do nothing to
-  // prefs.
-  {
-    base::test::TestFuture<bool> future;
-    handler_->CanShowRealboxContextMenuAnimation(future.GetCallback());
-    EXPECT_FALSE(future.Take());
-
-    handler_->RecordRealboxContextMenuAnimationImpression(/*shown=*/false);
-
-    const base::DictValue& dict =
-        prefs->GetDict(prefs::kContextMenuAnimationState);
-    EXPECT_THAT(dict.FindInt("realbox_daily_count"), testing::Optional(5));
-    EXPECT_THAT(dict.FindInt("realbox_lifetime_count"), testing::Optional(5));
-    histogram_tester_.ExpectBucketCount(
-        "Omnibox.ContextMenu.AnimationShown.NTP", false, 1);
-  }
-
-  // 5. Simulate a new day (change the date string in prefs).
-  {
-    ScopedDictPrefUpdate update(profile_->GetPrefs(),
-                                prefs::kContextMenuAnimationState);
-    update->Set("realbox_last_impression_time",
-                base::TimeToValue(base::Time::Now() - base::Days(1)));
-  }
-
-  // 6. Requesting now should reset daily count and allow more impressions.
-  {
-    base::test::TestFuture<bool> future;
-    handler_->CanShowRealboxContextMenuAnimation(future.GetCallback());
-    EXPECT_TRUE(future.Take());
-
-    handler_->RecordRealboxContextMenuAnimationImpression(/*shown=*/true);
-
-    const base::DictValue& dict =
-        prefs->GetDict(prefs::kContextMenuAnimationState);
-    EXPECT_THAT(dict.FindInt("realbox_daily_count"), testing::Optional(1));
-    EXPECT_THAT(dict.FindInt("realbox_lifetime_count"), testing::Optional(6));
-    histogram_tester_.ExpectBucketCount(
-        "Omnibox.ContextMenu.AnimationShown.NTP", true, 6);
-  }
-
-  // 7. Bring lifetime count to 19 and verify it caps after 20.
-  {
-    ScopedDictPrefUpdate update(profile_->GetPrefs(),
-                                prefs::kContextMenuAnimationState);
-    update->Set("realbox_lifetime_count", 19);
-    update->Set("realbox_daily_count",
-                0);  // Reset daily for today so we don't hit daily cap.
-  }
-
-  // 20th lifetime impression should still play.
-  {
-    base::test::TestFuture<bool> future;
-    handler_->CanShowRealboxContextMenuAnimation(future.GetCallback());
-    EXPECT_TRUE(future.Take());
-
-    handler_->RecordRealboxContextMenuAnimationImpression(/*shown=*/true);
-
-    const base::DictValue& dict =
-        prefs->GetDict(prefs::kContextMenuAnimationState);
-    EXPECT_THAT(dict.FindInt("realbox_daily_count"), testing::Optional(1));
-    EXPECT_THAT(dict.FindInt("realbox_lifetime_count"), testing::Optional(20));
-    histogram_tester_.ExpectBucketCount(
-        "Omnibox.ContextMenu.AnimationShown.NTP", true, 7);
-  }
-
-  // 21st lifetime impression should be blocked.
-  {
-    base::test::TestFuture<bool> future;
-    handler_->CanShowRealboxContextMenuAnimation(future.GetCallback());
-    EXPECT_FALSE(future.Take());
-
-    handler_->RecordRealboxContextMenuAnimationImpression(/*shown=*/false);
-
-    const base::DictValue& dict =
-        prefs->GetDict(prefs::kContextMenuAnimationState);
-    EXPECT_THAT(dict.FindInt("realbox_daily_count"), testing::Optional(1));
-    EXPECT_THAT(dict.FindInt("realbox_lifetime_count"), testing::Optional(20));
-    histogram_tester_.ExpectBucketCount(
-        "Omnibox.ContextMenu.AnimationShown.NTP", false, 2);
-  }
-}

@@ -7,12 +7,10 @@ package org.chromium.chrome.browser.tabbed_mode;
 import android.view.Window;
 
 import org.chromium.base.supplier.MonotonicObservableSupplier;
-import org.chromium.base.supplier.NullableObservableSupplier;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.browser_controls.BottomControlsStacker;
 import org.chromium.chrome.browser.browser_controls.BrowserControlsStateProvider;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchManager;
 import org.chromium.chrome.browser.fullscreen.FullscreenManager;
 import org.chromium.chrome.browser.keyboard_accessory.ManualFillingComponent;
 import org.chromium.chrome.browser.layouts.LayoutManager;
@@ -47,8 +45,6 @@ public class TabbedSystemUiCoordinator {
      *     checking the state of the bottom browser controls.
      * @param browserControlsStateProvider Supplies a {@link BrowserControlsStateProvider} for the
      *     browser controls.
-     * @param contextualSearchManagerSupplier Supplies a {@link ContextualSearchManager} to watch
-     *     for changes to contextual search and the overlay panel.
      * @param bottomSheetController A {@link BottomSheetController} to interact with and watch for
      *     changes to the bottom sheet.
      * @param omniboxSuggestionsVisualState An optional {@link OmniboxSuggestionsVisualState} for
@@ -67,7 +63,6 @@ public class TabbedSystemUiCoordinator {
             MonotonicObservableSupplier<EdgeToEdgeController> edgeToEdgeControllerSupplier,
             BottomControlsStacker bottomControlsStacker,
             BrowserControlsStateProvider browserControlsStateProvider,
-            NullableObservableSupplier<ContextualSearchManager> contextualSearchManagerSupplier,
             BottomSheetController bottomSheetController,
             @Nullable OmniboxSuggestionsVisualState omniboxSuggestionsVisualState,
             @Nullable ManualFillingComponent manualFillingComponent,
@@ -84,7 +79,6 @@ public class TabbedSystemUiCoordinator {
                         edgeToEdgeControllerSupplier,
                         bottomControlsStacker,
                         browserControlsStateProvider,
-                        contextualSearchManagerSupplier,
                         bottomSheetController,
                         omniboxSuggestionsVisualState,
                         manualFillingComponent,

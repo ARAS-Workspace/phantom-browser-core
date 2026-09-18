@@ -13,7 +13,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/dom_distiller/core/url_constants.h"
 #include "components/dom_distiller/core/url_utils.h"
 #include "components/omnibox/browser/buildflags.h"
@@ -50,19 +49,10 @@ LocationBarModelImpl::~LocationBarModelImpl() = default;
 
 // LocationBarModelImpl Implementation.
 std::u16string LocationBarModelImpl::GetFormattedFullURL() const {
-  if (IsContextualTasksPage()) {
-    return GetContextualTasksDisplayURL();
-  }
   return GetFormattedURL(url_formatter::kFormatUrlOmitDefaults);
 }
 
 std::u16string LocationBarModelImpl::GetURLForDisplay() const {
-  // For the contextual tasks page, apply "origin-swapping" logic in order to
-  // display the proper URL in the Omnibox.
-  if (IsContextualTasksPage()) {
-    return GetContextualTasksDisplayURL();
-  }
-
   url_formatter::FormatUrlTypes format_types =
       url_formatter::kFormatUrlOmitDefaults;
   if (delegate_->ShouldTrimDisplayUrlAfterHostName()) {
@@ -158,14 +148,6 @@ GURL LocationBarModelImpl::GetURL() const {
   return (ShouldDisplayURL() && delegate_->GetURL(&url))
              ? url
              : GURL(url::kAboutBlankURL);
-}
-
-bool LocationBarModelImpl::IsContextualTasksPage() const {
-  return delegate_->IsContextualTasksPage();
-}
-
-GURL LocationBarModelImpl::GetContextualTasksInnerFrameURL() const {
-  return delegate_->GetContextualTasksInnerFrameURL();
 }
 
 security_state::SecurityLevel LocationBarModelImpl::GetSecurityLevel() const {
@@ -317,13 +299,6 @@ std::u16string LocationBarModelImpl::GetSecureAccessibilityText() const {
     default:
       return std::u16string();
   }
-}
-
-std::u16string LocationBarModelImpl::GetContextualTasksDisplayURL() const {
-  const auto inner_frame_url = delegate_->GetContextualTasksInnerFrameURL();
-  GURL display_url =
-      location_bar_model::GetContextualTasksDisplayURL(inner_frame_url);
-  return display_url.is_valid() ? base::UTF8ToUTF16(display_url.spec()) : u"";
 }
 
 bool LocationBarModelImpl::ShouldDisplayURL() const {

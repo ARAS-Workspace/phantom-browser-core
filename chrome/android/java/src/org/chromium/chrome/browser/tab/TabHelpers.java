@@ -12,7 +12,6 @@ import org.chromium.chrome.browser.SwipeRefreshHandler;
 import org.chromium.chrome.browser.accessibility.AccessibilityTabHelper;
 import org.chromium.chrome.browser.app.tabmodel.TabStateStore;
 import org.chromium.chrome.browser.complex_tasks.TaskTabHelper;
-import org.chromium.chrome.browser.contextualsearch.ContextualSearchTabHelper;
 import org.chromium.chrome.browser.display_cutout.DisplayCutoutTabHelper;
 import org.chromium.chrome.browser.dom_distiller.ReaderModeManager;
 import org.chromium.chrome.browser.dom_distiller.TabDistillabilityProvider;
@@ -66,7 +65,6 @@ public final class TabHelpers {
         TabWebContentsObserver.from(tab);
         SwipeRefreshHandler.from(tab);
         AccessibilityTabHelper.from(tab);
-        ContextualSearchTabHelper.from(tab);
         MediaSessionTabHelper.from(tab);
         TabDistillabilityProvider.from(tab);
         TabFavicon.from(tab);

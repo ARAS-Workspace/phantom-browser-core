@@ -390,7 +390,7 @@ void OmniboxEverywhereUIManager::OnMostVisitedPrefChanged() {
 
 void OmniboxEverywhereUIManager::Close() {
   if (widget_) {
-    if (is_file_chooser_open_ || is_drive_picker_open_) {
+    if (is_file_chooser_open_) {
       CleanUpWidget();
       return;
     }
@@ -437,7 +437,6 @@ void OmniboxEverywhereUIManager::CleanUpWidget() {
   }
   last_context_menu_params_ = content::ContextMenuParams();
   is_file_chooser_open_ = false;
-  is_drive_picker_open_ = false;
   is_context_menu_open_ = false;
   is_screenshare_picker_open_ = false;
   is_dragging_ = false;
@@ -462,8 +461,7 @@ bool OmniboxEverywhereUIManager::IsActive() const {
 }
 
 bool OmniboxEverywhereUIManager::HasModalDialogOpen() const {
-  return is_file_chooser_open_ || is_drive_picker_open_ ||
-         is_screenshare_picker_open_;
+  return is_file_chooser_open_ || is_screenshare_picker_open_;
 }
 
 void OmniboxEverywhereUIManager::OnWidgetActivationChanged(
@@ -564,14 +562,6 @@ void OmniboxEverywhereUIManager::OnFileChooserOpened() {
 
 void OmniboxEverywhereUIManager::OnFileChooserClosed() {
   is_file_chooser_open_ = false;
-}
-
-void OmniboxEverywhereUIManager::OnDrivePickerOpened() {
-  is_drive_picker_open_ = true;
-}
-
-void OmniboxEverywhereUIManager::OnDrivePickerClosed() {
-  is_drive_picker_open_ = false;
 }
 
 void OmniboxEverywhereUIManager::OnScreensharePickerOpened() {

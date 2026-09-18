@@ -51,8 +51,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/view_ids.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_bubble_view.h"
-#include "chrome/browser/ui/views/contextual_tasks/contextual_tasks_button.h"
-#include "chrome/browser/ui/views/contextual_tasks/contextual_tasks_close_tab_button.h"
 #include "chrome/browser/ui/views/extensions/extension_popup.h"
 #include "chrome/browser/ui/views/extensions/extensions_container_views.h"
 #include "chrome/browser/ui/views/extensions/extensions_toolbar_button.h"
@@ -101,7 +99,6 @@
 #include "chrome/grit/generated_resources.h"
 #include "chrome/grit/theme_resources.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/core/common/features.h"
@@ -413,18 +410,6 @@ void ToolbarView::Init() {
         AddChildView(std::make_unique<SplitTabsToolbarButton>(browser_));
   }
 
-  if (contextual_tasks::IsContextualTasksUIEnabled() &&
-      contextual_tasks::kShowEntryPoint.Get() ==
-          contextual_tasks::EntryPointOption::kToolbarEphemeralBranded) {
-    auto button = std::make_unique<ContextualTasksButton>(browser_);
-    auto* vts_controller =
-        tabs::VerticalTabStripStateController::From(browser_);
-    if (!vts_controller || !vts_controller->ShouldDisplayVerticalTabs()) {
-      button->SetProperty(views::kMarginsKey, gfx::Insets());
-    }
-    AddChildViewAt(std::move(button), 0);
-  }
-
   if (location_bar_view) {
     location_bar_view_ = AddChildView(std::move(location_bar_view));
     location_bar_ = location_bar_view_;
@@ -495,12 +480,6 @@ void ToolbarView::Init() {
         l10n_util::GetStringUTF16(IDS_APPMENU_TOOLTIP));
     app_menu_button->SetID(VIEW_ID_APP_MENU);
     app_menu_button_ = AddChildView(std::move(app_menu_button));
-  }
-
-  if (base::FeatureList::IsEnabled(contextual_tasks::kContextualTasks) &&
-      contextual_tasks::GetExpandButtonOption() ==
-          contextual_tasks::ExpandButtonOption::kToolbarCloseButton) {
-    AddChildView(std::make_unique<ContextualTasksCloseTabButton>(browser_));
   }
 
   LoadImages();
@@ -1033,14 +1012,6 @@ void ToolbarView::LayoutCommon() {
 
   gfx::Insets interior_margin =
       GetLayoutInsets(LayoutInset::TOOLBAR_INTERIOR_MARGIN);
-
-  auto* vts_controller = tabs::VerticalTabStripStateController::From(browser_);
-  if (contextual_tasks::IsContextualTasksUIEnabled() &&
-      (contextual_tasks::kShowEntryPoint.Get() ==
-       contextual_tasks::EntryPointOption::kToolbarEphemeralBranded) &&
-      (!vts_controller || !vts_controller->ShouldDisplayVerticalTabs())) {
-    interior_margin.set_left(0);
-  }
 
   if (app_menu_button_) {
     const bool expanded = app_menu_button_->IsLabelPresentAndVisible();

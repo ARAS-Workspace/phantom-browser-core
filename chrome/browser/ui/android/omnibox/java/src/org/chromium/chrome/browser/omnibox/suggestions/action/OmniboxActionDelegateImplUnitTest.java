@@ -34,7 +34,6 @@ import org.mockito.junit.MockitoRule;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.IntentUtils;
-import org.chromium.base.UserDataHost;
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
@@ -44,8 +43,6 @@ import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.chrome.browser.tabmodel.TabModelSelector;
 import org.chromium.chrome.browser.tabwindow.TabWindowInfo;
 import org.chromium.chrome.browser.tabwindow.TabWindowManager;
-import org.chromium.chrome.browser.ui.lens.LensOverlayCoordinator;
-import org.chromium.chrome.browser.ui.lens.LensOverlayInvocationSource;
 import org.chromium.components.browser_ui.settings.SettingsNavigation;
 import org.chromium.components.browser_ui.settings.SettingsNavigation.SettingsFragment;
 import org.chromium.content_public.browser.LoadUrlParams;
@@ -74,7 +71,6 @@ public class OmniboxActionDelegateImplUnitTest {
     @Mock private SettingsNavigation mMockSettingsNavigation;
     @Mock private TabModel mTabModel;
     @Mock private TabModelSelector mTabModelSelector;
-    @Mock private LensOverlayCoordinator mLensOverlayCoordinator;
     @Captor private ArgumentCaptor<LoadUrlParams> mLoadParamsCaptor;
 
     private final AtomicReference<Tab> mTabReference = new AtomicReference<>();
@@ -173,18 +169,6 @@ public class OmniboxActionDelegateImplUnitTest {
     public void openQuickDeleteDialog() {
         mDelegate.handleClearBrowsingData();
         verify(mMockOpenQuickDeleteDialog).run();
-    }
-
-    @Test
-    public void openLensOverlay() {
-        // Provide a UserDataHost to prevent LensOverlayCoordinator from crashing on
-        // getOrCreateForTab.
-        UserDataHost userDataHost = new UserDataHost();
-        userDataHost.setUserData(LensOverlayCoordinator.class, mLensOverlayCoordinator);
-        doReturn(userDataHost).when(mTab).getUserDataHost();
-        mDelegate.openLensOverlay();
-        verify(mLensOverlayCoordinator, times(1))
-                .start(LensOverlayInvocationSource.OMNIBOX_PAGE_ACTION);
     }
 
     @Test

@@ -30,7 +30,6 @@
 #include "chrome/browser/ui/webui/webui_toolbar/webui_toolbar_ui.h"
 #include "chrome/common/chrome_features.h"
 #include "components/collaboration/public/features.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/data_sharing/public/features.h"
 #include "content/public/common/content_features.h"
 #include "content/public/test/browser_test_utils.h"
@@ -50,9 +49,6 @@ WebUIPinnedToolbarActionsTestBase::WebUIPinnedToolbarActionsTestBase()
            features::kRoundedIcons,
            // Facilitate testing kActionSidePanelShowComments
            collaboration::features::kCollaborationComments,
-           // Facilitate testing kActionsSidePanelShowContextualTasks
-           contextual_tasks::kContextualTasks,
-           contextual_tasks::kContextualTasksForceEntryPointEligibility,
            // Facilitate testing kActionSendSharedTabGroupFeedback
            data_sharing::features::kDataSharingFeature},
           {}),

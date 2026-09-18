@@ -12,22 +12,15 @@ namespace omnibox {
 
 // An integer pref to store the last day the AIM hint was shown. The day is
 // represented as the number of days since the Unix epoch.
-inline constexpr char kAimHintLastImpressionDay[] =
-    "omnibox.aim_hint_last_impression_day";
 
 // An integer pref to store the number of times the AIM hint has been shown on
 // the day in kAimHintLastImpressionDay.
-inline constexpr char kAimHintDailyImpressionsCount[] =
-    "omnibox.aim_hint_daily_impressions_count";
 
 // An integer pref to store the total number of times the AIM hint has been
 // shown.
-inline constexpr char kAimHintTotalImpressions[] =
-    "omnibox.aim_hint_total_impressions";
 
 // An integer pref stores whether browser AIM features are enabled. E.g.
 // omnibox and NTP AIM entrypoints. Controlled by an admin policy.
-inline constexpr char kAIModeSettings[] = "omnibox.ai_mode_settings";
 
 // An integer pref stores whether 3rd party AIM features are enabled.
 // Controlled by an admin policy.
@@ -73,14 +66,6 @@ inline constexpr char kKeywordSpaceTriggeringEnabled[] =
 // Boolean that specifies whether to always show full URLs in the omnibox.
 inline constexpr char kPreventUrlElisionsInOmnibox[] =
     "omnibox.prevent_url_elisions";
-
-// Boolean that specifies whether to show the LensOverlay entry point.
-inline constexpr char kShowGoogleLensShortcut[] =
-    "omnibox.show_google_lens_shortcut";
-
-// Boolean that specifies whether to show the AI Mode omnibox button.
-inline constexpr char kShowAiModeOmniboxButton[] =
-    "omnibox.show_ai_mode_omnibox_button";
 
 // Boolean that specifies whether to show the search tools at the bottom of the
 // omnibox.

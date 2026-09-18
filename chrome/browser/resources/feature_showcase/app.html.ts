@@ -52,17 +52,6 @@ export function getHtml(this: FeatureShowcaseAppElement) {
       </feature-showcase-password-manager-step>
   ` : ''}
 
-  ${this.hasStep_('google-lens') ? html`
-      <feature-showcase-google-lens-step id="google-lens" slot="view"
-          @step-completed="${this.onStepCompleted_}"
-          ?buttons-disabled="${this.areButtonsDisabled_}">
-        <feature-showcase-stepper slot="stepper"
-            .steps="${this.steps}"
-            .activeIndex="${this.activeStepIndex}">
-        </feature-showcase-stepper>
-      </feature-showcase-google-lens-step>
-  ` : ''}
-
   ${this.hasStep_('themes-and-customization') ? html`
       <feature-showcase-themes-and-customization-step
           id="themes-and-customization"

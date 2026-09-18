@@ -65,9 +65,6 @@ inline constexpr auto kActionIds = std::to_array<actions::ActionId>({
 
 // IMPORTANT NOTE: This assert SHOULD NOT be changed without prior consensus
 // from the page action team.
-static_assert(kActionIds[0] == kActionAiMode,
-              "kActionAiMode must be the first entry in kActionIds to ensure "
-              "it's the left-most page action");
 // IMPORTANT NOTE: This assert SHOULD NOT be changed without prior consensus
 // from the page action team.
 static_assert(

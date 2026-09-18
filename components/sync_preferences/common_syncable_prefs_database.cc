@@ -15,7 +15,6 @@
 #include "components/browsing_data/core/pref_names.h"
 #include "components/commerce/core/pref_names.h"
 #include "components/content_settings/core/common/pref_names.h"
-#include "components/contextual_search/pref_names.h"
 #include "components/desktop_to_mobile_promos/pref_names.h"
 #include "components/language/core/browser/pref_names.h"
 #include "components/metrics/demographics/user_demographics.h"
@@ -121,7 +120,7 @@ enum {
   kFacilitatedPaymentsPix = 72,
   kSyncableTabGroups = 73,
   kAutoPinNewTabGroups = 74,
-  kShowGoogleLensShortcut = 75,
+  // kShowGoogleLensShortcut = 75, (obsolete)
   // kSharingVapidKey = 76, (deprecated)
   kFirstPlusAddressCreationTime = 77,
   kLastPlusAddressFillingTime = 78,
@@ -154,7 +153,7 @@ enum {
   kCrossDeviceMostVisitedHomeModuleEnabled = 106,
   kCrossDeviceTipsHomeModuleEnabled = 107,
   kCrossDeviceMagicStackHomeModuleEnabled = 108,
-  kShowAiModeOmniboxButton = 109,
+  // kShowAiModeOmniboxButton = 109, (obsolete)
   // kAutofillAiSyncedOptInStatus = 110, (deprecated)
   kIOSPromoReminder = 111,
   kAutofillAiReauthBeforeViewingSensitiveData = 112,
@@ -166,7 +165,7 @@ enum {
   kAutofillAtMemoryTriggerInfo = 118,
   kAutofillGmailOtpFillingEnabled = 119,
   kAutofillGmailOtpFillingActivationDismissalTimestamp = 120,
-  kDriveConsentState = 121,
+  // kDriveConsentState = 121,  (obsolete).
   kAutofillAiPrivateInferenceOptInStatus = 122,
   // New entries should be added above this line.
   kSubscriptionEligibilityAiSubscriptionTier =
@@ -269,9 +268,6 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {omnibox::kKeywordSpaceTriggeringEnabled,
          {syncable_prefs_ids::kKeywordSpaceTriggeringEnabled,
           syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {omnibox::kShowGoogleLensShortcut,
-         {syncable_prefs_ids::kShowGoogleLensShortcut, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
         {password_manager::prefs::kCredentialsEnableAutosignin,
          {syncable_prefs_ids::kCredentialsEnableAutosignin,
           syncer::PRIORITY_PREFERENCES, PrefSensitivity::kNone,
@@ -454,15 +450,9 @@ constexpr auto kCommonSyncablePrefsAllowlist =
         {autofill::prefs::kAutofillAmountExtractionAiTermsSeen,
          {syncable_prefs_ids::kAutofillAmountExtractionAiTermsSeen,
           syncer::PREFERENCES, PrefSensitivity::kNone, MergeBehavior::kNone}},
-        {omnibox::kShowAiModeOmniboxButton,
-         {syncable_prefs_ids::kShowAiModeOmniboxButton, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
         {prefs::kIOSPromoReminder,
          {syncable_prefs_ids::kIOSPromoReminder, syncer::PREFERENCES,
           PrefSensitivity::kNone, MergeBehavior::kMergeableDict}},
-        {contextual_search::kDriveConsentState,
-         {syncable_prefs_ids::kDriveConsentState, syncer::PREFERENCES,
-          PrefSensitivity::kNone, MergeBehavior::kNone}},
         {subscription_eligibility::prefs::kAiSubscriptionTier,
          {syncable_prefs_ids::kSubscriptionEligibilityAiSubscriptionTier,
           syncer::PRIORITY_PREFERENCES,

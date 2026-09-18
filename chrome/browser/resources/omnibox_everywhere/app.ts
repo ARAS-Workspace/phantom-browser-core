@@ -3,15 +3,10 @@
 // found in the LICENSE file.
 
 import './omnibox.js';
-import './composebox.js';
 import '/strings.m.js';
-import '//resources/cr_components/composebox/composebox_voice_search.js';
 import '//resources/cr_components/most_visited/most_visited.js';
 import '//resources/cr_components/search/animated_glow.js';
 
-import type {ComposeboxState} from '//resources/cr_components/composebox/common.js';
-import type {ComposeboxVoiceSearchElement, VoicePermissionPromptState} from '//resources/cr_components/composebox/composebox_voice_search.js';
-import type {SearchAnimatedGlowElement} from '//resources/cr_components/search/animated_glow.js';
 import {SearchboxBrowserProxy} from '//resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {EventTracker} from '//resources/js/event_tracker.js';
 import {loadTimeData} from '//resources/js/load_time_data.js';
@@ -20,10 +15,8 @@ import type {PageCallbackRouter} from '//resources/mojo/components/omnibox/brows
 
 import {getCss} from './app.css.js';
 import {getHtml} from './app.html.js';
-import type {OmniboxEverywhereComposeboxElement} from './composebox.js';
 import type {OmniboxEverywhereOmniboxElement} from './omnibox.js';
 
-const PERMISSION_PROMPT_CSS_CLASS = 'permission-prompt-showing';
 const VOICE_IDLE_TIMEOUT_MS = 8000;
 const VOICE_QUERY_LENGTH_LIMIT = 120;
 
@@ -46,14 +39,9 @@ export class OmniboxEverywhereAppElement extends CrLitElement {
         type: Boolean,
         reflect: true,
       },
-      isComposeboxMode_: {type: Boolean},
       searchboxLayoutMode_: {type: String},
       caretAnimationsEnabled_: {type: Boolean},
-      disableComposeboxAnimation_: {type: Boolean},
-      usePecApi_: {type: Boolean},
       isOblongShape_: {type: Boolean},
-      contextManagementInComposeboxEnabled_: {type: Boolean},
-      composeboxState_: {type: Object},
       showVoiceSearchOverlay_: {
         type: Boolean,
         reflect: true,
@@ -71,20 +59,12 @@ export class OmniboxEverywhereAppElement extends CrLitElement {
 
   protected accessor omniboxPopupDebugEnabled_ =
       loadTimeData.getBoolean('omniboxPopupDebugEnabled');
-  protected accessor isComposeboxMode_: boolean = false;
   protected accessor searchboxLayoutMode_: string =
       loadTimeData.getString('searchboxLayoutMode');
   protected accessor caretAnimationsEnabled_: boolean =
       loadTimeData.getBoolean('caretAnimationEnabled');
-  protected accessor disableComposeboxAnimation_: boolean =
-      loadTimeData.getBoolean('composeboxAnimationDisabled');
-  protected accessor usePecApi_: boolean =
-      loadTimeData.getBoolean('contextualMenuUsePecApi');
   protected accessor isOblongShape_: boolean =
       loadTimeData.getBoolean('contextButtonShapeIsOblong');
-  protected accessor contextManagementInComposeboxEnabled_: boolean =
-      loadTimeData.getBoolean('contextManagementInComposeboxEnabled');
-  protected accessor composeboxState_: ComposeboxState|null = null;
   protected accessor showVoiceSearchOverlay_: boolean = false;
   protected accessor hasVoiceSearchError_: boolean = false;
   protected accessor voiceSearchTranscript_: string = '';
@@ -110,32 +90,6 @@ export class OmniboxEverywhereAppElement extends CrLitElement {
   override disconnectedCallback() {
     super.disconnectedCallback();
     this.eventTracker_.removeAll();
-  }
-
-  protected async onOpenComposebox_(e: CustomEvent<ComposeboxState>) {
-    this.composeboxState_ = e.detail;
-    this.isComposeboxMode_ = true;
-    await this.updateComplete;
-    const composebox =
-        this.shadowRoot.querySelector('omnibox-everywhere-composebox');
-    if (composebox) {
-      composebox.focusInput();
-      composebox.playGlowAnimation();
-    }
-  }
-
-  protected async onCloseComposebox_() {
-    this.isComposeboxMode_ = false;
-    await this.updateComplete;
-    const searchbox =
-        this.shadowRoot.querySelector('omnibox-everywhere-omnibox');
-    if (searchbox) {
-      searchbox.focusInput();
-    }
-  }
-
-  protected onComposeboxSubmit_() {
-    this.isComposeboxMode_ = false;
   }
 
   private async onVisibilitychange_() {
@@ -164,12 +118,6 @@ export class OmniboxEverywhereAppElement extends CrLitElement {
     if (dialog && !dialog.open) {
       dialog.showModal();
     }
-    const voiceSearch =
-        this.shadowRoot?.querySelector<ComposeboxVoiceSearchElement>(
-            '#voiceSearch');
-    if (voiceSearch) {
-      voiceSearch.start();
-    }
   }
 
   protected onVoiceSearchOverlayClose_() {
@@ -181,36 +129,6 @@ export class OmniboxEverywhereAppElement extends CrLitElement {
     this.showVoiceSearchOverlay_ = false;
     this.hasVoiceSearchError_ = false;
     this.voiceSearchListening_ = false;
-  }
-
-  protected onVoicePermissionChanged_(
-      e: CustomEvent<VoicePermissionPromptState>) {
-    if (e.detail.isOpened) {
-      this.voiceSearchListening_ = false;
-    } else {
-      this.voiceSearchListening_ =
-          this.showVoiceSearchOverlay_ && !this.hasVoiceSearchError_;
-    }
-    const audioAnimation =
-        this.shadowRoot?.querySelector<SearchAnimatedGlowElement>(
-            '#voiceSearchGlow');
-    if (audioAnimation) {
-      if (e.detail.isOpened) {
-        audioAnimation.classList.add(PERMISSION_PROMPT_CSS_CLASS);
-      } else {
-        audioAnimation.classList.remove(PERMISSION_PROMPT_CSS_CLASS);
-      }
-    }
-    const voiceSearchElement =
-        this.shadowRoot?.querySelector<ComposeboxVoiceSearchElement>(
-            '#voiceSearch');
-    if (voiceSearchElement) {
-      if (e.detail.isOpened) {
-        voiceSearchElement.classList.add(PERMISSION_PROMPT_CSS_CLASS);
-      } else {
-        voiceSearchElement.classList.remove(PERMISSION_PROMPT_CSS_CLASS);
-      }
-    }
   }
 
   protected onVoiceSearchCancel_() {
@@ -253,39 +171,20 @@ export class OmniboxEverywhereAppElement extends CrLitElement {
       return;
     }
 
-    if (this.isComposeboxMode_) {
-      const composebox =
-          this.shadowRoot?.querySelector<OmniboxEverywhereComposeboxElement>(
-              'omnibox-everywhere-composebox');
-      if (composebox) {
-        composebox.setInputText(trimmedQuery);
-        if (submit) {
-          composebox.getSearchboxHandler().submitQuery(
-              trimmedQuery, /*mouse_button=*/ 0, /*alt_key=*/ false,
-              /*ctrl_key=*/ false, /*meta_key=*/ false, /*shift_key=*/ false,
-              /*is_voice_search=*/ true);
-          composebox.submitCleanup();
-        } else {
-          composebox.focusInput();
-          composebox.queryAutocomplete(/*clearMatches=*/ false);
-        }
-      }
-    } else {
-      const searchbox =
-          this.shadowRoot?.querySelector<OmniboxEverywhereOmniboxElement>(
-              'omnibox-everywhere-omnibox');
-      if (searchbox) {
-        searchbox.setInputText(trimmedQuery);
-        if (submit) {
-          searchbox.pageHandler().submitQuery(
-              trimmedQuery, /*mouse_button=*/ 0, /*alt_key=*/ false,
-              /*ctrl_key=*/ false, /*meta_key=*/ false, /*shift_key=*/ false,
-              /*is_voice_search=*/ true);
-          searchbox.clearAutocompleteMatches();
-        } else {
-          searchbox.focusInput();
-          searchbox.queryAutocomplete(trimmedQuery, false, false);
-        }
+    const searchbox =
+        this.shadowRoot?.querySelector<OmniboxEverywhereOmniboxElement>(
+            'omnibox-everywhere-omnibox');
+    if (searchbox) {
+      searchbox.setInputText(trimmedQuery);
+      if (submit) {
+        searchbox.pageHandler().submitQuery(
+            trimmedQuery, /*mouse_button=*/ 0, /*alt_key=*/ false,
+            /*ctrl_key=*/ false, /*meta_key=*/ false, /*shift_key=*/ false,
+            /*is_voice_search=*/ true);
+        searchbox.clearAutocompleteMatches();
+      } else {
+        searchbox.focusInput();
+        searchbox.queryAutocomplete(trimmedQuery, false, false);
       }
     }
   }

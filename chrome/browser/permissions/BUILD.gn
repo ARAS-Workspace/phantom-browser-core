@@ -295,7 +295,6 @@ if (!is_android) {
       ":permissions",
       ":test_support",
       "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/contextual_tasks:ui",
       "//chrome/browser/custom_handlers",
       "//chrome/browser/geolocation",
       "//chrome/browser/media/webrtc",
@@ -307,7 +306,6 @@ if (!is_android) {
       "//chrome/browser/ui/views/permissions",
       "//chrome/test:test_support",
       "//components/back_forward_cache",
-      "//components/contextual_tasks/public",
       "//components/optimization_guide/core:test_support",
       "//components/passage_embeddings/core:test_support",
     ]

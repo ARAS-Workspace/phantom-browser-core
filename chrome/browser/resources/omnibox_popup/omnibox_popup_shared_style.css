@@ -24,7 +24,6 @@
   --color-composebox-file-chip-favicon-background: var(--color-omnibox-composebox-favicon-background);
   --color-composebox-file-chip-text: var(--color-omnibox-text);
   --composebox-context-menu-entrypoint-button-color: var(--color-omnibox-context-entrypoint-text);
-  --cr-composebox-font-size: 14px;
 
   --cr-searchbox-match-icon-container-background-fallback: var(--color-omnibox-results-background-hovered);
   --color-searchbox-background: var(--color-omnibox-results-background);
@@ -80,8 +79,4 @@ cr-searchbox-dropdown {
  */
 :host([can-show-secondary-side][has-secondary-side]) cr-searchbox-dropdown {
   --cr-searchbox-secondary-side-display: block;
-}
-
-.dropdownContainer:has(omnibox-popup-contextual-entrypoint[show-context-entrypoint_]) {
-  padding-bottom: 10px;
 }

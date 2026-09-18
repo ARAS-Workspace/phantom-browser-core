@@ -2505,16 +2505,9 @@ class FirstRunRevampInteractiveUiTest : public FirstRunInteractiveUiBaseTest {
     return *kQuery;
   }
 
-  const DeepQuery& GetFeatureShowcaseGoogleLensSkipButtonQuery() const {
-    static const base::NoDestructor<DeepQuery> kQuery(
-        {"feature-showcase-app", "feature-showcase-google-lens-step",
-         "#skip-button"});
-    return *kQuery;
-  }
-
   // FirstRunInteractiveUiBaseTest:
   std::vector<std::string> GetForcedFeatureShowcaseSteps() const override {
-    return {"default-browser", "google-lens"};
+    return {"default-browser"};
   }
 };
 
@@ -2921,8 +2914,7 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
 
   EXPECT_THAT(histogram_tester().GetAllSamples(
                   "ProfilePicker.FREFlow.FeatureShowcase.StepEligible"),
-              BucketsAre(Bucket(FeatureShowcaseStep::kDefaultBrowser, 1),
-                         Bucket(FeatureShowcaseStep::kGoogleLens, 1)));
+              BucketsAre(Bucket(FeatureShowcaseStep::kDefaultBrowser, 1)));
 
   histogram_tester().ExpectUniqueSample(
       "ProfilePicker.FREFlow.FeatureShowcase.StepShown",
@@ -2971,16 +2963,6 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
       SendAccelerator(kProfilePickerViewId, GetAccelerator(IDC_BACK)),
       PressJsButton(kWebContentsId,
                     GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
-
-      WaitForButtonEnabled(kWebContentsId,
-                           GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      EnsurePresent(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      // Send back accelerator on Google Lens step; should be ignored.
-      SendAccelerator(kProfilePickerViewId, GetAccelerator(IDC_BACK)),
-      PressJsButton(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-
       CompleteFinishOrContinueStep());
 
   WaitForPickerClosed();
@@ -3034,12 +3016,6 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
                     GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
       PressJsButton(kWebContentsId,
                     GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
-      WaitForButtonEnabled(kWebContentsId,
-                           GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      EnsurePresent(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      PressJsButton(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
       CompleteFinishOrContinueStep());
 
   WaitForPickerClosed();
@@ -3096,12 +3072,6 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
       // Pause effects.
       WaitForShow(kProfilePickerToolbarEffectsControlButtonElementId),
       PressButton(kProfilePickerToolbarEffectsControlButtonElementId),
-      WaitForButtonEnabled(kWebContentsId,
-                           GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      EnsurePresent(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      PressJsButton(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
       CompleteFinishOrContinueStep());
 
   WaitForPickerClosed();
@@ -3131,12 +3101,6 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
                     GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
       PressJsButton(kWebContentsId,
                     GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
-      WaitForButtonEnabled(kWebContentsId,
-                           GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      EnsurePresent(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      PressJsButton(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
       // Choose to continue education on the finish or continue step.
       CompleteFinishOrContinueStep(/*start_browsing=*/false));
 
@@ -3195,12 +3159,6 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampSoundDisabledInteractiveUiTest,
                     GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
       PressJsButton(kWebContentsId,
                     GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
-      WaitForButtonEnabled(kWebContentsId,
-                           GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      EnsurePresent(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
-      PressJsButton(kWebContentsId,
-                    GetFeatureShowcaseGoogleLensSkipButtonQuery()),
       // Now wait for navigation to finish or continue step.
       WaitForWebContentsNavigation(kWebContentsId, GetFinishOrContinueURL()),
       // Effects button should be present on the finish or continue step (to

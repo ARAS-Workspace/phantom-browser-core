@@ -2,19 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import '//resources/cr_components/composebox/composebox_file_inputs.js';
-import '//resources/cr_components/composebox/contextual_entrypoint_and_menu.js';
-import '//resources/cr_components/searchbox/searchbox_compose_button.js';
 import '//resources/cr_components/searchbox/searchbox_dropdown.js';
 import '//resources/cr_components/search/animated_glow.js';
 import '//resources/cr_components/searchbox/searchbox_input.js';
 
-import type {ComposeboxState, ContextualUpload, DriveUpload, TabUpload, TabUploadOrigin} from '//resources/cr_components/composebox/common.js';
-import {ContextType, getLoadTimeBoolean, GlifAnimationState, recordContextAdditionMethod, recordContextualElementClickedMetric, recordInputTypeShown, recordModelModeSelection, recordModelModeShown, recordToolModeSelection, recordToolModeShown, TabSuggestionsState} from '//resources/cr_components/composebox/common.js';
-import type {ContextualEntrypointAndMenuElement} from '//resources/cr_components/composebox/contextual_entrypoint_and_menu.js';
-import {ComposeboxContextAddedMethod, GlowAnimationState} from '//resources/cr_components/search/constants.js';
-import {DragAndDropHandler} from '//resources/cr_components/search/drag_drop_handler.js';
-import type {DragAndDropHost} from '//resources/cr_components/search/drag_drop_host.js';
+import {GlowAnimationState} from '//resources/cr_components/search/constants.js';
 import {PlaceholderTextCycler} from '//resources/cr_components/searchbox/placeholder_text_cycler.js';
 import {SearchboxBrowserProxy} from '//resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import type {SearchboxDropdownElement} from '//resources/cr_components/searchbox/searchbox_dropdown.js';
@@ -28,23 +20,11 @@ import {assert} from '//resources/js/assert.js';
 import {loadTimeData} from '//resources/js/load_time_data.js';
 import {CrLitElement} from '//resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from '//resources/lit/v3_0/lit.rollup.js';
-import {DriveDisclaimerStatus, SideType} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import type {DriveUploadError, PageCallbackRouter, PageHandlerInterface, TabInfo} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import type {InputState} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
-import {InputType, ModelMode, ToolMode} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
-import type {Url} from '//resources/mojo/url/mojom/url.mojom-webui.js';
+import {SideType} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
+import type {PageCallbackRouter, PageHandlerInterface, TabInfo} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 
 import {getCss} from './ntp_searchbox.css.js';
 import {getHtml} from './ntp_searchbox.html.js';
-
-
-
-interface ClickEventDetail {
-  button: number;
-  ctrlKey: boolean;
-  metaKey: boolean;
-  shiftKey: boolean;
-}
 
 export interface NtpSearchboxElement {
   $: {
@@ -58,7 +38,7 @@ const NtpSearchboxElementBase =
 
 /** A search box for the NTP that behaves like the Omnibox. */
 export class NtpSearchboxElement extends NtpSearchboxElementBase implements
-    DragAndDropHost, SearchboxMixinInterface {
+    SearchboxMixinInterface {
   static get is() {
     return 'ntp-searchbox';
   }
@@ -81,22 +61,11 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
         reflect: true,
       },
 
-      composeboxEnabled: {type: Boolean},
-
-      composeButtonEnabled: {type: Boolean},
-
-      showComposeButton_: {type: Boolean},
-
       cyclingPlaceholders: {type: Boolean},
 
       isDraggingFile: {
         reflect: true,
         type: Boolean,
-      },
-
-      contextMenuGlifAnimationState: {
-        type: String,
-        reflect: true,
       },
 
       animationState: {
@@ -175,9 +144,7 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
       // Protected properties
       //========================================================================
       tabSuggestions_: {type: Array},
-      inputState_: {type: Object},
       recentTabId_: {type: Number},
-      tabSuggestionsState_: {type: Number},
 
       /** Searchbox default icon (i.e., Google G icon or the search loupe). */
       searchboxIcon_: {type: String},
@@ -199,27 +166,16 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
         reflect: true,
       },
       energyEffectAnimationEnabled: {type: Boolean},
-      hasUserInput_: {type: Boolean},
-      ntpRealboxDynamicAiModeButtonEnabled_: {type: Boolean},
-      contextManagementInComposeboxEnabled: {type: Boolean},
       keepMenuOpenOnTabSelectForRealbox: {type: Boolean},
-      smartTabSharingVisible: {type: Boolean},
       smartTabSharingActive: {type: Boolean},
     };
   }
 
   accessor ntpRealboxNextEnabled: boolean = false;
-  accessor smartTabSharingVisible: boolean =
-      getLoadTimeBoolean('composeboxSmartTabSharingVisible', false);
   accessor smartTabSharingActive: boolean = false;
   accessor energyEffectAnimationEnabled: boolean = false;
-  accessor composeboxEnabled: boolean = false;
-  accessor composeButtonEnabled: boolean = false;
-  protected accessor showComposeButton_: boolean = false;
   accessor cyclingPlaceholders: boolean = false;
   accessor isDraggingFile: boolean = false;
-  accessor contextMenuGlifAnimationState: GlifAnimationState =
-      GlifAnimationState.INELIGIBLE;
   accessor animationState: GlowAnimationState = GlowAnimationState.NONE;
   accessor colorSourceIsBaseline: boolean = false;
   accessor isDark: boolean = false;
@@ -231,12 +187,8 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
       loadTimeData.getBoolean('searchboxCr23Theming');
   accessor searchboxSteadyStateShadow: boolean =
       loadTimeData.getBoolean('searchboxCr23SteadyStateShadow');
-  // `contextManagementInComposeboxEnabled` is also passed in from parent, but
-  // adding as a backup for tests.
-  accessor contextManagementInComposeboxEnabled: boolean =
-      getLoadTimeBoolean('contextManagementInComposeboxEnabled', false);
   accessor keepMenuOpenOnTabSelectForRealbox: boolean =
-      getLoadTimeBoolean('keepMenuOpenOnTabSelectForRealbox', false);
+      loadTimeData.getBoolean('keepMenuOpenOnTabSelectForRealbox');
   accessor placeholderText: string = '';
   accessor recentTabId_: number|null = null;
 
@@ -247,27 +199,17 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
   // is open (and active).
   accessor isListening: boolean = false;
   protected accessor tabSuggestions_: TabInfo[] = [];
-  protected accessor inputState_: InputState|null = null;
-  protected accessor tabSuggestionsState_: TabSuggestionsState =
-      TabSuggestionsState.NOT_STARTED;
   protected accessor searchboxIcon_: string =
       loadTimeData.getString('searchboxDefaultIcon');
   protected accessor searchboxVoiceSearchEnabled_: boolean =
       loadTimeData.getBoolean('searchboxVoiceSearch');
   protected accessor searchboxLensSearchEnabled_: boolean =
       loadTimeData.getBoolean('searchboxLensSearch');
-  protected accessor ntpRealboxDynamicAiModeButtonEnabled_: boolean =
-      loadTimeData.getBoolean('ntpRealboxDynamicAiModeButton');
   protected accessor useWebkitSearchIcons_: boolean = false;
-  protected accessor hasUserInput_: boolean = false;
-  protected dragAndDropHandler: DragAndDropHandler|null = null;
   protected callbackRouter_: PageCallbackRouter;
 
   private placeholderCycler_: PlaceholderTextCycler|null = null;
-  private dragAndDropEnabled_: boolean =
-      loadTimeData.getBoolean('composeboxContextDragAndDropEnabled');
   private onTabStripChangedListenerId_: number|null = null;
-  private contextMenuOpened_: boolean = false;
   private pageHandler_: PageHandlerInterface;
   private autocompleteResultChangedListenerId_: number|null = null;
   private inputStateListenerId_: number|null = null;
@@ -285,30 +227,6 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
     this.autocompleteResultChangedListenerId_ =
         this.callbackRouter_.autocompleteResultChanged.addListener(
             this.onAutocompleteResultChanged.bind(this));
-
-    if (this.ntpRealboxNextEnabled) {
-      this.dragAndDropHandler =
-          new DragAndDropHandler(this, this.dragAndDropEnabled_);
-    }
-    this.onTabStripChangedListenerId_ =
-        this.callbackRouter_.onTabStripChanged.addListener(() => {
-          if (this.contextMenuOpened_) {
-            this.refreshTabSuggestions_(/*forceRefresh=*/ true);
-          } else {
-            this.tabSuggestionsState_ = TabSuggestionsState.NOT_STARTED;
-          }
-        });
-    this.inputStateListenerId_ =
-        this.callbackRouter_.onInputStateChanged.addListener(
-            (inputState: InputState) => {
-              this.inputState_ = inputState;
-              this.inputState_.activeModel = ModelMode.kUnspecified;
-            });
-    this.inputState_ =
-        (await this.pageHandler().getInputState())?.state ?? null;
-    if (this.inputState_) {
-      this.inputState_.activeModel = ModelMode.kUnspecified;
-    }
 
     // <if expr="not is_android">
     this.smartTabSharingActive =
@@ -340,16 +258,10 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
   override willUpdate(changedProperties: PropertyValues<this>) {
     super.willUpdate(changedProperties);
 
-    if (changedProperties.has('composeButtonEnabled') ||
-        changedProperties.has('searchboxChromeRefreshTheming') ||
+    if (changedProperties.has('searchboxChromeRefreshTheming') ||
         changedProperties.has('colorSourceIsBaseline')) {
-      this.useWebkitSearchIcons_ = this.composeButtonEnabled ||
-          (this.searchboxChromeRefreshTheming && !this.colorSourceIsBaseline);
-    }
-
-    if (changedProperties.has('composeButtonEnabled') ||
-        changedProperties.has('result')) {
-      this.showComposeButton_ = this.calculateShowComposeButton_();
+      this.useWebkitSearchIcons_ =
+          this.searchboxChromeRefreshTheming && !this.colorSourceIsBaseline;
     }
 
     if (changedProperties.has('inVoiceSearchMode') ||
@@ -386,16 +298,10 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
   }
 
   protected shouldShowVoiceLens_(isEnabled: boolean): boolean {
-    return isEnabled && this.isInputEmpty() &&
-        !(this.dropdownIsVisible && this.composeButtonEnabled);
+    return isEnabled && this.isInputEmpty();
   }
 
   override handleKeyNavigation(e: KeyboardEvent) {
-    if (this.composeButtonEnabled && e.key === 'Tab' &&
-        this.$.input === this.shadowRoot.activeElement &&
-        this.acceptInlineAutocomplete(e)) {
-      return;
-    }
 
     if (!this.dropdownIsVisible &&
         (e.key === 'ArrowUp' || e.key === 'ArrowDown') &&
@@ -497,14 +403,6 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
     this.$.input.select();
   }
 
-  getDropTarget() {
-    return this;
-  }
-
-  addDroppedFiles(files: FileList) {
-    this.processFiles_(files, ComposeboxContextAddedMethod.DRAG_AND_DROP);
-  }
-
   //============================================================================
   // Event handlers
   //============================================================================
@@ -524,161 +422,16 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
     this.dispatchEvent(new Event('open-voice-search'));
   }
 
-  protected onFileChange_(e: CustomEvent<{files: FileList}>) {
-    this.processFiles_(
-        e.detail.files, ComposeboxContextAddedMethod.CONTEXT_MENU);
-  }
-
   protected onSmartTabSharingActiveChanged_(
       _e: CustomEvent<{active: boolean}>) {
     // <if expr="not is_android">
     this.smartTabSharingActive = _e.detail.active;
     this.pageHandler().setSmartTabSharingActive(_e.detail.active);
-    if (_e.detail.active) {
-      this.openComposebox_();
-    }
     // </if>
   }
 
-  protected onAddTabContext_(e: CustomEvent<{
-    id: number,
-    title: string,
-    url: Url,
-    delayUpload: boolean,
-    origin: TabUploadOrigin,
-  }>) {
-    const attachment: TabUpload = {
-      tabId: e.detail.id,
-      url: e.detail.url,
-      title: e.detail.title,
-      delayUpload: e.detail.delayUpload,
-      origin: e.detail.origin,
-    };
-    recordContextualElementClickedMetric(
-        this.composeboxSource, 'ClassicPopup', ContextType.TAB);
-    this.openComposebox_([attachment]);
-  }
-
-  protected async refreshTabSuggestions_(forceRefresh: boolean = false) {
-    // Only refresh tab suggestions if the context menu is opened.
-    const requiresRefresh = forceRefresh || this.contextMenuOpened_;
-    if (!requiresRefresh ||
-        this.tabSuggestionsState_ === TabSuggestionsState.LOADING ||
-        (this.tabSuggestionsState_ === TabSuggestionsState.LOADED &&
-         !forceRefresh)) {
-      return;
-    }
-    this.tabSuggestionsState_ = TabSuggestionsState.LOADING;
-    try {
-      const {tabs} = await this.pageHandler().getRecentTabs();
-      this.recentTabId_ = tabs[0]?.tabId ?? null;
-      this.tabSuggestions_ = [...tabs];
-      this.tabSuggestionsState_ = TabSuggestionsState.LOADED;
-
-      if (this.contextMenuOpened_ && this.inputState_) {
-        const {allowedInputTypes, disabledInputTypes} = this.inputState_;
-        if (allowedInputTypes.includes(InputType.kBrowserTab) &&
-            !disabledInputTypes.includes(InputType.kBrowserTab) &&
-            this.tabSuggestions_.length > 0) {
-          recordInputTypeShown(
-              InputType.kBrowserTab, this.composeboxSource, 'ClassicPopup');
-        }
-      }
-    } finally {
-      if (this.tabSuggestionsState_ === TabSuggestionsState.LOADING) {
-        this.tabSuggestionsState_ = TabSuggestionsState.NOT_STARTED;
-      }
-    }
-  }
-
-  protected async onGetTabPreview_(e: CustomEvent<{
-    tabId: number,
-    onPreviewFetched: (previewDataUrl: string) => void,
-  }>) {
-    const {previewDataUrl} =
-        await this.pageHandler().getTabPreview(e.detail.tabId);
-    e.detail.onPreviewFetched(previewDataUrl || '');
-  }
-
   protected onContextMenuClosed_() {
-    this.contextMenuOpened_ = false;
-    this.tabSuggestionsState_ = TabSuggestionsState.NOT_STARTED;
     this.blur();
-  }
-
-  protected onRequestTabSuggestionsLoad() {
-    this.refreshTabSuggestions_(/*forceRefresh=*/ true);
-  }
-
-  closeContextMenu() {
-    const context =
-        this.shadowRoot?.querySelector<ContextualEntrypointAndMenuElement>(
-            '#context');
-    if (context) {
-      context.closeMenu();
-    }
-  }
-
-  protected onContextMenuOpened_() {
-    this.contextMenuOpened_ = true;
-    this.refreshTabSuggestions_(/*forceRefresh=*/ true);
-
-    if (this.inputState_) {
-      const {allowedInputTypes, disabledInputTypes} = this.inputState_;
-      allowedInputTypes.forEach((inputType: InputType) => {
-        // The `kBrowserTab` InputType requires special metrics handling as part
-        // of `refreshTabSuggestions_()`.
-        if (inputType !== InputType.kBrowserTab &&
-            !disabledInputTypes.includes(inputType)) {
-          recordInputTypeShown(
-              inputType, this.composeboxSource, 'ClassicPopup');
-        }
-      });
-
-      const {allowedTools, disabledTools} = this.inputState_;
-      allowedTools.forEach((tool: ToolMode) => {
-        if (!disabledTools.includes(tool)) {
-          recordToolModeShown(tool, this.composeboxSource, 'ClassicPopup');
-        }
-      });
-
-      const {allowedModels, disabledModels} = this.inputState_;
-      allowedModels.forEach((model: ModelMode) => {
-        if (!disabledModels.includes(model)) {
-          recordModelModeShown(model, this.composeboxSource, 'ClassicPopup');
-        }
-      });
-    }
-  }
-
-  protected async onOpenDriveUpload_() {
-    // Check if the user has accepted the Drive disclaimer. This handles
-    // the edge case where a user sees the drive option in the menu, but
-    // then revokes Drive permissions.
-    const {status} = await this.pageHandler().getDriveDisclaimerStatus();
-    if (status === DriveDisclaimerStatus.kRestricted) {
-      return;
-    }
-
-    const {response} = await this.pageHandler().onDriveUploadClicked();
-
-    const driveUploads: DriveUpload[] =
-        response.files.map(file => ({
-                             token: file.token,
-                             mimeType: file.mimeType,
-                             fileName: file.fileName,
-                             thumbnailUrl: file.thumbnailUrl ?? null,
-                             iconUrl: file.iconUrl ?? null,
-                           }));
-
-    recordContextualElementClickedMetric(
-        this.composeboxSource, 'ClassicPopup', ContextType.DRIVE);
-
-    if (driveUploads.length > 0 || response.error !== null) {
-      this.openComposebox_(
-          driveUploads, ToolMode.kUnspecified, ModelMode.kUnspecified,
-          response.error ?? undefined);
-    }
   }
 
   protected onContextMenuEntrypointClick_() {
@@ -686,107 +439,8 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
     this.dispatchEvent(new Event('context-menu-entrypoint-click'));
   }
 
-  protected onContextMenuEntrypointHover_() {
-    this.refreshTabSuggestions_(/*forceRefresh=*/ true);
-  }
-
-  protected onToolClick_(e: CustomEvent<{toolMode: ToolMode}>) {
-    this.openComposebox_([], e.detail.toolMode);
-  }
-
-  protected onDeepSearchClick_() {
-    this.openComposebox_([], ToolMode.kDeepSearch);
-  }
-
-  protected onCreateImageClick_() {
-    this.openComposebox_([], ToolMode.kImageGen);
-  }
-
-  protected onModelClick_(e: CustomEvent<{model: ModelMode}>) {
-    this.openComposebox_([], ToolMode.kUnspecified, e.detail.model);
-  }
-
-  protected onComposeClick_(e: CustomEvent<ClickEventDetail>) {
-    // TODO(crbug.com/463667769): Call submitQuery here since RealboxHandler is
-    // now a `ContextualSearchboxHandler`.
-    this.pageHandler().activateMetricsFunnel('AiModeButton');
-
-    chrome.histograms.recordUserAction(
-        'ContextualSearch.AiModeButtonClick.NtpRealbox');
-    chrome.histograms.recordBoolean(
-        'ContextualSearch.AiModeButtonClick.NtpRealbox', true);
-
-    const isSearch = this.selectedMatch?.isSearchType ?? true;
-    if (!isSearch) {
-      this.setInputText('');
-    }
-    const queryText = isSearch ? this.$.input.inputElement.value.trim() : '';
-
-    if (queryText) {
-      const histogramName =
-          'ContextualSearch.UserAction.SubmitQueryV2.NewTabPage';
-      // LINT.IfChange(ContextualSearchContextState)
-      chrome.histograms.recordEnumerationValue(
-          histogramName, /*WithoutContext */ 0,
-          /*ContextualSearchContextState.Size + 1*/ 5);
-      // LINT.ThenChange(//tools/metrics/histograms/metadata/contextual_search/enums.xml:ContextualSearchContextState)
-
-      const userActionName =
-          'ContextualSearch.UserAction.SubmitQueryV2.WithoutContext.NewTabPage';
-      chrome.histograms.recordUserAction(userActionName);
-    }
-
-    if (!this.composeboxEnabled || queryText) {
-      this.pageHandler().notifySessionStarted();
-      this.pageHandler().submitQuery(
-          queryText, e.detail.button, false, /* altKey */
-          e.detail.ctrlKey, e.detail.metaKey, e.detail.shiftKey,
-          /* isVoiceSearch */ false);
-    } else {
-      this.openComposebox_();
-    }
-
-    chrome.histograms.recordBoolean(
-        'NewTabPage.ComposeEntrypoint.Click.UserTextPresent',
-        !this.isInputEmpty());
-  }
-
   protected useCompactLayout_(): boolean {
     return this.searchboxLayoutMode === 'Compact';
-  }
-
-  protected openComposebox_(
-      uploads: ContextualUpload[] = [], mode: ToolMode = ToolMode.kUnspecified,
-      model: ModelMode = ModelMode.kUnspecified, error?: DriveUploadError) {
-    if (this.ntpRealboxNextEnabled) {
-      const context =
-          this.shadowRoot.querySelector<ContextualEntrypointAndMenuElement>(
-              '#context');
-      assert(context);
-      if (!this.keepMenuOpenOnTabSelectForRealbox ||
-          !this.contextManagementInComposeboxEnabled) {
-        context.closeMenu();
-      }
-    }
-
-    if (mode !== ToolMode.kUnspecified) {
-      recordToolModeSelection(mode, this.composeboxSource, 'ClassicPopup');
-    }
-    if (model !== ModelMode.kUnspecified) {
-      recordModelModeSelection(model, this.composeboxSource, 'ClassicPopup');
-    }
-
-    this.fire<ComposeboxState>('open-composebox', {
-      text: this.$.input.inputElement.value,
-      files: uploads,
-      mode: mode,
-      model: model,
-      error: error,
-      // <if expr="not is_android">
-      smartTabSharingActive: this.smartTabSharingActive,
-      // </if>
-    });
-    this.setInputText('');
   }
 
   protected onSearchboxInputPasted_() {
@@ -794,35 +448,8 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
     chrome.histograms.recordUserAction('NewTabPage.Realbox.Paste');
   }
 
-  protected onSearchboxInputFilesPasted_(e: CustomEvent<{files: FileList}>) {
-    this.processFiles_(e.detail.files, ComposeboxContextAddedMethod.COPY_PASTE);
-  }
-
-  protected processFiles_(
-      files: FileList|null,
-      contextAdditionMethod: ComposeboxContextAddedMethod) {
-    if (!files || files.length === 0) {
-      return;
-    }
-    recordContextAdditionMethod(contextAdditionMethod, this.composeboxSource);
-
-    if (contextAdditionMethod === ComposeboxContextAddedMethod.CONTEXT_MENU) {
-      // In practice, the `files` list will only contain a single file when
-      // using the CONTEXT_MENU context addition method in the searchbox.
-      for (const file of files) {
-        const contextType =
-            file.type.includes('image') ? ContextType.IMAGE : ContextType.FILE;
-        recordContextualElementClickedMetric(
-            this.composeboxSource, 'ClassicPopup', contextType);
-      }
-    }
-
-    this.openComposebox_(Array.from(files, (file) => ({file})));
-  }
-
   protected onSearchboxInputTextUpdated_(
       e: CustomEvent<{value: string, isComposing: boolean}>) {
-    this.hasUserInput_ = !!e.detail.value.trim();
     this.onSearchboxInputTextUpdated(e);
   }
 
@@ -852,20 +479,6 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
     const inputHasWrapped = this.initialInputScrollHeight > 0 &&
         this.$.input.scrollHeight > this.initialInputScrollHeight;
     return inputHasWrapped || numMatches === 1;
-  }
-
-  private calculateShowComposeButton_(): boolean {
-    if (!this.composeButtonEnabled) {
-      return false;
-    }
-    if (this.ntpRealboxDynamicAiModeButtonEnabled_) {
-      const firstMatch = this.result?.matches?.[0];
-      if (firstMatch && firstMatch.allowedToBeDefaultMatch
-          && !firstMatch.isSearchType) {
-        return false;
-      }
-    }
-    return true;
   }
 
   protected computePlaceholderText_(placeholderText: string): string {

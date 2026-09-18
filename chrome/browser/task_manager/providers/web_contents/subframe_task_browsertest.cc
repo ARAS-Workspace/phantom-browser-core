@@ -94,8 +94,7 @@ class SubframeTaskBrowserTest : public InProcessBrowserTest {
  public:
   SubframeTaskBrowserTest() {
     scoped_feature_list_.InitWithFeatures(
-        /*enabled_features*/ {omnibox::internal::kWebUIOmniboxPopup,
-                              omnibox::internal::kWebUIOmniboxAimPopup},
+        /*enabled_features*/ {omnibox::internal::kWebUIOmniboxPopup},
         /*disabled_features*/ {});
   }
   SubframeTaskBrowserTest(const SubframeTaskBrowserTest&) = delete;
@@ -275,7 +274,6 @@ class SubframeTaskPDFBrowserTest : public base::test::WithFeatureOverride,
     std::vector<base::test::FeatureRefAndParams> enabled =
         PDFExtensionTestBase::GetEnabledFeatures();
     enabled.push_back({omnibox::internal::kWebUIOmniboxPopup, {}});
-    enabled.push_back({omnibox::internal::kWebUIOmniboxAimPopup, {}});
     return enabled;
   }
 };

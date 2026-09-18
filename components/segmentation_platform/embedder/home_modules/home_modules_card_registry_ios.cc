@@ -21,7 +21,6 @@
 #include "components/segmentation_platform/embedder/home_modules/default_browser_promo_ephemeral_module.h"
 #include "components/segmentation_platform/embedder/home_modules/enhanced_safe_browsing_ephemeral_module.h"
 #include "components/segmentation_platform/embedder/home_modules/ephemeral_module_utils.h"
-#include "components/segmentation_platform/embedder/home_modules/lens_ephemeral_module.h"
 #include "components/segmentation_platform/embedder/home_modules/price_tracking_notification_promo.h"
 #include "components/segmentation_platform/embedder/home_modules/save_passwords_ephemeral_module.h"
 #include "components/segmentation_platform/embedder/home_modules/send_tab_notification_promo.h"

@@ -12,7 +12,6 @@
 #include "chrome/browser/ui/test/test_browser_ui.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/default_browser_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/feature_showcase_constants.h"
-#include "chrome/browser/ui/views/profiles/feature_showcase/google_lens_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/password_manager_feature_showcase_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/themes_and_customization_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/first_run_flow_controller.h"
@@ -53,7 +52,6 @@ const std::vector<FeatureShowcaseTestParam>& GetTestParams() {
 
         const std::string kSteps[] = {
             kFeatureShowcaseDefaultBrowserStepIdentifier,
-            kFeatureShowcaseGoogleLensStepIdentifier,
             kFeatureShowcaseGeminiStepIdentifier,
             kFeatureShowcasePasswordManagerStepIdentifier,
             kFeatureShowcaseThemesAndCustomizationStepIdentifier,
@@ -184,8 +182,6 @@ INSTANTIATE_TEST_SUITE_P(
       std::string step_name = info.param.step;
       if (step_name == kFeatureShowcaseDefaultBrowserStepIdentifier) {
         step_name = "DefaultBrowser";
-      } else if (step_name == kFeatureShowcaseGoogleLensStepIdentifier) {
-        step_name = "GoogleLens";
       } else if (step_name == kFeatureShowcaseGeminiStepIdentifier) {
         step_name = "Gemini";
       } else if (step_name == kFeatureShowcasePasswordManagerStepIdentifier) {

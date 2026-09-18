@@ -65,7 +65,6 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/crx_file/id_util.h"
-#include "components/lens/lens_features.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
@@ -2227,45 +2226,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
   EXPECT_TRUE(pin_button->GetVisible());
   EXPECT_TRUE(pin_button->GetToggled());
   EXPECT_EQ(1u, model->pinned_action_ids().size());
-}
-
-class SidePanelCoordinatorLensOverlayTest : public SidePanelCoordinatorTest {
- public:
-  SidePanelCoordinatorLensOverlayTest() {
-    scoped_feature_list_.Reset();
-    scoped_feature_list_.InitWithFeatures({lens::features::kLensOverlay}, {});
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorLensOverlayTest,
-                       ShowMoreInfoButtonWhenCallbackProvided) {
-  Init();
-  BrowserView::GetBrowserViewForBrowser(browser())
-      ->browser()
-      ->tab_strip_model()
-      ->ActivateTabAt(1);
-  coordinator()->Show(SidePanelEntry::Id::kLensOverlayResults);
-  VerifyEntryExistenceAndValue(contextual_registries_[1]->GetActiveEntry(),
-                               SidePanelEntry::Id::kLensOverlayResults);
-  views::ImageButton* more_info_button = GetHeader()->header_more_info_button();
-  EXPECT_TRUE(more_info_button->GetVisible());
-}
-
-IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorLensOverlayTest,
-                       HideMoreInfoButtonWhenNoCallbackProvided) {
-  Init();
-  BrowserView::GetBrowserViewForBrowser(browser())
-      ->browser()
-      ->tab_strip_model()
-      ->ActivateTabAt(1);
-  coordinator()->Show(SidePanelEntry::Id::kLens);
-  VerifyEntryExistenceAndValue(contextual_registries_[1]->GetActiveEntry(),
-                               SidePanelEntry::Id::kLens);
-  views::ImageButton* more_info_button = GetHeader()->header_more_info_button();
-  EXPECT_FALSE(more_info_button->GetVisible());
 }
 
 // Test that the SidePanelCoordinator behaves and updates corrected when dealing

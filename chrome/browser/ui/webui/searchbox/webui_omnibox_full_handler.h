@@ -7,17 +7,16 @@
 
 #include <memory>
 
-#include "chrome/browser/ui/webui/cr_components/searchbox/contextual_searchbox_handler.h"
-
+#include "chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.h"
 class Profile;
 
 namespace content {
 class WebContents;
 }  // namespace content
 
-// A minimal implementation of ContextualSearchboxHandler that doesn't use an
+// A minimal implementation of SearchboxHandler that doesn't use an
 // OmniboxController or OmniboxEditModel.
-class WebuiOmniboxFullHandler : public ContextualSearchboxHandler {
+class WebuiOmniboxFullHandler : public SearchboxHandler {
  public:
   explicit WebuiOmniboxFullHandler(
       mojo::PendingReceiver<searchbox::mojom::PageHandler>
@@ -25,8 +24,7 @@ class WebuiOmniboxFullHandler : public ContextualSearchboxHandler {
       mojo::PendingRemote<searchbox::mojom::Page> pending_page,
       Profile* profile,
       content::WebContents* web_contents,
-      std::unique_ptr<OmniboxClient> client,
-      GetSessionHandleCallback get_session_callback);
+      std::unique_ptr<OmniboxClient> client);
 
   WebuiOmniboxFullHandler(const WebuiOmniboxFullHandler&) = delete;
   WebuiOmniboxFullHandler& operator=(const WebuiOmniboxFullHandler&) = delete;

@@ -10,7 +10,6 @@
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
-#include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
@@ -37,11 +36,8 @@
 #include "components/bookmarks/common/bookmark_bar_visibility_state.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/bookmarks/test/bookmark_test_helpers.h"
-#include "components/omnibox/browser/aim_eligibility_service.h"
-#include "components/omnibox/browser/aim_eligibility_service_features.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "content/public/test/browser_test.h"
-#include "third_party/omnibox_proto/aim_eligibility_response.pb.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/events/event_constants.h"
 #include "ui/events/keycodes/keyboard_codes.h"
@@ -915,181 +911,4 @@ IN_PROC_BROWSER_TEST_F(FullWebUIOmniboxInteractiveTest,
       WaitForWebContentsReady(kTab2),
       InAnyContext(WaitForHide(OmniboxPopupPresenter::kRoundedResultsFrame)),
       WaitForOmniboxFocus(false));
-}
-
-class FullWebUIOmniboxAimInteractiveTestBase
-    : public FullWebUIOmniboxInteractiveTestBase {
- public:
-  FullWebUIOmniboxAimInteractiveTestBase() = default;
-  ~FullWebUIOmniboxAimInteractiveTestBase() override = default;
-
- protected:
-  static std::vector<base::test::FeatureRefAndParams> GetEnabledFeatures(
-      bool force_enable_aim) {
-    std::vector<base::test::FeatureRefAndParams> features = {
-        {omnibox::kWebUIOmniboxFullPopup, {}},
-        {omnibox::kOmniboxWebUIDeferShowUntilVisualStateReady, {}}};
-    if (force_enable_aim) {
-      features.emplace_back(omnibox::internal::kWebUIOmniboxAimPopup,
-                            base::FieldTrialParams());
-      base::FieldTrialParams simplification_params = {
-          {omnibox::kWebUIOmniboxAimPopupAddContextButtonVariantParam.name,
-           "below_results"},
-          {omnibox::kHideClassicContextButton.name, "false"},
-          {omnibox::kShowLensSearchChip.name, "true"}};
-      features.emplace_back(omnibox::internal::kWebUIOmniboxSimplification,
-                            simplification_params);
-      features.emplace_back(omnibox::kAimEnabled, base::FieldTrialParams());
-    }
-    return features;
-  }
-
-  auto SetAimEligibleResponse() {
-    return Do([this]() {
-      auto* profile = browser()->GetProfile();
-      auto* service = AimEligibilityServiceFactory::GetForProfile(profile);
-      omnibox::AimEligibilityResponse response;
-      response.set_is_eligible(true);
-      response.set_is_fusebox_eligible(true);
-      response.set_is_cobrowse_eligible(true);
-      auto* config = response.mutable_searchbox_config();
-      config->mutable_rule_set();
-      auto* tool_config = config->add_tool_configs();
-      tool_config->set_tool(omnibox::TOOL_MODE_DEEP_SEARCH);
-      tool_config->mutable_rule()->set_allow_all_input_types(true);
-
-      auto* input_config = config->add_input_type_configs();
-      input_config->set_input_type(omnibox::INPUT_TYPE_LENS_IMAGE);
-
-      auto* input_config2 = config->add_input_type_configs();
-      input_config2->set_input_type(omnibox::INPUT_TYPE_LENS_FILE);
-
-      auto* input_config3 = config->add_input_type_configs();
-      input_config3->set_input_type(omnibox::INPUT_TYPE_BROWSER_TAB);
-
-      std::string serialized;
-      response.SerializeToString(&serialized);
-      service->SetEligibilityResponseForDebugging(
-          base::Base64Encode(serialized));
-      ASSERT_TRUE(
-          base::test::RunUntil([&]() { return service->IsAimEligible(); }));
-    });
-  }
-
-  auto WaitForOmniboxAimStateReady(
-      const ui::ElementIdentifier& omnibox_context_entrypoint_contents_id) {
-    return SearchboxInteractiveTestMixin::WaitForOmniboxAimStateReady(
-        omnibox_context_entrypoint_contents_id, kPopupSearchbox);
-  }
-};
-
-class FullWebUIOmniboxSimplificationInteractiveTest
-    : public FullWebUIOmniboxAimInteractiveTestBase {
- public:
-  FullWebUIOmniboxSimplificationInteractiveTest() {
-    std::vector<base::test::FeatureRefAndParams> enabled_features;
-    for (auto& feature : GetEnabledFeatures(/*force_enable_aim=*/true)) {
-      if (feature.feature.get().name !=
-          omnibox::internal::kWebUIOmniboxSimplification.name) {
-        enabled_features.push_back(feature);
-      }
-    }
-    enabled_features.emplace_back(
-        omnibox::internal::kWebUIOmniboxSimplification,
-        base::FieldTrialParams{
-            {omnibox::kWebUIOmniboxAimPopupAddContextButtonVariantParam.name,
-             "below_results"},
-            {omnibox::kHideClassicContextButton.name, "false"},
-            {"Omnibox_ContextButtonHasBackground", "true"},
-            {"Omnibox_ContextButtonShapeIsOblong", "true"},
-            {"Omnibox_ContextButtonShowSuggestionLabel", "true"}});
-    enabled_features.emplace_back(omnibox::kAimUsePecApi,
-                                  base::FieldTrialParams());
-    feature_list_.InitWithFeaturesAndParameters(
-        enabled_features, {omnibox::internal::kWebUIOmniboxPopup,
-                           omnibox::kAimServerEligibilityEnabled,
-                           omnibox::kAimFuseboxEligibilityCheckEnabled});
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(FullWebUIOmniboxSimplificationInteractiveTest,
-                       HasBackgroundApplied) {
-  const DeepQuery kContextButton = {
-      "omnibox-full-app",
-      "omnibox-popup-searchbox",
-      "omnibox-popup-contextual-entrypoint",
-      "#context",
-      "cr-composebox-contextual-entrypoint-button",
-      "#entrypoint"};
-  RunTestSequence(
-      SetAimEligibleResponse(),
-      OpenInitialTabAndFocusOmnibox(kTab1, GURL("chrome://version/")),
-      InAnyContext(WaitForOmniboxAimStateReady(kPopupWebView)),
-      InputWebUIText("a"),
-      WaitForMatch(kPopupWebView, kFirstSuggestionMatchContents,
-                   "suggestion-1"),
-      WaitForJsConditionAt(kPopupWebView, kPopupSearchbox,
-                           "(el) => el && el.dropdownIsVisible"),
-      InAnyContext(WaitForElementToRender(kPopupWebView, kContextButton)),
-      InSameContext(CheckJsResultAt(
-          kPopupWebView, kContextButton,
-          "el => window.getComputedStyle(el).backgroundColor !== 'transparent'",
-          true)));
-}
-
-IN_PROC_BROWSER_TEST_F(FullWebUIOmniboxSimplificationInteractiveTest,
-                       OblongShapeApplied) {
-  const DeepQuery kContextButton = {
-      "omnibox-full-app",
-      "omnibox-popup-searchbox",
-      "omnibox-popup-contextual-entrypoint",
-      "#context",
-      "cr-composebox-contextual-entrypoint-button",
-      "#entrypoint"};
-  DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kOblongStyleApplied);
-  StateChange style_applied;
-  style_applied.event = kOblongStyleApplied;
-  style_applied.where = kContextButton;
-  style_applied.test_function =
-      "(el) => el && window.getComputedStyle(el).borderRadius === \"100px\"";
-  RunTestSequence(
-      SetAimEligibleResponse(),
-      OpenInitialTabAndFocusOmnibox(kTab1, GURL("chrome://version/")),
-      InAnyContext(WaitForOmniboxAimStateReady(kPopupWebView)),
-      InputWebUIText("a"),
-      WaitForMatch(kPopupWebView, kFirstSuggestionMatchContents,
-                   "suggestion-1"),
-      WaitForJsConditionAt(kPopupWebView, kPopupSearchbox,
-                           "(el) => el && el.dropdownIsVisible"),
-      InAnyContext(WaitForElementToRender(kPopupWebView, kContextButton)),
-      InAnyContext(WaitForStateChange(kPopupWebView, style_applied)));
-}
-
-IN_PROC_BROWSER_TEST_F(FullWebUIOmniboxSimplificationInteractiveTest,
-                       HasSuggestionLabel) {
-  const DeepQuery kSuggestionLabel = {
-      "omnibox-full-app",
-      "omnibox-popup-searchbox",
-      "omnibox-popup-contextual-entrypoint",
-      "#context",
-      "cr-composebox-contextual-entrypoint-button",
-      "#description"};
-  std::u16string expected_text =
-      l10n_util::GetStringUTF16(IDS_GOOGLE_SEARCH_BOX_EMPTY_HINT_MULTIMODAL);
-  RunTestSequence(
-      SetAimEligibleResponse(),
-      OpenInitialTabAndFocusOmnibox(kTab1, GURL("chrome://version/")),
-      InAnyContext(WaitForOmniboxAimStateReady(kPopupWebView)),
-      InputWebUIText("a"),
-      WaitForMatch(kPopupWebView, kFirstSuggestionMatchContents,
-                   "suggestion-1"),
-      WaitForJsConditionAt(kPopupWebView, kPopupSearchbox,
-                           "(el) => el && el.dropdownIsVisible"),
-      InAnyContext(WaitForElementToRender(kPopupWebView, kSuggestionLabel)),
-      InSameContext(CheckJsResultAt(kPopupWebView, kSuggestionLabel,
-                                    "el => el.textContent.trim()",
-                                    base::UTF16ToUTF8(expected_text))));
 }

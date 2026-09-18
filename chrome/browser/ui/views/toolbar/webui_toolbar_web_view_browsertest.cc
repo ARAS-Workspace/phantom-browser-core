@@ -107,7 +107,6 @@
 #include "components/collaboration/public/features.h"
 #include "components/content_settings/browser/page_specific_content_settings.h"
 #include "components/content_settings/core/common/content_settings_types.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/data_sharing/public/features.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
 #include "components/performance_manager/public/user_tuning/prefs.h"
@@ -406,8 +405,7 @@ class WebUIToolbarWebViewPixelBrowserTest : public InProcessBrowserTest {
         /*disabled_features=*/
         // TODO(crbug.com/452061489): Fix tests that fail when the WebUI Omnibox
         // is enabled and then remove these two Features.
-        {omnibox::internal::kWebUIOmniboxPopup,
-         omnibox::internal::kWebUIOmniboxAimPopup});
+        {omnibox::internal::kWebUIOmniboxPopup});
   }
 
   void SetUp() override {
@@ -1453,8 +1451,7 @@ class WebUIToolbarWebViewStabilityAboutBlankTest
           /*disabled_features=*/
           // TODO(crbug.com/452061489): Fix tests that fail when the WebUI
           // Omnibox is enabled and then remove these two Features.
-          {omnibox::internal::kWebUIOmniboxPopup,
-           omnibox::internal::kWebUIOmniboxAimPopup});
+          {omnibox::internal::kWebUIOmniboxPopup});
     } else {
       param_feature_list_.InitWithFeatures(
           /*enabled_features=*/{},
@@ -1462,8 +1459,7 @@ class WebUIToolbarWebViewStabilityAboutBlankTest
           // TODO(crbug.com/452061489): Fix tests that fail when the WebUI
           // Omnibox is enabled and then remove the two omnibox Features below.
           {features::kDebugTopChromeWebUI,
-           omnibox::internal::kWebUIOmniboxPopup,
-           omnibox::internal::kWebUIOmniboxAimPopup});
+           omnibox::internal::kWebUIOmniboxPopup});
     }
   }
 

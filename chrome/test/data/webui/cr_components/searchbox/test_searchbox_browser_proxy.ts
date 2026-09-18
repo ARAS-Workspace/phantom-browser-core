@@ -4,17 +4,13 @@
 
 import type {WindowOpenDisposition} from '//resources/mojo/ui/base/mojom/window_open_disposition.mojom-webui.js';
 import type {NavigationPredictor} from 'chrome://resources/mojo/components/omnibox/browser/omnibox.mojom-webui.js';
-import type {ActionModifiers, InputMethod, OmniboxPopupSelection, PageHandlerInterface, PageRemote, PlaceholderConfig, SelectedFileInfo, SmartComposeStats, SuggestInventory} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
+import type {ActionModifiers, InputMethod, OmniboxPopupSelection, PageHandlerInterface, PageRemote, PlaceholderConfig, SmartComposeStats, SuggestInventory} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {DriveDisclaimerStatus, PageCallbackRouter} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import type {ModelMode, ToolMode} from 'chrome://resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
-import type {BigBuffer} from 'chrome://resources/mojo/mojo/public/mojom/base/big_buffer.mojom-webui.js';
 import type {String16} from 'chrome://resources/mojo/mojo/public/mojom/base/string16.mojom-webui.js';
 import type {TimeTicks} from 'chrome://resources/mojo/mojo/public/mojom/base/time.mojom-webui.js';
 import type {UnguessableToken} from 'chrome://resources/mojo/mojo/public/mojom/base/unguessable_token.mojom-webui.js';
 import type {Url} from 'chrome://resources/mojo/url/mojom/url.mojom-webui.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
-
-import {MockInputState} from './searchbox_test_utils.js';
 
 /**
  * Helps track realbox browser call arguments. A mocked page handler remote
@@ -29,8 +25,6 @@ class FakePageHandler extends TestBrowserProxy implements PageHandlerInterface {
     super([
       'activateKeyword',
       'activateMetricsFunnel',
-      'addFileContext',
-      'addTabContext',
       'clearFiles',
       'deleteAutocompleteMatch',
       'deleteContext',
@@ -38,7 +32,6 @@ class FakePageHandler extends TestBrowserProxy implements PageHandlerInterface {
       'executeAction',
       'getCyclingPlaceholderConfig',
       'getDriveDisclaimerStatus',
-      'getInputState',
       'getPageClassification',
       'getRecentTabs',
       'getSmartTabSharingActive',
@@ -51,22 +44,15 @@ class FakePageHandler extends TestBrowserProxy implements PageHandlerInterface {
       'onNavigationLikely',
       'onThumbnailRemoved',
       'openAutocompleteMatch',
-      'openLensSearch',
       'openPopupSelection',
       'openProfilePicker',
       'queryAutocomplete',
-      'recordModelSelectionAction',
-      'recordToolSelectionAction',
-      'setActiveModelMode',
-      'setActiveToolMode',
       'setPopupSelection',
       'setSmartComposeStats',
       'setSmartTabSharingActive',
-      'showContextMenu',
       'startScreenshare',
       'stopAutocomplete',
       'submitQuery',
-      'toggleSuggestionGroupIdVisibility',
       'waitForTabFaviconLoad',
     ]);
   }
@@ -92,10 +78,6 @@ class FakePageHandler extends TestBrowserProxy implements PageHandlerInterface {
       matchSelectionTimestamp,
       isMouseEvent,
     });
-  }
-
-  showContextMenu(point: {x: number, y: number}) {
-    this.methodCalled('showContextMenu', {point});
   }
 
   executeAction(
@@ -161,10 +143,6 @@ class FakePageHandler extends TestBrowserProxy implements PageHandlerInterface {
     this.methodCalled('stopAutocomplete', {clearResult});
   }
 
-  toggleSuggestionGroupIdVisibility(suggestionGroupId: number) {
-    this.methodCalled('toggleSuggestionGroupIdVisibility', {suggestionGroupId});
-  }
-
   getCyclingPlaceholderConfig(): Promise<{config: PlaceholderConfig}> {
     this.methodCalled('getCyclingPlaceholderConfig');
     return Promise.resolve({
@@ -194,22 +172,6 @@ class FakePageHandler extends TestBrowserProxy implements PageHandlerInterface {
     return Promise.resolve({faviconDataUrl: null});
   }
 
-  getInputState() {
-    this.methodCalled('getInputState');
-    if (this.results_.has('getInputState')) {
-      return this.results_.get('getInputState');
-    }
-
-    return Promise.resolve({
-      state: new MockInputState({
-        toolConfigs: [],
-        toolsSectionConfig: {header: ''},
-        modelConfigs: [],
-        modelSectionConfig: {header: ''},
-      }),
-    });
-  }
-
   notifySessionStarted() {
     this.methodCalled('notifySessionStarted');
   }
@@ -218,22 +180,12 @@ class FakePageHandler extends TestBrowserProxy implements PageHandlerInterface {
     this.methodCalled('notifySessionAbandoned');
   }
 
-  addFileContext(fileInfo: SelectedFileInfo, fileBytes: BigBuffer) {
-    this.methodCalled('addFileContext', {fileInfo, fileBytes});
-    return Promise.resolve('');
-  }
-
   onDriveUploadClicked() {
     this.methodCalled('onDriveUploadClicked');
     if (this.results_.has('onDriveUploadClicked')) {
       return this.results_.get('onDriveUploadClicked');
     }
     return Promise.resolve({response: {files: [], error: null}});
-  }
-
-  addTabContext(tabId: number, delayUpload: boolean) {
-    this.methodCalled('addTabContext', {tabId, delayUpload});
-    return Promise.resolve('');
   }
 
   deleteContext(fileToken: UnguessableToken) {
@@ -256,28 +208,8 @@ class FakePageHandler extends TestBrowserProxy implements PageHandlerInterface {
         {queryText, mouseButton, altKey, ctrlKey, metaKey, shiftKey});
   }
 
-  openLensSearch() {
-    this.methodCalled('openLensSearch');
-  }
-
   openProfilePicker() {
     this.methodCalled('openProfilePicker');
-  }
-
-  setActiveToolMode(tool: ToolMode, isSetByServer: boolean) {
-    this.methodCalled('setActiveToolMode', tool, isSetByServer);
-  }
-
-  recordToolSelectionAction(tool: ToolMode) {
-    this.methodCalled('recordToolSelectionAction', tool);
-  }
-
-  setActiveModelMode(model: ModelMode, isSetByAim: boolean) {
-    this.methodCalled('setActiveModelMode', model, isSetByAim);
-  }
-
-  recordModelSelectionAction(model: ModelMode) {
-    this.methodCalled('recordModelSelectionAction', model);
   }
 
   activateMetricsFunnel(funnelName: string) {

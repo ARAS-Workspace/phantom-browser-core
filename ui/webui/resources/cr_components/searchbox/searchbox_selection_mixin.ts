@@ -26,11 +26,6 @@ export function selectionToString(s: OmniboxPopupSelection): string {
   return `{${s.line},${s.state},${s.actionIndex}}`;
 }
 
-export function selectionIsNativelySupported(s: OmniboxPopupSelection):
-    boolean {
-  return s.state !== SelectionLineState.kFocusedButtonContextEntrypoint;
-}
-
 function getSelectionsForMatch(
     match: AutocompleteMatch, matchIndex: number): OmniboxPopupSelection[] {
   if (match.isHidden && !match.allowedToBeDefaultMatch) {
@@ -81,9 +76,6 @@ type Constructor<T> = new (...args: any[]) => T;
 type AbstractConstructor<T> = abstract new (...args: any[]) => T;
 
 export interface SearchboxSelectionMixinInterface {
-  isAimButtonVisible: boolean;
-  showContextEntrypoint: boolean;
-
   selection: OmniboxPopupSelection;
   setSelection(selection: OmniboxPopupSelection): void;
 
@@ -96,7 +88,6 @@ export interface SearchboxSelectionMixinInterface {
       step: SelectionStep): OmniboxPopupSelection;
 
   onSelectionChanged(e: CustomEvent<{value: OmniboxPopupSelection}>): void;
-  isAiModeVirtualFocused(): boolean;
 }
 
 export type SearchboxSelectionMixinBase = CrLitElement;
@@ -107,9 +98,6 @@ export const SearchboxSelectionMixin = <
   abstract class SearchboxSelectionMixin extends superClass implements
       SearchboxSelectionMixinInterface {
     private selection_: OmniboxPopupSelection = kDefaultSelection;
-
-    abstract get isAimButtonVisible(): boolean;
-    abstract get showContextEntrypoint(): boolean;
 
     get selection(): OmniboxPopupSelection {
       return this.selection_;
@@ -130,48 +118,12 @@ export const SearchboxSelectionMixin = <
       this.setSelection(e.detail.value);
     }
 
-    isAiModeVirtualFocused(): boolean {
-      return this.selection_.state === SelectionLineState.kFocusedButtonAim;
-    }
-
     getAvailableSelections(result: AutocompleteResult|null):
         OmniboxPopupSelection[] {
       if (!result) {
         return [];
       }
-      const available = getMatchSelections(result);
-
-      if (this.showContextEntrypoint) {
-        available.push({
-          line: -1,
-          state: SelectionLineState.kFocusedButtonContextEntrypoint,
-          actionIndex: 0,
-        });
-      }
-
-      if (this.isAimButtonVisible) {
-        const insertionIndex =
-            available.length > 0 && result.matches[0]?.allowedToBeDefaultMatch ?
-            1 :
-            0;
-        available.splice(insertionIndex, 0, {
-          line: result.matches.findIndex(
-              (m: AutocompleteMatch) => m.allowedToBeDefaultMatch),
-          state: SelectionLineState.kFocusedButtonAim,
-          actionIndex: 0,
-        });
-        if (!result.matches[0]?.allowedToBeDefaultMatch) {
-          // If there is no default match, we need a generic selection to
-          // represent the input field so that it can be focused.
-          available.splice(0, 0, {
-            line: -1,
-            state: SelectionLineState.kNormal,
-            actionIndex: 0,
-          });
-        }
-      }
-
-      return available;
+      return getMatchSelections(result);
     }
 
     getNextSelection(
