@@ -96,8 +96,9 @@ class ProfilePicker {
     // Opens the add new profile view from the app menu.
     kAppMenuProfileSubMenuAddNewProfile = 15,
 
-    // Opens the Glic version of the Profile Picker
-    kGlicManager = 16,
+    // `16` used to be the Glic version of the Profile Picker. It has been
+    // removed but in order to keep backward compatibility, its value has
+    // been retired.
 
     // Opens the profile picker on startup, and creates a profile with an email
     // address.
@@ -157,14 +158,6 @@ class ProfilePicker {
     static Params ForFirstRun(const base::FilePath& profile_path,
                               FirstRunExitedCallback first_run_exited_callback);
 
-    // Builds parameter with the `kForGlicManager` entry point.
-    //
-    // `picked_profile_callback` will be called when a Profile is selected
-    // (returning the loaded profile) or when the picker is closed (returning a
-    // nullptr profile).
-    static Params ForGlicManager(
-        base::OnceCallback<void(Profile*)> picked_profile_callback);
-
     // Builds parameter for the `kOmniboxEverywhere` entry point.
     static Params ForOmniboxEverywhere(
         base::OnceCallback<void(Profile*)> picked_profile_callback);
@@ -183,7 +176,7 @@ class ProfilePicker {
     void NotifyFirstRunExited(FirstRunExitStatus exit_status);
 
     // Calls `picked_profile_callback_`, forwarding the `profile`. See
-    // `ForGlicManager()` for more details.
+    // `ForOmniboxEverywhere()` for more details.
     // This method will be called if the view/controller are destroyed without a
     // profile being picked - the `profile` will be null in this case.
     void NotifyProfilePicked(Profile* profile);

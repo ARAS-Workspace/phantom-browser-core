@@ -164,14 +164,8 @@ enum class ProfileKeepAliveOrigin {
   // command handler, which does not belong to any window.
   kHeadlessCommand = 39,
 
-  // Used by glic to ensure that the profile associated with the glic view is
-  // not destroyed while visible.
-  kGlicView = 40,
-
-  // Used by the `ProfilePickerGlicFlowController` to ensure the loaded profile
-  // is not destroyed before opening the `GlicView` instead of relying on
-  // `kWaitingForFirstBrowserWindow`.
-  kWaitingForGlicView = 41,
+  // `40` and `41` used to be glic entry points. They have been removed but
+  // in order to keep backward compatibility, their values have been retired.
 
   // Used while importing bookmarks from Initial Preferences during Browser
   // First Run.

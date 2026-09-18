@@ -199,10 +199,4 @@ TEST_F(ProfilePickerParamsTest, CanReuse) {
   EXPECT_TRUE(first_run_params.CanReusePickerWindow(first_run_params));
   EXPECT_FALSE(params.CanReusePickerWindow(first_run_params));
   EXPECT_FALSE(first_run_params.CanReusePickerWindow(params));
-
-  ProfilePicker::Params glic_manager_params =
-      ProfilePicker::Params::ForGlicManager(base::DoNothing());
-  EXPECT_TRUE(glic_manager_params.CanReusePickerWindow(glic_manager_params));
-  EXPECT_FALSE(params.CanReusePickerWindow(glic_manager_params));
-  EXPECT_FALSE(glic_manager_params.CanReusePickerWindow(params));
 }

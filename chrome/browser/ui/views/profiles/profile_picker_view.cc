@@ -44,7 +44,6 @@
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_feature_promo_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_flow_controller.h"
-#include "chrome/browser/ui/views/profiles/profile_picker_glic_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_omnibox_everywhere_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_utils.h"
@@ -125,7 +124,6 @@ bool IsClassicProfilePickerFlow(const ProfilePicker::Params& params) {
     case ProfilePicker::EntryPoint::kOnStartupCreateProfileWithEmail:
       return true;
     case ProfilePicker::EntryPoint::kFirstRun:
-    case ProfilePicker::EntryPoint::kGlicManager:
     case ProfilePicker::EntryPoint::kOmniboxEverywhere:
       return false;
   }
@@ -700,17 +698,6 @@ ProfilePickerView::CreateFlowController(Profile* picker_profile,
     return std::make_unique<FirstRunFlowController>(
         /*host=*/this, std::move(clear_host_callback), picker_profile,
         std::move(first_run_exited_callback));
-  }
-
-  if (params_.entry_point() == ProfilePicker::EntryPoint::kGlicManager) {
-    auto profile_picked_callback =
-        base::BindOnce(&ProfilePicker::Params::NotifyProfilePicked,
-                       // Unretained ok because the controller is owned
-                       // by this through `initialized_steps_`.
-                       base::Unretained(&params_));
-    return std::make_unique<ProfilePickerGlicFlowController>(
-        /*host=*/this, std::move(clear_host_callback),
-        std::move(profile_picked_callback));
   }
 
   if (params_.entry_point() == ProfilePicker::EntryPoint::kOmniboxEverywhere) {
