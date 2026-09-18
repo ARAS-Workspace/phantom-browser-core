@@ -325,12 +325,6 @@ DiscardEligibilityPolicy::CanDiscardWithCustomRecentVisibilityWindow(
   }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-  if (live_state_data && is_proactive_or_suggested &&
-      live_state_data->IsGlicPinnedToVisibleInstance()) {
-    add_reason_and_update_result(CannotDiscardReason::kGlicShared,
-                                 CanDiscardResult::kProtected);
-  }
-
   // Only discard http(s) pages and internal pages to make sure that we don't
   // discard extensions or other PageNode that don't correspond to a tab.
   //

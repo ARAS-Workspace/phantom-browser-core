@@ -4,7 +4,6 @@
 
 #include "components/performance_manager/public/decorators/page_live_state_decorator.h"
 
-#include <ostream>
 #include <utility>
 
 #include "base/check.h"
@@ -13,7 +12,6 @@
 #include "base/not_fatal_until.h"
 #include "base/observer_list.h"
 #include "base/sequence_checker.h"
-#include "base/strings/to_string.h"
 #include "base/thread_annotations.h"
 #include "components/performance_manager/decorators/decorators_utils.h"
 #include "components/performance_manager/graph/page_node_impl.h"
@@ -100,14 +98,6 @@ class PageLiveStateDataImpl
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     return is_dev_tools_open_;
   }
-  GlicActuationState GetGlicActuationState() const override {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-    return glic_actuation_state_;
-  }
-  bool IsGlicPinnedToVisibleInstance() const override {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-    return is_glic_pinned_to_visible_instance_;
-  }
   bool UpdatedTitleOrFaviconInBackground() const override {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     return updated_title_or_favicon_in_background_;
@@ -154,12 +144,6 @@ class PageLiveStateDataImpl
   }
   void SetIsDevToolsOpenForTesting(bool value) override {
     set_is_dev_tools_open(value);
-  }
-  void SetGlicActuationStateForTesting(GlicActuationState value) override {
-    set_glic_actuation_state(value);
-  }
-  void SetIsGlicPinnedToVisibleInstanceForTesting(bool value) override {
-    set_is_glic_pinned_to_visible_instance(value);
   }
   void SetUpdatedTitleOrFaviconInBackgroundForTesting(bool value) override {
     set_updated_title_or_favicon_in_background(value);
@@ -282,29 +266,6 @@ class PageLiveStateDataImpl
       obs.OnIsDevToolsOpenChanged(page_node_);
     }
   }
-  void set_glic_actuation_state(GlicActuationState glic_actuation_state) {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-    if (glic_actuation_state_ == glic_actuation_state) {
-      return;
-    }
-    auto previous_state = glic_actuation_state_;
-    glic_actuation_state_ = glic_actuation_state;
-    for (auto& obs : observers_) {
-      obs.OnGlicActuationStateChanged(page_node_, previous_state);
-    }
-  }
-  void set_is_glic_pinned_to_visible_instance(
-      bool is_glic_pinned_to_visible_instance) {
-    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-    if (is_glic_pinned_to_visible_instance_ ==
-        is_glic_pinned_to_visible_instance) {
-      return;
-    }
-    is_glic_pinned_to_visible_instance_ = is_glic_pinned_to_visible_instance;
-    for (auto& obs : observers_) {
-      obs.OnIsGlicPinnedToVisibleInstanceChanged(page_node_);
-    }
-  }
   void set_updated_title_or_favicon_in_background(bool updated) {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     if (updated_title_or_favicon_in_background_ == updated) {
@@ -335,10 +296,6 @@ class PageLiveStateDataImpl
   bool is_active_tab_ GUARDED_BY_CONTEXT(sequence_checker_) = false;
   bool is_pinned_tab_ GUARDED_BY_CONTEXT(sequence_checker_) = false;
   bool is_dev_tools_open_ GUARDED_BY_CONTEXT(sequence_checker_) = false;
-  GlicActuationState glic_actuation_state_
-      GUARDED_BY_CONTEXT(sequence_checker_) = GlicActuationState::kNone;
-  bool is_glic_pinned_to_visible_instance_
-      GUARDED_BY_CONTEXT(sequence_checker_) = false;
   bool updated_title_or_favicon_in_background_
       GUARDED_BY_CONTEXT(sequence_checker_) = false;
 
@@ -348,17 +305,6 @@ class PageLiveStateDataImpl
 const char kDescriberName[] = "PageLiveStateDecorator";
 
 }  // namespace
-
-std::ostream& operator<<(std::ostream& os, GlicActuationState state) {
-  switch (state) {
-    case GlicActuationState::kNone:
-      return os << "None";
-    case GlicActuationState::kActuatingOnBackgroundTab:
-      return os << "ActuatingOnBackgroundTab";
-    case GlicActuationState::kActuatingOnVisibleTab:
-      return os << "ActuatingOnVisibleTab";
-  }
-}
 
 PageLiveStateDecorator::PageLiveStateDecorator() = default;
 PageLiveStateDecorator::~PageLiveStateDecorator() = default;
@@ -530,24 +476,6 @@ void PageLiveStateDecorator::SetIsDevToolsOpen(content::WebContents* contents,
 }
 
 // static
-void PageLiveStateDecorator::SetGlicActuationState(
-    content::WebContents* contents,
-    GlicActuationState glic_actuation_state) {
-  SetPropertyForWebContentsPageNode(
-      contents, &PageLiveStateDataImpl::set_glic_actuation_state,
-      glic_actuation_state);
-}
-
-// static
-void PageLiveStateDecorator::SetIsGlicPinnedToVisibleInstance(
-    content::WebContents* contents,
-    bool is_glic_pinned_to_visible_instance) {
-  SetPropertyForWebContentsPageNode(
-      contents, &PageLiveStateDataImpl::set_is_glic_pinned_to_visible_instance,
-      is_glic_pinned_to_visible_instance);
-}
-
-// static
 bool PageLiveStateDecorator::IsConnectedToUSBDevice(
     content::WebContents* contents) {
   return GetPropertyForWebContentsPageNode<bool>(
@@ -637,20 +565,6 @@ bool PageLiveStateDecorator::IsDevToolsOpen(content::WebContents* contents) {
 }
 
 // static
-GlicActuationState PageLiveStateDecorator::GetGlicActuationState(
-    content::WebContents* contents) {
-  return GetPropertyForWebContentsPageNode<GlicActuationState>(
-      contents, &PageLiveStateDataImpl::GetGlicActuationState);
-}
-
-// static
-bool PageLiveStateDecorator::IsGlicPinnedToVisibleInstance(
-    content::WebContents* contents) {
-  return GetPropertyForWebContentsPageNode<bool>(
-      contents, &PageLiveStateDataImpl::IsGlicPinnedToVisibleInstance);
-}
-
-// static
 bool PageLiveStateDecorator::UpdatedTitleOrFaviconInBackground(
     content::WebContents* contents) {
   return GetPropertyForWebContentsPageNode<bool>(
@@ -689,9 +603,6 @@ base::DictValue PageLiveStateDecorator::DescribePageNodeData(
   ret.Set("IsActiveTab", data->IsActiveTab());
   ret.Set("IsPinnedTab", data->IsPinnedTab());
   ret.Set("IsDevToolsOpen", data->IsDevToolsOpen());
-  ret.Set("GlicActuationState", base::ToString(data->GetGlicActuationState()));
-  ret.Set("IsGlicPinnedToVisibleInstance",
-          data->IsGlicPinnedToVisibleInstance());
   ret.Set("UpdatedTitleOrFaviconInBackground",
           data->UpdatedTitleOrFaviconInBackground());
 
@@ -769,8 +680,6 @@ void PageLiveStateDecorator::OnAboutToBeDiscarded(
     auto* new_data = PageLiveStateDataImpl::GetOrCreate(
         PageNodeImpl::FromNode(new_page_node));
     new_data->set_is_auto_discardable(data->IsAutoDiscardable());
-    new_data->set_is_glic_pinned_to_visible_instance(
-        data->IsGlicPinnedToVisibleInstance());
   }
 }
 

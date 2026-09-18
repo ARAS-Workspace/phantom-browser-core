@@ -251,8 +251,6 @@ BASE_DECLARE_FEATURE(kDisableTabDiscarding);
 // When disabled, falls back to legacy behavior.
 BASE_DECLARE_FEATURE(kUseLoadingStateToDetectBackgroundTitleOrFaviconUpdate);
 
-BASE_DECLARE_FEATURE(kGlicActuationPriorityVoter);
-
 // When enabled, ignores kMediaQueryChange favicon updates (e.g.
 // prefers-color-scheme toggles) when determining whether a background tab
 // updated its favicon.

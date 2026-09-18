@@ -19,7 +19,6 @@
 #include "components/performance_manager/execution_context_priority/frame_audible_voter.h"
 #include "components/performance_manager/execution_context_priority/frame_capturing_media_stream_voter.h"
 #include "components/performance_manager/execution_context_priority/frame_visibility_voter.h"
-#include "components/performance_manager/execution_context_priority/glic_actuation_priority_voter.h"
 #include "components/performance_manager/execution_context_priority/inherit_client_priority_voter.h"
 #include "components/performance_manager/execution_context_priority/loading_page_voter.h"
 #include "components/performance_manager/graph/frame_node_impl_describer.h"
@@ -128,11 +127,6 @@ void AddVoters(GraphImpl* graph, PrefService* pref_service) {
     }
 #endif
 
-    if (base::FeatureList::IsEnabled(features::kGlicActuationPriorityVoter)) {
-      // Casts a USER_BLOCKING vote when a frame is Glic actuating.
-      priority_voting_system->AddPriorityVoter<
-          execution_context_priority::GlicActuationPriorityVoter>();
-    }
   }
 }
 

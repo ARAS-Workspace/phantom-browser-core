@@ -331,11 +331,6 @@ void ProcessRankPolicyAndroid::OnIsDevToolsOpenChanged(
   UpdateProcessRank(page_node);
 }
 
-void ProcessRankPolicyAndroid::OnIsGlicPinnedToVisibleInstanceChanged(
-    const PageNode* page_node) {
-  UpdateProcessRank(page_node);
-}
-
 void ProcessRankPolicyAndroid::OnUpdatedTitleOrFaviconInBackgroundChanged(
     const PageNode* page_node) {
   UpdateProcessRank(page_node);
