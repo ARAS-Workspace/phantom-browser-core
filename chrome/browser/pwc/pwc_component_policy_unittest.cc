@@ -107,11 +107,6 @@ TEST(PwcComponentPolicyTest, NewWindowPolicyIsFixedPerComponent) {
                                  MakeTestDelegate());
   EXPECT_EQ(test_policy.new_window_policy(),
             PwcComponentPolicy::NewWindowPolicy::kDrop);
-
-  PwcComponentPolicy glic_policy(PrivilegedComponent::kGlic,
-                                 MakeTestDelegate());
-  EXPECT_EQ(glic_policy.new_window_policy(),
-            PwcComponentPolicy::NewWindowPolicy::kOpenAsUnrelatedTab);
 }
 
 TEST(PwcComponentPolicyTest, ContentEnforcementBitsAreFixedPerComponent) {
@@ -119,25 +114,15 @@ TEST(PwcComponentPolicyTest, ContentEnforcementBitsAreFixedPerComponent) {
                                  MakeTestDelegate());
   EXPECT_TRUE(test_policy.disallow_service_worker_control());
   EXPECT_FALSE(test_policy.disallow_shared_workers());
-
-  PwcComponentPolicy glic_policy(PrivilegedComponent::kGlic,
-                                 MakeTestDelegate());
-  EXPECT_TRUE(glic_policy.disallow_service_worker_control());
-  EXPECT_TRUE(glic_policy.disallow_shared_workers());
 }
 
 TEST(PwcComponentPolicyTest, ContentFeatureIdIsDerivedFromComponent) {
   PwcComponentPolicy test_policy(PrivilegedComponent::kTestComponent,
                                  MakeTestDelegate());
-  PwcComponentPolicy glic_policy(PrivilegedComponent::kGlic,
-                                 MakeTestDelegate());
   // The id is the enum value itself, so it is distinct per component by
   // construction and cannot drift from the component it names.
   EXPECT_EQ(test_policy.content_feature_id(),
             static_cast<int32_t>(PrivilegedComponent::kTestComponent));
-  EXPECT_EQ(glic_policy.content_feature_id(),
-            static_cast<int32_t>(PrivilegedComponent::kGlic));
-  EXPECT_NE(test_policy.content_feature_id(), glic_policy.content_feature_id());
 }
 
 }  // namespace

@@ -18,8 +18,6 @@ namespace pwc {
 enum class PrivilegedComponent {
   // Test-only component.
   kTestComponent,
-  // The glic panel (gemini.google.com).
-  kGlic,
 };
 
 // Supplies a component's origin allowlists. Implemented by the blessed

@@ -20,8 +20,6 @@ PwcComponentPolicy::NewWindowPolicy NewWindowPolicyForComponent(
   switch (component) {
     case PrivilegedComponent::kTestComponent:
       return PwcComponentPolicy::NewWindowPolicy::kDrop;
-    case PrivilegedComponent::kGlic:
-      return PwcComponentPolicy::NewWindowPolicy::kOpenAsUnrelatedTab;
   }
   NOTREACHED();
 }
@@ -72,10 +70,6 @@ PwcComponentPolicy::ContentEnforcementForComponent(
       // Asymmetric bits so tests catch a swapped-field mapping bug.
       enforcement.disallow_service_worker_control = true;
       enforcement.disallow_shared_workers = false;
-      return enforcement;
-    case PrivilegedComponent::kGlic:
-      enforcement.disallow_service_worker_control = true;
-      enforcement.disallow_shared_workers = true;
       return enforcement;
   }
   NOTREACHED();

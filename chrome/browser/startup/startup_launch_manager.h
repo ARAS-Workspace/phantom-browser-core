@@ -30,7 +30,6 @@ class BrowserProcess;
 // Reasons why Chrome should be launched on startup.
 enum class StartupLaunchReason {
   kExtensions = 0,
-  kGlic = 1,
   kForeground = 2,
 
   // Update these when adding/removing values.
