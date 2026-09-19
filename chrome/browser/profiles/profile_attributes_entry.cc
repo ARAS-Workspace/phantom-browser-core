@@ -119,7 +119,6 @@ const char ProfileAttributesEntry::kIsUsingDefaultAvatarKey[] =
     "is_using_default_avatar";
 const char ProfileAttributesEntry::kUseGAIAPictureKey[] = "use_gaia_picture";
 const char ProfileAttributesEntry::kAccountIdKey[] = "account_id_key";
-const char ProfileAttributesEntry::kIsGlicEligible[] = "is_glic_eligible";
 const char ProfileAttributesEntry::kAiSubscriptionKey[] =
     "ai_subscription_tier";
 
@@ -633,16 +632,8 @@ std::string ProfileAttributesEntry::GetAccountIdKey() const {
   return GetString(kAccountIdKey);
 }
 
-bool ProfileAttributesEntry::IsGlicEligible() const {
-  return GetBool(kIsGlicEligible);
-}
-
 int ProfileAttributesEntry::GetAiSubscriptionTier() const {
   return GetInteger(kAiSubscriptionKey);
-}
-
-void ProfileAttributesEntry::SetIsGlicEligible(bool value) {
-  SetBool(kIsGlicEligible, value);
 }
 
 void ProfileAttributesEntry::SetAiSubscriptionTier(int tier) {

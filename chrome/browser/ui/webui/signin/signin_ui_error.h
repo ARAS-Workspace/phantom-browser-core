@@ -104,9 +104,6 @@ class ForceSigninUIError {
     kReauthTimeout,
     // Signin pattern not matching.
     kSigninPatternNotMatching,
-    // Reauth flows are not supported in Glic Mode, redirects the user to do the
-    // reauth in the Regular Picker.
-    kReauthNotSupportedByGlicFlow,
   };
 
   // Helper pair to get the error messages based on the `Type` error enum to be
@@ -122,7 +119,6 @@ class ForceSigninUIError {
   static ForceSigninUIError ReauthWrongAccount(const std::string& email);
   static ForceSigninUIError ReauthTimeout();
   static ForceSigninUIError SigninPatternNotMatching(const std::string& email);
-  static ForceSigninUIError ReauthNotSupportedByGlicFlow();
 
   // Returns the error messages for the given `error`.
   // `type_` must not be `ForceSigninUIError::kNone`.

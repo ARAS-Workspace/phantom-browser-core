@@ -32,7 +32,6 @@ export class TestManageProfilesBrowserProxy extends TestBrowserProxy implements
       'confirmProfileSwitch',
       'cancelProfileSwitch',
       'updateProfileOrder',
-      'onLearnMoreClicked',
     ]);
 
     this.profileThemeInfo = {
@@ -174,7 +173,4 @@ export class TestManageProfilesBrowserProxy extends TestBrowserProxy implements
     this.methodCalled('updateProfileOrder', [fromIndex, toIndex]);
   }
 
-  onLearnMoreClicked(): void {
-    this.methodCalled('onLearnMoreClicked');
-  }
 }

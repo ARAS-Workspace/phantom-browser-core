@@ -240,32 +240,9 @@ base::DictValue CreateProfileState(const ProfileAttributesEntry* entry,
   return profile_entry;
 }
 
-// Opens a URL form the Chrome support Help Center based on the intended action
-// from the user.
-// Either Sign in to Chrome if there are no eligible profiles.
-// Or add a new Profile if the existing profiles do not match the user's need.
-void OpenLearnMoreURL(bool is_profile_list_empty,
-                      BrowserWindowInterface* browser) {
-  // Browser may be closing if the Profile was locked after being loaded for
-  // example.
-  if (!browser || browser->IsDeleteScheduled()) {
-    return;
-  }
-
-  browser->OpenURL(
-      content::OpenURLParams(
-          GURL(is_profile_list_empty
-                   ? chrome::kSigninOnDesktopLearnMoreURL
-                   : chrome::kAddNewProfileOnDesktopLearnMoreURL),
-          content::Referrer(), WindowOpenDisposition::NEW_FOREGROUND_TAB,
-          ui::PAGE_TRANSITION_LINK, false),
-      /*navigation_handle_callback=*/{});
-}
-
 }  // namespace
 
-ProfilePickerHandler::ProfilePickerHandler(bool is_glic_version)
-    : is_glic_version_(is_glic_version) {}
+ProfilePickerHandler::ProfilePickerHandler() = default;
 
 ProfilePickerHandler::~ProfilePickerHandler() {
   OnJavascriptDisallowed();
@@ -362,10 +339,6 @@ void ProfilePickerHandler::RegisterMessages() {
       "updateProfileOrder",
       base::BindRepeating(&ProfilePickerHandler::HandleUpdateProfileOrder,
                           base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "onLearnMoreClicked",
-      base::BindRepeating(&ProfilePickerHandler::HandleOnLearnMoreClicked,
-                          base::Unretained(this)));
   Profile* profile = Profile::FromWebUI(web_ui());
   content::URLDataSource::Add(profile, std::make_unique<ThemeSource>(profile));
 }
@@ -438,16 +411,6 @@ void ProfilePickerHandler::TryLaunchLockedProfile(
   if ((syncer::IsReplaceSyncPromosWithSignInPromosEnabled() &&
        entry.GetSigninState() != SigninState::kNotSignedIn) ||
       entry.CanBeManaged()) {
-    // Glic version cannot run the reauth steps, show a dialog instead that
-    // will redirect the user to the regular version of the picker.
-    if (is_glic_version_) {
-      DisplaySigninErrorDialog(
-          /*profile_path=*/base::FilePath(),
-          ForceSigninUIError::ReauthNotSupportedByGlicFlow());
-      OnResetPickerButtons(false);
-      return;
-    }
-
     g_browser_process->profile_manager()->LoadProfileByPath(
         entry.GetPath(), /*incognito=*/false,
         base::BindOnce(&ProfilePickerHandler::OnProfileLoadedForSwitchToReauth,
@@ -744,19 +707,6 @@ void ProfilePickerHandler::HandleUpdateProfileOrder(
       .UpdateProfilesOrderPref(from_index, to_index);
 }
 
-void ProfilePickerHandler::HandleOnLearnMoreClicked(
-    const base::ListValue& args) {
-  CHECK(is_glic_version_);
-  CHECK_EQ(0U, args.size());
-
-  bool is_profile_list_empty = GetProfilesAttributesForDisplay().empty();
-  // Loads the last used profile and open/uses a browser to show the help page.
-  profiles::SwitchToProfile(
-      g_browser_process->profile_manager()->GetLastUsedProfileDir(),
-      /*always_create=*/false,
-      base::BindOnce(&OpenLearnMoreURL, is_profile_list_empty));
-}
-
 void ProfilePickerHandler::HandleCloseProfileStatistics(
     const base::ListValue& args) {
   CHECK_EQ(0U, args.size());
@@ -869,15 +819,6 @@ ProfilePickerHandler::GetProfilesAttributesForDisplay() {
   std::erase_if(ordered_entries, [](const ProfileAttributesEntry* entry) {
     return entry->IsOmitted();
   });
-
-  // In Glic version, only allow profile entries that are eligible. This may
-  // cause the returned profile list to be empty, and will display different
-  // strings in the Ui.
-  if (is_glic_version_) {
-    std::erase_if(ordered_entries, [](const ProfileAttributesEntry* entry) {
-      return !entry->IsGlicEligible();
-    });
-  }
 
   size_t number_of_profiles = ordered_entries.size();
 

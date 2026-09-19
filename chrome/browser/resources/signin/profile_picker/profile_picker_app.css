@@ -16,38 +16,6 @@
   height: 100%;
 }
 
-:host([app-mode_='glic']) {
-  @media (prefers-color-scheme: dark) {
-    background-color: #131314;
-  }
-
-  #banner-right,
-  #banner-left {
-    max-width: 50%;
-    position: absolute;
-  }
-
-  #banner-right {
-    content: url(glic_banner_top_right_light.svg);
-    right: 0;
-    top: 0;
-
-    @media (prefers-color-scheme: dark) {
-      content: url(glic_banner_top_right.svg);
-    }
-  }
-
-  #banner-left {
-    content: url(glic_banner_bottom_left_light.svg);
-    left: 0;
-    bottom: 0;
-
-    @media (prefers-color-scheme: dark) {
-      content: url(glic_banner_bottom_left.svg);
-    }
-  }
-}
-
 :host([app-mode_='regular']) {
 
   #banner-right,

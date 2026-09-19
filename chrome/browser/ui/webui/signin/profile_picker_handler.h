@@ -48,7 +48,7 @@ class ProfilePickerHandler : public content::WebUIMessageHandler,
                              public content::WebContentsObserver,
                              public ProfileAttributesStorage::Observer {
  public:
-  explicit ProfilePickerHandler(bool is_glic_version);
+  ProfilePickerHandler();
 
   ProfilePickerHandler(const ProfilePickerHandler&) = delete;
   ProfilePickerHandler& operator=(const ProfilePickerHandler&) = delete;
@@ -106,7 +106,6 @@ class ProfilePickerHandler : public content::WebUIMessageHandler,
   void HandleCloseProfileStatistics(const base::ListValue& args);
   void HandleSetProfileName(const base::ListValue& args);
   void HandleUpdateProfileOrder(const base::ListValue& args);
-  void HandleOnLearnMoreClicked(const base::ListValue& args);
 
   void HandleSelectNewAccount(const base::ListValue& args);
   void HandleGetNewProfileSuggestedThemeInfo(const base::ListValue& args);
@@ -176,10 +175,8 @@ class ProfilePickerHandler : public content::WebUIMessageHandler,
   // Returns the list of profiles in the same order as when the picker
   // was first shown.
   // Filters out profiles that are not eligible to be shown: e.g. omitted
-  // profiles and glic ineligible profiles if applicable.
+  // profiles.
   std::vector<ProfileAttributesEntry*> GetProfilesAttributesForDisplay();
-
-  const bool is_glic_version_;
 
   // Observes changes to profile attributes, and notifies the WebUI.
   base::ScopedObservation<ProfileAttributesStorage,

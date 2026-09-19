@@ -309,8 +309,6 @@ class ProfilePickerUIPixelTest
         return ForceSigninUIError::ReauthTimeout();
       case ForceSigninUIError::Type::kSigninPatternNotMatching:
         return ForceSigninUIError::SigninPatternNotMatching(kEmail);
-      case ForceSigninUIError::Type::kReauthNotSupportedByGlicFlow:
-        return ForceSigninUIError::ReauthNotSupportedByGlicFlow();
     }
   }
 

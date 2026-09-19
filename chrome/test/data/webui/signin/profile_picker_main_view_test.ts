@@ -444,43 +444,6 @@ suite('ProfilePickerMainViewTest', function() {
         profiles, mainViewElement.shadowRoot.querySelectorAll('profile-card'));
   });
 
-  test('LearnMoreClickedInFooterText', async function() {
-    loadTimeData.overrideValues({isGlicVersion: true});
-    resetTest();
-
-    await browserProxy.whenCalled('initializeMainView');
-    await simulateProfilesListChanged(generateProfilesList(2));
-
-    const footerText =
-        mainViewElement.shadowRoot.querySelector('#footer-text')!;
-    assertTrue(isVisible(footerText));
-
-    const learnMoreLink = mainViewElement.shadowRoot.querySelector<HTMLElement>(
-        '.learn-more-link')!;
-    assertTrue(isVisible(learnMoreLink));
-
-    learnMoreLink.click();
-    await browserProxy.whenCalled('onLearnMoreClicked');
-  });
-
-  test('LearnMoreClickedWithNoProfiles', async function() {
-    loadTimeData.overrideValues({isGlicVersion: true});
-    resetTest();
-
-    await browserProxy.whenCalled('initializeMainView');
-    await simulateProfilesListChanged(generateProfilesList(0));
-
-    const footerText =
-        mainViewElement.shadowRoot.querySelector('#footer-text')!;
-    assertFalse(isVisible(footerText));
-
-    const learnMoreLink = mainViewElement.shadowRoot.querySelector<HTMLElement>(
-        '.learn-more-link')!;
-    assertTrue(isVisible(learnMoreLink));
-
-    learnMoreLink.click();
-    await browserProxy.whenCalled('onLearnMoreClicked');
-  });
 });
 
 suite('ProfilePickerProfilesReorderingTest', function() {

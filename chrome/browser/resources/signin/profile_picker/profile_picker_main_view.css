@@ -19,11 +19,6 @@
   --picker-logo-height: 44px;
 }
 
-:host([is-glic_]) {
-  --footer-spacing: 0px;
-  --picker-logo-height: 58px;
-}
-
 .flex-container {
   display: flex;
   flex-flow: column;

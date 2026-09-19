@@ -90,10 +90,7 @@ std::string GetManagedDeviceDisclaimer() {
       base::UTF8ToUTF16(*manager));
 }
 
-int GetMainViewTitleId(bool is_glic_version) {
-  if (is_glic_version) {
-    return IDS_PROFILE_PICKER_MAIN_VIEW_TITLE_GLIC;
-  }
+int GetMainViewTitleId() {
   return ProfilePicker::Shown() ? IDS_PROFILE_PICKER_MAIN_VIEW_TITLE_V2
                                 : IDS_PROFILE_PICKER_MAIN_VIEW_TITLE;
 }
@@ -111,7 +108,6 @@ int GetProfileTypeChoiceNotNowButtonLabelId(
 }
 
 void AddStrings(content::WebUIDataSource* html_source,
-                bool is_glic_version,
                 bool is_first_run_desktop_refresh_enabled) {
   constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"addSpaceButton", IDS_PROFILE_PICKER_ADD_SPACE_BUTTON},
@@ -151,23 +147,15 @@ void AddStrings(content::WebUIDataSource* html_source,
       {"ok", IDS_OK},
       {"signInButtonLabel",
        IDS_PROFILE_PICKER_PROFILE_CREATION_FLOW_SIGNIN_BUTTON_LABEL},
-      {"glicAddProfileHelper", IDS_PROFILE_PICKER_ADD_PROFILE_HELPER_GLIC},
-      {"glicTitleNoProfile",
-       IDS_PROFILE_PICKER_MAIN_VIEW_TITLE_GLIC_NO_PROFILE},
-      {"mainViewSubtitleGlicNoProfile",
-       IDS_PROFILE_PICKER_MAIN_VIEW_SUBTITLE_GLIC_NO_PROFILE},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
   html_source->AddLocalizedString("declineSignInButtonLabel",
                                   GetProfileTypeChoiceNotNowButtonLabelId(
                                       is_first_run_desktop_refresh_enabled));
-  html_source->AddLocalizedString("mainViewTitle",
-                                  GetMainViewTitleId(is_glic_version));
-  html_source->AddLocalizedString(
-      "mainViewSubtitle", is_glic_version
-                              ? IDS_PROFILE_PICKER_MAIN_VIEW_SUBTITLE_GLIC
-                              : IDS_PROFILE_PICKER_MAIN_VIEW_SUBTITLE);
+  html_source->AddLocalizedString("mainViewTitle", GetMainViewTitleId());
+  html_source->AddLocalizedString("mainViewSubtitle",
+                                  IDS_PROFILE_PICKER_MAIN_VIEW_SUBTITLE);
 
   html_source->AddLocalizedString(
       "profileTypeChoiceSubtitle",
@@ -189,31 +177,11 @@ void AddStrings(content::WebUIDataSource* html_source,
 }
 
 void AddFlags(content::WebUIDataSource* html_source,
-              bool is_glic_version,
               bool is_first_run_desktop_refresh_enabled) {
-  html_source->AddBoolean("isGlicVersion", is_glic_version);
-
   // TODO(crbug.com/385726690): Check if we want to show the locked profiles or
   // not.
   html_source->AddBoolean("isForceSigninEnabled",
                           signin_util::IsForceSigninEnabled());
-
-  // In glic version, disable all other policies:
-  // - Profile Creation and signing in are not allowed.
-  // - Additional action button should not be shown: Guest and AskOnStartup.
-  if (is_glic_version) {
-    html_source->AddBoolean("isAskOnStartupAllowed", false);
-    html_source->AddBoolean("askOnStartup", false);
-    html_source->AddBoolean("profilesReorderingEnabled", false);
-    html_source->AddBoolean("signInProfileCreationFlowSupported", false);
-    html_source->AddBoolean("isBrowserSigninAllowed", false);
-    html_source->AddBoolean("isGuestModeEnabled", false);
-    html_source->AddBoolean("isProfileCreationAllowed", false);
-    html_source->AddBoolean("isOpenAllProfilesButtonExperimentEnabled", false);
-    html_source->AddInteger("maxProfilesCountToShowOpenAllProfilesButton", 0);
-    html_source->AddBoolean("useRefreshedUI", false);
-    return;
-  }
 
   bool ask_on_startup_allowed =
       static_cast<ProfilePicker::AvailabilityOnStartup>(
@@ -241,8 +209,7 @@ void AddFlags(content::WebUIDataSource* html_source,
                           is_first_run_desktop_refresh_enabled);
 }
 
-void AddResourcePaths(content::WebUIDataSource* html_source,
-                      bool is_glic_version) {
+void AddResourcePaths(content::WebUIDataSource* html_source) {
   const webui::ResourcePath kResourcePaths[] = {
       {"left_banner.svg", IDR_SIGNIN_IMAGES_SHARED_LEFT_BANNER_SVG},
       {"left_banner_dark.svg", IDR_SIGNIN_IMAGES_SHARED_LEFT_BANNER_DARK_SVG},
@@ -278,17 +245,13 @@ ProfilePickerUI::ProfilePickerUI(content::WebUI* web_ui)
       content::WebUIDataSource::CreateAndAdd(
           profile, chrome::kChromeUIProfilePickerHost);
 
-  // `content::WebContents::GetVisibleURL()` is used here because a
-  // WebUIController is created before the navigation commits.
-  bool is_glic_version = web_ui->GetWebContents()->GetVisibleURL().GetQuery() ==
-                         chrome::kChromeUIProfilePickerGlicQuery;
-
   std::unique_ptr<ProfilePickerHandler> handler =
-      std::make_unique<ProfilePickerHandler>(is_glic_version);
+      std::make_unique<ProfilePickerHandler>();
   profile_picker_handler_ = handler.get();
   web_ui->AddMessageHandler(std::move(handler));
 
-  // Same as above for usage of `content::WebContents::GetVisibleURL()`.
+  // `content::WebContents::GetVisibleURL()` is used here because a
+  // WebUIController is created before the navigation commits.
   if (web_ui->GetWebContents()->GetVisibleURL().GetQuery() ==
       chrome::kChromeUIProfilePickerStartupQuery) {
     profile_picker_handler_->EnableStartupMetrics();
@@ -298,17 +261,15 @@ ProfilePickerUI::ProfilePickerUI(content::WebUI* web_ui)
   // page itself makes it available much earlier, and avoids having to fallback
   // to the one obtained from `NavigationEntry::GetTitleForDisplay()` (which
   // ends up being the URL) when we try to get it on startup for a11y purposes.
-  web_ui->OverrideTitle(
-      l10n_util::GetStringUTF16(GetMainViewTitleId(is_glic_version)));
+  web_ui->OverrideTitle(l10n_util::GetStringUTF16(GetMainViewTitleId()));
 
   const bool is_first_run_desktop_refresh_enabled =
       switches::IsFirstRunDesktopRefreshEnabled(
           IsInSearchEngineChoiceScreenRegion(CHECK_DEREF(profile)));
   // Add all resources.
-  AddStrings(html_source, is_glic_version,
-             is_first_run_desktop_refresh_enabled);
-  AddFlags(html_source, is_glic_version, is_first_run_desktop_refresh_enabled);
-  AddResourcePaths(html_source, is_glic_version);
+  AddStrings(html_source, is_first_run_desktop_refresh_enabled);
+  AddFlags(html_source, is_first_run_desktop_refresh_enabled);
+  AddResourcePaths(html_source);
 
   webui::SetupWebUIDataSource(html_source, kProfilePickerResources,
                               IDR_PROFILE_PICKER_PROFILE_PICKER_HTML);

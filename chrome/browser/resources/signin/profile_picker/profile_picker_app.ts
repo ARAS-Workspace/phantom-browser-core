@@ -22,7 +22,7 @@ import {ManageProfilesBrowserProxyImpl} from './manage_profiles_browser_proxy.js
 import {navigateTo, NavigationMixin, ProfileCreationSteps, Routes} from './navigation_mixin.js';
 import {getCss} from './profile_picker_app.css.js';
 import {getHtml} from './profile_picker_app.html.js';
-import {isForceSigninEnabled, isGlicVersion, isProfileCreationAllowed, isUseRefreshedUI} from './profile_picker_flags.js';
+import {isForceSigninEnabled, isProfileCreationAllowed, isUseRefreshedUI} from './profile_picker_flags.js';
 
 export interface ProfilePickerAppElement {
   $: {
@@ -39,7 +39,6 @@ enum AppMode {
   REGULAR = 'regular',
   REGULAR_REFRESHED = 'regular-refreshed',
   NO_BANNER = 'no-banner',
-  GLIC = 'glic',
 }
 
 export class ProfilePickerAppElement extends ProfilePickerAppElementBase {
@@ -164,10 +163,8 @@ export class ProfilePickerAppElement extends ProfilePickerAppElementBase {
     if (this.currentRoute_ === Routes.MAIN ||
         (this.currentRoute_ === Routes.NEW_PROFILE &&
          step === ProfileCreationSteps.PROFILE_TYPE_CHOICE)) {
-      this.appMode_ =
-          isGlicVersion() ? AppMode.GLIC : this.computeRegularAppMode_();
+      this.appMode_ = this.computeRegularAppMode_();
     } else {
-      assert(!isGlicVersion(), 'Only `Routes.MAIN` supports Glic version');
       this.appMode_ = AppMode.NO_BANNER;
     }
   }

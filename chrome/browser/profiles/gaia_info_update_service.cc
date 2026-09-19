@@ -161,7 +161,6 @@ void GAIAInfoUpdateService::ClearProfileEntry() {
   entry->SetGAIAPicture(std::string(), gfx::Image());
   entry->SetHostedDomain(std::nullopt);
   entry->SetIsManaged(signin::Tribool::kFalse);
-  entry->SetIsGlicEligible(false);
 }
 
 void GAIAInfoUpdateService::Shutdown() {
