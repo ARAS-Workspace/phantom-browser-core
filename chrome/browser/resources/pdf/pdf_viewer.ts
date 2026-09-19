@@ -976,41 +976,21 @@ export class PdfViewerElement extends PdfViewerBaseElement {
     this.zoomBounds_.max =
         Math.round(presetZoomFactors[presetZoomFactors.length - 1]! * 100);
 
-    const hasGlic = loadTimeData.getBoolean('pdfGlicSummarizeEnabled');
-    if (
-        hasGlic
-        // <if expr="enable_pdf_ink2">
-        || this.pdfInk2Enabled_
-        // </if>
-    ) {
+    // <if expr="enable_pdf_ink2">
+    if (this.pdfInk2Enabled_) {
       this.updateComplete.then(() => {
-        if (hasGlic) {
-          const summarizeBtn =
-              this.$.toolbar.shadowRoot.querySelector<HTMLElement>(
-                  '#glic-summarize-button');
-          if (summarizeBtn) {
-            this.registerHelpBubble(
-                'PdfHelpBubbleHandlerFactory::kPdfGlicSummarizeElementId',
-                summarizeBtn);
-          }
-        }
-
-        // <if expr="enable_pdf_ink2">
-        if (this.pdfInk2Enabled_) {
+        this.registerHelpBubble(
+            'PdfHelpBubbleHandlerFactory::kPdfInkSignaturesDrawElementId',
+            this.$.toolbar.shadowRoot.querySelector<HTMLElement>('#annotate')!);
+        if (this.pdfTextAnnotationsEnabled_) {
           this.registerHelpBubble(
-              'PdfHelpBubbleHandlerFactory::kPdfInkSignaturesDrawElementId',
+              'PdfHelpBubbleHandlerFactory::kPdfInkSignaturesAddTextElementId',
               this.$.toolbar.shadowRoot.querySelector<HTMLElement>(
-                  '#annotate')!);
-          if (this.pdfTextAnnotationsEnabled_) {
-            this.registerHelpBubble(
-                'PdfHelpBubbleHandlerFactory::kPdfInkSignaturesAddTextElementId',
-                this.$.toolbar.shadowRoot.querySelector<HTMLElement>(
-                    '#text-annotate')!);
-          }
+                  '#text-annotate')!);
         }
-        // </if>
       });
     }
+    // </if>
   }
 
   override handleScriptingMessage(message: MessageEvent<unknown>) {
@@ -1967,11 +1947,6 @@ export class PdfViewerElement extends PdfViewerBaseElement {
         assertNotReachedCase(requestType);
     }
   }
-
-  protected onGlicSummarize_() {
-    PdfViewerPrivateProxyImpl.getInstance().glicSummarize();
-  }
-
   protected async onPrint_() {
     record(UserAction.PRINT);
     assert(this.currentController);

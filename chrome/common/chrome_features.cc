@@ -314,9 +314,6 @@ BASE_FEATURE(kGoogleSearchAiModeWorkspace, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kPrivacyGuideForceAvailable, base::FEATURE_DISABLED_BY_DEFAULT);
 
 #if BUILDFLAG(ENABLE_PDF)
-BASE_FEATURE(kPdfGlicSummarize, base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<bool> kPdfGlicSummarizeUseLongButtonText{
-    &kPdfGlicSummarize, "use_long_button_text", false};
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)

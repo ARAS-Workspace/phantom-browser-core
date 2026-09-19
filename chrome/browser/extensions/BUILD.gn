@@ -2418,7 +2418,6 @@ source_set("browser_tests") {
       "//chrome/browser/extensions/api/messaging:test_support",
       "//chrome/browser/extensions/api/mime_handlers:browser_tests",
       "//chrome/browser/extensions/api/passwords_private:test_support",
-      "//chrome/browser/extensions/api/pdf_viewer_private:browser_tests",
       "//chrome/browser/hid",
       "//chrome/browser/password_manager",
       "//chrome/browser/password_manager:test_support",

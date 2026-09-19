@@ -26,8 +26,6 @@
 namespace pdf {
 
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(PdfHelpBubbleHandlerFactory,
-                                      kPdfGlicSummarizeElementId);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(PdfHelpBubbleHandlerFactory,
                                       kPdfInkSignaturesAddTextElementId);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(PdfHelpBubbleHandlerFactory,
                                       kPdfInkSignaturesDrawElementId);
@@ -36,8 +34,7 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(PdfHelpBubbleHandlerFactory,
 void PdfHelpBubbleHandlerFactory::Create(
     content::RenderFrameHost* render_frame_host,
     HelpFactoryPendingReceiver receiver) {
-  bool is_feature_enabled =
-      base::FeatureList::IsEnabled(features::kPdfGlicSummarize);
+  bool is_feature_enabled = false;
 #if BUILDFLAG(ENABLE_PDF_INK2)
   is_feature_enabled |=
       base::FeatureList::IsEnabled(chrome_pdf::features::kPdfInk2);
@@ -75,7 +72,6 @@ void PdfHelpBubbleHandlerFactory::CreateHelpBubbleHandler(
       content::WebContents::FromRenderFrameHost(&render_frame_host()),
       ui::ElementContext(this, base::PassKey<PdfHelpBubbleHandlerFactory>()),
       std::vector<ui::ElementIdentifier>{
-          PdfHelpBubbleHandlerFactory::kPdfGlicSummarizeElementId,
           PdfHelpBubbleHandlerFactory::kPdfInkSignaturesAddTextElementId,
           PdfHelpBubbleHandlerFactory::kPdfInkSignaturesDrawElementId});
   tracked_element_handler_->BindInterface(std::move(tracked_element_handler));

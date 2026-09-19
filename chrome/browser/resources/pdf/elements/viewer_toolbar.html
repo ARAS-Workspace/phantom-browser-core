@@ -83,17 +83,6 @@ import {AnnotationMode} from '../constants.js';
             title="$i18n{annotationRedo}"></cr-icon-button>
       </span>` : ''}
 </if>
-    ${this.pdfGlicSummarizeEnabled_ ? html`
-    <span id="glic-controls">
-      <span class="vertical-separator"></span>
-      <cr-button id="glic-summarize-button"
-          aria-label="$i18n{glicSummarize}"
-          title="$i18n{glicSummarizeTooltip}"
-          @click="${this.onGlicSummarizeClick_}">
-        <cr-icon slot="prefix-icon" icon="pdf-glic:summarize-auto-2"></cr-icon>
-        $i18n{glicSummarize}
-      </cr-button>
-    </span>` : ''}
   </div>
   <div id="end">
 <if expr="enable_pdf_save_to_drive">

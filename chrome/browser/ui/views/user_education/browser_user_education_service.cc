@@ -855,25 +855,6 @@ void MaybeRegisterChromeFeaturePromos(
       IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_DURING_SIGNIN_SCREENREADER,
       FeaturePromoSpecification::AcceleratorInfo()));
 
-
-  // kIPHPdfGlicSummarizeFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForToastPromo(
-          feature_engagement::kIPHPdfGlicSummarizeFeature,
-          pdf::PdfHelpBubbleHandlerFactory::kPdfGlicSummarizeElementId,
-          IDS_PDF_GLIC_SUMMARIZE_IPH_TEXT_NEW,
-          IDS_PDF_GLIC_SUMMARIZE_IPH_TEXT_NEW_SCREENREADER,
-          FeaturePromoSpecification::AcceleratorInfo())
-          .SetPromoSubtype(
-              FeaturePromoSpecification::PromoSubtype::kLegalNotice)
-          .SetBubbleTitleText(IDS_PDF_GLIC_SUMMARIZE_IPH_TITLE)
-          .SetBubbleIcon(&vector_icons::kChatSparkIcon)
-          .SetBubbleArrow(HelpBubbleArrow::kTopLeft)
-          .SetInAnyContext(true)
-          .SetMetadata(151, "cuianthony@chromium.org",
-                       "Triggered when the PDF Viewer loads with the "
-                       "Summarize button.")));
-
 #if BUILDFLAG(ENABLE_PDF_INK2)
   // kIPHPdfInkSignaturesFeature:
   registry.RegisterFeature(std::move(
