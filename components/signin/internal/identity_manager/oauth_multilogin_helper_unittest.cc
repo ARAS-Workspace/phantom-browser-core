@@ -1027,7 +1027,6 @@ TEST_F(OAuthMultiloginHelperTest,
 
 TEST_F(OAuthMultiloginHelperTest, ResponseStatusHistogramWithSuffix) {
   base::HistogramTester histogram_tester;
-  partition_suffix_ = PartitionSuffix::kGlic;
   token_service()->UpdateCredentials(kAccountId, "refresh_token");
   CreateHelper({{kAccountId, kGaiaId}});
 
@@ -1054,7 +1053,7 @@ TEST_F(OAuthMultiloginHelperTest, ResponseStatusHistogramWithSuffix) {
                                       /*expected_bucket_count=*/1);
   // Suffix specific histogram should be recorded.
   histogram_tester.ExpectUniqueSample(
-      "Signin.OAuthMultiloginResponseStatus.Glic",
+      "Signin.OAuthMultiloginResponseStatus.Test",
       OAuthMultiloginResponseStatus::kOk,
       /*expected_bucket_count=*/1);
 
@@ -1062,7 +1061,7 @@ TEST_F(OAuthMultiloginHelperTest, ResponseStatusHistogramWithSuffix) {
                                       OAuthMultiloginResponseStatus::kOk,
                                       /*expected_bucket_count=*/1);
   histogram_tester.ExpectUniqueSample(
-      "Signin.OAuthMultiloginResponseStatus2.Glic",
+      "Signin.OAuthMultiloginResponseStatus2.Test",
       OAuthMultiloginResponseStatus::kOk,
       /*expected_bucket_count=*/1);
 }

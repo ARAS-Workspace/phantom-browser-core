@@ -99,7 +99,8 @@ struct ExtendedRestartabilityState {
     kBackgroundActivity = 24,
     kFormInteractions = 25,
     kUserEdits = 26,
-    kGlicShared = 27,
+    // `27` used to be a shared tab blocker. It has been removed but in
+    // order to keep backward compatibility, its value has been retired.
     kWebApp = 28,
 
     // --- Additional Signals ---

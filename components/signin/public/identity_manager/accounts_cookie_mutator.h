@@ -34,7 +34,6 @@ enum class SetAccountsInCookieResult;
 enum class PartitionSuffix {
   kDefault,
   kContextualTasks,
-  kGlic,
   kTest,
   kNone,
 };
@@ -45,8 +44,6 @@ inline std::string_view PartitionSuffixToString(PartitionSuffix suffix) {
       return "Default";
     case PartitionSuffix::kContextualTasks:
       return "ContextualTasks";
-    case PartitionSuffix::kGlic:
-      return "Glic";
     case PartitionSuffix::kTest:
       CHECK_IS_TEST();
       return "Test";

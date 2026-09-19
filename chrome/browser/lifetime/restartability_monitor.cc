@@ -70,7 +70,6 @@ Level GetDisruptionLevel(Blocker blocker) {
     case Blocker::kConnectedToBluetooth:
     case Blocker::kConnectedToUSB:
     case Blocker::kDevToolsOpen:
-    case Blocker::kGlicShared:
     case Blocker::kUserEdits:
     case Blocker::kWebApp:
     case Blocker::kVisiblePausedMedia:

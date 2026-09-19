@@ -39,7 +39,8 @@ enum class CannotDiscardReason {
   kBackgroundActivity = 25,
   kFormInteractions = 26,
   kUserEdits = 27,
-  kGlicShared = 28,
+  // `28` used to be a shared tab reason. It has been removed but in order
+  // to keep backward compatibility, its value has been retired.
   kWebApp = 29,
 
   kMaxValue = kWebApp,
