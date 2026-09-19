@@ -1173,9 +1173,6 @@ void ScrollableArea::OnScrollFinished(bool enqueue_scrollend) {
                   node->GetDocument())) {
         viewport_position_tracker->OnScrollEnd();
       }
-      // TODO(https://crbug.com/41406914): This is temporary. Remove once we
-      // start to migrate to scroll-promises.
-      node->GetDocument().Markers().StartGlicMarkerAnimationIfNeeded();
       node->GetDocument().EnqueueScrollEndEventForNode(node);
     }
   }

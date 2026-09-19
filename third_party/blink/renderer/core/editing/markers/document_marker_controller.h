@@ -100,7 +100,6 @@ class CORE_EXPORT DocumentMarkerController final
       const String& highlight_name,
       const Member<Highlight> highlight,
       base::FunctionRef<void(const Element&)>* on_element_node = nullptr);
-  void AddGlicMarker(const EphemeralRange&);
 
   void MoveMarkers(const Text& src_node, int length, const Text& dst_node);
 
@@ -222,10 +221,6 @@ class CORE_EXPORT DocumentMarkerController final
                               wtf_size_t old_length,
                               wtf_size_t new_length);
 
-  void StartGlicMarkerAnimationIfNeeded();
-
-  void ContinueGlicMarkerAnimation(base::TimeTicks tick);
-
  private:
   // TODO(https://crbug.com/41406914): Remove once we migrate to
   // scroll-promises.
@@ -264,33 +259,6 @@ class CORE_EXPORT DocumentMarkerController final
 
   // Called when a node is removed from a marker map.
   void DidRemoveNodeFromMap(DocumentMarker::MarkerType);
-
-  // Returns a boolean indicating if the last frame is reached.
-  bool UpdateGlicMarkerOpacity(base::TimeDelta duration);
-
-  void InvalidatePaintForGlicMarkers();
-
-  // TODO(https://crbug.com/41406914): The state can be removed when we migrate
-  // to the scroll-promises. With scroll-promises we are guaranteed to call
-  // `StartGlicAnimation()` only once and only for the targeted programmatic
-  // scroll.
-  //
-  // Glic animations are highlight animations for `GlicMarker`s. Each
-  // `GlicMarker`s are always removed before they are added to guarantee they
-  // are only animated once.
-  enum class GlicAnimationState {
-    // The default state.
-    kNotStarted = 0,
-    // The animation is running.
-    kRunning,
-    // Finished. Note we don't allow the animation to restart in this case. We
-    // rely on the markers to be removed first, which resets the state back to
-    // `kNotStarted`.
-    kFinished,
-  };
-  GlicAnimationState glic_animation_state_ = GlicAnimationState::kNotStarted;
-
-  std::optional<base::TimeTicks> glic_marker_animation_start_;
 
   MarkerMaps markers_;
 

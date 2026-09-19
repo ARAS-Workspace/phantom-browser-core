@@ -165,7 +165,6 @@ bool IsValidRangeAndMarkable(const RangeInFlatTree* range) {
 bool ShouldUseIsValidRangeAndMarkable(mojom::blink::AnnotationType type) {
   switch (type) {
     case mojom::blink::AnnotationType::kTextFinder:
-    case mojom::blink::AnnotationType::kGlic:
       return true;
     case mojom::blink::AnnotationType::kSharedHighlight:
     case mojom::blink::AnnotationType::kScrollOnly:
@@ -173,23 +172,11 @@ bool ShouldUseIsValidRangeAndMarkable(mojom::blink::AnnotationType type) {
   }
 }
 
-// The maximum scroll distance for which an AnnotationAgent of type kGlic should
-// use a smooth (animated) scroll. For longer distances, the scroll will be
-// instant.
-int GetGlicSmoothScrollThresholdInDIPs() {
-  const base::FeatureParam<int> glic_smooth_scroll_threshold_in_dips{
-      &features::kProgrammaticScrollAnimationOverride,
-      "glic_smooth_scroll_threshold_in_dips", 15000};
-  return glic_smooth_scroll_threshold_in_dips.Get();
-}
-
 std::optional<DocumentMarker::MarkerTypes> GetMarkerTypesForAnnotationType(
     mojom::blink::AnnotationType annotation_type) {
   switch (annotation_type) {
     case mojom::blink::AnnotationType::kSharedHighlight:
       return DocumentMarker::MarkerTypes::TextFragment();
-    case mojom::blink::AnnotationType::kGlic:
-      return DocumentMarker::MarkerTypes::Glic();
     case mojom::blink::AnnotationType::kTextFinder:
     case mojom::blink::AnnotationType::kScrollOnly:
       return std::nullopt;
@@ -213,27 +200,6 @@ bool HasMarkerAroundPosition(const HitTestResult& result,
       ToPositionInFlatTree(marker_position),
       DocumentMarker::MarkerTypes(marker_type));
   return !markers.empty();
-}
-
-float CalculateMaxScrollOffsetPx(
-    LocalFrameView* view,
-    const PhysicalRect& bounding_box,
-    const mojom::blink::ScrollIntoViewParams& params) {
-  CHECK(view);
-  CHECK(view->GetScrollableArea());
-  ScrollOffset scroll_offset_px =
-      scroll_into_view_util::GetScrollOffsetToExpose(
-          *view->GetScrollableArea(), bounding_box, PhysicalBoxStrut(),
-          *params.align_x, *params.align_y);
-  // Removes any potential negative offset from the
-  // `ScrollAlignment::CenterAlways()`.
-  scroll_offset_px =
-      view->GetScrollableArea()->ClampScrollOffset(scroll_offset_px);
-  ScrollOffset scroll_distance_px =
-      scroll_offset_px - view->GetScrollableArea()->GetScrollOffset();
-
-  return std::max(std::abs(scroll_distance_px.x()),
-                  std::abs(scroll_distance_px.y()));
 }
 
 }  // namespace
@@ -441,24 +407,6 @@ void AnnotationAgentImpl::ScrollIntoView(bool applies_focus) const {
   document.SetSequentialFocusNavigationStartingPoint(
       first_node_with_layout_object);
 
-  if (type_ == mojom::blink::AnnotationType::kGlic) {
-    float max_distance_px = CalculateMaxScrollOffsetPx(
-        first_node_with_layout_object->GetLayoutObject()->GetFrameView(),
-        bounding_box, *params);
-    if (max_distance_px <= 1.f) {
-      document.Markers().StartGlicMarkerAnimationIfNeeded();
-    } else {
-      // Scroll is guaranteed to happen. `ScrollableArea::OnScrollFinished()`
-      // will call `StartGlicMarkerAnimation()`. This is a near-term solution
-      // due to the re-arch work in crbug.com/41406914. It means in the nested
-      // multiple scollers case, the first ever `OnScrollFinished()` starts the
-      // animation, regardless if the actual scroll has finished or not.
-      //
-      // TODO(https://crbug.com/41406914): Migrate from `OnScrollFinished()` to
-      // the scroll-promises.
-    }
-  }
-
   scroll_into_view_util::ScrollRectToVisible(
       *first_node_with_layout_object->GetLayoutObject(), bounding_box,
       std::move(params));
@@ -468,12 +416,6 @@ std::optional<mojom::blink::AnnotationType>
 AnnotationAgentImpl::IsOverAnnotation(const HitTestResult& result) {
   if (!result.InnerNode() || !result.InnerNodeFrame()) {
     return std::nullopt;
-  }
-
-  if (HasMarkerAroundPosition(result, DocumentMarker::MarkerType::kGlic)) {
-    // Note: We could also have a marker of type kTextFragment around the
-    // position as well, but we treat kGlic as topmost.
-    return mojom::blink::AnnotationType::kGlic;
   }
 
   if (HasMarkerAroundPosition(result,
@@ -590,10 +532,6 @@ void AnnotationAgentImpl::ProcessAttachmentFinished() {
             DocumentMarker::kTextFragment);
         break;
       }
-      case mojom::blink::AnnotationType::kGlic: {
-        document->Markers().AddGlicMarker(dom_range);
-        break;
-      }
       case mojom::blink::AnnotationType::kTextFinder:
       case mojom::blink::AnnotationType::kScrollOnly: {
         // TextFinder and ScrollOnly types are used only to determine whether a
@@ -672,27 +610,6 @@ mojom::blink::ScrollBehavior AnnotationAgentImpl::ComputeScrollIntoViewBehavior(
     case AnnotationType::kScrollOnly:
       // Use kInstant to match the behavior of browser-initiated scroll
       // restoration.
-      return ScrollBehavior::kInstant;
-    case AnnotationType::kGlic:
-      // Use kInstant for long scroll distances, kSmooth otherwise.
-      if (LocalFrameView* view = document->GetFrame()->View()) {
-        float max_distance_in_dips =
-            CalculateMaxScrollOffsetPx(view, bounding_box, params);
-        if (ChromeClient* client = view->GetChromeClient()) {
-          // Note: We explicitly don't use `LocalFrame::DevicePixelRatio` or
-          // `LocalFrame::LayoutZoomFactor` as both are affected by browser
-          // zoom, and we don't want to allow longer scrolls (in physical
-          // pixels) when content is zoomed.
-          const float device_scale_factor =
-              client->GetScreenInfo(view->GetFrame()).device_scale_factor;
-          max_distance_in_dips = max_distance_in_dips / device_scale_factor;
-        }
-        base::UmaHistogramCustomCounts("Glic.ScrollTo.ScrollDistance",
-                                       max_distance_in_dips, 1, 500000, 50);
-        if (max_distance_in_dips < GetGlicSmoothScrollThresholdInDIPs()) {
-          return ScrollBehavior::kSmooth;
-        }
-      }
       return ScrollBehavior::kInstant;
   }
 }

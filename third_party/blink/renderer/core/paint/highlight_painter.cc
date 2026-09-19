@@ -10,7 +10,6 @@
 #include "third_party/blink/renderer/core/editing/frame_selection.h"
 #include "third_party/blink/renderer/core/editing/markers/custom_highlight_marker.h"
 #include "third_party/blink/renderer/core/editing/markers/document_marker_controller.h"
-#include "third_party/blink/renderer/core/editing/markers/glic_marker.h"
 #include "third_party/blink/renderer/core/editing/markers/styleable_marker.h"
 #include "third_party/blink/renderer/core/editing/markers/text_match_marker.h"
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
@@ -643,14 +642,6 @@ void HighlightPainter::PaintNonCssMarkers(Phase phase) {
         }
         break;
       }
-      case DocumentMarker::kGlic: {
-        // GLIC markers may be related to agentic AI or other features that the
-        // document origin would not normally have access to.
-        if (phase == kBackground && !paint_info_.IsPrivacyPreserving()) {
-          PaintBackgroundForGlicMarker(marker, text, paint_start_offset,
-                                       paint_end_offset);
-        }
-      } break;
       case DocumentMarker::kSpelling:
       case DocumentMarker::kGrammar:
       case DocumentMarker::kTextFragment:
@@ -1292,20 +1283,6 @@ void HighlightPainter::PaintTextForCompositionMarker(
       text_style, kInvalidDOMNodeId, foreground_auto_dark_mode_);
 
   decoration_painter.PaintOnlyLineThrough();
-}
-
-void HighlightPainter::PaintBackgroundForGlicMarker(
-    const DocumentMarker* marker,
-    const StringView& text,
-    unsigned paint_start_offset,
-    unsigned paint_end_offset) {
-  const auto& glic_highlight = To<GlicMarker>(*marker);
-  gfx::RectF text_box(
-      ComputeBackgroundRect(text, paint_start_offset, paint_end_offset));
-  cc::PaintFlags flags;
-  flags.setAntiAlias(true);
-  flags.setColor(glic_highlight.BackgroundColor().toSkColor4f());
-  paint_info_.context.Canvas()->drawRect(RectFToSkRect(text_box), flags);
 }
 
 }  // namespace blink

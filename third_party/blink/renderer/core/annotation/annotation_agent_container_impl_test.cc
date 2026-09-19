@@ -785,8 +785,6 @@ TEST_F(AnnotationAgentContainerImplTest, RemoveAgentsOfType) {
     mojom::AnnotationType type = mojom::AnnotationType::kSharedHighlight;
   };
   std::array<AnnotationAgentHost, 3> agent_hosts;
-  agent_hosts[0].type = mojom::AnnotationType::kGlic;
-  agent_hosts[2].type = mojom::AnnotationType::kGlic;
 
   for (auto& agent_host : agent_hosts) {
     auto remote_receiver_pair = agent_host.host.BindForCreateAgent();
@@ -803,11 +801,6 @@ TEST_F(AnnotationAgentContainerImplTest, RemoveAgentsOfType) {
   ASSERT_TRUE(GetAgentAt(*container, 1)->IsAttached());
   ASSERT_TRUE(GetAgentAt(*container, 2)->IsAttached());
 
-  remote->RemoveAgentsOfType(mojom::AnnotationType::kGlic);
-  remote.FlushForTesting();
-
-  // Only the agents of type kGlic should be removed.
-  EXPECT_EQ(GetAgentCount(*container), 1u);
   EXPECT_EQ(GetAgentAt(*container, 0)->GetType(),
             mojom::AnnotationType::kSharedHighlight);
 

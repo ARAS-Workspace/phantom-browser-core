@@ -43,8 +43,6 @@ class PdfAnnotationAgent : public blink::mojom::AnnotationAgent {
 
   PdfAnnotationAgent(
       Container* container,
-      blink::mojom::AnnotationType type,
-      blink::mojom::SelectorPtr selector,
       mojo::PendingRemote<blink::mojom::AnnotationAgentHost> host_remote,
       mojo::PendingReceiver<blink::mojom::AnnotationAgent> agent_receiver);
   ~PdfAnnotationAgent() override;

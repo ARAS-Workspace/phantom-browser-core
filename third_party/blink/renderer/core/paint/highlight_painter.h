@@ -266,11 +266,6 @@ class CORE_EXPORT HighlightPainter {
                                      unsigned paint_start_offset,
                                      unsigned paint_end_offset);
 
-  void PaintBackgroundForGlicMarker(const DocumentMarker* marker,
-                                    const StringView& text,
-                                    unsigned paint_start_offset,
-                                    unsigned paint_end_offset);
-
   const TextFragmentPaintInfo& fragment_paint_info_;
 
   // Offsets of the fragment in DOM space, or nullopt if |node_| is not Text or

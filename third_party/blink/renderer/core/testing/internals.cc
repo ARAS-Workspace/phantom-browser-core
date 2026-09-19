@@ -654,9 +654,6 @@ static std::optional<DocumentMarker::MarkerType> MarkerTypeFrom(
   if (EqualIgnoringAsciiCase(marker_type, "Suggestion")) {
     return DocumentMarker::kSuggestion;
   }
-  if (EqualIgnoringAsciiCase(marker_type, "Glic")) {
-    return DocumentMarker::kGlic;
-  }
   return std::nullopt;
 }
 
@@ -1324,12 +1321,11 @@ void Internals::setMarker(Document* document,
     return;
   }
 
-  if (type != DocumentMarker::kSpelling && type != DocumentMarker::kGrammar &&
-      type != DocumentMarker::kGlic) {
+  if (type != DocumentMarker::kSpelling && type != DocumentMarker::kGrammar) {
     exception_state.ThrowDOMException(
         DOMExceptionCode::kSyntaxError,
         StrCat({"internals.setMarker() currently only "
-                "supports spelling, grammar and glic "
+                "supports spelling and grammar "
                 " markers; attempted to add marker of "
                 " type '",
                 marker_type, "'."}));
@@ -1339,15 +1335,8 @@ void Internals::setMarker(Document* document,
   document->UpdateStyleAndLayout(DocumentUpdateReason::kTest);
   if (type == DocumentMarker::kSpelling) {
     document->Markers().AddSpellingMarker(EphemeralRange(range));
-  } else if (type == DocumentMarker::kGrammar) {
-    document->Markers().AddGrammarMarker(EphemeralRange(range));
   } else {
-    // GLIC markers animate their color and start off transparent. So
-    // we need to start the animation and update it to the end in order to
-    // see the marker appearance.
-    document->Markers().AddGlicMarker(EphemeralRange(range));
-    document->Markers().StartGlicMarkerAnimationIfNeeded();
-    document->Markers().ContinueGlicMarkerAnimation(base::TimeTicks());
+    document->Markers().AddGrammarMarker(EphemeralRange(range));
   }
 }
 

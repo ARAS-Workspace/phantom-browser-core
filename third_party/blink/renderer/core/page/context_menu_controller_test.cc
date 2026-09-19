@@ -1892,7 +1892,6 @@ TEST_F(ContextMenuControllerTest, AnnotationType) {
   Element* second_element = document->getElementById(AtomicString("one"));
   Element* third_element = document->getElementById(AtomicString("three"));
   Element* fourth_element = document->getElementById(AtomicString("four"));
-  Element* fifth_element = document->getElementById(AtomicString("five"));
   Element* last_element = document->getElementById(AtomicString("six"));
 
   // Install a text fragment marker from the beginning of <p> one to near the
@@ -1901,12 +1900,6 @@ TEST_F(ContextMenuControllerTest, AnnotationType) {
       EphemeralRange(Position(first_element->firstChild(), 0),
                      Position(fourth_element->firstChild(), 21));
   document->Markers().AddTextFragmentMarker(dom_range);
-
-  // Install a glic marker from the beginning of <p> four to near the end of
-  // of <p> five.
-  dom_range = EphemeralRange(Position(fourth_element->firstChild(), 0),
-                             Position(fifth_element->firstChild(), 21));
-  document->Markers().AddGlicMarker(dom_range);
 
   document->UpdateStyleAndLayout(DocumentUpdateReason::kTest);
 
@@ -1931,21 +1924,6 @@ TEST_F(ContextMenuControllerTest, AnnotationType) {
   context_menu_data = GetWebFrameClient().GetContextMenuData();
   EXPECT_EQ(context_menu_data.annotation_type,
             mojom::AnnotationType::kSharedHighlight);
-
-  // Opening the context menu from fifth <p> should set `annotation_type` to
-  // kGlic.
-  EXPECT_TRUE(ShowContextMenuForElement(
-      fifth_element, ui::mojom::blink::MenuSourceType::kMouse));
-  context_menu_data = GetWebFrameClient().GetContextMenuData();
-  EXPECT_EQ(context_menu_data.annotation_type, mojom::AnnotationType::kGlic);
-
-  // Opening the context menu from fourth <p> should set `annotation_type` to
-  // kGlic (even though there's also an overlapping annotation of type
-  // kSharedHighlight).
-  EXPECT_TRUE(ShowContextMenuForElement(
-      fourth_element, ui::mojom::blink::MenuSourceType::kMouse));
-  context_menu_data = GetWebFrameClient().GetContextMenuData();
-  EXPECT_EQ(context_menu_data.annotation_type, mojom::AnnotationType::kGlic);
 }
 
 TEST_F(ContextMenuControllerTest, SelectAllEnabledForEditContext) {

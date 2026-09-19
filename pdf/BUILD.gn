@@ -476,7 +476,6 @@ if (enable_pdf) {
       "paint_manager_simd_unittest.cc",
       "paint_manager_unittest.cc",
       "parsed_params_unittest.cc",
-      "pdf_annotation_agent_unittest.cc",
       "pdf_caret_unittest.cc",
       "pdf_rect_unittest.cc",
       "pdf_transform_unittest.cc",

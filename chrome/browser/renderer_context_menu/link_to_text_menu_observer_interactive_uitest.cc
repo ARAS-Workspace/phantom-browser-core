@@ -726,39 +726,3 @@ IN_PROC_BROWSER_TEST_F(LinkToTextMenuObserverTest, ShowsToastOnCopyingLink) {
 
   EXPECT_TRUE(browser()->GetFeatures().toast_controller()->IsShowingToast());
 }
-
-IN_PROC_BROWSER_TEST_F(LinkToTextMenuObserverTest,
-                       AddsRemoveMenuItemForGlicHighlight) {
-  content::ContextMenuParams params;
-  params.page_url = GURL("http://foo.com/");
-  params.annotation_type = blink::mojom::AnnotationType::kGlic;
-  InitMenu(params);
-  EXPECT_EQ(1u, menu()->GetMenuSize());
-  MockRenderViewContextMenu::MockMenuItem item;
-
-  // Check Remove item.
-  menu()->GetMenuItem(0, &item);
-  EXPECT_EQ(IDC_CONTENT_CONTEXT_REMOVELINKTOTEXT, item.command_id);
-  EXPECT_FALSE(item.checked);
-  EXPECT_FALSE(item.hidden);
-  EXPECT_TRUE(item.enabled);
-}
-
-IN_PROC_BROWSER_TEST_F(LinkToTextMenuObserverTest, RemovesGlicHighlight) {
-  content::BrowserTestClipboardScope test_clipboard_scope;
-  content::ContextMenuParams params;
-  params.page_url = GURL("http://foo.com/");
-  params.annotation_type = blink::mojom::AnnotationType::kGlic;
-  InitMenu(params);
-  std::unique_ptr<MockAnnotationAgentContainer>
-      mock_annotation_agent_container =
-          MockAnnotationAgentContainer::InstallMockAnnotationAgentContainer(
-              browser()
-                  ->tab_strip_model()
-                  ->GetActiveWebContents()
-                  ->GetPrimaryMainFrame());
-  EXPECT_CALL(*mock_annotation_agent_container,
-              RemoveAgentsOfType(blink::mojom::AnnotationType::kGlic));
-  menu()->ExecuteCommand(IDC_CONTENT_CONTEXT_REMOVELINKTOTEXT, 0);
-  mock_annotation_agent_container->FlushForTesting();
-}
