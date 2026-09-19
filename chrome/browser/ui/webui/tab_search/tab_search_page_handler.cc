@@ -864,8 +864,7 @@ tab_search::mojom::TabPtr TabSearchPageHandler::GetTab(
                                 alert == tabs::TabAlert::kAudioRecording ||
                                 alert == tabs::TabAlert::kVideoRecording ||
                                 alert == tabs::TabAlert::kAudioPlaying ||
-                                alert == tabs::TabAlert::kAudioMuting ||
-                                alert == tabs::TabAlert::kGlicAccessing;
+                                alert == tabs::TabAlert::kAudioMuting;
                        });
 
   return tab_mojom_data;

@@ -14,7 +14,6 @@
 
 :host {
    --audio-icon-color: var(--color-tab-search-media-icon);
-   --glic-active-icon-color: var(--color-tab-search-media-glic-active-icon);
    --media-recording-icon-color:  var(--color-tab-search-media-recording-icon);
    position: relative;
  }
@@ -169,11 +168,6 @@ cr-icon-button {
 #mediaAlert[class = 'audio-muting'] {
   -webkit-mask-image: url(alert_indicators/tab_audio_muting_rounded_old.svg);
   background-color:  var(--audio-icon-color);
-}
-
-#mediaAlert[class = 'glic-accessing'] {
-  -webkit-mask-image: url(alert_indicators/tab_media_glic_active.svg);
-  background-color:  var(--glic-active-icon-color);
 }
 
 #iconContainer {

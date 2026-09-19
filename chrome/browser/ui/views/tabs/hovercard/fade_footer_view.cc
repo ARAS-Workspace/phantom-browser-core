@@ -51,8 +51,6 @@ ui::ColorId GetTabAlertColor(tabs::TabAlert alert_state) {
     case tabs::TabAlert::kPipPlaying:
     case tabs::TabAlert::kActorAccessing:
     case tabs::TabAlert::kActorWaitingOnUser:
-    case tabs::TabAlert::kGlicAccessing:
-    case tabs::TabAlert::kGlicSharing:
       icon_color = kColorHoverCardTabAlertPipPlayingIcon;
       break;
     case tabs::TabAlert::kAudioPlaying:

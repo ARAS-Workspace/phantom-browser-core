@@ -48,8 +48,6 @@ bool CompareAlerts::operator()(TabAlert first, TabAlert second) const {
            {TabAlert::kSerialConnected, 8},
            {TabAlert::kActorWaitingOnUser, 7},
            {TabAlert::kActorAccessing, 6},
-           {TabAlert::kGlicAccessing, 5},
-           {TabAlert::kGlicSharing, 4},
         // NOTE: VR must take priority over the audio alert ones
         // because most VR content has audio and its usage is implied by the
         // VR icon.
@@ -168,8 +166,6 @@ std::u16string TabAlertController::GetTabAlertStateText(
           IDS_TOOLTIP_TAB_ALERT_STATE_VR_PRESENTING);
     case TabAlert::kActorAccessing:
     case TabAlert::kActorWaitingOnUser:
-    case TabAlert::kGlicAccessing:
-    case TabAlert::kGlicSharing:
       NOTREACHED();
   }
   NOTREACHED();
@@ -208,8 +204,6 @@ int TabAlertController::GetAccessibleAlertStringId(const TabAlert alert_state) {
       return IDS_TAB_AX_LABEL_VR_PRESENTING;
     case TabAlert::kActorAccessing:
     case TabAlert::kActorWaitingOnUser:
-    case TabAlert::kGlicAccessing:
-    case TabAlert::kGlicSharing:
       NOTREACHED();
   }
 }
@@ -238,8 +232,6 @@ void TabAlertController::RecordCloseTabMetrics(const TabAlert alert_state) {
     case TabAlert::kVrPresentingInHeadset:
     case TabAlert::kActorWaitingOnUser:
     case TabAlert::kActorAccessing:
-    case TabAlert::kGlicAccessing:
-    case TabAlert::kGlicSharing:
       break;
   }
 }
