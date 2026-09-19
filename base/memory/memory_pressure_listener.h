@@ -65,7 +65,7 @@ enum class MemoryPressureListenerTag {
   // kNetworkServiceClient = 32,
   // kGpuChildThread = 33,
   // kNavigationEntryScreenshotManager = 34,
-  kGlicKeyedService = 35,
+  // kGlicKeyedService = 35,
   // kRenderThreadImpl = 36,  // Deprecated
   kSpareRenderProcessHostManagerImpl = 37,
   // kDOMStorageContextWrapper = 38,
@@ -90,7 +90,7 @@ enum class MemoryPressureListenerTag {
   kMemoryCache = 57,
   kResource = 58,
   // kResourceFetcher = 59,
-  kGlicProfileManager = 60,
+  // kGlicProfileManager = 60,
   kWebUIContentsPreloadManager = 61,
   kPaintPreviewTabService = 62,
   kRenderFrameHostImpl = 63,

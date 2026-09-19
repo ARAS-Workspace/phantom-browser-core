@@ -27,7 +27,8 @@ enum class PersonalContextNonEligibilityReason {
   kNotOptedInToContext = 5,
   kNotPhotosAndWorkspaceAvailable = 6,
   kPersonalIntelligencePrefDisabled = 7,
-  kNotGlicFirstRun = 8,
+  // `8` used to be a first run reason. It has been removed but in order to
+  // keep backward compatibility, its value has been retired.
   kFindAndFillWithGeminiSettingsDisabled = 9,
   kNotG1SubscriberOrAndroidPremiumDevice = 10,
   kEligible = 11,

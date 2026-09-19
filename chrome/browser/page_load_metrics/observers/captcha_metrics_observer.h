@@ -18,7 +18,8 @@ class CaptchaMetricsObserver
   enum class CaptchaFrameAgentContext {
     kUnknown = 0,
     kNoAgentActiveOnTab = 1,
-    kGlicAgentActiveOnTab = 2,
+    // `2` used to be an agent context. It has been removed but in order to
+    // keep backward compatibility, its value has been retired.
     kDevToolsAgentActiveOnTab = 3,
     kMultipleAgentsActiveOnTab = 4,
     kMaxValue = kMultipleAgentsActiveOnTab,
