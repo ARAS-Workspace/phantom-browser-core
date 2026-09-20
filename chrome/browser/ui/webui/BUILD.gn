@@ -927,7 +927,6 @@ if (!is_android) {
       ]
       deps += [
         ":theme_source",
-        "//chrome/browser/contextual_cueing",
         "//chrome/browser/ui:ui_features",
         "//chrome/browser/ui/webui/iwa_dev",
         "//chrome/browser/ui/webui/whats_new",

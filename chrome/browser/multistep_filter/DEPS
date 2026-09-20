@@ -1,5 +1,4 @@
 include_rules = [
-  "+chrome/browser/contextual_cueing",
   "+chrome/browser/favicon",
   "+chrome/browser/ui/browser_window",
   "+chrome/browser/ui/page_action",

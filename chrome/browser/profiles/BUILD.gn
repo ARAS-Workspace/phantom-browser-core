@@ -678,7 +678,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/content_index",
     "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/context_hub",
-    "//chrome/browser/contextual_cueing",
     "//chrome/browser/critical_actions",
     "//chrome/browser/custom_handlers",
     "//chrome/browser/data_sharing",

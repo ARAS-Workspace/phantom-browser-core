@@ -25,7 +25,6 @@
 #include "chrome/browser/chrome_content_browser_client.h"
 #include "chrome/browser/component_updater/component_updater_prefs.h"
 #include "chrome/browser/context_hub/prefs.h"
-#include "chrome/browser/contextual_cueing/prefs.h"
 #include "chrome/browser/download/download_prefs.h"
 #include "chrome/browser/engagement/important_sites_util.h"
 #include "chrome/browser/enterprise/reporting/prefs.h"
@@ -1339,7 +1338,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   collaboration::prefs::RegisterProfilePrefs(registry);
   commerce::RegisterProfilePrefs(registry);
   context_hub::prefs::RegisterProfilePrefs(registry);
-  contextual_cueing::prefs::RegisterProfilePrefs(registry);
   registry->RegisterIntegerPref(prefs::kContextualTasksNextPanelOpenCount, 0);
   registry->RegisterBooleanPref(prefs::kCtrlTabMru, false);
   cross_device::RegisterProfilePrefs(registry);

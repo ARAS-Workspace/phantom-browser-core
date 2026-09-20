@@ -36,10 +36,6 @@ struct ConsentState {
 };
 
 // Represents the user's suggestions policy state for multistep filter.
-// The values of this enum correspond to the integer settings values defined
-// in `contextual_cueing::ChromeSuggestionsSettingsValue` inside
-// the chrome-level header `chrome/browser/contextual_cueing/prefs.h`.
-// We define it here because this component cannot import chrome-level headers.
 enum class SuggestionsPolicyState {
   kEnabled = 0,
   kDisabled = 1,

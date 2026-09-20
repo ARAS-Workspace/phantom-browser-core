@@ -805,8 +805,7 @@
                   '|services/resource_coordinator/',
     },
     'chrome_intelligence': {
-      'filepath': 'contextual_cueing'\
-                  '|history_clusters'\
+      'filepath': 'history_clusters'\
                   '|history_embeddings'\
                   '|image_service'\
                   '|ios/chrome/browser/text_selection'\
