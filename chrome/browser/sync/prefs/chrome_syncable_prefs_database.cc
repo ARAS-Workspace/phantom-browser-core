@@ -376,7 +376,7 @@ enum {
   // kTabSearchMigrationComplete = 100325, (deprecated)
   kReadAloudPlaybackMode = 100326,
   kPinSplitTabButton = 100327,
-  kGlicRolloutEligibility = 100328,
+  // kGlicRolloutEligibility = 100328, (deprecated)
   kShelfNotebookLmAppPinRolls = 100329,
   // kVerticalTabsEnabled = 100330, (no longer synced)
   kSplitViewDragAndDropEnabled = 100331,

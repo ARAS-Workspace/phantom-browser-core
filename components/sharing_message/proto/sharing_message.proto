@@ -8,7 +8,6 @@ option java_multiple_files = true;
 option java_package = "org.chromium.components.sharing_message.proto";
 
 import "one_time_token_backend_notification.proto";
-import "glic_experimental_triggering.proto";
 import "optimization_guide_push_notification.proto";
 import "peer_connection_messages.proto";
 import "remote_copy_message.proto";
@@ -21,8 +20,8 @@ option optimize_for = LITE_RUNTIME;
 // Message for sending between devices in Sharing.
 // Next tag: 19
 message SharingMessage {
-  reserved 4, 5;
-  reserved "shared_clipboard_message";
+  reserved 4, 5, 18;
+  reserved "shared_clipboard_message", "glic_experimental_triggering";
 
   // Identifier of sender. required unless any of the following is true:
   // 1. payload is a AckMessage
@@ -42,7 +41,6 @@ message SharingMessage {
     WebRtcSignalingMessage web_rtc_signaling_frame = 14;
     OptimizationGuidePushNotification optimization_guide_push_notification = 16;
     OneTimeTokenBackendNotification one_time_token_backend_notification = 17;
-    GlicExperimentalTriggering glic_experimental_triggering = 18;
   }
 
   oneof ack_channel_configuration {
@@ -82,12 +80,14 @@ message AckMessage {
 
 // Message for responding to a SharingMessage.
 message ResponseMessage {
+  reserved 4;
+  reserved "glic_experimental_triggering";
+
   // Payload of the response, contains one of the messages below. required.
   oneof payload {
     SmsFetchResponse sms_fetch_response = 1;
     PeerConnectionAnswerMessage peer_connection_answer_message_response = 2;
     DiscoveryResponse discovery_response = 3;
-    GlicExperimentalTriggering glic_experimental_triggering = 4;
   }
 }
 
