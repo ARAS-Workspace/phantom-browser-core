@@ -26,7 +26,6 @@ import java.lang.annotation.RetentionPolicy;
     FeatureConstants.ADAPTIVE_BUTTON_IN_TOP_TOOLBAR_CUSTOMIZATION_SHARE_FEATURE,
     FeatureConstants.ADAPTIVE_BUTTON_IN_TOP_TOOLBAR_CUSTOMIZATION_TRANSLATE_FEATURE,
     FeatureConstants.ADAPTIVE_BUTTON_IN_TOP_TOOLBAR_CUSTOMIZATION_VOICE_SEARCH_FEATURE,
-    FeatureConstants.ADAPTIVE_BUTTON_PIN_GLIC_TOOLBAR_BUTTON_FEATURE,
     FeatureConstants.AIM_ACTIVATION_HINT,
     FeatureConstants.ANDROID_BOTTOM_BAR_AIM,
     FeatureConstants.ANDROID_BOTTOM_BAR_AIM_PROMO_DIALOG,
@@ -70,7 +69,6 @@ import java.lang.annotation.RetentionPolicy;
     FeatureConstants.FUSEBOX_ATTACHMENT_FEATURE,
     FeatureConstants.GENERIC_ALWAYS_TRIGGER_HELP_UI_FEATURE,
     FeatureConstants.GESTURE_USER_EDUCATION,
-    FeatureConstants.GLIC_PROMO_ANDROID_FEATURE,
     FeatureConstants.IDENTITY_DISC_FEATURE,
     FeatureConstants.INSTANCE_SWITCHER,
     FeatureConstants.IPH_EXTENSIONS_MANAGE_APP_MENU_FEATURE,
@@ -177,9 +175,6 @@ public @interface FeatureConstants {
 
     String ADAPTIVE_BUTTON_IN_TOP_TOOLBAR_CUSTOMIZATION_VOICE_SEARCH_FEATURE =
             "IPH_AdaptiveButtonInTopToolbarCustomization_VoiceSearch";
-
-    String ADAPTIVE_BUTTON_PIN_GLIC_TOOLBAR_BUTTON_FEATURE =
-            "IPH_AdaptiveButtonPinGlicToolbarButton";
 
     /** A hint to activate AI Mode on Android Desktop via keystrokes. */
     String AIM_ACTIVATION_HINT = "IPH_AimActivationHint";
@@ -292,9 +287,6 @@ public @interface FeatureConstants {
 
     /** An IPH feature to prompt users to use the back swipe. */
     String GESTURE_USER_EDUCATION = "IPH_GestureUserEducation";
-
-    /** An IPH feature to show on the Glic Promo on Android. */
-    String GLIC_PROMO_ANDROID_FEATURE = "IPH_GlicPromoAndroid";
 
     /**
      * An IPH feature prompting user to tap on identity disc to navigate to "Sync and Google

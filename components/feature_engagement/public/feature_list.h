@@ -77,8 +77,6 @@ DEFINE_VARIATION_PARAM(
 DEFINE_VARIATION_PARAM(
     kIPHAdaptiveButtonInTopToolbarCustomizationReadAloudFeature,
     "IPH_AdaptiveButtonInTopToolbarCustomization_ReadAloud");
-DEFINE_VARIATION_PARAM(kIPHAdaptiveButtonPinGlicToolbarButtonFeature,
-                       "IPH_AdaptiveButtonPinGlicToolbarButton");
 DEFINE_VARIATION_PARAM(
     kIPHAdaptiveButtonInTopToolbarCustomizationPageSummaryWebFeature,
     "IPH_AdaptiveButtonInTopToolbarCustomization_PageSummary_Web");
@@ -140,7 +138,6 @@ DEFINE_VARIATION_PARAM(kIPHFuseboxAttachmentFeature, "IPH_FuseboxAttachment");
 DEFINE_VARIATION_PARAM(kIPHGenericAlwaysTriggerHelpUiFeature,
                        "IPH_GenericAlwaysTriggerHelpUiFeature");
 DEFINE_VARIATION_PARAM(kIPHGestureUserEducation, "IPH_GestureUserEducation");
-DEFINE_VARIATION_PARAM(kIPHGlicPromoAndroidFeature, "IPH_GlicPromoAndroid");
 DEFINE_VARIATION_PARAM(kIPHIdentityDiscFeature, "IPH_IdentityDisc");
 DEFINE_VARIATION_PARAM(kIPHIncognitoIndicatorCloseAllWindows,
                        "IPH_IncognitoIndicatorCloseAllWindows");
@@ -633,7 +630,6 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHAdaptiveButtonInTopToolbarCustomizationShareFeature),
         VARIATION_ENTRY(kIPHAdaptiveButtonInTopToolbarCustomizationTranslateFeature),
         VARIATION_ENTRY(kIPHAdaptiveButtonInTopToolbarCustomizationVoiceSearchFeature),
-        VARIATION_ENTRY(kIPHAdaptiveButtonPinGlicToolbarButtonFeature),
         VARIATION_ENTRY(kIPHAimActivationHint),
         VARIATION_ENTRY(kIPHAndroidBottomBarAim),
         VARIATION_ENTRY(kIPHAndroidBottomBarAimPromoDialog),
@@ -677,7 +673,6 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHFeedHeaderMenuFeature),
         VARIATION_ENTRY(kIPHFeedSwipeRefresh),
         VARIATION_ENTRY(kIPHGestureUserEducation),
-        VARIATION_ENTRY(kIPHGlicPromoAndroidFeature),
         VARIATION_ENTRY(kIPHIdentityDiscFeature),
         VARIATION_ENTRY(kIPHIncognitoIndicatorCloseAllWindows),
         VARIATION_ENTRY(kIPHInstanceSwitcherFeature),

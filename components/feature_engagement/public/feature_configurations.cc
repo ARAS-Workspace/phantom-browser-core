@@ -1313,48 +1313,6 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     return config;
   }
 
-  if (kIPHAdaptiveButtonPinGlicToolbarButtonFeature.name == feature->name) {
-    // A config that defines when the Glic adaptive toolbar button should be
-    // auto-pinned:
-    // * If no other adaptive toolbar button has been used in the last 7 days.
-    // * If the Glic button itself hasn't been used.
-    // * Only once in its lifetime.
-    // * Other IPHs do not impact triggering.
-    FeatureConfig config;
-    config.valid = true;
-    config.availability = Comparator(ANY, 0);
-    config.session_rate = Comparator(ANY, 0);
-    config.session_rate_impact.type = SessionRateImpact::Type::NONE;
-    config.blocked_by.type = BlockedBy::Type::NONE;
-    config.blocking.type = Blocking::Type::NONE;
-    config.trigger =
-        EventConfig("adaptive_toolbar_glic_iph_trigger", Comparator(EQUAL, 0),
-                    k10YearsInDays, k10YearsInDays);
-    config.used = EventConfig("adaptive_toolbar_customization_glic_clicked",
-                              Comparator(EQUAL, 0), 7, 360);
-    config.event_configs.insert(
-        EventConfig("adaptive_toolbar_customization_new_tab_opened",
-                    Comparator(EQUAL, 0), 7, 360));
-    config.event_configs.insert(
-        EventConfig("adaptive_toolbar_customization_open_in_browser_opened",
-                    Comparator(EQUAL, 0), 7, 360));
-    config.event_configs.insert(
-        EventConfig("adaptive_toolbar_customization_share_opened",
-                    Comparator(EQUAL, 0), 7, 360));
-    config.event_configs.insert(
-        EventConfig("adaptive_toolbar_customization_voice_search_opened",
-                    Comparator(EQUAL, 0), 7, 360));
-    config.event_configs.insert(
-        EventConfig("adaptive_toolbar_customization_translate_opened",
-                    Comparator(EQUAL, 0), 7, 360));
-    config.event_configs.insert(
-        EventConfig("adaptive_toolbar_customization_read_aloud_clicked",
-                    Comparator(EQUAL, 0), 7, 360));
-    config.event_configs.insert(
-        EventConfig("adaptive_toolbar_customization_add_to_bookmarks_opened",
-                    Comparator(EQUAL, 0), 7, 360));
-    return config;
-  }
   if (kIPHMenuAddToGroup.name == feature->name) {
     // Allows an IPH for the main app menu 'Add to Group' entry:
     // * Only once per year.
@@ -1451,22 +1409,6 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
   // A generic feature that always returns true.
   if (kIPHGenericAlwaysTriggerHelpUiFeature.name == feature->name) {
     return CreateAlwaysTriggerConfig(feature);
-  }
-
-  if (kIPHGlicPromoAndroidFeature.name == feature->name) {
-    // A config that allows the GLIC promo IPH to be shown.
-    // * Only once in its lifetime.
-    // * Only as long as the user hasn't opened the glic feature on Android.
-    FeatureConfig config;
-    config.valid = true;
-    config.availability = Comparator(ANY, 0);
-    config.session_rate = Comparator(EQUAL, 0);
-    config.trigger =
-        EventConfig("glic_promo_android_iph_trigger", Comparator(LESS_THAN, 1),
-                    k10YearsInDays, k10YearsInDays);
-    config.used = EventConfig("glic_android_used", Comparator(EQUAL, 0),
-                              k10YearsInDays, k10YearsInDays);
-    return config;
   }
 
   if (kIPHLowUserEngagementDetectorFeature.name == feature->name) {

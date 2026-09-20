@@ -355,9 +355,6 @@ BASE_FEATURE(kIPHAdaptiveButtonInTopToolbarCustomizationAddToBookmarksFeature,
 BASE_FEATURE(kIPHAdaptiveButtonInTopToolbarCustomizationReadAloudFeature,
              "IPH_AdaptiveButtonInTopToolbarCustomization_ReadAloud",
              base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHAdaptiveButtonPinGlicToolbarButtonFeature,
-             "IPH_AdaptiveButtonPinGlicToolbarButton",
-             base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHAdaptiveButtonInTopToolbarCustomizationPageSummaryWebFeature,
              "IPH_AdaptiveButtonInTopToolbarCustomization_PageSummary_Web",
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -502,9 +499,6 @@ BASE_FEATURE(kIPHGenericAlwaysTriggerHelpUiFeature,
 BASE_FEATURE(kIPHGestureUserEducation,
              "IPH_GestureUserEducation",
              base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHGlicPromoAndroidFeature,
-             "IPH_GlicPromoAndroid",
-             base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHIdentityDiscFeature,
              "IPH_IdentityDisc",
              base::FEATURE_DISABLED_BY_DEFAULT);

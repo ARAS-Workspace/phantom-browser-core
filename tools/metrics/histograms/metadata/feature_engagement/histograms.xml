@@ -292,7 +292,8 @@ chromium-metrics-reviews@google.com.
   <variant name="IPH_GestureUserEducation"
       summary="IPH for gesture user education"/>
   <variant name="IPH_GlicPromo" summary="(obsolete) Glic promotion"/>
-  <variant name="IPH_GlicPromoAndroid" summary="Glic promotion on Android"/>
+  <variant name="IPH_GlicPromoAndroid"
+      summary="(obsolete) Glic promotion on Android"/>
   <variant name="IPH_GlicTrustFirstOnboardingShortcutSnoozePromo"
       summary="(obsolete) Glic quick access shortcut snooze promo."/>
   <variant name="IPH_GlicTrustFirstOnboardingShortcutToastPromo"

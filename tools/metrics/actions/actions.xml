@@ -480,7 +480,8 @@ should be able to be added at any place in this file.
   <variant name="_GestureUserEducation"
       summary="For gesture user edcuation IPH feature."/>
   <variant name="_GlicPromo" summary="(obsolete) For Glic feature."/>
-  <variant name="_GlicPromoAndroid" summary="For Glic promotion on Android."/>
+  <variant name="_GlicPromoAndroid"
+      summary="(obsolete) For Glic promotion on Android."/>
   <variant name="_GlicTrustFirstOnboardingShortcutSnoozePromo"
       summary="(obsolete) For Glic shortcut feature with a snooze promo."/>
   <variant name="_GlicTrustFirstOnboardingShortcutToastPromo"

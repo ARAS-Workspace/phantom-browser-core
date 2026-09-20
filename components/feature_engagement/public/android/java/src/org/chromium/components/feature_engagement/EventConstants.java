@@ -15,9 +15,6 @@ public final class EventConstants {
     public static final String ADAPTIVE_TOOLBAR_CUSTOMIZATION_ADD_TO_BOOKMARKS_OPENED =
             "adaptive_toolbar_customization_add_to_bookmarks_opened";
 
-    public static final String ADAPTIVE_TOOLBAR_CUSTOMIZATION_GLIC_CLICKED =
-            "adaptive_toolbar_customization_glic_clicked";
-
     /** AdaptiveButtonInTopToolbarCustomization new tab events. */
     public static final String ADAPTIVE_TOOLBAR_CUSTOMIZATION_NEW_TAB_OPENED =
             "adaptive_toolbar_customization_new_tab_opened";
@@ -41,9 +38,6 @@ public final class EventConstants {
     /** AdaptiveButtonInTopToolbarCustomization voice search events. */
     public static final String ADAPTIVE_TOOLBAR_CUSTOMIZATION_VOICE_SEARCH_OPENED =
             "adaptive_toolbar_customization_voice_search_opened";
-
-    public static final String ADAPTIVE_TOOLBAR_GLIC_IPH_TRIGGER =
-            "adaptive_toolbar_glic_iph_trigger";
 
     public static final String ADAPTIVE_TOOLBAR_PAGE_SUMMARY_PDF_USED =
             "adaptive_toolbar_page_summary_pdf_used";
@@ -142,9 +136,6 @@ public final class EventConstants {
 
     /** Fusebox attachment popup was toggled open by the user. */
     public static final String FUSEBOX_ATTACHMENT_POPUP_USED = "fusebox_attachment_popup_used";
-
-    /** Glic on Android used by the user. */
-    public static final String GLIC_ANDROID_USED = "glic_android_used";
 
     /** The user clicked the search button on the history toolbar. */
     public static final String HISTORY_TOOLBAR_SEARCH_MENU_ITEM_CLICKED =
