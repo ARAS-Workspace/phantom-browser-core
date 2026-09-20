@@ -115,29 +115,6 @@ data_controls::DataControlsDialogFactory* GetDialogFactory() {
 #endif
 }
 
-void MaybeReportDataControlsPasteFromGemini(
-    content::RenderFrameHost* destination,
-    const data_controls::Verdict& verdict,
-    int64_t content_size,
-    bool bypassed = false) {
-#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-  auto* router =
-      enterprise_connectors::ReportingEventRouterFactory::GetForBrowserContext(
-          destination->GetBrowserContext());
-
-  // `router` can be null for incognito browser contexts, so since there's no
-  // reporting in that case we just return early.
-  if (!router) {
-    return;
-  }
-
-  std::string email;
-
-  router->ReportPasteFromGemini(GetSourceURL(destination), email, verdict,
-                                content_size, bypassed);
-#endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
-}
-
 void MaybeReportDataControlsPaste(const FullPasteSource& source,
                                   const content::ClipboardEndpoint& destination,
                                   const ui::ClipboardMetadata& metadata,
@@ -566,14 +543,6 @@ std::optional<content::ClipboardEndpoint> GetValidURLEndpoint(
   }
 
   return endpoint;
-}
-
-void PasteFromGeminiIfAllowedByContentAnalysis(
-    content::RenderFrameHost* destination,
-    std::string data,
-    base::OnceCallback<void(bool)> callback) {
-
-  std::move(callback).Run(true);
 }
 
 }  // namespace
@@ -1178,89 +1147,4 @@ void CopyTextToClipboard(content::RenderFrameHost* rfh,
           std::make_unique<ui::DataTransferEndpoint>(std::move(dte))));
 }
 
-void PasteFromGeminiIfAllowedByPolicy(content::RenderFrameHost* destination,
-                                      std::string data,
-                                      base::OnceCallback<void(bool)> callback) {
-  CHECK(destination);
-  if (base::FeatureList::IsEnabled(data_controls::kDataControlsGlic)) {
-    auto* rules_service =
-        data_controls::ChromeRulesServiceFactory::GetInstance()
-            ->GetForBrowserContext(destination->GetBrowserContext());
-    if (rules_service) {
-      base::ElapsedTimer timer;
-      auto verdict = rules_service->GetPasteFromGeminiInChromeVerdict(
-          GetSourceURL(destination));
-      base::UmaHistogramTimes(
-          "Enterprise.DataControls.GlicPaste.EvaluationLatency",
-          timer.Elapsed());
-      base::UmaHistogramEnumeration("Enterprise.DataControls.GlicPaste.Verdict",
-                                    verdict.level());
-
-      auto* factory = GetDialogFactory();
-      auto* web_contents =
-          content::WebContents::FromRenderFrameHost(destination);
-
-      switch (verdict.level()) {
-        case data_controls::Rule::Level::kBlock:
-          MaybeReportDataControlsPasteFromGemini(destination, verdict,
-                                                 data.size());
-          if (factory) {
-            // TODO(crbug.com/473047343): Add browsertests to validate surfacing
-            // works.
-            if (web_contents && web_contents->GetDelegate()) {
-              web_contents->GetDelegate()->ActivateContents(web_contents);
-            }
-            factory->ShowDialogIfNeeded(
-                web_contents,
-                data_controls::DataControlsDialog::Type::kClipboardPasteBlock);
-          }
-          std::move(callback).Run(false);
-          return;
-        case data_controls::Rule::Level::kWarn:
-          MaybeReportDataControlsPasteFromGemini(destination, verdict,
-                                                 data.size());
-          if (factory) {
-            // TODO(crbug.com/473047343): Add browsertests to validate surfacing
-            // works.
-            if (web_contents && web_contents->GetDelegate()) {
-              web_contents->GetDelegate()->ActivateContents(web_contents);
-            }
-            factory->ShowDialogIfNeeded(
-                web_contents,
-                data_controls::DataControlsDialog::Type::kClipboardPasteWarn,
-                base::BindOnce(
-                    [](content::GlobalRenderFrameHostId rfh_id,
-                       std::string content_text, data_controls::Verdict verdict,
-                       base::OnceCallback<void(bool)> cb, bool bypassed) {
-                      auto* rfh = content::RenderFrameHost::FromID(rfh_id);
-                      if (bypassed && rfh) {
-                        MaybeReportDataControlsPasteFromGemini(
-                            rfh, verdict, content_text.size(),
-                            /*bypassed=*/true);
-                        PasteFromGeminiIfAllowedByContentAnalysis(
-                            rfh, std::move(content_text), std::move(cb));
-                      } else {
-                        std::move(cb).Run(false);
-                      }
-                    },
-                    destination->GetGlobalId(), std::move(data),
-                    std::move(verdict), std::move(callback)));
-          } else {
-            std::move(callback).Run(false);
-          }
-          return;
-        case data_controls::Rule::Level::kReport:
-          MaybeReportDataControlsPasteFromGemini(destination, verdict,
-                                                 data.size());
-          break;
-        case data_controls::Rule::Level::kAllow:
-        case data_controls::Rule::Level::kNotSet:
-          break;
-      }
-    }
-  }
-
-  PasteFromGeminiIfAllowedByContentAnalysis(destination, std::move(data),
-                                            std::move(callback));
-}
 }  // namespace enterprise_data_protection
