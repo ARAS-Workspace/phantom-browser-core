@@ -130,7 +130,6 @@ class FormFiller {
       const RefillOptions& refill_options,
       base::flat_map<FieldType, size_t>& type_count,
       const base::flat_set<FieldGlobalId>& blocked_fields,
-      AutofillTriggerSource trigger_source,
       AutocompleteUnrecognizedBehavior ac_unrecognized_behavior);
 
   // Resets states that FormFiller holds and maintains.
@@ -149,7 +148,6 @@ class FormFiller {
                              const AutofillField& trigger_field,
                              const RefillOptions& refill_options,
                              FillingProduct filling_product,
-                             AutofillTriggerSource trigger_source,
                              const AutofillClient& client,
                              base::flat_set<FieldGlobalId> blocked_fields);
 
@@ -273,8 +271,6 @@ class FormFiller {
   // Fills `field` and modifies the states needed by the renderer for filling.
   void FillField(const ValueAndTypeAndOverride& filling_content,
                  FormFieldData& field,
-                 mojom::ActionPersistence action_persistence,
-                 AutofillTriggerSource trigger_source,
                  bool allow_suggestion_swapping);
 
   // Updates the cached `AutofillField`s in `form` with the information
@@ -305,7 +301,6 @@ class FormFiller {
       const AutofillField& trigger_field,
       const RefillOptions& refill_options,
       FillingProduct filling_product,
-      AutofillTriggerSource trigger_source,
       const AutofillClient& client,
       base::flat_set<FieldGlobalId> blocked_fields,
       const base::flat_map<FieldGlobalId,

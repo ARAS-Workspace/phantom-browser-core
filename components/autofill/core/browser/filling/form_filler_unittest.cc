@@ -1934,7 +1934,7 @@ TEST_F(FormFillerTest, FillOrPreviewForm_WithBlockedFields) {
       FormFiller::GetFieldFillingSkipReasons(
           *form_structure, *form_structure->field(0),
           FormFiller::RefillOptions::NotRefill(), FillingProduct::kAddress,
-          AutofillTriggerSource::kPopup, autofill_client(), blocked_fields);
+          autofill_client(), blocked_fields);
 
   EXPECT_TRUE(skip_reasons[form.fields()[0].global_id()].empty());
   EXPECT_TRUE(skip_reasons[form.fields()[1].global_id()].empty());
@@ -2589,82 +2589,6 @@ TEST_F(FormFillerTest, UndoDiscardsFieldsThatChangedFillingProduct) {
   EXPECT_TRUE(form.fields()[0].value().empty());
   EXPECT_FALSE(form.fields()[0].is_autofilled_according_to_renderer());
   EXPECT_THAT(form.fields()[1], AutofilledWith(u"Other"));
-}
-
-// Tests that when Glic triggers a filling operation, some fields that are
-// usually skipped by regular operations are not skipped.
-TEST_F(FormFillerTest, GlicFillingDoeNotSkipSomeUsuallySkippableFields) {
-  FormData form = test::GetFormData(
-      {.fields = {
-           {.role = ADDRESS_HOME_COUNTRY, .autocomplete_attribute = "country"},
-           {.role = NAME_FIRST, .autocomplete_attribute = "given-name"},
-           {.role = NAME_MIDDLE, .autocomplete_attribute = "additional-name"},
-           // Simulate that field [3] has an invalid autocomplete attribute.
-           {.role = NAME_LAST, .autocomplete_attribute = "nope"}}});
-  // Simulate that field [2] is prefilled on page load.
-  test_api(form).field(2).set_value(u"G");
-
-  FormsSeen({form});
-  FormStructure* form_structure = GetFormStructure(form);
-  ASSERT_TRUE(form_structure);
-  ASSERT_EQ(form_structure->fields().size(), 4u);
-
-  // Simulate that the user typed into field [1].
-  test_api(form).field(1).set_value(u"Ji");
-  form_structure->field(1)->set_value(u"Ji");
-  test_api(form).field(1).set_properties_mask(kUserTyped);
-  form_structure->field(1)->set_properties_mask(kUserTyped);
-
-  base::flat_map<FieldGlobalId, DenseSet<FieldFillingSkipReason>> skip_reasons =
-      FormFiller::GetFieldFillingSkipReasons(
-          *form_structure, *form_structure->field(0),
-          FormFiller::RefillOptions::NotRefill(), FillingProduct::kAddress,
-          AutofillTriggerSource::kPopup, autofill_client(),
-          /*blocked_fields=*/{});
-
-  ASSERT_EQ(skip_reasons[form.fields()[1].global_id()],
-            DenseSet<FieldFillingSkipReason>{
-                FieldFillingSkipReason::kUserFilledFields});
-  ASSERT_EQ(skip_reasons[form.fields()[2].global_id()],
-            DenseSet<FieldFillingSkipReason>{
-                FieldFillingSkipReason::kValuePrefilled});
-  ASSERT_EQ(skip_reasons[form.fields()[3].global_id()],
-            DenseSet<FieldFillingSkipReason>{
-                FieldFillingSkipReason::kUnrecognizedAutocompleteAttribute});
-
-  skip_reasons = FormFiller::GetFieldFillingSkipReasons(
-      *form_structure, *form_structure->field(0),
-      FormFiller::RefillOptions::NotRefill(), FillingProduct::kAddress,
-      AutofillTriggerSource::kGlic, autofill_client(), /*blocked_fields=*/{});
-
-  EXPECT_TRUE(skip_reasons[form.fields()[1].global_id()].empty());
-  EXPECT_TRUE(skip_reasons[form.fields()[2].global_id()].empty());
-  EXPECT_TRUE(skip_reasons[form.fields()[3].global_id()].empty());
-}
-
-// Tests that when Glic triggers a filling operation, fields that are filled are
-// not marked as autofilled in the renderer.
-TEST_F(FormFillerTest, GlicFillingDoeNotSetIsAutofilled) {
-  FormData standard_filled_form = test::GetFormData(
-      {.fields = {{.role = NAME_FULL, .autocomplete_attribute = "name"}}});
-
-  FormData glic_filled_form = test::GetFormData(
-      {.fields = {{.role = NAME_FULL, .autocomplete_attribute = "name"}}});
-
-  FormsSeen({standard_filled_form, glic_filled_form});
-
-  AutofillProfile profile = test::GetFullProfile();
-  standard_filled_form = AutofillForm(
-      standard_filled_form, standard_filled_form.fields().front(), &profile);
-  glic_filled_form =
-      AutofillForm(glic_filled_form, glic_filled_form.fields().front(),
-                   &profile, AutofillTriggerSource::kGlic);
-
-  ASSERT_THAT(standard_filled_form.fields()[0], AutofilledWith(u"John H. Doe"));
-  EXPECT_EQ(glic_filled_form.fields()[0].value(),
-            standard_filled_form.fields()[0].value());
-  EXPECT_FALSE(
-      glic_filled_form.fields()[0].is_autofilled_according_to_renderer());
 }
 
 // Tests that when autofilling a select field, we correctly set the

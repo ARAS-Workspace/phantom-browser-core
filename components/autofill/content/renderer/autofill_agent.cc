@@ -1303,7 +1303,6 @@ void AutofillAgent::TriggerSuggestions(
       case kManualFallbackPasswords:
       case kPasswordManagerProcessedFocusedField:
       case kProactivePasswordRecovery:
-      case kGlic:
       case kAtMemoryInactivityNudge:
         return false;
     }

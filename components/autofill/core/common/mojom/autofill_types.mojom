@@ -608,8 +608,7 @@ enum AutofillSuggestionTriggerSource {
   // Suggestion triggered when Password Manager detects a potentially failed
   // login attempt that used a credential with a recovery password.
   kProactivePasswordRecovery = 20,
-  // Suggestions triggered by the GLIC service.
-  kGlic = 21,
+  // kGlic = 21 is deprecated
   // Suggestions triggered by the @memory feature (typing "@@").
   kAtMemoryTriggerString = 22,
   // Suggestions triggered by the @memory feature via context menu.

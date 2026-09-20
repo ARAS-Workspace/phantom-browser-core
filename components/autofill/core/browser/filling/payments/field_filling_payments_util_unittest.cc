@@ -1489,7 +1489,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_FALSE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/true,
+      /*card_has_cvc=*/true,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 
@@ -1511,7 +1511,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_FALSE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/true,
+      /*card_has_cvc=*/true,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 
@@ -1534,7 +1534,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_FALSE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/true,
+      /*card_has_cvc=*/true,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 
@@ -1555,7 +1555,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_TRUE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/true,
+      /*card_has_cvc=*/true,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 
@@ -1573,7 +1573,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_TRUE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/true,
+      /*card_has_cvc=*/true,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 
@@ -1590,7 +1590,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_TRUE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/true,
+      /*card_has_cvc=*/true,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 
@@ -1615,7 +1615,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_FALSE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/true,
+      /*card_has_cvc=*/true,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 
@@ -1636,7 +1636,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_TRUE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/true,
+      /*card_has_cvc=*/true,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 
@@ -1657,7 +1657,7 @@ TEST_F(FieldFillingPaymentsUtilTest,
 
   EXPECT_FALSE(WillFillCreditCardNumberOrCvc(
       form_structure.fields(), *form_structure.fields()[0],
-      AutofillTriggerSource::kPopup, /*card_has_cvc=*/false,
+      /*card_has_cvc=*/false,
       AutocompleteUnrecognizedBehavior::kSuggestionsSuppressed));
 }
 

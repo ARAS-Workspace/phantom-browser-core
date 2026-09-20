@@ -42,8 +42,6 @@ AutofillTriggerSource TriggerSourceFromSuggestionTriggerSource(
       return AutofillTriggerSource::kManualFallback;
     case AutofillSuggestionTriggerSource::kProactivePasswordRecovery:
       return AutofillTriggerSource::kProactivePasswordRecovery;
-    case AutofillSuggestionTriggerSource::kGlic:
-      return AutofillTriggerSource::kGlic;
   }
   NOTREACHED();
 }

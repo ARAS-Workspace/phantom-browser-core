@@ -25,7 +25,6 @@
 #include "base/strings/string_util.h"
 #include "base/time/time.h"
 #include "components/autofill/core/browser/autofill_field.h"
-#include "components/autofill/core/browser/autofill_trigger_source.h"
 #include "components/autofill/core/browser/data_model/data_model_utils.h"
 #include "components/autofill/core/browser/data_model/payments/credit_card.h"
 #include "components/autofill/core/browser/data_quality/autofill_data_util.h"
@@ -533,7 +532,6 @@ FillingValueAndType GetFillingValueAndTypeForCreditCard(
 bool WillFillCreditCardNumberOrCvc(
     base::span<const std::unique_ptr<AutofillField>> fields,
     const AutofillField& trigger_field,
-    AutofillTriggerSource trigger_source,
     bool card_has_cvc,
     AutocompleteUnrecognizedBehavior ac_unrecognized_behavior) {
   FieldTypeSet fillable_field_types({CREDIT_CARD_NUMBER});
@@ -561,8 +559,7 @@ bool WillFillCreditCardNumberOrCvc(
                FormFiller::GetFillingSkipReasonsForField(
                    *field, trigger_field,
                    FormFiller::RefillOptions::NotRefill(), type_count,
-                   /*blocked_fields=*/{}, trigger_source,
-                   ac_unrecognized_behavior)
+                   /*blocked_fields=*/{}, ac_unrecognized_behavior)
                    .empty();
       };
 

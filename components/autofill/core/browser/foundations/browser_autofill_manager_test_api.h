@@ -102,9 +102,8 @@ class BrowserAutofillManagerTestApi : public AutofillManagerTestApi {
                                                 const FormFieldData& field) {
     auto [form_structure, autofill_field] =
         manager_->FindMutableFormAndField(form.global_id(), field.global_id());
-    return manager_->GetProfileSuggestions(
-        form, CHECK_DEREF(form_structure), field, CHECK_DEREF(autofill_field),
-        mojom::AutofillSuggestionTriggerSource::kFormControlElementClicked);
+    return manager_->GetProfileSuggestions(form, CHECK_DEREF(form_structure),
+                                           field, CHECK_DEREF(autofill_field));
   }
 
   OtpManager* set_otp_manager(std::unique_ptr<OtpManager> otp_manager) {

@@ -279,38 +279,6 @@ std::optional<FillingValueAndType> GetRefillValueForExpirationDate(
   return FillingValueAndType(refill_value, CREDIT_CARD_EXP_DATE_2_DIGIT_YEAR);
 }
 
-// During filling operations, each field gets assigned a set of
-// `FieldFillingSkipReason` values, and only fields for which that set is empty
-// are considered for filling, and the rest are skipped. This function returns
-// reasons that can be ignored, which means that even if a field qualifies for
-// it, it does not get added to the set.
-DenseSet<FieldFillingSkipReason> GetIgnorableSkipReasons(
-    AutofillTriggerSource trigger_source) {
-  switch (trigger_source) {
-    case AutofillTriggerSource::kGlic:
-      // Note that `kUnrecognizedAutocompleteAttribute` is also governed by
-      // AutofillField::ShouldSuppressSuggestionsAndFillingByDefault.
-      return {FieldFillingSkipReason::kUnrecognizedAutocompleteAttribute,
-              FieldFillingSkipReason::kUserFilledFields,
-              FieldFillingSkipReason::kValuePrefilled};
-    case AutofillTriggerSource::kNone:
-    case AutofillTriggerSource::kPopup:
-    case AutofillTriggerSource::kKeyboardAccessoryOrBottomSheet:
-    case AutofillTriggerSource::kFormsSeen:
-    case AutofillTriggerSource::kSelectOptionsChanged:
-    case AutofillTriggerSource::kJavaScriptChangedAutofilledValue:
-    case AutofillTriggerSource::kManualFallback:
-    case AutofillTriggerSource::kDevtools:
-    case AutofillTriggerSource::kScanCreditCard:
-    case AutofillTriggerSource::kProactivePasswordRecovery:
-    case AutofillTriggerSource::kCreditCardSaveAndFill:
-    case AutofillTriggerSource::kProgrammaticRefill:
-    case AutofillTriggerSource::kOmniboxAutofill:
-      return {};
-  }
-  NOTREACHED();
-}
-
 }  // namespace
 
 // Like FillingPayload, but may carry additional data needed for filling.
@@ -529,15 +497,12 @@ DenseSet<FieldFillingSkipReason> FormFiller::GetFillingSkipReasonsForField(
     const RefillOptions& refill_options,
     base::flat_map<FieldType, size_t>& type_count,
     const base::flat_set<FieldGlobalId>& blocked_fields,
-    AutofillTriggerSource trigger_source,
     AutocompleteUnrecognizedBehavior ac_unrecognized_behavior) {
   DenseSet<FieldFillingSkipReason> skip_reasons;
   const bool is_trigger_field = field.global_id() == trigger_field.global_id();
 
-  auto add_if = [&skip_reasons,
-                 ignorable_reasons = GetIgnorableSkipReasons(trigger_source)](
-                    bool condition, FieldFillingSkipReason reason) {
-    if (condition && !ignorable_reasons.contains(reason)) {
+  auto add_if = [&skip_reasons](bool condition, FieldFillingSkipReason reason) {
+    if (condition) {
       skip_reasons.insert(reason);
     }
   };
@@ -637,7 +602,6 @@ FormFiller::GetFieldFillingSkipReasons(
     const AutofillField& trigger_field,
     const RefillOptions& refill_options,
     FillingProduct filling_product,
-    AutofillTriggerSource trigger_source,
     const AutofillClient& client,
     base::flat_set<FieldGlobalId> blocked_fields) {
   // Counts the number of times a type was seen in the section to be filled.
@@ -659,9 +623,9 @@ FormFiller::GetFieldFillingSkipReasons(
     // Log events when the fields on the form are filled by autofill
     // suggestion.
     DenseSet<FieldFillingSkipReason> field_skip_reasons =
-        GetFillingSkipReasonsForField(
-            *field, trigger_field, refill_options, type_count, blocked_fields,
-            trigger_source, GetAcUnrecognizedBehavior(client));
+        GetFillingSkipReasonsForField(*field, trigger_field, refill_options,
+                                      type_count, blocked_fields,
+                                      GetAcUnrecognizedBehavior(client));
 
     // Usually, `skip_reasons[field_id].empty()` before executing the line
     // below. It may not be the case though because FieldGlobalIds may not be
@@ -679,7 +643,6 @@ FormFiller::GetFieldFillingSkipReasons(
     const AutofillField& trigger_field,
     const RefillOptions& refill_options,
     FillingProduct filling_product,
-    AutofillTriggerSource trigger_source,
     const AutofillClient& client,
     base::flat_set<FieldGlobalId> blocked_fields,
     const base::flat_map<FieldGlobalId,
@@ -687,7 +650,7 @@ FormFiller::GetFieldFillingSkipReasons(
         filling_content) {
   base::flat_map<FieldGlobalId, DenseSet<FieldFillingSkipReason>> skip_reasons =
       GetFieldFillingSkipReasons(form, trigger_field, refill_options,
-                                 filling_product, trigger_source, client,
+                                 filling_product, client,
                                  std::move(blocked_fields));
 
   for (const std::unique_ptr<AutofillField>& field : form.fields()) {
@@ -898,8 +861,8 @@ void FormFiller::FillOrPreviewForm(
   base::flat_map<FieldGlobalId, DenseSet<FieldFillingSkipReason>> skip_reasons =
       GetFieldFillingSkipReasons(form, trigger_field, refill_options,
                                  augmented_filling_payload.filling_product(),
-                                 trigger_source, manager_->client(),
-                                 blocked_fields, filling_content);
+                                 manager_->client(), blocked_fields,
+                                 filling_content);
 
   // These are the fields that will be sent to the renderer so that the
   // corresponding `blink::WebFormControlElement`s can be filled.
@@ -919,8 +882,7 @@ void FormFiller::FillOrPreviewForm(
         expected_content = filling_content.at(field->global_id());
     CHECK(expected_content.has_value());
 
-    FillField(expected_content.value(), result_field, action_persistence,
-              trigger_source,
+    FillField(expected_content.value(), result_field,
               AllowPaymentSwapping(trigger_field, *field,
                                    refill_options.is_refill()));
     filled_field_types.emplace(field->global_id(),
@@ -1301,8 +1263,6 @@ FormFiller::GetFieldFillingData(
 
 void FormFiller::FillField(const ValueAndTypeAndOverride& filling_content,
                            FormFieldData& field_data,
-                           mojom::ActionPersistence action_persistence,
-                           AutofillTriggerSource trigger_source,
                            bool allow_suggestion_swapping) {
   field_data.set_value(filling_content.value);
   field_data.set_force_override(filling_content.value_is_an_override ||
@@ -1314,13 +1274,7 @@ void FormFiller::FillField(const ValueAndTypeAndOverride& filling_content,
   // Sometimes the field can be cleared by Autofill instead of being filled
   // (e.g. payments swapping) and in those cases
   // `is_autofilled_according_to_renderer` is set to false.
-  //
-  // Moreover, Glic-triggered filling operations must be done without setting
-  // a blue background.
-  bool should_mark_as_autofilled =
-      !filling_content.value.empty() &&
-      (trigger_source != AutofillTriggerSource::kGlic ||
-       action_persistence == mojom::ActionPersistence::kPreview);
+  bool should_mark_as_autofilled = !filling_content.value.empty();
 
   // This is an abuse of naming. `is_autofilled_according_to_renderer` is being
   // set here so that the form is sent to the renderer and the renderer is able

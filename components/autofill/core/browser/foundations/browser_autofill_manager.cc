@@ -397,7 +397,6 @@ bool ShouldFetchCreditCard(
     const FormStructure& form,
     const AutofillField& trigger_field,
     const CreditCard& credit_card,
-    AutofillTriggerSource trigger_source,
     AutocompleteUnrecognizedBehavior ac_unrecognized_behavior) {
   if (credit_card.is_bnpl_card()) {
     // This is a BNPL VCN, so fetching is not needed because an authentication
@@ -405,7 +404,6 @@ bool ShouldFetchCreditCard(
     return false;
   }
   if (WillFillCreditCardNumberOrCvc(form.fields(), trigger_field,
-                                    trigger_source,
                                     /*card_has_cvc=*/!credit_card.cvc().empty(),
                                     ac_unrecognized_behavior)) {
     return true;
@@ -437,7 +435,6 @@ bool IsTriggerSourceOnlyRelevantForCompose(
     case AutofillSuggestionTriggerSource::kManualFallbackPasswords:
     case AutofillSuggestionTriggerSource::kPasswordManagerProcessedFocusedField:
     case AutofillSuggestionTriggerSource::kProactivePasswordRecovery:
-    case AutofillSuggestionTriggerSource::kGlic:
     case AutofillSuggestionTriggerSource::kAtMemoryContextMenu:
     case AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge:
     case AutofillSuggestionTriggerSource::kAtMemoryKeyboardShortcut:
@@ -466,7 +463,6 @@ bool CanReplaceCurrentSuggestions(AutofillSuggestionTriggerSource source) {
     case mojom::AutofillSuggestionTriggerSource::
         kPasswordManagerProcessedFocusedField:
     case mojom::AutofillSuggestionTriggerSource::kProactivePasswordRecovery:
-    case mojom::AutofillSuggestionTriggerSource::kGlic:
     case mojom::AutofillSuggestionTriggerSource::kAtMemoryContextMenu:
     case mojom::AutofillSuggestionTriggerSource::kAtMemoryKeyboardShortcut:
     case mojom::AutofillSuggestionTriggerSource::kAtMemoryTriggerString:
@@ -541,9 +537,6 @@ FillingProductSet GetFillingProductsToSuggest(
     case kTextFieldDidReceiveKeyDown:
     case kiOS:
       return FillingProductSet::all();
-    case kGlic:
-      return {FillingProduct::kAddress, FillingProduct::kCreditCard,
-              FillingProduct::kPassword};
     case kAtMemoryContextMenu:
     case kAtMemoryKeyboardShortcut:
     case kAtMemoryTriggerString:
@@ -1940,10 +1933,8 @@ void BrowserAutofillManager::FillOrPreviewCreditCardForm(
     switch (trigger_source) {
       case AutofillTriggerSource::kPopup:
       case AutofillTriggerSource::kKeyboardAccessoryOrBottomSheet:
-      case AutofillTriggerSource::kGlic:
       case AutofillTriggerSource::kOmniboxAutofill:
         return ShouldFetchCreditCard(form, trigger_field, credit_card,
-                                     trigger_source,
                                      GetAcUnrecognizedBehavior(client()));
       case AutofillTriggerSource::kScanCreditCard:
       case AutofillTriggerSource::kDevtools:
@@ -2942,10 +2933,9 @@ std::vector<Suggestion> BrowserAutofillManager::GetProfileSuggestions(
     const FormData& form,
     const FormStructure& form_structure,
     const FormFieldData& trigger_field,
-    const AutofillField& trigger_autofill_field,
-    AutofillSuggestionTriggerSource trigger_source) {
+    const AutofillField& trigger_autofill_field) {
   std::vector<Suggestion> suggestions;
-  AddressSuggestionGenerator address_suggestion_generator(trigger_source);
+  AddressSuggestionGenerator address_suggestion_generator;
 
   auto on_suggestions_generated =
       [&suggestions](
@@ -3195,7 +3185,7 @@ std::vector<Suggestion> BrowserAutofillManager::GetAvailableSuggestions(
     case FillingProduct::kAddress:
       if (client().IsAutofillProfileEnabled()) {
         suggestions = GetProfileSuggestions(form, *form_structure, field,
-                                            *autofill_field, trigger_source);
+                                            *autofill_field);
       }
       if (autofill_field->Type().GetLoyaltyCardType() ==
           EMAIL_OR_LOYALTY_MEMBERSHIP_ID) {
@@ -3521,7 +3511,7 @@ void BrowserAutofillManager::InitializeSuggestionGenerators(
   }
   if (relevant_filling_products.contains(FillingProduct::kAddress)) {
     suggestion_generators_.push_back(
-        std::make_unique<AddressSuggestionGenerator>(trigger_source));
+        std::make_unique<AddressSuggestionGenerator>());
   }
   if (relevant_filling_products.contains(FillingProduct::kCreditCard)) {
     suggestion_generators_.push_back(

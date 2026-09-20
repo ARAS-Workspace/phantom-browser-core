@@ -442,8 +442,7 @@ class BrowserAutofillManager : public AutofillManager {
       const FormData& form,
       const FormStructure& form_structure,
       const FormFieldData& trigger_field,
-      const AutofillField& trigger_autofill_field,
-      AutofillSuggestionTriggerSource trigger_source);
+      const AutofillField& trigger_autofill_field);
 
   // Returns a list of suggestions from the stored loyalty cards for the given
   // last committed primary main frame URL obtained from `client()` and the

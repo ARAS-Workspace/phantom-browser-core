@@ -35,7 +35,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "build/build_config.h"
 #include "components/autofill/core/browser/autofill_browser_util.h"
-#include "components/autofill/core/browser/autofill_trigger_source.h"
 #include "components/autofill/core/browser/data_manager/addresses/address_data_manager.h"
 #include "components/autofill/core/browser/data_manager/personal_data_manager.h"
 #include "components/autofill/core/browser/data_model/addresses/autofill_normalization_utils.h"
@@ -886,10 +885,7 @@ std::vector<Suggestion> GetSuggestionsOnTypingForProfile(
     const FormData& form,
     const FormFieldData& trigger_field) {
   std::vector<Suggestion> suggestions;
-  AddressSuggestionGenerator address_suggestion_generator(
-      // AddressOnTyping suggestions do not depend on the trigger source.
-      /*trigger_source=*/
-      mojom::AutofillSuggestionTriggerSource::kUnspecified);
+  AddressSuggestionGenerator address_suggestion_generator;
 
   auto on_suggestions_generated =
       [&suggestions](
@@ -953,9 +949,7 @@ bool ContainsProfileSuggestionWithRecordType(
   });
 }
 
-AddressSuggestionGenerator::AddressSuggestionGenerator(
-    AutofillSuggestionTriggerSource trigger_source)
-    : trigger_source_(trigger_source) {}
+AddressSuggestionGenerator::AddressSuggestionGenerator() = default;
 
 AddressSuggestionGenerator::~AddressSuggestionGenerator() = default;
 
@@ -1003,8 +997,7 @@ void AddressSuggestionGenerator::GenerateSuggestions(
       skip_reasons = FormFiller::GetFieldFillingSkipReasons(
           *form_structure, *trigger_autofill_field,
           FormFiller::RefillOptions::NotRefill(), FillingProduct::kAddress,
-          TriggerSourceFromSuggestionTriggerSource(trigger_source_), client,
-          /*blocked_fields=*/{});
+          client, /*blocked_fields=*/{});
     }
     FieldTypeSet field_types;
     for (size_t i = 0; i < form_structure->field_count(); ++i) {

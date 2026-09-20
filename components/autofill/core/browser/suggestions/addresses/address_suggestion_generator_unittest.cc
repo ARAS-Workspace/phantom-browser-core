@@ -121,8 +121,7 @@ class AddressSuggestionGeneratorTest : public testing::Test {
     form_structure_ = std::make_unique<FormStructure>(form_data);
     test_api(*form_structure_).SetFieldTypes(field_types);
     std::vector<Suggestion> suggestions;
-    AddressSuggestionGenerator address_suggestion_generator(
-        mojom::AutofillSuggestionTriggerSource::kFormControlElementClicked);
+    AddressSuggestionGenerator address_suggestion_generator;
     auto on_suggestions_generated =
         [&suggestions](
             SuggestionGenerator::ReturnedSuggestions returned_suggestions) {
@@ -1517,8 +1516,7 @@ TEST_F(AddressSuggestionGeneratorTest, GeneratesSuggestions) {
       std::make_unique<FormStructure>(form_data);
   test_api(*form_structure).SetFieldTypes({NAME_FULL});
 
-  AddressSuggestionGenerator generator(
-      mojom::AutofillSuggestionTriggerSource::kFormControlElementClicked);
+  AddressSuggestionGenerator generator;
 
   EXPECT_CALL(
       suggestions_generated_callback,
@@ -1661,8 +1659,7 @@ TEST_F(AddressSuggestionGeneratorTest, AlreadyAutofilledMergeValues) {
       .SetFieldTypes({NAME_FIRST, NAME_LAST, ADDRESS_HOME_LINE1});
   form_structure->field(0)->AddFieldModifier(FieldModifier::kAutofill);
 
-  AddressSuggestionGenerator generator(
-      mojom::AutofillSuggestionTriggerSource::kFormControlElementClicked);
+  AddressSuggestionGenerator generator;
 
   std::vector<Suggestion> suggestions;
   generator.GenerateSuggestions(

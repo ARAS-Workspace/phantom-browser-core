@@ -72,8 +72,7 @@ bool ContainsProfileSuggestionWithRecordType(
 // suggestions should be done only through this class.
 class AddressSuggestionGenerator : public SuggestionGenerator {
  public:
-  explicit AddressSuggestionGenerator(
-      AutofillSuggestionTriggerSource trigger_source);
+  AddressSuggestionGenerator();
   ~AddressSuggestionGenerator() override;
 
   void GenerateSuggestions(
@@ -93,9 +92,6 @@ class AddressSuggestionGenerator : public SuggestionGenerator {
       const AutofillField* trigger_autofill_field,
       AutofillClient& client,
       base::FunctionRef<void(ReturnedSuggestions)> callback);
-
- private:
-  AutofillSuggestionTriggerSource trigger_source_;
 };
 
 }  // namespace autofill
