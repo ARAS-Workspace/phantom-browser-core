@@ -88,10 +88,6 @@ TestDeviceInfoBuilder::TestDeviceInfoBuilder(const DeviceInfo& other)
           other.desktop_to_ios_promo_receiving_enabled()),
       desktop_to_ios_promo_receiving_types_(
           other.desktop_to_ios_promo_receiving_types()),
-      glic_experimental_triggering_state_(
-          other.glic_experimental_triggering_state()),
-      glic_experimental_triggering_version_(
-          other.glic_experimental_triggering_version()),
       server_determined_model_name_(other.server_determined_model_name()) {}
 
 TestDeviceInfoBuilder::~TestDeviceInfoBuilder() = default;
@@ -111,8 +107,6 @@ std::unique_ptr<DeviceInfo> TestDeviceInfoBuilder::Build() const {
       interested_data_types_, auto_sign_out_last_signin_timestamp_,
       desktop_to_ios_promo_receiving_enabled_,
       desktop_to_ios_promo_receiving_types_,
-      glic_experimental_triggering_state_,
-      glic_experimental_triggering_version_,
       android_os_build_fingerprint_prefix_);
 }
 
@@ -262,21 +256,6 @@ TestDeviceInfoBuilder::WithDesktopToIosPromoReceivingTypes(
     const MobilePromoOnDesktopPromoTypeSet&
         desktop_to_ios_promo_receiving_types) {
   desktop_to_ios_promo_receiving_types_ = desktop_to_ios_promo_receiving_types;
-  return *this;
-}
-
-TestDeviceInfoBuilder&
-TestDeviceInfoBuilder::WithGlicExperimentalTriggeringState(
-    DeviceInfo::GlicExperimentalTriggeringState
-        glic_experimental_triggering_state) {
-  glic_experimental_triggering_state_ = glic_experimental_triggering_state;
-  return *this;
-}
-
-TestDeviceInfoBuilder&
-TestDeviceInfoBuilder::WithGlicExperimentalTriggeringVersion(
-    std::optional<int> glic_experimental_triggering_version) {
-  glic_experimental_triggering_version_ = glic_experimental_triggering_version;
   return *this;
 }
 

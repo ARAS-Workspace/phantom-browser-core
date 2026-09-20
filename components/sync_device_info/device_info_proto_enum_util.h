@@ -43,15 +43,6 @@ DeviceInfo::SendTabReceivingType ToDeviceInfoSendTabReceivingType(
 sync_pb::SyncEnums_SendTabReceivingType ToSendTabReceivingTypeProto(
     DeviceInfo::SendTabReceivingType type);
 
-// Conversion functions for DeviceInfo::GlicExperimentalTriggeringState <->
-// proto.
-DeviceInfo::GlicExperimentalTriggeringState
-ToDeviceInfoGlicExperimentalTriggeringState(
-    sync_pb::SyncEnums::GlicExperimentalTriggeringState state);
-sync_pb::SyncEnums::GlicExperimentalTriggeringState
-ToGlicExperimentalTriggeringStateProto(
-    DeviceInfo::GlicExperimentalTriggeringState state);
-
 // Conversion functions for DeviceInfo::SharingFeature <-> proto.
 DeviceInfo::SharingFeature ToDeviceInfoSharingFeature(
     sync_pb::SharingSpecificFields_EnabledFeatures feature);

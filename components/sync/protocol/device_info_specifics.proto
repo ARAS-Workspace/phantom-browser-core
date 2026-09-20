@@ -140,14 +140,10 @@ message FeatureSpecificFields {
 
   reserved 6;
   reserved "glic_experimental_triggering_opted_in";
-
-  // Tracks the experimental triggering state for Glic on the device.
-  optional SyncEnums.GlicExperimentalTriggeringState
-      glic_experimental_triggering_state = 7;
-
-  // Tracks the experimental triggering version of Glic on the device.
-  // Optional. If not set, the state is unavailable or unsupported.
-  optional int32 glic_experimental_triggering_version = 8;
+  reserved 7;
+  reserved "glic_experimental_triggering_state";
+  reserved 8;
+  reserved "glic_experimental_triggering_version";
 }
 
 // Device specific information for Sharing feature. Used to send end-to-end
@@ -180,8 +176,8 @@ message SharingSpecificFields {
     OPTIMIZATION_GUIDE_PUSH_NOTIFICATION = 9;
     // Supports receiving notifications about new OneTimeTokens in the backend.
     ONE_TIME_TOKEN_BACKEND_NOTIFICATION = 10;
-    // Supports experimental triggering.
-    GLIC_EXPERIMENTAL_TRIGGERING = 11;
+    reserved 11;
+    reserved "GLIC_EXPERIMENTAL_TRIGGERING";
   }
   // LINT.ThenChange(/components/sync_device_info/device_info.h:SharingFeature)
 

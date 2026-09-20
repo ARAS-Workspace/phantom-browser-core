@@ -162,17 +162,6 @@ MATCHER_P(ModelEqualsSpecifics, expected_specifics, "") {
              arg.desktop_to_ios_promo_receiving_types() &&
          expected_specifics.invalidation_fields().instance_id_token() ==
              arg.fcm_registration_token() &&
-         expected_specifics.feature_fields()
-                 .glic_experimental_triggering_state() ==
-             ToGlicExperimentalTriggeringStateProto(
-                 arg.glic_experimental_triggering_state()) &&
-         expected_specifics.feature_fields()
-                 .has_glic_experimental_triggering_version() ==
-             arg.glic_experimental_triggering_version().has_value() &&
-         (!arg.glic_experimental_triggering_version().has_value() ||
-          expected_specifics.feature_fields()
-                  .glic_experimental_triggering_version() ==
-              *arg.glic_experimental_triggering_version()) &&
          expected_specifics.has_android_os_build_fingerprint_prefix() ==
              arg.android_os_build_fingerprint_prefix().has_value() &&
          (!arg.android_os_build_fingerprint_prefix().has_value() ||
@@ -330,8 +319,6 @@ DeviceInfoSpecifics CreateSpecifics(
   specifics.mutable_feature_fields()->set_send_tab_to_self_receiving_type(
       sync_pb::
           SyncEnums_SendTabReceivingType_SEND_TAB_RECEIVING_TYPE_CHROME_OR_UNSPECIFIED);
-  specifics.mutable_feature_fields()->set_glic_experimental_triggering_state(
-      sync_pb::SyncEnums::READY);
   specifics.mutable_sharing_fields()->set_sender_id_fcm_token_v2(
       SharingSenderIdFcmTokenForSuffix(suffix));
   specifics.mutable_sharing_fields()->set_chime_representative_target_id(
@@ -430,21 +417,12 @@ class TestLocalDeviceInfoProvider : public MutableLocalDeviceInfoProvider {
       const DeviceInfo* device_info_restored_from_store) override {
     std::string last_fcm_registration_token;
     DataTypeSet last_interested_data_types;
-    DeviceInfo::GlicExperimentalTriggeringState
-        glic_experimental_triggering_state =
-            DeviceInfo::GlicExperimentalTriggeringState::kUnavailable;
-    std::optional<int> glic_experimental_triggering_version = std::nullopt;
     std::optional<std::string> server_determined_model_name;
     if (device_info_restored_from_store) {
       last_fcm_registration_token =
           device_info_restored_from_store->fcm_registration_token();
       last_interested_data_types =
           device_info_restored_from_store->interested_data_types();
-      glic_experimental_triggering_state =
-          device_info_restored_from_store->glic_experimental_triggering_state();
-      glic_experimental_triggering_version =
-          device_info_restored_from_store
-              ->glic_experimental_triggering_version();
       server_determined_model_name =
           device_info_restored_from_store->server_determined_model_name();
     }
@@ -474,10 +452,6 @@ class TestLocalDeviceInfoProvider : public MutableLocalDeviceInfoProvider {
         /*desktop_to_ios_promo_receiving_enabled=*/false,
         /*desktop_to_ios_promo_receiving_types=*/
         MobilePromoOnDesktopPromoTypeSet{},
-        /*glic_experimental_triggering_state=*/
-        glic_experimental_triggering_state,
-        /*glic_experimental_triggering_version=*/
-        glic_experimental_triggering_version,
         android_os_build_fingerprint_prefix);
   }
 

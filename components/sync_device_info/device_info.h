@@ -64,7 +64,7 @@ class DeviceInfo {
     // kSharedClipboardV2 = 8,  // Deprecated, do not reuse.
     kOptimizationGuidePushNotification = 9,
     kOneTimeTokenBackendNotification = 10,
-    kGlicExperimentalTriggering = 11,
+    // kGlicExperimentalTriggering = 11,  // Deprecated, do not reuse.
   };
   // LINT.ThenChange(/components/sync/protocol/device_info_specifics.proto:EnabledFeatures)
 
@@ -170,20 +170,6 @@ class DeviceInfo {
     kTv = 6,
   };
 
-  // Tracks the per-device user opt-in and readiness state for the Glic
-  // experimental triggering feature.
-  // These values are persisted to logs. Entries should not be renumbered and
-  // numeric values should never be reused.
-  // LINT.IfChange(GlicExperimentalTriggeringState)
-  enum class GlicExperimentalTriggeringState {
-    kUnavailable = 0,
-    kNeedsOptIn = 1,
-    kReady = 2,
-    kMaxValue = kReady,
-  };
-  // LINT.ThenChange(//components/sync/protocol/sync_enums.proto:GlicExperimentalTriggeringState,
-  // //tools/metrics/histograms/metadata/glic/enums.xml:GlicExperimentalTriggeringState)
-
   DeviceInfo(const std::string& guid,
              const std::string& client_name,
              const std::string& chrome_version,
@@ -208,8 +194,6 @@ class DeviceInfo {
              bool desktop_to_ios_promo_receiving_enabled,
              const MobilePromoOnDesktopPromoTypeSet&
                  desktop_to_ios_promo_receiving_types,
-             GlicExperimentalTriggeringState glic_experimental_triggering_state,
-             std::optional<int> glic_experimental_triggering_version,
              std::optional<std::string> android_os_build_fingerprint_prefix);
 
   DeviceInfo& operator=(const DeviceInfo&) = delete;
@@ -302,13 +286,6 @@ class DeviceInfo {
   const MobilePromoOnDesktopPromoTypeSet& desktop_to_ios_promo_receiving_types()
       const;
 
-  // Returns the experimental triggering state for Glic.
-  GlicExperimentalTriggeringState glic_experimental_triggering_state() const;
-
-  // Returns the capability version of the experimental triggering protocol for
-  // Glic, or std::nullopt if unavailable.
-  std::optional<int> glic_experimental_triggering_version() const;
-
   const std::optional<std::string>& server_determined_model_name() const;
 
   // Apps can set ids for a device that is meaningful to them but
@@ -338,14 +315,6 @@ class DeviceInfo {
   void set_desktop_to_ios_promo_receiving_enabled(bool new_value);
   void set_desktop_to_ios_promo_receiving_types(
       const MobilePromoOnDesktopPromoTypeSet& new_types);
-
-  // Sets the experimental triggering state for Glic.
-  void set_glic_experimental_triggering_state(
-      GlicExperimentalTriggeringState state);
-
-  // Sets the capability version of the experimental triggering protocol for
-  // Glic. Pass std::nullopt if unavailable.
-  void set_glic_experimental_triggering_version(std::optional<int> version);
 
  private:
   // Used by DeepCopyForTesting().
@@ -414,13 +383,6 @@ class DeviceInfo {
   // promo types feature is fully launched.
   bool desktop_to_ios_promo_receiving_enabled_;
   MobilePromoOnDesktopPromoTypeSet desktop_to_ios_promo_receiving_types_;
-
-  // The opt-in state of Glic experimental triggering for the device.
-  GlicExperimentalTriggeringState glic_experimental_triggering_state_;
-
-  // The version of the Glic experimental triggering protocol supported by the
-  // device.
-  std::optional<int> glic_experimental_triggering_version_;
 
   // NOTE: when adding a member, don't forget to update
   // |IsStoredLocalDeviceInfoStillAccurate| in device_info_sync_bridge.cc or

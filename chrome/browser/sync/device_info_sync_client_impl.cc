@@ -86,14 +86,4 @@ DeviceInfoSyncClientImpl::GetDesktopToIOSPromoReceivingTypes() const {
   return {};
 }
 
-syncer::DeviceInfo::GlicExperimentalTriggeringState
-DeviceInfoSyncClientImpl::GetGlicExperimentalTriggeringState() const {
-  return syncer::DeviceInfo::GlicExperimentalTriggeringState::kUnavailable;
-}
-
-std::optional<int>
-DeviceInfoSyncClientImpl::GetGlicExperimentalTriggeringVersion() const {
-  return std::nullopt;
-}
-
 }  // namespace browser_sync

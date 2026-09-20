@@ -75,11 +75,6 @@ class TestDeviceInfoBuilder {
   TestDeviceInfoBuilder& WithDesktopToIosPromoReceivingTypes(
       const MobilePromoOnDesktopPromoTypeSet&
           desktop_to_ios_promo_receiving_types);
-  TestDeviceInfoBuilder& WithGlicExperimentalTriggeringState(
-      DeviceInfo::GlicExperimentalTriggeringState
-          glic_experimental_triggering_state);
-  TestDeviceInfoBuilder& WithGlicExperimentalTriggeringVersion(
-      std::optional<int> glic_experimental_triggering_version);
   TestDeviceInfoBuilder& WithServerDeterminedModelName(
       const std::optional<std::string>& server_determined_model_name);
 
@@ -108,10 +103,6 @@ class TestDeviceInfoBuilder {
   std::optional<base::Time> auto_sign_out_last_signin_timestamp_;
   bool desktop_to_ios_promo_receiving_enabled_ = false;
   MobilePromoOnDesktopPromoTypeSet desktop_to_ios_promo_receiving_types_;
-  DeviceInfo::GlicExperimentalTriggeringState
-      glic_experimental_triggering_state_ =
-          DeviceInfo::GlicExperimentalTriggeringState::kUnavailable;
-  std::optional<int> glic_experimental_triggering_version_;
   std::optional<std::string> server_determined_model_name_;
 };
 

@@ -42,10 +42,6 @@ FakeLocalDeviceInfoProvider::FakeLocalDeviceInfoProvider()
                    /*desktop_to_ios_promo_receiving_enabled=*/false,
                    /*desktop_to_ios_promo_receiving_types=*/
                    MobilePromoOnDesktopPromoTypeSet{},
-                   /*glic_experimental_triggering_state=*/
-                   DeviceInfo::GlicExperimentalTriggeringState::kUnavailable,
-                   /*glic_experimental_triggering_version=*/
-                   std::nullopt,
                    /*android_os_build_fingerprint_prefix=*/std::nullopt) {}
 
 FakeLocalDeviceInfoProvider::~FakeLocalDeviceInfoProvider() = default;

@@ -85,8 +85,6 @@ DeviceInfo::DeviceInfo(
     bool desktop_to_ios_promo_receiving_enabled,
     const MobilePromoOnDesktopPromoTypeSet&
         desktop_to_ios_promo_receiving_types,
-    GlicExperimentalTriggeringState glic_experimental_triggering_state,
-    std::optional<int> glic_experimental_triggering_version,
     std::optional<std::string> android_os_build_fingerprint_prefix)
     : guid_(guid),
       client_name_(client_name),
@@ -114,10 +112,7 @@ DeviceInfo::DeviceInfo(
       desktop_to_ios_promo_receiving_enabled_(
           desktop_to_ios_promo_receiving_enabled),
       desktop_to_ios_promo_receiving_types_(
-          desktop_to_ios_promo_receiving_types),
-      glic_experimental_triggering_state_(glic_experimental_triggering_state),
-      glic_experimental_triggering_version_(
-          glic_experimental_triggering_version) {}
+          desktop_to_ios_promo_receiving_types) {}
 
 DeviceInfo::DeviceInfo(const DeviceInfo& other) = default;
 
@@ -206,15 +201,6 @@ DeviceInfo::desktop_to_ios_promo_receiving_types() const {
   return desktop_to_ios_promo_receiving_types_;
 }
 
-DeviceInfo::GlicExperimentalTriggeringState
-DeviceInfo::glic_experimental_triggering_state() const {
-  return glic_experimental_triggering_state_;
-}
-
-std::optional<int> DeviceInfo::glic_experimental_triggering_version() const {
-  return glic_experimental_triggering_version_;
-}
-
 const std::optional<std::string>& DeviceInfo::server_determined_model_name()
     const {
   return server_determined_model_name_;
@@ -267,16 +253,6 @@ void DeviceInfo::set_desktop_to_ios_promo_receiving_enabled(bool new_value) {
 void DeviceInfo::set_desktop_to_ios_promo_receiving_types(
     const MobilePromoOnDesktopPromoTypeSet& new_types) {
   desktop_to_ios_promo_receiving_types_ = new_types;
-}
-
-void DeviceInfo::set_glic_experimental_triggering_state(
-    GlicExperimentalTriggeringState state) {
-  glic_experimental_triggering_state_ = state;
-}
-
-void DeviceInfo::set_glic_experimental_triggering_version(
-    std::optional<int> version) {
-  glic_experimental_triggering_version_ = version;
 }
 
 void DeviceInfo::set_sharing_info(
