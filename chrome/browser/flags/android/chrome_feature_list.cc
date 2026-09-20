@@ -188,9 +188,6 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &features::kEnableFullscreenToAnyScreenAndroid,
     &features::kFluidResize,
     &features::kGenericSensorExtraClasses,
-    &features::kGlic,
-    &features::kGlicBackgroundActuation,
-    &features::kGlicBackgroundTriggering,
     &features::kHttpsFirstBalancedMode,
     &features::kLoadingPredictorLimitPreconnectSocketCount,
     &features::kMigrateManagementPageToWebUIOnMobile,
@@ -333,7 +330,6 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &kChromeNativeUrlOverriding,
     &kChromeSurveyNextAndroid,
     &kClampAutomotiveScaling,
-    &kClankGlicContextMenu,
     &kClankStartupLatencyInjection,
     &kClankWhatsNew,
     &kClearIntentWhenRecreated,
@@ -734,7 +730,6 @@ BASE_FEATURE(kChangeUnfocusedPriority, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kChromeNativeUrlOverriding, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kChromeSurveyNextAndroid, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kClampAutomotiveScaling, base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kClankGlicContextMenu, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kClankStartupLatencyInjection, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kClankWhatsNew, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kClearIntentWhenRecreated, base::FEATURE_DISABLED_BY_DEFAULT);

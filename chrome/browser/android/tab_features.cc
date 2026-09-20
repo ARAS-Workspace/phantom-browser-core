@@ -89,26 +89,12 @@ TabFeatures::TabFeatures(content::WebContents* web_contents, Profile* profile) {
     }
   }
 
-  if (base::FeatureList::IsEnabled(features::kGlicActor)) {
-    actor_tab_data_ =
-  }
-
   if (base::FeatureList::IsEnabled(
           enterprise_data_protection::
               kEnableAndroidEnterpriseScreenshotProtection) &&
       enterprise_util::IsBrowserManaged(profile)) {
     data_protection_tab_controller_ = std::make_unique<
         enterprise_data_protection::DataProtectionNavigationController>(tab);
-  }
-
-  glic_instance_helper_ =
-  if (base::FeatureList::IsEnabled(features::kGlicAndroidSidePanel) &&
-      AndroidSidePanelEnabledFn::IsEnabled()) {
-    glic_side_panel_coordinator_ =
-        GetUserDataFactory()
-  } else {
-    glic_side_panel_coordinator_ =
-        GetUserDataFactory()
   }
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)

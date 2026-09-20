@@ -19,10 +19,6 @@ class Profile;
 class QwacWebContentsObserver;
 class NewTabPagePreloadPipelineManager;
 
-namespace actor {
-class ActorTabData;
-}  // namespace actor
-
 namespace contextual_tasks {
 class ContextualTasksTabVisitTracker;
 }  // namespace contextual_tasks
@@ -34,12 +30,6 @@ class WebContents;
 namespace enterprise_data_protection {
 class DataProtectionNavigationController;
 }  // namespace enterprise_data_protection
-
-namespace glic {
-class ContextualCueingHelper;
-class GlicInstanceHelper;
-class GlicSidePanelCoordinator;
-}  // namespace glic
 
 namespace sync_sessions {
 class SyncSessionsRouterTabHelper;
