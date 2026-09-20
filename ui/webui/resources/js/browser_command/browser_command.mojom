@@ -31,8 +31,8 @@ enum Command {
   // kOpenSafetyCheckFromWhatsNew = 13, - deprecated
   kOpenPaymentsSettings = 14,
   // kOpenHistorySearchSettings = 15 - deprecated
-  kOpenGlic = 16,
-  kOpenGlicSettings = 17,
+  // kOpenGlic = 16, - deprecated
+  // kOpenGlicSettings = 17, - deprecated
   // kPrewarmGlicFre = 18, - deprecated
   kOpenSplitView = 19,
   // kOpenAutofillSettings = 20, - deprecated

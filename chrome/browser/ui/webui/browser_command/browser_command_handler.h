@@ -92,8 +92,6 @@ class BrowserCommandHandler : public CommandUpdaterDelegate,
   virtual void StartTutorial(StartTutorialInPage::Params params);
   virtual bool TutorialServiceExists();
   virtual void OpenAISettings();
-  virtual void OpenGlic();
-  virtual void OpenGlicSettings();
   virtual void OpenSplitView();
   virtual void EnableVerticalTabs();
   void StartTabGroupTutorial();

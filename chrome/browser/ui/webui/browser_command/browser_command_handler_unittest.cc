@@ -50,8 +50,6 @@ std::vector<Command> supported_commands = {
     Command::kStartSavedTabGroupTutorial,
     Command::kOpenAISettings,
     Command::kOpenPaymentsSettings,
-    Command::kOpenGlic,
-    Command::kOpenGlicSettings,
     Command::kOpenSplitView,
     Command::kEnableVerticalTabs,
 };
@@ -78,11 +76,6 @@ class TestCommandHandler : public BrowserCommandHandler {
 
   void OpenAISettings() override {
     // The functionality of opening the AI settings is removed, as it
-    // cannot be executed in a unittest.
-  }
-
-  void OpenGlic() override {
-    // The functionality of opening Glic is removed, as it
     // cannot be executed in a unittest.
   }
 
@@ -206,10 +199,6 @@ class MockCommandHandler : public TestCommandHandler {
   MOCK_METHOD(void, OpenAISettings, ());
 
   MOCK_METHOD(void, ShowCustomizeChromeToolbar, ());
-
-  MOCK_METHOD(void, OpenGlic, ());
-
-  MOCK_METHOD(void, OpenGlicSettings, ());
 
   MOCK_METHOD(void, OpenSplitView, ());
 
@@ -497,28 +486,6 @@ TEST_F(BrowserCommandHandlerTest, OpenPaymentsSettingsCommand) {
       NavigateToURL(GURL(chrome::GetSettingsUrl(chrome::kPaymentsSubPage)),
                     DispositionFromClick(*info)));
   EXPECT_TRUE(ExecuteCommand(Command::kOpenPaymentsSettings, std::move(info)));
-}
-
-TEST_F(BrowserCommandHandlerTest, OpenGlicCommand) {
-  // By default, opening Glic is allowed.
-  EXPECT_TRUE(CanExecuteCommand(Command::kOpenGlic));
-  ClickInfoPtr info = ClickInfo::New();
-  info->middle_button = true;
-  info->meta_key = true;
-  // The OpenGlic command opens glic.
-  EXPECT_CALL(*command_handler_, OpenGlic());
-  EXPECT_TRUE(ExecuteCommand(Command::kOpenGlic, std::move(info)));
-}
-
-TEST_F(BrowserCommandHandlerTest, OpenGlicSettingsCommand) {
-  // The OpenGlicSettings command opens a new settings window
-  // with the Glic settings sub page, and the correct disposition.
-  EXPECT_TRUE(CanExecuteCommand(Command::kOpenGlicSettings));
-  ClickInfoPtr info = ClickInfo::New();
-  info->middle_button = true;
-  info->meta_key = true;
-  EXPECT_CALL(*command_handler_, OpenGlicSettings());
-  EXPECT_TRUE(ExecuteCommand(Command::kOpenGlicSettings, std::move(info)));
 }
 
 TEST_F(BrowserCommandHandlerTest, OpenSplitViewCommand) {

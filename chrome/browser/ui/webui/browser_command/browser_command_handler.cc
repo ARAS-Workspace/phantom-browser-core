@@ -124,12 +124,6 @@ void BrowserCommandHandler::CanExecuteCommand(
     case Command::kOpenPaymentsSettings:
       can_execute = true;
       break;
-    case Command::kOpenGlic:
-      can_execute = true;
-      break;
-    case Command::kOpenGlicSettings:
-      can_execute = true;
-      break;
     case Command::kOpenSplitView:
       can_execute = true;
       break;
@@ -197,13 +191,6 @@ void BrowserCommandHandler::HandleCommandWithDisposition(
     case Command::kOpenPaymentsSettings:
       NavigateToURL(GURL(chrome::GetSettingsUrl(chrome::kPaymentsSubPage)),
                     disposition);
-      break;
-    case Command::kOpenGlic: {
-      OpenGlic();
-      break;
-    }
-    case Command::kOpenGlicSettings:
-      OpenGlicSettings();
       break;
     case Command::kOpenSplitView:
       OpenSplitView();
@@ -296,10 +283,6 @@ void BrowserCommandHandler::StartSavedTabGroupTutorial() {
                                    base::Unretained(this), tutorial_id);
   StartTutorial(std::move(params));
 }
-
-void BrowserCommandHandler::OpenGlic() {}
-
-void BrowserCommandHandler::OpenGlicSettings() {}
 
 void BrowserCommandHandler::OpenSplitView() {
   tabs::TabInterface* tab =

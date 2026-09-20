@@ -8,7 +8,6 @@
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_storage_service_impl.h"
 #include "chrome/common/buildflags.h"
-#include "chrome/common/chrome_features.h"
 #include "components/performance_manager/public/features.h"
 #include "components/search/ntp_features.h"
 #include "components/user_education/webui/whats_new_registry.h"
@@ -37,10 +36,6 @@ void RegisterWhatsNewModules(whats_new::WhatsNewRegistry* registry) {
 
 void RegisterWhatsNewEditions(whats_new::WhatsNewRegistry* registry) {
   // Register editions here.
-  registry->RegisterEdition(WhatsNewEdition(
-      ::features::kGlicRollout, "tommasin@chromium.org",
-      std::vector<BrowserCommand>{BrowserCommand::kOpenGlic,
-                                  BrowserCommand::kOpenGlicSettings}));
   registry->RegisterEdition(
       WhatsNewEdition(ntp_features::kLightningTakeoverEdition,
                       "rtatum@google.com", std::vector<BrowserCommand>{}));
