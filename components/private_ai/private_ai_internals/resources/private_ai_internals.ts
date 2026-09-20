@@ -16,7 +16,6 @@ const ZERO_STATE_SUGGESTION_FEATURE_NAME =
 const FORMS_AI_FEATURE_NAME = 'FEATURE_NAME_CHROME_FORMS_AI';
 const GENERATE_CONTENT_FEATURE_NAME =
     'FEATURE_NAME_DEMO_GEMINI_GENERATE_CONTENT';
-const CONTEXTUAL_CUE_FEATURE_NAME = 'FEATURE_NAME_CHROME_CONTEXTUAL_CUEING';
 
 function registerOnLogMessageListener() {
   const logsContainer = document.getElementById('logs-container');
@@ -126,11 +125,6 @@ function registerOnSendButtonListener() {
   const sendFormsAiButton = document.getElementById('send-forms-ai-button');
   sendFormsAiButton?.addEventListener('click', () => {
     sendRequest(FORMS_AI_FEATURE_NAME, 'FormsAI');
-  });
-  const sendContextualCueButton =
-      document.getElementById('send-contextual-cue-button');
-  sendContextualCueButton?.addEventListener('click', () => {
-    sendRequest(CONTEXTUAL_CUE_FEATURE_NAME, 'ContextualCue');
   });
 }
 
