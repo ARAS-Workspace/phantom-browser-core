@@ -1690,7 +1690,6 @@ if (!is_android) {
       "//chrome/browser/content_settings:browser_tests",
       "//chrome/browser/content_settings:content_settings_factory",
       "//chrome/browser/content_settings:content_settings_util",
-      "//chrome/browser/contextual_cueing:browser_tests",
       "//chrome/browser/custom_handlers",
       "//chrome/browser/custom_handlers:browser_tests",
       "//chrome/browser/data_saver",
@@ -5336,7 +5335,6 @@ test("unit_tests") {
     deps += [
       "//chrome/browser/autocomplete:aim_eligibility_service",
       "//chrome/browser/bluetooth",
-      "//chrome/browser/contextual_cueing:unit_tests",
       "//chrome/browser/device_api:unit_tests",
       "//chrome/browser/device_notifications:unit_tests",
       "//chrome/browser/engagement",
