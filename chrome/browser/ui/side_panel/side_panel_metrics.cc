@@ -127,16 +127,3 @@ void SidePanelMetrics::RecordPinnedButtonClicked(SidePanelEntry::Id id,
       {"SidePanel.", SidePanelEntryIdToHistogramName(id), ".",
        is_pinned ? "Pinned" : "Unpinned", ".BySidePanelHeaderButton"}));
 }
-
-void SidePanelMetrics::RecordPanelClosedForOtherPanelTypeMetrics(
-    SidePanelEntryId closing_panel_id,
-    SidePanelEntryId opening_panel_id) {
-  if (closing_panel_id == SidePanelEntryId::kContextualTasks &&
-      opening_panel_id == SidePanelEntryId::kGlic) {
-    base::RecordComputedAction(
-        base::StrCat({kSidePanelHistogramName, ".",
-                      SidePanelEntryIdToHistogramName(closing_panel_id),
-                      ".EntryClosedToOpen.",
-                      SidePanelEntryIdToHistogramName(opening_panel_id)}));
-  }
-}

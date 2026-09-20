@@ -723,16 +723,12 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest, SidePanelAlignmentOverrides) {
             SidePanel::HorizontalAlignment::kRight);
 
   // Verify overridden panels use their overrides despite the default pref.
-  // Glic is kRight and ContextualTasks is kLeft.
-  GetSidePanel()->UpdateHorizontalAlignment(SidePanelEntryId::kGlic);
-  EXPECT_EQ(GetSidePanel()->horizontal_alignment(),
-            SidePanel::HorizontalAlignment::kRight);
-
+  // ContextualTasks is kLeft.
   GetSidePanel()->UpdateHorizontalAlignment(SidePanelEntryId::kContextualTasks);
   EXPECT_EQ(GetSidePanel()->horizontal_alignment(),
             SidePanel::HorizontalAlignment::kLeft);
 
-  // Toggle the default pref and verify glic and contextual tasks alignment is
+  // Toggle the default pref and verify contextual tasks alignment is
   // unchanged.
   prefs->SetBoolean(prefs::kSidePanelHorizontalAlignment, false);
 
@@ -740,27 +736,18 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest, SidePanelAlignmentOverrides) {
   EXPECT_EQ(GetSidePanel()->horizontal_alignment(),
             SidePanel::HorizontalAlignment::kLeft);
 
-  GetSidePanel()->UpdateHorizontalAlignment(SidePanelEntryId::kGlic);
-  EXPECT_EQ(GetSidePanel()->horizontal_alignment(),
-            SidePanel::HorizontalAlignment::kRight);
-
   GetSidePanel()->UpdateHorizontalAlignment(SidePanelEntryId::kContextualTasks);
   EXPECT_EQ(GetSidePanel()->horizontal_alignment(),
             SidePanel::HorizontalAlignment::kLeft);
 
-  // Verify changes to glic/contextual tasks only apply to that feature.
+  // Verify changes to contextual tasks only apply to that feature.
   base::DictValue new_overrides;
-  new_overrides.Set(SidePanelEntryIdToString(SidePanelEntryId::kGlic), false);
   new_overrides.Set(
       SidePanelEntryIdToString(SidePanelEntryId::kContextualTasks), true);
   prefs->Set(prefs::kSidePanelAlignmentOverrides,
              base::Value(std::move(new_overrides)));
 
   GetSidePanel()->UpdateHorizontalAlignment(SidePanelEntryId::kReadingList);
-  EXPECT_EQ(GetSidePanel()->horizontal_alignment(),
-            SidePanel::HorizontalAlignment::kLeft);
-
-  GetSidePanel()->UpdateHorizontalAlignment(SidePanelEntryId::kGlic);
   EXPECT_EQ(GetSidePanel()->horizontal_alignment(),
             SidePanel::HorizontalAlignment::kLeft);
 

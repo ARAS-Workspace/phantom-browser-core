@@ -30,8 +30,10 @@ using ToastIdEnumSet = base::EnumSet<ToastId>;
 constexpr auto kDeprecatedToastIds =
     std::to_array<std::underlying_type_t<ToastId>>(
         {/*kLensOverlay=*/4, /*kAddedToComparisonTable=*/6,
-         /*kPlusAddressOverride=*/8, /*kMultistepFilterSuggestion=*/31,
-         /*kMultistepFilterSuggestionRecent=*/32});
+         /*kPlusAddressOverride=*/8, /*kGlicShareImageFailed=*/21,
+         /*kMultistepFilterSuggestion=*/31,
+         /*kMultistepFilterSuggestionRecent=*/32,
+         /*kGlicSelectionHiddenForSite=*/50});
 
 ToastIdEnumSet GetActiveToastIds() {
   auto result = ToastIdEnumSet::All();

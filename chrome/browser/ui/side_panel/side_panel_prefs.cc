@@ -34,8 +34,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterDictionaryPref(prefs::kSidePanelIdToWidth);
 
   base::DictValue alignment_overrides;
-  alignment_overrides.Set(SidePanelEntryIdToString(SidePanelEntryId::kGlic),
-                          !base::i18n::IsRTL());
   alignment_overrides.Set(
       SidePanelEntryIdToString(SidePanelEntryId::kContextualTasks),
       base::i18n::IsRTL());

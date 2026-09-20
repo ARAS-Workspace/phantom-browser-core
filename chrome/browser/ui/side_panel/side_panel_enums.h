@@ -44,7 +44,7 @@ enum class SidePanelOpenTrigger {
 #if BUILDFLAG(IS_ANDROID)
   kWindowResized = 27,
 #endif
-  kGlicOpened = 28,
+  // kGlicOpened = 28, (deprecated)
   kContextualTasks = 29,
   kReadAnythingListenToThisPageContextMenu = 30,
   kReadAnythingUnknown = 31,

@@ -36,9 +36,6 @@ class SidePanelMetrics {
       SidePanelEntry::Id id,
       std::optional<SidePanelOpenTrigger> trigger);
   static void RecordPinnedButtonClicked(SidePanelEntry::Id id, bool is_pinned);
-  static void RecordPanelClosedForOtherPanelTypeMetrics(
-      SidePanelEntryId closing_panel_id,
-      SidePanelEntryId opening_panel_id);
 };
 
 #endif  // CHROME_BROWSER_UI_SIDE_PANEL_SIDE_PANEL_METRICS_H_

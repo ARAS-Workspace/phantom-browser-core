@@ -406,7 +406,6 @@ std::string ToolbarController::GetActionNameFromElementIdentifier(
             "PinnedShowLensOverlayResultsSidePanelButton"},
            {kActionSendSharedTabGroupFeedback, "SharedTabGroupFeedbackButton"},
            {kActionTabSearch, "PinnedTabSearchButton"},
-           {kActionSidePanelShowGlic, "PinnedGlicButton"},
            {kActionSidePanelShowTabsFromOtherDevices,
             "PinnedTabsFromOtherDevicesButton"}});
 

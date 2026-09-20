@@ -112,7 +112,6 @@ inline ReadAnythingOpenTrigger SidePanelToReadAnythingOpenTrigger(
 #if BUILDFLAG(IS_ANDROID)
     case SidePanelOpenTrigger::kWindowResized:
 #endif
-    case SidePanelOpenTrigger::kGlicOpened:
     case SidePanelOpenTrigger::kContextualTasks:
     case SidePanelOpenTrigger::kUnknown:
       return ReadAnythingOpenTrigger::kUnknown;

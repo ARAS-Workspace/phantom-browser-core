@@ -66,8 +66,6 @@ inline std::string ToString(SidePanelOpenTrigger trigger) {
     case SidePanelOpenTrigger::kWindowResized:
       return "WindowResized";
 #endif
-    case SidePanelOpenTrigger::kGlicOpened:
-      return "GlicOpened";
     case SidePanelOpenTrigger::kContextualTasks:
       return "ContextualTasks";
     case SidePanelOpenTrigger::kReadAnythingListenToThisPageContextMenu:
