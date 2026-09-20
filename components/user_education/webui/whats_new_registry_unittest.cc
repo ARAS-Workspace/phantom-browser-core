@@ -112,7 +112,7 @@ class WhatsNewRegistryTest : public testing::Test {
     // Editions
     whats_new_registry_->RegisterEdition(WhatsNewEdition(
         kTestEditionEnabled1, "",
-        {BrowserCommand::kOpenAISettings, BrowserCommand::kOpenSafetyCheck}));
+        {BrowserCommand::kOpenAISettings, BrowserCommand::kOpenFeedbackForm}));
     whats_new_registry_->RegisterEdition(
         WhatsNewEdition(kTestEditionEnabled2, ""));
     whats_new_registry_->RegisterEdition(
@@ -163,8 +163,8 @@ TEST_F(WhatsNewRegistryTest, CommandsAreActiveForEnabledModulesAndEditions) {
   // registratrion.
   EXPECT_TRUE(
       std::ranges::contains(active_commands, BrowserCommand::kOpenAISettings));
-  EXPECT_TRUE(
-      std::ranges::contains(active_commands, BrowserCommand::kOpenSafetyCheck));
+  EXPECT_TRUE(std::ranges::contains(active_commands,
+                                    BrowserCommand::kOpenFeedbackForm));
 }
 
 TEST_F(WhatsNewRegistryTest, FindModulesForActiveFeatures) {

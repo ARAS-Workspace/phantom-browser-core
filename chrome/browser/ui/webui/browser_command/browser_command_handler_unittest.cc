@@ -15,9 +15,7 @@
 #include "chrome/browser/user_education/tutorial_identifiers.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/testing_profile.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/saved_tab_groups/public/features.h"
-#include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "components/user_education/common/help_bubble/help_bubble_factory_registry.h"
 #include "components/user_education/common/tutorial/tutorial_identifier.h"
 #include "components/user_education/common/tutorial/tutorial_registry.h"
@@ -41,8 +39,6 @@ namespace {
 
 std::vector<Command> supported_commands = {
     Command::kUnknownCommand,  // Included for SupportedCommands test
-    Command::kOpenSafetyCheck,
-    Command::kOpenSafeBrowsingEnhancedProtectionSettings,
     Command::kOpenFeedbackForm,
     Command::kOpenPrivacyGuide,
     Command::kStartTabGroupTutorial,
@@ -53,7 +49,6 @@ std::vector<Command> supported_commands = {
     Command::kStartPasswordManagerTutorial,
     Command::kStartSavedTabGroupTutorial,
     Command::kOpenAISettings,
-    Command::kOpenSafetyCheckFromWhatsNew,
     Command::kOpenPaymentsSettings,
     Command::kOpenGlic,
     Command::kOpenGlicSettings,
@@ -71,11 +66,6 @@ class TestCommandHandler : public BrowserCommandHandler {
                               web_contents) {}
   ~TestCommandHandler() override = default;
 
-  void NavigateToEnhancedProtectionSetting() override {
-    // The functionality of opening a URL is removed, as it cannot be executed
-    // in a unittest.
-  }
-
   void NavigateToURL(const GURL&, WindowOpenDisposition) override {
     // The functionality of opening a URL is removed, as it cannot be executed
     // in a unittest.
@@ -84,11 +74,6 @@ class TestCommandHandler : public BrowserCommandHandler {
   void OpenFeedbackForm() override {
     // The functionality of opening the feedback form is removed, as it cannot
     // be executed in a unittest.
-  }
-
-  void OpenPasswordManager() override {
-    // The functionality of opening the password manager is removed, as it
-    // cannot be executed in a unittest.
   }
 
   void OpenAISettings() override {
@@ -214,13 +199,9 @@ class MockCommandHandler : public TestCommandHandler {
 
   MOCK_METHOD(void, StartTutorial, (StartTutorialInPage::Params params));
 
-  MOCK_METHOD(void, NavigateToEnhancedProtectionSetting, ());
-
   MOCK_METHOD(void, NavigateToURL, (const GURL&, WindowOpenDisposition));
 
   MOCK_METHOD(void, OpenFeedbackForm, ());
-
-  MOCK_METHOD(void, OpenPasswordManager, ());
 
   MOCK_METHOD(void, OpenAISettings, ());
 
@@ -360,123 +341,6 @@ TEST_F(BrowserCommandHandlerTest, SupportedCommands) {
       BrowserCommandHandler::kPromoBrowserCommandHistogramName, 0, 1);
 }
 
-TEST_F(BrowserCommandHandlerTest, CanExecuteCommand_OpenSafetyCheck) {
-  // By default, showing the Safety Check promo is allowed.
-  EXPECT_TRUE(
-      CanExecuteCommand(Command::kOpenSafeBrowsingEnhancedProtectionSettings));
-
-  // If the browser is managed, showing the Safety Check promo is not allowed.
-  TestingProfile::Builder builder;
-  builder.OverridePolicyConnectorIsManagedForTesting(true);
-  std::unique_ptr<TestingProfile> profile = builder.Build();
-  command_handler_ = std::make_unique<MockCommandHandler>(profile.get());
-  EXPECT_FALSE(CanExecuteCommand(Command::kOpenSafetyCheck));
-}
-
-TEST_F(BrowserCommandHandlerTest, OpenSafetyCheckCommand) {
-  // The OpenSafetyCheck command opens a new settings window with the Safety
-  // Check, and the correct disposition.
-  ClickInfoPtr info = ClickInfo::New();
-  info->middle_button = true;
-  info->meta_key = true;
-  EXPECT_CALL(
-      *command_handler_,
-      NavigateToURL(GURL(chrome::GetSettingsUrl(chrome::kSafetyCheckSubPage)),
-                    DispositionFromClick(*info)));
-  EXPECT_TRUE(ExecuteCommand(Command::kOpenSafetyCheck, std::move(info)));
-}
-
-TEST_F(BrowserCommandHandlerTest, OpenSafetyCheckFromWhatsNewCommand) {
-  EXPECT_TRUE(CanExecuteCommand(Command::kOpenSafetyCheckFromWhatsNew));
-  // The OpenSafetyCheck command opens a new settings window with the Safety
-  // Check, and the correct disposition.
-  ClickInfoPtr info = ClickInfo::New();
-  info->middle_button = true;
-  info->meta_key = true;
-  EXPECT_CALL(
-      *command_handler_,
-      NavigateToURL(GURL(chrome::GetSettingsUrl(chrome::kSafetyCheckSubPage)),
-                    DispositionFromClick(*info)));
-  EXPECT_TRUE(
-      ExecuteCommand(Command::kOpenSafetyCheckFromWhatsNew, std::move(info)));
-}
-
-TEST_F(BrowserCommandHandlerTest,
-       CanShowSafeBrowsingEnhancedProtectionCommandPromo_NoPolicies) {
-  EXPECT_TRUE(
-      CanExecuteCommand(Command::kOpenSafeBrowsingEnhancedProtectionSettings));
-}
-
-TEST_F(
-    BrowserCommandHandlerTest,
-    CanShowSafeBrowsingEnhancedProtectionCommandPromo_EnhancedProtectionEnabled) {
-  TestingProfile::Builder builder;
-  std::unique_ptr<TestingProfile> profile = builder.Build();
-  profile->GetTestingPrefService()->SetUserPref(
-      prefs::kSafeBrowsingEnhanced, std::make_unique<base::Value>(true));
-  command_handler_ = std::make_unique<MockCommandHandler>(profile.get());
-
-  EXPECT_FALSE(
-      CanExecuteCommand(Command::kOpenSafeBrowsingEnhancedProtectionSettings));
-}
-
-TEST_F(
-    BrowserCommandHandlerTest,
-    CanShowSafeBrowsingEnhancedProtectionCommandPromo_HasSafeBrowsingManaged_NoProtection) {
-  TestingProfile::Builder builder;
-  std::unique_ptr<TestingProfile> profile = builder.Build();
-  profile->GetTestingPrefService()->SetManagedPref(
-      prefs::kSafeBrowsingEnabled, std::make_unique<base::Value>(false));
-  profile->GetTestingPrefService()->SetManagedPref(
-      prefs::kSafeBrowsingEnhanced, std::make_unique<base::Value>(false));
-  command_handler_ = std::make_unique<MockCommandHandler>(profile.get());
-
-  EXPECT_FALSE(
-      CanExecuteCommand(Command::kOpenSafeBrowsingEnhancedProtectionSettings));
-}
-
-TEST_F(
-    BrowserCommandHandlerTest,
-    CanShowSafeBrowsingEnhancedProtectionCommandPromo_HasSafeBrowsingManaged_StandardProtection) {
-  TestingProfile::Builder builder;
-  std::unique_ptr<TestingProfile> profile = builder.Build();
-  profile->GetTestingPrefService()->SetManagedPref(
-      prefs::kSafeBrowsingEnabled, std::make_unique<base::Value>(true));
-  profile->GetTestingPrefService()->SetManagedPref(
-      prefs::kSafeBrowsingEnhanced, std::make_unique<base::Value>(false));
-  command_handler_ = std::make_unique<MockCommandHandler>(profile.get());
-
-  EXPECT_FALSE(
-      CanExecuteCommand(Command::kOpenSafeBrowsingEnhancedProtectionSettings));
-}
-
-TEST_F(
-    BrowserCommandHandlerTest,
-    CanShowSafeBrowsingEnhancedProtectionCommandPromo_HasSafeBrowsingManaged_EnhancedProtection) {
-  TestingProfile::Builder builder;
-  std::unique_ptr<TestingProfile> profile = builder.Build();
-  profile->GetTestingPrefService()->SetManagedPref(
-      prefs::kSafeBrowsingEnabled, std::make_unique<base::Value>(true));
-  profile->GetTestingPrefService()->SetManagedPref(
-      prefs::kSafeBrowsingEnhanced, std::make_unique<base::Value>(true));
-  command_handler_ = std::make_unique<MockCommandHandler>(profile.get());
-
-  EXPECT_FALSE(
-      CanExecuteCommand(Command::kOpenSafeBrowsingEnhancedProtectionSettings));
-}
-
-TEST_F(BrowserCommandHandlerTest, OpenSafeBrowsingEnhancedProtectionCommand) {
-  // The kOpenSafeBrowsingEnhancedProtectionSettings command opens a new
-  // settings window with the Safe Browsing settings with the Enhanced
-  // Protection section expanded, and an In-product help bubble
-  ClickInfoPtr info = ClickInfo::New();
-  info->middle_button = true;
-  info->meta_key = true;
-  EXPECT_CALL(*command_handler_, NavigateToEnhancedProtectionSetting());
-  EXPECT_TRUE(ExecuteCommand(
-      Command::kOpenSafeBrowsingEnhancedProtectionSettings, std::move(info)));
-}
-
 TEST_F(BrowserCommandHandlerTest, OpenFeedbackFormCommand) {
   // Open feedback form command calls open feedback form.
   ClickInfoPtr info = ClickInfo::New();
@@ -552,18 +416,6 @@ TEST_F(BrowserCommandHandlerTest, StartTabGroupTutorialCommand) {
   }
 }
 
-TEST_F(BrowserCommandHandlerTest, OpenPasswordManagerCommand) {
-  // By default, opening the password manager is allowed.
-  EXPECT_TRUE(CanExecuteCommand(Command::kOpenPasswordManager));
-  ClickInfoPtr info = ClickInfo::New();
-  info->middle_button = true;
-  info->meta_key = true;
-  // The OpenPassswordManager command opens a new settings window with the
-  // password manager and the correct disposition.
-  EXPECT_CALL(*command_handler_, OpenPasswordManager());
-  EXPECT_TRUE(ExecuteCommand(Command::kOpenPasswordManager, std::move(info)));
-}
-
 TEST_F(BrowserCommandHandlerTest, OpenPerformanceSettings) {
   EXPECT_TRUE(CanExecuteCommand(Command::kOpenPerformanceSettings));
 
@@ -619,43 +471,6 @@ TEST_F(BrowserCommandHandlerTest,
     EXPECT_TRUE(ExecuteCommand(Command::kOpenNTPAndStartCustomizeChromeTutorial,
                                std::move(info)));
   }
-}
-
-TEST_F(BrowserCommandHandlerTest, StartPasswordManagerTutorialCommand) {
-  // Command cannot be executed if the tutorial service doesn't exist.
-  command_handler_->SetTutorialServiceExists(false);
-  EXPECT_FALSE(CanExecuteCommand(Command::kStartPasswordManagerTutorial));
-
-  // Create mock service so the command can be executed.
-  auto bubble_factory_registry =
-      std::make_unique<user_education::HelpBubbleFactoryRegistry>();
-  user_education::TutorialRegistry registry;
-  MockTutorialService service(&registry, bubble_factory_registry.get());
-
-  // Allow command to be executed.
-  command_handler_->SetTutorialServiceExists(true);
-
-  EXPECT_TRUE(CanExecuteCommand(Command::kStartPasswordManagerTutorial));
-
-  ClickInfoPtr info = ClickInfo::New();
-  EXPECT_CALL(*command_handler_, StartTutorial)
-      .WillOnce([&](StartTutorialInPage::Params params) {
-        EXPECT_EQ(params.tutorial_id, kPasswordManagerTutorialId);
-      });
-  EXPECT_TRUE(
-      ExecuteCommand(Command::kStartPasswordManagerTutorial, std::move(info)));
-
-  EXPECT_CALL(service, IsRunningTutorial).WillOnce(testing::Return(true));
-  EXPECT_CALL(service, LogStartedFromWhatsNewPage)
-      .WillOnce(
-          [&](user_education::TutorialIdentifier tutorial_id, bool is_running) {
-            EXPECT_EQ(tutorial_id, kPasswordManagerTutorialId);
-            EXPECT_TRUE(is_running);
-            return;
-          });
-
-  // Manually call tutorial started callback.
-  command_handler_->OnTutorialStarted(kPasswordManagerTutorialId, &service);
 }
 
 TEST_F(BrowserCommandHandlerTest, OpenAISettingsCommand) {
