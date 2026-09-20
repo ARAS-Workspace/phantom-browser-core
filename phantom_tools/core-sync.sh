@@ -155,6 +155,65 @@ EOF
     report deps "$started"
 }
 
+# The SDK the tree is written against, and the tools it reaches for, are both
+# kept under build/mac_files so that an Xcode update on the host cannot move
+# them. The version comes from the tree itself. Two of the tools reached for
+# there are shims that locate their own component through xcrun, so they are
+# written as wrappers.
+hermetic_xcode() {
+    local herm="$ROOT/build/mac_files/xcode_binaries"
+    local dev="$herm/Contents/Developer"
+    local xdev version sdk xt src e b
+
+    xdev=$(xcode-select -p 2>/dev/null) || die "xcode-select found no developer directory"
+    [ -d "$xdev" ] || die "the developer directory at $xdev is missing"
+
+    version=$(sed -n 's/^ *mac_sdk_official_version = "\([0-9.]*\)".*/\1/p' \
+        "$ROOT/build/config/mac/mac_sdk.gni" | head -1)
+    [ -n "$version" ] || die "no mac_sdk_official_version in build/config/mac/mac_sdk.gni"
+    sdk="MacOSX$version.sdk"
+
+    mkdir -p "$dev/Platforms/MacOSX.platform/Developer/SDKs"
+    ln -sfn "$xdev/../version.plist" "$herm/Contents/version.plist"
+    ln -sfn "$xdev/usr" "$dev/usr"
+    ln -sfn "$xdev/Platforms/MacOSX.platform/Info.plist" \
+        "$dev/Platforms/MacOSX.platform/Info.plist"
+
+    # The SDK is copied, not linked: the host keeps only the newest one.
+    if [ ! -d "$dev/Platforms/MacOSX.platform/Developer/SDKs/$sdk" ]; then
+        src=""
+        for c in "$xdev/Platforms/MacOSX.platform/Developer/SDKs/$sdk" \
+                 "/Library/Developer/CommandLineTools/SDKs/$sdk"; do
+            [ -d "$c" ] && { src=$c; break; }
+        done
+        [ -n "$src" ] || die "no $sdk on this host; install it or bump mac_sdk_official_version"
+        say "copying $sdk into build/mac_files (this takes a moment)"
+        ditto "$src" "$dev/Platforms/MacOSX.platform/Developer/SDKs/$sdk.partial" \
+            || die "copying $sdk failed"
+        mv "$dev/Platforms/MacOSX.platform/Developer/SDKs/$sdk.partial" \
+           "$dev/Platforms/MacOSX.platform/Developer/SDKs/$sdk"
+    fi
+
+    # Every tool is the host's, apart from the two that go through xcrun.
+    xt="$xdev/Toolchains/XcodeDefault.xctoolchain"
+    [ -d "$xt" ] || die "no XcodeDefault.xctoolchain under $xdev"
+    rm -rf "$dev/Toolchains"
+    mkdir -p "$dev/Toolchains/XcodeDefault.xctoolchain/usr/bin"
+    for e in "$xt"/*; do b=$(basename "$e"); [ "$b" = usr ] && continue
+        ln -sfn "$e" "$dev/Toolchains/XcodeDefault.xctoolchain/$b"; done
+    for e in "$xt"/usr/*; do b=$(basename "$e"); [ "$b" = bin ] && continue
+        ln -sfn "$e" "$dev/Toolchains/XcodeDefault.xctoolchain/usr/$b"; done
+    for e in "$xt"/usr/bin/*; do
+        ln -sfn "$e" "$dev/Toolchains/XcodeDefault.xctoolchain/usr/bin/$(basename "$e")"; done
+    for b in metal metallib; do
+        e="$dev/Toolchains/XcodeDefault.xctoolchain/usr/bin/$b"
+        rm -f "$e"
+        printf '#!/bin/sh\nexec "$(xcrun -f %s)" "$@"\n' "$b" > "$e"
+        chmod +x "$e"
+    done
+    say "hermetic xcode ready at build/mac_files with $sdk"
+}
+
 stage_configure() {
     local started=$SECONDS
     local gn="$ROOT/buildtools/mac/gn"
@@ -163,6 +222,8 @@ stage_configure() {
 
     [ -x "$gn" ] || die "no gn at $gn, the deps stage has not finished"
     [ -f "$FLAGS" ] || die "no dev flags at $FLAGS"
+
+    hermetic_xcode
 
     mkdir -p "$out"
     # The target list rides along in the args file so that changing it re-runs gn.

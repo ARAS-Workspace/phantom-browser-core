@@ -6,6 +6,9 @@
 # dcheck_always_on: the condition for catching crashes, since DCHECK is silent in
 # the production tree.
 # symbol_level=2: so the debugger can see variables.
+# use_system_xcode=false: the SDK comes from build/mac_files/xcode_binaries
+# at mac_sdk_official_version, and an Xcode update on the host does not
+# move it. core-sync.sh sets that directory up.
 is_debug=false
 dcheck_always_on=true
 is_official_build=false
@@ -21,3 +24,4 @@ proprietary_codecs=true
 ffmpeg_branding="Chrome"
 enable_swiftshader=true
 use_sysroot=false
+use_system_xcode=false
