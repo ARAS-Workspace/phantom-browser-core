@@ -39,12 +39,11 @@ Replace `<tree>` with the absolute path of this checkout.
 equivalent.
 
 **5. Exclude what you never read.** Do this before the first index; it removes
-roughly 235000 of the 499000 files.
+roughly 66000 of the 230000 files.
 
-    third_party/blink/web_tests   ios   ash   chromeos   android_webview   docs   infra
+    third_party   infra
 
 Select them in the Project view, right-click, `Mark Directory As`, `Excluded`.
-Keep `third_party/blink/renderer`.
 
 ## Building and debugging from the IDE
 

@@ -40,12 +40,11 @@ dosyasını seçin ve **Open as Project** deyin. Projeyi C++ projesine çeviren 
 budur; dosya üzerinden yapılan bir karşılığı yok.
 
 **5. Hiç okumadığınız yerleri dışarıda bırakın.** Bunu ilk indekslemeden önce
-yapın; 499000 dosyanın yaklaşık 235000'ini eler.
+yapın; 230000 dosyanın yaklaşık 66000'ini eler.
 
-    third_party/blink/web_tests   ios   ash   chromeos   android_webview   docs   infra
+    third_party   infra
 
 Project görünümünde seçin, sağ tıklayın, `Mark Directory As`, `Excluded`.
-`third_party/blink/renderer` dışarıda bırakılmaz.
 
 ## IDE üzerinden derleme ve hata ayıklama
 
