@@ -104,14 +104,6 @@ namespace extensions {
 class ExtensionSidePanelManager;
 }  // namespace extensions
 
-namespace glic {
-class ContextualCueingHelper;
-class GlicInstanceHelper;
-class GlicTabIndicatorHelper;
-class GlicSidePanelCoordinator;
-class GlicPageFeaturesManager;
-}  // namespace glic
-
 namespace memory_saver {
 class MemorySaverChipController;
 }  // namespace memory_saver
@@ -417,8 +409,6 @@ class TabFeatures {
   // Manages the Bookmark page action.
   std::unique_ptr<BookmarkPageActionController>
       bookmark_page_action_controller_;
-
-  // Observes page loads to decide when to offer glic contextual cueing.
 
   std::unique_ptr<memory_saver::MemorySaverChipController>
       memory_saver_chip_controller_;
