@@ -41,7 +41,6 @@ ts_library("build_ts") {
     "//chrome/browser/resources/conflicts:build_ts",
     "//chrome/browser/resources/content_settings:build_ts",
     "//chrome/browser/resources/context_hub:build_ts",
-    "//chrome/browser/resources/contextual_cueing/internals:build_ts",
     "//chrome/browser/resources/default_browser/default_browser_modal:build_ts",
     "//chrome/browser/resources/default_browser/visual_guided_setter:build_ts",
     "//chrome/browser/resources/device_log:build_ts",

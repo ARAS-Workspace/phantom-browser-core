@@ -21,11 +21,3 @@ struct CueLog {
   // The prompt text sent for Gemini feature execution, if available.
   string? prompt;
 };
-
-// Browser-side handler for requests from WebUI page. Bound specifically for
-// chrome://contextual-cueing-internals.
-// Messages sent from Renderer TypeScript to Browser C++.
-interface PageHandler {
-  // Returns the list of cues that have been shown to the user.
-  GetShownCues() => (array<CueLog> cues);
-};

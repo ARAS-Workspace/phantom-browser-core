@@ -46,9 +46,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://connection-monitoring-detected",
       "chrome://connectors-internals",
       "chrome://content-settings",
-#if !BUILDFLAG(IS_ANDROID)
-      "chrome://contextual-cueing-internals",
-#endif
       "chrome://context-hub",
       "chrome://crashes",
 // TODO(crbug.com/40913109): Re-enable this test

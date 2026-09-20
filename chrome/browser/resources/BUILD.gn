@@ -50,7 +50,6 @@ group("resources") {
       "bookmarks:resources",
       "certificate_manager:resources",
       "content_settings:resources",
-      "contextual_cueing/internals:resources",
       "data_sharing:resources",
       "downloads:resources",
       "feedback:resources",

@@ -6,7 +6,6 @@
 
 #include "base/strings/string_util.h"
 #include "base/test/bind.h"
-#include "chrome/browser/contextual_cueing/features.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/webui_urls_for_test.h"
 #include "chrome/common/chrome_features.h"
@@ -54,7 +53,6 @@ WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
 #endif
 
   enable_feature(features::kTabsFromOtherDevicesSidePanel);
-  enable_feature(contextual_cueing::kContextualCueingV2);
 
 #if !BUILDFLAG(IS_ANDROID)
   enable_feature(features::kIsolatedWebAppDevUi);

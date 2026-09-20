@@ -79,10 +79,6 @@ inline constexpr char kChromeUIConstrainedHTMLTestURL[] =
     "chrome://constrained-test/";
 inline constexpr char kChromeUIContactInfoPath[] = "/contactInfo";
 inline constexpr char kChromeUIContextHubHost[] = "context-hub";
-#if !BUILDFLAG(IS_ANDROID)
-inline constexpr char kChromeUIContextualCueingInternalsHost[] =
-    "contextual-cueing-internals";
-#endif
 inline constexpr char kChromeUIContentSettingsHost[] = "content-settings";
 inline constexpr char kChromeUIContentSettingsURL[] =
     "chrome://settings/content";
