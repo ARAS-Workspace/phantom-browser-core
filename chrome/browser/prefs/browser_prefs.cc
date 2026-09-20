@@ -636,11 +636,6 @@ constexpr char kShouldShowRemoteAnnotatorFirstRunInfo[] =
 constexpr char kHttpCacheFinchExperimentGroups[] =
     "profile_network_context_service.http_cache_finch_experiment_groups";
 
-// Deprecated 05/2026.
-constexpr char kContextualCueingEnterprisePolicyAllowedDeprecated[] =
-    "optimization_guide.model_execution.contextual_cueing_enterprise_policy_"
-    "allowed";
-
 // Deprecated 06/2026.
 inline constexpr char kDeleteTimePeriodBasic[] =
     "browser.clear_data.time_period_basic";
@@ -989,10 +984,6 @@ void RegisterProfilePrefsForMigration(
 
   // Deprecated 05/2026.
   registry->RegisterBooleanPref(kShouldShowRemoteAnnotatorFirstRunInfo, true);
-
-  // Deprecated 05/2026.
-  registry->RegisterIntegerPref(
-      kContextualCueingEnterprisePolicyAllowedDeprecated, 0);
 
   // Deprecated 06/2026.
   registry->RegisterIntegerPref(kDeleteTimePeriodBasic, 0);
