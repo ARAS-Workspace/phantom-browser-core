@@ -237,15 +237,11 @@ chromium-metrics-reviews@google.com.
   <int value="15" label="Result Not Set (instrumentation gap)"/>
 </enum>
 
-<!-- LINT.IfChange(GlicExperimentalTriggeringState) -->
-
 <enum name="GlicExperimentalTriggeringState">
   <int value="0" label="Unavailable"/>
   <int value="1" label="Needs Opt-In"/>
   <int value="2" label="Ready"/>
 </enum>
-
-<!-- LINT.ThenChange(//components/sync_device_info/device_info.h:GlicExperimentalTriggeringState) -->
 
 <enum name="GlicFeatureDisabledReason">
   <int value="0" label="Feature Flag Disabled"/>
@@ -1004,14 +1000,10 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="Unknown"/>
 </enum>
 
-<!-- LINT.IfChange(GlicWebContentsContextMenuResult) -->
-
 <enum name="GlicWebContentsContextMenuResult">
   <int value="0" label="ShownAndIgnored"/>
   <int value="1" label="Executed"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/renderer_context_menu/render_view_context_menu.cc:GlicWebContentsContextMenuResult) -->
 
 <enum name="GlicWebUseCounter">
   <int value="0" label="Default"/>
