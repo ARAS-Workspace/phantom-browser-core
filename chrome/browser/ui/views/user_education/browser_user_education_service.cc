@@ -75,7 +75,6 @@
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/browser/web_applications/web_app_tab_helper.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
@@ -2050,29 +2049,6 @@ void MaybeRegisterChromeNewBadges(user_education::NewBadgeRegistry& registry) {
                                "Shown in autofill-style suggestion UI when "
                                "Compose proactive nudge is shown.",
                                {}, kComposePlatforms)));
-
-  // This is a custom UI new badge that uses a small help bubble to annotate the
-  // element instead of a badge.
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      features::kGlic,
-      // TODO(crbug.com/391699323): fill in launch milestone
-      user_education::Metadata(136, "agale@chromium.org",
-                               "Shown in the glic settings page when the user "
-                               "wants to change the toggle value.")));
-
-  // This is a custom UI new badge that uses a small help bubble to annotate the
-  // element instead of a badge.
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      features::kGlicKeyboardShortcutNewBadge,
-      // TODO(crbug.com/391699323): fill in launch milestone
-      user_education::Metadata(136, "agale@chromium.org",
-                               "Shown in the glic settings page when the user "
-                               "wants to change the keyboard shortcut.")));
-
-  registry.RegisterFeature(user_education::NewBadgeSpecification(
-      features::kGlicAppMenuNewBadge,
-      user_education::Metadata(136, "sophey@chromium.org",
-                               "Shown in the three dot menu.")));
 
   registry.RegisterFeature(user_education::NewBadgeSpecification(
       tabs::kVerticalTabsPreviewBadge,
