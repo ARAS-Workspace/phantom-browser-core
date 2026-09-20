@@ -139,9 +139,6 @@ using FetchPageContextResultCallbackArg =
 // modifies the default values.
 BASE_DECLARE_FEATURE(kGlicTabScreenshotExperiment);
 
-// Controls whether password fields are redacted from screenshots.
-BASE_DECLARE_FEATURE(kGlicScreenshotPasswordRedaction);
-
 // Controls whether sensitive payment fields are redacted from screenshots.
 BASE_DECLARE_FEATURE(kGlicScreenshotSensitivePaymentRedaction);
 

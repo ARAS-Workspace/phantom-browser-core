@@ -557,7 +557,6 @@ class PasswordRedactionMultiSourcePageContextFetcherBrowserTest
  public:
   PasswordRedactionMultiSourcePageContextFetcherBrowserTest() {
     std::vector<base::test::FeatureRefAndParams> enabled_features{
-        {kGlicScreenshotPasswordRedaction, {}},
         // Effectively disables timeouts.
         {kGlicTabScreenshotExperiment,
          {
@@ -1126,7 +1125,6 @@ class ElementCSSRedactionMultiSourcePageContextFetcherBrowserTest
  public:
   ElementCSSRedactionMultiSourcePageContextFetcherBrowserTest() {
     std::vector<base::test::FeatureRefAndParams> enabled_features{
-        {kGlicScreenshotPasswordRedaction, {}},
         // Effectively disables timeouts.
         {kGlicTabScreenshotExperiment,
          {

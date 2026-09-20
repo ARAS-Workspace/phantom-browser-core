@@ -454,7 +454,6 @@ void PageContextFetcher::FetchStart(content::WebContents& aweb_contents,
         options.screenshot_options &&
         !options.screenshot_options->use_paint_preview();
     ai_page_content_options->include_passwords_for_redaction =
-        base::FeatureList::IsEnabled(kGlicScreenshotPasswordRedaction) &&
         !use_tracked_elements_for_password_screenshot_redaction;
     ai_page_content_options->include_sensitive_payments_for_redaction =
         base::FeatureList::IsEnabled(kGlicScreenshotSensitivePaymentRedaction);
@@ -1146,9 +1145,8 @@ void PageContextFetcher::MaybeAddIframeInfo() {
 
 void PageContextFetcher::CollectTrackedElementRectsForPassword(
     const viz::TrackedElementRects& tracked_element_rects) {
-  if (!(base::FeatureList::IsEnabled(kGlicScreenshotPasswordRedaction) &&
-        base::FeatureList::IsEnabled(
-            blink::features::kAIPageContentTrackedElementsPassword))) {
+  if (!base::FeatureList::IsEnabled(
+          blink::features::kAIPageContentTrackedElementsPassword)) {
     return;
   }
 
@@ -1181,9 +1179,6 @@ std::string ToString(FetchPageContextError error) {
 }
 
 BASE_FEATURE(kGlicTabScreenshotExperiment, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kGlicScreenshotPasswordRedaction,
-             base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kGlicScreenshotSensitivePaymentRedaction,
              base::FEATURE_DISABLED_BY_DEFAULT);
