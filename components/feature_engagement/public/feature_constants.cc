@@ -109,15 +109,6 @@ BASE_FEATURE_ENUM_PARAM(
 BASE_FEATURE(kIPHFocusHelpBubbleScreenReaderPromoFeature,
              "IPH_FocusHelpBubbleScreenReaderPromo",
              base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHGlicPromoFeature,
-             "IPH_GlicPromo",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHGlicTrustFirstOnboardingShortcutSnoozePromoFeature,
-             "IPH_GlicTrustFirstOnboardingShortcutSnoozePromo",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHGlicTryItFeature,
-             "IPH_GlicTryIt",
-             base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHGMCCastStartStopFeature,
              "IPH_GMCCastStartStop",
              base::FEATURE_ENABLED_BY_DEFAULT);

@@ -479,13 +479,14 @@ should be able to be added at any place in this file.
       summary="For generic always show help UI feature."/>
   <variant name="_GestureUserEducation"
       summary="For gesture user edcuation IPH feature."/>
-  <variant name="_GlicPromo" summary="For Glic feature."/>
+  <variant name="_GlicPromo" summary="(obsolete) For Glic feature."/>
   <variant name="_GlicPromoAndroid" summary="For Glic promotion on Android."/>
   <variant name="_GlicTrustFirstOnboardingShortcutSnoozePromo"
-      summary="For Glic shortcut feature with a snooze promo."/>
+      summary="(obsolete) For Glic shortcut feature with a snooze promo."/>
   <variant name="_GlicTrustFirstOnboardingShortcutToastPromo"
       summary="For Glic shortcut feature with a toast promo."/>
-  <variant name="_GlicTryIt" summary="For Glic feature with a call to action."/>
+  <variant name="_GlicTryIt"
+      summary="(obsolete) For Glic feature with a call to action."/>
   <variant name="_GlobalMediaControls"
       summary="For GlobalMediaControls feature."/>
   <variant name="_GMCCastStartStop"

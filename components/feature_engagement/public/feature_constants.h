@@ -76,10 +76,6 @@ BASE_DECLARE_FEATURE_PARAM(IPHExtensionsZeroStatePromoVariant,
                            kIPHExtensionsZeroStatePromoVariantParam);
 #endif
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHFocusHelpBubbleScreenReaderPromoFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHGlicPromoFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(
-    kIPHGlicTrustFirstOnboardingShortcutSnoozePromoFeature);
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHGlicTryItFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHGMCCastStartStopFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHGMCLocalMediaCastingFeature);
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHMemorySaverModeFeature);
