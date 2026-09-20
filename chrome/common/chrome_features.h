@@ -25,13 +25,6 @@ namespace features {
 // All features in alphabetical order. The features should be documented
 // alongside the definition of their values in the .cc file.
 
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>(
-    kActorPaintStabilityIntialPaintTimeout);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>(
-    kActorPaintStabilitySubsequentPaintTimeout);
-
 #if BUILDFLAG(IS_MAC)
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kAppShimRemoteCocoa);
 COMPONENT_EXPORT(CHROME_FEATURES)
@@ -154,14 +147,6 @@ BASE_DECLARE_FEATURE(kActorUiThemed);
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const char kGlicActorUiToastName[];
 
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>(kActorObservationDelayTimeout);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<base::TimeDelta>(kActorObservationDelayLcp);
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
-                           kActorObservationDelayAutofillPredictionsTimeout);
-
 // Exempts the user from ActorPolicyChecker.
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<bool> kGlicActorPolicyControlExemption;
@@ -179,11 +164,6 @@ COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlic);
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicBackgroundActuation);
-
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicUserStatusCheck);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGeminiOAuth2Scope;
 
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicKeyboardShortcutNewBadge);

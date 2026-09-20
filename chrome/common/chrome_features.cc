@@ -18,20 +18,6 @@ namespace features {
 
 // All features in alphabetical order.
 
-// Timeout controlling how long the paint stability monitor waits after the
-// initial contentful paint before considering the UI to have stabilized.
-const base::FeatureParam<base::TimeDelta>
-    kActorPaintStabilityIntialPaintTimeout{
-        &kGlicActor, "actor-paint-stability-initial-paint-timeout",
-        base::Seconds(1)};
-// Timeout controlling how long the paint stability monitor waits for subsequent
-// contenful paints before considering the UI to have stabilized.
-const base::FeatureParam<base::TimeDelta>
-    kActorPaintStabilitySubsequentPaintTimeout{
-        &kGlicActor, "actor-paint-stability-subsequent-paint-timeout",
-        base::Seconds(1)};
-
-
 #if BUILDFLAG(IS_MAC)
 // Can be used to disable RemoteCocoa (hosting NSWindows for apps in the app
 // process). For debugging purposes only.
@@ -236,26 +222,6 @@ BASE_FEATURE(kActorUiThemed, base::FEATURE_ENABLED_BY_DEFAULT);
 
 const char kGlicActorUiToastName[] = "glic-actor-ui-toast";
 
-// The overall observation timeout when waiting for a tool to complete.
-// This timeout is long but based on the NavigationToLoadEventFired UMA. This
-// should be tuned with real world usage.
-const base::FeatureParam<base::TimeDelta> kActorObservationDelayTimeout{
-    &kGlicActor, "actor-observation-delay-timeout", base::Seconds(10)};
-
-// The additional delay before completing a tool if LCP is not detected yet upon
-// loading.
-const base::FeatureParam<base::TimeDelta> kActorObservationDelayLcp{
-    &kGlicActor, "actor-observation-delay-lcp", base::Seconds(1)};
-
-// The time for Autofill to parse and classify form fields.
-// Autofill is expected to return within this timeout (having successfully
-// parsed the form fields or not).
-BASE_FEATURE_PARAM(base::TimeDelta,
-                   kActorObservationDelayAutofillPredictionsTimeout,
-                   &kGlicActor,
-                   "actor-observation-delay-autofill-predictions-timeout",
-                   base::Seconds(1));
-
 const base::FeatureParam<bool> kGlicActorPolicyControlExemption{
     &kGlicActor, "glic_actor_policy_control_exemption", false};
 
@@ -277,19 +243,11 @@ BASE_FEATURE(kGlic,
 
 BASE_FEATURE(kGlicBackgroundActuation, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE_PARAM(std::string,
-                   kGeminiOAuth2Scope,
-                   &kGlicUserStatusCheck,
-                   "glic-user-status-oauth2-scope",
-                   "https://www.googleapis.com/auth/gemini");
-
 BASE_FEATURE(kGlicKeyboardShortcutNewBadge, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kGlicAppMenuNewBadge, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kGlicRollout, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kGlicUserStatusCheck, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kGlicDefaultTabContextSetting, base::FEATURE_ENABLED_BY_DEFAULT);
 
