@@ -70,7 +70,6 @@ class COMPONENT_EXPORT(GOOGLE_APIS) GaiaSource {
     kAccountReconcilorDice,
     kAccountReconcilorMirror,
     kPrimaryAccountManager,
-    kChromeGlic,  // chrome/browser/glic
     kAccountReconcilorDiceCookieUpgrade,
   };
 

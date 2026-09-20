@@ -118,7 +118,6 @@ std::optional<AccessPoint> AccessPointFromInt(int value) {
     case AccessPoint::kCctAccountMismatchNotification:
     case AccessPoint::kDriveFilePickerIos:
     case AccessPoint::kCollaborationShareTabGroup:
-    case AccessPoint::kGlicLaunchButton:
     case AccessPoint::kIndigo:
     case AccessPoint::kHistoryPage:
     case AccessPoint::kCollaborationJoinTabGroup:
@@ -689,10 +688,6 @@ void RecordSigninUserActionForAccessPoint(AccessPoint access_point) {
       base::RecordAction(
           base::UserMetricsAction("Signin_Signin_FromAddressBubble"));
       break;
-    case AccessPoint::kGlicLaunchButton:
-      base::RecordAction(
-          base::UserMetricsAction("Signin_Signin_FromGlicLaunchButton"));
-      break;
     case AccessPoint::kIndigo:
       base::RecordAction(base::UserMetricsAction("Signin_Signin_FromIndigo"));
       break;
@@ -946,7 +941,6 @@ void RecordSigninImpressionUserActionForAccessPoint(AccessPoint access_point) {
     case AccessPoint::kCctAccountMismatchNotification:
     case AccessPoint::kDriveFilePickerIos:
     case AccessPoint::kCollaborationShareTabGroup:
-    case AccessPoint::kGlicLaunchButton:
     case AccessPoint::kIndigo:
     case AccessPoint::kHistoryPage:
     case AccessPoint::kCollaborationJoinTabGroup:

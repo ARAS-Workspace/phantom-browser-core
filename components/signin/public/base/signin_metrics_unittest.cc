@@ -44,7 +44,6 @@ const AccessPoint kAccessPointsThatSupportUserAction[] = {
     AccessPoint::kAvatarBubbleSignInWithSyncPromo,
     AccessPoint::kProductSpecifications,
     AccessPoint::kAddressBubble,
-    AccessPoint::kGlicLaunchButton,
     AccessPoint::kNonModalSigninPasswordPromo,
     AccessPoint::kNonModalSigninBookmarkPromo,
     AccessPoint::kUserManagerWithPrefilledEmail,
@@ -198,8 +197,6 @@ class SigninMetricsTest : public ::testing::Test {
         return "DriveFilePickerIOS";
       case AccessPoint::kCollaborationShareTabGroup:
         return "CollaborationShareTabGroup";
-      case AccessPoint::kGlicLaunchButton:
-        return "GlicLaunchButton";
       case AccessPoint::kHistoryPage:
         return "HistoryPage";
       case AccessPoint::kCollaborationJoinTabGroup:
