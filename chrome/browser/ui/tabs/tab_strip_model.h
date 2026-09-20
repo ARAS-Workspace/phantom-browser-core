@@ -787,10 +787,6 @@ class TabStripModel {
     CommandGoBack,
     CommandCloseAllTabs,
     CommandToggleVertical,
-    CommandGlicShare,
-    CommandGlicCreateNewChat,
-    CommandGlicSwitchToRecentConversation,
-    CommandGlicUnshare,
     CommandLast
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/tab/histograms.xml:TabContextMenuCommand)

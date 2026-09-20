@@ -93,9 +93,6 @@ BrowserTabStripModelDelegate::BrowserTabStripModelDelegate(Browser* browser)
 
 BrowserTabStripModelDelegate::~BrowserTabStripModelDelegate() = default;
 
-void BrowserTabStripModelDelegate::GlicUnpinTabsFromAllConversations(
-    base::span<const tabs::TabHandle> tab_handles) {}
-
 ////////////////////////////////////////////////////////////////////////////////
 // BrowserTabStripModelDelegate, TabStripModelDelegate implementation:
 

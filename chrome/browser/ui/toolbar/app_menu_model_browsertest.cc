@@ -321,21 +321,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, CustomizeChromeLogMetrics) {
   EXPECT_EQ(1, model.log_metrics_count_);
 }
 
-class AppMenuModelGlicTest : public AppMenuModelTest {
- public:
-  AppMenuModelGlicTest() {
-    feature_list_.InitWithFeatures({features::kGlic, features::kGlicRollout},
-                                   {});
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(AppMenuModelGlicTest, GlicItem) {
-  TestLogMetricsAppMenuModel model(this, browser());
-  model.Init();
-  model.ExecuteCommand(IDC_OPEN_GLIC, 0);
-  EXPECT_EQ(1, model.log_metrics_count_);
-}
-
 IN_PROC_BROWSER_TEST_F(AppMenuModelTest, DoNotShowShareSubMenuItem) {
   PrefService* prefs = browser()->GetProfile()->GetPrefs();
   prefs->SetBoolean(prefs::kDesktopSharingHubEnabled, false);

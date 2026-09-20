@@ -71,7 +71,6 @@ bool SystemMenuModelDelegate::GetAcceleratorForCommandId(
 bool SystemMenuModelDelegate::IsItemForCommandIdDynamic(int command_id) const {
   return std::set{IDC_RESTORE_TAB,
                   IDC_TAB_SEARCH_TOGGLE_PIN,
-                  IDC_GLIC_TOGGLE_PIN,
                   IDC_TOGGLE_VERTICAL_TABS,
                   IDC_TOGGLE_VERTICAL_TABS_COLLAPSE,
                   IDC_TOGGLE_VERTICAL_TABS_EXPAND_ON_HOVER}

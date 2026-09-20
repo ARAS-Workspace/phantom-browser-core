@@ -2638,14 +2638,6 @@ bool TabStripModel::IsContextMenuCommandEnabled(
              delegate()->CanMoveTabsToWindow(indices);
     }
 
-    case CommandGlicShare:
-      return true;
-    case CommandGlicCreateNewChat:
-    case CommandGlicSwitchToRecentConversation:
-      return true;
-    case CommandGlicUnshare:
-      return true;
-
     case CommandCopyURL:
       DCHECK(delegate()->IsForWebApp());
       return true;
@@ -2989,27 +2981,6 @@ void TabStripModel::ExecuteContextMenuCommand(int context_index,
       } else {
         std::move(callback).Run();
       }
-      break;
-    }
-
-    case CommandGlicShare:
-      // Do nothing. The submenu's delegate will invoke the correct subcommand
-      // later.
-      break;
-    case CommandGlicCreateNewChat:
-    case CommandGlicSwitchToRecentConversation:
-      // These are handled by GlicTabSubMenuModel.
-      break;
-    case CommandGlicUnshare: {
-      std::vector<int> indices = GetIndicesForCommand(context_index);
-      base::UmaHistogramCounts100("Glic.TabContextMenu.UnpinnedTabs",
-                                  indices.size());
-      std::vector<tabs::TabHandle> tab_handles;
-      tab_handles.reserve(indices.size());
-      std::transform(
-          indices.begin(), indices.end(), std::back_inserter(tab_handles),
-          [this](int index) { return GetTabAtIndex(index)->GetHandle(); });
-      delegate_->GlicUnpinTabsFromAllConversations(tab_handles);
       break;
     }
 

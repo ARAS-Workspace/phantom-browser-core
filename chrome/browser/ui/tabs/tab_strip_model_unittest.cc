@@ -7982,15 +7982,6 @@ TEST_F(TabStripModelCallbackTest, MoveTabToGroupThenDeleteGroup) {
   tabstrip()->CloseAllTabs();
 }
 
-TEST_F(TabStripModelTest, CommandGlicUnshare) {
-  tabstrip()->AppendWebContents(CreateWebContentsWithID(1), true);
-  EXPECT_TRUE(tabstrip()->IsContextMenuCommandEnabled(
-      0, TabStripModel::CommandGlicUnshare));
-
-  // This should not crash (it CHECKs the delegate returns true).
-  tabstrip()->ExecuteContextMenuCommand(0, TabStripModel::CommandGlicUnshare);
-}
-
 TEST_F(TabStripModelTest, TabStripUIWasSetResetOnObserverRemoval) {
   MockTabStripModelObserver observer;
   tabstrip()->SetTabStripUI(&observer);

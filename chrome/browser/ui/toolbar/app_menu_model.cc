@@ -1367,14 +1367,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       }
       LogMenuAction(MENU_ACTION_PRINT);
       break;
-    case IDC_OPEN_GLIC:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.OpenGlic",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_OPEN_GLIC);
-      break;
-
     case IDC_SHOW_TRANSLATE:
       if (!uma_action_recorded_) {
         base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.ShowTranslate",

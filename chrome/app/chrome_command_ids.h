@@ -263,7 +263,6 @@
 #define IDC_TASK_MANAGER_CONTEXT_MENU   40287
 #define IDC_TASK_MANAGER_MAIN_MENU      40288
 #define IDC_SHOW_HISTORY_SIDE_PANEL     40293
-#define IDC_OPEN_GLIC                   40294
 #define IDC_FIND_EXTENSIONS  40295
 #define IDC_SHOW_SEARCH_TOOLS  40296
 #define IDC_SHOW_COMMENTS_SIDE_PANEL  40297
@@ -488,15 +487,7 @@
 // Default browser prompt
 #define IDC_SET_BROWSER_AS_DEFAULT 53300
 
-// Glic status tray icon menu
-#define IDC_GLIC_STATUS_ICON_MENU_CUSTOMIZE_KEYBOARD_SHORTCUT 53311
-#define IDC_GLIC_STATUS_ICON_MENU_REMOVE_ICON                 53312
-#define IDC_GLIC_STATUS_ICON_MENU_SETTINGS                    53313
-#define IDC_GLIC_STATUS_ICON_MENU_EXIT                        53314
-#define IDC_GLIC_STATUS_ICON_MENU_TOGGLE                      53316
-
-// Glic button context menu and tabstrip context menu
-#define IDC_GLIC_TOGGLE_PIN 53320
+// Toolbar button context menu and tabstrip context menu
 #define IDC_TAB_SEARCH_TOGGLE_PIN 53321
 #define IDC_EVERYTHING_MENU_TOGGLE_PIN 53323
 

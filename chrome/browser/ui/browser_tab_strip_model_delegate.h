@@ -87,8 +87,6 @@ class BrowserTabStripModelDelegate : public TabStripModelDelegate {
   void OnRemovingAllTabsFromGroups(
       const std::vector<tab_groups::TabGroupId>& group_ids,
       base::OnceCallback<void()> callback) override;
-  void GlicUnpinTabsFromAllConversations(
-      base::span<const tabs::TabHandle> tab_handles) override;
   void CloseTab(const tabs::TabInterface* tab,
                 CloseTabSource source,
                 base::OnceCallback<void(CloseTabSource)> on_approved) override;

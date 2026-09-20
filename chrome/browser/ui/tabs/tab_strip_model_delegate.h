@@ -231,13 +231,6 @@ class TabStripModelDelegate {
       const std::vector<tab_groups::TabGroupId>& group_ids,
       base::OnceCallback<void()> callback) = 0;
 
-  // Glic related delegation (see GlicKeyedService and GlicSharingManager).
-  // Note: 'Pinning' in Glic is a distinct notion.
-
-  // Unpins the specified tabs from all Glic conversations.
-  virtual void GlicUnpinTabsFromAllConversations(
-      base::span<const tabs::TabHandle> tab_handles);
-
   // Requests closing the specified tab, performing all closability checks,
   // user prompts (e.g. UnloadController, group deletion dialogs), and fallback
   // tab creation. If `on_approved` is provided, it is executed once all checks

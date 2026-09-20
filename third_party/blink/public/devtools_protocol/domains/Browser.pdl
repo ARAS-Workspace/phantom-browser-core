@@ -103,7 +103,6 @@ domain Browser
     enum
       openTabSearch
       closeTabSearch
-      openGlic
 
   # Set permission settings for given embedding and embedded origins.
   experimental command setPermission

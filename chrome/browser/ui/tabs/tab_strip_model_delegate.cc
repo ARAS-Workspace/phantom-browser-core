@@ -10,6 +10,3 @@ TabStripModelDelegate::NewStripContents::NewStripContents() = default;
 TabStripModelDelegate::NewStripContents::~NewStripContents() = default;
 TabStripModelDelegate::NewStripContents::NewStripContents(NewStripContents&&) =
     default;
-
-void TabStripModelDelegate::GlicUnpinTabsFromAllConversations(
-    base::span<const tabs::TabHandle> tab_handles) {}
