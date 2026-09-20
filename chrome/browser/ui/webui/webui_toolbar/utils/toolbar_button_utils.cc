@@ -487,8 +487,6 @@ actions::ActionId MojomPageActionIdToActionId(
       return kActionBookmarkThisTab;
     case MojomPageActionId::kActionFederation:
       return kActionFederation;
-    case MojomPageActionId::kActionGlicContextualCueing:
-      return kActionGlicContextualCueing;
     case MojomPageActionId::kActionAnchoredContextualCue:
       return kActionAnchoredContextualCue;
     case MojomPageActionId::kActionWebAuthnAmbientSignin:
@@ -565,8 +563,6 @@ MojomPageActionId ActionIdToMojomPageActionId(actions::ActionId action_id) {
       return MojomPageActionId::kActionBookmarkThisTab;
     case kActionFederation:
       return MojomPageActionId::kActionFederation;
-    case kActionGlicContextualCueing:
-      return MojomPageActionId::kActionGlicContextualCueing;
     case kActionAnchoredContextualCue:
       return MojomPageActionId::kActionAnchoredContextualCue;
     case kActionWebAuthnAmbientSignin:

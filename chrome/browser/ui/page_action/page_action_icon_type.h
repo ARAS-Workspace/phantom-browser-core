@@ -54,7 +54,7 @@ enum class PageActionIconType {
   kRecordReplay = 39,
   kIndigo = 40,
   kFederation = 41,
-  kGlic = 42,
+  // DEPRECATED: kGlic = 42,
   kAnchoredContextualCue = 43,
   kWebAuthnAmbientSignin = 44,
   kAutofillPayment = 45,

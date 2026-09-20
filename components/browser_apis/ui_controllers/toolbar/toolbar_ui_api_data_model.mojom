@@ -394,7 +394,6 @@ enum PageActionId {
   kActionSidePanelShowContextualTasks,
   kActionBookmarkThisTab,
   kActionFederation,
-  kActionGlicContextualCueing,
   kActionAnchoredContextualCue,
   kActionWebAuthnAmbientSignin,
   kActionAutofillPayment,

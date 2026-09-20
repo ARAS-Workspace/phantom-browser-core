@@ -243,13 +243,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionGlicContextualCueing,
-        {
-            .histogram_name = "Glic",
-            .type = PageActionIconType::kGlic,
-        },
-    },
-    {
         kActionWebAuthnAmbientSignin,
         {
             .histogram_name = "WebAuthnAmbientSignin",
