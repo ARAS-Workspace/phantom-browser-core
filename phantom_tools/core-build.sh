@@ -58,6 +58,7 @@ started=$SECONDS
 say "building $targets in out/$OUT_NAME with -j $jobs"
 say "started at $(date '+%Y-%m-%d %H:%M:%S')"
 
+# shellcheck disable=SC2086  # targets holds one or more names
 ( cd "$ROOT" && env -u VPYTHON_BYPASS -u VIRTUAL_ENV -u PYTHONPATH -u PYTHONHOME \
     PATH="$STAGING/depot_tools:$(path_without_virtualenv)" \
     "$ninja" -C "out/$OUT_NAME" -j "$jobs" $targets )

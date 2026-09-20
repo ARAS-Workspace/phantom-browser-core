@@ -43,12 +43,12 @@ path_without_virtualenv() {
 }
 
 report() {
-    local stage="$1" started="$2" elapsed=$(( SECONDS - started ))
+    local stage="$1" started="$2"
+    local elapsed=$(( SECONDS - started ))
     say "$stage done in ${elapsed}s"
 }
 
 DEPS_PATHS="v8 third_party/angle third_party/skia third_party/dawn"
-PGO_TARGETS="mac"
 
 deps_paths_present() {
     local path
@@ -108,8 +108,10 @@ stage_deps() {
     # either way gclient would write the dependency trees into the wrong place.
     mkdir -p "$DEPS_DIR"
     if [ -L "$DEPS_DIR/src" ] || [ -e "$DEPS_DIR/src" ]; then
-        [ -L "$DEPS_DIR/src" ] && [ "$(cd "$DEPS_DIR/src" && pwd -P)" = "$ROOT" ] ||
+        if ! [ -L "$DEPS_DIR/src" ] ||
+            [ "$(cd "$DEPS_DIR/src" && pwd -P)" != "$ROOT" ]; then
             die "$DEPS_DIR/src does not resolve to $ROOT; remove it and run again"
+        fi
     else
         ln -s ../.. "$DEPS_DIR/src"
         [ "$(cd "$DEPS_DIR/src" && pwd -P)" = "$ROOT" ] || die "the new $DEPS_DIR/src link does not resolve to $ROOT"
@@ -208,6 +210,7 @@ hermetic_xcode() {
     for b in metal metallib; do
         e="$dev/Toolchains/XcodeDefault.xctoolchain/usr/bin/$b"
         rm -f "$e"
+        # shellcheck disable=SC2016  # the wrapper resolves these when it runs
         printf '#!/bin/sh\nexec "$(xcrun -f %s)" "$@"\n' "$b" > "$e"
         chmod +x "$e"
     done
