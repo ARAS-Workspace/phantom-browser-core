@@ -26,7 +26,6 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_utils.h"
-#include "chrome/browser/password_manager/password_change/features.h"
 #include "chrome/common/extensions/api/passwords_private.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/affiliations/core/browser/affiliation_utils.h"
@@ -520,9 +519,7 @@ PasswordCheckDelegate::ConstructInsecureCredentialUiEntry(
   if (change_password_url.has_value()) {
     api_credential.change_password_url = change_password_url->spec();
   }
-  api_credential.is_automatic_password_change_supported =
-      base::FeatureList::IsEnabled(
-          password_change::features::kPasswordChangeWithGlic);
+  api_credential.is_automatic_password_change_supported = false;
 
   CredentialUIEntry copy(std::move(entry));
   // Weak and reused flags should be cleaned before obtaining id. Otherwise

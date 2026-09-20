@@ -208,9 +208,7 @@ void ChromePasswordChangeService::OfferPasswordChangeUi(
     change_pwd_url = credentials.change_password_url;
   }
 
-  CHECK(change_pwd_url.is_valid() ||
-        base::FeatureList::IsEnabled(
-            password_change::features::kPasswordChangeWithGlic));
+  CHECK(change_pwd_url.is_valid());
 
   std::unique_ptr<PasswordChangeDelegate> delegate =
       std::make_unique<PasswordChangeDelegateImpl>(
@@ -377,9 +375,7 @@ PasswordChangeAvailability ChromePasswordChangeService::GetPerSiteAvailability(
                        has_change_url);
   }
 
-  if (!has_change_url &&
-      !base::FeatureList::IsEnabled(
-          password_change::features::kPasswordChangeWithGlic)) {
+  if (!has_change_url) {
     return PasswordChangeAvailability::kNotSupportedSite;
   }
 
