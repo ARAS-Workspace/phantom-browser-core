@@ -388,8 +388,6 @@ DEFINE_VARIATION_PARAM(kIPHiOSGeminiLiveNewBadgeFeature,
                        "IPHiOSGeminiLiveNewBadgeFeature");
 DEFINE_VARIATION_PARAM(kIPHiOSGeminiLiveIPHFeature,
                        "IPHiOSGeminiLiveIPHFeature");
-DEFINE_VARIATION_PARAM(kIPHiOSGeminiContextualCueChip,
-                       "IPH_iOSGeminiContextualCueChip");
 DEFINE_VARIATION_PARAM(kIPHiOSGeminiExternalAppStoreEvent,
                        "IPH_iOSGeminiExternalAppStoreEvent");
 DEFINE_VARIATION_PARAM(kIPHiOSGeminiFullscreenPromoFeature,
@@ -769,7 +767,6 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHiOSDefaultBrowserOverflowMenuBadgeFeature),
         VARIATION_ENTRY(kIPHiOSDockingPromoFeature),
         VARIATION_ENTRY(kIPHiOSDownloadAutoDeletionFeature),
-        VARIATION_ENTRY(kIPHiOSGeminiContextualCueChip),
         VARIATION_ENTRY(kIPHiOSGeminiExternalAppStoreEvent),
         VARIATION_ENTRY(kIPHiOSGeminiFullscreenPromoFeature),
         VARIATION_ENTRY(kIPHiOSGeminiImageRemixFeature),

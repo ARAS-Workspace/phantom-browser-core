@@ -405,9 +405,6 @@ FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiLiveIPHFeature);
 // FET feature flag that enabled the Gemini fullscreen promo.
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiFullscreenPromoFeature);
 
-// FET feature flag that enables omnibox Gemini contextual cue chip.
-FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiContextualCueChip);
-
 // FET feature flag that enables "What can Gemini do" suggestion.
 FEATURE_CONSTANTS_DECLARE_FEATURE(kIPHiOSGeminiWhatCanGeminiDo);
 

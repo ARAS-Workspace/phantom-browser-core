@@ -927,10 +927,6 @@ BASE_FEATURE(kIPHiOSGeminiFullscreenPromoFeature,
              "IPH_iOSGeminiFullscreenPromoFeature",
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kIPHiOSGeminiContextualCueChip,
-             "IPH_iOSGeminiContextualCueChip",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kIPHiOSGeminiWhatCanGeminiDo, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kIPHiOSGeminiImageRemixFeature,

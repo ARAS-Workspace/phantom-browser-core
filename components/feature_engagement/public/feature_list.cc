@@ -182,7 +182,6 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHiOSDownloadAutoDeletionFeature,
     &kIPHiOSFeedSwipeAnimatedFeature,
     &kIPHiOSFeedSwipeStaticFeature,
-    &kIPHiOSGeminiContextualCueChip,
     &kIPHiOSGeminiExternalAppStoreEvent,
     &kIPHiOSGeminiFullscreenPromoFeature,
     &kIPHiOSGeminiImageRemixFeature,

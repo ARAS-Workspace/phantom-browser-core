@@ -3245,40 +3245,6 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     return config;
   }
 
-  if (kIPHiOSGeminiContextualCueChip.name == feature->name) {
-    FeatureConfig config;
-    config.valid = true;
-    config.availability = Comparator(ANY, 0);
-    config.session_rate = Comparator(ANY, 0);
-
-    // This badge showing does not affect the session count for other IPHs.
-    config.session_rate_impact.type = SessionRateImpact::Type::NONE;
-    config.blocked_by.type = BlockedBy::Type::NONE;
-    config.blocking.type = Blocking::Type::NONE;
-
-    // Feature should show no matter how many times the chip was used.
-    config.used =
-        EventConfig(events::kIOSGeminiContextualCueChipUsed, Comparator(ANY, 0),
-                    feature_engagement::kMaxStoragePeriod,
-                    feature_engagement::kMaxStoragePeriod);
-
-    // Should trigger a maximum of 3 times in one day.
-    config.trigger =
-        EventConfig(events::kIOSGeminiContextualCueChipTriggered,
-                    Comparator(LESS_THAN_OR_EQUAL, 3), /*window=*/1,
-                    feature_engagement::kMaxStoragePeriod);
-
-    if (base::FeatureList::IsEnabled(kIPHiOSGeminiFullscreenPromoFeature)) {
-      // Should show if fullscreen promo was triggered once.
-      config.event_configs.insert(EventConfig(
-          events::kIOSGeminiFullscreenPromoTriggered,
-          Comparator(GREATER_THAN, 0), feature_engagement::kMaxStoragePeriod,
-          feature_engagement::kMaxStoragePeriod));
-    }
-
-    return config;
-  }
-
   if (kIPHiOSGeminiFullscreenPromoFeature.name == feature->name) {
     FeatureConfig config;
     config.valid = true;

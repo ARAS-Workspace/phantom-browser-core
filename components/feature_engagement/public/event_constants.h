@@ -379,12 +379,6 @@ extern const char kIOSAIHubNewBadgeUsed[];
 // Event fired when a fullscreen promo is triggered, to manage group frequency.
 extern const char kIOSFullscreenPromosGroupTrigger[];
 
-// Event fired when the omnibox Gemini contextual cue chip is shown.
-extern const char kIOSGeminiContextualCueChipTriggered[];
-
-// Event fired when the omnibox Gemini contextual cue chip is tapped.
-extern const char kIOSGeminiContextualCueChipUsed[];
-
 // Event fired when the Gemini Image Remix IPH is triggered.
 extern const char kIOSGeminiImageRemixIPHTrigger[];
 
