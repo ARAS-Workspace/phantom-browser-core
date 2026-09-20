@@ -75,11 +75,6 @@ BASE_DECLARE_FEATURE(kApiEnterpriseReportingPrivateOnDataMaskingRulesTriggered);
 BASE_DECLARE_FEATURE(
     kApiEnterpriseReportingPrivateReportForceSaveToCloudEventHandled);
 
-// Controls the availability of Glic access from Google webpages.
-BASE_DECLARE_FEATURE(kApiGlicAccessFromGoogleWebpage);
-
-extern const base::FeatureParam<std::string> kProdPromptEndpointUrlParam;
-
 // Controls the availability of the enterprise.webrtc API. Acts as a remote
 // kill switch: with this disabled the API is not present in the extension
 // context at all.

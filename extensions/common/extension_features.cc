@@ -38,15 +38,6 @@ BASE_FEATURE(kApiEnterpriseReportingPrivateOnDataMaskingRulesTriggered,
 BASE_FEATURE(kApiEnterpriseReportingPrivateReportForceSaveToCloudEventHandled,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kApiGlicAccessFromGoogleWebpage,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-const base::FeatureParam<std::string> kProdPromptEndpointUrlParam(
-    &kApiGlicAccessFromGoogleWebpage,
-    /*name=*/"prod_prompt_endpoint_url",
-    /*default_value=*/
-    "https://confection.pa.googleapis.com/v1:GetPromptForWebProperty");
-
 BASE_FEATURE(kApiEnterpriseWebrtc, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kApiProxyOverrideRulesPrivate, base::FEATURE_ENABLED_BY_DEFAULT);
