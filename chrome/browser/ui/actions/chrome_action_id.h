@@ -236,8 +236,6 @@
     IDC_CONTENT_CONTEXT_OPEN_ORIGINAL_IMAGE_NEW_TAB) \
   E(kActionContentContextLoadImage, IDC_CONTENT_CONTEXT_LOAD_IMAGE) \
   E(kActionContentContextSearchLensForImage) \
-  E(kActionContentContextGlicShareImage, \
-    IDC_CONTENT_CONTEXT_GLICSHAREIMAGE) \
   E(kActionContentContextTranslateImageWithWeb) \
   E(kActionContentContextTranslateImageWithLens) \
   /* Audio/video items. */ \

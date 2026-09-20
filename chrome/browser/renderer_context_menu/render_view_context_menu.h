@@ -96,9 +96,6 @@ class RenderViewContextMenu
  public:
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kExitFullscreenMenuItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kComposeMenuItem);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kGlicReloadMenuItem);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kGlicArchiveConversationMenuItem);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kGlicShareImageMenuItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kOpenLinkInSplitMenuItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kRegionSearchItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kSearchForImageItem);
@@ -210,8 +207,6 @@ class RenderViewContextMenu
   std::u16string GetElidedSelectionText(size_t max_length,
                                         gfx::BreakType break_type);
 
-  void ExecGlic();
-
   friend class RenderViewContextMenuTest;
   friend class TestRenderViewContextMenu;
   friend class FormatUrlForClipboardTest;
@@ -279,7 +274,6 @@ class RenderViewContextMenu
   void AppendLinkToTextItems();
   void AppendPrintItem();
   void AppendSaveToMemoryBanksItem();
-  void AppendGlicItems();
   void AppendRotationItems();
   void AppendSpellingAndSearchSuggestionItems();
   void AppendOtherEditableItems();
@@ -291,8 +285,6 @@ class RenderViewContextMenu
 #endif
   void AppendPrintPreviewItems();
   void AppendSearchWebForImageItems();
-  void AppendGlicShareImageItem();
-  bool CanAppendGlicShareImageItem() const;
   void AppendRevisedTextSelectionSection();
   void AppendProtocolHandlerSubMenu();
   void AppendSharingItems();
@@ -340,7 +332,6 @@ class RenderViewContextMenu
   void ExecInspectBackgroundPage();
   void ExecSaveLinkAs();
   void ExecSaveAs();
-  void ExecGlicShareImage();
   void ExecExitFullscreen();
   void ExecCopyLinkText();
   void ExecCopyImageAt();
@@ -390,8 +381,6 @@ class RenderViewContextMenu
   void CheckSupervisedUserURLFilterAndSaveLinkAs();
   void OnSupervisedUserURLFilterChecked(
       supervised_user::WebFilteringResult result);
-
-  void MaybeAppendOpenGlicItem(bool add_separator = true);
 
   // Opens the Lens overlay to search a region defined by the given bounds of
   // the view and the image to be searched. Tab bounds and view bounds are

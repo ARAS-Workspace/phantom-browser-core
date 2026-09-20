@@ -513,15 +513,15 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        {IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_PASSWORDS_USE_PASSKEY_FROM_ANOTHER_DEVICE,
         152},
        {IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE, 153},
-       {IDC_CONTENT_CONTEXT_RELOAD_GLIC, 154},
+       // Removed: {IDC_CONTENT_CONTEXT_RELOAD_GLIC, 154},
        // Removed: {IDC_CONTENT_CONTEXT_CLOSE_GLIC, 155},
        {IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW, 156},
-       {IDC_CONTENT_CONTEXT_GLICSHAREIMAGE, 157},
-       {IDC_CONTENT_CONTEXT_ARCHIVE_GLIC, 158},
+       // Removed: {IDC_CONTENT_CONTEXT_GLICSHAREIMAGE, 157},
+       // Removed: {IDC_CONTENT_CONTEXT_ARCHIVE_GLIC, 158},
        // Removed: {IDC_CONTENT_CONTEXT_INSPECTELEMENT_WITH_GEMINI, 159},
        {IDC_CONTENT_CONTEXT_INSPECTELEMENT_WITH_DEVTOOLS, 160},
        {IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_AT_MEMORY, 161},
-       {IDC_CONTENT_CONTEXT_GLIC, 162},
+       // Removed: {IDC_CONTENT_CONTEXT_GLIC, 162},
        {IDC_CONTENT_CONTEXT_VIDEO_FRAME, 163},
        {IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE, 164},
        {IDC_CONTENT_CONTEXT_DICTATION, 165},
@@ -573,7 +573,7 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        // Removed: {IDC_CONTENT_CONTEXT_TRANSLATEIMAGEWITHLENS, 28},
        {IDC_CONTENT_CONTEXT_SEARCHWEBFORNEWTAB, 29},
        {IDC_CONTENT_CONTEXT_OPENLINKSPLITVIEW, 31},
-       {IDC_CONTENT_CONTEXT_GLICSHAREIMAGE, 32},
+       // Removed: {IDC_CONTENT_CONTEXT_GLICSHAREIMAGE, 32},
        {IDC_SPELLCHECK_REMOVE_FROM_DICTIONARY, 33},
        {IDC_CONTENT_CONTEXT_OPENLINK_ISOLATED, 34},
        // To add new items:
@@ -790,11 +790,6 @@ bool MaybePdfViewerHandlesSave(RenderFrameHost* frame_host) {
 }
 #endif  // BUILDFLAG(ENABLE_PDF)
 
-bool IsGlicWindow(const RenderViewContextMenu* menu,
-                  content::BrowserContext* browser_context) {
-  return false;
-}
-
 #if !BUILDFLAG(IS_ANDROID)
 std::pair<int, const gfx::VectorIcon*> GetOpenLinkInSplitStringAndIcon(
     tabs::TabInterface* tab,
@@ -845,12 +840,6 @@ bool RenderViewContextMenu::IsDevToolsURL(const GURL& url) {
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu,
                                       kExitFullscreenMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu, kComposeMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu,
-                                      kGlicReloadMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu,
-                                      kGlicArchiveConversationMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu,
-                                      kGlicShareImageMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu,
                                       kOpenLinkInSplitMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu, kRegionSearchItem);
@@ -1052,14 +1041,6 @@ void RenderViewContextMenu::InitMenu() {
     if (params_.media_type != ContextMenuDataMediaType::kNone) {
       menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
     }
-  } else {
-    // Add "Copy Link Address" menu option for Glic Multi instance. Link
-    // options are not supported by default (since Glic uses WebView's context
-    // menu).
-    if (IsGlicWindow(this, browser_context_) && !params_.link_url.is_empty()) {
-      AppendCopyLinkLocationItem();
-      menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
-    }
   }
 
   bool media_image = content_type_->SupportsGroup(
@@ -1072,11 +1053,6 @@ void RenderViewContextMenu::InitMenu() {
     if (content_type_->SupportsGroup(
             ContextMenuContentType::ITEM_GROUP_SEARCHWEBFORIMAGE)) {
       AppendSearchWebForImageItems();
-    }
-
-    if (content_type_->SupportsGroup(
-            ContextMenuContentType::ITEM_GROUP_GLICSHAREIMAGE)) {
-      AppendGlicShareImageItem();
     }
   }
 
@@ -1124,8 +1100,6 @@ void RenderViewContextMenu::InitMenu() {
     AppendOtherEditableItems();
   }
 
-  AppendGlicItems();
-
   if (use_simplified_menu_for_text_selection &&
       !(params_.has_image_contents && !params_.link_url.is_empty())) {
     AppendRevisedTextSelectionSection();
@@ -1145,21 +1119,6 @@ void RenderViewContextMenu::InitMenu() {
     AppendSharingItems();
   }
 
-  bool show_glic = false;
-  if (features::IsMenuSimplificationEnabled()) {
-    show_glic = !params_.selection_text.empty();
-  } else {
-    show_glic = !params_.selection_text.empty() || !params_.link_url.is_empty();
-  }
-  show_glic = show_glic && !use_simplified_menu_for_text_selection;
-
-  const bool glic_below_search =
-      false;
-
-  if (show_glic && !glic_below_search) {
-    MaybeAppendOpenGlicItem(/*add_separator=*/false);
-  }
-
   if (!use_simplified_menu_for_text_selection &&
       !(features::IsMenuSimplificationEnabled() && editable) &&
       content_type_->SupportsGroup(
@@ -1169,10 +1128,6 @@ void RenderViewContextMenu::InitMenu() {
        params_.page_url != chrome::kChromeUIPasswordManagerCheckupURL &&
        params_.page_url != chrome::kChromeUIPasswordManagerSettingsURL)) {
     AppendSearchProvider();
-  }
-
-  if (show_glic && glic_below_search) {
-    MaybeAppendOpenGlicItem(/*add_separator=*/false);
   }
 
   if (!use_simplified_menu_for_text_selection &&
@@ -1837,11 +1792,8 @@ void RenderViewContextMenu::AppendImageItems() {
     menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_LOAD_IMAGE,
                                     IDS_CONTENT_CONTEXT_LOAD_IMAGE);
   }
-  if (!IsGlicWindow(this, browser_context_)) {
-    // Glic doesn't have tabs, to this option doesn't make sense there.
-    AddItemWithOptionalIcon(IDC_CONTENT_CONTEXT_OPENIMAGENEWTAB,
-                            IDS_CONTENT_CONTEXT_OPENIMAGENEWTAB, kImageIcon);
-  }
+  AddItemWithOptionalIcon(IDC_CONTENT_CONTEXT_OPENIMAGENEWTAB,
+                          IDS_CONTENT_CONTEXT_OPENIMAGENEWTAB, kImageIcon);
   menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_SAVEIMAGEAS,
                                   IDS_CONTENT_CONTEXT_SAVEIMAGEAS);
   menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_COPYIMAGE,
@@ -1876,8 +1828,6 @@ void RenderViewContextMenu::AppendSearchWebForImageItems() {
   menu_model_.SetElementIdentifierAt(command_index, kSearchForImageItem);
 
 }
-
-void RenderViewContextMenu::AppendGlicShareImageItem() {}
 
 void RenderViewContextMenu::AppendAudioItems() {
   AppendMediaItems();
@@ -2000,9 +1950,6 @@ void RenderViewContextMenu::AppendPluginItems() {
 void RenderViewContextMenu::AppendPageItems() {
   AppendExitFullscreenItem();
 
-  const bool glic_below_search =
-      false;
-
   if (features::IsMenuSimplificationEnabled() &&
       params_.selection_text.empty() && !params_.is_editable) {
     // Navigation
@@ -2018,20 +1965,8 @@ void RenderViewContextMenu::AppendPageItems() {
 
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
 
-    if (!glic_below_search) {
-      // Ask gemini
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-
-      // Save to Memory Banks
-      AppendSaveToMemoryBanksItem();
-
-    } else {
-      // Ask gemini
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-
-      // Save to Memory Banks
-      AppendSaveToMemoryBanksItem();
-    }
+    // Save to Memory Banks
+    AppendSaveToMemoryBanksItem();
 
     // Send to your devices
     if (GetBrowser() &&
@@ -2052,24 +1987,9 @@ void RenderViewContextMenu::AppendPageItems() {
   menu_model_.AddItemWithStringId(IDC_FORWARD, IDS_CONTENT_CONTEXT_FORWARD);
   menu_model_.AddItemWithStringId(IDC_RELOAD, IDS_CONTENT_CONTEXT_RELOAD);
   menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
-  if (!glic_below_search) {
-    MaybeAppendOpenGlicItem();
-  }
   menu_model_.AddItemWithStringId(IDC_SAVE_PAGE,
                                   IDS_CONTENT_CONTEXT_SAVEPAGEAS);
   menu_model_.AddItemWithStringId(IDC_PRINT, IDS_CONTENT_CONTEXT_PRINT);
-
-  if (features::IsReadAnythingMenuShuffleExperimentEnabled()) {
-    if (glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
-  } else {  // No ReadAnythingMenuShuffleExperiment -- keep default code.
-    if (!features::IsMenuSimplificationEnabled()) {
-      if (glic_below_search) {
-        MaybeAppendOpenGlicItem(/*add_separator=*/false);
-      }
-    }
-  }
 
   AppendSaveToMemoryBanksItem();
 
@@ -2139,11 +2059,6 @@ void RenderViewContextMenu::AppendLinkToTextItems() {
     return;
   }
 
-  // Disable for glic.
-  if (IsGlicWindow(this, browser_context_)) {
-    return;
-  }
-
   // Only show copy link to highlight for publicly accessible web pages.
   if (!params_.page_url.SchemeIsHTTPOrHTTPS()) {
     return;
@@ -2193,8 +2108,6 @@ void RenderViewContextMenu::AppendSaveToMemoryBanksItem() {
                                     IDS_CONTENT_CONTEXT_SAVE_TO_MEMORY_BANKS);
   }
 }
-
-void RenderViewContextMenu::AppendGlicItems() {}
 
 void RenderViewContextMenu::AppendRotationItems() {
   if (params_.media_flags & ContextMenuData::kMediaCanRotate) {
@@ -2284,17 +2197,7 @@ void RenderViewContextMenu::AppendSearchProvider() {
 void RenderViewContextMenu::AppendSpellingAndSearchSuggestionItems() {
   if (!params_.misspelled_word.empty() &&
       !features::IsMenuSimplificationEnabled()) {
-    bool show_glic =
-        !params_.selection_text.empty() || !params_.link_url.is_empty();
-    const bool glic_below_search =
-        false;
-    if (show_glic && !glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
     AppendSearchProvider();
-    if (show_glic && glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
   }
   bool render_separator = false;
@@ -2386,16 +2289,8 @@ void RenderViewContextMenu::AppendOtherEditableItems() {
 
   if (features::IsMenuSimplificationEnabled() &&
       !params_.selection_text.empty()) {
-    const bool glic_below_search =
-        false;
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
-    if (!glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
     AppendSearchProvider();
-    if (glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
     AppendPrintItem();
   }
 
@@ -2581,7 +2476,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_LOAD_IMAGE:
     case IDC_CONTENT_CONTEXT_OPENIMAGENEWTAB:
     case IDC_CONTENT_CONTEXT_SEARCHWEBFORIMAGE:
-    case IDC_CONTENT_CONTEXT_GLICSHAREIMAGE:
       return navigation_allowed && params_.src_url.is_valid() &&
              (params_.src_url.GetScheme() != content::kChromeUIScheme);
 
@@ -2711,11 +2605,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE:
       return true;
 
-    case IDC_CONTENT_CONTEXT_RELOAD_GLIC:
-    case IDC_CONTENT_CONTEXT_ARCHIVE_GLIC:
-    case IDC_CONTENT_CONTEXT_GLIC:
-      return true;
-
     case IDC_CONTENT_CONTEXT_EXIT_FULLSCREEN:
       return true;
 
@@ -2765,7 +2654,7 @@ bool RenderViewContextMenu::IsCommandIdChecked(int id) const {
     return (params_.media_flags & ContextMenuData::kMediaPictureInPicture) != 0;
   }
 
-  if (id == IDC_CONTENT_CONTEXT_EMOJI || id == IDC_CONTENT_CONTEXT_GLIC) {
+  if (id == IDC_CONTENT_CONTEXT_EMOJI) {
     return false;
   }
 
@@ -2976,24 +2865,12 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
                          weak_pointer_factory_.GetWeakPtr(), event_flags));
       break;
 
-    case IDC_CONTENT_CONTEXT_GLIC:
-      ExecGlic();
-      break;
-
     case IDC_CONTENT_CONTEXT_SEARCHWEBFORIMAGE:
       ExecSearchWebForImage();
       break;
 
-    case IDC_CONTENT_CONTEXT_GLICSHAREIMAGE:
-      ExecGlicShareImage();
-      break;
-
     case IDC_CONTENT_CONTEXT_SAVE_TO_MEMORY_BANKS:
       ExecSaveToMemoryBanks();
-      break;
-
-    case IDC_CONTENT_CONTEXT_RELOAD_GLIC:
-    case IDC_CONTENT_CONTEXT_ARCHIVE_GLIC:
       break;
 
     case IDC_CONTENT_CONTEXT_OPEN_ORIGINAL_IMAGE_NEW_TAB:
@@ -3989,10 +3866,6 @@ void RenderViewContextMenu::ExecSaveAs() {
                                              target_frame_host, is_subresource);
 }
 
-void RenderViewContextMenu::ExecGlic() {}
-
-void RenderViewContextMenu::ExecGlicShareImage() {}
-
 void RenderViewContextMenu::ExecExitFullscreen() {
   BrowserWindowInterface* browser = GetBrowser();
   if (!browser) {
@@ -4171,8 +4044,6 @@ void RenderViewContextMenu::ExecProtocolHandlerSettings(int event_flags) {
   OpenURL(url, GURL(), {}, disposition, ui::PAGE_TRANSITION_LINK);
 }
 
-void RenderViewContextMenu::MaybeAppendOpenGlicItem(bool add_separator) {}
-
 void RenderViewContextMenu::ExecPictureInPicture() {
   bool picture_in_picture_active =
       IsCommandIdChecked(IDC_CONTENT_CONTEXT_PICTUREINPICTURE);
@@ -4338,24 +4209,12 @@ bool RenderViewContextMenu::ShouldUseSimplifiedTextSelection() const {
          !params_.selection_text.empty() && !params_.is_editable;
 }
 
-bool RenderViewContextMenu::CanAppendGlicShareImageItem() const {
-  return false;
-}
-
 void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
-  const bool glic_below_search =
-      false;
   if (!params_.link_url.is_empty()) {
     // Link + Selection case
     AppendCopyItem();
     AppendLinkToTextItems();
-    if (!glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
     AppendSearchProvider();
-    if (glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
     AppendSaveToMemoryBanksItem();
     AppendPrintItem();
   } else {
@@ -4366,13 +4225,7 @@ void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
 
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
 
-    if (!glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
     AppendSearchProvider();
-    if (glic_below_search) {
-      MaybeAppendOpenGlicItem(/*add_separator=*/false);
-    }
     AppendSaveToMemoryBanksItem();
   }
 }

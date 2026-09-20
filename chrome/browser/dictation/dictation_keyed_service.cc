@@ -32,10 +32,6 @@ namespace dictation {
 namespace {
 constexpr int kVoiceTypingSettingsDisabled = 2;
 
-tabs::TabInterface* GetActiveTabFromGlic(content::WebContents* web_contents) {
-  return nullptr;
-}
-
 tabs::TabInterface* GetTabFromTargetId(
     const content::GlobalDOMNodeId& target_id) {
   content::RenderFrameHost* rfh = target_id.document.AsRenderFrameHostIfValid();
@@ -51,12 +47,6 @@ tabs::TabInterface* GetTabFromTargetId(
 
   // Use normal tab lookup first
   if (auto* tab = tabs::TabInterface::MaybeGetFromContents(web_contents)) {
-    return tab;
-  }
-
-  // If the Glic side panel is being targeted, then associate the session with
-  // the active tab of the window.
-  if (tabs::TabInterface* tab = GetActiveTabFromGlic(web_contents)) {
     return tab;
   }
 
