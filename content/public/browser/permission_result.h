@@ -50,9 +50,8 @@ enum class PermissionStatusSource {
   // the prompt to the user.
   RECENT_DISPLAY,
 
-  // The status is the result of a permission being temporarily overridden by an
-  // actor operating on the tab.
-  ACTOR_OVERRIDE,
+  // Obsolete:
+  // ACTOR_OVERRIDE,
 
   // The status is the result of a permission being granted based on a
   // heuristic.

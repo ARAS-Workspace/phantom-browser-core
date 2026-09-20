@@ -1015,11 +1015,6 @@ bool ChromePermissionsClient::CanPromptSystemPermission(
   return system_permission_settings::CanPrompt(type);
 }
 
-bool ChromePermissionsClient::IsActorOperatingOnWebContents(
-    content::WebContents* web_contents) const {
-  return false;
-}
-
 url::Origin ChromePermissionsClient::GetEmbeddingOrigin(
     content::WebContents* web_contents) {
   return web_contents->GetPrimaryMainFrame()->GetLastCommittedOrigin();

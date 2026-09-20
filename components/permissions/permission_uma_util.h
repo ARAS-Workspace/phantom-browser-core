@@ -314,11 +314,6 @@ class PermissionUmaUtil {
       bool embedded_permission_element_initiated,
       bool active);
 
-  // Records that a permission prompt was auto-rejected because an actor
-  // is operating on the tab.
-  static void RecordPermissionAutoRejectForActor(ContentSettingsType permission,
-                                                 bool is_actor_operating);
-
   // Records the duration of the browsing session before a permission prompt
   // was displayed.
   static void RecordPrePromptSessionDuration(

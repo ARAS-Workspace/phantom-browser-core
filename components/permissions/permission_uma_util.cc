@@ -900,7 +900,6 @@ void PermissionUmaUtil::RecordEmbargoPromptSuppressionFromSource(
       break;
     case content::PermissionStatusSource::UNSPECIFIED:
     case content::PermissionStatusSource::KILL_SWITCH:
-    case content::PermissionStatusSource::ACTOR_OVERRIDE:
     case content::PermissionStatusSource::INSECURE_ORIGIN:
     case content::PermissionStatusSource::FEATURE_POLICY:
     case content::PermissionStatusSource::VIRTUAL_URL_DIFFERENT_ORIGIN:
@@ -2123,17 +2122,6 @@ void PermissionUmaUtil::RecordActionBrowserAlwaysActive(
       {"Permissions.Prompt.", GetPermissionRequestString(request_type), ".",
        permission_action, ".WithBrowser"});
   base::UmaHistogramBoolean(histogram_name, always_active);
-}
-
-// static
-void PermissionUmaUtil::RecordPermissionAutoRejectForActor(
-    ContentSettingsType permission,
-    bool is_actor_operating) {
-  base::UmaHistogramBoolean(
-      base::StrCat({"Permissions.Experimental.Usage.",
-                    PermissionUtil::GetPermissionString(permission),
-                    ".IsBlockedDueToActuation"}),
-      is_actor_operating);
 }
 
 // static

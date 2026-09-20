@@ -265,11 +265,6 @@ bool PermissionsClient::CanPromptSystemPermission(
   return false;
 }
 
-bool PermissionsClient::IsActorOperatingOnWebContents(
-    content::WebContents* web_contents) const {
-  return false;
-}
-
 favicon::FaviconService* PermissionsClient::GetFaviconService(
     content::BrowserContext* browser_context) {
   return nullptr;

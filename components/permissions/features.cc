@@ -95,8 +95,6 @@ BASE_FEATURE(kShowRelatedWebsiteSetsPermissionGrants,
 
 BASE_FEATURE(kCpssUseTfliteSignatureRunner, base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kGlicActorPermissionsAutoReject, base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kSafetyHubUnusedPermissionRevocationForAllSurfaces,
              base::FEATURE_DISABLED_BY_DEFAULT);
 

@@ -234,7 +234,6 @@ void PermissionContextBase::RequestPermission(
                                     kPermissionBlockedAppLevelSettingsReason,
                                     content_settings_type_);
         break;
-      case content::PermissionStatusSource::ACTOR_OVERRIDE:
       case content::PermissionStatusSource::FENCED_FRAME:
       case content::PermissionStatusSource::INSECURE_ORIGIN:
       case content::PermissionStatusSource::VIRTUAL_URL_DIFFERENT_ORIGIN:
@@ -357,21 +356,6 @@ content::PermissionResult PermissionContextBase::GetPermissionStatus(
   if (IsPermissionKillSwitchOn()) {
     return content::PermissionResult(
         PermissionStatus::DENIED, content::PermissionStatusSource::KILL_SWITCH);
-  }
-
-  if (base::FeatureList::IsEnabled(features::kGlicActorPermissionsAutoReject) &&
-      render_frame_host) {
-    content::WebContents* web_contents =
-        content::WebContents::FromRenderFrameHost(render_frame_host);
-    bool is_actor_operating =
-        PermissionsClient::Get()->IsActorOperatingOnWebContents(web_contents);
-    PermissionUmaUtil::RecordPermissionAutoRejectForActor(
-        content_settings_type_, is_actor_operating);
-    if (is_actor_operating) {
-      return content::PermissionResult(
-          PermissionStatus::DENIED,
-          content::PermissionStatusSource::ACTOR_OVERRIDE);
-    }
   }
 
   if (!IsPermissionAvailableToOrigins(requesting_origin, embedding_origin)) {
