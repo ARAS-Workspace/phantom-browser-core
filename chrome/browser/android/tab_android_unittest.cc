@@ -22,7 +22,6 @@
 #include "chrome/browser/ui/android/tab_model/tab_model.h"
 #include "chrome/browser/ui/javascript_dialogs/javascript_tab_modal_dialog_manager_delegate_android.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/testing_profile_manager.h"
@@ -168,18 +167,6 @@ TEST_F(TabAndroidTest, WebUIEmbeddingContext) {
   // Verify that GetTabInterface returns correct tab.
   EXPECT_EQ(tab.get(), webui::GetTabInterface(raw_web_contents));
 }
-
-class GlicTabAndroidTest : public TabAndroidTest {
- public:
-  GlicTabAndroidTest() {
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{features::kGlic, features::kGlicActor},
-        /*disabled_features=*/{});
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
 
 TEST_F(TabAndroidTest, Getters) {
   EXPECT_EQ(u"about:blank", tab_android_->GetTitle());

@@ -10,7 +10,6 @@
 #include "chrome/browser/chrome_content_browser_client.h"
 #include "chrome/browser/permissions/permission_manager_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
@@ -155,7 +154,6 @@ class SlimWebviewBrowserTest : public WebUIMochaBrowserTest,
   std::vector<std::unique_ptr<GuestWebContentsObserver>> guest_observers_;
   std::map<std::string, net::test_server::HttpRequest::HeaderMap>
       captured_headers_;
-  base::test::ScopedFeatureList scoped_feature_list_{features::kGlic};
 };
 
 IN_PROC_BROWSER_TEST_F(SlimWebviewBrowserTest, All) {

@@ -92,7 +92,6 @@
 #include "chrome/browser/web_applications/web_app_install_info.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_render_frame.mojom.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
@@ -466,7 +465,7 @@ class ContextMenuBrowserTest : public ContextMenuBrowserTestBase {
     //   - ...SaveImageAsEntryIsDisabledForBlockedUrls/LinkPreviewDisabled
     //   - ...SaveImageAsEntryIsDisabledForBlockedUrls/LinkPreviewEnabled
     scoped_feature_list_.InitWithFeatures(
-        {features::kGlic, media::kContextMenuSaveVideoFrameAs,
+        {media::kContextMenuSaveVideoFrameAs,
          media::kContextMenuSearchForVideoFrame},
         {omnibox::internal::kWebUIOmniboxPopup});
   }

@@ -13,7 +13,6 @@
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/trusted_vault/trusted_vault_service_factory.h"
 #include "chrome/browser/webid/federated_identity_auto_reauthn_permission_context_factory.h"
-#include "chrome/common/chrome_features.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/password_manager/core/browser/fake_password_manager_settings_service.h"
 #include "components/password_manager/core/browser/password_manager_setting.h"
@@ -40,12 +39,6 @@ class FederatedIdentityAutoReauthnPermissionContextTest : public testing::Test {
     context_.OnPasswordManagerSettingsServiceInitialized(
         &password_manager_settings_service_);
 
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        /*enabled_features=*/{{features::kGlicActor,
-                               {{features::kGlicActorPolicyControlExemption
-                                     .name,
-                                 "true"}}}},
-        /*disabled_features=*/{});
   }
 
   FederatedIdentityAutoReauthnPermissionContextTest(
@@ -92,8 +85,6 @@ class FederatedIdentityAutoReauthnPermissionContextTest : public testing::Test {
       host_content_settings_map_.get(), &permission_decision_auto_blocker_};
   password_manager::FakePasswordManagerSettingsService
       password_manager_settings_service_;
-
-  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
 // Test that FedCM auto re-authn is opt-in by default.

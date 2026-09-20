@@ -208,41 +208,6 @@ BASE_FEATURE(kChromeAppsDeprecation, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 
-// Controls whether the actor component of Glic is enabled.
-BASE_FEATURE(kGlicActor, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kGlicBackgroundTriggering, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls whether the Actor UI components are enabled.
-BASE_FEATURE(kGlicActorUi, base::FEATURE_ENABLED_BY_DEFAULT);
-
-const char kGlicActorUiToastName[] = "glic-actor-ui-toast";
-
-const base::FeatureParam<bool> kGlicActorPolicyControlExemption{
-    &kGlicActor, "glic_actor_policy_control_exemption", false};
-
-// Controls country and locale filtering for Glic.
-BASE_FEATURE(kGlicCountryFiltering, base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kGlicLocaleFiltering, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Controls whether the Glic feature is enabled.
-// IMPORTANT: this feature should never be expired! It is used as the main
-// kill-switch for Glic and can be used in the future to handle unsupported
-// Chrome versions.
-BASE_FEATURE(kGlic,
-#if BUILDFLAG(IS_MAC)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
-
-BASE_FEATURE(kGlicBackgroundActuation, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kGlicRollout, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kGlicDefaultTabContextSetting, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Enables the `google-chrome://` URI scheme.
 BASE_FEATURE(kGoogleChromeScheme, base::FEATURE_ENABLED_BY_DEFAULT);
 

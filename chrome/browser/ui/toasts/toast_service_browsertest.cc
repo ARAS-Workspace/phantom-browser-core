@@ -13,7 +13,6 @@
 #include "chrome/browser/ui/toasts/api/toast_id.h"
 #include "chrome/browser/ui/toasts/api/toast_registry.h"
 #include "chrome/browser/ui/toasts/toast_features.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/data_sharing/public/features.h"
@@ -50,7 +49,6 @@ class ToastServiceBrowserTest : public InProcessBrowserTest {
         {{autofill::features::kAutofillAiWalletPrivatePasses, {}},
          {safe_browsing::kEsbAsASyncedSetting, {}},
          {data_sharing::features::kDataSharingFeature, {}},
-         {features::kGlicActorUi, {{features::kGlicActorUiToastName, "true"}}},
          {multistep_filter::kMultistepFilter, {}},
          {autofill::features::kAutofillAmbientAutofill, {}},
          {autofill::features::kAutofillAtMemory, {}},

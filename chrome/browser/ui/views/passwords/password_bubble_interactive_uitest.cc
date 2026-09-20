@@ -39,7 +39,6 @@
 #include "chrome/browser/ui/views/passwords/password_save_update_view.h"
 #include "chrome/browser/ui/views/passwords/shared_passwords_notification_view.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/test/base/interactive_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/password_manager/core/browser/features/password_features.h"
@@ -172,9 +171,6 @@ class PasswordBubbleInteractiveUiTestBase : public ManagePasswordsTest {
   void InitializeFeatures(
       std::vector<base::test::FeatureRefAndParams> enabled_features = {},
       std::vector<base::test::FeatureRef> disabled_features = {}) {
-    enabled_features.push_back(
-        {features::kGlicActor,
-         {{features::kGlicActorPolicyControlExemption.name, "true"}}});
     disabled_features.push_back(features::kNonBlockingOsClipboardReads);
 
     scoped_feature_list_.InitWithFeaturesAndParameters(enabled_features,

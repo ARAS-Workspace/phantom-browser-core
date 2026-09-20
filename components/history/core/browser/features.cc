@@ -129,8 +129,7 @@ BASE_FEATURE(kBrowsingHistorySimilarVisitsGrouping,
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables Milestone 3 of History-Actor integration, this includes improvements
-// in history entry grouping and filtering. Enabled by default on Android as
-// actor code are gated by the kGlic feature.
+// in history entry grouping and filtering.
 BASE_FEATURE(kBrowsingHistoryActorIntegrationM3,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // !BUILDFLAG(IS_IOS)

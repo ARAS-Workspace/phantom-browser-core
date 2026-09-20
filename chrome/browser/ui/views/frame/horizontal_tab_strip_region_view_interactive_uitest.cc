@@ -20,7 +20,6 @@
 #include "chrome/browser/ui/views/tabs/horizontal/tab_scroll_button_container.h"
 #include "chrome/browser/ui/views/tabs/new_tab_button.h"
 #include "chrome/browser/ui/views/tabs/tab_strip.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
 #include "content/public/test/browser_test.h"
@@ -70,11 +69,8 @@ class HorizontalTabStripRegionViewBrowserTest : public HorizontalTabStripRegionV
  public:
   HorizontalTabStripRegionViewBrowserTest() {
     scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{features::kGlic, features::kGlicRollout,
-        },
-        /*disabled_features=*/{features::kGlicLocaleFiltering,
-                               features::kGlicCountryFiltering,
-                               tabs::kTabStripUnification});
+        /*enabled_features=*/{},
+        /*disabled_features=*/{tabs::kTabStripUnification});
   }
   HorizontalTabStripRegionViewBrowserTest(const HorizontalTabStripRegionViewBrowserTest&) = delete;
   HorizontalTabStripRegionViewBrowserTest& operator=(
