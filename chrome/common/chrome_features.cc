@@ -247,15 +247,6 @@ BASE_FEATURE(kGlicRollout, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kGlicDefaultTabContextSetting, base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)
-#else
-#endif
-
-// Whether to enable OneTimePassword filling in Glic.
-// TODO(b/500683394): Clean up after launch.
-BASE_FEATURE(kGlicActorAutofillOneTimePassword,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Enables the `google-chrome://` URI scheme.
 BASE_FEATURE(kGoogleChromeScheme, base::FEATURE_ENABLED_BY_DEFAULT);
 
