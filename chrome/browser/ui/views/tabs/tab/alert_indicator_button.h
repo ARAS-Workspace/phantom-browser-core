@@ -12,7 +12,6 @@
 #include "ui/base/metadata/metadata_header_macros.h"
 #include "ui/base/models/image_model.h"
 #include "ui/color/color_id.h"
-#include "ui/lottie/animation.h"
 #include "ui/views/controls/button/image_button.h"
 #include "ui/views/view_targeter_delegate.h"
 
@@ -170,8 +169,6 @@ class AlertIndicatorButton : public views::ImageButton,
   // The view that contains the spinner displayed around ACTOR_ACCESSING alert
   // icons.
   raw_ptr<views::AnimatedImageView> actor_indicator_spinner_;
-  // The playback config for the actor_indicator_spinner.
-  std::optional<lottie::Animation::PlaybackConfig> actor_indicator_config_;
   // The scaled size of the spinner, stored at creation time.
   std::optional<gfx::Size> actor_spinner_scaled_size_;
 };

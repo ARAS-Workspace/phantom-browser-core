@@ -15,7 +15,6 @@
 #include "chrome/browser/ui/tabs/alert/tab_alert_icon.h"
 #include "chrome/browser/ui/views/tabs/tab.h"
 #include "chrome/browser/ui/views/tabs/tab_slot_controller.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/tabs/public/tab_alert.h"
 #include "media/base/media_switches.h"
@@ -27,7 +26,6 @@
 #include "ui/gfx/canvas.h"
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/paint_vector_icon.h"
-#include "ui/lottie/animation.h"
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/animation/animation_delegate_views.h"
 #include "ui/views/controls/animated_image_view.h"
@@ -261,8 +259,7 @@ void AlertIndicatorButton::UpdateSpinnerTheme() {
 void AlertIndicatorButton::OnThemeChanged() {
   ImageButton::OnThemeChanged();
 
-  if (!actor_indicator_spinner_ ||
-      !base::FeatureList::IsEnabled(features::kActorUiThemed)) {
+  if (!actor_indicator_spinner_) {
     return;
   }
 
@@ -352,12 +349,7 @@ void AlertIndicatorButton::UpdateAlertIndicatorAnimation() {
     MaybeLoadActorAccessingSpinner();
 
     actor_indicator_spinner_->SetVisible(true);
-    if (!base::FeatureList::IsEnabled(features::kActorUiThemed)) {
-      actor_indicator_spinner_->Play(*actor_indicator_config_);
-
-    } else {
-      actor_indicator_spinner_->Play();
-    }
+    actor_indicator_spinner_->Play();
   } else if (actor_indicator_spinner_) {
     actor_indicator_spinner_->Stop();
     actor_indicator_spinner_->SetVisible(false);

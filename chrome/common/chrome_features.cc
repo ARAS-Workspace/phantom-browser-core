@@ -216,10 +216,6 @@ BASE_FEATURE(kGlicBackgroundTriggering, base::FEATURE_DISABLED_BY_DEFAULT);
 // Controls whether the Actor UI components are enabled.
 BASE_FEATURE(kGlicActorUi, base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Controls theming updates for Actor UI, including the tab indicator spinner
-// and other elements.
-BASE_FEATURE(kActorUiThemed, base::FEATURE_ENABLED_BY_DEFAULT);
-
 const char kGlicActorUiToastName[] = "glic-actor-ui-toast";
 
 const base::FeatureParam<bool> kGlicActorPolicyControlExemption{
