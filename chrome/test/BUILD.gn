@@ -2682,7 +2682,6 @@ if (!is_android) {
       "../browser/ui/waap/initial_webui_browsertest.cc",
       "../common/chrome_paths_browsertest.cc",
       "../common/time_format_browsertest.cc",
-      "../renderer/accessibility/ax_tree_distiller_browsertest.cc",
       "../renderer/autofill/autofill_renderer_browsertest.cc",
       "../renderer/autofill/fake_mojo_password_manager_driver.cc",
       "../renderer/autofill/fake_mojo_password_manager_driver.h",

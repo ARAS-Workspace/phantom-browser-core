@@ -28,7 +28,6 @@
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/open_search_description_document_handler.mojom.h"
-#include "chrome/common/webui_url_constants.h"
 #include "chrome/renderer/benchmarking_bindings.h"
 #include "chrome/renderer/chrome_content_settings_agent_delegate.h"
 #include "chrome/renderer/loadtimes_bindings.h"
@@ -78,7 +77,6 @@
 #include "url/gurl.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/renderer/accessibility/read_anything/read_anything_app_controller.h"
 #include "chrome/renderer/searchbox/searchbox_extension.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
@@ -334,15 +332,6 @@ void ChromeRenderFrameObserver::DidClearWindowObject() {
 #if !BUILDFLAG(IS_ANDROID)
   if (process_state::IsInstantProcess()) {
     SearchBoxExtension::Install(render_frame()->GetWebFrame());
-  }
-
-  // Install ReadAnythingAppController on render frames with the Read Anything
-  // url, which is chrome-untrusted. ReadAnythingAppController installs v8
-  // bindings in the chrome.readingMode namespace which are consumed by
-  // read_anything/app.ts, the resource of the Read Anything WebUI.
-  if (render_frame()->GetWebFrame()->GetDocument().Url() ==
-      chrome::kChromeUIUntrustedReadAnythingSidePanelURL) {
-    ReadAnythingAppController::Install(render_frame());
   }
 #endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(ENABLE_GUEST_VIEW) && !BUILDFLAG(ENABLE_EXTENSIONS_CORE)

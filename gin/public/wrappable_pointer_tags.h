@@ -60,7 +60,6 @@ enum WrappablePointerTag : uint16_t {
   kPluginPlaceholder,                // plugins::PluginPlaceholder
   kPostMessageReceiver,              // chrome_pdf::PostMessageReceiver
   kPostMessageScriptableObject,  // extensions::(anonymous)::ScriptableObject
-  kReadAnythingAppController,    // ReadAnythingAppController
   kRemoteObject,                 // blink::RemoteObject
   kScriptState,                  // blink::ScriptState
   kSearchBoxBindings,            // SearchBoxBindings

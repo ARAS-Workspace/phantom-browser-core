@@ -161,8 +161,7 @@ interface ScreenAIAnnotator {
 };
 
 // Main interface a client uses for Main Content Extraction function of Screen
-// AI service. Each RenderFrameImpl can have one AXTreeDistiller which contains
-// an Screen2xMainContentExtractor.
+// AI service.
 // All interfaces of one browser profile use one ScreenAIService.
 interface Screen2xMainContentExtractor {
   // Receives the accessibility tree as a snapshot, schedules processing, and

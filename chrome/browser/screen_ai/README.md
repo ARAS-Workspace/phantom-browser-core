@@ -45,8 +45,7 @@ to trigger library download and service initialization and receive the result in
 a callback.\
 Once you know the service is ready, trigger connection to it in your process by
 connecting to `screen_ai:mojom:Screen2xMainContentExtractor` interface.\
-Call `SetClientType` once to set the client type.\
-For an example see `chrome/renderer/accessibility/ax_tree_distiller.cc`.
+Call `SetClientType` once to set the client type.
 
 ## Cautions and Best Practices
 1. OCR downsamples the images if they are larger than a certain threshold, which
