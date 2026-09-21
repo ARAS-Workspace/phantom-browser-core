@@ -54,7 +54,6 @@ if (!is_android) {
       "policy_logs_ui_browsertest.cc",
       "policy_test_ui_browsertest.cc",
       "policy_ui_browsertest.cc",
-      "policy_ui_managed_status_browsertest.cc",
     ]
     deps = [
       ":policy",

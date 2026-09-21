@@ -301,7 +301,7 @@ class ManagementUIManagedStatusTest
 
     // Only wait if the feature is enabled AND locale is en-US AND not dismissed
     const bool is_dismissed = browser()->GetProfile()->GetPrefs()->GetBoolean(
-        policy::policy_prefs::kHasDismissedPolicyPagePromotionBanner);
+        policy::policy_prefs::kHasDismissedManagementPagePromotionBanner);
 
     if (is_feature_enabled() &&
         g_browser_process->GetApplicationLocale() == kValidLocale &&
