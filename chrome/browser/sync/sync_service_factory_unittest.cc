@@ -205,10 +205,6 @@ class SyncServiceFactoryTest : public testing::Test {
       datatypes.Put(syncer::CONTEXTUAL_TASK);
     }
 
-    if (base::FeatureList::IsEnabled(features::kSkillsEnabled)) {
-      datatypes.Put(syncer::SKILL);
-    }
-
     if (base::FeatureList::IsEnabled(syncer::kSyncGeminiThread)) {
       datatypes.Put(syncer::GEMINI_THREAD);
     }

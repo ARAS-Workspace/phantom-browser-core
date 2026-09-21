@@ -1142,10 +1142,6 @@ syncer::DataTypeSet AllowedTypesInStandaloneTransportMode() {
     allowed_types.Put(syncer::AUTOFILL_VALUABLE_METADATA);
   }
 
-  if (base::FeatureList::IsEnabled(features::kSkillsEnabled)) {
-    allowed_types.Put(syncer::SKILL);
-  }
-
   if (base::FeatureList::IsEnabled(syncer::kSyncGeminiThread)) {
     allowed_types.Put(syncer::GEMINI_THREAD);
   }
