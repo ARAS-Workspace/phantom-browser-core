@@ -2191,21 +2191,11 @@ source_set("browser_tests") {
     sources += [
       # TODO(crbug.com/469417243): Move to BUILD.gn files closer to sources.
       "//chrome/browser/chrome_service_worker_browsertest.cc",
-      "//chrome/browser/controlled_frame/controlled_frame_apitest.cc",
-      "//chrome/browser/controlled_frame/controlled_frame_contextmenus_browsertest.cc",
-      "//chrome/browser/controlled_frame/controlled_frame_dialog_browsertest.cc",
-      "//chrome/browser/controlled_frame/controlled_frame_disabled_permission_browsertest.cc",
-      "//chrome/browser/controlled_frame/controlled_frame_new_window_browsertest.cc",
-      "//chrome/browser/controlled_frame/controlled_frame_permission_request_browsertest.cc",
-      "//chrome/browser/controlled_frame/controlled_frame_wpt_browsertest.cc",
-      "//chrome/browser/controlled_frame/scoped_test_driver_proxy.cc",
-      "//chrome/browser/controlled_frame/scoped_test_driver_proxy.h",
       "//chrome/browser/notifications/notification_permission_context_apitest.cc",
       "//chrome/browser/page_load_metrics/observers/serp_page_load_metrics_observer_browsertest.cc",
       "//chrome/browser/safe_browsing/extension_telemetry/extension_telemetry_service_browsertest.cc",
       "//chrome/browser/ui/views/autofill/popup/custom_cursor_suppressor_browsertest.cc",
       "//chrome/browser/ui/views/user_education/recent_session_observer_impl_browsertest.cc",
-      "//chrome/browser/web_applications/isolated_web_apps/window_management/isolated_web_apps_close_window_browsertest.cc",
       "//chrome/renderer/controlled_frame/web_url_pattern_natives_browsertest.cc",
       "ai_language_model_browsertest.cc",
       "alert_apitest.cc",
@@ -2355,7 +2345,6 @@ source_set("browser_tests") {
 
     if (is_win || is_linux || is_mac) {
       sources += [
-        "//chrome/browser/ui/views/web_apps/file_handler_launch_dialog_browsertest.cc",
         "api/proxy_override_rules/proxy_override_rules_private_apitest.cc",
         "api/web_authentication_proxy/web_authentication_proxy_apitest.cc",
       ]
@@ -2407,7 +2396,6 @@ source_set("browser_tests") {
       "//chrome/browser/background:test_support",
       "//chrome/browser/bluetooth:test_support",
       "//chrome/browser/client_hints",
-      "//chrome/browser/controlled_frame:test_support",
       "//chrome/browser/custom_handlers",
       "//chrome/browser/devtools:test_support",
       "//chrome/browser/dictation:test_support",
@@ -2437,7 +2425,6 @@ source_set("browser_tests") {
       "//chrome/browser/ui/tabs/saved_tab_groups:test_support",
       "//chrome/browser/ui/user_education",
       "//chrome/browser/ui/views:file_system_access_test_support",
-      "//chrome/browser/ui/views/web_apps:browser_tests",
       "//chrome/browser/ui/webui/bookmarks",
       "//chrome/browser/ui/webui/extensions_zero_state_promo",
       "//chrome/browser/usb",

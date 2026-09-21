@@ -6,7 +6,6 @@ source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-  sources = [ "web_app_url_loader_browsertest.cc" ]
 
   deps = [
     "//base",

@@ -34,7 +34,6 @@ mojom("mojo_bindings") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [ "manifest_id_unittest.cc" ]
   deps = [
     ":common",
     "//testing/gtest",

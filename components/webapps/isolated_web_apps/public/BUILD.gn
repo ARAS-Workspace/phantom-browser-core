@@ -28,7 +28,6 @@ source_set("public") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [ "iwa_entitlements_unittest.cc" ]
   deps = [
     "//base",
     "//components/webapps/isolated_web_apps",

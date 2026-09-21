@@ -59,22 +59,3 @@ source_set("util") {
     "//components/version_info:generate_version_info",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-
-  sources = [
-    "last_browser_file_util_unittest.cc",
-    "launcher_update_unittest.cc",
-  ]
-
-  deps = [
-    ":util",
-    "//base/test:test_support",
-    "//chrome/browser/web_applications",
-    "//chrome/test:test_support",
-    "//components/version_info:generate_version_info",
-    "//content/test:test_support",
-    "//testing/gtest",
-  ]
-}

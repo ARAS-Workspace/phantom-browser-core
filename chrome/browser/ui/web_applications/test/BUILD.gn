@@ -8,8 +8,6 @@ source_set("test_support") {
   sources = [
     "ssl_test_utils.cc",
     "ssl_test_utils.h",
-    "test_server_redirect_handle.cc",
-    "test_server_redirect_handle.h",
   ]
 
   public_deps = [

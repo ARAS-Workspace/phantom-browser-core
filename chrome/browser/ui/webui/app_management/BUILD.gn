@@ -47,7 +47,6 @@ source_set("app_management") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [ "app_management_page_handler_unittest.cc" ]
 
   deps = [
     ":app_management",

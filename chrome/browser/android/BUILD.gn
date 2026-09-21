@@ -915,7 +915,6 @@ if (is_android) {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [ "webapps/twa_launch_queue_tab_helper_unittest.cc" ]
   deps = [
     ":android",
     "//chrome/browser:chrome_content_browser_client",

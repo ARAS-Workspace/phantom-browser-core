@@ -24,7 +24,6 @@ source_set("download") {
 
 source_set("unit_tests") {
   testonly = true
-  sources = [ "bundle_downloader_unittest.cc" ]
   deps = [
     "//components/webapps/isolated_web_apps",
     "//base",

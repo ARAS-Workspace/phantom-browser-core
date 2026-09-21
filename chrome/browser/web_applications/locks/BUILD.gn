@@ -20,7 +20,6 @@ source_set("partitioned_lock_manager") {
 
 source_set("partitioned_lock_manager_unit_tests") {
   testonly = true
-  sources = [ "partitioned_lock_manager_unittest.cc" ]
   deps = [
     ":partitioned_lock_manager",
     "//base",

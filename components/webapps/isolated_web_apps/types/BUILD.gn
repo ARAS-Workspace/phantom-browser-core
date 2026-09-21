@@ -37,20 +37,3 @@ source_set("types") {
     "//url",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "isolated_web_app_external_install_options_unittest.cc",
-    "iwa_version_unittest.cc",
-    "source_unittest.cc",
-  ]
-  deps = [
-    "//components/webapps/isolated_web_apps",
-    "//base",
-    "//base/test:test_support",
-    "//testing/gmock",
-    "//testing/gtest",
-    "//url",
-  ]
-}

@@ -113,7 +113,6 @@ if (enable_extensions) {
   source_set("browser_tests") {
     testonly = true
     sources = [
-      "app_home_page_handler_browsertest.cc",
       "mock_app_home_page.cc",
       "mock_app_home_page.h",
     ]

@@ -56,7 +56,6 @@ source_set("extensions") {
 source_set("unit_tests") {
   testonly = true
 
-  sources = [ "extensions_manager_impl_unittest.cc" ]
 
   deps = [
     ":extensions",

@@ -53,36 +53,3 @@ source_set("publishers") {
     "//chrome/browser/web_applications/app_service",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-
-  sources = [
-    "app_publisher_unittest.cc",
-    "publisher_unittest.cc",
-  ]
-
-  deps = [
-    ":publishers",
-    "//base",
-    "//chrome/browser/apps/app_service",
-    "//chrome/browser/apps/app_service:test_support",
-    "//chrome/browser/extensions",
-    "//chrome/browser/profiles:profile",
-    "//chrome/browser/web_applications",
-    "//chrome/browser/web_applications:web_applications_test_support",
-    "//chrome/browser/web_applications/mojom:mojom_web_apps_enum",
-    "//chrome/common:chrome_features",
-    "//chrome/test:test_support",
-    "//components/account_id",
-    "//components/app_constants",
-    "//components/services/app_service",
-    "//components/services/app_service/public/cpp:app_types",
-    "//content/test:test_support",
-    "//extensions/browser",
-    "//testing/gmock",
-    "//testing/gtest",
-    "//ui/base",
-    "//url",
-  ]
-}

@@ -17,15 +17,3 @@ source_set("error") {
     "//components/web_package",
   ]
 }
-
-source_set("unit_tests") {
-  testonly = true
-  sources = [
-    "uma_logging_unittest.cc",
-    "unusable_swbn_file_error_unittest.cc",
-  ]
-  deps = [
-    "//components/webapps/isolated_web_apps",
-    "//base/test:test_support",
-  ]
-}

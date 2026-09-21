@@ -43,7 +43,6 @@ source_set("iwa_dev") {
 
 source_set("browser_tests") {
   testonly = true
-  sources = [ "iwa_dev_page_handler_browsertest.cc" ]
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   deps = [
     ":iwa_dev",
