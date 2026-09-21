@@ -74,13 +74,8 @@ class NotificationTelemetryService
                             const GURL& scope,
                             const content::ServiceWorkerRegistrationInformation&
                                 service_worker_registration_info) override;
-  void OnPushEventFinished(
-      const GURL& script_url,
-      const std::optional<std::vector<GURL>>& requested_urls) override;
 
   static int ServiceWorkerInfoCacheSizeForTest();
-
-  void SetShouldSendReportForTest(bool should_send);
 
  private:
   FRIEND_TEST_ALL_PREFIXES(NotificationTelemetryServiceTest,
@@ -89,8 +84,6 @@ class NotificationTelemetryService
                            EnforcesServiceWorkerInfoCacheSize);
   FRIEND_TEST_ALL_PREFIXES(NotificationTelemetryServiceTest,
                            ServiceWorkerSubscriptionSendsServiceWorkerBehavior);
-  FRIEND_TEST_ALL_PREFIXES(NotificationTelemetryServiceTest,
-                           OnPushEventFinished);
   // TODO(crbug.com/433543634): Clean up post
   // GlobalCacheListForGatingNotificationProtections launch.
   FRIEND_TEST_ALL_PREFIXES(
@@ -117,11 +110,6 @@ class NotificationTelemetryService
   // service worker origins.
   void OnNewNotificationServiceWorkerSubscription(int64_t registration_id);
 
-  // Normalizes URLs by stripping any query param values. Since query param
-  // values aren't important aspects of the URL, removing them reduces noise
-  // and storage usage.
-  std::vector<GURL> NormalizeURLs(std::vector<GURL> urls);
-
   // Stored service worker info whose size is based on
   // `kNotificationTelemetryServiceWorkerInfoMaxCount`
   std::vector<ServiceWorkerTelemetryInfo> service_worker_infos_;
@@ -133,9 +121,6 @@ class NotificationTelemetryService
 
   // Responsible for sending the CSBRRs.
   scoped_refptr<SafeBrowsingUIManager> ui_manager_;
-
-  // Forces a report to be sent in tests.
-  bool should_send_report_for_test_ = false;
 
   raw_ptr<Profile> profile_;
 

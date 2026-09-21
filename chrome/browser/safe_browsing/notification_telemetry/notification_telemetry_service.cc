@@ -39,9 +39,6 @@ namespace {
 // Size of the stored service worker info cache.
 const int kNotificationTelemetryServiceWorkerInfoMaxCount = 20;
 
-// The probability of sending a ServiceWorkerBehavior CSBRR off device.
-const double kNotificationTelemetrySwbReportingProbability = 0.01;
-
 
 
 }  // namespace
@@ -115,80 +112,9 @@ void NotificationTelemetryService::OnRegistrationStored(
   }
 }
 
-std::vector<GURL> NotificationTelemetryService::NormalizeURLs(
-    std::vector<GURL> urls) {
-  std::vector<GURL> normalized_urls;
-  normalized_urls.reserve(urls.size());
-
-  for (const auto& url : urls) {
-    if (!url.is_valid()) {
-      // Skip invalid URLs.
-      continue;
-    }
-    if (!url.has_query()) {
-      // No query, add as is.
-      normalized_urls.push_back(url);
-      continue;
-    }
-    std::string new_query;
-    net::QueryIterator query_iterator(url);
-
-    while (!query_iterator.IsAtEnd()) {
-      if (!new_query.empty()) {
-        new_query += "&";
-      }
-      // Append only the key, strip the value.
-      new_query += query_iterator.GetKey();
-      query_iterator.Advance();
-    }
-
-    GURL::Replacements replacements;
-    replacements.SetQueryStr(new_query);
-    normalized_urls.push_back(url.ReplaceComponents(replacements));
-  }
-  return normalized_urls;
-}
-void NotificationTelemetryService::OnPushEventFinished(
-    const GURL& script_url,
-    const std::optional<std::vector<GURL>>& requested_urls) {
-  if (!requested_urls.has_value()) {
-    return;
-  }
-  // Only collect information for ESB users
-  if (!IsEnhancedProtectionEnabled(*profile_->GetPrefs())) {
-    return;
-  }
-
-  std::vector<GURL> normalized_requested_urls =
-      NormalizeURLs(requested_urls.value());
-  // Remove duplicate URLs.
-  base::flat_set<GURL> requested_urls_set(normalized_requested_urls.begin(),
-                                          normalized_requested_urls.end());
-  if (should_send_report_for_test_ ||
-      base::RandDouble() < kNotificationTelemetrySwbReportingProbability) {
-    auto report = std::make_unique<CSBRR>();
-    report->set_type(CSBRR::SERVICE_WORKER_BEHAVIOR);
-    report->set_page_url(script_url.spec());
-    CSBRR::ServiceWorkerBehavior* service_worker_behavior =
-        report->add_service_worker_behaviors();
-    service_worker_behavior->set_script_url(script_url.spec());
-    for (const auto& url : requested_urls_set) {
-      service_worker_behavior->add_requested_urls(url.spec());
-    }
-    if (ui_manager_ && profile_) {
-      ui_manager_->SendThreatDetails(profile_, std::move(report));
-    }
-  }
-}
-
 // static
 int NotificationTelemetryService::ServiceWorkerInfoCacheSizeForTest() {
   return kNotificationTelemetryServiceWorkerInfoMaxCount;
-}
-
-void NotificationTelemetryService::SetShouldSendReportForTest(
-    bool should_send) {
-  should_send_report_for_test_ = should_send;
 }
 
 void NotificationTelemetryService::DatabaseCheckDone(
