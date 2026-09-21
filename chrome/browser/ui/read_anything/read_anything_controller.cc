@@ -14,7 +14,6 @@
 #include "chrome/browser/ui/find_bar/find_bar_controller.h"
 #include "chrome/browser/ui/read_anything/read_anything_entry_point_controller.h"
 #include "chrome/browser/ui/read_anything/read_anything_enums.h"
-#include "chrome/browser/ui/read_anything/read_anything_hats_survey_controller.h"
 #include "chrome/browser/ui/read_anything/read_anything_omnibox_controller.h"
 #include "chrome/browser/ui/read_anything/read_anything_prefs.h"
 #include "chrome/browser/ui/read_anything/read_anything_service.h"
@@ -129,11 +128,6 @@ ReadAnythingController::ReadAnythingController(
 
   if (features::IsReadAnythingOmniboxChipEnabled()) {
     omnibox_controller_ = std::make_unique<ReadAnythingOmniboxController>(tab_);
-  }
-
-  if (features::IsHatsReadingModeSurveyEnabled()) {
-    hats_survey_ =
-        std::make_unique<ReadAnythingHatsSurveyController>(this, tab_);
   }
 }
 

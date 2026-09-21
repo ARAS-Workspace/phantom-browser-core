@@ -257,10 +257,6 @@ AX_BASE_EXPORT bool IsReadAnythingImprovedUiEnabled();
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kReadAnythingLineFocus);
 AX_BASE_EXPORT bool IsReadAnythingLineFocusEnabled();
 
-// Enable HaTS survey for Reading Mode.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kHatsReadingModeSurvey);
-AX_BASE_EXPORT bool IsHatsReadingModeSurveyEnabled();
-
 AX_BASE_EXPORT bool IsReadAnythingDocsIntegrationEnabled();
 
 // Enable "load more" button to show at the end of Reading Mode panel.

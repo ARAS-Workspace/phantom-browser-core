@@ -4845,7 +4845,6 @@ test("unit_tests") {
     deps += [
       "//chrome/browser/enterprise/network_header_injection:unit_tests",
       "//chrome/browser/multistep_filter:unit_tests",
-      "//chrome/browser/ui/read_anything:unit_tests",
       "//chrome/browser/ui/views/hats",
       "//chrome/browser/ui/webui/multistep_filter_internals:unit_tests",
     ]

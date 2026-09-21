@@ -149,7 +149,6 @@ constexpr char kHatsSurveyTriggerTrustSafetyTrustedSurface[] =
     "ts-trusted-surface";
 constexpr char kHatsSurveyTriggerTrustSafetyTransactions[] = "ts-transactions";
 constexpr char kHatsSurveyTriggerWhatsNew[] = "whats-new";
-constexpr char kHatsSurveyTriggerReadingModeExit[] = "reading-mode-exit";
 constexpr char kHatsSurveyTriggerTrustSafetyV2BrowsingData[] =
     "ts-v2-browsing-data";
 constexpr char kHatsSurveyTriggerTrustSafetyV2ControlGroup[] =
@@ -716,10 +715,6 @@ std::vector<hats::SurveyConfig> GetAllSurveyConfigs() {
   survey_configs.emplace_back(
       &features::kHappinessTrackingSurveysForDesktopWhatsNew,
       kHatsSurveyTriggerWhatsNew);
-
-  // Reading Mode survey.
-  survey_configs.emplace_back(&features::kHatsReadingModeSurvey,
-                              kHatsSurveyTriggerReadingModeExit);
 
   // Performance Controls surveys.
   survey_configs.emplace_back(
