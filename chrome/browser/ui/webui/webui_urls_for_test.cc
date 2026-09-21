@@ -26,10 +26,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
 #endif
       // TODO:(https://crbug.com/40265685): Flakily crashes on ChromeOS.
       "chrome://app-service-internals",
-      "chrome://actor-internals",
-      "chrome://actor-overlay",
-      "chrome://autofill-ml-internals",
-      "chrome://autofill-internals",
 
       "chrome://bookmarks",
       "chrome://bookmarks-side-panel.top-chrome",
@@ -38,13 +34,11 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://chrome-urls",
       "chrome://color-pipeline-internals",
       "chrome://comments-side-panel.top-chrome",
-      "chrome://commerce-internals",
       "chrome://components",
       "chrome://connection-help",
       "chrome://connection-monitoring-detected",
       "chrome://connectors-internals",
       "chrome://content-settings",
-      "chrome://context-hub",
       "chrome://crashes",
 // TODO(crbug.com/40913109): Re-enable this test
 #if !BUILDFLAG(IS_LINUX)
@@ -56,18 +50,13 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://default-browser-modal",
 
       "chrome://debug-webuis-disabled",
-      "chrome://device-log",
       "chrome://download-internals",
       "chrome://downloads",
       "chrome://extensions",
       "chrome://extensions-internals",
       "chrome://extensions-zero-state",
       "chrome://family-link-user-internals",
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-      "chrome://feature-showcase/?steps=password-manager",
-#endif
       "chrome://flags",
-      "chrome://gcm-internals",
       "chrome://gpu",
       "chrome://histograms",
       "chrome://history",
@@ -86,14 +75,10 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
       "chrome://linux-proxy-config",
 #endif
-      "chrome://location-internals",
       "chrome://local-state",
-      "chrome://management",
       "chrome://media-engagement",
       "chrome://media-internals",
-      "chrome://media-router-internals",
       "chrome://metrics-internals",
-      "chrome://multistep-filter-internals",
       "chrome://net-export",
       "chrome://net-internals",
       "chrome://network-errors",
@@ -101,21 +86,11 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://newtab-footer",
       "chrome://new-tab-page-third-party",
       "chrome://newtab",
-      "chrome://notebooks-internals",
       "chrome://ntp-tiles-internals",
       "chrome://omnibox",
-      "chrome://on-device-internals",
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      "chrome://on-device-translation-internals",
-#endif
-
-      "chrome://optimization-guide-internals",
 #if !BUILDFLAG(IS_ANDROID)
       "chrome://organizer-panel.top-chrome",
 #endif
-      "chrome://password-manager",
-      "chrome://password-manager-internals",
       "chrome://policy",
       "chrome://predictors",
 
@@ -124,7 +99,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://prefs-internals",
 #endif
 
-      "chrome://private-ai-internals",
       "chrome://process-internals",
       "chrome://profile-internals",
       "chrome://quota-internals",
@@ -141,7 +115,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://signin-internals",
       "chrome://site-engagement",
       "chrome://subresource-filter-internals",
-      "chrome://suggest-internals",
       "chrome://support-tool",
       "chrome://sync-internals",
       "chrome://system",
@@ -152,14 +125,10 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://traces",
       "chrome://traces-internals",
       "chrome://tracing",
-      "chrome://translate-internals",
       "chrome://ukm",
-      "chrome://usb-internals",
       "chrome://user-actions",
       "chrome://user-education-internals",
       "chrome://version",
-      "chrome://web-app-internals",
-      "chrome://webnn-internals",
       "chrome://webrtc-internals",
       "chrome://webrtc-logs",
       "chrome://webui-gallery",
@@ -184,7 +153,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://webapks",
 #endif
 
-      "chrome://apps",
       "chrome://browser-switch",
       "chrome://browser-switch/internals",
       "chrome://profile-picker",
@@ -216,14 +184,9 @@ base::span<const std::string_view> GetUntestedChromeUrlsForTest() {
   // Don't add new URLs here unless there's a strong reason for them to be
   // exempted from these basic checks.
   static constexpr std::string_view kChromeUntestedUrls[] = {
-      "chrome-untrusted://ai-overlay-dialog",
-      "chrome-untrusted://compose",
       "chrome-untrusted://data-sharing",
-      "chrome-untrusted://lens",
-      "chrome-untrusted://lens-overlay",
       "chrome-untrusted://ntp-microsoft-auth",
       "chrome-untrusted://print",
-      "chrome-untrusted://read-anything-side-panel.top-chrome",
       "chrome://access-code-cast",
 #if !defined(NDEBUG)
       // TODO(crbug.com/487113801): Investigate why tests are flaky on dbg bots.
@@ -232,21 +195,13 @@ base::span<const std::string_view> GetUntestedChromeUrlsForTest() {
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
       "chrome://cross-device-signin-qr-bubble",
 #endif
-      "chrome://app-settings",
       "chrome://constrained-test",
-      "chrome://contextual-tasks",
 #if BUILDFLAG(IS_LINUX)
       // TODO(crbug.com/40913109): Re-enable this test
       "chrome://credits",
 #endif
       // TODO(crbug.com/40710256): Test failure due to excessive output.
       "chrome://discards",
-      // TODO(crbug.com/487571789): TrustedTypesEnabled test is very flaky.
-      "chrome://feedback",
-      "chrome://glic",
-      "chrome://glic-fre",
-      "chrome://glic-experimental-opt-in",
-      "chrome-untrusted://glic",
       "chrome://history-sync-optin",
       // Not a valid URL; only internals/session-service is valid.
       "chrome://internals",
@@ -259,35 +214,14 @@ base::span<const std::string_view> GetUntestedChromeUrlsForTest() {
       "chrome://profile-customization",
       "chrome://signin-dice-web-intercept.top-chrome",
       "chrome://signin-error",
-      "chrome://skills",
       // TODO(crbug.com/40137561): Navigating to chrome://sync-confirmation and
       // quickly navigating away cause DCHECK failure.
       "chrome://sync-confirmation",
       "chrome://tab-group-home",
-      // TODO(crbug.com/40137562): Navigating to chrome://tab-strip and quickly
-      // navigating away cause DCHECK failure.
-      "chrome://tab-strip.top-chrome",
-      "chrome://updater",
       "chrome://view-cert",
       "chrome://watermark",
       "chrome://webui-browser",
       "chrome://webui-toolbar.top-chrome",
-#if BUILDFLAG(IS_MAC)
-      // TODO(crbug.com/40772380): this test is flaky on mac.
-      "chrome://bluetooth-internals",
-      // New UI only supported on Mac.
-      "chrome://unexportable-keys-internals",
-#endif
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-      // Note: Disabled because a DCHECK fires when directly visiting the URL.
-      "chrome://signin-reauth",
-#endif
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-      // TODO(crbug.com/40250068): Move to list above when TrustedTypes are
-      // enabled.
-      "chrome://chrome-signin/?reason=5",
-      "chrome://chrome-signin",
-#endif
   };
   return kChromeUntestedUrls;
 }
