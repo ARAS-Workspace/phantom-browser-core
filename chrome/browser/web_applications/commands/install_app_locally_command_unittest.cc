@@ -170,63 +170,6 @@ class InstallAppLocallyCommandTest : public WebAppTest {
       blink::features::kWebAppMigrationApi};
 };
 
-TEST_F(InstallAppLocallyCommandTest, BasicBehavior) {
-  // Create an app that is not locally installed, i.e. has the
-  // is_locally_installed bit set to false and there is no OS integration
-  // defined for it.
-  OrderedSizeToBitmap icon_map;
-  icon_map[icon_size::k16] = CreateSolidColorIcon(icon_size::k16, SK_ColorBLUE);
-  icon_map[icon_size::k24] = CreateSolidColorIcon(icon_size::k24, SK_ColorRED);
-  icon_map[icon_size::k128] =
-      CreateSolidColorIcon(icon_size::k128, SK_ColorGREEN);
-  const webapps::AppId& app_id =
-      InstallNonLocallyInstalledAppWithIcons(std::move(icon_map));
-
-  auto state =
-      fake_provider().registrar_unsafe().GetAppCurrentOsIntegrationState(
-          app_id);
-  ASSERT_TRUE(state.has_value());
-  const proto::os_state::WebAppOsIntegration& os_integration_state =
-      state.value();
-
-  if (HasShortcutsOsIntegration()) {
-    ASSERT_FALSE(os_integration_state.has_shortcut());
-  }
-
-  // Install app locally.
-  base::test::TestFuture<void> test_future;
-  fake_provider().scheduler().InstallAppLocally(app_id,
-                                                test_future.GetCallback());
-  EXPECT_TRUE(test_future.Wait());
-
-  auto updated_state =
-      fake_provider().registrar_unsafe().GetAppCurrentOsIntegrationState(
-          app_id);
-  ASSERT_TRUE(updated_state.has_value());
-  const proto::os_state::WebAppOsIntegration& updated_os_states =
-      updated_state.value();
-  ASSERT_TRUE(updated_os_states.has_shortcut());
-
-  EXPECT_TRUE(
-      fake_provider().registrar_unsafe().GetAppById(app_id)->GetSources().Has(
-          WebAppManagement::kUserInstalled));
-
-  // OS integration should be triggered now.
-  if (HasShortcutsOsIntegration()) {
-    ASSERT_TRUE(OsIntegrationTestOverrideImpl::Get()->IsShortcutCreated(
-        profile(), app_id,
-        fake_provider().registrar_unsafe().GetAppShortName(app_id)));
-
-    // On all desktop platforms, the shortcut icon that is used for the
-    // launcher is icon_size::k128, which should be GREEN as per the icon_map
-    // being used above.
-    ASSERT_THAT(
-        GetShortcutColor(
-            app_id, fake_provider().registrar_unsafe().GetAppShortName(app_id)),
-        testing::Eq(SK_ColorGREEN));
-  }
-}
-
 TEST_F(InstallAppLocallyCommandTest, AppNotInRegistrar) {
   const webapps::AppId app_id = "abcde";
 

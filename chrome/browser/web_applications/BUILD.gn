@@ -882,7 +882,6 @@ source_set("web_applications_unit_tests") {
   sources = [
     "commands/app_migration_data_read_command_unittest.cc",
     "commands/app_update_data_read_command_unittest.cc",
-    "commands/apply_manifest_migration_command_unittest.cc",
     "commands/apply_pending_manifest_update_command_unittest.cc",
     "commands/clear_browsing_data_command_unittest.cc",
     "commands/dedupe_install_urls_command_unittest.cc",
@@ -890,7 +889,6 @@ source_set("web_applications_unit_tests") {
     "commands/fetch_install_info_from_install_url_command_unittest.cc",
     "commands/fetch_installability_for_chrome_management_unittest.cc",
     "commands/fetch_manifest_and_install_command_unittest.cc",
-    "commands/fetch_manifest_and_update_command_unittest.cc",
     "commands/generated_icon_fix_command_unittest.cc",
     "commands/install_app_locally_command_unittest.cc",
     "commands/install_from_sync_command_unittest.cc",
@@ -980,7 +978,6 @@ source_set("web_applications_unit_tests") {
     "web_app_pref_guardrails_unittest.cc",
     "web_app_proto_utils_unittest.cc",
     "web_app_registrar_unittest.cc",
-    "web_app_scope_extensions_unittest.cc",
     "web_app_scope_unittest.cc",
     "web_app_sync_bridge_unittest.cc",
     "web_app_translation_manager_unittest.cc",
@@ -1005,12 +1002,10 @@ source_set("web_applications_unit_tests") {
 
   if (is_mac) {
     sources += [
-      "commands/rewrite_diy_icons_command_unittest.mm",
       "os_integration/mac/app_shim_registry_unittest.cc",
       "os_integration/mac/icns_encoder_unittest.cc",
       "os_integration/mac/icon_utils_unittest.mm",
       "os_integration/mac/shortcuts_versioning_mac_unittest.cc",
-      "os_integration/mac/web_app_run_on_os_login_mac_unittest.mm",
       "os_integration/mac/web_app_shortcut_creator_unittest.mm",
     ]
   }

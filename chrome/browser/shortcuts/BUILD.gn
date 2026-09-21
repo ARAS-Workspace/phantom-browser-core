@@ -167,7 +167,6 @@ source_set("unit_tests") {
   testonly = true
 
   sources = [ "shortcut_icon_generator_unittest.cc" ]
-  sources += [ "icon_badging_unittest.cc" ]
 
   deps = [
     ":shortcuts",

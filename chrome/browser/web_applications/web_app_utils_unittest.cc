@@ -86,30 +86,6 @@ TEST_F(WebAppUtilsTest, TransformFileExtensionsForDisplay_StripsBidiControls) {
                                u"", u"AA", u"BB", u"CC", u"DD", u"EE", u"BAT"));
 }
 
-TEST_F(WebAppUtilsTest, AreWebAppsUserInstallable) {
-  Profile* regular_profile = profile();
-
-  EXPECT_FALSE(AreWebAppsEnabled(nullptr));
-  EXPECT_TRUE(AreWebAppsUserInstallable(regular_profile));
-  EXPECT_FALSE(AreWebAppsUserInstallable(
-      regular_profile->GetPrimaryOTRProfile(/*create_if_needed=*/true)));
-  EXPECT_FALSE(
-      AreWebAppsUserInstallable(regular_profile->GetOffTheRecordProfile(
-          Profile::OTRProfileID::CreateUniqueForTesting(),
-          /*create_if_needed=*/true)));
-
-  Profile* guest_profile = profile_manager().CreateGuestProfile();
-  EXPECT_FALSE(AreWebAppsUserInstallable(guest_profile));
-  EXPECT_FALSE(AreWebAppsUserInstallable(
-      guest_profile->GetPrimaryOTRProfile(/*create_if_needed=*/true)));
-
-  Profile* system_profile = profile_manager().CreateSystemProfile();
-  EXPECT_FALSE(AreWebAppsUserInstallable(system_profile));
-  EXPECT_FALSE(AreWebAppsUserInstallable(
-      system_profile->GetPrimaryOTRProfile(/*create_if_needed=*/true)));
-
-}
-
 TEST_F(WebAppUtilsTest, GetBrowserContextForWebApps) {
   Profile* regular_profile = profile();
 

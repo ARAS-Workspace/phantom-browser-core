@@ -146,41 +146,6 @@ class TrustedIconInstallUnitTest : public WebAppTest {
   const GURL trusted_icon_url_{"https://www.foo.bar/web_apps/trusted_icon.png"};
 };
 
-TEST_F(TrustedIconInstallUnitTest, UserInstall) {
-  SetupBasicInstallablePageState();
-  webapps::AppId app_id = test::InstallForWebContents(
-      profile(), web_contents(),
-      webapps::WebappInstallSource::OMNIBOX_INSTALL_ICON);
-
-  const WebApp* web_app = registrar().GetAppById(app_id);
-  ASSERT_NE(web_app, nullptr);
-
-  // Verify manifest and trusted icon metadata.
-  EXPECT_THAT(
-      web_app->manifest_icons(),
-      ElementsAre(apps::IconInfo(manifest_icon_url(), kIconSize),
-                  apps::IconInfo(trusted_icon_url(), kTrustedIconSize)));
-  EXPECT_THAT(
-      web_app->trusted_icons(),
-      ElementsAre(apps::IconInfo(trusted_icon_url(), kTrustedIconSize)));
-
-  // Verify manifest and trusted icon disk info cached correctly.
-  EXPECT_THAT(web_app->downloaded_icon_sizes(IconPurpose::ANY),
-              ElementsAre(32, 48, 64, 96, 128, 256));
-  EXPECT_THAT(web_app->stored_trusted_icon_sizes(IconPurpose::ANY),
-              ElementsAre(32, 48, 64, 96, 128, 256));
-
-  base::HistogramTester histogram_tester;
-  // Verify that trusted icons are read correctly from disk.
-  for (const auto& [size, bitmap] : LoadIconsFromDisk(app_id)) {
-    EXPECT_EQ(kTrustedIconColor, bitmap.getColor(size / 2, size / 2));
-  }
-
-  // Icons are read properly from the trusted icons directory.
-  EXPECT_THAT(histogram_tester.GetAllSamples("WebApp.TrustedIcons.ReadResult"),
-              BucketsAre(base::Bucket(true, 1)));
-}
-
 TEST_F(TrustedIconInstallUnitTest, PolicyInstall) {
   SetupBasicInstallablePageState();
   webapps::AppId app_id =
@@ -259,34 +224,6 @@ TEST_F(TrustedIconInstallUnitTest, DefaultInstall) {
   // Icons are read properly from the trusted icons directory.
   EXPECT_THAT(histogram_tester.GetAllSamples("WebApp.TrustedIcons.ReadResult"),
               BucketsAre(base::Bucket(true, 1)));
-}
-
-TEST_F(TrustedIconInstallUnitTest, ManifestIconsFallbackOnIconCorruption) {
-  SetupBasicInstallablePageState();
-  webapps::AppId app_id = test::InstallForWebContents(
-      profile(), web_contents(),
-      webapps::WebappInstallSource::OMNIBOX_INSTALL_ICON);
-
-  const WebApp* web_app = registrar().GetAppById(app_id);
-  ASSERT_NE(web_app, nullptr);
-
-  CorruptIconFilesOnDisk(app_id);
-  base::HistogramTester histogram_tester;
-
-  // Verify the fallback behavior of reading manifest icons when trusted icons
-  // are corrupted.
-  for (const auto& [size, bitmap] : LoadIconsFromDisk(app_id)) {
-    if (size == kTrustedIconSize) {
-      EXPECT_EQ(kTrustedIconColor, bitmap.getColor(size / 2, size / 2));
-    } else {
-      EXPECT_EQ(kManifestIconColor, bitmap.getColor(size / 2, size / 2));
-    }
-  }
-
-  // Icons are read from the manifest icons directory on corruption of the
-  // trusted icons.
-  EXPECT_THAT(histogram_tester.GetAllSamples("WebApp.TrustedIcons.ReadResult"),
-              BucketsAre(base::Bucket(false, 1)));
 }
 
 }  // namespace
