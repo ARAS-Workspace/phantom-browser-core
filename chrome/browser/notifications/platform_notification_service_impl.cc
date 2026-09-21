@@ -68,7 +68,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface_iterator.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"  // nogncheck
-#include "chrome/browser/web_applications/web_app_icon_manager.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #else
@@ -560,13 +559,7 @@ PlatformNotificationServiceImpl::CreateNotificationFromData(
   // might be a better "hint" than the service worker scope).
   std::optional<webapps::AppId> web_app_id = FindWebAppId(web_app_hint_url);
 
-  std::optional<WebAppIconAndTitle> web_app_icon_and_title;
-
-  message_center::NotifierId notifier_id(
-      origin,
-      web_app_icon_and_title ? std::make_optional(web_app_icon_and_title->title)
-                             : std::nullopt,
-      web_app_id);
+  message_center::NotifierId notifier_id(origin, std::nullopt, web_app_id);
 
   // TODO(peter): Handle different screen densities instead of always using the
   // 1x bitmap - crbug.com/41238973.
@@ -593,9 +586,6 @@ PlatformNotificationServiceImpl::CreateNotificationFromData(
     notification.set_type(message_center::NOTIFICATION_TYPE_IMAGE);
     notification.SetImage(gfx::Image::CreateFrom1xBitmap(image));
   }
-
-  if (web_app_icon_and_title && !web_app_icon_and_title->icon.isNull())
-    notification.SetSmallImage(gfx::Image(web_app_icon_and_title->icon));
 
   // TODO(peter): Handle different screen densities instead of always using the
   // 1x bitmap - crbug.com/41238973.
@@ -683,34 +673,6 @@ std::optional<webapps::AppId> PlatformNotificationServiceImpl::FindWebAppId(
   if (web_app_provider) {
     return web_app_provider->registrar_unsafe().FindBestAppWithUrlInScope(
         web_app_hint_url, web_app::WebAppFilter::InstalledInChrome());
-  }
-#endif
-
-  return std::nullopt;
-}
-
-std::optional<PlatformNotificationServiceImpl::WebAppIconAndTitle>
-PlatformNotificationServiceImpl::FindWebAppIconAndTitle(
-    const GURL& web_app_hint_url) const {
-#if !BUILDFLAG(IS_ANDROID)
-  web_app::WebAppProvider* web_app_provider =
-      web_app::WebAppProvider::GetForLocalAppsUnchecked(profile_);
-  if (web_app_provider) {
-    web_app::WebAppFilter filter =
-        web_app::WebAppFilter::SupportsOsNotifications();
-    const std::optional<webapps::AppId> app_id =
-        web_app_provider->registrar_unsafe().FindBestAppWithUrlInScope(
-            web_app_hint_url, filter);
-    if (app_id) {
-      std::optional<WebAppIconAndTitle> icon_and_title;
-      icon_and_title.emplace();
-
-      icon_and_title->title = base::UTF8ToUTF16(
-          web_app_provider->registrar_unsafe().GetAppShortName(*app_id));
-      icon_and_title->icon =
-          web_app_provider->icon_manager().GetMonochromeFavicon(*app_id);
-      return icon_and_title;
-    }
   }
 #endif
 

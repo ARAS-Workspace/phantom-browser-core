@@ -23,7 +23,6 @@
 #include "components/webapps/common/web_app_id.h"
 #include "content/public/browser/platform_notification_service.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
-#include "ui/gfx/image/image_skia.h"
 #include "ui/message_center/public/cpp/notification.h"
 
 class GURL;
@@ -91,7 +90,6 @@ class PlatformNotificationServiceImpl
   friend class PersistentNotificationHandlerTest;
   friend class PlatformNotificationServiceBrowserTest;
   friend class PlatformNotificationServiceTest;
-  friend class PushMessagingBrowserTest;
   FRIEND_TEST_ALL_PREFIXES(PlatformNotificationServiceTest,
                            CreateNotificationFromData);
   FRIEND_TEST_ALL_PREFIXES(PlatformNotificationServiceTest_WebApps,
@@ -102,12 +100,6 @@ class PlatformNotificationServiceImpl
                            RecordNotificationUkmEvent);
   FRIEND_TEST_ALL_PREFIXES(PlatformNotificationServiceTest_WebApps,
                            IncomingCallWebApp);
-  FRIEND_TEST_ALL_PREFIXES(
-      PlatformNotificationServiceTest_WebAppNotificationIconAndTitle,
-      FindWebAppIconAndTitle_NoApp);
-  FRIEND_TEST_ALL_PREFIXES(
-      PlatformNotificationServiceTest_WebAppNotificationIconAndTitle,
-      FindWebAppIconAndTitle);
   FRIEND_TEST_ALL_PREFIXES(
       PlatformNotificationServiceTest_ReportNotificationContentDetectionData,
       UpdateNotificationDatabaseMetadata);
@@ -126,11 +118,6 @@ class PlatformNotificationServiceImpl
   FRIEND_TEST_ALL_PREFIXES(
       PlatformNotificationServiceTest_AutoRevokeSuspiciousNotification,
       RevokeNotificationPermission_UpdateNotificationDatabaseMetadata);
-
-  struct WebAppIconAndTitle {
-    gfx::ImageSkia icon;
-    std::u16string title;
-  };
 
   // KeyedService implementation.
   void Shutdown() override;
@@ -163,12 +150,6 @@ class PlatformNotificationServiceImpl
   // Finds the AppId associated with |web_app_hint_url| when this is part of
   // an installed experience, and the notification can be attributed as such.
   std::optional<webapps::AppId> FindWebAppId(
-      const GURL& web_app_hint_url) const;
-
-  // Finds the icon and title associated with |web_app_id| when this
-  // is part of an installed experience, and the notification can be attributed
-  // as such.
-  std::optional<WebAppIconAndTitle> FindWebAppIconAndTitle(
       const GURL& web_app_hint_url) const;
 
   // Identifies whether the notification was sent from an installed web app or
