@@ -842,6 +842,17 @@ void InProcessBrowserTest::PreRunTestOnMainThread() {
 #endif
 }
 
+void InProcessBrowserTest::PostRunTestOnMainThread() {
+#if BUILDFLAG(IS_MAC)
+  autorelease_pool_->Recycle();
+#endif
+
+  QuitBrowsers();
+
+  // There should be no browsers at this point.
+  CHECK(GlobalBrowserCollection::GetInstance()->IsEmpty());
+}
+
 void InProcessBrowserTest::QuitBrowsers() {
   if (GlobalBrowserCollection::GetInstance()->GetSize() == 0) {
     browser_shutdown::NotifyAppTerminating();
