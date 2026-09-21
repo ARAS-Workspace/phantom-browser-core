@@ -46,7 +46,7 @@ class ChromeSyncClientTest : public testing::Test {
         /*pref_service=*/nullptr,
         /*identity_manager=*/nullptr,
         /*trusted_vault_service=*/nullptr,
-        /*sync_invalidations_service=*/nullptr, &device_info_sync_service_,
+        &device_info_sync_service_,
         &data_type_store_service_,
         /*supervised_user_settings_service=*/nullptr,
         /*extensions_activity_monitor=*/nullptr);

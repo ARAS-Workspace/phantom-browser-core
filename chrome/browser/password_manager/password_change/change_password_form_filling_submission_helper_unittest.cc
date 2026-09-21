@@ -337,69 +337,6 @@ class ChangePasswordFormFillingSubmissionHelperTest
 };
 
 // If the password being changed was stored, we will update it.
-TEST_F(ChangePasswordFormFillingSubmissionHelperTest,
-       SucceededForExistingCredential) {
-  base::HistogramTester histogram_tester;
-  auto* form_manager =
-      CreateFormManager(/*credentials_to_seed=*/{*existing_credential()});
-
-  base::test::TestFuture<SubmissionResult> completion_future;
-  auto verifier = CreateVerifier(form_manager, completion_future.GetCallback());
-  task_environment()->AdvanceClock(base::Milliseconds(1534));
-
-  // Presave generated password as backup
-  password_manager::StoredCredential presaved_generated_password_form;
-  password_manager::PasswordForm saved_generated_password_form;
-  EXPECT_CALL(*profile_password_store(), UpdateLogin)
-      .WillOnce(MoveArg<0>(&presaved_generated_password_form));
-
-  WaitForFillingAndSuccessfulSubmission(form_manager, verifier.get());
-  verifier->click_helper()->SimulateClickResult(true);
-
-  EXPECT_TRUE(completion_future.Get().has_value());
-  EXPECT_EQ(presaved_generated_password_form.username_value,
-            existing_credential()->username_value);
-  EXPECT_EQ(presaved_generated_password_form.password_value,
-            existing_credential()->password_value);
-  EXPECT_EQ(presaved_generated_password_form.url, existing_credential()->url);
-  EXPECT_EQ(presaved_generated_password_form.signon_realm,
-            existing_credential()->signon_realm);
-  EXPECT_EQ(presaved_generated_password_form.GetPasswordBackup(), kNewPassword);
-
-  verifier.reset();
-  histogram_tester.ExpectUniqueSample(
-      "PasswordManager.TimeSpentChangingPassword", 1534, 1);
-  EXPECT_EQ(1534, logs_uploader()
-                      ->GetFinalLog()
-                      .password_change_submission()
-                      .quality()
-                      .submit_form()
-                      .request_latency_ms());
-}
-
-// If the password being changed was not stored, we will add a new credential.
-TEST_F(ChangePasswordFormFillingSubmissionHelperTest, SucceededNewCredential) {
-  base::HistogramTester histogram_tester;
-  auto* form_manager = CreateFormManager(/*credentials_to_seed=*/{});
-
-  base::test::TestFuture<SubmissionResult> completion_future;
-  auto verifier = CreateVerifier(form_manager, completion_future.GetCallback());
-
-  password_manager::StoredCredential presaved_generated_password_form;
-  // Presave generated password as backup
-  EXPECT_CALL(*profile_password_store(), AddLogin)
-      .WillOnce(MoveArg<0>(&presaved_generated_password_form));
-  WaitForFillingAndSuccessfulSubmission(form_manager, verifier.get());
-  verifier->click_helper()->SimulateClickResult(true);
-
-  EXPECT_TRUE(completion_future.Get().has_value());
-  EXPECT_EQ(presaved_generated_password_form.username_value, kUsername);
-  EXPECT_EQ(presaved_generated_password_form.password_value, kOldPassword);
-  EXPECT_EQ(presaved_generated_password_form.url, url());
-  EXPECT_EQ(presaved_generated_password_form.signon_realm, kUrlString);
-  EXPECT_EQ(presaved_generated_password_form.GetPasswordBackup(), kNewPassword);
-}
-
 // Tests that we do not overwrite the stored password during the presave phase
 // if the password used for log in doesn't match the stored password.
 TEST_F(ChangePasswordFormFillingSubmissionHelperTest,
@@ -582,49 +519,6 @@ TEST_F(ChangePasswordFormFillingSubmissionHelperTest, ProvisionallySaveFailed) {
   task_environment()->RunUntilIdle();
 }
 
-TEST_F(ChangePasswordFormFillingSubmissionHelperTest,
-       ClickingSubmitButtonWorks) {
-  auto* form_manager = CreateFormManager(/*credentials_to_seed=*/{});
-
-  base::test::TestFuture<SubmissionResult> completion_future;
-  auto verifier = CreateVerifier(form_manager, completion_future.GetCallback());
-  WaitForFillingAndSuccessfulSubmission(form_manager, verifier.get());
-
-  // Sets up clicking on the Submit button using MES to find the button.
-  // Expects MES to be called for checking if the submission was successful.
-  verifier->click_helper()->SimulateClickResult(true);
-
-  // Expects that form submission succeeded.
-  EXPECT_TRUE(completion_future.Get().has_value());
-
-  CheckSubmitFormStatus(
-      logs_uploader()->GetFinalLog(),
-      QualityStatus::
-          PasswordChangeQuality_StepQuality_SubmissionStatus_ACTION_SUCCESS);
-}
-
-TEST_F(ChangePasswordFormFillingSubmissionHelperTest,
-       NoTimeoutAfterClickHelperCreated) {
-  auto* form_manager = CreateFormManager(/*credentials_to_seed=*/{});
-
-  base::test::TestFuture<SubmissionResult> completion_future;
-  auto verifier = CreateVerifier(form_manager, completion_future.GetCallback());
-  WaitForFillingAndSuccessfulSubmission(form_manager, verifier.get());
-
-  ASSERT_TRUE(verifier->click_helper());
-
-  // Advance clock by timeout duration.
-  task_environment()->AdvanceClock(
-      ChangePasswordFormFillingSubmissionHelper::kSubmissionWaitingTimeout);
-
-  // Verify that it did not time out.
-  EXPECT_FALSE(completion_future.IsReady());
-
-  // Complete the click to avoid leaks or dangling callbacks if any.
-  verifier->click_helper()->SimulateClickResult(true);
-  EXPECT_TRUE(completion_future.Get().has_value());
-}
-
 TEST_F(ChangePasswordFormFillingSubmissionHelperTest, SubmitButtonNotFound) {
   base::test::ScopedFeatureList feature_list;
   auto* form_manager = CreateFormManager(/*credentials_to_seed=*/{});
@@ -642,7 +536,6 @@ TEST_F(ChangePasswordFormFillingSubmissionHelperTest, SubmitButtonNotFound) {
   static_cast<FakeAnnotatedPageContentCapturer*>(verifier->capturer())
       ->SimulateResponse(optimization_guide::AIPageContentResult());
 
-  EXPECT_FALSE(verifier->click_helper());
 
   EXPECT_EQ(completion_future.Get().error(),
             SubmissionError::kSubmitButtonNotFound);
@@ -661,7 +554,6 @@ TEST_F(ChangePasswordFormFillingSubmissionHelperTest, SubmitButtonClickFailed) {
   auto verifier = CreateVerifier(form_manager, completion_future.GetCallback());
   WaitForFillingAndSuccessfulSubmission(form_manager, verifier.get());
 
-  verifier->click_helper()->SimulateClickResult(false);
 
   EXPECT_EQ(completion_future.Get().error(),
             SubmissionError::kFailedToClickSubmit);
@@ -726,7 +618,6 @@ TEST_F(ChangePasswordFormFillingSubmissionHelperTest,
 
   EXPECT_EQ(completion_future.Get().error(),
             SubmissionError::kInterventionDetected);
-  EXPECT_FALSE(verifier->click_helper());
 }
 
 TEST_F(ChangePasswordFormFillingSubmissionHelperTest,

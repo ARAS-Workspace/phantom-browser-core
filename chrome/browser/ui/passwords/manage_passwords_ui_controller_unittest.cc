@@ -28,15 +28,12 @@
 #include "chrome/browser/password_manager/password_change_delegate.h"
 #include "chrome/browser/password_manager/password_change_delegate_mock.h"
 #include "chrome/browser/password_manager/password_change_service_factory.h"
-#include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/hats/mock_trust_safety_sentiment_service.h"
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
-#include "chrome/browser/ui/page_action/test_support/mock_page_action_controller.h"
 #include "chrome/browser/ui/passwords/credential_leak_dialog_controller.h"
 #include "chrome/browser/ui/passwords/credential_manager_dialog_controller.h"
 #include "chrome/browser/ui/passwords/password_dialog_prompts.h"
 #include "chrome/browser/ui/passwords/passwords_model_delegate.h"
-#include "chrome/browser/ui/views/passwords/manage_passwords_page_action_controller.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "components/affiliations/core/browser/mock_affiliation_service.h"
 #include "components/device_reauth/device_authenticator.h"
@@ -67,7 +64,6 @@
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#include "ui/actions/actions.h"
 
 #if BUILDFLAG(IS_MAC)
 #include "components/device_reauth/mock_device_authenticator.h"
@@ -213,20 +209,12 @@ class TestManagePasswordsUIController : public ManagePasswordsUIController {
   void HideBubble(bool initiated_by_bubble_manager) override;
 
   bool opened_automatic_bubble_ = false;
-
-  page_actions::MockPageActionController page_action_controller_;
-  ManagePasswordsPageActionController manage_passwords_page_action_controller_;
-  std::unique_ptr<actions::ActionItem> passwords_action_item_;
 };
 
 TestManagePasswordsUIController::TestManagePasswordsUIController(
     content::WebContents* contents,
     password_manager::PasswordManagerClient* client)
-    : ManagePasswordsUIController(contents),
-      manage_passwords_page_action_controller_(page_action_controller_) {
-  passwords_action_item_ = actions::ActionItem::Builder()
-                               .SetActionId(kActionShowPasswordsBubbleOrPage)
-                               .Build();
+    : ManagePasswordsUIController(contents) {
   // Do not silently replace an existing ManagePasswordsUIController because it
   // unregisters itself in WebContentsDestroyed().
   EXPECT_FALSE(contents->GetUserData(UserDataKey()));
@@ -238,10 +226,6 @@ void TestManagePasswordsUIController::UpdateBubbleAndIconVisibility() {
   opened_automatic_bubble_ = IsAutomaticallyOpeningBubble();
   ManagePasswordsUIController::UpdateBubbleAndIconVisibility();
   OnUpdateBubbleAndIconVisibility();
-  // Manually invoke this because `OnUpdateBubbleAndIconVisibility` skips it
-  // due to the lack of a browser.
-  UpdatePasswordIconAndBubbleState(&manage_passwords_page_action_controller_,
-                                   passwords_action_item_.get());
   if (opened_automatic_bubble_) {
     OnBubbleShown();
   }

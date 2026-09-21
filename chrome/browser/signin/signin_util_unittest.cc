@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "base/memory/raw_ptr.h"
-#include "base/test/scoped_feature_list.h"
 #include "base/test/with_feature_override.h"
 #include "build/buildflag.h"
 #include "chrome/browser/browser_process.h"
@@ -23,7 +22,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/signin/public/base/signin_pref_names.h"
-#include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/user_selectable_type.h"
@@ -421,27 +419,6 @@ class SigninUtilHistorySyncOptinTest : public SigninUtilTest {
     test_sync_service()->GetUserSettings()->SetSelectedTypes(
         /*sync_everything=*/false, syncer::UserSelectableTypeSet());
   }
-
-  void SetupForAvatarSyncPromo(bool managed_account = false) {
-    SignInAndSetUpSyncService(managed_account);
-    DisableAllSyncedDataTypes();
-
-    // Simulate setting enough time passing for the cookie change.
-    profile()->GetPrefs()->SetDouble(
-        prefs::kGaiaCookieChangedTime,
-        (base::Time::Now() -
-         (switches::GetAvatarSyncPromoFeatureMinimumCookeAgeParam() +
-          base::Minutes(1)))
-            .InSecondsFSinceUnixEpoch());
-
-    // The rest of the setup should be aligned with the default profile
-    // initialization/signin.
-  }
-
- private:
-  // Use this flag to simplify test writing and not restrict to Windows only.
-  base::test::ScopedFeatureList scoped_feature_list_{
-      switches::kAvatarButtonSyncPromoForTesting};
 };
 
 TEST_F(SigninUtilHistorySyncOptinTest, HistorySyncOptinDisallowedByPolicy) {
@@ -505,60 +482,6 @@ TEST_F(SigninUtilHistorySyncOptinTest, EnableHistorySync) {
       syncer::UserSelectableType::kTabs));
   EXPECT_TRUE(test_sync_service()->GetUserSettings()->GetSelectedTypes().Has(
       syncer::UserSelectableType::kSavedTabGroups));
-}
-
-TEST_F(SigninUtilHistorySyncOptinTest, ShouldShowAvatarSyncPromo) {
-  SetupForAvatarSyncPromo();
-  EXPECT_TRUE(signin_util::ShouldShowAvatarSyncPromo(profile()));
-}
-
-TEST_F(SigninUtilHistorySyncOptinTest,
-       ShouldNotShowAvatarSyncPromoManagedAccounts) {
-  SetupForAvatarSyncPromo(/*managed_account*/ true);
-  EXPECT_FALSE(signin_util::ShouldShowAvatarSyncPromo(profile()));
-}
-
-TEST_F(SigninUtilHistorySyncOptinTest,
-       ShouldShowAvatarSyncPromoBasedOnProfleAlreadySyncing) {
-  SetupForAvatarSyncPromo();
-  ASSERT_TRUE(signin_util::ShouldShowAvatarSyncPromo(profile()));
-
-  // Promo should not show if the previously syncing gaia id is different than
-  // the current signed in one.
-  const GaiaId previously_syncing_gaia_id("syncing_gaia_id");
-  ASSERT_NE(previously_syncing_gaia_id, kSignedInGaiaId);
-  profile()->GetPrefs()->SetString(prefs::kGoogleServicesLastSyncingGaiaId,
-                                   previously_syncing_gaia_id.ToString());
-  EXPECT_FALSE(signin_util::ShouldShowAvatarSyncPromo(profile()));
-
-  // Promo can show if the gaia id match.
-  profile()->GetPrefs()->SetString(prefs::kGoogleServicesLastSyncingGaiaId,
-                                   kSignedInGaiaId.ToString());
-  EXPECT_TRUE(signin_util::ShouldShowAvatarSyncPromo(profile()));
-}
-
-TEST_F(SigninUtilHistorySyncOptinTest,
-       ShouldShowAvatarSyncPromoBasedOnGaiaCookieAge) {
-  SetupForAvatarSyncPromo();
-  ASSERT_TRUE(signin_util::ShouldShowAvatarSyncPromo(profile()));
-
-  // Promo should not show if the gaia cookie age is too short.
-  profile()->GetPrefs()->SetDouble(
-      prefs::kGaiaCookieChangedTime,
-      (base::Time::Now() -
-       (switches::GetAvatarSyncPromoFeatureMinimumCookeAgeParam() -
-        base::Minutes(1)))
-          .InSecondsFSinceUnixEpoch());
-  EXPECT_FALSE(signin_util::ShouldShowAvatarSyncPromo(profile()));
-
-  // Promo can show if the gaia cookie age is long enough.
-  profile()->GetPrefs()->SetDouble(
-      prefs::kGaiaCookieChangedTime,
-      (base::Time::Now() -
-       (switches::GetAvatarSyncPromoFeatureMinimumCookeAgeParam() +
-        base::Minutes(1)))
-          .InSecondsFSinceUnixEpoch());
-  EXPECT_TRUE(signin_util::ShouldShowAvatarSyncPromo(profile()));
 }
 
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

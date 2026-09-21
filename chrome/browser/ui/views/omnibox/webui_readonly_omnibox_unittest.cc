@@ -51,8 +51,6 @@ class TestUpdatePropagator : public WebUIReadOnlyOmnibox::UpdatePropagator {
     state_ = std::move(update);
   }
 
-  void PropagateApplyFocusRingToAimButton(bool force_focus) override {}
-
   void PropagateFocusRequest(
       toolbar_ui_api::mojom::FocusRequestTarget target) override {}
 
@@ -366,9 +364,7 @@ TEST_F(WebUIReadOnlyOmniboxTest, InputVersion) {
   EXPECT_EQ(1u, mojo_state->ui_version);
 }
 
-TEST_F(WebUIReadOnlyOmniboxTest, ContextualTasksFocusBlur) {
-  // Set up contextual tasks page.
-  location_bar_model()->set_is_contextual_tasks_page(true);
+TEST_F(WebUIReadOnlyOmniboxTest, FocusBlur) {
   std::u16string display_url = u"chrome://google.com/search?q=test";
   location_bar_model()->set_url_for_display(display_url);
   omnibox_view_->Update();  // Pull initial state

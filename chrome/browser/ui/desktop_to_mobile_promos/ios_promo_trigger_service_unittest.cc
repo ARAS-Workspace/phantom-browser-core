@@ -28,7 +28,6 @@
 namespace {
 
 using desktop_to_mobile_promos::PromoType;
-using testing::_;
 
 std::unique_ptr<KeyedService> BuildFakeDeviceInfoSyncService(
     content::BrowserContext* context) {

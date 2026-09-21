@@ -34,7 +34,6 @@
 #include "chrome/browser/safe_browsing/notification_content_detection/mock_notification_content_detection_service.h"
 #include "chrome/browser/safe_browsing/notification_content_detection/notification_content_detection_service_factory.h"
 #include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
-#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_util.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
@@ -411,72 +410,6 @@ TEST_F(PlatformNotificationServiceTest, NextPersistentNotificationId) {
   int64_t first_id = service()->ReadNextPersistentNotificationId();
   int64_t second_id = service()->ReadNextPersistentNotificationId();
   EXPECT_LT(first_id, second_id);
-}
-
-TEST_F(PlatformNotificationServiceTest,
-       ProposedDisruptiveNotificationRevocationMetricsPersistent) {
-  GURL url("https://chrome.test/");
-  const int kDailyNotificationCount = 4;
-
-  HostContentSettingsMap* hcsm =
-      HostContentSettingsMapFactory::GetForProfile(profile_.get());
-  DisruptiveNotificationPermissionsManager::RevocationEntry entry(
-      /*revocation_state=*/DisruptiveNotificationPermissionsManager::
-          RevocationState::kProposed,
-      /*site_engagement=*/0.0,
-      /*daily_notification_count=*/kDailyNotificationCount);
-
-  DisruptiveNotificationPermissionsManager::ContentSettingHelper(*hcsm)
-      .PersistRevocationEntry(url, entry);
-
-  PlatformNotificationData data;
-  data.title = u"My notification's title";
-  data.body = u"Hello, world!";
-
-  service()->DisplayPersistentNotification(kNotificationId,
-                                           GURL() /* service_worker_scope */,
-                                           url, data, NotificationResources());
-
-  EXPECT_EQ(1u, GetNotificationCountForType(
-                    NotificationHandler::Type::WEB_PERSISTENT));
-  // Check that the correct metric is reported.
-  EXPECT_EQ(1u, recorder_
-                    ->GetEntriesByName(
-                        "SafetyHub.DisruptiveNotificationRevocations.Proposed")
-                    .size());
-}
-
-TEST_F(PlatformNotificationServiceTest,
-       ProposedDisruptiveNotificationRevocationMetricsNonPersistent) {
-  GURL url("https://chrome.test/");
-  const int kDailyNotificationCount = 4;
-
-  HostContentSettingsMap* hcsm =
-      HostContentSettingsMapFactory::GetForProfile(profile_.get());
-  DisruptiveNotificationPermissionsManager::RevocationEntry entry(
-      /*revocation_state=*/DisruptiveNotificationPermissionsManager::
-          RevocationState::kProposed,
-      /*site_engagement=*/0.0,
-      /*daily_notification_count=*/kDailyNotificationCount);
-
-  DisruptiveNotificationPermissionsManager::ContentSettingHelper(*hcsm)
-      .PersistRevocationEntry(url, entry);
-
-  PlatformNotificationData data;
-  data.title = u"My notification's title";
-  data.body = u"Hello, world!";
-
-  service()->DisplayNotification(kNotificationId, url,
-                                 /*document_url=*/GURL(), data,
-                                 NotificationResources());
-
-  EXPECT_EQ(1u, GetNotificationCountForType(
-                    NotificationHandler::Type::WEB_NON_PERSISTENT));
-  // Check that the correct metric is reported.
-  EXPECT_EQ(1u, recorder_
-                    ->GetEntriesByName(
-                        "SafetyHub.DisruptiveNotificationRevocations.Proposed")
-                    .size());
 }
 
 #if !BUILDFLAG(IS_ANDROID)
