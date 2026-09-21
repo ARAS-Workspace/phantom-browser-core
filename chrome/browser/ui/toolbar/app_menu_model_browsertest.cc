@@ -495,26 +495,6 @@ INSTANTIATE_TEST_SUITE_P(
                     IDC_SHOW_TRAVEL,
                     AppMenuModel::kMinOtherProfileCommandId));
 
-IN_PROC_BROWSER_TEST_F(AppMenuModelTest, YourSavedInfoSubmenusShown) {
-  AppMenuModel model(this, browser());
-  model.Init();
-
-  const size_t your_saved_info_menu_index =
-      model
-          .GetIndexOfCommandId(
-              AppMenuModel::kPasswordsAndAutofillMenuPlaceholder)
-          .value();
-  ui::SimpleMenuModel* your_saved_info_menu = static_cast<ui::SimpleMenuModel*>(
-      model.GetSubmenuModelAt(your_saved_info_menu_index));
-
-  EXPECT_TRUE(your_saved_info_menu->GetIndexOfCommandId(IDC_SHOW_CONTACT_INFO)
-                  .has_value());
-  EXPECT_TRUE(your_saved_info_menu->GetIndexOfCommandId(IDC_SHOW_IDENTITY_DOCS)
-                  .has_value());
-  EXPECT_TRUE(
-      your_saved_info_menu->GetIndexOfCommandId(IDC_SHOW_TRAVEL).has_value());
-}
-
 IN_PROC_BROWSER_TEST_F(AppMenuModelTest, ProfileSyncOnTest) {
   signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(browser()->GetProfile());
