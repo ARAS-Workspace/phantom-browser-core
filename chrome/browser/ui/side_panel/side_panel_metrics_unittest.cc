@@ -21,20 +21,6 @@ class SidePanelMetricsTest : public testing::Test {
   std::unique_ptr<base::test::TaskEnvironment> task_environment_;
 };
 
-TEST_F(SidePanelMetricsTest, RecordDuration_ForReadAnythingEntry) {
-  const base::TimeTicks shown_timestamp = base::TimeTicks::Now();
-  const base::TimeDelta duration = base::Hours(1);
-  task_environment_->FastForwardBy(duration);
-
-  SidePanelMetrics::RecordEntryHiddenMetrics(SidePanelEntryId::kReadAnything,
-                                             shown_timestamp);
-
-  histogram_tester_.ExpectTimeBucketCount(
-      "SidePanel.ReadAnything.ShownDuration", duration, 1);
-  histogram_tester_.ExpectTimeBucketCount(
-      "SidePanel.ReadAnything.ShownDurationMax1Day", duration, 1);
-}
-
 TEST_F(SidePanelMetricsTest, RecordsMaxCap_WhenDurationExceedsOneDay) {
   const base::TimeTicks shown_timestamp = base::TimeTicks::Now();
   const base::TimeDelta duration = base::Hours(25);

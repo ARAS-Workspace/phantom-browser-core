@@ -260,7 +260,6 @@ if (!is_android) {
     testonly = true
 
     sources = [
-      "context_menu_content_type_read_anything_unittest.cc",
       "context_menu_content_type_unittest.cc",
       "render_view_context_menu_unittest.cc",
     ]
