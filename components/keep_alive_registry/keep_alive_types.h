@@ -55,9 +55,6 @@ enum class KeepAliveOrigin {
   PENDING_NOTIFICATION_CLICK_EVENT,
   PENDING_NOTIFICATION_CLOSE_EVENT,
 
-  // c/b/push_messaging
-  IN_FLIGHT_PUSH_MESSAGE,
-
   // c/b/ui
   APP_LIST_SERVICE_VIEWS,
   APP_LIST_SHOWER,

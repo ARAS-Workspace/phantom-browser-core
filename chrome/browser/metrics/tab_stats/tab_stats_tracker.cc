@@ -1119,7 +1119,6 @@ bool TabStatsTracker::UmaStatsReportingDelegate::
       KeepAliveOrigin::NOTIFICATION,
       KeepAliveOrigin::PENDING_NOTIFICATION_CLICK_EVENT,
       KeepAliveOrigin::PENDING_NOTIFICATION_CLOSE_EVENT,
-      KeepAliveOrigin::IN_FLIGHT_PUSH_MESSAGE,
   });
 #else
   return false;

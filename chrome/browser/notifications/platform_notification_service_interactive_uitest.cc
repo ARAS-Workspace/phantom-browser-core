@@ -1388,10 +1388,10 @@ IN_PROC_BROWSER_TEST_F(PlatformNotificationServiceBrowserTest,
   CloseBrowserSynchronously(browser());
 
   // Wait for the close event to complete.  Closing the browser must run all app
-  // terminating callbacks, including `PushMessagingServiceImpl::Shutdown()`,
-  // which releases `PENDING_NOTIFICATION_CLOSE_EVENT` keep alives immediately
-  // without waiting for the service worker 'notificationclose' event to
-  // complete.
+  // terminating callbacks, including the `PersistentNotificationHandler`
+  // subscription, which releases `PENDING_NOTIFICATION_CLOSE_EVENT` keep alives
+  // immediately without waiting for the service worker 'notificationclose'
+  // event to complete.
   close_event_run_loop.Run();
 
   EXPECT_FALSE(KeepAliveRegistry::GetInstance()->IsOriginRegistered(

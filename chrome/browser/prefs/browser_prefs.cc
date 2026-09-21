@@ -1144,9 +1144,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   ProfileNetworkContextService::RegisterLocalStatePrefs(registry);
   profiles::RegisterPrefs(registry);
   feature_engagement::RegisterLocalStatePrefs(registry);
-#if BUILDFLAG(IS_ANDROID)
-  PushMessagingServiceImpl::RegisterPrefs(registry);
-#endif
   RegisterScreenshotPrefs(registry);
   safe_browsing::RegisterLocalStatePrefs(registry);
   search_engines::SearchEngineChoiceService::RegisterLocalStatePrefs(registry);

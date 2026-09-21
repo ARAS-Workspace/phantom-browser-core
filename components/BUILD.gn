@@ -223,7 +223,6 @@ test("components_unittests") {
     "//components/favicon_base:unit_tests",
     "//components/feature_engagement:unit_tests",
     "//components/filename_generation:unit_tests",
-    "//components/gcm_driver/crypto:unit_tests",
     "//components/google/core/common:unit_tests",
     "//components/heap_profiling/in_process:unit_tests",
     "//components/history/core/browser:unit_tests",
