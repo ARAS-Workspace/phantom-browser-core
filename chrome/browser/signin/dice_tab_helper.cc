@@ -15,25 +15,15 @@
 #include "chrome/browser/metrics/profile_metrics_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_util.h"
-#include "chrome/browser/sync/sync_service_factory.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
-#include "chrome/browser/ui/signin/signin_view_controller.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin_helper.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin_service.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin_service_factory.h"
 #include "chrome/browser/ui/webui/signin/login_ui_service.h"
 #include "chrome/browser/ui/webui/signin/login_ui_service_factory.h"
 #include "chrome/browser/ui/webui/signin/turn_sync_on_helper.h"
 #include "components/signin/public/base/signin_metrics.h"
-#include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/sync/base/features.h"
-#include "components/sync/base/user_selectable_type.h"
-#include "components/sync/service/sync_user_settings.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/navigation_handle.h"
@@ -92,48 +82,6 @@ DiceTabHelper::GetEnableSyncCallbackForBrowser() {
 }
 
 // static
-DiceTabHelper::EnableHistorySyncOptinCallback
-DiceTabHelper::GetHistorySyncOptinCallbackForBrowser() {
-  return base::BindRepeating([](Profile* profile,
-                                content::WebContents* web_contents,
-                                const CoreAccountInfo& account_info,
-                                signin_metrics::AccessPoint access_point) {
-    CHECK(syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
-    CHECK(profile);
-
-    BrowserWindowInterface* browser =
-        web_contents
-            ? GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-                  web_contents)
-            : ProfileBrowserCollection::GetForProfile(profile)
-                  ->GetLastActiveBrowser();
-    if (!browser) {
-      return;
-    }
-
-    HistorySyncOptinService* history_sync_optin_service =
-        HistorySyncOptinServiceFactory::GetForProfile(profile);
-    CHECK(history_sync_optin_service);
-
-    signin::IdentityManager* identity_manager =
-        IdentityManagerFactory::GetForProfile(profile);
-    CHECK(identity_manager);
-    AccountInfo extended_account_info =
-        identity_manager->FindExtendedAccountInfoByAccountId(
-            account_info.account_id);
-    if (extended_account_info.IsEmpty()) {
-      return;
-    }
-    CHECK(identity_manager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
-              .account_id == account_info.account_id);
-    history_sync_optin_service->StartHistorySyncOptinFlow(
-        extended_account_info,
-        std::make_unique<HistorySyncOptinServiceDefaultDelegate>(),
-        access_point);
-  });
-}
-
-// static
 DiceTabHelper::ShowSigninErrorCallback
 DiceTabHelper::GetShowSigninErrorCallbackForBrowser() {
   return base::BindRepeating([](Profile* profile,
@@ -178,7 +126,6 @@ void DiceTabHelper::InitializeSigninFlow(
     const GURL& redirect_url,
     bool record_signin_started_metrics,
     EnableSyncCallback enable_sync_callback,
-    EnableHistorySyncOptinCallback history_sync_optin_callback,
     OnSigninHeaderReceived on_signin_header_received_callback,
     ShowSigninErrorCallback show_signin_error_callback) {
   DCHECK(signin_url.is_valid());
@@ -191,7 +138,6 @@ void DiceTabHelper::InitializeSigninFlow(
   state_->signin_promo_action = promo_action;
   state_->signin_reason = reason;
   state_->enable_sync_callback = std::move(enable_sync_callback);
-  state_->history_sync_optin_callback = std::move(history_sync_optin_callback);
   state_->on_signin_header_received_callback =
       std::move(on_signin_header_received_callback);
   state_->show_signin_error_callback = std::move(show_signin_error_callback);
@@ -259,11 +205,6 @@ void DiceTabHelper::OnTokenExchangeSuccess(
 void DiceTabHelper::UpdateSyncCallback(
     EnableSyncCallback enable_sync_callback) {
   state_->enable_sync_callback = std::move(enable_sync_callback);
-}
-
-void DiceTabHelper::UpdateHistorySyncOptinCallback(
-    EnableHistorySyncOptinCallback history_sync_optin_callback) {
-  state_->history_sync_optin_callback = std::move(history_sync_optin_callback);
 }
 
 void DiceTabHelper::UpdateSigninErrorCallback(

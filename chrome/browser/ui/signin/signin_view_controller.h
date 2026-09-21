@@ -16,7 +16,6 @@
 #include "base/observer_list.h"
 #include "build/build_config.h"
 #include "chrome/browser/ui/signin/signin_modal_dialog.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin_helper.h"
 #include "chrome/browser/ui/webui/signin/signin_utils.h"
 #include "chrome/common/url_constants.h"
 #include "components/signin/public/base/signin_buildflags.h"
@@ -71,7 +70,6 @@ class SigninViewController {
  public:
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(
       kSignoutConfirmationDialogViewElementId);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kHistorySyncOptinViewId);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kSigninErrorViewId);
 
   class Observer : public base::CheckedObserver {
@@ -176,16 +174,6 @@ class SigninViewController {
   // option. It is false if the user explicitly initiated the flow.
   void ShowModalSyncConfirmationDialog(bool is_signin_intercept,
                                        bool is_sync_promo);
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // Shows the modal history sync opt in dialog as a browser-modal dialog on top
-  // of the `browser_`'s window. Executes the provided callback when the dialog
-  // closes.
-  void ShowModalHistorySyncOptInDialog(
-      bool should_close_modal_dialog,
-      HistorySyncOptinHelper::FlowCompletedCallback
-          history_optin_completed_callback);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // Shows the modal managed user notice dialog as a browser-modal dialog on
   // top of the `browser_`'s window. `domain_name` is the domain of the

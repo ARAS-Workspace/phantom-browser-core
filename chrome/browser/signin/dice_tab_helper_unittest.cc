@@ -89,7 +89,6 @@ class DiceTabHelperTest : public ChromeRenderViewHostTestHarness {
         signin_metrics::PromoAction::PROMO_ACTION_NO_SIGNIN_PROMO, GURL(),
         /*record_signin_started_metrics=*/true,
         DiceTabHelper::EnableSyncCallback(),
-        DiceTabHelper::EnableHistorySyncOptinCallback(),
         DiceTabHelper::OnSigninHeaderReceived(),
         DiceTabHelper::ShowSigninErrorCallback());
     EXPECT_TRUE(helper->IsChromeSigninPage());
@@ -209,7 +208,6 @@ TEST_F(DiceTabHelperTest, SigninPrimaryAccountMetrics) {
       signin_metrics::PromoAction::PROMO_ACTION_NEW_ACCOUNT_NO_EXISTING_ACCOUNT,
       GURL(), /*record_signin_started_metrics=*/true,
       DiceTabHelper::EnableSyncCallback(),
-      DiceTabHelper::EnableHistorySyncOptinCallback(),
       DiceTabHelper::OnSigninHeaderReceived(),
       DiceTabHelper::ShowSigninErrorCallback());
   EXPECT_EQ(1, ua_tester.GetActionCount("Signin_Signin_FromSettings"));
@@ -246,7 +244,6 @@ TEST_F(DiceTabHelperTest, SigninPrimaryAccountMetrics) {
       signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT, GURL(),
       /*record_signin_started_metrics=*/true,
       DiceTabHelper::EnableSyncCallback(),
-      DiceTabHelper::EnableHistorySyncOptinCallback(),
       DiceTabHelper::OnSigninHeaderReceived(),
       DiceTabHelper::ShowSigninErrorCallback());
   EXPECT_EQ(2, ua_tester.GetActionCount("Signin_Signin_FromSettings"));
@@ -271,7 +268,6 @@ TEST_F(DiceTabHelperTest, SigninPrimaryAccountMetrics) {
       signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT, GURL(),
       /*record_signin_started_metrics=*/false,
       DiceTabHelper::EnableSyncCallback(),
-      DiceTabHelper::EnableHistorySyncOptinCallback(),
       DiceTabHelper::OnSigninHeaderReceived(),
       DiceTabHelper::ShowSigninErrorCallback());
   EXPECT_EQ(2, ua_tester.GetActionCount("Signin_Signin_FromSettings"));
@@ -305,7 +301,6 @@ TEST_F(DiceTabHelperTest, AddSecondaryAccountMetrics) {
       signin_metrics::PromoAction::PROMO_ACTION_NEW_ACCOUNT_NO_EXISTING_ACCOUNT,
       GURL(), /*record_signin_started_metrics=*/true,
       DiceTabHelper::EnableSyncCallback(),
-      DiceTabHelper::EnableHistorySyncOptinCallback(),
       DiceTabHelper::OnSigninHeaderReceived(),
       DiceTabHelper::ShowSigninErrorCallback());
   h_tester.ExpectUniqueSample("Signin.SignIn.Started",

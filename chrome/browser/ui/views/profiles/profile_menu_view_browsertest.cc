@@ -198,10 +198,6 @@ class MockSigninUiDelegate : public signin_ui_util::SigninUiDelegate {
                bool,
                bool),
               (override));
-  MOCK_METHOD(void,
-              ShowHistorySyncOptinUI,
-              (Profile*, const CoreAccountId&, signin_metrics::AccessPoint),
-              (override));
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   MOCK_METHOD(void,
               ShowCrossDeviceSigninQrBubble,
@@ -1009,21 +1005,14 @@ IN_PROC_BROWSER_TEST_F(ProfileMenuViewWebOnlyTest, ContinueAs) {
   const signin_metrics::AccessPoint expected_access_point =
       signin_metrics::AccessPoint::kAvatarBubbleSignInWithSyncPromo;
 
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    EXPECT_CALL(mock_signin_ui_delegate,
-                ShowHistorySyncOptinUI(browser()->GetProfile(),
-                                       account_info_.account_id,
-                                       expected_access_point));
-  } else {
-    EXPECT_CALL(
-        mock_signin_ui_delegate,
-        ShowTurnSyncOnUI(browser()->GetProfile(), expected_access_point,
-                         signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT,
-                         account_info_.account_id,
-                         TurnSyncOnHelper::SigninAbortedMode::KEEP_ACCOUNT,
-                         /*is_sync_promo=*/true,
-                         /*user_already_signed_in=*/false));
-  }
+  EXPECT_CALL(
+      mock_signin_ui_delegate,
+      ShowTurnSyncOnUI(browser()->GetProfile(), expected_access_point,
+                       signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT,
+                       account_info_.account_id,
+                       TurnSyncOnHelper::SigninAbortedMode::KEEP_ACCOUNT,
+                       /*is_sync_promo=*/true,
+                       /*user_already_signed_in=*/false));
 
   ClickSigninButton();
   EXPECT_EQ(IdentityManagerFactory::GetForProfile(browser()->GetProfile())
@@ -2914,47 +2903,23 @@ IN_PROC_BROWSER_TEST_F(ProfileMenuSigninAccessPointTest,
   histogram_tester.ExpectUniqueSample("Signin.SignIn.Offered",
                                       default_access_point,
                                       /*expected_bucket_count=*/0);
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    // `Signin.SyncOptIn.Offered` should be not recorded if
-    // `syncer::kReplaceSyncPromosWithSignInPromos` is enabled. Instead,
-    // `Signin.HistorySyncOptIn.Offered` should be.
-    histogram_tester.ExpectTotalCount("Signin.SyncOptIn.Offered",
-                                      /*expected_count=*/0);
-    histogram_tester.ExpectUniqueSample("Signin.HistorySyncOptIn.Offered",
-                                        default_access_point,
-                                        /*expected_bucket_count=*/1);
+  // `Signin.SyncOptIn.Offered` should be recorded if the sync opt-in is
+  // offered from the profile menu.
+  histogram_tester.ExpectUniqueSample("Signin.SyncOptIn.Offered",
+                                      default_access_point,
+                                      /*expected_bucket_count=*/1);
 
-    EXPECT_CALL(
-        mock_signin_ui_delegate_,
-        ShowHistorySyncOptinUI(browser()->GetProfile(),
-                               account_info_.account_id, default_access_point));
-    ASSERT_NO_FATAL_FAILURE(ClickSyncButton());
-    histogram_tester.ExpectUniqueSample(
-        "Profile.Menu.ClickedActionableItem",
-        ProfileMenuViewBase::ActionableItem::kHistorySyncButton,
-        /*expected_bucket_count=*/1);
-  } else {
-    // `Signin.SyncOptIn.Offered` should be recorded if the sync opt-in is
-    // offered from the profile menu. `Signin.HistorySyncOptIn.Offered` should
-    // not be recorded.
-    histogram_tester.ExpectUniqueSample("Signin.SyncOptIn.Offered",
-                                        default_access_point,
-                                        /*expected_bucket_count=*/1);
-    histogram_tester.ExpectTotalCount("Signin.HistorySyncOptIn.Offered",
-                                      /*expected_count=*/0);
-
-    EXPECT_CALL(
-        mock_signin_ui_delegate_,
-        ShowTurnSyncOnUI(browser()->GetProfile(), default_access_point,
-                         signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT,
-                         account_info_.account_id,
-                         TurnSyncOnHelper::SigninAbortedMode::KEEP_ACCOUNT,
-                         /*is_sync_promo=*/false,
-                         /*user_already_signed_in=*/true));
-    ASSERT_NO_FATAL_FAILURE(ClickSyncButton());
-    histogram_tester.ExpectUniqueSample(
-        "Profile.Menu.ClickedActionableItem",
-        ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
-        /*expected_bucket_count=*/1);
-  }
+  EXPECT_CALL(
+      mock_signin_ui_delegate_,
+      ShowTurnSyncOnUI(browser()->GetProfile(), default_access_point,
+                       signin_metrics::PromoAction::PROMO_ACTION_WITH_DEFAULT,
+                       account_info_.account_id,
+                       TurnSyncOnHelper::SigninAbortedMode::KEEP_ACCOUNT,
+                       /*is_sync_promo=*/false,
+                       /*user_already_signed_in=*/true));
+  ASSERT_NO_FATAL_FAILURE(ClickSyncButton());
+  histogram_tester.ExpectUniqueSample(
+      "Profile.Menu.ClickedActionableItem",
+      ProfileMenuViewBase::ActionableItem::kSigninAccountButton,
+      /*expected_bucket_count=*/1);
 }

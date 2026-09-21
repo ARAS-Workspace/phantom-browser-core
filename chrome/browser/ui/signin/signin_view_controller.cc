@@ -372,9 +372,6 @@ ChromeSignoutConfirmationPromptVariant GetSignoutConfirmationPromptVariant(
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(SigninViewController,
                                       kSignoutConfirmationDialogViewElementId);
 
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(SigninViewController,
-                                      kHistorySyncOptinViewId);
-
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(SigninViewController, kSigninErrorViewId);
 
 SigninViewController::SigninViewController(BrowserWindowInterface* browser,
@@ -586,20 +583,6 @@ void SigninViewController::ShowModalSyncConfirmationDialog(
       GetOnModalDialogClosedCallback());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-void SigninViewController::ShowModalHistorySyncOptInDialog(
-    bool should_close_modal_dialog,
-    HistorySyncOptinHelper::FlowCompletedCallback callback) {
-  CHECK(syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
-  CloseModalSignin();
-  dialog_ = std::make_unique<SigninModalDialogImpl>(
-      SigninViewControllerDelegate::CreateSyncHistoryOptInDelegate(
-          &browser_.get(), should_close_modal_dialog,
-          HistorySyncOptinLaunchContext::kModal, std::move(callback)),
-      GetOnModalDialogClosedCallback());
-}
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
 void SigninViewController::ShowModalManagedUserNoticeDialog(
     std::unique_ptr<signin::EnterpriseProfileCreationDialogParams>
         create_param) {
@@ -745,7 +728,6 @@ void SigninViewController::ShowDiceSigninTab(
       signin_url, access_point, signin_reason, promo_action, redirect_url,
       /*record_signin_started_metrics=*/true,
       DiceTabHelper::GetEnableSyncCallbackForBrowser(),
-      DiceTabHelper::GetHistorySyncOptinCallbackForBrowser(),
       DiceTabHelper::OnSigninHeaderReceived(),
       DiceTabHelper::GetShowSigninErrorCallbackForBrowser());
 

@@ -103,7 +103,6 @@ ProcessDiceHeaderDelegateImpl::Create(content::WebContents* web_contents) {
       signin_metrics::PromoAction::PROMO_ACTION_NO_SIGNIN_PROMO;
   GURL redirect_url;
   EnableSyncCallback enable_sync_callback;
-  EnableHistorySyncOptinCallback history_sync_optin_callback;
   OnSigninHeaderReceived on_signin_header_received;
   ShowSigninErrorCallback show_signin_error_callback;
 
@@ -119,7 +118,6 @@ ProcessDiceHeaderDelegateImpl::Create(content::WebContents* web_contents) {
         std::move(tab_helper->GetShowSigninErrorCallback());
     if (is_sync_signin_tab) {
       enable_sync_callback = tab_helper->GetEnableSyncCallback();
-      history_sync_optin_callback = tab_helper->GetHistorySyncOptinCallback();
     }
 
     on_signin_header_received = tab_helper->GetOnSigninHeaderReceived();
@@ -135,7 +133,6 @@ ProcessDiceHeaderDelegateImpl::Create(content::WebContents* web_contents) {
   return std::make_unique<ProcessDiceHeaderDelegateImpl>(
       web_contents, is_sync_signin_tab, access_point, promo_action,
       std::move(redirect_url), std::move(enable_sync_callback),
-      std::move(history_sync_optin_callback),
       std::move(on_signin_header_received),
       std::move(show_signin_error_callback));
 }
@@ -147,7 +144,6 @@ ProcessDiceHeaderDelegateImpl::ProcessDiceHeaderDelegateImpl(
     signin_metrics::PromoAction promo_action,
     GURL redirect_url,
     EnableSyncCallback enable_sync_callback,
-    EnableHistorySyncOptinCallback history_sync_optin_callback,
     OnSigninHeaderReceived on_signin_header_received,
     ShowSigninErrorCallback show_signin_error_callback)
     : web_contents_(web_contents->GetWeakPtr()),
@@ -158,7 +154,6 @@ ProcessDiceHeaderDelegateImpl::ProcessDiceHeaderDelegateImpl(
       promo_action_(promo_action),
       redirect_url_(std::move(redirect_url)),
       enable_sync_callback_(std::move(enable_sync_callback)),
-      history_sync_optin_callback_(std::move(history_sync_optin_callback)),
       on_signin_header_received_(std::move(on_signin_header_received)),
       show_signin_error_callback_(std::move(show_signin_error_callback)) {
   DCHECK_EQ(!is_sync_signin_tab_, enable_sync_callback_.is_null());
@@ -186,26 +181,6 @@ bool ProcessDiceHeaderDelegateImpl::ShouldEnableSync() {
     return false;
   }
 
-  return true;
-}
-
-bool ProcessDiceHeaderDelegateImpl::ShouldEnableHistorySync() {
-  if (!syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    return false;
-  }
-  if (!is_sync_signin_tab_) {
-    VLOG(1) << "Do not start history sync after web sign-in [not a Chrome "
-               "sign-in tab].";
-    return false;
-  }
-  if (!history_sync_optin_callback_) {
-    VLOG(1) << "Do not start history sync after web sign-in [no sync "
-               "flow in progress].";
-    return false;
-  }
-  if (!signin_util::IsValidAccessPointForHistoryOptinScreen(access_point_)) {
-    return false;
-  }
   return true;
 }
 
@@ -357,16 +332,6 @@ void ProcessDiceHeaderDelegateImpl::CompleteChromeSignInAfterGaiaSignin(
     tab_helper->OnSyncSigninFlowComplete();
   }
 
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    if (!ShouldEnableHistorySync()) {
-      return;
-    }
-    std::move(history_sync_optin_callback_)
-        .Run(&profile_.get(), web_contents, account_info, access_point_);
-    Redirect();
-    return;
-  }
-
   if (!ShouldEnableSync()) {
     // No special treatment is needed if the user is not enabling sync.
     return;
@@ -390,7 +355,7 @@ void ProcessDiceHeaderDelegateImpl::HandleTokenExchangeFailure(
     tab_helper->OnSyncSigninFlowComplete();
   }
 
-  if (ShouldEnableHistorySync() || ShouldEnableSync()) {
+  if (ShouldEnableSync()) {
     Redirect();
   }
 

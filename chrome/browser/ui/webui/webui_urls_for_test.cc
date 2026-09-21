@@ -202,7 +202,6 @@ base::span<const std::string_view> GetUntestedChromeUrlsForTest() {
 #endif
       // TODO(crbug.com/40710256): Test failure due to excessive output.
       "chrome://discards",
-      "chrome://history-sync-optin",
       // Not a valid URL; only internals/session-service is valid.
       "chrome://internals",
       // Note: Disabled because a DCHECK fires when directly visiting the URL.

@@ -129,7 +129,6 @@
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/webui/browser_switch/browser_switch_ui.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin/history_sync_optin_ui.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
@@ -309,7 +308,6 @@ void RegisterChromeWebUIConfigs() {
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   map.AddWebUIConfig(std::make_unique<BrowserSwitchUIConfig>());
-  map.AddWebUIConfig(std::make_unique<HistorySyncOptinUIConfig>());
   map.AddWebUIConfig(std::make_unique<WhatsNewUIConfig>());
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 

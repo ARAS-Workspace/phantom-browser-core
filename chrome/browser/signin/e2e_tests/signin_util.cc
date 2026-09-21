@@ -28,7 +28,6 @@
 #include "google_apis/gaia/gaia_urls.h"
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-#include "chrome/browser/ui/webui/signin/history_sync_optin/history_sync_optin_ui.h"
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 namespace signin::test {
 
@@ -106,43 +105,23 @@ void SignInFunctions::SignInFromSettingsWithSyncChoice(
               GURL("chrome://sync-confirmation"),
               SyncConfirmationStyle::kDefaultModal,
               /*is_sync_promo=*/true));
-  std::unique_ptr<content::TestNavigationObserver> history_sync_observer =
-      std::make_unique<content::TestNavigationObserver>(
-          HistorySyncOptinUI::AppendHistorySyncOptinQueryParams(
-              GURL("chrome://history-sync-optin"),
-              HistorySyncOptinLaunchContext::kModal));
   sync_confirmation_observer->StartWatchingNewWebContents();
-  history_sync_observer->StartWatchingNewWebContents();
 
   SignInFromSettings(test_account, previously_signed_in_accounts,
                      /*complete_signin_operation=*/true);
   observer.WaitForAccountChanges(previously_signed_in_accounts + 1,
                                  PrimaryAccountWait::kWaitForAdded);
 
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    history_sync_observer->Wait();
-    switch (sync_choice) {
-      case SyncChoice::kAcceptAllOptionalDataTypesSync:
-        EXPECT_TRUE(login_ui_test_utils::ConfirmHistorySyncOptinDialog(
-            browser_.Run(), kDialogTimeout));
-        break;
-      case SyncChoice::kRejectOptionalDateTypesSync:
-        EXPECT_TRUE(login_ui_test_utils::RejectHistorySyncOptinDialog(
-            browser_.Run(), kDialogTimeout));
-        break;
-    }
-  } else {
-    sync_confirmation_observer->Wait();
-    switch (sync_choice) {
-      case SyncChoice::kAcceptAllOptionalDataTypesSync:
-        EXPECT_TRUE(login_ui_test_utils::ConfirmSyncConfirmationDialog(
-            browser_.Run(), kDialogTimeout));
-        break;
-      case SyncChoice::kRejectOptionalDateTypesSync:
-        EXPECT_TRUE(login_ui_test_utils::CancelSyncConfirmationDialog(
-            browser_.Run(), kDialogTimeout));
-        break;
-    }
+  sync_confirmation_observer->Wait();
+  switch (sync_choice) {
+    case SyncChoice::kAcceptAllOptionalDataTypesSync:
+      EXPECT_TRUE(login_ui_test_utils::ConfirmSyncConfirmationDialog(
+          browser_.Run(), kDialogTimeout));
+      break;
+    case SyncChoice::kRejectOptionalDateTypesSync:
+      EXPECT_TRUE(login_ui_test_utils::CancelSyncConfirmationDialog(
+          browser_.Run(), kDialogTimeout));
+      break;
   }
 #endif  // BUILDFLAG(!ENABLE_DICE_SUPPORT)
 }

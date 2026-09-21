@@ -251,10 +251,6 @@ class MockSigninUiDelegate : public signin_ui_util::SigninUiDelegate {
                signin_metrics::AccessPoint,
                signin_metrics::PromoAction),
               (override));
-  MOCK_METHOD(void,
-              ShowHistorySyncOptinUI,
-              (Profile*, const CoreAccountId&, signin_metrics::AccessPoint),
-              (override));
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   MOCK_METHOD(void,
               ShowCrossDeviceSigninQrBubble,
@@ -670,18 +666,6 @@ class AvatarToolbarButtonInterfaceBaseBrowserTest {
     GetTestSyncService()->SetAllowedByEnterprisePolicy(false);
     // Disabling sync by policy resets the sync setup.
     GetTestSyncService()->SetInitialSyncFeatureSetupComplete(false);
-    GetTestSyncService()->FireStateChanged();
-  }
-
-  void SimulateTypeManagedByPolicy(syncer::UserSelectableType type) {
-    GetTestSyncService()->GetUserSettings()->SetTypeIsManagedByPolicy(type,
-                                                                      true);
-    GetTestSyncService()->FireStateChanged();
-  }
-
-  void SimulateTypeManagedByCustodian(syncer::UserSelectableType type) {
-    GetTestSyncService()->GetUserSettings()->SetTypeIsManagedByCustodian(type,
-                                                                         true);
     GetTestSyncService()->FireStateChanged();
   }
 
@@ -1495,76 +1479,6 @@ class AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest
     InteractiveFeaturePromoTest::TearDownOnMainThread();
   }
 };
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-enum class ManagedBy {
-  kPolicy,
-  kCustodian,
-};
-
-struct HistorySyncOptinSyncManagedTypeTestCase {
-  ManagedBy managed_by;
-  syncer::UserSelectableType managed_type;
-};
-
-class AvatarToolbarButtonHistorySyncOptinManagedTypeTest
-    : public AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest,
-      public WithParamInterface<HistorySyncOptinSyncManagedTypeTestCase> {
- private:
-  base::test::ScopedFeatureList feature_list_{
-      syncer::kReplaceSyncPromosWithSignInPromos};
-};
-
-const HistorySyncOptinSyncManagedTypeTestCase
-    kHistorySyncOptinSyncManagedTypeTestCases[] = {
-        {
-            ManagedBy::kPolicy,
-            syncer::UserSelectableType::kHistory,
-        },
-        {
-            ManagedBy::kPolicy,
-            syncer::UserSelectableType::kTabs,
-        },
-        {
-            ManagedBy::kCustodian,
-            syncer::UserSelectableType::kHistory,
-        },
-        {
-            ManagedBy::kCustodian,
-            syncer::UserSelectableType::kTabs,
-        },
-};
-
-TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
-                             AvatarToolbarButtonHistorySyncOptinManagedTypeTest,
-                             HistorySyncOptinNotShownWhenSyncManaged) {
-  switch (GetParam().managed_by) {
-    case ManagedBy::kPolicy:
-      SimulateTypeManagedByPolicy(GetParam().managed_type);
-      break;
-    case ManagedBy::kCustodian:
-      SimulateTypeManagedByCustodian(GetParam().managed_type);
-      break;
-    default:
-      NOTREACHED();
-  }
-  AvatarToolbarButtonInterface* avatar =
-      GetAvatarToolbarButtonInterface(browser());
-  AvatarToolbarButtonTestAccessor avatar_accessor(browser());
-  ASSERT_EQ(avatar_accessor.GetText(),
-            l10n_util::GetStringFUTF16(IDS_AVATAR_BUTTON_GREETING,
-                                       test_given_name()));
-  avatar->ClearActiveStateForTesting();
-  // The greeting should NOT be followed by the history sync opt-in entry point
-  // if sync is not allowed.
-  EXPECT_TRUE(avatar_accessor.GetText().empty());
-}
-
-INSTANTIATE_TEST_SUITE_P(HistorySyncOptinManagedType,
-                         AvatarToolbarButtonHistorySyncOptinManagedTypeTest,
-                         ValuesIn(kHistorySyncOptinSyncManagedTypeTestCases));
-
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 // Test suite for testing `AvatarToolbarButton`'s responsibility of updating
 // color information in `ProfileAttributesStorage`.

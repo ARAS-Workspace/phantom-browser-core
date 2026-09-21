@@ -60,15 +60,6 @@ class SigninViewControllerDelegateViews
       SyncConfirmationStyle style,
       bool is_sync_promo);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  static std::unique_ptr<views::WebView> CreateHistorySyncOptInWebView(
-      BrowserWindowInterface* browser,
-      bool should_close_modal_dialog,
-      HistorySyncOptinLaunchContext launch_context,
-      HistorySyncOptinHelper::FlowCompletedCallback
-          history_optin_completed_callback);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
   static std::unique_ptr<views::WebView> CreateSigninErrorWebView(
       BrowserWindowInterface* browser);
 

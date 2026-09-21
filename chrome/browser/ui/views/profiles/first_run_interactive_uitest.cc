@@ -147,10 +147,6 @@ enum class SyncButtonsFeatureConfig : int {
   kButtonsStillLoading = 4,
 };
 
-GURL GetHistorySyncOptinURL() {
-  return GURL("chrome://history-sync-optin?launch_context=0");
-}
-
 std::unique_ptr<KeyedService> CreateTestSyncService(
     content::BrowserContext* context) {
   return std::make_unique<syncer::TestSyncService>();
@@ -480,30 +476,6 @@ class FirstRunInteractiveUiBaseTest
     } else {
       static const base::NoDestructor<DeepQuery> kQuery(
           {"sync-confirmation-app", "#settingsButton"});
-      return *kQuery;
-    }
-  }
-
-  const DeepQuery& GetOptInSyncHistoryButtonQuery() const {
-    if (UseRefreshedView()) {
-      static const base::NoDestructor<DeepQuery> kQuery(
-          {"history-sync-optin-app-refresh", "#acceptButton"});
-      return *kQuery;
-    } else {
-      static const base::NoDestructor<DeepQuery> kQuery(
-          {"history-sync-optin-app", "#acceptButton"});
-      return *kQuery;
-    }
-  }
-
-  const DeepQuery& GetDontSyncHistoryButtonQuery() const {
-    if (UseRefreshedView()) {
-      static const base::NoDestructor<DeepQuery> kQuery(
-          {"history-sync-optin-app-refresh", "#rejectButton"});
-      return *kQuery;
-    } else {
-      static const base::NoDestructor<DeepQuery> kQuery(
-          {"history-sync-optin-app", "#rejectButton"});
       return *kQuery;
     }
   }
@@ -1078,41 +1050,23 @@ IN_PROC_BROWSER_TEST_P(FirstRunInteractiveUiTestWithSyncService, MAYBE_SignIn) {
   // Pulled out of the test sequence because it waits using `RunLoop`s.
   SimulateSignIn(kTestEmail, kTestGivenName);
 
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    GURL history_page_url = GetHistorySyncOptinURL();
-    RunTestSequenceInContext(
-        views::ElementTrackerViews::GetContextForView(view()),
-        // Web Contents already instrumented in the previous sequence.
-        If([this]() { return UseRevampedView(); },
-           Then(WaitForWebContentsNavigation(
-               kWebContentsId,
-               GURL(chrome::kChromeUIIntroURL)
-                   .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
-        WaitForWebContentsNavigation(kWebContentsId, history_page_url),
-        // Button is visible once capabilities are loaded or defaulted.
-        WaitForButtonVisible(kWebContentsId, GetDontSyncHistoryButtonQuery()),
-        EnsurePresent(kWebContentsId, GetDontSyncHistoryButtonQuery()),
-        PressJsButton(kWebContentsId, GetDontSyncHistoryButtonQuery())
-            .SetMustRemainVisible(false));
-  } else {
-    GURL sync_page_url = AppendSyncConfirmationQueryParams(
-        GURL("chrome://sync-confirmation/"), SyncConfirmationStyle::kWindow,
-        /*is_sync_promo=*/true);
-    RunTestSequenceInContext(
-        views::ElementTrackerViews::GetContextForView(view()),
-        // Web Contents already instrumented in the previous sequence.
-        If([this]() { return UseRevampedView(); },
-           Then(WaitForWebContentsNavigation(
-               kWebContentsId,
-               GURL(chrome::kChromeUIIntroURL)
-                   .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
-        WaitForWebContentsNavigation(kWebContentsId, sync_page_url),
-        // Button is visible once capabilities are loaded or defaulted.
-        WaitForButtonVisible(kWebContentsId, GetDontSyncButtonQuery()),
-        EnsurePresent(kWebContentsId, GetDontSyncButtonQuery()),
-        PressJsButton(kWebContentsId, GetDontSyncButtonQuery())
-            .SetMustRemainVisible(false));
-  }
+  GURL sync_page_url = AppendSyncConfirmationQueryParams(
+      GURL("chrome://sync-confirmation/"), SyncConfirmationStyle::kWindow,
+      /*is_sync_promo=*/true);
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      // Web Contents already instrumented in the previous sequence.
+      If([this]() { return UseRevampedView(); },
+         Then(WaitForWebContentsNavigation(
+             kWebContentsId,
+             GURL(chrome::kChromeUIIntroURL)
+                 .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage)))),
+      WaitForWebContentsNavigation(kWebContentsId, sync_page_url),
+      // Button is visible once capabilities are loaded or defaulted.
+      WaitForButtonVisible(kWebContentsId, GetDontSyncButtonQuery()),
+      EnsurePresent(kWebContentsId, GetDontSyncButtonQuery()),
+      PressJsButton(kWebContentsId, GetDontSyncButtonQuery())
+          .SetMustRemainVisible(false));
 
   RunTestSequenceInContext(
       views::ElementTrackerViews::GetContextForView(view()),
@@ -1588,16 +1542,9 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest,
       "Signin.SignIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
   histogram_tester().ExpectUniqueSample(
       "Signin.SignIn.Completed", signin_metrics::AccessPoint::kForYouFre, 1);
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    histogram_tester().ExpectUniqueSample(
-        "Signin.HistorySyncOptIn.Started",
-        signin_metrics::AccessPoint::kForYouFre, 0);
-    histogram_tester().ExpectTotalCount("Signin.HistorySyncOptIn.Completed", 0);
-  } else {
-    histogram_tester().ExpectUniqueSample(
-        "Signin.SyncOptIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
-    histogram_tester().ExpectTotalCount("Signin.SyncOptIn.Completed", 0);
-  }
+  histogram_tester().ExpectUniqueSample(
+      "Signin.SyncOptIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
+  histogram_tester().ExpectTotalCount("Signin.SyncOptIn.Completed", 0);
   histogram_tester().ExpectUniqueSample(
       "ProfilePicker.FirstRun.ExitStatus",
       ProfilePicker::FirstRunExitStatus::kCompleted, 1);
@@ -1698,69 +1645,37 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
   histogram_tester().ExpectUniqueSample(
       "Signin.SignIn.Completed", signin_metrics::AccessPoint::kForYouFre, 1);
 
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    GURL history_page_url = GetHistorySyncOptinURL();
-    RunTestSequenceInContext(
-        views::ElementTrackerViews::GetContextForView(view()),
-        // Web Contents already instrumented in the previous sequence.
-        WaitForStateChange(kWebContentsId,
-                           PageWithUrl(history_page_url.spec())),
-        Do([&] {
-          histogram_tester().ExpectUniqueSample(
-              "Signin.HistorySyncOptIn.Started",
-              signin_metrics::AccessPoint::kForYouFre, 1);
-        }),
-        // Button is visible once capabilities are loaded or defaulted.
-        WaitForButtonVisible(kWebContentsId, GetOptInSyncHistoryButtonQuery()),
+  GURL sync_page_url = AppendSyncConfirmationQueryParams(
+      GURL("chrome://sync-confirmation/"), SyncConfirmationStyle::kWindow,
+      /*is_sync_promo=*/true);
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      // Web Contents already instrumented in the previous sequence.
+      WaitForStateChange(kWebContentsId, PageWithUrl(sync_page_url.spec())),
+      Do([&] {
+        histogram_tester().ExpectUniqueSample(
+            "Signin.SyncOptIn.Started",
+            signin_metrics::AccessPoint::kForYouFre, 1);
+      }),
 
-        EnsurePresent(kWebContentsId, GetOptInSyncHistoryButtonQuery()),
-        PressJsButton(kWebContentsId, GetOptInSyncHistoryButtonQuery())
-            .SetMustRemainVisible(false),
+      // Button is visible once capabilities are loaded or defaulted.
+      WaitForButtonVisible(kWebContentsId, GetOptInSyncButtonQuery()),
 
-        CompleteSearchEngineChoiceStep(),
-        If([this]() { return !UseRevampedView(); },
-           Then(CompleteDefaultBrowserStep())),
-        If([this]() { return UseRevampedView(); },
-           Then(CompleteFinishOrContinueStep())));
-  } else {
-    GURL sync_page_url = AppendSyncConfirmationQueryParams(
-        GURL("chrome://sync-confirmation/"), SyncConfirmationStyle::kWindow,
-        /*is_sync_promo=*/true);
-    RunTestSequenceInContext(
-        views::ElementTrackerViews::GetContextForView(view()),
-        // Web Contents already instrumented in the previous sequence.
-        WaitForStateChange(kWebContentsId, PageWithUrl(sync_page_url.spec())),
-        Do([&] {
-          histogram_tester().ExpectUniqueSample(
-              "Signin.SyncOptIn.Started",
-              signin_metrics::AccessPoint::kForYouFre, 1);
-        }),
+      EnsurePresent(kWebContentsId, GetOptInSyncButtonQuery()),
+      PressJsButton(kWebContentsId, GetOptInSyncButtonQuery())
+          .SetMustRemainVisible(false),
 
-        // Button is visible once capabilities are loaded or defaulted.
-        WaitForButtonVisible(kWebContentsId, GetOptInSyncButtonQuery()),
-
-        EnsurePresent(kWebContentsId, GetOptInSyncButtonQuery()),
-        PressJsButton(kWebContentsId, GetOptInSyncButtonQuery())
-            .SetMustRemainVisible(false),
-
-        CompleteSearchEngineChoiceStep(),
-        If([this]() { return !UseRevampedView(); },
-           Then(CompleteDefaultBrowserStep())),
-        If([this]() { return UseRevampedView(); },
-           Then(CompleteFinishOrContinueStep())));
-  }
+      CompleteSearchEngineChoiceStep(),
+      If([this]() { return !UseRevampedView(); },
+         Then(CompleteDefaultBrowserStep())),
+      If([this]() { return UseRevampedView(); },
+         Then(CompleteFinishOrContinueStep())));
 
   WaitForPickerClosed();
 
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    histogram_tester().ExpectUniqueSample(
-        "Signin.HistorySyncOptIn.Completed",
-        signin_metrics::AccessPoint::kForYouFre, 1);
-  } else {
-    histogram_tester().ExpectUniqueSample(
-        "Signin.SyncOptIn.Completed", signin_metrics::AccessPoint::kForYouFre,
-        1);
-  }
+  histogram_tester().ExpectUniqueSample(
+      "Signin.SyncOptIn.Completed", signin_metrics::AccessPoint::kForYouFre,
+      1);
 
   histogram_tester().ExpectBucketCount(
       search_engines::kSearchEngineChoiceScreenEventsHistogram,
@@ -1781,20 +1696,11 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
       "Signin.SignIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
   histogram_tester().ExpectUniqueSample(
       "Signin.SignIn.Completed", signin_metrics::AccessPoint::kForYouFre, 1);
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    histogram_tester().ExpectUniqueSample(
-        "Signin.HistorySyncOptIn.Started",
-        signin_metrics::AccessPoint::kForYouFre, 1);
-    histogram_tester().ExpectUniqueSample(
-        "Signin.HistorySyncOptIn.Completed",
-        signin_metrics::AccessPoint::kForYouFre, 1);
-  } else {
-    histogram_tester().ExpectUniqueSample(
-        "Signin.SyncOptIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
-    histogram_tester().ExpectUniqueSample(
-        "Signin.SyncOptIn.Completed", signin_metrics::AccessPoint::kForYouFre,
-        1);
-  }
+  histogram_tester().ExpectUniqueSample(
+      "Signin.SyncOptIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
+  histogram_tester().ExpectUniqueSample(
+      "Signin.SyncOptIn.Completed", signin_metrics::AccessPoint::kForYouFre,
+      1);
   histogram_tester().ExpectUniqueSample(
       "Signin.SyncButtons.Shown",
       *ExpectedButtonShownMetric(SyncButtonsFeatureConfig()), 1);
@@ -1872,46 +1778,26 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
   // Pulled out of the test sequence because it waits using `RunLoop`s.
   SimulateSignIn(kTestEmail, kTestGivenName);
 
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    GURL history_page_url = GetHistorySyncOptinURL();
-    RunTestSequenceInContext(
-        views::ElementTrackerViews::GetContextForView(view()),
-        // Web Contents already instrumented in the previous sequence.
-        WaitForStateChange(kWebContentsId,
-                           PageWithUrl(history_page_url.spec())),
-        // Button is visible once capabilities are loaded or defaulted.
-        WaitForButtonVisible(kWebContentsId, GetDontSyncHistoryButtonQuery()),
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      // Web Contents already instrumented in the previous sequence.
+      WaitForStateChange(kWebContentsId,
+                         PageWithUrl(AppendSyncConfirmationQueryParams(
+                                         GURL("chrome://sync-confirmation/"),
+                                         SyncConfirmationStyle::kWindow,
+                                         /*is_sync_promo=*/true)
+                                         .spec())),
+      // Button is visible once capabilities are loaded or defaulted.
+      WaitForButtonVisible(kWebContentsId, GetDontSyncButtonQuery()),
 
-        EnsurePresent(kWebContentsId, GetDontSyncHistoryButtonQuery()),
-        PressJsButton(kWebContentsId, GetDontSyncHistoryButtonQuery()),
+      EnsurePresent(kWebContentsId, GetDontSyncButtonQuery()),
+      PressJsButton(kWebContentsId, GetDontSyncButtonQuery()),
 
-        CompleteSearchEngineChoiceStep(),
-        If([this]() { return !UseRevampedView(); },
-           Then(CompleteDefaultBrowserStep())),
-        If([this]() { return UseRevampedView(); },
-           Then(CompleteFinishOrContinueStep())));
-  } else {
-    RunTestSequenceInContext(
-        views::ElementTrackerViews::GetContextForView(view()),
-        // Web Contents already instrumented in the previous sequence.
-        WaitForStateChange(kWebContentsId,
-                           PageWithUrl(AppendSyncConfirmationQueryParams(
-                                           GURL("chrome://sync-confirmation/"),
-                                           SyncConfirmationStyle::kWindow,
-                                           /*is_sync_promo=*/true)
-                                           .spec())),
-        // Button is visible once capabilities are loaded or defaulted.
-        WaitForButtonVisible(kWebContentsId, GetDontSyncButtonQuery()),
-
-        EnsurePresent(kWebContentsId, GetDontSyncButtonQuery()),
-        PressJsButton(kWebContentsId, GetDontSyncButtonQuery()),
-
-        CompleteSearchEngineChoiceStep(),
-        If([this]() { return !UseRevampedView(); },
-           Then(CompleteDefaultBrowserStep())),
-        If([this]() { return UseRevampedView(); },
-           Then(CompleteFinishOrContinueStep())));
-  }
+      CompleteSearchEngineChoiceStep(),
+      If([this]() { return !UseRevampedView(); },
+         Then(CompleteDefaultBrowserStep())),
+      If([this]() { return UseRevampedView(); },
+         Then(CompleteFinishOrContinueStep())));
 
   // Wait for the picker to be closed and deleted.
   WaitForPickerClosed();
@@ -1927,16 +1813,9 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
       "Signin.SignIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
   histogram_tester().ExpectUniqueSample(
       "Signin.SignIn.Completed", signin_metrics::AccessPoint::kForYouFre, 1);
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    histogram_tester().ExpectUniqueSample(
-        "Signin.HistorySyncOptIn.Started",
-        signin_metrics::AccessPoint::kForYouFre, 1);
-    histogram_tester().ExpectTotalCount("Signin.HistorySyncOptIn.Completed", 0);
-  } else {
-    histogram_tester().ExpectUniqueSample(
-        "Signin.SyncOptIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
-    histogram_tester().ExpectTotalCount("Signin.SyncOptIn.Completed", 0);
-  }
+  histogram_tester().ExpectUniqueSample(
+      "Signin.SyncOptIn.Started", signin_metrics::AccessPoint::kForYouFre, 1);
+  histogram_tester().ExpectTotalCount("Signin.SyncOptIn.Completed", 0);
   histogram_tester().ExpectUniqueSample(
       "Signin.SyncButtons.Shown",
       *ExpectedButtonShownMetric(SyncButtonsFeatureConfig()), 1);
@@ -2026,15 +1905,6 @@ class FirstRunWithHatsInteractiveUiTest
   }
 
   InteractiveTestApi::MultiStep DeclineHistorySync() {
-    if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-      return Steps(
-          WaitForWebContentsNavigation(kWebContentsId,
-                                       GetHistorySyncOptinURL()),
-          WaitForButtonVisible(kWebContentsId, GetDontSyncHistoryButtonQuery()),
-          EnsurePresent(kWebContentsId, GetDontSyncHistoryButtonQuery()),
-          PressJsButton(kWebContentsId, GetDontSyncHistoryButtonQuery())
-              .SetMustRemainVisible(false));
-    }
     GURL sync_page_url = AppendSyncConfirmationQueryParams(
         GURL("chrome://sync-confirmation/"), SyncConfirmationStyle::kWindow,
         /*is_sync_promo=*/true);

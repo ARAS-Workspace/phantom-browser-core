@@ -449,9 +449,6 @@ inline constexpr char kChromeUIProfilePickerStartupQuery[] = "startup";
 inline constexpr char kChromeUIProfilePickerOmniboxEverywhereQuery[] =
     "omnibox-everywhere";
 inline constexpr char kChromeUIProfilePickerUrl[] = "chrome://profile-picker/";
-inline constexpr char kChromeUIHistorySyncOptinHost[] = "history-sync-optin";
-inline constexpr char kChromeUIHistorySyncOptinURL[] =
-    "chrome://history-sync-optin/";
 #endif
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)

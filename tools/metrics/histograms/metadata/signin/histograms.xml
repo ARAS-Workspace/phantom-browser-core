@@ -2379,8 +2379,6 @@ prefs when the profile is loaded.  -->
     Records that {OptInFlowEvent}, and logs the original access point associated
     with this event.
   </summary>
-<!-- LINT.IfChange(Signin.HistorySyncOptIn) -->
-
   <token key="OptInFlowEvent">
     <variant name="Aborted"
         summary="the history sync screen has been dismissed due to some
@@ -2409,8 +2407,6 @@ prefs when the profile is loaded.  -->
     <variant name="Started"
         summary="the user started the flow to enable history sync"/>
   </token>
-<!-- LINT.ThenChange(//chrome/browser/ui/webui/signin/history_sync_optin_helper.cc:FlowEventToString) -->
-
 </histogram>
 
 <histogram name="Signin.IdentityConfirmationSnackbarDecision"

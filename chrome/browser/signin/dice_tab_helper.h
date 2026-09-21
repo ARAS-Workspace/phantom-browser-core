@@ -40,13 +40,6 @@ class DiceTabHelper : public content::WebContentsUserData<DiceTabHelper>,
                                    signin_metrics::PromoAction,
                                    content::WebContents*,
                                    const CoreAccountInfo&)>;
-  // Callback starting the History syncing. This is a repeating callback,
-  // because multiple `ProcessDiceHeaderDelegateImpl` may make copies of it.
-  using EnableHistorySyncOptinCallback =
-      base::RepeatingCallback<void(Profile*,
-                                   content::WebContents*,
-                                   const CoreAccountInfo&,
-                                   signin_metrics::AccessPoint)>;
 
   // Callback displaying a signin error to the user. This is a repeating
   // callback, because multiple `ProcessDiceHeaderDelegateImpl` may make copies
@@ -60,9 +53,6 @@ class DiceTabHelper : public content::WebContentsUserData<DiceTabHelper>,
   // Returns the default callback to enable sync in a browser window. Does
   // nothing if there is no browser associated with the web contents.
   static EnableSyncCallback GetEnableSyncCallbackForBrowser();
-  // Returns the default callback to turn on history sync in a browser window.
-  // Does nothing if there is no browser associated with the web contents.
-  static EnableHistorySyncOptinCallback GetHistorySyncOptinCallbackForBrowser();
 
   // Returns the default callback to show a signin error in a browser window.
   // Does nothing if there is no browser associated with the web contents.
@@ -91,10 +81,6 @@ class DiceTabHelper : public content::WebContentsUserData<DiceTabHelper>,
     return state_->enable_sync_callback;
   }
 
-  const EnableHistorySyncOptinCallback& GetHistorySyncOptinCallback() {
-    return state_->history_sync_optin_callback;
-  }
-
   const ShowSigninErrorCallback& GetShowSigninErrorCallback() {
     return state_->show_signin_error_callback;
   }
@@ -120,7 +106,6 @@ class DiceTabHelper : public content::WebContentsUserData<DiceTabHelper>,
       const GURL& redirect_url,
       bool record_signin_started_metrics,
       EnableSyncCallback enable_sync_callback,
-      EnableHistorySyncOptinCallback history_sync_optin_callback,
       OnSigninHeaderReceived on_signin_header_received_callback,
       ShowSigninErrorCallback show_signin_error_callback);
 
@@ -146,8 +131,6 @@ class DiceTabHelper : public content::WebContentsUserData<DiceTabHelper>,
 
   // Updates the callbacks used by the tab helper.
   void UpdateSyncCallback(EnableSyncCallback enable_sync_callback);
-  void UpdateHistorySyncOptinCallback(
-      EnableHistorySyncOptinCallback history_sync_optin_callback);
   void UpdateSigninErrorCallback(
       ShowSigninErrorCallback show_signin_error_callback);
   // Updates the redirection url, that is used used after enabling Sync or
@@ -180,7 +163,6 @@ class DiceTabHelper : public content::WebContentsUserData<DiceTabHelper>,
     GURL redirect_url;
     GURL signin_url;
     EnableSyncCallback enable_sync_callback;
-    EnableHistorySyncOptinCallback history_sync_optin_callback;
     OnSigninHeaderReceived on_signin_header_received_callback;
     ShowSigninErrorCallback show_signin_error_callback;
 

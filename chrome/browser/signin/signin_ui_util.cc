@@ -318,19 +318,6 @@ void EnableSyncFromMultiAccountPromo(Profile* profile,
 
   signin_metrics::RecordSigninUserActionForAccessPoint(access_point);
 
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    if (!identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSignin)) {
-      signin_metrics::LogSignInStarted(
-          access_point, *ProfileMetricsServiceFactory::GetForProfile(profile));
-      identity_manager->GetPrimaryAccountMutator()->SetPrimaryAccount(
-          account.account_id, signin::ConsentLevel::kSignin, access_point);
-    }
-
-    GetSigninUiDelegate()->ShowHistorySyncOptinUI(profile, account.account_id,
-                                                  access_point);
-    return;
-  }
-
   // In the UNO model, if the account was in the web-only signed in state,
   // turning on sync will sign the account in the profile and show the sync
   // confirmation dialog.

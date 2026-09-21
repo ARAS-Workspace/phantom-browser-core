@@ -395,13 +395,8 @@ IN_PROC_BROWSER_TEST_P(LiveSignInTest, MANUAL_CancelSync) {
   CHECK(test_account.has_value());
   sign_in_functions.SignInFromSettings(*test_account, 0);
 
-  if (GetParam()) {
-    EXPECT_TRUE(login_ui_test_utils::RejectHistorySyncOptinDialog(
-        browser(), kDialogTimeout));
-  } else {
-    EXPECT_TRUE(login_ui_test_utils::CancelSyncConfirmationDialog(
-        browser(), kDialogTimeout));
-  }
+  EXPECT_TRUE(login_ui_test_utils::CancelSyncConfirmationDialog(
+      browser(), kDialogTimeout));
   // The account is still signed in, but not syncing.
   EXPECT_FALSE(
       identity_manager()->HasPrimaryAccount(signin::ConsentLevel::kSync));

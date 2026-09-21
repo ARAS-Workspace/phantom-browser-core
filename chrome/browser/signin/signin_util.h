@@ -56,23 +56,6 @@ enum class SignedInState {
   kSyncPaused = 5,
 };
 
-// Enum used to indicate if the history sync optin screen
-// should be shown or skipped.
-enum class ShouldShowHistorySyncOptinResult : int {
-  // The screen needs to be shown.
-  kShow = 0,
-  // The screen is skipped because there is no primary account in
-  // error-free state (this includes any SignedInState that is different
-  // from SignedInState::kSignedIn).
-  kSkipUserNotSignedIn = 1,
-  // The screen is skipped because syncing is disabled: this
-  // includes a null Sync service, a service disabled due to policies
-  // or the history sync setting being managed by policies.
-  kSkipSyncForbidden = 2,
-  // The screen is skipped because the user is already opted in.
-  kSkipUserAlreadyOptedIn = 3,
-};
-
 using ProfileSeparationPolicyStateSet =
     base::EnumSet<ProfileSeparationPolicyState,
                   ProfileSeparationPolicyState::kEnforcedByExistingProfile,
@@ -212,27 +195,10 @@ bool HasExplicitlyDisabledHistorySync(
     const syncer::SyncService* sync_service,
     const signin::IdentityManager* identity_manager);
 
-// Returns the value `ShouldShowHistorySyncOptinResult::kShow`
-// if the necessary conditions to show the History Sync Optin screen
-// are met. Otherwise it returns a skip reason.
-// This method does not take into account the feature flag
-// `ReplaceSyncPromosWithSignInPromos`.
-// TODO(crbug.com/457397173): Consider using also on mobile and moving the
-// method as necessary.
-ShouldShowHistorySyncOptinResult ShouldShowHistorySyncOptinScreen(
-    Profile& profile);
-
 // Enables the types history, tabs, and saved tab groups for the account
 // currently signed into Chrome. If a type cannot be enabled (e.g. by policy),
 // this does not do anything for that type.
 void EnableHistorySync(syncer::SyncService* sync_service);
-
-// Returns true if the history sync optin screen could be offered via the given
-// `access_point`. Returns false if enabling history sync is expected to be done
-// via other means for the given access point and the history sync screen should
-// not be shown.
-bool IsValidAccessPointForHistoryOptinScreen(
-    signin_metrics::AccessPoint access_point);
 
 // Show a simple error message with an "OK" button to the user, displaying
 // `error_message_id`.

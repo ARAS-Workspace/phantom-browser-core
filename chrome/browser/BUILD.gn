@@ -2631,7 +2631,6 @@ source_set("browser") {
       "//chrome/browser/ui/views/session_restore_infobar",
       "//chrome/browser/ui/webui/app_settings",
       "//chrome/browser/ui/webui/app_settings:impl",
-      "//chrome/browser/ui/webui/signin/history_sync_optin:mojo_bindings",
       "//chrome/browser/updates:impl",
       "//chrome/browser/updates:update_metrics",
       "//chrome/updater:browser_sources",

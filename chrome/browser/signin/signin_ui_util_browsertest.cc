@@ -94,12 +94,6 @@ class MockSigninUiDelegate : public SigninUiDelegateImplDice {
                bool user_already_signed_in),
               ());
   MOCK_METHOD(void,
-              ShowHistorySyncOptinUI,
-              (Profile * profile,
-               const CoreAccountId& account_id,
-               signin_metrics::AccessPoint access_point),
-              ());
-  MOCK_METHOD(void,
               ShowReauthUI,
               (Profile * profile,
                const std::string& email,
@@ -283,11 +277,7 @@ class SigninUiUtilTest_ReplaceSyncPromosWithSignInPromos
                 ShowTurnSyncOnUI(browser()->GetProfile(), access_point,
                                  promo_action, account_id, signin_aborted_mode,
                                  is_sync_promo, user_already_signed_in))
-        .Times(IsReplaceSyncPromosWithSignInPromosEnabled() ? 0 : 1);
-    EXPECT_CALL(mock_delegate_,
-                ShowHistorySyncOptinUI(browser()->GetProfile(), account_id,
-                                       access_point))
-        .Times(IsReplaceSyncPromosWithSignInPromosEnabled() ? 1 : 0);
+        .Times(1);
   }
 
  protected:

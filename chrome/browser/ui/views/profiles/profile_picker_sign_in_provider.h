@@ -125,11 +125,6 @@ class ProfilePickerSignInProvider : public content::WebContentsDelegate,
       signin_metrics::PromoAction promo_action,
       content::WebContents* contents,
       const CoreAccountInfo& account_info);
-  void FinishFlowInPickerWithHistorySyncOptin(
-      Profile* profile,
-      content::WebContents* contents,
-      const CoreAccountInfo& account_info,
-      signin_metrics::AccessPoint access_point);
   void ShowSigninError(Profile* profile,
                        content::WebContents* contents,
                        const SigninUIError& error);

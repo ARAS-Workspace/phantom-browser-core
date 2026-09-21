@@ -113,37 +113,3 @@ IN_PROC_BROWSER_TEST_F(SigninManagedUserProfileNoticeRefreshTest,
   RunTest("signin/managed_user_profile_notice_app_refresh_test.js",
           "mocha.run()");
 }
-
-class SigninTestWithHistorySync : public SigninTest {
- protected:
-  SigninTestWithHistorySync() {
-    feature_list_.InitAndEnableFeature(
-        syncer::kReplaceSyncPromosWithSignInPromos);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(SigninTestWithHistorySync, HistorySyncOptIn) {
-  set_test_loader_host(chrome::kChromeUIHistorySyncOptinHost);
-  RunTest("signin/history_sync_optin_test.js", "mocha.run()");
-}
-
-class SigninTestWithHistorySyncRefresh : public SigninTestWithHistorySync {
- protected:
-  SigninTestWithHistorySyncRefresh() {
-    feature_list_.InitWithFeatures(
-        {switches::kFirstRunDesktopRefresh,
-         switches::kFirstRunDesktopChoiceScreenRefresh},
-        {});
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(SigninTestWithHistorySyncRefresh, HistorySyncOptIn) {
-  set_test_loader_host(chrome::kChromeUIHistorySyncOptinHost);
-  RunTest("signin/history_sync_optin_app_refresh_test.js", "mocha.run()");
-}

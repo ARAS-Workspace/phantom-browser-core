@@ -184,7 +184,6 @@ void ProfilePickerReauthProvider::ShowReauth() {
       signin_metrics::Reason::kReauthentication,
       signin_metrics::PromoAction::PROMO_ACTION_NO_SIGNIN_PROMO, GURL(), false,
       DiceTabHelper::EnableSyncCallback(),
-      DiceTabHelper::EnableHistorySyncOptinCallback(),
       base::BindRepeating(
           &ProfilePickerReauthProvider::OnDiceSigninHeaderReceived,
           base::Unretained(this)),

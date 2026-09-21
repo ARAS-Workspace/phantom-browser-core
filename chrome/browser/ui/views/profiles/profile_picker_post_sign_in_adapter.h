@@ -13,7 +13,6 @@
 #include "chrome/browser/profiles/keep_alive/scoped_profile_keep_alive.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_web_contents_host.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin_helper.h"
 #include "chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.h"
 #include "chrome/browser/ui/webui/signin/signin_utils.h"
 #include "components/signin/public/base/signin_metrics.h"
@@ -22,7 +21,6 @@
 #include "third_party/skia/include/core/SkColor.h"
 
 class Profile;
-class HistorySyncOptinHelper;
 class SigninUIError;
 namespace content {
 struct ContextMenuParams;
@@ -40,14 +38,7 @@ class WebContents;
 //   - The host is closed and a browser is opened, via `FinishAndOpenBrowser()`;
 //   - The host is not closed and the profile switch screen is shown, via
 //     `SwitchToProfileSwitch()`.
-// - If the History Sync Optin Screen is used (replacing the Sync confirmation
-//   screen) then:
-//   1) It creates the `HistorySyncOptinHelper` and this object
-//   acts as its delegate to interact with `host`.
-//   2) At the end of the flow the host is closed and a browser is opened,
-//   via `FinishAndOpenBrowser().
-class ProfilePickerPostSignInAdapter : public content::WebContentsDelegate,
-                                       public HistorySyncOptinHelper::Delegate {
+class ProfilePickerPostSignInAdapter : public content::WebContentsDelegate {
  public:
   ProfilePickerPostSignInAdapter(
       ProfilePickerWebContentsHost* host,
@@ -96,17 +87,9 @@ class ProfilePickerPostSignInAdapter : public content::WebContentsDelegate,
   // switch screen. It uses the system profile for showing the switch screen.
   void SwitchToProfileSwitch(const base::FilePath& profile_path);
 
-  // HistorySyncOptinHelper::Delegate implementation:
-  void ShowHistorySyncOptinScreen(
-      Profile*,
-      HistorySyncOptinHelper::FlowCompletedCallback
-          history_optin_completed_callback) override;
-  void ShowAccountManagementScreen(
-      signin::SigninChoiceCallback on_account_management_screen_closed)
-      override;
-  void FinishFlowWithoutHistorySyncOptin() override;
-  void ShowSignInCelebration(
-      base::OnceClosure celebration_finished) override;
+  // Shows the sign-in celebration screen and runs `celebration_finished` when
+  // the screen is done.
+  virtual void ShowSignInCelebration(base::OnceClosure celebration_finished);
 
   base::WeakPtr<ProfilePickerPostSignInAdapter> GetWeakPtr() {
     return weak_ptr_factory_.GetWeakPtr();
@@ -145,7 +128,6 @@ class ProfilePickerPostSignInAdapter : public content::WebContentsDelegate,
 
   // Callbacks that finalize initialization of WebUI pages.
   void SwitchToSyncConfirmationFinished();
-  void SwitchToHistorySyncOptinFinished();
   void SwitchToSignInCelebrationFinished(base::OnceClosure celebration_finished);
 
   // Returns whether the flow is initialized (i.e. whether `Init()` has been
@@ -182,13 +164,6 @@ class ProfilePickerPostSignInAdapter : public content::WebContentsDelegate,
   // should be shown or not. E.g: Sync confirmation screen, profile switch, or
   // enterprise management.
   StepSwitchFinishedCallback step_switch_callback_;
-
-  // Steps to be executed after the user has made a choice in the history sync
-  // optin screen. Might be executed when the screen is also skipped.
-  HistorySyncOptinHelper::FlowCompletedCallback
-      on_post_signin_in_finished_callback_;
-
-  std::unique_ptr<HistorySyncOptinHelper> history_sync_optin_helper_;
 
   // Email of the signed-in account. It is set after the user finishes the
   // sign-in flow on GAIA and Chrome receives the account info.

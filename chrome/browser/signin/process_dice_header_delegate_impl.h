@@ -34,15 +34,6 @@ class ProcessDiceHeaderDelegateImpl : public ProcessDiceHeaderDelegate {
                               signin_metrics::PromoAction,
                               content::WebContents*,
                               const CoreAccountInfo&)>;
-  // Callback starting History syncing.
-  // This is similar to `DiceTabHelper::EnableHistorySyncOptinCallback` but is a
-  // once callback (vs repeating).
-  using EnableHistorySyncOptinCallback =
-      base::OnceCallback<void(Profile*,
-                              content::WebContents*,
-                              const CoreAccountInfo&,
-                              signin_metrics::AccessPoint)>;
-
   // Callback showing a signin error UI.
   // This is similar to `DiceTabHelper::ShowSigninErrorCallback` but is a once
   // callback (vs repeating).
@@ -68,7 +59,6 @@ class ProcessDiceHeaderDelegateImpl : public ProcessDiceHeaderDelegate {
       signin_metrics::PromoAction promo_action,
       GURL redirect_url,
       EnableSyncCallback enable_sync_callback,
-      EnableHistorySyncOptinCallback history_sync_optin_callback,
       OnSigninHeaderReceived on_signin_header_received,
       ShowSigninErrorCallback show_signin_error_callback);
 
@@ -95,7 +85,6 @@ class ProcessDiceHeaderDelegateImpl : public ProcessDiceHeaderDelegate {
  private:
   // Returns true if sync should be enabled after the user signs in.
   bool ShouldEnableSync();
-  bool ShouldEnableHistorySync();
   void AttemptChromeSignin(CoreAccountId account_id);
   bool AttemptSettingPrimaryAccount(const CoreAccountInfo& account_info,
                                     bool show_signin_error = true);
@@ -110,7 +99,6 @@ class ProcessDiceHeaderDelegateImpl : public ProcessDiceHeaderDelegate {
   const signin_metrics::PromoAction promo_action_;
   const GURL redirect_url_;
   EnableSyncCallback enable_sync_callback_;
-  EnableHistorySyncOptinCallback history_sync_optin_callback_;
   OnSigninHeaderReceived on_signin_header_received_;
   ShowSigninErrorCallback show_signin_error_callback_;
 

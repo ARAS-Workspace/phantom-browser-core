@@ -13,7 +13,6 @@
 #include "chrome/browser/ui/profiles/profile_customization_synced_theme_waiter.h"
 #include "chrome/browser/ui/signin/signin_modal_dialog.h"
 #include "chrome/browser/ui/signin/signin_view_controller_delegate.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin_helper.h"
 #include "chrome/browser/ui/webui/signin/profile_customization_handler.h"
 #include "google_apis/gaia/core_account_id.h"
 
@@ -86,7 +85,6 @@ class SigninInterceptFirstRunExperienceDialog
 
  private:
   class InterceptTurnSyncOnHelperDelegate;
-  class InterceptHistorySyncOptinHelperDelegate;
   friend class SigninInterceptFirstRunExperienceDialogBrowserTestBase;
 
   // Ordered list of first run steps. Some steps might be skipped but they
@@ -96,9 +94,6 @@ class SigninInterceptFirstRunExperienceDialog
     // Steps relevant for sync confirmation only.
     kTurnOnSync,
     kSyncConfirmation,
-    // Steps relevant for history sync optin screen only.
-    kStartHistorySyncOptin,
-    kShowHistorySyncScreen,
     // Common steps.
     kWaitForSyncedTheme,
     kProfileCustomization,
@@ -111,9 +106,6 @@ class SigninInterceptFirstRunExperienceDialog
   // Actions executed right after moving to a corresponding step.
   void DoTurnOnSync();
   void DoSyncConfirmation();
-
-  void DoStartHistorySync();
-  void DoShowHistorySyncOptin();
 
   void DoWaitForSyncedTheme();
   void DoProfileCustomization();
@@ -136,9 +128,6 @@ class SigninInterceptFirstRunExperienceDialog
   base::ScopedObservation<SigninViewControllerDelegate,
                           SigninViewControllerDelegate::Observer>
       dialog_delegate_observation_{this};
-
-  base::WeakPtr<InterceptHistorySyncOptinHelperDelegate>
-      history_sync_optin_delegate_;
 
   std::unique_ptr<content::WebContents>
       profile_customization_preloaded_contents_;

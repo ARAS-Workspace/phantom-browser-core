@@ -73,7 +73,6 @@ FirstRunIntroPixelTest.*
 FirstRunSignInCelebrationPixelTest.*
 GlobalErrorBubbleTest.*
 HatsBubbleTest.*
-HistorySyncOptinUIDialogPixelTest.*
 HomeButtonUiTest.*
 HungRendererDialogViewBrowserTest.*
 ImportLockDialogViewBrowserTest.*

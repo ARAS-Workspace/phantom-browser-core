@@ -29,7 +29,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/color_provider_browser_helper.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin_helper.h"
 #include "chrome/browser/ui/webui/signin/profile_customization_ui.h"
 #include "chrome/browser/ui/webui/signin/signin_url_utils.h"
 #include "chrome/browser/ui/webui/signin/signin_utils.h"
@@ -59,10 +58,6 @@
 #include "chrome/browser/ui/signin/chrome_signout_confirmation_prompt.h"
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation_ui.h"
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/ui/webui/signin/history_sync_optin/history_sync_optin_ui.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 namespace {
 
@@ -137,40 +132,6 @@ SigninViewControllerDelegateViews::CreateSyncConfirmationWebView(
       GetSyncConfirmationDialogPreferredHeight(browser->GetProfile()),
       kSyncConfirmationDialogWidth, InitializeSigninWebDialogUI(true));
 }
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-std::unique_ptr<views::WebView>
-SigninViewControllerDelegateViews::CreateHistorySyncOptInWebView(
-    BrowserWindowInterface* browser,
-    bool should_close_modal_dialog,
-    HistorySyncOptinLaunchContext launch_context,
-    HistorySyncOptinHelper::FlowCompletedCallback callback) {
-  GURL url = GURL(chrome::kChromeUIHistorySyncOptinURL);
-  // The the actual dialog's height will be set dynamically based on its
-  // contents, so the initial height does not matter.
-  auto web_view =
-      CreateDialogWebView(browser,
-                          HistorySyncOptinUI::AppendHistorySyncOptinQueryParams(
-                              url, launch_context),
-                          /*dialog_height=*/0, kModalDialogWidth,
-                          InitializeSigninWebDialogUI(false));
-  CHECK(web_view);
-  auto* helper = ColorProviderBrowserHelper::From(browser);
-  if (helper && helper->color_provider_source()) {
-    web_view->GetWebContents()->SetColorProviderSource(
-        helper->color_provider_source());
-  }
-  HistorySyncOptinUI* web_ui = web_view->GetWebContents()
-                                   ->GetWebUI()
-                                   ->GetController()
-                                   ->GetAs<HistorySyncOptinUI>();
-  DCHECK(web_ui);
-  web_view->SetProperty(views::kElementIdentifierKey,
-                        SigninViewController::kHistorySyncOptinViewId);
-  web_ui->Initialize(browser, should_close_modal_dialog, std::move(callback));
-  return web_view;
-}
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 // static
 std::unique_ptr<views::WebView>
@@ -592,26 +553,6 @@ SigninViewControllerDelegate::CreateSyncConfirmationDelegate(
       browser, ui::mojom::ModalType::kWindow, true, false,
       /*animate_on_resize=*/true);
 }
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-// static
-SigninViewControllerDelegate*
-SigninViewControllerDelegate::CreateSyncHistoryOptInDelegate(
-    BrowserWindowInterface* browser,
-    bool should_close_modal_dialog,
-    HistorySyncOptinLaunchContext launch_context,
-    HistorySyncOptinHelper::FlowCompletedCallback
-        history_optin_completed_callback) {
-  auto content_view =
-      SigninViewControllerDelegateViews::CreateHistorySyncOptInWebView(
-          browser, should_close_modal_dialog, launch_context,
-          std::move(history_optin_completed_callback));
-  return new SigninViewControllerDelegateViews(
-      std::move(content_view), browser, ui::mojom::ModalType::kWindow,
-      /*wait_for_size=*/true, /*should_show_close_button=*/false,
-      /*animate_on_resize=*/true);
-}
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // static
 SigninViewControllerDelegate*

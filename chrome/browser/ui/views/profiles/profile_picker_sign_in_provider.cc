@@ -363,17 +363,6 @@ void ProfilePickerSignInProvider::FinishFlowInPickerWithSyncConfirmation(
   FinishFlow(account_info);
 }
 
-void ProfilePickerSignInProvider::FinishFlowInPickerWithHistorySyncOptin(
-    Profile* profile,
-    content::WebContents* /*contents*/,
-    const CoreAccountInfo& account_info,
-    signin_metrics::AccessPoint /*access_point*/) {
-  CHECK_EQ(profile, profile_.get());
-  base::UmaHistogramEnumeration(kProfilePickerSignInProviderStepHistogram,
-                                SigninProviderStep::kFinishFlowHistoryOptin);
-  FinishFlow(account_info);
-}
-
 void ProfilePickerSignInProvider::ShowSigninError(
     Profile* profile,
     content::WebContents* contents,
@@ -431,9 +420,6 @@ void ProfilePickerSignInProvider::InitializeOrUpdateDiceTabHelper(
           base::BindRepeating(&ProfilePickerSignInProvider::
                                   FinishFlowInPickerWithSyncConfirmation,
                               weak_ptr_factory_.GetWeakPtr()),
-          base::BindRepeating(&ProfilePickerSignInProvider::
-                                  FinishFlowInPickerWithHistorySyncOptin,
-                              weak_ptr_factory_.GetWeakPtr()),
           DiceTabHelper::OnSigninHeaderReceived(),
           base::BindRepeating(&ProfilePickerSignInProvider::ShowSigninError,
                               weak_ptr_factory_.GetWeakPtr()));
@@ -447,8 +433,6 @@ void ProfilePickerSignInProvider::InitializeOrUpdateDiceTabHelper(
       // recovery in crbug.com/29524688).
       helper.UpdateSyncCallback(
           DiceTabHelper::GetEnableSyncCallbackForBrowser());
-      helper.UpdateHistorySyncOptinCallback(
-          DiceTabHelper::GetHistorySyncOptinCallbackForBrowser());
       helper.UpdateSigninErrorCallback(
           DiceTabHelper::GetShowSigninErrorCallbackForBrowser());
       helper.UpdateRedirectUrl(chrome::ChromeUINewTabURLAsGURL());

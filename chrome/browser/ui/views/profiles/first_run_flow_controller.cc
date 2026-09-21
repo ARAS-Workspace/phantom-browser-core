@@ -496,9 +496,8 @@ using IdentityStepsCompletedCallback =
     base::OnceCallback<void(PostHostClearedCallback post_host_cleared_callback,
                             bool is_continue_callback)>;
 
-// Instance allowing `TurnSyncOnHelper` (in legacy sync flow) or
-// `HistorySyncOptinHelper` (in new history sync flow) to drive the interface in
-// the `kPostSignIn` step.
+// Instance allowing `TurnSyncOnHelper` to drive the interface in the
+// `kPostSignIn` step.
 class FirstRunPostSignInAdapter : public ProfilePickerPostSignInAdapter {
  public:
   FirstRunPostSignInAdapter(
@@ -522,7 +521,7 @@ class FirstRunPostSignInAdapter : public ProfilePickerPostSignInAdapter {
 
   void Init(StepSwitchFinishedCallback step_switch_callback) override {
     // Stop with the sign-in navigation and show a spinner instead. The spinner
-    // will be shown until TurnSyncOnHelper or HistorySyncOptinHelper figures
+    // will be shown until TurnSyncOnHelper figures
     // out whether it's a managed account and whether sync/policies are resolved
     // (which in some cases involves fetching policies/capabilities and can take
     // a couple of seconds).
@@ -569,16 +568,6 @@ class FirstRunPostSignInAdapter : public ProfilePickerPostSignInAdapter {
   void ShowSignInCelebration(base::OnceClosure celebration_finished) override {
     ProfilePickerPostSignInAdapter::ShowSignInCelebration(
         std::move(celebration_finished));
-    if (play_celebration_sound_callback_) {
-      std::move(play_celebration_sound_callback_).Run();
-    }
-  }
-
-  void ShowAccountManagementScreen(
-      signin::SigninChoiceCallback on_account_management_screen_closed)
-      override {
-    ProfilePickerPostSignInAdapter::ShowAccountManagementScreen(
-        std::move(on_account_management_screen_closed));
     if (play_celebration_sound_callback_) {
       std::move(play_celebration_sound_callback_).Run();
     }

@@ -10,7 +10,6 @@
 #include "base/observer_list_types.h"
 #include "build/build_config.h"
 #include "chrome/browser/ui/signin/chrome_signout_confirmation_prompt.h"
-#include "chrome/browser/ui/webui/signin/history_sync_optin_helper.h"
 #include "chrome/browser/ui/webui/signin/signin_url_utils.h"
 #include "chrome/browser/ui/webui/signin/signin_utils.h"
 #include "components/signin/public/base/signin_buildflags.h"
@@ -49,17 +48,6 @@ class SigninViewControllerDelegate {
       BrowserWindowInterface* browser,
       SyncConfirmationStyle style,
       bool is_sync_promo);
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // Returns a platform-specific SigninViewControllerDelegate instance that
-  // displays the modal history sync opt in dialog. The returned object should
-  // delete itself when the window it's managing is closed.
-  static SigninViewControllerDelegate* CreateSyncHistoryOptInDelegate(
-      BrowserWindowInterface* browser,
-      bool should_close_modal_dialog,
-      HistorySyncOptinLaunchContext launch_context,
-      HistorySyncOptinHelper::FlowCompletedCallback callback);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // Returns a platform-specific SigninViewControllerDelegate instance that
   // displays the modal sign in error dialog. The returned object should delete
