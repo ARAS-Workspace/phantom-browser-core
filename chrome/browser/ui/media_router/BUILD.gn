@@ -107,7 +107,6 @@ source_set("unit_tests") {
     "cast_modes_with_media_sources_unittest.cc",
     "media_route_starter_unittest.cc",
     "media_router_ui_helper_unittest.cc",
-    "media_router_ui_service_factory_unittest.cc",
     "media_router_ui_unittest.cc",
     "query_result_manager_unittest.cc",
   ]

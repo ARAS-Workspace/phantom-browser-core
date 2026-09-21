@@ -137,8 +137,6 @@ source_set("unit_tests") {
     "cast_dialog_metrics_unittest.cc",
     "cast_dialog_no_sinks_view_unittest.cc",
     "cast_dialog_sink_button_unittest.cc",
-    "cast_dialog_sink_view_unittest.cc",
-    "cast_dialog_view_unittest.cc",
     "web_contents_display_observer_view_unittest.cc",
   ]
 

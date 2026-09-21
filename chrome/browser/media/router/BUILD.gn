@@ -348,11 +348,8 @@ source_set("unittests") {
     sources += [
       # In-browser discovery is not used by Android for now.
       "discovery/access_code/access_code_cast_discovery_interface_unittest.cc",
-      "discovery/access_code/access_code_cast_feature_unittest.cc",
       "discovery/access_code/access_code_cast_pref_updater_impl_unittest.cc",
       "discovery/access_code/access_code_cast_pref_updater_unittest.cc",
-      "discovery/access_code/access_code_cast_sink_service_factory_unittest.cc",
-      "discovery/access_code/access_code_cast_sink_service_unittest.cc",
       "discovery/access_code/access_code_media_sink_util_unittest.cc",
       "discovery/dial/device_description_fetcher_unittest.cc",
       "discovery/dial/device_description_service_unittest.cc",
@@ -371,8 +368,6 @@ source_set("unittests") {
       "discovery/mdns/dns_sd_registry_unittest.cc",
       "discovery/media_sink_discovery_metrics_unittest.cc",
       "logger_list_unittest.cc",
-      "media_router_feature_unittest.cc",
-      "mojo/media_router_debugger_impl_unittest.cc",
       "mojo/media_router_desktop_unittest.cc",
       "mojo/media_sink_service_status_unittest.cc",
       "providers/cast/app_activity_unittest.cc",

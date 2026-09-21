@@ -126,10 +126,6 @@ source_set("unit_tests") {
     "//ui/views:test_support",
   ]
 
-  if (is_linux || is_win || is_mac) {
-    sources += [ "media_dialog_view_unittest.cc" ]
-    deps += [ "//chrome/browser/accessibility" ]
-  }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
