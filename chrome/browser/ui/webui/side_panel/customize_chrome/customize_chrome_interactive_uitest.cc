@@ -309,28 +309,6 @@ class CustomizeChromeEnterpriseInteractiveTest
       scoped_browser_management_;
 };
 
-IN_PROC_BROWSER_TEST_F(CustomizeChromeEnterpriseInteractiveTest,
-                       FooterToggle_ManagementNoticePolicyChanges) {
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kLocalCustomizeChromeElementId);
-  const DeepQuery kFooterSection = {"customize-chrome-app", "#footer"};
-
-  RunTestSequence(
-      // Open non-extension new tab page.
-      AddInstrumentedTab(kNewTabElementId, chrome::ChromeUINewTabURLAsGURL()),
-      // Open customize chrome side panel.
-      OpenCustomizeChromeSidePanel(kLocalCustomizeChromeElementId),
-      // Check that the footer toggle is turned on but can't be toggled.
-      CheckFooterToggleState(kLocalCustomizeChromeElementId,
-                             /*enabled=*/true),
-      // Disable the management notice by policy.
-      Do(base::BindLambdaForTesting([=]() {
-        g_browser_process->local_state()->SetBoolean(
-            prefs::kNTPFooterManagementNoticeEnabled, false);
-      })),
-      // Check that the footer section does not exist anymore.
-      EnsureNotPresent(kLocalCustomizeChromeElementId, kFooterSection));
-}
-
 IN_PROC_BROWSER_TEST_F(
     CustomizeChromeEnterpriseInteractiveTest,
     FooterToggle_ManagementNoticeForceEnabledWithCustomPolicy) {
@@ -376,26 +354,5 @@ IN_PROC_BROWSER_TEST_F(CustomizeChromeEnterpriseInteractiveTest,
           WaitForElementExists(kLocalCustomizeChromeElementId, kFooterSection),
           WaitForElementToRender(kLocalCustomizeChromeElementId,
                                  kFooterSection)));
-}
-
-IN_PROC_BROWSER_TEST_F(CustomizeChromeEnterpriseInteractiveTest,
-                       FooterToggle_AllNoticesDisabledByPolicy) {
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kLocalCustomizeChromeElementId);
-  const DeepQuery kFooterSection = {"customize-chrome-app", "#footer"};
-
-  RunTestSequence(
-      // Disable both management notice and extension attribution.
-      Do(base::BindLambdaForTesting([=, this]() {
-        g_browser_process->local_state()->SetBoolean(
-            prefs::kNTPFooterManagementNoticeEnabled, false);
-        browser()->GetProfile()->GetPrefs()->SetBoolean(
-            prefs::kNTPFooterExtensionAttributionEnabled, false);
-      })),
-      // Open non-extension new tab page.
-      AddInstrumentedTab(kNewTabElementId, chrome::ChromeUINewTabURLAsGURL()),
-      // Open customize chrome side panel.
-      OpenCustomizeChromeSidePanel(kLocalCustomizeChromeElementId),
-      // Check that the footer section does not exist.
-      EnsureNotPresent(kLocalCustomizeChromeElementId, kFooterSection));
 }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

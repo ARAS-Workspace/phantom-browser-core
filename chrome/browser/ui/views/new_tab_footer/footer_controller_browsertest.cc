@@ -268,63 +268,6 @@ IN_PROC_BROWSER_TEST_P(FooterControllerEnterpriseTest, NoticePolicyEnabled) {
   NavigateCurrentTab(GURL(kNonNtpUrl));
   EXPECT_FALSE(footer()->GetVisible());
 }
-
-IN_PROC_BROWSER_TEST_P(FooterControllerEnterpriseTest, NoticePolicyDisabled) {
-  policy::ScopedManagementServiceOverrideForTesting browser_management(
-      policy::ManagementServiceFactory::GetForProfile(profile()),
-      managed() ? policy::EnterpriseManagementAuthority::DOMAIN_LOCAL
-                : policy::EnterpriseManagementAuthority::NONE);
-  local_state()->SetBoolean(prefs::kNTPFooterManagementNoticeEnabled, false);
-
-  NavigateCurrentTab(chrome::ChromeUINewTabPageURLAsGURL());
-  EXPECT_FALSE(footer()->GetVisible());
-}
-
-IN_PROC_BROWSER_TEST_P(FooterControllerEnterpriseTest, NoticePolicyChanged) {
-  policy::ScopedManagementServiceOverrideForTesting browser_management(
-      policy::ManagementServiceFactory::GetForProfile(profile()),
-      managed() ? policy::EnterpriseManagementAuthority::DOMAIN_LOCAL
-                : policy::EnterpriseManagementAuthority::NONE);
-  ASSERT_FALSE(footer()->GetVisible());
-
-  NavigateCurrentTab(chrome::ChromeUINewTabURLAsGURL());
-  EXPECT_EQ(managed(), footer()->GetVisible());
-
-  local_state()->SetBoolean(prefs::kNTPFooterManagementNoticeEnabled, false);
-  EXPECT_FALSE(footer()->GetVisible());
-
-  local_state()->SetBoolean(prefs::kNTPFooterManagementNoticeEnabled, true);
-  EXPECT_EQ(managed(), footer()->GetVisible());
-}
-
-IN_PROC_BROWSER_TEST_P(FooterControllerEnterpriseTest,
-                       NoticeItemMetricsRecorded) {
-  if (!managed()) {
-    GTEST_SKIP() << "This test is relevant only for managed case. Unmanaged "
-                    "case is covered by the extension test.";
-  }
-
-  policy::ScopedManagementServiceOverrideForTesting browser_management(
-      policy::ManagementServiceFactory::GetForProfile(profile()),
-      policy::EnterpriseManagementAuthority::DOMAIN_LOCAL);
-  VerifyNoticeMetricsRecorded(0);
-
-  NavigateCurrentTab(chrome::ChromeUINewTabURLAsGURL());
-  ASSERT_EQ(managed(), footer()->GetVisible());
-  VerifyNoticeMetricsRecorded(/*total_count= */ 1, /*management_count= */ 1);
-
-  auto extension = LoadNtpExtension();
-  NavigateCurrentTab(extension->url());
-  VerifyNoticeMetricsRecorded(/*total_count= */ 3, /*management_count= */ 2,
-                              /*extension_count= */ 1);
-
-  local_state()->SetBoolean(prefs::kNTPFooterManagementNoticeEnabled, false);
-  profile()->GetPrefs()->SetBoolean(
-      prefs::kNTPFooterExtensionAttributionEnabled, false);
-  NavigateCurrentTab(extension->url());
-  VerifyNoticeMetricsRecorded(/*total_count= */ 3, /*management_count= */ 2,
-                              /*extension_count= */ 1);
-}
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 class FooterControllerSplitViewTest : public FooterControllerExtensionTestBase {

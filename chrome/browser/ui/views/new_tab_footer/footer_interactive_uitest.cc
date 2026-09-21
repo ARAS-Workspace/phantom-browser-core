@@ -419,22 +419,6 @@ IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest, FooterShowsOnNtpOnly) {
 }
 
 IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
-                       ManagementNoticePolicyTogglesVisibility) {
-  RunTestSequence(
-      // Open NTP.
-      AddInstrumentedTab(kNewTabElementId, chrome::ChromeUINewTabURLAsGURL()),
-      // Ensure footer shows.
-      WaitForShow(kNtpFooterViewElementId),
-      // Disable management notice policy.
-      Do([=]() {
-        g_browser_process->local_state()->SetBoolean(
-            prefs::kNTPFooterManagementNoticeEnabled, false);
-      }),
-      // Ensure footer hides.
-      WaitForHide(kNtpFooterViewElementId));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
                        CustomizationTogglesVisibility) {
   RunTestSequence(
       // Open NTP.
@@ -491,27 +475,6 @@ IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
 }
 
 IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
-                       CustomizeChromeButtonShowsCorrectly) {
-  const DeepQuery kNtpCustomizeChromeButton = {
-      "ntp-app", "ntp-customize-buttons", "#customizeButton"};
-  RunTestSequence(
-      // Open 1P WebUI NTP and wait for footer to show.
-      OpenNewTabAndWaitForFooter(chrome::ChromeUINewTabPageURLAsGURL()),
-      // Ensure customize chrome button only shows in footer and not on NTP.
-      Steps(EnsurePresent(kFooterLocalElementId, kFooterCustomizeChromeButton),
-            EnsureNotPresent(kNewTabElementId, kNtpCustomizeChromeButton)),
-      Do([=]() {
-        // Disable management notice to hide footer.
-        g_browser_process->local_state()->SetBoolean(
-            prefs::kNTPFooterManagementNoticeEnabled, false);
-      }),
-      // Ensure footer hides.
-      WaitForHide(kNtpFooterViewElementId),
-      // Ensure customize chrome button shows in NTP.
-      WaitForElementToRender(kNewTabElementId, kNtpCustomizeChromeButton));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
                        ThirdPartyNtpHidesCustomizeChromeButton) {
   RunTestSequence(
       // Open 3P WebUI NTP and wait for footer to show.
@@ -519,37 +482,6 @@ IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
           GURL(chrome::kChromeUINewTabPageThirdPartyURL)),
       // Ensure customize chrome button hides in footer.
       EnsureNotPresent(kFooterLocalElementId, kFooterCustomizeChromeButton));
-}
-
-IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
-                       BackgroundAttributionShowsCorrectly) {
-  const DeepQuery kNtpBackgroundAttribution = {"ntp-app",
-                                               "#backgroundImageAttribution"};
-  const DeepQuery kFooterBackgroundAttribution{
-      "new-tab-footer-app", "#backgroundAttributionContainer"};
-  RunTestSequence(
-      // Open 1P WebUI NTP and wait for footer to show.
-      OpenNewTabAndWaitForFooter(chrome::ChromeUINewTabPageURLAsGURL()),
-      // Ensure background attribution shows in footer and not on NTP.
-      Steps(
-          EnsureNotPresent(kFooterLocalElementId, kFooterBackgroundAttribution),
-          EnsureNotPresent(kNewTabElementId, kNtpBackgroundAttribution)),
-      // Set a custom background.
-      Do(base::BindOnce(&FooterEnterpriseInteractiveTest::SetCustomBackground,
-                        base::Unretained(this))),
-      // Ensure background attribution shows in footer and not on NTP.
-
-      Steps(EnsurePresent(kFooterLocalElementId, kFooterBackgroundAttribution),
-            EnsureNotPresent(kNewTabElementId, kNtpBackgroundAttribution)),
-      Do([=]() {
-        // Disable management notice to hide footer.
-        g_browser_process->local_state()->SetBoolean(
-            prefs::kNTPFooterManagementNoticeEnabled, false);
-      }),
-      // Ensure footer hides.
-      WaitForHide(kNtpFooterViewElementId),
-      // Ensure background attribution shows in NTP.
-      WaitForElementToRender(kNewTabElementId, kNtpBackgroundAttribution));
 }
 
 IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,

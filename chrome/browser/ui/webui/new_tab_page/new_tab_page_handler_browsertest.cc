@@ -483,23 +483,6 @@ IN_PROC_BROWSER_TEST_P(NewTabPageHandlerManagedTest, UpdateFooterVisibility) {
   mock_page()->FlushForTesting();
 }
 
-IN_PROC_BROWSER_TEST_P(NewTabPageHandlerManagedTest, SetNoticePolicyPref) {
-  bool visible;
-  EXPECT_CALL(*mock_page(), FooterVisibilityUpdated)
-      .Times(2)
-      .WillRepeatedly([&visible](bool visible_arg) { visible = visible_arg; });
-
-  local_state()->SetBoolean(prefs::kNTPFooterManagementNoticeEnabled, false);
-  mock_page()->FlushForTesting();
-
-  EXPECT_FALSE(visible);
-
-  local_state()->SetBoolean(prefs::kNTPFooterManagementNoticeEnabled, true);
-  mock_page()->FlushForTesting();
-
-  EXPECT_EQ(managed(), visible);
-}
-
 // Verifies footer visibility respects user preference when no enterprise label
 // is set.
 IN_PROC_BROWSER_TEST_P(NewTabPageHandlerManagedTest, SetCustomFooterLabel) {

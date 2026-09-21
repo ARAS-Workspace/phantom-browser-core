@@ -188,8 +188,7 @@ class MockPage : public side_panel::mojom::CustomizeChromePage {
       void,
       SetFooterSettings,
       (bool visible,
-       bool extension_policy_enabled,
-       side_panel::mojom::ManagementNoticeStatePtr management_notice_state));
+       bool extension_policy_enabled));
 
   mojo::Receiver<side_panel::mojom::CustomizeChromePage> receiver_{this};
 };

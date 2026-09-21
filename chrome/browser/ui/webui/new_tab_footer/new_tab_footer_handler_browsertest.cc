@@ -127,16 +127,6 @@ IN_PROC_BROWSER_TEST_F(NewTabFooterHandlerBrowserTest,
   EXPECT_EQ(expected_url, web_contents()->GetLastCommittedURL());
 }
 
-IN_PROC_BROWSER_TEST_F(NewTabFooterHandlerBrowserTest, OpenManagementPage) {
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-  handler().OpenManagementPage();
-
-  WaitForLoadStop(web_contents());
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-  const GURL expected_url = GURL(chrome::kChromeUIManagementURL);
-  EXPECT_EQ(expected_url, web_contents()->GetLastCommittedURL());
-}
-
 // One test per rejected scheme: ReportBadMessage breaks the pipe, so reusing a
 // single Remote across iterations doesn't work.
 IN_PROC_BROWSER_TEST_F(NewTabFooterHandlerBrowserTest,
