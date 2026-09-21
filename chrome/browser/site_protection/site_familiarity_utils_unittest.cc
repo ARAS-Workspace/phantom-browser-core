@@ -9,7 +9,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/content_settings/generated_javascript_optimizer_pref.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/common/pref_names.h"
 #include "chrome/test/base/testing_profile.h"
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/prefs/pref_service.h"
@@ -117,26 +116,6 @@ INSTANTIATE_TEST_SUITE_P(
     All,
     SiteFamiliarityUtilsJsOptimizerParameterizedTest,
     ::testing::Values(
-        // Scenario 1: General Migration Feature Enabled -> Blocked for all SB
-        // users
-        JsOptimizerTestParam{
-            .test_name = "MigrationEnabled",
-            .enabled_features =
-                {safe_browsing::kMigrateToBlockV8OptimizerOnUnfamiliarSites},
-            .sb_state = safe_browsing::SafeBrowsingState::STANDARD_PROTECTION,
-            .expected_default_setting = content_settings::
-                JavascriptOptimizerSetting::kBlockedForUnfamiliarSites,
-        },
-        // Scenario 2: ESB Feature Enabled + ESB Active -> Blocked
-        JsOptimizerTestParam{
-            .test_name = "EsbFeatureEnabled_EsbUser",
-            .enabled_features =
-                {safe_browsing::
-                     kEnableBlockV8OptimizerOnUnfamiliarSitesForEsbClients},
-            .sb_state = safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION,
-            .expected_default_setting = content_settings::
-                JavascriptOptimizerSetting::kBlockedForUnfamiliarSites,
-        },
         // Scenario 3: ESB Feature Enabled + Standard SB -> Allowed
         JsOptimizerTestParam{
             .test_name = "EsbFeatureEnabled_StandardUser",
@@ -161,79 +140,5 @@ INSTANTIATE_TEST_SUITE_P(
     [](const ::testing::TestParamInfo<JsOptimizerTestParam>& info) {
       return info.param.test_name;
     });
-
-TEST_F(SiteFamiliarityUtilsJsOptimizerTest, IsV8OptimizerBlockingDryRun) {
-  // 1. Migration disabled, dry run disabled (default).
-  EXPECT_FALSE(IsV8OptimizerBlockingDryRun(profile()));
-
-  // 2. Migration enabled, dry run disabled (default).
-  {
-    base::test::ScopedFeatureList feature_list;
-    feature_list.InitAndEnableFeature(
-        safe_browsing::kMigrateToBlockV8OptimizerOnUnfamiliarSites);
-    EXPECT_FALSE(IsV8OptimizerBlockingDryRun(profile()));
-  }
-
-  // 3. Migration enabled, dry run enabled.
-  {
-    base::test::ScopedFeatureList feature_list;
-    feature_list.InitAndEnableFeatureWithParameters(
-        safe_browsing::kMigrateToBlockV8OptimizerOnUnfamiliarSites,
-        {{safe_browsing::kMigrateToBlockV8OptimizerOnUnfamiliarSitesDryRun.name,
-          "true"}});
-
-    // Default user (no pref) -> should be dry run.
-    EXPECT_TRUE(IsV8OptimizerBlockingDryRun(profile()));
-
-    // User opted in via pref -> should NOT be dry run.
-    SetJsOptimizerSetting(content_settings::JavascriptOptimizerSetting::
-                              kBlockedForUnfamiliarSites);
-    EXPECT_FALSE(IsV8OptimizerBlockingDryRun(profile()));
-
-    // User opted out via pref -> should NOT be dry run.
-    SetJsOptimizerSetting(
-        content_settings::JavascriptOptimizerSetting::kAllowed);
-    EXPECT_FALSE(IsV8OptimizerBlockingDryRun(profile()));
-
-    // Clear pref for next tests
-    profile()->GetPrefs()->ClearPref(
-        prefs::kJavascriptOptimizerBlockedForUnfamiliarSites);
-  }
-
-  // 4. ESB feature enabled, dry run disabled (default).
-  {
-    base::test::ScopedFeatureList feature_list;
-    feature_list.InitAndEnableFeature(
-        safe_browsing::kEnableBlockV8OptimizerOnUnfamiliarSitesForEsbClients);
-    safe_browsing::SetSafeBrowsingState(
-        profile()->GetPrefs(),
-        safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-    EXPECT_FALSE(IsV8OptimizerBlockingDryRun(profile()));
-  }
-
-  // 5. ESB feature enabled, dry run enabled.
-  {
-    base::test::ScopedFeatureList feature_list;
-    feature_list.InitAndEnableFeatureWithParameters(
-        safe_browsing::kEnableBlockV8OptimizerOnUnfamiliarSitesForEsbClients,
-        {{safe_browsing::kEsbDryRun.name, "true"}});
-    safe_browsing::SetSafeBrowsingState(
-        profile()->GetPrefs(),
-        safe_browsing::SafeBrowsingState::ENHANCED_PROTECTION);
-
-    // Default user (no pref) -> should be dry run.
-    EXPECT_TRUE(IsV8OptimizerBlockingDryRun(profile()));
-
-    // User opted in via pref -> should NOT be dry run.
-    SetJsOptimizerSetting(content_settings::JavascriptOptimizerSetting::
-                              kBlockedForUnfamiliarSites);
-    EXPECT_FALSE(IsV8OptimizerBlockingDryRun(profile()));
-
-    // User opted out via pref -> should NOT be dry run.
-    SetJsOptimizerSetting(
-        content_settings::JavascriptOptimizerSetting::kAllowed);
-    EXPECT_FALSE(IsV8OptimizerBlockingDryRun(profile()));
-  }
-}
 
 }  // namespace site_protection

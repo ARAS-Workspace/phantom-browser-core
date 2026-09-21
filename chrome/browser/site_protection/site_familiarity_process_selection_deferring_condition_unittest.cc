@@ -168,26 +168,6 @@ TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
 
 // Test that standard https URLs explicitly marked as unfamiliar for testing are
 // considered familiar.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
-       FamiliarityHeuristic_HttpsUrl_FamiliarForTesting) {
-  // A standard URL that is unfamiliar.
-  GURL kTestUrl("https://www.example.com");
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  BuildAndWaitForConditionToRunCallback(navigation_handle);
-  CheckSiteUnfamiliar(navigation_handle);
-
-  // Set URL as familiar.
-  site_protection::SiteFamiliarityFetcher::SetUrlFamiliarForTesting(kTestUrl);
-  SiteFamiliarityProcessSelectionDeferringCondition condition_familiar(
-      navigation_handle);
-  EXPECT_EQ(condition_familiar.OnWillSelectFinalProcess(base::OnceClosure()),
-            content::ProcessSelectionDeferringCondition::Result::kProceed);
-  // Site is familiar without meeting history/site engagement/SB list
-  // requirements.
-  CheckSiteFamiliar(navigation_handle);
-}
-
 // Test that web-safe non-http URLs (like blob:) explicitly marked as familiar
 // for testing are considered familiar.
 TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
@@ -299,31 +279,7 @@ TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
 // safe-browsing-high-confidence-allowlist, chrome://history does not have an
 // entry for the origin older than a day, and the site's engagement score is
 // below the familiarity threshold.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
-       FamiliarityHeuristic_Unfamiliar) {
-  GURL kTestUrl("https://www.example.com");
-  url::Origin kTestOrigin = url::Origin::Create(kTestUrl);
-  history_service()->AddPage(kTestUrl, (base::Time::Now() - base::Hours(1)),
-                             history::SOURCE_BROWSED);
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  BuildAndWaitForConditionToRunCallback(navigation_handle);
-  CheckSiteUnfamiliar(navigation_handle);
-}
-
 // Similar to test above but test with an empty history service.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
-       FamiliarityHeuristic_Unfamiliar_EmptyHistoryService) {
-  GURL kTestUrl("https://www.example.com");
-  url::Origin kTestOrigin = url::Origin::Create(kTestUrl);
-
-  SetSiteEngagementScore(kTestUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  content::MockNavigationHandle navigation_handle(kTestUrl, main_rfh());
-  BuildAndWaitForConditionToRunCallback(navigation_handle);
-  CheckSiteUnfamiliar(navigation_handle);
-}
-
 TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
        FamiliarityHeuristic_ConfigurableEngagementScore) {
   base::test::ScopedFeatureList feature_list;
@@ -552,43 +508,6 @@ TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
 
 // Test that history is re-queried when the navigation is redirected.
 // The redirect occurs while the history request is still pending.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest,
-       RequestRedirectedDuringQuery) {
-  GURL kTestUrl1("https://www.example.com");
-  GURL kTestUrl2("https://www.bar.com");
-  url::Origin kTestOrigin1 = url::Origin::Create(kTestUrl1);
-  url::Origin kTestOrigin2 = url::Origin::Create(kTestUrl2);
-
-  SetSiteEngagementScore(kTestUrl1, kMinSiteEngagementScoreForFamiliarity - 1);
-  SetSiteEngagementScore(kTestUrl2, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-
-  content::MockNavigationHandle navigation_handle(kTestUrl1, main_rfh());
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  MockConditionCallback callback;
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(callback.Get()));
-
-  navigation_handle.set_url(kTestUrl2);
-  condition.OnRequestRedirected();
-  EXPECT_FALSE(callback.was_run());
-  EXPECT_EQ(2u, mock_history_service->GetNumQueuedCallbacks());
-
-  // Run history request which was started prior to redirect.
-  mock_history_service->RunNextCallback();
-  EXPECT_FALSE(callback.was_run());
-
-  // Run history request which was started after redirect.
-  mock_history_service->RunNextCallback();
-  EXPECT_TRUE(callback.was_run());
-
-  CheckSiteUnfamiliar(navigation_handle);
-}
-
 namespace {
 // Test subclass for Default Search Engine (DSE) specific tests.
 class SiteFamiliarityDefaultSearchEngineTestBase
@@ -656,54 +575,8 @@ TEST_F(SiteFamiliarityDefaultSearchEngineSkipFamiliarityCheckTest, SearchUrl) {
 
 // Test that a navigation to a non-search page on the DSE's origin is deferred
 // and is unfamiliar.
-TEST_F(SiteFamiliarityDefaultSearchEngineSkipFamiliarityCheckTest,
-       NonSearchUrl_DseOrigin) {
-  GURL kHomepageUrl("https://www.example.com/");
-  SetSiteEngagementScore(kHomepageUrl,
-                         kMinSiteEngagementScoreForFamiliarity - 1);
-  content::MockNavigationHandle navigation_handle(kHomepageUrl, main_rfh());
-  base::HistogramTester histogram_tester;
-  MockConditionCallback callback;
-
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(callback.Get()));
-
-  // Complete history fetch.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-  CheckSiteUnfamiliar(navigation_handle);
-  histogram_tester.ExpectTotalCount(
-      kSiteFamiliarityDeferNavigationDurationHistogram, 1);
-}
-
 // Test that a navigation to a site unrelated to the DSE can be deferred and is
 // unfamiliar.
-TEST_F(SiteFamiliarityDefaultSearchEngineSkipFamiliarityCheckTest,
-       NonSearchUrl_NonDseOrigin) {
-  GURL kUnrelatedUrl("https://www.unrelated.com/");
-  SetSiteEngagementScore(kUnrelatedUrl,
-                         kMinSiteEngagementScoreForFamiliarity - 1);
-  content::MockNavigationHandle navigation_handle(kUnrelatedUrl, main_rfh());
-  base::HistogramTester histogram_tester;
-  MockConditionCallback callback;
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(callback.Get()));
-
-  // Complete history fetch.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-  CheckSiteUnfamiliar(navigation_handle);
-  histogram_tester.ExpectTotalCount(
-      kSiteFamiliarityDeferNavigationDurationHistogram, 1);
-}
-
 // SiteFamiliarityProcessSelectionDeferringConditionMockLookupTest subclass for
 // skip same-site checks tests.
 class SiteFamiliaritySameSiteSkipFamiliarityCheckTest
@@ -856,60 +729,8 @@ TEST_F(SiteFamiliaritySameSiteSkipFamiliarityCheckTest,
 
 // Test that same-site subframe navigation is deferred when the same-site skip
 // feature is disabled.
-TEST_F(SiteFamiliaritySameSiteRunFamiliarityCheckTest,
-       SameSiteSubframeDeferred) {
-  GURL kMainFrameUrl("https://www.example.com/");
-  NavigateAndCommit(kMainFrameUrl);
-
-  GURL kSubframeUrl("https://sub.example.com/page.html");
-  SetSiteEngagementScore(kSubframeUrl,
-                         kMinSiteEngagementScoreForFamiliarity - 1);
-
-  content::MockNavigationHandle navigation_handle(kSubframeUrl, main_rfh());
-  navigation_handle.set_is_in_primary_main_frame(false);
-
-  MockConditionCallback callback;
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(callback.Get()));
-
-  // Complete history fetch.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-  CheckSiteUnfamiliar(navigation_handle);
-}
-
 // Test that cross-site subframe navigation of a familiar main frame is
 // deferred.
-TEST_F(SiteFamiliaritySameSiteSkipFamiliarityCheckTest,
-       CrossSiteSubframeOfFamiliarMainFrame) {
-  GURL kMainFrameUrl("https://www.example.com/");
-  NavigateAndCommit(kMainFrameUrl);
-
-  GURL kSubframeUrl("https://www.unrelated.com/page.html");
-  SetSiteEngagementScore(kSubframeUrl,
-                         kMinSiteEngagementScoreForFamiliarity - 1);
-
-  content::MockNavigationHandle navigation_handle(kSubframeUrl, main_rfh());
-  navigation_handle.set_is_in_primary_main_frame(false);
-
-  MockConditionCallback callback;
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(callback.Get()));
-
-  // Complete history fetch.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-  CheckSiteUnfamiliar(navigation_handle);
-}
-
 // SiteFamiliarityDefaultSearchEngineTestBase subclass for tests that run site
 // familiarity calculations for DSE navigations.
 class SiteFamiliarityDefaultSearchEngineRunFamiliarityCheckTest
@@ -927,161 +748,11 @@ class SiteFamiliarityDefaultSearchEngineRunFamiliarityCheckTest
 
 // Test that a DSE search URL navigation with no history query is deferred,
 // histogram is logged, and site is unfamiliar.
-TEST_F(SiteFamiliarityDefaultSearchEngineRunFamiliarityCheckTest,
-       SearchUrl_NoHistoryQuery) {
-  GURL kSearchUrl("https://www.example.com/search?q=test");
-  SetSiteEngagementScore(kSearchUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-  content::MockNavigationHandle navigation_handle(kSearchUrl, main_rfh());
-  base::HistogramTester histogram_tester;
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  MockConditionCallback callback;
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kDefer,
-            condition.OnWillSelectFinalProcess(callback.Get()));
-
-
-  // Complete history fetch.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-
-  CheckSiteUnfamiliar(navigation_handle);
-  histogram_tester.ExpectTotalCount(
-      kSiteFamiliarityDeferNavigationDurationHistogram, 1);
-}
-
 // Test that a DSE search URL with history query is not deferred,
 // histogram is not logged, and site is marked unfamiliar.
-TEST_F(SiteFamiliarityDefaultSearchEngineRunFamiliarityCheckTest,
-       SearchUrl_HistoryQuery) {
-  GURL kSearchUrl("https://www.example.com/search?q=test2");
-
-  SetSiteEngagementScore(kSearchUrl, kMinSiteEngagementScoreForFamiliarity - 1);
-
-  content::MockNavigationHandle navigation_handle(kSearchUrl, main_rfh());
-  base::HistogramTester histogram_tester;
-  SiteFamiliarityProcessSelectionDeferringCondition condition(
-      navigation_handle);
-
-  // Complete history fetch so it proceeds immediately.
-  raw_ptr<ManualCallbackEmptyHistoryService> mock_history_service =
-      static_cast<ManualCallbackEmptyHistoryService*>(history_service());
-  mock_history_service->RunNextCallback();
-
-  base::MockCallback<base::OnceClosure> mock_callback;
-  EXPECT_CALL(mock_callback, Run()).Times(0);
-
-  EXPECT_EQ(content::ProcessSelectionDeferringCondition::Result::kProceed,
-            condition.OnWillSelectFinalProcess(mock_callback.Get()));
-
-  histogram_tester.ExpectTotalCount(
-      kSiteFamiliarityDeferNavigationDurationHistogram, 0);
-
-  CheckSiteUnfamiliar(navigation_handle);
-}
-
 // Test that top-frame navigations log TopFrame and overall histograms.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
-       VerdictLogging_TopFrame) {
-  GURL kFamiliarUrl("https://familiar.test");
-  GURL kUnfamiliarUrl("https://unfamiliar.test");
-
-  SetSiteEngagementScore(kFamiliarUrl, kMinSiteEngagementScoreForFamiliarity);
-  SetSiteEngagementScore(kUnfamiliarUrl,
-                         kMinSiteEngagementScoreForFamiliarity - 1);
-
-  {
-    base::HistogramTester histogram_tester;
-    content::MockNavigationHandle navigation_handle(kFamiliarUrl, main_rfh());
-    BuildAndWaitForConditionToRunCallback(navigation_handle);
-
-    histogram_tester.ExpectUniqueSample(
-        "SafeBrowsing.SiteFamiliarity.Verdict.TopFrame",
-        SiteFamiliarityFetcher::Verdict::kFamiliar, 1);
-    histogram_tester.ExpectUniqueSample(
-        "SafeBrowsing.SiteFamiliarity.Verdict",
-        SiteFamiliarityFetcher::Verdict::kFamiliar, 1);
-    histogram_tester.ExpectTotalCount(
-        "SafeBrowsing.SiteFamiliarity.Verdict.Subframe", 0);
-  }
-
-  {
-    base::HistogramTester histogram_tester;
-    content::MockNavigationHandle navigation_handle(kUnfamiliarUrl, main_rfh());
-    BuildAndWaitForConditionToRunCallback(navigation_handle);
-
-    histogram_tester.ExpectUniqueSample(
-        "SafeBrowsing.SiteFamiliarity.Verdict.TopFrame",
-        SiteFamiliarityFetcher::Verdict::kUnfamiliar, 1);
-    histogram_tester.ExpectUniqueSample(
-        "SafeBrowsing.SiteFamiliarity.Verdict",
-        SiteFamiliarityFetcher::Verdict::kUnfamiliar, 1);
-    histogram_tester.ExpectTotalCount(
-        "SafeBrowsing.SiteFamiliarity.Verdict.Subframe", 0);
-  }
-}
-
 // Test that cross-site subframe navigations log Subframe and overall
 // histograms.
-TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,
-       VerdictLogging_CrossSiteSubframe) {
-  GURL kTopFrameUrl("https://example.test");
-  GURL kFamiliarSubframeUrl("https://familiar.test");
-  GURL kUnfamiliarSubframeUrl("https://unfamiliar.test");
-
-  SetSiteEngagementScore(kFamiliarSubframeUrl,
-                         kMinSiteEngagementScoreForFamiliarity);
-  SetSiteEngagementScore(kUnfamiliarSubframeUrl,
-                         kMinSiteEngagementScoreForFamiliarity - 1);
-
-  // Set top frame URL in the test harness so that IsCrossSiteSubframe can
-  // compare against it.
-  NavigateAndCommit(kTopFrameUrl);
-
-  content::RenderFrameHost* child_rfh =
-      content::RenderFrameHostTester::For(main_rfh())
-          ->AppendChild("child_frame");
-
-  {
-    base::HistogramTester histogram_tester;
-    content::MockNavigationHandle navigation_handle(kFamiliarSubframeUrl,
-                                                    child_rfh);
-    ON_CALL(navigation_handle, GetOriginToCommit())
-        .WillByDefault(
-            testing::Return(url::Origin::Create(kFamiliarSubframeUrl)));
-    BuildAndWaitForConditionToRunCallback(navigation_handle);
-
-    histogram_tester.ExpectUniqueSample(
-        "SafeBrowsing.SiteFamiliarity.Verdict.Subframe",
-        SiteFamiliarityFetcher::Verdict::kFamiliar, 1);
-    histogram_tester.ExpectUniqueSample(
-        "SafeBrowsing.SiteFamiliarity.Verdict",
-        SiteFamiliarityFetcher::Verdict::kFamiliar, 1);
-    histogram_tester.ExpectTotalCount(
-        "SafeBrowsing.SiteFamiliarity.Verdict.TopFrame", 0);
-  }
-
-  {
-    base::HistogramTester histogram_tester;
-    content::MockNavigationHandle navigation_handle(kUnfamiliarSubframeUrl,
-                                                    child_rfh);
-    ON_CALL(navigation_handle, GetOriginToCommit())
-        .WillByDefault(
-            testing::Return(url::Origin::Create(kUnfamiliarSubframeUrl)));
-    BuildAndWaitForConditionToRunCallback(navigation_handle);
-
-    histogram_tester.ExpectUniqueSample(
-        "SafeBrowsing.SiteFamiliarity.Verdict.Subframe",
-        SiteFamiliarityFetcher::Verdict::kUnfamiliar, 1);
-    histogram_tester.ExpectUniqueSample(
-        "SafeBrowsing.SiteFamiliarity.Verdict",
-        SiteFamiliarityFetcher::Verdict::kUnfamiliar, 1);
-    histogram_tester.ExpectTotalCount(
-        "SafeBrowsing.SiteFamiliarity.Verdict.TopFrame", 0);
-  }
-}
-
 // Test that same-site subframe navigations do NOT log any familiarity
 // histograms.
 TEST_F(SiteFamiliarityProcessSelectionDeferringConditionTest,

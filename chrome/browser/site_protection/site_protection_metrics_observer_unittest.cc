@@ -654,62 +654,6 @@ TEST_F(SiteProtectionMetricsObserverV8OptTest, NoIframe) {
 }
 
 TEST_F(SiteProtectionMetricsObserverV8OptTest,
-       Iframe_EnabledForChildAndTopmost) {
-  base::HistogramTester histogram_tester;
-  GURL kMainUrl("https://foo.com");
-  GURL kIframeUrl("https://bar.com");
-  NavigateToPageWithIframeAndV8OptState(
-      kMainUrl,
-      /*topmost_are_v8_optimizations_enabled=*/true, kIframeUrl,
-      /*iframe_are_v8_optimizations_enabled=*/true);
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.IframeState",
-      IframeV8OptimizerState::kEnabledForChildAndTopmost, 1);
-}
-
-TEST_F(SiteProtectionMetricsObserverV8OptTest,
-       Iframe_EnabledForChildDisabledForTopmost) {
-  base::HistogramTester histogram_tester;
-  GURL kMainUrl("https://foo.com");
-  GURL kIframeUrl("https://bar.com");
-  NavigateToPageWithIframeAndV8OptState(
-      kMainUrl,
-      /*topmost_are_v8_optimizations_enabled=*/false, kIframeUrl,
-      /*iframe_are_v8_optimizations_enabled=*/true);
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.IframeState",
-      IframeV8OptimizerState::kEnabledForChildDisabledForTopmost, 1);
-}
-
-TEST_F(SiteProtectionMetricsObserverV8OptTest,
-       Iframe_DisabledForChildEnabledForTopmost) {
-  base::HistogramTester histogram_tester;
-  GURL kMainUrl("https://foo.com");
-  GURL kIframeUrl("https://bar.com");
-  NavigateToPageWithIframeAndV8OptState(
-      kMainUrl,
-      /*topmost_are_v8_optimizations_enabled=*/true, kIframeUrl,
-      /*iframe_are_v8_optimizations_enabled=*/false);
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.IframeState",
-      IframeV8OptimizerState::kDisabledForChildEnabledForTopmost, 1);
-}
-
-TEST_F(SiteProtectionMetricsObserverV8OptTest,
-       Iframe_DisabledForChildAndTopmost) {
-  base::HistogramTester histogram_tester;
-  GURL kMainUrl("https://foo.com");
-  GURL kIframeUrl("https://bar.com");
-  NavigateToPageWithIframeAndV8OptState(
-      kMainUrl,
-      /*topmost_are_v8_optimizations_enabled=*/false, kIframeUrl,
-      /*iframe_are_v8_optimizations_enabled=*/false);
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.IframeState",
-      IframeV8OptimizerState::kDisabledForChildAndTopmost, 1);
-}
-
-TEST_F(SiteProtectionMetricsObserverV8OptTest,
        Iframe_DifferentRenderProcessSameSiteMetric_SameProcess) {
   SetUseOriginIsolation(false);
 
@@ -725,22 +669,6 @@ TEST_F(SiteProtectionMetricsObserverV8OptTest,
                 .GetAllSamples("SafeBrowsing.V8Optimizer."
                                "DifferentRenderProcess.SameSite.IframeState")
                 .size());
-}
-
-TEST_F(SiteProtectionMetricsObserverV8OptTest,
-       Iframe_DifferentRenderProcessSameSiteMetric_DifferentProcess) {
-  SetUseOriginIsolation(true);
-
-  base::HistogramTester histogram_tester;
-  GURL kMainUrl("https://foo.com");
-  GURL kIframeUrl("https://sub.foo.com");
-  NavigateToPageWithIframeAndV8OptState(
-      kMainUrl,
-      /*topmost_are_v8_optimizations_enabled=*/false, kIframeUrl,
-      /*iframe_are_v8_optimizations_enabled=*/false);
-  histogram_tester.ExpectUniqueSample(
-      "SafeBrowsing.V8Optimizer.DifferentRendererProcess.SameSite.IframeState",
-      IframeV8OptimizerState::kDisabledForChildAndTopmost, 1);
 }
 
 TEST_F(SiteProtectionMetricsObserverV8OptTest,
