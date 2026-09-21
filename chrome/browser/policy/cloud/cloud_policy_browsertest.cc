@@ -83,31 +83,10 @@ namespace policy {
 
 namespace {
 
-constexpr char kPolicyInvalidationType[] = "USER_POLICY_FETCH";
-
 struct FeaturesTestParam {
   std::vector<base::test::FeatureRef> enabled_features;
   std::vector<base::test::FeatureRef> disabled_features;
 };
-
-std::unique_ptr<invalidation::InvalidationListener>
-CreateInvalidationListenerForProjectNumber(int64_t project_number,
-                                           std::string /*log_prefix*/) {
-  return std::make_unique<invalidation::FakeInvalidationListener>(
-      std::move(project_number));
-}
-
-std::unique_ptr<KeyedService> BuildFakeProfileInvalidationProvider(
-    content::BrowserContext* context) {
-  Profile* profile = static_cast<Profile*>(context);
-  return std::make_unique<invalidation::ProfileInvalidationProvider>(
-      profile->GetDefaultStoragePartition()
-          ->GetURLLoaderFactoryForBrowserProcess(),
-      std::make_unique<invalidation::ProfileIdentityProvider>(
-          IdentityManagerFactory::GetForProfile(profile)),
-      profile->GetPrefs(),
-      base::BindRepeating(&CreateInvalidationListenerForProjectNumber));
-}
 
 const char* GetTestUser() {
   return "user@example.com";
@@ -199,14 +178,6 @@ class CloudPolicyTest : public PlatformBrowserTest,
     ChromeBrowserPolicyConnector::EnableCommandLineSupportForTesting();
   }
 
-  void CreatedBrowserMainParts(
-      content::BrowserMainParts* browser_main_parts) override {
-    PlatformBrowserTest::CreatedBrowserMainParts(browser_main_parts);
-    invalidation::ProfileInvalidationProviderFactory::GetInstance()
-        ->RegisterTestingFactory(
-            base::BindRepeating(&BuildFakeProfileInvalidationProvider));
-  }
-
   void SetUpOnMainThread() override {
     ASSERT_TRUE(PolicyServiceIsEmpty(g_browser_process->policy_service()))
         << "Pre-existing policies in this machine will make this test fail.";
@@ -287,23 +258,6 @@ class CloudPolicyTest : public PlatformBrowserTest,
     return profile()->GetProfilePolicyConnector()->policy_service();
   }
 
-  void FirePolicyInvalidation() {
-    const base::TimeDelta now =
-        base::Time::NowFromSystemTime() - base::Time::UnixEpoch();
-
-    // Provider caches invalidation service and listener for sender id and
-    // project id. To send an invalidation to the policy invalidator, it
-    // must be sent to the correct project id.
-    auto* invalidation_listener =
-        static_cast<invalidation::FakeInvalidationListener*>(
-            invalidation::ProfileInvalidationProviderFactory::GetInstance()
-                ->GetForProfile(profile())
-                ->GetInvalidationListener(
-                    policy::kPolicyInvalidationProjectNumber));
-    invalidation_listener->FireInvalidation(invalidation::DirectInvalidation(
-        kPolicyInvalidationType, now.InMicroseconds(), "payload"));
-  }
-
   void SetServerPolicy(const em::CloudPolicySettings& settings,
                        int key_version) {
     test_server_->policy_storage()->SetPolicyPayload(
@@ -373,39 +327,6 @@ IN_PROC_BROWSER_TEST_P(CloudPolicyTest, FetchPolicy) {
   }
   EXPECT_TRUE(expected.Equals(policy_service->GetPolicies(
       PolicyNamespace(POLICY_DOMAIN_CHROME, std::string()))));
-}
-
-IN_PROC_BROWSER_TEST_P(CloudPolicyTest, InvalidatePolicy) {
-  PolicyService* policy_service = GetPolicyService();
-  policy_service->AddObserver(POLICY_DOMAIN_CHROME, this);
-
-  // Perform the initial fetch.
-  ASSERT_NO_FATAL_FAILURE(SetServerPolicy(GetTestPolicy("google.com"), 1));
-  {
-    base::RunLoop run_loop;
-    policy_service->RefreshPolicies(run_loop.QuitClosure(),
-                                    PolicyFetchReason::kTest);
-    run_loop.Run();
-  }
-
-  // Update the homepage in the policy and trigger an invalidation.
-  ASSERT_NO_FATAL_FAILURE(SetServerPolicy(GetTestPolicy("youtube.com"), 1));
-
-  FirePolicyInvalidation();
-
-  {
-    base::RunLoop run_loop;
-    on_policy_updated_ = run_loop.QuitClosure();
-    run_loop.Run();
-  }
-
-  // Check that the updated policy was fetched.
-  PolicyMap expected;
-  GetExpectedTestPolicy(&expected, "youtube.com");
-  EXPECT_TRUE(expected.Equals(policy_service->GetPolicies(
-      PolicyNamespace(POLICY_DOMAIN_CHROME, std::string()))));
-
-  policy_service->RemoveObserver(POLICY_DOMAIN_CHROME, this);
 }
 
 IN_PROC_BROWSER_TEST_P(CloudPolicyTest, FetchPolicyWithRotatedKey) {

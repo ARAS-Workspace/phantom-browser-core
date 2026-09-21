@@ -67,25 +67,6 @@ struct FeaturesTestParam {
   std::vector<base::test::FeatureRef> disabled_features;
 };
 
-std::unique_ptr<invalidation::InvalidationListener>
-CreateInvalidationListenerForProjectNumber(int64_t project_number,
-                                           std::string /*log_prefix*/) {
-  return std::make_unique<invalidation::FakeInvalidationListener>(
-      project_number);
-}
-
-std::unique_ptr<KeyedService> BuildFakeProfileInvalidationProvider(
-    content::BrowserContext* context) {
-  Profile* profile = Profile::FromBrowserContext(context);
-  return std::make_unique<invalidation::ProfileInvalidationProvider>(
-      profile->GetDefaultStoragePartition()
-          ->GetURLLoaderFactoryForBrowserProcess(),
-      std::make_unique<invalidation::ProfileIdentityProvider>(
-          IdentityManagerFactory::GetForProfile(profile)),
-      profile->GetPrefs(),
-      base::BindRepeating(&CreateInvalidationListenerForProjectNumber));
-}
-
 }  // namespace
 
 class UserRemoteCommandsServiceTest
@@ -114,14 +95,6 @@ class UserRemoteCommandsServiceTest
     command_line->AppendSwitchASCII(policy::switches::kDeviceManagementUrl,
                                     test_server_->GetServiceURL().spec());
     policy::ChromeBrowserPolicyConnector::EnableCommandLineSupportForTesting();
-  }
-
-  void CreatedBrowserMainParts(
-      content::BrowserMainParts* browser_main_parts) override {
-    PlatformBrowserTest::CreatedBrowserMainParts(browser_main_parts);
-    invalidation::ProfileInvalidationProviderFactory::GetInstance()
-        ->RegisterTestingFactory(
-            base::BindRepeating(&BuildFakeProfileInvalidationProvider));
   }
 
   // Mock a signed-in user. This is used by the UserCloudPolicyStore to pass
