@@ -42,7 +42,6 @@ WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
   enable_feature(
       optimization_guide::features::kOptimizationGuideModelExecution);
   enable_feature(collaboration::features::kCollaborationComments);
-  enable_feature(omnibox::kComposeboxDriveContextMenuOption);
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   enable_feature(features::kAiOverlayDialog);

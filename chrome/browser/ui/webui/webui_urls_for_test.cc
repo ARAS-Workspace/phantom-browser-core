@@ -31,8 +31,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://autofill-ml-internals",
       "chrome://autofill-internals",
 
-      "chrome://batch-upload",
-
       "chrome://bookmarks",
       "chrome://bookmarks-side-panel.top-chrome",
       "chrome://certificate-manager",
