@@ -163,7 +163,7 @@ void SetSafeBrowsingState(PrefService* prefs,
 }
 
 bool IsSafeBrowsingEnabled(const PrefService& prefs) {
-  return prefs.GetBoolean(prefs::kSafeBrowsingEnabled);
+  return false;
 }
 
 bool IsEnhancedProtectionEnabled(const PrefService& prefs) {
@@ -276,7 +276,7 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterTimePref(
       prefs::kSafeBrowsingEsbProtegoPingWithoutTokenLastLogTime, base::Time());
   registry->RegisterBooleanPref(
-      prefs::kSafeBrowsingEnabled, true,
+      prefs::kSafeBrowsingEnabled, false,
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
   if (base::FeatureList::IsEnabled(kEsbAsASyncedSetting)) {
     registry->RegisterBooleanPref(

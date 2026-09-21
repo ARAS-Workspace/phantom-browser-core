@@ -23,7 +23,6 @@
 #include "content/public/browser/navigation_entry.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/safe_browsing/download_protection/download_feedback_service.h"
 #endif
 
 namespace safe_browsing {

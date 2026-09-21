@@ -179,9 +179,6 @@ TestSafeBrowsingBlockingPageFactory::CreateSafeBrowsingPage(
               base::BindRepeating(&BuildMockTrustSafetySentimentService)));
 #endif
 
-  auto* hcsm = HostContentSettingsMapFactory::GetForProfile(
-      Profile::FromBrowserContext(web_contents->GetBrowserContext()));
-
   base::OnceCallback<void(bool, SBThreatType)>
       trust_safety_sentiment_service_trigger = base::NullCallback();
 #if BUILDFLAG(FULL_SAFE_BROWSING)
@@ -197,9 +194,7 @@ TestSafeBrowsingBlockingPageFactory::CreateSafeBrowsingPage(
       delegate, web_contents, main_frame_url, unsafe_resources, display_options,
       is_proceed_anyway_disabled, is_safe_browsing_surveys_enabled,
       std::move(trust_safety_sentiment_service_trigger),
-      base::BindOnce(
-          &safe_browsing::MaybeIgnoreAbusiveNotificationAutoRevocation,
-          base::WrapRefCounted(hcsm), main_frame_url),
+      base::NullCallback(),
       blocked_page_shown_timestamp);
 }
 

@@ -29,7 +29,6 @@
 #include "chrome/browser/ui/global_error/global_error.h"
 #include "chrome/browser/ui/global_error/global_error_service.h"
 #include "chrome/browser/ui/global_error/global_error_service_factory.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_test_util.h"
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_manager.h"
 #include "chrome/browser/ui/tabs/recent_tabs_sub_menu_model.h"
 #include "chrome/browser/ui/toolbar/app_menu_icon_controller.h"
@@ -107,10 +106,6 @@ class AppMenuModelTest : public InProcessBrowserTest,
 
   void SetUpOnMainThread() override {
     InProcessBrowserTest::SetUpOnMainThread();
-    safety_hub_test_util::CreateRevokedPermissionsService(
-        browser()->GetProfile());
-    safety_hub_test_util::CreateNotificationPermissionsReviewService(
-        browser()->GetProfile());
   }
 
   AppMenuModelTest(const AppMenuModelTest&) = delete;

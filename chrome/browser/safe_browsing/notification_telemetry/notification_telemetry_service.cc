@@ -63,14 +63,6 @@ NotificationTelemetryService::NotificationTelemetryService(
   service_worker_context_ =
       profile_->GetDefaultStoragePartition()->GetServiceWorkerContext();
   service_worker_context_->AddObserver(this);
-  PushMessagingServiceImpl* push_messaging_service =
-      PushMessagingServiceFactory::GetForProfile(profile_);
-  // Notification Telemetry Service is a keyed service and will outlive
-  // any invocations of the callback being registered with the push messaging
-  // service (also a keyed service).
-  push_messaging_service->SetSubscribeFromWorkerCallback(base::BindRepeating(
-      &NotificationTelemetryService::OnNewNotificationServiceWorkerSubscription,
-      base::Unretained(this)));
 }
 
 NotificationTelemetryService::~NotificationTelemetryService() {

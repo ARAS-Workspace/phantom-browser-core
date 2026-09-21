@@ -57,7 +57,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/hats/mock_trust_safety_sentiment_service.h"
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_util.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/location_bar/location_icon_view.h"
@@ -1725,22 +1724,6 @@ IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageBrowserTest,
                 ? ClientSafeBrowsingReportRequest::PVER5_NATIVE_LOCAL_BLOCKLIST
                 : ClientSafeBrowsingReportRequest::PVER4_NATIVE);
   EXPECT_FALSE(report.client_properties().is_async_check());
-}
-
-IN_PROC_BROWSER_TEST_P(SafeBrowsingBlockingPageBrowserTest,
-                       IgnoreFutureAutoRevocation) {
-  GURL url = SetupWarningAndNavigate(browser());
-  EXPECT_FALSE(
-      safety_hub_util::IsAbusiveNotificationRevocationIgnored(hcsm(), url));
-  EXPECT_TRUE(ClickAndWaitForDetach("proceed-link"));
-  AssertNoInterstitial();  // Assert the interstitial is gone.
-  if (GetThreatType() == SBThreatType::SB_THREAT_TYPE_URL_PHISHING) {
-    EXPECT_TRUE(
-        safety_hub_util::IsAbusiveNotificationRevocationIgnored(hcsm(), url));
-  } else {
-    EXPECT_FALSE(
-        safety_hub_util::IsAbusiveNotificationRevocationIgnored(hcsm(), url));
-  }
 }
 
 class AntiPhishingTelemetryBrowserTest

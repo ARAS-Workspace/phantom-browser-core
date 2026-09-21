@@ -12,17 +12,6 @@
 
 namespace safe_browsing {
 
-#if defined(UNIT_TEST)
-// If the user bypassed a phishing interstitial and the url is valid, set the
-// REVOKED_ABUSIVE_NOTIFICATION_PERMISSIONS setting value to ignore future
-// autorevocation.
-void MaybeIgnoreAbusiveNotificationAutoRevocation(
-    scoped_refptr<HostContentSettingsMap> hcsm,
-    GURL url,
-    bool did_proceed,
-    SBThreatType threat_type);
-#endif
-
 // The default SafeBrowsingBlockingPageFactory for //chrome.
 class ChromeSafeBrowsingBlockingPageFactory
     : public SafeBrowsingBlockingPageFactory {

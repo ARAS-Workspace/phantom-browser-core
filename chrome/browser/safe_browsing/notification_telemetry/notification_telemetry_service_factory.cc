@@ -36,7 +36,6 @@ NotificationTelemetryServiceFactory::NotificationTelemetryServiceFactory()
           ProfileSelections::Builder()
               .WithRegular(ProfileSelection::kOriginalOnly)
               .Build()) {
-  DependsOn(PushMessagingServiceFactory::GetInstance());
 }
 
 std::unique_ptr<KeyedService>

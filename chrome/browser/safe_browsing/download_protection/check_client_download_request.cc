@@ -90,19 +90,7 @@ void CheckClientDownloadRequest::OnDownloadUpdated(
       (download->GetState() == download::DownloadItem::COMPLETE ||
        download->GetState() == download::DownloadItem::CANCELLED)) {
     auto settings = ShouldUploadBinaryForDeepScanning(item_);
-#if !BUILDFLAG(IS_ANDROID)
-    if (settings.has_value()) {
-      enterprise_connectors::RecordDeepScanMetrics(
-          settings->cloud_or_local_settings.is_cloud_analysis(),
-          /*access_point=*/enterprise_connectors::DeepScanAccessPoint::DOWNLOAD,
-          /*duration=*/base::TimeTicks::Now() - upload_start_time_,
-          /*total_size=*/item_->GetTotalBytes(),
-          /*result=*/"BypassedByUser",
-          /*failure=*/true);
-    }
-#else
     CHECK(!settings.has_value());
-#endif
   }
 }
 

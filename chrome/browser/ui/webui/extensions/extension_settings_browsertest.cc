@@ -32,9 +32,6 @@
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/safety_hub/menu_notification_service_factory.h"  // nogncheck
-#include "chrome/browser/ui/safety_hub/safety_hub_constants.h"  // nogncheck
-#include "chrome/browser/ui/safety_hub/safety_hub_test_util.h"  // nogncheck
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/ui_test_utils.h"
 #endif  // BUILDFLAG(IS_ANDROID)
@@ -244,44 +241,3 @@ IN_PROC_BROWSER_TEST_F(ExtensionsActivityLogTest, TestActivityLogVisible) {
              });
       )"));
 }
-
-// Safety hub is not supported on Android.
-#if !BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_F(ExtensionSettingsUIBrowserTest,
-                       TestSafetyHubMenuNotificationDismissed) {
-  Profile* profile = browser()->GetProfile();
-  extensions::ExtensionPrefs* extension_prefs =
-      extensions::ExtensionPrefs::Get(profile);
-  const extensions::Extension* extension = InstallExtensionWithInPageOptions();
-  SafetyHubMenuNotificationService* notification_service =
-      SafetyHubMenuNotificationServiceFactory::GetForProfile(profile);
-  // No unpublished extensions yet, so there shouldn't be a menu notifications.
-  std::optional<MenuNotificationEntry> notification =
-      notification_service->GetNotificationToShow();
-  ASSERT_FALSE(notification.has_value());
-  // Update the extension pref to flag the extension as unpublished.
-  base::DictValue dict;
-  dict.Set("is-present", true);
-  dict.Set("is-live", true);
-  dict.Set("last-updated-time-millis", 100000000);
-  dict.Set("violation-type", 0);
-  dict.Set("no-privacy-practice", false);
-  dict.Set("unpublished-long-ago", true);
-  extension_prefs->SetDictionaryPref(
-      extension->id(),
-      {"cws-info", extensions::kDictionary,
-       extensions::PrefScope::kExtensionSpecific},
-      std::move(dict));
-  // An extension was unpublished, so we now should get an associated menu
-  // notification.
-  notification = notification_service->GetNotificationToShow();
-  ASSERT_TRUE(notification.has_value());
-
-  // When the user visits the extensions page, notifications for the extension
-  // module of Safety Hub should be dismissed.
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("chrome://extensions/")));
-  notification = notification_service->GetNotificationToShow();
-  ASSERT_FALSE(notification.has_value());
-}
-#endif  // BUILDFLAG(IS_ANDROID)

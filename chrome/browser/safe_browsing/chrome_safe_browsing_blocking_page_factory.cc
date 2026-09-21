@@ -17,7 +17,6 @@
 #include "chrome/browser/safe_browsing/safe_browsing_metrics_collector_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/security_interstitials/content/content_metrics_helper.h"
@@ -35,22 +34,6 @@ namespace {
 const char kHelpCenterLink[] = "cpn_safe_browsing";
 
 }  // namespace
-
-void MaybeIgnoreAbusiveNotificationAutoRevocation(
-    scoped_refptr<HostContentSettingsMap> hcsm,
-    GURL url,
-    bool did_proceed,
-    SBThreatType threat_type) {
-  // Set REVOKED_ABUSIVE_NOTIFICATION_PERMISSIONS to ignore only if the URL is
-  // valid and the user bypassed a phishing interstitial.
-  if (!url.is_valid() || !did_proceed ||
-      threat_type != SBThreatType::SB_THREAT_TYPE_URL_PHISHING) {
-    return;
-  }
-  AbusiveNotificationPermissionsManager::
-      SetRevokedAbusiveNotificationPermission(hcsm.get(), url,
-                                              /*is_ignored=*/true);
-}
 
 SafeBrowsingBlockingPage*
 ChromeSafeBrowsingBlockingPageFactory::CreateSafeBrowsingPage(
@@ -120,10 +103,7 @@ ChromeSafeBrowsingBlockingPageFactory::CreateSafeBrowsingPage(
 #else
       base::NullCallback(),
 #endif
-      base::BindOnce(&MaybeIgnoreAbusiveNotificationAutoRevocation,
-                     base::WrapRefCounted(
-                         HostContentSettingsMapFactory::GetForProfile(profile)),
-                     main_frame_url),
+      base::NullCallback(),
       /*url_loader_for_testing=*/nullptr);
 }
 
