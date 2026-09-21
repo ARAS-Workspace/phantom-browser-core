@@ -78,9 +78,13 @@
 #include "chrome/browser/segmentation_platform/ukm_database_client.h"
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/test_signin_client_builder.h"
+#include "components/spellcheck/spellcheck_buildflags.h"
+
+#if BUILDFLAG(ENABLE_SPELLCHECK)
 #include "chrome/browser/spellchecker/spellcheck_custom_dictionary.h"
 #include "chrome/browser/spellchecker/spellcheck_factory.h"
 #include "chrome/browser/spellchecker/spellcheck_service.h"
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 #include "chrome/browser/ssl/stateful_ssl_host_state_delegate_factory.h"
 #include "chrome/browser/storage/persistent_storage_permission_context.h"
 #include "chrome/browser/strike_database/strike_database_factory.h"
@@ -1119,6 +1123,7 @@ class ChromeBrowsingDataRemoverDelegateTest : public testing::Test {
         TestingProfile::TestingFactory{
             FaviconServiceFactory::GetInstance(),
             FaviconServiceFactory::GetDefaultFactory()},
+#if BUILDFLAG(ENABLE_SPELLCHECK)
         TestingProfile::TestingFactory{
             SpellcheckServiceFactory::GetInstance(),
             base::BindRepeating([](content::BrowserContext* profile)
@@ -1126,6 +1131,7 @@ class ChromeBrowsingDataRemoverDelegateTest : public testing::Test {
               return std::make_unique<SpellcheckService>(
                   static_cast<Profile*>(profile));
             })},
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
         TestingProfile::TestingFactory{
             TrustedVaultServiceFactory::GetInstance(),
             TrustedVaultServiceFactory::GetDefaultFactory()},
@@ -3661,6 +3667,7 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, WipeOriginVerifierData) {
 #endif  // BUILDFLAG(IS_ANDROID)
 
 
+#if BUILDFLAG(ENABLE_SPELLCHECK)
 TEST_F(ChromeBrowsingDataRemoverDelegateTest, WipeCustomDictionaryData) {
   base::FilePath dict_path =
       GetProfile()->GetPath().Append(chrome::kCustomDictionaryFileName);
@@ -3692,6 +3699,7 @@ TEST_F(ChromeBrowsingDataRemoverDelegateTest, WipeCustomDictionaryData) {
   EXPECT_EQ(std::string::npos, contents.find("spowing"));
   EXPECT_FALSE(base::PathExists(backup_path));
 }
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 TEST_F(ChromeBrowsingDataRemoverDelegateTest,
        WipeNotificationPermissionPromptOutcomesData) {
