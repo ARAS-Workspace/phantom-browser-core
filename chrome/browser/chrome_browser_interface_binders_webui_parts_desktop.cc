@@ -285,6 +285,11 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       ProfileCustomizationUI
       >(map);
 
+  RegisterWebUIControllerInterfaceBinder<
+      help_bubble::mojom::HelpBubbleHandlerFactory, UserEducationInternalsUI,
+      ReadingListUI, NewTabPageUI, CustomizeChromeUI, HistoryUI,
+      ProfilePickerUI>(map);
+
 #if !defined(OFFICIAL_BUILD)
   RegisterWebUIControllerInterfaceBinder<foo::mojom::FooHandler, NewTabPageUI>(
       map);
