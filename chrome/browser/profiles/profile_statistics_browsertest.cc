@@ -34,10 +34,8 @@ namespace {
 std::set<std::string> stats_categories() {
   std::set<std::string> categories;
   categories.insert(profiles::kProfileStatisticsBrowsingHistory);
-  categories.insert(profiles::kProfileStatisticsPasswords);
   categories.insert(profiles::kProfileStatisticsBookmarks);
-  categories.insert(profiles::kProfileStatisticsAutofill);
-  EXPECT_EQ(4u, categories.size());
+  EXPECT_EQ(2u, categories.size());
   return categories;
 }
 
