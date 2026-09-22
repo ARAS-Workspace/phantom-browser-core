@@ -13,13 +13,13 @@ TOOLS="$ROOT/phantom_tools"
 STAGING="$TOOLS/.deps/staging"
 
 usage() {
-    echo "usage: core-build.sh [-j N] [target...]"
+    echo "usage: core-build-mac.sh [-j N] [target...]"
     echo "-j defaults to $DEFAULT_JOBS, target defaults to $DEFAULT_TARGET"
     echo "test targets: unit_tests components_unittests browser_tests"
 }
 
-die() { echo "core-build: $*" >&2; exit 1; }
-say() { echo "core-build: $*"; }
+die() { echo "core-build-mac: $*" >&2; exit 1; }
+say() { echo "core-build-mac: $*"; }
 
 path_without_virtualenv() {
     local out="" entry

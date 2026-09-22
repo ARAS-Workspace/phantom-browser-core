@@ -5,7 +5,7 @@ CLion'u bu ağaca yöneltmenin adımları. Önce derleyin: `out/dev/gen` altınd
 binlerce include'u çözemiyor.
 
     phantom_tools/core-sync.sh
-    phantom_tools/core-build.sh -j 10
+    phantom_tools/core-build-mac.sh -j 10
 
 ## Projeyi açmadan önce
 
@@ -55,7 +55,7 @@ tek dosyalık `Recompile` sunuyor; gerisi özel bir hedef üzerinden yürüyor.
 Targets`. Build alanı bir **External Tool** istiyor, onu yanındaki `...` düğmesiyle
 oluşturun:
 
-    Program:           <ağaç>/phantom_tools/core-build.sh
+    Program:           <ağaç>/phantom_tools/core-build-mac.sh
     Argümanlar:        -j 10
     Çalışma dizini:    <ağaç>
 

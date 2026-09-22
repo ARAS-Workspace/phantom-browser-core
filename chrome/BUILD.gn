@@ -56,10 +56,6 @@ if (is_android) {
   import("//third_party/icu/config.gni")
 }
 
-# b/365489014: CrOS' chrome.sections_embedded target breaks on component builds;
-# there's no clear value of supporting it there, so disable it.
-_cros_generate_embed_section_target = false
-
 declare_args() {
   # On macOS, `is_chrome_branded` builds that have been signed locally will not
   # launch because certain entitlements are tied to the official Google code

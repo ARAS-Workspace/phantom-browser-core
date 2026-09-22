@@ -14,7 +14,8 @@ copied here, and the two trees do not share a build directory.
 ## Scripts
 
     phantom_tools/core-sync.sh [verify deps configure compdb]
-    phantom_tools/core-build.sh [-j N] [target...]
+    phantom_tools/core-build-mac.sh [-j N] [target...]
+    phantom_tools/core-gate-linux.sh [gen check]
 
 Stages of `core-sync.sh`:
 
@@ -51,3 +52,23 @@ trees gclient leaves in the tree, `out/`, and the generated `compile_commands.js
 are listed in this repository's own `.gitignore`, under a block that names them.
 This is a fork: upstream reaches this tree through a loop we control, not through a
 merge, so that file is ours to edit.
+
+## The linux gate
+
+This tree is built for mac. Linux is verified, not built: a linux link on a mac
+host is not a configuration chromium supports, and the value we want does not
+need one.
+
+    phantom_tools/core-gate-linux.sh gen    # gn gen out/dev-linux, target_os=linux
+    phantom_tools/core-gate-linux.sh check  # gn check over the same directory
+
+`flags-dev-linux.gn` carries the arguments; `flags-dev.gn` is left alone, since
+it holds `use_system_xcode=false`, which only means something on mac.
+`out/dev-linux` holds ninja files and nothing else, well under a gigabyte.
+
+Run it before every deletion package. `gn gen` reads every BUILD.gn with
+target_os="linux" and resolves every label, which is where two defects appeared
+that the mac gates had stayed silent about: a `//media/gpu/chromeos` label with
+no BUILD.gn behind it any more, and an unconditional sources row in `ui/aura`,
+a file the mac configuration does not load at all because `use_aura` is false
+there.

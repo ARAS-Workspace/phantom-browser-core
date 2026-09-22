@@ -1,0 +1,53 @@
+# Linux gate flags. This tree is built for mac; linux is VERIFIED, not built.
+# core-gate-linux.sh runs gn gen and gn check with these and stops there, so
+# nothing here has to satisfy a compiler or a linker.
+#
+# Why a separate file instead of flags-dev.gn: that one carries
+# use_system_xcode=false, which only means something on mac, and it leaves
+# use_sysroot at false for a host that has the SDK. Sharing one file would
+# make each platform answer for the other's arguments.
+#
+# The flags below mirror flags-dev.gn wherever the two agree, so the branches
+# the gate walks are the branches the development tree would walk.
+is_debug=false
+dcheck_always_on=true
+is_official_build=false
+is_clang=true
+enable_rust=true
+use_thin_lto=false
+chrome_pgo_phase=0
+symbol_level=2
+blink_symbol_level=1
+enable_iterator_debugging=false
+enable_updater=false
+proprietary_codecs=true
+ffmpeg_branding="Chrome"
+enable_swiftshader=true
+
+# The debian sysroot arrives through DEPS entries guarded by checkout_linux,
+# and .gclient in phantom_tools/.deps asks for mac only, so it is not on disk.
+# gn gen does not open a sysroot; it only records paths. Set this to true once
+# the sysroot is fetched and the gate will also walk the pkg_config branches.
+use_sysroot=false
+
+# build/modules/BUILD.gn:111 calls expand_directory("${sysroot}/usr/include")
+# for linux, and with use_sysroot=false that reads /usr/include on the host.
+# A mac host keeps its headers in the SDK, so gn opens a directory that is not
+# there. The block sits behind this argument, and //build/modules carries
+# header precompilation for the toolchain rather than product code, so the
+# gate loses nothing by walking around it. Turn this back on together with
+# use_sysroot once the debian sysroot is fetched.
+use_unified_system_module=false
+
+# gn builds a HOST toolchain as well, and this host is a mac, so
+# build/config/mac/BUILD.gn is evaluated even with target_os="linux". Without
+# this the host mac configuration reaches for xcode-select and rebases an empty
+# sysroot at build/config/mac/BUILD.gn:55. The same argument in flags-dev.gn
+# points at build/mac_files/xcode_binaries, which core-sync.sh keeps current.
+use_system_xcode=false
+
+# use_aura, use_ozone, use_glib, use_dbus, use_udev and use_bluez are left at
+# their linux defaults on purpose. Those are the branches the mac gates cannot
+# see, and they are the reason this gate exists: the two defects it was built
+# for sat under is_linux and under use_aura.
+target_os="linux"

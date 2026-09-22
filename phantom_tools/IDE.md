@@ -5,7 +5,7 @@ How to point CLion at this tree. Build first: the generated headers under
 resolve thousands of includes.
 
     phantom_tools/core-sync.sh
-    phantom_tools/core-build.sh -j 10
+    phantom_tools/core-build-mac.sh -j 10
 
 ## Before opening the project
 
@@ -54,7 +54,7 @@ target.
 **6. Custom Build Target.** `Settings | Build, Execution, Deployment | Custom Build
 Targets`. The Build field takes an **External Tool**, created with the `...` button:
 
-    Program:           <tree>/phantom_tools/core-build.sh
+    Program:           <tree>/phantom_tools/core-build-mac.sh
     Arguments:         -j 10
     Working directory: <tree>
 

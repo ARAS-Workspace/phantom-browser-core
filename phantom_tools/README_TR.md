@@ -14,7 +14,8 @@ kopyalanmaz ve iki ağaç aynı build dizinini paylaşmaz.
 ## Betikler
 
     phantom_tools/core-sync.sh [verify deps configure compdb]
-    phantom_tools/core-build.sh [-j N] [hedef...]
+    phantom_tools/core-build-mac.sh [-j N] [hedef...]
+    phantom_tools/core-gate-linux.sh [gen check]
 
 `core-sync.sh` aşamaları:
 
@@ -54,3 +55,22 @@ dosyası ise bu deponun kendi `.gitignore` dosyasında, onları adlandıran bir 
 altında listelenir. Burası bir fork: upstream bu ağaca birleştirmeyle değil, bizim
 yönettiğimiz bir döngüyle giriyor, dolayısıyla o dosya bizim düzenleyebileceğimiz
 bir dosya.
+
+## Linux kapısı
+
+Bu ağaç mac için derlenir. Linux derlenmez, **doğrulanır**: mac üzerinde bir
+linux link'i chromium'un desteklediği bir yapılandırma değil, ve istediğimiz
+değer zaten ona ihtiyaç duymuyor.
+
+    phantom_tools/core-gate-linux.sh gen    # gn gen out/dev-linux, target_os=linux
+    phantom_tools/core-gate-linux.sh check  # aynı dizinde gn check
+
+Bayrakları `flags-dev-linux.gn` taşır; `flags-dev.gn`'e dokunulmaz, çünkü o
+dosyada `use_system_xcode=false` var ve bu yalnız mac'te anlamlı.
+`out/dev-linux` yalnız ninja dosyaları tutar, bir gigabaytın çok altında.
+
+Her silme paketinden önce koşar. `gn gen`, target_os="linux" ile her BUILD.gn'i
+okur ve her etiketi çözer; mac kapılarının sessiz kaldığı iki defekt tam burada
+göründü: artık arkasında BUILD.gn olmayan bir `//media/gpu/chromeos` etiketi ve
+`ui/aura` içindeki koşulsuz bir sources satırı — o dosyayı mac yapılandırması
+`use_aura` false olduğu için hiç yüklemiyor.
