@@ -906,7 +906,6 @@ component("views") {
     if (enable_desktop_aura) {
       public += [
         "widget/desktop_aura/desktop_capture_client.h",
-        "widget/desktop_aura/desktop_drop_target_win.h",
         "widget/desktop_aura/desktop_event_client.h",
         "widget/desktop_aura/desktop_focus_rules.h",
         "widget/desktop_aura/desktop_native_cursor_manager.h",
