@@ -37,7 +37,6 @@ if (enable_rlz_support) {
     sources = [
       "lib/crc8.cc",
       "lib/crc8.h",
-      "lib/machine_deal_win.h",
       "lib/machine_id.cc",
       "lib/machine_id.h",
       "lib/rlz_lib_clear.cc",

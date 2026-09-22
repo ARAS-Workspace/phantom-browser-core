@@ -82,7 +82,6 @@ static_library("browser") {
     "password_change_backup_password_cleaner.h",
     "password_change_service_interface.cc",
     "password_change_service_interface.h",
-    "password_check_referrer_android.h",
     "password_counter.cc",
     "password_counter.h",
     "password_cross_domain_confirmation_popup_controller.h",
