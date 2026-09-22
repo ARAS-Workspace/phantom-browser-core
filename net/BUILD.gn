@@ -1342,39 +1342,6 @@ component("net") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "android/android_http_util.cc",
-      "android/cert_verify_result_android.cc",
-      "android/cert_verify_result_android.h",
-      "android/gurl_utils.cc",
-      "android/http_auth_negotiate_android.cc",
-      "android/http_auth_negotiate_android.h",
-      "android/keystore.cc",
-      "android/keystore.h",
-      "android/network_change_notifier_android.cc",
-      "android/network_change_notifier_android.h",
-      "android/network_change_notifier_delegate_android.cc",
-      "android/network_change_notifier_delegate_android.h",
-      "android/network_change_notifier_factory_android.cc",
-      "android/network_change_notifier_factory_android.h",
-      "android/network_library.cc",
-      "android/network_library.h",
-      "android/traffic_stats.cc",
-      "android/traffic_stats.h",
-      "cert/cert_verify_proc_android.cc",
-      "cert/cert_verify_proc_android.h",
-      "cert/test_root_certs_android.cc",
-      "cert/x509_util_android.cc",
-      "proxy_resolution/proxy_config_service_android.cc",
-      "proxy_resolution/proxy_config_service_android.h",
-      "ssl/ech_mode_getter_android.cc",
-      "ssl/ech_mode_getter_android.h",
-      "ssl/ssl_platform_key_android.cc",
-      "ssl/ssl_platform_key_android.h",
-    ]
-  }
-
   if (is_ios) {
     sources += [
       "cert/cert_verify_proc_ios.cc",
@@ -1597,12 +1564,6 @@ component("net") {
       "base/network_interfaces_getifaddrs.cc",
       "base/network_interfaces_getifaddrs.h",
     ]
-    if (is_android) {
-      sources += [
-        "base/network_interfaces_getifaddrs_android.cc",
-        "base/network_interfaces_getifaddrs_android.h",
-      ]
-    }
   }
 
   if (chrome_root_store_supported) {
@@ -1622,12 +1583,6 @@ component("net") {
         "cert/internal/trust_store_win.h",
         "third_party/mozilla_win/cert/win_util.cc",
         "third_party/mozilla_win/cert/win_util.h",
-      ]
-    }
-    if (is_android) {
-      sources += [
-        "cert/internal/trust_store_android.cc",
-        "cert/internal/trust_store_android.h",
       ]
     }
   }
@@ -1948,14 +1903,7 @@ source_set("net_deps") {
     public_configs += [ "//build/linux:gio_config" ]
   }
 
-  if (is_android) {
-    public_deps += [ ":net_jni_headers" ]
-  }
-
   if (use_platform_icu_alternatives) {
-    if (is_android) {
-      public_deps += [ ":net_jni_headers" ]
-    }
   } else {
     public_deps += [
       "//base:i18n",
@@ -2591,28 +2539,6 @@ if (is_linux || is_mac) {
   }
 }
 
-if (is_android) {
-  generate_jni("net_jni_headers") {
-    # quic_server links this code.
-    use_weak_called_by_natives = true
-    sources = [
-      "android/java/src/org/chromium/net/AndroidCertVerifyResult.java",
-      "android/java/src/org/chromium/net/AndroidKeyStore.java",
-      "android/java/src/org/chromium/net/AndroidNetworkLibrary.java",
-      "android/java/src/org/chromium/net/AndroidTrafficStats.java",
-      "android/java/src/org/chromium/net/DnsStatus.java",
-      "android/java/src/org/chromium/net/GURLUtils.java",
-      "android/java/src/org/chromium/net/HttpNegotiateAuthenticator.java",
-      "android/java/src/org/chromium/net/HttpUtil.java",
-      "android/java/src/org/chromium/net/NetStringUtil.java",
-      "android/java/src/org/chromium/net/NetworkActiveNotifier.java",
-      "android/java/src/org/chromium/net/NetworkChangeNotifier.java",
-      "android/java/src/org/chromium/net/ProxyChangeListener.java",
-      "android/java/src/org/chromium/net/X509Util.java",
-    ]
-  }
-}
-
 if (is_android || is_linux) {
   executable("disk_cache_memory_test") {
     testonly = true
@@ -3175,20 +3101,6 @@ target(_test_target_type, "net_unittests") {
     "url_request/url_request_unittest.cc",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/dummy_spnego_authenticator.cc",
-      "android/dummy_spnego_authenticator.h",
-      "android/http_auth_negotiate_android_unittest.cc",
-      "android/network_change_notifier_android_unittest.cc",
-      "android/network_library_unittest.cc",
-      "android/traffic_stats_unittest.cc",
-      "cert/cert_verify_proc_android_unittest.cc",
-      "proxy_resolution/proxy_config_service_android_unittest.cc",
-      "ssl/ssl_platform_key_android_unittest.cc",
-    ]
-  }
-
   if (is_linux) {
     sources += [
       "base/network_change_notifier_linux_unittest.cc",
@@ -3338,10 +3250,6 @@ target(_test_target_type, "net_unittests") {
 
   if (is_posix) {
     sources += [ "base/sockaddr_util_posix_unittest.cc" ]
-  }
-
-  if (is_android) {
-    sources += [ "base/network_change_notifier_passive_unittest.cc" ]
   }
 
   if (enable_reporting) {
@@ -3556,36 +3464,6 @@ target(_test_target_type, "net_unittests") {
     ]
   }
 
-  if (is_android) {
-    deps += [
-      ":net_jni_headers",
-      "//base:base_unittest_support_java",
-      "//net/android:dummy_spnego_authenticator_java",
-      "//net/android:dummy_spnego_authenticator_jni",
-      "//net/android:net_java",
-      "//net/android:net_java_test_support",
-      "//net/android:net_test_support_jni",
-      "//net/android:net_tests_java",
-      "//net/android:net_tests_jni",
-      "//net/android:net_unittests_apk_resources",
-
-      # TODO(mmenke):  This depends on test_support_base, which depends on
-      #                icu.  Figure out a way to remove that dependency.
-      "//testing/android/native_test:native_test_native_code",
-    ]
-    android_manifest = "//net/android/unittest_support/AndroidManifest.xml"
-
-    sources += [
-      "base/address_tracker_linux_unittest.cc",
-      "base/network_interfaces_linux_unittest.cc",
-    ]
-    shard_timeout = 300
-
-    if (enable_chrome_android_internal) {
-      data_deps += [ "//clank/build/bot/filters:net_unittests_filters" ]
-    }
-  }
-
   if (is_win) {
     libs = [
       "iphlpapi.lib",
@@ -3743,9 +3621,6 @@ if (!is_ios) {
       deps += [ "//build/win:default_exe_manifest" ]
     }
 
-    if (is_android) {
-      deps += [ "//net/android:net_java" ]
-    }
   }
 }
 

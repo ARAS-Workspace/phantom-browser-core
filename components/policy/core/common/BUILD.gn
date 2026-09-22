@@ -317,24 +317,6 @@ source_set("internal") {
       "config_dir_policy_loader.h",
     ]
   }
-  if (is_android) {
-    sources += [
-      "android/android_combined_policy_provider.cc",
-      "android/android_combined_policy_provider.h",
-      "android/policy_converter.cc",
-      "android/policy_converter.h",
-      "android/policy_feature_map.cc",
-      "android/policy_map_android.cc",
-      "android/policy_map_android.h",
-      "android/policy_service_android.cc",
-      "android/policy_service_android.h",
-      "management/android_enterprise_info.cc",
-      "management/android_enterprise_info.h",
-      "management/platform_management_status_provider_android.cc",
-      "management/platform_management_status_provider_android.h",
-    ]
-    deps += [ "//components/policy/android:jni_headers" ]
-  }
   if (is_apple) {
     sources += [
       "mac_util.cc",
@@ -624,9 +606,6 @@ source_set("unit_tests") {
     "//third_party/libxml:xml_reader",
     "//ui/base",
   ]
-  if (is_android) {
-    deps += [ "//components/policy/android:test_jni_headers" ]
-  }
 
   if (use_blink) {
     deps += [

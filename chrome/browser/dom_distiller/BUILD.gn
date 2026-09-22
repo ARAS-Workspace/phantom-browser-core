@@ -17,12 +17,6 @@ source_set("dom_distiller") {
     "//components/keyed_service/core",
   ]
 
-  if (is_android) {
-    sources += [
-      "../android/dom_distiller/distiller_ui_handle_android.h",
-      "dom_distiller_service_factory_android.h",
-    ]
-  }
 }
 
 source_set("impl") {
@@ -41,18 +35,6 @@ source_set("impl") {
     "//components/back_forward_cache",
     "//components/dom_distiller/content/browser",
   ]
-
-  if (is_android) {
-    sources += [
-      "../android/dom_distiller/distiller_ui_handle_android.cc",
-      "dom_distiller_service_factory_android.cc",
-      "tab_utils_android.cc",
-    ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//components/navigation_interception",
-    ]
-  }
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }

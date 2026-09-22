@@ -59,10 +59,6 @@ component("display") {
     "unified_desktop_utils.h",
   ]
 
-  if (is_android) {
-    sources += [ "screen_android.cc" ]
-  }
-
   if (is_mac) {
     sources += [
       "mac/ca_display_link_mac.h",

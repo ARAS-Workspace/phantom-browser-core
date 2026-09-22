@@ -201,26 +201,6 @@ source_set("filters") {
       ]
     }
 
-    if (is_android) {
-      sources += [
-        "android/video_frame_extractor.cc",
-        "android/video_frame_extractor.h",
-      ]
-    }
-  }
-
-  if (is_android) {
-    sources -= [
-      "decrypting_audio_decoder.cc",
-      "decrypting_audio_decoder.h",
-      "decrypting_video_decoder.cc",
-      "decrypting_video_decoder.h",
-    ]
-    sources += [
-      "android/media_codec_audio_decoder.cc",
-      "android/media_codec_audio_decoder.h",
-    ]
-    deps += [ "//media/base/android" ]
   }
 
   if (is_apple) {
@@ -349,17 +329,6 @@ source_set("unit_tests") {
     "//testing/gtest",
     "//ui/gfx:test_support",
   ]
-
-  if (is_android) {
-    sources -= [
-      "decrypting_audio_decoder_unittest.cc",
-      "decrypting_video_decoder_unittest.cc",
-    ]
-
-    if (media_use_ffmpeg) {
-      sources += [ "android/video_frame_extractor_unittest.cc" ]
-    }
-  }
 
   # libvpx for running vpx test on chromecast doesn't support high bit depth.
   # This may cause some unit tests failure. See b/65382374 for further context.

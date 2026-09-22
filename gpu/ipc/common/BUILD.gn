@@ -65,9 +65,6 @@ source_set("ipc_common_sources") {
       "dxguid.lib",
     ]
   }
-  if (is_android) {
-    visibility += [ "//media/gpu" ]
-  }
 
   configs += [
     "//gpu:gpu_implementation",
@@ -104,19 +101,6 @@ source_set("ipc_common_sources") {
       "ios/be_layer_hierarchy_transport.cc",
       "ios/be_layer_hierarchy_transport.h",
     ]
-  }
-
-  if (is_android) {
-    sources += [
-      "android/android_hardware_buffer_utils.cc",
-      "android/android_hardware_buffer_utils.h",
-      "gpu_surface_lookup.cc",
-      "gpu_surface_lookup.h",
-      "gpu_surface_tracker.cc",
-      "gpu_surface_tracker.h",
-    ]
-    libs = [ "android" ]
-    deps += [ "//ui/gl:surface_jni_headers" ]
   }
 
   if (use_ozone) {
@@ -766,9 +750,6 @@ source_set("mojom_traits") {
     public_deps += [ "//gpu/vulkan" ]
   }
 
-  if (is_android) {
-    sources += [ "vulkan_ycbcr_info_mojom_traits.h" ]
-  }
   configs += [ "//gpu:gpu_implementation" ]
 }
 

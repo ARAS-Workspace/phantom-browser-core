@@ -178,11 +178,6 @@ component("capture_lib") {
     "//ui/gfx/geometry",
   ]
 
-  if (is_android) {
-    public_deps += [ "video/android" ]
-    deps += [ "video/android:capture_jni_headers" ]
-  }
-
   if (is_apple) {
     public_deps += [ "video/apple" ]
   }
@@ -295,13 +290,6 @@ test("capture_unittests") {
   if (is_linux) {
     deps += [ "video/linux:unit_tests" ]
     data += [ "//media/test/data/one_frame_1280x720.mjpeg" ]
-  }
-
-  if (is_android) {
-    deps += [
-      "//media/capture/video/android",
-      "//media/capture/video/android:capture_java",
-    ]
   }
 
   if (is_apple) {

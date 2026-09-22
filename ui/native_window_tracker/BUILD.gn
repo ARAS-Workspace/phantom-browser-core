@@ -32,11 +32,4 @@ component("native_window_tracker") {
     frameworks = [ "AppKit.framework" ]
   }
 
-  if (is_android) {
-    sources += [
-      "native_window_tracker_android.cc",
-      "native_window_tracker_android.h",
-    ]
-    deps += [ "//ui/android" ]
-  }
 }

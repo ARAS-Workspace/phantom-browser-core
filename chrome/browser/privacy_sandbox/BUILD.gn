@@ -66,10 +66,6 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [ "android/privacy_sandbox_bridge.cc" ]
-    deps += [ "android:jni_headers" ]
-  }
 }
 
 if (!is_android) {

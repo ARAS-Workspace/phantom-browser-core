@@ -43,11 +43,3 @@ if (!is_android) {
     ]
   }
 }
-
-if (is_android) {
-  source_set("browser_tests") {
-    testonly = true
-
-    deps = [ "android_tab_model_impl:browser_tests" ]
-  }
-}

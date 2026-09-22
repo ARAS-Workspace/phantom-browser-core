@@ -234,19 +234,6 @@ source_set("webrtc") {
       "//chrome/browser/ui:url_identity",
     ]
 
-    if (is_android) {
-      sources += [
-        # This avoids header circular dependencies with //c/b/media.
-        "../android/desktop_media_picker_android.cc",
-        "../android/desktop_media_picker_android.h",
-        "../android/media_capture_picker_manager_bridge.cc",
-        "../android/media_capture_picker_manager_bridge.h",
-        "../android/tab_sharing_ui_android.cc",
-        "../android/tab_sharing_ui_android.h",
-      ]
-      deps += [ "//chrome/android:chrome_jni_headers" ]
-    }
-
     if (is_win) {
       sources += [
         "desktop_capture_devices_util_win.cc",
@@ -523,13 +510,5 @@ if (!is_android) {
     if (use_ozone) {
       deps += [ "//ui/ozone" ]
     }
-  }
-}
-
-if (is_android) {
-  import("//build/config/android/rules.gni")
-
-  java_cpp_enum("java_enums") {
-    sources = [ "capture_policy_utils.h" ]
   }
 }

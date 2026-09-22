@@ -25,10 +25,6 @@ source_set("lifetime") {
 
   public_deps = [ "//base" ]
 
-  if (is_android) {
-    public += [ "application_lifetime_android.h" ]
-  }
-
   if (!is_android) {
     public += [
       "application_lifetime_desktop.h",
@@ -80,11 +76,6 @@ source_set("impl") {
     "//printing/buildflags",
     "//rlz/buildflags",
   ]
-
-  if (is_android) {
-    sources += [ "application_lifetime_android.cc" ]
-    deps += [ "//chrome/browser/lifetime/android:jni_headers" ]
-  }
 
   if (is_mac) {
     sources += [ "application_lifetime_mac.mm" ]

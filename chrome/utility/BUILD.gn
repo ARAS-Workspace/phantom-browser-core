@@ -222,9 +222,6 @@ static_library("utility") {
     deps += [ "//components/on_device_translation/service:on_device_translation_service" ]
   }
 
-  if (is_android) {
-    deps += [ "//chrome/services/readaloud" ]
-  }
 }
 
 if (!is_android) {

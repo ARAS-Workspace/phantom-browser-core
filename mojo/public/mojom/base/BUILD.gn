@@ -602,25 +602,6 @@ mojom_component("base") {
     },
   ]
 
-  if (is_android) {
-    cpp_typemaps += [
-      {
-        types = [
-          {
-            mojom = "mojo_base.mojom.ApplicationState"
-            cpp = "::base::android::ApplicationState"
-          },
-        ]
-        traits_headers =
-            [ "//mojo/public/cpp/base/application_state_mojom_traits.h" ]
-        traits_public_deps = [
-          "//base",
-          "//mojo/public/cpp/base:typemap_traits",
-        ]
-      },
-    ]
-  }
-
   if (is_win) {
     cpp_typemaps += [
       {

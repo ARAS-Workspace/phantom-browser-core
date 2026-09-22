@@ -44,13 +44,6 @@ source_set("impl") {
   if (enable_extensions) {
     deps += [ "//extensions/browser" ]
   }
-  if (is_android) {
-    sources += [ "android/bluetooth_bridge.cc" ]
-    deps += [
-      "//chrome/browser/bluetooth/android:jni_headers",
-      "//chrome/browser/ui/android/device_dialog",
-    ]
-  }
 }
 
 if (!is_android) {

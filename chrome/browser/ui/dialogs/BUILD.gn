@@ -67,9 +67,6 @@ source_set("browser_dialogs") {
     deps += [ "//components/constrained_window" ]
   }
 
-  if (is_android) {
-    deps += [ "//ui/android" ]
-  }
 }
 
 if (is_linux) {

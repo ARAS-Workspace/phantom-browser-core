@@ -113,25 +113,6 @@ source_set("app") {
     "//content/public/app:*",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/content_child_process_service_delegate.cc",
-      "android/content_jni_onload.cc",
-      "android/content_main_android.cc",
-      "android/content_main_android.h",
-      "android/javaless_child_process_service.cc",
-      "android/library_loader_hooks.cc",
-      "android/library_loader_hooks.h",
-    ]
-    deps += [
-      "//base:build_info_aidl_native",
-      "//base:process_launcher_aidl_native",
-      "//content/common",
-      "//mojo/public/java/system:native_support",
-      "//ui/gl",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "mac_init.h",

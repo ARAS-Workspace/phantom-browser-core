@@ -44,16 +44,6 @@ source_set("data_controls") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [
-      "android_data_controls_dialog.cc",
-      "android_data_controls_dialog.h",
-      "android_data_controls_dialog_factory.cc",
-      "android_data_controls_dialog_factory.h",
-    ]
-    deps += [ "//ui/android" ]
-  }
-
   if (!is_android) {
     sources += [
       "desktop_data_controls_dialog.cc",
@@ -149,22 +139,4 @@ source_set("unit_tests") {
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}
-
-if (is_android) {
-  source_set("android_browsertests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    configs += [ "//components/enterprise:extra_warnings" ]
-
-    sources = [ "android_data_controls_dialog_browsertest.cc" ]
-
-    deps = [
-      ":data_controls",
-      "//base",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gmock",
-    ]
-  }
 }

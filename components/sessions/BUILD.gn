@@ -5,10 +5,6 @@
 import("//build/config/apple/mobile_config.gni")
 import("//build/config/features.gni")
 
-if (is_android) {
-  import("//build/config/android/config.gni")
-}
-
 config("implementation") {
   defines = [ "SESSIONS_IMPLEMENTATION" ]
 }

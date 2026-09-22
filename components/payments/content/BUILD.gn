@@ -212,10 +212,6 @@ group("unit_tests") {
     ":payment_content_unit_tests",
     "//components/payments/content/browser_binding:passkey_browser_binder_unittests",
   ]
-  if (is_android) {
-    deps +=
-        [ "//components/payments/content/browser_binding:android_unittests" ]
-  }
   if (is_mac || is_win || is_linux) {
     deps +=
         [ "//components/payments/content/browser_binding:desktop_unittests" ]

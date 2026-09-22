@@ -56,14 +56,6 @@ source_set("performance_manager") {
     "//url",
   ]
 
-  if (is_android) {
-    public += [
-      "policies/discard_page_with_crashed_subframe_policy.h",
-      "policies/process_rank_policy_android.h",
-    ]
-    public_deps += [ "//content/public/browser" ]
-  }
-
   if (!is_android) {
     public += [
       "execution_context_priority/side_panel_loading_voter.h",
@@ -170,21 +162,6 @@ source_set("impl") {
     "//third_party/blink/public/common:headers",
     "//ui/accessibility",
   ]
-
-  if (is_android) {
-    sources += [
-      "policies/discard_page_with_crashed_subframe_policy.cc",
-      "policies/process_rank_policy_android.cc",
-    ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/ui/android/tab_model",
-    ]
-    if (enable_guest_view && !enable_extensions_core) {
-      deps += [ "//components/guest_view/browser/slim_web_view" ]
-    }
-  }
 
   if (!is_android) {
     sources += [
@@ -358,23 +335,6 @@ source_set("unit_tests") {
       "user_tuning/user_performance_tuning_manager_unittest.cc",
       "user_tuning/user_performance_tuning_notifier_unittest.cc",
     ]
-  }
-
-  if (is_android) {
-    sources += [
-      "policies/discard_page_with_crashed_subframe_policy_unittest.cc",
-      "policies/process_rank_policy_android_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/ui/android/tab_model:test_support",
-    ]
-    if (enable_guest_view && !enable_extensions_core) {
-      deps += [
-        "//chrome/browser/android/guest_view",
-        "//components/guest_view/browser/slim_web_view",
-      ]
-    }
   }
 
   if (is_linux || is_mac || is_win) {

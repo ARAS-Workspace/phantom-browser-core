@@ -78,15 +78,6 @@ source_set("metrics") {
     "//ui/display",
   ]
 
-  if (is_android) {
-    public += [
-      "android/background_upload_task.h",
-      "chrome_android_metrics_provider.h",
-      "page_load_metrics_provider.h",
-    ]
-    public_deps += [ "//components/background_task_scheduler:public" ]
-  }
-
   if (!is_android) {
     public += [
       "desktop_platform_features_metrics_provider.h",
@@ -262,22 +253,6 @@ source_set("impl") {
     "//services/resource_coordinator/public/cpp/memory_instrumentation:browser",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/background_upload_task.cc",
-      "chrome_android_metrics_provider.cc",
-      "incognito_observer_android.cc",
-      "page_load_metrics_provider.cc",
-    ]
-    deps += [
-      "//chrome/browser/android/metrics:jni_headers",
-      "//chrome/browser/notifications:jni_headers",
-    ]
-    if (current_cpu == "arm") {
-      deps += [ "//third_party/cpu_features:ndk_compat" ]
-    }
-  }
-
   if (!is_android) {
     sources += [
       "browser_activity_watcher.cc",
@@ -404,9 +379,6 @@ source_set("test_support") {
     "//third_party/metrics_proto",
   ]
 
-  if (is_android) {
-    deps += [ "//content/public/browser" ]
-  }
 }
 
 source_set("unit_tests") {
@@ -582,12 +554,6 @@ source_set("platform_browser_tests") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    deps += [
-      "//chrome/browser/optimization_guide",
-      "//chrome/browser/ui/android/tab_model:test_support",
-    ]
-  }
 }
 
 if (!is_android) {
@@ -640,46 +606,5 @@ if (!is_android) {
     if (is_win) {
       deps += [ "//sandbox/win:common" ]
     }
-  }
-}
-
-if (is_android) {
-  source_set("android_browsertests") {
-    testonly = true
-
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [
-      "android/background_upload_task_browsertest.cc",
-      "dwa_browsertest.cc",
-      "metrics_service_user_demographics_browsertest.cc",
-      "puma_browsertest.cc",
-      "ukm_browsertest.cc",
-    ]
-
-    deps = [
-      ":metrics",
-      ":test_support",
-      "//base",
-      "//chrome/browser/android",
-      "//chrome/browser/sync",
-      "//chrome/browser/sync/test/integration:sync_integration_test_support",
-      "//chrome/browser/ui/android/tab_model:test_support",
-      "//chrome/browser/unified_consent",
-      "//chrome/test:test_support",
-      "//components/background_task_scheduler:factory",
-      "//components/metrics/demographics",
-      "//components/metrics/demographics:test_support",
-      "//components/metrics/private_metrics",
-      "//components/metrics/private_metrics:dwa_recorder",
-      "//components/metrics/private_metrics:private_metrics_features",
-      "//components/metrics/structured",
-      "//components/ukm:ukm_test_helper",
-      "//components/webui/chrome_urls",
-      "//content/test:test_support",
-      "//testing/gtest",
-      "//third_party/federated_compute:confidential_compute",
-      "//third_party/federated_compute:confidential_compute_crypto_test_util",
-    ]
   }
 }

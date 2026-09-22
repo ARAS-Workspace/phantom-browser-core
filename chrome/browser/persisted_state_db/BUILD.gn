@@ -11,13 +11,6 @@ source_set("persisted_state_db") {
     "session_proto_db_factory.h",
   ]
 
-  if (is_android) {
-    sources += [
-      "persisted_state_db.cc",
-      "persisted_state_db.h",
-    ]
-  }
-
   deps = [
     "//base",
     "//chrome/browser/profiles:profile",

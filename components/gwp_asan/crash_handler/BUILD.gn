@@ -60,8 +60,5 @@ source_set("unit_tests") {
       "//third_party/crashpad/crashpad/minidump",
       "//third_party/crashpad/crashpad/tools:tool_support",
     ]
-    if (is_android) {
-      deps += [ "//components/crash/core/app" ]
-    }
   }
 }

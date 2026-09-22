@@ -22,10 +22,6 @@ if (is_win) {
   }
 }
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 component("platform") {
   output_name = "accessibility_platform"
 
@@ -127,13 +123,6 @@ component("platform") {
       "//components/crash/core/common:crash_key",
       "//gin",
       "//services/accessibility/public/mojom:automation",
-    ]
-  }
-
-  if (is_android) {
-    sources += [
-      "ax_android_constants.cc",
-      "ax_android_constants.h",
     ]
   }
 

@@ -42,12 +42,6 @@ import("//ui/webui/webui_features.gni")
 
 assert(enable_supervised_users)
 
-# //build/config/android/rules.gni imports //tools/grit/grit_rule.gni, which
-# produces a conflict for the "grit" template so we have to only include one.
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 if (is_win) {
   import("//build/config/win/manifest.gni")
 }
@@ -229,9 +223,6 @@ source_set("browser_process_impl") {
       "//components/keep_alive_registry",
     ]
   }
-  if (is_android) {
-    deps += [ "//chrome/browser/accessibility/accessibility_prefs" ]
-  }
   if (is_win) {
     deps += [ "//chrome/browser/win:isolated_browser_support" ]
   }
@@ -249,9 +240,6 @@ source_set("browser_process_platform_part") {
   ]
   if (!is_android) {
     deps += [ "//chrome/browser/lifetime" ]
-  }
-  if (is_android) {
-    public += [ "browser_process_platform_part_android.h" ]
   }
   if (is_mac) {
     public += [ "browser_process_platform_part_mac.h" ]
@@ -379,9 +367,6 @@ source_set("startup_data") {
     "//base",
     "//extensions/buildflags",
   ]
-  if (is_android) {
-    public_deps += [ "//components/leveldb_proto" ]
-  }
 }
 
 # The following header-only targets exist so that targets like :core and
@@ -527,16 +512,6 @@ if (!is_win && !is_android) {
     }
 
     public_deps = [ "//chrome/browser:browser_public_dependencies" ]
-  }
-}
-
-if (is_android) {
-  # Header-only target so downstream targets can include
-  # profile_key_startup_accessor.h without depending on :browser. The .cc
-  # file remains in //chrome/browser:browser.
-  source_set("profile_key_startup_accessor") {
-    public = [ "android/profile_key_startup_accessor.h" ]
-    deps = [ "//base" ]
   }
 }
 
@@ -1367,72 +1342,6 @@ source_set("core") {
     }
   }
 
-  if (is_android) {
-    sources += [
-      "after_startup_task_utils_android.cc",
-      "browser_process_platform_part_android.cc",
-      "chrome_browser_interface_binders_webui_parts_android.cc",
-      "chrome_browser_main_android.cc",
-      "chrome_browser_main_android.h",
-      "chrome_content_browser_client_android.cc",
-      "chrome_content_browser_client_android.h",
-      "commerce/android/price_tracking_utils_android.cc",
-      "commerce/android/shopping_service_factory_android.cc",
-      "composeplate/android/composeplate_utils.cc",
-      "icon_loader_android.cc",
-      "incognito/android/incognito_utils_android.cc",
-      "memory_details_android.cc",
-      "platform_util_android.cc",
-      "shell_integration_android.cc",
-    ]
-    deps += [
-      ":profile_key_startup_accessor",
-      "//chrome/browser/accessibility/accessibility_prefs",
-      "//chrome/browser/android",
-      "//chrome/browser/autocomplete",
-      "//chrome/browser/bookmarks",
-      "//chrome/browser/commerce",
-      "//chrome/browser/commerce/android:shopping_service_jni",
-      "//chrome/browser/composeplate/android:jni_headers",
-      "//chrome/browser/dev_ui",
-      "//chrome/browser/facilitated_payments",
-      "//chrome/browser/feed",
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/incognito:jni_headers",
-      "//chrome/browser/notifications/chime/android",
-      "//chrome/browser/offline_pages",
-      "//chrome/browser/offline_pages:impl",
-      "//chrome/browser/prefetch/android",
-      "//chrome/browser/preloading/android",
-      "//chrome/browser/ui/page_info",
-      "//chrome/browser/ui/webui/feed_internals",
-      "//chrome/browser/ui/webui/notifications_internals",
-      "//chrome/browser/util:jni_headers",
-      "//chrome/browser/webapps:android",
-      "//components/android_autofill/browser:features",
-      "//components/browser_ui/accessibility/android",
-      "//components/browser_ui/contacts_picker/android",
-      "//components/browser_ui/modaldialog/android",
-      "//components/commerce/core:shopping_service",
-      "//components/crash/content/browser",
-      "//components/credential_management/android:features",
-      "//components/external_intents/android",
-      "//components/messages/android:feature_flags",
-      "//components/navigation_interception",
-      "//components/os_crypt/async/browser:posix_key_provider",
-      "//components/page_info/android",
-      "//components/payments/content/android",
-      "//components/record_replay/core/common:mojom",
-      "//components/sensitive_content:features",
-      "//components/supervised_user/core/browser/android",
-      "//components/thin_webview",
-      "//components/translate/content/android",
-      "//components/user_prefs",
-      "//services/webnn/public/mojom:features",
-      "//ui/compositor",
-    ]
-  }
-
   if (enable_offline_pages) {
     # Used to build test harness locally.The harness is used manually to
     # produce multiple offline pages to evaluate quality of the snapshots.
@@ -1554,18 +1463,6 @@ source_set("core") {
       "//device/vr/public/mojom:isolated_xr_service",
     ]
 
-    if (is_android) {
-      deps += [ "//components/webxr/android" ]
-
-      # vr/chrome_xr_integration_client.cc unconditionally includes JNI headers
-      # from the per-runtime modules.
-      if (enable_arcore) {
-        deps += [ "//chrome/browser/android/vr:ar_jni_headers" ]
-      }
-      if (enable_cardboard) {
-        deps += [ "//chrome/browser/android/vr:vr_jni_headers" ]
-      }
-    }
   }
 
   if (is_posix) {
@@ -3247,23 +3144,6 @@ if (is_win) {
   }
 }
 
-if (is_android) {
-  android_resources("screen_capture_java_resources") {
-    sources = [
-      "media/android/java/res/layout/media_capture_picker_button_row.xml",
-      "media/android/java/res/layout/media_capture_picker_dialog.xml",
-      "media/android/java/res/layout/media_capture_picker_list.xml",
-      "media/android/java/res/layout/media_capture_picker_list_item.xml",
-    ]
-    deps = [
-      "//components/browser_ui/modaldialog/android:java_resources",
-      "//components/browser_ui/styles/android:java_resources",
-      "//components/browser_ui/theme/android:java_resources",
-      "//components/browser_ui/widget/android:java_resources",
-    ]
-  }
-}
-
 grit("resources") {
   source = "browser_resources.grd"
 
@@ -3678,14 +3558,5 @@ if (!is_android) {
     if (toolkit_views) {
       sources += [ "platform_util_browsertest.cc" ]
     }
-  }
-}
-
-if (is_android) {
-  java_cpp_enum("tos_dialog_behavior_generated_enum") {
-    sources = [ "first_run/android/first_run_prefs.h" ]
-  }
-  java_cpp_enum("screenshot_mode_enum") {
-    sources = [ "android/feedback/screenshot_mode.h" ]
   }
 }

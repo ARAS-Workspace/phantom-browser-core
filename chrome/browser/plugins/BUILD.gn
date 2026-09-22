@@ -50,9 +50,6 @@ source_set("plugins") {
     sources += [ "plugin_observer_common.h" ]
   }
 
-  if (is_android) {
-    sources += [ "plugin_observer_android.h" ]
-  }
 }
 
 source_set("impl") {
@@ -112,9 +109,6 @@ source_set("impl") {
     sources += [ "plugin_observer_common.cc" ]
   }
 
-  if (is_android) {
-    sources += [ "plugin_observer_android.cc" ]
-  }
 }
 
 source_set("test_support") {

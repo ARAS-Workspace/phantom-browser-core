@@ -4,10 +4,6 @@
 
 import("//components/spellcheck/spellcheck_build_features.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 source_set("browser") {
   sources = [
     "platform_spell_checker.h",
@@ -56,14 +52,6 @@ source_set("browser") {
     sources += [ "spellcheck_platform_mac.mm" ]
   }
 
-  if (is_android) {
-    sources += [
-      "spellcheck_platform_android.cc",
-      "spellchecker_session_bridge_android.cc",
-      "spellchecker_session_bridge_android.h",
-    ]
-    deps += [ "android:jni_headers" ]
-  }
 }
 
 source_set("unit_tests") {

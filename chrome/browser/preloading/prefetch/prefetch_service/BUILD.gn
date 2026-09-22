@@ -35,7 +35,4 @@ source_set("impl") {
     "//components/unified_consent",
   ]
 
-  if (is_android) {
-    deps += [ "//chrome/browser/flags:flags_android" ]
-  }
 }

@@ -39,10 +39,6 @@ import("//ui/base/ui_features.gni")
 import("//ui/gl/features.gni")
 import("//v8/gni/v8.gni")
 
-if (is_android) {
-  import("//build/config/android/config.gni")
-}
-
 if (is_ios) {
   import("//build/config/apple/mobile_config.gni")
 }
@@ -322,52 +318,6 @@ group("gn_all") {
         "//chrome/installer/gcapi_mac:gcapi_example",
         "//tools/mac",
       ]
-    }
-
-    if (is_android) {
-      deps += [
-        "//base:base_junit_tests",
-        "//base/android/linker:chromium_android_linker",
-        "//build/android/gyp/test:hello_world",
-        "//build/android/stacktrace:java_deobfuscate",
-        "//build/config/android/test/proto:test_build_protos",
-        "//build/private_code_test:private_paths",
-        "//chrome/test:android_browsertests",
-        "//components:components_junit_tests",
-        "//content/public/android:content_junit_tests",
-        "//content/shell/android:content_shell_apk",
-        "//device:device_junit_tests",
-        "//media/gpu:video_decode_accelerator_unittest",
-        "//net/android:net_junit_tests",
-        "//services:services_junit_tests",
-        "//testing/android/junit:junit_unit_tests",
-        "//third_party/androidx_javascriptengine",
-        "//third_party/catapult/devil",
-        "//third_party/jni_zero:jni_zero_tests",
-        "//third_party/r8:custom_d8_java",
-        "//tools/android:android_tools",
-        "//tools/cygprofile:generate_orderfile_android_trichrome_chrome_bundle",
-        "//tools/pgo:generate_profile_android_trichrome_chrome_bundle",
-        "//ui:ui_junit_tests",
-      ]
-      deps -= [
-        "//net:net_perftests",
-        "//url:url_unittests",
-      ]
-
-      deps += [
-        "//chrome/browser/android/examples/custom_tabs_client:custom_tabs_client_example_apk",
-        "//chrome/browser/android/examples/inline_autofill_service:inline_autofill_service_example_apk",
-        "//chrome/browser/android/examples/partner_browser_customizations_provider:partner_browser_customizations_example_apk",
-        "//content/shell/android:content_shell_test_apk",
-      ]
-      if (defined(android_app_secondary_abi)) {
-        deps += [ "//android_webview/tools/pinlist:generate_pinlist" ]
-      }
-
-      if (enable_chrome_android_internal) {
-        deps += [ "//clank" ]
-      }
     }
 
     if (is_linux || is_android) {
@@ -839,9 +789,6 @@ if (use_blink && !is_cronet_build) {
       # device.
       deps =
           [ "//chrome/test/chromedriver:chromedriver_server($host_toolchain)" ]
-      if (is_android) {
-        deps += [ "//chrome/test/chromedriver/test/webview_shell:chromedriver_webview_shell_apk" ]
-      }
     } else if (!is_ios) {
       deps = [
         "//chrome/test/chromedriver:chromedriver_server",

@@ -8,10 +8,6 @@ import("//gpu/vulkan/features.gni")
 import("//skia/features.gni")
 import("//ui/gl/features.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 process_json_outputs = [
   "$target_gen_dir/gpu_driver_bug_list_arrays_and_structs_autogen.h",
   "$target_gen_dir/gpu_driver_bug_list_autogen.cc",
@@ -172,9 +168,6 @@ component("config") {
   allow_circular_includes_from =
       [ "//gpu/ipc/common:gpu_preferences_interface" ]
 
-  if (is_android) {
-    sources += [ "gpu_info_collector_android.cc" ]
-  }
   if (is_win) {
     sources += [ "gpu_info_collector_win.cc" ]
     deps += [ "//third_party/microsoft_dxheaders:dxguids" ]
@@ -195,30 +188,5 @@ component("config") {
   }
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
-  }
-}
-
-if (is_android) {
-  java_cpp_strings("java_switches_srcjar") {
-    # External code should depend on ":config_java" instead.
-    visibility = [ ":*" ]
-    sources = [ "gpu_switches.cc" ]
-    class_name = "org.chromium.gpu.config.GpuSwitches"
-  }
-
-  java_cpp_features("java_features_srcjar") {
-    # External code should depend on ":config_java" instead.
-    visibility = [ ":*" ]
-    sources = [ "gpu_finch_features.cc" ]
-    class_name = "org.chromium.gpu.config.GpuFeatures"
-  }
-
-  android_library("config_java") {
-    # Right now, this only includes the Java switches/features. But if we need
-    # more Java files, they should be added here as necessary.
-    srcjar_deps = [
-      ":java_features_srcjar",
-      ":java_switches_srcjar",
-    ]
   }
 }

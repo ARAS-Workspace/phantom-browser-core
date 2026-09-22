@@ -28,10 +28,6 @@ source_set("features") {
     "//build/config/compiler:wglobal_constructors",
   ]
 
-  if (is_android) {
-    sources += [ "feature_map.cc" ]
-    deps += [ "android:gwp_asan_jni" ]
-  }
 }
 
 component("client") {

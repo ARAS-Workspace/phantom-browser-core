@@ -3,25 +3,12 @@
 # found in the LICENSE file.
 
 import("//chrome/browser/buildflags.gni")
-if (is_android) {
-  import("//build/config/android/config.gni")
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-}
 
 source_set("share") {
   public = [
     "share_attempt.h",
     "share_metrics.h",
   ]
-
-  if (is_android) {
-    public += [
-      "default_ranking.h",
-      "share_history.h",
-      "share_ranking.h",
-    ]
-  }
 
   public_deps = [
     "//base",
@@ -60,25 +47,6 @@ source_set("impl") {
     "//ui/snapshot",
   ]
 
-  if (is_android) {
-    sources += [
-      "bitmap_download_request.cc",
-      "default_ranking.cc",
-      "default_ranking_android.cc",
-      "editor_screenshot_task.cc",
-      "link_to_text_bridge.cc",
-      "qr_code_generator_android.cc",
-      "share_history.cc",
-      "share_ranking.cc",
-    ]
-    deps += [
-      ":jni_headers",
-      "//components/history/core/browser",
-      "//components/ukm/content",
-      "//ui/android",
-      "//url",
-    ]
-  }
 }
 
 source_set("test_support") {
@@ -87,16 +55,6 @@ source_set("test_support") {
   sources = []
   deps = []
 
-  if (is_android) {
-    sources += [
-      "fake_share_history.cc",
-      "fake_share_history.h",
-    ]
-    deps += [
-      ":share",
-      "//base",
-    ]
-  }
 }
 
 source_set("unit_tests") {
@@ -105,22 +63,6 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  if (is_android) {
-    sources += [
-      "share_history_unittest.cc",
-      "share_ranking_unittest.cc",
-    ]
-    deps += [
-      ":share",
-      ":test_support",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/test:test_support",
-      "//components/leveldb_proto:test_support",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
-  }
 }
 
 source_set("browser_tests") {
@@ -138,40 +80,4 @@ source_set("browser_tests") {
     "//content/test:test_support",
     "//ui/base:test_support",
   ]
-}
-
-if (is_android) {
-  android_library("java") {
-    srcjar_deps = [ ":jni_headers" ]
-    sources = [
-      "android/java/src/org/chromium/chrome/browser/share/ChromeShareExtras.java",
-      "android/java/src/org/chromium/chrome/browser/share/ShareDelegate.java",
-      "android/java/src/org/chromium/chrome/browser/share/ShareDelegateSupplier.java",
-      "android/java/src/org/chromium/chrome/browser/share/ShareHistoryBridge.java",
-      "android/java/src/org/chromium/chrome/browser/share/ShareRankingBridge.java",
-      "android/java/src/org/chromium/chrome/browser/share/share_sheet/ChromeOptionShareCallback.java",
-    ]
-
-    deps = [
-      ":jni_headers",
-      "//base:base_java",
-      "//build/android:build_java",
-      "//chrome/browser/preferences:java",
-      "//chrome/browser/profiles/android:java",
-      "//chrome/browser/tab:java",
-      "//components/browser_ui/share/android:java",
-      "//content/public/android:content_java",
-      "//third_party/androidx:androidx_annotation_annotation_java",
-      "//third_party/jni_zero:jni_zero_java",
-      "//ui/android:ui_java",
-      "//url:gurl_java",
-    ]
-  }
-
-  generate_jni("jni_headers") {
-    sources = [
-      "android/java/src/org/chromium/chrome/browser/share/ShareHistoryBridge.java",
-      "android/java/src/org/chromium/chrome/browser/share/ShareRankingBridge.java",
-    ]
-  }
 }

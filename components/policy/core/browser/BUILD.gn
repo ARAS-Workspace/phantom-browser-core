@@ -106,14 +106,6 @@ source_set("internal") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/policy_cache_updater_android.cc",
-      "android/policy_cache_updater_android.h",
-    ]
-    deps += [ "//components/policy/android:jni_headers" ]
-  }
-
   public_deps += [ "//components/policy/core/common:internal" ]
   deps += [
     "//google_apis",
@@ -233,11 +225,6 @@ source_set("unit_tests") {
 
   sources +=
       [ "webui/machine_level_user_cloud_policy_status_provider_unittest.cc" ]
-
-  if (is_android) {
-    sources += [ "android/policy_cache_updater_android_unittest.cc" ]
-    deps += [ "//components/policy/android:test_jni_headers" ]
-  }
 
   sources += [ "url_list/incognito_mode_policy_handler_unittest.cc" ]
 }

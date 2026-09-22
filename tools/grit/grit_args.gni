@@ -55,10 +55,6 @@ if (is_chrome_branded) {
   _grit_environment_vars += [ "CHROMIUM_BUILD=chromium" ]
 }
 
-if (is_android) {
-  _grit_environment_vars += [ "ANDROID_JAVA_TAGGED_ONLY=true" ]
-}
-
 # Convert |_grit_defines| and |_grit_environment_vars| to command line flags.
 grit_args = []
 foreach(i, _grit_defines) {
@@ -76,9 +72,6 @@ foreach(i, _grit_environment_vars) {
 
 _target_platform = ""
 
-if (is_android) {
-  _target_platform = "android"
-}
 if (is_ios) {
   _target_platform = "ios"
 }

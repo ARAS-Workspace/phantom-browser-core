@@ -29,10 +29,6 @@ component("clipboard_types") {
     sources += [ "clipboard_format_type_ios.mm" ]
   }
 
-  if (is_android) {
-    sources += [ "clipboard_format_type_android.cc" ]
-  }
-
   if (is_mac) {
     sources += [ "clipboard_format_type_mac.mm" ]
   }
@@ -205,10 +201,6 @@ component("clipboard") {
     }
   }
 
-  if (is_android) {
-    deps += [ "//ui/base:clipboard_jni_headers" ]
-  }
-
   if (is_linux) {
     deps += [ "//ui/linux:linux_ui" ]
   }
@@ -235,10 +227,6 @@ source_set("clipboard_test_support") {
     ]
   }
 
-  if (is_android) {
-    sources += [ "clipboard_android_test_support.cc" ]
-  }
-
   public_deps = [
     ":clipboard",
     "//base",
@@ -251,9 +239,6 @@ source_set("clipboard_test_support") {
     "//ui/gfx",
   ]
 
-  if (is_android) {
-    deps += [ "//ui/android:ui_javatest_jni_headers" ]
-  }
 }
 
 source_set("clipboard_test") {
@@ -294,10 +279,6 @@ source_set("clipboard_test") {
 
   if (is_win) {
     sources += [ "clipboard_util_win_unittest.cc" ]
-  }
-
-  if (is_android) {
-    sources += [ "clipboard_android_unittest.cc" ]
   }
 
   deps = [

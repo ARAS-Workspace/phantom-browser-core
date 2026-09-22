@@ -106,10 +106,6 @@ source_set("configs") {
     deps += [ "//chrome/browser/ui/webui/signin:inline_login" ]
   }
 
-  if (is_android) {
-    deps += [ "//chrome/browser/ui/webui/management" ]
-  }
-
   if (!is_android) {
     deps += [
       "//chrome/browser/ui/webui/access_code_cast",
@@ -780,9 +776,6 @@ source_set("ntp_tiles_internals_ui") {
     "//ui/webui",
   ]
 
-  if (is_android) {
-    deps += [ "//chrome/browser/flags:flags_android" ]
-  }
   if (enable_webui_ntp) {
     deps += [ "//chrome/browser/new_tab_page" ]
   }
@@ -857,9 +850,6 @@ source_set("net_export_ui") {
     "//ui/webui",
   ]
 
-  if (is_android) {
-    deps += [ "//components/browser_ui/share/android" ]
-  }
 }
 
 if (!is_android) {

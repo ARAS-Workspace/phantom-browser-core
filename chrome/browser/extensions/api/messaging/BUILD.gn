@@ -84,9 +84,6 @@ source_set("messaging") {
     ]
   }
 
-  if (is_android) {
-    deps += [ "android" ]
-  }
 }
 
 source_set("test_support") {

@@ -81,10 +81,6 @@ group("run_perf_test") {
     "//third_party/catapult/tracing:convert_chart_json",
   ]
 
-  if (is_android) {
-    # Required when running with bundles (to run "bundletool").
-    data_deps += [ "//third_party/jdk:java_data" ]
-  }
 }
 
 group("pytype_dependencies") {

@@ -170,10 +170,6 @@ source_set("test_support") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [ "policy_test_utils_android.cc" ]
-  }
-
   if (enable_dice_support) {
     sources += [
       "cloud/user_policy_signin_service_test_util.cc",
@@ -335,10 +331,6 @@ source_set("policy_specific_browser_tests") {
   sources += [ "test/variation_restrict_parameter_policy_browsertest.cc" ]
   deps += [ "//components/variations/service" ]
 
-  if (is_android) {
-    deps += [ "//chrome/browser/safe_browsing/android:test_support" ]
-  }
-
   if (enable_on_device_translation) {
     sources += [ "test/translator_api_policy_browsertest.cc" ]
     deps += [
@@ -426,13 +418,6 @@ source_set("browser_tests") {
         "//components/webapps/browser",
       ]
     }
-  }
-
-  if (is_android) {
-    sources += [
-      "cloud/chrome_browser_cloud_management_browsertest_delegate_android.cc",
-      "cloud/chrome_browser_cloud_management_browsertest_delegate_android.h",
-    ]
   }
 
   if (is_linux || is_mac || is_win) {
@@ -688,14 +673,6 @@ source_set("unit_tests") {
     sources += [ "developer_tools_policy_handler_unittest.cc" ]
   }
 
-  if (is_android) {
-    sources += [
-      "browser_dm_token_storage_android_unittest.cc",
-      "chrome_browser_cloud_management_controller_android_unittest.cc",
-      "client_data_delegate_android_unittest.cc",
-    ]
-  }
-
   if (is_linux) {
     sources += [ "browser_dm_token_storage_linux_unittest.cc" ]
   }
@@ -811,20 +788,6 @@ source_set("policy") {
 
   if (enterprise_client_certificates) {
     public_deps += [ "//components/enterprise/client_certificates/core" ]
-  }
-
-  if (is_android) {
-    public += [
-      "android/cloud_management_shared_preferences.h",
-      "browser_dm_token_storage_android.h",
-      "chrome_browser_cloud_management_controller_android.h",
-      "client_data_delegate_android.h",
-      "cloud/user_policy_signin_service_mobile.h",
-    ]
-    public_deps += [
-      "//chrome/browser/ui/android/tab_model",
-      "//components/enterprise/browser/promotion",
-    ]
   }
 
   if (!is_android) {
@@ -1062,26 +1025,6 @@ source_set("impl") {
 
   if (safe_browsing_mode != 0) {
     deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
-  }
-
-  if (is_android) {
-    sources += [
-      "android/cloud_management_shared_preferences.cc",
-      "browser_dm_token_storage_android.cc",
-      "chrome_browser_cloud_management_controller_android.cc",
-      "client_data_delegate_android.cc",
-      "cloud/user_policy_signin_service_mobile.cc",
-      "policy_service_factory_android.cc",
-    ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/policy/android",
-      "//chrome/browser/policy/android:jni_headers",
-      "//chrome/browser/ui/android",
-      "//chrome/browser/ui/android/tab_model",
-      "//components/enterprise/device_trust",
-      "//components/performance_manager",
-    ]
   }
 
   if (!is_android) {

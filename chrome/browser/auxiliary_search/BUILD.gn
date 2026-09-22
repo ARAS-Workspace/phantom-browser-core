@@ -100,9 +100,6 @@ source_set("browser_tests") {
     "//url",
   ]
 
-  if (is_android) {
-    deps += [ "//chrome/browser/android" ]
-  }
 }
 
 android_library("java") {

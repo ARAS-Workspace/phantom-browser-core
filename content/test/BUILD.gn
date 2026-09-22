@@ -29,11 +29,6 @@ import("//tools/grit/preprocess_if_expr.gni")
 import("//tools/typescript/webui_ts_library.gni")
 import("//v8/gni/v8.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-}
-
 if (is_ios) {
   import("//build/config/apple/mobile_config.gni")  # For `target_platform`
   import("//build/config/ios/bundle_data_from_filelist.gni")
@@ -781,21 +776,6 @@ static_library("test_support") {
     libs = [ "oleacc.lib" ]
   }
 
-  if (is_android) {
-    sources += [
-      "mock_overscroll_refresh_handler_android.cc",
-      "mock_overscroll_refresh_handler_android.h",
-    ]
-
-    deps += [
-      "//components/discardable_memory/service",
-      "//media/capture/video/android",
-      "//ui/android",
-      "//ui/android:test_support",
-      "//ui/shell_dialogs",
-    ]
-  }
-
   if (is_win) {
     deps += [ "//sandbox" ]
     public_configs = [ "//build/config/win:delayloads_for_tests" ]
@@ -1263,27 +1243,6 @@ mojom("mojo_bindings_web_test_mojom") {
   js_generate_struct_deserializers = true
 }
 
-if (is_android) {
-  static_library("android_test_message_pump_support") {
-    testonly = true
-
-    # See comment at the top of //content/BUILD.gn for why this is disabled in
-    # component builds.
-    if (is_component_build) {
-      check_includes = false
-    }
-
-    sources = [
-      "../public/test/nested_message_pump_android.cc",
-      "../public/test/nested_message_pump_android.h",
-    ]
-
-    public_deps = [ "//base" ]
-
-    deps = [ "//content/public/test/android:test_support_content_jni_headers" ]
-  }
-}
-
 static_library("blink_test_browser_support") {
   testonly = true
 
@@ -1304,51 +1263,6 @@ static_library("blink_test_browser_support") {
     "//content/public/common",
     "//skia",
   ]
-}
-
-if (is_android) {
-  import("//build/config/android/rules.gni")
-
-  content_browsertests_manifest =
-      "${target_gen_dir}/content_browsertests_manifest/AndroidManifest.xml"
-
-  jinja_template("content_browsertests_manifest") {
-    testonly = true
-    input =
-        "//content/shell/android/browsertests_apk/AndroidManifest.xml.jinja2"
-    output = content_browsertests_manifest
-    variables = [ "library_name=content_browsertests__library" ]
-  }
-
-  android_library("content_browsertests_java") {
-    testonly = true
-    resources_package = "org.chromium.content_browsertests_apk"
-    sources = [
-      "../shell/android/browsertests_apk/src/org/chromium/content_browsertests_apk/ContentBrowserTestsActivity.java",
-      "../shell/android/browsertests_apk/src/org/chromium/content_browsertests_apk/ContentBrowserTestsApplication.java",
-    ]
-    deps = [
-      ":content_browsertests_resources",
-      "//base:base_java",
-      "//base:base_java_test_support",
-      "//components/download/internal/common:internal_java",
-      "//components/metrics:metrics_java",
-      "//components/viz/service:service_java",
-      "//content/public/android:content_java",
-      "//content/public/test/android:content_java_test_support",
-      "//content/shell/android:content_shell_browsertests_java",
-      "//testing/android/native_test:native_browser_test_java",
-      "//ui/android:ui_java",
-    ]
-  }
-
-  android_resources("content_browsertests_resources") {
-    testonly = true
-    sources = [
-      "//content/shell/android/browsertests_apk/res/layout/test_activity.xml",
-      "//content/shell/android/browsertests_apk/res/xml/file_paths.xml",
-    ]
-  }
 }
 
 static_library("content_test_entry") {
@@ -1774,20 +1688,6 @@ test("content_browsertests") {
 
   if (is_linux) {
     sources += [ "../browser/network/address_map_linux_browsertest.cc" ]
-  }
-
-  if (is_android) {
-    sources += [
-      "../browser/gpu/gpu_background_kill_android_browsertest.cc",
-      "../browser/navigation_transitions/back_forward_transition_animation_manager_android_browsertest.cc",
-      "../browser/network/quic_connection_migration_android_browsertest.cc",
-      "../browser/renderer_host/android_spare_renderer_navigation_throttle_browsertest.cc",
-      "../browser/renderer_host/render_widget_host_view_android_browsertest.cc",
-
-      # TODO(crbug.com/40267166): move out of Android once we can capture
-      # for other platforms.
-      "../browser/renderer_host/navigation_transitions/navigation_entry_screenshot_browsertest.cc",
-    ]
   }
 
   if (is_win) {
@@ -2321,13 +2221,6 @@ test("content_browsertests") {
       "//ui/touch_selection:test_support",
       "//ui/wm",
     ]
-  }
-
-  # KeyboardLock is currently not supported in Android, Fuchsia and
-  # Chromecast builds. TODO(crbug.com/40891949): Re-enable on Fuchsia
-  # once its platform support is available.
-  if (is_android) {
-    sources -= [ "../browser/keyboard_lock_browsertest.cc" ]
   }
 
   # MidiManager is not supported in Fuchsia (see crbug.com/40217214).
@@ -2934,27 +2827,6 @@ test("content_unittests") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "../browser/accessibility/ax_style_data_unittest.cc",
-      "../browser/accessibility/browser_accessibility_android_unittest.cc",
-      "../browser/accessibility/text_formatting_metrics_android_unittest.cc",
-      "../browser/android/nfc_host_unittest.cc",
-      "../browser/display_cutout/display_cutout_host_impl_unittest.cc",
-      "../browser/display_cutout/safe_area_insets_host_impl_unittest.cc",
-      "../browser/navigation_transitions/blur_transition_animation_manager_unittest.cc",
-      "../browser/navigation_transitions/physics_model_unittest.cc",
-      "../browser/renderer_host/input/input_transfer_handler_android_unittest.cc",
-      "../browser/renderer_host/navigation_transitions/navigation_entry_screenshot_cache_unittest.cc",
-      "../browser/renderer_host/navigation_transitions/navigation_entry_screenshot_manager_unittest.cc",
-      "../browser/screen_orientation/screen_orientation_delegate_android_unittest.cc",
-      "../browser/web_contents/color_chooser_unittest.cc",
-      "../common/android/child_process_id_unittest.cc",
-      "../common/android/cpu_time_metrics_unittest.cc",
-      "../common/android/gin_java_bridge_value_unittest.cc",
-    ]
-  }
-
   if (enable_compute_pressure) {
     sources += [
       "../browser/compute_pressure/pressure_service_for_frame_unittest.cc",
@@ -3281,10 +3153,6 @@ test("content_unittests") {
       ]
     }
 
-    if (is_android) {
-      sources +=
-          [ "../browser/media/capture/desktop_capturer_android_unittest.cc" ]
-    }
   }
 
   if (is_linux) {
@@ -3560,30 +3428,6 @@ group("test_buildbucket_api_gpu_use_cases") {
     "//content/test/gpu/gather_swarming_json_results.py",
   ]
   data_deps = [ "//testing:test_scripts_shared" ]
-}
-
-if (is_android) {
-  content_java_sources_needing_jni = [ "//content/public/android/javatests/src/org/chromium/content/browser/sms/SmsProviderFakes.java" ]
-
-  generate_jni("content_unittests_jni_headers") {
-    testonly = true
-    sources = content_java_sources_needing_jni
-  }
-
-  android_library("content_unittests_java") {
-    testonly = true
-    sources = content_java_sources_needing_jni
-    deps = [
-      "$google_play_services_package:google_play_services_auth_api_phone_java",
-      "$google_play_services_package:google_play_services_base_java",
-      "$google_play_services_package:google_play_services_basement_java",
-      "$google_play_services_package:google_play_services_tasks_java",
-      "//base:base_java",
-      "//content/public/android:content_java",
-      "//third_party/jni_zero:jni_zero_java",
-      "//ui/android:ui_full_java",
-    ]
-  }
 }
 
 group("gpu_pytype") {

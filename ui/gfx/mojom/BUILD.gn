@@ -435,22 +435,6 @@ mojom("native_handle_types") {
     ]
   }
 
-  if (is_android) {
-    shared_cpp_typemaps += [
-      {
-        types = [
-          {
-            mojom = "gfx.mojom.AHardwareBufferHandle"
-            cpp = "::base::android::ScopedHardwareBufferHandle"
-            move_only = true
-          },
-        ]
-        traits_headers = [ "native_handle_types_mojom_traits.h" ]
-        traits_public_deps = [ ":native_handle_types_mojom_traits" ]
-      },
-    ]
-  }
-
   if (is_win) {
     shared_cpp_typemaps += [
       {

@@ -6,10 +6,6 @@ import("//build/config/features.gni")
 import("//testing/test.gni")
 import("//tools/grit/repack.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 if (use_blink) {
   test("offline_pages_unittests") {
     deps = [
@@ -21,16 +17,6 @@ if (use_blink) {
     # breaking incremental compilation.
     data = [ "../test" ]
 
-    if (is_android) {
-      # renovations tests depend on content shell and UI.  For some reason.
-      # these deps need to be on the test() target and not the source_set
-      # for renovations.
-      deps += [
-        "//content/shell/android:content_shell_assets",
-        "//net/android:net_java",
-        "//ui/android:ui_java",
-      ]
-    }
   }
 
   group("unit_tests") {

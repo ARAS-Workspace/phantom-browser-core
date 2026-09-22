@@ -65,20 +65,6 @@ static_library("default_model") {
     "//services/metrics/public/cpp:ukm_builders",
     "//ui/base",
   ]
-  if (is_android) {
-    sources += [
-      "device_tier_segment.cc",
-      "device_tier_segment.h",
-      "frequent_feature_user_model.cc",
-      "frequent_feature_user_model.h",
-      "intentional_user_model.cc",
-      "intentional_user_model.h",
-      "power_user_segment.cc",
-      "power_user_segment.h",
-      "tablet_productivity_user_model.cc",
-      "tablet_productivity_user_model.h",
-    ]
-  }
   if (enable_compose) {
     sources += [
       "compose_promotion.cc",
@@ -116,16 +102,6 @@ source_set("unit_tests") {
     "tips_notifications_ranker_unittest.cc",
     "url_visit_resumption_ranker_unittest.cc",
   ]
-
-  if (is_android) {
-    sources += [
-      "device_tier_segment_unittest.cc",
-      "frequent_feature_user_model_unittest.cc",
-      "intentional_user_model_unittest.cc",
-      "power_user_segment_unittest.cc",
-      "tablet_productivity_user_model_unittest.cc",
-    ]
-  }
 
   deps = [
     ":default_model",

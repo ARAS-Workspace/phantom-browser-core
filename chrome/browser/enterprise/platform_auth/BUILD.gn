@@ -34,14 +34,6 @@ source_set("test_utils") {
   ]
 }
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-
-  java_cpp_enum("entra_auth_enum_javagen") {
-    sources = [ "entra_provider_android.h" ]
-  }
-}
-
 source_set("unit_tests") {
   testonly = true
 
@@ -58,10 +50,6 @@ source_set("unit_tests") {
   # these platforms.
   if (is_mac || is_win || is_android) {
     deps += [ ":test_utils" ]
-  }
-
-  if (is_android) {
-    sources += [ "entra_provider_android_unittest.cc" ]
   }
 
   if (is_win) {
@@ -130,28 +118,5 @@ if (!is_android) {
         "//third_party/ocmock",
       ]
     }
-  }
-}
-
-if (is_android) {
-  source_set("android_browsertests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [
-      "entra_sso_android_browsertest.cc",
-      "platform_auth_policy_observer_browsertest.cc",
-      "platform_auth_provider_manager_browsertest.cc",
-    ]
-
-    deps = [
-      ":features",
-      ":test_utils",
-      "//base",
-      "//chrome/browser/enterprise:impl",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gmock",
-    ]
   }
 }

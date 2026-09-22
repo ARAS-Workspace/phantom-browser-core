@@ -4,12 +4,6 @@
 
 import("//pdf/features.gni")
 
-if (is_android) {
-  import("//build/config/android/config.gni")
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-}
-
 source_set("page_content_annotations") {
   public = [ "page_content_annotations_service_factory.h" ]
   sources = [ "page_content_annotations_service_factory.cc" ]
@@ -73,22 +67,6 @@ source_set("extraction_service") {
     "//chrome/browser/profiles:profile_util",
     "//components/page_content_annotations/content",
   ]
-  if (is_android) {
-    sources += [
-      "android/page_content_extraction_service_android.cc",
-      "android/page_content_extraction_service_android.h",
-      "android/page_content_extraction_service_factory_android.cc",
-      "android/page_content_extraction_tab_model_observer_android.cc",
-      "android/page_content_extraction_tab_model_observer_android.h",
-    ]
-    deps += [
-      ":factory_jni_headers",
-      ":service_jni_headers",
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/tabwindow",
-      "//chrome/browser/ui/android/tab_model",
-    ]
-  }
 }
 
 source_set("fetcher") {

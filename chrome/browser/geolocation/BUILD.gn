@@ -11,10 +11,6 @@ source_set("geolocation") {
     "geolocation_permission_context_slim_web_view.h",
   ]
 
-  if (is_android) {
-    sources += [ "geolocation_permission_context_delegate_android.h" ]
-  }
-
   public_deps = [
     "//base",
     "//components/content_settings/core/common",
@@ -31,10 +27,6 @@ source_set("impl") {
     "geolocation_permission_context_slim_web_view.cc",
   ]
 
-  if (is_android) {
-    sources += [ "geolocation_permission_context_delegate_android.cc" ]
-  }
-
   deps = [
     ":geolocation",
     "//chrome/browser/profiles:profile",
@@ -46,15 +38,6 @@ source_set("impl") {
     deps += [
       "//extensions/browser",
       "//extensions/common",
-    ]
-  }
-
-  if (is_android) {
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/webapps/installable:android",
-      "//components/search_engines",
     ]
   }
 
@@ -78,9 +61,6 @@ source_set("unit_tests") {
     "//testing/gtest",
     "//third_party/blink/public/common",
   ]
-  if (is_android) {
-    deps += [ "//components/location/android:test_support" ]
-  }
 }
 
 if (!is_android) {

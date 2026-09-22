@@ -109,25 +109,6 @@ static_library("safe_browsing") {
     deps += [ "//chrome/browser/ui/web_applications" ]
   }
 
-  # Note: is_android is not equivalent to safe_browsing_mode == 2.
-  # Sources and dependencies added to this block must not depend on anything
-  # requiring safe_browsing_mode != 0.
-  if (is_android) {
-    deps += [
-      "//chrome/browser/password_manager/android:utils",
-      "//chrome/browser/ui/android/safe_browsing",
-      "//chrome/browser/ui/android/tab_model",
-      "//components/safe_browsing/android:safe_browsing_api_handler",
-      "//components/safe_browsing/android:safe_browsing_api_handler_util",
-    ]
-
-    # android/safe_browsing:safe_browsing includes
-    # chrome/browser/safe_browsing/android/password_reuse_controller_android.h
-    # (password_reuse_dialog_view_android.cc) which is owned by this target.
-    allow_circular_includes_from +=
-        [ "//chrome/browser/ui/android/safe_browsing:safe_browsing" ]
-  }
-
   if (!is_android) {
     public += [ "generated_safe_browsing_pref.h" ]
     sources += [ "generated_safe_browsing_pref.cc" ]
@@ -780,9 +761,6 @@ source_set("unit_tests") {
       "//third_party/zlib/google:zip",
     ]
 
-    if (is_android) {
-      deps += [ "//chrome/browser/password_manager/android:unit_tests" ]
-    }
   }
 
   if (safe_browsing_mode == 0) {
@@ -900,10 +878,6 @@ source_set("unit_tests") {
     }
   }
 
-  if (is_android) {
-    deps += [ "android:test_support" ]
-  }
-
   if (safe_browsing_mode == 2 && is_android) {
     sources += [
       "android/client_side_detection_intelligent_scan_delegate_android_unittest.cc",
@@ -923,18 +897,6 @@ source_set("unit_tests") {
       "//components/safe_browsing/android:real_time_url_checks_allowlist",
       "//components/safe_browsing/android:safe_browsing_api_handler",
       "//components/safe_browsing/android:safe_browsing_api_handler_util",
-    ]
-  }
-  if (is_android) {
-    deps += [
-      "//chrome/browser/enterprise/connectors/reporting:unit_tests",
-      "//chrome/browser/enterprise/connectors/test:test_support",
-      "//chrome/browser/interstitials:unit_tests",
-      "//components/enterprise/common/proto:browser_events_proto",
-      "//components/enterprise/common/proto:chrome_reporting_entity",
-      "//components/enterprise/connectors/core",
-      "//components/enterprise/connectors/core:test_support",
-      "//components/enterprise/obfuscation/core:enterprise_obfuscation",
     ]
   }
   if (is_win || is_mac || is_linux) {
@@ -1004,13 +966,6 @@ source_set("test_support") {
       "//components/safe_browsing/core/common/proto:crx_info_proto",
       "//services/network:test_support",
       "//testing/gtest",
-    ]
-  }
-
-  if (is_android) {
-    deps += [
-      "android:test_support",
-      "android:test_support_java",
     ]
   }
 

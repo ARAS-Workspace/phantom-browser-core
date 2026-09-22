@@ -432,7 +432,4 @@ group("test_generation") {
     ":other_test_interfaces_js",
   ]
 
-  if (is_android) {
-    deps += [ ":other_test_interfaces_java" ]
-  }
 }

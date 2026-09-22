@@ -123,13 +123,6 @@ if (enable_printing) {
       ]
     }
 
-    if (is_android) {
-      deps += [
-        "//chrome/browser/android:tabs_public",
-        "//ui/android",
-      ]
-    }
-
     if (is_win) {
       sources += [
         "pdf_to_emf_converter.cc",

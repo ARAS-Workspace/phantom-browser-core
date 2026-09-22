@@ -4,10 +4,6 @@
 
 import("//third_party/protobuf/proto_library.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 source_set("commerce_info_cache") {
   sources = [
     "commerce_info_cache.cc",
@@ -270,15 +266,6 @@ static_library("shopping_service") {
     "//services/data_decoder/public/cpp",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/feature_utils_android.cc",
-      "android/shopping_service_android.cc",
-      "android/shopping_service_android.h",
-    ]
-
-    deps += [ "//components/commerce/core/android:core_jni" ]
-  }
 }
 
 source_set("shopping_service_test_support") {

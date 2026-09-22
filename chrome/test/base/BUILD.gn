@@ -459,9 +459,6 @@ source_set("testing_browser_process") {
   if (enable_chrome_notifications) {
     deps += [ "//chrome/browser/notifications" ]
   }
-  if (is_android) {
-    deps += [ "//components/supervised_user/core/browser/android" ]
-  }
 }
 
 source_set("browser_window_waiters") {
@@ -652,23 +649,6 @@ if (is_win) {
     deps = [
       "//base",
       "//chrome/test/base:process_inspector_win",
-    ]
-  }
-}
-
-if (is_android) {
-  source_set("android_ui_test_utils") {
-    testonly = true
-    sources = [
-      "android/android_ui_test_utils.cc",
-      "android/android_ui_test_utils.h",
-    ]
-    public_deps = [ "//url" ]
-    deps = [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/ui/android/tab_model",
-      "//content/public/browser",
-      "//content/test:test_support",
     ]
   }
 }

@@ -5,10 +5,6 @@
 import("//sandbox/features.gni")
 import("//testing/test.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 declare_args() {
   compile_suid_client = is_linux
 
@@ -32,9 +28,6 @@ group("sandbox") {
   }
   if (use_seccomp_bpf) {
     public_deps += [ ":seccomp_bpf" ]
-  }
-  if (is_android) {
-    public_deps += [ ":seccomp_starter_android" ]
   }
 }
 
@@ -136,9 +129,6 @@ source_set("sandbox_linux_unittests_sources") {
     ]
     deps += [ ":bpf_dsl_golden" ]
 
-    if (is_android) {
-      sources += [ "seccomp-bpf-helpers/baseline_policy_android_unittest.cc" ]
-    }
   }
   if (compile_credentials) {
     sources += [
@@ -203,9 +193,6 @@ test("sandbox_linux_unittests") {
     ":sandbox_linux_unittests_sources",
     "//sandbox/policy:tests",
   ]
-  if (is_android) {
-    use_raw_android_executable = true
-  }
 }
 
 component("seccomp_bpf") {
@@ -256,36 +243,6 @@ component("seccomp_bpf") {
     "//sandbox:sandbox_buildflags",
   ]
 
-  if (is_android) {
-    sources += [
-      "seccomp-bpf-helpers/baseline_policy_android.cc",
-      "seccomp-bpf-helpers/baseline_policy_android.h",
-    ]
-  }
-}
-
-if (is_android) {
-  # This target is available even if use_seccomp_bpf is disabled, but it also
-  # works when it is enabled.
-  component("seccomp_starter_android") {
-    sources = [
-      "seccomp-bpf-helpers/seccomp_starter_android.cc",
-      "seccomp-bpf-helpers/seccomp_starter_android.h",
-    ]
-
-    defines = [ "SANDBOX_IMPLEMENTATION" ]
-
-    deps = [
-      "//base",
-      "//sandbox:sandbox_buildflags",
-    ]
-
-    if (use_seccomp_bpf) {
-      deps += [ ":seccomp_bpf" ]
-    }
-
-    visibility = [ ":*" ]
-  }
 }
 
 if (is_linux) {

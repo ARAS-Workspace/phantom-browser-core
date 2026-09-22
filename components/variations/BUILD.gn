@@ -13,10 +13,6 @@ mojom("variations_mojom") {
   sources = [ "variations.mojom" ]
 }
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 large_variation_key_size_enabled = false
 
 buildflag_header("buildflags") {
@@ -143,54 +139,6 @@ component("variations") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "android/variations_seed_bridge.cc",
-      "android/variations_seed_bridge.h",
-      "variations_crash_keys_android.cc",
-      "variations_crash_keys_android.h",
-    ]
-    deps += [
-      "//components/crash/android:anr_build_id_provider",
-      "//components/crash/android:anr_collector_jni_headers",
-      "//components/variations/android:variations_seed_jni",
-    ]
-  }
-}
-
-if (is_android) {
-  static_library("variations_associated_data") {
-    sources = [ "android/variations_associated_data_android.cc" ]
-    deps = [
-      ":variations",
-      "//components/variations/android:variations_data_jni",
-      "//components/variations/net",
-    ]
-  }
-
-  java_cpp_strings("java_switches_srcjar") {
-    # External code should depend on ":variations_java" instead.
-    visibility = [ ":*" ]
-    sources = [ "variations_switches.cc" ]
-    class_name = "org.chromium.components.variations.VariationsSwitches"
-  }
-
-  android_library("variations_java") {
-    srcjar_deps = [
-      ":java_switches_srcjar",
-      ":variations_enum_srcjar",
-    ]
-    deps = [ "//third_party/androidx:androidx_annotation_annotation_java" ]
-  }
-
-  java_cpp_enum("variations_enum_srcjar") {
-    # External code should depend on ":variations_java" instead.
-    visibility = [ ":*" ]
-    sources = [
-      "metrics.h",
-      "synthetic_trials.h",
-    ]
-  }
 }
 
 static_library("test_support") {
@@ -360,10 +308,6 @@ if (use_fuzzing_engine_with_lpm) {
       "//components/variations/service",
       "//third_party/libprotobuf-mutator",
     ]
-    if (is_android) {
-      # Provides org.chromium.components.metrics.LowEntropySource.
-      deps += [ "//components/metrics:metrics_java" ]
-    }
     seed_corpus = "fuzzers/testcases/create_trials_from_seed/"
   }
 }

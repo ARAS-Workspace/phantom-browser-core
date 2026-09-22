@@ -8,11 +8,6 @@ import("//build/config/ui.gni")
 import("//testing/test.gni")
 import("//ui/base/ui_features.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-}
-
 if (is_ios) {
   import("//build/config/apple/mobile_config.gni")
   import("//ios/build/config.gni")
@@ -95,36 +90,6 @@ source_set("platform_event") {
 
   public_deps = [ "//base" ]
 
-  if (is_android) {
-    public_deps += [ ":platform_event_android" ]
-  }
-}
-
-if (is_android) {
-  source_set("platform_event_android") {
-    sources = [
-      "android/event_flags_android.cc",
-      "android/event_flags_android.h",
-      "android/event_type_android.cc",
-      "android/event_type_android.h",
-      "android/key_event_android.cc",
-      "android/key_event_android.h",
-      "android/platform_event_android.cc",
-      "android/platform_event_android.h",
-
-      # Allow this target to include events_export.h without depending on the
-      # events target (which would be circular).
-      "events_export.h",
-    ]
-
-    deps = [
-      ":event_constants",
-      ":keyevent_jni_headers",
-      ":motionevent_jni_headers",
-      "//base",
-      "//ui/events/types:headers",
-    ]
-  }
 }
 
 component("events_base") {
@@ -155,13 +120,6 @@ component("events_base") {
     "pointer_details.cc",
     "pointer_details.h",
   ]
-
-  if (is_android) {
-    sources += [
-      "keycodes/keyboard_code_conversion_android.cc",
-      "keycodes/keyboard_code_conversion_android.h",
-    ]
-  }
 
   if (is_win) {
     sources += [
@@ -220,17 +178,6 @@ component("events_base") {
       "AppKit.framework",
       "Carbon.framework",
     ]
-  }
-}
-
-if (is_android) {
-  java_cpp_features("java_features_srcjar") {
-    visibility = [ ":*" ]
-    sources = [ "features.cc" ]
-    class_name = "org.chromium.ui.events.UiEventsFeatures"
-  }
-  android_library("ui_events_features_java") {
-    srcjar_deps = [ ":java_features_srcjar" ]
   }
 }
 
@@ -392,47 +339,6 @@ component("events") {
     sources -= [ "events_stub.cc" ]
   }
 
-  if (is_android) {
-    public += [
-      "android/cached_historical_event_source.h",
-      "android/drag_event_android.h",
-      "android/event_handler_android.h",
-      "android/events_android_utils.h",
-      "android/gesture_event_android.h",
-      "android/gesture_event_type.h",
-      "android/key_event_utils.h",
-      "android/motion_event_android.h",
-      "android/motion_event_android_factory.h",
-      "android/motion_event_android_java.h",
-      "android/motion_event_android_source.h",
-      "android/motion_event_android_source_java.h",
-      "android/motion_event_android_source_native.h",
-
-      # TODO(crbug.com/40255699): Move this outside is_android block when
-      # consuming cross-platform code which uses it lands.
-      "back_gesture_event.h",
-    ]
-    sources += [
-      "android/cached_historical_event_source.cc",
-      "android/drag_event_android.cc",
-      "android/event_handler_android.cc",
-      "android/events_android.cc",
-      "android/events_android_utils.cc",
-      "android/gesture_event_android.cc",
-      "android/key_event_utils.cc",
-      "android/motion_event_android.cc",
-      "android/motion_event_android_factory.cc",
-      "android/motion_event_android_java.cc",
-      "android/motion_event_android_source_java.cc",
-      "android/motion_event_android_source_native.cc",
-      "back_gesture_event.cc",
-    ]
-    deps += [
-      ":keyevent_jni_headers",
-      ":motionevent_jni_headers",
-    ]
-  }
-
   if (is_mac) {
     frameworks = [ "AppKit.framework" ]
   }
@@ -491,9 +397,6 @@ component("keyboard_hook") {
     ]
   }
 
-  if (is_android) {
-    sources += [ "android/keyboard_hook_android.cc" ]
-  }
 }
 
 component("gesture_detection") {
@@ -799,16 +702,6 @@ if (use_blink) {
     # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
     # enable the diagnostic by removing this line.
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-  }
-}
-
-if (is_android) {
-  generate_jar_jni("motionevent_jni_headers") {
-    classes = [ "android/view/MotionEvent.class" ]
-  }
-
-  generate_jar_jni("keyevent_jni_headers") {
-    classes = [ "android/view/KeyEvent.class" ]
   }
 }
 

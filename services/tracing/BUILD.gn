@@ -10,11 +10,6 @@ import("//build/config/compiler/compiler.gni")
 import("//build/config/features.gni")
 import("//services/tracing/public/cpp/stack_sampling/loader_lock_sampling.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-}
-
 if (use_blink) {
   source_set("lib") {
     sources = [
@@ -170,19 +165,6 @@ source_set("tests") {
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}
-
-if (is_android) {
-  generate_jni("jni_headers") {
-    testonly = true
-    sources = [ "android/test/src/org/chromium/tracing/UnwindTestHelper.java" ]
-  }
-
-  android_library("tracing_test_helper_java") {
-    testonly = true
-    deps = [ "//third_party/jni_zero:jni_zero_java" ]
-    sources = [ "android/test/src/org/chromium/tracing/UnwindTestHelper.java" ]
-  }
 }
 
 if (enable_loader_lock_sampling) {

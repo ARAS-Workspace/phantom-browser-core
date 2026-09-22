@@ -24,9 +24,6 @@ source_set("image_fetcher") {
     "//content/public/browser",
   ]
 
-  if (is_android) {
-    deps += [ "//components/image_fetcher:android" ]
-  }
 }
 
 if (!is_android) {

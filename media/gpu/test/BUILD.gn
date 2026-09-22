@@ -87,13 +87,6 @@ if (enable_av1_decoder &&
       "//testing/gtest",
     ]
 
-    if (is_android) {
-      deps += [
-        # The test needs the java dependencies to add the java classes for their
-        # native counterparts to the test apk.
-        "//media/base/android:media_java",
-      ]
-    }
   }
 
   test("video_encode_accelerator_perf_tests") {

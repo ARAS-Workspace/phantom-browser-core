@@ -19,9 +19,6 @@ source_set("send_tab_to_self") {
     "//content/public/browser",
   ]
 
-  if (is_android) {
-    public_deps += [ "//components/messages/android" ]
-  }
 }
 
 source_set("impl") {

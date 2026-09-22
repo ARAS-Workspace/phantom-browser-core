@@ -25,9 +25,6 @@ source_set("tracing") {
     ]
   }
 
-  if (is_android) {
-    public_deps += [ "//chrome/browser/ui/android/tab_model" ]
-  }
 }
 
 source_set("impl") {

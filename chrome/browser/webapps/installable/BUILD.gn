@@ -28,46 +28,6 @@ source_set("impl") {
   }
 }
 
-if (is_android) {
-  source_set("android") {
-    sources = [
-      "installed_webapp_bridge.h",
-      "installed_webapp_geolocation_bridge.h",
-      "installed_webapp_geolocation_context.h",
-      "installed_webapp_provider.h",
-    ]
-
-    deps = [
-      "//base",
-      "//components/content_settings/core/browser",
-      "//components/content_settings/core/common",
-      "//components/permissions",
-      "//mojo/public/cpp/bindings",
-      "//services/device/public/mojom",
-      "//url",
-    ]
-  }
-
-  source_set("android_impl") {
-    sources = [
-      "installed_webapp_bridge.cc",
-      "installed_webapp_geolocation_bridge.cc",
-      "installed_webapp_geolocation_context.cc",
-      "installed_webapp_provider.cc",
-    ]
-
-    deps = [
-      ":android",
-      "//base",
-      "//components/content_settings/core/browser",
-      "//components/content_settings/core/common",
-      "//components/permissions",
-      "//services/device/public/cpp/geolocation",
-      "//url",
-    ]
-  }
-}
-
 source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

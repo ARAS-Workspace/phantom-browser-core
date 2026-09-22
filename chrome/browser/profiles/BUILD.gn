@@ -23,10 +23,6 @@ source_set("profiles") {
     "sql_init_error_message_ids.h",
   ]
 
-  if (is_android) {
-    public += [ "profile_key_android.h" ]
-  }
-
   public_deps = [
     ":profile",
     ":profile_manager",
@@ -395,9 +391,6 @@ source_set("profile") {
   if (enable_extensions) {
     deps += [ "//extensions/browser" ]
   }
-  if (is_android) {
-    deps += [ "//chrome/browser/profiles/android:jni_headers" ]
-  }
 }
 
 source_set("profile_manager") {
@@ -426,9 +419,6 @@ source_set("profile_manager") {
     deps += [ "//chrome/browser/ui/browser_window" ]
   }
 
-  if (is_android) {
-    sources += [ "profile_manager_android.h" ]
-  }
 }
 
 source_set("profile_manager_impl") {
@@ -628,9 +618,6 @@ source_set("profile_util_impl") {
     deps += [ "//chrome/browser/ui/browser_window" ]
   }
 
-  if (is_android) {
-    deps += [ "//components/supervised_user/core/browser/android" ]
-  }
 }
 
 source_set("profiles_extra_parts") {
@@ -1032,11 +1019,6 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_android) {
-    sources += [ "android/profile_resolver_unittest.cc" ]
-    deps += [ "//chrome/browser/android:profile_token" ]
-  }
-
   sources += [ "gaia_info_update_service_unittest.cc" ]
   deps += [
     ":gaia_info_update_service",
@@ -1135,24 +1117,6 @@ if (!is_android) {
     # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
     # enable the diagnostic by removing this line.
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-  }
-}
-
-if (is_android) {
-  source_set("android_browsertests") {
-    testonly = true
-
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [ "profile_browsertest_android.cc" ]
-
-    deps = [
-      ":profile_manager",
-      "//base",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
   }
 }
 

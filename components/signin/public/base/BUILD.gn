@@ -6,10 +6,6 @@ import("//build/buildflag_header.gni")
 import("//components/signin/features.gni")
 import("//third_party/protobuf/proto_library.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 buildflag_header("signin_buildflags") {
   header = "signin_buildflags.h"
   flags = [
@@ -82,11 +78,6 @@ static_library("base") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [ "signin_feature_map.cc" ]
-    deps += [ "//components/signin/public/android:jni_headers" ]
-  }
-
   if (enable_dice_support) {
     sources += [
       "binding_key_registration_token_helper.cc",
@@ -114,26 +105,6 @@ if (is_android || is_ios) {
       "//net",
     ]
     public_deps = [ "//url" ]
-    if (is_android) {
-      sources += [
-        "signin_deep_link_payload_conversions.cc",
-        "signin_deep_link_payload_conversions.h",
-      ]
-      deps += [
-        "//components/signin/public/android:jni_headers",
-        "//third_party/jni_zero",
-      ]
-    }
-  }
-}
-
-if (is_android) {
-  java_cpp_enum("signin_metrics_enum_javagen") {
-    sources = [
-      "signin_deep_link_metrics.h",
-      "signin_deep_link_payload.h",
-      "signin_metrics.h",
-    ]
   }
 }
 

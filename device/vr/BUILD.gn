@@ -4,12 +4,6 @@
 
 import("//device/vr/buildflags/buildflags.gni")
 
-if (is_android) {
-  import("//build/config/android/config.gni")
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-}
-
 config("vr_gl_mode") {
   if (use_command_buffer) {
     defines = [
@@ -281,35 +275,6 @@ if (enable_vr) {
         deps += [ ":directx_helpers" ]
       }
 
-      if (is_android) {
-        sources += [
-          "openxr/android/openxr_anchor_manager_android.cc",
-          "openxr/android/openxr_anchor_manager_android.h",
-          "openxr/android/openxr_depth_sensor_android.cc",
-          "openxr/android/openxr_depth_sensor_android.h",
-          "openxr/android/openxr_graphics_binding_open_gles.cc",
-          "openxr/android/openxr_graphics_binding_open_gles.h",
-          "openxr/android/openxr_hit_test_manager_android.cc",
-          "openxr/android/openxr_hit_test_manager_android.h",
-          "openxr/android/openxr_light_estimator_android.cc",
-          "openxr/android/openxr_light_estimator_android.h",
-          "openxr/android/openxr_mesh_manager_android.cc",
-          "openxr/android/openxr_mesh_manager_android.h",
-          "openxr/android/openxr_plane_manager_android.cc",
-          "openxr/android/openxr_plane_manager_android.h",
-          "openxr/android/openxr_platform_helper_android_statics.cc",
-          "openxr/android/openxr_scene_understanding_manager_android.cc",
-          "openxr/android/openxr_scene_understanding_manager_android.h",
-          "openxr/android/openxr_unbounded_space_provider_android.cc",
-          "openxr/android/openxr_unbounded_space_provider_android.h",
-        ]
-
-        deps += [
-          "//device/vr/android:vr_android",
-          "//third_party/angle:includes",
-        ]
-      }
-
       deps += [
         ":openxr_data",
         "//components/version_info",
@@ -496,18 +461,5 @@ if (enable_openxr) {
       configs += [ "//build/config/compiler:no_exit_time_destructors" ]
     }
 
-    if (is_android) {
-      android_apk("openxr_test_support_apk") {
-        # Used as an additional_apk in test scripts.
-        never_incremental = true
-        testonly = true
-
-        shared_libraries = [ ":openxr_mock" ]
-        library_always_compress = [ "libmockopenxrruntime.so" ]
-
-        apk_name = "OpenXrTestSupport"
-        android_manifest = "openxr/test/AndroidManifest.xml"
-      }
-    }
   }
 }

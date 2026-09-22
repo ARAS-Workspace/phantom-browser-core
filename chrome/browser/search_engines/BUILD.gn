@@ -51,24 +51,6 @@ source_set("search_engines") {
     "//url",
   ]
 
-  if (is_android) {
-    public += [ "ui_thread_search_terms_data_android.h" ]
-    sources += [
-      "template_url_service_factory_android.cc",
-      "ui_thread_search_terms_data_android.cc",
-    ]
-    deps += [
-      "//chrome/browser/android/locale:locale_manager",
-      "//chrome/browser/search_engines/android:jni_headers",
-    ]
-
-    if (enable_extensions_core) {
-      public += [ "extension_control_handler_android.h" ]
-      sources += [ "extension_control_handler_android.cc" ]
-      deps += [ "//extensions/browser" ]
-    }
-  }
-
   if (enable_rlz) {
     deps += [ "//components/rlz" ]
   }

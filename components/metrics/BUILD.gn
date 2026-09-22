@@ -7,11 +7,6 @@ import("//build/config/features.gni")
 import("//testing/test.gni")
 import("//tools/grit/grit_rule.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-}
-
 # Dependency for histogram manager users: cronet and ios/webview
 source_set("library_support") {
   public = [
@@ -425,9 +420,6 @@ if (!is_cronet_build) {
         "//extensions/buildflags",
         "//gpu/config",
       ]
-      if (is_android) {
-        deps += [ "//components/crash/content/browser" ]
-      }
     }
   }
 
@@ -688,13 +680,6 @@ if (!is_cronet_build) {
     if (is_linux) {
       sources += [ "serialization/serialization_utils_unittest.cc" ]
       deps += [ ":serialization" ]
-    }
-
-    if (is_android) {
-      sources += [
-        "android_metrics_provider_unittest.cc",
-        "gms_metrics_provider_unittest.cc",
-      ]
     }
 
     if (use_blink) {

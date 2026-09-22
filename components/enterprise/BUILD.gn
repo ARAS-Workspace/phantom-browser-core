@@ -153,12 +153,6 @@ static_library("enterprise") {
     deps += [ "//components/signin/public/identity_manager" ]
   }
 
-  if (is_android) {
-    deps += [
-      "//components/enterprise/device_attestation/android",
-      "//components/enterprise/device_attestation/android:jni_headers",
-    ]
-  }
 }
 
 static_library("test_support") {
@@ -271,18 +265,6 @@ source_set("unit_tests") {
 
   if (enterprise_client_certificates) {
     deps += [ "//components/enterprise/client_certificates:unit_tests" ]
-  }
-
-  if (is_android) {
-    sources += [
-      "device_attestation/android/attestation_utils_unittest.cc",
-      "device_attestation/android/device_attestation_service_android_unittest.cc",
-    ]
-    deps += [
-      "//components/enterprise/device_attestation:test_support",
-      "//components/enterprise/device_attestation/android",
-      "//components/enterprise/device_attestation/android:jni_headers",
-    ]
   }
 
   if (is_win || is_linux || is_mac) {

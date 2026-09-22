@@ -49,19 +49,6 @@ if (!is_android) {
   }
 }
 
-if (is_android) {
-  import("//build/util/generate_wrapper.gni")
-
-  generate_wrapper("run_benchmark_wrapper") {
-    executable = "run_benchmark"
-    wrapper_script = "$root_build_dir/bin/run_benchmark"
-    executable_args = [
-      "--chromium-output-directory",
-      "@WrappedPath(.)",
-    ]
-  }
-}
-
 # Group for running benchmarks without building Chrome.
 group("perf_without_chrome") {
   testonly = true

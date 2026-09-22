@@ -311,17 +311,6 @@ source_set("sync_integration_tests_impl") {
   }
 }
 
-if (is_android) {
-  java_group("sync_integration_tests_java") {
-    deps = [
-      "//chrome/test:android_browsertests_assets",
-      "//chrome/test:android_browsertests_java",
-      "//chrome/test:sync_integration_test_support_java",
-      "//chrome/test:test_support_java",
-    ]
-  }
-}
-
 # For Android, this target has to be built along with the
 # sync_integration_test_support_java target from the test target dependencies.
 source_set("sync_integration_test_support") {

@@ -10,10 +10,6 @@ import("features.gni")
 import("//build/config/cronet/config.gni")
 import("//third_party/jni_zero/jni_zero.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 buildflag_header("buildflags") {
   header = "buildflags.h"
   flags = [ "USE_PLATFORM_ICU_ALTERNATIVES=$use_platform_icu_alternatives" ]
@@ -216,18 +212,6 @@ test("url_unittests") {
   ]
 
   if (use_platform_icu_alternatives) {
-    # Unit tests that are not supported by the current ICU alternatives on
-    # Android.
-    # TODO(https://crbug.com/513446116): revisit this - in Android >=24 we now
-    # use android.icu.text.IDNA which implements IDNA2008 and should therefore
-    # be consistent with ICU.
-    if (is_android) {
-      sources -= [
-        "url_canon_icu_unittest.cc",
-        "url_canon_unittest.cc",
-      ]
-      deps += [ ":url_java" ]
-    }
 
     # Unit tests that are not supported by the current ICU alternatives on iOS.
     if (is_ios) {

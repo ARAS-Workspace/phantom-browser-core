@@ -22,21 +22,6 @@ source_set("webauthn") {
     "//device/fido",
   ]
 
-  if (is_android) {
-    public += [
-      "android/cable_module_android.h",
-      "android/cable_registration_state.h",
-      "android/chrome_webauthn_client_android.h",
-      "android/credential_sorter_android.h",
-    ]
-
-    public_deps += [
-      "//chrome/browser/touch_to_fill/password_manager:public",
-      "//components/webauthn/android",
-      "//device/fido:cablev2_registration",
-    ]
-  }
-
   if (!is_android) {
     public += [
       "authenticator_reference.h",
@@ -108,28 +93,6 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/cable_module_android.cc",
-      "android/cable_registration_state.cc",
-      "android/credential_sorter_android.cc",
-    ]
-    deps += [
-      "//chrome/browser/net",
-      "//chrome/browser/password_manager/android:utils",
-      "//chrome/browser/password_manager/android/grouped_affiliations:public",
-      "//chrome/browser/sync",
-      "//chrome/browser/webauthn/android:jni_headers",
-      "//components/cbor",
-      "//components/password_manager/core/browser/features:password_features",
-      "//components/webauthn/android",
-      "//components/webauthn/core/browser",
-      "//components/webauthn/json",
-      "//device/fido:cablev2_registration",
-      "//third_party/blink/public/common:headers",
-    ]
-  }
-
   if (!is_android) {
     sources += [
       "authenticator_reference.cc",
@@ -197,45 +160,6 @@ source_set("impl") {
 
   if (is_win) {
     deps += [ ":local_credential_management" ]
-  }
-}
-
-if (is_android) {
-  source_set("webauthn_request_delegate_android") {
-    public = [ "android/webauthn_request_delegate_android.h" ]
-
-    public_deps = [
-      ":webauthn",
-      "//base",
-      "//components/password_manager/core/browser",
-      "//components/password_manager/core/browser:password_form",
-      "//components/webauthn/android",
-      "//content/public/browser",
-      "//device/fido",
-    ]
-  }
-
-  source_set("webauthn_request_delegate_android_impl") {
-    sources = [
-      "android/chrome_webauthn_client_android.cc",
-      "android/webauthn_request_delegate_android.cc",
-    ]
-
-    public_deps = [
-      ":webauthn_request_delegate_android",
-      "//chrome/browser:browser_public_dependencies",
-    ]
-
-    deps = [
-      ":webauthn",
-      "//chrome/browser/password_manager",
-      "//chrome/browser/password_manager/android/grouped_affiliations:public",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/touch_to_fill/password_manager:impl",
-      "//components/password_manager/content/browser",
-      "//components/webauthn/android",
-      "//components/webauthn/core/browser",
-    ]
   }
 }
 
@@ -468,13 +392,6 @@ source_set("unit_tests") {
     }
   }
 
-  if (is_android) {
-    sources += [
-      "android/cable_module_android_unittest.cc",
-      "android/cable_registration_state_unittest.cc",
-      "android/credential_sorter_android_unittest.cc",
-    ]
-  }
 }
 
 if (!is_android) {

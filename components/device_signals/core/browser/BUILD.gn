@@ -100,9 +100,6 @@ static_library("browser") {
     sources += [ "linux/browser_utils_linux.cc" ]
   }
 
-  if (is_android) {
-    sources += [ "android/browser_utils_android.cc" ]
-  }
 }
 
 static_library("test_support") {
@@ -158,15 +155,6 @@ source_set("unit_tests") {
     "//components/signin/public/identity_manager:test_support",
     "//testing/gtest",
   ]
-
-  if (is_android) {
-    sources += [ "android/android_os_signals_collector_unittest.cc" ]
-    deps += [
-      "//components/safe_browsing/android:safe_browsing_api_handler",
-      "//components/safe_browsing/android:safe_browsing_api_handler_util",
-      "//content/test:test_support",
-    ]
-  }
 
   if (is_win || is_mac || is_linux) {
     sources += [

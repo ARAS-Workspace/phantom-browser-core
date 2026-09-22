@@ -2,9 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
 import("//base/allocator/partition_allocator/partition_alloc.gni")
 import("//testing/test.gni")
 import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
@@ -256,8 +253,4 @@ test("gin_unittests") {
     data += [ "shell/hello_world.js" ]
   }
 
-  # On Android, the APK must bundle the startup data.
-  if (is_android) {
-    deps += [ ":v8_snapshot_assets" ]
-  }
 }

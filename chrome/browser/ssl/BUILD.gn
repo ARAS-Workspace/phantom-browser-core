@@ -61,18 +61,6 @@ source_set("ssl") {
     "//url",
   ]
 
-  if (is_android) {
-    public += [
-      "chrome_security_state_client.h",
-      "chrome_security_state_model_delegate.h",
-      "known_interception_disclosure_message_delegate.h",
-    ]
-    public_deps += [
-      "//components/messages/android",
-      "//components/security_state/content/android",
-    ]
-  }
-
   if (!is_android) {
     public += [
       "generated_https_first_mode_pref.h",
@@ -146,20 +134,6 @@ source_set("impl") {
 
   if (enable_captive_portal_detection) {
     deps += [ "//chrome/browser/captive_portal" ]
-  }
-
-  if (is_android) {
-    sources += [
-      "android/https_first_mode_bridge.cc",
-      "android/https_upgrades_interceptor_android.cc",
-      "chrome_security_state_client.cc",
-      "chrome_security_state_model_delegate.cc",
-      "known_interception_disclosure_message_delegate.cc",
-    ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/ssl/android:jni_headers",
-    ]
   }
 
   if (!is_android) {
@@ -272,10 +246,6 @@ source_set("unit_tests") {
     sources += [ "generated_https_first_mode_pref_unittest.cc" ]
   }
 
-  if (is_android) {
-    sources += [ "known_interception_disclosure_message_delegate_unittest.cc" ]
-    deps += [ "//components/messages/android:test_support" ]
-  }
 }
 
 if (!is_android) {
@@ -392,26 +362,4 @@ source_set("platform_browser_tests") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    deps += [ "//components/messages/android:test_support" ]
-  }
-}
-
-if (is_android) {
-  source_set("android_browsertests") {
-    testonly = true
-
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [ "chrome_security_state_client_browsertest.cc" ]
-
-    deps = [
-      ":cert_verifier_test_support",
-      ":ssl",
-      "//base",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
-  }
 }

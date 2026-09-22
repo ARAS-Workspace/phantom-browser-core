@@ -222,18 +222,6 @@ static_library("test_support") {
     "//components/autofill/core/browser",
   ]
 
-  if (is_android) {
-    sources += [
-      "mock_manual_filling_view.cc",
-      "mock_manual_filling_view.h",
-    ]
-    deps += [
-      "//chrome/browser",
-      "//chrome/browser/autofill",
-      "//chrome/browser/keyboard_accessory/test_utils/android",
-    ]
-  }
-
   if (!is_android) {
     deps += [ "//components/autofill/core/browser:test_support" ]
   }
@@ -440,21 +428,6 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "android/attribute_instance_android_unittest.cc",
-      "android/autofill_ai_save_update_entity_prompt_controller_unittest.cc",
-      "android/entity_data_manager_android_unittest.cc",
-      "android/entity_instance_android_unittest.cc",
-      "android/mock_autofill_ai_save_update_entity_prompt_view.cc",
-      "android/mock_autofill_ai_save_update_entity_prompt_view.h",
-      "android/save_update_address_profile_prompt_controller_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/sync",
-      "//chrome/browser/ui/autofill",
-    ]
-  }
 }
 
 if (!is_android) {

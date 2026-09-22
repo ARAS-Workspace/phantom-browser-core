@@ -9,14 +9,4 @@ source_set("digital_credentials") {
   deps = []
   public_deps = [ "//content/public/browser" ]
 
-  if (is_android) {
-    sources += [
-      "digital_identity_safety_interstitial_bridge_android.cc",
-      "digital_identity_safety_interstitial_bridge_android.h",
-    ]
-    deps += [
-      "//chrome/browser/ui/android/digital_credentials:jni_headers",
-      "//ui/android",
-    ]
-  }
 }

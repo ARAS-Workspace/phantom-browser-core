@@ -5,7 +5,4 @@
 source_set("internal") {
   deps = []
 
-  if (is_android) {
-    deps += [ "//chrome/browser/ui/side_panel/internal/android" ]
-  }
 }

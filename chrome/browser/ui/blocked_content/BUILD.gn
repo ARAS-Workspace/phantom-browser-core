@@ -133,11 +133,4 @@ source_set("unit_tests") {
     "//components/content_settings/browser",
     "//components/ukm/content",
   ]
-  if (is_android) {
-    deps += [
-      "//chrome/browser/android",
-      "//components/messages/android:test_support",
-      "//components/ukm:test_support",
-    ]
-  }
 }

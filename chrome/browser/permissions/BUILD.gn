@@ -122,34 +122,6 @@ source_set("permissions") {
     "//services/device/public/cpp/geolocation",
   ]
 
-  if (is_android) {
-    sources += [
-      "permission_blocked_dialog_controller_android.cc",
-      "permission_blocked_dialog_controller_android.h",
-      "permission_blocked_message_delegate_android.cc",
-      "permission_blocked_message_delegate_android.h",
-      "permission_update_message_controller_android.cc",
-      "permission_update_message_controller_android.h",
-      "permission_update_message_delegate_android.cc",
-      "permission_update_message_delegate_android.h",
-      "permission_update_requester_android.cc",
-      "permission_update_requester_android.h",
-      "quiet_permission_prompt_model_android.cc",
-      "quiet_permission_prompt_model_android.h",
-    ]
-
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/ui/safety_hub",
-      "//components/messages/android",
-      "//components/messages/android:feature_flags",
-      "//ui/android",
-    ]
-
-    if (enable_openxr) {
-      deps += [ "//device/vr/public/cpp:features" ]
-    }
-  }
   allow_circular_includes_from = []
 
   if (enable_extensions) {

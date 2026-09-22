@@ -466,12 +466,6 @@ component("skia") {
     sources += skia_ports_fontmgr_android_parser_sources
   }
 
-  if (is_android) {
-    # Note that this requires expat.
-    # Note that this requires skia_ports_fontmgr_android_parser_sources.
-    sources += skia_ports_fontmgr_android_ndk_sources
-  }
-
   configs -= [ "//build/config/compiler:chromium_code" ]
   configs += [
     ":skia_config",
@@ -516,13 +510,6 @@ component("skia") {
       "//third_party/expat",
       "//third_party/fontconfig",
       "//third_party/icu:icuuc",
-    ]
-  }
-
-  if (is_android) {
-    deps += [
-      "//third_party/cpu_features:ndk_compat",
-      "//third_party/expat",
     ]
   }
 

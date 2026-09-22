@@ -29,12 +29,6 @@ source_set("bluetooth_internals") {
     "//ui/webui",
   ]
 
-  if (is_android) {
-    deps += [
-      "//components/permissions",
-      "//ui/android",
-    ]
-  }
 }
 
 mojom("mojo_bindings") {

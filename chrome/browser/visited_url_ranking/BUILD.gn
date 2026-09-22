@@ -85,10 +85,6 @@ source_set("browser_tests") {
 
   sources = []
 
-  if (is_android) {
-    sources += [ "group_suggestions_service_factory_browsertest.cc" ]
-  }
-
   if (!is_android) {
     sources += [ "desktop_tab_model_url_visit_data_fetcher_browsertest.cc" ]
   }

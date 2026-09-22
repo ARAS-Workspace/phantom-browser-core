@@ -9,10 +9,6 @@ import("//device/vr/buildflags/buildflags.gni")
 import("//media/media_options.gni")
 import("//third_party/webrtc/webrtc.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 # See //content/BUILD.gn for how this works.
 group("browser") {
   if (is_component_build) {
@@ -557,10 +553,6 @@ source_set("browser_sources") {
     "//content:content_implementation",
   ]
 
-  if (is_android) {
-    sources += [ "color_chooser.h" ]
-  }
-
   if (is_linux || is_mac) {
     sources += [
       "cdm_helper.cc",
@@ -666,36 +658,6 @@ source_set("browser_sources") {
     sources += [ "posix_file_descriptor_info.h" ]
   }
 
-  if (is_android) {
-    deps += [
-      "//cc/slim",
-      "//third_party/jni_zero",
-      "//ui/android",
-    ]
-    sources += [
-      "android/additional_navigation_params_android.h",
-      "android/android_overlay_provider.h",
-      "android/browser_context_handle.h",
-      "android/child_process_importance.h",
-      "android/compositor.h",
-      "android/compositor_client.h",
-      "android/devtools_auth.h",
-      "android/gpu_video_accelerator_factories_provider.h",
-      "android/java_interfaces.h",
-      "android/message_payload.h",
-      "android/message_payload_type.h",
-      "android/message_port_helper.h",
-      "android/motion_event_action.h",
-      "android/selection_popup_delegate.cc",
-      "android/selection_popup_delegate.h",
-      "android/synchronous_compositor.cc",
-      "android/synchronous_compositor.h",
-      "android/synchronous_compositor_client.h",
-      "ax_inspect_factory_android.cc",
-      "tts_environment_android.h",
-    ]
-  }
-
   if (use_aura || is_mac) {
     sources += [ "context_factory.h" ]
   }
@@ -756,23 +718,5 @@ source_set("browser_sources") {
 
   if (use_clang_profiling_inside_sandbox) {
     sources += [ "profiling_utils.h" ]
-  }
-}
-
-if (is_android) {
-  java_cpp_enum("contacts_picker_properties_javagen") {
-    sources = [ "contacts_picker_properties.h" ]
-  }
-  java_cpp_enum("bluetooth_chooser_event_javagen") {
-    sources = [ "bluetooth_chooser.h" ]
-  }
-  java_cpp_enum("digital_identity_enum") {
-    sources = [
-      "digital_identity_interstitial_type.h",
-      "digital_identity_provider.h",
-    ]
-  }
-  java_cpp_enum("transfer_input_to_viz_result_enum") {
-    sources = [ "android/transfer_input_to_viz_result.h" ]
   }
 }

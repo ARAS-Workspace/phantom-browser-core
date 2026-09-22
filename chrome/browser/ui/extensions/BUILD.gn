@@ -45,11 +45,6 @@ source_set("extensions") {
 
   public_deps = []
 
-  if (is_android) {
-    sources += [ "extension_install_ui_android.h" ]
-    public_deps += [ "//components/messages/android" ]
-  }
-
   if (is_win || is_mac || is_linux) {
     sources += [ "extension_install_ui_desktop.h" ]
   }
@@ -126,9 +121,6 @@ source_set("extension_post_install_dialog") {
     "//ui/base",
     "//ui/strings",
   ]
-  if (is_android) {
-    deps += [ "//components/prefs" ]
-  }
   if (toolkit_views) {
     deps += [ "//chrome/browser/ui/views/extensions:extension_post_install_dialog_view_utils" ]
   }
@@ -201,17 +193,6 @@ source_set("impl") {
       "//extensions/browser/install",
       "//extensions/common",
       "//ui/base",
-    ]
-  }
-  if (is_android) {
-    sources += [
-      "extension_dialog_utils_android.cc",
-      "extension_install_ui_android.cc",
-    ]
-    deps += [
-      "//chrome/browser/ui/android/tab_model",
-      "//extensions/common",
-      "//ui/android",
     ]
   }
   if (toolkit_views) {

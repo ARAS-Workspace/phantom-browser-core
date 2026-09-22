@@ -38,20 +38,3 @@ if (!is_android) {
     ]
   }
 }
-
-if (is_android) {
-  source_set("android_browsertests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [ "profile_signals_collector_browsertest.cc" ]
-
-    deps = [
-      "//base",
-      "//chrome/browser/enterprise:impl",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gmock",
-    ]
-  }
-}

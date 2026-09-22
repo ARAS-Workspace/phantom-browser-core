@@ -7,10 +7,6 @@ import("//components/guest_view/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 # The public interface for task_manager does not allow circular dependencies.
 source_set("task_manager") {
   sources = [
@@ -196,9 +192,6 @@ source_set("impl") {
   } else {
     sources += [ "sampling/shared_sampler_stub.cc" ]
   }
-  if (is_android) {
-    deps += [ "//chrome/browser/android:tabs_public" ]
-  }
   if (!is_android) {
     deps += [
       "//chrome/browser/background",
@@ -237,13 +230,6 @@ source_set("impl") {
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}
-
-if (is_android) {
-  java_cpp_enum("java_enum_srcjar") {
-    visibility = [ "//chrome/browser/task_manager/internal/android:*" ]
-    sources = [ "task_manager_observer.h" ]
-  }
 }
 
 source_set("test_support") {

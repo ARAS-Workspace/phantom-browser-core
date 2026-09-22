@@ -16,14 +16,6 @@ source_set("device_reauth") {
     public += [ "chrome_device_authenticator_factory.h" ]
   }
 
-  if (is_android) {
-    public += [
-      "android/device_authenticator_android.h",
-      "android/device_authenticator_bridge.h",
-      "android/reauthenticator_bridge.h",
-    ]
-  }
-
   if (is_mac) {
     public += [
       "mac/authenticator_mac.h",
@@ -57,20 +49,6 @@ source_set("impl") {
 
   if (is_android || is_mac || is_win) {
     sources += [ "chrome_device_authenticator_factory.cc" ]
-  }
-
-  if (is_android) {
-    sources += [
-      "android/device_authenticator_android.cc",
-      "android/device_authenticator_bridge_impl.cc",
-      "android/device_authenticator_bridge_impl.h",
-      "android/reauthenticator_bridge.cc",
-    ]
-    deps += [
-      "//chrome/browser/device_reauth/android:jni_headers",
-      "//components/password_manager/core/browser",
-      "//ui/android",
-    ]
   }
 
   if (is_mac) {
@@ -113,11 +91,6 @@ source_set("unit_tests") {
 
   if (is_win || is_mac || is_android) {
     sources += [ "chrome_device_authenticator_factory_unittest.cc" ]
-  }
-
-  if (is_android) {
-    sources += [ "android/device_authenticator_android_unittest.cc" ]
-    deps += [ "//ui/android" ]
   }
 
   if (is_mac) {

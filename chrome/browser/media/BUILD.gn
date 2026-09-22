@@ -269,21 +269,6 @@ source_set("media") {
     ]
   }
 
-  if (is_android) {
-    public += [
-      "android/cdm/media_drm_origin_id_manager.h",
-      "android/cdm/media_drm_origin_id_manager_factory.h",
-      "android/cdm/media_drm_storage_factory.h",
-      "android/cdm/per_device_provisioning_permission.h",
-      "android/router/chrome_media_router_client.h",
-    ]
-    public_deps += [
-      "//media",
-      "//media/mojo/mojom",
-      "//mojo/public/cpp/bindings",
-    ]
-  }
-
   if (is_android || is_win) {
     public += [ "protected_media_identifier_permission_context.h" ]
     public_deps += [ "//components/permissions" ]
@@ -396,21 +381,6 @@ source_set("impl") {
       "//components/media_router/browser",
       "//components/mirroring/browser",
       "//media/mojo/services",
-    ]
-  }
-
-  if (is_android) {
-    sources += [
-      "android/cdm/media_drm_origin_id_manager.cc",
-      "android/cdm/media_drm_origin_id_manager_factory.cc",
-      "android/cdm/media_drm_storage_factory.cc",
-      "android/cdm/per_device_provisioning_permission.cc",
-      "android/router/chrome_media_router_client.cc",
-    ]
-    deps += [
-      "//chrome/browser/net",
-      "//components/cdm/browser",
-      "//third_party/widevine/cdm:headers",
     ]
   }
 

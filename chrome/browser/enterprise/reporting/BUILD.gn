@@ -68,23 +68,6 @@ if (!is_android) {
   }
 }
 
-if (is_android) {
-  source_set("android_browsertests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [ "cloud_profile_reporting_browsertest.cc" ]
-
-    deps = [
-      "//base",
-      "//chrome/browser/enterprise:impl",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gmock",
-    ]
-  }
-}
-
 source_set("platform_browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
@@ -103,10 +86,4 @@ source_set("platform_browser_tests") {
     "//testing/gmock",
   ]
 
-  if (is_android) {
-    deps += [
-      "//components/safe_browsing/android:safe_browsing_api_handler",
-      "//components/safe_browsing/android:safe_browsing_api_handler_util",
-    ]
-  }
 }

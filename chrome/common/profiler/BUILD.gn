@@ -84,10 +84,6 @@ source_set("unit_tests") {
     "//extensions/buildflags",
   ]
 
-  if (is_android) {
-    sources += [ "core_unwinders_android_unittest.cc" ]
-  }
-
   if (enable_extensions) {
     deps += [ "//extensions/common" ]
   }

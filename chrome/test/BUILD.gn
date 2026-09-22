@@ -50,12 +50,6 @@ import("//v8/gni/v8.gni")
 assert(!is_ios, "Chromium/iOS shouldn't use anything in //chrome")
 assert(enable_supervised_users)
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-  import("//tools/perf/chrome_telemetry_build/android_browser_types.gni")
-}
-
 # This target exists to reference other test executables to bring these files
 # into the build.
 group("test") {
@@ -66,53 +60,6 @@ group("test") {
   ]
   if (is_linux || is_mac || is_win) {
     deps += [ "//chrome/test/device_realtarget:device_realtarget_browsertests" ]
-  }
-}
-
-if (is_android) {
-  android_library("test_support_java") {
-    testonly = true
-    deps = [
-      ":payment_test_support_jni_headers_java",
-      ":test_support_jni_headers_java",
-      "//base:base_java",
-      "//chrome/browser/autofill/android:test_support_java",
-      "//chrome/browser/commerce/price_tracking/android:java",
-      "//chrome/browser/feedback/android:java",
-      "//chrome/browser/profiles/android:java",
-      "//chrome/browser/tab:java",
-      "//chrome/browser/tabmodel:java",
-      "//chrome/browser/tabwindow:java",
-      "//chrome/browser/ui/android/hats/test:test_support_java",
-      "//components/autofill/android:autofill_java",
-      "//components/autofill/android:payments_interfaces_java",
-      "//components/messages/android/test:test_support_java",
-      "//components/metrics:metrics_java",
-      "//components/payments/content/android:java",
-      "//components/payments/content/android/spc:java",
-      "//components/payments/mojom:mojom_java",
-      "//content/public/android:content_java",
-      "//third_party/androidx:androidx_annotation_annotation_java",
-      "//third_party/blink/public/common:common_java",
-      "//third_party/blink/public/mojom:android_mojo_bindings_java",
-      "//third_party/jni_zero:jni_zero_java",
-    ]
-    sources = [
-      "../android/java/src/org/chromium/chrome/browser/tab/TabAndroidTestHelper.java",
-      "android/test_support/src/org/chromium/chrome/test_support/FamilyInfoFeedbackSourceTestBridge.java",
-      "android/test_support/src/org/chromium/chrome/test_support/PaymentRequestTestBridge.java",
-    ]
-  }
-
-  generate_jni("test_support_jni_headers") {
-    testonly = true
-    sources = [
-      "android/test_support/src/org/chromium/chrome/test_support/FamilyInfoFeedbackSourceTestBridge.java",
-    ]
-  }
-  generate_jni("payment_test_support_jni_headers") {
-    testonly = true
-    sources = [ "android/test_support/src/org/chromium/chrome/test_support/PaymentRequestTestBridge.java" ]
   }
 }
 
@@ -192,10 +139,6 @@ static_library("test_support") {
     "//chrome/test/base:web_ui_mocha_browser_test",
     "//chrome/test/base:web_ui_test_data_source",
   ]
-
-  if (is_android) {
-    public_deps += [ "//chrome/test/base:android_ui_test_utils" ]
-  }
 
   sources = [
     "../app/startup_timestamps.h",
@@ -1019,558 +962,6 @@ source_set("platform_browser_tests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (is_android) {
-  test("android_browsertests") {
-    configs += [ "//build/config:precompiled_headers" ]
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    use_default_launcher = false
-    product_config_java_packages = [ "org.chromium.chrome.browser" ]
-    android_manifest =
-        "${target_gen_dir}/android_browsertests_manifest/AndroidManifest.xml"
-    android_manifest_dep = ":android_browsertests_manifest"
-
-    loadable_modules = [ "$root_out_dir/libcrashpad_handler_trampoline.so" ]
-
-    if (!is_java_debug) {
-      proguard_enabled = true
-      proguard_configs = [ "//chrome/android/proguard/main.flags" ]
-    }
-
-    sources = [
-      "../browser/android/cookies/cookies_fetcher_restore_util_browsertest.cc",
-      "../browser/android/customtabs/custom_tabs_browsertest.cc",
-      "../browser/android/customtabs/tab_interaction_recorder_browsertest.cc",
-      "../browser/android/historical_tab_saver_browsertest.cc",
-      "../browser/android/persisted_tab_data/persisted_tab_data_android_browsertest.cc",
-      "../browser/android/persisted_tab_data/sensitivity_persisted_tab_data_android_browsertest.cc",
-      "../browser/android/webview_renderer_extension_browsertest.cc",
-      "../browser/background_fetch/background_fetch_browsertest_android.cc",
-      "../browser/multi_network_browser_test.cc",
-      "../browser/net/cert_verifier_policy_browsertest.cc",
-      "../browser/password_manager/android/password_manager_android_browsertest.cc",
-      "../browser/renderer_host/javascript_optimizer_feature_browsertest.cc",
-      "../browser/safe_browsing/android/suspicious_site_browsertest.cc",
-      "../browser/ui/webui/policy/policy_test_ui_browsertest.cc",
-      "../browser/ui/webui/policy/policy_ui_browsertest.cc",
-      "../renderer/autofill/fake_mojo_password_manager_driver.cc",
-      "../renderer/autofill/fake_mojo_password_manager_driver.h",
-      "../renderer/autofill/fake_password_generation_driver.cc",
-      "../renderer/autofill/fake_password_generation_driver.h",
-      "../renderer/autofill/password_autofill_agent_browsertest.cc",
-      "../renderer/autofill/password_generation_agent_browsertest.cc",
-      "../renderer/autofill/password_generation_test_utils.cc",
-      "../renderer/autofill/password_generation_test_utils.h",
-      "../renderer/commerce/commerce_web_extractor_browsertest.cc",
-      "../renderer/wallet/boarding_pass_extractor_browsertest.cc",
-      "android/browsertests_apk/android_browsertests_jni_onload.cc",
-      "base/android/android_browser_test_browsertest_android.cc",
-    ]
-
-    deps = [
-      ":android_browsertests_assets",
-      ":android_browsertests_java",
-      ":browser_tests_runner",
-      ":platform_browser_tests",
-      ":sync_integration_test_support_java",
-      ":test_support",
-      ":test_support_java",
-      ":test_support_jni_headers",
-      ":test_support_ui_android",
-      "//base",
-      "//chrome:chrome_android_core",
-      "//chrome/browser:chrome_content_browser_client",
-      "//chrome/browser/accessibility/accessibility_prefs:browser_tests",
-      "//chrome/browser/android",
-      "//chrome/browser/android/persisted_tab_data/test:test_support",
-      "//chrome/browser/autofill",
-      "//chrome/browser/autofill:browser_tests",
-      "//chrome/browser/auxiliary_search:browser_tests",
-      "//chrome/browser/background_fetch",
-      "//chrome/browser/browsing_data:constants",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/context_sharing/tab_bottom_sheet/android:browser_tests",
-      "//chrome/browser/context_sharing/tab_bottom_sheet/android:test_support_java",
-      "//chrome/browser/engagement",
-      "//chrome/browser/engagement:android_browsertests",
-      "//chrome/browser/enterprise/data_controls",
-      "//chrome/browser/enterprise/data_controls:android_browsertests",
-      "//chrome/browser/enterprise/platform_auth:android_browsertests",
-      "//chrome/browser/enterprise/platform_auth:features",
-      "//chrome/browser/enterprise/platform_auth:test_utils",
-      "//chrome/browser/enterprise/reporting:android_browsertests",
-      "//chrome/browser/enterprise/signals:android_browsertests",
-      "//chrome/browser/feed",
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/history",
-      "//chrome/browser/keyboard_accessory/android",
-      "//chrome/browser/lifetime",
-      "//chrome/browser/metrics:android_browsertests",
-      "//chrome/browser/metrics:test_support",
-      "//chrome/browser/offline_items_collection",
-      "//chrome/browser/optimization_guide",
-      "//chrome/browser/origin_trials:browser_tests",
-      "//chrome/browser/page_content_annotations:android_browser_tests",
-      "//chrome/browser/page_content_annotations:extraction_service",
-      "//chrome/browser/page_load_metrics:android_browsertests",
-      "//chrome/browser/password_manager",
-      "//chrome/browser/password_manager:test_support",
-      "//chrome/browser/password_manager/android:test_support",
-      "//chrome/browser/password_manager/factories",
-      "//chrome/browser/payments:browser_tests",
-      "//chrome/browser/policy:android_browsertests",
-      "//chrome/browser/policy:browser_tests",
-      "//chrome/browser/policy:test_support",
-      "//chrome/browser/preloading:test_support",
-      "//chrome/browser/preloading/prerender:browser_tests",
-      "//chrome/browser/privacy_sandbox:browser_tests",
-      "//chrome/browser/profiles",
-      "//chrome/browser/profiles:android_browsertests",
-      "//chrome/browser/profiling_host:profiling_browsertests",
-      "//chrome/browser/safe_browsing:test_support",
-      "//chrome/browser/safe_browsing/android:test_support_java",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/segmentation_platform:test_utils",
-      "//chrome/browser/send_tab_to_self:browser_tests",
-      "//chrome/browser/site_protection",
-      "//chrome/browser/site_protection:utils",
-      "//chrome/browser/ssl:android_browsertests",
-      "//chrome/browser/ssl:cert_verifier_test_support",
-      "//chrome/browser/supervised_user:android_browser_tests",
-      "//chrome/browser/sync",
-      "//chrome/browser/sync/test/integration:sync_integration_test_support",
-      "//chrome/browser/tab",
-      "//chrome/browser/touch_to_fill/password_manager/password_generation/android:public",
-      "//chrome/browser/trusted_vault:android_browsertests",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/android/autofill:browser_tests",
-      "//chrome/browser/ui/android/hats:browser_tests",
-      "//chrome/browser/ui/autofill",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/browser_window:create_browser_window",
-      "//chrome/browser/ui/hats",
-      "//chrome/browser/ui/navigator",
-      "//chrome/browser/ui/side_panel/internal/android:browser_tests",
-      "//chrome/browser/ui/side_panel/test/android:browser_test_support_java",
-      "//chrome/browser/ui/tabs:tab_enums",
-      "//chrome/browser/ui/webui/policy",
-      "//chrome/browser/unified_consent",
-      "//chrome/browser/user_agent:browser_tests",
-      "//chrome/browser/visited_url_ranking:browser_tests",
-      "//chrome/browser/webapps/installable:browser_tests",
-      "//chrome/browser/webapps/web_contents:browser_tests",
-      "//chrome/browser/webauthn",
-      "//chrome/browser/webid",
-      "//chrome/browser/webid:android_browsertests",
-      "//chrome/test/base:chrome_test_launcher",
-      "//chrome/test/data/webui:browser_tests",
-      "//chrome/test/data/webui:interactive_ui_tests",
-      "//chrome/test/data/webui:resources",
-      "//components/autofill/content/browser:test_support",
-      "//components/autofill/content/renderer:test_support",
-      "//components/autofill/core/common",
-      "//components/back_forward_cache",
-      "//components/background_task_scheduler",
-      "//components/blocked_content",
-      "//components/browser_ui/widget/android:java",
-      "//components/browsing_data/content",
-      "//components/browsing_data/content:test_support",
-      "//components/browsing_data/core",
-      "//components/commerce/content/renderer",
-      "//components/commerce/core:commerce_constants",
-      "//components/commerce/core:commerce_heuristics_data",
-      "//components/commerce/core:feature_list",
-      "//components/commerce/core:persisted_state_db_content_proto",
-      "//components/content_settings/browser",
-      "//components/device_signals/core/browser",
-      "//components/enterprise",
-      "//components/enterprise:test_support",
-      "//components/enterprise/browser/identifiers",
-      "//components/enterprise/connectors/core:test_support",
-      "//components/feed:feature_list",
-      "//components/feed/core/v2:feed_core_v2",
-      "//components/feed/core/v2:ios_shared",
-      "//components/feed/core/v2:test_helpers",
-      "//components/infobars/content",
-      "//components/messages/android",
-      "//components/messages/android:feature_flags",
-      "//components/messages/android:test_support",
-      "//components/messages/android/test:test_support_cpp",
-      "//components/messages/android/test:test_support_java",
-      "//components/metrics:content",
-      "//components/metrics/demographics",
-      "//components/metrics/demographics:test_support",
-      "//components/metrics/private_metrics",
-      "//components/metrics/private_metrics:private_metrics_features",
-      "//components/metrics/structured",
-      "//components/metrics_services_manager",
-      "//components/offline_pages/content/background_loader:test_support",
-      "//components/offline_pages/core:test_support",
-      "//components/offline_pages/core/background:test_support",
-      "//components/optimization_guide/core",
-      "//components/optimization_guide/core:test_support",
-      "//components/page_content_annotations/content",
-      "//components/page_content_annotations/core",
-      "//components/page_content_annotations/core:test_support",
-      "//components/page_load_metrics/browser:test_support",
-      "//components/page_load_metrics/browser/observers/ad_metrics:test_support",
-      "//components/password_manager/content/browser",
-      "//components/policy:chrome_settings_proto_generated_compile",
-      "//components/policy/core/browser:pref_mapping_test_support",
-      "//components/policy/core/browser:test_support",
-      "//components/policy/test_support",
-      "//components/privacy_sandbox",
-      "//components/privacy_sandbox:privacy_sandbox_prefs",
-      "//components/privacy_sandbox/privacy_sandbox_attestations",
-      "//components/privacy_sandbox/privacy_sandbox_attestations:metrics",
-      "//components/privacy_sandbox/privacy_sandbox_attestations:test_support",
-      "//components/privacy_sandbox/privacy_sandbox_attestations/preload",
-      "//components/privacy_sandbox/privacy_sandbox_attestations/preload:privacy_sandbox_attestations_assets",
-      "//components/privacy_sandbox/privacy_sandbox_attestations/proto",
-      "//components/qr_code_generator:bitmap_generator",
-      "//components/safe_browsing/content/common:interfaces",
-      "//components/safe_browsing/core/browser/db:sb_database",
-      "//components/safe_browsing/core/common",
-      "//components/safe_browsing/core/common/fbs:client_model",
-      "//components/safe_browsing/core/common/proto:client_model_proto",
-      "//components/safe_browsing/core/common/proto:csd_proto",
-      "//components/security_interstitials/core:unsafe_resource",
-      "//components/security_state/content",
-      "//components/security_state/content/android",
-      "//components/segmentation_platform/embedder/default_model",
-      "//components/segmentation_platform/internal",
-      "//components/segmentation_platform/internal:test_support",
-      "//components/segmentation_platform/public",
-      "//components/segmentation_platform/public:test_support",
-      "//components/session_proto_db",
-      "//components/signin/public/identity_manager",
-      "//components/signin/public/identity_manager:test_support",
-      "//components/site_engagement/content",
-      "//components/site_isolation",
-      "//components/spellcheck:buildflags",
-      "//components/spellcheck/renderer",
-      "//components/subresource_filter/core/browser:test_support",
-      "//components/subresource_filter/core/common:test_support",
-      "//components/sync:test_support",
-      "//components/ukm:test_support",
-      "//components/ukm:ukm_test_helper",
-      "//components/ukm/content",
-      "//components/unified_consent",
-      "//components/user_manager",
-      "//components/variations/service",
-      "//components/visited_url_ranking/public",
-      "//components/webapk:proto",
-      "//components/webapps/browser",
-      "//components/webapps/browser:test_support",
-      "//components/webui/chrome_urls",
-      "//content/test:android_test_message_pump_support",
-      "//services/network/public/cpp:ip_address_space_overrides_test_utils",
-      "//testing/android/native_test:native_test_support",
-      "//third_party/crashpad/crashpad/handler:crashpad_handler_trampoline",
-      "//third_party/federated_compute:confidential_compute",
-      "//third_party/federated_compute:confidential_compute_crypto_test_util",
-    ]
-
-    deps += [
-      "//chrome/browser/offline_pages",
-      "//chrome/browser/offline_pages:android_browsertests",
-      "//chrome/browser/offline_pages:impl",
-      "//chrome/browser/ui/android/tab_model",
-      "//chrome/browser/ui/android/tab_model:browser_tests",
-      "//chrome/browser/ui/android/tab_model:test_support",
-      "//chrome/browser/ui/tabs/tab_strip_api:browser_tests",
-    ]
-
-    # TODO(crbug.com/40626932): This is needed for ShellManager which is what
-    # the ChromeBrowserTestsActivity is using to build the java UI. It's
-    # likely we want to replace it with something new that uses ChromeWindow
-    # and CompositorViewHolder instead.
-    deps += [ "//content/shell:content_shell_lib" ]
-
-    # TODO(crbug.com/504739401): Remove this dependency.
-    deps += [ "//chrome/browser/keyboard_accessory/android:impl" ]
-
-    data_deps = [ "//testing/buildbot/filters:android_browsertests_filters" ]
-
-    data = [
-      "$root_gen_dir/chrome/android/chrome_apk_paks/chrome_100_percent.pak",
-      "$root_gen_dir/chrome/android/chrome_apk_paks/locales/en-US.pak",
-      "$root_gen_dir/chrome/android/chrome_apk_paks/resources.pak",
-      "$root_gen_dir/components/components_resources.pak",
-      "$root_gen_dir/components/dev_ui_components_resources.pak",
-      "$root_out_dir/browser_tests.pak",
-      "//components/test/data/ads_observer/",
-      "//components/test/data/payments/",
-      "//chrome/test/data/android/customtabs/",
-      "//chrome/test/data/banners/",
-      "//chrome/test/data/policy/",
-      "//chrome/test/data/ssl/",
-      "//content/test/data/",
-    ]
-
-    extra_args = []
-
-    # TODO(crbug.com/473636857): Include once all Android builds correctly use
-    # BrowserWindowInterface.
-    if (is_desktop_android) {
-      deps += [
-        "//chrome/browser/ui/android:browser_tests",
-        "//chrome/browser/ui/browser_window:browser_tests",
-        "//chrome/browser/ui/browser_window/internal:android_browsertests",
-        "//chrome/browser/ui/browser_window/test:android_browser_test_support",
-      ]
-    }
-
-    if (enable_webui_ntp) {
-      deps += [ "//chrome/browser/ui/webui/customize_buttons:browser_tests" ]
-    }
-
-    if (enable_chrome_android_internal) {
-      data_deps += [ "//clank/build/bot/filters:android_browsertests_filters" ]
-    }
-
-    # Add unwind tables in android_browsertests apk to support enabling
-    # sampling profiler. The unwind tables are generated from debug info in the
-    # binary. Removing "default_symbols" and adding symbols config removes the
-    # "strip_debug" config that strips the debug info, on android_browsertests
-    # apk.
-    if (enable_arm_cfi_table) {
-      sources += [ "../common/profiler/thread_profiler_browsertest.cc" ]
-
-      configs -= [ "//build/config/compiler:default_symbols" ]
-      if (symbol_level == 2) {
-        configs += [ "//build/config/compiler:symbols" ]
-      } else {
-        configs += [ "//build/config/compiler:minimal_symbols" ]
-      }
-      add_unwind_tables_in_apk = true
-    }
-
-    if (enable_arcore) {
-      # If AR is supported, we should also include WebXR's AR enterprise policy
-      # browsertest. The test should not be enabled when AR features are not
-      # enabled, since we won't be able to distinguish whether the test cases
-      # are failing due to absence of AR, or due to an issue with propagating
-      # the enterprise policy setting.
-      sources += [ "../browser/android/vr/webxr_policy_browsertest.cc" ]
-    }
-
-    if (enable_openxr) {
-      # Infrastructure.
-      sources += [
-        "../browser/vr/test/mock_xr_device_hook_base.cc",
-        "../browser/vr/test/mock_xr_device_hook_base.h",
-        "../browser/vr/test/mock_xr_input_source.cc",
-        "../browser/vr/test/mock_xr_input_source.h",
-        "../browser/vr/test/ui_utils.cc",
-        "../browser/vr/test/ui_utils.h",
-      ]
-
-      # Tests.
-      sources += [
-        "../browser/vr/webxr_vr_frame_loop_browser_test.cc",
-        "../browser/vr/webxr_vr_frame_pose_browser_test.cc",
-        "../browser/vr/webxr_vr_indicators_browser_test.cc",
-        "../browser/vr/webxr_vr_input_browser_test.cc",
-        "../browser/vr/webxr_vr_layers_browser_test.cc",
-        "../browser/vr/webxr_vr_lifecycle_browser_test.cc",
-        "../browser/vr/webxr_vr_permission_browser_test.cc",
-        "../browser/vr/webxr_vr_permission_request_browser_test.cc",
-        "../browser/vr/webxr_vr_pixel_browser_test.cc",
-        "../browser/vr/webxr_vr_secondary_views_browser_test.cc",
-        "../browser/vr/webxr_vr_tab_browser_test.cc",
-        "../browser/vr/webxr_vr_transition_browser_test.cc",
-      ]
-
-      deps += [
-        ":xr_android_emulator_tests_runner",
-        ":xr_browser_tests_common",
-        "//chrome/browser/vr:vr_common",
-        "//chrome/common:constants",
-        "//components/content_settings/core/browser",
-        "//components/webxr",
-        "//components/webxr/android",
-        "//components/webxr/android:features_java",
-        "//components/webxr/android:xr_java",
-        "//device/vr",
-        "//device/vr:openxr_data",
-        "//device/vr:openxr_test_helper",
-        "//device/vr:vr_test_utils",
-        "//device/vr/buildflags",
-        "//device/vr/orientation",
-        "//device/vr/public/mojom:isolated_xr_service",
-        "//device/vr/public/mojom/test:test_mojom",
-        "//third_party/openxr",
-      ]
-
-      extra_args += [ "--deploy-mock-openxr-runtime" ]
-
-      additional_apks = [ "//device/vr:openxr_test_support_apk" ]
-    }
-
-    if (dfmify_dev_ui) {
-      # If DevUI DFM is on, include Java classes and native resource split so
-      # that DevUI page tests would work.
-      deps += []
-    }
-
-    if (enable_desktop_android_extensions) {
-      sources += [
-        # These API tests can't be part of platform_browser_tests because they
-        # run in interactive_ui_tests on Win/Mac/Linux.
-        "../browser/extensions/api/notifications/notifications_interactive_apitest.cc",
-        "../browser/extensions/api/omnibox/omnibox_api_interactive_uitest.cc",
-        "../browser/extensions/api/tabs/tabs_apitest_android.cc",
-        "../browser/extensions/desktop_android_extensions_browsertest.cc",
-        "../browser/ui/extensions/reload_page_dialog_controller_android_browsertest.cc",
-      ]
-
-      deps += [
-        "//chrome/browser/extensions",
-        "//chrome/browser/extensions:browser_tests",
-        "//chrome/browser/omnibox",
-        "//chrome/browser/ui:view_ids",
-        "//chrome/browser/ui/extensions",
-        "//chrome/browser/ui/extensions:browser_tests",
-        "//chrome/browser/ui/omnibox",
-      ]
-
-      data += [
-        "//chrome/test/data/extensions/",
-        "//extensions/test/data/",
-      ]
-    }
-
-    if (safe_browsing_mode != 0) {
-      sources += [
-        "../renderer/safe_browsing/phishing_classifier_browsertest.cc",
-        "../renderer/safe_browsing/phishing_dom_utils_browsertest.cc",
-      ]
-
-      deps += [
-        "//components/safe_browsing/content/browser:client_side_detection",
-        "//components/safe_browsing/content/browser:client_side_detection_service",
-        "//components/safe_browsing/content/renderer/phishing_classifier",
-        "//components/safe_browsing/core/common/phishing_classifier",
-      ]
-    }
-
-    # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-    # enable the diagnostic by removing this line.
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-  }
-
-  test("android_sync_integration_tests") {
-    use_default_launcher = false
-    android_manifest = "${target_gen_dir}/android_sync_integration_tests_manifest/AndroidManifest.xml"
-    android_manifest_dep = ":android_sync_integration_tests_manifest"
-    product_config_java_packages = [ "org.chromium.chrome.browser" ]
-
-    deps = [
-      "//chrome/browser/sync/test/integration:sync_integration_tests_impl",
-      "//chrome/browser/sync/test/integration:sync_integration_tests_java",
-    ]
-  }
-
-  static_library("test_support_ui_android") {
-    configs += [ "//build/config:precompiled_headers" ]
-    testonly = true
-
-    sources = [
-      "base/android/android_browser_test.cc",
-      "base/android/android_browser_test.h",
-      "base/interactive_test_utils.cc",
-      "base/interactive_test_utils.h",
-      "base/mixin_based_in_process_browser_test.cc",
-      "base/mixin_based_in_process_browser_test.h",
-      "base/platform_browser_test.h",
-    ]
-    public_deps = [
-      "//chrome/test/base:in_process_browser_test_mixin",
-      "//chrome/test/base:test_launcher_utils",
-      "//components/feed:feature_list",
-      "//content/test:test_support",
-    ]
-    deps = [
-      "//chrome/browser",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:view_ids",
-      "//chrome/browser/ui/android/tab_model",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/select_file_policy",
-      "//content/public/browser",
-      "//ui/base:test_support",
-    ]
-  }
-
-  android_assets("android_browsertests_assets") {
-    testonly = true
-    disable_compression = true
-    sources = []
-    deps = []
-
-    # These are grit() rules so they are in $root_gen_dir.
-    deps += [
-      "//chrome:browser_tests_pak",
-      "//components/resources",
-    ]
-    sources += [
-      "$root_gen_dir/components/components_resources.pak",
-      "$root_gen_dir/components/dev_ui_components_resources.pak",
-      "$root_out_dir/browser_tests.pak",
-    ]
-
-    # These are assets rules so we can just depend on them.
-    deps += [
-      "//gin:v8_snapshot_assets",
-      "//third_party/icu:icu_assets",
-    ]
-  }
-
-  android_library("android_browsertests_java") {
-    testonly = true
-    deps = [
-      "//base:base_java",
-      "//base:base_java_test_support",
-      "//build/android/gtest_apk:native_test_instrumentation_test_runner_java",
-      "//chrome/browser/tabmodel:java",
-      "//components/crash/android:java",
-      "//components/module_installer/android:module_installer_java",
-      "//content/public/android:content_java",
-      "//content/public/test/android:android_test_message_pump_support_java",
-      "//content/shell/android:content_shell_browsertests_java",
-      "//testing/android/native_test:native_browser_test_java",
-      "//testing/android/native_test:native_test_java",
-      "//ui/android:ui_full_java",
-    ]
-    sources = [
-      "android/browsertests_apk/src/org/chromium/android_browsertests_apk/ChromeBrowserTestsActivity.java",
-      "android/browsertests_apk/src/org/chromium/android_browsertests_apk/ChromeBrowserTestsApplication.java",
-      "android/browsertests_apk/src/org/chromium/android_browsertests_apk/ChromeBrowserTestsInstrumentationTestRunner.java",
-    ]
-  }
-
-  jinja_template("android_browsertests_manifest") {
-    testonly = true
-    input = "//chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2"
-    output =
-        "${target_gen_dir}/android_browsertests_manifest/AndroidManifest.xml"
-    variables = [
-      "manifest_package=org.chromium.android_browsertests_apk",
-      "library_name=android_browsertests__library",
-    ]
-  }
-
-  jinja_template("android_sync_integration_tests_manifest") {
-    testonly = true
-    input = "//chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2"
-    output = "${target_gen_dir}/android_sync_integration_tests_manifest/AndroidManifest.xml"
-    variables = [
-      "manifest_package=org.chromium.android_browsertests_apk",
-      "library_name=android_sync_integration_tests__library",
-    ]
-  }
-}
-
 static_library("browser_tests_runner") {
   testonly = true
   sources = []
@@ -1586,9 +977,6 @@ static_library("browser_tests_runner") {
     deps += [ "//chrome/installer/util:strings" ]
   }
 
-  if (is_android) {
-    deps += [ "//ui/compositor" ]
-  }
 }
 
 if (!is_android) {
@@ -3675,10 +3063,6 @@ if (is_linux || is_mac || is_win || is_android) {
     if (is_win) {
       data_deps += [ "//chrome/installer/mini_installer" ]
     }
-    if (is_android) {
-      data_deps -= [ "//chrome" ]
-      data_deps += [ "//chrome/android:chrome_public_apk" ]
-    }
   }
 }
 
@@ -3911,24 +3295,6 @@ if (is_linux) {
 # This is useful for Lacros, where the generic build is deployed to
 # many different targets.
 
-if (is_android) {
-  # Difference between this and performance_test_suite is that this runs a devil
-  # script before the build, to remove the system webview. See
-  # //testing/buildbot/gn_isolate_map.pyl
-  group("performance_webview_test_suite") {
-    testonly = true
-    data_deps = [ "//chrome/test:performance_test_suite_android_webview" ]
-  }
-
-  # Difference between this and telemetry_perf_tests is that this runs a devil
-  # script before the build, to remove the system webview. See
-  # //testing/buildbot/gn_isolate_map.pyl
-  group("telemetry_perf_webview_tests") {
-    testonly = true
-    deps = [ "//chrome/test:telemetry_perf_tests_android_webview" ]
-  }
-}
-
 config("disable_thinlto_cache_flags") {
   if (is_linux && use_thin_lto) {
     # This build target has so many inputs the LLD will run into the default
@@ -4069,13 +3435,6 @@ test("unit_tests") {
     ]
   }
 
-  if (is_android) {
-    data += [
-      "$root_gen_dir/chrome/android/chrome_apk_paks/chrome_100_percent.pak",
-      "$root_gen_dir/chrome/android/chrome_apk_paks/locales/en-US.pak",
-      "$root_gen_dir/chrome/android/chrome_apk_paks/resources.pak",
-    ]
-  }
   if (is_linux || is_win) {
     data_deps += [ "//chrome:packed_resources" ]
   }
@@ -5870,9 +5229,6 @@ test("unit_tests") {
       "//components/safe_browsing/core/browser:token_fetcher_testing_helper",
     ]
 
-    if (is_android) {
-      deps += [ "//components/safe_browsing/core/browser:referring_app_info" ]
-    }
   }
 
   if (safe_browsing_mode == 1) {
@@ -5908,10 +5264,6 @@ test("unit_tests") {
 
   if (is_win || is_mac || is_linux || is_android) {
     deps += [ "//components/enterprise/device_trust/core:test_support" ]
-  }
-
-  if (is_android) {
-    deps += [ "//chrome/browser/ui/webui/management:unit_tests" ]
   }
 
   if (enterprise_client_certificates) {
@@ -7643,45 +6995,6 @@ if (!is_android) {
     data_deps = [
       ":browser_tests",
       "//testing:run_perf_test",
-    ]
-  }
-}
-
-if (is_android) {
-  generate_jni("sync_integration_test_support_jni_headers") {
-    testonly = true
-    sources = [
-      "../android/javatests/src/org/chromium/chrome/browser/sync/SyncTestSigninUtils.java",
-      "../android/javatests/src/org/chromium/chrome/browser/sync/SyncTestTabGroupHelpers.java",
-    ]
-  }
-
-  android_library("sync_integration_test_support_java") {
-    testonly = true
-    srcjar_deps = [ ":sync_integration_test_support_jni_headers" ]
-    deps = [
-      "//base:base_java",
-      "//base:log_java",
-      "//chrome/browser/profiles/android:java",
-      "//chrome/browser/tab:java",
-      "//chrome/browser/tabmodel:java",
-      "//chrome/test/android:chrome_java_integration_test_support",
-      "//chrome/test/android:live_signin_test_util_java",
-      "//components/saved_tab_groups/public:java",
-      "//components/signin/public/android:java",
-      "//components/signin/public/android:signin_java_test_support",
-      "//components/sync/android:sync_java",
-      "//components/tab_groups:tab_groups_java",
-      "//content/public/test/android:content_java_test_support",
-      "//third_party/androidx:androidx_annotation_annotation_java",
-      "//third_party/jni_zero:jni_zero_java",
-      "//third_party/junit",
-      "//url:gurl_java",
-    ]
-
-    sources = [
-      "../android/javatests/src/org/chromium/chrome/browser/sync/SyncTestSigninUtils.java",
-      "../android/javatests/src/org/chromium/chrome/browser/sync/SyncTestTabGroupHelpers.java",
     ]
   }
 }

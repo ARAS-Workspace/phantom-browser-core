@@ -79,23 +79,6 @@ source_set("signin") {
     ]
   }
 
-  if (is_android) {
-    public += [
-      "android/cross_device_signin_flow_navigation_throttle.h",
-      "android/signin_bridge.h",
-      "android/signin_bridge_factory.h",
-      "android/signin_manager_android.h",
-      "android/web_signin_bridge.h",
-      "signin_manager_android_factory.h",
-      "signin_ui_delegate_impl_android.h",
-    ]
-    public_deps += [
-      "//components/signin/public/base:signin_deep_link",
-      "//components/signin/public/browser",
-    ]
-    deps = [ "//chrome/android:jni_headers" ]
-  }
-
   if (!is_android) {
     public += [
       "signin_promo_util.h",
@@ -287,34 +270,6 @@ source_set("impl") {
     if (!is_android) {
       deps += [ "//chrome/browser/ui/webui/signin/signout_confirmation" ]
     }
-  }
-
-  if (is_android) {
-    sources += [
-      "account_preview_data_service_android.cc",
-      "account_preview_data_service_android.h",
-      "android/cross_device_signin_flow_navigation_throttle.cc",
-      "android/signin_bridge.cc",
-      "android/signin_bridge_factory.cc",
-      "android/signin_manager_android.cc",
-      "android/signin_metrics_utils.cc",
-      "android/unified_consent_service_bridge.cc",
-      "android/web_signin_bridge.cc",
-      "identity_services_provider_android.cc",
-      "signin_manager_android_factory.cc",
-      "signin_ui_delegate_impl_android.cc",
-    ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/bookmarks/android",
-      "//chrome/browser/browsing_data:constants",
-      "//chrome/browser/reading_list",
-      "//chrome/browser/signin/services/android:jni_headers",
-      "//chrome/browser/unified_consent",
-      "//components/password_manager/core/browser/features:password_features",
-      "//components/signin/public/android:jni_headers",
-      "//components/signin/public/browser",
-    ]
   }
 
   if (!is_android) {
@@ -574,25 +529,6 @@ source_set("unit_tests") {
   ]
 
   sources += [ "wait_for_network_callback_helper_chrome_unittest.cc" ]
-
-  if (is_android) {
-    sources += [
-      "android/cross_device_signin_flow_navigation_throttle_unittest.cc",
-      "android/signin_manager_android_unittest.cc",
-      "signin_ui_delegate_impl_android_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/bookmarks",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/offline_pages",
-      "//chrome/browser/password_manager/factories",
-      "//chrome/browser/reading_list",
-      "//chrome/browser/ui/android/tab_model:test_support",
-      "//components/reading_list/core",
-      "//components/reading_list/core:test_support",
-      "//services/tracing/public/cpp/background_tracing",
-    ]
-  }
 
   if (!is_android) {
     sources += [ "signin_promo_unittest.cc" ]

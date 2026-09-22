@@ -12,10 +12,6 @@ import("//printing/buildflags/buildflags.gni")
 import("//services/screen_ai/buildflags/features.gni")
 import("//tools/grit/grit_rule.gni")
 
-if (is_android) {
-  import("//build/config/android/rules.gni")
-}
-
 group("strings") {
   public_deps = [
     ":components_branded_strings",
@@ -113,16 +109,7 @@ grit_strings("components_strings") {
   ]
 
   outputs = [ "grit/components_strings.h" ]
-  if (is_android) {
-    create_android_resources = true
-  }
   gritdeps = "../components_strings.grd.gritdeps"
-}
-
-if (is_android) {
-  java_strings_grd_prebuilt("components_strings_grd") {
-    generating_target = ":components_strings"
-  }
 }
 
 grit_strings("components_branded_strings") {
@@ -142,9 +129,6 @@ grit_strings("components_locale_settings") {
                    "en-XA",
                    "ur",
                  ]
-  if (is_android) {
-    _xtb_locales -= [ "cy" ]
-  }
   if (is_ios) {
     _xtb_locales -= [
       "es-MX",
@@ -184,15 +168,6 @@ grit_strings("components_locale_settings") {
 
   outputs = [ "grit/components_locale_settings.h" ]
 
-  if (is_android) {
-    create_android_resources = true
-  }
-}
-
-if (is_android) {
-  java_strings_grd_prebuilt("components_locale_settings_grd") {
-    generating_target = ":components_locale_settings"
-  }
 }
 
 grit_strings("components_variant_strings") {
@@ -203,15 +178,6 @@ grit_strings("components_variant_strings") {
   }
   outputs = [ "grit/components_variant_strings.h" ]
 
-  if (is_android) {
-    create_android_resources = true
-  }
-}
-
-if (is_android) {
-  java_strings_grd_prebuilt("components_variant_strings_grd") {
-    generating_target = ":components_variant_strings"
-  }
 }
 
 grit_strings("privacy_sandbox_strings") {
@@ -221,13 +187,4 @@ grit_strings("privacy_sandbox_strings") {
           [ "privacy_sandbox_strings_{{source_name_part}}.xtb" ])
   outputs = [ "grit/privacy_sandbox_strings.h" ]
 
-  if (is_android) {
-    create_android_resources = true
-  }
-}
-
-if (is_android) {
-  java_strings_grd_prebuilt("privacy_sandbox_strings_grd") {
-    generating_target = ":privacy_sandbox_strings"
-  }
 }

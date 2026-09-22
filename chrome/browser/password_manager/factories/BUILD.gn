@@ -64,13 +64,6 @@ source_set("factories") {
     "//content/public/browser",
     "//services/network/public/cpp",
   ]
-  if (is_android) {
-    deps += [
-      "//chrome/browser/password_manager/android:backend_public",
-      "//chrome/browser/password_manager/android:shared_preferences_delegate",
-      "//chrome/browser/password_manager/android:utils",
-    ]
-  }
 }
 
 source_set("backend_factory") {
@@ -89,13 +82,6 @@ source_set("backend_factory") {
     "//components/password_manager/core/common",
     "//components/prefs",
   ]
-  if (is_android) {
-    deps += [
-      "//chrome/browser/password_manager/android:backend",
-      "//chrome/browser/password_manager/android:utils",
-      "//components/webauthn/android",
-    ]
-  }
   if (is_win || is_mac) {
     deps += [ "//chrome/browser/policy:path_parser" ]
   }

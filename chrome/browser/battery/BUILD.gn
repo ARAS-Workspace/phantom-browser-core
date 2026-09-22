@@ -18,9 +18,6 @@ source_set("battery") {
 
   deps = [ "//content/public/browser" ]
 
-  if (is_android) {
-    deps += [ "//chrome/browser/battery/android:jni_headers" ]
-  }
 }
 
 source_set("unit_tests") {

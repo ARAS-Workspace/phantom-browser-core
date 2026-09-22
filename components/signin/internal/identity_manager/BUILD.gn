@@ -191,12 +191,6 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    sources += [ "profile_oauth2_token_service_delegate_android_unittest.cc" ]
-
-    deps += [ "//components/signin/public/android:test_support_jni_headers" ]
-  }
-
   if (is_ios) {
     sources += [ "profile_oauth2_token_service_delegate_ios_unittest.cc" ]
 
@@ -241,11 +235,6 @@ static_library("test_support") {
     "mock_profile_oauth2_token_service_observer.cc",
     "mock_profile_oauth2_token_service_observer.h",
   ]
-
-  if (is_android) {
-    sources += [ "account_info_serializer.cc" ]
-    deps = [ "//components/signin/public/android:test_support_jni_headers" ]
-  }
 
   public_deps = [
     ":identity_manager",

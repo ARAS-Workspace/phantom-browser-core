@@ -42,9 +42,6 @@ source_set("impl") {
     "//content/public/browser",
   ]
 
-  if (is_android) {
-    deps += [ "//chrome/browser/language/android:bridge" ]
-  }
 }
 
 source_set("unit_tests") {

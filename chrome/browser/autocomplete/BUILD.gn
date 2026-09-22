@@ -173,9 +173,6 @@ source_set("aim_eligibility_service") {
     "//third_party/blink/public/common:headers",
   ]
 
-  if (is_android) {
-    deps += [ "//chrome/browser/search_engines/android:jni_headers" ]
-  }
 }
 
 if (!is_android) {
@@ -286,15 +283,6 @@ source_set("unit_tests") {
       "//extensions:test_support",
       "//extensions/browser",
       "//extensions/common",
-    ]
-  }
-
-  if (is_android) {
-    sources += [ "../android/autocomplete/tab_matcher_android_unittest.cc" ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/ui/android/tab_model:test_support",
-      "//components/location/android:test_support",
     ]
   }
 

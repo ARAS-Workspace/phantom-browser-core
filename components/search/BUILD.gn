@@ -20,9 +20,6 @@ source_set("unit_tests") {
   testonly = true
 
   sources = [ "search_unittest.cc" ]
-  if (is_android) {
-    sources += [ "search_android_unittest.cc" ]
-  }
 
   deps = [
     ":search",

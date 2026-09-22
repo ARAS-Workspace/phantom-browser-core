@@ -32,9 +32,6 @@ static_library("flags") {
     "//url",
   ]
 
-  if (is_android) {
-    deps += [ "//components/cached_flags:android" ]
-  }
 }
 
 # This is a separate target so that the dependencies of

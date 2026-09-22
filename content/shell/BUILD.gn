@@ -60,9 +60,6 @@ source_set("android_shell_descriptors") {
   testonly = true
   sources = []
   public_deps = [ "//content/public/common:content_descriptors" ]
-  if (is_android) {
-    sources += [ "android/shell_descriptors.h" ]
-  }
 }
 
 # This component provides a ContentMainDelegate for Content Shell and derived
@@ -234,15 +231,6 @@ static_library("content_shell_lib") {
 
   sources += get_target_outputs(":protocol_sources")
 
-  if (is_android) {
-    sources += [
-      "android/shell_manager.cc",
-      "android/shell_manager.h",
-      "browser/shell_platform_delegate_android.cc",
-      "browser/shell_web_contents_view_delegate_android.cc",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "browser/renderer_host/shell_render_widget_host_view_mac_delegate.h",
@@ -412,15 +400,6 @@ static_library("content_shell_lib") {
       "//services/tracing/public/mojom",
       "//ui/accessibility:ax_base",
       "//ui/shell_dialogs",
-    ]
-  }
-
-  if (is_android) {
-    deps += [
-      "//components/embedder_support/android:view",
-      "//content/shell/android:content_shell_jni_headers",
-      "//mojo/public/java/system:test_support",
-      "//ui/android",
     ]
   }
 
@@ -1055,23 +1034,6 @@ mojom("content_browsertests_mojom") {
   ]
 }
 
-if (is_android) {
-  group("content_shell_freeze_test") {
-    testonly = true
-    data = [
-      "//content/shell/tools/aaudio_freezer_integration_test.py",
-      "//content/test/data/media/",
-    ]
-    data_deps = [
-      ":content_shell",
-      "//build/android:devil_chromium_py",
-      "//build/android:test_runner_py",
-      "//testing:test_scripts_shared",
-      "//tools/android/forwarder2",
-    ]
-  }
-}
-
 group("content_shell_crash_test") {
   testonly = true
   data_deps = [
@@ -1107,16 +1069,6 @@ group("content_shell_crash_test") {
     data_deps += [
       "//third_party/breakpad:dump_syms",
       "//third_party/breakpad:minidump_stackwalk",
-    ]
-  }
-  if (is_android) {
-    data_deps += [
-      "//build/android:devil_chromium_py",
-      "//build/android:test_runner_py",
-      "//third_party/breakpad:microdump_stackwalk",
-      "//third_party/breakpad:minidump_dump",
-      "//third_party/breakpad:symupload",
-      "//tools/android/forwarder2",
     ]
   }
 }

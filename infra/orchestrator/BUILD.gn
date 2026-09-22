@@ -24,10 +24,6 @@ group("orchestrator_all") {
     ":gpu_test_trigger_cas",
   ]
 
-  if (is_android) {
-    data_deps += [ "//build/android:test_result_presentations_py" ]
-  }
-
   data = [
     # Various merge/collect scripts will likely need a venv specified in
     # the root vpython spec files.

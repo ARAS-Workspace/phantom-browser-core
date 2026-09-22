@@ -548,10 +548,6 @@ if (is_clang_or_gcc) {
         "page_allocator_internals_posix.h",
       ]
     }
-    if (is_android) {
-      # The Android NDK supports PR_MTE_* macros as of NDK r23.
-      defines += [ "HAS_PR_MTE_MACROS" ]
-    }
 
     # Stack scanning support. First implemented for StarScan and later
     # enlisted for use with MiracleObject.
@@ -766,19 +762,6 @@ if (is_clang_or_gcc) {
       }
     }
 
-    if (is_android) {
-      # Only android build requires native_library, and native_library depends
-      # on file_path. So file_path is added if is_android = true.
-      sources += [
-        "partition_alloc_base/debug/stack_trace_android.cc",
-        "partition_alloc_base/files/file_path.cc",
-        "partition_alloc_base/files/file_path.h",
-        "partition_alloc_base/native_library.cc",
-        "partition_alloc_base/native_library.h",
-        "partition_alloc_base/native_library_posix.cc",
-      ]
-    }
-
     if (is_apple) {
       # Apple-specific utilities
       sources += [
@@ -889,18 +872,6 @@ if (is_clang_or_gcc) {
       shim_headers +=
           [ "shim/allocator_shim_default_dispatch_to_partition_alloc.h" ]
     }
-    if (is_android) {
-      shim_headers += [
-        "shim/allocator_shim_override_cpp_symbols.h",
-        "shim/allocator_shim_alloc_token_symbols.h",
-        "shim/allocator_shim_override_linker_wrapped_symbols.h",
-      ]
-      shim_sources -= [ "shim/allocator_shim.cc" ]
-      shim_sources += [ "shim/allocator_shim_android.cc" ]
-      if (use_allocator_shim) {
-        all_dependent_configs += [ ":wrap_malloc_symbols" ]
-      }
-    }
     if (is_apple) {
       shim_headers += [
         "shim/allocator_shim_override_apple_default_zone.h",
@@ -962,11 +933,6 @@ if (is_clang_or_gcc) {
     }
 
     if (!use_partition_alloc_as_malloc) {
-      if (is_android) {
-        shim_sources += [
-          "shim/allocator_shim_default_dispatch_to_linker_wrapped_symbols.cc",
-        ]
-      }
       if (is_apple) {
         shim_sources +=
             [ "shim/allocator_shim_default_dispatch_to_apple_zoned_malloc.cc" ]
@@ -1029,13 +995,6 @@ if (build_with_chromium) {
 
     if (is_linux || is_android) {
       deps += [ ":debug_proc_maps" ]
-    }
-
-    if (is_android) {
-      sources += [
-        "partition_alloc_base/files/file_path_pa_unittest.cc",
-        "partition_alloc_base/native_library_pa_unittest.cc",
-      ]
     }
 
     if (use_partition_alloc) {
@@ -1225,11 +1184,6 @@ source_set("test_support") {
   if (is_linux) {
     sources += [
       "partition_alloc_base/threading/platform_thread_linux_for_testing.cc",
-    ]
-  }
-  if (is_android) {
-    sources += [
-      "partition_alloc_base/threading/platform_thread_android_for_testing.cc",
     ]
   }
   public_deps = [

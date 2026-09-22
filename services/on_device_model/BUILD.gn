@@ -66,9 +66,6 @@ if (use_blink || (is_ios && build_with_internal_optimization_guide)) {
     if (is_linux) {
       deps += [ "//gpu/config" ]
     }
-    if (is_android) {
-      deps += [ "//services/on_device_model/android" ]
-    }
     deps += [
       "//third_party/dawn/include/dawn:cpp_headers",
       "//third_party/dawn/src/dawn:proc",

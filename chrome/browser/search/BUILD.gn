@@ -130,17 +130,6 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_android) {
-    deps += [
-      ":search",
-      "//base",
-      "//chrome/common",
-      "//components/policy/core/browser",
-      "//components/policy/core/common",
-      "//components/prefs",
-      "//testing/gtest",
-    ]
-  }
 }
 
 if (!is_android) {

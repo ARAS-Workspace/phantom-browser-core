@@ -128,17 +128,6 @@ component("services") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "android_mojo_media_client.cc",
-      "android_mojo_media_client.h",
-      "android_mojo_util.cc",
-      "android_mojo_util.h",
-      "mediadrm_support_service.cc",
-      "mediadrm_support_service.h",
-    ]
-  }
-
   if (enable_media_drm_storage) {
     sources += [
       "mojo_media_drm_storage.cc",
@@ -290,11 +279,6 @@ source_set("unit_tests") {
       "//media/cdm:cdm_api",
       "//media/cdm:cdm_paths",
     ]
-  }
-
-  if (is_android) {
-    sources += [ "mediadrm_support_service_unittest.cc" ]
-    deps += [ "//third_party/widevine/cdm:headers" ]
   }
 
   if (allow_hosting_oop_video_decoder) {

@@ -31,9 +31,6 @@ source_set("impl") {
     "//google_apis",
   ]
 
-  if (is_android) {
-    deps += [ "//components/trusted_vault/android" ]
-  }
 }
 
 source_set("unit_tests") {

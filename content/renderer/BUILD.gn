@@ -164,26 +164,6 @@ target(link_target_type, "renderer") {
     "worker/worker_thread_registry.h",
   ]
 
-  if (is_android) {
-    sources += [
-      "java/gin_java_bridge_dispatcher.cc",
-      "java/gin_java_bridge_dispatcher.h",
-      "java/gin_java_bridge_object.cc",
-      "java/gin_java_bridge_object.h",
-      "java/gin_java_bridge_value_converter.cc",
-      "java/gin_java_bridge_value_converter.h",
-      "java/gin_java_function_invocation_helper.cc",
-      "java/gin_java_function_invocation_helper.h",
-      "media/android/flinging_renderer_client.cc",
-      "media/android/flinging_renderer_client.h",
-      "media/android/flinging_renderer_client_factory.cc",
-      "media/android/flinging_renderer_client_factory.h",
-      "renderer_main_platform_delegate_android.cc",
-      "seccomp_sandbox_status_android.cc",
-      "seccomp_sandbox_status_android.h",
-    ]
-  }
-
   if (is_linux) {
     sources += [ "renderer_main_platform_delegate_linux.cc" ]
   }
@@ -309,21 +289,6 @@ target(link_target_type, "renderer") {
   ]
   allow_circular_includes_from = []
 
-  if (is_android) {
-    deps += [
-      # Used by Android WebView only.
-      "//base/android/linker:ashmem",
-      "//components/origin_matcher",
-      "//components/viz/service",
-      "//third_party/cpu_features:ndk_compat",
-      "//third_party/libphonenumber",
-    ]
-
-    if (use_seccomp_bpf) {
-      deps += [ "//sandbox/policy" ]
-    }
-  }
-
   if (enable_screen_ai_service) {
     sources += [
       "accessibility/annotations/ax_canvas_annotator.cc",
@@ -412,16 +377,6 @@ fuzzer_test("audio_decoder_fuzzer") {
     ":for_content_tests",
     "//content/test:test_support",
   ]
-  if (is_android) {
-    deps += [
-      # content::BlinkTestEnvironment from //content/test:test_support
-      # transitively requires org.chromium.ui.base.ResourceBundle for its
-      # execution on Android. //content/test:test_support is a static_library
-      # which wouldn't pass a java dependency to this target, thus the need of
-      # this here directly.
-      "//ui/android:ui_no_recycler_view_java",
-    ]
-  }
   seed_corpus = "//media/test/data"
 }
 
@@ -441,16 +396,6 @@ fuzzer_test("content_security_policy_util_fuzzer") {
     "//services/network/public/cpp",
     "//services/network/public/mojom",
   ]
-  if (is_android) {
-    deps += [
-      # content::BlinkTestEnvironment from //content/test:test_support
-      # transitively requires org.chromium.ui.base.ResourceBundle for its
-      # execution on Android. //content/test:test_support is a static_library
-      # which wouldn't pass a java dependency to this target, thus the need of
-      # adding this here directly.
-      "//ui/android:ui_no_recycler_view_java",
-    ]
-  }
   dict = "//testing/libfuzzer/fuzzers/dicts/content_security_policy.dict"
   seed_corpus = "//testing/libfuzzer/fuzzers/content_security_policy_corpus"
 }
