@@ -120,6 +120,7 @@ source_set("unit_tests") {
   testonly = true
   sources = [ "history_tab_helper_unittest.cc" ]
   deps = [
+    "//components/tabs:test_support",
     ":history",
     "//base",
     "//base/test:test_support",

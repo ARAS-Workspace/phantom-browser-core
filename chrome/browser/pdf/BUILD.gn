@@ -42,6 +42,7 @@ source_set("pdf") {
     "//components/pdf/browser:interceptors",
     "//components/pdf/common:util",
     "//components/prefs",
+    "//components/tabs:public",
     "//components/user_education/webui",
     "//components/zoom",
     "//extensions/browser",

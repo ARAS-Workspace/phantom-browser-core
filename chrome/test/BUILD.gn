@@ -98,6 +98,7 @@ static_library("test_support") {
     "//components/activity_reporter",
     "//components/affiliations/core/browser:test_support",
     "//components/record_replay/core/common",
+    "//components/spellcheck:buildflags",
     "//components/supervised_user/core/browser:device_parental_controls",
     "//components/supervised_user/core/browser:test_support",
     "//ui/base/unowned_user_data",
@@ -988,6 +989,7 @@ if (!is_android) {
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
     deps = [
+      "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
       ":browser_tests_runner",
       ":platform_browser_tests",
       ":test_support",
@@ -2600,6 +2602,7 @@ if (!is_android) {
       deps += [
         "//chrome/browser/ui/aura/accessibility",
         "//chrome/browser/ui/views/renderer_context_menu:browser_tests",
+        "//ui/wm",
       ]
 
       if (use_nss_certs) {

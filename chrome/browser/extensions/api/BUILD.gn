@@ -197,6 +197,7 @@ source_set("keyed_service_factories") {
   ]
 
   deps = [
+    "//components/spellcheck:buildflags",
     ":api_implementations",
     "//chrome/browser/extensions",
     "//chrome/common:buildflags",

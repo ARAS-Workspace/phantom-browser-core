@@ -107,6 +107,7 @@ if (!is_android) {
     sources = [ "browser_actions.cc" ]
     public_deps = [ "//base" ]
     deps = [
+      "//components/spellcheck:buildflags",
       ":browser_actions",
       ":browser_select_file_dialog_controller",
       ":bubble_anchor_util",

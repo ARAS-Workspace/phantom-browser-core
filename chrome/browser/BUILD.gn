@@ -1398,7 +1398,10 @@ source_set("core") {
 
   if (use_aura) {
     sources += [ "platform_util_aura.cc" ]
-    deps += [ "//ui/aura" ]
+    deps += [
+      "//ui/aura",
+      "//ui/wm",
+    ]
   }
 
   if (use_ozone) {
@@ -2862,6 +2865,7 @@ group("browser_public_dependencies") {
     # and thus their public dependencies are shared.
     "//base",
     "//chrome/app/vector_icons",
+    "//chrome/browser/content_settings:content_settings_factory",
     "//chrome/browser/enterprise",
     "//chrome/browser/optimization_guide:optimization_guide_on_device_model_installer",
     "//chrome/browser/plugins",

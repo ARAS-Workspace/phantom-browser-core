@@ -84,6 +84,7 @@ source_set("impl") {
   }
 
   deps = [
+    "//chrome/browser/page_load_metrics",
     ":bookmarks",
     "//chrome/app:command_ids",
     "//chrome/app/vector_icons",

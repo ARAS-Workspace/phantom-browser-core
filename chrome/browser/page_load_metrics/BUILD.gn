@@ -197,6 +197,7 @@ source_set("unit_tests") {
   ]
 
   deps = [
+    "//components/tabs:test_support",
     ":page_load_metrics",
     "//base",
     "//base/test:test_support",

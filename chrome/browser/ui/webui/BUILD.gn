@@ -845,6 +845,7 @@ source_set("net_export_ui") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui/select_file_policy",
     "//components/net_log",
+    "//components/net_log/resources",
     "//services/network/public/mojom",
     "//ui/shell_dialogs",
     "//ui/webui",

@@ -131,6 +131,7 @@ source_set("unit_tests") {
     "star_rating_view_unittest.cc",
   ]
   deps = [
+    "//chrome/browser/permissions/system",
     ":page_info",
     "//base/test:test_support",
     "//chrome/browser/content_settings",
@@ -194,6 +195,7 @@ source_set("interactive_ui_tests") {
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   sources = [ "page_info_bubble_view_interactive_uitest.cc" ]
   deps = [
+    "//chrome/browser/permissions/system",
     ":page_info",
     "//base",
     "//chrome/browser/ui",

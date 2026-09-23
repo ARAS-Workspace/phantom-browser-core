@@ -423,6 +423,7 @@ source_set("impl") {
     "//components/enterprise/content",
     "//components/enterprise/core",
     "//components/enterprise/data_protection",
+    "//components/enterprise/device_trust/core:device_trust_service",
     "//components/enterprise/encryption/cache",
     "//components/enterprise/net",
     "//components/guest_view/browser",

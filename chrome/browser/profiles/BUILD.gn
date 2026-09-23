@@ -430,6 +430,7 @@ source_set("profile_manager_impl") {
   ]
 
   deps = [
+    "//components/keep_alive_registry",
     ":profile",
     ":profile_manager",
     ":profile_util",

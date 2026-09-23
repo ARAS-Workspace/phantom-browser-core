@@ -45,7 +45,6 @@
 #include "chrome/browser/favicon/favicon_utils.h"
 #include "chrome/browser/page_load_metrics/chrome_initiator_location.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/search/search.h"
 #include "chrome/browser/tab_group_sync/tab_group_sync_service_factory.h"
 #include "chrome/browser/themes/theme_properties.h"
 #include "chrome/browser/ui/bookmarks/bookmark_context_menu_controller.h"

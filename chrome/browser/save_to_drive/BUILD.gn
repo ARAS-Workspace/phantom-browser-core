@@ -56,6 +56,7 @@ source_set("save_to_drive") {
     "//extensions/browser",
     "//extensions/browser/mime_handler",
     "//extensions/browser/mime_handler:stream_container",
+    "//google_apis/common",
     "//pdf:features",
   ]
 }

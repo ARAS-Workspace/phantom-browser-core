@@ -65,6 +65,7 @@ if (!is_android) {
 
     public_deps = [
       "//base",
+      "//extensions/buildflags",
       "//ui/base/interaction",
       "//ui/menus",
     ]

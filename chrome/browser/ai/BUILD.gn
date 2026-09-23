@@ -78,6 +78,7 @@ source_set("impl") {
     "//chrome/browser:browser_process",
     "//chrome/browser/component_updater",
     "//chrome/browser/history_embeddings",
+    "//chrome/browser/optimization_guide",
     "//chrome/browser/passage_embeddings",
     "//chrome/browser/ui/tabs:tabs_public",
     "//components/autofill/content/browser",
