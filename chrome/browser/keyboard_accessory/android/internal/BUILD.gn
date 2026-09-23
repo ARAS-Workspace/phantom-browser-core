@@ -12,9 +12,7 @@ generate_jni("jni") {
     "java/src/org/chromium/chrome/browser/keyboard_accessory/all_passwords_bottom_sheet/AllPasswordsBottomSheetBridge.java",
     "java/src/org/chromium/chrome/browser/keyboard_accessory/all_passwords_bottom_sheet/Credential.java",
   ]
-  visibility = [
-    ":*",
-  ]
+  visibility = [ ":*" ]
 }
 
 android_library("java") {
@@ -127,9 +125,7 @@ android_resources("java_resources") {
     "//components/browser_ui/strings/android:browser_ui_strings_grd",
     "//components/browser_ui/widget/android/shared_with_webview:java_resources",
   ]
-  visibility = [
-    ":*",
-  ]
+  visibility = [ ":*" ]
 }
 
 java_strings_grd("java_strings_grd") {
@@ -183,9 +179,7 @@ android_library("test_java") {
     "//ui/android:ui_java_test_support",
     "//ui/android:ui_utils_java",
   ]
-  visibility = [
-    ":*",
-  ]
+  visibility = [ ":*" ]
   resources_package = "org.chromium.chrome.browser.keyboard_accessory"
 }
 

@@ -61,7 +61,6 @@ fuzzer_test("renderer_proto_tree_fuzzer") {
 
   # TODO(crbug.com/505034799): Migrate to FUZZ_TEST.
   is_fuzztest_compatible = false
-
 }
 
 fuzzable_proto_library("html_tree_proto") {

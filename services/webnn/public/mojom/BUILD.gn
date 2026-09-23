@@ -165,7 +165,6 @@ component("webnn_mojom_traits") {
   defines = [ "IS_WEBNN_MOJOM_TRAITS_IMPL" ]
 
   configs += [ "//build/config/compiler:prevent_unsafe_narrowing" ]
-
 }
 
 source_set("tests") {

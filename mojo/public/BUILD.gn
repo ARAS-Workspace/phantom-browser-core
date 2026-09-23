@@ -11,7 +11,6 @@ group("public") {
     "interfaces/bindings/tests:test_interfaces",
     "rust:all",
   ]
-
 }
 
 group("sdk") {

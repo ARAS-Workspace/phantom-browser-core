@@ -505,6 +505,5 @@ if (!is_android) {
       "//testing/gmock",
       "//ui/gfx/geometry",
     ]
-
   }
 }

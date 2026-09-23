@@ -129,5 +129,4 @@ test("native_theme_unittests") {
   if (is_win || is_linux) {
     sources += [ "native_theme_fluent_unittest.cc" ]
   }
-
 }

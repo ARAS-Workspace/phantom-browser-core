@@ -760,7 +760,6 @@ source_set("unit_tests") {
       "//components/ukm:test_support",
       "//third_party/zlib/google:zip",
     ]
-
   }
 
   if (safe_browsing_mode == 0) {
@@ -861,7 +860,6 @@ source_set("unit_tests") {
       ]
       deps += [ "//chrome/common:constants" ]
     }
-
   }
 
   if (safe_browsing_mode == 2 && is_android) {

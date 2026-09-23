@@ -313,7 +313,6 @@ if (enable_vr) {
       "//testing/gmock",
     ]
   }
-
 } else {
   source_set("vr") {
     # We need to include an empty .cc file so that mac and windows don't fall
@@ -371,7 +370,6 @@ if (enable_openxr) {
         "//third_party/openxr:openxr_headers",
         "//ui/gl",
       ]
-
     }
 
     shared_library("openxr_mock") {
@@ -416,6 +414,5 @@ if (enable_openxr) {
       # enable the diagnostic by removing this line.
       configs += [ "//build/config/compiler:no_exit_time_destructors" ]
     }
-
   }
 }

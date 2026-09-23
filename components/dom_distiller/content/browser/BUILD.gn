@@ -49,7 +49,6 @@ static_library("browser") {
     "//url",
   ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
-
 }
 
 source_set("unit_tests") {

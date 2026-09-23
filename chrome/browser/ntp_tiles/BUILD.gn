@@ -35,7 +35,6 @@ source_set("impl") {
     "//content/public/browser",
     "//services/data_decoder/public/cpp",
   ]
-
 }
 
 if (!is_android) {

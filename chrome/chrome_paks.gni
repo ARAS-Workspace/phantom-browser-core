@@ -263,10 +263,8 @@ template("chrome_extra_paks") {
     }
 
     if (is_win || is_mac || is_linux) {
-      sources += [
-      ]
-      deps += [
-      ]
+      sources += []
+      deps += []
     }
 
     if (enable_extensions_core) {

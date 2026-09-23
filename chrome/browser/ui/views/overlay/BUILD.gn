@@ -85,7 +85,6 @@ source_set("impl") {
     deps += [ "//components/remote_cocoa/common:mojo" ]
     frameworks = [ "Cocoa.framework" ]
   }
-
 }
 
 source_set("unit_tests") {

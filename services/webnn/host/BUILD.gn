@@ -24,5 +24,4 @@ component("host") {
     "//services/webnn/public/mojom",
     "//url",
   ]
-
 }

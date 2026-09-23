@@ -20,7 +20,6 @@ static_library("rlz") {
     "//rlz:rlz_lib",
     "//services/network/public/cpp",
   ]
-
 }
 
 source_set("test_support") {

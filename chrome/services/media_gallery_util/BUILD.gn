@@ -30,7 +30,6 @@ source_set("lib") {
 
   # FFmpeg is required to demux and extract metadata.
   if (media_use_ffmpeg) {
-
     deps += [ "//third_party/ffmpeg" ]
   }
 }

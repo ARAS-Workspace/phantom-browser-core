@@ -71,5 +71,4 @@ source_set("unit_tests") {
   if (use_aura) {
     deps += [ "//ui/aura" ]
   }
-
 }

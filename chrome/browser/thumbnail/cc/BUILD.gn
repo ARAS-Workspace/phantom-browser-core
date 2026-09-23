@@ -31,7 +31,6 @@ source_set("cc") {
     "thumbnail_capture_tracker.cc",
     "thumbnail_capture_tracker.h",
   ]
-
 }
 
 source_set("unit_tests") {
@@ -51,5 +50,4 @@ source_set("unit_tests") {
   ]
 
   sources = [ "scoped_ptr_expiring_cache_unittest.cc" ]
-
 }

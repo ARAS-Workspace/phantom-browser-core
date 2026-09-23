@@ -42,9 +42,7 @@ source_set("profiler") {
   ]
 
   if (is_android) {
-    deps += [
-      "//base:native_unwinder_android",
-    ]
+    deps += [ "//base:native_unwinder_android" ]
     public += [ "native_unwinder_android_map_delegate_impl.h" ]
     sources += [
       "core_unwinders_android.cc",

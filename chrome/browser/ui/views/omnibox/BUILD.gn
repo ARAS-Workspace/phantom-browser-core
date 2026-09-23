@@ -155,7 +155,7 @@ source_set("impl") {
     "//extensions/common:common_constants",
     "//ui/base:data_exchange",
     "//ui/strings:ui_strings_grit",
-    "//ui/touch_selection:touch_selection",
+    "//ui/touch_selection",
   ]
 
   # These .cc files include headers still compiled in //chrome/browser/ui:ui:
@@ -350,5 +350,4 @@ source_set("interactive_ui_tests") {
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
   }
-
 }

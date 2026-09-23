@@ -62,7 +62,6 @@ static_library("test_support") {
 source_set("unit_tests") {
   testonly = true
 
-
   # NOTE: Some tests have //chrome dependencies, which are temporarily allowed
   # by DEPS.
   deps = [
@@ -80,8 +79,6 @@ source_set("browser_tests") {
   testonly = true
 
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-
 
   # NOTE: Some tests have //chrome dependencies, which are temporarily allowed
   # by DEPS.

@@ -956,7 +956,6 @@ static_library("browser_tests_runner") {
   ]
 
   sources += [ "base/browser_tests_main.cc" ]
-
 }
 
 if (!is_android) {
@@ -968,7 +967,6 @@ if (!is_android) {
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
     deps = [
-      "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
       ":browser_tests_runner",
       ":platform_browser_tests",
       ":test_support",
@@ -1566,6 +1564,7 @@ if (!is_android) {
       "//components/javascript_dialogs",
       "//components/language/core/browser",
       "//components/language/core/common",
+      "//components/language_detection/content/renderer:agent",
       "//components/language_detection/core",
       "//components/lookalikes/core",
       "//components/lookalikes/core:proto",
@@ -1662,6 +1661,7 @@ if (!is_android) {
       "//components/safe_browsing/core/browser/db:sb_database",
       "//components/safe_browsing/core/browser/db:test_database_manager",
       "//components/safe_browsing/core/browser/db:v4_get_hash_protocol_manager",
+      "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
       "//components/safe_browsing/core/browser/password_protection:password_protection_metrics_util",
       "//components/safe_browsing/core/browser/realtime:url_lookup_service_base",
       "//components/safe_browsing/core/common",
@@ -1714,7 +1714,6 @@ if (!is_android) {
       "//components/sync_preferences:features",
       "//components/tab_groups",
       "//components/tracing:background_tracing_utils",
-      "//components/language_detection/content/renderer:agent",
       "//components/trusted_vault",
       "//components/ukm/content",
       "//components/unexportable_keys",
@@ -2633,8 +2632,7 @@ if (!is_android) {
         ]
       }
       if (is_win || is_mac || is_linux) {
-        sources += [
-        ]
+        sources += []
 
         deps += [ "//chrome/browser/ui/webui/app_home" ]
       }
@@ -5043,7 +5041,6 @@ test("unit_tests") {
       "//components/safe_browsing/core/browser:token_fetcher",
       "//components/safe_browsing/core/browser:token_fetcher_testing_helper",
     ]
-
   }
 
   if (safe_browsing_mode == 1) {
@@ -5416,9 +5413,7 @@ test("unit_tests") {
       "../browser/ui/views/tabs/tab_unittest.cc",
       "../browser/ui/views/task_manager_search_bar_view_unittest.cc",
     ]
-    sources += [
-      "../browser/ui/views/profiles/avatar_badge_view_unittest.cc",
-    ]
+    sources += [ "../browser/ui/views/profiles/avatar_badge_view_unittest.cc" ]
 
     # TODO(crbug.com/353332589): Remove this dependency when the
     # views/autofill/popup/ unit tests get modularized.
@@ -6139,7 +6134,7 @@ if (!is_android) {
       "//chrome/test/media_router/access_code_cast:access_code_cast_integration_base",
       "//chrome/test/supervised_user:live_tests",
       "//chrome/test/supervised_user:test_support",
-      "//chrome/test/user_education:user_education",
+      "//chrome/test/user_education",
       "//components/accessibility:reading",
       "//components/autofill/content/browser:test_support",
       "//components/autofill/core/common:credit_card_number_validation",
@@ -6912,7 +6907,6 @@ if (!is_android) {
     if (is_mac) {
       deps += [ "//chrome/app:command_ids" ]
     }
-
   }
 
   script_test("telemetry_unittests") {

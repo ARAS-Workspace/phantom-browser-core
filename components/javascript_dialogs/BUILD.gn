@@ -49,7 +49,6 @@ static_library("javascript_dialogs") {
 
     deps += [ "//ui/views" ]
   }
-
 }
 
 source_set("unit_tests") {

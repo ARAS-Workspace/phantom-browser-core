@@ -113,9 +113,7 @@ source_set("page_embeddings") {
 
 if (is_android) {
   android_library("java") {
-    visibility = [
-      ":*",
-    ]
+    visibility = [ ":*" ]
     srcjar_deps = [ ":service_jni_headers" ]
     sources = [ "android/java/src/org/chromium/chrome/browser/page_content_annotations/PageContentExtractionService.java" ]
     deps = [

@@ -85,5 +85,4 @@ source_set("generic_sensor") {
       "platform_sensor_reader_linux.h",
     ]
   }
-
 }

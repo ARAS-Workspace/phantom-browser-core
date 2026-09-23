@@ -14,9 +14,7 @@ import("//third_party/inspector_protocol/inspector_protocol.gni")
 
 buildflag_header("buildflags") {
   header = "buildflags.h"
-  flags = [
-    "USE_VIZ_DEBUGGER=$use_viz_debugger",
-  ]
+  flags = [ "USE_VIZ_DEBUGGER=$use_viz_debugger" ]
 }
 
 if (enable_vulkan) {

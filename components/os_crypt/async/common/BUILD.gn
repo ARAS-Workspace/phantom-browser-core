@@ -110,5 +110,4 @@ source_set("unit_tests") {
     "//mojo/public/cpp/test_support:test_utils",
     "//testing/gtest",
   ]
-
 }

@@ -32,7 +32,6 @@ source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-
   deps = [
     "//base",
     "//base/test:test_support",
@@ -51,7 +50,6 @@ source_set("browser_tests") {
   ]
 
   if (!is_android) {
-
     deps += [
       "//chrome/app:command_ids",
       "//chrome/browser/banners:test_support",

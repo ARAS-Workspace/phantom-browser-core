@@ -32,7 +32,6 @@ source_set("cross_device_pref_tracker") {
     "//components/sync_preferences",
     "//components/sync_preferences:features",
   ]
-
 }
 
 source_set("unit_tests") {

@@ -67,7 +67,6 @@ static_library("public") {
     "//extensions/buildflags",
   ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
-
 }
 
 source_set("unit_tests") {

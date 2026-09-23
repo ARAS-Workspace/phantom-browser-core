@@ -80,9 +80,7 @@ source_set("shortcuts") {
 source_set("test_support") {
   testonly = true
 
-  public = [
-    "shortcut_creation_test_support.h",
-  ]
+  public = [ "shortcut_creation_test_support.h" ]
   public_deps = [
     ":shortcuts",
     "//base",
@@ -94,12 +92,8 @@ source_set("test_support") {
   sources = []
 
   if (is_linux) {
-    public += [
-      "fake_linux_xdg_wrapper.h",
-    ]
-    sources += [
-      "fake_linux_xdg_wrapper.cc",
-    ]
+    public += [ "fake_linux_xdg_wrapper.h" ]
+    sources += [ "fake_linux_xdg_wrapper.cc" ]
     deps += [
       "//chrome/browser",
       "//chrome/browser:chrome_browser_main",

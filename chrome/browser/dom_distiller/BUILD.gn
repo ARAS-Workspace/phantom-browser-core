@@ -16,7 +16,6 @@ source_set("dom_distiller") {
     "//components/dom_distiller/core",
     "//components/keyed_service/core",
   ]
-
 }
 
 source_set("impl") {

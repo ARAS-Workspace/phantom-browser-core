@@ -216,7 +216,6 @@ config("skia_library_config") {
   } else {
     defines += [ "SK_DEFAULT_FONT_CACHE_LIMIT=20971520" ]  # 20 * 1024 * 1024
   }
-
 }
 
 # Split out into separate target so that path_bridge can depend on the public

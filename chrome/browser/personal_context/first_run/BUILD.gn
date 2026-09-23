@@ -19,6 +19,4 @@ source_set("first_run") {
     "//components/personal_context/first_run",
     "//content/public/browser",
   ]
-
 }
-

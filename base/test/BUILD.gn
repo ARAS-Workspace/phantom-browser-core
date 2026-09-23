@@ -409,7 +409,6 @@ shared_library("immediate_crash_test_helper") {
   # Disable sanitization: sanitized builds are assumed to be saner than normal,
   # and can affect codegen in surprising ways, which breaks the tests.
   configs -= [ "//build/config/sanitizers:default_sanitizer_flags" ]
-
 }
 
 # This shared library is dynamically loaded by NativeLibrary unittests.

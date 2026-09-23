@@ -14,7 +14,6 @@ source_set("browser") {
   ]
 
   public_deps = [ "//content/public/browser" ]
-
 }
 
 source_set("unit_tests") {

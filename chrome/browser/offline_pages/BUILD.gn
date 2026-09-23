@@ -83,7 +83,6 @@ source_set("impl") {
     "//components/offline_pages/core/request_header",
     "//services/service_manager/public/cpp",
   ]
-
 }
 
 source_set("test_support") {

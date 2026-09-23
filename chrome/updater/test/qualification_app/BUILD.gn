@@ -6,5 +6,4 @@ import("//chrome/updater/updater_process_version_rc_template.gni")
 
 executable("qualification_app") {
   sources = [ "main.cc" ]
-
 }

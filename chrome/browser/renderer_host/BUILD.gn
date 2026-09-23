@@ -17,14 +17,11 @@ source_set("renderer_host") {
     "//content/public/browser",
     "//extensions/buildflags",
   ]
-  deps = [
-    "//chrome/browser/preloading/prefetch/no_state_prefetch",
-  ]
+  deps = [ "//chrome/browser/preloading/prefetch/no_state_prefetch" ]
 
   if (enable_extensions) {
     public_deps += [ "//extensions/browser" ]
   }
-
 }
 
 if (is_mac) {

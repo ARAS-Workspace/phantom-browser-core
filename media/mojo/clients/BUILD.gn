@@ -84,7 +84,6 @@ source_set("clients") {
     "//media/mojo/common",
     "//services/service_manager/public/cpp",
   ]
-
 }
 
 static_library("test_support") {

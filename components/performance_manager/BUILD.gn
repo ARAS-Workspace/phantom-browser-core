@@ -500,5 +500,4 @@ source_set("browser_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
 }

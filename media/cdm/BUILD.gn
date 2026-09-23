@@ -127,7 +127,6 @@ source_set("cdm") {
     ]
     public_deps += [ "//components/crash/core/common:crash_key" ]
   }
-
 }
 
 if (enable_library_cdms) {
@@ -205,7 +204,6 @@ source_set("unit_tests") {
       "//media/cdm/library_cdm:test_support",
     ]
   }
-
 }
 
 test("aes_decryptor_fuzztests") {

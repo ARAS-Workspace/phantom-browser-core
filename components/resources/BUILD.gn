@@ -40,7 +40,6 @@ group("resources") {
     "../signin/core/browser/resources",
     "../webui:resources",
   ]
-
 }
 
 grit("components_resources") {

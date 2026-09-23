@@ -216,7 +216,6 @@ source_set("browser_tests") {
   if (is_posix) {
     sources += [ "pdf_printer_handler_posix_browsertest.cc" ]
   }
-
 }
 
 source_set("interactive_ui_tests") {

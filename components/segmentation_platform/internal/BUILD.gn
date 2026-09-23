@@ -208,7 +208,6 @@ static_library("internal") {
     "//components/optimization_guide/proto:optimization_guide_proto",
     "//components/segmentation_platform/public",
   ]
-
 }
 
 static_library("optimization_guide_segmentation_handler") {

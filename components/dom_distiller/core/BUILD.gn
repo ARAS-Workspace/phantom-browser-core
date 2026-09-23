@@ -20,7 +20,6 @@ component("dom_distiller_features") {
     ":prefs",
     "//base",
   ]
-
 }
 
 action("dom_distiller_viewer_js") {
@@ -106,7 +105,6 @@ static_library("core") {
     "//url",
   ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
-
 }
 
 static_library("test_support") {

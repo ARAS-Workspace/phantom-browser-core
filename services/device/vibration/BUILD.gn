@@ -22,5 +22,4 @@ source_set("vibration") {
     "//base",
     "//mojo/public/cpp/bindings",
   ]
-
 }

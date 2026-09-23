@@ -61,9 +61,7 @@ mojo_ts_files = [
 ]
 
 if (!is_ios) {
-  mojo_ts_files += [
-    "components/omnibox/browser/searchbox.mojom-webui.ts",
-  ]
+  mojo_ts_files += [ "components/omnibox/browser/searchbox.mojom-webui.ts" ]
 }
 
 if (is_mac || is_win || is_linux || is_android) {

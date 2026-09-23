@@ -51,5 +51,4 @@ source_set("version") {
   if (!is_android || enable_webui_ntp) {
     deps += [ "//chrome/browser/ui/webui:theme_source" ]
   }
-
 }

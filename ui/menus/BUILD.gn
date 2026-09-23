@@ -44,7 +44,6 @@ component("menus") {
       "QuartzCore.framework",
     ]
   }
-
 }
 
 source_set("unit_tests") {

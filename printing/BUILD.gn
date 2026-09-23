@@ -169,7 +169,6 @@ component("metafile") {
   if (is_mac) {
     frameworks += [ "ApplicationServices.framework" ]
   }
-
 }
 
 component("printing") {

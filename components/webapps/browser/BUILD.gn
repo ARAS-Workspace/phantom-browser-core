@@ -132,7 +132,6 @@ source_set("browser") {
     ":constants",
     ":webapps_client",
   ]
-
 }
 
 source_set("test_support") {

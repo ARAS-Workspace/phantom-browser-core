@@ -33,5 +33,4 @@ source_set("system_cpu") {
   if (is_linux || enable_desktop_android_extensions) {
     sources += [ "cpu_info_provider_linux.cc" ]
   }
-
 }

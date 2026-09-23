@@ -21,7 +21,6 @@ component("private_insights") {
     "//components/private_insights/events:contextual_cue_log_event_proto",
   ]
   deps = [
-    "//services/network/public/cpp",
     ":fcp_event_publisher",
     ":fcp_files",
     ":fcp_http_client",
@@ -31,6 +30,7 @@ component("private_insights") {
     "//base",
     "//base:i18n",
     "//components/version_info",
+    "//services/network/public/cpp",
     "//third_party/federated_compute:fl_runner",
   ]
 }

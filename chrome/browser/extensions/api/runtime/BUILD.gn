@@ -34,5 +34,4 @@ source_set("runtime") {
     "//extensions/common/api",
     "//net",
   ]
-
 }

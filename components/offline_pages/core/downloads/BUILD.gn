@@ -15,7 +15,6 @@ static_library("offline_pages_ui_adapter") {
     "//components/offline_pages/core:switches",
     "//components/offline_pages/core/background:background_offliner",
   ]
-
 }
 
 source_set("unit_tests") {

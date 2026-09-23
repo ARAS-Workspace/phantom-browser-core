@@ -16,7 +16,6 @@ if (use_blink) {
     # On Fuchsia, components/test/data seems to change spuriously,
     # breaking incremental compilation.
     data = [ "../test" ]
-
   }
 
   group("unit_tests") {

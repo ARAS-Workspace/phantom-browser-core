@@ -853,19 +853,16 @@ source_set("web_applications_unit_tests") {
   ]
 
   if (is_mac) {
-    sources += [
-    ]
+    sources += []
   }
 
   if (is_linux) {
     # Desktop linux, doesn't count ChromeOS.
-    sources += [
-    ]
+    sources += []
   }
 
   if (!is_android) {
   }
-
 
   deps = [
     ":features",
@@ -945,9 +942,7 @@ source_set("web_applications_unit_tests") {
 group("unit_tests") {
   testonly = true
 
-  deps = [
-    ":web_applications_unit_tests",
-  ]
+  deps = [ ":web_applications_unit_tests" ]
 
   if (enable_extensions) {
     deps += [ "//chrome/browser/web_applications/extensions:unit_tests" ]
@@ -956,7 +951,6 @@ group("unit_tests") {
 
 group("browser_tests") {
   testonly = true
-
 }
 
 # Test harness for web app tests. Can't be part of
@@ -996,8 +990,6 @@ if (!is_android) {
     testonly = true
 
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-
 
     public_deps = [
       "//base",

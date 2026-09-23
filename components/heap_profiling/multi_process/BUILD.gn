@@ -35,5 +35,4 @@ source_set("test_support") {
     "//content/public/browser",
     "//content/public/common",
   ]
-
 }

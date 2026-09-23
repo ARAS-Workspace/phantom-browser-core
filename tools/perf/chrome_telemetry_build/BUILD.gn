@@ -58,7 +58,6 @@ group("telemetry_chrome_test") {
       "//third_party/crashpad/crashpad/tools:crashpad_database_util",
     ]
   }
-
 }
 
 group("telemetry_chrome_test_without_chrome") {

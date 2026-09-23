@@ -117,9 +117,7 @@ static_library("renderer") {
 
   defines = []
 
-  public_deps = [
-    "//components/signin/public/base:signin_buildflags",
-  ]
+  public_deps = [ "//components/signin/public/base:signin_buildflags" ]
 
   deps = [
     ":process_state",
@@ -149,6 +147,7 @@ static_library("renderer") {
     "//components/heap_profiling/in_process",
     "//components/history_clusters/core",
     "//components/language/core/common",
+    "//components/language_detection/content/renderer:agent",
     "//components/language_detection/core",
     "//components/metrics:child_call_stack_profile_builder",
     "//components/network_hints/renderer",
@@ -186,7 +185,6 @@ static_library("renderer") {
     "//components/supervised_user/core/common:buildflags",
     "//components/surface_embed/common",
     "//components/surface_embed/renderer",
-    "//components/language_detection/content/renderer:agent",
     "//components/visitedlink/renderer",
     "//components/wallet/content/renderer",
     "//components/wallet/core/common:features",
@@ -332,5 +330,4 @@ static_library("renderer") {
       "//components/trusted_vault",
     ]
   }
-
 }

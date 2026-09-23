@@ -591,7 +591,6 @@ test("gpu_unittests") {
 
   if (skia_use_dawn) {
     sources += [ "command_buffer/service/graphite_shared_context_unittest.cc" ]
-
   }
 
   configs += [ "//build/config:precompiled_headers" ]

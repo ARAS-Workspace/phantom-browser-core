@@ -102,6 +102,5 @@ if (!is_android) {
         "//components/upload_list",
       ]
     }
-
   }
 }

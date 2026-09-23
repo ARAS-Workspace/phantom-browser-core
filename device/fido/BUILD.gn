@@ -263,7 +263,6 @@ component("fido") {
 
       deps += [ "//build:branding_buildflags" ]
     }
-
   }
 }
 

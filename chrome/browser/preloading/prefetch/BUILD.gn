@@ -21,7 +21,6 @@ source_set("impl") {
     ":prefetch",
     "//chrome/browser/preloading",
   ]
-
 }
 
 source_set("test_support") {

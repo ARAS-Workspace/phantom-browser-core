@@ -22,7 +22,6 @@ source_set("device_reauth") {
       "mac/device_authenticator_mac.h",
     ]
   }
-
 }
 
 source_set("impl") {
@@ -55,7 +54,6 @@ source_set("impl") {
       "//device/fido",
     ]
   }
-
 }
 
 source_set("unit_tests") {
@@ -88,5 +86,4 @@ source_set("unit_tests") {
       "//device/fido:test_support",
     ]
   }
-
 }

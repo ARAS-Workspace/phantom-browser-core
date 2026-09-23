@@ -180,7 +180,6 @@ if (!is_android) {
     if (is_mac) {
       sources += [ "spell_check_host_chrome_impl_mac_browsertest.cc" ]
     }
-
   }
 }
 

@@ -27,7 +27,6 @@ source_set("extensions") {
   if (!is_android) {
     deps += [ "//components/keep_alive_registry" ]
   }
-
 }
 
 source_set("impl") {
@@ -76,7 +75,6 @@ source_set("impl") {
   }
 
   deps += [ "//chrome/browser/web_applications/extensions" ]
-
 }
 
 source_set("unit_tests") {
@@ -103,5 +101,4 @@ source_set("unit_tests") {
     "//testing/gtest",
     "//ui/message_center/public/cpp",
   ]
-
 }

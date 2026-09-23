@@ -80,7 +80,6 @@ source_set("unit_tests") {
     deps +=
         [ "//chrome/browser/web_applications:web_applications_test_support" ]
   }
-
 }
 
 if (!is_android) {

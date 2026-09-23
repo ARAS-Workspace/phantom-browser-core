@@ -170,9 +170,7 @@ source_set("browser_tests") {
   }
 
   if (is_win || is_mac || is_linux) {
-    sources += [
-      "discards/discards_browsertest.cc",
-    ]
+    sources += [ "discards/discards_browsertest.cc" ]
   }
 
   if (is_win || is_mac || is_linux) {
@@ -598,12 +596,8 @@ generate_grd("build_grd") {
   }
 
   if (!is_android || is_desktop_android) {
-    deps += [
-      "cr_components:build_grdp",
-    ]
-    grdp_files += [
-      "$target_gen_dir/cr_components/resources.grdp",
-    ]
+    deps += [ "cr_components:build_grdp" ]
+    grdp_files += [ "$target_gen_dir/cr_components/resources.grdp" ]
   }
 
   if (enable_extensions_core) {
@@ -699,8 +693,7 @@ generate_grd("build_grd") {
 if (!is_android) {
   source_set("composebox_pixel_test_support") {
     testonly = true
-    sources = [
-    ]
+    sources = []
     deps = [
       "//chrome/test:test_support",
       "//ui/native_theme:test_support",

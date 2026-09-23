@@ -9,20 +9,20 @@
 #
 # The flags below mirror flags-dev.gn wherever the two agree, so the branches
 # the gate walks are the branches the development tree would walk.
-is_debug=false
-dcheck_always_on=true
-is_official_build=false
-is_clang=true
-enable_rust=true
-use_thin_lto=false
-chrome_pgo_phase=0
-symbol_level=2
-blink_symbol_level=1
-enable_iterator_debugging=false
-enable_updater=false
-proprietary_codecs=true
-ffmpeg_branding="Chrome"
-enable_swiftshader=true
+is_debug = false
+dcheck_always_on = true
+is_official_build = false
+is_clang = true
+enable_rust = true
+use_thin_lto = false
+chrome_pgo_phase = 0
+symbol_level = 2
+blink_symbol_level = 1
+enable_iterator_debugging = false
+enable_updater = false
+proprietary_codecs = true
+ffmpeg_branding = "Chrome"
+enable_swiftshader = true
 
 # The debian sysroot arrives through the checkout_linux entries in DEPS, which
 # core-sync.sh asks gclient for, and lands at the stock
@@ -34,23 +34,23 @@ enable_swiftshader=true
 # $sysroot/usr/bin/cups-config, and the pkg_config branches read the .pc files
 # underneath it. Those branches are gate coverage the mac configuration has no
 # way to reach.
-use_sysroot=true
+use_sysroot = true
 
 # build/modules/BUILD.gn:111 calls expand_directory("${sysroot}/usr/include")
 # for linux. Without a sysroot that read reaches /usr/include on the host,
 # which a mac keeps inside the SDK instead, and gn opens a directory that is
 # not there. With the sysroot in place it reads the sysroot's own headers.
-use_unified_system_module=true
+use_unified_system_module = true
 
 # gn builds a HOST toolchain as well, and this host is a mac, so
 # build/config/mac/BUILD.gn is evaluated even with target_os="linux". Without
 # this the host mac configuration reaches for xcode-select and rebases an empty
 # sysroot at build/config/mac/BUILD.gn:55. The same argument in flags-dev.gn
 # points at build/mac_files/xcode_binaries, which core-sync.sh keeps current.
-use_system_xcode=false
+use_system_xcode = false
 
 # use_aura, use_ozone, use_glib, use_dbus, use_udev and use_bluez are left at
 # their linux defaults on purpose. Those are the branches the mac gates cannot
 # see, and they are the reason this gate exists: the two defects it was built
 # for sat under is_linux and under use_aura.
-target_os="linux"
+target_os = "linux"

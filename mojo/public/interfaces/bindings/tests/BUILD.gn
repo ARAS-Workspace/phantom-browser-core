@@ -420,5 +420,4 @@ group("test_generation") {
     ":other_test_interfaces",
     ":other_test_interfaces_js",
   ]
-
 }

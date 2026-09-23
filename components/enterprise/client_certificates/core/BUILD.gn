@@ -178,7 +178,6 @@ source_set("test_support") {
     "//testing/gmock",
     "//third_party/boringssl",
   ]
-
 }
 
 source_set("unit_tests") {
@@ -222,5 +221,4 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
 }

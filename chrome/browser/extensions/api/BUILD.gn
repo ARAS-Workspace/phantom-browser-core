@@ -90,8 +90,7 @@ group("api_implementations") {
   }  # if (enable_extensions)
 
   if (!is_android) {
-    public_deps += [
-    ]
+    public_deps += []
   }
 }
 
@@ -197,11 +196,11 @@ source_set("keyed_service_factories") {
   ]
 
   deps = [
-    "//components/spellcheck:buildflags",
     ":api_implementations",
     "//chrome/browser/extensions",
     "//chrome/common:buildflags",
     "//components/safe_browsing:buildflags",
+    "//components/spellcheck:buildflags",
     "//extensions/buildflags",
     "//pdf:buildflags",
     "//printing/buildflags",

@@ -30,7 +30,6 @@ source_set("impl") {
     "//components/signin/public/identity_manager",
     "//google_apis",
   ]
-
 }
 
 source_set("unit_tests") {

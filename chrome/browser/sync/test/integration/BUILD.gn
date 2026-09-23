@@ -209,8 +209,7 @@ source_set("sync_integration_tests_impl") {
 
     # TODO(crbug.com/478187672): Fix flakiness and enable on ASan.
     if (is_linux && is_asan) {
-      sources -= [
-      ]
+      sources -= []
     }
 
     deps += [

@@ -124,7 +124,6 @@ static_library("zucchini_io") {
     ":zucchini_lib",
     "//base",
   ]
-
 }
 
 if (is_win && current_toolchain == default_toolchain) {
@@ -170,7 +169,6 @@ if (!is_win || current_toolchain != default_toolchain) {
       ":zucchini_lib",
       "//base",
     ]
-
   }
 }
 
@@ -225,7 +223,6 @@ test("zucchini_unittests") {
     "//base/test:test_support",
     "//testing/gtest",
   ]
-
 }
 
 test("zucchini_integration_test") {

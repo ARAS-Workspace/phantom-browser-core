@@ -180,5 +180,4 @@ source_set("unit_tests") {
     "//components/unified_consent",
     "//components/variations:test_support",
   ]
-
 }

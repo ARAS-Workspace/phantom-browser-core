@@ -65,7 +65,6 @@ source_set("impl") {
     "//ui/base",
     "//url",
   ]
-
 }
 
 if (!is_android) {

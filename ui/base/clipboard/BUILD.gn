@@ -206,7 +206,6 @@ source_set("clipboard_test_support") {
     "//ui/base:features",
     "//ui/gfx",
   ]
-
 }
 
 source_set("clipboard_test") {

@@ -273,7 +273,6 @@ source_set("impl") {
   if (enable_offline_pages) {
     deps += [ "//components/offline_pages/core" ]
   }
-
 }
 
 source_set("status_text_builder_utils") {
@@ -440,7 +439,7 @@ if (!is_android) {
       "//components/infobars/content",
       "//components/lookalikes/core:safety_tips",
       "//components/page_load_metrics/browser:test_support",
-      "//components/pdf/browser:browser",
+      "//components/pdf/browser",
       "//components/safe_browsing/content/browser:safe_browsing_service",
       "//components/services/quarantine:test_support",
       "//content/public/browser",

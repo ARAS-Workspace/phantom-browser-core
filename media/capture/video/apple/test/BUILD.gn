@@ -36,5 +36,4 @@ source_set("test_support") {
     "IOSurface.framework",
     "VideoToolbox.framework",
   ]
-
 }

@@ -315,7 +315,6 @@ source_set("internal") {
       ]
       frameworks += [ "SystemConfiguration.framework" ]
     }
-
   }
 }
 
@@ -424,7 +423,6 @@ source_set("common_constants") {
     "proxy_settings_constants.h",
     "system_features_disable_list_constants.h",
   ]
-
 }
 
 source_set("policy_path_constants") {
@@ -535,7 +533,6 @@ source_set("unit_tests") {
     if (is_mac) {
       sources += [ "policy_loader_mac_unittest.cc" ]
     }
-
   }
   if (is_win || is_linux) {
     # Needed by policy_loader_win_unittest.cc

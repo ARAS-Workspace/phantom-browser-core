@@ -17,7 +17,6 @@ source_set("battery") {
   ]
 
   deps = [ "//content/public/browser" ]
-
 }
 
 source_set("unit_tests") {

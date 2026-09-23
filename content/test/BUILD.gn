@@ -671,7 +671,6 @@ static_library("test_support") {
       "../browser/speech/fake_speech_recognition_manager_delegate.cc",
       "../browser/speech/fake_speech_recognition_manager_delegate.h",
     ]
-
   }
 
   # HID support is not available without udev.
@@ -3042,7 +3041,6 @@ test("content_unittests") {
         "../browser/media/capture/desktop_capture_unittest.cc",
       ]
     }
-
   }
 
   if (is_linux) {

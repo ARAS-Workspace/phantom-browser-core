@@ -18,7 +18,6 @@ source_set("send_tab_to_self") {
     "//components/send_tab_to_self",
     "//content/public/browser",
   ]
-
 }
 
 source_set("impl") {

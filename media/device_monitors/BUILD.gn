@@ -36,7 +36,6 @@ source_set("device_monitors") {
     ]
     frameworks = [ "Foundation.framework" ]
   }
-
 }
 
 source_set("unit_tests") {
@@ -50,5 +49,4 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
 }

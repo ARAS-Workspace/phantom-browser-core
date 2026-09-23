@@ -566,7 +566,6 @@ if (!is_android) {
         "//chrome/browser/wallet",
       ]
     }
-
   }
 
   # This is a separate component to avoid possible circular deps.

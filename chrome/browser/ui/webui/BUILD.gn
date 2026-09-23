@@ -834,7 +834,6 @@ source_set("net_export_ui") {
     "//ui/shell_dialogs",
     "//ui/webui",
   ]
-
 }
 
 if (!is_android) {

@@ -541,7 +541,6 @@ target(link_target_type, "gles2_sources") {
     ]
     deps += [ "//third_party/dawn/src/dawn:cpp" ]
   }
-
 }
 
 proto_library("disk_cache_proto") {

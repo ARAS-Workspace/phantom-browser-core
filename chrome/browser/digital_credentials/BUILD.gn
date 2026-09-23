@@ -1,4 +1,3 @@
-
 source_set("digital_credentials") {
   sources = [
     "digital_credentials_keyed_service.h",
@@ -75,5 +74,4 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
 }

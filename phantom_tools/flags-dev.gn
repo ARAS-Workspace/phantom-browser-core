@@ -1,27 +1,25 @@
 # Development flags. The production flags live in the phantom-browser repository
 # (config/flags.gn) and are not copied here; this tree is for development.
 #
-# is_official_build / LTO / PGO off: linking stays cheap and the incremental loop
-# stays fast.
-# dcheck_always_on: the condition for catching crashes, since DCHECK is silent in
-# the production tree.
-# symbol_level=2: so the debugger can see variables.
-# use_system_xcode=false: the SDK comes from build/mac_files/xcode_binaries
-# at mac_sdk_official_version, and an Xcode update on the host does not
-# move it. core-sync.sh sets that directory up.
-is_debug=false
-dcheck_always_on=true
-is_official_build=false
-is_clang=true
-enable_rust=true
-use_thin_lto=false
-chrome_pgo_phase=0
-symbol_level=2
-blink_symbol_level=1
-enable_iterator_debugging=false
-enable_updater=false
-proprietary_codecs=true
-ffmpeg_branding="Chrome"
-enable_swiftshader=true
-use_sysroot=false
-use_system_xcode=false
+# is_official_build / LTO / PGO off: linking stays cheap and the incremental
+# loop stays fast. dcheck_always_on: the condition for catching crashes, since
+# DCHECK is silent in the production tree. symbol_level=2: so the debugger can
+# see variables. use_system_xcode=false: the SDK comes from
+# build/mac_files/xcode_binaries at mac_sdk_official_version, and an Xcode
+# update on the host does not move it. core-sync.sh sets that directory up.
+is_debug = false
+dcheck_always_on = true
+is_official_build = false
+is_clang = true
+enable_rust = true
+use_thin_lto = false
+chrome_pgo_phase = 0
+symbol_level = 2
+blink_symbol_level = 1
+enable_iterator_debugging = false
+enable_updater = false
+proprietary_codecs = true
+ffmpeg_branding = "Chrome"
+enable_swiftshader = true
+use_sysroot = false
+use_system_xcode = false

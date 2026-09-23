@@ -84,7 +84,6 @@ source_set("impl") {
   }
 
   deps = [
-    "//chrome/browser/page_load_metrics",
     ":bookmarks",
     "//chrome/app:command_ids",
     "//chrome/app/vector_icons",
@@ -94,6 +93,7 @@ source_set("impl") {
     "//chrome/browser/feature_engagement",
     "//chrome/browser/image_fetcher",
     "//chrome/browser/page_image_service",
+    "//chrome/browser/page_load_metrics",
     "//chrome/browser/predictors",
     "//chrome/browser/prefs",
     "//chrome/browser/preloading/bookmarkbar_preload",

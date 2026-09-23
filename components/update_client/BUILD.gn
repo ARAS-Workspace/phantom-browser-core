@@ -196,7 +196,6 @@ static_library("update_client") {
     frameworks = [ "Foundation.framework" ]
     deps += [ ":background_downloader_delegate" ]
   }
-
 }
 
 if (is_mac) {

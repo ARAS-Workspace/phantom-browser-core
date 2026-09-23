@@ -19,5 +19,4 @@ component("base") {
     "//base",
     "//device/vr/buildflags",
   ]
-
 }

@@ -265,7 +265,6 @@ static_library("shopping_service") {
     "//components/commerce/core/subscriptions",
     "//services/data_decoder/public/cpp",
   ]
-
 }
 
 source_set("shopping_service_test_support") {

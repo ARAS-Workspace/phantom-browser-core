@@ -252,5 +252,4 @@ test("gin_unittests") {
     data_deps += [ ":gin_shell" ]
     data += [ "shell/hello_world.js" ]
   }
-
 }

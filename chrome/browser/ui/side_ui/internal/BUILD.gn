@@ -20,9 +20,7 @@ android_resources("java_resources") {
 }
 
 android_library("java") {
-  visibility = [
-    ":*",
-  ]
+  visibility = [ ":*" ]
 
   sources = [
     "android/java/src/org/chromium/chrome/browser/ui/side_ui/AnchorContainerTopMargins.java",

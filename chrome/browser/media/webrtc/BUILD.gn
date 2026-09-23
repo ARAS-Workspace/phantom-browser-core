@@ -230,10 +230,7 @@ source_set("webrtc") {
       "display_media_access_handler.cc",
       "display_media_access_handler.h",
     ]
-    deps += [
-      "//chrome/browser/ui:url_identity",
-    ]
-
+    deps += [ "//chrome/browser/ui:url_identity" ]
   }
 
   if (is_mac) {

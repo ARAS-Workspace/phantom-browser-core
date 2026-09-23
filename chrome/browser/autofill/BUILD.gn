@@ -427,7 +427,6 @@ source_set("unit_tests") {
       "//ui/gfx:test_support",
     ]
   }
-
 }
 
 if (!is_android) {

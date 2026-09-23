@@ -46,7 +46,6 @@ source_set("impl") {
     "//ui/gfx",
     "//ui/snapshot",
   ]
-
 }
 
 source_set("test_support") {
@@ -54,7 +53,6 @@ source_set("test_support") {
 
   sources = []
   deps = []
-
 }
 
 source_set("unit_tests") {
@@ -62,7 +60,6 @@ source_set("unit_tests") {
 
   sources = []
   deps = []
-
 }
 
 source_set("browser_tests") {

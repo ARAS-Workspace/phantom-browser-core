@@ -62,7 +62,6 @@ viz_component("host") {
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
   }
-
 }
 
 viz_source_set("unit_tests") {

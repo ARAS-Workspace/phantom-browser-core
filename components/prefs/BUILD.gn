@@ -60,7 +60,6 @@ component("prefs") {
     "//base",
     "//base/i18n:language_tag_no_icu",
   ]
-
 }
 
 static_library("test_support") {

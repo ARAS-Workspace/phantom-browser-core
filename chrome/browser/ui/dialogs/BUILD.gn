@@ -28,7 +28,6 @@ source_set("dialogs") {
   if (!is_android) {
     deps += [ "//chrome/browser/ui/interaction" ]
   }
-
 }
 
 source_set("browser_dialogs") {
@@ -63,7 +62,6 @@ source_set("browser_dialogs") {
   if (toolkit_views) {
     deps += [ "//components/constrained_window" ]
   }
-
 }
 
 if (is_linux) {

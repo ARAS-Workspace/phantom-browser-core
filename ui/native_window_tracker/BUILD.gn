@@ -31,5 +31,4 @@ component("native_window_tracker") {
     ]
     frameworks = [ "AppKit.framework" ]
   }
-
 }

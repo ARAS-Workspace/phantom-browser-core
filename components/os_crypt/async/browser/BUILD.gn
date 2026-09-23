@@ -18,7 +18,6 @@ component("browser") {
   ]
 
   defines = [ "IS_OS_CRYPT_ASYNC_IMPL" ]
-
 }
 
 source_set("test_support") {

@@ -212,7 +212,7 @@ source_set("impl") {
     "//chrome/browser/ui/views/page_action",
     "//chrome/browser/ui/views/performance_controls",
     "//chrome/browser/ui/views/profiles:avatar_toolbar_button",
-    "//chrome/browser/ui/views/side_panel:side_panel",
+    "//chrome/browser/ui/views/side_panel",
     "//chrome/browser/ui/waap",
     "//chrome/browser/ui/waap:manager",
     "//chrome/browser/ui/waap:window_metrics_manager",
@@ -274,7 +274,6 @@ source_set("impl") {
   if (!is_android) {
     deps += [ "//chrome/browser/ui/views/zoom" ]
   }
-
 }
 
 if (!is_android) {

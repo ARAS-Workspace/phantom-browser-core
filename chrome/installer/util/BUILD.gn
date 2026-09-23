@@ -191,7 +191,6 @@ source_set("constants") {
   public = [ "initial_preferences_constants.h" ]
 
   sources = []
-
 }
 
 if (!is_win) {

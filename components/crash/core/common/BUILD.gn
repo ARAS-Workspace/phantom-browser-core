@@ -21,7 +21,6 @@ group("common") {
   if (is_apple) {
     public_deps += [ ":zombies" ]
   }
-
 }
 
 source_set("shared_memory_user_stream") {

@@ -296,7 +296,6 @@ source_set("unit_tests") {
       "test_task_manager.h",
     ]
   }
-
 }
 
 if (!is_android) {

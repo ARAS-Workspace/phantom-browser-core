@@ -414,7 +414,6 @@ source_set("profile_manager") {
     ]
     deps += [ "//chrome/browser/ui/browser_window" ]
   }
-
 }
 
 source_set("profile_manager_impl") {
@@ -426,7 +425,6 @@ source_set("profile_manager_impl") {
   ]
 
   deps = [
-    "//components/keep_alive_registry",
     ":profile",
     ":profile_manager",
     ":profile_util",
@@ -449,6 +447,7 @@ source_set("profile_manager_impl") {
     "//chrome/common:buildflags",
     "//chrome/common:constants",
     "//components/crash/core/common",
+    "//components/keep_alive_registry",
     "//components/profile_metrics",
     "//components/signin/core/browser",
     "//components/signin/public/base:signin_buildflags",
@@ -614,7 +613,6 @@ source_set("profile_util_impl") {
   if (!is_android) {
     deps += [ "//chrome/browser/ui/browser_window" ]
   }
-
 }
 
 source_set("profiles_extra_parts") {

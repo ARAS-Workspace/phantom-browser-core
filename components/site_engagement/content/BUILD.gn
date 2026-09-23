@@ -38,7 +38,6 @@ source_set("content") {
     "//third_party/blink/public/mojom:mojom_platform_headers",
     "//url",
   ]
-
 }
 
 source_set("unit_tests") {

@@ -245,7 +245,6 @@ source_set("unit_tests") {
   if (!is_android) {
     sources += [ "generated_https_first_mode_pref_unittest.cc" ]
   }
-
 }
 
 if (!is_android) {
@@ -361,5 +360,4 @@ source_set("platform_browser_tests") {
     "//net",
     "//testing/gtest",
   ]
-
 }

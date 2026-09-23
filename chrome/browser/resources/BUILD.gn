@@ -34,9 +34,7 @@ group("resources") {
   }
 
   if (enable_extensions_core) {
-    public_deps += [
-      ":component_extension_resources",
-    ]
+    public_deps += [ ":component_extension_resources" ]
   }
 
   if (!is_android) {
@@ -121,8 +119,7 @@ group("resources") {
   }
 
   if (is_win || is_mac || is_linux) {
-    public_deps += [
-    ]
+    public_deps += []
   }
 
   if (is_win || is_mac || is_linux) {

@@ -152,8 +152,7 @@ source_set("impl") {
 }
 
 source_set("aim_eligibility_service") {
-  sources = [
-  ]
+  sources = []
   deps = [
     "//base",
     "//chrome/browser:browser_process",
@@ -172,7 +171,6 @@ source_set("aim_eligibility_service") {
     "//services/network/public/cpp",
     "//third_party/blink/public/common:headers",
   ]
-
 }
 
 if (!is_android) {

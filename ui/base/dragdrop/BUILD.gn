@@ -19,5 +19,4 @@ component("types") {
     sources += [ "drag_drop_types_mac.mm" ]
     frameworks = [ "AppKit.framework" ]
   }
-
 }

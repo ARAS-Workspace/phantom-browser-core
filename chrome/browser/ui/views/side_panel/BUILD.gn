@@ -179,5 +179,4 @@ source_set("side_panel") {
     ]
     deps += [ "//chrome/common/extensions/api" ]
   }
-
 }

@@ -982,7 +982,6 @@ if (build_with_chromium) {
       sources += [
         "shim/allocator_shim_default_dispatch_to_partition_alloc_unittest.cc",
       ]
-
     }
 
     if ((is_android || is_linux) && target_cpu == "arm64") {

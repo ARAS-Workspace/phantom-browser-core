@@ -59,7 +59,6 @@ component("devices") {
     "//ui/gfx/geometry",
     "//ui/gfx/geometry:geometry_skia",
   ]
-
 }
 
 source_set("unittests") {

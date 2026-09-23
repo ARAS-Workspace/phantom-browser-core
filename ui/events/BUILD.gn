@@ -84,7 +84,6 @@ source_set("platform_event") {
   sources = [ "platform_event.h" ]
 
   public_deps = [ "//base" ]
-
 }
 
 component("events_base") {
@@ -338,7 +337,6 @@ component("keyboard_hook") {
       "//ui/ozone",
     ]
   }
-
 }
 
 component("gesture_detection") {

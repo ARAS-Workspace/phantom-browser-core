@@ -722,7 +722,6 @@ if (!is_android) {
         "//testing/gmock",
         "//testing/gtest",
       ]
-
     }
 
     if (!enable_dice_support) {
@@ -770,6 +769,5 @@ if (!is_android) {
 
     sources = []
     deps = [ "//chrome/browser/signin:signin_browser_test_base" ]
-
   }
 }

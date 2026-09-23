@@ -86,7 +86,6 @@ static_library("test_support") {
   ]
 
   deps = []
-
 }
 
 source_set("unit_tests") {

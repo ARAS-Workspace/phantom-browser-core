@@ -1,4 +1,3 @@
-
 group("password_manager") {
   public_deps = [
     ":factory",
@@ -7,7 +6,6 @@ group("password_manager") {
 }
 
 source_set("factory") {
-
   public_deps = [ ":public" ]
 }
 

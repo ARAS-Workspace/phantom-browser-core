@@ -128,5 +128,4 @@ test("tracing_perftests") {
     # Needed for isolate script to execute.
     "//testing:run_perf_test",
   ]
-
 }

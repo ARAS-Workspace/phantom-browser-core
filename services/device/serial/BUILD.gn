@@ -79,7 +79,6 @@ if (is_win || (is_linux && use_udev) || is_mac || is_android) {
         "IOKit.framework",
       ]
     }
-
   }
 
   static_library("test_support") {

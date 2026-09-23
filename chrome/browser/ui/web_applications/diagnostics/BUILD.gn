@@ -5,7 +5,6 @@
 source_set("app_service_browser_tests") {
   testonly = true
 
-
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
   deps = [

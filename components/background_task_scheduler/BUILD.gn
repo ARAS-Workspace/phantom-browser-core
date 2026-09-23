@@ -33,5 +33,4 @@ static_library("factory") {
   ]
 
   deps = [ ":public" ]
-
 }

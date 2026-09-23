@@ -382,7 +382,6 @@ declare_args() {
 media_subcomponent_deps = [
   "//media/audio",
   "//media/base",
-
   "//media/capabilities",
   "//media/cdm",
   "//media/device_monitors",

@@ -149,7 +149,6 @@ if (enable_vr) {
     configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
     defines = [ "VR_UI_IMPLEMENTATION" ]
-
   }
 
   component("vr_common") {
@@ -194,7 +193,6 @@ if (enable_vr) {
     configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
     defines = [ "VR_IMPLEMENTATION" ]
-
   }
 
   # vr_base contains common dependencies of vr_common and vr_ui. It exists
@@ -417,7 +415,6 @@ if (enable_vr) {
       ]
 
       data_deps = []
-
     }
   }
 }

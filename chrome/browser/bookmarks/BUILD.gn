@@ -177,7 +177,6 @@ source_set("unit_tests") {
       "//ui/gfx/codec",
     ]
   }
-
 }
 
 source_set("browser_tests") {

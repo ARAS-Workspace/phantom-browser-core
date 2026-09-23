@@ -122,7 +122,6 @@ component("ax_base") {
   ]
 
   deps = []
-
 }
 
 #if (is_win) {

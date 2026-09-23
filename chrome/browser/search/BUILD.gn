@@ -31,8 +31,7 @@ source_set("search") {
     "//url",
   ]
   if (is_android) {
-    sources += [
-    ]
+    sources += []
     public_deps += [ "//components/policy/core/browser" ]
     deps += [ "//components/prefs" ]
     if (enable_webui_ntp) {
@@ -129,7 +128,6 @@ source_set("unit_tests") {
       "//testing/gtest",
     ]
   }
-
 }
 
 if (!is_android) {

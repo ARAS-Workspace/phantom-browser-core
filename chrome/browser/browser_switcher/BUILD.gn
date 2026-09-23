@@ -144,5 +144,4 @@ fuzzer_test("browser_switcher_ieem_sitelist_parser_fuzzer") {
     "//mojo/core/embedder",
     "//services/data_decoder/public/cpp:test_support",
   ]
-
 }

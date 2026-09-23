@@ -282,5 +282,4 @@ test("compositor_unittests") {
   if (is_linux) {
     deps += [ "//third_party/angle:includes" ]
   }
-
 }

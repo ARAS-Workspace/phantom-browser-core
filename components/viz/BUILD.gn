@@ -40,7 +40,6 @@ viz_test("viz_unittests") {
     "//testing/buildbot/filters:viz_unittests_filters",
     "//third_party/angle:includes",
   ]
-
 }
 
 viz_test("viz_perftests") {

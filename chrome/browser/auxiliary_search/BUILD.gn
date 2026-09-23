@@ -99,7 +99,6 @@ source_set("browser_tests") {
     "//net/android:net_java_test_support_enums_srcjar",
     "//url",
   ]
-
 }
 
 android_library("java") {

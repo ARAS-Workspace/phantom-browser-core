@@ -43,7 +43,6 @@ static_library("core_internal") {
     "//components/data_sharing/public",
     "//components/keyed_service/core",
   ]
-
 }
 
 source_set("collaboration_finder") {
@@ -72,7 +71,6 @@ static_library("comments_internal") {
     "//components/collaboration/public:comments_public",
     "//components/keyed_service/core",
   ]
-
 }
 
 static_library("messaging_internal") {
@@ -119,7 +117,6 @@ static_library("messaging_internal") {
     "//sql",
     "//ui/base",
   ]
-
 }
 
 group("unit_tests") {
@@ -180,7 +177,6 @@ source_set("comments_unit_tests") {
     "//components/collaboration/public:comments_public",
     "//testing/gtest",
   ]
-
 }
 
 source_set("messaging_unit_tests") {
@@ -209,7 +205,6 @@ source_set("messaging_unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
 }
 
 source_set("collaboration_finder_unit_tests") {

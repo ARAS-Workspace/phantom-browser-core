@@ -58,5 +58,4 @@ cc_component("base") {
   ]
 
   defines = [ "CC_BASE_IMPLEMENTATION=1" ]
-
 }

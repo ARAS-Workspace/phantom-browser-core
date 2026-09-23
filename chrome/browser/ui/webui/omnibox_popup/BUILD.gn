@@ -52,9 +52,7 @@ if (!is_android) {
 
   source_set("unit_tests") {
     testonly = true
-    sources = [
-      "omnibox_popup_handler_unittest.cc",
-    ]
+    sources = [ "omnibox_popup_handler_unittest.cc" ]
     deps = [
       ":omnibox_popup",
       "//base/test:test_support",

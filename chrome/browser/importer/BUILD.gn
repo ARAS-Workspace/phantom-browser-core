@@ -86,7 +86,6 @@ source_set("browser_tests") {
     "//components/user_data_importer/common",
     "//testing/gtest",
   ]
-
 }
 
 source_set("unit_tests") {

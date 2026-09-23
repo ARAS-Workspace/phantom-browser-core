@@ -664,7 +664,6 @@ if (!is_android) {
       "//chrome/test/base:web_ui_test_data_source",
     ]
   }
-
 }
 
 source_set("web_ui_mocha_browser_test") {

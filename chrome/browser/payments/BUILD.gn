@@ -144,5 +144,4 @@ source_set("unittests") {
     "//components/infobars/content",
     "//components/permissions",
   ]
-
 }

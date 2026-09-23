@@ -44,7 +44,6 @@ source_set("chrome_dll_resources") {
   sources = [ "chrome_dll_resource.h" ]
 
   deps = [ ":command_ids" ]
-
 }
 
 grit_strings("generated_resources") {
@@ -56,7 +55,6 @@ grit_strings("generated_resources") {
             ]
   output_dir = "$root_gen_dir/chrome"
   outputs = [ "grit/generated_resources.h" ]
-
 }
 
 grit_strings("branded_strings") {
@@ -64,7 +62,6 @@ grit_strings("branded_strings") {
   defines = chrome_grit_defines
   output_dir = "$root_gen_dir/chrome"
   outputs = [ "grit/branded_strings.h" ]
-
 }
 
 static_library("test_support") {

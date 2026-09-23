@@ -189,7 +189,6 @@ component("google_apis") {
   }
 
   if (is_apple) {
-
     frameworks = [ "Foundation.framework" ]
   }
 

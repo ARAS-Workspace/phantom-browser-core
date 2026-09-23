@@ -27,7 +27,6 @@ source_set("features") {
     "//build/config/compiler:wexit_time_destructors",
     "//build/config/compiler:wglobal_constructors",
   ]
-
 }
 
 component("client") {

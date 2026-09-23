@@ -80,7 +80,6 @@ static_library("internal_url_grouping") {
     "//services/metrics/public/cpp:ukm_builders",
     "//ui/base",
   ]
-
 }
 
 source_set("test_support") {

@@ -230,7 +230,6 @@ source_set("webnn_test_support") {
   if (webnn_use_tflite || webnn_use_litert) {
     deps += [ "//services/webnn/public/cpp:in_process_context_provider" ]
   }
-
 }
 
 source_set("tests") {
@@ -264,7 +263,6 @@ source_set("tests") {
     "//testing/gtest",
     "//third_party/fp16",
   ]
-
 }
 
 # TODO(crbug.com/500747202): Re-enable in debug builds when timeout issues is
@@ -476,7 +474,6 @@ if (!is_debug) {
       "//third_party/fp16",
       "//third_party/fuzztest:fuzztest_gtest_main",
     ]
-
   }
 }
 

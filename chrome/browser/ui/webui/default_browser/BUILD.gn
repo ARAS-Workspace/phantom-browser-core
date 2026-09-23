@@ -53,5 +53,4 @@ source_set("browser_tests") {
 
   sources = []
   deps = []
-
 }

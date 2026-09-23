@@ -154,5 +154,4 @@ static_library("test_helpers") {
     "//device/gamepad/public/cpp:shared_with_blink",
     "//third_party/blink/public:blink_headers",
   ]
-
 }

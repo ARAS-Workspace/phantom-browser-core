@@ -157,7 +157,6 @@ grit_strings("components_locale_settings") {
   }
 
   outputs = [ "grit/components_locale_settings.h" ]
-
 }
 
 grit_strings("components_variant_strings") {
@@ -167,7 +166,6 @@ grit_strings("components_variant_strings") {
     source = "../components_variant_public_strings.grd"
   }
   outputs = [ "grit/components_variant_strings.h" ]
-
 }
 
 grit_strings("privacy_sandbox_strings") {
@@ -176,5 +174,4 @@ grit_strings("privacy_sandbox_strings") {
           xtb_locales,
           [ "privacy_sandbox_strings_{{source_name_part}}.xtb" ])
   outputs = [ "grit/privacy_sandbox_strings.h" ]
-
 }

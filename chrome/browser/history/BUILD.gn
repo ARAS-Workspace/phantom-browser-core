@@ -120,7 +120,6 @@ source_set("unit_tests") {
   testonly = true
   sources = [ "history_tab_helper_unittest.cc" ]
   deps = [
-    "//components/tabs:test_support",
     ":history",
     "//base",
     "//base/test:test_support",
@@ -128,6 +127,7 @@ source_set("unit_tests") {
     "//chrome/common:chrome_features",
     "//chrome/test:test_support",
     "//components/history/core/browser",
+    "//components/tabs:test_support",
     "//content/public/browser",
     "//content/test:test_support",
     "//testing/gmock",
@@ -135,7 +135,6 @@ source_set("unit_tests") {
     "//third_party/blink/public/common",
     "//ui/base",
   ]
-
 }
 
 if (!is_android) {

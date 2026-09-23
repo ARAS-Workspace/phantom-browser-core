@@ -72,7 +72,6 @@ source_set("apple") {
     "IOSurface.framework",
     "VideoToolbox.framework",
   ]
-
 }
 
 source_set("unit_tests") {
@@ -112,5 +111,4 @@ source_set("unit_tests") {
     "IOSurface.framework",
     "VideoToolbox.framework",
   ]
-
 }

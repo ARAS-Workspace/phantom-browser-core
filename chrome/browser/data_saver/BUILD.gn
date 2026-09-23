@@ -9,7 +9,6 @@ source_set("data_saver") {
   ]
 
   deps = [ "//base" ]
-
 }
 
 if (!is_android) {

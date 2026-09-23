@@ -85,7 +85,6 @@ if (enable_rlz_support) {
         sources += [ "mac/lib/machine_id_mac.cc" ]
         frameworks += [ "IOKit.framework" ]
       }
-
     }
 
     if (is_posix) {

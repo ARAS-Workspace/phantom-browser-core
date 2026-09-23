@@ -71,7 +71,6 @@ source_set("messaging") {
   if (!is_android) {
     deps += [ "//components/keep_alive_registry" ]
   }
-
 }
 
 source_set("test_support") {

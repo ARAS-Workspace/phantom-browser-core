@@ -172,7 +172,6 @@ executable("test_crashpad_embedder") {
     "//base",
     "//chrome/updater:constants_test",
   ]
-
 }
 
 source_set("test_utils") {
@@ -406,7 +405,6 @@ executable("enterprise_companion") {
     ":constants_prod",
     "//chrome/updater:constants_prod",
   ]
-
 }
 
 # Enterprise Companion application used by integration tests. Constants can be

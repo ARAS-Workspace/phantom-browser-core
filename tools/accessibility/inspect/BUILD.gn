@@ -16,7 +16,6 @@ executable("ax_dump_events") {
     "//base/test:test_support",
     "//content/test:test_support",
   ]
-
 }
 
 executable("ax_dump_tree") {
@@ -33,5 +32,4 @@ executable("ax_dump_tree") {
     "//base/test:test_support",
     "//content/test:test_support",
   ]
-
 }

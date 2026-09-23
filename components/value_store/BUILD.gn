@@ -67,5 +67,4 @@ source_set("unit_tests") {
     "//skia",
     "//testing/gtest",
   ]
-
 }

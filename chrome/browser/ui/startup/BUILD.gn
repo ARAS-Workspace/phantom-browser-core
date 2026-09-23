@@ -91,7 +91,6 @@ source_set("startup") {
       "//components/keyed_service/core",
     ]
   }
-
 }
 
 source_set("impl") {
@@ -365,7 +364,6 @@ source_set("unit_tests") {
       "//testing/gtest",
       "//url",
     ]
-
   }
   if (enable_dice_support) {
     sources += [ "first_run_service_unittest.cc" ]

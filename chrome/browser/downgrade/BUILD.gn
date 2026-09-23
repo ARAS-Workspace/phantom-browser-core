@@ -70,7 +70,6 @@ source_set("impl") {
       "//components/webdata/common",
     ]
   }
-
 }
 
 source_set("unit_tests") {
@@ -112,5 +111,4 @@ source_set("interactive_ui_tests") {
       "//testing/gmock",
     ]
   }
-
 }

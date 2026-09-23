@@ -25,5 +25,4 @@ source_set("generator") {
     "thumbnail_util.cc",
     "thumbnail_util.h",
   ]
-
 }

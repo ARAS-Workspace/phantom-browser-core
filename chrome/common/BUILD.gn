@@ -438,7 +438,6 @@ static_library("non_code_constants") {
     "//printing/buildflags",
     "//ui/base:buildflags",
   ]
-
 }
 
 component("chrome_features") {
@@ -676,9 +675,7 @@ mojom("mojo_bindings") {
   }
 
   if (!is_android) {
-    sources += [
-      "password_manager/remote_actor_credential_sharing.mojom",
-    ]
+    sources += [ "password_manager/remote_actor_credential_sharing.mojom" ]
   }
 
   if (safe_browsing_mode == 1) {

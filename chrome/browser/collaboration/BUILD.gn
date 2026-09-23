@@ -19,7 +19,6 @@ source_set("impl") {
     "//components/data_sharing/public:features",
     "//content/public/browser",
   ]
-
 }
 
 source_set("unit_tests") {

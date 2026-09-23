@@ -47,7 +47,6 @@ source_set("side_panel") {
   if (enable_extensions) {
     deps += [ "//extensions/common:common_constants" ]
   }
-
 }
 
 source_set("side_panel_views_dependent") {

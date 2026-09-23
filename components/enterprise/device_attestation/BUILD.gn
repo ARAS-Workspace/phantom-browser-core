@@ -26,7 +26,6 @@ static_library("device_attestation") {
     "//components/device_signals/core/common:features",
     "//components/policy/proto",
   ]
-
 }
 
 source_set("test_support") {

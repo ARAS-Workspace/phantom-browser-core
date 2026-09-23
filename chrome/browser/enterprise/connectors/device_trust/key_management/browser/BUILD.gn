@@ -49,7 +49,6 @@ source_set("browser") {
     "//services/network/public/cpp",
     "//services/network/public/cpp:cpp_base",
   ]
-
 }
 
 source_set("test_support") {

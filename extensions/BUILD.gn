@@ -299,5 +299,4 @@ test("extensions_unittests") {
     "//testing/buildbot/filters:extensions_unittests_filters",
     "//third_party/angle:includes",
   ]
-
 }

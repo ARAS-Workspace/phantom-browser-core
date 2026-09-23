@@ -40,7 +40,6 @@ source_set("impl") {
     "//sql",
     "//ui/base",
   ]
-
 }
 
 source_set("unit_tests") {

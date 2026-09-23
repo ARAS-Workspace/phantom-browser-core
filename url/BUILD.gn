@@ -203,7 +203,6 @@ test("url_unittests") {
   ]
 
   if (use_platform_icu_alternatives) {
-
   } else {  # !use_platform_icu_alternatives
     deps += [ "//third_party/icu:icuuc" ]
   }

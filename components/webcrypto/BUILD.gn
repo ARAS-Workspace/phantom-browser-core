@@ -106,7 +106,6 @@ source_set("unit_tests") {
     "//third_party/boringssl",
     "//third_party/re2",
   ]
-
 }
 
 # Shared functionality for writing WebCrypto fuzzers at this layer (several

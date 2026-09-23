@@ -22,7 +22,6 @@ source_set("signin_ui_error") {
     "//google_apis",
     "//ui/base",
   ]
-
 }
 
 # Removes circular dep between |login| and |signin|.
@@ -221,7 +220,6 @@ source_set("signin_impl") {
     "//components/unified_consent",
     "//ui/webui",
   ]
-
 }
 
 source_set("login_ui_service") {

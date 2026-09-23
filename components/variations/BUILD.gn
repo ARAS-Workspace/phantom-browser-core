@@ -138,7 +138,6 @@ component("variations") {
       "//third_party/zstd:decompress",
     ]
   }
-
 }
 
 static_library("test_support") {

@@ -26,5 +26,4 @@ component("tab_groups") {
     "//ui/base",
     "//ui/gfx",
   ]
-
 }

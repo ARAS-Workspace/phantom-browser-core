@@ -85,5 +85,4 @@ source_set("platform_browser_tests") {
     "//content/test:test_support",
     "//testing/gmock",
   ]
-
 }

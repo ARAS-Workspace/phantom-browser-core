@@ -76,9 +76,7 @@ source_set("impl") {
     "//chrome/browser:browser_public_dependencies",
   ]
 
-  deps = [
-    "//chrome/browser/lifetime",
-  ]
+  deps = [ "//chrome/browser/lifetime" ]
 
   if (enable_extensions) {
     deps += [

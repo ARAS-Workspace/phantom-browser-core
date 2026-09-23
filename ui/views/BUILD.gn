@@ -937,7 +937,6 @@ component("views") {
         "accessibility/view_ax_platform_node_delegate_mac.mm",
       ]
     }
-
   }
 
   if (use_ozone) {

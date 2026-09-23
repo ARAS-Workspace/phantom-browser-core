@@ -86,7 +86,6 @@ if (enable_av1_decoder &&
       "//testing/gmock",
       "//testing/gtest",
     ]
-
   }
 
   test("video_encode_accelerator_perf_tests") {

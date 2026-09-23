@@ -145,7 +145,6 @@ source_set("test_support") {
   testonly = true
 
   deps = [ ":lib" ]
-
 }
 
 source_set("unit_tests") {
@@ -161,5 +160,4 @@ source_set("unit_tests") {
     "//testing/gtest",
     "//third_party/crashpad/crashpad/minidump",
   ]
-
 }

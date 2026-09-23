@@ -1013,7 +1013,6 @@ cc_test("cc_unittests") {
       "//gpu/vulkan/init",
     ]
   }
-
 }
 
 cc_test("cc_perftests") {

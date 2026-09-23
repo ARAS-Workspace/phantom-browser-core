@@ -606,7 +606,6 @@ if (is_win || is_mac || is_linux) {
           ]
         }
       }
-
     }
 
     if (is_mac) {

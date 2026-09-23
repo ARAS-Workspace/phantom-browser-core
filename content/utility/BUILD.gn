@@ -137,7 +137,6 @@ source_set("utility") {
       "//device/vr/public/mojom:isolated_xr_service",
     ]
   }
-
 }
 
 # See comment at the top of //content/BUILD.gn for how this works.

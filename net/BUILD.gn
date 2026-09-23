@@ -3307,7 +3307,6 @@ target(_test_target_type, "net_unittests") {
       "//net/data/ssl/chrome_root_store:gen_root_store_test_inc",
       "//net/data/ssl/chrome_root_store:gen_signer_set_inc",
     ]
-
   }
 
   # Include transport_security_state_generator tests.
@@ -3440,7 +3439,6 @@ if (!is_ios) {
     if (enable_websockets) {
       sources += [ "websockets/websocket_frame_perftest.cc" ]
     }
-
   }
 }
 

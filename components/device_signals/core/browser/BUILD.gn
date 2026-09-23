@@ -93,7 +93,6 @@ static_library("browser") {
   if (is_linux) {
     sources += [ "linux/browser_utils_linux.cc" ]
   }
-
 }
 
 static_library("test_support") {

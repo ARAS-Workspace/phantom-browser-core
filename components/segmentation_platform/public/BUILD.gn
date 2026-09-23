@@ -45,7 +45,6 @@ source_set("public") {
     "//services/metrics/public/cpp:metrics_cpp",
     "//url",
   ]
-
 }
 
 source_set("unit_tests") {
@@ -59,7 +58,6 @@ source_set("unit_tests") {
     ":public",
     "//testing/gtest",
   ]
-
 }
 
 source_set("test_support") {

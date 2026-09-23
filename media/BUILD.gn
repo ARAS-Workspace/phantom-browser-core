@@ -224,7 +224,6 @@ test("media_unittests") {
 
   # The test needs OPUS_FIXED_POINT conditional define.
   configs += [ "//third_party/opus:opus_config" ]
-
 }
 
 test("media_perftests") {

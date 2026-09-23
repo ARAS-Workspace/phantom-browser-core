@@ -4,5 +4,4 @@
 
 group("thumbnail") {
   public_deps = [ "//chrome/browser/thumbnail/generator" ]
-
 }

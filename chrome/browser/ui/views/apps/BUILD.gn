@@ -34,7 +34,6 @@ source_set("apps") {
       "chrome_native_app_window_views_mac.h",
     ]
   }
-
 }
 
 source_set("impl") {
@@ -99,7 +98,6 @@ source_set("impl") {
 if (use_aura) {
   source_set("unit_tests") {
     testonly = true
-
 
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 

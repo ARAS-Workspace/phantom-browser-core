@@ -87,7 +87,6 @@ component("color") {
     ]
     frameworks = [ "AppKit.framework" ]
   }
-
 }
 
 source_set("test_support") {

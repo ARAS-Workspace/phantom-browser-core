@@ -15,7 +15,6 @@ source_set("run_all_unittests") {
     "//media:test_support",
     "//mojo/core/embedder",
   ]
-
 }
 
 source_set("pipeline_integration_test_base") {

@@ -668,9 +668,7 @@ if (is_android && !is_cronet_build) {
   # On CQ, run the Traffic Annotation Auditor when a change affects one of these
   # targets.
   group("traffic_annotation_auditor_dependencies") {
-    deps = [
-      "//tools/traffic_annotation:annotations_xml",
-    ]
+    deps = [ "//tools/traffic_annotation:annotations_xml" ]
   }
 }
 
@@ -767,7 +765,6 @@ group("chromium_builder_perf") {
 
     data_deps += [ "//tools/perf/clear_system_cache" ]
   }
-
 }
 
 if (!is_ios && !is_android && !is_cronet_build) {

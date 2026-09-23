@@ -36,7 +36,6 @@ source_set("system_cpu") {
       "host_processor_info_scanner.h",
     ]
   }
-
 }
 
 source_set("unit_tests") {
@@ -65,7 +64,6 @@ source_set("unit_tests") {
       "cpu_probe_mac_unittest.cc",
     ]
   }
-
 }
 
 source_set("test_support") {

@@ -93,7 +93,6 @@ static_library("discovery") {
     sources += [ "discovery_network_list_wifi_mac.mm" ]
     frameworks = [ "CoreWLAN.framework" ]
   }
-
 }
 
 source_set("test_support") {

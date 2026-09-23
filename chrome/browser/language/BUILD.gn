@@ -41,7 +41,6 @@ source_set("impl") {
     "//components/prefs",
     "//content/public/browser",
   ]
-
 }
 
 source_set("unit_tests") {

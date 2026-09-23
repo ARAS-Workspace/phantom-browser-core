@@ -14,7 +14,6 @@ source_set("crash_client") {
     "//components/crash/core/common:crash_key",
     "//third_party/crashpad/crashpad/client:common",
   ]
-
 }
 
 source_set("unit_tests") {

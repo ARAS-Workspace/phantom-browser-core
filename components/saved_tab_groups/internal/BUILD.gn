@@ -156,7 +156,6 @@ source_set("unit_tests") {
     "//testing/gtest",
     "//url",
   ]
-
 }
 
 source_set("tab_group_sync_bridge") {

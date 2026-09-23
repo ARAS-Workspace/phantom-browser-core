@@ -200,7 +200,6 @@ source_set("filters") {
         "ffmpeg_video_decoder.h",
       ]
     }
-
   }
 
   if (is_apple) {

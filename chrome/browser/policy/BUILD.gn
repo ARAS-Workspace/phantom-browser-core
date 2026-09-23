@@ -33,7 +33,6 @@ source_set("path_parser") {
   } else if (is_win) {
     deps += [ "//chrome/install_static:install_static_util" ]
   }
-
 }
 
 source_set("onc") {

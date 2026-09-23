@@ -45,7 +45,6 @@ source_set("status_icons") {
       deps += [ "//content/public/browser" ]
     }
   }
-
 }
 
 if (is_win || use_dbus) {

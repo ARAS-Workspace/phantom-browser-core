@@ -56,7 +56,6 @@ static_library("internal") {
     "//components/data_sharing/public/protocol",
     "//components/keyed_service/core",
   ]
-
 }
 
 static_library("personal_collaboration_data_internal") {

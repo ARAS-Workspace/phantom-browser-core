@@ -44,5 +44,4 @@ source_set("blink") {
     "//ui/gfx/geometry",
     "//ui/latency",
   ]
-
 }

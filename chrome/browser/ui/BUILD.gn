@@ -107,7 +107,6 @@ if (!is_android) {
     sources = [ "browser_actions.cc" ]
     public_deps = [ "//base" ]
     deps = [
-      "//components/spellcheck:buildflags",
       ":browser_actions",
       ":browser_select_file_dialog_controller",
       ":bubble_anchor_util",
@@ -173,6 +172,7 @@ if (!is_android) {
       "//components/commerce/core:metrics",
       "//components/multistep_filter/core:features",
       "//components/omnibox/common:features",
+      "//components/spellcheck:buildflags",
       "//components/undo",
     ]
 

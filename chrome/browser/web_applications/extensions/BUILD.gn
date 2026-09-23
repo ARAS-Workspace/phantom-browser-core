@@ -56,7 +56,6 @@ source_set("extensions") {
 source_set("unit_tests") {
   testonly = true
 
-
   deps = [
     ":extensions",
     "//chrome/browser/web_applications",

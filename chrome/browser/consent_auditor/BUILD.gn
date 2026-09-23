@@ -17,7 +17,6 @@ source_set("consent_auditor") {
     "//components/sync/base",
     "//components/sync/model",
   ]
-
 }
 
 source_set("test_support") {

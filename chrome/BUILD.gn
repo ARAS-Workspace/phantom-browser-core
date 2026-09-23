@@ -94,7 +94,6 @@ if (!is_android && !is_mac) {
   group("chrome") {
     public_deps = [ ":chrome_initial" ]
     data_deps = [ ":chrome_initial" ]
-
   }
 
   if (is_win) {

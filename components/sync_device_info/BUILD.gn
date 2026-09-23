@@ -63,7 +63,6 @@ static_library("sync_device_info") {
       "SystemConfiguration.framework",  # For local_device_info_util_mac.mm.
     ]
   }
-
 }
 
 static_library("test_support") {

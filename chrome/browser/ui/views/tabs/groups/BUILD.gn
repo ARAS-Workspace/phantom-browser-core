@@ -53,4 +53,3 @@ source_set("interactive_ui_tests") {
     "//ui/views:test_support",
   ]
 }
-

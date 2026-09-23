@@ -66,5 +66,4 @@ source_set("unit_tests") {
     "//components/autofill/core/common:test_support",
     "//testing/gtest",
   ]
-
 }

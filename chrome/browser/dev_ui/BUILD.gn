@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-
 if (is_android && dfmify_dev_ui) {
   source_set("dev_ui") {
     public = [ "android/dev_ui_loader_throttle.h" ]

@@ -28,7 +28,6 @@ source_set("first_run") {
     if (is_linux) {
       public += [ "upgrade_util_linux.h" ]
     }
-
   }
 }
 

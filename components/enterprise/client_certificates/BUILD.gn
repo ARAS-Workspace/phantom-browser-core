@@ -11,5 +11,4 @@ source_set("unit_tests") {
   configs += [ "//components/enterprise:extra_warnings" ]
 
   deps = [ "//components/enterprise/client_certificates/core:unit_tests" ]
-
 }

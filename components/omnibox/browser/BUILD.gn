@@ -511,8 +511,7 @@ source_set("pref_names") {
 }
 
 source_set("aim_eligibility_service_features") {
-  sources = [
-  ]
+  sources = []
   deps = [ "//base" ]
 }
 
@@ -558,7 +557,6 @@ static_library("location_bar") {
   if ((!is_android || enable_vr) && !is_ios) {
     deps += [ ":vector_icons" ]
   }
-
 }
 
 static_library("test_support") {

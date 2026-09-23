@@ -51,5 +51,4 @@ source_set("test_support") {
       "//chrome/browser/enterprise/connectors/device_trust/key_management/installer:elevated_rotation",
     ]
   }
-
 }

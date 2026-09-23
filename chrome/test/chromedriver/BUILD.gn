@@ -447,7 +447,6 @@ if (is_linux) {
     if (is_mac && is_component_ffmpeg) {
       ldflags = [ "-Wl,-rpath,@executable_path/." ]
     }
-
   }
 }
 
@@ -479,7 +478,6 @@ python_library("chromedriver_py_tests") {
   if (is_component_build && is_mac) {
     data_deps += [ "//chrome:chrome_framework" ]
   }
-
 }
 
 python_library("chromedriver_py_tests_headless_shell") {

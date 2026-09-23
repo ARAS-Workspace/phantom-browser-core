@@ -124,7 +124,6 @@ if (!is_android) {
       "//ui/views",
       "//ui/views:test_support",
     ]
-
   }
 
   source_set("interactive_ui_tests") {

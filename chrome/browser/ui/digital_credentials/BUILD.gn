@@ -8,5 +8,4 @@ source_set("digital_credentials") {
   sources = []
   deps = []
   public_deps = [ "//content/public/browser" ]
-
 }

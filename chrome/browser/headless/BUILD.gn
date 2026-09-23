@@ -49,7 +49,6 @@ source_set("initializer") {
       "//ui/ozone",
     ]
   }
-
 }
 
 source_set("metrics") {

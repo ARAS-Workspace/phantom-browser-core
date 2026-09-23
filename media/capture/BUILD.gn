@@ -295,5 +295,4 @@ test("capture_unittests") {
   if (is_mac) {
     deps += [ "video/mac:unit_tests" ]
   }
-
 }

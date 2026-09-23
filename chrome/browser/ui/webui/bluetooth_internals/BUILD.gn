@@ -28,7 +28,6 @@ source_set("bluetooth_internals") {
     "//device/bluetooth",
     "//ui/webui",
   ]
-
 }
 
 mojom("mojo_bindings") {
