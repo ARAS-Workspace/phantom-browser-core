@@ -24,20 +24,23 @@ proprietary_codecs=true
 ffmpeg_branding="Chrome"
 enable_swiftshader=true
 
-# The debian sysroot arrives through DEPS entries guarded by checkout_linux,
-# and .gclient in phantom_tools/.deps asks for mac only, so it is not on disk.
-# gn gen does not open a sysroot; it only records paths. Set this to true once
-# the sysroot is fetched and the gate will also walk the pkg_config branches.
-use_sysroot=false
+# The debian sysroot arrives through the checkout_linux entries in DEPS, which
+# core-sync.sh asks gclient for, and lands at the stock
+# build/linux/debian_bullseye_arm64-sysroot that target_sysroot_dir already
+# points at. build/.gitignore keeps it out of the working tree.
+#
+# gn does open it, so this cannot be satisfied with a path that points at
+# nothing: printing/BUILD.gn runs cups_config_helper.py against
+# $sysroot/usr/bin/cups-config, and the pkg_config branches read the .pc files
+# underneath it. Those branches are gate coverage the mac configuration has no
+# way to reach.
+use_sysroot=true
 
 # build/modules/BUILD.gn:111 calls expand_directory("${sysroot}/usr/include")
-# for linux, and with use_sysroot=false that reads /usr/include on the host.
-# A mac host keeps its headers in the SDK, so gn opens a directory that is not
-# there. The block sits behind this argument, and //build/modules carries
-# header precompilation for the toolchain rather than product code, so the
-# gate loses nothing by walking around it. Turn this back on together with
-# use_sysroot once the debian sysroot is fetched.
-use_unified_system_module=false
+# for linux. Without a sysroot that read reaches /usr/include on the host,
+# which a mac keeps inside the SDK instead, and gn opens a directory that is
+# not there. With the sysroot in place it reads the sysroot's own headers.
+use_unified_system_module=true
 
 # gn builds a HOST toolchain as well, and this host is a mac, so
 # build/config/mac/BUILD.gn is evaluated even with target_os="linux". Without

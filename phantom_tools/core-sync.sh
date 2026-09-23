@@ -130,7 +130,15 @@ solutions = [
     },
   },
 ];
-target_os = ['mac'];
+# linux rides along with mac because core-gate-linux.sh reads the tree with
+# target_os="linux". Without it gclient skips every checkout_linux entry, and
+# gn check then reports a missing source for each file of the linux-only deps
+# it cannot see -- fontconfig, libdrm, libsync, pipewire and wayland. Those
+# reports drown the ones a deletion package leaves behind, which are the ones
+# the gate exists to show. This costs disk and nothing else: the mac build
+# instantiates none of it, and build/.gitignore already keeps the debian
+# sysroot out of the working tree.
+target_os = ['mac', 'linux'];
 target_os_only = True;
 target_cpu = ['arm64'];
 target_cpu_only = True;
