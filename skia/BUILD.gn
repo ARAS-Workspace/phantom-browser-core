@@ -284,10 +284,6 @@ component("skia") {
     "ext/skia_utils_base.cc",
     "rusty_jpeg_feature.cc",
   ]
-  if (is_ios) {
-    public += [ "ext/skia_utils_ios.h" ]
-    sources += [ "ext/skia_utils_ios.mm" ]
-  }
   if (is_mac) {
     public += [ "ext/skia_utils_mac.h" ]
     sources += [ "ext/skia_utils_mac.mm" ]
@@ -493,9 +489,6 @@ component("skia") {
   }
 
   frameworks = []
-  if (is_ios) {
-    frameworks += [ "ImageIO.framework" ]
-  }
   if (is_apple && skia_support_gpu) {
     frameworks += [
       "CoreFoundation.framework",
@@ -505,9 +498,6 @@ component("skia") {
     ]
     if (is_mac) {
       frameworks += [ "AppKit.framework" ]
-    }
-    if (is_ios) {
-      frameworks += [ "IOSurface.framework" ]
     }
   }
 
@@ -1243,9 +1233,6 @@ test("skia_unittests") {
     "ext/skia_memory_dump_provider_unittest.cc",
     "ext/skia_utils_base_unittest.cc",
   ]
-  if (is_ios) {
-    sources += [ "ext/skia_utils_ios_unittest.mm" ]
-  }
   if (is_mac) {
     sources += [ "ext/skia_utils_mac_unittest.mm" ]
   }

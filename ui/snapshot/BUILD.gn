@@ -20,10 +20,6 @@ component("snapshot") {
     ]
   }
 
-  if (is_ios) {
-    sources += [ "snapshot_ios.mm" ]
-  }
-
   defines = [ "SNAPSHOT_IMPLEMENTATION" ]
 
   deps = [

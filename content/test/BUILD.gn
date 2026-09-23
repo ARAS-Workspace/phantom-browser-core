@@ -29,12 +29,6 @@ import("//tools/grit/preprocess_if_expr.gni")
 import("//tools/typescript/webui_ts_library.gni")
 import("//v8/gni/v8.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")  # For `target_platform`
-  import("//build/config/ios/bundle_data_from_filelist.gni")
-  import("//build/ios/extension_bundle_data.gni")
-}
-
 # Exposes a free function to enable the field trial testing config.
 # This allows testing new features enabled in the Dev/Beta/Stable channels.
 #
@@ -740,13 +734,6 @@ static_library("test_support") {
     deps += [
       "//ui/base/mojom",
       "//ui/views:test_support",
-    ]
-  }
-
-  if (is_ios) {
-    sources += [
-      "../browser/renderer_host/test_render_widget_host_view_ios_factory.h",
-      "../browser/renderer_host/test_render_widget_host_view_ios_factory.mm",
     ]
   }
 
@@ -2071,14 +2058,6 @@ test("content_browsertests") {
     frameworks = [ "ScreenCaptureKit.framework" ]
   }
 
-  if (is_ios) {
-    sources += [
-      "../browser/keyboard_lock_browsertest_ios.mm",
-      "../browser/pointer_lock_browsertest_ios.mm",
-    ]
-    bundle_deps += [ ":content_shell_pak_bundle_data" ]
-  }
-
   if (use_aura && !is_win) {
     deps += [ "//ui/events:test_support" ]
   }
@@ -2796,16 +2775,6 @@ test("content_unittests") {
       "//media/test/data/",
     ]
   }
-  if (is_ios) {
-    bundle_deps = [
-      ":content_shell_pak_bundle_data",
-      ":content_test_bundle_data",
-      ":content_test_perfetto_bundle_data",
-      ":content_test_perfetto_chrome_bundle_data",
-      "//media/test:media_bundle_data",
-      "//testing/buildbot/filters:content_unittests_filters_bundle_data",
-    ]
-  }
 
   if (!is_ios) {
     sources += [
@@ -3256,19 +3225,6 @@ test("content_unittests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (is_ios) {
-  bundle_data("content_shell_pak_bundle_data") {
-    testonly = true
-    public_deps = [ "//content/shell:pak" ]
-    sources = [ "$root_out_dir/content_shell.pak" ]
-    outputs = [ "{{bundle_resources_dir}}/content_shell.pak" ]
-  }
-
-  bundle_data_from_filelist("content_test_bundle_data") {
-    testonly = true
-    filelist_name = "content_test_bundle_data.filelist"
-  }
-}
 if (is_apple) {
   bundle_data("content_test_perfetto_bundle_data") {
     testonly = true

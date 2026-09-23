@@ -10,11 +10,6 @@ import("//gpu/vulkan/features.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 import("//testing/test.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-  import("//build/config/ios/bundle_data_from_filelist.gni")
-}
-
 # Used for color generation at build time without importing all the gfx.
 component("color_utils") {
   sources = [
@@ -237,30 +232,6 @@ component("gfx") {
       "CoreGraphics.framework",
       "CoreText.framework",
     ]
-  }
-  if (is_ios) {
-    sources += [
-      "image/image_ios.mm",
-      "image/image_skia_util_ios.h",
-      "image/image_skia_util_ios.mm",
-      "image/image_util_ios.mm",
-      "ios/NSString+CrStringDrawing.h",
-      "ios/NSString+CrStringDrawing.mm",
-      "platform_font_ios.h",
-      "platform_font_ios.mm",
-      "scoped_cg_context_save_gstate_mac.h",
-      "scoped_ui_graphics_push_context_ios.h",
-      "scoped_ui_graphics_push_context_ios.mm",
-      "text_utils_ios.mm",
-    ]
-    public_deps += [ "//ui/gfx/ios:uikit_util" ]
-
-    if (!use_blink) {
-      sources += [
-        "image/image_skia_rep_ios.cc",
-        "image/image_skia_rep_ios.h",
-      ]
-    }
   }
 
   if (use_blink) {
@@ -676,15 +647,6 @@ test("gfx_unittests") {
       "range/range_mac_unittest.mm",
     ]
   }
-  if (is_ios) {
-    sources += [
-      "image/image_ios_unittest.mm",
-      "ios/uikit_util_unittest.mm",
-    ]
-    if (target_platform == "iphoneos") {
-      sources += [ "ios/NSString+CrStringDrawing_unittest.mm" ]
-    }
-  }
 
   include_dirs = [ "//third_party/skia/include/private" ]
 
@@ -789,10 +751,6 @@ test("gfx_unittests") {
     deps += [ "//ui/resources:ui_test_pak_bundle_data" ]
   }
 
-  if (is_ios) {
-    deps += [ "//ui/gfx:codec_tests_bundle_data" ]
-  }
-
   if (use_aura || toolkit_views) {
     sources += [ "nine_image_painter_unittest.cc" ]
   }
@@ -858,15 +816,4 @@ fuzzer_test("render_text_api_fuzzer") {
   ]
 
   dict = "test/data/render_text/unicode_text_fuzzer.dict"
-}
-
-if (is_ios) {
-  bundle_data_from_filelist("codec_tests_bundle_data") {
-    testonly = true
-    filelist_name = "test/data/codec/unit_tests_bundle_data.filelist"
-  }
-  bundle_data_from_filelist("compositor_tests_bundle_data") {
-    testonly = true
-    filelist_name = "test/data/compositor/unit_tests_bundle_data.filelist"
-  }
 }

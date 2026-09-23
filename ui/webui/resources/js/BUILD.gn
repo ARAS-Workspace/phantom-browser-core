@@ -43,13 +43,6 @@ build_webui("build") {
     "util.ts",
   ]
 
-  if (is_ios) {
-    ts_files += [
-      "ios/mojo_api.js",
-      "ios/web_ui.js",
-    ]
-  }
-
   mojo_files_deps = [ "./metrics_reporter:mojo_bindings_ts__generator" ]
   mojo_files = [ "$root_gen_dir/ui/webui/resources/js/metrics_reporter/metrics_reporter.mojom-webui.ts" ]
 

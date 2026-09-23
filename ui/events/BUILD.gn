@@ -8,11 +8,6 @@ import("//build/config/ui.gni")
 import("//testing/test.gni")
 import("//ui/base/ui_features.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-  import("//ios/build/config.gni")
-}
-
 static_library("dom_keycode_converter") {
   public = [
     "keycodes/dom/dom_code.h",
@@ -223,11 +218,6 @@ component("events") {
       "cocoa/events_mac.mm",
       "gestures/gesture_recognizer_impl_mac.cc",
     ]
-  }
-
-  if (is_ios) {
-    sources += [ "ios/events_ios.mm" ]
-    frameworks = [ "UIKit.framework" ]
   }
 
   if (is_linux || is_win) {

@@ -764,9 +764,6 @@ source_set("quiche_tests") {
     "//testing/gtest",
     "//third_party/fuzztest",
   ]
-  if (is_ios) {
-    deps += [ ":test_data" ]
-  }
   public_deps = []
 
   if (build_epoll_based_tools) {

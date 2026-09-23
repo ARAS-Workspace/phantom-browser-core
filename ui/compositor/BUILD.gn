@@ -184,10 +184,6 @@ static_library("test_support") {
     sources += [ "test/test_compositor_host_mac.mm" ]
   }
 
-  if (is_ios) {
-    sources += [ "test/test_compositor_host_ios.mm" ]
-  }
-
   public_deps = [ ":compositor" ]
   deps = [
     "//base/test:test_support",
@@ -287,7 +283,4 @@ test("compositor_unittests") {
     deps += [ "//third_party/angle:includes" ]
   }
 
-  if (is_ios) {
-    public_deps = [ "//ui/gfx:compositor_tests_bundle_data" ]
-  }
 }

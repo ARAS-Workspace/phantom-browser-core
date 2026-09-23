@@ -232,13 +232,6 @@ component("bluetooth") {
     ]
   }
 
-  if (is_ios) {
-    sources += [
-      "bluetooth_adapter_ios.h",
-      "bluetooth_adapter_ios.mm",
-    ]
-  }
-
   if (is_linux) {
     if (use_bluez) {
       if (!force_cast_bluetooth) {

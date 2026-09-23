@@ -17,10 +17,6 @@ source_set("lib") {
 
   public_deps =
       [ "//components/password_manager/services/csv_password/public/mojom" ]
-  if (is_ios) {
-    public_deps +=
-        [ "//components/password_manager/services/csv_password/ios:lib" ]
-  }
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 }

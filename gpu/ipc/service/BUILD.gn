@@ -109,9 +109,6 @@ component("service") {
       ]
       defines += [ "GL_SILENCE_DEPRECATION" ]
     }
-    if (is_ios) {
-      sources += [ "image_transport_surface_ios.mm" ]
-    }
   }
   if (is_linux) {
     sources += [ "image_transport_surface_linux.cc" ]

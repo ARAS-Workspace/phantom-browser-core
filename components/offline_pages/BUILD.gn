@@ -29,8 +29,5 @@ if (use_blink) {
       "//components/offline_pages/core/request_header:unit_tests",
       "//components/offline_pages/task:unit_tests",
     ]
-    if (is_ios) {
-      deps += [ "//components/test:offline_pages_test_bundle_data" ]
-    }
   }
 }

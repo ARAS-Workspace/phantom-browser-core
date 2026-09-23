@@ -379,11 +379,6 @@ template("fuzzer_test") {
         sources += invoker.generated_sources
       }
 
-      if (is_ios) {
-        info_plist =
-            "//testing/libfuzzer/fuzzer_support_ios/fuzzer-engine-Info.plist"
-      }
-
       # Depend on libfuzzer_exports to satisfy GN header checking for
       # fuzzers that include libfuzzer_exports.h.
       deps += [ "//testing/libfuzzer:libfuzzer_exports" ]

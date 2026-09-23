@@ -39,10 +39,6 @@ import("//ui/base/ui_features.gni")
 import("//ui/gl/features.gni")
 import("//v8/gni/v8.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-}
-
 if (is_linux) {
   import("build/config/linux/gtk/gtk.gni")
 }
@@ -195,9 +191,6 @@ group("gn_all") {
         "//ui/touch_selection:ui_touch_selection_unittests",
         "//v8:gn_all",
       ]
-      if (is_ios) {
-        deps += [ "//content/shell:content_shell_ipa" ]
-      }
 
       if (!v8_use_external_startup_data) {
         deps += [ "//v8:v8_snapshot" ]

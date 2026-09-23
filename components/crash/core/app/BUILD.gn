@@ -81,11 +81,6 @@ static_library("app") {
     data_deps = [ ":chrome_crashpad_handler" ]
   }
 
-  if (is_ios) {
-    deps -= [ "//content/public/common:content_descriptors" ]
-    public_deps += [ "//third_party/crashpad/crashpad/client" ]
-  }
-
   if (is_android || is_linux) {
     deps += [
       "//base:base_static",
@@ -100,11 +95,6 @@ static_library("app") {
       "//third_party/crashpad/crashpad/minidump",
       "//third_party/crashpad/crashpad/snapshot",
     ]
-  }
-
-  if (is_ios) {
-    sources += [ "crashpad_ios.mm" ]
-    deps += [ "//third_party/crashpad/crashpad/minidump" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -172,13 +162,4 @@ source_set("unit_tests") {
     "//third_party/crashpad/crashpad/minidump",
   ]
 
-  if (is_ios) {
-    sources += [ "crashpad_ios_unittest.mm" ]
-    deps += [
-      ":app",
-      "//components/crash/core/common:reporter_running_ios",
-      "//third_party/crashpad/crashpad/client:common",
-      "//third_party/crashpad/crashpad/test",
-    ]
-  }
 }

@@ -1340,13 +1340,6 @@ static_library("browser") {
     ]
   }
 
-  if (is_ios) {
-    sources += [
-      "form_import/addresses/autofill_save_update_address_profile_delegate_ios.cc",
-      "form_import/addresses/autofill_save_update_address_profile_delegate_ios.h",
-    ]
-  }
-
   if (is_ios || is_android) {
     sources += [
       "payments/autofill_save_card_delegate.cc",
@@ -1514,10 +1507,6 @@ static_library("browser") {
 
   if (!is_android && !is_ios) {
     deps += [ "//ui/native_theme" ]
-  }
-
-  if (is_ios) {
-    deps += [ "//components/autofill/ios/common" ]
   }
 
   if (is_win || is_mac || is_linux || is_android) {
@@ -2205,10 +2194,6 @@ source_set("unit_tests") {
     "webdata/web_data_service_unittest.cc",
   ]
 
-  if (is_ios) {
-    sources += [ "form_import/addresses/autofill_save_update_address_profile_delegate_ios_unittest.cc" ]
-  }
-
   if (is_ios || is_android) {
     sources += [
       "payments/autofill_save_card_delegate_unittest.cc",
@@ -2362,10 +2347,6 @@ source_set("unit_tests") {
       "//content/test:test_support",
       "//third_party/blink/public/common",
     ]
-  }
-
-  if (is_ios) {
-    deps += [ "//components/autofill/ios/common" ]
   }
 
   deps += [ "//components/variations/service" ]

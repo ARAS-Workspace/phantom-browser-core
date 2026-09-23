@@ -364,15 +364,6 @@ source_set("unit_tests") {
       "bluetooth_scanning_prompt_controller_unittest.cc",
     ]
   }
-  if (is_ios) {
-    sources += [
-      "ios/content/permission_prompt/permission_dialog_delegate_unittest.mm",
-      "ios/content/permission_prompt/permission_dialog_unittest.mm",
-      "ios/content/permission_prompt/permission_prompt_ios_unittest.mm",
-      "ios/content/permission_prompt/permission_prompt_test_util.h",
-      "ios/content/permission_prompt/permission_prompt_test_util.mm",
-    ]
-  }
   deps = [
     ":permissions",
     ":test_support",

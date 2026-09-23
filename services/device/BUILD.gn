@@ -7,10 +7,6 @@ import("//services/device/public/cpp/compute_pressure/buildflags.gni")
 import("//services/device/public/cpp/geolocation/buildflags.gni")
 import("//testing/test.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-}
-
 is_serial_enabled_platform =
     is_win || (is_linux && use_udev) || is_mac || is_android
 

@@ -42,14 +42,6 @@ import("//testing/test.gni")
 import("//third_party/protobuf/proto_library.gni")
 import("//tools/metrics/generate_allowlist_from_histograms_file.gni")
 
-if (is_ios) {
-  # Used to access target_environment and target_platform.
-  import("//build/config/apple/mobile_config.gni")
-
-  # Used to access ios_is_app_extension variable definition.
-  import("//build/config/ios/ios_sdk.gni")
-}
-
 declare_args() {
   # Unsafe developer build. Has developer-friendly features that may weaken or
   # disable security measures like sandboxing or ASLR.
@@ -1600,139 +1592,6 @@ component("base") {
     ]
   }
 
-  # iOS
-  if (is_ios) {
-    sources += [
-      "base_paths_ios.h",
-      "base_paths_ios.mm",
-      "files/drive_info_ios.cc",
-      "ios/block_types.h",
-      "ios/crb_protocol_observers.h",
-      "ios/crb_protocol_observers.mm",
-      "ios/device_util.h",
-      "ios/device_util.mm",
-      "ios/ios_util.h",
-      "ios/ios_util.mm",
-      "ios/ns_error_util.h",
-      "ios/ns_error_util.mm",
-      "ios/ns_range.h",
-      "process/process_metrics_ios.cc",
-      "process/process_metrics_posix.cc",
-      "profiler/core_unwinders_ios.cc",
-      "profiler/stack_sampler_ios.cc",
-      "system/sys_info_ios.mm",
-    ]
-
-    if (!ios_is_app_extension) {
-      sources += [
-        "critical_closure_internal_ios.mm",
-        "ios/scoped_critical_action.h",
-        "ios/scoped_critical_action.mm",
-      ]
-    }
-
-    if (use_blink) {
-      sources += [
-        "files/file_path_watcher_kqueue.cc",
-        "files/file_path_watcher_kqueue.h",
-        "files/file_path_watcher_mac.cc",
-        "ios/sim_header_shims.h",
-        "process/kill_ios.cc",
-        "process/memory_mac.mm",
-        "process/port_provider_mac.cc",
-        "process/port_provider_mac.h",
-        "process/process_handle_mac.cc",
-        "process/process_ios.cc",
-        "process/process_iterator_mac.cc",
-        "process/process_posix.cc",
-        "sync_socket_posix.cc",
-        "synchronization/waitable_event_posix.cc",
-        "synchronization/waitable_event_watcher_posix.cc",
-      ]
-
-      if (target_platform == "iphoneos") {
-        sources += [
-          "apple/mach_port_rendezvous.cc",
-          "apple/mach_port_rendezvous.h",
-          "apple/mach_port_rendezvous_ios.cc",
-          "apple/mach_port_rendezvous_ios.h",
-          "power_monitor/power_monitor_device_source_ios.mm",
-          "process/process_mac.cc",
-        ]
-      } else {
-        sources += [
-          "power_monitor/power_monitor_device_source_stub.cc",
-
-          # tvOS apps must be single-process. Build a Process version that does
-          # the bare minimum and does not use Mach ports.
-          "process/process_tvos.cc",
-        ]
-      }
-
-      # We include launch_mac on simulator builds so unit and browser tests can
-      # fork.
-      # iOS-based platforms like tvOS need special treatment in launch_mac.cc
-      # due to some symbols being marked unavailable despite being present,
-      # which is why this condition is restricted to specific `target_platform`
-      # values.
-      # In all cases, this is restricted to simulator builds because App Store
-      # restrictions forbid the use of multiple processes in applications.
-      if (target_environment == "simulator" &&
-          (target_platform == "iphoneos" || target_platform == "tvos")) {
-        sources += [
-          "process/kill_mac.cc",
-          "process/launch_mac.cc",
-        ]
-      } else {
-        sources += [ "process/launch_ios.cc" ]
-      }
-    } else {
-      sources += [
-        "power_monitor/power_monitor_device_source_ios.mm",
-        "process/launch_ios.cc",
-        "process/memory_stubs.cc",
-        "process/process_stubs.cc",
-      ]
-    }
-
-    if (is_cronet_build || target_platform == "tvos") {
-      sources += [
-        "message_loop/message_pump_io_ios.cc",
-        "message_loop/message_pump_io_ios.h",
-      ]
-    } else {
-      sources += [
-        "message_loop/message_pump_kqueue.cc",
-        "message_loop/message_pump_kqueue.h",
-      ]
-      if (use_blink) {
-        frameworks += [ "BrowserEngineCore.framework" ]
-      }
-    }
-
-    if (ios_stack_profiler_enabled) {
-      sources += [
-        "profiler/frame_pointer_unwinder.cc",
-        "profiler/frame_pointer_unwinder.h",
-        "profiler/suspendable_thread_delegate_mac.cc",
-        "profiler/suspendable_thread_delegate_mac.h",
-      ]
-    }
-    if (!use_allocator_shim) {
-      sources -= [
-        "sampling_heap_profiler/poisson_allocation_sampler.cc",
-        "sampling_heap_profiler/poisson_allocation_sampler.h",
-        "sampling_heap_profiler/sampling_heap_profiler.cc",
-        "sampling_heap_profiler/sampling_heap_profiler.h",
-      ]
-    }
-
-    frameworks += [
-      "Foundation.framework",
-      "UIKit.framework",
-    ]
-  }
-
   # Linux.
   if (is_linux) {
     # TODO(brettw) this will need to be parameterized at some point.
@@ -2705,22 +2564,6 @@ generated_file("generate_file_for_test") {
   contents = "Hello world"
 }
 
-if (is_ios) {
-  bundle_data("base_test_proto_bundle_data") {
-    testonly = true
-    public_deps = [ "//base/test:test_proto_descriptor_gen" ]
-    sources = [ "$root_gen_dir/base/test/test_proto.descriptor" ]
-    outputs = [ "{{bundle_resources_dir}}/gen/base/test/{{source_file_part}}" ]
-  }
-
-  bundle_data("base_generated_test_file_bundle_data") {
-    testonly = true
-    public_deps = [ ":generate_file_for_test" ]
-    sources = [ "$target_gen_dir/generated_file_for_test.txt" ]
-    outputs = [ "{{bundle_resources_dir}}/gen/base/{{source_file_part}}" ]
-  }
-}
-
 if (is_apple) {
   source_set("base_unittests_noarc") {
     testonly = true
@@ -3286,10 +3129,6 @@ test("base_unittests") {
     sources += [ "memory/raw_ptr_asan_unittest.cc" ]
   }
 
-  if (is_ios) {
-    deps += [ "//base/test:test_shared_library_ios+bundle" ]
-  }
-
   if (is_android && enable_chrome_android_internal) {
     data_deps += [ "//clank/build/bot/filters:base_unittests_filters" ]
   }
@@ -3425,48 +3264,6 @@ test("base_unittests") {
     ]
     data_deps += [ "//base/mac:launch_application_test_helper" ]
     frameworks += [ "Security.framework" ]
-  }
-
-  if (is_ios) {
-    sources += [
-      "ios/crb_protocol_observers_unittest.mm",
-      "ios/device_util_unittest.mm",
-      "ios/scoped_critical_action_unittest.mm",
-      "message_loop/message_pump_ios_unittest.mm",
-    ]
-
-    bundle_deps = [ ":base_test_proto_bundle_data" ]
-    if (is_cronet_build || target_platform == "tvos") {
-      sources += [ "message_loop/message_pump_io_ios_unittest.cc" ]
-    } else {
-      sources += [ "message_loop/message_pump_kqueue_unittest.cc" ]
-    }
-
-    # ios does not use test_launcher to run gtests.
-    sources -= [
-      "files/file_path_watcher_unittest.cc",
-      "memory/discardable_shared_memory_unittest.cc",
-      "process/memory_unittest.cc",
-      "process/process_unittest.cc",
-      "process/process_util_unittest.cc",
-      "sync_socket_unittest.cc",
-      "synchronization/waitable_event_watcher_unittest.cc",
-      "test/gtest_links_unittest.cc",
-      "test/gtest_tags_unittest.cc",
-      "test/gtest_xml_unittest_result_printer_unittest.cc",
-      "test/launcher/test_launcher_unittest.cc",
-      "test/launcher/test_results_tracker_unittest.cc",
-    ]
-
-    sources -= [
-      # The immediate crash tests require shared libraries, which we don't
-      # support loading on iOS.
-      "immediate_crash_unittest.cc",
-    ]
-
-    if (use_blink) {
-      sources += [ "files/file_path_watcher_unittest.cc" ]
-    }
   }
 
   if (is_mac) {

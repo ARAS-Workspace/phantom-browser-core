@@ -748,15 +748,6 @@ cc_test_static_library("test_support") {
   }
 }
 
-if (is_ios) {
-  bundle_data("unit_tests_bundle_data") {
-    testonly = true
-    sources = [ "test/data/lottie/animation_with_2_text_nodes.json" ]
-    outputs = [ "{{bundle_resources_dir}}/" +
-                "{{source_root_relative_dir}}/{{source_file_part}}" ]
-  }
-}
-
 cc_test("cc_unittests") {
   use_xvfb = use_xvfb_in_this_config
 
@@ -1023,12 +1014,6 @@ cc_test("cc_unittests") {
     ]
   }
 
-  if (is_ios) {
-    public_deps = [
-      ":unit_tests_bundle_data",
-      "//components/test:viz_test_bundle_data",
-    ]
-  }
 }
 
 cc_test("cc_perftests") {

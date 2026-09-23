@@ -106,10 +106,6 @@ test("services_unittests") {
     deps += [ "//base:base_profiler_test_support_library" ]
   }
 
-  if (is_ios) {
-    bundle_deps = [ "//services/tracing:services_tracing_perfetto_bundle_data" ]
-  }
-
   if (is_linux) {
     deps += [ "//services/accessibility:tests" ]
   }

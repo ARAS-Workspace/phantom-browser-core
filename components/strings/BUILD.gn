@@ -129,16 +129,6 @@ grit_strings("components_locale_settings") {
                    "en-XA",
                    "ur",
                  ]
-  if (is_ios) {
-    _xtb_locales -= [
-      "es-MX",
-      "pt",
-    ]
-    _xtb_locales += [
-      "es-419",
-      "pt-BR",
-    ]
-  }
   inputs = process_file_template(
           _xtb_locales,
           [ "components_locale_settings_{{source_name_part}}.xtb" ])

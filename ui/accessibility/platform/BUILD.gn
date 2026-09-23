@@ -185,25 +185,6 @@ component("platform") {
       ]
     }
 
-    if (is_ios) {
-      sources += [
-        "ax_platform_node_ios.h",
-        "ax_platform_node_ios.mm",
-        "ax_platform_node_ui_kit_element.h",
-        "ax_platform_node_ui_kit_element.mm",
-        "browser_accessibility_ios.h",
-        "browser_accessibility_ios.mm",
-        "browser_accessibility_manager_ios.h",
-        "browser_accessibility_manager_ios.mm",
-      ]
-
-      frameworks = [
-        "Accessibility.framework",
-        "UIKit.framework",
-        "Foundation.framework",
-      ]
-    }
-
     if (use_atk) {
       sources += [
         "atk_util_auralinux.cc",

@@ -9,10 +9,6 @@ static_library("rlz") {
     "rlz_tracker_delegate.h",
   ]
 
-  if (is_ios) {
-    sources += [ "rlz_tracker_ios.cc" ]
-  }
-
   if (is_mac) {
     sources += [ "rlz_tracker_mac.cc" ]
   }
@@ -25,9 +21,6 @@ static_library("rlz") {
     "//services/network/public/cpp",
   ]
 
-  if (is_ios) {
-    deps += [ "//ui/base" ]
-  }
 }
 
 source_set("test_support") {

@@ -323,10 +323,6 @@ if (!is_cronet_build || is_ios) {
       deps += [ "//components/keep_alive_registry" ]
     }
 
-    if (is_ios) {
-      sources += [ "clean_exit_beacon_ios.mm" ]
-    }
-
     if (is_win) {
       sources += [
         "machine_id_provider_win.cc",

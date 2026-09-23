@@ -199,18 +199,6 @@ source_set("audio") {
     ]
   }
 
-  if (is_ios) {
-    sources += [
-      "ios/audio_manager_ios.cc",
-      "ios/audio_manager_ios.h",
-      "ios/audio_private_api.h",
-      "ios/audio_session_manager_ios.h",
-      "ios/audio_session_manager_ios.mm",
-    ]
-
-    frameworks += [ "AVFoundation.framework" ]
-  }
-
   if (is_linux) {
     sources += [ "linux/audio_manager_linux.cc" ]
   }

@@ -113,25 +113,6 @@ static_library("content_shell_app") {
       "app/shell_main_delegate_mac.mm",
     ]
   }
-  if (is_ios) {
-    sources += [
-      "app/ios/shell_application_ios.h",
-      "app/ios/shell_application_ios.mm",
-      "app/ios/web_tests_support_ios.h",
-      "app/ios/web_tests_support_ios.mm",
-    ]
-
-    if (target_platform == "tvos") {
-      sources += [
-        "app/ios/shell_app_scene_delegate_tvos.h",
-        "app/ios/shell_app_scene_delegate_tvos.mm",
-      ]
-    }
-
-    # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-    # enable the diagnostic by removing this line.
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-  }
   defines = [
     "CONTENT_SHELL_VERSION=\"$content_shell_version\"",
     "CONTENT_SHELL_MAJOR_VERSION=\"$content_shell_major_version\"",
@@ -241,30 +222,6 @@ static_library("content_shell_lib") {
       "browser/shell_javascript_dialog_mac.mm",
       "browser/shell_platform_delegate_mac.mm",
       "browser/shell_web_contents_view_delegate_mac.mm",
-    ]
-  }
-
-  if (is_ios) {
-    sources += [
-      "browser/bluetooth/ios/shell_bluetooth_chooser_coordinator.h",
-      "browser/bluetooth/ios/shell_bluetooth_chooser_coordinator.mm",
-      "browser/bluetooth/ios/shell_bluetooth_chooser_ios.h",
-      "browser/bluetooth/ios/shell_bluetooth_chooser_ios.mm",
-      "browser/bluetooth/ios/shell_bluetooth_chooser_mediator.h",
-      "browser/bluetooth/ios/shell_bluetooth_chooser_mediator.mm",
-      "browser/bluetooth/ios/shell_bluetooth_device_list_consumer.h",
-      "browser/bluetooth/ios/shell_bluetooth_device_list_delegate.h",
-      "browser/bluetooth/ios/shell_bluetooth_device_list_view_controller.h",
-      "browser/bluetooth/ios/shell_bluetooth_device_list_view_controller.mm",
-      "browser/bluetooth/shell_bluetooth_delegate_impl_client.cc",
-      "browser/bluetooth/shell_bluetooth_delegate_impl_client.h",
-      "browser/color_chooser/shell_color_chooser_ios.h",
-      "browser/color_chooser/shell_color_chooser_ios.mm",
-      "browser/shell_browser_main_parts_ios.mm",
-      "browser/shell_file_select_helper.cc",
-      "browser/shell_file_select_helper.h",
-      "browser/shell_platform_delegate_ios.mm",
-      "browser/shell_web_contents_view_delegate_ios.mm",
     ]
   }
 
@@ -378,17 +335,6 @@ static_library("content_shell_lib") {
 
   if (is_mac) {
     deps += [ "//ui/display:test_support" ]
-  }
-
-  if (is_ios) {
-    deps += [
-      "//components/permissions",
-      "//components/strings:components_strings",
-      "//services/tracing/public/cpp",
-      "//services/tracing/public/mojom",
-      "//ui/accessibility:ax_base",
-      "//ui/shell_dialogs",
-    ]
   }
 
   if (shell_use_toolkit_views) {
@@ -534,17 +480,6 @@ repack("pak") {
     sources += [
       "$root_gen_dir/content/browser/tracing/tracing_resources.pak",
       "$root_gen_dir/content/traces_internals_resources.pak",
-    ]
-  }
-
-  if (is_ios) {
-    sources += [
-      "$root_gen_dir/device/bluetooth/strings/bluetooth_strings_en-US.pak",
-      "${root_gen_dir}/components/strings/components_strings_en-US.pak",
-    ]
-    deps += [
-      "//components/strings:components_strings",
-      "//device/bluetooth/strings/",
     ]
   }
 

@@ -189,9 +189,6 @@ component("google_apis") {
   }
 
   if (is_apple) {
-    if (is_ios) {
-      sources += [ "gaia/gaia_id_ios.mm" ]
-    }
 
     frameworks = [ "Foundation.framework" ]
   }

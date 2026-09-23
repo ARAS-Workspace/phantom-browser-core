@@ -52,10 +52,6 @@ static_library("sync_device_info") {
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
-  if (is_ios) {
-    sources += [ "local_device_info_util_ios.mm" ]
-  }
-
   if (is_linux) {
     sources += [ "local_device_info_util_linux.cc" ]
   }

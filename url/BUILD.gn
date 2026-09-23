@@ -89,10 +89,6 @@ component("url") {
     public_configs = [ "//third_party/jdk" ]
   }
 
-  if (is_ios) {
-    sources += [ "url_constants_ios.h" ]
-  }
-
   # ICU support.
   if (use_platform_icu_alternatives) {
     if (is_android) {
@@ -208,15 +204,6 @@ test("url_unittests") {
 
   if (use_platform_icu_alternatives) {
 
-    # Unit tests that are not supported by the current ICU alternatives on iOS.
-    if (is_ios) {
-      sources -= [
-        "origin_unittest.cc",
-        "scheme_host_port_unittest.cc",
-        "url_canon_icu_unittest.cc",
-        "url_canon_unittest.cc",
-      ]
-    }
   } else {  # !use_platform_icu_alternatives
     deps += [ "//third_party/icu:icuuc" ]
   }

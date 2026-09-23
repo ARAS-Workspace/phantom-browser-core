@@ -70,10 +70,6 @@ source_set("identity_manager") {
 
   deps += [ "//pdf:buildflags" ]
 
-  if (is_ios) {
-    deps += [ "ios" ]
-  }
-
   allow_circular_includes_from = [
     # This target is a pair with internal/identity_manager. They always go
     # together and include headers from each other.
@@ -134,10 +130,6 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
-  if (is_ios) {
-    deps += [ "//components/signin/public/identity_manager/ios:test_support" ]
-  }
 
   deps += [ "//pdf:buildflags" ]
 

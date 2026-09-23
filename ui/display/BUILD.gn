@@ -81,10 +81,6 @@ component("display") {
     ]
   }
 
-  if (is_ios) {
-    sources += [ "ios/screen_ios.mm" ]
-  }
-
   defines = [ "DISPLAY_IMPLEMENTATION" ]
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
@@ -107,10 +103,6 @@ component("display") {
     "//ui/gfx",
     "//ui/gfx/geometry",
   ]
-
-  if (is_ios) {
-    deps += [ "//build:ios_buildflags" ]
-  }
 
   if (use_aura) {
     sources += [ "screen_aura.cc" ]

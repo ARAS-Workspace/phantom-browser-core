@@ -316,14 +316,6 @@ source_set("internal") {
       frameworks += [ "SystemConfiguration.framework" ]
     }
 
-    if (is_ios) {
-      sources += [
-        "management/platform_management_status_provider_ios.h",
-        "management/platform_management_status_provider_ios.mm",
-        "policy_loader_ios.h",
-        "policy_loader_ios.mm",
-      ]
-    }
   }
 }
 
@@ -433,13 +425,6 @@ source_set("common_constants") {
     "system_features_disable_list_constants.h",
   ]
 
-  if (is_ios) {
-    sources += [
-      "policy_loader_ios_constants.h",
-      "policy_loader_ios_constants.mm",
-    ]
-    frameworks = [ "Foundation.framework" ]
-  }
 }
 
 source_set("policy_path_constants") {
@@ -551,9 +536,6 @@ source_set("unit_tests") {
       sources += [ "policy_loader_mac_unittest.cc" ]
     }
 
-    if (is_ios) {
-      sources += [ "policy_loader_ios_unittest.mm" ]
-    }
   }
   if (is_win || is_linux) {
     # Needed by policy_loader_win_unittest.cc

@@ -72,9 +72,6 @@ foreach(i, _grit_environment_vars) {
 
 _target_platform = ""
 
-if (is_ios) {
-  _target_platform = "ios"
-}
 if (is_linux) {
   _target_platform = "linux"
 }

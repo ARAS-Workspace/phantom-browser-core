@@ -22,9 +22,6 @@ group("common") {
     public_deps += [ ":zombies" ]
   }
 
-  if (is_ios) {
-    public_deps += [ ":reporter_running_ios" ]
-  }
 }
 
 source_set("shared_memory_user_stream") {
@@ -155,15 +152,6 @@ if (is_apple) {
     }
 
     frameworks = [ "Foundation.framework" ]
-  }
-}
-
-if (is_ios) {
-  source_set("reporter_running_ios") {
-    sources = [
-      "reporter_running_ios.cc",
-      "reporter_running_ios.h",
-    ]
   }
 }
 

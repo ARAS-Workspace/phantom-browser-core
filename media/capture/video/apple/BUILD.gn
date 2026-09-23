@@ -62,10 +62,6 @@ source_set("apple") {
     deps += [ "//media/capture/video/mac" ]
   }
 
-  if (is_ios) {
-    deps += [ "//media/capture/video/ios" ]
-  }
-
   frameworks = [
     "AVFoundation.framework",
     "CoreFoundation.framework",
@@ -77,9 +73,6 @@ source_set("apple") {
     "VideoToolbox.framework",
   ]
 
-  if (is_ios) {
-    frameworks += [ "UIKit.framework" ]
-  }
 }
 
 source_set("unit_tests") {
@@ -120,7 +113,4 @@ source_set("unit_tests") {
     "VideoToolbox.framework",
   ]
 
-  if (is_ios) {
-    frameworks += [ "UIKit.framework" ]
-  }
 }

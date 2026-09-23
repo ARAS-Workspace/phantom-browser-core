@@ -21,9 +21,6 @@ test("gwp_asan_unittests") {
       "//components/gwp_asan/crash_handler:unit_tests",
     ]
   }
-  if (is_ios) {
-    deps -= [ "//components/gwp_asan/crash_handler:unit_tests" ]
-  }
   data_deps = [ "//testing/buildbot/filters:gwp_asan_unittests_filters" ]
 }
 

@@ -441,21 +441,6 @@ component("base") {
     ]
   }
 
-  if (is_ios) {
-    sources += [
-      "l10n/l10n_util_mac_bridge.h",
-      "l10n/l10n_util_mac_bridge.mm",
-    ]
-    public_deps += [ "//ui/events:event_constants" ]
-    deps += [
-      ":l10n_util_ios",
-      "//base",
-      "//ui/events",
-      "//ui/events:dom_keycode_converter",
-      "//ui/events:events_base",
-    ]
-  }
-
   if (use_blink) {
     deps += [
       "//cc/paint",
@@ -535,17 +520,6 @@ component("base") {
 
   if (is_android || is_ios) {
     sources -= [ "device_form_factor_desktop.cc" ]
-  }
-}
-
-if (is_ios) {
-  source_set("l10n_util_ios") {
-    sources = [
-      "l10n/l10n_util_ios.h",
-      "l10n/l10n_util_ios.mm",
-    ]
-    deps = [ "//base" ]
-    frameworks = [ "Foundation.framework" ]
   }
 }
 
@@ -729,13 +703,6 @@ static_library("test_support") {
     "//ui/gfx/geometry",
   ]
 
-  if (is_ios) {
-    deps -= [
-      "//ui/events:events_base",
-      "//ui/events:test_support",
-    ]
-  }
-
   if (build_ime) {
     sources += [
       "ime/dummy_input_method.cc",
@@ -781,15 +748,6 @@ copy("ui_base_test_resources_pak") {
   sources = [ "$target_gen_dir/ui_base_test_resources.pak" ]
   outputs = [ "$root_out_dir/ui_base_test_resources.pak" ]
   public_deps = [ ":ui_base_test_resources_grit" ]
-}
-
-if (is_ios) {
-  bundle_data("ui_base_test_bundle_data") {
-    testonly = true
-    public_deps = [ ":ui_base_test_resources_grit" ]
-    sources = [ "$target_gen_dir/ui_base_test_resources.pak" ]
-    outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
-  }
 }
 
 source_set("run_all_unittests") {

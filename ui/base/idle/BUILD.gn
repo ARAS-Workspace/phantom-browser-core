@@ -43,10 +43,6 @@ component("idle") {
     sources += [ "idle_mac.mm" ]
   }
 
-  if (is_ios) {
-    sources += [ "idle_ios.mm" ]
-  }
-
   if (is_linux) {
     sources += [ "idle_linux.cc" ]
     deps += [ "//ui/display" ]

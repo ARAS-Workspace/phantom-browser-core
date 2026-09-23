@@ -142,9 +142,6 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-  if (is_ios) {
-    deps += [ "//components/test:page_content_annotations_test_bundle_data" ]
-  }
 }
 
 fuzzer_test("optimization_guide_page_visibility_model_fuzzer") {

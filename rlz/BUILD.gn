@@ -86,9 +86,6 @@ if (enable_rlz_support) {
         frameworks += [ "IOKit.framework" ]
       }
 
-      if (is_ios) {
-        sources += [ "ios/lib/machine_id_ios.cc" ]
-      }
     }
 
     if (is_posix) {

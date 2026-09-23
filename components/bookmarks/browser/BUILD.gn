@@ -106,9 +106,6 @@ static_library("browser") {
     ]
   }
 
-  if (is_ios) {
-    sources += [ "bookmark_node_data_ios.cc" ]
-  }
 }
 
 static_library("test_support") {

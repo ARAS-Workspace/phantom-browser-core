@@ -61,7 +61,4 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_ios) {
-    deps += [ "//net:net_test_bundle_data" ]
-  }
 }

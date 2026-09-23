@@ -4,10 +4,6 @@
 
 import("//build/config/features.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")  # For `target_platform`
-}
-
 component("devices") {
   sources = [
     "device_data_manager.cc",

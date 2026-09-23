@@ -65,9 +65,6 @@ source_set("unit_tests") {
     "//ui/gfx:color_utils",
     "//url",
   ]
-  if (is_ios) {
-    deps += [ "//components/test:safe_browsing_test_bundle_data" ]
-  }
 }
 
 source_set("visual_utils") {

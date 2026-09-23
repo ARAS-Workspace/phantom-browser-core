@@ -10,10 +10,6 @@ import("//build/rust/rust_static_library.gni")
 import("//build_overrides/build.gni")
 import("//third_party/protobuf/proto_library.gni")
 
-if (is_ios) {
-  import("//build/config/ios/rules.gni")
-}
-
 import("//third_party/perfetto/gn/perfetto_cc_proto_descriptor.gni")
 
 static_library("test_config") {
@@ -276,12 +272,6 @@ static_library("test_support") {
       ":amalgamated_perfetto_sql_stdlib",
       ":gen_cc_chrome_track_event_descriptor",
     ]
-    if (is_ios) {
-      deps += [
-        ":test_trace_processor+bundle",
-        ":test_trace_processor+link",
-      ]
-    }
   }
 
   if (is_linux) {
@@ -303,28 +293,6 @@ static_library("test_support") {
       "mock_chrome_application_mac.mm",
       "test_file_util_mac.cc",
     ]
-  }
-
-  if (is_ios) {
-    sources += [
-      "ios/wait_util.h",
-      "ios/wait_util.mm",
-      "test_file_util_mac.cc",
-      "test_listener_ios.h",
-      "test_listener_ios.mm",
-      "test_support_ios.h",
-      "test_support_ios.mm",
-    ]
-    deps += [
-      ":google_test_runner_shared_headers",
-      "//build:blink_buildflags",
-      "//build:ios_buildflags",
-    ]
-
-    # With blink, we use the standard unit_test_launcher.cc.
-    if (!use_blink) {
-      sources += [ "launcher/unit_test_launcher_ios.cc" ]
-    }
   }
 
   if (is_posix) {
@@ -450,16 +418,6 @@ shared_library("test_shared_library") {
   sources = [ "test_shared_library.cc" ]
 }
 
-if (is_ios) {
-  ios_framework_bundle("test_shared_library_ios") {
-    testonly = true
-    output_name = "test_shared_library_ios"
-    info_plist = "ios/native-library-Info.plist"
-
-    sources = [ "test_shared_library.cc" ]
-  }
-}
-
 if (is_linux) {
   shared_library("malloc_wrapper") {
     testonly = true
@@ -467,19 +425,6 @@ if (is_linux) {
       "malloc_wrapper.cc",
       "malloc_wrapper.h",
     ]
-  }
-}
-
-if (is_ios) {
-  source_set("google_test_runner_shared_headers") {
-    sources = [ "ios/google_test_runner_delegate.h" ]
-  }
-
-  source_set("google_test_runner") {
-    sources = [ "ios/google_test_runner.mm" ]
-    deps = [ ":google_test_runner_shared_headers" ]
-    frameworks = [ "UIKit.framework" ]
-    configs += [ "//build/config/ios:xctest_config" ]
   }
 }
 
@@ -519,9 +464,6 @@ action("amalgamated_perfetto_sql_stdlib") {
 # different implementations, so we need to hide dev_sqlite in this shared
 # library even in non-component builds to prevent duplicate symbols.
 _target_type = "shared_library"
-if (is_ios) {
-  _target_type = "ios_framework_bundle"
-}
 
 target(_target_type, "test_trace_processor") {
   defines = [ "TEST_TRACE_PROCESSOR_IMPL" ]
@@ -535,12 +477,6 @@ target(_target_type, "test_trace_processor") {
     "//third_party/abseil-cpp:absl",
     "//third_party/perfetto:libtrace_processor",
   ]
-
-  if (is_ios) {
-    info_plist = "tracing/test_trace_processor_impl.plist"
-    output_name = "TestTraceProcessor"
-    bundle_deps_filter = [ "//third_party/icu:icudata" ]
-  }
 
   # Set rpath on dependent tests so that they can find the shared library
   # in a non-component build.

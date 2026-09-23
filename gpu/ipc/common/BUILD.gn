@@ -6,10 +6,6 @@ import("//build/config/ui.gni")
 import("//gpu/vulkan/features.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")  # For `target_platform`
-}
-
 group("common") {
   if (is_component_build) {
     public_deps = [ "//gpu" ]

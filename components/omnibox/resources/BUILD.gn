@@ -14,16 +14,6 @@ grit_strings("omnibox_pedal_synonyms") {
         "ur",
         "nb",
       ]
-  if (is_ios) {
-    _locales -= [
-      "es-MX",
-      "pt",
-    ]
-    _locales += [
-      "es-419",
-      "pt-BR",
-    ]
-  }
   inputs = process_file_template(
           _locales,
           [ "translations/omnibox_pedal_synonyms_{{source_name_part}}.xtb" ])

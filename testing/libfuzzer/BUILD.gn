@@ -45,10 +45,6 @@ source_set("libfuzzer_main") {
   sources = []
   if (use_libfuzzer) {
     deps += [ "//third_party/libFuzzer:libfuzzer_main" ]
-    if (is_ios) {
-      deps +=
-          [ "//testing/libfuzzer/fuzzer_support_ios:fuzzing_engine_main_ios" ]
-    }
   } else if (use_centipede) {
     deps += [ "//third_party/fuzztest:centipede_runner_main" ]
     data_deps = [

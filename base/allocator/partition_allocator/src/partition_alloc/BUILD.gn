@@ -757,13 +757,6 @@ if (is_clang_or_gcc) {
         "partition_alloc_base/apple/scoped_cftyperef.h",
         "partition_alloc_base/apple/scoped_typeref.h",
       ]
-      if (is_ios) {
-        sources += [
-          "partition_alloc_base/ios/ios_util.h",
-          "partition_alloc_base/ios/ios_util.mm",
-          "partition_alloc_base/system/sys_info_ios.mm",
-        ]
-      }
       if (is_mac) {
         sources += [
           "partition_alloc_base/mac/mac_util.h",
@@ -990,12 +983,6 @@ if (build_with_chromium) {
         "shim/allocator_shim_default_dispatch_to_partition_alloc_unittest.cc",
       ]
 
-      if (is_ios) {
-        sources += [
-          "shim/allocator_interception_apple_unittest.mm",
-          "shim/malloc_zone_functions_apple_unittest.cc",
-        ]
-      }
     }
 
     if ((is_android || is_linux) && target_cpu == "arm64") {

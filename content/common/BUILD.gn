@@ -301,11 +301,6 @@ source_set("common") {
     ]
   }
 
-  if (is_ios) {
-    # TOOD: Create ios file instead of stealing android
-    sources += [ "cursors/webcursor_android.cc" ]
-  }
-
   if (is_mac) {
     sources += [
       "mac/attributed_string_type_converters.h",

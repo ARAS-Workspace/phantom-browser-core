@@ -74,10 +74,6 @@ rust_static_library("child_process_security_policy_impl") {
   }
 }
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")  # For `target_platform`
-}
-
 source_set("browser") {
   # Only the public target should depend on this. All other targets (even
   # internal content ones) should depend on the public one.

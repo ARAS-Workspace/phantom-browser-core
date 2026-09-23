@@ -5,10 +5,6 @@
 component("nfc") {
   sources = [ "nfc_utils.h" ]
 
-  if (is_ios) {
-    sources += [ "nfc_utils_ios.mm" ]
-  }
-
   deps = [
     "//base",
     "//services/device/public/mojom",

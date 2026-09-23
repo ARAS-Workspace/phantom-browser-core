@@ -5,17 +5,6 @@
 import("//build/config/chrome_build.gni")
 import("//build/config/compiler/compiler.gni")
 
-if (is_ios) {
-  declare_args() {
-    # iOS is bring-your-own-model. ios_on_device_llm_files should include 3
-    # paths:
-    # - /path/to/weights.bin
-    # - /path/to/manifest.json
-    # - /path/to/config.pb
-    ios_on_device_llm_files = []
-  }
-}
-
 declare_args() {
   # You can set the variable 'build_with_internal_optimization_guide' to true
   # even in a developer build in args.gn. Setting this variable explicitly to

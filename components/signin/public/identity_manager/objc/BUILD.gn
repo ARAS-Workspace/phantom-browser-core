@@ -24,7 +24,4 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_ios) {
-    deps += [ "//components/signin/public/identity_manager/ios:test_support" ]
-  }
 }

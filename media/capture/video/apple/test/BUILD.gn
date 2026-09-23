@@ -37,7 +37,4 @@ source_set("test_support") {
     "VideoToolbox.framework",
   ]
 
-  if (is_ios) {
-    frameworks += [ "UIKit.framework" ]
-  }
 }

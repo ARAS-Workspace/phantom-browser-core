@@ -296,8 +296,4 @@ test("capture_unittests") {
     deps += [ "video/mac:unit_tests" ]
   }
 
-  if (is_ios) {
-    deps += [ "//media:unit_tests_bundle_data" ]
-  }
-
 }

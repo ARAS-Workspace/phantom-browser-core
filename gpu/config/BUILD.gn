@@ -172,9 +172,6 @@ component("config") {
     sources += [ "gpu_info_collector_mac.mm" ]
     frameworks = [ "OpenGL.framework" ]
   }
-  if (is_ios) {
-    sources += [ "gpu_info_collector_ios.mm" ]
-  }
   if (is_linux) {
     sources += [ "gpu_info_collector_linux.cc" ]
   }

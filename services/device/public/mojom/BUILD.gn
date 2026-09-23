@@ -6,10 +6,6 @@ import("//build/config/features.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 import("//services/device/public/cpp/compute_pressure/buildflags.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-}
-
 mojom("mojom") {
   generate_java = true
   sources = [

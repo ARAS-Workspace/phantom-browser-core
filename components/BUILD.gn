@@ -25,51 +25,6 @@ import("//testing/test.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/repack.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-  import("//ios/build/config.gni")
-}
-
-if (is_ios) {
-  bundle_data("components_tests_pak_bundle_data") {
-    testonly = true
-    public_deps = [
-      ":components_tests_pak",
-      "//ui/resources:ui_test_pak",
-    ]
-    sources = [
-      "$root_out_dir/components_tests_resources.pak",
-      "$root_out_dir/ui_test.pak",
-    ]
-    if (use_blink) {
-      public_deps += [ "//content/shell:pak" ]
-      sources += [ "$root_out_dir/content_shell.pak" ]
-    }
-    outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
-  }
-
-  if (use_blink) {
-    bundle_data("components_tests_distiller_bundle_data") {
-      testonly = true
-      public_deps =
-          [ "//components/dom_distiller/core:dom_distiller_viewer_js" ]
-      sources = [
-        "$root_gen_dir/components/dom_distiller/core/javascript/dom_distiller_viewer.js",
-        "//third_party/dom_distiller_js/dist/test/data/out/domdistillerjstest.js",
-        "//third_party/dom_distiller_js/dist/test/data/war/test.html",
-        "//third_party/node/node_modules/chai/index.js",
-        "//third_party/node/node_modules/mocha/mocha.js",
-        "dom_distiller/core/javascript/domdistiller.js",
-        "dom_distiller/core/javascript/extract_features.js",
-        "dom_distiller/core/javascript/readability_distiller.js",
-        "dom_distiller/core/javascript/readability_triggering.js",
-      ]
-      outputs = [ "{{bundle_resources_dir}}/" +
-                  "{{source_root_relative_dir}}/{{source_file_part}}" ]
-    }
-  }
-}
-
 disallowed_extension_deps_ = [
   # Components should largely not depend on //extensions. Since // extensions
   # is not a component target and is linked with //chrome, depending on most
@@ -924,10 +879,6 @@ test("components_unittests") {
   assert_no_deps = [ "//chrome/*" ]
   assert_no_deps += disallowed_extension_deps_
 
-  if (is_ios) {
-    assert_no_deps += ios_assert_no_deps
-    assert_no_deps += [ "//ios/chrome/*" ]
-  }
   fuzztests = [
     "AndroidAppDescriptionToolsFuzzTest.MaintainsSingleActivityInvariant",
     "Base32ParityTest.EncodeParity",
@@ -1100,28 +1051,6 @@ if (use_blink) {
     if (toolkit_views && !is_mac) {
       # TODO(crbug.com/349781050): Enable test on Mac.
       deps += [ "//components/constrained_window:browser_tests" ]
-    }
-
-    if (is_ios) {
-      bundle_deps = [
-        ":components_tests_distiller_bundle_data",
-        ":components_tests_pak_bundle_data",
-        "test:dom_distiller_test_bundle_data",
-        "test:url_rewrite_test_bundle_data",
-        "//content/test:content_test_bundle_data",
-        "//testing/buildbot/filters:components_browsertests_use_blink_filters_bundle_data",
-      ]
-
-      deps += [ "//components/test:optimization_guide_test_bundle_data" ]
-
-      if (target_platform == "iphoneos") {
-        entitlements_path = "//content/app/ios/appex/app.entitlements"
-        deps += [
-          "//content/test/ios/appex:test_content_process_bundle",
-          "//content/test/ios/appex:test_gpu_process_bundle",
-          "//content/test/ios/appex:test_network_process_bundle",
-        ]
-      }
     }
 
     if (enable_pdf) {
