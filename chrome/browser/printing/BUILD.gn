@@ -43,10 +43,6 @@ if (enable_printing) {
       "//ui/gfx/geometry",
     ]
 
-    if (is_win) {
-      public += [ "pdf_to_emf_converter.h" ]
-    }
-
     if (enable_oop_printing) {
       public += [
         "oop_features.h",
@@ -120,17 +116,6 @@ if (enable_printing) {
       deps += [
         "//components/pdf/browser",
         "//pdf:features",
-      ]
-    }
-
-    if (is_win) {
-      sources += [
-        "pdf_to_emf_converter.cc",
-        "printer_manager_dialog_win.cc",
-      ]
-      deps += [
-        "//chrome/browser:primitives",
-        "//ui/views",
       ]
     }
 
@@ -254,10 +239,6 @@ if (enable_printing) {
         "//printing",
         "//testing/gtest",
       ]
-
-      if (is_win) {
-        sources += [ "pdf_to_emf_converter_browsertest.cc" ]
-      }
 
       if (enable_oop_printing) {
         sources += [ "print_backend_browsertest.cc" ]

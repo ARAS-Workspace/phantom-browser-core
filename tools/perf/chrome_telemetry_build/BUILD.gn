@@ -38,10 +38,6 @@ group("telemetry_chrome_test") {
     data_deps += [ "//chrome" ]
   }
 
-  if (is_win) {
-    data_deps += [ "//chrome:reorder_imports" ]
-  }
-
   if (is_linux) {
     data_deps += [ "//third_party/breakpad:dump_syms" ]
 
@@ -63,12 +59,6 @@ group("telemetry_chrome_test") {
     ]
   }
 
-  if (is_win) {
-    data_deps += [
-      "//build/win:copy_cdb_to_output",
-      "//third_party/crashpad/crashpad/tools:crashpad_database_util",
-    ]
-  }
 }
 
 group("telemetry_chrome_test_without_chrome") {
@@ -98,14 +88,6 @@ group("telemetry_chrome_test_without_chrome") {
       # These explicitly not defined for Windows builds in Breakpad.
       "//third_party/breakpad:minidump_dump",
       "//third_party/breakpad:minidump_stackwalk",
-    ]
-  }
-
-  if (is_win) {
-    data_deps += [
-      # This is a stand-in for minidump_stackwalk on Windows since
-      # minidump_stackwalk is not defined on Windows.
-      "//third_party/crashpad/crashpad/tools:dump_minidump_annotations",
     ]
   }
 

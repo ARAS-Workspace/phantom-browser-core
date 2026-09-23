@@ -23,10 +23,6 @@ mojom("mojom") {
 
   enabled_features = []
 
-  if (is_win) {
-    sources += [ "pdf_to_emf_converter.mojom" ]
-  }
-
   if (enable_print_preview) {
     enabled_features += [ "enable_print_preview" ]
   }

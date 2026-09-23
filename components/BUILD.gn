@@ -767,10 +767,6 @@ test("components_unittests") {
     deps += [ "//components/services/font_data:unit_tests" ]
   }
 
-  if (is_win) {
-    deps += [ "//components/winhttp:unit_tests" ]
-  }
-
   if (enterprise_watermark) {
     deps += [ "//components/enterprise/watermarking:unit_tests" ]
   }

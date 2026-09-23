@@ -244,14 +244,6 @@ template("chrome_extra_paks") {
       }
     }
 
-    if (is_win) {
-      sources += [ "$root_gen_dir/chrome/inline_login_resources.pak" ]
-    }
-
-    if (is_win) {
-      sources += [ "$root_gen_dir/chrome/conflicts_resources.pak" ]
-    }
-
     if (!is_android) {
       sources += [
         "$root_gen_dir/chrome/default_browser_modal_resources.pak",
@@ -364,11 +356,6 @@ template("chrome_extra_paks") {
           [ "$root_gen_dir/chrome/unexportable_keys_internals_resources.pak" ]
       deps +=
           [ "//chrome/browser/resources/unexportable_keys_internals:resources" ]
-    }
-
-    if (is_win) {
-      sources += [ "$root_gen_dir/chrome/visual_guided_setter_resources.pak" ]
-      deps += [ "//chrome/browser/resources/default_browser/visual_guided_setter:resources" ]
     }
 
     if (safe_browsing_mode == 1) {

@@ -29,20 +29,6 @@ source_set("lib") {
     "//printing/buildflags",
   ]
 
-  if (is_win) {
-    sources += [
-      "pdf_to_emf_converter.cc",
-      "pdf_to_emf_converter.h",
-      "pdf_to_emf_converter_factory.cc",
-      "pdf_to_emf_converter_factory.h",
-    ]
-
-    deps += [
-      "//skia",
-      "//ui/gfx",
-    ]
-  }
-
   if (enable_print_preview) {
     sources += [
       "pdf_nup_converter.cc",

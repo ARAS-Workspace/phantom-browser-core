@@ -714,21 +714,6 @@ if (is_clang_or_gcc) {
     ]
     libs = []
 
-    if (is_win) {
-      sources += [
-        "partition_alloc_base/debug/stack_trace_win.cc",
-        "partition_alloc_base/memory/page_size_win.cc",
-        "partition_alloc_base/process/process_handle_win.cc",
-        "partition_alloc_base/rand_util_win.cc",
-        "partition_alloc_base/scoped_clear_last_error_win.cc",
-        "partition_alloc_base/threading/platform_thread_win.cc",
-        "partition_alloc_base/time/time_win.cc",
-      ]
-      libs += [
-        "winmm.lib",  # For timeGetTime.
-      ]
-    }
-
     if (is_posix) {
       sources += [
         "partition_alloc_base/debug/stack_trace_posix.cc",
@@ -905,32 +890,6 @@ if (is_clang_or_gcc) {
         "shim/allocator_shim_alloc_token_symbols.h",
       ]
     }
-    if (is_win) {
-      shim_headers += [
-        "shim/allocator_shim_override_ucrt_symbols_win.h",
-        "shim/winheap_stubs_win.h",
-      ]
-      shim_sources -= [ "shim/allocator_shim.cc" ]
-      shim_sources += [ "shim/winheap_stubs_win.cc" ]
-
-      if (!is_component_build) {
-        shim_sources += [
-          "shim/allocator_shim_win_static.cc",
-          "shim/checked_multiply_win.h",
-        ]
-      } else {
-        shim_sources += [
-          "shim/allocator_shim_functions_win_component.cc",
-          "shim/allocator_shim_win_component.cc",
-        ]
-
-        # allocator_shim cannot depend on libc++ objects because they use
-        # malloc() internally.
-        if (build_with_chromium) {
-          no_default_deps = true
-        }
-      }
-    }
 
     if (!use_partition_alloc_as_malloc) {
       if (is_apple) {
@@ -939,9 +898,6 @@ if (is_clang_or_gcc) {
       }
       if (is_linux) {
         shim_sources += [ "shim/allocator_shim_default_dispatch_to_glibc.cc" ]
-      }
-      if (is_win) {
-        shim_sources += [ "shim/allocator_shim_default_dispatch_to_winheap.cc" ]
       }
     }
 
@@ -1033,10 +989,6 @@ if (build_with_chromium) {
       sources += [
         "shim/allocator_shim_default_dispatch_to_partition_alloc_unittest.cc",
       ]
-
-      if (is_win) {
-        sources += [ "shim/winheap_stubs_win_unittest.cc" ]
-      }
 
       if (is_ios) {
         sources += [
@@ -1171,10 +1123,6 @@ source_set("test_support") {
     sources += [
       "partition_alloc_base/threading/platform_thread_posix_for_testing.cc",
     ]
-  }
-  if (is_win) {
-    sources +=
-        [ "partition_alloc_base/threading/platform_thread_win_for_testing.cc" ]
   }
   if (is_apple) {
     sources += [

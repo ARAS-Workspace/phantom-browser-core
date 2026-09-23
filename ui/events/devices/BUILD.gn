@@ -40,13 +40,6 @@ component("devices") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "input_device_observer_win.cc",
-      "input_device_observer_win.h",
-    ]
-  }
-
   if (is_ios && use_blink && target_platform == "iphoneos") {
     sources += [
       "input_device_observer_ios.h",

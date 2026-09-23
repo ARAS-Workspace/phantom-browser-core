@@ -79,12 +79,6 @@ source_set("themes") {
     ]
     deps += [ "//extensions/browser" ]
   }
-  if (is_win) {
-    sources += [
-      "theme_helper_win.cc",
-      "theme_helper_win.h",
-    ]
-  }
   if (is_linux) {
     public += [ "theme_service_aura_linux.h" ]
     sources += [ "theme_service_aura_linux.cc" ]

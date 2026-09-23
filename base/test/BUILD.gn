@@ -284,22 +284,6 @@ static_library("test_support") {
     }
   }
 
-  if (is_win) {
-    sources += [
-      "async_results_test_values_win.h",
-      "fake_iasync_operation_win.h",
-      "file_path_reparse_point_win.cc",
-      "file_path_reparse_point_win.h",
-      "scoped_os_info_override_win.cc",
-      "scoped_os_info_override_win.h",
-      "test_file_util_win.cc",
-      "test_reg_util_win.cc",
-      "test_reg_util_win.h",
-      "test_shortcut_win.cc",
-      "test_shortcut_win.h",
-    ]
-  }
-
   if (is_linux) {
     sources += [ "test_file_util_linux.cc" ]
     public_deps += [ "//third_party/test_fonts/fontconfig:test_support" ]

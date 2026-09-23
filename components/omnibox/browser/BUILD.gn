@@ -116,13 +116,6 @@ aggregate_vector_icons("omnibox_vector_icons") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "share_win_chrome_refresh_old.icon",
-      "share_windows.icon",
-    ]
-  }
-
   if (is_linux) {
     sources += [
       "send.icon",

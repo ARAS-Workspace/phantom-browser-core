@@ -300,19 +300,6 @@ group("gn_all") {
       deps += [ "//ui/ozone/demo" ]
     }
 
-    if (is_win) {
-      deps += [
-        "//chrome/credential_provider",
-        "//chrome/credential_provider/test:gcp_unittests",
-      ]
-
-      if (enable_platform_experience) {
-        deps += [
-          "//chrome/browser/platform_experience/win:platform_experience_helper",
-        ]
-      }
-    }
-
     if (is_mac) {
       deps += [
         "//chrome/installer/gcapi_mac:gcapi_example",
@@ -475,39 +462,6 @@ group("gn_all") {
         # Mac, so compilation fails on Mac. They need porting.
         "//mojo",
       ]
-    }
-
-    if (is_win) {
-      deps += [
-        "//base:pe_image_test",
-        "//chrome/chrome_elf:chrome_elf_unittests",
-        "//chrome/chrome_elf:dll_hash_main",
-        "//chrome/elevation_service:elevation_service_unittests",
-        "//chrome/install_static:install_static_unittests",
-        "//chrome/installer/gcapi",
-        "//chrome/installer/setup:setup_unittests",
-        "//chrome/notification_helper:notification_helper_unittests",
-        "//chrome/test:delayloads_unittests",
-        "//components/wifi:wifi_test",
-        "//components/zucchini",
-        "//net:quic_client",
-        "//net:quic_server",
-        "//sandbox/win:sbox_integration_tests",
-        "//sandbox/win:sbox_unittests",
-        "//sandbox/win:sbox_validation_tests",
-        "//testing/gtest:gtest_main",
-
-        # The following two are accessibility API debugging tools.
-        "//tools/accessibility/inspect:ax_dump_events",
-        "//tools/accessibility/inspect:ax_dump_tree",
-        "//tools/win/chromeexts",
-      ]
-
-      # TODO(thakis): Enable this in cross builds, https://crbug.com/799827
-      if (!(is_component_build && is_debug && target_cpu == "x86") &&
-          host_os == "win") {
-        deps += [ "//chrome/test/mini_installer:mini_installer_tests" ]
-      }
     }
 
     # The official builders use this binary from the default toolchain's
@@ -727,59 +681,6 @@ if (is_android && !is_cronet_build) {
   }
 }
 
-# TODO(GYP_GONE): Figure out if we really need this target or if there's
-# some better way to specify things.
-if (is_win) {
-  group("chrome_official_builder_no_unittests") {
-    deps = [
-      "//chrome/common/win:eventlog_provider",
-      "//chrome/credential_provider",
-      "//chrome/enterprise_companion:enterprise_companion_zip",
-      "//chrome/installer/gcapi",
-      "//chrome/installer/mini_installer",
-      "//chrome/updater/win:updater_zip",
-      "//components/policy:pack_policy_templates",
-      "//components/zucchini",
-      "//components/zucchini:zucchini64",
-      "//third_party/hyphenation-patterns",
-      "//tools/metrics:metrics_metadata",
-    ]
-
-    if (enable_platform_experience) {
-      deps += [
-        "//chrome/browser/platform_experience/win:platform_experience_helper",
-      ]
-    }
-  }
-
-  group("chrome_official_builder") {
-    testonly = true
-
-    deps = [
-      ":blink_wpt_tests",
-      ":chrome_official_builder_no_unittests",
-      "//base:base_unittests",
-      "//chrome/test:browser_tests",
-      "//chrome/test:interactive_ui_tests",
-      "//ipc:ipc_tests",
-      "//media:media_unittests",
-      "//media/midi:midi_unittests",
-      "//net:net_unittests",
-      "//sql:sql_unittests",
-      "//third_party/breakpad:symupload",
-      "//ui/base:ui_base_unittests",
-      "//ui/gfx:gfx_unittests",
-      "//ui/touch_selection:ui_touch_selection_unittests",
-      "//ui/views:views_unittests",
-      "//url:url_unittests",
-    ]
-
-    if (enable_printing || enable_printing_tests) {
-      deps += [ "//printing:printing_unittests" ]
-    }
-  }
-}
-
 if (use_blink && !is_cronet_build) {
   group("chromedriver_group") {
     testonly = true
@@ -874,13 +775,6 @@ group("chromium_builder_perf") {
     data_deps += [ "//tools/perf/clear_system_cache" ]
   }
 
-  if (is_win) {
-    data_deps += [
-      "//chrome/installer/mini_installer",
-      "//components:components_perftests",
-      "//third_party/angle/src/tests:angle_perftests",
-    ]
-  }
 }
 
 if (!is_ios && !is_android && !is_cronet_build) {

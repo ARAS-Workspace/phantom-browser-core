@@ -159,9 +159,6 @@ if (!is_android) {
   source_set("unit_tests") {
     testonly = true
     sources = [ "profile_resetter_unittest.cc" ]
-    if (is_win) {
-      sources += [ "triggered_profile_resetter_win_unittest.cc" ]
-    }
     deps = [
       ":impl",
       ":profile_resetter",

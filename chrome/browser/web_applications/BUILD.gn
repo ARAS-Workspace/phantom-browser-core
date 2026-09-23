@@ -467,21 +467,6 @@ source_set("web_applications") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "os_integration/web_app_file_handler_registration_win.cc",
-      "os_integration/web_app_handler_registration_utils_win.cc",
-      "os_integration/web_app_handler_registration_utils_win.h",
-      "os_integration/web_app_protocol_handler_registration_win.cc",
-      "os_integration/web_app_run_on_os_login_win.cc",
-      "os_integration/web_app_shortcut_win.cc",
-      "os_integration/web_app_shortcut_win.h",
-      "os_integration/web_app_shortcuts_menu_win.cc",
-      "os_integration/web_app_shortcuts_menu_win.h",
-      "os_integration/web_app_uninstallation_via_os_settings_registration_win.cc",
-    ]
-  }
-
   if (!is_android) {
     sources += [
       "policy/web_app_settings_policy_handler.cc",
@@ -612,15 +597,6 @@ source_set("web_applications") {
   if (is_mac) {
     deps += [
       "//chrome/browser/web_applications/mojom:web_app_shortcut_copier_mojom",
-    ]
-  }
-
-  if (is_win) {
-    deps += [
-      "//chrome/browser/profiles:profile_util",
-      "//chrome/browser/web_applications/chrome_pwa_launcher:util",
-      "//chrome/browser/win",
-      "//components/custom_handlers",
     ]
   }
 
@@ -876,11 +852,6 @@ source_set("web_applications_unit_tests") {
     "isolated_web_apps/test/isolated_web_app_test.h",
   ]
 
-  if (is_win) {
-    sources += [
-    ]
-  }
-
   if (is_mac) {
     sources += [
     ]
@@ -952,12 +923,6 @@ source_set("web_applications_unit_tests") {
     deps += [
       "//chrome/browser/extensions:test_support",
       "//chrome/browser/web_applications/extensions",
-    ]
-  }
-
-  if (is_win) {
-    deps += [
-      "//chrome/browser/web_applications/chrome_pwa_launcher:util",
     ]
   }
 

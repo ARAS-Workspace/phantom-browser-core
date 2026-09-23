@@ -65,16 +65,6 @@ source_set("password_manager") {
     sources += [ "password_manager_util_mac.mm" ]
   }
 
-  if (is_win) {
-    deps += [
-      "//chrome/app:branded_strings",
-      "//ui/aura",
-      "//ui/views",
-    ]
-    public += [ "password_manager_util_win.h" ]
-    sources += [ "password_manager_util_win.cc" ]
-  }
-
   if (is_android) {
     public += [
       "android/account_chooser_dialog_android.h",

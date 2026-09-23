@@ -72,10 +72,6 @@ source_set("task_manager") {
     "//ui/gfx",
   ]
 
-  if (is_win) {
-    sources += [ "sampling/shared_sampler_win_defines.h" ]
-  }
-
   if (!is_android) {
     sources += [
       "providers/web_contents/background_contents_tag.h",
@@ -301,9 +297,6 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_win) {
-    sources += [ "sampling/shared_sampler_win_unittest.cc" ]
-  }
 }
 
 if (!is_android) {

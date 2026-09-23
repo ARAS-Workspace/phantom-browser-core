@@ -11,10 +11,6 @@ import("//testing/test.gni")
 import("//tools/json_schema_compiler/json_schema_api.gni")
 import("//ui/base/ui_features.gni")
 
-if (is_win) {
-  import("//build/toolchain/win/midl.gni")
-}
-
 mojom("ax_constants_mojo") {
   generate_java = true
   sources = [ "ax_constants.mojom" ]
@@ -353,31 +349,6 @@ test("accessibility_unittests") {
     # implemented on these platforms.
     sources += [ "platform/ax_platform_node_base_unittest.cc" ]
 
-    if (is_win) {
-      sources += [
-        "platform/ax_fragment_root_win_unittest.cc",
-        "platform/ax_platform_node_textchildprovider_win_unittest.cc",
-        "platform/ax_platform_node_textprovider_win_unittest.cc",
-        "platform/ax_platform_node_textrangeprovider_win_unittest.cc",
-        "platform/ax_platform_node_win_unittest.cc",
-        "platform/ax_platform_node_win_unittest.h",
-        "platform/browser_accessibility_manager_win_unittest.cc",
-        "platform/browser_accessibility_win_unittest.cc",
-        "platform/iaccessible2/scoped_co_mem_array_unittest.cc",
-        "platform/uia_client_info_source_win_unittest.cc",
-      ]
-
-      deps += [
-        "//third_party/iaccessible2",
-        "//ui/accessibility/platform:ichromeaccessible",
-      ]
-
-      libs = [
-        "oleacc.lib",
-        "uiautomationcore.lib",
-      ]
-    }
-
     if (is_mac) {
       sources += [
         "platform/ax_platform_node_cocoa_unittest.mm",
@@ -439,22 +410,6 @@ fuzzer_test("ax_node_position_fuzzer") {
     ":test_support",
     "//base/test:test_support",
   ]
-}
-
-if (is_win) {
-  fuzzer_test("ax_platform_node_textrangeprovider_win_fuzzer") {
-    sources = [
-      "ax_tree_fuzzer_util.cc",
-      "ax_tree_fuzzer_util.h",
-      "platform/ax_platform_node_textrangeprovider_win_fuzzer.cc",
-    ]
-
-    deps = [
-      ":accessibility",
-      ":test_support",
-      "//base/test:test_support",
-    ]
-  }
 }
 
 test("accessibility_perftests") {

@@ -135,12 +135,6 @@ source_set("tests") {
     # enable the diagnostic by removing this line.
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
   }
-  if (is_win) {
-    sources += [
-      "face_detection_impl_win_unittest.cc",
-      "text_detection_impl_win_unittest.cc",
-    ]
-  }
 
   if (build_with_internal_shape_detection) {
     sources += [ "barcode_detection_impl_chrome_unittest.cc" ]

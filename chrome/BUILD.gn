@@ -70,32 +70,6 @@ if (is_win && enable_resource_allowlist_generation) {
   _chrome_resource_allowlist = "$target_gen_dir/chrome_resource_allowlist.txt"
 }
 
-if (is_win) {
-  action("reorder_imports") {
-    script = "//build/win/reorder-imports.py"
-
-    # initialexe/ is used so that the we can reorder imports and write back to
-    # the final destination at $root_out_dir/.
-    inputs = [
-      "$root_out_dir/initialexe/chrome.exe",
-      "$root_out_dir/initialexe/chrome.exe.pdb",
-    ]
-    outputs = [
-      "$root_out_dir/chrome.exe",
-      "$root_out_dir/chrome.exe.pdb",
-    ]
-    args = [
-      "-i",
-      rebase_path("$root_out_dir/initialexe", root_build_dir),
-      "-o",
-      rebase_path("$root_out_dir", root_build_dir),
-      "-a",
-      current_cpu,
-    ]
-    deps = [ ":chrome_initial" ]
-  }
-}
-
 # This does not currently work. See crbug.com/40220356.
 # This target exists above chrome and it's main components in the dependency
 # tree as a central place to put assert_no_deps annotations. Since this depends
@@ -110,10 +84,6 @@ group("assert_no_deps") {
     deps += [ ":chrome" ]
   }
 
-  if (is_win) {
-    deps += [ ":chrome_dll" ]
-  }
-
   # This should not pull in installer strings. This is will bloat the binary
   # for no reason and is easy to mess up. See the comment at the top of
   # //chrome/installer/util/BUILD.gn.
@@ -125,18 +95,6 @@ if (!is_android && !is_mac) {
     public_deps = [ ":chrome_initial" ]
     data_deps = [ ":chrome_initial" ]
 
-    # Do not add any more deps or data_deps to group("chrome").
-    # Because chrome_initial sets its output name to "chrome", running commands
-    # such as `ninja chrome` causes chrome_initial to be built instead. All
-    # deps and data_deps should be added to the chrome_initial target instead.
-    # Targets added here can only be built by explicitly using //chrome:chrome.
-    # Windows-only deps are OK because chrome_initial uses initialexe/chrome as
-    # the output name for that platform.
-    # See crbug.com/40156324.
-    if (is_win) {
-      public_deps += [ ":reorder_imports" ]
-      data_deps += [ ":reorder_imports" ]
-    }
   }
 
   if (is_win) {
@@ -1621,31 +1579,6 @@ group("dependencies") {
   }
 }
 
-if (is_win) {
-  process_version_rc_template("chrome_exe_version") {
-    sources = [ "app/chrome_exe.ver" ]
-    output = "$target_gen_dir/chrome_exe_version.rc"
-  }
-
-  process_version_rc_template("chrome_dll_version") {
-    sources = [ "app/chrome_dll.ver" ]
-    output = "$target_gen_dir/chrome_dll_version.rc"
-  }
-
-  # This manifest matches what GYP produced. It may not even be necessary.
-  windows_manifest("chrome_dll_manifest") {
-    sources = [
-      as_invoker_manifest,
-      common_controls_manifest,
-    ]
-  }
-
-  process_version_rc_template("other_version") {
-    sources = [ "app/other.ver" ]
-    output = "$target_gen_dir/other_version.rc"
-  }
-}
-
 copy("visual_elements_resources") {
   sources = [
     "//chrome/app/theme/$branding_path_component/win/tiles/Logo.png",
@@ -1932,13 +1865,6 @@ if (enable_separate_renderer_binary) {
     _chrome_renderer_deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 
-  if (is_win) {
-    process_version_rc_template("chrome_renderer_dll_version") {
-      sources = [ "app/chrome_renderer_dll.ver" ]
-      output = "$target_gen_dir/chrome_renderer_dll_version.rc"
-    }
-  }
-
   if (is_win || is_mac) {
     shared_library("chrome_renderer") {
       if (enable_separate_pgo) {
@@ -1950,15 +1876,6 @@ if (enable_separate_renderer_binary) {
         output_name = "renderer"
       }
 
-      if (is_win) {
-        # On Windows, chrome_renderer is built as a shared library DLL, so match
-        # the compiler and linker configs from :chrome_dll.
-        configs += [ "//build/config/compiler:wexit_time_destructors" ]
-        configs -= [ "//build/config/compiler:thinlto_optimize_default" ]
-        configs += [ "//build/config/compiler:thinlto_optimize_max" ]
-        configs += [ "//build/config/win:delayloads" ]
-      }
-
       sources = _chrome_renderer_sources
       if (is_mac) {
         sources += [
@@ -1966,20 +1883,9 @@ if (enable_separate_renderer_binary) {
           "app/chrome_crash_reporter_client.h",
         ]
       }
-      if (is_win) {
-        sources += [ "//base/win/dllmain.cc" ]
-      }
 
       defines = [ "BUILDING_CHROME_RENDERER" ]
       deps = _chrome_renderer_deps + [ "//chrome/child" ]
-      if (is_win) {
-        deps += [
-          ":chrome_renderer_dll_version",
-          "//chrome/chrome_elf",
-          "//chrome/install_static:secondary_module",
-          "//sandbox/win:sandbox",
-        ]
-      }
     }
   } else {
     executable("chrome_renderer") {

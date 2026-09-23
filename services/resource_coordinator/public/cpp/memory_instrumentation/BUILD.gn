@@ -23,10 +23,6 @@ component("memory_instrumentation") {
     sources += [ "os_metrics_mac.cc" ]
   }
 
-  if (is_win) {
-    sources += [ "os_metrics_win.cc" ]
-  }
-
   if (is_android || is_linux) {
     sources += [ "os_metrics_linux.cc" ]
   }
@@ -34,9 +30,6 @@ component("memory_instrumentation") {
   defines = [ "IS_RESOURCE_COORDINATOR_PUBLIC_MEMORY_INSTRUMENTATION_IMPL" ]
 
   deps = []
-  if (is_win) {
-    deps += [ "//base/win:pe_image" ]
-  }
 
   public_deps = [
     "//base",

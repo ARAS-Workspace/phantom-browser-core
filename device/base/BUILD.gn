@@ -20,13 +20,4 @@ component("base") {
     "//device/vr/buildflags",
   ]
 
-  if (is_win) {
-    sources += [
-      "device_monitor_win.cc",
-      "device_monitor_win.h",
-      "event_utils_winrt.h",
-    ]
-    public_deps += [ "//third_party/abseil-cpp:absl" ]
-    libs = [ "setupapi.lib" ]
-  }
 }

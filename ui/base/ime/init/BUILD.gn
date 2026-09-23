@@ -24,9 +24,6 @@ component("init") {
 
   deps = [ "//ui/base" ]
 
-  if (is_win) {
-    deps += [ "//ui/base/ime/win" ]
-  }
   if (is_mac) {
     deps += [ "//ui/base/ime/mac" ]
   }

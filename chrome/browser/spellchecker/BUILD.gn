@@ -181,9 +181,6 @@ if (!is_android) {
       sources += [ "spell_check_host_chrome_impl_mac_browsertest.cc" ]
     }
 
-    if (is_win) {
-      sources += [ "spell_check_host_chrome_impl_win_browsertest.cc" ]
-    }
   }
 }
 

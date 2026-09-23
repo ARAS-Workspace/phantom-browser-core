@@ -18,13 +18,5 @@ if (is_win || is_android || is_linux) {
     if (is_linux) {
       deps += [ "//sandbox/policy" ]
     }
-    if (is_win) {
-      sources += [ "sandbox_handler.cc" ]
-      public += [ "sandbox_handler.h" ]
-      deps += [
-        "//content/public/common",
-        "//sandbox/policy",
-      ]
-    }
   }
 }

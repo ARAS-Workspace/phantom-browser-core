@@ -320,13 +320,6 @@ source_set("common") {
     sources += [ "font_list_mac.mm" ]
   }
 
-  if (is_win) {
-    sources += [
-      "font_cache_dispatcher_win.cc",
-      "font_list_win.cc",
-    ]
-  }
-
   sources -= [ "cursors/webcursor_ash.cc" ]
 
   if (use_aura) {
@@ -420,10 +413,6 @@ mojom("mojo_bindings") {
 
   if (is_linux) {
     sources += [ "thread_type_switcher.mojom" ]
-  }
-
-  if (is_win) {
-    sources += [ "sandbox_support.mojom" ]
   }
 
   enabled_features = []

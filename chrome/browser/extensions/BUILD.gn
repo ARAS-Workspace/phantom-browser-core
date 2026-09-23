@@ -1787,10 +1787,6 @@ source_set("unit_tests") {
       "//ui/base/clipboard:clipboard_test_support",
     ]
 
-    if (is_win) {
-      sources += [ "external_registry_loader_win_unittest.cc" ]
-    }
-
     if (is_win || is_mac) {
       sources += [ "policy_dse_ntp_override_metrics_reporter_unittest.cc" ]
     }
@@ -2313,14 +2309,6 @@ source_set("browser_tests") {
 
     sources -=
         [ "api/braille_display_private/braille_display_private_apitest.cc" ]
-
-    if (is_win) {
-      data_deps += [
-        "//chrome/browser/extensions/api/messaging:native_messaging_test_echo_&_host",
-        "//chrome/browser/extensions/api/messaging:native_messaging_test_echo_host",
-        "//chrome/browser/extensions/api/messaging:native_messaging_test_echo_space_host",
-      ]
-    }
 
     if (enable_pdf) {
       sources += [ "api/pdf_viewer_private/pdf_viewer_private_apitest.cc" ]

@@ -88,28 +88,6 @@ component("service") {
   ]
   libs = []
   ldflags = []
-  if (is_win) {
-    sources += [
-      "dcomp_texture_win.cc",
-      "dcomp_texture_win.h",
-      "image_transport_surface_win.cc",
-    ]
-    if (skia_use_dawn) {
-      sources += [
-        "dawn_texture_solid_color_pool.cc",
-        "dawn_texture_solid_color_pool.h",
-      ]
-    }
-    libs += [
-      "d3d11.lib",
-      "dcomp.lib",
-      "dxguid.lib",
-    ]
-
-    if (enable_ml_internal) {
-      deps += [ "//services/webnn/public/mojom:features" ]
-    }
-  }
   if (is_apple) {
     sources += [
       "image_transport_surface_overlay_mac.h",

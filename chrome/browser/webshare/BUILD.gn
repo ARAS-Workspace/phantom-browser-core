@@ -41,13 +41,6 @@ if (is_win || is_mac) {
       public += [ "safe_browsing_request.h" ]
     }
 
-    if (is_win) {
-      public += [
-        "win/share_operation.h",
-        "win/show_share_ui_for_window_operation.h",
-      ]
-    }
-
     if (is_mac) {
       public += [ "mac/sharing_service_operation.h" ]
     }
@@ -74,19 +67,6 @@ if (is_win || is_mac) {
         "//components/safe_browsing/core/browser/db:database_manager",
         "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
         "//components/safe_browsing/core/common",
-      ]
-    }
-
-    if (is_win) {
-      sources += [
-        "win/share_operation.cc",
-        "win/show_share_ui_for_window_operation.cc",
-      ]
-      deps += [
-        "//chrome/browser/profiles",
-        "//net",
-        "//storage/browser",
-        "//ui/display",
       ]
     }
 
@@ -127,48 +107,9 @@ if (is_win || is_mac) {
       deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
     }
 
-    if (is_win) {
-      deps += [ ":test_support" ]
-    }
-
     if (is_mac) {
       sources += [ "mac/sharing_service_operation_browsertest.cc" ]
     }
-  }
-}
-
-if (is_win) {
-  source_set("test_support") {
-    testonly = true
-
-    sources = [
-      "win/fake_buffer.cc",
-      "win/fake_buffer.h",
-      "win/fake_data_transfer_manager.cc",
-      "win/fake_data_transfer_manager.h",
-      "win/fake_data_transfer_manager_interop.cc",
-      "win/fake_data_transfer_manager_interop.h",
-      "win/fake_data_writer_factory.cc",
-      "win/fake_data_writer_factory.h",
-      "win/fake_iasync_operation_with_progress.h",
-      "win/fake_random_access_stream.cc",
-      "win/fake_random_access_stream.h",
-      "win/fake_storage_file_statics.cc",
-      "win/fake_storage_file_statics.h",
-      "win/fake_uri_runtime_class_factory.cc",
-      "win/fake_uri_runtime_class_factory.h",
-      "win/scoped_fake_data_transfer_manager_interop.cc",
-      "win/scoped_fake_data_transfer_manager_interop.h",
-      "win/scoped_share_operation_fake_components.cc",
-      "win/scoped_share_operation_fake_components.h",
-    ]
-
-    deps = [
-      ":webshare",
-      "//base",
-      "//base/test:test_support",
-      "//testing/gtest",
-    ]
   }
 }
 
@@ -185,20 +126,6 @@ source_set("unit_tests") {
     sources += [ "mac/sharing_service_operation_unittest.cc" ]
   }
 
-  if (is_win) {
-    sources += [
-      "win/fake_buffer_unittest.cc",
-      "win/fake_data_transfer_manager_interop_unittest.cc",
-      "win/fake_data_transfer_manager_unittest.cc",
-      "win/fake_data_writer_factory_unittest.cc",
-      "win/fake_random_access_stream_unittest.cc",
-      "win/fake_storage_file_statics_unittest.cc",
-      "win/fake_uri_runtime_class_factory_unittest.cc",
-      "win/share_operation_unittest.cc",
-      "win/show_share_ui_for_window_operation_unittest.cc",
-    ]
-  }
-
   deps = [
     "//base/test:test_support",
     "//chrome/browser",
@@ -212,10 +139,6 @@ source_set("unit_tests") {
 
   if (is_win || is_mac) {
     deps += [ "//chrome/browser/webshare" ]
-  }
-
-  if (is_win) {
-    deps += [ ":test_support" ]
   }
 
   if (is_mac) {

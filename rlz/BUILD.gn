@@ -155,10 +155,6 @@ if (enable_rlz_support) {
       "test/rlz_unittest_main.cc",
     ]
 
-    if (is_win) {
-      sources += [ "win/lib/machine_deal_test.cc" ]
-    }
-
     deps = [
       ":rlz_lib",
       ":rlz_utils",

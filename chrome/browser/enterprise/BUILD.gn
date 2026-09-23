@@ -155,14 +155,6 @@ source_set("enterprise") {
     ]
   }
 
-  if (is_win) {
-    public += [
-      "platform_auth/cloud_ap_provider_win.h",
-      "platform_auth/cloud_ap_utils_win.h",
-      "signals/device_info_fetcher_win.h",
-    ]
-  }
-
   if (is_mac) {
     public += [
       "platform_auth/extensible_enterprise_sso_entra.h",
@@ -488,15 +480,6 @@ source_set("impl") {
       "platform_auth/platform_auth_policy_observer.cc",
       "platform_auth/platform_auth_provider_manager.cc",
     ]
-  }
-
-  if (is_win) {
-    sources += [
-      "platform_auth/cloud_ap_provider_win.cc",
-      "platform_auth/cloud_ap_utils_win.cc",
-      "signals/device_info_fetcher_win.cc",
-    ]
-    deps += [ "//components/device_signals/core/browser/win" ]
   }
 
   if (is_mac) {

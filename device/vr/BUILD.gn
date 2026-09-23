@@ -252,29 +252,6 @@ if (enable_vr) {
 
       deps += [ "//third_party/blink/public:blink_headers" ]
 
-      if (is_win) {
-        libs = [
-          "d3d11.lib",
-          "dxgi.lib",
-        ]
-
-        sources += [
-          "openxr/windows/openxr_graphics_binding_d3d11.cc",
-          "openxr/windows/openxr_graphics_binding_d3d11.h",
-          "openxr/windows/openxr_instance_wrapper.cc",
-          "openxr/windows/openxr_instance_wrapper.h",
-          "openxr/windows/openxr_platform_helper_windows.cc",
-          "openxr/windows/openxr_platform_helper_windows.h",
-          "windows/d3d11_texture_helper.cc",
-          "windows/d3d11_texture_helper.h",
-          "windows/flip_pixel_shader.h",
-          "windows/geometry_shader.h",
-          "windows/vertex_shader.h",
-        ]
-
-        deps += [ ":directx_helpers" ]
-      }
-
       deps += [
         ":openxr_data",
         "//components/version_info",
@@ -337,21 +314,6 @@ if (enable_vr) {
     ]
   }
 
-  if (is_win) {
-    static_library("directx_helpers") {
-      sources = [
-        "windows/d3d11_device_helpers.cc",
-        "windows/d3d11_device_helpers.h",
-      ]
-
-      libs = [
-        "d3d11.lib",
-        "dxgi.lib",
-      ]
-
-      deps = [ "//base" ]
-    }
-  }
 } else {
   source_set("vr") {
     # We need to include an empty .cc file so that mac and windows don't fall
@@ -410,12 +372,6 @@ if (enable_openxr) {
         "//ui/gl",
       ]
 
-      if (is_win) {
-        libs = [
-          "d3d11.lib",
-          "dxgi.lib",
-        ]
-      }
     }
 
     shared_library("openxr_mock") {

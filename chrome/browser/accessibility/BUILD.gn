@@ -89,10 +89,6 @@ source_set("impl") {
     sources += [ "caption_settings_dialog_mac.cc" ]
   }
 
-  if (is_win) {
-    sources += [ "caption_settings_dialog_win.cc" ]
-  }
-
   if (enable_extensions) {
     sources += [ "animation_policy_prefs.cc" ]
   }
@@ -186,33 +182,5 @@ if (!is_android) {
     if (enable_screen_ai_browsertests) {
       data_deps += [ "//third_party/screen-ai:screen_ai" ]
     }
-  }
-}
-
-if (is_win) {
-  source_set("test_support") {
-    testonly = true
-
-    public = [ "browser_test_with_ax_client.h" ]
-    sources = [ "browser_test_with_ax_client.cc" ]
-
-    public_deps = [
-      "//base",
-      "//chrome/browser/profiles:profile",
-      "//chrome/test:test_support_ui",
-      "//chrome/test/accessibility/ax_client:launcher",
-      "//chrome/test/accessibility/ax_client:mojom",
-      "//mojo/public/cpp/bindings",
-      "//ui/accessibility",
-    ]
-
-    deps = [
-      "//chrome/browser:browser_process",
-      "//chrome/browser/accessibility",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/browser_window",
-      "//components/sync_preferences",
-      "//ui/accessibility",
-    ]
   }
 }

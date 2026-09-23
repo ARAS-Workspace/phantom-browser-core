@@ -188,21 +188,6 @@ source_set("tests") {
     deps += [ "//services/device/compute_pressure" ]
   }
 
-  if (is_win) {
-    sources += [
-      "battery/battery_status_manager_win_unittest.cc",
-      "generic_sensor/platform_sensor_and_provider_unittest_win.cc",
-      "geolocation/wifi_data_provider_win_unittest.cc",
-      "hid/hid_service_win_unittest.cc",
-      "public/cpp/device_features_win_unittest.cc",
-      "public/cpp/geolocation/system_geolocation_source_win_unittest.cc",
-    ]
-    deps += [
-      "//services/device/public/proto:hid_gcpw_proto",
-      "//third_party/protobuf:protobuf_lite",
-    ]
-  }
-
   if (os_level_geolocation_permission_supported) {
     sources += [ "public/cpp/geolocation/geolocation_system_permission_manager_unittest.cc" ]
   }
@@ -291,10 +276,6 @@ source_set("tests") {
       sources += [ "serial/serial_io_handler_posix_unittest.cc" ]
     }
 
-    if (is_win) {
-      sources += [ "serial/serial_device_enumerator_win_unittest.cc" ]
-    }
-
     if (is_linux) {
       deps += [ "//device/udev_linux:test_support" ]
     }
@@ -370,31 +351,6 @@ source_set("tests") {
     deps += [ "//third_party/libusb" ]
   }
 
-  if (is_win) {
-    sources += [
-      "generic_sensor/platform_sensor_provider_winrt_unittest.cc",
-      "generic_sensor/platform_sensor_reader_winrt_unittest.cc",
-      "geolocation/win/fake_geocoordinate_winrt.cc",
-      "geolocation/win/fake_geocoordinate_winrt.h",
-      "geolocation/win/fake_geolocator_winrt.cc",
-      "geolocation/win/fake_geolocator_winrt.h",
-      "geolocation/win/fake_geoposition_winrt.cc",
-      "geolocation/win/fake_geoposition_winrt.h",
-      "geolocation/win/fake_position_changed_event_args_winrt.cc",
-      "geolocation/win/fake_position_changed_event_args_winrt.h",
-      "geolocation/win/fake_status_changed_event_args_winrt.cc",
-      "geolocation/win/fake_status_changed_event_args_winrt.h",
-      "geolocation/win/location_provider_winrt_unittest.cc",
-      "hid/hid_preparsed_data_unittest.cc",
-    ]
-
-    # Needed for "generic_sensor/platform_sensor_and_provider_unittest_win.cc"
-    libs = [
-      "propsys.lib",
-      "sensorsapi.lib",
-    ]
-  }
-
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
@@ -453,14 +409,6 @@ source_set("utility") {
       "utils/mac_utils.cc",
       "utils/mac_utils.h",
     ]
-  }
-  if (is_win) {
-    sources += [
-      "utils/setupdi_utils_win.cc",
-      "utils/setupdi_utils_win.h",
-    ]
-    libs = [ "setupapi.lib" ]
-    public_deps = [ "//components/device_event_log" ]
   }
   deps = [ "//base" ]
 }

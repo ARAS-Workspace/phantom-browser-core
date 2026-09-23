@@ -221,63 +221,6 @@ component("base") {
 
   libs = []
 
-  if (is_win) {
-    sources += [
-      "dragdrop/drag_source_win.cc",
-      "dragdrop/drag_source_win.h",
-      "dragdrop/drop_target_win.cc",
-      "dragdrop/drop_target_win.h",
-      "dragdrop/os_exchange_data_provider_win.cc",
-      "dragdrop/os_exchange_data_provider_win.h",
-      "l10n/l10n_util_win.cc",
-      "l10n/l10n_util_win.h",
-      "resource/resource_bundle_win.cc",
-      "resource/resource_bundle_win.h",
-      "resource/resource_data_dll_win.cc",
-      "resource/resource_data_dll_win.h",
-      "win/accessibility_ids_win.h",
-      "win/atl_module.h",
-      "win/event_creation_utils.cc",
-      "win/event_creation_utils.h",
-      "win/foreground_helper.cc",
-      "win/foreground_helper.h",
-      "win/hidden_window.cc",
-      "win/hidden_window.h",
-      "win/hwnd_metrics.cc",
-      "win/hwnd_metrics.h",
-      "win/hwnd_subclass.cc",
-      "win/hwnd_subclass.h",
-      "win/internal_constants.h",
-      "win/lock_state.cc",
-      "win/lock_state.h",
-      "win/message_box_win.cc",
-      "win/message_box_win.h",
-      "win/mouse_wheel_util.cc",
-      "win/mouse_wheel_util.h",
-      "win/power_setting_change_listener.cc",
-      "win/power_setting_change_listener.h",
-      "win/scoped_ole_initializer.cc",
-      "win/scoped_ole_initializer.h",
-      "win/session_change_observer.cc",
-      "win/session_change_observer.h",
-      "win/shell.cc",
-      "win/shell.h",
-      "win/touch_input.cc",
-      "win/touch_input.h",
-      "win/win_cursor.cc",
-      "win/win_cursor.h",
-      "win/win_cursor_factory.cc",
-      "win/win_cursor_factory.h",
-      "win/window_event_target.cc",
-      "win/window_event_target.h",
-    ]
-    ldflags = [ "/DELAYLOAD:dwmapi.dll" ]
-    libs += [
-      "dwmapi.lib",
-      "wtsapi32.lib",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "cocoa/accessibility_focus_overrider.h",
@@ -522,14 +465,6 @@ component("base") {
     ]
   }
 
-  if (is_win) {
-    public_deps += [
-      "//ui/base/cursor",
-      "//ui/base/cursor/mojom:cursor_type_shared",
-    ]
-    deps += [ "//ui/resources:ui_unscaled_resources_grd" ]
-  }
-
   if (is_mac) {
     public_deps += [ "//ui/base/cursor" ]
     deps += [ "//ui/resources:ui_resources_grd" ]
@@ -738,13 +673,6 @@ static_library("test_support") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "test/ui_controls_internal_win.cc",
-      "test/ui_controls_internal_win.h",
-    ]
-  }
-
   if (!is_ios) {
     sources += [
       "accelerators/test_accelerator_target.cc",
@@ -823,9 +751,6 @@ static_library("test_support") {
       "//ui/events",
     ]
 
-    if (is_win) {
-      deps += [ "//ui/base/ime/win" ]
-    }
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -880,14 +805,6 @@ source_set("run_all_unittests") {
     "//ui/base",
     "//ui/display",
   ]
-}
-
-if (is_win) {
-  executable("shell_test_helper") {
-    testonly = true
-    sources = [ "win/shell_test_helper.cc" ]
-    deps = [ "//base" ]
-  }
 }
 
 test("ui_base_unittests") {
@@ -1064,14 +981,6 @@ test("ui_base_unittests") {
       "//ui/base/ime:text_edit_commands",
       "//ui/base/ime/mojom:test_interfaces",
     ]
-    if (is_win) {
-      sources += [
-        "ime/win/on_screen_keyboard_display_manager_unittest.cc",
-        "ime/win/tsf_input_scope_unittest.cc",
-        "ime/win/tsf_text_store_unittest.cc",
-      ]
-      deps += [ "//ui/base/ime/win" ]
-    }
     if (is_linux && use_aura) {
       sources += [
         "dragdrop/os_exchange_data_provider_non_backed_unittest.cc",
@@ -1109,24 +1018,6 @@ test("ui_base_unittests") {
       "//ui/base/accelerators/mojom:unittests",
       "//ui/base/cursor/mojom:unittests",
     ]
-  }
-
-  if (is_win) {
-    sources += [
-      "dragdrop/os_exchange_data_win_unittest.cc",
-      "view_prop_unittest.cc",
-      "win/hwnd_subclass_unittest.cc",
-      "win/shell_unittest.cc",
-      "win/win_cursor_factory_unittest.cc",
-    ]
-    deps += [
-      "//ui/base/cursor",
-      "//ui/base/cursor/mojom:cursor_type_shared",
-      "//ui/base/idle:unit_tests",
-    ]
-    if (!is_component_build && !is_asan) {
-      data_deps += [ ":shell_test_helper" ]
-    }
   }
 
   if (use_pangocairo) {
@@ -1221,18 +1112,6 @@ if (is_mac) {
   }
 }
 
-if (is_win) {
-  # This source set is used by both //chrome/browser and
-  # //chrome/installer/setup.  It must have minimal dependencies for the latter
-  # (e.g., no skia).
-  source_set("fullscreen_win") {
-    sources = [
-      "fullscreen_win.cc",
-      "fullscreen_win.h",
-    ]
-  }
-}
-
 if (is_linux) {
   # This source set defines linux wm role names and must not have any external
   # dependencies and be kept as minimal as possible.
@@ -1245,18 +1124,6 @@ if (is_linux) {
 # be source_set, otherwise the linker will drop the tests as dead code.
 source_set("base_interactive_ui_tests") {
   testonly = true
-  if (is_win) {
-    sources =
-        [ "accelerators/global_media_keys_listener_win_interactive_test.cc" ]
-
-    deps = [
-      ":base",
-      ":test_support",
-      "//base/test:test_support",
-      "//testing/gtest",
-      "//ui/events",
-    ]
-  }
 }
 
 fuzzer_test("file_info_fuzzer") {

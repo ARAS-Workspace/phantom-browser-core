@@ -268,10 +268,6 @@ static_library("content_shell_lib") {
     ]
   }
 
-  if (is_win) {
-    sources += [ "browser/shell_javascript_dialog_win.cc" ]
-  }
-
   configs += [
     ":content_shell_lib_warnings",
     "//build/config:precompiled_headers",
@@ -374,14 +370,6 @@ static_library("content_shell_lib") {
       "browser/shell_plugin_service_filter.cc",
       "browser/shell_plugin_service_filter.h",
     ]
-  }
-
-  if (is_win) {
-    sources += [
-      "common/v8_crashpad_support_win.cc",
-      "common/v8_crashpad_support_win.h",
-    ]
-    deps += [ "//gin" ]
   }
 
   if (is_linux) {
@@ -714,10 +702,6 @@ if (is_android) {
 
     sources = [ "app/shell_main.cc" ]
 
-    if (is_win) {
-      sources += [ "app/shell.rc" ]
-    }
-
     defines = []
 
     deps = [
@@ -733,27 +717,6 @@ if (is_android) {
       ":pak",
       "//tools/v8_context_snapshot",
     ]
-
-    if (is_win) {
-      deps += [
-        "//base",
-        "//sandbox",
-      ]
-      if (win_console_app) {
-        defines += [ "WIN_CONSOLE_APP" ]
-      } else {
-        # Set /SUBSYSTEM:WINDOWS unless a console build has been requested.
-        configs -= [ "//build/config/win:console" ]
-        configs += [ "//build/config/win:windowed" ]
-      }
-
-      # Limit pre-loaded modules to improve sandbox coverage in content_shell.
-      configs += [ "//build/config/win:delayloads" ]
-
-      # Increase the initial stack size. The default is 1MB, this is 8MB.
-      # This matches the chrome.exe.
-      ldflags = [ "/STACK:0x800000" ]
-    }
 
     if (is_win) {
       data_deps +=
@@ -1061,9 +1024,6 @@ group("content_shell_crash_test") {
       "//components/crash/content/tools/generate_breakpad_symbols.py",
       "//components/crash/content/tools/dmp2minidump.py",
     ]
-  }
-  if (is_win) {
-    data_deps += [ "//build/win:copy_cdb_to_output" ]
   }
   if (is_posix) {
     data_deps += [

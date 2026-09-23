@@ -42,10 +42,6 @@ import("//ui/webui/webui_features.gni")
 
 assert(enable_supervised_users)
 
-if (is_win) {
-  import("//build/config/win/manifest.gni")
-}
-
 declare_args() {
   # You can set the variable 'use_official_enterprise_connectors_api_keys' to
   # true to use the Google-internal file containing official API keys
@@ -59,24 +55,6 @@ declare_args() {
   use_official_enterprise_connectors_api_keys = false
 }
 
-if (is_win) {
-  # This is in a separate config so the flags can be applied to dependents.
-  # ldflags in GN aren't automatically inherited.
-  config("browser_win_linker_flags") {
-    libs = [
-      "credui.lib",
-      "cryptui.lib",
-      "dwmapi.lib",
-      "imm32.lib",  # chrome_elf_init.cc
-      "netapi32.lib",
-      "ndfapi.lib",  # For browser/net/net_error_diagnostics_dialog_win.h
-      "wbemuuid.lib",  # For browser/metrics /
-                       # antivirus_metrics_provider_win.cc
-    ]
-    ldflags = [ "/DELAYLOAD:ndfapi.dll" ]
-  }
-}
-
 buildflag_header("buildflags") {
   header = "buildflags.h"
   flags = [
@@ -85,10 +63,6 @@ buildflag_header("buildflags") {
     "USE_MINIKIN_HYPHENATION=$use_minikin_hyphenation",
     "USE_THIN_LTO=$use_thin_lto",
   ]
-
-  if (is_win) {
-    flags += [ "ENABLE_SEGMENT_HEAP=$enable_segment_heap" ]
-  }
 
   # Android and ChromeOS don't support multiple browser processes, so they don't
   # employ ProcessSingleton.
@@ -172,9 +146,6 @@ source_set("flags") {
 
 source_set("shell_integration") {
   sources = [ "shell_integration.h" ]
-  if (is_win) {
-    sources += [ "shell_integration_win.h" ]
-  }
   deps = [
     "//base",
     "//ui/gfx",
@@ -222,9 +193,6 @@ source_set("browser_process_impl") {
       "//chrome/browser/upgrade_detector",
       "//components/keep_alive_registry",
     ]
-  }
-  if (is_win) {
-    deps += [ "//chrome/browser/win:isolated_browser_support" ]
   }
 }
 
@@ -546,13 +514,6 @@ if (is_mac) {
 
   source_set("global_keyboard_shortcuts_mac") {
     public = [ "global_keyboard_shortcuts_mac.h" ]
-  }
-}
-
-if (is_win) {
-  source_set("font_prewarmer_tab_helper") {
-    public = [ "font_prewarmer_tab_helper.h" ]
-    deps = [ "//content/public/browser" ]
   }
 }
 
@@ -1125,90 +1086,6 @@ source_set("core") {
       "//components/on_device_translation",
       "//components/on_device_translation:features",
     ]
-  }
-
-  if (is_win) {
-    sources += [
-      "chrome_browser_main_win.cc",
-      "chrome_browser_main_win.h",
-      "font_prewarmer_tab_helper.cc",
-      "fullscreen_win.cc",
-      "icon_loader_win.cc",
-      "memory_details_win.cc",
-      "platform_util_win.cc",
-      "process_singleton_win.cc",
-      "shell_integration_win.cc",
-    ]
-
-    libs = [
-      "secur32.lib",
-
-      # Needed for _variant_t used in browser_dm_token_storage_win.cc
-      "comsuppw.lib",
-    ]
-
-    deps += [
-      ":font_prewarmer_tab_helper",
-      ":fullscreen",
-      "//chrome/app:chrome_exe_main_exports",
-      "//chrome/app/theme:chrome_unscaled_resources_grit",
-      "//chrome/browser/install_verification:impl",
-      "//chrome/browser/os_crypt",
-      "//chrome/browser/platform_experience:prefs",
-      "//chrome/browser/shortcuts",
-      "//chrome/browser/startup",
-      "//chrome/browser/ui:uninstall_browser_prompt",
-      "//chrome/browser/web_applications/chrome_pwa_launcher:util",
-      "//chrome/browser/webnn",
-      "//chrome/browser/webshare:impl",
-      "//chrome/browser/win:chrome_process_finder",
-      "//chrome/browser/win:cloud_synced_folder_checker",
-      "//chrome/browser/win:isolated_browser_support",
-      "//chrome/browser/win:registry_watcher",
-      "//chrome/browser/win/conflicts:module_info",
-      "//chrome/chrome_elf:constants",
-      "//chrome/chrome_elf:dll_hash",
-      "//chrome/chrome_elf:third_party_shared_defines",
-      "//chrome/common:version_header",
-      "//chrome/credential_provider/common:common_constants",
-      "//chrome/elevation_service:public_headers",
-      "//chrome/install_static:install_static_util",
-      "//chrome/installer/util:isolation_support",
-      "//chrome/installer/util:with_no_strings",
-      "//chrome/notification_helper:constants",
-      "//chrome/services/util_win/public/mojom",
-      "//chrome/updater/app/server/win:updater_legacy_idl",
-      "//chrome/windows_services/elevated_tracing_service:tracing_service_idl",
-      "//components/app_launch_prefetch",
-      "//components/crash/core/app",
-      "//components/crash/core/app:crash_export_thunk_include",
-      "//components/device_signals/core/browser/win",
-      "//components/os_crypt/async/browser:dpapi_key_provider",
-      "//components/stylus_handwriting/win",
-      "//media/mojo/services",
-      "//sandbox/win:sandbox",
-      "//services/proxy_resolver/public/mojom",
-      "//third_party/crashpad/crashpad/client",
-      "//third_party/iaccessible2",
-      "//third_party/isimpledom",
-      "//third_party/wtl",
-      "//ui/aura_extra",
-      "//ui/base:fullscreen_win",
-      "//ui/color:accent_color_observer",
-      "//ui/display/util",
-    ]
-
-    all_dependent_configs = [ ":browser_win_linker_flags" ]
-
-    if (is_chrome_branded) {
-      deps += [
-        "//chrome/browser/platform_experience/installer:installer_win",
-        "//chrome/browser/win/installer_downloader:controller",
-        "//chrome/browser/win/installer_downloader:infobar",
-        "//chrome/browser/win/installer_downloader:infobar_impl",
-        "//chrome/updater/app/server/win:updater_legacy_idl",
-      ]
-    }
   }
 
   if (is_mac) {
@@ -2423,10 +2300,6 @@ source_set("browser") {
       "//ui/webui/resources/cr_components/history_embeddings:mojo_bindings",
     ]
 
-    if (is_win) {
-      deps += [ "//chrome/browser/ui/webui/signin:inline_login_impl" ]
-    }
-
     #!is_android
     deps += [
       "//chrome/browser/default_browser",
@@ -2445,11 +2318,6 @@ source_set("browser") {
       "//chrome/browser/ui/webui/signin:profile",
       "//chrome/browser/ui/webui/signin:profile_impl",
     ]
-
-    if (is_win) {
-      deps +=
-          [ "//chrome/browser/ui/webui/default_browser:visual_guided_setter" ]
-    }
 
     if (!is_win) {
       deps += [ ":process_singleton_posix" ]
@@ -2933,15 +2801,6 @@ group("browser_public_dependencies") {
       "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
     ]
   }
-  if (is_win) {
-    public_deps += [
-      ":titlebar_config",
-      "//build:branding_buildflags",
-      "//chrome/services/util_win/public/mojom",
-      "//ui/views",
-      "//ui/views/controls/webview",
-    ]
-  }
   if (is_linux || is_win || is_mac) {
     public_deps += [ "//components/enterprise/core" ]
   }
@@ -3049,9 +2908,6 @@ group("browser_generated_files") {
     public_deps += [ "//chrome/browser/ui/webui/discards:mojo_bindings" ]
   }
 
-  if (is_win) {
-    public_deps += [ "//chrome/browser/ui/startup:buildflags" ]
-  }
   if (is_win || is_mac || is_linux) {
     public_deps += [
       "//chrome/browser/ui/webui/app_home:mojo_bindings",
@@ -3139,13 +2995,6 @@ source_set("font_pref") {
 source_set("active_use_util") {
   sources = [ "active_use_util.h" ]
   public_deps = [ "//chrome/install_static:buildflags" ]
-}
-
-if (is_win) {
-  source_set("titlebar_config") {
-    sources = [ "win/titlebar_config.h" ]
-    deps = [ "//base" ]
-  }
 }
 
 grit("resources") {
@@ -3528,14 +3377,6 @@ if (!is_android) {
         "//ui/linux:linux_ui_factory",
         "//ui/ozone",
       ]
-    }
-
-    if (is_win) {
-      sources += [
-        "chrome_browser_main_win_browsertest.cc",
-        "font_prewarmer_tab_helper_browsertest.cc",
-      ]
-      deps += [ ":font_prewarmer_tab_helper" ]
     }
 
     if (is_mac) {

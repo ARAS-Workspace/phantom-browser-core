@@ -35,18 +35,6 @@ source_set("apps") {
     ]
   }
 
-  if (is_win) {
-    public += [
-      "app_window_desktop_native_widget_aura_win.h",
-      "app_window_desktop_window_tree_host_win.h",
-      "app_window_frame_view_win.h",
-      "chrome_native_app_window_views_win.h",
-    ]
-    public_deps += [
-      "//ui/base/metadata",
-      "//ui/gfx/geometry",
-    ]
-  }
 }
 
 source_set("impl") {
@@ -89,24 +77,6 @@ source_set("impl") {
     deps += [
       "//chrome/browser:shell_integration_linux",
       "//chrome/browser/ui/apps",
-    ]
-  }
-
-  if (is_win) {
-    sources += [
-      "app_window_desktop_native_widget_aura_win.cc",
-      "app_window_desktop_window_tree_host_win.cc",
-      "app_window_frame_view_win.cc",
-      "chrome_app_window_client_views_win.cc",
-      "chrome_native_app_window_views_win.cc",
-    ]
-    deps += [
-      "//chrome/browser:shell_integration",
-      "//chrome/browser/ui/apps",
-      "//chrome/browser/web_applications/extensions",
-      "//chrome/common:constants",
-      "//content/public/browser",
-      "//extensions/common",
     ]
   }
 

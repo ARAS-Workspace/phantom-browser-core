@@ -29,9 +29,6 @@ source_set("dialogs") {
     deps += [ "//chrome/browser/ui/interaction" ]
   }
 
-  if (is_win) {
-    deps += [ "//chrome/installer/util:with_no_strings" ]
-  }
 }
 
 source_set("browser_dialogs") {

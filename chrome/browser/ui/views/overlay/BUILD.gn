@@ -86,9 +86,6 @@ source_set("impl") {
     frameworks = [ "Cocoa.framework" ]
   }
 
-  if (is_win) {
-    deps += [ "//ui/base/ime/win" ]
-  }
 }
 
 source_set("unit_tests") {

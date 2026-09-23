@@ -351,7 +351,4 @@ source_set("interactive_ui_tests") {
     deps += [ "//ui/ozone" ]
   }
 
-  if (is_win) {
-    deps += [ "//chrome/browser/ui/views/accessibility:uia_test_support" ]
-  }
 }

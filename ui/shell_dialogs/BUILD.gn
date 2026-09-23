@@ -83,22 +83,6 @@ component("shell_dialogs") {
     }
   }
 
-  if (is_win) {
-    sources += [
-      "auto_close_dialog_event_handler_win.cc",
-      "auto_close_dialog_event_handler_win.h",
-      "base_shell_dialog_win.cc",
-      "base_shell_dialog_win.h",
-      "execute_select_file_win.cc",
-      "execute_select_file_win.h",
-      "safe_accept_file_dialog_event_handler_win.cc",
-      "safe_accept_file_dialog_event_handler_win.h",
-      "select_file_dialog_win.cc",
-      "select_file_dialog_win.h",
-      "select_file_utils_win.h",
-    ]
-  }
-
   if (use_aura) {
     if (is_mac) {
       # Will be automatically filtered out on non-Mac.
@@ -131,13 +115,6 @@ test("shell_dialogs_unittests") {
   if (is_mac) {
     sources += [ "select_file_dialog_mac_unittest.mm" ]
     frameworks = [ "UniformTypeIdentifiers.framework" ]
-  }
-
-  if (is_win) {
-    sources += [
-      "select_file_dialog_win_unittest.cc",
-      "select_file_utils_win_unittest.cc",
-    ]
   }
 
   deps = [

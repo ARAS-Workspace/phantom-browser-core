@@ -150,13 +150,6 @@ if (enable_vulkan) {
       }
     }
 
-    if (is_win) {
-      sources += [
-        "vulkan_image_win.cc",
-        "vulkan_util_win32.cc",
-      ]
-    }
-
     if (is_apple) {
       sources += [ "vulkan_image_mac.cc" ]
     }
@@ -178,10 +171,6 @@ if (enable_vulkan) {
         "//ui/ozone",
         "//ui/platform_window",
       ]
-    }
-
-    if (is_win) {
-      sources += [ "tests/native_window_win.cc" ]
     }
 
     # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

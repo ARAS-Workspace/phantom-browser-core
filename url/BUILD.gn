@@ -89,11 +89,6 @@ component("url") {
     public_configs = [ "//third_party/jdk" ]
   }
 
-  if (is_win) {
-    # Don't conflict with Windows' "url.dll".
-    output_name = "url_lib"
-  }
-
   if (is_ios) {
     sources += [ "url_constants_ios.h" ]
   }

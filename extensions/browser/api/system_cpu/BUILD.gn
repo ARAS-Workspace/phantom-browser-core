@@ -34,8 +34,4 @@ source_set("system_cpu") {
     sources += [ "cpu_info_provider_linux.cc" ]
   }
 
-  if (is_win) {
-    sources += [ "cpu_info_provider_win.cc" ]
-    libs += [ "ntdll.lib" ]
-  }
 }

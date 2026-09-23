@@ -182,10 +182,6 @@ component("capture_lib") {
     public_deps += [ "video/apple" ]
   }
 
-  if (is_win) {
-    public_deps += [ "video/win" ]
-  }
-
   if (is_linux) {
     deps += [ "video/linux" ]
   }
@@ -304,7 +300,4 @@ test("capture_unittests") {
     deps += [ "//media:unit_tests_bundle_data" ]
   }
 
-  if (is_win) {
-    deps += [ "video/win:win_unittests" ]
-  }
 }

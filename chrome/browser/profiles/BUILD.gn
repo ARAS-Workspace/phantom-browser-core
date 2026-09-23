@@ -287,10 +287,6 @@ source_set("policy_handlers") {
     "//components/strings:components_strings",
   ]
 
-  if (is_win) {
-    deps += [ "//chrome/credential_provider/common:common_constants" ]
-  }
-
   if (is_linux || is_win || is_mac) {
     public += [ "guest_mode_policy_handler.h" ]
     sources += [ "guest_mode_policy_handler.cc" ]
@@ -1013,13 +1009,6 @@ source_set("unit_tests") {
     "//ui/native_theme:test_support",
   ]
 
-  if (is_win) {
-    sources += [
-      "profile_load_tracker_win_unittest.cc",
-      "profile_shortcut_manager_unittest_win.cc",
-    ]
-  }
-
   sources += [ "gaia_info_update_service_unittest.cc" ]
   deps += [
     ":gaia_info_update_service",
@@ -1109,10 +1098,6 @@ if (!is_android) {
 
     if (is_mac || is_win || is_linux) {
       sources += [ "profile_statistics_browsertest.cc" ]
-    }
-
-    if (is_win) {
-      sources += [ "profile_shortcut_manager_browsertest_win.cc" ]
     }
 
     # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

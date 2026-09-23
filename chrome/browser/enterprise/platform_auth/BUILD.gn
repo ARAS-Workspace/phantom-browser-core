@@ -52,13 +52,6 @@ source_set("unit_tests") {
     deps += [ ":test_utils" ]
   }
 
-  if (is_win) {
-    sources += [
-      "cloud_ap_provider_win_unittest.cc",
-      "cloud_ap_utils_win_unittest.cc",
-    ]
-  }
-
   if (is_win || is_mac) {
     sources += [
       "platform_auth_navigation_throttle_unittest.cc",

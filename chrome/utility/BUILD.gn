@@ -73,13 +73,6 @@ static_library("utility") {
     "//ui/base:buildflags",
   ]
 
-  if (is_win) {
-    deps += [
-      "//components/services/quarantine",
-      "//components/services/quarantine/public/mojom",
-    ]
-  }
-
   if (is_mac) {
     deps += [
       "//chrome/services/mac_notifications",
@@ -120,20 +113,6 @@ static_library("utility") {
 
       deps += [ "//crypto:buildflags" ]
     }
-    if (is_win) {
-      sources += [
-        "importer/edge_database_reader_win.cc",
-        "importer/edge_database_reader_win.h",
-        "importer/edge_importer_win.cc",
-        "importer/edge_importer_win.h",
-        "importer/ie_importer_win.cc",
-        "importer/ie_importer_win.h",
-        "importer/nss_decryptor_win.cc",
-        "importer/nss_decryptor_win.h",
-      ]
-
-      deps += [ "//services/proxy_resolver_win" ]
-    }
     deps += [
       "//chrome/common:mojo_bindings",
       "//chrome/common/importer:interfaces",
@@ -159,20 +138,6 @@ static_library("utility") {
       "//chrome/services/removable_storage_writer/public/mojom",
       "//mojo/public/cpp/bindings",
     ]
-
-    # Prevent wininet from loading in the renderer. http://crbug.com/40406692
-    if (is_win) {
-      ldflags = [ "/DELAYLOAD:wininet.dll" ]
-
-      # Add ESE library for Edge Import support.
-      libs = [ "esent.lib" ]
-      ldflags += [ "/DELAYLOAD:esent.dll" ]
-
-      deps += [
-        "//chrome/services/util_win:lib",
-        "//components/device_signals/core/common/mojom",
-      ]
-    }
 
     if (is_win || is_mac || is_linux) {
       deps += [ "//chrome/services/system_signals" ]
@@ -232,9 +197,6 @@ if (!is_android) {
     sources += [ "importer/firefox_importer_unittest.cc" ]
     if (is_mac) {
       sources += [ "importer/safari_importer_unittest.mm" ]
-    }
-    if (is_win) {
-      sources += [ "importer/edge_database_reader_unittest_win.cc" ]
     }
 
     deps = [

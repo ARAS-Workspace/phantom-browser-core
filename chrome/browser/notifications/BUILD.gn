@@ -66,16 +66,6 @@ source_set("notifications") {
     public_deps += [ "//components/keep_alive_registry" ]
   }
 
-  if (is_win) {
-    public += [
-      "notification_platform_bridge_win.h",
-      "win/notification_launch_id.h",
-      "win/notification_metrics.h",
-      "win/notification_template_builder.h",
-      "win/notification_util.h",
-    ]
-  }
-
   if (is_mac) {
     public += [
       "mac/mac_notification_provider_factory.h",
@@ -196,21 +186,6 @@ source_set("impl") {
     deps += [ "//chrome/browser/default_browser" ]
   }
 
-  if (is_win) {
-    sources += [
-      "notification_platform_bridge_win.cc",
-      "win/notification_launch_id.cc",
-      "win/notification_metrics.cc",
-      "win/notification_template_builder.cc",
-      "win/notification_util.cc",
-    ]
-
-    deps += [
-      "//chrome/browser:shell_integration",
-      "//third_party/libxml:xml_writer",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "mac/mac_notification_provider_factory.cc",
@@ -306,13 +281,6 @@ source_set("test_support") {
     "//ui/message_center/public/cpp",
   ]
 
-  if (is_win) {
-    sources += [
-      "win/fake_itoastnotification.cc",
-      "win/fake_itoastnotification.h",
-    ]
-  }
-
   if (enable_chrome_notifications) {
     sources += [
       "notification_test_util.cc",
@@ -376,21 +344,6 @@ source_set("unit_tests") {
     ]
     deps +=
         [ "//chrome/browser/web_applications:web_applications_test_support" ]
-  }
-
-  if (is_win) {
-    sources += [
-      "notification_platform_bridge_win_unittest.cc",
-      "win/fake_notification_image_retainer.cc",
-      "win/fake_notification_image_retainer.h",
-      "win/notification_helper_launches_chrome_unittest.cc",
-      "win/notification_launch_id_unittest.cc",
-      "win/notification_template_builder_unittest.cc",
-    ]
-    deps += [
-      "//chrome/common/notifications",
-      "//chrome/installer/setup:lib",
-    ]
   }
 
   if (is_mac) {
@@ -464,14 +417,6 @@ if (!is_android) {
       "notification_interactive_uitest_support.cc",
       "notification_interactive_uitest_support.h",
     ]
-
-    if (is_win) {
-      sources += [
-        "notification_platform_bridge_win_interactive_uitest.cc",
-        "win/fake_itoastnotifier.cc",
-        "win/fake_itoastnotifier.h",
-      ]
-    }
 
     if (is_mac) {
       sources += [ "mac/notification_interactive_uitest_mac.mm" ]

@@ -263,24 +263,6 @@ source_set("internal") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "management/platform_management_status_provider_win.cc",
-      "management/platform_management_status_provider_win.h",
-      "policy_loader_win.cc",
-      "policy_loader_win.h",
-      "scoped_critical_policy_section.cc",
-      "scoped_critical_policy_section.h",
-    ]
-    libs = [
-      "netapi32.lib",
-      "ntdsapi.lib",
-      "secur32.lib",
-      "shlwapi.lib",
-      "userenv.lib",
-    ]
-  }
-
   if (is_win || is_mac || is_linux) {
     sources += [
       "cloud/profile_cloud_policy_manager.cc",
@@ -576,12 +558,6 @@ source_set("unit_tests") {
   if (is_win || is_linux) {
     # Needed by policy_loader_win_unittest.cc
     data = [ "//chrome/test/data/policy/" ]
-  }
-  if (is_win) {
-    sources += [
-      "policy_loader_win_unittest.cc",
-      "scoped_critical_policy_section_unittest.cc",
-    ]
   }
   deps = [
     ":common_constants",

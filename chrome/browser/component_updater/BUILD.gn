@@ -206,17 +206,6 @@ source_set("impl") {
     deps += [ "//chrome/updater:public_sources" ]
   }
 
-  if (is_win) {
-    sources += [ "updater_state_win.cc" ]
-    if (is_chrome_branded) {
-      sources += [ "recovery_improved_component_installer_win.cc" ]
-    }
-    deps += [
-      "//chrome/elevation_service:public_headers",
-      "//chrome/installer/util:with_no_strings",
-    ]
-  }
-
   if (is_mac) {
     sources += [ "updater_state_mac.mm" ]
     if (is_chrome_branded) {

@@ -234,13 +234,6 @@ source_set("impl") {
     deps += [ "//chrome/browser/download/bubble" ]
   }
 
-  if (is_win) {
-    sources += [
-      "download_status_updater_win.cc",
-      "trusted_sources_manager_win.cc",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "download_status_updater_mac.mm",

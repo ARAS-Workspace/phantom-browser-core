@@ -52,13 +52,6 @@ mojom_component("mojom") {
   if (is_win || is_apple) {
     sources += [ "webnn_model_loader.mojom" ]
   }
-  if (is_win) {
-    sources += [
-      "ep_device_info.mojom",
-      "ep_package_info.mojom",
-      "webnn_compiler_service.mojom",
-    ]
-  }
 
   deps = [
     ":features",
@@ -139,23 +132,6 @@ mojom_component("mojom") {
         "tensor_usage_mojom_traits.h",
       ]
 
-      if (is_win) {
-        types += [
-          {
-            mojom = "webnn.mojom.EpDeviceInfo"
-            cpp = "::webnn::EpDeviceInfo"
-          },
-          {
-            mojom = "webnn.mojom.PackageVersion"
-            cpp = "::PACKAGE_VERSION"
-          },
-        ]
-        traits_headers += [
-          "ep_device_info_mojom_traits.h",
-          "package_version_mojom_traits.h",
-        ]
-      }
-
       traits_public_deps = [ ":webnn_mojom_traits" ]
     },
   ]
@@ -190,13 +166,6 @@ component("webnn_mojom_traits") {
 
   configs += [ "//build/config/compiler:prevent_unsafe_narrowing" ]
 
-  if (is_win) {
-    sources += [
-      "ep_device_info_mojom_traits.h",
-      "package_version_mojom_traits.h",
-    ]
-    public_deps += [ "//services/webnn/public/cpp:win" ]
-  }
 }
 
 source_set("tests") {

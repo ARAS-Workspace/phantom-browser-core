@@ -198,9 +198,6 @@ config("skia_library_config") {
       "SK_FONTMGR_FREETYPE_EMPTY_AVAILABLE",
     ]
   }
-  if (is_win) {
-    defines += [ "SK_TYPEFACE_FACTORY_DIRECTWRITE" ]
-  }
   if (is_apple) {
     defines += [ "SK_TYPEFACE_FACTORY_CORETEXT" ]
   }
@@ -220,14 +217,6 @@ config("skia_library_config") {
     defines += [ "SK_DEFAULT_FONT_CACHE_LIMIT=20971520" ]  # 20 * 1024 * 1024
   }
 
-  if (is_win) {
-    defines += [
-      # On windows, GDI handles are a scarse system-wide resource so we have to
-      # keep the glyph cache, which holds up to 4 GDI handles per entry, to a
-      # fairly small size. http://crbug.com/314387
-      "SK_DEFAULT_FONT_CACHE_COUNT_LIMIT=256",
-    ]
-  }
 }
 
 # Split out into separate target so that path_bridge can depend on the public
@@ -303,10 +292,6 @@ component("skia") {
     public += [ "ext/skia_utils_mac.h" ]
     sources += [ "ext/skia_utils_mac.mm" ]
   }
-  if (is_win) {
-    public += [ "ext/skia_utils_win.h" ]
-    sources += [ "ext/skia_utils_win.cc" ]
-  }
 
   if (use_blink) {
     public += [ "ext/platform_canvas.h" ]
@@ -332,13 +317,6 @@ component("skia") {
     sources += [
       "ext/convolver_LSX.cc",
       "ext/convolver_LSX.h",
-    ]
-  }
-
-  if (is_win) {
-    sources += [
-      # Select the right BitmapPlatformDevice.
-      "ext/raster_handle_allocator_win.cc",
     ]
   }
 
@@ -407,10 +385,6 @@ component("skia") {
   } else {
     # Remove unused util sources.
     sources -= [ "//third_party/skia/src/utils/SkParsePath.cpp" ]
-  }
-
-  if (is_win) {
-    libs = [ "fontsub.lib" ]
   }
 
   # Select Skia ports.
@@ -944,12 +918,6 @@ template("skia_source_set") {
     # cost.
     if (using_mismatched_sample_profile) {
       configs -= [ "//build/config/compiler:afdo_optimize_size" ]
-    }
-    if (is_win) {
-      cflags_cc = [
-        "/wd5041",  # out-of-line definition for constexpr static data member is
-                    # not needed and is deprecated in C++17
-      ]
     }
   }
 }

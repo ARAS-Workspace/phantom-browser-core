@@ -84,10 +84,6 @@ executable("viz_demo") {
     "//ui/platform_window",
   ]
 
-  if (is_win) {
-    deps += [ "//ui/platform_window/win" ]
-  }
-
   if (use_ozone) {
     deps += [ "//ui/ozone:ozone_gpu_test_support" ]
   }

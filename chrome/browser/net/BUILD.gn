@@ -93,13 +93,6 @@ source_set("net") {
     public += [ "disk_cache_dir_policy_handler.h" ]
   }
 
-  if (is_win) {
-    public += [
-      "chrome_mojo_proxy_resolver_win.h",
-      "service_providers_win.h",
-    ]
-  }
-
   if (is_mac) {
     public += [ "chrome_mojo_proxy_resolver_mac.h" ]
   }
@@ -220,19 +213,6 @@ source_set("impl") {
 
   if (!is_android) {
     sources += [ "disk_cache_dir_policy_handler.cc" ]
-  }
-
-  if (is_win) {
-    sources += [
-      "chrome_mojo_proxy_resolver_win.cc",
-      "service_providers_win.cc",
-    ]
-    deps += [
-      "//chrome/browser/win",
-      "//ui/gfx",
-      "//ui/shell_dialogs",
-      "//ui/views",
-    ]
   }
 
   if (is_mac) {
@@ -444,9 +424,6 @@ if (!is_android) {
       "//services/network:test_support",
       "//services/network/public/cpp:ip_address_space_overrides_test_utils",
     ]
-    if (is_win) {
-      sources += [ "chrome_mojo_proxy_resolver_win_browsertest.cc" ]
-    }
     if (is_mac) {
       sources += [ "chrome_mojo_proxy_resolver_mac_browsertest.cc" ]
     }
@@ -477,14 +454,6 @@ if (!is_android) {
       "//chrome/test:test_support",
       "//content/test:test_support",
     ]
-    if (is_win) {
-      sources += [ "sandboxed_network_change_notifier_win_browsertest.cc" ]
-      deps += [
-        "//chrome/browser/os_crypt:test_support",
-        "//chrome/elevation_service:public_headers",
-        "//chrome/windows_services/service_program/test_support",
-      ]
-    }
     if (is_linux && use_dbus) {
       deps += [
         "//components/os_crypt/async/browser:secret_portal_key_provider",

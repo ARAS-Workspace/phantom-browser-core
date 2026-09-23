@@ -78,13 +78,6 @@ source_set("performance_manager") {
     ]
   }
 
-  if (is_win) {
-    public += [
-      "policies/priority_boost_helpers.h",
-      "public/dll_pre_read_policy_win.h",
-    ]
-  }
-
   if (enable_extensions_core) {
     public += [ "extension_watcher.h" ]
     public_deps += [ "//extensions/browser" ]
@@ -189,18 +182,6 @@ source_set("impl") {
       "//components/split_tabs",
       "//third_party/perfetto:libperfetto",
       "//ui/accessibility:ax_base",
-    ]
-  }
-
-  if (is_win) {
-    sources += [
-      "policies/dll_pre_read_policy_win.cc",
-      "policies/priority_boost_helpers.cc",
-    ]
-    deps += [
-      "//chrome/browser:browser_features",
-      "//components/startup_metric_utils",
-      "//services/network/public/mojom",
     ]
   }
 
@@ -341,9 +322,6 @@ source_set("unit_tests") {
     sources += [ "user_tuning/memory_saver_policy_handler_unittest.cc" ]
   }
 
-  if (is_win) {
-    sources += [ "policies/dll_pre_read_policy_win_unittest.cc" ]
-  }
 }
 
 if (!is_android) {
@@ -385,8 +363,5 @@ if (!is_android) {
       "//third_party/fuzztest",
     ]
 
-    if (is_win) {
-      sources += [ "mechanisms/termination_target_setter_browsertest.cc" ]
-    }
   }
 }

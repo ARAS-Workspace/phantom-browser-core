@@ -37,10 +37,6 @@ component("clipboard_types") {
     sources += [ "clipboard_constants_mac.mm" ]
   }
 
-  if (is_win) {
-    sources += [ "clipboard_format_type_win.cc" ]
-  }
-
   if (use_aura && !is_win) {
     sources += [ "clipboard_format_type_aura.cc" ]
   }
@@ -160,15 +156,6 @@ component("clipboard") {
     }
   }
 
-  if (is_win) {
-    sources += [
-      "clipboard_util_win.cc",
-      "clipboard_util_win.h",
-      "clipboard_win.cc",
-      "clipboard_win.h",
-    ]
-  }
-
   defines = [ "IS_UI_BASE_CLIPBOARD_IMPL" ]
 
   deps = [
@@ -275,10 +262,6 @@ source_set("clipboard_test") {
       "url_file_parser_unittest.cc",
     ]
     frameworks = [ "PDFKit.framework" ]
-  }
-
-  if (is_win) {
-    sources += [ "clipboard_util_win_unittest.cc" ]
   }
 
   deps = [

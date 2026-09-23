@@ -315,21 +315,6 @@ component("network_service") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "broker_helper_win.cc",
-      "broker_helper_win.h",
-      "brokered_client_socket_factory.cc",
-      "brokered_client_socket_factory.h",
-      "brokered_tcp_client_socket.cc",
-      "brokered_tcp_client_socket.h",
-      "brokered_udp_client_socket.cc",
-      "brokered_udp_client_socket.h",
-      "windows_system_proxy_resolver_mojo.cc",
-      "windows_system_proxy_resolver_mojo.h",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "mac_system_proxy_resolver_mojo.cc",
@@ -418,10 +403,6 @@ component("network_service") {
       "//services/network/public/cpp:cpp_p2p",
       "//third_party/webrtc_overrides:webrtc_component",
     ]
-  }
-
-  if (is_win) {
-    deps += [ "//sandbox/win:sandbox" ]
   }
 
   if (is_mac) {
@@ -567,15 +548,6 @@ source_set("tests") {
       "//net/tools/testserver/",
       "//services/test/data/",
       "//third_party/pywebsocket3/src/pywebsocket3/",
-    ]
-  }
-
-  if (is_win) {
-    sources += [
-      "broker_helper_win_unittest.cc",
-      "brokered_tcp_client_socket_unittest.cc",
-      "brokered_udp_client_socket_unittest.cc",
-      "windows_system_proxy_resolver_mojo_unittest.cc",
     ]
   }
 

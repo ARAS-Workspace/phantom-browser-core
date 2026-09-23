@@ -188,10 +188,6 @@ static_library("test_support") {
     sources += [ "test/test_compositor_host_ios.mm" ]
   }
 
-  if (is_win) {
-    sources += [ "test/test_compositor_host_win.cc" ]
-  }
-
   public_deps = [ ":compositor" ]
   deps = [
     "//base/test:test_support",

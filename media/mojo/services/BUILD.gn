@@ -162,24 +162,6 @@ component("services") {
     deps += [ "//media/cdm:cdm_api" ]
   }
 
-  if (is_win) {
-    sources += [
-      "media_foundation_gpu_info_monitor.cc",
-      "media_foundation_gpu_info_monitor.h",
-      "media_foundation_mojo_media_client.cc",
-      "media_foundation_mojo_media_client.h",
-      "media_foundation_preferences.cc",
-      "media_foundation_preferences.h",
-      "media_foundation_renderer_wrapper.cc",
-      "media_foundation_renderer_wrapper.h",
-      "media_foundation_service.cc",
-      "media_foundation_service.h",
-      "media_foundation_service_broker.cc",
-      "media_foundation_service_broker.h",
-    ]
-    deps += [ "//ui/gfx/mojom:dxgi_info" ]
-  }
-
   if (allow_hosting_oop_video_decoder) {
     sources += [
       "oop_video_decoder_factory_process_service.cc",

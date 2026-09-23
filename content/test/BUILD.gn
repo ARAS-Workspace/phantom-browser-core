@@ -678,14 +678,6 @@ static_library("test_support") {
       "../browser/speech/fake_speech_recognition_manager_delegate.h",
     ]
 
-    if (is_win) {
-      sources += [
-        "../browser/renderer_host/input/mock_tfhandwriting.cc",
-        "../browser/renderer_host/input/mock_tfhandwriting.h",
-        "../browser/renderer_host/input/stylus_handwriting_win_test_helper.cc",
-        "../browser/renderer_host/input/stylus_handwriting_win_test_helper.h",
-      ]
-    }
   }
 
   # HID support is not available without udev.
@@ -760,25 +752,6 @@ static_library("test_support") {
 
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
-  }
-
-  if (is_win) {
-    sources += [
-      "dwrite_font_fake_sender_win.cc",
-      "dwrite_font_fake_sender_win.h",
-      "mock_keyboard_driver_win.cc",
-      "mock_keyboard_driver_win.h",
-    ]
-    deps += [
-      "//content:sandbox_helper_win",
-      "//third_party/iaccessible2",
-    ]
-    libs = [ "oleacc.lib" ]
-  }
-
-  if (is_win) {
-    deps += [ "//sandbox" ]
-    public_configs = [ "//build/config/win:delayloads_for_tests" ]
   }
 
   if (v8_use_external_startup_data) {
@@ -1690,10 +1663,6 @@ test("content_browsertests") {
     sources += [ "../browser/network/address_map_linux_browsertest.cc" ]
   }
 
-  if (is_win) {
-    sources += [ "../browser/network/sandboxed_socket_broker_browsertest.cc" ]
-  }
-
   if (enable_reporting) {
     sources += [ "../browser/security/coop/cross_origin_opener_policy_reporting_browsertest.cc" ]
   }
@@ -1969,46 +1938,6 @@ test("content_browsertests") {
 
   sources +=
       [ "../browser/media/media_keys_listener_manager_impl_browsertest.cc" ]
-
-  if (is_win) {
-    sources += [
-      "../browser/accessibility/accessibility_win_browsertest.cc",
-      "../browser/accessibility/ax_platform_node_textprovider_win_browsertest.cc",
-      "../browser/accessibility/ax_platform_node_textrangeprovider_win_browsertest.cc",
-      "../browser/accessibility/ax_platform_node_win_browsertest.cc",
-      "../browser/accessibility/hit_testing_win_browsertest.cc",
-      "../browser/media/content_protection_window_browsertest.cc",
-      "../browser/media/system_media_controls/web_app_system_media_controls_browsertest.cc",
-      "../browser/network/network_service_process_tracker_win_browsertest.cc",
-      "../browser/renderer_host/accessibility_object_lifetime_win_browsertest.cc",
-      "../browser/renderer_host/accessibility_tree_linkage_win_browsertest.cc",
-      "../browser/renderer_host/direct_manipulation_test_helper_win.cc",
-      "../browser/renderer_host/direct_manipulation_test_helper_win.h",
-      "../browser/renderer_host/direct_manipulation_win_browsertest.cc",
-      "../browser/renderer_host/input/stylus_handwriting_controller_win_browsertest.cc",
-      "../browser/renderer_host/render_process_host_sandbox_policy_win_browsertest.cc",
-      "../browser/scheduler/responsiveness/native_event_observer_browsertest_win.cc",
-    ]
-
-    deps += [
-      "//components/stylus_handwriting/win",
-      "//components/system_media_controls",
-      "//net:net_resources",
-      "//sandbox",
-      "//third_party/blink/public:resources",
-      "//third_party/blink/public/strings",
-      "//third_party/iaccessible2",
-      "//third_party/isimpledom",
-      "//ui/strings:auto_image_annotation_strings",
-    ]
-
-    data_deps += [ "//services/test/echo:echo_preload_library" ]
-
-    libs = [
-      "dbghelp.lib",
-      "uiautomationcore.lib",
-    ]
-  }
 
   if (is_linux) {
     sources += [
@@ -2840,14 +2769,6 @@ test("content_unittests") {
     sources += [ "../browser/file_system_access/file_path_watcher/file_path_watcher_unittest.cc" ]
   }
 
-  if (is_win) {
-    sources += [
-      "../browser/renderer_host/renderer_sandboxed_process_launcher_delegate_unittest.cc",
-      "../browser/service_host/utility_sandbox_delegate_unittest.cc",
-      "../browser/speech/tts_win_utils_unittest.cc",
-    ]
-  }
-
   if (is_win || is_mac) {
     sources += [ "../browser/media/system_media_controls/web_app_system_media_controls_manager_unittest.cc" ]
   }
@@ -3165,35 +3086,6 @@ test("content_unittests") {
   if (is_win || is_linux) {
     sources += [ "../child/font_data/font_data_manager_unittest.cc" ]
     deps += [ "//components/services/font_data/public/mojom" ]
-  }
-  if (is_win) {
-    sources += [
-      "../browser/child_process_sandbox_support_win_unittest.cc",
-      "../browser/device_posture/device_posture_registry_watcher_win_unittest.cc",
-      "../browser/renderer_host/direct_manipulation_test_helper_win.cc",
-      "../browser/renderer_host/direct_manipulation_test_helper_win.h",
-      "../browser/renderer_host/direct_manipulation_win_unittest.cc",
-      "../browser/renderer_host/dwrite_font_proxy_impl_win_unittest.cc",
-      "../browser/screenlock_monitor/screenlock_monitor_device_source_win_unittest.cc",
-      "../child/dwrite_font_proxy/dwrite_font_proxy_win_unittest.cc",
-      "../child/dwrite_font_proxy/font_fallback_win_unittest.cc",
-      "../child/font_warmup_win_unittest.cc",
-    ]
-    deps += [
-      "//components/services/font_data/public/mojom",
-      "//components/stylus_handwriting/win",
-      "//sandbox/policy:sandbox_test_utils",
-      "//sandbox/win:sandbox",
-      "//third_party/blink/public/common",
-      "//third_party/blink/public/common:font_unique_name_table_proto",
-      "//third_party/iaccessible2",
-      "//third_party/microsoft_webauthn",
-      "//ui/base",
-    ]
-    libs = [
-      "dwrite.lib",
-      "wtsapi32.lib",
-    ]
   }
   if (is_mac) {
     deps += [

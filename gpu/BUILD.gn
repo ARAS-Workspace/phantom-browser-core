@@ -554,11 +554,6 @@ test("gpu_unittests") {
     sources += [ "command_buffer/client/internal/mappable_buffer_native_pixmap_unittest.cc" ]
   }
 
-  if (is_win) {
-    sources +=
-        [ "command_buffer/client/internal/mappable_buffer_dxgi_unittest.cc" ]
-  }
-
   if (is_linux || is_android) {
     sources += [ "command_buffer/service/gpu_fence_manager_unittest.cc" ]
   }
@@ -597,9 +592,6 @@ test("gpu_unittests") {
   if (skia_use_dawn) {
     sources += [ "command_buffer/service/graphite_shared_context_unittest.cc" ]
 
-    if (is_win) {
-      sources += [ "ipc/service/dawn_texture_solid_color_pool_unittest.cc" ]
-    }
   }
 
   configs += [ "//build/config:precompiled_headers" ]

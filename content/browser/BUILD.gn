@@ -2444,10 +2444,6 @@ source_set("browser") {
     ]
   }
 
-  if (is_win) {
-    deps += [ "//components/stylus_handwriting/win" ]
-  }
-
   if (is_win || is_linux) {
     deps += [ "//components/services/font_data:lib" ]
   }
@@ -2783,85 +2779,6 @@ source_set("browser") {
         "ScreenCaptureKit.framework",
       ]
     }
-  }
-
-  if (is_win) {
-    sources -=
-        [ "file_system_access/file_path_watcher/file_path_watcher_stub.cc" ]
-
-    sources += [
-      "accessibility/browser_accessibility_state_impl_win.cc",
-      "accessibility/browser_accessibility_state_impl_win.h",
-      "child_process_launcher_helper_win.cc",
-      "device_posture/device_posture_platform_provider_win.cc",
-      "device_posture/device_posture_platform_provider_win.h",
-      "device_posture/device_posture_registry_watcher_win.cc",
-      "device_posture/device_posture_registry_watcher_win.h",
-      "file_system_access/file_path_watcher/file_path_watcher_change_tracker.cc",
-      "file_system_access/file_path_watcher/file_path_watcher_change_tracker.h",
-      "file_system_access/file_path_watcher/file_path_watcher_win.cc",
-      "font_access/font_enumeration_data_source_win.cc",
-      "font_access/font_enumeration_data_source_win.h",
-      "installedapp/fetch_related_win_apps_task.cc",
-      "installedapp/fetch_related_win_apps_task.h",
-      "installedapp/native_win_app_fetcher.h",
-      "installedapp/native_win_app_fetcher_impl.cc",
-      "installedapp/native_win_app_fetcher_impl.h",
-      "media/content_protection_window.cc",
-      "media/content_protection_window.h",
-      "media/dcomp_surface_registry_broker.cc",
-      "media/dcomp_surface_registry_broker.h",
-      "media/key_system_support_win.cc",
-      "media/key_system_support_win.h",
-      "memory/swap_metrics_driver_impl_win.cc",
-      "network/network_service_process_tracker_win.cc",
-      "network/network_service_process_tracker_win.h",
-      "renderer_host/direct_manipulation_event_handler_win.cc",
-      "renderer_host/direct_manipulation_event_handler_win.h",
-      "renderer_host/direct_manipulation_helper_win.cc",
-      "renderer_host/direct_manipulation_helper_win.h",
-      "renderer_host/dwrite_font_file_util_win.cc",
-      "renderer_host/dwrite_font_file_util_win.h",
-      "renderer_host/dwrite_font_proxy_impl_win.cc",
-      "renderer_host/dwrite_font_proxy_impl_win.h",
-      "renderer_host/input/stylus_handwriting_callback_sink_win.cc",
-      "renderer_host/input/stylus_handwriting_callback_sink_win.h",
-      "renderer_host/input/stylus_handwriting_controller_win.cc",
-      "renderer_host/input/stylus_handwriting_controller_win.h",
-      "renderer_host/legacy_render_widget_host_win.cc",
-      "renderer_host/legacy_render_widget_host_win.h",
-      "renderer_host/virtual_keyboard_controller_win.cc",
-      "renderer_host/virtual_keyboard_controller_win.h",
-      "sandbox_support_impl.h",
-      "sandbox_support_win_impl.cc",
-      "screenlock_monitor/screenlock_monitor_device_source_win.cc",
-      "service_host/utility_sandbox_delegate_win.cc",
-      "speech/tts_win.cc",
-      "speech/tts_win_utils.cc",
-      "speech/tts_win_utils.h",
-      "webnn/webnn_compiler_process_host.cc",
-      "webnn/webnn_compiler_process_host.h",
-    ]
-    deps += [
-      "//components/app_launch_prefetch",
-      "//content/utility:delegate_data",
-      "//services/webnn/public/cpp:win",
-      "//third_party/blink/public/common:font_unique_name_table_proto",
-      "//third_party/iaccessible2",
-      "//third_party/isimpledom",
-      "//third_party/wtl",
-    ]
-    libs += [
-      "comctl32.lib",
-      "dinput8.lib",
-      "dwmapi.lib",
-      "dxguid.lib",
-      "imm32.lib",
-      "oleacc.lib",
-      "portabledeviceguids.lib",
-      "uiautomationcore.lib",
-      "wtsapi32.lib",
-    ]
   }
 
   if (is_win || is_mac) {
@@ -3279,10 +3196,6 @@ source_set("browser") {
       "tracing/traces_internals/traces_internals_ui.cc",
       "tracing/traces_internals/traces_internals_ui.h",
     ]
-  }
-
-  if (is_win) {
-    deps += [ "//ui/base/ime/win" ]
   }
 
   if (use_aura) {

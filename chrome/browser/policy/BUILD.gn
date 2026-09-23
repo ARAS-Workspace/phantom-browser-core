@@ -34,9 +34,6 @@ source_set("path_parser") {
     deps += [ "//chrome/install_static:install_static_util" ]
   }
 
-  if (is_win) {
-    libs = [ "wtsapi32.lib" ]
-  }
 }
 
 source_set("onc") {
@@ -432,19 +429,6 @@ source_set("browser_tests") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "test/audio_process_high_priority_enabled_browsertest.cc",
-      "test/browser_dynamic_code_blocked_win_browsertest.cc",
-      "test/locale_policy_browsertest.cc",
-      "test/printing_lpac_sandbox_enabled_win_browsertest.cc",
-      "test/process_isolation_enabled_browsertest.cc",
-      "test/renderer_app_container_enabled_win_browsertest.cc",
-      "test/restrict_core_sharing_policy_browsertest.cc",
-    ]
-    deps += [ "//chrome/browser/win:isolated_browser_support" ]
-  }
-
   if (is_win || is_linux) {
     sources += [ "test/network_service_sandbox_enabled_browsertest.cc" ]
   }
@@ -681,10 +665,6 @@ source_set("unit_tests") {
     sources += [ "browser_dm_token_storage_mac_unittest.cc" ]
   }
 
-  if (is_win) {
-    sources += [ "browser_dm_token_storage_win_unittest.cc" ]
-  }
-
   if (enable_printing) {
     sources += [ "printing_restrictions_policy_handler_unittest.cc" ]
   }
@@ -807,10 +787,6 @@ source_set("policy") {
     "cloud/user_policy_signin_service_factory.h",
     "cloud/user_policy_signin_service_util.h",
   ]
-
-  if (is_win) {
-    public += [ "browser_dm_token_storage_win.h" ]
-  }
 
   if (is_mac) {
     public += [ "browser_dm_token_storage_mac.h" ]
@@ -1051,14 +1027,6 @@ source_set("impl") {
     "cloud/user_policy_signin_service_factory.cc",
     "cloud/user_policy_signin_service_util.cc",
   ]
-
-  if (is_win) {
-    sources += [ "browser_dm_token_storage_win.cc" ]
-    deps += [
-      "//chrome/browser/google",
-      "//chrome/credential_provider/common:common_constants",
-    ]
-  }
 
   if (is_mac) {
     sources += [ "browser_dm_token_storage_mac.mm" ]

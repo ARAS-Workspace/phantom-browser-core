@@ -159,22 +159,6 @@ component("crypto") {
     }
   }
 
-  if (is_win) {
-    sources += [
-      "scoped_capi_types.h",
-      "scoped_cng_types.h",
-      "unexportable_key_win.cc",
-      "unexportable_key_win.h",
-      "user_verifying_key_win.cc",
-    ]
-    libs = [
-      "crypt32.lib",
-      "ncrypt.lib",
-      "tbs.lib",
-    ]
-    ldflags = [ "/DELAYLOAD:tbs.dll" ]
-  }
-
   # Some files are built when NSS is used for the platform certificate library.
   if (use_nss_certs) {
     sources += [
@@ -291,10 +275,6 @@ test("crypto_unittests") {
       "nss_util_unittest.cc",
     ]
     configs += [ "//build/config/linux/nss" ]
-  }
-
-  if (is_win) {
-    libs = [ "ncrypt.lib" ]
   }
 
   if (is_apple) {

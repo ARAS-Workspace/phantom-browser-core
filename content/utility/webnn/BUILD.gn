@@ -8,12 +8,4 @@ source_set("webnn_sandbox_init") {
     "webnn_sandbox_init.h",
   ]
   deps = [ "//base" ]
-  if (is_win) {
-    deps += [
-      "//services/webnn:webnn_service",
-      "//services/webnn:webnn_switches",
-      "//services/webnn/public/cpp:win",
-      "//services/webnn/public/mojom",
-    ]
-  }
 }

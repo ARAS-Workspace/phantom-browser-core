@@ -173,16 +173,6 @@ executable("webui_examples") {
     "//content/public/app",
   ]
 
-  if (is_win) {
-    configs += [ "//build/config/win:windowed" ]
-
-    deps += [
-      "//build/win:default_exe_manifest",
-      "//content:sandbox_helper_win",
-      "//sandbox/win:sandbox",
-    ]
-  }
-
   if (is_mac) {
     deps += [ "//sandbox/mac:seatbelt" ]
   }

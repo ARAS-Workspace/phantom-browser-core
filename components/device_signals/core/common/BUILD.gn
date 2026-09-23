@@ -30,14 +30,6 @@ static_library("common") {
     "//components/policy/core/common",
   ]
 
-  if (is_win) {
-    sources += [ "win/platform_utils_win.cc" ]
-    libs = [
-      "propsys.lib",
-      "secur32.lib",
-    ]
-  }
-
   if (is_mac || is_linux) {
     sources += [ "posix/platform_utils_posix.cc" ]
   }

@@ -51,11 +51,6 @@ source_set("impl") {
     "//ui/compositor",
   ]
 
-  if (is_win) {
-    sources += [ "accessibility_util.cc" ]
-    deps += [ "//chrome/browser/ui/waap:manager" ]
-  }
-
   sources += [ "accessibility_focus_highlight.cc" ]
   deps += [ "//chrome/browser/ui/webui/tab_search:mojo_bindings" ]
 }
@@ -130,9 +125,6 @@ if (!is_android) {
       "//ui/views:test_support",
     ]
 
-    if (is_win) {
-      sources += [ "tab_strip_dump_accessibility_events_browsertest.cc" ]
-    }
   }
 
   source_set("interactive_ui_tests") {
@@ -153,17 +145,6 @@ if (!is_android) {
       deps += [ "//components/on_device_translation:public" ]
     }
 
-    if (is_win) {
-      sources += [
-        "navigation_accessibility_uitest_win.cc",
-        "post_install_announcement_browsertest.cc",
-      ]
-      deps += [
-        "//chrome/browser/ui/views/toolbar",
-        "//ui/base:test_support",
-      ]
-    }
-
     if (use_atk) {
       sources += [ "browser_accessibility_uitest_auralinux.cc" ]
       configs += [ "//build/config/linux/atk" ]
@@ -172,21 +153,5 @@ if (!is_android) {
         "//content/test:test_support",
       ]
     }
-  }
-}
-
-# Windows-only test support for UIA accessibility events.
-if (is_win) {
-  source_set("uia_test_support") {
-    testonly = true
-    sources = [
-      "uia_accessibility_event_waiter.cc",
-      "uia_accessibility_event_waiter.h",
-    ]
-    deps = [
-      "//base",
-      "//ui/accessibility",
-      "//ui/views",
-    ]
   }
 }

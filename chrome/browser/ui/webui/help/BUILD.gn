@@ -9,24 +9,6 @@ source_set("help") {
   public_deps = [ "//base" ]
   deps = [ "//chrome/browser/upgrade_detector" ]
 
-  if (is_win) {
-    if (is_chrome_branded) {
-      sources = [ "version_updater_win.cc" ]
-      deps += [
-        "//chrome/app:generated_resources_grit",
-        "//chrome/browser:browser_process",
-        "//chrome/browser/first_run",
-        "//chrome/browser/google",
-        "//content/public/browser",
-        "//ui/aura",
-        "//ui/base",
-        "//ui/gfx",
-      ]
-    } else {
-      sources = [ "version_updater_basic.cc" ]
-    }
-  }
-
   if (is_linux) {
     sources = [ "version_updater_basic.cc" ]
   }

@@ -26,10 +26,6 @@ static_library("test_support") {
     ]
   }
 
-  if (is_win) {
-    sources += [ "test_utils_win.cc" ]
-  }
-
   if (is_posix) {
     sources += [ "test_utils.cc" ]
   }

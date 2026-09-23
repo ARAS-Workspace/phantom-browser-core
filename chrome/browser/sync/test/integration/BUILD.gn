@@ -204,8 +204,6 @@ source_set("sync_integration_tests_impl") {
     }
     if (is_mac) {
     }
-    if (is_win) {
-    }
     sources +=
         [ "select_type_and_migrate_local_data_items_when_active_sync_test.cc" ]
 
@@ -284,13 +282,6 @@ source_set("sync_integration_tests_impl") {
       data_deps += [
         "//chrome",
         "//chrome:chrome_framework",
-      ]
-    }
-    if (is_win) {
-      deps += [
-        "//chrome:other_version",
-        "//third_party/wtl",
-        "//ui/resources",
       ]
     }
 

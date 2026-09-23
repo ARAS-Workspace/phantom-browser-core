@@ -113,9 +113,6 @@ source_set("ini_parser") {
 
 group("common") {
   public_deps = [ ":common_lib" ]
-  if (is_win) {
-    public_deps += [ "//chrome/common/win:delay_load_hooks" ]
-  }
 }
 
 source_set("request_code_constants") {
@@ -351,26 +348,6 @@ static_library("common_lib") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "conflicts/module_watcher_win.cc",
-      "conflicts/module_watcher_win.h",
-      "conflicts/remote_module_watcher_win.cc",
-      "conflicts/remote_module_watcher_win.h",
-    ]
-    deps += [
-      "//chrome/common/win:eventlog_messages",
-      "//chrome/installer/util:isolation_support",
-    ]
-
-    public_deps += [
-      "//components/dom_distiller/core",  # Needed by chrome_content_client.cc.
-      "//third_party/wtl",
-    ]
-
-    libs = [ "wintrust.lib" ]
-  }
-
   if (is_posix && !is_android) {
     sources += [
       "process_singleton_lock_posix.cc",
@@ -462,9 +439,6 @@ static_library("non_code_constants") {
     "//ui/base:buildflags",
   ]
 
-  if (is_win) {
-    sources += [ "chrome_icon_resources_win.h" ]
-  }
 }
 
 component("chrome_features") {
@@ -573,10 +547,6 @@ static_library("constants") {
   if (is_mac) {
     sources += [ "chrome_paths_mac.mm" ]
   }
-  if (is_win) {
-    sources += [ "chrome_paths_win.cc" ]
-    deps += [ "//chrome/install_static:install_static_util" ]
-  }
 
   if (enable_widevine && enable_library_cdms) {
     deps += [
@@ -672,13 +642,6 @@ mojom("mojo_bindings") {
         traits_sources = [ "mac/app_shim_mojom_traits.cc" ]
         traits_public_deps = [ "//components/variations/net" ]
       },
-    ]
-  }
-
-  if (is_win) {
-    sources += [
-      "conflicts/module_event_sink_win.mojom",
-      "font_prewarmer.mojom",
     ]
   }
 

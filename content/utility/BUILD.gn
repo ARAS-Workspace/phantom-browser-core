@@ -138,22 +138,6 @@ source_set("utility") {
     ]
   }
 
-  if (is_win) {
-    deps += [
-      ":delegate_data",
-      "//services/webnn:webnn_service",
-      "//services/webnn/public/mojom",
-    ]
-  }
-}
-
-if (is_win) {
-  mojom("delegate_data") {
-    disable_variants = true
-
-    sources = [ "sandbox_delegate_data.mojom" ]
-    public_deps = [ "//mojo/public/mojom/base" ]
-  }
 }
 
 # See comment at the top of //content/BUILD.gn for how this works.

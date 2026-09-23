@@ -305,16 +305,6 @@ static_library("renderer") {
     deps += [ "//components/paint_preview/renderer" ]
   }
 
-  if (is_win) {
-    deps += [ "//third_party/wtl" ]
-    sources += [
-      "font_prewarmer.cc",
-      "font_prewarmer.h",
-      "render_frame_font_family_accessor.cc",
-      "render_frame_font_family_accessor.h",
-    ]
-  }
-
   if (is_android) {
     sources += [
       "net/page_auto_fetcher_helper_android.cc",

@@ -135,10 +135,6 @@ target("component", "cpp") {
       "//third_party/snappy",
     ]
 
-    if (is_win) {
-      deps += [ "//components/tracing:tracing_etw" ]
-    }
-
     deps += [ "//components/variations" ]
 
     # Add the SystemProducer implementations.

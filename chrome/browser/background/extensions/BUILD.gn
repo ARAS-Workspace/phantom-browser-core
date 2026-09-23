@@ -28,9 +28,6 @@ source_set("extensions") {
     deps += [ "//components/keep_alive_registry" ]
   }
 
-  if (is_win) {
-    deps += [ "//chrome/browser/startup" ]
-  }
 }
 
 source_set("impl") {
@@ -38,9 +35,6 @@ source_set("impl") {
     "background_application_list_model.cc",
     "background_mode_manager.cc",
   ]
-  if (is_win) {
-    sources += [ "background_mode_manager_win.cc" ]
-  }
   if (is_mac) {
     sources += [ "background_mode_manager_mac.cc" ]
   }
@@ -83,9 +77,6 @@ source_set("impl") {
 
   deps += [ "//chrome/browser/web_applications/extensions" ]
 
-  if (is_win) {
-    deps += [ "//chrome/browser/startup" ]
-  }
 }
 
 source_set("unit_tests") {
@@ -113,7 +104,4 @@ source_set("unit_tests") {
     "//ui/message_center/public/cpp",
   ]
 
-  if (is_win) {
-    deps += [ "//chrome/browser/startup" ]
-  }
 }

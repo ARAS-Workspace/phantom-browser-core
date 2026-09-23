@@ -87,15 +87,6 @@ static_library("test_support") {
 
   deps = []
 
-  if (is_win) {
-    sources += [
-      "test_storage_monitor_win.cc",
-      "test_storage_monitor_win.h",
-      "test_volume_mount_watcher_win.cc",
-      "test_volume_mount_watcher_win.h",
-    ]
-    deps += [ "//testing/gtest" ]
-  }
 }
 
 source_set("unit_tests") {
@@ -112,10 +103,6 @@ source_set("unit_tests") {
     "//content/test:test_support",
     "//testing/gtest",
   ]
-
-  if (is_win) {
-    sources += [ "storage_monitor_win_unittest.cc" ]
-  }
 
   if (is_mac) {
     sources += [ "storage_monitor_mac_unittest.mm" ]

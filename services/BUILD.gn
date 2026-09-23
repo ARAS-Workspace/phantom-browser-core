@@ -114,10 +114,6 @@ test("services_unittests") {
     deps += [ "//services/accessibility:tests" ]
   }
 
-  if (is_win) {
-    deps += [ "//services/proxy_resolver_win:tests" ]
-  }
-
   if (!is_android && !is_ios) {
     # NOTE: We do not currently support standalone service binaries on Android
     # or iOS, so any tests which use the ServiceTest framework to connect to

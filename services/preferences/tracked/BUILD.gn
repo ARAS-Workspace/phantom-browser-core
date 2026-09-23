@@ -83,10 +83,6 @@ source_set("unit_tests") {
     "tracked_preferences_migration_unittest.cc",
   ]
 
-  if (is_win) {
-    sources += [ "registry_hash_store_contents_win_unittest.cc" ]
-  }
-
   deps = [
     ":tracked",
     "//base",

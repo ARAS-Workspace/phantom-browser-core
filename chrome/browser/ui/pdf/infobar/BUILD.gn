@@ -41,9 +41,6 @@ source_set("infobar") {
     "//components/vector_icons",
     "//ui/gfx:native_ui_types",
   ]
-  if (is_win) {
-    deps += [ "//chrome/install_static:install_static_util" ]
-  }
 }
 
 source_set("unit_tests") {

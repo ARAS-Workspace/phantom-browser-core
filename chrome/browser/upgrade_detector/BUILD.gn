@@ -38,10 +38,6 @@ source_set("upgrade_detector") {
     ]
   }
 
-  if (is_win) {
-    sources += [ "registry_monitor.h" ]
-  }
-
   if (is_mac) {
     sources += [ "directory_monitor.h" ]
   }
@@ -96,13 +92,6 @@ source_set("impl") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "get_installed_version_win.cc",
-      "registry_monitor.cc",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "directory_monitor.cc",
@@ -141,14 +130,6 @@ source_set("unit_tests") {
 
     public_deps = [ ":build_state_observer" ]
     deps += [ "//components/prefs" ]
-  }
-
-  if (is_win) {
-    assert(toolkit_views)
-    sources += [
-      "get_installed_version_win_unittest.cc",
-      "registry_monitor_unittest.cc",
-    ]
   }
 
   if (is_mac) {

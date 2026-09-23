@@ -102,10 +102,6 @@ source_set("configs") {
     "//ui/webui:buildflags",
   ]
 
-  if (is_win) {
-    deps += [ "//chrome/browser/ui/webui/signin:inline_login" ]
-  }
-
   if (!is_android) {
     deps += [
       "//chrome/browser/ui/webui/access_code_cast",
@@ -137,10 +133,6 @@ source_set("configs") {
       "//chrome/browser/ui/webui/app_home",
       "//chrome/browser/ui/webui/default_browser:default_browser_modal",
     ]
-    if (is_win) {
-      deps +=
-          [ "//chrome/browser/ui/webui/default_browser:visual_guided_setter" ]
-    }
   } else {
     #is_android
     deps += [
@@ -210,10 +202,6 @@ source_set("configs") {
       "//chrome/browser/ui/webui/browser_switch",
       "//chrome/browser/ui/webui/on_device_translation_internals",
     ]
-  }
-
-  if (is_win) {
-    deps += [ "//chrome/browser/ui/webui/conflicts" ]
   }
 
   if (enable_extensions_core) {
@@ -592,10 +580,6 @@ source_set("chrome_web_ui_controller_factory") {
 
   if (!is_android) {
     deps += [ "//chrome/browser/ui/webui/app_home" ]
-  }
-
-  if (is_win) {
-    deps += [ "//chrome/browser/ui/webui/conflicts" ]
   }
 
   if (is_win || is_linux || is_android) {

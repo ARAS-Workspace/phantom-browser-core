@@ -86,12 +86,6 @@ static_library("browser") {
     deps += [ "//components/certificate_matching" ]
   }
 
-  if (is_win) {
-    sources += [ "win/browser_utils_win.cc" ]
-
-    public_deps += [ "//components/device_signals/core/common/win" ]
-  }
-
   if (is_mac) {
     sources += [ "mac/browser_utils_mac.cc" ]
   }
@@ -167,10 +161,6 @@ source_set("unit_tests") {
       "//components/certificate_matching",
       "//components/device_signals/core/common:test_support",
     ]
-  }
-
-  if (is_win) {
-    deps += [ "//components/device_signals/core/browser/win:unit_tests" ]
   }
 
   if (is_mac) {

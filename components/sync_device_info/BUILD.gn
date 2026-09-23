@@ -68,9 +68,6 @@ static_library("sync_device_info") {
     ]
   }
 
-  if (is_win) {
-    sources += [ "local_device_info_util_win.cc" ]
-  }
 }
 
 static_library("test_support") {

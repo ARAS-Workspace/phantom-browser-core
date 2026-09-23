@@ -723,10 +723,6 @@ if (!is_android) {
         "//testing/gtest",
       ]
 
-      if (is_win) {
-        sources += [ "signin_util_win_browsertest.cc" ]
-        deps += [ "//chrome/browser/ui/startup" ]
-      }
     }
 
     if (!enable_dice_support) {

@@ -19,13 +19,6 @@ source_set("memory_pressure") {
 
   deps = [ "//base" ]
 
-  if (is_win) {
-    sources += [
-      "system_memory_pressure_evaluator_win.cc",
-      "system_memory_pressure_evaluator_win.h",
-    ]
-  }
-
   if (is_apple) {
     sources += [
       "system_memory_pressure_evaluator_mac.cc",
@@ -51,10 +44,6 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-
-  if (is_win) {
-    sources += [ "system_memory_pressure_evaluator_win_unittest.cc" ]
-  }
 
   if (is_mac) {
     sources += [ "system_memory_pressure_evaluator_mac_unittest.cc" ]

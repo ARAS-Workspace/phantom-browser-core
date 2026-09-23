@@ -153,10 +153,6 @@ source_set("tests") {
   data = [ "$root_gen_dir/third_party/perfetto/protos/perfetto/config/config.descriptor" ]
 
   if (enable_loader_lock_sampling) {
-    if (is_win) {
-      sources +=
-          [ "public/cpp/stack_sampling/loader_lock_sampler_win_unittest.cc" ]
-    }
 
     deps += [ ":loader_lock_sampler_test_strings" ]
     data_deps += [ ":loader_lock_sampler_test_dll" ]

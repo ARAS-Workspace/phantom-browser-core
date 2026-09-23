@@ -81,35 +81,6 @@ component("display") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "win/audio_edid_scan.cc",
-      "win/audio_edid_scan.h",
-      "win/base_window_finder_win.cc",
-      "win/base_window_finder_win.h",
-      "win/color_profile_reader.cc",
-      "win/color_profile_reader.h",
-      "win/display_config_helper.cc",
-      "win/display_config_helper.h",
-      "win/display_info.cc",
-      "win/display_info.h",
-      "win/dpi.cc",
-      "win/dpi.h",
-      "win/local_process_window_finder_win.cc",
-      "win/local_process_window_finder_win.h",
-      "win/scaling_util.cc",
-      "win/scaling_util.h",
-      "win/screen_win.cc",
-      "win/screen_win.h",
-      "win/screen_win_display.cc",
-      "win/screen_win_display.h",
-      "win/screen_win_headless.cc",
-      "win/screen_win_headless.h",
-      "win/uwp_text_scale_factor.cc",
-      "win/uwp_text_scale_factor.h",
-    ]
-  }
-
   if (is_ios) {
     sources += [ "ios/screen_ios.mm" ]
   }
@@ -139,17 +110,6 @@ component("display") {
 
   if (is_ios) {
     deps += [ "//build:ios_buildflags" ]
-  }
-
-  if (is_win) {
-    # Don't conflict with Windows' "display.dll".
-    output_name = "ui_display"
-    deps += [
-      "//components/headless/screen_info",
-      "//ui/gfx/mojom:dxgi_info",
-    ]
-    libs = [ "shcore.lib" ]
-    ldflags = [ "/DELAYLOAD:shcore.dll" ]
   }
 
   if (use_aura) {
@@ -193,21 +153,6 @@ static_library("test_support") {
     "//ui/gfx/geometry",
   ]
 
-  if (is_win) {
-    sources += [
-      "win/test/scoped_screen_win.cc",
-      "win/test/scoped_screen_win.h",
-      "win/test/screen_util_win.cc",
-      "win/test/screen_util_win.h",
-      "win/test/virtual_display_util_win.cc",
-      "win/test/virtual_display_util_win.h",
-    ]
-    deps += [
-      "//third_party/win_virtual_display/controller",
-      "//third_party/win_virtual_display/driver/public",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "mac/test/test_screen_mac.h",
@@ -245,14 +190,6 @@ test("display_unittests") {
     "util/edid_parser_unittest.cc",
   ]
 
-  if (is_win) {
-    sources += [
-      "win/scaling_util_unittest.cc",
-      "win/screen_win_headless_unittest.cc",
-      "win/screen_win_unittest.cc",
-    ]
-  }
-
   deps = [
     ":display",
     ":test_support",
@@ -277,10 +214,6 @@ test("display_unittests") {
     # Do not run display_change_notifier_unittest.cc on Android because it
     # does not compile display_observer.cc
     sources += [ "display_change_notifier_unittest.cc" ]
-  }
-
-  if (is_win) {
-    deps += [ "//components/headless/screen_info" ]
   }
 
   deps += [ "//mojo/core/test:run_all_unittests" ]

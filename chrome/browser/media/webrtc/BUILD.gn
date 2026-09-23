@@ -234,12 +234,6 @@ source_set("webrtc") {
       "//chrome/browser/ui:url_identity",
     ]
 
-    if (is_win) {
-      sources += [
-        "desktop_capture_devices_util_win.cc",
-        "desktop_capture_devices_util_win.h",
-      ]
-    }
   }
 
   if (is_mac) {
@@ -258,11 +252,6 @@ source_set("webrtc") {
   if (is_linux && use_ozone) {
     sources += [ "window_icon_util_ozone.cc" ]
     deps += [ "//ui/ozone" ]
-  }
-
-  if (is_win) {
-    sources += [ "window_icon_util_win.cc" ]
-    deps += [ "//ui/views" ]
   }
 
   if (use_aura) {

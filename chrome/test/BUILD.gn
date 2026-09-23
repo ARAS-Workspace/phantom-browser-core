@@ -559,23 +559,6 @@ static_library("test_support") {
     public_deps += [ "//chrome/test/base:drag_and_drop_test_utils" ]
   }
 
-  if (is_win) {
-    sources += [ "//chrome/app/chrome_crash_reporter_client_win.cc" ]
-    public_deps += [
-      "//chrome/chrome_elf:crash",
-      "//chrome/install_static/test:test_support",
-      "//chrome/test/base:process_inspector_win",
-      "//chrome/test/base:process_lineage_win",
-      "//components/crash/core/app",
-      "//third_party/wtl",
-    ]
-    deps += [
-      "//chrome/browser/webshare:test_support",
-      "//chrome/chrome_elf:constants",
-    ]
-    libs = [ "runtimeobject.lib" ]
-  }
-
   if (is_win || is_mac || is_linux) {
     public_deps += [
       "//ui/base:pixel_diff_test_support",
@@ -973,10 +956,6 @@ static_library("browser_tests_runner") {
   ]
 
   sources += [ "base/browser_tests_main.cc" ]
-
-  if (is_win) {
-    deps += [ "//chrome/installer/util:strings" ]
-  }
 
 }
 
@@ -1882,10 +1861,6 @@ if (!is_android) {
       deps += [ "//chrome/browser/ui/views:bluetooth_dialogs" ]
     }
 
-    if (is_win) {
-      deps += [ "//chrome/browser/ui/webui/signin:inline_login" ]
-    }
-
     if (is_mac) {
       deps += [
         "//chrome/app_shim:browser_tests",
@@ -2298,19 +2273,6 @@ if (!is_android) {
       "//third_party/federated_compute:confidential_compute_crypto_test_util",
     ]
 
-    if (is_win) {
-      sources += [
-        "../browser/ui/views/device_id/pen_id_browsertest_win.cc",
-        "../browser/ui/views/tab_search_bubble_ui_browsertest.cc",
-      ]
-
-      # encrypted_media_browsertest uses Windows Media Foundation APIs.
-      libs = [
-        "mfuuid.lib",
-        "mfplat.lib",
-      ]
-    }
-
     if (is_win || is_linux) {
     }
 
@@ -2395,38 +2357,6 @@ if (!is_android) {
       deps += [ "//chrome/browser/ui/webui/default_browser:browser_tests" ]
     }
 
-    if (is_win) {
-      sources += [
-        "../browser/ui/color/win/native_chrome_color_mixer_win_browsertest.cc",
-        "../browser/ui/views/sync/inline_login_ui_browsertest.cc",
-        "../browser/ui/views/uninstall_view_browsertest.cc",
-        "../test/delayload/delayload_hook_browsertest.cc",
-      ]
-
-      data_deps += [ "//chrome/browser/web_applications/chrome_pwa_launcher" ]
-      data += [ "$root_out_dir/chrome_200_percent.pak" ]
-      deps += [
-        "//chrome:other_version",
-        "//chrome/app:chrome_dll_resources",
-        "//chrome/app:command_ids",
-        "//chrome/browser:font_prewarmer_tab_helper",
-        "//chrome/browser/ui:uninstall_browser_prompt",
-        "//chrome/browser/ui/views:critical_notification_bubble_view",
-        "//chrome/browser/ui/views:uninstall_browser_prompt",
-        "//chrome/browser/win:browser_tests",
-        "//chrome/credential_provider/common:common_constants",
-        "//components/onc",
-        "//sandbox/win:sandbox",
-        "//third_party/wtl",
-        "//ui/color:accent_color_observer",
-        "//ui/resources",
-      ]
-
-      if (target_cpu == "x64") {
-        sources += [ "../common/profiler/thread_profiler_browsertest.cc" ]
-      }
-    }
-
     if (is_mac) {
       sources += [
         "../browser/renderer_host/chrome_render_widget_host_view_mac_history_swiper_browsertest.mm",
@@ -2497,16 +2427,6 @@ if (!is_android) {
       "../browser/ui/views/download/bubble/download_toolbar_ui_controller_browsertest.cc",
       "../browser/ui/views/profiles/signin_view_controller_delegate_views_browsertest.cc",
     ]
-
-    if (is_win) {
-      sources += [
-        # Tooltip accessibility event tests rely on Aura APIs
-        # (EventGenerator, TooltipControllerTestHelper).
-        "../browser/ui/views/toolbar/browser_app_menu_button_dump_accessibility_events_browsertest.cc",
-        "../browser/ui/views/tooltip/tooltip_dump_accessibility_events_browsertest.cc",
-      ]
-      deps += [ "//ui/wm" ]
-    }
 
     deps += [
       "//chrome/browser/default_browser:browser_tests",
@@ -2689,21 +2609,12 @@ if (!is_android) {
       # TODO(crbug.com/353332589): Remove this dependency when the
       # views/autofill/popup/ browser tests get modularized.
       deps += [ "//chrome/browser/ui/views/autofill/popup" ]
-      if (is_win) {
-        deps +=
-            [ "//chrome/browser/ui/views:critical_notification_bubble_view" ]
-      }
 
       if (enable_dice_support) {
         deps += [
           "//chrome/browser/ui/webui/signin/signout_confirmation",
           "//chrome/browser/ui/webui/signin/signout_confirmation:test_support",
           "//components/sync_bookmarks",
-        ]
-      }
-      if (is_win) {
-        sources += [
-          "../browser/ui/views/frame/browser_frame_view_browsertest_win.cc",
         ]
       }
       if (is_mac) {
@@ -2918,10 +2829,6 @@ if (!is_android) {
         "//third_party/widevine/cdm",
       ]
     }
-    if (is_win) {
-      # Runtime dependencies.
-      data_deps += [ "//media/cdm/win/test:media_foundation_clear_key_cdm" ]
-    }
     if (enable_printing) {
       deps += [ "//chrome/browser/printing:browser_tests" ]
     }
@@ -3063,9 +2970,6 @@ if (is_linux || is_mac || is_win || is_android) {
 
   sizes_test("chrome_sizes") {
     data_deps = [ "//chrome" ]
-    if (is_win) {
-      data_deps += [ "//chrome/installer/mini_installer" ]
-    }
   }
 }
 
@@ -4199,91 +4103,6 @@ test("unit_tests") {
     ]
   }
 
-  if (is_win) {
-    assert(toolkit_views)
-    sources += [
-      "../browser/chrome_browser_main_win_unittest.cc",
-      "../browser/chrome_process_singleton_win_unittest.cc",
-      "../browser/process_singleton_win_unittest.cc",
-      "../browser/shell_integration_win_unittest.cc",
-      "../browser/ui/views/frame/windows_caption_button_unittest.cc",
-      "../browser/ui/views/uninstall_view_unittest.cc",
-      "../common/chrome_constants_win_unittest.cc",
-      "../common/conflicts/module_watcher_win_unittest.cc",
-      "../common/conflicts/remote_module_watcher_win_unittest.cc",
-      "../common/win/delay_load_failure_hook_unittest.cc",
-      "../common/win/delay_load_notify_hook_unittest.cc",
-    ]
-
-    data += [ "$root_out_dir/chrome.exe" ]
-
-    data_deps += [
-      "//chrome",
-      "//chrome/notification_helper",
-    ]
-
-    deps += [
-      "//chrome:other_version",
-      "//chrome//services/util_win:unit_tests",
-      "//chrome/app:chrome_dll_resources",
-      "//chrome/app:win_unit_tests",
-      "//chrome/browser:chrome_process_singleton",
-      "//chrome/browser/install_verification:unit_tests",
-      "//chrome/browser/os_crypt",
-      "//chrome/browser/os_crypt:unit_tests",
-      "//chrome/browser/shortcuts",
-      "//chrome/browser/ui:uninstall_browser_prompt",
-      "//chrome/browser/ui:view_ids",
-      "//chrome/browser/ui/search_promotion:unit_tests",
-      "//chrome/browser/ui/views:critical_notification_bubble_view",
-      "//chrome/browser/ui/views:uninstall_browser_prompt",
-      "//chrome/browser/ui/webui/version:unit_tests",
-      "//chrome/browser/win:chrome_process_finder",
-      "//chrome/browser/win:isolated_browser_support",
-      "//chrome/browser/win:registry_watcher",
-      "//chrome/browser/win:unit_tests",
-      "//chrome/browser/win/conflicts:unit_tests",
-      "//chrome/chrome_elf:constants",
-      "//chrome/common/notifications",
-      "//chrome/install_static:install_static_util",
-      "//chrome/installer/setup:lib",
-      "//chrome/installer/util:strings",
-      "//chrome/installer/util:with_no_strings",
-      "//chrome/services/util_win:lib",
-      "//chrome/windows_services/elevated_tracing_service:tracing_service_idl",
-      "//components/performance_manager/scenario_api",
-      "//third_party/iaccessible2",
-      "//third_party/isimpledom",
-      "//third_party/microsoft_webauthn",
-      "//third_party/wtl",
-      "//ui/events/devices:test_support",
-      "//ui/resources",
-    ]
-
-    ldflags = [
-      "/DELAYLOAD:api-ms-win-core-winrt-error-l1-1-0.dll",
-      "/DELAYLOAD:api-ms-win-core-winrt-l1-1-0.dll",
-      "/DELAYLOAD:api-ms-win-core-winrt-string-l1-1-0.dll",
-    ]
-
-    libs = [
-      "comsupp.lib",
-      "oleacc.lib",
-      "rpcrt4.lib",
-      "runtimeobject.lib",
-      "urlmon.lib",
-      "winmm.lib",
-    ]
-
-    if (is_chrome_branded) {
-      deps += [
-        "//chrome/browser/platform_experience:unit_tests",
-        "//chrome/browser/platform_experience/installer:unit_tests",
-        "//chrome/browser/win/installer_downloader:unit_tests",
-      ]
-    }
-  }
-
   if (is_internal_chrome_branded) {
     deps += [ "//chrome/browser/nearby_sharing/internal/icons:vector_icons" ]
   }
@@ -4781,13 +4600,6 @@ test("unit_tests") {
       "//chrome/browser/ui/views/passwords/password_change:password_change_toast",
     ]
 
-    if (is_win) {
-      deps += [
-        "//chrome/browser/startup",
-        "//chrome/browser/startup:unit_tests",
-      ]
-    }
-
     if (is_linux || is_mac || is_win) {
       deps += [ "//chrome/enterprise_companion:constants_prod" ]
       if (is_mac) {
@@ -5253,10 +5065,6 @@ test("unit_tests") {
         "../utility/safe_browsing/mac/udif_unittest.cc",
       ]
     }
-    if (is_win) {
-      sources +=
-          [ "../common/safe_browsing/binary_feature_extractor_win_unittest.cc" ]
-    }
     deps += [
       ":test_proto",
       "//chrome/services/file_util/public/cpp:unit_tests",
@@ -5448,12 +5256,6 @@ test("unit_tests") {
       "//components/enterprise:test_support",
     ]
 
-    if (is_win) {
-      deps += [
-        "//chrome/browser/ui/webui/default_browser:unit_tests",
-        "//chrome/browser/win:registry_watcher",
-      ]
-    }
     if (is_mac) {
       deps += [ "//components/remote_cocoa/browser" ]
     }
@@ -5754,10 +5556,6 @@ static_library("test_support_unit") {
     "//components/autofill/content/browser:test_support",
   ]
 
-  if (is_win) {
-    deps += [ "//chrome/install_static/test:test_support" ]
-  }
-
   if (enable_bound_session_credentials) {
     public_deps += [ "//components/unexportable_keys" ]
   }
@@ -6026,16 +5824,6 @@ if (!is_android) {
         "//chrome/browser/apps/app_shim",
         "//ui/base/interaction:test_support",
       ]
-    }
-
-    if (is_win) {
-      sources += [ "base/interactive_test_utils_win.cc" ]
-      public_deps += [
-        "//chrome/test/base:always_on_top_window_killer_win",
-        "//chrome/test/base:window_contents_as_string_win",
-      ]
-      public_deps += [ "//chrome/test/base:process_lineage_win" ]
-      deps += [ "//chrome/browser/os_crypt" ]
     }
 
     if (enable_extensions) {
@@ -6454,10 +6242,6 @@ if (!is_android) {
       deps += [ "//ui/linux:display_server_utils" ]
     }
 
-    if (is_win) {
-      deps += [ "//chrome/browser/ui/webui/default_browser:pixel_tests" ]
-    }
-
     # TODO(413315837): Remove this dependency when
     # c/b/ui/views/privacy_sandbox/privacy_sandbox_dialog_view_interactive_ui_test.cc
     # gets modularized.
@@ -6767,66 +6551,12 @@ if (!is_android) {
       if (is_mac) {
         deps += [ "//content/test:browsertest_support" ]
       }
-      if (is_win) {
-        sources += [
-          "../browser/ui/views/frame/browser_frame_view_win_interactive_uitest.cc",
-          "../browser/ui/views/frame/browser_window_property_manager_browsertest_win.cc",
-        ]
-        deps += [
-          "//chrome/browser/accessibility:test_support",
-          "//chrome/browser/profiles",
-          "//chrome/browser/ui/views/status_icons:interactive_ui_tests",
-          "//chrome/browser/web_applications/extensions",
-        ]
-        if (use_aura) {
-          sources += [ "../browser/ui/views/tooltip/tooltip_aura_interactive_uitest_win.cc" ]
-        }
-      }
     }
 
     # Non-ChromeOS tests.
     deps += [ "//chrome/browser/ui/signin:interactive_ui_tests" ]
 
     deps += [ "//chrome/browser/signin:interactive_ui_tests" ]
-
-    if (is_win) {
-      sources += [
-        "../browser/ui/send_mouse_move_uitest_win.cc",
-        "../browser/ui/views/touch_events_interactive_uitest_win.cc",
-        "//ui/base/clipboard/clipboard_win_unittest.cc",
-        "//ui/display/win/test/virtual_display_util_win_interactive_uitest.cc",
-      ]
-
-      if (use_aura) {
-        sources += [ "../browser/ui/views/autofill/autofill_accessibility_win_browsertest.cc" ]
-      }
-
-      deps += [
-        "//chrome:other_version",
-        "//chrome/app:chrome_dll_resources",
-        "//chrome/browser/os_crypt",
-        "//chrome/browser/os_crypt:browser_tests",
-        "//chrome/browser/os_crypt:test_support",
-        "//chrome/browser/ui/views/accessibility:uia_test_support",
-        "//chrome/browser/win:isolated_browser_support",
-        "//chrome/elevation_service:public_headers",
-        "//chrome/install_static:install_static_util",
-        "//chrome/installer/util:strings",
-        "//chrome/windows_services/service_program/test_support",
-        "//third_party/isimpledom",
-        "//third_party/webrtc_overrides:webrtc_component",
-        "//third_party/wtl",
-        "//ui/resources",
-      ]
-
-      data_deps += [ "//chrome/elevation_service" ]
-
-      libs = [
-        "newdev.lib",
-        "oleacc.lib",
-        "runtimeobject.lib",
-      ]
-    }
 
     if (is_mac) {
       sources += [
@@ -7007,9 +6737,6 @@ if (!is_android) {
     use_xvfb = use_xvfb_in_this_config
     deps =
         [ "//chrome/browser/sync/test/integration:sync_integration_tests_impl" ]
-    if (is_win) {
-      configs += [ "//build/config/win:delayloads" ]
-    }
   }
 
   test("sync_performance_tests") {
@@ -7051,14 +6778,6 @@ if (!is_android) {
       # The sync_performance_tests do not run on mac without this flag.
       # Search for comments about "xcode_settings" elsewhere in this file.
       ldflags = [ "-Wl,-ObjC" ]
-    }
-    if (is_win) {
-      deps += [
-        "//chrome:other_version",
-        "//chrome/installer/util:strings",
-        "//third_party/wtl",
-        "//ui/resources",
-      ]
     }
 
     if (toolkit_views) {
@@ -7194,15 +6913,6 @@ if (!is_android) {
       deps += [ "//chrome/app:command_ids" ]
     }
 
-    if (is_win) {
-      deps += [
-        "//chrome:other_version",
-        "//chrome/installer/util:strings",
-        "//third_party/webrtc_overrides:webrtc_component",
-        "//third_party/wtl",
-        "//ui/resources",
-      ]
-    }
   }
 
   script_test("telemetry_unittests") {
@@ -7269,75 +6979,6 @@ if (!is_android) {
       "//content/test:webgpu_cts_scripts",
       "//testing:test_scripts_shared",
     ]
-  }
-}
-
-if (is_win) {
-  fuzzer_test("safe_browsing_binary_feature_extractor_fuzzer") {
-    sources = [ "../common/safe_browsing/binary_feature_extractor_fuzzer.cc" ]
-    deps = [
-      "//base",
-      "//chrome/common/safe_browsing:binary_feature_extractor",
-      "//components/safe_browsing/core/common/proto:csd_proto",
-      "//crypto",
-      "//testing/libfuzzer:libfuzzer_base_wrappers",
-    ]
-    libs = [ "wintrust.lib" ]
-
-    # Directory contains useful and non-useful files. Don't worry about
-    # non-useful since they are eliminated during pruning.
-    seed_corpus = "data/safe_browsing/download_protection/"
-  }
-}
-
-if (is_win) {
-  action("generate_allowed_imports") {
-    testonly = true
-    script = "delayload/generate_allowed_imports.py"
-    sources = [ "delayload/supported_imports_10.0.10240.txt" ]
-    outputs = [ "$target_gen_dir/chrome/test/delayload/supported_imports.inc" ]
-    args = [
-      "--exports-file",
-      rebase_path("delayload/supported_imports_10.0.10240.txt", root_build_dir),
-      "--out-file",
-      rebase_path("$target_gen_dir/chrome/test/delayload/supported_imports.inc",
-                  root_build_dir),
-    ]
-  }
-
-  test("delayloads_unittests") {
-    output_name = "delayloads_unittests"
-    sources = [ "delayload/delayloads_unittest.cc" ]
-
-    include_dirs = [ "$target_gen_dir" ]
-    deps = [
-      ":generate_allowed_imports",
-      "//base",
-      "//base/test:test_support",
-      "//chrome",
-      "//chrome/install_static:install_static_util",
-      "//chrome/install_static/test:test_support",
-      "//mojo:buildflags",
-      "//testing/gtest",
-    ]
-
-    # It's not easily possible to have //chrome in data_deps without changing
-    # the //chrome target to bundle up both initial/chrome.exe and chrome.exe.
-    # As a workaround, explicitly include a data dep on just chrome.exe, and
-    # add //chrome to deps above to make sure it's been built.
-    data = [ "$root_out_dir/chrome.exe" ]
-
-    # Don't want the test-specific dependencies to affect load tests.
-    # In particular, a few system DLLs cause user32 to be loaded, which is bad.
-    # Add delayloads to ensure loader validations occur properly.
-    configs += [
-      "//build/config/win:delayloads",
-      "//build/config/win:delayloads_not_for_child_dll",
-    ]
-
-    # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-    # enable the diagnostic by removing this line.
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
   }
 }
 

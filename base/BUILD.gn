@@ -50,10 +50,6 @@ if (is_ios) {
   import("//build/config/ios/ios_sdk.gni")
 }
 
-if (is_win) {
-  import("//build/config/win/control_flow_guard.gni")
-}
-
 declare_args() {
   # Unsafe developer build. Has developer-friendly features that may weaken or
   # disable security measures like sandboxing or ASLR.
@@ -109,27 +105,6 @@ _build_date_header = "$target_gen_dir/generated_build_date.h"
 _enable_code_ordering = is_android && !is_component_build &&
                         (current_cpu == "arm" || current_cpu == "arm64" ||
                          current_cpu == "x86" || current_cpu == "x64")
-
-if (is_win) {
-  # This is in a separate config so the flags can be applied to dependents.
-  # ldflags in GN aren't automatically inherited.
-  config("base_win_linker_flags") {
-    ldflags = [
-      # Linking with shcore.lib causes the shcore api forwarder dll to load.
-      "/DELAYLOAD:api-ms-win-shcore-scaling-l1-1-1.dll",
-
-      # Linking with OneCore.lib causes the next three dlls to load.
-      "/DELAYLOAD:api-ms-win-core-realtime-l1-1-1.dll",
-      "/DELAYLOAD:api-ms-win-power-base-l1-1-0.dll",
-      "/DELAYLOAD:api-ms-win-power-setting-l1-1-0.dll",
-      "/DELAYLOAD:cfgmgr32.dll",
-      "/DELAYLOAD:powrprof.dll",
-      "/DELAYLOAD:setupapi.dll",
-      "/DELAYLOAD:shcore.dll",
-      "/DELAYLOAD:tbs.dll",
-    ]
-  }
-}
 
 buildflag_header("ios_cronet_buildflags") {
   header = "ios_cronet_buildflags.h"
@@ -1316,13 +1291,6 @@ component("base") {
     "task/thread_pool/initialization_util.h",
   ]
 
-  if (is_win) {
-    sources += [
-      "base_paths_win.cc",
-      "base_paths_win.h",
-    ]
-  }
-
   if (is_apple) {
     sources += [
       "base_paths_apple.cc",
@@ -1464,260 +1432,6 @@ component("base") {
     if (use_asan_backup_ref_ptr_v2) {
       all_dependent_configs += [ ":asan_raw_ptr_service_v2_config" ]
     }
-  }
-
-  # Windows.
-  if (is_win) {
-    sources += [
-      "debug/debugger_win.cc",
-      "debug/gdi_debug_util_win.cc",
-      "debug/gdi_debug_util_win.h",
-      "debug/handle_hooks_win.cc",
-      "debug/handle_hooks_win.h",
-      "debug/invalid_access_win.cc",
-      "debug/invalid_access_win.h",
-      "debug/stack_trace_win.cc",
-      "enterprise_util.cc",
-      "enterprise_util.h",
-      "enterprise_util_win.cc",
-      "file_version_info_win.cc",
-      "file_version_info_win.h",
-      "files/drive_info_win.cc",
-      "files/file_enumerator_win.cc",
-      "files/file_path_watcher_win.cc",
-      "files/file_util_win.cc",
-      "files/file_win.cc",
-      "files/memory_mapped_file_win.cc",
-      "logging_win.cc",
-      "logging_win.h",
-      "memory/page_size_win.cc",
-      "memory/platform_shared_memory_mapper_win.cc",
-      "memory/platform_shared_memory_region_win.cc",
-      "memory/protected_memory_win.cc",
-      "message_loop/message_pump_win.cc",
-      "message_loop/message_pump_win.h",
-      "moving_window.h",
-      "native_library_win.cc",
-      "power_monitor/battery_level_provider_win.cc",
-      "power_monitor/power_monitor_device_source_win.cc",
-      "power_monitor/speed_limit_observer_win.cc",
-      "power_monitor/speed_limit_observer_win.h",
-      "process/kill_win.cc",
-      "process/launch_win.cc",
-      "process/memory_win.cc",
-      "process/process_handle_win.cc",
-      "process/process_info_win.cc",
-      "process/process_iterator_win.cc",
-      "process/process_metrics_win.cc",
-      "process/process_win.cc",
-      "profiler/core_unwinders_win.cc",
-      "profiler/module_cache_win.cc",
-      "profiler/native_unwinder_win.cc",
-      "profiler/native_unwinder_win.h",
-      "profiler/stack_sampler_win.cc",
-      "profiler/suspendable_thread_delegate_win.cc",
-      "profiler/suspendable_thread_delegate_win.h",
-      "profiler/win32_stack_frame_unwinder.cc",
-      "profiler/win32_stack_frame_unwinder.h",
-      "rand_util_win.cc",
-      "scoped_clear_last_error_win.cc",
-      "strings/strcat_win.cc",
-      "strings/strcat_win.h",
-      "strings/string_number_conversions_win.cc",
-      "strings/string_number_conversions_win.h",
-      "strings/string_split_win.h",
-      "strings/string_util_win.cc",
-      "strings/string_util_win.h",
-      "strings/sys_string_conversions_win.cc",
-      "sync_socket_win.cc",
-      "synchronization/cancelable_event_win.cc",
-      "synchronization/condition_variable_win.cc",
-      "synchronization/lock_impl_win.cc",
-      "synchronization/waitable_event_watcher_win.cc",
-      "synchronization/waitable_event_win.cc",
-      "system/sys_info_win.cc",
-      "threading/platform_thread_metrics_win.cc",
-      "threading/platform_thread_win.cc",
-      "threading/platform_thread_win.h",
-      "threading/thread_local_storage_win.cc",
-      "time/time_win.cc",
-      "timer/hi_res_timer_manager_win.cc",
-      "win/access_control_list.cc",
-      "win/access_control_list.h",
-      "win/access_token.cc",
-      "win/access_token.h",
-      "win/async_operation.h",
-      "win/atl.h",
-      "win/atl_throw.cc",
-      "win/atl_throw.h",
-      "win/com_init_balancer.cc",
-      "win/com_init_balancer.h",
-      "win/com_init_check_hook.cc",
-      "win/com_init_check_hook.h",
-      "win/com_init_util.cc",
-      "win/com_init_util.h",
-      "win/core_winrt_util.cc",
-      "win/core_winrt_util.h",
-      "win/current_module.h",
-      "win/dark_mode_support.cc",
-      "win/dark_mode_support.h",
-      "win/default_apps_util.cc",
-      "win/default_apps_util.h",
-      "win/delayload_helpers.cc",
-      "win/delayload_helpers.h",
-      "win/elevation_util.cc",
-      "win/elevation_util.h",
-      "win/embedded_i18n/language_selector.cc",
-      "win/embedded_i18n/language_selector.h",
-      "win/enum_variant.cc",
-      "win/enum_variant.h",
-      "win/event_trace_consumer.h",
-      "win/event_trace_controller.cc",
-      "win/event_trace_controller.h",
-      "win/event_trace_provider.cc",
-      "win/event_trace_provider.h",
-      "win/hardware_check.cc",
-      "win/hardware_check.h",
-      "win/hstring_reference.cc",
-      "win/hstring_reference.h",
-      "win/i18n.cc",
-      "win/i18n.h",
-      "win/iat_patch_function.cc",
-      "win/iat_patch_function.h",
-      "win/limited_access_features.cc",
-      "win/limited_access_features.h",
-      "win/map.h",
-      "win/message_window.cc",
-      "win/message_window.h",
-      "win/nt_status.cc",
-      "win/nt_status.h",
-      "win/ntsecapi_shim.h",
-      "win/object_watcher.cc",
-      "win/object_watcher.h",
-      "win/patch_util.cc",
-      "win/patch_util.h",
-      "win/pdh_shim.h",
-      "win/pe_image_reader.cc",
-      "win/pe_image_reader.h",
-      "win/post_async_results.h",
-      "win/process_startup_helper.cc",
-      "win/process_startup_helper.h",
-      "win/propvarutil.h",
-      "win/reference.h",
-      "win/registry.cc",
-      "win/registry.h",
-      "win/resource_exhaustion.cc",
-      "win/resource_exhaustion.h",
-      "win/resource_util.cc",
-      "win/resource_util.h",
-      "win/scoped_bstr.cc",
-      "win/scoped_bstr.h",
-      "win/scoped_co_mem.h",
-      "win/scoped_com_initializer.cc",
-      "win/scoped_com_initializer.h",
-      "win/scoped_gdi_object.cc",
-      "win/scoped_gdi_object.h",
-      "win/scoped_handle.cc",
-      "win/scoped_handle.h",
-      "win/scoped_handle_verifier.cc",
-      "win/scoped_handle_verifier.h",
-      "win/scoped_hdc.h",
-      "win/scoped_hglobal.h",
-      "win/scoped_hstring.cc",
-      "win/scoped_hstring.h",
-      "win/scoped_localalloc.h",
-      "win/scoped_pdh_query.cc",
-      "win/scoped_pdh_query.h",
-      "win/scoped_process_information.cc",
-      "win/scoped_process_information.h",
-      "win/scoped_propvariant.h",
-      "win/scoped_safearray.h",
-      "win/scoped_select_object.h",
-      "win/scoped_variant.cc",
-      "win/scoped_variant.h",
-      "win/scoped_windows_thread_environment.h",
-      "win/scoped_winrt_initializer.cc",
-      "win/scoped_winrt_initializer.h",
-      "win/scoped_wintrust_data.cc",
-      "win/scoped_wintrust_data.h",
-      "win/security_descriptor.cc",
-      "win/security_descriptor.h",
-      "win/security_util.cc",
-      "win/security_util.h",
-      "win/shell_util.cc",
-      "win/shell_util.h",
-      "win/shlwapi.h",
-      "win/shortcut.cc",
-      "win/shortcut.h",
-      "win/sid.cc",
-      "win/sid.h",
-      "win/startup_information.cc",
-      "win/startup_information.h",
-      "win/trust_util.cc",
-      "win/trust_util.h",
-      "win/variant_conversions.h",
-      "win/variant_vector.cc",
-      "win/variant_vector.h",
-      "win/vector.cc",
-      "win/vector.h",
-      "win/wbemidl_shim.h",
-      "win/win_handle_types.h",
-      "win/win_handle_types_list.inc",
-      "win/win_util.cc",
-      "win/win_util.h",
-      "win/winbase_shim.h",
-      "win/wincred_shim.h",
-      "win/window_enumerator.cc",
-      "win/window_enumerator.h",
-      "win/windows_defines.inc",
-      "win/windows_h_disallowed.h",
-      "win/windows_handle_util.h",
-      "win/windows_types.h",
-      "win/windows_undefines.inc",
-      "win/windows_version.cc",
-      "win/windows_version.h",
-      "win/windowsx_shim.h",
-      "win/winrt_foundation_helpers.h",
-      "win/winrt_storage_util.cc",
-      "win/winrt_storage_util.h",
-      "win/wmi.cc",
-      "win/wmi.h",
-      "win/wrapped_window_proc.cc",
-      "win/wrapped_window_proc.h",
-    ]
-
-    deps += [ "//base/win:base_win_buildflags" ]
-
-    if (com_init_check_hook_disabled) {
-      defines += [ "COM_INIT_CHECK_HOOK_DISABLED" ]
-    }
-
-    libs += [
-      "cfgmgr32.lib",
-      "crypt32.lib",
-      "ntdll.lib",
-      "onecore.lib",
-      "pdh.lib",
-      "powrprof.lib",
-      "propsys.lib",
-      "setupapi.lib",
-      "shcore.lib",
-      "tbs.lib",
-      "userenv.lib",
-      "wbemuuid.lib",
-      "winmm.lib",
-      "wintrust.lib",
-    ]
-    all_dependent_configs += [
-      ":base_win_linker_flags",
-      "//tools/win/DebugVisualizers:chrome",
-    ]
-    inputs = [
-      # chrome.natvis listed as an input here instead of in
-      # //tools/win/DebugVisualizers:chrome to prevent unnecessary size increase
-      # in generated build files.
-      "//tools/win/DebugVisualizers/chrome.natvis",
-    ]
   }
 
   if (!is_win) {
@@ -2222,15 +1936,6 @@ component("base") {
 
   all_dependent_configs += [ "//third_party/perfetto/gn:public_config" ]
 
-  if (is_win) {
-    sources += [
-      "trace_event/etw_interceptor_win.cc",
-      "trace_event/etw_interceptor_win.h",
-      "trace_event/trace_logging_minimal_win.cc",
-      "trace_event/trace_logging_minimal_win.h",
-    ]
-  }
-
   if (use_partition_alloc_as_malloc) {
     sources += [
       "trace_event/address_space_dump_provider.cc",
@@ -2705,21 +2410,6 @@ static_library("base_static") {
 
   deps = [ ":fuzzing_buildflags" ]
 
-  if (is_win) {
-    sources += [
-      "win/static_constants.cc",
-      "win/static_constants.h",
-    ]
-
-    public_deps = [ "//base/win:pe_image" ]
-
-    # Disable sanitizer coverage in win/pe_image.cc. It is called by the sandbox
-    # before sanitizer coverage can initialize. http://crbug.com/484711
-    configs -= [ "//build/config/sanitizers:default_sanitizer_flags" ]
-    configs +=
-        [ "//build/config/sanitizers:default_sanitizer_flags_but_coverage" ]
-  }
-
   if (!is_debug) {
     configs -= [ "//build/config/compiler:default_optimization" ]
     configs += [ "//build/config/compiler:optimize_max" ]
@@ -2875,10 +2565,6 @@ test("base_perftests") {
     "//testing:run_perf_test",
   ]
 
-  if (is_win) {
-    sources += [ "time/time_win_perftest.cc" ]
-  }
-
   if (!is_official_build) {
     # The extra data tables required by stack traces are turned off for official
     # build, only do stack trace perftest for unofficial build
@@ -2922,31 +2608,6 @@ if (!is_ios) {
   executable("json_perftest_decodebench") {
     sources = [ "json/json_perftest_decodebench.cc" ]
     deps = [ ":base" ]
-  }
-}
-
-if (is_win) {
-  # Target to manually rebuild pe_image_test.dll which is checked into
-  # base/test/data/pe_image.
-  shared_library("pe_image_test") {
-    sources = [ "win/pe_image_test.cc" ]
-    ldflags = [
-      "/DELAYLOAD:cfgmgr32.dll",
-      "/DELAYLOAD:shell32.dll",
-      "/SUBSYSTEM:WINDOWS",
-    ]
-    libs = [
-      "cfgmgr32.lib",
-      "shell32.lib",
-    ]
-  }
-
-  loadable_module("scoped_handle_test_dll") {
-    sources = [ "win/scoped_handle_test_dll.cc" ]
-    deps = [
-      ":base",
-      "//base/win:base_win_buildflags",
-    ]
   }
 }
 
@@ -3106,13 +2767,6 @@ source_set("path_service_unittest") {
     deps += [ ":base_generated_test_file_bundle_data" ]
   } else {
     data_deps = [ ":generate_file_for_test" ]
-  }
-}
-
-if (is_win) {
-  # Used by win/delayload_helpers_unittest.cc to test delayload helpers.
-  config("delayload_esent_dll") {
-    ldflags = [ "/DELAYLOAD:esent.dll" ]
   }
 }
 
@@ -3689,88 +3343,6 @@ test("base_unittests") {
     data += [ "$root_gen_dir/base/test/test_proto.descriptor" ]
   }
 
-  if (is_win) {
-    deps += [ "//base/win:base_win_buildflags" ]
-
-    sources += [
-      "debug/gdi_debug_util_win_unittest.cc",
-      "file_version_info_win_unittest.cc",
-      "process/launch_unittest_win.cc",
-      "test/fake_iasync_operation_win_unittest.cc",
-      "test/test_file_util_win_unittest.cc",
-      "test/test_reg_util_win_unittest.cc",
-      "threading/platform_thread_win_unittest.cc",
-      "time/time_win_unittest.cc",
-      "win/access_control_list_unittest.cc",
-      "win/access_token_unittest.cc",
-      "win/async_operation_unittest.cc",
-      "win/com_init_balancer_unittest.cc",
-      "win/com_init_check_hook_unittest.cc",
-      "win/com_init_util_unittest.cc",
-      "win/dark_mode_support_unittest.cc",
-      "win/delayload_helpers_unittest.cc",
-      "win/dispatch_stub.cc",
-      "win/dispatch_stub.h",
-      "win/dllmain.cc",
-      "win/elevation_util_unittest.cc",
-      "win/embedded_i18n/language_selector_unittest.cc",
-      "win/enum_variant_unittest.cc",
-      "win/event_trace_consumer_unittest.cc",
-      "win/event_trace_controller_unittest.cc",
-      "win/event_trace_provider_unittest.cc",
-      "win/hardware_check_unittest.cc",
-      "win/hstring_reference_unittest.cc",
-      "win/i18n_unittest.cc",
-      "win/limited_access_features_unittest.cc",
-      "win/map_unittest.cc",
-      "win/message_window_unittest.cc",
-      "win/object_watcher_unittest.cc",
-      "win/pe_image_reader_unittest.cc",
-      "win/pe_image_unittest.cc",
-      "win/post_async_results_unittest.cc",
-      "win/reference_unittest.cc",
-      "win/registry_unittest.cc",
-      "win/scoped_bstr_unittest.cc",
-      "win/scoped_handle_unittest.cc",
-      "win/scoped_hstring_unittest.cc",
-      "win/scoped_localalloc_unittest.cc",
-      "win/scoped_process_information_unittest.cc",
-      "win/scoped_safearray_unittest.cc",
-      "win/scoped_variant_unittest.cc",
-      "win/scoped_winrt_initializer_unittest.cc",
-      "win/security_descriptor_unittest.cc",
-      "win/security_util_unittest.cc",
-      "win/shell_util_unittest.cc",
-      "win/shortcut_unittest.cc",
-      "win/sid_unittest.cc",
-      "win/startup_information_unittest.cc",
-      "win/trust_util_unittest.cc",
-      "win/variant_conversions_unittest.cc",
-      "win/variant_vector_unittest.cc",
-      "win/vector_unittest.cc",
-      "win/win_includes_unittest.cc",
-      "win/win_util_unittest.cc",
-      "win/window_enumerator_unittest.cc",
-      "win/windows_version_unittest.cc",
-      "win/winrt_storage_util_unittest.cc",
-      "win/wmi_unittest.cc",
-      "win/wrapped_window_proc_unittest.cc",
-    ]
-
-    fuzztests += [ "FileUtilFuzzTest.RemoveWindowsExtendedPathPrefixNoCrash" ]
-
-    if (enable_cet_shadow_stack) {
-      sources += [ "win/cet_shadow_stack_unittest.cc" ]
-    }
-
-    libs = [
-      "esent.lib",
-      "ntdll.lib",
-      "onecore.lib",
-    ]
-    configs += [ ":delayload_esent_dll" ]
-  }
-
   if (is_linux) {
     sources += [
       "debug/proc_maps_linux_unittest.cc",
@@ -3945,24 +3517,6 @@ test("base_unittests") {
     sources += [ "files/file_locking_unittest.cc" ]
   }
 
-  if (is_win) {
-    deps += [ ":scoped_handle_test_dll" ]
-    if (current_cpu == "x64" || current_cpu == "arm64") {
-      sources += [ "profiler/win32_stack_frame_unwinder_unittest.cc" ]
-      deps += [ ":base_profiler_test_support_library" ]
-    }
-
-    # These tests are not built by default because they make heavy use of
-    # parameterized tests. Even when disabled, they incur a startup penalty on
-    # base_unittests. See comments in the file as for why they are disabled by
-    # default, and https://crbug.com/1475518 for one consequence of the process
-    # startup penalty.
-    # sources += [ "files/os_validation_win_unittest.cc" ]
-
-    if (toolchain_has_rust && win_enable_cfg_guards) {
-      deps += [ ":rust_cfg_win_test" ]
-    }
-  }
   if (is_apple) {
     sources += [ "profiler/frame_pointer_unwinder_unittest.cc" ]
   }
@@ -3997,10 +3551,6 @@ test("base_unittests") {
     "trace_event/traced_value_unittest.cc",
     "tracing/perfetto_task_runner_unittest.cc",
   ]
-
-  if (is_win) {
-    sources += [ "trace_event/trace_logging_minimal_win_unittest.cc" ]
-  }
 
   deps += [
     "//third_party/perfetto:perfetto_test_support",

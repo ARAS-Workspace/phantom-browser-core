@@ -94,10 +94,6 @@ source_set("impl") {
     ]
   }
 
-  if (is_win) {
-    deps += [ "//chrome/browser/win" ]
-  }
-
   if (!is_android) {
     sources += [
       "application_lifetime_desktop.cc",

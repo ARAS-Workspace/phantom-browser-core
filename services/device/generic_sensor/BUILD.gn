@@ -86,24 +86,4 @@ source_set("generic_sensor") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "platform_sensor_provider_win.cc",
-      "platform_sensor_provider_win.h",
-      "platform_sensor_provider_winrt.cc",
-      "platform_sensor_provider_winrt.h",
-      "platform_sensor_reader_win.cc",
-      "platform_sensor_reader_win.h",
-      "platform_sensor_reader_win_base.h",
-      "platform_sensor_reader_winrt.cc",
-      "platform_sensor_reader_winrt.h",
-      "platform_sensor_win.cc",
-      "platform_sensor_win.h",
-    ]
-
-    libs = [
-      "portabledeviceguids.lib",
-      "sensorsapi.lib",
-    ]
-  }
 }

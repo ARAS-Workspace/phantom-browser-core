@@ -17,10 +17,6 @@ static_library("rlz") {
     sources += [ "rlz_tracker_mac.cc" ]
   }
 
-  if (is_win) {
-    sources += [ "rlz_tracker_win.cc" ]
-  }
-
   deps = [
     "//base",
     "//components/google/core/common",

@@ -86,13 +86,6 @@ component("message_center") {
 
     sources += get_target_outputs(":message_center_vector_icons")
 
-    if (is_win) {
-      deps += [
-        "//ui/aura",
-        "//ui/wm/public",
-      ]
-    }
-
     if (toolkit_views) {
       # TODO(crbug.com/257291597): Skip the sources that are unused on
       # is_chromeos (e.g. notification_view.cc). This will require refactoring

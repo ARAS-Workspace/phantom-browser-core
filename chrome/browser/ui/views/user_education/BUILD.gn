@@ -144,10 +144,6 @@ source_set("impl") {
     deps += [ "//components/remote_cocoa/app_shim" ]
   }
 
-  if (is_win) {
-    deps += [ "//chrome/browser/ui/search_promotion" ]
-  }
-
   if (enable_extensions) {
     deps += [ "//chrome/browser/ui/webui/extensions_zero_state_promo" ]
   }

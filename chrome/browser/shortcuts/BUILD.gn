@@ -47,15 +47,6 @@ source_set("shortcuts") {
     "//url",
   ]
 
-  if (is_win) {
-    public += [ "platform_util_win.h" ]
-    sources += [
-      "platform_util_win.cc",
-      "shortcut_creator_win.cc",
-    ]
-    deps += [ "//chrome/common:non_code_constants" ]
-  }
-
   friend = [
     ":browser_tests",
     ":test_support",
@@ -116,11 +107,5 @@ source_set("test_support") {
     ]
   }
   if (is_mac) {
-  }
-  if (is_win) {
-    deps += [
-      "//chrome/browser",
-      "//chrome/browser:chrome_browser_main",
-    ]
   }
 }

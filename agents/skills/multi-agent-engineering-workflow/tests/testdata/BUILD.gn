@@ -105,9 +105,6 @@ source_set("test_target") {
     "$target_gen_dir/type_converter.cc",
   ]
 
-  if (is_win) {
-    sources += [ "$target_gen_dir/file_manager_win.cc" ]
-  }
   if (is_linux) {
     sources += [ "$target_gen_dir/socket_handler_linux.cc" ]
   }

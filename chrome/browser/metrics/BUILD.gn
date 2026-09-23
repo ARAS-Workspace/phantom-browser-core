@@ -112,23 +112,6 @@ source_set("metrics") {
 
   public += [ "family_link_user_metrics_provider.h" ]
 
-  if (is_win) {
-    public += [
-      "antivirus_metrics_provider_win.h",
-      "google_update_metrics_provider_win.h",
-      "key_credential_manager_support_reporter_win.h",
-      "oom/commit_limit_oom_recovery_tracker.h",
-      "system_memory_list_metrics_provider_win.h",
-      "system_pdh_metrics_provider_win.h",
-      "tpm_metrics_provider_win.h",
-    ]
-    public_deps += [
-      "//chrome/browser:browser_features",
-      "//chrome/installer/util:with_no_strings",
-      "//chrome/services/util_win/public/mojom",
-    ]
-  }
-
   if (is_mac) {
     public += [
       "google_update_metrics_provider_mac.h",
@@ -300,24 +283,6 @@ source_set("impl") {
 
   sources += [ "family_link_user_metrics_provider.cc" ]
 
-  if (is_win) {
-    sources += [
-      "antivirus_metrics_provider_win.cc",
-      "google_update_metrics_provider_win.cc",
-      "key_credential_manager_support_reporter_win.cc",
-      "oom/commit_limit_oom_recovery_tracker.cc",
-      "system_memory_list_metrics_provider_win.cc",
-      "system_pdh_metrics_provider_win.cc",
-      "tpm_metrics_provider_win.cc",
-    ]
-    deps += [
-      "//chrome/browser/win",
-      "//chrome/browser/win:cloud_synced_folder_checker",
-      "//chrome/browser/win:isolated_browser_support",
-      "//chrome/notification_helper:constants",
-    ]
-  }
-
   if (is_mac) {
     sources += [
       "chrome_browser_main_extra_parts_metrics_mac.mm",
@@ -425,23 +390,6 @@ source_set("unit_tests") {
     "//ui/base:test_support",
     "//ui/display:test_support",
   ]
-
-  if (is_win) {
-    sources += [
-      "accessibility_state_provider_win_unittest.cc",
-      "antivirus_metrics_provider_win_unittest.cc",
-      "oom/commit_limit_oom_recovery_tracker_unittest.cc",
-      "system_memory_list_metrics_provider_win_unittest.cc",
-      "system_pdh_metrics_provider_win_unittest.cc",
-      "tpm_metrics_provider_win_unittest.cc",
-    ]
-    deps += [
-      "//chrome/services/util_win:lib",
-      "//components/tabs:test_support",
-      "//components/variations",
-      "//ui/accessibility",
-    ]
-  }
 
   if (is_mac) {
     sources += [
@@ -604,8 +552,5 @@ if (!is_android) {
       "//third_party/federated_compute:confidential_compute_crypto_test_util",
     ]
 
-    if (is_win) {
-      deps += [ "//sandbox/win:common" ]
-    }
   }
 }

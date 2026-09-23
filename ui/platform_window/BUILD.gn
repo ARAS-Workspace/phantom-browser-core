@@ -45,7 +45,4 @@ component("platform_window") {
 
 group("platform_impls") {
   public_deps = [ "//ui/platform_window/stub" ]
-  if (is_win) {
-    public_deps += [ "//ui/platform_window/win" ]
-  }
 }

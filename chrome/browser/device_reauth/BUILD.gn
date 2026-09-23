@@ -23,12 +23,6 @@ source_set("device_reauth") {
     ]
   }
 
-  if (is_win) {
-    public += [
-      "win/authenticator_win.h",
-      "win/device_authenticator_win.h",
-    ]
-  }
 }
 
 source_set("impl") {
@@ -62,12 +56,6 @@ source_set("impl") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "win/authenticator_win.cc",
-      "win/device_authenticator_win.cc",
-    ]
-  }
 }
 
 source_set("unit_tests") {
@@ -101,7 +89,4 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_win) {
-    sources += [ "win/device_authenticator_win_unittest.cc" ]
-  }
 }

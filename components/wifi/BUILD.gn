@@ -19,15 +19,6 @@ component("wifi") {
     "//crypto",
   ]
 
-  if (is_win) {
-    sources += [ "wifi_service_win.cc" ]
-    libs = [ "iphlpapi.lib" ]
-    deps += [
-      "//third_party/libxml:xml_reader",  # Safe, data come from system.
-      "//third_party/libxml:xml_writer",
-    ]
-  }
-
   if (is_mac) {
     sources += [ "wifi_service_mac.mm" ]
     frameworks = [

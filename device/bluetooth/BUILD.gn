@@ -8,16 +8,6 @@ import("//device/bluetooth/cast_bluetooth.gni")
 import("//device/bluetooth/emulation/buildflags.gni")
 
 config("bluetooth_config") {
-  if (is_win) {
-    ldflags = [
-      "/DELAYLOAD:BluetoothApis.dll",
-
-      # Despite MSDN stating that Bthprops.dll contains the
-      # symbols declared by bthprops.lib, they actually reside here:
-      "/DELAYLOAD:Bthprops.cpl",
-      "/DELAYLOAD:setupapi.dll",
-    ]
-  }
 }
 
 config("bluetooth_emulation_config") {
@@ -246,50 +236,6 @@ component("bluetooth") {
     sources += [
       "bluetooth_adapter_ios.h",
       "bluetooth_adapter_ios.mm",
-    ]
-  }
-
-  if (is_win) {
-    sources += [
-      "bluetooth_adapter_win.cc",
-      "bluetooth_adapter_win.h",
-      "bluetooth_adapter_winrt.cc",
-      "bluetooth_adapter_winrt.h",
-      "bluetooth_advertisement_winrt.cc",
-      "bluetooth_advertisement_winrt.h",
-      "bluetooth_classic_win.cc",
-      "bluetooth_classic_win.h",
-      "bluetooth_device_win.cc",
-      "bluetooth_device_win.h",
-      "bluetooth_device_winrt.cc",
-      "bluetooth_device_winrt.h",
-      "bluetooth_gatt_discoverer_winrt.cc",
-      "bluetooth_gatt_discoverer_winrt.h",
-      "bluetooth_init_win.cc",
-      "bluetooth_init_win.h",
-      "bluetooth_pairing_winrt.cc",
-      "bluetooth_pairing_winrt.h",
-      "bluetooth_remote_gatt_characteristic_winrt.cc",
-      "bluetooth_remote_gatt_characteristic_winrt.h",
-      "bluetooth_remote_gatt_descriptor_winrt.cc",
-      "bluetooth_remote_gatt_descriptor_winrt.h",
-      "bluetooth_remote_gatt_service_winrt.cc",
-      "bluetooth_remote_gatt_service_winrt.h",
-      "bluetooth_service_record_win.cc",
-      "bluetooth_service_record_win.h",
-      "bluetooth_socket_win.cc",
-      "bluetooth_socket_win.h",
-      "bluetooth_task_manager_win.cc",
-      "bluetooth_task_manager_win.h",
-      "event_utils_winrt.h",
-    ]
-
-    libs = [
-      # Bthprops must be listed before BluetoothApis or else delay loading
-      # crashes.
-      "Bthprops.lib",
-      "BluetoothApis.lib",
-      "setupapi.lib",
     ]
   }
 

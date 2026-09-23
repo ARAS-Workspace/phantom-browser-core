@@ -85,19 +85,6 @@ test("device_unittests") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "bluetooth/bluetooth_adapter_win_unittest.cc",
-      "bluetooth/bluetooth_device_win_unittest.cc",
-      "bluetooth/bluetooth_service_record_win_unittest.cc",
-      "bluetooth/bluetooth_task_manager_win_unittest.cc",
-      "bluetooth/test/bluetooth_test_win.cc",
-      "bluetooth/test/bluetooth_test_win.h",
-      "gamepad/gameinput_data_fetcher_unittest.cc",
-      "gamepad/wgi_data_fetcher_win_unittest.cc",
-    ]
-  }
-
   deps = [
     "//base",
     "//base/test:test_support",
@@ -216,13 +203,6 @@ test("device_unittests") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "fido/win/authenticator_unittest.cc",
-      "fido/win/type_conversions_unittest.cc",
-    ]
-  }
-
   # FIDO HID:
   # Android doesn't compile.
   # Linux, requires udev.
@@ -306,65 +286,6 @@ test("device_unittests") {
       "IOKit.framework",
       "Security.framework",
       "AuthenticationServices.framework",
-    ]
-  }
-
-  if (is_win) {
-    sources += [
-      "bluetooth/bluetooth_classic_win_fake.cc",
-      "bluetooth/bluetooth_classic_win_fake.h",
-      "bluetooth/test/fake_bluetooth_adapter_winrt.cc",
-      "bluetooth/test/fake_bluetooth_adapter_winrt.h",
-      "bluetooth/test/fake_bluetooth_le_advertisement_data_section_winrt.cc",
-      "bluetooth/test/fake_bluetooth_le_advertisement_data_section_winrt.h",
-      "bluetooth/test/fake_bluetooth_le_advertisement_publisher_status_changed_event_args_winrt.cc",
-      "bluetooth/test/fake_bluetooth_le_advertisement_publisher_status_changed_event_args_winrt.h",
-      "bluetooth/test/fake_bluetooth_le_advertisement_publisher_winrt.cc",
-      "bluetooth/test/fake_bluetooth_le_advertisement_publisher_winrt.h",
-      "bluetooth/test/fake_bluetooth_le_advertisement_received_event_args_winrt.cc",
-      "bluetooth/test/fake_bluetooth_le_advertisement_received_event_args_winrt.h",
-      "bluetooth/test/fake_bluetooth_le_advertisement_watcher_winrt.cc",
-      "bluetooth/test/fake_bluetooth_le_advertisement_watcher_winrt.h",
-      "bluetooth/test/fake_bluetooth_le_advertisement_winrt.cc",
-      "bluetooth/test/fake_bluetooth_le_advertisement_winrt.h",
-      "bluetooth/test/fake_bluetooth_le_device_winrt.cc",
-      "bluetooth/test/fake_bluetooth_le_device_winrt.h",
-      "bluetooth/test/fake_bluetooth_le_manufacturer_data_winrt.cc",
-      "bluetooth/test/fake_bluetooth_le_manufacturer_data_winrt.h",
-      "bluetooth/test/fake_device_information_custom_pairing_winrt.cc",
-      "bluetooth/test/fake_device_information_custom_pairing_winrt.h",
-      "bluetooth/test/fake_device_information_pairing_winrt.cc",
-      "bluetooth/test/fake_device_information_pairing_winrt.h",
-      "bluetooth/test/fake_device_information_winrt.cc",
-      "bluetooth/test/fake_device_information_winrt.h",
-      "bluetooth/test/fake_device_pairing_requested_event_args_winrt.cc",
-      "bluetooth/test/fake_device_pairing_requested_event_args_winrt.h",
-      "bluetooth/test/fake_device_pairing_result_winrt.cc",
-      "bluetooth/test/fake_device_pairing_result_winrt.h",
-      "bluetooth/test/fake_device_watcher_winrt.cc",
-      "bluetooth/test/fake_device_watcher_winrt.h",
-      "bluetooth/test/fake_gatt_characteristic_winrt.cc",
-      "bluetooth/test/fake_gatt_characteristic_winrt.h",
-      "bluetooth/test/fake_gatt_characteristics_result_winrt.cc",
-      "bluetooth/test/fake_gatt_characteristics_result_winrt.h",
-      "bluetooth/test/fake_gatt_descriptor_winrt.cc",
-      "bluetooth/test/fake_gatt_descriptor_winrt.h",
-      "bluetooth/test/fake_gatt_descriptors_result_winrt.cc",
-      "bluetooth/test/fake_gatt_descriptors_result_winrt.h",
-      "bluetooth/test/fake_gatt_device_service_winrt.cc",
-      "bluetooth/test/fake_gatt_device_service_winrt.h",
-      "bluetooth/test/fake_gatt_device_services_result_winrt.cc",
-      "bluetooth/test/fake_gatt_device_services_result_winrt.h",
-      "bluetooth/test/fake_gatt_read_result_winrt.cc",
-      "bluetooth/test/fake_gatt_read_result_winrt.h",
-      "bluetooth/test/fake_gatt_session_winrt.cc",
-      "bluetooth/test/fake_gatt_session_winrt.h",
-      "bluetooth/test/fake_gatt_value_changed_event_args_winrt.cc",
-      "bluetooth/test/fake_gatt_value_changed_event_args_winrt.h",
-      "bluetooth/test/fake_gatt_write_result_winrt.cc",
-      "bluetooth/test/fake_gatt_write_result_winrt.h",
-      "bluetooth/test/fake_radio_winrt.cc",
-      "bluetooth/test/fake_radio_winrt.h",
     ]
   }
 

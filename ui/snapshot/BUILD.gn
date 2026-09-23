@@ -20,10 +20,6 @@ component("snapshot") {
     ]
   }
 
-  if (is_win) {
-    sources += [ "snapshot_win.cc" ]
-  }
-
   if (is_ios) {
     sources += [ "snapshot_ios.mm" ]
   }

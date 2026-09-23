@@ -100,21 +100,6 @@ source_set("unittests") {
     "//third_party/blink/public/common",
   ]
 
-  if (is_win) {
-    sources += [
-      "cdm_document_service_impl_test.cc",
-      "media_foundation_service_monitor_unittest.cc",
-    ]
-    deps += [
-      ":impl",
-      "//chrome/browser/profiles:profile",
-      "//components/sync_preferences:test_support",
-      "//components/user_prefs",
-      "//content/test:test_support",
-      "//media",
-    ]
-  }
-
   if (enable_extensions) {
     sources += [ "cast_mirroring_service_host_unittest.cc" ]
     deps += [ ":impl" ]
@@ -274,14 +259,6 @@ source_set("media") {
     public_deps += [ "//components/permissions" ]
   }
 
-  if (is_win) {
-    public += [
-      "cdm_pref_service_helper.h",
-      "media_foundation_service_monitor.h",
-    ]
-    public_deps += [ "//ui/display" ]
-  }
-
   if (enable_media_remoting) {
     public += [
       "cast_remoting_connector.h",
@@ -386,13 +363,6 @@ source_set("impl") {
 
   if (is_android || is_win) {
     sources += [ "protected_media_identifier_permission_context.cc" ]
-  }
-
-  if (is_win) {
-    sources += [
-      "cdm_pref_service_helper.cc",
-      "media_foundation_service_monitor.cc",
-    ]
   }
 
   if (enable_media_remoting) {

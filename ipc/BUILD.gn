@@ -75,15 +75,6 @@ component("message_support") {
     "ipc_mojo_handle_attachment.h",
   ]
 
-  if (is_win) {
-    sources += [
-      "handle_attachment_win.cc",
-      "handle_attachment_win.h",
-      "handle_win.cc",
-      "handle_win.h",
-    ]
-  }
-
   if (is_posix) {
     sources += [
       "ipc_platform_file_attachment_posix.cc",
@@ -204,10 +195,6 @@ if (use_blink) {
 
     if (is_posix) {
       sources += [ "ipc_message_attachment_set_posix_unittest.cc" ]
-    }
-
-    if (is_win) {
-      sources += [ "handle_win_unittest.cc" ]
     }
 
     deps = [

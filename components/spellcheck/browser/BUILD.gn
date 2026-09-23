@@ -23,14 +23,6 @@ source_set("browser") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "spellcheck_platform_win.cc",
-      "windows_spell_checker.cc",
-      "windows_spell_checker.h",
-    ]
-  }
-
   public_deps = [
     "//base",
     "//components/spellcheck:buildflags",
@@ -57,10 +49,6 @@ source_set("browser") {
 source_set("unit_tests") {
   testonly = true
   sources = [ "spellcheck_host_metrics_unittest.cc" ]
-
-  if (is_win) {
-    sources += [ "windows_spell_checker_unittest.cc" ]
-  }
 
   if (is_mac) {
     sources += [ "spellcheck_platform_mac_unittest.cc" ]

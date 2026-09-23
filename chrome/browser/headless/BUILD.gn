@@ -50,9 +50,6 @@ source_set("initializer") {
     ]
   }
 
-  if (is_win) {
-    deps += [ "//chrome/chrome_elf:chrome_elf_main_include" ]
-  }
 }
 
 source_set("metrics") {
@@ -132,10 +129,6 @@ if (!is_android) {
       sources += [ "test/headless_mode_browsertest_linux.cc" ]
     }
 
-    if (is_win) {
-      sources += [ "test/headless_mode_browsertest_win.cc" ]
-    }
-
     if (is_mac) {
       sources += [ "test/headless_mode_browsertest_mac.mm" ]
     }
@@ -209,9 +202,6 @@ source_set("interactive_ui_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   sources = []
-  if (is_win) {
-    sources += [ "test/headless_mode_interactive_uitest_win.cc" ]
-  }
   deps = [
     ":initializer",
     "//base",

@@ -27,9 +27,6 @@ component("emoji") {
 
   deps = [ "//base" ]
 
-  if (is_win) {
-    deps += [ "//ui/events:events_base" ]
-  }
   if (is_mac) {
     frameworks = [
       "AppKit.framework",

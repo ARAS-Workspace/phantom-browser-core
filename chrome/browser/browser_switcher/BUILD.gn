@@ -10,14 +10,6 @@ source_set("browser_switcher") {
   public = []
   public_deps = [ "//base" ]
 
-  if (is_win) {
-    public += [
-      "browser_switcher_policy_migrator.h",
-      "browser_switcher_service_win.h",
-    ]
-    public_deps += [ "//chrome/browser/policy:policy_migrator" ]
-  }
-
   if (is_win || is_mac || is_linux) {
     public += [
       "alternative_browser_driver.h",
@@ -44,13 +36,6 @@ source_set("impl") {
   sources = []
   deps = [ ":browser_switcher" ]
 
-  if (is_win) {
-    sources += [
-      "browser_switcher_policy_migrator.cc",
-      "browser_switcher_service_win.cc",
-    ]
-  }
-
   if (is_win || is_mac || is_linux) {
     sources += [
       "browser_switcher_navigation_throttle.cc",
@@ -74,11 +59,6 @@ source_set("impl") {
       "//services/data_decoder/public/cpp:safe_xml_parser",
       "//services/data_decoder/public/mojom:mojom_xml_parser",
     ]
-  }
-
-  if (is_win) {
-    sources += [ "alternative_browser_driver_win.cc" ]
-    deps += [ "//chrome/browser/win:isolated_browser_support" ]
   }
 
   if (is_mac || is_linux) {
@@ -165,13 +145,4 @@ fuzzer_test("browser_switcher_ieem_sitelist_parser_fuzzer") {
     "//services/data_decoder/public/cpp:test_support",
   ]
 
-  if (is_win) {
-    deps += [
-      # Stub out thunks for transitive dependencies (they're normally linked
-      # into the Chrome binary by separate GN rules, but for the fuzzer we
-      # have to do it manually here).
-      "//chrome/chrome_elf:test_stubs",
-      "//components/crash/core/app:test_support",
-    ]
-  }
 }

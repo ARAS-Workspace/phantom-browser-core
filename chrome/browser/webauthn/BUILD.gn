@@ -158,9 +158,6 @@ source_set("impl") {
     sources += [ "chrome_authenticator_request_delegate_mac.mm" ]
   }
 
-  if (is_win) {
-    deps += [ ":local_credential_management" ]
-  }
 }
 
 source_set("chrome_web_authentication_delegate") {
@@ -220,15 +217,6 @@ if (!is_android) {
       "//components/prefs",
       "//net",
     ]
-
-    if (is_win) {
-      public += [ "local_credential_management_win.h" ]
-      sources += [ "local_credential_management_win.cc" ]
-      deps += [
-        "//components/pref_registry",
-        "//components/user_prefs",
-      ]
-    }
 
     if (is_mac) {
       public += [ "local_credential_management_mac.h" ]
@@ -387,9 +375,6 @@ source_set("unit_tests") {
       sources += [ "local_credential_management_mac_unittest.mm" ]
     }
 
-    if (is_win) {
-      sources += [ "local_credential_management_win_unittest.cc" ]
-    }
   }
 
 }

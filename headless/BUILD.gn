@@ -470,10 +470,6 @@ source_set("headless_browser") {
     "//components/crash/core/app",
   ]
 
-  if (is_win) {
-    deps += [ "//components/os_crypt/async/browser:dpapi_key_provider" ]
-  }
-
   if (is_linux) {
     data_deps += [ "//components/crash/core/app:chrome_crashpad_handler" ]
   }
@@ -556,10 +552,6 @@ test("headless_unittests") {
     "//testing/gtest",
     "//ui/gfx:test_support",
   ]
-
-  if (is_win) {
-    deps += [ "//components/crash/core/app:crash_export_thunks" ]
-  }
 
   if (enable_printing) {
     deps += [
@@ -866,16 +858,6 @@ executable("headless_shell") {
       "$root_out_dir/headless_lib_data.pak",
       "$root_out_dir/headless_lib_strings.pak",
     ]
-  }
-
-  if (is_win) {
-    deps += [
-      "//build/win:default_exe_manifest",
-      "//components/crash/core/app:run_as_crashpad_handler",
-      "//content:sandbox_helper_win",
-      "//sandbox/win:common",
-    ]
-    configs += [ "//build/config/win:delayloads" ]
   }
 
   if (is_mac) {

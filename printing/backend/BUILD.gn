@@ -35,23 +35,6 @@ component("backend") {
     "//url",
   ]
 
-  if (is_win) {
-    # PRINT_BACKEND_AVAILABLE disables the default dummy implementation of the
-    # print backend and enables a custom implementation instead.
-    defines += [ "PRINT_BACKEND_AVAILABLE" ]
-    sources += [
-      "print_backend_win.cc",
-      "print_backend_win.h",
-      "printing_info_win.cc",
-      "printing_info_win.h",
-      "spooler_win.cc",
-      "spooler_win.h",
-      "win_helper.cc",
-      "win_helper.h",
-    ]
-    public_deps += [ "//printing/mojom" ]
-  }
-
   if (use_cups) {
     public_configs += [ "//printing:cups" ]
 

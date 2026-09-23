@@ -23,9 +23,6 @@ source_set("signin_ui_error") {
     "//ui/base",
   ]
 
-  if (is_win) {
-    public_deps += [ "//chrome/credential_provider/common:common_constants" ]
-  }
 }
 
 # Removes circular dep between |login| and |signin|.
@@ -259,64 +256,6 @@ source_set("login_ui_service_impl") {
     "//chrome/browser/ui/navigator",
     "//chrome/browser/ui/signin",
   ]
-}
-
-# "inline_login_*" code is only available on Windows and ChromeOS, since the
-# "chrome-signin" webui dialog is only used there.
-if (is_win) {
-  source_set("inline_login") {
-    sources = [
-      "inline_login_handler.h",
-      "inline_login_ui.h",
-    ]
-
-    public_deps = [
-      "//base",
-      "//chrome/browser/profiles:profile",
-      "//chrome/common",
-      "//components/keyed_service/core",
-      "//content/public/browser",
-      "//google_apis",
-      "//net",
-      "//ui/web_dialogs",
-    ]
-
-    if (is_win) {
-      sources += [ "inline_login_handler_impl.h" ]
-    }
-  }
-
-  source_set("inline_login_impl") {
-    sources = [
-      "inline_login_handler.cc",
-      "inline_login_ui.cc",
-    ]
-
-    public_deps = [ "//chrome/browser:browser_public_dependencies" ]
-
-    deps = [
-      ":inline_login",
-      "//chrome/browser:browser_process",
-      "//chrome/browser/extensions",
-      "//chrome/browser/prefs",
-      "//chrome/browser/profiles",
-      "//chrome/browser/resources/gaia_auth_host:resources_grit",
-      "//chrome/browser/signin:signin_promo",
-      "//chrome/browser/ui/navigator",
-      "//chrome/browser/ui/webui:metrics_handler",
-      "//chrome/browser/ui/webui:theme_source",
-      "//components/signin/core/browser",
-      "//ui/webui",
-    ]
-
-    if (is_win) {
-      sources += [ "inline_login_handler_impl.cc" ]
-      deps += [
-        "//chrome/browser/resources/inline_login:resources_grit",
-        "//chrome/browser/ui/webui/signin:signin_ui_error",
-      ]
-    }
-  }
 }
 
 source_set("profile") {

@@ -217,10 +217,6 @@ source_set("browser_tests") {
     sources += [ "pdf_printer_handler_posix_browsertest.cc" ]
   }
 
-  if (is_win) {
-    sources += [ "pdf_printer_handler_win_browsertest.cc" ]
-    deps += [ "//ui/aura" ]
-  }
 }
 
 source_set("interactive_ui_tests") {

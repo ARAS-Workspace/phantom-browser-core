@@ -178,15 +178,6 @@ static_library("router") {
       "//third_party/openscreen/src/cast/common/channel/proto:channel_proto",
     ]
 
-    if (is_win) {
-      sources += [
-        "mojo/media_route_provider_util_win.cc",
-        "mojo/media_route_provider_util_win.h",
-      ]
-
-      deps += [ "//chrome/installer/util:with_no_strings" ]
-    }
-
     if (enable_media_remoting_redirection) {
       sources += [
         "providers/redirection/redirection_media_route_provider.cc",
@@ -401,9 +392,6 @@ source_set("unittests") {
       sources += [
         "providers/redirection/redirection_media_route_provider_unittest.cc",
       ]
-    }
-    if (is_win) {
-      sources += [ "discovery/discovery_network_list_win_unittest.cc" ]
     }
     deps += [
       ":logger_list",

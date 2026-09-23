@@ -94,24 +94,6 @@ static_library("app") {
     ]
   }
 
-  if (is_win) {
-    sources += [
-      "crashpad_win.cc",
-      "dump_hung_process_with_ptype.cc",
-      "dump_hung_process_with_ptype.h",
-      "minidump_with_crashpad_info.cc",
-      "minidump_with_crashpad_info.h",
-    ]
-
-    deps += [
-      "//components/app_launch_prefetch",
-      "//third_party/crashpad/crashpad/client",
-      "//third_party/crashpad/crashpad/handler",
-      "//third_party/crashpad/crashpad/minidump",
-      "//third_party/crashpad/crashpad/util",
-    ]
-  }
-
   if (is_mac) {
     sources += [ "crashpad_mac.mm" ]
     deps += [
@@ -128,89 +110,6 @@ static_library("app") {
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-}
-
-if (is_win) {
-  static_library("run_as_crashpad_handler") {
-    sources = [
-      "crash_switches.cc",
-      "crash_switches.h",
-      "fallback_crash_handler_launcher_win.cc",
-      "fallback_crash_handler_launcher_win.h",
-      "fallback_crash_handler_win.cc",
-      "fallback_crash_handler_win.h",
-      "fallback_crash_handling_win.cc",
-      "fallback_crash_handling_win.h",
-      "minidump_with_crashpad_info.cc",
-      "minidump_with_crashpad_info.h",
-      "run_as_crashpad_handler_win.cc",
-      "run_as_crashpad_handler_win.h",
-    ]
-
-    deps = [
-      "//base",
-      "//components/app_launch_prefetch",
-      "//components/gwp_asan/buildflags",
-      "//components/stability_report",
-      "//third_party/crashpad/crashpad/client",
-      "//third_party/crashpad/crashpad/handler",
-      "//third_party/crashpad/crashpad/minidump",
-      "//third_party/crashpad/crashpad/util",
-    ]
-
-    if (enable_gwp_asan) {
-      deps += [ "//components/gwp_asan/crash_handler" ]
-    }
-  }
-
-  # This source set contains the include file that declares the export thunks.
-  # Any target that gets compiled into both test and release code needs to
-  # depend on this for the include alone. The binary it's linked into then needs
-  # to depend on either :crash_export_thunks or :test_support, or in the case of
-  # release binaries, on //chrome_elf, which re-exports the thunks.
-  source_set("crash_export_thunk_include") {
-    sources = [ "crash_export_thunks.h" ]
-  }
-
-  # This source set contains a set of functions that allow using the crashpad
-  # handler across a module boundary. The intent is for these functions to be
-  # built into a dynamic library, which the user of the crashpad handler then
-  # has a link-time dependency on. This will result in an import dependency
-  # from the user to the dynamic library that will be bound at load time.
-  # In a single-module project, this source set can alternatively be included in
-  # the sole module, in which case the implementation will be bound at link
-  # time.
-  source_set("crash_export_thunks") {
-    sources = [
-      "crash_export_thunks.cc",
-      "crash_export_thunks.h",
-    ]
-
-    defines = [ "CRASH_IMPLEMENTATION" ]
-
-    deps = [
-      ":app",
-      "//base",
-      "//third_party/crashpad/crashpad/client",
-    ]
-  }
-
-  # This source set contains a set of test stubs for the functions above.
-  # time.
-  source_set("crash_export_stubs") {
-    testonly = true
-    defines = [ "CRASH_IMPLEMENTATION" ]
-
-    sources = [
-      "crash_export_stubs.cc",
-      "crash_export_thunks.h",
-    ]
-
-    deps = [
-      ":app",
-      "//base",
-    ]
-  }
 }
 
 if (is_mac || is_android || is_linux) {
@@ -257,9 +156,6 @@ source_set("test_support") {
 
   deps = [ ":lib" ]
 
-  if (is_win) {
-    deps += [ ":crash_export_stubs" ]
-  }
 }
 
 source_set("unit_tests") {
@@ -276,21 +172,6 @@ source_set("unit_tests") {
     "//third_party/crashpad/crashpad/minidump",
   ]
 
-  if (is_win) {
-    sources += [
-      "fallback_crash_handler_launcher_win_unittest.cc",
-      "fallback_crash_handler_win_unittest.cc",
-      "fallback_crash_handling_win_unittest.cc",
-    ]
-    deps += [
-      ":run_as_crashpad_handler",
-      "//components/crash/win:unit_tests",
-      "//third_party/breakpad:client",
-      "//third_party/crashpad/crashpad/client",
-      "//third_party/crashpad/crashpad/snapshot",
-      "//third_party/crashpad/crashpad/util",
-    ]
-  }
   if (is_ios) {
     sources += [ "crashpad_ios_unittest.mm" ]
     deps += [

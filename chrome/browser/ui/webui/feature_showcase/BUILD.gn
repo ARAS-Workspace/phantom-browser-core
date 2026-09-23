@@ -67,12 +67,6 @@ source_set("feature_showcase") {
     "//ui/webui",
   ]
 
-  if (is_win) {
-    deps += [
-      "//chrome/browser/win",
-      "//chrome/installer/util:with_no_strings",
-    ]
-  }
 }
 
 source_set("unit_tests") {

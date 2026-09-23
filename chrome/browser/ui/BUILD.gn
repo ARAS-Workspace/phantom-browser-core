@@ -890,10 +890,6 @@ static_library("ui") {
     ]
   }
 
-  if (is_win) {
-    deps += [ "//chrome/browser/ui/webui/default_browser:visual_guided_setter" ]
-  }
-
   # //chrome/browser/ui/views/relaunch_notification:impl sources include
   # :ui headers (browser.h, views/frame/browser_view.h).
   if (!is_android) {
@@ -1491,13 +1487,6 @@ static_library("ui") {
       "//ui/events",
     ]
 
-    if (is_win) {
-      deps += [
-        "//chrome/browser/ui/webui/signin:inline_login",
-        "//chrome/browser/ui/webui/signin:inline_login_impl",
-      ]
-    }
-
     # Non-android public_deps for "ui" target.
     public_deps += [
       "//chrome/browser/importer",
@@ -1682,11 +1671,6 @@ static_library("ui") {
       # plural_string_handler.h, and tab_ui_helper.h from //chrome/browser/ui.
       "//chrome/browser/ui/webui/tab_search",
     ]
-
-    if (is_win) {
-      allow_circular_includes_from +=
-          [ "//chrome/browser/ui/webui/signin:inline_login_impl" ]
-    }
 
     if (use_ozone) {
       deps += [ "//ui/ozone" ]
@@ -1938,57 +1922,6 @@ static_library("ui") {
       "Carbon.framework",
       "Quartz.framework",
     ]
-  }
-
-  if (is_win) {
-    assert(toolkit_views)
-    assert(use_aura)
-
-    sources += [
-      "network_profile_bubble.cc",
-      "network_profile_bubble.h",
-      "views/certificate_viewer_win.cc",
-      "views/frame/browser_caption_button_container_win.cc",
-      "views/frame/browser_caption_button_container_win.h",
-      "views/frame/browser_desktop_window_tree_host.h",
-      "views/frame/browser_desktop_window_tree_host_win.cc",
-      "views/frame/browser_desktop_window_tree_host_win.h",
-      "views/frame/browser_frame_view_win.cc",
-      "views/frame/browser_frame_view_win.h",
-      "views/frame/browser_native_widget_factory_aura.cc",
-      "views/frame/browser_window_property_manager_win.cc",
-      "views/frame/browser_window_property_manager_win.h",
-      "views/frame/minimize_button_metrics_win.cc",
-      "views/frame/minimize_button_metrics_win.h",
-      "views/frame/system_menu_insertion_delegate_win.cc",
-      "views/frame/system_menu_insertion_delegate_win.h",
-      "views/frame/windows_caption_button.cc",
-      "views/frame/windows_caption_button.h",
-      "views/frame/windows_taskbar_icon_updater.cc",
-      "views/frame/windows_taskbar_icon_updater.h",
-      "views/network_profile_bubble_view.cc",
-    ]
-
-    public_deps += [
-      "//chrome/browser/ui/search_promotion",
-      "//chrome/browser/win",
-      "//chrome/browser/win:jumplist",
-    ]
-
-    allow_circular_includes_from += [ "//chrome/browser/win:impl" ]
-
-    deps += [
-      "//chrome/browser:font_prewarmer_tab_helper",
-      "//chrome/browser:titlebar_config",
-      "//chrome/browser/taskbar",
-      "//chrome/browser/ui/views:critical_notification_bubble_view",
-      "//chrome/browser/ui/views:uninstall_browser_prompt",
-      "//chrome/browser/win:impl",
-      "//components/search_engines",
-      "//third_party/wtl",
-    ]
-
-    libs += [ "crypt32.lib" ]
   }
 
   if (is_linux || is_mac) {
@@ -2960,13 +2893,6 @@ static_library("ui") {
       ]
     }
 
-    if (is_win) {
-      sources += [
-        "accessibility_util.h",
-        "views/chrome_views_delegate_win.cc",
-      ]
-    }
-
     if (use_aura && is_linux) {
       # These files can do Gtk+-based theming for builds with gtk enabled.
       sources += [
@@ -3244,13 +3170,6 @@ group("ui_public_dependencies") {
       "//components/commerce/core:coupon_db_content_proto",
       "//components/feed/core/proto:proto_ios_shared_v2",
       "//components/feed/core/proto:proto_v2",
-    ]
-  }
-  if (is_win) {
-    public_deps += [
-      "//build:branding_buildflags",
-      "//ui/views",
-      "//ui/views/controls/webview",
     ]
   }
   if (chrome_root_store_cert_management_ui) {

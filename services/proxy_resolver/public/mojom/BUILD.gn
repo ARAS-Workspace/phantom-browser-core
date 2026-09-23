@@ -45,21 +45,6 @@ mojom("mojom") {
     },
   ]
 
-  if (is_win) {
-    cpp_typemaps += [
-      {
-        types = [
-          {
-            mojom = "proxy_resolver.mojom.WinHttpStatus"
-            cpp = "::net::WinHttpStatus"
-          },
-        ]
-        traits_headers = [ "//services/proxy_resolver_win/public/cpp/proxy_resolver_win_mojom_traits.h" ]
-        traits_sources = [ "//services/proxy_resolver_win/public/cpp/proxy_resolver_win_mojom_traits.cc" ]
-      },
-    ]
-  }
-
   if (is_mac) {
     cpp_typemaps += [
       {

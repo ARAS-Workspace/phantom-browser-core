@@ -7,9 +7,6 @@ import("//testing/test.gni")
 
 group("tools") {
   deps = [ ":${updater_product_full_name}Util" ]
-  if (is_win) {
-    deps += [ ":tag" ]
-  }
 }
 
 executable("tag_exe") {

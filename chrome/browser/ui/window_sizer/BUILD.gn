@@ -72,7 +72,4 @@ source_set("unit_tests") {
     deps += [ "//ui/aura" ]
   }
 
-  if (is_win) {
-    deps += [ "//chrome/install_static:install_static_util" ]
-  }
 }

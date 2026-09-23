@@ -12,16 +12,6 @@ import("//testing/test.gni")
 import("//tools/json_schema_compiler/json_schema_api.gni")
 import("//ui/base/ui_features.gni")
 
-if (is_win) {
-  import("//build/toolchain/win/midl.gni")
-}
-
-if (is_win) {
-  midl("ichromeaccessible") {
-    sources = [ "ichromeaccessible.idl" ]
-  }
-}
-
 component("platform") {
   output_name = "accessibility_platform"
 
@@ -148,68 +138,6 @@ component("platform") {
       "ax_platform_text_boundary.cc",
       "ax_platform_text_boundary.h",
     ]
-
-    if (is_win) {
-      sources += [
-        "ax_fragment_root_delegate_win.h",
-        "ax_fragment_root_win.cc",
-        "ax_fragment_root_win.h",
-        "ax_platform_node_delegate_utils_win.cc",
-        "ax_platform_node_delegate_utils_win.h",
-        "ax_platform_node_textchildprovider_win.cc",
-        "ax_platform_node_textchildprovider_win.h",
-        "ax_platform_node_textprovider_win.cc",
-        "ax_platform_node_textprovider_win.h",
-        "ax_platform_node_textrangeprovider_win.cc",
-        "ax_platform_node_textrangeprovider_win.h",
-        "ax_platform_node_win.cc",
-        "ax_platform_node_win.h",
-        "ax_platform_relation_win.cc",
-        "ax_platform_relation_win.h",
-        "ax_system_caret_win.cc",
-        "ax_system_caret_win.h",
-        "browser_accessibility_com_win.cc",
-        "browser_accessibility_com_win.h",
-        "browser_accessibility_manager_win.cc",
-        "browser_accessibility_manager_win.h",
-        "browser_accessibility_win.cc",
-        "browser_accessibility_win.h",
-        "iaccessible2/scoped_co_mem_array.cc",
-        "iaccessible2/scoped_co_mem_array.h",
-        "inspect/ax_call_statement_invoker_win.cc",
-        "inspect/ax_call_statement_invoker_win.h",
-        "inspect/ax_event_recorder_win.cc",
-        "inspect/ax_event_recorder_win.h",
-        "inspect/ax_event_recorder_win_uia.cc",
-        "inspect/ax_event_recorder_win_uia.h",
-        "inspect/ax_inspect_utils_win.cc",
-        "inspect/ax_inspect_utils_win.h",
-        "inspect/ax_target_win.cc",
-        "inspect/ax_target_win.h",
-        "inspect/ax_tree_formatter_uia_win.cc",
-        "inspect/ax_tree_formatter_uia_win.h",
-        "inspect/ax_tree_formatter_win.cc",
-        "inspect/ax_tree_formatter_win.h",
-        "inspect/ax_tree_indexer_win.h",
-        "uia_client_info_source_win.cc",
-        "uia_client_info_source_win.h",
-        "uia_registrar_win.cc",
-        "uia_registrar_win.h",
-      ]
-
-      public_deps += [
-        "//third_party/iaccessible2",
-        "//third_party/isimpledom",
-        "//ui/accessibility/platform:ichromeaccessible",
-      ]
-
-      deps += [ "//base/tracing/protos:chrome_track_event_zero" ]
-
-      libs = [
-        "oleacc.lib",
-        "uiautomationcore.lib",
-      ]
-    }
 
     if (is_mac) {
       sources += [

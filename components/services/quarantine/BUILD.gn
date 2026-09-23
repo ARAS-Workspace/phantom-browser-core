@@ -19,10 +19,6 @@ static_library("quarantine") {
     "//url",
   ]
 
-  if (is_win) {
-    sources += [ "quarantine_win.cc" ]
-  }
-
   if (is_mac) {
     sources += [ "quarantine_mac.mm" ]
     frameworks = [
@@ -42,13 +38,6 @@ source_set("common") {
     "//base",
     "//url",
   ]
-
-  if (is_win) {
-    sources += [
-      "common_win.cc",
-      "common_win.h",
-    ]
-  }
 
   if (is_mac) {
     sources += [
@@ -79,10 +68,6 @@ source_set("test_support") {
     "//base/test:test_support",
     "//url",
   ]
-
-  if (is_win) {
-    sources += [ "test_support_win.cc" ]
-  }
 
   if (is_mac) {
     sources += [ "test_support_mac.mm" ]
@@ -119,10 +104,6 @@ source_set("unit_tests") {
     "//testing/gtest",
     "//url",
   ]
-
-  if (is_win) {
-    sources += [ "quarantine_win_unittest.cc" ]
-  }
 
   if (is_mac) {
     sources += [ "quarantine_mac_unittest.mm" ]

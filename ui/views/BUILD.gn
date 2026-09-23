@@ -771,56 +771,6 @@ component("views") {
     ]
   }
 
-  if (is_win) {
-    public += [
-      "controls/menu/native_menu_win.h",
-      "widget/widget_hwnd_utils.h",
-      "win/fullscreen_handler.h",
-      "win/hwnd_message_handler.h",
-      "win/hwnd_message_handler_delegate.h",
-      "win/hwnd_message_handler_headless.h",
-      "win/hwnd_util.h",
-      "win/pen_event_handler_util.h",
-      "win/pen_event_processor.h",
-      "win/pen_id_handler.h",
-      "win/scoped_enable_unadjusted_mouse_events_win.h",
-      "win/scoped_fullscreen_visibility.h",
-      "win/user_resize_move_detector.h",
-    ]
-    sources += [
-      "controls/menu/menu_config_win.cc",
-      "controls/menu/native_menu_win.cc",
-      "widget/widget_hwnd_utils.cc",
-      "win/fullscreen_handler.cc",
-      "win/hwnd_message_handler.cc",
-      "win/hwnd_message_handler_headless.cc",
-      "win/hwnd_util.cc",
-      "win/pen_event_processor.cc",
-      "win/pen_id_handler.cc",
-      "win/scoped_enable_unadjusted_mouse_events_win.cc",
-      "win/scoped_fullscreen_visibility.cc",
-      "win/user_resize_move_detector.cc",
-    ]
-    libs = [
-      "dwmapi.lib",
-      "imm32.lib",
-      "oleacc.lib",
-      "uiautomationcore.lib",
-    ]
-    ldflags = [
-      "/DELAYLOAD:dwmapi.dll",
-      "/DELAYLOAD:imm32.dll",
-      "/DELAYLOAD:oleacc.dll",
-      "/DELAYLOAD:user32.dll",
-    ]
-    deps += [
-      "//components/stylus_handwriting/win",
-      "//services/tracing/public/cpp",
-      "//third_party/iaccessible2",
-      "//third_party/wtl",
-    ]
-  }
-
   if (use_aura) {
     public += [
       "accessibility/accessibility_alert_window.h",
@@ -923,26 +873,6 @@ component("views") {
         "widget/desktop_aura/desktop_screen_position_client.cc",
         "widget/desktop_aura/desktop_window_tree_host.cc",
       ]
-      if (is_win) {
-        public += [ "widget/desktop_aura/desktop_window_tree_host_win.h" ]
-        sources += [
-          "widget/desktop_aura/desktop_drag_drop_client_win.cc",
-          "widget/desktop_aura/desktop_drag_drop_client_win.h",
-          "widget/desktop_aura/desktop_drop_target_win.cc",
-          "widget/desktop_aura/desktop_native_cursor_manager_win.cc",
-          "widget/desktop_aura/desktop_native_cursor_manager_win.h",
-          "widget/desktop_aura/desktop_screen_win.cc",
-          "widget/desktop_aura/desktop_screen_win.h",
-          "widget/desktop_aura/desktop_screen_win_headless.cc",
-          "widget/desktop_aura/desktop_screen_win_headless.h",
-          "widget/desktop_aura/desktop_window_tree_host_win.cc",
-        ]
-        deps += [
-          "//components/headless/screen_info",
-          "//ui/events:dom_keyboard_layout",
-          "//ui/events:keyboard_hook",
-        ]
-      }
       if (use_ozone) {
         public += [ "widget/desktop_aura/desktop_screen_ozone.h" ]
         sources += [ "widget/desktop_aura/desktop_screen_ozone.cc" ]
@@ -1008,12 +938,6 @@ component("views") {
       ]
     }
 
-    if (is_win) {
-      sources += [
-        "accessibility/view_ax_platform_node_delegate_win.cc",
-        "accessibility/view_ax_platform_node_delegate_win.h",
-      ]
-    }
   }
 
   if (use_ozone) {
@@ -1184,16 +1108,6 @@ source_set("test_support") {
     "//ui/base/mojom:ui_base_types",
   ]
 
-  if (is_win) {
-    sources += [
-      "test/desktop_window_tree_host_win_test_api.cc",
-      "test/desktop_window_tree_host_win_test_api.h",
-      "win/test_support/fake_ipen_device.cc",
-      "win/test_support/fake_ipen_device.h",
-      "win/test_support/fake_ipen_device_statics.cc",
-      "win/test_support/fake_ipen_device_statics.h",
-    ]
-  }
   if (is_mac) {
     sources += [
       "test/desktop_test_views_delegate_mac.mm",
@@ -1448,35 +1362,6 @@ test("views_unittests") {
     "//ui/resources:ui_test_pak_data",
   ]
 
-  if (is_win) {
-    public_deps = [
-      "//build/win:default_exe_manifest",
-      "//third_party/iaccessible2",
-      "//third_party/wtl",
-    ]
-
-    deps += [
-      "//components/stylus_handwriting/win",
-      "//ui/base:data_exchange",
-    ]
-
-    libs = [
-      "imm32.lib",
-      "oleacc.lib",
-      "comctl32.lib",
-      "uiautomationcore.lib",
-    ]
-
-    sources += [
-      "accessibility/test_list_grid_view.cc",
-      "accessibility/test_list_grid_view.h",
-      "accessibility/view_ax_platform_node_delegate_win_unittest.cc",
-      "win/hwnd_util_unittest.cc",
-      "win/pen_event_processor_unittest.cc",
-      "win/pen_id_handler_unittest.cc",
-    ]
-  }
-
   if (is_linux) {
     sources += [
       "window/frame_view_linux_unittest.cc",
@@ -1567,11 +1452,6 @@ test("views_unittests") {
         "widget/legacy_window_reorderer_unittest.cc",
         "widget/window_reorderer_unittest.cc",
       ]
-    }
-
-    if (is_win) {
-      sources +=
-          [ "widget/desktop_aura/desktop_window_tree_host_win_unittest.cc" ]
     }
 
     if (enable_desktop_aura) {
@@ -1674,13 +1554,6 @@ source_set("views_interactive_ui_tests") {
 
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
-  }
-
-  if (is_win) {
-    sources += [
-      "accessibility/ax_system_caret_win_interactive_uitest.cc",
-      "win/hwnd_message_handler_interactive_uitest.cc",
-    ]
   }
 
   if (is_mac) {

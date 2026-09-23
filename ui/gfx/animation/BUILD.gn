@@ -33,10 +33,6 @@ component("animation") {
     sources += [ "animation_mac.mm" ]
   }
 
-  if (is_win) {
-    sources += [ "animation_win.cc" ]
-  }
-
   if (is_linux) {
     sources += [ "animation_linux.cc" ]
   }

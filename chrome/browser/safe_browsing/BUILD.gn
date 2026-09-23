@@ -862,20 +862,6 @@ source_set("unit_tests") {
       deps += [ "//chrome/common:constants" ]
     }
 
-    if (is_win) {
-      sources += [
-        "incident_reporting/binary_integrity_analyzer_win_unittest.cc",
-        "incident_reporting/environment_data_collection_win_unittest.cc",
-        "incident_reporting/module_integrity_unittest_util_win.cc",
-        "incident_reporting/module_integrity_unittest_util_win.h",
-        "incident_reporting/module_integrity_verifier_win_unittest.cc",
-        "incident_reporting/platform_state_store_win_unittest.cc",
-      ]
-      data_deps = [
-        "//chrome/browser/safe_browsing/incident_reporting/verifier_test:verifier_test_dll_1",
-        "//chrome/browser/safe_browsing/incident_reporting/verifier_test:verifier_test_dll_2",
-      ]
-    }
   }
 
   if (safe_browsing_mode == 2 && is_android) {

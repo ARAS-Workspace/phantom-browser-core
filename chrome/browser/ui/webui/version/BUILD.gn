@@ -52,25 +52,4 @@ source_set("version") {
     deps += [ "//chrome/browser/ui/webui:theme_source" ]
   }
 
-  if (is_win) {
-    sources += [
-      "version_handler_win.cc",
-      "version_handler_win.h",
-      "version_util_win.cc",
-      "version_util_win.h",
-    ]
-    deps += [ "//chrome/install_static:install_static_util" ]
-  }
-}
-
-if (is_win) {
-  source_set("unit_tests") {
-    testonly = true
-    sources = [ "version_handler_win_unittest.cc" ]
-    deps = [
-      ":version",
-      "//base/test:test_support",
-      "//testing/gtest",
-    ]
-  }
 }
