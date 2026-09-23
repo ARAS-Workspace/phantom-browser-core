@@ -121,13 +121,11 @@ source_set("browser_tests") {
     deps += [ "//chrome/browser/compose" ]
   }
 
-  if (!is_android || is_desktop_android) {
-    sources += [ "cr_components/cr_components_browsertest.cc" ]
-    deps += [
-      "//components/history_clusters/core",
-      "//components/history_embeddings/core",
-    ]
-  }
+  sources += [ "cr_components/cr_components_browsertest.cc" ]
+  deps += [
+    "//components/history_clusters/core",
+    "//components/history_embeddings/core",
+  ]
 
   if (enable_dice_support) {
     sources += [
@@ -575,10 +573,8 @@ generate_grd("build_grd") {
   deps += [ "default_browser:build_grdp" ]
   grdp_files += [ "$target_gen_dir/default_browser/resources.grdp" ]
 
-  if (!is_android || is_desktop_android) {
-    deps += [ "cr_components:build_grdp" ]
-    grdp_files += [ "$target_gen_dir/cr_components/resources.grdp" ]
-  }
+  deps += [ "cr_components:build_grdp" ]
+  grdp_files += [ "$target_gen_dir/cr_components/resources.grdp" ]
 
   if (enable_extensions_core) {
     deps += [ "extensions:build_grdp" ]

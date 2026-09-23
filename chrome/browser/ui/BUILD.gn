@@ -1137,14 +1137,12 @@ static_library("ui") {
     "//chrome/browser/ui/zoom:browser_window_zoom_observer",
   ]
 
-  if (!is_android || enable_webui_ntp) {
-    deps += [
-      "//chrome/browser/desktop_to_mobile_promos:utils",
-      "//chrome/browser/preloading/new_tab_page_preload",
-      "//chrome/browser/search/background",
-      "//chrome/browser/ui/color:mixers",
-    ]
-  }
+  deps += [
+    "//chrome/browser/desktop_to_mobile_promos:utils",
+    "//chrome/browser/preloading/new_tab_page_preload",
+    "//chrome/browser/search/background",
+    "//chrome/browser/ui/color:mixers",
+  ]
 
   if (enterprise_data_controls) {
     deps += [ "//chrome/browser/enterprise/data_controls" ]

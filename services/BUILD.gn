@@ -100,15 +100,10 @@ test("services_unittests") {
     deps += [ "//services/accessibility:tests" ]
   }
 
-  if (!is_android && !is_ios) {
-    # NOTE: We do not currently support standalone service binaries on Android
-    # or iOS, so any tests which use the ServiceTest framework to connect to
-    # standalone services must be added here.
-    deps += [
-      "//services/passage_embeddings:tests",
-      "//services/video_capture:tests",
-    ]
-  }
+  deps += [
+    "//services/passage_embeddings:tests",
+    "//services/video_capture:tests",
+  ]
 
   if (enable_screen_ai_service) {
     deps += [ "//services/screen_ai:unit_tests" ]

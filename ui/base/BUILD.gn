@@ -308,12 +308,10 @@ component("base") {
       "themed_vector_icon.h",
     ]
 
-    if (!is_android && !is_ios) {
-      sources += [
-        "menu_source_utils.cc",
-        "menu_source_utils.h",
-      ]
-    }
+    sources += [
+      "menu_source_utils.cc",
+      "menu_source_utils.h",
+    ]
 
     if (is_linux) {
       sources += [
@@ -794,9 +792,7 @@ test("ui_base_unittests") {
     deps += [ "//ui/base/unowned_user_data:unit_tests" ]
   }
 
-  if (!is_android && !is_ios) {
-    sources += [ "user_activity/user_activity_detector_unittest.cc" ]
-  }
+  sources += [ "user_activity/user_activity_detector_unittest.cc" ]
 
   if (is_mac) {
     sources += [

@@ -75,19 +75,15 @@ component("midi") {
 
   if (is_apple) {
     public_deps += [ ":ump_helper" ]
-    if (is_ios && target_platform == "tvos") {
-      sources += [ "midi_manager_tvos.cc" ]
-    } else {
-      sources += [
-        "midi_manager_mac.cc",
-        "midi_manager_mac.h",
-      ]
-      frameworks = [
-        "CoreAudio.framework",
-        "CoreFoundation.framework",
-        "CoreMIDI.framework",
-      ]
-    }
+    sources += [
+      "midi_manager_mac.cc",
+      "midi_manager_mac.h",
+    ]
+    frameworks = [
+      "CoreAudio.framework",
+      "CoreFoundation.framework",
+      "CoreMIDI.framework",
+    ]
   }
 
   if (use_alsa && use_udev) {

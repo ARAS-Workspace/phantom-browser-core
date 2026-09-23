@@ -1822,13 +1822,13 @@ test("content_browsertests") {
     "$root_gen_dir/url/mojom/scheme_host_port.mojom-lite.js",
   ]
 
-  if (!is_ios && !is_android) {
-    sources += [ "../browser/file_system_access/file_system_access_observer_browsertest.cc" ]
+  sources += [
+    "../browser/file_system_access/file_system_access_observer_browsertest.cc",
+  ]
 
-    # Add Material Design components for accessibility tests on desktop
-    # platforms
-    data += [ "//third_party/material_web_components/" ]
-  }
+  # Add Material Design components for accessibility tests on desktop
+  # platforms
+  data += [ "//third_party/material_web_components/" ]
 
   data_deps += [
     "//testing/buildbot/filters:content_browsertests_filters",
@@ -2643,9 +2643,7 @@ test("content_unittests") {
     ]
   }
 
-  if (!is_android && !is_ios) {
-    sources += [ "../browser/file_system_access/file_path_watcher/file_path_watcher_unittest.cc" ]
-  }
+  sources += [ "../browser/file_system_access/file_path_watcher/file_path_watcher_unittest.cc" ]
 
   if (is_win || is_mac) {
     sources += [ "../browser/media/system_media_controls/web_app_system_media_controls_manager_unittest.cc" ]
@@ -2918,17 +2916,15 @@ test("content_unittests") {
         "../browser/media/capture/pip_screen_capture_coordinator_proxy_impl_unittest.cc",
       ]
     }
-    if (!is_android && !is_ios) {
-      deps += [
-        "//content/common:buildflags",
-        "//third_party/libyuv",
-        "//third_party/webrtc_overrides:webrtc_component",
-      ]
-      sources += [
-        "../browser/media/captured_surface_controller_permission_manager_unittest.cc",
-        "../browser/media/captured_surface_controller_unittest.cc",
-      ]
-    }
+    deps += [
+      "//content/common:buildflags",
+      "//third_party/libyuv",
+      "//third_party/webrtc_overrides:webrtc_component",
+    ]
+    sources += [
+      "../browser/media/captured_surface_controller_permission_manager_unittest.cc",
+      "../browser/media/captured_surface_controller_unittest.cc",
+    ]
 
     deps += [ "//media/capture:test_support" ]
     sources += [

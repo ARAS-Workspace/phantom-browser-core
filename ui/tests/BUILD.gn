@@ -16,9 +16,7 @@ test("ui_unittests") {
     "//ui/menus:unit_tests",
   ]
 
-  if (!is_ios && !is_android) {
-    deps += [ "//ui/actions:unit_tests" ]
-  }
+  deps += [ "//ui/actions:unit_tests" ]
 
   if (is_mac) {
     deps += [ "//ui/base:ui_unittests_framework" ]

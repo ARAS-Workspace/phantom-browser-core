@@ -116,22 +116,14 @@ component("platform") {
     ]
   }
 
-  # BrowserAccessibility was historically used only by AXNodes
-  # coming from blink and has a dependency on `cc/base/rtree.h`.
-  # If we want to support using BrowserAccessibility on platforms
-  # that cannot take this dependency (such as non-blink ios) we
-  # will need to refactor to use a different data structure.
-  # So don't build on non-blink ios for now.
-  if (!(is_ios && !use_blink)) {
-    sources += [
-      "browser_accessibility.cc",
-      "browser_accessibility.h",
-      "browser_accessibility_manager.cc",
-      "browser_accessibility_manager.h",
-      "one_shot_accessibility_tree_search.cc",
-      "one_shot_accessibility_tree_search.h",
-    ]
-  }
+  sources += [
+    "browser_accessibility.cc",
+    "browser_accessibility.h",
+    "browser_accessibility_manager.cc",
+    "browser_accessibility_manager.h",
+    "one_shot_accessibility_tree_search.cc",
+    "one_shot_accessibility_tree_search.h",
+  ]
 
   if (has_native_accessibility) {
     sources += [

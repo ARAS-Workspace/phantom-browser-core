@@ -99,25 +99,23 @@ source_set("openscreen_platform_without_sockets") {
   ]
 }
 
-if (!is_win && !is_ios) {
-  source_set("message_port_tls_connection") {
-    testonly = true
+source_set("message_port_tls_connection") {
+  testonly = true
 
-    public = []
+  public = []
 
-    sources = [
-      "message_port_tls_connection.cc",
-      "message_port_tls_connection.h",
-    ]
+  sources = [
+    "message_port_tls_connection.cc",
+    "message_port_tls_connection.h",
+  ]
 
-    deps = [
-      "//base",
-      "//components/cast/message_port",
-      "//third_party/openscreen/src/platform:api",
-    ]
+  deps = [
+    "//base",
+    "//components/cast/message_port",
+    "//third_party/openscreen/src/platform:api",
+  ]
 
-    friend = [ ":unittests" ]
-  }
+  friend = [ ":unittests" ]
 }
 
 source_set("unittests") {
@@ -142,12 +140,10 @@ source_set("unittests") {
     "//testing/gtest",
   ]
 
-  if (!is_win && !is_ios) {
-    sources += [ "message_port_tls_connection_unittest.cc" ]
-    deps += [
-      ":message_port_tls_connection",
-      "//components/cast/message_port",
-      "//third_party/openscreen/src/platform:api",
-    ]
-  }
+  sources += [ "message_port_tls_connection_unittest.cc" ]
+  deps += [
+    ":message_port_tls_connection",
+    "//components/cast/message_port",
+    "//third_party/openscreen/src/platform:api",
+  ]
 }

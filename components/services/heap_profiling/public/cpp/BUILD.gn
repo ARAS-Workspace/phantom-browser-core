@@ -27,12 +27,10 @@ static_library("cpp") {
     "//base/allocator:buildflags",
   ]
 
-  if (!is_ios || use_allocator_shim) {
-    sources += [
-      "merge_samples.cc",
-      "merge_samples.h",
-    ]
-  }
+  sources += [
+    "merge_samples.cc",
+    "merge_samples.h",
+  ]
 }
 
 source_set("unit_tests") {
@@ -46,7 +44,5 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_ios || use_allocator_shim) {
-    sources += [ "merge_samples_unittest.cc" ]
-  }
+  sources += [ "merge_samples_unittest.cc" ]
 }

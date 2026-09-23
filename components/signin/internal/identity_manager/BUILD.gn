@@ -97,12 +97,10 @@ source_set("identity_manager") {
     ]
   }
 
-  if (!is_android && !is_ios) {
-    sources += [
-      "accounts_mutator_impl.cc",
-      "accounts_mutator_impl.h",
-    ]
-  }
+  sources += [
+    "accounts_mutator_impl.cc",
+    "accounts_mutator_impl.h",
+  ]
 }
 
 source_set("capabilities") {

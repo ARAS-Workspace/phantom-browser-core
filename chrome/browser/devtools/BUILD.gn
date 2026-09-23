@@ -348,12 +348,10 @@ static_library("devtools") {
     deps += [ "//chrome/browser/local_discovery" ]
   }
 
-  if (!is_android || enable_desktop_android_extensions) {
-    sources += [
-      "global_confirm_info_bar.cc",
-      "global_confirm_info_bar.h",
-    ]
-  }
+  sources += [
+    "global_confirm_info_bar.cc",
+    "global_confirm_info_bar.h",
+  ]
 
   if (is_mac) {
     sources += [ "devtools_dock_tile_mac.mm" ]
@@ -584,9 +582,7 @@ if (enable_devtools_frontend) {
 
     sources += [ "devtools_remote_server_infobar_browsertest.cc" ]
 
-    if (!is_android || enable_desktop_android_extensions) {
-      sources += [ "global_confirm_info_bar_browsertest.cc" ]
-    }
+    sources += [ "global_confirm_info_bar_browsertest.cc" ]
   }
 }
 

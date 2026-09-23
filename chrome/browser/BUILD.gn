@@ -447,28 +447,26 @@ if (is_linux) {
   }
 }
 
-if (!is_win && !is_android) {
-  source_set("chrome_browser_main_posix") {
-    public = [ "chrome_browser_main_posix.h" ]
-    deps = [ ":chrome_browser_main" ]
+source_set("chrome_browser_main_posix") {
+  public = [ "chrome_browser_main_posix.h" ]
+  deps = [ ":chrome_browser_main" ]
+}
+
+source_set("process_singleton_posix") {
+  sources = [ "process_singleton_posix.cc" ]
+  deps = [
+    ":process_singleton",
+    ":process_singleton_internal",
+    "//chrome/common",
+    "//chrome/common:non_code_constants",
+    "//content/public/browser",
+    "//ui/base",
+  ]
+  if (is_linux) {
+    deps += [ "//chrome/browser/ui/dialogs:process_singleton_dialog_linux" ]
   }
 
-  source_set("process_singleton_posix") {
-    sources = [ "process_singleton_posix.cc" ]
-    deps = [
-      ":process_singleton",
-      ":process_singleton_internal",
-      "//chrome/common",
-      "//chrome/common:non_code_constants",
-      "//content/public/browser",
-      "//ui/base",
-    ]
-    if (is_linux) {
-      deps += [ "//chrome/browser/ui/dialogs:process_singleton_dialog_linux" ]
-    }
-
-    public_deps = [ "//chrome/browser:browser_public_dependencies" ]
-  }
+  public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }
 
 if (is_mac) {
@@ -1041,9 +1039,7 @@ source_set("core") {
     ]
   }
 
-  if (!is_android || is_desktop_android) {
-    deps += [ "//chrome/browser/ui/webui/discards" ]
-  }
+  deps += [ "//chrome/browser/ui/webui/discards" ]
 
   if (enterprise_watermark) {
     deps += [ "//chrome/browser/ui/webui/watermark" ]
@@ -1147,16 +1143,14 @@ source_set("core") {
     ]
   }
 
-  if (!is_win && !is_android) {
-    sources += [
-      "certificate_viewer_stub.cc",
-      "chrome_browser_main_posix.cc",
-    ]
-    deps += [
-      ":certificate_viewer",
-      ":chrome_browser_main_posix",
-    ]
-  }
+  sources += [
+    "certificate_viewer_stub.cc",
+    "chrome_browser_main_posix.cc",
+  ]
+  deps += [
+    ":certificate_viewer",
+    ":chrome_browser_main_posix",
+  ]
 
   if (is_linux) {
     sources += [
@@ -1232,9 +1226,7 @@ source_set("core") {
     ]
   }
 
-  if (!is_android || enable_webui_ntp || enable_pdf) {
-    deps += [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]
-  }
+  deps += [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]
 
   if (enable_pdf) {
     deps += [
@@ -2041,9 +2033,7 @@ source_set("browser") {
       "//chrome/browser/ui/webui/ntp_microsoft_auth",
     ]
   }
-  if (!is_android || enable_webui_ntp) {
-    deps += [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]
-  }
+  deps += [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]
 
   #!is_android
   deps += [
@@ -2814,9 +2804,7 @@ group("browser_generated_files") {
     public_deps +=
         [ "//chrome/browser/ui/webui/new_tab_page/foo:mojo_bindings" ]
   }
-  if (!is_android || is_desktop_android) {
-    public_deps += [ "//chrome/browser/ui/webui/discards:mojo_bindings" ]
-  }
+  public_deps += [ "//chrome/browser/ui/webui/discards:mojo_bindings" ]
 
   if (is_win || is_mac || is_linux) {
     public_deps += [

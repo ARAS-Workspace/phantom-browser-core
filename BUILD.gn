@@ -111,24 +111,22 @@ group("gn_all") {
 
     deps += [ "//crypto:crypto_unittests" ]
 
-    if (!is_ios && !is_android) {
-      deps += [
-        "//chrome",
-        "//chrome/browser/ui/actions:dump_actions",
-        "//chrome/browser/ui/color:dump_colors",
-        "//chrome/test:browser_tests",
-      ]
-      deps += [
-        "//components/subresource_filter/tools:subresource_filter_tools",
-        "//components/zucchini",
-        "//net:hpack_example_generator",
-        "//third_party/spirv-tools/src:SPIRV-Tools",
-        "//tools/perf/clear_system_cache",
-        "//tools/polymer:polymer_tools_python_unittests",
-        "//ui/accessibility/extensions",
-        "//ui/webui/resources/tools:webui_resources_tools_python_unittests",
-      ]
-    }
+    deps += [
+      "//chrome",
+      "//chrome/browser/ui/actions:dump_actions",
+      "//chrome/browser/ui/color:dump_colors",
+      "//chrome/test:browser_tests",
+    ]
+    deps += [
+      "//components/subresource_filter/tools:subresource_filter_tools",
+      "//components/zucchini",
+      "//net:hpack_example_generator",
+      "//third_party/spirv-tools/src:SPIRV-Tools",
+      "//tools/perf/clear_system_cache",
+      "//tools/polymer:polymer_tools_python_unittests",
+      "//ui/accessibility/extensions",
+      "//ui/webui/resources/tools:webui_resources_tools_python_unittests",
+    ]
 
     deps += [ "//chrome/installer" ]
 
@@ -192,9 +190,7 @@ group("gn_all") {
       "//url/ipc:url_ipc_unittests",
     ]
 
-    if (!is_ios && !is_android) {
-      deps += [ "//components/viz/demo:viz_demo" ]
-    }
+    deps += [ "//components/viz/demo:viz_demo" ]
 
     deps += [ "//third_party/catapult/telemetry:bitmaptools($host_toolchain)" ]
     deps += [ "//chrome/test:telemetry_perf_unittests" ]
@@ -250,12 +246,10 @@ group("gn_all") {
       ]
     }
 
-    if (!is_android && !is_ios) {
-      deps += [
-        "//components/sync:sync_full_proto_unittests",
-        "//ui/webui/examples:webui_examples",
-      ]
-    }
+    deps += [
+      "//components/sync:sync_full_proto_unittests",
+      "//ui/webui/examples:webui_examples",
+    ]
 
     if (use_ozone) {
       deps += [
@@ -358,25 +352,21 @@ group("gn_all") {
         "//net:dump_cache",
       ]
 
-      if (!is_android && !is_ios) {
-        deps += [
-          "//chrome/test:load_library_perf_tests",
-          "//chrome/test:sync_performance_tests",
-        ]
-      }
+      deps += [
+        "//chrome/test:load_library_perf_tests",
+        "//chrome/test:sync_performance_tests",
+      ]
 
-      if (!is_android && !is_ios) {
-        deps += [
-          "//net:crash_cache",
-          "//net:net_watcher",  # TODO(GYP): This should be conditional on
-                                # use_v8_in_net
-          "//net:run_testserver",
-          "//net:stress_cache",
-          "//net:tld_cleanup",
-          "//third_party/leveldatabase:env_chromium_unittests",
-          "//third_party/libaddressinput:libaddressinput_unittests",
-        ]
-      }
+      deps += [
+        "//net:crash_cache",
+        "//net:net_watcher",  # TODO(GYP): This should be conditional on
+                              # use_v8_in_net
+        "//net:run_testserver",
+        "//net:stress_cache",
+        "//net:tld_cleanup",
+        "//third_party/leveldatabase:env_chromium_unittests",
+        "//third_party/libaddressinput:libaddressinput_unittests",
+      ]
 
       if (media_use_ffmpeg && !is_android) {
         deps += [ "//media:ffmpeg_regression_tests" ]
@@ -461,9 +451,7 @@ group("gn_all") {
       deps += [ "//ui/message_center:message_center_unittests" ]
     }
 
-    if (!is_android && !is_ios) {
-      deps += [ "//content/browser/bluetooth/tools:bluetooth_metrics_hash" ]
-    }
+    deps += [ "//content/browser/bluetooth/tools:bluetooth_metrics_hash" ]
 
     if (is_win || is_linux) {
       deps += [ "//mojo" ]
@@ -603,11 +591,7 @@ group("all_rust") {
     "//third_party/cloud_authenticator/processor",
   ]
 
-  # TODO(https://crbug.com/405379314): This fails to build on some iOS ASAN
-  # builders.
-  if (!is_ios || !is_asan) {
-    deps += [ "//testing/rust_gtest_interop:rust_gtest_interop_unittests" ]
-  }
+  deps += [ "//testing/rust_gtest_interop:rust_gtest_interop_unittests" ]
 
   if (!is_cronet_build) {
     deps += [ "//skia" ]

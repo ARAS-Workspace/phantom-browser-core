@@ -3,14 +3,9 @@
 # found in the LICENSE file.
 
 import("//build/buildflag_header.gni")
-import("//build/config/chrome_build.gni")
 import("//testing/test.gni")
 
 buildflag_header("buildflags") {
   header = "buildflags.h"
-  if (is_chrome_branded && is_win) {
-    flags = [ "USE_GOOGLE_UPDATE_INTEGRATION=true" ]
-  } else {
-    flags = [ "USE_GOOGLE_UPDATE_INTEGRATION=false" ]
-  }
+  flags = [ "USE_GOOGLE_UPDATE_INTEGRATION=false" ]
 }

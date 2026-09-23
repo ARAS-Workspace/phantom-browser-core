@@ -1491,9 +1491,7 @@ component("base") {
       "Security.framework",
     ]
 
-    if (!is_ios || !use_blink) {
-      sources += [ "synchronization/waitable_event_apple.cc" ]
-    }
+    sources += [ "synchronization/waitable_event_apple.cc" ]
   }
 
   # Desktop Mac.
@@ -3064,11 +3062,7 @@ test("base_unittests") {
   # (not diagnosed yet).
   deps += [ "//build/rust/tests" ]
 
-  # TODO(https://crbug.com/405379314): This fails to build on some iOS ASAN
-  # builders.
-  if (!is_ios || !is_asan) {
-    deps += [ "//testing/rust_gtest_interop:unittests" ]
-  }
+  deps += [ "//testing/rust_gtest_interop:unittests" ]
 
   # TODO(crbug.com/40158212): Move partition_alloc tests into its repository.
   #

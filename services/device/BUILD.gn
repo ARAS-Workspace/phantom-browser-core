@@ -55,9 +55,7 @@ source_set("lib") {
     "//services/device/public/mojom:device_service",
   ]
 
-  if (!(is_ios && target_platform == "tvos")) {
-    deps += [ "//services/device/battery" ]
-  }
+  deps += [ "//services/device/battery" ]
 
   if (enable_compute_pressure) {
     deps += [ "//services/device/compute_pressure" ]
@@ -201,10 +199,8 @@ source_set("tests") {
     ]
   }
 
-  if (!(is_ios && target_platform == "tvos")) {
-    sources += [ "battery/battery_monitor_impl_unittest.cc" ]
-    deps += [ "//services/device/battery" ]
-  }
+  sources += [ "battery/battery_monitor_impl_unittest.cc" ]
+  deps += [ "//services/device/battery" ]
 
   sources += [
     "hid/hid_device_info_unittest.cc",
@@ -228,18 +224,13 @@ source_set("tests") {
         "hid/input_service_linux_unittest.cc",
       ]
     }
-    if (!is_ios && !is_android) {
-      # Fuchsia, iOS, and Android do not currently implement HidService.
-      sources += [ "hid/hid_service_unittest.cc" ]
-    }
-    if (!is_ios && !is_android) {
-      sources += [ "hid/hid_connection_unittest.cc" ]
-      deps += [
-        ":usb_test_gadget",
-        "//net:test_support",
-        "//services/device/usb",
-      ]
-    }
+    sources += [ "hid/hid_service_unittest.cc" ]
+    sources += [ "hid/hid_connection_unittest.cc" ]
+    deps += [
+      ":usb_test_gadget",
+      "//net:test_support",
+      "//services/device/usb",
+    ]
   }
 
   if (is_serial_enabled_platform) {

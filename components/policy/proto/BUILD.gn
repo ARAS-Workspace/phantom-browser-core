@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//extensions/buildflags/buildflags.gni")
 import("//third_party/protobuf/proto_library.gni")
 
 # The proto files need to be a component to avoid duplicate symbols the way the
@@ -49,9 +48,7 @@ proto_library("proto_internal") {
     "secure_connect.proto",
   ]
 
-  if ((!is_android || enable_extensions_core) && !is_ios) {
-    sources += [ "chrome_extension_policy.proto" ]
-  }
+  sources += [ "chrome_extension_policy.proto" ]
 
   extra_configs =
       [ "//third_party/private_membership:private_membership_config" ]

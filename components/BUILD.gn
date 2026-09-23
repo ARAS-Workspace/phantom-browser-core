@@ -563,20 +563,15 @@ test("components_unittests") {
     "//components/manta:unit_tests",
   ]
 
-  # Desktop - only deps.
-  if (!is_android && !is_ios) {
-    deps += [
-      "//components/access_code_cast/common:unit_tests",
-      "//components/headless/console_message_logger:unit_tests",
-      "//components/headless/screen_info:unit_tests",
-
-      # TODO(crbug.com/470475787): Enable this test on Android.
-      "//components/storage_monitor:unit_tests",
-      "//components/trusted_vault:unit_tests",
-      "//components/web_modal:unit_tests",
-      "//components/zoom:unit_tests",
-    ]
-  }
+  deps += [
+    "//components/access_code_cast/common:unit_tests",
+    "//components/headless/console_message_logger:unit_tests",
+    "//components/headless/screen_info:unit_tests",
+    "//components/storage_monitor:unit_tests",
+    "//components/trusted_vault:unit_tests",
+    "//components/web_modal:unit_tests",
+    "//components/zoom:unit_tests",
+  ]
 
   deps += [ "//components/private_ai:unit_tests" ]
 

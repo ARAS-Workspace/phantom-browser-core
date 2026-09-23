@@ -136,14 +136,12 @@ grit_strings("components_locale_settings") {
                      "ar-XB",
                      "ms",
                    ]
-  if (!is_android && !is_ios) {
-    if (is_chrome_branded) {
-      inputs += process_file_template(
-              _terms_locales,
-              [ "../resources/terms/terms_{{source_name_part}}.html" ])
-    } else {
-      inputs += [ "../resources/terms/terms_chromium.html" ]
-    }
+  if (is_chrome_branded) {
+    inputs += process_file_template(
+            _terms_locales,
+            [ "../resources/terms/terms_{{source_name_part}}.html" ])
+  } else {
+    inputs += [ "../resources/terms/terms_chromium.html" ]
   }
 
   if (is_linux) {

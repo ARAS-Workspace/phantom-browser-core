@@ -19,12 +19,7 @@ executable("tag_exe") {
 }
 
 copy("tag") {
-  # For arm64 builds, we need to create an x86_64 tag executable.
-  if (current_cpu != "x64" && is_win) {
-    tag_tool = ":tag_exe(//build/toolchain/win:win_clang_x64)"
-  } else {
-    tag_tool = ":tag_exe"
-  }
+  tag_tool = ":tag_exe"
   suffix = ""
   sources = [ get_label_info(tag_tool, "root_out_dir") + "/tag_exe" + suffix ]
   outputs = [ "$root_build_dir/tag.exe" ]

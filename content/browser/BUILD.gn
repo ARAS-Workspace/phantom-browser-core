@@ -2469,17 +2469,10 @@ source_set("browser") {
     ]
   }
 
-  # Watching the local file system via the File System Access API is not
-  # supported on Android or Fuchsia. Local file system access is not supported
-  # on Android at all (see https://crbug.com/1011535), whereas
-  # `base::FilePatchWatcher` is not implemented on Fuchsia (see
-  # https://crbug.com/851641)
-  if (!is_android && !is_ios) {
-    sources += [
-      "file_system_access/file_system_access_local_path_watcher.cc",
-      "file_system_access/file_system_access_local_path_watcher.h",
-    ]
-  }
+  sources += [
+    "file_system_access/file_system_access_local_path_watcher.cc",
+    "file_system_access/file_system_access_local_path_watcher.h",
+  ]
 
   if (is_apple) {
     sources += [
@@ -2487,12 +2480,10 @@ source_set("browser") {
       "font_access/font_enumeration_data_source_mac.mm",
     ]
 
-    if (!(is_ios && target_platform == "tvos")) {
-      sources += [
-        "child_process_task_port_provider_mac.cc",
-        "child_process_task_port_provider_mac.h",
-      ]
-    }
+    sources += [
+      "child_process_task_port_provider_mac.cc",
+      "child_process_task_port_provider_mac.h",
+    ]
   }
 
   if (is_mac) {
@@ -2857,13 +2848,10 @@ source_set("browser") {
     ]
   }
 
-  if (!is_android && !is_ios) {
-    sources += [
-      # Trace report internal UI is not adapted for mobile use.
-      "tracing/traces_internals/traces_internals_ui.cc",
-      "tracing/traces_internals/traces_internals_ui.h",
-    ]
-  }
+  sources += [
+    "tracing/traces_internals/traces_internals_ui.cc",
+    "tracing/traces_internals/traces_internals_ui.h",
+  ]
 
   if (use_aura) {
     deps += [

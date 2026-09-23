@@ -136,12 +136,10 @@ component("crypto") {
       ]
     }
 
-    if (!(is_ios && target_platform == "tvos")) {
-      sources += [
-        "apple/unexportable_key_apple.h",
-        "apple/unexportable_key_apple.mm",
-      ]
-    }
+    sources += [
+      "apple/unexportable_key_apple.h",
+      "apple/unexportable_key_apple.mm",
+    ]
 
     frameworks = [
       "CoreFoundation.framework",
@@ -242,12 +240,10 @@ test("crypto_unittests") {
   ]
 
   if (is_apple) {
-    if (!(is_ios && target_platform == "tvos")) {
-      sources += [
-        "apple/keychain_util_unittest.mm",
-        "apple/unexportable_key_apple_unittest.mm",
-      ]
-    }
+    sources += [
+      "apple/keychain_util_unittest.mm",
+      "apple/unexportable_key_apple_unittest.mm",
+    ]
   }
 
   data = [ "test/data/" ]

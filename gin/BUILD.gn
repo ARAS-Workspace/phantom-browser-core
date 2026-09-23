@@ -189,11 +189,8 @@ test("gin_unittests") {
   ]
   data = []
 
-  # gin_shell is not an Android/iOS app.
-  if (!is_android && !is_ios) {
-    sources += [ "shell/gin_shell_unittest.cc" ]
-    deps += [ ":gin_shell" ]
-    data_deps += [ ":gin_shell" ]
-    data += [ "shell/hello_world.js" ]
-  }
+  sources += [ "shell/gin_shell_unittest.cc" ]
+  deps += [ ":gin_shell" ]
+  data_deps += [ ":gin_shell" ]
+  data += [ "shell/hello_world.js" ]
 }

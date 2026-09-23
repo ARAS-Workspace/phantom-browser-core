@@ -359,43 +359,41 @@ source_set("current_channel_logo") {
   ]
 }
 
-if (!is_android || enable_extensions_core) {
-  source_set("theme_source") {
-    sources = [ "theme_source.cc" ]
-    public = [ "theme_source.h" ]
-    public_deps = [
-      "//base",
-      "//content/public/browser",
-    ]
-    deps = [
-      ":current_channel_logo",
-      "//chrome/app/theme:theme_resources",
-      "//chrome/browser:resources_util",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui/color:color_headers",
-      "//chrome/browser/ui/color:mixers",
-      "//chrome/common",
-      "//chrome/common:channel_info",
-      "//components/version_info",
-      "//net",
-      "//services/network/public/mojom",
-      "//ui/base",
-      "//ui/color",
-      "//ui/gfx",
-      "//url",
-    ]
+source_set("theme_source") {
+  sources = [ "theme_source.cc" ]
+  public = [ "theme_source.h" ]
+  public_deps = [
+    "//base",
+    "//content/public/browser",
+  ]
+  deps = [
+    ":current_channel_logo",
+    "//chrome/app/theme:theme_resources",
+    "//chrome/browser:resources_util",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui/color:color_headers",
+    "//chrome/browser/ui/color:mixers",
+    "//chrome/common",
+    "//chrome/common:channel_info",
+    "//components/version_info",
+    "//net",
+    "//services/network/public/mojom",
+    "//ui/base",
+    "//ui/color",
+    "//ui/gfx",
+    "//url",
+  ]
 
-    deps += [
-      "//chrome/browser/themes",
-      "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
-    ]
+  deps += [
+    "//chrome/browser/themes",
+    "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
+  ]
 
-    # ThemeSource uses InstantService::ShouldServiceRequest() and InstantService
-    # (//chrome/browser/search) constructs ThemeSource — a genuine
-    # bidirectional pair. //chrome/browser/search owns the real dep edge and the
-    # corresponding allow_circular_includes_from, since search transitively
-    # reaches theme_source via the NTP targets.
-  }
+  # ThemeSource uses InstantService::ShouldServiceRequest() and InstantService
+  # (//chrome/browser/search) constructs ThemeSource — a genuine
+  # bidirectional pair. //chrome/browser/search owns the real dep edge and the
+  # corresponding allow_circular_includes_from, since search transitively
+  # reaches theme_source via the NTP targets.
 }
 
 source_set("theme_handler") {

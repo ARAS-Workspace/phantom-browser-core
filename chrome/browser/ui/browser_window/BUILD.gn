@@ -73,28 +73,24 @@ source_set("interactive_ui_tests") {
   ]
 }
 
-# These tests don't work on mobile Android due to the lack of multi-window
-# support.
-if (!is_android || is_desktop_android) {
-  source_set("browser_tests") {
-    testonly = true
-    sources = [ "internal/profile_browser_collection_browsertest.cc" ]
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    deps = [
-      ":browser_window",
-      ":create_browser_window",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/browser_window/test:test_support",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
+source_set("browser_tests") {
+  testonly = true
+  sources = [ "internal/profile_browser_collection_browsertest.cc" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  deps = [
+    ":browser_window",
+    ":create_browser_window",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/browser_window/test:test_support",
+    "//chrome/test:test_support",
+    "//content/test:test_support",
+    "//testing/gtest",
+  ]
 
-    sources += [
-      "internal/create_browser_window_browsertest.cc",
-      "public/browser_window_interface_iterator_browsertest.cc",
-    ]
-  }
+  sources += [
+    "internal/create_browser_window_browsertest.cc",
+    "public/browser_window_interface_iterator_browsertest.cc",
+  ]
 }

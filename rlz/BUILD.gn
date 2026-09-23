@@ -149,12 +149,10 @@ if (enable_rlz_support) {
   }
 }
 
-if (!is_ios && !is_android) {
-  executable("rlz_id") {
-    sources = [ "examples/rlz_id.cc" ]
-    deps = [
-      ":rlz_lib",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+executable("rlz_id") {
+  sources = [ "examples/rlz_id.cc" ]
+  deps = [
+    ":rlz_lib",
+    "//build/win:default_exe_manifest",
+  ]
 }

@@ -452,9 +452,7 @@ static_library("browser") {
     "geolocation_header_service.h",
   ]
 
-  if ((!is_android || enable_vr) && !is_ios) {
-    deps += [ ":vector_icons" ]
-  }
+  deps += [ ":vector_icons" ]
 
   if (enable_extensions_core) {
     deps += [
@@ -534,9 +532,7 @@ static_library("location_bar") {
     "//ui/gfx",
   ]
 
-  if ((!is_android || enable_vr) && !is_ios) {
-    deps += [ ":vector_icons" ]
-  }
+  deps += [ ":vector_icons" ]
 }
 
 static_library("test_support") {
@@ -770,14 +766,12 @@ source_set("unit_tests") {
 
   sources += [ "suggest_inventory_fallback_utils_unittest.cc" ]
 
-  if ((!is_android || enable_vr) && !is_ios) {
-    sources += [ "location_bar_model_util_unittest.cc" ]
-    deps += [
-      ":buildflags",
-      "//components/omnibox/browser:vector_icons",
-      "//components/vector_icons",
-    ]
-  }
+  sources += [ "location_bar_model_util_unittest.cc" ]
+  deps += [
+    ":buildflags",
+    "//components/omnibox/browser:vector_icons",
+    "//components/vector_icons",
+  ]
 
   sources += [
     "geolocation_header_service_unittest.cc",

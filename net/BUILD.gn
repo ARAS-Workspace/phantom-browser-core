@@ -2246,99 +2246,97 @@ static_library("test_support") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (!is_ios && !is_android) {
-  executable("cert_verify_tool") {
-    testonly = true
-    sources = [
-      "tools/cert_verify_tool/cert_verify_tool.cc",
-      "tools/cert_verify_tool/cert_verify_tool_util.cc",
-      "tools/cert_verify_tool/cert_verify_tool_util.h",
-      "tools/cert_verify_tool/verify_using_cert_verify_proc.cc",
-      "tools/cert_verify_tool/verify_using_cert_verify_proc.h",
-      "tools/cert_verify_tool/verify_using_path_builder.cc",
-      "tools/cert_verify_tool/verify_using_path_builder.h",
-    ]
+executable("cert_verify_tool") {
+  testonly = true
+  sources = [
+    "tools/cert_verify_tool/cert_verify_tool.cc",
+    "tools/cert_verify_tool/cert_verify_tool_util.cc",
+    "tools/cert_verify_tool/cert_verify_tool_util.h",
+    "tools/cert_verify_tool/verify_using_cert_verify_proc.cc",
+    "tools/cert_verify_tool/verify_using_cert_verify_proc.h",
+    "tools/cert_verify_tool/verify_using_path_builder.cc",
+    "tools/cert_verify_tool/verify_using_path_builder.h",
+  ]
 
-    deps = [
-      ":net",
-      ":test_support",
-      "//base",
-      "//build/win:default_exe_manifest",
-    ]
+  deps = [
+    ":net",
+    ":test_support",
+    "//base",
+    "//build/win:default_exe_manifest",
+  ]
 
-    if (is_mac) {
-      frameworks = [ "Security.framework" ]
-    }
+  if (is_mac) {
+    frameworks = [ "Security.framework" ]
   }
+}
 
-  executable("crash_cache") {
-    testonly = true
-    sources = [ "tools/crash_cache/crash_cache.cc" ]
+executable("crash_cache") {
+  testonly = true
+  sources = [ "tools/crash_cache/crash_cache.cc" ]
 
-    deps = [
-      ":net",
-      ":test_support",
-      "//base",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+  deps = [
+    ":net",
+    ":test_support",
+    "//base",
+    "//build/win:default_exe_manifest",
+  ]
+}
 
-  executable("hpack_example_generator") {
-    testonly = true
-    sources = [ "spdy/fuzzing/hpack_example_generator.cc" ]
+executable("hpack_example_generator") {
+  testonly = true
+  sources = [ "spdy/fuzzing/hpack_example_generator.cc" ]
 
-    deps = [
-      ":net",
-      ":spdy_test_tools",
-      "//base",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+  deps = [
+    ":net",
+    ":spdy_test_tools",
+    "//base",
+    "//build/win:default_exe_manifest",
+  ]
+}
 
-  executable("net_watcher") {
-    testonly = true
-    sources = [ "tools/net_watcher/net_watcher.cc" ]
-    deps = [
-      ":net",
-      "//base",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+executable("net_watcher") {
+  testonly = true
+  sources = [ "tools/net_watcher/net_watcher.cc" ]
+  deps = [
+    ":net",
+    "//base",
+    "//build/win:default_exe_manifest",
+  ]
+}
 
-  executable("run_testserver") {
-    testonly = true
-    sources = [ "tools/testserver/run_testserver.cc" ]
-    deps = [
-      ":test_support",
-      "//base",
-      "//base/test:test_support",
-      "//build/win:default_exe_manifest",
-      "//testing/gtest",
-    ]
-  }
+executable("run_testserver") {
+  testonly = true
+  sources = [ "tools/testserver/run_testserver.cc" ]
+  deps = [
+    ":test_support",
+    "//base",
+    "//base/test:test_support",
+    "//build/win:default_exe_manifest",
+    "//testing/gtest",
+  ]
+}
 
-  executable("stress_cache") {
-    testonly = true
-    sources = [ "tools/stress_cache/stress_cache.cc" ]
+executable("stress_cache") {
+  testonly = true
+  sources = [ "tools/stress_cache/stress_cache.cc" ]
 
-    deps = [
-      ":net",
-      ":test_support",
-      "//base",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+  deps = [
+    ":net",
+    ":test_support",
+    "//base",
+    "//build/win:default_exe_manifest",
+  ]
+}
 
-  executable("tld_cleanup") {
-    sources = [ "tools/tld_cleanup/tld_cleanup.cc" ]
+executable("tld_cleanup") {
+  sources = [ "tools/tld_cleanup/tld_cleanup.cc" ]
 
-    deps = [
-      "//base",
-      "//base:i18n",
-      "//build/win:default_exe_manifest",
-      "//net/tools/tld_cleanup",
-    ]
-  }
+  deps = [
+    "//base",
+    "//base:i18n",
+    "//build/win:default_exe_manifest",
+    "//net/tools/tld_cleanup",
+  ]
 }
 
 if (use_external_gssapi) {

@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//extensions/buildflags/buildflags.gni")
-
 source_set("browser") {
   sources = [
     "issue_manager.cc",
@@ -74,21 +72,19 @@ source_set("browser") {
   ]
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
-  if (!is_android || enable_extensions_core) {
-    sources += [
-      "issues_observer.cc",
-      "issues_observer.h",
-      "log_util.cc",
-      "log_util.h",
-      "logger_impl.cc",
-      "logger_impl.h",
-      "media_router_debugger.h",
-      "mirroring_to_flinging_switcher.cc",
-      "mirroring_to_flinging_switcher.h",
-      "presentation/presentation_navigation_policy.cc",
-      "presentation/presentation_navigation_policy.h",
-    ]
-  }
+  sources += [
+    "issues_observer.cc",
+    "issues_observer.h",
+    "log_util.cc",
+    "log_util.h",
+    "logger_impl.cc",
+    "logger_impl.h",
+    "media_router_debugger.h",
+    "mirroring_to_flinging_switcher.cc",
+    "mirroring_to_flinging_switcher.h",
+    "presentation/presentation_navigation_policy.cc",
+    "presentation/presentation_navigation_policy.h",
+  ]
 }
 
 source_set("test_support") {

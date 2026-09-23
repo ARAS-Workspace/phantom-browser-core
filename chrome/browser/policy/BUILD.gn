@@ -632,9 +632,7 @@ source_set("unit_tests") {
     "file_selection_dialogs_policy_handler_unittest.cc",
   ]
 
-  if (!is_android || enable_desktop_android_extensions) {
-    sources += [ "developer_tools_policy_handler_unittest.cc" ]
-  }
+  sources += [ "developer_tools_policy_handler_unittest.cc" ]
 
   if (is_linux) {
     sources += [ "browser_dm_token_storage_linux_unittest.cc" ]

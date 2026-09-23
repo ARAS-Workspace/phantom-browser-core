@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/chrome_build.gni")
-import("//build/config/ui.gni")
 
 static_library("core") {
   sources = [
@@ -41,9 +40,7 @@ static_library("core") {
     "//url",
   ]
 
-  if (use_aura || (!is_ios && !is_android)) {
-    deps += [ "//ui/native_theme" ]
-  }
+  deps += [ "//ui/native_theme" ]
 }
 
 source_set("unit_tests") {

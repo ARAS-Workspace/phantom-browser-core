@@ -90,14 +90,12 @@ component("gamepad") {
     }
   }
 
-  if (!is_android && !is_ios) {
-    sources += [
-      "nintendo_controller.cc",
-      "nintendo_controller.h",
-      "nintendo_data_fetcher.cc",
-      "nintendo_data_fetcher.h",
-    ]
-  }
+  sources += [
+    "nintendo_controller.cc",
+    "nintendo_controller.h",
+    "nintendo_data_fetcher.cc",
+    "nintendo_data_fetcher.h",
+  ]
 
   if (is_apple) {
     sources += [

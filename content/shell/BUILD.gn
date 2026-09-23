@@ -465,24 +465,19 @@ repack("pak") {
     sources += [ "$root_gen_dir/content/webxr_internals_resources.pak" ]
   }
 
-  if (!is_android && !is_ios) {
-    deps += [ "//content/browser/tracing:resources" ]
-    sources += [
-      "$root_gen_dir/content/browser/tracing/tracing_resources.pak",
-      "$root_gen_dir/content/traces_internals_resources.pak",
-    ]
-  }
+  deps += [ "//content/browser/tracing:resources" ]
+  sources += [
+    "$root_gen_dir/content/browser/tracing/tracing_resources.pak",
+    "$root_gen_dir/content/traces_internals_resources.pak",
+  ]
 
   if (shell_use_toolkit_views) {
     deps += [ "//ui/views/resources" ]
     sources +=
         [ "$root_gen_dir/ui/views/resources/views_resources_100_percent.pak" ]
   }
-  if (!is_android && !is_ios) {
-    sources +=
-        [ "$root_gen_dir/content/browser/devtools/devtools_resources.pak" ]
-    deps += [ "//content/browser/devtools:devtools_resources" ]
-  }
+  sources += [ "$root_gen_dir/content/browser/devtools/devtools_resources.pak" ]
+  deps += [ "//content/browser/devtools:devtools_resources" ]
   output = "$root_out_dir/content_shell.pak"
 }
 
