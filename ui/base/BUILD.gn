@@ -20,12 +20,7 @@ import("//tools/grit/grit_rule.gni")
 import("//ui/base/ui_features.gni")
 import("//ui/qt/qt.gni")
 
-if (is_android) {
-  import("//build/config/android/config.gni")
-  import("//build/config/android/rules.gni")
-} else if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-} else if (is_mac) {
+if (is_mac) {
   import("//build/config/mac/rules.gni")
   import("//build/util/branding.gni")
 }
@@ -354,11 +349,7 @@ component("base") {
       ]
     }
 
-    if (is_win) {
-      sources += [ "pointer/pointer_device_win.cc" ]
-    } else if (is_android) {
-      sources += [ "pointer/pointer_device_android.cc" ]
-    } else if (is_ios && target_platform == "iphoneos") {
+    if (is_ios && target_platform == "iphoneos") {
       sources += [ "pointer/pointer_device_ios.cc" ]
     } else if (is_linux) {
       sources += [ "pointer/pointer_device_linux.cc" ]
@@ -370,12 +361,6 @@ component("base") {
 
   if (is_mac) {
     sources += [ "accelerators/media_keys_listener_mac.mm" ]
-  } else if (is_win) {
-    sources += [
-      "accelerators/global_media_keys_listener_win.cc",
-      "accelerators/global_media_keys_listener_win.h",
-      "accelerators/media_keys_listener_win.cc",
-    ]
   } else {
     sources += [ "accelerators/media_keys_listener_stub.cc" ]
   }
@@ -595,9 +580,7 @@ if (use_blink) {
     # Because this links to a CIPD dependency, which is a symlink on Unix
     # platforms, refer to the actual executable rather than the whole directory;
     # copying the whole directory doesn't work, at least with "mb.py zip".
-    if (is_win) {
-      data += [ "//tools/skia_goldctl/win/goldctl.exe" ]
-    } else if (is_mac) {
+    if (is_mac) {
       data += [
         "//tools/skia_goldctl/mac_amd64/goldctl",
         "//tools/skia_goldctl/mac_arm64/goldctl",
@@ -958,10 +941,7 @@ test("ui_base_unittests") {
   }
 
   # Include the correct ui_base_test resources per platform.
-  if (is_android) {
-    deps += [ ":ui_base_test_android_assets" ]
-    data_deps += [ ":ui_base_test_resources_pak" ]
-  } else if (is_ios) {
+  if (is_ios) {
     deps += [ ":ui_base_test_bundle_data" ]
   } else {
     data += [ "$root_out_dir/ui_base_test_resources.pak" ]

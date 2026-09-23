@@ -17,9 +17,7 @@ grit_strings("locale_settings") {
 }
 
 grit_strings("platform_locale_settings") {
-  if (is_win) {
-    source = "locale_settings_win.grd"
-  } else if (is_mac) {
+  if (is_mac) {
     source = "locale_settings_mac.grd"
   } else if (is_posix) {
     # All other POSIX systems use the Linux one.

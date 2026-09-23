@@ -29,14 +29,7 @@ component("storage_monitor") {
     "//ui/base",
   ]
 
-  if (is_win) {
-    sources += [
-      "storage_monitor_win.cc",
-      "storage_monitor_win.h",
-      "volume_mount_watcher_win.cc",
-      "volume_mount_watcher_win.h",
-    ]
-  } else if (is_mac) {
+  if (is_mac) {
     sources += [
       "storage_monitor_mac.h",
       "storage_monitor_mac.mm",

@@ -183,62 +183,7 @@ source_set("permissions") {
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser" ]
   }
-  if (is_android) {
-    sources += [
-      "android/android_permission_util.cc",
-      "android/android_permission_util.h",
-      "android/bluetooth_chooser_android.cc",
-      "android/bluetooth_chooser_android.h",
-      "android/bluetooth_chooser_android_delegate.h",
-      "android/bluetooth_scanning_prompt_android.cc",
-      "android/bluetooth_scanning_prompt_android.h",
-      "android/bluetooth_scanning_prompt_android_delegate.h",
-      "android/permission_prompt/embedded_permission_prompt_android.cc",
-      "android/permission_prompt/embedded_permission_prompt_android.h",
-      "android/permission_prompt/permission_clapper_quiet_icon.cc",
-      "android/permission_prompt/permission_clapper_quiet_icon.h",
-      "android/permission_prompt/permission_clapper_quiet_icon_delegate.cc",
-      "android/permission_prompt/permission_clapper_quiet_icon_delegate.h",
-      "android/permission_prompt/permission_dialog.cc",
-      "android/permission_prompt/permission_dialog.h",
-      "android/permission_prompt/permission_dialog_controller.cc",
-      "android/permission_prompt/permission_dialog_controller.h",
-      "android/permission_prompt/permission_dialog_delegate.cc",
-      "android/permission_prompt/permission_dialog_delegate.h",
-      "android/permission_prompt/permission_message.cc",
-      "android/permission_prompt/permission_message.h",
-      "android/permission_prompt/permission_prompt_android.cc",
-      "android/permission_prompt/permission_prompt_android.h",
-      "android/permission_prompt/permission_prompt_android_factory.cc",
-      "android/permissions_android_feature_map.cc",
-      "android/permissions_android_feature_map.h",
-      "android/permissions_reprompt_controller_android.cc",
-      "android/permissions_reprompt_controller_android.h",
-      "contexts/geolocation_permission_context_android.cc",
-      "contexts/geolocation_permission_context_android.h",
-      "contexts/nfc_permission_context_android.cc",
-      "contexts/nfc_permission_context_android.h",
-    ]
-    deps += [
-      "//components/favicon_base",
-      "//components/location/android:location_settings_dialog_enums_java",
-      "//components/location/android:settings",
-      "//components/messages/android",
-      "//components/permissions/android:core_jni",
-      "//components/permissions/android:jni_headers",
-      "//components/permissions/android:native",
-      "//components/prefs",
-      "//components/resources:android_resources",
-      "//components/security_state/core",
-      "//components/strings:components_strings_grit",
-
-      # Our corresponding java library references Java files which use the
-      # jni depended on here.
-      "//components/webxr/android:features",
-      "//third_party/jni_zero",
-      "//ui/android",
-    ]
-  } else if (is_ios) {
+  if (is_ios) {
     sources += [
       "ios/content/permission_prompt/permission_dialog.h",
       "ios/content/permission_prompt/permission_dialog.mm",

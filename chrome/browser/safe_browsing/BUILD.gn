@@ -472,19 +472,6 @@ static_library("safe_browsing") {
           "incident_reporting/binary_integrity_analyzer_mac.cc",
           "signature_evaluator_mac.mm",
         ]
-      } else if (is_win) {
-        public += [
-          "incident_reporting/binary_integrity_analyzer_win.h",
-          "incident_reporting/environment_data_collection_win.h",
-          "incident_reporting/module_integrity_verifier_win.h",
-        ]
-        sources += [
-          "incident_reporting/binary_integrity_analyzer_win.cc",
-          "incident_reporting/environment_data_collection_win.cc",
-          "incident_reporting/module_integrity_verifier_win.cc",
-          "incident_reporting/platform_state_store_win.cc",
-        ]
-        deps += [ "//chrome/browser/install_verification" ]
       }
 
       deps += [
@@ -526,8 +513,6 @@ static_library("safe_browsing") {
       ]
       if (is_mac) {
         deps += [ "//chrome/common/safe_browsing:disk_image_type_sniffer_mac" ]
-      } else if (is_win) {
-        deps += [ "//chrome/common:version_header" ]
       }
       if (!is_android) {
         deps += [

@@ -676,12 +676,7 @@ if (use_blink && !is_cronet_build) {
   group("chromedriver_group") {
     testonly = true
 
-    if (is_android) {
-      # On Fuchsia and non-Cast Android, ChromeDriver runs on the host, not the
-      # device.
-      deps =
-          [ "//chrome/test/chromedriver:chromedriver_server($host_toolchain)" ]
-    } else if (!is_ios) {
+    if (!is_ios) {
       deps = [
         "//chrome/test/chromedriver:chromedriver_server",
         "//chrome/test/chromedriver:chromedriver_unittests",

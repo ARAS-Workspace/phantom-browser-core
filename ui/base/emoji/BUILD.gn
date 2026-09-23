@@ -18,8 +18,6 @@ component("emoji") {
   sources = [ "emoji_panel_helper.h" ]
   if (is_mac) {
     sources += [ "emoji_panel_helper_mac.mm" ]
-  } else if (is_win) {
-    sources += [ "emoji_panel_helper_win.cc" ]
   } else {
     # Empty implementation for all other platforms.
     sources += [ "emoji_panel_helper.cc" ]

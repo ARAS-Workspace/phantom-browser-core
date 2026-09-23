@@ -151,12 +151,7 @@ source_set("dns") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "dns_config_service_android.cc",
-      "dns_config_service_android.h",
-    ]
-  } else if (is_linux) {
+  if (is_linux) {
     sources += [
       "dns_config_service_linux.cc",
       "dns_config_service_linux.h",
@@ -443,14 +438,7 @@ source_set("tests") {
     "system_dns_config_change_notifier_unittest.cc",
   ]
 
-  if (is_android) {
-    sources += [
-      "dns_config_service_android_unittest.cc",
-      "dns_platform_android_attempt_unittest.cc",
-      "mock_dns_platform_android_attempt_delegate.cc",
-      "mock_dns_platform_android_attempt_delegate.h",
-    ]
-  } else if (is_linux) {
+  if (is_linux) {
     sources += [ "dns_config_service_linux_unittest.cc" ]
   } else if (is_posix) {
     sources += [ "dns_config_service_posix_unittest.cc" ]

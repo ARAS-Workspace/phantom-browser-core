@@ -88,10 +88,6 @@ if (is_chrome_branded && (is_mac || is_win || is_linux)) {
     if (is_mac) {
       sources += [ "scoped_channel_override_mac.cc" ]
       deps = [ "//chrome/common" ]
-    } else if (is_win) {
-      sources += [ "scoped_channel_override_win.cc" ]
-      public_deps += [ "//chrome/install_static/test:test_support" ]
-      deps = [ "//chrome/install_static:install_static_util" ]
     } else {
       sources += [ "scoped_channel_override_posix.cc" ]
       public_deps += [ "//base/test:test_support" ]

@@ -18,8 +18,6 @@ source_set("path_parser") {
     sources = [ "policy_path_parser_linux.cc" ]
   } else if (is_mac) {
     sources = [ "policy_path_parser_mac.mm" ]
-  } else if (is_win) {
-    sources = [ "policy_path_parser_win.cc" ]
   }
 
   deps = [
@@ -30,8 +28,6 @@ source_set("path_parser") {
 
   if (is_mac) {
     deps += [ "//build:branding_buildflags" ]
-  } else if (is_win) {
-    deps += [ "//chrome/install_static:install_static_util" ]
   }
 }
 

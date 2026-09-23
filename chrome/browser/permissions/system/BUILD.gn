@@ -56,14 +56,6 @@ source_set("system") {
       "//chrome/browser:after_startup_task_utils",
       "//chrome/browser/web_applications",
     ]
-  } else if (is_win) {
-    public += [ "system_media_source_win.h" ]
-    sources += [
-      "system_media_source_win.cc",
-      "system_media_source_win.h",
-      "system_permission_settings_win.cc",
-    ]
-    deps += [ "//chrome/browser:browser_public_dependencies" ]
   } else {
     sources += [ "system_permission_settings_default.cc" ]
   }

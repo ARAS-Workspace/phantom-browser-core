@@ -137,8 +137,6 @@ template("repack") {
 template("repack_locales") {
   if (defined(invoker.output_dir)) {
     _output_dir = invoker.output_dir
-  } else if (is_ios) {
-    _output_dir = "$target_gen_dir"
   } else {
     _output_dir = "$target_gen_dir/$target_name"
   }

@@ -333,8 +333,6 @@ if (enable_openxr) {
     sources = []
     if (is_win) {
       sources += [ "openxr/test/openxr_win.json" ]
-    } else if (is_android) {
-      sources += [ "openxr/test/openxr_android.json" ]
     }
 
     outputs = [ "$root_out_dir/mock_vr_clients/bin/openxr/openxr.json" ]
@@ -380,8 +378,6 @@ if (enable_openxr) {
       # in the output_name path, then symbolization on the bots is broken.
       if (is_win) {
         output_name = "mock_vr_clients/bin/openxr/openxrruntime"
-      } else if (is_android) {
-        output_name = "libmockopenxrruntime"
       }
 
       defines = [
@@ -397,13 +393,6 @@ if (enable_openxr) {
 
       if (is_win) {
         sources += [ "openxr/test/openxr.def" ]
-      } else if (is_android) {
-        configs -= [ "//build/config/gcc:symbol_visibility_hidden" ]
-        configs += [ "//build/config/gcc:symbol_visibility_default" ]
-        ldflags = [ "-Wl,--version-script=" +
-                    rebase_path("//device/vr/openxr/test/openxr.lst",
-                                root_build_dir) ]
-        inputs = [ "//device/vr/openxr/test/openxr.lst" ]
       }
 
       public_deps = [ ":openxr_data" ]

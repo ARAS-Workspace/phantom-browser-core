@@ -58,8 +58,6 @@ static_library("dom_keyboard_layout") {
   # Make sure we don't compile two versions of dom_keyboard_layout_map*
   if (is_mac) {
     sources += [ "keycodes/dom/dom_keyboard_layout_map_mac.mm" ]
-  } else if (is_win) {
-    sources += [ "keycodes/dom/dom_keyboard_layout_map_win.cc" ]
   } else if (use_ozone) {
     sources += [ "keycodes/dom/dom_keyboard_layout_map_ozone.cc" ]
     deps += [ "//ui/events/ozone/layout" ]
@@ -384,11 +382,7 @@ component("gesture_detection") {
 
   defines = [ "GESTURE_DETECTION_IMPLEMENTATION" ]
 
-  if (is_android) {
-    sources += [ "gesture_detection/gesture_configuration_android.cc" ]
-  } else if (is_ios) {
-    sources += [ "gesture_detection/gesture_configuration_ios.cc" ]
-  } else if (use_aura) {
+  if (use_aura) {
     sources += [ "gesture_detection/gesture_configuration_aura.cc" ]
   } else {
     sources += [ "gesture_detection/gesture_configuration_default.cc" ]

@@ -1128,25 +1128,7 @@ source_set("extensions") {
       }
     }
 
-    if (is_win) {
-      sources += [
-        "api/image_writer_private/removable_storage_provider_win.cc",
-        "external_registry_loader_win.cc",
-        "external_registry_loader_win.h",
-        "system_display/display_info_provider_win.cc",
-        "system_display/display_info_provider_win.h",
-      ]
-      deps += [
-        "//components/app_launch_prefetch",
-        "//components/device_signals/core/common/win",
-        "//third_party/iaccessible2",
-        "//third_party/isimpledom",
-      ]
-      libs = [
-        "setupapi.lib",
-        "propsys.lib",
-      ]
-    } else if (use_aura) {
+    if (use_aura) {
       sources += [
         "system_display/display_info_provider_aura.cc",
         "system_display/display_info_provider_aura.h",

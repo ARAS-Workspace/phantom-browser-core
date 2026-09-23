@@ -328,26 +328,9 @@ test("gl_tests") {
 
   libs = []
 
-  if (is_android) {
-    libs += [ "android" ]
-    deps += [ "//ui/android:ui_java" ]
-    sources += [ "command_buffer/service/shared_image/ahardwarebuffer_image_backing_factory_unittest.cc" ]
-  } else if (is_apple) {
+  if (is_apple) {
     frameworks = [ "IOSurface.framework" ]
     sources += [ "command_buffer/service/shared_image/iosurface_image_backing_factory_unittest.cc" ]
-  } else if (is_win) {
-    libs += [ "d3d12.lib" ]
-    libs += [ "d3d11.lib" ]
-    deps += [
-      "//third_party/microsoft_dxheaders:dxguids",
-      "//ui/platform_window",
-      "//ui/platform_window:platform_impls",
-    ]
-    sources += [
-      "command_buffer/service/dxgi_shared_handle_manager_unittest.cc",
-      "command_buffer/service/shared_image/d3d_image_backing_factory_unittest.cc",
-      "command_buffer/service/shared_image/dcomp_image_backing_factory_unittest.cc",
-    ]
   } else if (is_linux) {
     # Simply loading the Vulkan driver leaks crbug.com/1134681
     # CFI error in third_party/vulkan_memory_allocator crbug.com/1139916

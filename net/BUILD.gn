@@ -15,16 +15,8 @@ import("//third_party/protobuf/proto_library.gni")
 import("//tools/grit/grit_rule.gni")
 import("//url/features.gni")
 
-if (is_android) {
-  import("//build/config/android/config.gni")
-  import("//build/config/android/rules.gni")
-  import("//components/cronet/android/cronet_test_templates.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-} else if (is_mac) {
+if (is_mac) {
   import("//build/config/mac/mac_sdk.gni")
-} else if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-  import("//build/config/ios/bundle_data_from_filelist.gni")
 }
 
 enable_built_in_dns = use_blink
@@ -1645,10 +1637,7 @@ component("net") {
 
   # ICU support.
   if (use_platform_icu_alternatives) {
-    if (is_android) {
-      # Use ICU alternative on Android.
-      sources += [ "base/net_string_util_icu_alternatives_android.cc" ]
-    } else if (is_ios) {
+    if (is_ios) {
       # Use ICU alternative on iOS.
       sources += [ "base/net_string_util_icu_alternatives_ios.mm" ]
     } else {

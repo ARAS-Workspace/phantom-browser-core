@@ -107,13 +107,6 @@ source_set("geolocation") {
       "wifi_data_provider_mac.h",
       "wifi_data_provider_mac.mm",
     ]
-  } else if (is_win) {
-    sources += [
-      "wifi_data_provider_common_win.cc",
-      "wifi_data_provider_common_win.h",
-      "wifi_data_provider_win.cc",
-      "wifi_data_provider_win.h",
-    ]
   } else {
     # WifiDataProviderHandle declares a static factory method that is defined
     # by the platform implementation. Platforms with no Wi-Fi data provider must

@@ -33,13 +33,7 @@ source_set("tracked") {
     "tracked_split_preference.h",
   ]
 
-  if (is_win) {
-    sources += [
-      "device_id_win.cc",
-      "registry_hash_store_contents_win.cc",
-      "registry_hash_store_contents_win.h",
-    ]
-  } else if (is_mac) {
+  if (is_mac) {
     sources += [ "device_id_mac.cc" ]
   } else {
     sources += [ "device_id_stub.cc" ]

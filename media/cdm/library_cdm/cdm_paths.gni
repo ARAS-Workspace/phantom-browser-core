@@ -14,8 +14,6 @@ assert(enable_library_cdms)
 # Explicitly define what we use to avoid confusion.
 if (is_linux) {
   component_os = "linux"
-} else if (is_win) {
-  component_os = "win"
 } else if (is_mac) {
   component_os = "mac"
 } else {

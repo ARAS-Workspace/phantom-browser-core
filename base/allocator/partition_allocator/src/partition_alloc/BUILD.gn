@@ -537,12 +537,7 @@ if (is_clang_or_gcc) {
     ]
 
     defines = []
-    if (is_win) {
-      sources += [
-        "page_allocator_internals_win.h",
-        "partition_tls_win.cc",
-      ]
-    } else if (is_posix) {
+    if (is_posix) {
       sources += [
         "page_allocator_internals_posix.cc",
         "page_allocator_internals_posix.h",

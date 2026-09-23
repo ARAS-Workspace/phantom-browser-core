@@ -11,12 +11,7 @@ source_set("performance_monitor") {
     "system_monitor.h",
   ]
 
-  if (is_win) {
-    sources += [
-      "metric_evaluator_helper_win.cc",
-      "metric_evaluator_helper_win.h",
-    ]
-  } else if (is_posix) {
+  if (is_posix) {
     sources += [
       "metric_evaluator_helper_posix.cc",
       "metric_evaluator_helper_posix.h",

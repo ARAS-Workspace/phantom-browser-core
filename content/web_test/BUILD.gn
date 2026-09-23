@@ -147,8 +147,6 @@ static_library("web_test_browser") {
     sources += [ "browser/web_test_shell_platform_delegate_mac.mm" ]
   } else if (toolkit_views) {
     sources += [ "browser/web_test_shell_platform_delegate_views.cc" ]
-  } else if (is_ios) {
-    sources += [ "browser/web_test_shell_platform_delegate_ios.mm" ]
   } else {
     sources += [ "browser/web_test_shell_platform_delegate_aura.cc" ]
   }

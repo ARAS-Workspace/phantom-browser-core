@@ -140,23 +140,6 @@ source_set("base") {
       "mac/mac_utils.h",
       "mac/mac_utils.mm",
     ]
-  } else if (is_win) {
-    sources += [
-      "icu_util.cc",
-      "icu_util.h",
-      "installer_win.cc",
-      "ipc_security_win.cc",
-    ]
-    deps += [
-      "//base:i18n",
-      "//chrome/installer/util:work_item",
-      "//third_party/boringssl",
-    ]
-    libs = [ "wtsapi32.lib" ]
-    if (icu_use_data_file) {
-      defines = [ "ENTERPRISE_COMPANION_USE_ICU_DATA_FILE" ]
-      deps += [ ":icu_file_checksum_header" ]
-    }
   }
 }
 
@@ -203,8 +186,6 @@ source_set("test_utils") {
     sources += [ "test/test_utils_linux.cc" ]
   } else if (is_mac) {
     sources += [ "test/test_utils_mac.cc" ]
-  } else if (is_win) {
-    sources += [ "test/test_utils_win.cc" ]
   }
 }
 
@@ -303,9 +284,6 @@ test("enterprise_companion_integration_tests") {
   if (is_mac) {
     data_deps +=
         [ "//chrome/enterprise_companion/mac:enterprise_companion_bundle_test" ]
-  } else if (is_win) {
-    sources += [ "test/integration_tests_win.cc" ]
-    data_deps += [ ":enterprise_companion_test" ]
   } else if (is_linux) {
     data_deps += [ ":enterprise_companion_test" ]
   }
@@ -358,8 +336,6 @@ static_library("installer_paths") {
   } else if (is_mac) {
     sources += [ "installer_paths_mac.mm" ]
     frameworks = [ "Foundation.framework" ]
-  } else if (is_win) {
-    sources += [ "installer_paths_win.cc" ]
   }
 }
 
@@ -509,13 +485,6 @@ artifact_zip("prod_zip") {
       # chrome-unsigned.
       deps += [ ":syms_archive" ]
     }
-  } else if (is_win) {
-    inputs = [ "$root_build_dir/enterprise_companion.exe" ]
-    deps = [ ":enterprise_companion" ]
-
-    if (icu_use_data_file) {
-      inputs += [ "$root_out_dir/icudtl.dat" ]
-    }
   }
 }
 
@@ -537,13 +506,6 @@ artifact_zip("test_zip") {
 
     if (is_asan) {
       inputs += [ "$root_build_dir/${enterprise_companion_product_full_name}_test.app/Contents/MacOS/libclang_rt.asan_osx_dynamic.dylib" ]
-    }
-  } else if (is_win) {
-    inputs = [ "$root_build_dir/enterprise_companion_test.exe" ]
-    deps = [ ":enterprise_companion_test" ]
-
-    if (icu_use_data_file) {
-      inputs += [ "$root_out_dir/icudtl.dat" ]
     }
   }
 }

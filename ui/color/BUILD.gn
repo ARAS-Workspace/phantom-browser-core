@@ -169,18 +169,6 @@ component("mixers") {
       "mac/native_color_mixers_mac.mm",
     ]
     frameworks = [ "AppKit.framework" ]
-  } else if (is_win) {
-    sources += [
-      "win/css_system_color_mixer_win.cc",
-      "win/native_color_mixers_win.cc",
-      "win/native_color_mixers_win.h",
-    ]
-    deps += [ ":accent_color_observer" ]
-  } else if (is_android) {
-    sources += [
-      "android/sys_color_mixer_android.cc",
-      "android/sys_color_mixer_android.h",
-    ]
   }
 }
 

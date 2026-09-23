@@ -37,12 +37,8 @@ action("process_json") {
     "--skip-testing-data",
     "--os-filter",
   ]
-  if (is_win) {
-    args += [ "win" ]
-  } else if (is_mac) {
+  if (is_mac) {
     args += [ "macosx" ]
-  } else if (is_android) {
-    args += [ "android" ]
   } else {
     args += [ "linux" ]
   }

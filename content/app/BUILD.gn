@@ -29,24 +29,6 @@ content_app_deps = [
 
 if (is_win) {
   content_app_deps += [ "//sandbox" ]
-} else if (is_android) {
-  # Many of these are required for JNI registration.
-  content_app_deps += [
-    "//content/browser",
-    "//content/child",
-    "//content/public/android:content_app_jni",
-    "//device/bluetooth",
-    "//device/gamepad",
-    "//media",
-    "//media/capture",
-    "//media/midi",
-    "//net",
-    "//skia",
-    "//third_party/cpu_features:ndk_compat",
-    "//ui/android",
-    "//ui/events",
-    "//ui/shell_dialogs",
-  ]
 }
 
 if (is_ios && target_platform == "iphoneos") {

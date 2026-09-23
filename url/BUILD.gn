@@ -91,10 +91,7 @@ component("url") {
 
   # ICU support.
   if (use_platform_icu_alternatives) {
-    if (is_android) {
-      sources += [ "url_idna_icu_alternatives_android.cc" ]
-      deps += [ ":buildflags" ]
-    } else if (is_ios) {
+    if (is_ios) {
       sources += [ "url_idna_icu_alternatives_ios.mm" ]
     } else {
       assert(false,

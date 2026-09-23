@@ -17,23 +17,13 @@ import("//third_party/inspector_protocol/inspector_protocol.gni")
 import("//tools/grit/grit_rule.gni")
 import("//tools/grit/repack.gni")
 import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
-if (is_android) {
-  import("//build/config/android/config.gni")
-} else if (is_mac) {
+if (is_mac) {
   import("//build/apple/tweak_info_plist.gni")
   import("//build/config/mac/rules.gni")
   import("//content/public/app/mac_helpers.gni")
   import("//third_party/icu/config.gni")
   import("//ui/gl/features.gni")
   import("//v8/gni/v8.gni")
-} else if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-  import("//build/config/apple/swift_source_set.gni")
-  import("//build/config/ios/ios_app_ipa.gni")
-
-  if (target_platform == "iphoneos") {
-    import("//content/shell/app/ios/extensions.gni")
-  }
 }
 
 # TODO(crbug.com/1336055, spang): Investigate using shell_views with cast builds
@@ -496,12 +486,7 @@ repack("pak") {
   output = "$root_out_dir/content_shell.pak"
 }
 
-if (is_android) {
-  group("content_shell") {
-    testonly = true
-    deps = [ "//content/shell/android:content_shell_apk" ]
-  }
-} else if (is_mac) {
+if (is_mac) {
   tweak_info_plist("content_shell_plist") {
     testonly = true
     info_plist = "app/app-Info.plist"
@@ -539,98 +524,6 @@ if (is_android) {
       ldflags = [ "-Wl,-rpath,@executable_path/../Frameworks" ]
     }
   }
-} else if (is_ios) {
-  declare_args() {
-    # The bundle identifier. Overriding this will affect the provisioning
-    # profile used, and hence will affect the app's capabilities.
-    ios_content_shell_bundle_identifier = shared_bundle_id_for_test_apps
-
-    # Path to an entitlements file used in ios_content_shell. Can be overridden
-    # to provide an alternative.
-    if (target_platform == "iphoneos") {
-      ios_content_shell_entitlements_path =
-          "//content/app/ios/appex/app.entitlements"
-    } else {
-      ios_content_shell_entitlements_path =
-          "//build/config/ios/entitlements.plist"
-    }
-  }
-
-  declare_args() {
-    ios_content_process_bundle_identifier =
-        "$ios_content_shell_bundle_identifier.ContentProcessExtension"
-    ios_network_process_bundle_identifier =
-        "$ios_content_shell_bundle_identifier.NetworkProcessExtension"
-    ios_gpu_process_bundle_identifier =
-        "$ios_content_shell_bundle_identifier.GPUProcessExtension"
-  }
-
-  ios_app_bundle("content_shell") {
-    info_plist = "app/ios/ios-app.plist"
-    testonly = true
-
-    sources = [ "app/ios/shell_main_trampoline.cc" ]
-
-    deps = [ ":content_shell_framework+link" ]
-
-    if (target_platform == "iphoneos") {
-      deps += [
-        ":content_process_bundle",
-        ":gpu_process_bundle",
-        ":network_process_bundle",
-      ]
-    }
-
-    bundle_deps = [
-      ":content_shell_framework+bundle",
-      ":content_shell_framework_resources",
-      "app/ios/resources",
-    ]
-    entitlements_path = ios_content_shell_entitlements_path
-    bundle_identifier = ios_content_shell_bundle_identifier
-  }
-
-  ios_app_ipa("content_shell_ipa") {
-    testonly = true
-    bundle_target = ":content_shell"
-  }
-
-  ios_framework_bundle("content_shell_framework") {
-    testonly = true
-    transparent = true
-
-    output_name = "content_shell_framework"
-    sources = [ "app/shell_main.cc" ]
-
-    deps = [
-      ":content_shell_app",
-      ":content_shell_lib",
-      "//content/public/app",
-      "//content/public/common",
-      "//third_party/icu:icudata",
-    ]
-    if (target_platform == "iphoneos") {
-      deps += [ "//content/app/ios/appex:child_process_bridge" ]
-    }
-    info_plist = "app/ios/ios-app.plist"
-  }
-
-  if (target_platform == "iphoneos") {
-    browserkit_extension("gpu_process") {
-      testonly = true
-      bundle_identifier = ios_gpu_process_bundle_identifier
-    }
-
-    browserkit_extension("network_process") {
-      testonly = true
-      bundle_identifier = ios_network_process_bundle_identifier
-    }
-
-    browserkit_extension("content_process") {
-      testonly = true
-      bundle_identifier = ios_content_process_bundle_identifier
-    }
-  }
 } else {
   executable("content_shell") {
     testonly = true
@@ -653,10 +546,7 @@ if (is_android) {
       "//tools/v8_context_snapshot",
     ]
 
-    if (is_win) {
-      data_deps +=
-          [ "//third_party/crashpad/crashpad/handler:crashpad_handler" ]
-    } else if (is_linux) {
+    if (is_linux) {
       data_deps += [ "//components/crash/core/app:chrome_crashpad_handler" ]
     }
 
