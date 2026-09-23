@@ -331,9 +331,6 @@ if (enable_openxr) {
   # folder points to our mock OpenXR runtime.
   copy("json_mock") {
     sources = []
-    if (is_win) {
-      sources += [ "openxr/test/openxr_win.json" ]
-    }
 
     outputs = [ "$root_out_dir/mock_vr_clients/bin/openxr/openxr.json" ]
   }
@@ -373,13 +370,6 @@ if (enable_openxr) {
     shared_library("openxr_mock") {
       testonly = true
 
-      # Not everything seems to respect `output_dir`, so we can't actually use
-      # it on both platforms. Furthermore, on Android if there are directories
-      # in the output_name path, then symbolization on the bots is broken.
-      if (is_win) {
-        output_name = "mock_vr_clients/bin/openxr/openxrruntime"
-      }
-
       defines = [
         "XR_EXTENSION_PROTOTYPES",
         "DEVICE_VR_IMPLEMENTATION",
@@ -390,10 +380,6 @@ if (enable_openxr) {
       sources = [ "openxr/test/openxr_trampoline.cc" ]
 
       deps = [ "//third_party/openxr:openxr_headers" ]
-
-      if (is_win) {
-        sources += [ "openxr/test/openxr.def" ]
-      }
 
       public_deps = [ ":openxr_data" ]
 

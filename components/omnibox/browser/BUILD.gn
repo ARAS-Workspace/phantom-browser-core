@@ -433,28 +433,12 @@ static_library("browser") {
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
-  if (is_android) {
-    deps += [ "//components/location/android:settings" ]
-    sources += [
-      "actions/omnibox_action_factory_android.cc",
-      "actions/omnibox_action_factory_android.h",
-      "autocomplete_match_android.cc",
-      "autocomplete_result_android.cc",
-    ]
-    deps += [
-      ":jni_headers",
-      "//components/browser_ui/util/android",
-      "//components/saved_tab_groups/public:conversion_utils",
-      "//url",
-    ]
-  } else {
-    deps += [ "//components/keep_alive_registry" ]
-    sources += [
-      "suggest_inventory_fallback_prompts.h",
-      "suggest_inventory_fallback_utils.cc",
-      "suggest_inventory_fallback_utils.h",
-    ]
-  }
+  deps += [ "//components/keep_alive_registry" ]
+  sources += [
+    "suggest_inventory_fallback_prompts.h",
+    "suggest_inventory_fallback_utils.cc",
+    "suggest_inventory_fallback_utils.h",
+  ]
 
   # GeolocationHeaderService is not supported on iOS due to dependencies on
   # //content

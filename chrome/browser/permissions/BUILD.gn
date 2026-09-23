@@ -210,29 +210,16 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    sources += [
-      "permission_blocked_message_delegate_android_unittest.cc",
-      "permission_update_message_controller_android_unittest.cc",
-    ]
+  sources += [
+    "permission_hats_trigger_unittest.cc",
+    "system/system_media_permission_cache_unittest.cc",
+  ]
+  deps += [ "//chrome/browser/ui/hats" ]
+  if (enable_extensions) {
     deps += [
-      "//chrome/browser/ui/safety_hub",
-      "//chrome/browser/ui/safety_hub:test_support",
-      "//components/messages/android:test_support",
-      "//components/ukm:test_support",
+      "//extensions/browser/mime_handler:stream_container",
+      "//extensions/browser/mime_handler:test_helpers",
     ]
-  } else {
-    sources += [
-      "permission_hats_trigger_unittest.cc",
-      "system/system_media_permission_cache_unittest.cc",
-    ]
-    deps += [ "//chrome/browser/ui/hats" ]
-    if (enable_extensions) {
-      deps += [
-        "//extensions/browser/mime_handler:stream_container",
-        "//extensions/browser/mime_handler:test_helpers",
-      ]
-    }
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

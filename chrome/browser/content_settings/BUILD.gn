@@ -37,27 +37,19 @@ source_set("content_settings") {
 
   allow_circular_includes_from = []
 
-  if (is_android) {
-    sources += [
-      "javascript_optimizer_provider_android.h",
-      "request_desktop_site_web_contents_observer_android.h",
-    ]
-    public_deps += [ "//chrome/browser/preferences:android" ]
-  } else {
-    sources += [
-      "generated_cookie_prefs.h",
-      "generated_javascript_optimizer_pref.h",
-      "generated_permission_prompting_behavior_pref.h",
-    ]
+  sources += [
+    "generated_cookie_prefs.h",
+    "generated_javascript_optimizer_pref.h",
+    "generated_permission_prompting_behavior_pref.h",
+  ]
 
-    deps += [ "//components/content_settings/browser/ui" ]
+  deps += [ "//components/content_settings/browser/ui" ]
 
-    if (enable_extensions) {
-      public_deps += [ "//chrome/browser/extensions" ]
+  if (enable_extensions) {
+    public_deps += [ "//chrome/browser/extensions" ]
 
-      # _perf* uses extensions and extensions uses pref.
-      allow_circular_includes_from = [ "//chrome/browser/extensions" ]
-    }
+    # _perf* uses extensions and extensions uses pref.
+    allow_circular_includes_from = [ "//chrome/browser/extensions" ]
   }
 }
 
@@ -101,25 +93,13 @@ source_set("impl") {
     "//ui/webui",
   ]
 
-  if (is_android) {
-    sources += [
-      "javascript_optimizer_provider_android.cc",
-      "request_desktop_site_web_contents_observer_android.cc",
-    ]
+  sources += [
+    "generated_cookie_prefs.cc",
+    "generated_javascript_optimizer_pref.cc",
+    "generated_permission_prompting_behavior_pref.cc",
+  ]
 
-    deps += [
-      "//chrome/browser/notifications",
-      "//chrome/browser/notifications:notifications_java_enum_srcjar",
-    ]
-  } else {
-    sources += [
-      "generated_cookie_prefs.cc",
-      "generated_javascript_optimizer_pref.cc",
-      "generated_permission_prompting_behavior_pref.cc",
-    ]
-
-    deps += [ "//chrome/browser/ui/tabs" ]
-  }
+  deps += [ "//chrome/browser/ui/tabs" ]
 
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser" ]
@@ -344,20 +324,15 @@ source_set("unit_tests") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [ "javascript_optimizer_provider_android_unittest.cc" ]
-    deps += [ "//chrome/browser/android:tabs_public" ]
-  } else {
-    sources += [
-      "generated_cookie_prefs_unittest.cc",
-      "generated_javascript_optimizer_pref_unittest.cc",
-    ]
+  sources += [
+    "generated_cookie_prefs_unittest.cc",
+    "generated_javascript_optimizer_pref_unittest.cc",
+  ]
 
-    deps += [
-      "//chrome/browser/extensions",
-      "//chrome/browser/ui/tabs",
-      "//chrome/common/extensions",
-      "//chrome/common/extensions/api",
-    ]
-  }
+  deps += [
+    "//chrome/browser/extensions",
+    "//chrome/browser/ui/tabs",
+    "//chrome/common/extensions",
+    "//chrome/common/extensions/api",
+  ]
 }

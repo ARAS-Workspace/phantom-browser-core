@@ -114,19 +114,12 @@ component("clipboard") {
     "scoped_clipboard_writer.h",
   ]
 
-  if (is_android) {
-    sources += [
-      "clipboard_android.cc",
-      "clipboard_android.h",
-    ]
-  } else {
-    sources += [
-      "clipboard_data.cc",
-      "clipboard_data.h",
-      "clipboard_non_backed.cc",
-      "clipboard_non_backed.h",
-    ]
-  }
+  sources += [
+    "clipboard_data.cc",
+    "clipboard_data.h",
+    "clipboard_non_backed.cc",
+    "clipboard_non_backed.h",
+  ]
 
   if (is_mac) {
     sources += [
@@ -214,22 +207,10 @@ source_set("clipboard_test") {
   sources = [ "clipboard_format_type_unittest.cc" ]
   output_name = "ui_base_clipboard_test"
 
-  if (is_ios) {
-    if (use_blink) {
-      # On other OSs, clipboard platform unit tests are run as part of
-      # interactive_ui_tests. However, since interactive_ui_tests is not yet
-      # ready for Blink iOS, we run them here for now.
-      sources += [
-        "clipboard_test_template.h",
-        "clipboard_unittest.cc",
-      ]
-    }
-  } else {
-    sources += [
-      "custom_data_helper_unittest.cc",
-      "test/test_clipboard_unittest.cc",
-    ]
-  }
+  sources += [
+    "custom_data_helper_unittest.cc",
+    "test/test_clipboard_unittest.cc",
+  ]
 
   if (is_linux) {
     sources += [ "clipboard_util_linux_unittest.cc" ]

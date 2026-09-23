@@ -18,14 +18,8 @@ declare_args() {
   # relevant files not being present.
   # Mac: //chrome/installer/mac/signing/parts.py
   # Windows: //chrome/installer/mini_installer/chrome.release and internal archive files
-  if (is_ios) {
-    # Fuchsia and iOS should work but are not included in the set we release
-    # for, so we do not needlessly increase the binary size.
-    build_with_internal_optimization_guide = false
-  } else {
-    # Use is_chrome_branded as a proxy for "does src-internal exist".
-    build_with_internal_optimization_guide = is_chrome_branded
-  }
+  # Use is_chrome_branded as a proxy for "does src-internal exist".
+  build_with_internal_optimization_guide = is_chrome_branded
 }
 
 declare_args() {

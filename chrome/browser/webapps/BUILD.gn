@@ -42,64 +42,30 @@ source_set("impl") {
   }
 }
 
-if (is_android) {
-  source_set("android") {
-    sources = [ "webapps_client_android.h" ]
+source_set("desktop") {
+  sources = [ "webapps_client_desktop.h" ]
 
-    deps = [ ":webapps" ]
-  }
+  deps = [ ":webapps" ]
+}
 
-  source_set("android_impl") {
-    sources = [
-      "web_app_offline_android.cc",
-      "webapps_client_android.cc",
-    ]
+source_set("desktop_impl") {
+  sources = [ "webapps_client_desktop.cc" ]
 
-    deps = [
-      ":android",
-      ":webapps",
-      "//base",
-      "//chrome/browser:browser_public_dependencies",
-      "//chrome/browser/android:shortcut_helper",
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/android/webapk:webapk_sources",
-      "//chrome/browser/feature_engagement",
-      "//chrome/common",
-      "//components/feature_engagement/public",
-      "//components/infobars/content",
-      "//components/security_state/content",
-      "//components/webapps/browser",
-      "//components/webapps/common",
-      "//content/public/browser",
-      "//url",
-    ]
-  }
-} else {
-  source_set("desktop") {
-    sources = [ "webapps_client_desktop.h" ]
-
-    deps = [ ":webapps" ]
-  }
-
-  source_set("desktop_impl") {
-    sources = [ "webapps_client_desktop.cc" ]
-
-    deps = [
-      ":desktop",
-      ":webapps",
-      "//base",
-      "//chrome/browser/banners",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/segmentation_platform",
-      "//chrome/browser/user_education",
-      "//chrome/browser/web_applications",
-      "//chrome/common",
-      "//components/infobars/content",
-      "//components/security_state/content",
-      "//components/webapps/browser",
-      "//content/public/browser",
-    ]
-  }
+  deps = [
+    ":desktop",
+    ":webapps",
+    "//base",
+    "//chrome/browser/banners",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/segmentation_platform",
+    "//chrome/browser/user_education",
+    "//chrome/browser/web_applications",
+    "//chrome/common",
+    "//components/infobars/content",
+    "//components/security_state/content",
+    "//components/webapps/browser",
+    "//content/public/browser",
+  ]
 }
 
 if (!is_android) {

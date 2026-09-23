@@ -367,20 +367,5 @@ static_library("test_support") {
     "//testing/gmock",
     "//testing/gtest",
   ]
-  if (is_android) {
-    sources += [
-      "android/family_link_settings_test_bridge.cc",
-      "android/supervised_user_service_test_bridge.cc",
-    ]
-    deps += [
-      ":test_support_jni_headers",
-      "//chrome/test:test_support_ui_android",
-      "//components/safe_search_api:test_support",
-      "//components/signin/public/identity_manager:test_support",
-      "//components/supervised_user/core/browser/android",
-      "//services/network:test_support",
-    ]
-  } else {
-    deps += [ "//chrome/test:test_support_ui" ]
-  }
+  deps += [ "//chrome/test:test_support_ui" ]
 }

@@ -659,56 +659,24 @@ source_set("extensions") {
       "//components/spellcheck/browser",
     ]
   }
-  if (is_android) {
-    sources += [
-      "api/chrome_extensions_api_client_android.cc",
-      "api/management/chrome_management_api_delegate_android.cc",
-      "api/tabs/tabs_event_router_platform_delegate_android.cc",
-      "api/tabs/tabs_event_router_platform_delegate_android.h",
-      "api/tabs/windows_util_android.cc",
-      "extension_disabled_ui_android.cc",
-      "extension_error_ui_android.cc",
-      "extension_error_ui_android.h",
-      "external_install_error_android.cc",
-      "external_install_error_android.h",
-      "system_display/display_info_provider_android.cc",
-      "system_display/display_info_provider_android.h",
-    ]
-    deps += [ "//chrome/browser/ui/android/tab_model" ]
-
-    if (enable_desktop_android_extensions) {
-      sources += [
-        # These files are temporary workarounds to allow for a lightweight
-        # extensions runtime in desktop-android builds. They should be removed
-        # (see https://crbug.com/356905053).
-        "extension_menu_model_android.cc",
-        "extension_menu_model_android.h",
-      ]
-
-      # pack_extension_job.cc and developer_private_functions.cc include headers
-      # from android extension bridges under IS_ANDROID.
-      deps += [ "//chrome/browser/ui/android/extensions:public" ]
-    }
-  } else {
-    sources += [
-      "api/chrome_extensions_api_client_non_android.cc",
-      "api/tabs/tabs_event_router_platform_delegate_non_android.cc",
-      "api/tabs/tabs_event_router_platform_delegate_non_android.h",
-      "chrome_app_icon_loader.cc",
-      "chrome_app_icon_loader.h",
-    ]
-    public_deps += [
-      "//chrome/browser/ui/tabs:utils",
-      "//components/app_icon_loader",
-    ]
-    deps += [
-      "//chrome/browser/ui/interaction",
-      "//chrome/browser/ui/user_education",
-      "//chrome/browser/ui/web_applications:launch_utils",
-      "//extensions/browser/mime_handler",
-      "//extensions/browser/mime_handler:stream_container",
-    ]
-  }
+  sources += [
+    "api/chrome_extensions_api_client_non_android.cc",
+    "api/tabs/tabs_event_router_platform_delegate_non_android.cc",
+    "api/tabs/tabs_event_router_platform_delegate_non_android.h",
+    "chrome_app_icon_loader.cc",
+    "chrome_app_icon_loader.h",
+  ]
+  public_deps += [
+    "//chrome/browser/ui/tabs:utils",
+    "//components/app_icon_loader",
+  ]
+  deps += [
+    "//chrome/browser/ui/interaction",
+    "//chrome/browser/ui/user_education",
+    "//chrome/browser/ui/web_applications:launch_utils",
+    "//extensions/browser/mime_handler",
+    "//extensions/browser/mime_handler:stream_container",
+  ]
 
   sources += [
     "chrome_kiosk_delegate_non_chromeos.cc",
@@ -1321,31 +1289,11 @@ static_library("test_support") {
 
   public_deps = []
 
-  if (is_android) {
-    sources += [
-      "extension_browsertest_platform_delegate_android.cc",
-      "test_extension_menu_model_android.cc",
-      "test_extension_menu_model_android.h",
-    ]
-    public_deps += [
-      "//extensions/browser:test_support",
-      "//extensions/common:test_support",
-    ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/renderer_context_menu:test_support",
-      "//chrome/browser/ui/android/tab_model:test_support",
-      "//chrome/test:test_support_ui_android",
-      "//chrome/test/base:android_ui_test_utils",
-      "//extensions/common/api",
-    ]
-  } else {
-    sources += [ "extension_browsertest_platform_delegate_non_android.cc" ]
-    deps += [
-      "//chrome/browser/apps/app_service",
-      "//chrome/test:test_support_ui",
-    ]
-  }
+  sources += [ "extension_browsertest_platform_delegate_non_android.cc" ]
+  deps += [
+    "//chrome/browser/apps/app_service",
+    "//chrome/test:test_support_ui",
+  ]
 
   if (enable_extensions) {
     sources += [
@@ -2103,30 +2051,19 @@ source_set("browser_tests") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "//chrome/browser/extensions/extension_keybinding_interactive_apitest.cc",
-    ]
-    deps += [
-      "//chrome/test:test_support_jni_headers",
-      "//components/feed:feature_list",
-      "//components/messages/android:test_support",
-    ]
-  } else {
-    sources += []
+  sources += []
 
-    deps += [
-      "//chrome/browser/ui/search:test_support_ui",
-      "//chrome/browser/ui/tabs/saved_tab_groups",
-      "//chrome/browser/ui/views/location_bar",
-      "//chrome/browser/ui/webui/history_clusters:browser_tests",
-      "//chrome/browser/ui/webui/interstitials:browser_tests",
-      "//chrome/browser/ui/webui/location_internals:browser_tests",
-      "//chrome/browser/ui/webui/policy:browser_tests",
-      "//components/keep_alive_registry",
-      "//components/webapps/isolated_web_apps/test_support",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/search:test_support_ui",
+    "//chrome/browser/ui/tabs/saved_tab_groups",
+    "//chrome/browser/ui/views/location_bar",
+    "//chrome/browser/ui/webui/history_clusters:browser_tests",
+    "//chrome/browser/ui/webui/interstitials:browser_tests",
+    "//chrome/browser/ui/webui/location_internals:browser_tests",
+    "//chrome/browser/ui/webui/policy:browser_tests",
+    "//components/keep_alive_registry",
+    "//components/webapps/isolated_web_apps/test_support",
+  ]
 
   # ChromeOS and Android don't use the download bubble UI.
   if (is_win || is_mac || is_linux) {

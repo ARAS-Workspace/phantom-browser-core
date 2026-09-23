@@ -33,14 +33,8 @@ declare_args() {
 # target name. This is not necessary when the target is a `source_set`.
 exec_target_suffix = ""
 
-if (is_ios) {
-  import("//build/config/ios/ios_sdk.gni")
-  import("//build/config/ios/ios_test_runner_wrapper.gni")
-  import("//build/config/ios/rules.gni")
-} else {
-  import("//build/config/sanitizers/sanitizers.gni")
-  import("//build/util/generate_wrapper.gni")
-}
+import("//build/config/sanitizers/sanitizers.gni")
+import("//build/util/generate_wrapper.gni")
 
 # This template represents the core common functionality of a test target
 # on each platform. It includes:
@@ -423,185 +417,84 @@ template("test") {
            "allow_cleartext_traffic can be set only for Android tests")
   }
 
-  if (is_ios) {
+  if (is_mac || is_win) {
     assert(!defined(invoker.use_xvfb) || !invoker.use_xvfb)
-    _runtime_deps_file = "$root_out_dir/${target_name}.runtime_deps"
+  }
 
-    declare_args() {
-      # Keep the unittest-as-xctest functionality defaulted to off for
-      # local builds and test executions.
-      enable_run_ios_unittests_with_xctest = false
-    }
+  _runtime_deps_file = "$root_out_dir/${target_name}.runtime_deps"
+  _executable = target_name
+  _gen_runner_target = "${target_name}__runner"
 
-    _test_target = target_name
-
-    _wrapper_output_name = "run_${target_name}"
-    ios_test_runner_wrapper(_wrapper_output_name) {
-      forward_variables_from(invoker,
-                             [
-                               "clones",
-                               "data",
-                               "deps",
-                               "executable_args",
-                               "retries",
-                             ])
-
-      _root_build_dir = rebase_path("${root_build_dir}", root_build_dir)
-
-      if (!defined(executable_args)) {
-        executable_args = []
-      }
-      executable_args += [
-        "--app",
-        "@WrappedPath(${_root_build_dir}/${_test_target}.app)",
-      ]
-
-      wrapper_output_name = "${_wrapper_output_name}"
-
-      if (!defined(data)) {
-        data = []
-      }
-      if (tests_have_location_tags) {
-        data += [ "//testing/location_tags.json" ]
-      }
-    }
-
-    _resources_bundle_data = target_name + "_resources_bundle_data"
-
-    bundle_data(_resources_bundle_data) {
-      visibility = [ ":$_test_target" ]
-      sources = [ "//testing/gtest_ios/Default.png" ]
-      outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
-    }
-
-    force_xctest = enable_run_ios_unittests_with_xctest ||
-                   (defined(invoker.is_xctest) && invoker.is_xctest)
-
-    mixed_test(_test_target) {
-      if (force_xctest) {
-        target_type = "ios_xctest_test"
-      } else {
-        target_type = "ios_app_bundle"
-      }
-      testonly = true
-
-      if (force_xctest && build_with_chromium) {
-        xctest_module_target = "//base/test:google_test_runner"
-      }
-
-      forward_variables_from(invoker, "*", TESTONLY_AND_VISIBILITY)
-
-      # Provide sensible defaults in case invoker did not define any of those
-      # required variables.
-      if (!defined(info_plist) && !defined(info_plist_target)) {
-        info_plist = "//testing/gtest_ios/unittest-Info.plist"
-      }
-
-      if (!defined(bundle_identifier)) {
-        bundle_identifier = shared_bundle_id_for_test_apps
-      }
-
-      if (!defined(bundle_deps)) {
-        bundle_deps = []
-      }
-      bundle_deps += [ ":$_resources_bundle_data" ]
-
-      if (!defined(data_deps)) {
-        data_deps = []
-      }
-
-      data_deps += [ "//testing:test_scripts_shared" ]
-
-      # Include the generate_wrapper as part of data_deps
-      data_deps += [ ":${_wrapper_output_name}" ]
-      write_runtime_deps = _runtime_deps_file
-      if (use_rts) {
-        data_deps += [ ":${invoker.target_name}__rts_filters" ]
-      }
-      if (!defined(deps)) {
-        deps = []
-      }
-    }
+  if (is_linux && defined(invoker.use_xvfb)) {
+    _use_xvfb = invoker.use_xvfb
   } else {
-    if (is_mac || is_win) {
-      assert(!defined(invoker.use_xvfb) || !invoker.use_xvfb)
-    }
+    _use_xvfb = false
+  }
 
-    _runtime_deps_file = "$root_out_dir/${target_name}.runtime_deps"
-    _executable = target_name
-    _gen_runner_target = "${target_name}__runner"
+  generate_wrapper(_gen_runner_target) {
+    wrapper_script = "$root_build_dir/bin/run_" + _executable
 
-    if (is_linux && defined(invoker.use_xvfb)) {
-      _use_xvfb = invoker.use_xvfb
+    data = []
+    data_deps = [ "//testing:test_scripts_shared" ]
+
+    if (_use_xvfb) {
+      executable = "//testing/xvfb.py"
     } else {
-      _use_xvfb = false
+      executable = "//testing/test_env.py"
+    }
+    if (tests_have_location_tags) {
+      data += [ "//testing/location_tags.json" ]
     }
 
-    generate_wrapper(_gen_runner_target) {
-      wrapper_script = "$root_build_dir/bin/run_" + _executable
+    executable_args = [
+      "@WrappedPath(./${_executable})",
+      "--test-launcher-bot-mode",
+    ]
+    if (is_asan) {
+      executable_args += [ "--asan=1" ]
+    }
+    if (is_msan) {
+      executable_args += [ "--msan=1" ]
+    }
+    if (is_tsan) {
+      executable_args += [ "--tsan=1" ]
+    }
+    if (use_cfi_diag) {
+      executable_args += [ "--cfi-diag=1" ]
+    }
+    if (fail_on_san_warnings) {
+      executable_args += [ "--fail-san=1" ]
+    }
+    if (use_rts) {
+      data_deps += [ ":${invoker.target_name}__rts_filters" ]
+    }
+  }
 
-      data = []
-      data_deps = [ "//testing:test_scripts_shared" ]
-
-      if (_use_xvfb) {
-        executable = "//testing/xvfb.py"
-      } else {
-        executable = "//testing/test_env.py"
-      }
-      if (tests_have_location_tags) {
-        data += [ "//testing/location_tags.json" ]
-      }
-
-      executable_args = [
-        "@WrappedPath(./${_executable})",
-        "--test-launcher-bot-mode",
-      ]
-      if (is_asan) {
-        executable_args += [ "--asan=1" ]
-      }
-      if (is_msan) {
-        executable_args += [ "--msan=1" ]
-      }
-      if (is_tsan) {
-        executable_args += [ "--tsan=1" ]
-      }
-      if (use_cfi_diag) {
-        executable_args += [ "--cfi-diag=1" ]
-      }
-      if (fail_on_san_warnings) {
-        executable_args += [ "--fail-san=1" ]
-      }
-      if (use_rts) {
-        data_deps += [ ":${invoker.target_name}__rts_filters" ]
-      }
+  mixed_test(target_name) {
+    target_type = "executable"
+    forward_variables_from(invoker,
+                           "*",
+                           TESTONLY_AND_VISIBILITY + [ "use_xvfb" ])
+    forward_variables_from(invoker, [ "visibility" ])
+    if (!defined(deps)) {
+      deps = []
     }
 
-    mixed_test(target_name) {
-      target_type = "executable"
-      forward_variables_from(invoker,
-                             "*",
-                             TESTONLY_AND_VISIBILITY + [ "use_xvfb" ])
-      forward_variables_from(invoker, [ "visibility" ])
-      if (!defined(deps)) {
-        deps = []
-      }
+    deps += [
+      # Give tests the default manifest on Windows (a no-op elsewhere).
+      "//build/win:default_exe_manifest",
+    ]
 
-      deps += [
-        # Give tests the default manifest on Windows (a no-op elsewhere).
-        "//build/win:default_exe_manifest",
-      ]
+    write_runtime_deps = _runtime_deps_file
+    deps += [ ":$_gen_runner_target" ]
 
-      write_runtime_deps = _runtime_deps_file
-      deps += [ ":$_gen_runner_target" ]
+    if (!defined(data_deps)) {
+      data_deps = []
+    }
 
-      if (!defined(data_deps)) {
-        data_deps = []
-      }
-
-      data_deps += [ "//testing:test_scripts_shared" ]
-      if (use_rts) {
-        data_deps += [ ":${invoker.target_name}__rts_filters" ]
-      }
+    data_deps += [ "//testing:test_scripts_shared" ]
+    if (use_rts) {
+      data_deps += [ ":${invoker.target_name}__rts_filters" ]
     }
   }
 }
@@ -737,16 +630,5 @@ template("isolated_script_test") {
 
 # Test defaults.
 set_defaults("test") {
-  if (is_android) {
-    # Should be kept in sync with set_defaults("cronet_test") in
-    # //components/cronet/android/cronet_test_templates.gni
-    # LINT.IfChange
-    configs = default_shared_library_configs
-    configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
-    configs += [ "//build/config/android:hide_all_but_jni" ]
-
-    # LINT.ThenChange(/components/cronet/android/cronet_test_templates.gni)
-  } else {
-    configs = default_executable_configs
-  }
+  configs = default_executable_configs
 }

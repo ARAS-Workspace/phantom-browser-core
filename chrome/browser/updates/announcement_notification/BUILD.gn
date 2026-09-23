@@ -18,14 +18,10 @@ source_set("announcement_notification") {
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
-  if (is_android) {
-    sources += [ "announcement_notification_delegate_android.h" ]
-  } else {
-    sources += [
-      "announcement_notification_delegate.h",
-      "announcement_notification_handler.h",
-    ]
-  }
+  sources += [
+    "announcement_notification_delegate.h",
+    "announcement_notification_handler.h",
+  ]
 }
 
 source_set("impl") {
@@ -54,21 +50,15 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [ "announcement_notification_delegate_android.cc" ]
+  sources += [
+    "announcement_notification_delegate.cc",
+    "announcement_notification_handler.cc",
+  ]
 
-    deps += [ "//chrome/android:chrome_jni_headers" ]
-  } else {
-    sources += [
-      "announcement_notification_delegate.cc",
-      "announcement_notification_handler.cc",
-    ]
-
-    deps += [
-      "//chrome/browser/ui/navigator",
-      "//ui/message_center/public/cpp",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/navigator",
+    "//ui/message_center/public/cpp",
+  ]
 }
 
 source_set("unit_tests") {

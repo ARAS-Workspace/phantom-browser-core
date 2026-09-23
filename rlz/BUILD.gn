@@ -47,25 +47,7 @@ if (enable_rlz_support) {
       "lib/time_util.h",
     ]
 
-    if (is_win) {
-      sources += [
-        "lib/time_util_win.cc",
-        "win/lib/lib_mutex.cc",
-        "win/lib/lib_mutex.h",
-        "win/lib/machine_deal.cc",
-        "win/lib/machine_deal.h",
-        "win/lib/machine_id_win.cc",
-        "win/lib/process_info.cc",
-        "win/lib/process_info.h",
-        "win/lib/registry_util.cc",
-        "win/lib/registry_util.h",
-        "win/lib/rlz_lib_win.cc",
-        "win/lib/rlz_value_store_registry.cc",
-        "win/lib/rlz_value_store_registry.h",
-      ]
-    } else {
-      sources += [ "lib/time_util_base.cc" ]
-    }
+    sources += [ "lib/time_util_base.cc" ]
 
     deps = [
       ":rlz_utils",

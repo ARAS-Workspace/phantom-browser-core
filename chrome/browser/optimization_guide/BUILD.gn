@@ -74,19 +74,10 @@ source_set("impl") {
     "//components/version_info",
     "//ui/webui",
   ]
-  if (is_android) {
-    deps += [
-      "//base",
-      "//chrome/browser/commerce/price_tracking/android:price_tracking_notification_bridge",
-      "//chrome/browser/optimization_guide/android:jni_headers",
-      "//chrome/browser/optimization_guide/android:native",
-    ]
-  } else {
-    deps += [
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tabs:tab_strip",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/tabs:tab_strip",
+  ]
 }
 
 source_set("optimization_guide_on_device_model_installer") {

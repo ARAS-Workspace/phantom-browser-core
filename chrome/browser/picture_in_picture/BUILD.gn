@@ -122,48 +122,35 @@ source_set("impl") {
     deps += [ "//extensions/common:common_constants" ]
   }
 
-  if (is_android) {
-    sources += [
-      "auto_picture_in_picture_permission_controller_bridge.cc",
-      "auto_picture_in_picture_tab_model_observer_helper.cc",
-      "document_picture_in_picture_bridge_android.cc",
-      "picture_in_picture_bounds_cache_bridge.cc",
-    ]
-    deps += [
-      "//chrome/browser/ui/android/overlay",
-      "//components/strings:components_strings",
-    ]
-  } else {
-    sources += [
-      "auto_picture_in_picture_tab_strip_observer_helper.cc",
-      "auto_pip_setting_overlay_view.cc",
-      "auto_pip_setting_view.cc",
-      "hats/auto_picture_in_picture_hats_service.cc",
-      "hats/auto_picture_in_picture_hats_service_factory.cc",
-      "picture_in_picture_input_protector.cc",
-      "picture_in_picture_occlusion_observer.cc",
-      "picture_in_picture_occlusion_tracker.cc",
-      "picture_in_picture_occlusion_tracker_observer.cc",
-      "picture_in_picture_widget_fade_animator.cc",
-      "picture_in_picture_window_manager_uma_helper.cc",
-      "scoped_disallow_picture_in_picture.cc",
-      "scoped_picture_in_picture_occlusion_observation.cc",
-      "scoped_tuck_picture_in_picture.cc",
-    ]
-    deps += [
-      "//chrome/app:generated_resources",
-      "//chrome/browser/ui:browser_tab_strip",
-      "//chrome/browser/ui/color:color_headers",
-      "//chrome/browser/ui/hats",
-      "//chrome/browser/ui/views/picture_in_picture",
-      "//components/strings:components_strings",
-      "//components/unified_consent",
-      "//components/url_formatter",
-      "//net",
-      "//third_party/blink/public/common:headers",
-      "//ui/views",
-    ]
-  }
+  sources += [
+    "auto_picture_in_picture_tab_strip_observer_helper.cc",
+    "auto_pip_setting_overlay_view.cc",
+    "auto_pip_setting_view.cc",
+    "hats/auto_picture_in_picture_hats_service.cc",
+    "hats/auto_picture_in_picture_hats_service_factory.cc",
+    "picture_in_picture_input_protector.cc",
+    "picture_in_picture_occlusion_observer.cc",
+    "picture_in_picture_occlusion_tracker.cc",
+    "picture_in_picture_occlusion_tracker_observer.cc",
+    "picture_in_picture_widget_fade_animator.cc",
+    "picture_in_picture_window_manager_uma_helper.cc",
+    "scoped_disallow_picture_in_picture.cc",
+    "scoped_picture_in_picture_occlusion_observation.cc",
+    "scoped_tuck_picture_in_picture.cc",
+  ]
+  deps += [
+    "//chrome/app:generated_resources",
+    "//chrome/browser/ui:browser_tab_strip",
+    "//chrome/browser/ui/color:color_headers",
+    "//chrome/browser/ui/hats",
+    "//chrome/browser/ui/views/picture_in_picture",
+    "//components/strings:components_strings",
+    "//components/unified_consent",
+    "//components/url_formatter",
+    "//net",
+    "//third_party/blink/public/common:headers",
+    "//ui/views",
+  ]
 
   if (use_web_contents_occlusion_helper) {
     sources +=

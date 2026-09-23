@@ -490,15 +490,7 @@ source_set("unit_tests") {
     "vote_uploads_test_matchers.h",
     "votes_uploader_unittest.cc",
   ]
-  if (is_android) {
-    sources += [
-      "first_cct_page_load_passwords_ukm_recorder_unittest.cc",
-      "password_credential_filler_impl_unittest.cc",
-      "split_stores_and_local_upm_unittest.cc",
-    ]
-  } else {
-    sources += [ "os_crypt_async_migrator_unittest.cc" ]
-  }
+  sources += [ "os_crypt_async_migrator_unittest.cc" ]
   if (use_blink) {
     sources += [ "http_credentials_cleaner_unittest.cc" ]
   }

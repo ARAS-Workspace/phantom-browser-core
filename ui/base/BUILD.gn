@@ -281,18 +281,11 @@ component("base") {
     ]
   }
 
-  if (is_ios) {
-    sources += [
-      "device_form_factor_ios.mm",
-      "resource/resource_bundle_ios.mm",
-    ]
-  } else {
-    sources += [
-      "user_activity/user_activity_detector.cc",
-      "user_activity/user_activity_detector.h",
-      "user_activity/user_activity_observer.h",
-    ]
-  }
+  sources += [
+    "user_activity/user_activity_detector.cc",
+    "user_activity/user_activity_detector.h",
+    "user_activity/user_activity_observer.h",
+  ]
 
   if (use_blink) {
     sources += [
@@ -860,30 +853,21 @@ test("ui_base_unittests") {
     ]
   }
 
-  if (is_ios) {
-    sources += [
-      "l10n/l10n_util_ios_unittest.mm",
-      "l10n/l10n_util_mac_unittest.mm",
-      "test/ios/ui_image_test_utils_unittest.mm",
-    ]
-    deps += [ ":l10n_util_ios" ]
-  } else {  # !is_ios
-    sources += [
-      "accelerators/accelerator_manager_unittest.cc",
-      "accelerators/accelerator_map_unittest.cc",
-      "accelerators/accelerator_unittest.cc",
-      "accelerators/command_unittest.cc",
-      "accelerators/menu_label_accelerator_util_unittest.cc",
-      "models/dialog_model_menu_model_adapter_unittest.cc",
-      "models/dialog_model_unittest.cc",
-      "models/list_model_unittest.cc",
-      "models/list_selection_model_unittest.cc",
-      "models/tree_node_model_unittest.cc",
-      "text/bytes_formatting_unittest.cc",
-      "themed_vector_icon_unittest.cc",
-      "webui/web_ui_util_unittest.cc",
-    ]
-  }
+  sources += [
+    "accelerators/accelerator_manager_unittest.cc",
+    "accelerators/accelerator_map_unittest.cc",
+    "accelerators/accelerator_unittest.cc",
+    "accelerators/command_unittest.cc",
+    "accelerators/menu_label_accelerator_util_unittest.cc",
+    "models/dialog_model_menu_model_adapter_unittest.cc",
+    "models/dialog_model_unittest.cc",
+    "models/list_model_unittest.cc",
+    "models/list_selection_model_unittest.cc",
+    "models/tree_node_model_unittest.cc",
+    "text/bytes_formatting_unittest.cc",
+    "themed_vector_icon_unittest.cc",
+    "webui/web_ui_util_unittest.cc",
+  ]
 
   if (use_blink) {
     sources += [ "pointer/pointer_device_unittest.cc" ]
@@ -941,21 +925,13 @@ test("ui_base_unittests") {
   }
 
   # Include the correct ui_base_test resources per platform.
-  if (is_ios) {
-    deps += [ ":ui_base_test_bundle_data" ]
-  } else {
-    data += [ "$root_out_dir/ui_base_test_resources.pak" ]
-    data_deps += [ ":ui_base_test_resources_pak" ]
-  }
+  data += [ "$root_out_dir/ui_base_test_resources.pak" ]
+  data_deps += [ ":ui_base_test_resources_pak" ]
 
-  if (is_ios) {
-    deps += [ "//ui/resources:ui_test_pak_bundle_data" ]
-  } else {
-    deps += [
-      "//ui/base/accelerators/mojom:unittests",
-      "//ui/base/cursor/mojom:unittests",
-    ]
-  }
+  deps += [
+    "//ui/base/accelerators/mojom:unittests",
+    "//ui/base/cursor/mojom:unittests",
+  ]
 
   if (use_pangocairo) {
     configs += [ "//build/config/linux/pangocairo" ]

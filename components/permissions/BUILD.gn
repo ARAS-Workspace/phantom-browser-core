@@ -183,37 +183,17 @@ source_set("permissions") {
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser" ]
   }
-  if (is_ios) {
-    sources += [
-      "ios/content/permission_prompt/permission_dialog.h",
-      "ios/content/permission_prompt/permission_dialog.mm",
-      "ios/content/permission_prompt/permission_dialog_delegate.h",
-      "ios/content/permission_prompt/permission_dialog_delegate.mm",
-      "ios/content/permission_prompt/permission_prompt_ios.h",
-      "ios/content/permission_prompt/permission_prompt_ios.mm",
-      "ios/content/permission_prompt/permission_prompt_ios_factory.mm",
-    ]
-    deps += [
-      "//base",
-      "//components/content_settings/core/common",
-      "//components/strings:components_strings_grit",
-      "//content/public/browser",
-      "//ui/base",
-      "//url",
-    ]
-  } else {
-    sources += [
-      "bluetooth_chooser_controller.cc",
-      "bluetooth_chooser_controller.h",
-      "bluetooth_chooser_desktop.cc",
-      "bluetooth_chooser_desktop.h",
-      "bluetooth_scanning_prompt_controller.cc",
-      "bluetooth_scanning_prompt_controller.h",
-      "bluetooth_scanning_prompt_desktop.cc",
-      "bluetooth_scanning_prompt_desktop.h",
-      "permission_prompt_impl.cc",
-    ]
-  }
+  sources += [
+    "bluetooth_chooser_controller.cc",
+    "bluetooth_chooser_controller.h",
+    "bluetooth_chooser_desktop.cc",
+    "bluetooth_chooser_desktop.h",
+    "bluetooth_scanning_prompt_controller.cc",
+    "bluetooth_scanning_prompt_controller.h",
+    "bluetooth_scanning_prompt_desktop.cc",
+    "bluetooth_scanning_prompt_desktop.h",
+    "permission_prompt_impl.cc",
+  ]
 
   public_deps = [ ":permissions_common" ]
 

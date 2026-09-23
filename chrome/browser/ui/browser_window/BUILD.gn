@@ -96,17 +96,9 @@ if (!is_android || is_desktop_android) {
       "//testing/gtest",
     ]
 
-    if (is_android) {
-      # This is in the interactive_ui_tests target on non-Android
-      sources += [ "internal/global_browser_collection_interactive_ui_test.cc" ]
-      deps += [
-        "//chrome/browser/ui/browser_window/test:android_browser_test_support",
-      ]
-    } else {
-      sources += [
-        "internal/create_browser_window_browsertest.cc",
-        "public/browser_window_interface_iterator_browsertest.cc",
-      ]
-    }
+    sources += [
+      "internal/create_browser_window_browsertest.cc",
+      "public/browser_window_interface_iterator_browsertest.cc",
+    ]
   }
 }

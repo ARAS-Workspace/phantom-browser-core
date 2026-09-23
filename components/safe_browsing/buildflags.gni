@@ -15,11 +15,7 @@ declare_args() {
   #   protection (typically used for desktop OSes).
   # 2 compiles it for Android mobile, enabling remote database lookups via an
   #   external API.
-  if (is_ios) {
-    safe_browsing_mode = 0
-  } else {
-    safe_browsing_mode = 1
-  }
+  safe_browsing_mode = 1
 
   # Allows building without //third_party/unrar included, for license reasons
   safe_browsing_use_unrar = true

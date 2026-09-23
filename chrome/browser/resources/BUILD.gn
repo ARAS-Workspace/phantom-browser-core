@@ -330,24 +330,16 @@ group("dev_ui_resources") {
     public_deps += [ "//content/browser/resources/webxr_internals:resources" ]
   }
 
-  if (is_android) {
-    public_deps += [
-      "//chrome/browser/resources/feed_internals:resources",
-      "//chrome/browser/resources/notifications_internals:resources",
-      "//chrome/browser/resources/webapks:resources",
-    ]
-  } else {
-    public_deps += [
-      "color_pipeline_internals:resources",
-      "infobar_internals:resources",
-      "media_router/internals:resources",
-      "multistep_filter_internals:resources",
-      "on_device_internals:resources",
-      "user_education_internals:resources",
-      "webnn_internals:resources",
-      "webui_js_error:resources",
-    ]
-  }
+  public_deps += [
+    "color_pipeline_internals:resources",
+    "infobar_internals:resources",
+    "media_router/internals:resources",
+    "multistep_filter_internals:resources",
+    "on_device_internals:resources",
+    "user_education_internals:resources",
+    "webnn_internals:resources",
+    "webui_js_error:resources",
+  ]
 
   if (is_android || is_linux || is_win) {
     public_deps += [ "//chrome/browser/resources/sandbox_internals:resources" ]
@@ -417,23 +409,15 @@ repack("dev_ui_paks") {
     sources += [ "$root_gen_dir/content/webxr_internals_resources.pak" ]
   }
 
-  if (is_android) {
-    sources += [
-      "$root_gen_dir/chrome/feed_internals_resources.pak",
-      "$root_gen_dir/chrome/notifications_internals_resources.pak",
-      "$root_gen_dir/chrome/webapks_resources.pak",
-    ]
-  } else {
-    sources += [
-      "$root_gen_dir/chrome/color_pipeline_internals_resources.pak",
-      "$root_gen_dir/chrome/infobar_internals_resources.pak",
-      "$root_gen_dir/chrome/media_router_internals_resources.pak",
-      "$root_gen_dir/chrome/multistep_filter_internals_resources.pak",
-      "$root_gen_dir/chrome/on_device_internals_resources.pak",
-      "$root_gen_dir/chrome/user_education_internals_resources.pak",
-      "$root_gen_dir/chrome/webui_js_error_resources.pak",
-    ]
-  }
+  sources += [
+    "$root_gen_dir/chrome/color_pipeline_internals_resources.pak",
+    "$root_gen_dir/chrome/infobar_internals_resources.pak",
+    "$root_gen_dir/chrome/media_router_internals_resources.pak",
+    "$root_gen_dir/chrome/multistep_filter_internals_resources.pak",
+    "$root_gen_dir/chrome/on_device_internals_resources.pak",
+    "$root_gen_dir/chrome/user_education_internals_resources.pak",
+    "$root_gen_dir/chrome/webui_js_error_resources.pak",
+  ]
 
   if (is_android || is_linux || is_win) {
     sources += [ "$root_gen_dir/chrome/sandbox_internals_resources.pak" ]

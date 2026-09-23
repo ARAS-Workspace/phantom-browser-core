@@ -162,18 +162,6 @@ if (!is_android) {
       "//content/test:test_support",
     ]
 
-    if (is_win) {
-      sources += [
-        "aria_notify_uia_browsertest_win.cc",
-        "leaked_node_detection_browsertest.cc",
-      ]
-      deps += [
-        ":test_support",
-        "//chrome/browser/ui/views/accessibility:uia_test_support",
-      ]
-    } else {
-    }
-
     deps += [
       "//chrome/browser/screen_ai:screen_ai_service_router_factory",
       "//services/screen_ai/public/cpp:utilities",

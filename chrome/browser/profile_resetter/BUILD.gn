@@ -89,12 +89,7 @@ if (!is_android) {
       deps += [ "//components/spellcheck/browser" ]
     }
 
-    if (is_win) {
-      sources += [ "triggered_profile_resetter_win.cc" ]
-      deps += [ "//chrome/installer/util:with_no_strings" ]
-    } else {
-      sources += [ "triggered_profile_resetter_stub.cc" ]
-    }
+    sources += [ "triggered_profile_resetter_stub.cc" ]
   }
 
   source_set("fake_profile_resetter") {

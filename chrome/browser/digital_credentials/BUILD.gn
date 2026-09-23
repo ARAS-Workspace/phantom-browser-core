@@ -11,13 +11,8 @@ source_set("digital_credentials") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [ "digital_identity_provider_android.h" ]
-    public_deps += [ "//content/public/browser" ]
-  } else {
-    sources += [ "digital_identity_provider_desktop.h" ]
-    public_deps += [ "//content/public/browser" ]
-  }
+  sources += [ "digital_identity_provider_desktop.h" ]
+  public_deps += [ "//content/public/browser" ]
 }
 
 source_set("impl") {
@@ -37,26 +32,17 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [ "digital_identity_provider_android.cc" ]
-    deps += [
-      "//chrome/browser/ui/digital_credentials",
-      "//chrome/browser/webid:jni_headers",
-      "//ui/android",
-    ]
-  } else {
-    sources += [ "digital_identity_provider_desktop.cc" ]
-    deps += [
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/views/accessibility",
-      "//chrome/browser/ui/views/digital_credentials",
-      "//components/constrained_window",
-      "//components/qr_code_generator:bitmap_generator",
-      "//device/fido",
-      "//ui/base",
-      "//ui/views",
-    ]
-  }
+  sources += [ "digital_identity_provider_desktop.cc" ]
+  deps += [
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/views/accessibility",
+    "//chrome/browser/ui/views/digital_credentials",
+    "//components/constrained_window",
+    "//components/qr_code_generator:bitmap_generator",
+    "//device/fido",
+    "//ui/base",
+    "//ui/views",
+  ]
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }

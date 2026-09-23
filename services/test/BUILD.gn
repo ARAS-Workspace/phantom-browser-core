@@ -20,11 +20,7 @@ source_set("run_all_unittests") {
     "//ui/base",
   ]
 
-  if (is_ios) {
-    deps += [ ":tests_bundle_data" ]
-  } else {
-    data = [ "data/" ]
-  }
+  data = [ "data/" ]
 
   data_deps = [
     "//device/bluetooth/strings:bluetooth_test_strings",

@@ -30,71 +30,62 @@ source_set("search") {
     "//content/public/browser",
     "//url",
   ]
-  if (is_android) {
-    sources += []
-    public_deps += [ "//components/policy/core/browser" ]
-    deps += [ "//components/prefs" ]
-    if (enable_webui_ntp) {
-      public_deps += [ "//chrome/browser/ui/webui/new_tab_page" ]
-    }
-  } else {
-    sources += [
-      "instant_service.cc",
-      "instant_service.h",
-      "instant_service_factory.cc",
-      "instant_service_factory.h",
-      "instant_service_observer.cc",
-      "instant_service_observer.h",
-      "most_visited_iframe_source.cc",
-      "most_visited_iframe_source.h",
-      "search_engine_base_url_tracker.cc",
-      "search_engine_base_url_tracker.h",
-    ]
-    public_deps += [
-      "//base",
-      "//chrome/browser/ntp_tiles",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/themes",
-      "//chrome/browser/ui/webui/new_tab_page",
-      "//chrome/browser/ui/webui/new_tab_page_third_party",
-      "//chrome/common",
-      "//components/history/core/browser",
-      "//components/keyed_service/core",
-      "//components/ntp_tiles",
-      "//components/policy/core/browser",
-      "//components/prefs",
-      "//components/search_engines",
-      "//content/public/browser",
-      "//ui/native_theme",
-      "//url",
-    ]
-    deps += [
-      "//chrome/app/theme:theme_resources",
-      "//chrome/app/theme:theme_resources_grit",
-      "//chrome/browser/resources/new_tab_page_instant:resources",
-      "//chrome/browser/resources/new_tab_page_instant:resources_grit",
-      "//chrome/browser/ui/webui:theme_source",
-      "//chrome/common:constants",
-      "//chrome/common:non_code_constants",
-      "//chrome/common/search:mojo_bindings",
-      "//components/favicon_base",
-      "//components/page_image_service/mojom:mojo_bindings",
-      "//components/policy:generated",
-      "//components/policy:policy_code_generate",
-      "//components/policy/core/common",
-      "//components/sync_preferences",
-      "//extensions/browser",
-      "//extensions/common",
-      "//mojo/public/cpp/bindings",
-      "//ui/base",
-      "//ui/gfx:color_utils",
-    ]
+  sources += [
+    "instant_service.cc",
+    "instant_service.h",
+    "instant_service_factory.cc",
+    "instant_service_factory.h",
+    "instant_service_observer.cc",
+    "instant_service_observer.h",
+    "most_visited_iframe_source.cc",
+    "most_visited_iframe_source.h",
+    "search_engine_base_url_tracker.cc",
+    "search_engine_base_url_tracker.h",
+  ]
+  public_deps += [
+    "//base",
+    "//chrome/browser/ntp_tiles",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/themes",
+    "//chrome/browser/ui/webui/new_tab_page",
+    "//chrome/browser/ui/webui/new_tab_page_third_party",
+    "//chrome/common",
+    "//components/history/core/browser",
+    "//components/keyed_service/core",
+    "//components/ntp_tiles",
+    "//components/policy/core/browser",
+    "//components/prefs",
+    "//components/search_engines",
+    "//content/public/browser",
+    "//ui/native_theme",
+    "//url",
+  ]
+  deps += [
+    "//chrome/app/theme:theme_resources",
+    "//chrome/app/theme:theme_resources_grit",
+    "//chrome/browser/resources/new_tab_page_instant:resources",
+    "//chrome/browser/resources/new_tab_page_instant:resources_grit",
+    "//chrome/browser/ui/webui:theme_source",
+    "//chrome/common:constants",
+    "//chrome/common:non_code_constants",
+    "//chrome/common/search:mojo_bindings",
+    "//components/favicon_base",
+    "//components/page_image_service/mojom:mojo_bindings",
+    "//components/policy:generated",
+    "//components/policy:policy_code_generate",
+    "//components/policy/core/common",
+    "//components/sync_preferences",
+    "//extensions/browser",
+    "//extensions/common",
+    "//mojo/public/cpp/bindings",
+    "//ui/base",
+    "//ui/gfx:color_utils",
+  ]
 
-    # InstantService constructs ThemeSource while theme_source.cc includes
-    # instant_service.h (InstantService::ShouldServiceRequest) — a genuine
-    # bidirectional pair, with the real dep edge owned here.
-    allow_circular_includes_from = [ "//chrome/browser/ui/webui:theme_source" ]
-  }
+  # InstantService constructs ThemeSource while theme_source.cc includes
+  # instant_service.h (InstantService::ShouldServiceRequest) — a genuine
+  # bidirectional pair, with the real dep edge owned here.
+  allow_circular_includes_from = [ "//chrome/browser/ui/webui:theme_source" ]
 }
 
 source_set("unit_tests") {

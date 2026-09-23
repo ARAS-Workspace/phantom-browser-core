@@ -106,24 +106,9 @@ proto_library("proto") {
   ]
 }
 
-if (is_android) {
-  proto_java_library("proto_java") {
-    proto_path = "//"
-    sources = [
-      "proto/price_tracking.proto",
-      "proto/product_category.proto",
-    ]
-  }
-
-  proto_library("merchant_signal_db_proto") {
-    proto_in_dir = "//"
-    sources = [ "proto/merchant_signal_db_content.proto" ]
-  }
-} else {
-  proto_library("coupon_db_content_proto") {
-    proto_in_dir = "//"
-    sources = [ "proto/coupon_db_content.proto" ]
-  }
+proto_library("coupon_db_content_proto") {
+  proto_in_dir = "//"
+  sources = [ "proto/coupon_db_content.proto" ]
 }
 
 proto_library("parcel_tracking_db_content_proto") {

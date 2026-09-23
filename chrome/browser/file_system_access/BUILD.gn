@@ -59,14 +59,10 @@ source_set("impl") {
     "//components/pdf/common:util",
   ]
 
-  if (is_android) {
-    deps += [ "//chrome/browser/ui/android/tab_model" ]
-  } else {
-    deps += [
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/views/file_system_access",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/views/file_system_access",
+  ]
 
   if (safe_browsing_mode != 0) {
     deps += [ "//components/safe_browsing/content/common:file_type_policies" ]

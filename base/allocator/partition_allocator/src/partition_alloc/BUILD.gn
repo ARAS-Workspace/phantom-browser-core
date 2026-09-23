@@ -103,11 +103,7 @@ config("dependants_extra_warnings") {
     ]
 
     # clang-cl doesn't know -pedantic, pass it explicitly to the clang driver
-    if (is_win) {
-      cflags += [ "/clang:-pedantic" ]
-    } else {
-      cflags += [ "-pedantic" ]
-    }
+    cflags += [ "-pedantic" ]
   }
 }
 

@@ -45,14 +45,10 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_android) {
-    deps += [ "//components/navigation_interception" ]
-  } else {
-    deps += [
-      "//components/url_formatter",
-      "//components/web_modal",
-    ]
-  }
+  deps += [
+    "//components/url_formatter",
+    "//components/web_modal",
+  ]
 
   if (!is_android) {
     sources += [ "auto_launch_protocols_policy_handler.cc" ]
@@ -78,11 +74,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    deps += [ "//components/navigation_interception" ]
-  } else {
-    deps += [ "//components/web_modal" ]
-  }
+  deps += [ "//components/web_modal" ]
 }
 
 if (!is_android) {

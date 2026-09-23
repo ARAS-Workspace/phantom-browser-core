@@ -86,66 +86,42 @@ source_set("autofill") {
     "//ui/gfx/geometry",
   ]
 
-  if (is_android) {
-    sources += [
-      "at_memory_suggestion_controller.h",
-      "autofill_dialog_controller.h",
-      "autofill_dialog_controller_impl.h",
-      "autofill_keyboard_accessory_controller.h",
-      "autofill_keyboard_accessory_controller_impl.h",
-      "autofill_keyboard_accessory_view.h",
-      "autofill_message_controller.h",
-      "autofill_message_controller_impl.h",
-      "autofill_message_model.h",
-      "autofill_snackbar_controller.h",
-      "autofill_snackbar_controller_impl.h",
-      "autofill_snackbar_type.h",
-      "autofill_snackbar_view.h",
-    ]
-    public_deps += [
-      "//components/autofill/android:autofill_core_browser_java_enums",
-      "//components/password_manager/core/browser:metrics_util",
-      "//components/password_manager/core/browser:password_manager_java_enums_srcjar",
-      "//content/public/android:content_public_android_java_enums_srcjar",
-    ]
-  } else {
-    sources += [
-      "address_bubble_controller_delegate.h",
-      "address_bubbles_controller.h",
-      "address_bubbles_icon_controller.h",
-      "address_editor_controller.h",
-      "autofill_ai/autofill_ai_import_data_controller.h",
-      "autofill_ai/autofill_ai_import_data_controller_impl.h",
-      "autofill_context_menu_manager.h",
-      "autofill_field_promo_controller.h",
-      "autofill_field_promo_controller_impl.h",
-      "autofill_field_promo_view.h",
-      "autofill_popup_controller_impl.h",
-      "bubble_manager.h",
-      "bubble_manager_impl.h",
-      "delete_address_profile_dialog_controller.h",
-      "delete_address_profile_dialog_controller_impl.h",
-      "delete_address_profile_dialog_view.h",
-      "edit_address_profile_dialog_controller.h",
-      "edit_address_profile_dialog_controller_impl.h",
-      "edit_address_profile_view.h",
-      "email_verifier/email_verification_popup_controller.h",
-      "email_verifier/email_verified_toast_menu_model.h",
-      "save_address_bubble_controller.h",
-      "update_address_bubble_controller.h",
-    ]
-    public_deps += [
-      "//components/autofill/core/browser",
-      "//components/password_manager/core/browser",
-      "//components/password_manager/core/browser:password_form",
-      "//components/renderer_context_menu",
-      "//components/user_education/common",
-      "//third_party/abseil-cpp:absl",
-      "//ui/base/interaction",
-      "//ui/menus",
-      "//ui/views",
-    ]
-  }
+  sources += [
+    "address_bubble_controller_delegate.h",
+    "address_bubbles_controller.h",
+    "address_bubbles_icon_controller.h",
+    "address_editor_controller.h",
+    "autofill_ai/autofill_ai_import_data_controller.h",
+    "autofill_ai/autofill_ai_import_data_controller_impl.h",
+    "autofill_context_menu_manager.h",
+    "autofill_field_promo_controller.h",
+    "autofill_field_promo_controller_impl.h",
+    "autofill_field_promo_view.h",
+    "autofill_popup_controller_impl.h",
+    "bubble_manager.h",
+    "bubble_manager_impl.h",
+    "delete_address_profile_dialog_controller.h",
+    "delete_address_profile_dialog_controller_impl.h",
+    "delete_address_profile_dialog_view.h",
+    "edit_address_profile_dialog_controller.h",
+    "edit_address_profile_dialog_controller_impl.h",
+    "edit_address_profile_view.h",
+    "email_verifier/email_verification_popup_controller.h",
+    "email_verifier/email_verified_toast_menu_model.h",
+    "save_address_bubble_controller.h",
+    "update_address_bubble_controller.h",
+  ]
+  public_deps += [
+    "//components/autofill/core/browser",
+    "//components/password_manager/core/browser",
+    "//components/password_manager/core/browser:password_form",
+    "//components/renderer_context_menu",
+    "//components/user_education/common",
+    "//third_party/abseil-cpp:absl",
+    "//ui/base/interaction",
+    "//ui/menus",
+    "//ui/views",
+  ]
 
   if (is_mac) {
     sources += [ "autofill_popup_controller_impl_mac.h" ]
@@ -241,69 +217,46 @@ source_set("impl") {
     deps += [ "//components/safe_browsing/content/browser/password_protection" ]
   }
 
-  if (is_android) {
-    sources += [
-      "at_memory_suggestion_controller.cc",
-      "autofill_dialog_controller_impl.cc",
-      "autofill_keyboard_accessory_controller.cc",
-      "autofill_keyboard_accessory_controller_impl.cc",
-      "autofill_message_controller_impl.cc",
-      "autofill_message_model.cc",
-      "autofill_snackbar_controller_impl.cc",
-    ]
-    deps += [
-      "//chrome/browser/autofill/android:jni_headers",
-      "//chrome/browser/keyboard_accessory/android",
-      "//chrome/browser/keyboard_accessory/android:impl",
-      "//chrome/browser/touch_to_fill/autofill/android",
-      "//chrome/browser/touch_to_fill/autofill/android:public",
-      "//chrome/browser/ui/android/autofill",
-      "//components/android_autofill/browser:android",
-      "//components/messages/android:feature_flags",
-      "//components/password_manager/core/browser/features:password_features",
-    ]
-  } else {
-    sources += [
-      "address_bubbles_controller.cc",
-      "address_bubbles_icon_controller.cc",
-      "address_editor_controller.cc",
-      "autofill_ai/autofill_ai_import_data_controller_impl.cc",
-      "autofill_context_menu_manager.cc",
-      "autofill_field_promo_controller_impl.cc",
-      "autofill_popup_controller_impl.cc",
-      "bubble_manager.cc",
-      "bubble_manager_impl.cc",
-      "delete_address_profile_dialog_controller_impl.cc",
-      "edit_address_profile_dialog_controller_impl.cc",
-      "email_verifier/email_verification_popup_controller.cc",
-      "email_verifier/email_verified_toast_menu_model.cc",
-      "save_address_bubble_controller.cc",
-      "update_address_bubble_controller.cc",
-    ]
-    deps += [
-      "//chrome/app:command_ids",
-      "//chrome/app/vector_icons",
-      "//chrome/browser/apps/platform_apps",
-      "//chrome/browser/desktop_to_mobile_promos:utils",
-      "//chrome/browser/feedback",
-      "//chrome/browser/profiles:profile_manager",
-      "//chrome/browser/profiles:profile_util",
-      "//chrome/browser/ui:chrome_pages",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/desktop_to_mobile_promos:utils",
-      "//chrome/browser/ui/page_action",
-      "//chrome/browser/ui/toasts",
-      "//chrome/browser/ui/toasts/api:toasts",
-      "//chrome/browser/ui/user_education",
-      "//chrome/browser/ui/views/autofill/popup/email_verifier",
-      "//chrome/browser/ui/webauthn",
-      "//chrome/browser/ui/webui/signin:login_ui_service",
-      "//components/autofill/core/browser",
-      "//components/desktop_to_mobile_promos",
-      "//components/password_manager/core/browser/features:password_features",
-      "//extensions/browser",
-    ]
-  }
+  sources += [
+    "address_bubbles_controller.cc",
+    "address_bubbles_icon_controller.cc",
+    "address_editor_controller.cc",
+    "autofill_ai/autofill_ai_import_data_controller_impl.cc",
+    "autofill_context_menu_manager.cc",
+    "autofill_field_promo_controller_impl.cc",
+    "autofill_popup_controller_impl.cc",
+    "bubble_manager.cc",
+    "bubble_manager_impl.cc",
+    "delete_address_profile_dialog_controller_impl.cc",
+    "edit_address_profile_dialog_controller_impl.cc",
+    "email_verifier/email_verification_popup_controller.cc",
+    "email_verifier/email_verified_toast_menu_model.cc",
+    "save_address_bubble_controller.cc",
+    "update_address_bubble_controller.cc",
+  ]
+  deps += [
+    "//chrome/app:command_ids",
+    "//chrome/app/vector_icons",
+    "//chrome/browser/apps/platform_apps",
+    "//chrome/browser/desktop_to_mobile_promos:utils",
+    "//chrome/browser/feedback",
+    "//chrome/browser/profiles:profile_manager",
+    "//chrome/browser/profiles:profile_util",
+    "//chrome/browser/ui:chrome_pages",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/desktop_to_mobile_promos:utils",
+    "//chrome/browser/ui/page_action",
+    "//chrome/browser/ui/toasts",
+    "//chrome/browser/ui/toasts/api:toasts",
+    "//chrome/browser/ui/user_education",
+    "//chrome/browser/ui/views/autofill/popup/email_verifier",
+    "//chrome/browser/ui/webauthn",
+    "//chrome/browser/ui/webui/signin:login_ui_service",
+    "//components/autofill/core/browser",
+    "//components/desktop_to_mobile_promos",
+    "//components/password_manager/core/browser/features:password_features",
+    "//extensions/browser",
+  ]
 
   if (is_mac) {
     sources += [ "autofill_popup_controller_impl_mac.mm" ]
@@ -383,40 +336,22 @@ source_set("unit_tests") {
     "//ui/gfx/range",
   ]
 
-  if (is_android) {
-    sources += [
-      "at_memory_suggestion_controller_unittest.cc",
-      "autofill_dialog_controller_impl_unittest.cc",
-      "autofill_keyboard_accessory_controller_impl_unittest.cc",
-      "autofill_message_controller_impl_unittest.cc",
-      "autofill_message_model_unittest.cc",
-      "autofill_snackbar_controller_impl_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/autofill/android:jni_test_headers",
-      "//chrome/browser/keyboard_accessory/android:impl",
-      "//chrome/browser/preferences:android",
-      "//chrome/browser/ui/android/autofill",
-      "//components/messages/android:test_support",
-    ]
-  } else {
-    sources += [
-      "address_editor_controller_unittest.cc",
-      "autofill_field_promo_controller_impl_unittest.cc",
-      "autofill_popup_controller_impl_unittest.cc",
-      "bubble_manager_impl_unittest.cc",
-      "edit_address_profile_dialog_controller_impl_unittest.cc",
-      "save_address_bubble_controller_unittest.cc",
-      "update_address_bubble_controller_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/hats:test_support",
-      "//chrome/browser/ui/user_education",
-      "//chrome/test/user_education:impl",
-      "//components/tabs:test_support",
-    ]
-  }
+  sources += [
+    "address_editor_controller_unittest.cc",
+    "autofill_field_promo_controller_impl_unittest.cc",
+    "autofill_popup_controller_impl_unittest.cc",
+    "bubble_manager_impl_unittest.cc",
+    "edit_address_profile_dialog_controller_impl_unittest.cc",
+    "save_address_bubble_controller_unittest.cc",
+    "update_address_bubble_controller_unittest.cc",
+  ]
+  deps += [
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/hats:test_support",
+    "//chrome/browser/ui/user_education",
+    "//chrome/test/user_education:impl",
+    "//components/tabs:test_support",
+  ]
 
   if (is_mac) {
     sources += [ "autofill_popup_controller_impl_mac_unittest.mm" ]
@@ -439,33 +374,19 @@ source_set("test_support") {
     "//testing/gmock",
   ]
 
-  if (is_android) {
-    sources += [
-      "autofill_keyboard_accessory_controller_impl_test_api.h",
-      "autofill_message_controller_test_api.h",
-      "autofill_message_model_test_api.h",
-      "mock_autofill_dialog_controller.cc",
-      "mock_autofill_dialog_controller.h",
-      "mock_autofill_dialog_view.cc",
-      "mock_autofill_dialog_view.h",
-      "mock_autofill_message_controller.cc",
-      "mock_autofill_message_controller.h",
-    ]
-  } else {
-    sources += [
-      "autofill_ai/mock_autofill_ai_import_data_controller.cc",
-      "autofill_ai/mock_autofill_ai_import_data_controller.h",
-      "autofill_popup_controller_impl_test_api.h",
-      "mock_autofill_popup_controller.cc",
-      "mock_autofill_popup_controller.h",
-      "mock_bubble_manager.cc",
-      "mock_bubble_manager.h",
-    ]
-    if (is_mac) {
-      sources += [ "autofill_popup_controller_impl_mac_test_api.h" ]
-    }
-    public_deps += [ "//ui/gfx:test_support" ]
+  sources += [
+    "autofill_ai/mock_autofill_ai_import_data_controller.cc",
+    "autofill_ai/mock_autofill_ai_import_data_controller.h",
+    "autofill_popup_controller_impl_test_api.h",
+    "mock_autofill_popup_controller.cc",
+    "mock_autofill_popup_controller.h",
+    "mock_bubble_manager.cc",
+    "mock_bubble_manager.h",
+  ]
+  if (is_mac) {
+    sources += [ "autofill_popup_controller_impl_mac_test_api.h" ]
   }
+  public_deps += [ "//ui/gfx:test_support" ]
 }
 
 if (!is_android) {
@@ -554,17 +475,7 @@ source_set("test_support_unit") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    sources += [
-      "mock_autofill_keyboard_accessory_view.cc",
-      "mock_autofill_keyboard_accessory_view.h",
-      "test_autofill_keyboard_accessory_controller_autofill_client.h",
-    ]
-    deps = [ "//chrome/browser/keyboard_accessory/android:impl" ]
-    public_deps += [ "//chrome/browser/keyboard_accessory/test_utils/android" ]
-  } else {
-    sources += [ "test_autofill_popup_controller_autofill_client.h" ]
-  }
+  sources += [ "test_autofill_popup_controller_autofill_client.h" ]
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.

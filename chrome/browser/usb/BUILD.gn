@@ -40,23 +40,19 @@ source_set("usb") {
     # `:unit_tests`.
   ]
 
-  if (is_android) {
-    sources += [ "android/web_usb_chooser_android.h" ]
-  } else {
-    sources += [
-      "usb_connection_tracker.h",
-      "usb_connection_tracker_factory.h",
-      "usb_system_tray_icon.h",
-      "web_usb_chooser_desktop.h",
-      "web_usb_detector.h",
-    ]
-    public_deps += [
-      "//chrome/browser/device_notifications",
-      "//ui/gfx",
-    ]
+  sources += [
+    "usb_connection_tracker.h",
+    "usb_connection_tracker_factory.h",
+    "usb_system_tray_icon.h",
+    "web_usb_chooser_desktop.h",
+    "web_usb_detector.h",
+  ]
+  public_deps += [
+    "//chrome/browser/device_notifications",
+    "//ui/gfx",
+  ]
 
-    sources += [ "usb_status_icon.h" ]
-  }
+  sources += [ "usb_status_icon.h" ]
 }
 
 source_set("impl") {
@@ -99,45 +95,34 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/usb_bridge.cc",
-      "android/web_usb_chooser_android.cc",
-    ]
-    deps += [
-      "//chrome/browser/ui/android/device_dialog",
-      "//chrome/browser/usb/android:jni_headers",
-    ]
-  } else {
-    sources += [
-      "usb_connection_tracker.cc",
-      "usb_connection_tracker_factory.cc",
-      "usb_system_tray_icon.cc",
-      "web_usb_chooser_desktop.cc",
-      "web_usb_detector.cc",
-    ]
+  sources += [
+    "usb_connection_tracker.cc",
+    "usb_connection_tracker_factory.cc",
+    "usb_system_tray_icon.cc",
+    "web_usb_chooser_desktop.cc",
+    "web_usb_detector.cc",
+  ]
 
-    deps += [
-      "//chrome/app:branded_strings",
-      "//chrome/app/vector_icons",
-      "//chrome/browser:browser_process",
-      "//chrome/browser/ui:browser_tab_strip",
-      "//chrome/browser/ui:chrome_pages",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tab_contents",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//components/url_formatter",
-      "//components/vector_icons",
-      "//extensions/buildflags",
-      "//services/network/public/cpp:is_potentially_trustworthy",
-      "//ui/base:types",
-      "//ui/gfx",
-      "//ui/gfx:color_utils",
-      "//ui/message_center/public/cpp",
-    ]
+  deps += [
+    "//chrome/app:branded_strings",
+    "//chrome/app/vector_icons",
+    "//chrome/browser:browser_process",
+    "//chrome/browser/ui:browser_tab_strip",
+    "//chrome/browser/ui:chrome_pages",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/tab_contents",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//components/url_formatter",
+    "//components/vector_icons",
+    "//extensions/buildflags",
+    "//services/network/public/cpp:is_potentially_trustworthy",
+    "//ui/base:types",
+    "//ui/gfx",
+    "//ui/gfx:color_utils",
+    "//ui/message_center/public/cpp",
+  ]
 
-    sources += [ "usb_status_icon.cc" ]
-  }
+  sources += [ "usb_status_icon.cc" ]
 
   if (enable_extensions_core) {
     deps += [

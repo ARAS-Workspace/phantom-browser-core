@@ -463,11 +463,7 @@ source_set("base") {
     deps += [ "//ui/ozone" ]
   }
 
-  if (is_android) {
-    sources += [ "demuxer_memory_limit_android.cc" ]
-  } else {
-    sources += [ "demuxer_memory_limit_default.cc" ]
-  }
+  sources += [ "demuxer_memory_limit_default.cc" ]
 
   if (!is_android) {
     sources += [ "speech_recognition_client.h" ]

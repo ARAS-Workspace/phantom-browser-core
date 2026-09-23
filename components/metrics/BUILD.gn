@@ -304,35 +304,9 @@ if (!is_cronet_build || is_ios) {
       "//url",
     ]
 
-    if (is_android) {
-      sources += [
-        "android_metrics_provider.cc",
-        "android_metrics_provider.h",
-        "android_unconditional_persistent_histograms_field_trial.cc",
-        "android_unconditional_persistent_histograms_field_trial.h",
-        "gms_metrics_provider.cc",
-        "gms_metrics_provider.h",
-      ]
-      public += [
-        "android_metrics_provider.h",
-        "android_unconditional_persistent_histograms_field_trial.h",
-        "gms_metrics_provider.h",
-      ]
-      deps += [ ":jni_headers" ]
-    } else {
-      deps += [ "//components/keep_alive_registry" ]
-    }
+    deps += [ "//components/keep_alive_registry" ]
 
-    if (is_win) {
-      sources += [
-        "machine_id_provider_win.cc",
-        "system_session_analyzer/system_session_analyzer_win.cc",
-      ]
-      public += [ "system_session_analyzer/system_session_analyzer_win.h" ]
-      libs = [ "wevtapi.lib" ]
-    } else {
-      sources += [ "machine_id_provider_nonwin.cc" ]
-    }
+    sources += [ "machine_id_provider_nonwin.cc" ]
 
     if (is_win || is_linux) {
       sources += [
@@ -664,14 +638,7 @@ if (!is_cronet_build) {
       "//ui/gfx/geometry",
     ]
 
-    if (is_win) {
-      sources += [
-        "machine_id_provider_win_unittest.cc",
-        "system_session_analyzer/system_session_analyzer_win_unittest.cc",
-      ]
-    } else {
-      sources += [ "machine_id_provider_nonwin_unittest.cc" ]
-    }
+    sources += [ "machine_id_provider_nonwin_unittest.cc" ]
 
     if (is_linux) {
       sources += [ "serialization/serialization_utils_unittest.cc" ]
@@ -685,19 +652,11 @@ if (!is_cronet_build) {
       ]
     }
 
-    # iOS is not supported by the profiler and the ios-simulator bot chokes on
-    # these tests.
-    if (is_ios) {
-      sources -=
-          [ "call_stacks/child_call_stack_profile_collector_unittest.cc" ]
-      deps += [ "//ios/web/public/test" ]
-    } else {
-      sources += [
-        "content/content_stability_metrics_provider_unittest.cc",
-        "content/subprocess_metrics_provider_unittest.cc",
-      ]
-      deps += [ "//extensions/buildflags" ]
-    }
+    sources += [
+      "content/content_stability_metrics_provider_unittest.cc",
+      "content/subprocess_metrics_provider_unittest.cc",
+    ]
+    deps += [ "//extensions/buildflags" ]
 
     if (is_win || is_linux) {
       sources += [ "motherboard_metrics_provider_unittest.cc" ]

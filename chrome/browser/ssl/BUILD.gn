@@ -207,15 +207,11 @@ source_set("cert_verifier_test_support") {
 
   public_deps = [ "//content/test:test_support" ]
 
-  if (is_android) {
-    public_deps += [ "//chrome/test:test_support_ui_android" ]
-  } else {
-    sources += [
-      "cert_verifier_browser_test.cc",
-      "cert_verifier_browser_test.h",
-    ]
-    public_deps += [ "//chrome/test:test_support_ui" ]
-  }
+  sources += [
+    "cert_verifier_browser_test.cc",
+    "cert_verifier_browser_test.h",
+  ]
+  public_deps += [ "//chrome/test:test_support_ui" ]
 }
 
 source_set("unit_tests") {

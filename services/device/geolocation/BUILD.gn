@@ -61,22 +61,12 @@ source_set("geolocation") {
     "//services/network/public/cpp",
   ]
 
-  if (is_android) {
-    sources += [
-      "location_api_adapter_android.cc",
-      "location_api_adapter_android.h",
-      "location_provider_android.cc",
-      "location_provider_android.h",
-    ]
-    deps += [ ":geolocation_jni_headers" ]
-  } else {
-    sources += [
-      "network_location_provider.cc",
-      "network_location_provider.h",
-      "wifi_data_provider_common.cc",
-      "wifi_data_provider_common.h",
-    ]
-  }
+  sources += [
+    "network_location_provider.cc",
+    "network_location_provider.h",
+    "wifi_data_provider_common.cc",
+    "wifi_data_provider_common.h",
+  ]
 
   if (is_apple) {
     frameworks = [ "Security.framework" ]

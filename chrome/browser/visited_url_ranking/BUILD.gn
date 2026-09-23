@@ -9,11 +9,7 @@ source_set("visited_url_ranking") {
     "visited_url_ranking_service_factory.h",
   ]
 
-  if (is_android) {
-    sources += [ "android_tab_model_url_visit_data_fetcher.h" ]
-  } else {
-    sources += [ "desktop_tab_model_url_visit_data_fetcher.h" ]
-  }
+  sources += [ "desktop_tab_model_url_visit_data_fetcher.h" ]
 
   public_deps = [
     "//base",
@@ -33,11 +29,7 @@ source_set("impl") {
     "visited_url_ranking_service_factory.cc",
   ]
 
-  if (is_android) {
-    sources += [ "android_tab_model_url_visit_data_fetcher.cc" ]
-  } else {
-    sources += [ "desktop_tab_model_url_visit_data_fetcher.cc" ]
-  }
+  sources += [ "desktop_tab_model_url_visit_data_fetcher.cc" ]
 
   deps = [
     ":visited_url_ranking",
@@ -65,18 +57,10 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_android) {
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/ui/android/tab_model",
-      "//ui/base",
-    ]
-  } else {
-    deps += [
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tabs:tab_strip",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/tabs:tab_strip",
+  ]
 }
 
 source_set("browser_tests") {
@@ -101,19 +85,11 @@ source_set("browser_tests") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/ui/android/tab_model",
-      "//net:test_support",
-    ]
-  } else {
-    deps += [
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/test:test_support_ui",
-      "//components/sessions",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/test:test_support_ui",
+    "//components/sessions",
+  ]
 }
 
 source_set("unit_tests") {

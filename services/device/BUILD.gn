@@ -55,12 +55,8 @@ source_set("lib") {
     "//services/device/public/mojom:device_service",
   ]
 
-  if (is_android) {
-    deps += [ ":device_service_jni_headers" ]
-  } else {
-    if (!(is_ios && target_platform == "tvos")) {
-      deps += [ "//services/device/battery" ]
-    }
+  if (!(is_ios && target_platform == "tvos")) {
+    deps += [ "//services/device/battery" ]
   }
 
   if (enable_compute_pressure) {
@@ -205,18 +201,9 @@ source_set("tests") {
     ]
   }
 
-  if (is_android) {
-    sources -= [
-      "battery/battery_status_service_unittest.cc",
-      "geolocation/network_location_provider_unittest.cc",
-      "geolocation/wifi_data_provider_common_unittest.cc",
-    ]
-    deps += [ ":device_service_jni_headers" ]
-  } else {
-    if (!(is_ios && target_platform == "tvos")) {
-      sources += [ "battery/battery_monitor_impl_unittest.cc" ]
-      deps += [ "//services/device/battery" ]
-    }
+  if (!(is_ios && target_platform == "tvos")) {
+    sources += [ "battery/battery_monitor_impl_unittest.cc" ]
+    deps += [ "//services/device/battery" ]
   }
 
   sources += [

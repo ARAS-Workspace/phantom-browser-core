@@ -14,16 +14,12 @@ source_set("javascript_dialogs") {
     "//components/javascript_dialogs",
   ]
 
-  if (is_android) {
-    sources += [ "javascript_tab_modal_dialog_manager_delegate_android.h" ]
-  } else {
-    sources += [ "javascript_tab_modal_dialog_manager_delegate_desktop.h" ]
-    public_deps += [
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tabs:tab_strip_model_observer",
-      "//chrome/browser/ui/tabs:tabs_public",
-    ]
-  }
+  sources += [ "javascript_tab_modal_dialog_manager_delegate_desktop.h" ]
+  public_deps += [
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/tabs:tab_strip_model_observer",
+    "//chrome/browser/ui/tabs:tabs_public",
+  ]
 }
 
 source_set("impl") {
@@ -42,20 +38,11 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_android) {
-    sources += [ "javascript_tab_modal_dialog_manager_delegate_android.cc" ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/ui/android/tab_model",
-      "//chrome/browser/ui/android/tab_model:enums_java",
-    ]
-  } else {
-    sources += [ "javascript_tab_modal_dialog_manager_delegate_desktop.cc" ]
-    deps += [
-      "//chrome/browser/ui:tab_modal_confirm_dialog",
-      "//chrome/browser/ui/tabs:tab_strip",
-    ]
-  }
+  sources += [ "javascript_tab_modal_dialog_manager_delegate_desktop.cc" ]
+  deps += [
+    "//chrome/browser/ui:tab_modal_confirm_dialog",
+    "//chrome/browser/ui/tabs:tab_strip",
+  ]
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }

@@ -2655,20 +2655,12 @@ source_set("browser") {
       ]
       public_deps += [ "//ui/base/cursor" ]
 
-      if (is_android) {
-        sources += [
-          "media/capture/android_cursor_renderer.cc",
-          "media/capture/android_cursor_renderer.h",
-          "media/capture/mouse_cursor_overlay_controller_android.cc",
-        ]
-      } else {
-        sources += [
-          "media/captured_surface_control_permission_manager.cc",
-          "media/captured_surface_control_permission_manager.h",
-          "media/captured_surface_controller.cc",
-          "media/captured_surface_controller.h",
-        ]
-      }
+      sources += [
+        "media/captured_surface_control_permission_manager.cc",
+        "media/captured_surface_control_permission_manager.h",
+        "media/captured_surface_controller.cc",
+        "media/captured_surface_controller.h",
+      ]
     } else {
       sources += [
         "media/capture/screenshot_capture_request_impl.h",
@@ -2797,311 +2789,78 @@ source_set("browser") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "accessibility/accessibility_tree_formatter_android.cc",
-      "accessibility/accessibility_tree_formatter_android.h",
-      "accessibility/accessibility_tree_formatter_android_external.cc",
-      "accessibility/accessibility_tree_formatter_android_external.h",
-      "accessibility/accessibility_tree_snapshot_combiner.cc",
-      "accessibility/accessibility_tree_snapshot_combiner.h",
-      "accessibility/ax_style_data.cc",
-      "accessibility/ax_style_data.h",
-      "accessibility/browser_accessibility_android.cc",
-      "accessibility/browser_accessibility_android.h",
-      "accessibility/browser_accessibility_manager_android.cc",
-      "accessibility/browser_accessibility_manager_android.h",
-      "accessibility/browser_accessibility_state_impl_android.cc",
-      "accessibility/browser_accessibility_state_impl_android.h",
-      "accessibility/captioning_controller.cc",
-      "accessibility/captioning_controller.h",
-      "accessibility/text_formatting_metrics_android.cc",
-      "accessibility/text_formatting_metrics_android.h",
-      "accessibility/web_contents_accessibility_android.cc",
-      "accessibility/web_contents_accessibility_android.h",
-      "android/additional_navigation_params.cc",
-      "android/additional_navigation_params.h",
-      "android/android_overlay_provider_impl.cc",
-      "android/android_overlay_provider_impl.h",
-      "android/app_web_message_port.cc",
-      "android/app_web_message_port.h",
-      "android/background_sync_network_observer_android.cc",
-      "android/background_sync_network_observer_android.h",
-      "android/battery_metrics.cc",
-      "android/battery_metrics.h",
-      "android/browser_context_handle.cc",
-      "android/browser_startup_controller.cc",
-      "android/browser_startup_controller.h",
-      "android/child_process_importance.cc",
-      "android/client_data_json_android.cc",
-      "android/content_feature_map.cc",
-      "android/content_startup_flags.cc",
-      "android/content_startup_flags.h",
-      "android/content_ui_event_handler.cc",
-      "android/content_ui_event_handler.h",
-      "android/content_url_loader_factory.cc",
-      "android/content_url_loader_factory.h",
-      "android/content_view_statics.cc",
-      "android/content_web_feature_usage_utils_android.cc",
-      "android/devtools_auth.cc",
-      "android/dialog_overlay_impl.cc",
-      "android/dialog_overlay_impl.h",
-      "android/drop_data_android.cc",
-      "android/drop_data_android.h",
-      "android/gesture_listener_manager.cc",
-      "android/gesture_listener_manager.h",
-      "android/gpu_process_callback.cc",
-      "android/ime_adapter_android.cc",
-      "android/ime_adapter_android.h",
-      "android/ime_text_span.cc",
-      "android/ime_text_span.h",
-      "android/input_token_forwarder_manager.cc",
-      "android/input_token_forwarder_manager.h",
-      "android/java/gin_java_bound_object.cc",
-      "android/java/gin_java_bound_object.h",
-      "android/java/gin_java_bound_object_delegate.cc",
-      "android/java/gin_java_bound_object_delegate.h",
-      "android/java/gin_java_bridge_dispatcher_host.cc",
-      "android/java/gin_java_bridge_dispatcher_host.h",
-      "android/java/gin_java_method_invocation_helper.cc",
-      "android/java/gin_java_method_invocation_helper.h",
-      "android/java/gin_java_script_to_java_types_coercion.cc",
-      "android/java/gin_java_script_to_java_types_coercion.h",
-      "android/java/java_bridge_thread.cc",
-      "android/java/java_bridge_thread.h",
-      "android/java/java_method.cc",
-      "android/java/java_method.h",
-      "android/java/java_type.cc",
-      "android/java/java_type.h",
-      "android/java/jni_reflect.cc",
-      "android/java/jni_reflect.h",
-      "android/java_interfaces_impl.cc",
-      "android/java_interfaces_impl.h",
-      "android/javascript_injector.cc",
-      "android/javascript_injector.h",
-      "android/launcher_thread.cc",
-      "android/launcher_thread.h",
-      "android/load_url_params.cc",
-      "android/message_payload.cc",
-      "android/navigation_handle_proxy.cc",
-      "android/navigation_handle_proxy.h",
-      "android/nfc_host.cc",
-      "android/nfc_host.h",
-      "android/overscroll_controller_android.cc",
-      "android/overscroll_controller_android.h",
-      "android/page_proxy.cc",
-      "android/page_proxy.h",
-      "android/render_widget_host_connector.cc",
-      "android/render_widget_host_connector.h",
-      "android/select_popup.cc",
-      "android/select_popup.h",
-      "android/selection/composited_touch_handle_drawable.cc",
-      "android/selection/composited_touch_handle_drawable.h",
-      "android/selection/magnifier_surface_control.cc",
-      "android/selection/magnifier_surface_control.h",
-      "android/selection/selection_popup_controller.cc",
-      "android/selection/selection_popup_controller.h",
-      "android/selection/smart_selection_client.cc",
-      "android/selection/smart_selection_client.h",
-      "android/spare_renderer_priority.h",
-      "android/synchronous_compositor_host.cc",
-      "android/synchronous_compositor_host.h",
-      "android/synchronous_compositor_sync_call_bridge.cc",
-      "android/synchronous_compositor_sync_call_bridge.h",
-      "android/text_suggestion_host_android.cc",
-      "android/text_suggestion_host_android.h",
-      "android/text_suggestion_host_mojo_impl_android.cc",
-      "android/text_suggestion_host_mojo_impl_android.h",
-      "android/tracing_controller_android.cc",
-      "android/tracing_controller_android.h",
-      "android/web_contents_observer_proxy.cc",
-      "android/web_contents_observer_proxy.h",
-      "child_process_launcher_helper_android.cc",
-      "contacts/contacts_provider_android.cc",
-      "contacts/contacts_provider_android.h",
-      "date_time_chooser/android/date_time_chooser_android.cc",
-      "date_time_chooser/android/date_time_chooser_android.h",
-      "device_posture/device_posture_platform_provider_android.cc",
-      "device_posture/device_posture_platform_provider_android.h",
-      "font_unique_name_lookup/font_unique_name_lookup_android.cc",
-      "font_unique_name_lookup/font_unique_name_lookup_android.h",
-      "font_unique_name_lookup/font_unique_name_lookup_service.cc",
-      "font_unique_name_lookup/font_unique_name_lookup_service.h",
-      "media/android/browser_gpu_video_accelerator_factories.cc",
-      "media/android/browser_gpu_video_accelerator_factories.h",
-      "media/key_system_support_android.cc",
-      "media/key_system_support_android.h",
-      "media/session/audio_focus_delegate_android.cc",
-      "media/session/audio_focus_delegate_android.h",
-      "media/session/media_session_android.cc",
-      "media/session/media_session_android.h",
-      "memory/swap_metrics_driver_impl_linux.cc",
-      "memory/swap_metrics_driver_impl_linux.h",
-      "navigation_transitions/back_forward_transition_animation_manager_android.cc",
-      "navigation_transitions/back_forward_transition_animation_manager_android.h",
-      "navigation_transitions/back_forward_transition_animator.cc",
-      "navigation_transitions/back_forward_transition_animator.h",
-      "navigation_transitions/blur_transition_animation_manager.cc",
-      "navigation_transitions/blur_transition_animation_manager.h",
-      "navigation_transitions/physics_model.cc",
-      "navigation_transitions/physics_model.h",
-      "navigation_transitions/progress_bar.cc",
-      "navigation_transitions/progress_bar.h",
-      "renderer_host/android_spare_renderer_navigation_throttle.cc",
-      "renderer_host/android_spare_renderer_navigation_throttle.h",
-      "renderer_host/compositor_dependencies_android.cc",
-      "renderer_host/compositor_dependencies_android.h",
-      "renderer_host/compositor_impl_android.cc",
-      "renderer_host/compositor_impl_android.h",
-      "renderer_host/delegated_frame_host_client_android.cc",
-      "renderer_host/delegated_frame_host_client_android.h",
-      "renderer_host/input/fling_scheduler_android.cc",
-      "renderer_host/input/fling_scheduler_android.h",
-      "renderer_host/input/input_transfer_handler_android.cc",
-      "renderer_host/input/input_transfer_handler_android.h",
-      "renderer_host/input/synthetic_gesture_target_android.cc",
-      "renderer_host/input/synthetic_gesture_target_android.h",
-      "renderer_host/input/touch_selection_controller_client_manager_android.cc",
-      "renderer_host/input/touch_selection_controller_client_manager_android.h",
-      "renderer_host/navigation_controller_android.cc",
-      "renderer_host/navigation_controller_android.h",
-      "renderer_host/navigation_transitions/navigation_entry_screenshot.cc",
-      "renderer_host/navigation_transitions/navigation_entry_screenshot.h",
-      "renderer_host/navigation_transitions/navigation_entry_screenshot_cache.cc",
-      "renderer_host/navigation_transitions/navigation_entry_screenshot_cache.h",
-      "renderer_host/navigation_transitions/navigation_entry_screenshot_manager.cc",
-      "renderer_host/navigation_transitions/navigation_entry_screenshot_manager.h",
-      "renderer_host/navigation_transitions/navigation_transition_config.cc",
-      "renderer_host/navigation_transitions/navigation_transition_config.h",
-      "renderer_host/navigation_transitions/navigation_transition_utils.cc",
-      "renderer_host/navigation_transitions/navigation_transition_utils.h",
-      "renderer_host/render_frame_host_android.cc",
-      "renderer_host/render_frame_host_android.h",
-      "renderer_host/render_widget_host_view_android.cc",
-      "renderer_host/render_widget_host_view_android.h",
-      "renderer_host/screen_state.cc",
-      "renderer_host/screen_state.h",
-      "screen_orientation/screen_orientation_delegate_android.cc",
-      "screen_orientation/screen_orientation_delegate_android.h",
-      "sms/sms_provider_gms.cc",
-      "sms/sms_provider_gms.h",
-      "speech/speech_recognizer_impl_android.cc",
-      "speech/speech_recognizer_impl_android.h",
-      "speech/tts_android.cc",
-      "speech/tts_android.h",
-      "speech/tts_environment_android_impl.cc",
-      "speech/tts_environment_android_impl.h",
-      "web_contents/view_structure_builder_android.cc",
-      "web_contents/view_structure_builder_android.h",
-      "web_contents/web_contents_android.cc",
-      "web_contents/web_contents_android.h",
-      "web_contents/web_contents_view_android.cc",
-      "web_contents/web_contents_view_android.h",
-    ]
+  # Not Android.
+  sources += [
+    # The WebAuthn devtools protocol API is not supported in Android yet.
+    "$target_gen_dir/devtools/protocol/web_authn.cc",
+    "$target_gen_dir/devtools/protocol/web_authn.h",
+    "devtools/protocol/webauthn_handler.cc",
+    "devtools/protocol/webauthn_handler.h",
+    "media/session/audio_focus_delegate_default.cc",
 
-    deps += [
-      ":fontations_name_table_ffi",
-      ":reflection_jni_headers",
-      "//cc/slim",
-      "//components/origin_matcher",
-      "//components/tracing:graphics_provider",
-      "//content/public/android:browser_jni",
-      "//content/public/browser:transfer_input_to_viz_result_enum",
-      "//device/gamepad/public/mojom",
-      "//gpu/command_buffer/service:gles2",
-      "//media",
-      "//third_party/blink/public/common:font_unique_name_table_proto",
-      "//third_party/blink/public/mojom:mojom_platform_blink",
-      "//third_party/icu",
-      "//third_party/jni_zero",
-      "//ui/accessibility:ax_assistant",
-      "//ui/accessibility:ax_base_android",
-      "//ui/accessibility/mojom",
-      "//ui/accessibility/mojom:ax_assistant_mojom",
-      "//ui/android",
-      "//ui/android:ui_android_jni_headers",
-      "//ui/compositor",
-      "//ui/gfx/animation/keyframe",
-      "//url",
-    ]
-    if (enable_vulkan) {
-      deps += [ "//gpu/vulkan/init" ]
-    }
-    libs += [ "jnigraphics" ]
-  } else {
-    # Not Android.
-    sources += [
-      # The WebAuthn devtools protocol API is not supported in Android yet.
-      "$target_gen_dir/devtools/protocol/web_authn.cc",
-      "$target_gen_dir/devtools/protocol/web_authn.h",
-      "devtools/protocol/webauthn_handler.cc",
-      "devtools/protocol/webauthn_handler.h",
-      "media/session/audio_focus_delegate_default.cc",
+    # The Direct Sockets API is not implemented on Android.
+    "direct_sockets/direct_sockets_service_impl.cc",
+    "direct_sockets/direct_sockets_service_impl.h",
 
-      # The Direct Sockets API is not implemented on Android.
-      "direct_sockets/direct_sockets_service_impl.cc",
-      "direct_sockets/direct_sockets_service_impl.h",
+    # These fetch web app tasks, used by getInstalledRelatedApps API, are not
+    # supported in Android.
+    "installedapp/fetch_related_web_apps_task.cc",
+    "installedapp/fetch_related_web_apps_task.h",
 
-      # These fetch web app tasks, used by getInstalledRelatedApps API, are not
-      # supported in Android.
-      "installedapp/fetch_related_web_apps_task.cc",
-      "installedapp/fetch_related_web_apps_task.h",
+    # Support for restricting NetworkService disk access to a certain path.
+    # Not available on Android.
+    "network_sandbox.cc",
+    "network_sandbox.h",
 
-      # Support for restricting NetworkService disk access to a certain path.
-      # Not available on Android.
-      "network_sandbox.cc",
-      "network_sandbox.h",
+    # WebHID is not supported in service workers on Android
+    "service_worker/service_worker_hid_delegate_observer.cc",
+    "service_worker/service_worker_hid_delegate_observer.h",
 
-      # WebHID is not supported in service workers on Android
-      "service_worker/service_worker_hid_delegate_observer.cc",
-      "service_worker/service_worker_hid_delegate_observer.h",
+    # Most speech code is non-Android.
+    "tracing/tracing_ui.cc",
+    "tracing/tracing_ui.h",
 
-      # Most speech code is non-Android.
-      "tracing/tracing_ui.cc",
-      "tracing/tracing_ui.h",
+    # Most webauth code is non-Android
+    "webauth/authenticator_common_impl.cc",
+    "webauth/authenticator_common_impl.h",
+    "webauth/authenticator_environment.cc",
+    "webauth/authenticator_environment.h",
+    "webauth/authenticator_impl.cc",
+    "webauth/authenticator_impl.h",
+    "webauth/default_authenticator_request_client_delegate.cc",
+    "webauth/default_authenticator_request_client_delegate.h",
+    "webauth/is_uvpaa.cc",
+    "webauth/is_uvpaa.h",
+    "webauth/virtual_authenticator.cc",
+    "webauth/virtual_authenticator.h",
+    "webauth/virtual_authenticator_manager_impl.cc",
+    "webauth/virtual_authenticator_manager_impl.h",
+    "webauth/virtual_discovery.cc",
+    "webauth/virtual_discovery.h",
+    "webauth/virtual_fido_discovery_factory.cc",
+    "webauth/virtual_fido_discovery_factory.h",
 
-      # Most webauth code is non-Android
-      "webauth/authenticator_common_impl.cc",
-      "webauth/authenticator_common_impl.h",
-      "webauth/authenticator_environment.cc",
-      "webauth/authenticator_environment.h",
-      "webauth/authenticator_impl.cc",
-      "webauth/authenticator_impl.h",
-      "webauth/default_authenticator_request_client_delegate.cc",
-      "webauth/default_authenticator_request_client_delegate.h",
-      "webauth/is_uvpaa.cc",
-      "webauth/is_uvpaa.h",
-      "webauth/virtual_authenticator.cc",
-      "webauth/virtual_authenticator.h",
-      "webauth/virtual_authenticator_manager_impl.cc",
-      "webauth/virtual_authenticator_manager_impl.h",
-      "webauth/virtual_discovery.cc",
-      "webauth/virtual_discovery.h",
-      "webauth/virtual_fido_discovery_factory.cc",
-      "webauth/virtual_fido_discovery_factory.h",
+    # Cross-device digital credentials flows are handled by Play Services on
+    # Android, not the browser.
+    "digital_credentials/cross_device_request_dispatcher.cc",
+    "digital_credentials/cross_device_request_dispatcher.h",
+    "digital_credentials/cross_device_transaction_impl.cc",
+    "digital_credentials/cross_device_transaction_impl.h",
+  ]
 
-      # Cross-device digital credentials flows are handled by Play Services on
-      # Android, not the browser.
-      "digital_credentials/cross_device_request_dispatcher.cc",
-      "digital_credentials/cross_device_request_dispatcher.h",
-      "digital_credentials/cross_device_transaction_impl.cc",
-      "digital_credentials/cross_device_transaction_impl.h",
-    ]
+  sources += []
 
-    sources += []
+  deps += [ "//media/mojo/mojom:web_speech_recognition" ]
 
-    deps += [ "//media/mojo/mojom:web_speech_recognition" ]
-
-    deps += [
-      "//components/device_event_log",
-      "//components/password_manager/core/common",
-      "//components/vector_icons",
-      "//components/webauthn/json",
-      "//content/browser/tracing:resources",
-      "//media/mojo/mojom:speech_recognition",
-      "//ui/base",
-    ]
-  }
+  deps += [
+    "//components/device_event_log",
+    "//components/password_manager/core/common",
+    "//components/vector_icons",
+    "//components/webauthn/json",
+    "//content/browser/tracing:resources",
+    "//media/mojo/mojom:speech_recognition",
+    "//ui/base",
+  ]
 
   deps += [ "//components/crash/content/browser/error_reporting" ]
 

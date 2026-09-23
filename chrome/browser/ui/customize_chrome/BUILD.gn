@@ -34,19 +34,8 @@ source_set("customize_chrome_base") {
     "//chrome/browser/ui/side_panel:side_panel_views_dependent",
   ]
 
-  if (is_android) {
-    sources += [
-      "side_panel_controller_android.cc",
-      "side_panel_controller_android.h",
-    ]
-    deps += [
-      ":jni_headers",
-      "//ui/android",
-    ]
-  } else {
-    deps += [
-      "//chrome/browser/search/background",
-      "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
-    ]
-  }
+  deps += [
+    "//chrome/browser/search/background",
+    "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
+  ]
 }

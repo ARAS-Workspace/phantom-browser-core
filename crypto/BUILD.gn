@@ -250,15 +250,7 @@ test("crypto_unittests") {
     }
   }
 
-  if (is_ios) {
-    # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-    # enable the diagnostic by removing this line.
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-
-    deps += [ ":unittests_bundle_data" ]
-  } else {
-    data = [ "test/data/" ]
-  }
+  data = [ "test/data/" ]
 
   if (is_mac) {
     sources += [ "user_verifying_key_mac_unittest.mm" ]

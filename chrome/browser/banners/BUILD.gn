@@ -9,17 +9,13 @@ source_set("banners") {
     "//components/webapps/browser",
   ]
 
-  if (is_android) {
-    sources += [ "android/chrome_app_banner_manager_android.h" ]
-  } else {
-    sources += [ "app_banner_manager_desktop.h" ]
-    public_deps += [
-      "//chrome/browser/ui/web_applications",
-      "//chrome/browser/web_applications",
-      "//components/webapps/common",
-      "//content/public/browser",
-    ]
-  }
+  sources += [ "app_banner_manager_desktop.h" ]
+  public_deps += [
+    "//chrome/browser/ui/web_applications",
+    "//chrome/browser/web_applications",
+    "//components/webapps/common",
+    "//content/public/browser",
+  ]
 }
 
 # TODO(crbug.com/353332589): :banners and :impl can be merged once
@@ -33,31 +29,17 @@ source_set("impl") {
     "//third_party/blink/public/common",
   ]
 
-  if (is_android) {
-    sources += [ "android/chrome_app_banner_manager_android.cc" ]
-    deps += [
-      "//chrome/browser:browser_process",
-      "//chrome/browser/android/webapk:webapk_sources",
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/segmentation_platform",
-      "//chrome/common:chrome_features",
-      "//components/site_engagement/content",
-      "//components/webapps/browser/android:webapps_java_enums_srcjar",
-      "//content/public/browser",
-    ]
-  } else {
-    sources += [ "app_banner_manager_desktop.cc" ]
-    deps += [
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/web_applications",
-      "//chrome/browser/web_applications",
-      "//chrome/browser/web_applications/mojom:mojom_web_apps_enum",
-      "//chrome/browser/web_applications/proto",
-      "//components/webapps/browser:constants",
-      "//extensions/browser",
-      "//extensions/common:common_constants",
-    ]
-  }
+  sources += [ "app_banner_manager_desktop.cc" ]
+  deps += [
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/web_applications",
+    "//chrome/browser/web_applications",
+    "//chrome/browser/web_applications/mojom:mojom_web_apps_enum",
+    "//chrome/browser/web_applications/proto",
+    "//components/webapps/browser:constants",
+    "//extensions/browser",
+    "//extensions/common:common_constants",
+  ]
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }
 

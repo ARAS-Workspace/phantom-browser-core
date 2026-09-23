@@ -18,9 +18,5 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    sources += [ "cross_device_theme_tracker_android_unittest.cc" ]
-  } else {
-    sources += [ "cross_device_theme_tracker_unittest.cc" ]
-  }
+  sources += [ "cross_device_theme_tracker_unittest.cc" ]
 }

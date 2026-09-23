@@ -11,18 +11,13 @@ source_set("page_info") {
   ]
   public_deps = []
 
-  if (is_android) {
-    sources += [ "chrome_page_info_client.h" ]
-    public_deps += [ "//components/page_info/android" ]
-  } else {
-    sources += [
-      "about_this_site_side_panel.h",
-      "merchant_trust_side_panel.h",
-      "page_info_dialog.h",
-      "page_info_infobar_delegate.h",
-    ]
-    public_deps += [ "//ui/views" ]
-  }
+  sources += [
+    "about_this_site_side_panel.h",
+    "merchant_trust_side_panel.h",
+    "page_info_dialog.h",
+    "page_info_infobar_delegate.h",
+  ]
+  public_deps += [ "//ui/views" ]
   public_deps += [
     "//base",
     "//chrome/browser/infobars",
@@ -50,24 +45,20 @@ source_set("impl") {
     "//chrome/browser/vr",
   ]
 
-  if (is_android) {
-    sources += [ "chrome_page_info_client.cc" ]
-  } else {
-    sources += [
-      "page_info_dialog.cc",
-      "page_info_infobar_delegate.cc",
-    ]
-    deps += [
-      "//chrome/browser:certificate_viewer",
-      "//chrome/browser/extensions",
-      "//chrome/browser/smart_card",
-      "//chrome/browser/ui:chrome_pages",
-      "//chrome/browser/ui/browser_web_contents_delegate",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/web_applications",
-      "//chrome/browser/web_applications",
-    ]
-  }
+  sources += [
+    "page_info_dialog.cc",
+    "page_info_infobar_delegate.cc",
+  ]
+  deps += [
+    "//chrome/browser:certificate_viewer",
+    "//chrome/browser/extensions",
+    "//chrome/browser/smart_card",
+    "//chrome/browser/ui:chrome_pages",
+    "//chrome/browser/ui/browser_web_contents_delegate",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/web_applications",
+    "//chrome/browser/web_applications",
+  ]
   deps += [
     ":page_info",
     "//base",

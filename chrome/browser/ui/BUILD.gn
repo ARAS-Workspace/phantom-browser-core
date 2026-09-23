@@ -242,16 +242,11 @@ source_set("browser_ui_prefs") {
 
 source_set("browser_otr_state") {
   public = [ "browser_otr_state.h" ]
-  if (is_android) {
-    sources = [ "browser_otr_state_android.cc" ]
-    deps = [ "//chrome/browser/ui/android/tab_model" ]
-  } else {
-    sources = [ "browser_otr_state.cc" ]
-    deps = [
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui/browser_window",
-    ]
-  }
+  sources = [ "browser_otr_state.cc" ]
+  deps = [
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui/browser_window",
+  ]
 }
 
 if (!is_android) {
@@ -1172,525 +1167,477 @@ static_library("ui") {
     deps += [ "//chrome/browser/enterprise/data_controls" ]
   }
 
-  if (is_android) {
-    sources += [ "screen_capture_notification_ui_stub.cc" ]
+  # !is_android
+  sources += [
+    # This file physically lives in //chrome/browser but is compiled here so
+    # that //chrome/browser:browser has no remaining sources. It registers
+    # WebUI interface binders for desktop, which need this target's headers.
+    "//chrome/browser/chrome_browser_interface_binders_webui_parts_desktop.cc",
+    "browser.cc",
+    "browser.h",
+    "browser_command_controller.cc",
+    "browser_command_controller.h",
+    "browser_commands.cc",
+    "browser_commands.h",
+    "browser_content_setting_bubble_model_delegate.cc",
+    "browser_content_setting_bubble_model_delegate.h",
+    "browser_init_state.cc",
+    "browser_init_state.h",
+    "browser_live_tab_context.cc",
+    "browser_live_tab_context.h",
+    "browser_manager_service.cc",
+    "browser_manager_service.h",
+    "browser_manager_service_factory.cc",
+    "browser_manager_service_factory.h",
+    "browser_tab_menu_model_delegate.cc",
+    "browser_tab_menu_model_delegate.h",
+    "browser_tab_restorer.cc",
+    "browser_tab_strip_model_delegate.cc",
+    "browser_tabrestore.cc",
+    "browser_tabrestore.h",
+    "browser_tabstrip.cc",
+    "browser_tabstrip.h",
+    "browser_window.h",
+    "browser_window_deleter.cc",
+    "browser_window_deleter.h",
+    "browser_window_state.cc",
+    "browser_window_state.h",
+    "browser_window_theme_observer.cc",
+    "browser_window_theme_observer.h",
+    "chrome_pages.cc",
+    "intent_picker_tab_helper.cc",
+    "intent_picker_tab_helper.h",
+    "scoped_tabbed_browser_displayer.cc",
+    "scoped_tabbed_browser_displayer.h",
+    "singleton_tabs.cc",
+    "singleton_tabs.h",
+    "tab_ui_helper.cc",
+    "tab_ui_helper.h",
+    "unload_controller.cc",
+    "unload_controller.h",
+    "views/search_engine_choice/search_engine_choice_dialog_view.cc",
+    "views/search_engine_choice/search_engine_choice_dialog_view.h",
+  ]
 
+  # Non-android deps for "ui" target.
+  deps += [
+    ":accelerator_table",
+    ":browser_actions",
+    ":browser_select_file_dialog_controller",
+    ":collected_cookies_infobar_delegate",
+    ":confirm_bubble_model",
+    ":focus_tab_after_navigation_helper",
+    ":layout_constants",
+    ":uma_browsing_activity_observer",
+    "//base",
+    "//chrome/app/vector_icons",
+    "//chrome/browser:chrome_browser_interface_binders_webui_parts",
+    "//chrome/browser/app_mode",
+    "//chrome/browser/apps/app_service",
+    "//chrome/browser/apps/app_service/app_icon",
+    "//chrome/browser/apps/link_capturing",
+    "//chrome/browser/background",
+    "//chrome/browser/bluetooth",
+    "//chrome/browser/custom_handlers",
+    "//chrome/browser/device_api",
+    "//chrome/browser/first_party_sets",
+    "//chrome/browser/lifetime:termination_notification",
+    "//chrome/browser/password_manager/factories",
+    "//chrome/browser/record_replay",
+    "//chrome/browser/record_replay:impl",
+    "//chrome/browser/send_tab_to_self",
+    "//chrome/browser/speech",
+    "//chrome/browser/subscription_eligibility",
+    "//chrome/browser/ui/browser_ui_controller",
+    "//chrome/browser/ui/browser_ui_controller:impl",
+    "//chrome/browser/ui/browser_web_contents_delegate",
+    "//chrome/browser/ui/browser_window:create_browser_window",
+    "//chrome/browser/ui/desktop_to_mobile_promos:controller",
+    "//chrome/browser/ui/desktop_to_mobile_promos:service",
+    "//chrome/browser/ui/focus",
+    "//chrome/browser/ui/focus:impl",
+    "//chrome/browser/ui/fullscreen",
+    "//chrome/browser/ui/fullscreen:impl",
+    "//chrome/browser/ui/passwords/bubble_controllers",
+    "//chrome/browser/ui/passwords/bubble_controllers:impl",
+    "//chrome/browser/ui/passwords/settings",
+    "//chrome/browser/ui/passwords/settings:impl",
+    "//chrome/browser/ui/performance_controls",
+    "//chrome/browser/ui/performance_controls:impl",
+    "//chrome/browser/ui/search_engine_choice",
+    "//chrome/browser/ui/search_engine_choice:impl",
+    "//chrome/browser/ui/shared_highlighting",
+    "//chrome/browser/ui/tab_sharing",
+    "//chrome/browser/ui/tab_sharing:impl",
+    "//chrome/browser/ui/tabs/saved_tab_groups",
+    "//chrome/browser/ui/tabs/saved_tab_groups:impl",
+    "//chrome/browser/ui/task_manager",
+    "//chrome/browser/ui/thumbnails",
+    "//chrome/browser/ui/views/data_sharing",
+    "//chrome/browser/ui/views/data_sharing:impl",
+    "//chrome/browser/ui/waap:window_metrics_manager",
+    "//chrome/browser/ui/web_applications",
+    "//chrome/browser/ui/web_applications:impl",
+    "//chrome/browser/ui/web_applications:launch_utils",
+    "//chrome/browser/ui/webui/access_code_cast",
+    "//chrome/browser/ui/webui/access_code_cast:impl",
+    "//chrome/browser/ui/webui/bookmarks",
+    "//chrome/browser/ui/webui/data_sharing:impl",
+    "//chrome/browser/ui/webui/iwa_dev",
+    "//chrome/browser/ui/webui/iwa_dev:mojo_bindings",
+    "//chrome/browser/ui/webui/new_tab_page_third_party",
+    "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
+    "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
+    "//chrome/browser/ui/webui/ntp_microsoft_auth",
+    "//chrome/browser/ui/webui/omnibox",
+    "//chrome/browser/ui/webui/omnibox/logging:mojo_bindings",
+    "//chrome/browser/ui/webui/omnibox_everywhere",
+    "//chrome/browser/ui/webui/omnibox_popup",
+    "//chrome/browser/ui/webui/side_panel/history:impl",
+    "//chrome/browser/ui/webui/side_panel/history_clusters:impl",
+    "//chrome/browser/ui/webui/tab_search",
+    "//chrome/browser/ui/webui/user_education_internals",
+    "//chrome/browser/ui/webui/util:impl",
+    "//chrome/browser/ui/webui/web_app_internals",
+    "//chrome/browser/ui/window_feature_controller",
+    "//chrome/browser/usb",
+    "//components/privacy_sandbox:features",
+
+    # No reason for this dependencies be out of alphabetical order.
+    "//chrome/browser/content_extraction",
+    "//chrome/browser/download",
+    "//chrome/browser/download:impl",
+    "//chrome/browser/hid",
+    "//chrome/browser/hid:impl",
+    "//chrome/browser/media/router",
+    "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
+    "//chrome/browser/metrics/desktop_session_duration",
+    "//chrome/browser/reading_list",
+    "//chrome/browser/regional_capabilities",
+    "//chrome/browser/safe_browsing",
+    "//chrome/browser/safe_browsing:advanced_protection",
+    "//chrome/browser/screen_ai:screen_ai_service_router_factory",
+    "//chrome/browser/smart_card",
+    "//chrome/browser/support_tool",
+    "//chrome/browser/tab_group_sync:utils",
+    "//chrome/browser/themes",
+    "//chrome/browser/ui/apps",
+    "//chrome/browser/ui/apps:impl",
+    "//chrome/browser/ui/bookmarks",
+    "//chrome/browser/ui/bookmarks:impl",
+    "//chrome/browser/ui/commerce",
+    "//chrome/browser/ui/content_settings",
+    "//chrome/browser/ui/content_settings:impl",
+    "//chrome/browser/ui/customize_chrome",
+    "//chrome/browser/ui/exclusive_access",
+    "//chrome/browser/ui/extensions:extensions_menu_handler",
+    "//chrome/browser/ui/feature_first_run",
+    "//chrome/browser/ui/feature_first_run:impl",
+    "//chrome/browser/ui/global_error",
+    "//chrome/browser/ui/global_media_controls",
+    "//chrome/browser/ui/global_media_controls:impl",
+    "//chrome/browser/ui/media_router",
+    "//chrome/browser/ui/media_router:impl",
+    "//chrome/browser/ui/permission_bubble",
+    "//chrome/browser/ui/signin",
+    "//chrome/browser/ui/signin:impl",
+    "//chrome/browser/ui/tabs",
+    "//chrome/browser/ui/tabs:favicon_theming",
+    "//chrome/browser/ui/tabs:impl",
+    "//chrome/browser/ui/tabs:tab_group_impl",
+    "//chrome/browser/ui/tabs:tab_menu",
+    "//chrome/browser/ui/tabs:tab_menu_impl",
+    "//chrome/browser/ui/tabs:tab_model_impl",
+    "//chrome/browser/ui/tabs:tab_strip_impl",
+    "//chrome/browser/ui/tabs:tab_strip_model_observer_impl",
+    "//chrome/browser/ui/tabs/alert:impl",
+    "//chrome/browser/ui/tabs/back_to_opener",
+    "//chrome/browser/ui/tabs/tab_drag_api",
+    "//chrome/browser/ui/tabs/tab_strip_api",
+    "//chrome/browser/ui/toasts",
+    "//chrome/browser/ui/toasts:impl",
+    "//chrome/browser/ui/toolbar/cast",
+    "//chrome/browser/ui/toolbar/cast:impl",
+    "//chrome/browser/ui/toolbar/pinned_toolbar",
+    "//chrome/browser/ui/toolbar/pinned_toolbar:impl",
+    "//chrome/browser/ui/user_education",
+    "//chrome/browser/ui/user_education:impl",
+    "//chrome/browser/ui/views/app_menu",
+    "//chrome/browser/ui/views/app_menu:impl",
+    "//chrome/browser/ui/views/js_optimization",
+    "//chrome/browser/ui/views/location_bar",
+    "//chrome/browser/ui/views/new_tab_footer",
+    "//chrome/browser/ui/views/picture_in_picture",
+    "//chrome/browser/ui/views/toolbar",
+    "//chrome/browser/ui/views/toolbar:impl",
+    "//chrome/browser/ui/views/zoom",
+    "//chrome/browser/ui/webui/app_management",
+    "//chrome/browser/ui/webui/browser_command",
+    "//chrome/browser/ui/webui/color_pipeline_internals",
+    "//chrome/browser/ui/webui/commerce",
+    "//chrome/browser/ui/webui/commerce:impl",
+    "//chrome/browser/ui/webui/cr_components/history_clusters",
+    "//chrome/browser/ui/webui/cr_components/history_embeddings",
+    "//chrome/browser/ui/webui/customize_buttons",
+    "//chrome/browser/ui/webui/customize_buttons:impl",
+    "//chrome/browser/ui/webui/infobar_internals",
+    "//chrome/browser/ui/webui/inspect",
+    "//chrome/browser/ui/webui/metrics_reporter",
+    "//chrome/browser/ui/webui/metrics_reporter:impl",
+    "//chrome/browser/ui/webui/new_tab_footer",
+    "//chrome/browser/ui/webui/new_tab_footer:impl",
+    "//chrome/browser/ui/webui/settings",
+    "//chrome/browser/ui/webui/settings:impl",
+    "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
+    "//chrome/browser/ui/webui/side_panel/comments:impl",
+    "//chrome/browser/ui/webui/side_panel/customize_chrome:impl",
+    "//chrome/browser/ui/webui/side_panel/reading_list:impl",
+    "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices:impl",
+    "//chrome/browser/ui/webui/signin",
+    "//chrome/browser/ui/webui/signin:login_ui_service_impl",
+    "//chrome/browser/ui/webui/signin:signin_impl",
+    "//chrome/browser/ui/webui/top_chrome",
+    "//chrome/browser/ui/webui/top_chrome:impl",
+    "//chrome/browser/ui/webui/util",
+    "//chrome/browser/ui/webui/webui_toolbar",
+    "//chrome/browser/ui/webui/webui_toolbar:impl",
+    "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
+    "//chrome/browser/ui/webui/whats_new",
+    "//chrome/browser/ui/webui/whats_new:impl",
+    "//chrome/browser/ui/webui_browser",
+    "//chrome/browser/ui/webui_browser:impl",
+    "//chrome/browser/ui/window_sizer",
+    "//chrome/browser/ui/window_sizer:impl",
+    "//chrome/browser/visited_url_ranking:impl",
+    "//chrome/browser/web_applications",
+    "//chrome/browser/web_applications:features",
+    "//components/app_constants",
+    "//components/autofill/core/browser",
+    "//components/commerce/core:feature_list",
+    "//components/commerce/core:shopping_service",
+    "//components/multistep_filter/core:features",
+    "//components/notebooks/internals/webui",
+    "//components/paint_preview/public",
+    "//components/password_manager/content/common",
+    "//components/password_manager/core/browser/leak_detection",
+    "//components/private_ai",
+    "//components/services/app_service",
+    "//components/ui_metrics",
+    "//components/url_formatter",
+    "//components/user_education/webui",
+    "//components/webapps/isolated_web_apps",
+    "//device/bluetooth",
+    "//device/bluetooth/strings:strings_grit",
+    "//device/fido",
+    "//services/preferences/tracked",
+    "//third_party/blink/public/common:headers",
+    "//ui/color/dynamic_color",
+    "//ui/events",
+  ]
+
+  # Non-android public_deps for "ui" target.
+  public_deps += [
+    "//chrome/browser/importer",
+    "//chrome/browser/importer:impl",
+    "//chrome/browser/personal_context/first_run",
+    "//chrome/browser/ui/commerce",
+    "//chrome/browser/ui/read_anything",
+    "//chrome/browser/ui/views/side_panel",
+    "//chrome/browser/ui/waap:manager",
+    "//chrome/browser/ui/webui/data_sharing",
+    "//chrome/browser/ui/webui/feedback",
+    "//chrome/browser/ui/webui/feedback:impl",
+    "//chrome/browser/ui/webui/media_router",
+    "//chrome/browser/ui/webui/multistep_filter_internals",
+    "//chrome/browser/ui/webui/on_device_internals",
+    "//chrome/browser/ui/webui/search_engine_choice",
+    "//chrome/browser/ui/webui/side_panel/bookmarks",
+    "//chrome/browser/ui/webui/side_panel/comments",
+    "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
+    "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar",
+    "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",
+    "//chrome/browser/ui/webui/side_panel/history",
+    "//chrome/browser/ui/webui/side_panel/history_clusters",
+    "//chrome/browser/ui/webui/side_panel/read_anything",
+    "//chrome/browser/ui/webui/side_panel/reading_list",
+    "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices",
+    "//chrome/browser/ui/webui/util",
+    "//chrome/browser/ui/webui/webnn_internals",
+  ]
+
+  if (use_aura) {
+    public_deps += [ "//chrome/browser/ui:overscroll_pref_manager" ]
+  }
+
+  if (!is_android) {
     deps += [
-      "//chrome/browser/android/webapk:webapk_sources",
-      "//chrome/browser/autofill/android:jni_headers",
-      "//chrome/browser/facilitated_payments",
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/keyboard_accessory/android",
-      "//chrome/browser/keyboard_accessory/android:impl",
-      "//chrome/browser/password_manager/android:utils",
-      "//chrome/browser/ui/android/hats",
-      "//chrome/browser/ui/android/hats:impl",
-      "//chrome/browser/ui/android/tab_model",
-      "//chrome/browser/ui/android/tab_model:impl",
-      "//chrome/browser/ui/android/toolbar:adaptive_jni_headers",
-      "//chrome/browser/ui/android/toolbar:jni_headers",
-      "//chrome/browser/ui/exclusive_access",
-      "//chrome/browser/ui/safety_hub",
-      "//chrome/browser/ui/webui/notifications_internals",
-      "//chrome/browser/ui/webui/notifications_internals:impl",
-      "//components/android_autofill/browser:android",
-      "//components/autofill/android:payments_jni_headers",
-      "//components/browser_ui/accessibility/android",
-      "//components/browser_ui/client_certificate/android",
-      "//components/embedder_support/android:context_menu",
-      "//components/embedder_support/android:web_contents_delegate",
-      "//components/javascript_dialogs/android:jni_headers",
-      "//components/messages/android:feature_flags",
-      "//components/navigation_interception",
-      "//components/page_info/android",
-      "//components/password_manager/core/browser",
-      "//components/resources:android_resources",
-      "//components/security_state/content/android",
-      "//components/sensitive_content",
-      "//components/webauthn/android",
-      "//content/public/browser",
-      "//third_party/jni_zero",
-      "//ui/android",
-      "//url",
+      "//chrome/browser/download/bubble",
+      "//chrome/browser/download/bubble:impl",
     ]
+  }
 
+  # Any circular includes must depend on the target
+  # "//chrome/browser:browser_public_dependencies". Non-android circular
+  # dependencies
+  allow_circular_includes_from += [
+    # history_embeddings includes headers from //chrome/browser/ui (e.g.
+    # browser.h, browser_window.h) that can't be split out yet.
+    "//chrome/browser/ui/webui/cr_components/history_embeddings",
+
+    # history includes headers from //chrome/browser/ui (e.g. browser.h)
+    # that can't be split out yet.
+    "//chrome/browser/ui/webui/history",
+
+    # browser_command_handler.cc includes browser.h, browser_commands.h,
+    # etc. from //chrome/browser/ui:ui.
+    "//chrome/browser/ui/webui/browser_command",
+
+    # inspect_ui.cc includes browser.h, singleton_tabs.h.
+    "//chrome/browser/ui/webui/inspect",
+
+    # These side panel UIs include loose headers that remain in
+    # //chrome/browser/ui:ui (browser.h, browser_window.h, browser_commands.h,
+    # views/frame/browser_view.h).
+    "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
+    "//chrome/browser/ui/webui/side_panel/reading_list:impl",
+    "//chrome/browser/ui/webui/side_panel/customize_chrome:impl",
+    "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar",
+    "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",
+
+    # //chrome/browser/ui/webui/util/webui_util_desktop.h is included by
+    # :ui and its implementation is in //chrome/browser/ui/webui/util:impl.
+    "//chrome/browser/ui/webui/util:impl",
+
+    # TODO(crbug.com/40110173): Resolve circular dependencies.
+    "//chrome/browser/ui/desktop_to_mobile_promos:service",
+
+    # TODO(crbug.com/40251079): Remove circular dependencies.
+    "//chrome/browser/apps/app_service",
+
+    # TODO(crbug.com/345487716): Remove circular dependencies.
+    "//chrome/browser/ui/read_anything",
+    "//chrome/browser/ui/views/side_panel",
+
+    # TODO(crbug/com/387527798): Remove circular dependencies.
+    "//chrome/browser/ui/views/download",
+
+    # TODO(crbug.com/40246046): Remove allow_circular_includes_from when
+    # dependencies for controller are fixed.
+
+    # TODO(crbug.com/359593415): Remove allow_circular_includes_from.
+    # //c/b/ui/apps/directory_access_confirmation_dialog.cc includes
+    # //c/b/ui/tab_modal_confirm_dialog_delegate.h.
+    "//chrome/browser/ui/apps:impl",
+    "//chrome/browser/ui/browser_ui_controller:impl",
+    "//chrome/browser/ui/browser_window/internal",
+    "//chrome/browser/ui/find_bar:impl",
+    "//chrome/browser/ui/focus:impl",
+    "//chrome/browser/ui/fullscreen:impl",
+    "//chrome/browser/ui/performance_controls:impl",
+    "//chrome/browser/ui/tabs/saved_tab_groups:impl",
+    "//chrome/browser/ui/toasts:impl",
+    "//chrome/browser/ui/webui/customize_buttons:impl",
+    "//chrome/browser/ui/views/toolbar",
+    "//chrome/browser/ui/views/toolbar:impl",
+    "//chrome/browser/ui/views/new_tab_footer",
+    "//chrome/browser/ui/webui/searchbox",
+    "//chrome/browser/ui/webui/top_chrome:impl",
+    "//chrome/browser/ui/webui_browser",
+    "//chrome/browser/ui/webui_browser:impl",
+
+    # TODO(crbug.com/382237520): Remove this once NTP code is modularized.
+
+    "//chrome/browser/ui/signin:impl",
+    "//chrome/browser/ui/webui/commerce:impl",
+    "//chrome/browser/ui/webui/signin:signin_impl",
+    "//chrome/browser/ui/webui/webui_toolbar:impl",
+    "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
+    "//chrome/browser/ui/webui/whats_new:impl",
+
+    "//chrome/browser/ui/media_router:impl",
+    "//chrome/browser/ui/window_sizer:impl",
+    "//chrome/browser/ui/webui/settings:impl",
+    "//chrome/browser/ui/search_engine_choice:impl",
+    "//chrome/browser/ui/global_media_controls:impl",
+    "//chrome/browser/ui/toolbar/cast:impl",
+    "//chrome/browser/ui/tabs:impl",
+    "//chrome/browser/ui/tabs:tab_group_impl",
+    "//chrome/browser/ui/tabs:tab_model_impl",
+    "//chrome/browser/ui/tabs:tab_strip_impl",
+    "//chrome/browser/ui/bookmarks:impl",
+    "//chrome/browser/ui/desktop_to_mobile_promos:controller",
+
+    # TODO(crbug.com/353332589): Remove this circular dependency when
+    # c/b/ui/browser.h gets componentized.
+    "//chrome/browser/visited_url_ranking:impl",
+
+    # TODO(crbug.com/364667551): It includes quite a few files from //c/b/ui's
+    # subdirectories such as views and webui which are not modularized yet.
+    "//chrome/browser/ui/webui/access_code_cast:impl",
+
+    # TODO(crbug.com/364667551): It includes //c/b/ui/browser.h and
+    # //c/b/ui/browser_window.h.
+    "//chrome/browser/ui/webui/accessibility:impl",
+
+    # TODO(crbug.com/430013958): Remove this circular dependency when
+    # `translate_bubble_factory.cc` stop including c/b/ui/browser_window.h.
+
+    # TODO(crbug.com/430078439): Remove this circular dependency when .cc
+    # files stop including browser.h, browser_window.h.
+    "//chrome/browser/ui/user_education:impl",
+
+    # TODO(crbug.com/432421124): Remove when the following headers aren't
+    # included or get componentized: c/b/ui/browser_dialogs.h,
+    # browser_navigation.h, browser.h.
+    "//chrome/browser/ui/sync:impl",
+
+    # TODO(crbug.com/438226511): Remove this circular dependency when the
+    # following headers get componentized:
+    # - c/b/ui/browser.h, browser_window.h, browser_window_state.h,
+    #   browser_commands.h,
+    #   browser_tabstrip.h, intent_picker_tab_helper.h.
+    "//chrome/browser/ui/web_applications:impl",
+
+    # TODO(crbug.com/438226511): Remove this circular dependency when
+    # c/b/ui/browser.h gets componentized.
+    "//chrome/browser/ui/web_applications:launch_utils",
+
+    # TODO(crbug.com/542827630): Remove this circular dependency when
+    # c/b/ui/browser.h gets componentized.
+    "//chrome/browser/ui/sessions",
+
+    # ntp and ntp_resource_cache include browser_window.h and
+    # layout_constants.h from //chrome/browser/ui.
+    "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
+
+    # omnibox_popup includes browser_window.h and other headers from
+    # //chrome/browser/ui.
+    "//chrome/browser/ui/webui/omnibox_everywhere",
+    "//chrome/browser/ui/webui/omnibox_popup",
+
+    # tab_search includes browser.h, browser_window.h,
+    # plural_string_handler.h, and tab_ui_helper.h from //chrome/browser/ui.
+    "//chrome/browser/ui/webui/tab_search",
+  ]
+
+  if (use_ozone) {
+    deps += [ "//ui/ozone" ]
+  }
+
+  if (is_linux) {
+    deps += [ "//ui/base/ime/linux" ]
+  }
+
+  if (enable_dice_support) {
     deps += [
-      "//chrome/browser/ui/android",
-      "//chrome/browser/ui/android:context_menu_helper",
+      "//chrome/browser/ui/webui/signin/signout_confirmation",
+      "//chrome/browser/ui/webui/signin/signout_confirmation:signout_confirmation_impl",
     ]
-  } else {
-    # !is_android
-    sources += [
-      # This file physically lives in //chrome/browser but is compiled here so
-      # that //chrome/browser:browser has no remaining sources. It registers
-      # WebUI interface binders for desktop, which need this target's headers.
-      "//chrome/browser/chrome_browser_interface_binders_webui_parts_desktop.cc",
-      "browser.cc",
-      "browser.h",
-      "browser_command_controller.cc",
-      "browser_command_controller.h",
-      "browser_commands.cc",
-      "browser_commands.h",
-      "browser_content_setting_bubble_model_delegate.cc",
-      "browser_content_setting_bubble_model_delegate.h",
-      "browser_init_state.cc",
-      "browser_init_state.h",
-      "browser_live_tab_context.cc",
-      "browser_live_tab_context.h",
-      "browser_manager_service.cc",
-      "browser_manager_service.h",
-      "browser_manager_service_factory.cc",
-      "browser_manager_service_factory.h",
-      "browser_tab_menu_model_delegate.cc",
-      "browser_tab_menu_model_delegate.h",
-      "browser_tab_restorer.cc",
-      "browser_tab_strip_model_delegate.cc",
-      "browser_tabrestore.cc",
-      "browser_tabrestore.h",
-      "browser_tabstrip.cc",
-      "browser_tabstrip.h",
-      "browser_window.h",
-      "browser_window_deleter.cc",
-      "browser_window_deleter.h",
-      "browser_window_state.cc",
-      "browser_window_state.h",
-      "browser_window_theme_observer.cc",
-      "browser_window_theme_observer.h",
-      "chrome_pages.cc",
-      "intent_picker_tab_helper.cc",
-      "intent_picker_tab_helper.h",
-      "scoped_tabbed_browser_displayer.cc",
-      "scoped_tabbed_browser_displayer.h",
-      "singleton_tabs.cc",
-      "singleton_tabs.h",
-      "tab_ui_helper.cc",
-      "tab_ui_helper.h",
-      "unload_controller.cc",
-      "unload_controller.h",
-      "views/search_engine_choice/search_engine_choice_dialog_view.cc",
-      "views/search_engine_choice/search_engine_choice_dialog_view.h",
-    ]
+    allow_circular_includes_from += [ "//chrome/browser/ui/webui/signin/signout_confirmation:signout_confirmation_impl" ]
+  }
 
-    # Non-android deps for "ui" target.
-    deps += [
-      ":accelerator_table",
-      ":browser_actions",
-      ":browser_select_file_dialog_controller",
-      ":collected_cookies_infobar_delegate",
-      ":confirm_bubble_model",
-      ":focus_tab_after_navigation_helper",
-      ":layout_constants",
-      ":uma_browsing_activity_observer",
-      "//base",
-      "//chrome/app/vector_icons",
-      "//chrome/browser:chrome_browser_interface_binders_webui_parts",
-      "//chrome/browser/app_mode",
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/apps/app_service/app_icon",
-      "//chrome/browser/apps/link_capturing",
-      "//chrome/browser/background",
-      "//chrome/browser/bluetooth",
-      "//chrome/browser/custom_handlers",
-      "//chrome/browser/device_api",
-      "//chrome/browser/first_party_sets",
-      "//chrome/browser/lifetime:termination_notification",
-      "//chrome/browser/password_manager/factories",
-      "//chrome/browser/record_replay",
-      "//chrome/browser/record_replay:impl",
-      "//chrome/browser/send_tab_to_self",
-      "//chrome/browser/speech",
-      "//chrome/browser/subscription_eligibility",
-      "//chrome/browser/ui/browser_ui_controller",
-      "//chrome/browser/ui/browser_ui_controller:impl",
-      "//chrome/browser/ui/browser_web_contents_delegate",
-      "//chrome/browser/ui/browser_window:create_browser_window",
-      "//chrome/browser/ui/desktop_to_mobile_promos:controller",
-      "//chrome/browser/ui/desktop_to_mobile_promos:service",
-      "//chrome/browser/ui/focus",
-      "//chrome/browser/ui/focus:impl",
-      "//chrome/browser/ui/fullscreen",
-      "//chrome/browser/ui/fullscreen:impl",
-      "//chrome/browser/ui/passwords/bubble_controllers",
-      "//chrome/browser/ui/passwords/bubble_controllers:impl",
-      "//chrome/browser/ui/passwords/settings",
-      "//chrome/browser/ui/passwords/settings:impl",
-      "//chrome/browser/ui/performance_controls",
-      "//chrome/browser/ui/performance_controls:impl",
-      "//chrome/browser/ui/search_engine_choice",
-      "//chrome/browser/ui/search_engine_choice:impl",
-      "//chrome/browser/ui/shared_highlighting",
-      "//chrome/browser/ui/tab_sharing",
-      "//chrome/browser/ui/tab_sharing:impl",
-      "//chrome/browser/ui/tabs/saved_tab_groups",
-      "//chrome/browser/ui/tabs/saved_tab_groups:impl",
-      "//chrome/browser/ui/task_manager",
-      "//chrome/browser/ui/thumbnails",
-      "//chrome/browser/ui/views/data_sharing",
-      "//chrome/browser/ui/views/data_sharing:impl",
-      "//chrome/browser/ui/waap:window_metrics_manager",
-      "//chrome/browser/ui/web_applications",
-      "//chrome/browser/ui/web_applications:impl",
-      "//chrome/browser/ui/web_applications:launch_utils",
-      "//chrome/browser/ui/webui/access_code_cast",
-      "//chrome/browser/ui/webui/access_code_cast:impl",
-      "//chrome/browser/ui/webui/bookmarks",
-      "//chrome/browser/ui/webui/data_sharing:impl",
-      "//chrome/browser/ui/webui/iwa_dev",
-      "//chrome/browser/ui/webui/iwa_dev:mojo_bindings",
-      "//chrome/browser/ui/webui/new_tab_page_third_party",
-      "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
-      "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
-      "//chrome/browser/ui/webui/ntp_microsoft_auth",
-      "//chrome/browser/ui/webui/omnibox",
-      "//chrome/browser/ui/webui/omnibox/logging:mojo_bindings",
-      "//chrome/browser/ui/webui/omnibox_everywhere",
-      "//chrome/browser/ui/webui/omnibox_popup",
-      "//chrome/browser/ui/webui/side_panel/history:impl",
-      "//chrome/browser/ui/webui/side_panel/history_clusters:impl",
-      "//chrome/browser/ui/webui/tab_search",
-      "//chrome/browser/ui/webui/user_education_internals",
-      "//chrome/browser/ui/webui/util:impl",
-      "//chrome/browser/ui/webui/web_app_internals",
-      "//chrome/browser/ui/window_feature_controller",
-      "//chrome/browser/usb",
-      "//components/privacy_sandbox:features",
-
-      # No reason for this dependencies be out of alphabetical order.
-      "//chrome/browser/content_extraction",
-      "//chrome/browser/download",
-      "//chrome/browser/download:impl",
-      "//chrome/browser/hid",
-      "//chrome/browser/hid:impl",
-      "//chrome/browser/media/router",
-      "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
-      "//chrome/browser/metrics/desktop_session_duration",
-      "//chrome/browser/reading_list",
-      "//chrome/browser/regional_capabilities",
-      "//chrome/browser/safe_browsing",
-      "//chrome/browser/safe_browsing:advanced_protection",
-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
-      "//chrome/browser/smart_card",
-      "//chrome/browser/support_tool",
-      "//chrome/browser/tab_group_sync:utils",
-      "//chrome/browser/themes",
-      "//chrome/browser/ui/apps",
-      "//chrome/browser/ui/apps:impl",
-      "//chrome/browser/ui/bookmarks",
-      "//chrome/browser/ui/bookmarks:impl",
-      "//chrome/browser/ui/commerce",
-      "//chrome/browser/ui/content_settings",
-      "//chrome/browser/ui/content_settings:impl",
-      "//chrome/browser/ui/customize_chrome",
-      "//chrome/browser/ui/exclusive_access",
-      "//chrome/browser/ui/extensions:extensions_menu_handler",
-      "//chrome/browser/ui/feature_first_run",
-      "//chrome/browser/ui/feature_first_run:impl",
-      "//chrome/browser/ui/global_error",
-      "//chrome/browser/ui/global_media_controls",
-      "//chrome/browser/ui/global_media_controls:impl",
-      "//chrome/browser/ui/media_router",
-      "//chrome/browser/ui/media_router:impl",
-      "//chrome/browser/ui/permission_bubble",
-      "//chrome/browser/ui/signin",
-      "//chrome/browser/ui/signin:impl",
-      "//chrome/browser/ui/tabs",
-      "//chrome/browser/ui/tabs:favicon_theming",
-      "//chrome/browser/ui/tabs:impl",
-      "//chrome/browser/ui/tabs:tab_group_impl",
-      "//chrome/browser/ui/tabs:tab_menu",
-      "//chrome/browser/ui/tabs:tab_menu_impl",
-      "//chrome/browser/ui/tabs:tab_model_impl",
-      "//chrome/browser/ui/tabs:tab_strip_impl",
-      "//chrome/browser/ui/tabs:tab_strip_model_observer_impl",
-      "//chrome/browser/ui/tabs/alert:impl",
-      "//chrome/browser/ui/tabs/back_to_opener",
-      "//chrome/browser/ui/tabs/tab_drag_api",
-      "//chrome/browser/ui/tabs/tab_strip_api",
-      "//chrome/browser/ui/toasts",
-      "//chrome/browser/ui/toasts:impl",
-      "//chrome/browser/ui/toolbar/cast",
-      "//chrome/browser/ui/toolbar/cast:impl",
-      "//chrome/browser/ui/toolbar/pinned_toolbar",
-      "//chrome/browser/ui/toolbar/pinned_toolbar:impl",
-      "//chrome/browser/ui/user_education",
-      "//chrome/browser/ui/user_education:impl",
-      "//chrome/browser/ui/views/app_menu",
-      "//chrome/browser/ui/views/app_menu:impl",
-      "//chrome/browser/ui/views/js_optimization",
-      "//chrome/browser/ui/views/location_bar",
-      "//chrome/browser/ui/views/new_tab_footer",
-      "//chrome/browser/ui/views/picture_in_picture",
-      "//chrome/browser/ui/views/toolbar",
-      "//chrome/browser/ui/views/toolbar:impl",
-      "//chrome/browser/ui/views/zoom",
-      "//chrome/browser/ui/webui/app_management",
-      "//chrome/browser/ui/webui/browser_command",
-      "//chrome/browser/ui/webui/color_pipeline_internals",
-      "//chrome/browser/ui/webui/commerce",
-      "//chrome/browser/ui/webui/commerce:impl",
-      "//chrome/browser/ui/webui/cr_components/history_clusters",
-      "//chrome/browser/ui/webui/cr_components/history_embeddings",
-      "//chrome/browser/ui/webui/customize_buttons",
-      "//chrome/browser/ui/webui/customize_buttons:impl",
-      "//chrome/browser/ui/webui/infobar_internals",
-      "//chrome/browser/ui/webui/inspect",
-      "//chrome/browser/ui/webui/metrics_reporter",
-      "//chrome/browser/ui/webui/metrics_reporter:impl",
-      "//chrome/browser/ui/webui/new_tab_footer",
-      "//chrome/browser/ui/webui/new_tab_footer:impl",
-      "//chrome/browser/ui/webui/settings",
-      "//chrome/browser/ui/webui/settings:impl",
-      "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
-      "//chrome/browser/ui/webui/side_panel/comments:impl",
-      "//chrome/browser/ui/webui/side_panel/customize_chrome:impl",
-      "//chrome/browser/ui/webui/side_panel/reading_list:impl",
-      "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices:impl",
-      "//chrome/browser/ui/webui/signin",
-      "//chrome/browser/ui/webui/signin:login_ui_service_impl",
-      "//chrome/browser/ui/webui/signin:signin_impl",
-      "//chrome/browser/ui/webui/top_chrome",
-      "//chrome/browser/ui/webui/top_chrome:impl",
-      "//chrome/browser/ui/webui/util",
-      "//chrome/browser/ui/webui/webui_toolbar",
-      "//chrome/browser/ui/webui/webui_toolbar:impl",
-      "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
-      "//chrome/browser/ui/webui/whats_new",
-      "//chrome/browser/ui/webui/whats_new:impl",
-      "//chrome/browser/ui/webui_browser",
-      "//chrome/browser/ui/webui_browser:impl",
-      "//chrome/browser/ui/window_sizer",
-      "//chrome/browser/ui/window_sizer:impl",
-      "//chrome/browser/visited_url_ranking:impl",
-      "//chrome/browser/web_applications",
-      "//chrome/browser/web_applications:features",
-      "//components/app_constants",
-      "//components/autofill/core/browser",
-      "//components/commerce/core:feature_list",
-      "//components/commerce/core:shopping_service",
-      "//components/multistep_filter/core:features",
-      "//components/notebooks/internals/webui",
-      "//components/paint_preview/public",
-      "//components/password_manager/content/common",
-      "//components/password_manager/core/browser/leak_detection",
-      "//components/private_ai",
-      "//components/services/app_service",
-      "//components/ui_metrics",
-      "//components/url_formatter",
-      "//components/user_education/webui",
-      "//components/webapps/isolated_web_apps",
-      "//device/bluetooth",
-      "//device/bluetooth/strings:strings_grit",
-      "//device/fido",
-      "//services/preferences/tracked",
-      "//third_party/blink/public/common:headers",
-      "//ui/color/dynamic_color",
-      "//ui/events",
-    ]
-
-    # Non-android public_deps for "ui" target.
-    public_deps += [
-      "//chrome/browser/importer",
-      "//chrome/browser/importer:impl",
-      "//chrome/browser/personal_context/first_run",
-      "//chrome/browser/ui/commerce",
-      "//chrome/browser/ui/read_anything",
-      "//chrome/browser/ui/views/side_panel",
-      "//chrome/browser/ui/waap:manager",
-      "//chrome/browser/ui/webui/data_sharing",
-      "//chrome/browser/ui/webui/feedback",
-      "//chrome/browser/ui/webui/feedback:impl",
-      "//chrome/browser/ui/webui/media_router",
-      "//chrome/browser/ui/webui/multistep_filter_internals",
-      "//chrome/browser/ui/webui/on_device_internals",
-      "//chrome/browser/ui/webui/search_engine_choice",
-      "//chrome/browser/ui/webui/side_panel/bookmarks",
-      "//chrome/browser/ui/webui/side_panel/comments",
-      "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
-      "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar",
-      "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",
-      "//chrome/browser/ui/webui/side_panel/history",
-      "//chrome/browser/ui/webui/side_panel/history_clusters",
-      "//chrome/browser/ui/webui/side_panel/read_anything",
-      "//chrome/browser/ui/webui/side_panel/reading_list",
-      "//chrome/browser/ui/webui/side_panel/tabs_from_other_devices",
-      "//chrome/browser/ui/webui/util",
-      "//chrome/browser/ui/webui/webnn_internals",
-    ]
-
-    if (use_aura) {
-      public_deps += [ "//chrome/browser/ui:overscroll_pref_manager" ]
-    }
-
-    if (!is_android) {
-      deps += [
-        "//chrome/browser/download/bubble",
-        "//chrome/browser/download/bubble:impl",
-      ]
-    }
-
-    # Any circular includes must depend on the target
-    # "//chrome/browser:browser_public_dependencies". Non-android circular
-    # dependencies
-    allow_circular_includes_from += [
-      # history_embeddings includes headers from //chrome/browser/ui (e.g.
-      # browser.h, browser_window.h) that can't be split out yet.
-      "//chrome/browser/ui/webui/cr_components/history_embeddings",
-
-      # history includes headers from //chrome/browser/ui (e.g. browser.h)
-      # that can't be split out yet.
-      "//chrome/browser/ui/webui/history",
-
-      # browser_command_handler.cc includes browser.h, browser_commands.h,
-      # etc. from //chrome/browser/ui:ui.
-      "//chrome/browser/ui/webui/browser_command",
-
-      # inspect_ui.cc includes browser.h, singleton_tabs.h.
-      "//chrome/browser/ui/webui/inspect",
-
-      # These side panel UIs include loose headers that remain in
-      # //chrome/browser/ui:ui (browser.h, browser_window.h, browser_commands.h,
-      # views/frame/browser_view.h).
-      "//chrome/browser/ui/webui/side_panel/bookmarks:impl",
-      "//chrome/browser/ui/webui/side_panel/reading_list:impl",
-      "//chrome/browser/ui/webui/side_panel/customize_chrome:impl",
-      "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar",
-      "//chrome/browser/ui/webui/side_panel/customize_chrome/wallpaper_search",
-
-      # //chrome/browser/ui/webui/util/webui_util_desktop.h is included by
-      # :ui and its implementation is in //chrome/browser/ui/webui/util:impl.
-      "//chrome/browser/ui/webui/util:impl",
-
-      # TODO(crbug.com/40110173): Resolve circular dependencies.
-      "//chrome/browser/ui/desktop_to_mobile_promos:service",
-
-      # TODO(crbug.com/40251079): Remove circular dependencies.
-      "//chrome/browser/apps/app_service",
-
-      # TODO(crbug.com/345487716): Remove circular dependencies.
-      "//chrome/browser/ui/read_anything",
-      "//chrome/browser/ui/views/side_panel",
-
-      # TODO(crbug/com/387527798): Remove circular dependencies.
-      "//chrome/browser/ui/views/download",
-
-      # TODO(crbug.com/40246046): Remove allow_circular_includes_from when
-      # dependencies for controller are fixed.
-
-      # TODO(crbug.com/359593415): Remove allow_circular_includes_from.
-      # //c/b/ui/apps/directory_access_confirmation_dialog.cc includes
-      # //c/b/ui/tab_modal_confirm_dialog_delegate.h.
-      "//chrome/browser/ui/apps:impl",
-      "//chrome/browser/ui/browser_ui_controller:impl",
-      "//chrome/browser/ui/browser_window/internal",
-      "//chrome/browser/ui/find_bar:impl",
-      "//chrome/browser/ui/focus:impl",
-      "//chrome/browser/ui/fullscreen:impl",
-      "//chrome/browser/ui/performance_controls:impl",
-      "//chrome/browser/ui/tabs/saved_tab_groups:impl",
-      "//chrome/browser/ui/toasts:impl",
-      "//chrome/browser/ui/webui/customize_buttons:impl",
-      "//chrome/browser/ui/views/toolbar",
-      "//chrome/browser/ui/views/toolbar:impl",
-      "//chrome/browser/ui/views/new_tab_footer",
-      "//chrome/browser/ui/webui/searchbox",
-      "//chrome/browser/ui/webui/top_chrome:impl",
-      "//chrome/browser/ui/webui_browser",
-      "//chrome/browser/ui/webui_browser:impl",
-
-      # TODO(crbug.com/382237520): Remove this once NTP code is modularized.
-
-      "//chrome/browser/ui/signin:impl",
-      "//chrome/browser/ui/webui/commerce:impl",
-      "//chrome/browser/ui/webui/signin:signin_impl",
-      "//chrome/browser/ui/webui/webui_toolbar:impl",
-      "//chrome/browser/ui/webui/webui_toolbar/adapters:impl",
-      "//chrome/browser/ui/webui/whats_new:impl",
-
-      "//chrome/browser/ui/media_router:impl",
-      "//chrome/browser/ui/window_sizer:impl",
-      "//chrome/browser/ui/webui/settings:impl",
-      "//chrome/browser/ui/search_engine_choice:impl",
-      "//chrome/browser/ui/global_media_controls:impl",
-      "//chrome/browser/ui/toolbar/cast:impl",
-      "//chrome/browser/ui/tabs:impl",
-      "//chrome/browser/ui/tabs:tab_group_impl",
-      "//chrome/browser/ui/tabs:tab_model_impl",
-      "//chrome/browser/ui/tabs:tab_strip_impl",
-      "//chrome/browser/ui/bookmarks:impl",
-      "//chrome/browser/ui/desktop_to_mobile_promos:controller",
-
-      # TODO(crbug.com/353332589): Remove this circular dependency when
-      # c/b/ui/browser.h gets componentized.
-      "//chrome/browser/visited_url_ranking:impl",
-
-      # TODO(crbug.com/364667551): It includes quite a few files from //c/b/ui's
-      # subdirectories such as views and webui which are not modularized yet.
-      "//chrome/browser/ui/webui/access_code_cast:impl",
-
-      # TODO(crbug.com/364667551): It includes //c/b/ui/browser.h and
-      # //c/b/ui/browser_window.h.
-      "//chrome/browser/ui/webui/accessibility:impl",
-
-      # TODO(crbug.com/430013958): Remove this circular dependency when
-      # `translate_bubble_factory.cc` stop including c/b/ui/browser_window.h.
-
-      # TODO(crbug.com/430078439): Remove this circular dependency when .cc
-      # files stop including browser.h, browser_window.h.
-      "//chrome/browser/ui/user_education:impl",
-
-      # TODO(crbug.com/432421124): Remove when the following headers aren't
-      # included or get componentized: c/b/ui/browser_dialogs.h,
-      # browser_navigation.h, browser.h.
-      "//chrome/browser/ui/sync:impl",
-
-      # TODO(crbug.com/438226511): Remove this circular dependency when the
-      # following headers get componentized:
-      # - c/b/ui/browser.h, browser_window.h, browser_window_state.h,
-      #   browser_commands.h,
-      #   browser_tabstrip.h, intent_picker_tab_helper.h.
-      "//chrome/browser/ui/web_applications:impl",
-
-      # TODO(crbug.com/438226511): Remove this circular dependency when
-      # c/b/ui/browser.h gets componentized.
-      "//chrome/browser/ui/web_applications:launch_utils",
-
-      # TODO(crbug.com/542827630): Remove this circular dependency when
-      # c/b/ui/browser.h gets componentized.
-      "//chrome/browser/ui/sessions",
-
-      # ntp and ntp_resource_cache include browser_window.h and
-      # layout_constants.h from //chrome/browser/ui.
-      "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
-
-      # omnibox_popup includes browser_window.h and other headers from
-      # //chrome/browser/ui.
-      "//chrome/browser/ui/webui/omnibox_everywhere",
-      "//chrome/browser/ui/webui/omnibox_popup",
-
-      # tab_search includes browser.h, browser_window.h,
-      # plural_string_handler.h, and tab_ui_helper.h from //chrome/browser/ui.
-      "//chrome/browser/ui/webui/tab_search",
-    ]
-
-    if (use_ozone) {
-      deps += [ "//ui/ozone" ]
-    }
-
-    if (is_linux) {
-      deps += [ "//ui/base/ime/linux" ]
-    }
-
-    if (enable_dice_support) {
-      deps += [
-        "//chrome/browser/ui/webui/signin/signout_confirmation",
-        "//chrome/browser/ui/webui/signin/signout_confirmation:signout_confirmation_impl",
-      ]
-      allow_circular_includes_from += [ "//chrome/browser/ui/webui/signin/signout_confirmation:signout_confirmation_impl" ]
-    }
-
-    if (enable_extensions) {
-      deps += [ "//chrome/browser/web_applications/extensions" ]
-    }
+  if (enable_extensions) {
+    deps += [ "//chrome/browser/web_applications/extensions" ]
   }
 
   if (enable_webui_ntp) {
@@ -3422,29 +3369,25 @@ static_library("test_support") {
     }
   }
 
-  if (is_android) {
-    deps += [ "//chrome/browser/ui/android/autofill:test_support" ]
-  } else {
-    public_deps += [
-      "//chrome/browser/ui/test:confirm_bubble",
-      "//chrome/browser/ui/webui/help:test_support",
-    ]
-    deps += [
-      "//chrome/browser/ui/content_settings:test_support",
-      "//chrome/browser/ui/passwords:test_support_ui",
-      "//chrome/browser/ui/views/toolbar",
-      "//chrome/test:test_support_ui",
-      "//components/embedder_support",
-      "//components/input",
-      "//components/media_message_center",
-      "//components/media_router/browser",
-      "//components/signin/core/browser",
-      "//components/signin/public/identity_manager",
-      "//components/ukm:test_support",
-      "//services/metrics/public/mojom",
-    ]
-    public_deps += [ "//chrome/browser/ui/exclusive_access" ]
-  }
+  public_deps += [
+    "//chrome/browser/ui/test:confirm_bubble",
+    "//chrome/browser/ui/webui/help:test_support",
+  ]
+  deps += [
+    "//chrome/browser/ui/content_settings:test_support",
+    "//chrome/browser/ui/passwords:test_support_ui",
+    "//chrome/browser/ui/views/toolbar",
+    "//chrome/test:test_support_ui",
+    "//components/embedder_support",
+    "//components/input",
+    "//components/media_message_center",
+    "//components/media_router/browser",
+    "//components/signin/core/browser",
+    "//components/signin/public/identity_manager",
+    "//components/ukm:test_support",
+    "//services/metrics/public/mojom",
+  ]
+  public_deps += [ "//chrome/browser/ui/exclusive_access" ]
 }
 
 static_library("browser_element_identifiers") {

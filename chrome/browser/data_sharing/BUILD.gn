@@ -16,23 +16,16 @@ source_set("data_sharing") {
     "//content/public/browser",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/data_sharing_ui_delegate_android.h",
-      "data_sharing_service_factory_bridge.h",
-    ]
-  } else {
-    sources += [
-      "desktop/data_sharing_conversion_utils.h",
-      "desktop/data_sharing_sdk_delegate_desktop.h",
-      "desktop/data_sharing_ui_delegate_desktop.h",
-    ]
+  sources += [
+    "desktop/data_sharing_conversion_utils.h",
+    "desktop/data_sharing_sdk_delegate_desktop.h",
+    "desktop/data_sharing_ui_delegate_desktop.h",
+  ]
 
-    public_deps += [
-      "//chrome/browser/ui/webui/data_sharing",
-      "//components/data_sharing/public/protocol:mojo_bindings",
-    ]
-  }
+  public_deps += [
+    "//chrome/browser/ui/webui/data_sharing",
+    "//components/data_sharing/public/protocol:mojo_bindings",
+  ]
 }
 
 # The reason why `impl` target can't be merged into `data_sharing` target
@@ -68,25 +61,16 @@ source_set("impl") {
     "//content/public/browser",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/data_sharing_service_factory_android.cc",
-      "android/data_sharing_ui_delegate_android.cc",
-      "data_sharing_service_factory_bridge.cc",
-    ]
-    deps += [ ":jni_headers" ]
-  } else {
-    sources += [
-      "desktop/data_sharing_conversion_utils.cc",
-      "desktop/data_sharing_sdk_delegate_desktop.cc",
-      "desktop/data_sharing_ui_delegate_desktop.cc",
-    ]
-    deps += [
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/views/data_sharing",
-    ]
-  }
+  sources += [
+    "desktop/data_sharing_conversion_utils.cc",
+    "desktop/data_sharing_sdk_delegate_desktop.cc",
+    "desktop/data_sharing_ui_delegate_desktop.cc",
+  ]
+  deps += [
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/views/data_sharing",
+  ]
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }

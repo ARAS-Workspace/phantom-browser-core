@@ -87,16 +87,7 @@ source_set("impl") {
     deps += [ "//chrome/browser/extensions" ]
   }
 
-  if (is_android) {
-    deps += [
-      ":jni_headers",
-      "//chrome/browser/feed",
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/ui/android/tab_model:impl",
-    ]
-  } else {
-    deps += [ "//chrome/browser/ui/browser_window" ]
-  }
+  deps += [ "//chrome/browser/ui/browser_window" ]
 }
 
 source_set("test_support") {

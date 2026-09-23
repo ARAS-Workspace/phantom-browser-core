@@ -187,16 +187,7 @@ config("skia_library_config") {
     defines += [ "SK_ARM_HAS_NEON" ]
   }
 
-  if (is_android) {
-    defines += [
-      # Android devices are typically more memory constrained, so default to a
-      # smaller glyph cache (it may be overriden at runtime when the renderer
-      # starts up, depending on the actual device memory).
-      "SK_DEFAULT_FONT_CACHE_LIMIT=1048576",  # 1024 * 1024
-    ]
-  } else {
-    defines += [ "SK_DEFAULT_FONT_CACHE_LIMIT=20971520" ]  # 20 * 1024 * 1024
-  }
+  defines += [ "SK_DEFAULT_FONT_CACHE_LIMIT=20971520" ]  # 20 * 1024 * 1024
 }
 
 # Split out into separate target so that path_bridge can depend on the public
@@ -389,13 +380,7 @@ component("skia") {
     ]
   }
 
-  if (is_win) {
-    # See SK_TYPEFACE_FACTORY_DIRECTWRITE
-    sources += skia_ports_windows_fonts_sources
-    sources += skia_ports_windows_sources
-  } else {
-    sources += [ "//third_party/skia/src/ports/SkOSFile_posix.cpp" ]
-  }
+  sources += [ "//third_party/skia/src/ports/SkOSFile_posix.cpp" ]
 
   if (is_apple) {
     # See SK_TYPEFACE_FACTORY_CORETEXT
@@ -898,14 +883,10 @@ set_defaults("skia_source_set") {
 }
 
 config("skia_avx512_flags") {
-  if (is_win) {
-    cflags = [ "/arch:AVX512" ]
-  } else {
-    cflags = [
-      "-march=x86-64-v4",
-      "-mprefer-vector-width=512",
-    ]
-  }
+  cflags = [
+    "-march=x86-64-v4",
+    "-mprefer-vector-width=512",
+  ]
 }
 
 # Split out for targeted removal of the afdo_optimize_size config on Android.

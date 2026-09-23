@@ -111,116 +111,53 @@ source_set("page_embeddings") {
   ]
 }
 
-if (is_android) {
-  android_library("java") {
-    visibility = [ ":*" ]
-    srcjar_deps = [ ":service_jni_headers" ]
-    sources = [ "android/java/src/org/chromium/chrome/browser/page_content_annotations/PageContentExtractionService.java" ]
-    deps = [
-      "//base:base_java",
-      "//third_party/jni_zero:jni_zero_java",
-    ]
-  }
-
-  generate_jni("service_jni_headers") {
-    visibility = [
-      ":*",
-      "//chrome/browser/*",
-    ]
-    sources = [ "android/java/src/org/chromium/chrome/browser/page_content_annotations/PageContentExtractionService.java" ]
-  }
-
-  android_library("factory_java") {
-    srcjar_deps = [ ":factory_jni_headers" ]
-    sources = [ "android/java/src/org/chromium/chrome/browser/page_content_annotations/PageContentExtractionServiceFactory.java" ]
-    deps = [
-      ":java",
-      "//base:base_java",
-      "//chrome/browser/profiles/android:java",
-      "//third_party/jni_zero:jni_zero_java",
-    ]
-  }
-
-  generate_jni("factory_jni_headers") {
-    visibility = [
-      ":*",
-      "//chrome/browser/*",
-    ]
-    sources = [ "android/java/src/org/chromium/chrome/browser/page_content_annotations/PageContentExtractionServiceFactory.java" ]
-  }
-
-  source_set("android_browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "android/page_content_cache_android_browsertest.cc" ]
-    deps = [
-      ":extraction_service",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui/android/tab_model",
-      "//chrome/test:test_support",
-      "//components/optimization_guide/proto:optimization_guide_proto",
-      "//components/page_content_annotations/content",
-      "//components/page_content_annotations/core",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//net:test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//ui/base",
-    ]
-  }
-} else {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [
-      "multi_source_page_context_fetcher_browsertest.cc",
-      "page_content_annotations_service_browsertest.cc",
-      "page_settled_monitor_chrome_browsertest.cc",
-      "page_text_observer_browsertest.cc",
-    ]
-    deps = [
-      ":extraction_service",
-      ":fetcher",
-      ":page_content_annotations",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/history",
-      "//chrome/browser/optimization_guide",
-      "//chrome/browser/optimization_guide:test_support",
-      "//chrome/browser/page_content_annotations:test_support",
-      "//chrome/browser/profiles:profile",
-      "//chrome/common:non_code_constants",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/history/core/browser",
-      "//components/history/core/test",
-      "//components/network_session_configurator/common",
-      "//components/optimization_guide/content/browser",
-      "//components/optimization_guide/content/browser:test_support",
-      "//components/optimization_guide/content/mojom:mojo_interfaces",
-      "//components/optimization_guide/core",
-      "//components/optimization_guide/core:test_support",
-      "//components/optimization_guide/proto:optimization_guide_proto",
-      "//components/page_content_annotations/content",
-      "//components/page_content_annotations/content:metrics",
-      "//components/page_content_annotations/core",
-      "//components/passage_embeddings/core:test_support",
-      "//components/ukm:test_support",
-      "//content/public/browser",
-      "//content/test:browsertest_support",
-      "//content/test:test_support",
-      "//net:test_support",
-      "//skia",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//third_party/blink/public/common",
-      "//ui/gfx/codec",
-    ]
-  }
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [
+    "multi_source_page_context_fetcher_browsertest.cc",
+    "page_content_annotations_service_browsertest.cc",
+    "page_settled_monitor_chrome_browsertest.cc",
+    "page_text_observer_browsertest.cc",
+  ]
+  deps = [
+    ":extraction_service",
+    ":fetcher",
+    ":page_content_annotations",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/history",
+    "//chrome/browser/optimization_guide",
+    "//chrome/browser/optimization_guide:test_support",
+    "//chrome/browser/page_content_annotations:test_support",
+    "//chrome/browser/profiles:profile",
+    "//chrome/common:non_code_constants",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/history/core/browser",
+    "//components/history/core/test",
+    "//components/network_session_configurator/common",
+    "//components/optimization_guide/content/browser",
+    "//components/optimization_guide/content/browser:test_support",
+    "//components/optimization_guide/content/mojom:mojo_interfaces",
+    "//components/optimization_guide/core",
+    "//components/optimization_guide/core:test_support",
+    "//components/optimization_guide/proto:optimization_guide_proto",
+    "//components/page_content_annotations/content",
+    "//components/page_content_annotations/content:metrics",
+    "//components/page_content_annotations/core",
+    "//components/passage_embeddings/core:test_support",
+    "//components/ukm:test_support",
+    "//content/public/browser",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//net:test_support",
+    "//skia",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//third_party/blink/public/common",
+    "//ui/gfx/codec",
+  ]
 }
 
 source_set("unit_tests") {

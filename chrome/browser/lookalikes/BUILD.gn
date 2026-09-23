@@ -30,12 +30,7 @@ source_set("lookalikes") {
     "//services/metrics/public/cpp:metrics_cpp",
     "//url",
   ]
-  if (is_android) {
-    sources += [ "safety_tip_message_delegate_android.h" ]
-    public_deps += [ "//components/messages/android" ]
-  } else {
-    public_deps += [ "//ui/views" ]
-  }
+  public_deps += [ "//ui/views" ]
 }
 
 source_set("impl") {
@@ -105,20 +100,8 @@ source_set("unit_tests") {
     "//content/test:test_support",
     "//testing/gtest",
   ]
-  if (is_android) {
-    sources += [ "safety_tip_message_delegate_android_unittest.cc" ]
-    deps += [
-      "//base/test:test_support",
-      "//components/messages/android",
-      "//components/messages/android:test_support",
-      "//components/strings:components_strings",
-      "//content/public/browser",
-      "//ui/base",
-    ]
-  } else {
-    sources += [ "lookalike_url_navigation_throttle_unittest.cc" ]
-    deps += [ "//components/url_formatter" ]
-  }
+  sources += [ "lookalike_url_navigation_throttle_unittest.cc" ]
+  deps += [ "//components/url_formatter" ]
 }
 
 if (!is_android) {

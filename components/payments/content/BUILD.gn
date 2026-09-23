@@ -91,30 +91,22 @@ static_library("content") {
 
   sources += [ "android_app_communication_stub.cc" ]
 
-  if (is_android) {
-    sources += [ "secure_payment_confirmation_view_stub.cc" ]
-    deps += [
-      "//components/payments/content/android/spc:browser_binding_jni",
-      "//components/webauthn/android",
-    ]
-  } else {
-    sources += [
-      "content_payment_request_delegate.cc",
-      "content_payment_request_delegate.h",
-      "payment_request.cc",
-      "payment_request.h",
-      "payment_request_dialog.h",
-      "payment_request_display_manager.cc",
-      "payment_request_display_manager.h",
-      "payment_request_state.cc",
-      "payment_request_state.h",
-      "payment_response_helper.cc",
-      "payment_response_helper.h",
-      "secure_payment_confirmation_controller.cc",
-      "secure_payment_confirmation_controller.h",
-    ]
-    deps += [ "//components/webauthn/content/browser" ]
-  }
+  sources += [
+    "content_payment_request_delegate.cc",
+    "content_payment_request_delegate.h",
+    "payment_request.cc",
+    "payment_request.h",
+    "payment_request_dialog.h",
+    "payment_request_display_manager.cc",
+    "payment_request_display_manager.h",
+    "payment_request_state.cc",
+    "payment_request_state.h",
+    "payment_response_helper.cc",
+    "payment_response_helper.h",
+    "secure_payment_confirmation_controller.cc",
+    "secure_payment_confirmation_controller.h",
+  ]
+  deps += [ "//components/webauthn/content/browser" ]
 }
 
 # Files used by content and utility.

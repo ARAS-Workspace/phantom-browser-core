@@ -222,52 +222,34 @@ source_set("impl") {
     ]
   }
 
-  if (is_android) {
-    deps += [
-      "//chrome/browser/accessibility/accessibility_prefs",
-      "//chrome/browser/auxiliary_search",
-      "//chrome/browser/notifications",
-      "//chrome/browser/notifications:notifications_java_enum_srcjar",
-      "//chrome/browser/ntp_customization",
-      "//chrome/browser/partnerbookmarks:android",
-      "//chrome/browser/password_manager/android:utils",
-      "//chrome/browser/readaloud/android:native",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/ui/safety_hub",
-      "//components/feed/core/common:feed_core_common",
-      "//components/feed/core/shared_prefs:feed_shared_prefs",
-      "//components/feed/core/v2:ios_shared",
-    ]
-  } else {
-    deps += [
-      "//chrome/browser:intranet_redirect_detector",
-      "//chrome/browser/desktop_to_mobile_promos:utils",
-      "//chrome/browser/new_tab_page",
-      "//chrome/browser/screen_ai:prefs",
-      "//chrome/browser/search_engine_choice",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/sharing_hub",
-      "//chrome/browser/ui/commerce",
-      "//chrome/browser/ui/extensions",
-      "//chrome/browser/ui/omnibox/omnibox_everywhere:prefs",
-      "//chrome/browser/ui/performance_controls",
-      "//chrome/browser/ui/send_tab_to_self",
-      "//chrome/browser/ui/side_panel",
-      "//chrome/browser/ui/tabs",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/tabs/organizer:impl",
-      "//chrome/browser/ui/tabs/saved_tab_groups",
-      "//chrome/browser/ui/views/side_panel",
-      "//chrome/browser/ui/webui/bookmarks",
-      "//chrome/browser/ui/webui/settings",
-      "//chrome/browser/user_education",
-      "//components/headless/policy",
-    ]
-    sources += [
-      "persistent_renderer_prefs_manager.cc",
-      "persistent_renderer_prefs_manager_factory.cc",
-    ]
-  }
+  deps += [
+    "//chrome/browser:intranet_redirect_detector",
+    "//chrome/browser/desktop_to_mobile_promos:utils",
+    "//chrome/browser/new_tab_page",
+    "//chrome/browser/screen_ai:prefs",
+    "//chrome/browser/search_engine_choice",
+    "//chrome/browser/search_engines",
+    "//chrome/browser/sharing_hub",
+    "//chrome/browser/ui/commerce",
+    "//chrome/browser/ui/extensions",
+    "//chrome/browser/ui/omnibox/omnibox_everywhere:prefs",
+    "//chrome/browser/ui/performance_controls",
+    "//chrome/browser/ui/send_tab_to_self",
+    "//chrome/browser/ui/side_panel",
+    "//chrome/browser/ui/tabs",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/tabs/organizer:impl",
+    "//chrome/browser/ui/tabs/saved_tab_groups",
+    "//chrome/browser/ui/views/side_panel",
+    "//chrome/browser/ui/webui/bookmarks",
+    "//chrome/browser/ui/webui/settings",
+    "//chrome/browser/user_education",
+    "//components/headless/policy",
+  ]
+  sources += [
+    "persistent_renderer_prefs_manager.cc",
+    "persistent_renderer_prefs_manager_factory.cc",
+  ]
 
   if (enable_extensions) {
     deps += [

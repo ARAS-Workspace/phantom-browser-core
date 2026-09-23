@@ -76,11 +76,7 @@ if (is_win && enable_resource_allowlist_generation) {
 group("assert_no_deps") {
   deps = []
 
-  if (is_android) {
-    deps += [ "//chrome/android:chrome_public_apk" ]
-  } else {
-    deps += [ ":chrome" ]
-  }
+  deps += [ ":chrome" ]
 
   # This should not pull in installer strings. This is will bloat the binary
   # for no reason and is easy to mess up. See the comment at the top of
@@ -94,11 +90,7 @@ if (!is_android && !is_mac) {
     data_deps = [ ":chrome_initial" ]
   }
 
-  if (is_win) {
-    _chrome_output_name = "initialexe/chrome"
-  } else {
-    _chrome_output_name = "chrome"
-  }
+  _chrome_output_name = "chrome"
 
   executable("chrome_initial") {
     configs -= [ "//build/config/compiler:thinlto_optimize_default" ]

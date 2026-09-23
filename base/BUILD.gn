@@ -2606,11 +2606,7 @@ source_set("path_service_unittest") {
     "//testing/gtest",
   ]
 
-  if (is_ios) {
-    deps += [ ":base_generated_test_file_bundle_data" ]
-  } else {
-    data_deps = [ ":generate_file_for_test" ]
-  }
+  data_deps = [ ":generate_file_for_test" ]
 }
 
 test("base_unittests") {

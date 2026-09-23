@@ -28,16 +28,11 @@ source_set("autocomplete") {
     "//components/saved_tab_groups/public",
   ]
 
-  if (is_android) {
-    sources += [ "../android/autocomplete/tab_matcher_android.h" ]
-    public_deps += [ "//components/search_engines" ]
-  } else {
-    sources += [ "tab_matcher_desktop.h" ]
-    public_deps += [
-      "//components/search_engines",
-      "//content/public/browser",
-    ]
-  }
+  sources += [ "tab_matcher_desktop.h" ]
+  public_deps += [
+    "//components/search_engines",
+    "//content/public/browser",
+  ]
 
   if (enable_extensions_core) {
     sources += [
@@ -115,24 +110,14 @@ source_set("impl") {
     "//content/public/browser",
   ]
 
-  if (is_android) {
-    sources += [ "../android/autocomplete/tab_matcher_android.cc" ]
-    deps += [
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/ui/android/omnibox:jni_headers",
-      "//chrome/browser/ui/android/tab_model",
-    ]
-  } else {
-    sources += [ "tab_matcher_desktop.cc" ]
-    deps += [
-      "//chrome/browser/sharing_hub",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/views/side_panel",
-      "//chrome/browser/web_applications/app_service",
-    ]
-  }
+  sources += [ "tab_matcher_desktop.cc" ]
+  deps += [
+    "//chrome/browser/sharing_hub",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/views/side_panel",
+    "//chrome/browser/web_applications/app_service",
+  ]
 
   if (enable_extensions_core) {
     sources += [

@@ -62,13 +62,8 @@ source_set("impl") {
     "//components/variations/service",
   ]
 
-  if (is_android) {
-    sources += [ "about_this_site_controller_android.cc" ]
-    deps += [ "//chrome/android:jni_headers" ]
-  } else {
-    sources += [ "web_view_side_panel_throttle.cc" ]
-    deps += [ "//components/navigation_interception" ]
-  }
+  sources += [ "web_view_side_panel_throttle.cc" ]
+  deps += [ "//components/navigation_interception" ]
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }

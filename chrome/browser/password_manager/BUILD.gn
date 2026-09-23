@@ -65,55 +65,18 @@ source_set("password_manager") {
     sources += [ "password_manager_util_mac.mm" ]
   }
 
-  if (is_android) {
-    public += [
-      "android/account_chooser_dialog_android.h",
-      "android/all_passwords_bottom_sheet_controller.h",
-      "android/all_passwords_bottom_sheet_helper.h",
-      "android/auto_signin_first_run_dialog_android.h",
-      "android/auto_signin_prompt_controller.h",
-      "android/cred_man_controller.h",
-      "android/credential_android.h",
-      "android/credential_leak_controller_android.h",
-      "android/delayed_password_field_classification_model_handler_factory.h",
-      "android/generated_password_saved_message_delegate.h",
-      "android/password_accessory_metrics_util.h",
-      "android/password_checkup_launcher_helper.h",
-      "android/password_checkup_launcher_helper_impl.h",
-      "android/password_generation_controller.h",
-      "android/password_generation_controller_impl.h",
-      "android/password_manager_error_message_delegate.h",
-      "android/password_manager_error_message_helper_bridge.h",
-      "android/password_manager_error_message_helper_bridge_impl.h",
-      "android/password_manager_launcher_android.h",
-      "android/password_store_bridge.h",
-      "android/save_update_password_message_delegate.h",
-    ]
-    public_deps += [
-      "//chrome/browser/affiliations",
-      "//chrome/browser/password_edit_dialog/android",
-      "//chrome/browser/password_manager/android:utils",
-      "//chrome/browser/touch_to_fill/password_manager/password_generation/android",
-      "//chrome/browser/touch_to_fill/password_manager/password_generation/android:public",
-      "//chrome/browser/ui/passwords",
-      "//components/browser_ui/device_lock/android",
-      "//components/device_reauth",
-      "//components/messages/android",
-    ]
-  } else {
-    public += [
-      # TODO(crbug.com/485620841): Make delegate not dependent on client and
-      # move this back to /password_change.
-      "password_change/password_change_actuator.h",
-      "remote_actor/remote_actor_credential_sharing_impl.h",
-      "web_app_profile_switcher.h",
-    ]
-    public_deps += [
-      "//chrome/browser/password_manager/password_change",
-      "//chrome/browser/web_applications",
-      "//components/webapps/common",
-    ]
-  }
+  public += [
+    # TODO(crbug.com/485620841): Make delegate not dependent on client and
+    # move this back to /password_change.
+    "password_change/password_change_actuator.h",
+    "remote_actor/remote_actor_credential_sharing_impl.h",
+    "web_app_profile_switcher.h",
+  ]
+  public_deps += [
+    "//chrome/browser/password_manager/password_change",
+    "//chrome/browser/web_applications",
+    "//components/webapps/common",
+  ]
 
   if (enable_dice_support) {
     public += [ "multi_profile_credentials_filter.h" ]
@@ -189,62 +152,24 @@ source_set("impl") {
     "//extensions/buildflags",
   ]
 
-  if (is_android) {
-    sources += [
-      "android/account_chooser_dialog_android.cc",
-      "android/all_passwords_bottom_sheet_controller.cc",
-      "android/all_passwords_bottom_sheet_helper.cc",
-      "android/auto_signin_first_run_dialog_android.cc",
-      "android/auto_signin_prompt_controller.cc",
-      "android/cred_man_controller.cc",
-      "android/credential_android.cc",
-      "android/credential_leak_controller_android.cc",
-      "android/delayed_password_field_classification_model_handler_factory.cc",
-      "android/generated_password_saved_message_delegate.cc",
-      "android/password_checkup_launcher_helper.cc",
-      "android/password_checkup_launcher_helper_impl.cc",
-      "android/password_generation_controller_impl.cc",
-      "android/password_manager_error_message_delegate.cc",
-      "android/password_manager_error_message_helper_bridge_impl.cc",
-      "android/password_manager_launcher_android.cc",
-      "android/password_store_bridge.cc",
-      "android/save_update_password_message_delegate.cc",
-    ]
-    deps += [
-      "//chrome/browser/keyboard_accessory/android",
-      "//chrome/browser/password_manager/android:password_manager_android",
-      "//chrome/browser/touch_to_fill/password_manager:public",
-      "//chrome/browser/touch_to_fill/password_manager/no_passkeys/android:public",
-      "//chrome/browser/touch_to_fill/password_manager/password_generation/android",
-      "//chrome/browser/touch_to_fill/password_manager/password_generation/android:public",
-      "//chrome/browser/ui/android/passwords",
-      "//chrome/browser/webauthn:webauthn_request_delegate_android",
-      "//components/messages/android",
-      "//components/password_manager/core/browser/affiliation:affiliation_fetching",
-      "//components/password_manager/core/browser/form_parsing",
-      "//components/password_manager/core/browser/leak_detection",
-      "//components/webauthn/android",
-    ]
-  } else {
-    sources += [
-      "password_change/script_password_change_actuator.cc",
-      "password_change/script_password_change_actuator.h",
-      "password_change_delegate_impl.cc",
-      "password_change_delegate_impl.h",
-      "remote_actor/remote_actor_credential_sharing_impl.cc",
-      "web_app_profile_switcher.cc",
-    ]
-    deps += [
-      "//chrome/browser/password_manager/password_change",
-      "//chrome/browser/password_manager/remote_actor",
-      "//chrome/browser/ui/passwords",
-      "//chrome/browser/ui/passwords:impl",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/user_education",
-      "//chrome/browser/ui/web_applications",
-      "//chrome/browser/web_applications",
-    ]
-  }
+  sources += [
+    "password_change/script_password_change_actuator.cc",
+    "password_change/script_password_change_actuator.h",
+    "password_change_delegate_impl.cc",
+    "password_change_delegate_impl.h",
+    "remote_actor/remote_actor_credential_sharing_impl.cc",
+    "web_app_profile_switcher.cc",
+  ]
+  deps += [
+    "//chrome/browser/password_manager/password_change",
+    "//chrome/browser/password_manager/remote_actor",
+    "//chrome/browser/ui/passwords",
+    "//chrome/browser/ui/passwords:impl",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/user_education",
+    "//chrome/browser/ui/web_applications",
+    "//chrome/browser/web_applications",
+  ]
 
   if (enable_dice_support) {
     sources += [ "multi_profile_credentials_filter.cc" ]
@@ -456,43 +381,30 @@ source_set("unit_tests") {
     "//url",
   ]
 
-  if (is_android) {
-    deps += [
-      "//chrome/browser/autofill:test_support",
-      "//chrome/browser/keyboard_accessory/android:impl",
-      "//chrome/browser/keyboard_accessory/test_utils/android",
-      "//chrome/browser/password_manager/android/grouped_affiliations:test_utils",
-      "//chrome/browser/touch_to_fill/password_manager:impl",
-      "//chrome/browser/webauthn:webauthn_request_delegate_android",
-      "//components/password_manager/content/browser:test_support",
-      "//components/webauthn/android",
-    ]
-  } else {
-    sources += [
-      "password_change/script_password_change_actuator_unittest.cc",
-      "password_change_delegate_impl_unittest.cc",
-      "remote_actor/remote_actor_credential_sharing_impl_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/extensions:test_support",
-      "//chrome/browser/password_manager/password_change",
-      "//chrome/browser/password_manager/remote_actor",
-      "//chrome/browser/signin",
-      "//chrome/browser/signin:test_support",
-      "//chrome/browser/ui/hats",
-      "//chrome/browser/ui/hats:test_support",
-      "//chrome/browser/ui/passwords:impl",
-      "//chrome/browser/ui/passwords:test_support_ui",
-      "//components/optimization_guide/core",
-      "//components/optimization_guide/core:model_execution_test_support",
-      "//components/safe_browsing/core/common:safe_browsing_prefs",
-      "//components/signin/public/identity_manager:test_support",
-      "//components/tabs:test_support",
-      "//components/ukm:test_support",
-      "//services/metrics/public/cpp:metrics_cpp",
-      "//services/network:test_support",
-    ]
-  }
+  sources += [
+    "password_change/script_password_change_actuator_unittest.cc",
+    "password_change_delegate_impl_unittest.cc",
+    "remote_actor/remote_actor_credential_sharing_impl_unittest.cc",
+  ]
+  deps += [
+    "//chrome/browser/extensions:test_support",
+    "//chrome/browser/password_manager/password_change",
+    "//chrome/browser/password_manager/remote_actor",
+    "//chrome/browser/signin",
+    "//chrome/browser/signin:test_support",
+    "//chrome/browser/ui/hats",
+    "//chrome/browser/ui/hats:test_support",
+    "//chrome/browser/ui/passwords:impl",
+    "//chrome/browser/ui/passwords:test_support_ui",
+    "//components/optimization_guide/core",
+    "//components/optimization_guide/core:model_execution_test_support",
+    "//components/safe_browsing/core/common:safe_browsing_prefs",
+    "//components/signin/public/identity_manager:test_support",
+    "//components/tabs:test_support",
+    "//components/ukm:test_support",
+    "//services/metrics/public/cpp:metrics_cpp",
+    "//services/network:test_support",
+  ]
 
   if (enable_dice_support) {
     sources += [ "multi_profile_credentials_filter_unittest.cc" ]

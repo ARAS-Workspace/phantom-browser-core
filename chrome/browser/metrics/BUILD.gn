@@ -407,43 +407,34 @@ source_set("unit_tests") {
     sources += [ "pressure/pressure_metrics_unittest.cc" ]
   }
 
-  if (is_android) {
-    sources += [ "chrome_android_metrics_provider_unittest.cc" ]
-    deps += [
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/ui/android/tab_model:test_support",
-      "//services/metrics/public/cpp:test_support",
-    ]
-  } else {
-    sources += [
-      "desktop_platform_features_metrics_provider_unittest.cc",
-      "desktop_session_duration/desktop_session_duration_tracker_unittest.cc",
-      "desktop_session_duration/touch_ui_controller_stats_tracker_unittest.cc",
-      "power/battery_discharge_reporter_unittest.cc",
-      "power/power_metrics_reporter_unittest.cc",
-      "power/power_metrics_unittest.cc",
-      "power/process_monitor_unittest.cc",
-      "usage_scenario/chrome_responsiveness_calculator_delegate_unittest.cc",
-      "usage_scenario/system_event_provider_unittest.cc",
-      "usage_scenario/tab_usage_scenario_tracker_unittest.cc",
-      "usage_scenario/usage_scenario_data_store_unittest.cc",
-      "usage_scenario/usage_scenario_unittest.cc",
-    ]
-    deps += [
-      "//chrome/browser/metrics/desktop_session_duration",
-      "//chrome/browser/resource_coordinator:test_support",
-      "//chrome/browser/ui:browser_actions",
-      "//chrome/browser/ui:test_support",
-      "//chrome/browser/ui/tabs",
-      "//chrome/browser/ui/tabs:features",
-      "//chrome/browser/ui/tabs:tab_enums",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/tabs:test_support",
-      "//chrome/browser/ui/user_education",
-      "//chrome/test:test_support_ui",
-      "//chrome/test/user_education:impl",
-    ]
-  }
+  sources += [
+    "desktop_platform_features_metrics_provider_unittest.cc",
+    "desktop_session_duration/desktop_session_duration_tracker_unittest.cc",
+    "desktop_session_duration/touch_ui_controller_stats_tracker_unittest.cc",
+    "power/battery_discharge_reporter_unittest.cc",
+    "power/power_metrics_reporter_unittest.cc",
+    "power/power_metrics_unittest.cc",
+    "power/process_monitor_unittest.cc",
+    "usage_scenario/chrome_responsiveness_calculator_delegate_unittest.cc",
+    "usage_scenario/system_event_provider_unittest.cc",
+    "usage_scenario/tab_usage_scenario_tracker_unittest.cc",
+    "usage_scenario/usage_scenario_data_store_unittest.cc",
+    "usage_scenario/usage_scenario_unittest.cc",
+  ]
+  deps += [
+    "//chrome/browser/metrics/desktop_session_duration",
+    "//chrome/browser/resource_coordinator:test_support",
+    "//chrome/browser/ui:browser_actions",
+    "//chrome/browser/ui:test_support",
+    "//chrome/browser/ui/tabs",
+    "//chrome/browser/ui/tabs:features",
+    "//chrome/browser/ui/tabs:tab_enums",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/tabs:test_support",
+    "//chrome/browser/ui/user_education",
+    "//chrome/test:test_support_ui",
+    "//chrome/test/user_education:impl",
+  ]
 
   sources += [ "family_link_user_metrics_provider_unittest.cc" ]
 

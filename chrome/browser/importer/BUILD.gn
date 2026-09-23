@@ -65,11 +65,7 @@ source_set("impl") {
     "//components/password_manager/core/browser/password_store:password_store_interface",
   ]
 
-  if (is_win) {
-    sources += [ "firefox_profile_lock_win.cc" ]
-  } else {
-    sources += [ "firefox_profile_lock_posix.cc" ]
-  }
+  sources += [ "firefox_profile_lock_posix.cc" ]
 }
 
 source_set("browser_tests") {

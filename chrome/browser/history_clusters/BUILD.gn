@@ -38,21 +38,11 @@ source_set("impl") {
     "//components/site_engagement/content",
     "//services/metrics/public/cpp:ukm_builders",
   ]
-  if (is_android) {
-    sources += [ "history_clusters_tab_helper_android.cc" ]
-    deps += [
-      ":jni_headers",
-      "//chrome/browser/android:tabs_public",
-      "//chrome/browser/ui/android/tab_model",
-      "//components/ntp_tiles",
-    ]
-  } else {
-    deps += [
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//components/ntp_tiles",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//components/ntp_tiles",
+  ]
 }
 
 if (!is_android) {

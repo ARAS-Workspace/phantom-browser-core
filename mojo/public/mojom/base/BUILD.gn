@@ -49,11 +49,7 @@ mojom_component("base") {
   ]
 
   enabled_features = []
-  if (is_win) {
-    enabled_features += [ "file_path_is_string16" ]
-  } else {
-    enabled_features += [ "file_path_is_string" ]
-  }
+  enabled_features += [ "file_path_is_string" ]
 
   webui_module_path = "chrome://resources/mojo/mojo/public/mojom/base"
 

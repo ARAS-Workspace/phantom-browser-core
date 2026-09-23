@@ -134,22 +134,13 @@ source_set("dns") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "dns_platform_android_attempt.cc",
-      "dns_platform_android_attempt.h",
-      "dns_platform_attempt_factory_android.cc",
-      "dns_platform_attempt_factory_android.h",
-    ]
-  } else {
-    sources += [
-      # These are specific here, instead of the main sources, to make sure they
-      # cannot be references while compiling for Android. Doing so is always a
-      # mistake.
-      "dns_platform_attempt_factory_not_implemented.cc",
-      "dns_platform_attempt_factory_not_implemented.h",
-    ]
-  }
+  sources += [
+    # These are specific here, instead of the main sources, to make sure they
+    # cannot be references while compiling for Android. Doing so is always a
+    # mistake.
+    "dns_platform_attempt_factory_not_implemented.cc",
+    "dns_platform_attempt_factory_not_implemented.h",
+  ]
 
   if (is_linux) {
     sources += [

@@ -25,41 +25,22 @@ source_set("feedback") {
     "//chrome/browser/signin",
     "//google_apis",
   ]
-  if (is_android) {
-    sources += [
-      "android/family_info_feedback_source.cc",
-      "android/family_info_feedback_source.h",
-    ]
-    public_deps += [
-      "//components/supervised_user/core/browser",
-      "//components/supervised_user/core/browser:fetcher",
-      "//components/supervised_user/core/browser/proto",
-    ]
-    deps += [
-      "//base",
-      "//chrome/browser/feedback/android:jni_headers",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/supervised_user",
-      "//content/public/browser",
-      "//services/network/public/cpp",
-    ]
-  } else {
-    # The non-android feed code has circular dependencies and the easiest way to
-    # decouple is to separate between the interface and the implementation. Many
-    # parts of Chrome want to call a method "ShowFeedback" to show the feedback
-    # page (the interface). The implementation of the feedback uploader requires
-    # fetching data from many different components (the implementation).
-    sources += [
-      "feedback_dialog_utils.h",
-      "show_feedback_page.h",
-      "system_logs/chrome_system_logs_fetcher.h",
-    ]
-    public_deps += [
-      "//base",
-      "//chrome/browser/feedback:feedback_enum",
-      "//components/sessions:session_id",
-    ]
-  }
+
+  # The non-android feed code has circular dependencies and the easiest way to
+  # decouple is to separate between the interface and the implementation. Many
+  # parts of Chrome want to call a method "ShowFeedback" to show the feedback
+  # page (the interface). The implementation of the feedback uploader requires
+  # fetching data from many different components (the implementation).
+  sources += [
+    "feedback_dialog_utils.h",
+    "show_feedback_page.h",
+    "system_logs/chrome_system_logs_fetcher.h",
+  ]
+  public_deps += [
+    "//base",
+    "//chrome/browser/feedback:feedback_enum",
+    "//components/sessions:session_id",
+  ]
 }
 
 source_set("feedback_impl") {
@@ -162,33 +143,21 @@ source_set("unit_tests") {
     "//content/test:test_support",
     "//testing/gtest",
   ]
-  if (is_android) {
-    sources = [ "android/family_info_feedback_source_unittest.cc" ]
-    deps += [
-      "//chrome/browser/feedback/android",
-      "//chrome/browser/flags:flags_android",
-      "//chrome/browser/signin",
-      "//chrome/browser/signin:test_support",
-      "//chrome/browser/supervised_user:test_support",
-      "//chrome/test:test_support_jni_headers",
-    ]
-  } else {
-    sources = [
-      "show_feedback_page_unittest.cc",
-      "system_logs/log_sources/crash_ids_source_unittest.cc",
-      "system_logs/log_sources/family_info_log_source_unittest.cc",
-      "system_logs/log_sources/performance_log_source_unittest.cc",
-      "system_logs/log_sources/related_website_sets_source_unittest.cc",
-    ]
-    deps += [
-      "//components/feedback",
-      "//components/performance_manager",
-      "//components/supervised_user/core/browser",
-      "//components/supervised_user/core/common",
-      "//components/supervised_user/test_support",
-      "//components/upload_list",
-    ]
-  }
+  sources = [
+    "show_feedback_page_unittest.cc",
+    "system_logs/log_sources/crash_ids_source_unittest.cc",
+    "system_logs/log_sources/family_info_log_source_unittest.cc",
+    "system_logs/log_sources/performance_log_source_unittest.cc",
+    "system_logs/log_sources/related_website_sets_source_unittest.cc",
+  ]
+  deps += [
+    "//components/feedback",
+    "//components/performance_manager",
+    "//components/supervised_user/core/browser",
+    "//components/supervised_user/core/common",
+    "//components/supervised_user/test_support",
+    "//components/upload_list",
+  ]
 }
 
 if (!is_android) {

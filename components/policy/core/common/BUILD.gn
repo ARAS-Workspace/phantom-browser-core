@@ -501,18 +501,7 @@ source_set("unit_tests") {
     ]
   }
 
-  if (is_android) {
-    sources += [
-      "android/android_combined_policy_provider_unittest.cc",
-      "android/policy_converter_unittest.cc",
-      "android/policy_map_android_unittest.cc",
-      "android/policy_service_android_unittest.cc",
-      "management/android_enterprise_info_unittest.cc",
-      "management/platform_management_status_provider_android_unittest.cc",
-    ]
-  } else {
-    sources += [ "async_policy_provider_unittest.cc" ]
-  }
+  sources += [ "async_policy_provider_unittest.cc" ]
   if ((!is_android || enable_extensions_core) && !is_ios) {
     sources += [
       "cloud/cloud_external_data_store_unittest.cc",

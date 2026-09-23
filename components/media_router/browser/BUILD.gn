@@ -139,14 +139,9 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_android) {
-    sources += [ "android/media_router_android_unittest.cc" ]
-    deps += [ "android:test_jni_headers" ]
-  } else {
-    sources += [
-      "issue_manager_unittest.cc",
-      "logger_impl_unittest.cc",
-      "mirroring_to_flinging_switcher_unittest.cc",
-    ]
-  }
+  sources += [
+    "issue_manager_unittest.cc",
+    "logger_impl_unittest.cc",
+    "mirroring_to_flinging_switcher_unittest.cc",
+  ]
 }
