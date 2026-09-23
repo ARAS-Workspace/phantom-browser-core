@@ -40,15 +40,6 @@ source_set("open_from_clipboard_impl") {
   sources = []
   deps = [ "//base" ]
   assert_no_deps = [ "//base:i18n" ]
-  if (is_ios && target_platform == "iphoneos") {
-    sources += [
-      "clipboard_async_wrapper_ios.h",
-      "clipboard_async_wrapper_ios.mm",
-      "clipboard_recent_content_impl_ios.h",
-      "clipboard_recent_content_impl_ios.mm",
-    ]
-    frameworks = [ "MobileCoreServices.framework" ]
-  }
 }
 
 static_library("test_support") {

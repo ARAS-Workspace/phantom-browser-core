@@ -20,9 +20,6 @@ mojom("mojo_bindings") {
   if (enable_plugins) {
     enabled_features += [ "enable_plugins" ]
   }
-  if (is_win && is_chrome_branded) {
-    enabled_features += [ "is_win_and_chrome_branded" ]
-  }
   if (is_chrome_for_testing) {
     enabled_features += [ "is_chrome_for_testing" ]
   }
@@ -72,12 +69,6 @@ source_set("impl") {
     "//content/public/browser",
   ]
 
-  if (is_win && is_chrome_branded) {
-    deps += [
-      "//chrome/browser/win/installer_downloader:controller",
-      "//chrome/browser/win/installer_downloader:prefs",
-    ]
-  }
   if (is_win || is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/startup/default_browser_prompt",

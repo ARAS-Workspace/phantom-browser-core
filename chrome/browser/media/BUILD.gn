@@ -116,19 +116,6 @@ source_set("unittests") {
       "//media/mojo/mojom:remoting",
     ]
   }
-
-  if (is_android || is_win) {
-    sources += [ "protected_media_identifier_permission_context_unittest.cc" ]
-    deps += [
-      ":impl",
-      "//chrome/browser/profiles:test_support",
-      "//chrome/common:constants",
-      "//chrome/test:test_support",
-      "//components/policy/core/common",
-      "//components/prefs:test_support",
-      "//media",
-    ]
-  }
 }
 
 source_set("browser_tests") {
@@ -250,11 +237,6 @@ source_set("media") {
     "//ui/gfx/geometry",
   ]
 
-  if (is_android || is_win) {
-    public += [ "protected_media_identifier_permission_context.h" ]
-    public_deps += [ "//components/permissions" ]
-  }
-
   if (enable_media_remoting) {
     public += [
       "cast_remoting_connector.h",
@@ -354,10 +336,6 @@ source_set("impl") {
     "//components/mirroring/browser",
     "//media/mojo/services",
   ]
-
-  if (is_android || is_win) {
-    sources += [ "protected_media_identifier_permission_context.cc" ]
-  }
 
   if (enable_media_remoting) {
     sources += [

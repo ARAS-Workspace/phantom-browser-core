@@ -2634,15 +2634,6 @@ test("content_unittests") {
     ]
   }
 
-  if (is_ios && target_platform == "iphoneos") {
-    sources += [
-      "../browser/date_time_chooser/ios/date_time_chooser_util_unittest.mm",
-      "../browser/renderer_host/ios_extended_text_input_traits_unittest.mm",
-      "../browser/renderer_host/render_widget_host_view_ios_uiview_unittest.mm",
-      "../browser/renderer_host/render_widget_host_view_ios_unittest.mm",
-    ]
-  }
-
   if (enable_compute_pressure) {
     sources += [
       "../browser/compute_pressure/pressure_service_for_frame_unittest.cc",
@@ -3031,9 +3022,6 @@ test("content_unittests") {
       "//device/fido:mocks",
       "//device/fido:test_support",
     ]
-    if (is_ios && use_blink) {
-      deps += [ "//crypto:test_support" ]
-    }
   }
 
   if (use_aura) {

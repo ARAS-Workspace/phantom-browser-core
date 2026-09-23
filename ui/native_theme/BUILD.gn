@@ -45,13 +45,6 @@ component("native_theme") {
     "//ui/resources",
   ]
 
-  if (is_android || is_ios) {
-    sources += [
-      "native_theme_mobile.cc",
-      "native_theme_mobile.h",
-    ]
-  }
-
   if (is_mac) {
     frameworks = [
       "Accessibility.framework",

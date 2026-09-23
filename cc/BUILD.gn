@@ -997,10 +997,6 @@ cc_test("cc_unittests") {
     "//third_party/angle:includes",
   ]
 
-  if (is_android && enable_chrome_android_internal) {
-    data_deps += [ "//clank/build/bot/filters:cc_unittests_filters" ]
-  }
-
   if (skia_support_skottie) {
     data += [ "test/data/" ]
   }

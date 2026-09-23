@@ -1340,27 +1340,6 @@ static_library("browser") {
     ]
   }
 
-  if (is_ios || is_android) {
-    sources += [
-      "payments/autofill_save_card_delegate.cc",
-      "payments/autofill_save_card_delegate.h",
-      "payments/autofill_save_card_infobar_delegate_mobile.cc",
-      "payments/autofill_save_card_infobar_delegate_mobile.h",
-      "payments/autofill_save_card_ui_info.cc",
-      "payments/autofill_save_card_ui_info.h",
-      "payments/autofill_virtual_card_enrollment_bottom_sheet_delegate_mobile.cc",
-      "payments/autofill_virtual_card_enrollment_bottom_sheet_delegate_mobile.h",
-      "ui/payments/card_expiration_date_fix_flow_controller.h",
-      "ui/payments/card_expiration_date_fix_flow_controller_impl.cc",
-      "ui/payments/card_expiration_date_fix_flow_controller_impl.h",
-      "ui/payments/card_expiration_date_fix_flow_view.h",
-      "ui/payments/card_name_fix_flow_controller.h",
-      "ui/payments/card_name_fix_flow_controller_impl.cc",
-      "ui/payments/card_name_fix_flow_controller_impl.h",
-      "ui/payments/card_name_fix_flow_view.h",
-    ]
-  }
-
   sources += [
     "payments/credit_card_fido_authenticator.cc",
     "payments/credit_card_fido_authenticator.h",
@@ -1488,10 +1467,6 @@ static_library("browser") {
       "//components/webauthn/core/browser",
       "//third_party/blink/public/common",
     ]
-  }
-
-  if (is_ios || is_android) {
-    deps += [ "//components/strings" ]
   }
 
   sources += [
@@ -2188,15 +2163,6 @@ source_set("unit_tests") {
     "webdata/web_data_service_unittest.cc",
   ]
 
-  if (is_ios || is_android) {
-    sources += [
-      "payments/autofill_save_card_delegate_unittest.cc",
-      "payments/autofill_save_card_ui_info_unittest.cc",
-      "ui/payments/card_expiration_date_fix_flow_controller_impl_unittest.cc",
-      "ui/payments/card_name_fix_flow_controller_impl_unittest.cc",
-    ]
-  }
-
   sources += [
     "permissions/autofill_policy_handler_unittest.cc",
 
@@ -2323,10 +2289,6 @@ source_set("unit_tests") {
     "//ui/resources",
     "//url",
   ]
-
-  if (is_ios || is_android) {
-    deps += [ "//build:branding_buildflags" ]
-  }
 
   if (!is_ios && !is_android) {
     deps += [ "//ui/native_theme" ]

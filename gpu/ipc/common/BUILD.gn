@@ -81,13 +81,6 @@ source_set("ipc_common_sources") {
     "//ui/gl",
   ]
 
-  if (is_ios && target_platform == "iphoneos") {
-    sources += [
-      "ios/be_layer_hierarchy_transport.cc",
-      "ios/be_layer_hierarchy_transport.h",
-    ]
-  }
-
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
   }
@@ -164,7 +157,6 @@ mojom("gpu_channel_mojom") {
 }
 
 mojom("shared_image_pool_client_interface") {
-  generate_java = true
   visibility = [
     "//gpu/*",
     "//services/*",
@@ -177,7 +169,6 @@ mojom("shared_image_pool_client_interface") {
 }
 
 mojom("surface_handle") {
-  generate_java = true
   sources = [ "surface_handle.mojom" ]
   cpp_typemaps = [
     {
@@ -195,7 +186,6 @@ mojom("surface_handle") {
 }
 
 mojom("interfaces") {
-  generate_java = true
   sources = [
     "capabilities.mojom",
     "constants.mojom",
@@ -556,7 +546,6 @@ mojom("interfaces") {
 }
 
 mojom("gpu_preferences_interface") {
-  generate_java = true
   sources = [ "gpu_preferences.mojom" ]
 
   public_deps = [
@@ -594,7 +583,6 @@ mojom("gpu_preferences_interface") {
 
 if (enable_vulkan) {
   mojom("vulkan_interface") {
-    generate_java = true
     webui_module_path = "/"
     generate_legacy_js_bindings = true
 

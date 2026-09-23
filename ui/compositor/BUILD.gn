@@ -129,12 +129,6 @@ component("compositor") {
     deps += [ "//ui/accelerated_widget_mac" ]
   }
 
-  if (is_win && use_aura) {
-    # TODO(sky): before we make this real need to remove
-    # IDR_BITMAP_BRUSH_IMAGE.
-    deps += [ "//ui/resources" ]
-  }
-
   if (is_linux) {
     deps += [ "//ui/platform_window" ]
   }

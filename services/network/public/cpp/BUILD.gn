@@ -714,11 +714,6 @@ component("cpp_base") {
       "network_interface_change_listener_mojom_traits.h",
     ]
   }
-
-  # TODO(crbug.com/40915226): Remove the need to ignore this warning.
-  if (is_win && is_component_build) {
-    ldflags = [ "/IGNORE:4217" ]
-  }
 }
 
 if (is_p2p_enabled) {

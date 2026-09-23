@@ -16,12 +16,6 @@ import("//testing/test.gni")
 test("services_unittests") {
   use_xvfb = use_xvfb_in_this_config
 
-  # The tracing unittests require this for testing unwinding. See
-  # stack_unwinder_android_unittest.cc.
-  if (is_android && can_unwind_with_cfi_table && is_official_build) {
-    add_unwind_tables_in_apk = true
-  }
-
   # If your service does not run on iOS, its tests should go in the !iOS
   # section below. If you are unsure, contact blundell@chromium.org.
   deps = [
@@ -100,10 +94,6 @@ test("services_unittests") {
       "//services/webnn/public/cpp:tests",
       "//services/webnn/public/mojom:tests",
     ]
-  }
-
-  if (is_android && (current_cpu == "arm" || current_cpu == "arm64")) {
-    deps += [ "//base:base_profiler_test_support_library" ]
   }
 
   if (is_linux) {

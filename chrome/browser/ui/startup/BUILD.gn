@@ -249,9 +249,6 @@ source_set("impl") {
     deps += [ "//chrome/browser/ui/views/session_restore_infobar" ]
   }
 
-  if (is_win && is_chrome_branded) {
-    deps += [ "//chrome/browser/win/installer_downloader:controller" ]
-  }
   if (enable_rlz) {
     deps += [ "//components/rlz" ]
   }

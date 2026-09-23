@@ -233,9 +233,6 @@ source_set("browser_ui_prefs") {
     "//components/pref_registry",
     "//components/prefs",
   ]
-  if (is_win && is_chrome_branded) {
-    deps += [ "//chrome/browser/win/installer_downloader:prefs" ]
-  }
 }
 
 source_set("browser_otr_state") {

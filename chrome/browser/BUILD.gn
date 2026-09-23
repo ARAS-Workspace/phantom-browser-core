@@ -1204,18 +1204,6 @@ source_set("core") {
   }
 
   if (enable_offline_pages) {
-    # Used to build test harness locally.The harness is used manually to
-    # produce multiple offline pages to evaluate quality of the snapshots.
-    # This will only be built iff. | enable_offline_pages_harness | is set while
-    # | enable_offline_pages | and | is_android | are both true.
-    if (enable_offline_pages_harness && is_android) {
-      sources += [
-        "offline_pages/android/evaluation/evaluation_test_scheduler.cc",
-        "offline_pages/android/evaluation/evaluation_test_scheduler.h",
-        "offline_pages/android/evaluation/offline_page_evaluation_bridge.cc",
-        "offline_pages/android/evaluation/offline_page_evaluation_bridge.h",
-      ]
-    }
   }
 
   if (enable_dice_support) {

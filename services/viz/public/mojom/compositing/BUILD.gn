@@ -5,7 +5,6 @@ import("//build/config/ui.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 
 mojom("shared_image_format") {
-  generate_java = true
   sources = [ "shared_image_format.mojom" ]
   enabled_features = []
   if (use_ozone) {

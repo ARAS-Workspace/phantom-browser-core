@@ -267,5 +267,4 @@ mojom("internals_mojo_bindings") {
     "//mojo/public/mojom/base",
   ]
   webui_module_path = "/"
-  generate_java = false
 }

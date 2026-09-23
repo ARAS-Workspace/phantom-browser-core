@@ -12,10 +12,6 @@ build_webui("build") {
     "about_version.html",
   ]
 
-  if (is_android || is_ios) {
-    static_files += [ "about_version_mobile.css" ]
-  }
-
   ts_files = [ "about_version.ts" ]
 
   ts_definitions = [ "//tools/typescript/definitions/chrome_send.d.ts" ]

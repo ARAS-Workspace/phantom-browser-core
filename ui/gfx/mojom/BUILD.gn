@@ -7,7 +7,6 @@ import("//build/config/ozone.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 
 mojom("mojom") {
-  generate_java = true
   sources = [
     "accelerated_widget.mojom",
     "buffer_types.mojom",
@@ -388,7 +387,6 @@ mojom("native_handle_types") {
   }
 
   public_deps = [ "//mojo/public/mojom/base" ]
-  generate_java = true
 
   shared_cpp_typemaps = []
 
@@ -474,8 +472,6 @@ component("native_handle_types_mojom_traits") {
 }
 
 mojom("hdr_metadata") {
-  generate_java = true
-
   sources = [ "hdr_metadata.mojom" ]
 
   public_deps = [

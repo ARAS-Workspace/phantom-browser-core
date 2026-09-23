@@ -105,12 +105,6 @@ group("gn_all") {
       "//url:url_unittests",
     ]
 
-    if (current_cpu == "arm64" && is_android && host_os == "linux") {
-      deps += [
-        "//components/allocation_recorder/tools:dump_allocation_recorder_data",
-      ]
-    }
-
     if (!is_component_build) {
       deps += [ "//third_party/abseil-cpp:absl_tests" ]
     }
@@ -626,14 +620,6 @@ group("rust_build_tests") {
   deps = [ "//build/rust/tests" ]
 }
 
-if (is_android && !is_cronet_build) {
-  # On CQ, run the Traffic Annotation Auditor when a change affects one of these
-  # targets.
-  group("traffic_annotation_auditor_dependencies") {
-    deps = [ "//tools/traffic_annotation:annotations_xml" ]
-  }
-}
-
 if (use_blink && !is_cronet_build) {
   group("chromedriver_group") {
     testonly = true
@@ -736,24 +722,6 @@ if (!is_ios && !is_android && !is_cronet_build) {
     if (enable_pdf) {
       data_deps += [ "//third_party/pdfium/testing:pdfium_test" ]
     }
-  }
-}
-
-if (is_android && !is_cronet_build) {
-  group("optimize_gn_gen") {
-    deps = [
-      # These run expensive scripts in non-default toolchains. Generally, host
-      # toolchain targets are loaded in the later part of the run, and the
-      # result is they push out the end of generation. By preloading these, the
-      # scripts can be parallelized with the rest of the load.
-      "//build/config/linux(//build/toolchain/linux:clang_x64)",
-      "//build/config/posix(//build/toolchain/linux:clang_x64)",
-
-      # Include x86 toolchains as well since V8 uses them for 32-bit snapshot
-      # generation.
-      "//build/config/linux(//build/toolchain/linux:clang_x86)",
-      "//build/config/posix(//build/toolchain/linux:clang_x86)",
-    ]
   }
 }
 

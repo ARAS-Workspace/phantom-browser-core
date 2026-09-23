@@ -3225,36 +3225,6 @@ target(_test_target_type, "net_unittests") {
     sources += [ "base/network_interfaces_getifaddrs_unittest.cc" ]
   }
 
-  # Unit tests that aren't supported by the current ICU alternatives on Android.
-  if (is_android && use_platform_icu_alternatives) {
-    sources -= [
-      "base/filename_util_unittest.cc",
-      "base/url_util_unittest.cc",
-      "cert/x509_certificate_unittest.cc",
-      "url_request/url_request_job_unittest.cc",
-    ]
-    deps += [ "//url:url_java" ]
-  }
-
-  # Unit tests that are not supported by the current ICU alternatives on iOS.
-  if (is_ios && use_platform_icu_alternatives) {
-    sources -= [
-      "base/filename_util_unittest.cc",
-      "base/url_util_unittest.cc",
-      "cert/x509_certificate_unittest.cc",
-      "http/http_auth_handler_basic_unittest.cc",
-      "http/http_auth_handler_digest_unittest.cc",
-      "http/http_auth_handler_factory_unittest.cc",
-      "http/http_auth_unittest.cc",
-      "http/http_content_disposition_unittest.cc",
-      "http/http_network_transaction_unittest.cc",
-      "spdy/spdy_network_transaction_unittest.cc",
-      "spdy/spdy_proxy_client_socket_unittest.cc",
-      "url_request/url_request_job_unittest.cc",
-      "url_request/url_request_unittest.cc",
-    ]
-  }
-
   if (!disable_brotli_filter) {
     sources += [ "filter/brotli_source_stream_unittest.cc" ]
   }

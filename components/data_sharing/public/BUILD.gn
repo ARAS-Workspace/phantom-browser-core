@@ -52,8 +52,6 @@ source_set("logger") {
 }
 
 mojom("logger_interfaces") {
-  generate_java = true
-
   sources = [ "logger_common.mojom" ]
   webui_module_path = "/"
   public_deps = [ "//mojo/public/mojom/base" ]

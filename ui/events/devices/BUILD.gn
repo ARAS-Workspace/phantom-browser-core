@@ -36,14 +36,6 @@ component("devices") {
     ]
   }
 
-  if (is_ios && use_blink && target_platform == "iphoneos") {
-    sources += [
-      "input_device_observer_ios.h",
-      "input_device_observer_ios.mm",
-    ]
-    frameworks = [ "GameController.framework" ]
-  }
-
   defines = [ "EVENTS_DEVICES_IMPLEMENTATION" ]
 
   public_deps = [
@@ -68,10 +60,6 @@ source_set("unittests") {
     "input_device_unittest.cc",
     "touchscreen_device_unittest.cc",
   ]
-
-  if (is_ios && use_blink && target_platform == "iphoneos") {
-    sources += [ "input_device_observer_ios_unittest.cc" ]
-  }
 
   deps = [
     ":devices",

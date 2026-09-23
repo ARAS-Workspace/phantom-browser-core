@@ -376,24 +376,6 @@ if (is_clang_or_gcc) {
     ]
   }
 
-  if (is_win && is_component_build) {
-    group("win_component_build_adapter") {
-      # Currently guard this target by using build_with_chromium to avoid
-      # any issues on third_party build. But if any third_party code wants to
-      # use allocator_shim for its own component build, we will remove this
-      # guard.
-      if (build_with_chromium) {
-        if (use_allocator_shim) {
-          public_deps = [
-            ":allocator_base",
-            ":allocator_shim",
-          ]
-        }
-      }
-      # If not with chromium, currently do nothing.
-    }
-  }
-
   source_set("internal_headers") {
     visibility = [
       ":allocator_core",

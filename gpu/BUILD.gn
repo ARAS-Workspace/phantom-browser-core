@@ -360,10 +360,6 @@ test("gl_tests") {
 
   data_deps = [ "//testing/buildbot/filters:gl_tests_filters" ]
 
-  if (is_android && enable_chrome_android_internal) {
-    data_deps += [ "//clank/build/bot/filters:gl_tests_filters" ]
-  }
-
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
@@ -629,10 +625,6 @@ test("gpu_unittests") {
       "//third_party/dawn/src/dawn:proc",
       "//third_party/dawn/src/dawn/native",
     ]
-  }
-
-  if (skia_use_dawn && is_win) {
-    deps += [ "//media/base/win:test_support" ]
   }
 
   if (use_ozone) {

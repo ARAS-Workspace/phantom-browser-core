@@ -103,13 +103,6 @@ source_set("identity_manager") {
       "accounts_mutator_impl.h",
     ]
   }
-
-  if (is_ios || is_android) {
-    sources += [
-      "device_accounts_synchronizer_impl.cc",
-      "device_accounts_synchronizer_impl.h",
-    ]
-  }
 }
 
 source_set("capabilities") {

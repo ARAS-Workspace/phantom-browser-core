@@ -171,13 +171,6 @@ source_set("browser_tests") {
     deps += [ "//components/remote_cocoa/app_shim" ]
   }
 
-  if (use_aura && is_win) {
-    deps += [
-      "//ui/aura",
-      "//ui/aura:test_support",
-    ]
-  }
-
   if (use_ozone && is_linux) {
     deps += [ "//ui/ozone" ]
   }
@@ -210,10 +203,4 @@ source_set("interactive_ui_tests") {
     "//testing/gtest",
     "//ui/gfx",
   ]
-  if (use_aura && is_win) {
-    deps += [
-      "//ui/aura",
-      "//ui/compositor",
-    ]
-  }
 }

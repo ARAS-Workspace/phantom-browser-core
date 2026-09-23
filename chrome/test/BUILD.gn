@@ -3131,17 +3131,6 @@ test("unit_tests") {
     sources += [ "../common/net/x509_certificate_model_unittest.cc" ]
   }
 
-  # Support v8_unwinder_unittest on Android.
-  if (is_android && enable_arm_cfi_table) {
-    configs -= [ "//build/config/compiler:default_symbols" ]
-    if (symbol_level == 2) {
-      configs += [ "//build/config/compiler:symbols" ]
-    } else {
-      configs += [ "//build/config/compiler:minimal_symbols" ]
-    }
-    add_unwind_tables_in_apk = true
-  }
-
   configs += [ "//build/config:precompiled_headers" ]
   configs += [ ":disable_thinlto_cache_flags" ]
 
@@ -5956,10 +5945,6 @@ test("interactive_ui_tests") {
     ]
   }
 
-  if (is_win && is_chrome_branded) {
-    deps += [ "//chrome/browser/win/installer_downloader:interactive_ui_tests" ]
-  }
-
   if (is_win || is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/views/session_restore_infobar:interactive_ui_tests",
@@ -6651,9 +6636,6 @@ source_set("xr_browser_tests_common") {
 
   if (enable_vr) {
     deps += [ "//device/vr" ]
-  }
-  if (enable_vr && is_win) {
-    deps += [ "//device/vr:directx_helpers" ]
   }
 
   if (!is_mac && !is_android) {

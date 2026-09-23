@@ -340,9 +340,7 @@ component("base") {
       ]
     }
 
-    if (is_ios && target_platform == "iphoneos") {
-      sources += [ "pointer/pointer_device_ios.cc" ]
-    } else if (is_linux) {
+    if (is_linux) {
       sources += [ "pointer/pointer_device_linux.cc" ]
     } else {
       # Empty implementation for all other cases.
@@ -493,10 +491,6 @@ component("base") {
       "nine_image_painter_factory.h",
     ]
   }
-
-  if (is_android || is_ios) {
-    sources -= [ "device_form_factor_desktop.cc" ]
-  }
 }
 
 component("data_exchange") {
@@ -629,13 +623,6 @@ static_library("test_support") {
     "test/ui_controls.cc",
     "test/ui_controls.h",
   ]
-
-  if (use_aura && is_win) {
-    sources += [
-      "test/ui_controls_aura.cc",
-      "test/ui_controls_aura.h",
-    ]
-  }
 
   public_deps = [
     ":base",

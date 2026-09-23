@@ -90,10 +90,6 @@ component("client") {
   ]
 
   configs += [ ":gwp_asan_implementation" ]
-
-  if (is_android || is_ios) {
-    deps += [ "//components/crash/core/app" ]
-  }
 }
 
 source_set("unit_tests") {

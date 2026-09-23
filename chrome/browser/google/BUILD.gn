@@ -42,14 +42,4 @@ source_set("unit_tests") {
     "//chrome/installer/util:with_no_strings",
     "//testing/gtest",
   ]
-
-  if (is_win && is_chrome_branded) {
-    sources += [ "google_update_win_unittest.cc" ]
-    deps += [
-      "//chrome/common:version_header",
-      "//chrome/install_static/test:test_support",
-      "//chrome/updater/app/server/win:updater_legacy_idl",
-      "//components/policy/core/common",
-    ]
-  }
 }

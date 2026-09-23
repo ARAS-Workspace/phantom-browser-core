@@ -89,25 +89,6 @@ static_library("base") {
   }
 }
 
-if (is_android || is_ios) {
-  source_set("signin_deep_link") {
-    sources = [
-      "signin_deep_link_metrics.cc",
-      "signin_deep_link_metrics.h",
-      "signin_deep_link_parser.cc",
-      "signin_deep_link_parser.h",
-      "signin_deep_link_payload.cc",
-      "signin_deep_link_payload.h",
-    ]
-    deps = [
-      ":signin_switches",
-      "//base",
-      "//net",
-    ]
-    public_deps = [ "//url" ]
-  }
-}
-
 static_library("test_support") {
   testonly = true
   sources = [
@@ -175,15 +156,6 @@ source_set("unit_tests") {
       "//components/unexportable_keys:test_support",
       "//crypto:test_support",
     ]
-  }
-
-  if (is_android || is_ios) {
-    sources += [
-      "signin_deep_link_metrics_unittest.cc",
-      "signin_deep_link_parser_unittest.cc",
-      "signin_deep_link_payload_unittest.cc",
-    ]
-    deps += [ ":signin_deep_link" ]
   }
 }
 

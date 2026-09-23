@@ -130,13 +130,6 @@ component("events_base") {
     deps += [ "//base:i18n" ]
   }
 
-  if (is_ios && use_blink) {
-    sources += [
-      "keycodes/keyboard_code_conversion_ios.h",
-      "keycodes/keyboard_code_conversion_ios.mm",
-    ]
-  }
-
   if (ozone_platform_x11) {
     public_deps += [ "//ui/events/keycodes:x11" ]
 
@@ -256,10 +249,6 @@ component("events") {
 
   if (use_ozone) {
     sources += [ "events_default.cc" ]
-  }
-
-  if (is_win && use_ozone) {
-    sources -= [ "win/events_win.cc" ]
   }
 
   if (use_ozone) {

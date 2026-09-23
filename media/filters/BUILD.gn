@@ -211,12 +211,6 @@ source_set("filters") {
     ]
     deps += [ "//media/base/mac" ]
   }
-  if (is_win && enable_platform_dts_audio) {
-    sources += [
-      "passthrough_dts_audio_decoder.cc",
-      "passthrough_dts_audio_decoder.h",
-    ]
-  }
 
   if (enable_hls_demuxer) {
     sources += [

@@ -103,10 +103,6 @@ component("public") {
     "//components/download/database",
   ]
 
-  if (is_win && is_component_build) {
-    ldflags = [ "/IGNORE:4217" ]
-  }
-
   if (is_win || is_mac) {
     sources += [
       "desktop/desktop_auto_resumption_handler.cc",

@@ -9,7 +9,6 @@ import("//testing/test.gni")
 import("//third_party/libprotobuf-mutator/fuzzable_proto_library.gni")
 
 mojom("variations_mojom") {
-  generate_java = true
   sources = [ "variations.mojom" ]
 }
 
@@ -103,13 +102,6 @@ component("variations") {
   # Needed for exporting functions (because the target type is a component).
   defines = [ "IS_VARIATIONS_IMPL" ]
 
-  if (is_android || is_ios) {
-    sources += [
-      "variations_request_scheduler_mobile.cc",
-      "variations_request_scheduler_mobile.h",
-    ]
-  }
-
   public_deps = [
     ":variations_features",
     "proto",
@@ -197,10 +189,6 @@ source_set("unit_tests") {
     "variations_seed_store_unittest.cc",
     "variations_test_utils_unittest.cc",
   ]
-
-  if (is_android || is_ios) {
-    sources += [ "variations_request_scheduler_mobile_unittest.cc" ]
-  }
 
   # This test uses crash_reporter::GetCrashKeyValue(), which in a component
   # build returns the crash keys in the unit-test, not the "variations"

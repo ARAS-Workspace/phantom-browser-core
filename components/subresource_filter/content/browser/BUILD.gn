@@ -187,9 +187,6 @@ source_set("unit_tests") {
     "//url",
   ]
   public_deps = [ "//components/subresource_filter/content/mojom" ]
-  if (is_ios && use_blink) {
-    deps += [ "//components/test:subresource_filter_test_bundle_data" ]
-  }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.

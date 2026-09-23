@@ -29,63 +29,6 @@ source_set("library_support") {
   ]
 }
 
-if (!is_cronet_build && is_android) {
-  generate_jni("jni_headers") {
-    sources = [
-      "android/java/src/org/chromium/components/metrics/LowEntropySource.java",
-    ]
-  }
-
-  java_cpp_features("java_features_srcjar") {
-    # External code should depend on ":foo_java" instead.
-    visibility = [ ":*" ]
-    sources = [ "//components/metrics/metrics_features.cc" ]
-    class_name = "org.chromium.components.metrics.MetricsFeatures"
-  }
-
-  java_cpp_strings("java_switches_srcjar") {
-    # External code should depend on ":metrics_java" instead.
-    visibility = [ ":*" ]
-    sources = [ "metrics_switches.h" ]
-    class_name = "org.chromium.components.metrics.MetricsSwitches"
-  }
-
-  java_cpp_enum("java_enum_srcjar") {
-    # External code should depend on ":metrics_java" instead.
-    visibility = [ ":*" ]
-    sources = [ "stability_metrics_helper.h" ]
-  }
-
-  android_library("metrics_java") {
-    # Right now, this only includes the Java switches. But if we need more Java
-    # files, they should be added here as necessary.
-    srcjar_deps = [
-      ":java_enum_srcjar",
-      ":java_features_srcjar",
-      ":java_switches_srcjar",
-    ]
-    sources = [
-      "android/java/src/org/chromium/components/metrics/LimitedEntropyRandomizationSource.java",
-      "android/java/src/org/chromium/components/metrics/LowEntropySource.java",
-    ]
-    deps = [
-      "//base:base_java",
-      "//third_party/androidx:androidx_annotation_annotation_java",
-      "//third_party/jni_zero:jni_zero_java",
-    ]
-  }
-
-  robolectric_library("components_metrics_junit_tests") {
-    sources = [ "android/junit/src/org/chromium/components/metrics/LimitedEntropyRandomizationSourceTest.java" ]
-    deps = [
-      ":metrics_java",
-      "//base:base_java_test_support",
-      "//base:base_junit_test_support",
-      "//third_party/junit",
-    ]
-  }
-}
-
 # Used by the Chrome installer, which doesn't need the whole metrics library.
 source_set("client_info") {
   sources = [

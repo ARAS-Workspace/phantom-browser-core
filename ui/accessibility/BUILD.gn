@@ -12,12 +12,10 @@ import("//tools/json_schema_compiler/json_schema_api.gni")
 import("//ui/base/ui_features.gni")
 
 mojom("ax_constants_mojo") {
-  generate_java = true
   sources = [ "ax_constants.mojom" ]
 }
 
 mojom_component("ax_enums_mojo") {
-  generate_java = true
   sources = [ "ax_enums.mojom" ]
 
   macro_prefix = "UI_ACCESSIBILITY_AX_MOJOM"

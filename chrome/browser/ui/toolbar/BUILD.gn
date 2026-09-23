@@ -446,9 +446,3 @@ if (toolkit_views) {
     ]
   }
 }
-
-if (is_android && enable_extensions_core) {
-  java_cpp_enum("toolbar_action_view_model_enums") {
-    sources = [ "toolbar_action_view_model.h" ]
-  }
-}

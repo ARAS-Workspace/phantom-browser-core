@@ -6,15 +6,6 @@ import("//build/config/ui.gni")
 import("//components/viz/viz.gni")
 import("//testing/test.gni")
 
-if (is_ios && skia_use_dawn) {
-  bundle_data("unit_tests_filter_bundle_data") {
-    testonly = true
-    sources = [ "//testing/buildbot/filters/ios.viz_unittests.filter" ]
-    outputs = [ "{{bundle_resources_dir}}/" +
-                "{{source_root_relative_dir}}/{{source_file_part}}" ]
-  }
-}
-
 viz_test("viz_unittests") {
   configs = []
 

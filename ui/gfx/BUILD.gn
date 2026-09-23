@@ -272,13 +272,6 @@ component("gfx") {
     public_deps += [ "//cc/paint" ]
     deps += [ "//third_party/harfbuzz" ]
 
-    if (is_android || is_ios) {
-      sources += [
-        "font_fallback_skia.cc",
-        "font_render_params_skia.cc",
-      ]
-    }
-
     if (is_android || is_win || is_apple) {
       sources += [
         "font_fallback_skia_impl.cc",

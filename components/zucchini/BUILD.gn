@@ -126,34 +126,6 @@ static_library("zucchini_io") {
   ]
 }
 
-if (is_win && current_toolchain == default_toolchain) {
-  # Redirect the default 'zucchini' target to the one built with the system
-  # allocator.
-  _toolchain =
-      "//build/toolchain/win:win_clang_$target_cpu" + "_with_system_allocator"
-  _label = ":zucchini($_toolchain)"
-  _out_dir = get_label_info(_label, "root_out_dir")
-
-  copy("copy_zucchini_exe") {
-    sources = [ "$_out_dir/zucchini.exe" ]
-    outputs = [ "$root_out_dir/zucchini.exe" ]
-    deps = [ _label ]
-  }
-
-  copy("copy_zucchini_root_pdb") {
-    sources = [ "$_out_dir/zucchini.exe.pdb" ]
-    outputs = [ "$root_out_dir/zucchini.exe.pdb" ]
-    deps = [ _label ]
-  }
-
-  group("zucchini") {
-    public_deps = [
-      ":copy_zucchini_exe",
-      ":copy_zucchini_root_pdb",
-    ]
-  }
-}
-
 if (!is_win || current_toolchain != default_toolchain) {
   executable("zucchini") {
     sources = [

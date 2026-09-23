@@ -7,7 +7,6 @@ import("//mojo/public/tools/bindings/mojom.gni")
 import("//services/device/public/cpp/compute_pressure/buildflags.gni")
 
 mojom("mojom") {
-  generate_java = true
   sources = [
     "battery_monitor.mojom",
     "battery_status.mojom",
@@ -46,10 +45,6 @@ mojom("mojom") {
     "//url/mojom:url_mojom_gurl",
     "//url/mojom:url_mojom_origin",
   ]
-
-  if (is_ios && target_platform == "iphoneos") {
-    enabled_features = [ "is_ios_iphoneos" ]
-  }
 
   if (use_blink) {
     # The blink variant of the Device Service mojom are depended on by the
@@ -101,7 +96,6 @@ mojom("device_service") {
 }
 
 mojom("generic_sensor") {
-  generate_java = true
   sources = [
     "sensor.mojom",
     "sensor_provider.mojom",
@@ -154,7 +148,6 @@ mojom("generic_sensor") {
 }
 
 mojom("usb") {
-  generate_java = true
   sources = [
     "usb_device.mojom",
     "usb_enumeration_options.mojom",
@@ -197,14 +190,12 @@ mojom("usb") {
 }
 
 mojom("usb_test") {
-  generate_java = true
   sources = [ "usb_manager_test.mojom" ]
   public_deps = [ "//url/mojom:url_mojom_gurl" ]
   webui_module_path = "/"
 }
 
 mojom("geoposition") {
-  generate_java = true
   sources = [ "geoposition.mojom" ]
   public_deps = [ "//mojo/public/mojom/base" ]
 

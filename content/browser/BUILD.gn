@@ -89,13 +89,6 @@ source_set("browser") {
     "//content/test/fuzzer:media_stream_dispatcher_host_mojolpm_fuzzer",
   ]
 
-  if (use_fuzzing_engine && is_android) {
-    visibility += [
-      ":*",
-      "//content/test/fuzzer:*",
-    ]
-  }
-
   configs += [
     "//build/config:precompiled_headers",
     "//content:content_implementation",
@@ -2502,15 +2495,6 @@ source_set("browser") {
     }
   }
 
-  if (is_ios && target_platform == "iphoneos") {
-    sources += [
-      "ios/nfc_host.h",
-      "ios/nfc_host.mm",
-    ]
-    frameworks += [ "CoreNFC.framework" ]
-    deps += [ "//services/device/public/cpp/nfc" ]
-  }
-
   if (is_mac) {
     sources -=
         [ "file_system_access/file_path_watcher/file_path_watcher_stub.cc" ]
@@ -2773,13 +2757,6 @@ source_set("browser") {
 
   if (use_pangocairo) {
     configs += [ "//build/config/linux/pangocairo" ]
-  }
-
-  if (is_android || is_ios) {
-    sources += [
-      "date_time_chooser/date_time_chooser.cc",
-      "date_time_chooser/date_time_chooser.h",
-    ]
   }
 
   # Not Android.

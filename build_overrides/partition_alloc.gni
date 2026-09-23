@@ -75,15 +75,6 @@ if (is_asan || is_hwasan || is_lsan || is_tsan || is_msan) {
 
 # Under Fuchsia, the allocator shim is only required for PA-E.
 
-# Under Windows debug build, the allocator shim is not compatible with CRT.
-if (is_win && is_debug) {
-  use_allocator_shim_default = false
-}
-
-if (is_win && is_component_build && (!use_custom_libcxx || libcxx_is_shared)) {
-  use_allocator_shim_default = false
-}
-
 # When Cronet builds within Android this is not supported. See
 # https://crrev.com/c/6179216.
 if (is_cronet_for_aosp_build) {

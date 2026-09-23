@@ -279,26 +279,6 @@ source_set("internal") {
       "registry_dict.h",
     ]
   }
-  if ((is_android && !enable_extensions_core) || is_ios) {
-    sources += [ "cloud/component_cloud_policy_service_stub.cc" ]
-    sources -= [
-      "cloud/cloud_external_data_store.cc",
-      "cloud/cloud_external_data_store.h",
-      "cloud/component_cloud_policy_service.cc",
-      "cloud/component_cloud_policy_store.cc",
-      "cloud/component_cloud_policy_store.h",
-      "cloud/component_cloud_policy_updater.cc",
-      "cloud/component_cloud_policy_updater.h",
-      "cloud/external_policy_data_fetcher.cc",
-      "cloud/external_policy_data_fetcher.h",
-      "cloud/external_policy_data_updater.cc",
-      "cloud/external_policy_data_updater.h",
-      "cloud/resource_cache.cc",
-      "cloud/resource_cache.h",
-      "config_dir_policy_loader.cc",
-      "config_dir_policy_loader.h",
-    ]
-  }
   if (is_apple) {
     sources += [
       "mac_util.cc",
