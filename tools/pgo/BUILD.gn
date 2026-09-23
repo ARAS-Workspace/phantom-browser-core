@@ -6,11 +6,6 @@ import("//build/config/clang/clang.gni")
 import("//build/config/python.gni")
 import("//testing/test.gni")
 
-# Use the following import to find other suffixes as needed. The suffixes start
-# with _android. Since there are only two targets here, prefer to duplicate for
-# now instead of using a variable for better searchability.
-# import("//tools/perf/chrome_telemetry_build/android_browser_types.gni")
-
 python_library("generate_profile_py") {
   testonly = true
   pydeps_file = "//tools/pgo/generate_profile.pydeps"
