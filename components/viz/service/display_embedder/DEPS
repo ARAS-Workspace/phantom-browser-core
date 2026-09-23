@@ -6,7 +6,6 @@ include_rules = [
   "+cc/resources",
   "+cc/scheduler",
   "+components/viz/common",
-  "+components/viz/service/display/dc_layer_overlay.h",
   "+components/viz/service/display/display_compositor_memory_and_task_controller.h",
   "+components/viz/service/display/external_use_client.h",
   "+components/viz/service/display/output_surface_client.h",
