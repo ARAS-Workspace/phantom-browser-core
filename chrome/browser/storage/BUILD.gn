@@ -65,38 +65,36 @@ source_set("unit_tests") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
+source_set("browser_tests") {
+  testonly = true
 
-    sources = [ "persistent_storage_browsertest.cc" ]
+  sources = [ "persistent_storage_browsertest.cc" ]
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    deps = [
-      ":impl",
-      ":storage",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser",
-      "//chrome/browser/bookmarks",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/common:non_code_constants",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/bookmarks/browser",
-      "//components/bookmarks/test",
-      "//components/content_settings/core/browser",
-      "//components/content_settings/core/browser:cookie_settings",
-      "//content/public/browser",
-      "//content/public/common",
-      "//content/test:test_support",
-      "//net",
-      "//net:test_support",
-      "//testing/gtest",
-    ]
-  }
+  deps = [
+    ":impl",
+    ":storage",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser",
+    "//chrome/browser/bookmarks",
+    "//chrome/browser/content_settings:content_settings_factory",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/common:non_code_constants",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/bookmarks/browser",
+    "//components/bookmarks/test",
+    "//components/content_settings/core/browser",
+    "//components/content_settings/core/browser:cookie_settings",
+    "//content/public/browser",
+    "//content/public/common",
+    "//content/test:test_support",
+    "//net",
+    "//net:test_support",
+    "//testing/gtest",
+  ]
 }

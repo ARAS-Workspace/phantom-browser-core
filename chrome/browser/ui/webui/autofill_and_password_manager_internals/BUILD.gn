@@ -45,22 +45,20 @@ source_set("autofill_and_password_manager_internals") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    sources = [ "autofill_internals_ui_browsertest.cc" ]
+source_set("browser_tests") {
+  testonly = true
+  sources = [ "autofill_internals_ui_browsertest.cc" ]
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    deps = [
-      ":autofill_and_password_manager_internals",
-      "//base",
-      "//chrome/browser/autofill",
-      "//chrome/browser/ui",
-      "//chrome/test:test_support_ui",
-      "//components/device_reauth:test_support",
-      "//content/public/browser",
-      "//content/test:test_support",
-    ]
-  }
+  deps = [
+    ":autofill_and_password_manager_internals",
+    "//base",
+    "//chrome/browser/autofill",
+    "//chrome/browser/ui",
+    "//chrome/test:test_support_ui",
+    "//components/device_reauth:test_support",
+    "//content/public/browser",
+    "//content/test:test_support",
+  ]
 }

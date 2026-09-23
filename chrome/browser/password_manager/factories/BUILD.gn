@@ -25,14 +25,12 @@ source_set("factories") {
     "profile_password_store_factory.cc",
     "profile_password_store_factory.h",
   ]
-  if (!is_android) {
-    sources += [
-      "bulk_leak_check_service_factory.cc",
-      "bulk_leak_check_service_factory.h",
-      "password_counter_factory.cc",
-      "password_counter_factory.h",
-    ]
-  }
+  sources += [
+    "bulk_leak_check_service_factory.cc",
+    "bulk_leak_check_service_factory.h",
+    "password_counter_factory.cc",
+    "password_counter_factory.h",
+  ]
 
   deps = [
     ":backend_factory",
@@ -87,24 +85,22 @@ source_set("backend_factory") {
   }
 }
 
-if (!is_android) {
-  source_set("startup_import_factory") {
-    sources = [
-      "startup_passwords_import_service_factory.cc",
-      "startup_passwords_import_service_factory.h",
-    ]
+source_set("startup_import_factory") {
+  sources = [
+    "startup_passwords_import_service_factory.cc",
+    "startup_passwords_import_service_factory.h",
+  ]
 
-    deps = [
-      ":factories",
-      "//base",
-      "//chrome/browser/affiliations",
-      "//chrome/browser/password_manager:startup_import",
-      "//chrome/browser/profiles:profile",
-      "//chrome/common:channel_info",
-      "//chrome/common:non_code_constants",
-      "//components/keyed_service/core",
-      "//components/version_info:channel",
-      "//content/public/browser",
-    ]
-  }
+  deps = [
+    ":factories",
+    "//base",
+    "//chrome/browser/affiliations",
+    "//chrome/browser/password_manager:startup_import",
+    "//chrome/browser/profiles:profile",
+    "//chrome/common:channel_info",
+    "//chrome/common:non_code_constants",
+    "//components/keyed_service/core",
+    "//components/version_info:channel",
+    "//content/public/browser",
+  ]
 }

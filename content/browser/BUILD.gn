@@ -2644,29 +2644,22 @@ source_set("browser") {
       "media/capture/web_contents_video_capture_device.cc",
       "media/capture/web_contents_video_capture_device.h",
     ]
-    if (!is_ios) {
-      sources += [
-        "media/capture/desktop_capture_device.cc",
-        "media/capture/desktop_capture_device.h",
-        "media/capture/mouse_cursor_overlay_controller.cc",
-        "media/capture/mouse_cursor_overlay_controller.h",
-        "media/capture/screenshot_capture_request_impl.cc",
-        "media/capture/screenshot_capture_request_impl.h",
-      ]
-      public_deps += [ "//ui/base/cursor" ]
+    sources += [
+      "media/capture/desktop_capture_device.cc",
+      "media/capture/desktop_capture_device.h",
+      "media/capture/mouse_cursor_overlay_controller.cc",
+      "media/capture/mouse_cursor_overlay_controller.h",
+      "media/capture/screenshot_capture_request_impl.cc",
+      "media/capture/screenshot_capture_request_impl.h",
+    ]
+    public_deps += [ "//ui/base/cursor" ]
 
-      sources += [
-        "media/captured_surface_control_permission_manager.cc",
-        "media/captured_surface_control_permission_manager.h",
-        "media/captured_surface_controller.cc",
-        "media/captured_surface_controller.h",
-      ]
-    } else {
-      sources += [
-        "media/capture/screenshot_capture_request_impl.h",
-        "media/capture/screenshot_capture_request_impl_ios.cc",
-      ]
-    }
+    sources += [
+      "media/captured_surface_control_permission_manager.cc",
+      "media/captured_surface_control_permission_manager.h",
+      "media/captured_surface_controller.cc",
+      "media/captured_surface_controller.h",
+    ]
     if (use_aura) {
       sources += [
         "media/capture/aura_window_video_capture_device.cc",
@@ -2964,12 +2957,10 @@ source_set("browser") {
   }
 
   if (enable_vr) {
-    if (!is_android) {
-      sources += [
-        "xr/service/isolated_device_provider.cc",
-        "xr/service/isolated_device_provider.h",
-      ]
-    }
+    sources += [
+      "xr/service/isolated_device_provider.cc",
+      "xr/service/isolated_device_provider.h",
+    ]
 
     sources += [
       "xr/metrics/session_metrics_helper.cc",

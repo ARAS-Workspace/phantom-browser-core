@@ -11,20 +11,15 @@ source_set("accessibility") {
     "prefers_default_scrollbar_styles_prefs.h",
   ]
 
-  if (!is_android) {
-    public += [
-      "ax_main_node_annotator_controller.h",
-      "ax_main_node_annotator_controller_factory.h",
-      "caption_settings_dialog.h",
-      "embedded_a11y_extension_loader.h",
-      "invert_bubble_prefs.h",
-      "page_colors_controller.h",
-      "page_colors_controller_factory.h",
-    ]
-  }
-
-  if (!is_android) {
-  }
+  public += [
+    "ax_main_node_annotator_controller.h",
+    "ax_main_node_annotator_controller_factory.h",
+    "caption_settings_dialog.h",
+    "embedded_a11y_extension_loader.h",
+    "invert_bubble_prefs.h",
+    "page_colors_controller.h",
+    "page_colors_controller_factory.h",
+  ]
 
   if (enable_extensions) {
     public += [ "animation_policy_prefs.h" ]
@@ -39,19 +34,15 @@ source_set("accessibility") {
     "//net",
   ]
 
-  if (!is_android) {
-    public_deps += [ "//components/component_updater" ]
-  }
+  public_deps += [ "//components/component_updater" ]
 
-  if (!is_android) {
-    public_deps += [
-      "//chrome/browser/profiles:profile_manager",
-      "//chrome/browser/screen_ai:screen_ai_install_state",
-      "//components/pref_registry",
-      "//ui/accessibility/platform",
-      "//ui/native_theme",
-    ]
-  }
+  public_deps += [
+    "//chrome/browser/profiles:profile_manager",
+    "//chrome/browser/screen_ai:screen_ai_install_state",
+    "//components/pref_registry",
+    "//ui/accessibility/platform",
+    "//ui/native_theme",
+  ]
 }
 
 source_set("impl") {
@@ -62,28 +53,24 @@ source_set("impl") {
 
   deps = [ "//chrome/browser/language" ]
 
-  if (!is_android) {
-    sources += [
-      "ax_main_node_annotator_controller.cc",
-      "ax_main_node_annotator_controller_factory.cc",
-      "embedded_a11y_extension_loader.cc",
-      "invert_bubble_prefs.cc",
-      "page_colors_controller.cc",
-      "page_colors_controller_factory.cc",
-    ]
-    deps += [
-      "//chrome/browser/extensions",
-      "//chrome/browser/on_device_translation",
-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/browser_window",
-      "//components/on_device_translation",
-    ]
-  }
+  sources += [
+    "ax_main_node_annotator_controller.cc",
+    "ax_main_node_annotator_controller_factory.cc",
+    "embedded_a11y_extension_loader.cc",
+    "invert_bubble_prefs.cc",
+    "page_colors_controller.cc",
+    "page_colors_controller_factory.cc",
+  ]
+  deps += [
+    "//chrome/browser/extensions",
+    "//chrome/browser/on_device_translation",
+    "//chrome/browser/screen_ai:screen_ai_service_router_factory",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/browser_window",
+    "//components/on_device_translation",
+  ]
 
-  if (!is_android) {
-    deps += [ "//chrome/browser/component_updater" ]
-  }
+  deps += [ "//chrome/browser/component_updater" ]
 
   if (is_mac) {
     sources += [ "caption_settings_dialog_mac.cc" ]
@@ -135,40 +122,38 @@ source_set("unit_tests") {
   }
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-    data_deps = []
-    sources = [
-      "ax_main_node_annotator_controller_browsertest.cc",
-      "canvas_accessibility_browsertest.cc",
-      "interstitial_accessibility_browsertest.cc",
-      "page_colors_controller_browsertest.cc",
-    ]
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+  data_deps = []
+  sources = [
+    "ax_main_node_annotator_controller_browsertest.cc",
+    "canvas_accessibility_browsertest.cc",
+    "interstitial_accessibility_browsertest.cc",
+    "page_colors_controller_browsertest.cc",
+  ]
 
-    if (enable_extensions) {
-      sources += [ "embedded_a11y_extension_loader_browsertest.cc" ]
-    }
+  if (enable_extensions) {
+    sources += [ "embedded_a11y_extension_loader_browsertest.cc" ]
+  }
 
-    deps = [
-      ":accessibility",
-      ":impl",
-      "//chrome/browser/profiles:misc",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/test:test_support",
-      "//content/test:browsertest_support",
-      "//content/test:test_support",
-    ]
+  deps = [
+    ":accessibility",
+    ":impl",
+    "//chrome/browser/profiles:misc",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/test:test_support",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+  ]
 
-    deps += [
-      "//chrome/browser/screen_ai:screen_ai_service_router_factory",
-      "//services/screen_ai/public/cpp:utilities",
-    ]
+  deps += [
+    "//chrome/browser/screen_ai:screen_ai_service_router_factory",
+    "//services/screen_ai/public/cpp:utilities",
+  ]
 
-    if (enable_screen_ai_browsertests) {
-      data_deps += [ "//third_party/screen-ai:screen_ai" ]
-    }
+  if (enable_screen_ai_browsertests) {
+    data_deps += [ "//third_party/screen-ai:screen_ai" ]
   }
 }

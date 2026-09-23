@@ -76,19 +76,16 @@ group("telemetry_chrome_test_without_chrome") {
     "//tools/metrics:metrics_python_tests",
   ]
 
-  # Cr-Fuchsia doesn't support breakpad.
-  if (!is_win) {
-    data_deps += [
-      # This is defined for Windows, but is unused by Telemetry on
-      # Windows, and including it can have issues when cross-compiling
-      # for Arm-based Windows.
-      "//third_party/breakpad:dump_syms",
+  data_deps += [
+    # This is defined for Windows, but is unused by Telemetry on
+    # Windows, and including it can have issues when cross-compiling
+    # for Arm-based Windows.
+    "//third_party/breakpad:dump_syms",
 
-      # These explicitly not defined for Windows builds in Breakpad.
-      "//third_party/breakpad:minidump_dump",
-      "//third_party/breakpad:minidump_stackwalk",
-    ]
-  }
+    # These explicitly not defined for Windows builds in Breakpad.
+    "//third_party/breakpad:minidump_dump",
+    "//third_party/breakpad:minidump_stackwalk",
+  ]
 
   if (is_mac) {
     data += [

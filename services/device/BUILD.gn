@@ -296,9 +296,7 @@ source_set("tests") {
       "//third_party/fuzztest",
     ]
 
-    if (!is_android) {
-      sources += [ "public/cpp/usb/usb_ids_unittest.cc" ]
-    }
+    sources += [ "public/cpp/usb/usb_ids_unittest.cc" ]
 
     if (is_android || is_linux) {
       sources += [ "usb/usb_device_handle_usbfs_unittest.cc" ]

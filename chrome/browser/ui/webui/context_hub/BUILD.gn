@@ -82,19 +82,17 @@ source_set("context_hub_page_handler") {
     "//components/sessions",
   ]
 
-  if (!is_android) {
-    sources += [
-      "context_hub_tab_provider_desktop.cc",
-      "context_hub_tab_provider_desktop.h",
-    ]
-    deps += [
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/tabs/saved_tab_groups",
-      "//components/saved_tab_groups/public",
-      "//ui/base",
-    ]
-  }
+  sources += [
+    "context_hub_tab_provider_desktop.cc",
+    "context_hub_tab_provider_desktop.h",
+  ]
+  deps += [
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/tabs/saved_tab_groups",
+    "//components/saved_tab_groups/public",
+    "//ui/base",
+  ]
 }
 
 source_set("context_hub") {
@@ -117,9 +115,7 @@ source_set("context_hub") {
     "//chrome/common",
   ]
 
-  if (!is_android) {
-    deps += [ "//chrome/browser/ui/webui:favicon_source" ]
-  }
+  deps += [ "//chrome/browser/ui/webui:favicon_source" ]
 }
 
 source_set("unit_tests") {
@@ -142,7 +138,5 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_android) {
-    sources += [ "context_hub_tab_provider_desktop_unittest.cc" ]
-  }
+  sources += [ "context_hub_tab_provider_desktop_unittest.cc" ]
 }

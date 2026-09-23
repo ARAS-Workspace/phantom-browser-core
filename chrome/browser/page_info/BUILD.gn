@@ -28,9 +28,7 @@ source_set("page_info") {
     "//content/public/browser",
   ]
 
-  if (!is_android) {
-    sources += [ "web_view_side_panel_throttle.h" ]
-  }
+  sources += [ "web_view_side_panel_throttle.h" ]
 }
 
 # The reason `impl` is needed is because of the circular dependency
@@ -73,17 +71,15 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  if (!is_android) {
-    sources += [ "merchant_trust_service_delegate_unittest.cc" ]
-    deps += [
-      ":page_info",
-      "//base/test:test_support",
-      "//chrome/test:test_support",
-      "//components/page_info/core",
-      "//components/site_engagement/content",
-      "//content/test:test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-    ]
-  }
+  sources += [ "merchant_trust_service_delegate_unittest.cc" ]
+  deps += [
+    ":page_info",
+    "//base/test:test_support",
+    "//chrome/test:test_support",
+    "//components/page_info/core",
+    "//components/site_engagement/content",
+    "//content/test:test_support",
+    "//testing/gmock",
+    "//testing/gtest",
+  ]
 }

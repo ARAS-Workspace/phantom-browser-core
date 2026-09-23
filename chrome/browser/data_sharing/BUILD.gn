@@ -93,27 +93,23 @@ source_set("unit_tests") {
     "//content/test:test_support",
   ]
 
-  if (!is_android) {
-    sources += [ "desktop/data_sharing_conversion_utils_unittest.cc" ]
-  }
+  sources += [ "desktop/data_sharing_conversion_utils_unittest.cc" ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [
-      "desktop/data_sharing_sdk_delegate_desktop_browsertest.cc",
-      "desktop/data_sharing_service_browsertest.cc",
-    ]
-    deps = [
-      ":data_sharing",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/ui",
-      "//chrome/common",
-      "//chrome/test:test_support_ui",
-      "//components/data_sharing/public",
-    ]
-  }
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [
+    "desktop/data_sharing_sdk_delegate_desktop_browsertest.cc",
+    "desktop/data_sharing_service_browsertest.cc",
+  ]
+  deps = [
+    ":data_sharing",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/ui",
+    "//chrome/common",
+    "//chrome/test:test_support_ui",
+    "//components/data_sharing/public",
+  ]
 }

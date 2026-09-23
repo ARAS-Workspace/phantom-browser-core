@@ -172,90 +172,86 @@ template("chrome_extra_paks") {
       ]
     }
 
-    if (!is_android) {
-      # New paks should be added here by default.
-      sources += [
-        "$root_gen_dir/chrome/about_sys_resources.pak",
-        "$root_gen_dir/chrome/access_code_cast_resources.pak",
-        "$root_gen_dir/chrome/app_service_internals_resources.pak",
-        "$root_gen_dir/chrome/autofill_ml_internals_resources.pak",
-        "$root_gen_dir/chrome/bookmarks_resources.pak",
-        "$root_gen_dir/chrome/certificate_manager_resources.pak",
-        "$root_gen_dir/chrome/data_sharing_resources.pak",
-        "$root_gen_dir/chrome/dev_ui_resources.pak",
-        "$root_gen_dir/chrome/downloads_resources.pak",
-        "$root_gen_dir/chrome/feedback_resources.pak",
-        "$root_gen_dir/chrome/gaia_auth_host_resources.pak",
-        "$root_gen_dir/chrome/history_resources.pak",
-        "$root_gen_dir/chrome/inspect_resources.pak",
-        "$root_gen_dir/chrome/iwa_dev_resources.pak",
-        "$root_gen_dir/chrome/key_value_pair_viewer_shared_resources.pak",
-        "$root_gen_dir/chrome/new_tab_footer_resources.pak",
-        "$root_gen_dir/chrome/omnibox_everywhere_resources.pak",
-        "$root_gen_dir/chrome/omnibox_popup_resources.pak",
-        "$root_gen_dir/chrome/organizer_panel_resources.pak",
-        "$root_gen_dir/chrome/profile_internals_resources.pak",
-        "$root_gen_dir/chrome/search_engine_choice_resources.pak",
-        "$root_gen_dir/chrome/settings_resources.pak",
-        "$root_gen_dir/chrome/side_panel_bookmarks_resources.pak",
-        "$root_gen_dir/chrome/side_panel_comments_resources.pak",
-        "$root_gen_dir/chrome/side_panel_commerce_resources.pak",
-        "$root_gen_dir/chrome/side_panel_customize_chrome_resources.pak",
-        "$root_gen_dir/chrome/side_panel_history_clusters_resources.pak",
-        "$root_gen_dir/chrome/side_panel_history_resources.pak",
-        "$root_gen_dir/chrome/side_panel_read_anything_resources.pak",
-        "$root_gen_dir/chrome/side_panel_reading_list_resources.pak",
-        "$root_gen_dir/chrome/side_panel_shared_resources.pak",
-        "$root_gen_dir/chrome/side_panel_tabs_from_other_devices_resources.pak",
-        "$root_gen_dir/chrome/signin_resources.pak",
-        "$root_gen_dir/chrome/support_tool_resources.pak",
-        "$root_gen_dir/chrome/tab_group_home_resources.pak",
-        "$root_gen_dir/chrome/tab_search_resources.pak",
-        "$root_gen_dir/chrome/tab_strip_api_resources.pak",
-        "$root_gen_dir/chrome/web_app_internals_resources.pak",
-        "$root_gen_dir/chrome/webnn_internals_resources.pak",
-        "$root_gen_dir/chrome/webui_browser_resources.pak",
-        "$root_gen_dir/chrome/webui_gallery_resources.pak",
-        "$root_gen_dir/chrome/webui_toolbar_resources.pak",
-        "$root_gen_dir/chrome/webui_toolbar_shared_resources.pak",
-        "$root_gen_dir/chrome/whats_new_resources.pak",
-        "$root_gen_dir/components/headless/command_handler/headless_command_resources.pak",
-        "$root_gen_dir/content/browser/tracing/tracing_resources.pak",
-        "$root_gen_dir/content/traces_internals_resources.pak",
-      ]
+    # New paks should be added here by default.
+    sources += [
+      "$root_gen_dir/chrome/about_sys_resources.pak",
+      "$root_gen_dir/chrome/access_code_cast_resources.pak",
+      "$root_gen_dir/chrome/app_service_internals_resources.pak",
+      "$root_gen_dir/chrome/autofill_ml_internals_resources.pak",
+      "$root_gen_dir/chrome/bookmarks_resources.pak",
+      "$root_gen_dir/chrome/certificate_manager_resources.pak",
+      "$root_gen_dir/chrome/data_sharing_resources.pak",
+      "$root_gen_dir/chrome/dev_ui_resources.pak",
+      "$root_gen_dir/chrome/downloads_resources.pak",
+      "$root_gen_dir/chrome/feedback_resources.pak",
+      "$root_gen_dir/chrome/gaia_auth_host_resources.pak",
+      "$root_gen_dir/chrome/history_resources.pak",
+      "$root_gen_dir/chrome/inspect_resources.pak",
+      "$root_gen_dir/chrome/iwa_dev_resources.pak",
+      "$root_gen_dir/chrome/key_value_pair_viewer_shared_resources.pak",
+      "$root_gen_dir/chrome/new_tab_footer_resources.pak",
+      "$root_gen_dir/chrome/omnibox_everywhere_resources.pak",
+      "$root_gen_dir/chrome/omnibox_popup_resources.pak",
+      "$root_gen_dir/chrome/organizer_panel_resources.pak",
+      "$root_gen_dir/chrome/profile_internals_resources.pak",
+      "$root_gen_dir/chrome/search_engine_choice_resources.pak",
+      "$root_gen_dir/chrome/settings_resources.pak",
+      "$root_gen_dir/chrome/side_panel_bookmarks_resources.pak",
+      "$root_gen_dir/chrome/side_panel_comments_resources.pak",
+      "$root_gen_dir/chrome/side_panel_commerce_resources.pak",
+      "$root_gen_dir/chrome/side_panel_customize_chrome_resources.pak",
+      "$root_gen_dir/chrome/side_panel_history_clusters_resources.pak",
+      "$root_gen_dir/chrome/side_panel_history_resources.pak",
+      "$root_gen_dir/chrome/side_panel_read_anything_resources.pak",
+      "$root_gen_dir/chrome/side_panel_reading_list_resources.pak",
+      "$root_gen_dir/chrome/side_panel_shared_resources.pak",
+      "$root_gen_dir/chrome/side_panel_tabs_from_other_devices_resources.pak",
+      "$root_gen_dir/chrome/signin_resources.pak",
+      "$root_gen_dir/chrome/support_tool_resources.pak",
+      "$root_gen_dir/chrome/tab_group_home_resources.pak",
+      "$root_gen_dir/chrome/tab_search_resources.pak",
+      "$root_gen_dir/chrome/tab_strip_api_resources.pak",
+      "$root_gen_dir/chrome/web_app_internals_resources.pak",
+      "$root_gen_dir/chrome/webnn_internals_resources.pak",
+      "$root_gen_dir/chrome/webui_browser_resources.pak",
+      "$root_gen_dir/chrome/webui_gallery_resources.pak",
+      "$root_gen_dir/chrome/webui_toolbar_resources.pak",
+      "$root_gen_dir/chrome/webui_toolbar_shared_resources.pak",
+      "$root_gen_dir/chrome/whats_new_resources.pak",
+      "$root_gen_dir/components/headless/command_handler/headless_command_resources.pak",
+      "$root_gen_dir/content/browser/tracing/tracing_resources.pak",
+      "$root_gen_dir/content/traces_internals_resources.pak",
+    ]
 
-      deps += [
-        "//components/headless/command_handler",
-        "//content/browser/tracing:resources",
+    deps += [
+      "//components/headless/command_handler",
+      "//content/browser/tracing:resources",
+    ]
+    if (is_chrome_branded) {
+      sources += [
+        "$root_gen_dir/chrome/browser/nearby_sharing/internal/icons/nearby_share_internal_icons.pak",
+        "$root_gen_dir/chrome/media_router_feedback_resources.pak",
+        "$root_gen_dir/chrome/preinstalled_web_apps_resources.pak",
       ]
-      if (is_chrome_branded) {
-        sources += [
-          "$root_gen_dir/chrome/browser/nearby_sharing/internal/icons/nearby_share_internal_icons.pak",
-          "$root_gen_dir/chrome/media_router_feedback_resources.pak",
-          "$root_gen_dir/chrome/preinstalled_web_apps_resources.pak",
-        ]
-        deps += [ "//chrome/browser/nearby_sharing/internal/icons" ]
-      }
-      if (!optimize_webui) {
-        # Only add when optimize_webui=false, since in other cases the same
-        # resources are already bundled within the UIs that use them.
-        sources += [ "$root_gen_dir/chrome/settings_shared_resources.pak" ]
-        deps += [ "//chrome/browser/resources/settings_shared:resources" ]
-      }
+      deps += [ "//chrome/browser/nearby_sharing/internal/icons" ]
+    }
+    if (!optimize_webui) {
+      # Only add when optimize_webui=false, since in other cases the same
+      # resources are already bundled within the UIs that use them.
+      sources += [ "$root_gen_dir/chrome/settings_shared_resources.pak" ]
+      deps += [ "//chrome/browser/resources/settings_shared:resources" ]
     }
 
-    if (!is_android) {
-      sources += [
-        "$root_gen_dir/chrome/default_browser_modal_resources.pak",
-        "$root_gen_dir/chrome/intro_resources.pak",
-        "$root_gen_dir/chrome/profile_picker_resources.pak",
-      ]
-      deps += [
-        "//chrome/browser/resources/default_browser/default_browser_modal:resources",
-        "//chrome/browser/resources/intro:resources",
-        "//chrome/browser/resources/signin/profile_picker:resources",
-      ]
-    }
+    sources += [
+      "$root_gen_dir/chrome/default_browser_modal_resources.pak",
+      "$root_gen_dir/chrome/intro_resources.pak",
+      "$root_gen_dir/chrome/profile_picker_resources.pak",
+    ]
+    deps += [
+      "//chrome/browser/resources/default_browser/default_browser_modal:resources",
+      "//chrome/browser/resources/intro:resources",
+      "//chrome/browser/resources/signin/profile_picker:resources",
+    ]
 
     if (is_win || is_mac || is_linux || is_desktop_android) {
       sources += [ "$root_gen_dir/chrome/discards_resources.pak" ]

@@ -27,13 +27,11 @@ source_set("file_system_access") {
     "//third_party/blink/public/common",
     "//url",
   ]
-  if (!is_android) {
-    public_deps += [
-      "//chrome/browser/web_applications",
-      "//components/permissions",
-      "//components/permissions:permissions_common",
-    ]
-  }
+  public_deps += [
+    "//chrome/browser/web_applications",
+    "//components/permissions",
+    "//components/permissions:permissions_common",
+  ]
 }
 
 source_set("impl") {
@@ -82,49 +80,47 @@ source_set("impl") {
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [
-      "chrome_file_system_access_permission_context_browsertest.cc",
-      "file_system_access_picker_requires_user_gesture_browsertest.cc",
-      "file_system_access_tab_helper_browsertest.cc",
-      "file_system_file_handle_browsertest.cc",
-      "file_system_observer_browsertest.cc",
-    ]
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [
+    "chrome_file_system_access_permission_context_browsertest.cc",
+    "file_system_access_picker_requires_user_gesture_browsertest.cc",
+    "file_system_access_tab_helper_browsertest.cc",
+    "file_system_file_handle_browsertest.cc",
+    "file_system_observer_browsertest.cc",
+  ]
 
-    deps = [
-      ":file_system_access",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/profiles:profile",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/content_settings/core/browser:cookie_settings",
-      "//components/content_settings/core/common",
-      "//components/permissions",
-      "//components/permissions:permissions_common",
-      "//components/policy:generated",
-      "//components/policy:policy_code_generate",
-      "//components/policy/core/browser",
-      "//components/policy/core/common",
-      "//components/policy/core/common:common_constants",
-      "//components/policy/core/common:test_support",
-      "//content/public/browser",
-      "//content/public/common",
-      "//content/test:test_support",
-      "//extensions:test_support",
-      "//net:test_support",
-      "//testing/gtest",
-      "//ui/shell_dialogs",
-      "//url",
-    ]
+  deps = [
+    ":file_system_access",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/content_settings:content_settings_factory",
+    "//chrome/browser/profiles:profile",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/content_settings/core/browser:cookie_settings",
+    "//components/content_settings/core/common",
+    "//components/permissions",
+    "//components/permissions:permissions_common",
+    "//components/policy:generated",
+    "//components/policy:policy_code_generate",
+    "//components/policy/core/browser",
+    "//components/policy/core/common",
+    "//components/policy/core/common:common_constants",
+    "//components/policy/core/common:test_support",
+    "//content/public/browser",
+    "//content/public/common",
+    "//content/test:test_support",
+    "//extensions:test_support",
+    "//net:test_support",
+    "//testing/gtest",
+    "//ui/shell_dialogs",
+    "//url",
+  ]
 
-    if (enable_extensions) {
-      deps += [ "//chrome/browser/apps/platform_apps:browser_test_support" ]
-    }
+  if (enable_extensions) {
+    deps += [ "//chrome/browser/apps/platform_apps:browser_test_support" ]
   }
 }
 
@@ -148,8 +144,5 @@ source_set("unit_tests") {
     deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
   }
 
-  if (!is_android) {
-    deps +=
-        [ "//chrome/browser/web_applications:web_applications_test_support" ]
-  }
+  deps += [ "//chrome/browser/web_applications:web_applications_test_support" ]
 }

@@ -60,9 +60,7 @@ mojo_ts_files = [
   "url/mojom/url_converter.ts",
 ]
 
-if (!is_ios) {
-  mojo_ts_files += [ "components/omnibox/browser/searchbox.mojom-webui.ts" ]
-}
+mojo_ts_files += [ "components/omnibox/browser/searchbox.mojom-webui.ts" ]
 
 if (is_mac || is_win || is_linux || is_android) {
   mojo_ts_files += [ "mojo/public/mojom/base/version.mojom-webui.ts" ]

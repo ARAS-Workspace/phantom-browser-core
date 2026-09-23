@@ -89,15 +89,11 @@ source_set("browser_tests") {
     "//url",
   ]
 
-  # These tests use desktop-only UI (Browser, InProcessBrowserTest), so they
-  # are desktop-only.
-  if (!is_android) {
-    sources += [
-      "privileged_web_contents_browsertest.cc",
-      "pwc_api_binder_browsertest.cc",
-      "pwc_navigation_throttle_browsertest.cc",
-      "pwc_security_browsertest.cc",
-    ]
-    deps += [ "//chrome/browser/ui" ]
-  }
+  sources += [
+    "privileged_web_contents_browsertest.cc",
+    "pwc_api_binder_browsertest.cc",
+    "pwc_navigation_throttle_browsertest.cc",
+    "pwc_security_browsertest.cc",
+  ]
+  deps += [ "//chrome/browser/ui" ]
 }

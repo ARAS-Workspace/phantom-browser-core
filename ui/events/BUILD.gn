@@ -24,9 +24,7 @@ static_library("dom_keycode_converter") {
 
   deps = [ "//base" ]
 
-  if (!is_ios) {
-    deps += [ "//ipc:param_traits" ]
-  }
+  deps += [ "//ipc:param_traits" ]
 }
 
 static_library("dom_keyboard_layout") {
@@ -63,9 +61,7 @@ static_library("dom_keyboard_layout") {
     deps += [ "//ui/events/ozone/layout" ]
   }
 
-  if (!is_ios) {
-    deps += [ "//ipc:param_traits" ]
-  }
+  deps += [ "//ipc:param_traits" ]
 
   # Expose the internals of this target to other packages in this BUILD file
   # so the unit tests can access the private header files.
@@ -152,9 +148,7 @@ component("events_base") {
     deps += [ "//ui/gfx/x" ]
   }
 
-  if (!is_ios) {
-    deps += [ "//ipc:param_traits" ]
-  }
+  deps += [ "//ipc:param_traits" ]
 
   if (is_mac) {
     frameworks = [

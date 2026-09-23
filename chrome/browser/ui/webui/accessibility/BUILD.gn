@@ -28,11 +28,9 @@ source_set("impl") {
     "//components/pref_registry",
   ]
 
-  if (!is_android) {
-    deps += [
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/window_metadata",
-      "//ui/views",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/window_metadata",
+    "//ui/views",
+  ]
 }

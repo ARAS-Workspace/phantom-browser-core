@@ -109,10 +109,8 @@ static_library("safe_browsing") {
     deps += [ "//chrome/browser/ui/web_applications" ]
   }
 
-  if (!is_android) {
-    public += [ "generated_safe_browsing_pref.h" ]
-    sources += [ "generated_safe_browsing_pref.cc" ]
-  }
+  public += [ "generated_safe_browsing_pref.h" ]
+  sources += [ "generated_safe_browsing_pref.cc" ]
 
   if (is_win || is_mac || is_linux) {
     public += [ "security_settings_bundle_toast_helper.h" ]
@@ -504,15 +502,11 @@ static_library("safe_browsing") {
       if (is_mac) {
         deps += [ "//chrome/common/safe_browsing:disk_image_type_sniffer_mac" ]
       }
-      if (!is_android) {
-        deps += [
-          "//chrome/browser/ui:chrome_pages",
-          "//chrome/browser/user_education",
-        ]
-      }
-      if (!is_android) {
-        deps += [ "//chrome/browser/download/bubble" ]
-      }
+      deps += [
+        "//chrome/browser/ui:chrome_pages",
+        "//chrome/browser/user_education",
+      ]
+      deps += [ "//chrome/browser/download/bubble" ]
     } else if (safe_browsing_mode == 2) {
       public += [
         "android/download_protection_metrics_data.h",
@@ -892,12 +886,10 @@ source_set("test_support") {
       "test_safe_browsing_service.h",
     ]
 
-    if (!is_android) {
-      sources += [
-        "test_safe_browsing_navigation_observer_manager.cc",
-        "test_safe_browsing_navigation_observer_manager.h",
-      ]
-    }
+    sources += [
+      "test_safe_browsing_navigation_observer_manager.cc",
+      "test_safe_browsing_navigation_observer_manager.h",
+    ]
 
     deps += [
       ":safe_browsing",

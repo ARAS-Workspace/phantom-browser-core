@@ -36,12 +36,10 @@ source_set("renderer") {
     ]
   }
 
-  if (!is_android) {
-    sources += [
-      "hunspell_engine.cc",
-      "hunspell_engine.h",
-    ]
-  }
+  sources += [
+    "hunspell_engine.cc",
+    "hunspell_engine.h",
+  ]
 
   public_deps = [ "//components/spellcheck:buildflags" ]
   deps = [
@@ -55,9 +53,7 @@ source_set("renderer") {
     "//third_party/icu",
   ]
 
-  if (!is_android) {
-    deps += [ "//third_party/hunspell" ]
-  }
+  deps += [ "//third_party/hunspell" ]
 }
 
 source_set("unit_tests") {
@@ -73,9 +69,7 @@ source_set("unit_tests") {
   ]
   data = [ "//third_party/hunspell_dictionaries/" ]
 
-  if (!is_android) {
-    sources += [ "spellcheck_unittest.cc" ]
-  }
+  sources += [ "spellcheck_unittest.cc" ]
 
   if (!is_mac && !is_android) {
     sources += [

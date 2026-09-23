@@ -686,16 +686,14 @@ source_set("browser_sources") {
     public_deps += [ "//media/mojo/mojom" ]
   }
 
-  if (!is_android) {
-    sources += [
-      "direct_sockets_delegate.h",
+  sources += [
+    "direct_sockets_delegate.h",
 
-      # Some Web Authentication related targets only apply to desktop because
-      # Android provides its own native implementation of that API.
-      "authenticator_request_client_delegate.cc",
-      "authenticator_request_client_delegate.h",
-    ]
-  }
+    # Some Web Authentication related targets only apply to desktop because
+    # Android provides its own native implementation of that API.
+    "authenticator_request_client_delegate.cc",
+    "authenticator_request_client_delegate.h",
+  ]
 
   if (enable_vr) {
     sources += [

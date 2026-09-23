@@ -39,15 +39,13 @@ source_set("supervised_user") {
     "//url",
   ]
 
-  if (!is_android) {
-    public += [
-      "desktop/supervised_user_service_platform_delegate.h",
-      "supervised_user_verification_controller_client.h",
-    ]
-    public_deps += [
-      "//components/security_interstitials/content:security_interstitial_page",
-    ]
-  }
+  public += [
+    "desktop/supervised_user_service_platform_delegate.h",
+    "supervised_user_verification_controller_client.h",
+  ]
+  public_deps += [
+    "//components/security_interstitials/content:security_interstitial_page",
+  ]
 
   if (is_linux || is_mac || is_win) {
     public += [
@@ -126,17 +124,15 @@ source_set("impl") {
     "//content/public/browser",
   ]
 
-  if (!is_android) {
-    sources += [
-      "desktop/supervised_user_service_platform_delegate.cc",
-      "supervised_user_verification_controller_client.cc",
-    ]
-    deps += [
-      "//chrome/browser/lifetime",
-      "//chrome/browser/profiles:profile",
-      "//components/security_interstitials/content:security_interstitial_page",
-    ]
-  }
+  sources += [
+    "desktop/supervised_user_service_platform_delegate.cc",
+    "supervised_user_verification_controller_client.cc",
+  ]
+  deps += [
+    "//chrome/browser/lifetime",
+    "//chrome/browser/profiles:profile",
+    "//components/security_interstitials/content:security_interstitial_page",
+  ]
 
   if (is_linux || is_mac || is_win) {
     sources += [
@@ -223,115 +219,113 @@ source_set("unit_tests") {
   }
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "advanced_content_restrictions_browsertest.cc",
-      "classify_url_navigation_throttle_browsertest.cc",
-      "family_link_url_filter_browsertest.cc",
-      "supervised_user_incognito_browsertest.cc",
-      "supervised_user_navigation_throttle_browsertest.cc",
-      "supervised_user_regional_url_filter_browsertest.cc",
-      "supervised_user_service_browsertest.cc",
-      "supervised_user_url_filtering_service_common_browsertest.cc",
-      "url_filter_browsertest.cc",
-    ]
+  sources = [
+    "advanced_content_restrictions_browsertest.cc",
+    "classify_url_navigation_throttle_browsertest.cc",
+    "family_link_url_filter_browsertest.cc",
+    "supervised_user_incognito_browsertest.cc",
+    "supervised_user_navigation_throttle_browsertest.cc",
+    "supervised_user_regional_url_filter_browsertest.cc",
+    "supervised_user_service_browsertest.cc",
+    "supervised_user_url_filtering_service_common_browsertest.cc",
+    "url_filter_browsertest.cc",
+  ]
 
-    deps = [
-      ":test_support",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser",
-      "//chrome/browser:browser_process",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/history",
-      "//chrome/browser/profiles",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/signin",
-      "//chrome/browser/ssl",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:test_support",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/common",
-      "//chrome/test:test_support",
-      "//chrome/test/supervised_user:live_tests",
-      "//chrome/test/supervised_user:test_support",
-      "//components/content_settings/core/browser",
-      "//components/content_settings/core/browser:cookie_settings",
-      "//components/content_settings/core/common",
-      "//components/history/core/browser",
-      "//components/infobars/content",
-      "//components/infobars/core",
-      "//components/prefs",
-      "//components/safe_search_api",
-      "//components/supervised_user/core/browser",
-      "//components/supervised_user/core/browser:fetcher_config",
-      "//components/supervised_user/core/browser:mocked",
-      "//components/supervised_user/core/browser:test_support",
-      "//components/supervised_user/core/common",
-      "//components/supervised_user/test_support",
-      "//components/ukm:test_support",
-      "//content/public/browser",
-      "//content/test:browsertest_support",
-      "//content/test:test_support",
-      "//net:test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//ui/base:test_support",
-      "//ui/events:test_support",
-      "//url",
-    ]
-    if (enable_extensions) {
-      deps += [ "//chrome/browser/ui/views/supervised_user" ]
-    }
-
-    if (is_win || is_mac || is_linux) {
-      sources += [
-        "kids_profile_interactive_uitest.cc",
-        "linux_mac_windows/parent_access_dialog_result_observer_browsertest.cc",
-        "linux_mac_windows/supervised_user_web_content_handler_impl_browsertest.cc",
-      ]
-    }
-
-    if (enable_extensions_core) {
-      sources += [
-        "desktop/supervised_user_extension_browsertest.cc",
-        "extension_icon_loader_browsertest.cc",
-        "extensions_interactive_uitest.cc",
-      ]
-      deps += [
-        "//chrome/browser/extensions",
-        "//chrome/browser/ui/extensions",
-        "//extensions/browser",
-        "//extensions/common",
-      ]
-
-      if (is_win || is_linux || is_mac) {
-        sources += [ "supervised_user_pending_state_navigation_browsertest.cc" ]
-      }
-    }
+  deps = [
+    ":test_support",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser",
+    "//chrome/browser:browser_process",
+    "//chrome/browser/content_settings:content_settings_factory",
+    "//chrome/browser/history",
+    "//chrome/browser/profiles",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/signin",
+    "//chrome/browser/ssl",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:test_support",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/common",
+    "//chrome/test:test_support",
+    "//chrome/test/supervised_user:live_tests",
+    "//chrome/test/supervised_user:test_support",
+    "//components/content_settings/core/browser",
+    "//components/content_settings/core/browser:cookie_settings",
+    "//components/content_settings/core/common",
+    "//components/history/core/browser",
+    "//components/infobars/content",
+    "//components/infobars/core",
+    "//components/prefs",
+    "//components/safe_search_api",
+    "//components/supervised_user/core/browser",
+    "//components/supervised_user/core/browser:fetcher_config",
+    "//components/supervised_user/core/browser:mocked",
+    "//components/supervised_user/core/browser:test_support",
+    "//components/supervised_user/core/common",
+    "//components/supervised_user/test_support",
+    "//components/ukm:test_support",
+    "//content/public/browser",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//net:test_support",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//ui/base:test_support",
+    "//ui/events:test_support",
+    "//url",
+  ]
+  if (enable_extensions) {
+    deps += [ "//chrome/browser/ui/views/supervised_user" ]
   }
 
-  source_set("interactive_ui_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [ "incognito_mode_interactive_uitest.cc" ]
-
-    deps = [
-      "//chrome/browser/prefs",
-      "//chrome/browser/ui",
-      "//chrome/test:test_support",
-      "//chrome/test/supervised_user:live_tests",
-      "//chrome/test/supervised_user:test_support",
-      "//content/test:test_support",
-      "//testing/gtest",
-      "//ui/base/interaction:test_support",
+  if (is_win || is_mac || is_linux) {
+    sources += [
+      "kids_profile_interactive_uitest.cc",
+      "linux_mac_windows/parent_access_dialog_result_observer_browsertest.cc",
+      "linux_mac_windows/supervised_user_web_content_handler_impl_browsertest.cc",
     ]
   }
+
+  if (enable_extensions_core) {
+    sources += [
+      "desktop/supervised_user_extension_browsertest.cc",
+      "extension_icon_loader_browsertest.cc",
+      "extensions_interactive_uitest.cc",
+    ]
+    deps += [
+      "//chrome/browser/extensions",
+      "//chrome/browser/ui/extensions",
+      "//extensions/browser",
+      "//extensions/common",
+    ]
+
+    if (is_win || is_linux || is_mac) {
+      sources += [ "supervised_user_pending_state_navigation_browsertest.cc" ]
+    }
+  }
+}
+
+source_set("interactive_ui_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [ "incognito_mode_interactive_uitest.cc" ]
+
+  deps = [
+    "//chrome/browser/prefs",
+    "//chrome/browser/ui",
+    "//chrome/test:test_support",
+    "//chrome/test/supervised_user:live_tests",
+    "//chrome/test/supervised_user:test_support",
+    "//content/test:test_support",
+    "//testing/gtest",
+    "//ui/base/interaction:test_support",
+  ]
 }
 
 static_library("test_support") {

@@ -408,14 +408,10 @@ template("test") {
     }
   }
   testonly = true
-  if (!is_ios) {
-    assert(!defined(invoker.is_xctest) || !invoker.is_xctest,
-           "is_xctest can be set only for iOS builds")
-  }
-  if (!is_android) {
-    assert(!defined(invoker.allow_cleartext_traffic),
-           "allow_cleartext_traffic can be set only for Android tests")
-  }
+  assert(!defined(invoker.is_xctest) || !invoker.is_xctest,
+         "is_xctest can be set only for iOS builds")
+  assert(!defined(invoker.allow_cleartext_traffic),
+         "allow_cleartext_traffic can be set only for Android tests")
 
   if (is_mac || is_win) {
     assert(!defined(invoker.use_xvfb) || !invoker.use_xvfb)

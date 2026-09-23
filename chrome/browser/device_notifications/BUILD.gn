@@ -8,59 +8,55 @@ source_set("device_notifications") {
   sources = []
   public_deps = []
 
-  if (!is_android) {
-    sources += [
-      "device_connection_tracker.h",
-      "device_system_tray_icon.h",
-      "device_system_tray_icon_renderer.h",
-    ]
-    public_deps += [
-      "//base",
-      "//chrome/browser/profiles:profile",
-      "//components/keyed_service/core",
-      "//ui/gfx",
-      "//url",
-    ]
+  sources += [
+    "device_connection_tracker.h",
+    "device_system_tray_icon.h",
+    "device_system_tray_icon_renderer.h",
+  ]
+  public_deps += [
+    "//base",
+    "//chrome/browser/profiles:profile",
+    "//components/keyed_service/core",
+    "//ui/gfx",
+    "//url",
+  ]
 
-    sources += [ "device_status_icon_renderer.h" ]
-    public_deps += [
-      "//chrome/browser/profiles:profile_util",
-      "//chrome/browser/status_icons",
-    ]
-  }
+  sources += [ "device_status_icon_renderer.h" ]
+  public_deps += [
+    "//chrome/browser/profiles:profile_util",
+    "//chrome/browser/status_icons",
+  ]
 }
 
 source_set("impl") {
   sources = []
   deps = [ ":device_notifications" ]
 
-  if (!is_android) {
-    sources += [
-      "device_connection_tracker.cc",
-      "device_system_tray_icon.cc",
-    ]
+  sources += [
+    "device_connection_tracker.cc",
+    "device_system_tray_icon.cc",
+  ]
 
-    deps += [
-      "//chrome/browser/notifications:system_notification_helper",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/profiles:profile_manager",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:chrome_pages",
-      "//content/public/browser",
-      "//url",
-    ]
+  deps += [
+    "//chrome/browser/notifications:system_notification_helper",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/profiles:profile_manager",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:chrome_pages",
+    "//content/public/browser",
+    "//url",
+  ]
 
-    sources += [ "device_status_icon_renderer.cc" ]
-    deps += [
-      "//base:i18n",
-      "//chrome/app:command_ids",
-      "//chrome/app:generated_resources",
-      "//chrome/browser:browser_process",
-      "//ui/base",
-      "//ui/gfx",
-      "//ui/gfx:color_utils",
-    ]
-  }
+  sources += [ "device_status_icon_renderer.cc" ]
+  deps += [
+    "//base:i18n",
+    "//chrome/app:command_ids",
+    "//chrome/app:generated_resources",
+    "//chrome/browser:browser_process",
+    "//ui/base",
+    "//ui/gfx",
+    "//ui/gfx:color_utils",
+  ]
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }
 
@@ -97,27 +93,23 @@ source_set("unit_tests") {
   ]
   public_deps = []
 
-  if (!is_android) {
-    sources += [
-      "device_system_tray_icon_unittest.cc",
-      "device_system_tray_icon_unittest.h",
-    ]
-    public_deps += [
-      "//chrome/browser/extensions",
-      "//chrome/browser/extensions:test_support",
-      "//chrome/browser/notifications:system_notification_helper",
-      "//extensions:test_support",
-      "//extensions/common",
-    ]
-  }
+  sources += [
+    "device_system_tray_icon_unittest.cc",
+    "device_system_tray_icon_unittest.h",
+  ]
+  public_deps += [
+    "//chrome/browser/extensions",
+    "//chrome/browser/extensions:test_support",
+    "//chrome/browser/notifications:system_notification_helper",
+    "//extensions:test_support",
+    "//extensions/common",
+  ]
 
-  if (!is_android) {
-    sources += [
-      "device_status_icon_unittest.cc",
-      "device_status_icon_unittest.h",
-    ]
-    public_deps += [ "//chrome/browser/status_icons" ]
-  }
+  sources += [
+    "device_status_icon_unittest.cc",
+    "device_status_icon_unittest.h",
+  ]
+  public_deps += [ "//chrome/browser/status_icons" ]
 }
 
 source_set("browser_test_support") {
@@ -136,14 +128,12 @@ source_set("browser_test_support") {
   ]
   deps = [ "//content/test:test_support" ]
 
-  if (!is_android) {
-    deps += [
-      "//chrome/browser",
-      "//chrome/browser/extensions",
-      "//chrome/browser/extensions:test_support",
-      "//chrome/browser/notifications:system_notification_helper",
-      "//extensions:test_support",
-      "//extensions/common",
-    ]
-  }
+  deps += [
+    "//chrome/browser",
+    "//chrome/browser/extensions",
+    "//chrome/browser/extensions:test_support",
+    "//chrome/browser/notifications:system_notification_helper",
+    "//extensions:test_support",
+    "//extensions/common",
+  ]
 }

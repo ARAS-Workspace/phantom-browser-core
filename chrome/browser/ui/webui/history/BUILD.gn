@@ -95,51 +95,49 @@ source_set("history") {
   ]
 }
 
-if (!is_android) {
-  source_set("unit_tests") {
-    testonly = true
-    sources = [
-      "browsing_history_handler_unittest.cc",
-      "foreign_session_handler_unittest.cc",
-      "history_identity_state_watcher_unittest.cc",
-    ]
-    deps = [
-      ":history",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/bookmarks",
-      "//chrome/browser/critical_actions",
-      "//chrome/browser/signin",
-      "//chrome/browser/sync",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:test_support",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/hats",
-      "//chrome/browser/ui/hats:test_support",
-      "//chrome/browser/ui/tabs:test_support",
-      "//chrome/browser/ui/views/side_panel",
-      "//chrome/common",
-      "//chrome/test:test_support",
-      "//components/critical_actions/core/browser",
-      "//components/history/core/browser",
-      "//components/prefs",
-      "//components/sessions",
-      "//components/signin/public/identity_manager",
-      "//components/signin/public/identity_manager:test_support",
-      "//components/sync:test_support",
-      "//components/sync/base",
-      "//components/sync_device_info",
-      "//components/sync_device_info:test_support",
-      "//components/sync_sessions",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//mojo/public/cpp/bindings",
-      "//net",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//ui/base",
-      "//ui/webui/resources/cr_components/history:mojo_bindings",
-      "//url",
-    ]
-  }
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "browsing_history_handler_unittest.cc",
+    "foreign_session_handler_unittest.cc",
+    "history_identity_state_watcher_unittest.cc",
+  ]
+  deps = [
+    ":history",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/bookmarks",
+    "//chrome/browser/critical_actions",
+    "//chrome/browser/signin",
+    "//chrome/browser/sync",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:test_support",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/hats",
+    "//chrome/browser/ui/hats:test_support",
+    "//chrome/browser/ui/tabs:test_support",
+    "//chrome/browser/ui/views/side_panel",
+    "//chrome/common",
+    "//chrome/test:test_support",
+    "//components/critical_actions/core/browser",
+    "//components/history/core/browser",
+    "//components/prefs",
+    "//components/sessions",
+    "//components/signin/public/identity_manager",
+    "//components/signin/public/identity_manager:test_support",
+    "//components/sync:test_support",
+    "//components/sync/base",
+    "//components/sync_device_info",
+    "//components/sync_device_info:test_support",
+    "//components/sync_sessions",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//mojo/public/cpp/bindings",
+    "//net",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//ui/base",
+    "//ui/webui/resources/cr_components/history:mojo_bindings",
+    "//url",
+  ]
 }

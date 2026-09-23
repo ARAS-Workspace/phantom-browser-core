@@ -1925,16 +1925,12 @@ test("content_browsertests") {
     sources += [ "../browser/compute_pressure/pressure_service_browsertest.cc" ]
   }
 
-  if (!is_ios) {
-    data += [ "//content/test/data/clipboard/" ]
-  }
-  if (!is_ios) {
-    sources += [
-      "../browser/direct_sockets/direct_sockets_open_browsertest.cc",
-      "../browser/direct_sockets/direct_sockets_tcp_browsertest.cc",
-      "../browser/direct_sockets/direct_sockets_udp_browsertest.cc",
-    ]
-  }
+  data += [ "//content/test/data/clipboard/" ]
+  sources += [
+    "../browser/direct_sockets/direct_sockets_open_browsertest.cc",
+    "../browser/direct_sockets/direct_sockets_tcp_browsertest.cc",
+    "../browser/direct_sockets/direct_sockets_udp_browsertest.cc",
+  ]
   if (is_posix) {
     deps += [ "//services/tracing:test_utils" ]
   }
@@ -2688,13 +2684,11 @@ test("content_unittests") {
     ]
   }
 
-  if (!is_ios) {
-    sources += [
-      # Most ContentSettingsTypes are not registered on iOS so these
-      # tests cannot run.
-      "../browser/permissions/permission_service_impl_unittest.cc",
-    ]
-  }
+  sources += [
+    # Most ContentSettingsTypes are not registered on iOS so these
+    # tests cannot run.
+    "../browser/permissions/permission_service_impl_unittest.cc",
+  ]
 
   configs += [ "//build/config:precompiled_headers" ]
 
@@ -2874,16 +2868,14 @@ test("content_unittests") {
 
   data_deps = [ "//testing/buildbot/filters:content_unittests_filters" ]
 
-  if (!is_ios) {
-    data_deps += [
-      "//third_party/perfetto/protos/perfetto/config:descriptor",
-      "//third_party/perfetto/protos/perfetto/config/chrome:scenario_descriptor",
-    ]
-    data += [
-      "$root_gen_dir/third_party/perfetto/protos/perfetto/config/chrome/scenario_config.descriptor",
-      "$root_gen_dir/third_party/perfetto/protos/perfetto/config/config.descriptor",
-    ]
-  }
+  data_deps += [
+    "//third_party/perfetto/protos/perfetto/config:descriptor",
+    "//third_party/perfetto/protos/perfetto/config/chrome:scenario_descriptor",
+  ]
+  data += [
+    "$root_gen_dir/third_party/perfetto/protos/perfetto/config/chrome/scenario_config.descriptor",
+    "$root_gen_dir/third_party/perfetto/protos/perfetto/config/config.descriptor",
+  ]
 
   if (is_mac) {
     data_deps += [ "//device/fido/strings:fido_test_strings" ]
@@ -2947,13 +2939,11 @@ test("content_unittests") {
       ]
     }
 
-    if (!is_ios) {
-      deps += [ "//media/capture:test_support" ]
-      sources += [
-        "../browser/media/capture/desktop_capture_device_unittest.cc",
-        "../browser/media/capture/desktop_capture_unittest.cc",
-      ]
-    }
+    deps += [ "//media/capture:test_support" ]
+    sources += [
+      "../browser/media/capture/desktop_capture_device_unittest.cc",
+      "../browser/media/capture/desktop_capture_unittest.cc",
+    ]
   }
 
   if (is_linux) {

@@ -273,8 +273,6 @@ source_set("unit_tests") {
 
   if (enterprise_proxy) {
     deps += [ "//components/enterprise/net/core:unit_tests" ]
-    if (!is_ios) {
-      deps += [ "//components/enterprise/net/content:unit_tests" ]
-    }
+    deps += [ "//components/enterprise/net/content:unit_tests" ]
   }
 }

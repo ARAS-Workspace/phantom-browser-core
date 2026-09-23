@@ -43,9 +43,7 @@ source_set("unit_tests") {
   configs += [ "//components/enterprise:extra_warnings" ]
 
   sources = []
-  if (!is_ios) {
-    sources += [ "watermark_unittest.cc" ]
-  }
+  sources += [ "watermark_unittest.cc" ]
 
   if (enterprise_watermark) {
     sources += [ "watermark_style_policy_handler_unittest.cc" ]
@@ -68,13 +66,11 @@ source_set("unit_tests") {
     deps += [ ":watermarking_handler" ]
   }
 
-  if (!is_ios) {
-    deps += [
-      ":watermarking",
-      "//cc:test_support",
-      "//cc/paint",
-    ]
-  }
+  deps += [
+    ":watermarking",
+    "//cc:test_support",
+    "//cc/paint",
+  ]
 }
 
 source_set("watermark_test_utils") {

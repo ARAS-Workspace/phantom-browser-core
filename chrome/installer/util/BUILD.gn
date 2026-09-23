@@ -111,18 +111,16 @@ source_set("constants") {
   sources = []
 }
 
-if (!is_win) {
-  test("installer_util_unittests") {
-    sources = [ "client_id_backup_file_manager_unittest.cc" ]
+test("installer_util_unittests") {
+  sources = [ "client_id_backup_file_manager_unittest.cc" ]
 
-    deps = [
-      ":with_no_strings",
-      "//base",
-      "//base/test:run_all_unittests",
-      "//base/test:test_support",
-      "//chrome/common:constants",
-      "//testing/gmock",
-      "//testing/gtest",
-    ]
-  }
+  deps = [
+    ":with_no_strings",
+    "//base",
+    "//base/test:run_all_unittests",
+    "//base/test:test_support",
+    "//chrome/common:constants",
+    "//testing/gmock",
+    "//testing/gtest",
+  ]
 }

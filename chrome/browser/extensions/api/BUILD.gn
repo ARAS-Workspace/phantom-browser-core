@@ -89,9 +89,7 @@ group("api_implementations") {
     }
   }  # if (enable_extensions)
 
-  if (!is_android) {
-    public_deps += []
-  }
+  public_deps += []
 }
 
 # The step necessary to generate the code to register the corresponding

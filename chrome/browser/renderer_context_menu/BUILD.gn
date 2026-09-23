@@ -12,53 +12,49 @@ import("//printing/buildflags/buildflags.gni")
 # that can be depended on without forming a cycle through
 # //chrome/browser/ui:ui (e.g. from //chrome/browser/ui/webui/settings).
 source_set("bubble_models") {
-  if (!is_android) {
-    public_deps = [
-      "//base",
-      "//chrome/browser/ui:confirm_bubble_model",
-      "//ui/base/mojom",
-      "//url",
-    ]
-  }
+  public_deps = [
+    "//base",
+    "//chrome/browser/ui:confirm_bubble_model",
+    "//ui/base/mojom",
+    "//url",
+  ]
 }
 
 source_set("renderer_context_menu") {
-  if (!is_android) {
-    if (is_mac) {
-      allow_circular_includes_from = [ "//chrome/browser/ui/cocoa" ]
-    }
+  if (is_mac) {
+    allow_circular_includes_from = [ "//chrome/browser/ui/cocoa" ]
+  }
 
-    public = [ "render_view_context_menu.h" ]
+  public = [ "render_view_context_menu.h" ]
 
-    public_deps = [
-      ":bubble_models",
-      "//base",
-      "//chrome/app:command_ids",
-      "//chrome/browser/ui/autofill",
-      "//chrome/common:mojo_bindings",
-      "//components/compose:buildflags",
-      "//components/custom_handlers",
-      "//components/renderer_context_menu",
-      "//components/supervised_user/core/browser",
-      "//content/public/browser",
-      "//content/public/common:buildflags",
-      "//extensions/buildflags",
-      "//mojo/public/cpp/bindings",
-      "//printing/buildflags",
-      "//ui/base",
-      "//ui/base/interaction",
-      "//ui/gfx",
-      "//ui/menus",
-      "//url",
-    ]
+  public_deps = [
+    ":bubble_models",
+    "//base",
+    "//chrome/app:command_ids",
+    "//chrome/browser/ui/autofill",
+    "//chrome/common:mojo_bindings",
+    "//components/compose:buildflags",
+    "//components/custom_handlers",
+    "//components/renderer_context_menu",
+    "//components/supervised_user/core/browser",
+    "//content/public/browser",
+    "//content/public/common:buildflags",
+    "//extensions/buildflags",
+    "//mojo/public/cpp/bindings",
+    "//printing/buildflags",
+    "//ui/base",
+    "//ui/base/interaction",
+    "//ui/gfx",
+    "//ui/menus",
+    "//url",
+  ]
 
-    if (is_mac) {
-      public_deps += [ "//chrome/browser/ui/cocoa" ]
-    }
+  if (is_mac) {
+    public_deps += [ "//chrome/browser/ui/cocoa" ]
+  }
 
-    if (enable_extensions) {
-      public_deps += [ "//chrome/browser/extensions" ]
-    }
+  if (enable_extensions) {
+    public_deps += [ "//chrome/browser/extensions" ]
   }
 }
 
@@ -80,91 +76,89 @@ source_set("impl") {
     "//extensions/buildflags",
   ]
 
-  if (!is_android) {
-    public += [
-      "dictation_menu_observer.h",
-      "link_to_text_menu_observer.h",
-    ]
+  public += [
+    "dictation_menu_observer.h",
+    "link_to_text_menu_observer.h",
+  ]
 
-    sources += [
-      "context_menu_content_type_read_anything.cc",
-      "context_menu_content_type_read_anything.h",
-      "dictation_menu_observer.cc",
-      "link_to_text_menu_observer.cc",
-      "render_view_context_menu.cc",
-    ]
+  sources += [
+    "context_menu_content_type_read_anything.cc",
+    "context_menu_content_type_read_anything.h",
+    "dictation_menu_observer.cc",
+    "link_to_text_menu_observer.cc",
+    "render_view_context_menu.cc",
+  ]
 
-    deps += [
-      "//chrome/app:command_ids",
-      "//chrome/app:generated_resources",
-      "//chrome/browser:browser_features",
-      "//chrome/browser:browser_process",
-      "//chrome/browser:browser_public_dependencies",
-      "//chrome/browser/accessibility",
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/apps/platform_apps",
-      "//chrome/browser/autocomplete",
-      "//chrome/browser/context_hub",
-      "//chrome/browser/custom_handlers",
-      "//chrome/browser/devtools",
-      "//chrome/browser/dictation",
-      "//chrome/browser/language",
-      "//chrome/browser/media/router:media_router_feature",
-      "//chrome/browser/password_manager",
-      "//chrome/browser/pdf",
-      "//chrome/browser/predictors",
-      "//chrome/browser/prefs",
-      "//chrome/browser/preloading:prefs",
-      "//chrome/browser/profiles:misc",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/profiles:profile_io_data",
-      "//chrome/browser/reading_list",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/send_tab_to_self",
-      "//chrome/browser/sharing_hub",
-      "//chrome/browser/sync",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:chrome_pages",
-      "//chrome/browser/ui:confirm_bubble",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/autofill",
-      "//chrome/browser/ui/profiles",
-      "//chrome/browser/ui/qrcode_generator",
-      "//chrome/browser/ui/send_tab_to_self",
-      "//chrome/browser/ui/tabs",
-      "//chrome/browser/ui/toasts",
-      "//chrome/browser/ui/toasts/api:toasts",
-      "//chrome/browser/ui/user_education",
-      "//chrome/browser/ui/webui:webui_util",
-      "//chrome/browser/ui/webui/history",
-      "//chrome/browser/user_education",
-      "//chrome/common:mojo_bindings",
-      "//components/compose/core/browser",
-      "//components/compose/core/browser:features",
-      "//components/guest_view/browser",
-      "//components/media_router/browser",
-      "//components/password_manager/content/browser",
-      "//components/pdf/common:constants",
-      "//components/pdf/common:util",
-      "//components/prefs",
-      "//components/shared_highlighting/core/common",
-      "//components/user_prefs",
-      "//mojo/public/cpp/bindings",
-      "//pdf:features",
-      "//services/metrics/public/cpp:metrics_cpp",
-      "//services/metrics/public/cpp:ukm_builders",
-      "//services/service_manager/public/cpp",
-      "//ui/gfx",
-      "//ui/menus",
-      "//url",
-    ]
-    if (enable_compose) {
-      deps += [ "//chrome/browser/compose" ]
-    }
+  deps += [
+    "//chrome/app:command_ids",
+    "//chrome/app:generated_resources",
+    "//chrome/browser:browser_features",
+    "//chrome/browser:browser_process",
+    "//chrome/browser:browser_public_dependencies",
+    "//chrome/browser/accessibility",
+    "//chrome/browser/apps/app_service",
+    "//chrome/browser/apps/platform_apps",
+    "//chrome/browser/autocomplete",
+    "//chrome/browser/context_hub",
+    "//chrome/browser/custom_handlers",
+    "//chrome/browser/devtools",
+    "//chrome/browser/dictation",
+    "//chrome/browser/language",
+    "//chrome/browser/media/router:media_router_feature",
+    "//chrome/browser/password_manager",
+    "//chrome/browser/pdf",
+    "//chrome/browser/predictors",
+    "//chrome/browser/prefs",
+    "//chrome/browser/preloading:prefs",
+    "//chrome/browser/profiles:misc",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/profiles:profile_io_data",
+    "//chrome/browser/reading_list",
+    "//chrome/browser/search_engines",
+    "//chrome/browser/send_tab_to_self",
+    "//chrome/browser/sharing_hub",
+    "//chrome/browser/sync",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:chrome_pages",
+    "//chrome/browser/ui:confirm_bubble",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/autofill",
+    "//chrome/browser/ui/profiles",
+    "//chrome/browser/ui/qrcode_generator",
+    "//chrome/browser/ui/send_tab_to_self",
+    "//chrome/browser/ui/tabs",
+    "//chrome/browser/ui/toasts",
+    "//chrome/browser/ui/toasts/api:toasts",
+    "//chrome/browser/ui/user_education",
+    "//chrome/browser/ui/webui:webui_util",
+    "//chrome/browser/ui/webui/history",
+    "//chrome/browser/user_education",
+    "//chrome/common:mojo_bindings",
+    "//components/compose/core/browser",
+    "//components/compose/core/browser:features",
+    "//components/guest_view/browser",
+    "//components/media_router/browser",
+    "//components/password_manager/content/browser",
+    "//components/pdf/common:constants",
+    "//components/pdf/common:util",
+    "//components/prefs",
+    "//components/shared_highlighting/core/common",
+    "//components/user_prefs",
+    "//mojo/public/cpp/bindings",
+    "//pdf:features",
+    "//services/metrics/public/cpp:metrics_cpp",
+    "//services/metrics/public/cpp:ukm_builders",
+    "//services/service_manager/public/cpp",
+    "//ui/gfx",
+    "//ui/menus",
+    "//url",
+  ]
+  if (enable_compose) {
+    deps += [ "//chrome/browser/compose" ]
+  }
 
-    if (enable_print_preview) {
-      deps += [ "//chrome/browser/printing" ]
-    }
+  if (enable_print_preview) {
+    deps += [ "//chrome/browser/printing" ]
   }
 
   if (enable_extensions_core) {
@@ -212,180 +206,176 @@ static_library("test_support") {
     "//ui/base",
   ]
 
-  if (!is_android) {
-    public += [
-      "render_view_context_menu_browsertest_util.h",
-      "render_view_context_menu_test_util.h",
-    ]
-    sources += [
-      "render_view_context_menu_browsertest_util.cc",
-      "render_view_context_menu_test_util.cc",
-    ]
-    public_deps += [ "//extensions/buildflags" ]
-    if (enable_compose) {
-      deps += [ "//chrome/browser/compose" ]
-    }
+  public += [
+    "render_view_context_menu_browsertest_util.h",
+    "render_view_context_menu_test_util.h",
+  ]
+  sources += [
+    "render_view_context_menu_browsertest_util.cc",
+    "render_view_context_menu_test_util.cc",
+  ]
+  public_deps += [ "//extensions/buildflags" ]
+  if (enable_compose) {
+    deps += [ "//chrome/browser/compose" ]
   }
 }
 
-if (!is_android) {
-  static_library("mock_test_support") {
-    testonly = true
+static_library("mock_test_support") {
+  testonly = true
 
-    public = [ "mock_render_view_context_menu.h" ]
-    sources = [ "mock_render_view_context_menu.cc" ]
+  public = [ "mock_render_view_context_menu.h" ]
+  sources = [ "mock_render_view_context_menu.cc" ]
 
-    public_deps = [
-      "//base",
-      "//components/renderer_context_menu",
-      "//ui/base",
-      "//ui/gfx",
-      "//ui/menus",
-    ]
+  public_deps = [
+    "//base",
+    "//components/renderer_context_menu",
+    "//ui/base",
+    "//ui/gfx",
+    "//ui/menus",
+  ]
 
-    deps = [
-      ":test_support",
-      "//chrome/app:command_ids",
-      "//chrome/app:generated_resources",
-      "//chrome/browser/profiles:profile",
-      "//chrome/test:test_support",
-      "//components/prefs",
-      "//content/public/browser",
-      "//services/screen_ai/buildflags",
-      "//testing/gtest",
-    ]
+  deps = [
+    ":test_support",
+    "//chrome/app:command_ids",
+    "//chrome/app:generated_resources",
+    "//chrome/browser/profiles:profile",
+    "//chrome/test:test_support",
+    "//components/prefs",
+    "//content/public/browser",
+    "//services/screen_ai/buildflags",
+    "//testing/gtest",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+
+  sources = [
+    "context_menu_content_type_unittest.cc",
+    "render_view_context_menu_unittest.cc",
+  ]
+
+  deps = [
+    ":impl",
+    ":mock_test_support",
+    ":renderer_context_menu",
+    ":test_support",
+    "//base/test:test_support",
+    "//chrome/browser",
+    "//chrome/browser/password_manager",
+    "//chrome/browser/prefs",
+    "//chrome/browser/search_engines",
+    "//chrome/browser/send_tab_to_self",
+    "//chrome/browser/ui:chrome_pages",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/side_panel:test_support",
+    "//chrome/browser/user_education",
+    "//chrome/test:test_support",
+    "//components/proxy_config",
+    "//components/send_tab_to_self",
+    "//components/send_tab_to_self:features",
+    "//components/send_tab_to_self:test_support",
+    "//components/tabs:test_support",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//url",
+  ]
+}
+
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [ "render_view_context_menu_browsertest.cc" ]
+
+  deps = [
+    ":impl",
+    ":mock_test_support",
+    ":renderer_context_menu",
+    ":test_support",
+    "//base/test:test_support",
+    "//chrome/browser",
+    "//chrome/browser/context_hub",
+    "//chrome/browser/devtools",
+    "//chrome/browser/enterprise/data_controls:test_support",
+    "//chrome/browser/pdf:pdf_extension_test_utils",
+    "//chrome/browser/profiles:misc",
+    "//chrome/browser/search_engines",
+    "//chrome/browser/send_tab_to_self",
+    "//chrome/browser/sync",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/browser_web_contents_delegate",
+    "//chrome/browser/ui/side_panel",
+    "//chrome/browser/ui/side_panel:side_panel_views_dependent",
+    "//chrome/browser/ui/startup",
+    "//chrome/browser/ui/toasts",
+    "//chrome/browser/web_applications:web_applications_test_support",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//chrome/test/supervised_user:test_support",
+    "//components/enterprise/data_controls/core/browser:test_support",
+    "//components/send_tab_to_self",
+    "//components/send_tab_to_self:features",
+    "//components/send_tab_to_self:test_support",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//pdf:features",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//ui/events:test_support",
+    "//url",
+  ]
+  if (enable_compose) {
+    deps += [ "//chrome/browser/compose:test_support" ]
   }
 
-  source_set("unit_tests") {
-    testonly = true
-
-    sources = [
-      "context_menu_content_type_unittest.cc",
-      "render_view_context_menu_unittest.cc",
-    ]
-
-    deps = [
-      ":impl",
-      ":mock_test_support",
-      ":renderer_context_menu",
-      ":test_support",
-      "//base/test:test_support",
-      "//chrome/browser",
-      "//chrome/browser/password_manager",
-      "//chrome/browser/prefs",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/send_tab_to_self",
-      "//chrome/browser/ui:chrome_pages",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/side_panel:test_support",
-      "//chrome/browser/user_education",
-      "//chrome/test:test_support",
-      "//components/proxy_config",
-      "//components/send_tab_to_self",
-      "//components/send_tab_to_self:features",
-      "//components/send_tab_to_self:test_support",
-      "//components/tabs:test_support",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//url",
-    ]
+  if (enable_pdf) {
+    deps += [ "//chrome/browser/pdf:pdf_extension_test_base" ]
   }
+}
 
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+source_set("interactive_ui_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [ "render_view_context_menu_browsertest.cc" ]
+  sources = [
+    "link_to_text_menu_observer_interactive_uitest.cc",
+    "render_view_context_menu_interactive_uitest.cc",
+  ]
 
-    deps = [
-      ":impl",
-      ":mock_test_support",
-      ":renderer_context_menu",
-      ":test_support",
-      "//base/test:test_support",
-      "//chrome/browser",
-      "//chrome/browser/context_hub",
-      "//chrome/browser/devtools",
-      "//chrome/browser/enterprise/data_controls:test_support",
-      "//chrome/browser/pdf:pdf_extension_test_utils",
-      "//chrome/browser/profiles:misc",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/send_tab_to_self",
-      "//chrome/browser/sync",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/browser_web_contents_delegate",
-      "//chrome/browser/ui/side_panel",
-      "//chrome/browser/ui/side_panel:side_panel_views_dependent",
-      "//chrome/browser/ui/startup",
-      "//chrome/browser/ui/toasts",
-      "//chrome/browser/web_applications:web_applications_test_support",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//chrome/test/supervised_user:test_support",
-      "//components/enterprise/data_controls/core/browser:test_support",
-      "//components/send_tab_to_self",
-      "//components/send_tab_to_self:features",
-      "//components/send_tab_to_self:test_support",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//pdf:features",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//ui/events:test_support",
-      "//url",
-    ]
-    if (enable_compose) {
-      deps += [ "//chrome/browser/compose:test_support" ]
-    }
-
-    if (enable_pdf) {
-      deps += [ "//chrome/browser/pdf:pdf_extension_test_base" ]
-    }
-  }
-
-  source_set("interactive_ui_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [
-      "link_to_text_menu_observer_interactive_uitest.cc",
-      "render_view_context_menu_interactive_uitest.cc",
-    ]
-
-    deps = [
-      ":impl",
-      ":mock_test_support",
-      ":renderer_context_menu",
-      ":test_support",
-      "//base/test:test_support",
-      "//chrome/app:command_ids",
-      "//chrome/browser",
-      "//chrome/browser:chrome_content_browser_client",
-      "//chrome/browser/custom_handlers",
-      "//chrome/browser/enterprise/data_controls:test_support",
-      "//chrome/browser/signin",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/startup",
-      "//chrome/browser/ui/toasts",
-      "//chrome/browser/web_applications:web_applications_test_support",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/custom_handlers",
-      "//components/privacy_sandbox/privacy_sandbox_attestations",
-      "//components/privacy_sandbox/privacy_sandbox_attestations:test_support",
-      "//components/shared_highlighting/core/common",
-      "//components/signin/public/identity_manager:test_support",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//extensions/browser",
-      "//net:test_support",
-      "//services/service_manager/public/cpp",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//ui/base/clipboard:clipboard_test_support",
-      "//url",
-    ]
-  }
+  deps = [
+    ":impl",
+    ":mock_test_support",
+    ":renderer_context_menu",
+    ":test_support",
+    "//base/test:test_support",
+    "//chrome/app:command_ids",
+    "//chrome/browser",
+    "//chrome/browser:chrome_content_browser_client",
+    "//chrome/browser/custom_handlers",
+    "//chrome/browser/enterprise/data_controls:test_support",
+    "//chrome/browser/signin",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/startup",
+    "//chrome/browser/ui/toasts",
+    "//chrome/browser/web_applications:web_applications_test_support",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/custom_handlers",
+    "//components/privacy_sandbox/privacy_sandbox_attestations",
+    "//components/privacy_sandbox/privacy_sandbox_attestations:test_support",
+    "//components/shared_highlighting/core/common",
+    "//components/signin/public/identity_manager:test_support",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//extensions/browser",
+    "//net:test_support",
+    "//services/service_manager/public/cpp",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//ui/base/clipboard:clipboard_test_support",
+    "//url",
+  ]
 }

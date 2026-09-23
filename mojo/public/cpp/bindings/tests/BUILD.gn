@@ -271,9 +271,7 @@ source_set("perftests") {
 
   sources = [ "bindings_perftest.cc" ]
 
-  if (!is_ios) {
-    sources += [ "e2e_perftest.cc" ]
-  }
+  sources += [ "e2e_perftest.cc" ]
 
   deps = [
     "//base/test:test_support",

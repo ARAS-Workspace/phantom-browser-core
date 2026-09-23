@@ -52,9 +52,7 @@ source_set("unit_tests") {
     "trace_report_database_unittest.cc",
   ]
 
-  if (!is_ios) {
-    sources += [ "tracing_scenario_unittest.cc" ]
-  }
+  sources += [ "tracing_scenario_unittest.cc" ]
   deps = [
     ":background_tracing",
     "//base",
@@ -69,12 +67,10 @@ source_set("unit_tests") {
     "//third_party/zlib/google:compression_utils",
   ]
 
-  if (!is_ios) {
-    deps += [
-      "//services/tracing:lib",
-      "//services/tracing:test_utils",
-    ]
-  }
+  deps += [
+    "//services/tracing:lib",
+    "//services/tracing:test_utils",
+  ]
   data_deps = [
     "//third_party/perfetto/protos/perfetto/config/chrome:scenario_descriptor",
   ]

@@ -737,9 +737,7 @@ cc_test_static_library("test_support") {
   if (enable_vulkan) {
     deps += [ "//gpu/vulkan/init" ]
   }
-  if (!is_android) {
-    data_deps = [ "//third_party/angle:includes" ]
-  }
+  data_deps = [ "//third_party/angle:includes" ]
   if (skia_use_dawn) {
     deps += [
       "//third_party/dawn/src/dawn:proc",

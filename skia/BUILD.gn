@@ -934,17 +934,13 @@ skia_source_set("skia_core_and_effects") {
 if (current_cpu == "x86" || current_cpu == "x64") {
   skia_source_set("skia_opts_ml3") {
     sources = skia_opts.ml3_sources
-    if (!is_win) {
-      cflags = [
-        "-mavx2",
-        "-mbmi",
-        "-mbmi2",
-        "-mf16c",
-        "-mfma",
-      ]
-    } else {
-      cflags = [ "/arch:AVX2" ]
-    }
+    cflags = [
+      "-mavx2",
+      "-mbmi",
+      "-mbmi2",
+      "-mf16c",
+      "-mfma",
+    ]
     visibility = [ ":skia_opts" ]
   }
   skia_source_set("skia_opts_ml4") {
@@ -979,9 +975,7 @@ skia_source_set("skia_opts") {
   } else if (current_cpu == "arm") {
     # The assembly uses the frame pointer register (r7 in Thumb/r11 in
     # ARM), the compiler doesn't like that.
-    if (!is_ios) {
-      cflags += [ "-fomit-frame-pointer" ]
-    }
+    cflags += [ "-fomit-frame-pointer" ]
   } else if (current_cpu == "arm64") {
     # Conditional and empty body needed to avoid assert() below.
   } else if (current_cpu == "arm64e") {
@@ -1021,12 +1015,10 @@ config("skcms_implementation_config") {
 config("skcms_library_config") {
   cflags = []
 
-  if (!is_win) {
-    cflags += [
-      "-w",
-      "-std=c11",
-    ]
-  }
+  cflags += [
+    "-w",
+    "-std=c11",
+  ]
 
   # LLVM automatically sets the equivalent of GCC's -mfp16-format=ieee on ARM
   # builds by default, while GCC itself does not. We need it to enable support
@@ -1049,14 +1041,10 @@ if (current_cpu == "x64") {
   skia_source_set("skcms_TransformHsw") {
     sources = skcms_TransformHsw
     configs += [ ":skcms_library_config" ]
-    if (!is_win) {
-      cflags = [
-        "-mavx2",
-        "-mf16c",
-      ]
-    } else {
-      cflags = [ "/arch:AVX2" ]
-    }
+    cflags = [
+      "-mavx2",
+      "-mf16c",
+    ]
     visibility = [ ":skcms" ]
   }
   skia_source_set("skcms_TransformSkx") {
@@ -1198,9 +1186,7 @@ test("skia_unittests") {
     sources += [ "ext/skia_utils_mac_unittest.mm" ]
   }
 
-  if (!is_win) {
-    sources -= [ "ext/platform_canvas_unittest.cc" ]
-  }
+  sources -= [ "ext/platform_canvas_unittest.cc" ]
 
   fuzztests = [ "ImageOperationsResize.ResizeFuzzTest" ]
 
@@ -1219,42 +1205,38 @@ test("skia_unittests") {
 
   data_deps = [ "//testing/buildbot/filters:skia_unittests_filters" ]
 
-  if (!is_ios) {
-    sources += [ "public/mojom/test/mojom_traits_unittest.cc" ]
-    deps += [
-      "//mojo/public/cpp/bindings",
-      "//mojo/public/cpp/test_support:test_utils",
-      "//skia/public/mojom",
-    ]
-  }
+  sources += [ "public/mojom/test/mojom_traits_unittest.cc" ]
+  deps += [
+    "//mojo/public/cpp/bindings",
+    "//mojo/public/cpp/test_support:test_utils",
+    "//skia/public/mojom",
+  ]
 
   if (skia_support_skottie) {
     sources += [ "ext/skottie_unittest.cc" ]
   }
 }
 
-if (!is_ios) {
-  executable("image_operations_bench") {
-    sources = [ "ext/image_operations_bench.cc" ]
+executable("image_operations_bench") {
+  sources = [ "ext/image_operations_bench.cc" ]
 
-    deps = [
-      ":skia",
-      "//base",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+  deps = [
+    ":skia",
+    "//base",
+    "//build/win:default_exe_manifest",
+  ]
+}
 
-  executable("filter_fuzz_stub") {
-    testonly = true
-    sources = [ "tools/filter_fuzz_stub/filter_fuzz_stub.cc" ]
+executable("filter_fuzz_stub") {
+  testonly = true
+  sources = [ "tools/filter_fuzz_stub/filter_fuzz_stub.cc" ]
 
-    deps = [
-      ":skia",
-      "//base",
-      "//base/test:test_support",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+  deps = [
+    ":skia",
+    "//base",
+    "//base/test:test_support",
+    "//build/win:default_exe_manifest",
+  ]
 }
 
 group("fuzzers") {

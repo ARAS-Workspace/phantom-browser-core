@@ -1447,9 +1447,7 @@ component("net") {
         "socket/ephemeral_port_randomizer_mac.h",
       ]
     }
-    if (!is_ios) {
-      sources += [ "disk_cache/blockfile/file_posix.cc" ]
-    }
+    sources += [ "disk_cache/blockfile/file_posix.cc" ]
     sources += [ "disk_cache/blockfile/mapped_file_posix.cc" ]
   }
 
@@ -1460,23 +1458,21 @@ component("net") {
     ]
   }
 
-  if (!is_win) {
-    sources += [
-      "http/http_auth_handler_ntlm_portable.cc",
-      "http/http_auth_ntlm_mechanism.cc",
-      "http/http_auth_ntlm_mechanism.h",
-      "ntlm/ntlm.cc",
-      "ntlm/ntlm.h",
-      "ntlm/ntlm_buffer_reader.cc",
-      "ntlm/ntlm_buffer_reader.h",
-      "ntlm/ntlm_buffer_writer.cc",
-      "ntlm/ntlm_buffer_writer.h",
-      "ntlm/ntlm_client.cc",
-      "ntlm/ntlm_client.h",
-      "ntlm/ntlm_constants.cc",
-      "ntlm/ntlm_constants.h",
-    ]
-  }
+  sources += [
+    "http/http_auth_handler_ntlm_portable.cc",
+    "http/http_auth_ntlm_mechanism.cc",
+    "http/http_auth_ntlm_mechanism.h",
+    "ntlm/ntlm.cc",
+    "ntlm/ntlm.h",
+    "ntlm/ntlm_buffer_reader.cc",
+    "ntlm/ntlm_buffer_reader.h",
+    "ntlm/ntlm_buffer_writer.cc",
+    "ntlm/ntlm_buffer_writer.h",
+    "ntlm/ntlm_client.cc",
+    "ntlm/ntlm_client.h",
+    "ntlm/ntlm_constants.cc",
+    "ntlm/ntlm_constants.h",
+  ]
 
   if (use_external_gssapi) {
     sources += [
@@ -1921,24 +1917,22 @@ static_library("preload_decoder") {
   deps = [ "//base" ]
 }
 
-if (!is_ios) {
-  executable("dump_cache") {
-    testonly = true
-    sources = [
-      "tools/dump_cache/dump_cache.cc",
-      "tools/dump_cache/dump_cache_helper.cc",
-      "tools/dump_cache/dump_cache_helper.h",
-      "tools/dump_cache/dump_files.cc",
-      "tools/dump_cache/dump_files.h",
-    ]
+executable("dump_cache") {
+  testonly = true
+  sources = [
+    "tools/dump_cache/dump_cache.cc",
+    "tools/dump_cache/dump_cache_helper.cc",
+    "tools/dump_cache/dump_cache_helper.h",
+    "tools/dump_cache/dump_files.cc",
+    "tools/dump_cache/dump_files.h",
+  ]
 
-    deps = [
-      ":net",
-      ":test_support",
-      "//base",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+  deps = [
+    ":net",
+    ":test_support",
+    "//base",
+    "//build/win:default_exe_manifest",
+  ]
 }
 
 static_library("gtest_util") {
@@ -2499,36 +2493,34 @@ source_set("simple_quic_tools") {
   public_deps = [ "//net/third_party/quiche:quiche_tool_support" ]
 }
 
-if (!is_ios) {
-  executable("quic_client") {
-    testonly = true
-    sources = [ "tools/quic/quic_simple_client_bin.cc" ]
-    deps = [
-      ":net",
-      ":simple_quic_tools",
-      "//base",
-      "//build/win:default_exe_manifest",
-      "//net/third_party/quiche:quic_client_core",
-      "//url",
-    ]
-  }
-  executable("quic_server") {
-    testonly = true
-    sources = [
-      "tools/quic/quic_simple_server_backend_factory.cc",
-      "tools/quic/quic_simple_server_backend_factory.h",
-      "tools/quic/quic_simple_server_bin.cc",
-    ]
-    deps = [
-      ":net",
-      ":simple_quic_tools",
-      "//base",
-      "//build/win:default_exe_manifest",
-      "//net/third_party/quiche:quic_server_core",
-      "//third_party/boringssl",
-      "//third_party/protobuf:protobuf_lite",
-    ]
-  }
+executable("quic_client") {
+  testonly = true
+  sources = [ "tools/quic/quic_simple_client_bin.cc" ]
+  deps = [
+    ":net",
+    ":simple_quic_tools",
+    "//base",
+    "//build/win:default_exe_manifest",
+    "//net/third_party/quiche:quic_client_core",
+    "//url",
+  ]
+}
+executable("quic_server") {
+  testonly = true
+  sources = [
+    "tools/quic/quic_simple_server_backend_factory.cc",
+    "tools/quic/quic_simple_server_backend_factory.h",
+    "tools/quic/quic_simple_server_bin.cc",
+  ]
+  deps = [
+    ":net",
+    ":simple_quic_tools",
+    "//base",
+    "//build/win:default_exe_manifest",
+    "//net/third_party/quiche:quic_server_core",
+    "//third_party/boringssl",
+    "//third_party/protobuf:protobuf_lite",
+  ]
 }
 
 # TODO(crbug.com/477528387): Consider enabling net_fuzztests for cronet builds.
@@ -3139,16 +3131,14 @@ target(_test_target_type, "net_unittests") {
     ]
   }
 
-  if (!is_win) {
-    sources += [
-      "http/http_auth_handler_ntlm_portable_unittest.cc",
-      "ntlm/ntlm_buffer_reader_unittest.cc",
-      "ntlm/ntlm_buffer_writer_unittest.cc",
-      "ntlm/ntlm_client_unittest.cc",
-      "ntlm/ntlm_test_data.h",
-      "ntlm/ntlm_unittest.cc",
-    ]
-  }
+  sources += [
+    "http/http_auth_handler_ntlm_portable_unittest.cc",
+    "ntlm/ntlm_buffer_reader_unittest.cc",
+    "ntlm/ntlm_buffer_writer_unittest.cc",
+    "ntlm/ntlm_client_unittest.cc",
+    "ntlm/ntlm_test_data.h",
+    "ntlm/ntlm_unittest.cc",
+  ]
 
   if (enable_python_utils) {
     sources += [ "test/python_utils_unittest.cc" ]
@@ -3374,55 +3364,50 @@ target(_test_target_type, "net_unittests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-# !is_android && !is_win && !is_mac
-if (!is_ios) {
-  # TODO(crbug.com/40460932): this should be converted to "app" template and
-  # enabled on iOS too.
-  test("net_perftests") {
-    sources = [
-      "base/mime_sniffer_perftest.cc",
-      "cookies/cookie_monster_perftest.cc",
-      "disk_cache/disk_cache_perftest.cc",
-      "extras/sqlite/sqlite_persistent_cookie_store_perftest.cc",
-      "http/http_no_vary_search_data_perftest.cc",
-      "http/http_request_headers_perftest.cc",
-      "http/no_vary_search_cache_perftest.cc",
-      "socket/udp_socket_perftest.cc",
-      "spdy/spdy_http_utils_perftest.cc",
-      "url_request/url_request_quic_perftest.cc",
-    ]
+test("net_perftests") {
+  sources = [
+    "base/mime_sniffer_perftest.cc",
+    "cookies/cookie_monster_perftest.cc",
+    "disk_cache/disk_cache_perftest.cc",
+    "extras/sqlite/sqlite_persistent_cookie_store_perftest.cc",
+    "http/http_no_vary_search_data_perftest.cc",
+    "http/http_request_headers_perftest.cc",
+    "http/no_vary_search_cache_perftest.cc",
+    "socket/udp_socket_perftest.cc",
+    "spdy/spdy_http_utils_perftest.cc",
+    "url_request/url_request_quic_perftest.cc",
+  ]
 
-    deps = [
-      ":extras",
-      ":net",
-      ":quic_test_tools",
-      ":simple_quic_tools",
-      ":test_support",
-      "//base",
-      "//base:i18n",
-      "//base/test:test_support_perf",
-      "//testing/gtest",
-      "//testing/perf",
-      "//third_party/google_benchmark",
-      "//url",
-    ]
-    data_deps = [
-      # Needed for isolate script to execute.
-      "//testing:run_perf_test",
-    ]
+  deps = [
+    ":extras",
+    ":net",
+    ":quic_test_tools",
+    ":simple_quic_tools",
+    ":test_support",
+    "//base",
+    "//base:i18n",
+    "//base/test:test_support_perf",
+    "//testing/gtest",
+    "//testing/perf",
+    "//third_party/google_benchmark",
+    "//url",
+  ]
+  data_deps = [
+    # Needed for isolate script to execute.
+    "//testing:run_perf_test",
+  ]
 
-    if (enable_device_bound_sessions) {
-      sources += [ "device_bound_sessions/session_store_impl_perftest.cc" ]
-      deps += [
-        ":device_bound_sessions_storage_proto",
-        "//components/unexportable_keys",
-        "//crypto:test_support",
-      ]
-    }
+  if (enable_device_bound_sessions) {
+    sources += [ "device_bound_sessions/session_store_impl_perftest.cc" ]
+    deps += [
+      ":device_bound_sessions_storage_proto",
+      "//components/unexportable_keys",
+      "//crypto:test_support",
+    ]
+  }
 
-    if (enable_websockets) {
-      sources += [ "websockets/websocket_frame_perftest.cc" ]
-    }
+  if (enable_websockets) {
+    sources += [ "websockets/websocket_frame_perftest.cc" ]
   }
 }
 
@@ -3716,21 +3701,19 @@ fuzzer_test("canonicalize_host_fuzzer") {
   dict = "base/canonicalize_host_fuzzer.dict"
 }
 
-if (!is_win) {
-  fuzzer_test("net_ntlm_ntlm_client_fuzzer") {
-    sources = [
-      "ntlm/ntlm_client_fuzzer.cc",
-      "ntlm/ntlm_test_data.h",
-    ]
-    deps = [
-      ":net_fuzzer_test_support",
-      ":test_support",
-      "//base",
-      "//net",
-    ]
-    dict = "data/fuzzer_dictionaries/net_ntlm_ntlm_client_fuzzer.dict"
-    seed_corpus = "data/fuzzer_data/ntlm_client_fuzzer/"
-  }
+fuzzer_test("net_ntlm_ntlm_client_fuzzer") {
+  sources = [
+    "ntlm/ntlm_client_fuzzer.cc",
+    "ntlm/ntlm_test_data.h",
+  ]
+  deps = [
+    ":net_fuzzer_test_support",
+    ":test_support",
+    "//base",
+    "//net",
+  ]
+  dict = "data/fuzzer_dictionaries/net_ntlm_ntlm_client_fuzzer.dict"
+  seed_corpus = "data/fuzzer_data/ntlm_client_fuzzer/"
 }
 
 if (!disable_brotli_filter) {

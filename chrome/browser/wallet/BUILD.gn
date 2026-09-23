@@ -30,20 +30,18 @@ source_set("wallet") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "walletable_pass_barcode_detector_browsertest.cc" ]
-    deps = [
-      "//base/test:test_support",
-      "//chrome/browser/ui",
-      "//chrome/test:test_support",
-      "//components/wallet/content/browser",
-      "//content/public/browser",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//url",
-    ]
-  }
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [ "walletable_pass_barcode_detector_browsertest.cc" ]
+  deps = [
+    "//base/test:test_support",
+    "//chrome/browser/ui",
+    "//chrome/test:test_support",
+    "//components/wallet/content/browser",
+    "//content/public/browser",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//url",
+  ]
 }

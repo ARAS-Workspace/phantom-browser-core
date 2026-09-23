@@ -26,18 +26,16 @@ source_set("messaging") {
     "native_messaging_policy_handler.h",
   ]
 
-  if (!is_android) {
-    sources += [
-      "launch_context.cc",
-      "launch_context.h",
-      "native_message_process_host.cc",
-      "native_message_process_host.h",
-      "native_messaging_launch_from_native.cc",
-      "native_messaging_launch_from_native.h",
-      "native_process_launcher.cc",
-      "native_process_launcher.h",
-    ]
-  }
+  sources += [
+    "launch_context.cc",
+    "launch_context.h",
+    "native_message_process_host.cc",
+    "native_message_process_host.h",
+    "native_messaging_launch_from_native.cc",
+    "native_messaging_launch_from_native.h",
+    "native_process_launcher.cc",
+    "native_process_launcher.h",
+  ]
 
   if (is_posix) {
     sources += [ "launch_context_posix.cc" ]
@@ -68,9 +66,7 @@ source_set("messaging") {
     "//url",
   ]
 
-  if (!is_android) {
-    deps += [ "//components/keep_alive_registry" ]
-  }
+  deps += [ "//components/keep_alive_registry" ]
 }
 
 source_set("test_support") {
@@ -154,33 +150,31 @@ source_set("platform_browser_tests") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "message_tracker_browsertest.cc",
-      "native_messaging_apitest.cc",
-    ]
+  sources = [
+    "message_tracker_browsertest.cc",
+    "native_messaging_apitest.cc",
+  ]
 
-    deps = [
-      ":messaging",
-      ":test_support",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/startup",
-      "//chrome/test:test_support",
-      "//extensions:test_support",
-      "//extensions/browser",
-      "//extensions/common",
-      "//testing/gtest",
-    ]
+  deps = [
+    ":messaging",
+    ":test_support",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/startup",
+    "//chrome/test:test_support",
+    "//extensions:test_support",
+    "//extensions/browser",
+    "//extensions/common",
+    "//testing/gtest",
+  ]
 
-    if (enable_background_mode) {
-      deps += [ "//chrome/browser/background/extensions" ]
-    }
+  if (enable_background_mode) {
+    deps += [ "//chrome/browser/background/extensions" ]
   }
 }

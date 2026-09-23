@@ -73,11 +73,7 @@ source_set("factories_impl") {
     "//components/sync_device_info",
   ]
 
-  if (!is_android) {
-    deps += [ "//chrome/browser/ui/tabs/saved_tab_groups" ]
-  } else {
-    deps += [ "//chrome/browser/tab_group_sync:android" ]
-  }
+  deps += [ "//chrome/browser/ui/tabs/saved_tab_groups" ]
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }

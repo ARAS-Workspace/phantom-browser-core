@@ -1361,22 +1361,18 @@ static_library("browser") {
     ]
   }
 
-  if (!is_ios) {
-    sources += [
-      "payments/credit_card_fido_authenticator.cc",
-      "payments/credit_card_fido_authenticator.h",
-      "permissions/autofill_policy_handler.cc",
-      "permissions/autofill_policy_handler.h",
-      "strike_databases/payments/fido_authentication_strike_database.h",
-    ]
-  }
+  sources += [
+    "payments/credit_card_fido_authenticator.cc",
+    "payments/credit_card_fido_authenticator.h",
+    "permissions/autofill_policy_handler.cc",
+    "permissions/autofill_policy_handler.h",
+    "strike_databases/payments/fido_authentication_strike_database.h",
+  ]
 
-  if (!is_android) {
-    sources += [
-      "ui/autofill_image_fetcher.cc",
-      "ui/autofill_image_fetcher.h",
-    ]
-  }
+  sources += [
+    "ui/autofill_image_fetcher.cc",
+    "ui/autofill_image_fetcher.h",
+  ]
 
   configs += [
     "//build/config:precompiled_headers",
@@ -1498,12 +1494,10 @@ static_library("browser") {
     deps += [ "//components/strings" ]
   }
 
-  if (!is_android) {
-    sources += [
-      "crowdsourcing/server_prediction_overrides.cc",
-      "crowdsourcing/server_prediction_overrides.h",
-    ]
-  }
+  sources += [
+    "crowdsourcing/server_prediction_overrides.cc",
+    "crowdsourcing/server_prediction_overrides.h",
+  ]
 
   if (!is_android && !is_ios) {
     deps += [ "//ui/native_theme" ]
@@ -2203,22 +2197,18 @@ source_set("unit_tests") {
     ]
   }
 
-  if (!is_ios) {
-    sources += [
-      "permissions/autofill_policy_handler_unittest.cc",
+  sources += [
+    "permissions/autofill_policy_handler_unittest.cc",
 
-      # Not included on iOS because the files need to be bundled specially.
-      "heuristic_classification_unittest.cc",
-    ]
-  }
+    # Not included on iOS because the files need to be bundled specially.
+    "heuristic_classification_unittest.cc",
+  ]
 
-  if (!is_android) {
-    sources += [
-      "crowdsourcing/server_prediction_overrides_unittest.cc",
-      "ui/autofill_image_fetcher_unittest.cc",
-      "ui/payments/bnpl_tos_controller_impl_unittest.cc",
-    ]
-  }
+  sources += [
+    "crowdsourcing/server_prediction_overrides_unittest.cc",
+    "ui/autofill_image_fetcher_unittest.cc",
+    "ui/payments/bnpl_tos_controller_impl_unittest.cc",
+  ]
 
   if (is_win || is_mac || is_android) {
     sources += [
@@ -2351,9 +2341,7 @@ source_set("unit_tests") {
 
   deps += [ "//components/variations/service" ]
 
-  if (!is_ios) {
-    deps += [ "//components/autofill/core/browser/at_memory/policy:unit_tests" ]
-  }
+  deps += [ "//components/autofill/core/browser/at_memory/policy:unit_tests" ]
 
   if (is_win || is_mac || is_linux || is_android) {
     sources += [ "at_memory_cross_tab_copy_paste_tracker_unittest.cc" ]

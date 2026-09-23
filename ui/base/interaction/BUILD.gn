@@ -93,9 +93,7 @@ static_library("test_support") {
     deps += [ "//ui/aura" ]
   }
 
-  if (!is_ios) {
-    deps += [ "//ui/native_window_tracker" ]
-  }
+  deps += [ "//ui/native_window_tracker" ]
 }
 
 source_set("unit_tests") {

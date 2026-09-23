@@ -55,102 +55,100 @@ source_set("impl") {
   deps += [ "//chrome/browser/ui/webui/tab_search:mojo_bindings" ]
 }
 
-if (!is_android) {
-  source_set("unit_tests") {
-    testonly = true
-    sources = [ "theme_tracking_non_accessible_image_view_unittest.cc" ]
-    deps = [
-      ":accessibility",
-      "//testing/gtest",
-      "//ui/color:color_headers",
-      "//ui/views",
-      "//ui/views:test_support",
-    ]
+source_set("unit_tests") {
+  testonly = true
+  sources = [ "theme_tracking_non_accessible_image_view_unittest.cc" ]
+  deps = [
+    ":accessibility",
+    "//testing/gtest",
+    "//ui/color:color_headers",
+    "//ui/views",
+    "//ui/views:test_support",
+  ]
+}
+
+# Test base class for Views accessibility event tests. Shared by both
+# browser_tests and interactive_ui_tests.
+source_set("dump_accessibility_events_views_browsertest_base") {
+  testonly = true
+  sources = [
+    "dump_accessibility_events_views_browsertest_base.cc",
+    "dump_accessibility_events_views_browsertest_base.h",
+  ]
+
+  if (is_mac) {
+    sources += [ "dump_accessibility_events_views_browsertest_base_mac.mm" ]
+  } else if (is_linux) {
+    sources +=
+        [ "dump_accessibility_events_views_browsertest_base_auralinux.cc" ]
   }
 
-  # Test base class for Views accessibility event tests. Shared by both
-  # browser_tests and interactive_ui_tests.
-  source_set("dump_accessibility_events_views_browsertest_base") {
-    testonly = true
-    sources = [
-      "dump_accessibility_events_views_browsertest_base.cc",
-      "dump_accessibility_events_views_browsertest_base.h",
-    ]
+  deps = [
+    "//base",
+    "//base/test:test_support",
+    "//chrome/test:test_support",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//testing/gtest",
+    "//ui/accessibility",
+    "//ui/accessibility:test_support",
+    "//ui/views",
+    "//ui/views:test_support",
+  ]
+}
 
-    if (is_mac) {
-      sources += [ "dump_accessibility_events_views_browsertest_base_mac.mm" ]
-    } else if (is_linux) {
-      sources +=
-          [ "dump_accessibility_events_views_browsertest_base_auralinux.cc" ]
-    }
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = []
+  deps = [ ":accessibility" ]
 
-    deps = [
-      "//base",
-      "//base/test:test_support",
-      "//chrome/test:test_support",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//testing/gtest",
-      "//ui/accessibility",
-      "//ui/accessibility:test_support",
-      "//ui/views",
-      "//ui/views:test_support",
-    ]
+  sources += [
+    "accessibility_focus_highlight_browsertest.cc",
+    "dump_accessibility_events_views_browsertest.cc",
+    "menu_dump_accessibility_events_browsertest.cc",
+    "tree_view_dump_accessibility_events_browsertest.cc",
+  ]
+
+  deps += [
+    ":dump_accessibility_events_views_browsertest_base",
+    "//chrome/browser/ui/color:color_headers",
+    "//chrome/common:constants",
+    "//chrome/test:test_support_ui",
+    "//components/prefs",
+    "//content/test:test_support",
+    "//ui/accessibility",
+    "//ui/base",
+    "//ui/snapshot",
+    "//ui/views",
+    "//ui/views:test_support",
+  ]
+}
+
+source_set("interactive_ui_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = []
+  deps = [
+    ":accessibility",
+    "//base/test:test_support",
+    "//chrome/browser/preloading:test_support",
+    "//chrome/browser/ui",
+    "//chrome/test:test_support_ui",
+    "//components/on_device_translation/buildflags",
+    "//ui/views:test_support",
+  ]
+
+  if (enable_on_device_translation) {
+    deps += [ "//components/on_device_translation:public" ]
   }
 
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = []
-    deps = [ ":accessibility" ]
-
-    sources += [
-      "accessibility_focus_highlight_browsertest.cc",
-      "dump_accessibility_events_views_browsertest.cc",
-      "menu_dump_accessibility_events_browsertest.cc",
-      "tree_view_dump_accessibility_events_browsertest.cc",
-    ]
-
+  if (use_atk) {
+    sources += [ "browser_accessibility_uitest_auralinux.cc" ]
+    configs += [ "//build/config/linux/atk" ]
     deps += [
-      ":dump_accessibility_events_views_browsertest_base",
-      "//chrome/browser/ui/color:color_headers",
-      "//chrome/common:constants",
-      "//chrome/test:test_support_ui",
-      "//components/prefs",
+      "//chrome/browser/devtools:test_support",
       "//content/test:test_support",
-      "//ui/accessibility",
-      "//ui/base",
-      "//ui/snapshot",
-      "//ui/views",
-      "//ui/views:test_support",
     ]
-  }
-
-  source_set("interactive_ui_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = []
-    deps = [
-      ":accessibility",
-      "//base/test:test_support",
-      "//chrome/browser/preloading:test_support",
-      "//chrome/browser/ui",
-      "//chrome/test:test_support_ui",
-      "//components/on_device_translation/buildflags",
-      "//ui/views:test_support",
-    ]
-
-    if (enable_on_device_translation) {
-      deps += [ "//components/on_device_translation:public" ]
-    }
-
-    if (use_atk) {
-      sources += [ "browser_accessibility_uitest_auralinux.cc" ]
-      configs += [ "//build/config/linux/atk" ]
-      deps += [
-        "//chrome/browser/devtools:test_support",
-        "//content/test:test_support",
-      ]
-    }
   }
 }

@@ -6,17 +6,15 @@ import("//components/metrics/generate_expired_histograms_array.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 # TODO(b/504980566): Further modularize //chrome/browser/metrics.
-if (!is_android) {
-  # Header-only target so downstream targets can include
-  # browser_activity_watcher.h without depending on all of :metrics.
-  source_set("browser_activity_watcher") {
-    public = [ "browser_activity_watcher.h" ]
-    public_deps = [
-      "//base",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tabs:tab_strip_model_observer",
-    ]
-  }
+# Header-only target so downstream targets can include
+# browser_activity_watcher.h without depending on all of :metrics.
+source_set("browser_activity_watcher") {
+  public = [ "browser_activity_watcher.h" ]
+  public_deps = [
+    "//base",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/tabs:tab_strip_model_observer",
+  ]
 }
 
 source_set("metrics") {
@@ -78,37 +76,35 @@ source_set("metrics") {
     "//ui/display",
   ]
 
-  if (!is_android) {
-    public += [
-      "desktop_platform_features_metrics_provider.h",
-      "desktop_session_duration/desktop_profile_session_durations_service.h",
-      "desktop_session_duration/desktop_profile_session_durations_service_factory.h",
-      "desktop_session_duration/desktop_session_duration_observer.h",
-      "desktop_session_duration/desktop_session_metrics_provider.h",
-      "desktop_session_duration/touch_ui_controller_stats_tracker.h",
-      "first_web_contents_profiler.h",
-      "first_web_contents_profiler_base.h",
-      "power/battery_discharge_reporter.h",
-      "power/power_metrics.h",
-      "power/power_metrics_constants.h",
-      "power/power_metrics_reporter.h",
-      "power/process_metrics_recorder_util.h",
-      "power/process_monitor.h",
-      "usage_scenario/chrome_responsiveness_calculator_delegate.h",
-      "usage_scenario/system_event_provider.h",
-      "usage_scenario/tab_usage_scenario_tracker.h",
-      "usage_scenario/usage_scenario.h",
-      "usage_scenario/usage_scenario_data_store.h",
-      "usage_scenario/usage_scenario_tracker.h",
-      "usage_scenario/video_capture_event_provider.h",
-    ]
-    public_deps += [
-      "//chrome/browser/metrics/desktop_session_duration",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tabs:tab_strip_model_observer",
-      "//components/power_metrics",
-    ]
-  }
+  public += [
+    "desktop_platform_features_metrics_provider.h",
+    "desktop_session_duration/desktop_profile_session_durations_service.h",
+    "desktop_session_duration/desktop_profile_session_durations_service_factory.h",
+    "desktop_session_duration/desktop_session_duration_observer.h",
+    "desktop_session_duration/desktop_session_metrics_provider.h",
+    "desktop_session_duration/touch_ui_controller_stats_tracker.h",
+    "first_web_contents_profiler.h",
+    "first_web_contents_profiler_base.h",
+    "power/battery_discharge_reporter.h",
+    "power/power_metrics.h",
+    "power/power_metrics_constants.h",
+    "power/power_metrics_reporter.h",
+    "power/process_metrics_recorder_util.h",
+    "power/process_monitor.h",
+    "usage_scenario/chrome_responsiveness_calculator_delegate.h",
+    "usage_scenario/system_event_provider.h",
+    "usage_scenario/tab_usage_scenario_tracker.h",
+    "usage_scenario/usage_scenario.h",
+    "usage_scenario/usage_scenario_data_store.h",
+    "usage_scenario/usage_scenario_tracker.h",
+    "usage_scenario/video_capture_event_provider.h",
+  ]
+  public_deps += [
+    "//chrome/browser/metrics/desktop_session_duration",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/tabs:tab_strip_model_observer",
+    "//components/power_metrics",
+  ]
 
   public += [ "family_link_user_metrics_provider.h" ]
 
@@ -237,49 +233,47 @@ source_set("impl") {
     "//services/resource_coordinator/public/cpp/memory_instrumentation:browser",
   ]
 
-  if (!is_android) {
-    sources += [
-      "browser_activity_watcher.cc",
-      "desktop_platform_features_metrics_provider.cc",
-      "desktop_session_duration/audible_contents_tracker.cc",
-      "desktop_session_duration/chrome_visibility_observer.cc",
-      "desktop_session_duration/desktop_profile_session_durations_service.cc",
-      "desktop_session_duration/desktop_profile_session_durations_service_factory.cc",
-      "desktop_session_duration/desktop_session_duration_observer.cc",
-      "desktop_session_duration/desktop_session_duration_tracker.cc",
-      "desktop_session_duration/desktop_session_metrics_provider.cc",
-      "desktop_session_duration/touch_ui_controller_stats_tracker.cc",
-      "first_web_contents_profiler.cc",
-      "first_web_contents_profiler_base.cc",
-      "incognito_observer_desktop.cc",
-      "power/battery_discharge_reporter.cc",
-      "power/power_metrics.cc",
-      "power/power_metrics_constants.cc",
-      "power/power_metrics_reporter.cc",
-      "power/process_metrics_recorder_util.cc",
-      "power/process_monitor.cc",
-      "usage_scenario/chrome_responsiveness_calculator_delegate.cc",
-      "usage_scenario/system_event_provider.cc",
-      "usage_scenario/tab_usage_scenario_tracker.cc",
-      "usage_scenario/usage_scenario.cc",
-      "usage_scenario/usage_scenario_data_store.cc",
-      "usage_scenario/usage_scenario_tracker.cc",
-      "usage_scenario/video_capture_event_provider.cc",
-    ]
-    deps += [
-      ":browser_activity_watcher",
-      "//chrome/browser:after_startup_task_utils",
-      "//chrome/browser/performance_manager/public/user_tuning",
-      "//chrome/browser/ui/location_bar",
-      "//chrome/browser/ui/performance_controls",
-      "//chrome/browser/ui/tabs",
-      "//chrome/browser/ui/tabs:features",
-      "//chrome/browser/ui/tabs:tab_enums",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/waap:manager",
-      "//chrome/browser/web_applications:web_applications_metrics",
-    ]
-  }
+  sources += [
+    "browser_activity_watcher.cc",
+    "desktop_platform_features_metrics_provider.cc",
+    "desktop_session_duration/audible_contents_tracker.cc",
+    "desktop_session_duration/chrome_visibility_observer.cc",
+    "desktop_session_duration/desktop_profile_session_durations_service.cc",
+    "desktop_session_duration/desktop_profile_session_durations_service_factory.cc",
+    "desktop_session_duration/desktop_session_duration_observer.cc",
+    "desktop_session_duration/desktop_session_duration_tracker.cc",
+    "desktop_session_duration/desktop_session_metrics_provider.cc",
+    "desktop_session_duration/touch_ui_controller_stats_tracker.cc",
+    "first_web_contents_profiler.cc",
+    "first_web_contents_profiler_base.cc",
+    "incognito_observer_desktop.cc",
+    "power/battery_discharge_reporter.cc",
+    "power/power_metrics.cc",
+    "power/power_metrics_constants.cc",
+    "power/power_metrics_reporter.cc",
+    "power/process_metrics_recorder_util.cc",
+    "power/process_monitor.cc",
+    "usage_scenario/chrome_responsiveness_calculator_delegate.cc",
+    "usage_scenario/system_event_provider.cc",
+    "usage_scenario/tab_usage_scenario_tracker.cc",
+    "usage_scenario/usage_scenario.cc",
+    "usage_scenario/usage_scenario_data_store.cc",
+    "usage_scenario/usage_scenario_tracker.cc",
+    "usage_scenario/video_capture_event_provider.cc",
+  ]
+  deps += [
+    ":browser_activity_watcher",
+    "//chrome/browser:after_startup_task_utils",
+    "//chrome/browser/performance_manager/public/user_tuning",
+    "//chrome/browser/ui/location_bar",
+    "//chrome/browser/ui/performance_controls",
+    "//chrome/browser/ui/tabs",
+    "//chrome/browser/ui/tabs:features",
+    "//chrome/browser/ui/tabs:tab_enums",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/waap:manager",
+    "//chrome/browser/web_applications:web_applications_metrics",
+  ]
 
   sources += [ "family_link_user_metrics_provider.cc" ]
 
@@ -494,51 +488,49 @@ source_set("platform_browser_tests") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
+source_set("browser_tests") {
+  testonly = true
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "dwa_browsertest.cc",
-      "metrics_consent_migration_browsertest.cc",
-      "metrics_reporting_state_browsertest.cc",
-      "metrics_service_browsertest.cc",
-      "metrics_service_user_demographics_browsertest.cc",
-      "process_memory_metrics_emitter_browsertest.cc",
-      "puma_browsertest.cc",
-      "structured_metrics_service_browsertest.cc",
-      "ukm_background_recorder_browsertest.cc",
-      "ukm_browsertest.cc",
-      "usage_scenario/tab_usage_scenario_tracker_browsertest.cc",
-      "variations/force_field_trials_browsertest.cc",
-      "variations/variations_safe_mode_browsertest.cc",
-      "variations/variations_safe_mode_end_to_end_browsertest.cc",
-    ]
+  sources = [
+    "dwa_browsertest.cc",
+    "metrics_consent_migration_browsertest.cc",
+    "metrics_reporting_state_browsertest.cc",
+    "metrics_service_browsertest.cc",
+    "metrics_service_user_demographics_browsertest.cc",
+    "process_memory_metrics_emitter_browsertest.cc",
+    "puma_browsertest.cc",
+    "structured_metrics_service_browsertest.cc",
+    "ukm_background_recorder_browsertest.cc",
+    "ukm_browsertest.cc",
+    "usage_scenario/tab_usage_scenario_tracker_browsertest.cc",
+    "variations/force_field_trials_browsertest.cc",
+    "variations/variations_safe_mode_browsertest.cc",
+    "variations/variations_safe_mode_end_to_end_browsertest.cc",
+  ]
 
-    deps = [
-      ":metrics",
-      ":test_support",
-      "//base",
-      "//chrome/browser:chrome_browser_main",
-      "//chrome/browser/metrics/structured:test_support",
-      "//chrome/browser/sync",
-      "//chrome/browser/sync/test/integration:sync_integration_test_support",
-      "//chrome/browser/unified_consent",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/metrics/demographics",
-      "//components/metrics/demographics:test_support",
-      "//components/metrics/private_metrics",
-      "//components/metrics/private_metrics:dwa_recorder",
-      "//components/metrics/private_metrics:private_metrics_features",
-      "//components/metrics/structured",
-      "//content/test:browsertest_support",
-      "//content/test:test_support",
-      "//testing/gtest",
-      "//third_party/federated_compute:confidential_compute",
-      "//third_party/federated_compute:confidential_compute_crypto_test_util",
-    ]
-  }
+  deps = [
+    ":metrics",
+    ":test_support",
+    "//base",
+    "//chrome/browser:chrome_browser_main",
+    "//chrome/browser/metrics/structured:test_support",
+    "//chrome/browser/sync",
+    "//chrome/browser/sync/test/integration:sync_integration_test_support",
+    "//chrome/browser/unified_consent",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/metrics/demographics",
+    "//components/metrics/demographics:test_support",
+    "//components/metrics/private_metrics",
+    "//components/metrics/private_metrics:dwa_recorder",
+    "//components/metrics/private_metrics:private_metrics_features",
+    "//components/metrics/structured",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//testing/gtest",
+    "//third_party/federated_compute:confidential_compute",
+    "//third_party/federated_compute:confidential_compute_crypto_test_util",
+  ]
 }

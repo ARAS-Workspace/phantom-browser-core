@@ -35,18 +35,16 @@ source_set("browser") {
     ]
   }
 
-  if (!is_android) {
-    sources += [
-      "passkey_change_quota_tracker.cc",
-      "passkey_change_quota_tracker.h",
-      "passkey_sync_bridge.cc",
-      "passkey_sync_bridge.h",
-    ]
-    deps += [
-      ":passkey_model",
-      "//base",
-    ]
-  }
+  sources += [
+    "passkey_change_quota_tracker.cc",
+    "passkey_change_quota_tracker.h",
+    "passkey_sync_bridge.cc",
+    "passkey_sync_bridge.h",
+  ]
+  deps += [
+    ":passkey_model",
+    "//base",
+  ]
 }
 
 source_set("passkey_model") {
@@ -141,36 +139,34 @@ source_set("unit_tests") {
     "//url",
   ]
 
-  if (!is_android) {
+  sources += [
+    "passkey_model_utils_unittest.cc",
+    "signal_api_utils_unittest.cc",
+  ]
+  if (use_blink) {
     sources += [
-      "passkey_model_utils_unittest.cc",
-      "signal_api_utils_unittest.cc",
+      "passkey_change_quota_tracker_unittest.cc",
+      "rate_limiter_slide_window_unittest.cc",
     ]
-    if (use_blink) {
-      sources += [
-        "passkey_change_quota_tracker_unittest.cc",
-        "rate_limiter_slide_window_unittest.cc",
-      ]
-      deps += [
-        "//base/test:test_support",
-        "//device/fido",
-      ]
-    }
     deps += [
-      ":passkey_model",
-      ":signal_api_utils",
-      ":test_support",
-      "//components/sync/protocol",
-      "//crypto",
-      "//testing/gmock",
-      "//testing/gtest",
+      "//base/test:test_support",
+      "//device/fido",
     ]
-    if (use_blink) {
-      deps += [
-        ":browser",
-        "//url",
-      ]
-    }
+  }
+  deps += [
+    ":passkey_model",
+    ":signal_api_utils",
+    ":test_support",
+    "//components/sync/protocol",
+    "//crypto",
+    "//testing/gmock",
+    "//testing/gtest",
+  ]
+  if (use_blink) {
+    deps += [
+      ":browser",
+      "//url",
+    ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -202,15 +198,13 @@ static_library("test_support") {
       "//testing/gmock",
     ]
   }
-  if (!is_android) {
-    sources += [
-      "test_passkey_model.cc",
-      "test_passkey_model.h",
-    ]
-    deps += [
-      ":passkey_model",
-      "//base",
-      "//components/sync",
-    ]
-  }
+  sources += [
+    "test_passkey_model.cc",
+    "test_passkey_model.h",
+  ]
+  deps += [
+    ":passkey_model",
+    "//base",
+    "//components/sync",
+  ]
 }

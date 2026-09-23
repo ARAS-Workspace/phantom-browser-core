@@ -115,9 +115,7 @@ group("gn_all") {
       deps += [ "//third_party/abseil-cpp:absl_tests" ]
     }
 
-    if (!is_android) {
-      deps += [ "//crypto:crypto_unittests" ]
-    }
+    deps += [ "//crypto:crypto_unittests" ]
 
     if (!is_ios && !is_android) {
       deps += [
@@ -148,10 +146,8 @@ group("gn_all") {
       deps += [ "//chrome/enterprise_companion" ]
     }
 
-    if (!is_ios) {
-      deps += [ "//chrome/test:unit_tests" ]
-      deps += [ "//ui/accessibility:accessibility_unittests" ]
-    }
+    deps += [ "//chrome/test:unit_tests" ]
+    deps += [ "//ui/accessibility:accessibility_unittests" ]
 
     if (use_blink) {
       deps += [
@@ -193,35 +189,21 @@ group("gn_all") {
       }
     }
 
-    if (!is_ios) {
-      deps += [
-        ":chromedriver_group",
-        "//components:components_browsertests",
-        "//ipc:ipc_tests",
-        "//net:net_perftests",
-        "//ui/events:events_unittests",
-        "//url/ipc:url_ipc_unittests",
-      ]
-    }
+    deps += [
+      ":chromedriver_group",
+      "//components:components_browsertests",
+      "//ipc:ipc_tests",
+      "//net:net_perftests",
+      "//ui/events:events_unittests",
+      "//url/ipc:url_ipc_unittests",
+    ]
 
     if (!is_ios && !is_android) {
       deps += [ "//components/viz/demo:viz_demo" ]
     }
 
-    if (!is_ios) {
-      deps +=
-          [ "//third_party/catapult/telemetry:bitmaptools($host_toolchain)" ]
-      if (!is_android) {
-        deps += [ "//chrome/test:telemetry_perf_unittests" ]
-      } else {
-        import("//tools/perf/chrome_telemetry_build/android_browser_types.gni")
-        foreach(_target_suffix, telemetry_android_browser_target_suffixes) {
-          deps += [ "//chrome/test:telemetry_perf_unittests${_target_suffix}" ]
-        }
-      }
-    } else {
-      deps += [ "//third_party/crashpad/crashpad:crashpad_tests" ]
-    }
+    deps += [ "//third_party/catapult/telemetry:bitmaptools($host_toolchain)" ]
+    deps += [ "//chrome/test:telemetry_perf_unittests" ]
 
     deps += root_extra_deps
 
@@ -374,15 +356,13 @@ group("gn_all") {
         "//ui/compositor:compositor_unittests",
       ]
 
-      if (!is_ios) {
-        deps += [
-          "//base:build_utf8_validator_tables",
-          "//base:check_example",
-          "//components:components_perftests",
-          "//ipc:ipc_perftests",
-          "//net:dump_cache",
-        ]
-      }
+      deps += [
+        "//base:build_utf8_validator_tables",
+        "//base:check_example",
+        "//components:components_perftests",
+        "//ipc:ipc_perftests",
+        "//net:dump_cache",
+      ]
 
       if (!is_android && !is_ios) {
         deps += [
@@ -480,9 +460,7 @@ group("gn_all") {
         "//third_party/crashpad/crashpad:crashpad_tests",
         "//third_party/crashpad/crashpad/tools:crashpad_database_util",
       ]
-      if (!is_android) {
-        deps += [ "//third_party/crashpad/crashpad/handler:crashpad_handler" ]
-      }
+      deps += [ "//third_party/crashpad/crashpad/handler:crashpad_handler" ]
     }
 
     if (enable_message_center) {
@@ -544,9 +522,7 @@ group("gn_all") {
       ]
 
       if (target_cpu == "x86" || target_cpu == "x64") {
-        if (!is_android) {
-          deps += [ "//chrome/test:load_library_perf_tests" ]
-        }
+        deps += [ "//chrome/test:load_library_perf_tests" ]
         deps += [ "//third_party/libjpeg_turbo:simd_asm" ]
       }
       if (is_linux && current_toolchain == host_toolchain) {
@@ -576,17 +552,7 @@ group("gn_all") {
         "//chrome/browser/vr:vr_common_perftests",
         "//chrome/browser/vr:vr_common_unittests",
       ]
-      if (!is_android) {
-        deps += [ "//tools/perf/contrib/vr_benchmarks:vr_perf_tests" ]
-      } else {
-        deps += [ "//chrome/browser/android/vr:vr_android_unittests" ]
-        import("//tools/perf/chrome_telemetry_build/android_browser_types.gni")
-        foreach(_target_suffix, telemetry_android_browser_target_suffixes) {
-          deps += [
-            "//tools/perf/contrib/vr_benchmarks:vr_perf_tests${_target_suffix}",
-          ]
-        }
-      }
+      deps += [ "//tools/perf/contrib/vr_benchmarks:vr_perf_tests" ]
     }
 
     if (use_atk) {
@@ -672,14 +638,12 @@ if (use_blink && !is_cronet_build) {
   group("chromedriver_group") {
     testonly = true
 
-    if (!is_ios) {
-      deps = [
-        "//chrome/test/chromedriver:chromedriver_server",
-        "//chrome/test/chromedriver:chromedriver_unittests",
-        "//chrome/test/chromedriver:copy_license",
-        "//chrome/test/chromedriver:generate_chromedriver_notices",
-      ]
-    }
+    deps = [
+      "//chrome/test/chromedriver:chromedriver_server",
+      "//chrome/test/chromedriver:chromedriver_unittests",
+      "//chrome/test/chromedriver:copy_license",
+      "//chrome/test/chromedriver:generate_chromedriver_notices",
+    ]
   }
 
   copy("layout_test_data_mojo_bindings") {
@@ -741,9 +705,7 @@ group("chromium_builder_perf") {
 
     data_deps += [ "//chrome/test:performance_browser_tests" ]
 
-    if (!is_win) {
-      data_deps += [ "//third_party/breakpad:minidump_stackwalk($host_system_allocator_toolchain)" ]
-    }
+    data_deps += [ "//third_party/breakpad:minidump_stackwalk($host_system_allocator_toolchain)" ]
   }
 
   if (is_linux) {
@@ -769,9 +731,7 @@ if (!is_ios && !is_android && !is_cronet_build) {
       "//v8:d8",
     ]
     data_deps += [ "//chrome" ]
-    if (!is_win) {
-      data_deps += [ "//skia:filter_fuzz_stub" ]
-    }
+    data_deps += [ "//skia:filter_fuzz_stub" ]
     data_deps += [ "//v8:v8_shell($v8_snapshot_toolchain)" ]
     if (enable_pdf) {
       data_deps += [ "//third_party/pdfium/testing:pdfium_test" ]

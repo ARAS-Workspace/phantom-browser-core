@@ -95,26 +95,22 @@ generate_grd("build_grdp") {
     "icon_visibility_off_old.svg",
   ]
 
-  if (!is_ios) {
-    # TODO(crbug.com/527601593): Revert back to (!is_ios && (!is_android ||
-    # is_desktop_android)) if we disable composebox on mobile Android phones.
-    input_files += [
-      "business.svg",
-      "chevron_down.svg",
-      "colorize.svg",
-      "colorize_old.svg",
-      "dark/chevron_down.svg",
-      "icon_bookmark.svg",
-      "icon_bookmark_old.svg",
-      "icon_clock.svg",
-      "icon_clock_old.svg",
-      "icon_history.svg",
-      "icon_history_old.svg",
-      "icon_journeys.svg",
-      "icon_journeys_old.svg",
-      "promotion_policy_banner_close.svg",
-    ]
-  }
+  input_files += [
+    "business.svg",
+    "chevron_down.svg",
+    "colorize.svg",
+    "colorize_old.svg",
+    "dark/chevron_down.svg",
+    "icon_bookmark.svg",
+    "icon_bookmark_old.svg",
+    "icon_clock.svg",
+    "icon_clock_old.svg",
+    "icon_history.svg",
+    "icon_history_old.svg",
+    "icon_journeys.svg",
+    "icon_journeys_old.svg",
+    "promotion_policy_banner_close.svg",
+  ]
 
   resource_path_prefix = "images"
 }

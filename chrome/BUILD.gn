@@ -1421,20 +1421,18 @@ group("extra_resources") {
   ]
 }
 
-if (!is_android) {
-  chrome_paks("packed_resources") {
-    if (is_mac) {
-      output_dir = "$root_gen_dir/repack"
-      copy_data_to_bundle = true
-    } else {
-      output_dir = root_out_dir
-      mark_as_data = true
-    }
+chrome_paks("packed_resources") {
+  if (is_mac) {
+    output_dir = "$root_gen_dir/repack"
+    copy_data_to_bundle = true
+  } else {
+    output_dir = root_out_dir
+    mark_as_data = true
+  }
 
-    if (enable_resource_allowlist_generation) {
-      repack_allowlist = _chrome_resource_allowlist
-      deps = [ ":resource_allowlist" ]
-    }
+  if (enable_resource_allowlist_generation) {
+    repack_allowlist = _chrome_resource_allowlist
+    deps = [ ":resource_allowlist" ]
   }
 }
 

@@ -72,23 +72,21 @@ source_set("unit_tests") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "site_engagement_helper_browsertest.cc" ]
-    deps = [
-      "//base",
-      "//chrome/browser",
-      "//chrome/browser/ui",
-      "//chrome/test:test_support_ui",
-      "//components/site_engagement/content",
-      "//components/webapps/common",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//net:test_support",
-      "//testing/gtest",
-      "//url",
-    ]
-  }
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [ "site_engagement_helper_browsertest.cc" ]
+  deps = [
+    "//base",
+    "//chrome/browser",
+    "//chrome/browser/ui",
+    "//chrome/test:test_support_ui",
+    "//components/site_engagement/content",
+    "//components/webapps/common",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//net:test_support",
+    "//testing/gtest",
+    "//url",
+  ]
 }

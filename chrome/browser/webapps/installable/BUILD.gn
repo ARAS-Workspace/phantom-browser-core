@@ -42,41 +42,37 @@ source_set("browser_tests") {
     "//third_party/blink/public/common",
   ]
 
-  if (!is_android) {
-    deps += [
-      "//chrome/app:command_ids",
-      "//chrome/browser/banners:test_support",
-      "//chrome/browser/ui",
-      "//chrome/browser/user_education",
-      "//chrome/browser/web_applications",
-      "//chrome/browser/web_applications:web_applications_test_support",
-      "//chrome/common",
-      "//chrome/test:test_support_ui",
-      "//components/segmentation_platform/public",
-      "//components/segmentation_platform/public:test_support",
-      "//components/ukm:test_support",
-      "//components/user_education/common",
-      "//components/webapps/browser:test_support",
-      "//content/public/browser",
-      "//services/metrics/public/cpp:ukm_builders",
-      "//ui/gfx",
-      "//ui/views:test_support",
-      "//url",
-    ]
-  }
+  deps += [
+    "//chrome/app:command_ids",
+    "//chrome/browser/banners:test_support",
+    "//chrome/browser/ui",
+    "//chrome/browser/user_education",
+    "//chrome/browser/web_applications",
+    "//chrome/browser/web_applications:web_applications_test_support",
+    "//chrome/common",
+    "//chrome/test:test_support_ui",
+    "//components/segmentation_platform/public",
+    "//components/segmentation_platform/public:test_support",
+    "//components/ukm:test_support",
+    "//components/user_education/common",
+    "//components/webapps/browser:test_support",
+    "//content/public/browser",
+    "//services/metrics/public/cpp:ukm_builders",
+    "//ui/gfx",
+    "//ui/views:test_support",
+    "//url",
+  ]
 }
 
-if (!is_android) {
-  source_set("unit_tests") {
-    testonly = true
+source_set("unit_tests") {
+  testonly = true
 
-    deps = [
-      ":impl",
-      ":installable",
-      "//chrome/browser/web_applications:web_app_test",
-      "//chrome/browser/web_applications:web_applications_test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-    ]
-  }
+  deps = [
+    ":impl",
+    ":installable",
+    "//chrome/browser/web_applications:web_app_test",
+    "//chrome/browser/web_applications:web_applications_test_support",
+    "//testing/gmock",
+    "//testing/gtest",
+  ]
 }

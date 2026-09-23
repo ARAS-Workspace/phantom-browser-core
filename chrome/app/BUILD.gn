@@ -131,9 +131,7 @@ static_library("test_support") {
     deps += [ ":chrome_crash_reporter_client" ]
   }
 
-  if (!is_android) {
-    deps += [ "//chrome/browser:chrome_process_singleton" ]
-  }
+  deps += [ "//chrome/browser:chrome_process_singleton" ]
 
   if (use_ozone) {
     deps += [ "//ui/ozone" ]

@@ -9,13 +9,11 @@ source_set("file_system_access") {
   public = []
   public_deps = []
 
-  if (!is_android) {
-    public += [ "file_system_access_scroll_panel.h" ]
-    public_deps += [
-      "//base",
-      "//ui/views",
-    ]
-  }
+  public += [ "file_system_access_scroll_panel.h" ]
+  public_deps += [
+    "//base",
+    "//ui/views",
+  ]
 
   if (toolkit_views) {
     public += [
@@ -36,16 +34,14 @@ source_set("impl") {
   sources = []
   deps = [ ":file_system_access" ]
 
-  if (!is_android) {
-    sources += [ "file_system_access_scroll_panel.cc" ]
-    deps += [
-      "//chrome/browser/ui/color:color_headers",
-      "//chrome/browser/ui/file_system_access",
-      "//components/vector_icons",
-      "//content/public/browser",
-      "//ui/base:features",
-    ]
-  }
+  sources += [ "file_system_access_scroll_panel.cc" ]
+  deps += [
+    "//chrome/browser/ui/color:color_headers",
+    "//chrome/browser/ui/file_system_access",
+    "//components/vector_icons",
+    "//content/public/browser",
+    "//ui/base:features",
+  ]
 
   if (toolkit_views) {
     sources += [
@@ -71,60 +67,58 @@ source_set("impl") {
   }
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources =
-        [ "file_system_access_restore_permission_bubble_view_browsertest.cc" ]
-    deps = [
-      ":file_system_access",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:browser_actions",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/tabs",
-      "//chrome/browser/ui/views/frame:contents_container_outline",
-      "//chrome/test:test_support_ui",
-      "//content/test:test_support",
-      "//net:test_support",
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources =
+      [ "file_system_access_restore_permission_bubble_view_browsertest.cc" ]
+  deps = [
+    ":file_system_access",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:browser_actions",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/tabs",
+    "//chrome/browser/ui/views/frame:contents_container_outline",
+    "//chrome/test:test_support_ui",
+    "//content/test:test_support",
+    "//net:test_support",
+  ]
+
+  if (toolkit_views) {
+    sources += [
+      "file_system_access_browsertest.cc",
+      "file_system_access_usage_bubble_view_browsertest.cc",
     ]
-
-    if (toolkit_views) {
-      sources += [
-        "file_system_access_browsertest.cc",
-        "file_system_access_usage_bubble_view_browsertest.cc",
-      ]
-      deps += [
-        "//chrome/browser/safe_browsing",
-        "//chrome/browser/ui/test:dialog",
-        "//chrome/browser/ui/views:file_system_access_test_support",
-      ]
-    }
-
-    if (safe_browsing_mode != 0) {
-      deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
-    }
-  }
-
-  source_set("interactive_ui_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "file_system_access_usage_bubble_interactive_uitest.cc" ]
-    deps = [
-      ":file_system_access",
-      "//chrome/browser/file_system_access",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/actions:actions_headers",
-      "//chrome/browser/ui/page_action:icon_type",
+    deps += [
+      "//chrome/browser/safe_browsing",
       "//chrome/browser/ui/test:dialog",
-      "//chrome/test:test_support_ui",
-      "//content/test:test_support",
-      "//ui/views:test_support",
+      "//chrome/browser/ui/views:file_system_access_test_support",
     ]
   }
+
+  if (safe_browsing_mode != 0) {
+    deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
+  }
+}
+
+source_set("interactive_ui_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [ "file_system_access_usage_bubble_interactive_uitest.cc" ]
+  deps = [
+    ":file_system_access",
+    "//chrome/browser/file_system_access",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/actions:actions_headers",
+    "//chrome/browser/ui/page_action:icon_type",
+    "//chrome/browser/ui/test:dialog",
+    "//chrome/test:test_support_ui",
+    "//content/test:test_support",
+    "//ui/views:test_support",
+  ]
 }

@@ -80,9 +80,7 @@ source_set("unit_tests") {
   ]
 
   sources = [ "common/background_tracing_state_manager_unittest.cc" ]
-  if (!is_ios) {
-    sources += [ "common/background_tracing_utils_unittest.cc" ]
-  }
+  sources += [ "common/background_tracing_utils_unittest.cc" ]
 
   data_deps = [
     "//third_party/perfetto/protos/perfetto/config/chrome:scenario_descriptor",
@@ -98,16 +96,14 @@ source_set("unit_tests") {
     "//sql:test_support",
   ]
 
-  if (!is_ios) {
-    deps += [
-      ":background_tracing_utils",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//services/tracing:lib",
-      "//services/tracing:test_utils",
-      "//services/tracing/public/cpp/background_tracing",
-    ]
-  }
+  deps += [
+    ":background_tracing_utils",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//services/tracing:lib",
+    "//services/tracing:test_utils",
+    "//services/tracing/public/cpp/background_tracing",
+  ]
 }
 
 test("tracing_perftests") {

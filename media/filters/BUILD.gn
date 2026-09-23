@@ -328,14 +328,10 @@ source_set("unit_tests") {
       "//third_party/opus",
     ]
 
-    # Even if FFmpeg is enabled on Android we don't want these.
-    # TODO(watk): Refactor tests that could be made to run on Android.
-    if (!is_android) {
-      sources += [
-        "audio_video_metadata_extractor_unittest.cc",
-        "media_file_checker_unittest.cc",
-      ]
-    }
+    sources += [
+      "audio_video_metadata_extractor_unittest.cc",
+      "media_file_checker_unittest.cc",
+    ]
 
     if (enable_ffmpeg_video_decoders && proprietary_codecs) {
       sources += [ "ffmpeg_video_decoder_unittest.cc" ]

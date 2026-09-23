@@ -11,11 +11,9 @@ source_set("eye_dropper") {
   deps = []
   public_deps = []
 
-  if (!is_android) {
-    public += [ "eye_dropper.h" ]
-    sources += [ "eye_dropper.cc" ]
-    deps += [ "//content/public/browser" ]
-  }
+  public += [ "eye_dropper.h" ]
+  sources += [ "eye_dropper.cc" ]
+  deps += [ "//content/public/browser" ]
 
   if (is_mac) {
     public += [ "eye_dropper_view_mac.h" ]
@@ -52,67 +50,63 @@ source_set("eye_dropper") {
   }
 }
 
-if (!is_android) {
-  source_set("interactive_ui_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = []
-    deps = []
+source_set("interactive_ui_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = []
+  deps = []
 
-    if (use_aura) {
-      sources += [ "eye_dropper_view_aura_interactive_uitest.cc" ]
-      deps = [
-        ":eye_dropper",
-        "//chrome/browser/ui",
-        "//chrome/test:test_support_ui",
-        "//components/eye_dropper",
-        "//content/public/browser",
-        "//content/test:test_support",
-      ]
-    }
+  if (use_aura) {
+    sources += [ "eye_dropper_view_aura_interactive_uitest.cc" ]
+    deps = [
+      ":eye_dropper",
+      "//chrome/browser/ui",
+      "//chrome/test:test_support_ui",
+      "//components/eye_dropper",
+      "//content/public/browser",
+      "//content/test:test_support",
+    ]
   }
 }
 
-if (!is_android) {
-  source_set("unit_tests") {
-    testonly = true
-    sources = []
-    deps = []
+source_set("unit_tests") {
+  testonly = true
+  sources = []
+  deps = []
 
-    if (use_aura && use_dbus && is_linux) {
-      sources += [ "eye_dropper_portal_unittest.cc" ]
-      deps += [
-        ":eye_dropper",
-        "//base",
-        "//base/test:test_support",
-        "//chrome/test:test_support",
-        "//components/dbus",
-        "//content/public/browser",
-        "//content/test:test_support",
-        "//dbus:test_support",
-        "//skia",
-        "//testing/gmock",
-        "//testing/gtest",
-      ]
-    }
-  }
-
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "eye_dropper_browsertest.cc" ]
-    deps = [
+  if (use_aura && use_dbus && is_linux) {
+    sources += [ "eye_dropper_portal_unittest.cc" ]
+    deps += [
       ":eye_dropper",
       "//base",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/test:dialog",
-      "//chrome/test:test_support_ui",
+      "//base/test:test_support",
+      "//chrome/test:test_support",
+      "//components/dbus",
       "//content/public/browser",
-      "//content/public/common",
       "//content/test:test_support",
+      "//dbus:test_support",
+      "//skia",
+      "//testing/gmock",
+      "//testing/gtest",
     ]
-    if (use_aura) {
-      deps += [ "//components/eye_dropper" ]
-    }
+  }
+}
+
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [ "eye_dropper_browsertest.cc" ]
+  deps = [
+    ":eye_dropper",
+    "//base",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/test:dialog",
+    "//chrome/test:test_support_ui",
+    "//content/public/browser",
+    "//content/public/common",
+    "//content/test:test_support",
+  ]
+  if (use_aura) {
+    deps += [ "//components/eye_dropper" ]
   }
 }

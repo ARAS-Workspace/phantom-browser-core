@@ -14,29 +14,27 @@ source_set("upgrade_detector") {
   sources = [ "upgrade_observer.h" ]
   public_deps = []
 
-  if (!is_android) {
-    sources += [
-      "build_state.h",
-      "upgrade_detector.h",
-      "version_history_client.h",
-    ]
-    public_deps = [
-      "//base",
-      "//components/prefs",
-      "//url",
-    ]
+  sources += [
+    "build_state.h",
+    "upgrade_detector.h",
+    "version_history_client.h",
+  ]
+  public_deps = [
+    "//base",
+    "//components/prefs",
+    "//url",
+  ]
 
-    sources += [
-      "get_installed_version.h",
-      "installed_version_monitor.h",
-      "installed_version_poller.h",
-      "upgrade_detector_impl.h",
-    ]
-    public_deps += [
-      ":build_state_observer",
-      "//components/variations/service",
-    ]
-  }
+  sources += [
+    "get_installed_version.h",
+    "installed_version_monitor.h",
+    "installed_version_poller.h",
+    "upgrade_detector_impl.h",
+  ]
+  public_deps += [
+    ":build_state_observer",
+    "//components/variations/service",
+  ]
 
   if (is_mac) {
     sources += [ "directory_monitor.h" ]
@@ -54,43 +52,41 @@ source_set("impl") {
     "//chrome/browser/ui:browser_otr_state",
   ]
 
-  if (!is_android) {
-    sources += [
-      "build_state.cc",
-      "upgrade_detector.cc",
-      "version_history_client.cc",
-    ]
-    deps += [
-      ":build_state_observer",
-      ":upgrade_detector",
-      "//base",
-      "//base/version_info",
-      "//chrome/browser:browser_process",
-      "//chrome/browser/lifetime",
-      "//chrome/browser/ui",
-      "//chrome/common:channel_info",
-      "//chrome/common:constants",
-      "//chrome/common:non_code_constants",
-      "//components/network_time",
-      "//components/prefs",
-      "//components/version_info",
-      "//net",
-      "//services/network/public/cpp",
-      "//ui/base/idle",
-    ]
-    sources += [
-      "get_installed_version.cc",
-      "installed_version_poller.cc",
-      "upgrade_detector_impl.cc",
-    ]
-    deps += [
-      "//base:build_time",
-      "//chrome/browser:buildflags",
-      "//chrome/browser/google",
-      "//chrome/browser/obsolete_system",
-      "//content/public/browser",
-    ]
-  }
+  sources += [
+    "build_state.cc",
+    "upgrade_detector.cc",
+    "version_history_client.cc",
+  ]
+  deps += [
+    ":build_state_observer",
+    ":upgrade_detector",
+    "//base",
+    "//base/version_info",
+    "//chrome/browser:browser_process",
+    "//chrome/browser/lifetime",
+    "//chrome/browser/ui",
+    "//chrome/common:channel_info",
+    "//chrome/common:constants",
+    "//chrome/common:non_code_constants",
+    "//components/network_time",
+    "//components/prefs",
+    "//components/version_info",
+    "//net",
+    "//services/network/public/cpp",
+    "//ui/base/idle",
+  ]
+  sources += [
+    "get_installed_version.cc",
+    "installed_version_poller.cc",
+    "upgrade_detector_impl.cc",
+  ]
+  deps += [
+    "//base:build_time",
+    "//chrome/browser:buildflags",
+    "//chrome/browser/google",
+    "//chrome/browser/obsolete_system",
+    "//content/public/browser",
+  ]
 
   if (is_mac) {
     sources += [
@@ -119,18 +115,16 @@ source_set("unit_tests") {
     "//services/network:test_support",
   ]
 
-  if (!is_android) {
-    sources += [
-      "build_state_unittest.cc",
-      "mock_build_state_observer.cc",
-      "mock_build_state_observer.h",
-      "upgrade_detector_unittest.cc",
-      "version_history_client_unittest.cc",
-    ]
+  sources += [
+    "build_state_unittest.cc",
+    "mock_build_state_observer.cc",
+    "mock_build_state_observer.h",
+    "upgrade_detector_unittest.cc",
+    "version_history_client_unittest.cc",
+  ]
 
-    public_deps = [ ":build_state_observer" ]
-    deps += [ "//components/prefs" ]
-  }
+  public_deps = [ ":build_state_observer" ]
+  deps += [ "//components/prefs" ]
 
   if (is_mac) {
     sources += [ "directory_monitor_unittest.cc" ]
@@ -145,18 +139,16 @@ source_set("unit_tests") {
     deps += [ "//base:base_static" ]
   }
 
-  if (!is_android) {
-    sources += [
-      "installed_version_poller_unittest.cc",
-      "upgrade_detector_impl_unittest.cc",
-    ]
+  sources += [
+    "installed_version_poller_unittest.cc",
+    "upgrade_detector_impl_unittest.cc",
+  ]
 
-    deps += [
-      "//base:i18n",
-      "//chrome/browser/google",
-      "//components/enterprise:test_support",
-      "//components/network_time",
-      "//content/test:test_support",
-    ]
-  }
+  deps += [
+    "//base:i18n",
+    "//chrome/browser/google",
+    "//components/enterprise:test_support",
+    "//components/network_time",
+    "//content/test:test_support",
+  ]
 }

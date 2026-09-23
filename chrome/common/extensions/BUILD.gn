@@ -179,14 +179,12 @@ source_set("unit_tests") {
     "sync_type_unittest.cc",
   ]
 
-  if (!is_android) {
-    sources += [
-      "api/extension_action/browser_action_manifest_unittest.cc",
+  sources += [
+    "api/extension_action/browser_action_manifest_unittest.cc",
 
-      # Side panel is not yet supported on desktop Android.
-      "manifest_tests/extension_manifests_side_panel_unittest.cc",
-    ]
-  }
+    # Side panel is not yet supported on desktop Android.
+    "manifest_tests/extension_manifests_side_panel_unittest.cc",
+  ]
 
   if (enable_platform_apps) {
     sources += [

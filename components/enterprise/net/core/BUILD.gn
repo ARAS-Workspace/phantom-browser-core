@@ -86,9 +86,7 @@ source_set("unit_tests") {
       "//testing/gmock",
       "//testing/gtest",
     ]
-    if (!is_ios) {
-      deps += [ "//content/test:test_support" ]
-    }
+    deps += [ "//content/test:test_support" ]
   }
 }
 

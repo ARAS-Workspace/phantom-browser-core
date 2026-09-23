@@ -69,9 +69,7 @@ source_set("browser_tests") {
 
   sources = []
 
-  if (!is_android) {
-    sources += [ "desktop_tab_model_url_visit_data_fetcher_browsertest.cc" ]
-  }
+  sources += [ "desktop_tab_model_url_visit_data_fetcher_browsertest.cc" ]
 
   deps = [
     ":visited_url_ranking",

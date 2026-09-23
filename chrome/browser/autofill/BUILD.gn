@@ -154,9 +154,7 @@ static_library("test_support") {
     "//components/autofill/core/browser",
   ]
 
-  if (!is_android) {
-    deps += [ "//components/autofill/core/browser:test_support" ]
-  }
+  deps += [ "//components/autofill/core/browser:test_support" ]
 }
 
 source_set("browser_tests") {
@@ -168,19 +166,17 @@ source_set("browser_tests") {
   ]
 
   # TODO(crbug.com/449649023) Migrate these tests to PlatformBrowserTests.
-  if (!is_android) {
-    sources += [
-      "autocomplete_browsertest.cc",
-      "autofill_across_iframes_browsertest.cc",
-      "autofill_annotations_provider_browsertest.cc",
-      "autofill_browsertest.cc",
-      "autofill_metrics_browsertest.cc",
-      "autofill_server_browsertest.cc",
-      "email_verification_browsertest.cc",
-      "form_structure_browsertest.cc",
-      "omnibox_autofill_delegate_browsertest.cc",
-    ]
-  }
+  sources += [
+    "autocomplete_browsertest.cc",
+    "autofill_across_iframes_browsertest.cc",
+    "autofill_annotations_provider_browsertest.cc",
+    "autofill_browsertest.cc",
+    "autofill_metrics_browsertest.cc",
+    "autofill_server_browsertest.cc",
+    "email_verification_browsertest.cc",
+    "form_structure_browsertest.cc",
+    "omnibox_autofill_delegate_browsertest.cc",
+  ]
 
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
@@ -205,112 +201,108 @@ source_set("browser_tests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (!is_android) {
-  source_set("test_support_ui") {
-    testonly = true
+source_set("test_support_ui") {
+  testonly = true
 
-    sources = [
-      "autofill_flow_test_util.cc",
-      "autofill_flow_test_util.h",
-      "autofill_uitest.cc",
-      "autofill_uitest.h",
-      "captured_sites_test_utils.cc",
-      "captured_sites_test_utils.h",
-    ]
+  sources = [
+    "autofill_flow_test_util.cc",
+    "autofill_flow_test_util.h",
+    "autofill_uitest.cc",
+    "autofill_uitest.h",
+    "captured_sites_test_utils.cc",
+    "captured_sites_test_utils.h",
+  ]
 
-    deps = [
-      "//chrome/browser/autofill",
-      "//chrome/browser/ui/autofill",
-      "//chrome/browser/ui/autofill:test_support",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/javascript_dialogs",
-    ]
+  deps = [
+    "//chrome/browser/autofill",
+    "//chrome/browser/ui/autofill",
+    "//chrome/browser/ui/autofill:test_support",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/javascript_dialogs",
+  ]
 
-    # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-    # enable the diagnostic by removing this line.
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-  }
-
-  source_set("interactive_ui_tests") {
-    testonly = true
-
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [
-      "at_memory_interactive_uitest.cc",
-      "autofill_interactive_uitest.cc",
-    ]
-
-    deps = [
-      ":autofill",
-      ":test_support",
-      ":test_support_ui",
-      "//base",
-      "//base/test:test_support",
-      "//build:chromeos_buildflags",
-      "//chrome/browser",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/profiles:profile_io_data",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/autofill",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/common:chrome_features",
-      "//chrome/common:non_code_constants",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/autofill/content/browser",
-      "//components/autofill/content/browser:test_support",
-      "//components/autofill/core/browser",
-      "//components/autofill/core/browser:test_support",
-      "//components/autofill/core/common",
-      "//components/autofill/core/common:features",
-      "//components/metrics:content",
-      "//components/network_session_configurator/common",
-      "//content/public/browser",
-      "//content/public/common",
-      "//content/test:test_support",
-      "//net",
-      "//net:test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//third_party/abseil-cpp:absl",
-      "//third_party/blink/public/common:headers",
-      "//ui/events:dom_keycode_converter",
-      "//ui/events:events_base",
-    ]
-
-    if (use_aura) {
-      deps += [ "//chrome/browser/ui/aura/accessibility" ]
-    }
-
-    # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
-    # enable the diagnostic by removing this line.
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-  }
+  # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
+  # enable the diagnostic by removing this line.
+  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (!is_android) {
-  source_set("captured_sites_interactive_tests") {
-    testonly = true
+source_set("interactive_ui_tests") {
+  testonly = true
 
-    sources = [
-      "autofill_captured_sites_interactive_uitest.cc",
-      "captured_sites_test_utils_browsertest.cc",
-    ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [
+    "at_memory_interactive_uitest.cc",
+    "autofill_interactive_uitest.cc",
+  ]
 
-    deps = [
-      ":test_support",
-      "//chrome/browser/autofill:test_support_ui",
-      "//chrome/browser/ui/autofill",
-      "//chrome/browser/ui/autofill:test_support",
-      "//chrome/test:test_support",
-      "//components/autofill/core/common:autofill_regex",
-    ]
+  deps = [
+    ":autofill",
+    ":test_support",
+    ":test_support_ui",
+    "//base",
+    "//base/test:test_support",
+    "//build:chromeos_buildflags",
+    "//chrome/browser",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/profiles:profile_io_data",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/autofill",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/common:chrome_features",
+    "//chrome/common:non_code_constants",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/autofill/content/browser",
+    "//components/autofill/content/browser:test_support",
+    "//components/autofill/core/browser",
+    "//components/autofill/core/browser:test_support",
+    "//components/autofill/core/common",
+    "//components/autofill/core/common:features",
+    "//components/metrics:content",
+    "//components/network_session_configurator/common",
+    "//content/public/browser",
+    "//content/public/common",
+    "//content/test:test_support",
+    "//net",
+    "//net:test_support",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//third_party/abseil-cpp:absl",
+    "//third_party/blink/public/common:headers",
+    "//ui/events:dom_keycode_converter",
+    "//ui/events:events_base",
+  ]
+
+  if (use_aura) {
+    deps += [ "//chrome/browser/ui/aura/accessibility" ]
   }
+
+  # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
+  # enable the diagnostic by removing this line.
+  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+}
+
+source_set("captured_sites_interactive_tests") {
+  testonly = true
+
+  sources = [
+    "autofill_captured_sites_interactive_uitest.cc",
+    "captured_sites_test_utils_browsertest.cc",
+  ]
+
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  deps = [
+    ":test_support",
+    "//chrome/browser/autofill:test_support_ui",
+    "//chrome/browser/ui/autofill",
+    "//chrome/browser/ui/autofill:test_support",
+    "//chrome/test:test_support",
+    "//components/autofill/core/common:autofill_regex",
+  ]
 }
 
 source_set("unit_tests") {
@@ -338,38 +330,34 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_android) {
-    sources += [
-      "autofill_ai_personal_context_access_manager_factory_unittest.cc",
-      "entity_suppression_manager_factory_unittest.cc",
-      "generated_find_and_fill_with_gemini_pref_unittest.cc",
-      "ui/autofill_image_fetcher_impl_unittest.cc",
-    ]
-    deps += [
-      ":generated_find_and_fill_with_gemini_pref",
-      "//chrome/browser/personal_context",
-      "//components/autofill/core/browser",
-      "//components/autofill/core/common",
-      "//components/personal_context/core",
-      "//ui/base",
-      "//ui/gfx:test_support",
-    ]
-  }
+  sources += [
+    "autofill_ai_personal_context_access_manager_factory_unittest.cc",
+    "entity_suppression_manager_factory_unittest.cc",
+    "generated_find_and_fill_with_gemini_pref_unittest.cc",
+    "ui/autofill_image_fetcher_impl_unittest.cc",
+  ]
+  deps += [
+    ":generated_find_and_fill_with_gemini_pref",
+    "//chrome/browser/personal_context",
+    "//components/autofill/core/browser",
+    "//components/autofill/core/common",
+    "//components/personal_context/core",
+    "//ui/base",
+    "//ui/gfx:test_support",
+  ]
 }
 
-if (!is_android) {
-  source_set("generated_find_and_fill_with_gemini_pref") {
-    sources = [
-      "generated_find_and_fill_with_gemini_pref.cc",
-      "generated_find_and_fill_with_gemini_pref.h",
-    ]
-    deps = [
-      "//base",
-      "//chrome/browser/profiles:profile",
-      "//chrome/common/extensions/api",
-      "//components/optimization_guide/core",
-      "//components/personal_context/core",
-      "//components/prefs",
-    ]
-  }
+source_set("generated_find_and_fill_with_gemini_pref") {
+  sources = [
+    "generated_find_and_fill_with_gemini_pref.cc",
+    "generated_find_and_fill_with_gemini_pref.h",
+  ]
+  deps = [
+    "//base",
+    "//chrome/browser/profiles:profile",
+    "//chrome/common/extensions/api",
+    "//components/optimization_guide/core",
+    "//components/personal_context/core",
+    "//components/prefs",
+  ]
 }

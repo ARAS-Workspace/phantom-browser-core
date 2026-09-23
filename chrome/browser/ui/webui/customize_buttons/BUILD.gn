@@ -27,9 +27,7 @@ source_set("customize_buttons") {
     "//chrome/browser/ui/webui/side_panel/customize_chrome",
     "//chrome/common",
   ]
-  if (!is_android) {
-    public_deps += [ "//chrome/browser/ui/views/side_panel" ]
-  }
+  public_deps += [ "//chrome/browser/ui/views/side_panel" ]
 }
 
 source_set("impl") {

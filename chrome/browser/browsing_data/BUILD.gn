@@ -176,16 +176,14 @@ source_set("impl") {
   if (enable_webui_ntp) {
     deps += [ "//chrome/browser/new_tab_page" ]
   }
-  if (!is_android) {
-    deps += [
-      "//chrome/browser/profiles/keep_alive",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/web_applications",
-      "//chrome/browser/web_applications/isolated_web_apps",
-      "//components/keep_alive_registry",
-    ]
-  }
+  deps += [
+    "//chrome/browser/profiles/keep_alive",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/web_applications",
+    "//chrome/browser/web_applications/isolated_web_apps",
+    "//components/keep_alive_registry",
+  ]
 
   if (enable_extensions_core) {
     deps += [
@@ -195,12 +193,10 @@ source_set("impl") {
     ]
   }
 
-  if (!is_android) {
-    deps += [
-      "//chrome/browser/performance_manager/public/user_tuning",
-      "//chrome/browser/user_education",
-    ]
-  }
+  deps += [
+    "//chrome/browser/performance_manager/public/user_tuning",
+    "//chrome/browser/user_education",
+  ]
 }
 
 source_set("unit_tests") {
@@ -293,14 +289,12 @@ source_set("unit_tests") {
     deps += [ "//chrome/browser/custom_handlers" ]
   }
 
-  if (!is_android) {
-    sources += [ "chrome_browsing_data_lifetime_manager_unittest.cc" ]
-    deps += [
-      "//chrome/browser/performance_manager/public/user_tuning",
-      "//chrome/browser/user_education",
-      "//chrome/browser/web_applications:web_applications_test_support",
-    ]
-  }
+  sources += [ "chrome_browsing_data_lifetime_manager_unittest.cc" ]
+  deps += [
+    "//chrome/browser/performance_manager/public/user_tuning",
+    "//chrome/browser/user_education",
+    "//chrome/browser/web_applications:web_applications_test_support",
+  ]
 }
 
 source_set("platform_browser_tests") {
@@ -328,65 +322,58 @@ source_set("platform_browser_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_android) {
-    deps += [ "//chrome/browser/ui/browser_window" ]
-  }
+  deps += [ "//chrome/browser/ui/browser_window" ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [
-      "browsing_data_model_browsertest.cc",
-      "browsing_data_remover_browsertest.cc",
-      "chrome_browsing_data_lifetime_manager_browsertest.cc",
-      "counters/autofill_counter_browsertest.cc",
-      "counters/browsing_data_counter_utils_browsertest.cc",
-      "counters/cache_counter_browsertest.cc",
-      "counters/conditional_cache_counting_helper_browsertest.cc",
-      "counters/downloads_counter_browsertest.cc",
-      "counters/history_counter_browsertest.cc",
-      "counters/passwords_counter_browsertest.cc",
-      "counters/sync_aware_counter_browsertest.cc",
-      "incognito_browsing_data_browsertest.cc",
-      "navigation_entry_remover_browsertest.cc",
-    ]
-    deps = [
-      ":browsing_data",
-      ":impl",
-      ":platform_browser_tests",
-      "//base/test:test_support",
-      "//chrome/browser",
-      "//chrome/browser:browser_process_platform_part",
-      "//chrome/browser:test_support",
-      "//chrome/browser/autofill",
-      "//chrome/browser/prefs:util",
-      "//chrome/browser/signin",
-      "//chrome/browser/sync",
-      "//chrome/browser/sync/test/integration:sync_integration_test_support",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/unified_consent",
-      "//chrome/browser/webdata_services",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/autofill/core/browser:test_support",
-      "//components/browsing_data/content:test_support",
-      "//components/privacy_sandbox:privacy_sandbox_settings_headers",
-      "//components/privacy_sandbox/privacy_sandbox_attestations",
-      "//components/sync:test_support",
-      "//content/test:browsertest_support",
-      "//content/test:test_support",
-      "//media/mojo/services",
-      "//testing/gmock",
-      "//testing/gtest",
-    ]
+source_set("browser_tests") {
+  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [
+    "browsing_data_model_browsertest.cc",
+    "browsing_data_remover_browsertest.cc",
+    "chrome_browsing_data_lifetime_manager_browsertest.cc",
+    "counters/autofill_counter_browsertest.cc",
+    "counters/browsing_data_counter_utils_browsertest.cc",
+    "counters/cache_counter_browsertest.cc",
+    "counters/conditional_cache_counting_helper_browsertest.cc",
+    "counters/downloads_counter_browsertest.cc",
+    "counters/history_counter_browsertest.cc",
+    "counters/passwords_counter_browsertest.cc",
+    "counters/sync_aware_counter_browsertest.cc",
+    "incognito_browsing_data_browsertest.cc",
+    "navigation_entry_remover_browsertest.cc",
+  ]
+  deps = [
+    ":browsing_data",
+    ":impl",
+    ":platform_browser_tests",
+    "//base/test:test_support",
+    "//chrome/browser",
+    "//chrome/browser:browser_process_platform_part",
+    "//chrome/browser:test_support",
+    "//chrome/browser/autofill",
+    "//chrome/browser/prefs:util",
+    "//chrome/browser/signin",
+    "//chrome/browser/sync",
+    "//chrome/browser/sync/test/integration:sync_integration_test_support",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/unified_consent",
+    "//chrome/browser/webdata_services",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/autofill/core/browser:test_support",
+    "//components/browsing_data/content:test_support",
+    "//components/privacy_sandbox:privacy_sandbox_settings_headers",
+    "//components/privacy_sandbox/privacy_sandbox_attestations",
+    "//components/sync:test_support",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//media/mojo/services",
+    "//testing/gmock",
+    "//testing/gtest",
+  ]
 
-    if (!is_android) {
-      deps +=
-          [ "//chrome/browser/web_applications:web_applications_test_support" ]
-    }
-  }
+  deps += [ "//chrome/browser/web_applications:web_applications_test_support" ]
 }

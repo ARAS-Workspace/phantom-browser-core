@@ -21,25 +21,23 @@ source_set("impl") {
   ]
 }
 
-if (!is_android) {
-  source_set("unit_tests") {
-    testonly = true
+source_set("unit_tests") {
+  testonly = true
 
-    deps = [
-      ":impl",
-      ":tab_strip_api",
-      "controllers:unit_tests",
-      "tab_strip_model_impl:unit_tests",
-      "//chrome/test:test_support",
-    ]
-  }
+  deps = [
+    ":impl",
+    ":tab_strip_api",
+    "controllers:unit_tests",
+    "tab_strip_model_impl:unit_tests",
+    "//chrome/test:test_support",
+  ]
+}
 
-  source_set("browser_tests") {
-    testonly = true
+source_set("browser_tests") {
+  testonly = true
 
-    deps = [
-      "controllers:browser_tests",
-      "tab_strip_model_impl:browser_tests",
-    ]
-  }
+  deps = [
+    "controllers:browser_tests",
+    "tab_strip_model_impl:browser_tests",
+  ]
 }

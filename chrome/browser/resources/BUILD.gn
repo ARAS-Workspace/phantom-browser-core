@@ -37,62 +37,60 @@ group("resources") {
     public_deps += [ ":component_extension_resources" ]
   }
 
-  if (!is_android) {
+  public_deps += [
+    ":app_icon_resources",
+    ":dev_ui_paks",
+    "about_sys:resources",
+    "access_code_cast:resources",
+    "app_service_internals:resources",
+    "autofill_ml_internals:resources",
+    "bookmarks:resources",
+    "certificate_manager:resources",
+    "content_settings:resources",
+    "data_sharing:resources",
+    "downloads:resources",
+    "feedback:resources",
+    "gaia_auth_host:resources",
+    "history:resources",
+    "inspect:resources",
+    "iwa_dev:resources",
+    "key_value_pair_viewer_shared:resources",
+    "new_tab_footer:resources",
+    "omnibox_everywhere:resources",
+    "omnibox_popup:resources",
+    "organizer_panel:resources",
+    "profile_internals:resources",
+    "search_engine_choice:resources",
+    "settings:resources",
+    "settings_shared:resources",
+    "side_panel/bookmarks:resources",
+    "side_panel/comments:resources",
+    "side_panel/commerce:resources",
+    "side_panel/customize_chrome:resources",
+    "side_panel/history:resources",
+    "side_panel/history_clusters:resources",
+    "side_panel/read_anything:resources",
+    "side_panel/reading_list:resources",
+    "side_panel/shared:resources",
+    "side_panel/tabs_from_other_devices:resources",
+    "signin:resources",
+    "support_tool:resources",
+    "tab_group_home:resources",
+    "tab_search:resources",
+    "web_app_internals:resources",
+    "webnn_internals:resources",
+    "webui_browser:resources",
+    "webui_gallery:resources",
+    "webui_toolbar:resources",
+    "webui_toolbar_shared:resources",
+    "whats_new:resources",
+    "//components/browser_apis/tab_strip/resources",
+  ]
+  if (is_chrome_branded) {
     public_deps += [
-      ":app_icon_resources",
-      ":dev_ui_paks",
-      "about_sys:resources",
-      "access_code_cast:resources",
-      "app_service_internals:resources",
-      "autofill_ml_internals:resources",
-      "bookmarks:resources",
-      "certificate_manager:resources",
-      "content_settings:resources",
-      "data_sharing:resources",
-      "downloads:resources",
-      "feedback:resources",
-      "gaia_auth_host:resources",
-      "history:resources",
-      "inspect:resources",
-      "iwa_dev:resources",
-      "key_value_pair_viewer_shared:resources",
-      "new_tab_footer:resources",
-      "omnibox_everywhere:resources",
-      "omnibox_popup:resources",
-      "organizer_panel:resources",
-      "profile_internals:resources",
-      "search_engine_choice:resources",
-      "settings:resources",
-      "settings_shared:resources",
-      "side_panel/bookmarks:resources",
-      "side_panel/comments:resources",
-      "side_panel/commerce:resources",
-      "side_panel/customize_chrome:resources",
-      "side_panel/history:resources",
-      "side_panel/history_clusters:resources",
-      "side_panel/read_anything:resources",
-      "side_panel/reading_list:resources",
-      "side_panel/shared:resources",
-      "side_panel/tabs_from_other_devices:resources",
-      "signin:resources",
-      "support_tool:resources",
-      "tab_group_home:resources",
-      "tab_search:resources",
-      "web_app_internals:resources",
-      "webnn_internals:resources",
-      "webui_browser:resources",
-      "webui_gallery:resources",
-      "webui_toolbar:resources",
-      "webui_toolbar_shared:resources",
-      "whats_new:resources",
-      "//components/browser_apis/tab_strip/resources",
+      ":preinstalled_web_apps_resources",
+      "media_router/cast_feedback:resources",
     ]
-    if (is_chrome_branded) {
-      public_deps += [
-        ":preinstalled_web_apps_resources",
-        "media_router/cast_feedback:resources",
-      ]
-    }
   }
 
   if (enable_extensions) {
@@ -131,12 +129,10 @@ group("resources") {
     ]
   }
 
-  if (!is_android) {
-    public_deps += [
-      "default_browser/default_browser_modal:resources",
-      "signin/profile_picker:resources",
-    ]
-  }
+  public_deps += [
+    "default_browser/default_browser_modal:resources",
+    "signin/profile_picker:resources",
+  ]
 
   if (enable_dice_support) {
     public_deps += [
@@ -231,49 +227,47 @@ if (enable_extensions_core) {
   }
 }
 
-if (!is_android) {
-  grit("app_icon_resources") {
-    source = "app_icon/app_icon_resources.grd"
+grit("app_icon_resources") {
+  source = "app_icon/app_icon_resources.grd"
+  inputs = [
+    "app_icon/default_100_percent/app_icon_placeholder_cube.png",
+    "app_icon/default_100_percent/mask/mask.png",
+    "app_icon/default_100_percent/web_app_default_icon.png",
+    "app_icon/default_200_percent/app_icon_placeholder_cube.png",
+    "app_icon/default_200_percent/mask/mask.png",
+    "app_icon/default_200_percent/web_app_default_icon.png",
+  ]
+  defines = chrome_grit_defines
+  outputs = [
+    "grit/app_icon_resources.h",
+    "grit/app_icon_resources_map.cc",
+    "grit/app_icon_resources_map.h",
+    "app_icon_resources_100_percent.pak",
+    "app_icon_resources_200_percent.pak",
+  ]
+  output_dir = "$root_gen_dir/chrome"
+}
+
+if (is_chrome_branded) {
+  grit("preinstalled_web_apps_resources") {
+    source = "preinstalled_web_apps/resources.grd"
     inputs = [
-      "app_icon/default_100_percent/app_icon_placeholder_cube.png",
-      "app_icon/default_100_percent/mask/mask.png",
-      "app_icon/default_100_percent/web_app_default_icon.png",
-      "app_icon/default_200_percent/app_icon_placeholder_cube.png",
-      "app_icon/default_200_percent/mask/mask.png",
-      "app_icon/default_200_percent/web_app_default_icon.png",
+      "preinstalled_web_apps/internal/gmail_192.png",
+      "preinstalled_web_apps/internal/google_chat_192.png",
+      "preinstalled_web_apps/internal/google_docs_192.png",
+      "preinstalled_web_apps/internal/google_drive_192.png",
+      "preinstalled_web_apps/internal/google_sheets_192.png",
+      "preinstalled_web_apps/internal/google_slides_192.png",
+      "preinstalled_web_apps/internal/youtube_192.png",
     ]
     defines = chrome_grit_defines
     outputs = [
-      "grit/app_icon_resources.h",
-      "grit/app_icon_resources_map.cc",
-      "grit/app_icon_resources_map.h",
-      "app_icon_resources_100_percent.pak",
-      "app_icon_resources_200_percent.pak",
+      "grit/preinstalled_web_apps_resources.h",
+      "grit/preinstalled_web_apps_resources_map.cc",
+      "grit/preinstalled_web_apps_resources_map.h",
+      "preinstalled_web_apps_resources.pak",
     ]
     output_dir = "$root_gen_dir/chrome"
-  }
-
-  if (is_chrome_branded) {
-    grit("preinstalled_web_apps_resources") {
-      source = "preinstalled_web_apps/resources.grd"
-      inputs = [
-        "preinstalled_web_apps/internal/gmail_192.png",
-        "preinstalled_web_apps/internal/google_chat_192.png",
-        "preinstalled_web_apps/internal/google_docs_192.png",
-        "preinstalled_web_apps/internal/google_drive_192.png",
-        "preinstalled_web_apps/internal/google_sheets_192.png",
-        "preinstalled_web_apps/internal/google_slides_192.png",
-        "preinstalled_web_apps/internal/youtube_192.png",
-      ]
-      defines = chrome_grit_defines
-      outputs = [
-        "grit/preinstalled_web_apps_resources.h",
-        "grit/preinstalled_web_apps_resources_map.cc",
-        "grit/preinstalled_web_apps_resources_map.h",
-        "preinstalled_web_apps_resources.pak",
-      ]
-      output_dir = "$root_gen_dir/chrome"
-    }
   }
 }
 

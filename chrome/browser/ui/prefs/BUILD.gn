@@ -25,9 +25,7 @@ source_set("prefs") {
     "//ui/native_theme",
   ]
 
-  if (!is_android) {
-    public_deps += [ "//chrome/browser/themes" ]
-  }
+  public_deps += [ "//chrome/browser/themes" ]
 }
 
 source_set("impl") {

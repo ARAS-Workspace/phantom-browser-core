@@ -18,37 +18,31 @@ source_set("payments") {
 }
 
 source_set("impl") {
-  if (!is_android) {
-    sources = [
-      "chrome_payment_request_delegate.cc",
-      "payment_request_display_manager_factory.cc",
-      "payment_request_factory.cc",
-      "webapps/twa_package_helper.cc",
-    ]
+  sources = [
+    "chrome_payment_request_delegate.cc",
+    "payment_request_display_manager_factory.cc",
+    "payment_request_factory.cc",
+    "webapps/twa_package_helper.cc",
+  ]
 
-    public_deps = [ ":payments" ]
+  public_deps = [ ":payments" ]
 
-    deps = [
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/autofill",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/signin",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/views/payments",
-      "//chrome/browser/ui/web_applications",
-      "//chrome/browser/web_applications",
-      "//chrome/common:version_header",
-      "//components/payments/content",
-      "//components/payments/content:utils",
-      "//components/webauthn/content/browser",
-      "//components/webdata_services",
-      "//content/public/browser",
-    ]
-  } else {
-    deps = [
-      "//chrome/browser/payments/android:service_worker_payment_app_bridge",
-    ]
-  }
+  deps = [
+    "//chrome/browser/apps/app_service",
+    "//chrome/browser/autofill",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/signin",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/views/payments",
+    "//chrome/browser/ui/web_applications",
+    "//chrome/browser/web_applications",
+    "//chrome/common:version_header",
+    "//components/payments/content",
+    "//components/payments/content:utils",
+    "//components/webauthn/content/browser",
+    "//components/webdata_services",
+    "//content/public/browser",
+  ]
 }
 
 source_set("browser_tests") {
@@ -110,24 +104,22 @@ source_set("browser_tests") {
     "//device/fido:test_support",
   ]
 
-  if (!is_android) {
-    sources += [
-      "capability_delegation_browsertest.cc",
-      "manifest_verifier_browsertest.cc",
-      "payment_manifest_parser_browsertest.cc",
-      "secure_payment_confirmation_authenticator_browsertest.cc",
-      "service_worker_payment_app_finder_browsertest.cc",
-      "site_per_process_payments_browsertest.cc",
-    ]
+  sources += [
+    "capability_delegation_browsertest.cc",
+    "manifest_verifier_browsertest.cc",
+    "payment_manifest_parser_browsertest.cc",
+    "secure_payment_confirmation_authenticator_browsertest.cc",
+    "service_worker_payment_app_finder_browsertest.cc",
+    "site_per_process_payments_browsertest.cc",
+  ]
 
-    deps += [
-      "//chrome/test:test_support_ui",
-      "//components/payments/content:utils",
-      "//components/payments/content/utility",
-      "//components/permissions",
-      "//components/webdata_services",
-    ]
-  }
+  deps += [
+    "//chrome/test:test_support_ui",
+    "//components/payments/content:utils",
+    "//components/payments/content/utility",
+    "//components/permissions",
+    "//components/webdata_services",
+  ]
 }
 
 source_set("unittests") {

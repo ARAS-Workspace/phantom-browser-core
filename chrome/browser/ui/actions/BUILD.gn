@@ -29,17 +29,15 @@ source_set("actions") {
     "//ui/base",
   ]
 
-  if (!is_android) {
-    sources += [
-      "command_action_updater.cc",
-      "command_action_updater.h",
-    ]
-    deps += [
-      "//chrome/browser:command_updater_impl",
-      "//chrome/browser:primitives",
-      "//chrome/browser/ui/browser_window",
-    ]
-  }
+  sources += [
+    "command_action_updater.cc",
+    "command_action_updater.h",
+  ]
+  deps += [
+    "//chrome/browser:command_updater_impl",
+    "//chrome/browser:primitives",
+    "//chrome/browser/ui/browser_window",
+  ]
 }
 
 source_set("actions_util") {
@@ -51,17 +49,15 @@ source_set("actions_util") {
   deps = [ "//ui/gfx" ]
 }
 
-if (!is_android) {
-  executable("dump_actions") {
-    testonly = true
+executable("dump_actions") {
+  testonly = true
 
-    sources = [ "tools/dump_actions.cc" ]
+  sources = [ "tools/dump_actions.cc" ]
 
-    deps = [
-      ":actions_headers",
-      "//ui/actions:actions_headers",
-    ]
-  }
+  deps = [
+    ":actions_headers",
+    "//ui/actions:actions_headers",
+  ]
 }
 
 source_set("unit_tests") {
@@ -77,28 +73,26 @@ source_set("unit_tests") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
+source_set("browser_tests") {
+  testonly = true
 
-    sources = [ "command_action_updater_browsertest.cc" ]
+  sources = [ "command_action_updater_browsertest.cc" ]
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    deps = [
-      ":actions",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:browser_actions",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/side_panel",
-      "//chrome/browser/ui/side_panel:side_panel_views_dependent",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//ui/actions",
-    ]
-  }
+  deps = [
+    ":actions",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:browser_actions",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/side_panel",
+    "//chrome/browser/ui/side_panel:side_panel_views_dependent",
+    "//chrome/test:test_support",
+    "//content/test:test_support",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//ui/actions",
+  ]
 }

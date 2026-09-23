@@ -74,17 +74,14 @@ source_set("side_panel_views_dependent") {
     "//ui/base/unowned_user_data",
   ]
 
-  # No views dependency is allowed on Android.
-  if (!is_android) {
-    deps += [
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/views/side_panel",
-      "//ui/views",
-    ]
+  deps += [
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/views/side_panel",
+    "//ui/views",
+  ]
 
-    allow_circular_includes_from =
-        [ "//chrome/browser/ui/views/side_panel:side_panel" ]
-  }
+  allow_circular_includes_from =
+      [ "//chrome/browser/ui/views/side_panel:side_panel" ]
 }
 
 source_set("side_panel_ui_provider") {
@@ -126,11 +123,9 @@ source_set("unit_tests") {
     "//ui/actions:actions_headers",
   ]
 
-  if (!is_android) {
-    sources += [ "side_panel_metrics_unittest.cc" ]
-    deps += [
-      ":side_panel_views_dependent",
-      "//base/test:test_support",
-    ]
-  }
+  sources += [ "side_panel_metrics_unittest.cc" ]
+  deps += [
+    ":side_panel_views_dependent",
+    "//base/test:test_support",
+  ]
 }

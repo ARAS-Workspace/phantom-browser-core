@@ -101,9 +101,7 @@ source_set("constants") {
 # (ideally none).
 source_set("types") {
   sources = [ "window_open_disposition.h" ]
-  if (!is_ios) {
-    sources += [ "ui_base_types.h" ]
-  }
+  sources += [ "ui_base_types.h" ]
 }
 
 component("base") {
@@ -623,28 +621,14 @@ static_library("test_support") {
     ]
   }
 
-  if (!is_ios) {
-    sources += [
-      "accelerators/test_accelerator_target.cc",
-      "accelerators/test_accelerator_target.h",
-      "test/test_dialog_model_host.cc",
-      "test/test_dialog_model_host.h",
-      "test/ui_controls.cc",
-      "test/ui_controls.h",
-    ]
-  } else {
-    sources += [
-      "test/ios/ui_image_test_utils.h",
-      "test/ios/ui_image_test_utils.mm",
-    ]
-
-    if (target_platform == "iphoneos") {
-      sources += [
-        "test/ios/keyboard_appearance_listener.h",
-        "test/ios/keyboard_appearance_listener.mm",
-      ]
-    }
-  }
+  sources += [
+    "accelerators/test_accelerator_target.cc",
+    "accelerators/test_accelerator_target.h",
+    "test/test_dialog_model_host.cc",
+    "test/test_dialog_model_host.h",
+    "test/ui_controls.cc",
+    "test/ui_controls.h",
+  ]
 
   if (use_aura && is_win) {
     sources += [
@@ -661,9 +645,7 @@ static_library("test_support") {
     "//ui/base/interaction",
   ]
 
-  if (!is_ios) {
-    public_deps += [ "//ui/base/mojom:ui_base_types" ]
-  }
+  public_deps += [ "//ui/base/mojom:ui_base_types" ]
 
   deps = [
     "//base",

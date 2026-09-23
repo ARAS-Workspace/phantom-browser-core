@@ -215,9 +215,7 @@ js_library("bindings_uncompiled") {
 grit("resources") {
   source = "mojo_bindings_resources.grd"
   inputs = [ "$root_gen_dir/mojo/public/js/bindings.js" ]
-  if (!is_android) {
-    inputs += [ "$root_gen_dir/mojo/public/js/mojo_bindings.js" ]
-  }
+  inputs += [ "$root_gen_dir/mojo/public/js/mojo_bindings.js" ]
 
   outputs = [
     "grit/mojo_bindings_resources.h",

@@ -55,24 +55,22 @@ source_set("ntp_microsoft_auth") {
   ]
 }
 
-if (!is_android) {
-  source_set("unit_tests") {
-    testonly = true
-    sources = [
-      "ntp_microsoft_auth_page_handler_unittest.cc",
-      "ntp_microsoft_auth_response_capture_navigation_throttle_unittest.cc",
-    ]
-    deps = [
-      ":ntp_microsoft_auth",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser",
-      "//chrome/browser/new_tab_page",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/ui/search:test_support_ui",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
-  }
+source_set("unit_tests") {
+  testonly = true
+  sources = [
+    "ntp_microsoft_auth_page_handler_unittest.cc",
+    "ntp_microsoft_auth_response_capture_navigation_throttle_unittest.cc",
+  ]
+  deps = [
+    ":ntp_microsoft_auth",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser",
+    "//chrome/browser/new_tab_page",
+    "//chrome/browser/search_engines",
+    "//chrome/browser/ui/search:test_support_ui",
+    "//chrome/test:test_support",
+    "//content/test:test_support",
+    "//testing/gtest",
+  ]
 }

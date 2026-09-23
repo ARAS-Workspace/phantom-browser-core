@@ -26,12 +26,10 @@ source_set("tracked_element") {
     "//ui/gfx/geometry",
   ]
 
-  if (!is_android) {
-    deps += [
-      "//ui/views",
-      "//ui/views/controls/webview",
-    ]
-  }
+  deps += [
+    "//ui/views",
+    "//ui/views/controls/webview",
+  ]
 }
 
 source_set("test_support") {
@@ -66,11 +64,9 @@ source_set("unit_tests") {
     "//ui/base:test_support",
     "//ui/base/interaction:test_support",
   ]
-  if (!is_android) {
-    deps += [
-      "//ui/views",
-      "//ui/views:test_support",
-      "//ui/views/controls/webview",
-    ]
-  }
+  deps += [
+    "//ui/views",
+    "//ui/views:test_support",
+    "//ui/views/controls/webview",
+  ]
 }

@@ -379,35 +379,33 @@ if (enable_vr) {
     ]
   }
 
-  if (!is_android) {
-    # This should only contain that files that are useful if enable_vr = true.
-    # For tests/infrastructure that can be used with enable_vr = false, see
-    # //chrome/test:xr_browser_tests_common.
-    source_set("xr_browser_tests_vr_required") {
-      testonly = true
-      defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  # This should only contain that files that are useful if enable_vr = true.
+  # For tests/infrastructure that can be used with enable_vr = false, see
+  # //chrome/test:xr_browser_tests_common.
+  source_set("xr_browser_tests_vr_required") {
+    testonly = true
+    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-      # Infrastructure
-      sources = [
-        "test/mock_xr_device_hook_base.cc",
-        "test/mock_xr_device_hook_base.h",
-        "test/mock_xr_input_source.cc",
-        "test/mock_xr_input_source.h",
-      ]
+    # Infrastructure
+    sources = [
+      "test/mock_xr_device_hook_base.cc",
+      "test/mock_xr_device_hook_base.h",
+      "test/mock_xr_input_source.cc",
+      "test/mock_xr_input_source.h",
+    ]
 
-      deps = [
-        ":vr_common",
-        "//chrome/common:constants",
-        "//chrome/test:xr_browser_tests_common",
-        "//device/vr",
-        "//device/vr:vr_test_utils",
-        "//device/vr/buildflags",
-        "//device/vr/orientation",
-        "//device/vr/public/mojom:isolated_xr_service",
-        "//device/vr/public/mojom/test:test_mojom",
-      ]
+    deps = [
+      ":vr_common",
+      "//chrome/common:constants",
+      "//chrome/test:xr_browser_tests_common",
+      "//device/vr",
+      "//device/vr:vr_test_utils",
+      "//device/vr/buildflags",
+      "//device/vr/orientation",
+      "//device/vr/public/mojom:isolated_xr_service",
+      "//device/vr/public/mojom/test:test_mojom",
+    ]
 
-      data_deps = []
-    }
+    data_deps = []
   }
 }

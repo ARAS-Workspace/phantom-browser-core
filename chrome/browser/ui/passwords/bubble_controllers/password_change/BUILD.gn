@@ -29,15 +29,13 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  if (!is_android) {
-    sources += [ "successful_password_change_bubble_controller_unittest.cc" ]
-    deps += [
-      ":password_change",
-      "//base/test:test_support",
-      "//chrome/browser/ui:test_support",
-      "//chrome/browser/ui/passwords:test_support_ui",
-      "//testing/gmock",
-      "//testing/gtest",
-    ]
-  }
+  sources += [ "successful_password_change_bubble_controller_unittest.cc" ]
+  deps += [
+    ":password_change",
+    "//base/test:test_support",
+    "//chrome/browser/ui:test_support",
+    "//chrome/browser/ui/passwords:test_support_ui",
+    "//testing/gmock",
+    "//testing/gtest",
+  ]
 }

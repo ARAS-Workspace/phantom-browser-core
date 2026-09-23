@@ -154,55 +154,53 @@ source_set("browser_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_android) {
-    sources += [
-      "audio_ducker_browsertest.cc",
-      "autoplay_metrics_browsertest.cc",
-      "cast_mirroring_service_host_browsertest.cc",
-      "defer_background_media_browsertest.cc",
-      "encrypted_media_supported_types_browsertest.cc",
-      "media_browsertest.cc",
-      "media_browsertest.h",
-      "media_engagement_autoplay_browsertest.cc",
-      "media_engagement_browsertest.cc",
-      "media_session_browsertest.cc",
-      "unified_autoplay_browsertest.cc",
-    ]
+  sources += [
+    "audio_ducker_browsertest.cc",
+    "autoplay_metrics_browsertest.cc",
+    "cast_mirroring_service_host_browsertest.cc",
+    "defer_background_media_browsertest.cc",
+    "encrypted_media_supported_types_browsertest.cc",
+    "media_browsertest.cc",
+    "media_browsertest.h",
+    "media_engagement_autoplay_browsertest.cc",
+    "media_engagement_browsertest.cc",
+    "media_session_browsertest.cc",
+    "unified_autoplay_browsertest.cc",
+  ]
 
-    # TODO(crbug.com/40553979): encrypted_media_browsertest is flaky on the
-    # Linux Asan Lsan bot.
-    if (!(is_linux && is_asan && is_lsan)) {
-      sources += [ "encrypted_media_browsertest.cc" ]
-    }
-    deps += [
-      ":impl",
-      "//chrome/browser:chrome_content_browser_client",
-      "//chrome/browser/component_updater",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/content_settings:content_settings_util",
-      "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
-      "//chrome/browser/prefs:util",
-      "//chrome/browser/preloading/prefetch/no_state_prefetch",
-      "//chrome/browser/preloading/prefetch/no_state_prefetch:test_support",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/speech",
-      "//chrome/browser/tab_group_sync",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:recently_audible_helper",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/test:test_support_ui",
-      "//components/cdm/common:buildflags",
-      "//components/no_state_prefetch/browser",
-      "//components/no_state_prefetch/common",
-      "//components/prefs",
-      "//media:test_support",
-      "//media/capture/mojom:video_capture",
-      "//media/mojo/mojom",
-      "//services/media_session/public/cpp/test:test_support",
-      "//services/metrics/public/cpp:ukm_builders",
-      "//third_party/widevine/cdm:headers",
-    ]
+  # TODO(crbug.com/40553979): encrypted_media_browsertest is flaky on the
+  # Linux Asan Lsan bot.
+  if (!(is_linux && is_asan && is_lsan)) {
+    sources += [ "encrypted_media_browsertest.cc" ]
   }
+  deps += [
+    ":impl",
+    "//chrome/browser:chrome_content_browser_client",
+    "//chrome/browser/component_updater",
+    "//chrome/browser/content_settings:content_settings_factory",
+    "//chrome/browser/content_settings:content_settings_util",
+    "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
+    "//chrome/browser/prefs:util",
+    "//chrome/browser/preloading/prefetch/no_state_prefetch",
+    "//chrome/browser/preloading/prefetch/no_state_prefetch:test_support",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/speech",
+    "//chrome/browser/tab_group_sync",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:recently_audible_helper",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/test:test_support_ui",
+    "//components/cdm/common:buildflags",
+    "//components/no_state_prefetch/browser",
+    "//components/no_state_prefetch/common",
+    "//components/prefs",
+    "//media:test_support",
+    "//media/capture/mojom:video_capture",
+    "//media/mojo/mojom",
+    "//services/media_session/public/cpp/test:test_support",
+    "//services/metrics/public/cpp:ukm_builders",
+    "//third_party/widevine/cdm:headers",
+  ]
 }
 
 source_set("media") {
@@ -236,23 +234,21 @@ source_set("media") {
     "//url",
   ]
 
-  if (!is_android) {
-    public += [
-      "audio_ducker.h",
-      "cast_mirroring_service_host.h",
-      "cast_mirroring_service_host_factory.h",
-      "mirroring_service_host.h",
-      "offscreen_tab.h",
-    ]
-    public_deps += [
-      "//components/mirroring/mojom:service",
-      "//media/capture/mojom:video_capture",
-      "//media/mojo/mojom",
-      "//mojo/public/cpp/bindings",
-      "//services/media_session/public/mojom",
-      "//ui/gfx/geometry",
-    ]
-  }
+  public += [
+    "audio_ducker.h",
+    "cast_mirroring_service_host.h",
+    "cast_mirroring_service_host_factory.h",
+    "mirroring_service_host.h",
+    "offscreen_tab.h",
+  ]
+  public_deps += [
+    "//components/mirroring/mojom:service",
+    "//media/capture/mojom:video_capture",
+    "//media/mojo/mojom",
+    "//mojo/public/cpp/bindings",
+    "//services/media_session/public/mojom",
+    "//ui/gfx/geometry",
+  ]
 
   if (is_android || is_win) {
     public += [ "protected_media_identifier_permission_context.h" ]
@@ -341,25 +337,23 @@ source_set("impl") {
     "//third_party/blink/public/common",
   ]
 
-  if (!is_android) {
-    sources += [
-      "audio_ducker.cc",
-      "cast_mirroring_service_host.cc",
-      "cast_mirroring_service_host_factory.cc",
-      "mirroring_service_host.cc",
-      "offscreen_tab.cc",
-    ]
-    deps += [
-      "//chrome/browser/media/router:media_router_feature",
-      "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
-      "//chrome/browser/net",
-      "//chrome/browser/ui/tab_sharing",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//components/media_router/browser",
-      "//components/mirroring/browser",
-      "//media/mojo/services",
-    ]
-  }
+  sources += [
+    "audio_ducker.cc",
+    "cast_mirroring_service_host.cc",
+    "cast_mirroring_service_host_factory.cc",
+    "mirroring_service_host.cc",
+    "offscreen_tab.cc",
+  ]
+  deps += [
+    "//chrome/browser/media/router:media_router_feature",
+    "//chrome/browser/media/router/discovery/access_code:access_code_cast_feature",
+    "//chrome/browser/net",
+    "//chrome/browser/ui/tab_sharing",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//components/media_router/browser",
+    "//components/mirroring/browser",
+    "//media/mojo/services",
+  ]
 
   if (is_android || is_win) {
     sources += [ "protected_media_identifier_permission_context.cc" ]

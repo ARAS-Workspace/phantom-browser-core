@@ -158,58 +158,56 @@ source_set("aim_eligibility_service") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [
-      "autocomplete_browsertest.cc",
-      "chrome_autocomplete_provider_client_browsertest.cc",
-      "tab_matcher_desktop_browsertest.cc",
-    ]
-    deps = [
-      ":aim_eligibility_service",
-      ":autocomplete",
-      "//base",
-      "//base/test:test_support",
-      "//build:buildflag_header_h",
-      "//chrome/browser",
-      "//chrome/browser:browser_process",
-      "//chrome/browser/extensions",
-      "//chrome/browser/history",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/search_engines",
-      "//chrome/browser/signin",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/location_bar",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/tabs:tabs_public",
-      "//chrome/browser/ui/views/toolbar",
-      "//chrome/common",
-      "//chrome/common:constants",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/history/core/browser",
-      "//components/omnibox/browser",
-      "//components/omnibox/browser:location_bar",
-      "//components/prefs",
-      "//components/search",
-      "//components/search_engines",
-      "//components/signin/public/identity_manager:test_support",
-      "//components/variations/service",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//net:test_support",
-      "//testing/gmock",
-      "//testing/gtest",
-      "//third_party/metrics_proto",
-      "//third_party/omnibox_proto",
-      "//ui/base:types",
-      "//ui/base/unowned_user_data",
-      "//url",
-    ]
-  }
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [
+    "autocomplete_browsertest.cc",
+    "chrome_autocomplete_provider_client_browsertest.cc",
+    "tab_matcher_desktop_browsertest.cc",
+  ]
+  deps = [
+    ":aim_eligibility_service",
+    ":autocomplete",
+    "//base",
+    "//base/test:test_support",
+    "//build:buildflag_header_h",
+    "//chrome/browser",
+    "//chrome/browser:browser_process",
+    "//chrome/browser/extensions",
+    "//chrome/browser/history",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/search_engines",
+    "//chrome/browser/signin",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/location_bar",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/tabs:tabs_public",
+    "//chrome/browser/ui/views/toolbar",
+    "//chrome/common",
+    "//chrome/common:constants",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/history/core/browser",
+    "//components/omnibox/browser",
+    "//components/omnibox/browser:location_bar",
+    "//components/prefs",
+    "//components/search",
+    "//components/search_engines",
+    "//components/signin/public/identity_manager:test_support",
+    "//components/variations/service",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//net:test_support",
+    "//testing/gmock",
+    "//testing/gtest",
+    "//third_party/metrics_proto",
+    "//third_party/omnibox_proto",
+    "//ui/base:types",
+    "//ui/base/unowned_user_data",
+    "//url",
+  ]
 }
 
 source_set("unit_tests") {

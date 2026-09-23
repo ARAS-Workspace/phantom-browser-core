@@ -141,12 +141,10 @@ target("component", "cpp") {
     if (is_posix) {
       deps += [ "//third_party/perfetto/include/perfetto/ext/ipc" ]
 
-      if (!is_android) {
-        sources += [
-          "system_tracing_service.cc",
-          "system_tracing_service.h",
-        ]
-      }
+      sources += [
+        "system_tracing_service.cc",
+        "system_tracing_service.h",
+      ]
     }
   }  # !is_ios
 }

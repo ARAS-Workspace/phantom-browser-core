@@ -2,30 +2,28 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-if (!is_android) {
-  source_set("intent_chip_display_prefs") {
-    public = [ "intent_chip_display_prefs.h" ]
-    sources = [ "intent_chip_display_prefs.cc" ]
+source_set("intent_chip_display_prefs") {
+  public = [ "intent_chip_display_prefs.h" ]
+  sources = [ "intent_chip_display_prefs.cc" ]
 
-    public_deps = [ "//url" ]
+  public_deps = [ "//url" ]
 
-    deps = [
-      "//base",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/profiles:profile",
-      "//components/content_settings/core/browser",
-      "//components/content_settings/core/common",
-    ]
-  }
+  deps = [
+    "//base",
+    "//chrome/browser/content_settings:content_settings_factory",
+    "//chrome/browser/profiles:profile",
+    "//components/content_settings/core/browser",
+    "//components/content_settings/core/common",
+  ]
+}
 
-  source_set("unit_tests") {
-    testonly = true
-    deps = [
-      ":intent_chip_display_prefs",
-      "//chrome/test:test_support",
-      "//content/test:test_support",
-      "//testing/gtest",
-      "//url",
-    ]
-  }
+source_set("unit_tests") {
+  testonly = true
+  deps = [
+    ":intent_chip_display_prefs",
+    "//chrome/test:test_support",
+    "//content/test:test_support",
+    "//testing/gtest",
+    "//url",
+  ]
 }

@@ -38,19 +38,15 @@ component("proxy_config") {
   # checking enabled.
   deps += [ "//components/pref_registry" ]
 
-  if (!is_ios) {
-    sources += [
-      "proxy_policy_handler.cc",
-      "proxy_policy_handler.h",
-    ]
-  }
+  sources += [
+    "proxy_policy_handler.cc",
+    "proxy_policy_handler.h",
+  ]
 
-  if (!is_ios) {
-    sources += [
-      "proxy_override_rules_policy_handler.cc",
-      "proxy_override_rules_policy_handler.h",
-    ]
-  }
+  sources += [
+    "proxy_override_rules_policy_handler.cc",
+    "proxy_override_rules_policy_handler.h",
+  ]
 }
 
 source_set("unit_tests") {
@@ -81,11 +77,7 @@ source_set("unit_tests") {
     "//third_party/abseil-cpp:absl",
   ]
 
-  if (!is_ios) {
-    sources += [ "proxy_policy_handler_unittest.cc" ]
-  }
+  sources += [ "proxy_policy_handler_unittest.cc" ]
 
-  if (!is_ios) {
-    sources += [ "proxy_override_rules_policy_handler_unittest.cc" ]
-  }
+  sources += [ "proxy_override_rules_policy_handler_unittest.cc" ]
 }

@@ -22,10 +22,8 @@ source_set("infobars") {
     "simple_alert_infobar_creator.cc",
   ]
 
-  if (!is_android) {
-    public += [ "browser_infobar_manager.h" ]
-    sources += [ "browser_infobar_manager.cc" ]
-  }
+  public += [ "browser_infobar_manager.h" ]
+  sources += [ "browser_infobar_manager.cc" ]
 
   public_deps = [
     "//base",
@@ -51,9 +49,7 @@ source_set("infobars") {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar" ]
   }
 
-  if (!is_android) {
-    deps += [ "//chrome/browser/ui/tabs:tab_strip" ]
-  }
+  deps += [ "//chrome/browser/ui/tabs:tab_strip" ]
 
   if (toolkit_views) {
     deps += [ "//chrome/browser/ui/views/infobars" ]
@@ -89,57 +85,55 @@ source_set("unit_tests") {
   ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
+source_set("browser_tests") {
+  testonly = true
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "browser_infobar_manager_browsertest.cc",
-      "infobars_browsertest.cc",
+  sources = [
+    "browser_infobar_manager_browsertest.cc",
+    "infobars_browsertest.cc",
+  ]
+
+  deps = [
+    ":infobars",
+    "//base",
+    "//chrome/browser/devtools",
+    "//chrome/browser/infobars:test_support",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:collected_cookies_infobar_delegate",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/browser/ui/page_info",
+    "//chrome/browser/ui/select_file_policy",
+    "//chrome/browser/ui/startup",
+    "//chrome/browser/ui/tab_sharing",
+    "//chrome/browser/ui/tab_sharing:test_support",
+    "//chrome/browser/ui/test:test_support",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/infobars/content",
+    "//components/infobars/core",
+    "//content/public/browser",
+    "//content/test:test_support",
+    "//testing/gtest",
+    "//url",
+  ]
+
+  if (is_win || is_mac || is_linux) {
+    deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
+  }
+
+  if (toolkit_views) {
+    deps += [
+      "//chrome/browser/ui/views/infobars",
+      "//chrome/browser/ui/views/site_data",
     ]
+  }
 
-    deps = [
-      ":infobars",
-      "//base",
-      "//chrome/browser/devtools",
-      "//chrome/browser/infobars:test_support",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:collected_cookies_infobar_delegate",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/browser/ui/page_info",
-      "//chrome/browser/ui/select_file_policy",
-      "//chrome/browser/ui/startup",
-      "//chrome/browser/ui/tab_sharing",
-      "//chrome/browser/ui/tab_sharing:test_support",
-      "//chrome/browser/ui/test:test_support",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/infobars/content",
-      "//components/infobars/core",
-      "//content/public/browser",
-      "//content/test:test_support",
-      "//testing/gtest",
-      "//url",
+  if (enable_extensions_core) {
+    deps += [
+      "//chrome/browser/ui/extensions",
+      "//extensions/browser:crx_installer",
     ]
-
-    if (is_win || is_mac || is_linux) {
-      deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
-    }
-
-    if (toolkit_views) {
-      deps += [
-        "//chrome/browser/ui/views/infobars",
-        "//chrome/browser/ui/views/site_data",
-      ]
-    }
-
-    if (enable_extensions_core) {
-      deps += [
-        "//chrome/browser/ui/extensions",
-        "//extensions/browser:crx_installer",
-      ]
-    }
   }
 }

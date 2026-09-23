@@ -41,10 +41,8 @@ source_set("impl") {
     "//url",
   ]
 
-  if (!is_android) {
-    deps += [
-      "//chrome/browser/ui",
-      "//components/commerce/core:discounts_db_content_proto",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui",
+    "//components/commerce/core:discounts_db_content_proto",
+  ]
 }

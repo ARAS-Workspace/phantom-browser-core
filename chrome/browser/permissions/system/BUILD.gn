@@ -35,14 +35,12 @@ source_set("system") {
     "//services/device/public/cpp/geolocation",
   ]
 
-  if (!is_android) {
-    public += [ "system_media_permission_cache.h" ]
-    sources += [
-      "system_media_permission_cache.cc",
-      "system_media_permission_cache.h",
-    ]
-    deps += [ "//chrome/browser:browser_public_dependencies" ]
-  }
+  public += [ "system_media_permission_cache.h" ]
+  sources += [
+    "system_media_permission_cache.cc",
+    "system_media_permission_cache.h",
+  ]
+  deps += [ "//chrome/browser:browser_public_dependencies" ]
 
   if (is_mac) {
     public += [ "system_media_capture_permissions_mac.h" ]

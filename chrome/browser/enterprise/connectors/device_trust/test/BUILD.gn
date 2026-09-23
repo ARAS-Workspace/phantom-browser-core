@@ -14,27 +14,25 @@ source_set("test_support") {
 
   deps = [ "//chrome/browser/enterprise/connectors/device_trust:features" ]
 
-  if (!is_android) {
-    public += [
-      "device_trust_browsertest_base.h",
-      "device_trust_management_mixin.h",
-    ]
+  public += [
+    "device_trust_browsertest_base.h",
+    "device_trust_management_mixin.h",
+  ]
 
-    sources += [
-      "device_trust_browsertest_base.cc",
-      "device_trust_management_mixin.cc",
-    ]
+  sources += [
+    "device_trust_browsertest_base.cc",
+    "device_trust_management_mixin.cc",
+  ]
 
-    public_deps += [ "//chrome/browser/enterprise/test:test_support" ]
+  public_deps += [ "//chrome/browser/enterprise/test:test_support" ]
 
-    deps += [
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui/browser_window",
-      "//components/device_signals/core/browser",
-      "//components/policy:policy_code_generate",
-      "//components/prefs",
-    ]
-  }
+  deps += [
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui/browser_window",
+    "//components/device_signals/core/browser",
+    "//components/policy:policy_code_generate",
+    "//components/prefs",
+  ]
 
   if (is_win || is_mac || is_linux) {
     public += [ "device_trust_test_environment.h" ]

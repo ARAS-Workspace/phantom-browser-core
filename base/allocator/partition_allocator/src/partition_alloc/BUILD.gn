@@ -964,9 +964,7 @@ if (build_with_chromium) {
         "thread_cache_unittest.cc",
       ]
 
-      if (!is_android) {
-        deps += [ ":death_unittests" ]
-      }
+      deps += [ ":death_unittests" ]
     }
 
     if (use_allocator_shim) {

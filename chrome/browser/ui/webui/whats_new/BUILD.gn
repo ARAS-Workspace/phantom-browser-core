@@ -130,53 +130,49 @@ if (is_linux || is_mac || is_win) {
   }
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "whats_new_fetcher_browsertest.cc" ]
-    deps = [
-      ":whats_new",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser:browser_process",
-      "//chrome/browser:global_features",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/common:version_header",
-      "//chrome/test:test_support_ui",
-      "//components/user_education/common",
-      "//components/user_education/webui",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
-  }
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [ "whats_new_fetcher_browsertest.cc" ]
+  deps = [
+    ":whats_new",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser:browser_process",
+    "//chrome/browser:global_features",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/common:version_header",
+    "//chrome/test:test_support_ui",
+    "//components/user_education/common",
+    "//components/user_education/webui",
+    "//content/test:test_support",
+    "//testing/gtest",
+  ]
 }
 
 source_set("interactive_ui_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  if (!is_android) {
-    sources = [ "whats_new_fetcher_interactive_uitest.cc" ]
-    deps = [
-      ":whats_new",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser:browser_process",
-      "//chrome/browser:global_features",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:ui_features",
-      "//chrome/common:version_header",
-      "//chrome/test:test_support_ui",
-      "//components/user_education/common",
-      "//components/user_education/webui",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
-    if (use_ozone) {
-      deps += [ "//ui//ozone" ]
-    }
-    if (is_linux) {
-      deps += [ "//ui/views:test_support" ]
-    }
+  sources = [ "whats_new_fetcher_interactive_uitest.cc" ]
+  deps = [
+    ":whats_new",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser:browser_process",
+    "//chrome/browser:global_features",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:ui_features",
+    "//chrome/common:version_header",
+    "//chrome/test:test_support_ui",
+    "//components/user_education/common",
+    "//components/user_education/webui",
+    "//content/test:test_support",
+    "//testing/gtest",
+  ]
+  if (use_ozone) {
+    deps += [ "//ui//ozone" ]
+  }
+  if (is_linux) {
+    deps += [ "//ui/views:test_support" ]
   }
 }

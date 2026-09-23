@@ -1426,12 +1426,10 @@ component("base") {
     }
   }
 
-  if (!is_win) {
-    sources += [
-      "file_descriptor_store.cc",
-      "file_descriptor_store.h",
-    ]
-  }
+  sources += [
+    "file_descriptor_store.cc",
+    "file_descriptor_store.h",
+  ]
 
   # Mac or iOS.
   if (is_apple) {
@@ -1625,12 +1623,10 @@ component("base") {
       ]
     }
   } else {
-    if (!is_android) {
-      sources -= [
-        "linux_util.cc",
-        "linux_util.h",
-      ]
-    }
+    sources -= [
+      "linux_util.cc",
+      "linux_util.h",
+    ]
   }
 
   if (use_blink) {
@@ -1872,10 +1868,9 @@ source_set("simdutf_shim") {
     "//build/config/compiler:wexit_time_destructors",
     "//build/config/compiler:wglobal_constructors",
   ]
-  if (!is_win) {
-    # Generates -Werror,-Wsign-conversion
-    configs += [ "//build/config/compiler:prevent_unsafe_narrowing" ]
-  }
+
+  # Generates -Werror,-Wsign-conversion
+  configs += [ "//build/config/compiler:prevent_unsafe_narrowing" ]
 
   public = [ "simdutf_shim.h" ]
   sources = [ "simdutf_shim.cc" ]
@@ -2446,28 +2441,26 @@ test("base_i18n_perftests") {
   ]
 }
 
-if (!is_ios) {
-  executable("build_utf8_validator_tables") {
-    sources = [ "i18n/build_utf8_validator_tables.cc" ]
-    deps = [
-      ":base",
-      "//build/win:default_exe_manifest",
-      "//third_party/icu:icuuc",
-    ]
-  }
+executable("build_utf8_validator_tables") {
+  sources = [ "i18n/build_utf8_validator_tables.cc" ]
+  deps = [
+    ":base",
+    "//build/win:default_exe_manifest",
+    "//third_party/icu:icuuc",
+  ]
+}
 
-  executable("check_example") {
-    sources = [ "check_example.cc" ]
-    deps = [
-      ":base",
-      "//build/win:default_exe_manifest",
-    ]
-  }
+executable("check_example") {
+  sources = [ "check_example.cc" ]
+  deps = [
+    ":base",
+    "//build/win:default_exe_manifest",
+  ]
+}
 
-  executable("json_perftest_decodebench") {
-    sources = [ "json/json_perftest_decodebench.cc" ]
-    deps = [ ":base" ]
-  }
+executable("json_perftest_decodebench") {
+  sources = [ "json/json_perftest_decodebench.cc" ]
+  deps = [ ":base" ]
 }
 
 if ((is_win && (current_cpu == "x64" || current_cpu == "arm64")) || is_mac ||
@@ -3170,9 +3163,7 @@ test("base_unittests") {
       "allocator/partition_allocator/src/partition_alloc/tagging_unittest.cc",
     ]
 
-    if (!is_ios) {
-      sources += [ "memory/shared_memory_switch_unittest.cc" ]
-    }
+    sources += [ "memory/shared_memory_switch_unittest.cc" ]
 
     data_deps += [ "//base/test:test_proto_descriptor" ]
     data += [ "$root_gen_dir/base/test/test_proto.descriptor" ]
@@ -3306,9 +3297,7 @@ test("base_unittests") {
     sources += [ "message_loop/message_pump_epoll_unittest.cc" ]
   }
 
-  if (!is_ios) {
-    sources += [ "files/file_locking_unittest.cc" ]
-  }
+  sources += [ "files/file_locking_unittest.cc" ]
 
   if (is_apple) {
     sources += [ "profiler/frame_pointer_unwinder_unittest.cc" ]

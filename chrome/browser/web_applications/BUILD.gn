@@ -467,16 +467,14 @@ source_set("web_applications") {
     ]
   }
 
-  if (!is_android) {
-    sources += [
-      "policy/web_app_settings_policy_handler.cc",
-      "policy/web_app_settings_policy_handler.h",
-      "policy/web_app_user_install_policy_handler.cc",
-      "policy/web_app_user_install_policy_handler.h",
-      "web_app_utils.cc",
-      "web_app_utils.h",
-    ]
-  }
+  sources += [
+    "policy/web_app_settings_policy_handler.cc",
+    "policy/web_app_settings_policy_handler.h",
+    "policy/web_app_user_install_policy_handler.cc",
+    "policy/web_app_user_install_policy_handler.h",
+    "web_app_utils.cc",
+    "web_app_utils.h",
+  ]
 
   sources += [
     "navigation_capturing_settings_impl.cc",
@@ -680,20 +678,18 @@ source_set("iwa_types") {
   ]
 }
 
-if (!is_android) {
-  source_set("web_applications_metrics") {
-    sources = [
-      "sampling_metrics_provider.cc",
-      "sampling_metrics_provider.h",
-    ]
-    deps = [
-      ":web_applications",
-      "//chrome/browser/apps/app_service",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/web_applications",
-    ]
-    public_deps = [ "//base" ]
-  }
+source_set("web_applications_metrics") {
+  sources = [
+    "sampling_metrics_provider.cc",
+    "sampling_metrics_provider.h",
+  ]
+  deps = [
+    ":web_applications",
+    "//chrome/browser/apps/app_service",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/web_applications",
+  ]
+  public_deps = [ "//base" ]
 }
 
 # This test_support library doesn't use extensions. It must not depend on
@@ -861,9 +857,6 @@ source_set("web_applications_unit_tests") {
     sources += []
   }
 
-  if (!is_android) {
-  }
-
   deps = [
     ":features",
     ":web_app_test",
@@ -985,24 +978,22 @@ source_set("web_app_test") {
 # Separate from :web_applications_test_support because this browser-test
 # helper depends on //chrome/test:test_support, which cannot be a dependency
 # of :web_applications_test_support without forming a cycle.
-if (!is_android) {
-  source_set("profile_test_support") {
-    testonly = true
+source_set("profile_test_support") {
+  testonly = true
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    public_deps = [
-      "//base",
-      "//chrome/test:test_support",
-    ]
+  public_deps = [
+    "//base",
+    "//chrome/test:test_support",
+  ]
 
-    deps = [
-      ":web_applications_test_support",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui",
-      "//chrome/common:constants",
-    ]
-  }
+  deps = [
+    ":web_applications_test_support",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui",
+    "//chrome/common:constants",
+  ]
 }
 
 source_set("app_id_helpers") {

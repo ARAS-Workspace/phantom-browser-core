@@ -37,12 +37,10 @@ component("animation") {
     sources += [ "animation_linux.cc" ]
   }
 
-  if (!is_android) {
-    sources += [
-      "throb_animation.cc",
-      "throb_animation.h",
-    ]
-  }
+  sources += [
+    "throb_animation.cc",
+    "throb_animation.h",
+  ]
 
   if (is_mac) {
     frameworks = [

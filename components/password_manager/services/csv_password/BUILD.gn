@@ -3,17 +3,15 @@
 # found in the LICENSE file.
 
 source_set("lib") {
-  if (!is_ios) {
-    sources = [
-      "csv_password_parser_impl.cc",
-      "csv_password_parser_impl.h",
-    ]
-    deps = [
-      "//base",
-      "//components/password_manager/core/browser/import:csv",
-      "//mojo/public/cpp/bindings",
-    ]
-  }
+  sources = [
+    "csv_password_parser_impl.cc",
+    "csv_password_parser_impl.h",
+  ]
+  deps = [
+    "//base",
+    "//components/password_manager/core/browser/import:csv",
+    "//mojo/public/cpp/bindings",
+  ]
 
   public_deps =
       [ "//components/password_manager/services/csv_password/public/mojom" ]

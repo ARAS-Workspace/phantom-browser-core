@@ -57,14 +57,12 @@ source_set("notifications") {
 
   deps = [ "//components/content_settings/core/browser" ]
 
-  if (!is_android) {
-    public += [
-      "muted_notification_handler.h",
-      "profile_notification.h",
-    ]
+  public += [
+    "muted_notification_handler.h",
+    "profile_notification.h",
+  ]
 
-    public_deps += [ "//components/keep_alive_registry" ]
-  }
+  public_deps += [ "//components/keep_alive_registry" ]
 
   if (is_mac) {
     public += [
@@ -166,25 +164,23 @@ source_set("impl") {
     "//ui/strings:ui_strings_grit",
   ]
 
-  if (!is_android) {
-    sources += [
-      "muted_notification_handler.cc",
-      "profile_notification.cc",
-      "screen_capture_notification_blocker.cc",
-      "screen_capture_notification_blocker.h",
-    ]
+  sources += [
+    "muted_notification_handler.cc",
+    "profile_notification.cc",
+    "screen_capture_notification_blocker.cc",
+    "screen_capture_notification_blocker.h",
+  ]
 
-    deps += [
-      "//chrome/browser/media/webrtc",
-      "//chrome/browser/ui:chrome_pages",
-      "//chrome/browser/ui/navigator",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/web_applications",
-      "//chrome/browser/web_applications/proto",
-    ]
+  deps += [
+    "//chrome/browser/media/webrtc",
+    "//chrome/browser/ui:chrome_pages",
+    "//chrome/browser/ui/navigator",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/web_applications",
+    "//chrome/browser/web_applications/proto",
+  ]
 
-    deps += [ "//chrome/browser/default_browser" ]
-  }
+  deps += [ "//chrome/browser/default_browser" ]
 
   if (is_mac) {
     sources += [
@@ -337,14 +333,11 @@ source_set("unit_tests") {
     ]
   }
 
-  if (!is_android) {
-    sources += [
-      "muted_notification_handler_unittest.cc",
-      "screen_capture_notification_blocker_unittest.cc",
-    ]
-    deps +=
-        [ "//chrome/browser/web_applications:web_applications_test_support" ]
-  }
+  sources += [
+    "muted_notification_handler_unittest.cc",
+    "screen_capture_notification_blocker_unittest.cc",
+  ]
+  deps += [ "//chrome/browser/web_applications:web_applications_test_support" ]
 
   if (is_mac) {
     sources += [
@@ -372,61 +365,59 @@ source_set("unit_tests") {
   }
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
+source_set("browser_tests") {
+  testonly = true
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [ "notification_permission_browsertest.cc" ]
+  sources = [ "notification_permission_browsertest.cc" ]
 
-    deps = [
-      ":notifications",
-      ":test_support",
-      "//base",
-      "//chrome/browser:chrome_content_browser_client",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
+  deps = [
+    ":notifications",
+    ":test_support",
+    "//base",
+    "//chrome/browser:chrome_content_browser_client",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//content/test:test_support",
+    "//testing/gtest",
+  ]
+}
+
+source_set("interactive_ui_tests") {
+  testonly = true
+
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  sources = [ "platform_notification_service_interactive_uitest.cc" ]
+
+  deps = [
+    ":notifications",
+    ":test_support",
+    "//base",
+    "//chrome/browser/permissions",
+    "//chrome/browser/web_applications:web_applications_test_support",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/infobars/content",
+    "//content/test:test_support",
+    "//testing/gtest",
+  ]
+
+  sources += [
+    "notification_interactive_uitest.cc",
+    "notification_interactive_uitest_support.cc",
+    "notification_interactive_uitest_support.h",
+  ]
+
+  if (is_mac) {
+    sources += [ "mac/notification_interactive_uitest_mac.mm" ]
   }
 
-  source_set("interactive_ui_tests") {
-    testonly = true
-
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-
-    sources = [ "platform_notification_service_interactive_uitest.cc" ]
-
-    deps = [
-      ":notifications",
-      ":test_support",
-      "//base",
-      "//chrome/browser/permissions",
-      "//chrome/browser/web_applications:web_applications_test_support",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/infobars/content",
-      "//content/test:test_support",
-      "//testing/gtest",
-    ]
-
+  if (enable_chrome_notifications) {
     sources += [
-      "notification_interactive_uitest.cc",
-      "notification_interactive_uitest_support.cc",
-      "notification_interactive_uitest_support.h",
+      "notification_ui_manager_browsertest.cc",
+      "notification_ui_manager_interactive_uitest.cc",
     ]
-
-    if (is_mac) {
-      sources += [ "mac/notification_interactive_uitest_mac.mm" ]
-    }
-
-    if (enable_chrome_notifications) {
-      sources += [
-        "notification_ui_manager_browsertest.cc",
-        "notification_ui_manager_interactive_uitest.cc",
-      ]
-    }
   }
 }

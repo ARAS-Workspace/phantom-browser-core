@@ -72,14 +72,12 @@ source_set("searchbox_impl") {
     "//components/sessions",
     "//components/vector_icons",
   ]
-  if (!is_android) {
-    deps += [
-      "//chrome/browser/new_tab_page",
-      "//chrome/browser/ui/bookmarks",
-      "//chrome/browser/ui/omnibox/omnibox_everywhere",
-      "//chrome/browser/ui/tabs",
-      "//chrome/browser/ui/views/location_bar",
-      "//chrome/browser/ui/webui/omnibox_popup",
-    ]
-  }
+  deps += [
+    "//chrome/browser/new_tab_page",
+    "//chrome/browser/ui/bookmarks",
+    "//chrome/browser/ui/omnibox/omnibox_everywhere",
+    "//chrome/browser/ui/tabs",
+    "//chrome/browser/ui/views/location_bar",
+    "//chrome/browser/ui/webui/omnibox_popup",
+  ]
 }

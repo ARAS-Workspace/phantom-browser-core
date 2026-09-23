@@ -94,9 +94,7 @@ source_set("browser_tests") {
 
   sources = [ "service_browsertest.cc" ]
 
-  if (!is_android) {
-    sources += [ "client_util/local_tab_handler_browsertest.cc" ]
-  }
+  sources += [ "client_util/local_tab_handler_browsertest.cc" ]
 
   deps = [
     ":impl",

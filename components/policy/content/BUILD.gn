@@ -8,16 +8,10 @@ assert(use_blink,
        "Policy Throttle should not be referenced on non-blink platforms")
 
 source_set("content") {
-  # TODO(crbug.com/452575535): Disable policy_blocklist_navigation_throttle.cc/h
-  # until the iOS-specific implementation of PolicyBlocklistService is resolved.
-  # The PolicyBlocklistService is currently duplicated in
-  # `ios/chrome/browser/policy_url_blocking/model/policy_url_blocking_service.h`.
-  if (!is_ios) {
-    sources = [
-      "policy_blocklist_navigation_throttle.cc",
-      "policy_blocklist_navigation_throttle.h",
-    ]
-  }
+  sources = [
+    "policy_blocklist_navigation_throttle.cc",
+    "policy_blocklist_navigation_throttle.h",
+  ]
 
   deps = [
     "//components/policy/core/browser",
@@ -29,14 +23,7 @@ source_set("unit_tests") {
   testonly = true
   sources = []
 
-  # TODO(crbug.com/452575535): Disable
-  # policy_blocklist_navigation_throttle_unittest.cc as well until the
-  # iOS-specific implementation of PolicyBlocklistService is resolved. The
-  # PolicyBlocklistService is currently duplicated in
-  # `ios/chrome/browser/policy_url_blocking/model/policy_url_blocking_service.h`.
-  if (!is_ios) {
-    sources += [ "policy_blocklist_navigation_throttle_unittest.cc" ]
-  }
+  sources += [ "policy_blocklist_navigation_throttle_unittest.cc" ]
 
   deps = [
     ":content",

@@ -220,52 +220,50 @@ if (enable_printing) {
     }
   }
 
-  if (!is_android) {
-    source_set("browser_tests") {
-      testonly = true
+  source_set("browser_tests") {
+    testonly = true
 
-      defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-      sources = []
+    sources = []
 
-      deps = [
-        ":printing",
-        "//base",
-        "//chrome/common:constants",
-        "//chrome/test:test_support",
-        "//chrome/test:test_support_ui",
-        "//content/public/browser",
-        "//content/test:test_support",
-        "//printing",
-        "//testing/gtest",
+    deps = [
+      ":printing",
+      "//base",
+      "//chrome/common:constants",
+      "//chrome/test:test_support",
+      "//chrome/test:test_support_ui",
+      "//content/public/browser",
+      "//content/test:test_support",
+      "//printing",
+      "//testing/gtest",
+    ]
+
+    if (enable_oop_printing) {
+      sources += [ "print_backend_browsertest.cc" ]
+      deps += [
+        "//chrome/browser",
+        "//chrome/services/printing:lib",
+        "//chrome/services/printing/public/mojom",
+        "//components/printing/browser",
+        "//components/printing/common:mojo_interfaces",
+        "//mojo/public/cpp/bindings",
+        "//printing:test_support",
+        "//printing/backend",
+        "//printing/backend:test_support",
       ]
+    }
 
-      if (enable_oop_printing) {
-        sources += [ "print_backend_browsertest.cc" ]
-        deps += [
-          "//chrome/browser",
-          "//chrome/services/printing:lib",
-          "//chrome/services/printing/public/mojom",
-          "//components/printing/browser",
-          "//components/printing/common:mojo_interfaces",
-          "//mojo/public/cpp/bindings",
-          "//printing:test_support",
-          "//printing/backend",
-          "//printing/backend:test_support",
-        ]
-      }
+    if (enable_print_preview) {
+      sources += [ "pwg_raster_converter_browsertest.cc" ]
+    }
 
-      if (enable_print_preview) {
-        sources += [ "pwg_raster_converter_browsertest.cc" ]
-      }
-
-      if (enable_pdf) {
-        sources += [ "pdf_nup_converter_client_browsertest.cc" ]
-        deps += [
-          "//chrome/browser/ui",
-          "//pdf",
-        ]
-      }
+    if (enable_pdf) {
+      sources += [ "pdf_nup_converter_client_browsertest.cc" ]
+      deps += [
+        "//chrome/browser/ui",
+        "//pdf",
+      ]
     }
   }
 }

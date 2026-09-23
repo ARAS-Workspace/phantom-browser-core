@@ -181,78 +181,74 @@ source_set("content_settings_util_impl") {
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 
-  if (!is_android) {
-    deps += [
-      "//chrome/browser/ui/location_bar",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/views/picture_in_picture",
-    ]
-  }
+  deps += [
+    "//chrome/browser/ui/location_bar",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/views/picture_in_picture",
+  ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [
-      "mixed_content_settings_tab_helper_browsertest.cc",
-      "sound_content_setting_observer_browsertest.cc",
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  sources = [
+    "mixed_content_settings_tab_helper_browsertest.cc",
+    "sound_content_setting_observer_browsertest.cc",
+  ]
+
+  deps = [
+    ":content_settings",
+    ":content_settings_factory",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/browsing_data",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui:view_ids",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/content_settings",
+    "//chrome/test:test_support_ui",
+    "//components/content_settings/browser",
+    "//components/content_settings/core/browser",
+    "//components/network_session_configurator/common",
+    "//content/public/browser",
+    "//content/public/common",
+    "//content/test:test_support",
+    "//net:test_support",
+    "//testing/gtest",
+    "//third_party/blink/public/common",
+    "//third_party/blink/public/common:headers",
+    "//url",
+  ]
+
+  if (enable_extensions && enable_plugins) {
+    sources += [ "content_settings_browsertest.cc" ]
+
+    deps += [
+      "//build:chromeos_buildflags",
+      "//chrome/browser",
+      "//chrome/browser/ui/tabs:tab_strip",
+      "//chrome/common:chrome_features",
+      "//chrome/common:constants",
+      "//chrome/test:test_support",
+      "//components/browsing_data/content",
+      "//components/content_settings/core/browser:cookie_settings",
+      "//components/content_settings/core/common",
+      "//components/prefs",
+      "//content/public/common:buildflags",
+      "//pdf:buildflags",
+      "//services/network/public/cpp",
+      "//testing/gmock",
+      "//third_party/widevine/cdm:buildflags",
     ]
-
-    deps = [
-      ":content_settings",
-      ":content_settings_factory",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/browsing_data",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui:view_ids",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/content_settings",
-      "//chrome/test:test_support_ui",
-      "//components/content_settings/browser",
-      "//components/content_settings/core/browser",
-      "//components/network_session_configurator/common",
-      "//content/public/browser",
-      "//content/public/common",
-      "//content/test:test_support",
-      "//net:test_support",
-      "//testing/gtest",
-      "//third_party/blink/public/common",
-      "//third_party/blink/public/common:headers",
-      "//url",
-    ]
-
-    if (enable_extensions && enable_plugins) {
-      sources += [ "content_settings_browsertest.cc" ]
-
-      deps += [
-        "//build:chromeos_buildflags",
-        "//chrome/browser",
-        "//chrome/browser/ui/tabs:tab_strip",
-        "//chrome/common:chrome_features",
-        "//chrome/common:constants",
-        "//chrome/test:test_support",
-        "//components/browsing_data/content",
-        "//components/content_settings/core/browser:cookie_settings",
-        "//components/content_settings/core/common",
-        "//components/prefs",
-        "//content/public/common:buildflags",
-        "//pdf:buildflags",
-        "//services/network/public/cpp",
-        "//testing/gmock",
-        "//third_party/widevine/cdm:buildflags",
-      ]
-
-      if (enable_pdf) {
-        deps += [ "//components/pdf/browser" ]
-      }
-    }
 
     if (enable_pdf) {
-      deps += [ "//chrome/browser/pdf:pdf_extension_test_base" ]
+      deps += [ "//components/pdf/browser" ]
     }
+  }
+
+  if (enable_pdf) {
+    deps += [ "//chrome/browser/pdf:pdf_extension_test_base" ]
   }
 }
 

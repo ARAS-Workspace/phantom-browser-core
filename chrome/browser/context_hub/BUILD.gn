@@ -46,12 +46,10 @@ source_set("context_hub") {
     "//components/tab_groups",
   ]
 
-  if (!is_android) {
-    public_deps += [
-      "//chrome/browser/ui:browser_tab_strip",
-      "//chrome/browser/ui/tabs:tab_strip_model_observer",
-    ]
-  }
+  public_deps += [
+    "//chrome/browser/ui:browser_tab_strip",
+    "//chrome/browser/ui/tabs:tab_strip_model_observer",
+  ]
 
   deps = [
     "//chrome/browser/tab_group_sync",
@@ -91,7 +89,5 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_android) {
-    deps += [ "//chrome/browser/ui/tabs:tab_strip_model_observer" ]
-  }
+  deps += [ "//chrome/browser/ui/tabs:tab_strip_model_observer" ]
 }

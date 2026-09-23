@@ -15,9 +15,7 @@ source_set("status_icons") {
     "//ui/menus",
   ]
 
-  if (!is_android) {
-    sources += [ "desktop_notification_balloon.h" ]
-  }
+  sources += [ "desktop_notification_balloon.h" ]
 }
 
 source_set("impl") {
@@ -32,13 +30,11 @@ source_set("impl") {
     "//ui/gfx",
   ]
 
-  if (!is_android) {
-    sources += [ "desktop_notification_balloon.cc" ]
-    deps += [
-      "//chrome/browser/notifications",
-      "//ui/message_center/public/cpp",
-    ]
-  }
+  sources += [ "desktop_notification_balloon.cc" ]
+  deps += [
+    "//chrome/browser/notifications",
+    "//ui/message_center/public/cpp",
+  ]
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }

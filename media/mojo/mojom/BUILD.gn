@@ -1025,9 +1025,7 @@ source_set("unit_tests") {
     "video_frame_mojom_traits_unittest.cc",
   ]
 
-  if (!is_android) {
-    sources += [ "speech_recognition_result_mojom_traits_unittest.cc" ]
-  }
+  sources += [ "speech_recognition_result_mojom_traits_unittest.cc" ]
 
   deps = [
     ":speech_recognition",

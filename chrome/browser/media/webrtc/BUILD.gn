@@ -193,30 +193,28 @@ source_set("webrtc") {
     ]
   }
 
-  if (!is_android) {
-    sources += [
-      "current_tab_desktop_media_list.cc",
-      "current_tab_desktop_media_list.h",
-      "desktop_media_picker_utils.cc",
-      "desktop_media_picker_utils.h",
-      "media_stream_focus_delegate.cc",
-      "media_stream_focus_delegate.h",
-      "tab_desktop_media_list.cc",
-      "tab_desktop_media_list.h",
-    ]
-    public_deps += [
-      "//chrome/browser/ui/tabs:tab_strip_model_observer",
-      "//extensions/buildflags",
-    ]
-    deps += [
-      "//chrome/browser/controlled_frame:media_access_handler",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/web_applications",
-      "//extensions/browser",
-      "//extensions/browser/kiosk",
-      "//extensions/common",
-    ]
-  }
+  sources += [
+    "current_tab_desktop_media_list.cc",
+    "current_tab_desktop_media_list.h",
+    "desktop_media_picker_utils.cc",
+    "desktop_media_picker_utils.h",
+    "media_stream_focus_delegate.cc",
+    "media_stream_focus_delegate.h",
+    "tab_desktop_media_list.cc",
+    "tab_desktop_media_list.h",
+  ]
+  public_deps += [
+    "//chrome/browser/ui/tabs:tab_strip_model_observer",
+    "//extensions/buildflags",
+  ]
+  deps += [
+    "//chrome/browser/controlled_frame:media_access_handler",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/ui/web_applications",
+    "//extensions/browser",
+    "//extensions/browser/kiosk",
+    "//extensions/common",
+  ]
 
   if (enable_screen_capture) {
     sources += [
@@ -275,83 +273,81 @@ source_set("test_support") {
   ]
 }
 
-if (!is_android) {
-  # Shared WebRTC browser-test base fixtures (WebRtcTestBase etc.), used by
-  # the media/webrtc browser tests and by several other browser-test suites
-  # (picture_in_picture, ash video conference, ...).
-  static_library("webrtc_browser_tests_base") {
-    testonly = true
+# Shared WebRTC browser-test base fixtures (WebRtcTestBase etc.), used by
+# the media/webrtc browser tests and by several other browser-test suites
+# (picture_in_picture, ash video conference, ...).
+static_library("webrtc_browser_tests_base") {
+  testonly = true
 
-    sources = [
-      "test_stats_dictionary.cc",
-      "test_stats_dictionary.h",
-      "webrtc_browsertest_base.cc",
-      "webrtc_browsertest_base.h",
-      "webrtc_browsertest_common.cc",
-      "webrtc_browsertest_common.h",
-      "webrtc_browsertest_perf.cc",
-      "webrtc_browsertest_perf.h",
-    ]
-    deps = [
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/test:test_support",
-    ]
-  }
+  sources = [
+    "test_stats_dictionary.cc",
+    "test_stats_dictionary.h",
+    "webrtc_browsertest_base.cc",
+    "webrtc_browsertest_base.h",
+    "webrtc_browsertest_common.cc",
+    "webrtc_browsertest_common.h",
+    "webrtc_browsertest_perf.cc",
+    "webrtc_browsertest_perf.h",
+  ]
+  deps = [
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/test:test_support",
+  ]
+}
 
-  source_set("browser_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+source_set("browser_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    # Some of these tests declare file-scope objects with non-trivial
-    # destructors (e.g. webrtc_getdisplaymedia_browsertest.cc).
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+  # Some of these tests declare file-scope objects with non-trivial
+  # destructors (e.g. webrtc_getdisplaymedia_browsertest.cc).
+  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-    sources = [
-      "capture_handle_browsertest.cc",
-      "display_media_access_handler_browsertest.cc",
-      "media_stream_devices_controller_browsertest.cc",
-      "media_stream_focus_delegate_browsertest.cc",
-      "same_origin_observer_browsertest.cc",
-      "sub_capture_browsertest.cc",
-      "tab_desktop_media_list_browsertest.cc",
-      "webrtc_browsertest_perf_unittest.cc",
-      "webrtc_desktop_capture_browsertest.cc",
-      "webrtc_disable_encryption_flag_browsertest.cc",
-      "webrtc_getdisplaymedia_browsertest.cc",
-      "webrtc_internals_integration_browsertest.cc",
-      "webrtc_pan_tilt_zoom_browsertest.cc",
-      "webrtc_stats_perf_browsertest.cc",
-      "webrtc_video_display_perf_browsertest.cc",
-      "webrtc_video_high_bitrate_browsertest.cc",
-      "webrtc_video_quality_browsertest.cc",
-      "webrtc_webcam_browsertest.cc",
-    ]
-    deps = [
-      ":test_support",
-      ":webrtc",
-      ":webrtc_browser_tests_base",
-      "//base",
-      "//chrome/browser:test_support",
-      "//chrome/browser/apps/platform_apps:browser_test_support",
-      "//chrome/browser/extensions:test_support",
-      "//chrome/browser/extensions/api/desktop_capture",
-      "//chrome/browser/permissions",
-      "//chrome/browser/sessions:test_support",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/apps",
-      "//chrome/browser/ui/tab_sharing",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/web_applications:web_applications_test_support",
-      "//chrome/browser/web_applications/isolated_web_apps/test:test_support",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/infobars/content",
-      "//components/permissions:test_support",
-      "//content/test:test_support",
-      "//net:test_support",
-      "//testing/gtest",
-    ]
-  }
+  sources = [
+    "capture_handle_browsertest.cc",
+    "display_media_access_handler_browsertest.cc",
+    "media_stream_devices_controller_browsertest.cc",
+    "media_stream_focus_delegate_browsertest.cc",
+    "same_origin_observer_browsertest.cc",
+    "sub_capture_browsertest.cc",
+    "tab_desktop_media_list_browsertest.cc",
+    "webrtc_browsertest_perf_unittest.cc",
+    "webrtc_desktop_capture_browsertest.cc",
+    "webrtc_disable_encryption_flag_browsertest.cc",
+    "webrtc_getdisplaymedia_browsertest.cc",
+    "webrtc_internals_integration_browsertest.cc",
+    "webrtc_pan_tilt_zoom_browsertest.cc",
+    "webrtc_stats_perf_browsertest.cc",
+    "webrtc_video_display_perf_browsertest.cc",
+    "webrtc_video_high_bitrate_browsertest.cc",
+    "webrtc_video_quality_browsertest.cc",
+    "webrtc_webcam_browsertest.cc",
+  ]
+  deps = [
+    ":test_support",
+    ":webrtc",
+    ":webrtc_browser_tests_base",
+    "//base",
+    "//chrome/browser:test_support",
+    "//chrome/browser/apps/platform_apps:browser_test_support",
+    "//chrome/browser/extensions:test_support",
+    "//chrome/browser/extensions/api/desktop_capture",
+    "//chrome/browser/permissions",
+    "//chrome/browser/sessions:test_support",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/apps",
+    "//chrome/browser/ui/tab_sharing",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/browser/web_applications:web_applications_test_support",
+    "//chrome/browser/web_applications/isolated_web_apps/test:test_support",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/infobars/content",
+    "//components/permissions:test_support",
+    "//content/test:test_support",
+    "//net:test_support",
+    "//testing/gtest",
+  ]
 }
 
 source_set("unit_tests") {
@@ -391,54 +387,45 @@ source_set("unit_tests") {
     "//third_party/zlib/google:compression_utils",
   ]
 
-  # These media/webrtc unit tests are desktop-only (!is_android);
-  # test_stats_dictionary additionally lives in the desktop-only browser-test
-  # base.
-  if (!is_android) {
-    sources += [
-      "current_tab_desktop_media_list_unittest.cc",
-      "desktop_capture_access_handler_unittest.cc",
-      "desktop_media_picker_controller_unittest.cc",
-      "display_media_access_handler_unittest.cc",
-      "media_capture_devices_dispatcher_unittest.cc",
-      "media_stream_capture_indicator_unittest.cc",
-      "rtc_diagnostic_logging_unittest.cc",
-      "tab_capture_access_handler_unittest.cc",
-      "test_stats_dictionary_unittest.cc",
-      "webrtc_event_log_manager_common_unittest.cc",
-      "webrtc_event_log_manager_unittest.cc",
-      "webrtc_event_log_manager_unittest_helpers.cc",
-      "webrtc_event_log_manager_unittest_helpers.h",
-      "webrtc_event_log_uploader_impl_unittest.cc",
-      "webrtc_log_uploader_unittest.cc",
-      "webrtc_logging_controller_unittest.cc",
-      "webrtc_rtp_dump_handler_unittest.cc",
-      "webrtc_rtp_dump_writer_unittest.cc",
-      "webrtc_text_log_handler_unittest.cc",
-    ]
-    deps += [
-      ":test_support",
-      ":webrtc_browser_tests_base",
-      "//chrome/browser/web_applications:web_app_test",
-      "//chrome/browser/web_applications:web_applications_test_support",
-    ]
-  }
+  sources += [
+    "current_tab_desktop_media_list_unittest.cc",
+    "desktop_capture_access_handler_unittest.cc",
+    "desktop_media_picker_controller_unittest.cc",
+    "display_media_access_handler_unittest.cc",
+    "media_capture_devices_dispatcher_unittest.cc",
+    "media_stream_capture_indicator_unittest.cc",
+    "rtc_diagnostic_logging_unittest.cc",
+    "tab_capture_access_handler_unittest.cc",
+    "test_stats_dictionary_unittest.cc",
+    "webrtc_event_log_manager_common_unittest.cc",
+    "webrtc_event_log_manager_unittest.cc",
+    "webrtc_event_log_manager_unittest_helpers.cc",
+    "webrtc_event_log_manager_unittest_helpers.h",
+    "webrtc_event_log_uploader_impl_unittest.cc",
+    "webrtc_log_uploader_unittest.cc",
+    "webrtc_logging_controller_unittest.cc",
+    "webrtc_rtp_dump_handler_unittest.cc",
+    "webrtc_rtp_dump_writer_unittest.cc",
+    "webrtc_text_log_handler_unittest.cc",
+  ]
+  deps += [
+    ":test_support",
+    ":webrtc_browser_tests_base",
+    "//chrome/browser/web_applications:web_app_test",
+    "//chrome/browser/web_applications:web_applications_test_support",
+  ]
 
-  # native_desktop_media_list is not built on ChromeOS (it uses the desktop
-  # DesktopMediaList backend), so it is desktop-only excluding ChromeOS.
-  if (!is_android) {
-    sources += [ "native_desktop_media_list_unittest.cc" ]
-    deps += [
-      "//chrome/test/views",
-      "//content/public/browser",
-      "//ui/views",
-    ]
-    if (use_aura) {
-      deps += [ "//ui/aura" ]
-    }
-    if (is_mac) {
-      deps += [ "//components/remote_cocoa/browser" ]
-    }
+  sources += [ "native_desktop_media_list_unittest.cc" ]
+  deps += [
+    "//chrome/test/views",
+    "//content/public/browser",
+    "//ui/views",
+  ]
+  if (use_aura) {
+    deps += [ "//ui/aura" ]
+  }
+  if (is_mac) {
+    deps += [ "//components/remote_cocoa/browser" ]
   }
 
   if (is_mac) {
@@ -451,50 +438,46 @@ source_set("unit_tests") {
   }
 }
 
-# Interactive UI tests cannot run on ChromeOS devices; see
-# //docs/testing/chromeos_integration for background.
-if (!is_android) {
-  source_set("interactive_ui_tests") {
-    testonly = true
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+source_set("interactive_ui_tests") {
+  testonly = true
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "conditional_focus_interactive_uitest.cc",
-      "display_media_access_handler_interactive_uitest.cc",
-      "media_stream_permission_interactive_uitest.cc",
-      "webrtc_interactive_uitest.cc",
-      "webrtc_mediadevices_interactive_uitest.cc",
-    ]
-    deps = [
-      ":webrtc",
-      ":webrtc_browser_tests_base",
-      "//base",
-      "//chrome/browser/content_settings:content_settings_factory",
-      "//chrome/browser/picture_in_picture",
-      "//chrome/browser/preloading:test_support",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/common",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/content_settings/core/browser",
-      "//components/content_settings/core/common",
-      "//components/media_device_salt",
-      "//components/permissions:test_support",
-      "//components/prefs",
-      "//content/public/browser",
-      "//content/public/common",
-      "//content/test:test_support",
-      "//media",
-      "//services/network/public/cpp",
-      "//services/network/public/mojom",
-      "//testing/gtest",
-      "//ui/gl",
-    ]
+  sources = [
+    "conditional_focus_interactive_uitest.cc",
+    "display_media_access_handler_interactive_uitest.cc",
+    "media_stream_permission_interactive_uitest.cc",
+    "webrtc_interactive_uitest.cc",
+    "webrtc_mediadevices_interactive_uitest.cc",
+  ]
+  deps = [
+    ":webrtc",
+    ":webrtc_browser_tests_base",
+    "//base",
+    "//chrome/browser/content_settings:content_settings_factory",
+    "//chrome/browser/picture_in_picture",
+    "//chrome/browser/preloading:test_support",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/tabs:tab_strip",
+    "//chrome/common",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/content_settings/core/browser",
+    "//components/content_settings/core/common",
+    "//components/media_device_salt",
+    "//components/permissions:test_support",
+    "//components/prefs",
+    "//content/public/browser",
+    "//content/public/common",
+    "//content/test:test_support",
+    "//media",
+    "//services/network/public/cpp",
+    "//services/network/public/mojom",
+    "//testing/gtest",
+    "//ui/gl",
+  ]
 
-    if (use_ozone) {
-      deps += [ "//ui/ozone" ]
-    }
+  if (use_ozone) {
+    deps += [ "//ui/ozone" ]
   }
 }

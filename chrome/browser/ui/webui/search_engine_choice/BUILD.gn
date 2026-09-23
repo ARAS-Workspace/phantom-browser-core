@@ -9,38 +9,36 @@ mojom("mojo_bindings") {
   webui_module_path = "/"
 }
 
-if (!is_android) {
-  source_set("search_engine_choice") {
-    sources = [
-      "search_engine_choice_handler.cc",
-      "search_engine_choice_ui.cc",
-    ]
-    public = [
-      "search_engine_choice_handler.h",
-      "search_engine_choice_ui.h",
-    ]
-    public_deps = [ "//chrome/browser:browser_public_dependencies" ]
-    deps = [
-      ":mojo_bindings",
-      "//base",
-      "//chrome/app:generated_resources",
-      "//chrome/app/theme:chrome_unscaled_resources",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/regional_capabilities",
-      "//chrome/browser/resources/search_engine_choice:resources",
-      "//chrome/browser/resources/signin:resources",
-      "//chrome/browser/search_engine_choice",
-      "//chrome/common",
-      "//components/regional_capabilities",
-      "//components/search_engines",
-      "//components/signin/public/base",
-      "//components/strings:components_branded_strings",
-      "//components/strings:components_strings",
-      "//content/public/browser",
-      "//mojo/public/cpp/bindings",
-      "//ui/webui",
-    ]
-  }
+source_set("search_engine_choice") {
+  sources = [
+    "search_engine_choice_handler.cc",
+    "search_engine_choice_ui.cc",
+  ]
+  public = [
+    "search_engine_choice_handler.h",
+    "search_engine_choice_ui.h",
+  ]
+  public_deps = [ "//chrome/browser:browser_public_dependencies" ]
+  deps = [
+    ":mojo_bindings",
+    "//base",
+    "//chrome/app:generated_resources",
+    "//chrome/app/theme:chrome_unscaled_resources",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/regional_capabilities",
+    "//chrome/browser/resources/search_engine_choice:resources",
+    "//chrome/browser/resources/signin:resources",
+    "//chrome/browser/search_engine_choice",
+    "//chrome/common",
+    "//components/regional_capabilities",
+    "//components/search_engines",
+    "//components/signin/public/base",
+    "//components/strings:components_branded_strings",
+    "//components/strings:components_strings",
+    "//content/public/browser",
+    "//mojo/public/cpp/bindings",
+    "//ui/webui",
+  ]
 }
 
 if (is_win || is_linux) {

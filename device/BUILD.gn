@@ -128,12 +128,10 @@ test("device_unittests") {
     data_deps += [ "//clank/build/bot/filters:device_unittests_filters" ]
   }
 
-  if (!is_ios) {
-    deps += [
-      "//device/fido",
-      "//device/fido:test_support",
-    ]
-  }
+  deps += [
+    "//device/fido",
+    "//device/fido:test_support",
+  ]
 
   # Most of the FIDO implementation is not compiled in for Android.
   if (!is_android && !is_ios) {

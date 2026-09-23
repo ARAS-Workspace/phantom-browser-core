@@ -9,15 +9,13 @@ source_set("webui") {
     "help_bubble_webui.cc",
     "help_bubble_webui.h",
   ]
-  if (!is_android) {
-    sources += [
-      "floating_webui_help_bubble_factory.cc",
-      "floating_webui_help_bubble_factory.h",
-      "whats_new_registry.cc",
-      "whats_new_registry.h",
-      "whats_new_storage_service.h",
-    ]
-  }
+  sources += [
+    "floating_webui_help_bubble_factory.cc",
+    "floating_webui_help_bubble_factory.h",
+    "whats_new_registry.cc",
+    "whats_new_registry.h",
+    "whats_new_storage_service.h",
+  ]
 
   deps = [
     "//base",
@@ -33,26 +31,22 @@ source_set("webui") {
     "//ui/webui/resources/js/tracked_element:mojo_bindings",
     "//ui/webui/tracked_element",
   ]
-  if (!is_android) {
-    deps += [
-      "//components/user_education/views",
-      "//ui/views",
-      "//ui/views/controls/webview",
-      "//ui/webui/resources/js/browser_command:mojo_bindings",
-    ]
-  }
+  deps += [
+    "//components/user_education/views",
+    "//ui/views",
+    "//ui/views/controls/webview",
+    "//ui/webui/resources/js/browser_command:mojo_bindings",
+  ]
 }
 
 source_set("unit_tests") {
   testonly = true
 
   sources = [ "help_bubble_handler_unittest.cc" ]
-  if (!is_android) {
-    sources += [
-      "whats_new_registry_feature_param_unittest.cc",
-      "whats_new_registry_unittest.cc",
-    ]
-  }
+  sources += [
+    "whats_new_registry_feature_param_unittest.cc",
+    "whats_new_registry_unittest.cc",
+  ]
 
   deps = [
     ":webui",
@@ -75,27 +69,23 @@ source_set("unit_tests") {
     "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
     "//ui/webui/tracked_element",
   ]
-  if (!is_android) {
-    deps += [
-      ":test_support",
-      "//ui/webui/resources/js/browser_command:mojo_bindings",
-    ]
-  }
+  deps += [
+    ":test_support",
+    "//ui/webui/resources/js/browser_command:mojo_bindings",
+  ]
 }
 
-if (!is_android) {
-  source_set("test_support") {
-    testonly = true
+source_set("test_support") {
+  testonly = true
 
-    sources = [
-      "mock_whats_new_storage_service.cc",
-      "mock_whats_new_storage_service.h",
-    ]
+  sources = [
+    "mock_whats_new_storage_service.cc",
+    "mock_whats_new_storage_service.h",
+  ]
 
-    deps = [
-      ":webui",
-      "//base",
-      "//testing/gmock",
-    ]
-  }
+  deps = [
+    ":webui",
+    "//base",
+    "//testing/gmock",
+  ]
 }

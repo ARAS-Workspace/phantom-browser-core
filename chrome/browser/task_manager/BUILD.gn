@@ -72,22 +72,20 @@ source_set("task_manager") {
     "//ui/gfx",
   ]
 
-  if (!is_android) {
-    sources += [
-      "providers/web_contents/background_contents_tag.h",
-      "providers/web_contents/background_contents_task.h",
-      "providers/web_contents/extension_tag.h",
-      "providers/web_contents/extension_task.h",
-      "providers/web_contents/guest_tag.h",
-      "providers/web_contents/guest_task.h",
-      "providers/web_contents/guest_task_mparch.h",
-    ]
-    public_deps += [
-      "//extensions/browser",
-      "//extensions/buildflags",
-      "//extensions/common:mojom",
-    ]
-  }
+  sources += [
+    "providers/web_contents/background_contents_tag.h",
+    "providers/web_contents/background_contents_task.h",
+    "providers/web_contents/extension_tag.h",
+    "providers/web_contents/extension_task.h",
+    "providers/web_contents/guest_tag.h",
+    "providers/web_contents/guest_task.h",
+    "providers/web_contents/guest_task_mparch.h",
+  ]
+  public_deps += [
+    "//extensions/browser",
+    "//extensions/buildflags",
+    "//extensions/common:mojom",
+  ]
 }
 
 # The implementation must be linked into the same binary as the public
@@ -183,16 +181,14 @@ source_set("impl") {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   sources += [ "sampling/shared_sampler_stub.cc" ]
-  if (!is_android) {
-    deps += [
-      "//chrome/browser/background",
-      "//chrome/browser/ui:chrome_pages",
-    ]
-    sources += [
-      "providers/web_contents/background_contents_tag.cc",
-      "providers/web_contents/background_contents_task.cc",
-    ]
-  }
+  deps += [
+    "//chrome/browser/background",
+    "//chrome/browser/ui:chrome_pages",
+  ]
+  sources += [
+    "providers/web_contents/background_contents_tag.cc",
+    "providers/web_contents/background_contents_task.cc",
+  ]
   if (enable_guest_view) {
     deps += [ "//components/guest_view/browser" ]
     sources += [
@@ -281,63 +277,59 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (!is_android) {
-    sources += [
-      "sampling/task_group_unittest.cc",
-      "sampling/task_manager_impl_unittest.cc",
-      "task_manager_metrics_recorder_unittest.cc",
-      "task_manager_observer_unittest.cc",
-      "test_task_manager.cc",
-      "test_task_manager.h",
-    ]
-  }
+  sources += [
+    "sampling/task_group_unittest.cc",
+    "sampling/task_manager_impl_unittest.cc",
+    "task_manager_metrics_recorder_unittest.cc",
+    "task_manager_observer_unittest.cc",
+    "test_task_manager.cc",
+    "test_task_manager.h",
+  ]
 }
 
-if (!is_android) {
-  source_set("browser_tests") {
-    testonly = true
+source_set("browser_tests") {
+  testonly = true
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "providers/web_contents/background_contents_tag_browsertest.cc",
-      "providers/web_contents/devtools_tag_browsertest.cc",
-      "providers/web_contents/subframe_task_browsertest.cc",
-      "providers/web_contents/tab_contents_tag_browsertest.cc",
-      "providers/web_contents/web_app_tag_browsertest.cc",
-      "providers/worker_task_provider_browsertest.cc",
-      "task_manager_browsertest.cc",
-    ]
+  sources = [
+    "providers/web_contents/background_contents_tag_browsertest.cc",
+    "providers/web_contents/devtools_tag_browsertest.cc",
+    "providers/web_contents/subframe_task_browsertest.cc",
+    "providers/web_contents/tab_contents_tag_browsertest.cc",
+    "providers/web_contents/web_app_tag_browsertest.cc",
+    "providers/worker_task_provider_browsertest.cc",
+    "task_manager_browsertest.cc",
+  ]
 
-    deps = [
-      ":task_manager",
-      ":test_support",
-      "//base",
-      "//base/test:test_support",
-      "//chrome/browser/background:test_support",
-      "//chrome/browser/devtools:test_support",
-      "//chrome/browser/task_manager/common",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/task_manager",
-      "//chrome/browser/web_applications:web_applications_test_support",
-      "//chrome/browser/web_applications/extensions",
-      "//chrome/test:test_support",
-      "//chrome/test:test_support_ui",
-      "//components/embedder_support",
-      "//components/favicon/content",
-      "//components/infobars/content",
-      "//content/public/browser",
-      "//content/test:browsertest_support",
-      "//content/test:test_support",
-      "//pdf:features",
-      "//services/strings",
-      "//testing/gmock",
-      "//testing/gtest",
-    ]
+  deps = [
+    ":task_manager",
+    ":test_support",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/browser/background:test_support",
+    "//chrome/browser/devtools:test_support",
+    "//chrome/browser/task_manager/common",
+    "//chrome/browser/ui",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/task_manager",
+    "//chrome/browser/web_applications:web_applications_test_support",
+    "//chrome/browser/web_applications/extensions",
+    "//chrome/test:test_support",
+    "//chrome/test:test_support_ui",
+    "//components/embedder_support",
+    "//components/favicon/content",
+    "//components/infobars/content",
+    "//content/public/browser",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//pdf:features",
+    "//services/strings",
+    "//testing/gmock",
+    "//testing/gtest",
+  ]
 
-    if (enable_pdf) {
-      deps += [ "//chrome/browser/pdf:pdf_extension_test_base" ]
-    }
+  if (enable_pdf) {
+    deps += [ "//chrome/browser/pdf:pdf_extension_test_base" ]
   }
 }

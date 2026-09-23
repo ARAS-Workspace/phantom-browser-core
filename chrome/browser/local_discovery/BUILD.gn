@@ -99,10 +99,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  # TODO(crbug.com/429684535): Port this test to desktop Android.
-  if (!is_android) {
-    sources += [ "service_discovery_device_lister_unittest.cc" ]
-  }
+  sources += [ "service_discovery_device_lister_unittest.cc" ]
 
   if (is_mac) {
     sources += [
