@@ -4,7 +4,6 @@
 
 import("//build/buildflag_header.gni")
 import("//build/config/features.gni")
-import("//components/optimization_guide/features.gni")
 import("//services/on_device_model/on_device_model.gni")
 import("//third_party/dawn/scripts/dawn_features.gni")
 
@@ -23,7 +22,7 @@ component("backend_interfaces") {
   defines = [ "IS_ON_DEVICE_MODEL_IMPL" ]
 }
 
-if (use_blink || (is_ios && build_with_internal_optimization_guide)) {
+if (use_blink) {
   component("on_device_model_service") {
     sources = [
       "on_device_model_mojom_impl.cc",

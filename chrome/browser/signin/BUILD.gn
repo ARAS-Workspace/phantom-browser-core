@@ -93,7 +93,7 @@ source_set("signin") {
     "wait_for_network_callback_helper_chrome.h",
   ]
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     public += [
       "accounts_policy_manager.h",
       "accounts_policy_manager_factory.h",
@@ -288,7 +288,7 @@ source_set("impl") {
     "wait_for_network_callback_helper_chrome.cc",
   ]
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [
       "accounts_policy_manager.cc",
       "accounts_policy_manager_factory.cc",
@@ -526,7 +526,7 @@ source_set("unit_tests") {
     "//components/sync/service",
   ]
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     sources += [ "accounts_policy_manager_unittest.cc" ]
   }
 
@@ -639,7 +639,7 @@ source_set("browser_tests") {
     "//testing/gtest",
   ]
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "signin_hats_util_browsertest.cc" ]
     deps += [ "//chrome/browser/ui/hats:test_support" ]
   }

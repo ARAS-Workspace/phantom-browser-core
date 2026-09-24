@@ -68,7 +68,7 @@ source_set("component_updater") {
     public += [ "hyphenation_component_installer.h" ]
   }
 
-  if (is_mac || is_win) {
+  if (is_mac) {
     public += [ "updater_state.h" ]
   }
 
@@ -193,7 +193,7 @@ source_set("impl") {
     sources += [ "hyphenation_component_installer.cc" ]
   }
 
-  if (is_mac || is_win) {
+  if (is_mac) {
     sources += [ "updater_state.cc" ]
     deps += [ "//chrome/updater:public_sources" ]
   }
@@ -292,7 +292,7 @@ source_set("unit_tests") {
     "//third_party/zxcvbn-cpp",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [ "updater_state_unittest.cc" ]
     deps += [ "//chrome/updater:public_sources" ]
     if (is_mac) {

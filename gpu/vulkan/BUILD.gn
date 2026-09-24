@@ -180,7 +180,7 @@ if (enable_vulkan) {
 
   # TODO(penghuang): support more platforms
   # https://crbug.com/1065499
-  if (is_android || is_win || use_ozone) {
+  if (use_ozone) {
     test("vulkan_tests") {
       use_xvfb = use_xvfb_in_this_config
 

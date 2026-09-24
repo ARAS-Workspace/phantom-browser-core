@@ -172,7 +172,7 @@ source_set("chrome_web_authentication_delegate") {
     "//device/fido",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/extensions/api/web_authentication_proxy" ]
   }
 
@@ -423,7 +423,7 @@ source_set("browser_tests") {
     "enclave_authenticator_browsertest.cc",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "chrome_webauthn_iwa_remote_desktop_override_browsertest.cc" ]
   }
 

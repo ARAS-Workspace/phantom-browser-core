@@ -81,7 +81,7 @@ source_set("performance_manager") {
     public_deps += [ "//extensions/browser" ]
   }
 
-  if (enable_extensions_core && !is_android) {
+  if (enable_extensions_core) {
     public += [
       "execution_context_priority/extension_service_worker_priority_voter.h",
     ]
@@ -181,7 +181,7 @@ source_set("impl") {
     "//ui/accessibility:ax_base",
   ]
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [ "user_tuning/memory_saver_policy_handler.cc" ]
     deps += [ "//components/policy/core/browser" ]
   }
@@ -195,7 +195,7 @@ source_set("impl") {
     ]
   }
 
-  if (enable_extensions_core && !is_android) {
+  if (enable_extensions_core) {
     sources += [
       "execution_context_priority/extension_service_worker_priority_voter.cc",
     ]
@@ -284,7 +284,7 @@ source_set("unit_tests") {
     deps += [ "//dbus:test_support" ]
   }
 
-  if (enable_extensions_core && !is_android) {
+  if (enable_extensions_core) {
     sources += [ "execution_context_priority/extension_service_worker_priority_voter_unittest.cc" ]
     deps += [
       "//extensions:test_support",
@@ -312,7 +312,7 @@ source_set("unit_tests") {
     "user_tuning/user_performance_tuning_notifier_unittest.cc",
   ]
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     sources += [ "user_tuning/memory_saver_policy_handler_unittest.cc" ]
   }
 }

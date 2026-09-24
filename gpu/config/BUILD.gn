@@ -171,7 +171,7 @@ component("config") {
   if (is_linux) {
     sources += [ "gpu_info_collector_linux.cc" ]
   }
-  if (is_linux || is_apple || is_android) {
+  if (is_linux || is_apple) {
     deps += [ "//third_party/angle:angle_gpu_info_util" ]
   }
   if (use_ozone) {

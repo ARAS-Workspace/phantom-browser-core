@@ -12,7 +12,7 @@ source_set("device_reauth") {
     "//ui/gfx",
   ]
 
-  if (is_android || is_mac || is_win) {
+  if (is_mac) {
     public += [ "chrome_device_authenticator_factory.h" ]
   }
 
@@ -40,7 +40,7 @@ source_set("impl") {
     "//content/public/browser",
   ]
 
-  if (is_android || is_mac || is_win) {
+  if (is_mac) {
     sources += [ "chrome_device_authenticator_factory.cc" ]
   }
 
@@ -75,7 +75,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_win || is_mac || is_android) {
+  if (is_mac) {
     sources += [ "chrome_device_authenticator_factory_unittest.cc" ]
   }
 

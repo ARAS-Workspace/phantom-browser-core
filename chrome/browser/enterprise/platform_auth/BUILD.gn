@@ -48,11 +48,11 @@ source_set("unit_tests") {
 
   # PlatformAuthProviderManager (referenced by :test_utils) is only built on
   # these platforms.
-  if (is_mac || is_win || is_android) {
+  if (is_mac) {
     deps += [ ":test_utils" ]
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "platform_auth_navigation_throttle_unittest.cc",
       "platform_auth_provider_manager_unittest.cc",
@@ -90,7 +90,7 @@ source_set("browser_tests") {
     "//testing/gmock",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "platform_auth_policy_observer_browsertest.cc",
       "platform_auth_provider_manager_browsertest.cc",

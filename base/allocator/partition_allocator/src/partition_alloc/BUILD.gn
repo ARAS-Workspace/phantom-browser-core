@@ -305,7 +305,7 @@ if (is_clang_or_gcc) {
   }
 
   config("memory_tagging") {
-    if (current_cpu == "arm64" && is_clang && (is_linux || is_android)) {
+    if (current_cpu == "arm64" && is_clang && is_linux) {
       # base/ has access to the MTE intrinsics because it needs to use them,
       # but they're not backwards compatible. Use base::CPU::has_mte()
       # beforehand to confirm or use indirect functions (ifuncs) to select
@@ -888,7 +888,7 @@ if (is_clang_or_gcc) {
 # TODO(crbug.com/40158212): Consider supporting building tests outside of
 # chromium and having a dedicated 'partition_alloc_unittests' target.
 if (build_with_chromium) {
-  if (is_linux || is_android) {
+  if (is_linux) {
     source_set("debug_proc_maps") {
       testonly = true
 
@@ -915,7 +915,7 @@ if (build_with_chromium) {
     deps = []
     deps += [ ":internal_headers" ]
 
-    if (is_linux || is_android) {
+    if (is_linux) {
       deps += [ ":debug_proc_maps" ]
     }
 
@@ -955,7 +955,7 @@ if (build_with_chromium) {
       ]
     }
 
-    if ((is_android || is_linux) && target_cpu == "arm64") {
+    if (is_linux && target_cpu == "arm64") {
       cflags = [
         "-Xclang",
         "-target-feature",
@@ -1024,7 +1024,7 @@ if (build_with_chromium) {
     deps = []
     deps += [ ":internal_headers" ]
 
-    if (is_linux || is_android) {
+    if (is_linux) {
       deps += [ ":debug_proc_maps" ]
     }
 
@@ -1039,7 +1039,7 @@ if (build_with_chromium) {
       ]
     }
 
-    if ((is_android || is_linux) && target_cpu == "arm64") {
+    if (is_linux && target_cpu == "arm64") {
       cflags = [
         "-Xclang",
         "-target-feature",
@@ -1110,7 +1110,7 @@ source_set("test_support") {
 source_set("arm_bti_testfunctions") {
   testonly = true
   sources = []
-  if (target_cpu == "arm64" && (is_linux || is_android)) {
+  if (target_cpu == "arm64" && is_linux) {
     sources = [
       "arm_bti_test_functions.S",
       "arm_bti_test_functions.h",

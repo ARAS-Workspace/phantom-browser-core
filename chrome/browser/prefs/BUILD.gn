@@ -213,7 +213,7 @@ source_set("impl") {
     deps += [ "//chrome/browser/rlz" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/browser_switcher",
       "//chrome/browser/ui/webui/whats_new",

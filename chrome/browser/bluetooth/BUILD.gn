@@ -116,7 +116,7 @@ source_set("unit_tests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (is_linux || is_mac || is_win) {
+if (is_linux || is_mac) {
   source_set("device_realtarget_browsertests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

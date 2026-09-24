@@ -11,7 +11,6 @@
 import("//build/config/c++/modules.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/compiler/compiler.gni")
-import("//build/config/cronet/config.gni")
 import("//build/config/dcheck_always_on.gni")
 import("//build/config/features.gni")
 import("//build/config/linux/gtk/gtk.gni")
@@ -262,7 +261,7 @@ group("gn_all") {
     ]
   }
 
-  if (is_linux || is_android) {
+  if (is_linux) {
     deps += [
       "//third_party/breakpad:breakpad_unittests",
       "//third_party/breakpad:core-2-minidump",
@@ -272,7 +271,7 @@ group("gn_all") {
     ]
   }
 
-  if (is_mac || is_win) {
+  if (is_mac) {
     deps += [
       "//rlz:rlz_id",
       "//rlz:rlz_lib",
@@ -309,15 +308,14 @@ group("gn_all") {
     }
   }
 
-  if (is_ios || is_win || is_linux) {
+  if (is_linux) {
     deps += [
       "//base:base_i18n_perftests",
       "//google_apis:google_apis_unittests",
     ]
   }
 
-  if ((is_win || is_mac || is_linux) &&
-      (target_cpu == "x86" || target_cpu == "x64")) {
+  if ((is_mac || is_linux) && (target_cpu == "x86" || target_cpu == "x64")) {
     deps += [
       "//third_party/swiftshader/src/Vulkan:icd_file",
       "//third_party/swiftshader/src/Vulkan:swiftshader_libvulkan",
@@ -364,12 +362,12 @@ group("gn_all") {
       "//third_party/libaddressinput:libaddressinput_unittests",
     ]
 
-    if (media_use_ffmpeg && !is_android) {
+    if (media_use_ffmpeg) {
       deps += [ "//media:ffmpeg_regression_tests" ]
     }
   }
 
-  if (is_android || is_linux) {
+  if (is_linux) {
     deps += [
       "//components/network_hints/browser",
       "//content/public/app",
@@ -435,7 +433,7 @@ group("gn_all") {
     deps += [ "//third_party/breakpad:symupload($host_toolchain)" ]
   }
 
-  if (is_mac || is_win || is_android || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//third_party/crashpad/crashpad:crashpad_tests",
       "//third_party/crashpad/crashpad/tools:crashpad_database_util",
@@ -449,15 +447,15 @@ group("gn_all") {
 
   deps += [ "//content/browser/bluetooth/tools:bluetooth_metrics_hash" ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     deps += [ "//mojo" ]
   }
 
-  if (is_mac || is_linux || is_android) {
+  if (is_mac || is_linux) {
     deps += [ "//third_party/perfetto:all" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//third_party/sqlite:sqlite_shell" ]
   }
 
@@ -507,7 +505,7 @@ group("gn_all") {
     }
   }
 
-  if (is_linux || ((is_win || is_mac) && use_fuzzing_engine)) {
+  if (is_linux || (is_mac && use_fuzzing_engine)) {
     deps += [
       "//testing/libfuzzer/fuzzers",
       "//testing/libfuzzer/research",
@@ -596,7 +594,7 @@ group("rust_build_tests") {
   deps = [ "//build/rust/tests" ]
 }
 
-if (use_blink && !is_cronet_build) {
+if (use_blink) {
   group("chromedriver_group") {
     testonly = true
 

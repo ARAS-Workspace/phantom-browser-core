@@ -146,7 +146,7 @@ component("services") {
     }
   }
 
-  if (is_win || enable_library_cdms) {
+  if (enable_library_cdms) {
     sources += [
       "mojo_cdm_allocator.cc",
       "mojo_cdm_allocator.h",

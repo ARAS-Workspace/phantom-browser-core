@@ -19,7 +19,7 @@ source_set("updater") {
     "//chrome/browser/metrics:unit_tests",
   ]
 
-  if (enable_updater && (is_mac || is_win)) {
+  if (enable_updater && is_mac) {
     sources = [
       "browser_updater_client.cc",
       "browser_updater_client.h",
@@ -86,7 +86,7 @@ source_set("updater") {
 
 source_set("unit_tests") {
   testonly = true
-  if (enable_updater && (is_win || is_mac)) {
+  if (enable_updater && is_mac) {
     sources = [ "browser_updater_client_unittest.cc" ]
     deps = [
       ":test_support",
@@ -105,7 +105,7 @@ source_set("unit_tests") {
 
 source_set("test_support") {
   testonly = true
-  if (enable_updater && (is_win || is_mac)) {
+  if (enable_updater && is_mac) {
     sources = [
       "browser_updater_client_testutils.cc",
       "browser_updater_client_testutils.h",

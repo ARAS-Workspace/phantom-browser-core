@@ -45,7 +45,7 @@ source_set("impl") {
     "//ui/native_theme",
     "//ui/resources",
   ]
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 }

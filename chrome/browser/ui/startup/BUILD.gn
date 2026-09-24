@@ -72,12 +72,12 @@ source_set("startup") {
     sources += [ "chrome_for_testing_infobar_delegate.h" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "web_app_startup_utils.h" ]
     public_deps += [ "//components/services/app_service/public/cpp:app_types" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "first_run_service.h",
       "web_app_info_recorder_utils.h",
@@ -231,7 +231,7 @@ source_set("impl") {
     "//net",
     "//printing/buildflags",
   ]
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [
       "//chrome/browser/ui/pdf/infobar",
       "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar",
@@ -245,7 +245,7 @@ source_set("impl") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/views/session_restore_infobar" ]
   }
 
@@ -265,7 +265,7 @@ source_set("impl") {
     sources += [ "chrome_for_testing_infobar_delegate.cc" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "web_app_startup_utils.cc" ]
     deps += [
       "//chrome/browser/lifetime:termination_notification",
@@ -273,7 +273,7 @@ source_set("impl") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "first_run_service.cc",
       "web_app_info_recorder_utils.cc",

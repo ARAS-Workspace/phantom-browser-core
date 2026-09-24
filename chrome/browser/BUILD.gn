@@ -998,7 +998,7 @@ source_set("core") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/browser_switcher",
       "//chrome/browser/ui/startup/default_browser_prompt",
@@ -1007,7 +1007,7 @@ source_set("core") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/captive_portal",
       "//chrome/browser/enterprise/network_header_injection",
@@ -2254,7 +2254,7 @@ source_set("browser") {
 
   deps += [ ":process_singleton_posix" ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/webui/intro" ]
   }
 
@@ -2271,7 +2271,7 @@ source_set("browser") {
     ]
   }
 
-  if (is_mac || is_win) {
+  if (is_mac) {
     deps += [
       "//chrome/browser/ui/pdf/infobar",
       "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar:impl",
@@ -2294,7 +2294,7 @@ source_set("browser") {
     deps += [ "//components/enterprise/client_certificates/core" ]
   }
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     deps += [
       "//components/device_signals/core/browser",
       "//components/policy/proto",
@@ -2303,13 +2303,13 @@ source_set("browser") {
     ]
   }
 
-  if (is_android || safe_browsing_mode == 1) {
+  if (safe_browsing_mode == 1) {
     deps += [ "//components/enterprise/connectors/core" ]
     public_deps +=
         [ "//components/enterprise/common/proto:browser_events_proto" ]
   }
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     deps += [
       "//chrome/browser/enterprise/connectors/device_trust/key_management/core/persistence",
       "//chrome/browser/headless:metrics",
@@ -2347,14 +2347,14 @@ source_set("browser") {
     }
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [
       "//chrome/browser/webshare",
       "//chrome/browser/webshare:impl",
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/browser_switcher",
       "//chrome/browser/browser_switcher:impl",
@@ -2362,7 +2362,7 @@ source_set("browser") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += []
   }
 
@@ -2710,7 +2710,7 @@ group("browser_public_dependencies") {
     "//extensions/buildflags",
     "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
   ]
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     public_deps += [ "//components/enterprise/core" ]
   }
   if (enable_printing) {
@@ -2806,7 +2806,7 @@ group("browser_generated_files") {
   }
   public_deps += [ "//chrome/browser/ui/webui/discards:mojo_bindings" ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public_deps += [
       "//chrome/browser/ui/webui/app_home:mojo_bindings",
       "//chrome/browser/ui/webui/on_device_translation_internals:mojo_bindings",
@@ -2816,7 +2816,7 @@ group("browser_generated_files") {
       "//components/enterprise/device_trust/core/attestation/proto:interface_proto",
     ]
   }
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public_deps +=
         [ "//ui/webui/resources/cr_components/help_bubble:mojo_bindings" ]
   }
@@ -2835,12 +2835,12 @@ group("browser_generated_files") {
         [ "//chrome/browser/compose:compose_optimization_guide_proto" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public_deps +=
         [ "//chrome/browser/new_tab_page/chrome_colors:generate_colors_info" ]
   }
 
-  if (is_win || is_linux || is_android) {
+  if (is_linux) {
     public_deps += [ "//chrome/browser/privacy:traffic_annotation_proto" ]
   }
 }
@@ -2915,7 +2915,7 @@ grit("resources") {
 
   deps = []
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//services/resource_coordinator/public/mojom:mojom_js" ]
   }
 }
@@ -3112,7 +3112,7 @@ static_library("test_support") {
     ]
   }
 
-  if (enable_library_cdms || is_win) {
+  if (enable_library_cdms) {
     sources += [
       "media/clear_key_cdm_test_helper.cc",
       "media/clear_key_cdm_test_helper.h",
@@ -3162,7 +3162,7 @@ group("test_support_ui") {
     "//ui/webui/resources/cr_components/app_management:mojo_bindings",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public_deps += [ "//chrome/browser/ui/webui/app_home:mojo_bindings" ]
   }
 }
@@ -3249,11 +3249,11 @@ source_set("core_browser_tests") {
     "//ui/shell_dialogs:test_support",
   ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [ "process_singleton_browsertest.cc" ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [ "chrome_main_process_singleton_browsertest.cc" ]
   }
 

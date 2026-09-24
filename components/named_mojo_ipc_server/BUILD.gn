@@ -66,7 +66,7 @@ source_set("unit_tests") {
   sources = []
 
   # Disable MojoIpcServerTest on unsupported platforms.
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [ "named_mojo_ipc_server_unittest.cc" ]
   }
   deps = [

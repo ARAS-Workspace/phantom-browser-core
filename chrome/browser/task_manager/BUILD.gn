@@ -177,7 +177,7 @@ source_set("impl") {
   ]
 
   libs = []
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   sources += [ "sampling/shared_sampler_stub.cc" ]

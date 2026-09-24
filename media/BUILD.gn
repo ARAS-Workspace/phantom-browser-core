@@ -148,7 +148,7 @@ component("media") {
   ]
 
   # This must be included here since it actually depends on //media/base.
-  if (is_mac || (use_blink && is_ios)) {
+  if (is_mac) {
     public_deps += [ "//media/base/mac" ]
   }
 
@@ -252,9 +252,7 @@ test("media_perftests") {
   ]
 }
 
-# TODO(watk): Refactor tests that could be made to run on Android. See
-# http://crbug.com/570762
-if (media_use_ffmpeg && !is_android) {
+if (media_use_ffmpeg) {
   test("ffmpeg_regression_tests") {
     configs += [ "//media:media_config" ]
 

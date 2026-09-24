@@ -2433,7 +2433,7 @@ source_set("browser") {
     ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     deps += [ "//components/services/font_data:lib" ]
   }
 
@@ -2642,7 +2642,7 @@ source_set("browser") {
         "media/capture/mouse_cursor_overlay_controller_aura.cc",
       ]
     }
-    if (is_mac || is_win) {
+    if (is_mac) {
       sources += [
         "media/capture/pip_screen_capture_coordinator_impl.cc",
         "media/capture/pip_screen_capture_coordinator_impl.h",
@@ -2679,7 +2679,7 @@ source_set("browser") {
     }
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "media/system_media_controls/web_app_system_media_controls.cc",
       "media/system_media_controls/web_app_system_media_controls.h",
@@ -2688,7 +2688,7 @@ source_set("browser") {
     ]
   }
 
-  if (is_android || is_linux) {
+  if (is_linux) {
     deps += [ "//content/browser/system_dns_resolution" ]
   }
 
@@ -2724,7 +2724,7 @@ source_set("browser") {
     ]
   }
 
-  if (enable_library_cdms || is_win) {
+  if (enable_library_cdms) {
     sources += [
       "media/service_factory.cc",
       "media/service_factory.h",
@@ -2828,7 +2828,7 @@ source_set("browser") {
   # For platforms that support extension service workers.
   # NOTE: Fuchsia depends on this class, but probably shouldn't, as it doesn't
   # support extensions.
-  if (is_win || is_apple || is_linux || is_desktop_android) {
+  if (is_apple || is_linux) {
     sources += [
       "service_worker/service_worker_usb_delegate_observer.cc",
       "service_worker/service_worker_usb_delegate_observer.h",

@@ -219,8 +219,7 @@ group("zucchini_fuzzers") {
   ]
 
   # Ensure protoc is available.
-  # Disabled on Windows due to crbug/844826.
-  if (current_toolchain == host_toolchain && !is_win) {
+  if (current_toolchain == host_toolchain) {
     deps += [
       "//components/zucchini/fuzzers:zucchini_apply_fuzzer",
       "//components/zucchini/fuzzers:zucchini_imposed_ensemble_matcher_fuzzer",

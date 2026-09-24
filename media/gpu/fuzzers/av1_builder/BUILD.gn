@@ -11,7 +11,7 @@ proto_library("av1_builder_fuzzer_inputs") {
   sources = [ "av1_builder_fuzzer_inputs.proto" ]
 }
 
-if (is_win || use_vaapi) {
+if (use_vaapi) {
   fuzzer_test("av1_builder_fuzzer") {
     sources = [ "av1_builder_fuzzer.cc" ]
     deps = [

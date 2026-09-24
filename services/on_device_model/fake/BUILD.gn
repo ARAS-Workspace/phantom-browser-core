@@ -3,9 +3,8 @@
 # found in the LICENSE file.
 
 import("//build/config/features.gni")
-import("//components/optimization_guide/features.gni")
 
-if (use_blink || (is_ios && build_with_internal_optimization_guide)) {
+if (use_blink) {
   component("fake") {
     public = [
       "fake_chrome_ml_api.h",

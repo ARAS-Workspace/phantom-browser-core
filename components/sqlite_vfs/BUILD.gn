@@ -58,7 +58,7 @@ component("sqlite_vfs") {
   defines = [ "IS_SQLITE_VFS_IMPL" ]
 }
 
-if (use_blink && !is_android) {
+if (use_blink) {
   mojom("test_mojom") {
     testonly = true
     sources = [ "multiprocess_test.test-mojom" ]
@@ -91,7 +91,7 @@ source_set("unit_tests") {
     "//third_party/sqlite",
   ]
 
-  if (use_blink && !is_android) {
+  if (use_blink) {
     sources += [ "multiprocess_unittest.cc" ]
     deps += [ ":test_mojom" ]
   }

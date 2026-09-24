@@ -99,7 +99,7 @@ component("message_support") {
     "//mojo/public/cpp/system",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     # On Windows HandleAttachmentWin needs to generate random IDs.
     # On Mac MachPortAttachmentMac needs to generate random IDs.
     deps = [ "//crypto" ]

@@ -10,7 +10,7 @@ mojom("mojo_bindings") {
   webui_module_path = "/"
 }
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   source_set("on_device_translation_internals") {
     sources = [
       "on_device_translation_internals_page_handler_impl.cc",

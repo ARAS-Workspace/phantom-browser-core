@@ -26,7 +26,7 @@ static_library("renderer") {
     "//third_party/widevine/cdm:buildflags",
   ]
 
-  if (enable_library_cdms || is_win || is_android) {
+  if (enable_library_cdms) {
     sources += [
       "key_system_support_update.cc",
       "key_system_support_update.h",

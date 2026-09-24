@@ -387,8 +387,8 @@ if (use_blink) {
       "//testing/gtest",
     ]
 
-    # Android doesn't compile. Linux requires udev.
-    if (!is_linux_without_udev && !is_android) {
+    # Linux requires udev.
+    if (!is_linux_without_udev) {
       sources += [
         "fake_fido_discovery.cc",
         "fake_fido_discovery.h",

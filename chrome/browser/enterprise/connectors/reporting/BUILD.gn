@@ -9,7 +9,7 @@ import("//extensions/buildflags/buildflags.gni")
 source_set("reporting") {
   sources = []
 
-  if (is_android || safe_browsing_mode == 1) {
+  if (safe_browsing_mode == 1) {
     sources += [
       "browser_crash_event_router.h",
       "crash_reporting_context.h",
@@ -41,7 +41,7 @@ source_set("reporting") {
 source_set("impl") {
   sources = []
 
-  if (is_android || safe_browsing_mode == 1) {
+  if (safe_browsing_mode == 1) {
     sources += [
       "browser_crash_event_router.cc",
       "crash_reporting_context.cc",

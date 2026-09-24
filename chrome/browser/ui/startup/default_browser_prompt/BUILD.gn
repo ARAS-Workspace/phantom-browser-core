@@ -151,7 +151,7 @@ source_set("interactive_ui_tests") {
     "//ui/gfx:test_support",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [ "pin_infobar/pin_infobar_interactive_uitest.cc" ]
     deps += [
       "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar",

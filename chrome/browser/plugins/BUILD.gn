@@ -46,7 +46,7 @@ source_set("plugins") {
     ]
   }
 
-  if (enable_plugins || is_android) {
+  if (enable_plugins) {
     sources += [ "plugin_observer_common.h" ]
   }
 }
@@ -104,7 +104,7 @@ source_set("impl") {
     ]
   }
 
-  if (enable_plugins || is_android) {
+  if (enable_plugins) {
     sources += [ "plugin_observer_common.cc" ]
   }
 }
@@ -157,7 +157,7 @@ source_set("unit_tests") {
   }
 }
 
-if (!is_android && (enable_pdf || enable_plugins)) {
+if (enable_pdf || enable_plugins) {
   source_set("browser_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

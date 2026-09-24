@@ -264,7 +264,7 @@ component("skia") {
     public += [ "ext/platform_canvas.h" ]
     sources += [ "ext/platform_canvas.cc" ]
   }
-  if (!is_ios && (current_cpu == "x86" || current_cpu == "x64")) {
+  if (current_cpu == "x86" || current_cpu == "x64") {
     sources += [
       "ext/convolver_SSE2.cc",
       "ext/convolver_SSE2.h",
@@ -393,7 +393,7 @@ component("skia") {
     sources += skia_ports_fci_sources
   }
 
-  if (is_linux || is_android) {
+  if (is_linux) {
     # Retain the files for the SkFontMgr_Android on linux to emulate android
     # fonts. See content/zygote/zygote_main_linux.cc
     # Note that this requires expat.

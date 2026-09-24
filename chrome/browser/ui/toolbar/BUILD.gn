@@ -230,7 +230,7 @@ source_set("impl") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
   }
 
@@ -320,7 +320,7 @@ source_set("unit_tests") {
     "//ui/gfx/codec",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
   }
 
@@ -388,7 +388,7 @@ source_set("browser_tests") {
     "//ui/base:features",
     "//ui/gfx",
   ]
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
   }
 }

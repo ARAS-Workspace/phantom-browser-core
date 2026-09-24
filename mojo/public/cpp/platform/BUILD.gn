@@ -28,7 +28,7 @@ component("platform") {
 
   deps = [ "//mojo/core/embedder:features" ]
 
-  if (is_win || is_mac || (is_posix && !is_ios)) {
+  if (is_mac || is_posix) {
     public += [ "platform_channel_server.h" ]
     sources += [ "platform_channel_server.cc" ]
   }

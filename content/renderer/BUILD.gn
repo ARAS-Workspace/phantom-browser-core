@@ -305,7 +305,7 @@ target(link_target_type, "renderer") {
     }
   }
 
-  if (is_linux || is_android) {
+  if (is_linux) {
     deps += [ "//sandbox:sandbox_buildflags" ]
   }
 

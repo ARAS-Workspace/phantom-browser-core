@@ -195,9 +195,8 @@ test("device_unittests") {
   }
 
   # FIDO HID:
-  # Android doesn't compile.
   # Linux, requires udev.
-  if (!is_linux_without_udev && !is_android && !is_ios) {
+  if (!is_linux_without_udev) {
     sources += [
       "fido/hid/fido_hid_device_unittest.cc",
       "fido/hid/fido_hid_discovery_unittest.cc",

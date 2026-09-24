@@ -45,7 +45,7 @@ source_set("infobars") {
     "//ui/base",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar" ]
   }
 
@@ -119,7 +119,7 @@ source_set("browser_tests") {
     "//url",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
   }
 

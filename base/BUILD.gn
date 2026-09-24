@@ -1033,7 +1033,7 @@ component("base") {
     ]
   }
 
-  if (is_linux || is_android) {
+  if (is_linux) {
     sources += [
       "files/file_path_watcher_inotify.cc",
       "files/file_path_watcher_inotify.h",
@@ -1123,7 +1123,7 @@ component("base") {
   # Needed for <atomic> if using newer C++ library than sysroot, except if
   # building inside the cros_sdk environment - use host_toolchain as a
   # more robust check for this.
-  if (!use_sysroot && (is_android || is_linux) &&
+  if (!use_sysroot && is_linux &&
       host_toolchain != "//build/toolchain/cros:host") {
     libs += [ "atomic" ]
   }
@@ -1252,7 +1252,7 @@ component("base") {
     }
   }
 
-  if (is_posix && !is_ios) {
+  if (is_posix) {
     sources += [
       "process/process_metrics_posix.cc",
       "sync_socket_posix.cc",
@@ -1275,18 +1275,18 @@ component("base") {
     ]
   }
 
-  if (is_posix && !is_android) {
+  if (is_posix) {
     sources += [ "debug/stack_trace_posix.cc" ]
   }
 
-  if (is_posix && !is_ios) {
+  if (is_posix) {
     sources += [ "process/process_posix.cc" ]
   }
-  if (!is_win && !is_android && !is_linux) {
+  if (!is_linux) {
     sources += [ "synchronization/cancelable_event_default.cc" ]
   }
 
-  if (is_linux || is_android) {
+  if (is_linux) {
     sources += [ "synchronization/cancelable_event_posix.cc" ]
   }
 
@@ -1573,9 +1573,9 @@ component("base") {
     ]
   }
 
-  # Android and MacOS have their own custom shared memory handle
-  # implementations. e.g. due to supporting both POSIX and native handles.
-  if (is_posix && !is_android && !is_apple) {
+  # MacOS has its own custom shared memory handle implementation, e.g. due
+  # to supporting both POSIX and native handles.
+  if (is_posix && !is_apple) {
     sources += [
       "memory/platform_shared_memory_mapper_posix.cc",
       "memory/platform_shared_memory_region_posix.cc",
@@ -1616,14 +1616,14 @@ component("base") {
     sources += [ "time/time_exploded_posix.cc" ]
   }
 
-  if (is_posix && !is_apple && !is_android) {
+  if (is_posix && !is_apple) {
     sources += [
       "profiler/core_unwinders_posix.cc",
       "profiler/stack_sampler_posix.cc",
     ]
   }
 
-  if (is_posix && !is_apple && !is_android) {
+  if (is_posix && !is_apple) {
     sources += [ "power_monitor/power_monitor_device_source_stub.cc" ]
   }
 
@@ -2386,8 +2386,7 @@ executable("json_perftest_decodebench") {
   deps = [ ":base" ]
 }
 
-if ((is_win && (current_cpu == "x64" || current_cpu == "arm64")) || is_mac ||
-    (is_android && (current_cpu == "arm" || current_cpu == "arm64"))) {
+if (is_mac) {
   # Must be a loadable module so that it can be loaded/unloaded at runtime
   # during testing.
   loadable_module("base_profiler_test_support_library") {
@@ -3006,7 +3005,7 @@ test("base_unittests") {
     "//testing/buildbot/filters:base_unittests_filters",
   ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     data_deps += [ "//base/allocator:system_allocator_test_helper" ]
     sources += [ "allocator/system_allocator_unittest.cc" ]
   }

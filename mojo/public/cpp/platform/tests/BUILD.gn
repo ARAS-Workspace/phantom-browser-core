@@ -16,7 +16,7 @@ source_set("tests") {
     "//testing/gtest",
   ]
 
-  if (is_win || is_mac || (is_posix && !is_ios)) {
+  if (is_mac || is_posix) {
     sources += [ "platform_channel_server_unittest.cc" ]
     deps += [ "//mojo/core/embedder" ]
   }

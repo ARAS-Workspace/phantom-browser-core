@@ -385,7 +385,7 @@ viz_component("service") {
     "frame_sinks/external_begin_frame_source_mojo.h",
   ]
 
-  if (is_android || use_ozone) {
+  if (use_ozone) {
     sources += [
       "display/overlay_combination_cache.cc",
       "display/overlay_combination_cache.h",
@@ -554,7 +554,7 @@ viz_source_set("unit_tests") {
     "display/renderer_pixeltest_video.cc",
   ]
 
-  if (!use_aura && !is_mac && !is_win) {
+  if (!use_aura && !is_mac) {
     sources -= [ "display_embedder/buffer_queue_unittest.cc" ]
   }
 

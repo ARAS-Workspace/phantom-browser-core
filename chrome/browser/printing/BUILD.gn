@@ -56,7 +56,7 @@ if (enable_printing) {
       public += [ "prefs_util.h" ]
     }
 
-    if (is_win || enable_print_preview) {
+    if (enable_print_preview) {
       public += [ "printing_service.h" ]
     }
 
@@ -148,7 +148,7 @@ if (enable_printing) {
       sources += [ "prefs_util.cc" ]
     }
 
-    if (is_win || enable_print_preview) {
+    if (enable_print_preview) {
       sources += [ "printing_service.cc" ]
     }
 

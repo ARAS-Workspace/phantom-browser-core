@@ -14,7 +14,7 @@ source_set("tab_contents") {
     "tab_contents_iterator.h",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "chrome_web_contents_menu_helper.h",
       "chrome_web_contents_view_handle_drop.h",
@@ -39,7 +39,7 @@ source_set("impl") {
     "tab_contents_iterator.cc",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "chrome_web_contents_menu_helper.cc",
       "chrome_web_contents_view_handle_drop.cc",

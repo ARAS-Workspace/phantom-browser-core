@@ -944,7 +944,7 @@ component("views") {
   }
 }
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   static_library("view_pixel_diff_test_support") {
     testonly = true
     sources = [
@@ -1500,7 +1500,7 @@ test("views_unittests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "test/view_skia_gold_pixel_diff_unittest.cc" ]
     deps += [ "//ui/views:view_pixel_diff_test_support" ]
   }

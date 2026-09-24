@@ -63,7 +63,7 @@ static_library("browser") {
     deps += [ "//content/public/browser" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public += [
       "agent_signals_collector.h",
       "certificate_signals_collector.h",
@@ -142,7 +142,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "agent_signals_collector_unittest.cc",
       "certificate_signals_collector_unittest.cc",

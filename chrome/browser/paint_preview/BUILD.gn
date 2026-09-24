@@ -26,7 +26,7 @@ source_set("services") {
   ]
 }
 
-if (!is_android && enable_paint_preview) {
+if (enable_paint_preview) {
   source_set("browser_tests") {
     testonly = true
 

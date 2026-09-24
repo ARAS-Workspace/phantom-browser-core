@@ -29,7 +29,7 @@ component("clipboard_types") {
     sources += [ "clipboard_constants_mac.mm" ]
   }
 
-  if (use_aura && !is_win) {
+  if (use_aura) {
     sources += [ "clipboard_format_type_aura.cc" ]
   }
 

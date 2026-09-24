@@ -4,7 +4,7 @@
 
 import("//build/config/features.gni")
 
-if (is_win || (is_linux && use_udev) || is_mac || is_android) {
+if ((is_linux && use_udev) || is_mac) {
   config("platform_support") {
     visibility = [ ":serial" ]
   }

@@ -51,7 +51,7 @@ source_set("search_engines") {
     "//url",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     if (enable_extensions_core) {
       public += [ "default_search_extension_controlled_controller.h" ]
       sources += [ "default_search_extension_controlled_controller.cc" ]
@@ -80,7 +80,7 @@ source_set("unit_tests") {
     "//content/test:test_support",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     if (enable_extensions_core) {
       sources +=
           [ "default_search_extension_controlled_controller_unittest.cc" ]

@@ -83,7 +83,7 @@ source_set("unit_tests") {
     "//url",
   ]
 
-  if (is_win || is_mac || is_linux || is_ios) {
+  if (is_mac || is_linux) {
     sources += [ "theme_color_policy_handler_unittest.cc" ]
     deps += [
       ":policy",
@@ -96,7 +96,7 @@ source_set("unit_tests") {
   data = [ "//media/test/data/" ]
 }
 
-if (is_win || is_mac || is_linux || is_ios) {
+if (is_mac || is_linux) {
   source_set("policy") {
     public = [ "theme_color_policy_handler.h" ]
     sources = [ "theme_color_policy_handler.cc" ]

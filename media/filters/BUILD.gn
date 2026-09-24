@@ -340,7 +340,7 @@ source_set("unit_tests") {
     sources += [ "dav1d_video_decoder_unittest.cc" ]
   }
 
-  if (is_win || use_vaapi) {
+  if (use_vaapi) {
     sources += [ "h26x_annex_b_bitstream_builder_unittest.cc" ]
   }
 

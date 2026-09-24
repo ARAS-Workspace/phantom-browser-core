@@ -36,7 +36,7 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     sources += [ "dependency_factory_impl_unittest.cc" ]
     deps += [
       ":core",

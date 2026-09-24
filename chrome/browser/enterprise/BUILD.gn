@@ -144,7 +144,7 @@ source_set("enterprise") {
     "remote_commands/user_remote_commands_service_factory.h",
   ]
 
-  if (is_mac || is_win || is_android) {
+  if (is_mac) {
     public += [
       "platform_auth/platform_auth_navigation_throttle.h",
       "platform_auth/platform_auth_policy_observer.h",
@@ -197,14 +197,14 @@ source_set("enterprise") {
     ]
   }
 
-  if (is_linux || is_win || is_mac || is_android) {
+  if (is_linux || is_mac) {
     public += [
       "signals/user_delegate_impl.h",
       "signals/user_permission_service_factory.h",
     ]
   }
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     public += [
       "connectors/device_trust/device_trust_connector_service_factory.h",
       "connectors/device_trust/device_trust_service_factory.h",
@@ -224,7 +224,7 @@ source_set("enterprise") {
     ]
   }
 
-  if (is_linux || is_win || is_mac || is_android) {
+  if (is_linux || is_mac) {
     public += [
       "idle/action.h",
       "idle/action_runner.h",
@@ -235,11 +235,11 @@ source_set("enterprise") {
     public_deps += [ "//components/enterprise/idle" ]
   }
 
-  if (is_android || safe_browsing_mode == 1) {
+  if (safe_browsing_mode == 1) {
     public += [ "connectors/common.h" ]
   }
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     public += [
       "connectors/device_trust/browser/signing_key_policy_observer.h",
       "connectors/device_trust/signals/decorators/browser/browser_signals_decorator.h",
@@ -297,7 +297,7 @@ source_set("enterprise") {
 static_library("browser_launch_reporting") {
   sources = []
   deps = []
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [
       "reporting/browser_launch/scoped_initial_command_line.cc",
       "reporting/browser_launch/scoped_initial_command_line.h",
@@ -462,7 +462,7 @@ source_set("impl") {
     "remote_commands/user_remote_commands_service_factory.cc",
   ]
 
-  if (is_mac || is_win || is_android) {
+  if (is_mac) {
     sources += [
       "platform_auth/platform_auth_navigation_throttle.cc",
       "platform_auth/platform_auth_policy_observer.cc",
@@ -526,7 +526,7 @@ source_set("impl") {
     ]
   }
 
-  if (is_linux || is_win || is_mac || is_android) {
+  if (is_linux || is_mac) {
     sources += [
       "signals/user_delegate_impl.cc",
       "signals/user_permission_service_factory.cc",
@@ -534,7 +534,7 @@ source_set("impl") {
     deps += [ "//components/enterprise/device_trust/core:metrics" ]
   }
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [
       "connectors/device_trust/device_trust_connector_service_factory.cc",
       "connectors/device_trust/device_trust_service_factory.cc",
@@ -558,7 +558,7 @@ source_set("impl") {
     ]
   }
 
-  if (is_linux || is_win || is_mac || is_android) {
+  if (is_linux || is_mac) {
     sources += [
       "idle/action.cc",
       "idle/action_runner.cc",
@@ -569,12 +569,12 @@ source_set("impl") {
     deps += [ "//components/enterprise/idle" ]
   }
 
-  if (is_android || safe_browsing_mode == 1) {
+  if (safe_browsing_mode == 1) {
     sources += [ "connectors/common.cc" ]
     deps += [ "//components/enterprise/common/proto:chrome_reporting_entity" ]
   }
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [
       "connectors/device_trust/browser/signing_key_policy_observer.cc",
       "connectors/device_trust/signals/decorators/browser/browser_signals_decorator.cc",

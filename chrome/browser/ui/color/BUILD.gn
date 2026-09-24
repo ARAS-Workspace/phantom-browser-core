@@ -72,7 +72,7 @@ source_set("mixers") {
     sources += [ "mac/native_chrome_color_mixer_mac.cc" ]
   }
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     deps += [ "//chrome/browser/themes" ]
   }
 }

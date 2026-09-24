@@ -108,15 +108,15 @@ group("resources") {
     ]
   }
 
-  if (is_win || is_mac || is_linux || is_desktop_android) {
+  if (is_mac || is_linux) {
     public_deps += [ "discards:resources" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public_deps += []
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public_deps += [
       "app_home:resources",
       "app_settings:resources",
@@ -331,7 +331,7 @@ group("dev_ui_resources") {
     "webui_js_error:resources",
   ]
 
-  if (is_android || is_linux || is_win) {
+  if (is_linux) {
     public_deps += [ "//chrome/browser/resources/sandbox_internals:resources" ]
   }
 
@@ -409,7 +409,7 @@ repack("dev_ui_paks") {
     "$root_gen_dir/chrome/webui_js_error_resources.pak",
   ]
 
-  if (is_android || is_linux || is_win) {
+  if (is_linux) {
     sources += [ "$root_gen_dir/chrome/sandbox_internals_resources.pak" ]
   }
 

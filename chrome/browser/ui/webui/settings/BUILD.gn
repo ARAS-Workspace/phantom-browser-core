@@ -89,7 +89,7 @@ source_set("settings") {
     public_deps += [ "//ui/webui/resources/cr_components/signin:mojo_bindings" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "settings_default_browser_handler.h",
       "settings_manage_profile_handler.h",
@@ -280,7 +280,7 @@ source_set("impl") {
     deps += [ "//chrome/browser/compose" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "settings_default_browser_handler.cc",
       "settings_manage_profile_handler.cc",
@@ -542,7 +542,7 @@ source_set("unit_tests") {
     deps += [ "//ui/ozone" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "accessibility_main_handler_unittest.cc",
       "settings_manage_profile_handler_unittest.cc",
@@ -598,7 +598,7 @@ source_set("interactive_ui_tests") {
     "//ui/base/interaction",
   ]
 
-  if ((is_mac || is_linux || is_win) && enable_dice_support) {
+  if ((is_mac || is_linux) && enable_dice_support) {
     sources += [ "sync_settings_interactive_uitest.cc" ]
     deps += [
       "//chrome/browser/signin",

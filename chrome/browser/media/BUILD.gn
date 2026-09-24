@@ -105,7 +105,7 @@ source_set("unittests") {
     deps += [ ":impl" ]
   }
 
-  if (enable_media_remoting && !is_android) {
+  if (enable_media_remoting) {
     sources += [ "cast_remoting_connector_unittest.cc" ]
     deps += [
       ":impl",
@@ -269,7 +269,7 @@ source_set("media") {
     }
   }
 
-  if (enable_library_cdms || is_win) {
+  if (enable_library_cdms) {
     public += [ "cdm_document_service_impl.h" ]
     public_deps += [ "//media/mojo/mojom" ]
   }
@@ -379,7 +379,7 @@ source_set("impl") {
     }
   }
 
-  if (enable_library_cdms || is_win) {
+  if (enable_library_cdms) {
     sources += [ "cdm_document_service_impl.cc" ]
   }
 }

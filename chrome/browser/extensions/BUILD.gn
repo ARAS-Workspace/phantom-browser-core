@@ -640,7 +640,7 @@ source_set("extensions") {
   ]
   defines = []
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 
@@ -695,7 +695,7 @@ source_set("extensions") {
     ]
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "management/management_util.cc",
       "management/management_util.h",
@@ -1707,11 +1707,11 @@ source_set("unit_tests") {
       "//ui/base/clipboard:clipboard_test_support",
     ]
 
-    if (is_win || is_mac) {
+    if (is_mac) {
       sources += [ "policy_dse_ntp_override_metrics_reporter_unittest.cc" ]
     }
 
-    if (is_win || is_mac || is_linux) {
+    if (is_mac || is_linux) {
       sources += [
         # Batch upload is only available on Windows, Mac and Linux.
         "sync/extension_local_data_batch_uploader_unittest.cc",
@@ -2024,7 +2024,7 @@ source_set("browser_tests") {
     deps += [ "//components/safe_browsing/content/common:file_type_policies_test_support" ]
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "api/networking_private/networking_private_apitest.cc",
       "api/networking_private/networking_private_service_client_apitest.cc",
@@ -2035,7 +2035,7 @@ source_set("browser_tests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "api/image_writer_private/image_writer_utility_client_browsertest.cc",
     ]
@@ -2055,8 +2055,7 @@ source_set("browser_tests") {
     "//components/webapps/isolated_web_apps/test_support",
   ]
 
-  # ChromeOS and Android don't use the download bubble UI.
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/download" ]
   }
 
@@ -2219,7 +2218,7 @@ source_set("browser_tests") {
       sources += [ "api/pdf_viewer_private/pdf_viewer_private_apitest.cc" ]
     }
 
-    if (is_win || is_linux || is_mac) {
+    if (is_linux || is_mac) {
       sources += [
         "api/proxy_override_rules/proxy_override_rules_private_apitest.cc",
         "api/web_authentication_proxy/web_authentication_proxy_apitest.cc",
@@ -2231,7 +2230,7 @@ source_set("browser_tests") {
       ]
     }
 
-    if (is_win || is_linux || is_mac) {
+    if (is_linux || is_mac) {
       sources += [ "//chrome/browser/enterprise/connectors/device_trust/device_trust_browsertest.cc" ]
 
       deps += [
@@ -2246,7 +2245,7 @@ source_set("browser_tests") {
       ]
     }
 
-    if (is_win || is_linux || is_mac) {
+    if (is_linux || is_mac) {
       deps += [
         "//chrome/browser/enterprise/connectors/device_trust/key_management/browser/commands:test_support",
         "//chrome/browser/enterprise/connectors/device_trust/key_management/core/persistence:test_support",

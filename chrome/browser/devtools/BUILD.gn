@@ -230,7 +230,7 @@ static_library("devtools") {
     deps += [ "//chrome/browser:certificate_viewer" ]
   }
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   public_deps += [
@@ -281,7 +281,7 @@ static_library("devtools") {
     "//ui/views",
     "//ui/views/controls/webview",
   ]
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   sources += [

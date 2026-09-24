@@ -144,7 +144,7 @@ source_set("browser_tests") {
 
   if (!is_linux || target_cpu != "arm64") {
     # SODA doesn't support Linux on Arm64.
-    if (is_win || is_mac || is_linux) {
+    if (is_mac || is_linux) {
       deps += [ "//chrome/browser/browsing_data:constants" ]
     }
   }

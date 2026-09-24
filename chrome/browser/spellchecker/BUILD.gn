@@ -20,7 +20,7 @@ source_set("spellchecker") {
     public += [ "spelling_request.h" ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     public += [
       "spellcheck_language_blocklist_policy_handler.h",
       "spellcheck_language_policy_handler.h",
@@ -44,7 +44,7 @@ source_set("spellchecker") {
     "//services/network/public/cpp",
   ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     public_deps += [ "//components/policy/core/browser" ]
   }
 }
@@ -63,7 +63,7 @@ source_set("impl") {
     sources += [ "spelling_request.cc" ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [
       "spellcheck_language_blocklist_policy_handler.cc",
       "spellcheck_language_policy_handler.cc",
@@ -120,7 +120,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_linux || is_win) {
+  if (is_linux) {
     sources += [ "spellcheck_language_policy_handlers_unittest.cc" ]
     deps += [ "//components/policy/core/browser" ]
   }

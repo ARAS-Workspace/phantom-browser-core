@@ -161,11 +161,11 @@ source_set("browser_tests") {
         [ "signin/signout_confirmation/signout_confirmation_browsertest.cc" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "discards/discards_browsertest.cc" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "app_home/app_home_browsertest.cc",
       "app_settings/app_settings_browsertest.cc",
@@ -608,12 +608,12 @@ generate_grd("build_grd") {
     grdp_files += [ "$target_gen_dir/../pdf/resources.grdp" ]
   }
 
-  if (is_chrome_branded && !is_android) {
+  if (is_chrome_branded) {
     deps += [ "media_router:build_grdp" ]
     grdp_files += [ "$target_gen_dir/media_router/resources.grdp" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "app_home:build_grdp",
       "app_settings:build_grdp",

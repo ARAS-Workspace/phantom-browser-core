@@ -110,7 +110,7 @@ source_set("internal") {
     "//components/search",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [
       "//chrome/browser/ui/pdf/infobar",
       "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar",
@@ -121,7 +121,7 @@ source_set("internal") {
     }
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/download/bubble",
       "//chrome/browser/ui/views/session_restore_infobar",

@@ -47,7 +47,7 @@ group("sandbox") {
       "//sandbox/mac:system_services",
       "//sandbox/mac/mojom",
     ]
-  } else if (is_linux || is_android) {
+  } else if (is_linux) {
     public_deps = [ "//sandbox/linux:sandbox" ]
   }
 }

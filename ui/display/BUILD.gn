@@ -158,7 +158,7 @@ static_library("test_support") {
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
   }
 
-  if (!is_mac && !is_win) {
+  if (!is_mac) {
     sources += [
       # Virtual display util stub for unimplemented platforms.
       "test/virtual_display_util_stub.cc",

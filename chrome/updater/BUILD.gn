@@ -25,7 +25,7 @@ group("updater") {
     deps = [ "//chrome/updater/linux" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       ":updater_license",
       "//chrome/updater/test/qualification_app",
@@ -41,7 +41,7 @@ group("updater") {
 group("all") {
   testonly = true
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps = [
       ":updater",
       ":updater_tests",
@@ -50,7 +50,7 @@ group("all") {
   }
 }
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   action("updater_license") {
     script = "//chrome/updater/fix_licenses.py"
     deps = [ ":generate_updater_license" ]
@@ -567,7 +567,7 @@ if (is_win || is_mac || is_linux) {
     }
   }
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     crx3("updater_selfupdate_test_crx") {
       base_dir = "$root_build_dir"
       key = "test/data/selfupdate_test_key.der"

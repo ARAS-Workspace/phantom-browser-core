@@ -52,7 +52,7 @@ component("webview") {
     "//ui/views",
   ]
 
-  if (is_linux || is_android) {
+  if (is_linux) {
     if (use_ozone) {
       sources += [ "unhandled_keyboard_event_handler_ozone.cc" ]
       deps += [ "//ui/ozone" ]

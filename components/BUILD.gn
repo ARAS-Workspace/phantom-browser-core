@@ -55,7 +55,7 @@ disallowed_extension_deps_ = [
 test("components_unittests") {
   use_xvfb = use_xvfb_in_this_config
 
-  if (is_android || is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     # Ideally these would be added to the specific :unit_tests targets they are
     # relevant for. Please try to do this rather than add to this list.
     data = [
@@ -495,11 +495,11 @@ test("components_unittests") {
     ]
   }
 
-  if (is_linux || is_win || is_mac || is_android || is_ios) {
+  if (is_linux || is_mac) {
     deps += [ "//components/enterprise/idle:unit_tests" ]
   }
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     deps += [ "//components/named_system_lock:unit_tests" ]
   }
 
@@ -594,7 +594,7 @@ test("components_unittests") {
     deps += [ "//components/constrained_window:unit_tests" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//components/metrics/private_metrics:unit_tests",
       "//components/metrics/structured:unit_tests",
@@ -605,7 +605,7 @@ test("components_unittests") {
     ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     deps += [ "//components/services/font_data:unit_tests" ]
   }
 
@@ -649,7 +649,7 @@ test("components_unittests") {
     ]
   }
 
-  if (safe_browsing_mode != 0 && !is_ios) {
+  if (safe_browsing_mode != 0) {
     deps += [
       # TODO(chromium: 1169835) components / reporting / storage / resources:
       # unit_tests can't be run on iOS until they are updated.
@@ -1015,7 +1015,7 @@ if (use_blink) {
       "test/data/web_package/",
     ]
 
-    if (safe_browsing_mode == 1 || is_ios) {
+    if (safe_browsing_mode == 1) {
       sources += [ "safe_browsing/core/browser/db/v4_store_perftest.cc" ]
       deps += [
         "//components/safe_browsing/core/browser/db:sb_store",

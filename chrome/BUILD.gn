@@ -80,7 +80,7 @@ group("assert_no_deps") {
   assert_no_deps = [ "//chrome/installer/util:strings" ]
 }
 
-if (!is_android && !is_mac) {
+if (!is_mac) {
   group("chrome") {
     public_deps = [ ":chrome_initial" ]
     data_deps = [ ":chrome_initial" ]
@@ -106,7 +106,7 @@ if (!is_android && !is_mac) {
     data = [ "$root_out_dir/resources.pak" ]
     data_deps = []
 
-    if (is_win || is_linux) {
+    if (is_linux) {
       deps += [ "//components/webapps/isolated_web_apps:scheme" ]
     }
 
@@ -1645,11 +1645,11 @@ if (enable_separate_renderer_binary) {
     "//content/public/app",
     "//v8",
   ]
-  if (is_win || is_linux || is_mac) {
+  if (is_linux || is_mac) {
     _chrome_renderer_deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     shared_library("chrome_renderer") {
       if (enable_separate_pgo) {
         configs -= [ "//build/config/compiler/pgo:default_pgo_flags" ]

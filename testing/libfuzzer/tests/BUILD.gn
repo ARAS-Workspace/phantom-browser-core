@@ -60,7 +60,7 @@ test("fuzzing_unittests") {
 
     # The __generate targets (the wrappers) are only generated on Linux, Mac,
     # and Windows (see _building_fuzztest_fuzzer in testing/test.gni).
-    if (use_fuzztest_wrapper && (is_linux || is_mac || is_win)) {
+    if (use_fuzztest_wrapper && (is_linux || is_mac)) {
       data_deps += [ ":stub_fuzztest_StubFuzzer_Stub_fuzzer__generate" ]
       defines += [ "USING_FUZZTEST_WRAPPER" ]
     }
@@ -95,7 +95,7 @@ test("fuzzing_unittests") {
 # These fuzzer targets' outputs serve as inputs to `fuzzer_launcher_test.cc`,
 # which checks that `.options`, `.dict` and corpus files are generated
 # correctly. Only compile them when compiling the test itself.
-if (use_fuzzing_engine && !is_win) {
+if (use_fuzzing_engine) {
   fuzzer_test("test_dict_only") {
     sources = [ "../fuzzers/empty_fuzzer.cc" ]
     dict = "test.dict"

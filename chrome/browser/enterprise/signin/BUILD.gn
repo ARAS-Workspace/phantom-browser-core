@@ -35,7 +35,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     sources += [
       "managed_profile_creator_unittest.cc",
       "oidc_managed_profile_creation_delegate_unittest.cc",
@@ -45,7 +45,7 @@ source_set("unit_tests") {
   }
 }
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   source_set("browser_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

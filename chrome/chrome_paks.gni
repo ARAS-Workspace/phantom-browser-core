@@ -253,12 +253,12 @@ template("chrome_extra_paks") {
       "//chrome/browser/resources/signin/profile_picker:resources",
     ]
 
-    if (is_win || is_mac || is_linux || is_desktop_android) {
+    if (is_mac || is_linux) {
       sources += [ "$root_gen_dir/chrome/discards_resources.pak" ]
       deps += [ "//chrome/browser/resources/discards:resources" ]
     }
 
-    if (is_win || is_mac || is_linux) {
+    if (is_mac || is_linux) {
       sources += []
       deps += []
     }
@@ -301,7 +301,7 @@ template("chrome_extra_paks") {
       deps += [ "//chrome/browser/resources/watermark:resources" ]
     }
 
-    if (is_win || is_mac || is_linux) {
+    if (is_mac || is_linux) {
       sources += [
         "$root_gen_dir/chrome/app_home_resources.pak",
         "$root_gen_dir/chrome/app_settings_resources.pak",

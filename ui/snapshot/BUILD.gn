@@ -33,7 +33,7 @@ component("snapshot") {
     "//ui/gfx/geometry",
   ]
 
-  if (use_aura || is_android) {
+  if (use_aura) {
     sources += [
       "snapshot_async.cc",
       "snapshot_async.h",

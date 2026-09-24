@@ -31,7 +31,7 @@ source_set("hid") {
     "//url",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public += [
       "hid_connection_tracker.h",
       "hid_connection_tracker_factory.h",
@@ -145,7 +145,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "hid_status_icon_unittest.cc" ]
     deps += [ "//chrome/browser/device_notifications:unit_tests" ]
   }

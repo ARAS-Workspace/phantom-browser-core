@@ -209,7 +209,7 @@ source_set("interactive_ui_tests") {
 
   # media_router_ui_interactive_uitest.cc is desktop-only; it does not build
   # on ChromeOS or Fuchsia.
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "media_router_ui_interactive_uitest.cc" ]
   }
 

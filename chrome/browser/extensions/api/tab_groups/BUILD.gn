@@ -50,7 +50,7 @@ source_set("tab_groups") {
     "//chrome/browser/ui/tabs/saved_tab_groups",
   ]
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 

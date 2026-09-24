@@ -13,7 +13,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     sources += [
       "device_attester_unittest.cc",
       "profile_attester_unittest.cc",

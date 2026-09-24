@@ -83,7 +83,7 @@ source_set("core_keyed_service_factories") {
     "//extensions/buildflags",
   ]
 
-  if (enable_extensions && !is_android) {
+  if (enable_extensions) {
     deps += [ "//extensions/browser/mime_handler:mime_handler_registry" ]
   }
 }

@@ -19,8 +19,7 @@ group("test") {
   ]
 }
 
-# TODO(crbug.com/446587184): Enable in_process_fuzzer_runner on Android.
-if (fuzzing_engine_supports_custom_main && !is_android) {
+if (fuzzing_engine_supports_custom_main) {
   static_library("in_process_fuzzer_runner") {
     testonly = true
     sources = [

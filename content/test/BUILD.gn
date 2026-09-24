@@ -665,7 +665,7 @@ static_library("test_support") {
       "../browser/hid/hid_test_utils.h",
     ]
   }
-  if (!is_linux_without_udev && !is_android) {
+  if (!is_linux_without_udev) {
     sources += [
       "../browser/webauth/authenticator_test_base.cc",
       "../browser/webauth/authenticator_test_base.h",
@@ -1851,7 +1851,7 @@ test("content_browsertests") {
   }
 
   if (enable_screen_capture) {
-    if (is_android || is_linux || is_mac || is_win) {
+    if (is_linux || is_mac) {
       sources += [
         "../browser/media/capture/content_capture_device_browsertest_base.cc",
         "../browser/media/capture/content_capture_device_browsertest_base.h",
@@ -1866,7 +1866,7 @@ test("content_browsertests") {
       data += [ "$root_out_dir/content_shell.pak" ]
     }
 
-    if (is_linux || is_mac || is_win) {
+    if (is_linux || is_mac) {
       # For chromecast, content_browsertests does not provide a shell window.
       if (use_aura) {
         sources += [ "../browser/media/capture/aura_window_video_capture_device_browsertest.cc" ]
@@ -1874,7 +1874,7 @@ test("content_browsertests") {
     }
   }
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     deps += [ "//third_party/libyuv" ]
     data += [
       "//net/tools/testserver/",
@@ -1939,7 +1939,7 @@ test("content_browsertests") {
   if (!is_linux_without_udev) {
     sources += [ "../browser/hid/hid_browsertest.cc" ]
   }
-  if (!is_linux_without_udev && !is_android) {
+  if (!is_linux_without_udev) {
     sources += [ "../browser/webauth/webauth_browsertest.cc" ]
   }
 
@@ -1965,7 +1965,7 @@ test("content_browsertests") {
     frameworks = [ "ScreenCaptureKit.framework" ]
   }
 
-  if (use_aura && !is_win) {
+  if (use_aura) {
     deps += [ "//ui/events:test_support" ]
   }
 
@@ -2627,11 +2627,11 @@ test("content_unittests") {
 
   sources += [ "../browser/file_system_access/file_path_watcher/file_path_watcher_unittest.cc" ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [ "../browser/media/system_media_controls/web_app_system_media_controls_manager_unittest.cc" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "../browser/file_system_access/file_system_access_observer_observation_unittest.cc",
       "../browser/renderer_host/delegated_frame_host_unittest.cc",
@@ -2646,7 +2646,7 @@ test("content_unittests") {
     sources += [ "../browser/accessibility/browser_accessibility_state_impl_auralinux_unittest.cc" ]
   }
 
-  if (is_android || is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     data = [
       "$root_out_dir/content_shell.pak",
       "data/",
@@ -2891,7 +2891,7 @@ test("content_unittests") {
     if (is_mac) {
       sources += [ "../browser/media/capture/mouse_cursor_overlay_controller_mac_unittest.mm" ]
     }
-    if (is_mac || is_win) {
+    if (is_mac) {
       sources += [
         "../browser/media/capture/desktop_capture_util_mac_unittest.mm",
         "../browser/media/capture/pip_screen_capture_coordinator_impl_unittest.cc",
@@ -2922,7 +2922,7 @@ test("content_unittests") {
   }
 
   # Platforms with FontDataManager enabled
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [ "../child/font_data/font_data_manager_unittest.cc" ]
     deps += [ "//components/services/font_data/public/mojom" ]
   }
@@ -2980,7 +2980,7 @@ test("content_unittests") {
 
   # HID support is not available without udev.
   is_linux_without_udev = is_linux && !use_udev
-  if (!is_linux_without_udev && !is_android) {
+  if (!is_linux_without_udev) {
     sources += [
       "../browser/hid/hid_service_unittest.cc",
       "../browser/service_worker/service_worker_hid_delegate_observer_unittest.cc",

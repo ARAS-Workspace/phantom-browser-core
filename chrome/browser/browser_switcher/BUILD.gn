@@ -10,7 +10,7 @@ source_set("browser_switcher") {
   public = []
   public_deps = [ "//base" ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public += [
       "alternative_browser_driver.h",
       "browser_switcher_navigation_throttle.h",
@@ -36,7 +36,7 @@ source_set("impl") {
   sources = []
   deps = [ ":browser_switcher" ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "browser_switcher_navigation_throttle.cc",
       "browser_switcher_prefs.cc",
@@ -73,7 +73,7 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     sources += [
       "alternative_browser_driver_unittest.cc",
       "browser_switcher_navigation_throttle_unittest.cc",
@@ -108,7 +108,7 @@ source_set("browser_tests") {
   sources = []
   deps = []
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "browser_switcher_browsertest.cc",
       "browser_switcher_service_browsertest.cc",

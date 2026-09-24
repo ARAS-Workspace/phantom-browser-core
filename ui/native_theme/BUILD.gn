@@ -119,7 +119,7 @@ test("native_theme_unittests") {
     deps += [ "//ui/gfx:test_support" ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [ "native_theme_fluent_unittest.cc" ]
   }
 }

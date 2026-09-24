@@ -83,7 +83,7 @@ group("api_implementations") {
       public_deps += [ "//chrome/browser/extensions/api/pdf_viewer_private" ]
     }
 
-    if (is_win || is_mac || is_linux) {
+    if (is_mac || is_linux) {
       public_deps +=
           [ "//chrome/browser/extensions/api/web_authentication_proxy" ]
     }

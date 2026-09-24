@@ -67,7 +67,7 @@ declare_args() {
   # Enable usage of OpenH264 within the media library. Used for software based
   # encoding of H264 content.
   media_use_openh264 = true
-  if (is_ios || (is_android && current_cpu == "arm") || !proprietary_codecs) {
+  if (!proprietary_codecs) {
     media_use_openh264 = false
   }
 
@@ -211,12 +211,12 @@ declare_args() {
   # Enables runtime selection of ALSA library for audio.
   use_alsa = false
 
-  # Alsa should be used on all non-Android, non-Mac POSIX systems - with the
+  # Alsa should be used on all non-Mac POSIX systems - with the
   # exception of CastOS desktop builds.
   #
   # TODO(crbug.com/1336055): Remove legacy target_cpu hack used for targeting
   # desktop Chromecast builds.
-  if (is_posix && !is_android && !is_apple) {
+  if (is_posix && !is_apple) {
     use_alsa = true
 
     # Pulse is not supported on Chromecast platforms.
@@ -294,7 +294,7 @@ if (is_cast_media_device) {
     "video_decoder",
   ]
   _default_mojo_media_host = "gpu"
-} else if (is_apple || is_win) {
+} else if (is_apple) {
   _default_mojo_media_services = [
     "audio_decoder",
     "audio_encoder",
@@ -389,6 +389,6 @@ if (media_use_ffmpeg) {
   media_subcomponent_deps += [ "//media/ffmpeg" ]
 }
 
-if (enable_library_cdms || is_win) {
+if (enable_library_cdms) {
   media_subcomponent_deps += [ "//media/cdm:cdm_type_conversion" ]
 }

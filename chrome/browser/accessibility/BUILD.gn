@@ -108,7 +108,7 @@ source_set("impl") {
 source_set("unit_tests") {
   testonly = true
   sources = []
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
   }
   deps = [
     ":accessibility",
@@ -117,7 +117,7 @@ source_set("unit_tests") {
     "//chrome/test:test_support",
     "//testing/gtest",
   ]
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     deps += [ "//chrome/browser/component_updater" ]
   }
 }

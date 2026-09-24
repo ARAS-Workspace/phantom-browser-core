@@ -272,7 +272,7 @@ component("gfx") {
     public_deps += [ "//cc/paint" ]
     deps += [ "//third_party/harfbuzz" ]
 
-    if (is_android || is_win || is_apple) {
+    if (is_apple) {
       sources += [
         "font_fallback_skia_impl.cc",
         "font_fallback_skia_impl.h",
@@ -500,7 +500,7 @@ source_set("memory_buffer_sources") {
     deps += [ "//build/config/linux/libdrm" ]
   }
 
-  if (is_linux || is_android) {
+  if (is_linux) {
     deps += [ "//third_party/libsync" ]
   }
 
@@ -712,7 +712,7 @@ test("gfx_unittests") {
     ]
   }
 
-  if (is_linux || is_android || is_win) {
+  if (is_linux) {
     sources += [ "platform_font_skia_unittest.cc" ]
   }
 

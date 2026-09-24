@@ -205,7 +205,7 @@ source_set("tests") {
     "//third_party/tflite",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "public/cpp/sounds/audio_stream_handler_unittest.cc",
       "public/cpp/sounds/sounds_manager_unittest.cc",

@@ -47,7 +47,7 @@ if (is_linux) {
   }
 }
 
-if (is_linux || is_win) {
+if (is_linux) {
   source_set("metrics") {
     configs += [ "//components/enterprise:extra_warnings" ]
 

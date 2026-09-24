@@ -18,7 +18,7 @@ group("perf") {
     ":perf_without_chrome",
     "//tools/perf/chrome_telemetry_build:telemetry_chrome_test",
   ]
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     data_deps += [ "//chrome/test/chromedriver:chromedriver_server" ]
   }
 }

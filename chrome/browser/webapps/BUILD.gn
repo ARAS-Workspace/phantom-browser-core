@@ -35,7 +35,7 @@ source_set("impl") {
 
   deps += [ "//chrome/browser/web_applications" ]
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 }

@@ -348,7 +348,7 @@ source_set("common") {
     ]
   }
 
-  if (is_mac || is_win || is_android || is_ios) {
+  if (is_mac) {
     sources -= [ "font_list_fontconfig.cc" ]
   }
 
@@ -414,7 +414,7 @@ mojom("mojo_bindings") {
   if (use_clang_profiling_inside_sandbox) {
     enabled_features += [ "clang_profiling_inside_sandbox" ]
   }
-  if (is_posix && !is_android) {
+  if (is_posix) {
     enabled_features += [ "is_non_android_posix" ]
   }
 

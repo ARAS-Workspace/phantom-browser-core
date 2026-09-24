@@ -24,7 +24,7 @@ source_set("whats_new") {
     "//url",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "whats_new_fetcher.h",
       "whats_new_handler.h",
@@ -70,7 +70,7 @@ source_set("impl") {
     "//url",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "whats_new_fetcher.cc",
       "whats_new_handler.cc",
@@ -96,7 +96,7 @@ source_set("impl") {
   }
 }
 
-if (is_linux || is_mac || is_win) {
+if (is_linux || is_mac) {
   source_set("unit_tests") {
     testonly = true
     sources = [

@@ -18,7 +18,7 @@ source_set("unit_tests") {
   sources = []
 
   # Disable NamedSystemLockTest on unsupported platforms.
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [ "lock_unittest.cc" ]
   }
 

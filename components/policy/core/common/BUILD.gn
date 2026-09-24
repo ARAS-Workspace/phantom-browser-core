@@ -262,7 +262,7 @@ source_set("internal") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "cloud/profile_cloud_policy_manager.cc",
       "cloud/profile_cloud_policy_manager.h",
@@ -272,7 +272,7 @@ source_set("internal") {
   }
 
   # Compile on Linux for fuzzer and since code is reused on Chrome OS.
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [
       "registry_dict.cc",
       "registry_dict.h",
@@ -347,14 +347,14 @@ static_library("test_support") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "cloud/mock_profile_cloud_policy_store.cc",
       "cloud/mock_profile_cloud_policy_store.h",
     ]
   }
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [
       "field_validation_test_utils.cc",
       "field_validation_test_utils.h",
@@ -455,7 +455,7 @@ source_set("unit_tests") {
     "cloud/cloud_policy_validator_unittest.cc",
   ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [ "registry_dict_unittest.cc" ]
   }
   sources += [
@@ -469,11 +469,11 @@ source_set("unit_tests") {
     "cloud/user_cloud_policy_store_unittest.cc",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [ "policy_loader_common_unittest.cc" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "cloud/profile_cloud_policy_manager_unittest.cc",
       "cloud/profile_cloud_policy_store_unittest.cc",
@@ -500,7 +500,7 @@ source_set("unit_tests") {
       sources += [ "policy_loader_mac_unittest.cc" ]
     }
   }
-  if (is_win || is_linux) {
+  if (is_linux) {
     # Needed by policy_loader_win_unittest.cc
     data = [ "//chrome/test/data/policy/" ]
   }

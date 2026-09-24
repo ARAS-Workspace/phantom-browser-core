@@ -35,7 +35,7 @@ source_set("impl") {
   if (is_mac) {
     sources += [ "background_mode_manager_mac.cc" ]
   }
-  if (use_aura && !is_win) {
+  if (use_aura) {
     sources += [ "background_mode_manager_aura.cc" ]
   }
 

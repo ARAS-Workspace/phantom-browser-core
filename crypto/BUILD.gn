@@ -148,7 +148,7 @@ component("crypto") {
       "Security.framework",
     ]
 
-    if (is_mac || (is_ios && target_platform != "tvos")) {
+    if (is_mac) {
       frameworks += [ "LocalAuthentication.framework" ]
     }
   }
@@ -191,7 +191,7 @@ if (is_apple) {
       "Security.framework",
     ]
 
-    if (is_mac || (is_ios && target_platform != "tvos")) {
+    if (is_mac) {
       frameworks += [ "LocalAuthentication.framework" ]
     }
   }
@@ -293,7 +293,7 @@ static_library("test_support") {
     configs += [ "//build/config/linux/nss" ]
   }
 
-  if (is_mac || is_ios) {
+  if (is_mac) {
     sources += [
       "apple/fake_keychain_v2.h",
       "apple/fake_keychain_v2.mm",
@@ -308,7 +308,7 @@ static_library("test_support") {
       "Security.framework",
     ]
 
-    if (is_mac || (is_ios && target_platform != "tvos")) {
+    if (is_mac) {
       frameworks += [ "LocalAuthentication.framework" ]
     }
   }

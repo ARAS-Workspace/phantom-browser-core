@@ -107,7 +107,7 @@ source_set("impl_for_embedder") {
       "channel_posix.h",
     ]
 
-    if (is_linux || is_android) {
+    if (is_linux) {
       sources += [
         "channel_linux.cc",
         "channel_linux.h",

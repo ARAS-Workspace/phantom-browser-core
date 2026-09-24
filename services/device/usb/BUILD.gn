@@ -85,14 +85,14 @@ static_library("usb") {
     deps += [ "//device/udev_linux" ]
   }
 
-  if (is_android || is_linux) {
+  if (is_linux) {
     sources += [
       "usb_device_handle_usbfs.cc",
       "usb_device_handle_usbfs.h",
     ]
   }
 
-  if (is_android || is_linux) {
+  if (is_linux) {
     sources += [
       "usb_interface_detach_allowlist.cc",
       "usb_interface_detach_allowlist.h",

@@ -47,7 +47,7 @@ source_set("status_icons") {
   }
 }
 
-if (is_win || use_dbus) {
+if (use_dbus) {
   source_set("unit_tests") {
     testonly = true
     sources = []

@@ -28,7 +28,7 @@ source_set("profiles") {
     "//skia",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "profile_customization_synced_theme_waiter.h",
       "profile_customization_util.h",
@@ -81,7 +81,7 @@ source_set("impl") {
     "//components/user_prefs",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "profile_customization_synced_theme_waiter.cc",
       "profile_customization_util.cc",
@@ -152,7 +152,7 @@ source_set("unit_tests") {
     "//ui/native_theme:test_support",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "profile_customization_util_unittest.cc",
       "profile_picker_unittest.cc",

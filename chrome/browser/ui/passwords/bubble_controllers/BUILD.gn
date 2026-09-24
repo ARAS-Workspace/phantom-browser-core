@@ -27,7 +27,7 @@ source_set("bubble_controllers") {
     "//ui/gfx/range",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "biometric_authentication_confirmation_bubble_controller.h",
       "biometric_authentication_for_filling_bubble_controller.h",
@@ -86,7 +86,7 @@ source_set("impl") {
     "//ui/base",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "biometric_authentication_confirmation_bubble_controller.cc",
       "biometric_authentication_for_filling_bubble_controller.cc",
@@ -151,7 +151,7 @@ source_set("unit_tests") {
     "//ui/gfx:test_support",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "biometric_authentication_confirmation_bubble_controller_unittest.cc",
       "biometric_authentication_for_filling_bubble_controller_unittest.cc",

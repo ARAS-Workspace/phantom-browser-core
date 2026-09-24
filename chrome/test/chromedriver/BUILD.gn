@@ -612,7 +612,7 @@ test("chromedriver_unittests") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (is_win || is_posix) {
+if (is_posix) {
   test("chromedriver_integrationtests") {
     sources = [
       "net/test_http_server.cc",

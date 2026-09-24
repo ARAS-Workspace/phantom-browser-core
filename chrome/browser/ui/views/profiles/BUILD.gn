@@ -5,7 +5,7 @@
 import("//build/config/ui.gni")
 import("//components/signin/features.gni")
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   source_set("avatar_badge_view") {
     public = [ "avatar_badge_view.h" ]
     sources = [ "avatar_badge_view.cc" ]
@@ -184,7 +184,7 @@ if (toolkit_views) {
   }
 }
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   source_set("badged_profile_photo") {
     public = [ "badged_profile_photo.h" ]
     sources = [ "badged_profile_photo.cc" ]

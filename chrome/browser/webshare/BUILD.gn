@@ -27,7 +27,7 @@ if (is_mac) {
   }
 }
 
-if (is_win || is_mac) {
+if (is_mac) {
   source_set("webshare") {
     public = [ "share_service_impl.h" ]
 
@@ -137,7 +137,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [ "//chrome/browser/webshare" ]
   }
 

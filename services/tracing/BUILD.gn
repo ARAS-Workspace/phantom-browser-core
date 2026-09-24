@@ -133,7 +133,7 @@ source_set("tests") {
     ]
   }
 
-  if (!is_android && use_blink) {
+  if (use_blink) {
     sources += [ "tracing_service_unittest.cc" ]
   }
 

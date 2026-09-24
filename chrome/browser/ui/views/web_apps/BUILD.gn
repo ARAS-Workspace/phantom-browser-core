@@ -62,7 +62,7 @@ source_set("web_apps") {
     "//url",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public += [
       "deprecated_apps_dialog_view.h",
       "force_installed_deprecated_apps_dialog_view.h",

@@ -185,7 +185,7 @@ source_set("browser_actions_impl") {
   if (is_mac) {
     deps += [ "//chrome/browser:global_keyboard_shortcuts_mac" ]
   }
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt" ]
   }
 }
@@ -1651,7 +1651,7 @@ static_library("ui") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "incognito_clear_browsing_data_dialog_interface.h",
       "views/autofill/payments/webauthn_dialog_view.cc",
@@ -1688,7 +1688,7 @@ static_library("ui") {
 
   deps += [ "//chrome/browser/ui/webui/downloads" ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "views/profiles/profile_customization_bubble_sync_controller.cc",
       "views/profiles/profile_customization_bubble_sync_controller.h",
@@ -1783,7 +1783,7 @@ static_library("ui") {
     }
   }
 
-  if (is_win || is_mac || is_linux || is_android) {
+  if (is_mac || is_linux) {
     deps += [ "//components/enterprise/device_trust/core:metrics" ]
 
     if (enterprise_client_certificates) {
@@ -1881,10 +1881,7 @@ static_library("ui") {
     }
   }
 
-  # Device signals sharing currently only supports win, mac, linux and
-  # chromeos, so the corresponding consent functionality are
-  # limited to the same set of platforms.
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/views/device_signals_consent",
       "//chrome/browser/ui/views/device_signals_consent:impl",
@@ -2789,7 +2786,7 @@ static_library("ui") {
       ]
     }
 
-    if (is_win || is_linux) {
+    if (is_linux) {
       sources += [
         "views/native_widget_factory.cc",
         "views/native_widget_factory.h",
@@ -3155,7 +3152,7 @@ source_set("url_identity") {
     "//extensions/buildflags",
     "//url",
   ]
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   if (enable_extensions) {

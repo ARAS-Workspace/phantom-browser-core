@@ -37,7 +37,7 @@ static_library("sync_bookmarks") {
     "synced_bookmark_tracker_entity.h",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "initial_account_bookmark_deduplicator.cc",
       "initial_account_bookmark_deduplicator.h",
@@ -78,7 +78,7 @@ source_set("unit_tests") {
     "test_node_builders.h",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "initial_account_bookmark_deduplicator_unittest.cc" ]
   }
 

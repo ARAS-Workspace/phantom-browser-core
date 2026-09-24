@@ -103,7 +103,7 @@ component("public") {
     "//components/download/database",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [
       "desktop/desktop_auto_resumption_handler.cc",
       "desktop/desktop_auto_resumption_handler.h",
@@ -151,7 +151,7 @@ source_set("unit_tests") {
 
   sources = []
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += [ "desktop/desktop_auto_resumption_handler_unittest.cc" ]
   }
 

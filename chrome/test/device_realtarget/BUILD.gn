@@ -4,7 +4,7 @@
 
 import("//testing/test.gni")
 
-if (is_linux || is_mac || is_win) {
+if (is_linux || is_mac) {
   test("device_realtarget_browsertests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

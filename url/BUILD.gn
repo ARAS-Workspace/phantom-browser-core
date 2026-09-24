@@ -7,7 +7,6 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//testing/test.gni")
 import("features.gni")
 
-import("//build/config/cronet/config.gni")
 import("//third_party/jni_zero/jni_zero.gni")
 
 buildflag_header("buildflags") {
@@ -194,7 +193,7 @@ fuzzer_test("url_canon_icu_fuzzer") {
 
 # Use this in robolectric_binary() targets if you just need GURL and //base
 # functionality. Otherwise, define a custom shared_library().
-if (!is_cronet_build && target_os == "android") {
+if (target_os == "android") {
   shared_library_with_jni("libgurl_robolectric") {
     testonly = true
     enable_target = is_robolectric

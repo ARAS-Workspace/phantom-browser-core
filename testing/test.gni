@@ -413,7 +413,7 @@ template("test") {
   assert(!defined(invoker.allow_cleartext_traffic),
          "allow_cleartext_traffic can be set only for Android tests")
 
-  if (is_mac || is_win) {
+  if (is_mac) {
     assert(!defined(invoker.use_xvfb) || !invoker.use_xvfb)
   }
 

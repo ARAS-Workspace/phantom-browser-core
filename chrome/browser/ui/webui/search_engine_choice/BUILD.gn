@@ -41,7 +41,7 @@ source_set("search_engine_choice") {
   ]
 }
 
-if (is_win || is_linux) {
+if (is_linux) {
   source_set("browser_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

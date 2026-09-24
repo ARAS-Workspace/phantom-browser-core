@@ -58,7 +58,7 @@ group("test") {
     "fuzzing:test",
     "//chrome/test/variations:variations_desktop_smoke_tests",
   ]
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     deps += [ "//chrome/test/device_realtarget:device_realtarget_browsertests" ]
   }
 }
@@ -104,7 +104,7 @@ static_library("test_support") {
     "//ui/base/unowned_user_data",
   ]
 
-  if (is_android || is_mac || is_win) {
+  if (is_mac) {
     deps += [
       "//chrome/browser/device_reauth",
       "//components/device_reauth",
@@ -229,7 +229,7 @@ static_library("test_support") {
     ]
   }
 
-  if (is_chrome_branded && (is_mac || is_win || is_linux)) {
+  if (is_chrome_branded && (is_mac || is_linux)) {
     public_deps += [ "//chrome/test/base:scoped_channel_override" ]
   }
 
@@ -544,7 +544,7 @@ static_library("test_support") {
     public_deps += [ "//chrome/test/base:drag_and_drop_test_utils" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public_deps += [
       "//ui/base:pixel_diff_test_support",
       "//ui/views:view_pixel_diff_test_support",
@@ -1796,7 +1796,7 @@ test("browser_tests") {
   allow_circular_includes_from +=
       [ "//chrome/browser/ui/views/passwords:browser_tests" ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     deps += [ "//chrome/browser/ui/views:bluetooth_dialogs" ]
   }
 
@@ -2105,13 +2105,13 @@ test("browser_tests") {
     deps += [ "//chrome/browser/compose:browser_tests" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "../browser/ui/views/profiles/device_signals_disclaimer_browsertest.cc",
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "../browser/ui/views/device_signals_consent/consent_dialog_browsertest.cc" ]
     deps += [
       "//chrome/browser/ui/views/device_signals_consent",
@@ -2119,7 +2119,7 @@ test("browser_tests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/enterprise/profile_management:browser_tests",
       "//chrome/browser/enterprise/signin:browser_tests",
@@ -2212,10 +2212,10 @@ test("browser_tests") {
     "//third_party/federated_compute:confidential_compute_crypto_test_util",
   ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
   }
 
   deps += [
@@ -2286,7 +2286,7 @@ test("browser_tests") {
     ]
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += []
 
     deps += [ "//chrome/browser/enterprise/platform_auth:test_utils" ]
@@ -2388,12 +2388,12 @@ test("browser_tests") {
     "//chrome/browser/external_protocol:browser_tests",
   ]
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [ "//chrome/browser/webshare:browser_tests" ]
   }
 
   if (enable_dice_support) {
-    if (is_win || is_linux) {
+    if (is_linux) {
       sources += [
         "../browser/ui/views/profiles/first_run_default_browser_ui_browsertest.cc",
         "../browser/ui/views/profiles/first_run_feature_showcase_ui_browsertest.cc",
@@ -2418,7 +2418,7 @@ test("browser_tests") {
     ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [
       "../browser/ui/views/profiles/managed_user_profile_notice_ui_browsertest.cc",
       "../browser/ui/views/profiles/profile_menu_view_ui_browsertest.cc",
@@ -2433,7 +2433,7 @@ test("browser_tests") {
     ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     deps += [
       "//chrome/browser/ui/search_engine_choice",
       "//chrome/browser/ui/webui/search_engine_choice:browser_tests",
@@ -2571,7 +2571,7 @@ test("browser_tests") {
         "../browser/ui/views/task_manager_view_browsertest.cc",
       ]
     }
-    if (is_win || is_mac || is_linux) {
+    if (is_mac || is_linux) {
       sources += []
 
       deps += [ "//chrome/browser/ui/webui/app_home" ]
@@ -2743,7 +2743,7 @@ test("browser_tests") {
     sources -= [ "../common/time_format_browsertest.cc" ]
   }
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/browser_switcher:browser_tests",
       "//chrome/browser/ui/startup/default_browser_prompt",
@@ -2807,7 +2807,7 @@ test("browser_tests") {
 
   sources += [ "//chrome/browser/enterprise/data_protection/view_source_navigation_throttle_browsertest.cc" ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "../browser/ui/views/profiles/profile_picker_sign_in_provider_browsertest.cc",
       "../browser/ui/views/profiles/profile_picker_utils_browsertest.cc",
@@ -2837,7 +2837,7 @@ test("browser_tests") {
     ]
     deps += [ "//components/enterprise/connectors/core:test_support" ]
   }
-  if (enterprise_data_controls && !is_android) {
+  if (enterprise_data_controls) {
     sources += [
       "//chrome/browser/enterprise/data_controls/desktop_data_controls_dialog_browsertest.cc",
       "//chrome/browser/enterprise/data_protection/clipboard_toast_tracker_browsertest.cc",
@@ -2875,7 +2875,7 @@ test("browser_tests") {
   ]
 }
 
-if (is_linux || is_mac || is_win || is_android) {
+if (is_linux || is_mac) {
   import("//tools/binary_size/sizes.gni")
 
   # TODO(b/246519185) - Py3 incompatible, decide if to keep test.
@@ -3150,7 +3150,7 @@ test("unit_tests") {
     "//tools/metrics/histograms/metadata/user_education/histograms.xml",
   ]
 
-  if (is_linux || is_win) {
+  if (is_linux) {
     data_deps += [ "//chrome:packed_resources" ]
   }
   defines = []
@@ -3884,7 +3884,7 @@ test("unit_tests") {
     ]
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     sources += []
     deps += [
       "//chrome/browser/enterprise/platform_auth:test_utils",
@@ -3893,14 +3893,14 @@ test("unit_tests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/views/session_restore_infobar:unit_tests",
       "//chrome/browser/ui/webui/intro:unit_tests",
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/enterprise/network_header_injection:unit_tests",
       "//chrome/browser/multistep_filter:unit_tests",
@@ -3988,7 +3988,7 @@ test("unit_tests") {
     deps += [ "//chrome/browser/paint_preview:unit_tests" ]
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [ "//chrome/browser/webshare:unit_tests" ]
   }
 
@@ -4207,7 +4207,7 @@ test("unit_tests") {
     "//chrome/browser/ui/views/passwords/password_change:password_change_toast",
   ]
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     deps += [ "//chrome/enterprise_companion:constants_prod" ]
     if (is_mac) {
       deps += [ "//chrome/updater:browser_sources" ]
@@ -4564,7 +4564,7 @@ test("unit_tests") {
         [ "//components/safe_browsing/content/browser:client_side_detection" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources +=
         [ "../browser/ui/extensions/settings_overridden_dialog_unittest.cc" ]
 
@@ -4670,7 +4670,7 @@ test("unit_tests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux || is_android) {
+  if (is_mac || is_linux) {
     deps += [ "//components/enterprise/device_trust/core:test_support" ]
   }
 
@@ -4678,7 +4678,7 @@ test("unit_tests") {
     deps += [ "../browser/enterprise/client_certificates:unit_tests" ]
   }
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     sources += []
 
     deps += [
@@ -4697,7 +4697,7 @@ test("unit_tests") {
     ]
   }
 
-  if (is_linux || is_mac || is_win || is_android) {
+  if (is_linux || is_mac) {
     sources += []
     deps += [ "//components/enterprise/idle" ]
   }
@@ -4706,7 +4706,7 @@ test("unit_tests") {
     deps += [ "//components/enterprise/net/core:test_support" ]
   }
 
-  if (is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     deps += [
       "../browser/enterprise/connectors/device_trust/key_management/browser",
       "../browser/enterprise/connectors/device_trust/key_management/browser:test_support",
@@ -4743,7 +4743,7 @@ test("unit_tests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "../browser/enterprise/connectors/test:test_support",
       "../services/system_signals:unit_tests",
@@ -4813,7 +4813,7 @@ test("unit_tests") {
   if (is_chrome_branded && is_linux && current_cpu == "x86") {
     ldflags = [ "-Wl,--strip-debug" ]
   }
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [ "//chrome/common/notifications:unit_tests" ]
   }
   if (enable_rlz) {
@@ -4836,7 +4836,7 @@ test("unit_tests") {
     "//chrome/browser/ui/browser_window/test:test_support",
   ]
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources +=
         [ "../browser/ui/views/policy/enterprise_startup_dialog_unittest.cc" ]
 
@@ -5039,7 +5039,7 @@ test("unit_tests") {
       ]
       deps += [ "//ui/linux:linux_ui" ]
     }
-    if (is_win || (is_linux && use_dbus)) {
+    if (is_linux && use_dbus) {
       deps += [ "//chrome/browser/ui/views/status_icons:unit_tests" ]
     }
     if (is_mac) {
@@ -5071,7 +5071,7 @@ test("unit_tests") {
       }
     }
   }
-  if (!is_android && use_nss_certs) {
+  if (use_nss_certs) {
     sources += [ "../common/net/x509_certificate_model_nss_unittest.cc" ]
   }
 
@@ -5085,7 +5085,7 @@ test("unit_tests") {
     data_deps += [ "//third_party/widevine/cdm" ]
   }
 
-  if (is_win || is_linux || is_mac) {
+  if (is_linux || is_mac) {
     deps += [
       "//chrome/browser/metrics/structured:unit_tests",
       "//components/metrics/structured",
@@ -5105,7 +5105,7 @@ test("unit_tests") {
   }
   deps += [ "//chrome/browser/desktop_to_mobile_promos:unit_tests" ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//chrome/browser/ui/startup/default_browser_prompt:unit_tests" ]
   }
 
@@ -5432,7 +5432,7 @@ static_library("test_support_ui") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/sharing_hub:test_support_ui",
       "//chrome/browser/ui/webui/app_settings",
@@ -5486,12 +5486,12 @@ test("interactive_ui_tests") {
     "base/interactive_ui_tests_main.cc",
   ]
 
-  if (is_mac || is_linux || is_win) {
+  if (is_mac || is_linux) {
     sources +=
         [ "../browser/ui/views/default_link_capturing_interactive_uitest.cc" ]
   }
 
-  if (is_mac || is_linux || is_win) {
+  if (is_mac || is_linux) {
   }
 
   configs += [ "//build/config:precompiled_headers" ]
@@ -5869,7 +5869,7 @@ test("interactive_ui_tests") {
       "//extensions/browser/api:extensions_api_client",
     ]
 
-    if (is_mac || is_win) {
+    if (is_mac) {
       sources += [ "../browser/ui/extensions/settings_overridden_dialog_interactive_uitest.cc" ]
       deps += [ "//chrome/browser/ui/views/extensions:settings_overridden_dialog_view_utils" ]
     }
@@ -5879,18 +5879,18 @@ test("interactive_ui_tests") {
     deps += [ "//ui/linux:test_support" ]
   }
 
-  if (enable_dice_support && (is_mac || is_linux || is_win)) {
+  if (enable_dice_support && (is_mac || is_linux)) {
     deps += [
       "//chrome/browser/ui/signin",
       "//chrome/browser/ui/webui/signin/signout_confirmation",
     ]
   }
 
-  if (is_linux || is_win) {
+  if (is_linux) {
     data_deps += [ "//chrome:packed_resources" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/startup/default_browser_prompt:interactive_ui_tests",
       "//chrome/browser/ui/views/media_preview:interactive_ui_tests",
@@ -5934,7 +5934,7 @@ test("interactive_ui_tests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/views/session_restore_infobar:interactive_ui_tests",
     ]
@@ -6195,7 +6195,7 @@ test("interactive_ui_tests") {
     deps += [ "//ui/base/ime/linux" ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "../browser/ui/views/profiles/profile_picker_interactive_uitest.cc",
       "../browser/ui/views/profiles/profile_picker_interactive_uitest_base.cc",
@@ -6203,7 +6203,7 @@ test("interactive_ui_tests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "../browser/ui/views/profiles/device_signals_disclaimer_interactive_uitest.cc",
       "../browser/ui/views/profiles/first_run_interactive_uitest.cc",
@@ -6285,7 +6285,7 @@ test("chrome_app_unittests") {
     "//components/safe_browsing:buildflags",
     "//components/webui/flags:switches",
   ]
-  if (is_linux || is_win) {
+  if (is_linux) {
     data_deps = [ "//chrome:packed_resources" ]
   }
 }
@@ -6406,7 +6406,7 @@ test("captured_sites_interactive_tests") {
   ]
   data += [ "//third_party/webpagereplay/" ]
 
-  if (is_linux || is_win) {
+  if (is_linux) {
     data_deps = [ "//chrome:packed_resources" ]
   }
 
@@ -6627,7 +6627,7 @@ source_set("xr_browser_tests_common") {
     deps += [ "//device/vr" ]
   }
 
-  if (!is_mac && !is_android) {
+  if (!is_mac) {
     data_deps = [ "//chrome:packed_resources" ]
   }
 
@@ -6636,7 +6636,7 @@ source_set("xr_browser_tests_common") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (is_linux || is_mac || is_win) {
+if (is_linux || is_mac) {
   script_test("variations_smoke_tests") {
     if (is_linux) {
       script = "//testing/xvfb.py"

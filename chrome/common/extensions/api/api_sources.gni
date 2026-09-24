@@ -93,11 +93,11 @@ if (enable_extensions) {
     "webrtc_desktop_capture_private.idl",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     schema_sources_ += [ "web_authentication_proxy.webidl" ]
   }
 
-  if (is_linux || is_win) {
+  if (is_linux) {
     schema_sources_ += [ "input_ime.json" ]
   }
 

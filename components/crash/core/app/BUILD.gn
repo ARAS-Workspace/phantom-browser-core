@@ -79,7 +79,7 @@ static_library("app") {
     data_deps = [ ":chrome_crashpad_handler" ]
   }
 
-  if (is_android || is_linux) {
+  if (is_linux) {
     deps += [
       "//base:base_static",
       "//components/crash/core/common",
@@ -100,7 +100,7 @@ static_library("app") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (is_mac || is_android || is_linux) {
+if (is_mac || is_linux) {
   # We build a chromium-specific crashpad_handler executable so that we can
   # define custom UserStreamDataSources.
   executable("chrome_crashpad_handler") {

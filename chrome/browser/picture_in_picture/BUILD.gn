@@ -38,7 +38,7 @@ source_set("picture_in_picture") {
     "//url",
   ]
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     public_deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
   sources += [

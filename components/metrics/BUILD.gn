@@ -249,7 +249,7 @@ source_set("metrics") {
 
   sources += [ "machine_id_provider_nonwin.cc" ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [
       "motherboard.cc",
       "motherboard.h",
@@ -597,7 +597,7 @@ source_set("unit_tests") {
   ]
   deps += [ "//extensions/buildflags" ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [ "motherboard_metrics_provider_unittest.cc" ]
   }
 

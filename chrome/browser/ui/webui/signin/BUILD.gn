@@ -132,7 +132,7 @@ source_set("signin") {
     "//chrome/browser/ui/webui",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     public_deps += [
       "//chrome/browser/ui/webui/signin:profile",
       "//ui/webui",

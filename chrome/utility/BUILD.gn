@@ -137,7 +137,7 @@ static_library("utility") {
       "//mojo/public/cpp/bindings",
     ]
 
-    if (is_win || is_mac || is_linux) {
+    if (is_mac || is_linux) {
       deps += [ "//chrome/services/system_signals" ]
     }
   }
@@ -175,7 +175,7 @@ static_library("utility") {
     deps += [ "//chrome/services/redirection:redirection_service" ]
   }
 
-  if (is_android || enable_extensions) {
+  if (enable_extensions) {
     deps += [ "//chrome/services/media_gallery_util:lib" ]
   }
 

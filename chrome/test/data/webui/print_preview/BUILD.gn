@@ -64,7 +64,7 @@ build_webui_tests("build") {
     "test_plugin_proxy.ts",
   ]
 
-  if (is_mac || is_win) {
+  if (is_mac) {
     files += [ "system_dialog_test.ts" ]
   }
 

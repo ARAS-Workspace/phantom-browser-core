@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/features.gni")
-import("//components/optimization_guide/features.gni")
 import("//services/on_device_model/on_device_model.gni")
 
 source_set("api") {
@@ -24,7 +23,7 @@ source_set("api") {
   # skia_config.
 }
 
-if (use_blink || (is_ios && build_with_internal_optimization_guide)) {
+if (use_blink) {
   source_set("ml_holder_no_internal") {
     public = [ "chrome_ml_holder.h" ]
     sources = [ "chrome_ml_holder.cc" ]

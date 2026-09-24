@@ -47,7 +47,7 @@ source_set("page_info") {
     "//ui/views",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     # page_info_permission_content_view.h embeds a PageInfoPreviewsCoordinator
     # (media_preview is unavailable on ChromeOS).
     public_deps += [ "//chrome/browser/ui/views/media_preview" ]

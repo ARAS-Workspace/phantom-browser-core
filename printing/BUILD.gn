@@ -15,7 +15,7 @@ if (enable_printing_tests) {
   assert(enable_printing)
 }
 
-if (is_win || enable_print_preview) {
+if (enable_print_preview) {
   # Windows basic printing or print preview requires pdf enabled.
   assert(enable_pdf,
          "Windows basic printing or print preview needs pdf: " +

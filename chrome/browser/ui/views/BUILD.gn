@@ -241,7 +241,7 @@ source_set("device_chooser_content_view") {
   ]
 }
 
-if (is_win || is_linux) {
+if (is_linux) {
   source_set("bluetooth_dialogs") {
     public = [
       "bluetooth_device_credentials_view.h",
@@ -269,7 +269,7 @@ if (is_win || is_linux) {
   }
 }
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   source_set("close_bubble_on_tab_activation_helper") {
     public = [ "close_bubble_on_tab_activation_helper.h" ]
     sources = [ "close_bubble_on_tab_activation_helper.cc" ]

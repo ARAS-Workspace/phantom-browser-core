@@ -45,7 +45,7 @@ source_set("extensions") {
 
   public_deps = []
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "extension_install_ui_desktop.h" ]
   }
   public_deps += [
@@ -175,7 +175,7 @@ source_set("impl") {
     "//ui/strings",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "extension_install_ui_desktop.cc" ]
     deps += [
       "//chrome/app:generated_resources",
@@ -199,7 +199,7 @@ source_set("impl") {
     sources += [ "extension_dialog_utils_views.cc" ]
     deps += [ "//chrome/browser/ui/views/frame:toolbar_button_provider" ]
   }
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [ "//chrome/browser/ui/views/extensions:settings_overridden_dialog_view_utils" ]
   }
 

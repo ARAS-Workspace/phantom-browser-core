@@ -56,7 +56,7 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "sharing_hub_model_unittest.cc" ]
     deps += [
       ":sharing_hub",

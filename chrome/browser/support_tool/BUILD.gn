@@ -37,7 +37,7 @@ source_set("support_tool") {
     "//components/policy/core/browser",
   ]
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     public += [ "updater_data_collector.h" ]
     public_deps += [
       "//chrome/updater:public_sources",
@@ -73,7 +73,7 @@ source_set("impl") {
     "//third_party/zlib/google:zip",
   ]
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [ "updater_data_collector.cc" ]
     deps += [ "//chrome/updater:public_sources" ]
   }
@@ -104,7 +104,7 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 
-  if (is_linux || is_win || is_mac) {
+  if (is_linux || is_mac) {
     sources += [ "updater_data_collector_unittest.cc" ]
     deps += [ "//chrome/updater:public_sources" ]
   }

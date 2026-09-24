@@ -128,7 +128,7 @@ source_set("permissions") {
     deps += [ "//chrome/browser/clipboard" ]
   }
 
-  if (enable_extensions && !is_android) {
+  if (enable_extensions) {
     deps += [ "//extensions/browser/mime_handler" ]
   }
 
@@ -293,7 +293,7 @@ source_set("interactive_ui_tests") {
     "//content/test:browsertest_support",
   ]
 
-  if (is_mac || is_win) {
+  if (is_mac) {
     sources += [ "system/system_permission_settings_interactive_uitest.cc" ]
   }
   if (is_mac) {

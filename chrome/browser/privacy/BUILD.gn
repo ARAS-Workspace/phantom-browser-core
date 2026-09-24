@@ -4,7 +4,7 @@
 
 import("//components/spellcheck/spellcheck_build_features.gni")
 
-if (is_win || is_linux || is_android) {
+if (is_linux) {
   import("//components/policy/tools/generate_policy_source.gni")
   import("//third_party/protobuf/proto_library.gni")
 

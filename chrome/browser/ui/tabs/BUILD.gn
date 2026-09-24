@@ -372,7 +372,7 @@ source_set("tabs") {
     "vertical_tab_strip_state_controller.h",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "inactive_window_mouse_event_controller.h" ]
   }
 
@@ -441,7 +441,7 @@ source_set("impl") {
     "vertical_tab_strip_state_controller.cc",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "inactive_window_mouse_event_controller.cc" ]
   }
 
@@ -556,7 +556,7 @@ source_set("impl") {
     "//chrome/browser/ui/views/zoom",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/multistep_filter",
       "//chrome/browser/multistep_filter/ui",

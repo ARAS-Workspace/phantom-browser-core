@@ -81,7 +81,7 @@ target(link_target_type, "renderer_sources") {
     sources += [ "plugin_ax_tree_action_target_adapter.h" ]
   }
 
-  if (enable_library_cdms || is_win || is_android) {
+  if (enable_library_cdms) {
     sources += [
       "key_system_support.cc",
       "key_system_support.h",

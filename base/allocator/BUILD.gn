@@ -33,7 +33,7 @@ if (is_apple) {
   }
 }
 
-if (is_win || is_linux) {
+if (is_linux) {
   if (current_toolchain == default_system_allocator_toolchain) {
     # This binary ends up in the 'system_allocator' build output directory.
     executable("system_allocator_test_helper") {

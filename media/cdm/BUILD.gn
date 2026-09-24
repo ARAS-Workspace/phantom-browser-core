@@ -10,7 +10,7 @@ source_set("cdm_api") {
 }
 
 source_set("cdm_type_conversion") {
-  if (enable_library_cdms || is_win) {
+  if (enable_library_cdms) {
     # This target is a subcomponent.
     visibility = [
       ":*",
@@ -109,7 +109,7 @@ source_set("cdm") {
     }
   }
 
-  if (is_win || enable_library_cdms) {
+  if (enable_library_cdms) {
     sources += [
       "cdm_allocator.cc",
       "cdm_allocator.h",

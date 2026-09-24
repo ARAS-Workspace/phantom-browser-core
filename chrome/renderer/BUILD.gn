@@ -222,7 +222,7 @@ static_library("renderer") {
     "//v8",
   ]
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     deps += [ "//components/webapps/isolated_web_apps:scheme" ]
   }
 
@@ -258,7 +258,7 @@ static_library("renderer") {
     deps += [ "//third_party/widevine/cdm:headers" ]
   }
 
-  if (enable_library_cdms || is_win || is_android) {
+  if (enable_library_cdms) {
     sources += [
       "media/chrome_key_systems.cc",
       "media/chrome_key_systems.h",

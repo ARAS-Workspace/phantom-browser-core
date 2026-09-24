@@ -23,7 +23,7 @@ static_library("print_compositor") {
     "//ui/accessibility",
   ]
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     deps += [ "//content/public/child" ]
   }
 

@@ -80,7 +80,7 @@ source_set("web_ui_test_data_source") {
   ]
 }
 
-if (is_chrome_branded && (is_mac || is_win || is_linux)) {
+if (is_chrome_branded && (is_mac || is_linux)) {
   source_set("scoped_channel_override") {
     testonly = true
     sources = [ "scoped_channel_override.h" ]

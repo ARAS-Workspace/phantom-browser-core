@@ -38,7 +38,7 @@ static_library("power_metrics") {
     ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [
       "system_power_monitor.cc",
       "system_power_monitor.h",
@@ -66,7 +66,7 @@ source_set("unit_tests") {
     data = [ "test/data/" ]
   }
 
-  if (is_win || is_linux) {
+  if (is_linux) {
     sources += [ "system_power_monitor_unittest.cc" ]
 
     deps += [ "//base/test:test_support" ]

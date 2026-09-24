@@ -212,7 +212,7 @@ source_set("common") {
     "//ui/gfx/geometry",
   ]
 
-  if (is_win || use_vaapi) {
+  if (use_vaapi) {
     sources += [
       "av1_builder.cc",
       "av1_builder.h",
@@ -404,7 +404,7 @@ source_set("unit_tests") {
     deps += [ "//media/gpu/mac:unit_tests" ]
   }
 
-  if (is_win || use_vaapi) {
+  if (use_vaapi) {
     sources += [
       "av1_builder_unittest.cc",
       "svc_layers_unittest.cc",
@@ -465,7 +465,7 @@ fuzzer_test("media_vp9_decoder_fuzzer") {
   seed_corpuses = [ "//media/test/data" ]
 }
 
-if (is_win || use_vaapi) {
+if (use_vaapi) {
   fuzzer_test("media_h264_parser_structural_fuzzer") {
     sources = [ "fuzzers/h264_parser_structural_fuzzer.cc" ]
     deps = [

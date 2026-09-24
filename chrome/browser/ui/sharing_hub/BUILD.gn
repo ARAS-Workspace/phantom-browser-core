@@ -60,7 +60,7 @@ source_set("impl") {
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 }
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   source_set("test_support_ui") {
     testonly = true
     sources = [

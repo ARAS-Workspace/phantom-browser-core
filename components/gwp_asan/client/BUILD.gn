@@ -101,7 +101,7 @@ source_set("unit_tests") {
     "sampling_helpers_unittest.cc",
   ]
 
-  if (use_allocator_shim && !is_ios) {
+  if (use_allocator_shim) {
     sources += [
       "extreme_lightweight_detector_malloc_shims_unittest.cc",
       "extreme_lightweight_detector_quarantine_unittest.cc",
@@ -111,7 +111,7 @@ source_set("unit_tests") {
     ]
   }
 
-  if (use_partition_alloc && !is_ios) {
+  if (use_partition_alloc) {
     sources += [
       "lightweight_detector/partitionalloc_shims_unittest.cc",
       "sampling_partitionalloc_shims_unittest.cc",

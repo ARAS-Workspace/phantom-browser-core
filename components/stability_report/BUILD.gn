@@ -4,7 +4,7 @@
 
 import("//third_party/protobuf/proto_library.gni")
 
-if (is_win || is_linux || is_mac) {
+if (is_linux || is_mac) {
   proto_library("stability_report_proto") {
     sources = [ "stability_report.proto" ]
   }

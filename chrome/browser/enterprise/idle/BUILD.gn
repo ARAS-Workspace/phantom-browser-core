@@ -11,7 +11,7 @@ source_set("unit_tests") {
   sources = []
   deps = []
 
-  if (is_linux || is_mac || is_win || is_android) {
+  if (is_linux || is_mac) {
     sources += [
       "action_runner_unittest.cc",
       "action_unittest.cc",
@@ -25,7 +25,7 @@ source_set("unit_tests") {
   }
 }
 
-if (!is_android && (is_win || is_mac || is_linux)) {
+if (is_mac || is_linux) {
   source_set("interactive_ui_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

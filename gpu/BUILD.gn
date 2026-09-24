@@ -531,7 +531,7 @@ test("gpu_unittests") {
     sources += [ "command_buffer/client/internal/mappable_buffer_native_pixmap_unittest.cc" ]
   }
 
-  if (is_linux || is_android) {
+  if (is_linux) {
     sources += [ "command_buffer/service/gpu_fence_manager_unittest.cc" ]
   }
 

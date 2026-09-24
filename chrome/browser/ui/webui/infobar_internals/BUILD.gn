@@ -69,14 +69,14 @@ source_set("impl") {
     "//content/public/browser",
   ]
 
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     deps += [
       "//chrome/browser/ui/startup/default_browser_prompt",
       "//chrome/browser/ui/views/session_restore_infobar",
     ]
   }
 
-  if (is_win || is_mac) {
+  if (is_mac) {
     deps += [ "//chrome/browser/ui/pdf/infobar" ]
   }
 

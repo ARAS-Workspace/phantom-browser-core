@@ -450,7 +450,7 @@ component("base") {
     ]
   }
 
-  if (is_mac || is_win) {
+  if (is_mac) {
     deps += [ "//ui/base/clipboard" ]
   }
 
@@ -531,7 +531,7 @@ component("features") {
   ]
 }
 
-if (is_win || is_mac || is_linux) {
+if (is_mac || is_linux) {
   static_library("pixel_diff_test_support") {
     testonly = true
     sources = [
@@ -780,7 +780,7 @@ test("ui_base_unittests") {
     "//url",
   ]
 
-  if (is_mac || is_win || is_linux) {
+  if (is_mac || is_linux) {
     sources += [ "accelerators/global_accelerator_listener/global_accelerator_listener_unittest.cc" ]
     deps += [
       "//ui/base/accelerators/global_accelerator_listener",
@@ -788,7 +788,7 @@ test("ui_base_unittests") {
     ]
   }
 
-  if (is_win || is_mac || is_linux || is_android) {
+  if (is_mac || is_linux) {
     deps += [ "//ui/base/unowned_user_data:unit_tests" ]
   }
 
@@ -847,7 +847,7 @@ test("ui_base_unittests") {
   }
 
   # TODO(crbug.com/40134424): Support CrOS.
-  if (is_win || is_mac || is_linux) {
+  if (is_mac || is_linux) {
     sources += [
       "test/skia_gold_matching_algorithm_unittest.cc",
       "test/skia_gold_pixel_diff_unittest.cc",
@@ -914,7 +914,7 @@ test("ui_base_unittests") {
     ]
   }
 
-  if (is_android || is_linux || is_mac || is_win) {
+  if (is_linux || is_mac) {
     # TODO(brettw): We should be able to depend on //ui/resources:ui_test_pak
     # instead of depending directly on the non-test .pak files, but depending
     # on ui_test_pak seems to have no effect.
@@ -927,7 +927,7 @@ test("ui_base_unittests") {
       "//ui/resources:ui_test_pak",  # TODO(brettw): this does nothing.
     ]
   }
-  if (is_linux || is_win) {
+  if (is_linux) {
     data += [
       # TODO(brettw): Remove these two lines.
       "$root_out_dir/ui/en-US.pak",
@@ -938,7 +938,7 @@ test("ui_base_unittests") {
     data += [ "$root_out_dir/ui_unittests Framework.framework/" ]
   }
 
-  if (skia_support_skottie && !is_ios) {
+  if (skia_support_skottie) {
     sources += [ "//ui/lottie/animation_unittest.cc" ]
     deps += [
       "//cc:test_support",

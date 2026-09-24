@@ -30,7 +30,7 @@ source_set("test_support") {
     "//testing/gtest",
   ]
 
-  if (is_mac || is_linux || is_win) {
+  if (is_mac || is_linux) {
     sources += [ "test_utils_desktop.cc" ]
   }
 }
