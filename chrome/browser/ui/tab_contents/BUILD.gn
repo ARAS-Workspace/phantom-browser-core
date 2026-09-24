@@ -5,7 +5,7 @@
 import("//components/enterprise/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 
-assert(is_win || is_mac || is_linux || is_android)
+assert(is_mac || is_linux)
 
 source_set("tab_contents") {
   sources = [

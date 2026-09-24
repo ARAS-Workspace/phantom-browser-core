@@ -5,7 +5,7 @@
 import("//build/config/chromeos/args.gni")
 import("//ui/webui/webui_features.gni")
 
-assert(is_win || is_mac || is_linux || is_android)
+assert(is_mac || is_linux)
 
 # The public interface has no circular dependencies.
 source_set("omnibox") {

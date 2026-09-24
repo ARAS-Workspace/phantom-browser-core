@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 source_set("update_metrics") {
-  assert(is_linux || is_win || is_mac)
+  assert(is_linux || is_mac)
 
   public = [ "update_metrics_provider.h" ]
 
@@ -11,7 +11,7 @@ source_set("update_metrics") {
 }
 
 source_set("impl") {
-  assert(is_linux || is_win || is_mac)
+  assert(is_linux || is_mac)
 
   sources = [ "update_metrics_provider.cc" ]
 

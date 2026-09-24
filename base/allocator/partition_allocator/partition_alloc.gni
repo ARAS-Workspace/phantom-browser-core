@@ -90,7 +90,7 @@ is_clang_or_gcc = is_clang || !is_win
 if (current_cpu == "x64" || current_cpu == "arm64" || current_cpu == "arm64e" ||
     current_cpu == "loong64" || current_cpu == "riscv64" ||
     current_cpu == "ppc64" || current_cpu == "s390x") {
-  assert(current_cpu != "arm64e" || (is_ios && target_environment == "device"))
+  assert(current_cpu != "arm64e")
   has_64_bit_pointers = true
 } else if (current_cpu == "x86" || current_cpu == "arm" ||
            current_cpu == "wasm") {
@@ -428,8 +428,7 @@ if (!has_memory_tagging) {
 assert(enable_backup_ref_ptr_support || !use_raw_ptr_backup_ref_impl,
        "Can't use RawPtrBackupRefImpl if BRP isn't enabled at all")
 
-assert(!partition_alloc_enable_system_free_fallback || is_android,
-       "System free fallback is only supported on Android")
+assert(!partition_alloc_enable_system_free_fallback)
 
 # enable_backup_ref_ptr_slow_checks can only be used if
 # enable_backup_ref_ptr_support is true.

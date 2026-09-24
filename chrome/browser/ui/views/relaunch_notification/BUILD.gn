@@ -4,7 +4,7 @@
 
 import("//chrome/browser/buildflags.gni")
 
-assert(is_win || is_mac || is_linux)
+assert(is_mac || is_linux)
 
 source_set("relaunch_notification") {
   public = [

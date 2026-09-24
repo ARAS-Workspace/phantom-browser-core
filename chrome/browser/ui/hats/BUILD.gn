@@ -4,7 +4,7 @@
 
 import("//pdf/features.gni")
 
-assert(is_win || is_mac || is_linux || is_android)
+assert(is_mac || is_linux)
 
 source_set("hats") {
   sources = [

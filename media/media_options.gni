@@ -272,8 +272,8 @@ declare_args() {
   alternate_cdm_storage_id_key = ""
 }
 
-assert(!enable_cdm_host_verification || is_mac || is_win,
-       "CDM host verification is only supported on Mac and Windows.")
+assert(!enable_cdm_host_verification || is_mac,
+       "CDM host verification is only supported on Mac.")
 
 # https://crbug.com/1475137#c37
 assert(!is_chrome_for_testing_branded || !enable_cdm_host_verification,

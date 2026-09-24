@@ -374,13 +374,10 @@ assert(symbol_level >= 0 && symbol_level <= 2, "Invalid symbol_level")
 # flag is set to false in various components of the build (like nacl) and we
 # don't want to assert on those.
 # iOS does not support component builds so add an exception for this platform.
-# Windows supports huge PDBs so this combination is allowed for those who don't
-# mind long build times.
 if (forbid_non_component_debug_builds) {
   assert(
       symbol_level != 2 || current_toolchain != default_toolchain ||
-          is_component_build || is_apple || use_debug_fission || is_android ||
-          is_win,
+          is_component_build || is_apple || use_debug_fission,
       "Can't do non-component builds at symbol_level=2 without use_debug_fission=true")
 }
 

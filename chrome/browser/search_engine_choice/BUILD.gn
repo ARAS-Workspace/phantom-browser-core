@@ -5,7 +5,7 @@
 import("//build/config/chrome_build.gni")
 import("//build/config/chromeos/args.gni")
 
-assert(is_win || is_mac || is_linux || is_android)
+assert(is_mac || is_linux)
 
 source_set("search_engine_choice") {
   sources = [ "search_engine_choice_service_factory.h" ]

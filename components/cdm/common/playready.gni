@@ -9,4 +9,4 @@ declare_args() {
   enable_playready = is_win && is_chrome_branded
 }
 
-assert(!enable_playready || is_win, "PlayReady is only supported on Windows.")
+assert(!enable_playready)

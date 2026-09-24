@@ -25,5 +25,5 @@ enable_screen_capture =
     is_linux || (is_apple && use_blink) || is_win || is_android
 
 assert(
-    !enable_separate_renderer_binary || is_win || is_mac || is_linux,
-    "Separate renderer binary is only supported on desktop platforms (Windows, macOS, Linux).")
+    !enable_separate_renderer_binary || is_mac || is_linux,
+    "Separate renderer binary is only supported on desktop platforms (macOS, Linux).")
