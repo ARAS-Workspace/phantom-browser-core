@@ -112,10 +112,6 @@ group("resources") {
     public_deps += [ "discards:resources" ]
   }
 
-  if (is_desktop_android) {
-    public_deps += [ "management:resources" ]
-  }
-
   if (is_win || is_mac || is_linux) {
     public_deps += []
   }

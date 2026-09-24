@@ -44,17 +44,8 @@ static_library("url_formatter") {
 
   public_deps = [ "//third_party/icu" ]
 
-  if (is_robolectric) {
-    # Make jni.h available.
-    configs += [ "//third_party/jdk" ]
-  }
-  if (is_android || is_robolectric) {
-    sources += [ "url_formatter_android.cc" ]
-    deps += [ "android:jni_headers" ]
-  } else {
-    # Used in elide_url.cc
-    deps += [ "//ui/gfx" ]
-  }
+  # Used in elide_url.cc
+  deps += [ "//ui/gfx" ]
 }
 
 source_set("unit_tests") {

@@ -830,11 +830,6 @@ static_library("ui") {
     "//chrome/browser/ui/views/file_system_access:impl",
   ]
 
-  # Desktop-Android-only dependencies.
-  if (is_desktop_android) {
-    deps += [ "//chrome/browser/ui/android/extensions/windowing/internal" ]
-  }
-
   if (enable_captive_portal_detection) {
     deps += [ "//chrome/browser/captive_portal" ]
   }

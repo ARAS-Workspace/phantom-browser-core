@@ -1671,9 +1671,7 @@ component("net") {
     configs += [ "//build/config/compiler:optimize_max" ]
   }
 
-  if (!is_cronet_build) {
-    deps += [ "//mojo/public/cpp/bindings:default_construct_tag" ]
-  }
+  deps += [ "//mojo/public/cpp/bindings:default_construct_tag" ]
 
   if (enable_disk_cache_sql_backend) {
     sources += [
@@ -2521,43 +2519,36 @@ executable("quic_server") {
   ]
 }
 
-# TODO(crbug.com/477528387): Consider enabling net_fuzztests for cronet builds.
-if (!is_cronet_build) {
-  test("net_fuzztests") {
-    sources = [
-      "cert/qwac_fuzztest.cc",
-      "cert/x509_certificate_fuzztest.cc",
-      "http/http_cookie_indices_fuzztest.cc",
-      "http/http_security_headers_hsts_fuzzer.cc",
-    ]
+test("net_fuzztests") {
+  sources = [
+    "cert/qwac_fuzztest.cc",
+    "cert/x509_certificate_fuzztest.cc",
+    "http/http_cookie_indices_fuzztest.cc",
+    "http/http_security_headers_hsts_fuzzer.cc",
+  ]
 
-    fuzztests = [
-      "CookieIndicesFuzzTest.FuzzParseFromHeader",
-      "HttpSecurityHeadersHstsFuzzer.TestParseHSTSHeader",
-      "QwacFuzzTest.FuzzParseQcStatements",
-      "QwacFuzzTest.FuzzParseQcTypeInfo",
-      "QwacFuzzTest.FuzzParseTwoQwacCertBinding",
-      "X509CertificateFuzzTest.FuzzCreateFromDERCertChain",
-    ]
+  fuzztests = [
+    "CookieIndicesFuzzTest.FuzzParseFromHeader",
+    "HttpSecurityHeadersHstsFuzzer.TestParseHSTSHeader",
+    "QwacFuzzTest.FuzzParseQcStatements",
+    "QwacFuzzTest.FuzzParseQcTypeInfo",
+    "QwacFuzzTest.FuzzParseTwoQwacCertBinding",
+    "X509CertificateFuzzTest.FuzzCreateFromDERCertChain",
+  ]
 
-    data = [
-      "data/fuzzer_data/",
-      "data/fuzzer_dictionaries/",
-    ]
+  data = [
+    "data/fuzzer_data/",
+    "data/fuzzer_dictionaries/",
+  ]
 
-    deps = [
-      ":net",
-      "//testing/gtest",
-      "//third_party/fuzztest:fuzztest_gtest_main",
-    ]
-  }
+  deps = [
+    ":net",
+    "//testing/gtest",
+    "//third_party/fuzztest:fuzztest_gtest_main",
+  ]
 }
 
-if (is_cronet_build) {
-  _test_target_type = "cronet_test"
-} else {
-  _test_target_type = "test"
-}
+_test_target_type = "test"
 
 target(_test_target_type, "net_unittests") {
   sources = [
@@ -3040,21 +3031,19 @@ target(_test_target_type, "net_unittests") {
     "//url:buildflags",
   ]
 
-  if (!is_cronet_build) {
-    sources += [
-      "extras/sqlite/sqlite_persistent_cookie_store_unittest.cc",
-      "extras/sqlite/sqlite_persistent_shared_dictionary_store_unittest.cc",
-      "extras/sqlite/sqlite_persistent_store_backend_base_unittest.cc",
-      "log/trace_net_log_observer_unittest.cc",
-    ]
+  sources += [
+    "extras/sqlite/sqlite_persistent_cookie_store_unittest.cc",
+    "extras/sqlite/sqlite_persistent_shared_dictionary_store_unittest.cc",
+    "extras/sqlite/sqlite_persistent_store_backend_base_unittest.cc",
+    "log/trace_net_log_observer_unittest.cc",
+  ]
 
-    deps += [
-      ":extras",
-      "//components/sqlite_proto",
-      "//sql",
-      "//sql:test_support",
-    ]
-  }
+  deps += [
+    ":extras",
+    "//components/sqlite_proto",
+    "//sql",
+    "//sql:test_support",
+  ]
 
   if (enable_websockets) {
     sources += [
@@ -3084,11 +3073,9 @@ target(_test_target_type, "net_unittests") {
       "reporting/reporting_service_unittest.cc",
       "reporting/reporting_uploader_unittest.cc",
     ]
-    if (!is_cronet_build) {
-      sources += [
-        "extras/sqlite/sqlite_persistent_reporting_and_nel_store_unittest.cc",
-      ]
-    }
+    sources += [
+      "extras/sqlite/sqlite_persistent_reporting_and_nel_store_unittest.cc",
+    ]
   }
 
   data = [

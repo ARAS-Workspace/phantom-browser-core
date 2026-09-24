@@ -29,13 +29,6 @@ build_with_v8_embedder = build_with_chromium
 # `use_custom_libcxx = true`.
 enable_safe_libcxx = true
 
-if (is_cronet_build) {
-  # Used by //third_party/perfetto.
-  # Disabled for Cronet, where JSON support is not used and tends to cause
-  # problems (especially when building in the Android platform).
-  perfetto_libperfetto_includes_json = false
-}
-
 # Features used by //base/trace_event and //services/tracing.
 declare_args() {
   # Limits the defined //third_party/android_deps targets to only "buildCompile"

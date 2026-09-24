@@ -87,11 +87,6 @@ assert(!is_wasm, "base must not be built in most wasm toolchains")
 assert(!is_win || is_clang,
        "only clang-cl is supported on Windows, see https://crbug.com/988071")
 
-if (is_android || is_robolectric) {
-  import("//build/config/android/rules.gni")
-  import("//third_party/jni_zero/jni_zero.gni")
-}
-
 _build_date_header = "$target_gen_dir/generated_build_date.h"
 
 _enable_code_ordering = is_android && !is_component_build &&
@@ -1160,70 +1155,6 @@ component("base") {
     ]
   }
 
-  if (is_robolectric) {
-    # Make jni.h available.
-    configs += [ "//third_party/jdk" ]
-  }
-  if (is_android || is_robolectric) {
-    sources += [
-      "android/base_jni_init.cc",
-      "android/base_jni_init.h",
-      "android/callback_android.cc",
-      "android/callback_android.h",
-      "android/command_line_android.cc",
-      "android/command_line_android.h",
-      "android/int_string_callback.cc",
-      "android/int_string_callback.h",
-      "android/java_exception_reporter.cc",
-      "android/java_exception_reporter.h",
-      "android/jni_android.cc",
-      "android/jni_android.h",
-      "android/jni_array.cc",
-      "android/jni_array.h",
-      "android/jni_bytebuffer.cc",
-      "android/jni_bytebuffer.h",
-      "android/jni_registrar.cc",
-      "android/jni_registrar.h",
-      "android/jni_string.cc",
-      "android/jni_string.h",
-      "android/jni_utils.cc",
-      "android/jni_utils.h",
-      "android/jni_weak_ref.h",
-      "android/library_loader/anchor_functions.cc",
-      "android/library_loader/anchor_functions.h",
-      "android/library_loader/library_loader_hooks.cc",
-      "android/library_loader/library_loader_hooks.h",
-      "android/library_loader/library_prefetcher.cc",
-      "android/library_loader/library_prefetcher.h",
-      "android/library_loader/library_prefetcher_hooks.cc",
-      "android/native_uma_recorder.cc",
-      "android/scoped_java_ref.h",
-      "android/statistics_recorder_android.cc",
-      "android/token_android.cc",
-      "android/token_android.h",
-      "android/trace_event_binding.cc",
-      "android/trace_event_binding.h",
-      "android/unguessable_token_android.cc",
-      "android/unguessable_token_android.h",
-    ]
-    deps += [
-      ":callback_jni($default_toolchain)",
-      ":command_line_jni($default_toolchain)",
-      ":java_exception_reporter_jni($default_toolchain)",
-      ":jni_android_jni($default_toolchain)",
-      ":jni_callback_jni($default_toolchain)",
-      ":jni_utils_jni($default_toolchain)",
-      ":library_loader_jni($default_toolchain)",
-      ":metrics_jni($default_toolchain)",
-      ":tasks_minimal_jni($default_toolchain)",
-      ":token_jni($default_toolchain)",
-    ]
-    public_deps += [
-      ":system_jni($default_toolchain)",
-      "//third_party/jni_zero",
-    ]
-  }  # is_android || is_robolectric
-
   # Chromeos.
 
   # Fuchsia.
@@ -1603,23 +1534,22 @@ component("base") {
       "process/set_process_title_linux.h",
       "system/sys_info_linux.cc",
     ]
-    if (!is_cronet_build) {
-      # These dependencies are not required on Android.
-      sources += [
-        "nix/mime_util_xdg.cc",
-        "nix/mime_util_xdg.h",
-        "nix/scoped_xdg_activation_token_injector.cc",
-        "nix/scoped_xdg_activation_token_injector.h",
-        "nix/xdg_util.cc",
-        "nix/xdg_util.h",
-      ]
-      defines += [ "USE_SYMBOLIZE" ]
-      deps += [
-        ":dwarf_helpers",
-        "//base/third_party/symbolize",
-        "//base/third_party/xdg_user_dirs",
-      ]
-    }
+
+    # These dependencies are not required on Android.
+    sources += [
+      "nix/mime_util_xdg.cc",
+      "nix/mime_util_xdg.h",
+      "nix/scoped_xdg_activation_token_injector.cc",
+      "nix/scoped_xdg_activation_token_injector.h",
+      "nix/xdg_util.cc",
+      "nix/xdg_util.h",
+    ]
+    defines += [ "USE_SYMBOLIZE" ]
+    deps += [
+      ":dwarf_helpers",
+      "//base/third_party/symbolize",
+      "//base/third_party/xdg_user_dirs",
+    ]
   } else {
     sources -= [
       "linux_util.cc",
@@ -1667,24 +1597,19 @@ component("base") {
     # TODO(b/167763382) Find an alternate solution for Chromecast devices, since
     # adding the icui18n and icuuc deps significantly increases the binary size.
     # This dependency was added to deal with Y2038 problem where time_t is
-    # represented via int32. However, Android builds specifically have time64
-    # headers which allows representing time as int64, which makes this entire
-    # problem moot. Hence, why `!is_cronet_build` flag has been added.
-    # See crbug.com/431972096#comment10 for more information.
-    if (!is_cronet_build) {
-      sources += [ "time/time_exploded_icu.cc" ]
+    # represented via int32.
+    sources += [ "time/time_exploded_icu.cc" ]
 
-      # The ICU dependency is only needed on systems with a 32-bit time_t.
-      # However, that cannot be determined from build variables, like
-      # |current_cpu|, since some 32-bit systems have a 64-bit time_t (and vice
-      # versa). Thus, the dependency is taken here for all POSIX platforms and
-      # the compiler+linker should be able to easily detect when the ICU
-      # routines will not be called and delete them in the final linking.
-      deps += [
-        "//third_party/icu:icui18n",
-        "//third_party/icu:icuuc",
-      ]
-    }
+    # The ICU dependency is only needed on systems with a 32-bit time_t.
+    # However, that cannot be determined from build variables, like
+    # |current_cpu|, since some 32-bit systems have a 64-bit time_t (and vice
+    # versa). Thus, the dependency is taken here for all POSIX platforms and
+    # the compiler+linker should be able to easily detect when the ICU
+    # routines will not be called and delete them in the final linking.
+    deps += [
+      "//third_party/icu:icui18n",
+      "//third_party/icu:icuuc",
+    ]
   }
 
   if (is_posix) {
@@ -2982,12 +2907,10 @@ test("base_unittests") {
     "allocator/partition_allocator/src/partition_alloc/pointers/raw_ref_unittest.cc",
   ]
 
-  if (!is_cronet_build) {
-    # location_unittest.cc fails gn check for tracing-shimmed Cronet builds.
-    # Cronet buildbot do not run base_unittests, so exclusing this test
-    # instead of adding a nogncheck is preferred (crbug.com/1400235).
-    sources += [ "location_unittest.cc" ]
-  }
+  # location_unittest.cc fails gn check for tracing-shimmed Cronet builds.
+  # Cronet buildbot do not run base_unittests, so exclusing this test
+  # instead of adding a nogncheck is preferred (crbug.com/1400235).
+  sources += [ "location_unittest.cc" ]
 
   if (!(current_cpu == "riscv64" || current_cpu == "loong64" ||
         current_cpu == "ppc64")) {
@@ -3450,31 +3373,6 @@ if (enable_nocompile_tests) {
     ]
   }
 }
-
-if (is_android || is_robolectric) {
-  generate_jni("base_junit_tests_jni") {
-    testonly = true
-    sources = [ "android/junit/src/org/chromium/base/JniCallbacksTest.java" ]
-  }
-
-  shared_library_with_jni("libbase_junit_tests") {
-    testonly = true
-    enable_target = is_robolectric
-    sources = [
-      "android/jni_callbacks_test_support.cc",
-      "android/robolectric_jni_onload.cc",
-    ]
-    deps = [
-      ":base($robolectric_toolchain)",
-      ":base_junit_tests_jni($robolectric_toolchain)",
-    ]
-    java_targets = [ ":base_junit_tests" ]
-    visibility = [ ":*" ]
-
-    # Make jni.h available.
-    configs += [ "//third_party/jdk" ]
-  }
-}  # is_android || is_robolectric
 
 # Keep the list of fuzzer_tests in alphabetical order.
 fuzzer_test("base64_decode_fuzzer") {

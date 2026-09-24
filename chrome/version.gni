@@ -57,11 +57,6 @@ if (target_os == "android") {
   # configurations. i.e. "riscv64" does not show up in this list, as it's a
   # 64-bit-only target_cpu.
   if (target_cpu == "arm64" || target_cpu == "x64") {
-    if (is_desktop_android) {
-      _version_dictionary_template +=
-          "chrome_desktop_version_code = \"@CHROME_DESKTOP_VERSION_CODE@\" "
-      _version_dictionary_template += "chrome_desktop_beta_version_code = \"@CHROME_DESKTOP_BETA_VERSION_CODE@\" "
-    }
     _version_dictionary_template +=
         "chrome_32_version_code = \"@CHROME_32_VERSION_CODE@\" "
     _version_dictionary_template +=

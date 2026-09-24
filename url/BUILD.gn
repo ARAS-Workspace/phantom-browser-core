@@ -71,24 +71,6 @@ component("url") {
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
-  if (is_android || is_robolectric) {
-    public_deps += [ ":url_jni_headers" ]
-    if (!is_cronet_build) {
-      sources += [
-        "android/gurl_android.cc",
-        "android/gurl_android.h",
-        "android/origin_android.cc",
-        "android/parsed_android.cc",
-        "android/parsed_android.h",
-      ]
-    }
-  }
-
-  if (is_robolectric) {
-    # Make jni.h available.
-    public_configs = [ "//third_party/jdk" ]
-  }
-
   # ICU support.
   if (use_platform_icu_alternatives) {
     assert(false,
@@ -104,19 +86,6 @@ component("url") {
       "//base:i18n",
       "//third_party/icu",
     ]
-  }
-}
-
-if (is_android || is_robolectric) {
-  generate_jni("url_jni_headers") {
-    sources = [ "android/java/src/org/chromium/url/IDNStringUtil.java" ]
-    if (!is_cronet_build) {
-      sources += [
-        "android/java/src/org/chromium/url/GURL.java",
-        "android/java/src/org/chromium/url/Origin.java",
-        "android/java/src/org/chromium/url/Parsed.java",
-      ]
-    }
   }
 }
 
@@ -170,19 +139,17 @@ test("url_unittests") {
     deps += [ "//third_party/icu:icuuc" ]
   }
 
-  if (!is_ios && !is_cronet_build) {
-    sources += [
-      "mojom/scheme_host_port_mojom_traits_unittest.cc",
-      "mojom/url_gurl_mojom_traits_unittest.cc",
-    ]
-    deps += [
-      "//mojo/core/embedder",
-      "//mojo/public/cpp/test_support:test_utils",
-      "//url/ipc:url_ipc_unittests",
-      "//url/mojom:mojom_traits",
-      "//url/mojom:test_url_mojom_gurl",
-    ]
-  }
+  sources += [
+    "mojom/scheme_host_port_mojom_traits_unittest.cc",
+    "mojom/url_gurl_mojom_traits_unittest.cc",
+  ]
+  deps += [
+    "//mojo/core/embedder",
+    "//mojo/public/cpp/test_support:test_utils",
+    "//url/ipc:url_ipc_unittests",
+    "//url/mojom:mojom_traits",
+    "//url/mojom:test_url_mojom_gurl",
+  ]
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
@@ -236,30 +203,6 @@ if (!is_cronet_build && target_os == "android") {
       ":url_java",
     ]
     deps = [ ":robolectric_jni_onload($robolectric_toolchain)" ]
-  }
-  if (is_robolectric) {
-    # Depend on this if you need to write a custom JNI_OnLoad()
-    source_set("gurl_test_init") {
-      testonly = true
-      sources = [
-        "android/gurl_test_init.cc",
-        "android/gurl_test_init.h",
-      ]
-      deps = [ ":url" ]
-    }
-
-    # Depend on this if you do not need to write a custom JNI_OnLoad()
-    source_set("robolectric_jni_onload") {
-      testonly = true
-      sources = [ "android/robolectric_jni_onload.cc" ]
-      deps = [
-        ":gurl_test_init",
-        "//base",
-      ]
-
-      # Make jni.h available.
-      configs += [ "//third_party/jdk" ]
-    }
   }
 }
 
