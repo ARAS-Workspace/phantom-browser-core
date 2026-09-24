@@ -59,20 +59,17 @@ assert(use_official_google_api_keys || !is_internal_chrome_branded ||
 
 declare_args() {
   # Whether the SetAPIKey() method is defined.
-  # iOS and Fuchsia builds that do not use the built-in key use this.
-  support_external_google_api_key = is_ios
+  # Fuchsia builds that do not use the built-in key use this.
+  support_external_google_api_key = false
 
   # Whether to support the CDM Server Certificate.
-  support_cdm_server_certificate = is_mac || is_linux || is_win
+  support_cdm_server_certificate = is_mac || is_linux
 }
 
 # internal:generate_metrics_key_header must be a deps when
 # USE_OFFICIAL_GOOGLE_API_KEYS` is defined. Use this variable for both.
-# On iOS, Chrome branding had been overriding use_official_google_api_keys.
-# TODO(crbug.com/40864074): Fix this logic on iOS. Can this variable be replaced
-# with just use_official_google_api_keys?
 _use_official_google_keys_and_generate_metrics_key_header =
-    use_official_google_api_keys || (is_ios && is_chrome_branded)
+    use_official_google_api_keys
 
 buildflag_header("buildflags") {
   header = "buildflags.h"

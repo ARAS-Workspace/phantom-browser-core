@@ -9,12 +9,9 @@ import("//pdf/features.gni")
 
 declare_args() {
   # Enables printing support.
-  enable_printing = !is_ios
+  enable_printing = true
 
-  # TODO(crbug.com/40263786): iOS blink port only enables printing_tests to run
-  # unit tests and web tests for now because the port does not enable the
-  # printing feature yet.
-  enable_printing_tests = is_ios && use_blink
+  enable_printing_tests = false
 
   # Enable print media localization only on the platforms that support CUPS IPP
   # (ChromeOS and macOS for now). The localization expects media vendor IDs
@@ -25,8 +22,7 @@ declare_args() {
 declare_args() {
   # Enables printing with print preview.
   # Print preview requires PDF per //printing/BUILD.gn.
-  # The is_android condition is currently redundant but left for clarity.
-  enable_print_preview = enable_printing && enable_pdf && !is_android
+  enable_print_preview = enable_printing && enable_pdf
 
   # Enables the printing system dialog for platforms that support printing
   # and have a system dialog.
@@ -43,7 +39,7 @@ declare_args() {
   # Enables out-of-process printing.  Do not have this definition just be
   # based on `enable_print_preview`; this feature could still be appropriate
   # for some build configurations which explicitly disable print preview.
-  enable_oop_printing = enable_printing && !is_android
+  enable_oop_printing = enable_printing
 }
 
 declare_args() {
@@ -54,7 +50,7 @@ declare_args() {
   # that system print dialog from a process other than the browser process.
   # TODO(crbug.com/40561724)  Determine if Linux Wayland can be made to have a
   # system dialog be modal against an application window in the browser process.
-  enable_oop_basic_print_dialog = enable_oop_printing && is_win
+  enable_oop_basic_print_dialog = false
 
   # Enables out-of-process print handling for platforms which support a system
   # print dialog but are unable to invoke that dialog from the Print Backend

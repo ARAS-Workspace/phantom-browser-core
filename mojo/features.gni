@@ -7,8 +7,7 @@ import("//build/config/features.gni")
 import("//build/config/sanitizers/sanitizers.gni")
 
 declare_args() {
-  mojo_use_apple_channel =
-      is_mac || (is_ios && use_blink && target_platform == "iphoneos")
+  mojo_use_apple_channel = is_mac
 
   # Builds non-ipcz-based Mojo Core. No longer supported.
   #

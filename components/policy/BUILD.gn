@@ -21,14 +21,13 @@ gen_policy_templates_local = false
 # To test policy generation for platforms different than your OS, override and
 # enable these flags (but don't check that in!).
 gen_policy_templates_common = true
-gen_policy_templates_win = is_win
+gen_policy_templates_win = false
 gen_policy_templates_linux = is_linux
-gen_policy_templates_android = is_android
+gen_policy_templates_android = false
 gen_policy_templates_mac = is_mac
-gen_policy_templates_ios = is_ios
+gen_policy_templates_ios = false
 
-# The zip file is grabbed from the Windows build right now.
-gen_policy_templates_zip = is_win
+gen_policy_templates_zip = false
 
 # Make sure all dependencies of the zip are built.
 if (gen_policy_templates_zip) {

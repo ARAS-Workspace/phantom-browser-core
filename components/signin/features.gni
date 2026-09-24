@@ -6,11 +6,11 @@ import("//build/config/chrome_build.gni")
 
 declare_args() {
   # Compile time flag for Bound Session Credentials.
-  enable_bound_session_credentials = is_linux || is_mac || is_win
+  enable_bound_session_credentials = is_linux || is_mac
 }
 
 # Dice is supported on the platform (but not necessarily enabled).
-enable_dice_support = is_linux || is_mac || is_win
+enable_dice_support = is_linux || is_mac
 
 # Mirror is enabled and other account consistency mechanisms are not available.
-enable_mirror = is_android || is_ios
+enable_mirror = false

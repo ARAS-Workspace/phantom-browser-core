@@ -196,7 +196,7 @@ fuzzer_test("url_canon_icu_fuzzer") {
 if (target_os == "android") {
   shared_library_with_jni("libgurl_robolectric") {
     testonly = true
-    enable_target = is_robolectric
+    enable_target = false
     java_targets = [
       ":gurl_java",
       ":url_java",

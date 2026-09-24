@@ -40,7 +40,7 @@ source_set("memory_system") {
     deps += [ "//components/gwp_asan/client" ]
   }
 
-  is_heap_profiling_supported = !is_ios || use_allocator_shim
+  is_heap_profiling_supported = true
 
   if (is_heap_profiling_supported) {
     deps += [

@@ -13,7 +13,7 @@ declare_args() {
 declare_args() {
   # The on device model service is only enabled on a subset of platforms.
   # Exclude it on other platforms due to binary size.
-  use_on_device_model_service = is_win || is_mac || is_linux || is_ios
+  use_on_device_model_service = is_mac || is_linux
 }
 
 declare_args() {

@@ -21,10 +21,7 @@ declare_args() {
   enable_resource_allowlist_generation =
       is_official_build &&
       # Don't enable for Android-on-Chrome OS.
-      (target_os == "android" || target_os == "win") &&
-      # TODO(https://crbug.com/445896263): Consider whether Cronet should enable
-      # this.
-      !is_cronet_build
+      (target_os == "android" || target_os == "win")
 }
 
 # When the arg is set via args.gn, it applies to all toolchains. In order to not

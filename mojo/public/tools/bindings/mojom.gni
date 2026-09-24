@@ -56,7 +56,7 @@ generate_mojom_closure_libraries = false
 # value, so we limit the behavior to desktop builds for now.
 # We *cannot* enable scrambling on Chrome OS (it would break ARC).
 enable_scrambled_message_ids =
-    enable_mojom_message_id_scrambling && (is_mac || is_win || is_linux)
+    enable_mojom_message_id_scrambling && (is_mac || is_linux)
 if (enable_scrambled_message_ids) {
 }
 

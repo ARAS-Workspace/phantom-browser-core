@@ -15,8 +15,7 @@ enable_gl_backend_tests = true
 # Fuchsia: TODO(crbug.com/42050537): Enable on ARM64 when bots support Vulkan.
 enable_vulkan_backend_tests = enable_vulkan && is_linux && !is_cfi
 
-enable_skia_graphite_tests =
-    skia_use_dawn && (is_mac || is_win || is_linux || (is_ios && use_blink))
+enable_skia_graphite_tests = skia_use_dawn && (is_mac || is_linux)
 
 viz_remove_configs = []
 viz_add_configs = [ "//build/config:precompiled_headers" ]

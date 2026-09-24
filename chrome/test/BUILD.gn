@@ -6507,8 +6507,6 @@ script_test("telemetry_unittests") {
     # For isolate contract.
     "//testing:test_scripts_shared",
   ]
-
-  enable_android_wrapper = true
 }
 
 group("telemetry_gpu_unittests_run") {

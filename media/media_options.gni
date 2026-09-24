@@ -81,9 +81,7 @@ declare_args() {
 
   # Enables AC3/EAC3 audio handling in chromium. This includes demuxing,
   # on-device decoding and bitstream passthrough on Android.
-  enable_platform_ac3_eac3_audio =
-      proprietary_codecs &&
-      (is_cast_media_device || (is_ios && target_platform == "tvos"))
+  enable_platform_ac3_eac3_audio = proprietary_codecs && is_cast_media_device
 
   # Enables AC4 audio handling in chromium. This includes demuxing,
   # on-device decoding as supported by device.
@@ -99,21 +97,20 @@ declare_args() {
   # on-device decoding.
   enable_platform_iamf_audio = false
 
-  # Enable Dolby Vision demuxing. Enabled by default for Chromecast and Windows.
+  # Enable Dolby Vision demuxing. Enabled by default for Chromecast.
   # Actual decoding must be provided by the platform. Since most Dolby Vision
   # profiles use HEVC, `enable_platform_hevc` is required to enable this.
   #
   # TODO(crbug.com/1336055): Revisit the default value for this setting as it
   # applies to video-capable devices.
-  enable_platform_dolby_vision =
-      proprietary_codecs && (is_cast_media_device || is_win)
+  enable_platform_dolby_vision = proprietary_codecs && is_cast_media_device
 
   # Enable platform support of encrypted Dolby Vision. The actual support
   # depends on platform capability and is controlled by the run time feature
   # kPlatformEncryptedDolbyVision. Clear Dolby Vision is not supported by
   # default, unless overwritten by the run time feature
   # kAllowClearDolbyVisionInMseWhenPlatformEncryptedDvEnabled.
-  enable_platform_encrypted_dolby_vision = proprietary_codecs && is_win
+  enable_platform_encrypted_dolby_vision = false
 
   # Enable logging override, e.g. enable DVLOGs through level 2 at build time.
   # On Cast devices, these are logged as INFO.
@@ -124,22 +121,20 @@ declare_args() {
 
   # Enable browser managed persistent metadata storage for EME persistent
   # session.
-  enable_media_drm_storage = is_android
+  enable_media_drm_storage = false
 
   # Enable HLS manifest parser and demuxer.
   enable_hls_demuxer = proprietary_codecs
 
   # Enable inclusion of the HEVC/H265 parser and also enable HEVC/H265 decoding
-  # with hardware acceleration assist. Enabled by default for fuzzer builds,
-  # Windows, Mac, and Android.
+  # with hardware acceleration assist. Enabled by default for fuzzer builds
+  # and Mac.
   enable_hevc_parser_and_hw_decoder =
-      proprietary_codecs &&
-      (use_fuzzing_engine || is_win || is_apple || is_android || is_linux)
+      proprietary_codecs && (use_fuzzing_engine || is_apple || is_linux)
 
   # Determines if a GpuChannel is needed between media capture utility process
   # and gpu process for a given platform.
-  enable_gpu_channel_media_capture =
-      is_linux || is_win || is_apple || is_android
+  enable_gpu_channel_media_capture = is_linux || is_apple
 }
 
 # Use another declare_args() to allow dependence on args defined above.
@@ -159,17 +154,13 @@ declare_args() {
   enable_mse_mpeg2ts_stream_parser =
       proprietary_codecs && (enable_hls_demuxer || use_fuzzing_engine)
 
-  # Only Android and Windows actually have bitstream output implementations.
-  enable_passthrough_audio_codecs =
-      (enable_platform_ac3_eac3_audio && is_android) ||
-      (enable_platform_dts_audio && (is_android || is_win))
+  enable_passthrough_audio_codecs = false
 }
 
 declare_args() {
   platform_has_optional_hevc_decode_support =
-      enable_platform_hevc && (is_win || is_linux || is_apple || is_android)
-  platform_has_optional_hevc_encode_support =
-      enable_platform_hevc && (is_win || is_apple || is_android)
+      enable_platform_hevc && (is_linux || is_apple)
+  platform_has_optional_hevc_encode_support = enable_platform_hevc && is_apple
 }
 
 assert(!enable_hls_demuxer || enable_mse_mpeg2ts_stream_parser,
@@ -236,12 +227,7 @@ declare_args() {
 # Use another declare_args() to include possible overrides of media_use_ffmpeg
 # from --args command line flags in the evaluation. See "gn help declare_args".
 declare_args() {
-  # On Android, FFMpeg is built without video decoders by default.
-  # This flag gives the option to override that decision in case there are no
-  # hardware decoders. To do so, you will also need to update ffmpeg build files
-  # in order to define which decoders to build in.
-  enable_ffmpeg_video_decoders =
-      media_use_ffmpeg && (!is_android || current_cpu != "arm")
+  enable_ffmpeg_video_decoders = media_use_ffmpeg
 }
 
 declare_args() {
@@ -255,15 +241,14 @@ declare_args() {
 # Use another declare_args() to allow dependence on `enable_library_cdms`.
 declare_args() {
   # Enables host verification for CDMs.
-  # Windows and Mac.
+  # Mac.
   enable_cdm_host_verification =
-      enable_library_cdms && (is_mac || is_win) && is_chrome_branded &&
+      enable_library_cdms && is_mac && is_chrome_branded &&
       !is_chrome_for_testing_branded
 
   # Enable Storage ID which is used by CDMs. This is only available with chrome
   # branding, but may be overridden by other embedders.
-  enable_cdm_storage_id =
-      enable_library_cdms && is_chrome_branded && (is_win || is_mac)
+  enable_cdm_storage_id = enable_library_cdms && is_chrome_branded && is_mac
 
   # If |enable_cdm_storage_id| is set, then an implementation specific key
   # must also be provided. It can be provided by defining CDM_STORAGE_ID_KEY
@@ -341,31 +326,29 @@ declare_args() {
   # This switch defines whether the Media Remoting implementation will be built.
   # When enabled, media is allowed to be renderer and played back on remote
   # devices when the tab is being casted and other conditions are met.
-  enable_media_remoting = !is_cast_media_device && !is_ios
+  enable_media_remoting = !is_cast_media_device
 }
 
 declare_args() {
-  # Media Remoting RPC is disabled on Android since it's unused but increases
-  # the native binary size by ~70Kb.
-  enable_media_remoting_rpc = enable_media_remoting && !is_android
+  enable_media_remoting_rpc = enable_media_remoting
 }
 
 declare_args() {
   # Multimedia Redirection: redirects remoted video playback to a
   # platform-provided redirection sink. Builds on the Media Remoting RPC
   # courier renderer.
-  enable_media_remoting_redirection = enable_media_remoting_rpc && is_win
+  enable_media_remoting_redirection = false
 }
 
 declare_args() {
   # Currently it is available on Win, Mac and Linux, since it requires the audio
   # service to run in a separate process.
-  chrome_wide_echo_cancellation_supported = is_win || is_mac || is_linux
+  chrome_wide_echo_cancellation_supported = is_mac || is_linux
 }
 
 declare_args() {
   system_loopback_as_aec_reference_supported =
-      (is_win || is_mac) && chrome_wide_echo_cancellation_supported
+      is_mac && chrome_wide_echo_cancellation_supported
 }
 
 # Do not expand this list without double-checking with OWNERS, this is a list of

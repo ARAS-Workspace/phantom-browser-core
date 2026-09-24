@@ -2,10 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Compute Pressure doesn't have a backend implementation for Android or
-# Fuchsia. This flag prevents to include compute pressure implementation
-# into the mentioned build to reduce the image size.
+# Compute Pressure doesn't have a backend implementation for Fuchsia. This
+# flag prevents to include compute pressure implementation into the
+# mentioned build to reduce the image size.
 
 declare_args() {
-  enable_compute_pressure = !is_android
+  enable_compute_pressure = true
 }

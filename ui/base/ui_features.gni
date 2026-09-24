@@ -15,8 +15,7 @@ declare_args() {
   # Whether the platform provides a native accessibility toolkit, in other words
   # the platform has a C/C++ interface for accessibility that Chrome
   # implements/subclasses in some way - win, mac, linux.
-  has_native_accessibility =
-      use_atk || is_win || is_mac || (is_ios && use_blink)
+  has_native_accessibility = use_atk || is_mac
 
   # Whether the platform provide platform-specific accessibility implementation,
   # i.e. there an accessibility API of some kind on this platform that's
@@ -27,13 +26,9 @@ declare_args() {
   has_platform_accessibility_support = false
 
   # Whether the message center should be included for displaying notifications.
-  enable_message_center = is_win || is_mac || is_linux
+  enable_message_center = is_mac || is_linux
 
   enable_hidpi = true
 }
 
-# Android does have platform accessibility support that's implemented using
-# BrowserAccessibilityManager. But unlike Windows, Mac and Linux it does not use
-# AXPlatformNode to implement a native C++ API, instead it bridges to a Java
-# API.
-has_platform_accessibility_support = has_native_accessibility || is_android
+has_platform_accessibility_support = has_native_accessibility

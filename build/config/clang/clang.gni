@@ -61,14 +61,12 @@ declare_args() {
   clang_use_raw_ptr_plugin = clang_use_chrome_plugins
 
   enable_check_raw_ptr_fields =
-      build_with_chromium && !is_official_build &&
-      (is_linux || is_android || is_mac || is_ios || is_win)
+      build_with_chromium && !is_official_build && (is_linux || is_mac)
 
   # TODO(crbug.com/40268473): Merge with enable_check_raw_ptr_fields once both
   # checks are activated on the same set of platforms.
   enable_check_raw_ref_fields =
-      build_with_chromium && !is_official_build &&
-      (is_linux || is_android || is_win || is_mac || is_ios)
+      build_with_chromium && !is_official_build && (is_linux || is_mac)
 
   # Use this instead of clang_use_chrome_plugins to enable just the unsafe
   # buffers functionality of the plugin

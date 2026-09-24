@@ -36,11 +36,7 @@ enable_pointer_compression =
 partition_alloc_dchecks_are_on =
     partition_alloc_is_debug || partition_alloc_dcheck_always_on
 
-# Building PartitionAlloc for Windows component build.
-# Currently use build_with_chromium not to affect any third_party code,
-# but if any third_party code wants to use, remove build_with_chromium.
-use_partition_alloc_as_malloc_on_win_component_build =
-    build_with_chromium && is_win && is_component_build
+use_partition_alloc_as_malloc_on_win_component_build = false
 
 # TODO(crbug.com/40276913): Split PartitionAlloc into a public and
 # private parts. The public config would include add the "./include" dir and

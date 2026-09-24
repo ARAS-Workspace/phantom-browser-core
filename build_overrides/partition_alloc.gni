@@ -60,11 +60,8 @@ if (!is_debug || partition_alloc_optimized_debug) {
 }
 
 # - Component build support is disabled on all platforms except Linux. It is
-#   known to cause issues on some (e.g. Windows with shims, Android with
-#   non-universal symbol wrapping), and has not been validated on others.
-# - Windows: debug CRT is not compatible, see below.
-_disable_partition_alloc_everywhere =
-    (!is_linux && is_component_build) || (is_win && is_debug)
+#   known to cause issues on some, and has not been validated on others.
+_disable_partition_alloc_everywhere = !is_linux && is_component_build
 
 use_allocator_shim_default = true  # Updated below:
 
@@ -106,12 +103,7 @@ enable_dangling_raw_ptr_checks_default =
     # In unofficial builds, enable only for developers interested in
     # DCHECKd/Debug builds. In the future, given its neutral performance impact,
     # we could consider removing this restriction.
-    (is_debug || dcheck_always_on) &&
-    # iOS is rolling out DanglingPointerDetection bot-by-bot.
-    (!is_ios || ios_enable_dangling_raw_ptr_checks) &&
-    # Only the `android-rel` CQ bot has enforced DanglingPointerDetector checks
-    # at the moment. The other Android bots are not ready for it yet.
-    !is_android
+    (is_debug || dcheck_always_on)
 
 raw_ptr_zero_on_construct_default = true
 raw_ptr_zero_on_move_default = true
@@ -121,9 +113,7 @@ raw_ptr_zero_on_destruct_default = false
 # Kindly notify PartitionAlloc owners of change to false.
 assert_cpp20_default = true
 
-# Cronet disables PartitionAlloc to reduce its binary size (crbug.com/674570).
-# TODO(crbug.com/384669394): Consider enabling it instead.
-use_partition_alloc_default = !is_cronet_build
+use_partition_alloc_default = true
 
 # On Chromecast devices, some system libraries bypass the allocator shim and
 # call free() directly on memory not managed by PartitionAlloc. This flag

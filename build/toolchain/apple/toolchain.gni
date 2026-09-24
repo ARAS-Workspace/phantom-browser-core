@@ -47,8 +47,7 @@ declare_args() {
 
 # TODO(crbug.com/40869822): Remove this and replace with `build_with_chromium`
 # once the support for catalyst is available in the hermetic swift compiler.
-_can_use_hermetic_swift =
-    build_with_chromium && is_ios && target_environment != "catalyst"
+_can_use_hermetic_swift = false
 
 if (swift_toolchain_path == -1) {
   # TODO(crbug.com/40915887) The custom swift toolchain not does currently work

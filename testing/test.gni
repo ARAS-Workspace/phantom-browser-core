@@ -128,8 +128,7 @@ template("mixed_test") {
   }
 
   _building_fuzztest_fuzzer =
-      defined(invoker.fuzztests) && use_fuzzing_engine &&
-      (is_linux || is_mac || is_win)
+      defined(invoker.fuzztests) && use_fuzzing_engine && (is_linux || is_mac)
 
   # Fuzz tests are small fuzzers that do not require particularly-powerful
   # machines to run, so we do not build them when `high_end_fuzzer_targets`
@@ -512,11 +511,8 @@ template("test") {
 # Variables:
 #   script: Path to underlying test script.
 #   args: Args to the test script.
-#   enable_android_wrapper: (optional) If true, the test will get wrapped in the
-#       logdog_wrapper on Android, which will stream logcats from the device.
 template("script_test") {
-  _enable_logdog_wrapper = defined(invoker.enable_android_wrapper) &&
-                           invoker.enable_android_wrapper && is_android
+  _enable_logdog_wrapper = false
   if (use_rts) {
     action("${target_name}__rts_filters") {
       script = "//build/add_rts_filters.py"

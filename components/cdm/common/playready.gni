@@ -6,7 +6,7 @@ import("//build/config/chrome_build.gni")
 
 declare_args() {
   # Enables PlayReady key system support.
-  enable_playready = is_win && is_chrome_branded
+  enable_playready = false
 }
 
 assert(!enable_playready)

@@ -23,7 +23,7 @@ if (headless_enable_commands) {
       "'headless_enable_commands' is not compatible with 'headless_use_embedded_resources'.")
 }
 
-bundle_hyphen_data = (is_linux || is_win) && !headless_use_embedded_resources
+bundle_hyphen_data = is_linux && !headless_use_embedded_resources
 should_strip_binary = is_chrome_for_testing && is_linux
 
 if (should_strip_binary) {

@@ -56,5 +56,5 @@ use_linux_video_acceleration = use_vaapi || use_v4l2_codec
 
 declare_args() {
   # A platform that is capable of hardware av1 decoding.
-  use_av1_hw_decoder = (is_linux && use_vaapi) || is_win || is_apple
+  use_av1_hw_decoder = (is_linux && use_vaapi) || is_apple
 }

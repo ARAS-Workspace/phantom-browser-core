@@ -7,7 +7,7 @@ import("//build/config/chrome_build.gni")
 declare_args() {
   # `enable_extensions` controls whether the full and stable extensions platform
   # is compiled.
-  enable_extensions = !is_android && !is_ios
+  enable_extensions = true
 
   # `enable_desktop_android_extensions` is an experimental flag used in
   # prototypes of desktop-focused android-powered builds. This is very much
@@ -26,7 +26,7 @@ declare_args() {
   #
   # TODO(https://crbug.com/356905053): Continue expanding the scope of
   # enable_desktop_android_extensions.
-  enable_desktop_android_extensions = is_desktop_android
+  enable_desktop_android_extensions = false
 }
 
 # Note: GN forbids relying on args from the same declare_args() block, so we

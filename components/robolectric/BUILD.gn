@@ -9,7 +9,7 @@ import("//third_party/jni_zero/jni_zero.gni")
 # defining other targets in the robolectric_toolchain.
 shared_library_with_jni("libcomponents_junit_tests") {
   testonly = true
-  enable_target = is_robolectric
+  enable_target = false
   deps = [
     "//components/embedder_support/android:util($robolectric_toolchain)",
     "//components/url_formatter($robolectric_toolchain)",

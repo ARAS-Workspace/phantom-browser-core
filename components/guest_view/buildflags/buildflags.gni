@@ -8,5 +8,5 @@ declare_args() {
   # `enable_guest_view` controls whether the guest_view is compiled.
   # If `enable_extensions` in //extensions/buildflags/buildflags.gni is
   # set this must be enabled.
-  enable_guest_view = !is_ios
+  enable_guest_view = true
 }

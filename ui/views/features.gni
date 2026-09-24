@@ -9,6 +9,5 @@ enable_desktop_aura = use_aura
 
 # Supports accessible text offsets computation by Views. When this feature is
 # enabled, characters offsets and word boundaries become available to ATs for
-# select Views. Currently only used on Windows, but could be used by other
-# platforms if needed.
-supports_ax_text_offsets = is_win
+# select Views.
+supports_ax_text_offsets = false

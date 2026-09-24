@@ -10,9 +10,9 @@ assert(is_mac || is_linux)
 # WebContentsObserver-based implementation does not work on Linux
 # since it depends on aura::WindowOcclusionTracker which is not
 # supported on Linux.
-use_web_contents_occlusion_helper = is_win || is_mac
+use_web_contents_occlusion_helper = is_mac
 use_widget_occlusion_helper = is_linux
-use_stub_occlusion_helper = is_android
+use_stub_occlusion_helper = false
 
 source_set("picture_in_picture") {
   sources = [

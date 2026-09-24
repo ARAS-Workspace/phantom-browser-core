@@ -9,5 +9,5 @@ import("//services/webnn/features.gni")
 declare_args() {
   # This flag enables the graph dump feature for WebNN.
   webnn_enable_graph_dump =
-      (is_win || is_linux || is_mac) && !is_official_build && dcheck_always_on
+      (is_linux || is_mac) && !is_official_build && dcheck_always_on
 }

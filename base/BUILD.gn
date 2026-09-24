@@ -54,12 +54,7 @@ declare_args() {
   # Set to true to enable mutex priority inheritance. See the comments in
   # LockImpl::PriorityInheritanceAvailable() in lock_impl_posix.cc for the
   # platform requirements to safely enable priority inheritance.
-  #
-  # Enabled only on 64-bit Android. On 32 bit Android, PI mutexes have an extra
-  # level of indirection, so we don't bother enabling it. See:
-  # https://cs.android.com/android/platform/superproject/+/android14-qpr3-release:bionic/libc/bionic/pthread_mutex.cpp;drc=9108f258adad329a537e10461fbd526d5b9ad8bf;l=242
-  enable_mutex_priority_inheritance =
-      is_android && (current_cpu == "x64" || current_cpu == "arm64")
+  enable_mutex_priority_inheritance = false
 
   # Control whether the ios stack sampling profiler is enabled. This flag is
   # only supported on iOS 64-bit architecture, but some project build //base
@@ -84,9 +79,7 @@ assert(!is_wasm, "base must not be built in most wasm toolchains")
 
 _build_date_header = "$target_gen_dir/generated_build_date.h"
 
-_enable_code_ordering = is_android && !is_component_build &&
-                        (current_cpu == "arm" || current_cpu == "arm64" ||
-                         current_cpu == "x86" || current_cpu == "x64")
+_enable_code_ordering = false
 
 buildflag_header("ios_cronet_buildflags") {
   header = "ios_cronet_buildflags.h"
@@ -94,7 +87,7 @@ buildflag_header("ios_cronet_buildflags") {
   flags = [ "CRONET_BUILD=$is_cronet_build" ]
 }
 
-use_epoll = is_linux || is_android
+use_epoll = is_linux
 
 generate_allowlist_from_histograms_file("memory_dump_provider_name_variants") {
   namespace = "trace_event_metrics"
@@ -2029,9 +2022,7 @@ buildflag_header("debugging_buildflags") {
   enable_lldbinit_warning =
       is_debug && strip_absolute_paths_from_debug_symbols && is_mac
 
-  # TODO(crbug.com/40258939): Try and enable these checks on Android too.
-  enable_commandline_sequence_checks =
-      (is_debug || dcheck_always_on) && !is_android
+  enable_commandline_sequence_checks = is_debug || dcheck_always_on
 
   if (enable_stack_trace_line_numbers) {
     assert(
@@ -2069,8 +2060,8 @@ buildflag_header("feature_buildflags") {
 buildflag_header("orderfile_buildflags") {
   header = "orderfile_buildflags.h"
   header_dir = "base/android/orderfile"
-  using_order_profiling = is_android && use_order_profiling
-  using_devtools_dumping = is_android && devtools_instrumentation_dumping
+  using_order_profiling = false
+  using_devtools_dumping = false
 
   flags = [
     "DEVTOOLS_INSTRUMENTATION_DUMPING=$using_devtools_dumping",
@@ -2083,8 +2074,8 @@ buildflag_header("protected_memory_buildflags") {
   header = "protected_memory_buildflags.h"
   header_dir = "base/memory"
 
-  protected_memory_enabled = !is_component_build && is_clang &&
-                             (is_win || is_linux || is_android || is_mac)
+  protected_memory_enabled =
+      !is_component_build && is_clang && (is_linux || is_mac)
 
   flags = [ "PROTECTED_MEMORY_ENABLED=$protected_memory_enabled" ]
 }
@@ -2150,7 +2141,7 @@ buildflag_header("profiler_buildflags") {
 buildflag_header("power_monitor_buildflags") {
   header = "power_monitor_buildflags.h"
   header_dir = "base/power_monitor"
-  _has_battery_provider_impl = is_win || is_mac
+  _has_battery_provider_impl = is_mac
 
   flags = [ "HAS_BATTERY_LEVEL_PROVIDER_IMPL=$_has_battery_provider_impl" ]
 }

@@ -77,7 +77,7 @@ buildflag_header("robolectric_buildflags") {
 
 buildflag_header("ios_buildflags") {
   header = "ios_buildflags.h"
-  _is_ios_app_extension = is_ios && ios_is_app_extension
+  _is_ios_app_extension = false
   flags = [ "IS_IOS_APP_EXTENSION=$_is_ios_app_extension" ]
 }
 

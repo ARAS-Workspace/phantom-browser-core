@@ -9,8 +9,7 @@ import("//testing/test.gni")
 buildflag_header("buildflags") {
   header = "buildflags.h"
 
-  # Disable DEX on Windows Official Builds.
-  _enable_dex = !(is_win && is_official_build)
+  _enable_dex = true
   _enable_elf = true
   _enable_win = true
 

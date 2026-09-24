@@ -34,7 +34,7 @@ declare_args() {
 
   use_gio = is_linux && target_os != "android"
 
-  use_blink = !is_ios
+  use_blink = true
 }
 #
 # =============================================

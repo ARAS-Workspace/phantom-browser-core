@@ -11,9 +11,9 @@ declare_args() {
 
 # Generated args.
 declare_args() {
-  # Shortcut for only allowing the service to run on Chrome OS, Windows,
+  # Shortcut for only allowing the service to run on Chrome OS,
   # Mac, Fuchsia, and Linux when the buildflag above is enabled.
   # This is exposed with the macro ENABLE_ACCESSIBILITY_SERVICE.
   enable_accessibility_service_internal =
-      enable_accessibility_service && (is_linux || is_mac || is_win)
+      enable_accessibility_service && (is_linux || is_mac)
 }

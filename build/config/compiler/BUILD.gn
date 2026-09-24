@@ -93,9 +93,7 @@ declare_args() {
   # We currently only have default profiles for Chromium in-tree, so we disable
   # this by default for all downstream projects, since these profiles are likely
   # nonsensical for said projects.
-  clang_use_default_sample_profile =
-      chrome_pgo_phase == 0 && build_with_chromium && is_official_build &&
-      is_android && !is_high_end_android && !is_cronet_build
+  clang_use_default_sample_profile = false
 
   # This configuration is used to select a default profile in Chrome OS based on
   # the microarchitectures we are using. This is only used if
@@ -121,8 +119,7 @@ declare_args() {
   # TODO(gbiv): We disable optimizations by default on most platforms because
   # the space overhead is too great. We should use some mixture of profiles and
   # optimization settings to better tune the size increase.
-  thin_lto_enable_optimizations = (is_android || is_win || is_linux || is_mac ||
-                                   (is_ios && use_lld)) && is_official_build
+  thin_lto_enable_optimizations = (is_linux || is_mac) && is_official_build
 
   # Whether to enable thin lto incremental builds.
   # See: https://clang.llvm.org/docs/ThinLTO.html#incremental
@@ -136,10 +133,7 @@ declare_args() {
   # uninitialized pointers.
   #
   # Flag discussion: https://crbug.com/977230
-  #
-  # TODO(crbug.com/40721698): This regresses binary size by ~1MB on Android and
-  # needs to be evaluated before enabling it there as well.
-  init_stack_vars = !(is_android && is_official_build)
+  init_stack_vars = true
 
   # Specialization of `init_stack_vars` where locals are initialized with
   # zeroes instead of patterns. Zero init is generally faster and can lead to
@@ -160,8 +154,7 @@ declare_args() {
   use_text_section_splitting = false
 
   # Enable DWARF v5.
-  # See analysis for is_android at https://crbug.com/479802735
-  use_dwarf5 = is_android
+  use_dwarf5 = false
 
   # Override this to put full paths to PDBs in Windows PE files. This helps
   # windbg and Windows Performance Analyzer with finding the PDBs in some local-
@@ -193,15 +186,14 @@ declare_args() {
 
   # Use DWARF simple template names, with the following exceptions:
   #
-  # * Windows is not supported as it doesn't use DWARF.
-  # * Apple platforms (e.g. MacOS, iPhone, iPad) aren't supported because xcode
+  # * Apple platforms (e.g. MacOS) aren't supported because xcode
   #   lldb doesn't have the needed changes yet.
   # TODO(crbug.com/40244196): Remove if the upstream default ever changes.
   #
   # This greatly reduces the size of debug builds, at the cost of
   # debugging information which is required by some specialized
   # debugging tools.
-  simple_template_names = is_clang && !is_win && !is_apple
+  simple_template_names = is_clang && !is_apple
 
   # This switch is used to enable -Wexit-time-destructors by default. This
   # warning serves as a flip switch to allow a gradual migration of targets
@@ -212,9 +204,8 @@ declare_args() {
 
 declare_args() {
   # Set to true to use icf, Identical Code Folding.
-  use_icf =
-      is_posix && !is_debug && !using_sanitizer && !use_clang_coverage &&
-      !(is_android && use_order_profiling) && (use_lld || use_mold) && !is_wasm
+  use_icf = is_posix && !is_debug && !using_sanitizer && !use_clang_coverage &&
+            (use_lld || use_mold) && !is_wasm
 }
 
 if (is_android) {
@@ -2790,11 +2781,8 @@ config("symbols") {
     asmflags = cflags
     ldflags = []
 
-    # Disable debugger index for Android, which uses lldb. lldb can create (and
-    # cache) its own index in about 20 seconds, so there's no need to pay the
-    # price of an index on every link.
-    _add_symbol_index = symbol_level == 2 && !is_apple &&
-                        (use_lld || use_mold) && !is_wasm && !is_android
+    _add_symbol_index =
+        symbol_level == 2 && !is_apple && (use_lld || use_mold) && !is_wasm
     if (_add_symbol_index) {
       if (use_dwarf5) {
         cflags += [ "-gpubnames" ]

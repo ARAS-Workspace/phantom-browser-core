@@ -43,8 +43,7 @@ config("content_shell_lib_warnings") {
   }
 }
 
-# Web test support not built on android, but is everywhere else.
-support_web_tests = !is_android
+support_web_tests = true
 
 source_set("android_shell_descriptors") {
   testonly = true

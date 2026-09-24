@@ -53,7 +53,7 @@ source_set("gl_headers") {
 
 # On ChromeOS, system services require real ANGLE shared libraries,
 # so we omit dummy stubs to avoid output target collisions.
-use_angle_stubs = use_static_angle && (is_linux || is_win || is_mac)
+use_angle_stubs = use_static_angle && (is_linux || is_mac)
 
 # Generate stubs for EGL and GLESv2 libraries when linking ANGLE statically.
 # Some bot infrastructure expects these files to exist even in static builds.

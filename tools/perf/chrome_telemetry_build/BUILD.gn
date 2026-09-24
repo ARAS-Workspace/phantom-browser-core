@@ -4,7 +4,7 @@
 
 import("//build/config/chromeos/args.gni")
 import("//build/config/compiler/compiler.gni")
-is_remote_platform = is_android
+is_remote_platform = false
 if (is_remote_platform) {
   import("//build/symlink.gni")
 }
