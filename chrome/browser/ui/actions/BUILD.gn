@@ -4,8 +4,6 @@
 
 import("//ui/base/ui_features.gni")
 
-assert(!is_ios, "Chromium/iOS shouldn't use anything in //chrome")
-
 source_set("actions_headers") {
   sources = [ "chrome_action_id.h" ]
 

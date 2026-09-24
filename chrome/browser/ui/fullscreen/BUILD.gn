@@ -4,8 +4,6 @@
 
 import("//build/config/ui.gni")
 
-assert(!is_android)
-
 source_set("fullscreen") {
   public = [ "browser_window_fullscreen_controller.h" ]
 

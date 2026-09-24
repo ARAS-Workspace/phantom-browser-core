@@ -4,8 +4,6 @@
 
 import("//build/config/ui.gni")
 
-assert(!is_android)
-
 source_set("window_feature_controller") {
   public = [ "window_feature_controller.h" ]
   sources = [ "window_feature_controller.cc" ]

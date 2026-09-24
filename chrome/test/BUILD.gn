@@ -47,7 +47,6 @@ import("//ui/views/features.gni")
 import("//ui/webui/webui_features.gni")
 import("//v8/gni/v8.gni")
 
-assert(!is_ios, "Chromium/iOS shouldn't use anything in //chrome")
 assert(enable_supervised_users)
 
 # This target exists to reference other test executables to bring these files

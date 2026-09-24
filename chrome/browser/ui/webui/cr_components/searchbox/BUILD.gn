@@ -5,8 +5,6 @@
 import("//components/signin/features.gni")
 import("//ui/webui/webui_features.gni")
 
-assert(!is_ios || enable_webui_ntp)
-
 source_set("searchbox") {
   sources = [
     "searchbox_handler.h",

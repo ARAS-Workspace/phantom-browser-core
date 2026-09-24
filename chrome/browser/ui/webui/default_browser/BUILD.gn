@@ -4,8 +4,6 @@
 
 import("//mojo/public/tools/bindings/mojom.gni")
 
-assert(!is_android)
-
 source_set("default_browser_modal") {
   sources = [
     "default_browser_modal_dialog_delegate.cc",

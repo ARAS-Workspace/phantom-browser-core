@@ -5,7 +5,6 @@
 import("//ui/webui/webui_features.gni")
 
 assert(enable_webui_ntp)
-assert(!is_android)
 
 # Separate from //chrome/browser/ui/views/side_panel to avoid a cycle:
 # //chrome/browser/ui/side_panel:side_panel_views_dependent ->

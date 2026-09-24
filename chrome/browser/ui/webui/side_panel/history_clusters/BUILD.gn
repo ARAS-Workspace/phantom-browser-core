@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-assert(!is_android)
-
 source_set("history_clusters") {
   public = [ "history_clusters_side_panel_ui.h" ]
   public_deps = [

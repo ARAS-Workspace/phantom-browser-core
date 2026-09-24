@@ -4,8 +4,6 @@
 
 import("//build/config/ui.gni")
 
-assert(!is_android)
-
 source_set("shadow") {
   public = [ "shadow_frame_view.h" ]
 

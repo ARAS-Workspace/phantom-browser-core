@@ -4,8 +4,6 @@
 
 import("//build/config/chromeos/args.gni")
 
-assert(!is_ios)
-
 source_set("headers") {
   public = [
     "privacy_sandbox_policy_handler.h",

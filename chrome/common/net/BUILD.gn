@@ -5,8 +5,6 @@
 import("//chrome/common/features.gni")
 import("//crypto/features.gni")
 
-assert(!is_ios, "Chromium/iOS shouldn't use anything in //chrome")
-
 static_library("net") {
   sources = [
     "net_resource_provider.cc",

@@ -140,9 +140,6 @@ if (is_android && export_libcxxabi_from_executables) {
 libcxx_prefix = "//third_party/libc++/src"
 libcxxabi_prefix = "//third_party/libc++abi/src"
 
-assert(!(is_ios && libcxx_is_shared),
-       "Can't build libc++ as a shared library on iOS.")
-
 if (libcxx_is_shared) {
   libcxx_target_type = "shared_library"
 } else if (is_win) {

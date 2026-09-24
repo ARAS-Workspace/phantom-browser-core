@@ -4,8 +4,6 @@
 
 import("//build/config/ozone.gni")
 
-assert(!is_android, "This is desktop code for fedcm.")
-
 source_set("webid") {
   public = [
     "account_selection_bubble_view.h",

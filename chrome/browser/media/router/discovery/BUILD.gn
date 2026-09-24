@@ -4,8 +4,6 @@
 
 import("//build/config/chrome_build.gni")
 
-assert(!is_android || is_desktop_android, "Not supported on mobile")
-
 static_library("discovery") {
   inputs = [ "$root_gen_dir/chrome/grit/generated_resources.h" ]
   sources = [

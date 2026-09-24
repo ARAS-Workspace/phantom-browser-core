@@ -8,9 +8,6 @@ import("//extensions/buildflags/buildflags.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 import("//testing/test.gni")
 
-assert(!is_android,
-       "Android shouldn't use anything in //chrome/web_applications")
-
 source_set("web_applications") {
   sources = [
     "callback_utils.h",

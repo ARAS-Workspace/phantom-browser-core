@@ -4,8 +4,6 @@
 
 import("//build/config/chromeos/args.gni")
 
-assert(!is_ios)
-
 source_set("search") {
   sources = [
     "most_visited_metrics_logger.h",

@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-assert(!is_android)
-
 source_set("browser_active_state_manager") {
   public = [ "browser_active_state_manager.h" ]
   sources = [ "browser_active_state_manager.cc" ]

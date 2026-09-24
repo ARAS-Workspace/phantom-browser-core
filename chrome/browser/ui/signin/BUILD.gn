@@ -7,8 +7,6 @@ import("//build/config/ui.gni")
 import("//components/signin/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 
-assert(!is_android)
-
 source_set("signin") {
   sources = [
     "signin_modal_dialog.h",

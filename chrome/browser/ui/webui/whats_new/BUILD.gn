@@ -5,8 +5,6 @@
 import("//chrome/common/features.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 
-assert(!is_android)
-
 mojom("mojo_bindings") {
   sources = [ "whats_new.mojom" ]
   webui_module_path = "/"

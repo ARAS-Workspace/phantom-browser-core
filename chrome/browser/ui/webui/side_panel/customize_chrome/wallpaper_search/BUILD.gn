@@ -4,8 +4,6 @@
 
 import("//ui/webui/webui_features.gni")
 
-assert(!is_android)
-
 source_set("wallpaper_search") {
   sources = [
     "wallpaper_search_handler.cc",

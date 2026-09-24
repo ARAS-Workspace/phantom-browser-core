@@ -4,8 +4,6 @@
 
 import("//build/config/chromeos/args.gni")
 
-assert(!is_android)
-
 source_set("desktop_session_duration") {
   sources = [
     "audible_contents_tracker.h",

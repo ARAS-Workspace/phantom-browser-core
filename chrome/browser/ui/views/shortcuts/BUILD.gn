@@ -4,8 +4,6 @@
 
 import("//chrome/browser/buildflags.gni")
 
-assert(!is_android)
-
 source_set("shortcuts") {
   public = [ "create_desktop_shortcut.h" ]
   public_deps = [

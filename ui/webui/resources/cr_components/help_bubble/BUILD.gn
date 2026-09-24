@@ -6,8 +6,6 @@ import("//mojo/public/tools/bindings/mojom.gni")
 import("//ui/webui/resources/tools/build_webui.gni")
 import("//ui/webui/webui_features.gni")
 
-assert(!is_ios)
-
 mojom("mojo_bindings") {
   sources = [
     "custom_help_bubble.mojom",

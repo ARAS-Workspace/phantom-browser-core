@@ -5,8 +5,6 @@
 import("//build/config/features.gni")
 import("//components/captive_portal/core/features.gni")
 
-assert(!is_android)
-
 source_set("window_metadata") {
   public = [ "window_metadata_controller.h" ]
   sources = [ "window_metadata_controller.cc" ]

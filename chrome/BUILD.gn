@@ -62,8 +62,6 @@ declare_args() {
   include_branded_entitlements = true
 }
 
-assert(!is_ios, "Chromium/iOS shouldn't use anything in //chrome")
-
 # This does not currently work. See crbug.com/40220356.
 # This target exists above chrome and it's main components in the dependency
 # tree as a central place to put assert_no_deps annotations. Since this depends

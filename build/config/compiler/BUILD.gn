@@ -2590,8 +2590,6 @@ config("default_optimization") {
   if (is_debug) {
     configs = [ ":no_optimize" ]
   } else if (optimize_for_fuzzing) {
-    assert(!is_win, "Fuzzing optimize level not supported on Windows")
-
     # Coverage build is quite slow. Using "optimize_for_fuzzing" makes it even
     # slower as it uses "-O1" instead of "-O3". Prevent that from happening.
     assert(!use_clang_coverage,

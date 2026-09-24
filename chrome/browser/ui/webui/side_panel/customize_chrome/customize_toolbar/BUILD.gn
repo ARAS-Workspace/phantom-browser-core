@@ -4,8 +4,6 @@
 
 import("//ui/webui/webui_features.gni")
 
-assert(!is_android)
-
 source_set("customize_toolbar") {
   sources = [ "customize_toolbar_handler.cc" ]
   public = [ "customize_toolbar_handler.h" ]
