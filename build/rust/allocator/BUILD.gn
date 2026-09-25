@@ -27,9 +27,6 @@ if (build_with_chromium) {
 # enabling it breaks Win32 APIs like CreateProcess:
 # https://crbug.com/368070343#comment29
 rust_allocator_uses_aligned_malloc = false
-if (!rust_allocator_uses_partition_alloc && is_win && is_asan) {
-  rust_allocator_uses_aligned_malloc = true
-}
 
 rust_allocator_uses_allocator_impls_h =
     rust_allocator_uses_partition_alloc || rust_allocator_uses_aligned_malloc

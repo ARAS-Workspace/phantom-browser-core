@@ -8,10 +8,6 @@ import("//build/config/dcheck_always_on.gni")
 import("//build/config/features.gni")
 import("//build_overrides/build.gni")
 
-if (is_ios) {
-  import("//build/config/apple/mobile_config.gni")
-}
-
 declare_args() {
   # Specify the current PGO phase.
   # Here's the different values that can be used:
@@ -23,9 +19,8 @@ declare_args() {
   # to think some code is hotter than it actually is, potentially causing very
   # bad compile times.
   chrome_pgo_phase = 0
-  if (!is_cronet_build && !dcheck_always_on && is_official_build &&
-      (is_high_end_android || is_win || is_mac || is_linux ||
-       (is_ios && use_blink && target_environment == "device"))) {
+  if (!dcheck_always_on && is_official_build &&
+      (is_high_end_android || is_mac || is_linux)) {
     chrome_pgo_phase = 2
   }
 

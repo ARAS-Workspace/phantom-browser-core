@@ -75,16 +75,11 @@ shared_bundle_id_for_test_apps =
 # This file is included on all platforms, but the automatic configuration of
 # the variables can only be executed if building for ios or watchos (as they
 # either have no meaning or depend on tools that are only available on macOS).
-if (is_ios || is_watchos) {
+if (is_watchos) {
   # Check that target_platform and target_environment are set to supported
   # values.
   _target_platforms = []
-  if (is_ios) {
-    _target_platforms += [
-      "iphoneos",
-      "tvos",
-    ]
-  } else if (is_watchos) {
+  if (is_watchos) {
     _target_platforms += [
       "iphoneos",
       "watchos",
@@ -97,9 +92,6 @@ if (is_ios || is_watchos) {
     "simulator",
     "device",
   ]
-  if (is_ios && target_platform == "iphoneos") {
-    _target_environments += [ "catalyst" ]
-  }
   assert(filter_include([ target_environment ], _target_environments) != [],
          "target_environment must be in $_target_environments: " +
              "$target_environment")

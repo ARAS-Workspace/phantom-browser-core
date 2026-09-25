@@ -116,7 +116,7 @@ template("create_native_executable_dist") {
   }
 }
 
-if (!is_robolectric && enable_java_templates) {
+if (enable_java_templates) {
   import("//build/config/android/config.gni")
   import("//build/config/android/internal_rules.gni")
   import("//build/config/android/tiered_dex.gni")
@@ -2038,22 +2038,11 @@ if (!is_robolectric && enable_java_templates) {
         defines += [ "_IS_FOR_TEST" ]
       }
 
-      if (!is_java_debug && (!_test_only || is_cronet_build)) {
+      if (!is_java_debug && !_test_only) {
         defines += [ "_DISABLE_DEBUG_LOGS" ]
       }
 
-      if (is_cronet_build) {
-        defines += [ "_IS_CRONET_BUILD" ]
-        defines += [ "_LOGTAG_PREFIX=cn_" ]
-        if (is_cronet_for_aosp_build) {
-          defines += [ "_CRONET_FOR_AOSP_BUILD" ]
-        }
-      } else {
-        defines += [ "_LOGTAG_PREFIX=cr_" ]
-      }
-      if (is_desktop_android) {
-        defines += [ "_IS_DESKTOP_ANDROID" ]
-      }
+      defines += [ "_LOGTAG_PREFIX=cr_" ]
 
       if (defined(invoker.write_clang_profiling_data) &&
           invoker.write_clang_profiling_data) {

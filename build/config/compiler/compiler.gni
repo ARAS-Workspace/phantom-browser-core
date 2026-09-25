@@ -14,9 +14,6 @@ import("//build/toolchain/kythe.gni")
 import("//build/toolchain/toolchain.gni")
 import("//build_overrides/build.gni")
 
-if (is_android) {
-  import("//build/config/android/abi.gni")
-}
 if (current_cpu == "arm" || current_cpu == "arm64") {
   import("//build/config/arm.gni")
 }
@@ -26,7 +23,7 @@ if (is_apple) {
 }
 
 declare_args() {
-  if (!is_win && !is_mac && !is_ios) {
+  if (!is_mac) {
     # Link using a non-lld linker (e.g., mold or wild). See https://crbug.com/40208899
     experimental_linker_path = ""
   }
@@ -38,7 +35,7 @@ if (!defined(experimental_linker_path) || !is_a_target_toolchain) {
   experimental_linker_path = ""
 }
 
-if (!is_win && !is_mac && !is_ios) {
+if (!is_mac) {
   declare_args() {
     # Link using mold instead of lld for faster builds.
     use_mold =
@@ -108,12 +105,6 @@ default_symbol_level = 0
 if (is_official_build) {
   # We want the best debug info we can get for in-the-wild crashes.
   default_symbol_level = 2
-} else if (is_android) {
-  # Prefer faster & smaller build times by default. gdb/lldb do not work well
-  # on Android, and many devs touch only Java, so this is a good default.
-  # symbol_level = 0 is even faster, but crashes then have incomplete stacks
-  # (missing frames and source lines).
-  default_symbol_level = 1
 } else if (using_sanitizer) {
   # Sanitizers need line table info for stack traces. They don't need type
   # info or variable info, so we can leave that out to speed up the build.
@@ -248,26 +239,6 @@ if (use_thin_lto) {
 # and build arguments.
 if (is_apple || is_linux) {
   enable_frame_pointers = true
-} else if (is_win) {
-  # 64-bit Windows ABI doesn't support frame pointers.
-  # NOTE: This setting is actually not used in the BUILD.gn for Windows,
-  # but it still reflects correctly that we don't emit frame pointers on x64.
-  if (current_cpu == "x64") {
-    enable_frame_pointers = false
-  } else {
-    enable_frame_pointers = true
-  }
-} else if (is_android) {
-  enable_frame_pointers =
-      enable_profiling ||
-      # Ensure that stacks from arm64 crash dumps are usable (crbug.com/391706).
-      current_cpu == "arm64" ||
-      # For x86 Android, unwind tables are huge without frame pointers
-      # (crbug.com/762629). Enabling frame pointers grows the code size slightly
-      # but overall shrinks binaries considerably by avoiding huge unwind
-      # tables.
-      (current_cpu == "x86" && !exclude_unwind_tables && optimize_for_size) ||
-      using_sanitizer
 } else {
   # Explicitly ask for frame pointers, otherwise stacks may be missing for
   # sanitizer and profiling builds.
@@ -282,10 +253,6 @@ can_unwind_with_frame_pointers = enable_frame_pointers
 if (current_cpu == "arm" && arm_use_thumb) {
   # We cannot currently unwind ARM Thumb frame pointers correctly.
   # See https://bugs.llvm.org/show_bug.cgi?id=18505
-  can_unwind_with_frame_pointers = false
-} else if (is_win) {
-  # Windows 32-bit does provide frame pointers, but the compiler does not
-  # provide intrinsics to access them, so we don't use them.
   can_unwind_with_frame_pointers = false
 }
 
@@ -323,12 +290,6 @@ if (strip_absolute_paths_from_debug_symbols_default) {
 # When absolute_paths in debug symbols, we need to use input root
 # absolute path to execute remotely in RBE.
 clang_need_input_root_absolute_path = !strip_absolute_paths_from_debug_symbols
-
-# TODO(crbug.com/473693507): Remove once fixed.
-# Builders as Kythe client might output system headers with absolute paths.
-if (is_win && enable_kythe_annotations) {
-  clang_need_input_root_absolute_path = true
-}
 
 if (clang_need_input_root_absolute_path) {
   compiler_logs += [ "clang_need_input_root_absolute_path=true" ]
@@ -369,9 +330,3 @@ if (forbid_non_component_debug_builds) {
 # LzmaDecOpt.asm only works on x64 and not x86.
 # https://sourceforge.net/p/sevenzip/discussion/45797/thread/768932e9dd/?limit=25#0d6c
 disable_llvm_ml = host_os == "win" && target_cpu == "x64" && !is_msan
-
-# TODO(crbug.com/476018435): Remove this once the issue is resolved.
-if (is_win) {
-  assert(!use_clang_coverage || !is_component_build,
-         "Clang coverage requires non component build on Windows")
-}

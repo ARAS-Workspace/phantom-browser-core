@@ -4,10 +4,6 @@
 
 import("//build/config/zip.gni")
 
-if (is_ios) {
-  import("//build/config/ios/ios_sdk_overrides.gni")
-}
-
 # Compile a xib or storyboard file and add it to a bundle_data so that it is
 # available at runtime in the bundle.
 #
@@ -38,15 +34,7 @@ template("bundle_data_ib_file") {
   _output_path = "$target_gen_dir/$_target_name/"
   _output_name = get_path_info(invoker.source, "name") + ".${invoker.extension}"
 
-  if (is_ios) {
-    _deployment_target = ios_deployment_target
-    _target_devices = [
-      "iphone",
-      "ipad",
-    ]
-  } else {
-    assert(false, "Unsupported platform: " + current_os)
-  }
+  assert(false, "Unsupported platform: " + current_os)
 
   action(_compile_target) {
     forward_variables_from(invoker,

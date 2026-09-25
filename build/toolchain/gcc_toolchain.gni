@@ -501,9 +501,7 @@ template("single_gcc_toolchain") {
       }
       command += "-- $link_command $solink_extra_flags"
 
-      if (target_cpu == "mipsel" && is_component_build && is_android) {
-        rspfile_content = "-Wl,--start-group -Wl,--whole-archive {{inputs}} {{solibs}} -Wl,--no-whole-archive {{libs}} -Wl,--end-group"
-      } else if (current_os == "aix") {
+      if (current_os == "aix") {
         # --whole-archive, --no-whole-archive flags are not available on the aix
         # ld.
         rspfile_content = "{{inputs}} {{solibs}} {{libs}}"

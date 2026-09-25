@@ -28,14 +28,7 @@ if (concurrent_links == -1) {
       "--reserve_mem_gb=10",
       "--thin-lto=local",
     ]
-    if (is_win) {
-      # Based on measurements of linking chrome.dll and chrome_child.dll, plus
-      # a little padding to account for future growth.
-      _args += [ "--mem_per_link_gb=45" ]
-    } else if (is_android && symbol_level == 2) {
-      # Large solink of Android official builds take 30-60GB.
-      _args += [ "--mem_per_link_gb=50" ]
-    } else if (is_linux) {
+    if (is_linux) {
       # OOM quite frequently for linux.
       _args += [ "--mem_per_link_gb=30" ]
     } else {
@@ -57,14 +50,6 @@ if (concurrent_links == -1) {
     } else {
       _args = [ "--mem_per_link_gb=24" ]
     }
-  } else if (is_win && symbol_level == 1 && !is_debug && is_component_build) {
-    _args = [ "--mem_per_link_gb=3" ]
-  } else if (is_win && target_cpu == "arm64") {
-    # crbug.com/340979111: OOM quite frequently for win-arm64-rel.
-    # crbug.com/512405078: OOM for win-arm64-dbg.
-    _args = [ "--mem_per_link_gb=10" ]
-  } else if (is_win) {
-    _args = [ "--mem_per_link_gb=10" ]
   } else if (is_mac) {
     if (enable_dsyms) {
       _args = [ "--mem_per_link_gb=12" ]
@@ -103,15 +88,6 @@ if (concurrent_links == -1) {
         _args = [ "--mem_per_link_gb=54" ]
       }
     }
-  } else if (is_android && !is_component_build && symbol_level == 2) {
-    # Full debug symbols require large memory for link.
-    _args = [ "--mem_per_link_gb=25" ]
-  } else if (is_android && !is_debug && !using_sanitizer && symbol_level < 2) {
-    if (symbol_level == 1) {
-      _args = [ "--mem_per_link_gb=6" ]
-    } else {
-      _args = [ "--mem_per_link_gb=4" ]
-    }
   } else if (is_linux && symbol_level == 0) {
     # Memory consumption on link without debug symbols is low on linux.
     _args = [ "--mem_per_link_gb=3" ]
@@ -119,19 +95,6 @@ if (concurrent_links == -1) {
     _args = [ "--mem_per_link_gb=1" ]
   } else {
     _args = []
-  }
-
-  # For Android builds, we also need to be wary of:
-  # * ProGuard / R8
-  # * Android Lint
-  # These both have a peak usage of < 4GB, that is large enough for them to
-  # need to use a pool since they both typically happen at the same time as
-  # linking.
-  # TODO: crbug.com/399665139 - running proguard/r8, android lint steps locally
-  # freqneutly cause bot died issue for unknown reason. Reducing concurrency to
-  # see if it helps.
-  if (is_android) {
-    _args += [ "--secondary_mem_per_link=6" ]
   }
 
   # TODO(crbug.com/41257258) Pass more build configuration info to the script

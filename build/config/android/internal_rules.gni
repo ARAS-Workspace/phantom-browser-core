@@ -4454,54 +4454,6 @@ if (enable_java_templates) {
         if (defined(invoker.public_deps)) {
           public_deps += invoker.public_deps
         }
-        if (is_cronet_build) {
-          # See crbug/1449896 for more details about the metadata fields
-          # and why they are added.
-          _java_library_deps = _default_deps
-          if (defined(invoker.deps)) {
-            _java_library_deps += invoker.deps
-          }
-          if (defined(invoker.public_deps)) {
-            _java_library_deps += invoker.public_deps
-          }
-          if (defined(invoker.srcjar_deps)) {
-            _java_library_deps += invoker.srcjar_deps
-          }
-          _java_library_inputs = []
-          if (defined(invoker.sources)) {
-            _java_library_inputs += invoker.sources
-          }
-          if (defined(invoker.jar_path)) {
-            _java_library_inputs += [ invoker.jar_path ]
-          }
-          if (defined(invoker.srcjars)) {
-            _java_library_inputs += invoker.srcjars
-          }
-          metadata = {
-            java_library_deps = []
-            foreach(_java_library_dep, _java_library_deps) {
-              java_library_deps +=
-                  [ get_label_info(_java_library_dep, "label_no_toolchain") ]
-            }
-            java_library_inputs = []
-            foreach(_java_library_source, _java_library_inputs) {
-              java_library_inputs +=
-                  [ get_path_info(_java_library_source, "abspath") ]
-            }
-            if (defined(invoker.jar_excluded_patterns)) {
-              java_library_jar_excluded_patterns = invoker.jar_excluded_patterns
-            }
-            if (defined(invoker.jar_included_patterns)) {
-              java_library_jar_included_patterns = invoker.jar_included_patterns
-            }
-            if (defined(invoker.alternative_android_sdk_dep)) {
-              java_library_android_sdk_dep =
-                  [ invoker.alternative_android_sdk_dep ]
-            } else {
-              java_library_android_sdk_dep = [ default_android_sdk_dep ]
-            }
-          }
-        }
       } else {
         # For robolectric targets, depend only on non-java deps and the specific
         # subtargets below, which will not include __dex.

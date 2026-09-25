@@ -46,12 +46,6 @@ group("deps") {
     ]
 
     if (target_cpu == "x86") {
-      # Some `target_os`s do not support 32-bit platforms anymore.  The
-      # selection below is _loosely_ based on `is_valid_x86_target` from
-      # the top-level `//BUILD.gn`.
-      if (is_win || is_android) {
-        deps += [ "//build/rust/tests/test_build_rs_target_arch_x86" ]
-      }
     }
 
     if (!(is_apple && is_official_build)) {
@@ -125,15 +119,10 @@ group("deps") {
 
         # TODO(crbug.com/40266882): The shared library unittest EXE ends up
         # requiring the DLL to run, even though it does not use the DLL.
-        if (!is_win && !is_mac) {
+        if (!is_mac) {
           data_deps += [ "//build/rust/tests/test_rust_shared_library:test_rust_shared_library_unittests" ]
         }
       }
-    }
-
-    if (is_win) {
-      deps += [ "//build/rust/tests/windows_sys_test" ]
-      deps += [ "//build/rust/tests/test_control_flow_guard" ]
     }
   }
 }

@@ -24,11 +24,6 @@ if (sysroot == "") {
   if (current_os == target_os && current_cpu == target_cpu &&
       target_sysroot != "") {
     sysroot = target_sysroot
-  } else if (is_android) {
-    import("//build/config/android/config.gni")
-
-    # Android uses unified headers, and thus a single compile time sysroot
-    sysroot = "$android_toolchain_root/sysroot"
   } else if (is_linux && use_sysroot) {
     # By default build against a sysroot image downloaded from Cloud Storage
     # during gclient runhooks.
@@ -64,8 +59,5 @@ if (sysroot == "") {
   } else if (is_mac) {
     import("//build/config/mac/mac_sdk.gni")
     sysroot = mac_sdk_path
-  } else if (is_ios) {
-    import("//build/config/ios/ios_sdk.gni")
-    sysroot = ios_sdk_path
   }
 }

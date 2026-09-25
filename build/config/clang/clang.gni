@@ -16,15 +16,10 @@ import("//build_overrides/build.gni")
 # Android is here because on android, sysroot.gni would introduce a circular
 # dependency. We just assume that android is always safe to use clang modules
 # for, but we can change this later down the line if that turns out to be false.
-if (is_android) {
-  using_tested_sysroot = true
-} else {
-  import("//build/config/sysroot.gni")
-
-  using_tested_sysroot =
-      use_sysroot && (current_os != target_os || current_cpu != target_cpu ||
-                      target_sysroot == "")
-}
+import("//build/config/sysroot.gni")
+using_tested_sysroot =
+    use_sysroot && (current_os != target_os || current_cpu != target_cpu ||
+                    target_sysroot == "")
 
 default_clang_base_path = "//third_party/llvm-build/Release+Asserts"
 
@@ -116,8 +111,4 @@ if (defined(clang_warning_suppression_file) &&
 rbe_bug_326584510_missing_inputs =
     " -inputs=" + string_join(",", rbe_bug_326584510_missing_input_list)
 
-if (is_win) {
-  clang_arg_prefix = "/clang:"
-} else {
-  clang_arg_prefix = ""
-}
+clang_arg_prefix = ""

@@ -113,7 +113,7 @@ if (use_system_xcode && current_toolchain == default_toolchain) {
   }
 } else {
   group("sdk_inputs") {
-    if (current_toolchain != default_toolchain && (is_mac || is_ios)) {
+    if (current_toolchain != default_toolchain && is_mac) {
       public_deps = [ ":sdk_inputs($default_toolchain)" ]
     }
   }
