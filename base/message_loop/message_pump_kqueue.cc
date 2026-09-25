@@ -21,10 +21,6 @@
 #include "base/time/time_override.h"
 #include "build/blink_buildflags.h"
 
-#if BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK)
-#include <BrowserEngineCore/BEkevent.h>
-#endif
-
 namespace base {
 
 namespace {
@@ -54,11 +50,7 @@ int platform_kevent64(int kq,
                       struct kevent64_s* eventlist,
                       int nevents,
                       unsigned int flags) {
-#if BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK)
-  return be_kevent64(kq, changelist, nchanges, eventlist, nevents, flags);
-#else
   return kevent64(kq, changelist, nchanges, eventlist, nevents, flags, nullptr);
-#endif
 }
 
 int ChangeOneEvent(const ScopedFD& kqueue, kevent64_s* event) {

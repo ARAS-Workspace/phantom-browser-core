@@ -730,7 +730,7 @@ TEST_F(PaymentsSyncBridgeUtilTest, OfferSpecificsFromOfferData) {
   }
   EXPECT_EQ(offer_specifics.display_strings().value_prop_text(),
             offer_data.GetDisplayStrings().value_prop_text);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(offer_specifics.display_strings().see_details_text_mobile(),
             offer_data.GetDisplayStrings().see_details_text);
   EXPECT_EQ(offer_specifics.display_strings().usage_instructions_text_mobile(),
@@ -740,7 +740,7 @@ TEST_F(PaymentsSyncBridgeUtilTest, OfferSpecificsFromOfferData) {
             offer_data.GetDisplayStrings().see_details_text);
   EXPECT_EQ(offer_specifics.display_strings().usage_instructions_text_desktop(),
             offer_data.GetDisplayStrings().usage_instructions_text);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Test to ensure the card-linked offer-specific fields from an

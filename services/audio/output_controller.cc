@@ -75,11 +75,7 @@ const char* ErrorTypeToString(
 }
 
 bool ShouldMonitorAudioLevels() {
-#if BUILDFLAG(IS_IOS)
-  return false;
-#else
   return true;
-#endif
 }
 
 }  // namespace

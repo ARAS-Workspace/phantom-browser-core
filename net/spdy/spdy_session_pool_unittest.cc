@@ -1557,7 +1557,7 @@ TEST_F(SpdySessionPoolTest, HandleIPAddressChangeThenShutdown) {
   spdy_session_pool_->OnIPAddressChanged(
       NetworkChangeNotifier::IP_ADDRESS_CHANGE_NORMAL);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(1u, num_active_streams(session));
   EXPECT_TRUE(session->IsGoingAway());
   EXPECT_FALSE(session->IsDraining());
@@ -1565,7 +1565,7 @@ TEST_F(SpdySessionPoolTest, HandleIPAddressChangeThenShutdown) {
   EXPECT_EQ(0u, num_active_streams(session));
   EXPECT_FALSE(session->IsGoingAway());
   EXPECT_TRUE(session->IsDraining());
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   http_session_.reset();
 

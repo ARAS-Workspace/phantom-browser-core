@@ -68,10 +68,6 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_IOS)
-#import <Security/Security.h>
-#endif  // BUILDFLAG(IS_IOS)
-
 using signin::GaiaIdHash;
 
 namespace password_manager {
@@ -726,64 +722,6 @@ bool PasswordNotesPostMigrationStepCallback(
   return true;
 }
 
-#if BUILDFLAG(IS_IOS)
-bool DeletePassword(sql::Database* db, int id) {
-  sql::Statement password_delete(
-      db->GetUniqueStatement("DELETE FROM logins WHERE id = ?"));
-  password_delete.BindInt(0, id);
-  return password_delete.Run();
-}
-
-bool UpdatePassword(sql::Database* db,
-                    int id,
-                    const std::string& encrypted_password) {
-  sql::Statement password_value_update(db->GetUniqueStatement(
-      "UPDATE logins SET password_value = ? WHERE id = ?"));
-  password_value_update.BindBlob(0, encrypted_password);
-  password_value_update.BindInt(1, id);
-  return password_value_update.Run();
-}
-
-bool MigrateToOSCrypt(IsAccountStore is_account_store,
-                      sql::Database* db,
-                      EncryptDecryptInterface* encryptor) {
-  sql::Statement get_passwords_statement(
-      db->GetUniqueStatement("SELECT id, password_value FROM logins"));
-  // Update each password_value with the new BLOB.
-  while (get_passwords_statement.Step()) {
-    int id = get_passwords_statement.ColumnInt(0);
-    // First get decrypted password value using old method.
-    std::u16string plaintext_password;
-    OSStatus retrieval_status = GetTextFromKeychainIdentifier(
-        get_passwords_statement.ColumnString(1), &plaintext_password);
-    // Password no longer exists in the keychain, meaning it's lost forever.
-    // In this case delete the entry from the database and continue with
-    // migration.
-    if (retrieval_status == errSecItemNotFound) {
-      if (!DeletePassword(db, id)) {
-        return false;
-      }
-    } else if (retrieval_status != errSecSuccess) {
-      // Stop migration with any other error.
-      return false;
-    } else {
-      // Encrypt password using OSCrypt.
-      std::string encrypted_password;
-      if (encryptor->EncryptedString(plaintext_password, &encrypted_password) !=
-          EncryptionResult::kSuccess) {
-        return false;
-      }
-      // Updated password_value in the database.
-      if (!UpdatePassword(db, id, encrypted_password)) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-#endif
-
 // Call this after having called InitializeBuilders(), to migrate the database
 // from the current version to kCurrentVersionNumber.
 bool MigrateDatabase(unsigned current_version,
@@ -890,23 +828,6 @@ bool MigrateDatabase(unsigned current_version,
       }
     }
   }
-
-#if BUILDFLAG(IS_IOS)
-  if (current_version < 39) {
-    // Before version 39, password_value was used to store keychain identifier
-    // where the actual password is. After this version password_value is
-    // encrypted password using OSCrypt. To ensure Credential Provider works as
-    // intended we need to add new column and preserve saving password to
-    // keychain.
-    sql::Statement copy_keychain_identifier(db->GetUniqueStatement(
-        "UPDATE logins SET keychain_identifier = password_value"));
-    if (!copy_keychain_identifier.Run()) {
-      return false;
-    }
-
-    return MigrateToOSCrypt(is_account_store, db, encryptor);
-  }
-#endif
 
   return true;
 }
@@ -1286,11 +1207,9 @@ bool LoginDatabase::Init(
 }
 
 void LoginDatabase::ReportBubbleSuppressionMetrics() {
-#if !BUILDFLAG(IS_IOS)
   base::UmaHistogramCustomCounts(
       "PasswordManager.BubbleSuppression.AccountsInStatisticsTable2",
       stats_table_.GetNumAccounts(), 0, 1000, 100);
-#endif  // !BUILDFLAG(IS_IOS)
 }
 
 void LoginDatabase::ReportInaccessiblePasswordsMetrics() {
@@ -1351,35 +1270,7 @@ PasswordStoreChangeList LoginDatabase::AddLogin(StoredCredential cred,
     }
     return PasswordStoreChangeList();
   }
-#if BUILDFLAG(IS_IOS)
-  // [iOS] Passwords created in Credential Provider Extension (CPE) are already
-  // encrypted in the keychain and there is no need to do the process again.
-  // However, the password needs to be decrypted instead so the actual password
-  // syncs correctly.
-  bool has_encrypted_password =
-      !cred.keychain_identifier.empty() && cred.password_value.empty();
-  if (has_encrypted_password) {
-    std::u16string plaintext_password;
-    if (GetTextFromKeychainIdentifier(cred.keychain_identifier,
-                                      &plaintext_password) != errSecSuccess) {
-      if (error) {
-        *error = AddCredentialError::kEncryptionServiceFailure;
-      }
-      return PasswordStoreChangeList();
-    }
-    cred.password_value = PasswordString(std::move(plaintext_password));
-  } else {
-    if (!CreateKeychainIdentifier(cred.password_value.value(),
-                                  &cred.keychain_identifier)) {
-      if (error) {
-        *error = AddCredentialError::kEncryptionServiceFailure;
-      }
-      return PasswordStoreChangeList();
-    }
-  }
-#else
   CHECK(cred.keychain_identifier.empty());
-#endif  // BUILDFLAG(IS_IOS)
   std::string encrypted_password;
   if (EncryptedString(cred.password_value.secure_value(),
                       &encrypted_password) != EncryptionResult::kSuccess) {
@@ -1466,17 +1357,6 @@ PasswordStoreChangeList LoginDatabase::UpdateLogin(
       GetPrimaryKeyAndPassword(cred);
 
   std::string new_keychain_identifier;
-#if BUILDFLAG(IS_IOS)
-  DeleteEncryptedPasswordFromKeychain(
-      old_primary_key_password.keychain_identifier);
-  if (!CreateKeychainIdentifier(cred.password_value.value(),
-                                &new_keychain_identifier)) {
-    if (error) {
-      *error = UpdateCredentialError::kEncryptionServiceFailure;
-    }
-    return PasswordStoreChangeList();
-  }
-#endif
   DCHECK(!update_statement_.empty());
   sql::Statement s(db_.GetCachedStatement(SQL_FROM_HERE, update_statement_));
   int next_param = 0;
@@ -1587,10 +1467,6 @@ bool LoginDatabase::RemoveLogin(const StoredCredential& cred,
   }
   const PrimaryKeyAndPassword old_primary_key_password =
       GetPrimaryKeyAndPassword(cred);
-#if BUILDFLAG(IS_IOS)
-  DeleteEncryptedPasswordFromKeychain(
-      old_primary_key_password.keychain_identifier);
-#endif
   // Remove a login by UNIQUE-constrained fields.
   DCHECK(!delete_statement_.empty());
   sql::Statement s(db_.GetCachedStatement(SQL_FROM_HERE, delete_statement_));
@@ -1629,9 +1505,6 @@ bool LoginDatabase::RemoveLoginByPrimaryKey(FormPrimaryKey primary_key,
   StoredCredential cred = GetFormWithoutPasswordFromStatement(s1);
   CHECK_EQ(cred.primary_key.value(), primary_key);
 
-#if BUILDFLAG(IS_IOS)
-  DeleteEncryptedPasswordFromKeychain(cred.keychain_identifier);
-#endif
   DCHECK(!delete_by_id_statement_.empty());
   sql::Statement s2(
       db_.GetCachedStatement(SQL_FROM_HERE, delete_by_id_statement_));
@@ -1659,12 +1532,6 @@ bool LoginDatabase::RemoveLoginsCreatedBetween(
   if (!GetLoginsCreatedBetween(delete_begin, delete_end, &credentials)) {
     return false;
   }
-
-#if BUILDFLAG(IS_IOS)
-  for (const auto& cred : credentials) {
-    DeleteEncryptedPasswordFromKeychain(cred.keychain_identifier);
-  }
-#endif
 
   sql::Statement s(
       db_.GetCachedStatement(SQL_FROM_HERE,
@@ -1908,18 +1775,6 @@ bool LoginDatabase::GetAllLoginsWithBlocklistSetting(
 bool LoginDatabase::DeleteAndRecreateDatabaseFile() {
   TRACE_EVENT0("passwords", "LoginDatabase::DeleteAndRecreateDatabaseFile");
   DCHECK(db_.is_open());
-
-#if BUILDFLAG(IS_IOS)
-  {  // Scope the statement so the database closes properly.
-    // Clear keychain on iOS before deleting passwords.
-    sql::Statement s(
-        db_.GetUniqueStatement("SELECT keychain_identifier FROM logins"));
-    while (s.Step()) {
-      std::string keychain_identifier = s.ColumnBlobAsString(0);
-      DeleteEncryptedPasswordFromKeychain(keychain_identifier);
-    }
-  }
-#endif
 
   meta_table_.Reset();
   db_.Close();

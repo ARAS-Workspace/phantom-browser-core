@@ -98,21 +98,7 @@ TEST_F(EphemeralHomeModuleBackendTest, InitAndFetchModel) {
 }
 
 TEST_F(EphemeralHomeModuleBackendTest, ExecuteModelWithInput) {
-#if BUILDFLAG(IS_IOS)
-  size_t input_size = registry_->all_cards_input_size();
-  size_t output_size = registry_->all_output_labels().size();
-  std::vector<float> expected_result(output_size, kNotShownResultValue);
-  // App Bundle Promo card is visible when passed a 0 (below impression limit
-  // threshold.
-  int index = registry_->get_label_index(kAppBundlePromoEphemeralModule);
-  if (index != -1) {
-    expected_result[index] =
-        EphemeralHomeModuleRankToScore(EphemeralHomeModuleRank::kTop);
-  }
-  ExpectExecutionWithInput(std::vector<float>(input_size, 0),
-                           /*expected_error=*/false,
-                           /*expected_result=*/expected_result);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   size_t input_size = registry_->all_cards_input_size();
   size_t output_size = registry_->all_output_labels().size();
   ExpectExecutionWithInput(

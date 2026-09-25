@@ -792,8 +792,7 @@ TEST_P(PasswordFormManagerTest, Autofill) {
   EXPECT_EQ(observed_form_.url(), fill_data.url);
 
   // On Android Touch To Fill will prevent autofilling credentials on page load.
-  // On iOS bio-metric reauth will prevent autofilling as well.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(fill_data.wait_for_username);
 #else
   EXPECT_FALSE(fill_data.wait_for_username);
@@ -848,13 +847,9 @@ TEST_P(PasswordFormManagerTest, AutofillSignUpForm) {
   EXPECT_TRUE(fill_data.password_element_renderer_id.is_null());
   EXPECT_EQ(saved_match_.password_value,
             fill_data.preferred_login.password_value);
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(observed_form_.renderer_id(), generation_data.form_renderer_id);
-#else
   EXPECT_EQ(observed_form_.fields().back().renderer_id(),
             generation_data.new_password_renderer_id);
   EXPECT_TRUE(generation_data.confirmation_password_renderer_id.is_null());
-#endif
 }
 
 // Checks that generation signal is sent to the renderer when new password
@@ -881,13 +876,9 @@ TEST_P(PasswordFormManagerTest, GenerationOnNewAndConfirmPasswordFields) {
   fetcher_->NotifyFetchCompleted();
 
   task_environment_.FastForwardUntilNoTasksRemain();
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(observed_form_.renderer_id(), generation_data.form_renderer_id);
-#else
   EXPECT_EQ(new_password_renderer_id, generation_data.new_password_renderer_id);
   EXPECT_EQ(confirm_password_renderer_id,
             generation_data.confirmation_password_renderer_id);
-#endif
 }
 
 // Checks that `FormDataParser` classifies text field with `NEW_PASSWORD`
@@ -909,12 +900,8 @@ TEST_P(PasswordFormManagerTest, GenerationOnTextFieldsDueToOverride) {
   fetcher_->NotifyFetchCompleted();
 
   task_environment_.FastForwardUntilNoTasksRemain();
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(observed_form_.renderer_id(), generation_data.form_renderer_id);
-#else
   EXPECT_EQ(generation_data.new_password_renderer_id,
             observed_form_.fields()[kPasswordFieldIndex].renderer_id());
-#endif
 }
 
 TEST_P(PasswordFormManagerTest, AutofillWithBlocklistedMatch) {
@@ -943,13 +930,11 @@ TEST_P(PasswordFormManagerTest, SetSubmitted) {
 
   FormData another_form = submitted_form_;
   another_form.set_name(another_form.name() + u"1");
-#if !BUILDFLAG(IS_IOS)
   // |another_form| is managed because the same |renderer_id| as
   // |observed_form_|.
   EXPECT_TRUE(form_manager_->ProvisionallySave(another_form, &driver_,
                                                possible_usernames_));
   EXPECT_TRUE(form_manager_->is_submitted());
-#endif
 }
 
 TEST_P(PasswordFormManagerTest, TestSaveFormAllowedNegative) {
@@ -1147,7 +1132,7 @@ TEST_P(PasswordFormManagerTest, CreatePendingCredentialsAlreadySaved) {
   // Tests that depending on whether we fill on page load or account select that
   // correct user action is recorded. Fill on account select is simulated by
   // pretending we are in incognito mode.
-#if !BUILDFLAG(IS_IOS) && !defined(ANDROID)
+#if !defined(ANDROID)
   for (bool is_incognito : {false, true}) {
     EXPECT_CALL(client_, IsOffTheRecord).WillOnce(Return(is_incognito));
 #endif
@@ -1156,7 +1141,7 @@ TEST_P(PasswordFormManagerTest, CreatePendingCredentialsAlreadySaved) {
                                                  possible_usernames_));
     CheckPendingCredentials(/* expected */ saved_match_,
                             form_manager_->GetPendingCredentials());
-#if !BUILDFLAG(IS_IOS) && !defined(ANDROID)
+#if !defined(ANDROID)
   }
 #endif
 }
@@ -3106,126 +3091,6 @@ TEST_P(PasswordFormManagerTest, BlocklistHttpAuthCredentials) {
   EXPECT_CALL(form_saver, Blocklist(PasswordFormDigest(http_auth_form)));
   form_manager_->OnNeverClicked();
 }
-
-#if BUILDFLAG(IS_IOS)
-TEST_P(PasswordFormManagerTest, iOSPresavedGeneratedPassword) {
-  fetcher_->NotifyFetchCompleted();
-  MockFormSaver& form_saver = MockFormSaver::Get(form_manager_.get());
-
-  FormData form_to_presave = observed_form_;
-  const std::u16string typed_username = u"user1";
-  FormFieldData& username_field =
-      test_api(form_to_presave).field(kUsernameFieldIndex);
-  FormFieldData& password_field =
-      test_api(form_to_presave).field(kPasswordFieldIndex);
-  username_field.set_value(typed_username);
-  password_field.set_value(u"not_password");
-  // Use |generated_password| different from value in field to test that the
-  // generated password is saved.
-  const std::u16string generated_password = u"gen_pw";
-  form_manager_->SetGenerationElement(password_field.renderer_id());
-
-  PasswordForm saved_form;
-  EXPECT_CALL(form_saver, Save(_, IsEmpty(), std::u16string()))
-      .WillOnce(SaveArg<0>(&saved_form));
-  form_manager_->PresaveGeneratedPassword(form_to_presave, generated_password);
-  EXPECT_EQ(generated_password, saved_form.password_value);
-
-  Mock::VerifyAndClearExpectations(&form_saver);
-
-  const std::u16string changed_username = generated_password + u"1";
-  EXPECT_CALL(form_saver, UpdateReplace(_, _, std::u16string(), _))
-      .WillOnce(SaveArg<0>(&saved_form));
-
-  form_manager_->UpdateStateOnUserInput(form_to_presave.renderer_id(),
-                                        username_field.renderer_id(),
-                                        changed_username);
-  EXPECT_EQ(changed_username, saved_form.username_value);
-  EXPECT_EQ(generated_password, saved_form.password_value);
-}
-
-TEST_P(PasswordFormManagerTest, iOSUpdateStateWithoutPresaving) {
-  fetcher_->NotifyFetchCompleted();
-  MockFormSaver& form_saver = MockFormSaver::Get(form_manager_.get());
-
-  FieldRendererId password_field =
-      observed_form_.fields()[kPasswordFieldIndex].renderer_id();
-  const std::u16string new_field_value = u"some_password";
-
-  // Check that nothing is saved on changing password, in case when there was no
-  // pre-saving.
-  EXPECT_CALL(form_saver, Save).Times(0);
-  form_manager_->UpdateStateOnUserInput(observed_form_.renderer_id(),
-                                        password_field, new_field_value);
-
-  EXPECT_EQ(
-      new_field_value,
-      form_manager_->observed_form()->fields()[kPasswordFieldIndex].value());
-}
-
-TEST_P(PasswordFormManagerTest, iOSUsingFieldDataManagerData) {
-  CreateFormManager(observed_form_);
-
-  auto field_data_manager = base::MakeRefCounted<autofill::FieldDataManager>();
-  field_data_manager->UpdateFieldDataMap(
-      observed_form_.fields()[1].renderer_id(), u"typed_username",
-      FieldPropertiesFlags::kUserTyped);
-  field_data_manager->UpdateFieldDataMap(
-      observed_form_.fields()[2].renderer_id(), u"autofilled_pw",
-      FieldPropertiesFlags::kAutofilledOnUserTrigger);
-
-  base::LRUCache<PossibleUsernameFieldIdentifier, PossibleUsernameData>
-      possible_usernames(2);
-  form_manager_->ProvisionallySaveFieldDataManagerInfo(
-      *field_data_manager, &driver_, possible_usernames);
-
-  EXPECT_EQ(form_manager_->observed_form()->fields()[1].user_input(),
-            u"typed_username");
-  EXPECT_EQ(form_manager_->observed_form()->fields()[1].properties_mask(),
-            FieldPropertiesFlags::kUserTyped);
-
-  EXPECT_EQ(form_manager_->observed_form()->fields()[2].user_input(),
-            u"autofilled_pw");
-  EXPECT_EQ(form_manager_->observed_form()->fields()[2].properties_mask(),
-            FieldPropertiesFlags::kAutofilledOnUserTrigger);
-}
-
-// Tests provisional saving of credentials from field data manager info update
-// during username first flow.
-TEST_P(PasswordFormManagerTest,
-       iOSUsingFieldDataManagerDataInUsernameFirstFlow) {
-  FormData observed_form = observed_form_only_password_fields_;
-
-  CreateFormManager(observed_form);
-  SetNonFederatedAndNotifyFetchCompleted({saved_match_});
-
-  auto field_data_manager = base::MakeRefCounted<autofill::FieldDataManager>();
-  field_data_manager->UpdateFieldDataMap(
-      observed_form.fields()[0].renderer_id(), u"typed_password",
-      FieldPropertiesFlags::kUserTyped);
-
-  // Create possible username data with predictions.
-  constexpr autofill::FieldRendererId kUsernameFieldRendererId(101);
-  const std::u16string possible_username = u"test@example.com";
-  PossibleUsernameData possible_username_data(
-      saved_match_.signon_realm, kUsernameFieldRendererId, possible_username,
-      base::Time::Now(), DriverId(1),
-      /*autocomplete_attribute_has_username=*/false, /*is_likely_otp=*/false);
-  possible_username_data.form_predictions = MakeSingleUsernamePredictions(
-      kSingleUsernameFormSignature, kUsernameFieldRendererId,
-      kSingleUsernameFieldSignature);
-  base::LRUCache<PossibleUsernameFieldIdentifier, PossibleUsernameData>
-      possible_usernames = MakePossibleUsernamesCache({possible_username_data});
-
-  form_manager_->ProvisionallySaveFieldDataManagerInfo(
-      *field_data_manager, &driver_, possible_usernames);
-
-  // Check that a username is chosen from |possible_username_data|.
-  EXPECT_EQ(possible_username,
-            form_manager_->GetPendingCredentials().username_value);
-}
-
-#endif  // BUILDFLAG(IS_IOS)
 
 // Tests provisional saving of credentials during username first flow.
 TEST_P(PasswordFormManagerTest, UsernameFirstFlowProvisionalSave) {
@@ -5659,7 +5524,7 @@ TEST_F(PasswordFormManagerWebAuthnCredentialsTest,
   EXPECT_TRUE(form_manager().WebAuthnCredentialsAvailable());
 }
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasswordFormManagerWebAuthnCredentialsTest,
        NoPasskeysFromConditionalRequest_ThenNoWebauthnCredentials) {
   ON_CALL(webauthn_credentials_delegate(), GetPasskeys)
@@ -5676,6 +5541,6 @@ TEST_F(PasswordFormManagerWebAuthnCredentialsTest,
 
   EXPECT_TRUE(form_manager().WebAuthnCredentialsAvailable());
 }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace password_manager

@@ -197,8 +197,6 @@ TEST_F(SigninHeaderHelperTest, TestNoMirrorHeaderForYoutubekids) {
                            GaiaId("0123456789"), "");
 }
 
-// Does not apply to iOS as users cannot set cookies settings in iOS.
-#if !BUILDFLAG(IS_IOS)
 // Tests that no Mirror request is returned when the cookies aren't allowed to
 // be set.
 TEST_F(SigninHeaderHelperTest, TestNoMirrorRequestCookieSettingBlocked) {
@@ -210,7 +208,6 @@ TEST_F(SigninHeaderHelperTest, TestNoMirrorRequestCookieSettingBlocked) {
   CheckMirrorCookieRequest(GURL("https://docs.google.com"),
                            GaiaId("0123456789"), "");
 }
-#endif
 
 TEST_F(SigninHeaderHelperTest,
        BuildMirrorRequestCookieIfPossibleHandlesNullptrCookieSettings) {
@@ -218,16 +215,7 @@ TEST_F(SigninHeaderHelperTest,
       GURL("https://docs.google.com"), GaiaId("0123456789"),
       AccountConsistencyMethod::kMirror,
       /*cookie_settings=*/nullptr, PROFILE_MODE_DEFAULT);
-#if BUILDFLAG(IS_IOS)
-  // Users cannot disable cookies via settings on iOS so we always build a
-  // cookie.
-  EXPECT_EQ(
-      cookie,
-      "mode=0:enable_account_consistency=true:consistency_enabled_by_default=" +
-          consistency_enabled_by_default_value());
-#else
   EXPECT_TRUE(cookie.empty());
-#endif
 }
 
 // Tests that no Mirror request is returned when the target is a non-Google URL.
@@ -481,7 +469,7 @@ TEST_F(SigninHeaderHelperTest, TestBuildManageAccountsParams) {
       "action=ADDSESSION,email=%s,is_saml=true,"
       "is_same_tab=true,continue_url=%s",
       kEmail, kContinueURL);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   header += ",show_consistency_promo=true";
 #endif
 

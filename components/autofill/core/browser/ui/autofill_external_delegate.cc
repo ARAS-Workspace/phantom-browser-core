@@ -456,11 +456,6 @@ void AutofillExternalDelegate::OnSuggestionsReturned(
   if (trigger_field.global_id() != last_query_.field_id) {
     return;
   }
-#if BUILDFLAG(IS_IOS)
-  if (!manager_->client().IsLastQueriedField(trigger_field.global_id())) {
-    return;
-  }
-#endif
   AttemptToDisplayAutofillSuggestions(
       input_suggestions, trigger_source_, trigger_field,
       AutofillSuggestionsIgnoreFocusLoss(false));
@@ -626,14 +621,8 @@ AutofillExternalDelegate::CreateUpdateSuggestionsCallback() {
 }
 
 bool AutofillExternalDelegate::HasActiveScreenReader() const {
-#if BUILDFLAG(IS_IOS)
-  // ui::AXPlatform is not supported on iOS. The rendering engine handles
-  // a11y internally.
-  return false;
-#else
   return ui::AXPlatform::GetInstance().GetMode().has_mode(
       ui::AXMode::kScreenReader);
-#endif
 }
 
 void AutofillExternalDelegate::OnAutofillAvailabilityEvent(
@@ -1607,7 +1596,7 @@ void AutofillExternalDelegate::DidAcceptAddressSuggestion(
     default:
       NOTREACHED();  // Should be handled elsewhere.
   }
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // The user having accepted an address suggestion on this field, all strikes
   // previously recorded for this field are cleared so that address suggestions
   // can be automatically shown again if needed.

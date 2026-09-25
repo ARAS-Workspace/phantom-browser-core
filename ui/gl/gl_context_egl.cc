@@ -71,8 +71,6 @@ bool ChangeContextAttributes(std::vector<EGLint>& context_attributes,
 bool IsARMSwiftShaderPlatform() {
 #if BUILDFLAG(IS_MAC)
   return base::mac::GetCPUType() == base::mac::CPUType::kArm;
-#elif BUILDFLAG(IS_IOS)
-  return true;
 #else
   // SwiftShader is not used on Android
   return false;

@@ -23,7 +23,7 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/paint_vector_icon.h"
 #include "url/gurl.h"
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #include "components/vector_icons/vector_icons.h"     // nogncheck
 #endif
@@ -132,11 +132,7 @@ TEST_F(LocationBarModelImplTest, FormatsReaderModeUrls) {
   std::u16string originalFormattedFullUrl = model()->GetFormattedFullURL();
   // We expect that they don't start with "http://." We want the reader mode
   // URL shown to the user to be the same as this original URL.
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(u"example.com/TestSuffix", originalDisplayUrl);
-#else   // #!BUILDFLAG(IS_IOS)
   EXPECT_EQ(u"example.com/article.html/TestSuffix", originalDisplayUrl);
-#endif  // #defined (OS_IOS)
   EXPECT_EQ(u"www.example.com/article.html/TestSuffix",
             originalFormattedFullUrl);
 
@@ -164,12 +160,8 @@ TEST_F(LocationBarModelImplTest, FormatsReaderModeUrls) {
   // Invalid dom-distiller:// URLs should be shown, because they do not
   // correspond to any article.
   delegate()->SetURL(GURL(("chrome-distiller://abc/?url=invalid")));
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(u"chrome-distiller://abc/TestSuffix", model()->GetURLForDisplay());
-#else
   EXPECT_EQ(u"chrome-distiller://abc/?url=invalid/TestSuffix",
             model()->GetURLForDisplay());
-#endif
   EXPECT_EQ(u"chrome-distiller://abc/?url=invalid/TestSuffix",
             model()->GetFormattedFullURL());
 }
@@ -194,7 +186,7 @@ TEST_F(LocationBarModelImplTest, MAYBE_PreventElisionWorks) {
             model()->GetURLForDisplay());
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Tests GetVectorIcon returns the correct security indicator icon.
 TEST_F(LocationBarModelImplTest, GetVectorIcon) {
   delegate()->SetSecurityLevel(security_state::SecurityLevel::WARNING);
@@ -210,18 +202,7 @@ TEST_F(LocationBarModelImplTest, GetVectorIcon) {
 
   EXPECT_EQ(icon.bitmap(), expected_icon.bitmap());
 }
-#endif  // !BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_IOS)
-
-// Test that blob:http://example.test/foobar is displayed as "example.test" on
-// iOS.
-TEST_F(LocationBarModelImplTest, BlobDisplayURLIOS) {
-  delegate()->SetURL(GURL("blob:http://example.test/foo"));
-  EXPECT_EQ(u"example.test/TestSuffix", model()->GetURLForDisplay());
-}
-
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Test that the expected page classification is returned.
 TEST_F(LocationBarModelImplTest, GetPageClassification) {

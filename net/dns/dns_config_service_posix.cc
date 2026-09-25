@@ -44,22 +44,11 @@ namespace {
 const base::FilePath::CharType kFilePathHosts[] =
     FILE_PATH_LITERAL("/etc/hosts");
 
-#if BUILDFLAG(IS_IOS)
-// There is no public API to watch the DNS configuration on iOS.
-class DnsConfigWatcher {
- public:
-  using CallbackType = base::RepeatingCallback<void(bool succeeded)>;
-
-  bool Watch(const CallbackType& callback) {
-    return false;
-  }
-};
-
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 // DnsConfigWatcher for OS_MAC is in dns_config_watcher_mac.{hh,cc}.
 
-#else  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_MAC)
+#else
 
 #ifndef _PATH_RESCONF  // Normally defined in <resolv.h>
 #define _PATH_RESCONF "/etc/resolv.conf"
@@ -88,7 +77,7 @@ class DnsConfigWatcher {
   base::FilePathWatcher watcher_;
   CallbackType callback_;
 };
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC)
 
 std::optional<DnsConfig> ReadDnsConfig() {
   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
@@ -138,8 +127,6 @@ class DnsConfigServicePosix::Watcher : public DnsConfigService::Watcher {
       LOG(ERROR) << "DNS config watch failed to start.";
       success = false;
     }
-// Hosts file should never change on iOS, so don't watch it there.
-#if !BUILDFLAG(IS_IOS)
     if (!hosts_watcher_.Watch(
             base::FilePath(kFilePathHosts),
             base::FilePathWatcher::Type::kNonRecursive,
@@ -148,21 +135,16 @@ class DnsConfigServicePosix::Watcher : public DnsConfigService::Watcher {
       LOG(ERROR) << "DNS hosts watch failed to start.";
       success = false;
     }
-#endif  // !BUILDFLAG(IS_IOS)
     return success;
   }
 
  private:
-#if !BUILDFLAG(IS_IOS)
   void OnHostsFilePathWatcherChange(const base::FilePath& path, bool error) {
     OnHostsChanged(!error);
   }
-#endif  // !BUILDFLAG(IS_IOS)
 
   DnsConfigWatcher config_watcher_;
-#if !BUILDFLAG(IS_IOS)
   base::FilePathWatcher hosts_watcher_;
-#endif  // !BUILDFLAG(IS_IOS)
 };
 
 // A SerialWorker that uses libresolv to initialize res_state and converts
@@ -310,14 +292,7 @@ std::optional<DnsConfig> ConvertResStateToDnsConfig(
 
 // static
 std::unique_ptr<DnsConfigService> DnsConfigService::CreateSystemService() {
-  // DnsConfigService on iOS doesn't watch the config so its result can become
-  // inaccurate at any time.  Disable it to prevent promulgation of inaccurate
-  // DnsConfigs.
-#if BUILDFLAG(IS_IOS)
-  return nullptr;
-#else   // BUILDFLAG(IS_IOS)
   return std::make_unique<internal::DnsConfigServicePosix>();
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 }  // namespace net

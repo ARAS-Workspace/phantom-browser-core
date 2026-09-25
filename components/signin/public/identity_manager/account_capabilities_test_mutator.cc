@@ -36,13 +36,11 @@ void AccountCapabilitiesTestMutator::set_can_fetch_family_member_info(
       value;
 }
 
-#if !BUILDFLAG(IS_IOS)
 void AccountCapabilitiesTestMutator::set_can_have_email_address_displayed(
     bool value) {
   capabilities_
       ->capabilities_map_[kCanHaveEmailAddressDisplayedCapabilityName] = value;
 }
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
 void AccountCapabilitiesTestMutator::
@@ -52,78 +50,41 @@ void AccountCapabilitiesTestMutator::
 }
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 void AccountCapabilitiesTestMutator::set_can_run_chrome_privacy_sandbox_trials(
     bool value) {
   capabilities_
       ->capabilities_map_[kCanRunChromePrivacySandboxTrialsCapabilityName] =
       value;
 }
-#endif
 
 void AccountCapabilitiesTestMutator::
     set_can_show_history_sync_opt_ins_without_minor_mode_restrictions(
         bool value) {
-#if BUILDFLAG(IS_IOS)
-  if (base::FeatureList::IsEnabled(
-          switches::kReadContextualAccountCapabilities)) {
-    capabilities_->capabilities_map_
-        [kCanContextuallyShowHistorySyncOptInsWithoutMinorModeRestrictionsCapabilityName] =
-        value;
-  } else {
-    capabilities_->capabilities_map_
-        [kCanShowHistorySyncOptInsWithoutMinorModeRestrictionsCapabilityName] =
-        value;
-  }
-#else
   capabilities_->capabilities_map_
       [kCanShowHistorySyncOptInsWithoutMinorModeRestrictionsCapabilityName] =
       value;
-#endif
 }
 
-#if BUILDFLAG(IS_IOS)
-void AccountCapabilitiesTestMutator::set_can_sign_in_to_chrome(bool value) {
-  capabilities_->capabilities_map_[kCanSignInToChromeCapabilityName] = value;
-}
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 void AccountCapabilitiesTestMutator::set_can_submit_feedback(bool value) {
   capabilities_->capabilities_map_[kCanSubmitFeedbackInChromeCapabilityName] =
       value;
 }
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 void AccountCapabilitiesTestMutator::
     set_can_use_devtools_generative_ai_features(bool value) {
   capabilities_
       ->capabilities_map_[kCanUseDevToolsGenerativeAiFeaturesCapabilityName] =
       value;
 }
-#endif
 
-#if !BUILDFLAG(IS_IOS)
 void AccountCapabilitiesTestMutator::set_can_use_edu_features(bool value) {
   capabilities_->capabilities_map_[kCanUseEduFeaturesCapabilityName] = value;
 }
-#endif
 
 void AccountCapabilitiesTestMutator::set_can_use_gemini_in_chrome(bool value) {
-#if BUILDFLAG(IS_IOS)
-  if (base::FeatureList::IsEnabled(
-          switches::kReadContextualAccountCapabilities)) {
-    capabilities_
-        ->capabilities_map_[kCanContextuallyUseGeminiInChromeCapabilityName] =
-        value;
-  } else {
-    capabilities_->capabilities_map_[kCanUseGeminiInChromeCapabilityName] =
-        value;
-  }
-#else
   capabilities_->capabilities_map_[kCanUseGeminiInChromeCapabilityName] = value;
-#endif
 }
 
 void AccountCapabilitiesTestMutator::set_can_use_manta_service(bool value) {
@@ -132,18 +93,7 @@ void AccountCapabilitiesTestMutator::set_can_use_manta_service(bool value) {
 
 void AccountCapabilitiesTestMutator::set_can_use_model_execution_features(
     bool value) {
-#if BUILDFLAG(IS_IOS)
-  if (base::FeatureList::IsEnabled(
-          switches::kReadContextualAccountCapabilities)) {
-    capabilities_
-        ->capabilities_map_[kCanContextuallyUseModelExecutionFeaturesName] =
-        value;
-  } else {
-    capabilities_->capabilities_map_[kCanUseModelExecutionFeaturesName] = value;
-  }
-#else
   capabilities_->capabilities_map_[kCanUseModelExecutionFeaturesName] = value;
-#endif
 }
 
 void AccountCapabilitiesTestMutator::set_can_use_speaker_label_in_recorder_app(
@@ -194,23 +144,6 @@ void AccountCapabilitiesTestMutator::set_is_subject_to_universal_opt_out(
   capabilities_
       ->capabilities_map_[kIsSubjectToUniversalOptOutCapabilityName] = value;
 }
-
-#if BUILDFLAG(IS_IOS)
-void AccountCapabilitiesTestMutator::set_must_fetch_apple_age_range_in_chrome(
-    bool value) {
-  capabilities_
-      ->capabilities_map_[kMustFetchAppleAgeRangeInChromeCapabilityName] =
-      value;
-}
-#endif
-
-#if BUILDFLAG(IS_IOS)
-void AccountCapabilitiesTestMutator::set_must_skip_apple_age_range_in_chrome(
-    bool value) {
-  capabilities_
-      ->capabilities_map_[kMustSkipAppleAgeRangeInChromeCapabilityName] = value;
-}
-#endif
 
 void AccountCapabilitiesTestMutator::
     set_supports_wallet_private_passes_in_autofill(bool value) {

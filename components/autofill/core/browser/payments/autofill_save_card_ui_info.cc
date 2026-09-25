@@ -49,24 +49,7 @@ static std::u16string GetConfirmButtonText(
           IDS_AUTOFILL_SAVE_CVC_MESSAGE_SAVE_ACCEPT);
     }
   }
-#elif BUILDFLAG(IS_IOS)
-  if (options.source_feature == SourceFeature::kScanCardSaveAndFill) {
-    // TODO(bug.com/485262126): Update the confirm button text for scan card
-    // flow.
-  }
-  switch (options.card_save_type) {
-    case CardSaveType::kCardSaveOnly:
-    case CardSaveType::kCardSaveWithCvc: {
-      // TODO(crbug.com/407742057): Update confirm button's string id
-      // `IDS_AUTOFILL_SAVE_CARD_INFOBAR_ACCEPT` to not be UI specific.
-      return l10n_util::GetStringUTF16(IDS_AUTOFILL_SAVE_CARD_INFOBAR_ACCEPT);
-    }
-    case CardSaveType::kCvcSaveOnly: {
-      return l10n_util::GetStringUTF16(
-          IDS_AUTOFILL_SAVE_CVC_MESSAGE_SAVE_ACCEPT);
-    }
-  }
-#else  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#else
   NOTREACHED();
 #endif
 }
@@ -168,46 +151,7 @@ AutofillSaveCardUiInfo AutofillSaveCardUiInfo::CreateForLocalSave(
       break;
     }
   }
-#elif BUILDFLAG(IS_IOS)
-  // On iOS, the UI (infobar vs. bottom sheet) and title are determined by
-  // whether the feature is enabled and the card's strike count.
-  is_for_bottom_sheet = ShouldShowSaveCardBottomSheet(
-      options.card_save_type, options.source_feature,
-      options.num_strikes.value_or(0),
-      /*should_request_name_from_user=*/false,
-      /*should_request_expiration_date_from_user=*/false);
-
-  switch (options.card_save_type) {
-    case CardSaveType::kCardSaveOnly: {
-      save_card_icon_id = IDR_INFOBAR_AUTOFILL_CC;
-      save_card_prompt_title_id =
-          !is_for_bottom_sheet
-              ? IDS_AUTOFILL_SAVE_CARD_PROMPT_TITLE_LOCAL_ON_THIS_DEVICE
-              : IDS_AUTOFILL_SAVE_CARD_PROMPT_TITLE_LOCAL;
-      description_text = l10n_util::GetStringUTF16(
-          IDS_AUTOFILL_SAVE_CARD_ONLY_PROMPT_EXPLANATION_LOCAL);
-      break;
-    }
-    case CardSaveType::kCardSaveWithCvc: {
-      save_card_icon_id = IDR_INFOBAR_AUTOFILL_CC;
-      save_card_prompt_title_id =
-          !is_for_bottom_sheet
-              ? IDS_AUTOFILL_SAVE_CARD_PROMPT_TITLE_LOCAL_ON_THIS_DEVICE
-              : IDS_AUTOFILL_SAVE_CARD_PROMPT_TITLE_LOCAL;
-
-      description_text = l10n_util::GetStringUTF16(
-          IDS_AUTOFILL_SAVE_CARD_WITH_CVC_PROMPT_EXPLANATION_LOCAL);
-      break;
-    }
-    case CardSaveType::kCvcSaveOnly: {
-      save_card_icon_id = IDR_AUTOFILL_CC_GENERIC_PRIMARY_OLD;
-      save_card_prompt_title_id = IDS_AUTOFILL_SAVE_CVC_PROMPT_TITLE_LOCAL;
-      description_text = l10n_util::GetStringUTF16(
-          IDS_AUTOFILL_SAVE_CVC_PROMPT_EXPLANATION_LOCAL_SAVE_IOS);
-      break;
-    }
-  }
-#else  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#else
   NOTREACHED();
 #endif
   return CreateAutofillSaveCardUiInfo(
@@ -327,57 +271,7 @@ AutofillSaveCardUiInfo AutofillSaveCardUiInfo::CreateForUploadSave(
       break;
     }
   }
-#elif BUILDFLAG(IS_IOS)
-  is_for_bottom_sheet = ShouldShowSaveCardBottomSheet(
-      options.card_save_type, options.source_feature,
-      options.num_strikes.value_or(0), options.should_request_name_from_user,
-      options.should_request_expiration_date_from_user);
-  switch (options.card_save_type) {
-    case CardSaveType::kCardSaveWithCvc:
-    case CardSaveType::kCardSaveOnly: {
-      if (is_chrome_branding_enabled) {
-        save_card_icon_id = IDR_AUTOFILL_GOOGLE_PAY;
-        save_card_icon_description_text = l10n_util::GetStringUTF16(
-            base::FeatureList::IsEnabled(
-                features::kAutofillEnableWalletBranding)
-                ? IDS_AUTOFILL_GOOGLE_WALLET_LOGO_ACCESSIBLE_NAME
-                : IDS_AUTOFILL_GOOGLE_PAY_LOGO_ACCESSIBLE_NAME);
-        save_card_prompt_title_id =
-            base::FeatureList::IsEnabled(
-                features::kAutofillEnableWalletBrandingV2)
-                ? IDS_AUTOFILL_SAVE_CARD_IN_GOOGLE_WALLET_PROMPT_TITLE
-                : IDS_AUTOFILL_SAVE_CARD_PROMPT_TITLE_TO_CLOUD_SECURITY;
-        if (base::FeatureList::IsEnabled(
-                features::kAutofillEnableWalletBrandingV2)) {
-          description_text = l10n_util::GetStringUTF16(
-              IDS_AUTOFILL_SAVE_CARD_PROMPT_UPLOAD_TO_WALLET_V2_EXPLANATION);
-        } else if (base::FeatureList::IsEnabled(
-                       features::kAutofillEnableWalletBranding)) {
-          description_text = l10n_util::GetStringUTF16(
-              IDS_AUTOFILL_SAVE_CARD_PROMPT_UPLOAD_TO_WALLET_EXPLANATION_SECURITY);
-        } else {
-          description_text = l10n_util::GetStringUTF16(
-              IDS_AUTOFILL_SAVE_CARD_PROMPT_UPLOAD_EXPLANATION_SECURITY);
-        }
-      } else {
-        save_card_icon_id = IDR_INFOBAR_AUTOFILL_CC;
-        save_card_prompt_title_id =
-            IDS_AUTOFILL_SAVE_CARD_PROMPT_TITLE_TO_CLOUD;
-      }
-      break;
-    }
-    case CardSaveType::kCvcSaveOnly: {
-      save_card_icon_id = IDR_AUTOFILL_CC_GENERIC_PRIMARY_OLD;
-      save_card_prompt_title_id = IDS_AUTOFILL_SAVE_CVC_PROMPT_TITLE_TO_CLOUD;
-      description_text = l10n_util::GetStringFUTF16(
-          base::FeatureList::IsEnabled(features::kAutofillEnableWalletBranding)
-              ? IDS_AUTOFILL_SAVE_CVC_TO_WALLET_PROMPT_EXPLANATION_UPLOAD_IOS
-              : IDS_AUTOFILL_SAVE_CVC_PROMPT_EXPLANATION_UPLOAD_IOS,
-          base::UTF8ToUTF16(displayed_target_account.email));
-      break;
-    }
-  }
-#else  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#else
   NOTREACHED();
 #endif
   return CreateAutofillSaveCardUiInfo(
@@ -409,24 +303,5 @@ AutofillSaveCardUiInfo AutofillSaveCardUiInfo::CreateForUploadSave(
   return CreateForUploadSave(options, CreditCard(), legal_message_lines,
                              displayed_target_account);
 }
-
-#if BUILDFLAG(IS_IOS)
-bool ShouldShowSaveCardBottomSheet(
-    CardSaveType card_save_type,
-    SourceFeature source_feature,
-    int num_strikes,
-    bool should_request_name_from_user,
-    bool should_request_expiration_date_from_user) {
-  int max_strikes = 1;
-  if (base::FeatureList::IsEnabled(
-          features::kAutofillSaveCardBottomSheetStrikeLimitIos)) {
-    max_strikes = features::kMaxStrikesForSaveCardBottomSheetIos.Get();
-  }
-  return source_feature == SourceFeature::kScanCardSaveAndFill ||
-         (card_save_type != CardSaveType::kCvcSaveOnly &&
-          num_strikes < max_strikes && !should_request_name_from_user &&
-          !should_request_expiration_date_from_user);
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 }  // namespace autofill

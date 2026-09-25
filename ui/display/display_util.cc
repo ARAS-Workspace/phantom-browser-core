@@ -42,7 +42,7 @@ void DisplayUtil::DisplayToScreenInfo(ScreenInfo* screen_info,
     screen_info->orientation_angle = 90;
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   screen_info->orientation_type = GetOrientationTypeForMobile(display);
 #else
   screen_info->orientation_type = GetOrientationTypeForDesktop(display);

@@ -43,9 +43,8 @@ BASE_FEATURE(kUnoPhase2FollowUp,
 #endif
 );
 
-
 BASE_FEATURE(kSyncEnableContactInfoDataTypeForCustomPassphraseUsers,
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -67,7 +66,7 @@ BASE_FEATURE(kSeparateLocalAndAccountSearchEngines,
 );
 
 BASE_FEATURE(kReplaceSyncPromosWithSignInPromos,
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -97,20 +96,12 @@ bool IsReplaceSyncPromosWithSignInPromosEnabled() {
       "fi", "fr", "gb", "gr", "hr", "hu", "id", "ie", "in", "is", "it", "jp", \
       "kr", "li", "lt", "lu", "lv", "md", "mk", "ml", "mt", "nl", "no", "om", \
       "pl", "pt", "ro", "se", "si", "sk", "th")
-#elif BUILDFLAG(IS_IOS)
-#define DEFINE_SYNC_AUTOFILL_AI_FEATURE(feature_name) \
-  BASE_FEATURE_WITH_COUNTRY_RESTRICTIONS(             \
-      feature_name, base::FEATURE_ENABLED_FOR_COUNTRIES, "us")
 #else
 #define DEFINE_SYNC_AUTOFILL_AI_FEATURE(feature_name) \
   BASE_FEATURE(feature_name, base::FEATURE_ENABLED_BY_DEFAULT)
 #endif
 
 DEFINE_SYNC_AUTOFILL_AI_FEATURE(kSyncAccountSettings);
-
-#if BUILDFLAG(IS_IOS)
-DEFINE_SYNC_AUTOFILL_AI_FEATURE(kSyncAutofillValuable);
-#endif
 
 DEFINE_SYNC_AUTOFILL_AI_FEATURE(kSyncAutofillValuableMetadata);
 
@@ -123,7 +114,7 @@ DEFINE_SYNC_AUTOFILL_AI_FEATURE(kSyncWalletVehicleRegistrations);
 BASE_FEATURE(kSpellcheckSeparateLocalAndAccountDictionaries,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kReadingListEnableSyncTransportModeUponSignIn,
              base::FEATURE_ENABLED_BY_DEFAULT
 );
@@ -132,10 +123,10 @@ bool IsReadingListAccountStorageEnabled() {
   return base::FeatureList::IsEnabled(
       syncer::kReadingListEnableSyncTransportModeUponSignIn);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Enabled by default, intended as a kill switch.
 BASE_FEATURE(kSyncReadingListBatchUploadSelectedItems,
@@ -159,11 +150,6 @@ BASE_FEATURE(kSyncEnablePasswordsSyncErrorMessageAlternative,
 BASE_FEATURE(kSyncTrustedVaultErrorMessageDuration,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kSyncTrustedVaultInfobarMessageImprovements,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_IOS)
 
 BASE_FEATURE(kSyncPreferencesUseSelectedTypes,
              base::FEATURE_ENABLED_BY_DEFAULT);

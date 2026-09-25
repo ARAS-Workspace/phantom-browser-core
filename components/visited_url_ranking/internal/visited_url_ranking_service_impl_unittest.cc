@@ -620,16 +620,6 @@ TEST_F(VisitedURLRankingServiceImplTest, DecorateURLVisitAggregates) {
             DecorationType::kFrequentlyVisited);
   EXPECT_EQ(GetMostRelevantDecoration(result.second[1]).GetType(),
             DecorationType::kMostRecent);
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(result.second[0].decorations[0].GetDisplayString(),
-            u"You Visit Often");
-  EXPECT_EQ(result.second[0].decorations[1].GetDisplayString(),
-            u"You Visit Often");
-  EXPECT_EQ(GetMostRelevantDecoration(result.second[1]).GetDisplayString(),
-            u"Your Most Recent Tab");
-  EXPECT_EQ(result.second[1].decorations[1].GetDisplayString(),
-            u"You Just Visited");
-#else
   EXPECT_EQ(result.second[0].decorations[0].GetDisplayString(),
             u"You visit often");
   EXPECT_EQ(result.second[0].decorations[1].GetDisplayString(),
@@ -638,13 +628,9 @@ TEST_F(VisitedURLRankingServiceImplTest, DecorateURLVisitAggregates) {
             u"Your most recent tab");
   EXPECT_EQ(result.second[1].decorations[1].GetDisplayString(),
             u"You just visited");
-#endif
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(result.second[0].decorations[2].GetDisplayString(),
             u"You visited 5 min ago");
-#elif BUILDFLAG(IS_IOS)
-  EXPECT_EQ(result.second[0].decorations[2].GetDisplayString(),
-            u"You Visited 5 min ago");
 #else
   EXPECT_EQ(result.second[0].decorations[2].GetDisplayString(),
             u"You visited 5 mins ago");

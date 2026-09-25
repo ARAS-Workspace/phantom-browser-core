@@ -90,7 +90,7 @@ std::u16string GetYearInTheFuture() {
 }
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return true;
@@ -1137,7 +1137,7 @@ TEST(CreditCardTest, CompareCardCreationSource) {
   EXPECT_EQ(a.Compare(b), 0);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Test we get the correct icon for each card type.
 TEST(CreditCardTest, IconResourceId) {
   EXPECT_EQ(CreditCard::IconResourceId(Suggestion::Icon::kCardDiners),
@@ -1227,7 +1227,7 @@ TEST(CreditCardTest, IconResourceIdFromString_NewAmexNetworkArtDisabled) {
   EXPECT_EQ(CreditCard::IconResourceId(kAmericanExpressCard),
             IDR_AUTOFILL_METADATA_CC_AMEX);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST(CreditCardTest, UpdateFromImportedCard_UpdatedWithNameAndExpirationDate) {
   const std::u16string kYearInFuture = GetYearInTheFuture();

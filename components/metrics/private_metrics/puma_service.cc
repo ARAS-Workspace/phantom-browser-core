@@ -75,8 +75,6 @@ Platform GetCurrentPlatform() {
 #elif BUILDFLAG(IS_ANDROID)
   // TODO(b/463580425): Differentiate between Android platforms.
   return Platform::PLATFORM_ANDROID;
-#elif BUILDFLAG(IS_IOS)
-  return Platform::PLATFORM_IOS;
 #else
   return Platform::PLATFORM_OTHER;
 #endif

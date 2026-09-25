@@ -320,10 +320,7 @@ class CardUnmaskPromptTextTest
 // Ensures the card information is shown correctly.
 TEST_F(CardUnmaskPromptTextTest, DisplayCardInformation) {
   ShowPrompt();
-#if BUILDFLAG(IS_IOS)
-  EXPECT_TRUE(controller_->GetInstructionsMessage().find(
-                  card_.CardNameAndLastFourDigits()) == std::string::npos);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(controller_->GetCardName(), card_.CardNameForAutofillDisplay());
   EXPECT_EQ(controller_->GetCardLastFourDigits(),
             card_.ObfuscatedNumberWithVisibleLastFourDigits());
@@ -336,13 +333,6 @@ TEST_F(CardUnmaskPromptTextTest, DisplayCardInformation) {
 // Tests the title and instructions message in the credit card unmask dialog.
 TEST_F(CardUnmaskPromptTextTest, TitleAndInstructionMessage) {
   ShowPrompt();
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(controller_->GetNavigationTitle(), u"Verification");
-  EXPECT_EQ(controller_->GetWindowTitle(), u"Enter your CVC");
-  EXPECT_EQ(controller_->GetInstructionsMessage(),
-            u"To help keep your card secure, enter the CVC on the back of "
-            u"your card");
-#else
 
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(controller_->GetWindowTitle(), u"Enter your CVC");
@@ -357,7 +347,6 @@ TEST_F(CardUnmaskPromptTextTest, TitleAndInstructionMessage) {
       controller_->GetInstructionsMessage(),
       u"To help keep your card secure, enter the CVC on the back of your card");
 
-#endif
   DismissPrompt();
 }
 
@@ -366,13 +355,6 @@ TEST_F(CardUnmaskPromptTextTest, TitleAndInstructionMessageAmex) {
   // dialog relays this information to the users.
   card_ = test::GetMaskedServerCardAmex();
   ShowPrompt();
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(controller_->GetNavigationTitle(), u"Verification");
-  EXPECT_EQ(controller_->GetWindowTitle(), u"Enter your CVC");
-  EXPECT_EQ(controller_->GetInstructionsMessage(),
-            u"To help keep your card secure, enter the CVC on the front of "
-            u"your card");
-#else
 
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(controller_->GetWindowTitle(), u"Enter your CVC");
@@ -387,7 +369,6 @@ TEST_F(CardUnmaskPromptTextTest, TitleAndInstructionMessageAmex) {
             u"To help keep your card secure, enter the CVC on the front of "
             u"your card");
 
-#endif
   DismissPrompt();
 }
 
@@ -396,13 +377,6 @@ TEST_F(CardUnmaskPromptTextTest, TitleAndInstructionMessageAmex) {
 TEST_F(CardUnmaskPromptTextTest, ExpiredCardTitleAndInstructionMessage) {
   card_ = test::GetExpiredCreditCard();
   ShowPrompt();
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(controller_->GetNavigationTitle(), u"Verification");
-  EXPECT_EQ(controller_->GetWindowTitle(), u"Card expired");
-  EXPECT_EQ(controller_->GetInstructionsMessage(),
-            u"Enter your new expiration date and CVC on the back of your card");
-
-#else
 
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(controller_->GetWindowTitle(), u"Card expired");
@@ -415,7 +389,6 @@ TEST_F(CardUnmaskPromptTextTest, ExpiredCardTitleAndInstructionMessage) {
   EXPECT_EQ(controller_->GetInstructionsMessage(),
             u"Enter your new expiration date and CVC on the back of your card");
 
-#endif
   DismissPrompt();
 }
 
@@ -434,7 +407,7 @@ TEST_F(CardUnmaskPromptTextTest,
   EXPECT_EQ(controller_->GetInstructionsMessage(),
             u"Enter the 3-digit security code on the back of your card so your "
             u"bank can verify it's you");
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(controller_->GetWindowTitle(), u"Enter your security code");
 #else
   EXPECT_EQ(
@@ -458,7 +431,7 @@ TEST_F(
   EXPECT_EQ(controller_->GetInstructionsMessage(),
             u"Enter the 3-digit security code on the back of your card so your "
             u"bank can verify it's you");
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(controller_->GetWindowTitle(), u"Enter your security code");
 #else
   EXPECT_EQ(

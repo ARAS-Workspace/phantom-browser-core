@@ -24,7 +24,7 @@ namespace {
 constexpr int kResourceNotFoundId = 0;
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return true;

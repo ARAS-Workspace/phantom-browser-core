@@ -57,11 +57,7 @@
 
 namespace network_time {
 
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kNetworkTimeServiceQuerying, base::FEATURE_DISABLED_BY_DEFAULT);
-#else
 BASE_FEATURE(kNetworkTimeServiceQuerying, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 namespace {
 

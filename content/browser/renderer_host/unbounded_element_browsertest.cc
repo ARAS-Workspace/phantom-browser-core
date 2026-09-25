@@ -51,10 +51,7 @@ namespace content {
 namespace {
 
 void SkipTestsForUnsupportedPlatforms() {
-#if BUILDFLAG(IS_IOS)
-  // TODO(crbug.com/508672616): Not yet implemented on iOS.
-  GTEST_SKIP();
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // if (base::android::android_info::sdk_int() <
   //     base::android::android_info::SDK_VERSION_U) {
   //   GTEST_SKIP()
@@ -1318,11 +1315,7 @@ class UnboundedElementPermutationBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_CheckPermutation DISABLED_CheckPermutation
-#else
 #define MAYBE_CheckPermutation CheckPermutation
-#endif
 IN_PROC_BROWSER_TEST_P(UnboundedElementPermutationBrowserTest,
                        MAYBE_CheckPermutation) {
   const auto& params = GetParam();

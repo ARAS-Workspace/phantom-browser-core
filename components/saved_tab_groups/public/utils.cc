@@ -48,7 +48,7 @@ const int kMaxTitleChars = 64;
 }  // namespace
 
 bool AreLocalIdsPersisted() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return true;
 #else
   return false;

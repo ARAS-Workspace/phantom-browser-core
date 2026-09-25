@@ -10,7 +10,7 @@ namespace metrics {
 namespace {
 
 // The delay, in seconds, after startup before sending the first log message.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // Sessions are more likely to be short on a mobile device, so handle the
 // initial log quickly.
 const int kInitialIntervalSeconds = 15;

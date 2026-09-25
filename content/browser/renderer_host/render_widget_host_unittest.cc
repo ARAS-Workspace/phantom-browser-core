@@ -99,10 +99,6 @@
 #include "ui/display/test/test_screen.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "content/browser/renderer_host/test_render_widget_host_view_ios_factory.h"
-#endif
-
 #if defined(USE_AURA) || BUILDFLAG(IS_APPLE)
 #include "content/public/test/test_image_transport_factory.h"
 #endif
@@ -333,7 +329,7 @@ class FakeRenderFrameMetadataObserver
 
   ~FakeRenderFrameMetadataObserver() override {}
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   void UpdateRootScrollOffsetUpdateFrequency(
       cc::mojom::RootScrollOffsetUpdateFrequency frequency) override {}
 #endif
@@ -1471,8 +1467,6 @@ TEST_F(RenderWidgetHostTest, Background) {
                                          /*parent_layer=*/nullptr);
 #elif BUILDFLAG(IS_MAC)
   view = CreateRenderWidgetHostViewMacForTesting(host_.get());
-#elif BUILDFLAG(IS_IOS)
-  view = CreateRenderWidgetHostViewIOSForTesting(host_.get());
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)

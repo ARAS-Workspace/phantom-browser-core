@@ -74,10 +74,6 @@ void LaunchDateAndTimeSettings() {
 #elif BUILDFLAG(IS_MAC)
   base::mac::OpenSystemSettingsPane(
       base::mac::SystemSettingsPane::kGeneral_DateTime);
-#elif BUILDFLAG(IS_IOS)
-  // TODO(crbug.com/40191566): Send to the platform settings.
-  // The iOS Blink port also need to send the platform settings.
-  NOTIMPLEMENTED_LOG_ONCE();
 #else
 #error Unsupported target architecture.
 #endif

@@ -26,9 +26,7 @@
 #include "base/message_loop/message_pump_apple.h"
 #include "base/synchronization/condition_variable.h"
 
-#if !BUILDFLAG(IS_IOS) || !BUILDFLAG(USE_BLINK)
 #include "base/message_loop/message_pump_kqueue.h"
-#endif
 
 #endif
 
@@ -69,9 +67,6 @@ BASE_FEATURE(kHeapProfilerIncludeResidency, FEATURE_DISABLED_BY_DEFAULT);
 // LINT.IfChange
 #define LOW_MEMORY_DEVICE_THRESHOLD_MB 1024
 // LINT.ThenChange(//base/android/java/src/org/chromium/base/SysUtils.java)
-#elif BUILDFLAG(IS_IOS)
-// For M99, 45% of devices have 2GB of RAM, and 55% have more.
-#define LOW_MEMORY_DEVICE_THRESHOLD_MB 1024
 #else
 // Updated Desktop default threshold to match the Android 2021 definition.
 #define LOW_MEMORY_DEVICE_THRESHOLD_MB 2048
@@ -247,10 +242,7 @@ void Init() {
 #if BUILDFLAG(IS_APPLE)
   MessagePumpCFRunLoopBase::InitializeFeatures();
 
-// Kqueue is not used for ios blink.
-#if !BUILDFLAG(IS_IOS) || !BUILDFLAG(USE_BLINK)
   MessagePumpKqueue::InitializeFeatures();
-#endif
 
 #endif
 

@@ -52,10 +52,6 @@
 #include "base/strings/sys_string_conversions.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "base/ios/device_util.h"
-#endif
-
 namespace policy {
 
 namespace em = enterprise_management;
@@ -72,9 +68,6 @@ std::string GetMachineName() {
   if (gethostname(hostname, HOST_NAME_MAX) == 0)  // Success.
     return hostname;
   return std::string();
-#elif BUILDFLAG(IS_IOS)
-  // Use the Vendor ID as the machine name.
-  return ios::device_util::GetVendorId();
 #elif BUILDFLAG(IS_MAC)
   // Do not use NSHost currentHost, as it's very slow. http://crbug.com/138570
   SCDynamicStoreContext context = {0, NULL, NULL, NULL};

@@ -123,7 +123,7 @@ void CrossDeviceUserSegment::ExecuteModelWithInput(
 // calculation.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   desktop_count -= 1;
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#elif BUILDFLAG(IS_ANDROID)
   if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET) {
     tablet_count -= 1;
   } else {

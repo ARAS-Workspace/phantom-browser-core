@@ -38,16 +38,14 @@
 #include "components/autofill/core/browser/payments/android_bnpl_strategy.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_IOS)
 #include "components/autofill/core/browser/payments/test_internal_authenticator.h"
 #include "components/webauthn/core/browser/internal_authenticator.h"
-#endif  // !BUILDFLAG(IS_IOS)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "components/autofill/core/browser/payments/desktop_bnpl_strategy.h"
 #include "components/autofill/core/browser/suggestions/suggestion_hiding_reason.h"
 #include "components/autofill/core/browser/ui/payments/omnibox_autofill_delegate.h"
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace autofill::payments {
 
@@ -59,7 +57,7 @@ TestPaymentsAutofillClient::TestPaymentsAutofillClient(AutofillClient* client)
     : client_(CHECK_DEREF(client)),
       mock_save_and_fill_manager_(
           std::make_unique<NiceMock<MockSaveAndFillManager>>()) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(features::kAutofillEnableOmniboxAutofill)) {
     omnibox_autofill_delegate_ =
         std::make_unique<OmniboxAutofillDelegate>(client);
@@ -91,7 +89,7 @@ TestPaymentsAutofillClient::GetOrCreateAutofillSaveIbanBottomSheetBridge() {
 }
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 void TestPaymentsAutofillClient::ShowWebauthnOfferDialog(
     WebauthnDialogCallback offer_dialog_callback) {}
 
@@ -107,7 +105,7 @@ bool TestPaymentsAutofillClient::CloseWebauthnDialog() {
 void TestPaymentsAutofillClient::HideVirtualCardEnrollBubbleAndIconIfVisible() {
 }
 
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
 void TestPaymentsAutofillClient::ConfirmAccountNameFixFlow(
     base::OnceCallback<void(const std::u16string&)> callback) {
   credit_card_name_fix_flow_bubble_was_shown_ = true;
@@ -121,7 +119,7 @@ void TestPaymentsAutofillClient::ConfirmExpirationDateFixFlow(
   credit_card_name_fix_flow_bubble_was_shown_ = true;
   std::move(callback).Run(u"03", base::ASCIIToUTF16(test::NextYear()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool TestPaymentsAutofillClient::HasCreditCardScanFeature() const {
   return false;
@@ -253,23 +251,6 @@ void TestPaymentsAutofillClient::ShowUnmaskPrompt(
 
 void TestPaymentsAutofillClient::OnUnmaskVerificationResult(
     PaymentsRpcResult result) {}
-
-#if BUILDFLAG(IS_IOS)
-std::unique_ptr<AutofillProgressDialogController>
-TestPaymentsAutofillClient::ExtractProgressDialogModel() {
-  return nullptr;
-}
-
-std::unique_ptr<CardUnmaskOtpInputDialogController>
-TestPaymentsAutofillClient::ExtractOtpInputDialogModel() {
-  return nullptr;
-}
-
-CardUnmaskPromptController*
-TestPaymentsAutofillClient::GetCardUnmaskPromptModel() {
-  return nullptr;
-}
-#endif
 
 VirtualCardEnrollmentManager*
 TestPaymentsAutofillClient::GetVirtualCardEnrollmentManager() {
@@ -433,13 +414,11 @@ PaymentsDataManager& TestPaymentsAutofillClient::GetPaymentsDataManager() {
   return client_->GetPersonalDataManager().payments_data_manager();
 }
 
-#if !BUILDFLAG(IS_IOS)
 std::unique_ptr<webauthn::InternalAuthenticator>
 TestPaymentsAutofillClient::CreateCreditCardInternalAuthenticator(
     AutofillDriver* driver) {
   return std::make_unique<TestInternalAuthenticator>();
 }
-#endif
 
 MockMandatoryReauthManager*
 TestPaymentsAutofillClient::GetOrCreatePaymentsMandatoryReauthManager() {
@@ -472,13 +451,13 @@ bool TestPaymentsAutofillClient::IsTabModalPopup() const {
 
 BnplStrategy* TestPaymentsAutofillClient::GetBnplStrategy() {
   if (!bnpl_strategy_) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
     bnpl_strategy_ = std::make_unique<DesktopBnplStrategy>();
 #elif BUILDFLAG(IS_ANDROID)
     bnpl_strategy_ = std::make_unique<AndroidBnplStrategy>();
-#else   // BUILDFLAG(IS_IOS)
+#else
     bnpl_strategy_ = nullptr;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   }
   return bnpl_strategy_.get();
 }
@@ -501,7 +480,7 @@ TestPaymentsAutofillClient::GetWalletReminderNoticeManager() {
   return wallet_reminder_notice_manager_.get();
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 OmniboxAutofillDelegate*
 TestPaymentsAutofillClient::GetOmniboxAutofillDelegate() {
   return omnibox_autofill_delegate_.get();

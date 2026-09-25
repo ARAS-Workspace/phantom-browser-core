@@ -212,7 +212,7 @@ constexpr version_info::Channel kAssignedChannels[] = {
     version_info::Channel::CANARY,
     version_info::Channel::DEV,
     version_info::Channel::BETA,
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
     version_info::Channel::STABLE,
 #endif
 };
@@ -232,7 +232,7 @@ TEST_P(ExpectedFieldTrialGroupAssignedTest, AssignedGroup) {
       kOldSeedFilename, GetParam().seed_fields_prefs, GetParam().channel,
       entropy_providers_.get(), GetHistogramSuffix(),
       file_writer_thread_.task_runner());
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(base::FieldTrialList::FindFullName(kSeedFileTrial),
               ::testing::AnyOf(kControlGroup, kSeedFilesGroup));
 #else
@@ -1846,7 +1846,7 @@ TEST_P(SeedReaderWriterLocalStateGroupsTest, NoSeedFile) {
 
 constexpr version_info::Channel kLocalStateNoGroupChannels[] = {
     version_info::Channel::UNKNOWN,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     version_info::Channel::STABLE,
 #endif
 };
@@ -1863,7 +1863,7 @@ INSTANTIATE_TEST_SUITE_P(
 constexpr version_info::Channel kLocalStateGroupsChannels[] = {
     version_info::Channel::UNKNOWN, version_info::Channel::CANARY,
     version_info::Channel::DEV,     version_info::Channel::BETA,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     version_info::Channel::STABLE,
 #endif
 };

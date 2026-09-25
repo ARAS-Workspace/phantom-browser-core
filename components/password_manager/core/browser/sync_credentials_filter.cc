@@ -59,7 +59,7 @@ bool SyncCredentialsFilter::ShouldSave(const PasswordForm& form) const {
   }
 
 // The browser is signed-out and the web just signed-in.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // On desktop, this normally leads to immediate browser sign-in, in which case
   // we shouldn't offer saving. One exception is if browser sign-in is disabled.
   return !client_->GetPrefs()->GetBoolean(prefs::kSigninAllowed);

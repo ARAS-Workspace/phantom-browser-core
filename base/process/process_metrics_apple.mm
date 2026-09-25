@@ -266,37 +266,9 @@ bool GetSystemMemoryInfo(SystemMemoryInfo* meminfo) {
   }
   DCHECK_GE(count, HOST_VM_INFO64_REV1_COUNT);
 
-#if !(BUILDFLAG(IS_IOS) && defined(ARCH_CPU_X86_FAMILY))
   // PAGE_SIZE (aka vm_page_size) isn't constexpr, so this check needs to be
   // done at runtime.
   DCHECK_EQ(PAGE_SIZE % 1024, 0u) << "Invalid page size";
-#else
-  // On x86/x64, PAGE_SIZE used to be just a signed constant, I386_PGBYTES. When
-  // Arm Macs started shipping, PAGE_SIZE was defined from day one to be
-  // vm_page_size (an extern uintptr_t value), and the SDK, for x64, switched
-  // PAGE_SIZE to be vm_page_size for binaries targeted for macOS 11+:
-  //
-  // #if !defined(__MAC_OS_X_VERSION_MIN_REQUIRED) ||
-  //     (__MAC_OS_X_VERSION_MIN_REQUIRED < 101600)
-  //   #define PAGE_SIZE    I386_PGBYTES
-  // #else
-  //   #define PAGE_SIZE    vm_page_size
-  // #endif
-  //
-  // When building for Mac Catalyst or the iOS Simulator, this targeting
-  // switcharoo breaks. Because those apps do not have a
-  // __MAC_OS_X_VERSION_MIN_REQUIRED set, the SDK assumes that those apps are so
-  // old that they are implicitly targeting some ancient version of macOS, and a
-  // signed constant value is used for PAGE_SIZE.
-  //
-  // Therefore, when building for "iOS on x86", which is either Mac Catalyst or
-  // the iOS Simulator, use a static assert that assumes that PAGE_SIZE is a
-  // signed constant value.
-  //
-  // TODO(Chrome iOS team): Remove this entire #else branch when the Mac
-  // Catalyst and the iOS Simulator builds only target Arm Macs.
-  static_assert(PAGE_SIZE % 1024 == 0, "Invalid page size");
-#endif  // !(defined(IS_IOS) && defined(ARCH_CPU_X86_FAMILY))
 
   if (vm_info.speculative_count <= vm_info.free_count) {
     meminfo->free =

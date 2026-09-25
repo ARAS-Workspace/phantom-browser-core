@@ -756,12 +756,7 @@ TEST_P(VideoRendererPixelHiLoColorSpaceTest, SimpleYUVRect) {
                          cc::AlphaDiscardingFuzzyPixelOffByOneComparator()));
 }
 
-#if BUILDFLAG(IS_IOS)
-// TODO(crbug.com/40259140): currently failing on iOS.
-#define MAYBE_ClippedYUVRect DISABLED_ClippedYUVRect
-#else
 #define MAYBE_ClippedYUVRect ClippedYUVRect
-#endif  // BUILDFLAG(IS_IOS)
 TEST_P(VideoRendererPixelHiLoTest, MAYBE_ClippedYUVRect) {
   gfx::Rect viewport(this->device_viewport_size_);
   gfx::Rect draw_rect(this->device_viewport_size_.width() * 1.5,

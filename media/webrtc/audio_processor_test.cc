@@ -166,7 +166,7 @@ class AudioProcessorTest : public ::testing::Test {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#elif BUILDFLAG(IS_ANDROID)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
 #else
@@ -354,13 +354,7 @@ TEST_P(AudioProcessorTestMultichannelAndFormat, TestStereoAudio) {
 
   // Test without and with audio processing enabled.
   constexpr bool kUseApmValues[] =
-#if BUILDFLAG(IS_IOS)
-      // TODO(crbug.com/40257333): `false` fails on ios-blink platform
-      // due to a special case for iOS in settings.NeedWebrtcAudioProcessing()
-      {true};
-#else
       {false, true};
-#endif
   for (bool use_apm : kUseApmValues) {
     // No need to test stereo with APM if disabled.
     if (use_apm && !use_multichannel_processing) {
@@ -762,11 +756,7 @@ TEST(ApmTellsIfPlayoutReferenceIsNeededTest, DoesNotNeedPlayoutReference) {
 }
 
 // Checks that, with echo cancellation, APM always needs the playout reference.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_NeedsPlayoutReference DISABLED_NeedsPlayoutReference
-#else
 #define MAYBE_NeedsPlayoutReference NeedsPlayoutReference
-#endif
 // TODO: This test is disabled for ios-blink platform as per the discussion on
 // bug https://crbug.com/1417474
 TEST(ApmTellsIfPlayoutReferenceIsNeededTest, MAYBE_NeedsPlayoutReference) {

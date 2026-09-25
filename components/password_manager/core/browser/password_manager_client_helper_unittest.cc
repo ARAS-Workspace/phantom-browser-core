@@ -136,13 +136,13 @@ TEST_F(PasswordManagerClientHelperTest, PromptMoveForMovableFormInAccountMode) {
   ON_CALL(*client()->GetPasswordFeatureManager(), IsAccountStorageActive)
       .WillByDefault(Return(true));
   EXPECT_CALL(*client(), PromptUserToEnableAutosignin).Times(0);
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   EXPECT_CALL(*client(), PromptUserToMovePasswordToAccount);
 #else
   // On Android and iOS, prompting to move after using a password isn't
   // implemented.
   EXPECT_CALL(*client(), PromptUserToMovePasswordToAccount).Times(0);
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Indicate successful login.
   const PasswordForm form =

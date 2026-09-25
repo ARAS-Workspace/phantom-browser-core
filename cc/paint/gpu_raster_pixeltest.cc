@@ -1259,7 +1259,7 @@ TEST_F(GpuRasterPixelTest, DrawImageWithSourceAndTargetColorSpace) {
 
   auto actual = Raster(display_item_list, options);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Android has slight differences in color.
   FuzzyPixelOffByOneComparator comparator;
 #else
@@ -1299,7 +1299,7 @@ TEST_F(GpuRasterPixelTest, MAYBE_DrawImageReinterpretedAsSRGB) {
 
   auto actual = Raster(display_item_list, options);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Android has slight differences in color.
   FuzzyPixelOffByOneComparator comparator;
 #else

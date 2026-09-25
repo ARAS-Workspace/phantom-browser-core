@@ -38,11 +38,7 @@ const size_t kMaxRequestId = std::numeric_limits<size_t>::max() - 1;
 
 int OnDeviceHeadSuggestMaxScoreForNonUrlInput(bool is_incognito) {
   const int kDefaultScore =
-#if BUILDFLAG(IS_IOS)
-      99;
-#else
       is_incognito ? 99 : 1000;
-#endif  // BUILDFLAG(IS_IOS)
   return kDefaultScore;
 }
 

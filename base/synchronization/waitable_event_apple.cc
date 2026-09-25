@@ -143,11 +143,7 @@ size_t WaitableEvent::WaitManyImpl(base::span<WaitableEvent*> raw_waitables) {
     KQUEUE,
     PORT_SET,
   };
-#if BUILDFLAG(IS_IOS)
-  const WaitManyPrimitive kPrimitive = PORT_SET;
-#else
   const WaitManyPrimitive kPrimitive = KQUEUE;
-#endif
   if (kPrimitive == KQUEUE) {
     std::vector<kevent64_s> events(raw_waitables.size());
     for (size_t i = 0; i < raw_waitables.size(); ++i) {

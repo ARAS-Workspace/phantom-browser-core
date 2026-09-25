@@ -22,25 +22,17 @@ namespace page_content_annotations::features {
 namespace {
 
 constexpr auto enabled_by_default_desktop_only =
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     base::FEATURE_DISABLED_BY_DEFAULT;
 #else
     base::FEATURE_ENABLED_BY_DEFAULT;
 #endif
 
 constexpr auto enabled_by_default_non_ios =
-#if BUILDFLAG(IS_IOS)
-    base::FEATURE_DISABLED_BY_DEFAULT;
-#else
     base::FEATURE_ENABLED_BY_DEFAULT;
-#endif
 
 constexpr auto enabled_by_default_ios_only =
-#if BUILDFLAG(IS_IOS)
-    base::FEATURE_ENABLED_BY_DEFAULT;
-#else
     base::FEATURE_DISABLED_BY_DEFAULT;
-#endif
 
 const base::FeatureParam<base::TimeDelta> kAnnotatedPageContentCaptureDelay{
     &kAnnotatedPageContentExtraction, "capture_delay", base::Seconds(3)};

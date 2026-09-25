@@ -46,7 +46,7 @@ void ReportGenerator::CreateBasicRequest(
       .set_allocated_browser_device_identifier(
           policy::GetBrowserDeviceIdentifier().release());
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // 1. Async function base::SysInfo::SetHardwareInfo is called.
   // 2. ReportGenerator::SetHardwareInfo fills basic_report
   // 3. ReportGenerator::GenerateReport is called
@@ -59,7 +59,7 @@ void ReportGenerator::CreateBasicRequest(
                                     std::move(callback))));
 #else
   GenerateReport(report_type, std::move(callback), std::move(basic_request));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 std::string ReportGenerator::GetMachineName() {
@@ -111,11 +111,11 @@ void ReportGenerator::SetHardwareInfo(
     std::unique_ptr<ReportRequest> basic_request,
     base::OnceCallback<void(std::unique_ptr<ReportRequest>)> callback,
     base::SysInfo::HardwareInfo hardware_info) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   basic_request->GetDeviceReportRequest().set_brand_name(
       hardware_info.manufacturer);
   basic_request->GetDeviceReportRequest().set_device_model(hardware_info.model);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   std::move(callback).Run(std::move(basic_request));
 }

@@ -32,11 +32,7 @@
 #import "device/bluetooth/test/test_bluetooth_adapter_observer.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "device/bluetooth/bluetooth_adapter_ios.h"
-#else
 #include "device/bluetooth/bluetooth_adapter_mac.h"
-#endif
 
 namespace {
 
@@ -143,13 +139,8 @@ class BluetoothLowEnergyAdapterAppleTest : public testing::Test {
   }
 
   BluetoothLowEnergyAdapterApple* CreateBluetoothLowEnergyAdapterApple() {
-#if BUILDFLAG(IS_IOS)
-    return static_cast<BluetoothLowEnergyAdapterApple*>(
-        new BluetoothAdapterIOS());
-#else
     return static_cast<BluetoothLowEnergyAdapterApple*>(
         new BluetoothAdapterMac());
-#endif
   }
 
   BluetoothDevice* GetDevice(const std::string& address) {

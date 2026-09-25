@@ -952,7 +952,7 @@ bool IsAutofillAiEntityTypeBlockedByPolicy(const AutofillClient& client,
 }
 
 bool IsAutofillAiDefaultAvailabilityEnabled() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return base::FeatureList::IsEnabled(features::kAutofillAiAvailableByDefault);
 #else
   return true;

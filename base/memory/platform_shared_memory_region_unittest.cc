@@ -411,7 +411,7 @@ void CheckReadOnlyMapProtection(void* addr) {
 }
 
 bool TryToRestoreWritablePermissions(void* addr, size_t len) {
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_POSIX)
   int result = mprotect(addr, len, PROT_READ | PROT_WRITE);
   return result != -1;
 #else

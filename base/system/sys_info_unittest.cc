@@ -173,13 +173,6 @@ TEST_F(SysInfoTest, OperatingSystemVersionNumbers) {
 }
 #endif
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(SysInfoTest, GetIOSBuildNumber) {
-  std::string build_number(SysInfo::GetIOSBuildNumber());
-  EXPECT_GT(build_number.length(), 0U);
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 TEST_F(SysInfoTest, Uptime) {
   TimeDelta up_time_1 = SysInfo::Uptime();
   // UpTime() is implemented internally using TimeTicks::Now(), which documents
@@ -195,37 +188,12 @@ TEST_F(SysInfoTest, HardwareModelNameFormatMacAndiOS) {
   std::string hardware_model = SysInfo::HardwareModelName();
   ASSERT_FALSE(hardware_model.empty());
 
-  // Check that the model is of the expected format, which is different on iOS
-  // simulators and real iOS / MacOS devices.
-#if BUILDFLAG(IS_IOS) && TARGET_OS_SIMULATOR
-  // On iOS simulators, the device model looks like "iOS Simulator (Foo[,Bar])"
-  // where Foo is either "Unknown", "iPhone" or "iPad", and Bar, if present, is
-  // a number.
-  EXPECT_TRUE(base::MatchPattern(hardware_model, "iOS Simulator (*)"))
-      << hardware_model;
-  std::vector<std::string_view> mainPieces =
-      SplitStringPiece(hardware_model, "()", KEEP_WHITESPACE, SPLIT_WANT_ALL);
-  ASSERT_EQ(3u, mainPieces.size()) << hardware_model;
-  std::vector<std::string_view> modelPieces =
-      SplitStringPiece(mainPieces[1], ",", KEEP_WHITESPACE, SPLIT_WANT_ALL);
-  ASSERT_GE(modelPieces.size(), 1u) << hardware_model;
-  if (modelPieces.size() == 1u) {
-    EXPECT_TRUE(modelPieces[0] == "Unknown" || modelPieces[0] == "iPhone" ||
-                modelPieces[0] == "iPad")
-        << hardware_model;
-  } else {
-    int value;
-    EXPECT_TRUE(StringToInt(modelPieces[1], &value)) << hardware_model;
-  }
-#else
-  // The expected format is "Foo,Bar" where Foo is "iPhone" or "iPad" and Bar is
-  // a number.
+  // Check that the model is of the expected format on MacOS devices.
   std::vector<std::string_view> pieces =
       SplitStringPiece(hardware_model, ",", KEEP_WHITESPACE, SPLIT_WANT_ALL);
   ASSERT_EQ(2u, pieces.size()) << hardware_model;
   int value;
   EXPECT_TRUE(StringToInt(pieces[1], &value)) << hardware_model;
-#endif  // BUILDFLAG(IS_IOS) && TARGET_OS_SIMULATOR
 }
 #endif  // BUILDFLAG(IS_APPLE)
 

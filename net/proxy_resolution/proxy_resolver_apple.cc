@@ -27,11 +27,7 @@
 #include "net/proxy_resolution/proxy_resolver.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_IOS)
-#include <CFNetwork/CFProxySupport.h>
-#else
 #include <CoreServices/CoreServices.h>
-#endif
 
 #if LEAK_SANITIZER
 #include <sanitizer/lsan_interface.h>

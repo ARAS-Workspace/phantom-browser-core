@@ -8,7 +8,7 @@
 
 namespace ntp_tiles {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 const size_t kMaxNumCustomLinks = 8;
 #else
 const size_t kMaxNumCustomLinks = 10;

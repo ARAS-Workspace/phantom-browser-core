@@ -320,7 +320,7 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_SignedIn_AllEnabled) {
   MockSyncService sync;
   sync.SetSignedIn(signin::ConsentLevel::kSignin);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Mark apps and extensions sync as supported (registered) and enabled.
   syncer::UserSelectableTypeSet registered_types = {
       syncer::UserSelectableType::kExtensions};
@@ -354,7 +354,7 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_SignedIn_APPSDisabled) {
   MockSyncService sync;
   sync.SetSignedIn(signin::ConsentLevel::kSignin);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Mark apps and extensions sync as supported, but only extensions enabled.
   syncer::UserSelectableTypeSet registered_types = {
       syncer::UserSelectableType::kExtensions};
@@ -371,7 +371,7 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_SignedIn_APPSDisabled) {
   TestUkmConsentStateObserver observer;
   observer.StartObserving(&sync, &prefs);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // On mobile platforms, apps sync is not supported, so it is ignored. MSBB is
   // enabled, so migration succeeds!
   EXPECT_TRUE(prefs.GetBoolean(metrics::prefs::kAdvancedReportingEnabled));
@@ -395,7 +395,7 @@ TEST_F(UkmConsentStateObserverMigrationTest, Migration_AlreadyDone) {
   MockSyncService sync;
   sync.SetSignedIn(signin::ConsentLevel::kSignin);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   syncer::UserSelectableTypeSet registered_types = {
       syncer::UserSelectableType::kExtensions};
   syncer::UserSelectableTypeSet selected_types = {

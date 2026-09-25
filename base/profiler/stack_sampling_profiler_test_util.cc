@@ -423,13 +423,8 @@ NativeLibrary LoadTestLibrary(std::string_view library_name) {
   // macros in a function returning non-null.
   const auto load = [&](NativeLibrary* library) {
     FilePath library_path;
-#if BUILDFLAG(IS_IOS)
-    // TODO(crbug.com/40799492): Find a solution that works across platforms.
-    ASSERT_TRUE(PathService::Get(DIR_ASSETS, &library_path));
-#else
     // The module is next to the test module rather than with test data.
     ASSERT_TRUE(PathService::Get(DIR_MODULE, &library_path));
-#endif  // BUILDFLAG(IS_IOS)
     library_path =
         library_path.AppendASCII(GetLoadableModuleName(library_name));
     NativeLibraryLoadError load_error;

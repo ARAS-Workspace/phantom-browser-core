@@ -249,18 +249,14 @@ BASE_FEATURE_PARAM(base::TimeDelta,
                    base::Hours(24));
 
 BASE_FEATURE(kEnhancedFieldsForSecOps,
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_DISABLED_BY_DEFAULT);
 #else
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif
 
 BASE_FEATURE(kEnhancedSafeBrowsingPromo,
-#if BUILDFLAG(IS_IOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 BASE_FEATURE(kEnterpriseFileSystemAccessDeepScan,

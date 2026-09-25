@@ -134,13 +134,6 @@
 #include "sandbox/mac/seatbelt_exec.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_IOS)
-#include "base/threading/thread_restrictions.h"
-#if !BUILDFLAG(IS_IOS_TVOS)
-#include "content/app/ios/appex/child_process_sandbox.h"
-#endif  // !BUILDFLAG(IS_IOS_TVOS)
-#endif  // BUILDFLAG(IS_IOS)
-
 #if BUILDFLAG(IS_POSIX)
 #include <signal.h>
 
@@ -805,8 +798,8 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
 // The exit manager is in charge of calling the dtors of singleton objects.
 // On Android, AtExitManager is set up when library is loaded.
 // A consequence of this is that you can't use the ctor/dtor-based
-// TRACE_EVENT methods on Linux or iOS builds till after we set this up.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+// TRACE_EVENT methods on Linux builds till after we set this up.
+#if !BUILDFLAG(IS_ANDROID)
   if (!content_main_params_->ui_task) {
     // When running browser tests, don't create a second AtExitManager as that
     // interfers with shutdown when objects created before ContentMain is
@@ -945,8 +938,6 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
       process_type == switches::kZygoteProcess) {
     PreSandboxInit();
   }
-#elif BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-  ChildProcessEnterSandbox();
 #endif
 
   delegate_->SandboxInitialized(process_type);
@@ -1240,19 +1231,6 @@ int ContentMainRunnerImpl::RunBrowser(MainFunctionParams main_params,
 void ContentMainRunnerImpl::Shutdown() {
   DCHECK(is_initialized_);
   DCHECK(!is_shutdown_);
-
-#if BUILDFLAG(IS_IOS)
-  // This would normally be handled by BrowserMainLoop shutdown, but since iOS
-  // (like Android) does not run this shutdown, we also need to ensure that we
-  // permit sync primitives during shutdown. If we don't do this, eg, tearing
-  // down test fixtures will often fail.
-  // TODO(crbug.com/40557572): ideally these would both be scoped allowances.
-  // That would be one of the first step to ensure no persistent work is being
-  // done after ThreadPoolInstance::Shutdown() in order to move towards atomic
-  // shutdown.
-  base::PermanentThreadAllowance::AllowBaseSyncPrimitives();
-  base::PermanentThreadAllowance::AllowBlocking();
-#endif
 
   mojo_ipc_support_.reset();
 

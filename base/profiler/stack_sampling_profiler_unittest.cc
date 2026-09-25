@@ -44,12 +44,12 @@
 #include <alloca.h>
 
 // STACK_SAMPLING_PROFILER_SUPPORTED is used to conditionally enable the tests
-// below for supported platforms (currently Mac, iOS 64, some Android, and
+// below for supported platforms (currently Mac, some Android, and
 // ChromeOS x64).
 // ChromeOS: These don't run under MSan because parts of the stack aren't
 // initialized.
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && defined(ARCH_CPU_64_BITS)) || \
-    (BUILDFLAG(IS_ANDROID) &&                                                \
+#if BUILDFLAG(IS_MAC) ||      \
+    (BUILDFLAG(IS_ANDROID) && \
      (BUILDFLAG(ENABLE_ARM_CFI_TABLE) || defined(ARCH_CPU_ARM64)))
 #define STACK_SAMPLING_PROFILER_SUPPORTED 1
 #endif
@@ -511,7 +511,6 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_Alloca) {
 // Checks that a stack that runs through another library produces a stack with
 // the expected functions.
 // macOS ASAN is not yet supported - crbug.com/718628.
-// iOS chrome doesn't support loading native libraries.
 // Android is not supported when EXCLUDE_UNWIND_TABLES |other_library| doesn't
 // have unwind tables.
 // TODO(crbug.com/40702833): Enable this test again for Android with
@@ -520,7 +519,6 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_Alloca) {
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
 #if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) ||         \
-    BUILDFLAG(IS_IOS) ||                                           \
     (BUILDFLAG(IS_ANDROID) && BUILDFLAG(EXCLUDE_UNWIND_TABLES)) || \
     (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER))
 #define MAYBE_OtherLibrary DISABLED_OtherLibrary
@@ -567,8 +565,7 @@ PROFILER_TEST_F(StackSamplingProfilerTest, MAYBE_UnloadingLibrary) {
 // If we're running the ChromeOS unit tests on Linux, this test will never pass
 // because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
 // ChromeOS device.
-#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_UnloadedLibrary DISABLED_UnloadedLibrary
 #else
 #define MAYBE_UnloadedLibrary UnloadedLibrary

@@ -140,7 +140,7 @@ namespace heap_profiling {
 
 namespace {
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define ENABLE_MULTIPROCESS_TESTS 0
 #else
 #define ENABLE_MULTIPROCESS_TESTS 1

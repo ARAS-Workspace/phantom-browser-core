@@ -29,10 +29,6 @@
 #include "net/dns/dns_config_service.h"
 #include "net/log/net_log.h"
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-#import <CoreTelephony/CTTelephonyNetworkInfo.h>
-#endif
-
 namespace net {
 
 struct NetworkChangeNotifierApple::NetworkPathMonitorStorage {
@@ -256,71 +252,7 @@ NetworkChangeNotifierApple::CalculateConnectionType(
   if (!reachable)
     return CONNECTION_NONE;
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)
-  if (!(flags & kSCNetworkReachabilityFlagsIsWWAN)) {
-    return CONNECTION_WIFI;
-  }
-  CTTelephonyNetworkInfo* info = [[CTTelephonyNetworkInfo alloc] init];
-  NSDictionary<NSString*, NSString*>* service_current_radio_access_technology =
-      info.serviceCurrentRadioAccessTechnology;
-  NSSet<NSString*>* technologies_2g = [NSSet
-      setWithObjects:CTRadioAccessTechnologyGPRS, CTRadioAccessTechnologyEdge,
-                     CTRadioAccessTechnologyCDMA1x, nil];
-  NSSet<NSString*>* technologies_3g = [NSSet
-      setWithObjects:CTRadioAccessTechnologyWCDMA, CTRadioAccessTechnologyHSDPA,
-                     CTRadioAccessTechnologyHSUPA,
-                     CTRadioAccessTechnologyCDMAEVDORev0,
-                     CTRadioAccessTechnologyCDMAEVDORevA,
-                     CTRadioAccessTechnologyCDMAEVDORevB,
-                     CTRadioAccessTechnologyeHRPD, nil];
-  NSSet<NSString*>* technologies_4g =
-      [NSSet setWithObjects:CTRadioAccessTechnologyLTE, nil];
-  NSSet<NSString*>* technologies_5g =
-      [NSSet setWithObjects:CTRadioAccessTechnologyNRNSA,
-                            CTRadioAccessTechnologyNR, nil];
-  int best_network = 0;
-  for (NSString* service in service_current_radio_access_technology) {
-    if (!service_current_radio_access_technology[service]) {
-      continue;
-    }
-    int current_network = 0;
-
-    NSString* network_type = service_current_radio_access_technology[service];
-
-    if ([technologies_2g containsObject:network_type]) {
-      current_network = 2;
-    } else if ([technologies_3g containsObject:network_type]) {
-      current_network = 3;
-    } else if ([technologies_4g containsObject:network_type]) {
-      current_network = 4;
-    } else if ([technologies_5g containsObject:network_type]) {
-      current_network = 5;
-    } else {
-      // New technology?
-      NOTREACHED() << "Unknown network technology: " << network_type;
-    }
-    if (current_network > best_network) {
-      // iOS is supposed to use the best network available.
-      best_network = current_network;
-    }
-  }
-  switch (best_network) {
-    case 2:
-      return CONNECTION_2G;
-    case 3:
-      return CONNECTION_3G;
-    case 4:
-      return CONNECTION_4G;
-    case 5:
-      return CONNECTION_5G;
-    default:
-      // Default to CONNECTION_3G to not change existing behavior.
-      return CONNECTION_3G;
-  }
-
-#else
   return ConnectionTypeFromInterfaces();
-#endif
 }
 
 void NetworkChangeNotifierApple::Forwarder::StartReachabilityNotifications() {
@@ -409,10 +341,7 @@ void NetworkChangeNotifierApple::StartReachabilityNotifications() {
 
 void NetworkChangeNotifierApple::SetDynamicStoreNotificationKeys(
     base::apple::ScopedCFTypeRef<SCDynamicStoreRef> store) {
-#if BUILDFLAG(IS_IOS)
-  // SCDynamicStore API does not exist on iOS.
-  NOTREACHED();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   NSArray* notification_keys = @[
     base::apple::CFToNSOwnershipCast(SCDynamicStoreKeyCreateNetworkGlobalEntity(
         nullptr, kSCDynamicStoreDomainState, kSCEntNetInterface)),
@@ -440,14 +369,11 @@ void NetworkChangeNotifierApple::SetDynamicStoreNotificationKeys(
   if (initialized_callback_for_test_) {
     std::move(initialized_callback_for_test_).Run();
   }
-#endif  // BUILDFLAG(IS_IOS) /  BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 void NetworkChangeNotifierApple::OnNetworkConfigChange(CFArrayRef changed_keys) {
-#if BUILDFLAG(IS_IOS)
-  // SCDynamicStore API does not exist on iOS.
-  NOTREACHED();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   DCHECK_EQ(run_loop_.get(), CFRunLoopGetCurrent());
 
   bool net_ipv4_key_found = false;
@@ -520,7 +446,7 @@ void NetworkChangeNotifierApple::OnNetworkConfigChange(CFArrayRef changed_keys) 
   ipv6_primary_interface_name_ = std::move(ipv6_primary_interface_name);
   interfaces_for_network_change_check_ = std::move(interfaces);
   NotifyObserversOfIPAddressChange();
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 void NetworkChangeNotifierApple::CleanUpOnNotifierThread() {
@@ -554,11 +480,6 @@ void NetworkChangeNotifierApple::ReachabilityCallback(
     NotifyObserversOfMaxBandwidthChange(max_bandwidth_mbps, new_type);
   }
 
-#if BUILDFLAG(IS_IOS)
-  // On iOS, the SCDynamicStore API does not exist, and we use the reachability
-  // API to detect IP address changes instead.
-  NotifyObserversOfIPAddressChange();
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 bool NetworkChangeNotifierApple::ShouldUseNetworkPathMonitor() const {

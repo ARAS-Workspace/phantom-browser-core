@@ -233,7 +233,7 @@
 #include "third_party/blink/public/mojom/compute_pressure/web_pressure_manager.mojom.h"
 #endif  // BUILDFLAG(ENABLE_COMPUTE_PRESSURE)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 #include "content/browser/date_time_chooser/date_time_chooser.h"
 #endif
 
@@ -445,7 +445,7 @@ void BindSharedWorkerConnector(
   SharedWorkerConnectorImpl::Create(host->GetGlobalId(), std::move(receiver));
 }
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
 void BindDateTimeChooserForFrame(
     RenderFrameHost* host,
     mojo::PendingReceiver<blink::mojom::DateTimeChooser> receiver) {
@@ -1282,20 +1282,17 @@ void PopulateBinderMapWithContext(
             &RenderFrameHostImpl::BindInputInjectorReceiver>);
   }
 
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
   map->Add<device::mojom::NFC>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::BindNFCReceiver>);
 #else
   map->Add<blink::mojom::InstalledAppProvider>(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::CreateInstalledAppProvider>);
-#endif  // BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) &&
-        // !BUILDFLAG(IS_IOS_TVOS))
+#endif  // BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_IOS)
   map->Add<blink::mojom::HidService>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::GetHidService>);
-#endif  // !BUILDFLAG(IS_IOS)
 
   map->Add<blink::mojom::SerialService>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::BindSerialService>);
@@ -1379,7 +1376,7 @@ void PopulateBinderMapWithContext(
                                          ProcessInternalsUI>(map);
   RegisterWebUIControllerInterfaceBinder<storage::mojom::QuotaInternalsHandler,
                                          QuotaInternalsUI>(map);
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   RegisterWebUIControllerInterfaceBinder<
       traces_internals::mojom::TracesInternalsHandlerFactory,
       TracesInternalsUI>(map);
@@ -1388,7 +1385,7 @@ void PopulateBinderMapWithContext(
   RegisterWebUIControllerInterfaceBinder<webxr::mojom::WebXrInternalsHandler,
                                          WebXrInternalsUI>(map);
 #endif
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS))
+#if BUILDFLAG(IS_ANDROID)
   map->Add<blink::mojom::DateTimeChooser>(&BindDateTimeChooserForFrame);
 #endif
 #if BUILDFLAG(IS_ANDROID)

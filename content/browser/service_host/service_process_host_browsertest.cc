@@ -27,7 +27,7 @@
 #include "services/test/echo/public/mojom/echo.mojom.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if (BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)))
+#if BUILDFLAG(IS_MAC)
 #include "content/public/browser/browser_child_process_host.h"
 #endif
 
@@ -357,7 +357,7 @@ IN_PROC_BROWSER_TEST_F(ServiceProcessHostBrowserTest, Priority) {
           .Pass());
   observer.WaitForLaunch();
   base::Process::Priority priority = observer.process().GetPriority(
-#if (BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_TVOS)))
+#if BUILDFLAG(IS_MAC)
       content::BrowserChildProcessHost::GetPortProvider()
 #endif
   );

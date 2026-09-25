@@ -418,7 +418,7 @@ TEST_F(SyncServiceImplStartupTest, ResetSyncViaDashboard) {
       {.error_type = NOT_MY_BIRTHDAY, .action = DISABLE_SYNC_ON_CLIENT});
   base::RunLoop().RunUntilIdle();
   auto expected_transport_state_after_reset = SyncService::TransportState::
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
       DISABLED;
 #else
       ACTIVE;

@@ -179,12 +179,7 @@ TEST_F(NetworkQualitySocketWatcherTest, QuicFirstNotificationDropped) {
   EXPECT_TRUE(socket_watcher.ShouldNotifyUpdatedRTT());
 }
 
-#if BUILDFLAG(IS_IOS)
-// Flaky on iOS: crbug.com/672917.
-#define MAYBE_PrivateAddressRTTNotNotified DISABLED_PrivateAddressRTTNotNotified
-#else
 #define MAYBE_PrivateAddressRTTNotNotified PrivateAddressRTTNotNotified
-#endif
 TEST_F(NetworkQualitySocketWatcherTest, MAYBE_PrivateAddressRTTNotNotified) {
   base::SimpleTestTickClock tick_clock;
   tick_clock.SetNowTicks(base::TimeTicks::Now());

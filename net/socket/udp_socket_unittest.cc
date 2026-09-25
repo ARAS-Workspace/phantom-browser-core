@@ -61,10 +61,6 @@
 #include "net/base/network_change_notifier.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include <TargetConditionals.h>
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -79,7 +75,7 @@ namespace net {
 namespace {
 
 // Whether Source-Specific Multicast (SSM) is expected to work on this platform.
-#if defined(MCAST_JOIN_SOURCE_GROUP) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if defined(MCAST_JOIN_SOURCE_GROUP) && !BUILDFLAG(IS_ANDROID)
 constexpr bool kExpectSSMToWork = true;
 #else
 constexpr bool kExpectSSMToWork = false;
@@ -718,13 +714,13 @@ TEST_F(UDPSocketTest, ClientGetLocalPeerAddresses) {
     std::string local_address;
     bool may_fail;
   } tests[] = {
-    {"127.0.00.1", "127.0.0.1", false},
-    {"::1", "::1", true},
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-    // Addresses below are disabled on Android. See crbug.com/161248
-    // They are also disabled on iOS. See https://crbug.com/523225
-    {"192.168.1.1", "127.0.0.1", false},
-    {"2001:db8:0::42", "::1", true},
+      {"127.0.00.1", "127.0.0.1", false},
+      {"::1", "::1", true},
+#if !BUILDFLAG(IS_ANDROID)
+      // Addresses below are disabled on Android. See crbug.com/161248
+      // They are also disabled on iOS. See https://crbug.com/523225
+      {"192.168.1.1", "127.0.0.1", false},
+      {"2001:db8:0::42", "::1", true},
 #endif
   };
   for (const auto& test : tests) {
@@ -806,12 +802,7 @@ TEST_F(UDPSocketTest, ClientSetDoNotFragment) {
     EXPECT_THAT(rv, IsOk());
 
     rv = client.SetDoNotFragment();
-#if BUILDFLAG(IS_IOS)
-    // TODO(crbug.com/42050633): IP_MTU_DISCOVER is not implemented on Fuchsia.
-    EXPECT_THAT(rv, IsError(ERR_NOT_IMPLEMENTED));
-#else
     EXPECT_THAT(rv, IsOk());
-#endif
   }
 }
 
@@ -828,12 +819,7 @@ TEST_F(UDPSocketTest, ServerSetDoNotFragment) {
     EXPECT_THAT(rv, IsOk());
 
     rv = server.SetDoNotFragment();
-#if BUILDFLAG(IS_IOS)
-    // TODO(crbug.com/42050633): IP_MTU_DISCOVER is not implemented on Fuchsia.
-    EXPECT_THAT(rv, IsError(ERR_NOT_IMPLEMENTED));
-#else
     EXPECT_THAT(rv, IsOk());
-#endif
   }
 }
 
@@ -888,9 +874,8 @@ TEST_F(UDPSocketTest, JoinMulticastGroup) {
   socket.Close();
 }
 
-// TODO(crbug.com/40620614): failing on device on iOS 12.2.
 // TODO(crbug.com/40189274): flaky on Mac 11.
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_SharedMulticastAddress DISABLED_SharedMulticastAddress
 #else
 #define MAYBE_SharedMulticastAddress SharedMulticastAddress

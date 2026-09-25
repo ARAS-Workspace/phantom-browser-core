@@ -63,9 +63,6 @@ const char kRobotAuthCode[] = "robot-oauth-auth-code";
 const char kEnrollmentToken[] = "enrollment_token";
 const char kProfileID[] = "profile-id";
 const char kIdToken[] = "id-token";
-#if BUILDFLAG(IS_IOS)
-const char kOAuthAuthorizationHeaderPrefix[] = "OAuth ";
-#endif
 
 // Helper function which generates a DMServer response and populates the
 // `error_detail` field.
@@ -1304,16 +1301,10 @@ TEST_F(DeviceManagementRequestAuthTest, OnlyOAuthToken) {
       GetPendingRequest();
   ASSERT_TRUE(request);
 
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(base::StrCat({kOAuthAuthorizationHeaderPrefix, kOAuthToken}),
-            GetAuthHeader(*request));
-  EXPECT_TRUE(GetOAuthParams(*request).empty());
-#else
   const std::vector<std::string> params = GetOAuthParams(*request);
   ASSERT_EQ(1u, params.size());
   EXPECT_EQ(kOAuthToken, params[0]);
   EXPECT_FALSE(GetAuthHeader(*request));
-#endif
 
   SendResponse(net::OK, 200, std::string());
 }
@@ -1355,7 +1346,6 @@ TEST_F(DeviceManagementRequestAuthTest, OnlyEnrollmentToken) {
   SendResponse(net::OK, 200, std::string());
 }
 
-#if !BUILDFLAG(IS_IOS)
 // Cannot test requests with an oauth token and another authorization token on
 // iOS because they both use the "Authorization" header.
 
@@ -1417,7 +1407,6 @@ TEST_F(DeviceManagementRequestAuthTest, OidcAuthAndIdToken) {
 
   SendResponse(net::OK, 200, std::string());
 }
-#endif
 
 #if defined(GTEST_HAS_DEATH_TEST)
 TEST_F(DeviceManagementRequestAuthTest, CannotUseOAuthTokenAsAuthData) {

@@ -201,13 +201,13 @@ std::vector<raw_ptr<const BookmarkNode>> GetMostRecentlyModifiedUserFolders(
           model->account_other_node()};
 
   const BookmarkNode* default_node =
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
       model->account_mobile_node() ? model->account_mobile_node()
                                    : model->mobile_node();
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS).
+#else
       model->account_other_node() ? model->account_other_node()
                                   : model->other_node();
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   auto more_recently_modified = [account_permanent_nodes_possibly_null,
                                  default_node](const BookmarkNode* n1,
@@ -230,7 +230,7 @@ std::vector<raw_ptr<const BookmarkNode>> GetMostRecentlyModifiedUserFolders(
   return nodes;
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 BookmarkNodesSplitByAccountAndLocal::BookmarkNodesSplitByAccountAndLocal() =
     default;
 BookmarkNodesSplitByAccountAndLocal::BookmarkNodesSplitByAccountAndLocal(
@@ -347,7 +347,7 @@ BookmarkNodesSplitByAccountAndLocal GetPermanentNodesForDisplay(
 
   return permanent_nodes;
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 bool HasLocalOrSyncableBookmarks(const BookmarkModel* model) {
   return std::ranges::any_of(

@@ -31,7 +31,7 @@ namespace {
 
 using ::testing::_;
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 constexpr int kExpectedVisualWidth = 18;
 constexpr int kExpectedVisualHeight = 32;
 #else
@@ -91,34 +91,20 @@ class PhishingImageEmbedderTest : public testing::Test {
 
     auto scorer =
         Scorer::Create(mapped_region.region.Duplicate(), base::File());
-#if BUILDFLAG(IS_IOS)
-    image_embedder_->set_scorer(scorer.get());
-    scorer_ = std::move(scorer);
-#else
     ScorerStorage::GetInstance()->SetScorer(std::move(scorer));
-#endif
   }
 
   void TearDown() override {
     image_embedder_.reset();
-#if !BUILDFLAG(IS_IOS)
     ScorerStorage::GetInstance()->SetScorer(nullptr);
-#endif
   }
 
   void ClearScorer() {
-#if BUILDFLAG(IS_IOS)
-    image_embedder_->set_scorer(nullptr);
-#else
     ScorerStorage::GetInstance()->SetScorer(nullptr);
-#endif
   }
 
   base::test::TaskEnvironment task_environment_;
   std::unique_ptr<PhishingImageEmbedder> image_embedder_;
-#if BUILDFLAG(IS_IOS)
-  std::unique_ptr<Scorer> scorer_;
-#endif
 };
 
 TEST_F(PhishingImageEmbedderTest, NoImageEmbeddingWithVisualFeatures) {
@@ -184,12 +170,7 @@ TEST_F(PhishingImageEmbedderTest, NoImageEmbeddingOrVisualFeatures) {
 TEST_F(PhishingImageEmbedderTest, ImageEmbeddingWithMockScorer) {
   auto mock_scorer = std::make_unique<MockScorer>();
   MockScorer* raw_mock_scorer = mock_scorer.get();
-#if BUILDFLAG(IS_IOS)
-  image_embedder_->set_scorer(raw_mock_scorer);
-  scorer_ = std::move(mock_scorer);
-#else
   ScorerStorage::GetInstance()->SetScorer(std::move(mock_scorer));
-#endif
 
   SkBitmap bitmap;
   bitmap.allocN32Pixels(48, 48);

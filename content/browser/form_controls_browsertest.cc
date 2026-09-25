@@ -94,8 +94,6 @@ class FormControlsBrowserTest : public ContentBrowserTest {
     } else {
       platform_suffix = "_android";
     }
-#elif BUILDFLAG(IS_IOS)
-    platform_suffix = "_ios";
 #endif
 
     base::FilePath dir_test_data;

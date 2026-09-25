@@ -31,13 +31,13 @@
 #include "partition_alloc/shim/allocator_shim.h"
 #endif
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 #include "base/test/multiprocess_test.h"
 #endif
 
 namespace base::debug {
 
-#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 typedef MultiProcessTest StackTraceTest;
 #else
 typedef testing::Test StackTraceTest;

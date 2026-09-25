@@ -102,7 +102,7 @@ TEST_F(WebsiteSettingsRegistryTest, Properties) {
             info->default_value_pref_name());
   ASSERT_TRUE(info->initial_default_value().is_int());
   EXPECT_EQ(999, info->initial_default_value().GetInt());
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(PrefRegistry::LOSSY_PREF, info->GetPrefRegistrationFlags());
 #else
   EXPECT_EQ(PrefRegistry::LOSSY_PREF |

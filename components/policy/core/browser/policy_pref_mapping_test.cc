@@ -419,8 +419,6 @@ class PolicyTestCase {
     const std::string os("desktop_android");
 #elif BUILDFLAG(IS_ANDROID)
     const std::string os("android");
-#elif BUILDFLAG(IS_IOS)
-    const std::string os("ios");
 #elif BUILDFLAG(IS_LINUX)
     const std::string os("linux");
 #elif BUILDFLAG(IS_MAC)

@@ -973,12 +973,7 @@ void FeatureInfo::InitializeFeatures(uint32_t complete_fbo_for_workarounds) {
   // For ES, there is no extension that exposes BGRA renderbuffers, however
   // Angle does support these.
   bool enable_render_buffer_bgra =
-#if BUILDFLAG(IS_IOS)
-      // BGRA is not supported on iOS with ANGLE + GL.
-      gl_version_info_->is_angle_metal;
-#else
       gl_version_info_->is_angle;
-#endif  // BUILDFLAG(IS_IOS)
 
   if (enable_render_buffer_bgra) {
     feature_flags_.ext_render_buffer_format_bgra8888 = true;

@@ -1174,8 +1174,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && \
-    !(BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        GetBoundsRectIframes) {
   LoadInitialAccessibilityTreeFromHtml(std::string(R"HTML(
@@ -1442,13 +1441,11 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                second_list_item_bounds.y()),
       2);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !(BUILDFLAG(IS_IOS)
-        // && BUILDFLAG(USE_BLINK))
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
-// Select controls behave differently on Mac/Android/iOS-Blink, this test
+// Select controls behave differently on Mac/Android, this test
 // doesn't apply.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && \
-    !(BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        GetBoundsRectWithScroll) {
   LoadInitialAccessibilityTreeFromHtml(std::string(R"HTML(
@@ -1544,8 +1541,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                third_list_item_bounds.y()),
       2);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !(BUILDFLAG(IS_IOS)
-        // && BUILDFLAG(USE_BLINK))
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 // Android and Mac do not expose <select>s the same as other platforms do.
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
@@ -1766,12 +1762,12 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 }
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
-// The color picker's popup behaves differently on Android/iOS-Blink, this test
+// The color picker's popup behaves differently on Android, this test
 // doesn't apply.
 // TODO(crbug.com/40835208): This test is consistently failing in Fuchsia.
 // Similar to the test `ControlsIdsForDateTimePopup`, we should try to re-enable
 // it when content_browsertests runs in non-headless mode.
-#if !BUILDFLAG(IS_ANDROID) && !(BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        GetBoundsRectIframesForColorPicker) {
   LoadInitialAccessibilityTreeFromHtml(std::string(R"HTML(
@@ -1903,8 +1899,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
       [&]() { return !popup_area->GetLocation().IsEmpty(); }));
   EXPECT_EQ(gfx::SizeF(28, 24), previous_month_button->GetLocation().size());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !(BUILDFLAG(IS_IOS) &&
-        // BUILDFLAG(USE_BLINK))
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        PlatformIterator) {
@@ -3262,8 +3257,7 @@ IN_PROC_BROWSER_TEST_F(
 // We do not run this test on Android because only the Java code can change the
 // size of the web contents, instead see the associated test in
 // WebContentsAccessibilityTest#testBoundingBoxUpdatesOnWindowResize().
-// TODO(crbug.com/40918989): Timeout on iOS-Blink
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_FlexBoxBoundingBoxUpdatesOnWindowResize \
   DISABLED_FlexBoxBoundingBoxUpdatesOnWindowResize
 #else

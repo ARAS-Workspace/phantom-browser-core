@@ -99,9 +99,7 @@
 #include "base/android/device_info.h"
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 #include "components/autofill/core/browser/payments/test_credit_card_fido_authenticator.h"
-#endif
 
 namespace autofill::autofill_metrics {
 namespace {
@@ -643,7 +641,6 @@ TEST_F(AutofillMetricsTest, CreditCardCheckoutFlowUserActions) {
                      "Autofill_ShowedCreditCardSuggestions"));
   }
 
-#if !BUILDFLAG(IS_IOS)
   // Simulate selecting an "Undo autofill" suggestion.
   {
     base::UserActionTester user_action_tester;
@@ -659,7 +656,6 @@ TEST_F(AutofillMetricsTest, CreditCardCheckoutFlowUserActions) {
     EXPECT_EQ(
         1, user_action_tester.GetActionCount("Autofill_UndoPaymentsAutofill"));
   }
-#endif
 
   // Simulate showing a credit card suggestion polled from "Credit card number"
   // field, this time to submit the form.
@@ -1899,12 +1895,7 @@ TEST_F(AutofillMetricsTest, LogVerificationStatusesOfAddressTokens) {
 }
 
 // Verify that we correctly log metrics tracking the duration of form fill.
-// TODO(crbug.com/442816527): Reenable test on ios.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_FormFillDuration DISABLED_FormFillDuration
-#else
 #define MAYBE_FormFillDuration FormFillDuration
-#endif
 TEST_F(AutofillMetricsTest, MAYBE_FormFillDuration) {
   base::TimeTicks beginning = base::TimeTicks::Now();
   FormData empty_form = CreateForm(
@@ -2539,10 +2530,6 @@ TEST_F(AutofillMetricsTest, FrameDoesNotHaveAutocompleteOneTimeCode) {
       "Autofill.WebOTP.OneTimeCode.FromAutocomplete", 1);
 }
 
-// ContentAutofillDriver is not visible to TestAutofillDriver on iOS.
-// In addition, WebOTP will not ship on iOS.
-#if !BUILDFLAG(IS_IOS)
-
 // Use <Phone><WebOTP><OTC> as the bit pattern to identify the metrics state.
 enum class PhoneCollectionMetricState {
   kNone = 0,    // Site did not collect phone, not use OTC, not use WebOTP
@@ -2703,8 +2690,6 @@ TEST_F(AutofillMetricsTest, AutocompleteOneTimeCodeFormFilledDuration) {
     ResetAutofillDriver(autofill_driver());
   }
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(AutofillMetricsTest, OnAutocompleteSuggestionsShown) {
   base::HistogramTester histogram_tester;

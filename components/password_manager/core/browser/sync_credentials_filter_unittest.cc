@@ -188,17 +188,17 @@ TEST_F(CredentialsFilterTest, ShouldSave_NotSignedIn) {
   EXPECT_TRUE(filter_->ShouldSave(SimpleNonGaiaForm("")));
 
   // See comments inside ShouldSave() for the justification.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(filter_->ShouldSave(SimpleGaiaForm("")));
   EXPECT_TRUE(filter_->ShouldSave(SimpleGAIAChangePasswordForm()));
   EXPECT_TRUE(filter_->ShouldSave(SimpleGaiaForm(kTestEmail)));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   EXPECT_FALSE(filter_->ShouldSave(SimpleGaiaForm("")));
   // A web password change probably wouldn't cause a browser sign-in in this
   // case since the original web sign-in didn't, but oh well.
   EXPECT_FALSE(filter_->ShouldSave(SimpleGAIAChangePasswordForm()));
   EXPECT_FALSE(filter_->ShouldSave(SimpleGaiaForm(kTestEmail)));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 // Effectively the same as ShouldSave_NotSignedIn.
@@ -229,17 +229,17 @@ TEST_F(CredentialsFilterTest, ShouldSave_SignedInWithSyncServiceNull) {
   // See comments inside ShouldSave() for the justification.
   const PasswordForm simple_gaia_form =
       SimpleGaiaForm("non_sync_user@example.org");
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_TRUE(filter_->ShouldSave(simple_gaia_form));
   EXPECT_TRUE(filter_->ShouldSave(SimpleGaiaForm("")));
   EXPECT_TRUE(filter_->ShouldSave(SimpleGAIAChangePasswordForm()));
   EXPECT_TRUE(filter_->ShouldSave(SimpleGaiaForm(kPrimaryAccountEmail)));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   EXPECT_FALSE(filter_->ShouldSave(simple_gaia_form));
   EXPECT_FALSE(filter_->ShouldSave(SimpleGaiaForm("")));
   EXPECT_FALSE(filter_->ShouldSave(SimpleGAIAChangePasswordForm()));
   EXPECT_FALSE(filter_->ShouldSave(SimpleGaiaForm(kPrimaryAccountEmail)));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(CredentialsFilterTest, ShouldSave_SyncFeatureOn) {

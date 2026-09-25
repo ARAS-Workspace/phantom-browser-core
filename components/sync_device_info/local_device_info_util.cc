@@ -66,7 +66,7 @@ void OnMachineStatisticsLoaded(LocalDeviceNameInfo* name_info_ptr,
 DeviceInfo::DeviceType GetLocalDeviceType() {
 #if BUILDFLAG(IS_LINUX)
   return DeviceInfo::DeviceType::kLinux;
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#elif BUILDFLAG(IS_ANDROID)
   switch (ui::GetDeviceFormFactor()) {
     case ui::DEVICE_FORM_FACTOR_TABLET:
       return DeviceInfo::DeviceType::kTablet;
@@ -87,8 +87,6 @@ DeviceInfo::OsType GetLocalDeviceOSType() {
   return DeviceInfo::OsType::kLinux;
 #elif BUILDFLAG(IS_ANDROID)
   return DeviceInfo::OsType::kAndroid;
-#elif BUILDFLAG(IS_IOS)
-  return DeviceInfo::OsType::kIOS;
 #elif BUILDFLAG(IS_MAC)
   return DeviceInfo::OsType::kMac;
 #else

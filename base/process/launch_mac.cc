@@ -377,13 +377,6 @@ Process LaunchProcess(const std::vector<std::string>& argv,
 #endif  // BUILDFLAG(IS_IOS_TVOS)
         ;
 
-#if BUILDFLAG(IS_IOS)
-    // This code is only used for the iOS simulator to launch tests. We do not
-    // support setting MachPorts on launch. You should look at
-    // content::ChildProcessLauncherHelper (for iOS) if you are trying to spawn
-    // a non-test and need ports.
-    CHECK(!has_mach_ports_for_rendezvous);
-#else
     // If `options.mach_ports_for_rendezvous` or `options.process_requirement`
     // is specified : the server's lock must be held for the duration of
     // posix_spawnp() so that new child's PID can be recorded with the set of
@@ -395,7 +388,6 @@ Process LaunchProcess(const std::vector<std::string>& argv,
         needs_rendezvous_lock
             ? &MachPortRendezvousServerMac::GetInstance()->GetLock()
             : nullptr);
-#endif
     // Use posix_spawnp as some callers expect to have PATH consulted.
     //
     // SAFETY: `new_environ.data()` points to the system's `environ` array,
@@ -407,7 +399,6 @@ Process LaunchProcess(const std::vector<std::string>& argv,
         owned_environ.empty() ? const_cast<char**>(new_environ.data())
                               : owned_environ.data());
 
-#if !BUILDFLAG(IS_IOS)
     if (needs_rendezvous_lock) {
       if (rv == 0) {
         MachPortRendezvousServerMac::GetInstance()->GetLock().AssertAcquired();
@@ -430,7 +421,6 @@ Process LaunchProcess(const std::vector<std::string>& argv,
         }
       }
     }
-#endif
   }
 
 #if !BUILDFLAG(IS_MAC)

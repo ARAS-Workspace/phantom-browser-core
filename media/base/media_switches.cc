@@ -716,7 +716,7 @@ BASE_FEATURE(kMediaCapabilitiesWithParameters,
 //   having a high MEI until there is enough local data to determine the user's
 //   preferred behaviour.
 BASE_FEATURE(kMediaEngagementBypassAutoplayPolicies,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_DISABLED_BY_DEFAULT
 #else
              base::FEATURE_ENABLED_BY_DEFAULT
@@ -824,7 +824,7 @@ BASE_FEATURE(kPlatformAudioEncoder,
 BASE_FEATURE(kPreemptiveSodaDownload, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kPreloadMediaEngagementData,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_DISABLED_BY_DEFAULT
 #else
              base::FEATURE_ENABLED_BY_DEFAULT

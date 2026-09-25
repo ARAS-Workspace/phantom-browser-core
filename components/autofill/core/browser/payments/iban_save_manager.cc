@@ -135,7 +135,6 @@ bool IbanSaveManager::IsIbanUploadEnabled(
 }
 
 bool IbanSaveManager::AttemptToOfferSave(Iban& import_candidate) {
-#if !BUILDFLAG(IS_IOS)
   UpdateRecordType(import_candidate);
   switch (DetermineHowToSaveIban(import_candidate)) {
     case TypeOfOfferToSave::kDoNotOfferToSave:
@@ -145,10 +144,6 @@ bool IbanSaveManager::AttemptToOfferSave(Iban& import_candidate) {
     case TypeOfOfferToSave::kOfferLocalSave:
       return AttemptToOfferLocalSave(import_candidate);
   }
-#else
-  // IBAN save prompts do not currently exist on iOS.
-  return false;
-#endif
 }
 
 void IbanSaveManager::UpdateRecordType(Iban& import_candidate) {

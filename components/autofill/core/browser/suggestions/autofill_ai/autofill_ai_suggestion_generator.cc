@@ -402,7 +402,7 @@ std::vector<const EntityInstance*> DedupedEntitiesForSuggestions(
 Suggestion::Icon GetSuggestionIcon(
     EntityType trigger_entity_type,
     EntityInstance::RecordType trigger_entity_record_type) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
           features::kAutofillAiNoFillingIconsExperiment)) {
     return Suggestion::Icon::kNoIcon;
@@ -533,7 +533,7 @@ Suggestion GetSuggestionForEntity(
   Suggestion suggestion =
       Suggestion(main_text, SuggestionType::kFillAutofillAi);
   suggestion.labels = {{Suggestion::Text(std::move(label))}};
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (entity.record_type() == EntityInstance::RecordType::kPersonalContext) {
     suggestion.labels.push_back({Suggestion::Text(
         l10n_util::GetStringUTF16(IDS_AUTOFILL_AI_SUGGESTED_BY_GEMINI))});
@@ -769,7 +769,7 @@ std::vector<Suggestion> CreateFetchingAmbientSuggestions() {
 
 // The Personal Context Notice suggestion is only supported on Desktop.
 constexpr bool IsPersonalContextNoticeSuggestionSupported() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return true;

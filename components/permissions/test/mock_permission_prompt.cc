@@ -70,7 +70,7 @@ MockPermissionPrompt::MockPermissionPrompt(MockPermissionPromptFactory* factory,
   for (const auto& request : delegate_->Requests()) {
     RequestType request_type = request->request_type();
     // The actual prompt will call these, so test they're sane.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     // For kStorageAccess, the prompt itself calculates the message text.
     if (request_type != permissions::RequestType::kStorageAccess) {
       EXPECT_FALSE(
@@ -84,7 +84,7 @@ MockPermissionPrompt::MockPermissionPrompt(MockPermissionPromptFactory* factory,
 #else
     EXPECT_FALSE(request->GetMessageTextFragment().empty());
     EXPECT_FALSE(permissions::GetIconId(request_type).is_empty());
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
     EXPECT_EQ(request->ShouldUseTwoOriginPrompt(),
               request_type == permissions::RequestType::kStorageAccess);
   }

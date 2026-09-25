@@ -25,11 +25,6 @@
 #include "components/unexportable_keys/unexportable_key_service.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "components/signin/internal/identity_manager/profile_oauth2_token_service_delegate_ios.h"
-#include "components/signin/public/identity_manager/ios/device_accounts_provider.h"
-#endif
-
 namespace {
 
 #if BUILDFLAG(IS_ANDROID)
@@ -38,15 +33,6 @@ namespace {
 std::unique_ptr<ProfileOAuth2TokenServiceDelegateAndroid>
 CreateAndroidOAuthDelegate(AccountTrackerService* account_tracker_service) {
   return std::make_unique<ProfileOAuth2TokenServiceDelegateAndroid>(
-      account_tracker_service);
-}
-#elif BUILDFLAG(IS_IOS)
-std::unique_ptr<ProfileOAuth2TokenServiceIOSDelegate> CreateIOSOAuthDelegate(
-    SigninClient* signin_client,
-    std::unique_ptr<DeviceAccountsProvider> device_accounts_provider,
-    AccountTrackerService* account_tracker_service) {
-  return std::make_unique<ProfileOAuth2TokenServiceIOSDelegate>(
-      signin_client, std::move(device_accounts_provider),
       account_tracker_service);
 }
 #elif BUILDFLAG(ENABLE_DICE_SUPPORT)
@@ -92,16 +78,9 @@ CreateOAuth2TokenServiceDelegate(
     scoped_refptr<TokenWebData> token_web_data,
     unexportable_keys::UnexportableKeyService* unexportable_key_service,
 #endif
-#if BUILDFLAG(IS_IOS)
-    std::unique_ptr<DeviceAccountsProvider> device_accounts_provider,
-#endif
     network::NetworkConnectionTracker* network_connection_tracker) {
 #if BUILDFLAG(IS_ANDROID)
   return CreateAndroidOAuthDelegate(account_tracker_service);
-#elif BUILDFLAG(IS_IOS)
-  return CreateIOSOAuthDelegate(signin_client,
-                                std::move(device_accounts_provider),
-                                account_tracker_service);
 #elif BUILDFLAG(ENABLE_DICE_SUPPORT)
   // Fall back to |MutableProfileOAuth2TokenServiceDelegate| on all platforms
   // other than Android, iOS, and Chrome OS (Ash).
@@ -125,9 +104,6 @@ std::unique_ptr<ProfileOAuth2TokenService> BuildProfileOAuth2TokenService(
     scoped_refptr<TokenWebData> token_web_data,
     unexportable_keys::UnexportableKeyService* unexportable_key_service,
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-#if BUILDFLAG(IS_IOS)
-    std::unique_ptr<DeviceAccountsProvider> device_accounts_provider,
-#endif
     SigninClient* signin_client) {
   // Ensure the device ID is not empty. This is important for Dice, because the
   // device ID is needed on the network thread, but can only be generated on the
@@ -143,9 +119,6 @@ std::unique_ptr<ProfileOAuth2TokenService> BuildProfileOAuth2TokenService(
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
                         token_web_data, unexportable_key_service,
-#endif
-#if BUILDFLAG(IS_IOS)
-                        std::move(device_accounts_provider),
 #endif
                         network_connection_tracker));
 }

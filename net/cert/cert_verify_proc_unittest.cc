@@ -77,9 +77,6 @@
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/android_info.h"
 #include "net/cert/cert_verify_proc_android.h"
-#elif BUILDFLAG(IS_IOS)
-#include "base/ios/ios_util.h"
-#include "net/cert/cert_verify_proc_ios.h"
 #endif
 
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
@@ -218,9 +215,6 @@ scoped_refptr<CertVerifyProc> CreateCertVerifyProc(
     case CERT_VERIFY_PROC_ANDROID:
       return base::MakeRefCounted<CertVerifyProcAndroid>(
           std::move(cert_net_fetcher), std::move(crl_set));
-#elif BUILDFLAG(IS_IOS)
-    case CERT_VERIFY_PROC_IOS:
-      return base::MakeRefCounted<CertVerifyProcIOS>(std::move(crl_set));
 #endif
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
     case CERT_VERIFY_PROC_BUILTIN_CHROME_ROOTS:
@@ -243,8 +237,6 @@ scoped_refptr<CertVerifyProc> CreateCertVerifyProc(
 constexpr CertVerifyProcType kAllCertVerifiers[] = {
 #if BUILDFLAG(IS_ANDROID)
     CERT_VERIFY_PROC_ANDROID,
-#elif BUILDFLAG(IS_IOS)
-    CERT_VERIFY_PROC_IOS,
 #endif
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
     CERT_VERIFY_PROC_BUILTIN_CHROME_ROOTS,
@@ -346,13 +338,6 @@ class CertVerifyProcInternalTest
   // platform. IsInvalidRsaDsaKeySize should be checked prior, since some very
   // weak keys may be considered invalid.
   bool IsWeakRsaDsaKeySize(int size) const {
-#if BUILDFLAG(IS_IOS)
-    // Beginning with iOS 13, the minimum key size for RSA/DSA algorithms is
-    // 2048 bits. See https://support.apple.com/en-us/HT210176
-    if (verify_proc_type() == CERT_VERIFY_PROC_IOS) {
-      return size < 2048;
-    }
-#endif
 
     return size < 1024;
   }
@@ -360,14 +345,8 @@ class CertVerifyProcInternalTest
   // Returns true if the RSA/DSA keysize will be considered invalid on the
   // current platform.
   bool IsInvalidRsaDsaKeySize(int size) const {
-#if BUILDFLAG(IS_IOS)
-    // On iOS using SecTrustEvaluateWithError it is not possible to
-    // distinguish between weak and invalid key sizes.
-    return IsWeakRsaDsaKeySize(size);
-#else
     // This platform does not mark certificates with weak keys as invalid.
     return false;
-#endif
   }
 
   static bool ParseKeyType(const std::string& key_type,
@@ -443,12 +422,6 @@ class CertVerifyProcInternalTest
   }
 
   bool VerifyProcTypeIsIOSAtMostOS15() const {
-#if BUILDFLAG(IS_IOS)
-    if (verify_proc_type() == CERT_VERIFY_PROC_IOS &&
-        !base::ios::IsRunningOnIOS16OrLater()) {
-      return true;
-    }
-#endif
     return false;
   }
 

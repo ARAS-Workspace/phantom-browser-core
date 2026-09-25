@@ -27,12 +27,7 @@ namespace net::nqe::internal {
 
 namespace {
 
-#if BUILDFLAG(IS_IOS)
-// Flaky on iOS: crbug.com/672917.
-#define MAYBE_ReservedHost DISABLED_ReservedHost
-#else
 #define MAYBE_ReservedHost ReservedHost
-#endif
 // Verify that the cached network qualities from the prefs are not used if the
 // reading of the network quality prefs is not enabled..
 TEST(NetworkQualityEstimatorUtilTest, MAYBE_ReservedHost) {
@@ -85,12 +80,7 @@ TEST(NetworkQualityEstimatorUtilTest, MAYBE_ReservedHost) {
   EXPECT_EQ(2u, mock_host_resolver.num_non_local_resolves());
 }
 
-#if BUILDFLAG(IS_IOS)
-// Flaky on iOS: crbug.com/672917.
-#define MAYBE_ReservedHostUncached DISABLED_ReservedHostUncached
-#else
 #define MAYBE_ReservedHostUncached ReservedHostUncached
-#endif
 // Verify that IsPrivateHostForTesting() returns false for a hostname whose DNS
 // resolution is not cached. Further, once the resolution is cached, verify that
 // the cached entry is used.
@@ -124,7 +114,7 @@ TEST(NetworkQualityEstimatorUtilTest, MAYBE_ReservedHostUncached) {
   EXPECT_EQ(1u, mock_host_resolver.num_non_local_resolves());
 }
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // Flaky on iOS: crbug.com/672917.
 // Flaky on Android: crbug.com/1223950
 #define MAYBE_ReservedHostUncachedWithNetworkIsolationKey \
@@ -178,12 +168,7 @@ TEST(NetworkQualityEstimatorUtilTest,
       NetworkAnonymizationKey(), handles::kInvalidNetworkHandle));
 }
 
-#if BUILDFLAG(IS_IOS)
-// Flaky on iOS: crbug.com/672917.
-#define MAYBE_Localhost DISABLED_Localhost
-#else
 #define MAYBE_Localhost Localhost
-#endif
 
 // Verify that IsPrivateHostForTesting() returns correct results for local
 // hosts.

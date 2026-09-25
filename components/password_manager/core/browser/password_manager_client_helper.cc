@@ -22,7 +22,7 @@ namespace password_manager {
 
 namespace {
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 bool IsPrimaryAccountSignIn(const signin::IdentityManager& identity_manager,
                             const std::u16string& username,
                             const std::string& signon_realm) {
@@ -33,7 +33,7 @@ bool IsPrimaryAccountSignIn(const signin::IdentityManager& identity_manager,
          gaia::AreEmailsSame(base::UTF16ToUTF8(username),
                              primary_account.email);
 }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -106,7 +106,7 @@ bool PasswordManagerClientHelper::ShouldPromptToEnableAutoSignIn() const {
 
 bool PasswordManagerClientHelper::ShouldPromptToMovePasswordToAccount(
     const PasswordFormManagerForUI& submitted_manager) const {
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   PasswordFeatureManager* feature_manager =
       delegate_->GetPasswordFeatureManager();
   if (!feature_manager->IsAccountStorageActive()) {
@@ -131,7 +131,7 @@ bool PasswordManagerClientHelper::ShouldPromptToMovePasswordToAccount(
   // On Android and iOS, prompting to move after using a password isn't
   // implemented.
   return false;
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace password_manager

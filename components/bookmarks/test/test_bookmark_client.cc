@@ -132,8 +132,6 @@ bool TestBookmarkClient::IsDesktopFormFactorByDefault() {
 // Android tests.
 #if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)
   return false;
-#elif BUILDFLAG(IS_IOS)
-  return false;
 #else
   return true;
 #endif

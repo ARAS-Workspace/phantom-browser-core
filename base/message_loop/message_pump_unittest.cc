@@ -31,9 +31,7 @@
 #include "base/test/test_support_android.h"
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 #include "base/message_loop/message_pump_default.h"
-#endif
 
 using ::testing::_;
 using ::testing::AnyNumber;
@@ -58,8 +56,6 @@ namespace {
 constexpr bool ChromeControlsNativeEventProcessing(MessagePumpType pump_type) {
 #if BUILDFLAG(IS_MAC)
   return pump_type != MessagePumpType::UI;
-#elif BUILDFLAG(IS_IOS)
-  return false;
 #else
   return true;
 #endif
@@ -113,12 +109,8 @@ class MockMessagePumpDelegate : public MessagePump::Delegate {
     EXPECT_EQ(work_item_count_, 0);
 
     if (native_work_item_accounting_is_on_) {
-// Tests should trigger work beginning at least once except on iOS where
-// they need a call to MessagePumpUIApplication::Attach() to do so when on
-// the UI thread.
-#if !BUILDFLAG(IS_IOS)
+      // Tests should trigger work beginning at least once.
       EXPECT_TRUE(any_work_begun_);
-#endif
     }
   }
 
@@ -414,10 +406,6 @@ TEST_P(MessagePumpTest, RunWithoutScheduleWorkInvokesDoWork) {
 
   AddPostDoWorkExpectations(delegate);
 
-#if BUILDFLAG(IS_IOS)
-  EXPECT_CALL(delegate, DoIdleWork).Times(AnyNumber());
-#endif
-
   message_pump_->Run(&delegate);
 }
 
@@ -446,11 +434,6 @@ TEST_P(MessagePumpTest, NestedRunWithoutScheduleWorkInvokesDoWork) {
 
   AddPostDoWorkExpectations(delegate);
 
-#if BUILDFLAG(IS_IOS)
-  EXPECT_CALL(nested_delegate, DoIdleWork).Times(AnyNumber());
-  EXPECT_CALL(delegate, DoIdleWork).Times(AnyNumber());
-#endif
-
   message_pump_->Run(&delegate);
 }
 
@@ -459,9 +442,6 @@ INSTANTIATE_TEST_SUITE_P(All,
                          ::testing::Values(MessagePumpType::DEFAULT,
                                            MessagePumpType::UI,
                                            MessagePumpType::IO));
-
-// On iOS, MessagePumpDefault is not used.
-#if !BUILDFLAG(IS_IOS)
 
 class MessagePumpDefaultTest : public ::testing::Test {
  protected:
@@ -636,9 +616,8 @@ TEST_F(MessagePumpDefaultTest, BusyLoopPredictionAccuracyHistogram) {
   histogram_tester_.ExpectTotalCount(kHistogramName, 4);
   histogram_tester_.ExpectBucketCount(kHistogramName, 2 /*kFalseNegative*/, 1);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
 class MessagePumpWakeupCounterTest : public ::testing::Test {
  protected:
   void SetUp() override {
@@ -695,6 +674,6 @@ TEST_F(MessagePumpWakeupCounterTest, BusyLoopSkipsRecordingSample) {
   histogram_tester.ExpectBucketCount(
       "Scheduling.MessagePump.WakeupCount.BusyLoopThread", 1, 0);
 }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_APPLE)
+#endif  // !BUILDFLAG(IS_APPLE)
 
 }  // namespace base

@@ -66,7 +66,7 @@ constexpr int kMaxNicknameLength = 25;
 constexpr char kVirtualCardIdentifierSuffix[] = "_vcn";
 
 bool ShouldUseNewFopDisplay() {
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return true;

@@ -14,11 +14,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/metrics_proto/system_profile.pb.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "ios/web/public/test/web_task_environment.h"
-#else  // !BUILDFLAG(IS_IOS)
 #include "content/public/test/browser_task_environment.h"
-#endif  // BUILDFLAG(IS_IOS)
 
 namespace metrics {
 
@@ -33,13 +29,8 @@ class NetworkMetricsProviderTest : public testing::Test {
   ~NetworkMetricsProviderTest() override = default;
 
  private:
-#if BUILDFLAG(IS_IOS)
-  web::WebTaskEnvironment task_environment_{
-      web::WebTaskEnvironment::MainThreadType::IO};
-#else
   content::BrowserTaskEnvironment task_environment_{
       content::BrowserTaskEnvironment::IO_MAINLOOP};
-#endif
 };
 
 // Verifies that the effective connection type is correctly set.

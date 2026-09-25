@@ -144,10 +144,6 @@ TEST_F(PathServiceTest, Get) {
   for (int key = PATH_MAC_START + 1; key < PATH_MAC_END; ++key) {
     EXPECT_PRED1(ReturnsValidPath, key);
   }
-#elif BUILDFLAG(IS_IOS)
-  for (int key = PATH_IOS_START + 1; key < PATH_IOS_END; ++key) {
-    EXPECT_PRED1(ReturnsValidPath, key);
-  }
 #elif BUILDFLAG(IS_ANDROID)
   for (int key = PATH_ANDROID_START + 1; key < PATH_ANDROID_END; ++key) {
     EXPECT_PRED1(ReturnsValidPath, key);
@@ -283,8 +279,6 @@ TEST_F(PathServiceTest, DIR_ASSETS) {
   EXPECT_EQ(path.value(), kExpectedChromiumTestsRoot);
 #elif BUILDFLAG(IS_IOS_MACCATALYST)
   EXPECT_TRUE(base::apple::FrameworkBundlePath().IsParent(path));
-#elif BUILDFLAG(IS_IOS)
-  EXPECT_EQ(path, base::apple::FrameworkBundlePath());
 #else
   EXPECT_EQ(path, PathService::CheckedGet(DIR_MODULE));
 #endif
@@ -299,9 +293,6 @@ TEST_F(PathServiceTest, DIR_OUT_TEST_DATA_ROOT) {
 #if BUILDFLAG(IS_ANDROID)
   // This key is overridden in //base/test/test_support_android.cc.
   EXPECT_EQ(path.value(), kExpectedChromiumTestsRoot);
-#elif BUILDFLAG(IS_IOS)
-  // On iOS, build output files are moved to the resources directory.
-  EXPECT_EQ(path, base::apple::FrameworkBundlePath());
 #else
   // On other platforms all build output is in the same directory,
   // so DIR_OUT_TEST_DATA_ROOT should match DIR_MODULE.

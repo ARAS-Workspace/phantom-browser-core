@@ -42,8 +42,6 @@ em::DeviceRegisterRequest::Type GetCloudPolicyRegistrationType() {
   } else {
     return em::DeviceRegisterRequest::ANDROID_BROWSER;
   }
-#elif BUILDFLAG(IS_IOS)
-  return em::DeviceRegisterRequest::IOS_BROWSER;
 #else
   return em::DeviceRegisterRequest::BROWSER;
 #endif

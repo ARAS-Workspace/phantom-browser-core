@@ -52,11 +52,11 @@ AutocompleteUnrecognizedBehavior GetAcUnrecognizedBehavior(
 bool SuppressSuggestionsForAutocompleteUnrecognizedField(
     const AutofillField& field,
     AutocompleteUnrecognizedBehavior behavior) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return field.ShouldSuppressSuggestionsAndFillingByDefault(behavior);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 std::vector<Suggestion> PrepareLoadingStateSuggestions(

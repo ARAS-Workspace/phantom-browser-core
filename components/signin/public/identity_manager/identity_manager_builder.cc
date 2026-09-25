@@ -31,15 +31,11 @@
 #include "components/signin/public/webdata/token_web_data.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS)
-#include "components/signin/public/identity_manager/ios/device_accounts_provider.h"
-#endif
-
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 #include "components/signin/internal/identity_manager/device_accounts_synchronizer_impl.h"
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 #include "components/signin/internal/identity_manager/accounts_mutator_impl.h"
 #endif
 
@@ -61,7 +57,7 @@ std::unique_ptr<AccountsMutator> BuildAccountsMutator(
     AccountTrackerService* account_tracker_service,
     ProfileOAuth2TokenService* token_service,
     PrimaryAccountManager* primary_account_manager) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   return std::make_unique<AccountsMutatorImpl>(
       token_service, account_tracker_service, primary_account_manager, prefs);
 #else
@@ -107,9 +103,6 @@ IdentityManager::InitParameters BuildIdentityManagerInitParameters(
         params->delete_signin_cookies_on_exit, params->token_web_data,
         params->unexportable_key_service,
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-#if BUILDFLAG(IS_IOS)
-        std::move(params->device_accounts_provider),
-#endif
         params->signin_client);
   }
 
@@ -161,7 +154,7 @@ IdentityManager::InitParameters BuildIdentityManagerInitParameters(
       params->signin_client, token_service.get(), account_tracker_service.get(),
       std::move(params->image_decoder), std::move(account_fetcher_factory));
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   init_params.device_accounts_synchronizer =
       std::make_unique<DeviceAccountsSynchronizerImpl>(
           token_service->GetDelegate());

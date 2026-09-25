@@ -289,7 +289,7 @@ class ScopedTerminationChecker {
 
 // The delay, in seconds, after starting recording before doing expensive
 // initialization work.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // On mobile devices, a significant portion of sessions last less than a minute.
 // Use a shorter timer on these platforms to avoid losing data.
 // TODO(dfalcantara): To avoid delaying startup, tighten up initialization so
@@ -570,7 +570,7 @@ void MetricsService::OnApplicationNotIdle() {
     HandleIdleSinceLastTransmission(false);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 void MetricsService::IncrementFgBgIdIfNeeded(
     std::optional<bool> previous_is_in_foreground) const {
   // On iOS, it's possible to receive duplicate foreground and/or background
@@ -708,7 +708,7 @@ void MetricsService::OnAppEnterForeground(bool force_open_new_log,
     ClearFgBgIdIfNeeded(previous_is_in_foreground);
   }
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 void MetricsService::OnPageLoadStarted() {
   delegating_provider_.OnPageLoadStarted();

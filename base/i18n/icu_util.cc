@@ -37,10 +37,6 @@
 #include "base/android/locale_utils.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "base/ios/ios_util.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "base/apple/foundation_util.h"
 #endif
@@ -118,12 +114,6 @@ void LazyInitIcuDataFile() {
 #else  // !BUILDFLAG(IS_APPLE)
   // Assume it is in the framework bundle's Resources directory.
   FilePath data_path = apple::PathForFrameworkBundleResource(kIcuDataFileName);
-#if BUILDFLAG(IS_IOS)
-  FilePath override_data_path = ios::FilePathOfEmbeddedICU();
-  if (!override_data_path.empty()) {
-    data_path = override_data_path;
-  }
-#endif  // !BUILDFLAG(IS_IOS)
   if (data_path.empty()) {
     LOG(ERROR) << kIcuDataFileName << " not found in bundle";
     return;

@@ -161,7 +161,7 @@ TEST_F(TabGroupSyncCoordinatorTest, ReconcileGroupsToSync) {
 
 // Desktop Platforms do not use Startup Helper to perform initializing
 // actions.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_SaveUnsavedLocalGroupsOnStartupForFirstTimeFeatureLaunch \
   SaveUnsavedLocalGroupsOnStartupForFirstTimeFeatureLaunch
 #else
@@ -190,7 +190,7 @@ TEST_F(TabGroupSyncCoordinatorTest,
 
 // Desktop Platforms do not use Startup Helper to perform initializing
 // actions.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_CloseUnsavedLocalGroupsOnStartup CloseUnsavedLocalGroupsOnStartup
 #else
 #define MAYBE_CloseUnsavedLocalGroupsOnStartup \

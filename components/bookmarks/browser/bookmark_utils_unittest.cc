@@ -50,12 +50,9 @@ class BookmarkUtilsTest : public testing::Test,
 
   ~BookmarkUtilsTest() override {}
 
-// Copy and paste is not yet supported on iOS. http://crbug.com/228147
-#if !BUILDFLAG(IS_IOS)
   void TearDown() override {
     ui::Clipboard::DestroyClipboardForCurrentThread();
   }
-#endif  // !BUILDFLAG(IS_IOS)
 
   // Certain user actions require multiple changes to the bookmark model,
   // however these modifications need to be atomic for the undo framework. The
@@ -257,7 +254,7 @@ TEST_F(BookmarkUtilsTest, GetParentForNewNodes_ClientOverride) {
   std::unique_ptr<BookmarkModel> model(
       TestBookmarkClient::CreateModelWithClient(std::move(client)));
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(model->mobile_node(), GetParentForNewNodes(model.get(), GURL()));
 #else
   EXPECT_EQ(model->other_node(), GetParentForNewNodes(model.get(), GURL()));
@@ -342,7 +339,7 @@ TEST_F(BookmarkUtilsTest, RemoveAllBookmarks) {
   EXPECT_EQ(1u, managed_node->children().size());
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(
     BookmarkUtilsTest,
     GetRecentlyUsedFoldersWithOnlyLocalBookmarks_PermanentNodesOrderUnaffectedByDisplay) {
@@ -932,7 +929,7 @@ TEST_F(BookmarkUtilsTest, GetPermanentNodesForDisplayWithSyncEnabled) {
   EXPECT_THAT(permanent_display_nodes.local_nodes,
               ElementsAre(model->bookmark_bar_node(), model->other_node()));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(BookmarkUtilsTest,
        GetMostRecentlyModifiedUserFolders_DefaultOrderWithoutAccountBookmarks) {
@@ -940,13 +937,13 @@ TEST_F(BookmarkUtilsTest,
   ASSERT_FALSE(model->account_other_node());
 
   // The local other node should come first in order.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->mobile_node()));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->other_node(), model->bookmark_bar_node()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(BookmarkUtilsTest,
@@ -956,14 +953,14 @@ TEST_F(BookmarkUtilsTest,
 
   // The account other node should come first in order. Local nodes are not
   // included if empty.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->account_mobile_node(), model->mobile_node()));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->account_other_node(),
                           model->account_bookmark_bar_node()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 TEST_F(
     BookmarkUtilsTest,
@@ -977,13 +974,13 @@ TEST_F(
 
   std::vector<raw_ptr<const BookmarkNode>> recently_modified =
       GetMostRecentlyModifiedUserFolders(model.get());
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   ASSERT_THAT(recently_modified,
               ElementsAre(model->bookmark_bar_node(), model->mobile_node()));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   ASSERT_THAT(recently_modified,
               ElementsAre(model->bookmark_bar_node(), model->other_node()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Creating the account permanent folders should push the account other node
   // to the front of the list.
@@ -992,16 +989,16 @@ TEST_F(
 
   // The permanent account nodes should come first in order, then the local
   // ones. The account other node comes first.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(recently_modified,
               ElementsAre(model->account_mobile_node(),
                           model->bookmark_bar_node(), model->mobile_node()));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   EXPECT_THAT(recently_modified,
               ElementsAre(model->account_other_node(),
                           model->account_bookmark_bar_node(),
                           model->bookmark_bar_node(), model->other_node()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(
@@ -1016,16 +1013,16 @@ TEST_F(
                 GURL("http://google.com"));
 
   // The local bookmark bar should come first in order.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->bookmark_bar_node(),
                           model->account_mobile_node(), model->mobile_node()));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   EXPECT_THAT(
       GetMostRecentlyModifiedUserFolders(model.get()),
       ElementsAre(model->bookmark_bar_node(), model->account_other_node(),
                   model->account_bookmark_bar_node(), model->other_node()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(
@@ -1040,15 +1037,15 @@ TEST_F(
                 GURL("http://google.com"));
 
   // The account bookmark bar should come first in order.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->account_bookmark_bar_node(),
                           model->account_mobile_node(), model->mobile_node()));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->account_bookmark_bar_node(),
                           model->account_other_node()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 TEST_F(
@@ -1076,10 +1073,10 @@ TEST_F(
   model->SetDateFolderModified(local_folder1,
                                base::Time::FromMillisecondsSinceUnixEpoch(5));
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   model->SetDateFolderModified(model->mobile_node(),
                                base::Time::FromMillisecondsSinceUnixEpoch(6));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // This simulates signing out and in again, or turning account storage for
   // bookmarks off and on through the settings. Doing this should row the
@@ -1091,18 +1088,18 @@ TEST_F(
   // The permanent account nodes should come first in order, then the local
   // permanent folders and non-permanent nodes. The account other node comes
   // first.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->account_mobile_node(), model->mobile_node(),
                           local_folder1, model->other_node(), local_folder2,
                           model->bookmark_bar_node()));
-#else   // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#else
   EXPECT_THAT(GetMostRecentlyModifiedUserFolders(model.get()),
               ElementsAre(model->account_other_node(),
                           model->account_bookmark_bar_node(), local_folder1,
                           model->other_node(), local_folder2,
                           model->bookmark_bar_node()));
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

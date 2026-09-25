@@ -58,15 +58,9 @@ TEST(HashRealTimeUtilsTest, TestIsHashDetailRelevant) {
       create_hash_detail(V5::ThreatType::SOCIAL_ENGINEERING, std::nullopt)));
   EXPECT_TRUE(hash_realtime_utils::IsHashDetailRelevant(
       create_hash_detail(V5::ThreatType::UNWANTED_SOFTWARE, std::nullopt)));
-#if BUILDFLAG(IS_IOS)
-  EXPECT_FALSE(hash_realtime_utils::IsHashDetailRelevant(create_hash_detail(
-      V5::ThreatType::SOCIAL_ENGINEERING,
-      std::vector<V5::ThreatAttribute>({V5::ThreatAttribute::CANARY}))));
-#else
   EXPECT_TRUE(hash_realtime_utils::IsHashDetailRelevant(create_hash_detail(
       V5::ThreatType::SOCIAL_ENGINEERING,
       std::vector<V5::ThreatAttribute>({V5::ThreatAttribute::CANARY}))));
-#endif
   EXPECT_FALSE(hash_realtime_utils::IsHashDetailRelevant(create_hash_detail(
       V5::ThreatType::MALWARE,
       std::vector<V5::ThreatAttribute>({V5::ThreatAttribute::CANARY}))));

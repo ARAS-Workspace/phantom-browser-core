@@ -649,9 +649,7 @@ void FlagsState::GetFlagFeatureEntries(
 
 // static
 unsigned short FlagsState::GetCurrentPlatform() {
-#if BUILDFLAG(IS_IOS)
-  return kOsIos;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return kOsMac;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
   return kOsLinux;

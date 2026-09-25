@@ -102,8 +102,6 @@ const char kChromeSigninExtensionPolicyType[] =
 const char kChromeMachineLevelUserCloudPolicyType[] =
 #if BUILDFLAG(IS_ANDROID)
     "google/chrome/machine-level-user-android";
-#elif BUILDFLAG(IS_IOS)
-    "google/chrome/machine-level-user-ios";
 #else
     "google/chrome/machine-level-user";
 #endif
@@ -145,8 +143,6 @@ const char* GetChromeUserPolicyType() {
   } else {
     return "google/android/user";
   }
-#elif BUILDFLAG(IS_IOS)
-  return "google/ios/user";
 #else
   return "google/chrome/user";
 #endif

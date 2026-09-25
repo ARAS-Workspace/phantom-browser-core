@@ -67,7 +67,7 @@ void DistilledPagePrefs::SetFontFamily(mojom::FontFamily new_font_family) {
 
 bool DistilledPagePrefs::IsUserPrefFontAvailable(
     mojom::FontFamily font_family) {
-#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS))
+#if !BUILDFLAG(IS_ANDROID)
   return true;
 #else
   bool new_fonts_enabled =

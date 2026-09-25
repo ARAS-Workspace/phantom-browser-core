@@ -758,15 +758,9 @@ TEST_F(HashRealTimeServiceTest, TestLookup_OneHash) {
       {V5::ThreatType::MALWARE, std::nullopt, SB_THREAT_TYPE_URL_MALWARE, 1},
       {V5::ThreatType::UNWANTED_SOFTWARE, std::nullopt,
        SB_THREAT_TYPE_URL_UNWANTED, 1},
-#if BUILDFLAG(IS_IOS)
-      {V5::ThreatType::SOCIAL_ENGINEERING,
-       std::vector<V5::ThreatAttribute>({V5::ThreatAttribute::CANARY}),
-       SB_THREAT_TYPE_SAFE, 0},
-#else
       {V5::ThreatType::SOCIAL_ENGINEERING,
        std::vector<V5::ThreatAttribute>({V5::ThreatAttribute::CANARY}),
        SB_THREAT_TYPE_SUSPICIOUS_SITE, 1},
-#endif
       // SB_THREAT_TYPE_SAFE because MALWARE + CANARY are not considered
       // relevant.
       {V5::ThreatType::MALWARE,
@@ -1034,11 +1028,7 @@ TEST_F(HashRealTimeServiceTest, TestLookup_InvalidAttributes) {
                              UrlToSingleFullHash(url), attributes)},
         /*expected_threat_type=*/SBThreatType::SB_THREAT_TYPE_URL_PHISHING,
         /*expected_prefix_count=*/1,
-#if BUILDFLAG(IS_IOS)
-        /*expected_threat_info_size=*/1,  // CANARY is not supported on IOS.
-#else
         /*expected_threat_info_size=*/2,
-#endif
         /*expected_found_unmatched_full_hashes=*/false,
         /*expected_relay_url=*/kTestRelayUrl);
   }

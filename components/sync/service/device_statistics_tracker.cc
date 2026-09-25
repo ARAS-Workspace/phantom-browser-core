@@ -141,8 +141,6 @@ std::optional<DeviceStatisticsTracker::Platform> GetLocalPlatform() {
   return DeviceStatisticsTracker::Platform::kLinux;
 #elif BUILDFLAG(IS_ANDROID)
   return DeviceStatisticsTracker::Platform::kAndroid;
-#elif BUILDFLAG(IS_IOS)
-  return DeviceStatisticsTracker::Platform::kIOS;
 #else
   return std::nullopt;
 #endif

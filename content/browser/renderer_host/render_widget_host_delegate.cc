@@ -113,7 +113,7 @@ RenderWidgetHostDelegate::GetDevicePostureProvider() {
 }
 
 bool RenderWidgetHostDelegate::GetResizable() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   return true;

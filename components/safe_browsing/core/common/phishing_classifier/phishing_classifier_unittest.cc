@@ -80,34 +80,20 @@ class PhishingClassifierTest : public testing::Test {
 
     auto scorer =
         Scorer::Create(mapped_region.region.Duplicate(), base::File());
-#if BUILDFLAG(IS_IOS)
-    classifier_->set_scorer(scorer.get());
-    scorer_ = std::move(scorer);
-#else
     ScorerStorage::GetInstance()->SetScorer(std::move(scorer));
-#endif
   }
 
   void TearDown() override {
     classifier_.reset();
-#if !BUILDFLAG(IS_IOS)
     ScorerStorage::GetInstance()->SetScorer(nullptr);
-#endif
   }
 
   void ClearScorer() {
-#if BUILDFLAG(IS_IOS)
-    classifier_->set_scorer(nullptr);
-#else
     ScorerStorage::GetInstance()->SetScorer(nullptr);
-#endif
   }
 
   base::test::TaskEnvironment task_environment_;
   std::unique_ptr<PhishingClassifier> classifier_;
-#if BUILDFLAG(IS_IOS)
-  std::unique_ptr<Scorer> scorer_;
-#endif
 };
 
 TEST_F(PhishingClassifierTest, Classification) {
@@ -135,12 +121,7 @@ TEST_F(PhishingClassifierTest, ClassificationWithImageEmbedding) {
   // Inject a MockScorer to intercept model application calls.
   auto mock_scorer = std::make_unique<MockScorer>();
   MockScorer* raw_mock_scorer = mock_scorer.get();
-#if BUILDFLAG(IS_IOS)
-  classifier_->set_scorer(raw_mock_scorer);
-  scorer_ = std::move(mock_scorer);
-#else
   ScorerStorage::GetInstance()->SetScorer(std::move(mock_scorer));
-#endif
 
   SkBitmap bitmap;
   bitmap.allocN32Pixels(48, 48);

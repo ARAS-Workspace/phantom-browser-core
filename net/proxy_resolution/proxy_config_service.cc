@@ -13,9 +13,7 @@
 #include "build/build_config.h"
 #include "net/proxy_resolution/proxy_config_with_annotation.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "net/proxy_resolution/proxy_config_service_ios.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "net/proxy_resolution/proxy_config_service_mac.h"
 #elif BUILDFLAG(IS_LINUX)
 #include "net/proxy_resolution/proxy_config_service_linux.h"
@@ -77,10 +75,7 @@ class ProxyConfigServiceDirect : public ProxyConfigService {
 std::unique_ptr<ProxyConfigService>
 ProxyConfigService::CreateSystemProxyConfigService(
     scoped_refptr<base::SequencedTaskRunner> main_task_runner) {
-#if BUILDFLAG(IS_IOS)
-  return std::make_unique<ProxyConfigServiceIOS>(
-      kSystemProxyConfigTrafficAnnotation);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return std::make_unique<ProxyConfigServiceMac>(
       std::move(main_task_runner), kSystemProxyConfigTrafficAnnotation);
 #elif BUILDFLAG(IS_LINUX)

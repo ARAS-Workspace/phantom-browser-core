@@ -12,8 +12,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #import <AppKit/AppKit.h>
-#elif BUILDFLAG(IS_IOS)
-#import <UIKit/UIKit.h>
 #endif
 
 namespace gfx::test {
@@ -28,9 +26,6 @@ SkColor GetPlatformImageColor(PlatformImage image, int x, int y) {
   CGRect target_pixel =
       CGRectMake(x * CGImageGetWidth(image_ref) / image.size.width,
                  y * CGImageGetHeight(image_ref) / image.size.height, 1, 1);
-#elif BUILDFLAG(IS_IOS)
-  CGImageRef image_ref = image.CGImage;
-  CGRect target_pixel = CGRectMake(x * image.scale, y * image.scale, 1, 1);
 #endif
 
   // Start by extracting the target pixel into a 1x1 CGImage.

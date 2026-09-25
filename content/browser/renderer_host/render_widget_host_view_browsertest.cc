@@ -554,9 +554,6 @@ DelegatedFrameHost* GetDelegatedFrameHost(RenderWidgetHostView* view) {
 #if BUILDFLAG(IS_MAC)
   auto* compositor = GetBrowserCompositorMacForTesting(view);
   dfh = compositor->GetDelegatedFrameHost();
-#elif BUILDFLAG(IS_IOS)
-  auto* compositor = GetBrowserCompositorIOSForTesting(view);
-  dfh = compositor->GetDelegatedFrameHost();
 #elif defined(USE_AURA)
   dfh = static_cast<RenderWidgetHostViewAura*>(view)
             ->GetDelegatedFrameHostForTesting();

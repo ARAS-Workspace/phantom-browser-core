@@ -128,17 +128,6 @@ void SSLErrorUI::PopulateOverridableStrings(base::DictValue& load_time_data) {
       "primaryButtonText",
       l10n_util::GetStringUTF16(IDS_SSL_OVERRIDABLE_SAFETY_BUTTON));
 
-// On iOS, offer to close the page instead of navigating to NTP when unable to
-// go back. See crbug.com/1058476 for discussion.
-#if BUILDFLAG(IS_IOS)
-  if (!controller()->CanGoBack()) {
-    load_time_data.Set(
-        "primaryButtonText",
-        l10n_util::GetStringUTF16(IDS_SSL_OVERRIDABLE_CLOSE_PAGE_BUTTON));
-    load_time_data.Set("primary_button_close_page", true);
-  }
-#endif
-
   load_time_data.Set(
       "finalParagraph",
       l10n_util::GetStringFUTF16(IDS_SSL_OVERRIDABLE_PROCEED_PARAGRAPH, url));
@@ -258,7 +247,7 @@ void SSLErrorUI::HandleCommand(SecurityInterstitialCommand command) {
       break;
     }
     case CMD_SHOW_CERTIFICATE_VIEWER: {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
       controller_->metrics_helper()->RecordUserInteraction(
           security_interstitials::MetricsHelper::VIEW_CERTIFICATE);
       controller_->ShowCertificateViewer();

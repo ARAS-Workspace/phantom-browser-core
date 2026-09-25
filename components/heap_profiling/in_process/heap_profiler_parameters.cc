@@ -19,7 +19,7 @@ namespace {
 
 // Platform-specific parameter defaults.
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // Default on iOS is equal to mean value of process uptime. Android is
 // more similar to iOS than to Desktop.
 constexpr base::TimeDelta kDefaultCollectionInterval = base::Minutes(30);

@@ -93,7 +93,7 @@ class FlingControllerTest : public FlingControllerEventSenderClient,
     return progress_fling_on_fling_start_;
   }
   bool ShouldUseMobileFlingCurve() override {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     return true;
 #else
     return false;
@@ -831,7 +831,7 @@ TEST_P(FlingControllerWithPhysicsBasedFlingTest,
   // Android and iOS use Mobile fling curve so they are ignored
   // for this test
   bool use_mobile_fling_curve = false;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   use_mobile_fling_curve = true;
 #endif
   if (use_mobile_fling_curve)
@@ -879,7 +879,7 @@ TEST_P(FlingControllerWithPhysicsBasedFlingTest,
   // Android and iOS use Mobile fling curve so they are ignored
   // for this test
   bool use_mobile_fling_curve = false;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   use_mobile_fling_curve = true;
 #endif
   if (use_mobile_fling_curve)

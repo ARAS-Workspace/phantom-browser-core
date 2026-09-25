@@ -1441,7 +1441,7 @@ std::string TemplateURLRef::HandleReplacements(
           case RequestSource::CROS_APP_LIST:
           case RequestSource::COMPOSEBOX:
           case RequestSource::NTP_ACTION_CHIPS:
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
             HandleReplacement("sourceid", "chrome-mobile", replacement, &url);
 #else
             HandleReplacement("sourceid", "chrome", replacement, &url);
@@ -1615,13 +1615,6 @@ std::string TemplateURLRef::HandleReplacements(
         break;
 
       case GOOGLE_LANGUAGE:
-#if BUILDFLAG(IS_IOS)
-        if (base::FeatureList::IsEnabled(
-                omnibox::kReportApplicationLanguageInSearchRequest)) {
-          HandleReplacement("hl", search_terms_data.GetApplicationLocale(),
-                            replacement, &url);
-        }
-#endif
         break;
 
       case YANDEX_REFERRAL_ID: {
@@ -1823,8 +1816,6 @@ std::string TemplateURL::GetSuggestionClient(
     case SearchTermsData::RequestSource::NTP_MODULE:
 #if BUILDFLAG(IS_ANDROID)
       return "chrome-android-search-resumption-module";
-#elif BUILDFLAG(IS_IOS)
-      return "chrome-ios-ntp";
 #else
       NOTREACHED();
 #endif
@@ -1835,8 +1826,6 @@ std::string TemplateURL::GetSuggestionClient(
         return "chrome";
       }
       return "chrome-omni";
-#elif BUILDFLAG(IS_IOS)
-      return "chrome";
 #else
       return "chrome-omni";
 #endif

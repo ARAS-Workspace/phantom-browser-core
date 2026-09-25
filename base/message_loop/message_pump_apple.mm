@@ -31,9 +31,7 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_IOS)
 #import <AppKit/AppKit.h>
-#endif  // !BUILDFLAG(IS_IOS)
 
 namespace base {
 
@@ -47,29 +45,9 @@ void NoOp(void* info) {}
 constexpr CFTimeInterval kCFTimeIntervalMax =
     std::numeric_limits<CFTimeInterval>::max();
 
-#if !BUILDFLAG(IS_IOS)
 // Set to true if message_pump_apple::Create() is called before NSApp is
 // initialized.  Only accessed from the main thread.
 bool g_not_using_cr_app = false;
-#endif  // !BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_IOS)
-constexpr int kDefaultInitialNestingLevel = 1;
-// Tracks the initial loop nesting level for the current thread's message pump.
-// It is used to synchronize the pump's internal nesting state with the host
-// app's run loop depth on startup to prevent work item stack mismatches and
-// crashes.
-//
-// Requires thread_local storage because platform agnostic task plumbing
-// prevents passing host specific state via arguments during initialization.
-//
-// Note: This state is strictly consumable. The pump resets it to std::nullopt
-// upon reading so subsequent loops start clean.
-//
-// TODO(crbug.com/516847270): Pass this via OnAttach() if we can avoid subclass
-// specific parameter pollution on MessagePumpCFRunLoopBase.
-thread_local std::optional<int> g_initial_nesting_level;
-#endif  // BUILDFLAG(IS_IOS)
 
 }  // namespace
 
@@ -172,12 +150,6 @@ TimeTicks MessagePumpCFRunLoopBase::AdjustDelayedRunTime(
   return MessagePump::AdjustDelayedRunTime(earliest_time, run_time,
                                            latest_time);
 }
-
-#if BUILDFLAG(IS_IOS)
-void MessagePumpCFRunLoopBase::Attach(Delegate* delegate) {}
-
-void MessagePumpCFRunLoopBase::Detach() {}
-#endif  // BUILDFLAG(IS_IOS)
 
 // Must be called on the run loop thread.
 MessagePumpCFRunLoopBase::MessagePumpCFRunLoopBase() {
@@ -282,59 +254,6 @@ void MessagePumpCFRunLoopBase::InitializeFeatures() {
   g_timer_slack.store(FeatureList::IsEnabled(kTimerSlackMac),
                       std::memory_order_relaxed);
 }
-
-#if BUILDFLAG(IS_IOS)
-void MessagePumpCFRunLoopBase::OnAttach() {
-  CHECK_EQ(nesting_level_, 0);
-
-  // TODO(crbug.com/516847270): Consider passing the initial nesting level down
-  // as a parameter to OnAttach() if a clean way is found to avoid subclass
-  // specific parameter pollution on the parent MessagePumpCFRunLoopBase class
-  // (which is shared by other message pumps that do not support custom nesting
-  // synchronization).
-  std::optional<int> initial_depth =
-      std::exchange(g_initial_nesting_level, std::nullopt);
-  int depth = initial_depth.value_or(kDefaultInitialNestingLevel);
-  CHECK_GE(depth, kDefaultInitialNestingLevel);
-  if (depth == kDefaultInitialNestingLevel) {
-    // On iOS: the MessagePump is attached while it's already running.
-    nesting_level_ = 1;
-
-    // There could be some native work done after attaching to the loop and
-    // before |work_source_| is invoked.
-    PushWorkItemScope();
-    return;
-  }
-
-  // Host app custom depth flow.
-  for (int i = 0; i < depth; ++i) {
-    ++nesting_level_;
-
-    // Pre-populates the `stack_` with placeholder frames to match the host's
-    // nesting level. Since the delegate is already attached (see Attach()),
-    // these frames correctly inform the delegate of the host's run loop nesting
-    // depth, ensuring system-wide state stability.
-    PushWorkItemScope();
-  }
-
-  // Initialize the nesting state to match the host's run loop depth we just
-  // reconstructed. Chromium on iOS treats the main loop as nested by default
-  // (delta of 1), so we maintain that invariant here.
-  deepest_nesting_level_ = nesting_level_;
-}
-
-void MessagePumpCFRunLoopBase::OnDetach() {
-  // This function is called on shutdown. This can happen at either
-  // `nesting_level` >=1 or 0:
-  //   `nesting_level_ == 0`: When this is detached as part of tear down outside
-  //   of a run loop (e.g. ~TaskEnvironment). `nesting_level_ >= 1`: When this
-  //   is detached as part of a native shutdown notification ran from the
-  //   message pump itself. Nesting levels higher than 1 can happen in
-  //   legitimate nesting situations like the browser being dismissed while
-  //   displaying a long press context menu (CRWContextMenuController).
-  CHECK_GE(nesting_level_, 0);
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 void MessagePumpCFRunLoopBase::SetDelegate(Delegate* delegate) {
   delegate_ = delegate;
@@ -719,56 +638,6 @@ bool MessagePumpNSRunLoop::DoQuit() {
   return true;
 }
 
-#if BUILDFLAG(IS_IOS)
-MessagePumpUIApplication::MessagePumpUIApplication() = default;
-MessagePumpUIApplication::~MessagePumpUIApplication() = default;
-
-void MessagePumpUIApplication::DoRun(Delegate* delegate) {
-  NOTREACHED();
-}
-
-bool MessagePumpUIApplication::DoQuit() {
-  NOTREACHED();
-}
-
-// static
-// This is separate from Attach() because the MessagePump instance is
-// instantiated and owned by Chromium's internal task plumbing. The generic
-// callers of Attach() are platform-agnostic and cannot pass host-specific
-// state. This static method allows embedders to "prime" the nesting state for
-// the UI pump before Chromium's task system is fully initialized.
-void MessagePumpUIApplication::SetNextInitialNestingLevelForCurrentThread(
-    int depth) {
-  CHECK(!g_initial_nesting_level.has_value());
-  CHECK_GE(depth, kDefaultInitialNestingLevel);
-  g_initial_nesting_level = depth;
-}
-
-// static
-void MessagePumpUIApplication::ResetNextInitialNestingLevelForTesting() {
-  g_initial_nesting_level.reset();
-}
-
-void MessagePumpUIApplication::Attach(Delegate* delegate) {
-  DCHECK(!run_loop_);
-  run_loop_.emplace();
-
-  CHECK(run_loop_->BeforeRun());
-  SetDelegate(delegate);
-  OnAttach();
-}
-
-void MessagePumpUIApplication::Detach() {
-  DCHECK(run_loop_);
-  run_loop_->AfterRun();
-  SetDelegate(nullptr);
-  run_loop_.reset();
-
-  OnDetach();
-}
-
-#else
-
 MessagePumpNSApplication::MessagePumpNSApplication() = default;
 MessagePumpNSApplication::~MessagePumpNSApplication() = default;
 
@@ -885,15 +754,10 @@ bool MessagePumpCrApplication::ShouldCreateAutoreleasePool() {
   return MessagePumpNSApplication::ShouldCreateAutoreleasePool();
 }
 
-#endif  // BUILDFLAG(IS_IOS)
-
 namespace message_pump_apple {
 
 std::unique_ptr<MessagePump> Create() {
   if (NSThread.isMainThread) {
-#if BUILDFLAG(IS_IOS)
-    return std::make_unique<MessagePumpUIApplication>();
-#else
     if ([NSApp conformsToProtocol:@protocol(CrAppProtocol)]) {
       return std::make_unique<MessagePumpCrApplication>();
     }
@@ -905,13 +769,10 @@ std::unique_ptr<MessagePump> Create() {
     [NSApplication sharedApplication];
     g_not_using_cr_app = true;
     return std::make_unique<MessagePumpNSApplication>();
-#endif
   }
 
   return std::make_unique<MessagePumpNSRunLoop>();
 }
-
-#if !BUILDFLAG(IS_IOS)
 
 bool UsingCrApp() {
   DCHECK(NSThread.isMainThread);
@@ -933,8 +794,6 @@ bool IsHandlingSendEvent() {
   NSObject<CrAppProtocol>* app = static_cast<NSObject<CrAppProtocol>*>(NSApp);
   return [app isHandlingSendEvent];
 }
-
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace message_pump_apple
 

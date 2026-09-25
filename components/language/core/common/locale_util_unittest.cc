@@ -59,12 +59,7 @@ TEST_F(LocaleUtilTest, ConvertToActualUILocale) {
     locale = es_locale;
     is_ui = ConvertToActualUILocale(&locale);
     EXPECT_TRUE(is_ui) << es_locale;
-#if BUILDFLAG(IS_IOS)
-    // iOS uses a different name for es-419 (es-MX).
-    EXPECT_EQ("es-MX", locale) << es_locale;
-#else
     EXPECT_EQ("es-419", locale) << es_locale;
-#endif
   }
 
   // English falls back to US.
@@ -90,12 +85,7 @@ TEST_F(LocaleUtilTest, ConvertToActualUILocale) {
   locale = "pt";
   is_ui = ConvertToActualUILocale(&locale);
   EXPECT_TRUE(is_ui);
-#if BUILDFLAG(IS_IOS)
-  // On iOS, "pt" is used instead of "pt-BR".
-  EXPECT_EQ("pt", locale);
-#else
   EXPECT_EQ("pt-BR", locale);
-#endif
 
   locale = "it-CH";
   is_ui = ConvertToActualUILocale(&locale);

@@ -34,7 +34,7 @@ constexpr char kReportTimestampPref[] = "enterprise.last_report_timestamp";
 constexpr char kStatusKey[] = "status";
 constexpr char kTimeSinceReportKey[] = "timeSinceLastCloudReportSent";
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 constexpr char kExpectedDescriptionKey[] = "statusDevice";
 #else
 constexpr char kExpectedDescriptionKey[] = "statusMachine";

@@ -22,12 +22,12 @@
 namespace enterprise_idle {
 
 namespace {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 const char kCloseBrowsersActionName[] = "close_browsers";
 const char kShowProfilePickerActionName[] = "show_profile_picker";
 const char kClearDownloadHistoryActionName[] = "clear_download_history";
 const char kClearHostedAppDataActionName[] = "clear_hosted_app_data";
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 const char kClearBrowsingHistoryActionName[] = "clear_browsing_history";
 const char kClearCookiesAndOtherSiteDataActionName[] =
     "clear_cookies_and_other_site_data";
@@ -35,17 +35,12 @@ const char kClearCachedImagesAndFilesActionName[] =
     "clear_cached_images_and_files";
 const char kClearPasswordSigninActionName[] = "clear_password_signin";
 const char kClearAutofillActionName[] = "clear_autofill";
-#if BUILDFLAG(IS_IOS)
-const char kSignOut[] = "sign_out";
-const char kCloseTabs[] = "close_tabs";
-#else
 const char kClearSiteSettingsActionName[] = "clear_site_settings";
 const char kReloadPagesActionName[] = "reload_pages";
-#endif  // BUILDFLAG(IS_IOS)
 }  // namespace
 
 std::optional<ActionType> NameToActionType(const std::string& name) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (name == kCloseBrowsersActionName) {
     return ActionType::kCloseBrowsers;
   }
@@ -58,7 +53,7 @@ std::optional<ActionType> NameToActionType(const std::string& name) {
   if (name == kClearHostedAppDataActionName) {
     return ActionType::kClearHostedAppData;
   }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
   if (name == kClearBrowsingHistoryActionName) {
     return ActionType::kClearBrowsingHistory;
   }
@@ -74,21 +69,12 @@ std::optional<ActionType> NameToActionType(const std::string& name) {
   if (name == kClearAutofillActionName) {
     return ActionType::kClearAutofill;
   }
-#if BUILDFLAG(IS_IOS)
-  if (name == kSignOut) {
-    return ActionType::kSignOut;
-  }
-  if (name == kCloseTabs) {
-    return ActionType::kCloseTabs;
-  }
-#else
   if (name == kClearSiteSettingsActionName) {
     return ActionType::kClearSiteSettings;
   }
   if (name == kReloadPagesActionName) {
     return ActionType::kReloadPages;
   }
-#endif  // BUILDFLAG(IS_IOS)
   return std::nullopt;
 }
 

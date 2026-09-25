@@ -14,7 +14,7 @@ namespace metrics {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 const int kStandardUploadIntervalSeconds = 5 * 60;  // Five minutes.
 #else
 const int kStandardUploadIntervalSeconds = 30 * 60;  // Thirty minutes.

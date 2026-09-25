@@ -24,11 +24,11 @@ namespace {
 // `device policies`. This is a helper function that retrieves the expected
 // labelKey.
 std::string GetMachineStatusDescriptionKey() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return "statusDevice";
 #else
   return "statusMachine";
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

@@ -28,9 +28,7 @@
 #include "base/android/device_info.h"
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 #include "components/history_clusters/core/config.h"  // nogncheck
-#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/common/extension_features.h"  // nogncheck
@@ -55,7 +53,7 @@ void AutocompleteClassifier::Shutdown() {
 // static
 int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
   return
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
       // Custom search engines cannot be used on mobile.
       AutocompleteProvider::TYPE_KEYWORD | AutocompleteProvider::TYPE_OPEN_TAB |
       AutocompleteProvider::TYPE_FEATURED_SEARCH |
@@ -86,12 +84,10 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
                  AutocompleteProvider::TYPE_FEATURED_SEARCH
            : 0) |
 #endif
-#if !BUILDFLAG(IS_IOS)
       (history_clusters::GetConfig().is_journeys_enabled_no_locale_check &&
                history_clusters::GetConfig().omnibox_history_cluster_provider
            ? AutocompleteProvider::TYPE_HISTORY_CLUSTER_PROVIDER
            : 0) |
-#endif
       AutocompleteProvider::TYPE_ZERO_SUGGEST |
       AutocompleteProvider::TYPE_ZERO_SUGGEST_LOCAL_HISTORY |
       (base::FeatureList::IsEnabled(omnibox::kDocumentProvider)
@@ -115,7 +111,7 @@ int AutocompleteClassifier::DefaultOmniboxProviders(bool is_low_memory_device) {
       AutocompleteProvider::TYPE_ENTERPRISE_SEARCH_AGGREGATOR |
       AutocompleteProvider::TYPE_VERBATIM_MATCH |
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
       (history_embeddings::GetFeatureParameters().omnibox_scoped ||
                history_embeddings::GetFeatureParameters().omnibox_unscoped
            ? AutocompleteProvider::TYPE_HISTORY_EMBEDDINGS

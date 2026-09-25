@@ -40,7 +40,7 @@ int MapCrashExitCodeForHistogram(int exit_code) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 const char* HostedContentTypeToString(
     RendererHostedContentType hosted_content_type) {
   switch (hosted_content_type) {
@@ -74,7 +74,7 @@ void RecordRendererAbnormalTerminationByHostedContentType(
                     HostedContentTypeToString(hosted_content_type)}),
       status, base::TERMINATION_STATUS_MAX_ENUM);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::string CdmMetricsNameToUmaPrefix(const std::string& metrics_name) {
   const std::string uma_prefix = "Stability.Media.";
@@ -210,13 +210,7 @@ void StabilityMetricsHelper::LogLoadStarted() {
   RecordStabilityEvent(StabilityEventType::kPageLoad);
 }
 
-#if BUILDFLAG(IS_IOS)
-void StabilityMetricsHelper::LogRendererCrash() {
-  // The actual exit code isn't provided on iOS; use a dummy value.
-  constexpr int kDummyExitCode = 105;
-  LogRendererCrashImpl(CoarseRendererType::kRenderer, kDummyExitCode);
-}
-#elif !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 void StabilityMetricsHelper::LogRendererCrash(
     RendererHostedContentType hosted_content_type,
     base::TerminationStatus status,

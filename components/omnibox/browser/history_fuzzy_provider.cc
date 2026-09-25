@@ -463,7 +463,7 @@ HistoryFuzzyProvider::HistoryFuzzyProvider(AutocompleteProviderClient* client)
   // Set up tunable parameters. These can be used to affect fuzzy matching
   // behavior and performance. Note, we use different `min_input_length_` values
   // depending on desktop versus mobile platforms, determined by experiment.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   min_input_length_ = 5;
 #else
   min_input_length_ = 3;

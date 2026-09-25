@@ -42,12 +42,6 @@ std::string GetSystemString() {
       system = "ANDROID ";
       break;
   }
-#elif BUILDFLAG(IS_IOS)
-  if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET) {
-    system = "IOS-TABLET ";
-  } else {
-    system = "IOS-PHONE ";
-  }
 #elif BUILDFLAG(IS_LINUX)
   system = "LINUX ";
 #elif BUILDFLAG(IS_FREEBSD)

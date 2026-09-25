@@ -86,14 +86,14 @@ double GetNumberInNewRange(double number,
 constexpr base::TimeDelta kFirstDelayAtStartup = base::Seconds(15);
 
 // The delay for the all HistoryService queries other than the first one.
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // On mobile, having the max at 60 minutes results in the topsites database
 // being not updated often enough since the app isn't usually running for long
 // stretches of time.
 constexpr base::TimeDelta kDelayForUpdates = base::Minutes(5);
 #else
 constexpr base::TimeDelta kDelayForUpdates = base::Minutes(60);
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Key for preference listing the URLs that should not be shown as most visited
 // tiles.

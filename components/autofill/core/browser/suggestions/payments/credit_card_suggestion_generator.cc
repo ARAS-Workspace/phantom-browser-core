@@ -177,9 +177,6 @@ using SuggestionDataSource = SuggestionGenerator::SuggestionDataSource;
 bool IsSaveAndFillEnabled() {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return base::FeatureList::IsEnabled(features::kAutofillEnableSaveAndFill);
-#elif BUILDFLAG(IS_IOS)
-  return base::FeatureList::IsEnabled(
-      features::kAutofillEnableBottomSheetScanCardAndFill);
 #else
   return false;
 #endif

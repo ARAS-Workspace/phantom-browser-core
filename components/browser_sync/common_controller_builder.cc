@@ -162,7 +162,6 @@ AutofillWalletOfferDelegateFromDataService(
       ->GetControllerDelegate();
 }
 
-#if !BUILDFLAG(IS_IOS)
 base::WeakPtr<syncer::DataTypeControllerDelegate>
 AutofillWalletUsageDataDelegateFromDataService(
     autofill::AutofillWebDataService* service) {
@@ -171,7 +170,6 @@ AutofillWalletUsageDataDelegateFromDataService(
       ->change_processor()
       ->GetControllerDelegate();
 }
-#endif
 
 base::WeakPtr<syncer::DataTypeControllerDelegate>
 ContactInfoDelegateFromDataService(autofill::AutofillWebDataService* service) {
@@ -193,7 +191,7 @@ bool ArePreferencesAllowedInTransportMode() {
           switches::kEnablePreferencesAccountStorage)) {
     return false;
   }
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return syncer::IsReplaceSyncPromosWithSignInPromosEnabled();
 #else
   return true;
@@ -416,12 +414,10 @@ CommonControllerBuilder::Build(syncer::DataTypeSet disabled_types,
     add_controller(CreateAutofillWalletOfferDataTypeController(sync_service));
   }
 
-#if !BUILDFLAG(IS_IOS)
   if (!disabled_types.Has(syncer::AUTOFILL_WALLET_USAGE) &&
       !disabled_types.Has(syncer::AUTOFILL_WALLET_DATA)) {
     add_controller(CreateAutofillWalletUsageDataTypeController(sync_service));
   }
-#endif
 
   if (!disabled_types.Has(syncer::AUTOFILL_WALLET_CREDENTIAL) &&
       !disabled_types.Has(syncer::AUTOFILL_WALLET_DATA)) {
@@ -664,7 +660,6 @@ CommonControllerBuilder::CreateAutofillWalletOfferDataTypeController(
       syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
 }
 
-#if !BUILDFLAG(IS_IOS)
 std::unique_ptr<syncer::DataTypeController>
 CommonControllerBuilder::CreateAutofillWalletUsageDataTypeController(
     syncer::SyncService* sync_service) {
@@ -676,7 +671,6 @@ CommonControllerBuilder::CreateAutofillWalletUsageDataTypeController(
       base::BindRepeating(&AutofillWalletUsageDataDelegateFromDataService),
       sync_service, /*with_transport_mode_support=*/true);
 }
-#endif
 
 std::unique_ptr<syncer::DataTypeController>
 CommonControllerBuilder::CreateAutofillWalletCredentialDataTypeController(
@@ -975,11 +969,6 @@ CommonControllerBuilder::CreateUserConsentsDataTypeController() {
 
 std::unique_ptr<syncer::DataTypeController>
 CommonControllerBuilder::CreateAutofillValuableDataTypeController() {
-#if BUILDFLAG(IS_IOS)
-  if (!base::FeatureList::IsEnabled(syncer::kSyncAutofillValuable)) {
-    return nullptr;
-  }
-#endif
   if (!profile_autofill_web_data_service_.value()) {
     return nullptr;
   }

@@ -477,7 +477,7 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
   EXPECT_THAT(suggestions[0], HasIcon(Suggestion::Icon::kFlight));
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // Tests that no icon is set when `kAutofillAiNoFillingIconsExperiment` is
 // enabled.
 TEST_F(AutofillAiSuggestionGeneratorTest,
@@ -538,7 +538,7 @@ TEST_F(
   std::vector<Suggestion> suggestions =
       CreateAutofillAiFillingSuggestions(field(0));
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(suggestions,
               IdentityDocSuggestionsAre(
                   AllOf(EqualsSuggestion(SuggestionType::kFillAutofillAi,
@@ -565,7 +565,7 @@ TEST_F(
 #endif
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutofillAiSuggestionGeneratorTest,
        GetFillingSuggestion_PersonalContext_HideSuggestion) {
   base::test::ScopedFeatureList scoped_feature_list(
@@ -1251,7 +1251,7 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
   client()
       .GetPersonalContextFirstRunService()
       ->set_should_show_ambient_autofill_notice(true);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(
       CreateAutofillAiFillingSuggestions(field(0)),
       Not(Contains(EqualsSuggestion(SuggestionType::kPersonalContextNotice))));
@@ -2373,7 +2373,7 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
                   SuggestionType::kAutofillAiPrivateInferenceNotice)));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutofillAiSuggestionGeneratorTest,
        PrivateInferenceNoticeNotShownWhenPersonalContextNoticeIsAdded) {
   base::test::ScopedFeatureList scoped_feature_list(

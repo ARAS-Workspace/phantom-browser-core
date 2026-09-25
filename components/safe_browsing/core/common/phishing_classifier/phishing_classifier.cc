@@ -40,24 +40,13 @@ PhishingClassifier::~PhishingClassifier() {
 
 Scorer* PhishingClassifier::GetScorer() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_IOS)
-  return scorer_;
-#else
   return ScorerStorage::GetInstance()->GetScorer();
-#endif
 }
 
 bool PhishingClassifier::is_ready() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return !!GetScorer();
 }
-
-#if BUILDFLAG(IS_IOS)
-void PhishingClassifier::set_scorer(Scorer* scorer) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  scorer_ = scorer;
-}
-#endif
 
 void PhishingClassifier::SetClientSideDetectionType(
     std::optional<safe_browsing::ClientSideDetectionType> request_type) {

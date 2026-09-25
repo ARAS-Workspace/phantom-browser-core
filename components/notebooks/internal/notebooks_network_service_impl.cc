@@ -173,8 +173,6 @@ Device GetDevice() {
     return Device::kDesktopAndroid;
   }
   return Device::kMobileAndroid;
-#elif BUILDFLAG(IS_IOS)
-  return Device::kMobileIos;
 #elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return Device::kDesktop;
 #else
@@ -202,8 +200,6 @@ ApplicationPlatform GetApplicationPlatform() {
   if (base::android::device_info::is_desktop()) {
     return ApplicationPlatform::kWeb;
   }
-  return ApplicationPlatform::kNative;
-#elif BUILDFLAG(IS_IOS)
   return ApplicationPlatform::kNative;
 #else
   return ApplicationPlatform::kWeb;

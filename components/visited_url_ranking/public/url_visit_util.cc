@@ -68,8 +68,6 @@ PlatformType GetPlatformInput() {
   return PlatformType::kMac;
 #elif BUILDFLAG(IS_LINUX)
   return PlatformType::kLinux;
-#elif BUILDFLAG(IS_IOS)
-  return PlatformType::kIos;
 #elif BUILDFLAG(IS_ANDROID)
   return PlatformType::kAndroid;
 #else
@@ -495,35 +493,6 @@ const Decoration& GetMostRelevantDecoration(
 
 std::u16string GetStringForDecoration(DecorationType type,
                                       bool visited_recently) {
-#if BUILDFLAG(IS_IOS)
-  switch (type) {
-    case DecorationType::kMostRecent:
-      return l10n_util::GetStringUTF16(
-          IDS_TAB_RESUME_DECORATORS_MOST_RECENT_IOS);
-    case DecorationType::kFrequentlyVisitedAtTime:
-      return l10n_util::GetStringUTF16(
-          IDS_TAB_RESUME_DECORATORS_FREQUENTLY_VISITED_IOS);
-    case DecorationType::kFrequentlyVisited:
-      return l10n_util::GetStringUTF16(
-          IDS_TAB_RESUME_DECORATORS_FREQUENTLY_VISITED_IOS);
-    case DecorationType::kVisitedXAgo:
-      if (visited_recently) {
-        return l10n_util::GetStringUTF16(
-            IDS_TAB_RESUME_DECORATORS_VISITED_RECENTLY_IOS);
-      } else {
-        return l10n_util::GetStringUTF16(
-            IDS_TAB_RESUME_DECORATORS_VISITED_X_AGO_IOS);
-      }
-    case DecorationType::kUnknown:
-      if (visited_recently) {
-        return l10n_util::GetStringUTF16(
-            IDS_TAB_RESUME_DECORATORS_VISITED_RECENTLY_IOS);
-      } else {
-        return l10n_util::GetStringUTF16(
-            IDS_TAB_RESUME_DECORATORS_VISITED_X_AGO_IOS);
-      }
-  }
-#else
   switch (type) {
     case DecorationType::kMostRecent:
       return l10n_util::GetStringUTF16(IDS_TAB_RESUME_DECORATORS_MOST_RECENT);
@@ -550,7 +519,6 @@ std::u16string GetStringForDecoration(DecorationType type,
             IDS_TAB_RESUME_DECORATORS_VISITED_X_AGO);
       }
   }
-#endif
 }
 
 std::u16string GetStringForRecencyDecorationWithTime(
@@ -562,7 +530,7 @@ std::u16string GetStringForRecencyDecorationWithTime(
                                   /*visited_recently=*/true);
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   std::u16string relative_time = FormatRelativeTime(last_visit_time);
   if (relative_time.find(u"hour") != std::string::npos) {
     relative_time.erase(relative_time.find(u"hour"));

@@ -54,11 +54,6 @@ const char kFaviconUrl[] = "favicon_url";
 const char kSection[] = "section";
 const char kSites[] = "sites";
 const char kTitleSource[] = "title_source";
-#if BUILDFLAG(IS_IOS)
-const char kIOSDefaultPopularSitesLocaleUS[] =
-    "https://www.gstatic.com/chrome/ntp/ios/"
-    "suggested_sites_US_2023q1_mvt_experiment_with_popular_sites.json";
-#endif
 
 using TestPopularSite = std::map<std::string, std::string>;
 using TestPopularSiteVector = std::vector<TestPopularSite>;
@@ -74,7 +69,7 @@ using TestPopularSectionVector = std::vector<TestPopularSection>;
 }
 
 size_t GetNumberOfDefaultPopularSitesForPlatform() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return 8ul;
 #else
   return 0ul;
@@ -258,25 +253,6 @@ TEST_F(PopularSitesTest, ShouldSucceedFetching) {
   EXPECT_THAT(sites[0].title_source, Eq(TileTitleSource::TITLE_TAG));
 }
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(PopularSitesTest, ShouldSucceedFetchingDefaultPopularSitesForLocaleUS) {
-  SetCountryAndVersion("US", "7");
-  RespondWithV5JSON(kIOSDefaultPopularSitesLocaleUS, {kWikipedia});
-
-  PopularSites::SitesVector sites;
-  EXPECT_THAT(FetchPopularSites(/*force_download=*/true, &sites),
-              Eq(std::optional<bool>(true)));
-
-  ASSERT_THAT(sites.size(), Eq(1u));
-  EXPECT_THAT(sites[0].title, Str16Eq("Wikipedia, fhta Ph'nglui mglw'nafh"));
-  EXPECT_THAT(sites[0].url, URLEq("https://zz.m.wikipedia.org/"));
-  EXPECT_THAT(sites[0].large_icon_url,
-              URLEq("https://zz.m.wikipedia.org/wikipedia.png"));
-  EXPECT_THAT(sites[0].favicon_url, URLEq(""));
-  EXPECT_THAT(sites[0].title_source, Eq(TileTitleSource::TITLE_TAG));
-}
-#endif
-
 TEST_F(PopularSitesTest, Fallback) {
   SetCountryAndVersion("ZZ", "7");
   RespondWith404(
@@ -319,7 +295,7 @@ TEST_F(PopularSitesTest, PopulatesWithDefaultResoucesOnFailure) {
   EXPECT_THAT(sites.size(), Eq(GetNumberOfDefaultPopularSitesForPlatform()));
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(PopularSitesTest, AddsIconResourcesToDefaultPages) {
   std::unique_ptr<PopularSites> popular_sites = CreatePopularSites();
 

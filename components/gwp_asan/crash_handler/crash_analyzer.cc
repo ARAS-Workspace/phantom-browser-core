@@ -38,28 +38,10 @@
 #include <mach/exception_types.h>
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "third_party/crashpad/crashpad/snapshot/ios/process_snapshot_ios_intermediate_dump.h"
-#endif  // BUILDFLAG(IS_IOS)
-
 namespace gwp_asan {
 namespace internal {
 
 namespace {
-
-#if BUILDFLAG(IS_IOS)
-class ReadToPointer : public crashpad::MemorySnapshot::Delegate {
- public:
-  ReadToPointer(void* ptr) : ptr_(ptr) {}
-
-  bool MemorySnapshotDelegateRead(void* data, size_t size) override {
-    UNSAFE_TODO(memcpy(ptr_, data, size));
-    return true;
-  }
-
-  raw_ptr<void> ptr_;
-};
-#endif  // BUILDFLAG(IS_IOS)
 
 // Report failure for a particular allocator's histogram.
 void ReportHistogram(Crash_Allocator allocator,
@@ -185,19 +167,6 @@ bool CrashAnalyzer::GetState(const crashpad::ProcessSnapshot& process_snapshot,
     return false;
   }
 
-#if BUILDFLAG(IS_IOS)
-  for (auto memory :
-       reinterpret_cast<
-           const crashpad::internal::ProcessSnapshotIOSIntermediateDump&>(
-           process_snapshot)
-           .IntermediateDumpExtraMemory()) {
-    if (memory->Address() == state_addr && memory->Size() == sizeof(*state)) {
-      ReadToPointer delegate(state);
-      memory->Read(&delegate);
-      break;
-    }
-  }
-#else   // BUILDFLAG(IS_IOS)
   const crashpad::ProcessMemory* memory = process_snapshot.Memory();
   if (!memory) {
     DLOG(ERROR) << "Null ProcessMemory.";
@@ -212,7 +181,6 @@ bool CrashAnalyzer::GetState(const crashpad::ProcessSnapshot& process_snapshot,
                     GwpAsanCrashAnalysisResult::kErrorFailedToReadAllocator);
     return false;
   }
-#endif  // BUILDFLAG(IS_IOS)
 
   if (!state->IsValid()) {
     DLOG(ERROR) << "Allocator sanity check failed!";
@@ -250,35 +218,12 @@ bool CrashAnalyzer::AnalyzeLightweightDetectorCrash(
   }
 
   size_t slot_count = valid_state.num_metadata;
-#if BUILDFLAG(IS_IOS)
-  std::unique_ptr<LightweightDetectorState::SlotMetadata[]> metadata_arr;
-  for (auto memory :
-       reinterpret_cast<
-           const crashpad::internal::ProcessSnapshotIOSIntermediateDump&>(
-           process_snapshot)
-           .IntermediateDumpExtraMemory()) {
-    if (memory->Address() == valid_state.metadata_addr &&
-        memory->Size() ==
-            sizeof(LightweightDetectorState::SlotMetadata) * slot_count) {
-      metadata_arr = std::make_unique<LightweightDetectorState::SlotMetadata[]>(
-          slot_count);
-      ReadToPointer delegate(metadata_arr.get());
-      memory->Read(&delegate);
-    }
-    if (metadata_arr != nullptr) {
-      break;
-    }
-  }
-
-  if (metadata_arr == nullptr) {
-#else   // BUILDFLAG(IS_IOS)
   auto metadata_arr =
       std::make_unique<LightweightDetectorState::SlotMetadata[]>(slot_count);
   if (!process_snapshot.Memory()->Read(
           valid_state.metadata_addr,
           sizeof(LightweightDetectorState::SlotMetadata) * slot_count,
           metadata_arr.get())) {
-#endif  // BUILDFLAG(IS_IOS)
     ReportHistogram(
         Crash_Allocator_PARTITIONALLOC,
         GwpAsanCrashAnalysisResult::kErrorFailedToReadLightweightSlotMetadata);
@@ -415,50 +360,6 @@ bool CrashAnalyzer::AnalyzeCrashedAllocator(
   proto->set_missing_metadata(true);
   proto->set_allocator(allocator);
 
-#if BUILDFLAG(IS_IOS)
-  // Read the allocator's entire metadata array and slot_to_metadata mapping.
-  std::unique_ptr<AllocatorState::SlotMetadata[]> metadata_arr;
-  std::unique_ptr<AllocatorState::MetadataIdx[]> slot_to_metadata;
-  for (auto memory :
-       reinterpret_cast<
-           const crashpad::internal::ProcessSnapshotIOSIntermediateDump&>(
-           process_snapshot)
-           .IntermediateDumpExtraMemory()) {
-    if (memory->Address() == valid_state.metadata_addr &&
-        memory->Size() ==
-            sizeof(AllocatorState::SlotMetadata) * valid_state.num_metadata) {
-      metadata_arr = std::make_unique<AllocatorState::SlotMetadata[]>(
-          valid_state.num_metadata);
-      ReadToPointer delegate(metadata_arr.get());
-      memory->Read(&delegate);
-    } else if (memory->Address() == valid_state.slot_to_metadata_addr &&
-               memory->Size() == sizeof(AllocatorState::MetadataIdx) *
-                                     valid_state.total_reserved_pages) {
-      slot_to_metadata = std::make_unique<AllocatorState::MetadataIdx[]>(
-          valid_state.total_reserved_pages);
-      ReadToPointer delegate(slot_to_metadata.get());
-      memory->Read(&delegate);
-    }
-
-    if (metadata_arr != nullptr && slot_to_metadata != nullptr) {
-      break;
-    }
-  }
-
-  if (metadata_arr == nullptr) {
-    proto->set_internal_error("Failed to read metadata.");
-    ReportHistogram(allocator,
-                    GwpAsanCrashAnalysisResult::kErrorFailedToReadSlotMetadata);
-    return true;
-  }
-  if (slot_to_metadata == nullptr) {
-    proto->set_internal_error("Failed to read slot_to_metadata.");
-    ReportHistogram(
-        allocator,
-        GwpAsanCrashAnalysisResult::kErrorFailedToReadSlotMetadataMapping);
-    return true;
-  }
-#else   // BUILDFLAG(IS_IOS)
   // Read the allocator's entire metadata array.
   auto metadata_arr = std::make_unique<AllocatorState::SlotMetadata[]>(
       valid_state.num_metadata);
@@ -485,7 +386,6 @@ bool CrashAnalyzer::AnalyzeCrashedAllocator(
         GwpAsanCrashAnalysisResult::kErrorFailedToReadSlotMetadataMapping);
     return true;
   }
-#endif  // BUILDFLAG(IS_IOS)
 
   AllocatorState::MetadataIdx metadata_idx;
   std::string error;

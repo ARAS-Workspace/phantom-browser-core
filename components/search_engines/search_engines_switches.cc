@@ -37,21 +37,13 @@ BASE_FEATURE(kIgnoreSearchProviderOverrides, base::FEATURE_ENABLED_BY_DEFAULT);
 // Invalidates old search engine choices when Chrome detects that it has been
 // transferred to a new device.
 BASE_FEATURE(kInvalidateSearchEngineChoiceOnDeviceRestoreDetection,
-#if BUILDFLAG(IS_IOS)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 const base::FeatureParam<bool> kInvalidateChoiceOnRestoreIsRetroactive{
     /*feature=*/&kInvalidateSearchEngineChoiceOnDeviceRestoreDetection,
     /*name=*/"is_retroactive",
-#if BUILDFLAG(IS_IOS)
-    /*default_value=*/true
-#else
     /*default_value=*/false
-#endif
 };
 
 // Use an explicit "NO_REPROMPT" value as default to avoid reprompting users
@@ -90,9 +82,8 @@ BASE_FEATURE(kApplyDeviceChoiceRenewal, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kSearchSettingsUpdate, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kSearchSettingsUpdateV2, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
-
+#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace switches

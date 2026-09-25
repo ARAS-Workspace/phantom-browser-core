@@ -1051,15 +1051,11 @@ class CreditCardOtpAuthenticatorCardBenefitsTest
   }
 
   bool ShouldShowCardBenefits() const {
-#if !BUILDFLAG(IS_IOS)
     // Benefits sourced from Curinos currently only supports flat rate benefits.
     if (GetBenefitSource() == "curinos") {
       return std::holds_alternative<CreditCardFlatRateBenefit>(GetBenefit());
     }
     return true;
-#else
-    return false;
-#endif  // !BUILDFLAG(IS_IOS)
   }
 
   const CreditCard& card() { return card_; }

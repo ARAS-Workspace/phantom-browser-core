@@ -248,8 +248,8 @@ TEST_F(PasswordFormFillingTest, Autofill) {
       /*suggestion_banned_fields=*/{});
 
   // On Android, Mac and Win authentication will prevent autofilling credentials
-  // on page load. On iOS Reauth is always required.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) || BUILDFLAG(IS_MAC)
+  // on page load.
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
   EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
   EXPECT_TRUE(fill_data.wait_for_username);
 #else
@@ -337,8 +337,8 @@ TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestion) {
     // kFillOnAccountSelect.
     if (test_case.current_password_present) {
       // On Android, Mac and Win authentication will prevent autofilling
-      // credentials on page load. On iOS Reauth is always required.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) || BUILDFLAG(IS_MAC)
+      // credentials on page load.
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
       EXPECT_EQ(LikelyFormFilling::kFillOnAccountSelect, likely_form_filling);
 #else
       EXPECT_EQ(LikelyFormFilling::kFillOnPageLoad, likely_form_filling);
@@ -349,7 +349,7 @@ TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestion) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasswordFormFillingTest, FillWithOnlyWebAuthnCredentials) {
   observed_form_.accepts_webauthn_credentials = true;
   std::vector<PasswordForm> best_matches = {saved_match_};
@@ -366,9 +366,9 @@ TEST_F(PasswordFormFillingTest, FillWithOnlyWebAuthnCredentials) {
 
 // Test autofill when username and password are prefilled. Check that we not
 // overwrite values in the form if username doesn't look like a placeholder.
-// Skip for Android and iOS since it uses touch to fill, meaning placeholders
+// Skip for Android since it uses touch to fill, meaning placeholders
 // will never be overwritten.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(PasswordFormFillingTest, TestFillOnLoadSuggestionWithPrefill) {
   PasswordForm preferred_match = saved_match_;
   std::vector<PasswordForm> best_matches = {preferred_match};
@@ -442,7 +442,7 @@ TEST_F(PasswordFormFillingTest, NoAutofillOnHttp) {
   ASSERT_FALSE(GURL(saved_http_match.signon_realm).SchemeIsCryptographic());
   std::vector<PasswordForm> best_matches = {saved_http_match};
 
-#if !BUILDFLAG(IS_IOS) && !defined(ANDROID)
+#if !defined(ANDROID)
   EXPECT_CALL(client_, IsCommittedMainFrameSecure).WillOnce(Return(false));
 #endif
   LikelyFormFilling likely_form_filling = SendFillInformationToRenderer(
@@ -506,9 +506,9 @@ TEST_F(PasswordFormFillingTest, AutofillAffiliatedWebMatch) {
       PasswordFormMetricsRecorder::MatchedFormType::kAffiliatedWebsites, 1);
 }
 
-// Exclude Android and iOS, because there credentials are not filled on
+// Exclude Android, because there credentials are not filled on
 // the page load in any case.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 
 TEST_F(PasswordFormFillingTest, NoFillOnPageloadWithCrossOriginAncestor) {
   base::HistogramTester histogram_tester;
@@ -608,7 +608,7 @@ TEST_F(PasswordFormFillingTest, NoFillOnPageLoadForLeakedPassword) {
           kPasswordChangeOngoing,
       1);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests that the when there is a single preferred match, and no extra
 // matches, the PasswordFormFillData is filled in correctly.

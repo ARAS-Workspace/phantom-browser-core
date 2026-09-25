@@ -199,7 +199,7 @@ void MaybeClearAccountKeyedPreferences(
     signin::IdentityManager* identity_manager,
     const signin::AccountsInCookieJarInfo& accounts_in_cookie_jar_info,
     SyncUserSettingsImpl& user_settings) {
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   if (accounts_in_cookie_jar_info.AreAccountsFresh()) {
     // Clear settings for accounts no longer in the cookie jar. On Android
     // and iOS this is done when the account is removed from the OS instead.
@@ -208,7 +208,7 @@ void MaybeClearAccountKeyedPreferences(
             identity_manager, accounts_in_cookie_jar_info));
     user_settings.KeepAccountSettingsPrefsOnlyForUsers(gaia_ids);
   }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace
@@ -844,7 +844,7 @@ SyncService::TransportState SyncServiceImpl::GetTransportState() const {
 
 SyncService::UserActionableError SyncServiceImpl::GetUserActionableError()
     const {
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   if (HasSyncConsent()) {
     if (!GetUserSettings()->IsInitialSyncFeatureSetupComplete()) {
       return UserActionableError::kNeedsSettingsConfirmation;
@@ -855,17 +855,9 @@ SyncService::UserActionableError SyncServiceImpl::GetUserActionableError()
       return UserActionableError::kUnrecoverableError;
     }
   }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (GetAuthError().state() != GoogleServiceAuthError::NONE) {
-#if BUILDFLAG(IS_IOS)
-    if (GetAuthError().state() ==
-            GoogleServiceAuthError::DEVICE_MANAGEMENT_ERROR &&
-        base::FeatureList::IsEnabled(
-            switches::kHandleMdmErrorsForDasherAccounts)) {
-      return UserActionableError::kDeviceManagementError;
-    }
-#endif  // BUILDFLAG(IS_IOS)
     return UserActionableError::kSignInNeedsUpdate;
   }
   if (last_actionable_error_.action == UPGRADE_CLIENT) {
@@ -1120,7 +1112,7 @@ void SyncServiceImpl::OnActionableProtocolError(
         // platforms. Any platforms which support a single-step flow that signs
         // in and enables sync should clear the primary account here for
         // symmetry.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
         // On mobile, fully sign out the user (clear the primary account) but
         // do not remove the list of known accounts, as the user may sign in
         // again.
@@ -1142,7 +1134,7 @@ void SyncServiceImpl::OnActionableProtocolError(
         // ConsentLevel::kSignin is not supported.
         account_mutator->RevokeSyncConsent(
             signin_metrics::ProfileSignout::kServerForcedDisable);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
       }
       break;
     case STOP_SYNC_FOR_DISABLED_ACCOUNT:
@@ -1352,7 +1344,7 @@ void SyncServiceImpl::ReconfigureDataTypesDueToCrypto() {
 
 void SyncServiceImpl::PassphraseTypeChanged(PassphraseType passphrase_type) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // If kReplaceSyncPromosWithSignInPromos is enabled, new users with custom
   // passphrase should have kAutofill disabled upon the initial sign-in. This is
   // done to prevent confusion, as addresses are NOT encrypted by the custom
@@ -2099,7 +2091,7 @@ SyncTokenStatus SyncServiceImpl::GetSyncTokenStatusForDebugging() const {
   return auth_manager_->GetSyncTokenStatus();
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 void SyncServiceImpl::OverrideNetworkForTest(
     const CreateHttpPostProviderFactory& create_http_post_provider_factory_cb) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -2147,7 +2139,7 @@ void SyncServiceImpl::OverrideNetworkForTest(
     TryStart();
   }
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 SyncEncryptionHandler::Observer*
 SyncServiceImpl::GetEncryptionObserverForTest() {

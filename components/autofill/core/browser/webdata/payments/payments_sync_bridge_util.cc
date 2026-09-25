@@ -785,7 +785,7 @@ void SetAutofillOfferSpecificsFromOfferData(
       (offer_data.GetExpiry() - base::Time::UnixEpoch()).InSeconds());
   offer_specifics->mutable_display_strings()->set_value_prop_text(
       offer_data.GetDisplayStrings().value_prop_text);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   offer_specifics->mutable_display_strings()->set_see_details_text_mobile(
       offer_data.GetDisplayStrings().see_details_text);
   offer_specifics->mutable_display_strings()
@@ -797,7 +797,7 @@ void SetAutofillOfferSpecificsFromOfferData(
   offer_specifics->mutable_display_strings()
       ->set_usage_instructions_text_desktop(
           offer_data.GetDisplayStrings().usage_instructions_text);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Because card_linked_offer_data and promo_code_offer_data are a oneof,
   // setting one will clear the other. We should figure out which one we care
@@ -840,7 +840,7 @@ AutofillOfferData AutofillOfferDataFromOfferSpecifics(
   DisplayStrings display_strings;
   display_strings.value_prop_text =
       offer_specifics.display_strings().value_prop_text();
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   display_strings.see_details_text =
       offer_specifics.display_strings().see_details_text_mobile();
   display_strings.usage_instructions_text =
@@ -850,7 +850,7 @@ AutofillOfferData AutofillOfferDataFromOfferSpecifics(
       offer_specifics.display_strings().see_details_text_desktop();
   display_strings.usage_instructions_text =
       offer_specifics.display_strings().usage_instructions_text_desktop();
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   if (offer_specifics.promo_code_offer_data().promo_code().empty()) {
     // Card-linked offer fields:
@@ -879,18 +879,7 @@ AutofillOfferData AutofillOfferDataFromOfferSpecifics(
 sync_pb::AutofillWalletCredentialSpecifics
 AutofillWalletCredentialSpecificsFromStructData(const ServerCvc& server_cvc) {
   sync_pb::AutofillWalletCredentialSpecifics wallet_credential_specifics;
-#if BUILDFLAG(IS_IOS)
-  // TODO(crbug.com/542769367): Downgraded to NotFatalUntil as a short-term
-  // fix for production crashes until root-cause investigation completes.
-  if (base::FeatureList::IsEnabled(
-          features::kAutofillIgnoreEmptyCvcsInSyncBridge)) {
-    CHECK(!server_cvc.cvc.empty(), base::NotFatalUntil::M156);
-  } else {
-    CHECK(!server_cvc.cvc.empty());
-  }
-#else
   CHECK(!server_cvc.cvc.empty());
-#endif
   wallet_credential_specifics.set_instrument_id(
       base::NumberToString(server_cvc.instrument_id));
   wallet_credential_specifics.set_cvc(base::UTF16ToUTF8(server_cvc.cvc));

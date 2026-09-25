@@ -131,13 +131,6 @@ bool StructTraits<gfx::mojom::IOSurfaceHandleDataView, IOSurfaceHandle>::Read(
   if (!handle->mach_send_right.is_valid()) {
     return false;
   }
-#if BUILDFLAG(IS_IOS)
-  if (!data.ReadSharedMemoryHandle(&handle->shared_memory_region) ||
-      !data.ReadPlaneStrides(&handle->plane_strides) ||
-      !data.ReadPlaneOffsets(&handle->plane_offsets)) {
-    return false;
-  }
-#endif
   return true;
 }
 #endif  // BUILDFLAG(IS_APPLE)
@@ -185,17 +178,8 @@ IOSurfaceHandle UnionTraits<gfx::mojom::GpuMemoryBufferPlatformHandleDataView,
     io_surface_handle(gfx::GpuMemoryBufferHandle& gmb_handle) {
   IOSurfaceHandle io_surface_handle;
   gfx::ScopedRefCountedIOSurfaceMachPort io_surface_mach_port;
-#if BUILDFLAG(IS_IOS)
-  io_surface_handle.mach_send_right.reset(
-      gmb_handle.io_surface_mach_port_.release());
-  io_surface_handle.shared_memory_region =
-      std::move(gmb_handle.io_surface_shared_memory_region_);
-  io_surface_handle.plane_strides = gmb_handle.io_surface_plane_strides_;
-  io_surface_handle.plane_offsets = gmb_handle.io_surface_plane_offsets_;
-#else
   io_surface_handle.mach_send_right.reset(
       IOSurfaceCreateMachPort(gmb_handle.io_surface().get()));
-#endif
   return io_surface_handle;
 }
 #endif  // BUILDFLAG(IS_APPLE)
@@ -222,14 +206,6 @@ bool UnionTraits<gfx::mojom::GpuMemoryBufferPlatformHandleDataView,
       } else {
         gmb_handle->io_surface_.reset();
       }
-#if BUILDFLAG(IS_IOS)
-      gmb_handle->io_surface_mach_port_.reset(
-          io_surface_handle.mach_send_right.release());
-      gmb_handle->io_surface_shared_memory_region_ =
-          std::move(io_surface_handle.shared_memory_region);
-      gmb_handle->io_surface_plane_strides_ = io_surface_handle.plane_strides;
-      gmb_handle->io_surface_plane_offsets_ = io_surface_handle.plane_offsets;
-#endif
       return true;
 #endif  // BUILDFLAG(IS_APPLE)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OZONE)

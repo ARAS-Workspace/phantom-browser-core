@@ -41,17 +41,10 @@ constexpr FeaturePair<SearchUserModel::Feature> kFeatures[] = {
                        kOnlySearch)},
 };
 
-#if BUILDFLAG(IS_IOS)
-constexpr UkmEventHash kPageLoadHash = UkmEventHash::FromUnsafeValue(
-    ukm::builders::MainFrameNavigation::kEntryNameHash);
-constexpr UkmMetricHash kNavMetricHash = UkmMetricHash::FromUnsafeValue(
-    ukm::builders::MainFrameNavigation::kDidCommitNameHash);
-#else
 constexpr UkmEventHash kPageLoadHash =
     UkmEventHash::FromUnsafeValue(ukm::builders::PageLoad::kEntryNameHash);
 constexpr UkmMetricHash kNavMetricHash = UkmMetricHash::FromUnsafeValue(
     ukm::builders::PageLoad::kPaintTiming_NavigationToFirstPaintNameHash);
-#endif
 
 std::unique_ptr<DefaultModelProvider> GetSearchUserDefaultModel() {
   if (!base::GetFieldTrialParamByFeatureAsBool(

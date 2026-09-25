@@ -21,11 +21,7 @@
 #include "ui/gfx/image/image_skia_rep.h"
 #include "ui/gfx/test/sk_color_eq.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "base/apple/scoped_cftyperef.h"
-#include "skia/ext/skia_utils_ios.h"
-#include "ui/base/resource/resource_scale_factor.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #include "skia/ext/skia_utils_mac.h"
 #endif
@@ -193,21 +189,7 @@ bool IsEmpty(const gfx::Image& image) {
 
 PlatformImage CreatePlatformImage() {
   SkBitmap bitmap(CreateBitmap(25, 25));
-#if BUILDFLAG(IS_IOS)
-  const float scale = ui::GetScaleForMaxSupportedResourceScaleFactor();
-
-  if (scale > 1.0) {
-    // Always create a 25pt x 25pt image.
-    const int size = static_cast<int>(25 * scale);
-    bitmap = CreateBitmap(size, size);
-  }
-
-  base::apple::ScopedCFTypeRef<CGColorSpaceRef> color_space(
-      CGColorSpaceCreateDeviceRGB());
-  UIImage* image =
-      skia::SkBitmapToUIImageWithColorSpace(bitmap, scale, color_space.get());
-  return image;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   NSImage* image = skia::SkBitmapToNSImage(bitmap);
   return image;
 #else
@@ -216,9 +198,7 @@ PlatformImage CreatePlatformImage() {
 }
 
 gfx::Image::RepresentationType GetPlatformRepresentationType() {
-#if BUILDFLAG(IS_IOS)
-  return gfx::Image::kImageRepCocoaTouch;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return gfx::Image::kImageRepCocoa;
 #else
   return gfx::Image::kImageRepSkia;
@@ -226,9 +206,7 @@ gfx::Image::RepresentationType GetPlatformRepresentationType() {
 }
 
 PlatformImage ToPlatformType(const gfx::Image& image) {
-#if BUILDFLAG(IS_IOS)
-  return image.ToUIImage();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return image.ToNSImage();
 #else
   return image.AsImageSkia();
@@ -236,9 +214,7 @@ PlatformImage ToPlatformType(const gfx::Image& image) {
 }
 
 gfx::Image CopyViaPlatformType(const gfx::Image& image) {
-#if BUILDFLAG(IS_IOS)
-  return gfx::Image(image.ToUIImage());
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return gfx::Image(image.ToNSImage());
 #else
   return gfx::Image(image.AsImageSkia());

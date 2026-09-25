@@ -35,7 +35,7 @@ namespace optimization_guide::features {
 namespace {
 
 constexpr auto enabled_by_default_mobile_only =
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     base::FEATURE_ENABLED_BY_DEFAULT;
 #else
     base::FEATURE_DISABLED_BY_DEFAULT;

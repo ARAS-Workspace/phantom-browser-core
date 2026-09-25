@@ -41,7 +41,7 @@ constexpr ProgramSettings kWaffleWithLocationRestrictionSettings = []() {
   return ret;
 }();
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 constexpr country_codes::CountryId kTaiyakiCountry("JP");
 
 constexpr ProgramSettings kTaiyakiSettings{
@@ -61,15 +61,7 @@ constexpr ProgramSettings kTaiyakiSettings{
             .highlight_current_default = true,
         },
 };
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-constexpr ProgramSettings kTaiyakiSettingsFreOnly = []() {
-  ProgramSettings ret = kTaiyakiSettings;
-  ret.choice_screen_eligibility_config->restrict_surfaces_to_fre_only = true;
-  return ret;
-}();
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 constexpr ProgramSettings kDefaultSettings{
     .program = Program::kDefault,
@@ -109,7 +101,7 @@ bool IsInProgramRegion(Program program,
 bool IsClientCompatibleWithProgram(Program program) {
   switch (program) {
     case Program::kTaiyaki:
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
       switch (ui::GetDeviceFormFactor()) {
         case ui::DEVICE_FORM_FACTOR_PHONE:
         case ui::DEVICE_FORM_FACTOR_FOLDABLE:
@@ -133,12 +125,7 @@ bool IsClientCompatibleWithProgram(Program program) {
 const ProgramSettings& GetSettingsForProgram(Program program) {
   switch (program) {
     case Program::kTaiyaki:
-#if BUILDFLAG(IS_IOS)
-      if (!base::FeatureList::IsEnabled(switches::kTaiyakiAllSurfaces)) {
-        return kTaiyakiSettingsFreOnly;
-      }
-#endif
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
       return kTaiyakiSettings;
 #else
       NOTREACHED();

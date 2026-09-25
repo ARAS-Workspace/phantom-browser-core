@@ -25,8 +25,6 @@
 namespace {
 #if BUILDFLAG(IS_ANDROID)
 const char kSigninChromeSyncKeysPlatformSuffix[] = "android";
-#elif BUILDFLAG(IS_IOS)
-const char kSigninChromeSyncKeysPlatformSuffix[] = "ios";
 #else
 const char kSigninChromeSyncKeysPlatformSuffix[] = "desktop";
 #endif

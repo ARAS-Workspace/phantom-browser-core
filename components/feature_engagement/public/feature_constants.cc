@@ -18,17 +18,8 @@ BASE_FEATURE(kIPHDemoMode, "IPH_DemoMode", base::FEATURE_DISABLED_BY_DEFAULT);
 // Features used by various clients to show their In-Product Help messages.
 BASE_FEATURE(kIPHDummyFeature, "IPH_Dummy", base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_IOS)
-// Feature used to add on-device storage for feature engagement.
-BASE_FEATURE(kOnDeviceStorage, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 bool IsOnDeviceStorageEnabled() {
-#if BUILDFLAG(IS_IOS)
-  return base::FeatureList::IsEnabled(kOnDeviceStorage);
-#else
   return false;
-#endif
 }
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
@@ -676,280 +667,14 @@ BASE_FEATURE(kIPHTabTearingXR,
 // BASE_FEATURE_ANDROID_END
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kIPHBottomToolbarTipFeature,
              "IPH_BottomToolbarTip",
              base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHSendTabToSelfOmnibox,
              "IPH_SendTabToSelfOmnibox",
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kIPHLongPressToolbarTipFeature,
-             "IPH_LongPressToolbarTip",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHBadgedReaderModeFeature,
-             "IPH_BadgedReaderMode",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHBadgedReadingListFeature,
-             "IPH_BadgedReadingList",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHWhatsNewFeature,
-             "IPH_WhatsNew",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHWhatsNewUpdatedFeature,
-             "IPH_WhatsNewUpdated",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHReadingListMessagesFeature,
-             "IPH_ReadingListMessages",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHBadgedTranslateManualTriggerFeature,
-             "IPH_BadgedTranslateManualTrigger",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHDiscoverFeedHeaderFeature,
-             "IPH_DiscoverFeedHeaderMenu",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHDefaultSiteViewFeature,
-             "IPH_DefaultSiteView",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHFollowWhileBrowsingFeature,
-             "IPH_FollowWhileBrowsing",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHPriceNotificationsWhileBrowsingFeature,
-             "IPH_PriceNotificationsWhileBrowsing",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSDefaultBrowserBadgeEligibilityFeature,
-             "IPH_iOSDefaultBrowserBadgeEligibility",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSDefaultBrowserOverflowMenuBadgeFeature,
-             "IPH_iOSDefaultBrowserOverflowMenuBadge",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSDownloadAutoDeletionFeature,
-             "IPH_iOSDownloadAutoDeletion",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSLensKeyboardFeature,
-             "IPH_iOSLensKeyboard",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSBackendPromoFeature,
-             "IPH_iOSBackendPromoFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoAppStoreFeature,
-             "IPH_iOSPromoAppStore",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoWhatsNewFeature,
-             "IPH_iOSPromoWhatsNew",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoBackgroundCustomizationFeature,
-             "IPH_iOSPromoBackgroundCustomization",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoSigninFullscreenFeature,
-             "IPH_iOSPromoSigninFullscreen",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoPostRestoreFeature,
-             "IPH_iOSPromoPostRestore",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoCredentialProviderExtensionFeature,
-             "IPH_iOSPromoCredentialProviderExtension",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoDefaultBrowserReminderFeature,
-             "IPH_iOSPromoDefaultBrowserReminder",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSHistoryOnOverflowMenuFeature,
-             "IPH_iOSHistoryOnOverflowMenuFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoPostRestoreDefaultBrowserFeature,
-             "IPH_iOSPromoPostRestoreDefaultBrowser",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoNonModalUrlPasteDefaultBrowserFeature,
-             "IPH_iOSPromoNonModalUrlPasteDefaultBrowser",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoNonModalAppSwitcherDefaultBrowserFeature,
-             "IPH_iOSPromoNonModalAppSwitcherDefaultBrowser",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoNonModalShareDefaultBrowserFeature,
-             "IPH_iOSPromoNonModalShareDefaultBrowser",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoNonModalSigninPasswordFeature,
-             "IPH_iOSPromoNonModalSigninPassword",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoNonModalSigninBookmarkFeature,
-             "IPH_iOSPromoNonModalSigninBookmark",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoPasswordManagerWidgetFeature,
-             "IPH_iOSPromoPasswordManagerWidget",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPullToRefreshFeature,
-             "IPH_iOSPullToRefreshFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSReaderModeLargeOmniboxEntrypointFeature,
-             "IPH_iOSReaderModeLargeOmniboxEntrypointFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSReplaceSyncPromosWithSignInPromos,
-             "IPH_iOSReplaceSyncPromosWithSignInPromos",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSTabGridSwipeRightForIncognito,
-             "IPH_iOSTabGridSwipeRightForIncognito",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSDockingPromoFeature,
-             "IPH_iOSDockingPromo",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSDockingPromoEligibilityFeature,
-             "IPH_iOSDockingPromoEligibility",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoAllTabsFeature,
-             "IPH_iOSPromoAllTabs",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoMadeForIOSFeature,
-             "IPH_iOSPromoMadeForIOS",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoStaySafeFeature,
-             "IPH_iOSPromoStaySafe",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSSwipeBackForwardFeature,
-             "IPH_iOSSwipeBackForward",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSSwipeToolbarToChangeTabFeature,
-             "IPH_iOSSwipeToolbarToChangeTab",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPostDefaultAbandonmentPromoFeature,
-             "IPH_iOSPostDefaultAbandonmentPromo",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoGenericDefaultBrowserFeature,
-             "IPH_iOSPromoGenericDefaultBrowser",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoSettingsCardDefaultBrowserFeature,
-             "IPH_iOSPromoSettingsCardDefaultBrowser",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPromoSettingsCellDefaultBrowserFeature,
-             "IPH_iOSPromoSettingsCellDefaultBrowser",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSOverflowMenuCustomizationFeature,
-             "IPH_iOSOverflowMenuCustomization",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSPageInfoRevampFeature,
-             "IPH_iOSPageInfoRevamp",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSInlineEnhancedSafeBrowsingPromoFeature,
-             "IPH_iOSInlineEnhancedSafeBrowsingPromo",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSSavedTabGroupClosed,
-             "IPH_iOSSavedTabGroupClosed",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSContextualPanelSampleModelFeature,
-             "IPH_iOSContextualPanelSampleModel",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSContextualPanelPriceInsightsFeature,
-             "IPH_iOSContextualPanelPriceInsights",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHHomeCustomizationMenuFeature,
-             "IPH_HomeCustomizationMenu",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSLensOverlayEntrypointTipFeature,
-             "IPH_iOSLensOverlayEntrypointTip",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSLensOverlayEscapeHatchTipFeature,
-             "IPH_iOSLensOverlayEscapeHatchTip",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSSharedTabGroupForeground,
-             "IPH_iOSSharedTabGroupForeground",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSDefaultBrowserBannerPromoFeature,
-             "IPH_iOSDefaultBrowserBannerPromoFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSDefaultBrowserOffCyclePromoFeature,
-             "IPH_iOSDefaultBrowserOffCyclePromo",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-constexpr base::FeatureParam<int> kIPHiOSDefaultBrowserOffCyclePromoCooldown{
-    &kIPHiOSDefaultBrowserOffCyclePromoFeature,
-    /*name=*/"cooldown-days",
-    /*default_value=*/10 * 365};
-BASE_FEATURE(kIPHiOSReminderNotificationsOverflowMenuBubbleFeature,
-             "IPH_iOSReminderNotificationsOverflowMenuBubbleFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSReminderNotificationsOverflowMenuNewBadgeFeature,
-             "IPH_iOSReminderNotificationsOverflowMenuNewBadgeFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSSafariImportFeature,
-             "IPH_iOSSafariImportFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSSettingsInOverflowMenuBubbleFeature,
-             "IPH_iOSSettingsInOverflowMenuBubbleFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-// Note: This IPH will only be triggered if
-// `kSeparateProfilesForManagedAccounts` is enabled.
-BASE_FEATURE(kIPHiOSSwitchAccountsWithNTPAccountParticleDiscFeature,
-             "IPH_iOSSwitchAccountsWithNTPAccountParticleDiscFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-// Note: Feed swipe IPHs will only be triggered if `kFeedSwipeInProductHelp` is
-// enabled.
-BASE_FEATURE(kIPHiOSFeedSwipeStaticFeature,
-             "IPH_iOSFeedSwipeStaticFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE(kIPHiOSFeedSwipeAnimatedFeature,
-             "IPH_iOSFeedSwipeAnimatedFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSWelcomeBackFeature,
-             "IPH_iOSWelcomeBack",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHIOSPageActionMenu,
-             "IPH_iOSPageActionMenu",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSReaderModeOptionsFeature,
-             "IPH_iOSReaderModeOptions",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSHomepageLensNewBadge,
-             "IPH_iOSHomepageLensNewBadge",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSHomepageCustomizationNewBadge,
-             "IPH_iOSHomepageCustomizationNewBadge",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSOneTimeDefaultBrowserNotificationFeature,
-             "IPH_iOSOneTimeDefaultBrowserNotification",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSAIHubNewBadge,
-             "IPH_iOSAIHubNewBadge",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSGeminiLiveNewBadgeFeature,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSGeminiLiveIPHFeature, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSGeminiFullscreenPromoFeature,
-             "IPH_iOSGeminiFullscreenPromoFeature",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSGeminiWhatCanGeminiDo, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSGeminiImageRemixFeature,
-             "IPH_iOSGeminiImageRemixFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSNewIAPromoFeature,
-             "IPH_iOSNewIAPromoFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSGeminiExternalAppStoreEvent,
-             "IPH_iOSGeminiExternalAppStoreEvent",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSPinMostVisitedSiteFeature,
-             "IPH_iOSPinMostVisitedSiteFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kIPHiOSActiveDaysTrackingFeature,
-             "IPH_iOSActiveDaysTrackingFeature",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kIPHAutofillAtMemoryFeature,
@@ -1056,10 +781,8 @@ BASE_FEATURE(kIPHiOSPriceTrackingDesktopFeature,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_IOS)
 BASE_FEATURE(kIPHResumptionRailFeature,
              "IPH_ResumptionRail",
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace feature_engagement

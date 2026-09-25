@@ -38,12 +38,7 @@
 #include "components/viz/service/frame_sinks/external_begin_frame_source_android.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "components/viz/common/frame_sinks/external_begin_frame_source_ios.h"
-#include "components/viz/service/frame_sinks/external_begin_frame_source_mojo_ios.h"
-#else
 #include "components/viz/service/frame_sinks/external_begin_frame_source_mojo.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "base/feature_list.h"
@@ -148,9 +143,7 @@ RootCompositorFrameSinkImpl::Create(
   // |params|.
   std::unique_ptr<ExternalBeginFrameSource> external_begin_frame_source;
   std::unique_ptr<SyntheticBeginFrameSource> synthetic_begin_frame_source;
-#if !BUILDFLAG(IS_IOS)
   ExternalBeginFrameSourceMojo* external_begin_frame_source_mojo = nullptr;
-#endif
   bool hw_support_for_multiple_refresh_rates = false;
 #if BUILDFLAG(IS_MAC)
   bool created_external_begin_frame_source_mac = false;
@@ -160,14 +153,6 @@ RootCompositorFrameSinkImpl::Create(
 #endif
 
   if (params->external_begin_frame_controller) {
-#if BUILDFLAG(IS_IOS)
-    hw_support_for_multiple_refresh_rates = true;
-    external_begin_frame_source =
-        std::make_unique<ExternalBeginFrameSourceMojoIOS>(
-            std::move(params->external_begin_frame_controller),
-            std::move(params->external_begin_frame_controller_client),
-            restart_id);
-#else
     // On MacOS, CADisplayLink created in the browser does not take this path.
     external_begin_frame_source =
         std::make_unique<ExternalBeginFrameSourceMojo>(
@@ -178,7 +163,6 @@ RootCompositorFrameSinkImpl::Create(
     external_begin_frame_source_mojo =
         static_cast<ExternalBeginFrameSourceMojo*>(
             external_begin_frame_source.get());
-#endif
   } else {
 #if BUILDFLAG(IS_ANDROID)
     hw_support_for_multiple_refresh_rates = true;
@@ -186,10 +170,6 @@ RootCompositorFrameSinkImpl::Create(
         std::make_unique<ExternalBeginFrameSourceAndroid>(
             restart_id, params->refresh_rate,
             /*requires_align_with_java=*/false);
-#elif BUILDFLAG(IS_IOS)
-    hw_support_for_multiple_refresh_rates = true;
-    external_begin_frame_source =
-        std::make_unique<ExternalBeginFrameSourceIOS>(restart_id);
 #else
     if (params->disable_frame_rate_limit) {
       synthetic_begin_frame_source =
@@ -248,11 +228,9 @@ RootCompositorFrameSinkImpl::Create(
       std::move(output_surface), std::move(overlay_processor),
       std::move(scheduler), std::move(task_runner));
 
-#if !BUILDFLAG(IS_IOS)
   if (external_begin_frame_source_mojo) {
     external_begin_frame_source_mojo->SetDisplay(display.get());
   }
-#endif
 
   // base::WrapUnique instead of std::make_unique because the ctor is private.
   auto impl = base::WrapUnique(new RootCompositorFrameSinkImpl(
@@ -626,18 +604,9 @@ RootCompositorFrameSinkImpl::RootCompositorFrameSinkImpl(
                                                support_->frame_sink_id());
   display_->Initialize(this, support_->frame_sink_manager()->surface_manager());
   support_->SetUpHitTest(display_.get());
-#if BUILDFLAG(IS_IOS)
-  // iOS supports preferred refresh rate interval set as a hint how often a
-  // client wants to refresh the content. It works two ways - a client setting a
-  // preferred refresh rate and the system throttling the refresh rate in case
-  // of battery saving or any other events.
-  CHECK(hw_support_for_multiple_refresh_rates);
-  use_preferred_interval_ = true;
-#else
   if (!hw_support_for_multiple_refresh_rates) {
     use_preferred_interval_ = true;
   }
-#endif
 
   if (external_begin_frame_source_) {
     // Start with the maximum supported refresh rate by setting
@@ -649,8 +618,6 @@ RootCompositorFrameSinkImpl::RootCompositorFrameSinkImpl(
 #if BUILDFLAG(IS_ANDROID)
   interval_decider_use_fixed_intervals_ =
       !display_->OutputSurfaceSupportsSetFrameRate();
-#elif BUILDFLAG(IS_IOS)
-  interval_decider_use_fixed_intervals_ = false;
 #endif
   UpdateFrameIntervalDeciderSettings();
 }
@@ -682,8 +649,6 @@ void RootCompositorFrameSinkImpl::UpdateFrameIntervalDeciderSettings() {
     matchers.push_back(
         std::make_unique<OnlyScrollBarFadeOutAnimationMatcher>());
   }
-#elif BUILDFLAG(IS_IOS)
-  matchers.push_back(std::make_unique<OnlyVideoMatcher>());
 #else
   if (base::FeatureList::IsEnabled(features::kSingleVideoFrameRateThrottling)) {
     matchers.push_back(std::make_unique<OnlyVideoMatcher>());

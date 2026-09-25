@@ -57,11 +57,6 @@
 #include "ui/android/window_android_compositor.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_IOS)
-#include "content/browser/renderer_host/browser_compositor_ios.h"
-#include "content/browser/renderer_host/test_render_widget_host_view_ios_factory.h"
-#endif  // BUILDFLAG(IS_IOS)
-
 #if BUILDFLAG(IS_MAC)
 #include "content/browser/renderer_host/browser_compositor_view_mac.h"
 #include "content/browser/renderer_host/test_render_widget_host_view_mac_factory.h"
@@ -617,8 +612,7 @@ ScopedContentBrowserClientSetting::~ScopedContentBrowserClientSetting() {
 }
 
 void WaitForBrowserCompositorFramePresented(WebContents* web_contents) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS) && \
-    !defined(USE_AURA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !defined(USE_AURA)
   NOTREACHED();
 #else
   base::RunLoop run_loop;
@@ -638,11 +632,6 @@ void WaitForBrowserCompositorFramePresented(WebContents* web_contents) {
       web_contents->GetRenderWidgetHostView());
   browser_compositor->GetCompositor()
       ->RequestSuccessfulPresentationTimeForNextFrame(std::move(callback));
-#elif BUILDFLAG(IS_IOS)
-  auto* browser_compositor = GetBrowserCompositorIOSForTesting(
-      web_contents->GetRenderWidgetHostView());
-  browser_compositor->GetCompositor()
-      ->RequestSuccessfulPresentationTimeForNextFrame(std::move(callback));
 #elif defined(USE_AURA)
   auto* compositor = static_cast<RenderWidgetHostViewAura*>(
                          web_contents->GetRenderWidgetHostView())
@@ -655,8 +644,7 @@ void WaitForBrowserCompositorFramePresented(WebContents* web_contents) {
 }
 
 void ForceNewCompositorFrameFromBrowser(WebContents* web_contents) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS) && \
-    !defined(USE_AURA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !defined(USE_AURA)
   NOTREACHED();
 #endif
 
@@ -668,10 +656,6 @@ void ForceNewCompositorFrameFromBrowser(WebContents* web_contents) {
   layer_tree->SetNeedsRedrawForTesting();
 #elif BUILDFLAG(IS_MAC)
   auto* browser_compositor = GetBrowserCompositorMacForTesting(
-      web_contents->GetRenderWidgetHostView());
-  browser_compositor->GetCompositor()->ScheduleFullRedraw();
-#elif BUILDFLAG(IS_IOS)
-  auto* browser_compositor = GetBrowserCompositorIOSForTesting(
       web_contents->GetRenderWidgetHostView());
   browser_compositor->GetCompositor()->ScheduleFullRedraw();
 #elif defined(USE_AURA)

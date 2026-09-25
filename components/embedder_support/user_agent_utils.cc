@@ -35,7 +35,7 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/user_agent/user_agent_metadata.h"
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include "ui/base/device_form_factor.h"
 #endif
 
@@ -112,7 +112,7 @@ std::string GetUserAgentInternal() {
     product.insert(0, "Headless");
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(kUseMobileUserAgent)) {
     product += " Mobile";
   }
@@ -178,10 +178,6 @@ std::string GetUserAgentPlatform() {
   return "X11; ";  // strange, but that's what Firefox uses
 #elif BUILDFLAG(IS_ANDROID)
   return "Linux; ";
-#elif BUILDFLAG(IS_IOS)
-  return ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET
-             ? "iPad; "
-             : "iPhone; ";
 #else
 #error Unsupported platform
 #endif
@@ -208,11 +204,6 @@ std::string GetUnifiedPlatform() {
   return "Macintosh; Intel Mac OS X 10_15_7";
 #elif BUILDFLAG(IS_LINUX)
   return "X11; Linux x86_64";
-#elif BUILDFLAG(IS_IOS)
-  if (ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET) {
-    return "iPad; CPU iPad OS 14_0 like Mac OS X";
-  }
-  return "iPhone; CPU iPhone OS 14_0 like Mac OS X";
 #else
 #error Unsupported platform
 #endif
@@ -225,10 +216,6 @@ std::string BuildCpuInfo() {
 
 #if BUILDFLAG(IS_MAC)
   cpuinfo = "Intel";
-#elif BUILDFLAG(IS_IOS)
-  cpuinfo = ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET
-                ? "iPad"
-                : "iPhone";
 #elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
   // Should work on any Posix system.
   struct utsname unixinfo;
@@ -280,8 +267,6 @@ std::string GetOSVersion(IncludeAndroidBuildNumber include_android_build_number,
 #if BUILDFLAG(IS_MAC)
                       "%d_%d_%d", os_major_version, os_minor_version,
                       os_bugfix_version
-#elif BUILDFLAG(IS_IOS)
-                      "%d_%d", os_major_version, os_minor_version
 #elif BUILDFLAG(IS_ANDROID)
                       "%s%s", android_version_str.c_str(),
                       android_info_str.c_str()
@@ -438,7 +423,7 @@ bool GetMobileBitForUAMetadata() {
   }
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return base::CommandLine::ForCurrentProcess()->HasSwitch(kUseMobileUserAgent);
 #else
   return false;
@@ -562,8 +547,6 @@ std::string GetUnifiedPlatformForTesting() {
 std::string GetCpuArchitecture() {
 #if BUILDFLAG(IS_MAC)
   return "x86";
-#elif BUILDFLAG(IS_IOS)
-  return "arm";
 #elif BUILDFLAG(IS_ANDROID)
   // TODO(crbug.com/433345971) The user agent string should contain the actual
   // cpu type information obtained from the Android device. Same for the cpu bit
@@ -623,9 +606,6 @@ std::string BuildOSCpuInfoFromOSVersionAndCpuType(const std::string& os_version,
                       "%s Mac OS X %s", cpu_type.c_str(), os_version.c_str()
 #elif BUILDFLAG(IS_ANDROID)
                       "Android %s", os_version.c_str()
-#elif BUILDFLAG(IS_IOS)
-                      "CPU %s OS %s like Mac OS X", cpu_type.c_str(),
-                      os_version.c_str()
 #elif BUILDFLAG(IS_POSIX)
                       "%s %s",
                       unixinfo.sysname,  // e.g. Linux

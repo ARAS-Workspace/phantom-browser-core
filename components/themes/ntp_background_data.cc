@@ -7,17 +7,7 @@
 #include "build/build_config.h"
 
 namespace {
-#if BUILDFLAG(IS_IOS)
-// iOS label added to request to filter out unwanted collections.
-constexpr char kFilteringLabel[] = "chrome_ios_ntp";
-// The iOS options to be added to a thumbnail image URL, specifying resolution,
-// cropping, etc. Options appear on an image URL after the '=' character. This
-// resolution matches the height an width of bg-sel-tile.
-constexpr char kThumbnailImageOptions[] = "=s639-k-no-nd";
-// The iOS options to be added to an image URL, specifying resolution, cropping,
-// etc. Options appear on an image URL after the '=' character.
-constexpr char kImageOptions[] = "=s2556-k-no-nd";
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // Android label added to request to filter out unwanted collections.
 constexpr char kFilteringLabel[] = "chrome_android_ntp";
 // The Android options to be added to a thumbnail image URL, specifying

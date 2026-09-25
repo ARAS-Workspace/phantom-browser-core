@@ -52,8 +52,8 @@ class HeuristicSourceTest
   base::test::ScopedFeatureList features_;
 };
 
-// TODO(crbug.com/373902907): Flaky on ios and android bots.
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+// TODO(crbug.com/373902907): Flaky on android bots.
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_HeuristicSourceParams DISABLED_HeuristicSourceParams
 #else
 #define MAYBE_HeuristicSourceParams HeuristicSourceParams

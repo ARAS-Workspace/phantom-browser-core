@@ -212,13 +212,6 @@ void CardUnmaskPromptControllerImpl::NewCardLinkClicked() {
   new_card_link_clicked_ = true;
 }
 
-#if BUILDFLAG(IS_IOS)
-std::u16string CardUnmaskPromptControllerImpl::GetNavigationTitle() const {
-  return l10n_util::GetStringUTF16(
-      IDS_AUTOFILL_CARD_UNMASK_PROMPT_NAVIGATION_TITLE_VERIFICATION);
-}
-#endif
-
 std::u16string CardUnmaskPromptControllerImpl::GetWindowTitle() const {
   // Set title for VCN retrieval errors first.
   if (unmasking_result_ == PaymentsRpcResult::kVcnRetrievalPermanentFailure) {
@@ -232,7 +225,7 @@ std::u16string CardUnmaskPromptControllerImpl::GetWindowTitle() const {
 
   // For VCN unmask flow, display unique CVC title.
   if (IsChallengeOptionPresent()) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     return l10n_util::GetStringUTF16(
         IDS_AUTOFILL_CARD_UNMASK_PROMPT_TITLE_VIRTUAL_CARD);
 #else
@@ -244,7 +237,7 @@ std::u16string CardUnmaskPromptControllerImpl::GetWindowTitle() const {
 
   // Title for expired cards.
   if (ShouldRequestExpirationDate()) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     return l10n_util::GetStringUTF16(
         IDS_AUTOFILL_CARD_UNMASK_PROMPT_TITLE_EXPIRED_CARD);
 #else
@@ -255,7 +248,7 @@ std::u16string CardUnmaskPromptControllerImpl::GetWindowTitle() const {
   }
 
   // Default title.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return l10n_util::GetStringUTF16(
       IDS_AUTOFILL_CARD_UNMASK_PROMPT_TITLE_DEFAULT);
 #else
@@ -435,13 +428,11 @@ const CreditCard& CardUnmaskPromptControllerImpl::GetCreditCard() const {
   return card_;
 }
 
-#if !BUILDFLAG(IS_IOS)
 int CardUnmaskPromptControllerImpl::GetCvcTooltipResourceId() {
   return IsCvcInFront()
              ? IDS_AUTOFILL_CARD_UNMASK_CVC_IMAGE_DESCRIPTION_FOR_AMEX
              : IDS_AUTOFILL_CARD_UNMASK_CVC_IMAGE_DESCRIPTION;
 }
-#endif
 
 bool CardUnmaskPromptControllerImpl::AllowsRetry(PaymentsRpcResult result) {
   if (result == PaymentsRpcResult::kNetworkError ||
@@ -468,14 +459,14 @@ bool CardUnmaskPromptControllerImpl::IsCvcInFront() const {
 
 bool CardUnmaskPromptControllerImpl::ShouldDismissUnmaskPromptUponResult(
     PaymentsRpcResult result) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // For virtual card errors on Mobile, we'd dismiss the unmask prompt and
   // instead show a different error dialog.
   return result == PaymentsRpcResult::kVcnRetrievalPermanentFailure ||
          result == PaymentsRpcResult::kVcnRetrievalTryAgainFailure;
 #else
   return false;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void CardUnmaskPromptControllerImpl::LogOnCloseEvents() {

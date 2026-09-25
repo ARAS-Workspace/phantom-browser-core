@@ -11,8 +11,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
-#elif BUILDFLAG(IS_IOS)
-#include "base/system/sys_info.h"
 #endif
 
 namespace net {
@@ -23,13 +21,6 @@ bool OSVersionIsAffected() {
   // FB19384824 was introduced in macOS 13.3 and will be fixed in macOS 26.1.
   const int os_version = base::mac::MacOSVersion();
   return os_version >= 13'03'00 && os_version < 26'01'00;
-#elif BUILDFLAG(IS_IOS)
-  // These iOS version numbers that correspond to the macOS version numbers
-  // above.
-  int32_t major, minor, bugfix;
-  base::SysInfo::OperatingSystemVersionNumbers(&major, &minor, &bugfix);
-  const int os_version = major * 1'00'00 + minor * 1'00 + bugfix;
-  return os_version >= 16'03'00 && os_version < 26'01'00;
 #endif
 }
 

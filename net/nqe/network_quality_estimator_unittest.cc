@@ -1226,13 +1226,7 @@ TEST_F(NetworkQualityEstimatorTest, TestGetMetricsSince) {
   }
 }
 
-#if BUILDFLAG(IS_IOS)
-// Flaky on iOS: crbug.com/672917.
-#define MAYBE_TestThroughputNoRequestOverlap \
-  DISABLED_TestThroughputNoRequestOverlap
-#else
 #define MAYBE_TestThroughputNoRequestOverlap TestThroughputNoRequestOverlap
-#endif
 // Tests if the throughput observation is taken correctly when local and network
 // requests do not overlap.
 TEST_F(NetworkQualityEstimatorTest, MAYBE_TestThroughputNoRequestOverlap) {
@@ -1290,14 +1284,8 @@ TEST_F(NetworkQualityEstimatorTest, MAYBE_TestThroughputNoRequestOverlap) {
   }
 }
 
-#if BUILDFLAG(IS_IOS)
-// Flaky on iOS: crbug.com/672917.
-#define MAYBE_TestEffectiveConnectionTypeObserver \
-  DISABLED_TestEffectiveConnectionTypeObserver
-#else
 #define MAYBE_TestEffectiveConnectionTypeObserver \
   TestEffectiveConnectionTypeObserver
-#endif
 
 // Tests that the effective connection type is computed at the specified
 // interval, and that the observers are notified of any change.

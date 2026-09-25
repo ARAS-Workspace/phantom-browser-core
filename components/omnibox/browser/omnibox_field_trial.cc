@@ -108,11 +108,11 @@ bool IsKoreanLocale(const std::string& locale) {
   return locale == "ko" || locale == "ko-KR";
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 bool IsEnglishLocale(const std::string& locale) {
   return base::StartsWith(locale, "en", base::CompareCase::SENSITIVE);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -313,7 +313,7 @@ float OmniboxFieldTrial::HQPExperimentalTopicalityThreshold() {
 }
 
 int OmniboxFieldTrial::MaxNumHQPUrlsIndexedAtStartup() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Limits on Android and iOS are chosen based on experiment results. See
   // crbug.com/715852#c18 and crbug.com/1141539#c31.
   constexpr int kDefaultOnLowEndDevices = 100;
@@ -454,12 +454,12 @@ bool OmniboxFieldTrial::IsOnDeviceTailSuggestEnabled(
   }
 
 // On Desktop the model is only launched for English locales.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (IsEnglishLocale(locale)) {
     return base::FeatureList::IsEnabled(
         omnibox::kOnDeviceTailEnableEnglishModel);
   }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   return base::FeatureList::IsEnabled(omnibox::kOnDeviceTailModel);
 }

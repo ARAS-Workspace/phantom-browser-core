@@ -16,24 +16,11 @@
 #if BUILDFLAG(ENABLE_ML_INTERNAL)
 #include "services/on_device_model/ml/chrome_ml.h"  // nogncheck
 #endif
-#if BUILDFLAG(IS_IOS)
-#include "third_party/tflite/src/tensorflow/lite/delegates/coreml/coreml_delegate.h"
-#endif
 
 namespace passage_embeddings {
 
 HistoryOpResolver::HistoryOpResolver(bool allow_gpu_execution) {
-#if BUILDFLAG(IS_IOS)
-  if (allow_gpu_execution) {
-    delegate_creators_.insert(
-        delegate_creators_.begin(), [](TfLiteContext* context) {
-          TfLiteCoreMlDelegateOptions options = {};
-          options.enabled_devices = TfLiteCoreMlDelegateDevicesWithNeuralEngine;
-          return std::unique_ptr<TfLiteDelegate, void (*)(TfLiteDelegate*)>(
-              TfLiteCoreMlDelegateCreate(&options), TfLiteCoreMlDelegateDelete);
-        });
-  }
-#elif BUILDFLAG(ENABLE_ML_INTERNAL)
+#if BUILDFLAG(ENABLE_ML_INTERNAL)
   if (allow_gpu_execution) {
     auto* chrome_ml = ml::ChromeML::Get();
     if (chrome_ml && chrome_ml->HasCreateGpuDelegate() &&

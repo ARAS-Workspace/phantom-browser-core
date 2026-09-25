@@ -16,7 +16,7 @@
 namespace favicon {
 namespace {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 const bool kEnableTouchIcon = true;
 #else
 const bool kEnableTouchIcon = false;

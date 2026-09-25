@@ -76,14 +76,12 @@
 
 namespace ui {
 
-#if !BUILDFLAG(IS_IOS)
 Compositor::PendingBeginFrameArgs::PendingBeginFrameArgs(
     const viz::BeginFrameArgs& args,
     base::OnceCallback<void(const viz::BeginFrameAck&)> callback)
     : args(args), callback(std::move(callback)) {}
 
 Compositor::PendingBeginFrameArgs::~PendingBeginFrameArgs() = default;
-#endif
 
 Compositor::Compositor(const viz::FrameSinkId& frame_sink_id,
                        ui::ContextFactory* context_factory,
@@ -382,14 +380,9 @@ void Compositor::SetExternalBeginFrameController(
   DCHECK(use_external_begin_frame_control());
   external_begin_frame_controller_ = std::move(external_begin_frame_controller);
   if (pending_begin_frame_args_) {
-#if BUILDFLAG(IS_IOS)
-    external_begin_frame_controller_->IssueExternalBeginFrameNoAck(
-        *pending_begin_frame_args_);
-#else
     external_begin_frame_controller_->IssueExternalBeginFrame(
         pending_begin_frame_args_->args,
         std::move(pending_begin_frame_args_->callback));
-#endif
     pending_begin_frame_args_.reset();
   }
 }
@@ -743,17 +736,6 @@ bool Compositor::HasAnimationObserver(
   return animation_observer_list_.HasObserver(observer);
 }
 
-#if BUILDFLAG(IS_IOS)
-void Compositor::IssueExternalBeginFrameNoAck(const viz::BeginFrameArgs& args) {
-  if (!external_begin_frame_controller_) {
-    // It's ok to call this repeatedly until |external_begin_frame_controller_|
-    // is ready - we'll just update the |pending_begin_frame_args_|.
-    pending_begin_frame_args_.emplace(args);
-    return;
-  }
-  external_begin_frame_controller_->IssueExternalBeginFrameNoAck(args);
-}
-#else
 void Compositor::IssueExternalBeginFrame(
     const viz::BeginFrameArgs& args,
     base::OnceCallback<void(const viz::BeginFrameAck&)> callback) {
@@ -768,7 +750,6 @@ void Compositor::IssueExternalBeginFrame(
   external_begin_frame_controller_->IssueExternalBeginFrame(
       args, std::move(callback));
 }
-#endif
 
 CompositorMetricsTracker Compositor::RequestNewCompositorMetricsTracker() {
   return CompositorMetricsTracker(next_compositor_metrics_tracker_id_++,

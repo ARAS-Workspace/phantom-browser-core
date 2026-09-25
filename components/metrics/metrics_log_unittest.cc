@@ -201,7 +201,7 @@ TEST_F(MetricsLogTest, SessionHash) {
             log2.uma_proto()->system_profile().session_hash());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(MetricsLogTest, FgBgId) {
   MetricsLog log1(kClientId, kSessionId, MetricsLog::ONGOING_LOG, &client_);
   MetricsLog log2(kClientId, kSessionId, MetricsLog::ONGOING_LOG, &client_);
@@ -220,7 +220,7 @@ TEST_F(MetricsLogTest, FgBgId) {
   EXPECT_NE(log1.uma_proto()->system_profile().fg_bg_id(),
             log3.uma_proto()->system_profile().fg_bg_id());
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 TEST_F(MetricsLogTest, LogType) {
   MetricsLog log1(kClientId, kSessionId, MetricsLog::ONGOING_LOG, &client_);
@@ -283,9 +283,9 @@ TEST_F(MetricsLogTest, BasicRecord) {
   // The session hash.
   system_profile->set_session_hash(
       log.uma_proto()->system_profile().session_hash());
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   system_profile->set_fg_bg_id(log.uma_proto()->system_profile().fg_bg_id());
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if defined(ADDRESS_SANITIZER) || DCHECK_IS_ON()
   system_profile->set_is_instrumented_build(true);
@@ -312,9 +312,6 @@ TEST_F(MetricsLogTest, BasicRecord) {
   system_profile->mutable_hardware()->set_manufacturer(
       base::SysInfo::HardwareManufacturer());
   system_profile->set_app_package_name("test app");
-#elif BUILDFLAG(IS_IOS)
-  system_profile->mutable_os()->set_build_number(
-      base::SysInfo::GetIOSBuildNumber());
 #endif
 
 #if BUILDFLAG(IS_LINUX)

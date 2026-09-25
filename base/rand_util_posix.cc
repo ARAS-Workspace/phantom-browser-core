@@ -28,8 +28,6 @@
 #include "third_party/lss/linux_syscall_support.h"
 #elif BUILDFLAG(IS_MAC)
 #include <sys/random.h>
-#elif BUILDFLAG(IS_IOS)
-#include <CommonCrypto/CommonRandom.h>
 #endif
 
 namespace base {
@@ -129,10 +127,6 @@ void RandBytesInternal(span<uint8_t> output, bool avoid_allocation) {
   }
 #elif BUILDFLAG(IS_MAC)
   if (getentropy(output.data(), output.size()) == 0) {
-    return;
-  }
-#elif BUILDFLAG(IS_IOS)
-  if (CCRandomGenerateBytes(output.data(), output.size()) == kCCSuccess) {
     return;
   }
 #endif

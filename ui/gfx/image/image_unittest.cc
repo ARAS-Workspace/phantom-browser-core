@@ -19,10 +19,7 @@
 #include "ui/gfx/image/image_skia_rep.h"
 #include "ui/gfx/image/image_unittest_util.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "base/apple/foundation_util.h"
-#include "skia/ext/skia_utils_ios.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include <CoreGraphics/CoreGraphics.h>
 
 #include "base/apple/foundation_util.h"
@@ -60,9 +57,7 @@ class ImageTest : public testing::Test {
  private:
   ui::test::ScopedSetSupportedResourceScaleFactors
       scoped_set_supported_scale_factors_{{ui::k100Percent,
-#if !BUILDFLAG(IS_IOS)
                                            ui::k200Percent
-#endif
       }};
 };
 
@@ -259,7 +254,6 @@ TEST_F(ImageTest, MultiResolutionPNGToImageSkia) {
       gt::MaxColorSpaceConversionColorShift()));
   EXPECT_TRUE(gt::ImageSkiaStructureMatches(image_skia, kSize1x, kSize1x,
                                             scales));
-#if !BUILDFLAG(IS_IOS)
   // IOS does not support arbitrary scale factors.
   gfx::ImageSkiaRep rep_1_6x = image_skia.GetRepresentation(1.6f);
   ASSERT_FALSE(rep_1_6x.is_null());
@@ -270,10 +264,8 @@ TEST_F(ImageTest, MultiResolutionPNGToImageSkia) {
   ASSERT_FALSE(rep_0_8x.is_null());
   ASSERT_EQ(0.8f, rep_0_8x.scale());
   EXPECT_EQ("20x20", rep_0_8x.pixel_size().ToString());
-#endif
 }
 
-#if !BUILDFLAG(IS_IOS)
 // IOS does not support arbitrary scale factors.
 TEST_F(ImageTest, PreferDownscaleToUpscale) {
   constexpr int kSize1x = 25;
@@ -310,7 +302,6 @@ TEST_F(ImageTest, PreferDownscaleToUpscale) {
   gfx::ImageSkiaRep rep_8x = image_skia.GetRepresentation(8.0f);
   EXPECT_EQ(SK_ColorBLUE, rep_8x.GetBitmap().getColor(0, 0));
 }
-#endif
 
 TEST_F(ImageTest, MultiResolutionPNGToPlatform) {
   constexpr int kSize1x = 25;
@@ -324,27 +315,9 @@ TEST_F(ImageTest, MultiResolutionPNGToPlatform) {
 
   gfx::Image from_png(image_png_reps);
   gfx::Image from_platform(gt::CopyViaPlatformType(from_png));
-#if BUILDFLAG(IS_IOS)
-  // On iOS the platform type (UIImage) only supports one resolution.
-  const std::vector<ui::ResourceScaleFactor>& scales =
-      ui::GetSupportedResourceScaleFactors();
-  EXPECT_EQ(scales.size(), 1U);
-  if (scales[0] == ui::k100Percent) {
-    EXPECT_TRUE(
-        gt::ArePNGBytesCloseToBitmap(*bytes1x, from_platform.AsBitmap(),
-                                     gt::MaxColorSpaceConversionColorShift()));
-  } else if (scales[0] == ui::k200Percent) {
-    EXPECT_TRUE(
-        gt::ArePNGBytesCloseToBitmap(*bytes2x, from_platform.AsBitmap(),
-                                     gt::MaxColorSpaceConversionColorShift()));
-  } else {
-    ADD_FAILURE() << "Unexpected platform scale factor.";
-  }
-#else
   EXPECT_TRUE(
       gt::ArePNGBytesCloseToBitmap(*bytes1x, from_platform.AsBitmap(),
                                    gt::MaxColorSpaceConversionColorShift()));
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 

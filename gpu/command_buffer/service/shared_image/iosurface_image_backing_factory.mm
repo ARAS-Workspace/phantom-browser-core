@@ -248,11 +248,7 @@ IOSurfaceImageBackingFactory::CreateSharedImage(const Mailbox& mailbox,
     gl::ScopedProgressReporter scoped_progress_reporter(progress_reporter_);
     const bool should_clear = true;
     const bool override_rgba_to_bgra =
-#if BUILDFLAG(IS_IOS)
-        false;
-#else
         gr_context_type_ == GrContextType::kGL;
-#endif
     io_surface = gfx::CreateIOSurface(si_info.size, si_info.format,
                                       should_clear, override_rgba_to_bgra);
     if (!io_surface) {
@@ -372,11 +368,7 @@ IOSurfaceImageBackingFactory::CreateSharedImageInternal(
     gl::ScopedProgressReporter scoped_progress_reporter(progress_reporter_);
 
     const bool override_rgba_to_bgra =
-#if BUILDFLAG(IS_IOS)
-        false;
-#else
         gr_context_type_ == GrContextType::kGL;
-#endif
     io_surface =
         gfx::CreateIOSurface(size, format, should_clear, override_rgba_to_bgra);
     if (!io_surface) {

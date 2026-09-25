@@ -22,24 +22,13 @@ PhishingImageEmbedder::PhishingImageEmbedder() = default;
 
 Scorer* PhishingImageEmbedder::GetScorer() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_IOS)
-  return scorer_;
-#else
   return ScorerStorage::GetInstance()->GetScorer();
-#endif
 }
 
 bool PhishingImageEmbedder::is_ready() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   return !!GetScorer();
 }
-
-#if BUILDFLAG(IS_IOS)
-void PhishingImageEmbedder::set_scorer(Scorer* scorer) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  scorer_ = scorer;
-}
-#endif
 
 PhishingImageEmbedder::~PhishingImageEmbedder() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);

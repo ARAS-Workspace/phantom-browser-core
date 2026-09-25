@@ -22,8 +22,6 @@ namespace net {
 
 namespace {
 
-// SCDynamicStore API does not exist on iOS.
-#if !BUILDFLAG(IS_IOS)
 const base::TimeDelta kRetryInterval = base::Seconds(1);
 const int kMaxRetry = 5;
 
@@ -35,7 +33,6 @@ void DynamicStoreCallback(SCDynamicStoreRef /* store */,
       static_cast<NetworkConfigWatcherApple::Delegate*>(config_delegate);
   net_config_delegate->OnNetworkConfigChange(changed_keys);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 }  // namespace
 
@@ -63,9 +60,7 @@ class NetworkConfigWatcherAppleThread : public base::Thread {
 
   base::apple::ScopedCFTypeRef<CFRunLoopSourceRef> run_loop_source_;
   const raw_ptr<NetworkConfigWatcherApple::Delegate> delegate_;
-#if !BUILDFLAG(IS_IOS)
   int num_retry_ = 0;
-#endif  // !BUILDFLAG(IS_IOS)
   base::WeakPtrFactory<NetworkConfigWatcherAppleThread> weak_factory_;
 };
 
@@ -108,7 +103,6 @@ void NetworkConfigWatcherAppleThread::InitNotifications() {
   // If initialization fails, retry after a 1s delay.
   bool success = InitNotificationsHelper();
 
-#if !BUILDFLAG(IS_IOS)
   if (!success && num_retry_ < kMaxRetry) {
     LOG(ERROR) << "Retrying SystemConfiguration registration in 1 second.";
     task_runner()->PostDelayedTask(
@@ -120,13 +114,9 @@ void NetworkConfigWatcherAppleThread::InitNotifications() {
     return;
   }
 
-#else
-  DCHECK(success);
-#endif  // !BUILDFLAG(IS_IOS)
 }
 
 bool NetworkConfigWatcherAppleThread::InitNotificationsHelper() {
-#if !BUILDFLAG(IS_IOS)
   // SCDynamicStore API does not exist on iOS.
   // Add a run loop source for a dynamic store to the current run loop.
   SCDynamicStoreContext context = {
@@ -154,13 +144,10 @@ bool NetworkConfigWatcherAppleThread::InitNotificationsHelper() {
   }
   CFRunLoopAddSource(CFRunLoopGetCurrent(), run_loop_source_.get(),
                      kCFRunLoopCommonModes);
-#endif  // !BUILDFLAG(IS_IOS)
 
   // Set up notifications for interface and IP address changes.
   delegate_->StartReachabilityNotifications();
-#if !BUILDFLAG(IS_IOS)
   delegate_->SetDynamicStoreNotificationKeys(std::move(store));
-#endif  // !BUILDFLAG(IS_IOS)
   return true;
 }
 

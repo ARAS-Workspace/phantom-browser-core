@@ -87,11 +87,11 @@ void LogMetadata::AddSampleCount(base::HistogramBase::Count32 sample_count) {
 
 namespace {
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // The foreground/background ID. When a MetricsLog instance is created, its
 // `fg_bg_id` system profile field will be set to this value.
 static int g_fg_bg_id_counter = 1;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Convenience function to return the given time at a resolution in seconds.
 static int64_t ToMonotonicSeconds(base::TimeTicks time_ticks) {
@@ -321,7 +321,7 @@ int64_t MetricsLog::GetCurrentTime() {
   return ToMonotonicSeconds(base::TimeTicks::Now());
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 // static
 void MetricsLog::IncrementFgBgId() {
   g_fg_bg_id_counter++;
@@ -330,7 +330,7 @@ void MetricsLog::IncrementFgBgId() {
 void MetricsLog::ClearFgBgId() {
   uma_proto_.mutable_system_profile()->clear_fg_bg_id();
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 void MetricsLog::AssignFinalizedRecordId(PrefService* local_state) {
   DCHECK(!uma_proto_.has_finalized_record_id());
@@ -415,9 +415,9 @@ void MetricsLog::RecordCoreSystemProfile(
 
   system_profile->set_session_hash(GetSessionHash());
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   system_profile->set_fg_bg_id(g_fg_bg_id_counter);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   metrics::SystemProfileProto::Hardware* hardware =
       system_profile->mutable_hardware();
@@ -449,8 +449,6 @@ void MetricsLog::RecordCoreSystemProfile(
   }
   system_profile->set_installer_package(internal::ToInstallerPackage(
       base::android::apk_info::installer_package_name()));
-#elif BUILDFLAG(IS_IOS)
-  os->set_build_number(base::SysInfo::GetIOSBuildNumber());
 #endif
 
 #if BUILDFLAG(IS_LINUX)

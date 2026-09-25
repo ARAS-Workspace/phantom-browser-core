@@ -1085,19 +1085,6 @@ TEST_F(V5GetHashProtocolManagerTest,
   base::test::TestFuture<SBThreatType, const ThreatMetadata&> future;
   pm->GetFullHashes(full_hash_to_threat_types, future.GetCallback());
 
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(future.Get<0>(), SBThreatType::SB_THREAT_TYPE_SAFE);
-  EXPECT_EQ(future.Get<1>(), ThreatMetadata());
-
-  CheckSuccessTestLogs(
-      /*expected_prefix_count=*/1,
-      /*expected_threat_info_size=*/0,
-      /*expected_found_unmatched_full_hashes=*/false,
-      /*expected_attempt_threat_types=*/
-      {SBThreatType::SB_THREAT_TYPE_SUBRESOURCE_FILTER},
-      /*expected_network_threat_types=*/
-      {SBThreatType::SB_THREAT_TYPE_SUBRESOURCE_FILTER});
-#else
   EXPECT_EQ(future.Get<0>(), SBThreatType::SB_THREAT_TYPE_SUBRESOURCE_FILTER);
   const ThreatMetadata& metadata = future.Get<1>();
   auto it =
@@ -1113,7 +1100,6 @@ TEST_F(V5GetHashProtocolManagerTest,
       {SBThreatType::SB_THREAT_TYPE_SUBRESOURCE_FILTER},
       /*expected_network_threat_types=*/
       {SBThreatType::SB_THREAT_TYPE_SUBRESOURCE_FILTER});
-#endif
 }
 
 TEST_F(V5GetHashProtocolManagerTest,
@@ -1495,11 +1481,7 @@ TEST_F(V5GetHashProtocolManagerTest, GetFullHashes_RelevanceFiltering) {
       {{V5::ThreatType::SOCIAL_ENGINEERING},
        {{V5::ThreatAttribute::CANARY}},
        {SBThreatType::SB_THREAT_TYPE_SUSPICIOUS_SITE},
-#if BUILDFLAG(IS_IOS)
-       SBThreatType::SB_THREAT_TYPE_SAFE
-#else
        SBThreatType::SB_THREAT_TYPE_SUSPICIOUS_SITE
-#endif
       },
 
       // 5. SOCIAL_ENGINEERING with CANARY -> Ignored if only PHISHING

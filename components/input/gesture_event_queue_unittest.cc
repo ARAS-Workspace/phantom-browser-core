@@ -110,7 +110,7 @@ class GestureEventQueueTest : public testing::Test,
       base::WeakPtr<FlingController> fling_controller) override {}
   bool ProgressFlingOnFlingStart() override { return true; }
   bool ShouldUseMobileFlingCurve() override {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     return true;
 #else
     return false;

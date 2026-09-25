@@ -2549,12 +2549,7 @@ TEST_F(SBLocalDatabaseManagerTest_V5, FlagOneUrlAsHighConfidenceAllowlisted) {
 TEST_P(SBLocalDatabaseManagerTest_V4V5, SyncedLists) {
   WaitForTasksOnTaskRunner();
 
-#if BUILDFLAG(IS_IOS)
-  std::vector<ListIdentifier> expected_lists{
-      GetUrlSocEngId(),       GetUrlMalwareId(),
-      GetUrlUwsId(),          GetUrlBillingId(),
-      GetUrlCsdAllowlistId(), GetUrlHighConfidenceAllowlistId()};
-#elif BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   std::vector<ListIdentifier> expected_lists{GetUrlSocEngId(),
                                              GetUrlMalwareId(),
                                              GetUrlUwsId(),

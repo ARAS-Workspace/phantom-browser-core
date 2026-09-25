@@ -762,95 +762,6 @@ const PasswordForm* PasswordFormManager::GetParsedObservedForm() const {
   return parsed_observed_form_.get();
 }
 
-#if BUILDFLAG(IS_IOS)
-void PasswordFormManager::UpdateStateOnUserInput(
-    FormRendererId form_id,
-    FieldRendererId field_id,
-    const std::u16string& field_value) {
-  DCHECK(observed_form()->renderer_id() == form_id);
-  // Update the observed field value.
-  std::vector<FormFieldData> fields = mutable_observed_form()->ExtractFields();
-  auto modified_field =
-      std::ranges::find_if(fields, [&field_id](const FormFieldData& field) {
-        return field.renderer_id() == field_id;
-      });
-  if (modified_field == fields.end()) {
-    mutable_observed_form()->set_fields(std::move(fields));
-    return;
-  }
-  modified_field->set_value(field_value);
-  mutable_observed_form()->set_fields(std::move(fields));
-
-  if (HasGeneratedPassword()) {
-    // Update the presaved password form in the case the username has changed.
-    PresaveGeneratedPasswordInternal(
-        *observed_form(), password_save_manager_->GetGeneratedPassword());
-  }
-}
-
-void PasswordFormManager::SetDriver(
-    const base::WeakPtr<PasswordManagerDriver>& driver) {
-  driver_ = driver;
-}
-
-void PasswordFormManager::ProvisionallySaveFieldDataManagerInfo(
-    const FieldDataManager& field_data_manager,
-    const PasswordManagerDriver* driver,
-    const base::LRUCache<PossibleUsernameFieldIdentifier, PossibleUsernameData>&
-        possible_usernames) {
-  bool data_found = false;
-  std::vector<FormFieldData> fields = mutable_observed_form()->ExtractFields();
-  for (FormFieldData& field : fields) {
-    FieldRendererId field_id = field.renderer_id();
-    if (!field_data_manager.HasFieldData(field_id)) {
-      continue;
-    }
-    field.set_user_input(field_data_manager.GetUserInput(field_id));
-    field.set_properties_mask(
-        field_data_manager.GetFieldPropertiesMask(field_id));
-    data_found = true;
-  }
-  mutable_observed_form()->set_fields(std::move(fields));
-
-  // Provisionally save form and set the manager to be submitted if valid
-  // data was recovered.
-  if (data_found) {
-    ProvisionallySave(*observed_form(), driver, possible_usernames);
-  }
-}
-
-bool PasswordFormManager::AreRemovedUnownedFieldsValidForSubmissionDetection(
-    const std::set<FieldRendererId>& removed_fields,
-    const FieldDataManager& field_data_manager) const {
-  CHECK(observed_form());
-  CHECK(!observed_form()->renderer_id())
-      << "This method should only be called on formless form managers. Removed "
-         "formless fields are only relevant for formless forms submission "
-         "detection.";
-
-  const auto is_removed_password = [&](const FormFieldData& field_data) {
-    return field_data.IsPasswordInputElement() &&
-           removed_fields.find(field_data.renderer_id()) !=
-               removed_fields.end();
-  };
-
-  bool has_removed_passwords =
-      std::ranges::any_of(observed_form()->fields(), is_removed_password);
-  if (!has_removed_passwords) {
-    return false;
-  }
-
-  // The formless form can be considered submitted if all removed password
-  // fields had input and there was at least one removed password field.
-  return std::ranges::all_of(
-      observed_form()->fields(), [&](const FormFieldData& field_data) {
-        return !is_removed_password(field_data) ||
-               field_data_manager.HasFieldData(field_data.renderer_id());
-      });
-}
-
-#endif  // BUILDFLAG(IS_IOS)
-
 void PasswordFormManager::SaveSuggestedUsernameValueToVotesUploader() {
   if (votes_uploader_.has_value()) {
     votes_uploader_->set_suggested_username(
@@ -1012,7 +923,7 @@ bool PasswordFormManager::WebAuthnCredentialsAvailable() const {
   auto check_credentials_delegate = [=, this]() {
     WebAuthnCredentialsDelegate* delegate =
         client_->GetWebAuthnCredentialsDelegateForDriver(driver_.get());
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
     return delegate && delegate->GetPasskeys().has_value() &&
            !delegate->GetPasskeys().value()->empty();
 #else
@@ -1252,9 +1163,6 @@ void PasswordFormManager::FillNow() {
 
   if (form_parsing_result.is_new_password_reliable && !IsBlocklisted()) {
     driver_->FormEligibleForGenerationFound({
-#if BUILDFLAG(IS_IOS)
-        .form_renderer_id = parsed_observed_form_->form_data.renderer_id(),
-#endif
         .new_password_renderer_id =
             parsed_observed_form_->new_password_element_renderer_id,
         .confirmation_password_renderer_id =
@@ -1862,12 +1770,10 @@ std::unique_ptr<FormFetcher> PasswordFormManager::CreateFormFetcher() {
       observed_digest() ? *observed_digest()
                         : PasswordFormDigest(*observed_form()),
       client_, true /* should_migrate_http_passwords */);
-#if !BUILDFLAG(IS_IOS)
   if (base::FeatureList::IsEnabled(
           password_manager::features::kPasswordFormGroupedAffiliations)) {
     form_fetcher->set_filter_grouped_credentials(false);
   }
-#endif  // !BUILDFLAG(IS_IOS)
   return form_fetcher;
 }
 

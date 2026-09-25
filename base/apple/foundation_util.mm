@@ -28,9 +28,7 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_IOS)
 #import <AppKit/AppKit.h>
-#endif
 
 extern "C" {
 CFTypeID SecKeyGetTypeID();
@@ -46,17 +44,12 @@ bool g_override_am_i_bundled = false;
 bool g_override_am_i_bundled_value = false;
 
 bool UncachedAmIBundled() {
-#if BUILDFLAG(IS_IOS)
-  // All apps are bundled on iOS.
-  return true;
-#else
   if (g_override_am_i_bundled) {
     return g_override_am_i_bundled_value;
   }
 
   // Yes, this is cheap.
   return [apple::OuterBundle().bundlePath hasSuffix:@".app"];
-#endif
 }
 
 bool CFURLIsFileURL(CFURLRef url) {
@@ -83,10 +76,6 @@ bool AmIBundled() {
 }
 
 void SetOverrideAmIBundled(bool value) {
-#if BUILDFLAG(IS_IOS)
-  // It doesn't make sense not to be bundled on iOS.
-  CHECK(value);
-#endif
   g_override_am_i_bundled = true;
   g_override_am_i_bundled_value = value;
 }
@@ -286,11 +275,9 @@ TYPE_NAME_FOR_CF_TYPE_DEFN(CTRun)
 
 TYPE_NAME_FOR_CF_TYPE_DEFN(SecKey)
 
-#if !BUILDFLAG(IS_IOS)
 TYPE_NAME_FOR_CF_TYPE_DEFN(SecAccessControl)
 TYPE_NAME_FOR_CF_TYPE_DEFN(SecCertificate)
 TYPE_NAME_FOR_CF_TYPE_DEFN(SecPolicy)
-#endif
 
 #undef TYPE_NAME_FOR_CF_TYPE_DEFN
 
@@ -359,10 +346,8 @@ CF_CAST_DEFN(CTRun)
 CF_CAST_DEFN(SecCertificate)
 CF_CAST_DEFN(SecKey)
 
-#if !BUILDFLAG(IS_IOS)
 CF_CAST_DEFN(SecAccessControl)
 CF_CAST_DEFN(SecPolicy)
-#endif
 
 #undef CF_CAST_DEFN
 
@@ -509,7 +494,6 @@ std::ostream& operator<<(std::ostream& o, NSRange range) {
   return o << NSStringFromRange(range);
 }
 
-#if !BUILDFLAG(IS_IOS)
 std::ostream& operator<<(std::ostream& o, NSPoint point) {
   return o << NSStringFromPoint(point);
 }
@@ -519,4 +503,3 @@ std::ostream& operator<<(std::ostream& o, NSRect rect) {
 std::ostream& operator<<(std::ostream& o, NSSize size) {
   return o << NSStringFromSize(size);
 }
-#endif

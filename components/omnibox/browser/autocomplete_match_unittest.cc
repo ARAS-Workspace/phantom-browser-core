@@ -885,7 +885,7 @@ TEST_F(AutocompleteMatchTest, BetterDuplicate) {
       create_match(document_provider, 0),
       create_match(bookmark_provider, 1000)));
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   // Prefer non-shortcuts provider matches over shortcuts provider matches.
   EXPECT_TRUE(AutocompleteMatch::BetterDuplicate(
       create_match(history_provider, 0),
@@ -924,7 +924,7 @@ TEST_F(AutocompleteMatchTest, BetterDuplicate) {
       create_match(bookmark_provider, 500),
       create_match(featured_search_provider, 100,
                    AutocompleteMatchType::STARTER_PACK)));
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Prefer entity matches.
   auto entity_match = create_match(
@@ -1112,7 +1112,7 @@ TEST_F(AutocompleteMatchTest, RearrangeActionsInSuggest) {
   }
 }
 
-#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR)) && !BUILDFLAG(IS_IOS)
+#if (!BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_VR))
 TEST_F(AutocompleteMatchTest, ValidateGetVectorIcons) {
   AutocompleteMatch match;
 
@@ -1303,10 +1303,6 @@ TEST_F(AutocompleteMatchTest, GetKeywordUiState) {
                             &keyword, &keyword_placeholder);
     EXPECT_EQ(keyword, u"aggregator");
     EXPECT_EQ(keyword_state, KeywordState::kKeyword);
-#if BUILDFLAG(IS_IOS)
-    EXPECT_TRUE(keyword_placeholder.empty());
-#else
     EXPECT_EQ(keyword_placeholder, u"Enter a question");
-#endif
   }
 }

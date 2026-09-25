@@ -71,10 +71,6 @@
 #include "v8/include/v8-wasm-trap-handler-posix.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "content/shell/app/ios/shell_application_ios.h"
-#endif
-
 #if BUILDFLAG(IS_IOS_TVOS)
 #include "base/files/file_path.h"
 #include "base/path_service.h"
@@ -110,11 +106,7 @@ void InitLogging(const base::CommandLine& command_line) {
   if (dest == LoggingDest::kFile) {
     log_filename = command_line.GetSwitchValuePath(switches::kLogFile);
     if (log_filename.empty()) {
-#if BUILDFLAG(IS_IOS)
-      base::PathService::Get(base::DIR_TEMP, &log_filename);
-#else
       base::PathService::Get(base::DIR_EXE, &log_filename);
-#endif
       log_filename = log_filename.AppendASCII("content_shell.log");
     }
   }
@@ -266,7 +258,7 @@ std::variant<int, MainFunctionParams> ShellMainDelegate::RunProcess(
   }
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // On Android and iOS, we defer to the system message loop when the stack
   // unwinds. So here we only create (and leak) a BrowserMainRunner. The
   // shutdown of BrowserMainRunner doesn't happen in Chrome Android/iOS and

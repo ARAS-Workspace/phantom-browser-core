@@ -339,8 +339,6 @@ feedwire::ClientInfo CreateClientInfo(const RequestMetadata& request_metadata) {
 
 #if BUILDFLAG(IS_ANDROID)
   client_info.set_platform_type(feedwire::ClientInfo::ANDROID_ID);
-#elif BUILDFLAG(IS_IOS)
-  client_info.set_platform_type(feedwire::ClientInfo::IOS);
 #endif
   client_info.set_app_type(feedwire::ClientInfo::CHROME_ANDROID);
   *client_info.mutable_platform_version() = GetPlatformVersionMessage();

@@ -51,14 +51,10 @@
 #include "mojo/public/cpp/bindings/remote.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#if BUILDFLAG(IS_IOS)
-#include "ios/web/public/test/web_task_environment.h"
-#else
 #include "components/user_data_importer/content/content_bookmark_parser.h"
 #include "components/user_data_importer/content/fake_bookmark_html_parser.h"
 #include "components/user_data_importer/mojom/bookmark_html_parser.mojom.h"
 #include "content/public/test/browser_task_environment.h"  // nogncheck
-#endif  // BUILDFLAG(IS_IOS)
 
 using bookmarks::test::IsFolder;
 using bookmarks::test::IsUrlBookmark;
@@ -117,12 +113,8 @@ class MockSafariDataImportClient : public SafariDataImportClient {
 
 class SafariDataImporterTest : public testing::Test {
  public:
-#if BUILDFLAG(IS_IOS)
-  SafariDataImporterTest() : receiver_{&service_} {}
-#else
   SafariDataImporterTest()
       : html_parser_receiver_{&fake_utility_parser_}, receiver_{&service_} {}
-#endif  // BUILDFLAG(IS_IOS)
 
   ~SafariDataImporterTest() override = default;
 
@@ -133,13 +125,8 @@ class SafariDataImporterTest : public testing::Test {
   TestingPrefServiceSimple pref_service_;
 
  protected:
-#if BUILDFLAG(IS_IOS)
-  web::WebTaskEnvironment task_environment_{
-      base::test::TaskEnvironment::TimeSource::MOCK_TIME};
-#else
   content::BrowserTaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
-#endif  // BUILDFLAG(IS_IOS)
 
   void SetUp() override {
     CHECK(history_dir_.CreateUniqueTempDir());
@@ -172,13 +159,9 @@ class SafariDataImporterTest : public testing::Test {
     pref_service_.registry()->RegisterBooleanPref(
         autofill::prefs::kAutofillCreditCardEnabled, true);
 
-#if BUILDFLAG(IS_IOS)
-    auto parser = MakeBookmarkParser();
-#else
     auto parser = std::make_unique<ContentBookmarkParser>();
     parser->SetServiceForTesting(
         html_parser_receiver_.BindNewPipeAndPassRemote());
-#endif  // BUILDFLAG(IS_IOS)
 
     importer_ = std::make_unique<SafariDataImporter>(
         &client_, &presenter_,
@@ -372,11 +355,7 @@ class SafariDataImporterTest : public testing::Test {
             AllOf(Field(&ImportResults::number_imported, 0u),
                   Field(&ImportResults::number_to_import, 3u)))));
 
-#if BUILDFLAG(IS_IOS)
-    ExpectBookmarksReady(IsOkAndHolds(6u));
-#else
     ExpectBookmarksReady(IsOkAndHolds(5u));
-#endif
 
     EXPECT_CALL(client_, OnPaymentCardsReady(IsOkAndHolds(3u)));
     EXPECT_CALL(client_,
@@ -427,19 +406,11 @@ class SafariDataImporterTest : public testing::Test {
 
   void Synchronize() {
     task_environment_.RunUntilIdle();
-#if BUILDFLAG(IS_IOS)
-    // TODO(crbug.com/407587751): This hangs forever if not satisfied, probably
-    // because of `clock_`. We should instead fail with a timeout, but this will
-    // require refactoring how we mock time in this suite.
-    ASSERT_TRUE(base::test::RunUntil([&]() { return bookmarks_idle_; }));
-#endif  // BUILDFLAG(IS_IOS)
   }
 
-#if !BUILDFLAG(IS_IOS)
   FakeBookmarkHtmlParser fake_utility_parser_;
   mojo::Receiver<user_data_importer::mojom::BookmarkHtmlParser>
       html_parser_receiver_;
-#endif  // !BUILDFLAG(IS_IOS)
 
   password_manager::FakePasswordParserService service_;
   mojo::Receiver<password_manager::mojom::CSVPasswordParser> receiver_;
@@ -562,59 +533,6 @@ TEST_F(SafariDataImporterTest, Bookmarks_Folders) {
       </DL>
       </DL>)");
 
-#if BUILDFLAG(IS_IOS)
-  ASSERT_EQ(GetPendingBookmarks().size(), 6u);
-
-  ImportedBookmarkEntry entry = GetPendingBookmarks()[0];
-  EXPECT_FALSE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Google");
-  EXPECT_EQ(entry.creation_time,
-            base::Time::FromSecondsSinceUnixEpoch(904914000));
-  EXPECT_EQ(entry.url, GURL("https://www.google.com/"));
-  EXPECT_THAT(entry.path, IsEmpty());
-
-  entry = GetPendingBookmarks()[1];
-  EXPECT_TRUE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Folder 1");
-  // No timestamp maps to current time.
-  EXPECT_EQ(entry.creation_time, base::Time::Now());
-  EXPECT_TRUE(entry.url.is_empty());
-  EXPECT_THAT(entry.path, IsEmpty());
-
-  entry = GetPendingBookmarks()[2];
-  EXPECT_FALSE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Example");
-  EXPECT_EQ(entry.creation_time,
-            base::Time::FromSecondsSinceUnixEpoch(915181200));
-  EXPECT_EQ(entry.url, GURL("https://www.example.com/"));
-  EXPECT_THAT(entry.path, ElementsAre(u"Folder 1"));
-
-  entry = GetPendingBookmarks()[3];
-  EXPECT_TRUE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Folder 1.1");
-  EXPECT_EQ(entry.creation_time,
-            base::Time::FromSecondsSinceUnixEpoch(1145523600));
-  EXPECT_TRUE(entry.url.is_empty());
-  EXPECT_THAT(entry.path, ElementsAre(u"Folder 1"));
-
-  entry = GetPendingBookmarks()[4];
-  EXPECT_FALSE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Kitsune");
-  EXPECT_EQ(entry.creation_time,
-            base::Time::FromSecondsSinceUnixEpoch(1674205200));
-  EXPECT_EQ(entry.url, GURL("https://en.wikipedia.org/wiki/Kitsune"));
-  EXPECT_THAT(entry.path, ElementsAre(u"Folder 1", u"Folder 1.1"));
-
-  entry = GetPendingBookmarks()[5];
-  EXPECT_TRUE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Empty Folder");
-  // No timestamp maps to current time.
-  EXPECT_EQ(entry.creation_time, base::Time::Now());
-  EXPECT_TRUE(entry.url.is_empty());
-  EXPECT_THAT(entry.path, IsEmpty());
-
-  EXPECT_EQ(GetPendingReadingList().size(), 0u);
-#else
   ASSERT_EQ(GetPendingBookmarks().size(), 4u);
 
   ImportedBookmarkEntry entry = GetPendingBookmarks()[0];
@@ -650,55 +568,7 @@ TEST_F(SafariDataImporterTest, Bookmarks_Folders) {
   EXPECT_THAT(entry.path, IsEmpty());
 
   EXPECT_EQ(GetPendingReadingList().size(), 0u);
-#endif  // BUILDFLAG(IS_IOS)
 }
-
-#if BUILDFLAG(IS_IOS)
-TEST_F(SafariDataImporterTest, Bookmarks_ReadingList) {
-  ExpectBookmarksReady(IsOkAndHolds(4u));
-
-  PrepareBookmarks(
-      R"(<!DOCTYPE NETSCAPE-Bookmark-file-1>
-      <!--This is an automatically generated file.
-      It will be read and overwritten.
-      Do Not Edit! -->
-      <DL>
-      <DT><A HREF="https://www.google.com/" ADD_DATE="904914000">Google</A>
-      <DT><H3 id="com.apple.ReadingList">Reading List</H3>
-      <DL><p>
-      <DT><A HREF="https://en.wikipedia.org/wiki/The_Beach_Boys">The Beach Boys</A>
-      <DT><A HREF="https://en.wikipedia.org/wiki/Brian_Wilson" ADD_DATE="-868878000">Brian Wilson</A>
-      </DL><p>
-      </DL>)");
-
-  EXPECT_EQ(GetPendingBookmarks().size(), 1u);
-
-  ASSERT_EQ(GetPendingReadingList().size(), 3u);
-
-  ImportedBookmarkEntry entry = GetPendingReadingList()[0];
-  EXPECT_TRUE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Reading List");
-  EXPECT_EQ(entry.creation_time, base::Time::Now());
-  EXPECT_TRUE(entry.url.is_empty());
-  EXPECT_THAT(entry.path, IsEmpty());
-
-  entry = GetPendingReadingList()[1];
-  EXPECT_FALSE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"The Beach Boys");
-  // No timestamp maps to current time.
-  EXPECT_EQ(entry.creation_time, base::Time::Now());
-  EXPECT_EQ(entry.url, GURL("https://en.wikipedia.org/wiki/The_Beach_Boys"));
-  EXPECT_THAT(entry.path, ElementsAre(u"Reading List"));
-
-  entry = GetPendingReadingList()[2];
-  EXPECT_FALSE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Brian Wilson");
-  EXPECT_EQ(entry.creation_time,
-            base::Time::FromSecondsSinceUnixEpoch(-868878000));
-  EXPECT_EQ(entry.url, GURL("https://en.wikipedia.org/wiki/Brian_Wilson"));
-  EXPECT_THAT(entry.path, ElementsAre(u"Reading List"));
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 TEST_F(SafariDataImporterTest, Bookmarks_MiscJunk) {
   ExpectBookmarksReady(IsOkAndHolds(2u));
@@ -725,39 +595,6 @@ TEST_F(SafariDataImporterTest, Bookmarks_MiscJunk) {
       PREVIEWSIZE="100 x 100"
       </DL>)");
 
-#if BUILDFLAG(IS_IOS)
-  ASSERT_EQ(GetPendingBookmarks().size(), 3u);
-
-  // <A>Google</A> was skipped for lack of URL.
-
-  ImportedBookmarkEntry entry = GetPendingBookmarks()[0];
-  EXPECT_TRUE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Folder 1");
-  // No timestamp maps to current time.
-  EXPECT_EQ(entry.creation_time, base::Time::Now());
-  EXPECT_TRUE(entry.url.is_empty());
-  EXPECT_THAT(entry.path, IsEmpty());
-
-  // The folder contains a mix of invalid and valid entries. Ensure the valid
-  // ones are preserved.
-  entry = GetPendingBookmarks()[1];
-  EXPECT_FALSE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Chromium");
-  // No timestamp maps to current time.
-  EXPECT_EQ(entry.creation_time, base::Time::Now());
-  EXPECT_EQ(entry.url, GURL("https://www.chromium.org/"));
-  EXPECT_THAT(entry.path, ElementsAre(u"Folder 1"));
-
-  entry = GetPendingBookmarks()[2];
-  EXPECT_FALSE(entry.is_folder);
-  EXPECT_EQ(entry.title, u"Example");
-  // Invalid timestamp maps to current time.
-  EXPECT_EQ(entry.creation_time, base::Time::Now());
-  EXPECT_EQ(entry.url, GURL("https://www.example.org/"));
-  EXPECT_THAT(entry.path, ElementsAre(u"Folder 1"));
-
-  // <A>Google Reader</A> was skipped for lack of URL.
-#else
   ASSERT_EQ(GetPendingBookmarks().size(), 2u);
 
   // <A>Google</A> was skipped for lack of URL.
@@ -781,7 +618,6 @@ TEST_F(SafariDataImporterTest, Bookmarks_MiscJunk) {
   EXPECT_THAT(entry.path, ElementsAre(u"Folder 1"));
 
   // <A>Google Reader</A> was skipped for lack of URL.
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 TEST_F(SafariDataImporterTest, NoPassword) {
@@ -906,15 +742,6 @@ TEST_F(SafariDataImporterTest, HandleGarbageFile) {
   CompleteImport({});
 }
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(SafariDataImporterTest, HandleNonASCIIFile) {
-  SetUpEndToEndPrepareExpectations();
-  SetUpEndToEndCompleteExpectations();
-  PrepareImportFromNonASCIIFile();
-  CompleteImport({});
-}
-#endif
-
 TEST_F(SafariDataImporterTest, CancelImport) {
   ExpectBookmarksReady(_);
   EXPECT_CALL(client_, OnHistoryReady(_));
@@ -958,11 +785,7 @@ TEST_F(SafariDataImporterTest, PrepareImportFileTwice) {
                         Field(&ImportResults::number_to_import, 3u)))))
       .Times(2);
 
-#if BUILDFLAG(IS_IOS)
-  ExpectBookmarksReady(IsOkAndHolds(6u), /*times=*/2);
-#else
   ExpectBookmarksReady(IsOkAndHolds(5u), /*times=*/2);
-#endif
 
   EXPECT_CALL(client_, OnPaymentCardsReady(IsOkAndHolds(3u))).Times(2);
   EXPECT_CALL(client_, OnHistoryReady(IsOkAndHolds(13u))).Times(2);
@@ -1085,61 +908,10 @@ TEST_F(SafariDataImporterTest, ImportsEmptyFolder) {
                            ElementsAre(IsFolder(u"Empty Folder", IsEmpty())))));
 }
 
-// Tests that the reading lists are imported into the Reading List model on iOS.
-#if BUILDFLAG(IS_IOS)
-TEST_F(SafariDataImporterTest, ImportsMultipleReadingListItems) {
-  ExpectBookmarksReady(IsOkAndHolds(5u));
-  PrepareBookmarks(
-      R"(<!DOCTYPE NETSCAPE-Bookmark-file-1>
-                          <DL>
-                            <DT><H3 id="com.apple.ReadingList">Reading List</H3>
-                            <DL>
-                              <DT><A HREF="https://www.item1.com/">First Item</A>
-                              <DT><A HREF="https://www.item2.com/">Second Item</A>
-                              <DT>Third Item No URL</DT>
-                              <DT><A HREF="invalid_url">Invalid URL</A>
-                              <DT><A HREF="https://www.item3.com/">Third Item</A>
-                            </DL>
-                          </DL>)");
-
-  EXPECT_CALL(client_, OnBookmarksImported(3u));
-  EXPECT_CALL(client_, OnHistoryImported(0));
-  EXPECT_CALL(client_, OnPaymentCardsImported(0));
-  EXPECT_CALL(client_, OnPasswordsImported(
-                           AllOf(Field(&ImportResults::number_imported, 0u),
-                                 Field(&ImportResults::number_to_import, 0u))));
-  CompleteImport({});
-
-  const ReadingListModel* model = GetReadingListModel();
-
-  const auto& reading_list_entries = model->GetKeys();
-  ASSERT_EQ(reading_list_entries.size(), 3u);
-
-  const ReadingListEntry* entry1 =
-      model->GetEntryByURL(GURL("https://www.item1.com/")).get();
-  ASSERT_TRUE(entry1);
-  EXPECT_EQ(entry1->Title(), "First Item");
-
-  const ReadingListEntry* entry2 =
-      model->GetEntryByURL(GURL("https://www.item2.com/")).get();
-  ASSERT_TRUE(entry2);
-  EXPECT_EQ(entry2->Title(), "Second Item");
-
-  const ReadingListEntry* entry3 =
-      model->GetEntryByURL(GURL("https://www.item3.com/")).get();
-  ASSERT_TRUE(entry3);
-  EXPECT_EQ(entry3->Title(), "Third Item");
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 TEST_F(SafariDataImporterTest, DuplicateBookmarkFolders) {
 // TODO(crbug.com/407587751): Align behaviour of ContentBookmarkParser and
 // IOSBookmarkParser.
-#if BUILDFLAG(IS_IOS)
-  ExpectBookmarksReady(IsOkAndHolds(3u));
-#else
   ExpectBookmarksReady(IsOkAndHolds(2u));
-#endif
 
   PrepareBookmarks(
       R"(<!DOCTYPE NETSCAPE-Bookmark-file-1>
@@ -1161,11 +933,7 @@ TEST_F(SafariDataImporterTest, DuplicateBookmarkFolders) {
 
 // TODO(crbug.com/407587751): Align behaviour of ContentBookmarkParser and
 // IOSBookmarkParser.
-#if BUILDFLAG(IS_IOS)
-  EXPECT_CALL(client_, OnBookmarksImported(3u));
-#else
   EXPECT_CALL(client_, OnBookmarksImported(2u));
-#endif
 
   EXPECT_CALL(client_, OnHistoryImported(0));
   EXPECT_CALL(client_, OnPaymentCardsImported(0));
@@ -1177,22 +945,6 @@ TEST_F(SafariDataImporterTest, DuplicateBookmarkFolders) {
   const bookmarks::BookmarkNode* import_folder =
       GetOtherBookmarkNode()->children().at(0).get();
 
-#if BUILDFLAG(IS_IOS)
-  EXPECT_THAT(
-      import_folder->children(),
-      ElementsAre(
-          IsFolder(u"Folder A",
-                   ElementsAre(IsUrlBookmark(
-                       u"Bookmark 1", GURL("https://www.example1.com/")))),
-          IsFolder(u"Folder A",
-                   ElementsAre(IsFolder(
-                       u"Folder B", ElementsAre(IsUrlBookmark(
-                                        u"Bookmark 2",
-                                        GURL("https://www.example2.com/")))))),
-          IsFolder(u"Folder A",
-                   ElementsAre(IsUrlBookmark(
-                       u"Bookmark 3", GURL("https://www.example3.com/"))))));
-#else
   EXPECT_THAT(
       import_folder->children(),
       ElementsAre(
@@ -1202,7 +954,6 @@ TEST_F(SafariDataImporterTest, DuplicateBookmarkFolders) {
           IsFolder(u"Folder B",
                    ElementsAre(IsUrlBookmark(
                        u"Bookmark 2", GURL("https://www.example2.com/"))))));
-#endif
 }
 
 // Tests that an empty "Imported from Safari" folder is not created when there
@@ -1321,11 +1072,7 @@ TEST_F(SafariDataImporterTest, ImportHistoryBlockedByPolicy) {
                   &base::expected<ImportResults, ImportPreparationError>::value,
                   AllOf(Field(&ImportResults::number_imported, 0u),
                         Field(&ImportResults::number_to_import, 3u)))));
-#if BUILDFLAG(IS_IOS)
-  ExpectBookmarksReady(IsOkAndHolds(6u));
-#else
   ExpectBookmarksReady(IsOkAndHolds(5u));
-#endif
   EXPECT_CALL(client_, OnPaymentCardsReady(IsOkAndHolds(3u)));
   EXPECT_CALL(client_, OnHistoryReady(
                            IsError(ImportPreparationError::kBlockedByPolicy)));
@@ -1373,33 +1120,6 @@ TEST_F(SafariDataImporterTest, ImportBookmarksBlockedByPolicy) {
 
   EXPECT_THAT(GetOtherBookmarkNode()->children(), IsEmpty());
 }
-
-#if BUILDFLAG(IS_IOS)
-// Tests that reading list import is blocked when disabled by enterprise policy.
-TEST_F(SafariDataImporterTest, ImportReadingListBlockedByPolicy) {
-  pref_service_.SetManagedPref(bookmarks::prefs::kEditBookmarksEnabled,
-                               std::make_unique<base::Value>(false));
-
-  ExpectBookmarksReady(IsError(ImportPreparationError::kBlockedByPolicy));
-  PrepareBookmarks(
-      R"(<!DOCTYPE NETSCAPE-Bookmark-file-1>
-          <DL>
-            <DT><H3 id="com.apple.ReadingList">Reading List</H3>
-            <DL>
-              <DT><A HREF="https://www.item1.com/">First Item</A>
-            </DL>
-          </DL>)");
-
-  EXPECT_CALL(client_, OnPasswordsImported(_));
-  EXPECT_CALL(client_, OnBookmarksImported(0));
-  EXPECT_CALL(client_, OnHistoryImported(0));
-  EXPECT_CALL(client_, OnPaymentCardsImported(0));
-
-  CompleteImport({});
-
-  EXPECT_TRUE(GetReadingListModel()->GetKeys().empty());
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 // Tests that payment card import is blocked when disabled by enterprise policy.
 TEST_F(SafariDataImporterTest, ImportPaymentCardsBlockedByPolicy) {

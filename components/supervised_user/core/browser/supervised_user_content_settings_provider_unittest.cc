@@ -70,24 +70,6 @@ class SupervisedUserProviderTestForGeolocation
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(
     SupervisedUserProviderTestForGeolocation);
 
-#if BUILDFLAG(IS_IOS)
-// GEOLOCATION and GEOLOCATION_WITH_OPTIONS are not registered on IOS.
-TEST_P(SupervisedUserProviderTestForGeolocation, GeolocationTest) {
-  std::unique_ptr<content_settings::RuleIterator> rule_iterator =
-      provider_->GetRuleIterator(
-          content_settings::GeolocationContentSettingsType(), false);
-  EXPECT_FALSE(rule_iterator);
-
-  // Disable the default geolocation setting.
-  service_.SetLocalSetting(kGeolocationDisabled, base::Value(true));
-
-  // Check that nothing happened since the setting is not registered on IOS.
-  rule_iterator = provider_->GetRuleIterator(
-      content_settings::GeolocationContentSettingsType(), false);
-  EXPECT_FALSE(rule_iterator);
-}
-
-#else
 TEST_P(SupervisedUserProviderTestForGeolocation, GeolocationTest) {
   std::unique_ptr<content_settings::RuleIterator> rule_iterator =
       provider_->GetRuleIterator(
@@ -123,7 +105,6 @@ TEST_P(SupervisedUserProviderTestForGeolocation, GeolocationTest) {
       content_settings::GeolocationContentSettingsType(), false);
   EXPECT_FALSE(rule_iterator);
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(SupervisedUserProviderTest, CookiesTest) {
   std::unique_ptr<content_settings::RuleIterator> rule_iterator =

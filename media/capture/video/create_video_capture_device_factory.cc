@@ -67,8 +67,6 @@ CreatePlatformSpecificVideoCaptureDeviceFactory(
 #elif BUILDFLAG(IS_ANDROID)
   return std::make_unique<VideoCaptureDeviceFactoryAndroid>(
       gpu_workarounds ? *gpu_workarounds : gpu::GpuDriverBugWorkarounds());
-#elif BUILDFLAG(IS_IOS)
-  return CreateFakeVideoCaptureDeviceFactory();
 #else
   NOTIMPLEMENTED();
   return nullptr;

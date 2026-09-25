@@ -76,10 +76,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
-#include "base/ios/scoped_critical_action.h"
-#endif
-
 using base::Time;
 using base::TimeTicks;
 using favicon::FaviconBitmap;
@@ -248,38 +244,7 @@ bool CanAddForeignVisitToSegments(
     const VisitRow& foreign_visit,
     const std::string& local_device_originator_cache_guid,
     const SyncDeviceInfoMap& sync_device_info) {
-#if BUILDFLAG(IS_IOS)
-  if (foreign_visit.originator_cache_guid.empty() ||
-      !foreign_visit.consider_for_ntp_most_visited) {
-    return false;
-  }
-
-  auto foreign_device_info_iter =
-      sync_device_info.find(foreign_visit.originator_cache_guid);
-  auto local_device_info_iter =
-      sync_device_info.find(local_device_originator_cache_guid);
-
-  if (foreign_device_info_iter == sync_device_info.end() ||
-      local_device_info_iter == sync_device_info.end()) {
-    return false;
-  }
-
-  std::pair<OsType, FormFactor> foreign_device_info =
-      foreign_device_info_iter->second;
-  std::pair<OsType, FormFactor> local_device_info =
-      local_device_info_iter->second;
-
-  if (local_device_info.first != OsType::kIOS ||
-      local_device_info.second != FormFactor::kPhone) {
-    return false;
-  }
-
-  return foreign_device_info.second == FormFactor::kPhone &&
-         (foreign_device_info.first == OsType::kAndroid ||
-          foreign_device_info.first == OsType::kIOS);
-#else
   return false;
-#endif
 }
 
 // We require a `top_level_site` and a `frame_origin` to construct a
@@ -460,13 +425,6 @@ void HistoryBackend::Closing() {
   queued_history_db_tasks_.clear();
   posted_history_db_task_.Cancel();
 }
-
-#if BUILDFLAG(IS_IOS)
-void HistoryBackend::PersistState() {
-  TRACE_EVENT0("browser", "HistoryBackend::PersistState");
-  Commit();
-}
-#endif
 
 void HistoryBackend::ClearCachedDataForContextID(ContextID context_id) {
   TRACE_EVENT0("browser", "HistoryBackend::ClearCachedDataForContextID");
@@ -3348,13 +3306,6 @@ void HistoryBackend::Commit() {
   if (!db_) {
     return;
   }
-
-#if BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_IOS_APP_EXTENSION)
-  // Attempts to get the application running long enough to commit the database
-  // transaction if it is currently being backgrounded.
-  base::ios::ScopedCriticalAction scoped_critical_action(
-      "HistoryBackend::Commit");
-#endif
 
   // Note that a commit may not actually have been scheduled if a caller
   // explicitly calls this instead of using ScheduleCommit. Likewise, we

@@ -289,7 +289,6 @@ PrimaryAccountManager::PrimaryAccountManager(
       SetPrimaryAccountInternal(account_info, /*consented_to_sync=*/true,
                                 scoped_pref_commit);
 
-#if !BUILDFLAG(IS_IOS)
       // Ensure that the last syncing account data is consistent with the
       // primary account. The last signed-in account data is written inside
       // SetPrimaryAccountInternal().
@@ -297,7 +296,6 @@ PrimaryAccountManager::PrimaryAccountManager(
                                    account_info.gaia.ToString());
       scoped_pref_commit.SetString(prefs::kGoogleServicesLastSyncingUsername,
                                    account_info.email);
-#endif  // !BUILDFLAG(IS_IOS)
     } else {
       SetPrimaryAccountInternal(account_info, /*consented_to_sync=*/false,
                                 scoped_pref_commit);
@@ -375,12 +373,10 @@ PrimaryAccountManager::~PrimaryAccountManager() = default;
 
 // static
 void PrimaryAccountManager::RegisterProfilePrefs(PrefRegistrySimple* registry) {
-#if !BUILDFLAG(IS_IOS)
   registry->RegisterStringPref(prefs::kGoogleServicesLastSyncingGaiaId,
                                std::string());
   registry->RegisterStringPref(prefs::kGoogleServicesLastSyncingUsername,
                                std::string());
-#endif  // !BUILDFLAG(IS_IOS)
   registry->RegisterStringPref(prefs::kGoogleServicesLastSignedInUsername,
                                std::string());
   registry->RegisterStringPref(prefs::kGoogleServicesAccountId, std::string());
@@ -448,9 +444,6 @@ PrimaryAccountManager::GetOrRestorePrimaryAccountInfoOnInitialize(
                               kEmptyAccountInfo_RestoreFailedNotSyncConsented);
   }
 
-#if BUILDFLAG(IS_IOS)
-  NOTREACHED();
-#else
   PrefService* prefs = client_->GetPrefs();
   const GaiaId last_syncing_gaia_id =
       GaiaId(prefs->GetString(prefs::kGoogleServicesLastSyncingGaiaId));
@@ -484,7 +477,6 @@ PrimaryAccountManager::GetOrRestorePrimaryAccountInfoOnInitialize(
   return std::make_pair(account_tracker_service_->GetAccountInfo(account_id),
                         InitializeAccountInfoState::
                             kEmptyAccountInfo_RestoreSuccessFromLastSyncInfo);
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 const PrimaryAccountManager::PrimaryAccount&
@@ -590,7 +582,6 @@ void PrimaryAccountManager::SetSyncPrimaryAccountInternal(
   SetPrimaryAccountInternal(account_info, /*consented_to_sync=*/true,
                             scoped_pref_commit);
 
-#if !BUILDFLAG(IS_IOS)
   // Go ahead and update the last signed in account info here as well. Once a
   // user is signed in the corresponding preferences should match. Doing it here
   // as opposed to on signin allows us to catch the upgrade scenario.
@@ -598,7 +589,6 @@ void PrimaryAccountManager::SetSyncPrimaryAccountInternal(
                                account_info.gaia.ToString());
   scoped_pref_commit.SetString(prefs::kGoogleServicesLastSyncingUsername,
                                account_info.email);
-#endif  // !BUILDFLAG(IS_IOS)
 }
 
 void PrimaryAccountManager::SetPrimaryAccountInternal(

@@ -29,10 +29,6 @@
 #include "third_party/perfetto/protos/perfetto/trace/memory_graph.pbzero.h"
 #include "third_party/perfetto/protos/perfetto/trace/trace_packet.pbzero.h"
 
-#if BUILDFLAG(IS_IOS)
-#include <mach/vm_page_size.h>
-#endif
-
 #if BUILDFLAG(IS_POSIX)
 #include <sys/mman.h>
 #endif
@@ -69,15 +65,7 @@ bool ProcessMemoryDump::is_black_hole_non_fatal_for_testing_ = false;
 
 // static
 size_t ProcessMemoryDump::GetSystemPageSize() {
-#if BUILDFLAG(IS_IOS)
-  // On iOS, getpagesize() returns the user page sizes, but for allocating
-  // arrays for mincore(), kernel page sizes is needed. Use vm_kernel_page_size
-  // as recommended by Apple, https://forums.developer.apple.com/thread/47532/.
-  // Refer to http://crbug.com/542671 and Apple rdar://23651782
-  return vm_kernel_page_size;
-#else
   return base::GetPageSize();
-#endif  // BUILDFLAG(IS_IOS)
 }
 
 // static

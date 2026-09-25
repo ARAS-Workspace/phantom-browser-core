@@ -129,22 +129,7 @@ std::vector<AccountInfo> GetOrderedAccountsForDisplay(
     }
   }
 
-#if BUILDFLAG(IS_IOS)
-  // 2. On iOS: Device accounts are returned in system keychain order.
-  for (const AccountInfo& account : identity_manager->GetAccountsOnDevice()) {
-    if (account.account_id == primary_account_id) {
-      continue;
-    }
-    AccountInfo extended_info =
-        identity_manager->FindExtendedAccountInfo(account);
-    // Some device accounts may not be in Chrome.
-    const AccountInfo& account_to_use =
-        extended_info.IsEmpty() ? account : extended_info;
-    if (IsAccountAllowed(local_state, account_to_use.email)) {
-      accounts.push_back(account_to_use);
-    }
-  }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // 3. On Android: ProfileOAuth2TokenServiceDelegateAndroid stores accounts in
   // a std::vector<CoreAccountId> directly populated from
   // AccountManagerFacade.getAccounts(). Because insertion order is preserved

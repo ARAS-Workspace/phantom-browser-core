@@ -27,11 +27,7 @@
 #import "device/bluetooth/test/mock_bluetooth_central_manager_mac.h"
 #import "device/bluetooth/test/test_bluetooth_adapter_observer.h"
 
-#if BUILDFLAG(IS_IOS)
-#import "device/bluetooth/bluetooth_adapter_ios.h"
-#else
 #import "device/bluetooth/bluetooth_adapter_mac.h"
-#endif
 
 using base::apple::ObjCCast;
 
@@ -119,13 +115,8 @@ void BluetoothTestMac::InitWithDefaultAdapter() {
 }
 
 void BluetoothTestMac::InitWithoutDefaultAdapter() {
-#if BUILDFLAG(IS_IOS)
-  auto adapter = BluetoothAdapterIOS::CreateAdapterForTest(
-      "", "", task_environment_.GetMainThreadTaskRunner());
-#else
   auto adapter = BluetoothAdapterMac::CreateAdapterForTest(
       "", "", task_environment_.GetMainThreadTaskRunner());
-#endif
   adapter_low_energy_ = adapter.get();
   adapter_ = std::move(adapter);
 
@@ -138,15 +129,9 @@ void BluetoothTestMac::InitWithoutDefaultAdapter() {
 }
 
 void BluetoothTestMac::InitWithFakeAdapter() {
-#if BUILDFLAG(IS_IOS)
-  auto adapter = BluetoothAdapterIOS::CreateAdapterForTest(
-      kTestAdapterName, kTestAdapterAddress,
-      task_environment_.GetMainThreadTaskRunner());
-#else
   auto adapter = BluetoothAdapterMac::CreateAdapterForTest(
       kTestAdapterName, kTestAdapterAddress,
       task_environment_.GetMainThreadTaskRunner());
-#endif
   adapter_low_energy_ = adapter.get();
   adapter_ = std::move(adapter);
 

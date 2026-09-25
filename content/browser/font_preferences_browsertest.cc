@@ -74,8 +74,6 @@ class FontPreferencesBrowserTest : public DevToolsProtocolTest {
         default_preferences_font_family_map[blink::web_pref::kCommonScript];
 #if BUILDFLAG(IS_MAC)
     const std::string non_default_system_font = "Monaco";
-#elif BUILDFLAG(IS_IOS)
-    const std::string non_default_system_font = "Verdana";
 #else
     const std::string non_default_system_font = "Ahem";
 #endif

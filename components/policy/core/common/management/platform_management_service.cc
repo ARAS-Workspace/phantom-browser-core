@@ -8,8 +8,6 @@
 #include "build/build_config.h"
 #if BUILDFLAG(IS_MAC)
 #include "components/policy/core/common/management/platform_management_status_provider_mac.h"
-#elif BUILDFLAG(IS_IOS)
-#include "components/policy/core/common/management/platform_management_status_provider_ios.h"
 #elif BUILDFLAG(IS_ANDROID)
 #include "components/policy/core/common/management/platform_management_status_provider_android.h"
 #endif
@@ -24,9 +22,6 @@ GetPlatformManagementSatusProviders() {
   providers.push_back(std::make_unique<DomainEnrollmentStatusProvider>());
   providers.push_back(
       std::make_unique<EnterpriseMDMManagementStatusProvider>());
-#endif
-#if BUILDFLAG(IS_IOS)
-  providers.push_back(std::make_unique<DeviceManagementStatusProvider>());
 #endif
 #if BUILDFLAG(IS_ANDROID)
   providers.push_back(std::make_unique<AndroidManagementStatusProvider>());

@@ -495,7 +495,7 @@ bool ShouldSuppressSuggestions(SuppressReason suppress_reason,
 
 void MaybeAddAddressSuggestionStrikes(AutofillClient& client,
                                       const FormStructure& form) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   for (const std::unique_ptr<AutofillField>& field : form) {
     if (field->autocomplete_attribute() == "off" &&
         field->did_trigger_suggestions() &&
@@ -645,14 +645,14 @@ std::optional<Suggestion> GenerateComposeSuggestion(
 }
 
 bool ShouldShowWebauthnHybridEntryPoint(const FormFieldData& field) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #else
   const std::optional<AutocompleteParsingResult>& autocomplete =
       field.parsed_autocomplete();
   return autocomplete.has_value() &&  // Assume no autocomplete if not parsed.
          autocomplete->webauthn;      // Field must have "webauthn" annotation.
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void LogSuggestionGenerationMetrics(

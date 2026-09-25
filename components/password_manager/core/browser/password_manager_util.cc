@@ -170,7 +170,7 @@ bool IsSavingBlockedByTrustedVaultError(
     return false;
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   const password_manager::PasswordStoreInterface* account_store =
       client->GetAccountPasswordStore();
   return account_store &&
@@ -178,7 +178,7 @@ bool IsSavingBlockedByTrustedVaultError(
              password_manager::ActionableError::kTrustedVaultKeyNeeded &&
          base::FeatureList::IsEnabled(
              password_manager::features::kPasswordSaveInContextErrorResolution);
-#else  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#else
   bool has_trusted_vault_error = false;
   bool has_other_blocking_errors = false;
   // It might be that the credential is updated in both stores. In this case
@@ -214,31 +214,7 @@ bool IsSavingBlockedByTrustedVaultError(
 bool IsSavingBlockedByRecoverableError(
     const password_manager::PasswordManagerClient* client,
     const password_manager::PasswordFormManagerForUI* form_manager) {
-#if BUILDFLAG(IS_IOS)
-  if (!password_manager::sync_util::HasChosenToSyncPasswords(
-          client->GetSyncService())) {
-    return false;
-  }
-  // The updates of the locally stored passwords should not be blocked by
-  // recoverable errors.
-  if (form_manager && form_manager->IsPasswordUpdate() &&
-      !form_manager->IsUpdateAffectingPasswordsStoredInTheGoogleAccount()) {
-    return false;
-  }
-  const password_manager::PasswordStoreInterface* account_store =
-      client->GetAccountPasswordStore();
-  if (!account_store) {
-    return false;
-  }
-  password_manager::ActionableError error = account_store->GetError();
-  return (error == password_manager::ActionableError::kTrustedVaultKeyNeeded ||
-          error == password_manager::ActionableError::kSignInNeeded ||
-          error == password_manager::ActionableError::kNeedsPassphrase) &&
-         base::FeatureList::IsEnabled(
-             password_manager::features::kPasswordSaveInContextErrorResolution);
-#else  // !BUILDFLAG(IS_IOS)
   return false;
-#endif
 }
 
 std::string_view GetSignonRealmWithProtocolExcluded(const PasswordForm& form) {
@@ -556,19 +532,6 @@ std::string GetSignonRealm(const GURL& url) {
   rep.SetPathStr("");
   return url.ReplaceComponents(rep).spec();
 }
-
-#if BUILDFLAG(IS_IOS)
-bool IsCredentialProviderEnabledOnStartup(const PrefService* local_state) {
-  return local_state->GetBoolean(
-      password_manager::prefs::kCredentialProviderEnabledOnStartup);
-}
-
-void SetCredentialProviderEnabledOnStartup(PrefService* local_state,
-                                           bool enabled) {
-  local_state->SetBoolean(
-      password_manager::prefs::kCredentialProviderEnabledOnStartup, enabled);
-}
-#endif
 
 bool IsNumeric(char16_t c) {
   return '0' <= c && c <= '9';

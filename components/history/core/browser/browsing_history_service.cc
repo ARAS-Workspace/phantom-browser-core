@@ -504,13 +504,11 @@ bool BrowsingHistoryService::ShouldQueryRemote(const QueryHistoryState& state) {
     return false;
   }
 
-#if !BUILDFLAG(IS_IOS)
   // Actor visits are local-only and user visits should not be queried.
   if (history::IsBrowsingHistoryActorIntegrationM3Enabled() &&
       !state.original_options.include_user_visits) {
     return false;
   }
-#endif
 
   const size_t desired_count =
       static_cast<size_t>(state.original_options.EffectiveMaxCount());
@@ -632,13 +630,9 @@ void BrowsingHistoryService::MergeDuplicateResults(
       current_day_midnight = entry.time.LocalMidnight();
     }
 
-#if !BUILDFLAG(IS_IOS)
     auto& current_day_entries = entry.is_actor_visit
                                     ? actor_current_day_entries
                                     : non_actor_current_day_entries;
-#else
-    auto& current_day_entries = non_actor_current_day_entries;
-#endif
     GroupingKey key{.url = entry.url, .app_id = entry.app_id};
 
     // Keep this visit if it's the first visit to this URL on the current day.
@@ -727,13 +721,9 @@ BrowsingHistoryService::GroupSimilarVisits(QueryHistoryState* state) {
       current_day_midnight = entry.time.LocalMidnight();
     }
 
-#if !BUILDFLAG(IS_IOS)
     auto& current_day_entries = entry.is_actor_visit
                                     ? actor_current_day_entries
                                     : non_actor_current_day_entries;
-#else
-    auto& current_day_entries = non_actor_current_day_entries;
-#endif
 
     // TODO(b/481272035): Use the domain name that matches the displayed domain
     // name in the UI.
@@ -838,10 +828,10 @@ void BrowsingHistoryService::ReturnResultsToDriver(
   std::vector<HistoryEntry> results;
   bool has_remote_results = !state->remote_results.empty();
   bool group_visits = false;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   group_visits =
       base::FeatureList::IsEnabled(kBrowsingHistorySimilarVisitsGrouping);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (group_visits) {
     results = GroupSimilarVisits(state.get());

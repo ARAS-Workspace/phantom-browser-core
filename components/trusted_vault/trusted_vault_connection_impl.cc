@@ -107,8 +107,6 @@ GetLocalPhysicalDeviceType() {
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_LINUX;
 #elif BUILDFLAG(IS_ANDROID)
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_ANDROID;
-#elif BUILDFLAG(IS_IOS)
-  return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_IOS;
 #elif BUILDFLAG(IS_MAC)
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_MAC_OS;
 #else

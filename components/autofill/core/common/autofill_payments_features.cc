@@ -17,12 +17,6 @@ BASE_FEATURE(kAllowReentryFromRespondToDelegate,
 BASE_FEATURE(kAutofillAiBasedAmountExtractionIgnoreSeenTermsForTesting,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_IOS)
-// When enabled, users are given the option to use their phone camera to scan
-// their credit card when adding it via Autofill iOS settings.
-BASE_FEATURE(kAutofillCreditCardScannerIos, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
-
 // Enables testing BNPL in countries where it would otherwise be disabled. This
 // is a testing flag that should never be enabled.
 BASE_FEATURE(kAutofillDisableBnplCountryCheckForTesting,
@@ -66,13 +60,6 @@ BASE_FEATURE(kAutofillEnableBnplAffirmInternationalization,
 // international markets.
 BASE_FEATURE(kAutofillEnableBnplKlarnaInternationalization,
              base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_IOS)
-// When enabled, users are given the bottom sheet suggestion to scan credit
-// card, and save and fill the card information.
-BASE_FEATURE(kAutofillEnableBottomSheetScanCardAndFill,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // When enabled, buy now pay later (BNPL) in Autofill will be offered.
 BASE_FEATURE(kAutofillEnableBuyNowPayLater,
@@ -120,11 +107,7 @@ BASE_FEATURE(kAutofillEnableBuyNowPayLaterUpdatedSuggestionSecondLineString,
 // When enabled, card benefits offered by American Express will be shown in
 // Payments Autofill UI.
 BASE_FEATURE(kAutofillEnableCardBenefitsForAmericanExpress,
-#if BUILDFLAG(IS_IOS)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // When enabled, card benefits offered by BMO will be shown in Payments Autofill
 // UI.
@@ -138,20 +121,12 @@ BASE_FEATURE(kAutofillEnableCardBenefitsForBmo,
 // When enabled, Chrome will show metadata along with other card information
 // when the virtual card is presented to users.
 BASE_FEATURE(kAutofillEnableCardBenefitsSync,
-#if BUILDFLAG(IS_IOS)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // When enabled, this will enhance the CVV storage project. The enhancement will
 // enable CVV storage suggestions for standalone CVC fields.
 BASE_FEATURE(kAutofillEnableCvcStorageAndFillingStandaloneFormEnhancement,
-#if BUILDFLAG(IS_IOS)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 // When enabled, in-product help UI will be shown the first time a card added
 // outside of Chrome appears in Autofill card suggestions.
@@ -179,7 +154,7 @@ BASE_FEATURE(kAutofillEnableFlatRateCardBenefitsFromCurinos,
 // When enabled, server card retrieval will begin with a risk-based check
 // instead of jumping straight to CVC or biometric auth.
 BASE_FEATURE(kAutofillEnableFpanRiskBasedAuthentication,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT);
 #else
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -303,13 +278,6 @@ BASE_FEATURE(kAutofillEnableWalletReminderNotice,
 // TODO(crbug.com/526738761): Clean up after launch.
 BASE_FEATURE(kAutofillFixCvcImport, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_IOS)
-// When enabled, skips empty CVCs in AutofillWalletCredentialSyncBridge instead
-// of failing a CHECK.
-BASE_FEATURE(kAutofillIgnoreEmptyCvcsInSyncBridge,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 // When enabled, ignores the strike database checks for payments churned users.
 BASE_FEATURE(kAutofillIgnorePaymentsChurnedUsersStrikesForTesting,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -336,18 +304,6 @@ BASE_FEATURE(kAutofillPreferBuyNowPayLaterBlocklists,
 // TODO(crbug.com/40276036): Clean up after M139 branch (June 23, 2025).
 BASE_FEATURE(kAutofillRetryImageFetchOnFailure,
              base::FEATURE_ENABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_IOS)
-// When enabled, the strike limit for showing the save card bottom sheet on iOS
-// is increased from 1 to the value specified in the parameter and the default
-// value of the strike is 3.
-BASE_FEATURE(kAutofillSaveCardBottomSheetStrikeLimitIos,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-const base::FeatureParam<int> kMaxStrikesForSaveCardBottomSheetIos{
-    &kAutofillSaveCardBottomSheetStrikeLimitIos,
-    "max_strikes_for_bottom_sheet_ios", 3};
-#endif
 
 // Kill switch, when enabled, will prevent the display of the save card bubble
 // within a tab modal pop-up window.

@@ -130,9 +130,6 @@ UserProvidedCardSaveAndFillDetails CreateUserProvidedCardDetails(
   user_provided_card_details.expiration_date_year =
       std::move(expiration_date_year);
   user_provided_card_details.security_code = std::move(security_code);
-#if BUILDFLAG(IS_IOS)
-  user_provided_card_details.nickname = nickname;
-#endif
   return user_provided_card_details;
 }
 
@@ -337,7 +334,6 @@ TEST_F(SaveAndFillManagerImplTest, OnUserDidDecideOnLocalSave_Declined) {
   EXPECT_TRUE(payments_data_manager().GetCreditCards().empty());
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(SaveAndFillManagerImplTest, LocallySaveCreditCard_WithCvc_PrefOn) {
   prefs::SetPaymentCvcStorage(autofill_client().GetPrefs(), true);
 
@@ -394,7 +390,6 @@ TEST_F(SaveAndFillManagerImplTest, LocallySaveCreditCard_WithCvc_PrefOff) {
   // The CVC value should still be filled as long as the user provided it.
   EXPECT_THAT(card_to_fill.cvc(), u"123");
 }
-#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(SaveAndFillManagerImplTest,
        OnDidAcceptCreditCardSaveAndFillSuggestion_ServerSaveAndFill) {
@@ -641,11 +636,7 @@ TEST_F(SaveAndFillManagerImplTest, OnUserDidDecideOnUploadSave_Accepted) {
   EXPECT_EQ(u"06", card_to_fill.GetRawInfo(CREDIT_CARD_EXP_MONTH));
   EXPECT_EQ(u"2035", card_to_fill.GetRawInfo(CREDIT_CARD_EXP_4_DIGIT_YEAR));
   EXPECT_EQ(u"456", card_to_fill.cvc());
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(u"My Card", card_to_fill.nickname());
-#else
   EXPECT_EQ(card_to_fill.nickname(), std::u16string());
-#endif
 
   // Make sure that all strikes are cleared upon user acceptance.
   EXPECT_EQ(0, save_and_fill_strike_database.GetStrikes());
@@ -923,11 +914,7 @@ TEST_F(SaveAndFillManagerImplTest, StrikeDatabaseMetrics) {
 
 TEST_F(SaveAndFillManagerImplTest, MaxStrikeLimit) {
   SaveAndFillStrikeDatabase save_and_fill_strike_database(strike_database());
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(save_and_fill_strike_database.GetMaxStrikesLimit(), 2);
-#else
   EXPECT_EQ(save_and_fill_strike_database.GetMaxStrikesLimit(), 3);
-#endif
 }
 
 TEST_F(SaveAndFillManagerImplTest, HideDialog_CalledAfterLocalSaveCompleted) {

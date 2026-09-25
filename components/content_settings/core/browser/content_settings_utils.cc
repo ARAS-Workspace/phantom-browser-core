@@ -133,17 +133,8 @@ PatternPair ParsePatternString(const std::string& pattern_str) {
 
 void GetRendererContentSettingRules(const HostContentSettingsMap* map,
                                     RendererContentSettingRules* rules) {
-#if !BUILDFLAG(IS_IOS)
   rules->mixed_content_rules =
       map->GetSettingsForOneType(ContentSettingsType::MIXEDSCRIPT);
-#else
-  // In Android active mixed content is hard blocked, with no option to allow
-  // it.
-  rules->mixed_content_rules.push_back(ContentSettingPatternSource(
-      ContentSettingsPattern::Wildcard(), ContentSettingsPattern::Wildcard(),
-      ContentSettingToValue(CONTENT_SETTING_BLOCK), ProviderType::kNone,
-      map->IsOffTheRecord()));
-#endif
 }
 
 bool IsMorePermissive(ContentSetting a, ContentSetting b) {

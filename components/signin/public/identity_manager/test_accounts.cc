@@ -21,8 +21,6 @@ const char kPlatform[] = "mac";
 const char kPlatform[] = "linux";
 #elif BUILDFLAG(IS_ANDROID)
 const char kPlatform[] = "android";
-#elif BUILDFLAG(IS_IOS)
-const char kPlatform[] = "ios";
 #else
 const char kPlatform[] = "all_platform";
 #endif

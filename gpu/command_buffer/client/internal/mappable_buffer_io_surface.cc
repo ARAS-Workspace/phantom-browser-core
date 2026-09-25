@@ -115,16 +115,6 @@ MappableBufferIOSurface::CreateFromHandleImpl(
   // thousands of crash dumps).
   constexpr int kMaxCrashDumps = 10;
   static int dump_counter = kMaxCrashDumps;
-#if BUILDFLAG(IS_IOS)
-  if (!handle.io_surface_shared_memory_region().IsValid()) {
-    LOG(ERROR) << "Invalid shared memory region returned to client.";
-    if (dump_counter) {
-      dump_counter -= 1;
-      base::debug::DumpWithoutCrashing();
-    }
-    return nullptr;
-  }
-#else
   if (!handle.io_surface()) {
     LOG(ERROR) << "Failed to open IOSurface via mach port returned to client.";
     if (dump_counter) {
@@ -147,7 +137,6 @@ MappableBufferIOSurface::CreateFromHandleImpl(
     DLOG(ERROR) << "IOSurface size does not match handle.";
     return nullptr;
   }
-#endif
 
   return base::WrapUnique(
       new MappableBufferIOSurface(size, format, handle.Clone(), lock_flags));
@@ -159,38 +148,18 @@ bool MappableBufferIOSurface::Map() {
     return true;
   }
 
-#if BUILDFLAG(IS_IOS)
-  if (!shared_memory_mapping_.IsValid()) {
-    shared_memory_mapping_ = handle_.io_surface_shared_memory_region().Map();
-  }
-  if (!shared_memory_mapping_.IsValid()) {
-    LOG(ERROR) << "Invalid shared memory mapping";
-    return false;
-  }
-#else
   kern_return_t kr =
       IOSurfaceLock(handle_.io_surface().get(), lock_flags_, nullptr);
   DCHECK_EQ(kr, KERN_SUCCESS) << " lock_flags_: " << lock_flags_;
   MACH_LOG_IF(ERROR, kr != KERN_SUCCESS, kr)
       << "MappableBufferIOSurface::Map IOSurfaceLock lock_flags_: "
       << lock_flags_;
-#endif
   return true;
 }
 
 base::span<uint8_t> MappableBufferIOSurface::memory(size_t plane) {
   AssertMapped();
   CHECK_LT(base::checked_cast<int>(plane), format_.NumberOfPlanes());
-#if BUILDFLAG(IS_IOS)
-  // SAFETY: We trust the GPU process to allocate the IOSurface and initialize
-  // the shared memory region from it correctly and we assert that below too.
-  CHECK(shared_memory_mapping_.IsValid());
-  CHECK_LT(plane, gfx::kMaxIOSurfacePlanes);
-  const size_t plane_offset = handle_.io_surface_plane_offset(plane);
-  CHECK_LE(plane_offset, shared_memory_mapping_.mapped_size());
-  return shared_memory_mapping_.GetMemoryAsSpan<uint8_t>().subspan(
-      plane_offset);
-#else
   size_t height_in_pixels = format_.GetPlaneSize(plane, size_).height();
   size_t row_size_in_bytes = viz::SharedMemoryRowSizeForSharedImageFormat(
                                  format_, plane, size_.width())
@@ -210,7 +179,6 @@ base::span<uint8_t> MappableBufferIOSurface::memory(size_t plane) {
       base::span<uint8_t>(static_cast<uint8_t*>(IOSurfaceGetBaseAddressOfPlane(
                               handle_.io_surface().get(), plane)),
                           mapped_size));
-#endif
 }
 
 void MappableBufferIOSurface::Unmap() {
@@ -219,24 +187,17 @@ void MappableBufferIOSurface::Unmap() {
   if (--map_count_) {
     return;
   }
-#if !BUILDFLAG(IS_IOS)
   kern_return_t kr =
       IOSurfaceUnlock(handle_.io_surface().get(), lock_flags_, nullptr);
   DCHECK_EQ(kr, KERN_SUCCESS) << " lock_flags_: " << lock_flags_;
   MACH_LOG_IF(ERROR, kr != KERN_SUCCESS, kr)
       << "MappableBufferIOSurface::Unmap IOSurfaceUnlock lock_flags_: "
       << lock_flags_;
-#endif
 }
 
 int MappableBufferIOSurface::stride(size_t plane) const {
   CHECK_LT(base::checked_cast<int>(plane), format_.NumberOfPlanes());
-#if BUILDFLAG(IS_IOS)
-  CHECK_LT(plane, gfx::kMaxIOSurfacePlanes);
-  return handle_.io_surface_plane_stride(plane);
-#else
   return IOSurfaceGetBytesPerRowOfPlane(handle_.io_surface().get(), plane);
-#endif
 }
 
 gfx::GpuMemoryBufferType MappableBufferIOSurface::GetType() const {
@@ -258,12 +219,8 @@ bool MappableBufferIOSurface::AsyncMappingIsNonBlocking() const {
 }
 
 bool MappableBufferIOSurface::SupportsZeroCopyWebGPUImport() const {
-#if BUILDFLAG(IS_IOS)
-  return false;
-#else
   return gfx::IOSurfacePixelFormatIsWebGPUCompatible(
       IOSurfaceGetPixelFormat(handle_.io_surface().get()));
-#endif
 }
 
 }  // namespace gpu

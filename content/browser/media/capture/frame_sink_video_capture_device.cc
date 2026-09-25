@@ -33,9 +33,7 @@
 #include "media/capture/video_capture_types.h"
 #include "services/device/public/mojom/wake_lock_provider.mojom.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "content/browser/media/capture/mouse_cursor_overlay_controller.h"
-#endif
 
 #if BUILDFLAG(IS_MAC) || defined(USE_AURA)
 #include "components/viz/common/gpu/context_provider.h"
@@ -47,9 +45,7 @@ namespace content {
 
 namespace {
 
-#if !BUILDFLAG(IS_IOS)
 constexpr int32_t kMouseCursorStackingIndex = 1;
-#endif
 
 // Transfers ownership of an object to a std::unique_ptr with a custom deleter
 // that ensures the object is destroyed on the UI BrowserThread.
@@ -156,15 +152,11 @@ class ContextProviderObserver : viz::ContextLostObserver {
   base::WeakPtrFactory<ContextProviderObserver> weak_factory_{this};
 };
 
-#if !BUILDFLAG(IS_IOS)
 FrameSinkVideoCaptureDevice::FrameSinkVideoCaptureDevice()
     : cursor_controller_(
           RescopeToUIThread(std::make_unique<MouseCursorOverlayController>())) {
   DCHECK(cursor_controller_);
 }
-#else
-FrameSinkVideoCaptureDevice::FrameSinkVideoCaptureDevice() = default;
-#endif
 
 FrameSinkVideoCaptureDevice::~FrameSinkVideoCaptureDevice() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
@@ -337,14 +329,12 @@ void FrameSinkVideoCaptureDevice::AllocateCapturer(
     capturer_->ChangeTarget(target_, sub_capture_version_);
   }
 
-#if !BUILDFLAG(IS_IOS)
   GetUIThreadTaskRunner({})->PostTask(
       FROM_HERE,
       base::BindOnce(&MouseCursorOverlayController::Start,
                      cursor_controller_->GetWeakPtr(),
                      capturer_->CreateOverlay(kMouseCursorStackingIndex),
                      base::SingleThreadTaskRunner::GetCurrentDefault()));
-#endif
 }
 
 void FrameSinkVideoCaptureDevice::AllocateAndStart(
@@ -417,11 +407,9 @@ void FrameSinkVideoCaptureDevice::StopAndDeAllocate() {
     wake_lock_.reset();
   }
 
-#if !BUILDFLAG(IS_IOS)
   GetUIThreadTaskRunner({})->PostTask(
       FROM_HERE, base::BindOnce(&MouseCursorOverlayController::Stop,
                                 cursor_controller_->GetWeakPtr()));
-#endif
 
   MaybeStopConsuming();
   capturer_.reset();
@@ -489,14 +477,8 @@ void FrameSinkVideoCaptureDevice::OnFrameCaptured(
   }
   const BufferId buffer_id = static_cast<BufferId>(index);
 
-#if !BUILDFLAG(IS_IOS)
   info->metadata.interactive_content =
       cursor_controller_->IsUserInteractingWithView();
-#else
-  // Since we don't have a cursor controller, on iOS we'll just always
-  // assume the user is interacting with the view.
-  info->metadata.interactive_content = true;
-#endif
 
   if (video_rotation_ != media::VIDEO_ROTATION_0) {
     info->metadata.transformation = media::VideoTransformation(video_rotation_);

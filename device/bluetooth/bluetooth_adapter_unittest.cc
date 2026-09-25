@@ -727,10 +727,8 @@ TEST_F(BluetoothTest, MAYBE_ConstructWithoutDefaultAdapter) {
   InitWithoutDefaultAdapter();
   EXPECT_EQ(adapter_->GetAddress(), "");
   EXPECT_EQ(adapter_->GetName(), "");
-#if !BUILDFLAG(IS_IOS)
   EXPECT_FALSE(adapter_->IsPresent());
   EXPECT_FALSE(adapter_->IsPowered());
-#endif
   EXPECT_FALSE(adapter_->IsDiscoverable());
   EXPECT_FALSE(adapter_->IsDiscovering());
 #if BUILDFLAG(IS_ANDROID)
@@ -748,10 +746,8 @@ TEST_F(BluetoothTest, MAYBE_ConstructWithoutDefaultAdapter) {
 
 TEST_F(BluetoothTest, MAYBE_ConstructFakeAdapter) {
   InitWithFakeAdapter();
-#if !BUILDFLAG(IS_IOS)
   EXPECT_EQ(adapter_->GetAddress(), kTestAdapterAddress);
   EXPECT_EQ(adapter_->GetName(), kTestAdapterName);
-#endif
   EXPECT_TRUE(adapter_->CanPower());
   EXPECT_TRUE(adapter_->IsPresent());
   EXPECT_TRUE(adapter_->IsPowered());
@@ -964,11 +960,7 @@ TEST_F(BluetoothTest, MAYBE_DiscoverMultipleLowEnergyDevices) {
   EXPECT_EQ(2u, adapter_->GetDevices().size());
 }
 
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_TogglePowerFakeAdapter DISABLED_TogglePowerFakeAdapter
-#else
 #define MAYBE_TogglePowerFakeAdapter TogglePowerFakeAdapter
-#endif
 TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter) {
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);

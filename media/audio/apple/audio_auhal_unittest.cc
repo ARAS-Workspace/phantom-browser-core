@@ -98,13 +98,7 @@ TEST_F(AUHALStreamTest, CreateOpenClose) {
   stream->Close();
 }
 
-#if BUILDFLAG(IS_IOS)
-// TODO(crbug.com/40283968): audio output unit startup fails with partition
-// alloc.
-#define MAYBE_CreateOpenStartStopClose DISABLED_CreateOpenStartStopClose
-#else
 #define MAYBE_CreateOpenStartStopClose CreateOpenStartStopClose
-#endif
 TEST_F(AUHALStreamTest, MAYBE_CreateOpenStartStopClose) {
   ABORT_AUDIO_TEST_IF_NOT(OutputDevicesAvailable());
 

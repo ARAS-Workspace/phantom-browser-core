@@ -87,11 +87,7 @@ std::optional<std::string> TryGetEnrollmentDomain(
 }
 
 bool GetSiteIsolationEnabled() {
-#if BUILDFLAG(IS_IOS)
-  return false;
-#else
   return content::SiteIsolationPolicy::UseDedicatedProcessesForAllSites();
-#endif
 }
 
 }  // namespace device_signals

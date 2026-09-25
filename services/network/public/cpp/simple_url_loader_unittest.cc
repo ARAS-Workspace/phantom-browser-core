@@ -2643,12 +2643,7 @@ TEST_P(SimpleURLLoaderTest, CloseClientPipeBeforeBodyStarts) {
 // This test tries closing the client pipe / completing the request in most
 // possible valid orders relative to read events (Which always occur in the same
 // order).
-// TODO(crbug.com/40815508): Flakes on ios simulator.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_CloseClientPipeOrder DISABLED_CloseClientPipeOrder
-#else
 #define MAYBE_CloseClientPipeOrder CloseClientPipeOrder
-#endif
 TEST_P(SimpleURLLoaderTest, MAYBE_CloseClientPipeOrder) {
   if (GetReadAndDiscardBodyType() == ReadAndDiscardBodyType::kEnabled &&
       IsHeadersOnly()) {

@@ -41,7 +41,7 @@ bool EulaAcceptedNotifier::IsEulaAccepted() {
 
 // static
 EulaAcceptedNotifier* EulaAcceptedNotifier::Create(PrefService* local_state) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // Tests that use higher-level classes that use EulaAcceptNotifier may not
   // have local state or may not register this pref. Return null to indicate not
   // needing to check the EULA.

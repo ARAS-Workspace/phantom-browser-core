@@ -850,11 +850,7 @@ void SkiaOutputSurfaceImplOnGpu::CopyOutputRGBAInMemory(
   // not prevent readback, however, so once that is fixed, this code could be
   // removed.
   auto color_type =
-#if BUILDFLAG(IS_IOS)
-      kRGBA_8888_SkColorType;
-#else
       kN32_SkColorType;
-#endif  // BUILDFLAG(IS_IOS)
 
   SkImageInfo dst_info = SkImageInfo::Make(
       geometry.result_selection.width(), geometry.result_selection.height(),

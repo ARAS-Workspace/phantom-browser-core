@@ -292,7 +292,7 @@ bool UkmConsentStateObserver::IsUkmAllowedForAllProfiles() {
 // explain why it has IsDwaAllowedForAllProfiles.
 bool UkmConsentStateObserver::IsDwaAllowedForAllProfiles() {
   const UkmConsentState ukm_consent_state = GetUkmConsentState();
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return ukm_consent_state.Has(ukm::MSBB);
 #else
   return ukm_consent_state.HasAll({ukm::MSBB, ukm::APPS, ukm::EXTENSIONS});

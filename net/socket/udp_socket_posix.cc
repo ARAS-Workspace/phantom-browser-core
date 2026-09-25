@@ -145,7 +145,7 @@ uint32_t GetInterfaceForDestination(const IPAddress& destination_address) {
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Helper for IPv4 SSM. Sets sin_len on macOS, no-op on Linux.
 group_source_req CreateIPv4SourceGroupRequest(const IPAddress& group_address,
                                               const IPAddress& source_address,
@@ -205,7 +205,7 @@ group_source_req CreateSourceGroupRequest(const IPAddress& group_address,
   return CreateIPv6SourceGroupRequest(group_address, source_address,
                                       interface_index);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 
@@ -1631,7 +1631,7 @@ int UDPSocketPosix::LeaveGroup(const IPAddress& group_address) const {
 int UDPSocketPosix::SetSourceGroupMembership(const IPAddress& group_address,
                                              const IPAddress& source_address,
                                              int option) const {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return ERR_NOT_IMPLEMENTED;
 #else
   uint32_t interface_index = multicast_interface_;
@@ -1786,12 +1786,6 @@ int UDPSocketPosix::SetIOSNetworkServiceType(int ios_network_service_type) {
   if (ios_network_service_type == 0) {
     return OK;
   }
-#if BUILDFLAG(IS_IOS)
-  if (setsockopt(socket_, SOL_SOCKET, SO_NET_SERVICE_TYPE,
-                 &ios_network_service_type, sizeof(ios_network_service_type))) {
-    return MapSystemError(errno);
-  }
-#endif  // BUILDFLAG(IS_IOS)
   return OK;
 }
 

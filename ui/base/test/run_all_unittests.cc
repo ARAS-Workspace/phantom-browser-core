@@ -53,7 +53,7 @@ void UIBaseTestSuite::Initialize() {
   ui::ResourceBundle::InitSharedInstanceWithLocale(
       "en-US", NULL, ui::ResourceBundle::LOAD_COMMON_RESOURCES);
 
-#elif BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_ANDROID)
   // On iOS, the ui_base_unittests binary is itself a mini bundle, with
   // resources built in. On Android, ui_base_unittests_apk provides the
   // necessary framework.
@@ -81,8 +81,6 @@ void UIBaseTestSuite::Initialize() {
       base::PathService::Get(ui::DIR_RESOURCE_PAKS_ANDROID, &dir_resources);
 #elif BUILDFLAG(IS_MAC)
   result = base::PathService::Get(base::DIR_MODULE, &dir_resources);
-#elif BUILDFLAG(IS_IOS)
-  result = base::PathService::Get(base::DIR_ASSETS, &dir_resources);
 #else
   dir_resources = assets_path;
   result = true;

@@ -122,7 +122,7 @@ TEST_F(ThroughputAnalyzerTest, PrivateHost) {
       NetworkAnonymizationKey(), handles::kInvalidNetworkHandle));
 }
 
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // Flaky on iOS: crbug.com/672917.
 // Flaky on Android: crbug.com/1223950.
 #define MAYBE_MaximumRequests DISABLED_MaximumRequests
@@ -177,14 +177,8 @@ TEST_F(ThroughputAnalyzerTest, MAYBE_MaximumRequests) {
   }
 }
 
-#if BUILDFLAG(IS_IOS)
-// Flaky on iOS: crbug.com/672917.
-#define MAYBE_MaximumRequestsWithNetworkAnonymizationKey \
-  DISABLED_MaximumRequestsWithNetworkAnonymizationKey
-#else
 #define MAYBE_MaximumRequestsWithNetworkAnonymizationKey \
   MaximumRequestsWithNetworkAnonymizationKey
-#endif
 // Make sure that the NetworkAnonymizationKey is respected when resolving a host
 // from the cache.
 TEST_F(ThroughputAnalyzerTest,
@@ -634,14 +628,8 @@ TEST_F(ThroughputAnalyzerTest, TestRequestDeletedImmediately) {
   EXPECT_EQ(0u, throughput_analyzer.CountActiveInFlightRequests());
 }
 
-#if BUILDFLAG(IS_IOS)
-// Flaky on iOS: crbug.com/672917.
-#define MAYBE_TestThroughputWithMultipleRequestsOverlap \
-  DISABLED_TestThroughputWithMultipleRequestsOverlap
-#else
 #define MAYBE_TestThroughputWithMultipleRequestsOverlap \
   TestThroughputWithMultipleRequestsOverlap
-#endif
 // Tests if the throughput observation is taken correctly when local and network
 // requests overlap.
 TEST_F(ThroughputAnalyzerTest,

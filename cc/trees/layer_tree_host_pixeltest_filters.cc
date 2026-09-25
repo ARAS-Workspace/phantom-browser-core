@@ -148,12 +148,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterInvalid) {
       base::FilePath(FILE_PATH_LITERAL("backdrop_filter_invalid.png")));
 }
 
-// TODO(crbug.com/40256786): currently do not pass on iOS.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_BackdropFilterBlurRadius DISABLED_BackdropFilterBlurRadius
-#else
 #define MAYBE_BackdropFilterBlurRadius BackdropFilterBlurRadius
-#endif  // BUILDFLAG(IS_IOS)
 TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_BackdropFilterBlurRadius) {
 #if defined(MEMORY_SANITIZER)
   if (renderer_type() == viz::RendererType::kSkiaVk) {
@@ -320,11 +315,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterQuality_0_33) {
   blur->SetBackdropFilters(filters);
   blur->SetBackdropFilterQuality(0.33);
 
-#if BUILDFLAG(IS_IOS)
-  // iOS has imperceptible pixel differences (max error of 1 per channel).
-  pixel_comparator_ =
-      std::make_unique<AlphaDiscardingFuzzyPixelOffByOneComparator>();
-#elif defined(ARCH_CPU_ARM64)
+#if defined(ARCH_CPU_ARM64)
   // ARM64 (non-iOS) has 436 pixels off by 1: crbug.com/259915
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
@@ -360,11 +351,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterQuality_1_0) {
   blur->SetBackdropFilters(filters);
   blur->SetBackdropFilterQuality(1.0);
 
-#if BUILDFLAG(IS_IOS)
-  // iOS has imperceptible pixel differences (max error of 1 per channel).
-  pixel_comparator_ =
-      std::make_unique<AlphaDiscardingFuzzyPixelOffByOneComparator>();
-#elif defined(ARCH_CPU_ARM64)
+#if defined(ARCH_CPU_ARM64)
   // ARM64 (non-iOS) has 436 pixels off by 1: crbug.com/259915
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
@@ -626,12 +613,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, ImageFilterClipped) {
                base::FilePath(FILE_PATH_LITERAL("blue_yellow.png")));
 }
 
-// TODO(crbug.com/40256786): currently do not pass on iOS.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_ImageFilterScaled DISABLED_ImageFilterScaled
-#else
 #define MAYBE_ImageFilterScaled ImageFilterScaled
-#endif  // BUILDFLAG(IS_IOS)
 TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageFilterScaled) {
   scoped_refptr<SolidColorLayer> background =
       CreateSolidColorLayer(gfx::Rect(200, 200), SK_ColorWHITE);
@@ -698,13 +680,12 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageFilterScaled) {
           .InsertBeforeExtensionASCII(GetRendererSuffix()));
 }
 
-// TODO(crbug.com/40256786): currently do not pass on iOS.
 // TODO(crbug.com/401029604): Times out in arm64 windows and linux TSAN.
-#if BUILDFLAG(IS_IOS) || (defined(THREAD_SANITIZER) && BUILDFLAG(IS_LINUX))
+#if defined(THREAD_SANITIZER) && BUILDFLAG(IS_LINUX)
 #define MAYBE_BackdropFilterRotated DISABLED_BackdropFilterRotated
 #else
 #define MAYBE_BackdropFilterRotated BackdropFilterRotated
-#endif  // BUILDFLAG(IS_IOS)
+#endif  // defined(THREAD_SANITIZER) && BUILDFLAG(IS_LINUX)
 TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_BackdropFilterRotated) {
   if (renderer_type() == viz::RendererType::kSkiaVk) {
     // TODO(crbug.com/40859233): The vulkan expected image requires rebasing
@@ -762,12 +743,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_BackdropFilterRotated) {
                    .InsertBeforeExtensionASCII(GetRendererSuffix()));
 }
 
-// TODO(crbug.com/40256786): currently do not pass on iOS.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_ImageRenderSurfaceScaled DISABLED_ImageRenderSurfaceScaled
-#else
 #define MAYBE_ImageRenderSurfaceScaled ImageRenderSurfaceScaled
-#endif  // BUILDFLAG(IS_IOS)
 TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageRenderSurfaceScaled) {
   // A filter will cause a render surface to be used.  Here we force the
   // render surface on, and scale the result to make sure that we rasterize at
@@ -828,12 +804,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageRenderSurfaceScaled) {
           .InsertBeforeExtensionASCII(GetRendererSuffix()));
 }
 
-// TODO(crbug.com/40256786): currently does not pass on iOS.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_ZoomFilter DISABLED_ZoomFilter
-#else
 #define MAYBE_ZoomFilter ZoomFilter
-#endif  // BUILDFLAG(IS_IOS)
 TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ZoomFilter) {
   // ZOOM_FILTER is unsupported by software_renderer (crbug.com/1451898)
   if (use_software_renderer()) {
@@ -933,12 +904,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ZoomFilter) {
                    .InsertBeforeExtensionASCII(GetRendererSuffix()));
 }
 
-// TODO(crbug.com/40256786): currently do not pass on iOS.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_RotatedFilter DISABLED_RotatedFilter
-#else
 #define MAYBE_RotatedFilter RotatedFilter
-#endif  // BUILDFLAG(IS_IOS)
 TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_RotatedFilter) {
   scoped_refptr<SolidColorLayer> background =
       CreateSolidColorLayer(gfx::Rect(300, 300), SK_ColorWHITE);
@@ -1018,12 +984,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, RotatedDropShadowFilter) {
 
   // Windows, macOS, Fuchsia and Linux on ARM64 has some pixels difference.
   // crbug.com/1029728, crbug.com/1128443
-#if !BUILDFLAG(IS_IOS)
   float percentage_pixels_error = 0.89f;
-#else
-  // iOS on ARM64 has some more differing pixels.
-  float percentage_pixels_error = 0.96f;
-#endif
 
   float average_error_allowed_in_bad_pixels = 5.f;
   int error_allowed = 17;
@@ -1285,13 +1246,6 @@ INSTANTIATE_TEST_SUITE_P(All,
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(BackdropFilterOffsetTest);
 
 TEST_P(BackdropFilterOffsetTest, StandardDpi) {
-#if BUILDFLAG(IS_IOS)
-  // iOS has imperceptible pixel differences with SkiaGraphiteDawn.
-  if (renderer_type() == viz::RendererType::kSkiaGraphiteDawn) {
-    pixel_comparator_ =
-        std::make_unique<AlphaDiscardingFuzzyPixelOffByOneComparator>();
-  }
-#endif
   RunPixelTestType(1.f);
 }
 
@@ -1346,22 +1300,10 @@ INSTANTIATE_TEST_SUITE_P(All,
 GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(BackdropFilterInvertTest);
 
 TEST_P(BackdropFilterInvertTest, StandardDpi) {
-#if BUILDFLAG(IS_IOS)
-  // iOS has imperceptible pixel differences with SkiaGraphiteDawn.
-  if (renderer_type() == viz::RendererType::kSkiaGraphiteDawn) {
-    pixel_comparator_ =
-        std::make_unique<AlphaDiscardingFuzzyPixelOffByOneComparator>();
-  }
-#endif
   RunPixelTestType(1.f);
 }
 
-// TODO(crbug.com/40256786): currently do not pass on iOS.
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_HiDpi DISABLED_HiDpi
-#else
 #define MAYBE_HiDpi HiDpi
-#endif  // BUILDFLAG(IS_IOS)
 TEST_P(BackdropFilterInvertTest, MAYBE_HiDpi) {
   RunPixelTestType(2.f);
 }

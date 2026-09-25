@@ -446,7 +446,6 @@ TEST_F(VirtualCardEnrollmentManagerTest, Enroll_JniCleanupDuringCallbackNoUaf) {
       /*sample=*/true, 1);
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(VirtualCardEnrollmentManagerTest, StrikeDatabase_BubbleAccepted) {
   base::HistogramTester histogram_tester;
   SetUpStrikeDatabaseTest();
@@ -738,8 +737,6 @@ TEST_F(VirtualCardEnrollmentManagerTest, RequiredDelaySinceLastStrike) {
       VirtualCardEnrollmentSource::kDownstream, 2);
 }
 
-#endif  // !BUILDFLAG(IS_IOS)
-
 TEST_F(VirtualCardEnrollmentManagerTest, Metrics_LatencySinceUpstream) {
   base::HistogramTester histogram_tester;
   virtual_card_enrollment_manager_->SetSaveCardBubbleAcceptedTimestamp(
@@ -889,14 +886,7 @@ TEST_P(VirtualCardEnrollmentManagerParamTest,
       TestLegalMessageLine("issuer_test_legal_message");
   // Ignore strike database to avoid its required delay cooldown.
   virtual_card_enrollment_manager_->set_ignore_strike_database(true);
-// TODO(crbug.com/40223706): Makes the following test
-// PersonalDataManagerTest.AddUpdateRemoveCreditCards fail on iOS.
-// That other test fails when SetNetworkImageInResourceBundle is called here.
-#if BUILDFLAG(IS_IOS)
-  for (bool make_image_present : {true}) {
-#else
   for (bool make_image_present : {true, false}) {
-#endif  // BUILDFLAG(IS_IOS)
     SCOPED_TRACE(testing::Message()
                  << ", make_image_present=" << make_image_present);
     payments::GetDetailsForEnrollmentResponseDetails response =

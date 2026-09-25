@@ -26,10 +26,6 @@ namespace autofill::features {
   BASE_FEATURE_WITH_COUNTRY_RESTRICTIONS(feature_name,                         \
                                          base::FEATURE_DISABLED_FOR_COUNTRIES, \
                                          WALLET_UNSUPPORTED_COUNTRIES)
-#elif BUILDFLAG(IS_IOS)
-#define DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(feature_name) \
-  BASE_FEATURE_WITH_COUNTRY_RESTRICTIONS(                            \
-      feature_name, base::FEATURE_ENABLED_FOR_COUNTRIES, "us")
 #else
 #define DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(feature_name) \
   BASE_FEATURE(feature_name, base::FEATURE_ENABLED_BY_DEFAULT)
@@ -188,7 +184,7 @@ BASE_FEATURE(kAutofillAiAlwaysTriggerServerModel,
 // If enabled Autofill AI becomes available by default and the previous enable
 // toggle controls whether online model runs and MQLS logging are allowed.
 // TODO(crbug.com/440488776): Remove once clean up happens.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 DEFINE_FEATURE_WITH_MOBILE_COUNTRY_RESTRICTION(kAutofillAiAvailableByDefault);
 #endif
 
@@ -398,15 +394,9 @@ BASE_FEATURE_PARAM(int,
                    0);
 
 // If enabled, AutofillAi supports private passes entities from Google Wallet.
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE_WITH_COUNTRY_RESTRICTIONS(kAutofillAiWalletPrivatePasses,
-                                       base::FEATURE_ENABLED_FOR_COUNTRIES,
-                                       "us");
-#else
 BASE_FEATURE_WITH_COUNTRY_RESTRICTIONS(kAutofillAiWalletPrivatePasses,
                                        base::FEATURE_DISABLED_FOR_COUNTRIES,
                                        WALLET_UNSUPPORTED_COUNTRIES);
-#endif
 
 // When enabled, account-related eligibility criteria (minor status, location)
 // are determined based on a capability, rather than approximated through

@@ -48,10 +48,6 @@
 #include "ui/base/l10n/l10n_util_android.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "ui/base/l10n/l10n_util_ios.h"
-#endif
-
 #if defined(USE_GLIB)
 #include <glib.h>
 #endif
@@ -305,11 +301,6 @@ std::u16string GetDisplayNameForLocale(std::string_view locale,
   }
 #endif  // BUILDFLAG(ENABLE_PSEUDOLOCALES)
 
-#if BUILDFLAG(IS_IOS)
-  // Use the Foundation API to get the localized display name, removing the need
-  // for the ICU data file to include this data.
-  display_name = GetDisplayNameForLocale(locale_code, display_locale_code);
-#else
 #if BUILDFLAG(IS_ANDROID)
   // Use Java API to get locale display name so it would be possible to remove
   // most of the lang data from icu data to reduce binary size, except for
@@ -341,7 +332,6 @@ std::u16string GetDisplayNameForLocale(std::string_view locale,
     DCHECK(U_SUCCESS(error));
     display_name.resize(base::checked_cast<size_t>(actual_size));
   }
-#endif  // BUILDFLAG(IS_IOS)
 
   // Add directional markup so parentheses are properly placed.
   if (is_for_ui && base::i18n::IsRTL())

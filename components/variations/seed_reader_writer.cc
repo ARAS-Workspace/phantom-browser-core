@@ -228,9 +228,9 @@ void SetUpSeedFileTrial(
   }
 
   // Launch seed files on desktop. Continue the experiment on
-  // Android Chrome and iOS: 50% enabled on pre-Stable and 10%
+  // Android Chrome: 50% enabled on pre-Stable and 10%
   // enabled on Stable.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   base::FieldTrial::Probability control_probability =
       channel == version_info::Channel::STABLE ? 10 : 50;
   base::FieldTrial::Probability seed_files_probability =

@@ -74,10 +74,6 @@ bool Sandbox::IsProcessSandboxed() {
   return (status & kLayer1Flags) != 0 && (status & kLayer2Flags) != 0;
 #elif BUILDFLAG(IS_MAC)
   return Seatbelt::IsSandboxed();
-#elif BUILDFLAG(IS_IOS)
-  // Process launching on iOS is only supported via BrowserEngineKit which
-  // will automatically sandbox processes.
-  return !is_browser;
 #else
   return false;
 #endif

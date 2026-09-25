@@ -31,9 +31,7 @@
 #include "services/service_manager/service_instance.h"
 #include "services/service_manager/service_process_host.h"
 
-#if !BUILDFLAG(IS_IOS)
 #include "services/service_manager/service_process_launcher.h"
-#endif
 
 namespace service_manager {
 
@@ -41,17 +39,10 @@ namespace {
 
 const char kCapability_ServiceManager[] = "service_manager:service_manager";
 
-#if !BUILDFLAG(IS_IOS)
 const char kServiceExecutableExtension[] = ".service";
-#endif
 
 base::ProcessId GetCurrentPid() {
-#if BUILDFLAG(IS_IOS)
-  // iOS does not support base::Process.
-  return 0;
-#else
   return base::Process::Current().Pid();
-#endif
 }
 
 const Identity& GetServiceManagerInstanceIdentity() {
@@ -66,9 +57,7 @@ const Identity& GetServiceManagerInstanceIdentity() {
 class DefaultServiceProcessHost : public ServiceProcessHost {
  public:
   explicit DefaultServiceProcessHost(const base::FilePath& executable_path)
-#if !BUILDFLAG(IS_IOS)
       : launcher_(nullptr, executable_path)
-#endif
   {
   }
 
@@ -83,20 +72,14 @@ class DefaultServiceProcessHost : public ServiceProcessHost {
       sandbox::mojom::Sandbox sandbox_type,
       const std::u16string& display_name,
       LaunchCallback callback) override {
-#if BUILDFLAG(IS_IOS)
-    return mojo::NullRemote();
-#else
     // TODO(crbug.com/41353434): Support sandboxing.
     CHECK_EQ(sandbox_type, sandbox::mojom::Sandbox::kNoSandbox);
     return launcher_.Start(identity, sandbox::mojom::Sandbox::kNoSandbox,
                            std::move(callback));
-#endif  // BUILDFLAG(IS_IOS)
   }
 
  private:
-#if !BUILDFLAG(IS_IOS)
   ServiceProcessLauncher launcher_;
-#endif
 };
 
 // Default ServiceManager::Delegate implementation. This supports launching only
@@ -301,7 +284,6 @@ ServiceInstance* ServiceManager::FindOrCreateMatchingTargetInstance(
       break;
     }
 
-#if !BUILDFLAG(IS_IOS)
     case Manifest::ExecutionMode::kOutOfProcessBuiltin: {
       auto process_host = delegate_->CreateProcessHostForBuiltinServiceInstance(
           target_instance->identity());
@@ -330,10 +312,6 @@ ServiceInstance* ServiceManager::FindOrCreateMatchingTargetInstance(
       }
       break;
     }
-#else   // !BUILDFLAG(IS_IOS)
-    default:
-      NOTREACHED();
-#endif  // !BUILDFLAG(IS_IOS)
   }
 
   return target_instance;

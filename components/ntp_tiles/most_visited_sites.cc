@@ -368,7 +368,7 @@ bool MostVisitedSites::IsCustomLinksInitialized() const {
 void MostVisitedSites::EnableTileTypes(
     const MostVisitedSites::EnableTileTypesOptions& options) {
   // Mixing of personal types is only supported on mobile.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (options.enable_top_sites && options.enable_custom_links) {
     NOTIMPLEMENTED();
   }
@@ -550,7 +550,7 @@ void MostVisitedSites::ResetProfilePrefs(PrefService* prefs) {
 }
 
 size_t MostVisitedSites::GetMaxNumSites() const {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // The "Add new" button (for custom tiles) is not a Tile; don't include.
   return max_num_sites_;
 #else

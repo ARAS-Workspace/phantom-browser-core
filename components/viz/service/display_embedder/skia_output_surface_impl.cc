@@ -1675,11 +1675,7 @@ void SkiaOutputSurfaceImpl::SetSharedImagePurgeable(const gpu::Mailbox& mailbox,
 bool SkiaOutputSurfaceImpl::SupportsBGRA() const {
   if (graphite_recorder_) {
     // TODO(crbug.com/40270686): Implement properly for Graphite.
-#if BUILDFLAG(IS_IOS)
-    return false;
-#else
     return true;
-#endif  // BUILDFLAG(IS_IOS)
   }
 
   return gr_context_thread_safe_

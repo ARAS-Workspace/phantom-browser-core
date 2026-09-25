@@ -65,8 +65,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "net/cert/cert_verify_proc_android.h"
-#elif BUILDFLAG(IS_IOS)
-#include "net/cert/cert_verify_proc_ios.h"
 #endif
 
 namespace net {
@@ -378,8 +376,6 @@ scoped_refptr<CertVerifyProc> CertVerifyProc::CreateSystemVerifyProc(
 #if BUILDFLAG(IS_ANDROID)
   return base::MakeRefCounted<CertVerifyProcAndroid>(
       std::move(cert_net_fetcher), std::move(crl_set));
-#elif BUILDFLAG(IS_IOS)
-  return base::MakeRefCounted<CertVerifyProcIOS>(std::move(crl_set));
 #else
 #error Unsupported platform
 #endif

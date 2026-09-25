@@ -1306,12 +1306,7 @@ class ThreadTicksOverride {
 // static
 ThreadTicks ThreadTicksOverride::now_ticks_;
 
-// IOS doesn't support ThreadTicks::Now().
-#if BUILDFLAG(IS_IOS)
-#define MAYBE_NowOverride DISABLED_NowOverride
-#else
 #define MAYBE_NowOverride NowOverride
-#endif
 TEST(ThreadTicks, MAYBE_NowOverride) {
   ThreadTicksOverride::now_ticks_ = ThreadTicks::Min();
 

@@ -66,13 +66,8 @@
 #include "base/apple/scoped_nsautorelease_pool.h"
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_IOS)
-#include "base/test/test_listener_ios.h"
-#include "base/test/test_support_ios.h"
-#else
 #include "base/strings/string_util.h"
 #include "third_party/icu/source/common/unicode/uloc.h"
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/test/test_support_android.h"
@@ -349,10 +344,6 @@ int TestSuite::Run() {
     return multi_process_function_list::InvokeChildProcessTest(client_func);
   }
 
-#if BUILDFLAG(IS_IOS)
-  test_listener_ios::RegisterTestEndListener();
-#endif
-
 #if BUILDFLAG(IS_LINUX)
   // There's no standard way to opt processes into MTE on Linux just yet,
   // so this call explicitly opts this test into synchronous MTE mode, where
@@ -485,11 +476,9 @@ void TestSuite::Initialize() {
   test::ScopedRunLoopTimeout::SetAddGTestFailureOnTimeout();
 
   const CommandLine* command_line = CommandLine::ForCurrentProcess();
-#if !BUILDFLAG(IS_IOS)
   if (command_line->HasSwitch(switches::kWaitForDebugger)) {
     debug::WaitForDebugger(60, true);
   }
-#endif
 
 #if BUILDFLAG(DCHECK_IS_CONFIGURABLE)
   // Default the configurable DCHECK level to FATAL when running death tests'
@@ -501,10 +490,6 @@ void TestSuite::Initialize() {
     logging::LOGGING_DCHECK = logging::LOGGING_FATAL;
   }
 #endif  // BUILDFLAG(DCHECK_IS_CONFIGURABLE)
-
-#if BUILDFLAG(IS_IOS)
-  InitIOSTestMessageLoop();
-#endif  // BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_ANDROID)
   InitAndroidTestMessageLoop();
@@ -565,9 +550,6 @@ void TestSuite::InitializeFromCommandLine(int* argc, char** argv) {
   testing::InitGoogleMock(argc, argv);
   MaybeInitFuzztest(*argc, argv);
 
-#if BUILDFLAG(IS_IOS)
-  InitIOSArgs(*argc, argv);
-#endif
 }
 
 int TestSuite::RunAllTests() {

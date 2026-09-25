@@ -24,7 +24,7 @@ namespace metrics {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Determines which value of RendererHostedContentType correctly describes the
 // type of content hosted by `host`.
 RendererHostedContentType DetermineHostedContentType(
@@ -130,9 +130,7 @@ void ContentStabilityMetricsProvider::OnRenderProcessLaunched(
 void ContentStabilityMetricsProvider::OnRenderProcessHostCreationFailed(
     content::RenderProcessHost* host,
     const content::ChildProcessTerminationInfo& info) {
-#if BUILDFLAG(IS_IOS)
-  helper_.LogRendererCrash();
-#elif !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   helper_.LogRendererCrash(
       DetermineHostedContentType(host, extensions_helper_.get()), info.status,
       info.exit_code);
@@ -144,9 +142,7 @@ void ContentStabilityMetricsProvider::RenderProcessExited(
     const content::ChildProcessTerminationInfo& info) {
   // On Android, the renderer crashes are recorded in
   // `OnCrashDumpProcessed`.
-#if BUILDFLAG(IS_IOS)
-  helper_.LogRendererCrash();
-#elif !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   helper_.LogRendererCrash(
       DetermineHostedContentType(host, extensions_helper_.get()), info.status,
       info.exit_code);

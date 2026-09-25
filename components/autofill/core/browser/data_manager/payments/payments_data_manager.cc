@@ -1083,7 +1083,6 @@ void PaymentsDataManager::NotifyObservers() {
 
 bool PaymentsDataManager::IsCardEligibleForBenefits(
     const CreditCard& card) const {
-#if !BUILDFLAG(IS_IOS)
   const std::string& benefit_source = card.benefit_source();
   // Benefits sourced from American Express of Bank of Montreal are always
   // eligible.
@@ -1118,9 +1117,6 @@ bool PaymentsDataManager::IsCardEligibleForBenefits(
     }
   }
   return false;
-#else
-  return false;
-#endif  // !BUILDFLAG(IS_IOS)
 }
 
 bool PaymentsDataManager::ShouldBlockCardBenefitSuggestionLabels() const {
@@ -1656,19 +1652,6 @@ void PaymentsDataManager::ClearLocalCvcs() {
   // Refresh our local cache and send notifications to observers.
   Refresh();
 }
-
-#if BUILDFLAG(IS_IOS)
-void PaymentsDataManager::CleanupForCrbug445879524() {
-  if (!GetLocalDatabase()) {
-    return;
-  }
-
-  GetLocalDatabase()->CleanupForCrbug445879524();
-
-  // Refresh our local cache and send notifications to observers.
-  Refresh();
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 void PaymentsDataManager::ClearAllServerDataForTesting() {
   // This could theoretically be called before we get the data back from the

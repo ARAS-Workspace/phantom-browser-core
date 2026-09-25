@@ -1310,7 +1310,7 @@ TEST_F(AddressSuggestionGeneratorTest,
   EXPECT_THAT(suggestions, ElementsAre(HasIphFeature(kIphFeature)));
 }
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AddressSuggestionGeneratorTest, UndoAutofillOnAddressForm) {
   address_data().AddProfile(test::GetFullProfile());
   FormFieldData field;
@@ -1362,7 +1362,7 @@ TEST_F(AddressSuggestionGeneratorTest,
   EXPECT_EQ(test_address_child.type, SuggestionType::kDevtoolsTestAddressEntry);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Text fixture for label generation related tests. Parameterized by triggering
 // field type since how we build labels depends highly on it.
 class AddressLabelSuggestionGeneratorTest
@@ -1498,7 +1498,7 @@ TEST_F(
                                hiragana, Suggestion::Text::IsPrimary(true))));
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AddressSuggestionGeneratorTest, GeneratesSuggestions) {
   base::MockCallback<
@@ -1555,14 +1555,14 @@ TEST_F(AddressSuggestionGeneratorTest, UnrecognizedAttribute) {
 
   std::vector<Suggestion> suggestions_unrecognized = GetSuggestionsForProfiles(
       form, form.fields()[2], {NAME_FIRST, NAME_MIDDLE, NAME_LAST}, 2);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(suggestions_unrecognized.empty());
 #else
   EXPECT_TRUE(suggestions_unrecognized.empty());
 #endif
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AddressSuggestionGeneratorTest, BlockSuggestionsAfterStrikeLimit) {
   AutofillProfile profile = test::GetFullProfile();
   address_data().AddProfile(profile);
@@ -1757,7 +1757,7 @@ TEST_F(AddressSuggestionGeneratorTest, EmptyValue) {
 
 // Tests that suggestions are suppressed for autocomplete="unrecognized" fields
 // on desktop, but are unconditionally allowed on mobile platforms.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(AddressSuggestionGeneratorTest, AutocompleteUnrecognized) {
   AutofillProfile profile = test::GetFullProfile();
   address_data().AddProfile(profile);
@@ -1768,7 +1768,7 @@ TEST_F(AddressSuggestionGeneratorTest, AutocompleteUnrecognized) {
       GetSuggestionsForProfiles(triggering_field, NAME_FIRST);
   EXPECT_FALSE(address_suggestions.empty());
 }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Test that we return only matching address profile suggestions when the
 // selected form field has been partially filled out.

@@ -16,11 +16,7 @@
 #include "base/strings/sys_string_conversions.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_IOS)
-#include <MobileCoreServices/MobileCoreServices.h>
-#else
 #include <CoreServices/CoreServices.h>
-#endif  // BUILDFLAG(IS_IOS)
 
 namespace net {
 

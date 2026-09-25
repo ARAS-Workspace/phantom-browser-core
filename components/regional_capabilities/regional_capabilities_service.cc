@@ -220,10 +220,6 @@ std::pair<CountryId, LoadedCountrySource> SelectCountryId(
 // the program checks.
 Program CountryIdToProgram(const CountryId& country_id) {
   static constexpr Program kCountryDerivedPrograms[] = {
-#if BUILDFLAG(IS_IOS)
-      // Only iOS can derive Taiyaki scope directly from the country.
-      Program::kTaiyaki,
-#endif
 
       Program::kWaffle,
   };
@@ -509,26 +505,7 @@ RegionalCapabilitiesService::GetChoiceScreenDesign() {
     case Program::kDefault:
       return std::nullopt;
     case Program::kTaiyaki:
-#if BUILDFLAG(IS_IOS)
-      return RegionalCapabilitiesService::ChoiceScreenDesign{
-          .title_string_id = IDS_SEARCH_ENGINE_CHOICE_PAGE_TITLE,
-          .subtitle_1_string_id =
-              IDS_SEARCH_ENGINE_CHOICE_PAGE_SUBTITLE_WITH_DEFINITION1,
-          .subtitle_1_learn_more_suffix_string_id =
-              IDS_SEARCH_ENGINE_CHOICE_PAGE_SUBTITLE_INFO_LINK,
-          .subtitle_1_learn_more_a11y_string_id =
-              IDS_SEARCH_ENGINE_CHOICE_PAGE_SUBTITLE_INFO_LINK_A11Y_LABEL,
-          .subtitle_2_string_id =
-              IDS_SEARCH_ENGINE_CHOICE_PAGE_SUBTITLE_WITH_DEFINITION2,
-          .learn_more_third_paragraph_string_id =
-              base::FeatureList::IsEnabled(
-                  switches::kSearchEngineChoiceScreenSnackbar)
-                  ? IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_BODY_THIRD_PARAGRAPH_INSTRUCTIVE
-                  : IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_BODY_THIRD_PARAGRAPH,
-      };
-#else
       NOTREACHED();
-#endif
     case Program::kWaffle:
       return RegionalCapabilitiesService::ChoiceScreenDesign{
           .title_string_id = IDS_SEARCH_ENGINE_CHOICE_PAGE_TITLE,
@@ -544,17 +521,6 @@ RegionalCapabilitiesService::GetChoiceScreenDesign() {
   NOTREACHED();
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_IOS)
-bool RegionalCapabilitiesService::ShouldShowChoiceConfirmationSnackbar() {
-  if (!switches::IsSearchEngineChoiceScreenSnackbarEnabled()) {
-    return false;
-  }
-  const auto& eligibility_config = GetChoiceScreenEligibilityConfig();
-  return eligibility_config.has_value() &&
-         eligibility_config->highlight_current_default;
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 const std::optional<ChoiceScreenEligibilityConfig>&
 RegionalCapabilitiesService::GetChoiceScreenEligibilityConfig() {

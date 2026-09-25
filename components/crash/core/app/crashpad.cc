@@ -42,13 +42,6 @@
 
 namespace crash_reporter {
 
-#if BUILDFLAG(IS_IOS)
-crashpad::StringAnnotation<24>& PlatformStorage() {
-  static crashpad::StringAnnotation<24> platform("platform");
-  return platform;
-}
-#endif  // BUILDFLAG(IS_IOS)
-
 namespace {
 
 base::FilePath* g_database_path;
@@ -120,7 +113,6 @@ bool InitializeCrashpadImpl(bool initial_client,
 #endif  // BUILDFLAG(IS_APPLE)
 
   InitializeCrashKeys();
-#if !BUILDFLAG(IS_IOS)
   static crashpad::StringAnnotation<24> ptype_key("ptype");
   ptype_key.Set(browser_process ? std::string_view("browser")
                                 : std::string_view(process_type));
@@ -132,10 +124,6 @@ bool InitializeCrashpadImpl(bool initial_client,
 
   static crashpad::StringAnnotation<24> osarch_key("osarch");
   osarch_key.Set(base::SysInfo::OperatingSystemArchitecture());
-#else
-  // "platform" is used to determine device_model on the crash server.
-  PlatformStorage().Set(base::SysInfo::HardwareModelName());
-#endif  // !BUILDFLAG(IS_IOS)
 
   // If clients called CRASHPAD_SIMULATE_CRASH() instead of
   // base::debug::DumpWithoutCrashing(), these dumps would appear as crashes in
@@ -157,7 +145,7 @@ bool InitializeCrashpadImpl(bool initial_client,
     g_database =
         crashpad::CrashReportDatabase::Initialize(database_path).release();
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
     // On Android crashpad doesn't handle uploads. Android uses
     // //components/minidump_uploader which queries metrics sample/consent opt
     // in from preferences.
@@ -218,41 +206,6 @@ void SetUploadConsent(bool consent) {
 void DumpWithoutCrashing() {
   CRASHPAD_SIMULATE_CRASH();
 }
-
-#if BUILDFLAG(IS_IOS)
-void DumpWithoutCrashAndDeferProcessing() {
-  CRASHPAD_SIMULATE_CRASH_AND_DEFER_PROCESSING();
-}
-
-void DumpWithoutCrashAndDeferProcessingAtPath(const base::FilePath& path) {
-  CRASHPAD_SIMULATE_CRASH_AND_DEFER_PROCESSING_AT_PATH(path);
-}
-
-void OverridePlatformValue(const std::string& platform_value) {
-  // "platform" is used to determine device_model on the crash server.
-  PlatformStorage().Set(platform_value);
-}
-
-crashpad::SimpleAddressRangeBag* ExtraMemoryRanges() {
-  return crashpad::CrashpadInfo::GetCrashpadInfo()->extra_memory_ranges();
-}
-
-void SetExtraMemoryRanges(crashpad::SimpleAddressRangeBag* address_range_bag) {
-  crashpad::CrashpadInfo::GetCrashpadInfo()->set_extra_memory_ranges(
-      address_range_bag);
-}
-
-crashpad::SimpleAddressRangeBag* IntermediateDumpExtraMemoryRanges() {
-  return crashpad::CrashpadInfo::GetCrashpadInfo()
-      ->intermediate_dump_extra_memory_ranges();
-}
-
-void SetIntermediateDumpExtraMemoryRanges(
-    crashpad::SimpleAddressRangeBag* address_range_bag) {
-  crashpad::CrashpadInfo::GetCrashpadInfo()
-      ->set_intermediate_dump_extra_memory_ranges(address_range_bag);
-}
-#endif  // BUILDFLAG(IS_IOS)
 
 #endif
 

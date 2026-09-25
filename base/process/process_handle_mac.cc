@@ -12,11 +12,7 @@
 #include "base/logging.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "base/ios/sim_header_shims.h"
-#else
 #include <libproc.h>
-#endif
 
 namespace base {
 

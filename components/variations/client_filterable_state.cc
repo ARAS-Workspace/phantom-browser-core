@@ -116,9 +116,7 @@ Study::Platform ClientFilterableState::GetCurrentPlatform() {
     DVLOG(1) << "Invalid platform provided: " << forced_platform;
   }
 
-#if BUILDFLAG(IS_IOS)
-  return Study::PLATFORM_IOS;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return Study::PLATFORM_MAC;
 #elif BUILDFLAG(IS_ANDROID)
   return Study::PLATFORM_ANDROID;

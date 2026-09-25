@@ -65,7 +65,7 @@ bool DeferMediaLoadInBackgroundTab() {
 }
 
 bool ShouldForceRemoveClosedTabGroupsOnStartup() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return base::FeatureList::IsEnabled(kForceRemoveClosedTabGroupsOnStartup);
 #else
   return false;

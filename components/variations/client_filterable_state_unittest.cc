@@ -83,9 +83,7 @@ TEST(ClientFilterableStateTest, IgnoreInvalidFakePlatformSwitch) {
       switches::kFakeVariationsPlatform, "not_a_platform");
 
   Study::Platform actual_platform;
-#if BUILDFLAG(IS_IOS)
-  actual_platform = Study::PLATFORM_IOS;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   actual_platform = Study::PLATFORM_MAC;
 #elif BUILDFLAG(IS_ANDROID)
   actual_platform = Study::PLATFORM_ANDROID;

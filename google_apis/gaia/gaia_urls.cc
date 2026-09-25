@@ -60,8 +60,6 @@ const char kAccountChooser[] = "AccountChooser";
 
 #if BUILDFLAG(IS_ANDROID)
 const char kSigninChromeSyncKeysRetrievalUrl[] = "encryption/unlock/android";
-#elif BUILDFLAG(IS_IOS)
-const char kSigninChromeSyncKeysRetrievalUrl[] = "encryption/unlock/ios";
 #else
 const char kSigninChromeSyncKeysRetrievalUrl[] = "encryption/unlock/desktop";
 #endif

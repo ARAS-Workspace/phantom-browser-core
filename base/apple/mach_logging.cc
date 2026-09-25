@@ -13,11 +13,7 @@
 #include "build/build_config.h"
 
 #if BUILDFLAG(USE_BLINK)
-#if BUILDFLAG(IS_IOS)
-#include "base/ios/sim_header_shims.h"
-#else
 #include <servers/bootstrap.h>
-#endif  // BUILDFLAG(IS_IOS)
 #endif  // BUILDFLAG(USE_BLINK)
 
 namespace {

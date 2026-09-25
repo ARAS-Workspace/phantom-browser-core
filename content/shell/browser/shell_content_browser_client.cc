@@ -127,19 +127,10 @@
 #include "services/network/public/mojom/ct_log_info.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "components/permissions/bluetooth_delegate_impl.h"
-#include "content/shell/browser/bluetooth/shell_bluetooth_delegate_impl_client.h"
-#endif
-
 
 namespace content {
 
 namespace {
-
-#if BUILDFLAG(IS_IOS)
-inline constexpr char kJITEnabled[] = "settings.javascript.jit";
-#endif
 
 using PerformanceManagerRegistry =
     performance_manager::PerformanceManagerRegistry;
@@ -266,10 +257,6 @@ std::unique_ptr<PrefService> CreateLocalState() {
   auto pref_registry = base::MakeRefCounted<PrefRegistrySimple>();
   metrics::MetricsService::RegisterPrefs(pref_registry.get());
   variations::VariationsService::RegisterPrefs(pref_registry.get());
-
-#if BUILDFLAG(IS_IOS)
-  pref_registry->RegisterBooleanPref(kJITEnabled, true);
-#endif
 
   base::FilePath path;
   CHECK(base::PathService::Get(SHELL_DIR_USER_DATA, &path));
@@ -464,37 +451,12 @@ void ShellContentBrowserClient::AppendExtraCommandLineSwitches(
     command_line->AppendSwitch(switches::kEnableIsolatedWebAppsInRenderer);
   }
 
-#if BUILDFLAG(IS_IOS)
-  if (command_line->GetSwitchValueASCII(switches::kProcessType) ==
-          switches::kRendererProcess &&
-      !IsJITEnabled()) {
-    command_line->AppendSwitchASCII(blink::switches::kJavaScriptFlags,
-                                    "--jitless");
-  }
-#endif
 }
-
-#if BUILDFLAG(IS_IOS)
-bool ShellContentBrowserClient::IsJITEnabled() {
-  return GetSharedState().local_state->GetBoolean(kJITEnabled);
-}
-
-void ShellContentBrowserClient::SetJITEnabled(bool value) {
-  GetSharedState().local_state->SetBoolean(kJITEnabled, value);
-  GetSharedState().local_state->CommitPendingWrite();
-}
-#endif
 
 device::GeolocationSystemPermissionManager*
 ShellContentBrowserClient::GetGeolocationSystemPermissionManager() {
 #if BUILDFLAG(IS_MAC)
   return GetSharedState().location_manager.get();
-#elif BUILDFLAG(IS_IOS)
-  // TODO(crbug.com/1431447, 1411704): Unify this to
-  // FakeGeolocationSystemPermissionManager once exploring browser features in
-  // ContentShell on iOS is done.
-  return GetSharedState()
-      .shell_browser_main_parts->GetGeolocationSystemPermissionManager();
 #else
   return nullptr;
 #endif
@@ -703,7 +665,7 @@ std::string ShellContentBrowserClient::GetUserAgent() {
 
   std::string product =
       base::StringPrintf("Chrome/%s.0.0.0", CONTENT_SHELL_MAJOR_VERSION);
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
           embedder_support::kUseMobileUserAgent)) {
     product += " Mobile";
@@ -782,16 +744,6 @@ std::vector<base::FilePath>
 ShellContentBrowserClient::GetNetworkContextsParentDirectory() {
   return {browser_context()->GetPath()};
 }
-
-#if BUILDFLAG(IS_IOS)
-BluetoothDelegate* ShellContentBrowserClient::GetBluetoothDelegate() {
-  if (!bluetooth_delegate_) {
-    bluetooth_delegate_ = std::make_unique<permissions::BluetoothDelegateImpl>(
-        std::make_unique<ShellBluetoothDelegateImplClient>());
-  }
-  return bluetooth_delegate_.get();
-}
-#endif
 
 void ShellContentBrowserClient::BindBrowserControlInterface(
     mojo::ScopedMessagePipeHandle pipe) {

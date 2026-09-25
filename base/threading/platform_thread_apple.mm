@@ -369,12 +369,6 @@ ThreadType PlatformThreadBase::GetCurrentEffectiveThreadTypeForTest() {
 }
 
 size_t GetDefaultThreadStackSize(const pthread_attr_t& attributes) {
-#if BUILDFLAG(IS_IOS)
-  // For iOS 512kB (the default) isn't sufficient, but using the code
-  // for macOS below will return 8MB. So just be a little more conservative
-  // and return 1MB for now.
-  return 1024 * 1024;
-#else
   // The macOS default for a pthread stack size is 512kB.
   // Libc-594.1.4/pthreads/pthread.c's pthread_attr_init uses
   // DEFAULT_STACK_SIZE for this purpose.
@@ -402,7 +396,6 @@ size_t GetDefaultThreadStackSize(const pthread_attr_t& attributes) {
         static_cast<size_t>(stack_rlimit.rlim_cur));
   }
   return default_stack_size;
-#endif
 }
 
 void TerminateOnThread() {}

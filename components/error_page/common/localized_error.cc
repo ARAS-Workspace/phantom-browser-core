@@ -723,7 +723,7 @@ void GetSuggestionsSummaryList(int error_code,
         "summary", IDS_ERRORPAGES_SUGGESTION_CHECK_CONNECTION_SUMMARY));
   }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (IsSuggested(suggestions, SUGGEST_DNS_CONFIG) &&
       IsSuggested(suggestions, SUGGEST_FIREWALL_CONFIG) &&
       IsSuggested(suggestions, SUGGEST_PROXY_CONFIG)) {
@@ -760,7 +760,7 @@ void GetSuggestionsSummaryList(int error_code,
 #endif
 
   if (IsSuggested(suggestions, SUGGEST_OFFLINE_CHECKS)) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
     suggestions_summary_list.Append(SingleEntryDictionary(
         "summary", IDS_ERRORPAGES_SUGGESTION_TURN_OFF_AIRPLANE_SUMMARY));
     suggestions_summary_list.Append(SingleEntryDictionary(
@@ -818,7 +818,7 @@ void AddSuggestionDetailDictionaryToList(base::ListValue& list,
   list.Append(std::move(suggestion_list_item));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 // Creates a dictionary with "header" and "body" entries and adds it to `list`.
 void AddSuggestionDetailDictionaryToList(base::ListValue& list,
                                          std::u16string header_message,
@@ -840,15 +840,13 @@ void AddSuggestionsDetails(int error_code,
         IDS_ERRORPAGES_SUGGESTION_CHECK_CONNECTION_BODY);
   }
 
-#if !BUILDFLAG(IS_IOS)
   if (suggestions & SUGGEST_SECURE_DNS_CONFIG) {
     AddSuggestionDetailDictionaryToList(
         suggestions_details, IDS_ERRORPAGES_SUGGESTION_SECURE_DNS_CONFIG_HEADER,
         IDS_ERRORPAGES_SUGGESTION_SECURE_DNS_CONFIG_BODY);
   }
-#endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   if (suggestions & SUGGEST_DNS_CONFIG) {
     AddSuggestionDetailDictionaryToList(
         suggestions_details, IDS_ERRORPAGES_SUGGESTION_DNS_CONFIG_HEADER,

@@ -457,10 +457,8 @@ TEST(PlatformThreadTest, SetHugeThreadName) {
 
 TEST(PlatformThreadTest, GetDefaultThreadStackSize) {
   size_t stack_size = PlatformThread::GetDefaultThreadStackSize();
-#if BUILDFLAG(IS_IOS)
-  EXPECT_EQ(1024u * 1024u, stack_size);
-#elif (BUILDFLAG(IS_LINUX) && defined(__GLIBC__) && \
-       !defined(THREAD_SANITIZER)) ||               \
+#if (BUILDFLAG(IS_LINUX) && defined(__GLIBC__) && \
+     !defined(THREAD_SANITIZER)) ||               \
     (BUILDFLAG(IS_ANDROID) && !defined(ADDRESS_SANITIZER))
   EXPECT_EQ(0u, stack_size);
 #else

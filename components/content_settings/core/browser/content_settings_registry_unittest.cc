@@ -52,11 +52,6 @@ TEST_F(ContentSettingsRegistryTest, GetPlatformDependent) {
   EXPECT_FALSE(registry()->Get(ContentSettingsType::JAVASCRIPT));
 #endif
 
-#if (BUILDFLAG(IS_IOS) && !BUILDFLAG(USE_BLINK))
-  // Images shouldn't be registered on iOS.
-  EXPECT_FALSE(registry()->Get(ContentSettingsType::IMAGES));
-#endif
-
 // Protected media identifier only registered on Android.
 #if defined(ANDROID)
   EXPECT_TRUE(registry()->Get(ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER));
@@ -97,7 +92,7 @@ TEST_F(ContentSettingsRegistryTest, Properties) {
   ASSERT_TRUE(website_settings_info->initial_default_value().is_int());
   EXPECT_EQ(CONTENT_SETTING_ALLOW,
             website_settings_info->initial_default_value().GetInt());
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(PrefRegistry::NO_REGISTRATION_FLAGS,
             website_settings_info->GetPrefRegistrationFlags());
 #else
@@ -176,7 +171,7 @@ TEST_F(ContentSettingsRegistryTest, IsDefaultSettingValid) {
   info = registry()->Get(ContentSettingsType::MEDIASTREAM_CAMERA);
   EXPECT_FALSE(info->IsDefaultSettingValid(CONTENT_SETTING_ALLOW));
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   info = registry()->Get(ContentSettingsType::FILE_SYSTEM_WRITE_GUARD);
   EXPECT_FALSE(info->IsDefaultSettingValid(CONTENT_SETTING_ALLOW));
 #endif
@@ -186,12 +181,9 @@ TEST_F(ContentSettingsRegistryTest, IsDefaultSettingValid) {
 // default settings are hard coded, so changing them in ContentSettingsRegistry
 // would require this test to be updated.
 TEST_F(ContentSettingsRegistryTest, GetInitialDefaultSetting) {
-// There is no default-ask content setting on iOS, so skip testing it there.
-#if !BUILDFLAG(IS_IOS)
   const ContentSettingsInfo* notifications =
       registry()->Get(ContentSettingsType::NOTIFICATIONS);
   EXPECT_EQ(CONTENT_SETTING_ASK, notifications->GetInitialDefaultSetting());
-#endif
 
   const ContentSettingsInfo* cookies =
       registry()->Get(ContentSettingsType::COOKIES);

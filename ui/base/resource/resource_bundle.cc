@@ -978,23 +978,11 @@ void ResourceBundle::InitSharedInstance(Delegate* delegate) {
   DCHECK(g_shared_instance_ == nullptr) << "ResourceBundle initialized twice";
   g_shared_instance_ = new ResourceBundle(delegate);
   std::vector<ResourceScaleFactor> supported_scale_factors;
-#if BUILDFLAG(IS_IOS)
-  float internal_display_device_scale_factor =
-      display::GetInternalDisplayDeviceScaleFactor();
-  if (internal_display_device_scale_factor > 2.0) {
-    supported_scale_factors.push_back(k300Percent);
-  } else if (internal_display_device_scale_factor > 1.0) {
-    supported_scale_factors.push_back(k200Percent);
-  } else {
-    supported_scale_factors.push_back(k100Percent);
-  }
-#else
   // On platforms other than iOS, 100P is always a supported scale factor.
   supported_scale_factors.push_back(k100Percent);
 
 #if BUILDFLAG(ENABLE_HIDPI)
   supported_scale_factors.push_back(k200Percent);
-#endif
 #endif
   ui::SetSupportedResourceScaleFactors(supported_scale_factors);
 
@@ -1103,7 +1091,6 @@ bool ResourceBundle::LoadBitmap(const ResourceHandle& data_handle,
     return true;
   }
 
-#if !BUILDFLAG(IS_IOS)
   // iOS does not compile or use the JPEG codec.  On other platforms,
   // 99% of our assets are PNGs, however fallback to JPEG.
   SkBitmap jpeg_bitmap = gfx::JPEGCodec::Decode(*memory);
@@ -1112,7 +1099,6 @@ bool ResourceBundle::LoadBitmap(const ResourceHandle& data_handle,
     *fell_back_to_1x = false;
     return true;
   }
-#endif
 
   NOTREACHED() << "Unable to decode theme image resource " << resource_id;
 }

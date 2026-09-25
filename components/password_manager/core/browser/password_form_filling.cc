@@ -59,7 +59,7 @@ bool ContainsAndroidCredentials(const PasswordFormFillData& fill_data) {
   return PreferredRealmIsFromAndroid(fill_data);
 }
 
-#if !BUILDFLAG(IS_IOS) && !defined(ANDROID)
+#if !defined(ANDROID)
 bool IsFillOnAccountSelectFeatureEnabled() {
   return base::FeatureList::IsEnabled(
       password_manager::features::kFillOnAccountSelect);
@@ -123,7 +123,7 @@ bool IsSameOrigin(const Origin& frame_origin, const GURL& credential_url) {
   return frame_origin.IsSameOriginWith(Origin::Create(credential_url));
 }
 
-#if !BUILDFLAG(IS_IOS) && !defined(ANDROID)
+#if !defined(ANDROID)
 bool IsEligibleForPasswordChange(PasswordManagerClient* client,
                                  const StoredCredential* preferred_match) {
   if (!preferred_match) {
@@ -210,9 +210,9 @@ LikelyFormFilling SendFillInformationToRenderer(
     metrics_recorder->RecordMatchedFormType(*preferred_match);
   }
 
-// This metric will always record kReauthRequired on iOS and Android. So we can
-// drop it there.
-#if !BUILDFLAG(IS_IOS) && !defined(ANDROID)
+  // This metric will always record kReauthRequired on Android. So we can
+  // drop it there.
+#if !defined(ANDROID)
   // Proceed to autofill.
   // Note that we provide the choices but don't actually prefill a value if:
   // (1) we are in Incognito mode, or
@@ -279,7 +279,7 @@ LikelyFormFilling SendFillInformationToRenderer(
       wait_for_username_reason != WaitForUsernameReason::kDontWait;
 #else
   bool wait_for_username = true;
-#endif  // !BUILDFLAG(IS_IOS) && !defined(ANDROID)
+#endif  // !defined(ANDROID)
 
   if (wait_for_username) {
     metrics_recorder->RecordFillEvent(

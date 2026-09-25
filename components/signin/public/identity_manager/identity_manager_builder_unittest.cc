@@ -27,10 +27,6 @@
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "components/signin/public/identity_manager/ios/fake_device_accounts_provider.h"
-#endif
-
 namespace signin {
 
 class MockAccountFetcherFactory : public AccountFetcherFactory {
@@ -112,13 +108,6 @@ TEST_F(IdentityManagerBuilderTest, BuildIdentityManagerInitParameters) {
   params.signin_client = GetSigninClient();
   params.profile_metrics_service = GetProfileMetricsService();
 
-#if BUILDFLAG(IS_IOS)
-  params.device_accounts_provider =
-      std::make_unique<FakeDeviceAccountsProvider>();
-  params.account_fetcher_factory =
-      std::make_unique<MockAccountFetcherFactory>();
-#endif
-
   const IdentityManager::InitParameters init_params =
       signin::BuildIdentityManagerInitParameters(&params);
 
@@ -130,7 +119,7 @@ TEST_F(IdentityManagerBuilderTest, BuildIdentityManagerInitParameters) {
   EXPECT_NE(init_params.primary_account_mutator, nullptr);
   EXPECT_NE(init_params.accounts_cookie_mutator, nullptr);
   EXPECT_NE(init_params.diagnostics_provider, nullptr);
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_NE(init_params.device_accounts_synchronizer, nullptr);
   EXPECT_EQ(init_params.accounts_mutator, nullptr);
 #else

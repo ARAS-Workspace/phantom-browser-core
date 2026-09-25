@@ -48,7 +48,7 @@ const base::TickClock* GetTickClock() {
 
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 
 const int64_t CloudPolicyRefreshScheduler::kDefaultRefreshDelayMs =
     24 * 60 * 60 * 1000;  // 1 day.
@@ -281,7 +281,7 @@ void CloudPolicyRefreshScheduler::UpdateLastRefreshFromPolicy() {
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   // On mobile platforms the client is only registered for enterprise users.
   constexpr bool should_update = true;
 #else

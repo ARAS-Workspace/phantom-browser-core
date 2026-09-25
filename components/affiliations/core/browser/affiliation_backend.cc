@@ -33,7 +33,7 @@
 namespace affiliations {
 
 BASE_FEATURE(kFetchChangePasswordUrl,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
              // Change-password urls aren't utilized in any way on mobile. No
              // need to fetch them.
              base::FEATURE_DISABLED_BY_DEFAULT);

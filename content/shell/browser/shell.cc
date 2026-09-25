@@ -206,11 +206,8 @@ void Shell::Shutdown() {
   if (quit_loop)
     std::move(quit_loop).Run();
 
-  // Pump the message loop to allow window teardown tasks to run. On iOS the
-  // run loop is controlled differently and cannot be pumped.
-#if !BUILDFLAG(IS_IOS)
+  // Pump the message loop to allow window teardown tasks to run.
   base::RunLoop().RunUntilIdle();
-#endif  // !BUILDFLAG(IS_IOS)
 }
 
 gfx::Size Shell::AdjustWindowSize(const gfx::Size& initial_size) {
@@ -506,7 +503,7 @@ void Shell::ExitFullscreenModeForTab(WebContents* web_contents) {
 
 void Shell::ToggleFullscreenModeForTab(WebContents* web_contents,
                                        bool enter_fullscreen) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   g_platform->ToggleFullscreenModeForTab(this, web_contents, enter_fullscreen);
 #endif
   if (is_fullscreen_ != enter_fullscreen) {
@@ -519,7 +516,7 @@ void Shell::ToggleFullscreenModeForTab(WebContents* web_contents,
 }
 
 bool Shell::IsFullscreenForTabOrPending(const WebContents* web_contents) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   return g_platform->IsFullscreenForTabOrPending(this, web_contents);
 #else
   return is_fullscreen_;
@@ -691,7 +688,7 @@ void Shell::ActivateContents(WebContents* contents) {
 #endif
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
 std::unique_ptr<ColorChooser> Shell::OpenColorChooser(
     WebContents* web_contents,
     SkColor color,

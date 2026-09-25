@@ -138,11 +138,6 @@
 #include "content/browser/renderer_host/test_render_widget_host_view_mac_factory.h"
 #endif
 
-#if BUILDFLAG(IS_IOS)
-#include "content/browser/renderer_host/browser_compositor_ios.h"
-#include "content/browser/renderer_host/test_render_widget_host_view_ios_factory.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -9853,9 +9848,6 @@ DelegatedFrameHost* GetDelegatedFrameHost(RenderWidgetHostView* view) {
   DelegatedFrameHost* dfh = nullptr;
 #if BUILDFLAG(IS_MAC)
   auto* compositor = GetBrowserCompositorMacForTesting(view);
-  dfh = compositor->GetDelegatedFrameHost();
-#elif BUILDFLAG(IS_IOS)
-  auto* compositor = GetBrowserCompositorIOSForTesting(view);
   dfh = compositor->GetDelegatedFrameHost();
 #elif defined(USE_AURA)
   dfh = static_cast<RenderWidgetHostViewAura*>(view)

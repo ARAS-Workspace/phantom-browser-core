@@ -826,7 +826,7 @@ TEST_F(AutocompleteResultTest, SortAndCullEmptyDestinationURLs) {
   EXPECT_EQ(1000, result.match_at(3)->relevance);
 }
 
-#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS))
+#if !BUILDFLAG(IS_ANDROID)
 // Tests which remove results only work on desktop.
 
 TEST_F(AutocompleteResultTest, SortAndCullTailSuggestions) {
@@ -1346,8 +1346,7 @@ TEST_F(AutocompleteResultTest, DemoteByType) {
   matches[0].allowed_to_be_default_match = false;
   matches[2].allowed_to_be_default_match = false;
 
-#if (!BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)) || \
-    BUILDFLAG(IS_DESKTOP_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   // Where Grouping suggestions by Search vs URL kicks in, search gets
   // promoted to the top of the list.
 
@@ -1962,7 +1961,7 @@ TEST_F(AutocompleteResultTest, SortAndCullPromoteDuplicateSearchURLs) {
   EXPECT_EQ(900, result.match_at(2)->relevance);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteResultTest, SortAndCullFeaturedSearchBeforeStarterPack) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndEnableFeatureWithParameters(
@@ -2042,7 +2041,7 @@ TEST_F(AutocompleteResultTest,
                                   .first(AutocompleteResult::GetMaxMatches()));
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteResultTest, GroupSuggestionsByExtension) {
   const auto group1 = omnibox::GROUP_UNSCOPED_EXTENSION_1;
   const auto group2 = omnibox::GROUP_UNSCOPED_EXTENSION_2;
@@ -2131,10 +2130,9 @@ TEST_F(AutocompleteResultTest, SortAndCullMaxURLMatches) {
   result.max_url_matches_ = 3;
 
   // Case 1: Eject URL match for a search.
-  // Does not apply to Android and iOS which picks top N matches and performs
+  // Does not apply to Android which picks top N matches and performs
   // group by search vs URL separately (Adaptive Suggestions).
-#if (!BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)) || \
-    BUILDFLAG(IS_DESKTOP_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
   {
     ACMatches matches;
     const AutocompleteMatchTestData data[] = {
@@ -2395,8 +2393,8 @@ TEST_F(AutocompleteResultTest, AttachesPedals) {
     return pedal && pedal->PedalId() == OmniboxPedalId::CLEAR_BROWSING_DATA;
   }));
 
-// Android & iOS avoid attaching tab-switch actions by design.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+// Android avoids attaching tab-switch actions by design.
+#if !BUILDFLAG(IS_ANDROID)
   // Include a tab-switch action, which is common and shouldn't prevent
   // pedals from attaching to the same match. The first match has a URL
   // that triggers tab-switch action attachment with this fake matcher.
@@ -2709,7 +2707,7 @@ TEST_F(AutocompleteResultTest, MaybeCullTailSuggestions) {
   EXPECT_THAT(test({nd, td, t, h}), testing::ElementsAre(nd, tdp, t));
 }
 
-#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS))
+#if !BUILDFLAG(IS_ANDROID)
 // Tests zps grouping for most visited sites and backfills with different
 // suggestion limits.
 TEST_F(AutocompleteResultTest, Desktop_MostVisitedSitesGrouping) {
@@ -3200,7 +3198,7 @@ TEST_F(AutocompleteResultTest, SplitActionsToSuggestions) {
   EXPECT_EQ(result.size(), 4u);
 }
 
-#endif  // !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS))
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AutocompleteResultTest, BadDestinationUrls) {
   AutocompleteMatch empty_url_match;
@@ -3356,54 +3354,7 @@ TEST_F(AutocompleteResultTest, Android_UndedupTopSearch) {
   }
 }
 
-#if BUILDFLAG(IS_IOS)
-TEST_F(AutocompleteResultTest, IOS_InspireMe) {
-  const auto group1 = omnibox::GROUP_PERSONALIZED_ZERO_SUGGEST;
-  const auto group2 = omnibox::GROUP_TRENDS;
-  TestData data[] = {
-      {0, 1, 500, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {1, 1, 490, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {2, 1, 480, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {3, 1, 470, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group2},
-      {4, 1, 460, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group2},
-  };
-  ACMatches matches;
-  PopulateAutocompleteMatches(data, &matches);
-
-  // Suggestion groups have the omnibox::SECTION_DEFAULT and
-  // omnibox::GroupConfig_SideType_DEFAULT_PRIMARY by default.
-  omnibox::GroupConfigMap suggestion_groups_map;
-  suggestion_groups_map[group1];
-  suggestion_groups_map[group2];
-
-  // Set up input for zero-prefix suggestions.
-  AutocompleteInput zero_input(u"", metrics::OmniboxEventProto::NTP,
-                               TestSchemeClassifier());
-  zero_input.set_focus_type(metrics::OmniboxFocusType::INTERACTION_FOCUS);
-
-  base::test::ScopedFeatureList feature_list;
-  AutocompleteResult result;
-  result.MergeSuggestionGroupsMap(suggestion_groups_map);
-  result.AppendMatches(matches);
-  result.SortAndCull(zero_input, &template_url_service(),
-                     triggered_feature_service(), /*is_lens_active=*/false,
-                     /*can_show_contextual_suggestions=*/false,
-                     /*mia_enabled=*/false, /*is_incognito=*/false);
-
-  const std::array<TestData, 5> expected_data{{
-      {0, 1, 500, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {1, 1, 490, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {2, 1, 480, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group1},
-      {3, 1, 470, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group2},
-      {4, 1, 460, false, {}, AutocompleteMatchType::SEARCH_SUGGEST, group2},
-  }};
-
-  AssertResultMatches(result, expected_data);
-}
-#endif
-
-#if (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)) && \
-    !BUILDFLAG(IS_DESKTOP_ANDROID)
+#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)
 
 TEST_F(AutocompleteResultTest, Mobile_TrimOmniboxActions) {
   scoped_refptr<FakeAutocompleteProvider> provider =
@@ -3562,7 +3513,7 @@ TEST_F(AutocompleteResultTest, Mobile_TrimOmniboxActions) {
 
 #endif
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_F(AutocompleteResultTest, ContextualSearchAblateOthers) {
   omnibox_feature_configs::ScopedConfigForTesting<
       omnibox_feature_configs::ContextualSearch>
@@ -3764,7 +3715,7 @@ TEST_F(AutocompleteResultTest, ContextualSearchAblateOthers_AblateUrlOnly) {
   }};
   AssertResultMatches(result, expected_data);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 TEST_F(AutocompleteResultTest, AttachContextualSearchOpenLensActionToMatches) {
   AutocompleteResult result;

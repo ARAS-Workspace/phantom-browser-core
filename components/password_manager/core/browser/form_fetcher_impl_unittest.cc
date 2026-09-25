@@ -720,7 +720,7 @@ TEST_P(FormFetcherImplTest, Update_Reentrance) {
               UnorderedElementsAre(form_b, form_c));
 }
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 TEST_P(FormFetcherImplTest, FetchStatistics) {
   InteractionsStats stats;
   stats.origin_domain = form_digest_.url.DeprecatedGetOriginAsURL();

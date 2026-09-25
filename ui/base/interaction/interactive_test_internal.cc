@@ -38,9 +38,7 @@
 #include "ui/aura/window.h"
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 #include "ui/native_window_tracker/native_window_tracker.h"
-#endif
 
 namespace ui::test::internal {
 
@@ -118,12 +116,7 @@ class InteractiveTestPrivate::NativeWindowReference {
   NativeWindowReference& operator=(NativeWindowReference&& other) = default;
 
   bool IsValid() const {
-#if BUILDFLAG(IS_IOS)
-    // iOS uses a weak reference already.
-    return static_cast<bool>(window_);
-#else
     return window_ && tracker_ && !tracker_->WasNativeWindowDestroyed();
-#endif
   }
 
   gfx::NativeWindow GetWindow() const {
@@ -135,16 +128,12 @@ class InteractiveTestPrivate::NativeWindowReference {
       return;
     }
     window_ = window;
-#if !BUILDFLAG(IS_IOS)
     tracker_ = window ? ui::NativeWindowTracker::Create(window) : nullptr;
-#endif
   }
 
  private:
   gfx::NativeWindow window_ = gfx::NativeWindow();
-#if !BUILDFLAG(IS_IOS)
   std::unique_ptr<ui::NativeWindowTracker> tracker_;
-#endif
 };
 
 StateObserverElement::StateObserverElement(ElementIdentifier id,

@@ -271,8 +271,6 @@ void DwaService::RecordCoarseSystemInformation(
   // TODO(b/366276323): Populate set_platform using more granular
   // PLATFORM_ANDROID enum.
   coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_ANDROID);
-#elif BUILDFLAG(IS_IOS)
-  coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_IOS);
 #else
   coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_OTHER);
 #endif

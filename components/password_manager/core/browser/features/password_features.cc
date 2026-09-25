@@ -10,21 +10,11 @@
 #include "components/password_manager/core/browser/password_manager_buildflags.h"
 
 namespace password_manager::features {
-#if !BUILDFLAG(IS_IOS)  // Desktop and Android
 BASE_FEATURE(kActorLogin, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kActorLoginConflictingPermissionCleanup,
              base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kActorLoginLocalClassificationModel,
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_IOS)  // iOS
-BASE_FEATURE(kActorLogin, base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kActorLoginConflictingPermissionCleanup,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kActorLoginLocalClassificationModel,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_IOS)
 
 BASE_FEATURE(kActorLoginSyncsPasswordPermissions,
              base::FEATURE_ENABLED_BY_DEFAULT);
@@ -35,9 +25,7 @@ BASE_FEATURE(kActorLoginNoPermanentPermissionsAndroid,
 BASE_FEATURE(kActorLoginPermissionsUi, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif
 
-#if !BUILDFLAG(IS_IOS)
 BASE_FEATURE(kActorLoginQualityLogs, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kAndroidSmsOtpFilling, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -49,7 +37,7 @@ BASE_FEATURE(kApplyClientsideModelPredictionsForPasswordTypes,
 BASE_FEATURE(kAutoApproveSharedPasswordUpdatesFromSameSender,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)  // Desktop
+#if !BUILDFLAG(IS_ANDROID)  // Desktop
 BASE_FEATURE(kAutofillPasswordUserPerceptionSurvey,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -59,7 +47,7 @@ const base::FeatureParam<base::TimeDelta> kAwaitPageStabilityTimeout = {
     &kAwaitPageStabilityForPasswordChange, "stability_timeout",
     base::Seconds(5)};
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kBiometricTouchToFill, base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -70,7 +58,7 @@ BASE_FEATURE(kCheckIfSubmittedFormIdenticalToObserved,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kClearUndecryptablePasswords,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -79,34 +67,33 @@ BASE_FEATURE(kClearUndecryptablePasswords,
 
 BASE_FEATURE(kClearUndecryptablePasswordsOnSync,
              "ClearUndecryptablePasswordsInSync",
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
 #endif
 );
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)  // Desktop
+#if !BUILDFLAG(IS_ANDROID)  // Desktop
 BASE_FEATURE(kCredentialManagementUnifiedUi, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_ANDROID)
-
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kDebugUiForOtps, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kDisablePasswordChangeFromNewPasswordFields,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)  // Desktop
+#if !BUILDFLAG(IS_ANDROID)  // Desktop
 BASE_FEATURE(kEnablePasswordManagerMojoApi, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kEnablePasswordManagerMojoApiPhase2,
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kFallbackNoPreviewForCrossDomainCredentials,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kFetchChangePasswordUrlForPasswordChange,
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
              // Desktop only since password change is not available on mobile.
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
@@ -118,22 +105,9 @@ BASE_FEATURE(kFillOnAccountSelect,
              "fill-on-account-select",
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_IOS)
-BASE_FEATURE(kIosCleanupHangingPasswordFormExtractionRequests,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-const base::FeatureParam<int> kIosPasswordFormExtractionRequestsTimeoutMs = {
-    &kIosCleanupHangingPasswordFormExtractionRequests,
-    /*name=*/"period-ms", /*default_value=*/250};
-
-BASE_FEATURE(kIOSProactivePasswordGenerationBottomSheet,
-             "kIOSProactivePasswordGenerationBottomSheet",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // IS_IOS
-
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kTrustedVaultDesktopUnlock, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 BASE_FEATURE(kMarkAllCredentialsAsLeaked, base::FEATURE_DISABLED_BY_DEFAULT);
 

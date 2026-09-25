@@ -88,7 +88,7 @@ class SingleFieldFillRouterTest : public testing::Test {
 TEST_F(SingleFieldFillRouterTest, RouteToAllFillers_OnWillSubmitForm) {
   FormData form_data;
   size_t number_of_fields_for_testing = 3;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   test_api(form_data).Resize(3 * number_of_fields_for_testing);
 #else
   test_api(form_data).Resize(2 * number_of_fields_for_testing);
@@ -96,7 +96,7 @@ TEST_F(SingleFieldFillRouterTest, RouteToAllFillers_OnWillSubmitForm) {
 
   FormStructure form_structure{form_data};
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID)
   test_api(form_structure)
       .SetFieldTypes({UNKNOWN_TYPE, UNKNOWN_TYPE, UNKNOWN_TYPE,
                       MERCHANT_PROMO_CODE, MERCHANT_PROMO_CODE,

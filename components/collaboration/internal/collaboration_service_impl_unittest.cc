@@ -70,11 +70,6 @@ class CollaborationServiceImplTest : public testing::Test {
         ::prefs::kSigninAllowed, true);
     profile_pref_service_.registry()->RegisterBooleanPref(
         ::prefs::kSigninAllowedOnNextStartup, true);
-#if BUILDFLAG(IS_IOS)
-    local_pref_service_.registry()->RegisterIntegerPref(
-        ::prefs::kBrowserSigninPolicy,
-        static_cast<int>(BrowserSigninMode::kEnabled));
-#endif
     InitService();
   }
 
@@ -193,7 +188,6 @@ TEST_F(CollaborationServiceImplTest, GetServiceStatus_SigninDisabledByUser) {
   EXPECT_EQ(service_->GetServiceStatus().IsAllowedToCreate(), false);
 }
 
-#if !BUILDFLAG(IS_IOS)
 TEST_F(CollaborationServiceImplTest, GetServiceStatus_SigninDisabledByPolicy) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndEnableFeature(
@@ -213,7 +207,6 @@ TEST_F(CollaborationServiceImplTest, GetServiceStatus_SigninDisabledByPolicy) {
   EXPECT_EQ(service_->GetServiceStatus().collaboration_status,
             CollaborationStatus::kDisabledForPolicy);
 }
-#endif
 
 TEST_F(CollaborationServiceImplTest, GetServiceStatus_ManagedAccount) {
   base::test::ScopedFeatureList feature_list;
@@ -333,7 +326,7 @@ TEST_F(CollaborationServiceImplTest, SyncStatusChanges) {
 }
 
 TEST_F(CollaborationServiceImplTest, SyncTypeDisabledByEnterprise) {
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Set up a policy to disable Tabs.
   test_sync_service_->GetUserSettings()->SetTypeIsManagedByPolicy(
       syncer::UserSelectableType::kTabs, true);

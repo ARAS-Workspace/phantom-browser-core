@@ -1482,7 +1482,7 @@ TEST_F(TemplateURLTest, SearchSourceId) {
   GURL result(
       url.url_ref().ReplaceSearchTerms(search_terms_args, search_terms_data_));
   ASSERT_TRUE(result.is_valid());
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ("http://google.com/?sourceid=chrome-mobile&", result.spec());
 #else
   EXPECT_EQ("http://google.com/?sourceid=chrome&", result.spec());
@@ -1540,8 +1540,6 @@ TEST_F(TemplateURLTest, SuggestClient) {
   } else {
     EXPECT_EQ("http://google.com/?client=chrome-omni", result.spec());
   }
-#elif BUILDFLAG(IS_IOS)
-  EXPECT_EQ("http://google.com/?client=chrome", result.spec());
 #else
   EXPECT_EQ("http://google.com/?client=chrome-omni", result.spec());
 #endif
@@ -1566,7 +1564,7 @@ TEST_F(TemplateURLTest, ComposeboxSuggestClient) {
   features.InitAndEnableFeature(omnibox::kComposeboxUsesChromeComposeClient);
   GURL result(
       url.url_ref().ReplaceSearchTerms(search_terms_args, search_terms_data_));
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ("http://google.com/?client=chrome-mobile-aim", result.spec());
 #else
   EXPECT_EQ("http://google.com/?client=chrome-compose", result.spec());

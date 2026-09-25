@@ -131,9 +131,7 @@ std::string GetPlatformString() {
     }
   }
 
-#if BUILDFLAG(IS_IOS)
-  return "ios";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return "mac";
 #elif BUILDFLAG(IS_ANDROID)
   return "android";
