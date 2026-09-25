@@ -284,8 +284,6 @@ class BASE_EXPORT File {
   // Returns some basic information for the given file.
   bool GetInfo(Info* info) const;
 
-#if !BUILDFLAG( \
-    IS_FUCHSIA)  // Fuchsia's POSIX API does not support file locking.
   enum class LockMode {
     kShared,
     kExclusive,
@@ -315,8 +313,6 @@ class BASE_EXPORT File {
 
   // Unlock a file previously locked.
   Error Unlock();
-
-#endif  // !BUILDFLAG(  IS_FUCHSIA)
 
   // Returns a new object referencing this file for use within the current
   // process. Handling of FLAG_DELETE_ON_CLOSE varies by OS. On POSIX, the File
