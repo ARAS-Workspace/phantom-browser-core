@@ -28,10 +28,6 @@
 #include "partition_alloc/partition_alloc_constants.h"
 #include "partition_alloc/thread_isolation/thread_isolation.h"
 
-#if PA_BUILDFLAG(IS_IOS)
-#include <mach-o/dyld.h>
-#endif
-
 #if PA_BUILDFLAG(ENABLE_THREAD_ISOLATION)
 #include <sys/mman.h>
 #endif
@@ -73,9 +69,7 @@ size_t PartitionAddressSpace::zero_segment_size_ = 0;
 #endif
 
 #if PA_CONFIG(DYNAMICALLY_SELECT_POOL_SIZE)
-#if !PA_BUILDFLAG(IS_IOS)
 #error Dynamic pool size is only supported on iOS.
-#endif
 bool PartitionAddressSpace::is_core_pool_size_reduced_ = false;
 
 bool PartitionAddressSpace::IsIOSTestProcess() {

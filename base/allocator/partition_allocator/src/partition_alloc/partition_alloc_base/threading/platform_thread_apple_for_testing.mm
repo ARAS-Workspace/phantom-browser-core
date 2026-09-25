@@ -52,9 +52,6 @@ void PlatformThreadForTesting::YieldCurrentThread() {
 }
 
 size_t GetDefaultThreadStackSize(const pthread_attr_t& attributes) {
-#if PA_BUILDFLAG(IS_IOS)
-  return 1024 * 1024;
-#else
   // The macOS default for a pthread stack size is 512kB.
   // Libc-594.1.4/pthreads/pthread.c's pthread_attr_init uses
   // DEFAULT_STACK_SIZE for this purpose.
@@ -82,7 +79,6 @@ size_t GetDefaultThreadStackSize(const pthread_attr_t& attributes) {
         static_cast<size_t>(stack_rlimit.rlim_cur));
   }
   return default_stack_size;
-#endif
 }
 
 void TerminateOnThread() {}

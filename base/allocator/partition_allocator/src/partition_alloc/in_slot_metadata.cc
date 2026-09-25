@@ -47,10 +47,6 @@ bool IsInFreelist(UntaggedSlotStart slot_start,
   return false;
 }
 
-#if PA_BUILDFLAG(IS_IOS)
-std::atomic_bool suppress_double_free_detected_crash = false;
-std::atomic_bool suppress_corruption_detected_crash = false;
-#endif  // PA_BUILDFLAG(IS_IOS)
 std::atomic<void (*)(uintptr_t)> corruption_detected_fn = nullptr;
 }  // namespace
 
@@ -59,16 +55,8 @@ void InSlotMetadata::SetCorruptionDetectedFn(void (*fn)(uintptr_t)) {
   corruption_detected_fn.store(fn, std::memory_order_relaxed);
 }
 
-#if !PA_BUILDFLAG(IS_IOS)
 [[noreturn]]
-#endif  // !PA_BUILDFLAG(IS_IOS)
 PA_NOINLINE PA_NOT_TAIL_CALLED void DoubleFreeDetected(size_t position) {
-#if PA_BUILDFLAG(IS_IOS)
-  if (suppress_double_free_detected_crash) {
-    return;
-  }
-#endif  // PA_BUILDFLAG(IS_IOS)
-
   // If the double free happens very soon, `position` will be small.
   // We can use the value to estimate how large buffer we need to remember
   // freed slots. i.e. |slot_size * position| bytes.
@@ -79,25 +67,15 @@ PA_NOINLINE PA_NOT_TAIL_CALLED void DoubleFreeDetected(size_t position) {
   PA_IMMEDIATE_CRASH();
 }
 
-#if !PA_BUILDFLAG(IS_IOS)
 [[noreturn]]
-#endif  // !PA_BUILDFLAG(IS_IOS)
 PA_NOINLINE PA_NOT_TAIL_CALLED void CorruptionDetected() {
-#if PA_BUILDFLAG(IS_IOS)
-  if (suppress_corruption_detected_crash) {
-    return;
-  }
-#endif  // PA_BUILDFLAG(IS_IOS)
-
   // If we want to add more data related to the corruption, we will
   // add PA_DEBUG_DATA_ON_STACK() here.
   PA_NO_CODE_FOLDING();
   PA_IMMEDIATE_CRASH();
 }
 
-#if !PA_BUILDFLAG(IS_IOS)
 [[noreturn]]
-#endif  // !PA_BUILDFLAG(IS_IOS)
 PA_NOINLINE PA_NOT_TAIL_CALLED void
 InSlotMetadata::DoubleFreeOrCorruptionDetected(InSlotMetadata::CountType count,
                                                UntaggedSlotStart slot_start,
@@ -133,15 +111,6 @@ InSlotMetadata::DoubleFreeOrCorruptionDetected(InSlotMetadata::CountType count,
 
   CorruptionDetected();
 }
-
-#if PA_BUILDFLAG(IS_IOS)
-void SuppressDoubleFreeDetectedCrash() {
-  suppress_double_free_detected_crash = true;
-}
-void SuppressCorruptionDetectedCrash() {
-  suppress_corruption_detected_crash = true;
-}
-#endif  // PA_BUILDFLAG(IS_IOS)
 
 }  // namespace partition_alloc::internal
 

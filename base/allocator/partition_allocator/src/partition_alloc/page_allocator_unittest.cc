@@ -48,41 +48,6 @@
 
 #if !PA_BUILDFLAG(MEMORY_TOOL_REPLACES_ALLOCATOR)
 
-#if PA_BUILDFLAG(IS_IOS)
-#include <sys/sysctl.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-namespace {
-// Based on Apple's recommended method as described in
-// http://developer.apple.com/qa/qa2004/qa1361.html
-bool BeingDebugged() {
-  // Note this code is not signal safe since we only use it in this
-  // unittest, this differs from the Chromium posix
-  // `base::debug::BeingDebugged()` function. Also since we only need it
-  // for IOS the BSD code is removed.
-
-  // Initialize mib, which tells sysctl what info we want.  In this case,
-  // we're looking for information about a specific process ID.
-  int mib[] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()};
-
-  // Caution: struct kinfo_proc is marked __APPLE_API_UNSTABLE.  The
-  // source and binary interfaces may change.
-  struct kinfo_proc info;
-  size_t info_size = sizeof(info);
-
-  int sysctl_result = sysctl(mib, std::size(mib), &info, &info_size, NULL, 0);
-  PA_CHECK(sysctl_result == 0);
-  if (sysctl_result != 0) {
-    return false;
-  }
-
-  // This process is being debugged if the P_TRACED flag is set.
-  return (info.kp_proc.p_flag & P_TRACED) != 0;
-}
-}  // namespace
-#endif
-
 namespace partition_alloc::internal {
 
 namespace {
@@ -259,13 +224,7 @@ TEST(PartitionAllocPageAllocatorTest,
   // extension.
   base::CPU cpu;
   if (!cpu.has_bti()) {
-#if PA_BUILDFLAG(IS_IOS)
-    // Workaround for incorrectly failed iOS tests with GTEST_SKIP,
-    // see crbug.com/912138 for details.
-    return;
-#else
     GTEST_SKIP();
-#endif
   }
 #if defined(MTE_KILLED_BY_SIGNAL_AVAILABLE)
   // Next, map some read-write memory and copy the BTI-enabled function there.
@@ -317,11 +276,7 @@ TEST(PartitionAllocPageAllocatorTest,
   base::CPU cpu;
   if (!cpu.has_mte()) {
     // Skip this test if there's no MTE.
-#if PA_BUILDFLAG(IS_IOS)
-    return;
-#else
     GTEST_SKIP();
-#endif
   }
 
 #if defined(MTE_KILLED_BY_SIGNAL_AVAILABLE)
@@ -382,11 +337,7 @@ TEST(PartitionAllocPageAllocatorTest,
   base::CPU cpu;
   if (!cpu.has_mte()) {
     // Skip this test if there's no MTE.
-#if PA_BUILDFLAG(IS_IOS)
-    return;
-#else
     GTEST_SKIP();
-#endif
   }
 
 #if defined(MTE_KILLED_BY_SIGNAL_AVAILABLE)
@@ -481,14 +432,6 @@ void SignalHandler(int signal, siginfo_t* info, void*) {
   }
 
 TEST(PartitionAllocPageAllocatorTest, InaccessiblePages) {
-#if PA_BUILDFLAG(IS_IOS)
-  // InaccessiblePages will fail when attached to the debugger.
-  if (BeingDebugged()) {
-    GTEST_SKIP()
-        << "Skipping InaccessiblePages test because it fails when attached to "
-           "the debugger.";
-  }
-#endif
   uintptr_t buffer =
       AllocPages(PageAllocationGranularity(), PageAllocationGranularity(),
                  PageAccessibilityConfiguration(
@@ -512,22 +455,6 @@ TEST(PartitionAllocPageAllocatorTest, InaccessiblePages) {
 }
 
 TEST(PartitionAllocPageAllocatorTest, ReadExecutePages) {
-#if PA_BUILDFLAG(IS_IOS)
-  // ReadExecutePages will fail when attached to the debugger.
-  if (BeingDebugged()) {
-    GTEST_SKIP()
-        << "Skipping ReadExecutePages test because it fails when attached to "
-           "the debugger.";
-  }
-#endif
-  // Before iOS 18.6 on devices this appears to trigger a mach exception and not
-  // a fault signal, which doesn't work with the FAULT_TEST_BEGIN/FAULT_TEST_END
-  // logic. Skip on these devices.
-#if PA_BUILDFLAG(IS_IOS) && !TARGET_IPHONE_SIMULATOR
-  if (!__builtin_available(iOS 18.6, *)) {
-    GTEST_SKIP() << "FAULT_TEST not supported on iOS < 18.6";
-  }
-#endif  // PA_BUILDFLAG(IS_IOS) && !TARGET_IPHONE_SIMULATOR
   uintptr_t buffer =
       AllocPages(PageAllocationGranularity(), PageAllocationGranularity(),
                  PageAccessibilityConfiguration(
@@ -699,16 +626,7 @@ TEST(PartitionAllocPageAllocatorTest, MappedPagesAccounting) {
   }
 }
 
-#if PA_BUILDFLAG(IS_IOS)
-// MAP_JIT is not supported without the com.apple.developer.cs.allow-jit
-// entitlement which unittests do not have. To toggle W^X of pages
-// BrowserEngineKit library is needed which is not supported
-// until the 17.4 SDK.
-#define MAYBE_AllocInaccessibleWillJitLater \
-  DISABLED_AllocInaccessibleWillJitLater
-#else
 #define MAYBE_AllocInaccessibleWillJitLater AllocInaccessibleWillJitLater
-#endif  // PA_BUILDFLAG(IS_IOS)
 TEST(PartitionAllocPageAllocatorTest, MAYBE_AllocInaccessibleWillJitLater) {
   // Verify that kInaccessibleWillJitLater allows read/write, and read/execute
   // permissions to be set.
@@ -728,14 +646,14 @@ TEST(PartitionAllocPageAllocatorTest, MAYBE_AllocInaccessibleWillJitLater) {
   FreePages(buffer, PageAllocationGranularity());
 }
 
-#if PA_BUILDFLAG(IS_IOS) || PA_BUILDFLAG(IS_MAC)
+#if PA_BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40916148): Fix test to GTEST_SKIP() if MAP_JIT is in-use,
 // or to be run otherwise, since kReadWriteExecute is used in some other
 // configurations.
 #define MAYBE_AllocReadWriteExecute DISABLED_AllocReadWriteExecute
 #else
 #define MAYBE_AllocReadWriteExecute AllocReadWriteExecute
-#endif  // PA_BUILDFLAG(IS_IOS) || PA_BUILDFLAG(IS_MAC)
+#endif  // PA_BUILDFLAG(IS_MAC)
 TEST(PartitionAllocPageAllocatorTest, MAYBE_AllocReadWriteExecute) {
   // Verify that kReadWriteExecute is similarly functional.
   uintptr_t buffer =

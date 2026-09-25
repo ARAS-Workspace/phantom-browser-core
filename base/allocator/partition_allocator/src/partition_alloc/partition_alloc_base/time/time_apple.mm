@@ -15,10 +15,6 @@
 #include <cstdint>
 #include <ctime>
 
-#if PA_BUILDFLAG(IS_IOS)
-#include <cerrno>
-#endif
-
 #include "partition_alloc/build_config.h"
 #include "partition_alloc/partition_alloc_base/check.h"
 #include "partition_alloc/partition_alloc_base/logging.h"

@@ -22,8 +22,6 @@
 
 #if PA_BUILDFLAG(IS_MAC)
 #include <sys/random.h>
-#elif PA_BUILDFLAG(IS_IOS)
-#include <CommonCrypto/CommonRandom.h>
 #endif
 
 namespace {
@@ -97,10 +95,6 @@ void RandBytes(void* output, size_t output_length) {
   }
 #elif PA_BUILDFLAG(IS_MAC)
   if (getentropy(output, output_length) == 0) {
-    return;
-  }
-#elif PA_BUILDFLAG(IS_IOS)
-  if (CCRandomGenerateBytes(output, output_length) == kCCSuccess) {
     return;
   }
 #endif

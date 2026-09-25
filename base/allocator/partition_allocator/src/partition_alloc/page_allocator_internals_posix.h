@@ -48,7 +48,7 @@ void NameRegion(void* start, size_t length, PageTag page_tag);
 // entitlement, returning whether MAP_JIT should be used to allocate regions
 // that will contain JIT-compiled executable code.
 bool UseMapJit();
-#endif  // PA_BUILDFLAG(IS_IOS)
+#endif  // PA_BUILDFLAG(IS_APPLE)
 
 // |mmap| uses a nearby address if the hint address is blocked.
 constexpr bool kHintIsAdvisory = true;
@@ -84,13 +84,6 @@ uintptr_t SystemAllocPagesInternal(uintptr_t hint,
           PageAccessibilityConfiguration::kInaccessibleWillJitLater &&
       kUseMapJit) {
     map_flags |= MAP_JIT;
-    // iOS devices do not support toggling the page permissions after a MAP_JIT
-    // call, they must be set initially. iOS has per-thread W^X state that
-    // takes precedence over the mapping's permissions for MAP_JIT regions.
-    // See https://developer.apple.com/forums/thread/672804
-#if PA_BUILDFLAG(IS_IOS)
-    access_flag = PROT_READ | PROT_WRITE | PROT_EXEC;
-#endif
   }
 #endif
 

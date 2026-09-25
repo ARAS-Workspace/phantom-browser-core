@@ -41,11 +41,7 @@
 #include "partition_alloc/shim/malloc_zone_functions_apple.h"
 #include "partition_alloc/third_party/apple_apsl/CFBase.h"
 
-#if PA_BUILDFLAG(IS_IOS)
-#include "partition_alloc/partition_alloc_base/ios/ios_util.h"
-#else
 #include "partition_alloc/partition_alloc_base/mac/mac_util.h"
-#endif
 
 // The patching of Objective-C runtime bits must be done without any
 // interference from the ARC machinery.
@@ -253,13 +249,9 @@ void* oom_killer_memalign_purgeable(struct _malloc_zone_t* zone,
 // === Core Foundation CFAllocators ===
 
 bool CanGetContextForCFAllocator() {
-#if PA_BUILDFLAG(IS_IOS)
-  return !partition_alloc::internal::base::ios::IsRunningOnOrLater(17, 0, 0);
-#else
   // As of macOS 14, the allocators are in read-only memory and can no longer be
   // altered.
   return partition_alloc::internal::base::mac::MacOSMajorVersion() < 14;
-#endif
 }
 
 CFAllocatorContext* ContextForCFAllocator(CFAllocatorRef allocator) {

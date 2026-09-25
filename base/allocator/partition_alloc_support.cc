@@ -1139,14 +1139,6 @@ void PartitionAllocSupport::ReconfigureAfterFeatureListInit(
   DCHECK_NE(process_type, switches::kZygoteProcess);
   [[maybe_unused]] BrpConfiguration brp_config =
       GetBrpConfiguration(process_type);
-#if PA_BUILDFLAG(IS_IOS) && PA_BUILDFLAG(ENABLE_BACKUP_REF_PTR_SUPPORT)
-  if (brp_config.suppress_double_free_detected_crash) {
-    partition_alloc::internal::SuppressDoubleFreeDetectedCrash();
-  }
-  if (brp_config.suppress_corruption_detected_crash) {
-    partition_alloc::internal::SuppressCorruptionDetectedCrash();
-  }
-#endif  // PA_BUILDFLAG(IS_IOS) && PA_BUILDFLAG(ENABLE_BACKUP_REF_PTR_SUPPORT)
 
   // Configure ASAN hooks to report the `MiraclePtr status`. This is enabled
   // only if BackupRefPtr is normally enabled in the current process for the
