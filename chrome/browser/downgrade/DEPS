@@ -21,7 +21,6 @@ specific_include_rules = {
     "+chrome/browser/browsing_data/chrome_browsing_data_remover_constants.h",
     "+chrome/browser/profiles/profile_avatar_icon_util.h",
     "+chrome/browser/profiles/profile_shortcut_manager_win.h",
-    "+chrome/browser/web_applications/chrome_pwa_launcher/last_browser_file_util.h",
   ],
   "user_data_downgrade_browsertest\\.cc": [
     "+chrome/browser/chrome_browser_main.h",
