@@ -24,8 +24,11 @@ kopyalanmaz ve iki ağaç aynı build dizinini paylaşmaz.
   `gclient sync` çalıştırır. İşaretçi (`phantom_tools/.deps/staging/deps-synced-at`) HEAD
   ile eşleşiyorsa ve bağımlılık ağaçları yerindeyse hiçbir şey yapmaz.
 - **configure** `out/dev` için `gn gen` çalıştırır; `--fail-on-unused-args` ve
-  `--export-compile-commands="$COMPDB_TARGETS"` ile. Bayraklar değişmediyse aşamayı
-  atlar.
+  `--export-compile-commands="$COMPDB_TARGETS"` ile, her çağrıda. Bir gn dosyası
+  değiştiğinde `build.ninja`'yı ninja kendisi yeniler, ama kullandığı kural bu iki
+  bayrağı taşımaz; `compile_commands.json`'u ve kullanılmayan argüman denetimini
+  güncel tutan şey buradan koşan gn gen'dir. Argüman dosyası yalnızca farklıysa
+  yeniden yazılır.
 
   `COMPDB_TARGETS` derleme veritabanının hangi hedefleri kapsayacağını belirler ve
   varsayılan değeri `chrome`'dur. Bu sınır olmadan `gn` bildiği her hedef için bir

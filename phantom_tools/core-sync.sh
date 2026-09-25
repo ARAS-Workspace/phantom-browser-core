@@ -240,16 +240,21 @@ stage_configure() {
     # The target list rides along in the args file so that changing it re-runs gn.
     { cat "$FLAGS"; echo 'target_cpu = "arm64"'; echo "# compdb targets: $COMPDB_TARGETS"; } > "$desired"
 
-    if [ -f "$out/args.gn" ] && [ -f "$out/build.ninja" ] && cmp -s "$out/args.gn" "$desired"; then
+    # gn gen runs on every configure. ninja regenerates build.ninja on its own
+    # when a gn file changes, but the rule it uses carries neither
+    # --export-compile-commands nor --fail-on-unused-args: without a run from
+    # here, compile_commands.json keeps the graph of the last argument change
+    # and an argument whose declare_args has gone is reported by nobody.
+    local wrote_args=0
+    if [ -f "$out/args.gn" ] && cmp -s "$out/args.gn" "$desired"; then
         rm -f "$desired"
-        say "configure for $OUT_NAME is already current"
-        report configure "$started"
-        return 0
+    else
+        rm -f "$previous"
+        if [ -f "$out/args.gn" ]; then cp "$out/args.gn" "$previous"; fi
+        mv "$desired" "$out/args.gn"
+        wrote_args=1
     fi
 
-    rm -f "$previous"
-    [ -f "$out/args.gn" ] && cp "$out/args.gn" "$previous"
-    mv "$desired" "$out/args.gn"
     say "generating build files for out/$OUT_NAME"
     if ! ( cd "$ROOT" && env -u VPYTHON_BYPASS -u VIRTUAL_ENV -u PYTHONPATH -u PYTHONHOME \
         PATH="$STAGING/depot_tools:$(path_without_virtualenv)" \
@@ -258,7 +263,7 @@ stage_configure() {
             mv "$previous" "$out/args.gn"
             die "gn gen failed, the previous arguments are back in place"
         fi
-        rm -f "$out/args.gn"
+        if [ "$wrote_args" = "1" ]; then rm -f "$out/args.gn"; fi
         die "gn gen failed and there were no arguments to go back to"
     fi
     rm -f "$previous"

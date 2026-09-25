@@ -24,8 +24,11 @@ Stages of `core-sync.sh`:
   If the marker (`phantom_tools/.deps/staging/deps-synced-at`) matches HEAD and the
   dependency trees are in place, it does nothing.
 - **configure** runs `gn gen` for `out/dev` with `--fail-on-unused-args` and
-  `--export-compile-commands="$COMPDB_TARGETS"`. It skips when the arguments have
-  not changed.
+  `--export-compile-commands="$COMPDB_TARGETS"`, on every call. ninja regenerates
+  `build.ninja` on its own when a gn file changes, but the rule it uses carries
+  neither flag, so a run from here is what keeps `compile_commands.json` and the
+  unused-argument check current. The arguments file is rewritten only when it
+  differs.
 
   `COMPDB_TARGETS` decides which targets the compilation database covers, and it
   defaults to `chrome`. Without it `gn` writes a command for every target it knows,
